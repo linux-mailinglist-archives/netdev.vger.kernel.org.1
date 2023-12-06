@@ -1,137 +1,146 @@
-Return-Path: <netdev+bounces-54602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 744F1807942
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 21:19:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D339B807955
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 21:23:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DDB61F211F3
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 20:19:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81FB91F2169C
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 20:23:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 098F16F606;
-	Wed,  6 Dec 2023 20:19:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB6E6F623;
+	Wed,  6 Dec 2023 20:23:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jvWSPSl5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="C9nleJc1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DF1D109
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 12:19:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701893950; x=1733429950;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=NplvjNbEFM1WsC4sfnvrDmZLgEk7qco917sLaQ7BfYQ=;
-  b=jvWSPSl5Q/Gjal2PJqPDIuZcqp6UFXs3YftKria+ZsflJJJJT15DxoLS
-   x1YsBt/VOi8OmhE81pUOcrQXVrbyMznA9Q6ekybON32jDgo1wAf3oCngS
-   cK0FkN6rHuXn6BdxjsIj+V+y9wfhU29nN7h5Jau5NcRm1Wu5Ocb3bcIEV
-   bWi00ZmXsonfB2GTAjwj1giViA2AugLGydYrrIr63jNBe8ZlamPRDoB1D
-   KU6SafGNUaq94PJd3ox0Fdp4bUqoPp/RdUQhNlmDeiMUiawwnUkPZ0jzh
-   lWyh+Or8MGEDGaNFTBPjDWk9iIWuU7cM+2JHsF8bv69/tR8Ui04QLkvA5
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="393849133"
-X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
-   d="scan'208";a="393849133"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2023 12:19:09 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="771422076"
-X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
-   d="scan'208";a="771422076"
-Received: from jekeller-desk.amr.corp.intel.com (HELO jekeller-desk.jekeller.internal) ([10.166.241.1])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2023 12:19:09 -0800
-From: Jacob Keller <jacob.e.keller@intel.com>
-To: Intel Wired LAN <intel-wired-lan@lists.osuosl.org>,
-	netdev@vger.kernel.org
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Anthony Nguyen <anthony.l.nguyen@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH iwl-net] ice: stop trashing VF VSI aggregator node ID information
-Date: Wed,  6 Dec 2023 12:19:05 -0800
-Message-ID: <20231206201905.846723-1-jacob.e.keller@intel.com>
-X-Mailer: git-send-email 2.41.0
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2B69D4E;
+	Wed,  6 Dec 2023 12:23:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=84Czrtcy2ZdOY4+h79KmMJFEB0OGPN7K+ECAl/hY/XY=; b=C9nleJc1D1bnud5B+/8Tbghh79
+	whvs/4LG4gjAT74s1zNKdFPzP2rpGW1WNOONIwcQFF6R8nwUnXfqJJxJEqYSjCujDFjyUD0fdmZ1R
+	7xciKN5L3S4tBmCXvvz/19t8huMZX2axs7ZnS/rRI1ZdJMyB+yo+lNKt1KaRdVcKmKz6Z0koWdkMV
+	N8HioUfsQQZg/qqAtdQWlnhYgL1WdktiFzm3vgjDSopFhfnbnZNY7FS+X1bPHdKeel6hJvf91js9A
+	g0LpCzOtUsgdNvTbTYynMD+f4JUvSsnUv4ilS0tvcKB8gdbDUQBQwZ5mHzz6DWr732tlzlkoA6M7b
+	ptUrlNvw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35882)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rAyQG-0000MN-09;
+	Wed, 06 Dec 2023 20:23:08 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rAyQD-00030c-I2; Wed, 06 Dec 2023 20:23:05 +0000
+Date: Wed, 6 Dec 2023 20:23:05 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chunfeng Yun <chunfeng.yun@mediatek.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexander Couzens <lynxis@fe80.eu>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org
+Subject: Re: [RFC PATCH v2 8/8] net: ethernet: mtk_eth_soc: add paths and
+ SerDes modes for MT7988
+Message-ID: <ZXDYKeXsMuJZlzWB@shell.armlinux.org.uk>
+References: <cover.1701826319.git.daniel@makrotopia.org>
+ <3ccc33fa14310ab47e90ff8e6ce46f1562bb838e.1701826319.git.daniel@makrotopia.org>
+ <ZXDDtmRklS6o994V@shell.armlinux.org.uk>
+ <ZXDQ94Xh3gzL3IR9@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZXDQ94Xh3gzL3IR9@makrotopia.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-When creating new VSIs, they are assigned into an aggregator node in the
-scheduler tree. Information about which aggregator node a VSI is assigned
-into is maintained by the vsi->agg_node structure. In ice_vsi_decfg(), this
-information is being destroyed, by overwriting the valid flag and the
-agg_id field to zero.
+On Wed, Dec 06, 2023 at 07:52:23PM +0000, Daniel Golle wrote:
+> On Wed, Dec 06, 2023 at 06:55:50PM +0000, Russell King (Oracle) wrote:
+> > On Wed, Dec 06, 2023 at 01:45:17AM +0000, Daniel Golle wrote:
+> > > @@ -516,6 +538,21 @@ static struct phylink_pcs *mtk_mac_select_pcs(struct phylink_config *config,
+> > >  	struct mtk_eth *eth = mac->hw;
+> > >  	unsigned int sid;
+> > >  
+> > > +	if (mtk_is_netsys_v3_or_greater(eth)) {
+> > > +		switch (interface) {
+> > > +		case PHY_INTERFACE_MODE_1000BASEX:
+> > > +		case PHY_INTERFACE_MODE_2500BASEX:
+> > > +		case PHY_INTERFACE_MODE_SGMII:
+> > > +			return mtk_pcs_lynxi_select_pcs(mac->sgmii_pcs_of_node, interface);
+> > > +		case PHY_INTERFACE_MODE_5GBASER:
+> > > +		case PHY_INTERFACE_MODE_10GBASER:
+> > > +		case PHY_INTERFACE_MODE_USXGMII:
+> > > +			return mtk_usxgmii_select_pcs(mac->usxgmii_pcs_of_node, interface);
+> > 
+> > From what I can see, neither of these two "select_pcs" methods that
+> > you're calling makes any use of the "interface" you pass to them.
+> > I'm not sure what they _could_ do with it either, given that what
+> > you're effectively doing here is getting the phylink_pcs structure from
+> > the driver, and each one only has a single phylink_pcs.
+> 
+> Yes, you are right, the interface parameter isn't used, I will drop
+> it from both mtk_*_select_pcs() prototypes.
+> 
+> In the long run we may want something like
+> struct phylink_pcs *of_pcs_get(struct device_node *np, phy_interface_t interface)
+> provided by a to-be-built drivers/net/pcs/core.c...
 
-For VF VSIs, this breaks the aggregator node configuration replay, which
-depends on this information. This results in VFs being inserted into the
-default aggregator node. The resulting configuration will have unexpected
-Tx bandwidth sharing behavior.
+Again... it's not as simple as that. As soon as we get into the
+situation that some _other_ driver becomes responsible for providing
+the struct phylink_pcs pointer, we _then_ need to have some way of
+dealing with that device going away.
 
-This was broken by commit 6624e780a577 ("ice: split ice_vsi_setup into
-smaller functions"), which added the block to reset the agg_node data.
+By that I mean that the memory pointed to returned from such a function
+that you are proposing above could be freed - or worse could be unmapped
+from the kernel address space, and the same goes for the operations
+structure as well - even more so if the "ops" are part of module data
+and the module is unloaded.
 
-The vsi->agg_node structure is not managed by the scheduler code, but is
-instead a wrapper around an aggregator node ID that is tracked at the VSI
-layer. Its been around for a long time, and its primary purpose was for
-handling VFs. The SR-IOV VF reset flow does not make use of the standard VSI
-rebuild/replay logic, and uses vsi->agg_node as part of its handling to
-rebuild the aggregator node configuration.
+As I know how these discussions go (it's not my first time bringing up
+these kinds of multi-driver interations), no, locking the module into
+memory doesn't work, and shows a lack of a full understanding of the
+problem.
 
-The logic for aggregator nodes stretches  back to early ice driver code from
-commit b126bd6bcd67 ("ice: create scheduler aggregator node config and move
-VSIs")
+We need to have a way that when a PCS device is removed, that is
+propagated up the management levels and causes the PCS to be gracefully
+removed from the network driver (in other words, from phylink).
 
-The logic in ice_vsi_decfg() which trashes the ice_agg_node data is clearly
-wrong. It destroys information that is necessary for handling VF reset,. It
-is also not the correct way to actually remove a VSI from an aggregator
-node. For that, we need to implement logic in the scheduler code. Further,
-non-VF VSIs properly replay their aggregator configuration using existing
-scheduler replay logic.
+I won't accept a hack that sticky-plasters around the problem - not for
+code that I am involved in actively maintaining - and sticky-plastering
+around this class of problem seems to happen all too often in the
+kernel.
 
-To fix the VF replay logic, remove this broken aggregator node cleanup
-logic. This is the simplest way to immediately fix this.
-
-This ensures that VFs will have proper aggregate configuration after a
-reset. This is especially important since VFs often perform resets as part
-of their reconfiguration flows. Without fixing this, VFs will be placed in
-the default aggregator node and Tx bandwidth will not be shared in the
-expected and configured manner.
-
-Fixes: 6624e780a577 ("ice: split ice_vsi_setup into smaller functions")
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
-This is the simplest fix to resolve the aggregator node problem. However, I
-think we should clean this up properly. I don't know why the VF VSIs have
-their own custom code for replaying aggregator configuration. I also think
-its odd that there is both structures to track aggregator information in
-ice_sched.c, but we use a separate structure in ice.h for the ice_vsi
-structure. I plan to investigate this and clean it up in next. However, I
-wanted to get a smaller fix out to net sooner rather than later.
-
- drivers/net/ethernet/intel/ice/ice_lib.c | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 4b1e56396293..de7ba87af45d 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -2620,10 +2620,6 @@ void ice_vsi_decfg(struct ice_vsi *vsi)
- 	if (vsi->type == ICE_VSI_VF &&
- 	    vsi->agg_node && vsi->agg_node->valid)
- 		vsi->agg_node->num_vsis--;
--	if (vsi->agg_node) {
--		vsi->agg_node->valid = false;
--		vsi->agg_node->agg_id = 0;
--	}
- }
- 
- /**
 -- 
-2.41.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
