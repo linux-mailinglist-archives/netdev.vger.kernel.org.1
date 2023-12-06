@@ -1,125 +1,197 @@
-Return-Path: <netdev+bounces-54640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD192807B1A
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 23:05:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1F8B807B1E
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 23:08:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8689F2813C0
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 22:05:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEC121C20B45
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 22:08:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 060E656399;
-	Wed,  6 Dec 2023 22:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 280495639E;
+	Wed,  6 Dec 2023 22:08:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Y2e1++NN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LP0ayxyb"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A56B10C9;
-	Wed,  6 Dec 2023 14:05:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=O/XXOBx/uB/+sYdDySqcFpWuG+Hs1qkjZy8yZ4GyHZ4=; b=Y2e1++NNNL0k5c1puQ5os9Vf9b
-	SHbxPhH3TcZTG1uPKJWuHH/t7ze8afLhAPQnxR11bN2+cM1sWhxV91QG9E+35irrHxAkEQmPWOtxl
-	TxKf5sXDr4rD2JeSByZmiMok1A5MikMj9l3bKex8hLyNjOct37POcvICGs15MF3vFgV019rhPmxfZ
-	3yJ66MOXZDvJ4qw+ogU8bzx6nkFcmOqWxCbVIuzZpQyAL7XAtoLKB/Z+DUMVXutLbs+TagDBgQgIu
-	X6Qq565tvcNqwxP9tQLoQVaimO/+e4qzZwG7e3Ym7Jp5aM+t+7gLl9dn1tDsqnAka9W8baYS45hBd
-	8FJy3xrA==;
-Received: from 226.206.1.85.dynamic.wline.res.cust.swisscom.ch ([85.1.206.226] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rB01J-000Iaq-LH; Wed, 06 Dec 2023 23:05:29 +0100
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf 2023-12-06
-Date: Wed,  6 Dec 2023 23:05:28 +0100
-Message-Id: <20231206220528.12093-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E8D0A8
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 14:08:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701900491;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3cM3G3IxJYLM5tCOwlfSEThSnIq2Ia0o8pmJScU+oeA=;
+	b=LP0ayxybCAMjGUkLBJUNs2htBzsetpzYMQ6kAeuKXcQ1DOky651j49kha21z8RksbePzAJ
+	bp3yj0KJObKkI7m6YU0RALQP0u+229gchUauIFREiyStzy8ujZjmhq6ISGGVhkZg9+d4ph
+	nmn6lE6ksgeEb4zFfOzAJmsNNedzksk=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-452-TCTMitu7PCeiJZmhDmb86Q-1; Wed, 06 Dec 2023 17:08:09 -0500
+X-MC-Unique: TCTMitu7PCeiJZmhDmb86Q-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a1db7b26269so14429366b.0
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 14:08:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701900489; x=1702505289;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3cM3G3IxJYLM5tCOwlfSEThSnIq2Ia0o8pmJScU+oeA=;
+        b=io8WPt7kNGR7mNMnkN6CYiY4UgU3fZiU9EdyMWHY9YIJfWuNwLn9iQJce2rlfATmyF
+         fMAELaXpXaJ2IrjWOANRiGv8CpODpwMc9B1R7GSF/3GoIDwIfs69pTta7o3Zi3yFJCZd
+         1GCeptV2SQop7aOkHGNidUHAa083uUgVeyGvHTLfyv3eRoggqBO76zCW/37km+jFhQzI
+         giU/rIUADREgM20fgWF8fY1vv7cDJ5keBiaWmP8YCfVEgQ7wie/65dpaAqW/eFgeTvGA
+         JQEkyhfis47gdOYt80o+AFYrQn1+MUHFe9pSOs1qD2vpwRUFi7ZkvQ7gq1o/9ieqdO0B
+         9L7A==
+X-Gm-Message-State: AOJu0YyrcgIR7pFCivwcttubtGK0tx02zTXhl5YaH9QsqK5vx6IhlhA8
+	xIl+FHiqynwgUbHk+7gtB44yMOboIliUick3fK9yazbV3ZCjhTjy9P4tPj7GlG7JO9n4079AhKO
+	2IbWbQqisf7eMF8wi
+X-Received: by 2002:a17:906:225a:b0:a01:9d8b:db17 with SMTP id 26-20020a170906225a00b00a019d8bdb17mr1089766ejr.15.1701900488765;
+        Wed, 06 Dec 2023 14:08:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IELc1CseN/Lgd5NWinZpBx+NzuVrz10mseWrWKMVnwyTe6bCu+laowzD1kdbkuuvmu6nxMTFQ==
+X-Received: by 2002:a17:906:225a:b0:a01:9d8b:db17 with SMTP id 26-20020a170906225a00b00a019d8bdb17mr1089759ejr.15.1701900488420;
+        Wed, 06 Dec 2023 14:08:08 -0800 (PST)
+Received: from redhat.com ([2.55.11.67])
+        by smtp.gmail.com with ESMTPSA id d25-20020a170906371900b00a1d754b30a9sm462436ejc.86.2023.12.06.14.08.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 14:08:07 -0800 (PST)
+Date: Wed, 6 Dec 2023 17:08:02 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
+	oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v7 3/4] virtio/vsock: fix logic which reduces
+ credit update messages
+Message-ID: <20231206170640-mutt-send-email-mst@kernel.org>
+References: <20231206211849.2707151-1-avkrasnov@salutedevices.com>
+ <20231206211849.2707151-4-avkrasnov@salutedevices.com>
+ <20231206165045-mutt-send-email-mst@kernel.org>
+ <d9d1ec6a-dd9b-61d9-9211-52e9437cbb1f@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27115/Wed Dec  6 09:44:21 2023)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d9d1ec6a-dd9b-61d9-9211-52e9437cbb1f@salutedevices.com>
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+On Thu, Dec 07, 2023 at 12:52:51AM +0300, Arseniy Krasnov wrote:
+> 
+> 
+> On 07.12.2023 00:53, Michael S. Tsirkin wrote:
+> > On Thu, Dec 07, 2023 at 12:18:48AM +0300, Arseniy Krasnov wrote:
+> >> Add one more condition for sending credit update during dequeue from
+> >> stream socket: when number of bytes in the rx queue is smaller than
+> >> SO_RCVLOWAT value of the socket. This is actual for non-default value
+> >> of SO_RCVLOWAT (e.g. not 1) - idea is to "kick" peer to continue data
+> >> transmission, because we need at least SO_RCVLOWAT bytes in our rx
+> >> queue to wake up user for reading data (in corner case it is also
+> >> possible to stuck both tx and rx sides, this is why 'Fixes' is used).
+> >> Also handle case when 'fwd_cnt' wraps, while 'last_fwd_cnt' is still
+> >> not.
+> >>
+> >> Fixes: b89d882dc9fc ("vsock/virtio: reduce credit update messages")
+> >> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+> >> ---
+> >>  Changelog:
+> >>  v6 -> v7:
+> >>   * Handle wrap of 'fwd_cnt'.
+> >>   * Do to send credit update when 'fwd_cnt' == 'last_fwd_cnt'.
+> >>
+> >>  net/vmw_vsock/virtio_transport_common.c | 18 +++++++++++++++---
+> >>  1 file changed, 15 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> >> index e137d740804e..39f8660d825d 100644
+> >> --- a/net/vmw_vsock/virtio_transport_common.c
+> >> +++ b/net/vmw_vsock/virtio_transport_common.c
+> >> @@ -558,6 +558,8 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+> >>  	struct virtio_vsock_sock *vvs = vsk->trans;
+> >>  	size_t bytes, total = 0;
+> >>  	struct sk_buff *skb;
+> >> +	u32 fwd_cnt_delta;
+> >> +	bool low_rx_bytes;
+> >>  	int err = -EFAULT;
+> >>  	u32 free_space;
+> >>  
+> >> @@ -601,7 +603,15 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+> >>  		}
+> >>  	}
+> >>  
+> >> -	free_space = vvs->buf_alloc - (vvs->fwd_cnt - vvs->last_fwd_cnt);
+> >> +	/* Handle wrap of 'fwd_cnt'. */
+> >> +	if (vvs->fwd_cnt < vvs->last_fwd_cnt)
+> >> +		fwd_cnt_delta = vvs->fwd_cnt + (U32_MAX - vvs->last_fwd_cnt);
+> > 
+> > Are you sure there's no off by one here? for example if fwd_cnt is 0
+> > and last_fwd_cnt is 0xfffffffff then apparently delta is 0.
+> 
+> Seems yes, I need +1 here
 
-The following pull-request contains BPF updates for your *net* tree.
+And then you will get a nop, because assigning U32_MAX + 1 to u32
+gives you 0. Adding () does nothing to change the result,
++ and - are commutative.
 
-We've added 4 non-merge commits during the last 6 day(s) which contain
-a total of 7 files changed, 185 insertions(+), 55 deletions(-).
 
-The main changes are:
+> > 
+> > 
+> >> +	else
+> >> +		fwd_cnt_delta = vvs->fwd_cnt - vvs->last_fwd_cnt;
+> > 
+> > I actually don't see what is wrong with just
+> > 	fwd_cnt_delta = vvs->fwd_cnt - vvs->last_fwd_cnt
+> > 32 bit unsigned math will I think handle wrap around correctly.
+> > 
+> > And given buf_alloc is also u32 - I don't see where the bug is in
+> > the original code.
+> 
+> I think problem is when fwd_cnt wraps, while last_fwd_cnt is not. In this
+> case fwd_cnt_delta will be too big, so we won't send credit update which
+> leads to stall for sender
+> 
+> Thanks, Arseniy
 
-1) Fix race found by syzkaller on prog_array_map_poke_run when a BPF program's kallsym
-   symbols were still missing, from Jiri Olsa.
+Care coming up with an example?
 
-2) Fix BPF verifier's branch offset comparison for BPF_JMP32 | BPF_JA, from Yonghong Song.
 
-3) Fix xsk's poll handling to only set mask on bound xsk sockets, from Yewon Choi.
+> > 
+> > 
+> >> +
+> >> +	free_space = vvs->buf_alloc - fwd_cnt_delta;
+> >> +	low_rx_bytes = (vvs->rx_bytes <
+> >> +			sock_rcvlowat(sk_vsock(vsk), 0, INT_MAX));
+> >>  
+> >>  	spin_unlock_bh(&vvs->rx_lock);
+> >>  
+> >> @@ -611,9 +621,11 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+> >>  	 * too high causes extra messages. Too low causes transmitter
+> >>  	 * stalls. As stalls are in theory more expensive than extra
+> >>  	 * messages, we set the limit to a high value. TODO: experiment
+> >> -	 * with different values.
+> >> +	 * with different values. Also send credit update message when
+> >> +	 * number of bytes in rx queue is not enough to wake up reader.
+> >>  	 */
+> >> -	if (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
+> >> +	if (fwd_cnt_delta &&
+> >> +	    (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE || low_rx_bytes))
+> >>  		virtio_transport_send_credit_update(vsk);
+> >>  
+> >>  	return total;
+> >> -- 
+> >> 2.25.1
+> > 
 
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Ilya Leoshkevich, Magnus Karlsson, Yonghong Song
-
-----------------------------------------------------------------
-
-The following changes since commit 830139e7b6911266a84a77e1f18abf758995cc89:
-
-  octeontx2-af: Check return value of nix_get_nixlf before using nixlf (2023-12-01 12:19:02 +0000)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-for you to fetch changes up to ffed24eff9e0e52d8e74df1c18db8ed43b4666e6:
-
-  selftests/bpf: Add test for early update in prog_array_map_poke_run (2023-12-06 22:40:43 +0100)
-
-----------------------------------------------------------------
-bpf-for-netdev
-
-----------------------------------------------------------------
-Jiri Olsa (2):
-      bpf: Fix prog_array_map_poke_run map poke update
-      selftests/bpf: Add test for early update in prog_array_map_poke_run
-
-Yewon Choi (1):
-      xsk: Skip polling event check for unbound socket
-
-Yonghong Song (1):
-      bpf: Fix a verifier bug due to incorrect branch offset comparison with cpu=v4
-
- arch/x86/net/bpf_jit_comp.c                        | 46 ++++++++++++
- include/linux/bpf.h                                |  3 +
- kernel/bpf/arraymap.c                              | 58 +++------------
- kernel/bpf/core.c                                  | 12 ++--
- net/xdp/xsk.c                                      |  5 +-
- tools/testing/selftests/bpf/prog_tests/tailcalls.c | 84 ++++++++++++++++++++++
- tools/testing/selftests/bpf/progs/tailcall_poke.c  | 32 +++++++++
- 7 files changed, 185 insertions(+), 55 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/progs/tailcall_poke.c
 
