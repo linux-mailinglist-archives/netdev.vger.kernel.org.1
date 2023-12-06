@@ -1,63 +1,100 @@
-Return-Path: <netdev+bounces-54410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 965E7806FFA
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:39:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F373807005
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:42:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B88D11C20BED
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 12:39:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0ACF0281C5B
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 12:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD962D7AD;
-	Wed,  6 Dec 2023 12:39:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469DF36B03;
+	Wed,  6 Dec 2023 12:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="VxRomwY8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kqUWZKXW"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2087.outbound.protection.outlook.com [40.107.105.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3065611F
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 04:39:38 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD0CD12F;
+	Wed,  6 Dec 2023 04:41:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701866516; x=1733402516;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=JIA4MRWvRqIvY/d9J3zDIp0iTO2lkiZ206f6tRTLaz0=;
+  b=kqUWZKXWgJh29SIhrQEnTw8A5nRX5v5Y7H44b0WuaADkRTt8cmLFA+GJ
+   fAMEFfmhIw3JQmBawpb84ynF2EExtqVg9xU4vhwQyec5AKksA3gU+sbTw
+   XcyYVGY+xsXo4Mc5hW5bH2GSM93f/zSV/Loh7HeaakEiuX+3+CZEmHQTR
+   cCPIKYD/vWOWaiaKHiwyJsj1J4ogQedYqfFlBxC6Aax3Ol7XbHYUVi9/c
+   goi3SDc+TbfdqdcN4GlNEoBvh/KMlr7BJD3cRu4mmWzcx6M5lmh9/DY6o
+   YvwePs466k/tZGMGLAFEz4iHx9iY+s4Ygkk1M+AruSD6srP4EnooNp6VY
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="1149395"
+X-IronPort-AV: E=Sophos;i="6.04,255,1695711600"; 
+   d="scan'208";a="1149395"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2023 04:41:56 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="771289483"
+X-IronPort-AV: E=Sophos;i="6.04,255,1695711600"; 
+   d="scan'208";a="771289483"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Dec 2023 04:41:55 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 6 Dec 2023 04:41:54 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 6 Dec 2023 04:41:54 -0800
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 6 Dec 2023 04:41:54 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QoBKrppEOr2gWgcUahz117Tv0C0Hf/b7RXtc0OfVTerqfLIk7dyIG9ScXIe1wUYMNtPOnFr571q3QC0YENS1x+utD4G1bop4ly/BfUUflRPpDHdcleE3ErvNU/PgAIAt4PnHnHYEQD3Tiu5Pd05jrEotSl/gyZ1XDFvX17GCBYUBX/IBtA9am2nulDvmR864AK6d5qEwtSZ1QUAH7H4Jb3G1ceSD41060xjFnBTGkVFhrL4QGajaIDk3e9WZA6xqfWhaIFnzP8BsCJbYD/iO2ku+D83DPQkaUeuQYXqtvsBbG3RNKi8erVkQcC52K6m4cT98y8g1Bc0QFstEuQjngg==
+ b=iaDdHWMIH1cp4AM1DUElolAek58FmIPHp6V+/OVRn1dh/4ZRevS/a2IElV0OVcSBaWZQvGRl0JHNcuVSLAfkP5Ol2t2+N912mtWJ7Af14mLOLwCqEpXbMRQ/G54dD+FfGRsW3fTvomrpPbzbXtqfJN/63FZKURaUh9rehBC5Lk81pXjVd5I99WUrUNJFKFWoyg1ZnovyftjWH3Htka+xM/CazmEfNIFR0c5WlweG9c3OMheSxINtl55rXWOXk8F8iOUfuO9G1CoYQ9c1NwaHg4IiW4dQH7HWm9bnDRfTFg5BsZZ+zoKSZYUwyNz9jHHqBpyJAD6nO6qXGEj4ZBWVOA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GiIQGPO1OK9ONCUH44UBuPNd80+7hZ2bzSeSxKWcmjA=;
- b=IFG9beyb+lwE/zayRhrWZFtD2LrU1bT0d+Z+7uZsDdv42+/Ohk27v+Ejf2Qdgm8roKKQGlatdurd1Ap0QPTmlzGLW72k+oF193APItTXGoV/TUcPFL3Im1JKtVyzkZ1R5QkmVhZ87C0Cq3PW4U1FgoyVaI9YRMG1ToLxsHfk0afaHbz5xBsq8rw49/KKE9w4xc8Ek/32ix6oPq5ZATaTEP1GeBSD/6rqJtF51Ts69P8+Eo4F1xL8M8h9zqJ+WAAlnuehmfuQcQgEQzv9P9emxFcPMstLQi8VvLVC3w21SiMDlkKkojqhTbUtYqnTLWqmGXqK5qnjSGL9sS5ymOy4Bg==
+ bh=QeggSnmFShKdRLNzdvrfBRJaqE7lCFIb/eIVhJz9Gug=;
+ b=a9iH2AJ+I3tj+UMbWlwvbVGPdmvDW6n4/kT7u2t6GedZg7MulCKA0AozkClpb47w5iiC8JJQ3pWUAl2ZgWp19btWzZ4wkkJuL92YaMirwCDmbn3kFBzGPxJL4ipMW65Y0GOiPfN3pAZi2J8OmyUSFxB6QDqeR8liaZOOiuIeSlf9fm//grE4pr8sCGhiq5plo+z8UUIYsq5RX+vyoIKjm0PEL3/aub7GAifLRiAvaVkB/LDHwxmK3f5nDHh5eJWQZd5gghHLPSYKVZv6rPb1N7vapS46FLatBf7VcFJo8uuRBBQ2qgs11ZXsWFA20c35K2FuoYZEoup9iJOGxxXMbA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GiIQGPO1OK9ONCUH44UBuPNd80+7hZ2bzSeSxKWcmjA=;
- b=VxRomwY8s0ix/zbx7O7KZprtNZ44jahQbHKo+iEshylA9kIZ33DmcyCMELREM1cVMbVaIEOBgALhtjxrBJsAUKz3TrA3ekPdSHj/YLG4S1CmYfKrAmRIVtDbE1UDsa7vorUQtprEHO3b1FUYb6oY+lPSUprnZAajD7NqAP5+KNE=
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from GV1PR04MB9070.eurprd04.prod.outlook.com (2603:10a6:150:21::14)
- by AM9PR04MB8649.eurprd04.prod.outlook.com (2603:10a6:20b:43c::8) with
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ by SJ0PR11MB5771.namprd11.prod.outlook.com (2603:10b6:a03:424::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.25; Wed, 6 Dec
- 2023 12:39:35 +0000
-Received: from GV1PR04MB9070.eurprd04.prod.outlook.com
- ([fe80::1290:90d4:98c1:3d35]) by GV1PR04MB9070.eurprd04.prod.outlook.com
- ([fe80::1290:90d4:98c1:3d35%7]) with mapi id 15.20.7068.022; Wed, 6 Dec 2023
- 12:39:34 +0000
-Date: Wed, 6 Dec 2023 14:39:32 +0200
-From: Ioana Ciornei <ioana.ciornei@nxp.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] dpaa2-switch: fix size of the dma_unmap
-Message-ID: <fqvqnvzkzzwsqjyofhhaf3t3252v6bxtgk5ypunii2fannyp27@tfy2aydldudo>
-References: <20231204142156.1631060-1-ioana.ciornei@nxp.com>
- <b33f982180788cd6b68fa1cd4af40ad6f65cb905.camel@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b33f982180788cd6b68fa1cd4af40ad6f65cb905.camel@redhat.com>
-X-ClientProxiedBy: AS4P191CA0005.EURP191.PROD.OUTLOOK.COM
- (2603:10a6:20b:5d5::15) To GV1PR04MB9070.eurprd04.prod.outlook.com
- (2603:10a6:150:21::14)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Wed, 6 Dec
+ 2023 12:41:47 +0000
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::36be:aaee:c5fe:2b80]) by DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::36be:aaee:c5fe:2b80%7]) with mapi id 15.20.7046.034; Wed, 6 Dec 2023
+ 12:41:47 +0000
+Message-ID: <2a0f3c2a-71fe-4c79-8827-e53088bf3761@intel.com>
+Date: Wed, 6 Dec 2023 13:40:07 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 iwl-next] i40e: Use correct buffer size in
+ i40e_dbg_command_read
+Content-Language: en-US
+To: Kunwu Chan <chentao@kylinos.cn>
+CC: <jesse.brandeburg@intel.com>, <anthony.l.nguyen@intel.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <jeffrey.t.kirsher@intel.com>, <shannon.nelson@amd.com>,
+	<kunwu.chan@hotmail.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Simon Horman <horms@kernel.org>
+References: <20231205095844.2532859-1-chentao@kylinos.cn>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <20231205095844.2532859-1-chentao@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR3P281CA0011.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:1d::17) To DM6PR11MB3625.namprd11.prod.outlook.com
+ (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,89 +102,143 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: GV1PR04MB9070:EE_|AM9PR04MB8649:EE_
-X-MS-Office365-Filtering-Correlation-Id: 78ac32f6-53b0-47b9-3fb4-08dbf65866f1
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|SJ0PR11MB5771:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1e03a9c3-6fde-4716-fd19-08dbf658b54e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	eWcnUZNK4c6NNdcfmITo7GjyYXHdDO9yvmJ44xGIJCULMvuo0lk5LO5C4oXl0tCLAGLnOfP0VXZVm5okYkuarOsobnn6db5+DJ5gyJyylXAwGsN2KUNiL08ovECsghf0Nil+jpDh+ueIz2NK6cf8Bc0GjdvVNiw/vSPPRvBeIfRj0wU5xMPwIvaoHB6iGOmQSW362rU6RyzdX8Kso0/FxWYoIdfWEPE4YfhnWva2XxFODdt0tECQ7MlWZKaKA+ewxYTe3aASRJ+NNBftN3VZA4LAsNuTAbGIOuc7+6euQUj4ORq2pklC6pILasOSdyoPheRGBVL4qGjyEgijoZmthc974IwYH6S+7dEPOf5nTwf0r5NUxrvWSF4ONcryCb9zBKxPhMOiLpyAF5SV1hf0pFThwDaBb1k74Cj5xO4ex2rAwnDNh18JzaR1hxW2A0zP4vIluxHioBYvQXTRV4P1h4uDPga4bXtg1gseWUWkQjhvWNy1spMnBEyTe5ELBziRb9Vdtze5UmH61/lnfst3RD/VKVlh8Kxc4xff4p8HxZRooYjUJvSPs5j3hlzBjSyz
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9070.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(136003)(396003)(346002)(39860400002)(376002)(230922051799003)(186009)(1800799012)(451199024)(64100799003)(6916009)(5660300002)(66556008)(66476007)(66946007)(478600001)(44832011)(2906002)(6486002)(8676002)(4326008)(8936002)(316002)(6506007)(6512007)(9686003)(26005)(41300700001)(83380400001)(33716001)(86362001)(38100700002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: T+7SGRrBBmWg/ggrm7X4Bp93vAFYpPGHZJqhG0f1Af3REu6eUqZIqQs1MdE7jnZa2pJeo/X7xSB/BhE1BXY5LBG0RsDtdFuvbqK4uoor3uFJAWrSSnuKa+Dkz0PNU/rO2TJnPGm8ZzeTDEzMEUpgJh7J6zeZ+UD+wFpX2HXKzKDUKZF4LnRWBTYbMBRiD2Vgaf7AffCHYX9UEoXu3utH6w2R5na0ZuUoP4XWEZSxCnLdftn8KoC4nXF6wg7Hau3iLZsM50kyMyQ0fP9eiL9OxQp/OyQglKxxTGCY6vaFDCDOIapGoHQS5ivHcUQyIFpvTtrP5NWoB3fKsX+hOqm5T7i9c6HhjSF/8Mra5lbbj+pwWed6Ehv7x9TNhfwpVcK2DOovCGEXdgUYyAZaBD+eusS0pHgUJLTe2Mu4weGdlqgOGwFmbHEBjVmmUF24U78ktT8cHpCPaKUT6fW7Hx7uQHjfkXKHJQeBEIIauhFWfHw2fbtyQgXtJfAbSUcNYliZ3VuuqMBOqz5CfLzwllZdagTNImoK3HK7ErMCxvJHr76ma5M+YtuNY3F5iFsRhMsNs0XDes/bXUZEqyNhxEGADjYfUXsvkV8pukKMptyYOkMpeBpi1vu0gAH9D9T7OWzWlE51my6+k77GCJ7CBg85Jg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(136003)(366004)(39860400002)(346002)(396003)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(31686004)(26005)(2616005)(82960400001)(36756003)(38100700002)(31696002)(86362001)(6666004)(83380400001)(5660300002)(7416002)(66476007)(6506007)(6512007)(66556008)(8676002)(8936002)(6486002)(4326008)(66946007)(6916009)(316002)(41300700001)(2906002)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?SnXEjknWVBAt4O2TDcym4NmmRVLqedQ3kAEk/K/MhsrsxU6Z6ARoJv5D3bBe?=
- =?us-ascii?Q?jZppH7qvfO8yjA+ko0X84qgUFnNod/gXUCR/X/eBHSzAgVFycW6HU+fd3vmI?=
- =?us-ascii?Q?OWHimv/6RfzsqcOkW5SjHfKGd1FaAF2bJPQElxPdjngWUj/pi6xuYRrSrwPh?=
- =?us-ascii?Q?wCnV39EXKm8JEApUvt30kfvd0wPGiub7Y75lvkfoWy/j61suTCZJlJ4y9KIH?=
- =?us-ascii?Q?Rnas3vU6LM2EnLllDonWtnqcQVuGcDnqEG4gqy3OaZtlml1xZFESvqCI+edh?=
- =?us-ascii?Q?OEFGyRR+VyL5KguUrYm4Lu44eGdxnoL5pyEihO2GBCDb99IixxITcDWegtYN?=
- =?us-ascii?Q?y/mcmUiwcRHcfptSc5q/nRZxvKXTtFMGon9HMgtUf0GdD3w+eyC8Nc8ADLtt?=
- =?us-ascii?Q?KfqdfDCaVovSbkV8U2YWLaMuHAojbqf/Ay8yPznypPlOuBIyhRxj3nrVm+BA?=
- =?us-ascii?Q?mdzkDxErpNG0qapH1FUnGpZlo7RhRVYxqfsM5Cqvrwo5BaTv0g2p/GHh67g5?=
- =?us-ascii?Q?6adcQJWyGVAUOjw4bUD+oCn+Znq8P5bD3hP+e/U3aUcBxC1Ylo6fT8uWPMw/?=
- =?us-ascii?Q?e6RE67iKWq/pmWUIoi02OCKJKBRp972sk7Rd/PIKD9zcuaI+WhWxjC05D+JN?=
- =?us-ascii?Q?oy8Kw1K5kjwiIbB2QEG2ADtwhOw40WU1W9N4Vl5o/9huQlQf7LHTqd6EH0bA?=
- =?us-ascii?Q?QuOuMH+iTQ+TCJkhed8jowklScS4LIJce5J5RTt6CUiqTJqKbGCxsx41Wyde?=
- =?us-ascii?Q?jmL6lQ8pAag27YVGu0ToDcznh+KYicyIzGbfD3X2iD3jXvYAUZluQWfjrikT?=
- =?us-ascii?Q?38Ds7vOZECa3BJYp0Ygzc2RMrVYouX7n8d8bZtMLxxNaRJJOTiXCWZlq14su?=
- =?us-ascii?Q?m6oVrSOGAsTIrTejeHQ/w9OCRx8X7QLknvlPWTOm7IrbqyW0ZLu1j1rSIJmd?=
- =?us-ascii?Q?RErG98Ymxdv1Kj0mTlgb0FCYkNxPU7Cl4aPMlkiYAjFE4WS7MDI1qC3aSDHh?=
- =?us-ascii?Q?VQ/MKl1TR5MWNd3s88RTYZ7PqRnfb5AqD0gem3zg7oKNv3eSH3gcAbDGPt4O?=
- =?us-ascii?Q?MrRUpHytu0NYfeLnalJgoM+ml2+cd6hr5qNGSE/nLRR9qMaCkZcYwmw2vNAt?=
- =?us-ascii?Q?/0gxSellPh2HYMsD69n1F7YW/L3jJIxtvfABG6asCOETQCe4kaUQLs4u15E5?=
- =?us-ascii?Q?xmpuTHQa0T5eRlnRgxLaaJjnrec4W5mCexgy12lbP35ktUt5CG6mpCHH9hML?=
- =?us-ascii?Q?3KE8FGvtssiI/zAeTScmKpE0tbHHhPo8xk0sYLnY8TdorhfwxeZYKepB3AQr?=
- =?us-ascii?Q?yYmUJ7M/It8k50ytx0ODdXzi3SsZY8F8VrT7nNcV3zLLrl6BpL0pavxXQTy5?=
- =?us-ascii?Q?jnIsSa0EftDwWfAtAqHisctfgDb+NaeMHaNe3bbn8tXkqiOo91qR9KsG8cVB?=
- =?us-ascii?Q?4tL6vji7CwfcSKxXKYBCHU/N+oYIFqgeWMz8zkz2BX+BCdDdbhi1b5td7Mzr?=
- =?us-ascii?Q?pG0oOzM6Qzrdz28LLKQkwSupLF1AWFDXiKw1OVmg+05aGh7zZzTRRerYt+B5?=
- =?us-ascii?Q?MlOWkZl4IBdUhhCSAyhMHMAv6RuR36+a523MJpNz?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 78ac32f6-53b0-47b9-3fb4-08dbf65866f1
-X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9070.eurprd04.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZEllYncxZ05RNEhJbStoNjVmQ0VybDFiU1UyMU1QMko4dGg5T0tnc0EzcW9W?=
+ =?utf-8?B?aURGOGhSQXJRMld2aXA0QmVoTGtEdjU5bTNkcmJvdFd1elErdWpZaFcvQUl1?=
+ =?utf-8?B?UVRTS3p3eWFtdllSUmJscjN3TFR2Z0RRVlQ0QkgrNXhWKy9wNGlhV3IrdzZr?=
+ =?utf-8?B?djMyekMweGE4cmNkSzdld0w2REwwT0t1WktqUHNqdzY3eGhTZUp6U0dBYmdP?=
+ =?utf-8?B?ODRWZEw3L1lOK0pHbFhMSjl6TStPTnB1Vks4RkdUcGx6WXJDaFgyR0wvMDR1?=
+ =?utf-8?B?a3VDNytBRGVVUDlQT3ZnVEl5WmY0MzI5WGdRL3d5WkZxb2I4Ni9vR1QwdkZC?=
+ =?utf-8?B?S3JzYjYrUG1ta3lGQ0tOUGhPTStQazZxM0JMU3l5cFVPYld5VWJiUlVLNkto?=
+ =?utf-8?B?R1pDcjhRZ2ZMYTlNeHBDMjlRb2s5SVlhZUJ5ODZBbE9FOGhLZDNOZmJEWWZS?=
+ =?utf-8?B?TDdwK1BlREhSV29wbWdqaW9EV0loNll3OTA5WCtsaHZnWWhucloreHNFelZn?=
+ =?utf-8?B?MTJSYzlhZjBLQTZuTGM1VndGUyt0ZCtDb1JUOFFiNTZ3ZERMKzBrdndLbkxH?=
+ =?utf-8?B?MXpBZXBJcExYcGFLTjFvZEtGeWw4TUpzZVdrU3VHd2JjeW0xWXVnSnFXU1Zp?=
+ =?utf-8?B?UU1YeGd1b1JZOHV3ZjZLSWZoaHJJZkRqNWthZlJuTG9TUmFDOENPZk5XOElN?=
+ =?utf-8?B?NkcwaGFzQUI5cXZkOWd1ZWpDVzdRU1loaWhWTis0VisrM0hYNHVnSDRVUUc0?=
+ =?utf-8?B?azZGSW0yVXNUYmpkNVdxRGhhOUJGb0ZLd2MwM1RDUVBtaW1UdkRNT214bko4?=
+ =?utf-8?B?QVRvUGNyaThZQ3lNTFhFREF1bmloUTMvVWwxSDU3amxqSGUxdGtsM0dQV3pW?=
+ =?utf-8?B?TTlLd2JxR3pQKzExNzVOdXUycWFWZ1M2OHNlbmxETmYzejFOQWt5RDg5N0xO?=
+ =?utf-8?B?MzJCYk5pVUpWcksxVTBETFBHdGJwNGJhdk1EZDh1amw4akR2VTRlcFdhdndz?=
+ =?utf-8?B?MFFCdTluOXFXQzhjcHVpdXYzNzNnTTNaSlNOR2VMWkU4U21nWlgzVkZkYlcx?=
+ =?utf-8?B?cG9xSTB3ZzNpUU0vVWFxZkxNblFlaE9abnFOQ2ZUTEdOYktwMUo4cEc5LzAw?=
+ =?utf-8?B?Z2tPbU11SUxTRnRmNTNaV0lNcittcXhVcVlxSExyWENlS3VwV09Qam5KbEQ4?=
+ =?utf-8?B?ek82M0hDRHVjQ0tzVW1OMDI5djhFU3crZW9RNkVzK3BhZ0hTeEpJYjdvRzFV?=
+ =?utf-8?B?ZXlFUzV2eHFRWjNoZmpzZTM2ZFpCZ09yTmVvWHdsQkRPSGxRcGZ1VEhveisx?=
+ =?utf-8?B?ZGM5enIza3poTllnY0Z2aHV2QjZoMmJJLzRrbnhJdUNURXdleXVya1JRbzhq?=
+ =?utf-8?B?WlgxT1czNHRvVVhBenJiSmFVU1FIMmdMMlhwN2Y3ZlFMOXhCY0dxTVFwU0d6?=
+ =?utf-8?B?aVM3YXE2MXdPbmhTVk9xNDhNUGJZSTdSd21xblNWblBjNnI4WnFLbmMzL1dS?=
+ =?utf-8?B?YkFXcGJJUUFTc2dqbkk4eE9jM2RaLzA1VmNNNDMxWDBlN1I1RlFrQWEva2N1?=
+ =?utf-8?B?aDZuK2ZkcTR3a01sT0d1VEkxa0ZMdWtYUVh6K1BUaEpZc2VhdzhZSnJ5WFNa?=
+ =?utf-8?B?ZzNQSXJ2dnM1dDZuZHhrY3NQelU2WmM2UEgweWVzcGx6WXF3MEFZc0RTUXlr?=
+ =?utf-8?B?QUhNT0ZOK056U09TRDhNeTM3RFlKN25pN0dSdGpRZEdBV3ozU2RJY2VGZk11?=
+ =?utf-8?B?RkRTazNOb2ZVWTE4QW50blZnWnh5YTdKQ3BidDlGYnNLWFU3SGtWdXY5TWo3?=
+ =?utf-8?B?clBZN2U3SDZaYmNIVmEwV1JkNThrUkpxaG9TU3FrREpJYXVSdnM1UXhERCtS?=
+ =?utf-8?B?c1pPNFlFSEJ0cjFZbENpUjdseHdCMklranNZaUkxVm94OWsvOEcwU0tEMkU2?=
+ =?utf-8?B?eUZOVmEyWkw0SkU3YlJJSS9qK1pXL1ZaeFhVMlN6MFNiZnZvVFoxOFFPOThl?=
+ =?utf-8?B?UTF2YmhCYVZ4Vi90b2VuSFEvYWNXSVB2VXdMbUd1VGVzaFVRUXN0cDNWR0RJ?=
+ =?utf-8?B?MVlCTlJNK0srVXZHcFFZZzBuRGFzSk00ZHVaVHlRUGpzSUJqd2FobHczUzgw?=
+ =?utf-8?B?d01NbG8yUTR4M1d3VUdReTk0T01XTzBKMVRkZHltb0oxTTdWbW04RUVBOGcr?=
+ =?utf-8?B?OGc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1e03a9c3-6fde-4716-fd19-08dbf658b54e
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2023 12:39:34.9511
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2023 12:41:46.4758
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HMEGdPEG6g839UW9KixSac098q2ezfGXCq2gAza2hClC+KEFtmuwNvH+G90zvs+1njLjT1uyFL8KafTkfiedtQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8649
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ufn/FARhyFmLevttqrC2W7WjakehojcDtvTNf//FKu5Fb3TgFipK9Y8W+YdJ4vxcBSEL4Buo1MpvvDGnUEZbj/ftgJYa/X8qxnB9XD3f6o8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5771
+X-OriginatorOrg: intel.com
 
-On Wed, Dec 06, 2023 at 12:04:17PM +0100, Paolo Abeni wrote:
-> Hi,
-> On Mon, 2023-12-04 at 16:21 +0200, Ioana Ciornei wrote:
-> > The size of the DMA unmap was wrongly put as a sizeof of a pointer.
-> > Change the value of the DMA unmap to be the actual macro used for the
-> > allocation and the DMA map.
-> > 
-> > Fixes: 1110318d83e8 ("dpaa2-switch: add tc flower hardware offload on ingress traffic")
-> > Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
-> > ---
-> >  drivers/net/ethernet/freescale/dpaa2/dpaa2-switch-flower.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch-flower.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch-flower.c
-> > index 4798fb7fe35d..609dfde0a64a 100644
-> > --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch-flower.c
-> > +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch-flower.c
-> > @@ -139,7 +139,8 @@ int dpaa2_switch_acl_entry_add(struct dpaa2_switch_filter_block *filter_block,
-> >  	err = dpsw_acl_add_entry(ethsw->mc_io, 0, ethsw->dpsw_handle,
-> >  				 filter_block->acl_id, acl_entry_cfg);
-> >  
-> > -	dma_unmap_single(dev, acl_entry_cfg->key_iova, sizeof(cmd_buff),
-> > +	dma_unmap_single(dev, acl_entry_cfg->key_iova,
-> > +			 DPAA2_ETHSW_PORT_ACL_CMD_BUF_SIZE,
-> >  			 DMA_TO_DEVICE);
+From: Kunwu Chan <chentao@kylinos.cn>
+Date: Tue, 5 Dec 2023 17:58:44 +0800
+
+> The size of "i40e_dbg_command_buf" is 256, the size of "name"
+> depends on "IFNAMSIZ", plus a null character and format size,
+> the total size is more than 256.
 > 
-> I see a similar unmap in dpaa2_switch_acl_entry_remove() that looks
-> like being affect by the same issue. Why a similar change is not needed
-> there?
+> Improve readability and maintainability by replacing a hardcoded string
+> allocation and formatting by the use of the kasprintf() helper.
 > 
+> Fixes: 02e9c290814c ("i40e: debugfs interface")
+> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+> Suggested-by: Simon Horman <horms@kernel.org>
+> Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 
-My bad, it's needed there also.
+Your Signed-off-by must be the last tag in the block.
+Perhaps the maintainer could fix it when taking, so that you wouldn't
+need to send a new version only due to that.
 
-Thanks!
-Ioana
+> ---
+> v2
+>    - Update the size calculation with IFNAMSIZ and sizeof(i40e_dbg_command_buf)
+> v3
+>    - Use kasprintf to improve readability and maintainability
+> v4
+>    - Fix memory leak in error path
+> ---
+>  .../net/ethernet/intel/i40e/i40e_debugfs.c    | 20 ++++++++++---------
+>  1 file changed, 11 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+> index 88240571721a..78a7200211b2 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+> @@ -72,29 +72,31 @@ static ssize_t i40e_dbg_command_read(struct file *filp, char __user *buffer,
+>  {
+>  	struct i40e_pf *pf = filp->private_data;
+>  	int bytes_not_copied;
+> -	int buf_size = 256;
+>  	char *buf;
+>  	int len;
+>  
+>  	/* don't allow partial reads */
+>  	if (*ppos != 0)
+>  		return 0;
+> -	if (count < buf_size)
+> -		return -ENOSPC;
+>  
+> -	buf = kzalloc(buf_size, GFP_KERNEL);
+> +	buf = kasprintf(GFP_KERNEL, "%s: %s\n",
+> +			pf->vsi[pf->lan_vsi]->netdev->name,
+> +			i40e_dbg_command_buf);
+>  	if (!buf)
+>  		return -ENOSPC;
+>  
+> -	len = snprintf(buf, buf_size, "%s: %s\n",
+> -		       pf->vsi[pf->lan_vsi]->netdev->name,
+> -		       i40e_dbg_command_buf);
+> +	len = strlen(buf) + 1;
+> +	if (count < len)
+> +		bytes_not_copied = -ENOSPC;
+> +	else if (copy_to_user(buffer, buf, len))
+> +		bytes_not_copied = -EFAULT;
+> +	else
+> +		bytes_not_copied = 0;
+>  
+> -	bytes_not_copied = copy_to_user(buffer, buf, len);
+>  	kfree(buf);
+>  
+>  	if (bytes_not_copied)
+> -		return -EFAULT;
+> +		return bytes_not_copied;
+>  
+>  	*ppos = len;
+>  	return len;
+
+For the code:
+
+Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+
+Thanks,
+Olek
 
