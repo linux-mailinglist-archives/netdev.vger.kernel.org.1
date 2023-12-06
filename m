@@ -1,113 +1,66 @@
-Return-Path: <netdev+bounces-54256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D0408065EE
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 05:00:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9DAC8065F3
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 05:02:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F5161C20AA2
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 04:00:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 629D21F21420
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 04:02:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FE78DF46;
-	Wed,  6 Dec 2023 04:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77ACBDDCA;
+	Wed,  6 Dec 2023 04:02:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZYE/lnhN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jjDu4Syq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3EB9D52D;
-	Wed,  6 Dec 2023 04:00:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4EAC3C433C7;
-	Wed,  6 Dec 2023 04:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C168D286
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 04:02:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A2DCC433C8;
+	Wed,  6 Dec 2023 04:02:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701835226;
-	bh=Ch1hvqB7GoU/Da3vC7CIzaXtBMwgu6lLK49eDRsfEOE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZYE/lnhNZ3fA7P/wA+eB9LFbhPHXs3kAIOnr+YOv9rCZ7ppJ3BYKlspx+veJIu9IR
-	 1tlRQS64na1gSBNEEIFPG9UqDgeWg3Pzkh7R/92HmqN1NPxi17zWLTaO9Y61cgTzXF
-	 ImL8dzW3qa2OpjM0VveLuVfHJ74VtOrtCgufpD1OwFK9ndVEF0GNaKnIrnG6pqU5R5
-	 Jbz4BGfJON0+RNpKFFJFdJBwzRVA0W5LIzCXZ1yCu+rM2YNdydCpYqGZxpJ9duTFKY
-	 pxXFLizsaqjyP1mldslbUD4XscngoE7J7MOFl2QNIYfkK+YxeNha9XX74dRmWfsoLm
-	 C1zuuBh2FM9WQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 30028C41671;
-	Wed,  6 Dec 2023 04:00:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1701835353;
+	bh=f6TUQi8YLonQSXR1Mwy5Ic6tqKo5drSWb160rTjbLJw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jjDu4Syql+aC4BpMWIQK9tsITUMj6q3ueujPYpxdCYjDZ0yFfvNnUSLze1H1711BE
+	 uQcFfhwd4CLE8HxM1RdD51PcgIqDDVrNaLBOKzPrbAxzjA7/Ckj9JlRLLegvDDRwSd
+	 IoxyT2wwp+QkbK3gqM8qmxpCaz8Ssn2hCzcICAorNquRopWi6TX4cjOYia4NwDT7cX
+	 ji76nJ93z2W95uu9ByVZ+jfIeeBh4tEVtJ1bTJ0+tQqgbf4HdLFcVS0VVnRw9q+tUI
+	 UUg9KaB/SDhWe8NaKL9b29fQ0ksBl5ZQVFQ/XcoLzJC+vlhne3t7Ps/m7r6LestrNI
+	 Irc8CSYO66K7g==
+Date: Tue, 5 Dec 2023 20:02:32 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ioana Ciornei <ioana.ciornei@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH 5/8] dpaa2-switch: do not clear any interrupts
+ automatically
+Message-ID: <20231205200232.410387cc@kernel.org>
+In-Reply-To: <20231204163528.1797565-6-ioana.ciornei@nxp.com>
+References: <20231204163528.1797565-1-ioana.ciornei@nxp.com>
+	<20231204163528.1797565-6-ioana.ciornei@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/9] net*: Convert to platform remove callback
- returning void
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170183522618.32207.8967841669098706210.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Dec 2023 04:00:26 +0000
-References: <cover.1701713943.git.u.kleine-koenig@pengutronix.de>
-In-Reply-To: <cover.1701713943.git.u.kleine-koenig@pengutronix.de>
-To: =?utf-8?q?Uwe_Kleine-K=C3=B6nig_=3Cu=2Ekleine-koenig=40pengutronix=2Ede=3E?=@codeaurora.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, elder@kernel.org, netdev@vger.kernel.org,
- kernel@pengutronix.de, mkl@pengutronix.de, nnac123@linux.ibm.com,
- ansuelsmth@gmail.com, clement.leger@bootlin.com, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk,
- linux-renesas-soc@vger.kernel.org, qiang.zhao@nxp.com,
- linuxppc-dev@lists.ozlabs.org, linusw@kernel.org, kaloz@openwrt.org,
- linux-arm-kernel@lists.infradead.org, stephan@gerhold.net, agross@kernel.org,
- andersson@kernel.org, konrad.dybcio@linaro.org, loic.poulain@linaro.org,
- ryazanov.s.a@gmail.com, johannes@sipsolutions.net,
- linux-arm-msm@vger.kernel.org, alex.aring@gmail.com,
- stefan@datenfreihafen.org, miquel.raynal@bootlin.com,
- linux-wpan@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon,  4 Dec 2023 19:30:40 +0100 you wrote:
-> Hello,
+On Mon,  4 Dec 2023 18:35:25 +0200 Ioana Ciornei wrote:
+> The dpsw_get_irq_status() can clear interrupts automatically based on
+> the value stored in the 'status' variable passed to it. We don't want
+> that to happen because we could get into a situation when we are
+> clearing more interrupts that we actually handled.
 > 
-> (implicit) v1 of this series can be found at
-> https://lore.kernel.org/netdev/20231117095922.876489-1-u.kleine-koenig@pengutronix.de.
-> Changes since then:
-> 
->  - Dropped patch #1 as Alex objected. Patch #1 (was #2 before) now
->    converts ipa to remove_new() and introduces an error message in the
->    error path that failed before.
-> 
-> [...]
+> Just resort to manually clearing interrupts after we received them using
+> the dpsw_clear_irq_status().
 
-Here is the summary with links:
-  - [net-next,v2,1/9] net: ipa: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/a92dbb9cdf04
-  - [net-next,v2,2/9] net: fjes: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/2ce19934a4dc
-  - [net-next,v2,3/9] net: pcs: rzn1-miic: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/e36dc85c245f
-  - [net-next,v2,4/9] net: sfp: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/bb1afee98466
-  - [net-next,v2,5/9] net: wan/fsl_ucc_hdlc: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/2d0c06fd39be
-  - [net-next,v2,6/9] net: wan/ixp4xx_hss: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/2d8590858753
-  - [net-next,v2,7/9] net: wwan: qcom_bam_dmux: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/a06041e2f4ae
-  - [net-next,v2,8/9] ieee802154: fakelb: Convert to platform remove callback returning void
-    (no matching commit)
-  - [net-next,v2,9/9] ieee802154: hwsim: Convert to platform remove callback returning void
-    (no matching commit)
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Currently it can't cause any issues?
+We won't get into an IRQ storm if some unexpected IRQ fires?
 
