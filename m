@@ -1,69 +1,72 @@
-Return-Path: <netdev+bounces-54278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D63D480669E
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 06:36:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 157518066C9
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 06:56:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 599681F211AE
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 05:36:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD826281D9C
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 05:56:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1FA7101C3;
-	Wed,  6 Dec 2023 05:36:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDB71107BF;
+	Wed,  6 Dec 2023 05:56:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XcVQX36T"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eYZn90gG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09E901A2
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 21:35:57 -0800 (PST)
-Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-40c0873cf84so38978575e9.1
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 21:35:56 -0800 (PST)
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEF311BC
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 21:56:11 -0800 (PST)
+Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-33334480eb4so477225f8f.0
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 21:56:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1701840955; x=1702445755; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1701842170; x=1702446970; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
          :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qzthnNL0UkewQ0fO1K+PfqxIntdCT/Ts1fLBxjOArOk=;
-        b=XcVQX36TMvPD/G2D+hD5VCKJVoAA7budWGdvmim5wokrfSrrhd3M/hb1+sUDfCJbu/
-         E71IPpuerQE9GSt+k73wdoCV34B0oTMqV0akrmvzPUS5pH5SBB3tX0dT873ZP83qh7LC
-         F794xw3ckH4bMHfB0ezw3SK4u8QyCOTGHfBMnHaJj9gTrEElpGXELk0L3bbrZYC23zfF
-         xygUkJiY4RNOX7Uu/0wcH/d8wmYGmucJUMheyOxfEGRDVmBlTIT0llMg9VraXxvVUQAo
-         VAfuRnlo7JXLGA/Ppaz9pPNnxMWIYVZ4IZAxVMRTy9/p8LrZuZmDqXlq8DWj/AGK3G3j
-         iIDw==
+        bh=YX4MAqN/nDup4qMOCc0EzTmKzTOsFfxIwVqJEAFEG5A=;
+        b=eYZn90gGb5jE3i8EoAGo8TxzxZD18cZ2Cjp7tpqEy89liY2VdXEw6AnDuUw9NNoUyH
+         KU2nnNwP+hOFAIMDsTNyksxZLevmMhf7WRB50WZX8rl/MEZoRSVnZoAMl2u9WtbOMxKM
+         r+jO/t6v89WmLKmAt1a+GNpauXFYOtIk3Vqd2ndto0QAbCd+eycPN95TyI6sx2zSwKW4
+         YYbZrCCsh1OF5cZ4FkI2XuIAkmjKYrdSre67XuSUtkHKuhHNzWjR7YQIQF6/rHXIXLtm
+         fRlP6FJ4tNwcFRRrZ4U9kDh27/mXjkZu4meviuRkhWxq+gT6BQJWO5OXez9uJzAXs9H8
+         7GsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701840955; x=1702445755;
+        d=1e100.net; s=20230601; t=1701842170; x=1702446970;
         h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
          :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=qzthnNL0UkewQ0fO1K+PfqxIntdCT/Ts1fLBxjOArOk=;
-        b=cJGafaVlbuUUCFkXUwSTMeV4Qz03G7RdpYlx/0WELH7+lGpydnvkz4AzhagKNMfu7c
-         h7lN44oTYIKopBpa96mJkRcVyrHdh7mNtroGhlNyPdkNo4pi/k/atRr2LABGWb+9bSpm
-         kQPjBne60ruTK5gAv9XXC1dPef8j8DCP6enGWAnwXs1KRVx+UMgCOxsEDZl0QVaRdco6
-         lzUM7mQhfwF+3IdenPq+HBmIrsisVl2xvOGbXP+aQL2PKSlr7Q6zsgxBb9Kfq9EsHTLd
-         PVjFG7Eu2qhN1xpmj8z4i8yvTnOxOmg9NZuNKZeu7jN1l9oZiStwlxww0WJbDrklqUHC
-         +7gA==
-X-Gm-Message-State: AOJu0YwBx3KjDg21j6EDaHwqFPIIwvB/C7NkUFiji+RzS4BlKz1PKlZ8
-	DuD1M4DJ0NqDmK7s6NMTp2wQuAFCYTmBzGBnaVQ=
-X-Google-Smtp-Source: AGHT+IENKmGGzONbrvIGkyY6v9ZdmSl19kkWnDTVDK4IiWorUXZqx8FY4JZ07ZgvvdYSt4VRR9L23w==
-X-Received: by 2002:a05:600c:21c9:b0:40b:5e59:c555 with SMTP id x9-20020a05600c21c900b0040b5e59c555mr214951wmj.127.1701840955265;
-        Tue, 05 Dec 2023 21:35:55 -0800 (PST)
+        bh=YX4MAqN/nDup4qMOCc0EzTmKzTOsFfxIwVqJEAFEG5A=;
+        b=hFv9OA/ng8LwAd1YUpg8xpOqy7APmhna9gIJwATA0DxvIMzEksfPL7fDX4ZfxwQRxD
+         dhXRZ3IUcIo0aGMdQsMgdwtMP+579jcaKezxUi9e865sGHnRlQWjYAqAcTl3qMfR1eOH
+         ibDG5gfBhJS38K6QQywyAbIqDurZh7Rq02vhPUlSxz2cXa/F+n/+DdvgOMuwAALKYdod
+         a1NvI12fPJZKTGVfnStR+EGEi5wO2ANBKEnZQ11OzfiETVwW63ZWKYJ5KxOeQnGAPCsm
+         ceYsA08pwK9Gpd4I7dFn2ExwU7KVs/e72jDEK11VAnYcADSSlqbd+CjS30MNVl4RREg4
+         NsDQ==
+X-Gm-Message-State: AOJu0Yy8qlTMexAp19GN32Cwlnv61/nq6PQkyXmIhtvRZXi0RZL1Uefx
+	zSUUxKIaCbba9iMZqZmBTRm8cA==
+X-Google-Smtp-Source: AGHT+IHFQh+8y+KuZlMbCBdzapy61giA82q8qO6dwkp1UqO1DqLHlNlScuxD+uGU1Zzj3WZhPzOYjA==
+X-Received: by 2002:a05:6000:c4:b0:333:3ead:54c3 with SMTP id q4-20020a05600000c400b003333ead54c3mr147557wrx.97.1701842170341;
+        Tue, 05 Dec 2023 21:56:10 -0800 (PST)
 Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id x16-20020adfec10000000b003333beb564asm10410153wrn.5.2023.12.05.21.35.54
+        by smtp.gmail.com with ESMTPSA id e2-20020adf9bc2000000b003332fa77a0fsm13990491wrc.21.2023.12.05.21.56.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 21:35:54 -0800 (PST)
-Date: Wed, 6 Dec 2023 08:35:52 +0300
+        Tue, 05 Dec 2023 21:56:10 -0800 (PST)
+Date: Wed, 6 Dec 2023 08:56:06 +0300
 From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Haoran Liu <liuhaoran14@163.com>,
-	davem@davemloft.net
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, edumazet@google.com,
-	pabeni@redhat.com, heiko@sntech.de, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Haoran Liu <liuhaoran14@163.com>
-Subject: Re: [PATCH] [net/ethernet] arc_emac: Add error handling in
- emac_rockchip_probe
-Message-ID: <08f04975-2abb-4c1a-8bf6-34e6653568af@suswa.mountain>
+To: oe-kbuild@lists.linux.dev, Vadim Fedorenko <vadfed@meta.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-crypto@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH bpf-next v7 1/3] bpf: make common crypto API for TC/XDP
+ programs
+Message-ID: <dc0e2f8e-f82b-4439-b61a-9ab0be9f4e6b@suswa.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,195 +75,141 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231130031318.35850-1-liuhaoran14@163.com>
+In-Reply-To: <20231202010604.1877561-1-vadfed@meta.com>
 
-Hi Haoran,
+Hi Vadim,
 
 kernel test robot noticed the following build warnings:
 
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Haoran-Liu/arc_emac-Add-error-handling-in-emac_rockchip_probe/20231130-112325
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/mmind/linux-rockchip.git for-next
-patch link:    https://lore.kernel.org/r/20231130031318.35850-1-liuhaoran14%40163.com
-patch subject: [PATCH] [net/ethernet] arc_emac: Add error handling in emac_rockchip_probe
-config: csky-randconfig-r071-20231203 (https://download.01.org/0day-ci/archive/20231206/202312060119.eRpB9j4s-lkp@intel.com/config)
-compiler: csky-linux-gcc (GCC) 13.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20231206/202312060119.eRpB9j4s-lkp@intel.com/reproduce)
+url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/bpf-crypto-add-skcipher-to-bpf-crypto/20231202-091254
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20231202010604.1877561-1-vadfed%40meta.com
+patch subject: [PATCH bpf-next v7 1/3] bpf: make common crypto API for TC/XDP programs
+config: x86_64-randconfig-161-20231202 (https://download.01.org/0day-ci/archive/20231206/202312060647.2JfAE3rk-lkp@intel.com/config)
+compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
+reproduce: (https://download.01.org/0day-ci/archive/20231206/202312060647.2JfAE3rk-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
 | Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202312060119.eRpB9j4s-lkp@intel.com/
+| Closes: https://lore.kernel.org/r/202312060647.2JfAE3rk-lkp@intel.com/
 
 smatch warnings:
-drivers/net/ethernet/arc/emac_rockchip.c:139 emac_rockchip_probe() warn: missing unwind goto?
-drivers/net/ethernet/arc/emac_rockchip.c:249 emac_rockchip_probe() warn: 'ndev' from alloc_etherdev_mqs() not released on lines: 139.
+kernel/bpf/crypto.c:192 bpf_crypto_ctx_create() error: we previously assumed 'ctx' could be null (see line 165)
+kernel/bpf/crypto.c:192 bpf_crypto_ctx_create() error: potentially dereferencing uninitialized 'ctx'.
 
-vim +139 drivers/net/ethernet/arc/emac_rockchip.c
+vim +/ctx +192 kernel/bpf/crypto.c
 
-6eacf31139bf96 Romain Perier      2014-09-08   93  static int emac_rockchip_probe(struct platform_device *pdev)
-6eacf31139bf96 Romain Perier      2014-09-08   94  {
-6eacf31139bf96 Romain Perier      2014-09-08   95  	struct device *dev = &pdev->dev;
-6eacf31139bf96 Romain Perier      2014-09-08   96  	struct net_device *ndev;
-6eacf31139bf96 Romain Perier      2014-09-08   97  	struct rockchip_priv_data *priv;
-6eacf31139bf96 Romain Perier      2014-09-08   98  	const struct of_device_id *match;
-0c65b2b90d13c1 Andrew Lunn        2019-11-04   99  	phy_interface_t interface;
-6eacf31139bf96 Romain Perier      2014-09-08  100  	u32 data;
-0c65b2b90d13c1 Andrew Lunn        2019-11-04  101  	int err;
-6eacf31139bf96 Romain Perier      2014-09-08  102  
-6eacf31139bf96 Romain Perier      2014-09-08  103  	if (!pdev->dev.of_node)
-6eacf31139bf96 Romain Perier      2014-09-08  104  		return -ENODEV;
-6eacf31139bf96 Romain Perier      2014-09-08  105  
-6eacf31139bf96 Romain Perier      2014-09-08  106  	ndev = alloc_etherdev(sizeof(struct rockchip_priv_data));
-6eacf31139bf96 Romain Perier      2014-09-08  107  	if (!ndev)
-6eacf31139bf96 Romain Perier      2014-09-08  108  		return -ENOMEM;
-6eacf31139bf96 Romain Perier      2014-09-08  109  	platform_set_drvdata(pdev, ndev);
-6eacf31139bf96 Romain Perier      2014-09-08  110  	SET_NETDEV_DEV(ndev, dev);
-6eacf31139bf96 Romain Perier      2014-09-08  111  
-6eacf31139bf96 Romain Perier      2014-09-08  112  	priv = netdev_priv(ndev);
-6eacf31139bf96 Romain Perier      2014-09-08  113  	priv->emac.drv_name = DRV_NAME;
-6eacf31139bf96 Romain Perier      2014-09-08  114  	priv->emac.set_mac_speed = emac_rockchip_set_mac_speed;
-6eacf31139bf96 Romain Perier      2014-09-08  115  
-0c65b2b90d13c1 Andrew Lunn        2019-11-04  116  	err = of_get_phy_mode(dev->of_node, &interface);
-0c65b2b90d13c1 Andrew Lunn        2019-11-04  117  	if (err)
-0c65b2b90d13c1 Andrew Lunn        2019-11-04  118  		goto out_netdev;
-6eacf31139bf96 Romain Perier      2014-09-08  119  
-af72261f33ee49 Xing Zheng         2016-01-08  120  	/* RK3036/RK3066/RK3188 SoCs only support RMII */
-6eacf31139bf96 Romain Perier      2014-09-08  121  	if (interface != PHY_INTERFACE_MODE_RMII) {
-6eacf31139bf96 Romain Perier      2014-09-08  122  		dev_err(dev, "unsupported phy interface mode %d\n", interface);
-6eacf31139bf96 Romain Perier      2014-09-08  123  		err = -ENOTSUPP;
-6eacf31139bf96 Romain Perier      2014-09-08  124  		goto out_netdev;
-6eacf31139bf96 Romain Perier      2014-09-08  125  	}
-6eacf31139bf96 Romain Perier      2014-09-08  126  
-663713eb477b9b Caesar Wang        2016-03-14  127  	priv->grf = syscon_regmap_lookup_by_phandle(dev->of_node,
-663713eb477b9b Caesar Wang        2016-03-14  128  						    "rockchip,grf");
-6eacf31139bf96 Romain Perier      2014-09-08  129  	if (IS_ERR(priv->grf)) {
-663713eb477b9b Caesar Wang        2016-03-14  130  		dev_err(dev, "failed to retrieve global register file (%ld)\n",
-663713eb477b9b Caesar Wang        2016-03-14  131  			PTR_ERR(priv->grf));
-6eacf31139bf96 Romain Perier      2014-09-08  132  		err = PTR_ERR(priv->grf);
-6eacf31139bf96 Romain Perier      2014-09-08  133  		goto out_netdev;
-6eacf31139bf96 Romain Perier      2014-09-08  134  	}
-6eacf31139bf96 Romain Perier      2014-09-08  135  
-6eacf31139bf96 Romain Perier      2014-09-08  136  	match = of_match_node(emac_rockchip_dt_ids, dev->of_node);
-8cb4cdab4b4030 Haoran Liu         2023-11-29  137  	if (!match) {
-8cb4cdab4b4030 Haoran Liu         2023-11-29  138  		dev_err(dev, "No matching device found\n");
-8cb4cdab4b4030 Haoran Liu         2023-11-29 @139  		return -ENODEV;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  122  __bpf_kfunc struct bpf_crypto_ctx *
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  123  bpf_crypto_ctx_create(const char *type__str, const char *algo__str,
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  124  		      const struct bpf_dynptr_kern *pkey,
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  125  		      unsigned int authsize, int *err)
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  126  {
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  127  	const struct bpf_crypto_type *type = bpf_crypto_get_type(type__str);
 
-goto out_netdev;
+Delete this assignment.  (Duplicated).
 
-8cb4cdab4b4030 Haoran Liu         2023-11-29  140  	}
-8cb4cdab4b4030 Haoran Liu         2023-11-29  141  
-6eacf31139bf96 Romain Perier      2014-09-08  142  	priv->soc_data = match->data;
-6eacf31139bf96 Romain Perier      2014-09-08  143  
-6eacf31139bf96 Romain Perier      2014-09-08  144  	priv->emac.clk = devm_clk_get(dev, "hclk");
-6eacf31139bf96 Romain Perier      2014-09-08  145  	if (IS_ERR(priv->emac.clk)) {
-663713eb477b9b Caesar Wang        2016-03-14  146  		dev_err(dev, "failed to retrieve host clock (%ld)\n",
-663713eb477b9b Caesar Wang        2016-03-14  147  			PTR_ERR(priv->emac.clk));
-6eacf31139bf96 Romain Perier      2014-09-08  148  		err = PTR_ERR(priv->emac.clk);
-6eacf31139bf96 Romain Perier      2014-09-08  149  		goto out_netdev;
-6eacf31139bf96 Romain Perier      2014-09-08  150  	}
-6eacf31139bf96 Romain Perier      2014-09-08  151  
-6eacf31139bf96 Romain Perier      2014-09-08  152  	priv->refclk = devm_clk_get(dev, "macref");
-6eacf31139bf96 Romain Perier      2014-09-08  153  	if (IS_ERR(priv->refclk)) {
-663713eb477b9b Caesar Wang        2016-03-14  154  		dev_err(dev, "failed to retrieve reference clock (%ld)\n",
-663713eb477b9b Caesar Wang        2016-03-14  155  			PTR_ERR(priv->refclk));
-6eacf31139bf96 Romain Perier      2014-09-08  156  		err = PTR_ERR(priv->refclk);
-6eacf31139bf96 Romain Perier      2014-09-08  157  		goto out_netdev;
-6eacf31139bf96 Romain Perier      2014-09-08  158  	}
-6eacf31139bf96 Romain Perier      2014-09-08  159  
-6eacf31139bf96 Romain Perier      2014-09-08  160  	err = clk_prepare_enable(priv->refclk);
-6eacf31139bf96 Romain Perier      2014-09-08  161  	if (err) {
-6eacf31139bf96 Romain Perier      2014-09-08  162  		dev_err(dev, "failed to enable reference clock (%d)\n", err);
-6eacf31139bf96 Romain Perier      2014-09-08  163  		goto out_netdev;
-6eacf31139bf96 Romain Perier      2014-09-08  164  	}
-6eacf31139bf96 Romain Perier      2014-09-08  165  
-6eacf31139bf96 Romain Perier      2014-09-08  166  	/* Optional regulator for PHY */
-6eacf31139bf96 Romain Perier      2014-09-08  167  	priv->regulator = devm_regulator_get_optional(dev, "phy");
-6eacf31139bf96 Romain Perier      2014-09-08  168  	if (IS_ERR(priv->regulator)) {
-00777fac28ba3e Christophe JAILLET 2018-03-18  169  		if (PTR_ERR(priv->regulator) == -EPROBE_DEFER) {
-00777fac28ba3e Christophe JAILLET 2018-03-18  170  			err = -EPROBE_DEFER;
-00777fac28ba3e Christophe JAILLET 2018-03-18  171  			goto out_clk_disable;
-00777fac28ba3e Christophe JAILLET 2018-03-18  172  		}
-6eacf31139bf96 Romain Perier      2014-09-08  173  		dev_err(dev, "no regulator found\n");
-6eacf31139bf96 Romain Perier      2014-09-08  174  		priv->regulator = NULL;
-6eacf31139bf96 Romain Perier      2014-09-08  175  	}
-6eacf31139bf96 Romain Perier      2014-09-08  176  
-6eacf31139bf96 Romain Perier      2014-09-08  177  	if (priv->regulator) {
-6eacf31139bf96 Romain Perier      2014-09-08  178  		err = regulator_enable(priv->regulator);
-6eacf31139bf96 Romain Perier      2014-09-08  179  		if (err) {
-6eacf31139bf96 Romain Perier      2014-09-08  180  			dev_err(dev, "failed to enable phy-supply (%d)\n", err);
-6eacf31139bf96 Romain Perier      2014-09-08  181  			goto out_clk_disable;
-6eacf31139bf96 Romain Perier      2014-09-08  182  		}
-6eacf31139bf96 Romain Perier      2014-09-08  183  	}
-6eacf31139bf96 Romain Perier      2014-09-08  184  
-f4c9d3ee0334fd Xing Zheng         2016-01-08  185  	/* Set speed 100M */
-f4c9d3ee0334fd Xing Zheng         2016-01-08  186  	data = (1 << (priv->soc_data->grf_speed_offset + 16)) |
-f4c9d3ee0334fd Xing Zheng         2016-01-08  187  	       (1 << priv->soc_data->grf_speed_offset);
-f4c9d3ee0334fd Xing Zheng         2016-01-08  188  	/* Set RMII mode */
-f4c9d3ee0334fd Xing Zheng         2016-01-08  189  	data |= (1 << (priv->soc_data->grf_mode_offset + 16)) |
-f4c9d3ee0334fd Xing Zheng         2016-01-08  190  		(0 << priv->soc_data->grf_mode_offset);
-6eacf31139bf96 Romain Perier      2014-09-08  191  
-6eacf31139bf96 Romain Perier      2014-09-08  192  	err = regmap_write(priv->grf, priv->soc_data->grf_offset, data);
-6eacf31139bf96 Romain Perier      2014-09-08  193  	if (err) {
-663713eb477b9b Caesar Wang        2016-03-14  194  		dev_err(dev, "unable to apply initial settings to grf (%d)\n",
-663713eb477b9b Caesar Wang        2016-03-14  195  			err);
-6eacf31139bf96 Romain Perier      2014-09-08  196  		goto out_regulator_disable;
-6eacf31139bf96 Romain Perier      2014-09-08  197  	}
-6eacf31139bf96 Romain Perier      2014-09-08  198  
-6eacf31139bf96 Romain Perier      2014-09-08  199  	/* RMII interface needs always a rate of 50MHz */
-6eacf31139bf96 Romain Perier      2014-09-08  200  	err = clk_set_rate(priv->refclk, 50000000);
-2a9ee696c72a24 Branislav Radocaj  2017-12-12  201  	if (err) {
-663713eb477b9b Caesar Wang        2016-03-14  202  		dev_err(dev,
-663713eb477b9b Caesar Wang        2016-03-14  203  			"failed to change reference clock rate (%d)\n", err);
-2a9ee696c72a24 Branislav Radocaj  2017-12-12  204  		goto out_regulator_disable;
-2a9ee696c72a24 Branislav Radocaj  2017-12-12  205  	}
-c9bca2fe3ca6d6 Xing Zheng         2016-01-08  206  
-f4c9d3ee0334fd Xing Zheng         2016-01-08  207  	if (priv->soc_data->need_div_macclk) {
-f4c9d3ee0334fd Xing Zheng         2016-01-08  208  		priv->macclk = devm_clk_get(dev, "macclk");
-f4c9d3ee0334fd Xing Zheng         2016-01-08  209  		if (IS_ERR(priv->macclk)) {
-663713eb477b9b Caesar Wang        2016-03-14  210  			dev_err(dev, "failed to retrieve mac clock (%ld)\n",
-663713eb477b9b Caesar Wang        2016-03-14  211  				PTR_ERR(priv->macclk));
-f4c9d3ee0334fd Xing Zheng         2016-01-08  212  			err = PTR_ERR(priv->macclk);
-f4c9d3ee0334fd Xing Zheng         2016-01-08  213  			goto out_regulator_disable;
-f4c9d3ee0334fd Xing Zheng         2016-01-08  214  		}
-f4c9d3ee0334fd Xing Zheng         2016-01-08  215  
-f4c9d3ee0334fd Xing Zheng         2016-01-08  216  		err = clk_prepare_enable(priv->macclk);
-f4c9d3ee0334fd Xing Zheng         2016-01-08  217  		if (err) {
-f4c9d3ee0334fd Xing Zheng         2016-01-08  218  			dev_err(dev, "failed to enable mac clock (%d)\n", err);
-f4c9d3ee0334fd Xing Zheng         2016-01-08  219  			goto out_regulator_disable;
-f4c9d3ee0334fd Xing Zheng         2016-01-08  220  		}
-f4c9d3ee0334fd Xing Zheng         2016-01-08  221  
-f4c9d3ee0334fd Xing Zheng         2016-01-08  222  		/* RMII TX/RX needs always a rate of 25MHz */
-f4c9d3ee0334fd Xing Zheng         2016-01-08  223  		err = clk_set_rate(priv->macclk, 25000000);
-e46772a6946a7d Branislav Radocaj  2017-12-07  224  		if (err) {
-663713eb477b9b Caesar Wang        2016-03-14  225  			dev_err(dev,
-663713eb477b9b Caesar Wang        2016-03-14  226  				"failed to change mac clock rate (%d)\n", err);
-e46772a6946a7d Branislav Radocaj  2017-12-07  227  			goto out_clk_disable_macclk;
-e46772a6946a7d Branislav Radocaj  2017-12-07  228  		}
-f4c9d3ee0334fd Xing Zheng         2016-01-08  229  	}
-f4c9d3ee0334fd Xing Zheng         2016-01-08  230  
-c9bca2fe3ca6d6 Xing Zheng         2016-01-08  231  	err = arc_emac_probe(ndev, interface);
-c9bca2fe3ca6d6 Xing Zheng         2016-01-08  232  	if (err) {
-c9bca2fe3ca6d6 Xing Zheng         2016-01-08  233  		dev_err(dev, "failed to probe arc emac (%d)\n", err);
-2a9ee696c72a24 Branislav Radocaj  2017-12-12  234  		goto out_clk_disable_macclk;
-c9bca2fe3ca6d6 Xing Zheng         2016-01-08  235  	}
-c9bca2fe3ca6d6 Xing Zheng         2016-01-08  236  
-6eacf31139bf96 Romain Perier      2014-09-08  237  	return 0;
-2a9ee696c72a24 Branislav Radocaj  2017-12-12  238  
-e46772a6946a7d Branislav Radocaj  2017-12-07  239  out_clk_disable_macclk:
-2a9ee696c72a24 Branislav Radocaj  2017-12-12  240  	if (priv->soc_data->need_div_macclk)
-e46772a6946a7d Branislav Radocaj  2017-12-07  241  		clk_disable_unprepare(priv->macclk);
-6eacf31139bf96 Romain Perier      2014-09-08  242  out_regulator_disable:
-6eacf31139bf96 Romain Perier      2014-09-08  243  	if (priv->regulator)
-6eacf31139bf96 Romain Perier      2014-09-08  244  		regulator_disable(priv->regulator);
-6eacf31139bf96 Romain Perier      2014-09-08  245  out_clk_disable:
-6eacf31139bf96 Romain Perier      2014-09-08  246  	clk_disable_unprepare(priv->refclk);
-6eacf31139bf96 Romain Perier      2014-09-08  247  out_netdev:
-6eacf31139bf96 Romain Perier      2014-09-08  248  	free_netdev(ndev);
-6eacf31139bf96 Romain Perier      2014-09-08 @249  	return err;
-6eacf31139bf96 Romain Perier      2014-09-08  250  }
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  128  	struct bpf_crypto_ctx *ctx;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  129  	const u8 *key;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  130  	u32 key_len;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  131  
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  132  	type = bpf_crypto_get_type(type__str);
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  133  	if (IS_ERR(type)) {
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  134  		*err = PTR_ERR(type);
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  135  		return NULL;
+
+Why doesn't this function just return error pointers?
+
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  136  	}
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  137  
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  138  	if (!type->has_algo(algo__str)) {
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  139  		*err = -EOPNOTSUPP;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  140  		goto err;
+
+ctx is uninitialized on this path.
+
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  141  	}
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  142  
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  143  	if (!authsize && type->setauthsize) {
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  144  		*err = -EOPNOTSUPP;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  145  		goto err;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  146  	}
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  147  
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  148  	if (authsize && !type->setauthsize) {
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  149  		*err = -EOPNOTSUPP;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  150  		goto err;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  151  	}
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  152  
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  153  	key_len = __bpf_dynptr_size(pkey);
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  154  	if (!key_len) {
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  155  		*err = -EINVAL;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  156  		goto err;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  157  	}
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  158  	key = __bpf_dynptr_data(pkey, key_len);
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  159  	if (!key) {
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  160  		*err = -EINVAL;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  161  		goto err;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  162  	}
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  163  
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  164  	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+0c47cb96ac404e Vadim Fedorenko 2023-12-01 @165  	if (!ctx) {
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  166  		*err = -ENOMEM;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  167  		goto err;
+
+ctx is NULL here.
+
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  168  	}
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  169  
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  170  	ctx->type = type;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  171  	ctx->tfm = type->alloc_tfm(algo__str);
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  172  	if (IS_ERR(ctx->tfm)) {
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  173  		*err = PTR_ERR(ctx->tfm);
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  174  		ctx->tfm = NULL;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  175  		goto err;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  176  	}
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  177  
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  178  	if (authsize) {
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  179  		*err = type->setauthsize(ctx->tfm, authsize);
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  180  		if (*err)
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  181  			goto err;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  182  	}
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  183  
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  184  	*err = type->setkey(ctx->tfm, key, key_len);
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  185  	if (*err)
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  186  		goto err;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  187  
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  188  	refcount_set(&ctx->usage, 1);
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  189  
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  190  	return ctx;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  191  err:
+0c47cb96ac404e Vadim Fedorenko 2023-12-01 @192  	if (ctx->tfm)
+                                                            ^^^^^^^^
+NULL dereference.  These two error handling bugs in three lines of code
+are canonical One Err Label type bugs.  Better to do a ladder where each
+error label frees the last thing that was allocated.  Easier to review.
+Then you could delete the "ctx->tfm = NULL;" assignment on line 174.
+
+	return ctx;
+
+err_free_tfm:
+	type->free_tfm(ctx->tfm);
+err_free_ctx:
+	kfree(ctx);
+err_module_put:
+	module_put(type->owner);
+
+	return NULL;
+
+I have written about this at length on my blog:
+https://staticthinking.wordpress.com/2022/04/28/free-the-last-thing-style/
+
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  193  		type->free_tfm(ctx->tfm);
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  194  	kfree(ctx);
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  195  	module_put(type->owner);
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  196  
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  197  	return NULL;
+0c47cb96ac404e Vadim Fedorenko 2023-12-01  198  }
 
 -- 
 0-DAY CI Kernel Test Service
