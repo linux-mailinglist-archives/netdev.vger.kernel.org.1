@@ -1,114 +1,114 @@
-Return-Path: <netdev+bounces-54406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DD9E806FD1
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:34:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AED44806FE5
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:37:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFA6B1C20E3D
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 12:34:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF0B31C209BA
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 12:37:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A79D3364DD;
-	Wed,  6 Dec 2023 12:34:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35158358B6;
+	Wed,  6 Dec 2023 12:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="ky+r5FZJ"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="TxQ8Mjo+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4F94112;
-	Wed,  6 Dec 2023 04:33:55 -0800 (PST)
-Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
-	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id 058A017AAD;
-	Wed,  6 Dec 2023 14:33:51 +0200 (EET)
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id DF4DB17AA4;
-	Wed,  6 Dec 2023 14:33:50 +0200 (EET)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id 5E83A3C0439;
-	Wed,  6 Dec 2023 14:33:50 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
-	t=1701866030; bh=Qx6bGY5zwKCukI64izDOo4jSKiZokAgYKMjEju4y7Xc=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References;
-	b=ky+r5FZJhNsSI8aZdpYuGwZY/NnJVOx5ruooFjSqB14C457Iyrt6DUGDlCrW+BCAp
-	 Mf+m37WmEQt53Loth6p9nKxJf+NChZw+ADCVN+Klt03gjyQd7P67ilA45NS0Vh4hks
-	 w/WtISkByQk/WLNeRCuKFdUcuzQcqlwxw0H3jwJ0=
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 3B6CXlw6051933;
-	Wed, 6 Dec 2023 14:33:48 +0200
-Date: Wed, 6 Dec 2023 14:33:47 +0200 (EET)
-From: Julian Anastasov <ja@ssi.bg>
-To: Lev Pantiukhin <kndrvt@yandex-team.ru>
-cc: mitradir@yandex-team.ru, Simon Horman <horms@verge.net.au>,
-        linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
-        lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org
-Subject: Re: [PATCH] ipvs: add a stateless type of service and a stateless
- Maglev hashing scheduler
-In-Reply-To: <20231204152020.472247-1-kndrvt@yandex-team.ru>
-Message-ID: <58b14269-4d81-8939-020e-c33ed70df483@ssi.bg>
-References: <20231204152020.472247-1-kndrvt@yandex-team.ru>
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ABBAD1
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 04:37:25 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-3334254cfa3so395054f8f.1
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 04:37:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1701866243; x=1702471043; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jz+VDB9IuC8ai+mZOJOJXmrBtxu8BlNDpDW3sPbwSdg=;
+        b=TxQ8Mjo+LbP/ynwQnqWNEY3XvKx/uhIVob6xcE9KMNRyaoc/o5PL+KKE3Iic9NJ/OI
+         TtQjSOTucUAKyBs+4TK64U7TvPbd6UVEc2Ftops4WrPZ4oIJXPsig8qwn4jaEo3oJIC2
+         MKlbuRKw4rfAUEqdUMtPQTwrZdAsZnZ7E0UXA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701866243; x=1702471043;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jz+VDB9IuC8ai+mZOJOJXmrBtxu8BlNDpDW3sPbwSdg=;
+        b=eynIMuS+sspb4qBeTwUP5vjnqmcY6rBgGAGdltDYzFzuvy2ZDvXb9nKUnLrBTuTZ2U
+         7pUMRvM7Is5uFWxaB4UgDmo+a2GMKdieF7HSB3ybYEqQ3vU0MAXsyRca7Qb58nI3ShI5
+         vI2uzEywlIaFXXE+hZOtetMcpkdVOuzaMsmpGOihaWJoJ92k0GVu3sUvTcZESSbHGhZJ
+         T9kerQNctl7oThV4Oqf5Zi6I/Ib4vy5m57YmS/1/wpxfzi9eG2tppx45n8ajY1jvO/cm
+         sSagEkZ8Gjz/+iDQxlEeKYcr6mfYmu7Ce3+8w8C2jg5LkOEOyjPAAETgdFafizXDTKUp
+         VlVA==
+X-Gm-Message-State: AOJu0Ywd6ozdFT4JfwDo1zV7yhem4dYoMCA/cAIzrhj4rZSiGKMYyN8R
+	PcJNAHJxu/bTVwszZTSTYNNWZbt/9bctC6g6AmI=
+X-Google-Smtp-Source: AGHT+IEbEl3hPWVlP/0jGUWl2nFn7sZhfzLO6OUH1KO/RKEZwzndAZVUa4pZ+va7kn+WQ26dPSmoSg==
+X-Received: by 2002:a5d:424e:0:b0:333:2fd7:95f5 with SMTP id s14-20020a5d424e000000b003332fd795f5mr496465wrr.48.1701866242861;
+        Wed, 06 Dec 2023 04:37:22 -0800 (PST)
+Received: from revest.zrh.corp.google.com ([2a00:79e0:9d:6:628b:53d7:2bbf:7988])
+        by smtp.gmail.com with ESMTPSA id q15-20020a056000136f00b0033332524235sm14005573wrz.82.2023.12.06.04.37.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 04:37:22 -0800 (PST)
+From: Florent Revest <revest@chromium.org>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Florent Revest <revest@chromium.org>
+Subject: [PATCH] team: Fix use-after-free when an option instance allocation fails
+Date: Wed,  6 Dec 2023 13:37:18 +0100
+Message-ID: <20231206123719.1963153-1-revest@chromium.org>
+X-Mailer: git-send-email 2.43.0.rc2.451.g8631bc7472-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
 
+In __team_options_register, team_options are allocated and appended to
+the team's option_list.
+If one option instance allocation fails, the "inst_rollback" cleanup
+path frees the previously allocated options but doesn't remove them from
+the team's option_list.
+This leaves dangling pointers that can be dereferenced later by other
+parts of the team driver that iterate over options.
 
-	Hello,
+This patch fixes the cleanup path to remove the dangling pointers from
+the list.
 
-On Mon, 4 Dec 2023, Lev Pantiukhin wrote:
+As far as I can tell, this uaf doesn't have much security implications
+since it would be fairly hard to exploit (an attacker would need to make
+the allocation of that specific small object fail) but it's still nice
+to fix.
 
-> +#define IP_VS_SVC_F_STATELESS	0x0040		/* stateless scheduling */
+Fixes: 80f7c6683fe0 ("team: add support for per-port options")
+Signed-off-by: Florent Revest <revest@chromium.org>
+---
+ drivers/net/team/team.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-	I have another idea for the traffic that does not
-need per-client state. We need some per-dest cp to forward the packet.
-If we replace the cp->caddr usage with iph->saddr/daddr usage we can try 
-it. cp->caddr is used at the following places:
-
-- tcp_snat_handler (iph->daddr), tcp_dnat_handler (iph->saddr): iph is 
-already provided. tcp_snat_handler requires IP_VS_SVC_F_STATELESS
-to be set for serivce with present vaddr, i.e. non-fwmark based.
-So, NAT+svc->fwmark is another restriction for IP_VS_SVC_F_STATELESS
-because we do not know what VIP to use as saddr for outgoing traffic.
-
-- ip_vs_nfct_expect_related
-	- we should investigate for any problems when IP_VS_CONN_F_NFCT
-	is set, probably, we can not work with NFCT?
-
-- ip_vs_conn_drop_conntrack
-
-- FTP:
-	- sets IP_VS_CONN_F_NFCT, uses cp->app
-
-	May be IP_VS_CONN_F_NFCT should be restriction for 
-IP_VS_SVC_F_STATELESS mode? cp->app for sure because we keep TCP
-seq/ack state for the app in cp->in_seq/out_seq.
-
-	We can keep some dest->cp_route or another name that will
-hold our cp for such connections. The idea is to not allocate cp for
-every packet but to reuse this saved cp. It has all needed info to
-forward skb to real server. The first packet will create it, save
-it with some locking into dest and next packets will reuse it.
-
-	Probably, it should be ONE_PACKET entry (not hashed in table) but 
-can be with running timer, if needed. One refcnt for attaching to dest, 
-new temp refcnt for every packet. But in this mode __ip_vs_conn_put_timer 
-uses 0-second timer, we have to handle it somehow. It should be released
-when dest is removed and on edit_dest if needed.
-
-	There are other problems to solve, such as set_tcp_state()
-changing dest->activeconns and dest->inactconns. They are used also
-in ip_vs_bind_dest(), ip_vs_unbind_dest(). As we do not keep previous
-connection state and as conn can start in established state, we should
-avoid touching these counters. For UDP ONE_PACKET has no such problem
-with states but for TCP/SCTP we should take care.
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
+diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
+index 508d9a392ab18..f575f225d4178 100644
+--- a/drivers/net/team/team.c
++++ b/drivers/net/team/team.c
+@@ -281,8 +281,10 @@ static int __team_options_register(struct team *team,
+ 	return 0;
+ 
+ inst_rollback:
+-	for (i--; i >= 0; i--)
++	for (i--; i >= 0; i--) {
+ 		__team_option_inst_del_option(team, dst_opts[i]);
++		list_del(&dst_opts[i]->list);
++	}
+ 
+ 	i = option_count;
+ alloc_rollback:
+-- 
+2.43.0.rc2.451.g8631bc7472-goog
 
 
