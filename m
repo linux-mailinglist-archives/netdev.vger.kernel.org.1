@@ -1,103 +1,172 @@
-Return-Path: <netdev+bounces-54636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 681B6807AD4
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 22:53:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E1A0807ADC
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 22:54:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AE6A1F215B6
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 21:53:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF8911C20B6F
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 21:54:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20E854654B;
-	Wed,  6 Dec 2023 21:53:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B2B5638E;
+	Wed,  6 Dec 2023 21:53:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zs8JIsig"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eQDJie59"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6301D5B;
-	Wed,  6 Dec 2023 13:53:11 -0800 (PST)
-Received: by mail-qv1-xf2a.google.com with SMTP id 6a1803df08f44-67adea83ea6so1971716d6.0;
-        Wed, 06 Dec 2023 13:53:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701899590; x=1702504390; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SRsmCfZPRNHAmp69hbxA4nNZpGMatj3IE3IFRot8VPk=;
-        b=Zs8JIsigjf0aghaaFTbbW2vZmB0WxAUBZVsOKJ6ZwzFvjWhVeakpf8Ngce7sdKg8Ic
-         76zn+tdvlwxMQEVdrDtQSz9pSU1jGMntBAQWv1uoQTCMdaTHQRUwZTmWoV+mklJekQrV
-         i/d7eZqsnF8acFXNPFIOi7Vf3Dzx8MxSe6k5xlUo2mC6DUkK6Gx4tZTV42nFfsaOs2ZA
-         Egzp9V9uy+i21y0S3X0OYO0XgZnTAalkw2L5VG7pucsqEy3n3EsUTYN4AlrQnjaIL3Ib
-         VO435BluLvnnXY8cLNsTHTwCYp3YGEZA5c3NX0oBvzjulGgVAQSSY5CDRGXAKLNDt3e/
-         Dq4w==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77172D5E
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 13:53:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701899634;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yOEpllxAwSl6tZ982lozHOqBhkjhw8aoaRRTDnS4iew=;
+	b=eQDJie59n9wMPHQz3sp27gDgqCJvSlq+VnLMWo7vFOEUqmbGIoAB4J6Nf8ELSrSrXHM2vh
+	zGoOOcQwHRdtgXOK12n7aiS+TBMVFecFjq8QhKgKH2KPSkRSz6g0z0SfQXgf19BtTP+UzA
+	CYJ/OvxQlLu3Ay5Kgrm6S1AVXIK1fhI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-237-0K2g9XJMNjedg3PU-moAtg-1; Wed, 06 Dec 2023 16:53:53 -0500
+X-MC-Unique: 0K2g9XJMNjedg3PU-moAtg-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3333aaf02b0so217842f8f.1
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 13:53:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701899590; x=1702504390;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SRsmCfZPRNHAmp69hbxA4nNZpGMatj3IE3IFRot8VPk=;
-        b=hyY4D7rPk7Vjypsh3pATc9W9Jc1e4xc1djA4B+oCRsUUhIU/+/rgwPQ6pq9cZSakO7
-         GQ0A1Mt5SxHMVYjWlAWqksQCkBdcsa556/Dq3hFoMSOEiYbMI6yJhNmfggQaTTIrRcBR
-         9ZSa8NVmVHHae1xNF7ubaHDLZYo6X4Af8/zVvaoP2YXPWZ+ySejHWXrO0bg47vi/ARzR
-         Ld/uVp7jrmKbsTOc6qM4E7fyVp6HqMCtXd9wOLlJbNVljWOawurXg+x2qtPpIrTsU2Ao
-         V7X061YxGUHjQrZbNNyesjwQDJdDzJ6l8ivsdSODHxd6HbSMzmsYZMwXStEHM2/4VzB4
-         VQ3A==
-X-Gm-Message-State: AOJu0YzVdP4pE0hqvc/hM2AIIZlG5J/N9JdLxo/sfNbkk8S8Q8thzvuB
-	0H4+GAtqOELGx9ywv0nCFCY=
-X-Google-Smtp-Source: AGHT+IF2waxUW5G+Z+mwHnaUnX93Wr+Oe8l8z8LxWECLAhTi18WRGaDOYh4fdtXC/TpAUPCWHHj0ng==
-X-Received: by 2002:ad4:51c7:0:b0:67a:db17:c736 with SMTP id p7-20020ad451c7000000b0067adb17c736mr1656907qvq.62.1701899590481;
-        Wed, 06 Dec 2023 13:53:10 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id k1-20020a056214102100b0067abfe5709dsm292192qvr.139.2023.12.06.13.53.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Dec 2023 13:53:09 -0800 (PST)
-Message-ID: <d071fdad-79cb-4b8b-ab18-132b6c77e2ed@gmail.com>
-Date: Wed, 6 Dec 2023 13:53:06 -0800
+        d=1e100.net; s=20230601; t=1701899631; x=1702504431;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yOEpllxAwSl6tZ982lozHOqBhkjhw8aoaRRTDnS4iew=;
+        b=B7Ct2MQbtQOCyRCE/J4KdC5HUqYC1No0IhGO0OpJzY9Rm+aza/qR1RdgMBtd6rL6cU
+         nc2JiV2S2gswTnnOTwYqf/e4jHRXKhVufcaD2mRQ3Ql441SDcaOJfI98DC348oWVMUaD
+         p3jBufLX9c1MRXGFW5KLKR/1cAdaAawwDAe4z/68TSeZOStFxYVk9Bcl6gLHFGul8L/5
+         NPsiLS/rn9bX7cag+JR/mUVtDt1Bau2mElBRVxNPbsrf1x/vi8U8iPvXnye7281BjA5S
+         I5PCUz123NGJpp+Y9IH32sO81yokbz1FbbaY80+aMtS12F/AgsSKf/7n/PA54fOonl6n
+         UiWg==
+X-Gm-Message-State: AOJu0Ywibz+LAhK+iWESndfmRgoNp44dRrXNgJ9FCtk43W2/W+HsZONZ
+	mgu5biE6JviIoqx+qbCn9oTNXHVFvI5SX63Rt99xkXP+bw/WkBrGq5imlK9JIO8etC4egtz2f3U
+	enZwjI8iAshOnmlg7HOYJ4ihl
+X-Received: by 2002:a1c:720c:0:b0:40c:25c7:b323 with SMTP id n12-20020a1c720c000000b0040c25c7b323mr416131wmc.125.1701899631158;
+        Wed, 06 Dec 2023 13:53:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHKupXK9Nk8V+FfPP14UqB6ekz3NO+3af+wasE4pH9WneljAze4p+zMe4/8H113wgoXLXea/w==
+X-Received: by 2002:a1c:720c:0:b0:40c:25c7:b323 with SMTP id n12-20020a1c720c000000b0040c25c7b323mr416114wmc.125.1701899630826;
+        Wed, 06 Dec 2023 13:53:50 -0800 (PST)
+Received: from redhat.com ([2.55.57.48])
+        by smtp.gmail.com with ESMTPSA id l9-20020a1709066b8900b00a1d8626d650sm435564ejr.208.2023.12.06.13.53.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 13:53:50 -0800 (PST)
+Date: Wed, 6 Dec 2023 16:53:44 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
+	oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v7 3/4] virtio/vsock: fix logic which reduces
+ credit update messages
+Message-ID: <20231206165045-mutt-send-email-mst@kernel.org>
+References: <20231206211849.2707151-1-avkrasnov@salutedevices.com>
+ <20231206211849.2707151-4-avkrasnov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net] net: dsa: microchip: provide a list of valid
- protocols for xmit handler
-Content-Language: en-US
-To: Sean Nyekjaer <sean@geanix.com>, Woojung Huh <woojung.huh@microchip.com>,
- UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Arun Ramadoss <arun.ramadoss@microchip.com>,
- Christian Eggers <ceggers@arri.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231206071655.1626479-1-sean@geanix.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20231206071655.1626479-1-sean@geanix.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231206211849.2707151-4-avkrasnov@salutedevices.com>
 
-On 12/5/23 23:16, Sean Nyekjaer wrote:
-> Provide a list of valid protocols for which the driver will provide
-> it's deferred xmit handler.
+On Thu, Dec 07, 2023 at 12:18:48AM +0300, Arseniy Krasnov wrote:
+> Add one more condition for sending credit update during dequeue from
+> stream socket: when number of bytes in the rx queue is smaller than
+> SO_RCVLOWAT value of the socket. This is actual for non-default value
+> of SO_RCVLOWAT (e.g. not 1) - idea is to "kick" peer to continue data
+> transmission, because we need at least SO_RCVLOWAT bytes in our rx
+> queue to wake up user for reading data (in corner case it is also
+> possible to stuck both tx and rx sides, this is why 'Fixes' is used).
+> Also handle case when 'fwd_cnt' wraps, while 'last_fwd_cnt' is still
+> not.
 > 
-> When using DSA_TAG_PROTO_KSZ8795 protocol, it does not provide a
-> "connect" method, therefor ksz_connect() is not allocating ksz_tagger_data.
+> Fixes: b89d882dc9fc ("vsock/virtio: reduce credit update messages")
+> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+> ---
+>  Changelog:
+>  v6 -> v7:
+>   * Handle wrap of 'fwd_cnt'.
+>   * Do to send credit update when 'fwd_cnt' == 'last_fwd_cnt'.
 > 
-> This avoids the following null pointer dereference:
->   ksz_connect_tag_protocol from dsa_register_switch+0x9ac/0xee0
->   dsa_register_switch from ksz_switch_register+0x65c/0x828
->   ksz_switch_register from ksz_spi_probe+0x11c/0x168
->   ksz_spi_probe from spi_probe+0x84/0xa8
->   spi_probe from really_probe+0xc8/0x2d8
+>  net/vmw_vsock/virtio_transport_common.c | 18 +++++++++++++++---
+>  1 file changed, 15 insertions(+), 3 deletions(-)
 > 
-> Fixes: ab32f56a4100 ("net: dsa: microchip: ptp: add packet transmission timestamping")
-> Signed-off-by: Sean Nyekjaer <sean@geanix.com>
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index e137d740804e..39f8660d825d 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -558,6 +558,8 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+>  	struct virtio_vsock_sock *vvs = vsk->trans;
+>  	size_t bytes, total = 0;
+>  	struct sk_buff *skb;
+> +	u32 fwd_cnt_delta;
+> +	bool low_rx_bytes;
+>  	int err = -EFAULT;
+>  	u32 free_space;
+>  
+> @@ -601,7 +603,15 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+>  		}
+>  	}
+>  
+> -	free_space = vvs->buf_alloc - (vvs->fwd_cnt - vvs->last_fwd_cnt);
+> +	/* Handle wrap of 'fwd_cnt'. */
+> +	if (vvs->fwd_cnt < vvs->last_fwd_cnt)
+> +		fwd_cnt_delta = vvs->fwd_cnt + (U32_MAX - vvs->last_fwd_cnt);
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+Are you sure there's no off by one here? for example if fwd_cnt is 0
+and last_fwd_cnt is 0xfffffffff then apparently delta is 0.
+
+
+> +	else
+> +		fwd_cnt_delta = vvs->fwd_cnt - vvs->last_fwd_cnt;
+
+I actually don't see what is wrong with just
+	fwd_cnt_delta = vvs->fwd_cnt - vvs->last_fwd_cnt
+32 bit unsigned math will I think handle wrap around correctly.
+
+And given buf_alloc is also u32 - I don't see where the bug is in
+the original code.
+
+
+> +
+> +	free_space = vvs->buf_alloc - fwd_cnt_delta;
+> +	low_rx_bytes = (vvs->rx_bytes <
+> +			sock_rcvlowat(sk_vsock(vsk), 0, INT_MAX));
+>  
+>  	spin_unlock_bh(&vvs->rx_lock);
+>  
+> @@ -611,9 +621,11 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+>  	 * too high causes extra messages. Too low causes transmitter
+>  	 * stalls. As stalls are in theory more expensive than extra
+>  	 * messages, we set the limit to a high value. TODO: experiment
+> -	 * with different values.
+> +	 * with different values. Also send credit update message when
+> +	 * number of bytes in rx queue is not enough to wake up reader.
+>  	 */
+> -	if (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
+> +	if (fwd_cnt_delta &&
+> +	    (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE || low_rx_bytes))
+>  		virtio_transport_send_credit_update(vsk);
+>  
+>  	return total;
+> -- 
+> 2.25.1
 
 
