@@ -1,143 +1,178 @@
-Return-Path: <netdev+bounces-54579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A4658077BC
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 19:42:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0331E8077A9
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 19:38:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C06AB20EB0
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:42:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59FF82821AB
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:38:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7137A364;
-	Wed,  6 Dec 2023 18:42:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6298A36F;
+	Wed,  6 Dec 2023 18:38:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="AAV+fcuh"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BYNASHq+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20C13D67;
-	Wed,  6 Dec 2023 10:42:40 -0800 (PST)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 32B6710008B;
-	Wed,  6 Dec 2023 21:42:37 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 32B6710008B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1701888157;
-	bh=PAf3gWYNr1X6Etoo5fn0Vczq30SXtQKZGFNGORjRGC8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=AAV+fcuhHm0Evps55dof7IXXSARFQOz4XCrLKyDmqV/MHnMv+FBbH20vGfXDcx+DZ
-	 vVGUzbH1+BI16V3d8jpitWxYN/JE+rvI2+PlqHJPY0b4tw+oYpbcIJnp3fZiFDoNCH
-	 0BZoEqwFlLTZ36xUwhqX2A32xzhPAhMJ0kbFG+TXn53QKR6RncJ62fnvp9u+kYYrOj
-	 ZeksIl0PPQx2XYMQjx3O2yejtKDzcx7/UF1Z5nHc3pXOCrXUr+KMU/Jj3hyKvZ0EZM
-	 7TgUzpJ4nNNEx810vz6MtHB701dA/QCLJRiMBLOK8zwezjeAk0e7Rr1qAVJvFJ6D+a
-	 2fQBHpWr1thXA==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Wed,  6 Dec 2023 21:42:36 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Wed, 6 Dec 2023 21:42:36 +0300
-Message-ID: <44c8b8dd-24e4-24c9-c7f9-3d7db892095d@salutedevices.com>
-Date: Wed, 6 Dec 2023 21:34:27 +0300
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D12A139;
+	Wed,  6 Dec 2023 10:37:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=XjoZdIcJ4x0UyyYTC1Lhh7F1PH0NzGpQF/40WH8h+PE=; b=BYNASHq+jpc/8U1rxz8DCtJj7+
+	Kj4N1eQTG2Yt2dhsGMUSAsRvsSvY1FhmPVaE0bDvw43eARsX1ZWtS2CBnuadPcFc6dtE6LRNOVGYC
+	aZ2nVg6qJ3DRN1Hp3FWYd3h9zWB52+NlCnToyCdRhHDIKgfbalWxEmF1K/m3eh4ebIrexUdcllOya
+	iu5XU6Bs3e8b974e0dREPyH7SvE4bOjVN1reX+MSUGOm2oV7UaqlGMgKIz6Oc8/zxxrHtpEzX/N0v
+	5ZcnLPsxBaGRexjqTtzyz3w5P1owRBXyAq+dLtjk8i17Z+dITkegtGZouRvQyKoYP2c/NWK6ZBrP6
+	SEUC5Jqg==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rAwln-005Edk-1B;
+	Wed, 06 Dec 2023 18:37:15 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 061D930057E; Wed,  6 Dec 2023 19:37:14 +0100 (CET)
+Date: Wed, 6 Dec 2023 19:37:13 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Jiri Olsa <olsajiri@gmail.com>, Song Liu <song@kernel.org>,
+	Song Liu <songliubraving@meta.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Arnd Bergmann <arnd@arndb.de>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Kees Cook <keescook@chromium.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	linux-riscv <linux-riscv@lists.infradead.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Network Development <netdev@vger.kernel.org>,
+	bpf <bpf@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>,
+	clang-built-linux <llvm@lists.linux.dev>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Joao Moreira <joao@overdrivepizza.com>,
+	Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v2 2/2] x86/cfi,bpf: Fix BPF JIT call
+Message-ID: <20231206183713.GA35897@noisy.programming.kicks-ass.net>
+References: <20231130134204.136058029@infradead.org>
+ <CAADnVQJqE=aE7mHVS54pnwwnDS0b67iJbr+t4j5F4HRyJSTOHw@mail.gmail.com>
+ <20231204091334.GM3818@noisy.programming.kicks-ass.net>
+ <20231204111128.GV8262@noisy.programming.kicks-ass.net>
+ <20231204125239.GA1319@noisy.programming.kicks-ass.net>
+ <ZW4LjmUKj1q6RWdL@krava>
+ <20231204181614.GA7299@noisy.programming.kicks-ass.net>
+ <20231204183354.GC7299@noisy.programming.kicks-ass.net>
+ <CAADnVQJwU5fCLcjBWM9zBY6jUcnME3+p=vvdgKK9FiLPWvXozg@mail.gmail.com>
+ <20231206163814.GB36423@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net] vsock/virtio: fix "comparison of distinct pointer
- types lacks a cast" warning
-Content-Language: en-US
-To: Stefano Garzarella <sgarzare@redhat.com>, <netdev@vger.kernel.org>
-CC: Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	<virtualization@lists.linux.dev>, "Michael S. Tsirkin" <mst@redhat.com>,
-	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Stefan Hajnoczi
-	<stefanha@redhat.com>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>
-References: <20231206164143.281107-1-sgarzare@redhat.com>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <20231206164143.281107-1-sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 181917 [Dec 06 2023]
-X-KSMG-AntiSpam-Version: 6.0.0.2
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 5 0.3.5 98d108ddd984cca1d7e65e595eac546a62b0144b, {Tracking_from_domain_doesnt_match_to}, p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/12/06 17:41:00 #22621737
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231206163814.GB36423@noisy.programming.kicks-ass.net>
 
-
-
-On 06.12.2023 19:41, Stefano Garzarella wrote:
-> After backporting commit 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY
-> flag support") in CentOS Stream 9, CI reported the following error:
+On Wed, Dec 06, 2023 at 05:38:14PM +0100, Peter Zijlstra wrote:
+> On Mon, Dec 04, 2023 at 05:18:31PM -0800, Alexei Starovoitov wrote:
 > 
->     In file included from ./include/linux/kernel.h:17,
->                      from ./include/linux/list.h:9,
->                      from ./include/linux/preempt.h:11,
->                      from ./include/linux/spinlock.h:56,
->                      from net/vmw_vsock/virtio_transport_common.c:9:
->     net/vmw_vsock/virtio_transport_common.c: In function ‘virtio_transport_can_zcopy‘:
->     ./include/linux/minmax.h:20:35: error: comparison of distinct pointer types lacks a cast [-Werror]
->        20 |         (!!(sizeof((typeof(x) *)1 == (typeof(y) *)1)))
->           |                                   ^~
->     ./include/linux/minmax.h:26:18: note: in expansion of macro ‘__typecheck‘
->        26 |                 (__typecheck(x, y) && __no_side_effects(x, y))
->           |                  ^~~~~~~~~~~
->     ./include/linux/minmax.h:36:31: note: in expansion of macro ‘__safe_cmp‘
->        36 |         __builtin_choose_expr(__safe_cmp(x, y), \
->           |                               ^~~~~~~~~~
->     ./include/linux/minmax.h:45:25: note: in expansion of macro ‘__careful_cmp‘
->        45 | #define min(x, y)       __careful_cmp(x, y, <)
->           |                         ^~~~~~~~~~~~~
->     net/vmw_vsock/virtio_transport_common.c:63:37: note: in expansion of macro ‘min‘
->        63 |                 int pages_to_send = min(pages_in_iov, MAX_SKB_FRAGS);
+> > [   13.978497]  ? asm_exc_invalid_op+0x1a/0x20
+> > [   13.978798]  ? tcp_set_ca_state+0x51/0xd0
+> > [   13.979087]  tcp_v6_syn_recv_sock+0x45c/0x6c0
+> > [   13.979401]  tcp_check_req+0x497/0x590
 > 
-> We could solve it by using min_t(), but this operation seems entirely
-> unnecessary, because we also pass MAX_SKB_FRAGS to iov_iter_npages(),
-> which performs almost the same check, returning at most MAX_SKB_FRAGS
-> elements. So, let's eliminate this unnecessary comparison.
+> > The stack trace doesn't have any bpf, but it's a bpf issue too.
+> > Here tcp_set_ca_state() calls
+> > icsk->icsk_ca_ops->set_state(sk, ca_state);
+> > which calls bpf prog via bpf trampoline.
 > 
-> Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
-> Cc: avkrasnov@salutedevices.com
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
+> 
+> 
+> Specifically, I think this is
+> tools/testing/selftests/bpf/progs/bpf_cubic.c, which has:
+> 
+>         .set_state      = (void *)bpf_cubic_state,
+> 
+> which comes from:
+> 
+> BPF_STRUCT_OPS(bpf_cubic_state, struct sock *sk, __u8 *new_state)
+> 
+> which then wraps:
+> 
+> BPF_PROG()
+> 
+> which ends up generating:
+> 
+> static __always_inline ___bpf_cubic_state(unsigned long long *ctx, struct sock *sk, __u8 *new_state)
+> {
+> 	...
+> }
+> 
+> void bpf_cubic_state(unsigned long long *ctx)
+> {
+> 	return ____bpf_cubic_state(ctx, ctx[0], ctx[1]);
+> }
+> 
+> 
+> I think this then uses arch_prepare_bpf_trampoline(), but I'm entirely
+> lost how this all comes together, because the way I understand it the
+> whole bpf_trampoline is used to hook into an ftrace __fentry hook.
+> 
+> And a __fentry hook is very much not a function pointer. Help!?!?
 
-Reviewed-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+kernel/bpf/bpf_struct_ops.c:bpf_struct_ops_prepare_trampoline()
 
->  net/vmw_vsock/virtio_transport_common.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+And yeah, it seems to use the ftrace trampoline for indirect calls here,
+*sigh*.
+
+> The other case:
 > 
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> index f6dc896bf44c..c8e162c9d1df 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -59,8 +59,7 @@ static bool virtio_transport_can_zcopy(const struct virtio_transport *t_ops,
->  	t_ops = virtio_transport_get_ops(info->vsk);
->  
->  	if (t_ops->can_msgzerocopy) {
-> -		int pages_in_iov = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
-> -		int pages_to_send = min(pages_in_iov, MAX_SKB_FRAGS);
-> +		int pages_to_send = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
->  
->  		/* +1 is for packet header. */
->  		return t_ops->can_msgzerocopy(pages_to_send + 1);
+> For tools/testing/selftests/bpf/progs/bloom_filter_bench.c we have:
+> 
+>         bpf_for_each_map_elem(&array_map, bloom_callback, &data, 0);
+> 
+> and here bloom callback appears like a normal function:
+> 
+> static __u64
+> bloom_callback(struct bpf_map *map, __u32 *key, void *val,
+>                struct callback_ctx *data)
+> 
+> 
+> But what do functions looks like in the JIT? What's the actual address
+> that's then passed into the helper function. Given this seems to work
+> without kCFI, it should at least have an ENDBR, but there's only 3 of
+> those afaict:
+> 
+>   - emit_prologue() first insn
+>   - emit_prologue() tail-call site
+>   - arch_preprare_bpf_trampoline()
+> 
+> If the function passed to the helper is from do_jit()/emit_prologue(),
+> then how do I tell what 'function' is being JIT'ed ?
+> 
+> If it is arch_prepare_bpf_trampoline(), then we're back at the previous
+> question and I don't see how a __fentry site becomes a callable function
+> pointer.
+> 
+> 
+> Any clues would be much appreciated.
+
+Still not figured out how this one works...
 
