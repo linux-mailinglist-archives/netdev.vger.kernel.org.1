@@ -1,125 +1,113 @@
-Return-Path: <netdev+bounces-54322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 122D4806997
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 09:28:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A0F58069B2
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 09:35:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9515DB20D45
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 08:27:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 043C11F21618
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 08:35:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB61D19455;
-	Wed,  6 Dec 2023 08:27:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8C9C18C3D;
+	Wed,  6 Dec 2023 08:35:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="aJNEGg9Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF97718D;
-	Wed,  6 Dec 2023 00:27:50 -0800 (PST)
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-5d3758fdd2eso65829367b3.0;
-        Wed, 06 Dec 2023 00:27:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701851270; x=1702456070;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J96bjVl10/YZKpO0+pJdZW7wN1/H6wsxpMA2dwhuCto=;
-        b=XAynB3JCLszm0lxVYNuTjTlEcATT/a2lKcjWUIHgSh2fSrA1SLp6ZsCwPOqktu21Py
-         R78ahdnOX10qTPaB5LAZDlo4VQsvs6zwRCMVkSxb0BZoS6f8uyPZLShWImdPXEQDtzu3
-         zlWPzrw33NohyAWiRFxfHkYB8HlEkJoCMD8qu0DEuGG2ERMwVvYV0oUak7YP/bZkykxV
-         Y/LWEhJbbC64Nle/BVyJb4L8KmMdMgI2hpRym3/5Hx8vaLFta1SIZTIXfJVoYQm4qAvZ
-         cVmiNdwVBugOZqpF8sa5zHHGn3z0Ea6/vHAEdf+dWKXfeVZoT7N8JVmvnBVsQl8bDMmi
-         +5/g==
-X-Gm-Message-State: AOJu0YyXNilsgdZZY08iKrxGrJTBcuH8E5cYffJUqJCfIdp4RhOFzY8H
-	7RUsX9zPIPcudFBUnLIn2lSS9RPQy3C7EA==
-X-Google-Smtp-Source: AGHT+IHneFXRyXNRh2NBYGczFKqTsBrNrAOitW0M+o6QtQRxQ7aPsb+SxUOQZjh/m2xW36UHO2qnEg==
-X-Received: by 2002:a0d:eb0d:0:b0:5d7:1941:3576 with SMTP id u13-20020a0deb0d000000b005d719413576mr457636ywe.93.1701851269662;
-        Wed, 06 Dec 2023 00:27:49 -0800 (PST)
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com. [209.85.219.178])
-        by smtp.gmail.com with ESMTPSA id c6-20020a814e06000000b005d364adb887sm4689374ywb.26.2023.12.06.00.27.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Dec 2023 00:27:49 -0800 (PST)
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-da077db5145so4339070276.0;
-        Wed, 06 Dec 2023 00:27:48 -0800 (PST)
-X-Received: by 2002:a25:6607:0:b0:db7:dad0:76ac with SMTP id
- a7-20020a256607000000b00db7dad076acmr407887ybc.72.1701851268359; Wed, 06 Dec
- 2023 00:27:48 -0800 (PST)
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17AF4112;
+	Wed,  6 Dec 2023 00:35:15 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8D83840008;
+	Wed,  6 Dec 2023 08:35:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1701851714;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/JkFIxNj8NPk822mRewsy8oS7BhiBkPsoFjDPzgpryg=;
+	b=aJNEGg9Z/Z1hk8At6T7xptjbm9FfpsaIX/W36ZUxZuUNKQDNAES8c3SK4LY0B/fiNLQv4Y
+	rcLuq5MeYwusid5ahKRvzYGBmdAQ+0owGMQ924oLKyJ/mDRsDKW6w+rzF7hak9c4XhuQpD
+	KPM+WHfdJShJr1QPZjv/pK0SEhacoJq6YqoiBixzbI6ACTW9GpHH41SR/1akJ/PDWRiv8n
+	+CapeooQBZz+n7I1HgHwytx/drEdrivxmF48c1iiQOr+BCXd/Hv/2YDKVv0w9NGTqTeqTk
+	JjhawXR80bK8HkvY5P7wa3Bi0Lq+kAoCE/MHLyDJxqIxPFSRDq/KQK296DoZNA==
+Date: Wed, 6 Dec 2023 09:35:10 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
+ <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, attreyee-muk
+ <tintinm2017@gmail.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ Linux Networking <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
+ Linux Documentation <linux-doc@vger.kernel.org>, Linux Devicetree
+ <devicetree@vger.kernel.org>, Dent Project
+ <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v2 2/8] ethtool: Expand Ethernet Power
+ Equipment with c33 (PoE) alongside PoDL
+Message-ID: <20231206093510.68b9179b@kmaincent-XPS-13-7390>
+In-Reply-To: <ZW_gWDrlp4ltXIRf@archie.me>
+References: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
+	<20231201-feature_poe-v2-2-56d8cac607fa@bootlin.com>
+	<ZW_gWDrlp4ltXIRf@archie.me>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231206073712.17776-1-jirislaby@kernel.org> <20231206073712.17776-5-jirislaby@kernel.org>
-In-Reply-To: <20231206073712.17776-5-jirislaby@kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 6 Dec 2023 09:27:36 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdU4_==x7efMMOmxm3L4vZeWGeeWNo2bQ8Pv1wWx7246gQ@mail.gmail.com>
-Message-ID: <CAMuHMdU4_==x7efMMOmxm3L4vZeWGeeWNo2bQ8Pv1wWx7246gQ@mail.gmail.com>
-Subject: Re: [PATCH 04/27] tty: make tty_operations::send_xchar accept u8 char
-To: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
-Cc: gregkh@linuxfoundation.org, linux-serial@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Karsten Keil <isdn@linux-pingi.de>, 
-	Ulf Hansson <ulf.hansson@linaro.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, netdev@vger.kernel.org, 
-	linux-mmc@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-m68k <linux-m68k@lists.linux-m68k.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-CC linux-m68k
+On Wed, 6 Dec 2023 09:45:44 +0700
+Bagas Sanjaya <bagasdotme@gmail.com> wrote:
 
-On Wed, Dec 6, 2023 at 8:37=E2=80=AFAM Jiri Slaby (SUSE) <jirislaby@kernel.=
-org> wrote:
-> tty_operations::send_xchar is one of the last users of 'char' type for
-> characters in the tty layer. Convert it to u8 now.
->
-> Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
+> On Fri, Dec 01, 2023 at 06:10:24PM +0100, Kory Maincent wrote:
+> > In the current PSE interface for Ethernet Power Equipment, support is
+> > limited to PoDL. This patch extends the interface to accommodate the
+> > objects specified in IEEE 802.3-2022 145.2 for Power sourcing
+> > Equipment (PSE).
+> >=20
+> > The following objects are now supported and considered mandatory:
+> > - IEEE 802.3-2022 30.9.1.1.5 aPSEPowerDetectionStatus
+> > - IEEE 802.3-2022 30.9.1.1.2 aPSEAdminState
+> > - IEEE 802.3-2022 30.9.1.2.1 aPSEAdminControl
+> >=20
+> > To avoid confusion between "PoDL PSE" and "PoE PSE", which have similar
+> > names but distinct values, we have followed the suggestion of Oleksij
+> > Rempel and Andrew Lunn to maintain separate naming schemes for each,
+> > using c33 (clause 33) prefix for "PoE PSE".
+> > You can find more details in the discussion threads here:
+> > https://lore.kernel.org/netdev/20230912110637.GI780075@pengutronix.de/
+> > https://lore.kernel.org/netdev/2539b109-72ad-470a-9dae-9f53de4f64ec@lun=
+n.ch/
+> >=20
+> > Sponsored-by: Dent Project <dentproject@linuxfoundation.org>
+> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> > ---
+> >=20
+> > Changes in v2:
+> > - Rename all the PoE variables and enum with a c33 prefix.
+> > - Add documentation, thanks to Oleksij for having written one.
+> > ---
 
->  drivers/tty/amiserial.c          | 2 +-
+>=20
+> I get many htmldocs warnings:
 
-Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Oops sorry, I forgot to run the documentation build.
+Thanks for your reviews!
 
-> --- a/drivers/tty/amiserial.c
-> +++ b/drivers/tty/amiserial.c
-> @@ -811,7 +811,7 @@ static void rs_flush_buffer(struct tty_struct *tty)
->   * This function is used to send a high-priority XON/XOFF character to
->   * the device
->   */
-> -static void rs_send_xchar(struct tty_struct *tty, char ch)
-> +static void rs_send_xchar(struct tty_struct *tty, u8 ch)
->  {
->         struct serial_state *info =3D tty->driver_data;
->          unsigned long flags;
-
-Looks like this might fix an actual (harmless?) bug, if anyone evers
-configures a VSTOP or VSTART character with bit 7 set?
-
-    info->x_char =3D ch; // x_char is int, hence sign-extended
-
-transmit_chars() does:
-
-    amiga_custom.serdat =3D info->x_char | 0x100;
-
-which will inadvertently have all high bits sets, including the bit
-9, which is only used if PARENB is enabled.  But as it looks like
-PARENB handling is broken in amiseral anyway, this doesn't matter
-much...
-
-include/linux/tty.h:#define STOP_CHAR(tty) ((tty)->termios.c_cc[VSTOP])
-include/linux/tty.h:#define START_CHAR(tty) ((tty)->termios.c_cc[VSTART])
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
+Regards,
 --=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
