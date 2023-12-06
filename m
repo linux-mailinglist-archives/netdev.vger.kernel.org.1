@@ -1,170 +1,102 @@
-Return-Path: <netdev+bounces-54502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02B0580754A
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:39:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3367807550
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:39:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CE05B20F35
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 16:38:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95C6A281E5F
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 16:39:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C90773FE2C;
-	Wed,  6 Dec 2023 16:38:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DBA546442;
+	Wed,  6 Dec 2023 16:39:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mFV0PJjQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O6L2EpCm"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8209AD3;
-	Wed,  6 Dec 2023 08:38:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=evl1U5G+v7p9gMxFFsHi0NmzyC/QyjntfdGiRP4l5KI=; b=mFV0PJjQXYK/i1bHZs3i4ArIx2
-	d+67mDb1sq/1LHA4CRjlKQFBybEQ/pPdtvl3YCA6rjyaE1TstBZDO3xznhyQPDrCnlR9QGuHq3P+S
-	narwijdN41kTVPuDq/6+3vxrGUyBvNIMT9JwiAoZ+bKsub8Bznx2HjLBVgDnJa7Nw9VaQgcFYyPFS
-	crmsGQu6piC1a+orpEC7xdDPk1laSZFsjU9j97438gE7BXKWwta+0GMp+qulr7yAxnnu2WxNfAdpE
-	JfXYDiufGNKc/x4BwwXFLE93CGGLVcxqD4Rmg8yirLAoTf4UUc8Ax39kqbOCpn2HNkZKVZz0E48Xo
-	Wk6R1rlw==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1rAuue-0034Um-DJ; Wed, 06 Dec 2023 16:38:16 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 09FD5300451; Wed,  6 Dec 2023 17:38:15 +0100 (CET)
-Date: Wed, 6 Dec 2023 17:38:14 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Jiri Olsa <olsajiri@gmail.com>, Song Liu <song@kernel.org>,
-	Song Liu <songliubraving@meta.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Arnd Bergmann <arnd@arndb.de>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Kees Cook <keescook@chromium.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	linux-riscv <linux-riscv@lists.infradead.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	bpf <bpf@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>,
-	clang-built-linux <llvm@lists.linux.dev>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Joao Moreira <joao@overdrivepizza.com>,
-	Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v2 2/2] x86/cfi,bpf: Fix BPF JIT call
-Message-ID: <20231206163814.GB36423@noisy.programming.kicks-ass.net>
-References: <20231130133630.192490507@infradead.org>
- <20231130134204.136058029@infradead.org>
- <CAADnVQJqE=aE7mHVS54pnwwnDS0b67iJbr+t4j5F4HRyJSTOHw@mail.gmail.com>
- <20231204091334.GM3818@noisy.programming.kicks-ass.net>
- <20231204111128.GV8262@noisy.programming.kicks-ass.net>
- <20231204125239.GA1319@noisy.programming.kicks-ass.net>
- <ZW4LjmUKj1q6RWdL@krava>
- <20231204181614.GA7299@noisy.programming.kicks-ass.net>
- <20231204183354.GC7299@noisy.programming.kicks-ass.net>
- <CAADnVQJwU5fCLcjBWM9zBY6jUcnME3+p=vvdgKK9FiLPWvXozg@mail.gmail.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224C547770
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 16:39:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5485AC433C8;
+	Wed,  6 Dec 2023 16:39:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701880747;
+	bh=1NFQvaeqPQy74Jp+IPaGkTgA8ipB7fhgOLgtT7FAh9g=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=O6L2EpCmKd2/rLii38fu4e0BoU4Q6mGcZE63GKAFq+tyM1lYZ/p1rTyep7/5xQYgo
+	 IdH6FKHC7VU6ltiXpxtk55AX1qzGmwZf7U8Ei+UX6AAtNYAlCGKXuCMWK7OeKEiBSe
+	 THAsqO+rU2QhMAJMRM+lBn7Zu8Maz/bCVB1TGSaafKWLc1fq5ebNNJdRz0KvpCYVNA
+	 k0ppuF0ct1hrDmbKHj5dY4a0yEnRhcDo/UAr7uWTPq/+VhoaI6g7rbB8UKaFIyoChv
+	 9XyXWyQ4D0kcKf2Z3qg+QEOvdm7U8dGLXDJpHhfvcXbntNiyxCmQtXuJw5vuiBskK8
+	 7OqMKZ9YlISew==
+Message-ID: <f9d3e1dd-133a-45de-827e-c2f152b619b8@kernel.org>
+Date: Wed, 6 Dec 2023 09:39:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAADnVQJwU5fCLcjBWM9zBY6jUcnME3+p=vvdgKK9FiLPWvXozg@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] Use READ/WRITE_ONCE() for IP
+ local_port_range.
+Content-Language: en-US
+To: David Laight <David.Laight@ACULAB.COM>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Stephen Hemminger <stephen@networkplumber.org>,
+ "jakub@cloudflare.com" <jakub@cloudflare.com>,
+ Eric Dumazet <edumazet@google.com>, 'Mat Martineau' <martineau@kernel.org>
+References: <4e505d4198e946a8be03fb1b4c3072b0@AcuMS.aculab.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <4e505d4198e946a8be03fb1b4c3072b0@AcuMS.aculab.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 04, 2023 at 05:18:31PM -0800, Alexei Starovoitov wrote:
+On 12/6/23 6:44 AM, David Laight wrote:
+> Commit 227b60f5102cd added a seqlock to ensure that the low and high
+> port numbers were always updated together.
+> This is overkill because the two 16bit port numbers can be held in
+> a u32 and read/written in a single instruction.
+> 
+> More recently 91d0b78c5177f added support for finer per-socket limits.
+> The user-supplied value is 'high << 16 | low' but they are held
+> separately and the socket options protected by the socket lock.
+> 
+> Use a u32 containing 'high << 16 | low' for both the 'net' and 'sk'
+> fields and use READ_ONCE()/WRITE_ONCE() to ensure both values are
+> always updated together.
+> 
+> Change (the now trival) inet_get_local_port_range() to a static inline
+> to optimise the calling code.
+> (In particular avoiding returning integers by reference.)
+> 
+> Signed-off-by: David Laight <david.laight@aculab.com>
+> ---
+> Changes for v2:
+> - minor layout changes.
+> - remove unlikely() from comparisons when per-socket range set.
+> - avoid shifts of signed values that generate unsigned 32bit results.
+> I fiddled with the code that validates the argument to IP_LOCAL_PORT_RANGE
+> then decided to leave it (mostly) unchanged because it is also moved.
+> (There is a 'u16 x = int_val >> 16' which is required to move bit 31 to
+> bit 15 and is probably undefined behaviour - but will be ok on all sane cpu.)
+> 
+>  include/net/inet_sock.h         |  5 +----
+>  include/net/ip.h                |  8 +++++++-
+>  include/net/netns/ipv4.h        |  3 +--
+>  net/ipv4/af_inet.c              |  4 +---
+>  net/ipv4/inet_connection_sock.c | 29 ++++++++++-------------------
+>  net/ipv4/ip_sockglue.c          | 33 ++++++++++++++++-----------------
+>  net/ipv4/sysctl_net_ipv4.c      | 18 +++++++-----------
+>  7 files changed, 43 insertions(+), 57 deletions(-)
+> 
 
-> [   13.978497]  ? asm_exc_invalid_op+0x1a/0x20
-> [   13.978798]  ? tcp_set_ca_state+0x51/0xd0
-> [   13.979087]  tcp_v6_syn_recv_sock+0x45c/0x6c0
-> [   13.979401]  tcp_check_req+0x497/0x590
-
-> The stack trace doesn't have any bpf, but it's a bpf issue too.
-> Here tcp_set_ca_state() calls
-> icsk->icsk_ca_ops->set_state(sk, ca_state);
-> which calls bpf prog via bpf trampoline.
-
-
-
-Specifically, I think this is
-tools/testing/selftests/bpf/progs/bpf_cubic.c, which has:
-
-        .set_state      = (void *)bpf_cubic_state,
-
-which comes from:
-
-BPF_STRUCT_OPS(bpf_cubic_state, struct sock *sk, __u8 *new_state)
-
-which then wraps:
-
-BPF_PROG()
-
-which ends up generating:
-
-static __always_inline ___bpf_cubic_state(unsigned long long *ctx, struct sock *sk, __u8 *new_state)
-{
-	...
-}
-
-void bpf_cubic_state(unsigned long long *ctx)
-{
-	return ____bpf_cubic_state(ctx, ctx[0], ctx[1]);
-}
-
-
-I think this then uses arch_prepare_bpf_trampoline(), but I'm entirely
-lost how this all comes together, because the way I understand it the
-whole bpf_trampoline is used to hook into an ftrace __fentry hook.
-
-And a __fentry hook is very much not a function pointer. Help!?!?
-
-
-The other case:
-
-For tools/testing/selftests/bpf/progs/bloom_filter_bench.c we have:
-
-        bpf_for_each_map_elem(&array_map, bloom_callback, &data, 0);
-
-and here bloom callback appears like a normal function:
-
-static __u64
-bloom_callback(struct bpf_map *map, __u32 *key, void *val,
-               struct callback_ctx *data)
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
 
-But what do functions looks like in the JIT? What's the actual address
-that's then passed into the helper function. Given this seems to work
-without kCFI, it should at least have an ENDBR, but there's only 3 of
-those afaict:
-
-  - emit_prologue() first insn
-  - emit_prologue() tail-call site
-  - arch_preprare_bpf_trampoline()
-
-If the function passed to the helper is from do_jit()/emit_prologue(),
-then how do I tell what 'function' is being JIT'ed ?
-
-If it is arch_prepare_bpf_trampoline(), then we're back at the previous
-question and I don't see how a __fentry site becomes a callable function
-pointer.
-
-
-Any clues would be much appreciated.
 
