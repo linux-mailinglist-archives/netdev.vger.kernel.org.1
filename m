@@ -1,102 +1,122 @@
-Return-Path: <netdev+bounces-54633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15FBC807AC2
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 22:49:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56EB7807AC8
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 22:51:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8F6F1F21367
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 21:49:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00F261F212FB
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 21:51:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 118347099A;
-	Wed,  6 Dec 2023 21:49:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A20D3FE55;
+	Wed,  6 Dec 2023 21:51:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CLraeujU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gtg07h/r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CBE798
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 13:49:32 -0800 (PST)
-Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-a1d93da3eb7so26975666b.0
-        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 13:49:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701899371; x=1702504171; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=icAGLF6y2iN4/TdWwfUe2dws+wW8NTNLWr5XhF/ldFE=;
-        b=CLraeujUu0wwa/Bki1h+hz5fZPrICqG26MQqEP+bswuJCxoXyAGiyp4D5tD8m6f0lz
-         dvkHdbuloh79undSVpcxwUTsz73racAOW1dAz0B5ScR4quLC+Q8WuV08R4ERBk09OhI+
-         tGffUweWLQ+bfY3pI32Tqe58s/Bpdso1rrmb2/umUiZkZ8rOycbAqlnsOux8y5tSmfgZ
-         4/Owq+Nfmmid9pGyOEvp/lrMbFuGpsO3XzP6UMsXMd2aiLf51gAb6d8P+BxKStW1Wt0e
-         fLHH6MOqvd0IFtUYwRkkcslMnjdrmGrqT5BAVS1dZxB/CO8/2tRY9h3rB0ksXPLreUZ1
-         EUQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701899371; x=1702504171;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=icAGLF6y2iN4/TdWwfUe2dws+wW8NTNLWr5XhF/ldFE=;
-        b=OJliRI4N2sqViK6mjDcYwxLr/YWAn9L1nx5+7r4xMcbi+up8k8x1ANsRZYfuiPuShI
-         e/vH6n+yezMi785uFBECiim5wY+nBw2BZgaoEs+hAcusOsBRNSdDOH1wAlN/OdPyv3XC
-         BLsC/hslCkcNCqa5l4EheJ2KFpW+kW+21qTX6h9Ai4veUEY/7UHzZWelKqA/hX0eeA1H
-         C3dmhHItyev40b3wWLCy5k1m36gaZIsZwuulsiJ2X4BXpHTmKA59uuVt0XwuJ/RGNimK
-         Eikodl+jUPcGuszwC+DpKtF1FqVINJnvn7BCifbBf4SOaB1i69BCC1nOBDuS5iF3SSFm
-         QEOQ==
-X-Gm-Message-State: AOJu0Yz+3Jb+gOujmeIlb5BTZ62ahur/wMiKMrYjDa8q4PRHW+sTr2q7
-	TFxBGtlT9ibUDPVPKwdv6yA=
-X-Google-Smtp-Source: AGHT+IGDaFPTkPlj/iWkSiYl0O5nuuiTgw+X2KiLlTazF2TrYRRsZ2ZffroYHKvzPE0DUxTfRP+T4A==
-X-Received: by 2002:a17:906:715:b0:a1c:2eb:3839 with SMTP id y21-20020a170906071500b00a1c02eb3839mr935652ejb.67.1701899370600;
-        Wed, 06 Dec 2023 13:49:30 -0800 (PST)
-Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id b9-20020a170906194900b00a1cbb055575sm435426eje.180.2023.12.06.13.49.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 13:49:30 -0800 (PST)
-Date: Wed, 6 Dec 2023 23:49:28 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Daniel Danzberger <dd@embedd.com>, woojung.huh@microchip.com,
-	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
-	Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH] net: dsa: microchip: fix NULL pointer dereference on
- platform init
-Message-ID: <20231206214928.jhx6naeo2o2eonj5@skbuf>
-References: <20231204154315.3906267-1-dd@embedd.com>
- <20231204174330.rjwxenuuxcimbzce@skbuf>
- <577c2f8511b700624cdfdf75db5b1a90cf71314b.camel@embedd.com>
- <20231205165540.jnmzuh4pb5xayode@skbuf>
- <e37d2c6678f33b490e8ab56cd1472429ca3dcc7a.camel@embedd.com>
- <20231205181735.csbtkcy3g256kwxl@skbuf>
- <52f88c8bf0897f1b97360fd4f94bdfe2e18f6cc0.camel@embedd.com>
- <20231206003706.w3azftqx7nopn4go@skbuf>
- <19d4d689-a73e-4301-b22c-5ad2dfb4410d@lunn.ch>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59FEC70986;
+	Wed,  6 Dec 2023 21:51:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEDBFC433C8;
+	Wed,  6 Dec 2023 21:51:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701899465;
+	bh=Q63swJ2+NLD0RQu6BuRcv9wlpDxUWII9x/AotwElN5k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Gtg07h/rVyTNJlt3F4T4oRHOwHZOOSt/Fz6u0Lz9rRctYwlhLlXPDS8sNgcv43vdt
+	 WXvfR61K0Jl3tLU0VLDTaj17rbNITldFbGwEHpODlwE3kzvJ54L1JNcTTwEstCxtfs
+	 Yi5bdrjKYOrtacSFWl9MZ6TAH7OiQtgZ9JfiduhVNsxMi8v18ahnScq2X3sN9pSdBZ
+	 TYxIauEUgF5kupMmq+RogxxdVHFqXb8IAMPxSYpHgvarN75NoeEwWsqgxx9333SYWf
+	 bV0SQhqwPKjq8HM344ZYI/hLTR8jwfVL+w9KbZh4Y9MKvbCj+F0gpykaUyzeG4EFQj
+	 L/vQS5Stlb0TQ==
+Date: Wed, 6 Dec 2023 13:51:04 -0800
+From: Saeed Mahameed <saeed@kernel.org>
+To: Shifeng Li <lishifeng@sangfor.com.cn>
+Cc: saeedm@nvidia.com, leon@kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	eranbe@mellanox.com, moshe@mellanox.com, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dinghui@sangfor.com.cn, lishifeng1992@126.com,
+	Moshe Shemesh <moshe@nvidia.com>
+Subject: Re: [PATCH net v4] net/mlx5e: Fix a race in command alloc flow
+Message-ID: <ZXDsyLyQYWW4OZN3@x130>
+References: <20231202080126.1167237-1-lishifeng@sangfor.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <19d4d689-a73e-4301-b22c-5ad2dfb4410d@lunn.ch>
+In-Reply-To: <20231202080126.1167237-1-lishifeng@sangfor.com.cn>
 
-On Wed, Dec 06, 2023 at 04:26:52PM +0100, Andrew Lunn wrote:
-> > So, surprisingly, there is enough redundancy between DSA mechanisms that
-> > platform_data kinda works.
-> 
-> I have x86 platforms using mv88e6xxx with platform data. Simple
-> systems do work, the platforms i have only make use of the internal
-> PHYs. This is partially because of history. DSA is older than the
-> adoption of DT. The mv88e6xxx driver and DSA used to be purely
-> platform data driven, and we have not yet broken that.
-> 
-> 	Andrew
+On 02 Dec 00:01, Shifeng Li wrote:
+>Fix a cmd->ent use after free due to a race on command entry.
+>Such race occurs when one of the commands releases its last refcount and
+>frees its index and entry while another process running command flush
+>flow takes refcount to this command entry. The process which handles
+>commands flush may see this command as needed to be flushed if the other
+>process allocated a ent->idx but didn't set ent to cmd->ent_arr in
+>cmd_work_handler(). Fix it by moving the assignment of cmd->ent_arr into
+>the spin lock.
+>
+>[70013.081955] BUG: KASAN: use-after-free in mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
+>[70013.081967] Write of size 4 at addr ffff88880b1510b4 by task kworker/26:1/1433361
+>[70013.081968]
+>[70013.082028] Workqueue: events aer_isr
+>[70013.082053] Call Trace:
+>[70013.082067]  dump_stack+0x8b/0xbb
+>[70013.082086]  print_address_description+0x6a/0x270
+>[70013.082102]  kasan_report+0x179/0x2c0
+>[70013.082173]  mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
+>[70013.082267]  mlx5_cmd_flush+0x80/0x180 [mlx5_core]
+>[70013.082304]  mlx5_enter_error_state+0x106/0x1d0 [mlx5_core]
+>[70013.082338]  mlx5_try_fast_unload+0x2ea/0x4d0 [mlx5_core]
+>[70013.082377]  remove_one+0x200/0x2b0 [mlx5_core]
+>[70013.082409]  pci_device_remove+0xf3/0x280
+>[70013.082439]  device_release_driver_internal+0x1c3/0x470
+>[70013.082453]  pci_stop_bus_device+0x109/0x160
+>[70013.082468]  pci_stop_and_remove_bus_device+0xe/0x20
+>[70013.082485]  pcie_do_fatal_recovery+0x167/0x550
+>[70013.082493]  aer_isr+0x7d2/0x960
+>[70013.082543]  process_one_work+0x65f/0x12d0
+>[70013.082556]  worker_thread+0x87/0xb50
+>[70013.082571]  kthread+0x2e9/0x3a0
+>[70013.082592]  ret_from_fork+0x1f/0x40
+>
+>The logical relationship of this error is as follows:
+>
+>             aer_recover_work              |          ent->work
+>-------------------------------------------+------------------------------
+>aer_recover_work_func                      |
+>|- pcie_do_recovery                        |
+>  |- report_error_detected                 |
+>    |- mlx5_pci_err_detected               |cmd_work_handler
+>      |- mlx5_enter_error_state            |  |- cmd_alloc_index
+>        |- enter_error_state               |    |- lock cmd->alloc_lock
+>          |- mlx5_cmd_flush                |    |- clear_bit
+>            |- mlx5_cmd_trigger_completions|    |- unlock cmd->alloc_lock
+>              |- lock cmd->alloc_lock      |
+>              |- vector = ~dev->cmd.vars.bitmask
+>              |- for_each_set_bit          |
+>                |- cmd_ent_get(cmd->ent_arr[i]) (UAF)
+>              |- unlock cmd->alloc_lock    |  |- cmd->ent_arr[ent->idx]=ent
+>
+>The cmd->ent_arr[ent->idx] assignment and the bit clearing are not
+>protected by the cmd->alloc_lock in cmd_work_handler().
+>
+>Fixes: 50b2412b7e78 ("net/mlx5: Avoid possible free of command entry while timeout comp handler")
+>Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
+>Signed-off-by: Shifeng Li <lishifeng@sangfor.com.cn>
 
-I'm not saying that platform_data did not have its time and place, but
-Device Tree clearly won, and platform_data is a rarely untested minority
-nowadays.
 
-We don't have to break platform_data in mv88e6xxx and in the DSA core
-all of a sudden. It can coexist with software nodes for a while, as
-alternative solutions to the same problem.
+LGTM,
+Applied to net-mlx5.
+
+Thanks,
+Saeed.
 
