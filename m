@@ -1,123 +1,176 @@
-Return-Path: <netdev+bounces-54268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8333806622
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 05:24:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A538806628
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 05:25:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 358C7B210CB
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 04:24:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFA411F21683
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 04:25:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE144FC0C;
-	Wed,  6 Dec 2023 04:24:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA900FBF1;
+	Wed,  6 Dec 2023 04:25:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FWNbUgRQ"
+	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="Hemd8dwF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D94F6D45;
-	Tue,  5 Dec 2023 20:24:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701836681; x=1733372681;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=YsZ2Q4U8UY65YpbcLnRP1WWpz/335NVd/R5/RmX/Y3c=;
-  b=FWNbUgRQV1vgu/BOYWaCl5CObPemBgUhideRaOYvW1W2VMaVuu48J9RK
-   HF46g3XIviUebVanBY01zI5Rnp0B7JJCRysRI0AqVJmwRPtXt7xu093Gr
-   20SQre029e+vn/V6QvpuyTOftncEN5/iSHxtGR6yh98cVuAObdlSeJAMS
-   uCDIWE8Jw3Vv9UNIsJ8ZaMxwnVmo5uvlI+6bAVntk71ygxiaEGRdqsewZ
-   P81lkeIv6VkfR4Txe4g+Agqqm4hxtdUtZWAp9iHwuGUagZJaUxzDMfFxo
-   kmn2MDj7X8fiYtOfseVNH+CNX5Sstine2caPn9YDgxrYt0+2f5bOYw7cs
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="1097561"
-X-IronPort-AV: E=Sophos;i="6.04,254,1695711600"; 
-   d="scan'208";a="1097561"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 20:24:40 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="774864744"
-X-IronPort-AV: E=Sophos;i="6.04,254,1695711600"; 
-   d="scan'208";a="774864744"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by fmsmga007.fm.intel.com with ESMTP; 05 Dec 2023 20:24:35 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rAjSb-000AFc-0h;
-	Wed, 06 Dec 2023 04:24:33 +0000
-Date: Wed, 6 Dec 2023 12:23:38 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kory Maincent <kory.maincent@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>,
-	Kory Maincent <kory.maincent@bootlin.com>
-Subject: Re: [PATCH net-next v2 2/8] ethtool: Expand Ethernet Power Equipment
- with c33 (PoE) alongside PoDL
-Message-ID: <202312061223.iHikO4O3-lkp@intel.com>
-References: <20231201-feature_poe-v2-2-56d8cac607fa@bootlin.com>
+Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91292D3
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 20:25:25 -0800 (PST)
+Received: by mail-ot1-x32a.google.com with SMTP id 46e09a7af769-6d9a6f756c3so1753133a34.2
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 20:25:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=theori.io; s=google; t=1701836725; x=1702441525; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=AzMpY3Q2dnUPW+re7xTCMq4vQkW0i8Xw3gC6e6cbmPw=;
+        b=Hemd8dwFtDf4cQet5oIT/6UXvvzXeY7fS4/godFp4k2Y9eckyxMuwSmEaIGQe9LTrz
+         RA35pH5IduhFqrOZCuNDEcC0zQFLJj5mg3LoN6OWosnrxTTjMVczY0yrI46hWVzpDYHu
+         85CzmK3GTwwbng2g1yExtOPkGHYC9G1UHcF4Q=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701836725; x=1702441525;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AzMpY3Q2dnUPW+re7xTCMq4vQkW0i8Xw3gC6e6cbmPw=;
+        b=qolTnZlJc10Kn7ImhVIvFtwGWgYXgDOAbxAHUB6ojVTmibTj/VsfAnRcNK51Jt/EI9
+         g4+XR1pKRBYzTkekXEtdJwkTNQ68yPTvdFNbfLG12+Kn2vjPU+db64yx85FUxfuGPQA0
+         Fb994d4Bkz/uzyAJuJLZ9DsF7epnVkKYfdWXzXRupzmtIZFI3qBTUOMDzf1UimjCioyq
+         +f9E3IAjmB8tiKVlylW0t6b/jzI3wXObYOORgmMZZHAfJtifuUVg6N8zwGn8pXSOcsn9
+         Jdo+j3oZ6L8mNSVrw2TKW9E4zxQfnXw5CmPDkwy0BPm2mtrNW9VZcg1hqnj3dzNKgALn
+         s89g==
+X-Gm-Message-State: AOJu0YybXFUoKZIzB2iZXEiy3JpbsPlGuBjtZhxvxMjqOwUEVxrwli5x
+	r+CHj2izhUuamQW1+2NBQowatA==
+X-Google-Smtp-Source: AGHT+IHrWsS2/q5dwYRFBc4GD6P35Jgc+UxEFv+kNarIZiCIT0FRa1QGkLz1PoM1uhslATUHaNlwzw==
+X-Received: by 2002:a9d:6e9a:0:b0:6d8:4c76:bac9 with SMTP id a26-20020a9d6e9a000000b006d84c76bac9mr468850otr.13.1701836724869;
+        Tue, 05 Dec 2023 20:25:24 -0800 (PST)
+Received: from ubuntu ([211.219.71.65])
+        by smtp.gmail.com with ESMTPSA id c17-20020a637251000000b005c6676349f8sm6245452pgn.89.2023.12.05.20.25.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Dec 2023 20:25:24 -0800 (PST)
+Date: Tue, 5 Dec 2023 20:25:19 -0800
+From: Hyunwoo Kim <v4bel@theori.io>
+To: =?iso-8859-1?Q?R=E9mi?= Denis-Courmont <remi@remlab.net>
+Cc: courmisch@gmail.com, imv4bel@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, v4bel@theori.io
+Subject: Re: [PATCH] net: phonet: Fix Use-After-Free in pep_recvmsg
+Message-ID: <20231206042519.GA5926@ubuntu>
+References: <20231204065952.GA16224@ubuntu>
+ <A2443BF8-D693-4182-9E07-3FFA33D97217@remlab.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20231201-feature_poe-v2-2-56d8cac607fa@bootlin.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <A2443BF8-D693-4182-9E07-3FFA33D97217@remlab.net>
 
-Hi Kory,
+Hi,
 
-kernel test robot noticed the following build warnings:
+On Mon, Dec 04, 2023 at 09:12:11AM +0200, Rémi Denis-Courmont wrote:
+> Hi,
+> 
+> Le 4 décembre 2023 08:59:52 GMT+02:00, Hyunwoo Kim <v4bel@theori.io> a écrit :
+> >Because pep_recvmsg() fetches the skb from pn->ctrlreq_queue
+> >without holding the lock_sock and then frees it,
+> >a race can occur with pep_ioctl().
+> >A use-after-free for a skb occurs with the following flow.
+> 
+> Isn't this the same issue that was reported by Huawei rootlab and for which I already provided a pair of patches to the security list two months ago?
 
-[auto build test WARNING on net-next/main]
+Is the issue reported to the security mailing list two months ago the same as this pn->ctrlreq_queue race?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kory-Maincent/ethtool-Expand-Ethernet-Power-Equipment-with-c33-PoE-alongside-PoDL/20231202-021033
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231201-feature_poe-v2-2-56d8cac607fa%40bootlin.com
-patch subject: [PATCH net-next v2 2/8] ethtool: Expand Ethernet Power Equipment with c33 (PoE) alongside PoDL
-reproduce: (https://download.01.org/0day-ci/archive/20231206/202312061223.iHikO4O3-lkp@intel.com/reproduce)
+> 
+> TBH, I much prefer the approach in the other patch set, which takes the hit on the ioctl() side rather than the recvmsg()'s.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312061223.iHikO4O3-lkp@intel.com/
+That's probably a patch to add sk->sk_receive_queue.lock to pep_ioctl(), is that correct?
 
-All warnings (new ones prefixed by >>):
+> 
+> Unfortunately, I have no visibility on what happened or didn't happen after that, since the security list is private.
 
->> Documentation/networking/pse-pd/introduction.rst:56: WARNING: Title underline too short.
+Perhaps this issue hasn't gotten much attention.
 
-vim +56 Documentation/networking/pse-pd/introduction.rst
 
-    46	
-    47	- For general PSE (PoE) code, use "c33_pse" key words. For example:
-    48	  ``enum ethtool_c33_pse_admin_state c33_admin_control;``.
-    49	  This aligns with Clause 33, encompassing various PoE forms.
-    50	
-    51	- For PoDL PSE - specific code, use "podl_pse". For example:
-    52	  ``enum ethtool_podl_pse_admin_state podl_admin_control;`` to differentiate
-    53	  PoDL PSE settings according to Clause 104.
-    54	
-    55	Summary of Clause 33: Data Terminal Equipment (DTE) Power via Media Dependent Interface (MDI)
-  > 56	-------------------------------------------------------------------------------------------
-    57	
+Regards,
+Hyunwoo Kim
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> 
+> >```
+> >pep_recvmsg() -> skb_dequeue() -> skb_free_datagram()
+> >pep_ioctl() -> skb_peek()
+> >```
+> >Fix this by adjusting the scope of lock_sock in pep_recvmsg().
+> >
+> >Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
+> >---
+> > net/phonet/pep.c | 17 +++++++++++++----
+> > 1 file changed, 13 insertions(+), 4 deletions(-)
+> >
+> >diff --git a/net/phonet/pep.c b/net/phonet/pep.c
+> >index faba31f2eff2..212d8a9ddaee 100644
+> >--- a/net/phonet/pep.c
+> >+++ b/net/phonet/pep.c
+> >@@ -1250,12 +1250,17 @@ static int pep_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+> > 	if (unlikely(1 << sk->sk_state & (TCPF_LISTEN | TCPF_CLOSE)))
+> > 		return -ENOTCONN;
+> > 
+> >+	lock_sock(sk);
+> >+
+> > 	if ((flags & MSG_OOB) || sock_flag(sk, SOCK_URGINLINE)) {
+> > 		/* Dequeue and acknowledge control request */
+> > 		struct pep_sock *pn = pep_sk(sk);
+> > 
+> >-		if (flags & MSG_PEEK)
+> >+		if (flags & MSG_PEEK) {
+> >+			release_sock(sk);
+> > 			return -EOPNOTSUPP;
+> >+		}
+> >+
+> 
+> Also this change is not really accounted for.
+> 
+> > 		skb = skb_dequeue(&pn->ctrlreq_queue);
+> > 		if (skb) {
+> > 			pep_ctrlreq_error(sk, skb, PN_PIPE_NO_ERROR,
+> >@@ -1263,12 +1268,14 @@ static int pep_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+> > 			msg->msg_flags |= MSG_OOB;
+> > 			goto copy;
+> > 		}
+> >-		if (flags & MSG_OOB)
+> >+
+> >+		if (flags & MSG_OOB) {
+> >+			release_sock(sk);
+> > 			return -EINVAL;
+> >+		}
+> > 	}
+> > 
+> > 	skb = skb_recv_datagram(sk, flags, &err);
+> >-	lock_sock(sk);
+> > 	if (skb == NULL) {
+> > 		if (err == -ENOTCONN && sk->sk_state == TCP_CLOSE_WAIT)
+> > 			err = -ECONNRESET;
+> >@@ -1278,7 +1285,7 @@ static int pep_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+> > 
+> > 	if (sk->sk_state == TCP_ESTABLISHED)
+> > 		pipe_grant_credits(sk, GFP_KERNEL);
+> >-	release_sock(sk);
+> >+
+> > copy:
+> > 	msg->msg_flags |= MSG_EOR;
+> > 	if (skb->len > len)
+> >@@ -1291,6 +1298,8 @@ static int pep_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+> > 		err = (flags & MSG_TRUNC) ? skb->len : len;
+> > 
+> > 	skb_free_datagram(sk, skb);
+> >+
+> >+	release_sock(sk);
+> > 	return err;
+> > }
+> > 
 
