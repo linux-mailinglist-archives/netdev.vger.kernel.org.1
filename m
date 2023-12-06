@@ -1,173 +1,125 @@
-Return-Path: <netdev+bounces-54337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C045806AF5
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:45:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D383F806B0C
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:49:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C97511F21248
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 09:45:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 100A71C20942
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 09:49:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7A31BDD4;
-	Wed,  6 Dec 2023 09:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 632B91CAA4;
+	Wed,  6 Dec 2023 09:49:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="J6Viro+m"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="JfWYiQXZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51149B9;
-	Wed,  6 Dec 2023 01:44:59 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3672B20005;
-	Wed,  6 Dec 2023 09:44:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1701855897;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1wOVKCT46yFHYzsZfptn/YLuf58amecso91N0y4R11c=;
-	b=J6Viro+mz0owT7xGlK236zyL/HHYYcaom8AJXxIhCJMxSlaCJIaCrVXTji8O0Y2B+FB3yI
-	Ki01S0DKSB/GoyzwVdzLKhDlNObkSufX0srTobqBjEeIx8Mrk8IR5FNoOGCGiFfDUwgnvf
-	19+Uf8Rp0ztIC+ysfcHt9FZXj6whr9foZTg/GS1oFm0uxrMeZ9QT/431AC2O1k+erb3MKg
-	eePPpZRAN1tp/2qZTHcU4e6sPPlFPUEj3+etcmOKCKOULfBZJqVNa1b52PePUBkcj67nft
-	mRFIcgRG5xrRP0G44UqazKz5cxGUgTYE8mw0WOpSfevOFsWtdzXGhB4f1081og==
-Date: Wed, 6 Dec 2023 10:44:48 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>,
- Kishon Vijay Abraham I <kishon@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>, Mark
- Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Alexander Couzens <lynxis@fe80.eu>, Qingfang Deng
- <dqfext@gmail.com>, SkyLake Huang <SkyLake.Huang@mediatek.com>, Philipp
- Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- linux-phy@lists.infradead.org
-Subject: Re: [RFC PATCH v2 2/8] phy: add driver for MediaTek pextp 10GE
- SerDes PHY
-Message-ID: <20231206104448.0774da58@device.home>
-In-Reply-To: <63636378a52dd1ea7370dbf0ca3037a7d24004b9.1701826319.git.daniel@makrotopia.org>
-References: <cover.1701826319.git.daniel@makrotopia.org>
-	<63636378a52dd1ea7370dbf0ca3037a7d24004b9.1701826319.git.daniel@makrotopia.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5688109
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 01:49:16 -0800 (PST)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-a1a496a73ceso73723566b.2
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 01:49:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1701856155; x=1702460955; darn=vger.kernel.org;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=YqYYX+lt5EEif67Rak16lbjAMvNYu8HrLB23eU/ToBo=;
+        b=JfWYiQXZ92tpoJbVCHo0SvWosvx0WAmO7f7km1kq0zQjcQuP6nfZlQLztKJjZqjwL5
+         yLc5jjRCktX8PLw56ZTstdFsRR5bnDsJ9BQd7o6Ds8AvhMqSHaoWqJ8AqKm86SIKitCd
+         C7YRipj7h6ntR4x2P8bfgsfgaxhMEM0ILi4g0Eyx1AfMxDeGw46sOw/+B/z6sjEQ1ewn
+         /1o5sT31Zhwwvx7vPCoZg1Qa/7eqyGHeUybucTR4mKBSE7Ot1u9HkF46RVew5/DmhorW
+         doV2bWOhmKUPaVJFx3GCMdXMmFqyVvpOPa9KBgBImJ32treSNn8pMEBBEROO1ZLVNZHA
+         f68g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701856155; x=1702460955;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YqYYX+lt5EEif67Rak16lbjAMvNYu8HrLB23eU/ToBo=;
+        b=Ah5gpNw7rY3vKSxdGUfu54HfclO60vIRWUBmZif6Kn4A+/IQjuk8K5RViKgO8Lfw8i
+         2PJCE1+kfuuueQFfPGS0rwwxSJ/kH+xPGsZ/B9wqZCFW0GYC+7qWWh5K/Q9tnb5ogSTB
+         4KBKeyNKAoFHb8e7qyih/bPWQY0VM4q1TXkiQ93XcnwU7a/buEdbb2tBUWVca/mNxXy/
+         ivyKmTxDBbxcWRQUr8HnDc5AElBxB+/RYt8WZhVZnvUFP99oKUM8iSbPRSW2Qy5N5HWU
+         QVLCAmqBko2TcpBMMrWoFxRarQjJeinavfUC+IEj3ruah2lnUMGy0Kfu4a58XBHjFKPL
+         k9vA==
+X-Gm-Message-State: AOJu0YwV5bFYASLFW4FTMg4ljGJnoCGRh+dJWWxqaf07CGt232cvfVIE
+	738VCO5nOMJmXj6IfRfBieg/eQ==
+X-Google-Smtp-Source: AGHT+IGZeR8QUNsrYHhXWge70KGc2wwspw1S8hno2oOMEQME2GZL7Ls8H9AMKGFkLdbdniUdMXYORw==
+X-Received: by 2002:a17:906:fc03:b0:a19:a19b:7892 with SMTP id ov3-20020a170906fc0300b00a19a19b7892mr376544ejb.85.1701856155371;
+        Wed, 06 Dec 2023 01:49:15 -0800 (PST)
+Received: from cloudflare.com ([2a09:bac5:5064:2dc::49:cb])
+        by smtp.gmail.com with ESMTPSA id t9-20020a170906178900b00a1b65249053sm4515395eje.128.2023.12.06.01.49.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 01:49:14 -0800 (PST)
+References: <20231201180139.328529-2-john.fastabend@gmail.com>
+ <20231201211453.27432-1-kuniyu@amazon.com>
+ <656e4758675b9_1bd6e2086f@john.notmuch>
+User-agent: mu4e 1.6.10; emacs 28.3
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: bpf@vger.kernel.org, edumazet@google.com, martin.lau@kernel.org,
+ netdev@vger.kernel.org, kuniyu@amazon.com
+Subject: Re: [PATCH bpf v2 1/2] bpf: syzkaller found null ptr deref in
+ unix_bpf proto add
+Date: Wed, 06 Dec 2023 10:47:42 +0100
+In-reply-to: <656e4758675b9_1bd6e2086f@john.notmuch>
+Message-ID: <87msunslt2.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain
 
-Hello Daniel,
+On Mon, Dec 04, 2023 at 01:40 PM -08, John Fastabend wrote:
+> Kuniyuki Iwashima wrote:
+>> From: John Fastabend <john.fastabend@gmail.com>
+>> Date: Fri,  1 Dec 2023 10:01:38 -0800
+>> > I added logic to track the sock pair for stream_unix sockets so that we
+>> > ensure lifetime of the sock matches the time a sockmap could reference
+>> > the sock (see fixes tag). I forgot though that we allow af_unix unconnected
+>> > sockets into a sock{map|hash} map.
+>> > 
+>> > This is problematic because previous fixed expected sk_pair() to exist
+>> > and did not NULL check it. Because unconnected sockets have a NULL
+>> > sk_pair this resulted in the NULL ptr dereference found by syzkaller.
+>> > 
+>> > BUG: KASAN: null-ptr-deref in unix_stream_bpf_update_proto+0x72/0x430
+>> > net/unix/unix_bpf.c:171
+>> > Write of size 4 at addr 0000000000000080 by task syz-executor360/5073
+>> > Call Trace:
+>> >  <TASK>
+>> >  ...
+>> >  sock_hold include/net/sock.h:777 [inline]
+>> >  unix_stream_bpf_update_proto+0x72/0x430 net/unix/unix_bpf.c:171
+>> >  sock_map_init_proto net/core/sock_map.c:190 [inline]
+>> >  sock_map_link+0xb87/0x1100 net/core/sock_map.c:294
+>> >  sock_map_update_common+0xf6/0x870 net/core/sock_map.c:483
+>> >  sock_map_update_elem_sys+0x5b6/0x640 net/core/sock_map.c:577
+>> >  bpf_map_update_value+0x3af/0x820 kernel/bpf/syscall.c:167
+>> > 
+>> > We considered just checking for the null ptr and skipping taking a ref
+>> > on the NULL peer sock. But, if the socket is then connected() after
+>> > being added to the sockmap we can cause the original issue again. So
+>> > instead this patch blocks adding af_unix sockets that are not in the
+>> > ESTABLISHED state.
+>> 
+>> I'm not sure if someone has the unconnected stream socket use case
+>> though, can't we call additional sock_hold() in connect() by checking
+>> sk_prot under sk_callback_lock ?
+>
+> Could be done I guess yes. I'm not sure the utility of it though. I
+> thought above patch was the simplest solution and didn't require touching
+> main af_unix code. I don't actually use the sockmap with af_unix
+> sockets anywhere so maybe someone who is using this can comment if
+> unconnected is needed?
+>
+> From rcu and locking side looks like holding sk_callback_lock would
+> be sufficient. I was thinking it would require a rcu grace period
+> or something but seems not.
 
-On Wed, 6 Dec 2023 01:44:08 +0000
-Daniel Golle <daniel@makrotopia.org> wrote:
-
-> Add driver for MediaTek's pextp 10 Gigabit/s Ethernet SerDes PHY which
-> can be found in the MT7988 SoC.
-> 
-> The PHY can operates only in PHY_MODE_ETHERNET, the submode is one of
-> PHY_INTERFACE_MODE_* corresponding to the supported modes:
-> 
->  * USXGMII
->  * 10GBase-R
->  * 5GBase-R
->  * 2500Base-X
->  * 1000Base-X
->  * Cisco SGMII (MAC side)
-> 
-> In order to work-around a performance issue present on the first of
-> two PEXTP present in MT7988 special tuning is applied which can be
-> selected by adding the mediatek,usxgmii-performance-errata property to
-> the device tree node.
-> 
-> There is no documentation what-so-ever for the pextp registers and
-> this driver is based on a GPL licensed implementation found in
-> MediaTek's SDK.
-> 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
-
- [...]
-
-> +
-> +static int mtk_pextp_power_on(struct phy *phy)
-> +{
-> +	struct mtk_pextp_phy *pextp = phy_get_drvdata(phy);
-> +	int ret;
-> +
-> +	ret = clk_prepare_enable(pextp->clk[0]);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return clk_prepare_enable(pextp->clk[1]);
-> +}
-
-clk_bulk operations could be used here
-
-> +static int mtk_pextp_power_off(struct phy *phy)
-> +{
-> +	struct mtk_pextp_phy *pextp = phy_get_drvdata(phy);
-> +
-> +	clk_disable_unprepare(pextp->clk[1]);
-> +	clk_disable_unprepare(pextp->clk[0]);
-> +
-> +	return 0;
-> +}
-
-Here
-
-> +static const struct phy_ops mtk_pextp_ops = {
-> +	.power_on	= mtk_pextp_power_on,
-> +	.power_off	= mtk_pextp_power_off,
-> +	.set_mode	= mtk_pextp_set_mode,
-> +	.reset		= mtk_pextp_reset,
-> +	.owner		= THIS_MODULE,
-> +};
-> +
-> +static int mtk_pextp_probe(struct platform_device *pdev)
-> +{
-> +	struct device_node *np = pdev->dev.of_node;
-> +	struct phy_provider *phy_provider;
-> +	struct mtk_pextp_phy *pextp;
-> +	struct phy *phy;
-> +
-> +	if (!np)
-> +		return -ENODEV;
-> +
-> +	pextp = devm_kzalloc(&pdev->dev, sizeof(*pextp), GFP_KERNEL);
-> +	if (!pextp)
-> +		return -ENOMEM;
-> +
-> +	pextp->base = devm_of_iomap(&pdev->dev, np, 0, NULL);
-> +	if (!pextp->base)
-> +		return -EIO;
-> +
-> +	pextp->dev = &pdev->dev;
-> +	pextp->clk[0] = devm_clk_get(&pdev->dev, "topxtal");
-> +	if (IS_ERR(pextp->clk[0]))
-> +		return PTR_ERR(pextp->clk[0]);
-> +
-> +	pextp->clk[1] = devm_clk_get(&pdev->dev, "xfipll");
-> +	if (IS_ERR(pextp->clk[1]))
-> +		return PTR_ERR(pextp->clk[1]);
-
-And here as well.
-
-Thanks,
-
-Maxime
+I'd revist the option of grabbing an skpair ref in unix_stream_sendmsg.
 
 
