@@ -1,77 +1,72 @@
-Return-Path: <netdev+bounces-54552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9CCE80772A
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:58:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AFFD807735
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 19:01:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CA9BB20DE5
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:58:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8D84281FBC
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:01:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9D4D6DD10;
-	Wed,  6 Dec 2023 17:58:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B846E2AF;
+	Wed,  6 Dec 2023 18:01:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0HbX49In"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hcMU5fKv"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DFE2D42;
-	Wed,  6 Dec 2023 09:58:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=3ZZNNhGyoTwRHgS/bMWVfX3vw+ZZ4cEePiAqrrIcnwM=; b=0HbX49InVIrrypsWfM0ZmrDswH
-	hUiEYIwZ/X0y6/g3n9MfR/Xe2G5AdEZwo+6WoFCG9muiQqjrdSwuIWlOmpA/dcAwSSIDNPabftXNo
-	uUNE6oM3plQH/R0YwGvoVXykOm1A4uJeGpKeG2xQ6OpBt4v6vuNKuyUgCJLK2gEMd+nzY3h0O6rqU
-	lVYOBys6d13VTBf1WTZRBZfPGgizzwR9LYBtitOMb3NgrraS95ziohm/QKnnBx5eXCTQ1NEWNAn6r
-	jZStgPtTaO+kCOGSkHoMhAr3HpiHeQ3UkPTPRTIclBzQAngtVpzIr9Moie2tqITHv3pZ/w+4X8vqF
-	3QJptGVQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56612)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rAw9w-0000E0-0u;
-	Wed, 06 Dec 2023 17:58:08 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rAw9w-0002uo-Va; Wed, 06 Dec 2023 17:58:08 +0000
-Date: Wed, 6 Dec 2023 17:58:08 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Daniel Golle <daniel@makrotopia.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chunfeng Yun <chunfeng.yun@mediatek.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexander Couzens <lynxis@fe80.eu>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org
-Subject: Re: [RFC PATCH v2 5/8] net: pcs: add driver for MediaTek USXGMII PCS
-Message-ID: <ZXC2MFn7pVX/KNmJ@shell.armlinux.org.uk>
-References: <cover.1701826319.git.daniel@makrotopia.org>
- <3cd8af5e44554c2db2d7898494ee813967206bd9.1701826319.git.daniel@makrotopia.org>
- <20231206105838.069ae288@device.home>
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1B7F122;
+	Wed,  6 Dec 2023 10:01:35 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-54cdef4c913so2423019a12.1;
+        Wed, 06 Dec 2023 10:01:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701885694; x=1702490494; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uakw0xbIjx7LFKm73fUVJEIp419SfbRyT/FiQAyMveE=;
+        b=hcMU5fKvoOU+VIXeOZ4LhcBH/mR0pgpY9OzgVOhhpWZwfH1jylaD1TYyRqzJ7ZU7I8
+         AaogpzmHddsos4hzBdjedmIRzumlES8O7c+XrMXnVoP7Pm2Xgfqrze17UjHgCzED9FvP
+         WRfkVPJBa4LgLAOIkzG10IrNz7UOI5HbdG5wOqZ7lHchSjOx/ESax3Hh8PybQBKTGeqV
+         Q9+o2pxTlYaw0ESHB9avS02WmMxtZEjHu+UAIci/YXukN2dQP/EQwNnEaRzUTktFOyOV
+         IsCGUKeZ65QmK2SdeXx/o0NBHeEk5fpKDv4XkHJ3br+iI1aKE/2ZTxBIXVRy7S96yhVa
+         Qhtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701885694; x=1702490494;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uakw0xbIjx7LFKm73fUVJEIp419SfbRyT/FiQAyMveE=;
+        b=HzKHgUxJdeVnLC43X08ugicf/nauI1EE20Ngx3cyoUNvR1p2prkW8kDDe3e73xJVmg
+         MZemedXB2C3ol0obTnQmnff34/gaKA5Se1ItFqOf11Yjok+OliORzxEi2pVoYkmfVlgZ
+         IcYCMBu3WLgbo99pNnpzO51wDQUUdU7VNNqwbSxbcAE2MThlTnEBWcPaTaRJB9itjV4e
+         kxRcfvlKIqgyiPthUizb/2O24HfQgGFYeFeyk+7kQHe4u5iQcAzlXsD6f1BX3Tvxs4Ss
+         f1XciJE+Fnh2jVdkNJQsADt+oSwuo5clYek0kcFLD13N6mEC0dfrZtgDBtbPm7A1j5hM
+         4Ifg==
+X-Gm-Message-State: AOJu0YxSPDBkhRo/91BEy4cIiMnhevBUNQ8ujWH/YWgrLgOxSyGEMxUc
+	1Tpo3JdykBgU7PNwnQkVJHM=
+X-Google-Smtp-Source: AGHT+IE7/6aN+mvH6ma4z5ujZMBMtBcU/LCSPM0CjFNej2u1lk1K8sqvvGWuIM2ToQiYzGt/stCpog==
+X-Received: by 2002:a17:906:c292:b0:a1b:75f6:165c with SMTP id r18-20020a170906c29200b00a1b75f6165cmr3602583ejz.52.1701885693921;
+        Wed, 06 Dec 2023 10:01:33 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id kx2-20020a170907774200b00a1da2f7c1d8sm239570ejc.77.2023.12.06.10.01.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 10:01:33 -0800 (PST)
+Date: Wed, 6 Dec 2023 20:01:31 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Sean Nyekjaer <sean@geanix.com>
+Cc: Madhuri.Sripada@microchip.com, Woojung.Huh@microchip.com,
+	UNGLinuxDriver@microchip.com, andrew@lunn.ch, f.fainelli@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, Arun.Ramadoss@microchip.com, ceggers@arri.de,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net] net: dsa: microchip: provide a list of valid
+ protocols for xmit handler
+Message-ID: <20231206180131.6uy3c3nazjaok2yl@skbuf>
+References: <20231206071655.1626479-1-sean@geanix.com>
+ <DM6PR11MB4124D98726836442169C2C55E184A@DM6PR11MB4124.namprd11.prod.outlook.com>
+ <20231206173543.ag7xb4vhcjknyiyv@skbuf>
+ <2244A511-6F6F-4711-9BE0-30786B021AE5@geanix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,33 +75,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231206105838.069ae288@device.home>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <2244A511-6F6F-4711-9BE0-30786B021AE5@geanix.com>
 
-On Wed, Dec 06, 2023 at 10:58:38AM +0100, Maxime Chevallier wrote:
-> On Wed, 6 Dec 2023 01:44:38 +0000
-> Daniel Golle <daniel@makrotopia.org> wrote:
-> > +	/* Read USXGMII link status */
-> > +	state->link = FIELD_GET(RG_PCS_RX_LINK_STATUS,
-> > +				mtk_r32(mpcs, RG_PCS_RX_STATUS0));
-> > +
-> > +	/* Continuously repeat re-configuration sequence until link comes up */
-> > +	if (!state->link) {
-> > +		mtk_usxgmii_pcs_config(pcs, mpcs->neg_mode,
-> > +				       state->interface, NULL, false);
-> > +		return;
+On Wed, Dec 06, 2023 at 06:45:12PM +0100, Sean Nyekjaer wrote:
+> > Don't just leave it there, also explain why.
 > 
-> .pcs_get_state() isn't called only for link state polling,but also when querying
-> the link state from ethtool, from phylink_ethtool_ksettings_get().
+> Message to me?
 > 
-> As mtk_usxgmii_pcs_config triggers a pcs reset and reconfiguration, won't this disrupt
-> the link ? 
+> /Sean
 
-Highly likely if there's a race, but note that mtk_usxgmii_pcs_config()
-only gets called if the link is *down*. I guess some IPs need a bit of
-kicking to work properly.
+No, to Madhuri (as the To: field suggests).
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+In the Linux kernel it's not a good practice to put defensive checks
+which don't have a logical justification, because other people end up
+not knowing why they're there, and when they can be removed. Checking
+for the tagging protocol gives a very clear indication and traceability
+of why it is being done, on the other hand.
+
+If the ds->tagger_data is NULL for a tagging protocol for which it was
+expected it shouldn't be, and the DSA core still decides to call
+ds->ops->connect_tag_protocol() anyway, this is a violation of the API
+contract established with all drivers that use this mechanism. Papering
+over a bug in the DSA core results in silent failures, which means that
+any further behavior is unpredictable. So I'd very much prefer the
+system to fail fast in case of a bug in the framework, so that it can be
+reported and fixed. With rigorous testing, it will fail earlier than in
+the production stage.
+
+I only said "don't leave it there, also explain why" because I really
+don't appreciate review comments spreading FUD, for which I'd have to
+spend 20-30 minutes to explain why leaving out the NULL pointer checking
+is, in fact, safe.
+
+Of course, I am not excluding a not-yet-found bug either, but I am
+strongly encouraging Madhuri to walk through the code path and point
+it to us, and strongly discouraging lazy review comments. It's not fair
+for me to reply to a 5 word sentence with a wall of text. So I replied
+with a phrase of comparable length to the suggestion.
 
