@@ -1,234 +1,324 @@
-Return-Path: <netdev+bounces-54186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24A39806343
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 01:12:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35B3F806357
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 01:20:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 493DB1C20B4C
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 00:12:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 707251C210C8
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 00:20:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A3EC19F;
-	Wed,  6 Dec 2023 00:12:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A1F7361;
+	Wed,  6 Dec 2023 00:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WAqXhWkJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mSLMocFJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7836218F
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 16:12:46 -0800 (PST)
-Received: by mail-qv1-xf2f.google.com with SMTP id 6a1803df08f44-67ad277a06bso12458336d6.1
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 16:12:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1701821565; x=1702426365; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JymTmm1wF4ol8X+dKR5dhtMdZAWSGho530O3W6NsfDI=;
-        b=WAqXhWkJ/BIfXYgdyMtcd8J5EnCFDKOku94BvgwVkHoPNpUI5Du6NIprKSc8MQmc/v
-         Xl+lXOC2ZqG9+Wmocoie/Qjk0Mb8/3DkQxqwqa1CiGLgu2a0NCgN8p9wIXeRa9un2Tbm
-         H3JofCb3/jdg1RKHXpq4iUvdxpyaZyJ2ZB0A0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701821565; x=1702426365;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JymTmm1wF4ol8X+dKR5dhtMdZAWSGho530O3W6NsfDI=;
-        b=V/oAi5VBy/8tuS5n+ytXURy1WnTc/Tf2qD2RFARokBSzgxy1akejOmyTBOLtqPkQ3W
-         5HhEjnqr0U5fquWs8m5PO0HyHGj++8jXLHXtJfPZibYBN2IL90tR/2jQSaoZXeqh1+YB
-         +RmDudmQW2YjdxY53iDh5jFdWPm3ttxC5FAHsr5KaDLLiac5124bZ7qaJzw8jkj7BM+g
-         I4VxbNu6JuF2vyjN1jnw8Hn4GVwOv7TQ76VU1pqGLCuVYO7obqlsXa2s8pYLgB12JKOE
-         W7y+0rjL3whdgOOMZvsVC/S+jzIKj2SBtH1VNldWG7PdGhAkrkO76/tkdF3vVIv0OE10
-         lb/w==
-X-Gm-Message-State: AOJu0YxA1NknS3d39xhQ8QRoJpc+eobVUrGniodn2UjpqUJolvha4jeo
-	7EhDiywkrksoy29KB484zgAXgA==
-X-Google-Smtp-Source: AGHT+IHdvkGFJod2t1zurUIcN7F92pxQCfkRaCibtVKtA/6D9kYMw1K+dkNyPJyOIHoqvHKr/6t9nw==
-X-Received: by 2002:ad4:5914:0:b0:67a:b0a6:f943 with SMTP id ez20-20020ad45914000000b0067ab0a6f943mr47806qvb.66.1701821565579;
-        Tue, 05 Dec 2023 16:12:45 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id x18-20020a0ce252000000b0067abc69c71bsm2709071qvl.0.2023.12.05.16.12.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Dec 2023 16:12:44 -0800 (PST)
-Message-ID: <c2ce6d12-fb5e-4067-aa7c-4f57f4eb4613@broadcom.com>
-Date: Tue, 5 Dec 2023 16:12:41 -0800
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F901FA;
+	Tue,  5 Dec 2023 16:20:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701822010; x=1733358010;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=h9K6AU4xHVERz83I4OcOX+bcHFvOTHS3L3ye/btbUfg=;
+  b=mSLMocFJTuopHabJMHwjt2IqtAExNo3nTgjSBuzXwTjfjBmpmtst3fc4
+   O89PblhhECdMEJODRhkPCfh0XQpaiM3RROhAgR0otX8FKPsz2sTFVe58n
+   kDLNTDvquIiunD/Y3EhmTguGk5DFe8C67Zr2YhLHyBQa7CEC9c2sUstEU
+   OKdaVneMIOCdof14l0kmcBJ7qEOd0fz7uP9vvPoEpVinjnlwd6KFr9z/o
+   0T8/xDShmFx1SRdL+GfJxZQrlWdiubmJmN+04eHjvP2pSinAoYG8cYBnK
+   sCr32zus8oeOwn5AcVAzVBIouQlaUr1WeVpYr01fIr8c5JL0r68/nzDfS
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="425131127"
+X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
+   d="scan'208";a="425131127"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 16:20:09 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="800150425"
+X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
+   d="scan'208";a="800150425"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga008.jf.intel.com with ESMTP; 05 Dec 2023 16:20:03 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rAfdx-0009vc-02;
+	Wed, 06 Dec 2023 00:20:01 +0000
+Date: Wed, 6 Dec 2023 08:19:07 +0800
+From: kernel test robot <lkp@intel.com>
+To: Serge Semin <fancer.lancer@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Tomer Maimon <tmaimon77@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Serge Semin <fancer.lancer@gmail.com>, openbmc@lists.ozlabs.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next 13/16] net: stmmac: intel: Register generic MDIO
+ device
+Message-ID: <202312060845.lDDRDWET-lkp@intel.com>
+References: <20231205103559.9605-14-fancer.lancer@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: phy: Only resume phy if it is suspended
-To: Justin Chen <justin.chen@broadcom.com>, Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, open list <linux-kernel@vger.kernel.org>
-References: <20231205234229.274601-1-justin.chen@broadcom.com>
- <7e3208aa-3adf-47ec-9e95-3c88a121e8a3@lunn.ch>
- <55a08719-cd18-4a01-9a2a-0115065c06a6@broadcom.com>
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- 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
-In-Reply-To: <55a08719-cd18-4a01-9a2a-0115065c06a6@broadcom.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000e79095060bcc3548"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231205103559.9605-14-fancer.lancer@gmail.com>
 
---000000000000e79095060bcc3548
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Hi Serge,
 
-On 12/5/23 16:10, Justin Chen wrote:
-> 
-> 
-> On 12/5/23 4:03 PM, Andrew Lunn wrote:
->> On Tue, Dec 05, 2023 at 03:42:29PM -0800, Justin Chen wrote:
->>> Resuming the phy can take quite a bit of time. Lets only resume the
->>> phy if it is suspended.
->>
->> Humm...
->>
->> https://lore.kernel.org/netdev/6d45f4da-c45e-4d35-869f-85dd4ec37b31@lunn.ch/T/
->>
->> If Broadcom PHYs are slow to resume, maybe you should solve this in
->> the broadcom resume handler, read the status from the hardware and
->> only do the resume if the hardware is suspended.
->>
->>       Andrew
-> 
-> Right... Guess this won't work. It is odd that during resume we call 
-> __phy_resume twice. Once from phy_resume() and another at phy_start(). 
-> Let me rethink this. Thanks for the feedback.
+kernel test robot noticed the following build errors:
 
-This might be something for us to figure out on the driver side, I think 
-historically I have always followed the pattern of doing:
+[auto build test ERROR on net-next/main]
 
-phy_suspend()
-phy_stop()
+url:    https://github.com/intel-lab-lkp/linux/commits/Serge-Semin/net-pcs-xpcs-Drop-sentinel-entry-from-2500basex-ifaces-list/20231205-183808
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231205103559.9605-14-fancer.lancer%40gmail.com
+patch subject: [PATCH net-next 13/16] net: stmmac: intel: Register generic MDIO device
+config: x86_64-kexec (https://download.01.org/0day-ci/archive/20231206/202312060845.lDDRDWET-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231206/202312060845.lDDRDWET-lkp@intel.com/reproduce)
 
-and
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312060845.lDDRDWET-lkp@intel.com/
 
-phy_resume()
-phy_start()
+All errors (new ones prefixed by >>):
 
-because it used to be necessary to do that way back when...
+   drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c: In function 'intel_mgbe_common_data':
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c:646:31: error: 'clk' undeclared (first use in this function)
+     646 |         clk_disable_unprepare(clk);
+         |                               ^~~
+   drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c:646:31: note: each undeclared identifier is reported only once for each function it appears in
+
+
+vim +/clk +646 drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+
+   446	
+   447	static int intel_mgbe_common_data(struct pci_dev *pdev,
+   448					  struct plat_stmmacenet_data *plat)
+   449	{
+   450		struct fwnode_handle *fwnode;
+   451		char clk_name[20];
+   452		int ret;
+   453		int i;
+   454	
+   455		plat->pdev = pdev;
+   456		plat->phy_addr = -1;
+   457		plat->clk_csr = 5;
+   458		plat->has_gmac = 0;
+   459		plat->has_gmac4 = 1;
+   460		plat->force_sf_dma_mode = 0;
+   461		plat->flags |= (STMMAC_FLAG_TSO_EN | STMMAC_FLAG_SPH_DISABLE);
+   462	
+   463		/* Multiplying factor to the clk_eee_i clock time
+   464		 * period to make it closer to 100 ns. This value
+   465		 * should be programmed such that the clk_eee_time_period *
+   466		 * (MULT_FACT_100NS + 1) should be within 80 ns to 120 ns
+   467		 * clk_eee frequency is 19.2Mhz
+   468		 * clk_eee_time_period is 52ns
+   469		 * 52ns * (1 + 1) = 104ns
+   470		 * MULT_FACT_100NS = 1
+   471		 */
+   472		plat->mult_fact_100ns = 1;
+   473	
+   474		plat->rx_sched_algorithm = MTL_RX_ALGORITHM_SP;
+   475	
+   476		for (i = 0; i < plat->rx_queues_to_use; i++) {
+   477			plat->rx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
+   478			plat->rx_queues_cfg[i].chan = i;
+   479	
+   480			/* Disable Priority config by default */
+   481			plat->rx_queues_cfg[i].use_prio = false;
+   482	
+   483			/* Disable RX queues routing by default */
+   484			plat->rx_queues_cfg[i].pkt_route = 0x0;
+   485		}
+   486	
+   487		for (i = 0; i < plat->tx_queues_to_use; i++) {
+   488			plat->tx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
+   489	
+   490			/* Disable Priority config by default */
+   491			plat->tx_queues_cfg[i].use_prio = false;
+   492			/* Default TX Q0 to use TSO and rest TXQ for TBS */
+   493			if (i > 0)
+   494				plat->tx_queues_cfg[i].tbs_en = 1;
+   495		}
+   496	
+   497		/* FIFO size is 4096 bytes for 1 tx/rx queue */
+   498		plat->tx_fifo_size = plat->tx_queues_to_use * 4096;
+   499		plat->rx_fifo_size = plat->rx_queues_to_use * 4096;
+   500	
+   501		plat->tx_sched_algorithm = MTL_TX_ALGORITHM_WRR;
+   502		plat->tx_queues_cfg[0].weight = 0x09;
+   503		plat->tx_queues_cfg[1].weight = 0x0A;
+   504		plat->tx_queues_cfg[2].weight = 0x0B;
+   505		plat->tx_queues_cfg[3].weight = 0x0C;
+   506		plat->tx_queues_cfg[4].weight = 0x0D;
+   507		plat->tx_queues_cfg[5].weight = 0x0E;
+   508		plat->tx_queues_cfg[6].weight = 0x0F;
+   509		plat->tx_queues_cfg[7].weight = 0x10;
+   510	
+   511		plat->dma_cfg->pbl = 32;
+   512		plat->dma_cfg->pblx8 = true;
+   513		plat->dma_cfg->fixed_burst = 0;
+   514		plat->dma_cfg->mixed_burst = 0;
+   515		plat->dma_cfg->aal = 0;
+   516		plat->dma_cfg->dche = true;
+   517	
+   518		plat->axi = devm_kzalloc(&pdev->dev, sizeof(*plat->axi),
+   519					 GFP_KERNEL);
+   520		if (!plat->axi)
+   521			return -ENOMEM;
+   522	
+   523		plat->axi->axi_lpi_en = 0;
+   524		plat->axi->axi_xit_frm = 0;
+   525		plat->axi->axi_wr_osr_lmt = 1;
+   526		plat->axi->axi_rd_osr_lmt = 1;
+   527		plat->axi->axi_blen[0] = 4;
+   528		plat->axi->axi_blen[1] = 8;
+   529		plat->axi->axi_blen[2] = 16;
+   530	
+   531		plat->ptp_max_adj = plat->clk_ptp_rate;
+   532		plat->eee_usecs_rate = plat->clk_ptp_rate;
+   533	
+   534		/* Set system clock */
+   535		sprintf(clk_name, "%s-%s", "stmmac", pci_name(pdev));
+   536	
+   537		plat->stmmac_clk = clk_register_fixed_rate(&pdev->dev,
+   538							   clk_name, NULL, 0,
+   539							   plat->clk_ptp_rate);
+   540	
+   541		if (IS_ERR(plat->stmmac_clk)) {
+   542			dev_warn(&pdev->dev, "Fail to register stmmac-clk\n");
+   543			plat->stmmac_clk = NULL;
+   544		}
+   545	
+   546		ret = clk_prepare_enable(plat->stmmac_clk);
+   547		if (ret) {
+   548			clk_unregister_fixed_rate(plat->stmmac_clk);
+   549			return ret;
+   550		}
+   551	
+   552		plat->ptp_clk_freq_config = intel_mgbe_ptp_clk_freq_config;
+   553	
+   554		/* Set default value for multicast hash bins */
+   555		plat->multicast_filter_bins = HASH_TABLE_SIZE;
+   556	
+   557		/* Set default value for unicast filter entries */
+   558		plat->unicast_filter_entries = 1;
+   559	
+   560		/* Set the maxmtu to a default of JUMBO_LEN */
+   561		plat->maxmtu = JUMBO_LEN;
+   562	
+   563		plat->flags |= STMMAC_FLAG_VLAN_FAIL_Q_EN;
+   564	
+   565		/* Use the last Rx queue */
+   566		plat->vlan_fail_q = plat->rx_queues_to_use - 1;
+   567	
+   568		/* For fixed-link setup, we allow phy-mode setting */
+   569		fwnode = dev_fwnode(&pdev->dev);
+   570		if (fwnode) {
+   571			int phy_mode;
+   572	
+   573			/* "phy-mode" setting is optional. If it is set,
+   574			 *  we allow either sgmii or 1000base-x for now.
+   575			 */
+   576			phy_mode = fwnode_get_phy_mode(fwnode);
+   577			if (phy_mode >= 0) {
+   578				if (phy_mode == PHY_INTERFACE_MODE_SGMII ||
+   579				    phy_mode == PHY_INTERFACE_MODE_1000BASEX)
+   580					plat->phy_interface = phy_mode;
+   581				else
+   582					dev_warn(&pdev->dev, "Invalid phy-mode\n");
+   583			}
+   584		}
+   585	
+   586		/* Intel mgbe SGMII interface uses pcs-xcps */
+   587		if (plat->phy_interface == PHY_INTERFACE_MODE_SGMII ||
+   588		    plat->phy_interface == PHY_INTERFACE_MODE_1000BASEX) {
+   589			struct mdio_board_info *xpcs_info;
+   590	
+   591			xpcs_info = devm_kzalloc(&pdev->dev,
+   592						 sizeof(*xpcs_info) + MII_BUS_ID_SIZE,
+   593						 GFP_KERNEL);
+   594			if (!xpcs_info) {
+   595				ret = -ENOMEM;
+   596				goto err_alloc_info;
+   597			}
+   598	
+   599			xpcs_info->bus_id = (void *)xpcs_info + sizeof(*xpcs_info);
+   600			snprintf((char *)xpcs_info->bus_id, MII_BUS_ID_SIZE,
+   601				 "stmmac-%x", plat->bus_id);
+   602	
+   603			snprintf(xpcs_info->modalias, MDIO_NAME_SIZE, "dwxpcs");
+   604	
+   605			xpcs_info->mdio_addr = INTEL_MGBE_XPCS_ADDR;
+   606	
+   607			ret = mdiobus_register_board_info(xpcs_info, 1);
+   608			if (ret)
+   609				goto err_alloc_info;
+   610	
+   611			plat->mdio_bus_data->has_xpcs = true;
+   612			plat->mdio_bus_data->xpcs_an_inband = true;
+   613		}
+   614	
+   615		/* For fixed-link setup, we clear xpcs_an_inband */
+   616		if (fwnode) {
+   617			struct fwnode_handle *fixed_node;
+   618	
+   619			fixed_node = fwnode_get_named_child_node(fwnode, "fixed-link");
+   620			if (fixed_node)
+   621				plat->mdio_bus_data->xpcs_an_inband = false;
+   622	
+   623			fwnode_handle_put(fixed_node);
+   624		}
+   625	
+   626		/* Ensure mdio bus PHY-scan skips intel serdes and pcs-xpcs */
+   627		plat->mdio_bus_data->phy_mask = 1 << INTEL_MGBE_ADHOC_ADDR;
+   628		plat->mdio_bus_data->phy_mask |= 1 << INTEL_MGBE_XPCS_ADDR;
+   629	
+   630		plat->int_snapshot_num = AUX_SNAPSHOT1;
+   631	
+   632		plat->crosststamp = intel_crosststamp;
+   633		plat->flags &= ~STMMAC_FLAG_INT_SNAPSHOT_EN;
+   634	
+   635		/* Setup MSI vector offset specific to Intel mGbE controller */
+   636		plat->msi_mac_vec = 29;
+   637		plat->msi_lpi_vec = 28;
+   638		plat->msi_sfty_ce_vec = 27;
+   639		plat->msi_sfty_ue_vec = 26;
+   640		plat->msi_rx_base_vec = 0;
+   641		plat->msi_tx_base_vec = 1;
+   642	
+   643		return 0;
+   644	
+   645	err_alloc_info:
+ > 646		clk_disable_unprepare(clk);
+   647		clk_unregister_fixed_rate(clk);
+   648	
+   649		return ret;
+   650	}
+   651	
+
 -- 
-Florian
-
-
---000000000000e79095060bcc3548
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
-9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
-AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
-UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
-KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
-nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
-Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
-VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
-ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
-CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
-MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
-d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
-hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
-bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
-BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
-KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
-kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
-2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
-3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
-NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
-AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
-LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIDsyrGb+xHMJDuCN
-Lbiwkd7yvTmpNOBU35Tkg5GTGY1PMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTIzMTIwNjAwMTI0NVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
-AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQC9VjSycjTYqK3st2UrYTtbNRdxiocMFP7Z
-Lm3Hnmv1C2s1yI4ryUEffWKovIGnUbwfX0oA8T5QqwFIPBqUGr44dTr9qApScsFsFg9Qf2X98mzo
-6aTVJQXigydG7qRNOXcb57Y9pH7eSFo+EwB4tKA+cDnVWZmOgq5zv9G8aAYJfnGhIAKUJuDrtrVw
-UMZgGiOhKw2nnjuQlOz6Z7frhAJpE79iL3UPCbymbsHyrfQ5mXi/tLdZypc9ETHdUUEjyMqOQ8yo
-cL9KUL84ntZbB12Z+S0dVsdu13dBfQFyhT25FIplkEFo7FtXggjl+RoU/5o/uk7dokbSZSsHi9YN
-yp+z
---000000000000e79095060bcc3548--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
