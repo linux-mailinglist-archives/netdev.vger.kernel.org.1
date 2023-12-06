@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-54537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46FE4807698
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:27:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E148C8076AC
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:35:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4E611F211AF
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:27:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BE131F210F3
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:35:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06B1C675BC;
-	Wed,  6 Dec 2023 17:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14DD66A005;
+	Wed,  6 Dec 2023 17:35:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="RspeMsNl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hd5xgApd"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CD4FD4B;
-	Wed,  6 Dec 2023 09:27:08 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 4D837FF805;
-	Wed,  6 Dec 2023 17:27:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1701883627;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=o8pZVmJLBTU+1tWg81N7K3SrAOmJRHhU7sJoEUi0B8Q=;
-	b=RspeMsNlXs4d9FVko5LXZ3Kk3UqyCUGNCdsvtlEh+T6qMnNVaAAJKhPfp1sYFoj6hjBTCj
-	ylgCMP9ngNWeyY9LxI6KabuMqEtQLjDrdMBz0I8KZeukyXFLCrH/+DOIN9hm1hQNXh6Fev
-	M2j9oMbc4cXuShB9qSFyhqctHwnyEyjn4pFjxv38xjVYiuEKCg1gVA0pQNxb0n/0n90Dhw
-	mOEph1mESP0822WMO36jzvlFA6rPG8yWiPJgciDCB3+moMrWPzUx81vh7Yeeagnc8Lwjbn
-	wXBVek6wM7IgU+NDmVLVqwaZypP0vkx7oVV44HsAtlAqZdMK3qzKnnkV8oZ5Vg==
-Date: Wed, 6 Dec 2023 18:27:05 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Stefan Eichenberger <eichest@gmail.com>
-Cc: mw@semihalf.com, linux@armlinux.org.uk, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: mvpp2: add support for mii
-Message-ID: <20231206182705.3ff798ad@device.home>
-In-Reply-To: <20231206160125.2383281-1-eichest@gmail.com>
-References: <20231206160125.2383281-1-eichest@gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD8B364B2
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 17:35:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 440ADC433C7;
+	Wed,  6 Dec 2023 17:35:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701884101;
+	bh=l6uc1UENCSeZGc8bYRiceTUZSVKdPJe0fsQ9QeaY7IE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hd5xgApdfvAuj5tM31R7hVfrywxhW9+Yny5BGw/8VEAWCZDD0KzMbKxTkxf7eOZ6v
+	 XprD4Pn5KglgdfBDqZx5hokxMgZs53IswH57V/12pRf9DzgEfincz/Snc6PTtSTkEO
+	 lg5is/uOX5cR9OkT4l5mN1Tj0IqmMGtjz3wEr63jWuzHkCjeARinRIZ9OZdL0B4LNG
+	 q7YjPYFjDxYUaO+csN6ZPc31VWyYRrTZ4zF4wi6r7kYyowrX0ZZQOZhtwOlcAW5jph
+	 AeITXs/iNNh9XvKMx/N0o/yLPaf74ppVjOIFkwEsc/XMD0YJfef3CO5jvQoc7cS3zm
+	 XOX7lP28OG4NA==
+Date: Wed, 6 Dec 2023 09:35:00 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ linux@armlinux.org.uk, andrew@lunn.ch, netdev@vger.kernel.org,
+ mengyuanlou@net-swift.com
+Subject: Re: [PATCH net-next v3 6/7] net: wangxun: add ethtool_ops for
+ channel number
+Message-ID: <20231206093500.7e71fbcf@kernel.org>
+In-Reply-To: <20231206095355.1220086-7-jiawenwu@trustnetic.com>
+References: <20231206095355.1220086-1-jiawenwu@trustnetic.com>
+	<20231206095355.1220086-7-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,92 +52,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hello Stefan,
+On Wed,  6 Dec 2023 17:53:54 +0800 Jiawen Wu wrote:
+> +	/* verify they are not requesting separate vectors */
+> +	if (!count || ch->rx_count || ch->tx_count)
+> +		return -EOPNOTSUPP;
 
-On Wed,  6 Dec 2023 17:01:25 +0100
-Stefan Eichenberger <eichest@gmail.com> wrote:
-
-> Currently, mvpp2 only supports RGMII. This commit adds support for MII.
-> The description in Marvell's functional specification seems to be wrong.
-> To enable MII, we need to set GENCONF_CTRL0_PORT3_RGMII, while for RGMII
-> we need to clear it. This is also how U-Boot handles it.
-> 
-> Signed-off-by: Stefan Eichenberger <eichest@gmail.com>
-> ---
->  .../net/ethernet/marvell/mvpp2/mvpp2_main.c   | 24 ++++++++++++++++---
->  1 file changed, 21 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-> index 93137606869e..6f136f42e2bf 100644
-> --- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-> +++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-> @@ -1513,10 +1513,21 @@ static void mvpp22_gop_init_rgmii(struct mvpp2_port *port)
->  	regmap_write(priv->sysctrl_base, GENCONF_PORT_CTRL0, val);
->  
->  	regmap_read(priv->sysctrl_base, GENCONF_CTRL0, &val);
-> -	if (port->gop_id == 2)
-> +	if (port->gop_id == 2) {
->  		val |= GENCONF_CTRL0_PORT2_RGMII;
-> -	else if (port->gop_id == 3)
-> +	} else if (port->gop_id == 3) {
->  		val |= GENCONF_CTRL0_PORT3_RGMII_MII;
-> +
-> +		/* According to the specification, GENCONF_CTRL0_PORT3_RGMII
-> +		 * should be set to 1 for RGMII and 0 for MII. However, tests
-> +		 * show that it is the other way around. This is also what
-> +		 * U-Boot does for mvpp2, so it is assumed to be correct.
-> +		 */
-> +		if (port->phy_interface == PHY_INTERFACE_MODE_MII)
-> +			val |= GENCONF_CTRL0_PORT3_RGMII;
-> +		else
-> +			val &= ~GENCONF_CTRL0_PORT3_RGMII;
-> +	}
->  	regmap_write(priv->sysctrl_base, GENCONF_CTRL0, val);
->  }
->  
-> @@ -1615,6 +1626,7 @@ static int mvpp22_gop_init(struct mvpp2_port *port, phy_interface_t interface)
->  		return 0;
->  
->  	switch (interface) {
-> +	case PHY_INTERFACE_MODE_MII:
->  	case PHY_INTERFACE_MODE_RGMII:
->  	case PHY_INTERFACE_MODE_RGMII_ID:
->  	case PHY_INTERFACE_MODE_RGMII_RXID:
-> @@ -6948,8 +6960,11 @@ static int mvpp2_port_probe(struct platform_device *pdev,
->  					MAC_10000FD;
->  		}
->  
-> -		if (mvpp2_port_supports_rgmii(port))
-> +		if (mvpp2_port_supports_rgmii(port)) {
->  			phy_interface_set_rgmii(port->phylink_config.supported_interfaces);
-> +			__set_bit(PHY_INTERFACE_MODE_MII,
-> +				  port->phylink_config.supported_interfaces);
-> +		}
->  
->  		if (comphy) {
->  			/* If a COMPHY is present, we can support any of the
-> @@ -6973,6 +6988,9 @@ static int mvpp2_port_probe(struct platform_device *pdev,
->  				  port->phylink_config.supported_interfaces);
->  			__set_bit(PHY_INTERFACE_MODE_SGMII,
->  				  port->phylink_config.supported_interfaces);
-> +		} else if (phy_mode == PHY_INTERFACE_MODE_MII) {
-> +			__set_bit(PHY_INTERFACE_MODE_100BASEX,
-> +				  port->phylink_config.supported_interfaces);
-
-Can you explain that part ? I don't understand why 100BaseX is being
-reported as a supported mode here. This whole section of the function
-is about detecting what can be reported based on the presence or not of
-a comphy driver / hardcoded comphy config. I don't think the comphy
-here has anything to do with MII / 100BaseX
-
-If 100BaseX can be carried on MII (which I don't know), shouldn't it be
-reported no matter what ?
-
-Thanks,
-
-Maxime
-
-
+Doesn't core already check this? You leave the max_ values as 0
 
