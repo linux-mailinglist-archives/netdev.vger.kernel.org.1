@@ -1,119 +1,179 @@
-Return-Path: <netdev+bounces-54471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72655807348
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 16:05:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B22CF807361
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 16:08:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22FFB1F2188C
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 15:05:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2EF21C20A6C
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 15:08:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE973EA90;
-	Wed,  6 Dec 2023 15:05:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D95ED3FB0F;
+	Wed,  6 Dec 2023 15:08:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QZEk6Qus"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="XY4q6oJM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FD379A;
-	Wed,  6 Dec 2023 07:05:12 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1d03fb57b69so35457805ad.1;
-        Wed, 06 Dec 2023 07:05:12 -0800 (PST)
+Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF1F4C6
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 07:08:34 -0800 (PST)
+Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-5cece20f006so81548347b3.3
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 07:08:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701875112; x=1702479912; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jI9BXQ6U/V2yKZyvwgWABlpSIS9z4T/U+cMlmbF/xPw=;
-        b=QZEk6QusF/Z6Y3zUnMvSlQnTKeGLOBLHrk+cG/2UThR1DXmJS9lUACV1swELq5vW0l
-         keTEaG2Yr554q+L0cfJBZlurwpxYcZkjGku9zbuueK/qeHMa7oKz9qGhYbnBDH44/cgw
-         9XQdkxyETE3fn+mL1yBhGPuNWuZ3ZVYxEic5XbAbMIcAKZ9waDzbyGvVpD2cCIk88o8H
-         pzGgqfCsWrG9loGc5tY0C9qQjDzP6Irx0hfXhQQgG8wCnsobKj6pmOZGSleDLJSkApdB
-         wRQLNGAEtX8H1OeDlkdS7JKZwZTJDpxCjzPCKC7mhxLEsF43h2kdb1MVpOXmr6NIRO2L
-         U3Ww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701875112; x=1702479912;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701875314; x=1702480114; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jI9BXQ6U/V2yKZyvwgWABlpSIS9z4T/U+cMlmbF/xPw=;
-        b=PM30QV46gfDypPhCG2WPp/sllSJe3iVtg7BGa2CIdHtIrMP3I4v/ZVLcnVwDXDCP1b
-         fdj4nDwp6Ixo4tHS7NH5gjcBi05E/MkXq6XasBtMWL0cj2bqCEg5LsWg7pzBbBoAtBhK
-         MhNHp8fd8+WkSV4SXGxsnUsQLPHCVdc5fyffjfh9Q3xfDCP0UBFOxXUIgSxNJ0KtR6jc
-         xcGVyPPY8BdojRULHA5DrI4ApWA6BRXPljS9a57e67Wk7Gey1I1M/UdFnediMGF6fvlB
-         OS4y/DCPERN6XSRm9nT54bx5VLRyYExUSwxdb6TA6642SzmchXIyJErCnDneRs5bcQS8
-         c6vA==
-X-Gm-Message-State: AOJu0Yx2J9xbZgMyfH/xU7cjuNgmN2k5zPksnSWvU9XQC7mO2oNmVHdN
-	l/vEwxvPeBvDuhkW6N/nWsCVlHHkGzSYUCkI
-X-Google-Smtp-Source: AGHT+IHMIrp6vihpwyJjk/bwe3y89ZutbMbWmzySJQKcGLrlc8f7z7dP/gTw5TpWkY8ph2J3cEdwmA==
-X-Received: by 2002:a17:902:f68b:b0:1d0:c6a6:10e8 with SMTP id l11-20020a170902f68b00b001d0c6a610e8mr759970plg.56.1701875111692;
-        Wed, 06 Dec 2023 07:05:11 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id jh17-20020a170903329100b001cfad034756sm7458267plb.138.2023.12.06.07.05.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 07:05:11 -0800 (PST)
-Date: Wed, 6 Dec 2023 23:05:06 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Florent Revest <revest@chromium.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jiri@resnulli.us,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH] team: Fix use-after-free when an option instance
- allocation fails
-Message-ID: <ZXCNouKlBlAKgll9@Laptop-X1>
-References: <20231206123719.1963153-1-revest@chromium.org>
+        bh=gI4+87OmuedWYZowFLyZTVA/u3jp6SGb1EP0gsJn5OY=;
+        b=XY4q6oJMulDtDfGvgZX7Rx6nvetjT5BNrNAyuSIRJzqMWmYPeZhQiesXEexmbeTorT
+         4AL8+taBVtrOB/PdklOUKZJCg1b5rx6oQUhOX/7igdRP8THpbot+DZsxvj1+v2zoFN38
+         QnsU7Ub9CSFs2Lg5osOhd7CyW9an0nHGJ0buZdQpCFzLQS1z5q/EXJ78xAYVkYEfk4ML
+         EtwRfuhzCg4W2qRtxvU6UCZrm6DWzXlIaOvWKOleFLjuCW7M6b+dlQt/mx/lfzMhFqvy
+         RBYMs6mM9LnPCWxxIJJQxp37M7qNx9inq/l/fupwsj6uTi1HvR5x7lSXsbbC1ZcVOJe0
+         QuHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701875314; x=1702480114;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gI4+87OmuedWYZowFLyZTVA/u3jp6SGb1EP0gsJn5OY=;
+        b=UNYB2TEE3ViL++REcIGNSI9YbhOA14UvXEZPFlwidUE0vNdgEybcwH5gEGgGUMhl5C
+         uB1pIKwpeoCNt3krAeyYYYRL2hj+WfUXjYUOO1BQWOAQPPTKxVgUE+7mndJcwSQ+hV6f
+         mfLF3aF8aX5hyTDnUG5IrHZVuGpkCJJbj42uXBWqToWayLkNqlXHpOqN/Lwx6G/btID5
+         dKzE8OfRnNMIqFL1ACPwn3qeyK/T1UDHx18GG9ZVvwVyjVyFOeccX0jifaaKssvcNigt
+         AvxhiBaKloYx2o8ypNxoa9V5xZQJxjWVGxLdB26eqhrP4THR5dEtCvmrPpNSBcKG0r3s
+         LF9w==
+X-Gm-Message-State: AOJu0YynvZJwSwWRjkf7SRuriQ3c3XnlWWcoNT823CoVvITPfsxwHqgm
+	jQ3ssPmSl5gEqjncRYLVET+zOX6MULk8PbFvbpEtuw==
+X-Google-Smtp-Source: AGHT+IHF9CzT8VrghpajIXOI4MLzZ24JXy9q27f+k6JJ8gWMSKwgFRPeOQuAl95Vk0Cb7Kg8XGZRY9Z+ZKYjtmmKU1M=
+X-Received: by 2002:a0d:e60b:0:b0:5d7:1940:f3e9 with SMTP id
+ p11-20020a0de60b000000b005d71940f3e9mr760885ywe.81.1701875313870; Wed, 06 Dec
+ 2023 07:08:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231206123719.1963153-1-revest@chromium.org>
+References: <20231201182904.532825-14-jhs@mojatatu.com> <9dc10258-a370-4c8f-8099-36edf40b6f80@suswa.mountain>
+In-Reply-To: <9dc10258-a370-4c8f-8099-36edf40b6f80@suswa.mountain>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 6 Dec 2023 10:08:22 -0500
+Message-ID: <CAM0EoMnnXNxtzDqtC96rbKjy1qfebtBTPpGj7MR7j4uzqXjEWA@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 13/15] p4tc: add runtime table entry create,
+ update, get, delete, flush and dump
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: oe-kbuild@lists.linux.dev, netdev@vger.kernel.org, lkp@intel.com, 
+	oe-kbuild-all@lists.linux.dev, deb.chatterjee@intel.com, 
+	anjali.singhai@intel.com, namrata.limaye@intel.com, mleitner@redhat.com, 
+	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, jiri@resnulli.us, 
+	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, 
+	khalidm@nvidia.com, toke@redhat.com, daniel@iogearbox.net, 
+	bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 06, 2023 at 01:37:18PM +0100, Florent Revest wrote:
-> In __team_options_register, team_options are allocated and appended to
-> the team's option_list.
-> If one option instance allocation fails, the "inst_rollback" cleanup
-> path frees the previously allocated options but doesn't remove them from
-> the team's option_list.
-> This leaves dangling pointers that can be dereferenced later by other
-> parts of the team driver that iterate over options.
-> 
-> This patch fixes the cleanup path to remove the dangling pointers from
-> the list.
-> 
-> As far as I can tell, this uaf doesn't have much security implications
-> since it would be fairly hard to exploit (an attacker would need to make
-> the allocation of that specific small object fail) but it's still nice
-> to fix.
-> 
-> Fixes: 80f7c6683fe0 ("team: add support for per-port options")
-> Signed-off-by: Florent Revest <revest@chromium.org>
-> ---
->  drivers/net/team/team.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
-> index 508d9a392ab18..f575f225d4178 100644
-> --- a/drivers/net/team/team.c
-> +++ b/drivers/net/team/team.c
-> @@ -281,8 +281,10 @@ static int __team_options_register(struct team *team,
->  	return 0;
->  
->  inst_rollback:
-> -	for (i--; i >= 0; i--)
-> +	for (i--; i >= 0; i--) {
->  		__team_option_inst_del_option(team, dst_opts[i]);
-> +		list_del(&dst_opts[i]->list);
-> +	}
->  
->  	i = option_count;
->  alloc_rollback:
-> -- 
-> 2.43.0.rc2.451.g8631bc7472-goog
-> 
+Hi Dan,
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+On Wed, Dec 6, 2023 at 12:34=E2=80=AFAM Dan Carpenter <dan.carpenter@linaro=
+.org> wrote:
+>
+> Hi Jamal,
+>
+> kernel test robot noticed the following build warnings:
+>
+> url:    https://github.com/intel-lab-lkp/linux/commits/Jamal-Hadi-Salim/n=
+et-sched-act_api-increase-action-kind-string-length/20231202-032940
+> base:   net-next/main
+> patch link:    https://lore.kernel.org/r/20231201182904.532825-14-jhs%40m=
+ojatatu.com
+> patch subject: [PATCH net-next v9 13/15] p4tc: add runtime table entry cr=
+eate, update, get, delete, flush and dump
+> config: powerpc64-randconfig-r081-20231204 (https://download.01.org/0day-=
+ci/archive/20231205/202312052121.NV57fCuG-lkp@intel.com/config)
+> compiler: powerpc64-linux-gcc (GCC) 13.2.0
+> reproduce: (https://download.01.org/0day-ci/archive/20231205/202312052121=
+.NV57fCuG-lkp@intel.com/reproduce)
+>
+> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
+ion of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> | Closes: https://lore.kernel.org/r/202312052121.NV57fCuG-lkp@intel.com/
+
+Thanks - Will do (it will be a new version not separate fix commit).
+
+> smatch warnings:
+> net/sched/p4tc/p4tc_tbl_entry.c:2555 p4tc_tbl_entry_dumpit() warn: can 'n=
+l_path_attrs.pname' even be NULL?
+
+We need to update our smatch i suppose because we didnt catch this one.
+
+cheers,
+jamal
+
+> vim +2555 net/sched/p4tc/p4tc_tbl_entry.c
+>
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2529        pnatt =3D nla_res=
+erve(skb, P4TC_ROOT_PNAME, P4TC_PIPELINE_NAMSIZ);
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2530        if (!pnatt)
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2531                return -E=
+NOMEM;
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2532
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2533        ids[P4TC_PID_IDX]=
+ =3D t_new->pipeid;
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2534        arg_ids =3D nla_d=
+ata(tb[P4TC_PATH]);
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2535        memcpy(&ids[P4TC_=
+TBLID_IDX], arg_ids, nla_len(tb[P4TC_PATH]));
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2536        nl_path_attrs.ids=
+ =3D ids;
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2537
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2538        nl_path_attrs.pna=
+me =3D nla_data(pnatt);
+>
+> nla_data() can't be NULL
+>
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2539        if (!p_name) {
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2540                /* Filled=
+ up by the operation or forced failure */
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2541                memset(nl=
+_path_attrs.pname, 0, P4TC_PIPELINE_NAMSIZ);
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2542                nl_path_a=
+ttrs.pname_passed =3D false;
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2543        } else {
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2544                strscpy(n=
+l_path_attrs.pname, p_name, P4TC_PIPELINE_NAMSIZ);
+>
+> And we dereference it
+>
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2545                nl_path_a=
+ttrs.pname_passed =3D true;
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2546        }
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2547
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2548        root =3D nla_nest=
+_start(skb, P4TC_ROOT);
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2549        ret =3D p4tc_tabl=
+e_entry_dump(net, skb, tb[P4TC_PARAMS], &nl_path_attrs,
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2550                         =
+           cb, extack);
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2551        if (ret <=3D 0)
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2552                goto out;
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2553        nla_nest_end(skb,=
+ root);
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01  2554
+> 0d5bbed1381e54 Jamal Hadi Salim 2023-12-01 @2555        if (nl_path_attrs=
+.pname) {
+>                                                             ^^^^^^^^^^^^^=
+^^^^^^
+> This NULL check can be removed.
+>
+>
+> --
+> 0-DAY CI Kernel Test Service
+> https://github.com/intel/lkp-tests/wiki
+>
 
