@@ -1,98 +1,146 @@
-Return-Path: <netdev+bounces-54442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE48580714F
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 14:53:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A79AE807171
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 14:58:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A88E1C20C76
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:53:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AEEBAB20F03
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 475BC3BB3C;
-	Wed,  6 Dec 2023 13:53:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C85563C481;
+	Wed,  6 Dec 2023 13:58:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oLeJA4CA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C5Kycxyx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 891CBD50
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 05:53:24 -0800 (PST)
-Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso8952a12.1
-        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 05:53:24 -0800 (PST)
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B7C412B;
+	Wed,  6 Dec 2023 05:58:45 -0800 (PST)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2c9fe0b5b28so48661441fa.1;
+        Wed, 06 Dec 2023 05:58:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701870803; x=1702475603; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d+gLZKiKj1GCcMobmu/DUk62mvWsOs0b7/e7NkIe1CE=;
-        b=oLeJA4CAU5VKPmxqltgKScm2YYivPL2s7kokDZ11L4rwADBz0BTI6T6RjfrCPrBOxU
-         3T7KrycVZcetpLk4KU4vDCD3y0zSKBcFU3RLO/9zY93RzkgTmCiAjKyllP33qbfWBeln
-         gFTIdG5jJZwpGaPVoem+qQvS9UEbtrlFpfNWNCOdpEFRb5M1oD52LpIkygSrwzQsuxUp
-         envLdZ+6+j0JcZ3XXZ9QE5Ll5v4vtFll8ic1475orAY+hydx6L81lbYoPWrT7F//fy6c
-         CPB805xkDfKFQ1lqaRvi++kBYWeZZ/Fly0fiuhkUp8XE3/nuKlS7E8Wtsexfz0xOBZAp
-         r5YQ==
+        d=gmail.com; s=20230601; t=1701871123; x=1702475923; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ysehmX4Pt24WsrUEQ3QJu+I81wy32Tt8NuJKvK6AdqQ=;
+        b=C5KycxyxaOvlRSfGwcNQUGmA5kgnc4bVcA4ljNUbe9fFjTpYSMTWH7uVwmh5wqithu
+         /cSG7Pbo4Gn+Qe4N2ajssAja1CLQWaz1fprwbCKadUQfIYqsjUxwY9OSNS2YTZDslZF+
+         geuAUSV/JLmLjYKxVJj4dg4YDluo1a6HfsmKWBIC1qKloZxyG/PQvfFicMuFwE+cokqf
+         Bdsqv/eILGcg5A6P60XFxpavFk35pukP+lINBew7CU+6tGcE5HpdL4mWv0e1kVIk7Ho5
+         VA5/687IuLMeD5W47yf5q2KRw8KO9v5ZlpwZiIrb6ehrEeAILabMiHapodb5MWQMEVln
+         5nHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701870803; x=1702475603;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=d+gLZKiKj1GCcMobmu/DUk62mvWsOs0b7/e7NkIe1CE=;
-        b=cWCl0oDLR2gRN+++ZIBIpzNmPsNP+5HaknNLyNiboBXl/rF2XkWJzz9e8AMiTSmOdZ
-         XfA0L780+wIcNH6SeGGfOdFYJaKyD7xDUJHGkVO3hPZ+bOWqUp95yj6yqqWVST4zW7hW
-         66CBu5OlJAMHi3j3I0cOskN/ym6YSg4MHgZzFaBtLC5Aj11wbn+hh2fz672fZw/3Eipu
-         YlVbDpbJttx5tvnHTsse5sf/VDikRlZCLriv0ALsbYJ6dWyMFzX0T2cpUMOFKnO0R3dG
-         JLQE7G7AUz+MXLmcn68YFR3E4yBUN9iDkjlIRrPtNjXPYLcnA7lil8Bp6H43ilpQVYGI
-         WXAA==
-X-Gm-Message-State: AOJu0Yz1wcFJ7tAtvpve4JBkUTFYXSLSQNg42Kg7wBNyFYMJL2Dp/dD7
-	veFREv0O0vwFhUt905KkmJkhkvFrBXc3CA46IhpmCA==
-X-Google-Smtp-Source: AGHT+IFIDix0CAvjRl+6bl9SxYnnl9tQeRl3UbNWwZSdM4WPZ5ygMYG41gGwLszA67qDUP7Og9mVV4CMH271YQ4Bgrs=
-X-Received: by 2002:a50:d0cc:0:b0:54c:9996:7833 with SMTP id
- g12-20020a50d0cc000000b0054c99967833mr67928edf.7.1701870802633; Wed, 06 Dec
- 2023 05:53:22 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701871123; x=1702475923;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ysehmX4Pt24WsrUEQ3QJu+I81wy32Tt8NuJKvK6AdqQ=;
+        b=iM2B6DYdbWqVKQ6c3kyssa/o7pPgFtpd7TMZOoO5zXIKCp3xpCijuht1bzIHotgDV+
+         8rbxjMqYnaFHlAGm/rkgmfSrxGF2d6fZJr9bk53tNHd+OjlDHFgtIksjSnUobobnKNHZ
+         0hjtKF+l/dfiyhHEM1zvmGuUCPQHLY9hKHwzKdYrdcCo8EoZn/sfcnWm4ZMCL2Ba2gAq
+         6UXaGgdPOl51rjmlaIewEYM6Fc9d+CVuJhR104N1SC90rT5WHkXbkpj65YZdSLlt6DKR
+         ilraU1699WP4t7ls6CsukjEcas3BBbnTz/w1R2Vu8yPLdxbaoabnPRmf1fTE/gLsM1Rx
+         Tiwg==
+X-Gm-Message-State: AOJu0Yw0j8zfAug/tiACR35bfhgGumiA6vjr6x7pIH0+2dDZwrauG14C
+	zpfRpg20mHeq2GSpAQt0UJ8wkILv2R0=
+X-Google-Smtp-Source: AGHT+IHIJ4rzxIE3cF1KqRrszjBGmYzbzhE3snj7i/rSEsicZWKt3h3Qn5xDOdTY1dk+XIf0oZZXrQ==
+X-Received: by 2002:a05:651c:204:b0:2c9:ffbb:34fd with SMTP id y4-20020a05651c020400b002c9ffbb34fdmr696685ljn.12.1701871122704;
+        Wed, 06 Dec 2023 05:58:42 -0800 (PST)
+Received: from 127.com ([2620:10d:c092:600::2:15ce])
+        by smtp.gmail.com with ESMTPSA id m23-20020a1709061ed700b00a1ddf81b4ffsm624546ejj.207.2023.12.06.05.58.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 05:58:42 -0800 (PST)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: io-uring@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	asml.silence@gmail.com,
+	jannh@google.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH RESEND] io_uring/af_unix: disable sending io_uring over sockets
+Date: Wed,  6 Dec 2023 13:55:19 +0000
+Message-ID: <c716c88321939156909cfa1bd8b0faaf1c804103.1701868795.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <4e505d4198e946a8be03fb1b4c3072b0@AcuMS.aculab.com>
-In-Reply-To: <4e505d4198e946a8be03fb1b4c3072b0@AcuMS.aculab.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 6 Dec 2023 14:53:08 +0100
-Message-ID: <CANn89iKCECyTvRnedsS-0BGBXi00L3Kj+HrmpNQnejm0vMD5Hg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] Use READ/WRITE_ONCE() for IP local_port_range.
-To: David Laight <David.Laight@aculab.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Stephen Hemminger <stephen@networkplumber.org>, David Ahern <dsahern@kernel.org>, 
-	"jakub@cloudflare.com" <jakub@cloudflare.com>, Mat Martineau <martineau@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 6, 2023 at 2:44=E2=80=AFPM David Laight <David.Laight@aculab.co=
-m> wrote:
->
-> Commit 227b60f5102cd added a seqlock to ensure that the low and high
-> port numbers were always updated together.
-> This is overkill because the two 16bit port numbers can be held in
-> a u32 and read/written in a single instruction.
->
-> More recently 91d0b78c5177f added support for finer per-socket limits.
-> The user-supplied value is 'high << 16 | low' but they are held
-> separately and the socket options protected by the socket lock.
->
-> Use a u32 containing 'high << 16 | low' for both the 'net' and 'sk'
-> fields and use READ_ONCE()/WRITE_ONCE() to ensure both values are
-> always updated together.
->
-> Change (the now trival) inet_get_local_port_range() to a static inline
-> to optimise the calling code.
-> (In particular avoiding returning integers by reference.)
->
-> Signed-off-by: David Laight <david.laight@aculab.com>
+File reference cycles have caused lots of problems for io_uring
+in the past, and it still doesn't work exactly right and races with
+unix_stream_read_generic(). The safest fix would be to completely
+disallow sending io_uring files via sockets via SCM_RIGHT, so there
+are no possible cycles invloving registered files and thus rendering
+SCM accounting on the io_uring side unnecessary.
 
-SGTM thanks.
+Cc: stable@vger.kernel.org
+Fixes: 0091bfc81741b ("io_uring/af_unix: defer registered files gc to io_uring release")
+Reported-and-suggested-by: Jann Horn <jannh@google.com>
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Note, it's a minimal patch intended for backporting, all the leftovers
+will be cleaned up separately.
+
+ io_uring/rsrc.h | 7 -------
+ net/core/scm.c  | 6 ++++++
+ 2 files changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/io_uring/rsrc.h b/io_uring/rsrc.h
+index 8625181fb87a..08ac0d8e07ef 100644
+--- a/io_uring/rsrc.h
++++ b/io_uring/rsrc.h
+@@ -77,17 +77,10 @@ int io_sqe_files_register(struct io_ring_ctx *ctx, void __user *arg,
+ 
+ int __io_scm_file_account(struct io_ring_ctx *ctx, struct file *file);
+ 
+-#if defined(CONFIG_UNIX)
+-static inline bool io_file_need_scm(struct file *filp)
+-{
+-	return !!unix_get_socket(filp);
+-}
+-#else
+ static inline bool io_file_need_scm(struct file *filp)
+ {
+ 	return false;
+ }
+-#endif
+ 
+ static inline int io_scm_file_account(struct io_ring_ctx *ctx,
+ 				      struct file *file)
+diff --git a/net/core/scm.c b/net/core/scm.c
+index 880027ecf516..7dc47c17d863 100644
+--- a/net/core/scm.c
++++ b/net/core/scm.c
+@@ -26,6 +26,7 @@
+ #include <linux/nsproxy.h>
+ #include <linux/slab.h>
+ #include <linux/errqueue.h>
++#include <linux/io_uring.h>
+ 
+ #include <linux/uaccess.h>
+ 
+@@ -103,6 +104,11 @@ static int scm_fp_copy(struct cmsghdr *cmsg, struct scm_fp_list **fplp)
+ 
+ 		if (fd < 0 || !(file = fget_raw(fd)))
+ 			return -EBADF;
++		/* don't allow io_uring files */
++		if (io_uring_get_socket(file)) {
++			fput(file);
++			return -EINVAL;
++		}
+ 		*fpp++ = file;
+ 		fpl->count++;
+ 	}
+-- 
+2.43.0
+
 
