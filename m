@@ -1,89 +1,186 @@
-Return-Path: <netdev+bounces-54631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B42AF807AAC
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 22:43:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01333807ABD
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 22:46:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E47661C209F3
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 21:43:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CF981F2130E
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 21:46:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 883687098C;
-	Wed,  6 Dec 2023 21:43:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 499E370997;
+	Wed,  6 Dec 2023 21:46:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e4Woje4H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N8AYDgbg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 671C97097D;
-	Wed,  6 Dec 2023 21:43:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D12B7C433C8;
-	Wed,  6 Dec 2023 21:43:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E7E870992
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 21:46:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC91FC433C7;
+	Wed,  6 Dec 2023 21:46:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701899002;
-	bh=M6QR7jmJtF0bi+CXOH3OmbL5+zqx/nverCaKK0xbSJc=;
+	s=k20201202; t=1701899186;
+	bh=l9pQaQbgUHALJ2vwCHkcZ5rSYRY+yqrXuiys54WpdbA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=e4Woje4H3pBspHNglsWdUfKEDsITiAguirACEeOB+nqS0EleDRko9eC3FTNEmZxrm
-	 k2RVbczUh6NvmBWNDME12TNRybekES9cIp0la/HrIFuqIVv8MEm8bMk6P2mXPvPNza
-	 /jTxkuMRyXbTk5skJJm4R2MzFjYKNvEeq9+WpsClvQQ/Llxuz4rcRhuwGnxknRm41L
-	 oBpiPXbWHTLIaDx9Ly5W9+YkU1T5EEW1dSgfmlfEo9/jg+C1lSVeKqfLM5yvtK9QZx
-	 jxvKf3K4amREpeI6Mc6Pleotq4rNjCe98hDVQ+ghmYkoufZ61ZBPv/2n5LtiShIzvW
-	 XMB+6Ys/OVxoQ==
-Date: Wed, 6 Dec 2023 13:43:22 -0800
-From: Saeed Mahameed <saeed@kernel.org>
-To: Shifeng Li <lishifeng@sangfor.com.cn>
-Cc: saeedm@nvidia.com, leon@kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	ogerlitz@mellanox.com, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dinghui@sangfor.com.cn, lishifeng1992@126.com
-Subject: Re: [PATCH] net/mlx5e: Fix slab-out-of-bounds in
- mlx5_query_nic_vport_mac_list()
-Message-ID: <ZXDq-k8LU2ORTLAW@x130>
-References: <20231130094656.894412-1-lishifeng@sangfor.com.cn>
+	b=N8AYDgbg++krTc8tjjB8RpnQd7Yrt6x0Pcge39vjGdGIY3snjbEkRTAHFFzpklmIo
+	 9wduIe9htoEzofQoyPvuyoWNuel0lHWApJ8aSFkeznVm5hW/mEupMpEZcpzOMVt1X6
+	 yAMRgImg3E/yS8PcSarjq/YDedj82AL25TDQmylR5VsjMGK05rKlNEOl6V+1adP7HE
+	 XNat0wDA1ByzwGroVpM9RVscXUMwEewqVcHhNDKdbwNuE2QIq8wot0/r9H5SuDiixB
+	 r98Z1TMxeGbMDewSo2RG0Sczfpssl+GxLKlGupRVinvaDoPEXHZtwsyCwCc1gB3YnI
+	 gMjRh9920Dg/Q==
+Date: Wed, 6 Dec 2023 21:46:18 +0000
+From: Simon Horman <horms@kernel.org>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	Dan Carpenter <dan.carpenter@linaro.org>
+Subject: Re: [PATCH net-next 07/15] net: dsa: mt7530: do not run
+ mt7530_setup_port5() if port 5 is disabled
+Message-ID: <20231206214618.GC50400@kernel.org>
+References: <20231118123205.266819-1-arinc.unal@arinc9.com>
+ <20231118123205.266819-8-arinc.unal@arinc9.com>
+ <20231121185358.GA16629@kernel.org>
+ <a2826485-70a6-4ba7-89e1-59e68e622901@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231130094656.894412-1-lishifeng@sangfor.com.cn>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a2826485-70a6-4ba7-89e1-59e68e622901@arinc9.com>
 
-On 30 Nov 01:46, Shifeng Li wrote:
->Out_sz that the size of out buffer is calculated using query_nic_vport
->_context_in structure when driver query the MAC list. However query_nic
->_vport_context_in structure is smaller than query_nic_vport_context_out.
->When allowed_list_size is greater than 96, calling ether_addr_copy() will
->trigger an slab-out-of-bounds.
->
->[ 1170.055866] BUG: KASAN: slab-out-of-bounds in mlx5_query_nic_vport_mac_list+0x481/0x4d0 [mlx5_core]
->[ 1170.055869] Read of size 4 at addr ffff88bdbc57d912 by task kworker/u128:1/461
->[ 1170.055870]
->[ 1170.055932] Workqueue: mlx5_esw_wq esw_vport_change_handler [mlx5_core]
->[ 1170.055936] Call Trace:
->[ 1170.055949]  dump_stack+0x8b/0xbb
->[ 1170.055958]  print_address_description+0x6a/0x270
->[ 1170.055961]  kasan_report+0x179/0x2c0
->[ 1170.056061]  mlx5_query_nic_vport_mac_list+0x481/0x4d0 [mlx5_core]
->[ 1170.056162]  esw_update_vport_addr_list+0x2c5/0xcd0 [mlx5_core]
->[ 1170.056257]  esw_vport_change_handle_locked+0xd08/0x1a20 [mlx5_core]
->[ 1170.056377]  esw_vport_change_handler+0x6b/0x90 [mlx5_core]
->[ 1170.056381]  process_one_work+0x65f/0x12d0
->[ 1170.056383]  worker_thread+0x87/0xb50
->[ 1170.056390]  kthread+0x2e9/0x3a0
->[ 1170.056394]  ret_from_fork+0x1f/0x40
->
->Fixes: e16aea2744ab ("net/mlx5: Introduce access functions to modify/query vport mac lists")
->Cc: Ding Hui <dinghui@sangfor.com.cn>
->Signed-off-by: Shifeng Li <lishifeng@sangfor.com.cn>
++ Dan Carpenter <dan.carpenter@linaro.org>
 
-Applied to net-mlx5. 
+On Sat, Dec 02, 2023 at 11:45:42AM +0300, Arınç ÜNAL wrote:
+> Hi Simon.
+> 
+> On 21.11.2023 21:53, Simon Horman wrote:
+> > On Sat, Nov 18, 2023 at 03:31:57PM +0300, Arınç ÜNAL wrote:
+> > > There's no need to run all the code on mt7530_setup_port5() if port 5 is
+> > > disabled. The only case for calling mt7530_setup_port5() from
+> > > mt7530_setup() is when PHY muxing is enabled. That is because port 5 is not
+> > > defined as a port on the devicetree, therefore, it cannot be controlled by
+> > > phylink.
+> > > 
+> > > Because of this, run mt7530_setup_port5() if priv->p5_intf_sel is
+> > > P5_INTF_SEL_PHY_P0 or P5_INTF_SEL_PHY_P4. Remove the P5_DISABLED case from
+> > > mt7530_setup_port5().
+> > > 
+> > > Stop initialising the interface variable as the remaining cases will always
+> > > call mt7530_setup_port5() with it initialised.
+> > > 
+> > > Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> > > Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+> > > ---
+> > >   drivers/net/dsa/mt7530.c | 9 +++------
+> > >   1 file changed, 3 insertions(+), 6 deletions(-)
+> > > 
+> > > diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+> > > index fc87ec817672..1aab4c3f28b0 100644
+> > > --- a/drivers/net/dsa/mt7530.c
+> > > +++ b/drivers/net/dsa/mt7530.c
+> > > @@ -942,9 +942,6 @@ static void mt7530_setup_port5(struct dsa_switch *ds, phy_interface_t interface)
+> > >   		/* MT7530_P5_MODE_GMAC: P5 -> External phy or 2nd GMAC */
+> > >   		val &= ~MHWTRAP_P5_DIS;
+> > >   		break;
+> > > -	case P5_DISABLED:
+> > > -		interface = PHY_INTERFACE_MODE_NA;
+> > > -		break;
+> > >   	default:
+> > >   		dev_err(ds->dev, "Unsupported p5_intf_sel %d\n",
+> > >   			priv->p5_intf_sel);
+> > > @@ -2313,8 +2310,6 @@ mt7530_setup(struct dsa_switch *ds)
+> > >   		 * Set priv->p5_intf_sel to the appropriate value if PHY muxing
+> > >   		 * is detected.
+> > >   		 */
+> > > -		interface = PHY_INTERFACE_MODE_NA;
+> > > -
+> > >   		for_each_child_of_node(dn, mac_np) {
+> > >   			if (!of_device_is_compatible(mac_np,
+> > >   						     "mediatek,eth-mac"))
+> > > @@ -2346,7 +2341,9 @@ mt7530_setup(struct dsa_switch *ds)
+> > >   			break;
+> > >   		}
+> > > -		mt7530_setup_port5(ds, interface);
+> > > +		if (priv->p5_intf_sel == P5_INTF_SEL_PHY_P0 ||
+> > > +		    priv->p5_intf_sel == P5_INTF_SEL_PHY_P4)
+> > > +			mt7530_setup_port5(ds, interface);
+> > 
+> > Hi Arınç,
+> > 
+> > It appears that interface is now uninitialised here.
+> > 
+> > Flagged by Smatch.
+> 
+> I'm not sure why it doesn't catch that for mt7530_setup_port5() to run
+> here, priv->p5_intf_sel must be either P5_INTF_SEL_PHY_P0 or
+> P5_INTF_SEL_PHY_P4. And for that to happen, the interface variable will be
+> initialised.
 
-Thanks,
-Saeed.
+Yes, I see your point now. At a guess, perhaps it because:
+
+1. It doesn't know that of_get_phy_mode will set the value of interface
+2. It doesn't know if the loop will run (more than zero times)
+
+I CCed Dan Carpenter, who is surely more knowledgeable about this than I,
+in case he wants to add anything.
+
+> for_each_child_of_node(dn, mac_np) {
+> 	if (!of_device_is_compatible(mac_np,
+> 				     "mediatek,eth-mac"))
+> 		continue;
+> 
+> 	ret = of_property_read_u32(mac_np, "reg", &id);
+> 	if (ret < 0 || id != 1)
+> 		continue;
+> 
+> 	phy_node = of_parse_phandle(mac_np, "phy-handle", 0);
+> 	if (!phy_node)
+> 		continue;
+> 
+> 	if (phy_node->parent == priv->dev->of_node->parent) {
+> 		ret = of_get_phy_mode(mac_np, &interface);
+> 		if (ret && ret != -ENODEV) {
+> 			of_node_put(mac_np);
+> 			of_node_put(phy_node);
+> 			return ret;
+> 		}
+> 		id = of_mdio_parse_addr(ds->dev, phy_node);
+> 		if (id == 0)
+> 			priv->p5_intf_sel = P5_INTF_SEL_PHY_P0;
+> 		if (id == 4)
+> 			priv->p5_intf_sel = P5_INTF_SEL_PHY_P4;
+> 	}
+> 	of_node_put(mac_np);
+> 	of_node_put(phy_node);
+> 	break;
+> }
+> 
+> if (priv->p5_intf_sel == P5_INTF_SEL_PHY_P0 ||
+>     priv->p5_intf_sel == P5_INTF_SEL_PHY_P4)
+> 	mt7530_setup_port5(ds, interface);
+> 
+> Arınç
 
