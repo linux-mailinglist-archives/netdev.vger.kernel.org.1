@@ -1,186 +1,102 @@
-Return-Path: <netdev+bounces-54632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01333807ABD
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 22:46:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15FBC807AC2
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 22:49:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CF981F2130E
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 21:46:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8F6F1F21367
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 21:49:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 499E370997;
-	Wed,  6 Dec 2023 21:46:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 118347099A;
+	Wed,  6 Dec 2023 21:49:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N8AYDgbg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CLraeujU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E7E870992
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 21:46:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC91FC433C7;
-	Wed,  6 Dec 2023 21:46:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701899186;
-	bh=l9pQaQbgUHALJ2vwCHkcZ5rSYRY+yqrXuiys54WpdbA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=N8AYDgbg++krTc8tjjB8RpnQd7Yrt6x0Pcge39vjGdGIY3snjbEkRTAHFFzpklmIo
-	 9wduIe9htoEzofQoyPvuyoWNuel0lHWApJ8aSFkeznVm5hW/mEupMpEZcpzOMVt1X6
-	 yAMRgImg3E/yS8PcSarjq/YDedj82AL25TDQmylR5VsjMGK05rKlNEOl6V+1adP7HE
-	 XNat0wDA1ByzwGroVpM9RVscXUMwEewqVcHhNDKdbwNuE2QIq8wot0/r9H5SuDiixB
-	 r98Z1TMxeGbMDewSo2RG0Sczfpssl+GxLKlGupRVinvaDoPEXHZtwsyCwCc1gB3YnI
-	 gMjRh9920Dg/Q==
-Date: Wed, 6 Dec 2023 21:46:18 +0000
-From: Simon Horman <horms@kernel.org>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: Re: [PATCH net-next 07/15] net: dsa: mt7530: do not run
- mt7530_setup_port5() if port 5 is disabled
-Message-ID: <20231206214618.GC50400@kernel.org>
-References: <20231118123205.266819-1-arinc.unal@arinc9.com>
- <20231118123205.266819-8-arinc.unal@arinc9.com>
- <20231121185358.GA16629@kernel.org>
- <a2826485-70a6-4ba7-89e1-59e68e622901@arinc9.com>
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CBE798
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 13:49:32 -0800 (PST)
+Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-a1d93da3eb7so26975666b.0
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 13:49:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701899371; x=1702504171; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=icAGLF6y2iN4/TdWwfUe2dws+wW8NTNLWr5XhF/ldFE=;
+        b=CLraeujUu0wwa/Bki1h+hz5fZPrICqG26MQqEP+bswuJCxoXyAGiyp4D5tD8m6f0lz
+         dvkHdbuloh79undSVpcxwUTsz73racAOW1dAz0B5ScR4quLC+Q8WuV08R4ERBk09OhI+
+         tGffUweWLQ+bfY3pI32Tqe58s/Bpdso1rrmb2/umUiZkZ8rOycbAqlnsOux8y5tSmfgZ
+         4/Owq+Nfmmid9pGyOEvp/lrMbFuGpsO3XzP6UMsXMd2aiLf51gAb6d8P+BxKStW1Wt0e
+         fLHH6MOqvd0IFtUYwRkkcslMnjdrmGrqT5BAVS1dZxB/CO8/2tRY9h3rB0ksXPLreUZ1
+         EUQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701899371; x=1702504171;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=icAGLF6y2iN4/TdWwfUe2dws+wW8NTNLWr5XhF/ldFE=;
+        b=OJliRI4N2sqViK6mjDcYwxLr/YWAn9L1nx5+7r4xMcbi+up8k8x1ANsRZYfuiPuShI
+         e/vH6n+yezMi785uFBECiim5wY+nBw2BZgaoEs+hAcusOsBRNSdDOH1wAlN/OdPyv3XC
+         BLsC/hslCkcNCqa5l4EheJ2KFpW+kW+21qTX6h9Ai4veUEY/7UHzZWelKqA/hX0eeA1H
+         C3dmhHItyev40b3wWLCy5k1m36gaZIsZwuulsiJ2X4BXpHTmKA59uuVt0XwuJ/RGNimK
+         Eikodl+jUPcGuszwC+DpKtF1FqVINJnvn7BCifbBf4SOaB1i69BCC1nOBDuS5iF3SSFm
+         QEOQ==
+X-Gm-Message-State: AOJu0Yz+3Jb+gOujmeIlb5BTZ62ahur/wMiKMrYjDa8q4PRHW+sTr2q7
+	TFxBGtlT9ibUDPVPKwdv6yA=
+X-Google-Smtp-Source: AGHT+IGDaFPTkPlj/iWkSiYl0O5nuuiTgw+X2KiLlTazF2TrYRRsZ2ZffroYHKvzPE0DUxTfRP+T4A==
+X-Received: by 2002:a17:906:715:b0:a1c:2eb:3839 with SMTP id y21-20020a170906071500b00a1c02eb3839mr935652ejb.67.1701899370600;
+        Wed, 06 Dec 2023 13:49:30 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id b9-20020a170906194900b00a1cbb055575sm435426eje.180.2023.12.06.13.49.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 13:49:30 -0800 (PST)
+Date: Wed, 6 Dec 2023 23:49:28 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Daniel Danzberger <dd@embedd.com>, woojung.huh@microchip.com,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+	Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH] net: dsa: microchip: fix NULL pointer dereference on
+ platform init
+Message-ID: <20231206214928.jhx6naeo2o2eonj5@skbuf>
+References: <20231204154315.3906267-1-dd@embedd.com>
+ <20231204174330.rjwxenuuxcimbzce@skbuf>
+ <577c2f8511b700624cdfdf75db5b1a90cf71314b.camel@embedd.com>
+ <20231205165540.jnmzuh4pb5xayode@skbuf>
+ <e37d2c6678f33b490e8ab56cd1472429ca3dcc7a.camel@embedd.com>
+ <20231205181735.csbtkcy3g256kwxl@skbuf>
+ <52f88c8bf0897f1b97360fd4f94bdfe2e18f6cc0.camel@embedd.com>
+ <20231206003706.w3azftqx7nopn4go@skbuf>
+ <19d4d689-a73e-4301-b22c-5ad2dfb4410d@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a2826485-70a6-4ba7-89e1-59e68e622901@arinc9.com>
+In-Reply-To: <19d4d689-a73e-4301-b22c-5ad2dfb4410d@lunn.ch>
 
-+ Dan Carpenter <dan.carpenter@linaro.org>
+On Wed, Dec 06, 2023 at 04:26:52PM +0100, Andrew Lunn wrote:
+> > So, surprisingly, there is enough redundancy between DSA mechanisms that
+> > platform_data kinda works.
+> 
+> I have x86 platforms using mv88e6xxx with platform data. Simple
+> systems do work, the platforms i have only make use of the internal
+> PHYs. This is partially because of history. DSA is older than the
+> adoption of DT. The mv88e6xxx driver and DSA used to be purely
+> platform data driven, and we have not yet broken that.
+> 
+> 	Andrew
 
-On Sat, Dec 02, 2023 at 11:45:42AM +0300, Arınç ÜNAL wrote:
-> Hi Simon.
-> 
-> On 21.11.2023 21:53, Simon Horman wrote:
-> > On Sat, Nov 18, 2023 at 03:31:57PM +0300, Arınç ÜNAL wrote:
-> > > There's no need to run all the code on mt7530_setup_port5() if port 5 is
-> > > disabled. The only case for calling mt7530_setup_port5() from
-> > > mt7530_setup() is when PHY muxing is enabled. That is because port 5 is not
-> > > defined as a port on the devicetree, therefore, it cannot be controlled by
-> > > phylink.
-> > > 
-> > > Because of this, run mt7530_setup_port5() if priv->p5_intf_sel is
-> > > P5_INTF_SEL_PHY_P0 or P5_INTF_SEL_PHY_P4. Remove the P5_DISABLED case from
-> > > mt7530_setup_port5().
-> > > 
-> > > Stop initialising the interface variable as the remaining cases will always
-> > > call mt7530_setup_port5() with it initialised.
-> > > 
-> > > Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> > > Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
-> > > ---
-> > >   drivers/net/dsa/mt7530.c | 9 +++------
-> > >   1 file changed, 3 insertions(+), 6 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-> > > index fc87ec817672..1aab4c3f28b0 100644
-> > > --- a/drivers/net/dsa/mt7530.c
-> > > +++ b/drivers/net/dsa/mt7530.c
-> > > @@ -942,9 +942,6 @@ static void mt7530_setup_port5(struct dsa_switch *ds, phy_interface_t interface)
-> > >   		/* MT7530_P5_MODE_GMAC: P5 -> External phy or 2nd GMAC */
-> > >   		val &= ~MHWTRAP_P5_DIS;
-> > >   		break;
-> > > -	case P5_DISABLED:
-> > > -		interface = PHY_INTERFACE_MODE_NA;
-> > > -		break;
-> > >   	default:
-> > >   		dev_err(ds->dev, "Unsupported p5_intf_sel %d\n",
-> > >   			priv->p5_intf_sel);
-> > > @@ -2313,8 +2310,6 @@ mt7530_setup(struct dsa_switch *ds)
-> > >   		 * Set priv->p5_intf_sel to the appropriate value if PHY muxing
-> > >   		 * is detected.
-> > >   		 */
-> > > -		interface = PHY_INTERFACE_MODE_NA;
-> > > -
-> > >   		for_each_child_of_node(dn, mac_np) {
-> > >   			if (!of_device_is_compatible(mac_np,
-> > >   						     "mediatek,eth-mac"))
-> > > @@ -2346,7 +2341,9 @@ mt7530_setup(struct dsa_switch *ds)
-> > >   			break;
-> > >   		}
-> > > -		mt7530_setup_port5(ds, interface);
-> > > +		if (priv->p5_intf_sel == P5_INTF_SEL_PHY_P0 ||
-> > > +		    priv->p5_intf_sel == P5_INTF_SEL_PHY_P4)
-> > > +			mt7530_setup_port5(ds, interface);
-> > 
-> > Hi Arınç,
-> > 
-> > It appears that interface is now uninitialised here.
-> > 
-> > Flagged by Smatch.
-> 
-> I'm not sure why it doesn't catch that for mt7530_setup_port5() to run
-> here, priv->p5_intf_sel must be either P5_INTF_SEL_PHY_P0 or
-> P5_INTF_SEL_PHY_P4. And for that to happen, the interface variable will be
-> initialised.
+I'm not saying that platform_data did not have its time and place, but
+Device Tree clearly won, and platform_data is a rarely untested minority
+nowadays.
 
-Yes, I see your point now. At a guess, perhaps it because:
-
-1. It doesn't know that of_get_phy_mode will set the value of interface
-2. It doesn't know if the loop will run (more than zero times)
-
-I CCed Dan Carpenter, who is surely more knowledgeable about this than I,
-in case he wants to add anything.
-
-> for_each_child_of_node(dn, mac_np) {
-> 	if (!of_device_is_compatible(mac_np,
-> 				     "mediatek,eth-mac"))
-> 		continue;
-> 
-> 	ret = of_property_read_u32(mac_np, "reg", &id);
-> 	if (ret < 0 || id != 1)
-> 		continue;
-> 
-> 	phy_node = of_parse_phandle(mac_np, "phy-handle", 0);
-> 	if (!phy_node)
-> 		continue;
-> 
-> 	if (phy_node->parent == priv->dev->of_node->parent) {
-> 		ret = of_get_phy_mode(mac_np, &interface);
-> 		if (ret && ret != -ENODEV) {
-> 			of_node_put(mac_np);
-> 			of_node_put(phy_node);
-> 			return ret;
-> 		}
-> 		id = of_mdio_parse_addr(ds->dev, phy_node);
-> 		if (id == 0)
-> 			priv->p5_intf_sel = P5_INTF_SEL_PHY_P0;
-> 		if (id == 4)
-> 			priv->p5_intf_sel = P5_INTF_SEL_PHY_P4;
-> 	}
-> 	of_node_put(mac_np);
-> 	of_node_put(phy_node);
-> 	break;
-> }
-> 
-> if (priv->p5_intf_sel == P5_INTF_SEL_PHY_P0 ||
->     priv->p5_intf_sel == P5_INTF_SEL_PHY_P4)
-> 	mt7530_setup_port5(ds, interface);
-> 
-> Arınç
+We don't have to break platform_data in mv88e6xxx and in the DSA core
+all of a sudden. It can coexist with software nodes for a while, as
+alternative solutions to the same problem.
 
