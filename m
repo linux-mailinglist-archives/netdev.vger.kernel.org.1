@@ -1,93 +1,83 @@
-Return-Path: <netdev+bounces-54616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50EA5807A3C
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 22:19:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53212807A4B
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 22:25:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B625282481
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 21:19:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BE7B1C20B1A
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 21:25:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD4C36F60D;
-	Wed,  6 Dec 2023 21:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C866F628;
+	Wed,  6 Dec 2023 21:25:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l64y8tNe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UqiOM5j1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E68ED5B
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 13:19:21 -0800 (PST)
-Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-77dcf6330f3so8972185a.0
-        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 13:19:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701897560; x=1702502360; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Elwiqko9sbyKNIAs5tE4r8jqstg8OoAY6A4v3Cn2hwo=;
-        b=l64y8tNelthJGKJ3xo1xFS/FClFhDwYqSyzQScrqOEhelUnDT/reM3jrlG8st2ohRj
-         C0QLV0P+YVmsSyPsMtaCtAyhgXAgLn2RTJNj9ryB7MGf9NP/siCDbSxvzj28LddWegdT
-         1nEa9/HQu3Eu4l5ijpO1J1NUkz/4tCVTHKJ9WoM+OoQS1EfbYx3R4by+usRFfHUYI09q
-         5JYhMlR+G9izOApJjX9iE9hDsguebWyf2v7cRlamApKR9TCIf0gj/7s7WNqHhV4671Bs
-         eBGGPnm+dz/lDJ5xn4t1EMh/SRgdzvL+pbv3WHnfK147ccHk7Nh5ngCUH9nCc+Fqnc4W
-         pWFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701897560; x=1702502360;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Elwiqko9sbyKNIAs5tE4r8jqstg8OoAY6A4v3Cn2hwo=;
-        b=P8dz6prX2wd3SMEJXA4iY5G8GFPICNU8Y0os8EABsqVcjUCfS/tl+mrVKx7sUZL3Yo
-         /Wdga844RohBtStEtdee5XOQUsiu/7y8uub4TYAOY6A+L8zRny9Wy4ADvurIm5C+D/TN
-         xWLE+s66R6Hj+nQWksPk28jhqyDxXLXxxg9GSAzHMi+Gnpo6qPMVnAefa9ZdRL8a0TUQ
-         tDch7ThTkVmzlxsm5kB8uGxXs0iTw2xF1JA3LTazlqiosDAHyneCEKs7xKOrDLtjNjD6
-         7MbUXOteZTvi00l/uEbt++2+rjaVKs4YAgCobuSGVXQXmF2/S4gPF7m8oBZOoAIDvdtU
-         fTkA==
-X-Gm-Message-State: AOJu0YzW9We7UK1MfS4BqoVaL5F60GC6xSj6Hfg9FUQtEJMw0+rHIr9l
-	64tEZFBX049TQfFgwQLOOKg=
-X-Google-Smtp-Source: AGHT+IH4ybZPhNbBhPd6I9odNxSGhhKiPbgYpcT45Gq8EQpYjX6ITx2nyqNr/urSPHEEArB2qmyvnQ==
-X-Received: by 2002:a05:620a:8a8b:b0:77f:1827:a9b6 with SMTP id qu11-20020a05620a8a8b00b0077f1827a9b6mr94967qkn.138.1701897560385;
-        Wed, 06 Dec 2023 13:19:20 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id c19-20020ae9e213000000b0077589913a8bsm234684qkc.132.2023.12.06.13.19.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Dec 2023 13:19:19 -0800 (PST)
-Message-ID: <7913de53-3ee8-489a-910d-94ded7a77848@gmail.com>
-Date: Wed, 6 Dec 2023 13:19:16 -0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 773D54B122
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 21:25:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85679C433C8;
+	Wed,  6 Dec 2023 21:25:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701897913;
+	bh=0K/Q3+TV9b4ZKPISgc1t6BvtY9or0a9QPAxTEXr8000=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UqiOM5j1vK8ZL65l8ntjuTP2qD/pl+mPCCUKXQO4+X4mU06JmF7+kfojbILGrQEKJ
+	 WQOLIdfTwdhzvy7DJUH2FvEKOsVSA59/qpvtbpMeLUjiCLvr8xx/nbyMF/5qsDMETN
+	 wve6Jmvz+K1ThHXfTHVc23uQqJfQNxou+jSwX9uDnjMVKmjQNqGav2HqAjqSzYJL6/
+	 yfOcpX+eWQMD5MomJT9QOVGKoKl+QbAhv/WYIJdL6pg9iBS4qmaKDne0AD3BI1cW/X
+	 F3E4gCGapW/P/iOB5N8mLXvK89vM1qtK2dXoHBr48IuzYR1ZvDIi/B90OF3Kl2W63b
+	 1bGWuI2xHlIyw==
+Date: Wed, 6 Dec 2023 21:25:09 +0000
+From: Simon Horman <horms@kernel.org>
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org,
+	Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>,
+	Andrii Staikov <andrii.staikov@intel.com>
+Subject: Re: [PATCH iwl-net v2] i40e:Fix filter input checks to prevent
+ config with invalid values
+Message-ID: <20231206212509.GA50400@kernel.org>
+References: <20231129102311.2780151-1-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: dsa: mv88e6xxx: Restore USXGMII support for
- 6393X
-Content-Language: en-US
-To: Tobias Waldekranz <tobias@waldekranz.com>, davem@davemloft.net,
- kuba@kernel.org
-Cc: andrew@lunn.ch, olteanv@gmail.com, linux@armlinux.org.uk,
- michal.smulski@ooma.com, netdev@vger.kernel.org
-References: <20231205221359.3926018-1-tobias@waldekranz.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20231205221359.3926018-1-tobias@waldekranz.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231129102311.2780151-1-aleksandr.loktionov@intel.com>
 
-On 12/5/23 14:13, Tobias Waldekranz wrote:
-> In 4a56212774ac, USXGMII support was added for 6393X, but this was
-> lost in the PCS conversion (the blamed commit), most likely because
-> these efforts where more or less done in parallel.
+On Wed, Nov 29, 2023 at 11:23:11AM +0100, Aleksandr Loktionov wrote:
+> From: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
 > 
-> Restore this feature by porting Michal's patch to fit the new
-> implementation.
+> Prevent VF from configuring filters with unsupported actions or use
+> REDIRECT action with invalid tc number. Current checks could cause
+> out of bounds access on PF side.
 > 
-> Fixes: e5b732a275f5 ("net: dsa: mv88e6xxx: convert 88e639x to phylink_pcs")
-> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
+> Fixes: e284fc280473 ("i40e: Add and delete cloud filter")
+> Reviewed-by: Andrii Staikov <andrii.staikov@intel.com>
+> Signed-off-by: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
+> v1->v2 add 'Fixes:' tag into commit message
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+Hi Aleksandr and Sudheer,
 
+Some minor nits from my side:
+
+* Probably there should be a space after 'i40e:' in the subject.
+* v2 was posted not long after v1.
+  Please consider allowing 24h between posts.
+
+  Link: https://docs.kernel.org/process/maintainer-netdev.html
+
+The above notwithstanding, this looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
