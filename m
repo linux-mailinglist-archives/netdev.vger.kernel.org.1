@@ -1,123 +1,146 @@
-Return-Path: <netdev+bounces-54507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36515807585
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:43:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B514A807587
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:44:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 678F81C20858
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 16:43:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F7811F21252
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 16:44:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0DD63DBAB;
-	Wed,  6 Dec 2023 16:43:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 576F13E48B;
+	Wed,  6 Dec 2023 16:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mm5FIgot"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="UUhfeTkD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BA3BD47;
-	Wed,  6 Dec 2023 08:43:34 -0800 (PST)
-Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-50bfa5a6cffso4330634e87.0;
-        Wed, 06 Dec 2023 08:43:33 -0800 (PST)
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17943D47
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 08:44:38 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1d08a924fcfso34426675ad.2
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 08:44:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701881012; x=1702485812; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zUpkLHka5kYwhvClkLnYahC6G9D+w/JULwDjw/f4rQs=;
-        b=mm5FIgotDo5WzTm6m6ynx5HH1MYn0fUNthXjdd+t1kqUqud86kEo+ZHZizouppp1uF
-         0mWYOX7v9VR65INj+vyvteiW3M3uwHBlPVoH33N71x8EsnTpbavxvFbN1qkuiLAmszqa
-         EX+7ZGDAOh2sr+8qGevHwvNkVZ4rBwydn0fNEiuxPuDeJpNzDuV0yi0CarlP9pw92v9B
-         fuyRd7+xn6v+2lUoRzkPMD6oyKXlt2vRCIgzzBhJ/FsnNFjrD1J62m8wNzZuoU7m1GEj
-         0uKVwj7D+8zxe444W4khISjjy/t7tiZLRj+aoBSxwhU7md9rmAADHrms6AWbT3MNoo5n
-         R/fw==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701881077; x=1702485877; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XsCMB6uvft/P0Kzq8vYo58p7DgwQkKyvKz9sLTHsADc=;
+        b=UUhfeTkDDUJyk15aaa9WhRZhD3F8sM0axP2wwIYhjGhElJ3X5WEjNvrwqyEMNOtU1R
+         3bVcBCZ6K6UAJ9C05E6zpEDVCO2WKyJYujfCvCqIQGOm1Op5qNomgC3+yWtYjoypI3Bk
+         lp7KeXQ0xiQWlSspviH4SUoA/6Guy3LNN4sptJZnGYEKP2nYr3CLaN8EfboiaMmoqL3i
+         QcDK2UZDbk6lbMBVJkED+AU4E8HlGiXVRDwuxoIr3LOE9cIZaHXTgCbzLFU9HVy14IHN
+         8RtVO/OyEpqtxuak0ggSP40zq/irhgvZI4L/kL8s5fhItlNqmN8lPv1z00M5zaW+BOao
+         y59Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701881012; x=1702485812;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zUpkLHka5kYwhvClkLnYahC6G9D+w/JULwDjw/f4rQs=;
-        b=iQiblb4mNAJRSLorFZc2HjFDy4dzhIzPosAfmhtPjSQuVy7UBAoL1hHoa6IDbcKfsK
-         pTMcABfKwb0SPlK6HC5opiv9gqBlz4DNjL//cSdDW9M/D/Qq1iwcG0ozVWL2X1GYzB8l
-         BlNPlvij7g4BS1H3dBS2sKfjMMsPU/vfrHUdNfyS0amN9Y7qnAcLvXeRGl5nb3ecFxjB
-         k0l/zcTjeiB8vWCz6vPUgT2kJpmZsKyMJj9VDNRv5x0raNYNBlkBplYIEOvADzjRLQE5
-         wg69++xUe2iKtX3PTdiy00HHlLGGz1g/cwYtQH48o8B7zlBbV3t+sYMBIoOO9q5H0G5u
-         bEpQ==
-X-Gm-Message-State: AOJu0YyTM5L3rThWhrhzkJxeF9LgOKn2qFt90o2EvLm3lg/thrmOc+Wu
-	nQ9dmrqYqNAT1I270Vap9Rg=
-X-Google-Smtp-Source: AGHT+IF9WlTStknbcxL3fvGYNhUFNrrN9eRVZG4ocV/Fwh4u4BMSClhXfoneS1LduLey87n4ix/mHQ==
-X-Received: by 2002:ac2:4a6b:0:b0:50b:f2f4:279 with SMTP id q11-20020ac24a6b000000b0050bf2f40279mr624240lfp.110.1701881011931;
-        Wed, 06 Dec 2023 08:43:31 -0800 (PST)
-Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id q11-20020a056402032b00b0054d486674d8sm169871edw.45.2023.12.06.08.43.30
+        d=1e100.net; s=20230601; t=1701881077; x=1702485877;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XsCMB6uvft/P0Kzq8vYo58p7DgwQkKyvKz9sLTHsADc=;
+        b=hfcI3I/sIK2MjRn+hfsWQudIc2s2SHaqhdKgTh7chZvANRw8QspQuGDySwnhV0UWry
+         M8azDhR0d+HLFTmrn9+YYzcaCZBXsvrx2h5PUH1cX3dFGDSN1uHntUEPMbnhN6lEP3mB
+         z2+3C44aMv8wxCMi2f5Jom6VNywvRkUZKPT6hBjLi9MVLC6xp75H6ZBXQL3nxmX8n2Rx
+         39hyGQH2uwlzPu9p446xX2QEk2DITuZ39M/DEdKrbx7u01z9EmG/furJX5qo+CSbcMzJ
+         m1PP40fzjydhSFtBE7iRX9LTXKHrAAiTwy7VIWFKjcIYXt2yYevkN6UGps/6VylZfSy6
+         yVYQ==
+X-Gm-Message-State: AOJu0YzzEiZUlvkFg7Y6OIa0CepKA1tdeBnM4l37IpO5S14ZFgEJJy+H
+	YcQA05OD0qwQ2RNcXT/YYoQM09renl3S2gdQ21w=
+X-Google-Smtp-Source: AGHT+IGt5/PcVUngrSgcEFfLS3AO9UTsOAH+9D9v+/GaY0pNDG6jW+Y1Wz4xUtmSXugn1csDKj9aVw==
+X-Received: by 2002:a17:902:c411:b0:1d0:8e61:1020 with SMTP id k17-20020a170902c41100b001d08e611020mr1403447plk.89.1701881077293;
+        Wed, 06 Dec 2023 08:44:37 -0800 (PST)
+Received: from rogue-one.tail33bf8.ts.net ([201.17.86.134])
+        by smtp.gmail.com with ESMTPSA id g1-20020a170902740100b001cfc3f73920sm36719pll.227.2023.12.06.08.44.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 08:43:31 -0800 (PST)
-Date: Wed, 6 Dec 2023 18:43:29 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next v1 3/3] net: dsa: microchip: Fix PHY loopback
- configuration for KSZ8794 and KSZ8873
-Message-ID: <20231206164329.fszkmpilktyq6r6v@skbuf>
-References: <20231121152426.4188456-1-o.rempel@pengutronix.de>
- <20231121152426.4188456-3-o.rempel@pengutronix.de>
- <35045f6ef6a5b274063186c065a8215088b94cd5.camel@redhat.com>
- <20231206085520.GA1293736@pengutronix.de>
- <20231206151406.75eglqtsrrb4vegf@skbuf>
- <20231206155440.GA1324895@pengutronix.de>
+        Wed, 06 Dec 2023 08:44:36 -0800 (PST)
+From: Pedro Tammela <pctammela@mojatatu.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	marcelo.leitner@gmail.com,
+	vladbu@nvidia.com,
+	Pedro Tammela <pctammela@mojatatu.com>
+Subject: [PATCH net-next v3 0/5] net/sched: conditional notification of events for cls and act
+Date: Wed,  6 Dec 2023 13:44:11 -0300
+Message-Id: <20231206164416.543503-1-pctammela@mojatatu.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231206155440.GA1324895@pengutronix.de>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 06, 2023 at 04:54:40PM +0100, Oleksij Rempel wrote:
-> > I don't see DSA implementing ndo_set_features(), nor offering NETIF_F_LOOPBACK.
-> > The PHY is integrated, so DSA is the only relevant netdev driver. Is
-> > there any other way to test this functionality?
-> 
-> yes - net_selftest()
+This is an optimization we have been leveraging on P4TC but we believe
+it will benefit rtnl users in general.
 
-Ok, I didn't notice net_test_phy_loopback_enable(). So it can be
-triggered after all, it seems.
+It's common to allocate an skb, build a notification message and then
+broadcast an event. In the absence of any user space listeners, these
+resources (cpu and memory operations) are wasted. In cases where the subsystem
+is lockless (such as in tc-flower) this waste is more prominent. For the
+scenarios where the rtnl_lock is held it is not as prominent.
 
-But I mean, if it's exclusively a selftest that fails, and has always
-failed since its introduction, I think it can be considered new
-development work when it stops failing? I don't believe that the impact
-of the bug is relevant for users. It's not a production functionality.
-Documentation/process/stable-kernel-rules.rst doesn't specifically say
-this, but it does imply that we should triage the "real bugs that bother
-people" as much as possible.
+The idea is simple. Build and send the notification iif:
+   - The user requests via NLM_F_ECHO or
+   - Someone is listening to the rtnl group (tc mon)
 
-> > If not, I think it's a case of "tree falling in the woods and nobody
-> > hearing it". Not "stable" material. But it definitely has nothing to do
-> > with not caring about the switch variant.
-> 
-> Sorry, my intention is not to criticize anyone. I am not getting
-> feedbacks or bug reports for ksz88xx variants, so it seems like not many
-> people use it in upstream.
-> 
-> When I have time slots to work on this driver, I try to use them to do
-> fixes and also clean up the code. Since there is some sort of fog of
-> uncertainty about when I get the next time slot, or even if I get it at
-> all, I am trying to push both fixes and cleanups together.
-> 
-> But, you are right, it is not a good reason for not caring about stable :)
-> 
-> What is the decision about this patch set?
+On a simple test with tc-flower adding 1M entries, using just a single core,
+there's already a noticeable difference in the cycles spent in tc_new_tfilter
+with this patchset.
 
-I wouldn't bend over backwards for this, and reorder the patches.
-I would spend my time doing more meaningful things.
+before:
+   - 43.68% tc_new_tfilter
+      + 31.73% fl_change
+      + 6.35% tfilter_notify
+      + 1.62% nlmsg_notify
+        0.66% __tcf_qdisc_find.part.0
+        0.64% __tcf_chain_get
+        0.54% fl_get
+      + 0.53% tcf_proto_lookup_ops
+
+after:
+   - 39.20% tc_new_tfilter
+      + 34.58% fl_change
+        0.69% __tcf_qdisc_find.part.0
+        0.67% __tcf_chain_get
+      + 0.61% tcf_proto_lookup_ops
+
+Note, the above test is using iproute2:tc which execs a shell.
+We expect people using netlink directly to observe even greater
+reductions.
+
+The qdisc side needs some refactoring of the notification routines to fit in
+this new model, so they will be sent in a later patchset.
+
+v2->v3:
+- Collected Jiri review tags
+- Fixed commit messages to refer to rtnl_notify_needed
+
+v1->v2:
+- Address Jakub comments
+
+Jamal Hadi Salim (1):
+  rtnl: add helper to check if rtnl group has listeners
+
+Pedro Tammela (3):
+  rtnl: add helper to send if skb is not null
+  net/sched: act_api: conditional notification of events
+  net/sched: cls_api: conditional notification of events
+
+Victor Nogueira (1):
+  rtnl: add helper to check if a notification is needed
+
+ include/linux/rtnetlink.h |  29 +++++++++++
+ net/sched/act_api.c       | 105 +++++++++++++++++++++++++++-----------
+ net/sched/cls_api.c       |  12 +++++
+ 3 files changed, 117 insertions(+), 29 deletions(-)
+
+-- 
+2.40.1
+
 
