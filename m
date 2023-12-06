@@ -1,197 +1,360 @@
-Return-Path: <netdev+bounces-54641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1F8B807B1E
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 23:08:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DF71807B51
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 23:27:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEC121C20B45
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 22:08:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 694761C20B44
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 22:27:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 280495639E;
-	Wed,  6 Dec 2023 22:08:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFB5C563B1;
+	Wed,  6 Dec 2023 22:26:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LP0ayxyb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a/47k6zS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E8D0A8
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 14:08:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701900491;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3cM3G3IxJYLM5tCOwlfSEThSnIq2Ia0o8pmJScU+oeA=;
-	b=LP0ayxybCAMjGUkLBJUNs2htBzsetpzYMQ6kAeuKXcQ1DOky651j49kha21z8RksbePzAJ
-	bp3yj0KJObKkI7m6YU0RALQP0u+229gchUauIFREiyStzy8ujZjmhq6ISGGVhkZg9+d4ph
-	nmn6lE6ksgeEb4zFfOzAJmsNNedzksk=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-452-TCTMitu7PCeiJZmhDmb86Q-1; Wed, 06 Dec 2023 17:08:09 -0500
-X-MC-Unique: TCTMitu7PCeiJZmhDmb86Q-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a1db7b26269so14429366b.0
-        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 14:08:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701900489; x=1702505289;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21CD6D44
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 14:26:53 -0800 (PST)
+Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-40c09f4814eso4295265e9.1
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 14:26:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701901611; x=1702506411; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3cM3G3IxJYLM5tCOwlfSEThSnIq2Ia0o8pmJScU+oeA=;
-        b=io8WPt7kNGR7mNMnkN6CYiY4UgU3fZiU9EdyMWHY9YIJfWuNwLn9iQJce2rlfATmyF
-         fMAELaXpXaJ2IrjWOANRiGv8CpODpwMc9B1R7GSF/3GoIDwIfs69pTta7o3Zi3yFJCZd
-         1GCeptV2SQop7aOkHGNidUHAa083uUgVeyGvHTLfyv3eRoggqBO76zCW/37km+jFhQzI
-         giU/rIUADREgM20fgWF8fY1vv7cDJ5keBiaWmP8YCfVEgQ7wie/65dpaAqW/eFgeTvGA
-         JQEkyhfis47gdOYt80o+AFYrQn1+MUHFe9pSOs1qD2vpwRUFi7ZkvQ7gq1o/9ieqdO0B
-         9L7A==
-X-Gm-Message-State: AOJu0YyrcgIR7pFCivwcttubtGK0tx02zTXhl5YaH9QsqK5vx6IhlhA8
-	xIl+FHiqynwgUbHk+7gtB44yMOboIliUick3fK9yazbV3ZCjhTjy9P4tPj7GlG7JO9n4079AhKO
-	2IbWbQqisf7eMF8wi
-X-Received: by 2002:a17:906:225a:b0:a01:9d8b:db17 with SMTP id 26-20020a170906225a00b00a019d8bdb17mr1089766ejr.15.1701900488765;
-        Wed, 06 Dec 2023 14:08:08 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IELc1CseN/Lgd5NWinZpBx+NzuVrz10mseWrWKMVnwyTe6bCu+laowzD1kdbkuuvmu6nxMTFQ==
-X-Received: by 2002:a17:906:225a:b0:a01:9d8b:db17 with SMTP id 26-20020a170906225a00b00a019d8bdb17mr1089759ejr.15.1701900488420;
-        Wed, 06 Dec 2023 14:08:08 -0800 (PST)
-Received: from redhat.com ([2.55.11.67])
-        by smtp.gmail.com with ESMTPSA id d25-20020a170906371900b00a1d754b30a9sm462436ejc.86.2023.12.06.14.08.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 14:08:07 -0800 (PST)
-Date: Wed, 6 Dec 2023 17:08:02 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
-	oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v7 3/4] virtio/vsock: fix logic which reduces
- credit update messages
-Message-ID: <20231206170640-mutt-send-email-mst@kernel.org>
-References: <20231206211849.2707151-1-avkrasnov@salutedevices.com>
- <20231206211849.2707151-4-avkrasnov@salutedevices.com>
- <20231206165045-mutt-send-email-mst@kernel.org>
- <d9d1ec6a-dd9b-61d9-9211-52e9437cbb1f@salutedevices.com>
+        bh=I8IQ04I+iRm3dx5k4NwzAHzUj1mzQpXP0awf5WuAlvw=;
+        b=a/47k6zSaYoibI5r9r6TL+ycdpSXzCT6x0uS6Q7z34Ui9uRGJYU9hizcWwpGODrQNi
+         GN5A4qAg2Ln0WspogN/1Hz3LKLUy87p7o3VMcwHAFsKGz0hnBTxqDiuOCpuAWifg9ano
+         P5kMXiualcPg2Z2KLUp5s5WOtDU6Gi+/oAWfig61DlcTP0IbWRw097EONLS61Y2uQEFy
+         g2Ecx28sg7nPeQqN/FPdYnOZfnAcVx/5cbyWy586w1GMaocltj39e6lS2uxqSJlZCOkj
+         IJCpliBTstF8gMkL+3Ppq+qnTJs+tYD8LoFD8WpM2WDsDC4IqTgJwrJEcQPoSw9hGAdQ
+         Wa0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701901611; x=1702506411;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I8IQ04I+iRm3dx5k4NwzAHzUj1mzQpXP0awf5WuAlvw=;
+        b=WJDH+ik1QpsA6gq68vJrnKXS1r8Wpw74MyHcBpgWlvg7fX1AQm72jywqLpN/nsDDJC
+         mZ1yB8NoFERjpO7X+N43MbA7l5xBCpGA0SapdcanlMCNatNIerdmnCeIGX42NOpVi/hR
+         7BAhmLWXxZnA8d8Z52fC1QMkiSBLTue1shwYO+IG6EiL+KuT/yWCo3KLznmOqKkUPWqw
+         TkSdU+bBRTZX5sgfc/Y8YippSRz6dLE4zw1vV5+aNr6iVjY+IFZp87CH/Wf8BgQqGiYY
+         P9MczGKhdppp5+4D8c3bUXsprlt+nRi2e5Op6qqxad7SrCoyotM1Py3yfnU+f0ip1m0q
+         FQHA==
+X-Gm-Message-State: AOJu0YwL6/6Lb3t8dQ/50OQrrdjqWma0sgWU1xfHjdxai6i8pE38y8Sc
+	tPWYBOwKHrNaL1UqPDHxOKA=
+X-Google-Smtp-Source: AGHT+IEuX/V+ZCvsQTkr3A1Lus2EbnP8hbyVrWW4/pBHTdM6GywjeL0y8ar2ZxE677g724iHLpx/PA==
+X-Received: by 2002:a05:600c:4f85:b0:40b:5e59:cc9d with SMTP id n5-20020a05600c4f8500b0040b5e59cc9dmr1129205wmq.126.1701901610966;
+        Wed, 06 Dec 2023 14:26:50 -0800 (PST)
+Received: from smtpclient.apple ([178.254.237.20])
+        by smtp.gmail.com with ESMTPSA id g12-20020a05600c310c00b0040648217f4fsm966873wmo.39.2023.12.06.14.26.49
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 06 Dec 2023 14:26:49 -0800 (PST)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d9d1ec6a-dd9b-61d9-9211-52e9437cbb1f@salutedevices.com>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.200.91.1.1\))
+Subject: Re: Urgent Bug Report Kernel crash 6.5.2
+From: Martin Zaharinov <micron10@gmail.com>
+In-Reply-To: <D773F198-BCE3-4D43-9C27-2C2CA34062AC@gmail.com>
+Date: Thu, 7 Dec 2023 00:26:38 +0200
+Cc: netdev <netdev@vger.kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ patchwork-bot+netdevbpf@kernel.org,
+ Jakub Kicinski <kuba@kernel.org>,
+ Stephen Hemminger <stephen@networkplumber.org>,
+ kuba+netdrv@kernel.org,
+ dsahern@gmail.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <8E92BAA8-0FC6-4D29-BB4D-B6B60047A1D2@gmail.com>
+References: <64CCB695-BA43-48F5-912A-AFD5B9C103A7@gmail.com>
+ <CANn89iL9Twf+Rzm9v_dwsH_iG4YkW3fAc2Hnx2jypN_Qf9oojw@mail.gmail.com>
+ <D773F198-BCE3-4D43-9C27-2C2CA34062AC@gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+X-Mailer: Apple Mail (2.3774.200.91.1.1)
 
-On Thu, Dec 07, 2023 at 12:52:51AM +0300, Arseniy Krasnov wrote:
-> 
-> 
-> On 07.12.2023 00:53, Michael S. Tsirkin wrote:
-> > On Thu, Dec 07, 2023 at 12:18:48AM +0300, Arseniy Krasnov wrote:
-> >> Add one more condition for sending credit update during dequeue from
-> >> stream socket: when number of bytes in the rx queue is smaller than
-> >> SO_RCVLOWAT value of the socket. This is actual for non-default value
-> >> of SO_RCVLOWAT (e.g. not 1) - idea is to "kick" peer to continue data
-> >> transmission, because we need at least SO_RCVLOWAT bytes in our rx
-> >> queue to wake up user for reading data (in corner case it is also
-> >> possible to stuck both tx and rx sides, this is why 'Fixes' is used).
-> >> Also handle case when 'fwd_cnt' wraps, while 'last_fwd_cnt' is still
-> >> not.
-> >>
-> >> Fixes: b89d882dc9fc ("vsock/virtio: reduce credit update messages")
-> >> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
-> >> ---
-> >>  Changelog:
-> >>  v6 -> v7:
-> >>   * Handle wrap of 'fwd_cnt'.
-> >>   * Do to send credit update when 'fwd_cnt' == 'last_fwd_cnt'.
-> >>
-> >>  net/vmw_vsock/virtio_transport_common.c | 18 +++++++++++++++---
-> >>  1 file changed, 15 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> >> index e137d740804e..39f8660d825d 100644
-> >> --- a/net/vmw_vsock/virtio_transport_common.c
-> >> +++ b/net/vmw_vsock/virtio_transport_common.c
-> >> @@ -558,6 +558,8 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
-> >>  	struct virtio_vsock_sock *vvs = vsk->trans;
-> >>  	size_t bytes, total = 0;
-> >>  	struct sk_buff *skb;
-> >> +	u32 fwd_cnt_delta;
-> >> +	bool low_rx_bytes;
-> >>  	int err = -EFAULT;
-> >>  	u32 free_space;
-> >>  
-> >> @@ -601,7 +603,15 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
-> >>  		}
-> >>  	}
-> >>  
-> >> -	free_space = vvs->buf_alloc - (vvs->fwd_cnt - vvs->last_fwd_cnt);
-> >> +	/* Handle wrap of 'fwd_cnt'. */
-> >> +	if (vvs->fwd_cnt < vvs->last_fwd_cnt)
-> >> +		fwd_cnt_delta = vvs->fwd_cnt + (U32_MAX - vvs->last_fwd_cnt);
-> > 
-> > Are you sure there's no off by one here? for example if fwd_cnt is 0
-> > and last_fwd_cnt is 0xfffffffff then apparently delta is 0.
-> 
-> Seems yes, I need +1 here
-
-And then you will get a nop, because assigning U32_MAX + 1 to u32
-gives you 0. Adding () does nothing to change the result,
-+ and - are commutative.
+Hi all
 
 
-> > 
-> > 
-> >> +	else
-> >> +		fwd_cnt_delta = vvs->fwd_cnt - vvs->last_fwd_cnt;
-> > 
-> > I actually don't see what is wrong with just
-> > 	fwd_cnt_delta = vvs->fwd_cnt - vvs->last_fwd_cnt
-> > 32 bit unsigned math will I think handle wrap around correctly.
-> > 
-> > And given buf_alloc is also u32 - I don't see where the bug is in
-> > the original code.
-> 
-> I think problem is when fwd_cnt wraps, while last_fwd_cnt is not. In this
-> case fwd_cnt_delta will be too big, so we won't send credit update which
-> leads to stall for sender
-> 
-> Thanks, Arseniy
+its strange same problem is go on 6.6.4 same same debug log
 
-Care coming up with an example?
+diff hardware , users number and =E2=80=A6.
+
+in debug log is same : lib/rcuref.c=20
+
+in this line is :=20
 
 
-> > 
-> > 
-> >> +
-> >> +	free_space = vvs->buf_alloc - fwd_cnt_delta;
-> >> +	low_rx_bytes = (vvs->rx_bytes <
-> >> +			sock_rcvlowat(sk_vsock(vsk), 0, INT_MAX));
-> >>  
-> >>  	spin_unlock_bh(&vvs->rx_lock);
-> >>  
-> >> @@ -611,9 +621,11 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
-> >>  	 * too high causes extra messages. Too low causes transmitter
-> >>  	 * stalls. As stalls are in theory more expensive than extra
-> >>  	 * messages, we set the limit to a high value. TODO: experiment
-> >> -	 * with different values.
-> >> +	 * with different values. Also send credit update message when
-> >> +	 * number of bytes in rx queue is not enough to wake up reader.
-> >>  	 */
-> >> -	if (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
-> >> +	if (fwd_cnt_delta &&
-> >> +	    (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE || low_rx_bytes))
-> >>  		virtio_transport_send_credit_update(vsk);
-> >>  
-> >>  	return total;
-> >> -- 
-> >> 2.25.1
-> > 
+        /*
+         * If the reference count was already in the dead zone, then =
+this
+         * put() operation is imbalanced. Warn, put the reference count =
+back to
+         * DEAD and tell the caller to not deconstruct the object.
+         */
+        if (WARN_ONCE(cnt >=3D RCUREF_RELEASED, "rcuref - imbalanced =
+put()")) {
+                atomic_set(&ref->refcnt, RCUREF_DEAD);
+                return false;
+        }
+
+
+[529520.875413] CPU: 13 PID: 0 Comm: swapper/13 Tainted: G           O   =
+    6.6.3 #1
+[529520.875533] Hardware name: Supermicro SYS-5038MR-H8TRF/X10SRD-F, =
+BIOS 3.3 10/28/2020
+[529520.875653] RIP: 0010:rcuref_put_slowpath+0x5f/0x70
+[529520.875748] Code: 31 c0 eb e2 80 3d 9e d1 e6 00 00 74 0a c7 03 00 00 =
+00 e0 31 c0 eb cf 48 c7 c7 d9 96 e3 8f c6 05 84 d1 e6 00 01 e8 41 9d c7 =
+ff <0f> 0b eb df cc cc cc cc cc cc cc cc cc cc cc cc cc 48 89 fa 83 e2
+[529520.875908] RSP: 0018:ffffa823c052cde8 EFLAGS: 00010296
+[529520.876003] RAX: 0000000000000019 RBX: ffffa0f049053180 RCX: =
+00000000fff7ffff
+[529520.876122] RDX: 00000000fff7ffff RSI: 0000000000000001 RDI: =
+00000000ffffffea
+[529520.876244] RBP: ffffa0f0a8fffec0 R08: 0000000000000000 R09: =
+00000000fff7ffff
+[529520.876364] R10: ffffa0f79ae00000 R11: 0000000000000003 R12: =
+ffffa0f04655f000
+[529520.876482] R13: 0000000000000258 R14: ffffa0f16ade1000 R15: =
+ffffa0f79f964bd0
+[529520.876601] FS:  0000000000000000(0000) GS:ffffa0f79f940000(0000) =
+knlGS:0000000000000000
+[529520.876723] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[529520.876822] CR2: 00007fa9bd56b3c8 CR3: 000000016e43e002 CR4: =
+00000000003706e0
+[529520.877043] DR0: 0000000000000000 DR1: 0000000000000000 DR2: =
+0000000000000000
+[529520.877164] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: =
+0000000000000400
+[529520.877287] Call Trace:
+[529520.877382]  <IRQ>
+[529520.877472]  ? __warn+0x6c/0x130
+[529520.877566]  ? report_bug+0x1b8/0x200
+[529520.877661]  ? handle_bug+0x36/0x70
+[529520.877753]  ? exc_invalid_op+0x17/0x1a0
+[529520.877849]  ? asm_exc_invalid_op+0x16/0x20
+[529520.877947]  ? rcuref_put_slowpath+0x5f/0x70
+[529520.878043]  ? rcuref_put_slowpath+0x5f/0x70
+[529520.878136]  dst_release+0x1c/0x40
+[529520.878229]  __dev_queue_xmit+0x594/0xcd0
+[529520.878324]  ? eth_header+0x25/0xc0
+[529520.878417]  ip_finish_output2+0x1a0/0x530
+[529520.878514]  process_backlog+0x107/0x210
+[529520.878610]  __napi_poll+0x20/0x180
+[529520.878702]  net_rx_action+0x29f/0x380
+[529520.878935]  __do_softirq+0xd0/0x202
+[529520.879033]  do_softirq+0x3a/0x50
+[529520.879127]  </IRQ>
+[529520.879217]  <TASK>
+[529520.879306]  flush_smp_call_function_queue+0x3f/0x50
+[529520.879407]  do_idle+0x14d/0x210
+[529520.879500]  cpu_startup_entry+0x21/0x30
+[529520.879597]  start_secondary+0xe1/0xf0
+[529520.879693]  secondary_startup_64_no_verify+0x166/0x16b
+[529520.879793]  </TASK>
+[529520.879884] ---[ end trace 0000000000000000 ]=E2=80=94
+
+
+m.
+
+> On 16 Nov 2023, at 16:17, Martin Zaharinov <micron10@gmail.com> wrote:
+>=20
+> Hi All
+>=20
+> report same problem with kernel 6.6.1 - i think problem is in rcu but =
+=E2=80=A6 if have options to add people from RCU here.
+>=20
+> See report :=20
+>=20
+>=20
+>=20
+> [141229.505339] ------------[ cut here ]------------
+> [141229.505492] rcuref - imbalanced put()
+> [141229.505504] WARNING: CPU: 8 PID: 0 at lib/rcuref.c:267 =
+rcuref_put_slowpath (lib/rcuref.c:267 (discriminator 1))
+> [141229.505821] Modules linked in: xsk_diag unix_diag iptable_filter =
+xt_TCPMSS iptable_mangle xt_addrtype xt_nat xt_MASQUERADE iptable_nat =
+ip_tables netconsole coretemp e1000 ixgbe mdio pppoe pppox sha1_ssse3 =
+sha1_generic ppp_mppe libarc4 ppp_generic slhc nf_nat_sip =
+nf_conntrack_sip nf_nat_pptp nf_conntrack_pptp nf_nat_tftp =
+nf_conntrack_tftp nf_nat_ftp nf_conntrack_ftp nf_nat nf_conntrack =
+nf_defrag_ipv6 nf_defrag_ipv4
+> [141229.506349] CPU: 8 PID: 0 Comm: swapper/8 Tainted: G           O   =
+    6.6.1 #1
+> [141229.506527] Hardware name: Persy Super Server/X11DDW-L, BIOS 4.0 =
+07/11/2023
+> [141229.506701] RIP: 0010:rcuref_put_slowpath (lib/rcuref.c:267 =
+(discriminator 1))
+> [141229.506843] Code: 31 c0 eb e2 80 3d ef 4e e6 00 00 74 0a c7 03 00 =
+00 00 e0 31 c0 eb cf 48 c7 c7 07 99 e3 97 c6 05 d5 4e e6 00 01 e8 d1 1f =
+c7 ff <0f> 0b eb df cc cc cc cc cc cc cc cc cc cc cc cc cc 48 89 fa 83 =
+e2
+> All code
+> =3D=3D=3D=3D=3D=3D=3D=3D
+>   0: 31 c0                 xor    %eax,%eax
+>   2: eb e2                 jmp    0xffffffffffffffe6
+>   4: 80 3d ef 4e e6 00 00 cmpb   $0x0,0xe64eef(%rip)        # 0xe64efa
+>   b: 74 0a                 je     0x17
+>   d: c7 03 00 00 00 e0     movl   $0xe0000000,(%rbx)
+>  13: 31 c0                 xor    %eax,%eax
+>  15: eb cf                 jmp    0xffffffffffffffe6
+>  17: 48 c7 c7 07 99 e3 97 mov    $0xffffffff97e39907,%rdi
+>  1e: c6 05 d5 4e e6 00 01 movb   $0x1,0xe64ed5(%rip)        # 0xe64efa
+>  25: e8 d1 1f c7 ff        call   0xffffffffffc71ffb
+>  2a:* 0f 0b                 ud2     <-- trapping instruction
+>  2c: eb df                 jmp    0xd
+>  2e: cc                    int3
+>  2f: cc                    int3
+>  30: cc                    int3
+>  31: cc                    int3
+>  32: cc                    int3
+>  33: cc                    int3
+>  34: cc                    int3
+>  35: cc                    int3
+>  36: cc                    int3
+>  37: cc                    int3
+>  38: cc                    int3
+>  39: cc                    int3
+>  3a: cc                    int3
+>  3b: 48 89 fa              mov    %rdi,%rdx
+>  3e: 83                    .byte 0x83
+>  3f: e2                    .byte 0xe2
+>=20
+> Code starting with the faulting instruction
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>   0: 0f 0b                 ud2
+>   2: eb df                 jmp    0xffffffffffffffe3
+>   4: cc                    int3
+>   5: cc                    int3
+>   6: cc                    int3
+>   7: cc                    int3
+>   8: cc                    int3
+>   9: cc                    int3
+>   a: cc                    int3
+>   b: cc                    int3
+>   c: cc                    int3
+>   d: cc                    int3
+>   e: cc                    int3
+>   f: cc                    int3
+>  10: cc                    int3
+>  11: 48 89 fa              mov    %rdi,%rdx
+>  14: 83                    .byte 0x83
+>  15: e2                    .byte 0xe2
+> [141229.507086] RSP: 0018:ffffa444449e0978 EFLAGS: 00010296
+> [141229.507229] RAX: 0000000000000019 RBX: ffff9b54866a4100 RCX: =
+00000000fff7ffff
+> [141229.507404] RDX: 00000000fff7ffff RSI: 0000000000000001 RDI: =
+00000000ffffffea
+> [141229.507577] RBP: ffff9b53e57b1ec0 R08: 0000000000000000 R09: =
+00000000fff7ffff
+> [141229.507751] R10: ffff9b62db200000 R11: 0000000000000003 R12: =
+ffff9b5b0595c000
+> [141229.507929] R13: ffff9b5b09c32200 R14: ffff9b5b09e29a00 R15: =
+ffff9b5b0557e080
+> [141229.508101] FS:  0000000000000000(0000) GS:ffff9b62dfa00000(0000) =
+knlGS:0000000000000000
+> [141229.508279] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [141229.508425] CR2: 00007fbadced6a80 CR3: 000000096f014002 CR4: =
+00000000003706e0
+> [141229.508599] DR0: 0000000000000000 DR1: 0000000000000000 DR2: =
+0000000000000000
+> [141229.508773] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: =
+0000000000000400
+> [141229.508947] Call Trace:
+> [141229.509079]  <IRQ>
+> [141229.509206] ? __warn (kernel/panic.c:235 kernel/panic.c:673)
+> [141229.509342] ? report_bug (lib/bug.c:180 lib/bug.c:219)
+> [141229.509482] ? handle_bug (arch/x86/kernel/traps.c:237)
+> [141229.509617] ? exc_invalid_op (arch/x86/kernel/traps.c:258 =
+(discriminator 1))
+> [141229.509751] ? asm_exc_invalid_op =
+(./arch/x86/include/asm/idtentry.h:568)
+> [141229.509892] ? rcuref_put_slowpath (lib/rcuref.c:267 (discriminator =
+1))
+> [141229.510028] ? rcuref_put_slowpath (lib/rcuref.c:267 (discriminator =
+1))
+> [141229.510164] dst_release (./arch/x86/include/asm/preempt.h:95 =
+./include/linux/rcuref.h:151 net/core/dst.c:166)
+> [141229.510302] __dev_queue_xmit (./include/net/dst.h:283 =
+net/core/dev.c:4324)
+> [141229.510441] vlan_dev_hard_start_xmit (net/8021q/vlan_dev.c:130)
+> [141229.510584] dev_hard_start_xmit (./include/linux/netdevice.h:4904 =
+net/core/dev.c:3573 net/core/dev.c:3589)
+> [141229.510722] __dev_queue_xmit (./include/linux/netdevice.h:3278 =
+(discriminator 25) net/core/dev.c:4370 (discriminator 25))
+> [141229.510862] ? eth_header (net/ethernet/eth.c:85)
+> [141229.510998] ip_finish_output2 (./include/net/neighbour.h:542 =
+(discriminator 2) net/ipv4/ip_output.c:233 (discriminator 2))
+> [141229.511135] ip_sabotage_in (net/bridge/br_netfilter_hooks.c:881 =
+net/bridge/br_netfilter_hooks.c:866)
+> [141229.511269] nf_hook_slow (./include/linux/netfilter.h:144 =
+net/netfilter/core.c:626)
+> [141229.511406] ip_rcv (./include/linux/netfilter.h:259 =
+./include/linux/netfilter.h:302 net/ipv4/ip_input.c:569)
+> [141229.511540] ? ip_rcv_core.constprop.0 (net/ipv4/ip_input.c:436)
+> [141229.511678] netif_receive_skb (net/core/dev.c:5552 =
+net/core/dev.c:5666 net/core/dev.c:5752 net/core/dev.c:5811)
+> [141229.511814] br_handle_frame_finish (net/bridge/br_input.c:216)
+> [141229.511954] ? br_pass_frame_up (net/bridge/br_input.c:75)
+> [141229.512092] br_nf_hook_thresh =
+(net/bridge/br_netfilter_hooks.c:1051)
+> [141229.512227] ? br_pass_frame_up (net/bridge/br_input.c:75)
+> [141229.512363] br_nf_pre_routing_finish =
+(net/bridge/br_netfilter_hooks.c:427)
+> [141229.512501] ? br_pass_frame_up (net/bridge/br_input.c:75)
+> [141229.512644] ? nf_nat_ipv4_pre_routing =
+(net/netfilter/nf_nat_proto.c:656) nf_nat
+> [141229.512792] br_nf_pre_routing =
+(net/bridge/br_netfilter_hooks.c:538)
+> [141229.512928] ? br_nf_hook_thresh =
+(net/bridge/br_netfilter_hooks.c:354)
+> [141229.513061] br_handle_frame (./include/linux/netfilter.h:144 =
+net/bridge/br_input.c:272 net/bridge/br_input.c:417)
+> [141229.513196] ? br_pass_frame_up (net/bridge/br_input.c:75)
+> [141229.513333] __netif_receive_skb_core.constprop.0 =
+(net/core/dev.c:5446 (discriminator 1))
+> [141229.513475] ? ip_finish_output2 (net/ipv4/ip_output.c:243)
+> [141229.513613] process_backlog (net/core/dev.c:5551 =
+net/core/dev.c:5666 net/core/dev.c:5994)
+> [141229.513749] __napi_poll (net/core/dev.c:6556)
+> [141229.513887] net_rx_action (net/core/dev.c:6625 =
+net/core/dev.c:6756)
+> [141229.514023] __do_softirq (./arch/x86/include/asm/preempt.h:27 =
+kernel/softirq.c:564)
+> [141229.514158] do_softirq (kernel/softirq.c:463 (discriminator 32) =
+kernel/softirq.c:450 (discriminator 32))
+> [141229.514292]  </IRQ>
+> [141229.514420]  <TASK>
+> [141229.514548] flush_smp_call_function_queue =
+(./arch/x86/include/asm/irqflags.h:134 (discriminator 1) =
+kernel/smp.c:579 (discriminator 1))
+> [141229.514688] do_idle (kernel/sched/idle.c:314)
+> [141229.514822] cpu_startup_entry (kernel/sched/idle.c:379)
+> [141229.516148] start_secondary (arch/x86/kernel/smpboot.c:326)
+> [141229.516291] secondary_startup_64_no_verify =
+(arch/x86/kernel/head_64.S:433)
+> [141229.516435]  </TASK>
+> [141229.516562] ---[ end trace 0000000000000000 ]=E2=80=94
+>=20
+>=20
+> Best regards,
+> Martin
+>=20
+>=20
+>=20
+>> On 15 Sep 2023, at 9:45, Eric Dumazet <edumazet@google.com> wrote:
+>>=20
+>> scripts/decode_stacktrace.sh
+>=20
+>=20
 
 
