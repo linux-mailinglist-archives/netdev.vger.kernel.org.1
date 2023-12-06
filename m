@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-54508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B514A807587
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:44:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB6C5807589
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:44:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F7811F21252
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 16:44:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15198B20FA7
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 16:44:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 576F13E48B;
-	Wed,  6 Dec 2023 16:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2286247777;
+	Wed,  6 Dec 2023 16:44:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="UUhfeTkD"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="x4pwIHGn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17943D47
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 08:44:38 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1d08a924fcfso34426675ad.2
-        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 08:44:38 -0800 (PST)
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA9FCD3
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 08:44:42 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1d048c171d6so51167155ad.1
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 08:44:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701881077; x=1702485877; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XsCMB6uvft/P0Kzq8vYo58p7DgwQkKyvKz9sLTHsADc=;
-        b=UUhfeTkDDUJyk15aaa9WhRZhD3F8sM0axP2wwIYhjGhElJ3X5WEjNvrwqyEMNOtU1R
-         3bVcBCZ6K6UAJ9C05E6zpEDVCO2WKyJYujfCvCqIQGOm1Op5qNomgC3+yWtYjoypI3Bk
-         lp7KeXQ0xiQWlSspviH4SUoA/6Guy3LNN4sptJZnGYEKP2nYr3CLaN8EfboiaMmoqL3i
-         QcDK2UZDbk6lbMBVJkED+AU4E8HlGiXVRDwuxoIr3LOE9cIZaHXTgCbzLFU9HVy14IHN
-         8RtVO/OyEpqtxuak0ggSP40zq/irhgvZI4L/kL8s5fhItlNqmN8lPv1z00M5zaW+BOao
-         y59Q==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701881082; x=1702485882; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i1n+hUHrQ3jdYpTFXY4hRVwRAm0ea6knPIuI4zsgLEY=;
+        b=x4pwIHGneJt6WLef0XEWObvXwpjW93klDrKv8nw7M7ezG9mulRA4OBYQ/jyZmk2fl0
+         ZXGE1Bb/gstIX5V+3Qo99mDjMyGozXQNzUWqclaL39sO2Qir7m4WSFE7C1ufKotZkq3/
+         qQtOcVnBRGAECNbLeiJ0WOoPkzCu/X2lXAV2gTkI2yg4FkYC5yxUjs/AAjbYTeEdxgUC
+         h0CrFCY5vnxd6JR8CaoSf4GagGMPzeAesdCjjcd5AIK75AKr+sshfnDLiPq5Rz1rLko0
+         LyMCVJl/I3WO8JuOBWpfrxY8JMUsQfo7Raiq3WW6RduSwzX2G8daWvey+IjhaXCxMDK2
+         H3Kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701881077; x=1702485877;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XsCMB6uvft/P0Kzq8vYo58p7DgwQkKyvKz9sLTHsADc=;
-        b=hfcI3I/sIK2MjRn+hfsWQudIc2s2SHaqhdKgTh7chZvANRw8QspQuGDySwnhV0UWry
-         M8azDhR0d+HLFTmrn9+YYzcaCZBXsvrx2h5PUH1cX3dFGDSN1uHntUEPMbnhN6lEP3mB
-         z2+3C44aMv8wxCMi2f5Jom6VNywvRkUZKPT6hBjLi9MVLC6xp75H6ZBXQL3nxmX8n2Rx
-         39hyGQH2uwlzPu9p446xX2QEk2DITuZ39M/DEdKrbx7u01z9EmG/furJX5qo+CSbcMzJ
-         m1PP40fzjydhSFtBE7iRX9LTXKHrAAiTwy7VIWFKjcIYXt2yYevkN6UGps/6VylZfSy6
-         yVYQ==
-X-Gm-Message-State: AOJu0YzzEiZUlvkFg7Y6OIa0CepKA1tdeBnM4l37IpO5S14ZFgEJJy+H
-	YcQA05OD0qwQ2RNcXT/YYoQM09renl3S2gdQ21w=
-X-Google-Smtp-Source: AGHT+IGt5/PcVUngrSgcEFfLS3AO9UTsOAH+9D9v+/GaY0pNDG6jW+Y1Wz4xUtmSXugn1csDKj9aVw==
-X-Received: by 2002:a17:902:c411:b0:1d0:8e61:1020 with SMTP id k17-20020a170902c41100b001d08e611020mr1403447plk.89.1701881077293;
-        Wed, 06 Dec 2023 08:44:37 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701881082; x=1702485882;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i1n+hUHrQ3jdYpTFXY4hRVwRAm0ea6knPIuI4zsgLEY=;
+        b=OT4NabsZexY1CuFLcrpTgk+Vj7h0IaGhAX4hRtYgCJSzLxXlzPaF9W1Wz8smdc5orn
+         TXJ4s3CCjHDX46j6rf4icy2/f9pZnzDZHBfAyKFxM799eC0VQD0saxB8KLk4LWKRBI6F
+         XyTDFbndqDlATaKfoeujYx0jI3LeseWXPliNzd2tPHl2YhTgw0/x2LueC25uLvk6TN0z
+         VFFq4qayjfCXdNn+y/oQejruFTVGM2lwr6Dsjz6M3gfReOYFYKpfgUHwWQ3V9dlPK1iI
+         N2hs2juB+Xu3VJtK6vgD/6yyVijUgpDeZ7uHcsMAm4/iayw9Uth1rDmO4yixwm9EoKY0
+         h3rQ==
+X-Gm-Message-State: AOJu0YxQBhvNGXfAzRiM/pSslQ+s07q6nAabwZOkqfhbV2hvscsOEn+L
+	CciWex0efJPR8bTr1eU2iaW6r2iiZ/dbjU7W76Y=
+X-Google-Smtp-Source: AGHT+IGZ/SOLjkZ3FCy4v/KN/ZPXD0BaC6UPAJ0G10qWDS0CVww7VfaNlQI4NByc/By8a9NHnyMAhw==
+X-Received: by 2002:a17:902:e882:b0:1d0:b3f5:c318 with SMTP id w2-20020a170902e88200b001d0b3f5c318mr1292638plg.106.1701881081988;
+        Wed, 06 Dec 2023 08:44:41 -0800 (PST)
 Received: from rogue-one.tail33bf8.ts.net ([201.17.86.134])
-        by smtp.gmail.com with ESMTPSA id g1-20020a170902740100b001cfc3f73920sm36719pll.227.2023.12.06.08.44.32
+        by smtp.gmail.com with ESMTPSA id g1-20020a170902740100b001cfc3f73920sm36719pll.227.2023.12.06.08.44.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 08:44:36 -0800 (PST)
+        Wed, 06 Dec 2023 08:44:41 -0800 (PST)
 From: Pedro Tammela <pctammela@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -63,11 +64,15 @@ Cc: davem@davemloft.net,
 	jiri@resnulli.us,
 	marcelo.leitner@gmail.com,
 	vladbu@nvidia.com,
+	Jiri Pirko <jiri@nvidia.com>,
+	Victor Nogueira <victor@mojatatu.com>,
 	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH net-next v3 0/5] net/sched: conditional notification of events for cls and act
-Date: Wed,  6 Dec 2023 13:44:11 -0300
-Message-Id: <20231206164416.543503-1-pctammela@mojatatu.com>
+Subject: [PATCH net-next v3 1/5] rtnl: add helper to check if rtnl group has listeners
+Date: Wed,  6 Dec 2023 13:44:12 -0300
+Message-Id: <20231206164416.543503-2-pctammela@mojatatu.com>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20231206164416.543503-1-pctammela@mojatatu.com>
+References: <20231206164416.543503-1-pctammela@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,70 +81,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is an optimization we have been leveraging on P4TC but we believe
-it will benefit rtnl users in general.
+From: Jamal Hadi Salim <jhs@mojatatu.com>
 
-It's common to allocate an skb, build a notification message and then
-broadcast an event. In the absence of any user space listeners, these
-resources (cpu and memory operations) are wasted. In cases where the subsystem
-is lockless (such as in tc-flower) this waste is more prominent. For the
-scenarios where the rtnl_lock is held it is not as prominent.
+As of today, rtnl code creates a new skb and unconditionally fills and
+broadcasts it to the relevant group. For most operations this is okay
+and doesn't waste resources in general.
 
-The idea is simple. Build and send the notification iif:
-   - The user requests via NLM_F_ECHO or
-   - Someone is listening to the rtnl group (tc mon)
+When operations are done without the rtnl_lock, as in tc-flower, such
+skb allocation, message fill and no-op broadcasting can happen in all
+cores of the system, which contributes to system pressure and wastes
+precious cpu cycles when no one will receive the built message.
 
-On a simple test with tc-flower adding 1M entries, using just a single core,
-there's already a noticeable difference in the cycles spent in tc_new_tfilter
-with this patchset.
+Introduce this helper so rtnetlink operations can simply check if someone
+is listening and then proceed if necessary.
 
-before:
-   - 43.68% tc_new_tfilter
-      + 31.73% fl_change
-      + 6.35% tfilter_notify
-      + 1.62% nlmsg_notify
-        0.66% __tcf_qdisc_find.part.0
-        0.64% __tcf_chain_get
-        0.54% fl_get
-      + 0.53% tcf_proto_lookup_ops
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+---
+ include/linux/rtnetlink.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-after:
-   - 39.20% tc_new_tfilter
-      + 34.58% fl_change
-        0.69% __tcf_qdisc_find.part.0
-        0.67% __tcf_chain_get
-      + 0.61% tcf_proto_lookup_ops
-
-Note, the above test is using iproute2:tc which execs a shell.
-We expect people using netlink directly to observe even greater
-reductions.
-
-The qdisc side needs some refactoring of the notification routines to fit in
-this new model, so they will be sent in a later patchset.
-
-v2->v3:
-- Collected Jiri review tags
-- Fixed commit messages to refer to rtnl_notify_needed
-
-v1->v2:
-- Address Jakub comments
-
-Jamal Hadi Salim (1):
-  rtnl: add helper to check if rtnl group has listeners
-
-Pedro Tammela (3):
-  rtnl: add helper to send if skb is not null
-  net/sched: act_api: conditional notification of events
-  net/sched: cls_api: conditional notification of events
-
-Victor Nogueira (1):
-  rtnl: add helper to check if a notification is needed
-
- include/linux/rtnetlink.h |  29 +++++++++++
- net/sched/act_api.c       | 105 +++++++++++++++++++++++++++-----------
- net/sched/cls_api.c       |  12 +++++
- 3 files changed, 117 insertions(+), 29 deletions(-)
-
+diff --git a/include/linux/rtnetlink.h b/include/linux/rtnetlink.h
+index 3d6cf306cd55..a7d757e96c55 100644
+--- a/include/linux/rtnetlink.h
++++ b/include/linux/rtnetlink.h
+@@ -130,4 +130,11 @@ extern int ndo_dflt_bridge_getlink(struct sk_buff *skb, u32 pid, u32 seq,
+ 
+ extern void rtnl_offload_xstats_notify(struct net_device *dev);
+ 
++static inline int rtnl_has_listeners(const struct net *net, u32 group)
++{
++	struct sock *rtnl = net->rtnl;
++
++	return netlink_has_listeners(rtnl, group);
++}
++
+ #endif	/* __LINUX_RTNETLINK_H */
 -- 
 2.40.1
 
