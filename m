@@ -1,69 +1,71 @@
-Return-Path: <netdev+bounces-54316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26C198068F4
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 08:52:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67FEA8068F9
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 08:54:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D67A228206D
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 07:52:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F40B7281CEF
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 07:54:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52DC7182C5;
-	Wed,  6 Dec 2023 07:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FDE3182CA;
+	Wed,  6 Dec 2023 07:54:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Wniyd2P3"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="giv24QfG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60DA6D44
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 23:51:58 -0800 (PST)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-a1b68ae40f0so46171166b.0
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 23:51:58 -0800 (PST)
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49B69D65
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 23:53:56 -0800 (PST)
+Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2ca208940b3so5703051fa.1
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 23:53:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1701849117; x=1702453917; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1701849234; x=1702454034; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eFp5uRjObHI5sx2KkKwRQYb2OVirn1mK3AeigSWlk4s=;
-        b=Wniyd2P3RLg1FtMeuyUepKuWnMpXvFa+1qDMwmmnncFjQZiZno+vUPwkw/Rfewm33y
-         /5rAdjVU0vckTkJaSDGBZh8+09F9lTiE6Ucfmq8i1A3LRu7tHV0KXwrJ9AOVVkbFn9so
-         XGyVpv/sZ8NojMhTMv/+m0aeLgsNd+czXEylT5FgEcnadCvCb8C7g2N9UBYVeU1h3fQJ
-         W5lPv/XFC/6/R3kpHz00ulRq0qP6abEv4haosB5GJeQIYJ4xlre0jXbhenVx8Ay2wAiY
-         SmZnTHz9cGZAjaMPm1Yw3et2STDnl5j5lZGh/uQtCO4G76l9YFVQ0zeGHOvFEplDd0ts
-         l+hA==
+        bh=u0HKekEiaC+hgm7YlUHFNWq+Xaz94fy3Pwc/4RQIjig=;
+        b=giv24QfGOKUp36/K5NExvxslz/InqBrI1+bcQDPNSd+gKa0Z4q4PF3U/hai1VyPPg8
+         46A3iVaLskR0DQOoTxIWInBt8VQxcZMXaf2HUzLIkUicUOLRdK4PvaLWc0eg2SVRRhRL
+         HnGiwu/yG80Tx9+SJVbLK6FqZCtHGR9i3VLrKN+D8G+vE8+RX2ie0eBoq06C5ZQfr4i+
+         +Jv/cZHrM0TNsnhS8ssb13et9Vx0FLSkI26INjzOV8gmw8x3ogipY3bWs76wSchgGgBg
+         bDiyMHuCaWOW7x3WFIzDwG7CrqNAvKtyWvxHdNN4PotKxe5CVjtQf+Q772d+7K5hLgqA
+         umHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701849117; x=1702453917;
+        d=1e100.net; s=20230601; t=1701849234; x=1702454034;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eFp5uRjObHI5sx2KkKwRQYb2OVirn1mK3AeigSWlk4s=;
-        b=detEayc6HweI9B4DT+Uq9EBc6Q2oLG8x5pZwrzymdjNySqt+qxF+ajTky2rLq5gZDU
-         SdtqiQ0Tn3XHh1LmH3WiY2KzK3aF4LAmvTVXpVPxlu67XWBZRowrxoXF1/i8RL6u3Ejv
-         av6mNkHpDAChiLzLW/YLelX0h7GoALh9elPnpjONbL6GQU4Hf/VYGyjoQ56rbnxAnm8B
-         Mq00gfGPjPtCFfqWPVolEOlKa8gZB7J2TCstM/6pcQiYYiGqwi0oJn2nJhlHsUeoJ0xW
-         W+KvepT9owcExZQLXd4Ds2Z1xPV/e/xE1fQnc9n1/g6H7XcqNs58P/thGWtSRD/r9zL8
-         3lvQ==
-X-Gm-Message-State: AOJu0YxpS4wQ+H7AxZspQmqKWADkJUMPRxMcpFGZJiNE/CFyqGk128pf
-	q8W5YnLPhRk6Mq8QYzrCXOgHAmORQbbCnxLG0vU=
-X-Google-Smtp-Source: AGHT+IHMzuY1meGvg3Pi+vDkWvago2/oB4Ztcse2n8A7UWRnbPN+dQ+ogzUsnIcWjEorXoxs4+bAgA==
-X-Received: by 2002:a17:906:1cd:b0:a02:9891:29ba with SMTP id 13-20020a17090601cd00b00a02989129bamr269843ejj.15.1701849116698;
-        Tue, 05 Dec 2023 23:51:56 -0800 (PST)
+        bh=u0HKekEiaC+hgm7YlUHFNWq+Xaz94fy3Pwc/4RQIjig=;
+        b=HaTnsZvXR9b44G/e6pKtHyHxJtMUMjPMvFT8c9JWFpgmaWv5eGUZS/1xXwTY7p0MFf
+         WhoJEhtrxWkfWzl+SFrCTRN48r6dWtBiyaYKIzKU7keF4dAF+bg6hivLpRZBAUoJoXXh
+         zg57HaXg/9j2hrbJEiWj66JQXBrH79AHpARKWwryHRPAH3CSPZWiDJIIbBEVsPjPYbOF
+         hzWKA49TL5AGAtblUW1yswCMb7fXHqtezKl+yOBVhtEDsfweLkHWIlx69DcjM2svFRBj
+         29US2b7RmKeMTUMVmyDKxx65iVO5BFEUhLpOYc8WO0aShijxFuPrebmSoh2wDm67urZh
+         brWQ==
+X-Gm-Message-State: AOJu0YwftHspJYsv8u19p8gZcMK6Kx7a9Ite1uSLTbVCpeSEGya4VJQp
+	pgWnDHAlYGjoHhx8dryHfUKHig==
+X-Google-Smtp-Source: AGHT+IG8+ocv6jcfXZr/sCm4koVHZ/ZSXkJS5VbfiMqTROMDWgZJV09JBC1NkXF7vPmVdSuG9kVL+w==
+X-Received: by 2002:a2e:86da:0:b0:2c9:f985:457b with SMTP id n26-20020a2e86da000000b002c9f985457bmr298305ljj.3.1701849234328;
+        Tue, 05 Dec 2023 23:53:54 -0800 (PST)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id q14-20020a1709064c8e00b009fc42f37970sm7915855eju.171.2023.12.05.23.51.55
+        by smtp.gmail.com with ESMTPSA id bf17-20020a0564021a5100b0054ca1d90410sm2071733edb.85.2023.12.05.23.53.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 23:51:56 -0800 (PST)
-Date: Wed, 6 Dec 2023 08:51:54 +0100
+        Tue, 05 Dec 2023 23:53:53 -0800 (PST)
+Date: Wed, 6 Dec 2023 08:53:52 +0100
 From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Swarup Laxman Kotiaklapudi <swarupkotikalapudi@gmail.com>,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org
-Subject: Re: [PATCH net-next v5] netlink: specs: devlink: add some(not all)
- missing attributes in devlink.yaml
-Message-ID: <ZXAoGhUnBFzQxD0f@nanopsycho>
-References: <20231202123048.1059412-1-swarupkotikalapudi@gmail.com>
- <20231205191944.6738deb7@kernel.org>
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com, marcelo.leitner@gmail.com,
+	vladbu@nvidia.com
+Subject: Re: [PATCH net-next v2 4/5] net/sched: act_api: conditional
+ notification of events
+Message-ID: <ZXAokByEQY//QqXm@nanopsycho>
+References: <20231204203907.413435-1-pctammela@mojatatu.com>
+ <20231204203907.413435-5-pctammela@mojatatu.com>
+ <ZW8KaANgu0DpryWV@nanopsycho>
+ <6a70805b-953d-494e-a9b9-a2cb0e0aff18@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,32 +74,90 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231205191944.6738deb7@kernel.org>
+In-Reply-To: <6a70805b-953d-494e-a9b9-a2cb0e0aff18@mojatatu.com>
 
-Wed, Dec 06, 2023 at 04:19:44AM CET, kuba@kernel.org wrote:
->On Sat,  2 Dec 2023 18:00:48 +0530 Swarup Laxman Kotiaklapudi wrote:
->> Add some missing(not all) attributes in devlink.yaml.
+Tue, Dec 05, 2023 at 03:45:52PM CET, pctammela@mojatatu.com wrote:
+>On 05/12/2023 08:32, Jiri Pirko wrote:
+>> Mon, Dec 04, 2023 at 09:39:06PM CET, pctammela@mojatatu.com wrote:
+>> > As of today tc-action events are unconditionally built and sent to
+>> > RTNLGRP_TC. As with the introduction of tc_should_notify we can check
+>> > before-hand if they are really needed.
+>> > 
+>> > Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+>> > ---
+>> > net/sched/act_api.c | 105 ++++++++++++++++++++++++++++++++------------
+>> > 1 file changed, 76 insertions(+), 29 deletions(-)
+>> > 
+>> > diff --git a/net/sched/act_api.c b/net/sched/act_api.c
+>> > index c39252d61ebb..55c62a8e8803 100644
+>> > --- a/net/sched/act_api.c
+>> > +++ b/net/sched/act_api.c
+>> > @@ -1780,31 +1780,45 @@ static int tcf_action_delete(struct net *net, struct tc_action *actions[])
+>> > 	return 0;
+>> > }
+>> > 
+>> > -static int
+>> > -tcf_reoffload_del_notify(struct net *net, struct tc_action *action)
+>> > +static struct sk_buff *tcf_reoffload_del_notify_msg(struct net *net,
+>> 
+>> I wonder, why this new function is needed? If I'm reading things
+>> correctly, tcf_reoffload_del_notify() with added check would be just ok,
+>> woundn't it?
+>> 
+>> Same for others.
 >
->Hi Jiri,
+>In V1 we had it like what you are suggesting[1].
+>Jakub suggested to refactor the functions a bit more. The main argument was
+>the code duplication introduced for the delete routines.
+
+Okay.
+
+>Note that for the case that no notification is needed, we still need to do
+>the action delete etc...
+>I agree that code duplication is bad in the long term, so I did the changes,
+>but I don't have a strong opinion here (either way is fine for me).
+>Let's see what he has to say, perhaps I overdid what he was suggesting :)
 >
->Do you want to take a closer look at the spec here?
->Looks fine to me, on a quick scroll.
-
-Yep, will do that later today.
-
+>[1]
+>https://lore.kernel.org/all/20231201204314.220543-4-pctammela@mojatatu.com/
 >
->> Suggested-by: Jiri Pirko <jiri@resnulli.us>
->> Suggested-by: Jakub Kicinski <kuba@kernel.org>
->> Fixes: f2f9dd164db0 ("netlink: specs: devlink: add the remaining command to generate complete split_ops")
+>> 
+>> > +						    struct tc_action *action)
+>> > {
+>> > 	size_t attr_size = tcf_action_fill_size(action);
+>> > 	struct tc_action *actions[TCA_ACT_MAX_PRIO] = {
+>> > 		[0] = action,
+>> > 	};
+>> > -	const struct tc_action_ops *ops = action->ops;
+>> > 	struct sk_buff *skb;
+>> > -	int ret;
+>> > 
+>> > -	skb = alloc_skb(attr_size <= NLMSG_GOODSIZE ? NLMSG_GOODSIZE : attr_size,
+>> > -			GFP_KERNEL);
+>> > +	skb = alloc_skb(max(attr_size, NLMSG_GOODSIZE), GFP_KERNEL);
+>> 
+>> I don't see how this is related to this patch. Can't you do it in separate
+>> patch?
+>> 
+>> Same for others.
 >
->I'll drop these when / if applying, FWIW. 
+>Sure, will split it out.
 >
->Swarup, for future reference if there are comments / changes suggested
->during normal review process you don't have to add the Suggested-by
-
-My "suggested-by" is probably fine as I suggested Swarup to make the patch :)
-
-
->tag. The expectation is that the reviewer will send a Reviewed-by tag
->themselves at the end instead.
+>> 
+>> > 	if (!skb)
+>> > -		return -ENOBUFS;
+>> > +		return ERR_PTR(-ENOBUFS);
+>> > 
+>> > 	if (tca_get_fill(skb, actions, 0, 0, 0, RTM_DELACTION, 0, 1, NULL) <= 0) {
+>> > 		kfree_skb(skb);
+>> > -		return -EINVAL;
+>> > +		return ERR_PTR(-EINVAL);
+>> > 	}
+>> > 
+>> > +	return skb;
+>> > +}
+>> > +
+>> 
+>> [...]
+>
 
