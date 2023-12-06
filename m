@@ -1,89 +1,94 @@
-Return-Path: <netdev+bounces-54400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C9FD806F84
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:15:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F3FA806F88
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:17:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B20CC281964
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 12:15:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E83F01F214BB
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 12:17:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0542535F09;
-	Wed,  6 Dec 2023 12:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B1A6364A8;
+	Wed,  6 Dec 2023 12:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="cskeBUUo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LDNy3lDA"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6FF59A
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 04:15:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=9x2SLU29rQEMfu8pqDWi89Hi3pvx5ygfkmNfxxCTGg0=; b=cskeBUUoqkuP8iJs14gCsCSz6C
-	9O3P6wq73rqdCmWegiDX3/6rIYrtFWTpRGKx2Vm1cuRXLqKZkWtXaApeaLwVuqOPQ9twt7sJTtiY5
-	ds9mn/SwpMV79J9kOZWAoAveAg3A1E0048fVHehMMhAGhCejJZmjGG010kTX0XTPNt9NenExBYWcl
-	NcQOl4fqI8OIEM1Vll1k1eWpJsXtQmkEH1SvIp0oRdxRQqShiAF2yIWHiKEEsNfa87y8asy2zSuma
-	YjIQ2fhhHce7wVC7XpaDBpab7VrHUU3nWACScaBkVWY8xuonydf6D4tN/mHyQJOE77eAdNL8UOH7p
-	bS2lvDFQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52288)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rAqoZ-0008Ed-0m;
-	Wed, 06 Dec 2023 12:15:43 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rAqob-0002iN-C6; Wed, 06 Dec 2023 12:15:45 +0000
-Date: Wed, 6 Dec 2023 12:15:45 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew@lunn.ch, netdev@vger.kernel.org,
-	mengyuanlou@net-swift.com
-Subject: Re: [PATCH net-next v3 2/7] net: wangxun: unified phylink
- implementation in libwx
-Message-ID: <ZXBl8VCncGJSpkad@shell.armlinux.org.uk>
-References: <20231206095355.1220086-1-jiawenwu@trustnetic.com>
- <20231206095355.1220086-3-jiawenwu@trustnetic.com>
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 473B5D3
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 04:17:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701865061;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eB959rdqwj3McpopDWbd2KITPsbXVjh5QYy/Nwyj7gY=;
+	b=LDNy3lDAHufF7P/X1ceFVZHDVENsTsJorh751Y3eJ4noh/SvPFgGhyPLj7hcB2enuOKChh
+	3GNQiHevgnCrHUcdkerBmhcyX69vI/Po5z/li3tG4ooPkF/bh8ht6GqgEZj7QTsuGy2Ubj
+	oXz6EbFriVdCXwaYgB7V7NQxMF1s6rg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-553-oRHB5hP9Ot2hTUPZpvAgvg-1; Wed, 06 Dec 2023 07:17:38 -0500
+X-MC-Unique: oRHB5hP9Ot2hTUPZpvAgvg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8CCD685CBA5;
+	Wed,  6 Dec 2023 12:17:37 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.39.193.237])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4998D111E3EE;
+	Wed,  6 Dec 2023 12:17:34 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: stern@rowland.harvard.edu
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	greg@kroah.com,
+	jtornosm@redhat.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	oneukum@suse.com,
+	pabeni@redhat.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v4] net: usb: ax88179_178a: avoid failed operations when device is disconnected
+Date: Wed,  6 Dec 2023 13:17:32 +0100
+Message-ID: <20231206121732.7154-1-jtornosm@redhat.com>
+In-Reply-To: <624ad05b-0b90-4d1c-b06b-7a75473401c3@rowland.harvard.edu>
+References: <624ad05b-0b90-4d1c-b06b-7a75473401c3@rowland.harvard.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231206095355.1220086-3-jiawenwu@trustnetic.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On Wed, Dec 06, 2023 at 05:53:50PM +0800, Jiawen Wu wrote:
-> Use wx->phylink instead of txgbe->phylink, and move the same ethtool
-> functions to libwx because them can be implemented with phylink in
-> ngbe driver.
-> 
-> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+Hello Alan,
 
-I would probably do the first two patches of your series differently:
+> The __ax88179_read_cmd() and __ax88179_write_cmd() routines are 
+> asynchronous with respect to ax88179_disconnect(), right?  Or at least, 
+> they are if they run as a result of the user closing the network 
+> interface.  Otherwise there wouldn't be any memory ordering issues.
+Yes, I think so, they could be asynchronous regarding ax88179_disconnect.
 
-Patch 1: add struct phylink + phylink_config to the wx structure, and
-  add the helper functions for ksettings and nway reset.
+> But the memory barriers you added are not the proper solution.  What you 
+> need here is _synchronization_, not _ordering_.  As it is, the memory 
+> barriers you have added don't do anything; they shouldn't be in the 
+> patch.
+Ok, thank you for the helpful clarification, let me check it better,
+I understood it in a wrong way.
 
-Patch 2: convert txgbe to use the bits added in patch 1.
+> If you would like a more in-depth explanation, let me know.
+Thank you for your help, I will try first, I really appreciate this.
 
-Patch 3: convert ngbe to phylink using the wx bits added in the first
-  patch as a pure phylink conversion.
+Best regards
+José Ignacio
 
-Patch 4: change how the PHY is attached/detached (as mentioned in the
-  review of your existing first patch.)
-
-which probably would have been easier to review.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
