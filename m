@@ -1,146 +1,114 @@
-Return-Path: <netdev+bounces-54446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A79AE807171
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 14:58:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AB3A807155
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 14:56:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AEEBAB20F03
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:58:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8EB4B20E93
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:56:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C85563C481;
-	Wed,  6 Dec 2023 13:58:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1EA3C46B;
+	Wed,  6 Dec 2023 13:55:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C5Kycxyx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g3WZRGs4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B7C412B;
-	Wed,  6 Dec 2023 05:58:45 -0800 (PST)
-Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2c9fe0b5b28so48661441fa.1;
-        Wed, 06 Dec 2023 05:58:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701871123; x=1702475923; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ysehmX4Pt24WsrUEQ3QJu+I81wy32Tt8NuJKvK6AdqQ=;
-        b=C5KycxyxaOvlRSfGwcNQUGmA5kgnc4bVcA4ljNUbe9fFjTpYSMTWH7uVwmh5wqithu
-         /cSG7Pbo4Gn+Qe4N2ajssAja1CLQWaz1fprwbCKadUQfIYqsjUxwY9OSNS2YTZDslZF+
-         geuAUSV/JLmLjYKxVJj4dg4YDluo1a6HfsmKWBIC1qKloZxyG/PQvfFicMuFwE+cokqf
-         Bdsqv/eILGcg5A6P60XFxpavFk35pukP+lINBew7CU+6tGcE5HpdL4mWv0e1kVIk7Ho5
-         VA5/687IuLMeD5W47yf5q2KRw8KO9v5ZlpwZiIrb6ehrEeAILabMiHapodb5MWQMEVln
-         5nHQ==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AEE6D4D
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 05:55:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701870955;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P7s0RODaU0CONE0ORnylh3BqAbb5cnBkp4sJTs7k4Oo=;
+	b=g3WZRGs4sKcnJwO9HBtnHNa1jMkWtdfKjo4kGUeelgpDdEkAXkTHxvSQIDyllEfuLDxpqm
+	dTe4qGmgcpdaQdlI5jeK1ECd5qjv0OzenWu+LOGlddmYugwYujT+d6qbly3isH5nrQ6og+
+	HgT/Dc459pU+XjQ79cRn27xMCPp9xYU=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-679-Ndfu2W8CM6-OiWkh-aNMHw-1; Wed, 06 Dec 2023 08:55:53 -0500
+X-MC-Unique: Ndfu2W8CM6-OiWkh-aNMHw-1
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-50c0047a34dso2671836e87.1
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 05:55:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701871123; x=1702475923;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ysehmX4Pt24WsrUEQ3QJu+I81wy32Tt8NuJKvK6AdqQ=;
-        b=iM2B6DYdbWqVKQ6c3kyssa/o7pPgFtpd7TMZOoO5zXIKCp3xpCijuht1bzIHotgDV+
-         8rbxjMqYnaFHlAGm/rkgmfSrxGF2d6fZJr9bk53tNHd+OjlDHFgtIksjSnUobobnKNHZ
-         0hjtKF+l/dfiyhHEM1zvmGuUCPQHLY9hKHwzKdYrdcCo8EoZn/sfcnWm4ZMCL2Ba2gAq
-         6UXaGgdPOl51rjmlaIewEYM6Fc9d+CVuJhR104N1SC90rT5WHkXbkpj65YZdSLlt6DKR
-         ilraU1699WP4t7ls6CsukjEcas3BBbnTz/w1R2Vu8yPLdxbaoabnPRmf1fTE/gLsM1Rx
-         Tiwg==
-X-Gm-Message-State: AOJu0Yw0j8zfAug/tiACR35bfhgGumiA6vjr6x7pIH0+2dDZwrauG14C
-	zpfRpg20mHeq2GSpAQt0UJ8wkILv2R0=
-X-Google-Smtp-Source: AGHT+IHIJ4rzxIE3cF1KqRrszjBGmYzbzhE3snj7i/rSEsicZWKt3h3Qn5xDOdTY1dk+XIf0oZZXrQ==
-X-Received: by 2002:a05:651c:204:b0:2c9:ffbb:34fd with SMTP id y4-20020a05651c020400b002c9ffbb34fdmr696685ljn.12.1701871122704;
-        Wed, 06 Dec 2023 05:58:42 -0800 (PST)
-Received: from 127.com ([2620:10d:c092:600::2:15ce])
-        by smtp.gmail.com with ESMTPSA id m23-20020a1709061ed700b00a1ddf81b4ffsm624546ejj.207.2023.12.06.05.58.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 05:58:42 -0800 (PST)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: io-uring@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	asml.silence@gmail.com,
-	jannh@google.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH RESEND] io_uring/af_unix: disable sending io_uring over sockets
-Date: Wed,  6 Dec 2023 13:55:19 +0000
-Message-ID: <c716c88321939156909cfa1bd8b0faaf1c804103.1701868795.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1701870952; x=1702475752;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=P7s0RODaU0CONE0ORnylh3BqAbb5cnBkp4sJTs7k4Oo=;
+        b=L2L9J+57pEAazoy4qoc5YHaSOSI2b8WdZMZAgos7YWrfG6rMfQFrUKwNTbCrrXVLwj
+         cWzfE6juErWXYot/0ccxHHqXkAE4yIFeNgE7YspFe5WMgCJ6p4FylTxCO/Q6lv5kUPVG
+         bW9bUAC0IEuHFUlkQcVHI6JKe+X8FL2WGb+7HbnG/al2VpuHD86T4n5xEVWs1vI8z7/h
+         D9LGLBGfhbxZxHuMkij6XfkaqRceE0ObvTaYQznNLrNE77hy8F567Fl4ULGSd/uQAXe7
+         tGJZq81mQ0oTAxhfTDBWHI8/GPVynwcwp12u6YDZJbw25j4bzk2EtZUQsPSMmIejlOo1
+         hVCQ==
+X-Gm-Message-State: AOJu0YzG8sCnWIAnUmwqF4volArmpmiTXahkrUP5JZs6eNdOSvNyWu4G
+	FlywahwUaSQFWoJ3XxUPnK0IjFeKTfHSdakqZxXlm3u1hG7WOB8YLUUeD4CRozuPE6mX68Bj8Q8
+	ZLUTF540eQ0XaLPkxLN0AVPx3fivd8Ntr
+X-Received: by 2002:ac2:559a:0:b0:50b:e60f:4baa with SMTP id v26-20020ac2559a000000b0050be60f4baamr577483lfg.47.1701870952244;
+        Wed, 06 Dec 2023 05:55:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGySLmvleNpyWCKhp6Ms6z7L9oDKbB5Ep3UDcXrZEAKc/ZMomNHiJ3gmUVz0bLloH+uuuwybbA9sE3pt4kNYMU=
+X-Received: by 2002:ac2:559a:0:b0:50b:e60f:4baa with SMTP id
+ v26-20020ac2559a000000b0050be60f4baamr577466lfg.47.1701870951874; Wed, 06 Dec
+ 2023 05:55:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231206135228.2591659-1-srasheed@marvell.com>
+In-Reply-To: <20231206135228.2591659-1-srasheed@marvell.com>
+From: Michal Schmidt <mschmidt@redhat.com>
+Date: Wed, 6 Dec 2023 14:55:40 +0100
+Message-ID: <CADEbmW3bn7btX_8RiOEncyh+M+WMK5Kxi+Gy_o3P2pi3u7rzHg@mail.gmail.com>
+Subject: Re: [PATCH net v3] octeon_ep: initialise control mbox tasks before
+ using APIs
+To: Shinas Rasheed <srasheed@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, hgani@marvell.com, 
+	vimleshk@marvell.com, egallen@redhat.com, pabeni@redhat.com, horms@kernel.org, 
+	kuba@kernel.org, davem@davemloft.net, wizhao@redhat.com, konguyen@redhat.com, 
+	Veerasenareddy Burru <vburru@marvell.com>, Sathesh Edara <sedara@marvell.com>, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-File reference cycles have caused lots of problems for io_uring
-in the past, and it still doesn't work exactly right and races with
-unix_stream_read_generic(). The safest fix would be to completely
-disallow sending io_uring files via sockets via SCM_RIGHT, so there
-are no possible cycles invloving registered files and thus rendering
-SCM accounting on the io_uring side unnecessary.
+On Wed, Dec 6, 2023 at 2:52=E2=80=AFPM Shinas Rasheed <srasheed@marvell.com=
+> wrote:
+>
+> Initialise various workqueue tasks and queue interrupt poll task
+> before the first invocation of any control net APIs. Since
+> octep_ctrl_net_get_info was called before the control net receive
+> work task was initialised or even the interrupt poll task was
+> queued, the function call wasn't returning actual firmware
+> info queried from Octeon.
+>
+> Fixes: 8d6198a14e2b ("octeon_ep: support to fetch firmware info")
+> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
+> ---
+> V3:
+>   - Included Fixes line in commit log.
+>   - Corrected typo in print statement.
+>
+> V2: https://lore.kernel.org/all/20231205130625.2586755-1-srasheed@marvell=
+.com/
+>   - Updated changelog.
+>   - Handled error return for octep_ctrl_net_get_info
+>
+> V1: https://lore.kernel.org/all/20231202150807.2571103-1-srasheed@marvell=
+.com/
+>
+>  .../ethernet/marvell/octeon_ep/octep_main.c   | 22 +++++++++++--------
+>  1 file changed, 13 insertions(+), 9 deletions(-)
 
-Cc: stable@vger.kernel.org
-Fixes: 0091bfc81741b ("io_uring/af_unix: defer registered files gc to io_uring release")
-Reported-and-suggested-by: Jann Horn <jannh@google.com>
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
+Good timing. I was just going to write to you about the typo :)
+Looks good now.
 
-Note, it's a minimal patch intended for backporting, all the leftovers
-will be cleaned up separately.
-
- io_uring/rsrc.h | 7 -------
- net/core/scm.c  | 6 ++++++
- 2 files changed, 6 insertions(+), 7 deletions(-)
-
-diff --git a/io_uring/rsrc.h b/io_uring/rsrc.h
-index 8625181fb87a..08ac0d8e07ef 100644
---- a/io_uring/rsrc.h
-+++ b/io_uring/rsrc.h
-@@ -77,17 +77,10 @@ int io_sqe_files_register(struct io_ring_ctx *ctx, void __user *arg,
- 
- int __io_scm_file_account(struct io_ring_ctx *ctx, struct file *file);
- 
--#if defined(CONFIG_UNIX)
--static inline bool io_file_need_scm(struct file *filp)
--{
--	return !!unix_get_socket(filp);
--}
--#else
- static inline bool io_file_need_scm(struct file *filp)
- {
- 	return false;
- }
--#endif
- 
- static inline int io_scm_file_account(struct io_ring_ctx *ctx,
- 				      struct file *file)
-diff --git a/net/core/scm.c b/net/core/scm.c
-index 880027ecf516..7dc47c17d863 100644
---- a/net/core/scm.c
-+++ b/net/core/scm.c
-@@ -26,6 +26,7 @@
- #include <linux/nsproxy.h>
- #include <linux/slab.h>
- #include <linux/errqueue.h>
-+#include <linux/io_uring.h>
- 
- #include <linux/uaccess.h>
- 
-@@ -103,6 +104,11 @@ static int scm_fp_copy(struct cmsghdr *cmsg, struct scm_fp_list **fplp)
- 
- 		if (fd < 0 || !(file = fget_raw(fd)))
- 			return -EBADF;
-+		/* don't allow io_uring files */
-+		if (io_uring_get_socket(file)) {
-+			fput(file);
-+			return -EINVAL;
-+		}
- 		*fpp++ = file;
- 		fpl->count++;
- 	}
--- 
-2.43.0
+Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
 
 
