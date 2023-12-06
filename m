@@ -1,170 +1,146 @@
-Return-Path: <netdev+bounces-54439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38D22807132
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 14:51:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A3D98807145
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 14:52:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69CB01C20D80
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:51:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA0901C20A33
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:52:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614AE3BB24;
-	Wed,  6 Dec 2023 13:51:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0924337155;
+	Wed,  6 Dec 2023 13:52:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WZkqBg0A"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Odkcvdrp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408EA321AE;
-	Wed,  6 Dec 2023 13:51:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94A0BC433C7;
-	Wed,  6 Dec 2023 13:51:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701870694;
-	bh=4yJEOyXZICGTPIYoLV9zvlyTK4vOBWYD6er6RDgInGs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WZkqBg0A4hzkm7E32fn25fsGUQzsPFGOVtxsUVNn0NU+ZTzeLnbDt7RSUbpZxWP4G
-	 7p4KGUAFwfFu5VhayRNgXApi6Yvhkvyg3NNX5dZRFOt76AqzM0g6B2dMCEQuzzFVoQ
-	 UktUjH7rggGTvgg9G4TFHL/I66BPz43yVwmGtXu9aPMVlViab2DQDG4JaXlEN5g2ab
-	 6i/wMEEpXHKHqyZQ7NzVUl/urnFSsh4/EOQYlwDAsBqTTBodE0+OZGTJKtZeuQnWfg
-	 4Klc6nNcEPo5jtPEKOCxiZZm1MC0Q9fKK/VjU1jE9rO8BN5zxAuXw57BmhJ+ND+VUE
-	 xPEKNHrnWq2uw==
-Date: Wed, 6 Dec 2023 14:51:30 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, aleksander.lobakin@intel.com,
-	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, lorenzo.bianconi@redhat.com, bpf@vger.kernel.org,
-	toke@redhat.com, willemdebruijn.kernel@gmail.com,
-	jasowang@redhat.com, sdf@google.com
-Subject: Re: [PATCH v3 net-next 2/2] xdp: add multi-buff support for xdp
- running in generic mode
-Message-ID: <ZXB8Yr-nkhYaF5nS@lore-desk>
-References: <cover.1701437961.git.lorenzo@kernel.org>
- <c9ee1db92c8baa7806f8949186b43ffc13fa01ca.1701437962.git.lorenzo@kernel.org>
- <20231201194829.428a96da@kernel.org>
- <ZW3zvEbI6o4ydM_N@lore-desk>
- <20231204120153.0d51729a@kernel.org>
- <ZW-tX9EAnbw9a2lF@lore-desk>
- <20231205155849.49af176c@kernel.org>
- <4b9804e2-42f0-4aed-b191-2abe24390e37@kernel.org>
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B547F12B;
+	Wed,  6 Dec 2023 05:52:40 -0800 (PST)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B6DYq3f021830;
+	Wed, 6 Dec 2023 05:52:32 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=mf2VUIogGD9WROPqEUdLuGXNPzy/Kl00mkGnzkqjjJk=;
+ b=Odkcvdrpa5R3KLnIZsIfqy5/fWAxonkNDoG32NPqYTX1MMVlwd0p57ZQABHS0Epi1nQF
+ 44SaGquiDlM4CNBIxnXKaKFge/VZgrDqUNBV6jbmbOoVuF9QqLJoHIVw3CLnkCe1k6KZ
+ 8jE2QLViWxEonNKzeuwy2X/OuLqpC8PpP2HHzpLd3LTiIqCP3tScdORqfYTuDZMTTNwq
+ /zlwVKMQGQvXJTQYX7ijzt8YmECDO1mBWd1ExABb1fw6HDA17ncFb0lS35v4nSezuxPd
+ vvk5QR80PuXQAAPmFE1w+oM9fDHF9IV4Hwbokf8WTBbq2zjJtXtAw1/JK7Y5Jv/XF4qK eQ== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3utd0pae8c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Wed, 06 Dec 2023 05:52:32 -0800
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 6 Dec
+ 2023 05:52:30 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Wed, 6 Dec 2023 05:52:30 -0800
+Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
+	by maili.marvell.com (Postfix) with ESMTP id ECBCD3F70A0;
+	Wed,  6 Dec 2023 05:52:29 -0800 (PST)
+From: Shinas Rasheed <srasheed@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
+        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
+        <kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
+        <konguyen@redhat.com>, Shinas Rasheed <srasheed@marvell.com>,
+        "Veerasenareddy
+ Burru" <vburru@marvell.com>,
+        Sathesh Edara <sedara@marvell.com>,
+        Eric Dumazet
+	<edumazet@google.com>
+Subject: [PATCH net v3] octeon_ep: initialise control mbox tasks before using APIs
+Date: Wed, 6 Dec 2023 05:52:27 -0800
+Message-ID: <20231206135228.2591659-1-srasheed@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="egsugcSD3Fs8QYbL"
-Content-Disposition: inline
-In-Reply-To: <4b9804e2-42f0-4aed-b191-2abe24390e37@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: n6LfMkp4Wfy_1ZovDgVfQ6r1PH1seTSe
+X-Proofpoint-ORIG-GUID: n6LfMkp4Wfy_1ZovDgVfQ6r1PH1seTSe
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-06_11,2023-12-06_01,2023-05-22_02
 
+Initialise various workqueue tasks and queue interrupt poll task
+before the first invocation of any control net APIs. Since
+octep_ctrl_net_get_info was called before the control net receive
+work task was initialised or even the interrupt poll task was
+queued, the function call wasn't returning actual firmware
+info queried from Octeon.
 
---egsugcSD3Fs8QYbL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Fixes: 8d6198a14e2b ("octeon_ep: support to fetch firmware info")
+Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
+---
+V3:
+  - Included Fixes line in commit log.
+  - Corrected typo in print statement.
 
->=20
->=20
-> On 12/6/23 00:58, Jakub Kicinski wrote:
-> > On Wed, 6 Dec 2023 00:08:15 +0100 Lorenzo Bianconi wrote:
-> > > v00 (NS:ns0 - 192.168.0.1/24) <---> (NS:ns1 - 192.168.0.2/24) v01 =3D=
-=3D(XDP_REDIRECT)=3D=3D> v10 (NS:ns1 - 192.168.1.1/24) <---> (NS:ns2 - 192.=
-168.1.2/24) v11
-> > >=20
-> > > - v00: iperf3 client (pinned on core 0)
-> > > - v11: iperf3 server (pinned on core 7)
-> > >=20
-> > > net-next veth codebase (page_pool APIs):
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > - MTU  1500: ~ 5.42 Gbps
-> > > - MTU  8000: ~ 14.1 Gbps
-> > > - MTU 64000: ~ 18.4 Gbps
-> > >=20
-> > > net-next veth codebase + page_frag_cahe APIs [0]:
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> > > - MTU  1500: ~ 6.62 Gbps
-> > > - MTU  8000: ~ 14.7 Gbps
-> > > - MTU 64000: ~ 19.7 Gbps
-> > >=20
-> > > xdp_generic codebase + page_frag_cahe APIs (current proposed patch):
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > - MTU  1500: ~ 6.41 Gbps
-> > > - MTU  8000: ~ 14.2 Gbps
-> > > - MTU 64000: ~ 19.8 Gbps
-> > >=20
-> > > xdp_generic codebase + page_frag_cahe APIs [1]:
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >=20
-> > This one should say page pool?
+V2: https://lore.kernel.org/all/20231205130625.2586755-1-srasheed@marvell.com/
+  - Updated changelog.
+  - Handled error return for octep_ctrl_net_get_info
 
-yep, sorry
+V1: https://lore.kernel.org/all/20231202150807.2571103-1-srasheed@marvell.com/
 
-> >=20
-> > > - MTU  1500: ~ 5.75 Gbps
-> > > - MTU  8000: ~ 15.3 Gbps
-> > > - MTU 64000: ~ 21.2 Gbps
-> > >=20
-> > > It seems page_pool APIs are working better for xdp_generic codebase
-> > > (except MTU 1500 case) while page_frag_cache APIs are better for
-> > > veth driver. What do you think? Am I missing something?
-> >=20
-> > IDK the details of veth XDP very well but IIUC they are pretty much
-> > the same. Are there any clues in perf -C 0 / 7?
-> >=20
-> > > [0] Here I have just used napi_alloc_frag() instead of
-> > > page_pool_dev_alloc_va()/page_pool_dev_alloc() in
-> > > veth_convert_skb_to_xdp_buff()
-> > >=20
-> > > [1] I developed this PoC to use page_pool APIs for xdp_generic code:
-> >=20
-> > Why not put the page pool in softnet_data?
->=20
-> First I thought cool that Jakub is suggesting softnet_data, which will
-> make page_pool (PP) even more central as the netstacks memory layer.
->=20
-> BUT then I realized that PP have a weakness, which is the return/free
-> path that need to take a normal spin_lock, as that can be called from
-> any CPU (unlike the RX/alloc case).  Thus, I fear that making multiple
-> devices share a page_pool via softnet_data, increase the chance of lock
-> contention when packets are "freed" returned/recycled.
+ .../ethernet/marvell/octeon_ep/octep_main.c   | 22 +++++++++++--------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
 
-yep, afaik skb_attempt_defer_free() is used just by the tcp stack so far
-(e.g. we will have contention for udp).
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+index b8ae269f6f97..dbab878b4d76 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+@@ -1193,6 +1193,13 @@ int octep_device_setup(struct octep_device *oct)
+ 	if (ret)
+ 		return ret;
+ 
++	INIT_WORK(&oct->tx_timeout_task, octep_tx_timeout_task);
++	INIT_WORK(&oct->ctrl_mbox_task, octep_ctrl_mbox_task);
++	INIT_DELAYED_WORK(&oct->intr_poll_task, octep_intr_poll_task);
++	oct->poll_non_ioq_intr = true;
++	queue_delayed_work(octep_wq, &oct->intr_poll_task,
++			   msecs_to_jiffies(OCTEP_INTR_POLL_TIME_MSECS));
++
+ 	atomic_set(&oct->hb_miss_cnt, 0);
+ 	INIT_DELAYED_WORK(&oct->hb_task, octep_hb_timeout_task);
+ 
+@@ -1326,21 +1333,18 @@ static int octep_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		goto err_octep_config;
+ 	}
+ 
+-	octep_ctrl_net_get_info(octep_dev, OCTEP_CTRL_NET_INVALID_VFID,
+-				&octep_dev->conf->fw_info);
++	err = octep_ctrl_net_get_info(octep_dev, OCTEP_CTRL_NET_INVALID_VFID,
++				      &octep_dev->conf->fw_info);
++	if (err) {
++		dev_err(&pdev->dev, "Failed to get firmware info\n");
++		goto register_dev_err;
++	}
+ 	dev_info(&octep_dev->pdev->dev, "Heartbeat interval %u msecs Heartbeat miss count %u\n",
+ 		 octep_dev->conf->fw_info.hb_interval,
+ 		 octep_dev->conf->fw_info.hb_miss_count);
+ 	queue_delayed_work(octep_wq, &octep_dev->hb_task,
+ 			   msecs_to_jiffies(octep_dev->conf->fw_info.hb_interval));
+ 
+-	INIT_WORK(&octep_dev->tx_timeout_task, octep_tx_timeout_task);
+-	INIT_WORK(&octep_dev->ctrl_mbox_task, octep_ctrl_mbox_task);
+-	INIT_DELAYED_WORK(&octep_dev->intr_poll_task, octep_intr_poll_task);
+-	octep_dev->poll_non_ioq_intr = true;
+-	queue_delayed_work(octep_wq, &octep_dev->intr_poll_task,
+-			   msecs_to_jiffies(OCTEP_INTR_POLL_TIME_MSECS));
+-
+ 	netdev->netdev_ops = &octep_netdev_ops;
+ 	octep_set_ethtool_ops(netdev);
+ 	netif_carrier_off(netdev);
+-- 
+2.25.1
 
-moreover it seems page_pool return path is not so optimized for the percpu
-approach (we have a lot of atomic read/write operations and page_pool stats
-are already implemented as percpu variables).
-
-Regards,
-Lorenzo
-
->=20
-> --Jesper
->=20
-> p.s. PP have the page_pool_put_page_bulk() API, but only XDP (NIC-drivers)
-> leverage this.
-
---egsugcSD3Fs8QYbL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZXB8YgAKCRA6cBh0uS2t
-rA2HAP932KDGT1rX/CBkEVNxOYG/9eujkDW8ijLslHaJmH0HPAEAlbqMrAUV5ALh
-UCXLIrKwNWx9qYbrrbdVANgk/CHRLQc=
-=OF0s
------END PGP SIGNATURE-----
-
---egsugcSD3Fs8QYbL--
 
