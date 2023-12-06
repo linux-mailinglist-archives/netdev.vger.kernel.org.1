@@ -1,124 +1,137 @@
-Return-Path: <netdev+bounces-54300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3B32806818
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 08:17:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 249F7806834
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 08:24:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19F831C20A91
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 07:17:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3179B210B3
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 07:24:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5CB15487;
-	Wed,  6 Dec 2023 07:17:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2821516419;
+	Wed,  6 Dec 2023 07:24:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="orh0/fxn"
+	dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b="JQDI7AsF"
 X-Original-To: netdev@vger.kernel.org
-Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC65F135;
-	Tue,  5 Dec 2023 23:17:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
-	s=default2211; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:
-	Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=+H62xYUVYv9m4br7cg0DgyNn6m4JbUs5+N/PVPX56JM=; b=orh0/fxnE4NeMLDDyd/Te3IbWW
-	3OIDv19m9XNBLLmL0BneUzz1K1wcODjswD+O8g1TI5nfiL8G74Ecn0qqfJ1aAlb6CA9YsmdrocFF0
-	SV2GiVg/oC5O5vpiNs2ySi8VsBrEcyCPbQ3OO75FMiCtek4cCNvPyyg5wo0uGtER7HKLoH1BjRL/H
-	v5zul/3wD5U4Umggmj+8L7EugVxamtCHJyUdpKWu+SVBzEZieqhRr24jcB0eVq/6rfmjvn/bWWgbN
-	IOYobp8jH3LXpOmqZJaAisFBLHExOV8LLv8Vf7lWKW3nX0rYk1P14FuoiQWbCOLxMtNc6CjuIpXw6
-	LXdH5vGw==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <sean@geanix.com>)
-	id 1rAmA7-0009kh-21; Wed, 06 Dec 2023 08:17:39 +0100
-Received: from [185.17.218.86] (helo=zen..)
-	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <sean@geanix.com>)
-	id 1rAmA6-000Kzf-CG; Wed, 06 Dec 2023 08:17:38 +0100
-From: Sean Nyekjaer <sean@geanix.com>
-To: Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Christian Eggers <ceggers@arri.de>
-Cc: Sean Nyekjaer <sean@geanix.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 net] net: dsa: microchip: provide a list of valid protocols for xmit handler
-Date: Wed,  6 Dec 2023 08:16:54 +0100
-Message-ID: <20231206071655.1626479-1-sean@geanix.com>
-X-Mailer: git-send-email 2.42.0
+Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DFED18F;
+	Tue,  5 Dec 2023 23:24:27 -0800 (PST)
+Received: from mx0.infotecs-nt (localhost [127.0.0.1])
+	by mx0.infotecs.ru (Postfix) with ESMTP id E3CE110DD0FD;
+	Wed,  6 Dec 2023 10:24:23 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru E3CE110DD0FD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
+	t=1701847464; bh=KfvchKOA/sLbhIOxU2hiXLBZ5RE8gliVQJO2gD/Rrhk=;
+	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
+	b=JQDI7AsFk0YKwiWEka8I3czWWmXJY4i0G27Xu0QcZKnyidvY1VeNj7k83BfO06zcp
+	 nwzH9pM1ZecF05BIKM6rLiKFtGVgoSa03mHO4Pbi0Ek/ZBTjbZ0oL6FRehvMp0fnjs
+	 QRssQk8v5Z3j5qTUKtOvsOgDRcwO6JfCNNsUz3BE=
+Received: from msk-exch-02.infotecs-nt (msk-exch-02.infotecs-nt [10.0.7.192])
+	by mx0.infotecs-nt (Postfix) with ESMTP id DFF7031605BA;
+	Wed,  6 Dec 2023 10:24:23 +0300 (MSK)
+From: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
+To: Paul Moore <paul@paul-moore.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Huw Davies <huw@codeweavers.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-security-module@vger.kernel.org"
+	<linux-security-module@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "lvc-project@linuxtesting.org"
+	<lvc-project@linuxtesting.org>
+Subject: Re: [PATCH net v2] calipso: Fix memory leak in
+ netlbl_calipso_add_pass()
+Thread-Topic: [PATCH net v2] calipso: Fix memory leak in
+ netlbl_calipso_add_pass()
+Thread-Index: AQHaKBU85mJ5ws8RUEuBSAQjhk4+cw==
+Date: Wed, 6 Dec 2023 07:24:23 +0000
+Message-ID: <b6410a50-df16-4087-94b9-3a6270287ae2@infotecs.ru>
+References: <20231123092314.91299-1-Ilia.Gavrilov@infotecs.ru>
+ <CAHC9VhQGX_22WTdZG4+K8WYQK-G21j8NM9Wy0TodgPAZk57TCQ@mail.gmail.com>
+ <CAHC9VhTEREuTymgMW8zmQcRZCOpW8M0MZPcKto17ve5Aw1_2gg@mail.gmail.com>
+In-Reply-To: <CAHC9VhTEREuTymgMW8zmQcRZCOpW8M0MZPcKto17ve5Aw1_2gg@mail.gmail.com>
+Accept-Language: ru-RU, en-US
+Content-Language: ru-RU
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <98E32942F6D9DF409EA1DB9C12C248B3@infotecs.ru>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: sean@geanix.com
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27114/Tue Dec  5 09:39:00 2023)
+X-KLMS-Rule-ID: 5
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2023/12/06 06:09:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2023/12/06 03:32:00 #22616787
+X-KLMS-AntiVirus-Status: Clean, skipped
 
-Provide a list of valid protocols for which the driver will provide
-it's deferred xmit handler.
-
-When using DSA_TAG_PROTO_KSZ8795 protocol, it does not provide a
-"connect" method, therefor ksz_connect() is not allocating ksz_tagger_data.
-
-This avoids the following null pointer dereference:
- ksz_connect_tag_protocol from dsa_register_switch+0x9ac/0xee0
- dsa_register_switch from ksz_switch_register+0x65c/0x828
- ksz_switch_register from ksz_spi_probe+0x11c/0x168
- ksz_spi_probe from spi_probe+0x84/0xa8
- spi_probe from really_probe+0xc8/0x2d8
-
-Fixes: ab32f56a4100 ("net: dsa: microchip: ptp: add packet transmission timestamping")
-Signed-off-by: Sean Nyekjaer <sean@geanix.com>
----
-https://lore.kernel.org/netdev/20231205124636.1345761-1-sean@geanix.com/#R
-Changes since v1:
- - Provided a list of valid protocols
-
- drivers/net/dsa/microchip/ksz_common.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 42db7679c360..286e20f340e5 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -2624,10 +2624,18 @@ static int ksz_connect_tag_protocol(struct dsa_switch *ds,
- {
- 	struct ksz_tagger_data *tagger_data;
- 
--	tagger_data = ksz_tagger_data(ds);
--	tagger_data->xmit_work_fn = ksz_port_deferred_xmit;
--
--	return 0;
-+	switch (proto) {
-+	case DSA_TAG_PROTO_KSZ8795:
-+		return 0;
-+	case DSA_TAG_PROTO_KSZ9893:
-+	case DSA_TAG_PROTO_KSZ9477:
-+	case DSA_TAG_PROTO_LAN937X:
-+		tagger_data = ksz_tagger_data(ds);
-+		tagger_data->xmit_work_fn = ksz_port_deferred_xmit;
-+		return 0;
-+	default:
-+		return -EPROTONOSUPPORT;
-+	}
- }
- 
- static int ksz_port_vlan_filtering(struct dsa_switch *ds, int port,
--- 
-2.42.0
-
+T24gMTIvNi8yMyAwMDozMSwgUGF1bCBNb29yZSB3cm90ZToNCj4gT24gU2F0LCBOb3YgMjUsIDIw
+MjMgYXQgOTo0N+KAr0FNIFBhdWwgTW9vcmUgPHBhdWxAcGF1bC1tb29yZS5jb20+IHdyb3RlOg0K
+Pj4NCj4+IE9uIFRodSwgTm92IDIzLCAyMDIzIGF0IDQ6MjXigK9BTSBHYXZyaWxvdiBJbGlhIDxJ
+bGlhLkdhdnJpbG92QGluZm90ZWNzLnJ1PiB3cm90ZToNCj4+Pg0KPj4+IElmIElQdjYgc3VwcG9y
+dCBpcyBkaXNhYmxlZCBhdCBib290IChpcHY2LmRpc2FibGU9MSksDQo+Pj4gdGhlIGNhbGlwc29f
+aW5pdCgpIC0+IG5ldGxibF9jYWxpcHNvX29wc19yZWdpc3RlcigpIGZ1bmN0aW9uIGlzbid0IGNh
+bGxlZCwNCj4+PiBhbmQgdGhlIG5ldGxibF9jYWxpcHNvX29wc19nZXQoKSBmdW5jdGlvbiBhbHdh
+eXMgcmV0dXJucyBOVUxMLg0KPj4+IEluIHRoaXMgY2FzZSwgdGhlIG5ldGxibF9jYWxpcHNvX2Fk
+ZF9wYXNzKCkgZnVuY3Rpb24gYWxsb2NhdGVzIG1lbW9yeQ0KPj4+IGZvciB0aGUgZG9pX2RlZiB2
+YXJpYWJsZSBidXQgZG9lc24ndCBmcmVlIGl0IHdpdGggdGhlIGNhbGlwc29fZG9pX2ZyZWUoKS4N
+Cj4+Pg0KPj4+IEJVRzogbWVtb3J5IGxlYWsNCj4+PiB1bnJlZmVyZW5jZWQgb2JqZWN0IDB4ZmZm
+Zjg4ODAxMWQ2ODE4MCAoc2l6ZSA2NCk6DQo+Pj4gICAgY29tbSAic3l6LWV4ZWN1dG9yLjEiLCBw
+aWQgMTA3NDYsIGppZmZpZXMgNDI5NTQxMDk4NiAoYWdlIDE3LjkyOHMpDQo+Pj4gICAgaGV4IGR1
+bXAgKGZpcnN0IDMyIGJ5dGVzKToNCj4+PiAgICAgIDAwIDAwIDAwIDAwIDAyIDAwIDAwIDAwIDAw
+IDAwIDAwIDAwIDAwIDAwIDAwIDAwICAuLi4uLi4uLi4uLi4uLi4uDQo+Pj4gICAgICAwMCAwMCAw
+MCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAgLi4uLi4uLi4uLi4uLi4u
+Lg0KPj4+ICAgIGJhY2t0cmFjZToNCj4+PiAgICAgIFs8MDAwMDAwMDA3MzBkODc3MD5dIGttYWxs
+b2MgaW5jbHVkZS9saW51eC9zbGFiLmg6NTUyIFtpbmxpbmVdDQo+Pj4gICAgICBbPDAwMDAwMDAw
+NzMwZDg3NzA+XSBuZXRsYmxfY2FsaXBzb19hZGRfcGFzcyBuZXQvbmV0bGFiZWwvbmV0bGFiZWxf
+Y2FsaXBzby5jOjc2IFtpbmxpbmVdDQo+Pj4gICAgICBbPDAwMDAwMDAwNzMwZDg3NzA+XSBuZXRs
+YmxfY2FsaXBzb19hZGQrMHgyMmUvMHg0ZjAgbmV0L25ldGxhYmVsL25ldGxhYmVsX2NhbGlwc28u
+YzoxMTENCj4+PiAgICAgIFs8MDAwMDAwMDAwMmU2NjJjMD5dIGdlbmxfZmFtaWx5X3Jjdl9tc2df
+ZG9pdCsweDIyZi8weDMzMCBuZXQvbmV0bGluay9nZW5ldGxpbmsuYzo3MzkNCj4+PiAgICAgIFs8
+MDAwMDAwMDBhMDhkNmQ3ND5dIGdlbmxfZmFtaWx5X3Jjdl9tc2cgbmV0L25ldGxpbmsvZ2VuZXRs
+aW5rLmM6NzgzIFtpbmxpbmVdDQo+Pj4gICAgICBbPDAwMDAwMDAwYTA4ZDZkNzQ+XSBnZW5sX3Jj
+dl9tc2crMHgzNDEvMHg1YTAgbmV0L25ldGxpbmsvZ2VuZXRsaW5rLmM6ODAwDQo+Pj4gICAgICBb
+PDAwMDAwMDAwOTgzOTlhOTc+XSBuZXRsaW5rX3Jjdl9za2IrMHgxNGQvMHg0NDAgbmV0L25ldGxp
+bmsvYWZfbmV0bGluay5jOjI1MTUNCj4+PiAgICAgIFs8MDAwMDAwMDBmZjdkYjgzYj5dIGdlbmxf
+cmN2KzB4MjkvMHg0MCBuZXQvbmV0bGluay9nZW5ldGxpbmsuYzo4MTENCj4+PiAgICAgIFs8MDAw
+MDAwMDAwY2Y1M2I4Yz5dIG5ldGxpbmtfdW5pY2FzdF9rZXJuZWwgbmV0L25ldGxpbmsvYWZfbmV0
+bGluay5jOjEzMTMgW2lubGluZV0NCj4+PiAgICAgIFs8MDAwMDAwMDAwY2Y1M2I4Yz5dIG5ldGxp
+bmtfdW5pY2FzdCsweDU0Yi8weDgwMCBuZXQvbmV0bGluay9hZl9uZXRsaW5rLmM6MTMzOQ0KPj4+
+ICAgICAgWzwwMDAwMDAwMGQ3OGNkMzhiPl0gbmV0bGlua19zZW5kbXNnKzB4OTBhLzB4ZGYwIG5l
+dC9uZXRsaW5rL2FmX25ldGxpbmsuYzoxOTM0DQo+Pj4gICAgICBbPDAwMDAwMDAwODMyOGE1N2Y+
+XSBzb2NrX3NlbmRtc2dfbm9zZWMgbmV0L3NvY2tldC5jOjY1MSBbaW5saW5lXQ0KPj4+ICAgICAg
+WzwwMDAwMDAwMDgzMjhhNTdmPl0gc29ja19zZW5kbXNnKzB4MTU3LzB4MTkwIG5ldC9zb2NrZXQu
+Yzo2NzENCj4+PiAgICAgIFs8MDAwMDAwMDA3YjY1YTFiNT5dIF9fX19zeXNfc2VuZG1zZysweDcx
+Mi8weDg3MCBuZXQvc29ja2V0LmM6MjM0Mg0KPj4+ICAgICAgWzwwMDAwMDAwMDgzZGE4MDBlPl0g
+X19fc3lzX3NlbmRtc2crMHhmOC8weDE3MCBuZXQvc29ja2V0LmM6MjM5Ng0KPj4+ICAgICAgWzww
+MDAwMDAwMDRhOWI4MjdmPl0gX19zeXNfc2VuZG1zZysweGVhLzB4MWIwIG5ldC9zb2NrZXQuYzoy
+NDI5DQo+Pj4gICAgICBbPDAwMDAwMDAwNjFiNjRkM2E+XSBkb19zeXNjYWxsXzY0KzB4MzAvMHg0
+MCBhcmNoL3g4Ni9lbnRyeS9jb21tb24uYzo0Ng0KPj4+ICAgICAgWzwwMDAwMDAwMGExMjY1MzQ3
+Pl0gZW50cnlfU1lTQ0FMTF82NF9hZnRlcl9od2ZyYW1lKzB4NjEvMHhjNg0KPj4+DQo+Pj4gRm91
+bmQgYnkgSW5mb1RlQ1Mgb24gYmVoYWxmIG9mIExpbnV4IFZlcmlmaWNhdGlvbiBDZW50ZXINCj4+
+PiAobGludXh0ZXN0aW5nLm9yZykgd2l0aCBTeXprYWxsZXINCj4+Pg0KPj4+IEZpeGVzOiBjYjcy
+ZDM4MjExZWEgKCJuZXRsYWJlbDogSW5pdGlhbCBzdXBwb3J0IGZvciB0aGUgQ0FMSVBTTyBuZXRs
+aW5rIHByb3RvY29sLiIpDQo+Pj4gU2lnbmVkLW9mZi1ieTogR2F2cmlsb3YgSWxpYSA8SWxpYS5H
+YXZyaWxvdkBpbmZvdGVjcy5ydT4NCj4+PiAtLS0NCj4+PiB2MjoNCj4+PiAgICAtIHJldHVybiB0
+aGUgZXJyb3IgY29kZSBpbiBuZXRsYmxfY2FsaXBzb19hZGQoKSBpZiB0aGUgdmFyaWFibGUgY2Fs
+aXBzb19ob3BzIGlzIE5VTEwNCj4+PiB2MTogaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvYWxsLzIw
+MjMxMTIyMTM1MjQyLjI3NzkwNTgtMS1JbGlhLkdhdnJpbG92QGluZm90ZWNzLnJ1Lw0KPj4+DQo+
+Pj4gICBuZXQvbmV0bGFiZWwvbmV0bGFiZWxfY2FsaXBzby5jIHwgNDkgKysrKysrKysrKysrKysr
+KystLS0tLS0tLS0tLS0tLS0tDQo+Pj4gICAxIGZpbGUgY2hhbmdlZCwgMjYgaW5zZXJ0aW9ucygr
+KSwgMjMgZGVsZXRpb25zKC0pDQo+Pg0KPj4gVGhpcyBsb29rcyBnb29kIHRvIG1lLCB0aGFua3Mh
+DQo+Pg0KPj4gQWNrZWQtYnk6IFBhdWwgTW9vcmUgPHBhdWxAcGF1bC1tb29yZS5jb20+DQo+IA0K
+PiBBIHF1aWNrIGZvbGxvdy11cCB0byBzZWUgaWYgdGhpcyBwYXRjaCB3YXMgcGlja2VkIHVwIGJ5
+IHRoZSBuZXR3b3JraW5nDQo+IGZvbGtzPyAgSSBkaWRuJ3QgZ2V0IGEgcGF0Y2h3b3JrIG5vdGlm
+aWNhdGlvbiwgYW5kIEkgZG9uJ3Qgc2VlIGl0IGluDQo+IExpbnVzJyB0cmVlLCBidXQgcGVyaGFw
+cyBJIG1pc3NlZCBzb21ldGhpbmc/DQo+IA0KDQpJIG9ubHkgc2VlIHRoYW4gdGhlIHBhdGNoIGlz
+IGluIHRoZSAiTm90IEFwcGxpY2FibGUiIHN0YXRlIGluIHBhdGNod29yay4NCg0K
 
