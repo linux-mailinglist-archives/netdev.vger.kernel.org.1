@@ -1,73 +1,158 @@
-Return-Path: <netdev+bounces-54216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D876880641D
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 02:28:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B094E806425
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 02:30:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 774D91F216FD
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 01:28:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AD1A282216
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 01:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED26B805;
-	Wed,  6 Dec 2023 01:28:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C75A7EC4;
+	Wed,  6 Dec 2023 01:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZqCAe3W2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DE7A196
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 17:28:05 -0800 (PST)
-Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3b8b0fb63cbso5899429b6e.1
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 17:28:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701826085; x=1702430885;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7ySauBYp0pXzqSF3h5YZYqJdikNmojNceW9Ms4nmH48=;
-        b=L1DbiI0Ct05OvFOa/dfM2jzOMFMjjcbgVWcL5mREIPBTV3vu3tpmHHfwbSlwtlhwjT
-         UI2htKOzRd5aWUn273I8K2jn/PEMyk5T2Xy63n1LhV0xPOHWDMD8FVsh2jfrBIrqUscf
-         Wk8KBwARp2dpipIzFnkGzdcgE4CaDcURWuuxVLkXH5O4Fgs30WY1EU0qQckBfBbDZvPh
-         BsO0PZyOqIbTiyNqFx4D7w8AS/EGt9xIc8MxOyeZ6RYlzZqGogjWs5v6m320MNbxKZCL
-         Ok+xp+AV3QpYzeXL5UqS8m1xKpOK+beXauv6hdlFK1+tlI1aWUg9WhIRxyYxfZfRSDvJ
-         vDnQ==
-X-Gm-Message-State: AOJu0YwLpBjxYx4dRpx+IbS2p5YSGsqlKjYwpxM4KfMTc3j+5yTJsz3c
-	EcIpSEibh5hYwETI+SsGdxxSOs0f8JSVINljLV/16loJQcIP
-X-Google-Smtp-Source: AGHT+IERo+uS3K5PcCNLP0zvPy2IvH185FonEs/HGwm+m6q13cU7lDnfz/RiiSjaBSIUmpp2rN0ho2Cm9BzujinCS+f+Q1Hly+Gw
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67F291B9;
+	Tue,  5 Dec 2023 17:30:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1701826225; x=1733362225;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=VmwbFzgQc683/Km1kXUxblbm3uj2GMRfIZtyMCZbTXU=;
+  b=ZqCAe3W2S9XNRU3Ll37bYAlV6GsiDVnzI6+olCxhnPPxemK1OIfprayn
+   aDfWWHQcYlBdfp+iWxLosmDTjQWi4MUjYYWEb6Vz0P61XGWNdPxHDOMBx
+   J9EQKabfHugJKuOKyDCK3QroTcfs93FDlxY2rNK2GgKiDcVX2W7pY106m
+   I=;
+X-IronPort-AV: E=Sophos;i="6.04,254,1695686400"; 
+   d="scan'208";a="48659072"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-e651a362.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2023 01:30:22 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
+	by email-inbound-relay-iad-1d-m6i4x-e651a362.us-east-1.amazon.com (Postfix) with ESMTPS id 176E5804F5;
+	Wed,  6 Dec 2023 01:30:20 +0000 (UTC)
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:44813]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.6.101:2525] with esmtp (Farcaster)
+ id 37ef6114-7268-42c9-88f9-80743902ad9e; Wed, 6 Dec 2023 01:30:20 +0000 (UTC)
+X-Farcaster-Flow-ID: 37ef6114-7268-42c9-88f9-80743902ad9e
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Wed, 6 Dec 2023 01:30:19 +0000
+Received: from 88665a182662.ant.amazon.com (10.119.13.242) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Wed, 6 Dec 2023 01:30:08 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <martin.lau@linux.dev>
+CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
+	<daniel@iogearbox.net>, <edumazet@google.com>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH v4 bpf-next 1/3] bpf: tcp: Handle BPF SYN Cookie in cookie_v[46]_check().
+Date: Wed, 6 Dec 2023 10:29:52 +0900
+Message-ID: <20231206012952.18761-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <8bd1d595-4bb3-44d1-a9c3-2d9c0c960bcb@linux.dev>
+References: <8bd1d595-4bb3-44d1-a9c3-2d9c0c960bcb@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:2009:b0:3b2:e2b6:75a3 with SMTP id
- q9-20020a056808200900b003b2e2b675a3mr171604oiw.6.1701826084931; Tue, 05 Dec
- 2023 17:28:04 -0800 (PST)
-Date: Tue, 05 Dec 2023 17:28:04 -0800
-In-Reply-To: <20231206005340.11534-1-kuniyu@amazon.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000004310b8060bcd43a7@google.com>
-Subject: Re: [syzbot] [net?] KMSAN: uninit-value in __llc_lookup_established
-From: syzbot <syzbot+b5ad66046b913bc04c6f@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	kuniyu@amazon.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D032UWA004.ant.amazon.com (10.13.139.56) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-Hello,
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Date: Tue, 5 Dec 2023 16:19:20 -0800
+> On 12/4/23 5:34 PM, Kuniyuki Iwashima wrote:
+> > diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+> > index 61f1c96cfe63..0f9c3aed2014 100644
+> > --- a/net/ipv4/syncookies.c
+> > +++ b/net/ipv4/syncookies.c
+> > @@ -304,6 +304,59 @@ static int cookie_tcp_reqsk_init(struct sock *sk, struct sk_buff *skb,
+> >   	return 0;
+> >   }
+> >   
+> > +#if IS_ENABLED(CONFIG_BPF)
+> > +struct request_sock *cookie_bpf_check(struct net *net, struct sock *sk,
+> > +				      struct sk_buff *skb)
+> > +{
+> > +	struct request_sock *req = inet_reqsk(skb->sk);
+> > +	struct inet_request_sock *ireq = inet_rsk(req);
+> > +	struct tcp_request_sock *treq = tcp_rsk(req);
+> > +	struct tcp_options_received tcp_opt;
+> > +	int ret;
+> > +
+> > +	skb->sk = NULL;
+> > +	skb->destructor = NULL;
+> > +	req->rsk_listener = NULL;
+> > +
+> > +	memset(&tcp_opt, 0, sizeof(tcp_opt));
+> > +	tcp_parse_options(net, skb, &tcp_opt, 0, NULL);
+> 
+> In patch 2, the bpf prog is passing the tcp_opt to the kfunc. The selftest in 
+> patch 3 is also parsing the tcp-options.
+> 
+> The kernel parses the tcp-option here again to do some checking and req's member 
+> initialization. Can these checking and initialization be done in the 
+> bpf_sk_assign_tcp_reqsk() kfunc instead to avoid the double tcp-option parsing?
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+If TS is not used as a cookie storage, bpf prog need not parse it.
+OTOH, if a value is encoded into TS, bpf prog need to parse it.
+In that case, we cannot avoid parsing options in bpf prog.
 
-Reported-and-tested-by: syzbot+b5ad66046b913bc04c6f@syzkaller.appspotmail.com
+The parsing here comes from my paranoia, so.. probably we can drop it
+and the first test below, and rely on bpf prog's tcp_opt, especially
+tstamp_ok, rcv_tsval, and rcv_tsecr ?
 
-Tested on:
+I placed other tests here to align with the normal cookie flow, but
+they can be moved to kfunc.  However, initialisation assuems skb
+points to TCP header, so here would be better place, I think.
 
-commit:         1c410411 Merge tag 'i3c/for-6.7' of git://git.kernel.o..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-console output: https://syzkaller.appspot.com/x/log.txt?x=1577c0d4e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=956549bd1d1e9efd
-dashboard link: https://syzkaller.appspot.com/bug?extid=b5ad66046b913bc04c6f
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=13fa938ce80000
 
-Note: testing is done by a robot and is best-effort only.
+> 
+> > +
+> > +	if (ireq->tstamp_ok ^ tcp_opt.saw_tstamp) {
+> > +		__NET_INC_STATS(net, LINUX_MIB_SYNCOOKIESFAILED);
+> > +		goto reset;
+> > +	}
+> > +
+> > +	__NET_INC_STATS(net, LINUX_MIB_SYNCOOKIESRECV);
+> > +
+> > +	if (ireq->tstamp_ok) {
+> > +		if (!READ_ONCE(net->ipv4.sysctl_tcp_timestamps))
+> > +			goto reset;
+> > +
+> > +		req->ts_recent = tcp_opt.rcv_tsval;
+> > +		treq->ts_off = tcp_opt.rcv_tsecr - tcp_ns_to_ts(false, tcp_clock_ns());
+> > +	}
+> > +
+> > +	if (ireq->sack_ok && !READ_ONCE(net->ipv4.sysctl_tcp_sack))
+> > +		goto reset;
+> > +
+> > +	if (ireq->wscale_ok && !READ_ONCE(net->ipv4.sysctl_tcp_window_scaling))
+> > +		goto reset;
+> > +
+> > +	ret = cookie_tcp_reqsk_init(sk, skb, req);
+> > +	if (ret) {
+> > +		reqsk_free(req);
+> > +		req = NULL;
+> > +	}
+> > +
+> > +	return req;
+> > +
+> > +reset:
+> > +	reqsk_free(req);
+> > +	return ERR_PTR(-EINVAL);
+> > +}
+> > +EXPORT_SYMBOL_GPL(cookie_bpf_check);
+> > +#endif
 
