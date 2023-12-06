@@ -1,180 +1,95 @@
-Return-Path: <netdev+bounces-54312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B47380687A
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 08:32:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 801F880687E
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 08:34:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30C36281167
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 07:32:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B134A1C20A9E
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 07:34:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72945179AA;
-	Wed,  6 Dec 2023 07:31:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3834417734;
+	Wed,  6 Dec 2023 07:34:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="UIgA5O+c"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RVgXsKxL"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2068.outbound.protection.outlook.com [40.107.101.68])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E242810FB;
-	Tue,  5 Dec 2023 23:31:44 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EM1yf62RpmLQ4NA2Ozo+U8dcMv5BBe4sFMaKchzebGO4kVhpmnaEhVL9mNtK+K8RRI6gtDZbINsr0IplwCSFOsJ9tGqSzU3mySXtOb7pe39aQs3cZ/Qh95X8r5mymSUg7uOStiAbXnw4mMwnxOEfcvlAhBsbS2HhbpIyR+XmszwNFUqbciFLsDAi8k04eRnthjhS+D65863mztpGWggLJIXmevLmDbzkv7iFyc7c0S2LgHltvNRxy8nrDBoZPZrwz2F3KKMHtfhTLKD1FSj8Oj3zSDWAp0Klfnt6zjNk29w6gjERCyvKDF/EZFHCWBSpumWZp0QwB0u5VWeI3ooYMw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/FG/v7ogyS6xo4c1TLYkdS7kjTNds9VBLaPwExQZrCs=;
- b=agcckDuVrqcnxYcJI4XSGTbGOGc5e0scgLWVALN7dYyez6du4HpipyUaucT1tEvmSwa1oH7k784Jju5ftvzF5MkS7vVI2ekPBImGVirtzb83mRcgZLrSPr4CQmuJk2APTZY4KUj8DZ29ekGsJsXpSsAyTNRVUIp4fX4KLgmz6eW3QRYysIkz4Q7lUIcFMTXSvuroOJKJVExXXfeNJ+IzLi8RCmAATmD0PBi1ugysBcCGXfw1B2hyVp/cGPKN5cUUHd66RnWs18DKDOSq2kRDTTecQmWpLdhSoxVcDwkoVvUcAc5+P8nkpdLUQ/cUY697TRLEGSdGBIgNernM7/cWfQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=lists.freedesktop.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/FG/v7ogyS6xo4c1TLYkdS7kjTNds9VBLaPwExQZrCs=;
- b=UIgA5O+cVAGovj/BunraztZqK7N44cSj0SxSIvWEJaeYPtFb1iMkle00nBrOfNMf67kzdKO/OgDASguKENAV5JRpYH28lvkCmnib0Uoydeayhr1Nykp1J0PRh1KFAG45uHNi7IsjTB29H34L5lP+kjzhwq8OzvpgnWVIgPjDBYo=
-Received: from MW4P222CA0004.NAMP222.PROD.OUTLOOK.COM (2603:10b6:303:114::9)
- by SJ2PR12MB8829.namprd12.prod.outlook.com (2603:10b6:a03:4d0::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Wed, 6 Dec
- 2023 07:31:42 +0000
-Received: from CO1PEPF000044F6.namprd21.prod.outlook.com
- (2603:10b6:303:114:cafe::1c) by MW4P222CA0004.outlook.office365.com
- (2603:10b6:303:114::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34 via Frontend
- Transport; Wed, 6 Dec 2023 07:31:41 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1PEPF000044F6.mail.protection.outlook.com (10.167.241.196) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7091.2 via Frontend Transport; Wed, 6 Dec 2023 07:31:41 +0000
-Received: from compile-server.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Wed, 6 Dec
- 2023 01:31:24 -0600
-From: Ma Jun <Jun.Ma2@amd.com>
-To: <amd-gfx@lists.freedesktop.org>, <lenb@kernel.org>, <hdegoede@redhat.com>,
-	<johannes@sipsolutions.net>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <alexander.deucher@amd.com>,
-	<Lijo.Lazar@amd.com>, <mario.limonciello@amd.com>, <netdev@vger.kernel.org>,
-	<linux-wireless@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <platform-driver-x86@vger.kernel.org>
-CC: <majun@amd.com>, Evan Quan <quanliangl@hotmail.com>, Ma Jun
-	<Jun.Ma2@amd.com>
-Subject: [PATCH v15 9/9] drm/amd/pm: enable Wifi RFI mitigation feature support for SMU13.0.7
-Date: Wed, 6 Dec 2023 15:29:47 +0800
-Message-ID: <20231206072947.1331729-10-Jun.Ma2@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231206072947.1331729-1-Jun.Ma2@amd.com>
-References: <20231206072947.1331729-1-Jun.Ma2@amd.com>
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7161A1B5
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 23:34:39 -0800 (PST)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so7891a12.0
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 23:34:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701848078; x=1702452878; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XrLGOurk8L5L0NnPLUV2I7uNbYLxUdBqrFGq7mAToT4=;
+        b=RVgXsKxLYCuPUrDTXabS/YaKPggmrfdjbfeFicZ+ty34bG93X6Qbr7MrmwwVDkiro8
+         gi8vX159tHoXz5e4VcjKjGrE90vdyimjZ6pNtipmXzYTgJMXVGba5b9kuUowW4JFincb
+         Y/fR5IXQ6bzPh8WvgpIT9QWwifm1YEvNxMVPnX4U0pGUCGfFUWRcQGRTJ5oiHzOGSBB2
+         SO1dQCxh4N9EMPW74vmxhmTSOHMbTVh6Mw8qLShws+tvknuJHnq4HiX3Zl9JVRtUCKDy
+         OHFjmf5I6j4DwubaYzIrrpFAXHlIiAZ3LyDzv4chD+yAZnKVJbXKBD9xsv4caHCiyNGO
+         /OGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701848078; x=1702452878;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XrLGOurk8L5L0NnPLUV2I7uNbYLxUdBqrFGq7mAToT4=;
+        b=EVQ6J4b4tDKMQQi/tfX2NhcQKd8CRv15oUuH/VeGRsQSxBWXpNNd5AxTiMjgpo9bGZ
+         ogZdkRIoFcXj2iine3gQZWv3Wj2yhJuBDTlqK27rTArVmQVh9JDQ2kHnxOapofEZFIot
+         tsTWsu/DlBVpK86kQ285b6TIONqu1tOhPnuLYDdP2VXdgwlJkJrwuxP/bZfBgqN8mz76
+         9zSccjkYtWQ6NOqqhUml792dwr6sqtyHagqnwnJXu/UB+Ae5TUFZdzcezahsgkcP8WYQ
+         ZpmU6LungNmu2PfqV17OH8DId+cCVxygpCSVclDMWB3qNbjEb8N0cnd4kvtTe6j/bvPo
+         zwuA==
+X-Gm-Message-State: AOJu0YweoEmzhSNlBzD4TwtHemwHdQJfbb1km4vEM+iqn1d8v2Px+B9u
+	I7GE50UUPbNhUjj441kVXcd6o3N6Idlgb7o7xfU4YQ==
+X-Google-Smtp-Source: AGHT+IGldiRIFyGKYysUNKi5CQSdX373OFF+v40mkRnSHG6nIDPkTDJD/kDCf/0mazNx1HSyGQ9CMJ5qmSJ/VPpXWqA=
+X-Received: by 2002:a50:d744:0:b0:54c:384b:e423 with SMTP id
+ i4-20020a50d744000000b0054c384be423mr40767edj.5.1701848077557; Tue, 05 Dec
+ 2023 23:34:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044F6:EE_|SJ2PR12MB8829:EE_
-X-MS-Office365-Filtering-Correlation-Id: c8900bf9-76a4-43be-01e6-08dbf62d644c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	MijNCUFaWPXSdNdiJeID/Hm3U0InozjB/qdiwyR1LizKY87oJOruK3YVhEgZP/99xL6xNME3hgGsOhdO1jzpyuEOe2EprkWtHpALLI+z4EANR4BUBtZlOhkpMTnb3OrZU0lhBFqZVgjBp83VpwqhI+7rfs1o9chZ54d5YaM1qZgoy8sauBK7eAffzAAlmkP2/QjrIYXPTN04kgX99ZsYO+VnBuYawirAwahy+clorupBntBOWEAma7KtFxpiNwcBv05IshlPq2EkKpNPZ7nWknVUm+SP3aQ2XEICUXL5RJUjNqWcwxlwKvGiuX3EAhQBFczNMlj5hhSjg/2wpCKlKcqhl6hH9W2WK7EzIZ0FhfRolgulSuFfJrzufB7/Yblib4c7zFmd9q5jNJbeWlDVl7ft5QOeEXys+bX+lw30tg15GmpJER5lVAjVXFeEVcnK/Y7n3XjDX7FCQs3KIYFVrEb0RG2XZ1rl65uHK1Wg5CU4rEFYTvat5IraqMLlcvTtCt7rzdL5UpIz00wm7AUfkEktkOyqC0RTKNQWXLumDIKIyFpHyHPrVhgmrryBeOf8kInS5+kQq20gf3oGaswErYYpGvM81bQE3bUER4jkY219LB85AgNkET6B4KRXHcNCH2/6V3EIW0t3r59hw7pXgJylIP8g1HkgI2MkVg4lM2OglhLgVtQbzbKjDdTU6Z5he/yQqxfTsAbLR0FK7V4R8S0H1x6ie7+qbG+5PMmgcH6cEhgJsW7fPGc9m8GSKi7UnYyi07ldqKdhASQRb4eJ95J7WcvKDnR1szpJwO3GFd/WEJPHvsaNiml1AOWFGlHDWJEJhCvheLRjhnn938+nMQ==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(136003)(39860400002)(376002)(396003)(230273577357003)(230922051799003)(230173577357003)(64100799003)(82310400011)(1800799012)(186009)(451199024)(40470700004)(36840700001)(40480700001)(426003)(336012)(26005)(2616005)(1076003)(16526019)(40460700003)(81166007)(356005)(82740400003)(36756003)(921008)(7696005)(86362001)(83380400001)(32650700002)(7416002)(5660300002)(6666004)(45080400002)(36860700001)(70586007)(4326008)(70206006)(8936002)(316002)(110136005)(54906003)(478600001)(2906002)(41300700001)(8676002)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2023 07:31:41.8002
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c8900bf9-76a4-43be-01e6-08dbf62d644c
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000044F6.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8829
+References: <20231206033913.1290566-1-judyhsiao@chromium.org>
+In-Reply-To: <20231206033913.1290566-1-judyhsiao@chromium.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 6 Dec 2023 08:34:24 +0100
+Message-ID: <CANn89iKiG0oLhkYQj=OkhvcWyR_kfSsot_2zo9hFCm1A7u-tWA@mail.gmail.com>
+Subject: Re: [PATCH v2] neighbour: Don't let neigh_forced_gc() disable
+ preemption for long
+To: Judy Hsiao <judyhsiao@chromium.org>
+Cc: David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Douglas Anderson <dianders@chromium.org>, Brian Haley <haleyb.dev@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Joel Granados <joel.granados@gmail.com>, Julian Anastasov <ja@ssi.bg>, Leon Romanovsky <leon@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Evan Quan <quanliangl@hotmail.com>
+On Wed, Dec 6, 2023 at 4:39=E2=80=AFAM Judy Hsiao <judyhsiao@chromium.org> =
+wrote:
+>
+> We are seeing cases where neigh_cleanup_and_release() is called by
+> neigh_forced_gc() many times in a row with preemption turned off.
+> When running on a low powered CPU at a low CPU frequency, this has
+> been measured to keep preemption off for ~10 ms. That's not great on a
+> system with HZ=3D1000 which expects tasks to be able to schedule in
+> with ~1ms latency.
+>
+> Suggested-by: Douglas Anderson <dianders@chromium.org>
+> Signed-off-by: Judy Hsiao <judyhsiao@chromium.org>
+>
+> ---
+>
+> Changes in v2:
+> - Use ktime_get_ns() for timeout calculation instead of jiffies.
 
-Fulfill the SMU13.0.7 support for Wifi RFI mitigation feature.
-
-Signed-off-by: Evan Quan <quanliangl@hotmail.com>
-Reviewed-by: Mario Limonciello <mario.limonciello@amd.com>
-Signed-off-by: Ma Jun <Jun.Ma2@amd.com>
---
-v10->v11:
-  - downgrade the prompt level on message failure(Lijo)
-v13:
- - Fix the format issue (IIpo Jarvinen)
- - Remove duplicate code (IIpo Jarvinen)
----
- .../gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c    | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
-
-diff --git a/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c b/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c
-index 81eafed76045..eb507cbf5c3d 100644
---- a/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c
-+++ b/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c
-@@ -140,6 +140,7 @@ static struct cmn2asic_msg_mapping smu_v13_0_7_message_map[SMU_MSG_MAX_COUNT] =
- 	MSG_MAP(AllowGpo,			PPSMC_MSG_SetGpoAllow,           0),
- 	MSG_MAP(GetPptLimit,			PPSMC_MSG_GetPptLimit,                 0),
- 	MSG_MAP(NotifyPowerSource,		PPSMC_MSG_NotifyPowerSource,           0),
-+	MSG_MAP(EnableUCLKShadow,		PPSMC_MSG_EnableUCLKShadow,            0),
- };
- 
- static struct cmn2asic_mapping smu_v13_0_7_clk_map[SMU_CLK_COUNT] = {
-@@ -222,6 +223,7 @@ static struct cmn2asic_mapping smu_v13_0_7_table_map[SMU_TABLE_COUNT] = {
- 	TAB_MAP(ACTIVITY_MONITOR_COEFF),
- 	[SMU_TABLE_COMBO_PPTABLE] = {1, TABLE_COMBO_PPTABLE},
- 	TAB_MAP(OVERDRIVE),
-+	TAB_MAP(WIFIBAND),
- };
- 
- static struct cmn2asic_mapping smu_v13_0_7_pwr_src_map[SMU_POWER_SOURCE_COUNT] = {
-@@ -512,6 +514,9 @@ static int smu_v13_0_7_tables_init(struct smu_context *smu)
- 		       AMDGPU_GEM_DOMAIN_VRAM);
- 	SMU_TABLE_INIT(tables, SMU_TABLE_COMBO_PPTABLE, MP0_MP1_DATA_REGION_SIZE_COMBOPPTABLE,
- 			PAGE_SIZE, AMDGPU_GEM_DOMAIN_VRAM);
-+	SMU_TABLE_INIT(tables, SMU_TABLE_WIFIBAND,
-+		       sizeof(WifiBandEntryTable_t), PAGE_SIZE,
-+		       AMDGPU_GEM_DOMAIN_VRAM);
- 
- 	smu_table->metrics_table = kzalloc(sizeof(SmuMetricsExternal_t), GFP_KERNEL);
- 	if (!smu_table->metrics_table)
-@@ -2567,6 +2572,11 @@ static int smu_v13_0_7_set_df_cstate(struct smu_context *smu,
- 					       NULL);
- }
- 
-+static bool smu_v13_0_7_wbrf_support_check(struct smu_context *smu)
-+{
-+	return smu->smc_fw_version > 0x00524600;
-+}
-+
- static const struct pptable_funcs smu_v13_0_7_ppt_funcs = {
- 	.get_allowed_feature_mask = smu_v13_0_7_get_allowed_feature_mask,
- 	.set_default_dpm_table = smu_v13_0_7_set_default_dpm_table,
-@@ -2635,6 +2645,9 @@ static const struct pptable_funcs smu_v13_0_7_ppt_funcs = {
- 	.set_mp1_state = smu_v13_0_7_set_mp1_state,
- 	.set_df_cstate = smu_v13_0_7_set_df_cstate,
- 	.gpo_control = smu_v13_0_gpo_control,
-+	.is_asic_wbrf_supported = smu_v13_0_7_wbrf_support_check,
-+	.enable_uclk_shadow = smu_v13_0_enable_uclk_shadow,
-+	.set_wbrf_exclusion_ranges = smu_v13_0_set_wbrf_exclusion_ranges,
- };
- 
- void smu_v13_0_7_set_ppt_funcs(struct smu_context *smu)
--- 
-2.34.1
-
+SGTM, thanks.
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
