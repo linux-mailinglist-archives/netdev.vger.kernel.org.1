@@ -1,100 +1,142 @@
-Return-Path: <netdev+bounces-54575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBB8C807788
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 19:24:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AFA780778F
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 19:29:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 688952820E9
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:24:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AE671C20A9F
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:29:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41CC84184B;
-	Wed,  6 Dec 2023 18:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2DA4184E;
+	Wed,  6 Dec 2023 18:28:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LbCuwLR1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XkrUUZid"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12BC3D5A;
-	Wed,  6 Dec 2023 10:24:46 -0800 (PST)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-a1c890f9b55so4327466b.1;
-        Wed, 06 Dec 2023 10:24:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701887085; x=1702491885; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hymZLMkFf6s/DnyiwuB/acMDQ7OLJSqS0MPYzZqPxYU=;
-        b=LbCuwLR1dwKLrzm7G7GtdqbbF7O9cyTl3R3x1Bva3K5xj/GMUfJ+LIUn01YQk1uw89
-         gX6W7tF3VriWg1uhiOnx/G662ELDjCeWUhdSXM5hG1CM02lJDF53NfZgdXm46gzeENjI
-         tlJHJXVNml3ckXrKLxLJcHWIGCgIAf5/hg2by7OPzuw9nOcjutcBpXVZWxMOZe2smLqI
-         2FbJ7XJVUlXy9kBKXHruX6qydsfUK56PDUZbwKy9SxLfBcVxpQwCl0v3ny956sMWykyK
-         ZOz3xCuWeKqRd66K48W2fO76BFXEKEXZQy1VoBKYxMgZo/YYxai0uvl2yFcuRG8v+oZL
-         J+Jg==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1415B122
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 10:28:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701887334;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jnuem6msgUvZR/qtC3Ankzp7FYXj3vJHjUZIQQCp0oc=;
+	b=XkrUUZidA5R19cc2eZp/Eb+0F+CKozbgTQXtsLJch8V3l0EdjmYfl8SbidPBzrpBBh7DYr
+	qy8o/dmV/DBXWlmpkonm7SGEbLxPJ0p+SiB1AHDq6MR39ld42WFpbO0g3yuc9JE/gWBN/1
+	EOQfQKhAVz1SuC2H9kXoInUMwl9Dna4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-425-8jM8eOCwOr6HMstimReLUg-1; Wed, 06 Dec 2023 13:28:26 -0500
+X-MC-Unique: 8jM8eOCwOr6HMstimReLUg-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-33349915da3so86643f8f.0
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 10:28:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701887085; x=1702491885;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hymZLMkFf6s/DnyiwuB/acMDQ7OLJSqS0MPYzZqPxYU=;
-        b=cQQC5iLhJUxMvaAM+d4/NWYMs8l5rE7oyd2rf29PEoFg3cJiDlN9v+aLNDmcdp2UHm
-         tqvuHURplVSlovA9DS2leYetSzEDPXvuE6m5m0C0ugna3v2O61+ZRS1h/YjS+X8uUdwo
-         0xtUaKqUB/JmMSkYsJ2DCGBrN8o1b5lZSX3XHRTFFRWcdSLKrNWDXwIyukHlQTAxic3S
-         90Nz4BF863zuOrANBfShSNAakx5qeh259Ri2IT++7RguHvTeKBpTI1kd5Cwc4NDfOTwj
-         54yzn0kltJX9jpPlLy2xY89Piknyd+WbMfdQtrcUwOjBycAtxKrYBTofqE9WrO2xnEDT
-         MGpA==
-X-Gm-Message-State: AOJu0YzDdz1iNICdaT8z3jSJP3jFfrxkjUwIAuV81AENCUHnm5KtcW1z
-	sJgGowb29JEfqOokktRhaj5dUd+wVutbp4io8cg=
-X-Google-Smtp-Source: AGHT+IFPE3koNKI8CODmosSCzDtPb4+ESL3iSMDpxZwrBRth36OVE778kw3mUhrhm9xFDCGyOHWVI4hz+v4hUNF0ZtI=
-X-Received: by 2002:a17:906:7f08:b0:9fc:93e1:c6bc with SMTP id
- d8-20020a1709067f0800b009fc93e1c6bcmr1013736ejr.33.1701887085179; Wed, 06 Dec
- 2023 10:24:45 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701887304; x=1702492104;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jnuem6msgUvZR/qtC3Ankzp7FYXj3vJHjUZIQQCp0oc=;
+        b=EsFwA8vx9QqrR1jlgq6LUYgvT9D57cgmynMOSz6qE7+hsLpv+9BRb7mNGm//Zq19Ay
+         /wdQIuVwiE5r4PsUyphtkos4RkOB5SrBrmw+c9XG6CMlm6XIsj54GECIs+3d9JmIb/0i
+         gR+G2XHxZSbKnCWACJ/Y4zeWwlZfPYwnfrtS0v3Xnfo3he+f0A700I2nr9esFV9bwG+Y
+         7rDFHN5fj2OEvfQdbG5qUsIHyadLiB0zYKpwnSY+U5ERIfdskkTcEAkmLmKw62Doi47a
+         qRN3Q7ZKdeFn1SPSig3ZQuQTKof8fznVjve3TPQbqV9wZbCHH+fCq3M5/6pLjjoUcq09
+         uQLA==
+X-Gm-Message-State: AOJu0Yz353m2+9ZJPgNIdktFmY79T/g5gcBfk92TPt83adto2HHSs/zE
+	mdGoeb1PlmuJaNMDnhKxS/YQpmzCAuCeqU+qEoIjfNZPuJqoHguGDYFUQ87yANTvIBgV8MRYLVB
+	K7LyNXAxy9Oht3l7a
+X-Received: by 2002:adf:f752:0:b0:333:2fd2:3be2 with SMTP id z18-20020adff752000000b003332fd23be2mr563994wrp.155.1701887303895;
+        Wed, 06 Dec 2023 10:28:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGPfF7salzTJo8Tl0XEOHa4Kq1FjBjVSq+If3zpML0Un6nfo5ZCrIh/61l68acpETq59NVYPA==
+X-Received: by 2002:adf:f752:0:b0:333:2fd2:3be2 with SMTP id z18-20020adff752000000b003332fd23be2mr563984wrp.155.1701887303527;
+        Wed, 06 Dec 2023 10:28:23 -0800 (PST)
+Received: from redhat.com ([2.55.57.48])
+        by smtp.gmail.com with ESMTPSA id lg18-20020a170906f89200b00a1b7f4c22a7sm267591ejb.82.2023.12.06.10.28.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 10:28:22 -0800 (PST)
+Date: Wed, 6 Dec 2023 13:28:18 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	virtualization@lists.linux.dev,
+	Arseniy Krasnov <avkrasnov@salutedevices.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] vsock/virtio: fix "comparison of distinct pointer
+ types lacks a cast" warning
+Message-ID: <20231206132803-mutt-send-email-mst@kernel.org>
+References: <20231206164143.281107-1-sgarzare@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231130185229.2688956-1-andrii@kernel.org> <20231130185229.2688956-4-andrii@kernel.org>
- <CAADnVQLbxWPM1njsE141dQjw2+USd8Ggv80QgY+PgsGRd6FoVA@mail.gmail.com>
-In-Reply-To: <CAADnVQLbxWPM1njsE141dQjw2+USd8Ggv80QgY+PgsGRd6FoVA@mail.gmail.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Wed, 6 Dec 2023 10:24:33 -0800
-Message-ID: <CAEf4BzYNU=zSAm4JpwVAJ-krfRdC+xnA_GF=wxhv8HL-VOp2Sw@mail.gmail.com>
-Subject: Re: [PATCH v12 bpf-next 03/17] bpf: introduce BPF token object
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, Paul Moore <paul@paul-moore.com>, 
-	Christian Brauner <brauner@kernel.org>, Linux-Fsdevel <linux-fsdevel@vger.kernel.org>, 
-	LSM List <linux-security-module@vger.kernel.org>, Kees Cook <keescook@chromium.org>, 
-	Kernel Team <kernel-team@meta.com>, Sargun Dhillon <sargun@sargun.me>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231206164143.281107-1-sgarzare@redhat.com>
 
-On Wed, Dec 6, 2023 at 10:19=E2=80=AFAM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Thu, Nov 30, 2023 at 10:57=E2=80=AFAM Andrii Nakryiko <andrii@kernel.o=
-rg> wrote:
-> >   *
-> > @@ -901,6 +931,8 @@ enum bpf_cmd {
-> >         BPF_ITER_CREATE,
-> >         BPF_LINK_DETACH,
-> >         BPF_PROG_BIND_MAP,
-> > +       BPF_TOKEN_CREATE,
-> > +       __MAX_BPF_CMD,
-> >  };
->
-> Not an issue with this commit. I just noticed that
-> commit f2e10bff16a0 ("bpf: Add support for BPF_OBJ_GET_INFO_BY_FD for bpf=
-_link")
-> added MAX_BPF_LINK_TYPE to enum bpf_link_type.
-> While this commit is correctly adding __MAX_BPF_CMD that
-> is consistent with old __MAX_BPF_ATTACH_TYPE (added in 2016)
-> and __MAX_BPF_REG (added in 2014).
-> I think it would be good to follow up with adding two underscores
-> to MAX_BPF_LINK_TYPE just to keep things consistent in bpf.h.
+On Wed, Dec 06, 2023 at 05:41:43PM +0100, Stefano Garzarella wrote:
+> After backporting commit 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY
+> flag support") in CentOS Stream 9, CI reported the following error:
+> 
+>     In file included from ./include/linux/kernel.h:17,
+>                      from ./include/linux/list.h:9,
+>                      from ./include/linux/preempt.h:11,
+>                      from ./include/linux/spinlock.h:56,
+>                      from net/vmw_vsock/virtio_transport_common.c:9:
+>     net/vmw_vsock/virtio_transport_common.c: In function ???virtio_transport_can_zcopy???:
+>     ./include/linux/minmax.h:20:35: error: comparison of distinct pointer types lacks a cast [-Werror]
+>        20 |         (!!(sizeof((typeof(x) *)1 == (typeof(y) *)1)))
+>           |                                   ^~
+>     ./include/linux/minmax.h:26:18: note: in expansion of macro ???__typecheck???
+>        26 |                 (__typecheck(x, y) && __no_side_effects(x, y))
+>           |                  ^~~~~~~~~~~
+>     ./include/linux/minmax.h:36:31: note: in expansion of macro ???__safe_cmp???
+>        36 |         __builtin_choose_expr(__safe_cmp(x, y), \
+>           |                               ^~~~~~~~~~
+>     ./include/linux/minmax.h:45:25: note: in expansion of macro ???__careful_cmp???
+>        45 | #define min(x, y)       __careful_cmp(x, y, <)
+>           |                         ^~~~~~~~~~~~~
+>     net/vmw_vsock/virtio_transport_common.c:63:37: note: in expansion of macro ???min???
+>        63 |                 int pages_to_send = min(pages_in_iov, MAX_SKB_FRAGS);
+> 
+> We could solve it by using min_t(), but this operation seems entirely
+> unnecessary, because we also pass MAX_SKB_FRAGS to iov_iter_npages(),
+> which performs almost the same check, returning at most MAX_SKB_FRAGS
+> elements. So, let's eliminate this unnecessary comparison.
+> 
+> Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
+> Cc: avkrasnov@salutedevices.com
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
 
-I'll send a small patch adjusting this
+
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+>  net/vmw_vsock/virtio_transport_common.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index f6dc896bf44c..c8e162c9d1df 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -59,8 +59,7 @@ static bool virtio_transport_can_zcopy(const struct virtio_transport *t_ops,
+>  	t_ops = virtio_transport_get_ops(info->vsk);
+>  
+>  	if (t_ops->can_msgzerocopy) {
+> -		int pages_in_iov = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
+> -		int pages_to_send = min(pages_in_iov, MAX_SKB_FRAGS);
+> +		int pages_to_send = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
+>  
+>  		/* +1 is for packet header. */
+>  		return t_ops->can_msgzerocopy(pages_to_send + 1);
+> -- 
+> 2.43.0
+
 
