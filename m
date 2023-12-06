@@ -1,98 +1,103 @@
-Return-Path: <netdev+bounces-54445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE59380716C
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 14:58:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0761807192
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 15:01:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 876FD2810C8
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:58:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 868A3281678
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 14:01:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FEBF3C46B;
-	Wed,  6 Dec 2023 13:58:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B6E33C6A3;
+	Wed,  6 Dec 2023 14:01:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NuZBxUDR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QIYY42O7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78347381AA;
-	Wed,  6 Dec 2023 13:58:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B72FC433C7;
-	Wed,  6 Dec 2023 13:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270183C497;
+	Wed,  6 Dec 2023 14:01:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11A0AC433C7;
+	Wed,  6 Dec 2023 14:01:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701871122;
-	bh=igbPsqBqoC6Yx2+ikp9QT1gV4CGkTMXJP7iKBjWdZ3o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NuZBxUDRhHT/RUByFl8OswuDT+o0oA7/OX5J4+UiSHxe2O6k9gLNxFAZtfXxO0uiq
-	 R71x2H6o0RrTHC0eVqeJNL+K3VlpWwLf+zMNsf7i/JmNRHQNoFX9id6su73i+rqncg
-	 dOrrWdyjbFbeY2LB+cHc0SE6yWdnoE+X80I68lpt+R3HI7km/6fSMLn1B5Lk6legQa
-	 KVqqlpEk3X/wEyIG7ytGOPaaga7jCka2AWPIi3Ato9IfoM5t9OTFnrxbhg/x2xx/yc
-	 nYdgYtarnKjk4VxveyJNg5pFi7OgQXomKaf5r/dUe3R1i0KcQCpWYe8NPGLK4e//bU
-	 EA6jxYRGTg4+Q==
-Date: Wed, 6 Dec 2023 14:58:36 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Jann Horn <jannh@google.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	netfilter-devel <netfilter-devel@vger.kernel.org>,
-	coreteam@netfilter.org, "David S. Miller" <davem@davemloft.net>,
+	s=k20201202; t=1701871305;
+	bh=/smgYwrNiywTTOUBDU8u9NXotG8+d5x1VH+6Q14bcgE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QIYY42O737W5KvHlLRD+NnFnvcHBU33Xptq4n48C+y6W77vkWAo68OhPytfSqCW5m
+	 mLcO4qS6/jTSNIFEq0MhxxXSgvzM3lonJOMDjXfk0k55MblKghDkztH3vy7CA2FD6y
+	 Q0BKCKolqdkocKPkjTLQRJEArUATMFlxNmdqKsJJoOINLfayFlJhSUv3D3fU2a/lJR
+	 45tRqIldjL7Ee+QFVIj+x0uUr/XP/lHzzmLzpmUIJ6gMezgEU1cpnu9p99x6I6kEIZ
+	 qvAifQtP8tO4cmadQQ4l8SbU42+uj4iishys2xEKIAfUMDYyxBplKTNRKBC31aEkNb
+	 h6W2JzWIW0aGg==
+From: Leon Romanovsky <leon@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Leon Romanovsky <leonro@nvidia.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Network Development <netdev@vger.kernel.org>,
-	kernel list <linux-kernel@vger.kernel.org>
-Subject: Re: Is xt_owner's owner_mt() racy with sock_orphan()? [worse with
- new TYPESAFE_BY_RCU file lifetime?]
-Message-ID: <20231206-refinanzieren-werkhalle-22db5334f256@brauner>
-References: <CAG48ez0TfTAkaRWFCTb44x=TWP_sDZVx-5U2hvfQSFOhghNrCA@mail.gmail.com>
- <CAG48ez1hXk_cffp3dy-bYMcoyCCj-EySYR5SzYrNiRHGD=hOUg@mail.gmail.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	Mark Bloch <mbloch@nvidia.com>,
+	Michael Guralnik <michaelgur@nvidia.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Shun Hao <shunh@nvidia.com>
+Subject: [PATCH mlx5-next v1 0/5] Expose c0 and SW encap ICM for RDMA
+Date: Wed,  6 Dec 2023 16:01:33 +0200
+Message-ID: <cover.1701871118.git.leon@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAG48ez1hXk_cffp3dy-bYMcoyCCj-EySYR5SzYrNiRHGD=hOUg@mail.gmail.com>
 
-On Tue, Dec 05, 2023 at 06:08:29PM +0100, Jann Horn wrote:
-> On Tue, Dec 5, 2023 at 5:40 PM Jann Horn <jannh@google.com> wrote:
-> >
-> > Hi!
-> >
-> > I think this code is racy, but testing that seems like a pain...
-> >
-> > owner_mt() in xt_owner runs in context of a NF_INET_LOCAL_OUT or
-> > NF_INET_POST_ROUTING hook. It first checks that sk->sk_socket is
-> > non-NULL, then checks that sk->sk_socket->file is non-NULL, then
-> > accesses the ->f_cred of that file.
-> >
-> > I don't see anything that protects this against a concurrent
-> > sock_orphan(), which NULLs out the sk->sk_socket pointer, if we're in
-> 
-> Ah, and all the other users of ->sk_socket in net/netfilter/ do it
-> under the sk_callback_lock... so I guess the fix would be to add the
-> same in owner_mt?
+From: Leon Romanovsky <leonro@nvidia.com>
 
-In your other mail you wrote:
+Changelog:
+v1:
+ * Reordered patches
+v0: https://lore.kernel.org/all/cover.1701172481.git.leon@kernel.org
 
-> I also think we have no guarantee here that the socket's ->file won't
-> go away due to a concurrent __sock_release(), which could cause us to
-> continue reading file credentials out of a file whose refcount has
-> already dropped to zero?
+-----------------------------------------------------------------------
+Hi,
 
-Is this an independent worry or can the concurrent __sock_release()
-issue only happen due to a sock_orphan() having happened first? I think
-that it requires a sock_orphan() having happend, presumably because the
-socket gets marked SOCK_DEAD and can thus be released via
-__sock_release() asynchronously?
+These two series from Mark and Shun extend RDMA mlx5 API.
 
-If so then taking sk_callback_lock() in owner_mt() should fix this.
-(Otherwise we might need an additional get_active_file() on
-sk->sk_socker->file in owner_mt() in addition to the other fix.)
+Mark's series provides c0 register used to match egress
+traffic sent by local device.
+
+Shun's series adds new type for ICM area.
+
+Thanks
+
+Mark Bloch (2):
+  net/mlx5: E-Switch, expose eswitch manager vport
+  RDMA/mlx5: Expose register c0 for RDMA device
+
+Shun Hao (3):
+  net/mlx5: Introduce indirect-sw-encap ICM properties
+  RDMA/mlx5: Support handling of SW encap ICM area
+  net/mlx5: Manage ICM type of SW encap
+
+ drivers/infiniband/hw/mlx5/dm.c               |  5 +++
+ drivers/infiniband/hw/mlx5/main.c             | 24 ++++++++++++
+ drivers/infiniband/hw/mlx5/mr.c               |  1 +
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h |  7 ----
+ .../net/ethernet/mellanox/mlx5/core/lib/dm.c  | 38 ++++++++++++++++++-
+ include/linux/mlx5/driver.h                   |  1 +
+ include/linux/mlx5/eswitch.h                  |  8 ++++
+ include/linux/mlx5/mlx5_ifc.h                 |  9 ++++-
+ include/uapi/rdma/mlx5-abi.h                  |  2 +
+ include/uapi/rdma/mlx5_user_ioctl_verbs.h     |  1 +
+ 10 files changed, 86 insertions(+), 10 deletions(-)
+
+-- 
+2.43.0
+
 
