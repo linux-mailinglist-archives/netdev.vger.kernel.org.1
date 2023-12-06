@@ -1,106 +1,83 @@
-Return-Path: <netdev+bounces-54544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DD188076DA
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:45:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BE7378076FA
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:50:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28FF4B20EE7
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:45:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F051B20B61
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8A3A6D1C0;
-	Wed,  6 Dec 2023 17:45:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3055F6ABBC;
+	Wed,  6 Dec 2023 17:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hgzt9I+u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yf3guVuf"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51AC4D50;
-	Wed,  6 Dec 2023 09:45:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=1mo1LgfKsz3GNeuJdlpVdTsBLDDEkpPEzTaq9ExbB5k=; b=hgzt9I+uUlQkrxtxNPIpTm7nE2
-	/A9hOHwJK92xwF2Vgt2OyRKbFJZmL3kCtQTNdceEjJRRDxP+jxp+7xNT1tlaYkk8+AtY0ax1V7bAe
-	W3d668LWGdsZZAHCFaRWbBrIrO3l1MfB5UuiVqNjKg/rStzVJPxVBSHXGjtpUDDlItI8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rAvxj-002El3-VR; Wed, 06 Dec 2023 18:45:31 +0100
-Date: Wed, 6 Dec 2023 18:45:31 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"linux-leds@vger.kernel.org" <linux-leds@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH] leds: trigger: netdev: skip setting baseline state in
- activate if hw-controlled
-Message-ID: <a53883cd-f843-45a5-82d3-483d80e9a806@lunn.ch>
-References: <49f1b91e-a637-4062-83c6-f851f7c80628@gmail.com>
- <a69ebe41-3f37-4988-a0bc-e53f79df27f2@lunn.ch>
- <CAFSsGVvBfvkotAd+p++bzca4Km8pHVzNJEGV6CAjYULVOWuD2Q@mail.gmail.com>
- <7535cb07-31ab-407d-9226-7b3f65050a65@lunn.ch>
- <c57558a4-9f3a-48fa-acb7-e3eb2349c666@gmail.com>
- <4c9396eb-f255-4277-8151-caa28c8ea0d3@lunn.ch>
- <9a8373c6-e916-4a98-858a-294e7bed9f24@gmail.com>
- <d42dd05d-fc76-4040-aa15-8bbc4aa535f3@gmail.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 140826A32D
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 17:50:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 91D24C433C7;
+	Wed,  6 Dec 2023 17:50:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701885025;
+	bh=zbXM14EN3sqsrCBofarpNNfTES8vUEuOP71ZWwp2E2s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Yf3guVufWK5xJaNR4soEjxiHYEmHik47RNa1QaZ6MoyCaEbkm8b3UvEpMDvy4v9w5
+	 VP4xpy/6R2/D3XmRDdaRM+JH+t9goxqEY5D/WwG0qMnt6bYoY5Q5V9EPxBIRFJ4an3
+	 A4yzud+k1ZToTs33bRwWCho0h5nYilj2/HHnvHHkyHpXX6G6Zg0oQ0Q4wXv7sGXVvf
+	 wPRBsj9bQ1tVA0OXJyMnx98S0AWpQQVsapO5M+wYyUX+YfRt4EQbaI988DJhbag0V/
+	 PyTa36KRdbUg7IT4y/d1dtVaBMRxrR/BTKySHzjxPNLI2RNEIJ4VdYRQP6if5ew2+W
+	 c20JN3RCQW/Vg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 75BDEDD4EEE;
+	Wed,  6 Dec 2023 17:50:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d42dd05d-fc76-4040-aa15-8bbc4aa535f3@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] ss: prevent "Process" column from being printed unless
+ requested
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170188502547.4762.12538306262617961469.git-patchwork-notify@kernel.org>
+Date: Wed, 06 Dec 2023 17:50:25 +0000
+References: <20231206111444.191173-1-qde@naccy.de>
+In-Reply-To: <20231206111444.191173-1-qde@naccy.de>
+To: Quentin Deslandes <qde@naccy.de>
+Cc: netdev@vger.kernel.org, dsahern@gmail.com
 
-> >> I actually think we need to define some best practices, ordered on
-> >> what the hardware can do.
-> >>
-> >> 1) With software control, set_brightness should do what you expect,
-> >> not return an error.
-> >>
-> >> 2) Without full software control, but there is a mechanism to report a
-> >> problem, like constant blinking, or off, do that, and return
-> >> -EOPNOTSUPP.
-> >>
-> >> 3) Really dumb hardware like this, set_brightness should be a NULL
-> >> pointer. The core returns -EOPNOTSUPP.
-> >>
-> >> The core should return this -EOPNOTSUPP to user space, but it should
-> >> accept the configuration change. So the user can put it into an
-> >> invalid state, in order to get to a valid state with further
-> >> configuration.
-> >>
-> > Sounds good to me. Let me come up with a RFC patch.
-> > 
-> >> I don't see an easy way to let the user know what the valid states
-> >> are. We currently have a 10bit state. I don't think we can put all the
-> >> valid ones in a /sysfs file, especially when QCA8K pretty much
-> >> supports everything.
-> >>
-> >> 	 Andrew
-> > 
-> > Heiner
+Hello:
+
+This patch was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
+
+On Wed, 6 Dec 2023 12:14:44 +0100 you wrote:
+> Commit 5883c6eba517 ("ss: show header for --processes/-p") added
+> "Process" to the list of columns printed by ss. However, the "Process"
+> header is now printed even if --processes/-p is not used.
 > 
-> Patch is so simple that I send it this way. What do you think?
+> This change aims to fix this by moving the COL_PROC column ID to the same
+> index as the corresponding column structure in the columns array, and
+> enabling it if --processes/-p is used.
+> 
+> [...]
 
-That is simpler than i expected.
+Here is the summary with links:
+  - ss: prevent "Process" column from being printed unless requested
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=1607bf531fd2
 
-But i think we need to document our expectations. What do we expect an
-LED driver to do when it cannot support software blinking. So please
-could you add a comment somewhere. Maybe extend the
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-/*
- *Configurable sysfs attributes:
- *
 
-section?
-
-Thanks
-	Andrew
 
