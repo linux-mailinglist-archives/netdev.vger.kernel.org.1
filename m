@@ -1,87 +1,140 @@
-Return-Path: <netdev+bounces-54484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35DDF8073F2
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 16:47:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11593807407
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 16:55:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6392281E3B
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 15:47:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0B7A281E2F
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 15:54:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22CE13D98C;
-	Wed,  6 Dec 2023 15:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ro/bRRwO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C3145975;
+	Wed,  6 Dec 2023 15:54:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04437182C3
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 15:47:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E993DC433C9;
-	Wed,  6 Dec 2023 15:47:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701877643;
-	bh=MrNgRiYa9MAcWug7NSrquxYR6x57hudTb4cvkZDbmPc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ro/bRRwOO+94JLkbJreebvw6kzsLXzH273lFl8owBLz/0qKxATZ0YD8ffzRNas+VV
-	 mzNASWXVLIzxByTT9T1mvE/+c+IYox12jtXy8GyTPHBeRvtiwrbDkEMPQ3rKRRLsnO
-	 A69ymnBP1Je81RnuIbNfaxQ12msOVQneig9gQmhOqcXGj/oJvSrsFyBWsqh5UbfF/B
-	 zNxrJ9FSYlOZDJMT34eu8b9I28y8LCjhUXCNjJ+IraHjpSpcUjT/nLza5IZKBX+EGS
-	 M1jVjfQCb7Hz5acbgXGhWqaJTzLAXoyDY8gyanoObj1X6Gl+JRIjz1bqLYsYNWm7k1
-	 MeyLDE78g6PcA==
-Date: Wed, 6 Dec 2023 07:47:21 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Conor Dooley <conor@kernel.org>
-Cc: Kory Maincent <kory.maincent@bootlin.com>, Luis Chamberlain
- <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- linux-kernel@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v3] firmware_loader: Expand Firmware upload
- error codes with firmware invalid error
-Message-ID: <20231206074721.2eb68abc@kernel.org>
-In-Reply-To: <20231206-sacrament-cadmium-4cc02374d163@spud>
-References: <20231122-feature_firmware_error_code-v3-1-04ec753afb71@bootlin.com>
-	<20231124192407.7a8eea2c@kernel.org>
-	<20231206-sacrament-cadmium-4cc02374d163@spud>
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C894D1A2
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 07:54:50 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rAuEU-0005eJ-Fi; Wed, 06 Dec 2023 16:54:42 +0100
+Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rAuES-00DzeT-4b; Wed, 06 Dec 2023 16:54:40 +0100
+Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rAuES-005aMs-1i; Wed, 06 Dec 2023 16:54:40 +0100
+Date: Wed, 6 Dec 2023 16:54:40 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next v1 3/3] net: dsa: microchip: Fix PHY loopback
+ configuration for KSZ8794 and KSZ8873
+Message-ID: <20231206155440.GA1324895@pengutronix.de>
+References: <20231121152426.4188456-1-o.rempel@pengutronix.de>
+ <20231121152426.4188456-3-o.rempel@pengutronix.de>
+ <35045f6ef6a5b274063186c065a8215088b94cd5.camel@redhat.com>
+ <20231206085520.GA1293736@pengutronix.de>
+ <20231206151406.75eglqtsrrb4vegf@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231206151406.75eglqtsrrb4vegf@skbuf>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed, 6 Dec 2023 12:04:33 +0000 Conor Dooley wrote:
-> It's taken me longer than I would like to get back to this, sorry.
-> I tried pulling the tag today and I think there's been a mistake - the
-> tagged commit is the merge commit into net, not the commit adding the
-> firmware loader change:
+On Wed, Dec 06, 2023 at 05:14:06PM +0200, Vladimir Oltean wrote:
+> On Wed, Dec 06, 2023 at 09:55:20AM +0100, Oleksij Rempel wrote:
+> > On Thu, Nov 23, 2023 at 11:52:57AM +0100, Paolo Abeni wrote:
+> > > Hi,
+> > > 
+> > > On Tue, 2023-11-21 at 16:24 +0100, Oleksij Rempel wrote:
+> > > > Correct the PHY loopback bit handling in the ksz8_w_phy_bmcr and
+> > > > ksz8_r_phy_bmcr functions for KSZ8794 and KSZ8873 variants in the ksz8795
+> > > > driver. Previously, the code erroneously used Bit 7 of port register 0xD
+> > > > for both chip variants, which is actually for LED configuration. This
+> > > > update ensures the correct registers and bits are used for the PHY
+> > > > loopback feature:
+> > > > 
+> > > > - For KSZ8794: Use 0xF / Bit 7.
+> > > > - For KSZ8873: Use 0xD / Bit 0.
+> > > > 
+> > > > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> > > 
+> > > This looks like a bugfix, so possibly worth a Fixes tag? Given the
+> > > dependency on the previous refactor, I think we can take it via net-
+> > > next.
+> > > 
+> > > @Andrew, Florian, Vladimir: do you have any specific preference here?
+> > 
+> > I do not think any one cares about supporting this switch variant in
+> > stable :)
+> > 
+> > Regards,
+> > Oleksij
 > 
-> commit 53775da0b4768cd7e603d7ac1ad706c383c6f61e (tag: firmware_loader-add-upload-error, korg-kuba/firmware_loader)
-> Merge: 3a767b482cac a066f906ba39
-> Author: Jakub Kicinski <kuba@kernel.org>
-> Date:   Fri Nov 24 18:09:19 2023 -0800
+> Sorry, this simply fell through the cracks.
 > 
->     Merge branch 'firmware_loader'
-> 
-> commit a066f906ba396ab00d4af19fc5fad42b2605582a
-> Author: Kory Maincent <kory.maincent@bootlin.com>
-> Date:   Wed Nov 22 14:52:43 2023 +0100
-> 
->     firmware_loader: Expand Firmware upload error codes with firmware invalid error
-> 
-> I'm going to merge in a066f906ba39 ("firmware_loader: Expand Firmware
-> upload error codes with firmware invalid error") so that I don't end
-> up with a bunch of netdev stuff in my tree.
-> 
-> Have I missed something?
+> How is PHY loopback even supposed to be triggered? User space flips
+> NETIF_F_LOOPBACK on the netdev, driver ndo_set_features() catches it and
+> calls phy_loopback() and this calls into phylib's phydev->drv->set_loopback()
+> or the generic genphy_loopback()?
 
-You're right, looks like I tagged the wrong thing.
-Merging a066f906ba39 will work, sorry!
+correct.
+
+> I don't see DSA implementing ndo_set_features(), nor offering NETIF_F_LOOPBACK.
+> The PHY is integrated, so DSA is the only relevant netdev driver. Is
+> there any other way to test this functionality?
+
+yes - net_selftest()
+
+> If not, I think it's a case of "tree falling in the woods and nobody
+> hearing it". Not "stable" material. But it definitely has nothing to do
+> with not caring about the switch variant.
+
+Sorry, my intention is not to criticize anyone. I am not getting
+feedbacks or bug reports for ksz88xx variants, so it seems like not many
+people use it in upstream.
+
+When I have time slots to work on this driver, I try to use them to do
+fixes and also clean up the code. Since there is some sort of fog of
+uncertainty about when I get the next time slot, or even if I get it at
+all, I am trying to push both fixes and cleanups together.
+
+But, you are right, it is not a good reason for not caring about stable :)
+
+What is the decision about this patch set?
+
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
