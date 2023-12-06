@@ -1,55 +1,61 @@
-Return-Path: <netdev+bounces-54398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F81A806F72
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:06:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F8FB806F77
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:09:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2374928195A
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 12:06:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E06981F212EC
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 12:09:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FD6A358AE;
-	Wed,  6 Dec 2023 12:06:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE39358BB;
+	Wed,  6 Dec 2023 12:09:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="yXwBRfcs"
+	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="D/hOsNEN"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06805D3
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 04:06:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=gnpuVM+NQl0wBMZNSKRWmJUgaOxMtGOQ0+U+8CuUDRY=; b=yXwBRfcsDUQDyLZroO27ugs6f1
-	4GXqvFADguAJkslFFeSPUCHQtKqFDJSzYsyE+5ngRE9JvpW4CR0wBnlqxSmpbrWCo5SfxUU7OnhPv
-	5jRuC2PYnksZU3iq7z5bHBb14Q6AYSw5M1vmoXi2o7O5dpKOpkK3SnKF0TaTVkJZzikZdPASv5Zyj
-	RidC92eyPUM17ufTOQGWU9mMo0jHWqXtcKC2D1JqKYL68iZYLzg27f6F2+Co5aU0GU5RxRXKWUkj9
-	d9jDZP7Lk1qYyL3kEybWRXTzRrNi4MshKQTD0ftlvaSGPZA6oqjQtugDZlpfH48m4eTFFrJ1Msa/Z
-	nBQgTDQQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45950)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rAqfa-0008E5-0Q;
-	Wed, 06 Dec 2023 12:06:26 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rAqfZ-0002hM-MS; Wed, 06 Dec 2023 12:06:25 +0000
-Date: Wed, 6 Dec 2023 12:06:25 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew@lunn.ch, netdev@vger.kernel.org,
-	mengyuanlou@net-swift.com
-Subject: Re: [PATCH net-next v3 1/7] net: ngbe: implement phylink to handle
- PHY device
-Message-ID: <ZXBjwWjd1Jv8916K@shell.armlinux.org.uk>
-References: <20231206095355.1220086-1-jiawenwu@trustnetic.com>
- <20231206095355.1220086-2-jiawenwu@trustnetic.com>
+Received: from mail-oo1-xc36.google.com (mail-oo1-xc36.google.com [IPv6:2607:f8b0:4864:20::c36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0869CBA
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 04:09:30 -0800 (PST)
+Received: by mail-oo1-xc36.google.com with SMTP id 006d021491bc7-58e256505f7so2595850eaf.3
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 04:09:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=theori.io; s=google; t=1701864569; x=1702469369; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VUdX8AHUZyNKsOQIuPu3E/oWx+8+/pEtsEupQddJKnA=;
+        b=D/hOsNENpXeBeHVV8e1t0UrWwtvrvjcluYWgxoWS1vltp1YYbdKalCjAbPNu+wLnPp
+         5BX1bztFDI/0GXcvUTuMT9cJr+xaX4nPhTxwx97ZhZ27jhxqdbQF8NWCTJGy+qxibJ0f
+         EqXb6r60dDM/Ep5+kO8JzNf45il2EBQKhCDBA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701864569; x=1702469369;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VUdX8AHUZyNKsOQIuPu3E/oWx+8+/pEtsEupQddJKnA=;
+        b=OS5ch3U+NEK72dwJHV4AWR+uBsXz5+R5MfxK5Q/aWcaf54QXyB4ks/+QrPoc/HpmqD
+         z4KMlEMV07Vo99qwI2A/wHzapZBlwbiHDRU4WNRwkf5UQUCLHxxm5zl5muVmhFaRAsMV
+         YWkd1gRDKDvCrfdkHvadN7Bma9Sea0OnJQn8eHfxMqoGyv+AfpgZaWx+v5RWE6rZCr9t
+         pC/XPDqn38U+83+Zut4XQmpwzJ99xv/tTrIsFMaKMeqx9f3L/bxWY0z1C7c9UG6GuaCD
+         boc9CtIzkKugPa9+hLFZaGwxj6j/AbrEcTqeXyUywlc3pFPGtjDOWanfg0k/get90ppy
+         3mig==
+X-Gm-Message-State: AOJu0YyIvsZjpJsOWI+FTxuxWPoaMP/dsUJP4mE2XCNAVP6wsxa9faN5
+	ja3J44lA4s7H//rmet+ppcOWNQ==
+X-Google-Smtp-Source: AGHT+IF8ACEgI9PBEDMOyFN7N3ORHyNyztftRX5bV2fbEOqNxDmM/Ir0n+Hv08XOGtU2748NceKzPw==
+X-Received: by 2002:a05:6358:9106:b0:170:302b:545f with SMTP id q6-20020a056358910600b00170302b545fmr1151672rwq.56.1701864569208;
+        Wed, 06 Dec 2023 04:09:29 -0800 (PST)
+Received: from ubuntu ([211.219.71.65])
+        by smtp.gmail.com with ESMTPSA id bm10-20020a056a00320a00b006cbafd6996csm11135842pfb.123.2023.12.06.04.09.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 04:09:28 -0800 (PST)
+Date: Wed, 6 Dec 2023 04:09:23 -0800
+From: Hyunwoo Kim <v4bel@theori.io>
+To: davem@davemloft.net, edumazet@google.com
+Cc: v4bel@theori.io, imv4bel@gmail.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, dhowells@redhat.com, lukas.bulwahn@gmail.com,
+	mkl@pengutronix.de, netdev@vger.kernel.org
+Subject: [PATCH] appletalk: Fix Use-After-Free in atalk_ioctl
+Message-ID: <20231206120923.GA14115@ubuntu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,95 +64,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231206095355.1220086-2-jiawenwu@trustnetic.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, Dec 06, 2023 at 05:53:49PM +0800, Jiawen Wu wrote:
-> Add phylink support for Wangxun 1Gb Ethernet controller.
-> 
-> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> ---
->  drivers/net/ethernet/wangxun/libwx/wx_type.h  |   8 ++
->  drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  20 ++-
->  drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c | 126 +++++++++++-------
->  drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.h |   2 +-
->  4 files changed, 93 insertions(+), 63 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> index 165e82de772e..9225aaf029f8 100644
-> --- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> @@ -8,6 +8,7 @@
->  #include <linux/netdevice.h>
->  #include <linux/if_vlan.h>
->  #include <net/ip.h>
-> +#include <linux/phylink.h>
+Because atalk_ioctl() accesses sk->sk_receive_queue
+without holding a sk->sk_receive_queue.lock, it can
+cause a race with atalk_recvmsg().
+A use-after-free for skb occurs with the following flow.
+```
+atalk_ioctl() -> skb_peek()
+atalk_recvmsg() -> skb_recv_datagram() -> skb_free_datagram()
+```
+Add sk->sk_receive_queue.lock to atalk_ioctl() to fix this issue.
 
-Nit: would be better to keep linux/ includes together (and in
-alphabetical order to prevent conflicts.)
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
+---
+ net/appletalk/ddp.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-> diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-> index 8db804543e66..c61f4b9d79fa 100644
-> --- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-> +++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-> @@ -9,6 +9,7 @@
->  #include <linux/etherdevice.h>
->  #include <net/ip.h>
->  #include <linux/phy.h>
-> +#include <linux/phylink.h>
->  #include <linux/if_vlan.h>
->  
->  #include "../libwx/wx_type.h"
-
-As wx_type.h includes linux/phylink.h, which is now fundamental for the
-definition of one of the structures in wx_type.h, the include of
-linux/phylink.h seems unnecessary here.
-
-> @@ -336,7 +337,8 @@ static void ngbe_disable_device(struct wx *wx)
->  
->  static void ngbe_down(struct wx *wx)
->  {
-> -	phy_stop(wx->phydev);
-> +	phylink_stop(wx->phylink);
-> +	phylink_disconnect_phy(wx->phylink);
-
-I'm not sure why you're moving the PHY disconnection in this patch -
-that seems like a separate change to the actual conversion to phylink.
-For a pure conversion, you should be able to just replace the phylib
-calls with their phylink equivalents.
-
-It seems to me that there's two changes happening here: a conversion to
-phylink and a re-ordering of the open/close methods particularly to do
-with connecting and disconnecting the PHY. Either this needs to be
-described in the commit message (the fact that it's happening and why)
-or it should be two patches.
-
-> -static void ngbe_phy_fixup(struct wx *wx)
-> +void ngbe_phylink_start(struct wx *wx)
->  {
-> -	struct phy_device *phydev = wx->phydev;
-> -	struct ethtool_eee eee;
-> -
-> -	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
-> -	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
-> -	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
-> -
-> -	phydev->mac_managed_pm = true;
-> -	if (wx->mac_type != em_mac_type_mdi)
-> -		return;
-> -	/* disable EEE, internal phy does not support eee */
-> -	memset(&eee, 0, sizeof(eee));
-> -	phy_ethtool_set_eee(phydev, &eee);
-> +	struct phylink *phylink = wx->phylink;
-> +
-> +	phylink_connect_phy(phylink, wx->phydev);
-
-Note that phylink_connect_phy() can fail, so it's return value should
-be checked.
-
-Apart from the comments above, I think I'm fine with this.
-
+diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c
+index 9ba04a69ec2a..f240d5338bc9 100644
+--- a/net/appletalk/ddp.c
++++ b/net/appletalk/ddp.c
+@@ -1775,15 +1775,16 @@ static int atalk_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
+ 		break;
+ 	}
+ 	case TIOCINQ: {
++		long amount = 0;
+ 		/*
+ 		 * These two are safe on a single CPU system as only
+ 		 * user tasks fiddle here
+ 		 */
++		spin_lock_irq(&sk->sk_receive_queue.lock);
+ 		struct sk_buff *skb = skb_peek(&sk->sk_receive_queue);
+-		long amount = 0;
+-
+ 		if (skb)
+ 			amount = skb->len - sizeof(struct ddpehdr);
++		spin_unlock_irq(&sk->sk_receive_queue.lock);
+ 		rc = put_user(amount, (int __user *)argp);
+ 		break;
+ 	}
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.25.1
+
 
