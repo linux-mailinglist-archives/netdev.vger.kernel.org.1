@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-54248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0771E8065C9
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 04:41:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 649A08065CF
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 04:43:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38FD41C20B10
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 03:41:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 172D51F21644
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 03:43:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55D3D2F0;
-	Wed,  6 Dec 2023 03:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABAC1D304;
+	Wed,  6 Dec 2023 03:43:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SixnKGXj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cEk+RaKy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 996EED517
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 03:41:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4944C433C8;
-	Wed,  6 Dec 2023 03:41:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDA0D27F
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 03:43:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62C4BC433C8;
+	Wed,  6 Dec 2023 03:43:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701834063;
-	bh=8ezYr81SA31316O3MGd+Zv62N56/5VhuDHegpjMihwI=;
+	s=k20201202; t=1701834226;
+	bh=Yt/7bAOKIimNBpZ0Q4GpZ/R6rZPYD6PxJiZ4tyrcpxs=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SixnKGXjiBxgshYU7Bc7gOldSm2UrC2vQyw8NBbBVEbkJ3/jrWwd86gxjULZ+OTBB
-	 be7EMDOhQ36btIsAtdJ5zTEQegXCZVOAdMlI+YHbFLkis6+VxdjpGo7rHhD4Kj78E7
-	 n7SW6TyzD5yidPA88CyJqrPpcAiXAda1v1MsPXyJELjt06+uH+mblEDuMrKUOhavxd
-	 JQIrVoFRN0G74bEPCylXNMdEgo8EGmwBinOc+BGO4tQz6m5/kkpAvKKBVmWkXElLdl
-	 FHBwkJbXmv78Sizkmoe0TRL1wwO2ci7bIi9uTX2y+58LE/GL4jeb32z5Dl+qzSbkZR
-	 uZ4LIT412peZw==
-Message-ID: <ee557d3b-79f1-4851-9473-99f711a78f2b@kernel.org>
-Date: Tue, 5 Dec 2023 20:41:02 -0700
+	b=cEk+RaKyvuWTUrYHayrbeJd+hkwdeo/6xXsVj9MQpyDav2tUpHVJPo8phFf00hoxV
+	 dc2wrv7DXhihdJpBks5x4pDuOCoaGwaUSiAZ6jJi1x5gctVY2OZz3vdeHwjM7H0G9P
+	 2vIP4kBu79EfQo4/XOuFXREVjY91BvCkOna62RS1TLhD26qUSGm1jQ3kY99CHeaK1z
+	 JOt0YI6tPiwqQzKf7cEMiKXuCQYMZlli+23XDclgnxffCiJc6jaE0h6/vkv5jNg/61
+	 Lh08gLdtNnCiuxds2dIzP+KmmDUgxpA86x5V08dpKdB1WiUj8aEN9hZ6Xdl7b6EeLb
+	 43SXRNnz4tNnw==
+Message-ID: <2fea2908-69a5-4c6d-ad27-94f48f2f2586@kernel.org>
+Date: Tue, 5 Dec 2023 20:43:44 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,43 +41,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ipv6: add debug checks in fib6_info_release()
+Subject: Re: [PATCH v2] neighbour: Don't let neigh_forced_gc() disable
+ preemption for long
 Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com
-References: <20231205173250.2982846-1-edumazet@google.com>
+To: Judy Hsiao <judyhsiao@chromium.org>, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>
+Cc: Douglas Anderson <dianders@chromium.org>,
+ Brian Haley <haleyb.dev@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Joel Granados <joel.granados@gmail.com>,
+ Julian Anastasov <ja@ssi.bg>, Leon Romanovsky <leon@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20231206033913.1290566-1-judyhsiao@chromium.org>
 From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20231205173250.2982846-1-edumazet@google.com>
+In-Reply-To: <20231206033913.1290566-1-judyhsiao@chromium.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 12/5/23 10:32 AM, Eric Dumazet wrote:
-> Some elusive syzbot reports are hinting to fib6_info_release(),
-> with a potential dangling f6i->gc_link anchor.
+On 12/5/23 8:38 PM, Judy Hsiao wrote:
+> We are seeing cases where neigh_cleanup_and_release() is called by
+> neigh_forced_gc() many times in a row with preemption turned off.
+> When running on a low powered CPU at a low CPU frequency, this has
+> been measured to keep preemption off for ~10 ms. That's not great on a
+> system with HZ=1000 which expects tasks to be able to schedule in
+> with ~1ms latency.
 > 
-> Add debug checks so that syzbot can catch the issue earlier eventually.
+> Suggested-by: Douglas Anderson <dianders@chromium.org>
+> Signed-off-by: Judy Hsiao <judyhsiao@chromium.org>
 > 
-> BUG: KASAN: slab-use-after-free in __hlist_del include/linux/list.h:990 [inline]
-> BUG: KASAN: slab-use-after-free in hlist_del_init include/linux/list.h:1016 [inline]
-> BUG: KASAN: slab-use-after-free in fib6_clean_expires_locked include/net/ip6_fib.h:533 [inline]
-> BUG: KASAN: slab-use-after-free in fib6_purge_rt+0x986/0x9c0 net/ipv6/ip6_fib.c:1064
-> Write of size 8 at addr ffff88802805a840 by task syz-executor.1/10057
-> 
-
-...
-
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
 > ---
->  include/net/ip6_fib.h | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
+> Changes in v2:
+> - Use ktime_get_ns() for timeout calculation instead of jiffies.
+> 
+>  net/core/neighbour.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+
 
 Reviewed-by: David Ahern <dsahern@kernel.org>
-
-
-
 
 
