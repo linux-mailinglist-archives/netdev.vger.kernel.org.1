@@ -1,245 +1,177 @@
-Return-Path: <netdev+bounces-54594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C5AA8078C4
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 20:40:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 131B88078CB
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 20:43:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70E731C20A76
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 19:40:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7F331F211F4
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 19:43:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3084447F5B;
-	Wed,  6 Dec 2023 19:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C12CB47F63;
+	Wed,  6 Dec 2023 19:42:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VzP38TOg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TyRipRph"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CADDFD64
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 11:39:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701891591; x=1733427591;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=/xmzw9e9Hx3LPzOESVE1FSeSBVtYqjlHmaM1rAFR9RE=;
-  b=VzP38TOgLKOr6BvPu6RiYjoVMETcqQrqTC1TGsXbtsgpkA1oPaZ0MDAp
-   nN/P7R9mt34hDUjzPAWa6GORp9WIZ/YUQyQlR6+B+nHiMKnWRjUP6/KBU
-   us+paKAE/JgAOy2jymHpnVtG6pC9m9csLS95wUhWCegfHUgC2ZU/D6Rl0
-   rBJfDMJ0DiKxH4KxClx6YCsvq0+8HpMhAui4CSHaBVc4ulLevc7cX6Ciz
-   bBuRisb+2bNG+2t6TsL4kdPZrRZpXCrjMOWQvd2MKD9ZXyQyT7BB8iX2P
-   6GC29GJNEOMyimPbcYVIvXBBDti3KyWk3jEhj5cxdE9utuz0Kx25Fy6e8
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="374289587"
-X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
-   d="scan'208";a="374289587"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2023 11:39:51 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="721197429"
-X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
-   d="scan'208";a="721197429"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Dec 2023 11:39:51 -0800
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 6 Dec 2023 11:39:50 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 6 Dec 2023 11:39:50 -0800
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 6 Dec 2023 11:39:49 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MglPkjdWo1rE8pufMuc5rM3w5EfYRMPFVztktkMvO1Qh7lDzHg9FI6nC6qIqo1PVe7Vlf+7qYjxfD/mRjyHWvvOVtbr8yl5ygNnSXp3mbqngk/m+k1yrDXDytowG1Uq/usaZp+uPOyvWzMS9FRv2NVBspWSHswxjNBY/JR0JNDQD5KKWWfU32BVgsghAD8LHLC3+yLQWg+SfmLQWbNXXW7Z+uRhaTiozHYZy5NQypgoKxXxAf1EYkuUN2fRsh+bmgg/89NAtIya8DnougTcEd/PWPOAI87Nk3ErDA+LuLM6XBGBnVl0/avIlIGJLyLI8z2tZqKcbIkflH2yXadK72Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rghNZYCHnGEyulLBlBMWvpAspekMl7/E679t1N4F7m8=;
- b=VGEP/XvMdoHToWmUDDUkAxnYPRgl9ku7RTEPHtrC4XL2yZZt4wFfh0wRH0JM1LZi3B4Xx677Vi3esUeEuaCWQNBOAKhEHJiLvh7yW0313q6FHCZ/9d//mQla+B/3ORD/k6BWeMogymrJmMb4C9GzL52VhrJDbbY022mBolCogM7/GSsgje5Cyhpe2kqDaX0sILOn2TyOYZhX0wFceQeU61V3n4eWHDs85oni+LgHHoerIiQSF0Kx6BN4e8et4k9o/nfahuHxgMD1Y3evo7FP4twCphOMqO/JaQBptx4PqLxQStcVk+JYr16Iv9vqxTUDVwMiuKbD8OrLe8UtrIfGIA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL0PR11MB3521.namprd11.prod.outlook.com (2603:10b6:208:7b::32)
- by PH8PR11MB6753.namprd11.prod.outlook.com (2603:10b6:510:1c8::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.25; Wed, 6 Dec
- 2023 19:39:46 +0000
-Received: from BL0PR11MB3521.namprd11.prod.outlook.com
- ([fe80::1498:c32d:2d2:975c]) by BL0PR11MB3521.namprd11.prod.outlook.com
- ([fe80::1498:c32d:2d2:975c%5]) with mapi id 15.20.7046.034; Wed, 6 Dec 2023
- 19:39:46 +0000
-From: "Romanowski, Rafal" <rafal.romanowski@intel.com>
-To: "Rao, Ranganatha" <ranganatha.rao@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Laba, SlawomirX" <slawomirx.laba@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
-	"Zaki, Ahmed" <ahmed.zaki@intel.com>, "Rao, Ranganatha"
-	<ranganatha.rao@intel.com>, Michal Swiatkowski
-	<michal.swiatkowski@linux.intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net, v2] iavf: Fix iavf_shutdown to
- call iavf_remove instead iavf_close
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net, v2] iavf: Fix iavf_shutdown to
- call iavf_remove instead iavf_close
-Thread-Index: AQHaIvTM2xAaEkqhRkSPuxxcbo/xpLCcse3g
-Date: Wed, 6 Dec 2023 19:39:46 +0000
-Message-ID: <BL0PR11MB3521B3E9C6784B5124B0074F8F84A@BL0PR11MB3521.namprd11.prod.outlook.com>
-References: <20231129153526.57912-1-ranganatha.rao@intel.com>
-In-Reply-To: <20231129153526.57912-1-ranganatha.rao@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL0PR11MB3521:EE_|PH8PR11MB6753:EE_
-x-ms-office365-filtering-correlation-id: afc4a788-6849-46e8-a0c4-08dbf6931a17
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: j0i1wsj4kssja1nu8EyYkG1FM5uBd007+xuPBBmgjwlaC0xuRiwkUxa7VVYu/XKgf+g9zDJVn7ZAtD+mcB7AOadEh+BQnaBvd7AyZ0z7f/hOlnvcwhyu/ej3igOEofYfBLH+KwTldrIhL37yN6usNLNdQCceG5gBZ3fKrlYuQDlGxDmqiXuEBBHDskNyREzDH7zr1H2cVgDc5rp/uA/LgHsgDmlS/snvtac2reUs4dw6TArJ3KYVHUzHD7SWsdYtQGTIi2lBFMs97+x1pPbeYaG9HG8CcHBtUj6WRmKAauZO1w/F2wH4TVfZySt13ccal6T63QLqUo5aU9YPGthSM7IWHRnaN918pfg5EAdiLq4eZETAW3/5L6bCEorqdphk6hwwL7i9Un7BrqVwcTim+PsV6sXZ4fX11tNW0LghYvZAFdLWE3ENyqSDcSuf8B4Wmlxqt1R39H6Dz3h6nCowaaIzBzMoA290WnTrf+lHsYKN62blfUbnJl4aSmj+lIm/RdSsA4gWO08TlXZmZInwzgOHFQ2TauBKBwXnbqWKS9WsqofzYLdZ/OGD55iDz15hnt3sGZrEx2uU62M7HCzXlNjM7VgDY4LSIV5daZvun3IZkQJjP2MuXQufANoqhqfQ
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3521.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(376002)(136003)(346002)(396003)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(76116006)(9686003)(83380400001)(26005)(66556008)(66946007)(66476007)(54906003)(64756008)(66446008)(110136005)(316002)(478600001)(7696005)(53546011)(6506007)(38070700009)(5660300002)(71200400001)(33656002)(55016003)(122000001)(38100700002)(82960400001)(2906002)(86362001)(52536014)(41300700001)(4326008)(8676002)(8936002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?8Ui3j1C4DtKT8EJYnG9UavFe3W76y5SJ2QWfuYyge1XroRhiBAE7ZPRJUMk3?=
- =?us-ascii?Q?eKxiKZjFV5Yb4feGKTBgQ0E3pr8OrmnMzchSBwNdZm0JTddQ1kNVfUlNlY+c?=
- =?us-ascii?Q?+YtzLzTLJn+w5DkNoFNL5irOpgvA5qrL/tt1yHQ39oZuTjkEnAMeMPt+nGlm?=
- =?us-ascii?Q?zouStND+LhzH2Zxqz+iNV7d5H3UOvrILwrpkhKjTC3ABSmkbuD1aPyVWwWQS?=
- =?us-ascii?Q?eRHRAHQ+nVxNd+IbghZueyChLPh8SkWVBO8chlAxKlf5tH9332GqvK+A0Unj?=
- =?us-ascii?Q?zypt8flXdX39Sdeo2DKD3fkCGahMKmVYeMUzQoaKDmf/0ZFFTw13HbPj1lfo?=
- =?us-ascii?Q?YYXxkhCXi5Owr4M2S8N5vnnANB9P8R1WR4K9uzkJVPHUnJrr9eswcqZhX4Mo?=
- =?us-ascii?Q?/a3F6Dh+/NMvws1eEFiBGR+WxBYrGgoD7Kx55KNDIShP1khX8En3qeKvFq6y?=
- =?us-ascii?Q?+lsvWmXHi6lGng8ayg90nbz/967+s+JVFUUd4FZ3Y8VkUlYmI10bOHA4Yqb/?=
- =?us-ascii?Q?i9XjswBjbm5gI7inQ0jO/LoavhAXY+dxTYrj2XL3dkxLWxiFg05imd8iopX7?=
- =?us-ascii?Q?/pHGTzRFuEZkqC8Z1LLTAjaAkjUE5Wz/IdJ8yjku0xMydhNWCLNuJo6/o3+B?=
- =?us-ascii?Q?frWU9CjLbwMTnQoTqf0XF6uedzeKFKlKuRc2N8ZOTiseRvBIwllOUmuojsZl?=
- =?us-ascii?Q?+/OlAxWo6YIMBUCQ7iHxkuZ+oDPGMO1fh3ZpRwG6raL14UJwCKsro3fBY3ru?=
- =?us-ascii?Q?xQ5J0hLPF0DnHyyDeEXykIXwf3gPYEX5e0AL/KdWgD0DGfnZ8niQBxb399Hu?=
- =?us-ascii?Q?4GLT6wB971O9Y8tUCbXSSBdm5HOt/HZkkiPJBTmJUmbzx1cQIgIGMB41p+Df?=
- =?us-ascii?Q?rz6pJPq2kF3UiHofMjVIl/nb31vzyk3XPMyXDT7beZ18Jd2UfwoXEPA946fz?=
- =?us-ascii?Q?3ix5y5zBJmQIegvXtghyClvmcyw21pP1rYf0X7Of+cSPgtfBLG/rdpOl6fqO?=
- =?us-ascii?Q?N26Kh+N3C9vjdZm6FcD5bx7/OvMYXj+d8wcwfpyr9yNJ/wYsm9Pz7BtAlsqQ?=
- =?us-ascii?Q?tntlWLQY2QNZlLxLfenk6XNjucLvZlWQ6cOYuUI0Wrb4cBOsCy6YAjFntVnC?=
- =?us-ascii?Q?vs/nK60/GOJUYkVCf75es31ymuMf8wVA3of7qN4no/wYjfjXIef4p7UbMOlb?=
- =?us-ascii?Q?SHJvfUti3xI7ZgoOUW7rEmKceCLHuS41cKeYwm46Ei6a8LFK2YNDIkp8YleU?=
- =?us-ascii?Q?HPZDfn58zicmg+/4/UugjlC43qCTntJKIKN1UVwPFnnC5TUEYRuBmhURi0Jb?=
- =?us-ascii?Q?qzyZ4Hzj38CJfbC7/4yxKaNTHhVxRv8itJe5/uUoi9iYDNZEVth/p5J7Tmqr?=
- =?us-ascii?Q?S3XkajjXQXsVSnAzY4AuTi3NjKKrpqSOBgkW8lQp9EKFSTeQ+KpiGga4eFA+?=
- =?us-ascii?Q?1/TPCZSkqA0ODwWEymhR0GuFC50B4oEBjd7+rGz8dcJxLPN7w3zn6Pb9g06b?=
- =?us-ascii?Q?uO8aKe3yTIcpSJu0fyxfkWS9QwBaMLXnd5jV5UWTqlnJew5EZSWVT7QWeiTf?=
- =?us-ascii?Q?KXSoRYvWvpn8d4x0RcNZyAEh1DrkeH3G00sD3ekMCPCzICxPcH0YEB6Y/tF8?=
- =?us-ascii?Q?5Q=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47B8AD46;
+	Wed,  6 Dec 2023 11:42:54 -0800 (PST)
+Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-54c671acd2eso208439a12.1;
+        Wed, 06 Dec 2023 11:42:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701891773; x=1702496573; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:cc:to:autocrypt:from
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OtiQVOsiziZolbXqEGsWppzN9yGgcFtqpuEfznXju8E=;
+        b=TyRipRphHg+dffllnri59mcInt5PZp/+KqGuCEzFMdpNIVpBxKR6VzMpzlELxDcc44
+         unpp4CHBL6G2Rt+DRts5+2O4k+a2VaThUT8CvdMeM+MmFA01UVHyqQbECdAOQyEc/Mro
+         ZpOVyStJtNai3sYM9lAgFyqLo5s3Th2RbjwAPtQNrmDiv6+zyyBBeidY5iaCntZ5swxo
+         CC8EWgpozi0kQzm7EtHcsrKtqQQ4czgyhCmXsKSPgoXkEVkLkt9hG9u1hjyg4UrbbuIu
+         X/P2e19/atK1oWtXc7+I1B1nu1jCJXJruQ0wOr5F0B7zuyWK98FxvRfWdBzPDtIGwY0i
+         0yKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701891773; x=1702496573;
+        h=content-transfer-encoding:subject:cc:to:autocrypt:from
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OtiQVOsiziZolbXqEGsWppzN9yGgcFtqpuEfznXju8E=;
+        b=Xykq4FtAlLjWx7pil/fd+d7B17Tu9JvXdiEi+o/qOWHKRRS6Wqp46rn+bP1f2Zk1uw
+         MS1XCzmo55nlrAZTPJj6Dtex/NZSnfpW5XwuZKqaNCZ82h3XpLvzVUpkVUfQb4Mdeb72
+         8U6qj5CpRg7qr0xdNNRdaxHfLrYPUPIgnqQ+Iio+DG0OcLrc/XGxLH3aYMtKHe40UWWS
+         RpU/qRMo4FhufPoktWRMpo94/ljimME9vuhwBMqb4wBhhKr2TKhO8gtqouacLI++PX52
+         wTxgp99/lZ95ONz0IMebP5NFIzKiqNaETrL6Zpnkgloj1VWxAZId5whSAJ5DaEow+n++
+         w3JA==
+X-Gm-Message-State: AOJu0YyUzys0qXoYr6Ahd05JZB6JEJefURiu31qvNvCgLkGAYxzCUs3z
+	SgjdVnZv3WC67tzB98fDqhY=
+X-Google-Smtp-Source: AGHT+IEqfFq80DzCK47QMH4f6Exh6ehHg8uW5GTxKK17K1RgZUmaHP8V2xB7yyKSuOIBp9Emx77zoQ==
+X-Received: by 2002:a17:906:3408:b0:a19:a19b:c741 with SMTP id c8-20020a170906340800b00a19a19bc741mr780717ejb.145.1701891772448;
+        Wed, 06 Dec 2023 11:42:52 -0800 (PST)
+Received: from ?IPV6:2a01:c23:c486:e400:94df:9494:ce6f:5fa4? (dynamic-2a01-0c23-c486-e400-94df-9494-ce6f-5fa4.c23.pool.telefonica.de. [2a01:c23:c486:e400:94df:9494:ce6f:5fa4])
+        by smtp.googlemail.com with ESMTPSA id bi18-20020a170906a25200b00a0c3b122a1esm341627ejb.63.2023.12.06.11.42.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Dec 2023 11:42:52 -0800 (PST)
+Message-ID: <91e9f4c6-d869-45be-be72-ac49a3c3b818@gmail.com>
+Date: Wed, 6 Dec 2023 20:42:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3521.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: afc4a788-6849-46e8-a0c4-08dbf6931a17
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Dec 2023 19:39:46.1078
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6uK1cOLTZYUrflFKNAROkn5p6VdmsfKBe/xf//+nJ+bR5rrW2XjovQlEle86E3G6QE0bVMjhWFx38r7JKVGWFPHfmZiVXCCv5bkmJz1VZdE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6753
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
+ sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
+ MVE4yNwdS+UsPeCF/6CQQTzHc+n7DomE7fjJD5J1hOJjqz2XWe71fTvYXzxCFLwXXbBiqDC9
+ dNqOe5odPsa4TsWZ09T33g5n2nzTJs4Zw8fCy8rLqix/raVsqr8fw5qM66MVtdmEljFaJ9N8
+ /W56qGCp+H8Igk/F7CjlbWXiOlKHA25mPTmbVp7VlFsvsmMokr/imQr+0nXtmvYVaKEUwY2g
+ 86IU6RAOuA8E0J5bD/BeyZdMyVEtX1kT404UJZekFytJZrDZetwxM/cAH+1fMx4z751WJmxQ
+ J7mIXSPuDfeJhRDt9sGM6aRVfXbZt+wBogxyXepmnlv9K4A13z9DVLdKLrYUiu9/5QEl6fgI
+ kPaXlAZmJsQfoKbmPqCHVRYj1lpQtDM/2/BO6gHASflWUHzwmBVZbS/XRs64uJO8CB3+V3fa
+ cIivllReueGCMsHh6/8wgPAyopXOWOxbLsZ291fmZqIR0L5Y6b2HvdFN1Xhc+YrQ8TKK+Z4R
+ mJRDh0wNQ8Gm89g92/YkHji4jIWlp2fwzCcx5+lZCQ1XdqAiHQARAQABzSZIZWluZXIgS2Fs
+ bHdlaXQgPGhrYWxsd2VpdDFAZ21haWwuY29tPsLBjgQTAQgAOBYhBGxfqY/yOyXjyjJehXLe
+ ig9U8DoMBQJf9GRVAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEHLeig9U8DoMSycQ
+ AJbfg8HZEK0ljV4M8nvdaiNixWAufrcZ+SD8zhbxl8GispK4F3Yo+20Y3UoZ7FcIidJWUUJL
+ axAOkpI/70YNhlqAPMsuudlAieeYZKjIv1WV5ucNZ3VJ7dC+dlVqQdAr1iD869FZXvy91KhJ
+ wYulyCf+s4T9YgmLC6jLMBZghKIf1uhSd0NzjyCqYWbk2ZxByZHgunEShOhHPHswu3Am0ftt
+ ePaYIHgZs+Vzwfjs8I7EuW/5/f5G9w1vibXxtGY/GXwgGGHRDjFM7RSprGOv4F5eMGh+NFUJ
+ TU9N96PQYMwXVxnQfRXl8O6ffSVmFx4H9rovxWPKobLmqQL0WKLLVvA/aOHCcMKgfyKRcLah
+ 57vGC50Ga8oT2K1g0AhKGkyJo7lGXkMu5yEs0m9O+btqAB261/E3DRxfI1P/tvDZpLJKtq35
+ dXsj6sjvhgX7VxXhY1wE54uqLLHY3UZQlmH3QF5t80MS7/KhxB1pO1Cpcmkt9hgyzH8+5org
+ +9wWxGUtJWNP7CppY+qvv3SZtKJMKsxqk5coBGwNkMms56z4qfJm2PUtJQGjA65XWdzQACib
+ 2iaDQoBqGZfXRdPT0tC1H5kUJuOX4ll1hI/HBMEFCcO8++Bl2wcrUsAxLzGvhINVJX2DAQaF
+ aNetToazkCnzubKfBOyiTqFJ0b63c5dqziAgzsFNBF/0ZFUBEADF8UEZmKDl1w/UxvjeyAeX
+ kghYkY3bkK6gcIYXdLRfJw12GbvMioSguvVzASVHG8h7NbNjk1yur6AONfbUpXKSNZ0skV8V
+ fG+ppbaY+zQofsSMoj5gP0amwbwvPzVqZCYJai81VobefTX2MZM2Mg/ThBVtGyzV3NeCpnBa
+ 8AX3s9rrX2XUoCibYotbbxx9afZYUFyflOc7kEpc9uJXIdaxS2Z6MnYLHsyVjiU6tzKCiVOU
+ KJevqvzPXJmy0xaOVf7mhFSNQyJTrZpLa+tvB1DQRS08CqYtIMxRrVtC0t0LFeQGly6bOngr
+ ircurWJiJKbSXVstLHgWYiq3/GmCSx/82ObeLO3PftklpRj8d+kFbrvrqBgjWtMH4WtK5uN5
+ 1WJ71hWJfNchKRlaJ3GWy8KolCAoGsQMovn/ZEXxrGs1ndafu47yXOpuDAozoHTBGvuSXSZo
+ ythk/0EAuz5IkwkhYBT1MGIAvNSn9ivE5aRnBazugy0rTRkVggHvt3/7flFHlGVGpBHxFUwb
+ /a4UjJBPtIwa4tWR8B1Ma36S8Jk456k2n1id7M0LQ+eqstmp6Y+UB+pt9NX6t0Slw1NCdYTW
+ gJezWTVKF7pmTdXszXGxlc9kTrVUz04PqPjnYbv5UWuDd2eyzGjrrFOsJEi8OK2d2j4FfF++
+ AzOMdW09JVqejQARAQABwsF2BBgBCAAgFiEEbF+pj/I7JePKMl6Fct6KD1TwOgwFAl/0ZFUC
+ GwwACgkQct6KD1TwOgxUfg//eAoYc0Vm4NrxymfcY30UjHVD0LgSvU8kUmXxil3qhFPS7KA+
+ y7tgcKLHOkZkXMX5MLFcS9+SmrAjSBBV8omKoHNo+kfFx/dUAtz0lot8wNGmWb+NcHeKM1eb
+ nwUMOEa1uDdfZeKef/U/2uHBceY7Gc6zPZPWgXghEyQMTH2UhLgeam8yglyO+A6RXCh+s6ak
+ Wje7Vo1wGK4eYxp6pwMPJXLMsI0ii/2k3YPEJPv+yJf90MbYyQSbkTwZhrsokjQEaIfjrIk3
+ rQRjTve/J62WIO28IbY/mENuGgWehRlTAbhC4BLTZ5uYS0YMQCR7v9UGMWdNWXFyrOB6PjSu
+ Trn9MsPoUc8qI72mVpxEXQDLlrd2ijEWm7Nrf52YMD7hL6rXXuis7R6zY8WnnBhW0uCfhajx
+ q+KuARXC0sDLztcjaS3ayXonpoCPZep2Bd5xqE4Ln8/COCslP7E92W1uf1EcdXXIrx1acg21
+ H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
+ lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
+ OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
+To: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>
+Cc: "linux-leds@vger.kernel.org" <linux-leds@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>
+Subject: [PATCH] leds: trigger: netdev: add core support for hw not supporting
+ fallback to LED sw control
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Ranganatha Rao
-> Sent: Wednesday, November 29, 2023 4:35 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Laba, SlawomirX <slawomirx.laba@intel.com>; netdev@vger.kernel.org;
-> Brandeburg, Jesse <jesse.brandeburg@intel.com>; Zaki, Ahmed
-> <ahmed.zaki@intel.com>; Rao, Ranganatha <ranganatha.rao@intel.com>;
-> Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-net, v2] iavf: Fix iavf_shutdown to=
- call
-> iavf_remove instead iavf_close
->=20
-> From: Slawomir Laba <slawomirx.laba@intel.com>
->=20
-> Make the flow for pci shutdown be the same to the pci remove.
->=20
-> iavf_shutdown was implementing an incomplete version of iavf_remove. It
-> misses several calls to the kernel like iavf_free_misc_irq,
-> iavf_reset_interrupt_capability, iounmap that might break the system on
-> reboot or hibernation.
->=20
-> Implement the call of iavf_remove directly in iavf_shutdown to close this=
- gap.
->=20
-> Fixes below error messages (dmesg) during shutdown stress tests -
-> [685814.900917] ice 0000:88:00.0: MAC 02:d0:5f:82:43:5d does not exist
-> for  VF 0 [685814.900928] ice 0000:88:00.0: MAC 33:33:00:00:00:01 does
-> not exist for VF 0
->=20
-> Reproduction:
->=20
-> 1. Create one VF interface:
-> echo 1 > /sys/class/net/<interface_name>/device/sriov_numvfs
->=20
-> 2. Run live dmesg on the host:
-> dmesg -wH
->=20
-> 3. On SUT, script below steps into vf_namespace_assignment.sh
->=20
-> <#!/bin/sh> // Remove <>. Git removes # line if=3D<VF name> (edit this pe=
-r VF
-> name)
-> loop=3D0
->=20
-> while true; do
->=20
-> echo test round $loop
-> let loop++
->=20
-> ip netns add ns$loop
-> ip link set dev $if up
-> ip link set dev $if netns ns$loop
-> ip netns exec ns$loop ip link set dev $if up ip netns exec ns$loop ip lin=
-k set dev
-> $if netns 1 ip netns delete ns$loop
->=20
-> done
->=20
-> 4. Run the script for at least 1000 iterations on SUT:
-> ./vf_namespace_assignment.sh
->=20
-> Expected result:
-> No errors in dmesg.
->=20
-> Fixes: 129cf89e5856 ("iavf: rename functions and structs to new name")
-> Signed-off-by: Slawomir Laba <slawomirx.laba@intel.com>
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Reviewed-by: Ahmed Zaki <ahmed.zaki@intel.com>
-> Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-> Co-authored-by: Ranganatha Rao <ranganatha.rao@intel.com>
-> Signed-off-by: Ranganatha Rao <ranganatha.rao@intel.com>
->=20
-> ---
-> v2: Add reproduction steps in commit log
-> ---
->  drivers/net/ethernet/intel/iavf/iavf_main.c | 72 ++++++---------------
->  1 file changed, 21 insertions(+), 51 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c
-> b/drivers/net/ethernet/intel/iavf/iavf_main.c
-> index c862ebcd2e39..3c177dcd3b38 100644
-> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+If hw doesn't support sw control of the LED and we switch to a mode
+not supported by hw, currently we get lots of errors because neither
+brigthness_set() nor brithness_set_blocking() is set.
+Deal with this by not falling back to sw control, and return
+-EOPNOTSUPP to the user. Note that we still store the new mode.
+This is needed in case an intermediate unsupported mode is necessary
+to switch from one supported mode to another.
 
+Add a comment explaining how a driver for such hw is supposed to behave.
 
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/leds/trigger/ledtrig-netdev.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
+diff --git a/drivers/leds/trigger/ledtrig-netdev.c b/drivers/leds/trigger/ledtrig-netdev.c
+index d76214fa9..27f090bc8 100644
+--- a/drivers/leds/trigger/ledtrig-netdev.c
++++ b/drivers/leds/trigger/ledtrig-netdev.c
+@@ -38,6 +38,16 @@
+  * tx -  LED blinks on transmitted data
+  * rx -  LED blinks on receive data
+  *
++ * Note: If the user selects a mode that is not supported by hw, default
++ * behavior is to fall back to software control of the LED. However not every
++ * hw supports software control. LED callbacks brightness_set() and
++ * brightness_set_blocking() are NULL in this case. hw_control_is_supported()
++ * should use available means supported by hw to inform the user that selected
++ * mode isn't supported by hw. This could be switching off the LED or any
++ * hw blink mode. If software control fallback isn't possible, we return
++ * -EOPNOTSUPP to the user, but still store the selected mode. This is needed
++ * in case an intermediate unsupported mode is necessary to switch from one
++ * supported mode to another.
+  */
+ 
+ struct led_netdev_data {
+@@ -306,6 +316,7 @@ static ssize_t netdev_led_attr_store(struct device *dev, const char *buf,
+ 				     size_t size, enum led_trigger_netdev_modes attr)
+ {
+ 	struct led_netdev_data *trigger_data = led_trigger_get_drvdata(dev);
++	struct led_classdev *led_cdev = trigger_data->led_cdev;
+ 	unsigned long state, mode = trigger_data->mode;
+ 	int ret;
+ 	int bit;
+@@ -345,6 +356,10 @@ static ssize_t netdev_led_attr_store(struct device *dev, const char *buf,
+ 	trigger_data->mode = mode;
+ 	trigger_data->hw_control = can_hw_control(trigger_data);
+ 
++	if (!led_cdev->brightness_set && !led_cdev->brightness_set_blocking &&
++	    !trigger_data->hw_control)
++		return -EOPNOTSUPP;
++
+ 	set_baseline_state(trigger_data);
+ 
+ 	return size;
+-- 
+2.43.0
 
 
