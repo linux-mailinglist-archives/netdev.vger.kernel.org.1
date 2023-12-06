@@ -1,83 +1,133 @@
-Return-Path: <netdev+bounces-54547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE7378076FA
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:50:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59514807700
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:52:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F051B20B61
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:50:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1371A281D72
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:52:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3055F6ABBC;
-	Wed,  6 Dec 2023 17:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 696516DCF0;
+	Wed,  6 Dec 2023 17:52:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yf3guVuf"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zH/nzGG9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 140826A32D
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 17:50:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 91D24C433C7;
-	Wed,  6 Dec 2023 17:50:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701885025;
-	bh=zbXM14EN3sqsrCBofarpNNfTES8vUEuOP71ZWwp2E2s=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Yf3guVufWK5xJaNR4soEjxiHYEmHik47RNa1QaZ6MoyCaEbkm8b3UvEpMDvy4v9w5
-	 VP4xpy/6R2/D3XmRDdaRM+JH+t9goxqEY5D/WwG0qMnt6bYoY5Q5V9EPxBIRFJ4an3
-	 A4yzud+k1ZToTs33bRwWCho0h5nYilj2/HHnvHHkyHpXX6G6Zg0oQ0Q4wXv7sGXVvf
-	 wPRBsj9bQ1tVA0OXJyMnx98S0AWpQQVsapO5M+wYyUX+YfRt4EQbaI988DJhbag0V/
-	 PyTa36KRdbUg7IT4y/d1dtVaBMRxrR/BTKySHzjxPNLI2RNEIJ4VdYRQP6if5ew2+W
-	 c20JN3RCQW/Vg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 75BDEDD4EEE;
-	Wed,  6 Dec 2023 17:50:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 023F9D5A;
+	Wed,  6 Dec 2023 09:52:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=xtEyYJ2fL6Bd/0ZQMBJdBd4JHYGCVwVdwTisB+sS+6c=; b=zH/nzGG9C8Rq19EuObrG0yz4pf
+	R93eD9OUVT4C3HY1QMdnol7HJPeIhWZROomiVjeEA5vOZl+0VpkragNpePVgochBymEUcb4tqXCE3
+	+cjT7SYIHITZerFDewzgXH17u0OEX74lJJgr1l0RhzVh/6LqsKCJhwiwCF7e2roBz4pIBnMbfKqer
+	rsm1nvLceBhbmqXohGYuaIJpwIMyIwAia2po95HwUoKD2VVBzltSdO2VPi64RXLRe2cWd+jlWTZg7
+	LkNLQNz1yJGIvo73+eEPhriyAPciIpXk+54b0oGxPr5VdsfZ3ol0O1LZA6f3oOXKHIkbRLhsIHA6d
+	4E4Aed3w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45446)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rAw3e-0000CW-1J;
+	Wed, 06 Dec 2023 17:51:38 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rAw3a-0002uY-MH; Wed, 06 Dec 2023 17:51:34 +0000
+Date: Wed, 6 Dec 2023 17:51:34 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chunfeng Yun <chunfeng.yun@mediatek.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexander Couzens <lynxis@fe80.eu>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org
+Subject: Re: [RFC PATCH v2 3/8] net: pcs: pcs-mtk-lynxi: add platform driver
+ for MT7988
+Message-ID: <ZXC0pq2C6iRmeF4B@shell.armlinux.org.uk>
+References: <cover.1701826319.git.daniel@makrotopia.org>
+ <68bb81ac6bf99393c8de256f42e5715626590af8.1701826319.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] ss: prevent "Process" column from being printed unless
- requested
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170188502547.4762.12538306262617961469.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Dec 2023 17:50:25 +0000
-References: <20231206111444.191173-1-qde@naccy.de>
-In-Reply-To: <20231206111444.191173-1-qde@naccy.de>
-To: Quentin Deslandes <qde@naccy.de>
-Cc: netdev@vger.kernel.org, dsahern@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <68bb81ac6bf99393c8de256f42e5715626590af8.1701826319.git.daniel@makrotopia.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello:
+On Wed, Dec 06, 2023 at 01:44:17AM +0000, Daniel Golle wrote:
+> +struct phylink_pcs *mtk_pcs_lynxi_select_pcs(struct device_node *np, phy_interface_t mode)
+> +{
+> +	struct platform_device *pdev;
+> +	struct mtk_pcs_lynxi *mpcs;
+> +
+> +	if (!np)
+> +		return NULL;
+> +
+> +	if (!of_device_is_available(np))
+> +		return ERR_PTR(-ENODEV);
+> +
+> +	if (!of_match_node(mtk_pcs_lynxi_of_match, np))
+> +		return ERR_PTR(-EINVAL);
+> +
+> +	pdev = of_find_device_by_node(np);
+> +	if (!pdev || !platform_get_drvdata(pdev)) {
+> +		if (pdev)
+> +			put_device(&pdev->dev);
+> +		return ERR_PTR(-EPROBE_DEFER);
+> +	}
+> +
+> +	mpcs = platform_get_drvdata(pdev);
+> +	put_device(&pdev->dev);
+> +
+> +	return &mpcs->pcs;
+> +}
+> +EXPORT_SYMBOL(mtk_pcs_lynxi_select_pcs);
 
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+If you're going to play games like this, then you must mark the driver
+with .suppress_bind_attrs = true to remove the bind/unbind attributes
+in userspace that could wreak havoc with the above - because there is
+_nothing_ that guarantees that the memory you're returning from this
+function will remain intact. Basically, it's racy.
 
-On Wed, 6 Dec 2023 12:14:44 +0100 you wrote:
-> Commit 5883c6eba517 ("ss: show header for --processes/-p") added
-> "Process" to the list of columns printed by ss. However, the "Process"
-> header is now printed even if --processes/-p is not used.
-> 
-> This change aims to fix this by moving the COL_PROC column ID to the same
-> index as the corresponding column structure in the columns array, and
-> enabling it if --processes/-p is used.
-> 
-> [...]
+Also, I'm not sure I approve of using the "select_pcs" suffix (I
+haven't spotted _where_ you use this, but returning EPROBE_DEFER to
+phylink's mac_select_pcs() method doesn't do anything to defer any
+probe, so that's an entirely misleading error code.
 
-Here is the summary with links:
-  - ss: prevent "Process" column from being printed unless requested
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=1607bf531fd2
+If we are going to have device drivers for PCS, then we need to
+seriously think about how we look up PCS and return the phylink_pcs
+pointer - and also how we handle the PCS device going away. None of
+that should be coded into _any_ PCS driver.
 
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
