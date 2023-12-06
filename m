@@ -1,83 +1,94 @@
-Return-Path: <netdev+bounces-54340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37397806B10
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:50:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74896806B12
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:52:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FE901C20B99
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 09:50:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA67DB20CE9
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 09:52:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26E3288A7;
-	Wed,  6 Dec 2023 09:50:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cwXPedNz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577A21A725;
+	Wed,  6 Dec 2023 09:52:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E58241F4;
-	Wed,  6 Dec 2023 09:50:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F2E84C433C9;
-	Wed,  6 Dec 2023 09:50:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701856224;
-	bh=IYirpk9Zuv663jhWbzf8HfLvsoJDvN1k0rophts0q9I=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cwXPedNz3opDAYq+xJxJX5vFliJiGNkcoW/FuI4Eu/irzT1TJhylZSClp1303uG8K
-	 kQPtsVJwbzgvtRXW3V5hPt/zN+r91cJQEis9DkeJChu3YulKX6JhTaFtFwoJCfSJNb
-	 EozKE+WLvtn70OufSSfIy9Lpi7ZeZKmRsl8+e17Fk03jAxtdaTPx0bT6V8o0wjyUxI
-	 tCKxRJH/6TSVfeX2Fuv4OOLqE+mfnxWVRDegzg8bRZjvxFeQN8EoSvghdMfwyCMd30
-	 dt7ZboR+t4LO8bzXNOzyO1MZCQp7GrFn72f3N9ID39zvI9DwVvA2B10TBi8Zm5td7t
-	 y0MpcIDTbOtkQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DC267DD4F1F;
-	Wed,  6 Dec 2023 09:50:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+X-Greylist: delayed 97236 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 06 Dec 2023 01:52:01 PST
+Received: from bg5.exmail.qq.com (bg5.exmail.qq.com [43.154.197.177])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E11E5B9
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 01:52:01 -0800 (PST)
+X-QQ-mid: bizesmtp90t1701856252tl7hy36d
+Received: from dsp-duanqiangwen.trustnetic.com ( [115.204.154.156])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 06 Dec 2023 17:50:50 +0800 (CST)
+X-QQ-SSF: 01400000000000D0E000000A0000000
+X-QQ-FEAT: np1AzCldIqFKRGpuWr7VSKNtYQB0NbIuyjelGrJutp/oZyovYwfLIX6NqH7dP
+	QD/t1fQtN6k1xJ0ErKWuboucKm2iXxTc0iZlRX4bQRXF7AjnI2rg82JXopIhErSKeqh6Ugn
+	naizoZhXuB9MSulI5aEuc3SGOgNPQdblYqAaQomCSeLd9o9QkZ6+PBEITBcMyUyyg5W+ky0
+	b80MsdjUWUpsMMEJIFaPfQ+bacKV7lskNFx5MNrPeKMPERXoL2IXq+TrMEM+d83+X/YOJTb
+	67VfxK6YOJ3RUrcNoL+XwJA9IPrKEj94C9eIP31nzxpvH/zrdtCc4dCl3OVZXEhcFGiGYc/
+	MY9rArlufdupKrlokXtuNjeBWaPeVjqJ6O0KSeDxAcnkLvCx65QgE8wWp7PQjsVmrq2WTnA
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 4584648233011343514
+From: duanqiangwen <duanqiangwen@net-swift.com>
+To: netdev@vger.kernel.org,
+	kuba@kernel.org,
+	mengyuanlou@net-swift.com,
+	jiawenwu@trustnetic.com,
+	davem@davemloft.net,
+	andrew@lunn.ch,
+	bhelgaas@google.com,
+	maciej.fijalkowski@intel.com
+Cc: duanqiangwen <duanqiangwen@net-swift.com>
+Subject: [PATCH net] net: wangxun: fix changing mac failed when running
+Date: Wed,  6 Dec 2023 17:50:44 +0800
+Message-Id: <20231206095044.17844-1-duanqiangwen@net-swift.com>
+X-Mailer: git-send-email 2.12.2.windows.1
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrsz:qybglogicsvrsz3a-1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] r8152: add vendor/device ID pair for ASUS USB-C2500
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170185622389.11676.14511333566632987056.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Dec 2023 09:50:23 +0000
-References: <20231203011712.6314-1-kelly@hawknetworks.com>
-In-Reply-To: <20231203011712.6314-1-kelly@hawknetworks.com>
-To: Kelly Kane <kelly@hawknetworks.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
 
-Hello:
+in some bonding mode, service need to change mac when
+netif is running. Wangxun netdev add IFF_LIVE_ADDR_CHANGE
+priv_flag to support it.
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Fixes: 79625f45ca73 ("net: wangxun: Move MAC address handling to libwx")
 
-On Sat,  2 Dec 2023 17:17:12 -0800 you wrote:
-> The ASUS USB-C2500 is an RTL8156 based 2.5G Ethernet controller.
-> 
-> Add the vendor and product ID values to the driver. This makes Ethernet
-> work with the adapter.
-> 
-> Signed-off-by: Kelly Kane <kelly@hawknetworks.com>
-> 
-> [...]
+Signed-off-by: duanqiangwen <duanqiangwen@net-swift.com>
+---
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c   | 1 +
+ drivers/net/ethernet/wangxun/txgbe/txgbe_main.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-Here is the summary with links:
-  - r8152: add vendor/device ID pair for ASUS USB-C2500
-    https://git.kernel.org/netdev/net/c/7037d95a047c
-
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+index 8db804543e66..a5c623fd023e 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+@@ -582,6 +582,7 @@ static int ngbe_probe(struct pci_dev *pdev,
+ 
+ 	netdev->priv_flags |= IFF_UNICAST_FLT;
+ 	netdev->priv_flags |= IFF_SUPP_NOFCS;
++	netdev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
+ 
+ 	netdev->min_mtu = ETH_MIN_MTU;
+ 	netdev->max_mtu = WX_MAX_JUMBO_FRAME_SIZE -
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+index 526250102db2..a78da2309db5 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+@@ -638,6 +638,7 @@ static int txgbe_probe(struct pci_dev *pdev,
+ 
+ 	netdev->priv_flags |= IFF_UNICAST_FLT;
+ 	netdev->priv_flags |= IFF_SUPP_NOFCS;
++	netdev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
+ 
+ 	netdev->min_mtu = ETH_MIN_MTU;
+ 	netdev->max_mtu = WX_MAX_JUMBO_FRAME_SIZE -
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.12.2.windows.1
 
 
