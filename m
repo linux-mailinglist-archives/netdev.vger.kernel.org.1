@@ -1,134 +1,217 @@
-Return-Path: <netdev+bounces-54348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94AD5806B33
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 11:01:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A0B3806B27
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:58:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C59BD1C209CD
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:01:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8BF21C20981
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 09:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA4ED28E3F;
-	Wed,  6 Dec 2023 10:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E28961DFF4;
+	Wed,  6 Dec 2023 09:58:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="E4sSHAHN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B5CCD4F
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 02:01:01 -0800 (PST)
-X-QQ-mid: bizesmtp87t1701856773t9lbp94d
-Received: from wxdbg.localdomain.com ( [115.204.154.156])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 06 Dec 2023 17:59:32 +0800 (CST)
-X-QQ-SSF: 01400000000000L0Z000000A0000000
-X-QQ-FEAT: 3VVObL39cqTzmYYO2GLF2rU6UJEWfcXZ/DiqQX008uDwCjdnBpQwtf32W/2dt
-	ExkqmIE5Ln9KFcq/E5RSI83HMi7vhw9mVdfXHyq++ykOa4ECiQyOLJU0F68am8Djm1TsjAb
-	WjnC6wSfchQKk67ZbpVqsbwXba0wSpPPRKK6AVYkMv+7QsWCjbFaDIE3BzbkMANcRr2esGa
-	UeaUjlUYxiaezDdCNfeyqxrov1bedIHhPxTN5pQfvVLjyoacI4zrmBgn5HeWtg1stR8OOZ1
-	Y3mnRmCpDRbgruAbXcuLBaVegm7vasvVH27VV/xblNsBzOMFWVTAqO6NnP0jK1jN2P9ddA/
-	jDKwLypdbT3q7lAXfERTEDsNHluaBLCWhs22BydFtfUXV3l99YftL9IngVWMTddw9aj7rtF
-	3Q1l8mSiV+YI0aDhwW+HzA==
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 16637623331100390454
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	andrew@lunn.ch,
-	netdev@vger.kernel.org
-Cc: mengyuanlou@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v3 7/7] net: wangxun: add ethtool_ops for msglevel
-Date: Wed,  6 Dec 2023 17:53:55 +0800
-Message-Id: <20231206095355.1220086-8-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20231206095355.1220086-1-jiawenwu@trustnetic.com>
-References: <20231206095355.1220086-1-jiawenwu@trustnetic.com>
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66CFFFA;
+	Wed,  6 Dec 2023 01:58:46 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3BB97240008;
+	Wed,  6 Dec 2023 09:58:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1701856724;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dasdfMtvb5/6F6Xl6tXdAQvmSib+B8MTu7AZcbGRRpI=;
+	b=E4sSHAHNbk/P25tK9GlNW898yfNEPsTTCpuSOrvNg3FDLAQa5H2MB8BRBjjdZkmc8iyIaA
+	b6odeZBloX3O6K431Gft6l8bCm/hcnvr2+z/XM6Lahwsh4AtTFk85mbSpf7X6rzHKvMVt6
+	3umP9OEFpwaUVhEVEAcTVj0ieLjeJiNgKnvgJ0VctBblzzer+uzeuVxsOuDH5U9LF9cI2Q
+	zzti/EjMfrFKZsIUnuinTx9zodpPb9o4h+HfB7PROhWn5RHP3LpKUYtFXinRhxwNKJWX1+
+	/fEfRmLP4XlanmKXIT1XLFJfuEOYBwF14EvjJt38ClTdAVVQVxjpVi8R93acjg==
+Date: Wed, 6 Dec 2023 10:58:38 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>,
+ Kishon Vijay Abraham I <kishon@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+ John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>, Mark
+ Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Alexander Couzens <lynxis@fe80.eu>, Qingfang Deng
+ <dqfext@gmail.com>, SkyLake Huang <SkyLake.Huang@mediatek.com>, Philipp
+ Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ linux-phy@lists.infradead.org
+Subject: Re: [RFC PATCH v2 5/8] net: pcs: add driver for MediaTek USXGMII
+ PCS
+Message-ID: <20231206105838.069ae288@device.home>
+In-Reply-To: <3cd8af5e44554c2db2d7898494ee813967206bd9.1701826319.git.daniel@makrotopia.org>
+References: <cover.1701826319.git.daniel@makrotopia.org>
+	<3cd8af5e44554c2db2d7898494ee813967206bd9.1701826319.git.daniel@makrotopia.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Add support to get and set msglevel for driver txgbe and ngbe.
+Hello Daniel,
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
- drivers/net/ethernet/wangxun/libwx/wx_ethtool.c  | 16 ++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_ethtool.h  |  2 ++
- drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c |  2 ++
- .../net/ethernet/wangxun/txgbe/txgbe_ethtool.c   |  2 ++
- 4 files changed, 22 insertions(+)
+On Wed, 6 Dec 2023 01:44:38 +0000
+Daniel Golle <daniel@makrotopia.org> wrote:
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-index 864c1ba78365..bc34b1d7fc0a 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-@@ -414,3 +414,19 @@ int wx_set_channels(struct net_device *dev,
- 	return 0;
- }
- EXPORT_SYMBOL(wx_set_channels);
-+
-+u32 wx_get_msglevel(struct net_device *netdev)
-+{
-+	struct wx *wx = netdev_priv(netdev);
-+
-+	return wx->msg_enable;
-+}
-+EXPORT_SYMBOL(wx_get_msglevel);
-+
-+void wx_set_msglevel(struct net_device *netdev, u32 data)
-+{
-+	struct wx *wx = netdev_priv(netdev);
-+
-+	wx->msg_enable = data;
-+}
-+EXPORT_SYMBOL(wx_set_msglevel);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-index ec4ad84c03b9..600c3b597d1a 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-@@ -38,4 +38,6 @@ void wx_get_channels(struct net_device *dev,
- 		     struct ethtool_channels *ch);
- int wx_set_channels(struct net_device *dev,
- 		    struct ethtool_channels *ch);
-+u32 wx_get_msglevel(struct net_device *netdev);
-+void wx_set_msglevel(struct net_device *netdev, u32 data);
- #endif /* _WX_ETHTOOL_H_ */
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-index 8c7bcd9dbfe1..c0297172f506 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-@@ -123,6 +123,8 @@ static const struct ethtool_ops ngbe_ethtool_ops = {
- 	.set_coalesce		= wx_set_coalesce,
- 	.get_channels		= wx_get_channels,
- 	.set_channels		= ngbe_set_channels,
-+	.get_msglevel		= wx_get_msglevel,
-+	.set_msglevel		= wx_set_msglevel,
- };
- 
- void ngbe_set_ethtool_ops(struct net_device *netdev)
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-index fb499ea72991..e377ae61a543 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-@@ -87,6 +87,8 @@ static const struct ethtool_ops txgbe_ethtool_ops = {
- 	.set_coalesce		= wx_set_coalesce,
- 	.get_channels		= wx_get_channels,
- 	.set_channels		= txgbe_set_channels,
-+	.get_msglevel		= wx_get_msglevel,
-+	.set_msglevel		= wx_set_msglevel,
- };
- 
- void txgbe_set_ethtool_ops(struct net_device *netdev)
--- 
-2.27.0
+> Add driver for USXGMII PCS found in the MediaTek MT7988 SoC and supporting
+> USXGMII, 10GBase-R and 5GBase-R interface modes. In order to support
+> Cisco SGMII, 1000Base-X and 2500Base-X via the also present LynxI PCS
+> create a wrapped PCS taking care of the components shared between the
+> new USXGMII PCS and the legacy LynxI PCS.
+> 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
 
+[...]
+
+> +
+> +static int mtk_usxgmii_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+> +				  phy_interface_t interface,
+> +				  const unsigned long *advertising,
+> +				  bool permit_pause_to_mac)
+> +{
+> +	struct mtk_usxgmii_pcs *mpcs = pcs_to_mtk_usxgmii_pcs(pcs);
+> +	unsigned int an_ctrl = 0, link_timer = 0, xfi_mode = 0, adapt_mode = 0;
+> +	bool mode_changed = false;
+
+Reverse christmas tree ordering can be used here (longest lines first)
+
+> +
+> +	if (interface == PHY_INTERFACE_MODE_USXGMII) {
+> +		an_ctrl = FIELD_PREP(USXGMII_AN_SYNC_CNT, 0x1FF) | USXGMII_AN_ENABLE;
+> +		link_timer = FIELD_PREP(USXGMII_LINK_TIMER_IDLE_DETECT, 0x7B) |
+> +			     FIELD_PREP(USXGMII_LINK_TIMER_COMP_ACK_DETECT, 0x7B) |
+> +			     FIELD_PREP(USXGMII_LINK_TIMER_AN_RESTART, 0x7B);
+> +		xfi_mode = FIELD_PREP(USXGMII_XFI_RX_MODE, USXGMII_XFI_MODE_10G) |
+> +			   FIELD_PREP(USXGMII_XFI_TX_MODE, USXGMII_XFI_MODE_10G);
+> +	} else if (interface == PHY_INTERFACE_MODE_10GBASER) {
+> +		an_ctrl = FIELD_PREP(USXGMII_AN_SYNC_CNT, 0x1FF);
+> +		link_timer = FIELD_PREP(USXGMII_LINK_TIMER_IDLE_DETECT, 0x7B) |
+> +			     FIELD_PREP(USXGMII_LINK_TIMER_COMP_ACK_DETECT, 0x7B) |
+> +			     FIELD_PREP(USXGMII_LINK_TIMER_AN_RESTART, 0x7B);
+> +		xfi_mode = FIELD_PREP(USXGMII_XFI_RX_MODE, USXGMII_XFI_MODE_10G) |
+> +			   FIELD_PREP(USXGMII_XFI_TX_MODE, USXGMII_XFI_MODE_10G);
+> +		adapt_mode = USXGMII_RATE_UPDATE_MODE;
+> +	} else if (interface == PHY_INTERFACE_MODE_5GBASER) {
+> +		an_ctrl = FIELD_PREP(USXGMII_AN_SYNC_CNT, 0xFF);
+> +		link_timer = FIELD_PREP(USXGMII_LINK_TIMER_IDLE_DETECT, 0x3D) |
+> +			     FIELD_PREP(USXGMII_LINK_TIMER_COMP_ACK_DETECT, 0x3D) |
+> +			     FIELD_PREP(USXGMII_LINK_TIMER_AN_RESTART, 0x3D);
+> +		xfi_mode = FIELD_PREP(USXGMII_XFI_RX_MODE, USXGMII_XFI_MODE_5G) |
+> +			   FIELD_PREP(USXGMII_XFI_TX_MODE, USXGMII_XFI_MODE_5G);
+> +		adapt_mode = USXGMII_RATE_UPDATE_MODE;
+> +	} else {
+> +		return -EINVAL;
+> +	}
+> +
+> +	adapt_mode |= FIELD_PREP(USXGMII_RATE_ADAPT_MODE, USXGMII_RATE_ADAPT_MODE_X1);
+> +
+> +	if (mpcs->interface != interface) {
+> +		mpcs->interface = interface;
+> +		mode_changed = true;
+> +	}
+> +
+> +	mtk_usxgmii_reset(mpcs);
+> +
+> +	/* Setup USXGMII AN ctrl */
+> +	mtk_m32(mpcs, RG_PCS_AN_CTRL0,
+> +		USXGMII_AN_SYNC_CNT | USXGMII_AN_ENABLE,
+> +		an_ctrl);
+> +
+> +	mtk_m32(mpcs, RG_PCS_AN_CTRL2,
+> +		USXGMII_LINK_TIMER_IDLE_DETECT |
+> +		USXGMII_LINK_TIMER_COMP_ACK_DETECT |
+> +		USXGMII_LINK_TIMER_AN_RESTART,
+> +		link_timer);
+> +
+> +	mpcs->neg_mode = neg_mode;
+> +
+> +	/* Gated MAC CK */
+> +	mtk_m32(mpcs, RG_PHY_TOP_SPEED_CTRL1,
+> +		USXGMII_MAC_CK_GATED, USXGMII_MAC_CK_GATED);
+> +
+> +	/* Enable interface force mode */
+> +	mtk_m32(mpcs, RG_PHY_TOP_SPEED_CTRL1,
+> +		USXGMII_IF_FORCE_EN, USXGMII_IF_FORCE_EN);
+> +
+> +	/* Setup USXGMII adapt mode */
+> +	mtk_m32(mpcs, RG_PHY_TOP_SPEED_CTRL1,
+> +		USXGMII_RATE_UPDATE_MODE | USXGMII_RATE_ADAPT_MODE,
+> +		adapt_mode);
+> +
+> +	/* Setup USXGMII speed */
+> +	mtk_m32(mpcs, RG_PHY_TOP_SPEED_CTRL1,
+> +		USXGMII_XFI_RX_MODE | USXGMII_XFI_TX_MODE,
+> +		xfi_mode);
+> +
+> +	usleep_range(1, 10);
+> +
+> +	/* Un-gated MAC CK */
+> +	mtk_m32(mpcs, RG_PHY_TOP_SPEED_CTRL1, USXGMII_MAC_CK_GATED, 0);
+> +
+> +	usleep_range(1, 10);
+> +
+> +	/* Disable interface force mode for the AN mode */
+> +	if (an_ctrl & USXGMII_AN_ENABLE)
+> +		mtk_m32(mpcs, RG_PHY_TOP_SPEED_CTRL1, USXGMII_IF_FORCE_EN, 0);
+> +
+> +	return mode_changed;
+> +}
+> +
+
+[...]
+
+> +static void mtk_usxgmii_pcs_get_state(struct phylink_pcs *pcs,
+> +				      struct phylink_link_state *state)
+> +{
+> +	struct mtk_usxgmii_pcs *mpcs = pcs_to_mtk_usxgmii_pcs(pcs);
+> +
+> +	/* Refresh USXGMII link status by toggling RG_PCS_AN_STATUS_UPDATE */
+> +	mtk_m32(mpcs, RG_PCS_RX_STATUS0, RG_PCS_RX_STATUS_UPDATE,
+> +		RG_PCS_RX_STATUS_UPDATE);
+> +	ndelay(1020);
+> +	mtk_m32(mpcs, RG_PCS_RX_STATUS0, RG_PCS_RX_STATUS_UPDATE, 0);
+> +	ndelay(1020);
+> +
+> +	/* Read USXGMII link status */
+> +	state->link = FIELD_GET(RG_PCS_RX_LINK_STATUS,
+> +				mtk_r32(mpcs, RG_PCS_RX_STATUS0));
+> +
+> +	/* Continuously repeat re-configuration sequence until link comes up */
+> +	if (!state->link) {
+> +		mtk_usxgmii_pcs_config(pcs, mpcs->neg_mode,
+> +				       state->interface, NULL, false);
+> +		return;
+
+.pcs_get_state() isn't called only for link state polling,but also when querying
+the link state from ethtool, from phylink_ethtool_ksettings_get().
+
+As mtk_usxgmii_pcs_config triggers a pcs reset and reconfiguration, won't this disrupt
+the link ? 
+
+Thanks,
+
+Maxime
 
