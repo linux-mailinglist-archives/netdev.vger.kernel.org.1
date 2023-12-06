@@ -1,79 +1,235 @@
-Return-Path: <netdev+bounces-54236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96C0980659D
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 04:23:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAC468065A4
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 04:29:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 493571F21188
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 03:23:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A715B282004
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 03:29:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC0AECA7B;
-	Wed,  6 Dec 2023 03:23:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fzZ+bX6/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B556D267;
+	Wed,  6 Dec 2023 03:29:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CADF9CA69
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 03:23:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFF90C433C8;
-	Wed,  6 Dec 2023 03:23:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701833028;
-	bh=0icMTsZffc3HsofoVIIMmjh5hP1g6SqIcxw749v3E9E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fzZ+bX6/C+v8bCMDCwhFV48Ta3s6YrX5ZoYHymZP8IlclkW0Izsp085wVdQC2s9vc
-	 AOav5FbkiRVeDUNao10HWQA23RJLyYwlKSAnHU6l5IxwhujVyewsDCCbwgj3A3IIRf
-	 Jj2Cr+YtK+g4aIP0P4Q4+gWb7i/KBqVuL2TzfUNBREmRm8tPQBG1pktUVn0phmOu52
-	 /9w6j+vjmv7vPkVNa4eyiOJbLXg84YlBRyUSDq/ym45PgDBzXRal2jZCI+ShRk70hH
-	 Hu5iGt2dR6vzctYiaW3z5/iLro2p2/T/+7wGmGqil8b6X9hd2o6c5sXeKgpC80L8Xx
-	 mjGyYUK4FSiig==
-Date: Tue, 5 Dec 2023 19:23:46 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: Arnd Bergmann <arnd@kernel.org>, Yisen Zhuang <yisen.zhuang@huawei.com>,
- Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Hao Chen
- <chenhao418@huawei.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] [v2] net: hns3: reduce stack usage in
- hclge_dbg_dump_tm_pri()
-Message-ID: <20231205192346.4409ee16@kernel.org>
-In-Reply-To: <7df7cfcb-d39b-4643-a378-a18b8d2b5b35@huawei.com>
-References: <20231204085735.4112882-1-arnd@kernel.org>
-	<7df7cfcb-d39b-4643-a378-a18b8d2b5b35@huawei.com>
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C744CD5F;
+	Tue,  5 Dec 2023 19:28:58 -0800 (PST)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3B63SWmuC3311098, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3B63SWmuC3311098
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 6 Dec 2023 11:28:32 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Wed, 6 Dec 2023 11:28:33 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Wed, 6 Dec 2023 11:28:32 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7%5]) with mapi id
+ 15.01.2375.007; Wed, 6 Dec 2023 11:28:32 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "andrew@lunn.ch"
+	<andrew@lunn.ch>, Ping-Ke Shih <pkshih@realtek.com>,
+        Larry Chiu
+	<larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v13 01/13] rtase: Add pci table supported in this module
+Thread-Topic: [PATCH net-next v13 01/13] rtase: Add pci table supported in
+ this module
+Thread-Index: AQHaI4J1hYqre02tzkGBvHQzDpC7MLCU5PoAgAV9LKA=
+Date: Wed, 6 Dec 2023 03:28:32 +0000
+Message-ID: <ae4807e31b53452ebf176098d95cf1fb@realtek.com>
+References: <20231130114327.1530225-1-justinlai0215@realtek.com>
+	<20231130114327.1530225-2-justinlai0215@realtek.com>
+ <20231201203602.7e380716@kernel.org>
+In-Reply-To: <20231201203602.7e380716@kernel.org>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-kse-serverinfo: RTEXMBS03.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-On Mon, 4 Dec 2023 22:50:55 +0800 Jijie Shao wrote:
-> >   static int hclge_dbg_dump_tm_pri(struct hclge_dev *hdev, char *buf, int len)
-> >   {
-> > -	char data_str[ARRAY_SIZE(tm_pri_items)][HCLGE_DBG_DATA_STR_LEN];
-> > +	char *data_str;  
-> 
-> We want to define variables in an inverted triangle based on the code length.
-> so, "char *data_str" should move four lines down.
-> 
->    	struct hclge_tm_shaper_para c_shaper_para, p_shaper_para;
-> 	char *result[ARRAY_SIZE(tm_pri_items)], *sch_mode_str;
-> 	char content[HCLGE_DBG_TM_INFO_LEN];
-> 	u8 pri_num, sch_mode, weight, i, j;
-> 	char *data_str;
-> 	int pos, ret;
+> On Thu, 30 Nov 2023 19:43:15 +0800 Justin Lai wrote:
+> > +#include <linux/crc32.h>
+> > +#include <linux/dma-mapping.h>
+> > +#include <linux/etherdevice.h>
+> > +#include <linux/if_vlan.h>
+> > +#include <linux/in.h>
+> > +#include <linux/init.h>
+> > +#include <linux/interrupt.h>
+> > +#include <linux/io.h>
+> > +#include <linux/iopoll.h>
+> > +#include <linux/ip.h>
+> > +#include <linux/ipv6.h>
+> > +#include <linux/mdio.h>
+> > +#include <linux/module.h>
+> > +#include <linux/moduleparam.h>
+>=20
+> I don't see module params, please trim the includes.
 
-I took the liberty of fixing this when applying.
-Don't want this to fall thru the cracks.
+Thanks, I will remove it.
 
-Applied to net-next now, thanks!
+>=20
+> > +#include <linux/netdevice.h>
+> > +#include <linux/pci.h>
+> > +#include <linux/pm_runtime.h>
+> > +#include <linux/prefetch.h>
+> > +#include <linux/rtnetlink.h>
+> > +#include <linux/tcp.h>
+> > +#include <asm/irq.h>
+> > +#include <net/ip6_checksum.h>
+> > +#include <net/page_pool/helpers.h>
+> > +#include <net/pkt_cls.h>
+>=20
+> > +static void rtase_get_mac_address(struct net_device *dev) {
+> > +     struct rtase_private *tp =3D netdev_priv(dev);
+> > +     u8 mac_addr[ETH_ALEN] __aligned(2) =3D {};
+> > +     u32 i;
+> > +
+> > +     for (i =3D 0; i < ETH_ALEN; i++)
+> > +             mac_addr[i] =3D rtase_r8(tp, RTASE_MAC0 + i);
+> > +
+> > +     if (!is_valid_ether_addr(mac_addr)) {
+> > +             eth_random_addr(mac_addr);
+> > +             dev->addr_assign_type =3D NET_ADDR_RANDOM;
+>=20
+> eth_hw_addr_random()
+
+I will use this function instead for this part.
+
+>=20
+> > +             netdev_warn(dev, "Random ether addr %pM\n",
+> mac_addr);
+> > +     }
+> > +
+> > +     eth_hw_addr_set(dev, mac_addr);
+> > +     rtase_rar_set(tp, mac_addr);
+> > +
+> > +     ether_addr_copy(dev->perm_addr, dev->dev_addr);
+>=20
+> Should it be perm if it's random?
+
+No, I will modify this part.
+
+>=20
+> > +}
+> > +
+> > +static void rtase_reset_interrupt(struct pci_dev *pdev,
+> > +                               const struct rtase_private *tp) {
+> > +     if (tp->sw_flag & SWF_MSIX_ENABLED)
+> > +             pci_disable_msix(pdev);
+> > +     else
+> > +             pci_disable_msi(pdev);
+> > +}
+> > +
+> > +static int rtase_alloc_msix(struct pci_dev *pdev, struct
+> > +rtase_private *tp) {
+> > +     int ret;
+> > +     u16 i;
+> > +
+> > +     memset(tp->msix_entry, 0x0, RTASE_NUM_MSIX * sizeof(struct
+> > + msix_entry));
+> > +
+> > +     for (i =3D 0; i < RTASE_NUM_MSIX; i++)
+> > +             tp->msix_entry[i].entry =3D i;
+> > +
+> > +     ret =3D pci_enable_msix_range(pdev, tp->msix_entry, tp->int_nums,
+> > +                                 tp->int_nums);
+>=20
+> pci_enable_msix_exact()
+
+Thanks, I will use this function instead.
+
+>=20
+> > +     if (ret =3D=3D tp->int_nums) {
+> > +             for (i =3D 0; i < tp->int_nums; i++) {
+> > +                     tp->int_vector[i].irq =3D pci_irq_vector(pdev, i)=
+;
+> > +                     tp->int_vector[i].status =3D 1;
+> > +             }
+> > +     }
+> > +
+> > +     return ret;
+> > +}
+>=20
+> > +     if (!dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64)))
+> > +             dev->features |=3D NETIF_F_HIGHDMA;
+> > +     else if (dma_set_mask_and_coherent(&pdev->dev,
+> DMA_BIT_MASK(32)))
+> > +             goto err_out_free_res;
+> > +     else
+> > +             dev_info(&pdev->dev, "DMA_BIT_MASK: 32\n");
+>=20
+> This dance is unnecessary, see https://lkml.org/lkml/2021/6/7/398
+
+Thank you for providing this information, I will remove the 32-bit part.
+
+>=20
+> > +     dev->tstats =3D netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
+> > +     if (!dev->tstats)
+> > +             goto err_out_1;
+>=20
+> Please use dev->pcpu_stat_type
+> Set it before register and core will allocate stats for you.
+
+Thanks for your suggestion, I will allocate stats by setting dev->pcpu_stat=
+_type.
+
+>=20
+> > +     ret =3D register_netdev(dev);
+> > +     if (ret !=3D 0)
+> > +             goto err_out;
+> > +
+> > +     netdev_dbg(dev, "%pM, IRQ %d\n", dev->dev_addr, dev->irq);
+> > +
+> > +     netif_carrier_off(dev);
+>=20
+> Should be before register_netdev().
+=20
+Ok, I will do that.
+
+>=20
+> > +     goto out;
+>=20
+> Just return 0...
+
+I will modify it.
+
+>=20
+> > +static void rtase_remove_one(struct pci_dev *pdev) {
+> > +     struct net_device *dev =3D pci_get_drvdata(pdev);
+> > +     struct rtase_private *tp =3D netdev_priv(dev);
+> > +     struct rtase_int_vector *ivec;
+> > +     u32 i;
+> > +
+> > +     for (i =3D 0; i < tp->int_nums; i++) {
+> > +             ivec =3D &tp->int_vector[i];
+> > +             netif_napi_del(&ivec->napi);
+>=20
+> NAPI instances should be added on ndo_open()
+
+Do you want me to call netif_napi_add() in the .ndo_open function, and neti=
+f_napi_del() in the .ndo_stop function?
+However, I saw that many drivers do it in probe and remove. What is the pur=
+pose of doing this in .ndo_open and .ndo_stop?
 
