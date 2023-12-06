@@ -1,90 +1,193 @@
-Return-Path: <netdev+bounces-54267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 340E5806619
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 05:20:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A592806624
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 05:24:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB2C0B2127B
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 04:20:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 960E1B211FE
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 04:24:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CEEAFBF1;
-	Wed,  6 Dec 2023 04:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B155FC1A;
+	Wed,  6 Dec 2023 04:24:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dsawhQ4o"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jhSbLp3q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA83FBE7
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 04:20:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C219DC433C9;
-	Wed,  6 Dec 2023 04:20:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701836424;
-	bh=AxK5xqBDUT44KxIo/AG3pwfrXhHcBsRIjRWsKWf6zLc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dsawhQ4o83eaP2eHa78PPWEkglBLLD558Y9YLJijNWP8tWMRWPd5/ern8BD50//sI
-	 IsJu/Q5bYYJLlUwztBJ1txuU/sA30Wz2Wqt74ej2cieiDBtdtUX3ya9Rxg/R4sXwGL
-	 990cKJrB6n5/B7yLe+q8uxME7puL39vfntoOGWmhikiBARAqVmke5zQ1XBaqhR63AK
-	 NcgOazKTYheqsNJhdoeuEG2uOmCq/3AYySaocXDQp/VARtPGNM6xwUz+IP7J0m/Qnf
-	 p3p2m3EPrDqj5QTX1eKs89UNpkebHbbKXMhbu2GqvRyU9Sh+vKJ79PV6Hm8EifiXzs
-	 4nPBs4EfdJjXw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AA661C395F1;
-	Wed,  6 Dec 2023 04:20:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0A5ED46;
+	Tue,  5 Dec 2023 20:24:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701836681; x=1733372681;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=h4+9QXz80nPqdIE6m1NyWQGvcxtDrnbM7zgzhRzWAXo=;
+  b=jhSbLp3qPvMU21z0XK5EDTICqpwpU6pvVQ+HUowIeZRZviMOADqIsebR
+   QxtTYJGCBOwQcSADQ07NnYne9bvGoaIHMDyFPJc76aM7Vh7p9irnYgiYs
+   5sbVML4CNgHOMhK1lOfsvmCu2A8R0NzPZP56C/8UYodMWJqzJPsDUKBOU
+   Q0QtvJhHhC3BN1OYTMbGW3UAxjTOdIGyWxpQo7AYM9K/aBBsbmnC4ciWx
+   xx2jQ9C3cJimKGlBxRxvLq5zgCwNfFJPfwBCc2NmN96VZlwcez5izx7cS
+   Fcsi6D3JjeN21ACHVs9eTZduFzovkCbPAbr1jwTbNwrPMuIPRGBZdN2i6
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="396794385"
+X-IronPort-AV: E=Sophos;i="6.04,254,1695711600"; 
+   d="scan'208";a="396794385"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 20:24:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="837189478"
+X-IronPort-AV: E=Sophos;i="6.04,254,1695711600"; 
+   d="scan'208";a="837189478"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by fmsmga008.fm.intel.com with ESMTP; 05 Dec 2023 20:24:35 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rAjSb-000AFa-0c;
+	Wed, 06 Dec 2023 04:24:33 +0000
+Date: Wed, 6 Dec 2023 12:23:37 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ma Jun <Jun.Ma2@amd.com>, amd-gfx@lists.freedesktop.org,
+	lenb@kernel.org, hdegoede@redhat.com, johannes@sipsolutions.net,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, alexander.deucher@amd.com, Lijo.Lazar@amd.com,
+	mario.limonciello@amd.com, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, platform-driver-x86@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, majun@amd.com,
+	Evan Quan <quanliangl@hotmail.com>, Ma Jun <Jun.Ma2@amd.com>
+Subject: Re: [PATCH v14 4/9] wifi: mac80211: Add support for WBRF features
+Message-ID: <202312061221.VlhfjRyI-lkp@intel.com>
+References: <20231129091348.3972539-5-Jun.Ma2@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next 0/3] net: mvmdio: Performance related improvements
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170183642469.10645.13461359609300512156.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Dec 2023 04:20:24 +0000
-References: <20231204100811.2708884-1-tobias@waldekranz.com>
-In-Reply-To: <20231204100811.2708884-1-tobias@waldekranz.com>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
- gregory.clement@bootlin.com, sebastian.hesselbarth@gmail.com,
- robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231129091348.3972539-5-Jun.Ma2@amd.com>
 
-Hello:
+Hi Ma,
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+kernel test robot noticed the following build errors:
 
-On Mon,  4 Dec 2023 11:08:08 +0100 you wrote:
-> Observations of the XMDIO bus on a CN9130-based system during a
-> firmware download showed a very low bus utilization, which stemmed
-> from the 150us (10x the average access time) sleep which would take
-> place when the first poll did not succeed.
-> 
-> With this series in place, bus throughput increases by about 10x,
-> multiplied by whatever gain you are able to extract from running the
-> MDC at a higher frequency (hardware dependent).
-> 
-> [...]
+[auto build test ERROR on v6.7-rc1]
+[also build test ERROR on next-20231205]
+[cannot apply to drm-misc/drm-misc-next wireless-next/main wireless/main linus/master v6.7-rc3 v6.7-rc2]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Here is the summary with links:
-  - [v2,net-next,1/3] arm64: dts: marvell: cp11x: Provide clock names for MDIO controllers
-    (no matching commit)
-  - [v2,net-next,2/3] net: mvmdio: Avoid excessive sleeps in polled mode
-    https://git.kernel.org/netdev/net-next/c/7dd12fe34686
-  - [v2,net-next,3/3] net: mvmdio: Support setting the MDC frequency on XSMI controllers
-    https://git.kernel.org/netdev/net-next/c/eb6a6605ff5a
+url:    https://github.com/intel-lab-lkp/linux/commits/Ma-Jun/Documentation-driver-api-Add-document-about-WBRF-mechanism/20231129-181516
+base:   v6.7-rc1
+patch link:    https://lore.kernel.org/r/20231129091348.3972539-5-Jun.Ma2%40amd.com
+patch subject: [PATCH v14 4/9] wifi: mac80211: Add support for WBRF features
+config: hexagon-randconfig-002-20231201 (https://download.01.org/0day-ci/archive/20231206/202312061221.VlhfjRyI-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231206/202312061221.VlhfjRyI-lkp@intel.com/reproduce)
 
-You are awesome, thank you!
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312061221.VlhfjRyI-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from net/mac80211/wbrf.c:10:
+   In file included from include/net/cfg80211.h:13:
+   In file included from include/linux/ethtool.h:18:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:337:
+   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     547 |         val = __raw_readb(PCI_IOBASE + addr);
+         |                           ~~~~~~~~~~ ^
+   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
+      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
+         |                                                   ^
+   In file included from net/mac80211/wbrf.c:10:
+   In file included from include/net/cfg80211.h:13:
+   In file included from include/linux/ethtool.h:18:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:337:
+   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
+      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
+         |                                                   ^
+   In file included from net/mac80211/wbrf.c:10:
+   In file included from include/net/cfg80211.h:13:
+   In file included from include/linux/ethtool.h:18:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:337:
+   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     584 |         __raw_writeb(value, PCI_IOBASE + addr);
+         |                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+>> net/mac80211/wbrf.c:79:2: error: call to undeclared function 'acpi_amd_wbrf_add_remove'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+      79 |         acpi_amd_wbrf_add_remove(dev, WBRF_RECORD_ADD, &ranges_in);
+         |         ^
+   net/mac80211/wbrf.c:94:2: error: call to undeclared function 'acpi_amd_wbrf_add_remove'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+      94 |         acpi_amd_wbrf_add_remove(dev, WBRF_RECORD_REMOVE, &ranges_in);
+         |         ^
+   6 warnings and 2 errors generated.
+
+
+vim +/acpi_amd_wbrf_add_remove +79 net/mac80211/wbrf.c
+
+    66	
+    67	void ieee80211_add_wbrf(struct ieee80211_local *local, struct cfg80211_chan_def *chandef)
+    68	{
+    69		struct wbrf_ranges_in_out ranges_in = {0};
+    70		struct device *dev;
+    71	
+    72		if (!local->wbrf_supported)
+    73			return;
+    74	
+    75		dev = local->hw.wiphy->dev.parent;
+    76	
+    77		get_ranges_from_chandef(chandef, &ranges_in);
+    78	
+  > 79		acpi_amd_wbrf_add_remove(dev, WBRF_RECORD_ADD, &ranges_in);
+    80	}
+    81	
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
