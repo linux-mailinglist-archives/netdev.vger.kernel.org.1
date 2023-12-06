@@ -1,76 +1,98 @@
-Return-Path: <netdev+bounces-54431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3F2C8070F2
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 14:32:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C56358070F5
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 14:34:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 799D81F2142F
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:32:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0198A1C209D0
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:34:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6E2D39FD8;
-	Wed,  6 Dec 2023 13:32:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PP2wvEtX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94DF739FE4;
+	Wed,  6 Dec 2023 13:34:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8683118AFB;
-	Wed,  6 Dec 2023 13:32:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24687C433C7;
-	Wed,  6 Dec 2023 13:32:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701869559;
-	bh=87DeOzN+H+/ZblXZmRyco22+Ti8CYuCGBYv8nG8F4lE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PP2wvEtXRXqJcfTNN6HC/ncsZItCFqmirJK+fJzyVs3Dt6dh04Mu9BXTcnPNtUApH
-	 nfiq+ZgRFWZxx5jlZYEjNR6VzHdUs/iO3tfhY/fJ3XYyGX6NpVmAtNMtXwcWXJoTnx
-	 F/vyenqT4k80NZsqAbtCU1SZJgO3/lzvZkVrEYLi9X7KahVWZc5uxmBvEHoOF3AzYp
-	 Cg60xXENRqgEYNuZXqBTLokDFp05tNEZgvMZYOoeaFZju2ep3EU4CzCr2ZDhtV2hXS
-	 KYUHNQT1j4NUNO+0xMfAU+LR1Rn+ABAhUNrgL5UGz/oVO9Z+wGmFLPVBE2L1x29iKw
-	 ItEpA9y9aoKBA==
-Date: Wed, 6 Dec 2023 13:32:34 +0000
-From: Lee Jones <lee@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Pavel Machek <pavel@ucw.cz>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	"linux-leds@vger.kernel.org" <linux-leds@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH v2] leds: trigger: netdev: fix RTNL handling to prevent
- potential deadlock
-Message-ID: <20231206133234.GD3375667@google.com>
-References: <fb5c8294-2a10-4bf5-8f10-3d2b77d2757e@gmail.com>
- <20231204144808.26083e8a@kernel.org>
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C662122;
+	Wed,  6 Dec 2023 05:34:06 -0800 (PST)
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-6d9d29a2332so46603a34.0;
+        Wed, 06 Dec 2023 05:34:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701869646; x=1702474446;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GKUyAGPVNJ2iCz/byc+vad2U0HtCXFR/OKxsFSUjBSo=;
+        b=Afr08ZZnZPflUMyXwsoWEYz2ezular9v0AiFuR2H+yREBvoQX07sLYoUN1csfE0M+8
+         8PFV9eOsxWT0meHHZO1crWjhhg43dFoZzpO6zXKYHHMuZLwgEyiEsUbfoEvwfw7k1Bon
+         k/5rHG6bmLPccVJXadEyU5UMQAFgUaPgaZENS3TqYv6/u5s34JrZBuI9+cRYIp3SQhsJ
+         pmfKxQcZ6MQ8h/oIH4NZ3EbISQRsDEd1Qe7SdztxRKOg9MW21Df8+wmNng6jmdekriMQ
+         k+vKln7W/rb4lWYGX4+H98wPgcDGAXRi2ppCT66RFbElC2uGqNSWzeP1J7PC7NrPLelF
+         fmlw==
+X-Gm-Message-State: AOJu0Yx9KzH4HMzc1IhChQbqOCTauqXBaUXDiRYCJf5R50ZA2EG3k/V+
+	6TkQpIqJ1ylDVDYY5MOs1g==
+X-Google-Smtp-Source: AGHT+IHWs8BDYeEsQ9p7nU50NuMdIrEA5NhSUWcTgZm0IYA+OhimehJYkLAie1qpwHIrrcHjciYBFA==
+X-Received: by 2002:a05:6830:2aaa:b0:6d8:74e2:552a with SMTP id s42-20020a0568302aaa00b006d874e2552amr431988otu.22.1701869645696;
+        Wed, 06 Dec 2023 05:34:05 -0800 (PST)
+Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id z17-20020a9d62d1000000b006b9848f8aa7sm2665206otk.45.2023.12.06.05.34.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 05:34:05 -0800 (PST)
+Received: (nullmailer pid 1911334 invoked by uid 1000);
+	Wed, 06 Dec 2023 13:34:03 -0000
+Date: Wed, 6 Dec 2023 07:34:03 -0600
+From: Rob Herring <robh@kernel.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>, 
+	Kishon Vijay Abraham I <kishon@kernel.org>, Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, 
+	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Alexander Couzens <lynxis@fe80.eu>, Qingfang Deng <dqfext@gmail.com>, 
+	SkyLake Huang <SkyLake.Huang@mediatek.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org
+Subject: Re: [RFC PATCH v2 5/8] net: pcs: add driver for MediaTek USXGMII PCS
+Message-ID: <20231206133403.GA1894508-robh@kernel.org>
+References: <cover.1701826319.git.daniel@makrotopia.org>
+ <3cd8af5e44554c2db2d7898494ee813967206bd9.1701826319.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231204144808.26083e8a@kernel.org>
+In-Reply-To: <3cd8af5e44554c2db2d7898494ee813967206bd9.1701826319.git.daniel@makrotopia.org>
 
-On Mon, 04 Dec 2023, Jakub Kicinski wrote:
-
-> On Fri, 1 Dec 2023 11:23:22 +0100 Heiner Kallweit wrote:
-> > When working on LED support for r8169 I got the following lockdep
-> > warning. Easiest way to prevent this scenario seems to be to take
-> > the RTNL lock before the trigger_data lock in set_device_name().
+On Wed, Dec 06, 2023 at 01:44:38AM +0000, Daniel Golle wrote:
+> Add driver for USXGMII PCS found in the MediaTek MT7988 SoC and supporting
+> USXGMII, 10GBase-R and 5GBase-R interface modes. In order to support
+> Cisco SGMII, 1000Base-X and 2500Base-X via the also present LynxI PCS
+> create a wrapped PCS taking care of the components shared between the
+> new USXGMII PCS and the legacy LynxI PCS.
 > 
-> Pavel/Lee, would you like to handle this patch?
-> Or should we ship it to Linus on Thu?
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+>  .../bindings/net/pcs/mediatek,usxgmii.yaml    |  46 +-
 
-Go for it.
+Why are you changing the binding you just added?
 
-Acked-by: Lee Jones <lee@kernel.org>
+In any case, bindings are separate patches.
 
--- 
-Lee Jones [李琼斯]
+>  MAINTAINERS                                   |   2 +
+>  drivers/net/pcs/Kconfig                       |  11 +
+>  drivers/net/pcs/Makefile                      |   1 +
+>  drivers/net/pcs/pcs-mtk-usxgmii.c             | 413 ++++++++++++++++++
+>  include/linux/pcs/pcs-mtk-usxgmii.h           |  26 ++
+>  6 files changed, 456 insertions(+), 43 deletions(-)
+>  create mode 100644 drivers/net/pcs/pcs-mtk-usxgmii.c
+>  create mode 100644 include/linux/pcs/pcs-mtk-usxgmii.h
 
