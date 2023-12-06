@@ -1,80 +1,69 @@
-Return-Path: <netdev+bounces-54657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C932F807C4B
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 00:26:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F767807C4D
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 00:27:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC7D8B20E43
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 23:26:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9B7F281E1A
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 23:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3D202F85A;
-	Wed,  6 Dec 2023 23:26:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA8282E413;
+	Wed,  6 Dec 2023 23:27:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PT+XEm1k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mzV9fod0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5597A3;
-	Wed,  6 Dec 2023 15:26:03 -0800 (PST)
-Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-40c09d62b70so4230125e9.1;
-        Wed, 06 Dec 2023 15:26:03 -0800 (PST)
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 705FB10CC;
+	Wed,  6 Dec 2023 15:27:10 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6ce972ac39dso63014b3a.3;
+        Wed, 06 Dec 2023 15:27:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701905162; x=1702509962; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=K8nM9qWelyRyVgavRdtFw3MAmrowMHhgp/kZSBIDqog=;
-        b=PT+XEm1kc+HEl8oGYN/OKBmB5OcdX1my3T//i/nAKSqCkc/AzvUlsImMrRVFFObkQW
-         3lqgeC6H2uNc+ZH5s7nc8as7eYyQcUQuuMPCGGFGAte/h7+slOuNIYsg4TxFk6dKJsmJ
-         u4qOSn2hsCJAgQ9yluI+kxXtYRQH+InTlj5U4e1/o3cr74Iv0PnYlxk5b0Vlp22wcMNY
-         XA3/9PSeZydNWs2l1ZSwrAr2NmGa8wyY4vXo2T2SlwjgnSvXVhy6ILCO9yQYjoE3fz0s
-         EsncvUhVbU/1KACZcuyXURuHJ6Ia+umPX343e8s0D/UrCffll93PaGP8bIZ+KPV7ifgz
-         37mA==
+        d=gmail.com; s=20230601; t=1701905230; x=1702510030; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fX2TomnDpcWa9Rf5bjJuYqn4PKTx3fdJMigTAusfJvA=;
+        b=mzV9fod0Q14L2zaqaJJFNaSYstZfhCxbjhu7DHaz3kZ8LQbaCnKFGtLV/QMC/BXNRS
+         dUijB6WmmzKmc9pw6gIvaKwbSl0ELir54e70dxPQ3ZwGFkmzwv27PojDo4mNTp4tmekc
+         2QHqNQwBzI4CdrKjA92Jdzmrm2gNlKiKDqZ2yjZcLFvT7KcWTRe/eYJZglOoIa785pHG
+         9NxjPqpyMVGqpE93BmL93QicPLGI8srPQaY2TVnQ7d8r50q0prPGNTQs8MhQ1ovuhjvq
+         b6LdEDCBuJ58BiFcuuZAwnk+5B/pI2vSKJkvmYJZ3CtJ6RIpUI8GAx2TRMGrn5fF7LBo
+         PJqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701905162; x=1702509962;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=K8nM9qWelyRyVgavRdtFw3MAmrowMHhgp/kZSBIDqog=;
-        b=vREjrSrCyjXqCqNt8B2c7lMjKexARKRGc8zJ8QLa6SMQuYxjRnfQxj4qYeE/BMFvoJ
-         rRXcSzAEmI4IaiDEs49l9Fc51Ugekyf4Hh+gJy17HKZBnyE8khC79ak+344MJhYy4dk4
-         iWmZUQd3hHYJNgA1c5hp6FpdDtULZALfdGEGY6+mY2514izGlUigjvSToYlzNUvhEseS
-         m33OO9dk5iBVsE4qWlDrrorwrP9XujADWeTUdNQC7qxdFH/2ignQ76k/h5M9WebBO7Ci
-         rss5KDyC+IosPkWKQTu+wMsmMvHrwS7MnSeG3pZs+WzFCPohE5j1eKNz2QN3lDhaioQ8
-         UvFg==
-X-Gm-Message-State: AOJu0YyVZwyvGlIItjIcBxRgu9O7LREkXfcg9tlmcKyfAANwEZtb+nt3
-	C3QNl5OoiXM0G/9EWs0NL+4=
-X-Google-Smtp-Source: AGHT+IGSryGfcwe2mbxn82t4MKHOIrokLTAXFZlwfzmfi5rB3Rom1wn5/b9JD+NszNdAbUiLyyn1RQ==
-X-Received: by 2002:a05:600c:354e:b0:405:1bbd:aa9c with SMTP id i14-20020a05600c354e00b004051bbdaa9cmr711037wmq.34.1701905162266;
-        Wed, 06 Dec 2023 15:26:02 -0800 (PST)
-Received: from localhost.localdomain (host-79-26-252-6.retail.telecomitalia.it. [79.26.252.6])
-        by smtp.googlemail.com with ESMTPSA id n2-20020a5d51c2000000b0033339027c89sm718754wrv.108.2023.12.06.15.26.00
+        d=1e100.net; s=20230601; t=1701905230; x=1702510030;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fX2TomnDpcWa9Rf5bjJuYqn4PKTx3fdJMigTAusfJvA=;
+        b=T964g7QLuJbhgKsyQz4RkvBXfpNperC+19Tf3NqSxyCnylJSJJbg4up4fCkFOAkAYj
+         InOGhvDDLll/axwPRZfGSY5ogHP7Vy7wlRnZhZ6Gn97XTm95zABcdsXpAtAIZqI1K1z8
+         IfPPNZ++CsklD1kW9Et/37zdY1eXNNt04nZzKKA8ELTtf7S7YuW6uO6brnl5dx/Xiz5n
+         K6E/pRD0zszVtMHQCf8sHB7Svp0nYIoXbfbNLPv1G1IQOU3o4dTBEQQawYTK5v2jfI1Q
+         IxxboHPXYvXFK2D1hzkDdIi+VMMElkPNNz33jvUjb3ETC26ignDCr7PN3q4aUC4SOOY3
+         Z11Q==
+X-Gm-Message-State: AOJu0YzB8Pobclte3RtJAjxZ4RWufHrdaH/NOELsPRdg0G82IknVyRUe
+	/uhO5qAptXAgETY4rvv27HQ=
+X-Google-Smtp-Source: AGHT+IH97bKNklJ+bTgsJXkY2/Z74iquDLTg/8+BXT6ocb14RFZTDU9ggOR0/q+PoZnDkzDdL3+B1A==
+X-Received: by 2002:a05:6a00:2302:b0:6ce:1001:2f0e with SMTP id h2-20020a056a00230200b006ce10012f0emr1411103pfh.4.1701905229706;
+        Wed, 06 Dec 2023 15:27:09 -0800 (PST)
+Received: from john.. ([98.97.116.78])
+        by smtp.gmail.com with ESMTPSA id ka18-20020a056a00939200b006ce91d27c72sm58545pfb.175.2023.12.06.15.27.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 15:26:02 -0800 (PST)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Harini Katakam <harini.katakam@amd.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [net-next PATCH v4 3/3] net: phy: add support for PHY package MMD read/write
-Date: Thu,  7 Dec 2023 00:25:47 +0100
-Message-Id: <20231206232547.2501-3-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231206232547.2501-1-ansuelsmth@gmail.com>
-References: <20231206232547.2501-1-ansuelsmth@gmail.com>
+        Wed, 06 Dec 2023 15:27:08 -0800 (PST)
+From: John Fastabend <john.fastabend@gmail.com>
+To: kuba@kernel.org,
+	jannh@google.com,
+	daniel@iogearbox.net
+Cc: john.fastabend@gmail.com,
+	borisp@nvidia.com,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net 0/2] fixes for ktls
+Date: Wed,  6 Dec 2023 15:27:04 -0800
+Message-Id: <20231206232706.374377-1-john.fastabend@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,206 +72,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Some PHY in PHY package may require to read/write MMD regs to correctly
-configure the PHY package.
+Couple fixes for TLS and BPF interactions.
 
-Add support for these additional required function in both lock and no
-lock variant.
+John Fastabend (2):
+  net: tls, update curr on splice as well
+  bpf: sockmap, updating the sg structure should also update curr
 
-It's assumed that the entire PHY package is either C22 or C45. We use
-C22 or C45 way of writing/reading to mmd regs based on the passed phydev
-whether it's C22 or C45.
+ net/core/filter.c | 19 +++++++++++++++++++
+ net/tls/tls_sw.c  |  2 ++
+ 2 files changed, 21 insertions(+)
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
-Changes v4:
-- Drop function comments in header file
-Changes v3:
-- Move in phy-core.c from phy.h
-- Base c45 from phydev
-Changes v2:
-- Rework to use newly introduced helper
-- Add common check for regnum and devad
-
- drivers/net/phy/phy-core.c | 136 +++++++++++++++++++++++++++++++++++++
- include/linux/phy.h        |  16 +++++
- 2 files changed, 152 insertions(+)
-
-diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
-index b729ac8b2640..b5868282def1 100644
---- a/drivers/net/phy/phy-core.c
-+++ b/drivers/net/phy/phy-core.c
-@@ -650,6 +650,142 @@ int phy_write_mmd(struct phy_device *phydev, int devad, u32 regnum, u16 val)
- }
- EXPORT_SYMBOL(phy_write_mmd);
- 
-+/**
-+ * __phy_package_read_mmd - Convenience function for reading a register
-+ * on an MMD on a given PHY using the PHY package base addr, added of
-+ * the addr_offset value.
-+ * @phydev: The phy_device struct
-+ * @addr_offset: The offset to be added to PHY package base_addr
-+ * @devad: The MMD to read from
-+ * @regnum: The register on the MMD to read
-+ *
-+ * Same rules as for __phy_read();
-+ *
-+ * NOTE: It's assumed that the entire PHY package is either C22 or C45.
-+ */
-+int __phy_package_read_mmd(struct phy_device *phydev,
-+			   unsigned int addr_offset, int devad,
-+			   u32 regnum)
-+{
-+	struct phy_package_shared *shared = phydev->shared;
-+	int addr = shared->base_addr + addr_offset;
-+
-+	if (addr >= PHY_MAX_ADDR)
-+		return -EIO;
-+
-+	if (regnum > (u16)~0 || devad > 32)
-+		return -EINVAL;
-+
-+	return mmd_phy_read(phydev->mdio.bus, addr, phydev->is_c45, devad,
-+			    regnum);
-+}
-+EXPORT_SYMBOL(__phy_package_read_mmd);
-+
-+/**
-+ * phy_package_read_mmd - Convenience function for reading a register
-+ * on an MMD on a given PHY using the PHY package base addr, added of
-+ * the addr_offset value.
-+ * @phydev: The phy_device struct
-+ * @addr_offset: The offset to be added to PHY package base_addr
-+ * @devad: The MMD to read from
-+ * @regnum: The register on the MMD to read
-+ *
-+ * Same rules as for phy_read();
-+ *
-+ * NOTE: It's assumed that the entire PHY package is either C22 or C45.
-+ */
-+int phy_package_read_mmd(struct phy_device *phydev,
-+			 unsigned int addr_offset, int devad,
-+			 u32 regnum)
-+{
-+	struct phy_package_shared *shared = phydev->shared;
-+	int addr = shared->base_addr + addr_offset;
-+	int val;
-+
-+	if (addr >= PHY_MAX_ADDR)
-+		return -EIO;
-+
-+	if (regnum > (u16)~0 || devad > 32)
-+		return -EINVAL;
-+
-+	phy_lock_mdio_bus(phydev);
-+	val = mmd_phy_read(phydev->mdio.bus, addr, phydev->is_c45, devad,
-+			   regnum);
-+	phy_unlock_mdio_bus(phydev);
-+
-+	return val;
-+}
-+EXPORT_SYMBOL(phy_package_read_mmd);
-+
-+/**
-+ * __phy_package_write_mmd - Convenience function for writing a register
-+ * on an MMD on a given PHY using the PHY package base addr, added of
-+ * the addr_offset value.
-+ * @phydev: The phy_device struct
-+ * @addr_offset: The offset to be added to PHY package base_addr
-+ * @devad: The MMD to read from
-+ * @regnum: The register on the MMD to read
-+ * @val: value to write to @regnum
-+ *
-+ * Same rules as for __phy_write();
-+ *
-+ * NOTE: It's assumed that the entire PHY package is either C22 or C45.
-+ */
-+int __phy_package_write_mmd(struct phy_device *phydev,
-+			    unsigned int addr_offset, int devad,
-+			    u32 regnum, u16 val)
-+{
-+	struct phy_package_shared *shared = phydev->shared;
-+	int addr = shared->base_addr + addr_offset;
-+
-+	if (addr >= PHY_MAX_ADDR)
-+		return -EIO;
-+
-+	if (regnum > (u16)~0 || devad > 32)
-+		return -EINVAL;
-+
-+	return mmd_phy_write(phydev->mdio.bus, addr, phydev->is_c45, devad,
-+			     regnum, val);
-+}
-+EXPORT_SYMBOL(__phy_package_write_mmd);
-+
-+/**
-+ * phy_package_write_mmd - Convenience function for writing a register
-+ * on an MMD on a given PHY using the PHY package base addr, added of
-+ * the addr_offset value.
-+ * @phydev: The phy_device struct
-+ * @addr_offset: The offset to be added to PHY package base_addr
-+ * @devad: The MMD to read from
-+ * @regnum: The register on the MMD to read
-+ * @val: value to write to @regnum
-+ *
-+ * Same rules as for phy_write();
-+ *
-+ * NOTE: It's assumed that the entire PHY package is either C22 or C45.
-+ */
-+int phy_package_write_mmd(struct phy_device *phydev,
-+			  unsigned int addr_offset, int devad,
-+			  u32 regnum, u16 val)
-+{
-+	struct phy_package_shared *shared = phydev->shared;
-+	int addr = shared->base_addr + addr_offset;
-+	int ret;
-+
-+	if (addr >= PHY_MAX_ADDR)
-+		return -EIO;
-+
-+	if (regnum > (u16)~0 || devad > 32)
-+		return -EINVAL;
-+
-+	phy_lock_mdio_bus(phydev);
-+	ret = mmd_phy_write(phydev->mdio.bus, addr, phydev->is_c45, devad,
-+			    regnum, val);
-+	phy_unlock_mdio_bus(phydev);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL(phy_package_write_mmd);
-+
- /**
-  * phy_modify_changed - Function for modifying a PHY register
-  * @phydev: the phy_device struct
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 51702e349d83..f58a9ff52e0d 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -2049,6 +2049,22 @@ static inline int __phy_package_write(struct phy_device *phydev,
- 	return __mdiobus_write(phydev->mdio.bus, addr, regnum, val);
- }
- 
-+int __phy_package_read_mmd(struct phy_device *phydev,
-+			   unsigned int addr_offset, int devad,
-+			   u32 regnum);
-+
-+int phy_package_read_mmd(struct phy_device *phydev,
-+			 unsigned int addr_offset, int devad,
-+			 u32 regnum);
-+
-+int __phy_package_write_mmd(struct phy_device *phydev,
-+			    unsigned int addr_offset, int devad,
-+			    u32 regnum, u16 val);
-+
-+int phy_package_write_mmd(struct phy_device *phydev,
-+			  unsigned int addr_offset, int devad,
-+			  u32 regnum, u16 val);
-+
- static inline bool __phy_package_set_once(struct phy_device *phydev,
- 					  unsigned int b)
- {
 -- 
-2.40.1
+2.33.0
 
 
