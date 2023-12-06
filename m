@@ -1,218 +1,231 @@
-Return-Path: <netdev+bounces-54648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8B5A807BB5
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 23:58:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6552C807C1C
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 00:16:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40B7B1F2131B
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 22:58:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06B971F2186C
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 23:16:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E476B2DF92;
-	Wed,  6 Dec 2023 22:58:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 628712DF9F;
+	Wed,  6 Dec 2023 23:16:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="AzQhnpoO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fYE42oA1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 592AB18D;
-	Wed,  6 Dec 2023 14:58:18 -0800 (PST)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 5BD2210008C;
-	Thu,  7 Dec 2023 01:58:15 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 5BD2210008C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1701903495;
-	bh=GR8f5v1JtQpcmatJwQW8QuK09rw3Xh9UYk7P6i0iyVM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=AzQhnpoOzA4m2YKkhoWWERtGsDzcrnUQe3FV5rtHJyV1bYtfWo6T318SQ5w0eC5uk
-	 7X07K3w3BmjqaYSTzRcSunBOejtlSfUw9artgMdP+5g6urR4maqCMd9vHJoBjCsWlX
-	 v55Jg4FzRTpQPQGsIL1rKB/sMS/eROUhypQi1psETG1O1zvx9t8K0sSxcel7lPnIhe
-	 6p1blDrLGQ+a80Jm3uu164REeEIpmUTii7I550b2PONkcjVuAuWcK6mjbSF2YVKGVE
-	 AxezUAY4My3w8AyoakHMgwTul5Rzy7BOQxsNcmx2ZT35jBv3ExgsMuiK6q9SSBPYsU
-	 cJPVsa3N/ugbw==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Thu,  7 Dec 2023 01:58:15 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 7 Dec 2023 01:58:14 +0300
-Message-ID: <d30a1df7-ecda-652d-8c98-853308a560c9@salutedevices.com>
-Date: Thu, 7 Dec 2023 01:50:05 +0300
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 426BD181
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 15:16:15 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-daf702bde7eso389428276.3
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 15:16:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701904574; x=1702509374; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2PrTW3nyo92scL20Ekap9nlWMoYhz1YGjtYVc4UbsDk=;
+        b=fYE42oA1pM3AYIcMWTjgGkPMO91nGCNxI7n1JSqnjqvTvEUL9cX7e2Ujyf+ZxCfGI8
+         OipWW2jWRWBY79X9lsQy1YQoSJjj/jKw3A7I3pbPKI+RyTjD7fX0XGc4kgvDbf9+0LM+
+         4mv7FtSlCMb2oXd7bYaWTtAfIX4Q7O0CNO7kg4VSxbS7kL0QeCO9JaiY7VYmYXxE3cYV
+         3A94e1VewMQT+Gs+Y0odSRMnFr6840mMNtMz8Dv+PUheAbI/yVBVAncYUwP1Eb8j7mZL
+         NoLGzLmRD7s6/9UtXZ2a2OY1/lwgaqwqj4j3/3p4ZHchLvhc+LoKgWKULnoXai2lx3DW
+         tIzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701904574; x=1702509374;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2PrTW3nyo92scL20Ekap9nlWMoYhz1YGjtYVc4UbsDk=;
+        b=ITZpvhjzk4KoWe/J2MRqc4ablthuD3SXNK7OLBXi/KyGVoru1IUvRbB7mgbc1TLwkr
+         VU0QMg6MO9j8h1wMvh3H0shkngAKV6S+g/tCJXipO6HotzidN7XN6qeTJ0t7dAaHYlsi
+         ZYlSuYKddsPJ0+O2dITeVDT65ruK33uy1BZbhLiiRJ8OZv+mr2T3KlG1GvQ2UpTVIy0M
+         KAGul2/XwOWP0NcYjujG+IxgBLOALbsEz/smeDqLgk/HyaTeUcWQfAdEo6E4Ob8g2NRX
+         IVNSs+erzLEw+tNnvpsRVACMygjOpTUsFcRM8Hc8mKK8iQWqLhOqc2IWlSQOTIKPL8Vv
+         2oiA==
+X-Gm-Message-State: AOJu0YwaoPCuERXlHm+Sc7giTbApMGKQv0VaVaaFelSuRvnN3ijtukhC
+	UOSU70CX8QoOjGIjZVpMrMOoOl0Zh9Lkg5nY5A==
+X-Google-Smtp-Source: AGHT+IF8Oo3DT9loeb9aEty1FTzi+++EbnOCGNjlZWHZ7P/6knrHCLDtwnFQ4WffwShG/pP4xjX6s5KGOGOlpxebFA==
+X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
+ (user=justinstitt job=sendgmr) by 2002:a25:8707:0:b0:dbc:1c42:f29a with SMTP
+ id a7-20020a258707000000b00dbc1c42f29amr22315ybl.9.1701904574326; Wed, 06 Dec
+ 2023 15:16:14 -0800 (PST)
+Date: Wed, 06 Dec 2023 23:16:09 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v7 3/4] virtio/vsock: fix logic which reduces
- credit update messages
-Content-Language: en-US
-To: "Michael S. Tsirkin" <mst@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
-	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20231206211849.2707151-1-avkrasnov@salutedevices.com>
- <20231206211849.2707151-4-avkrasnov@salutedevices.com>
- <20231206165045-mutt-send-email-mst@kernel.org>
- <d9d1ec6a-dd9b-61d9-9211-52e9437cbb1f@salutedevices.com>
- <20231206170640-mutt-send-email-mst@kernel.org>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <20231206170640-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 181917 [Dec 06 2023]
-X-KSMG-AntiSpam-Version: 6.0.0.2
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 5 0.3.5 98d108ddd984cca1d7e65e595eac546a62b0144b, {Tracking_from_domain_doesnt_match_to}, p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;salutedevices.com:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;100.64.160.123:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/12/06 20:57:00 #22623256
-X-KSMG-AntiVirus-Status: Clean, skipped
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIALkAcWUC/33NwYrDIBgE4FcpntdF/Y3WPe17LKUY/ZMIaQzRD
+ S0h717JpVka9jgM881CEk4BE/k6LWTCOaQQhxKqjxNxnR1apMGXTAQTwJmoKOYux9hfx9+cruE
+ 29tRyqU3T1E4jI2U3TtiE+2b+kAEzHfCeyaU0XUg5To/tbOZb/487c8qoshVYAx5qLb7bGNseP
+ 128bdws9oQ6IkQhmFfa1d6zCs5vBOwJfURAIUAqZZ3SBph8I+SLKMYRIQvBJXI0Qp+lUX+IdV2 fMJRVs4YBAAA=
+X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1701904573; l=4962;
+ i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
+ bh=hX2m37gMZ5rAPKE+4kIVNycVYHBLG9ddRIJkMzUA6RI=; b=RvWHJ4xB9uVWwwcYYhFFHSc6UhVUTEXYdWVlyy9npIwevwaSWmJxWI3522jpPRhH+RhKEPd8/
+ mDoZWqOJHC1DGpRyOIT3ZrhP/AxPdcb5WKstGVNQh+tjqNS2vR9a4uF
+X-Mailer: b4 0.12.3
+Message-ID: <20231206-ethtool_puts_impl-v5-0-5a2528e17bf8@google.com>
+Subject: [PATCH net-next v5 0/3] ethtool: Add ethtool_puts()
+From: justinstitt@google.com
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shay Agroskin <shayagr@amazon.com>, 
+	Arthur Kiyanovski <akiyano@amazon.com>, David Arinzon <darinzon@amazon.com>, Noam Dagan <ndagan@amazon.com>, 
+	Saeed Bishara <saeedb@amazon.com>, Rasesh Mody <rmody@marvell.com>, 
+	Sudarsana Kalluru <skalluru@marvell.com>, GR-Linux-NIC-Dev@marvell.com, 
+	Dimitris Michailidis <dmichail@fungible.com>, Yisen Zhuang <yisen.zhuang@huawei.com>, 
+	Salil Mehta <salil.mehta@huawei.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>, 
+	Tony Nguyen <anthony.l.nguyen@intel.com>, Louis Peens <louis.peens@corigine.com>, 
+	Shannon Nelson <shannon.nelson@amd.com>, Brett Creeley <brett.creeley@amd.com>, drivers@pensando.io, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, Ronak Doshi <doshir@vmware.com>, 
+	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>, 
+	Dwaipayan Ray <dwaipayanray1@gmail.com>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, 
+	Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
+	"=?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?=" <arinc.unal@arinc9.com>, Daniel Golle <daniel@makrotopia.org>, 
+	Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>, 
+	Sean Wang <sean.wang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Linus Walleij <linus.walleij@linaro.org>, 
+	"=?utf-8?q?Alvin_=C5=A0ipraga?=" <alsi@bang-olufsen.dk>, Wei Fang <wei.fang@nxp.com>, 
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	NXP Linux Team <linux-imx@nxp.com>, Lars Povlsen <lars.povlsen@microchip.com>, 
+	Steen Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon <daniel.machon@microchip.com>, 
+	UNGLinuxDriver@microchip.com, Jiawen Wu <jiawenwu@trustnetic.com>, 
+	Mengyuan Lou <mengyuanlou@net-swift.com>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Nick Desaulniers <ndesaulniers@google.com>, Nathan Chancellor <nathan@kernel.org>, 
+	Kees Cook <keescook@chromium.org>, intel-wired-lan@lists.osuosl.org, 
+	oss-drivers@corigine.com, linux-hyperv@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+	bpf@vger.kernel.org, Justin Stitt <justinstitt@google.com>
+Content-Type: text/plain; charset="utf-8"
 
+Hi,
 
+This series aims to implement ethtool_puts() and send out a wave 1 of
+conversions from ethtool_sprintf(). There's also a checkpatch patch
+included to check for the cases listed below.
 
-On 07.12.2023 01:08, Michael S. Tsirkin wrote:
-> On Thu, Dec 07, 2023 at 12:52:51AM +0300, Arseniy Krasnov wrote:
->>
->>
->> On 07.12.2023 00:53, Michael S. Tsirkin wrote:
->>> On Thu, Dec 07, 2023 at 12:18:48AM +0300, Arseniy Krasnov wrote:
->>>> Add one more condition for sending credit update during dequeue from
->>>> stream socket: when number of bytes in the rx queue is smaller than
->>>> SO_RCVLOWAT value of the socket. This is actual for non-default value
->>>> of SO_RCVLOWAT (e.g. not 1) - idea is to "kick" peer to continue data
->>>> transmission, because we need at least SO_RCVLOWAT bytes in our rx
->>>> queue to wake up user for reading data (in corner case it is also
->>>> possible to stuck both tx and rx sides, this is why 'Fixes' is used).
->>>> Also handle case when 'fwd_cnt' wraps, while 'last_fwd_cnt' is still
->>>> not.
->>>>
->>>> Fixes: b89d882dc9fc ("vsock/virtio: reduce credit update messages")
->>>> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->>>> ---
->>>>  Changelog:
->>>>  v6 -> v7:
->>>>   * Handle wrap of 'fwd_cnt'.
->>>>   * Do to send credit update when 'fwd_cnt' == 'last_fwd_cnt'.
->>>>
->>>>  net/vmw_vsock/virtio_transport_common.c | 18 +++++++++++++++---
->>>>  1 file changed, 15 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->>>> index e137d740804e..39f8660d825d 100644
->>>> --- a/net/vmw_vsock/virtio_transport_common.c
->>>> +++ b/net/vmw_vsock/virtio_transport_common.c
->>>> @@ -558,6 +558,8 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
->>>>  	struct virtio_vsock_sock *vvs = vsk->trans;
->>>>  	size_t bytes, total = 0;
->>>>  	struct sk_buff *skb;
->>>> +	u32 fwd_cnt_delta;
->>>> +	bool low_rx_bytes;
->>>>  	int err = -EFAULT;
->>>>  	u32 free_space;
->>>>  
->>>> @@ -601,7 +603,15 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
->>>>  		}
->>>>  	}
->>>>  
->>>> -	free_space = vvs->buf_alloc - (vvs->fwd_cnt - vvs->last_fwd_cnt);
->>>> +	/* Handle wrap of 'fwd_cnt'. */
->>>> +	if (vvs->fwd_cnt < vvs->last_fwd_cnt)
->>>> +		fwd_cnt_delta = vvs->fwd_cnt + (U32_MAX - vvs->last_fwd_cnt);
->>>
->>> Are you sure there's no off by one here? for example if fwd_cnt is 0
->>> and last_fwd_cnt is 0xfffffffff then apparently delta is 0.
->>
->> Seems yes, I need +1 here
-> 
-> And then you will get a nop, because assigning U32_MAX + 1 to u32
-> gives you 0. Adding () does nothing to change the result,
-> + and - are commutative.
+This was sparked from recent discussion here [1]
 
-Ahh, unsigned here, yes.
+The conversions are used in cases where ethtool_sprintf() was being used
+with just two arguments:
+|       ethtool_sprintf(&data, buffer[i].name);
+or when it's used with format string: "%s"
+|       ethtool_sprintf(&data, "%s", buffer[i].name);
+which both now become:
+|       ethtool_puts(&data, buffer[i].name);
 
-@Stefano, what did You mean about wrapping here?
+The first case commonly triggers a -Wformat-security warning with Clang
+due to potential problems with format flags present in the strings [3].
 
-I think Michael is right, for example
+The second is just a bit weird with a plain-ol' "%s".
 
-vvs->fwd_cnt wraps and now == 5
-vvs->last_fwd_cnt == 0xffffffff
+Changes found with Cocci [4] and grep [5].
 
-now delta before this patch will be 6 - correct value
+[1]: https://lore.kernel.org/all/202310141935.B326C9E@keescook/
+[2]: https://lore.kernel.org/all/?q=dfb%3Aethtool_sprintf+AND+f%3Ajustinstitt
+[3]: https://lore.kernel.org/all/202310101528.9496539BE@keescook/
+[4]: (script authored by Kees w/ modifications from Joe)
+@replace_2_args@
+expression BUF;
+expression VAR;
+@@
 
-May be I didn't get your idea, so implement it very naive?
+-       ethtool_sprintf(BUF, VAR)
++       ethtool_puts(BUF, VAR)
 
-Thanks, Arseniy
+@replace_3_args@
+expression BUF;
+expression VAR;
+@@
 
-> 
-> 
->>>
->>>
->>>> +	else
->>>> +		fwd_cnt_delta = vvs->fwd_cnt - vvs->last_fwd_cnt;
->>>
->>> I actually don't see what is wrong with just
->>> 	fwd_cnt_delta = vvs->fwd_cnt - vvs->last_fwd_cnt
->>> 32 bit unsigned math will I think handle wrap around correctly.
->>>
->>> And given buf_alloc is also u32 - I don't see where the bug is in
->>> the original code.
->>
->> I think problem is when fwd_cnt wraps, while last_fwd_cnt is not. In this
->> case fwd_cnt_delta will be too big, so we won't send credit update which
->> leads to stall for sender
->>
->> Thanks, Arseniy
-> 
-> Care coming up with an example?
-> 
-> 
->>>
->>>
->>>> +
->>>> +	free_space = vvs->buf_alloc - fwd_cnt_delta;
->>>> +	low_rx_bytes = (vvs->rx_bytes <
->>>> +			sock_rcvlowat(sk_vsock(vsk), 0, INT_MAX));
->>>>  
->>>>  	spin_unlock_bh(&vvs->rx_lock);
->>>>  
->>>> @@ -611,9 +621,11 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
->>>>  	 * too high causes extra messages. Too low causes transmitter
->>>>  	 * stalls. As stalls are in theory more expensive than extra
->>>>  	 * messages, we set the limit to a high value. TODO: experiment
->>>> -	 * with different values.
->>>> +	 * with different values. Also send credit update message when
->>>> +	 * number of bytes in rx queue is not enough to wake up reader.
->>>>  	 */
->>>> -	if (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
->>>> +	if (fwd_cnt_delta &&
->>>> +	    (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE || low_rx_bytes))
->>>>  		virtio_transport_send_credit_update(vsk);
->>>>  
->>>>  	return total;
->>>> -- 
->>>> 2.25.1
->>>
-> 
+-       ethtool_sprintf(BUF, "%s", VAR)
++       ethtool_puts(BUF, VAR)
+
+-       ethtool_sprintf(&BUF, "%s", VAR)
++       ethtool_puts(&BUF, VAR)
+
+[5]: $ rg "ethtool_sprintf\(\s*[^,)]+\s*,\s*[^,)]+\s*\)"
+
+Signed-off-by: Justin Stitt <justinstitt@google.com>
+---
+Changes in v5:
+- updated documentation to include info about the lack of a trailing newline
+  (Thanks Russell)
+- rebased onto mainline
+- Link to v4: https://lore.kernel.org/r/20231102-ethtool_puts_impl-v4-0-14e1e9278496@google.com
+
+Changes in v4:
+- update documentation to match:
+  https://lore.kernel.org/all/20231028192511.100001-1-andrew@lunn.ch/
+
+- Link to v3: https://lore.kernel.org/r/20231027-ethtool_puts_impl-v3-0-3466ac679304@google.com
+
+Changes in v3:
+- fix force_speed_maps merge conflict + formatting (thanks Vladimir)
+- rebase onto net-next (thanks Andrew, Vladimir)
+- change subject (thanks Vladimir)
+- fix checkpatch formatting + implementation (thanks Joe)
+- Link to v2: https://lore.kernel.org/r/20231026-ethtool_puts_impl-v2-0-0d67cbdd0538@google.com
+
+Changes in v2:
+- wrap lines better in replacement (thanks Joe, Kees)
+- add --fix to checkpatch (thanks Joe)
+- clean up checkpatch formatting (thanks Joe, et al.)
+- rebase against next
+- Link to v1: https://lore.kernel.org/r/20231025-ethtool_puts_impl-v1-0-6a53a93d3b72@google.com
+
+---
+Justin Stitt (3):
+      ethtool: Implement ethtool_puts()
+      checkpatch: add ethtool_sprintf rules
+      net: Convert some ethtool_sprintf() to ethtool_puts()
+
+ drivers/net/dsa/lantiq_gswip.c                     |  2 +-
+ drivers/net/dsa/mt7530.c                           |  2 +-
+ drivers/net/dsa/qca/qca8k-common.c                 |  2 +-
+ drivers/net/dsa/realtek/rtl8365mb.c                |  2 +-
+ drivers/net/dsa/realtek/rtl8366-core.c             |  2 +-
+ drivers/net/dsa/vitesse-vsc73xx-core.c             |  8 +--
+ drivers/net/ethernet/amazon/ena/ena_ethtool.c      |  4 +-
+ drivers/net/ethernet/brocade/bna/bnad_ethtool.c    |  2 +-
+ drivers/net/ethernet/freescale/fec_main.c          |  4 +-
+ .../net/ethernet/fungible/funeth/funeth_ethtool.c  |  8 +--
+ drivers/net/ethernet/hisilicon/hns/hns_dsaf_gmac.c |  2 +-
+ .../net/ethernet/hisilicon/hns/hns_dsaf_xgmac.c    |  2 +-
+ drivers/net/ethernet/hisilicon/hns/hns_ethtool.c   | 65 +++++++++++-----------
+ drivers/net/ethernet/intel/i40e/i40e_ethtool.c     |  6 +-
+ drivers/net/ethernet/intel/iavf/iavf_ethtool.c     |  3 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c       |  9 +--
+ drivers/net/ethernet/intel/idpf/idpf_ethtool.c     |  2 +-
+ drivers/net/ethernet/intel/igb/igb_ethtool.c       |  6 +-
+ drivers/net/ethernet/intel/igc/igc_ethtool.c       |  6 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c   |  5 +-
+ .../net/ethernet/microchip/sparx5/sparx5_ethtool.c |  2 +-
+ .../net/ethernet/netronome/nfp/nfp_net_ethtool.c   | 44 +++++++--------
+ drivers/net/ethernet/pensando/ionic/ionic_stats.c  |  4 +-
+ drivers/net/ethernet/wangxun/libwx/wx_ethtool.c    |  2 +-
+ drivers/net/hyperv/netvsc_drv.c                    |  4 +-
+ drivers/net/phy/nxp-tja11xx.c                      |  2 +-
+ drivers/net/phy/smsc.c                             |  2 +-
+ drivers/net/vmxnet3/vmxnet3_ethtool.c              | 10 ++--
+ include/linux/ethtool.h                            | 13 +++++
+ net/ethtool/ioctl.c                                |  7 +++
+ scripts/checkpatch.pl                              | 19 +++++++
+ 31 files changed, 139 insertions(+), 112 deletions(-)
+---
+base-commit: bee0e7762ad2c6025b9f5245c040fcc36ef2bde8
+change-id: 20231025-ethtool_puts_impl-a1479ffbc7e0
+
+Best regards,
+-- 
+Justin Stitt <justinstitt@google.com>
+
 
