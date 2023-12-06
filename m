@@ -1,65 +1,81 @@
-Return-Path: <netdev+bounces-54529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44287807646
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:16:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4A7E807652
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:17:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75AE91C209DD
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:16:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 773E8281F79
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:17:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C647D5D8E1;
-	Wed,  6 Dec 2023 17:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF955F1EB;
+	Wed,  6 Dec 2023 17:17:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gmkm2t8v"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J367BBzQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 550EED40;
-	Wed,  6 Dec 2023 09:16:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=IvyHLevqaWwmN1PEaR8y9j27ex/cMjnuMMaarrKFRVk=; b=gmkm2t8vp+fn3e1v3+/IW7UlnP
-	Zq8i4cvkqRISJ8FEXXqf+zZXf9kJvtyXd4TU0t8r4Qs4EyQ/h5nO/x/7WrtCKaZ9fu4lvTsxRO4vL
-	pJt+RJCYzxuuHi7hjE+RcOD7psMgZ8ocqPj2IOXIrkq47igYfMsuZQu5zWmZga4ESCt8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rAvVp-002EVf-7k; Wed, 06 Dec 2023 18:16:41 +0100
-Date: Wed, 6 Dec 2023 18:16:41 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v2 07/12] net: phy: at803x: move specific at8031
- config_init to dedicated function
-Message-ID: <ee33bc65-c64a-4971-aaf3-2c90972120ac@lunn.ch>
-References: <20231201001423.20989-1-ansuelsmth@gmail.com>
- <20231201001423.20989-8-ansuelsmth@gmail.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5113B48798
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 17:17:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 26240C433C8;
+	Wed,  6 Dec 2023 17:17:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701883053;
+	bh=VwyudqvssUGouEPe/doZEgpxB104JGX7e++XEKaFxNg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=J367BBzQtrLJ8cK4vEZWp3pvvfygylMWu3ogYmc6c+FsQj/LxtIzpRpasPHaQpK5S
+	 p14WFjBnTINW5mwvRsAYFNy4vcXiD8CjrKyUiYCY1eL1AHNXhMVRoJU8N71xBe3kbE
+	 lVL0ZZuMIXGJVR/xaBXhteKtPkf1pSm5iD0StIeN+YouhG5lcxCSWhiRk+n7iF8N/a
+	 IUkiR9Yqvnztwdyu9/tEAwHB4bG8l6gjewtGp178M9dKj+CosiEd4Sy26rhTIIe78v
+	 rcCZtxnalGT9e/N5Z/8B3Weswmt4j5jzADARyJb7EbuGxlu5aV418WumGPCjufdYqW
+	 natlN9XUtB8TQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 14348C04E27;
+	Wed,  6 Dec 2023 17:17:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231201001423.20989-8-ansuelsmth@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [iproute2 PATCH] configure: Add _GNU_SOURCE to strlcpy configure test
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170188305307.32642.7730865310846878199.git-patchwork-notify@kernel.org>
+Date: Wed, 06 Dec 2023 17:17:33 +0000
+References: <20231202024705.1375296-1-sam@gentoo.org>
+In-Reply-To: <20231202024705.1375296-1-sam@gentoo.org>
+To: Sam James <sam@gentoo.org>
+Cc: netdev@vger.kernel.org
 
-On Fri, Dec 01, 2023 at 01:14:17AM +0100, Christian Marangi wrote:
-> Move specific at8031 config_init to dedicated function to make
-> at803x_config_init more generic and tidy things up.
+Hello:
+
+This patch was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
+
+On Sat,  2 Dec 2023 02:47:04 +0000 you wrote:
+> >=glibc-2.38 adds strlcpy but it's guarded under a feature-test macro. Just
+> add _GNU_SOURCE to the configure test because we already pass _GNU_SOURCE unconditionally
+> in the Makefiles when building iproute2.
 > 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> Signed-off-by: Sam James <sam@gentoo.org>
+> ---
+>  configure | 1 +
+>  1 file changed, 1 insertion(+)
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Here is the summary with links:
+  - [iproute2] configure: Add _GNU_SOURCE to strlcpy configure test
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=0a24c18d30f4
 
-    Andrew
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
