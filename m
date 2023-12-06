@@ -1,106 +1,108 @@
-Return-Path: <netdev+bounces-54584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27BC1807862
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 20:08:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D436E807872
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 20:15:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D5D9281D91
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 19:08:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58B92B20DAB
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 19:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A71649F81;
-	Wed,  6 Dec 2023 19:08:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 392836DCFE;
+	Wed,  6 Dec 2023 19:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FzQiPI39"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZW3mQY6I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5838439FF5;
-	Wed,  6 Dec 2023 19:08:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BDACC433C7;
-	Wed,  6 Dec 2023 19:08:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A64A6DCE3
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 19:15:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EA29C433C7;
+	Wed,  6 Dec 2023 19:15:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701889682;
-	bh=mk22NdkfBNdfAfeeQw1EbdrJEVgfDlAix+kmVnh+OAc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FzQiPI39g4aUTdmFWCiaHbxzhkqLL06D3ySAS2tTCyPd+pkunmeniZn2Wc/h8DrtC
-	 8tftlBzMZKVLLYBhFoWPzlaogzqzOP7gGhQrB3dQ+lHJ0vhmV3v5CmfucCRF1+ZbcM
-	 KjqDixsz8OZEoxpbYcX+TR/Z31E2Lygf/+BvN4Ky204Dlzvtlii0CbcGEWg/siFt3b
-	 3i/gmOMRnhHgP8t/9y/lOjPdqruEM/nmri3epkrqUliDcZPRqT74ZNvku3gCyGa7aY
-	 9JfcriU8Y3QHhGMZEItCHhCOX64mPI+jdwwVXaz21oC5tgVKwsznLuYufJU/MqQ3dV
-	 3q7OptYErEaHA==
-Date: Wed, 6 Dec 2023 19:07:58 +0000
-From: Simon Horman <horms@kernel.org>
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH net-next v3 3/9] net: rswitch: Use build_skb() for RX
-Message-ID: <20231206190758.GZ50400@kernel.org>
-References: <20231204012058.3876078-1-yoshihiro.shimoda.uh@renesas.com>
- <20231204012058.3876078-4-yoshihiro.shimoda.uh@renesas.com>
+	s=k20201202; t=1701890137;
+	bh=SQBCq+vdv0d3tGaClUH0WQbz0FTWgbIDaKT4M0mAh1M=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ZW3mQY6IaEElt6DdQcPJRLSzIdWZQ+mW/oGAUfWPF2QMPgjxB9CT2p1Lhiajup1XC
+	 oDqO70xg+YNQp5jh9A47oedCCkYEThPN9EUufF8iGfoHJHyA2NGwIEjPxW3LJico6Q
+	 ZRXIGKfWNAV0wC6LYY8h0u3cJuWmILQn7Z/dQQUelRcWo5mnS6Q1KIFwT2u7JCO7YS
+	 5nWgtdFB4Shah17Pk0zmJYLglrUo1e+SZlKWrXIznjllXhx8Ydf5/Yq7GqDLtYRn0n
+	 SEiXpR8E422gZuQUqE+CRWSH3WHlEIlFKNKhZQ8RZYYiiBfWVX22Pr6pfyIeFXJk24
+	 KysCm5H0cGrTw==
+Message-ID: <e4823a44-33a9-4dbf-a39d-66ae256b903a@kernel.org>
+Date: Wed, 6 Dec 2023 12:15:36 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231204012058.3876078-4-yoshihiro.shimoda.uh@renesas.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] neighbour: Don't let neigh_forced_gc() disable
+ preemption for long
+Content-Language: en-US
+To: Doug Anderson <dianders@chromium.org>
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+ Judy Hsiao <judyhsiao@chromium.org>, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Brian Haley <haleyb.dev@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Joel Granados <joel.granados@gmail.com>, Julian Anastasov <ja@ssi.bg>,
+ Leon Romanovsky <leon@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20231206033913.1290566-1-judyhsiao@chromium.org>
+ <20231206093917.04fd57b5@hermes.local>
+ <efd58582-31b6-47f0-ba14-bf369fddd1c0@kernel.org>
+ <CAD=FV=UgPZoXsGTgLV_4X9x2hGTMouO3Tpe9_WkwhU7Bsvav2Q@mail.gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <CAD=FV=UgPZoXsGTgLV_4X9x2hGTMouO3Tpe9_WkwhU7Bsvav2Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Dec 04, 2023 at 10:20:52AM +0900, Yoshihiro Shimoda wrote:
-> If this hardware receives a jumbo frame like 2KiB or more, it will be
-> split into multiple queues. In the near future, to support this, use
-> build_skb() instead of netdev_alloc_skb_ip_align().
+On 12/6/23 11:49 AM, Doug Anderson wrote:
+> Hi,
 > 
-> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+> On Wed, Dec 6, 2023 at 9:51 AM David Ahern <dsahern@kernel.org> wrote:
+>>
+>> On 12/6/23 10:39 AM, Stephen Hemminger wrote:
+>>> On Wed,  6 Dec 2023 03:38:33 +0000
+>>> Judy Hsiao <judyhsiao@chromium.org> wrote:
+>>>
+>>>> diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+>>>> index df81c1f0a570..552719c3bbc3 100644
+>>>> --- a/net/core/neighbour.c
+>>>> +++ b/net/core/neighbour.c
+>>>> @@ -253,9 +253,11 @@ static int neigh_forced_gc(struct neigh_table *tbl)
+>>>>  {
+>>>>      int max_clean = atomic_read(&tbl->gc_entries) -
+>>>>                      READ_ONCE(tbl->gc_thresh2);
+>>>> +    u64 tmax = ktime_get_ns() + NSEC_PER_MSEC;
+>>>>      unsigned long tref = jiffies - 5 * HZ;
+>>>>      struct neighbour *n, *tmp;
+>>>>      int shrunk = 0;
+>>>> +    int loop = 0;
+>>>>
+>>>>      NEIGH_CACHE_STAT_INC(tbl, forced_gc_runs);
+>>>>
+>>>> @@ -278,11 +280,16 @@ static int neigh_forced_gc(struct neigh_table *tbl)
+>>>>                              shrunk++;
+>>>>                      if (shrunk >= max_clean)
+>>>>                              break;
+>>>> +                    if (++loop == 16) {
+>>>
+>>> Overall looks good.
+>>> Minor comments:
+>>>       - loop count should probably be unsigned
+>>>         - the magic constant 16 should be a sysctl tuneable
+>>
+>> A tunable is needed here; the loop counter is just to keep the overhead
+>> of the ktime_get_ns call in check.
+> 
+> From context, I'm going to assume you meant a tunable is _NOT_ needed here. ;-)
+> 
+> -Doug
 
-...
-
->  static void rswitch_gwca_ts_queue_free(struct rswitch_private *priv)
-> @@ -308,17 +308,19 @@ static int rswitch_gwca_queue_alloc(struct net_device *ndev,
->  	gq->ring_size = ring_size;
->  	gq->ndev = ndev;
->  
-> -	gq->skbs = kcalloc(gq->ring_size, sizeof(*gq->skbs), GFP_KERNEL);
-> -	if (!gq->skbs)
-> -		return -ENOMEM;
-> -
->  	if (!dir_tx) {
-> -		rswitch_gwca_queue_alloc_skb(gq, 0, gq->ring_size);
-> +		gq->rx_bufs = kcalloc(gq->ring_size, sizeof(*gq->rx_bufs), GFP_KERNEL);
-> +		if (!gq->rx_bufs)
-> +			goto out;
-
-Hi Shimoda-san,
-
-there is no need to re-spin because of this,
-but I have some commends on error handling.
-
-I think that for consistency this can just return -ENOMEM.
-Or alternatively, perhaps 'goto out' can be used for the (!gq->skbs)
-condition below.
-
-> +		rswitch_gwca_queue_alloc_rx_buf(gq, 0, gq->ring_size);
-
-Not strictly related to this patch, but should
-the return value of rswitch_gwca_queue_alloc_rx_buf be checked?
-
->  
->  		gq->rx_ring = dma_alloc_coherent(ndev->dev.parent,
->  						 sizeof(struct rswitch_ext_ts_desc) *
->  						 (gq->ring_size + 1), &gq->ring_dma, GFP_KERNEL);
->  	} else {
-> +		gq->skbs = kcalloc(gq->ring_size, sizeof(*gq->skbs), GFP_KERNEL);
-> +		if (!gq->skbs)
-> +			return -ENOMEM;
->  		gq->tx_ring = dma_alloc_coherent(ndev->dev.parent,
->  						 sizeof(struct rswitch_ext_desc) *
->  						 (gq->ring_size + 1), &gq->ring_dma, GFP_KERNEL);
-
-...
+yes, multitasking fail :-(
 
