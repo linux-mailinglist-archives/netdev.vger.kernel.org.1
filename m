@@ -1,133 +1,206 @@
-Return-Path: <netdev+bounces-54377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E92EF806CDD
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 11:58:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F951806D25
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 12:00:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3DBA28199A
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:58:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A0B41C20914
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 11:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EAF230653;
-	Wed,  6 Dec 2023 10:58:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B77753066D;
+	Wed,  6 Dec 2023 11:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V3W0jyI/"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Aud7xUpj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE610D45
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 02:58:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701860317;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ws+hgkygHt/vtC7PcuOkC3qv40aLWwHeYDQTmLjEFPw=;
-	b=V3W0jyI/70PxABB6rNlwQrF6b+YcAC6ZktzhgWdOh/WIqdF6nL/93r9N0Xfr8CInUmOzQg
-	yENse54kKSlLDzdlncDYuycz2Pun4Lg9OndHK4GR+iK5W0C9d1+w4oFTyNkYsXPF2jSJH9
-	7LOKvzYRUTSJruIO1oHsYp9X97hgLzI=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-568-cWFgAFzzNkenZ31Xw6_EvQ-1; Wed, 06 Dec 2023 05:58:36 -0500
-X-MC-Unique: cWFgAFzzNkenZ31Xw6_EvQ-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-5450c83aa5dso881083a12.0
-        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 02:58:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701860315; x=1702465115;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Ws+hgkygHt/vtC7PcuOkC3qv40aLWwHeYDQTmLjEFPw=;
-        b=lF/dMvTS7q/J6vXsQKgTuhBYca25wvuXVpYLDv89A2ZQkYCImr2RmVs7VyCh9gjs7y
-         QfLLyGOMPzjwzSPdL5Lz+DH3xKdiVKljNAFuDMO7zlQm4iGb00Jp419Ay10LhIaRipHh
-         eR7pSg17oOUeOXLAaHTWt0CKiWQWuIzNW3BwMD4ajrt+c8KNacSF7N235Wz6wJZD5zn/
-         V6OKIcDSWeNImI91LNMR2CTOYrR5Y39DTUNKYcx8b94GDB/CLZtLHe7z6SdsW+c6Ru4W
-         kWy13BUvf91jC+4X/83BH8tNtOIE+J3rU5NpL7I2xVGNN05+MOFnhVk9iFsjIVrYPKY+
-         E6bg==
-X-Gm-Message-State: AOJu0YxjBgGfVRF/NvMgP2VCM2pdY88wm27TkPnpe6e3vf854d7njrdJ
-	UNtkeSuwoZTkm2Q40lWrOoMCKvgb3HMU7z0yGaRwjomrMY4D13GjiS/0wKEUsLV0xNbloY65akt
-	MqMmi7chaE2G2DVwg
-X-Received: by 2002:a17:906:57c8:b0:a1a:541c:561b with SMTP id u8-20020a17090657c800b00a1a541c561bmr994470ejr.6.1701860314994;
-        Wed, 06 Dec 2023 02:58:34 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEWly6Sn6L5UhvuHcIpOPIEOfYoGl6GmooOAkWFEeTSkRUFQqvojaS4yL0eew8srCAFkMPLSg==
-X-Received: by 2002:a17:906:57c8:b0:a1a:541c:561b with SMTP id u8-20020a17090657c800b00a1a541c561bmr994456ejr.6.1701860314628;
-        Wed, 06 Dec 2023 02:58:34 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-243-102.dyn.eolo.it. [146.241.243.102])
-        by smtp.gmail.com with ESMTPSA id y21-20020a17090629d500b00a1d3b1c311csm1260323eje.164.2023.12.06.02.58.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 02:58:34 -0800 (PST)
-Message-ID: <f18fdc337f58317b85acb45a0ac694f9140fc022.camel@redhat.com>
-Subject: Re: [net-next PATCH v6 1/2] octeontx2-af: Add new mbox to support
- multicast/mirror offload
-From: Paolo Abeni <pabeni@redhat.com>
-To: Suman Ghosh <sumang@marvell.com>, sgoutham@marvell.com,
- gakula@marvell.com,  sbhatta@marvell.com, hkelam@marvell.com,
- davem@davemloft.net, edumazet@google.com,  kuba@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- lcherian@marvell.com, jerinj@marvell.com, horms@kernel.org, 
- wojciech.drewek@intel.com
-Date: Wed, 06 Dec 2023 11:58:32 +0100
-In-Reply-To: <20231204141956.3956942-2-sumang@marvell.com>
-References: <20231204141956.3956942-1-sumang@marvell.com>
-	 <20231204141956.3956942-2-sumang@marvell.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E79B1FF1;
+	Wed,  6 Dec 2023 02:59:58 -0800 (PST)
+Received: from [100.113.186.2] (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id D896C660576A;
+	Wed,  6 Dec 2023 10:59:54 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1701860396;
+	bh=HoPHOhlV5xjupYlTbEAUED1Io4kwS+bA2h3iDVkbUWc=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=Aud7xUpjM8bRjM7zomse72JYlZAIPri/6RIp9o0ijL/8LGxHF+BIayERr9Sakoevn
+	 b4uXHgp5w5WVDSltP2n2DpVpy83vXk46pKB3JVTAYXIApp+W9sAYmM8wUWdmrpPvUd
+	 nXRN7BdRwYPFnjWK3Ug4RlUI8biuHmBbHPrW67zo4RRGKjfDzcDCY1bEBLxkyTk15V
+	 7E2USSxoKh6efRjxybRqYk0NfNF1U0zLXhvglR6loxxeFi4wEHMrsrl0xqoQkyylHG
+	 TwxA3q/FkZQs3xeBGESjLQEfJdpiHjHiEqa9G+m7jtYK2DIYINdVMeIP3nfJ8F5AuB
+	 /kd33Us9uCKfQ==
+Message-ID: <3e72bff6-9f4d-4cd4-845e-b065f1233ec6@collabora.com>
+Date: Wed, 6 Dec 2023 11:59:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/4] dt-bindings: clock: mediatek: add clock
+ controllers of MT7988
+Content-Language: en-US
+To: Daniel Golle <daniel@makrotopia.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Sabrina Dubroca <sd@queasysnail.net>, Jianhui Zhao <zhaojh329@gmail.com>,
+ Chen-Yu Tsai <wenst@chromium.org>, "Garmin.Chang"
+ <Garmin.Chang@mediatek.com>, Sam Shih <sam.shih@mediatek.com>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Dan Carpenter <dan.carpenter@linaro.org>,
+ James Liao <jamesjj.liao@mediatek.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org
+References: <23bc89d407e7797e97b703fa939b43bfe79296ce.1701823757.git.daniel@makrotopia.org>
+ <def05aac79ddff872d3e56698b736cb445f14116.1701823757.git.daniel@makrotopia.org>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+In-Reply-To: <def05aac79ddff872d3e56698b736cb445f14116.1701823757.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 2023-12-04 at 19:49 +0530, Suman Ghosh wrote:
-> A new mailbox is added to support offloading of multicast/mirror
-> functionality. The mailbox also supports dynamic updation of the
-> multicast/mirror list.
->=20
-> Signed-off-by: Suman Ghosh <sumang@marvell.com>
-> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-
-Note that v5 was already applied to net-next. But I still have a
-relevant note, see below.
-
-> @@ -5797,3 +6127,337 @@ int rvu_mbox_handler_nix_bandprof_get_hwinfo(stru=
-ct rvu *rvu, struct msg_req *re
-> =20
->  	return 0;
->  }
+Il 06/12/23 01:57, Daniel Golle ha scritto:
+> Add various clock controllers found in the MT7988 SoC to existing
+> bindings (if applicable) and add files for the new ethwarp, mcusys
+> and xfi-pll clock controllers not previously present in any SoC.
+> 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+> v3:
+>   * move clock bindings to clock folder
+>   * drop ti,syscon-reset from bindings and example
+>   * merge mcusys with topckgen bindings
+> 
+> v2:
+>   * dropped unused labels
+>   * add 'type: object' declaration for reset-controller found in new
+>     ethwarp controller and represented as ti,syscon-reset
+>   * rebase on top of
+>     "dt-bindings: arm: mediatek: move ethsys controller & convert to DT schema"
+> 
+>   .../arm/mediatek/mediatek,infracfg.yaml       |  1 +
+>   .../bindings/clock/mediatek,apmixedsys.yaml   |  1 +
+>   .../bindings/clock/mediatek,ethsys.yaml       |  1 +
+>   .../clock/mediatek,mt7988-ethwarp.yaml        | 49 +++++++++++++++++++
+>   .../clock/mediatek,mt7988-xfi-pll.yaml        | 48 ++++++++++++++++++
+>   .../bindings/clock/mediatek,topckgen.yaml     |  2 +
+>   .../bindings/net/pcs/mediatek,sgmiisys.yaml   | 13 +++--
+>   7 files changed, 112 insertions(+), 3 deletions(-)
+>   create mode 100644 Documentation/devicetree/bindings/clock/mediatek,mt7988-ethwarp.yaml
+>   create mode 100644 Documentation/devicetree/bindings/clock/mediatek,mt7988-xfi-pll.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/arm/mediatek/mediatek,infracfg.yaml b/Documentation/devicetree/bindings/arm/mediatek/mediatek,infracfg.yaml
+> index ea98043c6ba3d..230b5188a88db 100644
+> --- a/Documentation/devicetree/bindings/arm/mediatek/mediatek,infracfg.yaml
+> +++ b/Documentation/devicetree/bindings/arm/mediatek/mediatek,infracfg.yaml
+> @@ -30,6 +30,7 @@ properties:
+>                 - mediatek,mt7629-infracfg
+>                 - mediatek,mt7981-infracfg
+>                 - mediatek,mt7986-infracfg
+> +              - mediatek,mt7988-infracfg
+>                 - mediatek,mt8135-infracfg
+>                 - mediatek,mt8167-infracfg
+>                 - mediatek,mt8173-infracfg
+> diff --git a/Documentation/devicetree/bindings/clock/mediatek,apmixedsys.yaml b/Documentation/devicetree/bindings/clock/mediatek,apmixedsys.yaml
+> index 372c1d744bc27..685535846cbb7 100644
+> --- a/Documentation/devicetree/bindings/clock/mediatek,apmixedsys.yaml
+> +++ b/Documentation/devicetree/bindings/clock/mediatek,apmixedsys.yaml
+> @@ -22,6 +22,7 @@ properties:
+>             - mediatek,mt7622-apmixedsys
+>             - mediatek,mt7981-apmixedsys
+>             - mediatek,mt7986-apmixedsys
+> +          - mediatek,mt7988-apmixedsys
+>             - mediatek,mt8135-apmixedsys
+>             - mediatek,mt8173-apmixedsys
+>             - mediatek,mt8516-apmixedsys
+> diff --git a/Documentation/devicetree/bindings/clock/mediatek,ethsys.yaml b/Documentation/devicetree/bindings/clock/mediatek,ethsys.yaml
+> index 94d42c8647777..f9cddacc2eae1 100644
+> --- a/Documentation/devicetree/bindings/clock/mediatek,ethsys.yaml
+> +++ b/Documentation/devicetree/bindings/clock/mediatek,ethsys.yaml
+> @@ -22,6 +22,7 @@ properties:
+>                 - mediatek,mt7629-ethsys
+>                 - mediatek,mt7981-ethsys
+>                 - mediatek,mt7986-ethsys
+> +              - mediatek,mt7988-ethsys
+>             - const: syscon
+>         - items:
+>             - const: mediatek,mt7623-ethsys
+> diff --git a/Documentation/devicetree/bindings/clock/mediatek,mt7988-ethwarp.yaml b/Documentation/devicetree/bindings/clock/mediatek,mt7988-ethwarp.yaml
+> new file mode 100644
+> index 0000000000000..9b919a155eb13
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/clock/mediatek,mt7988-ethwarp.yaml
+> @@ -0,0 +1,49 @@
+> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/arm/mediatek/mediatek,mt7988-ethwarp.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
 > +
-> +static struct nix_mcast_grp_elem *rvu_nix_mcast_find_grp_elem(struct nix=
-_mcast_grp *mcast_grp,
-> +							      u32 mcast_grp_idx)
-> +{
-> +	struct nix_mcast_grp_elem *iter;
-> +	bool is_found =3D false;
+> +title: MediaTek MT7988 ethwarp Controller
 > +
-> +	mutex_lock(&mcast_grp->mcast_grp_lock);
-> +	list_for_each_entry(iter, &mcast_grp->mcast_grp_head, list) {
-> +		if (iter->mcast_grp_idx =3D=3D mcast_grp_idx) {
-> +			is_found =3D true;
-> +			break;
-> +		}
-> +	}
-> +	mutex_unlock(&mcast_grp->mcast_grp_lock);
+> +maintainers:
+> +  - Daniel Golle <daniel@makrotopia.org>
+> +
+> +description:
+> +  The Mediatek MT7988 ethwarp controller provides clocks and resets for the
+> +  Ethernet related subsystems found the MT7988 SoC.
+> +  The clock values can be found in <dt-bindings/clock/mt*-clk.h>.
+> +
+> +properties:
+> +  compatible:
+> +    items:
+> +      - const: mediatek,mt7988-ethwarp
+> +      - const: syscon
+> +      - const: simple-mfd
 
-AFAICS, at this point another thread/CPU could kick-in and run
-rvu_mbox_handler_nix_mcast_grp_destroy() up to completion, freeing
-'iter' before it's later used by the current thread.
+No, this is not a mfd, I say.
 
-What prevents such scenario?
+Prove me wrong! :-)
 
-_If_ every mcast group manipulation happens under the rtnl lock, then
-you could as well completely remove the confusing mcast_grp_lock.
+..snip..
+
+> diff --git a/Documentation/devicetree/bindings/net/pcs/mediatek,sgmiisys.yaml b/Documentation/devicetree/bindings/net/pcs/mediatek,sgmiisys.yaml
+> index 66a95191bd776..68632cda334bd 100644
+> --- a/Documentation/devicetree/bindings/net/pcs/mediatek,sgmiisys.yaml
+> +++ b/Documentation/devicetree/bindings/net/pcs/mediatek,sgmiisys.yaml
+> @@ -15,15 +15,22 @@ description:
+>   
+>   properties:
+>     compatible:
+> -    items:
+> -      - enum:
+> +    oneOf:
+> +      - items:
+> +        - enum:
+>             - mediatek,mt7622-sgmiisys
+>             - mediatek,mt7629-sgmiisys
+>             - mediatek,mt7981-sgmiisys_0
+>             - mediatek,mt7981-sgmiisys_1
+>             - mediatek,mt7986-sgmiisys_0
+>             - mediatek,mt7986-sgmiisys_1
+> -      - const: syscon
+> +        - const: syscon
+> +      - items:
+> +        - enum:
+> +          - mediatek,mt7988-sgmiisys_0
+> +          - mediatek,mt7988-sgmiisys_1
+> +        - const: syscon
+> +        - const: simple-mfd
+
+Same.
 
 Cheers,
-
-Paolo
-
+Angelo
 
