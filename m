@@ -1,153 +1,107 @@
-Return-Path: <netdev+bounces-54609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63E578079E9
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 21:59:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F28BA8079ED
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 22:01:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D57F282468
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 20:59:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EEB27B2101B
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 21:01:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E2F60EDB;
-	Wed,  6 Dec 2023 20:59:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B6247F66;
+	Wed,  6 Dec 2023 21:00:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="jZZw9mI7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ahauyE9B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A710D42
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 12:59:12 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1d0a5422c80so1634085ad.3
-        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 12:59:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1701896352; x=1702501152; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=J93fduvsJM9IBDskoI9RKo4tnycXW8hW3zH9yUjvMQk=;
-        b=jZZw9mI7YrxEPgI+aIObpwp94vnWw09sNo7OJ/9O8MwgjocHUrmcfZpMxhmTZjk3CF
-         SZ0XlZj4Tt8IneivqQgFUq6XcOuf9wDJds7WEv3FQKLaytYyPTknLrpB1dfzqRfHHL4X
-         kXCU7iBrV3JBcbRr1LsgX3tMkuE4Y+1zGEvic=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701896352; x=1702501152;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=J93fduvsJM9IBDskoI9RKo4tnycXW8hW3zH9yUjvMQk=;
-        b=PaI44by2OWW2xhPvvv8cVcY08kPWUIkc8iBthBo217iaDn5B+7WSonzTKzTIzyIEKn
-         9EGOmQyrrvdwpZnBPdNjTTY5yRowCYnX7Oh+vKJ/Rsa86hiaTvkTCYyj6gEM/NvHTe1h
-         bv8SJbdYECojGuUH/3mIQ/MtMpw5+W5cSLi2O1zkqeDHbpwBwm2/cotWOQQysl1IIbNM
-         1RiLUuzdSNnCsXcbcIsXhiHS71eKvrMWpvnc8j7kxo4CN/9PWmuUP/nMwfmbGcgZmh7K
-         gzO5s33YNNcUMZDDwsiI4yvMWYF9NRIhNIZ+p/w9b7OErUWHflbSHqDlBfKFpd3Fi4nx
-         1iFQ==
-X-Gm-Message-State: AOJu0YyfC5vVBYaEaK7ouXBrTssAQxVDmltIVDxMuZolhbgf/e2hLnf5
-	6pUyh6aZFQELA1pfDCqU0ipiJefT64YioVbkD3g=
-X-Google-Smtp-Source: AGHT+IFvswkhjo/IRJgksME8nSDfGlm3ijJw/G6gOtT77V36Y3AGjjCCSiF/AeJmBG3/ZUhfEybY+w==
-X-Received: by 2002:a17:902:ce8c:b0:1d0:5efb:852e with SMTP id f12-20020a170902ce8c00b001d05efb852emr1894519plg.40.1701896351898;
-        Wed, 06 Dec 2023 12:59:11 -0800 (PST)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id g15-20020a1709029f8f00b001cffe1e7374sm241121plq.214.2023.12.06.12.59.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 12:59:11 -0800 (PST)
-From: Kees Cook <keescook@chromium.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Kees Cook <keescook@chromium.org>,
-	kernel test robot <lkp@intel.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jeff Johnson <quic_jjohnson@quicinc.com>,
-	Michael Walle <mwalle@kernel.org>,
-	Max Schulze <max.schulze@online.de>,
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16CFBD5B;
+	Wed,  6 Dec 2023 13:00:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701896456; x=1733432456;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=gf6A/da8Ph5wHaBV8QGdKg/10gFjzFHD4tYQbfo/VI0=;
+  b=ahauyE9Bz60beOqkLel9ZKDpiLHEcyARHb2ZQW4753nu/RfyfF1pDNU/
+   og+kJ5CU0bXdA5Rj5w6Dw00nu/WjmLoCh/JYM7UDgVAgepSBFqR1Ylud0
+   Cw1sfWt2G6+I6WFTQHD4M5ZIX0fM+tU+M4izSksfGAObVmJyl6uTCoLQJ
+   Mb4p4BoocSrmIBcPzhMxztgDlLAT9XpkyxbI80fDU5sFWEcWGSN+SdbTm
+   w4CkizQ0BAUSgDOgggfpK9ZekhkoygHttCorcMuM7v7sEjzMVADTyNDTC
+   IruZO921IopS7WP0Ria+KcfhuSaPxBr3V7C2BEg3eNnMlWzK722teXr+3
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="425278149"
+X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
+   d="scan'208";a="425278149"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2023 13:00:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="837448530"
+X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
+   d="scan'208";a="837448530"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmsmga008.fm.intel.com with ESMTP; 06 Dec 2023 13:00:52 -0800
+Received: from lincoln.igk.intel.com (lincoln.igk.intel.com [10.102.21.235])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id AD25E32A17;
+	Wed,  6 Dec 2023 21:00:50 +0000 (GMT)
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: bpf@vger.kernel.org
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
 	netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH v3] netlink: Return unsigned value for nla_len()
-Date: Wed,  6 Dec 2023 12:59:07 -0800
-Message-Id: <20231206205904.make.018-kees@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Magnus Karlsson <magnus.karlsson@gmail.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Aleksander Lobakin <aleksander.lobakin@intel.com>
+Subject: [PATCH bpf-next v4 0/2] Allow data_meta size > 32
+Date: Wed,  6 Dec 2023 21:59:17 +0100
+Message-ID: <20231206205919.404415-1-larysa.zaremba@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2690; i=keescook@chromium.org;
- h=from:subject:message-id; bh=pLbf9+8/Dl6ABNGi9y3vSm6UF9GJMzpseYPTOTsyx3s=;
- b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBlcOCb/xqKImyOG8B5tSBdCnmYR3X3y0Fpi6OPz
- +IJ//WINgGJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZXDgmwAKCRCJcvTf3G3A
- Jla8D/4u3zQcCSzbtxkzBPPv06VCqIqEjWUmThCDWb+7VGajZMflRwumsBIenZhrHpN5F5aclOO
- 4VuHTW8AM5MPLgfRnMQ4JvuUp2Upru5NZQjfGbfMVR8helKPFcBr9hc04VO1f92ifYptZRN/LKb
- jOKQWB3KCZMuQasgWFlbpupkYVvuSZVid0v4uHPmr+XPVJHMHShYG5uojmi79M+Ublpsz9iH88S
- lbfK82rcT0UN8FROEBI2dTwMS5WlKw4KrykUQbatRuSyFrU7vSM2SFxoT55PrI419GzCH35Rvqc
- gz7Zap2Sr3KnVwn21KhkpdXtzjiX8Y/hOeWFpfSnhS/PlKtOUWwS84KMSfBCuqIWqBo62i0+zGT
- tyELRq341AAVcM5zvGvxbytPFkyPSbNR7dZJ2STXBR6LM0NKhVEqnpQXcXn2zq5bhpj25epO8cJ
- 5rHqEuJaVlT0U7t1RHlp3tkdieB2VJpkHjx9vnAMrB7aXV+30hKEZZvtgIpv6UXRdfnBYXufLpw
- hPjF2ZyQ7BEW3wi3OqKe0Hw0rZrzOYmCRZ5s/oUW5icBLeD2zNyTioD8elQ+oFohpwdafgXuy/v
- 9qOsRL44DGAAZ+T1MUSWBz+xvuCU2vKWiUkQWVbeT+otZYhXiojiclK7j+OVH8jbd3TIghZHF6P
- 3UCxxmr ZBhWuGBg==
-X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 
-The return value from nla_len() is never expected to be negative, and can
-never be more than struct nlattr::nla_len (a u16). Adjust the prototype
-on the function. This will let GCC's value range optimization passes
-know that the return can never be negative, and can never be larger than
-u16. As recently discussed[1], this silences the following warning in
-GCC 12+:
+Currently, there is no reason for data_meta to be limited to 32 bytes.
+Loosen this limitation and make maximum meta size 252 (max value of u8,
+aligned to 4). Details in the second patch.
 
-net/wireless/nl80211.c: In function 'nl80211_set_cqm_rssi.isra':
-net/wireless/nl80211.c:12892:17: warning: 'memcpy' specified bound 18446744073709551615 exceeds maximum object size 9223372036854775807 [-Wstringop-overflow=]
-12892 |                 memcpy(cqm_config->rssi_thresholds, thresholds,
-      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-12893 |                        flex_array_size(cqm_config, rssi_thresholds,
-      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-12894 |                                        n_thresholds));
-      |                                        ~~~~~~~~~~~~~~
+Also, modify the selftest, so test_xdp_context_error does not complain
+about the unexpected success.
 
-A future change would be to clamp the subtraction to make sure it never
-wraps around if nla_len is somehow less than NLA_HDRLEN, which would
-have the additional benefit of being defensive in the face of nlattr
-corruption or logic errors.
+v3->v4:
+* Explain limit of 252 in cover letter and commit message
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202311090752.hWcJWAHL-lkp@intel.com/ [1]
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>
-Cc: Jeff Johnson <quic_jjohnson@quicinc.com>
-Cc: Michael Walle <mwalle@kernel.org>
-Cc: Max Schulze <max.schulze@online.de>
-Cc: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Link: https://lore.kernel.org/r/20231202202539.it.704-kees@kernel.org
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- v3: do not cast NLA_HDRLEN to u16 (nicolas.dichtel)
- v2: https://lore.kernel.org/all/20231202202539.it.704-kees@kernel.org/
- v1: https://lore.kernel.org/all/20231130200058.work.520-kees@kernel.org/
----
- include/net/netlink.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+v2->v3:
+* Fix main patch author
+* Add selftests path
 
-diff --git a/include/net/netlink.h b/include/net/netlink.h
-index 83bdf787aeee..7678a596a86b 100644
---- a/include/net/netlink.h
-+++ b/include/net/netlink.h
-@@ -1200,7 +1200,7 @@ static inline void *nla_data(const struct nlattr *nla)
-  * nla_len - length of payload
-  * @nla: netlink attribute
-  */
--static inline int nla_len(const struct nlattr *nla)
-+static inline u16 nla_len(const struct nlattr *nla)
- {
- 	return nla->nla_len - NLA_HDRLEN;
- }
+v1->v2:
+* replace 'typeof(metalen)' with the actual type
+
+Aleksander Lobakin (1):
+  net, xdp: allow metadata > 32
+
+Larysa Zaremba (1):
+  selftests/bpf: increase invalid metadata size
+
+ include/linux/skbuff.h                              | 13 ++++++++-----
+ include/net/xdp.h                                   |  7 ++++++-
+ .../selftests/bpf/prog_tests/xdp_context_test_run.c |  4 ++--
+ 3 files changed, 16 insertions(+), 8 deletions(-)
+
 -- 
-2.34.1
+2.41.0
 
 
