@@ -1,126 +1,126 @@
-Return-Path: <netdev+bounces-54187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3703A806351
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 01:19:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E43CC806360
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 01:22:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8EC14B211D6
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 00:19:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F058282166
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 00:22:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF14D19F;
-	Wed,  6 Dec 2023 00:19:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 229B419F;
+	Wed,  6 Dec 2023 00:22:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vrubHhhR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fNuqpWKl"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [IPv6:2001:41d0:1004:224b::ae])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFE011A2
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 16:19:29 -0800 (PST)
-Message-ID: <8bd1d595-4bb3-44d1-a9c3-2d9c0c960bcb@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1701821967;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FDi2GR+fCgeL6g64+LyWBiWncmrcFqQFI6ly1vYBOLE=;
-	b=vrubHhhR+3gKDTzdbUH8sRkx0vSczF/ZoFZZy5nAxYK4VEsmlMdInBYRpxPJqPBe5+jerG
-	BcfIS00Zb7j5XgcPhhAVOAA6Rz6XnIC5GIdJLAPzscC64wSYSjTEJoMI/wk2e4KK9Xbl7j
-	/rjKLVk2DIQuk3avtwJXyUW+Lr9f3+0=
-Date: Tue, 5 Dec 2023 16:19:20 -0800
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B48F41A4
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 16:22:29 -0800 (PST)
+Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-54cc60f3613so3799081a12.2
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 16:22:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701822148; x=1702426948; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7CxVh4KjAZkwso8l+MJQRNq1axFZ2ic5CVdh+OzmZ6Y=;
+        b=fNuqpWKlckUjD9w1mQ5KWI5F3/at3xNFSHlNI2F+7ZlTEvq9+yzDnVL999OS1pZxbM
+         UGfbD88cGFwHO9VtuKLMZ3FhY8JEpyviwgTxfbWQMzC4GlqHtzFHdhxCwkhufG6jEqd7
+         7r0LPSEkWpIPsxBxE9uHE2xdNxEKKL/l/5CEgJQVpd+ucZnUXCXcMOc16AlLT9Xzdu9T
+         JuxYI1HPKzKqxYAmLPZhqnpz4/htzbgZ77B01fvk7cY8Ap21uZ8UGiPP1+Pms0KBcxtu
+         BHZryXbH1Cz35/C4YWxwHF5kn6snLUEZFQs2KJ7Zw60dB/bfejC2lgWI9hBH370kzs07
+         KqGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701822148; x=1702426948;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7CxVh4KjAZkwso8l+MJQRNq1axFZ2ic5CVdh+OzmZ6Y=;
+        b=NiHbCHnByceIKYRtBCIBo1nH0m++jEOf0khkN8Hc6Lpd0P+jcRUoF3SE0uJztYYySY
+         ubiLk4vPNyYdQb7Xr1RM8ESACDa+qo5zcgKVob5lCiU2UgNF0TkrjfTQtMbSDujV5Tio
+         KWP94Pr+I+bu6sd0tlJWaXBQcwNOcjE0oosEVCEM9Gs7lCgkLbCkpDUp6ZYJ6l44ytbr
+         1AkL1xWFJ+Q+qQK6LbYAL+TzWzoSspYGrXMPQJz/eMmM/8H2EJwmUejsPel7UqjSV8JB
+         2rQGPA4fmgH8x9TXy4zStrQCs3EwMbkiHxxGqrsswDgT/D/eSWUB6LTQAKZY1OMv26xl
+         Hltg==
+X-Gm-Message-State: AOJu0Yw8BZEWnArXIw6Vx9K7x0Rx4iQI8RPCNFs9FHdaKXDrJ8YGhUEZ
+	s6wonB4oHeaakBLHnK1cKWo=
+X-Google-Smtp-Source: AGHT+IFXZD74orANgkuah89H3q3Dwry2/HsMFK8O96sezP/dPN1cAX36tWoXX+L0viLJp1tj7KOUAg==
+X-Received: by 2002:a05:6402:5147:b0:54c:4837:81e6 with SMTP id n7-20020a056402514700b0054c483781e6mr54010edd.55.1701822147950;
+        Tue, 05 Dec 2023 16:22:27 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id e8-20020a50fb88000000b0054c6261d245sm1689399edq.37.2023.12.05.16.22.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Dec 2023 16:22:27 -0800 (PST)
+Date: Wed, 6 Dec 2023 02:22:25 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Tobias Waldekranz <tobias@waldekranz.com>
+Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
+	f.fainelli@gmail.com, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 6/6] net: dsa: mv88e6xxx: Add "rmon" counter
+ group support
+Message-ID: <20231206002225.nehk4htc4mozcq5b@skbuf>
+References: <20231205160418.3770042-1-tobias@waldekranz.com>
+ <20231205160418.3770042-7-tobias@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v4 bpf-next 1/3] bpf: tcp: Handle BPF SYN Cookie in
- cookie_v[46]_check().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>
-References: <20231205013420.88067-1-kuniyu@amazon.com>
- <20231205013420.88067-2-kuniyu@amazon.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20231205013420.88067-2-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231205160418.3770042-7-tobias@waldekranz.com>
 
-On 12/4/23 5:34 PM, Kuniyuki Iwashima wrote:
-> diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
-> index 61f1c96cfe63..0f9c3aed2014 100644
-> --- a/net/ipv4/syncookies.c
-> +++ b/net/ipv4/syncookies.c
-> @@ -304,6 +304,59 @@ static int cookie_tcp_reqsk_init(struct sock *sk, struct sk_buff *skb,
->   	return 0;
->   }
->   
-> +#if IS_ENABLED(CONFIG_BPF)
-> +struct request_sock *cookie_bpf_check(struct net *net, struct sock *sk,
-> +				      struct sk_buff *skb)
+On Tue, Dec 05, 2023 at 05:04:18PM +0100, Tobias Waldekranz wrote:
+> +static void mv88e6xxx_get_rmon_stats(struct dsa_switch *ds, int port,
+> +				     struct ethtool_rmon_stats *rmon_stats,
+> +				     const struct ethtool_rmon_hist_range **ranges)
 > +{
-> +	struct request_sock *req = inet_reqsk(skb->sk);
-> +	struct inet_request_sock *ireq = inet_rsk(req);
-> +	struct tcp_request_sock *treq = tcp_rsk(req);
-> +	struct tcp_options_received tcp_opt;
+> +	static const struct ethtool_rmon_hist_range rmon_ranges[] = {
+> +		{   64,    64 },
+> +		{   65,   127 },
+> +		{  128,   255 },
+> +		{  256,   511 },
+> +		{  512,  1023 },
+> +		{ 1024, 65535 },
+> +		{}
+> +	};
+> +	struct mv88e6xxx_chip *chip = ds->priv;
 > +	int ret;
 > +
-> +	skb->sk = NULL;
-> +	skb->destructor = NULL;
-> +	req->rsk_listener = NULL;
+> +	ret = mv88e6xxx_stats_snapshot(chip, port);
+> +	if (ret < 0)
+> +		return;
 > +
-> +	memset(&tcp_opt, 0, sizeof(tcp_opt));
-> +	tcp_parse_options(net, skb, &tcp_opt, 0, NULL);
-
-In patch 2, the bpf prog is passing the tcp_opt to the kfunc. The selftest in 
-patch 3 is also parsing the tcp-options.
-
-The kernel parses the tcp-option here again to do some checking and req's member 
-initialization. Can these checking and initialization be done in the 
-bpf_sk_assign_tcp_reqsk() kfunc instead to avoid the double tcp-option parsing?
-
+> +#define MV88E6XXX_RMON_STAT_MAP(_id, _member)				\
+> +	mv88e6xxx_stats_get_stat(chip, port,				\
+> +				 &mv88e6xxx_hw_stats[MV88E6XXX_HW_STAT_ID_ ## _id], \
+> +				 &rmon_stats->stats._member)
 > +
-> +	if (ireq->tstamp_ok ^ tcp_opt.saw_tstamp) {
-> +		__NET_INC_STATS(net, LINUX_MIB_SYNCOOKIESFAILED);
-> +		goto reset;
-> +	}
+> +	MV88E6XXX_RMON_STAT_MAP(in_undersize, undersize_pkts);
+> +	MV88E6XXX_RMON_STAT_MAP(in_oversize, oversize_pkts);
+> +	MV88E6XXX_RMON_STAT_MAP(in_fragments, fragments);
+> +	MV88E6XXX_RMON_STAT_MAP(in_jabber, jabbers);
+> +	MV88E6XXX_RMON_STAT_MAP(hist_64bytes, hist[0]);
+> +	MV88E6XXX_RMON_STAT_MAP(hist_65_127bytes, hist[1]);
+> +	MV88E6XXX_RMON_STAT_MAP(hist_128_255bytes, hist[2]);
+> +	MV88E6XXX_RMON_STAT_MAP(hist_256_511bytes, hist[3]);
+> +	MV88E6XXX_RMON_STAT_MAP(hist_512_1023bytes, hist[4]);
+> +	MV88E6XXX_RMON_STAT_MAP(hist_1024_max_bytes, hist[5]);
 > +
-> +	__NET_INC_STATS(net, LINUX_MIB_SYNCOOKIESRECV);
+> +#undef MV88E6XXX_RMON_STAT_MAP
 > +
-> +	if (ireq->tstamp_ok) {
-> +		if (!READ_ONCE(net->ipv4.sysctl_tcp_timestamps))
-> +			goto reset;
-> +
-> +		req->ts_recent = tcp_opt.rcv_tsval;
-> +		treq->ts_off = tcp_opt.rcv_tsecr - tcp_ns_to_ts(false, tcp_clock_ns());
-> +	}
-> +
-> +	if (ireq->sack_ok && !READ_ONCE(net->ipv4.sysctl_tcp_sack))
-> +		goto reset;
-> +
-> +	if (ireq->wscale_ok && !READ_ONCE(net->ipv4.sysctl_tcp_window_scaling))
-> +		goto reset;
-> +
-> +	ret = cookie_tcp_reqsk_init(sk, skb, req);
-> +	if (ret) {
-> +		reqsk_free(req);
-> +		req = NULL;
-> +	}
-> +
-> +	return req;
-> +
-> +reset:
-> +	reqsk_free(req);
-> +	return ERR_PTR(-EINVAL);
+> +	*ranges = rmon_ranges;
 > +}
-> +EXPORT_SYMBOL_GPL(cookie_bpf_check);
-> +#endif
 
+I just noticed that this doesn't populate the TX counters, just RX.
+
+I haven't tried it, but I think the Histogram Mode bits (11:10) of the
+Stats Operation Register might be able to control what gets reported for
+the Set 4 of counters. Currently AFAICS, the driver always sets it to
+MV88E6XXX_G1_STATS_OP_HIST_RX_TX, aka what gets reported to
+"rx-rmon-etherStatsPkts64to64Octets" is actually an RX+TX counter.
+
+What's the story behind this?
 
