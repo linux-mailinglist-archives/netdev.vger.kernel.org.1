@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-54336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77253806AE0
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:38:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C045806AF5
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:45:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 318AB28198E
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 09:38:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C97511F21248
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 09:45:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B10441A71C;
-	Wed,  6 Dec 2023 09:38:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7A31BDD4;
+	Wed,  6 Dec 2023 09:45:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="k3xwGbvc"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="J6Viro+m"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::225])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD4D3B9;
-	Wed,  6 Dec 2023 01:38:33 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 2AE831C000C;
-	Wed,  6 Dec 2023 09:38:27 +0000 (UTC)
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51149B9;
+	Wed,  6 Dec 2023 01:44:59 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3672B20005;
+	Wed,  6 Dec 2023 09:44:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1701855512;
+	t=1701855897;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4y+flM2aoike/FPH6qr4fSM5H3yUCAUYtHfykcYhVEk=;
-	b=k3xwGbvc8l51DdwhCNNogPX2i1UK8RjJkiIGiGaX0/DJVE/mlb7iIDCQUJX7b0YZt7Pyrz
-	ol/ktsBWk+HKKJ9KtMnbWNEZbsDwzAZarfZ8Tvw7RKPgjQfRyvZTdgdh2dzaknhZgnsGPc
-	CYNBqpr0zllwndP39wsFuYC0BUL1s/YeutbzFu7W1iQ/r2FAd2DGfueucoeZnU4UGzcbUd
-	DKRseSOSfCmYsxVvS2QS2Ef4WcQCfq6MI2Adx2ZJCp2z/Rr7ilVlDANz8ZYN4LzE2Yf7ZG
-	sRDfl+Qr214EPqeEauGxYkj4Y7YZqozG5zfnFxtxI9jLhBh5pkCvFanPbMffsQ==
-Date: Wed, 6 Dec 2023 10:38:26 +0100
+	bh=1wOVKCT46yFHYzsZfptn/YLuf58amecso91N0y4R11c=;
+	b=J6Viro+mz0owT7xGlK236zyL/HHYYcaom8AJXxIhCJMxSlaCJIaCrVXTji8O0Y2B+FB3yI
+	Ki01S0DKSB/GoyzwVdzLKhDlNObkSufX0srTobqBjEeIx8Mrk8IR5FNoOGCGiFfDUwgnvf
+	19+Uf8Rp0ztIC+ysfcHt9FZXj6whr9foZTg/GS1oFm0uxrMeZ9QT/431AC2O1k+erb3MKg
+	eePPpZRAN1tp/2qZTHcU4e6sPPlFPUEj3+etcmOKCKOULfBZJqVNa1b52PePUBkcj67nft
+	mRFIcgRG5xrRP0G44UqazKz5cxGUgTYE8mw0WOpSfevOFsWtdzXGhB4f1081og==
+Date: Wed, 6 Dec 2023 10:44:48 +0100
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: Daniel Golle <daniel@makrotopia.org>
 Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
@@ -52,12 +52,12 @@ Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
  devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
  linux-phy@lists.infradead.org
-Subject: Re: [RFC PATCH v2 3/8] net: pcs: pcs-mtk-lynxi: add platform driver
- for MT7988
-Message-ID: <20231206103826.4e396513@device.home>
-In-Reply-To: <68bb81ac6bf99393c8de256f42e5715626590af8.1701826319.git.daniel@makrotopia.org>
+Subject: Re: [RFC PATCH v2 2/8] phy: add driver for MediaTek pextp 10GE
+ SerDes PHY
+Message-ID: <20231206104448.0774da58@device.home>
+In-Reply-To: <63636378a52dd1ea7370dbf0ca3037a7d24004b9.1701826319.git.daniel@makrotopia.org>
 References: <cover.1701826319.git.daniel@makrotopia.org>
-	<68bb81ac6bf99393c8de256f42e5715626590af8.1701826319.git.daniel@makrotopia.org>
+	<63636378a52dd1ea7370dbf0ca3037a7d24004b9.1701826319.git.daniel@makrotopia.org>
 Organization: Bootlin
 X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
@@ -72,85 +72,102 @@ X-GND-Sasl: maxime.chevallier@bootlin.com
 
 Hello Daniel,
 
-My two cents below :
-
-On Wed, 6 Dec 2023 01:44:17 +0000
+On Wed, 6 Dec 2023 01:44:08 +0000
 Daniel Golle <daniel@makrotopia.org> wrote:
 
-> Introduce a proper platform MFD driver for the LynxI (H)SGMII PCS which
-> is going to initially be used for the MT7988 SoC.
+> Add driver for MediaTek's pextp 10 Gigabit/s Ethernet SerDes PHY which
+> can be found in the MT7988 SoC.
+> 
+> The PHY can operates only in PHY_MODE_ETHERNET, the submode is one of
+> PHY_INTERFACE_MODE_* corresponding to the supported modes:
+> 
+>  * USXGMII
+>  * 10GBase-R
+>  * 5GBase-R
+>  * 2500Base-X
+>  * 1000Base-X
+>  * Cisco SGMII (MAC side)
+> 
+> In order to work-around a performance issue present on the first of
+> two PEXTP present in MT7988 special tuning is applied which can be
+> selected by adding the mediatek,usxgmii-performance-errata property to
+> the device tree node.
+> 
+> There is no documentation what-so-ever for the pextp registers and
+> this driver is based on a GPL licensed implementation found in
+> MediaTek's SDK.
 > 
 > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-
- [ ... ]
-
-> +static int mtk_pcs_lynxi_enable(struct phylink_pcs *pcs)
-> +{
-> +	struct mtk_pcs_lynxi *mpcs = pcs_to_mtk_pcs_lynxi(pcs);
-> +
-> +	if (mpcs->sgmii_tx && mpcs->sgmii_rx) {
-> +		clk_prepare_enable(mpcs->sgmii_rx);
-> +		clk_prepare_enable(mpcs->sgmii_tx);
-
-You can use the clk_bulk_prepare_enable() here
-
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static void mtk_pcs_lynxi_disable(struct phylink_pcs *pcs)
->  {
->  	struct mtk_pcs_lynxi *mpcs = pcs_to_mtk_pcs_lynxi(pcs);
->  
-> +	regmap_set_bits(mpcs->regmap, SGMSYS_QPHY_PWR_STATE_CTRL, SGMII_PHYA_PWD);
-> +
-> +	if (mpcs->sgmii_tx && mpcs->sgmii_rx) {
-> +		clk_disable_unprepare(mpcs->sgmii_tx);
-> +		clk_disable_unprepare(mpcs->sgmii_rx);
-
-and clk_bulk_disable_unprepare() here
+> ---
 
  [...]
 
-> +static int mtk_pcs_lynxi_probe(struct platform_device *pdev)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	struct device_node *np = dev->of_node;
-> +	struct mtk_pcs_lynxi *mpcs;
-> +	struct phylink_pcs *pcs;
-> +	struct regmap *regmap;
-> +	u32 flags = 0;
 > +
-> +	mpcs = devm_kzalloc(dev, sizeof(*mpcs), GFP_KERNEL);
-> +	if (!mpcs)
+> +static int mtk_pextp_power_on(struct phy *phy)
+> +{
+> +	struct mtk_pextp_phy *pextp = phy_get_drvdata(phy);
+> +	int ret;
+> +
+> +	ret = clk_prepare_enable(pextp->clk[0]);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return clk_prepare_enable(pextp->clk[1]);
+> +}
+
+clk_bulk operations could be used here
+
+> +static int mtk_pextp_power_off(struct phy *phy)
+> +{
+> +	struct mtk_pextp_phy *pextp = phy_get_drvdata(phy);
+> +
+> +	clk_disable_unprepare(pextp->clk[1]);
+> +	clk_disable_unprepare(pextp->clk[0]);
+> +
+> +	return 0;
+> +}
+
+Here
+
+> +static const struct phy_ops mtk_pextp_ops = {
+> +	.power_on	= mtk_pextp_power_on,
+> +	.power_off	= mtk_pextp_power_off,
+> +	.set_mode	= mtk_pextp_set_mode,
+> +	.reset		= mtk_pextp_reset,
+> +	.owner		= THIS_MODULE,
+> +};
+> +
+> +static int mtk_pextp_probe(struct platform_device *pdev)
+> +{
+> +	struct device_node *np = pdev->dev.of_node;
+> +	struct phy_provider *phy_provider;
+> +	struct mtk_pextp_phy *pextp;
+> +	struct phy *phy;
+> +
+> +	if (!np)
+> +		return -ENODEV;
+> +
+> +	pextp = devm_kzalloc(&pdev->dev, sizeof(*pextp), GFP_KERNEL);
+> +	if (!pextp)
 > +		return -ENOMEM;
 > +
-> +	regmap = syscon_node_to_regmap(np->parent);
-> +	if (IS_ERR(regmap))
-> +		return PTR_ERR(regmap);
+> +	pextp->base = devm_of_iomap(&pdev->dev, np, 0, NULL);
+> +	if (!pextp->base)
+> +		return -EIO;
 > +
-> +	if (of_property_read_bool(np->parent, "mediatek,pnswap"))
-> +		flags |= MTK_SGMII_FLAG_PN_SWAP;
+> +	pextp->dev = &pdev->dev;
+> +	pextp->clk[0] = devm_clk_get(&pdev->dev, "topxtal");
+> +	if (IS_ERR(pextp->clk[0]))
+> +		return PTR_ERR(pextp->clk[0]);
 > +
-> +	mpcs->rstc = of_reset_control_get_shared(np->parent, NULL);
-> +	if (IS_ERR(mpcs->rstc))
-> +		return PTR_ERR(mpcs->rstc);
-> +
-> +	reset_control_deassert(mpcs->rstc);
-> +	mpcs->sgmii_sel = devm_clk_get_enabled(dev, "sgmii_sel");
-> +	if (IS_ERR(mpcs->sgmii_sel))
-> +		return PTR_ERR(mpcs->sgmii_sel);
-> +
-> +	mpcs->sgmii_rx = devm_clk_get(dev, "sgmii_rx");
-> +	if (IS_ERR(mpcs->sgmii_rx))
-> +		return PTR_ERR(mpcs->sgmii_rx);
-> +
-> +	mpcs->sgmii_tx = devm_clk_get(dev, "sgmii_tx");
-> +	if (IS_ERR(mpcs->sgmii_tx))
-> +		return PTR_ERR(mpcs->sgmii_tx);
+> +	pextp->clk[1] = devm_clk_get(&pdev->dev, "xfipll");
+> +	if (IS_ERR(pextp->clk[1]))
+> +		return PTR_ERR(pextp->clk[1]);
 
-and clk bulk operations here as well ?
+And here as well.
+
+Thanks,
 
 Maxime
+
 
