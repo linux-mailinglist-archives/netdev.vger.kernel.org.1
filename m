@@ -1,106 +1,301 @@
-Return-Path: <netdev+bounces-54285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E356806765
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 07:36:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 72E398067A6
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 07:40:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C01171C21155
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 06:36:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 971851C2118C
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 06:40:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B1A10A37;
-	Wed,  6 Dec 2023 06:36:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3262E10A3D;
+	Wed,  6 Dec 2023 06:39:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="fbP6on6j"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ki/USa01"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADC46D46;
-	Tue,  5 Dec 2023 22:36:07 -0800 (PST)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B65ddqp023836;
-	Tue, 5 Dec 2023 22:35:54 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=C2Vbd6JnDAfhgxbHY/teR4Hm++QYeBA9A+zn+kRvmgQ=;
- b=fbP6on6jCeqDu+3KP4c3c12eBlb+wTZBUnHJeSGSBWpHSusAFauYmiNF1SCOKypgQr9D
- Qr3GJxqUuH3gbYqgUtiSoNgpF3RBXGTd6jqKLplvspO+90YLclIJdxDZSb8vdCaF0yH/
- lYe6haOq51/RA/cF7ae19B/qwWgLuAVXlcs7RUPMcdy4Yz72oW1umVJFv47jblyYv4Bq
- 2Nm2tjdXzUX8BQqqZQwc4DJekaLPHVczwqgkX2bPDcWdGdwCkQgUBaR0EHafXcEcWRW3
- BHykKewB4JWXSCOqhoqk9F4Qa02CZQOqjJz/EHFeO14PtpIniRC05OXm37j5EH+9tq3Q AA== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3utd0p95tf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Tue, 05 Dec 2023 22:35:54 -0800
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 5 Dec
- 2023 22:35:52 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Tue, 5 Dec 2023 22:35:52 -0800
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id D640E3F704E;
-	Tue,  5 Dec 2023 22:35:51 -0800 (PST)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
-        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
-        <konguyen@redhat.com>, Shinas Rasheed <srasheed@marvell.com>,
-        "Veerasenareddy
- Burru" <vburru@marvell.com>,
-        Sathesh Edara <sedara@marvell.com>,
-        Eric Dumazet
-	<edumazet@google.com>,
-        Abhijit Ayarekar <aayarekar@marvell.com>,
-        "Satananda
- Burla" <sburla@marvell.com>
-Subject: [PATCH net v1] octeon_ep: explicitly test for firmware ready value
-Date: Tue, 5 Dec 2023 22:35:49 -0800
-Message-ID: <20231206063549.2590305-1-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E5FD10C2
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 22:39:43 -0800 (PST)
+Message-ID: <7e04fc5f-30a9-468e-bf07-49b00040b6db@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1701844781;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C+rRkxEDsRVqGW4fFbNq980n2/wUjGiwZBnVQet7ykY=;
+	b=Ki/USa01yldyhh07jb4x9NHYDor2c2d7nolGuPt9yRBjrQPd8PF4iZHIh2zrZUbbWCsZie
+	UXfaQtHxhjxWg3WTFkKpVEhzYTiBGVN5I3RwR0Ag8rk5uCNEYKHW8XkhqyCpQwQTEJok5L
+	FPovi2gESwwTCpm0eIq6EN6On0KGp+I=
+Date: Tue, 5 Dec 2023 22:39:33 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: U6H81ENnbgqaAmserLKIWBlR8Vi0D_Ch
-X-Proofpoint-ORIG-GUID: U6H81ENnbgqaAmserLKIWBlR8Vi0D_Ch
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-06_04,2023-12-05_01,2023-05-22_02
+Subject: Re: [PATCH v4 bpf-next 3/3] selftest: bpf: Test
+ bpf_sk_assign_tcp_reqsk().
+Content-Language: en-US
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>
+References: <20231205013420.88067-1-kuniyu@amazon.com>
+ <20231205013420.88067-4-kuniyu@amazon.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20231205013420.88067-4-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-The firmware ready value is 1, and get firmware ready status
-function should explicitly test for that value. The firmware
-ready value read will be 2 after driver load, and on unbind
-till firmware rewrites the firmware ready back to 0, the value
-seen by driver will be 2, which should be regarded as not ready.
+On 12/4/23 5:34 PM, Kuniyuki Iwashima wrote:
+> This commit adds a sample selftest to demonstrate how we can use
+> bpf_sk_assign_tcp_reqsk() as the backend of SYN Proxy.
+> 
+> The test creates IPv4/IPv6 x TCP/MPTCP connections and transfer
+> messages over them on lo with BPF tc prog attached.
+> 
+> The tc prog will process SYN and returns SYN+ACK with the following
+> ISN and TS.  In a real use case, this part will be done by other
+> hosts.
+> 
+>          MSB                                   LSB
+>    ISN:  | 31 ... 8 | 7 6 |   5 |    4 | 3 2 1 0 |
+>          |   Hash_1 | MSS | ECN | SACK |  WScale |
+> 
+>    TS:   | 31 ... 8 |          7 ... 0           |
+>          |   Random |           Hash_2           |
 
-Fixes: 10c073e40469 ("octeon_ep: defer probe if firmware not ready")
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
- drivers/net/ethernet/marvell/octeon_ep/octep_main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Thanks for the details. It is helpful.
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-index 552970c7dec0..b8ae269f6f97 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-@@ -1258,7 +1258,8 @@ static bool get_fw_ready_status(struct pci_dev *pdev)
- 
- 		pci_read_config_byte(pdev, (pos + 8), &status);
- 		dev_info(&pdev->dev, "Firmware ready status = %u\n", status);
--		return status;
-+#define FW_STATUS_READY 1ULL
-+		return (status == FW_STATUS_READY) ? true : false;
- 	}
- 	return false;
- }
--- 
-2.25.1
+> 
+>    WScale in SYN is reused in SYN+ACK.
+> 
+> The client returns ACK, and tc prog will recalculate ISN and TS
+> from ACK and validate SYN Cookie.
+> 
+> If it's valid, the prog calls kfunc to allocate a reqsk for skb and
+> configure the reqsk based on the argument created from SYN Cookie.
+> 
+> Later, the reqsk will be processed in cookie_v[46]_check() to create
+> a connection.
+> 
+
+[ ... ]
+
+> +SEC("tc")
+> +int tcp_custom_syncookie(struct __sk_buff *skb)
+> +{
+> +	struct tcp_syncookie ctx = {
+> +		.skb = skb,
+> +	};
+> +
+> +	if (tcp_load_headers(&ctx))
+> +		return TC_ACT_OK;
+> +
+> +	if (ctx.tcp->rst)
+> +		return TC_ACT_OK;
+> +
+> +	if (ctx.tcp->syn) {
+> +		if (ctx.tcp->ack)
+> +			return TC_ACT_OK;
+> +
+> +		return tcp_handle_syn(&ctx);
+> +	}
+> +
+> +	return tcp_handle_ack(&ctx);
+
+It may be useful to ensure tcp_handle_{syn,ack} is executed instead of the 
+kernel doing the regular syncookie. A global variable (bool or counter) can be 
+used by the prog_tests to check.
+
+> +}
+> +
+> +char _license[] SEC("license") = "GPL";
+> diff --git a/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.h b/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.h
+> new file mode 100644
+> index 000000000000..a401f59e46d8
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.h
+> @@ -0,0 +1,162 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright Amazon.com Inc. or its affiliates. */
+> +
+> +#ifndef _TEST_TCP_SYNCOOKIE_H
+> +#define _TEST_TCP_SYNCOOKIE_H
+> +
+> +#define TC_ACT_OK	0
+> +#define TC_ACT_SHOT	2
+> +
+> +#define ETH_ALEN	6
+> +#define ETH_P_IP	0x0800
+> +#define ETH_P_IPV6	0x86DD
+> +
+> +#define NEXTHDR_TCP	6
+> +
+> +#define TCPOPT_NOP		1
+> +#define TCPOPT_EOL		0
+> +#define TCPOPT_MSS		2
+> +#define TCPOPT_WINDOW		3
+> +#define TCPOPT_TIMESTAMP	8
+> +#define TCPOPT_SACK_PERM	4
+> +
+> +#define TCPOLEN_MSS		4
+> +#define TCPOLEN_WINDOW		3
+> +#define TCPOLEN_TIMESTAMP	10
+> +#define TCPOLEN_SACK_PERM	2
+
+Some of the above is already in the bpf_tracing_net.h. Move the non-existing 
+ones to bpf_tracing_net.h also.
+
+> +#define BPF_F_CURRENT_NETNS	(-1)
+
+This should be already in the vmlinux.h
+
+> +
+> +#define __packed __attribute__((__packed__))
+> +#define __force
+> +
+> +#define ARRAY_SIZE(arr)	(sizeof(arr) / sizeof((arr)[0]))
+> +
+> +#define swap(a, b)				\
+> +	do {					\
+> +		typeof(a) __tmp = (a);		\
+> +		(a) = (b);			\
+> +		(b) = __tmp;			\
+> +	} while (0)
+> +
+> +#define swap_array(a, b)				\
+> +	do {						\
+> +		typeof(a) __tmp[sizeof(a)];		\
+> +		__builtin_memcpy(__tmp, a, sizeof(a));	\
+> +		__builtin_memcpy(a, b, sizeof(a));	\
+> +		__builtin_memcpy(b, __tmp, sizeof(a));	\
+> +	} while (0)
+> +
+> +/* asm-generic/unaligned.h */
+> +#define __get_unaligned_t(type, ptr) ({						\
+> +	const struct { type x; } __packed * __pptr = (typeof(__pptr))(ptr);	\
+> +	__pptr->x;								\
+> +})
+> +
+> +#define get_unaligned(ptr) __get_unaligned_t(typeof(*(ptr)), (ptr))
+> +
+> +static inline u16 get_unaligned_be16(const void *p)
+> +{
+> +	return bpf_ntohs(__get_unaligned_t(__be16, p));
+> +}
+> +
+> +static inline u32 get_unaligned_be32(const void *p)
+> +{
+> +	return bpf_ntohl(__get_unaligned_t(__be32, p));
+> +}
+> +
+> +/* lib/checksum.c */
+> +static inline u32 from64to32(u64 x)
+> +{
+> +	/* add up 32-bit and 32-bit for 32+c bit */
+> +	x = (x & 0xffffffff) + (x >> 32);
+> +	/* add up carry.. */
+> +	x = (x & 0xffffffff) + (x >> 32);
+> +	return (u32)x;
+> +}
+> +
+> +static inline __wsum csum_tcpudp_nofold(__be32 saddr, __be32 daddr,
+> +					__u32 len, __u8 proto, __wsum sum)
+> +{
+> +	unsigned long long s = (__force u32)sum;
+> +
+> +	s += (__force u32)saddr;
+> +	s += (__force u32)daddr;
+> +#ifdef __BIG_ENDIAN
+> +	s += proto + len;
+> +#else
+> +	s += (proto + len) << 8;
+> +#endif
+> +	return (__force __wsum)from64to32(s);
+> +}
+> +
+> +/* asm-generic/checksum.h */
+> +static inline __sum16 csum_fold(__wsum csum)
+> +{
+> +	u32 sum = (__force u32)csum;
+> +
+> +	sum = (sum & 0xffff) + (sum >> 16);
+> +	sum = (sum & 0xffff) + (sum >> 16);
+> +	return (__force __sum16)~sum;
+> +}
+> +
+> +static inline __sum16 csum_tcpudp_magic(__be32 saddr, __be32 daddr, __u32 len,
+> +					__u8 proto, __wsum sum)
+> +{
+> +	return csum_fold(csum_tcpudp_nofold(saddr, daddr, len, proto, sum));
+> +}
+> +
+> +/* net/ipv6/ip6_checksum.c */
+> +static inline __sum16 csum_ipv6_magic(const struct in6_addr *saddr,
+> +				      const struct in6_addr *daddr,
+> +				      __u32 len, __u8 proto, __wsum csum)
+> +{
+> +	int carry;
+> +	__u32 ulen;
+> +	__u32 uproto;
+> +	__u32 sum = (__force u32)csum;
+> +
+> +	sum += (__force u32)saddr->in6_u.u6_addr32[0];
+> +	carry = (sum < (__force u32)saddr->in6_u.u6_addr32[0]);
+> +	sum += carry;
+> +
+> +	sum += (__force u32)saddr->in6_u.u6_addr32[1];
+> +	carry = (sum < (__force u32)saddr->in6_u.u6_addr32[1]);
+> +	sum += carry;
+> +
+> +	sum += (__force u32)saddr->in6_u.u6_addr32[2];
+> +	carry = (sum < (__force u32)saddr->in6_u.u6_addr32[2]);
+> +	sum += carry;
+> +
+> +	sum += (__force u32)saddr->in6_u.u6_addr32[3];
+> +	carry = (sum < (__force u32)saddr->in6_u.u6_addr32[3]);
+> +	sum += carry;
+> +
+> +	sum += (__force u32)daddr->in6_u.u6_addr32[0];
+> +	carry = (sum < (__force u32)daddr->in6_u.u6_addr32[0]);
+> +	sum += carry;
+> +
+> +	sum += (__force u32)daddr->in6_u.u6_addr32[1];
+> +	carry = (sum < (__force u32)daddr->in6_u.u6_addr32[1]);
+> +	sum += carry;
+> +
+> +	sum += (__force u32)daddr->in6_u.u6_addr32[2];
+> +	carry = (sum < (__force u32)daddr->in6_u.u6_addr32[2]);
+> +	sum += carry;
+> +
+> +	sum += (__force u32)daddr->in6_u.u6_addr32[3];
+> +	carry = (sum < (__force u32)daddr->in6_u.u6_addr32[3]);
+> +	sum += carry;
+> +
+> +	ulen = (__force u32)bpf_htonl((__u32)len);
+> +	sum += ulen;
+> +	carry = (sum < ulen);
+> +	sum += carry;
+> +
+> +	uproto = (__force u32)bpf_htonl(proto);
+> +	sum += uproto;
+> +	carry = (sum < uproto);
+> +	sum += carry;
+> +
+> +	return csum_fold((__force __wsum)sum);
+> +}
+
+The above helpers are useful for other tests, so make sense to stay in 
+test_tcp_custom_syncookie.h. e.g. In the future, some of the duplicated helpers 
+in xdp_synproxy_kern.c can be removed.
+
+> +#endif
 
 
