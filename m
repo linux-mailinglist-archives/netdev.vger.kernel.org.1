@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-54459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F22E48071F4
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 15:13:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDC528071EF
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 15:13:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FCC2281590
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 14:13:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1EB51F21639
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 14:13:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB4993E49B;
-	Wed,  6 Dec 2023 14:13:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D2B3DBA2;
+	Wed,  6 Dec 2023 14:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="fhpsqh//"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="nMnbgVzJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33CC4D64;
-	Wed,  6 Dec 2023 06:13:10 -0800 (PST)
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65B20D4D;
+	Wed,  6 Dec 2023 06:13:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
 	s=s31663417; t=1701871977; x=1702476777; i=wahrenst@gmx.net;
-	bh=t+f1UAgVS82IAxHkQg45rYdv3HCZesbwHcYQR49U1yA=;
+	bh=NFHFy7MUTsIivLLoDazvEvqOotBAQMt162fTOKvGnW4=;
 	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:
 	 References;
-	b=fhpsqh//DmRe51w/WhxGzgfDAwtWvu6SHZpm3I+aFBQuTbDVIONOPIAWmpZEdTbh
-	 gHS1oCDMmwhjR+Fp60IzIA+drhzBKasL5gF5zbBCYQyu6EocBbmLtOnrJqA/mL0K2
-	 2NOTyDSUGG7YTQfLgeEDhwzgD9GmIth2tXbw4sfWDAPzdYLUc1Ln+bhrXurSeR7Pb
-	 ZzS8KtOO3UDJx/nyrjNbl+RPRZdJJ/EZRLuhlB3gQWlK8Wv8apQzQ9Y/OrtryE/cN
-	 iXrKgoO2xsm9oysCske6IgLzXMMomNDflIOLVYLk0XKnu/ALFAf6WHlKURNahZbiL
-	 Yfea6aPt6AmzvKeORg==
+	b=nMnbgVzJ5g9k4NhkelmRDBlz7WbjnM9nwn6xE0e14EZ/q3E9Ei7DaCfStDJ9GYZt
+	 31EiwRZAPvGw3l/L5qCTeh8v99do6bY6w2MeH+Q/PwUdzoV4lQ1t/UTm+PLOPDj21
+	 qeWee1MS66gJVwfUe70QgFolQ3bfk5RxBPkf4anY4x6uQGQHF3jrGnrPeTgYsIdm3
+	 UgsU+9OiQT5d7eg0ZVlXx2XsdiXSLd59wti3V7kKasN23KKElVCEwRCz0OL8MNoQh
+	 cXHnJL7Dc3GJq0MUUXw43ZasY1BGtP8k1zc4QqWKMmyayFTHPNUV72Q8XD7aCkIjr
+	 uhvfATbjwRnVAugMLg==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
 Received: from stefanw-SCHENKER ([37.4.248.43]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MtfJd-1rWY7z3UQZ-00v6lK; Wed, 06
- Dec 2023 15:12:56 +0100
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MpDJd-1ravrC0Kh5-00qlAk; Wed, 06
+ Dec 2023 15:12:57 +0100
 From: Stefan Wahren <wahrenst@gmx.net>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -41,9 +41,9 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Stefan Wahren <wahrenst@gmx.net>
-Subject: [PATCH V3 2/3] qca_debug: Fix ethtool -G iface tx behavior
-Date: Wed,  6 Dec 2023 15:12:21 +0100
-Message-Id: <20231206141222.52029-3-wahrenst@gmx.net>
+Subject: [PATCH V3 3/3] qca_spi: Fix reset behavior
+Date: Wed,  6 Dec 2023 15:12:22 +0100
+Message-Id: <20231206141222.52029-4-wahrenst@gmx.net>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231206141222.52029-1-wahrenst@gmx.net>
 References: <20231206141222.52029-1-wahrenst@gmx.net>
@@ -54,95 +54,64 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:36FELgj58zhnj9meTzWv5UNr4ht+VcW2xPTn1NS6lRPF5yKk3M/
- r+NuO+ANLp744TAqiAYURQXc5Y2UO/gcQ5l4vYvcV74WUkE5ZvEoV/QycDSTPWYTJHRzVSn
- A3Emy114Ey7I7Dz/H7UjWymfuBiK3gE5LB/IKnE8VJ+RVo4XsBwByOCXpk8MXrrXilAnG/Y
- oJlNrRW64py1cqP8ZmXqg==
-UI-OutboundReport: notjunk:1;M01:P0:deRqzXBwFwo=;NxG2xNoVGLrOFMC2+iMbaJOMFZf
- vfKnZyrighxPEze1v9oFpvFyplcmMjtKe/DJHVY19h5chkH2Btl+Mi618VE+Fwdtk/1kOpfsS
- oqVdB8Z4X2MNgmBu/KUZlNpBi2T41UBjER6pmGpB3I3Hl3wSlLK0iHIK9x1JgybpvzIAfO7gj
- AWkpEf5cRrbuW6e29GKNT2+dTxao2pFs1ldbXwKPZFT6yQGPYNLdlMIta+40wjtupbiEt/TZ4
- HpJ5i7tU2sTcZEbKKSDEsMEVh5gDmJe53sb1XNXrq6lggQuJKr0LRZNH1dFVfz0DHeap481mE
- L8HkQpuSYfSzeAN+oXXTyV/f0toq+WkGsb+9WAccJYvI5ohLwNQpA/u6JSrnSPdUrftcKwg22
- j65NbE3867LaZRK5BldLAKyvTyROISOhLmT0/hAiVv2kouFBIqXQ5QUem230t+CEkh6to0fmc
- KPZOkTs9tksn5weqflWsiYqDklGyGPBNgws3L1bxXtyKUlhE7BnJeMZ1O87F11xJjlGV5WUdC
- DEwwX5pmlHHQghrxya+azQYafWsIAtQcQ/Xe/NlqhJNNAYJ8G388dWF0ePmfuI4Jy9mNPOjpT
- H1rf9gIZ3AqmgWR+VuASVm0fnL+pVy/UltwetL6DU/Bj6ixjPOiFZXZPD1nJTNxsCji7aL0NW
- uNL6CudETiftfnNq8UiUnDzOaCXzPD1Y1RpjXp82QUx9JwAk/FYdhyoxeqWjzndqWMZNuP8Ed
- lgGDZXqtim3o2o2iKyULMYeg9TJl+SfH/oTw/IkPfbE9W2qMA0qoW9V0HMA4yG01JEwQltO+k
- y331nYJ4f2oPrlgAHJsLpako/HnQkKI8Te/a7YiK4KGfUcERVGyNqMVJtlAxeGuj74Y5wnUOQ
- t8K6nEMy7XZIJfdPAQhWxawdZ99gaX3BTugBUxNc4pqSDsnfBr8QkbeLAkJF63AQk0EENamEs
- +qqtjJgAjTr5bKue043HAG06QNI=
+X-Provags-ID: V03:K1:+XSWkDgLG6Ts7yg8IvwWWOfQQgwbt2PKtQsWdmvBvK1QXPcSrZT
+ 1p591gcydajuLH8DrU1WjNiXNHLADPCAbus6Od/+vKBDjMcm5F63uskiGZ0CRIQuk/TDgWC
+ jVPI02amPtfrp7Ds6sA84eJosQ/hULL3wmDPO1+l1wymxvZyTcJkeGWMe/GVWjxrs5YXTTS
+ TOEq8SJl/CyZ9BgfZXg2Q==
+UI-OutboundReport: notjunk:1;M01:P0:6rEvhQ21+Mc=;zuh1M4W3sztlsJGyKeR50nIJMhR
+ IBuGi2ieIugsooP/gypPY5lnP9S0dabGARRPLBU4rsc9NVEyRQuMJTmHz60EbmUPo9iKqhj2v
+ i3glTa/EeYft4myDbmMozzzV2SusrNzwGZ5GVv1YWIFBWwMmwiqnqbccwzM2uBHsCM+j3jwT4
+ QfbaczjA4da7s7SPL4Fi/ZHRU6q76CFYtkcNPl9SP2O9Y8O42K4EfYlRApb7vXJLYzvgI1oK0
+ Y/vw3HwLYVaY8yQAY2/VfSdqWXMQcV1SEeuzqgdXgrO8O2qXn6B9o9VMYAxtGsse/qa8KECd6
+ KZEDH4/VQJ6Vf494E+QrK6aPWY56KFVgB+ji/y5N9DQrq4wgaacHLvxoMOzGVOFNmLTmlI9cm
+ JA0XVyfsZXOhK6QWhJBXS9UuCDqSzzxwRovA/WiDCQAb1fF49WzTyqKvC3FY1VWd7wkR7uWPE
+ 92nWxpFl/Z6cDkjcypkKZuxQuPn2M0Af+JO3Q63JLe+dwdp720P4wnBSEbcyHPaefUuEz97lB
+ dBl5bNKy5syueHx/6tNIvJdEgnTfeD3Mb3jgHkYFgda9u3FLzBCQm9T0O8yXjy45sv2aqTTRe
+ EEsedw353HgoDZPMNFjRMN0Ca7q3DnpyUlMS/SwG+a7Jr/FVunshN1FD21Z8pp033ScHBQ2HF
+ 0YN2pGX5gF3FkQsiaUlZ1rxgYLZoMT5ZghoKfaQ7HCOVMDIQ6XPhaV7+7zq6yXKwkhnejM31i
+ 7ahQ+ytiwZqRL1wuwHAgCsezMrA9ajKQ8vBObrnkzn1US8l0Vmwf7AH824nYj97PJNoRLgSm7
+ VFRYiznSpL/GEorZCoz2Cx2LOBFevGCPTtrXyuvDx+3VK4BLdzvjp0xQT9o4mwzOYO92YkSzm
+ GQBqlW+1CKZKJpfPWSzP2RSVAZuO+FtSbi5ITglfACrv++hWwtwLvEarojoTlte1rOUPIqd8N
+ 1AvvEukd2c69QVIDb+B0DFLJG/c=
 
-After calling ethtool -g it was not possible to adjust the TX ring
-size again:
-
-  # ethtool -g eth1
-  Ring parameters for eth1:
-  Pre-set maximums:
-  RX:		4
-  RX Mini:	n/a
-  RX Jumbo:	n/a
-  TX:		10
-  Current hardware settings:
-  RX:		4
-  RX Mini:	n/a
-  RX Jumbo:	n/a
-  TX:		10
-  # ethtool -G eth1 tx 8
-  netlink error: Invalid argument
-
-The reason for this is that the readonly setting rx_pending get
-initialized and after that the range check in qcaspi_set_ringparam()
-fails regardless of the provided parameter. So fix this by accepting
-the exposed RX defaults. Instead of adding another magic number
-better use a new define here.
+In case of a reset triggered by the QCA7000 itself, the behavior of the
+qca_spi driver was not quite correct:
+- in case of a pending RX frame decoding the drop counter must be
+  incremented and decoding state machine reseted
+- also the reset counter must always be incremented regardless of sync
+  state
 
 Fixes: 291ab06ecf67 ("net: qualcomm: new Ethernet over SPI driver for QCA7=
 000")
-Suggested-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
 =2D--
- drivers/net/ethernet/qualcomm/qca_debug.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/qualcomm/qca_spi.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/qualcomm/qca_debug.c b/drivers/net/ether=
-net/qualcomm/qca_debug.c
-index a5445252b0c4..1822f2ad8f0d 100644
-=2D-- a/drivers/net/ethernet/qualcomm/qca_debug.c
-+++ b/drivers/net/ethernet/qualcomm/qca_debug.c
-@@ -30,6 +30,8 @@
+diff --git a/drivers/net/ethernet/qualcomm/qca_spi.c b/drivers/net/etherne=
+t/qualcomm/qca_spi.c
+index b0fad69bb755..5f3c11fb3fa2 100644
+=2D-- a/drivers/net/ethernet/qualcomm/qca_spi.c
++++ b/drivers/net/ethernet/qualcomm/qca_spi.c
+@@ -620,11 +620,17 @@ qcaspi_spi_thread(void *data)
+ 			if (intr_cause & SPI_INT_CPU_ON) {
+ 				qcaspi_qca7k_sync(qca, QCASPI_EVENT_CPUON);
 
- #define QCASPI_MAX_REGS 0x20
-
-+#define QCASPI_RX_MAX_FRAMES 4
++				/* Frame decoding in progress */
++				if (qca->frm_handle.state !=3D qca->frm_handle.init)
++					qca->net_dev->stats.rx_dropped++;
 +
- static const u16 qcaspi_spi_regs[] =3D {
- 	SPI_REG_BFR_SIZE,
- 	SPI_REG_WRBUF_SPC_AVA,
-@@ -252,9 +254,9 @@ qcaspi_get_ringparam(struct net_device *dev, struct et=
-htool_ringparam *ring,
- {
- 	struct qcaspi *qca =3D netdev_priv(dev);
++				qcafrm_fsm_init_spi(&qca->frm_handle);
++				qca->stats.device_reset++;
++
+ 				/* not synced. */
+ 				if (qca->sync !=3D QCASPI_SYNC_READY)
+ 					continue;
 
--	ring->rx_max_pending =3D 4;
-+	ring->rx_max_pending =3D QCASPI_RX_MAX_FRAMES;
- 	ring->tx_max_pending =3D TX_RING_MAX_LEN;
--	ring->rx_pending =3D 4;
-+	ring->rx_pending =3D QCASPI_RX_MAX_FRAMES;
- 	ring->tx_pending =3D qca->txr.count;
- }
-
-@@ -265,7 +267,7 @@ qcaspi_set_ringparam(struct net_device *dev, struct et=
-htool_ringparam *ring,
- {
- 	struct qcaspi *qca =3D netdev_priv(dev);
-
--	if ((ring->rx_pending) ||
-+	if (ring->rx_pending !=3D QCASPI_RX_MAX_FRAMES ||
- 	    (ring->rx_mini_pending) ||
- 	    (ring->rx_jumbo_pending))
- 		return -EINVAL;
+-				qca->stats.device_reset++;
+ 				netif_wake_queue(qca->net_dev);
+ 				netif_carrier_on(qca->net_dev);
+ 			}
 =2D-
 2.34.1
 
