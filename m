@@ -1,159 +1,73 @@
-Return-Path: <netdev+bounces-54232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A960F806575
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 04:11:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D31F80658E
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 04:19:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63645281C90
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 03:11:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE75A1F2170E
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 03:19:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0BB879DB;
-	Wed,  6 Dec 2023 03:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16858CA71;
+	Wed,  6 Dec 2023 03:19:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UNo90qxN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mq64Bb7Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A71C61B9
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 19:11:26 -0800 (PST)
-Message-ID: <48a54674-3e96-4a35-89d9-d726608fb8c5@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1701832284;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Td1wCnY57CVO1M0Fwy3V9pqGf9Wilw3eR6IuVutexXI=;
-	b=UNo90qxN9V5KsiQAIks/yAlpvZpPtWdA8P8ZtVzPUdaTYHP9LBFh4mmeRAqHnuOqKv0462
-	y90OEn/M0M5AFWLwYA7WmAe7zzIqLV8pyVZLeXwFMOhd2ROMWg0oRP+eSsSJQvhANYhWxU
-	BAhyGyi1o1qGxGDd3giHz/4McO1/+n4=
-Date: Tue, 5 Dec 2023 19:11:17 -0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5FACA6F
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 03:19:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33062C433C9;
+	Wed,  6 Dec 2023 03:19:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701832785;
+	bh=qazZjGvxESECPn7UnTm0gAKB5GVROhpZtoKCBMJdlf8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Mq64Bb7QpK5vWSjzSS9lPdiPM36ZaL19wSEK7MQroYIYFJuFiXXDcEdDEX1ay3/zK
+	 dP6WmPwHxxKPX3LQ2t68P3EQkopt9p7RP6pjfFZHXGD6KifWBX/bRPFw15ABM5CM2a
+	 MQKqWgbxXKH8mnwnLG78gQCsqPfU0RVKsS2cAS1GR9COmG4vrONfk37E98DqKJmmc/
+	 TEP0qQUC30L8ah9SlnCweZBcLEARgd+1w+BlC7ut7U5OoOQxGogCAfpRa/C38i+3kJ
+	 Js6gFOl6wUk+L25rxxWkjuY0aG/d4pz2GROJ4Yaajv1/c2BJ8mk45Z5H4v4mpcU6Cn
+	 nn6++EUwtdn/g==
+Date: Tue, 5 Dec 2023 19:19:44 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Swarup Laxman Kotiaklapudi <swarupkotikalapudi@gmail.com>,
+ jiri@resnulli.us
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel-mentees@lists.linuxfoundation.org
+Subject: Re: [PATCH net-next v5] netlink: specs: devlink: add some(not all)
+ missing attributes in devlink.yaml
+Message-ID: <20231205191944.6738deb7@kernel.org>
+In-Reply-To: <20231202123048.1059412-1-swarupkotikalapudi@gmail.com>
+References: <20231202123048.1059412-1-swarupkotikalapudi@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v4 bpf-next 1/3] bpf: tcp: Handle BPF SYN Cookie in
- cookie_v[46]_check().
-Content-Language: en-US
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
- daniel@iogearbox.net, edumazet@google.com, kuni1840@gmail.com,
- netdev@vger.kernel.org
-References: <8bd1d595-4bb3-44d1-a9c3-2d9c0c960bcb@linux.dev>
- <20231206012952.18761-1-kuniyu@amazon.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20231206012952.18761-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 12/5/23 5:29 PM, Kuniyuki Iwashima wrote:
-> From: Martin KaFai Lau <martin.lau@linux.dev>
-> Date: Tue, 5 Dec 2023 16:19:20 -0800
->> On 12/4/23 5:34 PM, Kuniyuki Iwashima wrote:
->>> diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
->>> index 61f1c96cfe63..0f9c3aed2014 100644
->>> --- a/net/ipv4/syncookies.c
->>> +++ b/net/ipv4/syncookies.c
->>> @@ -304,6 +304,59 @@ static int cookie_tcp_reqsk_init(struct sock *sk, struct sk_buff *skb,
->>>    	return 0;
->>>    }
->>>    
->>> +#if IS_ENABLED(CONFIG_BPF)
->>> +struct request_sock *cookie_bpf_check(struct net *net, struct sock *sk,
->>> +				      struct sk_buff *skb)
->>> +{
->>> +	struct request_sock *req = inet_reqsk(skb->sk);
->>> +	struct inet_request_sock *ireq = inet_rsk(req);
->>> +	struct tcp_request_sock *treq = tcp_rsk(req);
->>> +	struct tcp_options_received tcp_opt;
->>> +	int ret;
->>> +
->>> +	skb->sk = NULL;
->>> +	skb->destructor = NULL;
->>> +	req->rsk_listener = NULL;
->>> +
->>> +	memset(&tcp_opt, 0, sizeof(tcp_opt));
->>> +	tcp_parse_options(net, skb, &tcp_opt, 0, NULL);
->>
->> In patch 2, the bpf prog is passing the tcp_opt to the kfunc. The selftest in
->> patch 3 is also parsing the tcp-options.
->>
->> The kernel parses the tcp-option here again to do some checking and req's member
->> initialization. Can these checking and initialization be done in the
->> bpf_sk_assign_tcp_reqsk() kfunc instead to avoid the double tcp-option parsing?
-> 
-> If TS is not used as a cookie storage, bpf prog need not parse it.
-> OTOH, if a value is encoded into TS, bpf prog need to parse it.
-> In that case, we cannot avoid parsing options in bpf prog.
+On Sat,  2 Dec 2023 18:00:48 +0530 Swarup Laxman Kotiaklapudi wrote:
+> Add some missing(not all) attributes in devlink.yaml.
 
-If I read patch 2 correctly, the ireq->tstamp_ok is set by the kfunc, so I 
-assume that the bpf prog has to parse the tcp-option.
+Hi Jiri,
 
-Like the "if (ireq->tstamp_ok ^ tcp_opt.saw_tstamp)" test below, ireq->tstamp_ok 
-will always be 0 if the bpf prog did not parse the tcp-option.
+Do you want to take a closer look at the spec here?
+Looks fine to me, on a quick scroll.
 
-> 
-> The parsing here comes from my paranoia, so.. probably we can drop it
-> and the first test below, and rely on bpf prog's tcp_opt, especially
-> tstamp_ok, rcv_tsval, and rcv_tsecr ?
+> Suggested-by: Jiri Pirko <jiri@resnulli.us>
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Fixes: f2f9dd164db0 ("netlink: specs: devlink: add the remaining command to generate complete split_ops")
 
-My preference is that it is clearer to allow the bpf prog to initialize all 
-tcp_opt instead of only taking the tcp_opt.tstamp_ok from bpf_prog but ignore 
-the tcp_opt.rcv_tsval/tsecr. The kfunc will then use the tcp_opt to initialize 
-the req.
+I'll drop these when / if applying, FWIW. 
 
-It is also better to detect the following error cases as much as possible in the 
-kfunc instead of failing later in the tcp stack. e.g. checking the sysctl should 
-be doable in the kfunc.
-
-> 
-> I placed other tests here to align with the normal cookie flow, but
-> they can be moved to kfunc.  However, initialisation assuems skb
-> points to TCP header, so here would be better place, I think.
-> 
-> 
->>
->>> +
->>> +	if (ireq->tstamp_ok ^ tcp_opt.saw_tstamp) {
->>> +		__NET_INC_STATS(net, LINUX_MIB_SYNCOOKIESFAILED);
->>> +		goto reset;
->>> +	}
->>> +
->>> +	__NET_INC_STATS(net, LINUX_MIB_SYNCOOKIESRECV);
->>> +
->>> +	if (ireq->tstamp_ok) {
->>> +		if (!READ_ONCE(net->ipv4.sysctl_tcp_timestamps))
->>> +			goto reset;
->>> +
->>> +		req->ts_recent = tcp_opt.rcv_tsval;
->>> +		treq->ts_off = tcp_opt.rcv_tsecr - tcp_ns_to_ts(false, tcp_clock_ns());
->>> +	}
->>> +
->>> +	if (ireq->sack_ok && !READ_ONCE(net->ipv4.sysctl_tcp_sack))
->>> +		goto reset;
->>> +
->>> +	if (ireq->wscale_ok && !READ_ONCE(net->ipv4.sysctl_tcp_window_scaling))
->>> +		goto reset;
->>> +
->>> +	ret = cookie_tcp_reqsk_init(sk, skb, req);
->>> +	if (ret) {
->>> +		reqsk_free(req);
->>> +		req = NULL;
->>> +	}
->>> +
->>> +	return req;
->>> +
->>> +reset:
->>> +	reqsk_free(req);
->>> +	return ERR_PTR(-EINVAL);
->>> +}
->>> +EXPORT_SYMBOL_GPL(cookie_bpf_check);
->>> +#endif
-
+Swarup, for future reference if there are comments / changes suggested
+during normal review process you don't have to add the Suggested-by
+tag. The expectation is that the reviewer will send a Reviewed-by tag
+themselves at the end instead.
 
