@@ -1,217 +1,295 @@
-Return-Path: <netdev+bounces-54342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A0B3806B27
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:58:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D581806B3E
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 11:03:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8BF21C20981
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 09:58:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D5F81C20948
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:03:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E28961DFF4;
-	Wed,  6 Dec 2023 09:58:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0104288B6;
+	Wed,  6 Dec 2023 10:03:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="E4sSHAHN"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="OD3bwzu7"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66CFFFA;
-	Wed,  6 Dec 2023 01:58:46 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3BB97240008;
-	Wed,  6 Dec 2023 09:58:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1701856724;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dasdfMtvb5/6F6Xl6tXdAQvmSib+B8MTu7AZcbGRRpI=;
-	b=E4sSHAHNbk/P25tK9GlNW898yfNEPsTTCpuSOrvNg3FDLAQa5H2MB8BRBjjdZkmc8iyIaA
-	b6odeZBloX3O6K431Gft6l8bCm/hcnvr2+z/XM6Lahwsh4AtTFk85mbSpf7X6rzHKvMVt6
-	3umP9OEFpwaUVhEVEAcTVj0ieLjeJiNgKnvgJ0VctBblzzer+uzeuVxsOuDH5U9LF9cI2Q
-	zzti/EjMfrFKZsIUnuinTx9zodpPb9o4h+HfB7PROhWn5RHP3LpKUYtFXinRhxwNKJWX1+
-	/fEfRmLP4XlanmKXIT1XLFJfuEOYBwF14EvjJt38ClTdAVVQVxjpVi8R93acjg==
-Date: Wed, 6 Dec 2023 10:58:38 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>,
- Kishon Vijay Abraham I <kishon@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>, Mark
- Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Alexander Couzens <lynxis@fe80.eu>, Qingfang Deng
- <dqfext@gmail.com>, SkyLake Huang <SkyLake.Huang@mediatek.com>, Philipp
- Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- linux-phy@lists.infradead.org
-Subject: Re: [RFC PATCH v2 5/8] net: pcs: add driver for MediaTek USXGMII
- PCS
-Message-ID: <20231206105838.069ae288@device.home>
-In-Reply-To: <3cd8af5e44554c2db2d7898494ee813967206bd9.1701826319.git.daniel@makrotopia.org>
-References: <cover.1701826319.git.daniel@makrotopia.org>
-	<3cd8af5e44554c2db2d7898494ee813967206bd9.1701826319.git.daniel@makrotopia.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 241CF112
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 02:03:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=KP1nlwP/9gi56kPSlQ4SVzxTQ0hq1ComwafVzCfVkNs=; t=1701856989; x=1703066589; 
+	b=OD3bwzu7JF8fPzoQmaewhyZyeEVXIPTjhi2Je+D8SGH9s2TAD1wLIYzZw/XffEPA3RAi1aLS9BC
+	oiQb9aknvgrOncZR0/yiv6drkK6ANINLOr4Q1lEUY4n7sFMFHMDFx0dtkJ9W8LHmJbFXYtdSVAmtf
+	hYarr/3XsN8NqTDjVPpEp5QBCnW/yHRfUat9xyLTeACwpB14v/BMYrBFNNXuQsvXJonaPZi4PvQH6
+	i3/jF36qQXLBpIkkIDM4qQc5qz5dYr0kwew/Osk26lNdewGxXMOJNf39O/H7OQAgmpbeixZSdE0Ry
+	6tBncnojM7CtW4fDEQ7xsKsXxYtdp4Dbmclw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1rAokE-0000000HYuG-2MHo;
+	Wed, 06 Dec 2023 11:03:06 +0100
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Marc MERLIN <marc@merlins.org>
+Subject: [PATCH net] net: ethtool: do runtime PM outside RTNL
+Date: Wed,  6 Dec 2023 11:03:04 +0100
+Message-ID: <20231206110304.05c8a30623f4.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-Hello Daniel,
+From: Johannes Berg <johannes.berg@intel.com>
 
-On Wed, 6 Dec 2023 01:44:38 +0000
-Daniel Golle <daniel@makrotopia.org> wrote:
+As reported by Marc MERLIN, at least one driver (igc) wants or
+needs to acquire the RTNL inside suspend/resume ops, which can
+be called from here in ethtool if runtime PM is enabled.
 
-> Add driver for USXGMII PCS found in the MediaTek MT7988 SoC and supporting
-> USXGMII, 10GBase-R and 5GBase-R interface modes. In order to support
-> Cisco SGMII, 1000Base-X and 2500Base-X via the also present LynxI PCS
-> create a wrapped PCS taking care of the components shared between the
-> new USXGMII PCS and the legacy LynxI PCS.
-> 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
+Allow this by doing runtime PM transitions without the RTNL
+held. For the ioctl to have the same operations order, this
+required reworking the code to separately check validity and
+do the operation. For the netlink code, this now has to do
+the runtime_pm_put a bit later.
 
-[...]
+Reported-by: Marc MERLIN <marc@merlins.org>
+Fixes: f32a21376573 ("ethtool: runtime-resume netdev parent before ethtool ioctl ops")
+Fixes: d43c65b05b84 ("ethtool: runtime-resume netdev parent in ethnl_ops_begin")
+Closes: https://lore.kernel.org/r/20231202221402.GA11155@merlins.org
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+v2:
+ - add tags
+ - use netdev_get_by_name()/netdev_put() in ioctl path
+---
+ net/ethtool/ioctl.c   | 72 ++++++++++++++++++++++++++-----------------
+ net/ethtool/netlink.c | 32 ++++++++-----------
+ 2 files changed, 57 insertions(+), 47 deletions(-)
 
-> +
-> +static int mtk_usxgmii_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
-> +				  phy_interface_t interface,
-> +				  const unsigned long *advertising,
-> +				  bool permit_pause_to_mac)
-> +{
-> +	struct mtk_usxgmii_pcs *mpcs = pcs_to_mtk_usxgmii_pcs(pcs);
-> +	unsigned int an_ctrl = 0, link_timer = 0, xfi_mode = 0, adapt_mode = 0;
-> +	bool mode_changed = false;
+diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
+index a977f8903467..6a8471e4b8c5 100644
+--- a/net/ethtool/ioctl.c
++++ b/net/ethtool/ioctl.c
+@@ -2768,26 +2768,18 @@ static int ethtool_set_fecparam(struct net_device *dev, void __user *useraddr)
+ /* The main entry point in this file.  Called from net/core/dev_ioctl.c */
+ 
+ static int
+-__dev_ethtool(struct net *net, struct ifreq *ifr, void __user *useraddr,
+-	      u32 ethcmd, struct ethtool_devlink_compat *devlink_state)
++__dev_ethtool_check(struct net_device *dev, void __user *useraddr,
++		    u32 ethcmd, u32 *sub_cmd)
+ {
+-	struct net_device *dev;
+-	u32 sub_cmd;
+-	int rc;
+-	netdev_features_t old_features;
+-
+-	dev = __dev_get_by_name(net, ifr->ifr_name);
+-	if (!dev)
+-		return -ENODEV;
+-
+ 	if (ethcmd == ETHTOOL_PERQUEUE) {
+-		if (copy_from_user(&sub_cmd, useraddr + sizeof(ethcmd), sizeof(sub_cmd)))
++		if (copy_from_user(sub_cmd, useraddr + sizeof(ethcmd), sizeof(*sub_cmd)))
+ 			return -EFAULT;
+ 	} else {
+-		sub_cmd = ethcmd;
++		*sub_cmd = ethcmd;
+ 	}
++
+ 	/* Allow some commands to be done by anyone */
+-	switch (sub_cmd) {
++	switch (*sub_cmd) {
+ 	case ETHTOOL_GSET:
+ 	case ETHTOOL_GDRVINFO:
+ 	case ETHTOOL_GMSGLVL:
+@@ -2826,22 +2818,28 @@ __dev_ethtool(struct net *net, struct ifreq *ifr, void __user *useraddr,
+ 	case ETHTOOL_GFECPARAM:
+ 		break;
+ 	default:
+-		if (!ns_capable(net->user_ns, CAP_NET_ADMIN))
++		if (!ns_capable(dev_net(dev)->user_ns, CAP_NET_ADMIN))
+ 			return -EPERM;
+ 	}
+ 
+-	if (dev->dev.parent)
+-		pm_runtime_get_sync(dev->dev.parent);
++	return 0;
++}
+ 
+-	if (!netif_device_present(dev)) {
+-		rc = -ENODEV;
+-		goto out;
+-	}
++static int
++__dev_ethtool_do(struct net_device *dev, struct ifreq *ifr,
++		 void __user *useraddr, u32 ethcmd, u32 sub_cmd,
++		 struct ethtool_devlink_compat *devlink_state)
++{
++	netdev_features_t old_features;
++	int rc;
++
++	if (!netif_device_present(dev))
++		return -ENODEV;
+ 
+ 	if (dev->ethtool_ops->begin) {
+ 		rc = dev->ethtool_ops->begin(dev);
+ 		if (rc < 0)
+-			goto out;
++			return rc;
+ 	}
+ 	old_features = dev->features;
+ 
+@@ -3052,7 +3050,7 @@ __dev_ethtool(struct net *net, struct ifreq *ifr, void __user *useraddr,
+ 		rc = ethtool_set_fecparam(dev, useraddr);
+ 		break;
+ 	default:
+-		rc = -EOPNOTSUPP;
++		return -EOPNOTSUPP;
+ 	}
+ 
+ 	if (dev->ethtool_ops->complete)
+@@ -3060,9 +3058,6 @@ __dev_ethtool(struct net *net, struct ifreq *ifr, void __user *useraddr,
+ 
+ 	if (old_features != dev->features)
+ 		netdev_features_change(dev);
+-out:
+-	if (dev->dev.parent)
+-		pm_runtime_put(dev->dev.parent);
+ 
+ 	return rc;
+ }
+@@ -3070,7 +3065,9 @@ __dev_ethtool(struct net *net, struct ifreq *ifr, void __user *useraddr,
+ int dev_ethtool(struct net *net, struct ifreq *ifr, void __user *useraddr)
+ {
+ 	struct ethtool_devlink_compat *state;
+-	u32 ethcmd;
++	struct net_device *dev = NULL;
++	netdevice_tracker dev_tracker;
++	u32 ethcmd, subcmd;
+ 	int rc;
+ 
+ 	if (copy_from_user(&ethcmd, useraddr, sizeof(ethcmd)))
+@@ -3090,9 +3087,26 @@ int dev_ethtool(struct net *net, struct ifreq *ifr, void __user *useraddr)
+ 		break;
+ 	}
+ 
++	dev = netdev_get_by_name(net, ifr->ifr_name, &dev_tracker, GFP_KERNEL);
++	if (!dev) {
++		rc = -ENODEV;
++		goto exit_free;
++	}
++
++	rc = __dev_ethtool_check(dev, useraddr, ethcmd, &subcmd);
++	if (rc)
++		goto exit_free;
++
++	if (dev->dev.parent)
++		pm_runtime_get_sync(dev->dev.parent);
++
+ 	rtnl_lock();
+-	rc = __dev_ethtool(net, ifr, useraddr, ethcmd, state);
++	rc = __dev_ethtool_do(dev, ifr, useraddr, ethcmd, subcmd, state);
+ 	rtnl_unlock();
++
++	if (dev->dev.parent)
++		pm_runtime_put(dev->dev.parent);
++
+ 	if (rc)
+ 		goto exit_free;
+ 
+@@ -3115,6 +3129,8 @@ int dev_ethtool(struct net *net, struct ifreq *ifr, void __user *useraddr)
+ 	}
+ 
+ exit_free:
++	if (dev)
++		netdev_put(dev, &dev_tracker);
+ 	if (state->devlink)
+ 		devlink_put(state->devlink);
+ 	kfree(state);
+diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
+index fe3553f60bf3..67e2dd893330 100644
+--- a/net/ethtool/netlink.c
++++ b/net/ethtool/netlink.c
+@@ -34,39 +34,23 @@ int ethnl_ops_begin(struct net_device *dev)
+ {
+ 	int ret;
+ 
+-	if (!dev)
+-		return -ENODEV;
+-
+-	if (dev->dev.parent)
+-		pm_runtime_get_sync(dev->dev.parent);
+-
+ 	if (!netif_device_present(dev) ||
+-	    dev->reg_state == NETREG_UNREGISTERING) {
+-		ret = -ENODEV;
+-		goto err;
+-	}
++	    dev->reg_state == NETREG_UNREGISTERING)
++		return -ENODEV;
+ 
+ 	if (dev->ethtool_ops->begin) {
+ 		ret = dev->ethtool_ops->begin(dev);
+ 		if (ret)
+-			goto err;
++			return ret;
+ 	}
+ 
+ 	return 0;
+-err:
+-	if (dev->dev.parent)
+-		pm_runtime_put(dev->dev.parent);
+-
+-	return ret;
+ }
+ 
+ void ethnl_ops_complete(struct net_device *dev)
+ {
+ 	if (dev->ethtool_ops->complete)
+ 		dev->ethtool_ops->complete(dev);
+-
+-	if (dev->dev.parent)
+-		pm_runtime_put(dev->dev.parent);
+ }
+ 
+ /**
+@@ -602,6 +586,14 @@ static int ethnl_default_set_doit(struct sk_buff *skb, struct genl_info *info)
+ 			goto out_dev;
+ 	}
+ 
++	if (!req_info.dev) {
++		ret = -ENODEV;
++		goto out_dev;
++	}
++
++	if (req_info.dev->dev.parent)
++		pm_runtime_get_sync(req_info.dev->dev.parent);
++
+ 	rtnl_lock();
+ 	ret = ethnl_ops_begin(req_info.dev);
+ 	if (ret < 0)
+@@ -617,6 +609,8 @@ static int ethnl_default_set_doit(struct sk_buff *skb, struct genl_info *info)
+ 	ethnl_ops_complete(req_info.dev);
+ out_rtnl:
+ 	rtnl_unlock();
++	if (req_info.dev->dev.parent)
++		pm_runtime_put(req_info.dev->dev.parent);
+ out_dev:
+ 	ethnl_parse_header_dev_put(&req_info);
+ 	return ret;
+-- 
+2.43.0
 
-Reverse christmas tree ordering can be used here (longest lines first)
-
-> +
-> +	if (interface == PHY_INTERFACE_MODE_USXGMII) {
-> +		an_ctrl = FIELD_PREP(USXGMII_AN_SYNC_CNT, 0x1FF) | USXGMII_AN_ENABLE;
-> +		link_timer = FIELD_PREP(USXGMII_LINK_TIMER_IDLE_DETECT, 0x7B) |
-> +			     FIELD_PREP(USXGMII_LINK_TIMER_COMP_ACK_DETECT, 0x7B) |
-> +			     FIELD_PREP(USXGMII_LINK_TIMER_AN_RESTART, 0x7B);
-> +		xfi_mode = FIELD_PREP(USXGMII_XFI_RX_MODE, USXGMII_XFI_MODE_10G) |
-> +			   FIELD_PREP(USXGMII_XFI_TX_MODE, USXGMII_XFI_MODE_10G);
-> +	} else if (interface == PHY_INTERFACE_MODE_10GBASER) {
-> +		an_ctrl = FIELD_PREP(USXGMII_AN_SYNC_CNT, 0x1FF);
-> +		link_timer = FIELD_PREP(USXGMII_LINK_TIMER_IDLE_DETECT, 0x7B) |
-> +			     FIELD_PREP(USXGMII_LINK_TIMER_COMP_ACK_DETECT, 0x7B) |
-> +			     FIELD_PREP(USXGMII_LINK_TIMER_AN_RESTART, 0x7B);
-> +		xfi_mode = FIELD_PREP(USXGMII_XFI_RX_MODE, USXGMII_XFI_MODE_10G) |
-> +			   FIELD_PREP(USXGMII_XFI_TX_MODE, USXGMII_XFI_MODE_10G);
-> +		adapt_mode = USXGMII_RATE_UPDATE_MODE;
-> +	} else if (interface == PHY_INTERFACE_MODE_5GBASER) {
-> +		an_ctrl = FIELD_PREP(USXGMII_AN_SYNC_CNT, 0xFF);
-> +		link_timer = FIELD_PREP(USXGMII_LINK_TIMER_IDLE_DETECT, 0x3D) |
-> +			     FIELD_PREP(USXGMII_LINK_TIMER_COMP_ACK_DETECT, 0x3D) |
-> +			     FIELD_PREP(USXGMII_LINK_TIMER_AN_RESTART, 0x3D);
-> +		xfi_mode = FIELD_PREP(USXGMII_XFI_RX_MODE, USXGMII_XFI_MODE_5G) |
-> +			   FIELD_PREP(USXGMII_XFI_TX_MODE, USXGMII_XFI_MODE_5G);
-> +		adapt_mode = USXGMII_RATE_UPDATE_MODE;
-> +	} else {
-> +		return -EINVAL;
-> +	}
-> +
-> +	adapt_mode |= FIELD_PREP(USXGMII_RATE_ADAPT_MODE, USXGMII_RATE_ADAPT_MODE_X1);
-> +
-> +	if (mpcs->interface != interface) {
-> +		mpcs->interface = interface;
-> +		mode_changed = true;
-> +	}
-> +
-> +	mtk_usxgmii_reset(mpcs);
-> +
-> +	/* Setup USXGMII AN ctrl */
-> +	mtk_m32(mpcs, RG_PCS_AN_CTRL0,
-> +		USXGMII_AN_SYNC_CNT | USXGMII_AN_ENABLE,
-> +		an_ctrl);
-> +
-> +	mtk_m32(mpcs, RG_PCS_AN_CTRL2,
-> +		USXGMII_LINK_TIMER_IDLE_DETECT |
-> +		USXGMII_LINK_TIMER_COMP_ACK_DETECT |
-> +		USXGMII_LINK_TIMER_AN_RESTART,
-> +		link_timer);
-> +
-> +	mpcs->neg_mode = neg_mode;
-> +
-> +	/* Gated MAC CK */
-> +	mtk_m32(mpcs, RG_PHY_TOP_SPEED_CTRL1,
-> +		USXGMII_MAC_CK_GATED, USXGMII_MAC_CK_GATED);
-> +
-> +	/* Enable interface force mode */
-> +	mtk_m32(mpcs, RG_PHY_TOP_SPEED_CTRL1,
-> +		USXGMII_IF_FORCE_EN, USXGMII_IF_FORCE_EN);
-> +
-> +	/* Setup USXGMII adapt mode */
-> +	mtk_m32(mpcs, RG_PHY_TOP_SPEED_CTRL1,
-> +		USXGMII_RATE_UPDATE_MODE | USXGMII_RATE_ADAPT_MODE,
-> +		adapt_mode);
-> +
-> +	/* Setup USXGMII speed */
-> +	mtk_m32(mpcs, RG_PHY_TOP_SPEED_CTRL1,
-> +		USXGMII_XFI_RX_MODE | USXGMII_XFI_TX_MODE,
-> +		xfi_mode);
-> +
-> +	usleep_range(1, 10);
-> +
-> +	/* Un-gated MAC CK */
-> +	mtk_m32(mpcs, RG_PHY_TOP_SPEED_CTRL1, USXGMII_MAC_CK_GATED, 0);
-> +
-> +	usleep_range(1, 10);
-> +
-> +	/* Disable interface force mode for the AN mode */
-> +	if (an_ctrl & USXGMII_AN_ENABLE)
-> +		mtk_m32(mpcs, RG_PHY_TOP_SPEED_CTRL1, USXGMII_IF_FORCE_EN, 0);
-> +
-> +	return mode_changed;
-> +}
-> +
-
-[...]
-
-> +static void mtk_usxgmii_pcs_get_state(struct phylink_pcs *pcs,
-> +				      struct phylink_link_state *state)
-> +{
-> +	struct mtk_usxgmii_pcs *mpcs = pcs_to_mtk_usxgmii_pcs(pcs);
-> +
-> +	/* Refresh USXGMII link status by toggling RG_PCS_AN_STATUS_UPDATE */
-> +	mtk_m32(mpcs, RG_PCS_RX_STATUS0, RG_PCS_RX_STATUS_UPDATE,
-> +		RG_PCS_RX_STATUS_UPDATE);
-> +	ndelay(1020);
-> +	mtk_m32(mpcs, RG_PCS_RX_STATUS0, RG_PCS_RX_STATUS_UPDATE, 0);
-> +	ndelay(1020);
-> +
-> +	/* Read USXGMII link status */
-> +	state->link = FIELD_GET(RG_PCS_RX_LINK_STATUS,
-> +				mtk_r32(mpcs, RG_PCS_RX_STATUS0));
-> +
-> +	/* Continuously repeat re-configuration sequence until link comes up */
-> +	if (!state->link) {
-> +		mtk_usxgmii_pcs_config(pcs, mpcs->neg_mode,
-> +				       state->interface, NULL, false);
-> +		return;
-
-.pcs_get_state() isn't called only for link state polling,but also when querying
-the link state from ethtool, from phylink_ethtool_ksettings_get().
-
-As mtk_usxgmii_pcs_config triggers a pcs reset and reconfiguration, won't this disrupt
-the link ? 
-
-Thanks,
-
-Maxime
 
