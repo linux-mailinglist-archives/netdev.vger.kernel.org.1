@@ -1,164 +1,140 @@
-Return-Path: <netdev+bounces-54476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08343807373
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 16:12:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E95C80737C
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 16:14:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B82FB281E8C
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 15:12:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C28C1B20F11
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 15:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A2E3FE38;
-	Wed,  6 Dec 2023 15:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3924A3FB39;
+	Wed,  6 Dec 2023 15:14:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="OHLi74/s"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iDUxckXp"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2119.outbound.protection.outlook.com [40.107.244.119])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AE42112
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 07:12:39 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N2Zd7+jb/wOOlowhwBMW4KCuKoX+iE+QuwGahZzsWBu5fJJNupREHWr+HWLCq5llAqvAyYRBpWL/wiIQrNn7wT9JtUu+AVBe+DK/ZQMRk84Uy+qEgJk2y7svXflHPzvPDYwz1oz6Xo5trjcr++EH68iZCYRW8LqLZuODoN+ZUtjVXLCKdHyXSlFQgCyGL8hhOcCHmp0yL+jcbWjW8+kXTvzuLPFD73qS8oZbO8PzivpdIjn3u2xf0+ZdRk/exbIvmPHU65I8ZZcRTjYJCnukN1NA3lHaVOkhOk8w8V1xPL/tnsW1ynYBCylRF6Cm9OjlW60de1XJCfnQhsPJ/C3mig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=20dxaEgOIN+DvVzwTjKnC9EmUy6RYdz02QUEWA04MHU=;
- b=VX7fgfguSVZ6zBnnNL8Ou34REruqIBupG4LwhhC+cXgD/2PqNfjCNzYA5mKgzuK+7THp8ab0yIPLDBHPeDHGY4V6MjIxku/nJbQoNwVUIrhQsGlMVq9T7bjHfJr3HoPN735rCEwbFBQulMm13ZqFW1U+tzL23EQyFAl7UOAx/cB/ZTmkjVB9USkJ1XirhfQY5Oyfr4DQgM8iLg0bV/aTsyWuukMukm7GpSUyi5xblSuo0kLHk+KhSatUr5DAB1fatAKJjaG/SB31fipOU73h+ZqSau/WrtqbregTtpfKi3SOVcilnLvnOK59cFb2yMUnk9Sdq9/W/eA0XJZgDLUWwQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=20dxaEgOIN+DvVzwTjKnC9EmUy6RYdz02QUEWA04MHU=;
- b=OHLi74/sU3GPfj4ZPUNqnXribYxZkoaKrVRC1TSXlKWwmX7v/qqAP+F5B9a2jDRhEkC8a144H8T22tAaofBKWgs5kxhKnxp/GW8v5RV9kVnJsgpwQpOMBcnt5uSRtqLbpT0/HPkqY8GGLl4vzEOCUToiYZzgvYsjK6i2VgdUQfc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
- by LV8PR13MB6421.namprd13.prod.outlook.com (2603:10b6:408:18d::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Wed, 6 Dec
- 2023 15:12:36 +0000
-Received: from BL0PR13MB4403.namprd13.prod.outlook.com
- ([fe80::d3c0:fa39:cb9e:a536]) by BL0PR13MB4403.namprd13.prod.outlook.com
- ([fe80::d3c0:fa39:cb9e:a536%7]) with mapi id 15.20.7068.025; Wed, 6 Dec 2023
- 15:12:36 +0000
-From: Louis Peens <louis.peens@corigine.com>
-To: David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Ryno Swart <ryno.swart@corigine.com>,
-	netdev@vger.kernel.org,
-	oss-drivers@corigine.com
-Subject: [PATCH net-next 2/2] nfp: devlink: add extended ack report messages
-Date: Wed,  6 Dec 2023 17:12:09 +0200
-Message-Id: <20231206151209.20296-3-louis.peens@corigine.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231206151209.20296-1-louis.peens@corigine.com>
-References: <20231206151209.20296-1-louis.peens@corigine.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: JN3P275CA0008.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:70::10)
- To BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B8A7D5F
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 07:14:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701875644;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LDBnyP1g1RG8X2pWpNL9U6g9VK+bR9BnvKJLC9D2B9Y=;
+	b=iDUxckXpbUkV0lK/3oqmUOfbhjunx/VT+OJlQNDAXlT9d/8td1o9CpT9NiWAZu4mn5rai3
+	wRG2dpGiss3BGfWoDVXDghY7HtRmnecJfRGhWlBj9HNV5zB1q/QEcwqh2Iu3QrGhz6XxYO
+	/6L93rDtUfRh8YQuZ7rRzI65qrgzH9o=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-656-Dw6yz-NKPiie1xDYhSNtgw-1; Wed, 06 Dec 2023 10:14:02 -0500
+X-MC-Unique: Dw6yz-NKPiie1xDYhSNtgw-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a1ae30a04ffso81633366b.0
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 07:14:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701875641; x=1702480441;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LDBnyP1g1RG8X2pWpNL9U6g9VK+bR9BnvKJLC9D2B9Y=;
+        b=jHCfQKJHCgKWN7xUkaaLNegFPKQD8fEtQhWbhqfjvZrDjWYi7u8B2n4dQ7H/sxjwpr
+         E8rdTL/ZAU/6S6IEz6dAzLiBXPRBrKd/K9unVNtLsdSkBgsMHaTXV2L1k6DTb8hj3ej/
+         S/JRQEvft35L1Mxv3et96ydJ90DGeWMUskl2C+C6CVMzOip6Fn8UMhloUoS2ORzBwKuE
+         i6coz+YQfPeJQ+gUmWJkDActrYOuMld3QSsGhSyJXfEMXKh1oHWSADIWXIpgTDK2k7G/
+         AU8NbeOMT7stj1vVVuLtfjq4MQB/RXGpgVCaJE066bo/5LSH6IRGFT2Ph0TuV93flJ7K
+         ukqA==
+X-Gm-Message-State: AOJu0YwXp/izi9UUimSWArHDNXMFUE36FMVfGU/Pq2l4jpAFr4GGTqM3
+	MqX42ESMFV/XhVPT73uezRp+EKHYEZoVbGc+Oxv7YroLPupMKZ5yqiL+gjgfh3b8n2Qf00Gx0wB
+	I45bVYmcdfa7885Er
+X-Received: by 2002:a17:906:7f08:b0:a1d:1c71:8158 with SMTP id d8-20020a1709067f0800b00a1d1c718158mr1376389ejr.4.1701875641534;
+        Wed, 06 Dec 2023 07:14:01 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHH4g3R2HEOI3zDVywah2i1EzMR4lb37y99R2HGm/dv2ky/blvgh6Pw56PyopKcfjAyqvBjqA==
+X-Received: by 2002:a17:906:7f08:b0:a1d:1c71:8158 with SMTP id d8-20020a1709067f0800b00a1d1c718158mr1376368ejr.4.1701875641118;
+        Wed, 06 Dec 2023 07:14:01 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-243-102.dyn.eolo.it. [146.241.243.102])
+        by smtp.gmail.com with ESMTPSA id g25-20020a1709064e5900b00a1aa6f2d5fcsm37351ejw.110.2023.12.06.07.13.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 07:14:00 -0800 (PST)
+Message-ID: <70497ad83be1c7bd715abc8f29c72ee39a381f58.camel@redhat.com>
+Subject: Re: [PATCHv3 net-next 01/14] selftests/net: add lib.sh
+From: Paolo Abeni <pabeni@redhat.com>
+To: Petr Machata <petrm@nvidia.com>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org, "David S.
+ Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Eric
+ Dumazet <edumazet@google.com>,  Shuah Khan <shuah@kernel.org>, David Ahern
+ <dsahern@kernel.org>, linux-kselftest@vger.kernel.org,  Po-Hsu Lin
+ <po-hsu.lin@canonical.com>, Guillaume Nault <gnault@redhat.com>, James
+ Prestwood <prestwoj@gmail.com>, Jaehee Park <jhpark1013@gmail.com>, Ido
+ Schimmel <idosch@nvidia.com>, Justin Iurman <justin.iurman@uliege.be>, Xin
+ Long <lucien.xin@gmail.com>, James Chapman <jchapman@katalix.com>
+Date: Wed, 06 Dec 2023 16:13:59 +0100
+In-Reply-To: <87jzpr5x0r.fsf@nvidia.com>
+References: <20231202020110.362433-1-liuhangbin@gmail.com>
+	 <20231202020110.362433-2-liuhangbin@gmail.com>
+	 <7e73dbfe6cad7d551516d02bb02881d885045498.camel@redhat.com>
+	 <87jzpr5x0r.fsf@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL0PR13MB4403:EE_|LV8PR13MB6421:EE_
-X-MS-Office365-Filtering-Correlation-Id: bb470232-74b8-45aa-76b9-08dbf66dc758
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Jj4nyWzCK1i8Vfi4HLPbVMOr5RyF2Gy/z3v0RIy65lbAFyYR2QJtsyOrv3C+KO4D88ZUbcUaqpEEwbFMhMD67ylsGLTc5DKLH479fA23EtpKnz5ScWA+55PCNE9uHXuI4WRTXMtOP3tsvtWsoDQnuTgTIemwgbQ/gOGW3XiayNVhiW3nWTkzq2tKlHybH55ghemBRhiHUMrLhoyuU/cPMTKQXSm4UOvnQWDAy6uxYTphkZswG8BcZpvPvskpog++jNU5xqJ31Vhvxo2UAgqO/zkrb8wfFtnOddRG5RMenC/RUtu9Sqdc8/P6m73fEYWn0Yq1X6LKJVsDL+eZz1bLk/iGcju7kD7ONrdShcIIMJYScfgFZwBDkngDHCT5ZutMpY1npfjxDytCviwGyAsbimV+OBA8ya1VRinq094B634svc3TNg9hUQ3sCObpRaLiXXRMHDoibRuTNptTP6/qJLTFKyQehQgSrA/+quZqH5WuDKRgkPs/IHjlS1vkCFiRAfn1JGf2gfQdu+dc9rd9iMjbh64e9NntdBp/cXyzLLtCXbwPEFL4bvBP3TprV6sSXWKLihLWC2k5t91wXimp8mCnlkL6mNj18cLJbzyuhqXlif51bpWfco666YbqE9opP9Q8ePxw6+h8om4U8Tcy7k5lsh/rTHleRqpOYMEuNqk=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR13MB4403.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39840400004)(376002)(396003)(136003)(346002)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(38350700005)(4326008)(6512007)(52116002)(478600001)(8676002)(8936002)(26005)(107886003)(2616005)(1076003)(6506007)(6666004)(66476007)(110136005)(66946007)(66556008)(316002)(83380400001)(15650500001)(36756003)(6486002)(38100700002)(5660300002)(2906002)(86362001)(41300700001)(44832011);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?2ltE+89COLs/C1LokzIMKSm3mD+fa3zl26KP+/Tu4qt+aztqnTUR2gjni6aP?=
- =?us-ascii?Q?yKN3s3GPZp7MFY0+5AZUmYvl3O8dSurvTilDgaPNiZln/Fcq4FmBizW2V7uP?=
- =?us-ascii?Q?rs0TBW2GaAg0g2hlA01OsVcXxmEJ5PqkKJEfVdXHwtH0KcoMyhbfgbheiznP?=
- =?us-ascii?Q?MQGKvDxvo/aTb/MHWfhhQYh/JhnE0Ymqyho4UIY0plJos2q+OgoPl3sRVw1x?=
- =?us-ascii?Q?aucIUanXTljv49dI7Ao2BzY13KHIw5rIxm41bhO5941FJOwHKD1FyXIcFNkH?=
- =?us-ascii?Q?S8nb59Jr+cKpRTxcFL1r14NZcKPtIr7QXBzQgaKFOj5Dod5v+0KUudxRQnIB?=
- =?us-ascii?Q?xlQiDa7suRrK768zc+hL7eiXBbgHvlMcy3WRHysIn5VA+O3G/R7Al95D+C8O?=
- =?us-ascii?Q?h52JA/iJqoKa05PkBNjSu/aiBYegR5UNmBAwS/mzgKMknbCrr5SHA7c9a5eC?=
- =?us-ascii?Q?45m+cuEGSy4Z3oxmVBUebhc+cnjJtr5K1HJGYKIc7gJ67uAj/9KMk1GAbPJC?=
- =?us-ascii?Q?AuEqbyljLhnHDa2q+F2ElOCGSPh37tm2RSo/tWG6fZoPuiVoAiYV4RI0StsL?=
- =?us-ascii?Q?CtGaTvgpWFUKsVCwF7iwKdmiVQ/Vg6QjWgJB3JqMyjn0hRicbZegeC12/mL6?=
- =?us-ascii?Q?QfGyLNlub6vSPTDElWIZMo2cDCGZk8UHt2WAl3qjdjHLrFjEQ5+VEQ+W2goo?=
- =?us-ascii?Q?umeF1hpzFjm1JhoopI4fAxzPKDyK8KryYcKOrqPGooppT8XDKNrIt2khQ3MW?=
- =?us-ascii?Q?ve30x70k06OyMeomsJIAac7xuwgZXc0yUrTJTTrLHiP+aHw+1xeLtFWO2rlw?=
- =?us-ascii?Q?0ArwV1lCL2z4VDJhy7rkE9AWA82wfcTiZGxWnXbIDsJI2q09LWMicqYKsVL1?=
- =?us-ascii?Q?LigCwhZw+DSJHcOTYa4Ejn0ztJYiRI450J1QC4mJVE1R5Bvrm+kdxrdxbNwj?=
- =?us-ascii?Q?49o04Ms2i1JYe8j6lQersTP1o9d5jxbhmj6JkqO+t3Y6kP+A08M3NhdXBDt0?=
- =?us-ascii?Q?BfCRLGO9Mu0zl5tSm7CqrnpkiSNoHl9nLmlVZtj3nhKRafWFKzvkBpyJEqyf?=
- =?us-ascii?Q?z+74zJpptJLZkAuQiSdLPrrmHEajPUqjnOzdZUTVze8HgLY50Cy2u5F5RgmQ?=
- =?us-ascii?Q?oTIWqUrnVEGqN4L/b/ZetcQ2RW8PjMT1jrkOCnfgqB9YFsIE+RFHYylCs+ZN?=
- =?us-ascii?Q?2I35ANanvzB2kyPJvJuYCU/2nhhF5LO6sn1IleFlapPpyv4YJMeEIc87AbV9?=
- =?us-ascii?Q?D3GM+HKnXBr8TlL/o3CVf7fUjEuZIFJonO55Ez9lbG6PIV4ylz2NWmqM5/ds?=
- =?us-ascii?Q?Kh2Ij39PuEBhCI7S8pVf2V2Zyp+YYpLm8jZmOWZWeNZ3ymujfTVTE8Gi4zwX?=
- =?us-ascii?Q?pBrdG4RNtz55m+eHF2TqkadLJTPsIUgnoeZdbeU67bcfGhIom0wnA8EKDQ5O?=
- =?us-ascii?Q?WWNTTn8Q1V2lYzloJE9jFvOc9/XVWavCNACtAzxY53faFuGyO3IH9om0Ehsa?=
- =?us-ascii?Q?/5tVd6AMQoiIH/kj9u9QCNviLnU0hyBLK5+Et9udfoP0fpZaIawh2cjEFiI9?=
- =?us-ascii?Q?vbakQwf/GpQCIH2E2lpHaSHVuEgXG1M68y8vK9eeJcHeLu9AnEjQbuILMcR/?=
- =?us-ascii?Q?EA=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bb470232-74b8-45aa-76b9-08dbf66dc758
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR13MB4403.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2023 15:12:36.3177
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SdVqoNMdtt7OQay+oHo0X9Lxpku1LPV3LbA525HFX0r4ZzYjos0elDrdR/p67vTk1Et1ZOZJLZaRueg12xnnkXThQVTlDdzC4oSX07fzjfk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR13MB6421
 
-From: Ryno Swart <ryno.swart@corigine.com>
+On Wed, 2023-12-06 at 13:32 +0100, Petr Machata wrote:
+> Paolo Abeni <pabeni@redhat.com> writes:
+>=20
+> > Side note for a possible follow-up: if you maintain $ns_list as global
+> > variable, and remove from such list the ns deleted by cleanup_ns, you
+> > could remove the cleanup trap from the individual test with something
+> > alike:
+> >=20
+> > final_cleanup_ns()
+> > {
+> > 	cleanup_ns $ns_list
+> > }
+> >=20
+> > trap final_cleanup_ns EXIT
+> >=20
+> > No respin needed for the above, could be a follow-up if agreed upon.
+>=20
+> If you propose this for the library then I'm against it. The exit trap
+> is a global resource that the client scripts sometimes need to use as
+> well, to do topology teardowns or just general cleanups.=C2=A0
+> So either the library would have to provide APIs for cleanup management, =
+or the trap
+> is for exclusive use by clients. The latter is IMHO simpler.
 
-Add descriptive error messages to common devlink failures to
-be more user friendly.
+Even the former would not be very complex:
 
-Signed-off-by: Ryno Swart <ryno.swart@corigine.com>
-Signed-off-by: Louis Peens <louis.peens@corigine.com>
----
- drivers/net/ethernet/netronome/nfp/nfp_devlink.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+TRAPS=3D""
+do_at_exit() {
+        TRAPS=3D"${TRAPS}$@;"
 
-diff --git a/drivers/net/ethernet/netronome/nfp/nfp_devlink.c b/drivers/net/ethernet/netronome/nfp/nfp_devlink.c
-index 8c6954c58a88..635d33c0d6d3 100644
---- a/drivers/net/ethernet/netronome/nfp/nfp_devlink.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfp_devlink.c
-@@ -75,8 +75,10 @@ nfp_devlink_port_split(struct devlink *devlink, struct devlink_port *port,
- 	if (ret)
- 		return ret;
- 
--	if (eth_port.port_lanes % count)
-+	if (eth_port.port_lanes % count) {
-+		NL_SET_ERR_MSG_MOD(extack, "invalid count");
- 		return -EINVAL;
-+	}
- 
- 	/* Special case the 100G CXP -> 2x40G split */
- 	lanes = eth_port.port_lanes / count;
-@@ -101,8 +103,10 @@ nfp_devlink_port_unsplit(struct devlink *devlink, struct devlink_port *port,
- 	if (ret)
- 		return ret;
- 
--	if (!eth_port.is_split)
-+	if (!eth_port.is_split) {
-+		NL_SET_ERR_MSG_MOD(extack, "port is not split");
- 		return -EINVAL;
-+	}
- 
- 	/* Special case the 100G CXP -> 2x40G unsplit */
- 	lanes = eth_port.port_lanes;
--- 
-2.34.1
+        trap "${TRAPS}" EXIT
+}
+
+And then use "do_at_exit <whatever>" instead of "trap <whatever> EXIT"
+
+> It also puts the cleanups at the same place where the acquisition is
+> prompted: the client allocates the NS, the client should prompt its
+> cleanup.
+
+I guess I could argue that the the script is asking the library to
+allocate the namespaces, and the library could take care of disposing
+them.
+
+But I'm not pushing the proposed option, if there is no agreement no
+need for additional work ;)
+
+Cheers,
+
+Paolo
 
 
