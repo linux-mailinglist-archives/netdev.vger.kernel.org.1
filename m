@@ -1,100 +1,120 @@
-Return-Path: <netdev+bounces-54392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B197806E21
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 12:37:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECAB9806ECB
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 12:49:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B21DF281C54
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 11:36:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 775DFB20DE5
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 11:49:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C7931A97;
-	Wed,  6 Dec 2023 11:36:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DD5F347D7;
+	Wed,  6 Dec 2023 11:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="PJSVzEFL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98DD31A5;
-	Wed,  6 Dec 2023 03:36:54 -0800 (PST)
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-5d74186170fso42084847b3.3;
-        Wed, 06 Dec 2023 03:36:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701862613; x=1702467413;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Q7uKADVFo67bwK9oLvgec0xCPe6KYQSC4PqeYTk7K8M=;
-        b=wCd7RJ4chb2r3uf8Qosbe1Fmf4ZKLgAjxaa6mPUk+L8lXAy5heN3NmUZpeGpJ1vjIe
-         shTz7A944KGjzQ0zkahp//hmyRir6iRYz/+4PV9wSAxxfXgwY66AT39BLT9t1cE1593S
-         1Y3ZLzd9UnYhfhX2hGpmGYnuJnbRZwKgd5tclPlr+vKlFe0CkplMNcJ0qn07RMz8pcZg
-         B8hRk3GA3nCv+U2/u/Z6ya/WxJHXFiumY5bIECHvLFiZunvjl14Lc6ii2/Vk2U4HaZjV
-         y1ALkTFpkfAbKbiVBr5NRESLn3uHDOYc//opzffrbRDKoTUh4xTzBwX7NSHRVt+PR/XS
-         WRIw==
-X-Gm-Message-State: AOJu0YzwbN5hcFk+p7+0QOgMJ+o3VcQqP/y2TxlpLFhZTJcbD8GP+jpK
-	Wkm3Hwz3SUMs0IGNW0x0LzSXIdEz7nMq5A==
-X-Google-Smtp-Source: AGHT+IFcRlZyOhU4rv85Tz0KaWEXBAmvUQaQyMJXzGN7o+d/zc8yq6Lrq6M8ZxDlN/A44bkK37MglA==
-X-Received: by 2002:a81:af61:0:b0:5d8:96c:690d with SMTP id x33-20020a81af61000000b005d8096c690dmr575820ywj.7.1701862613612;
-        Wed, 06 Dec 2023 03:36:53 -0800 (PST)
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com. [209.85.128.178])
-        by smtp.gmail.com with ESMTPSA id r20-20020a0de814000000b005d39c874019sm4620372ywe.66.2023.12.06.03.36.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Dec 2023 03:36:51 -0800 (PST)
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-5d96efd26f8so24131207b3.2;
-        Wed, 06 Dec 2023 03:36:49 -0800 (PST)
-X-Received: by 2002:a81:a103:0:b0:5d1:430e:4c2f with SMTP id
- y3-20020a81a103000000b005d1430e4c2fmr594560ywg.42.1701862609581; Wed, 06 Dec
- 2023 03:36:49 -0800 (PST)
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4965210E6;
+	Wed,  6 Dec 2023 03:48:44 -0800 (PST)
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B6ASh92021416;
+	Wed, 6 Dec 2023 11:48:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=i/AKFSSfnBuhU1k9dGXdGPic9GfGYHJhpTGcMfynM8w=;
+ b=PJSVzEFL+NDlG3tEvn4GOXdDbzSh2OuYHvAYz9OeJU3CHSqQ0tCEs7mum62+0otk4o8d
+ WL+VZK3Xll7T1mN0itr3VjOf6TiTyGXuSkSl/g/rZojAibnTwZTlh1LuzjbzKAoL+1JQ
+ UOkHku2AthZ2ixW/PLJ9atJC7iPB6F2FN4BE81QM5e4eACK1ldQN8Ce2/DMTRZl0przZ
+ +tma1kkahi/y3EvNi6PJII8CRCmsTpezcl9phj7JCxxWeRGQS1DNEkuavVoBvzNY8HLz
+ jnaVirdz9TG4zp1v7jn55g3qiv71f/CQP/CU3lBtHID50msjhIDUWYMgZP1Hy1qWV+9G yA== 
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3utd5nhhd5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 06 Dec 2023 11:48:16 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3B6BmFK1013080
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 6 Dec 2023 11:48:15 GMT
+Received: from [10.216.47.147] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 6 Dec
+ 2023 03:47:29 -0800
+Message-ID: <5d5f3955-fc30-428c-99f4-42f9b7580a84@quicinc.com>
+Date: Wed, 6 Dec 2023 17:17:25 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com> <20231120084606.4083194-11-claudiu.beznea.uj@bp.renesas.com>
-In-Reply-To: <20231120084606.4083194-11-claudiu.beznea.uj@bp.renesas.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 6 Dec 2023 12:36:38 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdUe4xNMOqMkRhnD0Ciq19uWoFRVbg0YPzB6-Y2gh6m-1g@mail.gmail.com>
-Message-ID: <CAMuHMdUe4xNMOqMkRhnD0Ciq19uWoFRVbg0YPzB6-Y2gh6m-1g@mail.gmail.com>
-Subject: Re: [PATCH 10/13] net: ravb: Switch to SYSTEM_SLEEP_PM_OPS()/RUNTIME_PM_OPS()
- and pm_ptr()
-To: Claudiu <claudiu.beznea@tuxon.dev>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, p.zabel@pengutronix.de, 
-	yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com, 
-	biju.das.jz@bp.renesas.com, prabhakar.mahadev-lad.rj@bp.renesas.com, 
-	sergei.shtylyov@cogentembedded.com, mitsuhiro.kimura.kc@renesas.com, 
-	masaru.nagai.vx@renesas.com, netdev@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: stmmac: qcom-ethqos: Add sysfs nodes for
+ qcom ethqos
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu
+	<joabreu@synopsys.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@quicinc.com>, Andrew Halaney <ahalaney@redhat.com>,
+        <andersson@kernel.org>
+References: <20231204084854.31543-1-quic_snehshah@quicinc.com>
+ <3e4a1b9c-ed0f-466e-ba11-fc5b7ef308a1@lunn.ch>
+From: Sneh Shah <quic_snehshah@quicinc.com>
+In-Reply-To: <3e4a1b9c-ed0f-466e-ba11-fc5b7ef308a1@lunn.ch>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: hZ9NNN9k50p4_qLz5sJ2DEbMAxBD1qip
+X-Proofpoint-GUID: hZ9NNN9k50p4_qLz5sJ2DEbMAxBD1qip
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-06_09,2023-12-06_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 priorityscore=1501 spamscore=0 bulkscore=0 suspectscore=0
+ phishscore=0 adultscore=0 clxscore=1011 mlxscore=0 mlxlogscore=727
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2312060098
 
-On Thu, Nov 23, 2023 at 7:15=E2=80=AFAM Claudiu <claudiu.beznea@tuxon.dev> =
-wrote:
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->
-> SET_SYSTEM_SLEEP_PM_OPS() and SET_RUNTIME_PM_OPS() are deprecated now
-> and require __maybe_unused protection against unused function warnings.
-> The usage of pm_ptr() and SYSTEM_SLEEP_PM_OPS()/RUNTIME_PM_OPS() allows
-> the compiler to see the functions, thus suppressing the warning. Thus
-> drop the __maybe_unused markings.
->
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-Gr{oetje,eeting}s,
+On 12/5/2023 8:38 PM, Andrew Lunn wrote:
+> On Mon, Dec 04, 2023 at 02:18:54PM +0530, Sneh Shah wrote:
+>> Add sysfs nodes to conifigure routing of specific vlan id to GVM queue.
+>> GVM queue is not exposed to PVM stmmac, so TC ops can't configure routing.
+> 
+> Adding files in /sysfs has ~0 chance of being accepted.
+> 
+> As requested, please explain what all these different hardware blocks
+> are, and what you are trying to achieve. We can then recommend the
+> correct interface.
+> 
+>     Andrew
+> 
+> ---
+> pw-bot: cr
 
-                        Geert
+We have multiVM Architecture here. PVM  will have stmmac running with 4 Rx Tx queues. stmmac in PVM is responsible to configure whole ethernet HW MAC/DMA/MTL ( including clocks, regulators and other core bsp elements).
+In GVM we have thin Ethernet driver, which is responsible to configure and manage only 1 Rx/TX queue, i.e 5th Rx/Tx ethernet queue. GVM can't access any other resisters apart from this 5th queue specific MTL and DMA registers.
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
+We need to route vlan traffic of a specific Priority to GVM Queue (Ethernet queue 5) via programming a MAC register. The MAC register is not accessible in GVM and has to be programmed from PVM. stmmac already has TC OPS to program this routing via vlan priority. However, as PVM has only 4 queues enabled, TC tool will not take 5th queue as input. Hence, these nodes were added to conifure the MAC register to route specific vlan packets to 5th queue in GVM.
 
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+Note: The queues mentioned above are HW MTL Queues and DMA Channels. The routing can be done in the HW itself based on vlan pcp before the packets reach to driver.
+
+
 
