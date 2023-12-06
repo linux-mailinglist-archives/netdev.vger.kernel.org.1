@@ -1,102 +1,156 @@
-Return-Path: <netdev+bounces-54335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38756806ADE
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:38:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77253806AE0
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:38:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 650171C208D1
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 09:38:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 318AB28198E
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 09:38:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B43D1A718;
-	Wed,  6 Dec 2023 09:38:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B10441A71C;
+	Wed,  6 Dec 2023 09:38:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="R496WGkg"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="k3xwGbvc"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17CBC9C
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 01:38:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=3fntxHKIyKjnSM6vuBVwyvUk6ZAEqyru8xw5RbWoPl0=;
-	t=1701855486; x=1703065086; b=R496WGkgUyg2vTrEv9K2Z+xo52I9II3ZI4hUR4oIkxQXnWY
-	0rhQdTIO4b79d1xmroMn0s5ml89BABz3nHfNYWnoYb1G5rEmhSAdsvQJz+iHkBakSEThjiVXEulzl
-	MAAfyltLZaT5URwf/Tm42LN0jCAMvZolxCKPR9B8XCnZ6UEKQCm1rTtHK/NsLhP+2z5z0x+ILseFO
-	TBXtDydxY0dY+/Y1WcE4EG038yQJeBb8sc09wkyXc/sN1PO3Jg8L82WPSnl6KyX8Ueqs6h+5TbduU
-	64sQa08oDL92ZiFQPtf57UeoJnxqiewhZChXP478oeYZCO7Ll75SyX+w9R5B5KCQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rAoLt-0000000HY61-2IUs;
-	Wed, 06 Dec 2023 10:37:57 +0100
-Message-ID: <c1189a1982630f71dd106c3963e0fa71fa6c8a76.camel@sipsolutions.net>
-Subject: Re: [RFC PATCH] net: ethtool: do runtime PM outside RTNL
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, netdev@vger.kernel.org
-Cc: Marc MERLIN <marc@merlins.org>, Jesse Brandeburg
-	 <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	intel-wired-lan@lists.osuosl.org, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Date: Wed, 06 Dec 2023 10:37:56 +0100
-In-Reply-To: <3e7ae1f5-77e3-a561-2d6b-377026b1fd26@intel.com>
-References: 
-	<20231204200710.40c291e60cea.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
-	 <d0fc7d04-e3c9-47c0-487e-666cb2a4e3bc@intel.com>
-	 <709eff7500f2da223df9905ce49c026a881cb0e0.camel@sipsolutions.net>
-	 <3e7ae1f5-77e3-a561-2d6b-377026b1fd26@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.1 (3.50.1-1.fc39) 
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::225])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD4D3B9;
+	Wed,  6 Dec 2023 01:38:33 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 2AE831C000C;
+	Wed,  6 Dec 2023 09:38:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1701855512;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4y+flM2aoike/FPH6qr4fSM5H3yUCAUYtHfykcYhVEk=;
+	b=k3xwGbvc8l51DdwhCNNogPX2i1UK8RjJkiIGiGaX0/DJVE/mlb7iIDCQUJX7b0YZt7Pyrz
+	ol/ktsBWk+HKKJ9KtMnbWNEZbsDwzAZarfZ8Tvw7RKPgjQfRyvZTdgdh2dzaknhZgnsGPc
+	CYNBqpr0zllwndP39wsFuYC0BUL1s/YeutbzFu7W1iQ/r2FAd2DGfueucoeZnU4UGzcbUd
+	DKRseSOSfCmYsxVvS2QS2Ef4WcQCfq6MI2Adx2ZJCp2z/Rr7ilVlDANz8ZYN4LzE2Yf7ZG
+	sRDfl+Qr214EPqeEauGxYkj4Y7YZqozG5zfnFxtxI9jLhBh5pkCvFanPbMffsQ==
+Date: Wed, 6 Dec 2023 10:38:26 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>,
+ Kishon Vijay Abraham I <kishon@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+ John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>, Mark
+ Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Alexander Couzens <lynxis@fe80.eu>, Qingfang Deng
+ <dqfext@gmail.com>, SkyLake Huang <SkyLake.Huang@mediatek.com>, Philipp
+ Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ linux-phy@lists.infradead.org
+Subject: Re: [RFC PATCH v2 3/8] net: pcs: pcs-mtk-lynxi: add platform driver
+ for MT7988
+Message-ID: <20231206103826.4e396513@device.home>
+In-Reply-To: <68bb81ac6bf99393c8de256f42e5715626590af8.1701826319.git.daniel@makrotopia.org>
+References: <cover.1701826319.git.daniel@makrotopia.org>
+	<68bb81ac6bf99393c8de256f42e5715626590af8.1701826319.git.daniel@makrotopia.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Wed, 2023-12-06 at 09:46 +0100, Przemek Kitszel wrote:
->=20
-> That sounds right too; one could argue if your fix is orthogonal to that
-> or not. I would say that your fix makes core net code more robust
-> against drivers from past millennia. :)
-> igc folks are notified, no idea how much time it would take to propose
-> a fix.
+Hello Daniel,
 
-Maybe it should be on whoever added runtime pm to ethtool ;-)
+My two cents below :
 
-Heiner, the igc driver was already doing this when you added
-pm_runtime_get_sync() ops, was there a discussion at the time, or just
-missed?
+On Wed, 6 Dec 2023 01:44:17 +0000
+Daniel Golle <daniel@makrotopia.org> wrote:
 
-I really don't know any of this ...
+> Introduce a proper platform MFD driver for the LynxI (H)SGMII PCS which
+> is going to initially be used for the MT7988 SoC.
+> 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 
-> > Well, according to the checks, the patch really should use
-> > netdev_get_by_name() and netdev_put()? But I don't know how to do that
-> > on short-term stack thing ... maybe it doesn't have to?
->=20
-> Nice to have such checks :)
-> You need some &netdevice_tracker, perhaps one added into struct net
-> or other place that would allow to track it at ethtool level.
+ [ ... ]
 
-Yeah but that's dynamic? Seems weird to add something to allocations for
-something released in the same function ...
+> +static int mtk_pcs_lynxi_enable(struct phylink_pcs *pcs)
+> +{
+> +	struct mtk_pcs_lynxi *mpcs = pcs_to_mtk_pcs_lynxi(pcs);
+> +
+> +	if (mpcs->sgmii_tx && mpcs->sgmii_rx) {
+> +		clk_prepare_enable(mpcs->sgmii_rx);
+> +		clk_prepare_enable(mpcs->sgmii_tx);
 
-> "short term stack thing" does not relieve us from good coding practices,
-> but perhaps "you just replaced __dev_get_by_name() call by
-> dev_get_by_name()" to fix a bug would ;) - with transition to tracked
-> alloc as a next series to be promised :)
+You can use the clk_bulk_prepare_enable() here
 
-All I want is to know how ;)
-but I guess I can try to find examples.
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static void mtk_pcs_lynxi_disable(struct phylink_pcs *pcs)
+>  {
+>  	struct mtk_pcs_lynxi *mpcs = pcs_to_mtk_pcs_lynxi(pcs);
+>  
+> +	regmap_set_bits(mpcs->regmap, SGMSYS_QPHY_PWR_STATE_CTRL, SGMII_PHYA_PWD);
+> +
+> +	if (mpcs->sgmii_tx && mpcs->sgmii_rx) {
+> +		clk_disable_unprepare(mpcs->sgmii_tx);
+> +		clk_disable_unprepare(mpcs->sgmii_rx);
 
-> anyway, I'm fresh here, and would love to know what others think about
+and clk_bulk_disable_unprepare() here
 
-Not me, but me too ;-)
+ [...]
 
-johannes
+> +static int mtk_pcs_lynxi_probe(struct platform_device *pdev)
+> +{
+> +	struct device *dev = &pdev->dev;
+> +	struct device_node *np = dev->of_node;
+> +	struct mtk_pcs_lynxi *mpcs;
+> +	struct phylink_pcs *pcs;
+> +	struct regmap *regmap;
+> +	u32 flags = 0;
+> +
+> +	mpcs = devm_kzalloc(dev, sizeof(*mpcs), GFP_KERNEL);
+> +	if (!mpcs)
+> +		return -ENOMEM;
+> +
+> +	regmap = syscon_node_to_regmap(np->parent);
+> +	if (IS_ERR(regmap))
+> +		return PTR_ERR(regmap);
+> +
+> +	if (of_property_read_bool(np->parent, "mediatek,pnswap"))
+> +		flags |= MTK_SGMII_FLAG_PN_SWAP;
+> +
+> +	mpcs->rstc = of_reset_control_get_shared(np->parent, NULL);
+> +	if (IS_ERR(mpcs->rstc))
+> +		return PTR_ERR(mpcs->rstc);
+> +
+> +	reset_control_deassert(mpcs->rstc);
+> +	mpcs->sgmii_sel = devm_clk_get_enabled(dev, "sgmii_sel");
+> +	if (IS_ERR(mpcs->sgmii_sel))
+> +		return PTR_ERR(mpcs->sgmii_sel);
+> +
+> +	mpcs->sgmii_rx = devm_clk_get(dev, "sgmii_rx");
+> +	if (IS_ERR(mpcs->sgmii_rx))
+> +		return PTR_ERR(mpcs->sgmii_rx);
+> +
+> +	mpcs->sgmii_tx = devm_clk_get(dev, "sgmii_tx");
+> +	if (IS_ERR(mpcs->sgmii_tx))
+> +		return PTR_ERR(mpcs->sgmii_tx);
+
+and clk bulk operations here as well ?
+
+Maxime
 
