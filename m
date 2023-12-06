@@ -1,168 +1,125 @@
-Return-Path: <netdev+bounces-54321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43254806993
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 09:27:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 122D4806997
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 09:28:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 633C01C20941
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 08:27:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9515DB20D45
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 08:27:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 154D919449;
-	Wed,  6 Dec 2023 08:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="WYuNgxEe"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB61D19455;
+	Wed,  6 Dec 2023 08:27:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63A6A98
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 00:27:33 -0800 (PST)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-50bfd8d5c77so3286981e87.1
-        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 00:27:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1701851251; x=1702456051; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=o4AfVQ2zbTAHUj7f1jRzqOSD0uXgr0T0uDtU04QznLE=;
-        b=WYuNgxEeLtmmDkR9gdt6ebGyOjZps1ZUaXNSQ2sZCCo+P5DNExteLWBGi5dzY4tSX0
-         BaRHFYnQ0pEWOFyLTycLW2BijNqL/guusZOW8ESrLnaw+RwJ2ym/rW5LeHy9AwK7o+K8
-         aBDHAp4Ixesp30zTKyQxmydBTojToDRt29DMU1xAzlVJIBwMM14/ocx4dJacRoE34p2H
-         Ljnn4U6Dffh14YFq8CX+eoXI3HcxNO+4xjMfdPTOyYR2Se5VKJy4yk0OK1rgfu/EYkzQ
-         dv4MQbNX51zn2WfM8f1NDbf2MNcTkzT0n3ZzJigtwYMC3RmeRSTg8+1ph5f0Bg7vY9RI
-         bhgw==
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF97718D;
+	Wed,  6 Dec 2023 00:27:50 -0800 (PST)
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-5d3758fdd2eso65829367b3.0;
+        Wed, 06 Dec 2023 00:27:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701851251; x=1702456051;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o4AfVQ2zbTAHUj7f1jRzqOSD0uXgr0T0uDtU04QznLE=;
-        b=YMZC58ho3qANJNpi/RgjDw4814BHOUqQNDsOxyJLUhx+f2k8WThoIfVbTFLOvxVxFm
-         oBoyd0U6PQSbNnNAYtKypFWkTOcWmVx2NFAufFIqMZw15IoT1jYPyyYWzwKOM50Ky17m
-         cWRj7pRC50SU3kziHld2yP2BFha9U1Qj2Xcpq9L9akTFMOa2qJ+p7T88PHmURjhhIvvv
-         csjCUf/3U3eSTxwxECyfCoIxxcb5pKOrNFb5Ze+xLeP53GdSNuSiPz+qiusi4QILsgR+
-         vZ4CaYYC4Z52Hc2P3TxtiboHOTOZXb5yj2UBJJIxQVOsGaIun9LGc9FwT/bjnm6k6Rqs
-         czmw==
-X-Gm-Message-State: AOJu0YxyD7XbldNC6RCytUbKmRatng2LGXsioZjPf2Zkxr+BguyuEZ6J
-	fBTf/F45IU0hU1nt+o3SHI+Sxx65XbaPT+j9SKM=
-X-Google-Smtp-Source: AGHT+IGBk8HKWGUlhcABWyJ+BdKxhq17cXA4/tzK6OZnHqB5IhgX+myD61TuvQ4CBom1F4cjaIA3pg==
-X-Received: by 2002:a05:6512:5d6:b0:50b:fb07:dd15 with SMTP id o22-20020a05651205d600b0050bfb07dd15mr199249lfo.248.1701851250826;
-        Wed, 06 Dec 2023 00:27:30 -0800 (PST)
-Received: from wkz-x13 (a124.broadband3.quicknet.se. [46.17.184.124])
-        by smtp.gmail.com with ESMTPSA id bi38-20020a0565120ea600b0050bfd88075asm659588lfb.287.2023.12.06.00.27.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 00:27:30 -0800 (PST)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
- f.fainelli@gmail.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 6/6] net: dsa: mv88e6xxx: Add "rmon" counter
- group support
-In-Reply-To: <20231206002225.nehk4htc4mozcq5b@skbuf>
-References: <20231205160418.3770042-1-tobias@waldekranz.com>
- <20231205160418.3770042-7-tobias@waldekranz.com>
- <20231206002225.nehk4htc4mozcq5b@skbuf>
-Date: Wed, 06 Dec 2023 09:27:29 +0100
-Message-ID: <87v89b91n2.fsf@waldekranz.com>
+        d=1e100.net; s=20230601; t=1701851270; x=1702456070;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J96bjVl10/YZKpO0+pJdZW7wN1/H6wsxpMA2dwhuCto=;
+        b=XAynB3JCLszm0lxVYNuTjTlEcATT/a2lKcjWUIHgSh2fSrA1SLp6ZsCwPOqktu21Py
+         R78ahdnOX10qTPaB5LAZDlo4VQsvs6zwRCMVkSxb0BZoS6f8uyPZLShWImdPXEQDtzu3
+         zlWPzrw33NohyAWiRFxfHkYB8HlEkJoCMD8qu0DEuGG2ERMwVvYV0oUak7YP/bZkykxV
+         Y/LWEhJbbC64Nle/BVyJb4L8KmMdMgI2hpRym3/5Hx8vaLFta1SIZTIXfJVoYQm4qAvZ
+         cVmiNdwVBugOZqpF8sa5zHHGn3z0Ea6/vHAEdf+dWKXfeVZoT7N8JVmvnBVsQl8bDMmi
+         +5/g==
+X-Gm-Message-State: AOJu0YyXNilsgdZZY08iKrxGrJTBcuH8E5cYffJUqJCfIdp4RhOFzY8H
+	7RUsX9zPIPcudFBUnLIn2lSS9RPQy3C7EA==
+X-Google-Smtp-Source: AGHT+IHneFXRyXNRh2NBYGczFKqTsBrNrAOitW0M+o6QtQRxQ7aPsb+SxUOQZjh/m2xW36UHO2qnEg==
+X-Received: by 2002:a0d:eb0d:0:b0:5d7:1941:3576 with SMTP id u13-20020a0deb0d000000b005d719413576mr457636ywe.93.1701851269662;
+        Wed, 06 Dec 2023 00:27:49 -0800 (PST)
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com. [209.85.219.178])
+        by smtp.gmail.com with ESMTPSA id c6-20020a814e06000000b005d364adb887sm4689374ywb.26.2023.12.06.00.27.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Dec 2023 00:27:49 -0800 (PST)
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-da077db5145so4339070276.0;
+        Wed, 06 Dec 2023 00:27:48 -0800 (PST)
+X-Received: by 2002:a25:6607:0:b0:db7:dad0:76ac with SMTP id
+ a7-20020a256607000000b00db7dad076acmr407887ybc.72.1701851268359; Wed, 06 Dec
+ 2023 00:27:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20231206073712.17776-1-jirislaby@kernel.org> <20231206073712.17776-5-jirislaby@kernel.org>
+In-Reply-To: <20231206073712.17776-5-jirislaby@kernel.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 6 Dec 2023 09:27:36 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdU4_==x7efMMOmxm3L4vZeWGeeWNo2bQ8Pv1wWx7246gQ@mail.gmail.com>
+Message-ID: <CAMuHMdU4_==x7efMMOmxm3L4vZeWGeeWNo2bQ8Pv1wWx7246gQ@mail.gmail.com>
+Subject: Re: [PATCH 04/27] tty: make tty_operations::send_xchar accept u8 char
+To: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
+Cc: gregkh@linuxfoundation.org, linux-serial@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Karsten Keil <isdn@linux-pingi.de>, 
+	Ulf Hansson <ulf.hansson@linaro.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, netdev@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-m68k <linux-m68k@lists.linux-m68k.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On ons, dec 06, 2023 at 02:22, Vladimir Oltean <olteanv@gmail.com> wrote:
-> On Tue, Dec 05, 2023 at 05:04:18PM +0100, Tobias Waldekranz wrote:
->> +static void mv88e6xxx_get_rmon_stats(struct dsa_switch *ds, int port,
->> +				     struct ethtool_rmon_stats *rmon_stats,
->> +				     const struct ethtool_rmon_hist_range **ranges)
->> +{
->> +	static const struct ethtool_rmon_hist_range rmon_ranges[] = {
->> +		{   64,    64 },
->> +		{   65,   127 },
->> +		{  128,   255 },
->> +		{  256,   511 },
->> +		{  512,  1023 },
->> +		{ 1024, 65535 },
->> +		{}
->> +	};
->> +	struct mv88e6xxx_chip *chip = ds->priv;
->> +	int ret;
->> +
->> +	ret = mv88e6xxx_stats_snapshot(chip, port);
->> +	if (ret < 0)
->> +		return;
->> +
->> +#define MV88E6XXX_RMON_STAT_MAP(_id, _member)				\
->> +	mv88e6xxx_stats_get_stat(chip, port,				\
->> +				 &mv88e6xxx_hw_stats[MV88E6XXX_HW_STAT_ID_ ## _id], \
->> +				 &rmon_stats->stats._member)
->> +
->> +	MV88E6XXX_RMON_STAT_MAP(in_undersize, undersize_pkts);
->> +	MV88E6XXX_RMON_STAT_MAP(in_oversize, oversize_pkts);
->> +	MV88E6XXX_RMON_STAT_MAP(in_fragments, fragments);
->> +	MV88E6XXX_RMON_STAT_MAP(in_jabber, jabbers);
->> +	MV88E6XXX_RMON_STAT_MAP(hist_64bytes, hist[0]);
->> +	MV88E6XXX_RMON_STAT_MAP(hist_65_127bytes, hist[1]);
->> +	MV88E6XXX_RMON_STAT_MAP(hist_128_255bytes, hist[2]);
->> +	MV88E6XXX_RMON_STAT_MAP(hist_256_511bytes, hist[3]);
->> +	MV88E6XXX_RMON_STAT_MAP(hist_512_1023bytes, hist[4]);
->> +	MV88E6XXX_RMON_STAT_MAP(hist_1024_max_bytes, hist[5]);
->> +
->> +#undef MV88E6XXX_RMON_STAT_MAP
->> +
->> +	*ranges = rmon_ranges;
->> +}
+CC linux-m68k
+
+On Wed, Dec 6, 2023 at 8:37=E2=80=AFAM Jiri Slaby (SUSE) <jirislaby@kernel.=
+org> wrote:
+> tty_operations::send_xchar is one of the last users of 'char' type for
+> characters in the tty layer. Convert it to u8 now.
 >
-> I just noticed that this doesn't populate the TX counters, just RX.
->
-> I haven't tried it, but I think the Histogram Mode bits (11:10) of the
-> Stats Operation Register might be able to control what gets reported for
-> the Set 4 of counters. Currently AFAICS, the driver always sets it to
-> MV88E6XXX_G1_STATS_OP_HIST_RX_TX, aka what gets reported to
-> "rx-rmon-etherStatsPkts64to64Octets" is actually an RX+TX counter.
+> Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
 
-You have a keen eye! Yes, that is what's happening.
+>  drivers/tty/amiserial.c          | 2 +-
 
-> What's the story behind this?
+Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-I think the story starts, and ends, with this value being the hardware
-default.
+> --- a/drivers/tty/amiserial.c
+> +++ b/drivers/tty/amiserial.c
+> @@ -811,7 +811,7 @@ static void rs_flush_buffer(struct tty_struct *tty)
+>   * This function is used to send a high-priority XON/XOFF character to
+>   * the device
+>   */
+> -static void rs_send_xchar(struct tty_struct *tty, char ch)
+> +static void rs_send_xchar(struct tty_struct *tty, u8 ch)
+>  {
+>         struct serial_state *info =3D tty->driver_data;
+>          unsigned long flags;
 
-Seeing as the hardware only has a single set of histogram counters, it
-seems to me like we have to prioritize between:
+Looks like this might fix an actual (harmless?) bug, if anyone evers
+configures a VSTOP or VSTART character with bit 7 set?
 
-1. Keeping Rx+Tx: Backwards-compatible, but we can't export any histogram via
-   the standard RMON group.
+    info->x_char =3D ch; // x_char is int, hence sign-extended
 
-2. Move to Rx-only: We can export them via the RMON group, but we change
-   the behavior of the "native" counters.
+transmit_chars() does:
 
-3. Move to Tx-only: We can export them via the RMON group, but we change
-   the behavior of the "native" counters.
+    amiga_custom.serdat =3D info->x_char | 0x100;
 
-Looking at RFC2819, which lays out the original RMON MIB, we find this
-description:
+which will inadvertently have all high bits sets, including the bit
+9, which is only used if PARENB is enabled.  But as it looks like
+PARENB handling is broken in amiseral anyway, this doesn't matter
+much...
 
-    etherStatsPkts64Octets OBJECT-TYPE
-        SYNTAX     Counter32
-        UNITS      "Packets"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-            "The total number of packets (including bad
-            packets) received that were 64 octets in length
-            (excluding framing bits but including FCS octets)."
-        ::= { etherStatsEntry 14 }
+include/linux/tty.h:#define STOP_CHAR(tty) ((tty)->termios.c_cc[VSTOP])
+include/linux/tty.h:#define START_CHAR(tty) ((tty)->termios.c_cc[VSTART])
 
-In my opinion, this gives (2) a clear edge over (3), so we're down to
-choosing between (1) and (2). Personally, I lean towards (2), as I think
-it is more useful because:
+Gr{oetje,eeting}s,
 
-- Most people will tend to assume that the histogram counters refers to
-  those defined in RFC2819 anyway
+                        Geert
 
-- It means we can deliver _something_ rather than nothing to someone
-  building an operating system, who is looking for a hardware
-  independent way of providing diagnostics
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
