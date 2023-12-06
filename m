@@ -1,164 +1,159 @@
-Return-Path: <netdev+bounces-54231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA276806544
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 03:48:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A960F806575
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 04:11:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90D161F21771
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 02:48:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63645281C90
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 03:11:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ECA36D39;
-	Wed,  6 Dec 2023 02:48:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0BB879DB;
+	Wed,  6 Dec 2023 03:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R01iuJxL"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UNo90qxN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B68CE1A2;
-	Tue,  5 Dec 2023 18:48:33 -0800 (PST)
-Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-6ce52ff23dfso361252b3a.0;
-        Tue, 05 Dec 2023 18:48:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701830913; x=1702435713; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ogka+BvCza9TVWp5K8/aCslfOSdnFwmW67J3MECnwfs=;
-        b=R01iuJxL3CirOXnZz3rEkpduGRO5vCAEhlyWH+SDEkBvljXPUX7WFATZtftCwp/PlJ
-         I4WEhYNobbWyU5+zGSmNw0yWQDu7iLqh2dSYWoYHRp/XeOeWMC2vANL1mCHIOYkhNebi
-         eJ7WKaOHojrRi27wpqkX1u9Qxm53aB7lk9+BGB2eWAw/aRJ/S1+IchUX0An5uzRnstRD
-         rhzrfOPvvrgWKjTM04ZG3PVyWacRZu3KxV4LUiKzv1frzCxHWR28srRVnqoj5M/eMExw
-         C/jxdnSrZ14ZSkfoyztddFZo1tztlAs6WWXgvBITHLhLlyfHsyy1AJ754cAFEWl4bbDD
-         nPug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701830913; x=1702435713;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ogka+BvCza9TVWp5K8/aCslfOSdnFwmW67J3MECnwfs=;
-        b=a3ZuPKBfJ75V68cMGiBM6d3B1vE2uWPLbS+XZXXf8E2BjQQuRwfiGb6qnF7U+L91rP
-         lTN4WyI4uZdY96FAJGYFvrpgEFzyXJdcSRWhJF3XCS9VBHr6on6QF+v/bPb1DV9nCsaY
-         gX92Dl4ZPVHZb6ByeTxSXwNlXZUhgdZvpy3yl97WhBakay7zZTndFCStU6w8XAzF9zTM
-         lWPpCcuts2LAlM0r8eBOwNyylzc77D8g5XgyGJLKbBNS+w7IWgb1cPEbjrAAT6bkKHlj
-         wgqUVMtmiNbd8ZpQfITVBzpwR1F1wtCB4HLGUYez8+pEqEpxaGg4XVIMzKIvgC0rRqHS
-         kcPg==
-X-Gm-Message-State: AOJu0YxKnvpPGHvasC2BIQpNWjhq/dsRvs85bku3/oSj3LTPbNNGDPzo
-	Kk7IYyAJp92Q0eglx4rBj14=
-X-Google-Smtp-Source: AGHT+IFc1Se7YJW9EQzzdr3+Da3Mguzwub8+qaSA85sAx3k+jdog5hBB4HS4fkB4HxH708O5I3HzDg==
-X-Received: by 2002:a05:6a00:238c:b0:6ce:939e:bed6 with SMTP id f12-20020a056a00238c00b006ce939ebed6mr114201pfc.34.1701830913027;
-        Tue, 05 Dec 2023 18:48:33 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id p23-20020aa78617000000b006ce742b6b1fsm1646551pfn.63.2023.12.05.18.48.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 18:48:32 -0800 (PST)
-Date: Wed, 6 Dec 2023 10:48:26 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>,
-	David Ahern <dsahern@kernel.org>, linux-kselftest@vger.kernel.org,
-	Po-Hsu Lin <po-hsu.lin@canonical.com>,
-	Guillaume Nault <gnault@redhat.com>,
-	Petr Machata <petrm@nvidia.com>,
-	James Prestwood <prestwoj@gmail.com>,
-	Jaehee Park <jhpark1013@gmail.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Justin Iurman <justin.iurman@uliege.be>,
-	Xin Long <lucien.xin@gmail.com>,
-	James Chapman <jchapman@katalix.com>
-Subject: Re: [PATCHv3 net-next 01/14] selftests/net: add lib.sh
-Message-ID: <ZW_g-g1Rd0FA95fU@Laptop-X1>
-References: <20231202020110.362433-1-liuhangbin@gmail.com>
- <20231202020110.362433-2-liuhangbin@gmail.com>
- <7e73dbfe6cad7d551516d02bb02881d885045498.camel@redhat.com>
+Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A71C61B9
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 19:11:26 -0800 (PST)
+Message-ID: <48a54674-3e96-4a35-89d9-d726608fb8c5@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1701832284;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Td1wCnY57CVO1M0Fwy3V9pqGf9Wilw3eR6IuVutexXI=;
+	b=UNo90qxN9V5KsiQAIks/yAlpvZpPtWdA8P8ZtVzPUdaTYHP9LBFh4mmeRAqHnuOqKv0462
+	y90OEn/M0M5AFWLwYA7WmAe7zzIqLV8pyVZLeXwFMOhd2ROMWg0oRP+eSsSJQvhANYhWxU
+	BAhyGyi1o1qGxGDd3giHz/4McO1/+n4=
+Date: Tue, 5 Dec 2023 19:11:17 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7e73dbfe6cad7d551516d02bb02881d885045498.camel@redhat.com>
+Subject: Re: [PATCH v4 bpf-next 1/3] bpf: tcp: Handle BPF SYN Cookie in
+ cookie_v[46]_check().
+Content-Language: en-US
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, edumazet@google.com, kuni1840@gmail.com,
+ netdev@vger.kernel.org
+References: <8bd1d595-4bb3-44d1-a9c3-2d9c0c960bcb@linux.dev>
+ <20231206012952.18761-1-kuniyu@amazon.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20231206012952.18761-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Dec 05, 2023 at 01:00:29PM +0100, Paolo Abeni wrote:
-> > +cleanup_ns()
-> > +{
-> > +	local ns=""
-> > +	local errexit=0
-> > +	local ret=0
-> > +
-> > +	# disable errexit temporary
-> > +	if [[ $- =~ "e" ]]; then
-> > +		errexit=1
-> > +		set +e
-> > +	fi
-> > +
-> > +	for ns in "$@"; do
-> > +		ip netns delete "${ns}" &> /dev/null
-> > +		if ! busywait 2 ip netns list \| grep -vq "^$ns$" &> /dev/null; then
-> > +			echo "Warn: Failed to remove namespace $ns"
-> > +			ret=1
-> > +		fi
-> > +	done
-> > +
-> > +	[ $errexit -eq 1 ] && set -e
-> > +	return $ret
-> > +}
-> > +
-> > +# setup netns with given names as prefix. e.g
-> > +# setup_ns local remote
-> > +setup_ns()
-> > +{
-> > +	local ns=""
-> > +	local ns_name=""
-> > +	local ns_list=""
-> > +	for ns_name in "$@"; do
-> > +		# Some test may setup/remove same netns multi times
-> > +		if unset ${ns_name} 2> /dev/null; then
-> > +			ns="${ns_name,,}-$(mktemp -u XXXXXX)"
-> > +			eval readonly ${ns_name}="$ns"
-> > +		else
-> > +			eval ns='$'${ns_name}
-> > +			cleanup_ns "$ns"
-> > +
-> > +		fi
-> > +
-> > +		if ! ip netns add "$ns"; then
-> > +			echo "Failed to create namespace $ns_name"
-> > +			cleanup_ns "$ns_list"
-> > +			return $ksft_skip
-> > +		fi
-> > +		ip -n "$ns" link set lo up
-> > +		ns_list="$ns_list $ns"
+On 12/5/23 5:29 PM, Kuniyuki Iwashima wrote:
+> From: Martin KaFai Lau <martin.lau@linux.dev>
+> Date: Tue, 5 Dec 2023 16:19:20 -0800
+>> On 12/4/23 5:34 PM, Kuniyuki Iwashima wrote:
+>>> diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+>>> index 61f1c96cfe63..0f9c3aed2014 100644
+>>> --- a/net/ipv4/syncookies.c
+>>> +++ b/net/ipv4/syncookies.c
+>>> @@ -304,6 +304,59 @@ static int cookie_tcp_reqsk_init(struct sock *sk, struct sk_buff *skb,
+>>>    	return 0;
+>>>    }
+>>>    
+>>> +#if IS_ENABLED(CONFIG_BPF)
+>>> +struct request_sock *cookie_bpf_check(struct net *net, struct sock *sk,
+>>> +				      struct sk_buff *skb)
+>>> +{
+>>> +	struct request_sock *req = inet_reqsk(skb->sk);
+>>> +	struct inet_request_sock *ireq = inet_rsk(req);
+>>> +	struct tcp_request_sock *treq = tcp_rsk(req);
+>>> +	struct tcp_options_received tcp_opt;
+>>> +	int ret;
+>>> +
+>>> +	skb->sk = NULL;
+>>> +	skb->destructor = NULL;
+>>> +	req->rsk_listener = NULL;
+>>> +
+>>> +	memset(&tcp_opt, 0, sizeof(tcp_opt));
+>>> +	tcp_parse_options(net, skb, &tcp_opt, 0, NULL);
+>>
+>> In patch 2, the bpf prog is passing the tcp_opt to the kfunc. The selftest in
+>> patch 3 is also parsing the tcp-options.
+>>
+>> The kernel parses the tcp-option here again to do some checking and req's member
+>> initialization. Can these checking and initialization be done in the
+>> bpf_sk_assign_tcp_reqsk() kfunc instead to avoid the double tcp-option parsing?
 > 
-> Side note for a possible follow-up: if you maintain $ns_list as global
-> variable, and remove from such list the ns deleted by cleanup_ns, you
-> could remove the cleanup trap from the individual test with something
-> alike:
+> If TS is not used as a cookie storage, bpf prog need not parse it.
+> OTOH, if a value is encoded into TS, bpf prog need to parse it.
+> In that case, we cannot avoid parsing options in bpf prog.
+
+If I read patch 2 correctly, the ireq->tstamp_ok is set by the kfunc, so I 
+assume that the bpf prog has to parse the tcp-option.
+
+Like the "if (ireq->tstamp_ok ^ tcp_opt.saw_tstamp)" test below, ireq->tstamp_ok 
+will always be 0 if the bpf prog did not parse the tcp-option.
+
 > 
-> final_cleanup_ns()
-> {
-> 	cleanup_ns $ns_list
-> }
+> The parsing here comes from my paranoia, so.. probably we can drop it
+> and the first test below, and rely on bpf prog's tcp_opt, especially
+> tstamp_ok, rcv_tsval, and rcv_tsecr ?
+
+My preference is that it is clearer to allow the bpf prog to initialize all 
+tcp_opt instead of only taking the tcp_opt.tstamp_ok from bpf_prog but ignore 
+the tcp_opt.rcv_tsval/tsecr. The kfunc will then use the tcp_opt to initialize 
+the req.
+
+It is also better to detect the following error cases as much as possible in the 
+kfunc instead of failing later in the tcp stack. e.g. checking the sysctl should 
+be doable in the kfunc.
+
 > 
-> trap final_cleanup_ns EXIT
+> I placed other tests here to align with the normal cookie flow, but
+> they can be moved to kfunc.  However, initialisation assuems skb
+> points to TCP header, so here would be better place, I think.
 > 
-> No respin needed for the above, could be a follow-up if agreed upon.
+> 
+>>
+>>> +
+>>> +	if (ireq->tstamp_ok ^ tcp_opt.saw_tstamp) {
+>>> +		__NET_INC_STATS(net, LINUX_MIB_SYNCOOKIESFAILED);
+>>> +		goto reset;
+>>> +	}
+>>> +
+>>> +	__NET_INC_STATS(net, LINUX_MIB_SYNCOOKIESRECV);
+>>> +
+>>> +	if (ireq->tstamp_ok) {
+>>> +		if (!READ_ONCE(net->ipv4.sysctl_tcp_timestamps))
+>>> +			goto reset;
+>>> +
+>>> +		req->ts_recent = tcp_opt.rcv_tsval;
+>>> +		treq->ts_off = tcp_opt.rcv_tsecr - tcp_ns_to_ts(false, tcp_clock_ns());
+>>> +	}
+>>> +
+>>> +	if (ireq->sack_ok && !READ_ONCE(net->ipv4.sysctl_tcp_sack))
+>>> +		goto reset;
+>>> +
+>>> +	if (ireq->wscale_ok && !READ_ONCE(net->ipv4.sysctl_tcp_window_scaling))
+>>> +		goto reset;
+>>> +
+>>> +	ret = cookie_tcp_reqsk_init(sk, skb, req);
+>>> +	if (ret) {
+>>> +		reqsk_free(req);
+>>> +		req = NULL;
+>>> +	}
+>>> +
+>>> +	return req;
+>>> +
+>>> +reset:
+>>> +	reqsk_free(req);
+>>> +	return ERR_PTR(-EINVAL);
+>>> +}
+>>> +EXPORT_SYMBOL_GPL(cookie_bpf_check);
+>>> +#endif
 
-Hi Paolo,
-
-I did similar in the first version. But Petr said[1] we should let the
-client do cleanup specifically. I agree that we should let client script
-keep this in mind.
-
-On the other hand, maybe we can add this final cleanup and let client call
-it directly. What do you think?
-
-[1] https://lore.kernel.org/netdev/878r6nf9x5.fsf@nvidia.com/
-
-Thanks
-Hangbin
 
