@@ -1,41 +1,46 @@
-Return-Path: <netdev+bounces-54496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A6B28074C0
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:19:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 858578074D2
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:21:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBADE1C20E20
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 16:19:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3ADE31F2112D
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 16:21:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E96D846547;
-	Wed,  6 Dec 2023 16:19:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26EE46558;
+	Wed,  6 Dec 2023 16:21:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tAXd38r8"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="NacfPxEs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4DCF4644C;
-	Wed,  6 Dec 2023 16:19:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3D090C433D9;
-	Wed,  6 Dec 2023 16:19:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701879542;
-	bh=XEP1QVqzJ74XUk0NFatwejr8VZg7C0G6iCtNllQWctY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tAXd38r8uZwcO8Fros7ZsCKn4m+7B10wawkNfWtys4T5p+JaYTKtTAKWHaU8Ks6sk
-	 xhuMVF7fw/Uj4kFkqrNT3AclnFABa+c3aDFHrP54d6/NHdbh29ahMl07d0TuKZJ1mJ
-	 UUUpy9SPYF0xJODj95/Vf0m/ji+Bi/YEYYJoS9fifRoGvtfHymdmhBbhP6L0fqWPdd
-	 4WOQW+sf69yrv5cFMwxfMKPnlTDU6yC0yhzvs7sGJ+R+H2hPzytyrvMqb2lhG61rVj
-	 y1DHwz358tfheNRDStrYGxZcXyhcYz6qq0w+w19BUWWmD3SV2kFBbwMiAG0skllNlW
-	 RO0P09CwlJX5Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2AB28C395DC;
-	Wed,  6 Dec 2023 16:19:02 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4919312F
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 08:21:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=iK7M+ghmwzgB++t5LQX5y/beLqJXnKTdLCVNYj9kq2w=; t=1701879687; x=1703089287; 
+	b=NacfPxEsG+UMIOOZESPv4w3QkkLe0dHeEaD1jftWuIpm8tFKC6RaycBzvtae3NeX/O3Iydac+Mb
+	Qgq/m1vdHQ0pS2CV4m7Z/GvB1sF8ECVCOaw0SHjv4uwP1GkZ/uL/OHyJWF1U+Y7X7CIElpji4lUUG
+	heUIpH2qUrx7wdz46ZP2LeAga4PtR2Fi1n/imK4vxt7+ZTs2g52d8H9g1S9Tc9ROjCVQIxyjlu170
+	6zFywmSMif5xO4BfcbPnlZcmTKzJbLtBljpZZfIyuI5l0tMMRIWLLg9IgKi6QBtF78uz5nyT4C/Kq
+	ABO9R5XQsbSn/6y/pPNXVI+OLYsmopDfGHBw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1rAueK-000000009ol-02Tr;
+	Wed, 06 Dec 2023 17:21:24 +0100
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: Johannes Berg <johannes.berg@intel.com>
+Subject: [PATCH net-next] net: sysfs: fix locking in carrier read
+Date: Wed,  6 Dec 2023 17:21:23 +0100
+Message-ID: <20231206172122.859df6ba937f.I9c80608bcfbab171943ff4942b52dbd5e97fe06e@changeid>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,43 +48,52 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] leds: trigger: netdev: fix RTNL handling to prevent
- potential deadlock
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170187954217.26038.13218917015861949443.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Dec 2023 16:19:02 +0000
-References: <fb5c8294-2a10-4bf5-8f10-3d2b77d2757e@gmail.com>
-In-Reply-To: <fb5c8294-2a10-4bf5-8f10-3d2b77d2757e@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: ansuelsmth@gmail.com, pavel@ucw.cz, lee@kernel.org, kuba@kernel.org,
- andrew@lunn.ch, linux-leds@vger.kernel.org, netdev@vger.kernel.org,
- horms@kernel.org
 
-Hello:
+From: Johannes Berg <johannes.berg@intel.com>
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+My previous patch added a call to linkwatch_sync_dev(),
+but that of course needs to be called under RTNL, which
+I missed earlier, but now saw RCU warnings from.
 
-On Fri, 1 Dec 2023 11:23:22 +0100 you wrote:
-> When working on LED support for r8169 I got the following lockdep
-> warning. Easiest way to prevent this scenario seems to be to take
-> the RTNL lock before the trigger_data lock in set_device_name().
-> 
-> ======================================================
-> WARNING: possible circular locking dependency detected
-> 6.7.0-rc2-next-20231124+ #2 Not tainted
-> 
-> [...]
+Fix that by acquiring the RTNL in a similar fashion to
+how other files do it here.
 
-Here is the summary with links:
-  - [v2] leds: trigger: netdev: fix RTNL handling to prevent potential deadlock
-    https://git.kernel.org/netdev/net/c/fe2b1226656a
+Fixes: facd15dfd691 ("net: core: synchronize link-watch when carrier is queried")
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ net/core/net-sysfs.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-You are awesome, thank you!
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index d9b33e923b18..a09d507c5b03 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -193,6 +193,10 @@ static ssize_t carrier_show(struct device *dev,
+ 			    struct device_attribute *attr, char *buf)
+ {
+ 	struct net_device *netdev = to_net_dev(dev);
++	int ret = -EINVAL;
++
++	if (!rtnl_trylock())
++		return restart_syscall();
+ 
+ 	if (netif_running(netdev)) {
+ 		/* Synchronize carrier state with link watch,
+@@ -200,10 +204,11 @@ static ssize_t carrier_show(struct device *dev,
+ 		 */
+ 		linkwatch_sync_dev(netdev);
+ 
+-		return sysfs_emit(buf, fmt_dec, !!netif_carrier_ok(netdev));
++		ret = sysfs_emit(buf, fmt_dec, !!netif_carrier_ok(netdev));
+ 	}
++	rtnl_unlock();
+ 
+-	return -EINVAL;
++	return ret;
+ }
+ static DEVICE_ATTR_RW(carrier);
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
