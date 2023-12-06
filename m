@@ -1,146 +1,122 @@
-Return-Path: <netdev+bounces-54440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3D98807145
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 14:52:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5765C80714A
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 14:53:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA0901C20A33
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:52:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CAE31F2125E
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:53:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0924337155;
-	Wed,  6 Dec 2023 13:52:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD6993BB3C;
+	Wed,  6 Dec 2023 13:53:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Odkcvdrp"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="do5UeC6Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B547F12B;
-	Wed,  6 Dec 2023 05:52:40 -0800 (PST)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B6DYq3f021830;
-	Wed, 6 Dec 2023 05:52:32 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=mf2VUIogGD9WROPqEUdLuGXNPzy/Kl00mkGnzkqjjJk=;
- b=Odkcvdrpa5R3KLnIZsIfqy5/fWAxonkNDoG32NPqYTX1MMVlwd0p57ZQABHS0Epi1nQF
- 44SaGquiDlM4CNBIxnXKaKFge/VZgrDqUNBV6jbmbOoVuF9QqLJoHIVw3CLnkCe1k6KZ
- 8jE2QLViWxEonNKzeuwy2X/OuLqpC8PpP2HHzpLd3LTiIqCP3tScdORqfYTuDZMTTNwq
- /zlwVKMQGQvXJTQYX7ijzt8YmECDO1mBWd1ExABb1fw6HDA17ncFb0lS35v4nSezuxPd
- vvk5QR80PuXQAAPmFE1w+oM9fDHF9IV4Hwbokf8WTBbq2zjJtXtAw1/JK7Y5Jv/XF4qK eQ== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3utd0pae8c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Wed, 06 Dec 2023 05:52:32 -0800
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 6 Dec
- 2023 05:52:30 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Wed, 6 Dec 2023 05:52:30 -0800
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id ECBCD3F70A0;
-	Wed,  6 Dec 2023 05:52:29 -0800 (PST)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
-        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
-        <konguyen@redhat.com>, Shinas Rasheed <srasheed@marvell.com>,
-        "Veerasenareddy
- Burru" <vburru@marvell.com>,
-        Sathesh Edara <sedara@marvell.com>,
-        Eric Dumazet
-	<edumazet@google.com>
-Subject: [PATCH net v3] octeon_ep: initialise control mbox tasks before using APIs
-Date: Wed, 6 Dec 2023 05:52:27 -0800
-Message-ID: <20231206135228.2591659-1-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94F2BD1;
+	Wed,  6 Dec 2023 05:53:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ZMxTBdEVgr5LReWJcDBdaRxFXxTwHu3OEqZQ7L+jIbM=; b=do5UeC6QVxG1xmzolqXjm+3JpY
+	GmBPI2dyYiXm60UrnGOB1kz1kAjIJunZLfwJvNbSi24xsWBjTaNZE9wDwhmqhLA0r/6dj2eYb48QS
+	mlyiwn4scZdJXBHokrPHA/spCX6H+04UoP226065WLKdi86tYQ4RV62a6ibl/zAwNHGM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rAsKh-002DA0-Os; Wed, 06 Dec 2023 14:52:59 +0100
+Date: Wed, 6 Dec 2023 14:52:59 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sneh Shah <quic_snehshah@quicinc.com>
+Cc: Vinod Koul <vkoul@kernel.org>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kernel@quicinc.com, Andrew Halaney <ahalaney@redhat.com>,
+	andersson@kernel.org
+Subject: Re: [PATCH net-next] net: stmmac: qcom-ethqos: Add sysfs nodes for
+ qcom ethqos
+Message-ID: <0c966845-2bbc-4196-806d-6a33e435bf7d@lunn.ch>
+References: <20231204084854.31543-1-quic_snehshah@quicinc.com>
+ <3e4a1b9c-ed0f-466e-ba11-fc5b7ef308a1@lunn.ch>
+ <5d5f3955-fc30-428c-99f4-42f9b7580a84@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: n6LfMkp4Wfy_1ZovDgVfQ6r1PH1seTSe
-X-Proofpoint-ORIG-GUID: n6LfMkp4Wfy_1ZovDgVfQ6r1PH1seTSe
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-06_11,2023-12-06_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5d5f3955-fc30-428c-99f4-42f9b7580a84@quicinc.com>
 
-Initialise various workqueue tasks and queue interrupt poll task
-before the first invocation of any control net APIs. Since
-octep_ctrl_net_get_info was called before the control net receive
-work task was initialised or even the interrupt poll task was
-queued, the function call wasn't returning actual firmware
-info queried from Octeon.
+On Wed, Dec 06, 2023 at 05:17:25PM +0530, Sneh Shah wrote:
+> 
+> 
+> On 12/5/2023 8:38 PM, Andrew Lunn wrote:
+> > On Mon, Dec 04, 2023 at 02:18:54PM +0530, Sneh Shah wrote:
+> >> Add sysfs nodes to conifigure routing of specific vlan id to GVM queue.
+> >> GVM queue is not exposed to PVM stmmac, so TC ops can't configure routing.
+> > 
+> > Adding files in /sysfs has ~0 chance of being accepted.
+> > 
+> > As requested, please explain what all these different hardware blocks
+> > are, and what you are trying to achieve. We can then recommend the
+> > correct interface.
+> > 
+> >     Andrew
+> > 
+> > ---
+> > pw-bot: cr
+> 
 
-Fixes: 8d6198a14e2b ("octeon_ep: support to fetch firmware info")
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
-V3:
-  - Included Fixes line in commit log.
-  - Corrected typo in print statement.
+> We have multiVM Architecture here. PVM will have stmmac running with
+> 4 Rx Tx queues. stmmac in PVM is responsible to configure whole
+> ethernet HW MAC/DMA/MTL ( including clocks, regulators and other
+> core bsp elements).
 
-V2: https://lore.kernel.org/all/20231205130625.2586755-1-srasheed@marvell.com/
-  - Updated changelog.
-  - Handled error return for octep_ctrl_net_get_info
+Please remember that stmmac is mostly used in embedded systems. People
+used to embedded systems generally don't know virtual machine
+terminology. So please spell out what PBM, GVM, etc mean.
 
-V1: https://lore.kernel.org/all/20231202150807.2571103-1-srasheed@marvell.com/
-
- .../ethernet/marvell/octeon_ep/octep_main.c   | 22 +++++++++++--------
- 1 file changed, 13 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-index b8ae269f6f97..dbab878b4d76 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-@@ -1193,6 +1193,13 @@ int octep_device_setup(struct octep_device *oct)
- 	if (ret)
- 		return ret;
+> In GVM we have thin Ethernet driver, which is responsible to
+> configure and manage only 1 Rx/TX queue, i.e 5th Rx/Tx ethernet
+> queue. GVM can't access any other resisters apart from this 5th
+> queue specific MTL and DMA registers.
  
-+	INIT_WORK(&oct->tx_timeout_task, octep_tx_timeout_task);
-+	INIT_WORK(&oct->ctrl_mbox_task, octep_ctrl_mbox_task);
-+	INIT_DELAYED_WORK(&oct->intr_poll_task, octep_intr_poll_task);
-+	oct->poll_non_ioq_intr = true;
-+	queue_delayed_work(octep_wq, &oct->intr_poll_task,
-+			   msecs_to_jiffies(OCTEP_INTR_POLL_TIME_MSECS));
-+
- 	atomic_set(&oct->hb_miss_cnt, 0);
- 	INIT_DELAYED_WORK(&oct->hb_task, octep_hb_timeout_task);
+> We need to route vlan traffic of a specific Priority to GVM Queue
+> (Ethernet queue 5) via programming a MAC register. The MAC register
+> is not accessible in GVM and has to be programmed from PVM. stmmac
+> already has TC OPS to program this routing via vlan
+> priority. However, as PVM has only 4 queues enabled, TC tool will
+> not take 5th queue as input. Hence, these nodes were added to
+> conifure the MAC register to route specific vlan packets to 5th
+> queue in GVM.
  
-@@ -1326,21 +1333,18 @@ static int octep_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto err_octep_config;
- 	}
- 
--	octep_ctrl_net_get_info(octep_dev, OCTEP_CTRL_NET_INVALID_VFID,
--				&octep_dev->conf->fw_info);
-+	err = octep_ctrl_net_get_info(octep_dev, OCTEP_CTRL_NET_INVALID_VFID,
-+				      &octep_dev->conf->fw_info);
-+	if (err) {
-+		dev_err(&pdev->dev, "Failed to get firmware info\n");
-+		goto register_dev_err;
-+	}
- 	dev_info(&octep_dev->pdev->dev, "Heartbeat interval %u msecs Heartbeat miss count %u\n",
- 		 octep_dev->conf->fw_info.hb_interval,
- 		 octep_dev->conf->fw_info.hb_miss_count);
- 	queue_delayed_work(octep_wq, &octep_dev->hb_task,
- 			   msecs_to_jiffies(octep_dev->conf->fw_info.hb_interval));
- 
--	INIT_WORK(&octep_dev->tx_timeout_task, octep_tx_timeout_task);
--	INIT_WORK(&octep_dev->ctrl_mbox_task, octep_ctrl_mbox_task);
--	INIT_DELAYED_WORK(&octep_dev->intr_poll_task, octep_intr_poll_task);
--	octep_dev->poll_non_ioq_intr = true;
--	queue_delayed_work(octep_wq, &octep_dev->intr_poll_task,
--			   msecs_to_jiffies(OCTEP_INTR_POLL_TIME_MSECS));
--
- 	netdev->netdev_ops = &octep_netdev_ops;
- 	octep_set_ethtool_ops(netdev);
- 	netif_carrier_off(netdev);
--- 
-2.25.1
+> Note: The queues mentioned above are HW MTL Queues and DMA
+> Channels. The routing can be done in the HW itself based on vlan pcp
+> before the packets reach to driver.
 
+Is the normal way you would do this is like this:
+
+tc qdisc add dev eth1 parent root handle 100 \
+mqprio num_tc 4 \
+map 0 1 2 3 0 0 0 0 0 0 0 0 0 0 0 0 \
+queues 1@0 1@1 1@2 1@3 \
+hw 1
+
+But you are saying that you cannot extend this to 5 queues?
+
+    Andrew
 
