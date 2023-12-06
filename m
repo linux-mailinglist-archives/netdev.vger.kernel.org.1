@@ -1,102 +1,142 @@
-Return-Path: <netdev+bounces-54503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3367807550
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:39:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BFB5807573
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:42:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95C6A281E5F
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 16:39:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD0A91F21626
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 16:42:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DBA546442;
-	Wed,  6 Dec 2023 16:39:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 802E130348;
+	Wed,  6 Dec 2023 16:42:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O6L2EpCm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HvwHU/3w"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224C547770
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 16:39:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5485AC433C8;
-	Wed,  6 Dec 2023 16:39:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701880747;
-	bh=1NFQvaeqPQy74Jp+IPaGkTgA8ipB7fhgOLgtT7FAh9g=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=O6L2EpCmKd2/rLii38fu4e0BoU4Q6mGcZE63GKAFq+tyM1lYZ/p1rTyep7/5xQYgo
-	 IdH6FKHC7VU6ltiXpxtk55AX1qzGmwZf7U8Ei+UX6AAtNYAlCGKXuCMWK7OeKEiBSe
-	 THAsqO+rU2QhMAJMRM+lBn7Zu8Maz/bCVB1TGSaafKWLc1fq5ebNNJdRz0KvpCYVNA
-	 k0ppuF0ct1hrDmbKHj5dY4a0yEnRhcDo/UAr7uWTPq/+VhoaI6g7rbB8UKaFIyoChv
-	 9XyXWyQ4D0kcKf2Z3qg+QEOvdm7U8dGLXDJpHhfvcXbntNiyxCmQtXuJw5vuiBskK8
-	 7OqMKZ9YlISew==
-Message-ID: <f9d3e1dd-133a-45de-827e-c2f152b619b8@kernel.org>
-Date: Wed, 6 Dec 2023 09:39:06 -0700
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77510D4F
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 08:41:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701880916;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:  content-type:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=BRBYbA6A9iVFJVJw2yLnCuRWTbq0bYeGysrV9jksr78=;
+	b=HvwHU/3wBwdD8oPXKZ2+jR1CI5hSr+MJuSguM9HX7nXpd2cZH6S2D6PxOwqo4tYJcuM7NP
+	0/zD+/vmoqPpqJzujAOcdKB9OxHQKxiPDm+TxqH/+FxVOlgkvUpWJEeV8U3Y/X9YNhpNYI
+	bjFrf39TuMgC85HBIA1fszBxXyXxFC0=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-264-FyV7u_otNz-G6OAE9XY7Qg-1; Wed, 06 Dec 2023 11:41:55 -0500
+X-MC-Unique: FyV7u_otNz-G6OAE9XY7Qg-1
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4239047911bso10994601cf.3
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 08:41:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701880914; x=1702485714;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BRBYbA6A9iVFJVJw2yLnCuRWTbq0bYeGysrV9jksr78=;
+        b=qVm6no0uQNtLpnF6/xUUZ3iq71r5XeQnqVEVwDYUV5+dwBw6uiZF99ZAHe1+xnfHEO
+         aKjLmXvtZImQLDLflnrwSQs4pe7EuUu3FqP9ZldQWXqTFgF3kvNAm7dEKnumTTH+azRn
+         Dv7yz0Ar4eiytp3CRX6PwTb1Jy65QNFyt2srGuHMpxLYjnMPb2k5uIgef6Z40YcIjCr8
+         +/j8vvXs2nOdnterDbgkFgBQsSF6bkNsSuxPiRNElUzr3DQJ9rFj2tl4uSB9rTJFqgNe
+         hhiXyZ0TMMjUqT+iWlU8FczEj45iPnoOZ9ro9f44YP/xIxF+x8Xd2Zw1JnQwy/S8tusS
+         p0BQ==
+X-Gm-Message-State: AOJu0Yy1rH7ODtaZEEbz9SvynDFYHM1YlfQXFr7sqzfhA9yFafHKkSDP
+	c5bXwdd1PqKboQ8QP0mi8L3M+uQmwfM+DtPj7RtLKf3b7QtCwFo80Vdnvb2FlqClcIXPSj2zm+O
+	GizTCtUm0q/vodLbpxLW4joWggXU5ItnvW4s2vbYAsexuYv1B+AiwCdqhZ6bLCZnrCCqScL/4So
+	tH
+X-Received: by 2002:ac8:5b95:0:b0:425:4043:2a05 with SMTP id a21-20020ac85b95000000b0042540432a05mr1420278qta.128.1701880914675;
+        Wed, 06 Dec 2023 08:41:54 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFaJIB6NOvZQTIiVkkPSR38mjWBsiSx+xgzPD2epv6qC/zaKWzLLIvu6i12qCTPMRBfNOkUNA==
+X-Received: by 2002:ac8:5b95:0:b0:425:4043:2a05 with SMTP id a21-20020ac85b95000000b0042540432a05mr1420258qta.128.1701880914272;
+        Wed, 06 Dec 2023 08:41:54 -0800 (PST)
+Received: from step1.redhat.com (host-79-46-200-125.retail.telecomitalia.it. [79.46.200.125])
+        by smtp.gmail.com with ESMTPSA id e25-20020ac86719000000b00423e8021da2sm78802qtp.42.2023.12.06.08.41.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 08:41:53 -0800 (PST)
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	virtualization@lists.linux.dev,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Arseniy Krasnov <avkrasnov@salutedevices.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net] vsock/virtio: fix "comparison of distinct pointer types lacks a cast" warning
+Date: Wed,  6 Dec 2023 17:41:43 +0100
+Message-ID: <20231206164143.281107-1-sgarzare@redhat.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] Use READ/WRITE_ONCE() for IP
- local_port_range.
-Content-Language: en-US
-To: David Laight <David.Laight@ACULAB.COM>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Stephen Hemminger <stephen@networkplumber.org>,
- "jakub@cloudflare.com" <jakub@cloudflare.com>,
- Eric Dumazet <edumazet@google.com>, 'Mat Martineau' <martineau@kernel.org>
-References: <4e505d4198e946a8be03fb1b4c3072b0@AcuMS.aculab.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <4e505d4198e946a8be03fb1b4c3072b0@AcuMS.aculab.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
 
-On 12/6/23 6:44 AM, David Laight wrote:
-> Commit 227b60f5102cd added a seqlock to ensure that the low and high
-> port numbers were always updated together.
-> This is overkill because the two 16bit port numbers can be held in
-> a u32 and read/written in a single instruction.
-> 
-> More recently 91d0b78c5177f added support for finer per-socket limits.
-> The user-supplied value is 'high << 16 | low' but they are held
-> separately and the socket options protected by the socket lock.
-> 
-> Use a u32 containing 'high << 16 | low' for both the 'net' and 'sk'
-> fields and use READ_ONCE()/WRITE_ONCE() to ensure both values are
-> always updated together.
-> 
-> Change (the now trival) inet_get_local_port_range() to a static inline
-> to optimise the calling code.
-> (In particular avoiding returning integers by reference.)
-> 
-> Signed-off-by: David Laight <david.laight@aculab.com>
-> ---
-> Changes for v2:
-> - minor layout changes.
-> - remove unlikely() from comparisons when per-socket range set.
-> - avoid shifts of signed values that generate unsigned 32bit results.
-> I fiddled with the code that validates the argument to IP_LOCAL_PORT_RANGE
-> then decided to leave it (mostly) unchanged because it is also moved.
-> (There is a 'u16 x = int_val >> 16' which is required to move bit 31 to
-> bit 15 and is probably undefined behaviour - but will be ok on all sane cpu.)
-> 
->  include/net/inet_sock.h         |  5 +----
->  include/net/ip.h                |  8 +++++++-
->  include/net/netns/ipv4.h        |  3 +--
->  net/ipv4/af_inet.c              |  4 +---
->  net/ipv4/inet_connection_sock.c | 29 ++++++++++-------------------
->  net/ipv4/ip_sockglue.c          | 33 ++++++++++++++++-----------------
->  net/ipv4/sysctl_net_ipv4.c      | 18 +++++++-----------
->  7 files changed, 43 insertions(+), 57 deletions(-)
-> 
+After backporting commit 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY
+flag support") in CentOS Stream 9, CI reported the following error:
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+    In file included from ./include/linux/kernel.h:17,
+                     from ./include/linux/list.h:9,
+                     from ./include/linux/preempt.h:11,
+                     from ./include/linux/spinlock.h:56,
+                     from net/vmw_vsock/virtio_transport_common.c:9:
+    net/vmw_vsock/virtio_transport_common.c: In function ‘virtio_transport_can_zcopy‘:
+    ./include/linux/minmax.h:20:35: error: comparison of distinct pointer types lacks a cast [-Werror]
+       20 |         (!!(sizeof((typeof(x) *)1 == (typeof(y) *)1)))
+          |                                   ^~
+    ./include/linux/minmax.h:26:18: note: in expansion of macro ‘__typecheck‘
+       26 |                 (__typecheck(x, y) && __no_side_effects(x, y))
+          |                  ^~~~~~~~~~~
+    ./include/linux/minmax.h:36:31: note: in expansion of macro ‘__safe_cmp‘
+       36 |         __builtin_choose_expr(__safe_cmp(x, y), \
+          |                               ^~~~~~~~~~
+    ./include/linux/minmax.h:45:25: note: in expansion of macro ‘__careful_cmp‘
+       45 | #define min(x, y)       __careful_cmp(x, y, <)
+          |                         ^~~~~~~~~~~~~
+    net/vmw_vsock/virtio_transport_common.c:63:37: note: in expansion of macro ‘min‘
+       63 |                 int pages_to_send = min(pages_in_iov, MAX_SKB_FRAGS);
 
+We could solve it by using min_t(), but this operation seems entirely
+unnecessary, because we also pass MAX_SKB_FRAGS to iov_iter_npages(),
+which performs almost the same check, returning at most MAX_SKB_FRAGS
+elements. So, let's eliminate this unnecessary comparison.
+
+Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
+Cc: avkrasnov@salutedevices.com
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ net/vmw_vsock/virtio_transport_common.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index f6dc896bf44c..c8e162c9d1df 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -59,8 +59,7 @@ static bool virtio_transport_can_zcopy(const struct virtio_transport *t_ops,
+ 	t_ops = virtio_transport_get_ops(info->vsk);
+ 
+ 	if (t_ops->can_msgzerocopy) {
+-		int pages_in_iov = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
+-		int pages_to_send = min(pages_in_iov, MAX_SKB_FRAGS);
++		int pages_to_send = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
+ 
+ 		/* +1 is for packet header. */
+ 		return t_ops->can_msgzerocopy(pages_to_send + 1);
+-- 
+2.43.0
 
 
