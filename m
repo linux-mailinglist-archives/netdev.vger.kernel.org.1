@@ -1,109 +1,102 @@
-Return-Path: <netdev+bounces-54542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05BE58076C7
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:39:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA4BF8076E4
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:48:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C6DDB20CCC
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:39:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63DDA2816A1
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:48:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80C166A01E;
-	Wed,  6 Dec 2023 17:39:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C9E6A339;
+	Wed,  6 Dec 2023 17:48:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="G7LjdyIB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mwQdlp4I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6202D40
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 09:39:20 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1d0538d9bbcso49429955ad.3
-        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 09:39:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1701884360; x=1702489160; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=epEPAoODqaSsyq6mWAsXlk/zwY3UQrTT5iMw4+zTkgU=;
-        b=G7LjdyIBPxbsJPrlhEsc/+rcQEIDcADolRlDc0bxGGMoxV2At6voLXxW1WNg1sPigp
-         ubDVSi4drL8F4IeGeN4cp7tKlL85UIPstQN+vSxODzRN8dQ/5WZeYyY4nqyPRkhxaVp8
-         3Om4T3p9ZrfI93wQVBqlH1w0yigioBPPlVtUMpALHSKtioytu53GIcjsLQtr0fsQsmr3
-         PxJCU90MYP02ZZ7aNCbhKM1/ju2pgzr+AEV7XqfNKMrW9PlvrgOPJQFJ/a4vrgOfpgd1
-         sy6cORbKKk5h8ygo1blZd440qABNaIyhZJmZNNKk8Iu8d6r/wdcEK0uHFvynwOQs1WEs
-         Souw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701884360; x=1702489160;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=epEPAoODqaSsyq6mWAsXlk/zwY3UQrTT5iMw4+zTkgU=;
-        b=NUm5tL0392bPPsQxSavHa0sKQV3qDlS9v4jdbi1J1Q0jTQc2KWg/BcicYMP0OvX2ay
-         VtEKyTn9s+CzTYHjpxXZbZ8lR7P2T8jiflkTVR3WiX1iw2F5fhW1QtQ+dAXVMUbktzO7
-         4RsyJzqm1MBvbIhPxuKkURQiEY2ZR/3PCyxPm42h/jue2ZS5EG7TWDiK9mANzJwDfjcj
-         UK2LTzdGYfD11J6w4S3jcJZEstH8qwPhX4EOaDHtHwJ/Z5/9nLnrIJPcPCKmY6oCUOEl
-         rm8CQYCXsyTz2qK0ZCnBTbyugmLew6DZ/OKGwMxhrNOfHX2717gjf6UdVMyMJs69n9G6
-         +HrA==
-X-Gm-Message-State: AOJu0Yxf3hy+oEA+Yllj9BDNJAWUGgrBTXRX2/maDAWVfM6Rlh0Z5fC0
-	y9+YrSKOOORAPj21Y8cT1JnG1A==
-X-Google-Smtp-Source: AGHT+IGVTG9OQEKtoS6pjPpVNzMPWylYXwUA5I/GkMnBeOoLO3QQ7WcBm26jNLVY5AwA6U/sTaSzSg==
-X-Received: by 2002:a17:902:8f8c:b0:1d0:6ffd:e2d7 with SMTP id z12-20020a1709028f8c00b001d06ffde2d7mr1069589plo.113.1701884360181;
-        Wed, 06 Dec 2023 09:39:20 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id j5-20020a170902da8500b001cff353696asm81396plx.302.2023.12.06.09.39.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 09:39:19 -0800 (PST)
-Date: Wed, 6 Dec 2023 09:39:17 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Judy Hsiao <judyhsiao@chromium.org>
-Cc: Eric Dumazet <edumazet@google.com>, David Ahern <dsahern@kernel.org>,
- Simon Horman <horms@kernel.org>, Douglas Anderson <dianders@chromium.org>,
- Brian Haley <haleyb.dev@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Joel Granados
- <joel.granados@gmail.com>, Julian Anastasov <ja@ssi.bg>, Leon Romanovsky
- <leon@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2] neighbour: Don't let neigh_forced_gc() disable
- preemption for long
-Message-ID: <20231206093917.04fd57b5@hermes.local>
-In-Reply-To: <20231206033913.1290566-1-judyhsiao@chromium.org>
-References: <20231206033913.1290566-1-judyhsiao@chromium.org>
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C5ED18D
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 09:48:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701884891; x=1733420891;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=XKczPfVFDpxiCBqQU2b3X2l9G0j9/ijvgX1GahluUT4=;
+  b=mwQdlp4IDXZ/weeVogpYCEXkdDV7l6fWLP9b49wU6RHLJYYltdqMVd+a
+   UDYNgJufBn5TpeeP3cPJJfDIP/hfWftqukUYAX1Ou27M+LoWj/PXKBBAD
+   VtFZzHF+aLq1Wvxu8PFa4XBcaX/q/R6yW3kV0VKkXFGgcgF2i6XNTL4kR
+   +PkfKZI94bbh2yAnbJ46Bi9xvlgICSJRE1Ct8cyQc7a+hS3HPm0zwf2Sc
+   NKLKRe4FDwPUnqQC2P6QYIfjKHXqYyRk3AENtpWNKxcEzyS//N8UGdA/S
+   IIg6VNI3NnmTDqeU0VZ9lr0S8YyHxruPLJPMf4YVEjLxXZi1enirAg4YW
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="7399505"
+X-IronPort-AV: E=Sophos;i="6.04,255,1695711600"; 
+   d="scan'208";a="7399505"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2023 09:48:11 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="764806498"
+X-IronPort-AV: E=Sophos;i="6.04,255,1695711600"; 
+   d="scan'208";a="764806498"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orsmga007.jf.intel.com with ESMTP; 06 Dec 2023 09:48:08 -0800
+Received: from baltimore.igk.intel.com (baltimore.igk.intel.com [10.102.21.1])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 708EE34331;
+	Wed,  6 Dec 2023 17:48:03 +0000 (GMT)
+From: Pawel Chmielewski <pawel.chmielewski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Ngai-Mint Kwan <ngai-mint.kwan@intel.com>,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+	Pawel Chmielewski <pawel.chmielewski@intel.com>
+Subject: [PATCH iwl-net v2] ice: Do not get coalesce settings while in reset
+Date: Wed,  6 Dec 2023 18:39:36 +0100
+Message-Id: <20231206173936.732818-1-pawel.chmielewski@intel.com>
+X-Mailer: git-send-email 2.37.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed,  6 Dec 2023 03:38:33 +0000
-Judy Hsiao <judyhsiao@chromium.org> wrote:
+From: Ngai-Mint Kwan <ngai-mint.kwan@intel.com>
 
-> diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-> index df81c1f0a570..552719c3bbc3 100644
-> --- a/net/core/neighbour.c
-> +++ b/net/core/neighbour.c
-> @@ -253,9 +253,11 @@ static int neigh_forced_gc(struct neigh_table *tbl)
->  {
->  	int max_clean = atomic_read(&tbl->gc_entries) -
->  			READ_ONCE(tbl->gc_thresh2);
-> +	u64 tmax = ktime_get_ns() + NSEC_PER_MSEC;
->  	unsigned long tref = jiffies - 5 * HZ;
->  	struct neighbour *n, *tmp;
->  	int shrunk = 0;
-> +	int loop = 0;
->  
->  	NEIGH_CACHE_STAT_INC(tbl, forced_gc_runs);
->  
-> @@ -278,11 +280,16 @@ static int neigh_forced_gc(struct neigh_table *tbl)
->  				shrunk++;
->  			if (shrunk >= max_clean)
->  				break;
-> +			if (++loop == 16) {
+Getting coalesce settings while reset is in progress can cause NULL
+pointer deference bug.
+If under reset, abort get coalesce for ethtool.
 
-Overall looks good.
-Minor comments:
-	- loop count should probably be unsigned
-        - the magic constant 16 should be a sysctl tuneable
+Fixes: 67fe64d78c437 ("ice: Implement getting and setting ethtool coalesce")
+Signed-off-by: Ngai-Mint Kwan <ngai-mint.kwan@intel.com>
+Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Signed-off-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
+---
+Changes since v1:
+ * Added "Fixes:" tag
+ * targeting iwl-net instead of iwl-next
+---
+---
+ drivers/net/ethernet/intel/ice/ice_ethtool.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+index bde9bc74f928..2d565cc484a0 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+@@ -3747,6 +3747,9 @@ __ice_get_coalesce(struct net_device *netdev, struct ethtool_coalesce *ec,
+ 	struct ice_netdev_priv *np = netdev_priv(netdev);
+ 	struct ice_vsi *vsi = np->vsi;
+ 
++	if (ice_is_reset_in_progress(vsi->back->state))
++		return -EBUSY;
++
+ 	if (q_num < 0)
+ 		q_num = 0;
+ 
+-- 
+2.37.3
+
 
