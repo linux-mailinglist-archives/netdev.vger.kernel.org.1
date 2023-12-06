@@ -1,101 +1,120 @@
-Return-Path: <netdev+bounces-54466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE2CE80728F
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 15:36:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D1BD8072A0
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 15:39:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7127FB20F3A
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 14:36:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88EF52811DB
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 14:39:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97F3535F1B;
-	Wed,  6 Dec 2023 14:36:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F2D23BB35;
+	Wed,  6 Dec 2023 14:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0kvVHlQk"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BA14D65
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 06:35:59 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1rAt0G-000789-Ha; Wed, 06 Dec 2023 15:35:56 +0100
-Received: from [2a0a:edc0:0:900:1d::4e] (helo=lupine)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1rAt0F-00Dz2R-IV; Wed, 06 Dec 2023 15:35:55 +0100
-Received: from pza by lupine with local (Exim 4.96)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1rAt0F-000EYR-1c;
-	Wed, 06 Dec 2023 15:35:55 +0100
-Message-ID: <d45a52e356766b6f90122e75d53089cd17a0e9d3.camel@pengutronix.de>
-Subject: Re: [PATCH] net: rfkill: gpio: set GPIO direction
-From: Philipp Zabel <p.zabel@pengutronix.de>
-To: Rouven Czerwinski <r.czerwinski@pengutronix.de>, Johannes Berg
-	 <johannes@sipsolutions.net>, Josua Mayer <josua@solid-run.com>, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-	kernel@pengutronix.de, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	 <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
-Date: Wed, 06 Dec 2023 15:35:55 +0100
-In-Reply-To: <6e3049e37b00e2e5a5f02bff7b75d6c9282973b5.camel@pengutronix.de>
-References: <20231206131336.3099727-1-r.czerwinski@pengutronix.de>
-	 <cd25fd96fa391d3c8a5811d995d166cbb0b0efe5.camel@sipsolutions.net>
-	 <6e3049e37b00e2e5a5f02bff7b75d6c9282973b5.camel@pengutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B003DD5E
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 06:39:30 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-54c79cca895so12186a12.0
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 06:39:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701873569; x=1702478369; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tW4rpGHQhN9YNVTV5oiqqcaigarX5iDMhMQO+9Q6sBI=;
+        b=0kvVHlQkWbFbLJ/N6mDI4+2NwPNiFc1a1bqcH8YyRBUQQnRM33ptdGgPouOmKzj+vM
+         31mSR5wENDfbI9HdVmVFXn10nAvx7T9AE8e0dl5QPz4CrYm1zQ80eoKbeir1dM6feypY
+         RMuX71mOq0zXtYG7YtLaFvqKaAiwza/AYqltw8gL2Pi4bvaBbslUEQdMHDHjTuKs6R73
+         XpixfnL86MnfuWBppF9Whr77kuDbZnn37OTaWF9QE8B+gQs+YMCJVnaDOqfZLaukZ/RJ
+         FgxefBeVtvx4Vrr/bKufL1uayeOXrVHP5IUvuKhoqk3W79hoThx3IDTJl0zPa8QZTcJw
+         zlDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701873569; x=1702478369;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tW4rpGHQhN9YNVTV5oiqqcaigarX5iDMhMQO+9Q6sBI=;
+        b=KyihSf9GFNV39d4GHLlJDymag4Pj1ddXPUhEL0FXA5Cg63iERNZ2dnVXBkVALrRq7z
+         raTDOitzzNhE7YmwmTa6y90+g3QBPi8vGnunU/mpj7ADhuWxo4V7pmkgyrwtLqgKxYHT
+         R37FFh7iOPrDXGytagK1v/YpDzxqwiWVyjsij92t72f1SDZF0LJunTCI2UZUUjqWsTTV
+         Laf15VD986k11wxe9vsuP3cAqSQehm5fJQsV8aw+I+edATGNuNK3YkHsKabP+ZfxvpvZ
+         MxFxYPR9zrwMl8F4DuGS6/bvds3xjUYN/c9hNfzVSBnmCCKgzX2i/pfr8Ag5tx9tSH+A
+         NjRQ==
+X-Gm-Message-State: AOJu0YxZ5/lmxdBqJr6ZzHfSG1Pu8XRbbLrKvQje08DgUej08B0eJiff
+	trXvbSnnxZWVI8zrGw3xcnNijeIpGOBHQkOZeMbbSg==
+X-Google-Smtp-Source: AGHT+IHOApoAkKvH3wtbpKAIohGjJybdA9WJOGcJGuGDhFjsElRi+QiZLT+HeS9ho01lLQhVQILt1AqrvqJ5qf9gzrA=
+X-Received: by 2002:a50:c35d:0:b0:54c:79ed:a018 with SMTP id
+ q29-20020a50c35d000000b0054c79eda018mr96470edb.2.1701873568956; Wed, 06 Dec
+ 2023 06:39:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: p.zabel@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <CAG48ez0TfTAkaRWFCTb44x=TWP_sDZVx-5U2hvfQSFOhghNrCA@mail.gmail.com>
+ <CAG48ez1hXk_cffp3dy-bYMcoyCCj-EySYR5SzYrNiRHGD=hOUg@mail.gmail.com> <20231206-refinanzieren-werkhalle-22db5334f256@brauner>
+In-Reply-To: <20231206-refinanzieren-werkhalle-22db5334f256@brauner>
+From: Jann Horn <jannh@google.com>
+Date: Wed, 6 Dec 2023 15:38:50 +0100
+Message-ID: <CAG48ez07dJ_=KUzRONVhMmr2koW9PwiZ5KxMHfx8ERPA=j4cUw@mail.gmail.com>
+Subject: Re: Is xt_owner's owner_mt() racy with sock_orphan()? [worse with new
+ TYPESAFE_BY_RCU file lifetime?]
+To: Christian Brauner <brauner@kernel.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
+	Florian Westphal <fw@strlen.de>, netfilter-devel <netfilter-devel@vger.kernel.org>, coreteam@netfilter.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Network Development <netdev@vger.kernel.org>, kernel list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Rouven,
+On Wed, Dec 6, 2023 at 2:58=E2=80=AFPM Christian Brauner <brauner@kernel.or=
+g> wrote:
+>
+> On Tue, Dec 05, 2023 at 06:08:29PM +0100, Jann Horn wrote:
+> > On Tue, Dec 5, 2023 at 5:40=E2=80=AFPM Jann Horn <jannh@google.com> wro=
+te:
+> > >
+> > > Hi!
+> > >
+> > > I think this code is racy, but testing that seems like a pain...
+> > >
+> > > owner_mt() in xt_owner runs in context of a NF_INET_LOCAL_OUT or
+> > > NF_INET_POST_ROUTING hook. It first checks that sk->sk_socket is
+> > > non-NULL, then checks that sk->sk_socket->file is non-NULL, then
+> > > accesses the ->f_cred of that file.
+> > >
+> > > I don't see anything that protects this against a concurrent
+> > > sock_orphan(), which NULLs out the sk->sk_socket pointer, if we're in
+> >
+> > Ah, and all the other users of ->sk_socket in net/netfilter/ do it
+> > under the sk_callback_lock... so I guess the fix would be to add the
+> > same in owner_mt?
+>
+> In your other mail you wrote:
+>
+> > I also think we have no guarantee here that the socket's ->file won't
+> > go away due to a concurrent __sock_release(), which could cause us to
+> > continue reading file credentials out of a file whose refcount has
+> > already dropped to zero?
+>
+> Is this an independent worry or can the concurrent __sock_release()
+> issue only happen due to a sock_orphan() having happened first? I think
+> that it requires a sock_orphan() having happend, presumably because the
+> socket gets marked SOCK_DEAD and can thus be released via
+> __sock_release() asynchronously?
+>
+> If so then taking sk_callback_lock() in owner_mt() should fix this.
+> (Otherwise we might need an additional get_active_file() on
+> sk->sk_socker->file in owner_mt() in addition to the other fix.)
 
-On Mi, 2023-12-06 at 14:24 +0100, Rouven Czerwinski wrote:
-> Hi Johannes,
->=20
-> On Wed, 2023-12-06 at 14:16 +0100, Johannes Berg wrote:
-> > On Wed, 2023-12-06 at 14:13 +0100, Rouven Czerwinski wrote:
-> > >=20
-> > > +++ b/net/rfkill/rfkill-gpio.c
-> > > @@ -126,6 +126,16 @@ static int rfkill_gpio_probe(struct
-> > > platform_device *pdev)
-> > > =C2=A0		return -EINVAL;
-> > > =C2=A0	}
-> > > =C2=A0
-> > > +	if (rfkill->reset_gpio)
-> > > +		ret =3D gpiod_direction_output(rfkill->reset_gpio,
-> > > true);
-> > > +	if (ret)
-> > > +		return ret;
-> > > +
-> > > +	if (rfkill->shutdown_gpio)
-> > > +		ret =3D gpiod_direction_output(rfkill-
-> > > > shutdown_gpio, true);
-> > > +	if (ret)
-> > > +		return ret;
-> > >=20
-> >=20
-> > That's weird, you need ret to be inside the if. It's even entirely
-> > uninitialized if you don't have ACPI, if you don't have
-> > reset/shutdown.
->=20
-> Thanks for the review, you are totally right, I didn't look at the ret
-> initialization. I moved it inside the if for v2.
-
-The if-block is not required at all, gpiod_direction_output(NULL, ...)
-will just return 0 from VALIDATE_DESC().
-
-regards
-Philipp
+My understanding is that it could only happen due to a sock_orphan()
+having happened first, and so just sk_callback_lock() should probably
+be a sufficient fix. (I'm not an expert on net subsystem locking rules
+though.)
 
