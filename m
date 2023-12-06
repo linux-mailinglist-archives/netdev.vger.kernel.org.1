@@ -1,226 +1,193 @@
-Return-Path: <netdev+bounces-54372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD9E4806CB9
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 11:55:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B5C4806CCB
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 11:57:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 779B6281A65
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:55:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05B32281AC6
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:57:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39AF330345;
-	Wed,  6 Dec 2023 10:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GKkY5RBh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 736A230357;
+	Wed,  6 Dec 2023 10:57:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E832A4
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 02:54:54 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6ce5a0c384fso2424712b3a.1
-        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 02:54:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701860094; x=1702464894; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XJpeq0esGgvSQwPlWYu5mSKUKlrzr2fXLQ04GZyOjBI=;
-        b=GKkY5RBhEugujfXGZA5eTzCLUzWXMrrW5rZmhxPn1VVY6GeTdTO5VDNSPXsXZlNhVd
-         wyn05E8FZw4gNw/+vnMgJnW3Cd9Ev/s15wdksMmIuwEqUZ1EaWuVtY0RD+JxYo4oJPXQ
-         UqQNKAdUR2I+w97tCoqm0QefRWdErIlAhYpeWC69Equ/aU2mfcjcv0r5YO9Jo7EQui1d
-         sd9Y5rmHTxlhgOn5hJupRqz3ty60nYXi7xVoOMW6mtWKr6NCxqrs5bj/NoSNyueGFygz
-         5pbOY9oW1RlnJx9FIiEDv+CXy/hhum8jPUs9nihXqHAkKngigM25xyNvQzhAa9X6IBMv
-         0DXw==
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6461A5;
+	Wed,  6 Dec 2023 02:57:01 -0800 (PST)
+Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-d9caf5cc948so5126955276.0;
+        Wed, 06 Dec 2023 02:57:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701860094; x=1702464894;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1701860221; x=1702465021;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XJpeq0esGgvSQwPlWYu5mSKUKlrzr2fXLQ04GZyOjBI=;
-        b=jFppUv1AUqeBLz82NRoIeJMDNCmrLJr7jXmPieJJZxrCqH2ovhCo+cXEUx+XS5gpCm
-         +FbrJP0OX6cHfOlMtg+ThoWQWuSzjNR3wvNM5nkFrdysj68Usk+NaupUJzJEhI5Aks5O
-         JRheYHevgGZt6MIZB5XHur/zNepbehB+PTRZPUe1Fy9S1E8fjjdQ3xs8hx7prYRQG2T8
-         RJb2mLV5F/ljI5T/QD7bZ+XA1H9ZJvGUNkV8QhJfekB7nYUQ3O8wKAoieh7UmGHgd74S
-         aAYDiO2SopIGYikvjUPFMYaNxJm1T1V6FTzCiKTRR/YYBmsth6x0kWOyVnPCX8Wq4Z3j
-         n8GA==
-X-Gm-Message-State: AOJu0YygSm1/9bCNGJZCQDLypSglVEcaApamX+SkUpjxW/qdHIxS7eNN
-	VZhNEXXPAb845HDEKb7MWsw=
-X-Google-Smtp-Source: AGHT+IGs32UGGkDmx++vF2WrxMsf6vIKFr/2F29zLgzga5cW6Le3dLh6j/00l5geSI7if5bXr/dyag==
-X-Received: by 2002:a05:6a00:1743:b0:6ce:6c6d:1622 with SMTP id j3-20020a056a00174300b006ce6c6d1622mr514790pfc.62.1701860093745;
-        Wed, 06 Dec 2023 02:54:53 -0800 (PST)
-Received: from localhost.localdomain ([89.187.161.180])
-        by smtp.gmail.com with ESMTPSA id n15-20020a638f0f000000b005c6801efa0fsm5388796pgd.28.2023.12.06.02.54.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 02:54:52 -0800 (PST)
-From: Liang Chen <liangchen.linux@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	hawk@kernel.org,
-	ilias.apalodimas@linaro.org,
-	linyunsheng@huawei.com
-Cc: netdev@vger.kernel.org,
-	linux-mm@kvack.org,
-	jasowang@redhat.com,
-	liangchen.linux@gmail.com
-Subject: [PATCH net-next v7 4/4] skbuff: Optimization of SKB coalescing for page pool
-Date: Wed,  6 Dec 2023 18:54:19 +0800
-Message-Id: <20231206105419.27952-5-liangchen.linux@gmail.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20231206105419.27952-1-liangchen.linux@gmail.com>
-References: <20231206105419.27952-1-liangchen.linux@gmail.com>
+        bh=gxTfrYqiLxr3M+6uddkoekO0UeZOV7/CqGvJG57yRhQ=;
+        b=WPbEAHUkgENLiMQCu2Q0ruGnVag8Q562hQHL7ft+YV2dPCqQpiXt0WlQPLWEZIz/SB
+         P4CSItLNxpcmgsDqVhvqOfc30CIXNIHTBFbpXYWhXM1/tJ5D28GLCk5/oTgU8GwR1YFW
+         rl8QQc5ScoF6McpSnWo4kb9sfWEioPj9x6B2GaPRxmq1uyXPppupC8SYFZcVT5JwWFA7
+         YXKbh5qRpjxtcgXUEA3Cv3ExZR9WxxY3r65j5kpdDUq2Ct3SC7jfhBXKNGFAVJYu59gi
+         kjutOuSM38+al2kdeZ7ovECJ0MyDKuyxqJNhfiV2ze6M7fo5tW9DG14HPP+Nceb0GVq9
+         C2AQ==
+X-Gm-Message-State: AOJu0YyaJSLF+p75/gaqXhmPW6ndbsEmqfemfk/bZSFIj06Txw8kMcPv
+	oEHeIuJw1+xHJKapewMYHXOJ5eHJq+mLEg==
+X-Google-Smtp-Source: AGHT+IGLeztLiZDB9xM0WxwbOKDNkEkwMuKeZIM5i82Y5PGYqOeXqmEI+Wzll6y2qtTM4d2hbwikqA==
+X-Received: by 2002:a25:8010:0:b0:db5:4508:28b8 with SMTP id m16-20020a258010000000b00db5450828b8mr442065ybk.38.1701860220886;
+        Wed, 06 Dec 2023 02:57:00 -0800 (PST)
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com. [209.85.128.179])
+        by smtp.gmail.com with ESMTPSA id y8-20020a259288000000b00db9811e1f92sm1423221ybl.7.2023.12.06.02.57.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Dec 2023 02:57:00 -0800 (PST)
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-5d74186170fso41744507b3.3;
+        Wed, 06 Dec 2023 02:57:00 -0800 (PST)
+X-Received: by 2002:a81:b722:0:b0:5d3:a3fb:428e with SMTP id
+ v34-20020a81b722000000b005d3a3fb428emr544436ywh.21.1701860220544; Wed, 06 Dec
+ 2023 02:57:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231120070024.4079344-12-claudiu.beznea.uj@bp.renesas.com> <CAMuHMdUbKe=yiXWNmk5BJFLtF2psx9khiDRGasT9WsnHz4RWsg@mail.gmail.com>
+In-Reply-To: <CAMuHMdUbKe=yiXWNmk5BJFLtF2psx9khiDRGasT9WsnHz4RWsg@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 6 Dec 2023 11:56:48 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdXwSo1L9UuFg9RL0TLL_xzVt2r6QEFc0gtPoydpr4FmSQ@mail.gmail.com>
+Message-ID: <CAMuHMdXwSo1L9UuFg9RL0TLL_xzVt2r6QEFc0gtPoydpr4FmSQ@mail.gmail.com>
+Subject: Re: [PATCH 11/14] arm64: renesas: rzg3s-smarc-som: Invert the logic
+ for SW_SD2_EN macro
+To: Claudiu <claudiu.beznea@tuxon.dev>
+Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, linux@armlinux.org.uk, 
+	geert+renesas@glider.be, magnus.damm@gmail.com, mturquette@baylibre.com, 
+	sboyd@kernel.org, linus.walleij@linaro.org, p.zabel@pengutronix.de, 
+	arnd@arndb.de, m.szyprowski@samsung.com, alexandre.torgue@foss.st.com, 
+	afd@ti.com, broonie@kernel.org, alexander.stein@ew.tq-group.com, 
+	eugen.hristev@collabora.com, sergei.shtylyov@gmail.com, 
+	prabhakar.mahadev-lad.rj@bp.renesas.com, biju.das.jz@bp.renesas.com, 
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In order to address the issues encountered with commit 1effe8ca4e34
-("skbuff: fix coalescing for page_pool fragment recycling"), the
-combination of the following condition was excluded from skb coalescing:
+On Wed, Dec 6, 2023 at 11:33=E2=80=AFAM Geert Uytterhoeven <geert@linux-m68=
+k.org> wrote:
+> On Mon, Nov 20, 2023 at 8:03=E2=80=AFAM Claudiu <claudiu.beznea@tuxon.dev=
+> wrote:
+> > From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> >
+> > The intention of SW_SD2_EN macro was to reflect the state of SW_CONFIG3
+> > switch available on RZ/G3S Smarc Module. According to documentation SD2
+> > is enabled when switch is in OFF state. For this, changed the logic of
+> > marco to map value 0 to switch's OFF state and value 1 to switch's ON
+> > state. Along with this update the description for each state for better
+> > understanding.
+> >
+> > The value of SW_SD2_EN macro was not changed in file because, according=
+ to
+> > documentation, the default state for this switch is ON.
+> >
+> > Fixes: adb4f0c5699c ("arm64: dts: renesas: Add initial support for RZ/G=
+3S SMARC SoM")
+> > Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>
+> Thanks for your patch!
+>
+> > --- a/arch/arm64/boot/dts/renesas/rzg3s-smarc-som.dtsi
+> > +++ b/arch/arm64/boot/dts/renesas/rzg3s-smarc-som.dtsi
+> > @@ -14,8 +14,8 @@
+> >   *     0 - SD0 is connected to eMMC
+> >   *     1 - SD0 is connected to uSD0 card
+> >   * @SW_SD2_EN:
+> > - *     0 - SCIF1, SSI0, IRQ0, IRQ1 connected to SoC
+> > - *     1 - SD2 is connected to SoC
+> > + *     0 - (switch OFF) SD2 is connected to SoC
+> > + *     1 - (switch ON)  SCIF1, SSI0, IRQ0, IRQ1 connected to SoC
+>
+> I think this is still confusing: SW_SD2_EN refers to an active-low signal
+> (SW_SD2_EN#) in the schematics.
 
-from->pp_recycle = 1
-from->cloned = 1
-to->pp_recycle = 1
+OMG, while the signal is called "SW_SD2_EN#" in the schematics, it is
+_not_ active-low!
+SW_D2_EN# drives a STG3692 quad SPDT switch, and SD2 is enabled
+if SW_D2_EN# is high...
 
-However, with page pool environments, the aforementioned combination can
-be quite common(ex. NetworkMananger may lead to the additional
-packet_type being registered, thus the cloning). In scenarios with a
-higher number of small packets, it can significantly affect the success
-rate of coalescing. For example, considering packets of 256 bytes size,
-our comparison of coalescing success rate is as follows:
+The RZ/G3S SMARC Module User Manual says:
 
-Without page pool: 70%
-With page pool: 13%
+Signal SW_SD2_EN ON: SD2 is disabled.
+Signal SW_SD2_EN OFF: SD2 is enabled.
 
-Consequently, this has an impact on performance:
+So whatever we do, something will look odd :-(
 
-Without page pool: 2.57 Gbits/sec
-With page pool: 2.26 Gbits/sec
+> Before, SW_SD2_EN used assertion-logic (1 is enabled), and didn't
+> match the physical signal level.
+> After your patch, SW_SD2_EN matches the active-low physical level, but
+> this is not reflected in the name...
+>
+> >   */
+> >  #define SW_SD0_DEV_SEL 1
+> >  #define SW_SD2_EN      1
+> > @@ -25,7 +25,7 @@ / {
+> >
+> >         aliases {
+> >                 mmc0 =3D &sdhi0;
+> > -#if SW_SD2_EN
+> > +#if !SW_SD2_EN
+>
+> ... so this condition looks really weird.
 
-Therefore, it seems worthwhile to optimize this scenario and enable
-coalescing of this particular combination. To achieve this, we need to
-ensure the correct increment of the "from" SKB page's page pool
-reference count (pp_ref_count).
+Still, I think the original looks nicer here.
 
-Following this optimization, the success rate of coalescing measured in
-our environment has improved as follows:
+So I suggest to keep the original logic, but clarify the position of
+the switch.
+Does that make sense?
 
-With page pool: 60%
 
-This success rate is approaching the rate achieved without using page
-pool, and the performance has also been improved:
+>
+> >                 mmc2 =3D &sdhi2;
+> >  #endif
+> >         };
+> > @@ -116,7 +116,7 @@ &sdhi0 {
+> >  };
+> >  #endif
+> >
+> > -#if SW_SD2_EN
+> > +#if !SW_SD2_EN
+> >  &sdhi2 {
+> >         pinctrl-0 =3D <&sdhi2_pins>;
+> >         pinctrl-names =3D "default";
+>
+> So I think SW_SD2_EN should be renamed to SW_SD2_EN_N.
+>
+> Cfr. SW_ET0_EN_N on RZ/G2UL:
+>
+> arch/arm64/boot/dts/renesas/r9a07g043u11-smarc.dts- * DIP-Switch SW1 sett=
+ing
+> arch/arm64/boot/dts/renesas/r9a07g043u11-smarc.dts- * 1 : High; 0: Low
+> arch/arm64/boot/dts/renesas/r9a07g043u11-smarc.dts- * SW1-2 :
+> SW_SD0_DEV_SEL    (0: uSD; 1: eMMC)
+> arch/arm64/boot/dts/renesas/r9a07g043u11-smarc.dts- * SW1-3 :
+> SW_ET0_EN_N               (0: ETHER0; 1: CAN0, CAN1, SSI1, RSPI1)
+> arch/arm64/boot/dts/renesas/r9a07g043u11-smarc.dts- * Please change
+> below macros according to SW1 setting on the SoM
 
-With page pool: 2.52 Gbits/sec
+Gr{oetje,eeting}s,
 
-Below is the performance comparison for small packets before and after
-this optimization. We observe no impact to packets larger than 4K.
+                        Geert
 
-packet size     before      after       improved
-(bytes)         (Gbits/sec) (Gbits/sec)
-128             1.19        1.27        7.13%
-256             2.26        2.52        11.75%
-512             4.13        4.81        16.50%
-1024            6.17        6.73        9.05%
-2048            14.54       15.47       6.45%
-4096            25.44       27.87       9.52%
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
 
-Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
-Reviewed-by: Yunsheng Lin <linyunsheng@huawei.com>
-Suggested-by: Jason Wang <jasowang@redhat.com>
----
- include/net/page_pool/helpers.h |  5 ++++
- net/core/skbuff.c               | 41 +++++++++++++++++++++++----------
- 2 files changed, 34 insertions(+), 12 deletions(-)
-
-diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
-index 9dc8eaf8a959..268bc9d9ffd3 100644
---- a/include/net/page_pool/helpers.h
-+++ b/include/net/page_pool/helpers.h
-@@ -278,6 +278,11 @@ static inline long page_pool_unref_page(struct page *page, long nr)
- 	return ret;
- }
- 
-+static inline void page_pool_ref_page(struct page *page)
-+{
-+	atomic_long_inc(&page->pp_ref_count);
-+}
-+
- static inline bool page_pool_is_last_ref(struct page *page)
- {
- 	/* If page_pool_unref_page() returns 0, we were the last user */
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 7e26b56cda38..3c2515a29376 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -947,6 +947,24 @@ static bool skb_pp_recycle(struct sk_buff *skb, void *data, bool napi_safe)
- 	return napi_pp_put_page(virt_to_page(data), napi_safe);
- }
- 
-+/**
-+ * skb_pp_frag_ref() - Increase fragment reference count of a page
-+ * @page:	page of the fragment on which to increase a reference
-+ *
-+ * Increase fragment reference count (pp_ref_count) on a page, but if it is
-+ * not a page pool page, fallback to increase a reference(_refcount) on a
-+ * normal page.
-+ */
-+static void skb_pp_frag_ref(struct page *page)
-+{
-+	struct page *head_page = compound_head(page);
-+
-+	if (likely(is_pp_page(head_page)))
-+		page_pool_ref_page(head_page);
-+	else
-+		page_ref_inc(head_page);
-+}
-+
- static void skb_kfree_head(void *head, unsigned int end_offset)
- {
- 	if (end_offset == SKB_SMALL_HEAD_HEADROOM)
-@@ -5769,17 +5787,12 @@ bool skb_try_coalesce(struct sk_buff *to, struct sk_buff *from,
- 		return false;
- 
- 	/* In general, avoid mixing page_pool and non-page_pool allocated
--	 * pages within the same SKB. Additionally avoid dealing with clones
--	 * with page_pool pages, in case the SKB is using page_pool fragment
--	 * references (page_pool_alloc_frag()). Since we only take full page
--	 * references for cloned SKBs at the moment that would result in
--	 * inconsistent reference counts.
--	 * In theory we could take full references if @from is cloned and
--	 * !@to->pp_recycle but its tricky (due to potential race with
--	 * the clone disappearing) and rare, so not worth dealing with.
-+	 * pages within the same SKB. In theory we could take full
-+	 * references if @from is cloned and !@to->pp_recycle but its
-+	 * tricky (due to potential race with the clone disappearing) and
-+	 * rare, so not worth dealing with.
- 	 */
--	if (to->pp_recycle != from->pp_recycle ||
--	    (from->pp_recycle && skb_cloned(from)))
-+	if (to->pp_recycle != from->pp_recycle)
- 		return false;
- 
- 	if (len <= skb_tailroom(to)) {
-@@ -5836,8 +5849,12 @@ bool skb_try_coalesce(struct sk_buff *to, struct sk_buff *from,
- 	/* if the skb is not cloned this does nothing
- 	 * since we set nr_frags to 0.
- 	 */
--	for (i = 0; i < from_shinfo->nr_frags; i++)
--		__skb_frag_ref(&from_shinfo->frags[i]);
-+	if (from->pp_recycle)
-+		for (i = 0; i < from_shinfo->nr_frags; i++)
-+			skb_pp_frag_ref(skb_frag_page(&from_shinfo->frags[i]));
-+	else
-+		for (i = 0; i < from_shinfo->nr_frags; i++)
-+			__skb_frag_ref(&from_shinfo->frags[i]);
- 
- 	to->truesize += delta;
- 	to->len += len;
--- 
-2.31.1
-
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
