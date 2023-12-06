@@ -1,81 +1,110 @@
-Return-Path: <netdev+bounces-54532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33EEA807654
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:17:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B7E2807670
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:21:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70249282087
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:17:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C1391C20A9A
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:21:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6C7965EC8;
-	Wed,  6 Dec 2023 17:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7AC860B97;
+	Wed,  6 Dec 2023 17:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NJ3fbUVh"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="D5MQeZ/g"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A114861FC4
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 17:17:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 33EBDC43395;
-	Wed,  6 Dec 2023 17:17:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701883053;
-	bh=4iBwyOzm4+lW4YbkH+lNNusD4beOr9gVF0dZeh3+6oU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NJ3fbUVhaK6hj0BpGFQ1MmgQwTC7yS71nDRS2RuZpuMOoWLNqT9se7nEOy6IvMvbz
-	 W3ub/XPBUOEop+qLMn329supf85HXw3e66dTLMlfLveKS6QCBAA11CnMIsfufdv/ag
-	 8pA3eaHeAMxtUvX12fGP/501reZbPVihsx6470u8Kazs6R9cC43wt9u8zJc3HkswfD
-	 tKMjGW8QnZ1ag+kGQbhW5Bdgr6OI21TL86MNccz2ySzo8da5Z+rwbZfOVPgxg+S5M0
-	 yeWb/cxKF1c0nJr3LdidPM+R6b1GHj5UxeI3+zim+CMoajifIUdrW433pPjz/FPfh1
-	 kHklJmnFc9svQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1D71CC395DC;
-	Wed,  6 Dec 2023 17:17:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14DDBD47
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 09:21:44 -0800 (PST)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-a1a496a73ceso144026366b.2
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 09:21:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1701883300; x=1702488100; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GaGi8ynGM0sSJk2cTHVa3nEhLRrFYa9iM9DZek/jE/U=;
+        b=D5MQeZ/gXYCtMOa4/nL+W0QBofAy1ruXp7uqMLykbemVYDW/4RPGjsZw7k9542PbyH
+         Tat05egCGHpq5U8zwd78UufQ0qkkvOK6skxvp20/Baq3/lQww2Lk2AqcoAasdVAgJxTv
+         WgGb3/XNA3o9RjDF+FOAh3POgoGann7NFe+zs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701883300; x=1702488100;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GaGi8ynGM0sSJk2cTHVa3nEhLRrFYa9iM9DZek/jE/U=;
+        b=xMJYJmReEqsVEbw2hoX6QZJiZYeIIElUc2Hyx/pQqvehB8i7PX8kd6yw3BfG2GfBAH
+         VPHpJIoaiONj86Rq6mBV5UVcnPd5gpDwln8ztvlhhfKgz4KAMl7zmxsTLP14mzkiUp/j
+         8Ye21uFbSWvcyvJRaoGJWVSa2symZNYRtjB0s0RlFnpHlGXbi6RZr4X5S50sGJKm1yY9
+         wsN5djI8nHr5JP6zk8pnG0ApiBtxjZXKbytwOYxAc5b2d7d5tcs/rRyKzpUfmS4u6UKk
+         5cCzoLU5kQDTqtpheX/z47ePNRVZ4rpuIqdyzkGtry2k6Wljn2EUSGr2o2YTGKYWeXd9
+         SfOg==
+X-Gm-Message-State: AOJu0YzkXCQeDvMzHmHecAZ8H1+fD/KCrPdaVARzZ0R76fCqucu8073R
+	aVB8fdy+n3jocZHDnyh8YueVGztrG10I62mSYSu0kUCU
+X-Google-Smtp-Source: AGHT+IELor0YGeZuJdAz2JdlCwkM5627VRDbhNY78JEZl0SjSWpfBb0gYKOLTSq2iPwCt7Sr+dFghQ==
+X-Received: by 2002:a17:906:198:b0:a1e:6f75:d9f6 with SMTP id 24-20020a170906019800b00a1e6f75d9f6mr37195ejb.74.1701883299823;
+        Wed, 06 Dec 2023 09:21:39 -0800 (PST)
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com. [209.85.128.49])
+        by smtp.gmail.com with ESMTPSA id gs1-20020a170906f18100b00a1df4387f16sm197943ejb.95.2023.12.06.09.21.38
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Dec 2023 09:21:39 -0800 (PST)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40b367a0a12so79835e9.1
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 09:21:38 -0800 (PST)
+X-Received: by 2002:a05:600c:22d8:b0:40b:4221:4085 with SMTP id
+ 24-20020a05600c22d800b0040b42214085mr87519wmg.1.1701883298586; Wed, 06 Dec
+ 2023 09:21:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2] ip: require RTM_NEWLINK
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170188305311.32642.2704244428398607464.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Dec 2023 17:17:33 +0000
-References: <20231203182929.9559-1-stephen@networkplumber.org>
-In-Reply-To: <20231203182929.9559-1-stephen@networkplumber.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org
+References: <20231206033913.1290566-1-judyhsiao@chromium.org>
+In-Reply-To: <20231206033913.1290566-1-judyhsiao@chromium.org>
+From: Doug Anderson <dianders@chromium.org>
+Date: Wed, 6 Dec 2023 09:21:21 -0800
+X-Gmail-Original-Message-ID: <CAD=FV=WCLB2M1jGEa5NM=thEmJmntV1sAqg11iLH0uizwhN2eA@mail.gmail.com>
+Message-ID: <CAD=FV=WCLB2M1jGEa5NM=thEmJmntV1sAqg11iLH0uizwhN2eA@mail.gmail.com>
+Subject: Re: [PATCH v2] neighbour: Don't let neigh_forced_gc() disable
+ preemption for long
+To: Judy Hsiao <judyhsiao@chromium.org>
+Cc: Eric Dumazet <edumazet@google.com>, David Ahern <dsahern@kernel.org>, 
+	Simon Horman <horms@kernel.org>, Brian Haley <haleyb.dev@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Joel Granados <joel.granados@gmail.com>, Julian Anastasov <ja@ssi.bg>, Leon Romanovsky <leon@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+Hi,
 
-This patch was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
+On Tue, Dec 5, 2023 at 7:39=E2=80=AFPM Judy Hsiao <judyhsiao@chromium.org> =
+wrote:
+>
+> We are seeing cases where neigh_cleanup_and_release() is called by
+> neigh_forced_gc() many times in a row with preemption turned off.
+> When running on a low powered CPU at a low CPU frequency, this has
+> been measured to keep preemption off for ~10 ms. That's not great on a
+> system with HZ=3D1000 which expects tasks to be able to schedule in
+> with ~1ms latency.
+>
+> Suggested-by: Douglas Anderson <dianders@chromium.org>
+> Signed-off-by: Judy Hsiao <judyhsiao@chromium.org>
+>
+> ---
+>
+> Changes in v2:
+> - Use ktime_get_ns() for timeout calculation instead of jiffies.
+>
+>  net/core/neighbour.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
 
-On Sun,  3 Dec 2023 10:29:14 -0800 you wrote:
-> The kernel support for creating network devices was added back
-> in 2007 and iproute2 has been carrying backward compatability
-> support since then. After 16 years, it is enough time to
-> drop the code.
-> 
-> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
-> 
-> [...]
+Though as evidenced by the discussion in v1 I'm not versed enough in
+this code for it to mean much, the patch nonetheless looks reasonable
+to me. I'm happy enough with:
 
-Here is the summary with links:
-  - [iproute2] ip: require RTM_NEWLINK
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=6174b7283295
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Douglas Anderson <dianders@chromium.org>
 
