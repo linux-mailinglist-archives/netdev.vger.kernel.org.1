@@ -1,176 +1,129 @@
-Return-Path: <netdev+bounces-54270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A538806628
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 05:25:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E454806639
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 05:34:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFA411F21683
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 04:25:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F5831C210AB
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 04:34:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA900FBF1;
-	Wed,  6 Dec 2023 04:25:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73083FC19;
+	Wed,  6 Dec 2023 04:34:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="Hemd8dwF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RAk8XbSW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91292D3
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 20:25:25 -0800 (PST)
-Received: by mail-ot1-x32a.google.com with SMTP id 46e09a7af769-6d9a6f756c3so1753133a34.2
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 20:25:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=theori.io; s=google; t=1701836725; x=1702441525; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=AzMpY3Q2dnUPW+re7xTCMq4vQkW0i8Xw3gC6e6cbmPw=;
-        b=Hemd8dwFtDf4cQet5oIT/6UXvvzXeY7fS4/godFp4k2Y9eckyxMuwSmEaIGQe9LTrz
-         RA35pH5IduhFqrOZCuNDEcC0zQFLJj5mg3LoN6OWosnrxTTjMVczY0yrI46hWVzpDYHu
-         85CzmK3GTwwbng2g1yExtOPkGHYC9G1UHcF4Q=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701836725; x=1702441525;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AzMpY3Q2dnUPW+re7xTCMq4vQkW0i8Xw3gC6e6cbmPw=;
-        b=qolTnZlJc10Kn7ImhVIvFtwGWgYXgDOAbxAHUB6ojVTmibTj/VsfAnRcNK51Jt/EI9
-         g4+XR1pKRBYzTkekXEtdJwkTNQ68yPTvdFNbfLG12+Kn2vjPU+db64yx85FUxfuGPQA0
-         Fb994d4Bkz/uzyAJuJLZ9DsF7epnVkKYfdWXzXRupzmtIZFI3qBTUOMDzf1UimjCioyq
-         +f9E3IAjmB8tiKVlylW0t6b/jzI3wXObYOORgmMZZHAfJtifuUVg6N8zwGn8pXSOcsn9
-         Jdo+j3oZ6L8mNSVrw2TKW9E4zxQfnXw5CmPDkwy0BPm2mtrNW9VZcg1hqnj3dzNKgALn
-         s89g==
-X-Gm-Message-State: AOJu0YybXFUoKZIzB2iZXEiy3JpbsPlGuBjtZhxvxMjqOwUEVxrwli5x
-	r+CHj2izhUuamQW1+2NBQowatA==
-X-Google-Smtp-Source: AGHT+IHrWsS2/q5dwYRFBc4GD6P35Jgc+UxEFv+kNarIZiCIT0FRa1QGkLz1PoM1uhslATUHaNlwzw==
-X-Received: by 2002:a9d:6e9a:0:b0:6d8:4c76:bac9 with SMTP id a26-20020a9d6e9a000000b006d84c76bac9mr468850otr.13.1701836724869;
-        Tue, 05 Dec 2023 20:25:24 -0800 (PST)
-Received: from ubuntu ([211.219.71.65])
-        by smtp.gmail.com with ESMTPSA id c17-20020a637251000000b005c6676349f8sm6245452pgn.89.2023.12.05.20.25.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 20:25:24 -0800 (PST)
-Date: Tue, 5 Dec 2023 20:25:19 -0800
-From: Hyunwoo Kim <v4bel@theori.io>
-To: =?iso-8859-1?Q?R=E9mi?= Denis-Courmont <remi@remlab.net>
-Cc: courmisch@gmail.com, imv4bel@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, v4bel@theori.io
-Subject: Re: [PATCH] net: phonet: Fix Use-After-Free in pep_recvmsg
-Message-ID: <20231206042519.GA5926@ubuntu>
-References: <20231204065952.GA16224@ubuntu>
- <A2443BF8-D693-4182-9E07-3FFA33D97217@remlab.net>
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05BE81BF;
+	Tue,  5 Dec 2023 20:34:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701837281; x=1733373281;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=sq4PJPq6VrkCmDvgjz4GTxFgQOfpDStAzoJv/e5p5AQ=;
+  b=RAk8XbSWbFO2prS0S9EByQNG3FZ8EMi6HhlSS5Y0AF/Ec4XM2h7Rwf3f
+   tmt8PMi1zFB0BqF1O26CPyq9QlWAvsHtQpUVYoflvhQLgwxrwpZwKC0Ge
+   b0jn/UHMy3XWV9UI+tD5oAq7BahdIEV4lPaJ8j2NWGSAKBYHdbx/bMwpq
+   srmBTd8Ti3g+DTLwRIKPtOijXi0bQK3uiaze/K+ZHwbnT45A+bobU0iU0
+   GfXSC0OF42py7T/nZw4mYen8S1awFyedNiF0kXVvX5XbxZF41v0ReUzT3
+   Rion1s8gPEXewObUWQxow8tQC66tHSlFepi5IOVbvcKaLDO6L1tIg+Mty
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="379023583"
+X-IronPort-AV: E=Sophos;i="6.04,254,1695711600"; 
+   d="scan'208";a="379023583"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 20:34:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="944514523"
+X-IronPort-AV: E=Sophos;i="6.04,254,1695711600"; 
+   d="scan'208";a="944514523"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga005.jf.intel.com with ESMTP; 05 Dec 2023 20:34:35 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rAjcH-000AGM-22;
+	Wed, 06 Dec 2023 04:34:33 +0000
+Date: Wed, 6 Dec 2023 12:34:02 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ma Jun <Jun.Ma2@amd.com>, amd-gfx@lists.freedesktop.org,
+	lenb@kernel.org, hdegoede@redhat.com, johannes@sipsolutions.net,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, alexander.deucher@amd.com, Lijo.Lazar@amd.com,
+	mario.limonciello@amd.com, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, platform-driver-x86@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, majun@amd.com,
+	Evan Quan <quanliangl@hotmail.com>, Ma Jun <Jun.Ma2@amd.com>
+Subject: Re: [PATCH v14 4/9] wifi: mac80211: Add support for WBRF features
+Message-ID: <202312061213.9yUe2RGP-lkp@intel.com>
+References: <20231129091348.3972539-5-Jun.Ma2@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <A2443BF8-D693-4182-9E07-3FFA33D97217@remlab.net>
+In-Reply-To: <20231129091348.3972539-5-Jun.Ma2@amd.com>
 
-Hi,
+Hi Ma,
 
-On Mon, Dec 04, 2023 at 09:12:11AM +0200, Rémi Denis-Courmont wrote:
-> Hi,
-> 
-> Le 4 décembre 2023 08:59:52 GMT+02:00, Hyunwoo Kim <v4bel@theori.io> a écrit :
-> >Because pep_recvmsg() fetches the skb from pn->ctrlreq_queue
-> >without holding the lock_sock and then frees it,
-> >a race can occur with pep_ioctl().
-> >A use-after-free for a skb occurs with the following flow.
-> 
-> Isn't this the same issue that was reported by Huawei rootlab and for which I already provided a pair of patches to the security list two months ago?
+kernel test robot noticed the following build errors:
 
-Is the issue reported to the security mailing list two months ago the same as this pn->ctrlreq_queue race?
+[auto build test ERROR on v6.7-rc1]
+[also build test ERROR on next-20231205]
+[cannot apply to drm-misc/drm-misc-next wireless-next/main wireless/main linus/master v6.7-rc3 v6.7-rc2]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-> 
-> TBH, I much prefer the approach in the other patch set, which takes the hit on the ioctl() side rather than the recvmsg()'s.
+url:    https://github.com/intel-lab-lkp/linux/commits/Ma-Jun/Documentation-driver-api-Add-document-about-WBRF-mechanism/20231129-181516
+base:   v6.7-rc1
+patch link:    https://lore.kernel.org/r/20231129091348.3972539-5-Jun.Ma2%40amd.com
+patch subject: [PATCH v14 4/9] wifi: mac80211: Add support for WBRF features
+config: arm-randconfig-004-20231201 (https://download.01.org/0day-ci/archive/20231206/202312061213.9yUe2RGP-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231206/202312061213.9yUe2RGP-lkp@intel.com/reproduce)
 
-That's probably a patch to add sk->sk_receive_queue.lock to pep_ioctl(), is that correct?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312061213.9yUe2RGP-lkp@intel.com/
 
-> 
-> Unfortunately, I have no visibility on what happened or didn't happen after that, since the security list is private.
+All errors (new ones prefixed by >>):
 
-Perhaps this issue hasn't gotten much attention.
+   net/mac80211/wbrf.c: In function 'ieee80211_add_wbrf':
+>> net/mac80211/wbrf.c:79:9: error: implicit declaration of function 'acpi_amd_wbrf_add_remove'; did you mean 'acpi_amd_wbrf_add_exclusion'? [-Werror=implicit-function-declaration]
+      79 |         acpi_amd_wbrf_add_remove(dev, WBRF_RECORD_ADD, &ranges_in);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~
+         |         acpi_amd_wbrf_add_exclusion
+   cc1: some warnings being treated as errors
 
 
-Regards,
-Hyunwoo Kim
+vim +79 net/mac80211/wbrf.c
 
-> 
-> >```
-> >pep_recvmsg() -> skb_dequeue() -> skb_free_datagram()
-> >pep_ioctl() -> skb_peek()
-> >```
-> >Fix this by adjusting the scope of lock_sock in pep_recvmsg().
-> >
-> >Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
-> >---
-> > net/phonet/pep.c | 17 +++++++++++++----
-> > 1 file changed, 13 insertions(+), 4 deletions(-)
-> >
-> >diff --git a/net/phonet/pep.c b/net/phonet/pep.c
-> >index faba31f2eff2..212d8a9ddaee 100644
-> >--- a/net/phonet/pep.c
-> >+++ b/net/phonet/pep.c
-> >@@ -1250,12 +1250,17 @@ static int pep_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
-> > 	if (unlikely(1 << sk->sk_state & (TCPF_LISTEN | TCPF_CLOSE)))
-> > 		return -ENOTCONN;
-> > 
-> >+	lock_sock(sk);
-> >+
-> > 	if ((flags & MSG_OOB) || sock_flag(sk, SOCK_URGINLINE)) {
-> > 		/* Dequeue and acknowledge control request */
-> > 		struct pep_sock *pn = pep_sk(sk);
-> > 
-> >-		if (flags & MSG_PEEK)
-> >+		if (flags & MSG_PEEK) {
-> >+			release_sock(sk);
-> > 			return -EOPNOTSUPP;
-> >+		}
-> >+
-> 
-> Also this change is not really accounted for.
-> 
-> > 		skb = skb_dequeue(&pn->ctrlreq_queue);
-> > 		if (skb) {
-> > 			pep_ctrlreq_error(sk, skb, PN_PIPE_NO_ERROR,
-> >@@ -1263,12 +1268,14 @@ static int pep_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
-> > 			msg->msg_flags |= MSG_OOB;
-> > 			goto copy;
-> > 		}
-> >-		if (flags & MSG_OOB)
-> >+
-> >+		if (flags & MSG_OOB) {
-> >+			release_sock(sk);
-> > 			return -EINVAL;
-> >+		}
-> > 	}
-> > 
-> > 	skb = skb_recv_datagram(sk, flags, &err);
-> >-	lock_sock(sk);
-> > 	if (skb == NULL) {
-> > 		if (err == -ENOTCONN && sk->sk_state == TCP_CLOSE_WAIT)
-> > 			err = -ECONNRESET;
-> >@@ -1278,7 +1285,7 @@ static int pep_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
-> > 
-> > 	if (sk->sk_state == TCP_ESTABLISHED)
-> > 		pipe_grant_credits(sk, GFP_KERNEL);
-> >-	release_sock(sk);
-> >+
-> > copy:
-> > 	msg->msg_flags |= MSG_EOR;
-> > 	if (skb->len > len)
-> >@@ -1291,6 +1298,8 @@ static int pep_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
-> > 		err = (flags & MSG_TRUNC) ? skb->len : len;
-> > 
-> > 	skb_free_datagram(sk, skb);
-> >+
-> >+	release_sock(sk);
-> > 	return err;
-> > }
-> > 
+    66	
+    67	void ieee80211_add_wbrf(struct ieee80211_local *local, struct cfg80211_chan_def *chandef)
+    68	{
+    69		struct wbrf_ranges_in_out ranges_in = {0};
+    70		struct device *dev;
+    71	
+    72		if (!local->wbrf_supported)
+    73			return;
+    74	
+    75		dev = local->hw.wiphy->dev.parent;
+    76	
+    77		get_ranges_from_chandef(chandef, &ranges_in);
+    78	
+  > 79		acpi_amd_wbrf_add_remove(dev, WBRF_RECORD_ADD, &ranges_in);
+    80	}
+    81	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
