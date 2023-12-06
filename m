@@ -1,36 +1,35 @@
-Return-Path: <netdev+bounces-54349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C925806B35
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 11:02:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1713806B3C
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 11:02:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FC411C20956
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:02:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 514411F21275
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:02:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B47BA20307;
-	Wed,  6 Dec 2023 10:02:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6F0D23761;
+	Wed,  6 Dec 2023 10:02:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-X-Greylist: delayed 93 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 06 Dec 2023 02:02:16 PST
-Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B04FAC3
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 02:02:16 -0800 (PST)
-X-QQ-mid: bizesmtp87t1701856754t8rquxfw
+Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D03D4C3
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 02:02:37 -0800 (PST)
+X-QQ-mid: bizesmtp87t1701856758tyqnqybh
 Received: from wxdbg.localdomain.com ( [115.204.154.156])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 06 Dec 2023 17:59:13 +0800 (CST)
+	id ; Wed, 06 Dec 2023 17:59:17 +0800 (CST)
 X-QQ-SSF: 01400000000000L0Z000000A0000000
-X-QQ-FEAT: vLOCICHxEeATSIEfBIee0IDT0mtR64pqvEBEoVyTVl1P4VxShWmXK1AvY3e53
-	AKoZUBnXrjVMLSl4SSL+abv3aIIF3PWBjc/cvhrq1a+mMO3omqz7UScfRYzT7d8aymgRC+2
-	ar7mzXjXMkInG+x07+pLkhBYSIBpxkCddGV52mL7uW9JJWJ2fBnfj3OPjsRZChB+8VzmdId
-	ZvSwGTQoHf+LA0rwZ1z8GqFzZl4vS6RzXb4nvZOo1WOk1iCi5ZIbBBiXzbmnXya3QZ3aBmt
-	zxqha0SXycpi6+C5iIWKzRe+KA0FWflWPBHIrHIBSFatCfwXPmJvrgBO+ujL8xcayKXdFC6
-	Fz7wG/oj8l/iI43Qn0KcSJuS6OszvZtE5YOictJB+1ROIVR4c3f/n2X8rXSku4tjVj7VA0/
-	gxlMwGlGkoejvFnkr4tCiA==
+X-QQ-FEAT: 3VVObL39cqRbO6Xnc3HfovqvVWJiLz47JHdnj7tNVNpOJfqwi3JLIZiRhnECo
+	HLdA4pB8MtFJJ80+ffGXKclDnhZlIZhMdOFZ06OoiTfoZDk9FrGeIuetR+Dgl5siMOuQHvl
+	ydePQdTPr9+0OoUspnVg4dnZRgdAGjNroHwURbsrDVFbKOgg26dNdVQMab7J8e07Ji4nPoJ
+	cNnI9aQgy3TXBXPzxGFxmxzMAIa4DL4MenZ3vL+NXYvVA/qr4zFeFK6V2QP/QR0j2h2+nO6
+	bVtHP/0/CoWRdplrs4///IlDiIanTsruG+NgAnZmYaBIoS2yjiSKLhQZ0z4F9wfZsT2dSz6
+	8vLfZHFLXco56LtHAOn6ZBEdsCAVazt1Vz2gl6pMutPZP0uAKL/vrDaeXvHudsaA3NCVAgG
+	m8OTOTq/pS8=
 X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 786562421831322864
+X-BIZMAIL-ID: 13130132088267658999
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -41,9 +40,9 @@ To: davem@davemloft.net,
 	netdev@vger.kernel.org
 Cc: mengyuanlou@net-swift.com,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v3 2/7] net: wangxun: unified phylink implementation in libwx
-Date: Wed,  6 Dec 2023 17:53:50 +0800
-Message-Id: <20231206095355.1220086-3-jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v3 3/7] net: wangxun: add flow control support
+Date: Wed,  6 Dec 2023 17:53:51 +0800
+Message-Id: <20231206095355.1220086-4-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20231206095355.1220086-1-jiawenwu@trustnetic.com>
 References: <20231206095355.1220086-1-jiawenwu@trustnetic.com>
@@ -57,366 +56,409 @@ Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
 
-Use wx->phylink instead of txgbe->phylink, and move the same ethtool
-functions to libwx because them can be implemented with phylink in
-ngbe driver.
+Add support to set pause params with ethtool -A and get pause
+params with ethtool -a, for ethernet driver txgbe and ngbe.
 
 Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 ---
- .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 27 ++++++++++++
- .../net/ethernet/wangxun/libwx/wx_ethtool.h   |  5 +++
- .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  |  6 +--
- .../ethernet/wangxun/txgbe/txgbe_ethtool.c    | 29 ++-----------
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  8 +---
- .../net/ethernet/wangxun/txgbe/txgbe_phy.c    | 43 +++++++++----------
- .../net/ethernet/wangxun/txgbe/txgbe_type.h   |  8 ----
- 7 files changed, 61 insertions(+), 65 deletions(-)
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   |  18 ++
+ .../net/ethernet/wangxun/libwx/wx_ethtool.h   |   4 +
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    | 172 ++++++++++++++++++
+ drivers/net/ethernet/wangxun/libwx/wx_hw.h    |   1 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  48 +++++
+ .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  |   2 +
+ drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c |   2 +
+ .../ethernet/wangxun/txgbe/txgbe_ethtool.c    |   2 +
+ .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |   2 +
+ 9 files changed, 251 insertions(+)
 
 diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-index ddc5f6d20b9c..f210ce48ac55 100644
+index f210ce48ac55..8f3088ba6477 100644
 --- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
 +++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-@@ -3,6 +3,7 @@
- 
- #include <linux/pci.h>
- #include <linux/phy.h>
-+#include <linux/phylink.h>
- #include <linux/ethtool.h>
- 
- #include "wx_type.h"
-@@ -185,3 +186,29 @@ void wx_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *info)
- 	}
+@@ -212,3 +212,21 @@ int wx_set_link_ksettings(struct net_device *netdev,
+ 	return phylink_ethtool_ksettings_set(wx->phylink, cmd);
  }
- EXPORT_SYMBOL(wx_get_drvinfo);
+ EXPORT_SYMBOL(wx_set_link_ksettings);
 +
-+int wx_nway_reset(struct net_device *netdev)
++void wx_get_pauseparam(struct net_device *netdev,
++		       struct ethtool_pauseparam *pause)
 +{
 +	struct wx *wx = netdev_priv(netdev);
 +
-+	return phylink_ethtool_nway_reset(wx->phylink);
++	phylink_ethtool_get_pauseparam(wx->phylink, pause);
 +}
-+EXPORT_SYMBOL(wx_nway_reset);
++EXPORT_SYMBOL(wx_get_pauseparam);
 +
-+int wx_get_link_ksettings(struct net_device *netdev,
-+			  struct ethtool_link_ksettings *cmd)
++int wx_set_pauseparam(struct net_device *netdev,
++		      struct ethtool_pauseparam *pause)
 +{
 +	struct wx *wx = netdev_priv(netdev);
 +
-+	return phylink_ethtool_ksettings_get(wx->phylink, cmd);
++	return phylink_ethtool_set_pauseparam(wx->phylink, pause);
 +}
-+EXPORT_SYMBOL(wx_get_link_ksettings);
-+
-+int wx_set_link_ksettings(struct net_device *netdev,
-+			  const struct ethtool_link_ksettings *cmd)
-+{
-+	struct wx *wx = netdev_priv(netdev);
-+
-+	return phylink_ethtool_ksettings_set(wx->phylink, cmd);
-+}
-+EXPORT_SYMBOL(wx_set_link_ksettings);
++EXPORT_SYMBOL(wx_set_pauseparam);
 diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-index 16d1a09369a6..f15cc445ae0f 100644
+index f15cc445ae0f..7d3d85f212eb 100644
 --- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
 +++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-@@ -13,4 +13,9 @@ void wx_get_mac_stats(struct net_device *netdev,
- void wx_get_pause_stats(struct net_device *netdev,
- 			struct ethtool_pause_stats *stats);
- void wx_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *info);
-+int wx_nway_reset(struct net_device *netdev);
-+int wx_get_link_ksettings(struct net_device *netdev,
-+			  struct ethtool_link_ksettings *cmd);
-+int wx_set_link_ksettings(struct net_device *netdev,
-+			  const struct ethtool_link_ksettings *cmd);
+@@ -18,4 +18,8 @@ int wx_get_link_ksettings(struct net_device *netdev,
+ 			  struct ethtool_link_ksettings *cmd);
+ int wx_set_link_ksettings(struct net_device *netdev,
+ 			  const struct ethtool_link_ksettings *cmd);
++void wx_get_pauseparam(struct net_device *netdev,
++		       struct ethtool_pauseparam *pause);
++int wx_set_pauseparam(struct net_device *netdev,
++		      struct ethtool_pauseparam *pause);
  #endif /* _WX_ETHTOOL_H_ */
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+index 533e912af089..d11f7d8db194 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+@@ -1158,6 +1158,81 @@ static void wx_set_rxpba(struct wx *wx)
+ 	wr32(wx, WX_TDM_PB_THRE(0), txpbthresh);
+ }
+ 
++#define WX_ETH_FRAMING 20
++
++/**
++ * wx_hpbthresh - calculate high water mark for flow control
++ *
++ * @wx: board private structure to calculate for
++ **/
++static int wx_hpbthresh(struct wx *wx)
++{
++	struct net_device *dev = wx->netdev;
++	int link, tc, kb, marker;
++	u32 dv_id, rx_pba;
++
++	/* Calculate max LAN frame size */
++	link = dev->mtu + ETH_HLEN + ETH_FCS_LEN + WX_ETH_FRAMING;
++	tc = link;
++
++	/* Calculate delay value for device */
++	dv_id = WX_DV(link, tc);
++
++	/* Delay value is calculated in bit times convert to KB */
++	kb = WX_BT2KB(dv_id);
++	rx_pba = rd32(wx, WX_RDB_PB_SZ(0)) >> WX_RDB_PB_SZ_SHIFT;
++
++	marker = rx_pba - kb;
++
++	/* It is possible that the packet buffer is not large enough
++	 * to provide required headroom. In this case throw an error
++	 * to user and a do the best we can.
++	 */
++	if (marker < 0) {
++		dev_warn(&wx->pdev->dev,
++			 "Packet Buffer can not provide enough headroom to support flow control. Decrease MTU or number of traffic classes\n");
++		marker = tc + 1;
++	}
++
++	return marker;
++}
++
++/**
++ * wx_lpbthresh - calculate low water mark for flow control
++ *
++ * @wx: board private structure to calculate for
++ **/
++static int wx_lpbthresh(struct wx *wx)
++{
++	struct net_device *dev = wx->netdev;
++	u32 dv_id;
++	int tc;
++
++	/* Calculate max LAN frame size */
++	tc = dev->mtu + ETH_HLEN + ETH_FCS_LEN;
++
++	/* Calculate delay value for device */
++	dv_id = WX_LOW_DV(tc);
++
++	/* Delay value is calculated in bit times convert to KB */
++	return WX_BT2KB(dv_id);
++}
++
++/**
++ * wx_pbthresh_setup - calculate and setup high low water marks
++ *
++ * @wx: board private structure to calculate for
++ **/
++static void wx_pbthresh_setup(struct wx *wx)
++{
++	wx->fc.high_water = wx_hpbthresh(wx);
++	wx->fc.low_water = wx_lpbthresh(wx);
++
++	/* Low water marks must not be larger than high water marks */
++	if (wx->fc.low_water > wx->fc.high_water)
++		wx->fc.low_water = 0;
++}
++
+ static void wx_configure_port(struct wx *wx)
+ {
+ 	u32 value, i;
+@@ -1584,6 +1659,7 @@ static void wx_configure_isb(struct wx *wx)
+ void wx_configure(struct wx *wx)
+ {
+ 	wx_set_rxpba(wx);
++	wx_pbthresh_setup(wx);
+ 	wx_configure_port(wx);
+ 
+ 	wx_set_rx_mode(wx->netdev);
+@@ -2003,6 +2079,102 @@ int wx_vlan_rx_kill_vid(struct net_device *netdev, __be16 proto, u16 vid)
+ }
+ EXPORT_SYMBOL(wx_vlan_rx_kill_vid);
+ 
++static void wx_enable_rx_drop(struct wx *wx, struct wx_ring *ring)
++{
++	u16 reg_idx = ring->reg_idx;
++	u32 srrctl;
++
++	srrctl = rd32(wx, WX_PX_RR_CFG(reg_idx));
++	srrctl |= WX_PX_RR_CFG_DROP_EN;
++
++	wr32(wx, WX_PX_RR_CFG(reg_idx), srrctl);
++}
++
++static void wx_disable_rx_drop(struct wx *wx, struct wx_ring *ring)
++{
++	u16 reg_idx = ring->reg_idx;
++	u32 srrctl;
++
++	srrctl = rd32(wx, WX_PX_RR_CFG(reg_idx));
++	srrctl &= ~WX_PX_RR_CFG_DROP_EN;
++
++	wr32(wx, WX_PX_RR_CFG(reg_idx), srrctl);
++}
++
++int wx_fc_enable(struct wx *wx, bool tx_pause, bool rx_pause)
++{
++	u16 pause_time = WX_DEFAULT_FCPAUSE;
++	u32 mflcn_reg, fccfg_reg, reg;
++	u32 fcrtl, fcrth;
++	int i;
++
++	/* Low water mark of zero causes XOFF floods */
++	if (tx_pause && wx->fc.high_water) {
++		if (!wx->fc.low_water || wx->fc.low_water >= wx->fc.high_water) {
++			wx_err(wx, "Invalid water mark configuration\n");
++			return -EINVAL;
++		}
++	}
++
++	/* Disable any previous flow control settings */
++	mflcn_reg = rd32(wx, WX_MAC_RX_FLOW_CTRL);
++	mflcn_reg &= ~WX_MAC_RX_FLOW_CTRL_RFE;
++
++	fccfg_reg = rd32(wx, WX_RDB_RFCC);
++	fccfg_reg &= ~WX_RDB_RFCC_RFCE_802_3X;
++
++	if (rx_pause)
++		mflcn_reg |= WX_MAC_RX_FLOW_CTRL_RFE;
++	if (tx_pause)
++		fccfg_reg |= WX_RDB_RFCC_RFCE_802_3X;
++
++	/* Set 802.3x based flow control settings. */
++	wr32(wx, WX_MAC_RX_FLOW_CTRL, mflcn_reg);
++	wr32(wx, WX_RDB_RFCC, fccfg_reg);
++
++	/* Set up and enable Rx high/low water mark thresholds, enable XON. */
++	if (tx_pause && wx->fc.high_water) {
++		fcrtl = (wx->fc.low_water << 10) | WX_RDB_RFCL_XONE;
++		wr32(wx, WX_RDB_RFCL, fcrtl);
++		fcrth = (wx->fc.high_water << 10) | WX_RDB_RFCH_XOFFE;
++	} else {
++		wr32(wx, WX_RDB_RFCL, 0);
++		/* In order to prevent Tx hangs when the internal Tx
++		 * switch is enabled we must set the high water mark
++		 * to the Rx packet buffer size - 24KB.  This allows
++		 * the Tx switch to function even under heavy Rx
++		 * workloads.
++		 */
++		fcrth = rd32(wx, WX_RDB_PB_SZ(0)) - 24576;
++	}
++
++	wr32(wx, WX_RDB_RFCH, fcrth);
++
++	/* Configure pause time */
++	reg = pause_time * 0x00010001;
++	wr32(wx, WX_RDB_RFCV, reg);
++
++	/* Configure flow control refresh threshold value */
++	wr32(wx, WX_RDB_RFCRT, pause_time / 2);
++
++	/*  We should set the drop enable bit if:
++	 *  Number of Rx queues > 1 and flow control is disabled
++	 *
++	 *  This allows us to avoid head of line blocking for security
++	 *  and performance reasons.
++	 */
++	if (wx->num_rx_queues > 1 && !tx_pause) {
++		for (i = 0; i < wx->num_rx_queues; i++)
++			wx_enable_rx_drop(wx, wx->rx_ring[i]);
++	} else {
++		for (i = 0; i < wx->num_rx_queues; i++)
++			wx_disable_rx_drop(wx, wx->rx_ring[i]);
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL(wx_fc_enable);
++
+ /**
+  * wx_update_stats - Update the board statistics counters.
+  * @wx: board private structure
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.h b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
+index 12c20a7c364d..9e219fa717a2 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_hw.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
+@@ -41,6 +41,7 @@ int wx_get_pcie_msix_counts(struct wx *wx, u16 *msix_count, u16 max_msix_count);
+ int wx_sw_init(struct wx *wx);
+ int wx_vlan_rx_add_vid(struct net_device *netdev, __be16 proto, u16 vid);
+ int wx_vlan_rx_kill_vid(struct net_device *netdev, __be16 proto, u16 vid);
++int wx_fc_enable(struct wx *wx, bool tx_pause, bool rx_pause);
+ void wx_update_stats(struct wx *wx);
+ void wx_clear_hw_cntrs(struct wx *wx);
+ 
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+index 9225aaf029f8..7f2bdc2b966d 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+@@ -131,6 +131,15 @@
+ #define WX_RDB_PFCMACDAH             0x19214
+ #define WX_RDB_LXOFFTXC              0x19218
+ #define WX_RDB_LXONTXC               0x1921C
++/* Flow Control Registers */
++#define WX_RDB_RFCV                  0x19200
++#define WX_RDB_RFCL                  0x19220
++#define WX_RDB_RFCL_XONE             BIT(31)
++#define WX_RDB_RFCH                  0x19260
++#define WX_RDB_RFCH_XOFFE            BIT(31)
++#define WX_RDB_RFCRT                 0x192A0
++#define WX_RDB_RFCC                  0x192A4
++#define WX_RDB_RFCC_RFCE_802_3X      BIT(3)
+ /* ring assignment */
+ #define WX_RDB_PL_CFG(_i)            (0x19300 + ((_i) * 4))
+ #define WX_RDB_PL_CFG_L4HDR          BIT(1)
+@@ -331,6 +340,7 @@ enum WX_MSCA_CMD_value {
+ #define WX_PX_MPRC(_i)               (0x01020 + ((_i) * 0x40))
+ /* PX_RR_CFG bit definitions */
+ #define WX_PX_RR_CFG_VLAN            BIT(31)
++#define WX_PX_RR_CFG_DROP_EN         BIT(30)
+ #define WX_PX_RR_CFG_SPLIT_MODE      BIT(26)
+ #define WX_PX_RR_CFG_RR_THER_SHIFT   16
+ #define WX_PX_RR_CFG_RR_HDR_SZ       GENMASK(15, 12)
+@@ -368,6 +378,38 @@ enum WX_MSCA_CMD_value {
+ #define WX_MAC_STATE_MODIFIED        0x2
+ #define WX_MAC_STATE_IN_USE          0x4
+ 
++/* BitTimes (BT) conversion */
++#define WX_BT2KB(BT)         (((BT) + (8 * 1024 - 1)) / (8 * 1024))
++#define WX_B2BT(BT)          ((BT) * 8)
++
++/* Calculate Delay to respond to PFC */
++#define WX_PFC_D     672
++/* Calculate Cable Delay */
++#define WX_CABLE_DC  5556 /* Delay Copper */
++/* Calculate Delay incurred from higher layer */
++#define WX_HD        6144
++
++/* Calculate Interface Delay */
++#define WX_PHY_D     12800
++#define WX_MAC_D     4096
++#define WX_XAUI_D    (2 * 1024)
++#define WX_ID        (WX_MAC_D + WX_XAUI_D + WX_PHY_D)
++/* Calculate PCI Bus delay for low thresholds */
++#define WX_PCI_DELAY 10000
++
++/* Calculate delay value in bit times */
++#define WX_DV(_max_frame_link, _max_frame_tc) \
++	((36 * (WX_B2BT(_max_frame_link) + WX_PFC_D + \
++		(2 * WX_CABLE_DC) + (2 * WX_ID) + WX_HD) / 25 + 1) + \
++	 2 * WX_B2BT(_max_frame_tc))
++
++/* Calculate low threshold delay values */
++#define WX_LOW_DV(_max_frame_tc) \
++	(2 * (2 * WX_B2BT(_max_frame_tc) + (36 * WX_PCI_DELAY / 25) + 1))
++
++/* flow control */
++#define WX_DEFAULT_FCPAUSE           0xFFFF
++
+ #define WX_MAX_RXD                   8192
+ #define WX_MAX_TXD                   8192
+ 
+@@ -881,6 +923,11 @@ enum wx_isb_idx {
+ 	WX_ISB_MAX
+ };
+ 
++struct wx_fc_info {
++	u32 high_water; /* Flow Ctrl High-water */
++	u32 low_water; /* Flow Ctrl Low-water */
++};
++
+ /* Statistics counters collected by the MAC */
+ struct wx_hw_stats {
+ 	u64 gprc;
+@@ -921,6 +968,7 @@ struct wx {
+ 	enum sp_media_type media_type;
+ 	struct wx_eeprom_info eeprom;
+ 	struct wx_addr_filter_info addr_ctrl;
++	struct wx_fc_info fc;
+ 	struct wx_mac_addr *mac_table;
+ 	u16 device_id;
+ 	u16 vendor_id;
 diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-index afbdf6919071..0f87898a55b2 100644
+index 0f87898a55b2..9a89f9576180 100644
 --- a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
 +++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-@@ -44,9 +44,9 @@ static int ngbe_set_wol(struct net_device *netdev,
- static const struct ethtool_ops ngbe_ethtool_ops = {
- 	.get_drvinfo		= wx_get_drvinfo,
- 	.get_link		= ethtool_op_get_link,
--	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
--	.set_link_ksettings	= phy_ethtool_set_link_ksettings,
--	.nway_reset		= phy_ethtool_nway_reset,
-+	.get_link_ksettings	= wx_get_link_ksettings,
-+	.set_link_ksettings	= wx_set_link_ksettings,
-+	.nway_reset		= wx_nway_reset,
- 	.get_wol		= ngbe_get_wol,
- 	.set_wol		= ngbe_set_wol,
- 	.get_sset_count		= wx_get_sset_count,
+@@ -54,6 +54,8 @@ static const struct ethtool_ops ngbe_ethtool_ops = {
+ 	.get_ethtool_stats	= wx_get_ethtool_stats,
+ 	.get_eth_mac_stats	= wx_get_mac_stats,
+ 	.get_pause_stats	= wx_get_pause_stats,
++	.get_pauseparam		= wx_get_pauseparam,
++	.set_pauseparam		= wx_set_pauseparam,
+ };
+ 
+ void ngbe_set_ethtool_ops(struct net_device *netdev)
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
+index 324f8af58b97..346ee9812eb0 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
+@@ -76,6 +76,8 @@ static void ngbe_mac_link_up(struct phylink_config *config,
+ 	struct wx *wx = phylink_to_wx(config);
+ 	u32 lan_speed, reg;
+ 
++	wx_fc_enable(wx, tx_pause, rx_pause);
++
+ 	switch (speed) {
+ 	case SPEED_10:
+ 		lan_speed = 0;
 diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-index 3f336a088e43..60f351a3b89d 100644
+index 60f351a3b89d..cdaa19528248 100644
 --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
 +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-@@ -10,35 +10,12 @@
- #include "txgbe_type.h"
- #include "txgbe_ethtool.h"
- 
--static int txgbe_nway_reset(struct net_device *netdev)
--{
--	struct txgbe *txgbe = netdev_to_txgbe(netdev);
--
--	return phylink_ethtool_nway_reset(txgbe->phylink);
--}
--
--static int txgbe_get_link_ksettings(struct net_device *netdev,
--				    struct ethtool_link_ksettings *cmd)
--{
--	struct txgbe *txgbe = netdev_to_txgbe(netdev);
--
--	return phylink_ethtool_ksettings_get(txgbe->phylink, cmd);
--}
--
--static int txgbe_set_link_ksettings(struct net_device *netdev,
--				    const struct ethtool_link_ksettings *cmd)
--{
--	struct txgbe *txgbe = netdev_to_txgbe(netdev);
--
--	return phylink_ethtool_ksettings_set(txgbe->phylink, cmd);
--}
--
- static const struct ethtool_ops txgbe_ethtool_ops = {
- 	.get_drvinfo		= wx_get_drvinfo,
--	.nway_reset		= txgbe_nway_reset,
-+	.nway_reset		= wx_nway_reset,
- 	.get_link		= ethtool_op_get_link,
--	.get_link_ksettings	= txgbe_get_link_ksettings,
--	.set_link_ksettings	= txgbe_set_link_ksettings,
-+	.get_link_ksettings	= wx_get_link_ksettings,
-+	.set_link_ksettings	= wx_set_link_ksettings,
- 	.get_sset_count		= wx_get_sset_count,
- 	.get_strings		= wx_get_strings,
+@@ -21,6 +21,8 @@ static const struct ethtool_ops txgbe_ethtool_ops = {
  	.get_ethtool_stats	= wx_get_ethtool_stats,
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index 526250102db2..ffb7a182baf3 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -206,7 +206,6 @@ static int txgbe_request_irq(struct wx *wx)
- static void txgbe_up_complete(struct wx *wx)
- {
- 	struct net_device *netdev = wx->netdev;
--	struct txgbe *txgbe;
+ 	.get_eth_mac_stats	= wx_get_mac_stats,
+ 	.get_pause_stats	= wx_get_pause_stats,
++	.get_pauseparam		= wx_get_pauseparam,
++	.set_pauseparam		= wx_set_pauseparam,
+ };
  
- 	wx_control_hw(wx, true);
- 	wx_configure_vectors(wx);
-@@ -215,8 +214,7 @@ static void txgbe_up_complete(struct wx *wx)
- 	smp_mb__before_atomic();
- 	wx_napi_enable_all(wx);
- 
--	txgbe = netdev_to_txgbe(netdev);
--	phylink_start(txgbe->phylink);
-+	phylink_start(wx->phylink);
- 
- 	/* clear any pending interrupts, may auto mask */
- 	rd32(wx, WX_PX_IC(0));
-@@ -292,11 +290,9 @@ static void txgbe_disable_device(struct wx *wx)
- 
- static void txgbe_down(struct wx *wx)
- {
--	struct txgbe *txgbe = netdev_to_txgbe(wx->netdev);
--
- 	txgbe_disable_device(wx);
- 	txgbe_reset(wx);
--	phylink_stop(txgbe->phylink);
-+	phylink_stop(wx->phylink);
- 
- 	wx_clean_all_tx_rings(wx);
- 	wx_clean_all_rx_rings(wx);
+ void txgbe_set_ethtool_ops(struct net_device *netdev)
 diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-index b6c06adb8656..3c0524d19866 100644
+index 3c0524d19866..b1b5cdc04a92 100644
 --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
 +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-@@ -159,7 +159,8 @@ static int txgbe_mdio_pcs_init(struct txgbe *txgbe)
- static struct phylink_pcs *txgbe_phylink_mac_select(struct phylink_config *config,
- 						    phy_interface_t interface)
- {
--	struct txgbe *txgbe = netdev_to_txgbe(to_net_dev(config->dev));
-+	struct wx *wx = phylink_to_wx(config);
-+	struct txgbe *txgbe = wx->priv;
- 
- 	if (interface == PHY_INTERFACE_MODE_10GBASER)
- 		return &txgbe->xpcs->pcs;
-@@ -175,7 +176,7 @@ static void txgbe_mac_config(struct phylink_config *config, unsigned int mode,
- static void txgbe_mac_link_down(struct phylink_config *config,
- 				unsigned int mode, phy_interface_t interface)
- {
--	struct wx *wx = netdev_priv(to_net_dev(config->dev));
-+	struct wx *wx = phylink_to_wx(config);
- 
- 	wr32m(wx, WX_MAC_TX_CFG, WX_MAC_TX_CFG_TE, 0);
- }
-@@ -186,7 +187,7 @@ static void txgbe_mac_link_up(struct phylink_config *config,
- 			      int speed, int duplex,
- 			      bool tx_pause, bool rx_pause)
- {
--	struct wx *wx = netdev_priv(to_net_dev(config->dev));
-+	struct wx *wx = phylink_to_wx(config);
+@@ -190,6 +190,8 @@ static void txgbe_mac_link_up(struct phylink_config *config,
+ 	struct wx *wx = phylink_to_wx(config);
  	u32 txcfg, wdg;
  
++	wx_fc_enable(wx, tx_pause, rx_pause);
++
  	txcfg = rd32(wx, WX_MAC_TX_CFG);
-@@ -217,7 +218,7 @@ static void txgbe_mac_link_up(struct phylink_config *config,
- static int txgbe_mac_prepare(struct phylink_config *config, unsigned int mode,
- 			     phy_interface_t interface)
- {
--	struct wx *wx = netdev_priv(to_net_dev(config->dev));
-+	struct wx *wx = phylink_to_wx(config);
+ 	txcfg &= ~WX_MAC_TX_CFG_SPEED_MASK;
  
- 	wr32m(wx, WX_MAC_TX_CFG, WX_MAC_TX_CFG_TE, 0);
- 	wr32m(wx, WX_MAC_RX_CFG, WX_MAC_RX_CFG_RE, 0);
-@@ -228,7 +229,7 @@ static int txgbe_mac_prepare(struct phylink_config *config, unsigned int mode,
- static int txgbe_mac_finish(struct phylink_config *config, unsigned int mode,
- 			    phy_interface_t interface)
- {
--	struct wx *wx = netdev_priv(to_net_dev(config->dev));
-+	struct wx *wx = phylink_to_wx(config);
- 
- 	txgbe_enable_sec_tx_path(wx);
- 	wr32m(wx, WX_MAC_RX_CFG, WX_MAC_RX_CFG_RE, WX_MAC_RX_CFG_RE);
-@@ -253,10 +254,7 @@ static int txgbe_phylink_init(struct txgbe *txgbe)
- 	phy_interface_t phy_mode;
- 	struct phylink *phylink;
- 
--	config = devm_kzalloc(&wx->pdev->dev, sizeof(*config), GFP_KERNEL);
--	if (!config)
--		return -ENOMEM;
--
-+	config = &wx->phylink_config;
- 	config->dev = &wx->netdev->dev;
- 	config->type = PHYLINK_NETDEV;
- 	config->mac_capabilities = MAC_10000FD | MAC_1000FD | MAC_100FD |
-@@ -287,7 +285,7 @@ static int txgbe_phylink_init(struct txgbe *txgbe)
- 		}
- 	}
- 
--	txgbe->phylink = phylink;
-+	wx->phylink = phylink;
- 
- 	return 0;
- }
-@@ -483,7 +481,7 @@ static void txgbe_irq_handler(struct irq_desc *desc)
- 		    TXGBE_PX_MISC_ETH_AN)) {
- 		u32 reg = rd32(wx, TXGBE_CFG_PORT_ST);
- 
--		phylink_mac_change(txgbe->phylink, !!(reg & TXGBE_CFG_PORT_ST_LINK_UP));
-+		phylink_mac_change(wx->phylink, !!(reg & TXGBE_CFG_PORT_ST_LINK_UP));
- 	}
- 
- 	/* unmask interrupt */
-@@ -701,6 +699,7 @@ static int txgbe_ext_phy_init(struct txgbe *txgbe)
- 
- int txgbe_init_phy(struct txgbe *txgbe)
- {
-+	struct wx *wx = txgbe->wx;
- 	int ret;
- 
- 	if (txgbe->wx->media_type == sp_media_copper)
-@@ -708,43 +707,43 @@ int txgbe_init_phy(struct txgbe *txgbe)
- 
- 	ret = txgbe_swnodes_register(txgbe);
- 	if (ret) {
--		wx_err(txgbe->wx, "failed to register software nodes\n");
-+		wx_err(wx, "failed to register software nodes\n");
- 		return ret;
- 	}
- 
- 	ret = txgbe_mdio_pcs_init(txgbe);
- 	if (ret) {
--		wx_err(txgbe->wx, "failed to init mdio pcs: %d\n", ret);
-+		wx_err(wx, "failed to init mdio pcs: %d\n", ret);
- 		goto err_unregister_swnode;
- 	}
- 
- 	ret = txgbe_phylink_init(txgbe);
- 	if (ret) {
--		wx_err(txgbe->wx, "failed to init phylink\n");
-+		wx_err(wx, "failed to init phylink\n");
- 		goto err_destroy_xpcs;
- 	}
- 
- 	ret = txgbe_gpio_init(txgbe);
- 	if (ret) {
--		wx_err(txgbe->wx, "failed to init gpio\n");
-+		wx_err(wx, "failed to init gpio\n");
- 		goto err_destroy_phylink;
- 	}
- 
- 	ret = txgbe_clock_register(txgbe);
- 	if (ret) {
--		wx_err(txgbe->wx, "failed to register clock: %d\n", ret);
-+		wx_err(wx, "failed to register clock: %d\n", ret);
- 		goto err_destroy_phylink;
- 	}
- 
- 	ret = txgbe_i2c_register(txgbe);
- 	if (ret) {
--		wx_err(txgbe->wx, "failed to init i2c interface: %d\n", ret);
-+		wx_err(wx, "failed to init i2c interface: %d\n", ret);
- 		goto err_unregister_clk;
- 	}
- 
- 	ret = txgbe_sfp_register(txgbe);
- 	if (ret) {
--		wx_err(txgbe->wx, "failed to register sfp\n");
-+		wx_err(wx, "failed to register sfp\n");
- 		goto err_unregister_i2c;
- 	}
- 
-@@ -756,7 +755,7 @@ int txgbe_init_phy(struct txgbe *txgbe)
- 	clkdev_drop(txgbe->clock);
- 	clk_unregister(txgbe->clk);
- err_destroy_phylink:
--	phylink_destroy(txgbe->phylink);
-+	phylink_destroy(wx->phylink);
- err_destroy_xpcs:
- 	xpcs_destroy(txgbe->xpcs);
- err_unregister_swnode:
-@@ -768,8 +767,8 @@ int txgbe_init_phy(struct txgbe *txgbe)
- void txgbe_remove_phy(struct txgbe *txgbe)
- {
- 	if (txgbe->wx->media_type == sp_media_copper) {
--		phylink_disconnect_phy(txgbe->phylink);
--		phylink_destroy(txgbe->phylink);
-+		phylink_disconnect_phy(txgbe->wx->phylink);
-+		phylink_destroy(txgbe->wx->phylink);
- 		return;
- 	}
- 
-@@ -777,7 +776,7 @@ void txgbe_remove_phy(struct txgbe *txgbe)
- 	platform_device_unregister(txgbe->i2c_dev);
- 	clkdev_drop(txgbe->clock);
- 	clk_unregister(txgbe->clk);
--	phylink_destroy(txgbe->phylink);
-+	phylink_destroy(txgbe->wx->phylink);
- 	xpcs_destroy(txgbe->xpcs);
- 	software_node_unregister_node_group(txgbe->nodes.group);
- }
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-index 3ba9ce43f394..5494ea88df0a 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-@@ -129,13 +129,6 @@
- 
- extern char txgbe_driver_name[];
- 
--static inline struct txgbe *netdev_to_txgbe(struct net_device *netdev)
--{
--	struct wx *wx = netdev_priv(netdev);
--
--	return wx->priv;
--}
--
- #define NODE_PROP(_NAME, _PROP)			\
- 	(const struct software_node) {		\
- 		.name = _NAME,			\
-@@ -175,7 +168,6 @@ struct txgbe {
- 	struct wx *wx;
- 	struct txgbe_nodes nodes;
- 	struct dw_xpcs *xpcs;
--	struct phylink *phylink;
- 	struct platform_device *sfp_dev;
- 	struct platform_device *i2c_dev;
- 	struct clk_lookup *clock;
 -- 
 2.27.0
 
