@@ -1,120 +1,161 @@
-Return-Path: <netdev+bounces-54386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9973C806DBE
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 12:18:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C12F2806DE9
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 12:28:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5358F281BB7
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 11:18:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E316D1C20B9A
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 11:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B9831728;
-	Wed,  6 Dec 2023 11:18:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aYkklvLL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A68DD31A67;
+	Wed,  6 Dec 2023 11:28:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 545BCC3
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 03:18:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701861530;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AJncplPRljOk1kpx+WzGu84RdAxKtfrBb2w62k3mS4o=;
-	b=aYkklvLLJlFZ2i8RDJM2k3bfgx9jjxKqMkClEh6Lsj6fd/Q1OAzxjttNFdrxBZ/aKsc0oZ
-	CPIteijzp0RFNBXVakpfwEJHgNyUTHWVGronzeWkQX+eyoK8JLP34jZV47x+I5w6q3bU6A
-	a66WcMRAaDYwfIhiyWvco41bNXmy8Gc=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-639-HAyF6kp8MqGpkW90cgiVfw-1; Wed, 06 Dec 2023 06:18:48 -0500
-X-MC-Unique: HAyF6kp8MqGpkW90cgiVfw-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a1d27c45705so19745766b.0
-        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 03:18:48 -0800 (PST)
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE921C9;
+	Wed,  6 Dec 2023 03:28:38 -0800 (PST)
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2866951b6e0so4493420a91.2;
+        Wed, 06 Dec 2023 03:28:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701861527; x=1702466327;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AJncplPRljOk1kpx+WzGu84RdAxKtfrBb2w62k3mS4o=;
-        b=HuIlf/Ly3XCou9zDNBVq0XJa27BGNHf0f1O3mF7UePH8q25Q+TrmHye1Wz6j35qZ32
-         td/mawW6Scfe5R9JyZs++731VpMTxHpSh1y7nhn7dA74tr9KlvfnvRG2I8P3ScQM0aD6
-         v0DhCpvWQedmVmiWisiVUqhpAlQjb7r0Mii7ncGyESiN6i8vsAGqms7qjPyOVR+lkxhy
-         tfhV9z7lesdFG3/cMb99UH/9gkLgmh55bOTHYhof6i++xFX1ayDSlf6964/sCRltQYSz
-         tbDSIsIek+Xy1aHX1lURooJH5IPluap/+KgivmhB5z6wxhRSUZCxn0O/nB7bljsLnfb1
-         pcCA==
-X-Gm-Message-State: AOJu0YyixYl3UyK+1C9Hrfkt9k1sJwCRprRxRwxSEkRwpzZP0TzEblG7
-	xqkrDxL2m08+2gqN1wlENVBQ8iKQJgikcqnjIhI0h06kxgN2V3CvsQFW0/Y+ihbiqt5ndYBIPEE
-	PV16asHqZ5Uo56rl2
-X-Received: by 2002:a17:907:d40d:b0:9e6:c282:5bd5 with SMTP id vi13-20020a170907d40d00b009e6c2825bd5mr1127056ejc.3.1701861527669;
-        Wed, 06 Dec 2023 03:18:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG0Um7Bufb1/ZT9/Kaw3C5YP9nLXIl+1wHqoIb4g2MvErWwV8whtClxgMm14gtL9LyWcUS7SQ==
-X-Received: by 2002:a17:907:d40d:b0:9e6:c282:5bd5 with SMTP id vi13-20020a170907d40d00b009e6c2825bd5mr1127034ejc.3.1701861527285;
-        Wed, 06 Dec 2023 03:18:47 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-243-102.dyn.eolo.it. [146.241.243.102])
-        by smtp.gmail.com with ESMTPSA id hd18-20020a170907969200b00a1cbb289a7csm2037614ejc.183.2023.12.06.03.18.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 03:18:46 -0800 (PST)
-Message-ID: <ffd7a4cbefa8c4f435db5bab0f5f7f2d4e2dad73.camel@redhat.com>
-Subject: Re: [PATCH V3 net 1/2] net: hns: fix wrong head when modify the tx
- feature when sending packets
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jijie Shao <shaojijie@huawei.com>, yisen.zhuang@huawei.com, 
- salil.mehta@huawei.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org,  wojciech.drewek@intel.com
-Cc: shenjian15@huawei.com, wangjie125@huawei.com, liuyonglong@huawei.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Wed, 06 Dec 2023 12:18:45 +0100
-In-Reply-To: <20231204143232.3221542-2-shaojijie@huawei.com>
-References: <20231204143232.3221542-1-shaojijie@huawei.com>
-	 <20231204143232.3221542-2-shaojijie@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        d=1e100.net; s=20230601; t=1701862118; x=1702466918;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0S0kmFImYzeIHSyo7VpqV5Zap9umvn3x/Zbri7a4b0g=;
+        b=S+ZcXaDZtRkudeRDU3JGQ82h8uzqy9iOkCfwsj7wgUc5RmFC/I0fpecZTjYy2mUnwQ
+         MbuMIhpESW81vB1/wGlYzfs8ZVwSDnrFTs/w7tb/bnzeer0g7+f0XLUjmdn41jPOUZqx
+         8ckwEwDZ7zo1Jx0xw2e4Hikg3BF/VwbSeM1KukJkYg4cd7XBxlhRxyGtDvsWNtFNvWIb
+         Vn/2NaBQFi3OIc1wpQoNH8a4bgoKKFB5BO4+paRGKcpWcNY40Pip0VtZE7DPFM+3W5hF
+         RIVwzjoi3QydozICbYagpNZ+q0mRRqjI+M62FWi0odMzx2OOSkPMH0kYFvyKoig6hgzP
+         BlXg==
+X-Gm-Message-State: AOJu0YyhpMp4KcUJNxKNT982DRN9InzgUbSFBn/Rpl7E5Fjm0sKF/Tlu
+	PmIGNe/JBDHteltijEFW1zCSI6MO2PSiEA==
+X-Google-Smtp-Source: AGHT+IFJRKN9kEYEzXAgQhz5tCOXfmXnrkUfAqeHzyOLSzTJ7Wxo8oNcR3Nsi9GvM97os3Jl3pJXng==
+X-Received: by 2002:a17:90a:780e:b0:286:ca3e:be8c with SMTP id w14-20020a17090a780e00b00286ca3ebe8cmr718479pjk.90.1701862117992;
+        Wed, 06 Dec 2023 03:28:37 -0800 (PST)
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com. [209.85.215.178])
+        by smtp.gmail.com with ESMTPSA id 14-20020a17090a194e00b00281032f9f9csm14159353pjh.35.2023.12.06.03.28.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Dec 2023 03:28:37 -0800 (PST)
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-53fbf2c42bfso4324519a12.3;
+        Wed, 06 Dec 2023 03:28:37 -0800 (PST)
+X-Received: by 2002:a25:bec4:0:b0:db5:47ee:47c4 with SMTP id
+ k4-20020a25bec4000000b00db547ee47c4mr366154ybm.53.1701861745075; Wed, 06 Dec
+ 2023 03:22:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com> <20231120070024.4079344-14-claudiu.beznea.uj@bp.renesas.com>
+In-Reply-To: <20231120070024.4079344-14-claudiu.beznea.uj@bp.renesas.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 6 Dec 2023 12:22:13 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdXs9tKo9W31f5OybNR51a_i99Lyx=wHe0GLrADN_8KZTg@mail.gmail.com>
+Message-ID: <CAMuHMdXs9tKo9W31f5OybNR51a_i99Lyx=wHe0GLrADN_8KZTg@mail.gmail.com>
+Subject: Re: [PATCH 13/14] arm64: dts: renesas: rzg3s-smarc-som: Enable
+ Ethernet interfaces
+To: Claudiu <claudiu.beznea@tuxon.dev>
+Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, linux@armlinux.org.uk, 
+	magnus.damm@gmail.com, mturquette@baylibre.com, sboyd@kernel.org, 
+	linus.walleij@linaro.org, p.zabel@pengutronix.de, arnd@arndb.de, 
+	m.szyprowski@samsung.com, alexandre.torgue@foss.st.com, afd@ti.com, 
+	broonie@kernel.org, alexander.stein@ew.tq-group.com, 
+	eugen.hristev@collabora.com, sergei.shtylyov@gmail.com, 
+	prabhakar.mahadev-lad.rj@bp.renesas.com, biju.das.jz@bp.renesas.com, 
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2023-12-04 at 22:32 +0800, Jijie Shao wrote:
-> @@ -2159,16 +2175,9 @@ static void hns_nic_set_priv_ops(struct net_device=
- *netdev)
->  		priv->ops.maybe_stop_tx =3D hns_nic_maybe_stop_tx;
->  	} else {
->  		priv->ops.get_rxd_bnum =3D get_v2rx_desc_bnum;
-> -		if ((netdev->features & NETIF_F_TSO) ||
-> -		    (netdev->features & NETIF_F_TSO6)) {
-> -			priv->ops.fill_desc =3D fill_tso_desc;
-> -			priv->ops.maybe_stop_tx =3D hns_nic_maybe_stop_tso;
-> -			/* This chip only support 7*4096 */
-> -			netif_set_tso_max_size(netdev, 7 * 4096);
-> -		} else {
-> -			priv->ops.fill_desc =3D fill_v2_desc;
-> -			priv->ops.maybe_stop_tx =3D hns_nic_maybe_stop_tx;
-> -		}
-> +		priv->ops.fill_desc =3D fill_desc_v2;
-> +		priv->ops.maybe_stop_tx =3D hns_nic_maybe_stop_tx_v2;
-> +		netif_set_tso_max_size(netdev, 7 * 4096);
->  		/* enable tso when init
->  		 * control tso on/off through TSE bit in bd
->  		 */
+Hi Claudiu,
 
-Side note: since both 'fill_desc' and 'maybe_stop_tx' have constant
-values, for net-next you should really consider replacing the function
-pointers with direct-calls.
+Thanks for your patch!
 
-You currently have at least 2 indirect calls per wire packet, which
-hurt performances a lot in case security issues mitigations are in
-place.
+On Mon, Nov 20, 2023 at 8:03=E2=80=AFAM Claudiu <claudiu.beznea@tuxon.dev> =
+wrote:
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>
+> RZ/G3S Smarc Module has Ethernet PHYs (KSZ9131) connected to each Etherne=
+t
+> IP. For this add proper DT bindings to enable the Ethernet communication
+> though these PHYs.
+>
+> The interface b/w PHYs and MACs is RGMII. The skew settings were set to
+> zero as based on phy-mode (rgmii-id) the KSZ9131 driver enables internal
+> DLL which adds 2ns delay b/w clocks (TX/RX) and data signals.
 
-Cheers,
+So shouldn't you just use phy-mode "rgmii" instead?
 
-Paolo
+> Different pin settings were applied to TXC, TX_CTL compared with the rest
+> of the RGMII pins to comply with requirements for these pins imposed by
+> HW manual of RZ/G3S (see chapters "Ether Ch0 Voltage Mode Control
+> Register (ETH0_POC)", "Ether Ch1 Voltage Mode Control Register (ETH1_POC)=
+",
+> for power source selection, "Ether MII/RGMII Mode Control Register
+> (ETH_MODE)" for output-enable and "Input Enable Control Register (IEN_m)"
+> for input-enable configurations).
+>
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
+> --- a/arch/arm64/boot/dts/renesas/rzg3s-smarc-som.dtsi
+> +++ b/arch/arm64/boot/dts/renesas/rzg3s-smarc-som.dtsi
+> @@ -25,7 +25,10 @@ / {
+>
+>         aliases {
+>                 mmc0 =3D &sdhi0;
+> -#if !SW_SD2_EN
+> +#if SW_SD2_EN
+
+Cfr. my comment on [PATCH 11/14], this looks odd...
+
+> +               eth0 =3D &eth0;
+> +               eth1 =3D &eth1;
+> +#else
+>                 mmc2 =3D &sdhi2;
+>  #endif
+>         };
+> @@ -81,6 +84,64 @@ vcc_sdhi2: regulator2 {
+>         };
+>  };
+>
+> +#if SW_SD2_EN
+
+Likewise.
+
+> +&eth0 {
+> +       pinctrl-0 =3D <&eth0_pins>;
+> +       pinctrl-names =3D "default";
+> +       phy-handle =3D <&phy0>;
+> +       phy-mode =3D "rgmii-id";
+> +       #address-cells =3D <1>;
+> +       #size-cells =3D <0>;
+
+#{address,size}-cells should be in the SoC-specific .dtsi.
+Same for eth1.
+
+> +       status =3D "okay";
+
+The rest LGTM.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
