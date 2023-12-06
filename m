@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-54244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D8778065BD
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 04:40:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD4198065BA
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 04:39:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FF3128228D
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 03:40:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F1BA28209B
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 03:39:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60FD6D2EE;
-	Wed,  6 Dec 2023 03:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5ECD30F;
+	Wed,  6 Dec 2023 03:39:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A10BD46;
-	Tue,  5 Dec 2023 19:39:52 -0800 (PST)
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-1fae0e518a4so237817fac.0;
-        Tue, 05 Dec 2023 19:39:52 -0800 (PST)
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D619DD4D;
+	Tue,  5 Dec 2023 19:39:49 -0800 (PST)
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-58d52e0065fso233404eaf.0;
+        Tue, 05 Dec 2023 19:39:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701833991; x=1702438791;
+        d=1e100.net; s=20230601; t=1701833989; x=1702438789;
         h=date:subject:message-id:references:in-reply-to:cc:to:from
          :mime-version:content-transfer-encoding:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=eJIWxQKQmoNjd89AOA5RvXC8o59/K2/mf5I5lOAD10o=;
-        b=Xdrga9hN+lydmxzHm+b4FsZGXR2D8XOmni1fyy0NfXrzLVWFSRDKUMYo2q9J7KwlrS
-         5Xae7qDy++kRtsrDqLTNWwXuj1kZrRo4UZMgdyX5kn1OhI36cF6BcfE5QpsnhQlvt0VD
-         40QVOvPlXLm9PP7fGlsoopHY15ffKXaoct5nkz2wQhkG8h++BrjKDXZsunYJcQvCHGnv
-         phveVCwEIwMR9S4Z+09SeSwkyCBaxTpkJ7dgtkLnnx/rOv/r0+FL1LWIyzwU1JjZ+7k7
-         PZRXyyf2KONS90X3y+6FSIO9OXgi3vs/T5Lb8PwqU87ASINDUj2WjPs/58WE1L6pYteU
-         eKyg==
-X-Gm-Message-State: AOJu0YyNxshTUm2GH/5lD/MvTK1q2Ec8o7hUFOY5X5WLTOgPatw474XT
-	MMyh/DcSqTbOF2Jjj0dlYw==
-X-Google-Smtp-Source: AGHT+IHKIuDZkUJdhycFI25RBd55iQTufoFG0amrVDo68Zz7yH3kYl4TC99m4aOnfpMln9254UTV5w==
-X-Received: by 2002:a05:6871:4087:b0:1fb:75a:678c with SMTP id kz7-20020a056871408700b001fb075a678cmr145094oab.51.1701833991728;
-        Tue, 05 Dec 2023 19:39:51 -0800 (PST)
+        bh=2Cp6B76RfEovozKgFZOSkZEc0z4IdQhSv0EPMVtgG3c=;
+        b=VL29NtxPH7uxZiBjVslU/xBn9dt4nYOwFagKUHrntyzOB9AcYeiB+Owrk+WQncm8cB
+         jI6xdsKjRQx5AfezksUpsWw7N6IDIWe9UyTMJ9/mRwybDB8Ft1a21hGjGRfo4NMbIfPK
+         Ftdeh19Ld5w9YWB83fVtn9pzX7A6LbO1d13S1QfT9qXR/vpUIwjnAqMLT8qJ3UsbM9Rm
+         2BDzqxnJfyiuozJBzWvi6Q+0fD+yyoYLNBLpudsFqjoCzQdGWTK7CQLePN0dec6HZ2XL
+         KUQg13yBV7zjE2J5/YoNimljF3Ww6DZO4HhVvzVtM4Ssze0if1Dbg74YNx1L5fqn/y3X
+         Ksww==
+X-Gm-Message-State: AOJu0YyogHbiLYu9HOH5shoHHi6X9oPl4lvAgq3eojYiMbeBCI1yDaqs
+	MLNNYe6Mh6fQV/HjXrA3og==
+X-Google-Smtp-Source: AGHT+IGHF5dD63okkY1uvYpYaFlmCqd+PhAofHIUKjCT14hyHnztdFSRU2uuzJg0QPWdJ+poKIuuKw==
+X-Received: by 2002:a05:6820:2c08:b0:58e:1ca4:cb7d with SMTP id dw8-20020a0568202c0800b0058e1ca4cb7dmr992708oob.9.1701833988882;
+        Tue, 05 Dec 2023 19:39:48 -0800 (PST)
 Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id on7-20020a0568715a0700b001fb42001fa7sm1462872oac.36.2023.12.05.19.39.49
+        by smtp.gmail.com with ESMTPSA id br6-20020a0568201a4600b0058a0d3fb333sm2492975oob.37.2023.12.05.19.39.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 19:39:50 -0800 (PST)
-Received: (nullmailer pid 463139 invoked by uid 1000);
+        Tue, 05 Dec 2023 19:39:48 -0800 (PST)
+Received: (nullmailer pid 463143 invoked by uid 1000);
 	Wed, 06 Dec 2023 03:39:36 -0000
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 8bit
@@ -51,49 +51,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: Rob Herring <robh@kernel.org>
 To: Daniel Golle <daniel@makrotopia.org>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Felix Fietkau <nbd@nbd.name>, 
-	Eric Dumazet <edumazet@google.com>, Sean Wang <sean.wang@mediatek.com>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, Conor Dooley <conor+dt@kernel.org>, 
-	Russell King <linux@armlinux.org.uk>, Vinod Koul <vkoul@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, linux-phy@lists.infradead.org, 
-	Rob Herring <robh+dt@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Qingfang Deng <dqfext@gmail.com>, linux-kernel@vger.kernel.org, 
-	linux-mediatek@lists.infradead.org, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Chunfeng Yun <chunfeng.yun@mediatek.com>, Jakub Kicinski <kuba@kernel.org>, 
-	John Crispin <john@phrozen.org>, linux-arm-kernel@lists.infradead.org, 
-	Mark Lee <Mark-MC.Lee@mediatek.com>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, 
-	SkyLake Huang <SkyLake.Huang@mediatek.com>, Kishon Vijay Abraham I <kishon@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Alexander Couzens <lynxis@fe80.eu>
-In-Reply-To: <3cd8af5e44554c2db2d7898494ee813967206bd9.1701826319.git.daniel@makrotopia.org>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Conor Dooley <conor+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Vinod Koul <vkoul@kernel.org>, 
+	linux-kernel@vger.kernel.org, Kishon Vijay Abraham I <kishon@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Rob Herring <robh+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Jakub Kicinski <kuba@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	Eric Dumazet <edumazet@google.com>, Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Russell King <linux@armlinux.org.uk>, 
+	Chunfeng Yun <chunfeng.yun@mediatek.com>, linux-mediatek@lists.infradead.org, 
+	SkyLake Huang <SkyLake.Huang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-phy@lists.infradead.org, 
+	Sean Wang <sean.wang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Alexander Couzens <lynxis@fe80.eu>, Qingfang Deng <dqfext@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
+	devicetree@vger.kernel.org, John Crispin <john@phrozen.org>
+In-Reply-To: <567c6aaa64ecb4872056bc0105c70153fd9d9b50.1701826319.git.daniel@makrotopia.org>
 References: <cover.1701826319.git.daniel@makrotopia.org>
- <3cd8af5e44554c2db2d7898494ee813967206bd9.1701826319.git.daniel@makrotopia.org>
-Message-Id: <170183397446.463049.17564721561503446292.robh@kernel.org>
-Subject: Re: [RFC PATCH v2 5/8] net: pcs: add driver for MediaTek USXGMII
- PCS
+ <567c6aaa64ecb4872056bc0105c70153fd9d9b50.1701826319.git.daniel@makrotopia.org>
+Message-Id: <170183397601.463117.12810951410156171210.robh@kernel.org>
+Subject: Re: [RFC PATCH v2 7/8] dt-bindings: net: mediatek,net: fix and
+ complete mt7988-eth binding
 Date: Tue, 05 Dec 2023 21:39:36 -0600
 
 
-On Wed, 06 Dec 2023 01:44:38 +0000, Daniel Golle wrote:
-> Add driver for USXGMII PCS found in the MediaTek MT7988 SoC and supporting
-> USXGMII, 10GBase-R and 5GBase-R interface modes. In order to support
-> Cisco SGMII, 1000Base-X and 2500Base-X via the also present LynxI PCS
-> create a wrapped PCS taking care of the components shared between the
-> new USXGMII PCS and the legacy LynxI PCS.
+On Wed, 06 Dec 2023 01:45:02 +0000, Daniel Golle wrote:
+> Complete support for MT7988 which comes with 3 MACs, SRAM for DMA
+> descriptors and uses a dedicated PCS for the SerDes units.
 > 
+> Fixes: c94a9aabec36 ("dt-bindings: net: mediatek,net: add mt7988-eth binding")
 > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 > ---
->  .../bindings/net/pcs/mediatek,usxgmii.yaml    |  46 +-
->  MAINTAINERS                                   |   2 +
->  drivers/net/pcs/Kconfig                       |  11 +
->  drivers/net/pcs/Makefile                      |   1 +
->  drivers/net/pcs/pcs-mtk-usxgmii.c             | 413 ++++++++++++++++++
->  include/linux/pcs/pcs-mtk-usxgmii.h           |  26 ++
->  6 files changed, 456 insertions(+), 43 deletions(-)
->  create mode 100644 drivers/net/pcs/pcs-mtk-usxgmii.c
->  create mode 100644 include/linux/pcs/pcs-mtk-usxgmii.h
+>  .../devicetree/bindings/net/mediatek,net.yaml | 148 +++++++++++++++++-
+>  1 file changed, 146 insertions(+), 2 deletions(-)
 > 
 
 My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
@@ -102,11 +91,13 @@ on your patch (DT_CHECKER_FLAGS is new in v5.13):
 yamllint warnings/errors:
 
 dtschema/dtc warnings/errors:
-
+Documentation/devicetree/bindings/net/mediatek,net.example.dts:231:18: fatal error: dt-bindings/clock/mediatek,mt7988-clk.h: No such file or directory
+  231 |         #include <dt-bindings/clock/mediatek,mt7988-clk.h>
+make[2]: *** [scripts/Makefile.lib:419: Documentation/devicetree/bindings/net/mediatek,net.example.dtb] Error 1
 
 doc reference errors (make refcheckdocs):
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/3cd8af5e44554c2db2d7898494ee813967206bd9.1701826319.git.daniel@makrotopia.org
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/567c6aaa64ecb4872056bc0105c70153fd9d9b50.1701826319.git.daniel@makrotopia.org
 
 The base for the series is generally the latest rc1. A different dependency
 should be noted in *this* patch.
