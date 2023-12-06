@@ -1,138 +1,135 @@
-Return-Path: <netdev+bounces-54672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1F8B807C95
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 00:55:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86FBE807C9D
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 01:00:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA6731C20BC8
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 23:55:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 086F71F2112A
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 00:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FCE6328C2;
-	Wed,  6 Dec 2023 23:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4896D328C7;
+	Thu,  7 Dec 2023 00:00:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="frfMqTYe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dbGBai1F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4958919E
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 15:55:48 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-289d988a947so26681a91.0
-        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 15:55:48 -0800 (PST)
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C209AD53;
+	Wed,  6 Dec 2023 16:00:16 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-40c2718a768so3801945e9.0;
+        Wed, 06 Dec 2023 16:00:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1701906948; x=1702511748; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8ioixfZXRdrOh6hBuj+IGCCPeUDF31MruhCzIBSvtPg=;
-        b=frfMqTYeAmfyN/QMFsODwFNBXyJEXuHZK7/GuWqV85l7wZik6Do5E6yGl+1GpypHXP
-         VXxL60URir4iMZdc55ZnCAnYzuBTTpDd88gA9qRLsBZYc5nlgZKVCnzx9NbU1xcALwCz
-         yhS2NxMx8i6aSugxd3y5oXGL8lmJ/3gVfWGEiOugG7eIgu0ntQY02w1FWPoDdPu2PqZE
-         4tIoneqXlVy+fXHu9TQDelfA6C4KVDwqjQGhZH28V5c5/jf/8EIcIKfuBWZijJaKNOkh
-         C2vFHRcd7DLoomzlAMLZ7DzkBU9xnu61FdON+HIZdfLMdLutJRlT6cBdRMVBlQ8Ib/Lr
-         /LwA==
+        d=gmail.com; s=20230601; t=1701907215; x=1702512015; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Tye+lFKaTYqQMgsTDUf39Nbyo3cJQMb67chfUAmRTkk=;
+        b=dbGBai1FcnchEliUCVgqnUcDbhL83cfGlpydbbbD4Hat3UlDIeQ52tYFjXo6QdqIcQ
+         ArQy2RrzjkdvN9JBw1AVaWCT7Sl1E0oVH7jHY99TQvST/8k7dihwqcVXdfLyhXsy+a5q
+         jXOZIAePG3JfYqLGRHnsRKV+np3xQsAPT/bBdTmeUTdLqEMI9MfeAyDbSWps4t/E6VTO
+         zPXvNiV1dnBYRIvA+f3Rs6A9sS7+HoG80Ju/d3i6DVzz9CFV2IqcpBc5nB6fB/yGjD0k
+         10MqDVWMc4Ts0C5bEqo9/MhmHNXzP5nu77Qrgxf50tDwni3MJk7eZHqoyGXpt4N2PQ6O
+         thKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701906948; x=1702511748;
-        h=mime-version:references:in-reply-to:message-id:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8ioixfZXRdrOh6hBuj+IGCCPeUDF31MruhCzIBSvtPg=;
-        b=K0aagV8FTaHYZG1kZvlYTycWCRxi0mBE0ktx70nofjOhkSS7ALxLXpuEfuKFBtLtDK
-         0EPnw7VGGGTpj4HDzXv1aQJ3ZDaVLw0A0sJAzcP4pL386hSCzKKN1A/GuC4u0ZjRjxVo
-         6xN9p1giRPUMujXO4L82O5JxvwSD/hvW7QWWKamAiDglO4EkR21hbcWENmpy57Qw9X91
-         hE8cXrVWRZ+sq2DHHRwkuzTnBY4ZVKRh63NENzPMEq4DMji8wIRCJwchfxsPbrWrh7GI
-         NxM/RLxZla6DV2ET+S0Qu0solqCGPp6yNKt93jJyvxa7j0WmkwEvGz/xx5FjKe8Bgk4p
-         ziPA==
-X-Gm-Message-State: AOJu0Yx0V9kO9LZsMwNuPXP/Ckz+s5MwM0CsppmbnCRTYAYMCPHSUS1G
-	P+C+yippK1zt/tTAD1eecCzhwQ==
-X-Google-Smtp-Source: AGHT+IH4RBfMuZUIQDGUHTBkbgy1nx2Dp65ER39CnQABXNDh/8+Z4plHxRfGRvtVG/0D876wBT2R1g==
-X-Received: by 2002:a17:90b:3b44:b0:286:815b:8c75 with SMTP id ot4-20020a17090b3b4400b00286815b8c75mr1449165pjb.16.1701906947681;
-        Wed, 06 Dec 2023 15:55:47 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id cx14-20020a17090afd8e00b00286c1303cdasm7303pjb.45.2023.12.06.15.55.46
+        d=1e100.net; s=20230601; t=1701907215; x=1702512015;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Tye+lFKaTYqQMgsTDUf39Nbyo3cJQMb67chfUAmRTkk=;
+        b=A9YkNwochvtf4hJN/3wdRP6r5sZeKkP7d51YU1gvA1qWZ2XHL/lFFmmchWeqB31GgM
+         3eka1d3k7+kulNU3qTlRDNNlIBgIr3JIWoVHNEzMvIxm2pO7CYl5+w0cJCK2rNwrpp5s
+         feooPtk0z3lqqn7SfZdrwPyazG4maVyntmW3sWk2sKsb8yBGCLlLdEp0L+R4CN9ayW2U
+         K39rGzZCG5C6HCfRnIKAXZECnU79VNkXuklbXwyU5mZQkJdLD4u2fqW3lMbn54/Wg65i
+         bZbi+H36uDd6UC67p9lDqQHd2prxlo/ipIYpwohRo1a5Eikw3UO/WEZAdHGeszbFTGUI
+         xXeg==
+X-Gm-Message-State: AOJu0YzbJaaN2+74ETZIGnlm/4SsaFkqcP/Ne9eOiOQBLJfDBxp+wWG/
+	v/ByzHdYSkqzdGkaRrtlSOw=
+X-Google-Smtp-Source: AGHT+IGAh+wEwM51M1WboBecv6WFQ6J5V0N+9FsTAo0xRj6R/S+BGEPKz5X6BQsR0Dm/4rD64Z7hkA==
+X-Received: by 2002:a1c:7501:0:b0:40c:9fa:592f with SMTP id o1-20020a1c7501000000b0040c09fa592fmr913835wmc.104.1701907214820;
+        Wed, 06 Dec 2023 16:00:14 -0800 (PST)
+Received: from localhost.localdomain (host-79-26-252-6.retail.telecomitalia.it. [79.26.252.6])
+        by smtp.googlemail.com with ESMTPSA id je16-20020a05600c1f9000b00405442edc69sm50280wmb.14.2023.12.06.16.00.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 15:55:47 -0800 (PST)
-Date: Wed, 6 Dec 2023 15:55:45 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Michal =?UTF-8?B?S291dG7DvQ==?= <mkoutny@suse.com>
-Cc: Pedro Tammela <pctammela@mojatatu.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- cake@lists.bufferbloat.net, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
- <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
- <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
- Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Toke =?UTF-8?B?SMO4?=
- =?UTF-8?B?aWxhbmQtSsO4cmdlbnNlbg==?= <toke@toke.dk>, Vinicius Costa Gomes
- <vinicius.gomes@intel.com>, Petr Pavlu <ppavlu@suse.cz>, Michal Kubecek
- <mkubecek@suse.cz>, Martin Wilck <mwilck@suse.com>
-Subject: Re: [PATCH 0/3] net/sched: Load modules via alias
-Message-ID: <20231206155545.3ca3b2f6@hermes.local>
-In-Reply-To: <53ohvb547tegxv2vuvurhuwqunamfiy22sonog7gll54h3czht@3dnijc44xilq>
-References: <20231206192752.18989-1-mkoutny@suse.com>
-	<7789659d-b3c5-4eef-af86-540f970102a4@mojatatu.com>
-	<vk6uhf4r2turfxt2aokp66x5exzo5winal55253czkl2pmkkuu@77bhdfwfk5y3>
-	<20231206142857.38403344@hermes.local>
-	<53ohvb547tegxv2vuvurhuwqunamfiy22sonog7gll54h3czht@3dnijc44xilq>
+        Wed, 06 Dec 2023 16:00:14 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Christian Marangi <ansuelsmth@gmail.com>
+Subject: [net-next PATCH v3 00/13] net: phy: at803x: cleanup
+Date: Thu,  7 Dec 2023 00:57:15 +0100
+Message-Id: <20231206235728.6985-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/alJaYiBnMbJbkGX8ASSTb5n";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
 
---Sig_/alJaYiBnMbJbkGX8ASSTb5n
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+The intention of this big series is to try to cleanup the big
+at803x PHY driver.
 
-On Wed, 6 Dec 2023 23:49:14 +0100
-Michal Koutn=C3=BD <mkoutny@suse.com> wrote:
+It currently have 3 different family of PHY in it. at803x, qca83xx
+and qca808x.
 
-> On Wed, Dec 06, 2023 at 02:28:57PM -0800, Stephen Hemminger <stephen@netw=
-orkplumber.org> wrote:
-> > It is not clear to me what this patchset is trying to fix.
-> > Autoloading happens now, but it does depend on the name not alias. =20
->=20
-> There are some more details in the thread of v1 [1] [2].
-> Does it clarify?
->=20
-> Thanks,
-> Michal
->=20
-> [1] https://lore.kernel.org/r/yerqczxbz6qlrslkfbu6u2emb5esqe7tkrexdbneite=
-2ah2a6i@l6arp7nzyj75/
-> [2] Oh, I realize I forgot to add v2 to today's posting.
->=20
->=20
+The current codebase required lots of cleanup and reworking to
+make the split possible as currently there is a greater use of
+adding special function matching the phy_id.
 
-So your using blacklist as workaround security method and the name confuses=
- it now.
+This has been reworked to make the function actually generic
+and make the change only in more specific one. The result
+is the addition of micro additional function but that is for good
+as it massively simplify splitting the driver later.
 
---Sig_/alJaYiBnMbJbkGX8ASSTb5n
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Consider that this is all in preparation for the addition of
+qca807x PHY driver that will also uso some of the functions of
+at803x.
 
------BEGIN PGP SIGNATURE-----
+Subsequent series will come with the actual PHY split and other
+required cleanup. This is only to start the process with minor
+changes.
 
-iQIzBAEBCAAdFiEEn2/DRbBb5+dmuDyPgKd/YJXN5H4FAmVxCgEACgkQgKd/YJXN
-5H4msQ//bQpRE8MaxhEFPjgk6hhxd+8VBX3AF8SYclV67kaBLPnORN58blvGFVpR
-jt+gbHGMyENxE3KXzowiyHcYayDrBJz3IswSKiFZgGTFiUZegH6/mwpfEZ77qd9R
-II5Lqwc65AJWOlLvCXICUhvdCrAbyoIV+Draa6QZAz3hYILjXfVgDbIi1O7WI0S5
-EcoyKP49Z3+TvakdNmgIV/XPkPQrbM6ipoeeYT1VUBhp2crFa68ISSjkjIlqDIhw
-324Px5bmpOWrQfHUjBZnWyPUZpseRfKMhnd1czTRa/mRIFsZRr77O8/2XFp7IdLN
-AMM1SuvfWj5jv8MSlR58Jf0/Us30X0ng4xAYIMx9ySFTqFK0sHN/84bgBermd/q6
-ZGGTQR6jeMJw9phnLF7DUfZRlgs8QnqJ6KoddTyI7mF7yMbVpTvyT5EdWxEf5duY
-IQf8b/ULKjsUankcEKQVM0hseAMEj0VTstA8bYiOpsrXPJGNenvOlp90E3hl/pBv
-pM2Em+CpsJBabfXfwDqV9TcgpA8oCHgcuI+oDjJhY5PjIWT7+obMQSDpILntdAIM
-UU28U81t1gl33s8XKcpNDGW9KUJv6j0/CUPX91FkWArt6DgF8zvbMGkICgndTHJT
-6tBF/6G1G0mCvpdRPm133mx8j0SAA6dnJJvKM5fUjPikplpDoQo=
-=Lgtk
------END PGP SIGNATURE-----
+Changes v3:
+- Add Reviewed-by tag from Andrew
+- Split patch 10 (at8031 rename) to rename and move
+Changes v2:
+- Drop split part due to series too big
+- Split changes even more
+- Fix problem pointed out by Russell (flawed reworked function logic)
+- Add Reviewed-by tag from Andrew
+- Minor rework to prevent further code duplication for cdt
 
---Sig_/alJaYiBnMbJbkGX8ASSTb5n--
+Christian Marangi (13):
+  net: phy: at803x: fix passing the wrong reference for config_intr
+  net: phy: at803x: move disable WOL to specific at8031 probe
+  net: phy: at803x: raname hw_stats functions to qca83xx specific name
+  net: phy: at803x: move qca83xx specific check in dedicated functions
+  net: phy: at803x: move specific DT option for at8031 to specific probe
+  net: phy: at803x: move specific at8031 probe mode check to dedicated
+    probe
+  net: phy: at803x: move specific at8031 config_init to dedicated
+    function
+  net: phy: at803x: move specific at8031 WOL bits to dedicated function
+  net: phy: at803x: move specific at8031 config_intr to dedicated
+    function
+  net: phy: at803x: make at8031 related DT functions name more specific
+  net: phy: at803x: move at8031 functions in dedicated section
+  net: phy: at803x: move at8035 specific DT parse to dedicated probe
+  net: phy: at803x: drop specific PHY ID check from cable test functions
+
+ drivers/net/phy/at803x.c | 777 +++++++++++++++++++++------------------
+ 1 file changed, 428 insertions(+), 349 deletions(-)
+
+-- 
+2.40.1
+
 
