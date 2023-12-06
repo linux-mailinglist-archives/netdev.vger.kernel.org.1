@@ -1,142 +1,96 @@
-Return-Path: <netdev+bounces-54504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BFB5807573
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:42:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F071807580
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:43:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD0A91F21626
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 16:42:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1F7A282001
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 16:42:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 802E130348;
-	Wed,  6 Dec 2023 16:42:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HvwHU/3w"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E103EA68;
+	Wed,  6 Dec 2023 16:42:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77510D4F
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 08:41:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701880916;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:  content-type:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=BRBYbA6A9iVFJVJw2yLnCuRWTbq0bYeGysrV9jksr78=;
-	b=HvwHU/3wBwdD8oPXKZ2+jR1CI5hSr+MJuSguM9HX7nXpd2cZH6S2D6PxOwqo4tYJcuM7NP
-	0/zD+/vmoqPpqJzujAOcdKB9OxHQKxiPDm+TxqH/+FxVOlgkvUpWJEeV8U3Y/X9YNhpNYI
-	bjFrf39TuMgC85HBIA1fszBxXyXxFC0=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-264-FyV7u_otNz-G6OAE9XY7Qg-1; Wed, 06 Dec 2023 11:41:55 -0500
-X-MC-Unique: FyV7u_otNz-G6OAE9XY7Qg-1
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4239047911bso10994601cf.3
-        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 08:41:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701880914; x=1702485714;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BRBYbA6A9iVFJVJw2yLnCuRWTbq0bYeGysrV9jksr78=;
-        b=qVm6no0uQNtLpnF6/xUUZ3iq71r5XeQnqVEVwDYUV5+dwBw6uiZF99ZAHe1+xnfHEO
-         aKjLmXvtZImQLDLflnrwSQs4pe7EuUu3FqP9ZldQWXqTFgF3kvNAm7dEKnumTTH+azRn
-         Dv7yz0Ar4eiytp3CRX6PwTb1Jy65QNFyt2srGuHMpxLYjnMPb2k5uIgef6Z40YcIjCr8
-         +/j8vvXs2nOdnterDbgkFgBQsSF6bkNsSuxPiRNElUzr3DQJ9rFj2tl4uSB9rTJFqgNe
-         hhiXyZ0TMMjUqT+iWlU8FczEj45iPnoOZ9ro9f44YP/xIxF+x8Xd2Zw1JnQwy/S8tusS
-         p0BQ==
-X-Gm-Message-State: AOJu0Yy1rH7ODtaZEEbz9SvynDFYHM1YlfQXFr7sqzfhA9yFafHKkSDP
-	c5bXwdd1PqKboQ8QP0mi8L3M+uQmwfM+DtPj7RtLKf3b7QtCwFo80Vdnvb2FlqClcIXPSj2zm+O
-	GizTCtUm0q/vodLbpxLW4joWggXU5ItnvW4s2vbYAsexuYv1B+AiwCdqhZ6bLCZnrCCqScL/4So
-	tH
-X-Received: by 2002:ac8:5b95:0:b0:425:4043:2a05 with SMTP id a21-20020ac85b95000000b0042540432a05mr1420278qta.128.1701880914675;
-        Wed, 06 Dec 2023 08:41:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFaJIB6NOvZQTIiVkkPSR38mjWBsiSx+xgzPD2epv6qC/zaKWzLLIvu6i12qCTPMRBfNOkUNA==
-X-Received: by 2002:ac8:5b95:0:b0:425:4043:2a05 with SMTP id a21-20020ac85b95000000b0042540432a05mr1420258qta.128.1701880914272;
-        Wed, 06 Dec 2023 08:41:54 -0800 (PST)
-Received: from step1.redhat.com (host-79-46-200-125.retail.telecomitalia.it. [79.46.200.125])
-        by smtp.gmail.com with ESMTPSA id e25-20020ac86719000000b00423e8021da2sm78802qtp.42.2023.12.06.08.41.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 08:41:53 -0800 (PST)
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [IPv6:2001:780:45:1d:225:90ff:fe52:c662])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09F0AD51;
+	Wed,  6 Dec 2023 08:42:48 -0800 (PST)
+Received: from [78.30.43.141] (port=54118 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1rAuyx-003xzA-MK; Wed, 06 Dec 2023 17:42:46 +0100
+Date: Wed, 6 Dec 2023 17:42:42 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Phil Sutter <phil@nwl.cc>, Jann Horn <jannh@google.com>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	netfilter-devel <netfilter-devel@vger.kernel.org>,
+	coreteam@netfilter.org, Christian Brauner <brauner@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	virtualization@lists.linux.dev,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Arseniy Krasnov <avkrasnov@salutedevices.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Stefan Hajnoczi <stefanha@redhat.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net] vsock/virtio: fix "comparison of distinct pointer types lacks a cast" warning
-Date: Wed,  6 Dec 2023 17:41:43 +0100
-Message-ID: <20231206164143.281107-1-sgarzare@redhat.com>
-X-Mailer: git-send-email 2.43.0
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Network Development <netdev@vger.kernel.org>,
+	kernel list <linux-kernel@vger.kernel.org>
+Subject: Re: Is xt_owner's owner_mt() racy with sock_orphan()? [worse with
+ new TYPESAFE_BY_RCU file lifetime?]
+Message-ID: <ZXCkgoVQCn6bMoKT@calendula>
+References: <CAG48ez0TfTAkaRWFCTb44x=TWP_sDZVx-5U2hvfQSFOhghNrCA@mail.gmail.com>
+ <CAG48ez1hXk_cffp3dy-bYMcoyCCj-EySYR5SzYrNiRHGD=hOUg@mail.gmail.com>
+ <ZW+Yv6TR+EMBp03f@orbyte.nwl.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZW+Yv6TR+EMBp03f@orbyte.nwl.cc>
+X-Spam-Score: -1.9 (-)
 
-After backporting commit 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY
-flag support") in CentOS Stream 9, CI reported the following error:
+On Tue, Dec 05, 2023 at 10:40:15PM +0100, Phil Sutter wrote:
+> Hi,
+> 
+> On Tue, Dec 05, 2023 at 06:08:29PM +0100, Jann Horn wrote:
+> > On Tue, Dec 5, 2023 at 5:40 PM Jann Horn <jannh@google.com> wrote:
+> > >
+> > > Hi!
+> > >
+> > > I think this code is racy, but testing that seems like a pain...
+> > >
+> > > owner_mt() in xt_owner runs in context of a NF_INET_LOCAL_OUT or
+> > > NF_INET_POST_ROUTING hook. It first checks that sk->sk_socket is
+> > > non-NULL, then checks that sk->sk_socket->file is non-NULL, then
+> > > accesses the ->f_cred of that file.
+> > >
+> > > I don't see anything that protects this against a concurrent
+> > > sock_orphan(), which NULLs out the sk->sk_socket pointer, if we're in
+> > 
+> > Ah, and all the other users of ->sk_socket in net/netfilter/ do it
+> > under the sk_callback_lock... so I guess the fix would be to add the
+> > same in owner_mt?
+> 
+> Sounds reasonable, although I wonder how likely a socket is to
+> orphan while netfilter is processing a packet it just sent.
+> 
+> How about the attached patch? Not sure what hash to put into a Fixes:
+> tag given this is a day 1 bug and ipt_owner/ip6t_owner predate git.
+> 
+> Thanks, Phil
 
-    In file included from ./include/linux/kernel.h:17,
-                     from ./include/linux/list.h:9,
-                     from ./include/linux/preempt.h:11,
-                     from ./include/linux/spinlock.h:56,
-                     from net/vmw_vsock/virtio_transport_common.c:9:
-    net/vmw_vsock/virtio_transport_common.c: In function ‘virtio_transport_can_zcopy‘:
-    ./include/linux/minmax.h:20:35: error: comparison of distinct pointer types lacks a cast [-Werror]
-       20 |         (!!(sizeof((typeof(x) *)1 == (typeof(y) *)1)))
-          |                                   ^~
-    ./include/linux/minmax.h:26:18: note: in expansion of macro ‘__typecheck‘
-       26 |                 (__typecheck(x, y) && __no_side_effects(x, y))
-          |                  ^~~~~~~~~~~
-    ./include/linux/minmax.h:36:31: note: in expansion of macro ‘__safe_cmp‘
-       36 |         __builtin_choose_expr(__safe_cmp(x, y), \
-          |                               ^~~~~~~~~~
-    ./include/linux/minmax.h:45:25: note: in expansion of macro ‘__careful_cmp‘
-       45 | #define min(x, y)       __careful_cmp(x, y, <)
-          |                         ^~~~~~~~~~~~~
-    net/vmw_vsock/virtio_transport_common.c:63:37: note: in expansion of macro ‘min‘
-       63 |                 int pages_to_send = min(pages_in_iov, MAX_SKB_FRAGS);
+> From 3e28490e43b04d49e6e7f145a70fff7dd42c8cc5 Mon Sep 17 00:00:00 2001
+> From: Phil Sutter <phil@nwl.cc>
+> Date: Tue, 5 Dec 2023 21:58:12 +0100
+> Subject: [nf PATCH] netfilter: xt_owner: Fix for unsafe access of sk->sk_socket
+> 
+> A concurrently running sock_orphan() may NULL the sk_socket pointer in
+> between check and deref. Follow other users (like nft_meta.c for
+> instance) and acquire sk_callback_lock before dereferencing sk_socket.
 
-We could solve it by using min_t(), but this operation seems entirely
-unnecessary, because we also pass MAX_SKB_FRAGS to iov_iter_npages(),
-which performs almost the same check, returning at most MAX_SKB_FRAGS
-elements. So, let's eliminate this unnecessary comparison.
+For the record, I have placed this patch in nf.git
 
-Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
-Cc: avkrasnov@salutedevices.com
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- net/vmw_vsock/virtio_transport_common.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index f6dc896bf44c..c8e162c9d1df 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -59,8 +59,7 @@ static bool virtio_transport_can_zcopy(const struct virtio_transport *t_ops,
- 	t_ops = virtio_transport_get_ops(info->vsk);
- 
- 	if (t_ops->can_msgzerocopy) {
--		int pages_in_iov = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
--		int pages_to_send = min(pages_in_iov, MAX_SKB_FRAGS);
-+		int pages_to_send = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
- 
- 		/* +1 is for packet header. */
- 		return t_ops->can_msgzerocopy(pages_to_send + 1);
--- 
-2.43.0
-
+Thanks.
 
