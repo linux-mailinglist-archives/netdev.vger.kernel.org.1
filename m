@@ -1,129 +1,118 @@
-Return-Path: <netdev+bounces-54366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C16ED806CAB
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 11:53:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EDFF806CB5
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 11:54:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D9491F2156E
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:53:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF71E1C20937
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 10:54:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8AB530331;
-	Wed,  6 Dec 2023 10:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA64230344;
+	Wed,  6 Dec 2023 10:54:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="O40FOdX0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZZUj/A3/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F259898
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 02:52:56 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1d0c93b1173so10876415ad.2
-        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 02:52:56 -0800 (PST)
+Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D924D9C
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 02:54:33 -0800 (PST)
+Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-1f060e059a3so3730571fac.1
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 02:54:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=theori.io; s=google; t=1701859976; x=1702464776; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ndrwArs8BHo8pksNnEzWW3TY5l3AocyhYh91ziw2ze0=;
-        b=O40FOdX0PoqzQbdvswfe+d1hmTB4w5mMtlSDN1FHPb6staAWCamh2xgbhItoYx80WF
-         zfIPQ8ITK+RZuYAN66YsNH9GqgxUHBu8Dy9sNEruT1n9Ckre0/WSvfg/Oi9L0QuZer/k
-         amMcL1YjPjhT+MaC8auqWi+bNZ0gdoZW4cH7o=
+        d=gmail.com; s=20230601; t=1701860072; x=1702464872; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2qSQoXhaZIkSox5U4y8/LH5pk6N5f+xtot1Ew+ZDWQM=;
+        b=ZZUj/A3/dqwixetG/U67Z++J1pXa8ugYXPoROHyUZoW07vjWpLTSi3N5TkDvVIFBN3
+         MZaNeOfdTVOejfinR/RzgrhsfNUx8vbYYo7T2Um1KYn8x3BRA+dd42Px6Ow4LkmZLVQH
+         dGpYZx6UyYXILyG2AukZVYXcfMruskVIJkF6F2QljALiJhkbU9QEnyEGlpc1hhZZaR34
+         qv0jibCE4Wv22y+H0stawFNiAsHSNjuZ8QIvTQq/BFNkOjEvrnczZX30m0EMXOmC8baa
+         4fR7nfnw90m3JoTEPh4lqhpwmYHsK2bgyXbi9cFybG6794+fp2M9gnQbb+svB6yPRzm/
+         Pxsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701859976; x=1702464776;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ndrwArs8BHo8pksNnEzWW3TY5l3AocyhYh91ziw2ze0=;
-        b=S+9kZGzwXi+eb4bVQnVNQ/OViFeegyXEmn1nL1gIdqEHbPAB+AOgaaa2y9x/W9BMaq
-         iBPqWettR7lHcF5tMhp2wOWd1Q26hbJHnCBOVYBU3MAArFdRk+qkfZZsqWEnnr7pfONK
-         dEolZFEKOLge+ZVsglUoBxU2ZGHBTL0IodvgTgY3vyRuRIUuTXhW6VrbqXQ2yT81PvM8
-         SD7fzodTYA5QeqOnxxQs9Aqtm0042voSBidUE7/n4uV7P8jnJUWyQQIcUY+gzU5PGLx8
-         TlbpxbqJCFR//ChMZqPtTau7iLiU/pU6UCW+YYGWZvm47Zb3F/MKokW9zI+UIvOknSd7
-         lseA==
-X-Gm-Message-State: AOJu0YwDBg8OVaeBDfVfKcPpPODku94itdvdKhfYJatg/HBUPgo6dWF8
-	XI1ZQdU/U8Lca3pF7k/fXlamWwdplG9EyLEbD/s=
-X-Google-Smtp-Source: AGHT+IHtIqYOh4gBdtnYlkJhpMem0iNAPeNF7Z7OT0ZleUKPPQV/bm2kmvG4doInosNedFaRAtmSgA==
-X-Received: by 2002:a17:903:2343:b0:1d0:6ffd:f20a with SMTP id c3-20020a170903234300b001d06ffdf20amr454445plh.96.1701859976087;
-        Wed, 06 Dec 2023 02:52:56 -0800 (PST)
-Received: from ubuntu ([211.219.71.65])
-        by smtp.gmail.com with ESMTPSA id h6-20020a170902eec600b001d0a6f31519sm5144370plb.188.2023.12.06.02.52.53
+        d=1e100.net; s=20230601; t=1701860072; x=1702464872;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2qSQoXhaZIkSox5U4y8/LH5pk6N5f+xtot1Ew+ZDWQM=;
+        b=ZLx92q+7qyEtzgtF1Uk80bISBDIFpNAlNGdTz1rPp0XuXcbxFu5G/PC7IyxNRJBXO6
+         tZuHZRkN5U/lCc/q26FL93oV3ZTeTDRBCjuUV0avBCBtWdvxjF/gS7glaRg0edLLcv7e
+         /yhAJMVbAzYzMMixx/BrzEsrJREB0OzkmCRVG7FvDjsdhWfsM9msYytt7DNe7u3Q6ld3
+         owYl5KItx70UMnDmwmll642IOLezu1rlH6K1hHc7Nf543VK4YnfXlER1p2/BnvldUp2G
+         tz7yJAINQEP2EhRM/Nre3yC1qOvU+OKhG3ayyyPz69KEqLDwCLxDcJeySrHCQIn7Rknh
+         UxDg==
+X-Gm-Message-State: AOJu0YxBiAwsvPm4s+OGR8nYs8n6dhWiIWLenpl82FfO3jvuGxpAFvph
+	LGAbk8gEt3h5Ok3UVxOzHzs=
+X-Google-Smtp-Source: AGHT+IG6Q6CwXDOVK1QrybKOfwa9jQm+Yy2c7KW0m9JQ9gPTTFusxHRJxArUpmVKE2k1Pzd7pOTruA==
+X-Received: by 2002:a05:6871:330a:b0:1fb:205d:756b with SMTP id nf10-20020a056871330a00b001fb205d756bmr800031oac.19.1701860072268;
+        Wed, 06 Dec 2023 02:54:32 -0800 (PST)
+Received: from localhost.localdomain ([89.187.161.180])
+        by smtp.gmail.com with ESMTPSA id n15-20020a638f0f000000b005c6801efa0fsm5388796pgd.28.2023.12.06.02.54.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 02:52:55 -0800 (PST)
-Date: Wed, 6 Dec 2023 02:52:51 -0800
-From: Hyunwoo Kim <v4bel@theori.io>
-To: Eric Dumazet <edumazet@google.com>
-Cc: ralf@linux-mips.org, imv4bel@gmail.com, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, linux-hams@vger.kernel.org,
-	netdev@vger.kernel.org, v4bel@theori.io
-Subject: Re: [PATCH v2] net/rose: Fix Use-After-Free in rose_ioctl
-Message-ID: <20231206105251.GA7219@ubuntu>
-References: <20231206041332.GA5721@ubuntu>
- <CANn89i+uXB__Bx7HAJt1Dg-P-cWyQUQk1SshE0jHjcTdODS9_w@mail.gmail.com>
+        Wed, 06 Dec 2023 02:54:31 -0800 (PST)
+From: Liang Chen <liangchen.linux@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	hawk@kernel.org,
+	ilias.apalodimas@linaro.org,
+	linyunsheng@huawei.com
+Cc: netdev@vger.kernel.org,
+	linux-mm@kvack.org,
+	jasowang@redhat.com,
+	liangchen.linux@gmail.com
+Subject: [PATCH net-next v7 0/4] skbuff: Optimize SKB coalescing for page pool
+Date: Wed,  6 Dec 2023 18:54:15 +0800
+Message-Id: <20231206105419.27952-1-liangchen.linux@gmail.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89i+uXB__Bx7HAJt1Dg-P-cWyQUQk1SshE0jHjcTdODS9_w@mail.gmail.com>
 
-Dear,
+The combination of the following condition was excluded from skb coalescing:
 
-On Wed, Dec 06, 2023 at 11:33:15AM +0100, Eric Dumazet wrote:
-> On Wed, Dec 6, 2023 at 5:13 AM Hyunwoo Kim <v4bel@theori.io> wrote:
-> >
-> > Because rose_ioctl() accesses sk->sk_receive_queue
-> > without holding a sk->sk_receive_queue.lock, it can
-> > cause a race with rose_accept().
-> > A use-after-free for skb occurs with the following flow.
-> > ```
-> > rose_ioctl() -> skb_peek()
-> > rose_accept() -> skb_dequeue() -> kfree_skb()
-> > ```
-> > Add sk->sk_receive_queue.lock to rose_ioctl() to fix this issue.
-> >
-> 
-> Please add a Fixes: tag
-> 
-> > Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
-> > ---
-> > v1 -> v2: Use sk->sk_receive_queue.lock instead of lock_sock.
-> > ---
-> >  net/rose/af_rose.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> >
-> > diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
-> > index 0cc5a4e19900..841c238de222 100644
-> > --- a/net/rose/af_rose.c
-> > +++ b/net/rose/af_rose.c
-> > @@ -1316,8 +1316,10 @@ static int rose_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
-> >                 struct sk_buff *skb;
-> >                 long amount = 0L;
-> >                 /* These two are safe on a single CPU system as only user tasks fiddle here */
-> > +               spin_lock(&sk->sk_receive_queue.lock);
-> 
-> You need interrupt safety here.
-> 
-> sk_receive_queue can be fed from interrupt, that would potentially deadlock.
+from->pp_recycle = 1
+from->cloned = 1
+to->pp_recycle = 1
 
-I want to change spin_lock to spin_lock_irqsave, is this okay?
+With page pool in use, this combination can be quite common(ex.
+NetworkMananger may lead to the additional packet_type being registered,
+thus the cloning). In scenarios with a higher number of small packets, it
+can significantly affect the success rate of coalescing.
+
+This patchset aims to optimize this scenario and enable coalescing of this
+particular combination. That also involves supporting multiple users
+referencing the same fragment of a pp page to accomondate the need to
+increment the "from" SKB page's pp page reference count.
+
+Changes from v6:
+- provide sufficient description for the first patch
+- rename the utility function for checking pp page
 
 
-Regards,
-Hyunwoo Kim
+Liang Chen (4):
+  page_pool: transition to reference count management after page
+    draining
+  page_pool: halve BIAS_MAX for multiple user references of a fragment
+  skbuff: Add a function to check if a page belongs to page_pool
+  skbuff: Optimization of SKB coalescing for page pool
 
-> 
-> >                 if ((skb = skb_peek(&sk->sk_receive_queue)) != NULL)
-> >                         amount = skb->len;
-> > +               spin_unlock(&sk->sk_receive_queue.lock);
-> >                 return put_user(amount, (unsigned int __user *) argp);
-> >         }
-> >
-> > --
-> > 2.25.1
-> >
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  4 +-
+ include/linux/mm_types.h                      |  2 +-
+ include/net/page_pool/helpers.h               | 50 +++++++++++--------
+ include/net/page_pool/types.h                 |  6 +--
+ net/core/page_pool.c                          | 14 +++---
+ net/core/skbuff.c                             | 48 +++++++++++++-----
+ 6 files changed, 78 insertions(+), 46 deletions(-)
+
+-- 
+2.31.1
+
 
