@@ -1,256 +1,417 @@
-Return-Path: <netdev+bounces-54737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A15A180803B
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 06:33:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B315B808053
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 06:42:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5791E281DAA
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 05:33:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B435B20E7B
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 05:42:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2014611181;
-	Thu,  7 Dec 2023 05:33:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC2DD11726;
+	Thu,  7 Dec 2023 05:42:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bpj3YbNL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Pb71r+Cr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93D99D51
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 21:33:35 -0800 (PST)
-Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-40c0e7b8a9bso7960055e9.3
-        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 21:33:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1701927214; x=1702532014; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aDh5Ha6meMpNT5PZvdiFsf/a/63SoEjRN6VfIgk3fbs=;
-        b=bpj3YbNLkvzoxEw3xr0u3agkAhCoIuowOElrV/CTMzye8qwEDGvkm7uR0/cuL/ftIt
-         jRquYrxsKhkgv5IE3W4Znm0vKoMxtiibCYaq3PHsXZHiRDE69BXKRvyHra6UJrZOb0yx
-         5oP0oV9Xp+4qIJPjAS4YsUSOoFJLslTrFGhysjrsJRHyvoSBWDBqECcOzT8ZGY4J7FRs
-         FWr8T0YXHfsJoKZ1LEotF/Rto6mU37c+Q6Ovedu0tLngsP9f7fodtv1C90zMwhcIY2Z7
-         ejn6BqFG2uqY7p1NT4CzU3pGdrQ9EcLj/fTLkh8OPizFM0+96H/D4NemDC7T3p/JMVTD
-         N6Wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701927214; x=1702532014;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aDh5Ha6meMpNT5PZvdiFsf/a/63SoEjRN6VfIgk3fbs=;
-        b=CwNAuiGDqsw2JebTv51UazKT/cW0xjnN/VU8irCW2BwMSTETkQ8YVJ87BsRtXbktaW
-         WZ7ykK+LGyQiGBP7fqtLoWKUds0qJA8wu6kdgNOgTOCBu4TSzFvcIzaVzwQSLcOjhjAN
-         R/dUcGHIhjanHnfB27unr13OhKys9l9LuCgrZLser0fFxday2xGeirUx23wnW8lMEhtH
-         70QdxB8AtIIR6mwY6CwzdksGT7TAU9ML1k93lnkIhgD5/WmDEyW7zlDi22afXGKfxh4d
-         dwVqbkEFPU0KluFXOmmbBQVu766sFu/ju1uuaftqdr6l2oT621yhv6bEUAlz5WvJ/oTL
-         iTnw==
-X-Gm-Message-State: AOJu0YxSocgpkWS5rrUxzsU0k5k94OK5A0hB05+T4ToTxHG+4bwtZl/a
-	gHIQ1FGUUXreBXk1d8kyc3G7sg==
-X-Google-Smtp-Source: AGHT+IGRMzw6ole/sY4x+aWmyT5JGTFS7U8esyxKHbhMcm0/ifnMUpQvK3RimMuKBvFeDdeF9e+gqQ==
-X-Received: by 2002:a7b:c4c9:0:b0:40b:5e21:dd2b with SMTP id g9-20020a7bc4c9000000b0040b5e21dd2bmr1280861wmk.89.1701927213762;
-        Wed, 06 Dec 2023 21:33:33 -0800 (PST)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id z17-20020a5d4c91000000b003333abf3edfsm459345wrs.47.2023.12.06.21.33.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 21:33:33 -0800 (PST)
-Date: Thu, 7 Dec 2023 08:33:30 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Lev Pantiukhin <kndrvt@yandex-team.ru>
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, mitradir@yandex-team.ru,
-	Lev Pantiukhin <kndrvt@yandex-team.ru>,
-	Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH] ipvs: add a stateless type of service and a stateless
- Maglev hashing scheduler
-Message-ID: <db2f0650-6e23-457f-bc5c-f9da0047f37d@suswa.mountain>
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEBA7DE;
+	Wed,  6 Dec 2023 21:42:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701927723; x=1733463723;
+  h=date:from:to:cc:subject:message-id;
+  bh=uKfMX7B7AelUiYi9YjjS3dGRw+Gxe2MWxWgi3QPMihQ=;
+  b=Pb71r+CrdpfpvxZjW9u8ukpVYnr5+XIeNSv5dWTMwJqFIhu6uCFu5cJW
+   P4jndM7P1am0u+74iLJRa82WJq3lK636W1WWcBSfAn3LMZgecxYG9SHSw
+   3TLDT8H49AMN71PKrwcFJI9oi+9HoKJ+RaPdnEBrJytm4HvCWz3O1BxuQ
+   ZrsGXaDrp56xOAHyz8R/rRwYabi3Ui2bg/G5YdcSERr3SASzRG1V5NbU4
+   V/yDFHzEc2CYtSsCuiH6ARvTAf0vciufBAPazlM4d+S59uvDRAJRSyyC8
+   taG2mpBEHXV7FOvydjCfrOiFzfIPt9Y3xTSu324y9+KonwWHrizqXMG7J
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="7537557"
+X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
+   d="scan'208";a="7537557"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2023 21:42:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="895013884"
+X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
+   d="scan'208";a="895013884"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga004.jf.intel.com with ESMTP; 06 Dec 2023 21:41:56 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rB78z-000Btc-2F;
+	Thu, 07 Dec 2023 05:41:53 +0000
+Date: Thu, 07 Dec 2023 13:41:02 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Linux Memory Management List <linux-mm@kvack.org>,
+ amd-gfx@lists.freedesktop.org, linux-alpha@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+ linux-atm-general@lists.sourceforge.net, linux-block@vger.kernel.org,
+ linux-csky@vger.kernel.org, linux-iio@vger.kernel.org,
+ linux-leds@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-sh@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-sunxi@lists.linux.dev,
+ netdev@vger.kernel.org, sparclinux@vger.kernel.org
+Subject: [linux-next:master] BUILD REGRESSION
+ 577a4ee0b96fb043c9cf4a533c550ff587e526cf
+Message-ID: <202312071357.ypE0yrPf-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231204152020.472247-1-kndrvt@yandex-team.ru>
 
-Hi Lev,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+branch HEAD: 577a4ee0b96fb043c9cf4a533c550ff587e526cf  Add linux-next specific files for 20231206
 
-kernel test robot noticed the following build warnings:
+Error/Warning reports:
 
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+https://lore.kernel.org/oe-kbuild-all/202312061337.WNVSk0AL-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202312061837.tbKWaozM-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202312062242.RFPPozG9-lkp@intel.com
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Lev-Pantiukhin/ipvs-add-a-stateless-type-of-service-and-a-stateless-Maglev-hashing-scheduler/20231204-232344
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/horms/ipvs-next.git master
-patch link:    https://lore.kernel.org/r/20231204152020.472247-1-kndrvt%40yandex-team.ru
-patch subject: [PATCH] ipvs: add a stateless type of service and a stateless Maglev hashing scheduler
-config: i386-randconfig-141-20231207 (https://download.01.org/0day-ci/archive/20231207/202312070849.i9gwwSH0-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-12) 11.3.0
-reproduce: (https://download.01.org/0day-ci/archive/20231207/202312070849.i9gwwSH0-lkp@intel.com/reproduce)
+Error/Warning: (recently discovered and may have been fixed)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202312070849.i9gwwSH0-lkp@intel.com/
+/tmp/cco4BMDv.s:387: Error: selected processor does not support requested special purpose register -- `mrs r1,cpsr'
+drivers/perf/riscv_pmu_sbi.c:1008:19: error: incompatible function pointer types initializing 'proc_handler *' (aka 'int (*)(const struct ctl_table *, int, void *, unsigned long *, long long *)') with an expression of type 'int (struct ctl_table *, int, void *, size_t *, loff_t *)' (aka 'int (struct ctl_table *, int, void *, unsigned long *, long long *)') [-Wincompatible-function-pointer-types]
 
-New smatch warnings:
-net/netfilter/ipvs/ip_vs_core.c:545 ip_vs_schedule() error: uninitialized symbol 'need_state'.
+Error/Warning ids grouped by kconfigs:
 
-vim +/need_state +545 net/netfilter/ipvs/ip_vs_core.c
+gcc_recent_errors
+|-- alpha-randconfig-r132-20231206
+|   |-- arch-alpha-mm-fault.c:sparse:sparse:Using-plain-integer-as-NULL-pointer
+|   |-- drivers-atm-fore200e.c:sparse:sparse:incorrect-type-in-argument-(different-base-types)-expected-unsigned-int-usertype-b-got-restricted-__le32-usertype
+|   |-- drivers-iio-imu-bmi323-bmi323_i2c.c:sparse:sparse:symbol-bmi323_i2c_regmap_config-was-not-declared.-Should-it-be-static
+|   `-- lib-zstd-compress-zstd_fast.c:sparse:sparse:Using-plain-integer-as-NULL-pointer
+|-- arm-allyesconfig
+|   `-- qcom_stats.c:(.text):undefined-reference-to-__aeabi_uldivmod
+|-- arm-randconfig-r016-20220626
+|   `-- :Error:selected-processor-does-not-support-requested-special-purpose-register-mrs-r1-cpsr
+|-- csky-randconfig-r122-20231206
+|   |-- arch-csky-kernel-vdso-vgettimeofday.c:sparse:sparse:function-__vdso_clock_gettime-with-external-linkage-has-definition
+|   `-- lib-zstd-compress-zstd_fast.c:sparse:sparse:Using-plain-integer-as-NULL-pointer
+|-- microblaze-randconfig-r121-20231206
+|   `-- lib-zstd-compress-zstd_fast.c:sparse:sparse:Using-plain-integer-as-NULL-pointer
+|-- mips-allyesconfig
+|   `-- qcom_stats.c:(.text.qcom_ddr_stats_show):undefined-reference-to-__udivdi3
+|-- mips-randconfig-r123-20231206
+|   `-- lib-zstd-compress-zstd_fast.c:sparse:sparse:Using-plain-integer-as-NULL-pointer
+|-- parisc-randconfig-r113-20231206
+|   |-- drivers-iio-imu-bmi323-bmi323_i2c.c:sparse:sparse:symbol-bmi323_i2c_regmap_config-was-not-declared.-Should-it-be-static
+|   |-- drivers-soc-qcom-pmic_pdcharger_ulog.c:sparse:sparse:incorrect-type-in-initializer-(different-base-types)-expected-restricted-__le32-usertype-opcode-got-int
+|   |-- drivers-soc-qcom-pmic_pdcharger_ulog.c:sparse:sparse:incorrect-type-in-initializer-(different-base-types)-expected-restricted-__le32-usertype-owner-got-int
+|   |-- drivers-soc-qcom-pmic_pdcharger_ulog.c:sparse:sparse:incorrect-type-in-initializer-(different-base-types)-expected-restricted-__le32-usertype-type-got-int
+|   `-- lib-zstd-compress-zstd_fast.c:sparse:sparse:Using-plain-integer-as-NULL-pointer
+|-- sh-randconfig-m031-20230727
+|   `-- standard-input:Error:unknown-pseudo-op:cfi_def_cfa_regist
+|-- sh-randconfig-r112-20231206
+|   |-- arch-sh-kernel-crash_dump.c:sparse:sparse:incorrect-type-in-argument-(different-address-spaces)-expected-void-const-addr-got-void-noderef-__iomem
+|   |-- drivers-soc-qcom-pmic_pdcharger_ulog.c:sparse:sparse:incorrect-type-in-initializer-(different-base-types)-expected-restricted-__le32-usertype-opcode-got-int
+|   |-- drivers-soc-qcom-pmic_pdcharger_ulog.c:sparse:sparse:incorrect-type-in-initializer-(different-base-types)-expected-restricted-__le32-usertype-owner-got-int
+|   |-- drivers-soc-qcom-pmic_pdcharger_ulog.c:sparse:sparse:incorrect-type-in-initializer-(different-base-types)-expected-restricted-__le32-usertype-type-got-int
+|   `-- lib-zstd-compress-zstd_fast.c:sparse:sparse:Using-plain-integer-as-NULL-pointer
+|-- sparc-allmodconfig
+|   |-- arch-sparc-kernel-module.c:warning:variable-strtab-set-but-not-used
+|   `-- arch-sparc-mm-init_64.c:warning:variable-hv_pgsz_idx-set-but-not-used
+|-- sparc-allnoconfig
+|   |-- arch-sparc-mm-leon_mm.c:warning:variable-paddrbase-set-but-not-used
+|   `-- arch-sparc-mm-srmmu.c:warning:variable-clear-set-but-not-used
+|-- sparc-defconfig
+|   |-- arch-sparc-kernel-module.c:warning:variable-strtab-set-but-not-used
+|   |-- arch-sparc-mm-leon_mm.c:warning:variable-paddrbase-set-but-not-used
+|   `-- arch-sparc-mm-srmmu.c:warning:variable-clear-set-but-not-used
+|-- sparc-randconfig-001-20231206
+|   |-- arch-sparc-kernel-module.c:warning:variable-strtab-set-but-not-used
+|   |-- arch-sparc-mm-leon_mm.c:warning:variable-paddrbase-set-but-not-used
+|   `-- arch-sparc-mm-srmmu.c:warning:variable-clear-set-but-not-used
+|-- sparc-randconfig-002-20231206
+|   |-- arch-sparc-mm-leon_mm.c:warning:variable-paddrbase-set-but-not-used
+|   `-- arch-sparc-mm-srmmu.c:warning:variable-clear-set-but-not-used
+|-- sparc-randconfig-r061-20231206
+|   |-- arch-sparc-kernel-module.c:warning:variable-strtab-set-but-not-used
+|   `-- arch-sparc-mm-init_64.c:warning:variable-hv_pgsz_idx-set-but-not-used
+|-- sparc64-allmodconfig
+|   |-- arch-sparc-kernel-module.c:warning:variable-strtab-set-but-not-used
+|   `-- arch-sparc-mm-init_64.c:warning:variable-hv_pgsz_idx-set-but-not-used
+|-- sparc64-allyesconfig
+|   |-- arch-sparc-kernel-module.c:warning:variable-strtab-set-but-not-used
+|   `-- arch-sparc-mm-init_64.c:warning:variable-hv_pgsz_idx-set-but-not-used
+|-- sparc64-defconfig
+|   |-- arch-sparc-kernel-module.c:warning:variable-strtab-set-but-not-used
+|   `-- arch-sparc-mm-init_64.c:warning:variable-hv_pgsz_idx-set-but-not-used
+|-- sparc64-randconfig-001-20231206
+|   |-- arch-sparc-kernel-module.c:warning:variable-strtab-set-but-not-used
+|   `-- arch-sparc-mm-init_64.c:warning:variable-hv_pgsz_idx-set-but-not-used
+|-- sparc64-randconfig-002-20231206
+|   `-- arch-sparc-mm-init_64.c:warning:variable-hv_pgsz_idx-set-but-not-used
+|-- sparc64-randconfig-r133-20231206
+|   |-- drivers-infiniband-hw-vmw_pvrdma-pvrdma.h:sparse:sparse:incorrect-type-in-argument-(different-base-types)-expected-unsigned-int-usertype-l-got-restricted-__le32-usertype
+|   `-- lib-zstd-compress-zstd_fast.c:sparse:sparse:Using-plain-integer-as-NULL-pointer
+|-- x86_64-randconfig-121-20231206
+|   |-- drivers-gpu-drm-amd-amdgpu-..-amdkfd-kfd_process.c:sparse:sparse:incompatible-types-in-comparison-expression-(different-address-spaces):
+|   |-- drivers-gpu-drm-amd-amdgpu-..-amdkfd-kfd_process.c:sparse:struct-dma_fence
+|   |-- drivers-gpu-drm-amd-amdgpu-..-amdkfd-kfd_process.c:sparse:struct-dma_fence-noderef-__rcu
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_amdkfd_gpuvm.c:sparse:sparse:incompatible-types-in-comparison-expression-(different-address-spaces):
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_amdkfd_gpuvm.c:sparse:struct-dma_fence
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_amdkfd_gpuvm.c:sparse:struct-dma_fence-noderef-__rcu
+|   |-- drivers-soc-qcom-pmic_pdcharger_ulog.c:sparse:sparse:incorrect-type-in-initializer-(different-base-types)-expected-restricted-__le32-usertype-opcode-got-int
+|   |-- drivers-soc-qcom-pmic_pdcharger_ulog.c:sparse:sparse:incorrect-type-in-initializer-(different-base-types)-expected-restricted-__le32-usertype-owner-got-int
+|   |-- drivers-soc-qcom-pmic_pdcharger_ulog.c:sparse:sparse:incorrect-type-in-initializer-(different-base-types)-expected-restricted-__le32-usertype-type-got-int
+|   `-- lib-zstd-compress-zstd_fast.c:sparse:sparse:Using-plain-integer-as-NULL-pointer
+`-- x86_64-randconfig-122-20231206
+    `-- lib-zstd-compress-zstd_fast.c:sparse:sparse:Using-plain-integer-as-NULL-pointer
+clang_recent_errors
+|-- arm64-allmodconfig
+|   `-- drivers-leds-leds-max5970.c:warning:variable-num_leds-set-but-not-used
+|-- arm64-allyesconfig
+|   `-- drivers-leds-leds-max5970.c:warning:variable-num_leds-set-but-not-used
+|-- arm64-randconfig-003-20231206
+|   `-- drivers-leds-leds-max5970.c:warning:variable-num_leds-set-but-not-used
+|-- arm64-randconfig-004-20231206
+|   `-- drivers-leds-leds-max5970.c:warning:variable-num_leds-set-but-not-used
+|-- hexagon-allmodconfig
+|   `-- drivers-leds-leds-max5970.c:warning:variable-num_leds-set-but-not-used
+|-- hexagon-allyesconfig
+|   |-- drivers-leds-leds-max5970.c:warning:variable-num_leds-set-but-not-used
+|   |-- ld.lld:error:vmlinux.a(arch-hexagon-kernel-head.o):(.init.text):relocation-R_HEX_B22_PCREL-out-of-range:is-not-in-references-__vmnewmap
+|   |-- ld.lld:error:vmlinux.a(arch-hexagon-kernel-head.o):(.init.text):relocation-R_HEX_B22_PCREL-out-of-range:is-not-in-references-__vmsetvec
+|   `-- ld.lld:error:vmlinux.a(arch-hexagon-kernel-head.o):(.init.text):relocation-R_HEX_B22_PCREL-out-of-range:is-not-in-references-memset
+|-- hexagon-randconfig-002-20231206
+|   `-- drivers-leds-leds-max5970.c:warning:variable-num_leds-set-but-not-used
+|-- i386-allmodconfig
+|   `-- drivers-leds-leds-max5970.c:warning:variable-num_leds-set-but-not-used
+|-- i386-allyesconfig
+|   `-- drivers-leds-leds-max5970.c:warning:variable-num_leds-set-but-not-used
+|-- i386-randconfig-061-20231206
+|   |-- drivers-soc-qcom-pmic_pdcharger_ulog.c:sparse:sparse:incorrect-type-in-initializer-(different-base-types)-expected-restricted-__le32-usertype-opcode-got-int
+|   |-- drivers-soc-qcom-pmic_pdcharger_ulog.c:sparse:sparse:incorrect-type-in-initializer-(different-base-types)-expected-restricted-__le32-usertype-owner-got-int
+|   |-- drivers-soc-qcom-pmic_pdcharger_ulog.c:sparse:sparse:incorrect-type-in-initializer-(different-base-types)-expected-restricted-__le32-usertype-type-got-int
+|   `-- lib-zstd-compress-zstd_fast.c:sparse:sparse:Using-plain-integer-as-NULL-pointer
+|-- i386-randconfig-141-20231206
+|   |-- block-bdev.c-bdev_open_by_dev()-warn:possible-memory-leak-of-handle
+|   |-- drivers-hwtracing-stm-core.c-stm_register_device()-error:double-free-of-stm
+|   |-- lib-zstd-common-bits.h-ZSTD_countLeadingZeros32()-warn:inconsistent-indenting
+|   |-- lib-zstd-common-bits.h-ZSTD_countTrailingZeros32()-warn:inconsistent-indenting
+|   |-- lib-zstd-compress-..-common-bits.h-ZSTD_countLeadingZeros32()-warn:inconsistent-indenting
+|   |-- lib-zstd-compress-..-common-bits.h-ZSTD_countLeadingZeros64()-warn:inconsistent-indenting
+|   |-- lib-zstd-compress-..-common-bits.h-ZSTD_countTrailingZeros32()-warn:inconsistent-indenting
+|   |-- lib-zstd-compress-..-common-bits.h-ZSTD_countTrailingZeros64()-warn:inconsistent-indenting
+|   |-- lib-zstd-decompress-..-common-bits.h-ZSTD_countLeadingZeros32()-warn:inconsistent-indenting
+|   |-- lib-zstd-decompress-..-common-bits.h-ZSTD_countTrailingZeros32()-warn:inconsistent-indenting
+|   |-- lib-zstd-decompress-..-common-bits.h-ZSTD_countTrailingZeros64()-warn:inconsistent-indenting
+|   `-- mm-slub.c-__put_partials()-error:calling-spin_unlock_irqrestore()-with-bogus-flags
+|-- powerpc-allmodconfig
+|   `-- drivers-leds-leds-max5970.c:warning:variable-num_leds-set-but-not-used
+|-- powerpc-allyesconfig
+|   `-- drivers-leds-leds-max5970.c:warning:variable-num_leds-set-but-not-used
+|-- powerpc-randconfig-r064-20231206
+|   `-- drivers-leds-leds-sun50i-a100.c:error:call-to-__compiletime_assert_NNN-declared-with-error-attribute:FIELD_PREP:value-too-large-for-the-field
+|-- powerpc64-randconfig-002-20231206
+|   `-- drivers-leds-leds-max5970.c:warning:variable-num_leds-set-but-not-used
+|-- powerpc64-randconfig-003-20231206
+|   `-- drivers-leds-leds-max5970.c:warning:variable-num_leds-set-but-not-used
+|-- riscv-randconfig-001-20231206
+|   `-- drivers-perf-riscv_pmu_sbi.c:error:incompatible-function-pointer-types-initializing-proc_handler-(aka-int-(-)(const-struct-ctl_table-int-void-unsigned-long-long-long-)-)-with-an-expression-of-type-int
+|-- riscv-randconfig-002-20231206
+|   `-- drivers-leds-leds-max5970.c:warning:variable-num_leds-set-but-not-used
+|-- s390-randconfig-r111-20231206
+|   |-- drivers-leds-leds-max5970.c:warning:variable-num_leds-set-but-not-used
+|   `-- lib-zstd-compress-zstd_fast.c:sparse:sparse:Using-plain-integer-as-NULL-pointer
+|-- x86_64-allmodconfig
+|   `-- drivers-leds-leds-max5970.c:warning:variable-num_leds-set-but-not-used
+`-- x86_64-allyesconfig
+    `-- drivers-leds-leds-max5970.c:warning:variable-num_leds-set-but-not-used
 
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  440  struct ip_vs_conn *
-190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  441  ip_vs_schedule(struct ip_vs_service *svc, struct sk_buff *skb,
-d4383f04d145cc net/netfilter/ipvs/ip_vs_core.c Jesper Dangaard Brouer 2012-09-26  442  	       struct ip_vs_proto_data *pd, int *ignored,
-d4383f04d145cc net/netfilter/ipvs/ip_vs_core.c Jesper Dangaard Brouer 2012-09-26  443  	       struct ip_vs_iphdr *iph)
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  444  {
-9330419d9aa4f9 net/netfilter/ipvs/ip_vs_core.c Hans Schillstrom       2011-01-03  445  	struct ip_vs_protocol *pp = pd->pp;
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  446  	struct ip_vs_conn *cp = NULL;
-ceec4c38168184 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2013-03-22  447  	struct ip_vs_scheduler *sched;
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  448  	struct ip_vs_dest *dest;
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  449  	__be16 _ports[2], *pptr, cport, vport;
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  450  	const void *caddr, *vaddr;
-3575792e005dc9 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-09-17  451  	unsigned int flags;
-b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  452  	bool need_state;
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  453  
-190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  454  	*ignored = 1;
-2f74713d1436b7 net/netfilter/ipvs/ip_vs_core.c Jesper Dangaard Brouer 2012-09-26  455  	/*
-2f74713d1436b7 net/netfilter/ipvs/ip_vs_core.c Jesper Dangaard Brouer 2012-09-26  456  	 * IPv6 frags, only the first hit here.
-2f74713d1436b7 net/netfilter/ipvs/ip_vs_core.c Jesper Dangaard Brouer 2012-09-26  457  	 */
-6b3d933000cbe5 net/netfilter/ipvs/ip_vs_core.c Gao Feng               2017-11-13  458  	pptr = frag_safe_skb_hp(skb, iph->len, sizeof(_ports), _ports);
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  459  	if (pptr == NULL)
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  460  		return NULL;
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  461  
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  462  	if (likely(!ip_vs_iph_inverse(iph))) {
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  463  		cport = pptr[0];
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  464  		caddr = &iph->saddr;
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  465  		vport = pptr[1];
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  466  		vaddr = &iph->daddr;
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  467  	} else {
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  468  		cport = pptr[1];
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  469  		caddr = &iph->daddr;
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  470  		vport = pptr[0];
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  471  		vaddr = &iph->saddr;
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  472  	}
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  473  
-190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  474  	/*
-190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  475  	 * FTPDATA needs this check when using local real server.
-190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  476  	 * Never schedule Active FTPDATA connections from real server.
-190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  477  	 * For LVS-NAT they must be already created. For other methods
-190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  478  	 * with persistence the connection is created on SYN+ACK.
-190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  479  	 */
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  480  	if (cport == FTPDATA) {
-b0e010c527de74 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  481  		IP_VS_DBG_PKT(12, svc->af, pp, skb, iph->off,
-0d79641a96d612 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  482  			      "Not scheduling FTPDATA");
-190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  483  		return NULL;
-190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  484  	}
-190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  485  
-190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  486  	/*
-a5959d53d6048a net/netfilter/ipvs/ip_vs_core.c Hans Schillstrom       2010-11-19  487  	 *    Do not schedule replies from local real server.
-190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  488  	 */
-802c41adcf3be6 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  489  	if ((!skb->dev || skb->dev->flags & IFF_LOOPBACK)) {
-802c41adcf3be6 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  490  		iph->hdr_flags ^= IP_VS_HDR_INVERSE;
-6ecd754883daff net/netfilter/ipvs/ip_vs_core.c Matteo Croce           2019-01-19  491  		cp = INDIRECT_CALL_1(pp->conn_in_get,
-6ecd754883daff net/netfilter/ipvs/ip_vs_core.c Matteo Croce           2019-01-19  492  				     ip_vs_conn_in_get_proto, svc->ipvs,
-6ecd754883daff net/netfilter/ipvs/ip_vs_core.c Matteo Croce           2019-01-19  493  				     svc->af, skb, iph);
-802c41adcf3be6 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  494  		iph->hdr_flags ^= IP_VS_HDR_INVERSE;
-802c41adcf3be6 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  495  
-802c41adcf3be6 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  496  		if (cp) {
-b0e010c527de74 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  497  			IP_VS_DBG_PKT(12, svc->af, pp, skb, iph->off,
-802c41adcf3be6 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  498  				      "Not scheduling reply for existing"
-802c41adcf3be6 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  499  				      " connection");
-190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  500  			__ip_vs_conn_put(cp);
-190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  501  			return NULL;
-190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  502  		}
-802c41adcf3be6 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  503  	}
-190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  504  
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  505  	/*
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  506  	 *    Persistent service
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  507  	 */
-a5959d53d6048a net/netfilter/ipvs/ip_vs_core.c Hans Schillstrom       2010-11-19  508  	if (svc->flags & IP_VS_SVC_F_PERSISTENT)
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  509  		return ip_vs_sched_persist(svc, skb, cport, vport, ignored,
-d4383f04d145cc net/netfilter/ipvs/ip_vs_core.c Jesper Dangaard Brouer 2012-09-26  510  					   iph);
-a5959d53d6048a net/netfilter/ipvs/ip_vs_core.c Hans Schillstrom       2010-11-19  511  
-190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  512  	*ignored = 0;
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  513  
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  514  	/*
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  515  	 *    Non-persistent service
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  516  	 */
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  517  	if (!svc->fwmark && vport != svc->port) {
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  518  		if (!svc->port)
-1e3e238e9c4bf9 net/netfilter/ipvs/ip_vs_core.c Hannes Eder            2009-08-02  519  			pr_err("Schedule: port zero only supported "
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  520  			       "in persistent services, "
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  521  			       "check your ipvs configuration\n");
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  522  		return NULL;
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  523  	}
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  524  
-ceec4c38168184 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2013-03-22  525  	sched = rcu_dereference(svc->scheduler);
-05f00505a89acd net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2015-06-29  526  	if (sched) {
-05f00505a89acd net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2015-06-29  527  		/* read svc->sched_data after svc->scheduler */
-05f00505a89acd net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2015-06-29  528  		smp_rmb();
-b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  529  		/* we use distinct handler for stateless service */
-b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  530  		if (svc->flags & IP_VS_SVC_F_STATELESS)
-b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  531  			dest = sched->schedule_sl(svc, skb, iph, &need_state);
-b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  532  		else
-bba54de5bdd107 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2013-06-16  533  			dest = sched->schedule(svc, skb, iph);
+elapsed time: 1467m
 
-need_state not initialized on this path
+configs tested: 176
+configs skipped: 3
 
-05f00505a89acd net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2015-06-29  534  	} else {
-05f00505a89acd net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2015-06-29  535  		dest = NULL;
-05f00505a89acd net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2015-06-29  536  	}
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  537  	if (dest == NULL) {
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  538  		IP_VS_DBG(1, "Schedule: no dest found.\n");
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  539  		return NULL;
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  540  	}
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  541  
-b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  542  	/* We use IP_VS_SVC_F_ONEPACKET flag to create no state */
-b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  543  	flags = ((svc->flags & IP_VS_SVC_F_ONEPACKET &&
-b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  544  		  iph->protocol == IPPROTO_UDP) ||
-b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04 @545  		 (svc->flags & IP_VS_SVC_F_STATELESS && !need_state))
-                                                                                                                                         ^^^^^^^^^^
-
-b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  546  		? IP_VS_CONN_F_ONE_PACKET : 0;
-26ec037f9841e4 net/netfilter/ipvs/ip_vs_core.c Nick Chalk             2010-06-22  547  
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  548  	/*
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  549  	 *    Create a connection entry.
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  550  	 */
-f11017ec2d1859 net/netfilter/ipvs/ip_vs_core.c Simon Horman           2010-08-22  551  	{
-f11017ec2d1859 net/netfilter/ipvs/ip_vs_core.c Simon Horman           2010-08-22  552  		struct ip_vs_conn_param p;
-6e67e586e7289c net/netfilter/ipvs/ip_vs_core.c Hans Schillstrom       2011-01-03  553  
-3109d2f2d1fe06 net/netfilter/ipvs/ip_vs_core.c Eric W. Biederman      2015-09-21  554  		ip_vs_conn_fill_param(svc->ipvs, svc->af, iph->protocol,
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  555  				      caddr, cport, vaddr, vport, &p);
-ba38528aae6ee2 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2014-09-09  556  		cp = ip_vs_conn_new(&p, dest->af, &dest->addr,
-ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  557  				    dest->port ? dest->port : vport,
-0e051e683ba4ac net/netfilter/ipvs/ip_vs_core.c Hans Schillstrom       2010-11-19  558  				    flags, dest, skb->mark);
-a5959d53d6048a net/netfilter/ipvs/ip_vs_core.c Hans Schillstrom       2010-11-19  559  		if (!cp) {
-a5959d53d6048a net/netfilter/ipvs/ip_vs_core.c Hans Schillstrom       2010-11-19  560  			*ignored = -1;
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  561  			return NULL;
-f11017ec2d1859 net/netfilter/ipvs/ip_vs_core.c Simon Horman           2010-08-22  562  		}
-a5959d53d6048a net/netfilter/ipvs/ip_vs_core.c Hans Schillstrom       2010-11-19  563  	}
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  564  
-cd17f9ed099ed2 net/ipv4/ipvs/ip_vs_core.c      Julius Volz            2008-09-02  565  	IP_VS_DBG_BUF(6, "Schedule fwd:%c c:%s:%u v:%s:%u "
-cd17f9ed099ed2 net/ipv4/ipvs/ip_vs_core.c      Julius Volz            2008-09-02  566  		      "d:%s:%u conn->flags:%X conn->refcnt:%d\n",
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  567  		      ip_vs_fwd_tag(cp),
-f18ae7206eaebf net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2014-09-09  568  		      IP_VS_DBG_ADDR(cp->af, &cp->caddr), ntohs(cp->cport),
-f18ae7206eaebf net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2014-09-09  569  		      IP_VS_DBG_ADDR(cp->af, &cp->vaddr), ntohs(cp->vport),
-f18ae7206eaebf net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2014-09-09  570  		      IP_VS_DBG_ADDR(cp->daf, &cp->daddr), ntohs(cp->dport),
-b54ab92b84b616 net/netfilter/ipvs/ip_vs_core.c Reshetova, Elena       2017-03-16  571  		      cp->flags, refcount_read(&cp->refcnt));
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  572  
-b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  573  	if (!(svc->flags & IP_VS_SVC_F_STATELESS) ||
-b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  574  	    (svc->flags & IP_VS_SVC_F_STATELESS && need_state)) {
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  575  		ip_vs_conn_stats(cp, svc);
-b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  576  	}
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  577  	return cp;
-^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  578  }
+tested configs:
+alpha                             allnoconfig   gcc  
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+arc                              allmodconfig   gcc  
+arc                               allnoconfig   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arc                         haps_hs_defconfig   gcc  
+arc                   randconfig-001-20231206   gcc  
+arc                   randconfig-002-20231206   gcc  
+arm                              allmodconfig   gcc  
+arm                               allnoconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                                 defconfig   clang
+arm                          pxa910_defconfig   gcc  
+arm                   randconfig-001-20231206   clang
+arm                   randconfig-002-20231206   clang
+arm                   randconfig-003-20231206   clang
+arm                   randconfig-004-20231206   clang
+arm                           spitz_defconfig   clang
+arm64                            allmodconfig   clang
+arm64                             allnoconfig   gcc  
+arm64                               defconfig   gcc  
+arm64                 randconfig-001-20231206   clang
+arm64                 randconfig-002-20231206   clang
+arm64                 randconfig-003-20231206   clang
+arm64                 randconfig-004-20231206   clang
+csky                             allmodconfig   gcc  
+csky                              allnoconfig   gcc  
+csky                             allyesconfig   gcc  
+csky                                defconfig   gcc  
+csky                  randconfig-001-20231206   gcc  
+csky                  randconfig-002-20231206   gcc  
+hexagon                          allmodconfig   clang
+hexagon                           allnoconfig   clang
+hexagon                          allyesconfig   clang
+hexagon                             defconfig   clang
+hexagon               randconfig-001-20231206   clang
+hexagon               randconfig-002-20231206   clang
+i386                             allmodconfig   clang
+i386                              allnoconfig   clang
+i386                             allyesconfig   clang
+i386         buildonly-randconfig-001-20231206   clang
+i386         buildonly-randconfig-002-20231206   clang
+i386         buildonly-randconfig-003-20231206   clang
+i386         buildonly-randconfig-004-20231206   clang
+i386         buildonly-randconfig-005-20231206   clang
+i386         buildonly-randconfig-006-20231206   clang
+i386                                defconfig   gcc  
+i386                  randconfig-001-20231206   clang
+i386                  randconfig-002-20231206   clang
+i386                  randconfig-003-20231206   clang
+i386                  randconfig-004-20231206   clang
+i386                  randconfig-005-20231206   clang
+i386                  randconfig-006-20231206   clang
+i386                  randconfig-011-20231206   gcc  
+i386                  randconfig-012-20231206   gcc  
+i386                  randconfig-013-20231206   gcc  
+i386                  randconfig-014-20231206   gcc  
+i386                  randconfig-015-20231206   gcc  
+i386                  randconfig-016-20231206   gcc  
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+loongarch             randconfig-001-20231206   gcc  
+loongarch             randconfig-002-20231206   gcc  
+m68k                             allmodconfig   gcc  
+m68k                              allnoconfig   gcc  
+m68k                             allyesconfig   gcc  
+m68k                                defconfig   gcc  
+m68k                          hp300_defconfig   gcc  
+microblaze                       allmodconfig   gcc  
+microblaze                        allnoconfig   gcc  
+microblaze                       allyesconfig   gcc  
+microblaze                          defconfig   gcc  
+mips                              allnoconfig   clang
+mips                             allyesconfig   gcc  
+mips                           mtx1_defconfig   clang
+nios2                            allmodconfig   gcc  
+nios2                             allnoconfig   gcc  
+nios2                            allyesconfig   gcc  
+nios2                               defconfig   gcc  
+nios2                 randconfig-001-20231206   gcc  
+nios2                 randconfig-002-20231206   gcc  
+openrisc                          allnoconfig   gcc  
+openrisc                         allyesconfig   gcc  
+openrisc                            defconfig   gcc  
+parisc                           allmodconfig   gcc  
+parisc                            allnoconfig   gcc  
+parisc                           allyesconfig   gcc  
+parisc                              defconfig   gcc  
+parisc                randconfig-001-20231206   gcc  
+parisc                randconfig-002-20231206   gcc  
+parisc64                            defconfig   gcc  
+powerpc                     akebono_defconfig   clang
+powerpc                          allmodconfig   clang
+powerpc                           allnoconfig   gcc  
+powerpc                          allyesconfig   clang
+powerpc                 canyonlands_defconfig   gcc  
+powerpc               randconfig-001-20231206   clang
+powerpc               randconfig-003-20231206   clang
+powerpc                     tqm5200_defconfig   clang
+powerpc                     tqm8548_defconfig   gcc  
+powerpc64             randconfig-001-20231206   clang
+powerpc64             randconfig-002-20231206   clang
+powerpc64             randconfig-003-20231206   clang
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   clang
+riscv                            allyesconfig   gcc  
+riscv                               defconfig   gcc  
+riscv                 randconfig-001-20231206   clang
+riscv                 randconfig-002-20231206   clang
+riscv                          rv32_defconfig   clang
+s390                             allmodconfig   gcc  
+s390                              allnoconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                                defconfig   gcc  
+s390                  randconfig-001-20231206   gcc  
+s390                  randconfig-002-20231206   gcc  
+sh                               allmodconfig   gcc  
+sh                                allnoconfig   gcc  
+sh                               allyesconfig   gcc  
+sh                                  defconfig   gcc  
+sh                        edosk7705_defconfig   gcc  
+sh                        edosk7760_defconfig   gcc  
+sh                          lboxre2_defconfig   gcc  
+sh                    randconfig-001-20231206   gcc  
+sh                    randconfig-002-20231206   gcc  
+sh                          rsk7269_defconfig   gcc  
+sh                            shmin_defconfig   gcc  
+sparc                            allmodconfig   gcc  
+sparc64                          allmodconfig   gcc  
+sparc64                          allyesconfig   gcc  
+sparc64                             defconfig   gcc  
+sparc64               randconfig-001-20231206   gcc  
+sparc64               randconfig-002-20231206   gcc  
+um                               allmodconfig   clang
+um                                allnoconfig   clang
+um                               allyesconfig   clang
+um                                  defconfig   gcc  
+um                             i386_defconfig   gcc  
+um                    randconfig-001-20231206   clang
+um                    randconfig-002-20231206   clang
+um                           x86_64_defconfig   gcc  
+x86_64                           alldefconfig   gcc  
+x86_64                            allnoconfig   gcc  
+x86_64                           allyesconfig   clang
+x86_64       buildonly-randconfig-001-20231206   clang
+x86_64       buildonly-randconfig-002-20231206   clang
+x86_64       buildonly-randconfig-003-20231206   clang
+x86_64       buildonly-randconfig-004-20231206   clang
+x86_64       buildonly-randconfig-005-20231206   clang
+x86_64       buildonly-randconfig-006-20231206   clang
+x86_64                              defconfig   gcc  
+x86_64                randconfig-001-20231206   gcc  
+x86_64                randconfig-002-20231206   gcc  
+x86_64                randconfig-003-20231206   gcc  
+x86_64                randconfig-004-20231206   gcc  
+x86_64                randconfig-005-20231206   gcc  
+x86_64                randconfig-006-20231206   gcc  
+x86_64                randconfig-011-20231206   clang
+x86_64                randconfig-012-20231206   clang
+x86_64                randconfig-013-20231206   clang
+x86_64                randconfig-014-20231206   clang
+x86_64                randconfig-015-20231206   clang
+x86_64                randconfig-016-20231206   clang
+x86_64                randconfig-071-20231206   clang
+x86_64                randconfig-072-20231206   clang
+x86_64                randconfig-073-20231206   clang
+x86_64                randconfig-074-20231206   clang
+x86_64                randconfig-075-20231206   clang
+x86_64                randconfig-076-20231206   clang
+x86_64                          rhel-8.3-rust   clang
+xtensa                            allnoconfig   gcc  
+xtensa                randconfig-001-20231206   gcc  
+xtensa                randconfig-002-20231206   gcc  
 
 -- 
 0-DAY CI Kernel Test Service
 https://github.com/intel/lkp-tests/wiki
-
 
