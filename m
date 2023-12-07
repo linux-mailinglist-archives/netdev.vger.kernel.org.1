@@ -1,105 +1,97 @@
-Return-Path: <netdev+bounces-54954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21E7180900F
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:37:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C9DF809011
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:37:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9EE41F21170
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:36:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D1F31C209ED
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:37:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 279DB481A6;
-	Thu,  7 Dec 2023 18:36:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDFFD4B131;
+	Thu,  7 Dec 2023 18:37:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m0Rgrbty"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="SKcFclhT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 276D210E7
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 10:36:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701974215; x=1733510215;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=vm+p1HPYLMEP6pTnhkAjNt2c/G43BCy+qGmCaoSAe0w=;
-  b=m0RgrbtyZFUwtdLcEY7w1aG4C/SpHO+TvuOY+/tpkVfzTG83xMdsIlRo
-   b0acG3a7ZUl2hq33aK6l1XoxIJH9Ru43JHmub5WvDg4yZDJ1cfp7YttSi
-   wbgfUpbE7gg3C6QlH3aJ2z8C8YbydMC3Av7AjijXFUc/VQL/QT4wNyHfo
-   13k3CDrVHwZG79N0fXjZLS2MpO82z5keElen+YsfK331HcC4u9LdFD3WO
-   Gp+g0CksJk75qUBDCthR/qyXV4RlgfQIzJYTsf5q3X8eLw6kJn7n9DYuu
-   tv8D6Z16JMyosOqLbTDiFS2KKVDy9+9dzPVEhNEDmM44NwQ/63L+nCVOb
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="398156921"
-X-IronPort-AV: E=Sophos;i="6.04,258,1695711600"; 
-   d="scan'208";a="398156921"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2023 10:36:54 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="862572676"
-X-IronPort-AV: E=Sophos;i="6.04,258,1695711600"; 
-   d="scan'208";a="862572676"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by FMSMGA003.fm.intel.com with ESMTP; 07 Dec 2023 10:36:53 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Jason Xing <kernelxing@tencent.com>,
-	anthony.l.nguyen@intel.com,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net-next] i40e: remove fake support of rx-frames-irq
-Date: Thu,  7 Dec 2023 10:36:47 -0800
-Message-ID: <20231207183648.2819987-1-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
+Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D92210E7
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 10:37:48 -0800 (PST)
+Received: by mail-qk1-x72c.google.com with SMTP id af79cd13be357-77f3b4394fdso48256285a.0
+        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 10:37:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1701974267; x=1702579067; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=al8pLf1i2K3vW5QKeT3fYcCSCcUQxhzzcB4t0NAml9Y=;
+        b=SKcFclhTJ2VdbK7aWehytEPETIk12t+WkDwniczn8Fn/rsH3HwUq7HVw9Q4eOY7tOP
+         gyyVioP0UmHMFlSyLq+hsAyzD3/0TOPXukuDPEzND68xHuE6ZCEU6WJ5rb4jFcrTMKev
+         LBmG1nZu0hW9Lyv2A6SIiei3r02wWK40VPxIY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701974267; x=1702579067;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=al8pLf1i2K3vW5QKeT3fYcCSCcUQxhzzcB4t0NAml9Y=;
+        b=ANWtT6YJ623IWAFFeQao2T7Y6uXveRoGO8nVy+zEc4DIjwD3R6a3tH92aFElWIqPXR
+         Xy/XsdXaKVThmQo3K9n8DP3okiheDSqfJxPK4EUqgwrtgqFZ+dj29MjnehOiJoLFhBGS
+         HfsE94q7YtHIzi5ESM0qMbDKX4MfhHInOfuh46Rr8tPRroN3mqt1WKdAXT+mnbGznRBE
+         1XFBNNCubBSMf0HV2/1Swr+UpaAarntCUgrM0oPVwhyt1ctKXBTEplnLS5cHot3NrS/4
+         xKWhj44L9srPfkiXh+H2+hajUeyseHb9OlNVZQ08qqgmMHGOvXug1aTOL4lPbeK8lCe0
+         6S3Q==
+X-Gm-Message-State: AOJu0Yzwp9Nj1/yND4hockwRiDEthfApV+zKB7vEAZVqdYKaowHB2VI/
+	cVssISZd34yB+zjABzewuv0FrA==
+X-Google-Smtp-Source: AGHT+IEENN9QGjrujgMo6+T217n+Z391k0/HjRzFfGT/Y79Pbi3Rta69sB4OnvBqmHVVfLZsN9TCUg==
+X-Received: by 2002:a05:620a:858:b0:77e:fba3:58bf with SMTP id u24-20020a05620a085800b0077efba358bfmr1321465qku.80.1701974267493;
+        Thu, 07 Dec 2023 10:37:47 -0800 (PST)
+Received: from C02YVCJELVCG.dhcp.broadcom.net ([192.19.144.250])
+        by smtp.gmail.com with ESMTPSA id bk40-20020a05620a1a2800b0077da8c0936asm93148qkb.107.2023.12.07.10.37.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Dec 2023 10:37:47 -0800 (PST)
+From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+X-Google-Original-From: Andy Gospodarek <gospo@broadcom.com>
+Date: Thu, 7 Dec 2023 13:37:40 -0500
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Vikas Gupta <vikas.gupta@broadcom.com>
+Subject: Re: [PATCH net v2 2/4] bnxt_en: Fix skb recycling logic in
+ bnxt_deliver_skb()
+Message-ID: <ZXIQ9FCfUV1Fvr_A@C02YVCJELVCG.dhcp.broadcom.net>
+References: <20231207000551.138584-1-michael.chan@broadcom.com>
+ <20231207000551.138584-3-michael.chan@broadcom.com>
+ <20231207102144.6634a108@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231207102144.6634a108@kernel.org>
 
-From: Jason Xing <kernelxing@tencent.com>
+On Thu, Dec 07, 2023 at 10:21:44AM -0800, Jakub Kicinski wrote:
+> On Wed,  6 Dec 2023 16:05:49 -0800 Michael Chan wrote:
+> > Receive SKBs can go through the VF-rep path or the normal path.
+> > skb_mark_for_recycle() is only called for the normal path.  Fix it
+> > to do it for both paths to fix possible stalled page pool shutdown
+> > errors.
+> 
+> This patch is probably fine, but since I'm complaining -
+> IMHO it may be better to mark the skbs right after they
+> are allocated. Catching all "exit points" seems very error
+> prone...
 
-Since we never support this feature for I40E driver, we don't have to
-display the value when using 'ethtool -c eth0'.
-
-Before this patch applied, the rx-frames-irq is 256 which is consistent
-with tx-frames-irq. Apparently it could mislead users.
-
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/i40e/i40e_ethtool.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-index eb9a7b32af73..2a0a12a79aa3 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-@@ -2895,7 +2895,6 @@ static int __i40e_get_coalesce(struct net_device *netdev,
- 	struct i40e_vsi *vsi = np->vsi;
- 
- 	ec->tx_max_coalesced_frames_irq = vsi->work_limit;
--	ec->rx_max_coalesced_frames_irq = vsi->work_limit;
- 
- 	/* rx and tx usecs has per queue value. If user doesn't specify the
- 	 * queue, return queue 0's value to represent.
-@@ -3029,7 +3028,7 @@ static int __i40e_set_coalesce(struct net_device *netdev,
- 	struct i40e_pf *pf = vsi->back;
- 	int i;
- 
--	if (ec->tx_max_coalesced_frames_irq || ec->rx_max_coalesced_frames_irq)
-+	if (ec->tx_max_coalesced_frames_irq)
- 		vsi->work_limit = ec->tx_max_coalesced_frames_irq;
- 
- 	if (queue < 0) {
--- 
-2.41.0
+That's a good suggestion.  To take it a step further...what about a
+third arg (bool) to build_skb that would automatically call
+skb_mark_for_recycle if the new 3rd arg was true?  I don't love the
+extra arg, but that would avoid duplicating the need to call
+skb_mark_for_recycle for all drivers that use the page pool for all
+data.
 
 
