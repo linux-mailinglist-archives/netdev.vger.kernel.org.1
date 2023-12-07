@@ -1,121 +1,151 @@
-Return-Path: <netdev+bounces-54755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C288808150
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 08:03:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A955480815B
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 08:08:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCF621C20C7D
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 07:03:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 587F5282449
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 07:08:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C65F14264;
-	Thu,  7 Dec 2023 07:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5FA14AA5;
+	Thu,  7 Dec 2023 07:08:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="QQuwvC9U"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="YQkAT+Nx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6A36FA;
-	Wed,  6 Dec 2023 23:03:04 -0800 (PST)
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B90E0D73
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 23:08:01 -0800 (PST)
+Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-54c1cd8d239so753959a12.0
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 23:08:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1701932585; x=1733468585;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=SXaE0jxYY1JnqLGQ+FtXfTHRRnIazmjY0HeKThSqzHQ=;
-  b=QQuwvC9Urkjgro+rl8R0bKIUAGES2jD/ZxQ1lODNiVgziUwFbpDDfJCO
-   ZKY4Cas/WaU2lOqEQf/vPT307qopdkxHHH3rR6LSb0A2tzoN5vsexwgap
-   wRCk2ptwxLmprOO0o0CeDylvvrCkyutI2DGHTGdrSb50z3Ry1ASzb8Ys/
-   M=;
-X-IronPort-AV: E=Sophos;i="6.04,256,1695686400"; 
-   d="scan'208";a="689490897"
-Subject: RE: [PATCH net-next v8 1/8] net: ethtool: pass a pointer to parameters to
- get/set_rxfh ethtool ops
-Thread-Topic: [PATCH net-next v8 1/8] net: ethtool: pass a pointer to parameters to
- get/set_rxfh ethtool ops
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-25ac6bd5.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2023 07:02:58 +0000
-Received: from smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
-	by email-inbound-relay-iad-1d-m6i4x-25ac6bd5.us-east-1.amazon.com (Postfix) with ESMTPS id 29D8B49403;
-	Thu,  7 Dec 2023 07:02:51 +0000 (UTC)
-Received: from EX19MTAEUC001.ant.amazon.com [10.0.43.254:20385]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.44.90:2525] with esmtp (Farcaster)
- id 2082292f-9c21-48cb-bbf7-6b1cfbdc6572; Thu, 7 Dec 2023 07:02:51 +0000 (UTC)
-X-Farcaster-Flow-ID: 2082292f-9c21-48cb-bbf7-6b1cfbdc6572
-Received: from EX19D022EUA002.ant.amazon.com (10.252.50.201) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 7 Dec 2023 07:02:49 +0000
-Received: from EX19D022EUA002.ant.amazon.com (10.252.50.201) by
- EX19D022EUA002.ant.amazon.com (10.252.50.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 7 Dec 2023 07:02:48 +0000
-Received: from EX19D022EUA002.ant.amazon.com ([fe80::7f87:7d63:def0:157d]) by
- EX19D022EUA002.ant.amazon.com ([fe80::7f87:7d63:def0:157d%3]) with mapi id
- 15.02.1118.040; Thu, 7 Dec 2023 07:02:48 +0000
-From: "Kiyanovski, Arthur" <akiyano@amazon.com>
-To: Ahmed Zaki <ahmed.zaki@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"corbet@lwn.net" <corbet@lwn.net>, "jesse.brandeburg@intel.com"
-	<jesse.brandeburg@intel.com>, "anthony.l.nguyen@intel.com"
-	<anthony.l.nguyen@intel.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>, "andrew@lunn.ch"
-	<andrew@lunn.ch>, "horms@kernel.org" <horms@kernel.org>, "mkubecek@suse.cz"
-	<mkubecek@suse.cz>, "willemdebruijn.kernel@gmail.com"
-	<willemdebruijn.kernel@gmail.com>, "gal@nvidia.com" <gal@nvidia.com>,
-	"alexander.duyck@gmail.com" <alexander.duyck@gmail.com>,
-	"ecree.xilinx@gmail.com" <ecree.xilinx@gmail.com>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, Jacob Keller
-	<jacob.e.keller@intel.com>
-Thread-Index: AQHaKJ02y/VPHsTkPk+svVtpsphWUrCdYuGQ
-Date: Thu, 7 Dec 2023 07:02:28 +0000
-Deferred-Delivery: Thu, 7 Dec 2023 07:02:04 +0000
-Message-ID: <82af13c02b5b4a3b9372ee5b38221b4b@amazon.com>
-References: <20231206233642.447794-1-ahmed.zaki@intel.com>
- <20231206233642.447794-2-ahmed.zaki@intel.com>
-In-Reply-To: <20231206233642.447794-2-ahmed.zaki@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=tuxon.dev; s=google; t=1701932880; x=1702537680; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TVyclZazJvX0BLnaExZFu9C3yH6+5Ao3su3cId334Q4=;
+        b=YQkAT+Nxdj3his7EyWpn1VUSiZ7ie8RiRYyZQ4gQKDDZ8OfTB3L/IeHEp/Lbd0LxDu
+         Be2zYwp/3MbEjlgeuwDsALXmMr5MebJkB7r80DPjB58ulbuFAvhzToO1KUqhnkvfLjRb
+         s1FuZVZp4HKAHR5QMicQlX483eg/y+yApoHpiyIfnZRWcq8cIvak/jeEO3ZCSC/tzEln
+         gmSp/ScUAbavTL9nVCZZwJKpDHBTkQFUlK6OZCo6cIzHg5uWgHXJ16N2ePjN6QiTLlHS
+         kgrRNRmX9ozJTwmNRRm+GUDtJufuJNIKV1Ns154h1ecEJLdmvPwio7F2OaSangP1Z96D
+         6hfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701932880; x=1702537680;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TVyclZazJvX0BLnaExZFu9C3yH6+5Ao3su3cId334Q4=;
+        b=mgae30IhTY8pXlnmImRr/BzMpRTfA8m/sxBFs6lI7FpFiPHtzCa/vpWlymZfL+t+fn
+         h1E0tCpJyLXu9nq9V4wFIVXrpPeQtzRLKrufCZgK0YQNyIoS1/508HABuavrVjqpAz/t
+         MhLuyMYcHKaEQ8p08c2JH1OPDWQvPsgr5Yf5+8ldVVqfELGgMOVqwCUyKF0OjvTM0URN
+         TIyKESaqTFJCNWUfavpUgzZYW5G4P3hu7zvBqn2C0B3y/4gojGR3UvIW5wKkoNFxhurW
+         Zo701knWA7MdXt4hbL030/Vk4bwF/mpemcGHZQFvvLj173YPEsSUTqkj5MztxItVNOdM
+         9MOw==
+X-Gm-Message-State: AOJu0YyNwMjbOiYBYt9uJg9C2MoFA3sMASh25ODLPVQ7JBBUGX4Ixuay
+	L1VZ9H7/nFNYPRWCi8xX4gaglg==
+X-Google-Smtp-Source: AGHT+IEC0FkV7t0JGk/8vCkIjlrSN99fzjy/K71uEAV88dEq3aC+gkR+brEZ3swbNQIpMT1WiCCaHw==
+X-Received: by 2002:a05:6402:176b:b0:54c:4837:9fd8 with SMTP id da11-20020a056402176b00b0054c48379fd8mr565439edb.47.1701932880051;
+        Wed, 06 Dec 2023 23:08:00 -0800 (PST)
+Received: from claudiu-X670E-Pro-RS.. ([82.78.167.22])
+        by smtp.gmail.com with ESMTPSA id b41-20020a509f2c000000b0054cb88a353dsm420818edf.14.2023.12.06.23.07.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 23:07:59 -0800 (PST)
+From: Claudiu <claudiu.beznea@tuxon.dev>
+X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
+To: s.shtylyov@omp.ru,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org,
+	geert+renesas@glider.be,
+	magnus.damm@gmail.com,
+	mturquette@baylibre.com,
+	sboyd@kernel.org,
+	linus.walleij@linaro.org,
+	prabhakar.mahadev-lad.rj@bp.renesas.com,
+	biju.das.jz@bp.renesas.com
+Cc: linux-renesas-soc@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-clk@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Subject: [PATCH v2 00/11] renesas: rzg3s: Add support for Ethernet
+Date: Thu,  7 Dec 2023 09:06:49 +0200
+Message-Id: <20231207070700.4156557-1-claudiu.beznea.uj@bp.renesas.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Precedence: Bulk
+Content-Transfer-Encoding: 8bit
 
+From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-> The get/set_rxfh ethtool ops currently takes the rxfh (RSS) parameters
-> as direct function arguments. This will force us to change the API (and
-> all drivers' functions) every time some new parameters are added.
->=20
-> This is part 1/2 of the fix, as suggested in [1]:
->=20
-> - First simplify the code by always providing a pointer to all params
->    (indir, key and func); the fact that some of them may be NULL seems
->    like a weird historic thing or a premature optimization.
->    It will simplify the drivers if all pointers are always present.
->=20
->  - Then make the functions take a dev pointer, and a pointer to a
->    single struct wrapping all arguments. The set_* should also take
->    an extack.
->=20
-> Link: https://lore.kernel.org/netdev/20231121152906.2dd5f487@kernel.org/
-> [1]
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Suggested-by: Jacob Keller <jacob.e.keller@intel.com>
-> Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
-> ---
+Hi,
 
-Thanks for submitting this.
-For the ENA driver:
-Acked-by: Arthur Kiyanovski <akiyano@amazon.com>
+Series adds Ethernet support for Renesas RZ/G3S.
+Along with it preparatory cleanups and fixes were included.
+
+Patches 1-2 are clock specific.
+Patches 3-7 are pinctrl specific.
+Patches 8-11 are device tree specific.
+
+It is expected that patches will be integrated though Geert's tree.
+
+Thank you,
+Claudiu Beznea
+
+Changes in v2:
+- patches 1/14 and 14/14 from v1 were integrated thus, didn't include
+  them in this version
+- dropped patch 3/14 "clk: renesas: rzg2l-cpg: Add support for MSTOP"
+  from v1 and associated changes; a follow up will be done on it after
+  the current series will be accepted
+- addressed review comments
+- fixed typos in commit title and description
+- collected tags
+- removed IEN functinality form patch 6/12 and added it in a separate patch
+  (patch 7/12)
+- patch 11/14] "arm64: renesas: rzg3s-smarc-som: Invert the logic for
+  SW_SD2_EN macro from" from v1 was replaced by patch 10/11 in this
+  version "arm64: renesas: rzg3s-smarc-som: Use switches' names
+  to select on-board functionalities"
+
+Claudiu Beznea (11):
+  clk: renesas: rzg2l-cpg: Check reset monitor registers
+  clk: renesas: r9a08g045-cpg: Add clock and reset support for ETH0 and
+    ETH1
+  pinctrl: renesas: rzg2l: Move arg and index in the main function block
+  pinctrl: renesas: rzg2l: Add pin configuration support for pinmux
+    groups
+  pinctrl: renesas: rzg2l: Add support to select power source for
+    Ethernet pins
+  pinctrl: renesas: rzg2l: Add output enable support
+  pinctrl: renesas: rzg2l: Add input enable to the Ethernet pins
+  dt-bindings: net: renesas,etheravb: Document RZ/G3S support
+  arm64: renesas: r9a08g045: Add the Ethernet nodes
+  arm64: renesas: rzg3s-smarc-som: Use switches' names to select
+    on-board functionalities
+  arm64: dts: renesas: rzg3s-smarc-som: Enable the Ethernet interfaces
+
+ .../bindings/net/renesas,etheravb.yaml        |   1 +
+ arch/arm64/boot/dts/renesas/r9a08g045.dtsi    |  38 ++++
+ .../boot/dts/renesas/rzg3s-smarc-som.dtsi     | 173 ++++++++++++++++--
+ drivers/clk/renesas/r9a08g045-cpg.c           |  10 +
+ drivers/clk/renesas/rzg2l-cpg.c               |  59 ++++--
+ drivers/pinctrl/renesas/pinctrl-rzg2l.c       | 164 +++++++++++++++--
+ 6 files changed, 398 insertions(+), 47 deletions(-)
+
+-- 
+2.39.2
+
 
