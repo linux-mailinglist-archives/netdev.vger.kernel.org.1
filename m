@@ -1,73 +1,76 @@
-Return-Path: <netdev+bounces-54856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63869808999
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 14:55:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 376658089B6
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 15:00:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85B6A1C20BA0
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 13:55:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 681791C20AC0
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 14:00:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E060140C0B;
-	Thu,  7 Dec 2023 13:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3DD04122A;
+	Thu,  7 Dec 2023 14:00:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lXB2XNmW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lCt2r5X0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48CF710F2;
-	Thu,  7 Dec 2023 05:55:24 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-50bfd3a5b54so838051e87.3;
-        Thu, 07 Dec 2023 05:55:24 -0800 (PST)
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1CDC133;
+	Thu,  7 Dec 2023 06:00:34 -0800 (PST)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-a1ca24776c3so416734066b.0;
+        Thu, 07 Dec 2023 06:00:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701957322; x=1702562122; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701957633; x=1702562433; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xv99P0Cwbob2IZ5KHU9goQeyjwZHcKSLv3OpI2FqkiY=;
-        b=lXB2XNmWdXYZRyU0/xKvRUnmDZH6OrAsAmzC7jr3W6yJTXA/mAC5ul5cojTrYxtjWo
-         uUO/0rpu8UwAh6ua9tWaowc3I8+aJEIKRUGIX6xMKaP6Hg7Vq2b0e+y/WP/vmrLdqnvG
-         mHbmVnf5diUkC3IVCYB/84TjbPSR5fkJTUgI9FHqQlYpRzNs8XgYYQWvkHy5xb7CGd4g
-         OJxNJHIBGAwS61Dp0yO1ONGz4+GLts80Vft5fU15mQYer7q7IoK4nz6xzQwvLp75ApxW
-         qAtf0kYBqGAhimpbaFZtadP+x6+anvfNPl6Pxz05/6zYhGFXdCzw68tQ08Pc8Sb7qYB2
-         5s/A==
+        bh=DXGIepeuK98bX+uV4nm8inVKbX3KEEAy9u4QQp1AxGk=;
+        b=lCt2r5X0mXArcV+GDNWYfUwnXTxexggpmME0xLra7SJMmKVs8lemHp6CGFcEolehEW
+         VaNmGly3C9vdoP20KZ4izJgd7SSk49huGvN95+1yEfuqHUZ9z2ZsRNv16hOU/3g77D8X
+         d5A8DyGyI2ExJF0DX5ABC64GWgYEOiX/jn91xKEGIh4cggpkr82LmjccMvSUt/EvULIY
+         sf/bTkFkLkppB6C38i0tsV+bkmfcATPVnyVb9LV+u3IM1gbrPpRGOGVW+OnEOcxcpA59
+         TnVcm/uULsnawr+jZYCBXn0te+kpapIhfqR6NIof3qagQJQ/kgHPGMptDEQF9L8FkN8g
+         X8fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701957322; x=1702562122;
+        d=1e100.net; s=20230601; t=1701957633; x=1702562433;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Xv99P0Cwbob2IZ5KHU9goQeyjwZHcKSLv3OpI2FqkiY=;
-        b=VPoWPQzL/XUttI+ZIEt17T9dFye80sIvLCR1WTnGYaaRLqD+88PnMKyWNfwaakBvkT
-         ZvsBoR4wC57M0kgOEX9jtfUqXuCmmQ+9xnxqmicEhjbHBUExOvClhAfD88VHIRb3fkxz
-         5mDt5HlFaroIPkyaYniXmXq/K/vzjbzAjS+twU0spf+gjkyvWP+pcw3ih6FZEu93Df6d
-         m40DMMhMahpxio9vkMmyvOl2mWIZcv0DoJw5WzVustz1RutGAmt/r6reCYcB68spmClW
-         KB5fIC0YF+RJJ0w8DvhcK1F3zzI2Bk30kWkusvzqWYgQG0j7cAZAiPgEDeHJZfdgiIDh
-         rm2A==
-X-Gm-Message-State: AOJu0YwA+oU6/1465kNla6DCH3a5vfif6H5ez0rUgDmrGYBavZXePNW1
-	FfE/sI7rzzlrELDEDvx5vEu+jeIolYI=
-X-Google-Smtp-Source: AGHT+IEGB4xbcrdvLVhG1vISLjJuiKNX+6Yof/B8clw0ibuf/ixT8aOrRztoSikFwXxu/nprTW3hLA==
-X-Received: by 2002:a05:6512:3c2:b0:50b:e302:597b with SMTP id w2-20020a05651203c200b0050be302597bmr1542042lfp.12.1701957322300;
-        Thu, 07 Dec 2023 05:55:22 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id p23-20020ac246d7000000b0050bf48e6610sm175994lfo.229.2023.12.07.05.55.21
+        bh=DXGIepeuK98bX+uV4nm8inVKbX3KEEAy9u4QQp1AxGk=;
+        b=rjtN/CQrptKTQV+BXCaXiADVdbo3Wntn74I5c9UruIz+oHinnDKGgn6T5MDUNGGC40
+         RsSldl2140Xz44wOjyk7UJWerQ2SnCAAggoza1IUN4bgFrEGbuCoZzJR7LgSyXymHFps
+         eT1QRhZqHz3x2D+rfye239Ci8MY12idWEEAQGzmkbZtozJIrS6GOj4JGtGBb8MKFWd5f
+         5UK8HFdinuagoEgxEXl/61gzlFKNBDynqMDrDxyUVLVY9+roHgyX/al8iZg/8nh1+qt4
+         vcRmXpHfstJ0sSO0L4ly04BV7/JQ+N2cFHJVUIgUnEv/I2Wq2gB5RpqYqjr0b0s4nD/O
+         0zVg==
+X-Gm-Message-State: AOJu0YyV3lfCPbtmmDnsqU5gGREAbQ5zpf/1IfAtJGtlVEFyzMOIBqkv
+	S4UHS3FVyYUehy+stXXzPDg=
+X-Google-Smtp-Source: AGHT+IGLm1ugs54nqbnfjLwuyS3eJ2hV8SofIcgU+yLeZw6U+TvVYoMvUgp62rd0YWlZpZwovXlmxw==
+X-Received: by 2002:a17:906:73d9:b0:a1c:cd3b:4c2f with SMTP id n25-20020a17090673d900b00a1ccd3b4c2fmr4375666ejl.34.1701957632972;
+        Thu, 07 Dec 2023 06:00:32 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id lw26-20020a170906bcda00b00a1b6d503e7esm850811ejb.157.2023.12.07.06.00.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Dec 2023 05:55:21 -0800 (PST)
-Date: Thu, 7 Dec 2023 16:55:19 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Andrew Halaney <ahalaney@redhat.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH net-next v2] net: stmmac: don't create a MDIO bus if
- unnecessary
-Message-ID: <rlq2eodwlesa4bvxz2ro24tsrhfd3cyz3blxhxzldrs3nuktzu@wspwzlz3umkh>
-References: <20231206-stmmac-no-mdio-node-v2-1-333cae49b1ca@redhat.com>
- <o3abmn7ocuksmjg23rrgsib7nfm4yo5rtzlqw2np2pplg73drd@7qe4vrsx2gyc>
- <vmjpuli2l6r7awtiwip6hbgmc4m7hgtbyoqi3z4rhb5chfoiu4@5ebw7tepe6mp>
+        Thu, 07 Dec 2023 06:00:32 -0800 (PST)
+Date: Thu, 7 Dec 2023 16:00:30 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com,
+	Eric Dumazet <edumazet@google.com>, kernel@pengutronix.de,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH net-next v1 3/3] net: dsa: microchip: Fix PHY loopback
+ configuration for KSZ8794 and KSZ8873
+Message-ID: <20231207140030.ki625ety6cg3ujxn@skbuf>
+References: <20231121152426.4188456-1-o.rempel@pengutronix.de>
+ <20231121152426.4188456-1-o.rempel@pengutronix.de>
+ <20231121152426.4188456-3-o.rempel@pengutronix.de>
+ <20231121152426.4188456-3-o.rempel@pengutronix.de>
+ <20231207002823.2qx24nxjhn6e43w4@skbuf>
+ <20231207051502.GB1324895@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,299 +79,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <vmjpuli2l6r7awtiwip6hbgmc4m7hgtbyoqi3z4rhb5chfoiu4@5ebw7tepe6mp>
+In-Reply-To: <20231207051502.GB1324895@pengutronix.de>
 
-On Thu, Dec 07, 2023 at 07:32:29AM -0600, Andrew Halaney wrote:
-> On Thu, Dec 07, 2023 at 02:56:25PM +0300, Serge Semin wrote:
-> > Hi Andrew
-> > 
-> > On Wed, Dec 06, 2023 at 05:46:09PM -0600, Andrew Halaney wrote:
-> > > The stmmac_dt_phy() function, which parses the devicetree node of the
-> > > MAC and ultimately causes MDIO bus allocation, misinterprets what
-> > > fixed-link means in relation to the MAC's MDIO bus. This results in
-> > > a MDIO bus being created in situations it need not be.
+On Thu, Dec 07, 2023 at 06:15:02AM +0100, Oleksij Rempel wrote:
+> On Thu, Dec 07, 2023 at 02:28:23AM +0200, Vladimir Oltean wrote:
+> > On Tue, Nov 21, 2023 at 04:24:26PM +0100, Oleksij Rempel wrote:
+> > > Correct the PHY loopback bit handling in the ksz8_w_phy_bmcr and
+> > > ksz8_r_phy_bmcr functions for KSZ8794 and KSZ8873 variants in the ksz8795
+> > > driver. Previously, the code erroneously used Bit 7 of port register 0xD
+> > > for both chip variants, which is actually for LED configuration. This
+> > > update ensures the correct registers and bits are used for the PHY
+> > > loopback feature:
 > > > 
-> > > Currently a MDIO bus is created if the description is either:
+> > > - For KSZ8794: Use 0xF / Bit 7.
+> > > - For KSZ8873: Use 0xD / Bit 0.
 > > > 
-> > >     1. Not fixed-link
-> > >     2. fixed-link but contains a MDIO bus as well
-> > > 
-> > > The "1" case above isn't always accurate. If there's a phy-handle,
-> > > it could be referencing a phy on another MDIO controller's bus[1]. In
-> > > this case currently the MAC will make a MDIO bus and scan it all
-> > > anyways unnecessarily.
-> > > 
-> > > There's also a lot of upstream devicetrees[2] that expect a MDIO bus to
-> > > be created and scanned for a phy. This case can also be inferred from
-> > > the platform description by not having a phy-handle && not being
-> > > fixed-link. This hits case "1" in the current driver's logic.
-> > > 
-> > > Let's improve the logic to create a MDIO bus if either:
-> > > 
-> > >     - Devicetree contains a MDIO bus
-> > >     - !fixed-link && !phy-handle (legacy handling)
-> > > 
-> > > Below upstream devicetree snippets can be found that explain some of
-> > > the cases above more concretely.
-> > > 
-> > > Here's[0] a devicetree example where the MAC is both fixed-link and
-> > > driving a switch on MDIO (case "2" above). This needs a MDIO bus to
-> > > be created:
-> > > 
-> > >     &fec1 {
-> > >             phy-mode = "rmii";
-> > > 
-> > >             fixed-link {
-> > >                     speed = <100>;
-> > >                     full-duplex;
-> > >             };
-> > > 
-> > >             mdio1: mdio {
-> > >                     switch0: switch0@0 {
-> > >                             compatible = "marvell,mv88e6190";
-> > >                             pinctrl-0 = <&pinctrl_gpio_switch0>;
-> > >                     };
-> > >             };
-> > >     };
-> > > 
-> > > Here's[1] an example where there is no MDIO bus or fixed-link for
-> > > the ethernet1 MAC, so no MDIO bus should be created since ethernet0
-> > > is the MDIO master for ethernet1's phy:
-> > > 
-> > >     &ethernet0 {
-> > >             phy-mode = "sgmii";
-> > >             phy-handle = <&sgmii_phy0>;
-> > > 
-> > >             mdio {
-> > >                     compatible = "snps,dwmac-mdio";
-> > >                     sgmii_phy0: phy@8 {
-> > >                             compatible = "ethernet-phy-id0141.0dd4";
-> > >                             reg = <0x8>;
-> > >                             device_type = "ethernet-phy";
-> > >                     };
-> > > 
-> > >                     sgmii_phy1: phy@a {
-> > >                             compatible = "ethernet-phy-id0141.0dd4";
-> > >                             reg = <0xa>;
-> > >                             device_type = "ethernet-phy";
-> > >                     };
-> > >             };
-> > >     };
-> > > 
-> > >     &ethernet1 {
-> > >             phy-mode = "sgmii";
-> > >             phy-handle = <&sgmii_phy1>;
-> > >     };
-> > > 
-> > > Finally there's descriptions like this[2] which don't describe the
-> > > MDIO bus but expect it to be created and the whole address space
-> > > scanned for a phy since there's no phy-handle or fixed-link described:
-> > > 
-> > >     &gmac {
-> > >             phy-supply = <&vcc_lan>;
-> > >             phy-mode = "rmii";
-> > >             snps,reset-gpio = <&gpio3 RK_PB4 GPIO_ACTIVE_HIGH>;
-> > >             snps,reset-active-low;
-> > >             snps,reset-delays-us = <0 10000 1000000>;
-> > >     };
-> > > 
-> > > [0] https://elixir.bootlin.com/linux/v6.5-rc5/source/arch/arm/boot/dts/nxp/vf/vf610-zii-ssmb-dtu.dts
-> > > [1] https://elixir.bootlin.com/linux/v6.6-rc5/source/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
-> > > [2] https://elixir.bootlin.com/linux/v6.6-rc5/source/arch/arm64/boot/dts/rockchip/rk3368-r88.dts#L164
-> > 
-> > Thank you for the patch. Please find a comment below.
-> > 
-> > > 
-> > > Co-developed-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > > Signed-off-by: Andrew Halaney <ahalaney@redhat.com>
+> > > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 > > > ---
-> > >  .../net/ethernet/stmicro/stmmac/stmmac_platform.c  | 85 ++++++++++------------
-> > >  1 file changed, 37 insertions(+), 48 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > > index 1ffde555da47..7da461fe93f6 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > > @@ -296,69 +296,39 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
-> > >  }
-> > >  
-> > >  /**
-> > > - * stmmac_dt_phy - parse device-tree driver parameters to allocate PHY resources
-> > > - * @plat: driver data platform structure
-> > > - * @np: device tree node
-> > > - * @dev: device pointer
-> > > - * Description:
-> > > - * The mdio bus will be allocated in case of a phy transceiver is on board;
-> > > - * it will be NULL if the fixed-link is configured.
-> > > - * If there is the "snps,dwmac-mdio" sub-node the mdio will be allocated
-> > > - * in any case (for DSA, mdio must be registered even if fixed-link).
-> > > - * The table below sums the supported configurations:
-> > > - *	-------------------------------
-> > > - *	snps,phy-addr	|     Y
-> > > - *	-------------------------------
-> > > - *	phy-handle	|     Y
-> > > - *	-------------------------------
-> > > - *	fixed-link	|     N
-> > > - *	-------------------------------
-> > > - *	snps,dwmac-mdio	|
-> > > - *	  even if	|     Y
-> > > - *	fixed-link	|
-> > > - *	-------------------------------
-> > > + * stmmac_of_get_mdio() - Gets the MDIO bus from the devicetree
-> > > + * @np: devicetree node
-> > >   *
-> > > - * It returns 0 in case of success otherwise -ENODEV.
-> > > + * The MDIO bus will be searched for in the following ways:
-> > > + * 1. The compatible is "snps,dwc-qos-ethernet-4.10" && a "mdio" named
-> > > + *    child node exists
-> > > + * 2. A child node with the "snps,dwmac-mdio" compatible is present
-> > > + *
-> > > + * Return: The MDIO node if present otherwise NULL
-> > >   */
-> > > -static int stmmac_dt_phy(struct plat_stmmacenet_data *plat,
-> > > -			 struct device_node *np, struct device *dev)
-> > > +static struct device_node *stmmac_of_get_mdio(struct device_node *np)
-> > >  {
-> > > -	bool mdio = !of_phy_is_fixed_link(np);
-> > >  	static const struct of_device_id need_mdio_ids[] = {
-> > >  		{ .compatible = "snps,dwc-qos-ethernet-4.10" },
-> > >  		{},
-> > >  	};
-> > > +	struct device_node *mdio_node = NULL;
-> > >  
-> > >  	if (of_match_node(need_mdio_ids, np)) {
-> > > -		plat->mdio_node = of_get_child_by_name(np, "mdio");
-> > > +		mdio_node = of_get_child_by_name(np, "mdio");
-> > >  	} else {
-> > >  		/**
-> > >  		 * If snps,dwmac-mdio is passed from DT, always register
-> > >  		 * the MDIO
-> > >  		 */
-> > > -		for_each_child_of_node(np, plat->mdio_node) {
-> > > -			if (of_device_is_compatible(plat->mdio_node,
-> > > +		for_each_child_of_node(np, mdio_node) {
-> > > +			if (of_device_is_compatible(mdio_node,
-> > >  						    "snps,dwmac-mdio"))
-> > >  				break;
-> > >  		}
-> > >  	}
-> > >  
-> > > -	if (plat->mdio_node) {
-> > > -		dev_dbg(dev, "Found MDIO subnode\n");
-> > > -		mdio = true;
-> > > -	}
-> > > -
-> > > -	if (mdio) {
-> > > -		plat->mdio_bus_data =
-> > > -			devm_kzalloc(dev, sizeof(struct stmmac_mdio_bus_data),
-> > > -				     GFP_KERNEL);
-> > > -		if (!plat->mdio_bus_data)
-> > > -			return -ENOMEM;
-> > > -
-> > > -		plat->mdio_bus_data->needs_reset = true;
-> > > -	}
-> > > -
-> > > -	return 0;
-> > > +	return mdio_node;
-> > >  }
-> > >  
-> > >  /**
-> > > @@ -417,6 +387,7 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
-> > >  	struct device_node *np = pdev->dev.of_node;
-> > >  	struct plat_stmmacenet_data *plat;
-> > >  	struct stmmac_dma_cfg *dma_cfg;
-> > > +	bool legacy_mdio;
-> > >  	int phy_mode;
-> > >  	void *ret;
-> > >  	int rc;
-> > > @@ -471,10 +442,28 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
-> > >  	if (of_property_read_u32(np, "snps,phy-addr", &plat->phy_addr) == 0)
-> > >  		dev_warn(&pdev->dev, "snps,phy-addr property is deprecated\n");
-> > >  
-> > > -	/* To Configure PHY by using all device-tree supported properties */
-> > > -	rc = stmmac_dt_phy(plat, np, &pdev->dev);
-> > > -	if (rc)
-> > > -		return ERR_PTR(rc);
-> > > +	plat->mdio_node = stmmac_of_get_mdio(np);
-> > > +	if (plat->mdio_node)
-> > > +		dev_dbg(&pdev->dev, "Found MDIO subnode\n");
-> > > +
 > > 
-> > > +	/* Legacy devicetrees allowed for no MDIO bus description and expect
-> > > +	 * the bus to be scanned for devices. If there's no phy or fixed-link
-> > > +	 * described assume this is the case since there must be something
-> > > +	 * connected to the MAC.
-> > > +	 */
-> > > +	legacy_mdio = !of_phy_is_fixed_link(np) && !plat->phy_node;
-> > > +	if (legacy_mdio)
-> > > +		dev_info(&pdev->dev, "Deprecated MDIO bus assumption used\n");
-> > > +
-> > > +	if (plat->mdio_node || legacy_mdio) {
-> > > +		plat->mdio_bus_data = devm_kzalloc(&pdev->dev,
-> > > +						   sizeof(struct stmmac_mdio_bus_data),
-> > > +						   GFP_KERNEL);
-> > > +		if (!plat->mdio_bus_data)
-> > > +			return ERR_PTR(-ENOMEM);
-> > > +
-> > > +		plat->mdio_bus_data->needs_reset = true;
-> > > +	}
-> > 
-> > Why did you decide to move this out of the dedicated function?
-> > stmmac_probe_config_dt() is already overwhelmed with various
-> > non-coherent actions. The method has already got to being too long to
-> > follow the kernel coding style limit (I have got a not submitted yet
-> > cleanup patchset which step-by-step fixes that). Could you please get
-> > the chunk above back to the respective function and, for instance,
-> > just change it's name to something like stmmac_mdio_setup()? (I prefer
-> > having "_setup" suffix because some of the locally defined static
-> > methods already use it: stmmac_axi_setup(), stmmac_mtl_setup().)
+> > How did you find, and how did you test this, and on which one of the switches?
 > 
-
-> Sure, I can put it back in. I'll probably keep stmmac_of_get_mdio()
-> (which is named in the style I see in the current file -- although as
-> you highlight that shouldn't be taken as the best example of clean),
-> and have stmmac_mdio_setup() call that and and mimic the inputs/outputs
-> of the current function (moving the rest of the added code from
-> stmmac_probe_config_dt() back into that function).
+> I tested it by using "ethtool -t lanX" command on KSZ8873. Before this
+> patch the link will stop to work _after_ end of the selftest. The
+> selftest will fail too.
 > 
-> Thanks for the feedback, let me know if you still think that abstraction
-> isn't ideal (or wait till I post it :P) and I'll go with exactly as you
-> said.
+> After this patch, the selftest is passed, except of the TCP test. And
+> link is working _after_ the selftest,
 
-Sounds good. Thanks for taking my comment into account.
+So you are suggesting that this far-end loopback mode does work as
+expected by the kernel.
 
-> I'm not _too_ opinionated on it, but thought stmmac_dt_phy()
-> didn't explain much and stmmac_of_get_mdio() was self-explanatory enough
-> that it helped readability.
+But is that consistent with the description from the datasheet? It speaks
+about an "originating PHY port", but maybe this is confusing, because
+based on your test, even the CPU port could be originating the traffic
+that gets looped back?
 
-You were right. stmmac_dt_phy() hasn't been explicitly doing
-PHY-related things since commit 74371272f97f ("net: stmmac: Convert to
-phylink and remove phylib logic"), but has been left with the MDIO
-stuff only. The function name wasn't that well chosen either.  It
-didn't indicate what the function actually did, like "init", "get",
-"setup", etc. From that perspective your naming is much better - short
-and self-explanatory indeed.
+I see it says that far-end loopback goes through the switching fabric.
+So the packet, on its return path from the loopback port, gets forwarded
+by its MAC DA? That can't be, because the MAC DA lookup has already
+determined the destination to be the loopback port (and no MAC SA<->DA
+swapping should take place). Or it is forced by the switch to return
+specifically to the originating port?
 
--Serge(y)
+With a bridge between the 2 LAN ports, and lan1 put in loopback, what
+happens if you send a broadcast packet towards lan1? Will you also see
+it on lan2's link partner, or only on the CPU port?
 
-> 
-> > 
-> > -Serge(y)
-> > 
-> > >  
-> > >  	of_property_read_u32(np, "tx-fifo-depth", &plat->tx_fifo_size);
-> > >  
-> > > 
-> > > ---
-> > > base-commit: fd8a79b63710acb84321be3ce74be23c876873fb
-> > > change-id: 20231127-stmmac-no-mdio-node-1db9da8a25d9
-> > > 
-> > > Best regards,
-> > > -- 
-> > > Andrew Halaney <ahalaney@redhat.com>
-> > > 
-> > > 
-> > 
-> 
+It's not your fault, but this is all a bit confusing, and I'm not quite
+able to match up the documentation with your results. I will trust the
+experimental results, however.
 
