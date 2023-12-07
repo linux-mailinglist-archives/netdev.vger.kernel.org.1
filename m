@@ -1,222 +1,204 @@
-Return-Path: <netdev+bounces-54860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B46A18089E5
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 15:10:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC0908089EA
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 15:10:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D79921C20BB4
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 14:10:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0907E1C2096B
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 14:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D6741766;
-	Thu,  7 Dec 2023 14:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4A6641743;
+	Thu,  7 Dec 2023 14:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fnZ4NFJ9"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="RtAKYDCo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B17A10F8
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 06:09:57 -0800 (PST)
-Received: by mail-yb1-xb35.google.com with SMTP id 3f1490d57ef6-db539f21712so879966276.1
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 06:09:57 -0800 (PST)
+Received: from mail-yw1-x112a.google.com (mail-yw1-x112a.google.com [IPv6:2607:f8b0:4864:20::112a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23D4C10E4
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 06:10:26 -0800 (PST)
+Received: by mail-yw1-x112a.google.com with SMTP id 00721157ae682-5d7a47d06eeso7882007b3.1
+        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 06:10:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1701958197; x=1702562997; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=5qgF3sSIvHz1zfLicY+6TVgFqCZEC8QJz84mVPu4JT0=;
-        b=fnZ4NFJ9NmR/qCxRU79NGewBCmU7WI2JOWueNsfu/tGjssI98afaJBefSldy5rTbjA
-         I6dt3qLGEfi5JZJOHJvNhdjzYesH1X9AZqJ833az11x/7zhV0vVMFKu6TYogMeM50u9g
-         MdWDBLOkD58SigGjVLyno5hvFxq3wLLFOTf4O9CYd1WcqVwhYJvSvtZiDg3obQGjm7Pk
-         MzitHMFWByZOQNz7S278KiKOjmImUw+AmwYEeUd71kSNvnGLWTJBkXveNZRbeflhp17e
-         3QjW0g3dxQY905+3Ke3tC4qsoSHDQKPmUVSqSsY8WumxOzMxvT1OOgFbv/kxAI/QX6sm
-         /AHQ==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701958225; x=1702563025; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uDGlQYDb5PUCcczbzebIyUx2ResvXtOo+s87LRLH3zs=;
+        b=RtAKYDColJ+Hwj66XMHoYWoqFnijV+E2Fl+W4OeI0g0e55+kvX4wc5x99vnTEbHPEg
+         tAXcidR2nrrnmvcgsask5frtXscd7uCk2rFwSdhE1FOrfagDRDlHWTEXmjom5aZoSv3M
+         dLBYAmiqxGqAm88A6A6JK315kjyAWEiM2y7Ij1L35gQP9AsVnMeepL3YRie7A9zAIc2f
+         iz50kyeL8maPkIs8QCmkOrkCzJc/PrmI9TZMtR5B07ZJBvxpnnx08C6ejEuo5LHMQzkM
+         wVyIY+OanDYUToZsGe9iIO5m1vuoiY5SvSOGdzgUOG7DC2Tp9RA2kTrrX0lVM+lJvG7O
+         NZrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701958197; x=1702562997;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5qgF3sSIvHz1zfLicY+6TVgFqCZEC8QJz84mVPu4JT0=;
-        b=C3jx6sL8QlLvZPidGRxUpi+P125nrDw+RagsuSqpoZK7xxgdceBhLhdmCuKcERcy/V
-         e43L97FPdXPqJJXutNA7UgoEniOW0HOnt9kuxjMnfs1e77oE5GKVYcXWU4qjF+kiff/Y
-         Xu1WHragDft2zrC4UVcYKUTpwYqDqzd0dLijnrjj+sXfQJfDKO16VxMftU7kX52wy5Y4
-         /OapWSC7Y6GiB5IGWHrnu66KNamZMrjpP5u6jlkGYT50KFwUbdE0HGttyeJrnXWi+rLB
-         8CrAB8EyZjJknV4VjN7ESzaLCstYG8eh/wPKQ+8fCr4qWrzJ0KYpTq6s/MWaRAf0FmWd
-         kmrw==
-X-Gm-Message-State: AOJu0YwWeMr7bAaABcpcMj+AsuJYujQeq/erG/Bs08aFS51yFVHxw+Ty
-	0+Re8nuUAZ5BdhMbtkrGSUFQfGNy8H/AHWE5DOgclA==
-X-Google-Smtp-Source: AGHT+IHVRH9O+e/jlUGrQAx9xh4VLn2kxitHRh22/vDYDil0LX+cgDdw2m9RceCZ/RhFJs4fR36Mbayjmu8hE8wtVMY=
-X-Received: by 2002:a25:da49:0:b0:db4:5cdd:f6b4 with SMTP id
- n70-20020a25da49000000b00db45cddf6b4mr3336991ybf.14.1701958196710; Thu, 07
- Dec 2023 06:09:56 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701958225; x=1702563025;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uDGlQYDb5PUCcczbzebIyUx2ResvXtOo+s87LRLH3zs=;
+        b=asLkID1K7tbKlQTs/Z5jKtIU5ojnyqqqCcJG0o2+jvgPeJnicqR1KiJV9yjeTcqE5n
+         lKdbdQSkto+hWopWy9T8n59KTZDIG3Va71Pxb3e74h/OqHp17nOcMEDpdTOp7JiZakGm
+         FJva1Qt941l+uyaB+bvsTlXRvE94Z3/1Xli3/OoUlakWTNHNS9m8YqzBw+P35QN54idv
+         yGnXMUeY0k573YsRM7S6754kyXWAtGiJrnVv4XY5ZsW3CqjZMtnnjmktNzc+P8/27xLw
+         yBGGOqnwTONXmT8h80kuyD0gsEtH40QSbsd7dynagavwmSe4Mtum+tspshz8Cv42luA8
+         MHzA==
+X-Gm-Message-State: AOJu0YwLRgCoQcpQugKi3gyC3P+coRkSmsmaAAI8HVu2QtEBCrVnfypB
+	PW0GMen9ZyHorxC2MFMwv4ajivoqKjPPJjVv34HOQg==
+X-Google-Smtp-Source: AGHT+IHlXNWdOZ8QC8IUstIusrU0V6V71CjdzbND+uTsAe3x7XbWfUVIrrLtyXnac+A71ULvwPlfHajKKebicYyjzxM=
+X-Received: by 2002:a0d:dd0d:0:b0:5d4:ce2:e90d with SMTP id
+ g13-20020a0ddd0d000000b005d40ce2e90dmr2364538ywe.31.1701958225246; Thu, 07
+ Dec 2023 06:10:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231206073712.17776-1-jirislaby@kernel.org> <20231206073712.17776-5-jirislaby@kernel.org>
-In-Reply-To: <20231206073712.17776-5-jirislaby@kernel.org>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Thu, 7 Dec 2023 15:09:21 +0100
-Message-ID: <CAPDyKFo=X+ESxuYov1TDvLEWk1XCSU2o98=+5Y8LvHWr2nKF6Q@mail.gmail.com>
-Subject: Re: [PATCH 04/27] tty: make tty_operations::send_xchar accept u8 char
-To: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
-Cc: gregkh@linuxfoundation.org, linux-serial@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Karsten Keil <isdn@linux-pingi.de>, 
-	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, netdev@vger.kernel.org, linux-mmc@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org
+References: <cover.1674233458.git.dcaratti@redhat.com> <5fdd584d53f0807f743c07b1c0381cf5649495cd.1674233458.git.dcaratti@redhat.com>
+ <CAM0EoMn4C-zwrTCGzKzuRYukxoqBa8tyHyFDwUSZYwkMOUJ4Lw@mail.gmail.com>
+ <CAKa-r6sNMq5b=PiUhm0U=COV1fE=HL_CjOPxchs1WpWi4-_XNA@mail.gmail.com> <CAM0EoMm6QHzFdFLJ8Q1nO6W-m47tkxzVp7k2rAZYJZNXCCbM9g@mail.gmail.com>
+In-Reply-To: <CAM0EoMm6QHzFdFLJ8Q1nO6W-m47tkxzVp7k2rAZYJZNXCCbM9g@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 7 Dec 2023 09:10:13 -0500
+Message-ID: <CAM0EoMmvjwxLmdT5pQJ-hXVMA2OJUfy8TJKDxZ=vf+Thzza0=Q@mail.gmail.com>
+Subject: Re: Mirred broken WAS(Re: [PATCH net-next 2/2] act_mirred: use the
+ backlog for nested calls to mirred ingress
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, Xin Long <lucien.xin@gmail.com>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, wizhao@redhat.com, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Florian Westphal <fw@strlen.de>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 6 Dec 2023 at 08:37, Jiri Slaby (SUSE) <jirislaby@kernel.org> wrote:
->
-> tty_operations::send_xchar is one of the last users of 'char' type for
-> characters in the tty layer. Convert it to u8 now.
->
-> Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
-> Cc: Karsten Keil <isdn@linux-pingi.de>
-> Cc: Ulf Hansson <ulf.hansson@linaro.org>
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> Cc: netdev@vger.kernel.org
-> Cc: linux-mmc@vger.kernel.org
-> Cc: linux-bluetooth@vger.kernel.org
+Hi Davide,
 
-Acked-by: Ulf Hansson <ulf.hansson@linaro.org> # For MMC
 
-Kind regards
-Uffe
+On Tue, Dec 5, 2023 at 10:12=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> On Tue, Dec 5, 2023 at 5:54=E2=80=AFAM Davide Caratti <dcaratti@redhat.co=
+m> wrote:
+> >
+> > hello Jamal, thanks for looking at this!
+> >
+> > On Mon, Dec 4, 2023 at 9:24=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.c=
+om> wrote:
+> > >
+> > > On Fri, Jan 20, 2023 at 12:02=E2=80=AFPM Davide Caratti <dcaratti@red=
+hat.com> wrote:
+> > > >
+> > > > William reports kernel soft-lockups on some OVS topologies when TC =
+mirred
+> > > > egress->ingress action is hit by local TCP traffic [1].
+> > > > The same can also be reproduced with SCTP (thanks Xin for verifying=
+), when
+> > > > client and server reach themselves through mirred egress to ingress=
+, and
+> > > > one of the two peers sends a "heartbeat" packet (from within a time=
+r).
+> >
+> > [...]
+> >
+> > > I am afraid this broke things. Here's a simple use case which causes
+> > > an infinite loop (that we found while testing blockcasting but
+> > > simplified to demonstrate the issue):
+> >
+> > [...]
+> >
+> > > sudo ip netns exec p4node tc qdisc add dev port0 clsact
+> > > sudo ip netns exec p4node tc filter add dev port0 ingress protocol ip
+> > > prio 10 matchall action mirred ingress redirect dev port0
+> >
+> > the above rule is taking packets from port0 ingress and putting it
+> > again in the mirred ingress of the same device, hence the loop.
+>
+> Right - that was intentional to show the loop. We are worrying about
+> extending mirred now to also broadcast (see the blockcast discussion)
+> to more ports making the loop even worse. The loop should terminate at
+> some point - in this case it does not...
+>
+> > I don't see it much different than what we can obtain with bridges:
+> >
+> > # ip link add name one type veth peer name two
+> > # ip link add name three type veth peer name four
+> > # for n in even odd; do ip link add name $n type bridge; done
+> > # for n in one two three four even odd; do ip link set dev $n up; done
+> > # for n in one three; do ip link set dev $n master odd; done
+> > # for n in two four; do ip link set dev $n master even; done
+> >
+>
+> Sure that is another way to reproduce.
 
-> ---
->  drivers/isdn/capi/capi.c         | 4 ++--
->  drivers/mmc/core/sdio_uart.c     | 2 +-
->  drivers/tty/amiserial.c          | 2 +-
->  drivers/tty/serial/serial_core.c | 2 +-
->  drivers/tty/tty_io.c             | 2 +-
->  include/linux/tty.h              | 2 +-
->  include/linux/tty_driver.h       | 4 ++--
->  net/bluetooth/rfcomm/tty.c       | 2 +-
->  8 files changed, 10 insertions(+), 10 deletions(-)
+Ok, so i can verify that re-introduction of the ttl field in the
+skb[1] fixes the issue. But restoring that patch may cause too much
+bikeshedding. Victor will work on a better approach using the cb
+struct instead - there may. Are you able to test with/out your patch
+and see if this same patch fixes it?
+
+cheers,
+jamal
+
+[1]https://lore.kernel.org/all/1430765318-13788-1-git-send-email-fw@strlen.=
+de/
+
+> > there is a practical difference: with bridges we have protocols (like
+> > STP) that can detect and act-upon loops - while TC mirred needs some
+> > facility on top (not 100% sure, but the same might also apply to
+> > similar tools, such as users of bpf_redirect() helper)
+> >
 >
-> diff --git a/drivers/isdn/capi/capi.c b/drivers/isdn/capi/capi.c
-> index 2f3789515445..6e80d7bd3c4d 100644
-> --- a/drivers/isdn/capi/capi.c
-> +++ b/drivers/isdn/capi/capi.c
-> @@ -1231,9 +1231,9 @@ static void capinc_tty_hangup(struct tty_struct *tty)
->         tty_port_hangup(&mp->port);
->  }
+> I dont think we can run something equivalent inside the kernel. The
+> ttl worked fine. BTW, the example shown breaks even when you have
+> everything running on a single cpu (and packets being queued on the
+> backlog)
 >
-> -static void capinc_tty_send_xchar(struct tty_struct *tty, char ch)
-> +static void capinc_tty_send_xchar(struct tty_struct *tty, u8 ch)
->  {
-> -       pr_debug("capinc_tty_send_xchar(%d)\n", ch);
-> +       pr_debug("capinc_tty_send_xchar(%u)\n", ch);
->  }
+> > > reverting the patch fixes things and it gets caught by the nested
+> > > recursion check.
+> >
+> > the price of that revert is: we'll see those soft-lockups again with
+> > L4 protocols when peers communicate through mirred egress -> ingress.
+> >
+> > And even if it would fix mirred egress->ingress loops, we would still
+> > suffer from soft-lockups (on the qdisc root lock) when the same rule
+> > is done with mirred egress (see an example at
+> > https://github.com/multipath-tcp/mptcp_net-next/issues/451#issuecomment=
+-1782690200)
+> > [1]
 >
->  static const struct tty_operations capinc_ops = {
-> diff --git a/drivers/mmc/core/sdio_uart.c b/drivers/mmc/core/sdio_uart.c
-> index a05322f15771..370fadf1d6d1 100644
-> --- a/drivers/mmc/core/sdio_uart.c
-> +++ b/drivers/mmc/core/sdio_uart.c
-> @@ -792,7 +792,7 @@ static unsigned int sdio_uart_chars_in_buffer(struct tty_struct *tty)
->         return kfifo_len(&port->xmit_fifo);
->  }
+> Yes, we need to make sure those are fixed with whatever replacement..
+> The loops will happen even on egress->egress (the example only showed
+> ingress-ingress).
 >
-> -static void sdio_uart_send_xchar(struct tty_struct *tty, char ch)
-> +static void sdio_uart_send_xchar(struct tty_struct *tty, u8 ch)
->  {
->         struct sdio_uart_port *port = tty->driver_data;
+> We will try restoring the ttl and see if it continues to work with
+> your patch intact... unless there are other ideas.
 >
-> diff --git a/drivers/tty/amiserial.c b/drivers/tty/amiserial.c
-> index a80f059f77bf..a30dc054ffbf 100644
-> --- a/drivers/tty/amiserial.c
-> +++ b/drivers/tty/amiserial.c
-> @@ -811,7 +811,7 @@ static void rs_flush_buffer(struct tty_struct *tty)
->   * This function is used to send a high-priority XON/XOFF character to
->   * the device
->   */
-> -static void rs_send_xchar(struct tty_struct *tty, char ch)
-> +static void rs_send_xchar(struct tty_struct *tty, u8 ch)
->  {
->         struct serial_state *info = tty->driver_data;
->          unsigned long flags;
-> diff --git a/drivers/tty/serial/serial_core.c b/drivers/tty/serial/serial_core.c
-> index 0393853b9947..80085b151b34 100644
-> --- a/drivers/tty/serial/serial_core.c
-> +++ b/drivers/tty/serial/serial_core.c
-> @@ -687,7 +687,7 @@ EXPORT_SYMBOL_GPL(uart_xchar_out);
->   * This function is used to send a high-priority XON/XOFF character to
->   * the device
->   */
-> -static void uart_send_xchar(struct tty_struct *tty, char ch)
-> +static void uart_send_xchar(struct tty_struct *tty, u8 ch)
->  {
->         struct uart_state *state = tty->driver_data;
->         struct uart_port *port;
-> diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
-> index 005d91c63707..6a502110da61 100644
-> --- a/drivers/tty/tty_io.c
-> +++ b/drivers/tty/tty_io.c
-> @@ -1149,7 +1149,7 @@ ssize_t redirected_tty_write(struct kiocb *iocb, struct iov_iter *iter)
->   *
->   * Locking: none for xchar method, write ordering for write method.
->   */
-> -int tty_send_xchar(struct tty_struct *tty, char ch)
-> +int tty_send_xchar(struct tty_struct *tty, u8 ch)
->  {
->         bool was_stopped = tty->flow.stopped;
+> > > Frankly, I believe we should restore a proper ttl from what was remov=
+ed here:
+> > > https://lore.kernel.org/all/1430765318-13788-1-git-send-email-fw@strl=
+en.de/
+> > > The headaches(and time consumed) trying to save the 3-4 bits removing
+> > > the ttl field is not worth it imo.
+> >
+> > TTL would protect us against loops when they are on the same node:
+> > what do you think about inserting a rule that detects BPDU before the
+> > mirred ingress rule?
 >
-> diff --git a/include/linux/tty.h b/include/linux/tty.h
-> index e96c85f4f91e..d3bedcc08738 100644
-> --- a/include/linux/tty.h
-> +++ b/include/linux/tty.h
-> @@ -410,7 +410,7 @@ void tty_wait_until_sent(struct tty_struct *tty, long timeout);
->  void stop_tty(struct tty_struct *tty);
->  void start_tty(struct tty_struct *tty);
->  void tty_write_message(struct tty_struct *tty, char *msg);
-> -int tty_send_xchar(struct tty_struct *tty, char ch);
-> +int tty_send_xchar(struct tty_struct *tty, u8 ch);
->  int tty_put_char(struct tty_struct *tty, unsigned char c);
->  unsigned int tty_chars_in_buffer(struct tty_struct *tty);
->  unsigned int tty_write_room(struct tty_struct *tty);
-> diff --git a/include/linux/tty_driver.h b/include/linux/tty_driver.h
-> index f428c1b784a2..7372124fbf90 100644
-> --- a/include/linux/tty_driver.h
-> +++ b/include/linux/tty_driver.h
-> @@ -242,7 +242,7 @@ struct serial_struct;
->   *     Optional: If not provided, the device is assumed to have no FIFO.
->   *     Usually correct to invoke via tty_wait_until_sent(). May sleep.
->   *
-> - * @send_xchar: ``void ()(struct tty_struct *tty, char ch)``
-> + * @send_xchar: ``void ()(struct tty_struct *tty, u8 ch)``
->   *
->   *     This routine is used to send a high-priority XON/XOFF character (@ch)
->   *     to the @tty device.
-> @@ -374,7 +374,7 @@ struct tty_operations {
->         void (*flush_buffer)(struct tty_struct *tty);
->         void (*set_ldisc)(struct tty_struct *tty);
->         void (*wait_until_sent)(struct tty_struct *tty, int timeout);
-> -       void (*send_xchar)(struct tty_struct *tty, char ch);
-> +       void (*send_xchar)(struct tty_struct *tty, u8 ch);
->         int (*tiocmget)(struct tty_struct *tty);
->         int (*tiocmset)(struct tty_struct *tty,
->                         unsigned int set, unsigned int clear);
-> diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-> index 94ec913dfb76..69c75c041fe1 100644
-> --- a/net/bluetooth/rfcomm/tty.c
-> +++ b/net/bluetooth/rfcomm/tty.c
-> @@ -1041,7 +1041,7 @@ static void rfcomm_tty_flush_buffer(struct tty_struct *tty)
->         tty_wakeup(tty);
->  }
+> I dont think running STP will save us from this, unless i am mistaken.
+> This happens within the kernel before the packet hits the "wire".
+> Besides this happens without using any bridging.
 >
-> -static void rfcomm_tty_send_xchar(struct tty_struct *tty, char ch)
-> +static void rfcomm_tty_send_xchar(struct tty_struct *tty, u8 ch)
->  {
->         BT_DBG("tty %p ch %c", tty, ch);
->  }
-> --
-> 2.43.0
+> > [1] by the way: the POC patch at
+> > https://github.com/multipath-tcp/mptcp_net-next/issues/451#issuecomment=
+-1782654075
+> > silcences lockdep false warnings, and it preserves the splat when the
+> > real deadlock happens with TC marred egress. If you agree I will send
+> > it soon to this ML for review.
 >
+> please do.
+>
+> cheers,
+> jamal
 
