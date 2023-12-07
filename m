@@ -1,108 +1,204 @@
-Return-Path: <netdev+bounces-54865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF85A808A82
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 15:27:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFD6A808A83
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 15:28:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C885A1C20967
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 14:27:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 309EF1F2147A
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 14:28:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF88641C98;
-	Thu,  7 Dec 2023 14:27:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D52D842ABB;
+	Thu,  7 Dec 2023 14:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kk5oat6g"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X7H0sA/S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-xc2f.google.com (mail-oo1-xc2f.google.com [IPv6:2607:f8b0:4864:20::c2f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E33110F4
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 06:27:50 -0800 (PST)
-Received: by mail-oo1-xc2f.google.com with SMTP id 006d021491bc7-58df5988172so399430eaf.0
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 06:27:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701959269; x=1702564069; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=450M0AQxIxgaM1VLNXLyeZJkmjwkJaCjk2V9n5tnm28=;
-        b=kk5oat6gdB8cR3bg0bMPW0YFsiFkhaucDYzuccd2B8V1SR6ME7tvw1nGj5YmRIQlSc
-         biV5owuOHZE0sphcLFsWXgj3db8gJybGk/xyrRZtS2ikFmJfa7abJ9R/O2FW8Aom6cOa
-         hEwnpotpuNKbbZpYsVM8vm/mMXM7pvHRM4b/0uSuu2sXn85MPcHZyR2772y6vncNWtfw
-         lMsOwdJANMlKrCA7+Dqlagpyw2EVlZ9nZ2QubEFHfL65g6d0N4qrGDXmsVvXAns8QySU
-         fL7N/CPsBVOb/ID9PKAmc7bueax0DXDbUsYDdRkKn2DgrvHvKskoHEw4VYNfRKKyurkH
-         p6cQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701959269; x=1702564069;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=450M0AQxIxgaM1VLNXLyeZJkmjwkJaCjk2V9n5tnm28=;
-        b=Q9GZ+G+eqGONTRPTqIYSqah25UwAzxgSS7nFl032a1KsGTs/bJAv+O65vw2dQmxHb6
-         4xNcuCwyrxyEiK3iDxNHqqygCb2ksNVjV8rmR+Ku8r5ZqTJ0+reOPFWiOHfV9nsLPbgg
-         yxc2AF51gqFOqTRVbnbhtRfGzaWI+W3XrIgX+4vulL+oeH4j0rmvR6ITY0n2ldFIQYkJ
-         7BQ3KWbqhmk3/yZE90Rr8TF+lnbl2ycbevnJA0d0htbfeGuAE1wCA3FqUj3ZapiUtfRa
-         ymS5sKXwZ2Gw1rBSr5f4MdvZGDLJlGfUWxTGkTDIGho1mv5ZFqv9QPkf13LPi98pQxki
-         9GaQ==
-X-Gm-Message-State: AOJu0Yw1j67jvExrsAbVxMD7dY1a7/w3jbxcwa60ns5I2h9gBwvp7RRO
-	0FMuLblFzyyQ+WNVQICJV6I8T1G/L/212cH2GrE7Eg==
-X-Google-Smtp-Source: AGHT+IFsS8ZotwJYg7hGsduC5QWUllce5/gQ2SPETv47QZsDRcQ1x+VKt0XD8FZpXJiSii0SSYq5G2EarHyPUgheHKw=
-X-Received: by 2002:a05:6358:7581:b0:16d:b577:e9f1 with SMTP id
- x1-20020a056358758100b0016db577e9f1mr2934420rwf.9.1701959269433; Thu, 07 Dec
- 2023 06:27:49 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4424310E3;
+	Thu,  7 Dec 2023 06:27:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701959278; x=1733495278;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ZG1vMO4cSUhVul76dBImy73eOf3+jvZTzN/AOEghMDQ=;
+  b=X7H0sA/SgrGg4OcYBGa1g/edh03TXatd5/heRo2KV2kd/Hc24M/oQKYk
+   jtF6Dc/o37Yl2TYTr/8JWaygtrFzdZ2cujmQzzyxn95ajxHxYQpk4UJQH
+   wqgihjZloWkhwBuDtCTTTJ+H538pviQVcWZU87ADZZhRGcGEeyfZEskbg
+   Krb9uV6vqOqNt0JitI1bH3VTCCmRrA7rRWxccJyDlYNNt9FOZz2BVHf0k
+   vtZnviw6dh6OuKRU9UA6KNE+4utCZmd8tywV1zwsBG1ftOKW3VzwEfVma
+   eHuRWNR32pduuU3pd1z+ULBnmO/cdBGYAFGdjt2jw5oGII4kPDjkgWJY2
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="460728286"
+X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
+   d="scan'208";a="460728286"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2023 06:27:57 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="915603033"
+X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
+   d="scan'208";a="915603033"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmsmga001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Dec 2023 06:27:56 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 7 Dec 2023 06:27:56 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 7 Dec 2023 06:27:56 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 7 Dec 2023 06:27:56 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=D4ze0spG5DDDZ6DsEofDY50EwmfMMzQXI2QLnhsG7Cj167zZwB5H0QunavJbFCgvL2TLXJDFJ4OrID3v+ise2VSlV6WaoVR9PaNZKKIEAw6WCZTJXuJBxsnoMTvnJdNu0JxXJXAac7ChWF4jXT06O+1E8dP9ztt8mcDCfjFwij9AhOSD8MopD1el9IzsXdXvRRqQbLG/CydPMovCw8aDEKUghGLXQh34RHVZkWC8fm5KdbrSGRTVbq06EsKr07kCDZhjk/zpLodYo6NFTAL8Tvyf/aSntyWKk/8yJMnc0a1I5/T1eNkYZ8WxI1jnQPxPrOhshT+WzRITNkSEU71K2g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2BpDLR1DtQ8s+DDyQ5gfxP2jV7NKuVm1EqCvgj0rJ6Q=;
+ b=agEAjNcSp8KrDXzACUywHhkt6QjDDZ3Lej1QTRGR7E/PhRZ3wlEsNqf+ZUNaaMCUUqMVEjv8CVkeisa9Yr3/usDS34MgheuIrGsQazSIdbLxavNqs8wUHy28UeB+YmyqS+gAjGFRgJLAJ7ob9qdSGn3FrtGspIlnSlx2UwCyF3PRFAXejJQBAIqAn+/qKIyNNx7NDiHtstFpr8iFzigpeqNesHA7cb+UPVQ8nX2UswMoUE7g+yp2hhT8md9Q4meYOXDU4MDi4CdIawyLjhbP1VEap5gePEGUF8G34Ytim23eyZZfJqT7xFfZP+n819AxtPC81ZVQ2UZDBO5L4PQMeA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ by SA0PR11MB4685.namprd11.prod.outlook.com (2603:10b6:806:9e::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.27; Thu, 7 Dec
+ 2023 14:27:54 +0000
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::36be:aaee:c5fe:2b80]) by DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::36be:aaee:c5fe:2b80%7]) with mapi id 15.20.7046.034; Thu, 7 Dec 2023
+ 14:27:54 +0000
+Message-ID: <6ba23f52-6a80-4db4-8081-f6568c81b6ca@intel.com>
+Date: Thu, 7 Dec 2023 15:27:13 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl] idpf: fix corrupted frames and skb leaks in singleq
+ mode
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>
+CC: Simon Horman <horms@kernel.org>, <intel-wired-lan@lists.osuosl.org>,
+	Michal Kubiak <michal.kubiak@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Maciej Fijalkowski
+	<maciej.fijalkowski@intel.com>, "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20231201143821.1091005-1-aleksander.lobakin@intel.com>
+ <20231207115751.GG50400@kernel.org>
+ <CANn89iKiiexYLXP1fW3anaZt0TJWPUBBmXdjsAV8t3CH3Ra8aw@mail.gmail.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <CANn89iKiiexYLXP1fW3anaZt0TJWPUBBmXdjsAV8t3CH3Ra8aw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR4P281CA0047.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:cc::14) To DM6PR11MB3625.namprd11.prod.outlook.com
+ (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CABOYnLyH=PmSoP8=PdkyK5VG1vhiG8fHKg2Xie4oBrVeYbdhHw@mail.gmail.com>
-In-Reply-To: <CABOYnLyH=PmSoP8=PdkyK5VG1vhiG8fHKg2Xie4oBrVeYbdhHw@mail.gmail.com>
-From: Alexander Potapenko <glider@google.com>
-Date: Thu, 7 Dec 2023 15:27:10 +0100
-Message-ID: <CAG_fn=XnFw0756BNQSVXUwCh7-JjzTgfp6jCvut41++PSJ9oeA@mail.gmail.com>
-Subject: Re: KMSAN: uninit-value in ip_tunnel_xmit
-To: xingwei lee <xrivendell7@gmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, 
-	Eric Dumazet <edumazet@google.com>, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller@googlegroups.com, 
-	syzbot+4a2c52677a8a1aa283cb@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|SA0PR11MB4685:EE_
+X-MS-Office365-Filtering-Correlation-Id: 45c4d7c4-20dc-4df2-0cda-08dbf730b31b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 2unsatmZWf5gRG5LQMPotJfGx5SIHJWpAQ7e2dhEUp3bOwPM5ev698DUNiiFyqDsAptGZVN6dpcTNWwfg7OCJhHtUu+fUHfGKro0Sj8+eLCvChAXHEcVoHFzmzvZAdha2XsHeNUoKMx0WK4GtJ9QBJortoNSvC6wCp+bIYlXkrdBGDrIb1EwUweqPkkZRnPg+N+MP6tzxZcylaOI9544W01WHxC8FgBSTKVJk1AIdiPkpEJMyrpfxPz6cgD4ygv92RD1LTSJIl88V4dLd4P9Hv3VS+q686CuNmw8kGhYd+j2/JQqTjx7xhNjVlX7lGmc9vhf2yEykuZ5DQk/dJGZwXGGXkifcC087B3XpLzzO1lCZ7GB202Xu60T619L003dmvFifKufubrA6tak1/Dgq7owQleqgL76qUCE0O5bqtqv5QvBdeRZuFftVKt9AWX8uCRu643FrPsMzLFR9HsyITygrimBhgM+gJNjLIFp0UTJg3nCYJhDXn4NeFp3L0uxWQhA8a0L2bGj6NwVYZQawbkfiE9t7BZdWn9VWwVBm0kzKg1IDY1N71udD3t5Xf1qM4T6BXyRxXwlsiVRqOzihi6EBcWO+FN55Z6i355BwHubF7iOWdfFJDg4f1goqDaKZBWRI62r1ISZ8q907ip7tw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(366004)(136003)(376002)(346002)(230922051799003)(186009)(451199024)(64100799003)(1800799012)(26005)(6506007)(53546011)(2616005)(6512007)(6666004)(5660300002)(41300700001)(2906002)(4326008)(6486002)(478600001)(316002)(8936002)(8676002)(54906003)(66556008)(66476007)(6916009)(66946007)(86362001)(31696002)(36756003)(38100700002)(82960400001)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?S1lNR1EvWFlHbXdCMGorclhVOTdYck9DWFJzaVNvK0NOVjZPRkFRMmEwZlJW?=
+ =?utf-8?B?VGphRjZqeWpSd09HSzdYWVk2ZFVsSDJVczZwZ0RwSE9yTHhDbWpHb2dkTUhC?=
+ =?utf-8?B?cUlrRlM5cjlTS0tLYXRaV1lYM2tsalRLR3hKbVp6RFlkQjdCTVFpb0phT0dS?=
+ =?utf-8?B?ZjlJM2JZQ3BSa3k4YVBzelQvc3ZTT001bjlpeE4zekJwbkVmNDJQL3NveUJs?=
+ =?utf-8?B?dVUxV01vUkdGdlFpRmk1VC9WL0NHYWs5VEdsNEdzYjNqdUJkcWlOMnkxWXZU?=
+ =?utf-8?B?aHk1STY3NXhXTzJiazI1Yi9kV0JzUG9kOEY3WmNRdWs4aGxjSXNzd2szb2lN?=
+ =?utf-8?B?ZTgxTXd0TUVRQkMrb2txUkw4ZG5KVXBEVHZsWlIyb2VyY3h3SFZyTkdFUVhQ?=
+ =?utf-8?B?Kzl4OHZ6U1pWTUh2cm1NbHh2SjVObHBFamdndXdlWUpJZU41QlZlTytpYTJx?=
+ =?utf-8?B?L1RQWGVPc2RtMC9idGltNG1nNWNjWGh5WUVlbUpHZ2ZBaEZUS3V2RUVHMWZu?=
+ =?utf-8?B?SG1IRzRjK1NVaVhFRjNqcWVOMW1Dc0RaRHpIeVZQM0xSUzNuOU9CbHpXaWpY?=
+ =?utf-8?B?dDFucGVRWkthdjU4anQrOSt4Rzl5cDJjanBjRWIrbk5KRU1KUCttTGwyS2dG?=
+ =?utf-8?B?WlZWRExZTHFSOUxOckhZT3RGc2NyTVVjVzBqUWlOSXhyYmZTcG1XYnVyNjVh?=
+ =?utf-8?B?eFBjQXFMUW56MlFjRFZIekFzWjA3NzRsSjc1bng3dWttUFBoNEVmc0h2clVk?=
+ =?utf-8?B?QS8zT3VXaEJRZW5qUGtoRnBFKzlsT0VETHpMOEQyWlh4Q29SeDVld0JiRTRM?=
+ =?utf-8?B?SEsrbWdkN1BsaGtrS0tjeVRXK3VqdC9BQW1RMGJMekRwelhmQm1iZU05MjZH?=
+ =?utf-8?B?c0djMlNyZHBEQXQ0Y2NRUTUvOGFURGlEQU1Kc2lqRW03MGQ5Y0RWL3VBU2Rt?=
+ =?utf-8?B?ZytaUEQzS3Iva0tHS3VWNzhLTHpSN2hXS3JQc2xsNlJHbVJkdWtQanJzZjN0?=
+ =?utf-8?B?ekVjbFpiSVV1VXZqZjNldFlGbTdyYzBYbGh6NldEb1JxL0pBdStYZmRIWWFj?=
+ =?utf-8?B?SC8vS0JNL09qRUFvakxBQmtDaGZPS1NJMU0xOTFoWjJ3UjhZaStwQ0hsSjBQ?=
+ =?utf-8?B?bzgrajU1cmpIWTVRQys5N3RySjcxNURBbVQ2dzBkZTltaDdPRngremt0aWRo?=
+ =?utf-8?B?VjJWUk8xQkZZUWNGeTkxem5wZTZYS1FuNUx4c2tveU1hY1dGU1ZwOFA5QmhO?=
+ =?utf-8?B?Y1VqcUREajhObE4xaEp2QlpmU2dsSWExMWE2UmVEY2VHRzFDdm13NEdkUTJM?=
+ =?utf-8?B?RjQxek44Q0l6eDZkU2FVOEpqb3NleDhZenlzMG45OEJQTFZ5cndESW5hcG95?=
+ =?utf-8?B?Y3R1QlUvajVoZ3lwcDlJWldiUWNOeGtHbXk0bzV3ZjJaVE92NS85WXAyNlNB?=
+ =?utf-8?B?alJuZGI5MDBMaHRvL1MzVFg3SVprTUtaNjBWcVJYMmtHSWJzUjBmR1dHalM4?=
+ =?utf-8?B?c3ZCay9TUzV4KzArYTgrL3lpdjNWWXV3djBiYmgybnhxcGI5M3g3dVEwRFZv?=
+ =?utf-8?B?dm9JaDIzQ2dpTHNqU3JXTmhjQVZsSWZMUjlJMjhXV09ETW5IS2ZiaHU0Q2hU?=
+ =?utf-8?B?dFpDK2w1bHBrYUEwWUZlRkp5Y2t0QmUrdmt1U1d2TzAweG16WFNHTFh6SUI3?=
+ =?utf-8?B?L3R4U3BNdnJrRkhGVm1RVWNJVEJqVmZrTjhFdDgzci9Ed1lLTlRJNnFGbHVX?=
+ =?utf-8?B?YnpFYUk1aG50VENsRnJHSTVGcHF2UlFxS01MWXZyRENOTlVmM3VlNzIrajgy?=
+ =?utf-8?B?aXhma1BPS1dtaHlsQThIZFRYblk4bjBpOUlKSE9xbzlndG15THpTS2QvOVJi?=
+ =?utf-8?B?eXZaMGpudTlzS3djdXd0NytldXZ4MU5JeVRtSjhnYlNEM0Q1M3dOMzdTMzBO?=
+ =?utf-8?B?STZOVVZXZXJuZVYvMktYY0ltdVFJdlZtMlA5eWVIYTA0OTdrQlJzQWlSZkM1?=
+ =?utf-8?B?UEpnc0pXa1RXSjgwQUJvcjRRT3gxdWpIR3JBTHo5Wm9JZXlyU1JjZ3ZBemha?=
+ =?utf-8?B?ZXRlTngzbzFpMDlDS0tPVkF0Qlh1ZmU1NnZXMDZpc0k2Tk5LQjAzSW0ydW93?=
+ =?utf-8?B?ZUNxR0hsNXFYU1pScThNYUV6SlUwUEFBVktISWFWdVFvS0JkYkhJcjZKREpw?=
+ =?utf-8?B?T2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 45c4d7c4-20dc-4df2-0cda-08dbf730b31b
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Dec 2023 14:27:54.0856
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: P5wVSq15oTAyCAmBIeAMdv8PZb4ezYT6UaTEiER03KS5E8qxu7v4e0pEJcsKHPTlRDz1WrR1OPLMF3kWnyEq/5MU0bmZcbldfkXOAHjth8E=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4685
+X-OriginatorOrg: intel.com
 
-On Thu, Dec 7, 2023 at 2:28=E2=80=AFPM xingwei lee <xrivendell7@gmail.com> =
-wrote:
->
-> Hello,
->
-> When fuzzing the latest upstream linux 6.7-rc4,  the following crash
-> was triggered.
-> HEAD commit: bee0e7762ad2c6025b9f5245c040fcc36ef2bde8
->
-> If you fix this issue, please add the following tag to the commit:
-> Reported-by: xingwei Lee <xrivendell7@gmail.com>
->
-> console_log: https://gist.github.com/xrivendell7/b41fbc928cd203823783fd90=
-c98b6583#file-console_log
-> report: https://gist.github.com/xrivendell7/b41fbc928cd203823783fd90c98b6=
-583#file-report
-> kernel commit: bee0e7762ad2c6025b9f5245c040fcc36ef2bde8
-> kernel config: https://syzkaller.appspot.com/text?tag=3DKernelConfig&x=3D=
-ce27066613dacbb6
-> repro.c: https://gist.github.com/xrivendell7/b41fbc928cd203823783fd90c98b=
-6583#file-repro-c
-> repro.txt: https://gist.github.com/xrivendell7/b41fbc928cd203823783fd90c9=
-8b6583#file-repro-txt
->
-> In the lasted kernel: bee0e7762ad2c6025b9f5245c040fcc36ef2bde8 the
-> [  199.471467][ T8590] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> [  199.475015][ T8590] BUG: KMSAN: uninit-value in ip_tunnel_xmit+0x857/0=
-x3e80
-> [  199.478180][ T8590]  ip_tunnel_xmit+0x857/0x3e80
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 7 Dec 2023 13:48:52 +0100
 
-In the future, please consider symbolizing your reports using
-syz-symbolize before sending them upstream.
+> On Thu, Dec 7, 2023 at 12:58 PM Simon Horman <horms@kernel.org> wrote:
+>>
+>> On Fri, Dec 01, 2023 at 03:38:21PM +0100, Alexander Lobakin wrote:
+>>> idpf_ring::skb serves only for keeping an incomplete frame between
+>>> several NAPI Rx polling cycles, as one cycle may end up before
+>>> processing the end of packet descriptor. The pointer is taken from
+>>> the ring onto the stack before entering the loop and gets written
+>>> there after the loop exits. When inside the loop, only the onstack
+>>> pointer is used.
+>>> For some reason, the logics is broken in the singleq mode, where the
+>>> pointer is taken from the ring each iteration. This means that if a
+>>> frame got fragmented into several descriptors, each fragment will have
+>>> its own skb, but only the last one will be passed up the stack
+>>> (containing garbage), leaving the rest leaked.
+>>> Just don't touch the ring skb field inside the polling loop, letting
+>>> the onstack skb pointer work as expected: build a new skb if it's the
+>>> first frame descriptor and attach a frag otherwise.
+>>>
+>>> Fixes: a5ab9ee0df0b ("idpf: add singleq start_xmit and napi poll")
+>>> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>>> Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
+>>> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+>>
+>> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+> It seems singlequeue mode is not really used on idpf :)
+
+From what I know, there's currently no hardware supporting singleq mode.
+I'd remove it completely, but seems like it was decided to keep it in
+case someone would like to support it one day...
+
+> 
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+
+Thanks,
+Olek
 
