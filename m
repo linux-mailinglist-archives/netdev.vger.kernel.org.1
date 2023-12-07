@@ -1,93 +1,90 @@
-Return-Path: <netdev+bounces-54698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1E62807D7A
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 02:00:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17082807D89
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 02:02:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EA1AB21038
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 01:00:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5B221F21363
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 01:02:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D1E27F6;
-	Thu,  7 Dec 2023 01:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F4F37C;
+	Thu,  7 Dec 2023 01:02:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DncELJY9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PgXklL5D"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9AF7F3
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 01:00:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAC1CC433C8;
-	Thu,  7 Dec 2023 00:59:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701910799;
-	bh=JTwLLTXz2XWUkXKsx1vFQNBXjRc2FG8wpB494W+qK7s=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-	b=DncELJY9SqcPKhuX9g5OGAhQMqmhVVB7ktpYlOHZCn7j174VvwJbTdNxrUuSavRfi
-	 l8sRuGnZLAjJKE8T/W2uaA6pv8ffDQMlN/jYiFwlBUkQw9JTDA3Wo88ueE4Wa62ldr
-	 dy4RQ3RqgbKL9yyi/90lr1GR+Dfe7/kyDpEBMiBCcz2rmvmthSEI+KJl7A8aCMZu91
-	 v+AIIQMHRwIOx5rxDuRMnnXlnCjRVyLXkWht34Nv2LTi/YNdxybhkODpKQHm8otygg
-	 H0ArEaWMi57YHoxDkIrHLY7zNJJX6j82G78bGMWr/C2M10zUqX2uDklTVUMD10u9UZ
-	 xgVS+K6IuPjPQ==
-Date: Wed, 6 Dec 2023 16:59:58 -0800 (PST)
-From: Mat Martineau <martineau@kernel.org>
-To: David Laight <David.Laight@aculab.com>
-cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Stephen Hemminger <stephen@networkplumber.org>, 
-    David Ahern <dsahern@kernel.org>, 
-    "jakub@cloudflare.com" <jakub@cloudflare.com>, 
-    Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next v2] Use READ/WRITE_ONCE() for IP
- local_port_range.
-In-Reply-To: <4e505d4198e946a8be03fb1b4c3072b0@AcuMS.aculab.com>
-Message-ID: <e9d546ac-dbcb-272e-f4c0-4ecd61f65c78@kernel.org>
-References: <4e505d4198e946a8be03fb1b4c3072b0@AcuMS.aculab.com>
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03B8DEE;
+	Wed,  6 Dec 2023 17:02:49 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-5c66bbb3d77so274116a12.0;
+        Wed, 06 Dec 2023 17:02:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701910968; x=1702515768; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q0ZHx2dTpeeD/dzT9UX8bmnVSTh3P7Zoy3W1EjS6Yvs=;
+        b=PgXklL5DfrY+z2Sojg4K0GhWAcv8yGpLesQA9JLBMLz8FL9iINIhDv5m/zih91q0Ul
+         buasSlbpFsKmM0sjOpImIvsqkhu6JdGtgUY3HYHvYsmGxGULNFI9LPq7l4ZJsrGj+PGi
+         Gkx7cbQc8snT+K1NbjWi7eYEEd6L13rkHIGrdmCZNBCyBSvvYSxwizZ4b6FZ5lGQtO6q
+         sd12Z2uwcsdUx0iE33sxFEEmNtx72M5k2aHDIKPPVqR0KKIkWjh9a8IMyjcvWj+r1cex
+         UkZT22jxmit3LpaQhw81vgnTp3xUOSN1fa+MNs2p9QTKDgjl3839LcaTPGe/VS5z13E7
+         X0ZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701910968; x=1702515768;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q0ZHx2dTpeeD/dzT9UX8bmnVSTh3P7Zoy3W1EjS6Yvs=;
+        b=jbclxm5/S1Pq2pSzYd5NSwdBCOjJ42ux2yVVoTlT6CvXHSvsCIyqv0XW1ZuzDAXXs4
+         y6Z2JzWpcGnoScWb6joQNbMBbKXGi7oLZvpqjHyd6iSBhfN+JLFTvhoFORh5yCim53m+
+         StFpgf6TjNjqNUM1G4iTPSzWoBzzQEoOqljaiLRWL0YOw4VHPPSrFO/EeL6wtODm04Zt
+         h5xx74d8L5ECxWADtQdeD8iOuFIo26PgoHwHh3Kp8YRkzlK1w2YSsLUo+Ldtt0WmoHew
+         h6r4Ua952o3I6LFb7RYH4GiiPDg7XsHI63rdmoXB/4l+0hfnfEW3LGzNi2W8/58sS/gt
+         c6CA==
+X-Gm-Message-State: AOJu0Yy2Hq26IGayBDIJEePGIB84cg2enyWxGOYJpOZBV3ERThCGYDDB
+	xR2E+YbcsVb4AWV9XNATU3U=
+X-Google-Smtp-Source: AGHT+IF0NVXLnlslRkPt5reTco4DlgSrpI8lg5XgES8+5VA48tmxLztqsza/95Hxskb1PbsMxiLgzQ==
+X-Received: by 2002:a05:6a20:9410:b0:18f:97c:825e with SMTP id hl16-20020a056a20941000b0018f097c825emr1268601pzb.104.1701910968337;
+        Wed, 06 Dec 2023 17:02:48 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id fa37-20020a056a002d2500b006ce93ff8c7esm127179pfb.104.2023.12.06.17.02.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 17:02:47 -0800 (PST)
+Date: Thu, 7 Dec 2023 09:02:43 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Florent Revest <revest@chromium.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jiri@resnulli.us,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, stable@vger.kernel.org
+Subject: Re: [PATCH] team: Fix use-after-free when an option instance
+ allocation fails
+Message-ID: <ZXEZs2rOUil8QH8Y@Laptop-X1>
+References: <20231206123719.1963153-1-revest@chromium.org>
+ <ZXCNouKlBlAKgll9@Laptop-X1>
+ <CABRcYmKK0F1F5SzXoUpG4etDz2eGhJoSZo56PHq7M+MNjcjTKA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABRcYmKK0F1F5SzXoUpG4etDz2eGhJoSZo56PHq7M+MNjcjTKA@mail.gmail.com>
 
-On Wed, 6 Dec 2023, David Laight wrote:
+On Wed, Dec 06, 2023 at 05:31:58PM +0100, Florent Revest wrote:
+> Thank you for the quick reviews Hangbin & Jiri, I appreciate! :)
+> 
+> I just realized I forgot to CC stable (like I always do... :) maybe I
+> should tattoo it on my arm) Let me know if you'd like a v2 adding:
+> 
+> Cc: stable@vger.kernel.org
 
-> Commit 227b60f5102cd added a seqlock to ensure that the low and high
-> port numbers were always updated together.
-> This is overkill because the two 16bit port numbers can be held in
-> a u32 and read/written in a single instruction.
->
-> More recently 91d0b78c5177f added support for finer per-socket limits.
-> The user-supplied value is 'high << 16 | low' but they are held
-> separately and the socket options protected by the socket lock.
->
-> Use a u32 containing 'high << 16 | low' for both the 'net' and 'sk'
-> fields and use READ_ONCE()/WRITE_ONCE() to ensure both values are
-> always updated together.
->
-> Change (the now trival) inet_get_local_port_range() to a static inline
-> to optimise the calling code.
-> (In particular avoiding returning integers by reference.)
->
-> Signed-off-by: David Laight <david.laight@aculab.com>
-> ---
-> Changes for v2:
-> - minor layout changes.
-> - remove unlikely() from comparisons when per-socket range set.
-> - avoid shifts of signed values that generate unsigned 32bit results.
-> I fiddled with the code that validates the argument to IP_LOCAL_PORT_RANGE
-> then decided to leave it (mostly) unchanged because it is also moved.
-> (There is a 'u16 x = int_val >> 16' which is required to move bit 31 to
-> bit 15 and is probably undefined behaviour - but will be ok on all sane cpu.)
->
+I think Greg will take care of it. No need to send v2 when there is
+nothing to change.
 
-The unsigned bit shift fixes look good to me, thanks David.
-
-Acked-by: Mat Martineau <martineau@kernel.org>
-
+Thanks
+Hangbin
 
