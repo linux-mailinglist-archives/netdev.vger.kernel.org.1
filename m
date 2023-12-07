@@ -1,121 +1,129 @@
-Return-Path: <netdev+bounces-54960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 309EA80908B
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:50:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 423158090B7
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:55:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5319A1C20984
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:50:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B7AF1C2083C
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:55:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45E0442ABB;
-	Thu,  7 Dec 2023 18:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="D+Bv31+p"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3594F1EB;
+	Thu,  7 Dec 2023 18:55:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B37F121;
-	Thu,  7 Dec 2023 10:50:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=SC4n/zXNUUfBAekQk0GSBXQG99rCFLSursm1c12jHB8=; b=D+Bv31+pmR2HKYSu9WWo8G+iKO
-	Q+ym0IM0v5Np/DlRoQZzGADL3Mez59xLnfhj4GN9u8DEOA1ciWeqWxXwq08tv6sNCdJSAsITPtpWR
-	ZggnqmzDkQGBLm9VnQiruV9Two2tFI4Bq6Vc+YTJkndgr5rwuCzQBdaeXq0gZOqgdsIqfVBbt8cxG
-	vJRooJkXsYvWwjbQDWZ48Pt7V0ACG/eauYgwUBSKC9zcbSrI/cwU4jOYSUPfIH7HavLv3FBaJ5BQW
-	YdPOpIMsrJuYZQgN1q/y5DaHHaA0mb1NnzLLDnLwE/ShkalxEWKfvoVLnCLMummC/R5BuQejHTHum
-	4IFd2MrQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38272)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rBJSJ-0001YV-2i;
-	Thu, 07 Dec 2023 18:50:40 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rBJSK-0003xn-Lc; Thu, 07 Dec 2023 18:50:40 +0000
-Date: Thu, 7 Dec 2023 18:50:40 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: Justin Chen <justin.chen@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
-	Doug Berger <opendmb@gmail.com>, netdev@vger.kernel.org,
-	bcm-kernel-feedback-list@broadcom.com,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: phy: Only resume phy if it is suspended
-Message-ID: <ZXIUAPx1aClSsKED@shell.armlinux.org.uk>
-References: <20231205234229.274601-1-justin.chen@broadcom.com>
- <7e3208aa-3adf-47ec-9e95-3c88a121e8a3@lunn.ch>
- <55a08719-cd18-4a01-9a2a-0115065c06a6@broadcom.com>
- <c2ce6d12-fb5e-4067-aa7c-4f57f4eb4613@broadcom.com>
- <f7eb20eb-3f0d-42c5-93fe-a622639c55a6@broadcom.com>
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E20CC1720
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 10:54:58 -0800 (PST)
+Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B7EKMcI031322
+	for <netdev@vger.kernel.org>; Thu, 7 Dec 2023 10:54:58 -0800
+Received: from maileast.thefacebook.com ([163.114.130.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3uufqft7hf-5
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 10:54:57 -0800
+Received: from twshared34392.14.frc2.facebook.com (2620:10d:c0a8:1b::30) by
+ mail.thefacebook.com (2620:10d:c0a8:83::8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Thu, 7 Dec 2023 10:54:55 -0800
+Received: by devbig019.vll3.facebook.com (Postfix, from userid 137359)
+	id EE2113CC1C903; Thu,  7 Dec 2023 10:54:43 -0800 (PST)
+From: Andrii Nakryiko <andrii@kernel.org>
+To: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>, <paul@paul-moore.com>,
+        <brauner@kernel.org>
+CC: <linux-fsdevel@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
+        <keescook@chromium.org>, <kernel-team@meta.com>, <sargun@sargun.me>
+Subject: [PATCH bpf-next 0/8] BPF token support in libbpf's BPF object
+Date: Thu, 7 Dec 2023 10:54:35 -0800
+Message-ID: <20231207185443.2297160-1-andrii@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f7eb20eb-3f0d-42c5-93fe-a622639c55a6@broadcom.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: SEl6r3891nt7j64ZqWffZwVweyYazVwS
+X-Proofpoint-GUID: SEl6r3891nt7j64ZqWffZwVweyYazVwS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-07_15,2023-12-07_01,2023-05-22_02
 
-On Thu, Dec 07, 2023 at 09:56:01AM -0800, Florian Fainelli wrote:
-> Hi Andrew,
-> 
-> So we discussed with Justin and Doug about this yesterday and the main
-> reason for the phy_resume() ... MAC initialization ... phy_start() pattern
-> has to do with external RGMII PHYs and the clocking dependency between the
-> MAC and the PHY on the RX path. And also a tiny bit of cargo culting, but
-> shhh.
-> 
-> When the external RGMII PHYs are suspended they will stop providing a RXC
-> back to the Ethernet MAC and our Ethernet MAC like a lot of designs out
-> there require the RXC in order to be functional and complete its reset
-> procedure correctly (you would think there would be a way to mux in a
-> different clock, but that does not appear to be the case). If we reset the
-> UniMAC block without a RXC we will typically see duplicate packets being
-> received, or absurdly long round trip times as soon as we try to use the RX
-> path.
+Add fuller support for BPF token in high-level BPF object APIs. This is t=
+he
+most frequently used way to work with BPF using libbpf, so supporting BPF
+token there is critical.
 
-This issue keeps appearing, and I think phylib ought to be doing more
-to support it, rather than ethernet drivers having to play fancy games.
-If one recalls stmmac, that has similar issues - it needs the RXC from
-the PHY to reset properly.
+Patch #1 is improving kernel-side BPF_TOKEN_CREATE behavior by rejecting =
+to
+create "empty" BPF token with no delegation. This seems like saner behavi=
+or
+which also makes libbpf's caching better overall. If we ever want to crea=
+te
+BPF token with no delegate_xxx options set on BPF FS, we can use a new fl=
+ag to
+enable that.
 
-I did propose that we have:
+Patches #2-#5 refactor libbpf internals, mostly feature detection code, t=
+o
+prepare it from BPF token FD.
 
-+#define PHY_F_RXC_ALWAYS_ON    BIT(30)
+Patch #6 adds options to pass BPF token into BPF object open options. It =
+also
+adds implicit BPF token creation logic to BPF object load step, even with=
+out
+any explicit involvement of the user. If the environment is setup properl=
+y,
+BPF token will be created transparently and used implicitly. This allows =
+for
+all existing application to gain BPF token support by just linking with
+latest version of libbpf library. No source code modifications are requir=
+ed.
+All that under assumption that privileged container management agent prop=
+erly
+set up default BPF FS instance at /sys/bpf/fs to allow BPF token creation=
+.
 
-that can be passed to phy_attach_direct()'s flags, which phylib drivers
-can then act upon to e.g. in the case of at803x, disable their
-hibernation mode which stops the RXC when the system isn't suspended.
-(AT803x Hibernation mode is enabled by default and the PHY automatically
-enters it when the link is down.)
+Patches #7-#8 adds more selftests, validating BPF object APIs work as exp=
+ected
+under unprivileged user namespaced conditions in the presence of BPF toke=
+n.
 
-Maybe this flag should be used to determine the resume behaviour,
-e.g. to ensure that the RXC is re-enabled early without the MAC driver
-needing to be involved?
+Andrii Nakryiko (8):
+  bpf: fail BPF_TOKEN_CREATE if no delegation option was set on BPF FS
+  libbpf: split feature detectors definitions from cached results
+  libbpf: further decouple feature checking logic from bpf_object
+  libbpf: move feature detection code into its own file
+  libbpf: wire up token_fd into feature probing logic
+  libbpf: wire up BPF token support at BPF object level
+  selftests/bpf: add BPF object loading tests with explicit token
+    passing
+  selftests/bpf: add tests for BPF object load with implicit token
 
-WoL is a different problem - that depends whether the PHY is itself
-doing WoL independently from the MAC, or whether the MAC is involved.
-If the MAC is involved, then clearly the MII link between the PHY and
-MAC needs to be maintained while the system is in low power mode,
-which is an entirely different issue from the RXC being present
-while the MAC is being resumed.
+ kernel/bpf/token.c                            |  10 +-
+ tools/lib/bpf/Build                           |   2 +-
+ tools/lib/bpf/bpf.c                           |   9 +-
+ tools/lib/bpf/btf.c                           |   7 +-
+ tools/lib/bpf/elf.c                           |   2 -
+ tools/lib/bpf/features.c                      | 478 +++++++++++++++
+ tools/lib/bpf/libbpf.c                        | 570 ++++--------------
+ tools/lib/bpf/libbpf.h                        |  28 +-
+ tools/lib/bpf/libbpf_internal.h               |  36 +-
+ tools/lib/bpf/libbpf_probes.c                 |   8 +-
+ tools/lib/bpf/str_error.h                     |   3 +
+ .../testing/selftests/bpf/prog_tests/token.c  | 235 ++++++++
+ tools/testing/selftests/bpf/progs/priv_map.c  |  13 +
+ tools/testing/selftests/bpf/progs/priv_prog.c |  13 +
+ 14 files changed, 941 insertions(+), 473 deletions(-)
+ create mode 100644 tools/lib/bpf/features.c
+ create mode 100644 tools/testing/selftests/bpf/progs/priv_map.c
+ create mode 100644 tools/testing/selftests/bpf/progs/priv_prog.c
 
-Maybe PHY_F_RXC_ALWAYS_ON is a bad name, as I intended it to only refer
-to while the system is running, not while in low power mode.
+--=20
+2.34.1
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
