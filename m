@@ -1,148 +1,81 @@
-Return-Path: <netdev+bounces-54831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E375808744
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 13:02:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1417380874F
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 13:04:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2193E1C216D3
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 12:02:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B26B21F221C6
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 12:04:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF3A39AE2;
-	Thu,  7 Dec 2023 12:02:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58EBF39AE1;
+	Thu,  7 Dec 2023 12:04:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e1kHBT/7"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="W1tmbvh6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD67CA9;
-	Thu,  7 Dec 2023 04:02:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701950562; x=1733486562;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=jjebZ/3jB6yBXogRzbFTiLh94dgst6N2OkVomZJsYDM=;
-  b=e1kHBT/7BJgXcqzrs/jrvqLQ4Yp52BY+Gy3o52oUg5sNOHkONa3UZP/m
-   I7E09f+JZOkTb7mq0yVAQL1lKtagUbboirWmr7V6ORQ9ISiz6EhPGEldF
-   mvd5SHA2v7JJRxJEHzoxZ7S3iYkFiQ9N6amZ124j/0u8xPCpI/VU56NU/
-   5qccJlkaYVn3YSkT0JNH2rdX65eCbKRx4ZBj0lxFVPNGUaNBWCS8jlXne
-   MnwP6vTE7R6zrylT9QIh4HtBoOi7LseKFlq5ktOfywZOfgm6HotudyKR9
-   SqMFBrWeS7zSKFD7hgNGqYmfwmI1+9naaPTPThtallN4OvuV/qZYALqDO
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="12933467"
-X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
-   d="scan'208";a="12933467"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2023 04:02:42 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="1103177243"
-X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
-   d="scan'208";a="1103177243"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by fmsmga005.fm.intel.com with ESMTP; 07 Dec 2023 04:02:36 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rBD5O-000CCM-02;
-	Thu, 07 Dec 2023 12:02:34 +0000
-Date: Thu, 7 Dec 2023 20:01:34 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ma Jun <Jun.Ma2@amd.com>, amd-gfx@lists.freedesktop.org,
-	lenb@kernel.org, hdegoede@redhat.com, johannes@sipsolutions.net,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, alexander.deucher@amd.com, Lijo.Lazar@amd.com,
-	mario.limonciello@amd.com, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, platform-driver-x86@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, majun@amd.com, Ma Jun <Jun.Ma2@amd.com>
-Subject: Re: [PATCH v15 1/9] Documentation/driver-api: Add document about
- WBRF mechanism
-Message-ID: <202312071941.JXQXsK1C-lkp@intel.com>
-References: <20231206072947.1331729-2-Jun.Ma2@amd.com>
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [IPv6:2001:41d0:1004:224b::b4])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10AA1A9
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 04:04:49 -0800 (PST)
+Message-ID: <9d6ea286-0301-4bd9-8c67-790a12a7198b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1701950685;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ugDhUqiMhHXg7FOyCTGZjVpconkGe6k6hfHc+Gvozvs=;
+	b=W1tmbvh61rg9dYQNhUvjJC0nzFGFqw+3gVIq2jSK8sbYLSyPv/DzDK0QUgvU8GV0DHvr87
+	CyKQBo+PT+CE1AUSmVFsueg8TOzmhicc6ndhnSFNNhWwEbQoPHsPzxL1n/0Oux51cKy69C
+	vVJzUdusAXJqWYjGeTAIc2bDl8D9kc0=
+Date: Thu, 7 Dec 2023 12:04:39 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231206072947.1331729-2-Jun.Ma2@amd.com>
+Subject: Re: [PATCH net v2 0/4] bnxt_en: Misc. fixes
+Content-Language: en-US
+To: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, gospo@broadcom.com
+References: <20231207000551.138584-1-michael.chan@broadcom.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20231207000551.138584-1-michael.chan@broadcom.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Ma,
+On 06/12/2023 16:05, Michael Chan wrote:
+> 4 miscellaneous driver fixes covering PM resume, SKB recycling,
+> wrong return value check, and PTP HWTSTAMP_FILTER_ALL.
+> 
+> v2: Fix SOB tags in patch 1 and 3.
+> 
+> Kalesh AP (1):
+>    bnxt_en: Fix wrong return value check in bnxt_close_nic()
+> 
+> Michael Chan (1):
+>    bnxt_en: Fix HWTSTAMP_FILTER_ALL packet timestamp logic
 
-kernel test robot noticed the following build warnings:
+Hi Michael!
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v6.7-rc4 next-20231207]
-[cannot apply to drm-misc/drm-misc-next wireless-next/main wireless/main]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+What about reconfiguration part? I thought this fix was the only
+blocker to remove bnxt_close_nic/bnxt_open_nic logic.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ma-Jun/Documentation-driver-api-Add-document-about-WBRF-mechanism/20231206-153327
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20231206072947.1331729-2-Jun.Ma2%40amd.com
-patch subject: [PATCH v15 1/9] Documentation/driver-api: Add document about WBRF mechanism
-reproduce: (https://download.01.org/0day-ci/archive/20231207/202312071941.JXQXsK1C-lkp@intel.com/reproduce)
+> 
+> Somnath Kotur (1):
+>    bnxt_en: Clear resource reservation during resume
+> 
+> Sreekanth Reddy (1):
+>    bnxt_en: Fix skb recycling logic in bnxt_deliver_skb()
+> 
+>   drivers/net/ethernet/broadcom/bnxt/bnxt.c | 27 ++++++++++++++++++-----
+>   drivers/net/ethernet/broadcom/bnxt/bnxt.h |  8 ++++++-
+>   2 files changed, 29 insertions(+), 6 deletions(-)
+> 
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312071941.JXQXsK1C-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> Documentation/driver-api/wbrf.rst:28: WARNING: Unexpected indentation.
->> Documentation/driver-api/wbrf.rst:61: WARNING: Block quote ends without a blank line; unexpected unindent.
->> Documentation/driver-api/wbrf.rst: WARNING: document isn't included in any toctree
-
-vim +28 Documentation/driver-api/wbrf.rst
-
-    25	
-    26	Producer: such component who can produce high-powered radio frequency
-    27	Consumer: such component who can adjust its in-use frequency in
-  > 28	           response to the radio frequencies of other components to
-    29	           mitigate the possible RFI.
-    30	
-    31	To make the mechanism function, those producers should notify active use
-    32	of their particular frequencies so that other consumers can make relative
-    33	internal adjustments as necessary to avoid this resonance.
-    34	
-    35	ACPI interface
-    36	==============
-    37	
-    38	Although initially used by for wifi + dGPU use cases, the ACPI interface
-    39	can be scaled to any type of device that a platform designer discovers
-    40	can cause interference.
-    41	
-    42	The GUID used for the _DSM is 7B7656CF-DC3D-4C1C-83E9-66E721DE3070.
-    43	
-    44	3 functions are available in this _DSM:
-    45	
-    46	* 0: discover # of functions available
-    47	* 1: record RF bands in use
-    48	* 2: retrieve RF bands in use
-    49	
-    50	Driver programming interface
-    51	============================
-    52	
-    53	.. kernel-doc:: drivers/platform/x86/amd/wbrf.c
-    54	
-    55	Sample Usage
-    56	=============
-    57	
-    58	The expected flow for the producers:
-    59	1. During probe, call `acpi_amd_wbrf_supported_producer` to check if WBRF
-    60	   can be enabled for the device.
-  > 61	2. On using some frequency band, call `acpi_amd_wbrf_add_remove` with 'add'
-    62	   param to get other consumers properly notified.
-    63	3. Or on stopping using some frequency band, call
-    64	   `acpi_amd_wbrf_add_remove` with 'remove' param to get other consumers notified.
-    65	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
