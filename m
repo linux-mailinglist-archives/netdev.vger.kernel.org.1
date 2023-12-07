@@ -1,106 +1,112 @@
-Return-Path: <netdev+bounces-54991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB9938091FC
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 20:57:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99EC58091FF
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 21:01:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76D43281EBF
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:57:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C22E81C20956
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 20:01:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73284F899;
-	Thu,  7 Dec 2023 19:57:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7B2E4F8BF;
+	Thu,  7 Dec 2023 20:01:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZndeX6Yz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M3+sAbO4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2059210EF
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 11:57:20 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-28647f4ebd9so1188875a91.3
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 11:57:20 -0800 (PST)
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3CC510F7;
+	Thu,  7 Dec 2023 12:01:37 -0800 (PST)
+Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-a1db6c63028so151999266b.2;
+        Thu, 07 Dec 2023 12:01:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701979039; x=1702583839; darn=vger.kernel.org;
-        h=to:date:message-id:subject:mime-version:content-transfer-encoding
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6HMdpJ28r8mttHeq5lgMJ6ge0bIyorsFZA7pKmCIgG0=;
-        b=ZndeX6YzBLZR/pEgTLg/u+dTJJvVQtdvPCfgHp8DcNqA3onc8HxqQgwwugORzn4Vql
-         7hpRy8tdPtnjuvZE+p4xNsWRLG7Qp5VEaJCoshX5vkJjkKtguDPIpBwpGh2plB4NlRst
-         3R4T+N44ZzFNGnwa56muSLcWYEHrYflubNdwCQZhiCVuT90+1jU3j6qqY0bTuCPSeDG+
-         zFiaindP7VEF92oW6hqfRWwcFMeUVZks86ZIIRiU0yab4elMSscO1Nskl2INWWPA4bN3
-         4zjUtb45AMdbM2hTsp1oI0pJ4rLUoc2EjfYQTmKJAFhUXLZSk45PiepUkpu8nMvaTgsU
-         uuAw==
+        d=gmail.com; s=20230601; t=1701979296; x=1702584096; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BxKQalM2XsdeZ6LbLxJy5cCkk6wpAYdzkOBgji/EH9U=;
+        b=M3+sAbO47F8/nZw15naHvPabJAA5sCwgIl9JssmMSOCImtRdnPxLqX630boLHzVbZ9
+         5ylt2/cfAtUYEwzUDN2LNPRG8yCv8oy1B4NJdFtmrILYGsqMD06Lx8UqEPSfiPlqzlpf
+         45vnBiWFXyDbtOmIqZZoewD2aCTp6X+pckrOMXnU8yxn5KwzsCUaX7BoVfzte0rjZP5d
+         +SjQVa1VN6oU17j9gBkvUJFidutekc4j52PC17xhTQShq72ewPwwK/Tj6tHLsrNDiB3f
+         /f5CpItUA2zAvkGW7nETL5EoFCvWTTQhl79+L+hs1MLp1Yqkce9tkEzy0yIxDRDaJKMN
+         qYFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701979039; x=1702583839;
-        h=to:date:message-id:subject:mime-version:content-transfer-encoding
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6HMdpJ28r8mttHeq5lgMJ6ge0bIyorsFZA7pKmCIgG0=;
-        b=eZyMgHiy6nBjPbkSATDtx2nyxfnobOc6VqGaKSIl8I/cxRmbuzWE6oUGMMJrGKeE/q
-         pPiTfLalzyt47TjSlPE4+MgdFtyLk7BUxL1S9roKHDNY0GlDg/Q+m5NWk5SjGhnP/+F0
-         kPY5iPumJvSXIC2n2gcdjPqwXzKdV+0e5EqMnmV1PyxjI3/0dzw36V9VTNObYe6jDbTh
-         /osFo3ZIi+BkIFByxvhLscZoAIBagql6KcJ21blpWcv7bomfv0UWHjvImnt2t9giCkSx
-         3RCIkexkE5SY96mmA4a9eIJDd9FYwW0WCaO7egVdLvJxLCrGhCQmOgQIv2aMseEWJaF0
-         dtXA==
-X-Gm-Message-State: AOJu0YxBNjVHMD77Oc0TEfCTtYC4jzjg4ZryUxtnaIMimR8Xsi9+9mp3
-	HxHXTY3fpdxe4RUTxFhBYIJgk9YQRMQ=
-X-Google-Smtp-Source: AGHT+IGzSbAwlqROIcyE68Q3E2B/NiRhI2NIWGas5VvRuwvVKzg4jQ1S5Gc3lN036PTg91OxW2wgEQ==
-X-Received: by 2002:a17:90b:1b0e:b0:286:e436:4aca with SMTP id nu14-20020a17090b1b0e00b00286e4364acamr2725961pjb.92.1701979039342;
-        Thu, 07 Dec 2023 11:57:19 -0800 (PST)
-Received: from smtpclient.apple ([2001:56a:78d6:ff00::1fac])
-        by smtp.gmail.com with ESMTPSA id f5-20020a17090aec8500b00286f5f0dcb8sm300811pjy.10.2023.12.07.11.57.18
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 07 Dec 2023 11:57:19 -0800 (PST)
-From: Arjun Mehta <arjunmeht@gmail.com>
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+        d=1e100.net; s=20230601; t=1701979296; x=1702584096;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BxKQalM2XsdeZ6LbLxJy5cCkk6wpAYdzkOBgji/EH9U=;
+        b=VtLX7+8KPcme3ILX9LUPpcGQ9dwGfthB38WK30fJtev0HZm6ro3Em/fyLRoCzJBrxr
+         M76LhWp8niRV0nD2q3PMOn0FuAK6Tva2vDnLFjXX0YIG0H86yvID6N6N5pE4efc0tFI4
+         n2ltekANdpobfXP7dAdWiUqw7FaPJiGeqySXkkS/DupzK73ogEx7CGeWnNOLJNtS2Fcp
+         AqI3xORF8zrEBgwUpKKgEBCEV0h1Ehm4LJasQbMzMIKle2AjoBe/H6HZwuGmnxHup8nV
+         PNSKaAcc6vEXgAn0MNkB+jAphbHojtg7UNSz6+/6X2SMOWycXlxGY0jgp+Kddjfz16Ov
+         KeOQ==
+X-Gm-Message-State: AOJu0YzbT64rQO4InonWCSpOCXH5l4GwXfM/rMKi3038OwE1EIte5/yx
+	tjfcfYsl7FHxm2LMprCQbBI=
+X-Google-Smtp-Source: AGHT+IHjp1aCJEXZp+EHs5Gft8fX73EKJgH1YZLg6gizzxEd99zvXmS2xooHm5ZJUX0mJmsyTvN7pQ==
+X-Received: by 2002:a17:906:5185:b0:a19:a19a:ea9a with SMTP id y5-20020a170906518500b00a19a19aea9amr1705134ejk.83.1701979295685;
+        Thu, 07 Dec 2023 12:01:35 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id cu12-20020a170906ba8c00b00a10f3030e11sm141937ejd.1.2023.12.07.12.01.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Dec 2023 12:01:35 -0800 (PST)
+Date: Thu, 7 Dec 2023 22:01:32 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>,
+	Simon Horman <horms@kernel.org>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com
+Subject: Re: [PATCH net-next 07/15] net: dsa: mt7530: do not run
+ mt7530_setup_port5() if port 5 is disabled
+Message-ID: <20231207200132.772h3t3l6coan6ht@skbuf>
+References: <20231118123205.266819-1-arinc.unal@arinc9.com>
+ <20231118123205.266819-8-arinc.unal@arinc9.com>
+ <20231121185358.GA16629@kernel.org>
+ <a2826485-70a6-4ba7-89e1-59e68e622901@arinc9.com>
+ <90fde560-054e-4188-b15c-df2e082d3e33@moroto.mountain>
+ <20231207184015.u7uoyfhdxiyuw6hh@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.700.6\))
-Subject: Rx issues with Linux Bridge and thunderbolt-net 
-Message-Id: <C6FFF684-8F05-47B5-8590-5603859128FC@gmail.com>
-Date: Thu, 7 Dec 2023 12:57:08 -0700
-To: netdev@vger.kernel.org
-X-Mailer: Apple Mail (2.3731.700.6)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231207184015.u7uoyfhdxiyuw6hh@skbuf>
 
-Hi there, I=E2=80=99d like to report what I believe to be a bug with =
-either Linux Bridge (maybe and/or thunderbolt-net as well).
+On Thu, Dec 07, 2023 at 08:40:15PM +0200, Vladimir Oltean wrote:
+> Also, reducing the indentation level of for_each_child_of_node() by one
+> can't be bad. Maybe even by more. There's this pattern:
+> 
+> for_each_child_of_node(dn, mac_np) {
+> 	// do stuff with mac_np
+> 	break;
+> }
+> 
+> aka we only care about the first child of dn. We could find the mac_np
+> as the only operation inside for_each_child_of_node(), break directly,
+> and "do stuff with mac_np" could be done outside, further reducing the
+> indentation by 1 level.
 
-Problem: Rx on bridged Thunderbolt interface are blocked
-
-Reported Behavior:
-Tested on Proxmox host via iperf3, between B550 Vision D-P and MacBook =
-Pro (2019 intel). On a direct interface, thunderbolt bridge Tx and Rx =
-speeds are equal and full speed (in my case 9GB/s each). However, when a =
-thunderbolt bridge is passed through via Linux Bridge to a VM or =
-container (in my case a Proxmox LXC container or VM) the bridge achieves =
-full Tx speeds, but Rx speeds are reporting limited to ~30kb/s
-
-Expected:
-The VM/CT should have the same general performance for Tx AND Rx as the =
-host
-
-Reproducing:
-- Setup for the bridge was done by following this guide: =
-https://gist.github.com/scyto/67fdc9a517faefa68f730f82d7fa3570
-- Both devices on Thunderbolt interfaces have static IPs
-- VM is given the same IP, but unique MAC address
-- BIOS has Thunderbolt security mode set to =E2=80=9CNo security=E2=80=9D
-
-Further reading:
-The problem is outlined more with screenshots and further details in =
-this Reddit post: =
-https://www.reddit.com/r/Proxmox/comments/17kq5st/slow_rx_speed_from_thund=
-erbolt_3_port_to_vm_over/.
-
-Please let me know if there is any further action I can do to help =
-investigate or where else I can direct the bug/concern
-
-Thanks!
-Arjun=
+I noticed just now that there is further filtering on the child OF node
+by of_device_is_compatible(). In that case, of_get_compatible_child()
+could be used to eliminate for_each_child_of_node() completely.
 
