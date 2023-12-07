@@ -1,93 +1,103 @@
-Return-Path: <netdev+bounces-54994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AE5280920F
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 21:07:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E884809217
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 21:13:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45B952819E6
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 20:07:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC1ACB20B7B
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 20:13:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E857650256;
-	Thu,  7 Dec 2023 20:07:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91F2D50256;
+	Thu,  7 Dec 2023 20:13:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="OOhTtmS/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TGCl2jxF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 643551710
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 12:07:29 -0800 (PST)
-Received: by mail-yb1-xb31.google.com with SMTP id 3f1490d57ef6-daf26d84100so1453879276.3
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 12:07:29 -0800 (PST)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B36E170F
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 12:13:24 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5d42c43d8daso8354007b3.0
+        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 12:13:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1701979648; x=1702584448; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fWWx2X5EKVBT2ik8RNeobD9aXUGmS5cw6HelRXHUt0Y=;
-        b=OOhTtmS/zd/xbYlsrFNvhdshu6HikXSG8pz6R6NPC/DhKmWzUN85qvdP+oJC9iZ7mY
-         w+t3k+NqNIPycz/dhW1sp/caABieR9x5ojgfau44yWvafqHmjojid7n9ISCsdGdoTAQJ
-         IvmlWg+c10OoGsx0v+adQDBu8GLJzAM4OFZwdsZ4g0x2fPOHjyr3f7cVGX5nfaMWtFej
-         aDiJ2QkstV4FwiyCR9S3ii2jtmnEgj5YGGX1jCGbeSL94V44F3ndZP2sXNFPwytHDrKB
-         C8bFjt3P2Gkg8KEYGPezOU8hgOJowhiKCPWQKzi4WpGn9WSsCE4VGLewmnBPRH2GJEDe
-         WfSw==
+        d=google.com; s=20230601; t=1701980003; x=1702584803; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Xn6buCrGR0vgnL7mOEqOirgThpbJiAXtrF8s5TzWL8Q=;
+        b=TGCl2jxFcrRRJumbf/Lt3unEGRcLIAUmjrmbeGUuq8sZhxjPsCU/H93Iq3XTFNwjHu
+         EGr6zeLmqxMSDH91r0Rz6EeQgrH6qkkQCsKEo/0+pTDeY6itArfSjC82m05JVmeZbQQs
+         TWh7XyIcCbR8LktboahM65CRs53CSujher1i4FHKwm0F0dEFjdzPQUer7SVuqioJfFfo
+         oq9SEGwzXBHM5wsXKaL92NZU5iyYOwZ0MU9XI8QwPK2j/AdwRM8QVGvsiWzRUcw/pQ1p
+         cc/FJv41X8WHa9VTA7TBit1mx+tJHNYLlGdsOMTM7M3PUhmF2G7yj+9Y9wdNYs6B5hC2
+         zG1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701979648; x=1702584448;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fWWx2X5EKVBT2ik8RNeobD9aXUGmS5cw6HelRXHUt0Y=;
-        b=j1gsZ1zGtz0Im5r89BsxLcA0AGhvwhm/S9WQ50J61xPi9UXovp47puDvwTbOfTipG0
-         IqNuRK773oLXOoB8u01cXeZUNaOY54MHuY/i0vRFs/s4YqmyX3OcSAZooU4RzdicyQUZ
-         UHFxEp/RQvcgvG8xf8ahFPbJIVnHLIn6hXxOMVRcgULrJc0eEXwv6UCtu7naODHBQcr+
-         vqt57XFZ4PNbhjbKp0zdhI03XMmMaVbDThV6H/yqhsIBZ1Rou6XZGsa1bQlIw0iyuf4N
-         kIide8nzTlgxZmx2IZs2CoTf2aUPbXDnJ2hNo7is4pGUvtvPCrrWQGPz+4fh0D7lEXaT
-         DKxw==
-X-Gm-Message-State: AOJu0Yyd4pYotqoPFZkLy/qtqb9aARpp9rn/v5Np+H30kwfpEklTuQlf
-	uj89+NzsMJW5/RB8ecAC0Cc15ryFcqp02OMSY3zFNkQYH1I0fMQ=
-X-Google-Smtp-Source: AGHT+IG5/rfQ7VOYEbjBCN4z3iR1f+9ch+DgYqYY7IQnxs9sgR4R5gv+dYWcIh0/BxhiyVctY7N0GyyZ5mV77zvS90g=
-X-Received: by 2002:a25:2f4d:0:b0:db5:449c:5ebf with SMTP id
- v74-20020a252f4d000000b00db5449c5ebfmr3001755ybv.38.1701979648614; Thu, 07
- Dec 2023 12:07:28 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701980003; x=1702584803;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Xn6buCrGR0vgnL7mOEqOirgThpbJiAXtrF8s5TzWL8Q=;
+        b=GPXMNCPEWPSscjlGWqnvMRra6EcB7msYn/1vUfkv9X5aQL3mDVojXg1giTIsPpOTZD
+         0hBJiS6aA6rLY0ZV7UP+WFy6w5MZ8vkJX0pgKj+0p5Hyn5KvL2Vfl1r+bfmloLQectBt
+         lelt6HywlD3Kx/MOd+x0zxKFwsV7S8GsFRL1Yr+UinxmVluyIHPXy5tVyS8LJCU1bTOF
+         Rcyw7Yp8CVzk2xG1fA8s9lzFkrQed8Xujdej3grJsqOoNI7Jh9q9Z4AiyDkOY8Hl3CGo
+         kqn3aCU2UGkQQaCHDBiwDaiwVjL4jiPVwptfaTu1xt0sDZflFmpka2kvJYWgOBIseBwG
+         a7cg==
+X-Gm-Message-State: AOJu0YwSOzEXNXXDpO6Pd5T8dEr/3orzInJ5QwzhGUdEC5k1MZMq78pR
+	yWjvE8VbhqosynsMxOX/6S8C97GDPxiF1Q==
+X-Google-Smtp-Source: AGHT+IFNgy791H4vzQtxCkFFoz9BWR1fvXfVAVJaTfF1Nkhhx3DyH0j39sVKTOSGeLJovafhNV6iSWm/SyfiWQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a81:fe09:0:b0:5c1:4b36:85bf with SMTP id
+ j9-20020a81fe09000000b005c14b3685bfmr74346ywn.1.1701980003377; Thu, 07 Dec
+ 2023 12:13:23 -0800 (PST)
+Date: Thu,  7 Dec 2023 20:13:22 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231123092314.91299-1-Ilia.Gavrilov@infotecs.ru>
- <CAHC9VhQGX_22WTdZG4+K8WYQK-G21j8NM9Wy0TodgPAZk57TCQ@mail.gmail.com>
- <CAHC9VhTEREuTymgMW8zmQcRZCOpW8M0MZPcKto17ve5Aw1_2gg@mail.gmail.com> <20231206075529.769270f2@kernel.org>
-In-Reply-To: <20231206075529.769270f2@kernel.org>
-From: Paul Moore <paul@paul-moore.com>
-Date: Thu, 7 Dec 2023 15:07:17 -0500
-Message-ID: <CAHC9VhT2Azgxv4uL0+Auj4YtOt3cm6=yNnZ=Qihfd5NNhmi4uA@mail.gmail.com>
-Subject: Re: [PATCH net v2] calipso: Fix memory leak in netlbl_calipso_add_pass()
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Huw Davies <huw@codeweavers.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-security-module@vger.kernel.org" <linux-security-module@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Message-ID: <20231207201322.549000-1-edumazet@google.com>
+Subject: [PATCH net-next] ipv6: do not check fib6_has_expires() in fib6_info_release()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com, 
+	Kui-Feng Lee <thinker.li@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 6, 2023 at 10:55=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 5 Dec 2023 16:31:20 -0500 Paul Moore wrote:
-> > A quick follow-up to see if this patch was picked up by the networking
-> > folks?  I didn't get a patchwork notification, and I don't see it in
-> > Linus' tree, but perhaps I missed something?
->
-> Oops. Feel free to take it via your tree.
+My prior patch went a bit too far, because apparently fib6_has_expires()
+could be true while f6i->gc_link is not hashed yet.
 
-Okay, will do.  I don't believe this is a stable candidate so I'm
-going to merge this into the lsm/dev branch, it should be there
-shortly.
+fib6_set_expires_locked() can indeed set RTF_EXPIRES
+while f6i->fib6_table is NULL.
 
---=20
-paul-moore.com
+Original syzbot reports were about corruptions caused
+by dangling f6i->gc_link.
+
+Fixes: 5a08d0065a91 ("ipv6: add debug checks in fib6_info_release()")
+Reported-by: syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: David Ahern <dsahern@kernel.org>
+Cc: Kui-Feng Lee <thinker.li@gmail.com>
+---
+ include/net/ip6_fib.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
+index e1e7a894863a7891610ce5afb2034473cc208d3e..95ed495c3a4028457baf1503c367d2e7a6e14770 100644
+--- a/include/net/ip6_fib.h
++++ b/include/net/ip6_fib.h
+@@ -329,7 +329,6 @@ static inline bool fib6_info_hold_safe(struct fib6_info *f6i)
+ static inline void fib6_info_release(struct fib6_info *f6i)
+ {
+ 	if (f6i && refcount_dec_and_test(&f6i->fib6_ref)) {
+-		DEBUG_NET_WARN_ON_ONCE(fib6_has_expires(f6i));
+ 		DEBUG_NET_WARN_ON_ONCE(!hlist_unhashed(&f6i->gc_link));
+ 		call_rcu(&f6i->rcu, fib6_info_destroy_rcu);
+ 	}
+-- 
+2.43.0.472.g3155946c3a-goog
+
 
