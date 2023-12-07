@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-54691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B205A807CBD
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 01:06:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C53F807CBF
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 01:06:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C9601F21985
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 00:06:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B59741C209A9
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 00:06:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C886173;
-	Thu,  7 Dec 2023 00:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C061367;
+	Thu,  7 Dec 2023 00:06:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="TC5biusA"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="OZ5MZJfz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6793E10D9
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 16:06:11 -0800 (PST)
-Received: by mail-qv1-xf33.google.com with SMTP id 6a1803df08f44-67aa3b62c35so2104176d6.0
-        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 16:06:11 -0800 (PST)
+Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AA3910EB
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 16:06:13 -0800 (PST)
+Received: by mail-qk1-x730.google.com with SMTP id af79cd13be357-77efc30eee3so4612285a.1
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 16:06:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1701907570; x=1702512370; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1701907572; x=1702512372; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bw5sNGv3VbIRSF4MrQ2S3JRjWP8i2DBnkqSzM3oAGUc=;
-        b=TC5biusATDaHkvSbxdCzidGksyA7hK42aDZIsTar/4GLNr9tCwBHKABSGpS+OeqK0i
-         /DI3pjXjSTvK4bdQpzf1x0iOAif4Gg1q0vZeanfUcGCNvT9GPu1ZNHciaEHTrpUGJmvJ
-         JGNhL6ZlW9xoVw1JdGqUO8bFAYGtISOeOYUDM=
+        bh=rSRA0bl+Ki/kDE4LOuZBWg84JCHB80sJd9yiCb0tzZ0=;
+        b=OZ5MZJfznNsZ0yfvH+V0kYQ99PxT0i/5E6xn40eBF2wEsf2kYAFKQExlInWewJx19B
+         t27cUJBMeF7yKkh12nZF4CKw3TrXAwbw0goHOE/Fwto1jl5WC3tkQDou2v/a0vRSmQsF
+         I+Xei0OkIGswkgPaqkdLUQupKgNXmuLPL1tzQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701907570; x=1702512370;
+        d=1e100.net; s=20230601; t=1701907572; x=1702512372;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bw5sNGv3VbIRSF4MrQ2S3JRjWP8i2DBnkqSzM3oAGUc=;
-        b=VLOj9rRH0VMwxpqhlWTDNt0nji2GDiLy+H2CgPFga19RcK5QFVk6p3Qo470uANS+b7
-         IPtveGpH8ES91uPjZ246n2e9YAOpyxytEeNdcEzfFur29FKCg8taH+qP8JhSb181xTAS
-         7ljEHXhdFKZrEGw8WrQTND1DNgNwmEv7uyyugOY6aPbnY2taiCMshFKqWo5angZYVP91
-         CMCN+VVC8b++//uT5+y/kpA+3pTkYJsxtpHR3GHjBxdxm890wnSmDMx3WCn27XLWQOzg
-         3t4LXxPTUEW7+FnCiI9JvVge6DAwC0C8YbswFawtpN7gpEt/CDFp4CzTD1+zSygPU4dN
-         dTCw==
-X-Gm-Message-State: AOJu0YwKar0Gq9kYS3EIG1xw+MOR+ClMjy83iVoa7PvdRSeiGU5bNEO+
-	YaI3507LrJ/IKbObvnCso3Sreg==
-X-Google-Smtp-Source: AGHT+IEmQOhR8Z//m+RP0oiDKtzlOh6/5l3+mAj5iq3Ka7jeqdRX7vQgkioDxcWJpej8fuIVgc3SWA==
-X-Received: by 2002:ad4:4212:0:b0:67a:a721:e121 with SMTP id k18-20020ad44212000000b0067aa721e121mr2001811qvp.78.1701907570345;
-        Wed, 06 Dec 2023 16:06:10 -0800 (PST)
+        bh=rSRA0bl+Ki/kDE4LOuZBWg84JCHB80sJd9yiCb0tzZ0=;
+        b=Zij2X7X3+xaVQD3uVuZhNv0qeqGOjBekNdHQ5+WC+P0Oev02VItdQ1bPc0ZLFIAgNE
+         BHEkqjoIUMXePIhYOC3s01X53bLkuANjaDbOkP0/zdqBDH5ulfOCpizzpPiY4zE/KKwn
+         lvAOL1nxr70Zwl3MdFnYU0KTMNN2f5Ac/ZCAwu5K+7rLlXLa2pjKmHr142mMEyHc7twu
+         JkRNFRV5Pqy6RQ/c5leEPC8K8zeGRO1t/R4ZB6hkwgI5c/uu8ozaTigZ47vvGU2luVa5
+         UKXdlb/q07SiMGxXgNbi0wadaiZE8Sm83a9SrlPnd0umeR3jV2GGVk4FPXt8+OCt2QHd
+         YW1w==
+X-Gm-Message-State: AOJu0YzjeM+V8nNHJT0nrRITnajX6EhgqcUHLyXC0zLOVH0cG/TdFM9L
+	Sb8bU/eSeP6v7c5jwIhLe+LRbA==
+X-Google-Smtp-Source: AGHT+IGK5AC5dnprcPH759G+zRQ6S8k2hhx0Tq/OgBbUjQSafI/Flmgi2hFl63T6DiLpHSytt2+ETQ==
+X-Received: by 2002:a05:620a:8f86:b0:77f:11e3:57c7 with SMTP id ri6-20020a05620a8f8600b0077f11e357c7mr244770qkn.55.1701907571917;
+        Wed, 06 Dec 2023 16:06:11 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id a11-20020a05620a102b00b0077d78afc513sm23091qkk.110.2023.12.06.16.06.08
+        by smtp.gmail.com with ESMTPSA id a11-20020a05620a102b00b0077d78afc513sm23091qkk.110.2023.12.06.16.06.10
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 06 Dec 2023 16:06:09 -0800 (PST)
+        Wed, 06 Dec 2023 16:06:11 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -55,12 +55,11 @@ Cc: netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	gospo@broadcom.com,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Vikas Gupta <vikas.gupta@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>
-Subject: [PATCH net v2 3/4] bnxt_en: Fix wrong return value check in bnxt_close_nic()
-Date: Wed,  6 Dec 2023 16:05:50 -0800
-Message-Id: <20231207000551.138584-4-michael.chan@broadcom.com>
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>
+Subject: [PATCH net v2 4/4] bnxt_en: Fix HWTSTAMP_FILTER_ALL packet timestamp logic
+Date: Wed,  6 Dec 2023 16:05:51 -0800
+Message-Id: <20231207000551.138584-5-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231207000551.138584-1-michael.chan@broadcom.com>
 References: <20231207000551.138584-1-michael.chan@broadcom.com>
@@ -71,50 +70,108 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000320361060be03c8a"
+	boundary="0000000000004ac3e4060be03c9d"
 
---000000000000320361060be03c8a
+--0000000000004ac3e4060be03c9d
 Content-Transfer-Encoding: 8bit
 
-From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+When the chip is configured to timestamp all receive packets, the
+timestamp in the RX completion is only valid if the metadata
+present flag is not set for packets received on the wire.  In
+addition, internal loopback packets will never have a valid timestamp
+and the timestamp field will always be zero.  We must exclude
+any 0 value in the timestamp field because there is no way to
+determine if it is a loopback packet or not.
 
-The wait_event_interruptible_timeout() function returns 0
-if the timeout elapsed, -ERESTARTSYS if it was interrupted
-by a signal, and the remaining jiffies otherwise if the
-condition evaluated to true before the timeout elapsed.
+Add a new function bnxt_rx_ts_valid() to check for all timestamp
+valid conditions.
 
-Driver should have checked for zero return value instead of
-a positive value.
-
-Fixes: c0c050c58d84 ("bnxt_en: New Broadcom ethernet driver.")
-Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Fixes: 66ed81dcedc6 ("bnxt_en: Enable packet timestamping for all RX packets")
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
-v2: Add missing SoB tag.
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 20 +++++++++++++++++---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h |  8 +++++++-
+ 2 files changed, 24 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index b4a5311bdeb5..16b7cf6b01a4 100644
+index 16b7cf6b01a4..55ac281a9b06 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -10753,7 +10753,7 @@ int bnxt_close_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
- 		rc = wait_event_interruptible_timeout(bp->sriov_cfg_wait,
- 						      !bp->sriov_cfg,
- 						      BNXT_SRIOV_CFG_WAIT_TMO);
--		if (rc)
-+		if (!rc)
- 			netdev_warn(bp->dev, "timeout waiting for SRIOV config operation to complete!\n");
+@@ -1759,6 +1759,21 @@ static void bnxt_deliver_skb(struct bnxt *bp, struct bnxt_napi *bnapi,
+ 	napi_gro_receive(&bnapi->napi, skb);
+ }
+ 
++static bool bnxt_rx_ts_valid(struct bnxt *bp, u32 flags,
++			     struct rx_cmp_ext *rxcmp1, u32 *cmpl_ts)
++{
++	u32 ts = le32_to_cpu(rxcmp1->rx_cmp_timestamp);
++
++	if (BNXT_PTP_RX_TS_VALID(flags))
++		goto ts_valid;
++	if (!bp->ptp_all_rx_tstamp || !ts || !BNXT_ALL_RX_TS_VALID(flags))
++		return false;
++
++ts_valid:
++	*cmpl_ts = ts;
++	return true;
++}
++
+ /* returns the following:
+  * 1       - 1 packet successfully received
+  * 0       - successful TPA_START, packet not completed yet
+@@ -1784,6 +1799,7 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
+ 	struct sk_buff *skb;
+ 	struct xdp_buff xdp;
+ 	u32 flags, misc;
++	u32 cmpl_ts;
+ 	void *data;
+ 	int rc = 0;
+ 
+@@ -2006,10 +2022,8 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
+ 		}
  	}
- #endif
+ 
+-	if (unlikely((flags & RX_CMP_FLAGS_ITYPES_MASK) ==
+-		     RX_CMP_FLAGS_ITYPE_PTP_W_TS) || bp->ptp_all_rx_tstamp) {
++	if (bnxt_rx_ts_valid(bp, flags, rxcmp1, &cmpl_ts)) {
+ 		if (bp->flags & BNXT_FLAG_CHIP_P5) {
+-			u32 cmpl_ts = le32_to_cpu(rxcmp1->rx_cmp_timestamp);
+ 			u64 ns, ts;
+ 
+ 			if (!bnxt_get_rx_ts_p5(bp, &ts, cmpl_ts)) {
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index e702dbc3e6b1..5b570058e1c9 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -161,7 +161,7 @@ struct rx_cmp {
+ 	#define RX_CMP_FLAGS_ERROR				(1 << 6)
+ 	#define RX_CMP_FLAGS_PLACEMENT				(7 << 7)
+ 	#define RX_CMP_FLAGS_RSS_VALID				(1 << 10)
+-	#define RX_CMP_FLAGS_UNUSED				(1 << 11)
++	#define RX_CMP_FLAGS_PKT_METADATA_PRESENT		(1 << 11)
+ 	 #define RX_CMP_FLAGS_ITYPES_SHIFT			 12
+ 	 #define RX_CMP_FLAGS_ITYPES_MASK			 0xf000
+ 	 #define RX_CMP_FLAGS_ITYPE_UNKNOWN			 (0 << 12)
+@@ -188,6 +188,12 @@ struct rx_cmp {
+ 	__le32 rx_cmp_rss_hash;
+ };
+ 
++#define BNXT_PTP_RX_TS_VALID(flags)				\
++	(((flags) & RX_CMP_FLAGS_ITYPES_MASK) == RX_CMP_FLAGS_ITYPE_PTP_W_TS)
++
++#define BNXT_ALL_RX_TS_VALID(flags)				\
++	!((flags) & RX_CMP_FLAGS_PKT_METADATA_PRESENT)
++
+ #define RX_CMP_HASH_VALID(rxcmp)				\
+ 	((rxcmp)->rx_cmp_len_flags_type & cpu_to_le32(RX_CMP_FLAGS_RSS_VALID))
+ 
 -- 
 2.30.1
 
 
---000000000000320361060be03c8a
+--0000000000004ac3e4060be03c9d
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -185,14 +242,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILLsramxlDBDgKkkPkGr7uvPpTZPMmkd
-stA2mnjXcuB+MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
-NzAwMDYxMFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPISghiv25h8IF9ghwuPS9KcVjaT2gYA
+pLaPXxkLhPlbMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
+NzAwMDYxMlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAsDAC3Tu9S9mrgftip4cqRA8CA38iFMYK7FBm/kDMtar9QzHYo
-iCuZEuQjYCBmo+Y/Qs9MoOSepcbMWnscnf4wgku61QIUA3HhEinwmPZUlJwqZIFZH9Py4Oa8aT1k
-26DemPx03ABCNg8XPakK0hJq2JJ+TAU4zzhJ8Z/bkoQCkuXexLncmGw7NykhNpxeivdzpNVYqf6M
-ihtCMGhDBw5ckrX3Or4hmOX9t5pK3xqmbpmxbBJu2QCYOzbiRmhWmbZUNNWnIrPkANtnoAAB4Gw4
-JiCiVd/WAl2Ll3yPo2V1Kk35RQ0duhwDr1SyuxD6ReoBE6k7hbSZm4YPtLtYKnsz
---000000000000320361060be03c8a--
+ATANBgkqhkiG9w0BAQEFAASCAQBJxXgbYGM9LBJKAgRFJsueTn7sViYBHUwBcVcIxL1pjAfKU8xh
+1wqbFgKJKF+le5cFjcd2qRC2Cml7C2Ulgxrjlf9qbPtJ91BP6UsPydU5jh8Sz+RvSyBAUNTneHpt
+DJ4MYl5Pf34AnbXeXpquhZZmA1R9iKfHlSKkEwYbf0WGUg4seYVG4FplreCmVnQCVmL1CX3CrkF3
+8zwXa52vs47qApZuowvgI/D5P/8Cx4zEo3ddpdURfckp/mFOidbM5/KZ58nBJwa1QakOAAZh46vQ
+/g9RQz7UDGIG3BJ0cMILz9plNvjE4QWlrhQXRek0QTo+JrnWwz4YqxyYrz8DHBHu
+--0000000000004ac3e4060be03c9d--
 
