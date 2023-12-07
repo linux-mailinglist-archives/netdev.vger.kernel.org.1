@@ -1,343 +1,1209 @@
-Return-Path: <netdev+bounces-54733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 319B5807FDA
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 05:58:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CF7E807FE8
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 06:03:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA78B281714
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 04:57:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8FA91F2135D
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 05:03:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BC545670;
-	Thu,  7 Dec 2023 04:57:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128B2D532;
+	Thu,  7 Dec 2023 05:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="S4RC+QZg";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="2biQol/E"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eG7K2LKS"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A077B10C2;
-	Wed,  6 Dec 2023 20:57:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1701925070; x=1733461070;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=EpbsAL62gq2K8BLKcj+K9z5gs/G3CZyUbQPUGW1X3HU=;
-  b=S4RC+QZgUyboby/RHx8bKTwmp0rxX0SpBgaiu3F4Uy1FDVhj7hI3iXnW
-   V4Yu/nybPGcqFWFbRsxU0eh0TAcrrL+v7lXsJ4m0vgz77dMmYR1st4OQO
-   RKuy1fX/A48PdzFDJOrXHcBqBHbPtboRRvsnrv+oNpp+L2s3El2QJvHZT
-   qlptFjpD/wMsCutdDj1p1shZcVeETQzx7cX3wJ/8cLFwwuzC5mDR5L6WR
-   YXO0SCmjNlcAV9ghTFU8NdzY8xaX8ho+uTYw9EE37Or9sKvzKvuRC2xmb
-   z8tyKFCAKIGRrtlBalhZsiFU7LaUd+SBuNTmlhkuIDDfn2h7WdSpYhoOv
-   A==;
-X-CSE-ConnectionGUID: th8psTPlRoymhPvxnwQasw==
-X-CSE-MsgGUID: qmRtUAnRQ4OZZR8Uc5ch7Q==
-X-ThreatScanner-Verdict: Negative
-X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
-   d="scan'208";a="13770911"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Dec 2023 21:57:49 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 6 Dec 2023 21:57:25 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 6 Dec 2023 21:57:25 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OO9o6aav+Bm3bs5LbvOfVbWykaNV89FHTZU+UtGRkH5xDThM6jaJWSqFUwgQVX1WXUj4hKzy0bKySit4tGcyVq+PV5zoLcdv7V9JSYy2jmp9Fapid+LjRlTNY5qygFSmwt8t//LZ3+AIJAQs2K6efgsRCnE8dhY9z+yANzBAFPpF/EwjPOgT7ZWsfF/onEgl2HJpsNJK4dkMb6KcbwBdduOrLyctCQNqNKfmY/VKz5HYBBJ64zEUlypFfrVEms2p7Cg02mLKiforpsCqC1E6w59Oqw2D7dbZEUdOXASoXrCJf27hc7FVmFhY29a4FC8AI1zjwwSD2u8QxbMa5C2LFg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EpbsAL62gq2K8BLKcj+K9z5gs/G3CZyUbQPUGW1X3HU=;
- b=mS55J0wfYGGe9x/e0nXE4v0nSLyJQhsY3S8edmkGDBDXUSYOfFL4tBQB44pVi7gILvmxTG8Rk3rgdfHHneC5MLxw2NdtBGUm2OEDuC5DFzarv8rqwME0emloML1jtuSJ4Znprc42SE5ssdvLqSo/XABFFFusQmeqctSiaefPTIzFlhMjbpnvwJZ+wfzYk9dvEkp7yTav1/hhksavft0+IT2z2ipJcJclARl8hoEKiT5HXAVVx6/LoECU/K3ci30DY1jlfmvlX+4Yt25fVBSISU7Ha5/Db5FdMpMnA/MnKGeMOKySHE98nqncEZrULCI5RAUrB1klFRNk6IkQPVEBaQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EpbsAL62gq2K8BLKcj+K9z5gs/G3CZyUbQPUGW1X3HU=;
- b=2biQol/E2y0+DLsxj/48ZIZ8fLZQwf9Pg7Gv/qufPFJbo69mVgk1bscD9BIv4DGebobdgC/JGQrO6mZQ6ac1IvqxGhF/ZjhlprPxbBMqfkkR01/z5Wm/Puo0+Po1W1t0hgmOUSc6JzARYi5waH9zEGpuM7ZSm8j2Rujh8WNh76LRCZTyM4nGUZuVxuRVO8VDv8/IhsBPDRAMPaHGPKd/To0FpOawLglJB+V9B9G7jqTrJdOKap06Bcb1c6u6plHBt7zkb6EWLBYxCKrdDb+3PmGF6dj9Wfnb7jcO+7WJCxgxMQFhThK6gPyV5da/KWFhI8b7onXY7pHbS9DjnPsxbA==
-Received: from DM5PR11MB0076.namprd11.prod.outlook.com (2603:10b6:4:6b::28) by
- BL1PR11MB5448.namprd11.prod.outlook.com (2603:10b6:208:319::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7068.25; Thu, 7 Dec 2023 04:57:23 +0000
-Received: from DM5PR11MB0076.namprd11.prod.outlook.com
- ([fe80::4f7c:a191:fa1e:6fcb]) by DM5PR11MB0076.namprd11.prod.outlook.com
- ([fe80::4f7c:a191:fa1e:6fcb%6]) with mapi id 15.20.7068.027; Thu, 7 Dec 2023
- 04:57:23 +0000
-From: <Arun.Ramadoss@microchip.com>
-To: <andrew@lunn.ch>, <olteanv@gmail.com>, <davem@davemloft.net>,
-	<Woojung.Huh@microchip.com>, <pabeni@redhat.com>, <o.rempel@pengutronix.de>,
-	<edumazet@google.com>, <f.fainelli@gmail.com>, <kuba@kernel.org>
-CC: <kernel@pengutronix.de>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net-next v1 1/3] net: dsa: microchip: ksz8: move BMCR
- specific code to separate function
-Thread-Topic: [PATCH net-next v1 1/3] net: dsa: microchip: ksz8: move BMCR
- specific code to separate function
-Thread-Index: AQHaHI7fzGuG1o7H/0CSgPd3o2GtlLCdWpIA
-Date: Thu, 7 Dec 2023 04:57:23 +0000
-Message-ID: <47b3197a0cf95aa3ac1da8e76b93adacfa69d9e9.camel@microchip.com>
-References: <20231121152426.4188456-1-o.rempel@pengutronix.de>
-In-Reply-To: <20231121152426.4188456-1-o.rempel@pengutronix.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.36.5-0ubuntu1 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM5PR11MB0076:EE_|BL1PR11MB5448:EE_
-x-ms-office365-filtering-correlation-id: 49024a7f-8bc6-4984-1036-08dbf6e10023
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: soOeTf2jqSm8RBqowRNZcF5qEp3CwhXx3DW8EmuhrvDJRMfTZxbRe/u32BSNO+IWMzmeO+qdPRMEN0FLFkbe4XTkB7DIjxl+KsenIwIGLZw6u1+BTOdSFKSfbwouJmxYgzATycVVIyJeA7LU6upEoF72e6k9YnwZJurcxWbN5Kxxm671raImg/OAeNQqiiaBM9WrQtHAVggc56kxpATi3f7T/hreSw3gXcTTrhwlpHgB6TJJh2QeVX3VYAH+lxk88jwTpGfBm2WlNE3NWqqSHT8Pnp819hqYnNewLlu1V3GvRIVl50NJY8WdUVjbq7+4QPAh024gB950HXxnEF/FIMrCWBxwuS6KjPasAS75Wh1RQGAu1j1O4qRNPywdrNPpuAGkvQeUaj101jIiNzXqiPonSg+Es7V9jDPpxnGxvlSAtqlkVVnOQpvleOnGbdxtQYIm4avsqHXcXlv9EHfMYMmHC+X84PL+R4B5XC/DRvp313vRkWpi3sFP18nYHnIzAYxgrWFWJrwuDAAuJaKT7AMqdRKJSrv8zK/Ry0QTcP1vpQxBkJ+3YLHRfRIpYZw13cskS+zyqPa+XHA/waZ2sqgoQgfqX54QbVIZoisVKbEYvp0z/9kMIdRnZ5zoIVNekhimd7u4YdHl/DUb+JqSdg6LabW0SA+qhFX6yrv6ijw=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR11MB0076.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(376002)(39860400002)(396003)(366004)(230173577357003)(230273577357003)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(38070700009)(41300700001)(7416002)(5660300002)(86362001)(2906002)(36756003)(4001150100001)(6506007)(6512007)(26005)(107886003)(6486002)(478600001)(2616005)(71200400001)(83380400001)(122000001)(4326008)(38100700002)(8676002)(8936002)(54906003)(91956017)(316002)(76116006)(64756008)(66556008)(66446008)(66946007)(66476007)(110136005);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?cWQ2RkpQOHJMY294RnlLa0VLSkVlZU9MYUhUQjVLb2c4MUdZbmNUNmxzeGp5?=
- =?utf-8?B?T0lWTjlMWkhZS2JuVXRSNmNhdUlIYTRNV2JJbDlmaEE4c3kyNDRrSEk5OExT?=
- =?utf-8?B?b0RqNjZ0MzI0UkZ0dGlvTlNMQUEyZ2xzTldUNC9NRHZnZkpZMk14YUVwVzRs?=
- =?utf-8?B?a1YxU2NCYmdLekQyUnFSUlozbmtRSUI1S0RNMHNFb3JTSitjY2paelRsdU55?=
- =?utf-8?B?dFQ4OUpMdVAxbEtaRENiZUxGbDlHT0U5RXlRV1BUemd3djRkT0pQM3Y5YXVh?=
- =?utf-8?B?c0dWN0pKR0gzQ1ZKUmNnQ3h5RDVtWmVuQTNtRmN2aGc3bUdUN3ByekwreWxD?=
- =?utf-8?B?YnlxRkJHejlVT2V4YVY4SUtTYjRidFJYa05Ia0lYQnlyYjF2LzUyNERmcGs5?=
- =?utf-8?B?R0c2L0tkd254VUJxOHoyOXVBS05vTzhyTDd4YW04YVgwUmM4cllkVkJ6aDcy?=
- =?utf-8?B?NFkySVJmdkZNMm9VR2tyY29uMlgva1hSSy9HenpEMGR4c3FFa3dPQkppUG05?=
- =?utf-8?B?OEVkL2hWNkFYd2FCWHJyOGRSaGhidjFHVUdoa1VYS2lSVmlvS2JqK1Bzb3Vs?=
- =?utf-8?B?RDNDdlUvczdqNGVaVEJHVFRQNFhaYUg3c0hnQjRBZ3I3TURLbkMxVG1RelZF?=
- =?utf-8?B?enVpcEJYaTI2UWRsSkxlZlBiYmtWUDF1bXNWWTV5S1JRdnN5elZQK1hRb3JY?=
- =?utf-8?B?TEtjSE9yNTh0emptYU55Y01DQWZFTlFaKzloUTBPd0VmOHVhc0xoUVlldGRG?=
- =?utf-8?B?UEtRdjFUR3lJWnErYUhpQXFMNHRtUWVLRkpWTlhSOGc0dTZFT2dDb3F2TDNO?=
- =?utf-8?B?NS84SFNJdmoxVExFKzFvSXdpWjZIVUErRzF2U0YwWU1QZHNSK0lQRXNWblJS?=
- =?utf-8?B?ZXhUUkN5djY3ajRhc3VPcGlYTjJYYVVKUUZmUjJyVDRpTVp5ZE8rSXkvNUVW?=
- =?utf-8?B?amRER2dmcFQ3QTVyQWpXcTNaQW9yREpMK0ZHMDZaNEYxTTQvcklVN3dlcTNp?=
- =?utf-8?B?V00xQ0EzM2Z1cmVpWFRZWHZseGQ3dnRsb0hRdlJlSjJUdXBOcWdkVDBWUFNC?=
- =?utf-8?B?d05FcHkxRG5EcXJ2cHVsbWR6MWVhQ0NVanFqSlQ2cjRlcWVtZzE2dm9samNx?=
- =?utf-8?B?M3RtUHU3KzA2cDVkU2Zab0NGS3F2bmlOU2s0NUFPa1B3V1UxeHJQdUIxdWM2?=
- =?utf-8?B?Zlh1ZzIwU29tVW1EbERHdERXTit0djNrYXBSOXM1QkI5UEROUG1aRDBOUXVv?=
- =?utf-8?B?ZlVreVZXMXNuYUR1dS93c01yaWtUY25PSTFYWnFaSXZlZ2NLZ2c2Z2ZZQmlL?=
- =?utf-8?B?NnJIZzdKb2RWQUNpcGR0OGxPUUlPU1lBUnNkMTY0VTkzY3ovOGh5OHprUE05?=
- =?utf-8?B?djJmQmU5YmNkaHJFbFNMRXIyTUEzRDNiT21RQ3dQVC8vSFJsUnFyUUtzbTJl?=
- =?utf-8?B?Z0dSbGVTSnZoTThLZCs0Ni9LK2I0K1dLRkRJS3B2YlNvODFjUWd0N1VuZVQ4?=
- =?utf-8?B?UmRibWdrREFDSnlldVk1WmJOdGo0cExsaUJmRDhvVDh6L1ZkY0hGVjVZcFh6?=
- =?utf-8?B?a1B6N01kYzFZSGVRSmZxREgwRnFaSW1UTzZUZGdreFZVZEFTZjBjZ1NvZmFR?=
- =?utf-8?B?bjV1SHZuejBXVGV6cFBINUtwam5rZ0xIVG1wSnlWb3pibzNuNUdSTllXMXc5?=
- =?utf-8?B?ZXY2K0RBNUhzQjZGVUlmN3MvRi8ya2xjeGlRd21tbTg3QlQzenNLRzdIdDdD?=
- =?utf-8?B?QVhJdmZJZ0lCREpCaXhjb1J0aHg1QWpreUFPT3pCdU9wUldZZHhETGJNOWh4?=
- =?utf-8?B?RVYxajByeDJ2SkNtN2VzR1hnMFRxV29zUXVoaS8xbmhXRHExeHFQdFFWbk15?=
- =?utf-8?B?Q3cwSzROMk5mbE1STkthQ29ROG9FUVdVaFk5N3pmWTlDR3N4dmM2Q0VwYmly?=
- =?utf-8?B?TE44SGtkTTN2RnJqa3lwM0hvQ3pReHAwKzhSTFZRMFZSU1pXN05NR3lvR2lu?=
- =?utf-8?B?a3VDVkVEUFNXT1R6K0hzcTBKR2cvQ2NJeHZ1cEQ1aFhSanBwb2FYak1maWRz?=
- =?utf-8?B?bTZKRjRHMjV1VVRQdTdQNHo4MzFRbk5rcXNUQ3N1cUxIcktENFJoYk15K2ta?=
- =?utf-8?B?N0UwVk9ncmx3OUMydVY0bzNMYi9Ed21tQyt4bHlIM0xoWHlHUWMwQ042Nm16?=
- =?utf-8?B?M3c9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C9EAE6F572CCD54D8A0AD774637C1CEA@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 019BEA4;
+	Wed,  6 Dec 2023 21:03:14 -0800 (PST)
+Received: by mail-pj1-x1042.google.com with SMTP id 98e67ed59e1d1-286fb44eb16so431273a91.3;
+        Wed, 06 Dec 2023 21:03:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701925393; x=1702530193; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dqWPJdxJQyJhuvtjBbBsBQSO/fQiXQkhcxA4mwkp1G0=;
+        b=eG7K2LKS4vKbuZ5Kg3TeR0snvfhCE0a2GjZabs8dzx22xtTWt6V6uZwBQc3GcxK+cb
+         N8vTcfrjGSDOTfE+rPaMfu5qdu0EOUaXbLej/7zq4dEwo/6Iv993SEQUjQIWQOjLCWtz
+         Pt1jxWG+bTN7PaBNoj3JowpF1NaxPlqOLNa20ONJtgt76reEzdJ8CZYR5anqKAYL6x5X
+         GobDvETuMpmpRVqdYziw0EoZYvk25WpeDYOU5WDpHQjF6dalxOktmNSJN5kqRjbljEsk
+         r/Cc9llRUUK6534kUkGhqeuF6KGMjUgnryrX+DtfsqcgELRWtDyDkpd4pTshx3pUuntp
+         rA2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701925393; x=1702530193;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dqWPJdxJQyJhuvtjBbBsBQSO/fQiXQkhcxA4mwkp1G0=;
+        b=szYvfu7x8AkMfvnli0JTmoCdY6OK89BQTobIoSfpAit9znpJMd4BIMZnMzD7+GgrWZ
+         PTj/y53LhlG+CTKevirMPA0ngX4O18gPB8g8CkmLOB3vhsKZCXkClmo22UyQHD8cPXzy
+         UixzYu0gJjJKSEQSaO/aiI+CJ+4qensrq9a3bltrxHFT9Yf2Ft66AGBy2LVy9YZGgNmu
+         98j/gIwWy3CjJ35Kui93wSmOywuoDpGsv6ZrDOJYWW+K34kRoJuNHCH+B9+ZCMe/myTx
+         w+Fumi1FyTjYEDIRlVglS7UyJKVfqSV6SUdMC1VDw7/C2lKkPmDHHScAilwOUgkdHZrw
+         7BSA==
+X-Gm-Message-State: AOJu0YzGVdM0ur48meTDldFUviTqWI4nKszku7FirlDztPwJrnhick+Y
+	qWxRHstmfXj5xB3KW6RWL//5aVpKn6e3G4S8UaA=
+X-Google-Smtp-Source: AGHT+IE7okZKgiA1lI79sRKHqPc/9OG/l4gjQCbbKBoQQOHkVuD5VzzYbQS9l4xRLgRdAQgb+NvZ1TDEmW0r89KXgTI=
+X-Received: by 2002:a17:90b:3eca:b0:286:9989:3e85 with SMTP id
+ rm10-20020a17090b3eca00b0028699893e85mr1830999pjb.31.1701925393077; Wed, 06
+ Dec 2023 21:03:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR11MB0076.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 49024a7f-8bc6-4984-1036-08dbf6e10023
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Dec 2023 04:57:23.3350
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WH3FRrS969j9RR4VYMx9LZGvdkphLEJhvWs3oSRl563pKY9YM8uLz867uvebKKMup9grFi3nubU7TDnRXrXXjSWBsPXsJFpUXHBKYVPBIE8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5448
+From: xingwei lee <xrivendell7@gmail.com>
+Date: Thu, 7 Dec 2023 13:03:01 +0800
+Message-ID: <CABOYnLwn2wOR-OG5fG1eS5Az12S15Tf8GbWVut5xtFj-SsOnjw@mail.gmail.com>
+Subject: Re: [syzbot] [net?] KMSAN: uninit-value in ipgre_xmit
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syoshida@redhat.com, syzbot+2cb7b1bd08dc77ae7f89@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-SGkgT2xla3NpaiwNCg0KT24gVHVlLCAyMDIzLTExLTIxIGF0IDE2OjI0ICswMTAwLCBPbGVrc2lq
-IFJlbXBlbCB3cm90ZToNCj4gRVhURVJOQUwgRU1BSUw6IERvIG5vdCBjbGljayBsaW5rcyBvciBv
-cGVuIGF0dGFjaG1lbnRzIHVubGVzcyB5b3UNCj4ga25vdyB0aGUgY29udGVudCBpcyBzYWZlDQo+
-IA0KPiBJc29sYXRlIHRoZSBCYXNpYyBNb2RlIENvbnRyb2wgUmVnaXN0ZXIgKEJNQ1IpIG9wZXJh
-dGlvbnMgaW4gdGhlDQo+IGtzejg3OTUNCj4gZHJpdmVyIGJ5IG1vdmluZyB0aGUgQk1DUi1yZWxh
-dGVkIGNvZGUgc2VnbWVudHMgZnJvbSB0aGUga3N6OF9yX3BoeSgpDQo+IGFuZCBrc3o4X3dfcGh5
-KCkgZnVuY3Rpb25zIHRvIG5ld2x5IGNyZWF0ZWQga3N6OF9yX3BoeV9ibWNyKCkgYW5kDQo+IGtz
-ejhfd19waHlfYm1jcigpIGZ1bmN0aW9ucy4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IE9sZWtzaWog
-UmVtcGVsIDxvLnJlbXBlbEBwZW5ndXRyb25peC5kZT4NCj4gLS0tDQo+ICBkcml2ZXJzL25ldC9k
-c2EvbWljcm9jaGlwL2tzejg3OTUuYyB8IDM1MSArKysrKysrKysrKysrKysrKystLS0tLS0NCj4g
-LS0tLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDIyNyBpbnNlcnRpb25zKCspLCAxMjQgZGVsZXRpb25z
-KC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvZHNhL21pY3JvY2hpcC9rc3o4Nzk1
-LmMNCj4gYi9kcml2ZXJzL25ldC9kc2EvbWljcm9jaGlwL2tzejg3OTUuYw0KPiBpbmRleCA0YmY0
-ZDY3NTU3ZGMuLjgzNTE1NzgxNTkzNyAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9uZXQvZHNhL21p
-Y3JvY2hpcC9rc3o4Nzk1LmMNCj4gKysrIGIvZHJpdmVycy9uZXQvZHNhL21pY3JvY2hpcC9rc3o4
-Nzk1LmMNCj4gQEAgLTY3Niw5ICs2NzYsOTggQEAgc3RhdGljIGludCBrc3o4X3JfcGh5X2N0cmwo
-c3RydWN0IGtzel9kZXZpY2UNCj4gKmRldiwgaW50IHBvcnQsIHUxNiAqdmFsKQ0KPiAgICAgICAg
-IHJldHVybiAwOw0KPiAgfQ0KPiANCj4gDQo+ICBpbnQga3N6OF9yX3BoeShzdHJ1Y3Qga3N6X2Rl
-dmljZSAqZGV2LCB1MTYgcGh5LCB1MTYgcmVnLCB1MTYgKnZhbCkNCj4gIHsNCj4gLSAgICAgICB1
-OCByZXN0YXJ0LCBzcGVlZCwgY3RybCwgbGluazsNCj4gKyAgICAgICB1OCBjdHJsLCBsaW5rOw0K
-PiAgICAgICAgIGludCBwcm9jZXNzZWQgPSB0cnVlOw0KDQpSZXZlcnNlIGNocmlzdG1hcyB0cmVl
-DQoNCj4gICAgICAgICBjb25zdCB1MTYgKnJlZ3M7DQo+ICAgICAgICAgdTggdmFsMSwgdmFsMjsN
-Cj4gQEAgLTY5MCw0NSArNzc5LDkgQEAgaW50IGtzejhfcl9waHkoc3RydWN0IGtzel9kZXZpY2Ug
-KmRldiwgdTE2IHBoeSwNCj4gdTE2IHJlZywgdTE2ICp2YWwpDQo+IA0KPiAgICAgICAgIHN3aXRj
-aCAocmVnKSB7DQo+ICAgICAgICAgY2FzZSBNSUlfQk1DUjoNCj4gLSAgICAgICAgICAgICAgIHJl
-dCA9IGtzel9wcmVhZDgoZGV2LCBwLCByZWdzW1BfTkVHX1JFU1RBUlRfQ1RSTF0sDQo+ICZyZXN0
-YXJ0KTsNCj4gLSAgICAgICAgICAgICAgIGlmIChyZXQpDQo+IC0gICAgICAgICAgICAgICAgICAg
-ICAgIHJldHVybiByZXQ7DQo+IC0NCj4gLSAgICAgICAgICAgICAgIHJldCA9IGtzel9wcmVhZDgo
-ZGV2LCBwLCByZWdzW1BfU1BFRURfU1RBVFVTXSwNCj4gJnNwZWVkKTsNCj4gLSAgICAgICAgICAg
-ICAgIGlmIChyZXQpDQo+IC0gICAgICAgICAgICAgICAgICAgICAgIHJldHVybiByZXQ7DQo+IC0N
-Cj4gLSAgICAgICAgICAgICAgIHJldCA9IGtzel9wcmVhZDgoZGV2LCBwLCByZWdzW1BfRk9SQ0Vf
-Q1RSTF0sICZjdHJsKTsNCj4gKyAgICAgICAgICAgICAgIHJldCA9IGtzejhfcl9waHlfYm1jcihk
-ZXYsIHAsICZkYXRhKTsNCj4gICAgICAgICAgICAgICAgIGlmIChyZXQpDQo+ICAgICAgICAgICAg
-ICAgICAgICAgICAgIHJldHVybiByZXQ7DQo+IA0KDQo+ICtzdGF0aWMgaW50IGtzejhfd19waHlf
-Ym1jcihzdHJ1Y3Qga3N6X2RldmljZSAqZGV2LCBpbnQgcG9ydCwgdTE2DQo+IHZhbCkNCj4gIHsN
-Cj4gLSAgICAgICB1OCByZXN0YXJ0LCBzcGVlZCwgY3RybCwgZGF0YTsNCj4gLSAgICAgICBjb25z
-dCB1MTYgKnJlZ3M7DQo+IC0gICAgICAgdTggcCA9IHBoeTsNCj4gKyAgICAgICBjb25zdCB1MTYg
-KnJlZ3MgPSBkZXYtPmluZm8tPnJlZ3M7DQo+ICsgICAgICAgdTggcmVzdGFydCwgY3RybCwgc3Bl
-ZWQsIGRhdGE7DQo+ICAgICAgICAgaW50IHJldDsNCj4gDQo+IC0gICAgICAgcmVncyA9IGRldi0+
-aW5mby0+cmVnczsNCj4gKyAgICAgICAvKiBEbyBub3Qgc3VwcG9ydCBQSFkgcmVzZXQgZnVuY3Rp
-b24uICovDQo+ICsgICAgICAgaWYgKHZhbCAmIEJNQ1JfUkVTRVQpDQo+ICsgICAgICAgICAgICAg
-ICByZXR1cm4gMDsNCj4gDQo+IC0gICAgICAgc3dpdGNoIChyZWcpIHsNCj4gLSAgICAgICBjYXNl
-IE1JSV9CTUNSOg0KPiArICAgICAgIHJldCA9IGtzel9wcmVhZDgoZGV2LCBwb3J0LCByZWdzW1Bf
-U1BFRURfU1RBVFVTXSwgJnNwZWVkKTsNCj4gKyAgICAgICBpZiAocmV0KQ0KPiArICAgICAgICAg
-ICAgICAgcmV0dXJuIHJldDsNCj4gDQo+IC0gICAgICAgICAgICAgICAvKiBEbyBub3Qgc3VwcG9y
-dCBQSFkgcmVzZXQgZnVuY3Rpb24uICovDQo+IC0gICAgICAgICAgICAgICBpZiAodmFsICYgQk1D
-Ul9SRVNFVCkNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgYnJlYWs7DQo+IC0gICAgICAgICAg
-ICAgICByZXQgPSBrc3pfcHJlYWQ4KGRldiwgcCwgcmVnc1tQX1NQRUVEX1NUQVRVU10sDQo+ICZz
-cGVlZCk7DQo+ICsgICAgICAgZGF0YSA9IHNwZWVkOw0KPiArICAgICAgIGlmICh2YWwgJiBLU1o4
-ODZYX0JNQ1JfSFBfTURJWCkNCj4gKyAgICAgICAgICAgICAgIGRhdGEgfD0gUE9SVF9IUF9NRElY
-Ow0KPiArICAgICAgIGVsc2UNCj4gKyAgICAgICAgICAgICAgIGRhdGEgJj0gflBPUlRfSFBfTURJ
-WDsNCj4gKw0KPiArICAgICAgIGlmIChkYXRhICE9IHNwZWVkKSB7DQo+ICsgICAgICAgICAgICAg
-ICByZXQgPSBrc3pfcHdyaXRlOChkZXYsIHBvcnQsIHJlZ3NbUF9TUEVFRF9TVEFUVVNdLA0KPiBk
-YXRhKTsNCj4gICAgICAgICAgICAgICAgIGlmIChyZXQpDQo+ICAgICAgICAgICAgICAgICAgICAg
-ICAgIHJldHVybiByZXQ7DQo+ICsgICAgICAgfQ0KPiArDQo+ICsgICAgICAgcmV0ID0ga3N6X3By
-ZWFkOChkZXYsIHBvcnQsIHJlZ3NbUF9GT1JDRV9DVFJMXSwgJmN0cmwpOw0KPiArICAgICAgIGlm
-IChyZXQpDQo+ICsgICAgICAgICAgICAgICByZXR1cm4gcmV0Ow0KPiANCj4gLSAgICAgICAgICAg
-ICAgIGRhdGEgPSBzcGVlZDsNCj4gLSAgICAgICAgICAgICAgIGlmICh2YWwgJiBLU1o4ODZYX0JN
-Q1JfSFBfTURJWCkNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgZGF0YSB8PSBQT1JUX0hQX01E
-SVg7DQo+ICsgICAgICAgZGF0YSA9IGN0cmw7DQo+ICsgICAgICAgaWYgKGtzel9pc19rc3o4OHgz
-KGRldikpIHsNCj4gKyAgICAgICAgICAgICAgIGlmICgodmFsICYgQk1DUl9BTkVOQUJMRSkpDQo+
-ICsgICAgICAgICAgICAgICAgICAgICAgIGRhdGEgfD0gUE9SVF9BVVRPX05FR19FTkFCTEU7DQo+
-ICsgICAgICAgICAgICAgICBlbHNlDQo+ICsgICAgICAgICAgICAgICAgICAgICAgIGRhdGEgJj0g
-flBPUlRfQVVUT19ORUdfRU5BQkxFOw0KPiArICAgICAgIH0gZWxzZSB7DQo+ICsgICAgICAgICAg
-ICAgICBpZiAoISh2YWwgJiBCTUNSX0FORU5BQkxFKSkNCj4gKyAgICAgICAgICAgICAgICAgICAg
-ICAgZGF0YSB8PSBQT1JUX0FVVE9fTkVHX0RJU0FCTEU7DQo+ICAgICAgICAgICAgICAgICBlbHNl
-DQo+IC0gICAgICAgICAgICAgICAgICAgICAgIGRhdGEgJj0gflBPUlRfSFBfTURJWDsNCj4gKyAg
-ICAgICAgICAgICAgICAgICAgICAgZGF0YSAmPSB+UE9SVF9BVVRPX05FR19ESVNBQkxFOw0KPiAN
-Cj4gLSAgICAgICAgICAgICAgIGlmIChkYXRhICE9IHNwZWVkKSB7DQo+IC0gICAgICAgICAgICAg
-ICAgICAgICAgIHJldCA9IGtzel9wd3JpdGU4KGRldiwgcCwNCj4gcmVnc1tQX1NQRUVEX1NUQVRV
-U10sIGRhdGEpOw0KPiAtICAgICAgICAgICAgICAgICAgICAgICBpZiAocmV0KQ0KPiAtICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiByZXQ7DQo+IC0gICAgICAgICAgICAgICB9
-DQo+ICsgICAgICAgICAgICAgICAvKiBGaWJlciBwb3J0IGRvZXMgbm90IHN1cHBvcnQgYXV0by1u
-ZWdvdGlhdGlvbi4gKi8NCj4gKyAgICAgICAgICAgICAgIGlmIChkZXYtPnBvcnRzW3BvcnRdLmZp
-YmVyKQ0KPiArICAgICAgICAgICAgICAgICAgICAgICBkYXRhIHw9IFBPUlRfQVVUT19ORUdfRElT
-QUJMRTsNCj4gKyAgICAgICB9DQo+IA0KPiAtICAgICAgICAgICAgICAgcmV0ID0ga3N6X3ByZWFk
-OChkZXYsIHAsIHJlZ3NbUF9GT1JDRV9DVFJMXSwgJmN0cmwpOw0KPiArICAgICAgIGlmICh2YWwg
-JiBCTUNSX1NQRUVEMTAwKQ0KPiArICAgICAgICAgICAgICAgZGF0YSB8PSBQT1JUX0ZPUkNFXzEw
-MF9NQklUOw0KPiArICAgICAgIGVsc2UNCj4gKyAgICAgICAgICAgICAgIGRhdGEgJj0gflBPUlRf
-Rk9SQ0VfMTAwX01CSVQ7DQo+ICsgICAgICAgaWYgKHZhbCAmIEJNQ1JfRlVMTERQTFgpDQo+ICsg
-ICAgICAgICAgICAgICBkYXRhIHw9IFBPUlRfRk9SQ0VfRlVMTF9EVVBMRVg7DQo+ICsgICAgICAg
-ZWxzZQ0KPiArICAgICAgICAgICAgICAgZGF0YSAmPSB+UE9SVF9GT1JDRV9GVUxMX0RVUExFWDsN
-Cj4gKw0KPiArICAgICAgIGlmIChkYXRhICE9IGN0cmwpIHsNCj4gKyAgICAgICAgICAgICAgIHJl
-dCA9IGtzel9wd3JpdGU4KGRldiwgcG9ydCwgcmVnc1tQX0ZPUkNFX0NUUkxdLA0KPiBkYXRhKTsN
-Cj4gICAgICAgICAgICAgICAgIGlmIChyZXQpDQo+ICAgICAgICAgICAgICAgICAgICAgICAgIHJl
-dHVybiByZXQ7DQo+ICsgICAgICAgfQ0KPiANCj4gLSAgICAgICAgICAgICAgIGRhdGEgPSBjdHJs
-Ow0KPiAtICAgICAgICAgICAgICAgaWYgKGtzel9pc19rc3o4OHgzKGRldikpIHsNCj4gLSAgICAg
-ICAgICAgICAgICAgICAgICAgaWYgKCh2YWwgJiBCTUNSX0FORU5BQkxFKSkNCj4gLSAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBkYXRhIHw9IFBPUlRfQVVUT19ORUdfRU5BQkxFOw0KPiAt
-ICAgICAgICAgICAgICAgICAgICAgICBlbHNlDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgZGF0YSAmPSB+UE9SVF9BVVRPX05FR19FTkFCTEU7DQo+IC0gICAgICAgICAgICAgICB9
-IGVsc2Ugew0KPiAtICAgICAgICAgICAgICAgICAgICAgICBpZiAoISh2YWwgJiBCTUNSX0FORU5B
-QkxFKSkNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBkYXRhIHw9IFBPUlRfQVVU
-T19ORUdfRElTQUJMRTsNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgZWxzZQ0KPiAtICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIGRhdGEgJj0gflBPUlRfQVVUT19ORUdfRElTQUJMRTsN
-Cj4gLQ0KPiAtICAgICAgICAgICAgICAgICAgICAgICAvKiBGaWJlciBwb3J0IGRvZXMgbm90IHN1
-cHBvcnQgYXV0by0NCj4gbmVnb3RpYXRpb24uICovDQo+IC0gICAgICAgICAgICAgICAgICAgICAg
-IGlmIChkZXYtPnBvcnRzW3BdLmZpYmVyKQ0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIGRhdGEgfD0gUE9SVF9BVVRPX05FR19ESVNBQkxFOw0KPiAtICAgICAgICAgICAgICAgfQ0K
-PiArICAgICAgIHJldCA9IGtzel9wcmVhZDgoZGV2LCBwb3J0LCByZWdzW1BfTkVHX1JFU1RBUlRf
-Q1RSTF0sDQo+ICZyZXN0YXJ0KTsNCj4gKyAgICAgICBpZiAocmV0KQ0KPiArICAgICAgICAgICAg
-ICAgcmV0dXJuIHJldDsNCj4gDQo+IC0gICAgICAgICAgICAgICBpZiAodmFsICYgQk1DUl9TUEVF
-RDEwMCkNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgZGF0YSB8PSBQT1JUX0ZPUkNFXzEwMF9N
-QklUOw0KPiAtICAgICAgICAgICAgICAgZWxzZQ0KPiAtICAgICAgICAgICAgICAgICAgICAgICBk
-YXRhICY9IH5QT1JUX0ZPUkNFXzEwMF9NQklUOw0KDQpzdWdnZXN0aW9uOiBibGFuayBsaW5lIGJl
-dHdlZW4gdGhlbSBpbmNyZWFzZXMgcmVhZGFiaWxpdHkuDQoNCj4gLSAgICAgICAgICAgICAgIGlm
-ICh2YWwgJiBCTUNSX0ZVTExEUExYKQ0KPiAtICAgICAgICAgICAgICAgICAgICAgICBkYXRhIHw9
-IFBPUlRfRk9SQ0VfRlVMTF9EVVBMRVg7DQo+IC0gICAgICAgICAgICAgICBlbHNlDQo+IC0gICAg
-ICAgICAgICAgICAgICAgICAgIGRhdGEgJj0gflBPUlRfRk9SQ0VfRlVMTF9EVVBMRVg7DQo+ICsg
-ICAgICAgZGF0YSA9IHJlc3RhcnQ7DQo+ICsgICAgICAgaWYgKHZhbCAmIEtTWjg4NlhfQk1DUl9E
-SVNBQkxFX0xFRCkNCj4gKyAgICAgICAgICAgICAgIGRhdGEgfD0gUE9SVF9MRURfT0ZGOw0KPiAr
-ICAgICAgIGVsc2UNCj4gKyAgICAgICAgICAgICAgIGRhdGEgJj0gflBPUlRfTEVEX09GRjsNCj4g
-KyAgICAgICBpZiAodmFsICYgS1NaODg2WF9CTUNSX0RJU0FCTEVfVFJBTlNNSVQpDQo+ICsgICAg
-ICAgICAgICAgICBkYXRhIHw9IFBPUlRfVFhfRElTQUJMRTsNCj4gKyAgICAgICBlbHNlDQo+ICsg
-ICAgICAgICAgICAgICBkYXRhICY9IH5QT1JUX1RYX0RJU0FCTEU7DQo+ICsgICAgICAgaWYgKHZh
-bCAmIEJNQ1JfQU5SRVNUQVJUKQ0KPiArICAgICAgICAgICAgICAgZGF0YSB8PSBQT1JUX0FVVE9f
-TkVHX1JFU1RBUlQ7DQo+ICsgICAgICAgZWxzZQ0KPiArICAgICAgICAgICAgICAgZGF0YSAmPSB+
-KFBPUlRfQVVUT19ORUdfUkVTVEFSVCk7DQo+ICsgICAgICAgaWYgKHZhbCAmIEJNQ1JfUERPV04p
-DQo+ICsgICAgICAgICAgICAgICBkYXRhIHw9IFBPUlRfUE9XRVJfRE9XTjsNCj4gKyAgICAgICBl
-bHNlDQo+ICsgICAgICAgICAgICAgICBkYXRhICY9IH5QT1JUX1BPV0VSX0RPV047DQo+ICsgICAg
-ICAgaWYgKHZhbCAmIEtTWjg4NlhfQk1DUl9ESVNBQkxFX0FVVE9fTURJWCkNCj4gKyAgICAgICAg
-ICAgICAgIGRhdGEgfD0gUE9SVF9BVVRPX01ESVhfRElTQUJMRTsNCj4gKyAgICAgICBlbHNlDQo+
-ICsgICAgICAgICAgICAgICBkYXRhICY9IH5QT1JUX0FVVE9fTURJWF9ESVNBQkxFOw0KPiArICAg
-ICAgIGlmICh2YWwgJiBLU1o4ODZYX0JNQ1JfRk9SQ0VfTURJKQ0KPiArICAgICAgICAgICAgICAg
-ZGF0YSB8PSBQT1JUX0ZPUkNFX01ESVg7DQo+ICsgICAgICAgZWxzZQ0KPiArICAgICAgICAgICAg
-ICAgZGF0YSAmPSB+UE9SVF9GT1JDRV9NRElYOw0KPiArICAgICAgIGlmICh2YWwgJiBCTUNSX0xP
-T1BCQUNLKQ0KPiArICAgICAgICAgICAgICAgZGF0YSB8PSBQT1JUX1BIWV9MT09QQkFDSzsNCj4g
-KyAgICAgICBlbHNlDQo+ICsgICAgICAgICAgICAgICBkYXRhICY9IH5QT1JUX1BIWV9MT09QQkFD
-SzsNCj4gDQo+IC0gICAgICAgICAgICAgICBpZiAoZGF0YSAhPSBjdHJsKSB7DQo+IC0gICAgICAg
-ICAgICAgICAgICAgICAgIHJldCA9IGtzel9wd3JpdGU4KGRldiwgcCwgcmVnc1tQX0ZPUkNFX0NU
-UkxdLA0KPiBkYXRhKTsNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgaWYgKHJldCkNCj4gLSAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICByZXR1cm4gcmV0Ow0KPiAtICAgICAgICAgICAg
-ICAgfQ0KPiArICAgICAgIGlmIChkYXRhICE9IHJlc3RhcnQpIHsNCj4gKyAgICAgICAgICAgICAg
-IHJldCA9IGtzel9wd3JpdGU4KGRldiwgcG9ydCwNCj4gcmVnc1tQX05FR19SRVNUQVJUX0NUUkxd
-LA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZGF0YSk7DQo+ICsgICAgICAg
-ICAgICAgICBpZiAocmV0KQ0KPiArICAgICAgICAgICAgICAgICAgICAgICByZXR1cm4gcmV0Ow0K
-PiArICAgICAgIH0NCj4gDQo+IC0gICAgICAgICAgICAgICByZXQgPSBrc3pfcHJlYWQ4KGRldiwg
-cCwgcmVnc1tQX05FR19SRVNUQVJUX0NUUkxdLA0KPiAmcmVzdGFydCk7DQo+ICsgICAgICAgcmV0
-dXJuIDA7DQo+ICt9DQo+ICsNCj4gK2ludCBrc3o4X3dfcGh5KHN0cnVjdCBrc3pfZGV2aWNlICpk
-ZXYsIHUxNiBwaHksIHUxNiByZWcsIHUxNiB2YWwpDQo+ICt7DQo+ICsgICAgICAgdTggY3RybCwg
-ZGF0YTsNCj4gKyAgICAgICBjb25zdCB1MTYgKnJlZ3M7DQoNCnJldmVyc2UgY2hyaXN0bWFzIHRy
-ZWUNCg0KPiArICAgICAgIHU4IHAgPSBwaHk7DQo+ICsgICAgICAgaW50IHJldDsNCj4gKw0KPiAr
-ICAgICAgIHJlZ3MgPSBkZXYtPmluZm8tPnJlZ3M7DQo+ICsNCj4gKyAgICAgICBzd2l0Y2ggKHJl
-Zykgew0KPiArICAgICAgIGNhc2UgTUlJX0JNQ1I6DQo+ICsgICAgICAgICAgICAgICByZXQgPSBr
-c3o4X3dfcGh5X2JtY3IoZGV2LCBwLCB2YWwpOw0KDQpJbiBrc3o4X3dfcGh5X2JtY3IsIHAgaXMg
-b2YgaW50LCBoZXJlIHlvdSBhcmUgcGFzc2luZyBwIHdoaWNoIGlzIHU4Lg0KYWxzbyBpdCBpcyBh
-c3NpZ25lZCB1c2luZyB1MTYuIEFueSByZWFzb24gYmVoaW5kIGl0LiBpZiBub3QsIGhhdmUNCmNv
-bnNpc3RlbmN5Lg0KDQo+ICAgICAgICAgICAgICAgICBpZiAocmV0KQ0KPiAgICAgICAgICAgICAg
-ICAgICAgICAgICByZXR1cm4gcmV0Ow0KPiANCj4gLSAgICAgICAgICAgICAgIGRhdGEgPSByZXN0
-YXJ0Ow0KPiAtICAgICAgICAgICAgICAgaWYgKHZhbCAmIEtTWjg4NlhfQk1DUl9ESVNBQkxFX0xF
-RCkNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgZGF0YSB8PSBQT1JUX0xFRF9PRkY7DQo+IC0g
-ICAgICAgICAgICAgICBlbHNlDQo+IC0gICAgICAgICAgICAgICAgICAgICAgIGRhdGEgJj0gflBP
-UlRfTEVEX09GRjsNCj4gLSAgICAgICAgICAgICAgIGlmICh2YWwgJiBLU1o4ODZYX0JNQ1JfRElT
-QUJMRV9UUkFOU01JVCkNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgZGF0YSB8PSBQT1JUX1RY
-X0RJU0FCTEU7DQo+IC0gICAgICAgICAgICAgICBlbHNlDQo+IC0gICAgICAgICAgICAgICAgICAg
-ICAgIGRhdGEgJj0gflBPUlRfVFhfRElTQUJMRTsNCj4gLSAgICAgICAgICAgICAgIGlmICh2YWwg
-JiBCTUNSX0FOUkVTVEFSVCkNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgZGF0YSB8PSBQT1JU
-X0FVVE9fTkVHX1JFU1RBUlQ7DQo+IC0gICAgICAgICAgICAgICBlbHNlDQo+IC0gICAgICAgICAg
-ICAgICAgICAgICAgIGRhdGEgJj0gfihQT1JUX0FVVE9fTkVHX1JFU1RBUlQpOw0KPiAtICAgICAg
-ICAgICAgICAgaWYgKHZhbCAmIEJNQ1JfUERPV04pDQo+IC0gICAgICAgICAgICAgICAgICAgICAg
-IGRhdGEgfD0gUE9SVF9QT1dFUl9ET1dOOw0KPiAtICAgICAgICAgICAgICAgZWxzZQ0KPiAtICAg
-ICAgICAgICAgICAgICAgICAgICBkYXRhICY9IH5QT1JUX1BPV0VSX0RPV047DQo+IC0gICAgICAg
-ICAgICAgICBpZiAodmFsICYgS1NaODg2WF9CTUNSX0RJU0FCTEVfQVVUT19NRElYKQ0KPiAtICAg
-ICAgICAgICAgICAgICAgICAgICBkYXRhIHw9IFBPUlRfQVVUT19NRElYX0RJU0FCTEU7DQo+IC0g
-ICAgICAgICAgICAgICBlbHNlDQo+IC0gICAgICAgICAgICAgICAgICAgICAgIGRhdGEgJj0gflBP
-UlRfQVVUT19NRElYX0RJU0FCTEU7DQo+IC0gICAgICAgICAgICAgICBpZiAodmFsICYgS1NaODg2
-WF9CTUNSX0ZPUkNFX01ESSkNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgZGF0YSB8PSBQT1JU
-X0ZPUkNFX01ESVg7DQo+IC0gICAgICAgICAgICAgICBlbHNlDQo+IC0gICAgICAgICAgICAgICAg
-ICAgICAgIGRhdGEgJj0gflBPUlRfRk9SQ0VfTURJWDsNCj4gLSAgICAgICAgICAgICAgIGlmICh2
-YWwgJiBCTUNSX0xPT1BCQUNLKQ0KPiAtICAgICAgICAgICAgICAgICAgICAgICBkYXRhIHw9IFBP
-UlRfUEhZX0xPT1BCQUNLOw0KPiAtICAgICAgICAgICAgICAgZWxzZQ0KPiAtICAgICAgICAgICAg
-ICAgICAgICAgICBkYXRhICY9IH5QT1JUX1BIWV9MT09QQkFDSzsNCj4gDQo+IC0gICAgICAgICAg
-ICAgICBpZiAoZGF0YSAhPSByZXN0YXJ0KSB7DQo+IC0gICAgICAgICAgICAgICAgICAgICAgIHJl
-dCA9IGtzel9wd3JpdGU4KGRldiwgcCwNCj4gcmVnc1tQX05FR19SRVNUQVJUX0NUUkxdLA0KPiAt
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBkYXRhKTsNCj4gLSAgICAg
-ICAgICAgICAgICAgICAgICAgaWYgKHJldCkNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICByZXR1cm4gcmV0Ow0KPiAtICAgICAgICAgICAgICAgfQ0KPiAgICAgICAgICAgICAgICAg
-YnJlYWs7DQo+ICAgICAgICAgY2FzZSBNSUlfQURWRVJUSVNFOg0KPiAgICAgICAgICAgICAgICAg
-cmV0ID0ga3N6X3ByZWFkOChkZXYsIHAsIHJlZ3NbUF9MT0NBTF9DVFJMXSwgJmN0cmwpOw0KPiAt
-LQ0KPiAyLjM5LjINCj4gDQo=
+Hello Eric.
+I reproduced this bug with repro.c and repro.txt
+HEAD commit: 815fb87b753055df2d9e50f6cd80eb10235fe3e9
+kernel config: https://syzkaller.appspot.com/text?tag=KernelConfig&x=f711bc2a7eb1db25
+as the same in https://syzkaller.appspot.com/bug?extid=2cb7b1bd08dc77ae7f89
+
+=* repro.c =*
+// autogenerated by syzkaller (https://github.com/google/syzkaller)
+
+#define _GNU_SOURCE
+
+#include <arpa/inet.h>
+#include <dirent.h>
+#include <endian.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <linux/capability.h>
+#include <linux/genetlink.h>
+#include <linux/if_addr.h>
+#include <linux/if_ether.h>
+#include <linux/if_link.h>
+#include <linux/if_tun.h>
+#include <linux/in6.h>
+#include <linux/ip.h>
+#include <linux/neighbour.h>
+#include <linux/net.h>
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
+#include <linux/tcp.h>
+#include <linux/veth.h>
+#include <net/if.h>
+#include <net/if_arp.h>
+#include <netinet/in.h>
+#include <sched.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/mount.h>
+#include <sys/prctl.h>
+#include <sys/resource.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/syscall.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/uio.h>
+#include <sys/wait.h>
+#include <time.h>
+#include <unistd.h>
+
+static unsigned long long procid;
+
+static void sleep_ms(uint64_t ms) { usleep(ms * 1000); }
+
+static uint64_t current_time_ms(void) {
+  struct timespec ts;
+  if (clock_gettime(CLOCK_MONOTONIC, &ts)) exit(1);
+  return (uint64_t)ts.tv_sec * 1000 + (uint64_t)ts.tv_nsec / 1000000;
+}
+
+static bool write_file(const char* file, const char* what, ...) {
+  char buf[1024];
+  va_list args;
+  va_start(args, what);
+  vsnprintf(buf, sizeof(buf), what, args);
+  va_end(args);
+  buf[sizeof(buf) - 1] = 0;
+  int len = strlen(buf);
+  int fd = open(file, O_WRONLY | O_CLOEXEC);
+  if (fd == -1) return false;
+  if (write(fd, buf, len) != len) {
+    int err = errno;
+    close(fd);
+    errno = err;
+    return false;
+  }
+  close(fd);
+  return true;
+}
+
+struct nlmsg {
+  char* pos;
+  int nesting;
+  struct nlattr* nested[8];
+  char buf[4096];
+};
+
+static void netlink_init(struct nlmsg* nlmsg, int typ, int flags,
+                         const void* data, int size) {
+  memset(nlmsg, 0, sizeof(*nlmsg));
+  struct nlmsghdr* hdr = (struct nlmsghdr*)nlmsg->buf;
+  hdr->nlmsg_type = typ;
+  hdr->nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK | flags;
+  memcpy(hdr + 1, data, size);
+  nlmsg->pos = (char*)(hdr + 1) + NLMSG_ALIGN(size);
+}
+
+static void netlink_attr(struct nlmsg* nlmsg, int typ, const void* data,
+                         int size) {
+  struct nlattr* attr = (struct nlattr*)nlmsg->pos;
+  attr->nla_len = sizeof(*attr) + size;
+  attr->nla_type = typ;
+  if (size > 0) memcpy(attr + 1, data, size);
+  nlmsg->pos += NLMSG_ALIGN(attr->nla_len);
+}
+
+static void netlink_nest(struct nlmsg* nlmsg, int typ) {
+  struct nlattr* attr = (struct nlattr*)nlmsg->pos;
+  attr->nla_type = typ;
+  nlmsg->pos += sizeof(*attr);
+  nlmsg->nested[nlmsg->nesting++] = attr;
+}
+
+static void netlink_done(struct nlmsg* nlmsg) {
+  struct nlattr* attr = nlmsg->nested[--nlmsg->nesting];
+  attr->nla_len = nlmsg->pos - (char*)attr;
+}
+
+static int netlink_send_ext(struct nlmsg* nlmsg, int sock, uint16_t reply_type,
+                            int* reply_len, bool dofail) {
+  if (nlmsg->pos > nlmsg->buf + sizeof(nlmsg->buf) || nlmsg->nesting) exit(1);
+  struct nlmsghdr* hdr = (struct nlmsghdr*)nlmsg->buf;
+  hdr->nlmsg_len = nlmsg->pos - nlmsg->buf;
+  struct sockaddr_nl addr;
+  memset(&addr, 0, sizeof(addr));
+  addr.nl_family = AF_NETLINK;
+  ssize_t n = sendto(sock, nlmsg->buf, hdr->nlmsg_len, 0,
+                     (struct sockaddr*)&addr, sizeof(addr));
+  if (n != (ssize_t)hdr->nlmsg_len) {
+    if (dofail) exit(1);
+    return -1;
+  }
+  n = recv(sock, nlmsg->buf, sizeof(nlmsg->buf), 0);
+  if (reply_len) *reply_len = 0;
+  if (n < 0) {
+    if (dofail) exit(1);
+    return -1;
+  }
+  if (n < (ssize_t)sizeof(struct nlmsghdr)) {
+    errno = EINVAL;
+    if (dofail) exit(1);
+    return -1;
+  }
+  if (hdr->nlmsg_type == NLMSG_DONE) return 0;
+  if (reply_len && hdr->nlmsg_type == reply_type) {
+    *reply_len = n;
+    return 0;
+  }
+  if (n < (ssize_t)(sizeof(struct nlmsghdr) + sizeof(struct nlmsgerr))) {
+    errno = EINVAL;
+    if (dofail) exit(1);
+    return -1;
+  }
+  if (hdr->nlmsg_type != NLMSG_ERROR) {
+    errno = EINVAL;
+    if (dofail) exit(1);
+    return -1;
+  }
+  errno = -((struct nlmsgerr*)(hdr + 1))->error;
+  return -errno;
+}
+
+static int netlink_send(struct nlmsg* nlmsg, int sock) {
+  return netlink_send_ext(nlmsg, sock, 0, NULL, true);
+}
+
+static int netlink_query_family_id(struct nlmsg* nlmsg, int sock,
+                                   const char* family_name, bool dofail) {
+  struct genlmsghdr genlhdr;
+  memset(&genlhdr, 0, sizeof(genlhdr));
+  genlhdr.cmd = CTRL_CMD_GETFAMILY;
+  netlink_init(nlmsg, GENL_ID_CTRL, 0, &genlhdr, sizeof(genlhdr));
+  netlink_attr(nlmsg, CTRL_ATTR_FAMILY_NAME, family_name,
+               strnlen(family_name, GENL_NAMSIZ - 1) + 1);
+  int n = 0;
+  int err = netlink_send_ext(nlmsg, sock, GENL_ID_CTRL, &n, dofail);
+  if (err < 0) {
+    return -1;
+  }
+  uint16_t id = 0;
+  struct nlattr* attr = (struct nlattr*)(nlmsg->buf + NLMSG_HDRLEN +
+                                         NLMSG_ALIGN(sizeof(genlhdr)));
+  for (; (char*)attr < nlmsg->buf + n;
+       attr = (struct nlattr*)((char*)attr + NLMSG_ALIGN(attr->nla_len))) {
+    if (attr->nla_type == CTRL_ATTR_FAMILY_ID) {
+      id = *(uint16_t*)(attr + 1);
+      break;
+    }
+  }
+  if (!id) {
+    errno = EINVAL;
+    return -1;
+  }
+  recv(sock, nlmsg->buf, sizeof(nlmsg->buf), 0);
+  return id;
+}
+
+static int netlink_next_msg(struct nlmsg* nlmsg, unsigned int offset,
+                            unsigned int total_len) {
+  struct nlmsghdr* hdr = (struct nlmsghdr*)(nlmsg->buf + offset);
+  if (offset == total_len || offset + hdr->nlmsg_len > total_len) return -1;
+  return hdr->nlmsg_len;
+}
+
+static void netlink_add_device_impl(struct nlmsg* nlmsg, const char* type,
+                                    const char* name, bool up) {
+  struct ifinfomsg hdr;
+  memset(&hdr, 0, sizeof(hdr));
+  if (up) hdr.ifi_flags = hdr.ifi_change = IFF_UP;
+  netlink_init(nlmsg, RTM_NEWLINK, NLM_F_EXCL | NLM_F_CREATE, &hdr,
+               sizeof(hdr));
+  if (name) netlink_attr(nlmsg, IFLA_IFNAME, name, strlen(name));
+  netlink_nest(nlmsg, IFLA_LINKINFO);
+  netlink_attr(nlmsg, IFLA_INFO_KIND, type, strlen(type));
+}
+
+static void netlink_add_device(struct nlmsg* nlmsg, int sock, const char* type,
+                               const char* name) {
+  netlink_add_device_impl(nlmsg, type, name, false);
+  netlink_done(nlmsg);
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static void netlink_add_veth(struct nlmsg* nlmsg, int sock, const char* name,
+                             const char* peer) {
+  netlink_add_device_impl(nlmsg, "veth", name, false);
+  netlink_nest(nlmsg, IFLA_INFO_DATA);
+  netlink_nest(nlmsg, VETH_INFO_PEER);
+  nlmsg->pos += sizeof(struct ifinfomsg);
+  netlink_attr(nlmsg, IFLA_IFNAME, peer, strlen(peer));
+  netlink_done(nlmsg);
+  netlink_done(nlmsg);
+  netlink_done(nlmsg);
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static void netlink_add_xfrm(struct nlmsg* nlmsg, int sock, const char* name) {
+  netlink_add_device_impl(nlmsg, "xfrm", name, true);
+  netlink_nest(nlmsg, IFLA_INFO_DATA);
+  int if_id = 1;
+  netlink_attr(nlmsg, 2, &if_id, sizeof(if_id));
+  netlink_done(nlmsg);
+  netlink_done(nlmsg);
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static void netlink_add_hsr(struct nlmsg* nlmsg, int sock, const char* name,
+                            const char* slave1, const char* slave2) {
+  netlink_add_device_impl(nlmsg, "hsr", name, false);
+  netlink_nest(nlmsg, IFLA_INFO_DATA);
+  int ifindex1 = if_nametoindex(slave1);
+  netlink_attr(nlmsg, IFLA_HSR_SLAVE1, &ifindex1, sizeof(ifindex1));
+  int ifindex2 = if_nametoindex(slave2);
+  netlink_attr(nlmsg, IFLA_HSR_SLAVE2, &ifindex2, sizeof(ifindex2));
+  netlink_done(nlmsg);
+  netlink_done(nlmsg);
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static void netlink_add_linked(struct nlmsg* nlmsg, int sock, const char* type,
+                               const char* name, const char* link) {
+  netlink_add_device_impl(nlmsg, type, name, false);
+  netlink_done(nlmsg);
+  int ifindex = if_nametoindex(link);
+  netlink_attr(nlmsg, IFLA_LINK, &ifindex, sizeof(ifindex));
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static void netlink_add_vlan(struct nlmsg* nlmsg, int sock, const char* name,
+                             const char* link, uint16_t id, uint16_t proto) {
+  netlink_add_device_impl(nlmsg, "vlan", name, false);
+  netlink_nest(nlmsg, IFLA_INFO_DATA);
+  netlink_attr(nlmsg, IFLA_VLAN_ID, &id, sizeof(id));
+  netlink_attr(nlmsg, IFLA_VLAN_PROTOCOL, &proto, sizeof(proto));
+  netlink_done(nlmsg);
+  netlink_done(nlmsg);
+  int ifindex = if_nametoindex(link);
+  netlink_attr(nlmsg, IFLA_LINK, &ifindex, sizeof(ifindex));
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static void netlink_add_macvlan(struct nlmsg* nlmsg, int sock, const char* name,
+                                const char* link) {
+  netlink_add_device_impl(nlmsg, "macvlan", name, false);
+  netlink_nest(nlmsg, IFLA_INFO_DATA);
+  uint32_t mode = MACVLAN_MODE_BRIDGE;
+  netlink_attr(nlmsg, IFLA_MACVLAN_MODE, &mode, sizeof(mode));
+  netlink_done(nlmsg);
+  netlink_done(nlmsg);
+  int ifindex = if_nametoindex(link);
+  netlink_attr(nlmsg, IFLA_LINK, &ifindex, sizeof(ifindex));
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static void netlink_add_geneve(struct nlmsg* nlmsg, int sock, const char* name,
+                               uint32_t vni, struct in_addr* addr4,
+                               struct in6_addr* addr6) {
+  netlink_add_device_impl(nlmsg, "geneve", name, false);
+  netlink_nest(nlmsg, IFLA_INFO_DATA);
+  netlink_attr(nlmsg, IFLA_GENEVE_ID, &vni, sizeof(vni));
+  if (addr4) netlink_attr(nlmsg, IFLA_GENEVE_REMOTE, addr4, sizeof(*addr4));
+  if (addr6) netlink_attr(nlmsg, IFLA_GENEVE_REMOTE6, addr6, sizeof(*addr6));
+  netlink_done(nlmsg);
+  netlink_done(nlmsg);
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+#define IFLA_IPVLAN_FLAGS 2
+#define IPVLAN_MODE_L3S 2
+#undef IPVLAN_F_VEPA
+#define IPVLAN_F_VEPA 2
+
+static void netlink_add_ipvlan(struct nlmsg* nlmsg, int sock, const char* name,
+                               const char* link, uint16_t mode,
+                               uint16_t flags) {
+  netlink_add_device_impl(nlmsg, "ipvlan", name, false);
+  netlink_nest(nlmsg, IFLA_INFO_DATA);
+  netlink_attr(nlmsg, IFLA_IPVLAN_MODE, &mode, sizeof(mode));
+  netlink_attr(nlmsg, IFLA_IPVLAN_FLAGS, &flags, sizeof(flags));
+  netlink_done(nlmsg);
+  netlink_done(nlmsg);
+  int ifindex = if_nametoindex(link);
+  netlink_attr(nlmsg, IFLA_LINK, &ifindex, sizeof(ifindex));
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static void netlink_device_change(struct nlmsg* nlmsg, int sock,
+                                  const char* name, bool up, const char* master,
+                                  const void* mac, int macsize,
+                                  const char* new_name) {
+  struct ifinfomsg hdr;
+  memset(&hdr, 0, sizeof(hdr));
+  if (up) hdr.ifi_flags = hdr.ifi_change = IFF_UP;
+  hdr.ifi_index = if_nametoindex(name);
+  netlink_init(nlmsg, RTM_NEWLINK, 0, &hdr, sizeof(hdr));
+  if (new_name) netlink_attr(nlmsg, IFLA_IFNAME, new_name, strlen(new_name));
+  if (master) {
+    int ifindex = if_nametoindex(master);
+    netlink_attr(nlmsg, IFLA_MASTER, &ifindex, sizeof(ifindex));
+  }
+  if (macsize) netlink_attr(nlmsg, IFLA_ADDRESS, mac, macsize);
+  int err = netlink_send(nlmsg, sock);
+  if (err < 0) {
+  }
+}
+
+static int netlink_add_addr(struct nlmsg* nlmsg, int sock, const char* dev,
+                            const void* addr, int addrsize) {
+  struct ifaddrmsg hdr;
+  memset(&hdr, 0, sizeof(hdr));
+  hdr.ifa_family = addrsize == 4 ? AF_INET : AF_INET6;
+  hdr.ifa_prefixlen = addrsize == 4 ? 24 : 120;
+  hdr.ifa_scope = RT_SCOPE_UNIVERSE;
+  hdr.ifa_index = if_nametoindex(dev);
+  netlink_init(nlmsg, RTM_NEWADDR, NLM_F_CREATE | NLM_F_REPLACE, &hdr,
+               sizeof(hdr));
+  netlink_attr(nlmsg, IFA_LOCAL, addr, addrsize);
+  netlink_attr(nlmsg, IFA_ADDRESS, addr, addrsize);
+  return netlink_send(nlmsg, sock);
+}
+
+static void netlink_add_addr4(struct nlmsg* nlmsg, int sock, const char* dev,
+                              const char* addr) {
+  struct in_addr in_addr;
+  inet_pton(AF_INET, addr, &in_addr);
+  int err = netlink_add_addr(nlmsg, sock, dev, &in_addr, sizeof(in_addr));
+  if (err < 0) {
+  }
+}
+
+static void netlink_add_addr6(struct nlmsg* nlmsg, int sock, const char* dev,
+                              const char* addr) {
+  struct in6_addr in6_addr;
+  inet_pton(AF_INET6, addr, &in6_addr);
+  int err = netlink_add_addr(nlmsg, sock, dev, &in6_addr, sizeof(in6_addr));
+  if (err < 0) {
+  }
+}
+
+static struct nlmsg nlmsg;
+
+#define DEVLINK_FAMILY_NAME "devlink"
+
+#define DEVLINK_CMD_PORT_GET 5
+#define DEVLINK_ATTR_BUS_NAME 1
+#define DEVLINK_ATTR_DEV_NAME 2
+#define DEVLINK_ATTR_NETDEV_NAME 7
+
+static struct nlmsg nlmsg2;
+
+static void initialize_devlink_ports(const char* bus_name, const char* dev_name,
+                                     const char* netdev_prefix) {
+  struct genlmsghdr genlhdr;
+  int len, total_len, id, err, offset;
+  uint16_t netdev_index;
+  int sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
+  if (sock == -1) exit(1);
+  int rtsock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+  if (rtsock == -1) exit(1);
+  id = netlink_query_family_id(&nlmsg, sock, DEVLINK_FAMILY_NAME, true);
+  if (id == -1) goto error;
+  memset(&genlhdr, 0, sizeof(genlhdr));
+  genlhdr.cmd = DEVLINK_CMD_PORT_GET;
+  netlink_init(&nlmsg, id, NLM_F_DUMP, &genlhdr, sizeof(genlhdr));
+  netlink_attr(&nlmsg, DEVLINK_ATTR_BUS_NAME, bus_name, strlen(bus_name) + 1);
+  netlink_attr(&nlmsg, DEVLINK_ATTR_DEV_NAME, dev_name, strlen(dev_name) + 1);
+  err = netlink_send_ext(&nlmsg, sock, id, &total_len, true);
+  if (err < 0) {
+    goto error;
+  }
+  offset = 0;
+  netdev_index = 0;
+  while ((len = netlink_next_msg(&nlmsg, offset, total_len)) != -1) {
+    struct nlattr* attr = (struct nlattr*)(nlmsg.buf + offset + NLMSG_HDRLEN +
+                                           NLMSG_ALIGN(sizeof(genlhdr)));
+    for (; (char*)attr < nlmsg.buf + offset + len;
+         attr = (struct nlattr*)((char*)attr + NLMSG_ALIGN(attr->nla_len))) {
+      if (attr->nla_type == DEVLINK_ATTR_NETDEV_NAME) {
+        char* port_name;
+        char netdev_name[IFNAMSIZ];
+        port_name = (char*)(attr + 1);
+        snprintf(netdev_name, sizeof(netdev_name), "%s%d", netdev_prefix,
+                 netdev_index);
+        netlink_device_change(&nlmsg2, rtsock, port_name, true, 0, 0, 0,
+                              netdev_name);
+        break;
+      }
+    }
+    offset += len;
+    netdev_index++;
+  }
+error:
+  close(rtsock);
+  close(sock);
+}
+
+#define DEV_IPV4 "172.20.20.%d"
+#define DEV_IPV6 "fe80::%02x"
+#define DEV_MAC 0x00aaaaaaaaaa
+
+static void netdevsim_add(unsigned int addr, unsigned int port_count) {
+  write_file("/sys/bus/netdevsim/del_device", "%u", addr);
+  if (write_file("/sys/bus/netdevsim/new_device", "%u %u", addr, port_count)) {
+    char buf[32];
+    snprintf(buf, sizeof(buf), "netdevsim%d", addr);
+    initialize_devlink_ports("netdevsim", buf, "netdevsim");
+  }
+}
+
+#define WG_GENL_NAME "wireguard"
+enum wg_cmd {
+  WG_CMD_GET_DEVICE,
+  WG_CMD_SET_DEVICE,
+};
+enum wgdevice_attribute {
+  WGDEVICE_A_UNSPEC,
+  WGDEVICE_A_IFINDEX,
+  WGDEVICE_A_IFNAME,
+  WGDEVICE_A_PRIVATE_KEY,
+  WGDEVICE_A_PUBLIC_KEY,
+  WGDEVICE_A_FLAGS,
+  WGDEVICE_A_LISTEN_PORT,
+  WGDEVICE_A_FWMARK,
+  WGDEVICE_A_PEERS,
+};
+enum wgpeer_attribute {
+  WGPEER_A_UNSPEC,
+  WGPEER_A_PUBLIC_KEY,
+  WGPEER_A_PRESHARED_KEY,
+  WGPEER_A_FLAGS,
+  WGPEER_A_ENDPOINT,
+  WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL,
+  WGPEER_A_LAST_HANDSHAKE_TIME,
+  WGPEER_A_RX_BYTES,
+  WGPEER_A_TX_BYTES,
+  WGPEER_A_ALLOWEDIPS,
+  WGPEER_A_PROTOCOL_VERSION,
+};
+enum wgallowedip_attribute {
+  WGALLOWEDIP_A_UNSPEC,
+  WGALLOWEDIP_A_FAMILY,
+  WGALLOWEDIP_A_IPADDR,
+  WGALLOWEDIP_A_CIDR_MASK,
+};
+
+static void netlink_wireguard_setup(void) {
+  const char ifname_a[] = "wg0";
+  const char ifname_b[] = "wg1";
+  const char ifname_c[] = "wg2";
+  const char private_a[] =
+      "\xa0\x5c\xa8\x4f\x6c\x9c\x8e\x38\x53\xe2\xfd\x7a\x70\xae\x0f\xb2\x0f\xa1"
+      "\x52\x60\x0c\xb0\x08\x45\x17\x4f\x08\x07\x6f\x8d\x78\x43";
+  const char private_b[] =
+      "\xb0\x80\x73\xe8\xd4\x4e\x91\xe3\xda\x92\x2c\x22\x43\x82\x44\xbb\x88\x5c"
+      "\x69\xe2\x69\xc8\xe9\xd8\x35\xb1\x14\x29\x3a\x4d\xdc\x6e";
+  const char private_c[] =
+      "\xa0\xcb\x87\x9a\x47\xf5\xbc\x64\x4c\x0e\x69\x3f\xa6\xd0\x31\xc7\x4a\x15"
+      "\x53\xb6\xe9\x01\xb9\xff\x2f\x51\x8c\x78\x04\x2f\xb5\x42";
+  const char public_a[] =
+      "\x97\x5c\x9d\x81\xc9\x83\xc8\x20\x9e\xe7\x81\x25\x4b\x89\x9f\x8e\xd9\x25"
+      "\xae\x9f\x09\x23\xc2\x3c\x62\xf5\x3c\x57\xcd\xbf\x69\x1c";
+  const char public_b[] =
+      "\xd1\x73\x28\x99\xf6\x11\xcd\x89\x94\x03\x4d\x7f\x41\x3d\xc9\x57\x63\x0e"
+      "\x54\x93\xc2\x85\xac\xa4\x00\x65\xcb\x63\x11\xbe\x69\x6b";
+  const char public_c[] =
+      "\xf4\x4d\xa3\x67\xa8\x8e\xe6\x56\x4f\x02\x02\x11\x45\x67\x27\x08\x2f\x5c"
+      "\xeb\xee\x8b\x1b\xf5\xeb\x73\x37\x34\x1b\x45\x9b\x39\x22";
+  const uint16_t listen_a = 20001;
+  const uint16_t listen_b = 20002;
+  const uint16_t listen_c = 20003;
+  const uint16_t af_inet = AF_INET;
+  const uint16_t af_inet6 = AF_INET6;
+  const struct sockaddr_in endpoint_b_v4 = {
+      .sin_family = AF_INET,
+      .sin_port = htons(listen_b),
+      .sin_addr = {htonl(INADDR_LOOPBACK)}};
+  const struct sockaddr_in endpoint_c_v4 = {
+      .sin_family = AF_INET,
+      .sin_port = htons(listen_c),
+      .sin_addr = {htonl(INADDR_LOOPBACK)}};
+  struct sockaddr_in6 endpoint_a_v6 = {.sin6_family = AF_INET6,
+                                       .sin6_port = htons(listen_a)};
+  endpoint_a_v6.sin6_addr = in6addr_loopback;
+  struct sockaddr_in6 endpoint_c_v6 = {.sin6_family = AF_INET6,
+                                       .sin6_port = htons(listen_c)};
+  endpoint_c_v6.sin6_addr = in6addr_loopback;
+  const struct in_addr first_half_v4 = {0};
+  const struct in_addr second_half_v4 = {(uint32_t)htonl(128 << 24)};
+  const struct in6_addr first_half_v6 = {{{0}}};
+  const struct in6_addr second_half_v6 = {{{0x80}}};
+  const uint8_t half_cidr = 1;
+  const uint16_t persistent_keepalives[] = {1, 3, 7, 9, 14, 19};
+  struct genlmsghdr genlhdr = {.cmd = WG_CMD_SET_DEVICE, .version = 1};
+  int sock;
+  int id, err;
+  sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
+  if (sock == -1) {
+    return;
+  }
+  id = netlink_query_family_id(&nlmsg, sock, WG_GENL_NAME, true);
+  if (id == -1) goto error;
+  netlink_init(&nlmsg, id, 0, &genlhdr, sizeof(genlhdr));
+  netlink_attr(&nlmsg, WGDEVICE_A_IFNAME, ifname_a, strlen(ifname_a) + 1);
+  netlink_attr(&nlmsg, WGDEVICE_A_PRIVATE_KEY, private_a, 32);
+  netlink_attr(&nlmsg, WGDEVICE_A_LISTEN_PORT, &listen_a, 2);
+  netlink_nest(&nlmsg, NLA_F_NESTED | WGDEVICE_A_PEERS);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGPEER_A_PUBLIC_KEY, public_b, 32);
+  netlink_attr(&nlmsg, WGPEER_A_ENDPOINT, &endpoint_b_v4,
+               sizeof(endpoint_b_v4));
+  netlink_attr(&nlmsg, WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL,
+               &persistent_keepalives[0], 2);
+  netlink_nest(&nlmsg, NLA_F_NESTED | WGPEER_A_ALLOWEDIPS);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &first_half_v4,
+               sizeof(first_half_v4));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet6, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &first_half_v6,
+               sizeof(first_half_v6));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGPEER_A_PUBLIC_KEY, public_c, 32);
+  netlink_attr(&nlmsg, WGPEER_A_ENDPOINT, &endpoint_c_v6,
+               sizeof(endpoint_c_v6));
+  netlink_attr(&nlmsg, WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL,
+               &persistent_keepalives[1], 2);
+  netlink_nest(&nlmsg, NLA_F_NESTED | WGPEER_A_ALLOWEDIPS);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &second_half_v4,
+               sizeof(second_half_v4));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet6, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &second_half_v6,
+               sizeof(second_half_v6));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  err = netlink_send(&nlmsg, sock);
+  if (err < 0) {
+  }
+  netlink_init(&nlmsg, id, 0, &genlhdr, sizeof(genlhdr));
+  netlink_attr(&nlmsg, WGDEVICE_A_IFNAME, ifname_b, strlen(ifname_b) + 1);
+  netlink_attr(&nlmsg, WGDEVICE_A_PRIVATE_KEY, private_b, 32);
+  netlink_attr(&nlmsg, WGDEVICE_A_LISTEN_PORT, &listen_b, 2);
+  netlink_nest(&nlmsg, NLA_F_NESTED | WGDEVICE_A_PEERS);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGPEER_A_PUBLIC_KEY, public_a, 32);
+  netlink_attr(&nlmsg, WGPEER_A_ENDPOINT, &endpoint_a_v6,
+               sizeof(endpoint_a_v6));
+  netlink_attr(&nlmsg, WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL,
+               &persistent_keepalives[2], 2);
+  netlink_nest(&nlmsg, NLA_F_NESTED | WGPEER_A_ALLOWEDIPS);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &first_half_v4,
+               sizeof(first_half_v4));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet6, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &first_half_v6,
+               sizeof(first_half_v6));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGPEER_A_PUBLIC_KEY, public_c, 32);
+  netlink_attr(&nlmsg, WGPEER_A_ENDPOINT, &endpoint_c_v4,
+               sizeof(endpoint_c_v4));
+  netlink_attr(&nlmsg, WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL,
+               &persistent_keepalives[3], 2);
+  netlink_nest(&nlmsg, NLA_F_NESTED | WGPEER_A_ALLOWEDIPS);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &second_half_v4,
+               sizeof(second_half_v4));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet6, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &second_half_v6,
+               sizeof(second_half_v6));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  err = netlink_send(&nlmsg, sock);
+  if (err < 0) {
+  }
+  netlink_init(&nlmsg, id, 0, &genlhdr, sizeof(genlhdr));
+  netlink_attr(&nlmsg, WGDEVICE_A_IFNAME, ifname_c, strlen(ifname_c) + 1);
+  netlink_attr(&nlmsg, WGDEVICE_A_PRIVATE_KEY, private_c, 32);
+  netlink_attr(&nlmsg, WGDEVICE_A_LISTEN_PORT, &listen_c, 2);
+  netlink_nest(&nlmsg, NLA_F_NESTED | WGDEVICE_A_PEERS);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGPEER_A_PUBLIC_KEY, public_a, 32);
+  netlink_attr(&nlmsg, WGPEER_A_ENDPOINT, &endpoint_a_v6,
+               sizeof(endpoint_a_v6));
+  netlink_attr(&nlmsg, WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL,
+               &persistent_keepalives[4], 2);
+  netlink_nest(&nlmsg, NLA_F_NESTED | WGPEER_A_ALLOWEDIPS);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &first_half_v4,
+               sizeof(first_half_v4));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet6, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &first_half_v6,
+               sizeof(first_half_v6));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGPEER_A_PUBLIC_KEY, public_b, 32);
+  netlink_attr(&nlmsg, WGPEER_A_ENDPOINT, &endpoint_b_v4,
+               sizeof(endpoint_b_v4));
+  netlink_attr(&nlmsg, WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL,
+               &persistent_keepalives[5], 2);
+  netlink_nest(&nlmsg, NLA_F_NESTED | WGPEER_A_ALLOWEDIPS);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &second_half_v4,
+               sizeof(second_half_v4));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_nest(&nlmsg, NLA_F_NESTED | 0);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_FAMILY, &af_inet6, 2);
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_IPADDR, &second_half_v6,
+               sizeof(second_half_v6));
+  netlink_attr(&nlmsg, WGALLOWEDIP_A_CIDR_MASK, &half_cidr, 1);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  netlink_done(&nlmsg);
+  err = netlink_send(&nlmsg, sock);
+  if (err < 0) {
+  }
+
+error:
+  close(sock);
+}
+
+static void initialize_netdevices(void) {
+  char netdevsim[16];
+  sprintf(netdevsim, "netdevsim%d", (int)procid);
+  struct {
+    const char* type;
+    const char* dev;
+  } devtypes[] = {
+      {"ip6gretap", "ip6gretap0"}, {"bridge", "bridge0"}, {"vcan", "vcan0"},
+      {"bond", "bond0"},           {"team", "team0"},     {"dummy", "dummy0"},
+      {"nlmon", "nlmon0"},         {"caif", "caif0"},     {"batadv", "batadv0"},
+      {"vxcan", "vxcan1"},         {"veth", 0},           {"wireguard", "wg0"},
+      {"wireguard", "wg1"},        {"wireguard", "wg2"},
+  };
+  const char* devmasters[] = {"bridge", "bond", "team", "batadv"};
+  struct {
+    const char* name;
+    int macsize;
+    bool noipv6;
+  } devices[] = {
+      {"lo", ETH_ALEN},
+      {"sit0", 0},
+      {"bridge0", ETH_ALEN},
+      {"vcan0", 0, true},
+      {"tunl0", 0},
+      {"gre0", 0},
+      {"gretap0", ETH_ALEN},
+      {"ip_vti0", 0},
+      {"ip6_vti0", 0},
+      {"ip6tnl0", 0},
+      {"ip6gre0", 0},
+      {"ip6gretap0", ETH_ALEN},
+      {"erspan0", ETH_ALEN},
+      {"bond0", ETH_ALEN},
+      {"veth0", ETH_ALEN},
+      {"veth1", ETH_ALEN},
+      {"team0", ETH_ALEN},
+      {"veth0_to_bridge", ETH_ALEN},
+      {"veth1_to_bridge", ETH_ALEN},
+      {"veth0_to_bond", ETH_ALEN},
+      {"veth1_to_bond", ETH_ALEN},
+      {"veth0_to_team", ETH_ALEN},
+      {"veth1_to_team", ETH_ALEN},
+      {"veth0_to_hsr", ETH_ALEN},
+      {"veth1_to_hsr", ETH_ALEN},
+      {"hsr0", 0},
+      {"dummy0", ETH_ALEN},
+      {"nlmon0", 0},
+      {"vxcan0", 0, true},
+      {"vxcan1", 0, true},
+      {"caif0", ETH_ALEN},
+      {"batadv0", ETH_ALEN},
+      {netdevsim, ETH_ALEN},
+      {"xfrm0", ETH_ALEN},
+      {"veth0_virt_wifi", ETH_ALEN},
+      {"veth1_virt_wifi", ETH_ALEN},
+      {"virt_wifi0", ETH_ALEN},
+      {"veth0_vlan", ETH_ALEN},
+      {"veth1_vlan", ETH_ALEN},
+      {"vlan0", ETH_ALEN},
+      {"vlan1", ETH_ALEN},
+      {"macvlan0", ETH_ALEN},
+      {"macvlan1", ETH_ALEN},
+      {"ipvlan0", ETH_ALEN},
+      {"ipvlan1", ETH_ALEN},
+      {"veth0_macvtap", ETH_ALEN},
+      {"veth1_macvtap", ETH_ALEN},
+      {"macvtap0", ETH_ALEN},
+      {"macsec0", ETH_ALEN},
+      {"veth0_to_batadv", ETH_ALEN},
+      {"veth1_to_batadv", ETH_ALEN},
+      {"batadv_slave_0", ETH_ALEN},
+      {"batadv_slave_1", ETH_ALEN},
+      {"geneve0", ETH_ALEN},
+      {"geneve1", ETH_ALEN},
+      {"wg0", 0},
+      {"wg1", 0},
+      {"wg2", 0},
+  };
+  int sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+  if (sock == -1) exit(1);
+  unsigned i;
+  for (i = 0; i < sizeof(devtypes) / sizeof(devtypes[0]); i++)
+    netlink_add_device(&nlmsg, sock, devtypes[i].type, devtypes[i].dev);
+  for (i = 0; i < sizeof(devmasters) / (sizeof(devmasters[0])); i++) {
+    char master[32], slave0[32], veth0[32], slave1[32], veth1[32];
+    sprintf(slave0, "%s_slave_0", devmasters[i]);
+    sprintf(veth0, "veth0_to_%s", devmasters[i]);
+    netlink_add_veth(&nlmsg, sock, slave0, veth0);
+    sprintf(slave1, "%s_slave_1", devmasters[i]);
+    sprintf(veth1, "veth1_to_%s", devmasters[i]);
+    netlink_add_veth(&nlmsg, sock, slave1, veth1);
+    sprintf(master, "%s0", devmasters[i]);
+    netlink_device_change(&nlmsg, sock, slave0, false, master, 0, 0, NULL);
+    netlink_device_change(&nlmsg, sock, slave1, false, master, 0, 0, NULL);
+  }
+  netlink_add_xfrm(&nlmsg, sock, "xfrm0");
+  netlink_device_change(&nlmsg, sock, "bridge_slave_0", true, 0, 0, 0, NULL);
+  netlink_device_change(&nlmsg, sock, "bridge_slave_1", true, 0, 0, 0, NULL);
+  netlink_add_veth(&nlmsg, sock, "hsr_slave_0", "veth0_to_hsr");
+  netlink_add_veth(&nlmsg, sock, "hsr_slave_1", "veth1_to_hsr");
+  netlink_add_hsr(&nlmsg, sock, "hsr0", "hsr_slave_0", "hsr_slave_1");
+  netlink_device_change(&nlmsg, sock, "hsr_slave_0", true, 0, 0, 0, NULL);
+  netlink_device_change(&nlmsg, sock, "hsr_slave_1", true, 0, 0, 0, NULL);
+  netlink_add_veth(&nlmsg, sock, "veth0_virt_wifi", "veth1_virt_wifi");
+  netlink_add_linked(&nlmsg, sock, "virt_wifi", "virt_wifi0",
+                     "veth1_virt_wifi");
+  netlink_add_veth(&nlmsg, sock, "veth0_vlan", "veth1_vlan");
+  netlink_add_vlan(&nlmsg, sock, "vlan0", "veth0_vlan", 0, htons(ETH_P_8021Q));
+  netlink_add_vlan(&nlmsg, sock, "vlan1", "veth0_vlan", 1, htons(ETH_P_8021AD));
+  netlink_add_macvlan(&nlmsg, sock, "macvlan0", "veth1_vlan");
+  netlink_add_macvlan(&nlmsg, sock, "macvlan1", "veth1_vlan");
+  netlink_add_ipvlan(&nlmsg, sock, "ipvlan0", "veth0_vlan", IPVLAN_MODE_L2, 0);
+  netlink_add_ipvlan(&nlmsg, sock, "ipvlan1", "veth0_vlan", IPVLAN_MODE_L3S,
+                     IPVLAN_F_VEPA);
+  netlink_add_veth(&nlmsg, sock, "veth0_macvtap", "veth1_macvtap");
+  netlink_add_linked(&nlmsg, sock, "macvtap", "macvtap0", "veth0_macvtap");
+  netlink_add_linked(&nlmsg, sock, "macsec", "macsec0", "veth1_macvtap");
+  char addr[32];
+  sprintf(addr, DEV_IPV4, 14 + 10);
+  struct in_addr geneve_addr4;
+  if (inet_pton(AF_INET, addr, &geneve_addr4) <= 0) exit(1);
+  struct in6_addr geneve_addr6;
+  if (inet_pton(AF_INET6, "fc00::01", &geneve_addr6) <= 0) exit(1);
+  netlink_add_geneve(&nlmsg, sock, "geneve0", 0, &geneve_addr4, 0);
+  netlink_add_geneve(&nlmsg, sock, "geneve1", 1, 0, &geneve_addr6);
+  netdevsim_add((int)procid, 4);
+  netlink_wireguard_setup();
+  for (i = 0; i < sizeof(devices) / (sizeof(devices[0])); i++) {
+    char addr[32];
+    sprintf(addr, DEV_IPV4, i + 10);
+    netlink_add_addr4(&nlmsg, sock, devices[i].name, addr);
+    if (!devices[i].noipv6) {
+      sprintf(addr, DEV_IPV6, i + 10);
+      netlink_add_addr6(&nlmsg, sock, devices[i].name, addr);
+    }
+    uint64_t macaddr = DEV_MAC + ((i + 10ull) << 40);
+    netlink_device_change(&nlmsg, sock, devices[i].name, true, 0, &macaddr,
+                          devices[i].macsize, NULL);
+  }
+  close(sock);
+}
+static void initialize_netdevices_init(void) {
+  int sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+  if (sock == -1) exit(1);
+  struct {
+    const char* type;
+    int macsize;
+    bool noipv6;
+    bool noup;
+  } devtypes[] = {
+      {"nr", 7, true},
+      {"rose", 5, true, true},
+  };
+  unsigned i;
+  for (i = 0; i < sizeof(devtypes) / sizeof(devtypes[0]); i++) {
+    char dev[32], addr[32];
+    sprintf(dev, "%s%d", devtypes[i].type, (int)procid);
+    sprintf(addr, "172.30.%d.%d", i, (int)procid + 1);
+    netlink_add_addr4(&nlmsg, sock, dev, addr);
+    if (!devtypes[i].noipv6) {
+      sprintf(addr, "fe88::%02x:%02x", i, (int)procid + 1);
+      netlink_add_addr6(&nlmsg, sock, dev, addr);
+    }
+    int macsize = devtypes[i].macsize;
+    uint64_t macaddr = 0xbbbbbb +
+                       ((unsigned long long)i << (8 * (macsize - 2))) +
+                       (procid << (8 * (macsize - 1)));
+    netlink_device_change(&nlmsg, sock, dev, !devtypes[i].noup, 0, &macaddr,
+                          macsize, NULL);
+  }
+  close(sock);
+}
+
+#define MAX_FDS 30
+
+static void setup_common() {
+  if (mount(0, "/sys/fs/fuse/connections", "fusectl", 0, 0)) {
+  }
+}
+
+static void setup_binderfs() {
+  if (mkdir("/dev/binderfs", 0777)) {
+  }
+  if (mount("binder", "/dev/binderfs", "binder", 0, NULL)) {
+  }
+  if (symlink("/dev/binderfs", "./binderfs")) {
+  }
+}
+
+static void loop();
+
+static void sandbox_common() {
+  prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0);
+  setsid();
+  struct rlimit rlim;
+  rlim.rlim_cur = rlim.rlim_max = (200 << 20);
+  setrlimit(RLIMIT_AS, &rlim);
+  rlim.rlim_cur = rlim.rlim_max = 32 << 20;
+  setrlimit(RLIMIT_MEMLOCK, &rlim);
+  rlim.rlim_cur = rlim.rlim_max = 136 << 20;
+  setrlimit(RLIMIT_FSIZE, &rlim);
+  rlim.rlim_cur = rlim.rlim_max = 1 << 20;
+  setrlimit(RLIMIT_STACK, &rlim);
+  rlim.rlim_cur = rlim.rlim_max = 128 << 20;
+  setrlimit(RLIMIT_CORE, &rlim);
+  rlim.rlim_cur = rlim.rlim_max = 256;
+  setrlimit(RLIMIT_NOFILE, &rlim);
+  if (unshare(CLONE_NEWNS)) {
+  }
+  if (mount(NULL, "/", NULL, MS_REC | MS_PRIVATE, NULL)) {
+  }
+  if (unshare(CLONE_NEWIPC)) {
+  }
+  if (unshare(0x02000000)) {
+  }
+  if (unshare(CLONE_NEWUTS)) {
+  }
+  if (unshare(CLONE_SYSVSEM)) {
+  }
+  typedef struct {
+    const char* name;
+    const char* value;
+  } sysctl_t;
+  static const sysctl_t sysctls[] = {
+      {"/proc/sys/kernel/shmmax", "16777216"},
+      {"/proc/sys/kernel/shmall", "536870912"},
+      {"/proc/sys/kernel/shmmni", "1024"},
+      {"/proc/sys/kernel/msgmax", "8192"},
+      {"/proc/sys/kernel/msgmni", "1024"},
+      {"/proc/sys/kernel/msgmnb", "1024"},
+      {"/proc/sys/kernel/sem", "1024 1048576 500 1024"},
+  };
+  unsigned i;
+  for (i = 0; i < sizeof(sysctls) / sizeof(sysctls[0]); i++)
+    write_file(sysctls[i].name, sysctls[i].value);
+}
+
+static int wait_for_loop(int pid) {
+  if (pid < 0) exit(1);
+  int status = 0;
+  while (waitpid(-1, &status, __WALL) != pid) {
+  }
+  return WEXITSTATUS(status);
+}
+
+static void drop_caps(void) {
+  struct __user_cap_header_struct cap_hdr = {};
+  struct __user_cap_data_struct cap_data[2] = {};
+  cap_hdr.version = _LINUX_CAPABILITY_VERSION_3;
+  cap_hdr.pid = getpid();
+  if (syscall(SYS_capget, &cap_hdr, &cap_data)) exit(1);
+  const int drop = (1 << CAP_SYS_PTRACE) | (1 << CAP_SYS_NICE);
+  cap_data[0].effective &= ~drop;
+  cap_data[0].permitted &= ~drop;
+  cap_data[0].inheritable &= ~drop;
+  if (syscall(SYS_capset, &cap_hdr, &cap_data)) exit(1);
+}
+
+static int do_sandbox_none(void) {
+  if (unshare(CLONE_NEWPID)) {
+  }
+  int pid = fork();
+  if (pid != 0) return wait_for_loop(pid);
+  setup_common();
+  sandbox_common();
+  drop_caps();
+  initialize_netdevices_init();
+  if (unshare(CLONE_NEWNET)) {
+  }
+  write_file("/proc/sys/net/ipv4/ping_group_range", "0 65535");
+  initialize_netdevices();
+  setup_binderfs();
+  loop();
+  exit(1);
+}
+
+static void kill_and_wait(int pid, int* status) {
+  kill(-pid, SIGKILL);
+  kill(pid, SIGKILL);
+  for (int i = 0; i < 100; i++) {
+    if (waitpid(-1, status, WNOHANG | __WALL) == pid) return;
+    usleep(1000);
+  }
+  DIR* dir = opendir("/sys/fs/fuse/connections");
+  if (dir) {
+    for (;;) {
+      struct dirent* ent = readdir(dir);
+      if (!ent) break;
+      if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0)
+        continue;
+      char abort[300];
+      snprintf(abort, sizeof(abort), "/sys/fs/fuse/connections/%s/abort",
+               ent->d_name);
+      int fd = open(abort, O_WRONLY);
+      if (fd == -1) {
+        continue;
+      }
+      if (write(fd, abort, 1) < 0) {
+      }
+      close(fd);
+    }
+    closedir(dir);
+  } else {
+  }
+  while (waitpid(-1, status, __WALL) != pid) {
+  }
+}
+
+static void setup_test() {
+  prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0);
+  setpgrp();
+  write_file("/proc/self/oom_score_adj", "1000");
+}
+
+static void close_fds() {
+  for (int fd = 3; fd < MAX_FDS; fd++) close(fd);
+}
+
+static void execute_one(void);
+
+#define WAIT_FLAGS __WALL
+
+static void loop(void) {
+  int iter = 0;
+  for (;; iter++) {
+    int pid = fork();
+    if (pid < 0) exit(1);
+    if (pid == 0) {
+      setup_test();
+      execute_one();
+      close_fds();
+      exit(0);
+    }
+    int status = 0;
+    uint64_t start = current_time_ms();
+    for (;;) {
+      if (waitpid(-1, &status, WNOHANG | WAIT_FLAGS) == pid) break;
+      sleep_ms(1);
+      if (current_time_ms() - start < 5000) continue;
+      kill_and_wait(pid, &status);
+      break;
+    }
+  }
+}
+
+uint64_t r[1] = {0xffffffffffffffff};
+
+void execute_one(void) {
+  intptr_t res = 0;
+  res = syscall(__NR_socket, /*domain=*/0x11ul, /*type=*/3ul, /*proto=*/0x300);
+  if (res != -1) r[0] = res;
+  syscall(__NR_socket, /*domain=*/0x11ul, /*type=*/2ul, /*proto=*/0x300);
+  *(uint64_t*)0x20001200 = 0x20000040;
+  *(uint16_t*)0x20000040 = 0x1f;
+  *(uint16_t*)0x20000042 = 0;
+  *(uint16_t*)0x20000044 = 3;
+  *(uint32_t*)0x20001208 = 0x80;
+  *(uint64_t*)0x20001210 = 0x20001180;
+  *(uint64_t*)0x20001180 = 0x20000240;
+  memset((void*)0x20000240, 185, 1);
+  *(uint64_t*)0x20001188 = 1;
+  *(uint64_t*)0x20001218 = 1;
+  *(uint64_t*)0x20001220 = 0;
+  *(uint64_t*)0x20001228 = 0;
+  *(uint32_t*)0x20001230 = 0;
+  syscall(__NR_sendmsg, /*fd=*/r[0], /*msg=*/0x20001200ul, /*f=*/0ul);
+}
+int main(void) {
+  syscall(__NR_mmap, /*addr=*/0x1ffff000ul, /*len=*/0x1000ul, /*prot=*/0ul,
+          /*flags=*/0x32ul, /*fd=*/-1, /*offset=*/0ul);
+  syscall(__NR_mmap, /*addr=*/0x20000000ul, /*len=*/0x1000000ul, /*prot=*/7ul,
+          /*flags=*/0x32ul, /*fd=*/-1, /*offset=*/0ul);
+  syscall(__NR_mmap, /*addr=*/0x21000000ul, /*len=*/0x1000ul, /*prot=*/0ul,
+          /*flags=*/0x32ul, /*fd=*/-1, /*offset=*/0ul);
+  do_sandbox_none();
+  return 0;
+}
+
+=* repro.txt =*
+r0 = socket$packet(0x11, 0x3, 0x300)
+socket$packet(0x11, 0x2, 0x300)
+sendmsg(r0, &(0x7f0000001200)={&(0x7f0000000040)=@hci={0x1f, 0x0,
+0x3}, 0x80, &(0x7f0000001180)=[{&(0x7f0000000240)="b9", 0x1}], 0x1},
+0x0)
+
+and also https://gist.github.com/xrivendell7/69d1aa018898b4a9df1c0b4322520ff7
+
+also I test your patch in HEAD commit
+815fb87b753055df2d9e50f6cd80eb10235fe3e9 with your patch
+
+diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
+index 22a26d1d29a0..f2a6bd6a32b1 100644
+--- a/net/ipv4/ip_gre.c
++++ b/net/ipv4/ip_gre.c
+@@ -635,15 +635,18 @@ static netdev_tx_t ipgre_xmit(struct sk_buff *skb,
+        }
+
+        if (dev->header_ops) {
++    int pull_len = tunnel->hlen + sizeof(struct iphdr);
++
+                if (skb_cow_head(skb, 0))
+                        goto free_skb;
+
+                tnl_params = (const struct iphdr *)skb->data;
+
+-               /* Pull skb since ip_tunnel_xmit() needs skb->data pointing
+-                * to gre header.
+-                */
+-               skb_pull(skb, tunnel->hlen + sizeof(struct iphdr));
++    if (!pskb_network_may_pull(skb, pull_len))
++      goto free_skb;
++
++    /* ip_tunnel_xmit() needs skb->data pointing to gre header. */
++    skb_pull(skb, pull_len);
+                skb_reset_mac_header(skb);
+
+                if (skb->ip_summed == CHECKSUM_PARTIAL &&
+
+and I'm running the for 20 minus do not trigger the crash.
 
