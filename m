@@ -1,331 +1,163 @@
-Return-Path: <netdev+bounces-54872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1901D808AF8
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 15:47:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E646B808AFD
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 15:48:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F53CB2131D
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 14:47:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C0EF282EF3
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 14:48:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 089E94120B;
-	Thu,  7 Dec 2023 14:47:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B32164120B;
+	Thu,  7 Dec 2023 14:48:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C9V/RbbD"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ViPTOjjM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AA67A3;
-	Thu,  7 Dec 2023 06:47:17 -0800 (PST)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-50be10acaf9so788350e87.1;
-        Thu, 07 Dec 2023 06:47:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701960435; x=1702565235; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cqlaAjyYoTX21n2s5cfjq7OlbuSAPm9lzmylNhTuY6I=;
-        b=C9V/RbbD2BKzLXf3m6AIPnRVmo/JiQTY9t6a02Bhgy5MyiSfJbGz1DOOkFArzX5/r+
-         MNmKQ5aWnAy3TOD4CkuUGuBrdwZ9NTp9vh6faQitbbc6VUKziiuW6bfp4LIesasb8pg9
-         EX6/eoEwL+qV0FO1e6kdyDlgkjp4I5MEdti2y0UtqxB2RgReAOe5aC24pNtHMLapPiGK
-         hJ1/aMax6zfdJM8EICeisJ/IlfNQaLsQ05GY+UGDBLJU/FZLeZAHWB7BIQDoDJJ8x3xR
-         qgAs8VFruEVUBZfSWKMo6hgBdz0E/dKFiAKmxuJlN+Abf9kX+c6cDRIuUG5Jxbx7WkSw
-         ij8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701960435; x=1702565235;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cqlaAjyYoTX21n2s5cfjq7OlbuSAPm9lzmylNhTuY6I=;
-        b=oACUKcfYpx4De4/xK5rIjytkUj+gtFU9pl/gA2dhEAJHJw7naJTjAGj9CtagAsYeao
-         N1FL2ObuPRxWXzT/Gnmo3WA41bWEuuWjxiGwUsFWuz8b7JYHnw1wqVVA9gfQJFViwyF4
-         Frsy9m7QZvEOne8qmcBcHTIGKnl1Mdqz95gT6OKXhdQ1Lt0d+KeqGNPZSlj2g9TASc6k
-         dine3qIe4iKu2O/px6s0c13ncmyXYhIY3J/JsgwJXSY13OZhyVu3TXZTCNrsgHbhtvwh
-         WNZf3iaelGeW/Utns/lDFUfJyhVGKOr4BeE8YeMHFW9nUOJzZcBY42MLU37euABPTLzk
-         IUAg==
-X-Gm-Message-State: AOJu0YwiNJkeluQCMtJNzxELJFdYcErA+EX4ZR1koF0aBKoz5rUTHSSe
-	JZXF+XParoSazDCJR4EW7hQ=
-X-Google-Smtp-Source: AGHT+IHt6jmaJ4Kw2i2qQNJQx0ETtzVu6UphNSpRZpwIAZmDoKS9ekjWRCFIkH2tj1BtTLNIyKFnFw==
-X-Received: by 2002:a05:6512:3e27:b0:50b:c0f1:f532 with SMTP id i39-20020a0565123e2700b0050bc0f1f532mr4043138lfv.26.1701960434989;
-        Thu, 07 Dec 2023 06:47:14 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id e10-20020ac24e0a000000b0050c0215a806sm189601lfr.83.2023.12.07.06.47.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Dec 2023 06:47:14 -0800 (PST)
-Date: Thu, 7 Dec 2023 17:47:11 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: kernel test robot <lkp@intel.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Maxime Chevallier <maxime.chevallier@bootlin.com>, 
-	Tomer Maimon <tmaimon77@gmail.com>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzk@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org, 
-	openbmc@lists.ozlabs.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next 13/16] net: stmmac: intel: Register generic MDIO
- device
-Message-ID: <ohhgcfdvbxo3sffjpf7nedti3gujcwti4cysgim47jgcsum5ay@rrtsfnwktbqb>
-References: <20231205103559.9605-14-fancer.lancer@gmail.com>
- <202312060845.lDDRDWET-lkp@intel.com>
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2075.outbound.protection.outlook.com [40.107.244.75])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4251C3;
+	Thu,  7 Dec 2023 06:48:13 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mtQ+FLMoHhK3DnmFxP7BOuHS3Q0nb0waR0qPYPJ864cfhVqA6YA/eJqJYONCawVCihpeQIg0XdASLU7FqRER5b7RcJM5q0KjkfMLGN+rcWT7V7FdhjktmVAeNITm+q8C8uoXzKWedf0q6jT5Kf05ufpOjt9XFCepWnbF17Gt9y2twu1lgADI0K8uyB6aQGHWZT0P76JteDvzVP325RczrbZKN77WaKmRoC5uU/Y+HDavsX8dPYSwtK6IHy0pv/W4tDt2HqLplu4loweLgO2OR/mINwRgcFUqvGEI5Y1bjcdT0Wk4bGr01jeRTStDuyXUP32G1ia8gaEK62mtp1yKow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=S2xv0u7Qte0VvrE6wh/6iY8jN3GCGS4/gAUdQu0eL/8=;
+ b=dAI0V7KAhIEBO+ymMwn5mFwhz64A97nBRzrOnkYiZtUE0ibOyKpF4A8j6f14zZjsBAaT7oEapup1F4PekCyOZXxU+O+ikh3kNLcRyGO7aH/9BXSE1mj4bDFTzA8qXRdwbI+TQaFYq+GwDj0hjGj+YjJ5qyULkI9/BHzSedWsk0N5RQlzAjSnLTzhBZX81i4ebEtf/rjjsZgtwyfGChXyCCemlrlzkn42ShvG89IRuPMn2SQ2FVF4wlqjVVcf8qfyDuZ2HQUC3JX16kQZ3Ju9QzpoC0AypRcryR+dgUPWySC3YEuwNNmaIwy5xsp6O3/rBSz9z5Blq4PQP2BBfc5L3A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S2xv0u7Qte0VvrE6wh/6iY8jN3GCGS4/gAUdQu0eL/8=;
+ b=ViPTOjjMC1T8Ewq3Pbg5s/RYw9PeRbmFB+KT8MUeM2HVG8aBQMxpQzbgI+inuNf0HaiZSTVPIH6Pfl2gIwpE+yM6J86DMtAaJ4/jOC0rTlIs+L/ycAdr7QWQTuj6Gcoyyk7LvM9cZt12QZetC20clqwXVFtf3Mo9vW7K0zuVJr4ySpvLqbvcAYyLYeUP26PvoJmdEOz2/Lm32IFTwdvA6KpF7W331V5KWlu3JKuHZehzsVt7lcyttWVgROeMo8M5kAGi56LAyV3CcUskdaLX/jqJenaI+tK5AkmyaSXtXchfXQeWge+qCYrVdlKl4L7khWEws0ICicHe5/BWSE63nw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by CH2PR12MB4135.namprd12.prod.outlook.com (2603:10b6:610:7c::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.27; Thu, 7 Dec
+ 2023 14:48:08 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7046.038; Thu, 7 Dec 2023
+ 14:48:08 +0000
+Date: Thu, 7 Dec 2023 10:48:07 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: "Cao, Yahui" <yahui.cao@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"Liu, Lingyu" <lingyu.liu@intel.com>,
+	"Chittim, Madhu" <madhu.chittim@intel.com>,
+	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"yishaih@nvidia.com" <yishaih@nvidia.com>,
+	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
+	"brett.creeley@amd.com" <brett.creeley@amd.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>
+Subject: Re: [PATCH iwl-next v4 09/12] ice: Save and load TX Queue head
+Message-ID: <20231207144807.GL2692119@nvidia.com>
+References: <20231121025111.257597-1-yahui.cao@intel.com>
+ <20231121025111.257597-10-yahui.cao@intel.com>
+ <BN9PR11MB52766AECA2168F37AEF6995D8C8BA@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB52766AECA2168F37AEF6995D8C8BA@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BL6PEPF0001641E.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:22e:400:0:1004:0:e) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202312060845.lDDRDWET-lkp@intel.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH2PR12MB4135:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8c3776c8-f440-445d-efbb-08dbf7338700
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	HJMVh3vp8IgjnyabVePEbXstGuddkOouz/SDEC8qKfGMo0n20VyrojwX86cX7sA3Rr7ulcUeS6RpiryKgNjon16SQELhDgWCAnSV5ggR/b0d3aAdui3KoBSLMSdvqO5uLC3BrX1YRGNvztD7v1eRuSXE3HsB3t/90PRg98iX9nEMH/AnR3k9KSSKqal/3Ab2t0EuuqPbY9BN6cOLIzCh/NbtFtOVqeQz4r6JTLNQOQG0TUufAnThLYZrJb0/Hx4ihLhmKCHFTAXkI/7lZ8XEUJF/NNgJC9bRMC+nLIpBffhJZzBu9Ra/Iw3Tu0TKPa7ANxqN/YiuIsDdCOQXmn/Tr5CnFdulwamzmCL7rP5G2ZyAtjWajYG4uuJTd86TnSE2HGy/hfv3ehoYbFEQOKEfyVkGpUF2WMVGiMCX4QNOnARumWugR+hf/Ykb0XvVRjwfGBqBikwFTYQj9IWydVRVk1phiaC2lh4g2o9QhPs90ZPzoorZbz/bDMsfJvdMK/5Fteif20WCqhjRtVMCXBLl52EcfC3uxunt2NedhCc1gwqMy28JuUdLrkznfmzJUGmW
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(136003)(366004)(376002)(346002)(230922051799003)(186009)(1800799012)(451199024)(64100799003)(26005)(83380400001)(36756003)(33656002)(6512007)(1076003)(38100700002)(41300700001)(2616005)(2906002)(7416002)(478600001)(6486002)(6506007)(5660300002)(86362001)(316002)(6916009)(66476007)(54906003)(66946007)(66556008)(8676002)(8936002)(4326008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?CXYq0f1nzF7EL8LVeISIm6wxOgc/Cz+aGlEArCxXcH+5qIokQhRC0qHf03xi?=
+ =?us-ascii?Q?ET3H3KLVyvAYnzHDMMfEFSJ8/j4JNSBT2NBSViEKacLzZRg87PdJuBmkhC8J?=
+ =?us-ascii?Q?zGPimeAtLSAGyUYqBB/QJlkABu2YJGhxtqblVZoEd2s6SLiXyRMrkxGEdkvq?=
+ =?us-ascii?Q?k1+uzM1sTFEmjKrspB8YPviM+Z9sIG+HcmH0xxxHT/qGGwZL3obUwJaFZcnG?=
+ =?us-ascii?Q?aul0LAhRqL3SKHJvOp2hI4Io36BRucH0fyv+Bi39qUk/0XEBhS/pKmjycfhl?=
+ =?us-ascii?Q?clxEjK8jTvjNDgESYlSsFnqc+55/0kUz38DsNtIVqwKTxGl69Xd/z5jOxW+X?=
+ =?us-ascii?Q?Mhw9Gqa8OvXyCQD3Pb8XJSwbg/tNoPjhGPywYKj3ezO7lbOV9GeQMVLWPIlo?=
+ =?us-ascii?Q?Kty9gTHHdG6zuE0RZixv2SwDX3ILtF9Bs6A78lKlNr/aJoXYBfNFvUf1yO/o?=
+ =?us-ascii?Q?BSaZCMx7AEvukPCDSi5G9z3ZghfYwo8sbllVjb+37Uf1bhquCt/5hZQGmgg1?=
+ =?us-ascii?Q?vUADCwRn2OEaD0lscS8NPsaeS+zSslK8HOxMoltaATT6Xu208V6YT1MPG4XR?=
+ =?us-ascii?Q?f7rtOvR+B3D/17bRPh6VdLrgmUrtWaU5qzjGJdpWXCIuNRP4rltgF3CnxlXq?=
+ =?us-ascii?Q?G7b81VJeDGiCkRUpSu/2wLyCwrCl0lKsGd65y5On8Uu1WcdXrfyn9rOicjaF?=
+ =?us-ascii?Q?t/q7hAw1U/ccZDCOcEKPzL6U6qwlcMsRlLOh29ePYsJKuhpBzUhPgoVV91FF?=
+ =?us-ascii?Q?FPwt9Ab/96YTOoUDP92fmINdX49ZeOvAfeFSAK3V6fQFnkizZXR86s882HEG?=
+ =?us-ascii?Q?3VRbAKCFyclq7N0/vyb4Gy1CNoMTN3dVtlpD8xjDqaHqv+1gAMmPLyxufl8B?=
+ =?us-ascii?Q?R/RPdC+8mmE9amskPU8I3uvpkct50rAwBGyeKZiZvWDH+LA61IKddGf1a1cK?=
+ =?us-ascii?Q?d53dvOJR04tzA1tTUS8LUigAVtWgDnRLpFbKAYavODkKt2kY9Y+lrLY9c5Gj?=
+ =?us-ascii?Q?MqBEeEE4uYBRLiOw0+fEYjXrg5yGmy3YlVPzOq+b7y3kQUbm5AkiYCyG4Nte?=
+ =?us-ascii?Q?X0dMrSxB+0j7wg17LAnt+1zkS4myLmeFF4kBWsyS96vR/bxWChqHrDY35DfL?=
+ =?us-ascii?Q?5gc1sxxg59EfSwWQWK39tUEtODZPo0tbe51ECJd/d9nfVLfoBZp2qWSUB6pS?=
+ =?us-ascii?Q?bLPMfqDI0CUQY9EYTigNhXXqJVMqcH0aG69xnewy/KxQAcdVWl1AA8WKZRjK?=
+ =?us-ascii?Q?J5UsBT5rJe75lBtRRt3aJkrSMi5oLHMxlrxuab/9G+D+03CzBGIfA6kMheDr?=
+ =?us-ascii?Q?EzkISXgIEQYcdXYqXTq25CUOkThI/+Et9D45c5K5kygTj9fPZDoPNf1xmUPK?=
+ =?us-ascii?Q?8Y3Z9n36ZDKjXmM97f2dXHec4LCceBu/a7nOWqwGaRB9pCdzS9I01Qdr8jK/?=
+ =?us-ascii?Q?soXKTBqEa6Knr543w3/t3KGGwc1Fc0V3cHhlZ06of3QFodZUQwq+mH5jusSi?=
+ =?us-ascii?Q?W2Z1VgeeGB+UUTwBQK8rPtT+XAUReO7ue/FdylKcNPQm01vd/pTcDFjDYoRt?=
+ =?us-ascii?Q?ZtvVC2/x3DXhZJF7cTywnYgzjlLiwgTixbvLAwiK?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8c3776c8-f440-445d-efbb-08dbf7338700
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Dec 2023 14:48:08.4890
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6bDvAYPIUSsecHRBpmytcZy0VUGNFjdRbvY1wXvUPM/OycMJNUrJzWSR65Lq4sAg
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4135
 
-On Wed, Dec 06, 2023 at 08:19:07AM +0800, kernel test robot wrote:
-> Hi Serge,
+On Thu, Dec 07, 2023 at 08:22:53AM +0000, Tian, Kevin wrote:
+> > In virtual channel model, VF driver only send TX queue ring base and
+> > length info to PF, while rest of the TX queue context are managed by PF.
+> > TX queue length must be verified by PF during virtual channel message
+> > processing. When PF uses dummy descriptors to advance TX head, it will
+> > configure the TX ring base as the new address managed by PF itself. As a
+> > result, all of the TX queue context is taken control of by PF and this
+> > method won't generate any attacking vulnerability
 > 
-> kernel test robot noticed the following build errors:
+> So basically the key points are:
 > 
-> [auto build test ERROR on net-next/main]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Serge-Semin/net-pcs-xpcs-Drop-sentinel-entry-from-2500basex-ifaces-list/20231205-183808
-> base:   net-next/main
-> patch link:    https://lore.kernel.org/r/20231205103559.9605-14-fancer.lancer%40gmail.com
-> patch subject: [PATCH net-next 13/16] net: stmmac: intel: Register generic MDIO device
-> config: x86_64-kexec (https://download.01.org/0day-ci/archive/20231206/202312060845.lDDRDWET-lkp@intel.com/config)
-> compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231206/202312060845.lDDRDWET-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202312060845.lDDRDWET-lkp@intel.com/
-> 
-> All errors (new ones prefixed by >>):
-> 
->    drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c: In function 'intel_mgbe_common_data':
-> >> drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c:646:31: error: 'clk' undeclared (first use in this function)
->      646 |         clk_disable_unprepare(clk);
->          |                               ^~~
->    drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c:646:31: note: each undeclared identifier is reported only once for each function it appears in
-> 
-> 
-> vim +/clk +646 drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+> 1) TX queue head cannot be directly updated via VF mmio interface;
+> 2) Using dummy descriptors to update TX queue head is possible but it
+>     must be done in PF's context;
+> 3) FW provides a way to keep TX queue head intact when moving
+>     the TX queue ownership between VF and PF;
+> 4) the TX queue context affected by the ownership change is largely
+>     initialized by the PF driver already, except ring base/size coming from
+>     virtual channel messages. This implies that a malicious guest VF driver
+>     cannot attack this small window though the tx head restore is done
+>     after all the VF state are restored;
+> 5) and a missing point is that the temporary owner change doesn't
+>     expose the TX queue to the software stack on top of the PF driver
+>     otherwise that would be a severe issue.
 
-Right, my series had been originally based on a branch which had some
-of this driver parts fixed. I should have more thoroughly performed
-the re-base process. I'll make sure it's fixed on v2.
+This matches my impression of these patches. It is convoluted but the
+explanation sounds find, and if Intel has done an internal security
+review then I have no issue.
 
--Serge(y)
-
-> 
->    446	
->    447	static int intel_mgbe_common_data(struct pci_dev *pdev,
->    448					  struct plat_stmmacenet_data *plat)
->    449	{
->    450		struct fwnode_handle *fwnode;
->    451		char clk_name[20];
->    452		int ret;
->    453		int i;
->    454	
->    455		plat->pdev = pdev;
->    456		plat->phy_addr = -1;
->    457		plat->clk_csr = 5;
->    458		plat->has_gmac = 0;
->    459		plat->has_gmac4 = 1;
->    460		plat->force_sf_dma_mode = 0;
->    461		plat->flags |= (STMMAC_FLAG_TSO_EN | STMMAC_FLAG_SPH_DISABLE);
->    462	
->    463		/* Multiplying factor to the clk_eee_i clock time
->    464		 * period to make it closer to 100 ns. This value
->    465		 * should be programmed such that the clk_eee_time_period *
->    466		 * (MULT_FACT_100NS + 1) should be within 80 ns to 120 ns
->    467		 * clk_eee frequency is 19.2Mhz
->    468		 * clk_eee_time_period is 52ns
->    469		 * 52ns * (1 + 1) = 104ns
->    470		 * MULT_FACT_100NS = 1
->    471		 */
->    472		plat->mult_fact_100ns = 1;
->    473	
->    474		plat->rx_sched_algorithm = MTL_RX_ALGORITHM_SP;
->    475	
->    476		for (i = 0; i < plat->rx_queues_to_use; i++) {
->    477			plat->rx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
->    478			plat->rx_queues_cfg[i].chan = i;
->    479	
->    480			/* Disable Priority config by default */
->    481			plat->rx_queues_cfg[i].use_prio = false;
->    482	
->    483			/* Disable RX queues routing by default */
->    484			plat->rx_queues_cfg[i].pkt_route = 0x0;
->    485		}
->    486	
->    487		for (i = 0; i < plat->tx_queues_to_use; i++) {
->    488			plat->tx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
->    489	
->    490			/* Disable Priority config by default */
->    491			plat->tx_queues_cfg[i].use_prio = false;
->    492			/* Default TX Q0 to use TSO and rest TXQ for TBS */
->    493			if (i > 0)
->    494				plat->tx_queues_cfg[i].tbs_en = 1;
->    495		}
->    496	
->    497		/* FIFO size is 4096 bytes for 1 tx/rx queue */
->    498		plat->tx_fifo_size = plat->tx_queues_to_use * 4096;
->    499		plat->rx_fifo_size = plat->rx_queues_to_use * 4096;
->    500	
->    501		plat->tx_sched_algorithm = MTL_TX_ALGORITHM_WRR;
->    502		plat->tx_queues_cfg[0].weight = 0x09;
->    503		plat->tx_queues_cfg[1].weight = 0x0A;
->    504		plat->tx_queues_cfg[2].weight = 0x0B;
->    505		plat->tx_queues_cfg[3].weight = 0x0C;
->    506		plat->tx_queues_cfg[4].weight = 0x0D;
->    507		plat->tx_queues_cfg[5].weight = 0x0E;
->    508		plat->tx_queues_cfg[6].weight = 0x0F;
->    509		plat->tx_queues_cfg[7].weight = 0x10;
->    510	
->    511		plat->dma_cfg->pbl = 32;
->    512		plat->dma_cfg->pblx8 = true;
->    513		plat->dma_cfg->fixed_burst = 0;
->    514		plat->dma_cfg->mixed_burst = 0;
->    515		plat->dma_cfg->aal = 0;
->    516		plat->dma_cfg->dche = true;
->    517	
->    518		plat->axi = devm_kzalloc(&pdev->dev, sizeof(*plat->axi),
->    519					 GFP_KERNEL);
->    520		if (!plat->axi)
->    521			return -ENOMEM;
->    522	
->    523		plat->axi->axi_lpi_en = 0;
->    524		plat->axi->axi_xit_frm = 0;
->    525		plat->axi->axi_wr_osr_lmt = 1;
->    526		plat->axi->axi_rd_osr_lmt = 1;
->    527		plat->axi->axi_blen[0] = 4;
->    528		plat->axi->axi_blen[1] = 8;
->    529		plat->axi->axi_blen[2] = 16;
->    530	
->    531		plat->ptp_max_adj = plat->clk_ptp_rate;
->    532		plat->eee_usecs_rate = plat->clk_ptp_rate;
->    533	
->    534		/* Set system clock */
->    535		sprintf(clk_name, "%s-%s", "stmmac", pci_name(pdev));
->    536	
->    537		plat->stmmac_clk = clk_register_fixed_rate(&pdev->dev,
->    538							   clk_name, NULL, 0,
->    539							   plat->clk_ptp_rate);
->    540	
->    541		if (IS_ERR(plat->stmmac_clk)) {
->    542			dev_warn(&pdev->dev, "Fail to register stmmac-clk\n");
->    543			plat->stmmac_clk = NULL;
->    544		}
->    545	
->    546		ret = clk_prepare_enable(plat->stmmac_clk);
->    547		if (ret) {
->    548			clk_unregister_fixed_rate(plat->stmmac_clk);
->    549			return ret;
->    550		}
->    551	
->    552		plat->ptp_clk_freq_config = intel_mgbe_ptp_clk_freq_config;
->    553	
->    554		/* Set default value for multicast hash bins */
->    555		plat->multicast_filter_bins = HASH_TABLE_SIZE;
->    556	
->    557		/* Set default value for unicast filter entries */
->    558		plat->unicast_filter_entries = 1;
->    559	
->    560		/* Set the maxmtu to a default of JUMBO_LEN */
->    561		plat->maxmtu = JUMBO_LEN;
->    562	
->    563		plat->flags |= STMMAC_FLAG_VLAN_FAIL_Q_EN;
->    564	
->    565		/* Use the last Rx queue */
->    566		plat->vlan_fail_q = plat->rx_queues_to_use - 1;
->    567	
->    568		/* For fixed-link setup, we allow phy-mode setting */
->    569		fwnode = dev_fwnode(&pdev->dev);
->    570		if (fwnode) {
->    571			int phy_mode;
->    572	
->    573			/* "phy-mode" setting is optional. If it is set,
->    574			 *  we allow either sgmii or 1000base-x for now.
->    575			 */
->    576			phy_mode = fwnode_get_phy_mode(fwnode);
->    577			if (phy_mode >= 0) {
->    578				if (phy_mode == PHY_INTERFACE_MODE_SGMII ||
->    579				    phy_mode == PHY_INTERFACE_MODE_1000BASEX)
->    580					plat->phy_interface = phy_mode;
->    581				else
->    582					dev_warn(&pdev->dev, "Invalid phy-mode\n");
->    583			}
->    584		}
->    585	
->    586		/* Intel mgbe SGMII interface uses pcs-xcps */
->    587		if (plat->phy_interface == PHY_INTERFACE_MODE_SGMII ||
->    588		    plat->phy_interface == PHY_INTERFACE_MODE_1000BASEX) {
->    589			struct mdio_board_info *xpcs_info;
->    590	
->    591			xpcs_info = devm_kzalloc(&pdev->dev,
->    592						 sizeof(*xpcs_info) + MII_BUS_ID_SIZE,
->    593						 GFP_KERNEL);
->    594			if (!xpcs_info) {
->    595				ret = -ENOMEM;
->    596				goto err_alloc_info;
->    597			}
->    598	
->    599			xpcs_info->bus_id = (void *)xpcs_info + sizeof(*xpcs_info);
->    600			snprintf((char *)xpcs_info->bus_id, MII_BUS_ID_SIZE,
->    601				 "stmmac-%x", plat->bus_id);
->    602	
->    603			snprintf(xpcs_info->modalias, MDIO_NAME_SIZE, "dwxpcs");
->    604	
->    605			xpcs_info->mdio_addr = INTEL_MGBE_XPCS_ADDR;
->    606	
->    607			ret = mdiobus_register_board_info(xpcs_info, 1);
->    608			if (ret)
->    609				goto err_alloc_info;
->    610	
->    611			plat->mdio_bus_data->has_xpcs = true;
->    612			plat->mdio_bus_data->xpcs_an_inband = true;
->    613		}
->    614	
->    615		/* For fixed-link setup, we clear xpcs_an_inband */
->    616		if (fwnode) {
->    617			struct fwnode_handle *fixed_node;
->    618	
->    619			fixed_node = fwnode_get_named_child_node(fwnode, "fixed-link");
->    620			if (fixed_node)
->    621				plat->mdio_bus_data->xpcs_an_inband = false;
->    622	
->    623			fwnode_handle_put(fixed_node);
->    624		}
->    625	
->    626		/* Ensure mdio bus PHY-scan skips intel serdes and pcs-xpcs */
->    627		plat->mdio_bus_data->phy_mask = 1 << INTEL_MGBE_ADHOC_ADDR;
->    628		plat->mdio_bus_data->phy_mask |= 1 << INTEL_MGBE_XPCS_ADDR;
->    629	
->    630		plat->int_snapshot_num = AUX_SNAPSHOT1;
->    631	
->    632		plat->crosststamp = intel_crosststamp;
->    633		plat->flags &= ~STMMAC_FLAG_INT_SNAPSHOT_EN;
->    634	
->    635		/* Setup MSI vector offset specific to Intel mGbE controller */
->    636		plat->msi_mac_vec = 29;
->    637		plat->msi_lpi_vec = 28;
->    638		plat->msi_sfty_ce_vec = 27;
->    639		plat->msi_sfty_ue_vec = 26;
->    640		plat->msi_rx_base_vec = 0;
->    641		plat->msi_tx_base_vec = 1;
->    642	
->    643		return 0;
->    644	
->    645	err_alloc_info:
->  > 646		clk_disable_unprepare(clk);
->    647		clk_unregister_fixed_rate(clk);
->    648	
->    649		return ret;
->    650	}
->    651	
-> 
-> -- 
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
+Jason
 
