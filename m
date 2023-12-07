@@ -1,101 +1,73 @@
-Return-Path: <netdev+bounces-54943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 180E5808FB0
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:20:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA07B808FC2
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:22:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 495A91C20924
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:20:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 661B82815A5
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:22:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 990A04D596;
-	Thu,  7 Dec 2023 18:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B6A14D596;
+	Thu,  7 Dec 2023 18:22:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k7k/GWtB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W7aKpjOv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6ADE10E3
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 10:20:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701973204; x=1733509204;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Uh6ICvHM5Z9cI9fvL4WpgaNh4HLyMbOCcZVHnRMxEfQ=;
-  b=k7k/GWtBWK8xh5ivhkZMajMVIfrAZ2QYvjWaBlXyZbbj50MGasXMJtIo
-   lz6B01EaWmqdbvYfbyzloxKCqlU5gdZ+QzDX2xp+UqhkIOPtFAudozy2p
-   egisgQ/TAct5cK9d3TzM3d+wUEZhCFaF9tNCw09WiFTnKXJs0L+djEImT
-   9TY9fe4rjFGK8bNOOSQuP9QnaiXu6DPXRnd0Ots+RwwEc/3XXiUXYny4c
-   tjuiakBdL9eLN0aEEju259umKNjNiCukb+XZuFrZxtGMw0DuV8DDYo0Oc
-   FQfgtLAWFpAV0T2darmH9d5ioSzWFHZQ7NaifWnvaKz9/izM/DOE9+wZM
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="1349376"
-X-IronPort-AV: E=Sophos;i="6.04,258,1695711600"; 
-   d="scan'208";a="1349376"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2023 10:20:04 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="721566108"
-X-IronPort-AV: E=Sophos;i="6.04,258,1695711600"; 
-   d="scan'208";a="721566108"
-Received: from dmert-dev.jf.intel.com ([10.166.241.14])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2023 10:20:03 -0800
-From: Dave Ertman <david.m.ertman@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>
-Subject: [PATCH iwl-next] ice: alter feature support check for SRIOV and LAG
-Date: Thu,  7 Dec 2023 10:21:58 -0800
-Message-Id: <20231207182158.2199799-1-david.m.ertman@intel.com>
-X-Mailer: git-send-email 2.40.1
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CFD81400F
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 18:22:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 312DFC433C8;
+	Thu,  7 Dec 2023 18:22:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701973335;
+	bh=cxp+MgknMCpa+DtgGp2WSh3TeALdfpCsqbGB3zKzAlU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=W7aKpjOv3GgkoeJ0xz3pABgmJ+THEaEOsExy3OJ2qPgllBSM5JF2+tAVBqGruAzjq
+	 b1f6zfJTc4rdnKR+CwCV5jZx5zeMcaPfcGULmeunl+HoSgNBZtTBluvcAlQVSVZkcb
+	 94lPF7k6uhr4gF7LZ18oei5ejt8/sHgLDuczyRH5FSbwZwJPXUxehCAepOBGgQSbRy
+	 BUWpLU4OUNTuMfvIY1/Ffe83ELe4RCCFjBTMbdjENZ1YWx3zjJ8xYCehagW1efPiyr
+	 wTzXrENFFvJlra7ZGcc14QllbsZ1SGUyI55v5EMuvI+kVm+PIqx804eY27qXyDHBea
+	 Zb8ge1x/aPvjw==
+Date: Thu, 7 Dec 2023 10:22:14 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, gospo@broadcom.com, Sreekanth Reddy
+ <sreekanth.reddy@broadcom.com>, Somnath Kotur <somnath.kotur@broadcom.com>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>, Vikas Gupta
+ <vikas.gupta@broadcom.com>
+Subject: Re: [PATCH net v2 2/4] bnxt_en: Fix skb recycling logic in
+ bnxt_deliver_skb()
+Message-ID: <20231207102214.4aa23d14@kernel.org>
+In-Reply-To: <20231207102144.6634a108@kernel.org>
+References: <20231207000551.138584-1-michael.chan@broadcom.com>
+	<20231207000551.138584-3-michael.chan@broadcom.com>
+	<20231207102144.6634a108@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Previously, the ice driver had support for using a hanldler for bonding
-netdev events to ensure that conflicting features were not allowed to be
-activated at the same time.  While this was still in place, additional
-support was added to specifically support SRIOV and LAG together.  These
-both utilized the netdev event handler, but the SRIOV and LAG feature was
-behind a capabilities feature check to make sure the current NVM has
-support.
+On Thu, 7 Dec 2023 10:21:44 -0800 Jakub Kicinski wrote:
+> On Wed,  6 Dec 2023 16:05:49 -0800 Michael Chan wrote:
+> > Receive SKBs can go through the VF-rep path or the normal path.
+> > skb_mark_for_recycle() is only called for the normal path.  Fix it
+> > to do it for both paths to fix possible stalled page pool shutdown
+> > errors.  
+> 
+> This patch is probably fine, but since I'm complaining -
+> IMHO it may be better to mark the skbs right after they
+> are allocated. Catching all "exit points" seems very error
+> prone...
 
-The exclusion part of the event handler should be removed since there are
-users who have custom made solutions that depend on the non-exclusion of
-features.
-
-Wrap the creation/registration and cleanup of the event handler and
-associated structs in the probe flow with a feature check so that the
-only systems that support the full implementation of LAG features will
-initialize support.  This will leave other systems unhindered with
-functionality as it existed before any LAG code was added.
-
-Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Signed-off-by: Dave Ertman <david.m.ertman@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_lag.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
-index 280994ee5933..b47cd43ae871 100644
---- a/drivers/net/ethernet/intel/ice/ice_lag.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lag.c
-@@ -1981,6 +1981,8 @@ int ice_init_lag(struct ice_pf *pf)
- 	int n, err;
- 
- 	ice_lag_init_feature_support_flag(pf);
-+	if (!ice_is_feature_supported(pf, ICE_F_SRIOV_LAG))
-+		return 0;
- 
- 	pf->lag = kzalloc(sizeof(*lag), GFP_KERNEL);
- 	if (!pf->lag)
--- 
-2.40.1
-
+To be 100% clear - I mean that as a suggestion for a potential 
+net-next cleanup.
 
