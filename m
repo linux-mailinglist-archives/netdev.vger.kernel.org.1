@@ -1,126 +1,100 @@
-Return-Path: <netdev+bounces-54998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6C0180923D
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 21:24:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 507BB80923E
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 21:25:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F74D1F2122B
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 20:24:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6DC61F21153
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 20:25:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B86965026E;
-	Thu,  7 Dec 2023 20:24:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51DEE5026E;
+	Thu,  7 Dec 2023 20:25:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HkeXNFRK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VdouKteb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78BE21715;
-	Thu,  7 Dec 2023 12:24:16 -0800 (PST)
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B7J17Pj001079;
-	Thu, 7 Dec 2023 20:24:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=WSu8+CooPg2Ovx5eQ7X0nUx4jDjHPKdceAqnwSTf7hs=;
- b=HkeXNFRKsX0mNWlWO8Xu/o4t0E++toU4XYVLKH6sbjhuS3JUEWi87M1AilCGJYY62ec6
- vF8A6roVIJTcG55h7UGmLS+2ivqJ79k5GPq7671q/At5MnegtQDrP31CLfaicnHXhrTj
- dl4+F9oOT+EW6cZxuibTKpU8HMk1p98SYdM52OB9jwxJgGEOpOwQvwzp36Mg2WKKT/zu
- wMDg7uAraEorsKzFZ8+cusLBHymI7ReaEzhN/zuluU/vTe+ihDXUEraVI9V0ruebUHF+
- tDZ3w2EvXMFtONjW2BTkpY+7VE8Yv6u3LSv2m62VI5QDxrWstaV9MebQZrGxN5iHGGMd Lg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uukmnhwej-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Dec 2023 20:24:07 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B7KHoE3009435;
-	Thu, 7 Dec 2023 20:24:07 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uukmnhwdn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Dec 2023 20:24:07 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B7JWQ6J015423;
-	Thu, 7 Dec 2023 20:24:06 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3utavknh42-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Dec 2023 20:24:05 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B7KO27443909826
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 7 Dec 2023 20:24:03 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CF0CD20043;
-	Thu,  7 Dec 2023 20:24:02 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A4E5E20040;
-	Thu,  7 Dec 2023 20:24:01 +0000 (GMT)
-Received: from MBP-von-Wenjia.fritz.box.com (unknown [9.171.68.143])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  7 Dec 2023 20:24:01 +0000 (GMT)
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-        Alexandra Winter <wintera@linux.ibm.com>,
-        Karsten Graul <kgraul@linux.ibm.com>,
-        Stefan Raspl <raspl@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, Nils Hoppmann <niho@linux.ibm.com>,
-        Niklas Schnell <schnelle@linux.ibm.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>
-Subject: [PATCH net] MAINTAINERS: remove myself as maintainer of SMC
-Date: Thu,  7 Dec 2023 21:23:58 +0100
-Message-Id: <20231207202358.53502-1-wenjia@linux.ibm.com>
-X-Mailer: git-send-email 2.40.1
+Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58474171B
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 12:24:56 -0800 (PST)
+Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-5d77a1163faso9879497b3.0
+        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 12:24:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701980695; x=1702585495; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tMyzG6/LQ9fJFBhiWd82aTNJpqAKqu5WvC38KtmseZQ=;
+        b=VdouKtebihw+7+SPLbpKEdbMN8d68rZEsDFvmUnD18bSkttdl2nhNxm/TMqnbpvUMI
+         b9dzRnK11BaU5GB7nHAQb6WeWX0UV7p0qSD5Xg+DiGqJ6pLvCyNOGOCDRp5prDq3tlqY
+         D+PO2HtOBxlNKlceKKjXOTKyyDQUcDTDwFP1zUkmlNyRZk9vsfOGfqnHhjhh6GIUf5ml
+         97kywXyVMRPHsFSIwCj7WGrzi5icH0HetSZKmigDRV/tmeGBVzl1HBbsn7K7kLjlelXA
+         Le7UxI78B2tbfUlselk91cuNbai11sKt8HIyjTSWxtXSbhkZzGkOOX+fVKZ1n4FVD2bM
+         hJ1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701980695; x=1702585495;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tMyzG6/LQ9fJFBhiWd82aTNJpqAKqu5WvC38KtmseZQ=;
+        b=ksbtREzfUYt+7ELxqB+XwjYcF2N5g2cRnoFxn4deqncmaumS2k818YK5HhKoeVo3iK
+         HCPv+Kt2a5eGUQg+RWJ09qK64TxU9l2kXUT6s40KyBK/1G1XlYj0BZBZ1TeQmLZypnJW
+         mzbEoNBPDARvzgEoQqcqF2wxwmz8Iv6zDid10on8Ln7yxSAfrxDk5OX/c4JnTG7auWWP
+         svV002Z8DFS9kCHbLRs12Grqn5ora6j/XgDeapEfuU4CdIvSUwWWM9BuXRbuXhF/Ofya
+         qK4GdGr20oaP5OFekRTDs/bt0ysp2Kuc7CygIM72yRnkAKaPsWPkfF04NrQbECNgafOT
+         5tgg==
+X-Gm-Message-State: AOJu0Yz+hTYPUSGFzvpXUVzGyw0ZLL3rARzq75yV0mDmvc70cuHjxOCj
+	iEgfU3GFFtWccGAZ4Rg+X/Q=
+X-Google-Smtp-Source: AGHT+IEM9dWJM8ql04Ou9wUgUY5GqAbR5WnxTdsydCs0bW1IA+ILaeOytHiTuDOU2TyNlUuoKdxSLg==
+X-Received: by 2002:a0d:d4c5:0:b0:5d7:f227:55d0 with SMTP id w188-20020a0dd4c5000000b005d7f22755d0mr2279787ywd.42.1701980695543;
+        Thu, 07 Dec 2023 12:24:55 -0800 (PST)
+Received: from ?IPV6:2600:1700:6cf8:1240:57df:3a91:11ad:dcd? ([2600:1700:6cf8:1240:57df:3a91:11ad:dcd])
+        by smtp.gmail.com with ESMTPSA id h197-20020a816cce000000b005ccf7fc2197sm136872ywc.24.2023.12.07.12.24.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Dec 2023 12:24:55 -0800 (PST)
+Message-ID: <e4d86104-0b66-4535-85bc-87bea2409a7e@gmail.com>
+Date: Thu, 7 Dec 2023 12:24:53 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next] ipv6: fix warning messages in
+ fib6_info_release().
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, thinker.li@gmail.com
+Cc: netdev@vger.kernel.org, martin.lau@linux.dev, kernel-team@meta.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
+ kuifeng@meta.com
+References: <20231207195051.556101-1-thinker.li@gmail.com>
+ <CANn89i+CTAYZft=LT+ZH8bg__9p63URnQH=s9=AL7MO4rbvPJg@mail.gmail.com>
+From: Kui-Feng Lee <sinquersw@gmail.com>
+In-Reply-To: <CANn89i+CTAYZft=LT+ZH8bg__9p63URnQH=s9=AL7MO4rbvPJg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 079KmwIGMNJwqicRGCh5T8PA9sDLYTiO
-X-Proofpoint-ORIG-GUID: rerRKfLyGkEP9FuAtAHeGLQp1YcUEJfW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-07_17,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 mlxscore=0 suspectscore=0 adultscore=0 clxscore=1015
- mlxlogscore=660 spamscore=0 phishscore=0 bulkscore=0 impostorscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2312070171
 
-From: Karsten Graul <kgraul@linux.ibm.com>
 
-I changed responsibilities some time ago, its time
-to remove myself as maintainer of the SMC component.
 
-Signed-off-by: Karsten Graul <kgraul@linux.ibm.com>
-Signed-off-by: Wenjia Zhang <wenjia@linux.ibm.com>
----
- MAINTAINERS | 1 -
- 1 file changed, 1 deletion(-)
+On 12/7/23 12:04, Eric Dumazet wrote:
+> On Thu, Dec 7, 2023 at 8:50 PM <thinker.li@gmail.com> wrote:
+>>
+>> From: Kui-Feng Lee <thinker.li@gmail.com>
+>>
+>> The previous patch doesn't handle the case in ip6_route_info_create().
+>> Move calling to fib6_set_expires_locked() to the end of the function to
+>> avoid the false alarm of the previous patch.
+>>
+>> Fixes: 5a08d0065a91 ("ipv6: add debug checks in fib6_info_release()")
+> 
+> This looks quite wrong.
+> 
+> Let's separate things to have clean stable backports.
+> 
+> I will submit my single liner, you will submit a patch fixing your prior commit,
+> otherwise linux-6.6 and linux-6.7 will still have a bug.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e6109201e8b4..ddb858576d8b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -19638,7 +19638,6 @@ S:	Maintained
- F:	drivers/misc/sgi-xp/
- 
- SHARED MEMORY COMMUNICATIONS (SMC) SOCKETS
--M:	Karsten Graul <kgraul@linux.ibm.com>
- M:	Wenjia Zhang <wenjia@linux.ibm.com>
- M:	Jan Karcher <jaka@linux.ibm.com>
- R:	D. Wythe <alibuda@linux.alibaba.com>
--- 
-2.40.1
-
+Sure, I am working on that.
 
