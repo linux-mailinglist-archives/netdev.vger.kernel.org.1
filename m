@@ -1,164 +1,362 @@
-Return-Path: <netdev+bounces-54852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECA51808931
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 14:29:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 639E6808938
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 14:32:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A829828304A
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 13:29:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CDC67B20BAD
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 13:32:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1D9C40BE1;
-	Thu,  7 Dec 2023 13:29:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 379C740BE3;
+	Thu,  7 Dec 2023 13:32:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mlL/YjVc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BB7ff/j2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFC6C10C2
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 05:29:37 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-54c77d011acso8442a12.1
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 05:29:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701955776; x=1702560576; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iE5wSRpyi4qkVk7sZZIsQKJL0ecDYjuI1CJ7H63UiBc=;
-        b=mlL/YjVcKlkIW6klOOCiqJ/Lc+dkYXYEHGarWNyfXdzj2vjrlWWyV5hafEXKX89m5G
-         u0+sFKc4sEEoYVKer5XfUjqkm0G/SiTGm9DHpvp3zJyObj7YqYgcN/ONlzYQbf876WWF
-         m6UqeKGByNwz32rCsqaow4jnIs0nhwQGLURU4/ErTE5VGONdtjzj4rwja5lCc0AG5+mH
-         TiNCRDZWeg+OoFeJTNseNR0McGRQQeI349t82/nk5b69gEssEDap9Vt4zLjMGZzco8kl
-         lAtdmplT7j6OymDWd1TfUynOwY17eztABkgGeNzal24qRiJv4FtXf09E8CoSJriIjt1m
-         ZytQ==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D5F4AA
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 05:32:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701955954;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=d/SBhZAK414JzvquQwqVRSEGrKebKeCBrQXSFCxn068=;
+	b=BB7ff/j2a1UzZTbY69SEuUB07/klNBrlAa+ajSlbEQA0nyi3ep6hNxq8uVfy/bcfAVc1B7
+	WvG5LcR42bjicR3x1EpyVEBAFavEGzK1kBaBSsC7CDNi+fAshZVZNnGFeclaD7d6Svv+MT
+	oDeyQCwrQcxfk83TI8/O9zERkBqvnns=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-584-jPaPD9dcOPm_Bvof16pmFA-1; Thu, 07 Dec 2023 08:32:33 -0500
+X-MC-Unique: jPaPD9dcOPm_Bvof16pmFA-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-77d8528360cso84107885a.3
+        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 05:32:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701955776; x=1702560576;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iE5wSRpyi4qkVk7sZZIsQKJL0ecDYjuI1CJ7H63UiBc=;
-        b=SfyYW7XVgCV0srkX51IVPpbiW5ceAMQN2M7hJMi47wTIRB1rkyIcSS7saw2Q8OHHm1
-         KuufY1O2ZxXIiHamlQB4l3nrM1l7I/68J1FXTbG2UDYrsinYxnD0KqcLeiPwXuQDatEm
-         u8+L5Efw1FD6/ZFd/a8ooU9HrLd5o4q5Mlkfu2Kop0oLyDe1ZMOfrEUZQOg7Ievb9VxP
-         XIKhGGk1dawCxSAaPgYfpyaPEhzuHiD5SM5Kf2dfbYi3oanOciRot7O7/pCSVDOAhkdD
-         LCf6XLzATkSxWY68o7V68J3fQ9pgXdfQjxxdzHxFh49VyArk+X1ZxWT6tEsvkJWktBMu
-         7T6Q==
-X-Gm-Message-State: AOJu0YyE0fAYO0Ps2eKKFCG0LMg7/78dd0coP/4C3gMS3pTuPw54oaic
-	Oo8QJ0MdYVAx1BX3zwjFx5xrYq8dVfII+8oNpehyhByFeR0Wi9x3nVWtUg==
-X-Google-Smtp-Source: AGHT+IH1cr6O9yPTA6CMV8lL48xt8H+lS9Y52KAetUTOS0cUzDKx34oWeNOUmLvJH1gvczrRN5RM02JtxhnZ9dRNpac=
-X-Received: by 2002:a50:c35d:0:b0:54c:79ed:a018 with SMTP id
- q29-20020a50c35d000000b0054c79eda018mr246249edb.2.1701955775847; Thu, 07 Dec
- 2023 05:29:35 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701955953; x=1702560753;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d/SBhZAK414JzvquQwqVRSEGrKebKeCBrQXSFCxn068=;
+        b=LHHigWnjrswAeJPP+4m2lSUXUrTchhxWj43EI951lFqbjmiPYJb/rg8xQkOHjgFQP5
+         XKy5P37+pEpWbRRETQvuP9uEiGiMNf7MPK1BVd1fumo7cr9I7PXREExGwBrN+MYZXEwU
+         14324/Tq4FduN866hsyqQTvAiH6n5IIhbLL3O9UG8HK/k8vU5tZl8oQFjtIURfz8VHQE
+         +U733pX9J9AoOFTayGXP0uj0iHhlDiipF8Ci+ud0aqBWKjV/IWKn83T3RUhOajvP9wbg
+         kna6kFieSDEcGDFjDVl6PivCjR64GvlwHecPfGvwXXcRDxujuWdMF0Oyt+S/NQqsy9bA
+         PU9A==
+X-Gm-Message-State: AOJu0YzPdDT5cnxv7NqVFrfv3LcZ0pSJTji/2rQrwRfn48aoxK57cT8Y
+	3b/VwEDtIGLA7y4bNxZXUW4/CjHc8nG2o5SCSYJSPsl5vU8xhZIDuxw0dLQgxJ2BrTuqD2Z56U7
+	PF+GZkcXVJoPfTgf4
+X-Received: by 2002:a05:620a:8ec5:b0:77f:85a:98cc with SMTP id rg5-20020a05620a8ec500b0077f085a98ccmr1093512qkn.67.1701955952591;
+        Thu, 07 Dec 2023 05:32:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH8AmSmUPsew3T2IwHJ8Kz7pb8PNKlkDZy/EK5ipjXZM7iqsTnedkfLks4D4gqigy8EmBeg1g==
+X-Received: by 2002:a05:620a:8ec5:b0:77f:85a:98cc with SMTP id rg5-20020a05620a8ec500b0077f085a98ccmr1093493qkn.67.1701955952267;
+        Thu, 07 Dec 2023 05:32:32 -0800 (PST)
+Received: from fedora ([2600:1700:1ff0:d0e0::47])
+        by smtp.gmail.com with ESMTPSA id u6-20020a05620a454600b0077d797676a4sm396176qkp.122.2023.12.07.05.32.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Dec 2023 05:32:31 -0800 (PST)
+Date: Thu, 7 Dec 2023 07:32:29 -0600
+From: Andrew Halaney <ahalaney@redhat.com>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH net-next v2] net: stmmac: don't create a MDIO bus if
+ unnecessary
+Message-ID: <vmjpuli2l6r7awtiwip6hbgmc4m7hgtbyoqi3z4rhb5chfoiu4@5ebw7tepe6mp>
+References: <20231206-stmmac-no-mdio-node-v2-1-333cae49b1ca@redhat.com>
+ <o3abmn7ocuksmjg23rrgsib7nfm4yo5rtzlqw2np2pplg73drd@7qe4vrsx2gyc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231205173250.2982846-1-edumazet@google.com> <170191862445.7525.14404095197034927243.git-patchwork-notify@kernel.org>
-In-Reply-To: <170191862445.7525.14404095197034927243.git-patchwork-notify@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 7 Dec 2023 14:29:22 +0100
-Message-ID: <CANn89iKcFxJ68+M8UvHzqp1k-FDiZHZ8ujP79WJd1338DVJy6w@mail.gmail.com>
-Subject: Re: [PATCH net-next] ipv6: add debug checks in fib6_info_release()
-To: patchwork-bot+netdevbpf@kernel.org, Kui-Feng Lee <thinker.li@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <o3abmn7ocuksmjg23rrgsib7nfm4yo5rtzlqw2np2pplg73drd@7qe4vrsx2gyc>
 
-On Thu, Dec 7, 2023 at 4:10=E2=80=AFAM <patchwork-bot+netdevbpf@kernel.org>=
- wrote:
->
-> Hello:
->
-> This patch was applied to netdev/net-next.git (main)
-> by Jakub Kicinski <kuba@kernel.org>:
->
-> On Tue,  5 Dec 2023 17:32:50 +0000 you wrote:
-> > Some elusive syzbot reports are hinting to fib6_info_release(),
-> > with a potential dangling f6i->gc_link anchor.
-> >
-> > Add debug checks so that syzbot can catch the issue earlier eventually.
-> >
-> > BUG: KASAN: slab-use-after-free in __hlist_del include/linux/list.h:990=
- [inline]
-> > BUG: KASAN: slab-use-after-free in hlist_del_init include/linux/list.h:=
-1016 [inline]
-> > BUG: KASAN: slab-use-after-free in fib6_clean_expires_locked include/ne=
-t/ip6_fib.h:533 [inline]
-> > BUG: KASAN: slab-use-after-free in fib6_purge_rt+0x986/0x9c0 net/ipv6/i=
-p6_fib.c:1064
-> > Write of size 8 at addr ffff88802805a840 by task syz-executor.1/10057
-> >
-> > [...]
->
-> Here is the summary with links:
->   - [net-next] ipv6: add debug checks in fib6_info_release()
->     https://git.kernel.org/netdev/net-next/c/5a08d0065a91
+On Thu, Dec 07, 2023 at 02:56:25PM +0300, Serge Semin wrote:
+> Hi Andrew
+> 
+> On Wed, Dec 06, 2023 at 05:46:09PM -0600, Andrew Halaney wrote:
+> > The stmmac_dt_phy() function, which parses the devicetree node of the
+> > MAC and ultimately causes MDIO bus allocation, misinterprets what
+> > fixed-link means in relation to the MAC's MDIO bus. This results in
+> > a MDIO bus being created in situations it need not be.
+> > 
+> > Currently a MDIO bus is created if the description is either:
+> > 
+> >     1. Not fixed-link
+> >     2. fixed-link but contains a MDIO bus as well
+> > 
+> > The "1" case above isn't always accurate. If there's a phy-handle,
+> > it could be referencing a phy on another MDIO controller's bus[1]. In
+> > this case currently the MAC will make a MDIO bus and scan it all
+> > anyways unnecessarily.
+> > 
+> > There's also a lot of upstream devicetrees[2] that expect a MDIO bus to
+> > be created and scanned for a phy. This case can also be inferred from
+> > the platform description by not having a phy-handle && not being
+> > fixed-link. This hits case "1" in the current driver's logic.
+> > 
+> > Let's improve the logic to create a MDIO bus if either:
+> > 
+> >     - Devicetree contains a MDIO bus
+> >     - !fixed-link && !phy-handle (legacy handling)
+> > 
+> > Below upstream devicetree snippets can be found that explain some of
+> > the cases above more concretely.
+> > 
+> > Here's[0] a devicetree example where the MAC is both fixed-link and
+> > driving a switch on MDIO (case "2" above). This needs a MDIO bus to
+> > be created:
+> > 
+> >     &fec1 {
+> >             phy-mode = "rmii";
+> > 
+> >             fixed-link {
+> >                     speed = <100>;
+> >                     full-duplex;
+> >             };
+> > 
+> >             mdio1: mdio {
+> >                     switch0: switch0@0 {
+> >                             compatible = "marvell,mv88e6190";
+> >                             pinctrl-0 = <&pinctrl_gpio_switch0>;
+> >                     };
+> >             };
+> >     };
+> > 
+> > Here's[1] an example where there is no MDIO bus or fixed-link for
+> > the ethernet1 MAC, so no MDIO bus should be created since ethernet0
+> > is the MDIO master for ethernet1's phy:
+> > 
+> >     &ethernet0 {
+> >             phy-mode = "sgmii";
+> >             phy-handle = <&sgmii_phy0>;
+> > 
+> >             mdio {
+> >                     compatible = "snps,dwmac-mdio";
+> >                     sgmii_phy0: phy@8 {
+> >                             compatible = "ethernet-phy-id0141.0dd4";
+> >                             reg = <0x8>;
+> >                             device_type = "ethernet-phy";
+> >                     };
+> > 
+> >                     sgmii_phy1: phy@a {
+> >                             compatible = "ethernet-phy-id0141.0dd4";
+> >                             reg = <0xa>;
+> >                             device_type = "ethernet-phy";
+> >                     };
+> >             };
+> >     };
+> > 
+> >     &ethernet1 {
+> >             phy-mode = "sgmii";
+> >             phy-handle = <&sgmii_phy1>;
+> >     };
+> > 
+> > Finally there's descriptions like this[2] which don't describe the
+> > MDIO bus but expect it to be created and the whole address space
+> > scanned for a phy since there's no phy-handle or fixed-link described:
+> > 
+> >     &gmac {
+> >             phy-supply = <&vcc_lan>;
+> >             phy-mode = "rmii";
+> >             snps,reset-gpio = <&gpio3 RK_PB4 GPIO_ACTIVE_HIGH>;
+> >             snps,reset-active-low;
+> >             snps,reset-delays-us = <0 10000 1000000>;
+> >     };
+> > 
+> > [0] https://elixir.bootlin.com/linux/v6.5-rc5/source/arch/arm/boot/dts/nxp/vf/vf610-zii-ssmb-dtu.dts
+> > [1] https://elixir.bootlin.com/linux/v6.6-rc5/source/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
+> > [2] https://elixir.bootlin.com/linux/v6.6-rc5/source/arch/arm64/boot/dts/rockchip/rk3368-r88.dts#L164
+> 
+> Thank you for the patch. Please find a comment below.
+> 
+> > 
+> > Co-developed-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > Signed-off-by: Andrew Halaney <ahalaney@redhat.com>
+> > ---
+> >  .../net/ethernet/stmicro/stmmac/stmmac_platform.c  | 85 ++++++++++------------
+> >  1 file changed, 37 insertions(+), 48 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > index 1ffde555da47..7da461fe93f6 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > @@ -296,69 +296,39 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
+> >  }
+> >  
+> >  /**
+> > - * stmmac_dt_phy - parse device-tree driver parameters to allocate PHY resources
+> > - * @plat: driver data platform structure
+> > - * @np: device tree node
+> > - * @dev: device pointer
+> > - * Description:
+> > - * The mdio bus will be allocated in case of a phy transceiver is on board;
+> > - * it will be NULL if the fixed-link is configured.
+> > - * If there is the "snps,dwmac-mdio" sub-node the mdio will be allocated
+> > - * in any case (for DSA, mdio must be registered even if fixed-link).
+> > - * The table below sums the supported configurations:
+> > - *	-------------------------------
+> > - *	snps,phy-addr	|     Y
+> > - *	-------------------------------
+> > - *	phy-handle	|     Y
+> > - *	-------------------------------
+> > - *	fixed-link	|     N
+> > - *	-------------------------------
+> > - *	snps,dwmac-mdio	|
+> > - *	  even if	|     Y
+> > - *	fixed-link	|
+> > - *	-------------------------------
+> > + * stmmac_of_get_mdio() - Gets the MDIO bus from the devicetree
+> > + * @np: devicetree node
+> >   *
+> > - * It returns 0 in case of success otherwise -ENODEV.
+> > + * The MDIO bus will be searched for in the following ways:
+> > + * 1. The compatible is "snps,dwc-qos-ethernet-4.10" && a "mdio" named
+> > + *    child node exists
+> > + * 2. A child node with the "snps,dwmac-mdio" compatible is present
+> > + *
+> > + * Return: The MDIO node if present otherwise NULL
+> >   */
+> > -static int stmmac_dt_phy(struct plat_stmmacenet_data *plat,
+> > -			 struct device_node *np, struct device *dev)
+> > +static struct device_node *stmmac_of_get_mdio(struct device_node *np)
+> >  {
+> > -	bool mdio = !of_phy_is_fixed_link(np);
+> >  	static const struct of_device_id need_mdio_ids[] = {
+> >  		{ .compatible = "snps,dwc-qos-ethernet-4.10" },
+> >  		{},
+> >  	};
+> > +	struct device_node *mdio_node = NULL;
+> >  
+> >  	if (of_match_node(need_mdio_ids, np)) {
+> > -		plat->mdio_node = of_get_child_by_name(np, "mdio");
+> > +		mdio_node = of_get_child_by_name(np, "mdio");
+> >  	} else {
+> >  		/**
+> >  		 * If snps,dwmac-mdio is passed from DT, always register
+> >  		 * the MDIO
+> >  		 */
+> > -		for_each_child_of_node(np, plat->mdio_node) {
+> > -			if (of_device_is_compatible(plat->mdio_node,
+> > +		for_each_child_of_node(np, mdio_node) {
+> > +			if (of_device_is_compatible(mdio_node,
+> >  						    "snps,dwmac-mdio"))
+> >  				break;
+> >  		}
+> >  	}
+> >  
+> > -	if (plat->mdio_node) {
+> > -		dev_dbg(dev, "Found MDIO subnode\n");
+> > -		mdio = true;
+> > -	}
+> > -
+> > -	if (mdio) {
+> > -		plat->mdio_bus_data =
+> > -			devm_kzalloc(dev, sizeof(struct stmmac_mdio_bus_data),
+> > -				     GFP_KERNEL);
+> > -		if (!plat->mdio_bus_data)
+> > -			return -ENOMEM;
+> > -
+> > -		plat->mdio_bus_data->needs_reset = true;
+> > -	}
+> > -
+> > -	return 0;
+> > +	return mdio_node;
+> >  }
+> >  
+> >  /**
+> > @@ -417,6 +387,7 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+> >  	struct device_node *np = pdev->dev.of_node;
+> >  	struct plat_stmmacenet_data *plat;
+> >  	struct stmmac_dma_cfg *dma_cfg;
+> > +	bool legacy_mdio;
+> >  	int phy_mode;
+> >  	void *ret;
+> >  	int rc;
+> > @@ -471,10 +442,28 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+> >  	if (of_property_read_u32(np, "snps,phy-addr", &plat->phy_addr) == 0)
+> >  		dev_warn(&pdev->dev, "snps,phy-addr property is deprecated\n");
+> >  
+> > -	/* To Configure PHY by using all device-tree supported properties */
+> > -	rc = stmmac_dt_phy(plat, np, &pdev->dev);
+> > -	if (rc)
+> > -		return ERR_PTR(rc);
+> > +	plat->mdio_node = stmmac_of_get_mdio(np);
+> > +	if (plat->mdio_node)
+> > +		dev_dbg(&pdev->dev, "Found MDIO subnode\n");
+> > +
+> 
+> > +	/* Legacy devicetrees allowed for no MDIO bus description and expect
+> > +	 * the bus to be scanned for devices. If there's no phy or fixed-link
+> > +	 * described assume this is the case since there must be something
+> > +	 * connected to the MAC.
+> > +	 */
+> > +	legacy_mdio = !of_phy_is_fixed_link(np) && !plat->phy_node;
+> > +	if (legacy_mdio)
+> > +		dev_info(&pdev->dev, "Deprecated MDIO bus assumption used\n");
+> > +
+> > +	if (plat->mdio_node || legacy_mdio) {
+> > +		plat->mdio_bus_data = devm_kzalloc(&pdev->dev,
+> > +						   sizeof(struct stmmac_mdio_bus_data),
+> > +						   GFP_KERNEL);
+> > +		if (!plat->mdio_bus_data)
+> > +			return ERR_PTR(-ENOMEM);
+> > +
+> > +		plat->mdio_bus_data->needs_reset = true;
+> > +	}
+> 
+> Why did you decide to move this out of the dedicated function?
+> stmmac_probe_config_dt() is already overwhelmed with various
+> non-coherent actions. The method has already got to being too long to
+> follow the kernel coding style limit (I have got a not submitted yet
+> cleanup patchset which step-by-step fixes that). Could you please get
+> the chunk above back to the respective function and, for instance,
+> just change it's name to something like stmmac_mdio_setup()? (I prefer
+> having "_setup" suffix because some of the locally defined static
+> methods already use it: stmmac_axi_setup(), stmmac_mtl_setup().)
 
-Nice, syzbot gave me exactly what I was looking for.
+Sure, I can put it back in. I'll probably keep stmmac_of_get_mdio()
+(which is named in the style I see in the current file -- although as
+you highlight that shouldn't be taken as the best example of clean),
+and have stmmac_mdio_setup() call that and and mimic the inputs/outputs
+of the current function (moving the rest of the added code from
+stmmac_probe_config_dt() back into that function).
 
-WARNING: CPU: 0 PID: 5059 at include/net/ip6_fib.h:332
-fib6_info_release include/net/ip6_fib.h:332 [inline]
-WARNING: CPU: 0 PID: 5059 at include/net/ip6_fib.h:332
-ip6_route_info_create+0x1a1a/0x1f10 net/ipv6/route.c:3829
-Modules linked in:
-CPU: 0 PID: 5059 Comm: syz-executor256 Not tainted
-6.7.0-rc3-syzkaller-00805-g5a08d0065a91 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine,
-BIOS Google 11/10/2023
-RIP: 0010:fib6_info_release include/net/ip6_fib.h:332 [inline]
-RIP: 0010:ip6_route_info_create+0x1a1a/0x1f10 net/ipv6/route.c:3829
-Code: 49 83 7f 40 00 75 28 e8 04 ae 50 f8 49 8d bf a0 00 00 00 48 c7
-c6 c0 ae 37 89 e8 41 2c 3a f8 e9 65 f4 ff ff e8 e7 ad 50 f8 90 <0f> 0b
-90 eb ad e8 dc ad 50 f8 90 0f 0b 90 eb cd e8 d1 ad 50 f8 e8
-RSP: 0018:ffffc90003bdf8e0 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000400000 RCX: ffffffff8936e418
-RDX: ffff888026a58000 RSI: ffffffff8936e469 RDI: 0000000000000005
-RBP: ffffc90003bdf9d0 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000400000 R11: ffffffff81de4c35 R12: ffffffffffffffea
-R13: ffff88802993242c R14: ffffc90003bdfac4 R15: ffff888029932400
-FS: 00005555562b4380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00000000004585c0 CR3: 000000007390d000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
-<TASK>
-ip6_route_add+0x26/0x1f0 net/ipv6/route.c:3843
-ipv6_route_ioctl+0x3ff/0x590 net/ipv6/route.c:4467
-inet6_ioctl+0x265/0x2b0 net/ipv6/af_inet6.c:575
-sock_do_ioctl+0x113/0x270 net/socket.c:1220
-sock_ioctl+0x22e/0x6b0 net/socket.c:1339
-vfs_ioctl fs/ioctl.c:51 [inline]
-__do_sys_ioctl fs/ioctl.c:871 [inline]
-__se_sys_ioctl fs/ioctl.c:857 [inline]
-__x64_sys_ioctl+0x18f/0x210 fs/ioctl.c:857
-do_syscall_x64 arch/x86/entry/common.c:51 [inline]
-do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
-entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7f175790d369
+Thanks for the feedback, let me know if you still think that abstraction
+isn't ideal (or wait till I post it :P) and I'll go with exactly as you
+said. I'm not _too_ opinionated on it, but thought stmmac_dt_phy()
+didn't explain much and stmmac_of_get_mdio() was self-explanatory enough
+that it helped readability.
 
+> 
+> -Serge(y)
+> 
+> >  
+> >  	of_property_read_u32(np, "tx-fifo-depth", &plat->tx_fifo_size);
+> >  
+> > 
+> > ---
+> > base-commit: fd8a79b63710acb84321be3ce74be23c876873fb
+> > change-id: 20231127-stmmac-no-mdio-node-1db9da8a25d9
+> > 
+> > Best regards,
+> > -- 
+> > Andrew Halaney <ahalaney@redhat.com>
+> > 
+> > 
+> 
 
-Following commit seems buggy.
-
-commit 3dec89b14d37ee635e772636dad3f09f78f1ab87
-Author: Kui-Feng Lee <thinker.li@gmail.com>
-Date:   Tue Aug 15 11:07:05 2023 -0700
-
-    net/ipv6: Remove expired routes with a separated list of routes.
-
-    FIB6 GC walks trees of fib6_tables to remove expired routes. Walking a =
-tree
-    can be expensive if the number of routes in a table is big, even if mos=
-t of
-    them are permanent. Checking routes in a separated list of routes havin=
-g
-    expiration will avoid this potential issue.
-
-    Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
-    Reviewed-by: David Ahern <dsahern@kernel.org>
-    Signed-off-by: David S. Miller <davem@davemloft.net>
 
