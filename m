@@ -1,100 +1,118 @@
-Return-Path: <netdev+bounces-54817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7FF18085BA
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 11:48:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 043A68085C5
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 11:52:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2AA5B21B9E
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 10:48:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B48EF2833B3
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 10:52:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3EDC2F866;
-	Thu,  7 Dec 2023 10:48:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1143933080;
+	Thu,  7 Dec 2023 10:52:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="njLwgueQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XuUBuaCx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 803084C95;
-	Thu,  7 Dec 2023 10:48:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69B60C433C7;
-	Thu,  7 Dec 2023 10:47:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E755E4C95
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 10:52:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E381DC433C8;
+	Thu,  7 Dec 2023 10:52:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701946082;
-	bh=mnW/y6nXu5tGf4aEpGvE7GdOvchE6NCkqKjTKz4fXwE=;
+	s=k20201202; t=1701946362;
+	bh=5W0HsIUrX9rQ2Z3aNMkLYeMpOcwj3cSmk1NBCIWioOs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=njLwgueQPMVqMY1mUjUe1pvV4+OHWT1ZvJNs7uxomTu8Dm/ta/UU3O7ennmc97qcc
-	 Pm7hMxXfSTnpp0LmBwpJSY9kpBtqGA7fh53+GSBeV6lAuuVnMCKH2pyFocu89s1YkX
-	 MbZ52KwIxp+cyfM94UZ84zgyK8fh16M6FpNUbgy4Q96ZD4n6068Yc8Z8kyB7j5Mk95
-	 gRQSdTBFeknv4ju7hXWhgGz/bd/T34brckot0jvbVU0eqhtHEVLlxzKOcv90DBWwfD
-	 QXtzww7AP2wYyn1Ab1KPyOaqviSxM6ZbkoU+g4SkrD6URa7Eea0tRD1lS9+vvkTcVi
-	 s7AZ0cJSKixeQ==
-Date: Thu, 7 Dec 2023 10:47:55 +0000
+	b=XuUBuaCxwj+udyoOssB8D4M3eAX1tEqiCf3i4YqwKggrNye964Je/xTwd/9y4T1iY
+	 ieoukzTIZXOa3zdJpiqbBAHmYzreNiInTPQAAvaSSJFF7rgYGsYB4UZZvUl5Q7G5QI
+	 3cmy2iE3k0Y3wTSLhkx36CcRleBh7x9b9h75HVX0VLU15P9z88Jf3YznWTl82+83Pc
+	 8bRBTcN8jz+tXjfyAhCV86wRq/Q7RUEvwj/TJnrz96CY7YqmUF5fjATpECC+EDqiJ4
+	 MXVPiH5NpAI3yEAuTzqunB35aGYNPgrj9P0x1rRV5P/v/D6+JqK4matpuqCe0vLPeJ
+	 Zn/nWHU79kj2g==
+Date: Thu, 7 Dec 2023 10:52:36 +0000
 From: Simon Horman <horms@kernel.org>
-To: Stanislav Fomichev <sdf@google.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
-	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
-	haoluo@google.com, jolsa@kernel.org, kuba@kernel.org,
-	toke@kernel.org, willemb@google.com, dsahern@kernel.org,
-	magnus.karlsson@intel.com, bjorn@kernel.org,
-	maciej.fijalkowski@intel.com, hawk@kernel.org,
-	yoong.siang.song@intel.com, netdev@vger.kernel.org,
-	xdp-hints@xdp-project.net
-Subject: Re: [PATCH bpf-next v6 06/13] xsk: Document tx_metadata_len layout
-Message-ID: <20231207104755.GD50400@kernel.org>
-References: <20231127190319.1190813-1-sdf@google.com>
- <20231127190319.1190813-7-sdf@google.com>
- <20231202170952.GB50400@kernel.org>
- <CAKH8qBvk695byc6TdXyxWR9RmQa+_-0OQAvEsxgOgT6O0amN0g@mail.gmail.com>
+To: Dmitry Safonov <dima@arista.com>
+Cc: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>,
+	Francesco Ruggeri <fruggeri05@gmail.com>,
+	Salam Noureddine <noureddine@arista.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 6/7] net/tcp: Store SNEs + SEQs on ao_info
+Message-ID: <20231207105236.GE50400@kernel.org>
+References: <20231129165721.337302-1-dima@arista.com>
+ <20231129165721.337302-7-dima@arista.com>
+ <20231202171612.GC50400@kernel.org>
+ <45d63402-bd0f-4593-8e57-042c0753f3e3@arista.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKH8qBvk695byc6TdXyxWR9RmQa+_-0OQAvEsxgOgT6O0amN0g@mail.gmail.com>
+In-Reply-To: <45d63402-bd0f-4593-8e57-042c0753f3e3@arista.com>
 
-On Mon, Dec 04, 2023 at 08:48:46AM -0800, Stanislav Fomichev wrote:
-> On Sat, Dec 2, 2023 at 9:10 AM Simon Horman <horms@kernel.org> wrote:
-> >
-> > On Mon, Nov 27, 2023 at 11:03:12AM -0800, Stanislav Fomichev wrote:
-> > > - how to use
-> > > - how to query features
-> > > - pointers to the examples
-> > >
-> > > Signed-off-by: Stanislav Fomichev <sdf@google.com>
-> >
-> > ...
-> >
-> > > diff --git a/Documentation/networking/xdp-rx-metadata.rst b/Documentation/networking/xdp-rx-metadata.rst
-> > > index 205696780b78..e3e9420fd817 100644
-> > > --- a/Documentation/networking/xdp-rx-metadata.rst
-> > > +++ b/Documentation/networking/xdp-rx-metadata.rst
-> > > @@ -1,3 +1,5 @@
-> > > +.. SPDX-License-Identifier: GPL-2.0
-> > > +
-> > >  ===============
-> > >  XDP RX Metadata
-> > >  ===============
-> > > diff --git a/Documentation/networking/xsk-tx-metadata.rst b/Documentation/networking/xsk-tx-metadata.rst
-> > > new file mode 100644
-> > > index 000000000000..4f376560b23f
-> > > --- /dev/null
-> > > +++ b/Documentation/networking/xsk-tx-metadata.rst
-> >
-> > Hi Stan,
-> >
-> > could you send a follow-up patch to add an SPDX identifier here?
+On Mon, Dec 04, 2023 at 05:08:20PM +0000, Dmitry Safonov wrote:
+> Hi Simon,
 > 
-> Hmmm, I vividly remember adding it here after your initial comment :-/
-> Will send a follow up, thank you for catching it!
+> On 12/2/23 17:16, Simon Horman wrote:
+> > On Wed, Nov 29, 2023 at 04:57:20PM +0000, Dmitry Safonov wrote:
+> >> RFC 5925 (6.2):
+> >>> TCP-AO emulates a 64-bit sequence number space by inferring when to
+> >>> increment the high-order 32-bit portion (the SNE) based on
+> >>> transitions in the low-order portion (the TCP sequence number).
+> >>
+> >> snd_sne and rcv_sne are the upper 4 bytes of extended SEQ number.
+> >> Unfortunately, reading two 4-bytes pointers can't be performed
+> >> atomically (without synchronization).
+> >>
+> >> In order to avoid locks on TCP fastpath, let's just double-account for
+> >> SEQ changes: snd_una/rcv_nxt will be lower 4 bytes of snd_sne/rcv_sne.
+> >>
+> >> Fixes: 64382c71a557 ("net/tcp: Add TCP-AO SNE support")
+> >> Signed-off-by: Dmitry Safonov <dima@arista.com>
+> > 
+> > ...
+> > 
+> >> diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
+> >> index 647781080613..b8ef25d4b632 100644
+> >> --- a/include/net/tcp_ao.h
+> >> +++ b/include/net/tcp_ao.h
+> >> @@ -121,8 +121,8 @@ struct tcp_ao_info {
+> >>  	 * - for time-wait sockets the basis is tw_rcv_nxt/tw_snd_nxt.
+> >>  	 *   tw_snd_nxt is not expected to change, while tw_rcv_nxt may.
+> >>  	 */
+> >> -	u32			snd_sne;
+> >> -	u32			rcv_sne;
+> >> +	u64			snd_sne;
+> >> +	u64			rcv_sne;
+> >>  	refcount_t		refcnt;		/* Protects twsk destruction */
+> >>  	struct rcu_head		rcu;
+> >>  };
+> > 
+> > Hi Dmitry,
+> > 
+> > In tcp_ao.c:tcp_ao_connect_init() there is a local
+> > variable:
+> > 
+> >         struct tcp_ao_info *ao_info;
+> > 
+> > And the following assignment occurs:
+> > 
+> >                 ao_info->snd_sne = htonl(tp->write_seq);
+> > 
+> > Is this still correct in light of the change of the type of snd_sne?
+> 
+> Thanks for the report.
+> Yes, it's correct as lower 4-bytes are initialized as initial SEQ.
+> I'll add a cast for it if I'll go with v5 for this patch.
 
-Thanks, these things happen :)
+Thanks Dmitry,
+
+I think that would address my concern.
 
