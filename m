@@ -1,101 +1,114 @@
-Return-Path: <netdev+bounces-54696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AE90807D07
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 01:26:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8E09807D34
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 01:29:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C7311C20BCD
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 00:26:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFA601C2117F
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 00:29:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A631E367;
-	Thu,  7 Dec 2023 00:26:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB390EA0;
+	Thu,  7 Dec 2023 00:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h6JPcthY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NZJGnH31"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E98C137
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 16:26:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701908778; x=1733444778;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=xZ1OH9wKIvhPVgH5ur8bjSVDHHxW6WDPg5JRMWIHXSY=;
-  b=h6JPcthYDGP/BvIDDAnbhAj7nC/RTenaU24i0ULq4rpev/UZiFZSKVQo
-   VodzKP2xduBjI/eCZy+ECUlKPl54pMd20ni8w4zy6XjROaWE7ptnNOJJM
-   j/cxu3bb6oJVfLsUWGJB4jzxAow9EEm+h/tbiiaN+TNq9x2FO4E2rFdIT
-   EZt7nBmxPencOHGjKuR3jlGEzejzZk11Q3uwmDuu9sniQq3dxjhzOVCA0
-   DcyQ6KFUJQgoqsFstl1FzHude8w8S8iqqZ9UCrx35HX9O/tz+VNvTWVLe
-   hVELGKIoZDcxFD3dwzhXPXo/PcMd7k4a2Tn41pASNZwFe6qTcPf4nWcof
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="425302678"
-X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
-   d="scan'208";a="425302678"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2023 16:26:18 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="764912669"
-X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
-   d="scan'208";a="764912669"
-Received: from pkaminsk-mobl1.amr.corp.intel.com (HELO [10.124.112.216]) ([10.124.112.216])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2023 16:26:17 -0800
-Message-ID: <340900d4-b30a-4387-9ce2-1971e8d8024c@intel.com>
-Date: Wed, 6 Dec 2023 18:26:13 -0600
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFB89D68;
+	Wed,  6 Dec 2023 16:28:27 -0800 (PST)
+Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-54cdef4c913so3065050a12.1;
+        Wed, 06 Dec 2023 16:28:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701908906; x=1702513706; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=js3vvEMH89qmox90J/KM0UnK1/RXnwyqtGHvEr0H27c=;
+        b=NZJGnH31Ve8w/7MXJCoAsJz8gqvgt9ejM/vpFGNMdQv+33Da+cEOgkeL3BuB77Jsy+
+         Mi3hgKk9bFkjQvo7ywDX9KVaisTO4rQUoQSXn6y9VrIhyIF/KXrO78HcDKRLw+hMERjD
+         wLAElJV2ZDM7NlvDLrNwRxkiOuKqalAj/z+iIlLPYi4rp4l0A7WOQhvAzgsKAFvDRdVg
+         8McXQw+3ia79lnMlSUgKgE2JgKk/oFJ/aL7URTQyVU3qv4g4IZGRaMuoWT4tHCRdD1hk
+         EFwrx4Eg9K+4ECNROoxyMvC5AhS/V9IfRz6ZD+juIpOq+KWlSuSWh+uq0KgSya5q446c
+         kJBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701908906; x=1702513706;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=js3vvEMH89qmox90J/KM0UnK1/RXnwyqtGHvEr0H27c=;
+        b=LZbvFvybzq2QyZb1LFx3bIEXKZ/Mpi0zg+8lij3bj4kPZFvFRrPu3VOqqBjAuqCQRn
+         PnFXZPfDO9iYOc/cE4auG/fBLprMs0qIRiEET7S/StTvzKswQHndnZzdv9eQBQ/CHnxz
+         2UvCoFGea8pVFU7O8xoSOYnQe3XJdpTW2mnsZAqTN6b7FRcUJS1FI6dLKCMxdgC2qRDp
+         c7YRaddtBmuMW44Egwf/oRrelrJ9wU7o/B0GTfCHBcbbIsNDl9pCkrkHTAuxcxRNPfuX
+         ZPTk7OfkSK9RTli2IzHQBFvIH6x1djRK94pbr2XqHBRqf76b8iF3XNOayNR2KogcYjx5
+         vz+g==
+X-Gm-Message-State: AOJu0YzeuFx9W6LCswwB84CeALvZicxh0qeyDwNMj6cgwOrJ7SehpS0i
+	+6ThWTMEBDBi7QUD7rSSKAo=
+X-Google-Smtp-Source: AGHT+IGNrT7hViTJQsGamQ4k6tqu+2atpHkoEskaMm1SjUu6xtabZMmDurcam3BxY8sx0Tfbz78Ykg==
+X-Received: by 2002:a17:906:f951:b0:a01:ae9a:c1d3 with SMTP id ld17-20020a170906f95100b00a01ae9ac1d3mr3266896ejb.11.1701908905883;
+        Wed, 06 Dec 2023 16:28:25 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id f21-20020a170906c09500b00a1cd30d06d1sm86543ejz.14.2023.12.06.16.28.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 16:28:25 -0800 (PST)
+Date: Thu, 7 Dec 2023 02:28:23 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next v1 3/3] net: dsa: microchip: Fix PHY loopback
+ configuration for KSZ8794 and KSZ8873
+Message-ID: <20231207002823.2qx24nxjhn6e43w4@skbuf>
+References: <20231121152426.4188456-1-o.rempel@pengutronix.de>
+ <20231121152426.4188456-1-o.rempel@pengutronix.de>
+ <20231121152426.4188456-3-o.rempel@pengutronix.de>
+ <20231121152426.4188456-3-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v1] ice: Add support for devlink loopback param.
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: intel-wired-lan@osuosl.org, netdev@vger.kernel.org,
- Michal Wilczynski <michal.wilczynski@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-References: <20231201235949.62728-1-pawel.kaminski@intel.com>
- <20231201183704.382f5964@kernel.org>
-From: "Kaminski, Pawel" <pawel.kaminski@intel.com>
-In-Reply-To: <20231201183704.382f5964@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231121152426.4188456-3-o.rempel@pengutronix.de>
+ <20231121152426.4188456-3-o.rempel@pengutronix.de>
 
-On 2023-12-01 20:37, Jakub Kicinski wrote:
-> On Fri,  1 Dec 2023 15:59:49 -0800 Pawel Kaminski wrote:
->> Add support for devlink loopback param. Supported values are "enabled",
->> "disabled" and "prioritized". Default configuration is set to "enabled.
->>
->> By default loopback traffic BW is locked to PF configured BW.
+On Tue, Nov 21, 2023 at 04:24:26PM +0100, Oleksij Rempel wrote:
+> Correct the PHY loopback bit handling in the ksz8_w_phy_bmcr and
+> ksz8_r_phy_bmcr functions for KSZ8794 and KSZ8873 variants in the ksz8795
+> driver. Previously, the code erroneously used Bit 7 of port register 0xD
+> for both chip variants, which is actually for LED configuration. This
+> update ensures the correct registers and bits are used for the PHY
+> loopback feature:
 > 
-> First off - hairpin-bandwidth or some such would be a much better name.
-> Second - you must explain every devlink param in Documentation/
+> - For KSZ8794: Use 0xF / Bit 7.
+> - For KSZ8873: Use 0xD / Bit 0.
 > 
-> Also admission ctrl vs prioritizing sounds like different knobs.
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> ---
 
-While at certain abstraction level I agree, in my opinion it is not 
-worth here to divide this to separate knobs, since underlying logic (FW) 
-doesn't follow that anyways. It is driver specific and extremely 
-unlikely to change in the future. Hopefully next gen card will not need 
-this knob at all.
+How did you find, and how did you test this, and on which one of the switches?
 
->> HW is
->> capable of higher speeds on loopback traffic. Loopback param set to
->> "prioritized" enables HW BW prioritization for VF to VF traffic,
->> effectively increasing BW between VFs. Applicable to 8x10G and 4x25G
->> cards.
-> 
-> Not very clear what this means...
-> So the VFs are Tx bandwidth limited to link speed.
-> How does the device know it can admit extra traffic?
-> Presumably this doesn't affect rates set by devlink rate?
+Opening the KSZ8873 datasheet, I am confused about their description of
+the "far-end loopback". They make it sound as if this loops the packets
+_received_ from the media side of PHY port A back to the transmit side
+of PHY port A. But the route that these packets take is through the MAC
+of PHY port A, then the switching fabric, then PHY port B which reflects
+them back to PHY port A, where they finally egress.
 
-I will rewrite the description and explanation in v2 and include 
-documentation change.
+Actually, they even go as far as saying that if you set the loopback bit
+of port 1, the packets that will be looped back will be from port 2's
+RXP/RXM to TXP/TXM pins, and viceversa.
 
-Thank you,
-PK
+If true, I believe this isn't the behavior expected by phy_loopback(),
+where the TX signals from the media side of the PHY are looped back into
+the RX side.
 
