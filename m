@@ -1,120 +1,165 @@
-Return-Path: <netdev+bounces-54896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EFEA808E18
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:02:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D30DE808E28
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:04:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20017281723
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 17:02:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DBE1281767
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 17:04:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8459E46BAE;
-	Thu,  7 Dec 2023 17:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EA71481CF;
+	Thu,  7 Dec 2023 17:04:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LMUhrtqF"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ea13UkkR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65A951703
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 09:02:06 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-50c0f13ea11so1108366e87.3
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 09:02:06 -0800 (PST)
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF6111709
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 09:04:14 -0800 (PST)
+Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-332c0c32d19so1410193f8f.3
+        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 09:04:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701968524; x=1702573324; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8Pwe3YBA5UG9UkG+sVNwMWmUm/BEDRYKqzUTKwcYJZs=;
-        b=LMUhrtqF0YqvYn+rfhm+w/tq8SzgsUnQujYnPWshwwsZMSIs0Z0Z07EWe8XEotipP+
-         rFYc7Q0AYckqX+l7U/bf4naM6OuV3xP8j4jTEzN3kC7bUi6lrMrRNdZ2z0uSsIgFo1zo
-         qTXAHOfNqIvXR8Oxhv9PupoKcXRPJW/gBQ5C/QSOgIqKhjfZGADC4L/HkZu3CwdcniVK
-         inDdnwt8cHj4ttjKnoyetoeyTmv/TLnUBaxBatVPi0wyCTE8t0fbq3wsFJodJIOBZSaS
-         rvAT2mtlfuKVbalu/Et3Ko+i4T1wLyf1QXSBfw61D2FRn3imtNdx4PUE5Kba3R+/+5Di
-         21Gw==
+        d=linaro.org; s=google; t=1701968653; x=1702573453; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wIK0i4TzjdboGcUSVSsAnrSwQJ8ReNMyGt/OVRNCE2k=;
+        b=Ea13UkkRptvrXsBWGmi5dgBZMtI3IGxVo8xNLd1eKAgKrbvy7eBexBWrHpBCTox9VM
+         2Xgxpyx65Y9HLjCn9y+VGBDA7toSG0gY3+Yn0AJAty6oq8NJjDbFT0M/eyjneQ4RR1Eh
+         8FDPCWR9xArq+HUeHd7KpAuaF9t/DZjjJ4nGY0RL9cCY21O3W0hUGf19Y16k8//R59DI
+         BZTc0KfKFJZRa8Gas6bbkxKxzuNMV+jFcCuLSWAri55Iyhyzk5Sw0tp6/vR1PXBrF24r
+         NV/jyZS9KIO8UQCtKO6DDnsDD/+/JaB03Ou0dnC9rid7hKWqWE02gkmWRl1HZQwT2+2G
+         IbfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701968524; x=1702573324;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8Pwe3YBA5UG9UkG+sVNwMWmUm/BEDRYKqzUTKwcYJZs=;
-        b=BvgY+kcecS66XVDA/Hg/rYmK0q/HL37euzeponoB1EdkDnBBRZQ5fNZpu1L209P0R/
-         N+L4fECSfvVRDvxgOhzzrT51o7QoI+iBsYXOtuk65INRyoyofFy7GP6Xo+AkhGg/6BOD
-         0Qe56WhBBcbN0s9ZZs1qmysLuPZb2k0L7+DzjuX+R4ZHCIvnaVjibvjV867LAX6IcuYk
-         IlLvGB77QlyKv1YYnpHVOduqgLpdDNKQOLDg8XBVlH7g0R/JHk1h4UjVjoRlRL29F4y4
-         QlODZv+JQXmwJfed4L2dseR5rQeLtJ+OeJRG6Y0Ai8uULrdBJ8YleaWcw+TpLkVqkiH/
-         8dVg==
-X-Gm-Message-State: AOJu0Yyl2iBoZ234U1Z4plWBxlRrOtLIgexo6ae2ZGGTUjP4cdXGyGq/
-	RJ2/Z7j6HxB1PktgGtpl2Z0=
-X-Google-Smtp-Source: AGHT+IHcmMl4kmkn60Kxrbp8J40wA/z44GBjZh2+Fi7+xfmKipO1IikRj03iLFa7L08ROWtwzmLSRg==
-X-Received: by 2002:a2e:b0ce:0:b0:2c9:f58b:70c with SMTP id g14-20020a2eb0ce000000b002c9f58b070cmr1646820ljl.10.1701968524140;
-        Thu, 07 Dec 2023 09:02:04 -0800 (PST)
-Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id kh10-20020a170906f80a00b00a0180de2797sm1046611ejb.74.2023.12.07.09.02.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Dec 2023 09:02:03 -0800 (PST)
-Date: Thu, 7 Dec 2023 19:02:01 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: Alvin =?utf-8?Q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	"linus.walleij@linaro.org" <linus.walleij@linaro.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"andrew@lunn.ch" <andrew@lunn.ch>,
-	"f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"arinc.unal@arinc9.com" <arinc.unal@arinc9.com>
-Subject: Re: [net-next 2/2] net: dsa: realtek: load switch variants on demand
-Message-ID: <20231207170201.xq3it75hqqd6qnzj@skbuf>
-References: <20231117235140.1178-3-luizluca@gmail.com>
- <9460eced-5a3b-41c0-b821-e327f6bd06c9@kernel.org>
- <20231120134818.e2k673xsjec5scy5@skbuf>
- <b304af68-7ce1-49b5-ab62-5473970e618f@kernel.org>
- <CAJq09z5nOnwtL_rOsmReimt+76uRreDiOW_+9r==YJXF4+2tYg@mail.gmail.com>
- <95381a84-0fd0-4f57-88e4-1ed31d282eee@kernel.org>
- <7afdc7d6-1382-48c0-844b-790dcb49fdc2@kernel.org>
- <CAJq09z5uVjjE1k2ugVGctsUvn5yLwLQAM6u750Z4Sz7cyW5rVQ@mail.gmail.com>
- <vcq6qsx64ulmhflxm4vji2zelr2xj5l7o35anpq3csxasbiffe@xlugnyxbpyyg>
- <CAJq09z4ZdB9L7ksuN0b+N-LCv+zOvM+5Q9iWXccGN3w54EN1_Q@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1701968653; x=1702573453;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wIK0i4TzjdboGcUSVSsAnrSwQJ8ReNMyGt/OVRNCE2k=;
+        b=p7s/BP3ftZVBn3YO4MmPOim+sEru0HtlqeXs4r1QdzOxS5A+Kp1RgLEaFEJ2xIUHj1
+         CZ+JRUBLF9TeWYF144lMAKV/W9ZrmRZqLuU12TwMTv4fJIdWrZROKE3n2CpaFL6QIh83
+         1AtJrngIX2LKBG0Z3O7rtkEdayyqxFIGNg6IABrxIj7OUrfE200xHh1v+8Ei6k86mYFC
+         TAFogtNb7Vk77/mbdTGA6fjvxg6FDSH9YBeAauiQ0PhMpGF5qCYR+YOek5jYpJOScrtJ
+         TLhrvB8dCKo9Y93OgEaMs2owCgH7GoviGOhFhKzsw5Nz6oEmnCbV8Z0uBNtqqLwgg2ZX
+         Vyiw==
+X-Gm-Message-State: AOJu0YxjahP/1yBmOqXR3P4zUKhBx0ZkFpn7c8atY5rR9UiXOCGqkW+K
+	6B6RQpQY0pKIyLreACNMqmMQQA==
+X-Google-Smtp-Source: AGHT+IHIKz0oA9x3+g76SEzo9UIbVaO2JrxPwmG1Hvcdjofzjv0HBTFxjn24wY3gV7tbvwTmdgs7Jw==
+X-Received: by 2002:a5d:5041:0:b0:333:2fd2:2f10 with SMTP id h1-20020a5d5041000000b003332fd22f10mr1527867wrt.137.1701968653173;
+        Thu, 07 Dec 2023 09:04:13 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.218.27])
+        by smtp.gmail.com with ESMTPSA id o12-20020a5d474c000000b003333dd777a4sm99632wrs.46.2023.12.07.09.03.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Dec 2023 09:04:12 -0800 (PST)
+Message-ID: <64ee48fc-4f77-48cc-b235-c9fb2b10afc4@linaro.org>
+Date: Thu, 7 Dec 2023 18:03:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJq09z4ZdB9L7ksuN0b+N-LCv+zOvM+5Q9iWXccGN3w54EN1_Q@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/4] dt-bindings: clock: mediatek: add clock
+ controllers of MT7988
+Content-Language: en-US
+To: Daniel Golle <daniel@makrotopia.org>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Sabrina Dubroca <sd@queasysnail.net>, Jianhui Zhao <zhaojh329@gmail.com>,
+ Chen-Yu Tsai <wenst@chromium.org>, "Garmin.Chang"
+ <Garmin.Chang@mediatek.com>, Sam Shih <sam.shih@mediatek.com>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Dan Carpenter <dan.carpenter@linaro.org>,
+ James Liao <jamesjj.liao@mediatek.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org
+References: <23bc89d407e7797e97b703fa939b43bfe79296ce.1701823757.git.daniel@makrotopia.org>
+ <def05aac79ddff872d3e56698b736cb445f14116.1701823757.git.daniel@makrotopia.org>
+ <3e72bff6-9f4d-4cd4-845e-b065f1233ec6@collabora.com>
+ <ZXBs9GOOOlZrMuSW@makrotopia.org>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <ZXBs9GOOOlZrMuSW@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 27, 2023 at 07:24:16PM -0300, Luiz Angelo Daros de Luca wrote:
-> I'm not sure if getting/putting a module is a problem or if I can
-> request it when missing. I would like some options on that specific
-> topic from the experts. It seems to happen in many places, even in DSA
-> tag code.
+On 06/12/2023 13:45, Daniel Golle wrote:
+>>> +properties:
+>>> +  compatible:
+>>> +    items:
+>>> +      - const: mediatek,mt7988-ethwarp
+>>> +      - const: syscon
+>>> +      - const: simple-mfd
+>>
+>> No, this is not a mfd, I say.
+>>
+>> Prove me wrong! :-)
 > 
-> I wouldn't say it will invariably require both interface modules to be
-> loaded. The dynamic load would be much simpler if variants request the
-> interface module as we only have two (at most 3 with a future
-> realtek-spi) modules. We would just need to call a
-> realtek_interface_get() and realtek_interface_put() on each respective
-> probe. The module names will be well-known with no issues with
-> module_alias.
+> https://github.com/dangowrt/linux/blob/mt7988-for-next/arch/arm64/boot/dts/mediatek/mt7988a.dtsi#L564
 > 
-> Thanks for your help, Alvin. I'll wait for a couple of more days for
-> others to manifest.
+> The 'simple-mfd' compatible is required to have the Linux
+> kernel probe drivers for sub-nodes -- several drivers will act on
+> the different aspects of the circuit exposed at this memory range.
+> From what I understand, this is the definition of a MFD.
 
-I'm not an expert on this topic either, but Alvin's suggestion makes
-sense to have the switch variant drivers be both platform and MDIO
-device drivers, and call symbols exported by the interface drivers as
-needed.
+We know what is MFD, so no need to teach us. We expect you to look at
+this. You do not have subnodes, so MFD is pointless. Showing DTSI means
+nothing except that you did not test your bindings.
 
-If you are able to make the variant driver depend on just the interface
-driver in use based on some request_module() calls, I don't think that
-will be a problem with Krzysztof either, since he just said to not
-duplicate the MODULE_DEVICE_TABLE() functionality.
+Best regards,
+Krzysztof
 
-I think it's down to prototyping something and seeing what are the pros
-and cons.
 
