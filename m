@@ -1,156 +1,328 @@
-Return-Path: <netdev+bounces-54976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86272809103
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 20:07:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 412FD809100
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 20:07:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0203D1F21168
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:07:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA4A31F211E1
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:07:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DE424EB5C;
-	Thu,  7 Dec 2023 19:07:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0937F4EB37;
+	Thu,  7 Dec 2023 19:07:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MV6LSP0V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5zJZKYL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEE45122;
-	Thu,  7 Dec 2023 11:07:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701976071; x=1733512071;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=pmpl+6ezX0Ah9BkO+Ag8eq4zTiI/Wi2kFTYQxpuuf98=;
-  b=MV6LSP0V/1DWVUmNVg1DNc955S0SdNZKDOIzsDN4B/ofiTyMk8fZ0rda
-   rYNEdQDlo3aq+hAbF7cDEdb95fKtzd5ZefkTA8tBw3b3O0FMhsDbiDYcl
-   esjZ2tg4D2YBe8rqHhKLyN/K1QYlb7SUh4sklWHrm1ZRT3tMjDczaHg4N
-   M1AniVghCDCDYHZJcomrocOGTtzIynqY2e5qcA2L9U5BU96O0exe1iCF4
-   MkOjHy9WjcC7Y3j3346zZlaroRghfTQU1RU2t4SH0ur+502C21az6le2l
-   nFWYz6vB6bfsCoJlJp5Yhoor54brHgFhWYz4rIAQo0hWDF+I/wEkWXWfI
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="1357819"
-X-IronPort-AV: E=Sophos;i="6.04,258,1695711600"; 
-   d="scan'208";a="1357819"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2023 11:07:51 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="895246434"
-X-IronPort-AV: E=Sophos;i="6.04,258,1695711600"; 
-   d="scan'208";a="895246434"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by orsmga004.jf.intel.com with ESMTP; 07 Dec 2023 11:07:44 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rBJio-000CiZ-06;
-	Thu, 07 Dec 2023 19:07:42 +0000
-Date: Fri, 8 Dec 2023 03:06:59 +0800
-From: kernel test robot <lkp@intel.com>
-To: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Luka Perkov <luka.perkov@sartura.hr>,
-	Robert Marko <robert.marko@sartura.hr>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@somainline.org>
-Subject: Re: [PATCH net-next v3 5/8] net: qualcomm: ipqess: add bridge
- offloading features to the IPQESS driver
-Message-ID: <202312080233.sRrkY9Q5-lkp@intel.com>
-References: <20231114105600.1012056-6-romain.gantois@bootlin.com>
+Received: from mail-oa1-x34.google.com (mail-oa1-x34.google.com [IPv6:2001:4860:4864:20::34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B83EB10DC;
+	Thu,  7 Dec 2023 11:07:16 -0800 (PST)
+Received: by mail-oa1-x34.google.com with SMTP id 586e51a60fabf-1fb04b2251bso872993fac.0;
+        Thu, 07 Dec 2023 11:07:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701976036; x=1702580836; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2NO+bCRkaU0DSrSI6joTFWWkgOisLNkFpllFmbKTXPo=;
+        b=e5zJZKYLJGghF9o1X9SAM5Xv/s8UHhTjga89opiCjcYpiicKTus31vX72mnqNhEJSA
+         Y+J3pZWR/tfRvVsoOuYScZht0gdKR5BK/kbQxv+Yq1EZIg+Ca9DYRwe4AEiMuBDgxMrf
+         UVFovbdQXTu/VMDfiZsKargJRe+/CG1Dp4huFKx5j4sbK6dMDKAR/F9pn5yxj71eXFwV
+         bJMtJbG0beKKHP8XYVjyy+jm6jDpbd/r9fObx2MInZzPoSCc48lKO3YFhh6xBnmpO11r
+         2EjZyXxA0gOltyxKxgAj2i2YDctk/JTBPvbHG0f0MRACWB85b++nnsn0NR5XCqr9dgzV
+         pNEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701976036; x=1702580836;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2NO+bCRkaU0DSrSI6joTFWWkgOisLNkFpllFmbKTXPo=;
+        b=dtGj9iL6h4jr/eKL7gHp+l4/w+adqqreLJjxeRut5Koe2ANp1SEgC4QCP/rQwbveg4
+         c2NY7C1Iw3dnTtg7iUOU/9ldWosJ8QS1hc9S5Wr3NzZnUvaYlIt5sPjOgL//nEjSf+UB
+         1swP1Q0PCOzBhnRF1Lwh6z5B8kWvzBhXo65eaTCd5mPgO/fy8j2+Ri6vWsYCUJLT8Gb9
+         h6csNFn28ZcFE5TOq39B0ciHllScIsPcN4LuslC07m/uf/fi/OhJkiybm9sGVjGPJ8dM
+         Ut7TJd3qiRSnNka4QJ51aJYJcdpTQkyaH5K+fWQ1ZoYHlMvJeW3wAI5q+eup50AKO1G9
+         caqg==
+X-Gm-Message-State: AOJu0YzIefxPGPO64wCsTOsGUyYMNI7tgX4dXmOj3bXFf8buFUqNgdSV
+	tSSnuJ0VsbgyFqAYCMFNDvY=
+X-Google-Smtp-Source: AGHT+IFbvzrtU8Rnhw6vNIEX10en57yLLr8MNJrGVLqQ7al+Prp9yviQxjB6qol2pVOL0o/30gT81g==
+X-Received: by 2002:a05:6870:4724:b0:1fb:29f8:20e6 with SMTP id b36-20020a056870472400b001fb29f820e6mr3280545oaq.82.1701976035943;
+        Thu, 07 Dec 2023 11:07:15 -0800 (PST)
+Received: from ?IPV6:2603:8081:1405:679b:ca1f:53fd:59c8:8b84? (2603-8081-1405-679b-ca1f-53fd-59c8-8b84.res6.spectrum.com. [2603:8081:1405:679b:ca1f:53fd:59c8:8b84])
+        by smtp.gmail.com with ESMTPSA id xa14-20020a0568707f0e00b001faff1908d3sm80181oab.53.2023.12.07.11.07.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Dec 2023 11:07:15 -0800 (PST)
+Message-ID: <319ba5c7-1ce8-4417-86de-0b42e8abad16@gmail.com>
+Date: Thu, 7 Dec 2023 13:07:14 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231114105600.1012056-6-romain.gantois@bootlin.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH for-next v5 3/7] RDMA/rxe: Register IP mcast address
+To: Rain River <rain.1986.08.12@gmail.com>, Zhu Yanjun <yanjun.zhu@linux.dev>
+Cc: jgg@nvidia.com, linux-rdma@vger.kernel.org, dsahern@kernel.org,
+ davem@davemloft.net, netdev@vger.kernel.org
+References: <20231205002613.10219-1-rpearsonhpe@gmail.com>
+ <763abeeb-64b2-496f-9249-b588d1d47e60@linux.dev>
+ <7f5d614e-dc1a-47ce-b573-60ba8c5a21fa@linux.dev>
+ <CAJr_XRDphUUTLbXJbbVGjaQ-HBQ59DioQs_0PSVvmLpGiHk1FQ@mail.gmail.com>
+Content-Language: en-US
+From: Bob Pearson <rpearsonhpe@gmail.com>
+In-Reply-To: <CAJr_XRDphUUTLbXJbbVGjaQ-HBQ59DioQs_0PSVvmLpGiHk1FQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Romain,
 
-kernel test robot noticed the following build warnings:
 
-[auto build test WARNING on net-next/main]
+On 12/6/23 19:47, Rain River wrote:
+> On Tue, Dec 5, 2023 at 6:30 PM Zhu Yanjun <yanjun.zhu@linux.dev> wrote:
+>>
+>>
+>> 在 2023/12/5 13:55, Zhu Yanjun 写道:
+>>> Add David S. Miller and  David Ahern.
+>>>
+>>> They are the maintainers in netdev and very familiar with mcast.
+>>>
+>>> Zhu Yanjun
+>>>
+>>> 在 2023/12/5 8:26, Bob Pearson 写道:
+>>>> Currently the rdma_rxe driver does not receive mcast packets at all.
+>>>>
+>>>> Add code to rxe_mcast_add() and rxe_mcast_del() to register/deregister
+>>>> the IP mcast address. This is required for mcast traffic to reach the
+>>>> rxe driver when coming from an external source.
+>>>>
+>>>> Fixes: 8700e3e7c485 ("Soft RoCE driver")
+>>>> Signed-off-by: Bob Pearson <rpearsonhpe@gmail.com>
+>>>> ---
+>>>>    drivers/infiniband/sw/rxe/rxe_mcast.c | 119 +++++++++++++++++++++-----
+>>>>    drivers/infiniband/sw/rxe/rxe_net.c   |   2 +-
+>>>>    drivers/infiniband/sw/rxe/rxe_net.h   |   1 +
+>>>>    drivers/infiniband/sw/rxe/rxe_verbs.h |   1 +
+>>>>    4 files changed, 102 insertions(+), 21 deletions(-)
+>>>>
+>>>> diff --git a/drivers/infiniband/sw/rxe/rxe_mcast.c
+>>>> b/drivers/infiniband/sw/rxe/rxe_mcast.c
+>>>> index 86cc2e18a7fd..54735d07cee5 100644
+>>>> --- a/drivers/infiniband/sw/rxe/rxe_mcast.c
+>>>> +++ b/drivers/infiniband/sw/rxe/rxe_mcast.c
+>>>> @@ -19,38 +19,116 @@
+>>>>     * mcast packets in the rxe receive path.
+>>>>     */
+>>>>    +#include <linux/igmp.h>
+>>>> +
+>>>>    #include "rxe.h"
+>>>>    -/**
+>>>> - * rxe_mcast_add - add multicast address to rxe device
+>>>> - * @rxe: rxe device object
+>>>> - * @mgid: multicast address as a gid
+>>>> - *
+>>>> - * Returns 0 on success else an error
+>>>> - */
+>>>> -static int rxe_mcast_add(struct rxe_dev *rxe, union ib_gid *mgid)
+>>>> +static int rxe_mcast_add6(struct rxe_dev *rxe, union ib_gid *mgid)
+>>>>    {
+>>>> +    struct in6_addr *addr6 = (struct in6_addr *)mgid;
+>>>> +    struct sock *sk = recv_sockets.sk6->sk;
+>>>>        unsigned char ll_addr[ETH_ALEN];
+>>>> +    int err;
+>>>> +
+>>>> +    spin_lock_bh(&sk->sk_lock.slock);
+>>>> +    rtnl_lock();
+>>>> +    err = ipv6_sock_mc_join(sk, rxe->ndev->ifindex, addr6);
+>>
+>>
+>> Normally sk_lock is used. Not sure if spin_lock_bh is correct or not.
+> 
+> ./net/ipv6/addrconf.c-2915-     lock_sock(sk);
+> ./net/ipv6/addrconf.c-2916-     if (join)
+> ./net/ipv6/addrconf.c:2917:             ret = ipv6_sock_mc_join(sk,
+> ifindex, addr);
+> ./net/ipv6/addrconf.c-2918-     else
+> ./net/ipv6/addrconf.c-2919-             ret = ipv6_sock_mc_drop(sk,
+> ifindex, addr);
+> ./net/ipv6/addrconf.c-2920-     release_sock(sk);
+> 
+> Should be lock_sock?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Romain-Gantois/dt-bindings-net-Introduce-the-Qualcomm-IPQESS-Ethernet-switch/20231114-185953
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231114105600.1012056-6-romain.gantois%40bootlin.com
-patch subject: [PATCH net-next v3 5/8] net: qualcomm: ipqess: add bridge offloading features to the IPQESS driver
-config: arc-randconfig-r112-20231116 (https://download.01.org/0day-ci/archive/20231208/202312080233.sRrkY9Q5-lkp@intel.com/config)
-compiler: arc-elf-gcc (GCC) 13.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20231208/202312080233.sRrkY9Q5-lkp@intel.com/reproduce)
+It works as well as spin_lock_bh() in preventing the RCU splat and
+looks like the preferred way. I'll make this change.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312080233.sRrkY9Q5-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/net/dsa/qca/qca8k-8xxx.c:1982:5: sparse: sparse: symbol 'qca8k_dsa_port_fdb_dump' was not declared. Should it be static?
->> drivers/net/dsa/qca/qca8k-8xxx.c:1988:6: sparse: sparse: symbol 'qca8k_dsa_port_stp_state_set' was not declared. Should it be static?
->> drivers/net/dsa/qca/qca8k-8xxx.c:1995:6: sparse: sparse: symbol 'qca8k_dsa_port_fast_age' was not declared. Should it be static?
->> drivers/net/dsa/qca/qca8k-8xxx.c:2000:5: sparse: sparse: symbol 'qca8k_dsa_set_ageing_time' was not declared. Should it be static?
->> drivers/net/dsa/qca/qca8k-8xxx.c:2005:5: sparse: sparse: symbol 'qca8k_dsa_port_vlan_filtering' was not declared. Should it be static?
->> drivers/net/dsa/qca/qca8k-8xxx.c:2012:5: sparse: sparse: symbol 'qca8k_dsa_vlan_add' was not declared. Should it be static?
-
-vim +/qca8k_dsa_port_fdb_dump +1982 drivers/net/dsa/qca/qca8k-8xxx.c
-
-  1981	
-> 1982	int qca8k_dsa_port_fdb_dump(struct dsa_switch *ds, int port,
-  1983				    dsa_fdb_dump_cb_t *cb, void *data)
-  1984	{
-  1985		return qca8k_port_fdb_dump(ds->priv, port, cb, data);
-  1986	}
-  1987	
-> 1988	void qca8k_dsa_port_stp_state_set(struct dsa_switch *ds, int port,
-  1989					  u8 state)
-  1990	{
-  1991		qca8k_port_stp_state_set(ds->priv, port, state,
-  1992					 dsa_to_port(ds, port)->learning, true);
-  1993	}
-  1994	
-> 1995	void qca8k_dsa_port_fast_age(struct dsa_switch *ds, int port)
-  1996	{
-  1997		qca8k_port_fast_age(ds->priv, port);
-  1998	}
-  1999	
-> 2000	int qca8k_dsa_set_ageing_time(struct dsa_switch *ds, unsigned int msecs)
-  2001	{
-  2002		return qca8k_set_ageing_time(ds->priv, msecs);
-  2003	}
-  2004	
-> 2005	int qca8k_dsa_port_vlan_filtering(struct dsa_switch *ds, int port,
-  2006					  bool vlan_filtering,
-  2007					  struct netlink_ext_ack *extack)
-  2008	{
-  2009		return qca8k_port_vlan_filtering(ds->priv, port, vlan_filtering);
-  2010	}
-  2011	
-> 2012	int qca8k_dsa_vlan_add(struct dsa_switch *ds, int port,
-  2013			       const struct switchdev_obj_port_vlan *vlan,
-  2014			       struct netlink_ext_ack *extack)
-  2015	{
-  2016		return qca8k_port_vlan_add(ds->priv, port, vlan, extack);
-  2017	}
-  2018	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Bob
+> 
+>>
+>> Please Jason or experts from netdev comment on this.
+>>
+>> Thanks,
+>>
+>> Zhu Yanjun
+>>
+>>
+>>>> +    rtnl_unlock();
+>>>> +    spin_unlock_bh(&sk->sk_lock.slock);
+>>>> +    if (err && err != -EADDRINUSE)
+>>>> +        goto err_out;
+>>>>          ipv6_eth_mc_map((struct in6_addr *)mgid->raw, ll_addr);
+>>>> +    err = dev_mc_add(rxe->ndev, ll_addr);
+>>>> +    if (err)
+>>>> +        goto err_drop;
+>>>> +
+>>>> +    return 0;
+>>>>    -    return dev_mc_add(rxe->ndev, ll_addr);
+>>>> +err_drop:
+>>>> +    spin_lock_bh(&sk->sk_lock.slock);
+>>>> +    rtnl_lock();
+>>>> +    ipv6_sock_mc_drop(sk, rxe->ndev->ifindex, addr6);
+>>>> +    rtnl_unlock();
+>>>> +    spin_unlock_bh(&sk->sk_lock.slock);
+>>>> +err_out:
+>>>> +    return err;
+>>>>    }
+>>>>    -/**
+>>>> - * rxe_mcast_del - delete multicast address from rxe device
+>>>> - * @rxe: rxe device object
+>>>> - * @mgid: multicast address as a gid
+>>>> - *
+>>>> - * Returns 0 on success else an error
+>>>> - */
+>>>> -static int rxe_mcast_del(struct rxe_dev *rxe, union ib_gid *mgid)
+>>>> +static int rxe_mcast_add(struct rxe_mcg *mcg)
+>>>>    {
+>>>> +    struct rxe_dev *rxe = mcg->rxe;
+>>>> +    union ib_gid *mgid = &mcg->mgid;
+>>>>        unsigned char ll_addr[ETH_ALEN];
+>>>> +    struct ip_mreqn imr = {};
+>>>> +    int err;
+>>>> +
+>>>> +    if (mcg->is_ipv6)
+>>>> +        return rxe_mcast_add6(rxe, mgid);
+>>>> +
+>>>> +    imr.imr_multiaddr = *(struct in_addr *)(mgid->raw + 12);
+>>>> +    imr.imr_ifindex = rxe->ndev->ifindex;
+>>>> +    rtnl_lock();
+>>>> +    err = ip_mc_join_group(recv_sockets.sk4->sk, &imr);
+>>>> +    rtnl_unlock();
+>>>> +    if (err && err != -EADDRINUSE)
+>>>> +        goto err_out;
+>>>> +
+>>>> +    ip_eth_mc_map(imr.imr_multiaddr.s_addr, ll_addr);
+>>>> +    err = dev_mc_add(rxe->ndev, ll_addr);
+>>>> +    if (err)
+>>>> +        goto err_leave;
+>>>> +
+>>>> +    return 0;
+>>>> +
+>>>> +err_leave:
+>>>> +    rtnl_lock();
+>>>> +    ip_mc_leave_group(recv_sockets.sk4->sk, &imr);
+>>>> +    rtnl_unlock();
+>>>> +err_out:
+>>>> +    return err;
+>>>> +}
+>>>> +
+>>>> +static int rxe_mcast_del6(struct rxe_dev *rxe, union ib_gid *mgid)
+>>>> +{
+>>>> +    struct sock *sk = recv_sockets.sk6->sk;
+>>>> +    unsigned char ll_addr[ETH_ALEN];
+>>>> +    int err, err2;
+>>>>          ipv6_eth_mc_map((struct in6_addr *)mgid->raw, ll_addr);
+>>>> +    err = dev_mc_del(rxe->ndev, ll_addr);
+>>>> +
+>>>> +    spin_lock_bh(&sk->sk_lock.slock);
+>>>> +    rtnl_lock();
+>>>> +    err2 = ipv6_sock_mc_drop(sk, rxe->ndev->ifindex,
+>>>> +            (struct in6_addr *)mgid);
+>>>> +    rtnl_unlock();
+>>>> +    spin_unlock_bh(&sk->sk_lock.slock);
+>>>> +
+>>>> +    return err ?: err2;
+>>>> +}
+>>>> +
+>>>> +static int rxe_mcast_del(struct rxe_mcg *mcg)
+>>>> +{
+>>>> +    struct rxe_dev *rxe = mcg->rxe;
+>>>> +    union ib_gid *mgid = &mcg->mgid;
+>>>> +    unsigned char ll_addr[ETH_ALEN];
+>>>> +    struct ip_mreqn imr = {};
+>>>> +    int err, err2;
+>>>> +
+>>>> +    if (mcg->is_ipv6)
+>>>> +        return rxe_mcast_del6(rxe, mgid);
+>>>> +
+>>>> +    imr.imr_multiaddr = *(struct in_addr *)(mgid->raw + 12);
+>>>> +    imr.imr_ifindex = rxe->ndev->ifindex;
+>>>> +    ip_eth_mc_map(imr.imr_multiaddr.s_addr, ll_addr);
+>>>> +    err = dev_mc_del(rxe->ndev, ll_addr);
+>>>> +
+>>>> +    rtnl_lock();
+>>>> +    err2 = ip_mc_leave_group(recv_sockets.sk4->sk, &imr);
+>>>> +    rtnl_unlock();
+>>>>    -    return dev_mc_del(rxe->ndev, ll_addr);
+>>>> +    return err ?: err2;
+>>>>    }
+>>>>      /**
+>>>> @@ -164,6 +242,7 @@ static void __rxe_init_mcg(struct rxe_dev *rxe,
+>>>> union ib_gid *mgid,
+>>>>    {
+>>>>        kref_init(&mcg->ref_cnt);
+>>>>        memcpy(&mcg->mgid, mgid, sizeof(mcg->mgid));
+>>>> +    mcg->is_ipv6 = !ipv6_addr_v4mapped((struct in6_addr *)mgid);
+>>>>        INIT_LIST_HEAD(&mcg->qp_list);
+>>>>        mcg->rxe = rxe;
+>>>>    @@ -225,7 +304,7 @@ static struct rxe_mcg *rxe_get_mcg(struct
+>>>> rxe_dev *rxe, union ib_gid *mgid)
+>>>>        spin_unlock_bh(&rxe->mcg_lock);
+>>>>          /* add mcast address outside of lock */
+>>>> -    err = rxe_mcast_add(rxe, mgid);
+>>>> +    err = rxe_mcast_add(mcg);
+>>>>        if (!err)
+>>>>            return mcg;
+>>>>    @@ -273,7 +352,7 @@ static void __rxe_destroy_mcg(struct rxe_mcg *mcg)
+>>>>    static void rxe_destroy_mcg(struct rxe_mcg *mcg)
+>>>>    {
+>>>>        /* delete mcast address outside of lock */
+>>>> -    rxe_mcast_del(mcg->rxe, &mcg->mgid);
+>>>> +    rxe_mcast_del(mcg);
+>>>>          spin_lock_bh(&mcg->rxe->mcg_lock);
+>>>>        __rxe_destroy_mcg(mcg);
+>>>> diff --git a/drivers/infiniband/sw/rxe/rxe_net.c
+>>>> b/drivers/infiniband/sw/rxe/rxe_net.c
+>>>> index 58c3f3759bf0..b481f8da2002 100644
+>>>> --- a/drivers/infiniband/sw/rxe/rxe_net.c
+>>>> +++ b/drivers/infiniband/sw/rxe/rxe_net.c
+>>>> @@ -18,7 +18,7 @@
+>>>>    #include "rxe_net.h"
+>>>>    #include "rxe_loc.h"
+>>>>    -static struct rxe_recv_sockets recv_sockets;
+>>>> +struct rxe_recv_sockets recv_sockets;
+>>>>      static struct dst_entry *rxe_find_route4(struct rxe_qp *qp,
+>>>>                         struct net_device *ndev,
+>>>> diff --git a/drivers/infiniband/sw/rxe/rxe_net.h
+>>>> b/drivers/infiniband/sw/rxe/rxe_net.h
+>>>> index 45d80d00f86b..89cee7d5340f 100644
+>>>> --- a/drivers/infiniband/sw/rxe/rxe_net.h
+>>>> +++ b/drivers/infiniband/sw/rxe/rxe_net.h
+>>>> @@ -15,6 +15,7 @@ struct rxe_recv_sockets {
+>>>>        struct socket *sk4;
+>>>>        struct socket *sk6;
+>>>>    };
+>>>> +extern struct rxe_recv_sockets recv_sockets;
+>>>>      int rxe_net_add(const char *ibdev_name, struct net_device *ndev);
+>>>>    diff --git a/drivers/infiniband/sw/rxe/rxe_verbs.h
+>>>> b/drivers/infiniband/sw/rxe/rxe_verbs.h
+>>>> index ccb9d19ffe8a..7be9e6232dd9 100644
+>>>> --- a/drivers/infiniband/sw/rxe/rxe_verbs.h
+>>>> +++ b/drivers/infiniband/sw/rxe/rxe_verbs.h
+>>>> @@ -352,6 +352,7 @@ struct rxe_mcg {
+>>>>        atomic_t        qp_num;
+>>>>        u32            qkey;
+>>>>        u16            pkey;
+>>>> +    bool            is_ipv6;
+>>>>    };
+>>>>      struct rxe_mca {
+>>
 
