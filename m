@@ -1,125 +1,68 @@
-Return-Path: <netdev+bounces-54880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23B9C808BD6
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 16:30:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BCBE808CF7
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 17:15:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 552E61C20A0D
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 15:30:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43E21282115
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 16:15:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E64444C8F;
-	Thu,  7 Dec 2023 15:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 549C946B93;
+	Thu,  7 Dec 2023 16:15:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oxOzptF/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EfS/iD0Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE20410C2;
-	Thu,  7 Dec 2023 07:29:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=n+I5o5uNs0ujmnJFMTa99RBBYyMjrKgdxQALljW8hDk=; b=oxOzptF/B2tvkGKr5hOfx+sAp+
-	DtwJIPV2JMNZPaTf2fo/lACU/XGm6oxPZuecFhhAEjNINbbw8pnrHLrQ21uIFiJud38o+uozFe0NE
-	An8zs0GvRftOjjR1SDmTn9W8+bD8o9yCGe/jmpTBcEsLBJefvDLa9fu639enHNxBnA8g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rBGJ5-002KI3-R5; Thu, 07 Dec 2023 16:28:55 +0100
-Date: Thu, 7 Dec 2023 16:28:55 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: justinstitt@google.com
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shay Agroskin <shayagr@amazon.com>,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	David Arinzon <darinzon@amazon.com>, Noam Dagan <ndagan@amazon.com>,
-	Saeed Bishara <saeedb@amazon.com>, Rasesh Mody <rmody@marvell.com>,
-	Sudarsana Kalluru <skalluru@marvell.com>,
-	GR-Linux-NIC-Dev@marvell.com,
-	Dimitris Michailidis <dmichail@fungible.com>,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Louis Peens <louis.peens@corigine.com>,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	Brett Creeley <brett.creeley@amd.com>, drivers@pensando.io,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Ronak Doshi <doshir@vmware.com>,
-	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-	Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>,
-	Dwaipayan Ray <dwaipayanray1@gmail.com>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-	Hauke Mehrtens <hauke@hauke-m.de>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	UNGLinuxDriver@microchip.com, Jiawen Wu <jiawenwu@trustnetic.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Kees Cook <keescook@chromium.org>, intel-wired-lan@lists.osuosl.org,
-	oss-drivers@corigine.com, linux-hyperv@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next v5 3/3] net: Convert some ethtool_sprintf() to
- ethtool_puts()
-Message-ID: <43063267-191c-47b2-a824-ba93feb89834@lunn.ch>
-References: <20231206-ethtool_puts_impl-v5-0-5a2528e17bf8@google.com>
- <20231206-ethtool_puts_impl-v5-3-5a2528e17bf8@google.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A1946B82;
+	Thu,  7 Dec 2023 16:15:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 692A3C433C7;
+	Thu,  7 Dec 2023 16:15:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701965704;
+	bh=MOEuOWnQ7iJjzsou/brhCZLRq2Q1F1WBC0eit+b83AI=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=EfS/iD0YEjiR9YGMWCKAaiQfo4bUkvuBYv+oGfmqOV256nDlIhOk8KeH6iUHNSPAj
+	 m5zqxoaRzm5lM3+qGrNmzzRug9RYeCpfAGEidyiwyNuv+/qOruiZWy7eBrvlA8NwK/
+	 6N3xhmnTjD6XK5Ytu9k9uN5ft/ntCocvuh+NFFpre2pAul0FNsq7rayOWGByKa9t3t
+	 AkzATgTEgLaif/A3nQ6J/Qv2FX3hb0hwpCHZbcyoYWfJb+kSACfvI/NHbE3n3IvFeb
+	 8qaYQqzngQ7dyzDEDOX9+U25JgYaqXC276utFm2iFwVEDHCWyhdzRALuyYuotjNZvn
+	 tC8kaOBSUV7UQ==
+Message-ID: <89d3b24c-2f04-4793-9f7b-8818b320c372@kernel.org>
+Date: Thu, 7 Dec 2023 09:15:03 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231206-ethtool_puts_impl-v5-3-5a2528e17bf8@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH for-next v5 0/7] RDMA/rxe: Make multicast work
+Content-Language: en-US
+To: Zhu Yanjun <yanjun.zhu@linux.dev>, Bob Pearson <rpearsonhpe@gmail.com>,
+ jgg@nvidia.com, linux-rdma@vger.kernel.org,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20231205002322.10143-1-rpearsonhpe@gmail.com>
+ <9d5f532a-9ea1-42be-8628-4acb060753b3@linux.dev>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <9d5f532a-9ea1-42be-8628-4acb060753b3@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 06, 2023 at 11:16:12PM +0000, justinstitt@google.com wrote:
-> This patch converts some basic cases of ethtool_sprintf() to
-> ethtool_puts().
+On 12/4/23 10:50 PM, Zhu Yanjun wrote:
+> Add  David S. Miller and  David Ahern.
 > 
-> The conversions are used in cases where ethtool_sprintf() was being used
-> with just two arguments:
-> |       ethtool_sprintf(&data, buffer[i].name);
-> or when it's used with format string: "%s"
-> |       ethtool_sprintf(&data, "%s", buffer[i].name);
-> which both now become:
-> |       ethtool_puts(&data, buffer[i].name);
+> They are the maintainers in netdev and very familiar with mcast.
 > 
-> Signed-off-by: Justin Stitt <justinstitt@google.com>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+I am nowhere close to being an expert on multicast, but many members of
+the netdev community are. This set seems to be refactoring rxe code vs
+new use of Linux networking stack. If there is something specific,
+please Cc netdev on the entire patch set with a request in the cover
+letter for specific reviews of individual patches.
 
