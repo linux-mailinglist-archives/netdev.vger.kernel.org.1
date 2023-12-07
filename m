@@ -1,213 +1,374 @@
-Return-Path: <netdev+bounces-54978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6104E809117
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 20:14:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8B06809145
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 20:29:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3DA21F20FD9
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:14:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F075C1C209CB
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:29:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1475E4F5E9;
-	Thu,  7 Dec 2023 19:14:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA8C24F618;
+	Thu,  7 Dec 2023 19:28:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nzB7uLr4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="urv7ZZg+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B06F1A9
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 11:14:34 -0800 (PST)
-Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so1545a12.0
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 11:14:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701976473; x=1702581273; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LcwuHJDz6rT+NIEd3PryDsp1eSD2KWnzOIpinVYI0j8=;
-        b=nzB7uLr4S8sLfP1uYk53dLx6/QWmTx38QrrjVTdt+aswxdAajSzITWMPTRbhF0LBJY
-         JodSufXOUNlqzsjEBznLKmJQNSSk24zjiEe2iDSCyODeDDEseD/XIoS4i+BlSGcKtIly
-         oEqwuH2Aj/ft8XEyYXd7S0MagEdbGb6HHYYyU8EbageP6SJkIAGDTBK9FUwiFZC+YNQx
-         Vqi/0bHmRiAbwPoypr97HebCDdwgdf72hRojHRUqYNDi/B96jciedFn4sP/kb1C6t2Ek
-         3Zl7vMfSnBw6dKcZwHTxE3ZguyV4XXbPh/74+IZCSKfZOL+CTg23OZphmnjQpmH6gyYJ
-         GztQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701976473; x=1702581273;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LcwuHJDz6rT+NIEd3PryDsp1eSD2KWnzOIpinVYI0j8=;
-        b=lroKtgMiGqvNauU7BYIpyVkGL8572ThIzhJ8h5jk3ccJbRtOVKNXwxbAOyc0GK68f0
-         NUM0JPnszs48AOXYpgDCFHMgR1D9aHSZOXwPar8FdJfmvzZUs3/ADDgreG+OB6ol3CjP
-         LMcG4bha+OsGP4L2M3Evde2JQ4BGYe11ZuWi8NPh/G124CfG7tdz0BMn/rYHzj+wKRVo
-         opwSpBNgqggCrFwuZatsTyZpz5M68v/HzbStjrXAM8UQ9RhRYQQ2gP8KHWRGP1NZqPNV
-         xfX0AQoRrpB1zYTrXAU6kybL2WBrO7avmHlH2sB0icZ3Jho221Osv8NFaKXzr98IM+5/
-         QH+w==
-X-Gm-Message-State: AOJu0YzObppuyWMk2DWKvfGSTUBszPE6IpW2kEzLmDWwno1VphypLYGa
-	ysXc6SebciaaIjsS0Xlf92H8ZcvfaEQFIEQEzLQ0Aw==
-X-Google-Smtp-Source: AGHT+IEa7uunpympljWBZWnz8n+BOWAI1jB2GqdBJ50DZSgEZLO74wttZBUFw9SECts2jEOfnGatMOjOXT00qVus6WM=
-X-Received: by 2002:a50:9f6e:0:b0:54c:794b:875b with SMTP id
- b101-20020a509f6e000000b0054c794b875bmr3143edf.1.1701976472824; Thu, 07 Dec
- 2023 11:14:32 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 981674F5F7;
+	Thu,  7 Dec 2023 19:28:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C8C1C433C8;
+	Thu,  7 Dec 2023 19:28:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701977334;
+	bh=eMusVwTrdgEkt+KFoA8JGId1Q66EYgkk/hlk2YotBiU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=urv7ZZg+lBPXYlMuNl62mPHHXQR8TyOplw8R2R3NJSsBSOcyBOMa7xStG2xZ4IAH2
+	 aUUFkt09CHZk1ABjw9k1pedXaUho/13b0BkIJ+rQDRbyAi1KtP1/BEXeI5RmkW2L29
+	 bCf9AG3pjbXA/ypr7cPbkvQmCHUAEv+EavE4OGE60AJLRvYHBY1iqADZooRRyWAat1
+	 zBc5XnKUgp/K0eaEFW1zPxLbF/Ph9N/b3cxCLMgvdrvlfmwgcNVWPD2fTfWkKvFnlE
+	 skLi3WMegYOwPODPwk5y+X0bhaOkFoR6mcUuc7kz2Yo0+4msqrRGWAPtjnWAOS/Pmc
+	 PZwv7ZimkMTIQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com,
+	bpf@vger.kernel.org
+Subject: [GIT PULL] Networking for v6.7-rc5
+Date: Thu,  7 Dec 2023 11:28:53 -0800
+Message-ID: <20231207192853.448914-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231205173250.2982846-1-edumazet@google.com> <170191862445.7525.14404095197034927243.git-patchwork-notify@kernel.org>
- <CANn89iKcFxJ68+M8UvHzqp1k-FDiZHZ8ujP79WJd1338DVJy6w@mail.gmail.com>
- <c4ca9c7d-12fa-4205-84e2-c1001242fc0d@gmail.com> <CANn89iKpM33oQ+2dwoLHzZvECAjwiKJTR3cDM64nE6VvZA99Sg@mail.gmail.com>
- <2ba1bbde-0e80-4b73-be2b-7ce27c784089@gmail.com> <CANn89i+2NJ4sp8iGQHG9wKakRD+uzvo7juqAFpE4CdRbg8F6gQ@mail.gmail.com>
- <590c27ae-c583-4404-ace7-ea68548d07a2@kernel.org> <d7ffcd2b-55b0-4084-a18d-49596df8b494@gmail.com>
- <3b432fa3-8cfc-4d50-8363-848cbe775621@gmail.com> <d973fd6a-4fd0-4578-a784-00ed7fd1c927@gmail.com>
- <CANn89iJo6i67tf=k8_KHYNFXy1DyPoOZKLB2NbyY4xqmp_qWgw@mail.gmail.com> <dd9aefd4-b436-4ef7-8d1f-e966bccb2a14@gmail.com>
-In-Reply-To: <dd9aefd4-b436-4ef7-8d1f-e966bccb2a14@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 7 Dec 2023 20:14:21 +0100
-Message-ID: <CANn89i+fo=SUqP01vNwNhZiDYo-vi5xst26V8JpYh8oJjSNr7Q@mail.gmail.com>
-Subject: Re: [PATCH net-next] ipv6: add debug checks in fib6_info_release()
-To: Kui-Feng Lee <sinquersw@gmail.com>
-Cc: David Ahern <dsahern@kernel.org>, patchwork-bot+netdevbpf@kernel.org, 
-	Kui-Feng Lee <thinker.li@gmail.com>, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 7, 2023 at 8:08=E2=80=AFPM Kui-Feng Lee <sinquersw@gmail.com> w=
-rote:
->
->
->
-> On 12/7/23 11:05, Eric Dumazet wrote:
-> > On Thu, Dec 7, 2023 at 8:00=E2=80=AFPM Kui-Feng Lee <sinquersw@gmail.co=
-m> wrote:
-> >>
-> >>
-> >>
-> >> On 12/7/23 10:40, Kui-Feng Lee wrote:
-> >>>
-> >>>
-> >>> On 12/7/23 10:36, Kui-Feng Lee wrote:
-> >>>>
-> >>>>
-> >>>> On 12/7/23 10:25, David Ahern wrote:
-> >>>>> On 12/7/23 11:22 AM, Eric Dumazet wrote:
-> >>>>>> Feel free to amend the patch, but the issue is that we insert a fi=
-b
-> >>>>>> gc_link to a list, then free the fi6 object without removing it fi=
-rst
-> >>>>>> from the external list.
-> >>>>>
-> >>>>> yes, move the insert down:
-> >>>>>
-> >>>>> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-> >>>>> index b132feae3393..7257ba0e72b7 100644
-> >>>>> --- a/net/ipv6/route.c
-> >>>>> +++ b/net/ipv6/route.c
-> >>>>> @@ -3762,12 +3762,6 @@ static struct fib6_info
-> >>>>> *ip6_route_info_create(struct fib6_config *cfg,
-> >>>>>           if (cfg->fc_flags & RTF_ADDRCONF)
-> >>>>>                   rt->dst_nocount =3D true;
-> >>>>>
-> >>>>> -       if (cfg->fc_flags & RTF_EXPIRES)
-> >>>>> -               fib6_set_expires_locked(rt, jiffies +
-> >>>>> -
-> >>>>> clock_t_to_jiffies(cfg->fc_expires));
-> >>>>> -       else
-> >>>>> -               fib6_clean_expires_locked(rt);
-> >>>>> -
-> >>>>
-> >>>> fib6_set_expires_locked() here actually doesn't insert a fib gc_link
-> >>>> since rt->fib6_table is not assigned yet.  The gc_link will
-> >>>> be inserted by fib6_add() being called later.
-> >>>>
-> >>>>
-> >>>>>           if (cfg->fc_protocol =3D=3D RTPROT_UNSPEC)
-> >>>>>                   cfg->fc_protocol =3D RTPROT_BOOT;
-> >>>>>           rt->fib6_protocol =3D cfg->fc_protocol;
-> >>>>> @@ -3824,6 +3818,12 @@ static struct fib6_info
-> >>>>> *ip6_route_info_create(struct fib6_config *cfg,
-> >>>>>           } else
-> >>>>>                   rt->fib6_prefsrc.plen =3D 0;
-> >>>>>
-> >>>>> +
-> >>>>> +       if (cfg->fc_flags & RTF_EXPIRES)
-> >>>>> +               fib6_set_expires_locked(rt, jiffies +
-> >>>>> +
-> >>>>> clock_t_to_jiffies(cfg->fc_expires));
-> >>>>> +       else
-> >>>>> +               fib6_clean_expires_locked(rt);
-> >>>>>           return rt;
-> >>>>>    out:
-> >>>>>           fib6_info_release(rt);
-> >>>>
-> >>>> However, this should fix the warning messages.
-> >>> Just realize this cause inserting the gc_link twice.  fib6_add()
-> >>> will try to add it again!
-> >>
-> >> I made a minor change to the patch that fix warning messages
-> >> provided by David Ahern. Will send an official patch later.
-> >>
-> >> --- a/net/ipv6/route.c
-> >> +++ b/net/ipv6/route.c
-> >> @@ -3762,17 +3762,10 @@ static struct fib6_info
-> >> *ip6_route_info_create(struct fib6_config *cfg,
-> >>           if (cfg->fc_flags & RTF_ADDRCONF)
-> >>                   rt->dst_nocount =3D true;
-> >>
-> >> -       if (cfg->fc_flags & RTF_EXPIRES)
-> >> -               fib6_set_expires_locked(rt, jiffies +
-> >> -
-> >> clock_t_to_jiffies(cfg->fc_expires));
-> >> -       else
-> >> -               fib6_clean_expires_locked(rt);
-> >> -
-> >>           if (cfg->fc_protocol =3D=3D RTPROT_UNSPEC)
-> >>                   cfg->fc_protocol =3D RTPROT_BOOT;
-> >>           rt->fib6_protocol =3D cfg->fc_protocol;
-> >>
-> >> -       rt->fib6_table =3D table;
-> >>           rt->fib6_metric =3D cfg->fc_metric;
-> >>           rt->fib6_type =3D cfg->fc_type ? : RTN_UNICAST;
-> >>           rt->fib6_flags =3D cfg->fc_flags & ~RTF_GATEWAY;
-> >> @@ -3824,6 +3817,17 @@ static struct fib6_info
-> >> *ip6_route_info_create(struct fib6_config *cfg,
-> >>           } else
-> >>                   rt->fib6_prefsrc.plen =3D 0;
-> >>
-> >> +       if (cfg->fc_flags & RTF_EXPIRES)
-> >> +               fib6_set_expires_locked(rt, jiffies +
-> >> +
-> >> clock_t_to_jiffies(cfg->fc_expires));
-> >> +       else
-> >> +               fib6_clean_expires_locked(rt);
-> >
-> > Note that I do not see why we call fib6_clean_expires_locked() on a
-> > freshly allocated object.
-> >
-> > f6i->expires should already be zero...
-> >
->
-> Agree! I will remove it as well.
+Hi Linus!
 
-Please also add the following, if really we keep fib6_has_expires()
-current definition.
+The following changes since commit 6172a5180fcc65170bfa2d49e55427567860f2a7:
 
-diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
-index e1e7a894863a7891610ce5afb2034473cc208d3e..95ed495c3a4028457baf1503c36=
-7d2e7a6e14770
-100644
---- a/include/net/ip6_fib.h
-+++ b/include/net/ip6_fib.h
-@@ -329,7 +329,6 @@ static inline bool fib6_info_hold_safe(struct
-fib6_info *f6i)
- static inline void fib6_info_release(struct fib6_info *f6i)
- {
-        if (f6i && refcount_dec_and_test(&f6i->fib6_ref)) {
--               DEBUG_NET_WARN_ON_ONCE(fib6_has_expires(f6i));
-                DEBUG_NET_WARN_ON_ONCE(!hlist_unhashed(&f6i->gc_link));
-                call_rcu(&f6i->rcu, fib6_info_destroy_rcu);
-        }
+  Merge tag 'net-6.7-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-12-01 08:24:46 +0900)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.7-rc5
+
+for you to fetch changes up to b0a930e8d90caf66a94fee7a9d0b8472bc3e7561:
+
+  vsock/virtio: fix "comparison of distinct pointer types lacks a cast" warning (2023-12-07 10:12:34 -0800)
+
+----------------------------------------------------------------
+Including fixes from bpf and netfilter.
+
+Current release - regressions:
+
+ - veth: fix packet segmentation in veth_convert_skb_to_xdp_buff
+
+Current release - new code bugs:
+
+ - tcp: assorted fixes to the new Auth Option support
+
+Older releases - regressions:
+
+ - tcp: fix mid stream window clamp
+
+ - tls: fix incorrect splice handling
+
+ - ipv4: ip_gre: handle skb_pull() failure in ipgre_xmit()
+
+ - dsa: mv88e6xxx: restore USXGMII support for 6393X
+
+ - arcnet: restore support for multiple Sohard Arcnet cards
+
+Older releases - always broken:
+
+ - tcp: do not accept ACK of bytes we never sent
+
+ - require admin privileges to receive packet traces via netlink
+
+ - packet: move reference count in packet_sock to atomic_long_t
+
+ - bpf:
+   - fix incorrect branch offset comparison with cpu=v4
+   - fix prog_array_map_poke_run map poke update
+
+ - netfilter:
+   - 3 fixes for crashes on bad admin commands
+   - xt_owner: fix race accessing sk->sk_socket, TOCTOU null-deref
+   - nf_tables: fix 'exist' matching on bigendian arches
+
+ - leds: netdev: fix RTNL handling to prevent potential deadlock
+
+ - eth: tg3: prevent races in error/reset handling
+
+ - eth: r8169: fix rtl8125b PAUSE storm when suspended
+
+ - eth: r8152: improve reset and surprise removal handling
+
+ - eth: hns: fix race between changing features and sending
+
+ - eth: nfp: fix sleep in atomic for bonding offload
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+----------------------------------------------------------------
+Brett Creeley (1):
+      ionic: Fix dim work handling in split interrupt mode
+
+ChunHao Lin (1):
+      r8169: fix rtl8125b PAUSE frames blasting when suspended
+
+D. Wythe (1):
+      netfilter: bpf: fix bad registration on nf_defrag
+
+Daniel Borkmann (1):
+      packet: Move reference count in packet_sock to atomic_long_t
+
+Daniil Maximov (1):
+      net: atlantic: Fix NULL dereference of skb pointer in
+
+Dinghao Liu (1):
+      net: bnxt: fix a potential use-after-free in bnxt_init_tc
+
+Dmitry Safonov (5):
+      Documentation/tcp: Fix an obvious typo
+      net/tcp: Consistently align TCP-AO option in the header
+      net/tcp: Limit TCP_AO_REPAIR to non-listen sockets
+      net/tcp: Don't add key with non-matching VRF on connected sockets
+      net/tcp: Don't store TCP-AO maclen on reqsk
+
+Douglas Anderson (5):
+      r8152: Hold the rtnl_lock for all of reset
+      r8152: Add RTL8152_INACCESSIBLE checks to more loops
+      r8152: Add RTL8152_INACCESSIBLE to r8156b_wait_loading_flash()
+      r8152: Add RTL8152_INACCESSIBLE to r8153_pre_firmware_1()
+      r8152: Add RTL8152_INACCESSIBLE to r8153_aldps_en()
+
+Eric Dumazet (2):
+      ipv6: fix potential NULL deref in fib6_add()
+      tcp: do not accept ACK of bytes we never sent
+
+Florian Westphal (2):
+      netfilter: nft_set_pipapo: skip inactive elements during set walk
+      netfilter: nf_tables: fix 'exist' matching on bigendian arches
+
+Geetha sowjanya (3):
+      octeontx2-af: Fix mcs sa cam entries size
+      octeontx2-af: Fix mcs stats register address
+      octeontx2-af: Add missing mcs flr handler call
+
+Heiner Kallweit (1):
+      leds: trigger: netdev: fix RTNL handling to prevent potential deadlock
+
+Hui Zhou (1):
+      nfp: flower: fix for take a mutex lock in soft irq context and rcu lock
+
+Ido Schimmel (2):
+      psample: Require 'CAP_NET_ADMIN' when joining "packets" group
+      drop_monitor: Require 'CAP_SYS_ADMIN' when joining "events" group
+
+Ivan Vecera (1):
+      i40e: Fix unexpected MFS warning message
+
+Jacob Keller (1):
+      iavf: validate tx_coalesce_usecs even if rx_coalesce_usecs is zero
+
+Jakub Kicinski (7):
+      MAINTAINERS: exclude 9p from networking
+      Merge branch 'ionic-small-driver-fixes'
+      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
+      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
+      Merge tag 'nf-23-12-06' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+      Merge branch 'fixes-for-ktls'
+      Merge branch 'generic-netlink-multicast-fixes'
+
+Jianheng Zhang (1):
+      net: stmmac: fix FPE events losing
+
+Jiri Olsa (2):
+      bpf: Fix prog_array_map_poke_run map poke update
+      selftests/bpf: Add test for early update in prog_array_map_poke_run
+
+John Fastabend (2):
+      net: tls, update curr on splice as well
+      bpf: sockmap, updating the sg structure should also update curr
+
+Kelly Kane (1):
+      r8152: add vendor/device ID pair for ASUS USB-C2500
+
+Lorenzo Bianconi (1):
+      net: veth: fix packet segmentation in veth_convert_skb_to_xdp_buff
+
+Marcin Szycik (1):
+      ice: Restore fix disabling RX VLAN filtering
+
+Michal Swiatkowski (1):
+      ice: change vfs.num_msix_per to vf->num_msix
+
+Naveen Mamindlapalli (1):
+      octeontx2-pf: consider both Rx and Tx packet stats for adaptive interrupt coalescing
+
+Nithin Dabilpuram (1):
+      octeontx2-af: Adjust Tx credits when MCS external bypass is disabled
+
+Pablo Neira Ayuso (2):
+      netfilter: nf_tables: bail out on mismatching dynset and set expressions
+      netfilter: nf_tables: validate family when identifying table via handle
+
+Paolo Abeni (4):
+      tcp: fix mid stream window clamp.
+      Merge branch 'there-are-some-bugfix-for-the-hns-ethernet-driver'
+      Merge branch 'tcp-ao-fixes'
+      Merge branch 'octeontx2-af-miscellaneous-fixes'
+
+Phil Sutter (1):
+      netfilter: xt_owner: Fix for unsafe access of sk->sk_socket
+
+Rahul Bhansali (1):
+      octeontx2-af: Update Tx link register range
+
+Randy Dunlap (1):
+      hv_netvsc: rndis_filter needs to select NLS
+
+Sean Nyekjaer (1):
+      net: dsa: microchip: provide a list of valid protocols for xmit handler
+
+Shannon Nelson (1):
+      ionic: fix snprintf format length warning
+
+Shigeru Yoshida (1):
+      ipv4: ip_gre: Avoid skb_pull() failure in ipgre_xmit()
+
+Stefano Garzarella (1):
+      vsock/virtio: fix "comparison of distinct pointer types lacks a cast" warning
+
+Subbaraya Sundeep (2):
+      octeontx2-pf: Add missing mutex lock in otx2_get_pauseparam
+      octeontx2-af: Check return value of nix_get_nixlf before using nixlf
+
+Thinh Tran (1):
+      net/tg3: fix race condition in tg3_reset_task()
+
+Thomas Reichinger (1):
+      arcnet: restoring support for multiple Sohard Arcnet cards
+
+Tobias Waldekranz (1):
+      net: dsa: mv88e6xxx: Restore USXGMII support for 6393X
+
+Wen Gu (1):
+      net/smc: fix missing byte order conversion in CLC handshake
+
+Yewon Choi (1):
+      xsk: Skip polling event check for unbound socket
+
+Yonghong Song (1):
+      bpf: Fix a verifier bug due to incorrect branch offset comparison with cpu=v4
+
+Yonglong Liu (2):
+      net: hns: fix wrong head when modify the tx feature when sending packets
+      net: hns: fix fake link up on xge port
+
+Zhipeng Lu (1):
+      octeontx2-af: fix a use-after-free in rvu_npa_register_reporters
+
+ Documentation/networking/tcp_ao.rst                |   2 +-
+ MAINTAINERS                                        |   1 +
+ arch/x86/net/bpf_jit_comp.c                        |  46 ++++++++
+ drivers/leds/trigger/ledtrig-netdev.c              |  11 +-
+ drivers/net/arcnet/arcdevice.h                     |   2 +
+ drivers/net/arcnet/com20020-pci.c                  |  89 ++++++++-------
+ drivers/net/dsa/microchip/ksz_common.c             |  16 ++-
+ drivers/net/dsa/mv88e6xxx/pcs-639x.c               |  31 ++++-
+ drivers/net/ethernet/aquantia/atlantic/aq_ptp.c    |  10 +-
+ drivers/net/ethernet/aquantia/atlantic/aq_ptp.h    |   4 +-
+ drivers/net/ethernet/aquantia/atlantic/aq_ring.c   |  18 ++-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c       |   1 +
+ drivers/net/ethernet/broadcom/tg3.c                |  11 +-
+ drivers/net/ethernet/hisilicon/hns/hns_dsaf_mac.c  |  29 +++++
+ drivers/net/ethernet/hisilicon/hns/hns_enet.c      |  53 +++++----
+ drivers/net/ethernet/hisilicon/hns/hns_enet.h      |   3 +-
+ drivers/net/ethernet/intel/i40e/i40e_main.c        |   2 +-
+ drivers/net/ethernet/intel/iavf/iavf_ethtool.c     |  12 +-
+ drivers/net/ethernet/intel/iavf/iavf_txrx.h        |   1 -
+ drivers/net/ethernet/intel/ice/ice_sriov.c         |   7 +-
+ .../net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c   |  11 +-
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c      |   5 +-
+ drivers/net/ethernet/marvell/octeontx2/af/mbox.h   |   2 +-
+ drivers/net/ethernet/marvell/octeontx2/af/mcs.c    |  18 ++-
+ drivers/net/ethernet/marvell/octeontx2/af/mcs.h    |   2 +
+ .../net/ethernet/marvell/octeontx2/af/mcs_reg.h    |  31 ++++-
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.c    |   3 +
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.h    |   1 +
+ .../ethernet/marvell/octeontx2/af/rvu_devlink.c    |   5 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu_nix.c    |   8 ++
+ .../net/ethernet/marvell/octeontx2/af/rvu_npc.c    |   8 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu_reg.c    |   4 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu_reg.h    |   1 +
+ .../ethernet/marvell/octeontx2/nic/otx2_ethtool.c  |   6 +-
+ .../net/ethernet/marvell/octeontx2/nic/otx2_pf.c   |   9 ++
+ .../net/ethernet/marvell/octeontx2/nic/otx2_txrx.c |  20 ++--
+ .../ethernet/netronome/nfp/flower/tunnel_conf.c    | 127 +++++++++++++++------
+ drivers/net/ethernet/pensando/ionic/ionic_dev.h    |   2 +-
+ drivers/net/ethernet/pensando/ionic/ionic_lif.c    |  16 +--
+ drivers/net/ethernet/realtek/r8169_main.c          |   7 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.c       |  45 +++-----
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.h       |   4 +-
+ .../net/ethernet/stmicro/stmmac/dwxgmac2_core.c    |   3 +-
+ drivers/net/ethernet/stmicro/stmmac/hwif.h         |   4 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |   8 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c    |   1 +
+ drivers/net/hyperv/Kconfig                         |   1 +
+ drivers/net/usb/r8152.c                            |  28 ++++-
+ drivers/net/veth.c                                 |   3 +-
+ include/linux/bpf.h                                |   3 +
+ include/linux/stmmac.h                             |   1 +
+ include/linux/tcp.h                                |   8 +-
+ include/linux/usb/r8152.h                          |   1 +
+ include/net/genetlink.h                            |   2 +
+ include/net/tcp.h                                  |   9 +-
+ include/net/tcp_ao.h                               |   6 +
+ kernel/bpf/arraymap.c                              |  58 ++--------
+ kernel/bpf/core.c                                  |  12 +-
+ net/core/drop_monitor.c                            |   4 +-
+ net/core/filter.c                                  |  19 +++
+ net/ipv4/ip_gre.c                                  |  11 +-
+ net/ipv4/tcp.c                                     |  28 ++++-
+ net/ipv4/tcp_ao.c                                  |  17 ++-
+ net/ipv4/tcp_input.c                               |  11 +-
+ net/ipv4/tcp_ipv4.c                                |   4 +-
+ net/ipv4/tcp_minisocks.c                           |   2 +-
+ net/ipv4/tcp_output.c                              |  15 +--
+ net/ipv6/ip6_fib.c                                 |   6 +-
+ net/ipv6/tcp_ipv6.c                                |   2 +-
+ net/netfilter/nf_bpf_link.c                        |  10 +-
+ net/netfilter/nf_tables_api.c                      |   5 +-
+ net/netfilter/nft_dynset.c                         |  13 ++-
+ net/netfilter/nft_exthdr.c                         |   4 +-
+ net/netfilter/nft_fib.c                            |   8 +-
+ net/netfilter/nft_set_pipapo.c                     |   3 +
+ net/netfilter/xt_owner.c                           |  16 ++-
+ net/netlink/genetlink.c                            |   3 +
+ net/packet/af_packet.c                             |  16 +--
+ net/packet/internal.h                              |   2 +-
+ net/psample/psample.c                              |   3 +-
+ net/smc/af_smc.c                                   |   4 +-
+ net/smc/smc_clc.c                                  |   9 +-
+ net/smc/smc_clc.h                                  |   4 +-
+ net/tls/tls_sw.c                                   |   2 +
+ net/vmw_vsock/virtio_transport_common.c            |   3 +-
+ net/xdp/xsk.c                                      |   5 +-
+ tools/testing/selftests/bpf/prog_tests/tailcalls.c |  84 ++++++++++++++
+ tools/testing/selftests/bpf/progs/tailcall_poke.c  |  32 ++++++
+ 88 files changed, 821 insertions(+), 356 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/tailcall_poke.c
 
