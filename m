@@ -1,120 +1,111 @@
-Return-Path: <netdev+bounces-54700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4730E807D99
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 02:08:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3B5A807DE2
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 02:26:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE8E7282092
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 01:08:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C1A81F2194E
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 01:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04517F3;
-	Thu,  7 Dec 2023 01:08:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 752BB110D;
+	Thu,  7 Dec 2023 01:26:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="lb0l514G"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fQC5JQAL"
 X-Original-To: netdev@vger.kernel.org
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09A8512F;
-	Wed,  6 Dec 2023 17:08:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1701911315;
-	bh=phe4O51H7/V3YS47hEgMUqHs3d968ZCnQlFDHma9U1Y=;
-	h=Date:From:To:Cc:Subject:From;
-	b=lb0l514GhPPpUFUIO2g5tSXP3nYjAIvM8WKSPJQ/fjLwmG9cLD0f+iEhGrvlvx+yF
-	 obQMBK4np8Rh7BumQsBoT/OkM9nuxFo+AvlN6JnEzVeXENefpZnUBxf6ob9iq1K7gs
-	 KCITTzuDDMHnv0pDEnocyCdfnAHhz0RGuNJoP48tHKFr57T+tyxcvgxW5S38iGriMJ
-	 Xxh/X2WJYdWZ4EcpHN97ubJgevzcjSGmI9KU/c5QvAIHcAEvPHxFEC7tv6H2wXKJMv
-	 7Kk893gKFzyCMtQczY/Ah+tf8w3H5aLUBuiGcEMlE6Mi5x7mZii9/N2s881S4wQNGG
-	 QTFrxiy1MdkZA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Slx3k4BP6z4wc3;
-	Thu,  7 Dec 2023 12:08:34 +1100 (AEDT)
-Date: Thu, 7 Dec 2023 12:08:33 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Paul Moore <paul@paul-moore.com>, Daniel Borkmann
- <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, Andrii
- Nakryiko <andrii@kernel.org>
-Cc: bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Casey
- Schaufler <casey@schaufler-ca.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the security tree with the bpf-next
- tree
-Message-ID: <20231207120833.46ebfc2d@canb.auug.org.au>
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E41219BB
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 17:26:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701912367; x=1733448367;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=i4yeWVE6+wrgX9vmL6iqP5eumdCMoGTglZZEcsnM/FM=;
+  b=fQC5JQALyc6j7I+CVH4u26wAF/CQm/O/5JsESlCcG/Rb47OwZ+6P/o2R
+   RhRZ5rUpkk5s7a8Ev3CyZER1If8mGmwWKDCl7lKOhFpgSruR3aWI3YAp5
+   5ToOa1gPV0y6u0525zhkUA5iJqYY1XIztNs7dlbKXoyDzCJdjk/Dgq9XC
+   FubDE9x9zrji3dPa61fNKvKi0+dh4ty4s4WvMnVItwNIg/woGuJrKcHue
+   vhqXuywlc4W3CqTKQJY+FG5/SoATLvicq6+NRpLvkC7Hm53v6dyz9eGDR
+   VivdM8l4UmcLF8+O6qW1LIJFlYF0Xs64SW2OvOQO0HiL0/JH/s31ihmrL
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="1231754"
+X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
+   d="scan'208";a="1231754"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2023 17:26:06 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
+   d="scan'208";a="19518060"
+Received: from alwohlse-mobl.amr.corp.intel.com (HELO vcostago-mobl3) ([10.209.58.167])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2023 17:26:06 -0800
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Kurt Kanzenbach <kurt@linutronix.de>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, Kurt Kanzenbach <kurt@linutronix.de>, Suman Ghosh
+ <sumang@marvell.com>
+Subject: Re: [PATCH iwl-net] igc: Check VLAN EtherType mask
+In-Reply-To: <20231206140718.57433-1-kurt@linutronix.de>
+References: <20231206140718.57433-1-kurt@linutronix.de>
+Date: Wed, 06 Dec 2023 17:26:05 -0800
+Message-ID: <87r0jy6bwy.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/XLz+L06gsoqiomsd0nyAVro";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain
 
---Sig_/XLz+L06gsoqiomsd0nyAVro
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Kurt Kanzenbach <kurt@linutronix.de> writes:
 
-Hi all,
+> Currently the driver accepts VLAN EtherType steering rules regardless of
+> the configured mask. And things might fail silently or with confusing error
+> messages to the user. The VLAN EtherType can only be matched by full
+> mask. Therefore, add a check for that.
+>
+> For instance the following rule is invalid, but the driver accepts it and
+> ignores the user specified mask:
+> |root@host:~# ethtool -N enp3s0 flow-type ether vlan-etype 0x8100 \
+> |             m 0x00ff action 0
+> |Added rule with ID 63
+> |root@host:~# ethtool --show-ntuple enp3s0
+> |4 RX rings available
+> |Total 1 rules
+> |
+> |Filter: 63
+> |        Flow Type: Raw Ethernet
+> |        Src MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
+> |        Dest MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
+> |        Ethertype: 0x0 mask: 0xFFFF
+> |        VLAN EtherType: 0x8100 mask: 0x0
+> |        VLAN: 0x0 mask: 0xffff
+> |        User-defined: 0x0 mask: 0xffffffffffffffff
+> |        Action: Direct to queue 0
+>
+> After:
+> |root@host:~# ethtool -N enp3s0 flow-type ether vlan-etype 0x8100 \
+> |             m 0x00ff action 0
+> |rmgr: Cannot insert RX class rule: Operation not supported
+>
+> Fixes: 2b477d057e33 ("igc: Integrate flex filter into ethtool ops")
+> Suggested-by: Suman Ghosh <sumang@marvell.com>
+> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+> ---
 
-Today's linux-next merge of the security tree got a conflict in:
+I was just wondering if an alternative would be to use flex filters for
+matching vlan-etype with a partial mask. But I don't think there's any
+real use case for partial masks, better to reject them:
 
-  include/linux/security.h
+Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
 
-between commit:
 
-  d734ca7b33db ("bpf,lsm: add BPF token LSM hooks")
-
-from the bpf-next tree and commit:
-
-  e1ca7129db2c ("LSM: Helpers for attribute names and filling lsm_ctx")
-
-from the security tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
 Cheers,
-Stephen Rothwell
-
-diff --cc include/linux/security.h
-index 00809d2d5c38,750130a7b9dd..000000000000
---- a/include/linux/security.h
-+++ b/include/linux/security.h
-@@@ -32,7 -32,7 +32,8 @@@
-  #include <linux/string.h>
-  #include <linux/mm.h>
-  #include <linux/sockptr.h>
- +#include <linux/bpf.h>
-+ #include <uapi/linux/lsm.h>
- =20
-  struct linux_binprm;
-  struct cred;
-
---Sig_/XLz+L06gsoqiomsd0nyAVro
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmVxGxEACgkQAVBC80lX
-0Gy4Vgf+O274EwUxOtVS9S2Y1V4GBLB4rb1nfBXkGFaZcVFEb0Me3AaxcaEzpg8d
-Kt4r6LSKFPfCR3vLi372ixaQSUJSYthQL8hoUNVDuCo1dVq7I2pFHfH/C/BsSFut
-xww4WgQOAp2iWekkU7/5XjPQLgqDGTd1fB+4fiNTW/2rOluhVOeOsqrf+pfymLHD
-7kwej6pieq63GjksZD2462AGiYkwiS7vedj2smlvYBACVCB5sZ+L1NCWMZE6nKtc
-FG1/UsFpuIBvmaEGz8QlW20AFMB85SqxOnXSG/qvmfi5jINU3y32I6WEBGuGN0xT
-BgO0o1aotXB2X/z9yezZPGO329pBqA==
-=dqeK
------END PGP SIGNATURE-----
-
---Sig_/XLz+L06gsoqiomsd0nyAVro--
+-- 
+Vinicius
 
