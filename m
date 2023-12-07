@@ -1,88 +1,62 @@
-Return-Path: <netdev+bounces-55002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 140D1809249
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 21:28:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45752809254
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 21:33:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF4DC2812C5
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 20:28:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF07F1F21227
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 20:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5751150275;
-	Thu,  7 Dec 2023 20:28:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50EA950277;
+	Thu,  7 Dec 2023 20:32:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="WF5eaCD6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kW81JGLc"
 X-Original-To: netdev@vger.kernel.org
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6390C1713;
-	Thu,  7 Dec 2023 12:28:03 -0800 (PST)
-Received: from [IPV6:2003:e9:d746:9cf9:ea55:93e0:2b2c:f5b6] (p200300e9d7469cf9ea5593e02b2cf5b6.dip0.t-ipconnect.de [IPv6:2003:e9:d746:9cf9:ea55:93e0:2b2c:f5b6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	(Authenticated sender: stefan@datenfreihafen.org)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id 2CD58C084A;
-	Thu,  7 Dec 2023 21:28:00 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-	s=2021; t=1701980880;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=knbgzvbIyj1cmWisBX7JA49IkOd+jI1IhNDx7hQJRXw=;
-	b=WF5eaCD6TQKYAoG3ujF3p1lYGjqmYh6ZHW67phLCTPVxcnubR+KnTCnYSqS0znlejinwF9
-	8FBkErzVSdnWYHrYelYNnN9L/jiVo3vjGFN2FyjHcylzdqqRcGQaUN7VAirYwblb5c89/N
-	UjBOkVQ+SANmiQ8E4RMXEEneywL8Oqt5QPoSs91SsafKQkLaXmrjLpPJeb01Tdd3ffpWOe
-	KT/HBydmZBskhIt8BPuaAuOBYCdhFK6XD+ZgW9RBhkjSDPTEQ1BMtI6JY+iX/89Sv1bZKW
-	Sxy8m8g66wFaX1ZL9UL97qexz5+U/Z7gMwmGr5OTqMjtwHl3/hhOIxfkAx0gxQ==
-Message-ID: <51de3b76-78cf-5ee4-ec31-6cf368b584b7@datenfreihafen.org>
-Date: Thu, 7 Dec 2023 21:27:59 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2703F563A8;
+	Thu,  7 Dec 2023 20:32:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EB37C433C7;
+	Thu,  7 Dec 2023 20:32:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701981177;
+	bh=Czicd5N/eXaMLjTilbeZ1WUkn0YbvQTJzzOKqY7RemA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kW81JGLc1cjb9TaxSmqDV2nxeQjeYaPVfVhNAtH2tZ81Y3GWgXgHZAY0rOWblhVYv
+	 YOql0kFfBUFjj9v9eZ4MHZtx/Osz2FBORYVcLOC5JphinYn/42k064IrOAFY9vQyYY
+	 eCkTadcdQephXqlSuGRJ/wp4L7QHOd7/Mnp5giuMWCyP4GIUUw5PDwcdFenWq/gxpn
+	 282pHAsjgL2blUaHo6nbYDaq97UHuM6O8oP8brwLiA3qQM+d4JjPiJeqwotrtkI5Fz
+	 toOtfsjaGqAt52VztbWiIENZW034Ckx3N1Sz0KNDUgo2ITm9Cs+kwIcQ0yWv+7vhWh
+	 bfM0GKuCXcCeA==
+Date: Thu, 7 Dec 2023 12:32:56 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alan Stern <stern@rowland.harvard.edu>
+Cc: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>, davem@davemloft.net,
+ edumazet@google.com, greg@kroah.com, linux-kernel@vger.kernel.org,
+ linux-usb@vger.kernel.org, netdev@vger.kernel.org, oneukum@suse.com,
+ pabeni@redhat.com, stable@vger.kernel.org
+Subject: Re: [PATCH v6] net: usb: ax88179_178a: avoid failed operations when
+ device is disconnected
+Message-ID: <20231207123256.337753f9@kernel.org>
+In-Reply-To: <d8c331dd-deb1-4f12-8e66-295bfac8b1d7@rowland.harvard.edu>
+References: <0bd3204e-19f4-48de-b42e-a75640a1b1da@rowland.harvard.edu>
+	<20231207175007.263907-1-jtornosm@redhat.com>
+	<d8c331dd-deb1-4f12-8e66-295bfac8b1d7@rowland.harvard.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH wpan-next v5 01/11] ieee802154: Let PAN IDs be reset
-Content-Language: en-US
-To: Miquel Raynal <miquel.raynal@bootlin.com>,
- Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
- David Girault <david.girault@qorvo.com>,
- Romuald Despres <romuald.despres@qorvo.com>,
- Frederic Blain <frederic.blain@qorvo.com>,
- Nicolas Schodet <nico@ni.fr.eu.org>,
- Guilhem Imberton <guilhem.imberton@qorvo.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-References: <20231120110100.3808292-1-miquel.raynal@bootlin.com>
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20231120110100.3808292-1-miquel.raynal@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Hello Miquel,
+On Thu, 7 Dec 2023 15:23:23 -0500 Alan Stern wrote:
+> Acked-by: Alan Stern <stern@rowland.harvard.edu>
 
-
-On 20.11.23 12:01, Miquel Raynal wrote:
-> On Wed, 2023-09-27 at 18:12:04 UTC, Miquel Raynal wrote:
->> Soon association and disassociation will be implemented, which will
->> require to be able to either change the PAN ID from 0xFFFF to a real
->> value when association succeeded, or to reset the PAN ID to 0xFFFF upon
->> disassociation. Let's allow to do that manually for now.
->>
->> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> 
-> Applied to https://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan-next.git staging.
-
-I can't see this, or any other patch from the series, in the staging 
-branch. Did you forget to push this out to kernel.org?
-
-regards
-Stefan Schmidt
+FWIW I'm expecting Greg to pick this up for usb.
 
