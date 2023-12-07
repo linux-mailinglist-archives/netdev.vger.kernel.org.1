@@ -1,204 +1,136 @@
-Return-Path: <netdev+bounces-54861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC0908089EA
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 15:10:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70E368089FD
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 15:15:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0907E1C2096B
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 14:10:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DC7E1C20C0B
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 14:15:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4A6641743;
-	Thu,  7 Dec 2023 14:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5172E41849;
+	Thu,  7 Dec 2023 14:15:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="RtAKYDCo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I5uvD8TY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x112a.google.com (mail-yw1-x112a.google.com [IPv6:2607:f8b0:4864:20::112a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23D4C10E4
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 06:10:26 -0800 (PST)
-Received: by mail-yw1-x112a.google.com with SMTP id 00721157ae682-5d7a47d06eeso7882007b3.1
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 06:10:26 -0800 (PST)
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63C5A10D1
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 06:15:34 -0800 (PST)
+Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-33349b3f99aso1004784f8f.0
+        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 06:15:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701958225; x=1702563025; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uDGlQYDb5PUCcczbzebIyUx2ResvXtOo+s87LRLH3zs=;
-        b=RtAKYDColJ+Hwj66XMHoYWoqFnijV+E2Fl+W4OeI0g0e55+kvX4wc5x99vnTEbHPEg
-         tAXcidR2nrrnmvcgsask5frtXscd7uCk2rFwSdhE1FOrfagDRDlHWTEXmjom5aZoSv3M
-         dLBYAmiqxGqAm88A6A6JK315kjyAWEiM2y7Ij1L35gQP9AsVnMeepL3YRie7A9zAIc2f
-         iz50kyeL8maPkIs8QCmkOrkCzJc/PrmI9TZMtR5B07ZJBvxpnnx08C6ejEuo5LHMQzkM
-         wVyIY+OanDYUToZsGe9iIO5m1vuoiY5SvSOGdzgUOG7DC2Tp9RA2kTrrX0lVM+lJvG7O
-         NZrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701958225; x=1702563025;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=gmail.com; s=20230601; t=1701958533; x=1702563333; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uDGlQYDb5PUCcczbzebIyUx2ResvXtOo+s87LRLH3zs=;
-        b=asLkID1K7tbKlQTs/Z5jKtIU5ojnyqqqCcJG0o2+jvgPeJnicqR1KiJV9yjeTcqE5n
-         lKdbdQSkto+hWopWy9T8n59KTZDIG3Va71Pxb3e74h/OqHp17nOcMEDpdTOp7JiZakGm
-         FJva1Qt941l+uyaB+bvsTlXRvE94Z3/1Xli3/OoUlakWTNHNS9m8YqzBw+P35QN54idv
-         yGnXMUeY0k573YsRM7S6754kyXWAtGiJrnVv4XY5ZsW3CqjZMtnnjmktNzc+P8/27xLw
-         yBGGOqnwTONXmT8h80kuyD0gsEtH40QSbsd7dynagavwmSe4Mtum+tspshz8Cv42luA8
-         MHzA==
-X-Gm-Message-State: AOJu0YwLRgCoQcpQugKi3gyC3P+coRkSmsmaAAI8HVu2QtEBCrVnfypB
-	PW0GMen9ZyHorxC2MFMwv4ajivoqKjPPJjVv34HOQg==
-X-Google-Smtp-Source: AGHT+IHlXNWdOZ8QC8IUstIusrU0V6V71CjdzbND+uTsAe3x7XbWfUVIrrLtyXnac+A71ULvwPlfHajKKebicYyjzxM=
-X-Received: by 2002:a0d:dd0d:0:b0:5d4:ce2:e90d with SMTP id
- g13-20020a0ddd0d000000b005d40ce2e90dmr2364538ywe.31.1701958225246; Thu, 07
- Dec 2023 06:10:25 -0800 (PST)
+        bh=bOWUB+gryR0TwBFnM8jRyxzuLGSZFI6NALJA9ueIn9g=;
+        b=I5uvD8TYHrHdmFGveCBW46FS1oix6v7GvZaGlYyG1MXMb5uXayWVua+/jDEjcdrmCH
+         Ie89ynVSHeUAeXwXekrkpCqq0kPrad19JMNML7EPk0BhEAGwurIofL4t79nkUesfnDfM
+         OVLF4LARCEstUelnkb5vgqN1+Bd3w5KEUoBZHX27/Gp1oBopX2KzJ2n+UQuHFze+8JR8
+         CCcmufqiFq5ktThQyarm53Msz+OwK0tQlYrFghJg5tDa0nUZuDxZmJhNmb1O72OMx3P1
+         cLxaOyRzBQChf8Qxy5ZUBnNEZZ2pm9c/Af0v8bS6vTCuSMuGrO2iuHMlc5k0PakQQq7A
+         ldTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701958533; x=1702563333;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bOWUB+gryR0TwBFnM8jRyxzuLGSZFI6NALJA9ueIn9g=;
+        b=rP1CwpWUTo/Z38m6Lv6qeOnytA63b6YOxV32VrKYAP5KIIP3GYSayiyWWgFItkQjBe
+         dMFyCLJ83PSHZyV5zJPgUdUuDAWQzgw6SW+7DjXRtXVeTxI/FJKmLUWFas6hye46kato
+         Bxr4Vt9EqfyFNBdCYmb34hm6dDJY1Fm2CHlQZxf2HBSH/JWP5Whpfg8Oh9J43uB2oYg4
+         UuphTsMKg5JxUp0VdtujCEm8lXTTmE9zgsRH0U93/hMg7KPZEMIwCdARFllJxTZY13v2
+         xQe1M5zYfGik+ME5C+eF/YivKIlhFjFzXhzEiIaa6p1tMTqSWc8sp2DxyWxl62oPCV8R
+         pgEw==
+X-Gm-Message-State: AOJu0YyBvysi0P/noAcUEPp2rPmTBNpuPwW04cliQiYolyOqgDVr5JG7
+	cLQ1icaVt7nErBK4w33vJgE=
+X-Google-Smtp-Source: AGHT+IH5TUvyx7lXeDEUz+2QgYPGvDBZogVbSnKJuebvruJICUw0NHCUC5Dpb3gCznTvosz4SUYF0Q==
+X-Received: by 2002:a05:600c:470e:b0:40b:5e59:c57d with SMTP id v14-20020a05600c470e00b0040b5e59c57dmr1773238wmo.167.1701958532603;
+        Thu, 07 Dec 2023 06:15:32 -0800 (PST)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id u13-20020a05600c19cd00b0040b42df75fcsm2061104wmq.39.2023.12.07.06.15.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Dec 2023 06:15:32 -0800 (PST)
+Subject: Re: [PATCH v4 net-next 6/7] net: ethtool: add a mutex protecting RSS
+ contexts
+To: Jakub Kicinski <kuba@kernel.org>, edward.cree@amd.com
+Cc: linux-net-drivers@amd.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, netdev@vger.kernel.org, habetsm.xilinx@gmail.com,
+ sudheer.mogilappagari@intel.com, jdamato@fastly.com, andrew@lunn.ch,
+ mw@semihalf.com, linux@armlinux.org.uk, sgoutham@marvell.com,
+ gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
+ saeedm@nvidia.com, leon@kernel.org
+References: <cover.1695838185.git.ecree.xilinx@gmail.com>
+ <b5d7b8e243178d63643c8efc1f1c48b3b2468dc7.1695838185.git.ecree.xilinx@gmail.com>
+ <20231004161651.76f686f3@kernel.org>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <2ea45188-5554-8067-820d-378cada735ee@gmail.com>
+Date: Thu, 7 Dec 2023 14:15:30 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1674233458.git.dcaratti@redhat.com> <5fdd584d53f0807f743c07b1c0381cf5649495cd.1674233458.git.dcaratti@redhat.com>
- <CAM0EoMn4C-zwrTCGzKzuRYukxoqBa8tyHyFDwUSZYwkMOUJ4Lw@mail.gmail.com>
- <CAKa-r6sNMq5b=PiUhm0U=COV1fE=HL_CjOPxchs1WpWi4-_XNA@mail.gmail.com> <CAM0EoMm6QHzFdFLJ8Q1nO6W-m47tkxzVp7k2rAZYJZNXCCbM9g@mail.gmail.com>
-In-Reply-To: <CAM0EoMm6QHzFdFLJ8Q1nO6W-m47tkxzVp7k2rAZYJZNXCCbM9g@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 7 Dec 2023 09:10:13 -0500
-Message-ID: <CAM0EoMmvjwxLmdT5pQJ-hXVMA2OJUfy8TJKDxZ=vf+Thzza0=Q@mail.gmail.com>
-Subject: Re: Mirred broken WAS(Re: [PATCH net-next 2/2] act_mirred: use the
- backlog for nested calls to mirred ingress
-To: Davide Caratti <dcaratti@redhat.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, Xin Long <lucien.xin@gmail.com>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, wizhao@redhat.com, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Florian Westphal <fw@strlen.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20231004161651.76f686f3@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-Hi Davide,
+On 05/10/2023 00:16, Jakub Kicinski wrote:
+> On Wed, 27 Sep 2023 19:13:37 +0100 edward.cree@amd.com wrote:
+>> While this is not needed to serialise the ethtool entry points (which
+>>  are all under RTNL), drivers may have cause to asynchronously access
+>>  dev->ethtool->rss_ctx; taking dev->ethtool->rss_lock allows them to
+>>  do this safely without needing to take the RTNL.
+> 
+> Can we use a replay mechanism, like we do in TC offloads and VxLAN/UDP
+> ports? The driver which lost config can ask for the rss contexts to be
+> "replayed" and the core will issue a series of ->create calls for all
+> existing entries?
+So I tried to prototype this, and unfortunately I ran into a problem.
+While we can replay the contexts alright, that still leaves the ntuple
+ filters which we also want to restore, and which might depend on the
+ contexts, so that can't be done until after context restore is done.
+So to do this we'd need to *also* have the core replay the filters,
+ which would mean adding a filter array to the core similar to this
+ context array.  Now that's a thing that might be useful to have,
+ enabling netlink dumps and so on, but it would considerably extend
+ the scope of this work, in which case who knows if it'll ever be
+ ready to merge :S
+Moreover, at least in the case of sfc (as usual, no idea about other
+ NICs), the filter table on the device contains more than just ntuple
+ filters; stuff like the device's unicast address list, PTP filters
+ and representor filters, some of which are required for correct
+ operation, live in the same table.
+When coming up after a reset, currently we:
+1) restore RSS contexts
+2) restore all filters (both driver-internal and ethtool ntuple) from
+   the software shadow filter table into the hardware
+3) bring up the NIC datapath.
+Instead we would need to:
+1) restore all the 'internal' filters (which do not, and after these
+   changes could not ever, use custom RSS contexts), and discard all
+   ntuple filters from the software shadow filter table in the driver
+2) request RSS+ntuple replay
+3) bring up the NIC datapath
+4) the replay workitem runs, and reinserts RSS contexts and ntuple
+   filters.
+This would also mean that the default RSS context, which is used by
+ the unicast/multicast address and Ethernet broadcast filters, could
+ not ever migrate to be tracked in the XArray (otherwise a desirable
+ simplification).
 
+tl;dr: none of this is impossible, but it'd be a lot of work just to
+ get rid of one mutex, and would paint us into a bit of a corner.
+So I propose to stick with the locking scheme for now; I'll post v5
+ with the other review comments addressed; and if at some point in
+ the future core tracking of ntuple filters gets added, we can
+ revisit then whether moving to a replay scheme is viable.  Okay?
 
-On Tue, Dec 5, 2023 at 10:12=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
->
-> On Tue, Dec 5, 2023 at 5:54=E2=80=AFAM Davide Caratti <dcaratti@redhat.co=
-m> wrote:
-> >
-> > hello Jamal, thanks for looking at this!
-> >
-> > On Mon, Dec 4, 2023 at 9:24=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.c=
-om> wrote:
-> > >
-> > > On Fri, Jan 20, 2023 at 12:02=E2=80=AFPM Davide Caratti <dcaratti@red=
-hat.com> wrote:
-> > > >
-> > > > William reports kernel soft-lockups on some OVS topologies when TC =
-mirred
-> > > > egress->ingress action is hit by local TCP traffic [1].
-> > > > The same can also be reproduced with SCTP (thanks Xin for verifying=
-), when
-> > > > client and server reach themselves through mirred egress to ingress=
-, and
-> > > > one of the two peers sends a "heartbeat" packet (from within a time=
-r).
-> >
-> > [...]
-> >
-> > > I am afraid this broke things. Here's a simple use case which causes
-> > > an infinite loop (that we found while testing blockcasting but
-> > > simplified to demonstrate the issue):
-> >
-> > [...]
-> >
-> > > sudo ip netns exec p4node tc qdisc add dev port0 clsact
-> > > sudo ip netns exec p4node tc filter add dev port0 ingress protocol ip
-> > > prio 10 matchall action mirred ingress redirect dev port0
-> >
-> > the above rule is taking packets from port0 ingress and putting it
-> > again in the mirred ingress of the same device, hence the loop.
->
-> Right - that was intentional to show the loop. We are worrying about
-> extending mirred now to also broadcast (see the blockcast discussion)
-> to more ports making the loop even worse. The loop should terminate at
-> some point - in this case it does not...
->
-> > I don't see it much different than what we can obtain with bridges:
-> >
-> > # ip link add name one type veth peer name two
-> > # ip link add name three type veth peer name four
-> > # for n in even odd; do ip link add name $n type bridge; done
-> > # for n in one two three four even odd; do ip link set dev $n up; done
-> > # for n in one three; do ip link set dev $n master odd; done
-> > # for n in two four; do ip link set dev $n master even; done
-> >
->
-> Sure that is another way to reproduce.
-
-Ok, so i can verify that re-introduction of the ttl field in the
-skb[1] fixes the issue. But restoring that patch may cause too much
-bikeshedding. Victor will work on a better approach using the cb
-struct instead - there may. Are you able to test with/out your patch
-and see if this same patch fixes it?
-
-cheers,
-jamal
-
-[1]https://lore.kernel.org/all/1430765318-13788-1-git-send-email-fw@strlen.=
-de/
-
-> > there is a practical difference: with bridges we have protocols (like
-> > STP) that can detect and act-upon loops - while TC mirred needs some
-> > facility on top (not 100% sure, but the same might also apply to
-> > similar tools, such as users of bpf_redirect() helper)
-> >
->
-> I dont think we can run something equivalent inside the kernel. The
-> ttl worked fine. BTW, the example shown breaks even when you have
-> everything running on a single cpu (and packets being queued on the
-> backlog)
->
-> > > reverting the patch fixes things and it gets caught by the nested
-> > > recursion check.
-> >
-> > the price of that revert is: we'll see those soft-lockups again with
-> > L4 protocols when peers communicate through mirred egress -> ingress.
-> >
-> > And even if it would fix mirred egress->ingress loops, we would still
-> > suffer from soft-lockups (on the qdisc root lock) when the same rule
-> > is done with mirred egress (see an example at
-> > https://github.com/multipath-tcp/mptcp_net-next/issues/451#issuecomment=
--1782690200)
-> > [1]
->
-> Yes, we need to make sure those are fixed with whatever replacement..
-> The loops will happen even on egress->egress (the example only showed
-> ingress-ingress).
->
-> We will try restoring the ttl and see if it continues to work with
-> your patch intact... unless there are other ideas.
->
-> > > Frankly, I believe we should restore a proper ttl from what was remov=
-ed here:
-> > > https://lore.kernel.org/all/1430765318-13788-1-git-send-email-fw@strl=
-en.de/
-> > > The headaches(and time consumed) trying to save the 3-4 bits removing
-> > > the ttl field is not worth it imo.
-> >
-> > TTL would protect us against loops when they are on the same node:
-> > what do you think about inserting a rule that detects BPDU before the
-> > mirred ingress rule?
->
-> I dont think running STP will save us from this, unless i am mistaken.
-> This happens within the kernel before the packet hits the "wire".
-> Besides this happens without using any bridging.
->
-> > [1] by the way: the POC patch at
-> > https://github.com/multipath-tcp/mptcp_net-next/issues/451#issuecomment=
--1782654075
-> > silcences lockdep false warnings, and it preserves the splat when the
-> > real deadlock happens with TC marred egress. If you agree I will send
-> > it soon to this ML for review.
->
-> please do.
->
-> cheers,
-> jamal
+-ed
 
