@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-54705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89DC1807E26
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 02:58:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60631807E33
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 03:08:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EC111F21892
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 01:58:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 367C828200B
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 02:08:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C56E15B9;
-	Thu,  7 Dec 2023 01:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79B6215C9;
+	Thu,  7 Dec 2023 02:08:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SkxCEksM"
 X-Original-To: netdev@vger.kernel.org
-Received: from zju.edu.cn (mail.zju.edu.cn [61.164.42.155])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id A9DEAB9;
-	Wed,  6 Dec 2023 17:58:16 -0800 (PST)
-Received: from dinghao.liu$zju.edu.cn ( [10.190.66.146] ) by
- ajax-webmail-mail-app2 (Coremail) ; Thu, 7 Dec 2023 09:58:00 +0800
- (GMT+08:00)
-Date: Thu, 7 Dec 2023 09:58:00 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: dinghao.liu@zju.edu.cn
-To: "Suman Ghosh" <sumang@marvell.com>
-Cc: "Ariel Elior" <aelior@marvell.com>, 
-	"Manish Chopra" <manishc@marvell.com>, 
-	"David S. Miller" <davem@davemloft.net>, 
-	"Eric Dumazet" <edumazet@google.com>, 
-	"Jakub Kicinski" <kuba@kernel.org>, 
-	"Paolo Abeni" <pabeni@redhat.com>, 
-	"Yuval Mintz" <Yuval.Mintz@qlogic.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [EXT] [PATCH] qed: Fix a potential double-free in
- qed_cxt_tables_alloc
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.2-cmXT5 build
- 20230825(e13b6a3b) Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <SJ0PR18MB5216D284A0CFEF612721D5FDDB84A@SJ0PR18MB5216.namprd18.prod.outlook.com>
-References: <20231206064531.6089-1-dinghao.liu@zju.edu.cn>
- <SJ0PR18MB5216D284A0CFEF612721D5FDDB84A@SJ0PR18MB5216.namprd18.prod.outlook.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21839D3
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 18:08:21 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1d06fffdb65so3224165ad.2
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 18:08:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701914900; x=1702519700; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sqe6+ODVrguz5c8m6TdqeAPB2/cG6oAt7NcdDHwUniU=;
+        b=SkxCEksMNX1Wh9xoDpLf6tkvt+8ghD9/0SjHitfYinqGdZkx04Pc0uyiCfRTbpeB1v
+         mjHcwgqbBq+LmZZ17LbeXp7g9+6W6QDoQt2ZCKDg11gi+1Itc+snurnobxqUxyRfN1ts
+         pm9hX0OpppUsm5sPPfw1+rB3mD3t7113veFOIWzJJ1BTh2xd0hIQ6w6qlBqMCTaY0O51
+         GBw+AJq+TN2s4Z1hiCutOtXaizRzVe3+NKLHAOhpb9R0KSCTctvExFmXmbxEBNr/Uxqi
+         zqQbKsCAurOPTKVlzcY9C6oN+ctYW5aWdB0AzcC79h0Ohx/DYrVfgidw1LIHxjKRgFle
+         HyAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701914900; x=1702519700;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sqe6+ODVrguz5c8m6TdqeAPB2/cG6oAt7NcdDHwUniU=;
+        b=JUs4FH5wRmxIAZ+HBARlb06fYOehNtDlwdqwckBA8Dn1I5kUNDKXrg3RmFERcXNHQW
+         Cybgd75JNG2HXkiOI/ofP93nPwS/oBIQ1C9XD1/hr83JGpBytCy6QbQUwzC01wayTwpk
+         QD28D9tDH2NB/KDib+A5SsR+wjU3CRgbFBbF22lNA30V0rtCBTmj/rxRckVYII5NrTQj
+         q15IHgyeMeawT4EAg0ivKpMvhl0WkNiaWKzThWidIgmITiZP/TUMGXC6tnKSkJYROVz0
+         fXEmbErcE7L11KOBHAbK9ByUZEIqS76qDoTspno3ESMDOLXH1bDEhYGOCah0qANzEjw9
+         8Oqw==
+X-Gm-Message-State: AOJu0YxEAyvaiNewZ5sMTvcwmkuw3BObrIAbjCvMdCEthvt1pyIb3mQJ
+	1BX4SviEKUUjLgGtNZpqpHI=
+X-Google-Smtp-Source: AGHT+IHPRst44H7aADvFNJUY3LQZsthl1oUhVIkM1K+oRkzR1qeJh9MJ4cy8hsX14yq/SLNbvhw17w==
+X-Received: by 2002:a17:903:22d0:b0:1d0:6ffd:6e69 with SMTP id y16-20020a17090322d000b001d06ffd6e69mr1821150plg.97.1701914900387;
+        Wed, 06 Dec 2023 18:08:20 -0800 (PST)
+Received: from swarup-virtual-machine ([171.76.80.2])
+        by smtp.gmail.com with ESMTPSA id h6-20020a170902eec600b001d087d2c42fsm131764plb.24.2023.12.06.18.08.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 18:08:19 -0800 (PST)
+Date: Thu, 7 Dec 2023 07:38:14 +0530
+From: swarup <swarupkotikalapudi@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jiri Pirko <jiri@resnulli.us>, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel-mentees@lists.linuxfoundation.org
+Subject: Re: [PATCH net-next v5] netlink: specs: devlink: add some(not all)
+ missing attributes in devlink.yaml
+Message-ID: <ZXEpDtDkKMTQwmwy@swarup-virtual-machine>
+References: <20231202123048.1059412-1-swarupkotikalapudi@gmail.com>
+ <20231205191944.6738deb7@kernel.org>
+ <ZXAoGhUnBFzQxD0f@nanopsycho>
+ <20231206080611.4ba32142@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <7f6e6e60.21d45.18c41ff00b8.Coremail.dinghao.liu@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:by_KCgBXX9eoJnFluc5VAA--.18379W
-X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/1tbiAgsCBmVwRZQh7wABsG
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231206080611.4ba32142@kernel.org>
 
-SGkgU3VtYW4sCgo+ID5xZWRfaWx0X3NoYWRvd19hbGxvYygpIHdpbGwgY2FsbCBxZWRfaWx0X3No
-YWRvd19mcmVlKCkgdG8gZnJlZSBwX2h3Zm4tCj4gPj5wX2N4dF9tbmdyLT5pbHRfc2hhZG93IG9u
-IGVycm9yLiBIb3dldmVyLAo+ID5xZWRfY3h0X3RhYmxlc19hbGxvYygpIGZyZWVzIHRoaXMgcG9p
-bnRlciBhZ2FpbiBvbiBmYWlsdXJlIG9mCj4gPnFlZF9pbHRfc2hhZG93X2FsbG9jKCkgdGhyb3Vn
-aCBjYWxsaW5nIHFlZF9jeHRfbW5ncl9mcmVlKCksIHdoaWNoIG1heQo+ID5sZWFkIHRvIGRvdWJs
-ZS1mcmVlLiBGaXggdGhpcyBpc3N1ZSBieSBzZXR0aW5nIHBfaHdmbi0+cF9jeHRfbW5nci0KPiA+
-PmlsdF9zaGFkb3cgdG8gTlVMTCBpbiBxZWRfaWx0X3NoYWRvd19mcmVlKCkuCj4gPgo+ID5GaXhl
-czogZmU1NmI5ZTZhOGQ5ICgicWVkOiBBZGQgbW9kdWxlIHdpdGggYmFzaWMgY29tbW9uIHN1cHBv
-cnQiKQo+ID5TaWduZWQtb2ZmLWJ5OiBEaW5naGFvIExpdSA8ZGluZ2hhby5saXVAemp1LmVkdS5j
-bj4KPiA+LS0tCj4gPiBkcml2ZXJzL25ldC9ldGhlcm5ldC9xbG9naWMvcWVkL3FlZF9jeHQuYyB8
-IDEgKwo+ID4gMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspCj4gPgo+ID5kaWZmIC0tZ2l0
-IGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvcWxvZ2ljL3FlZC9xZWRfY3h0LmMKPiA+Yi9kcml2ZXJz
-L25ldC9ldGhlcm5ldC9xbG9naWMvcWVkL3FlZF9jeHQuYwo+ID5pbmRleCA2NWUyMDY5M2M1NDku
-LjI2ZTI0NzUxNzM5NCAxMDA2NDQKPiA+LS0tIGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvcWxvZ2lj
-L3FlZC9xZWRfY3h0LmMKPiA+KysrIGIvZHJpdmVycy9uZXQvZXRoZXJuZXQvcWxvZ2ljL3FlZC9x
-ZWRfY3h0LmMKPiA+QEAgLTkzMyw2ICs5MzMsNyBAQCBzdGF0aWMgdm9pZCBxZWRfaWx0X3NoYWRv
-d19mcmVlKHN0cnVjdCBxZWRfaHdmbgo+ID4qcF9od2ZuKQo+ID4gCQlwX2RtYS0+dmlydF9hZGRy
-ID0gTlVMTDsKPiA+IAl9Cj4gPiAJa2ZyZWUocF9tbmdyLT5pbHRfc2hhZG93KTsKPiA+KwlwX2h3
-Zm4tPnBfY3h0X21uZ3ItPmlsdF9zaGFkb3cgPSBOVUxMOwo+IFtTdW1hbl0gSGkgRGluZ2hhbywK
-PiAKPiBJIGFtIG5vdCBzdXJlIGhvdyB0aGlzIHdpbGwgaGVscCBwcmV2ZW50IHRoZSBkb3VibGUg
-ZnJlZSBoZXJlPyBJZiBxZWRfaWx0X3NoYWRvd19hbGxvYygpIGZhaWxzIHRvIGFsbG9jYXRlIG1l
-bW9yeSwgdGhlbiBzdGlsbCBxZWRfY3h0X21uZ3JfZnJlZSgpIHdpbGwgYmUgY2FsbGVkIGFuZCBr
-ZnJlZSgpCj4gd2lsbCB0cnkgdG8gZnJlZSB0aGUgTlVMTCBwb2ludGVyLiBTaG91bGRuJ3QgaXQg
-YmUgbGlrZSBiZWxvdz8KPiAKPiBpZiAocF9tbmdyLT5pbHRfc2hhZG93KQo+IAlLZnJlZShwX21u
-Z3ItPmlsdF9zaGFkb3cpOwo+ID4gfQo+ID4KPiA+IHN0YXRpYyBpbnQgcWVkX2lsdF9ibGtfYWxs
-b2Moc3RydWN0IHFlZF9od2ZuICpwX2h3Zm4sCj4gPi0tCj4gPjIuMTcuMQo+ID4KCmtmcmVlKE5V
-TEwpIGlzIHNhZmUgaW4ga2VybmVsLiBCdXQga2ZyZWUoKSB3aWxsIG5vdCBzZXQgdGhlIGZyZWVk
-CnBvaW50ZXIgdG8gTlVMTC4gVGhlcmVmb3JlLCBjaGVja2luZyBwX21uZ3ItPmlsdF9zaGFkb3cg
-d2lsbApub3QgcHJldmVudCB0aGUga2ZyZWUoKSBmb3IgdGhlIHNlY29uZCB0aW1lLiBNYW55IGRv
-dWJsZS1mcmVlCmJ1Z3MgYXJlIGZpeGVkIGJ5IHNldHRpbmcgdGhlIGZyZWVkIHBvaW50ZXIgdG8g
-TlVMTCAoZS5nLiwgCjZiMGQwNDc3ZmNlNyAoIm1lZGlhOiBkdmItY29yZTogRml4IGRvdWJsZSBm
-cmVlIGluCmR2Yl9yZWdpc3Rlcl9kZXZpY2UoKSIpKSwgc28gSSBqdXN0IGZpeCB0aGlzIGJ1ZyBp
-biB0aGUgc2FtZQp3YXkuIAoKUmVnYXJkcywKRGluZ2hhbw==
+On Wed, Dec 06, 2023 at 08:06:11AM -0800, Jakub Kicinski wrote:
+> On Wed, 6 Dec 2023 08:51:54 +0100 Jiri Pirko wrote:
+> > My "suggested-by" is probably fine as I suggested Swarup to make the patch :)
+> 
+> Ah, I didn't realize, sorry :) Just mine needs to go then.
+
+Hi Jiri and Jakub,
+
+Thanks for your patience and support.
+
+I will send the new patchset tomorrow with Jiri comments fixed.
+
+Thanks,
+Swarup
+
 
