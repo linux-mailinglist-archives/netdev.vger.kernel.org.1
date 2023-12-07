@@ -1,103 +1,129 @@
-Return-Path: <netdev+bounces-54995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E884809217
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 21:13:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C77E809234
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 21:23:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC1ACB20B7B
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 20:13:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D6CF1C20959
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 20:23:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91F2D50256;
-	Thu,  7 Dec 2023 20:13:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE4050266;
+	Thu,  7 Dec 2023 20:23:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TGCl2jxF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XKw4ai3j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B36E170F
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 12:13:24 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5d42c43d8daso8354007b3.0
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 12:13:24 -0800 (PST)
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DECB1715
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 12:23:05 -0800 (PST)
+Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2ca0c36f5beso16450081fa.1
+        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 12:23:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701980003; x=1702584803; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Xn6buCrGR0vgnL7mOEqOirgThpbJiAXtrF8s5TzWL8Q=;
-        b=TGCl2jxFcrRRJumbf/Lt3unEGRcLIAUmjrmbeGUuq8sZhxjPsCU/H93Iq3XTFNwjHu
-         EGr6zeLmqxMSDH91r0Rz6EeQgrH6qkkQCsKEo/0+pTDeY6itArfSjC82m05JVmeZbQQs
-         TWh7XyIcCbR8LktboahM65CRs53CSujher1i4FHKwm0F0dEFjdzPQUer7SVuqioJfFfo
-         oq9SEGwzXBHM5wsXKaL92NZU5iyYOwZ0MU9XI8QwPK2j/AdwRM8QVGvsiWzRUcw/pQ1p
-         cc/FJv41X8WHa9VTA7TBit1mx+tJHNYLlGdsOMTM7M3PUhmF2G7yj+9Y9wdNYs6B5hC2
-         zG1g==
+        d=gmail.com; s=20230601; t=1701980583; x=1702585383; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=pDuSADVLpoQMP5PxroQPpBur1JJssHbSzpFJ1P/D71Y=;
+        b=XKw4ai3jR00aFoBHiaLmfAMjxdF4SRc3yOi7ULqpsE5mShT75R1Gx+EVCYXhSGKFRd
+         13KP8r37x0agHMYCEJBNoL6+gbTB3MYeBWrvA7dP3Zo6cdlCtEh93bCn+6r9DcWFVJxg
+         dNNqpdAXTKaK3PpFnBdydaJ8gV+x24dvmtdZHvxabvAo8Vb/YwIwWjKbMhEGhhkCFH/P
+         k8wTDBJXi8ro8ffHLW33hrPEBkDDkl4mhVcpHtG/39ZvrYvEab9LratBo2+kMVqWYSoc
+         Uu6jNM80uVtY4aMPj2qztSaPzSI60wz+NEP9pbLfKmyiDN9tHiVTowvdozMAF+Dz4bao
+         H54w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701980003; x=1702584803;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Xn6buCrGR0vgnL7mOEqOirgThpbJiAXtrF8s5TzWL8Q=;
-        b=GPXMNCPEWPSscjlGWqnvMRra6EcB7msYn/1vUfkv9X5aQL3mDVojXg1giTIsPpOTZD
-         0hBJiS6aA6rLY0ZV7UP+WFy6w5MZ8vkJX0pgKj+0p5Hyn5KvL2Vfl1r+bfmloLQectBt
-         lelt6HywlD3Kx/MOd+x0zxKFwsV7S8GsFRL1Yr+UinxmVluyIHPXy5tVyS8LJCU1bTOF
-         Rcyw7Yp8CVzk2xG1fA8s9lzFkrQed8Xujdej3grJsqOoNI7Jh9q9Z4AiyDkOY8Hl3CGo
-         kqn3aCU2UGkQQaCHDBiwDaiwVjL4jiPVwptfaTu1xt0sDZflFmpka2kvJYWgOBIseBwG
-         a7cg==
-X-Gm-Message-State: AOJu0YwSOzEXNXXDpO6Pd5T8dEr/3orzInJ5QwzhGUdEC5k1MZMq78pR
-	yWjvE8VbhqosynsMxOX/6S8C97GDPxiF1Q==
-X-Google-Smtp-Source: AGHT+IFNgy791H4vzQtxCkFFoz9BWR1fvXfVAVJaTfF1Nkhhx3DyH0j39sVKTOSGeLJovafhNV6iSWm/SyfiWQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:fe09:0:b0:5c1:4b36:85bf with SMTP id
- j9-20020a81fe09000000b005c14b3685bfmr74346ywn.1.1701980003377; Thu, 07 Dec
- 2023 12:13:23 -0800 (PST)
-Date: Thu,  7 Dec 2023 20:13:22 +0000
+        d=1e100.net; s=20230601; t=1701980583; x=1702585383;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pDuSADVLpoQMP5PxroQPpBur1JJssHbSzpFJ1P/D71Y=;
+        b=WcqiEzfVzXeglyCICC0+j2D0rQYR7hwm7sPtybvZ/H4gtXrGMWKiLCTiwq6C+M9TUL
+         xTgXGKMw3pxuBsNhw5fsu1gKRX1uOATF+wgVRh+8KeXdfXOAwMo3Y5OaRdAIOVaw4lN/
+         YIuRk4HvtvY9Ddt5lTXbPOj3pxQFc8pa6kLJTbMpa9z6uqqiUnZTOsFJyi5RqKOOsZR5
+         YZK3T3r3KSrWAS13AnrMS03Uwktzq6/0guKyN5+la4hdU3+9px8fPdllBCOTlCXAhHPy
+         51Cl76rLqdGoHTs/wUyVQLjvqEsOojYyVE5OvXrtvjLwm/TTO/X+5FRP9RVvPP8nxwWA
+         FdxA==
+X-Gm-Message-State: AOJu0YzN88qxDCdjM0ae519uJDnyDe+us6dxIIOQwgYhkK/cq4mOhXim
+	miHsQKmhHzaBb0SDg4pAqay8yoIeF7AOrF5WBxc=
+X-Google-Smtp-Source: AGHT+IEs3uPU+o3+4X1ZgRLE85TqZm8clsEp6fpg/xOKS0gQtU02+o1fpdDCbjoxYUjwShBre81sYoIXCOELslRqNhI=
+X-Received: by 2002:a05:6512:3050:b0:50c:21d7:e1b2 with SMTP id
+ b16-20020a056512305000b0050c21d7e1b2mr602094lfb.27.1701980583225; Thu, 07 Dec
+ 2023 12:23:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20231207201322.549000-1-edumazet@google.com>
-Subject: [PATCH net-next] ipv6: do not check fib6_has_expires() in fib6_info_release()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com, 
-	Kui-Feng Lee <thinker.li@gmail.com>
+MIME-Version: 1.0
+References: <20231117235140.1178-3-luizluca@gmail.com> <9460eced-5a3b-41c0-b821-e327f6bd06c9@kernel.org>
+ <20231120134818.e2k673xsjec5scy5@skbuf> <b304af68-7ce1-49b5-ab62-5473970e618f@kernel.org>
+ <CAJq09z5nOnwtL_rOsmReimt+76uRreDiOW_+9r==YJXF4+2tYg@mail.gmail.com>
+ <95381a84-0fd0-4f57-88e4-1ed31d282eee@kernel.org> <7afdc7d6-1382-48c0-844b-790dcb49fdc2@kernel.org>
+ <CAJq09z5uVjjE1k2ugVGctsUvn5yLwLQAM6u750Z4Sz7cyW5rVQ@mail.gmail.com>
+ <vcq6qsx64ulmhflxm4vji2zelr2xj5l7o35anpq3csxasbiffe@xlugnyxbpyyg>
+ <CAJq09z4ZdB9L7ksuN0b+N-LCv+zOvM+5Q9iWXccGN3w54EN1_Q@mail.gmail.com> <20231207170201.xq3it75hqqd6qnzj@skbuf>
+In-Reply-To: <20231207170201.xq3it75hqqd6qnzj@skbuf>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Thu, 7 Dec 2023 17:22:52 -0300
+Message-ID: <CAJq09z4YzgWW8n2=yCSNtmOERAKHf-EuLqdMOk+B4dQe2DCwEw@mail.gmail.com>
+Subject: Re: [net-next 2/2] net: dsa: realtek: load switch variants on demand
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <ALSI@bang-olufsen.dk>, 
+	Krzysztof Kozlowski <krzk@kernel.org>, "linus.walleij@linaro.org" <linus.walleij@linaro.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "andrew@lunn.ch" <andrew@lunn.ch>, 
+	"f.fainelli@gmail.com" <f.fainelli@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>, 
+	"pabeni@redhat.com" <pabeni@redhat.com>, "arinc.unal@arinc9.com" <arinc.unal@arinc9.com>
 Content-Type: text/plain; charset="UTF-8"
 
-My prior patch went a bit too far, because apparently fib6_has_expires()
-could be true while f6i->gc_link is not hashed yet.
+Hi Vladimir,
 
-fib6_set_expires_locked() can indeed set RTF_EXPIRES
-while f6i->fib6_table is NULL.
+> > I'm not sure if getting/putting a module is a problem or if I can
+> > request it when missing. I would like some options on that specific
+> > topic from the experts. It seems to happen in many places, even in DSA
+> > tag code.
+> >
+> > I wouldn't say it will invariably require both interface modules to be
+> > loaded. The dynamic load would be much simpler if variants request the
+> > interface module as we only have two (at most 3 with a future
+> > realtek-spi) modules. We would just need to call a
+> > realtek_interface_get() and realtek_interface_put() on each respective
+> > probe. The module names will be well-known with no issues with
+> > module_alias.
+> >
+> > Thanks for your help, Alvin. I'll wait for a couple of more days for
+> > others to manifest.
+>
+> I'm not an expert on this topic either, but Alvin's suggestion makes
+> sense to have the switch variant drivers be both platform and MDIO
+> device drivers, and call symbols exported by the interface drivers as
+> needed.
 
-Original syzbot reports were about corruptions caused
-by dangling f6i->gc_link.
+Yes, it does. It looks like the driver was upside down.
 
-Fixes: 5a08d0065a91 ("ipv6: add debug checks in fib6_info_release()")
-Reported-by: syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: David Ahern <dsahern@kernel.org>
-Cc: Kui-Feng Lee <thinker.li@gmail.com>
----
- include/net/ip6_fib.h | 1 -
- 1 file changed, 1 deletion(-)
+> If you are able to make the variant driver depend on just the interface
+> driver in use based on some request_module() calls, I don't think that
+> will be a problem with Krzysztof either, since he just said to not
+> duplicate the MODULE_DEVICE_TABLE() functionality.
 
-diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
-index e1e7a894863a7891610ce5afb2034473cc208d3e..95ed495c3a4028457baf1503c367d2e7a6e14770 100644
---- a/include/net/ip6_fib.h
-+++ b/include/net/ip6_fib.h
-@@ -329,7 +329,6 @@ static inline bool fib6_info_hold_safe(struct fib6_info *f6i)
- static inline void fib6_info_release(struct fib6_info *f6i)
- {
- 	if (f6i && refcount_dec_and_test(&f6i->fib6_ref)) {
--		DEBUG_NET_WARN_ON_ONCE(fib6_has_expires(f6i));
- 		DEBUG_NET_WARN_ON_ONCE(!hlist_unhashed(&f6i->gc_link));
- 		call_rcu(&f6i->rcu, fib6_info_destroy_rcu);
- 	}
--- 
-2.43.0.472.g3155946c3a-goog
+The interface modules are quite small, multiple times smaller than the
+variant module. It wasn't worth it to load them on demand as the code
+to handle that might be close to the interface module size. Indeed, as
+we'll have a common module, I think the best solution would be to
+merge both interfaces into the common module. It would make things
+much simpler: two variant/families modules that require a single
+common module. It is also closer to what we see in other DSA drivers.
 
+> I think it's down to prototyping something and seeing what are the pros
+> and cons.
+
+I already did that and I'm finishing some tests before submitting it.
+It looks like it fits nicely. I avoided some struct refactoring Alvim
+suggested to keep the change as small as possible but I went a little
+further migrating the user mdio driver to common and use it for both
+interfaces.
+
+Regards,
+
+Luiz
 
