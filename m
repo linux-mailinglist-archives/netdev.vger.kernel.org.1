@@ -1,126 +1,222 @@
-Return-Path: <netdev+bounces-54901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEF58808E79
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:19:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DE76808E84
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:22:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 768F91F2101D
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 17:19:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A816BB20A14
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 17:22:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D09648CDE;
-	Thu,  7 Dec 2023 17:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A7A48CDE;
+	Thu,  7 Dec 2023 17:22:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kxr2+Q9T"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CBwhfiF5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 037ABA3
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 09:19:46 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-50be3611794so1137123e87.0
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 09:19:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701969584; x=1702574384; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BRHoBg+e4lgIgJKzi58vQb3qsKzDJiDasD/dwcxO1Ig=;
-        b=Kxr2+Q9T7Nvj8ZCs6xqmi9v3a1ObQ0mYjkIfopyKuF/Zr8VCAU5Uwx/AXYPrtyGs8D
-         4k3nvskY6fIziC2QywZkN0zXPpa/Ge3jj+DkEqwqIOCf0CTBt4ErPyTQjPMmMtzFCEzn
-         IjWHUWrcDmAqyzD8RzhODSCD29gOntpE8FfX0eBqexWSpK4+IE71nzA7999gzw1e786s
-         /zbu87YKBspSTBF0k9W7c7weFSj82ON1Kb1jWCDzt0oxLp9uRHANLyBjNrRNLACl4X85
-         y8P8sVZDGIzBb4RkdrR/o6PtjNwlQq7rmycIEwdTsEERQAPkUy5lP39MeEyz1jwFPlbP
-         ieJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701969584; x=1702574384;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BRHoBg+e4lgIgJKzi58vQb3qsKzDJiDasD/dwcxO1Ig=;
-        b=ESZ3P6TjldcCgRzU4p/5wFQHMhdlInqP7n/VVQHdmqYUEm3LX+Sq2Fj/vdGEYBq56O
-         Kx+sKDdUSRw+mFfMM1avnPd14qttLQGyv4vhyk5GdZNe34A4+OLtTSMr7Tu+B5KQwJFU
-         IUN7HhZtb1TRrYhjB0iDzesGyIDsndFzJNAeGNM7LO3MddCz9iruqI7x7WS+6jglRRaR
-         QKYtzuB3gO/sHpMs/Kmi2/hpAhEK6COUWo5jfEf12wvN5i1XlMJCB4uLriIfAHNQgTSI
-         7YqVE/I7V8ZP/pXaNe/53S/ZDrMoNENN4I8kkfrl/5uA7qbiSm6tChRDHj2NN5p5gMEt
-         P3xg==
-X-Gm-Message-State: AOJu0Ywp8Rwxal90rUQNfYwV2rc3Vx8PiyOoBoOEeac++X9xZkwIBouZ
-	2y0IrQuOdhJME6rHyJZikD8=
-X-Google-Smtp-Source: AGHT+IEpj6tGSGS158u15FcF7n6tjEx5auUv/OmsZYJgE6zJpi7PcJ3MXF20AGjV+4ghi0wuH0mwcw==
-X-Received: by 2002:a05:6512:78e:b0:50b:aa9a:903b with SMTP id x14-20020a056512078e00b0050baa9a903bmr1376304lfr.30.1701969583827;
-        Thu, 07 Dec 2023 09:19:43 -0800 (PST)
-Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id ck9-20020a0564021c0900b0054f4097fea2sm67095edb.0.2023.12.07.09.19.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Dec 2023 09:19:43 -0800 (PST)
-Date: Thu, 7 Dec 2023 19:19:41 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: Alvin =?utf-8?Q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	"linus.walleij@linaro.org" <linus.walleij@linaro.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"andrew@lunn.ch" <andrew@lunn.ch>,
-	"f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"arinc.unal@arinc9.com" <arinc.unal@arinc9.com>
-Subject: Re: [net-next 2/2] net: dsa: realtek: load switch variants on demand
-Message-ID: <20231207171941.dhgch5fs6mmke7v7@skbuf>
-References: <20231117235140.1178-3-luizluca@gmail.com>
- <9460eced-5a3b-41c0-b821-e327f6bd06c9@kernel.org>
- <20231120134818.e2k673xsjec5scy5@skbuf>
- <b304af68-7ce1-49b5-ab62-5473970e618f@kernel.org>
- <CAJq09z5nOnwtL_rOsmReimt+76uRreDiOW_+9r==YJXF4+2tYg@mail.gmail.com>
- <95381a84-0fd0-4f57-88e4-1ed31d282eee@kernel.org>
- <7afdc7d6-1382-48c0-844b-790dcb49fdc2@kernel.org>
- <CAJq09z5uVjjE1k2ugVGctsUvn5yLwLQAM6u750Z4Sz7cyW5rVQ@mail.gmail.com>
- <vcq6qsx64ulmhflxm4vji2zelr2xj5l7o35anpq3csxasbiffe@xlugnyxbpyyg>
- <CAJq09z4ZdB9L7ksuN0b+N-LCv+zOvM+5Q9iWXccGN3w54EN1_Q@mail.gmail.com>
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C79CEA3;
+	Thu,  7 Dec 2023 09:22:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701969727; x=1733505727;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=cxce2/w/Ev4WegPERyasoQSNccjGfNR/i9i/+gJ+2KM=;
+  b=CBwhfiF5egY0nCYyELLU2H0hI4UjgaWZC0CSMA9y1eC0DvLWYP4QINfH
+   jv4r4vsKm8/cW+Dh1XIbRhLSHltpCmbTDaa/eIzqXPQP75itLAQJ2IO5M
+   d3oVrxuPOhPHg6RmlSH8IbkVKCMn70uBBUpWioL05SCC9edeyTdTI0NLa
+   Sq4fVjTaVnjYKvvvMgc4gswqnk9lZIx1nzoI6RMfwFyd5g2qKVmYte2ZV
+   zuO+nMCcHfOUVOzByfBQkicZZ+QtdJOXHjp+ehCvXgRz3i59vV+IPpMb9
+   1T+v/bZmxsE0aXdTmGjqP4CZOgZ1yAFip3ODBXm8l3FDNuJ0by1jJ2ekB
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="374434623"
+X-IronPort-AV: E=Sophos;i="6.04,258,1695711600"; 
+   d="scan'208";a="374434623"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2023 09:21:54 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="721548484"
+X-IronPort-AV: E=Sophos;i="6.04,258,1695711600"; 
+   d="scan'208";a="721548484"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orsmga003.jf.intel.com with ESMTP; 07 Dec 2023 09:21:50 -0800
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	David Christensen <drc@linux.vnet.ibm.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v6 00/12] net: intel: start The Great Code Dedup + Page Pool for iavf
+Date: Thu,  7 Dec 2023 18:19:58 +0100
+Message-ID: <20231207172010.1441468-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJq09z4ZdB9L7ksuN0b+N-LCv+zOvM+5Q9iWXccGN3w54EN1_Q@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 27, 2023 at 07:24:16PM -0300, Luiz Angelo Daros de Luca wrote:
-> The "realtek_smi_setup_mdio()" used in setup_interface isn't really
-> necessary (like it happens in realtek-mdio). It could be used (or not)
-> by both interfaces. The "realtek,smi-mdio" compatible string is
-> misleading, indicating it might be something specific to the SMI
-> interface HW while it is just how the driver was implemented. A
-> "realtek,slave_mdio" or "realtek,user_mii" would be better.
+Here's a two-shot: introduce Intel Ethernet common library (libie) and
+switch iavf to Page Pool. Details are in the commit messages; here's
+a summary:
 
-The compatible string is about picking a driver for a device. It is
-supposed to uniquely describe the register layout and functionality of
-that IP block, not its functional role in the kernel. "slave_mdio" and
-"user_mii" are too ingrained with "this MDIO controller gives access to
-internal PHY ports of DSA slave ports".
+Not a secret there's a ton of code duplication between two and more Intel
+ethernet modules. Before introducing new changes, which would need to be
+copied over again, start decoupling the already existing duplicate
+functionality into a new module, which will be shared between several
+Intel Ethernet drivers. The first name that came to my mind was
+"libie" -- "Intel Ethernet common library". Also this sounds like
+"lovelie" (-> one word, no "lib I E" pls) and can be expanded as
+"lib Internet Explorer" :P
+The series is only the beginning. From now on, adding every new feature
+or doing any good driver refactoring will remove much more lines than add
+for quite some time. There's a basic roadmap with some deduplications
+planned already, not speaking of that touching every line now asks:
+"can I share this?". The final destination is very ambitious: have only
+one unified driver for at least i40e, ice, iavf, and idpf with a struct
+ops for each generation. That's never gonna happen, right? But you still
+can at least try.
+PP conversion for iavf lands within the same series as these two are tied
+closely. libie will support Page Pool model only, so that a driver can't
+use much of the lib until it's converted. iavf is only the example, the
+rest will eventually be converted soon on a per-driver basis. That is
+when it gets really interesting. Stay tech.
 
-Even if the MDIO controller doesn't currently have its own struct device
-and driver, you'd have to think of the fact that it could, when picking
-an appropriate compatible string.
+Alexander Lobakin (12):
+  page_pool: make sure frag API fields don't span between cachelines
+  page_pool: don't use driver-set flags field directly
+  net: intel: introduce Intel Ethernet common library
+  iavf: kill "legacy-rx" for good
+  iavf: drop page splitting and recycling
+  page_pool: constify some read-only function arguments
+  page_pool: add DMA-sync-for-CPU inline helper
+  libie: add Rx buffer management (via Page Pool)
+  iavf: pack iavf_ring more efficiently
+  iavf: switch to Page Pool
+  libie: add common queue stats
+  iavf: switch queue stats to libie
 
-If you have very specific information that the MDIO controller is based on
-some reusable/licensable IP block and there were no modifications made
-to it, you could use that compatible string.
+ MAINTAINERS                                   |   3 +-
+ drivers/net/ethernet/intel/Kconfig            |   6 +
+ drivers/net/ethernet/intel/Makefile           |   1 +
+ drivers/net/ethernet/intel/i40e/i40e_common.c | 253 -------
+ drivers/net/ethernet/intel/i40e/i40e_main.c   |   1 +
+ .../net/ethernet/intel/i40e/i40e_prototype.h  |   7 -
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c   |  72 +-
+ drivers/net/ethernet/intel/i40e/i40e_type.h   |  88 ---
+ drivers/net/ethernet/intel/iavf/iavf.h        |   2 +-
+ drivers/net/ethernet/intel/iavf/iavf_common.c | 253 -------
+ .../net/ethernet/intel/iavf/iavf_ethtool.c    | 235 +------
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  42 +-
+ .../net/ethernet/intel/iavf/iavf_prototype.h  |   7 -
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c   | 624 ++++--------------
+ drivers/net/ethernet/intel/iavf/iavf_txrx.h   | 174 +----
+ drivers/net/ethernet/intel/iavf/iavf_type.h   |  90 ---
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   |  17 +-
+ .../net/ethernet/intel/ice/ice_lan_tx_rx.h    | 316 ---------
+ drivers/net/ethernet/intel/ice/ice_main.c     |   1 +
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.c |  74 +--
+ drivers/net/ethernet/intel/libie/Kconfig      |   9 +
+ drivers/net/ethernet/intel/libie/Makefile     |   7 +
+ drivers/net/ethernet/intel/libie/rx.c         | 179 +++++
+ drivers/net/ethernet/intel/libie/stats.c      | 121 ++++
+ include/linux/net/intel/libie/rx.h            | 259 ++++++++
+ include/linux/net/intel/libie/stats.h         | 179 +++++
+ include/net/page_pool/helpers.h               |  34 +-
+ include/net/page_pool/types.h                 |  19 +-
+ net/core/page_pool.c                          |  42 +-
+ 29 files changed, 1058 insertions(+), 2057 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/libie/Kconfig
+ create mode 100644 drivers/net/ethernet/intel/libie/Makefile
+ create mode 100644 drivers/net/ethernet/intel/libie/rx.c
+ create mode 100644 drivers/net/ethernet/intel/libie/stats.c
+ create mode 100644 include/linux/net/intel/libie/rx.h
+ create mode 100644 include/linux/net/intel/libie/stats.h
 
-Otherwise, another sensible choice would be "realtek,<precise-soc-name>-mdio",
-because it leaves room for future extensions with other compatible
-strings, more generic or just as specific, that all bind to the same
-driver.
+---
+Directly to net-next, has non-Intel code changes :p
 
-It's always good to start being too specific rather than too generic,
-because a future Realtek switch might have a different IP block for its
-MDIO controller. Then a driver for your existing "realtek,smi-mdio" or
-"realtek,slave_mdio" or "realtek,user_mii" compatible string sounds like
-it could handle it, but it can't.
+From v5[0]:
+* drop Page Pool DMA shortcut: will pick up Eric's more global DMA sync
+  optimization[1] and expand it to cover both IOMMU and direct DMA a bit
+  later (Yunsheng);
+* drop per-queue Page Pool Ethtool stats: they are now exported via
+  generic Netlink interface (Jakub);
+* #01: leave a comment why exactly this alignment (Jakub, Yunsheng);
+* #08: make use of page_pool_params::netdev when calculating PP params;
+* #08: rename ``libie_rx_queue`` -> ``libie_buf_queue``.
 
-You can always add secondary compatible strings to a node, but changing
-the existing one breaks the ABI between the kernel and the DT.
+From v4[2]:
+* make use of Jakub's &page_pool_params split;
+* #01: prevent frag fields from spanning into 2 cachelines after
+  splitting &page_pool_params into fast and slow;
+* #02-03: bring back the DMA sync shortcut, now as a per-page flag
+  (me, Yunsheng);
+* #04: let libie have its own Kconfig to stop further bloating of poor
+  intel/Kconfig;
+* #06: merge page split-reuse-recycle drop into one commit (Alex);
+* #07: decouple constifying of several Page Pool function arguments
+  into a separate commit, constify some more;
+* #09: stop abusing internal PP fields in the driver code (Yunsheng);
+* #09: calculate DMA sync size (::max_len) correctly: within one page,
+  not one buffer (Yunsheng);
+* #10: decouple rearranging &iavf_ring into separate commit, optimize
+  it even more;
+* #11: let the driver get back to the last descriptor to process after
+  an skb allocation fail, don't drop it (Alex);
+* #11: stop touching unrelated stuff like watchdog timeout etc. (Alex);
+* fix "Return:" in the kdoc (now `W=12 C=1` is clean), misc typos.
+
+From v3[3]:
+* base on the latest net-next, update bloat-o-meter and perf stats;
+* split generic PP optimizations into a separate series;
+* drop "optimize hotpath a bunch" commit: a lot of [controversial]
+  changes in one place, worth own series (Alex);
+* 02: pick Rev-by (Alex);
+* 03: move in-place recycling removal here from the dropped patch;
+* 05: new, add libie Rx buffer API separatelly from IAVF changes;
+* 05-06: use new "hybrid" allocation API from[4] to reduce memory usage
+  when a page can fit more than 1 truesize (also asked by David);
+* 06: merge with "always use order-0 page" commit to reduce diffs and
+  simplify things (Alex);
+* 09: fix page_alloc_fail counter.
+
+From v2[5]:
+* 0006: fix page_pool.h include in OcteonTX2 files (Jakub, Patchwork);
+* no functional changes.
+
+From v1[6]:
+* 0006: new (me, Jakub);
+* 0008: give the helpers more intuitive names (Jakub, Ilias);
+*  -^-: also expand their kdoc a bit for the same reason;
+*  -^-: fix kdoc copy-paste issue (Patchwork, Jakub);
+* 0011: drop `inline` from C file (Patchwork, Jakub).
+
+[0] https://lore.kernel.org/netdev/20231124154732.1623518-1-aleksander.lobakin@intel.com
+[1] https://lore.kernel.org/netdev/20221115182841.2640176-1-edumazet@google.com
+[2] https://lore.kernel.org/netdev/20230705155551.1317583-1-aleksander.lobakin@intel.com
+[3] https://lore.kernel.org/netdev/20230530150035.1943669-1-aleksander.lobakin@intel.com
+[4] https://lore.kernel.org/netdev/20230629120226.14854-1-linyunsheng@huawei.com
+[5] https://lore.kernel.org/netdev/20230525125746.553874-1-aleksander.lobakin@intel.com
+[6] https://lore.kernel.org/netdev/20230516161841.37138-1-aleksander.lobakin@intel.com
+
+-- 
+2.43.0
+
 
