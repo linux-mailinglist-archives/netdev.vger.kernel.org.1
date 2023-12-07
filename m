@@ -1,349 +1,195 @@
-Return-Path: <netdev+bounces-54788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 301B48082DE
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 09:23:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91E11808381
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 09:47:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5173C1C21999
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 08:23:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48A0B2840FF
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 08:47:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6847528E04;
-	Thu,  7 Dec 2023 08:23:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFAB213AD6;
+	Thu,  7 Dec 2023 08:47:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SHjMXZ+D"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="FuYt+n1D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 042BE171E;
-	Thu,  7 Dec 2023 00:22:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701937380; x=1733473380;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=a3P1ITBA2KcXu7C6krGKaYwwSWVlPYDFSmgk28x0pqY=;
-  b=SHjMXZ+DhAJzLuZSTe2fO+I8W/bRA+IagLSOo/ZOMgKqBZUKplBhkEKc
-   bN3QrzO8m3/zlMYiMMru81yjGziOhPsBEWR8cXbDnbVann7bxXtljeEKN
-   idVnw7pAfrrpNaFu8nPpx9F3zgKgDDb1Cq2EYp8wjs7C+0/jth2b9GXX2
-   BOy+GbeoahOV5jt5ZDQ57rK3+S8UHP88USXLK8M5YPWUbWpzi14q1UFka
-   FdkYCufRWjwpOHVOVX1+X6DF+YiR7beuFXfbFnd8pxfXlf81c6z9fsYqS
-   9MUYIhKiFS/9rJlhWhrpxo7FlMSL2z26HRKGSo5L/nvCnA4h10BoZmuPb
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="1301298"
-X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
-   d="scan'208";a="1301298"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2023 00:22:58 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="747892097"
-X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
-   d="scan'208";a="747892097"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Dec 2023 00:22:57 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 7 Dec 2023 00:22:57 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 7 Dec 2023 00:22:57 -0800
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 7 Dec 2023 00:22:57 -0800
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2072.outbound.protection.outlook.com [40.107.20.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8381AC6;
+	Thu,  7 Dec 2023 00:47:19 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hSUs6QP9OYLdiJDvp4O0Hdemvf/XxUd5xjsRTIBigzRLTlyqsJKjk/hZqPiEj+73zrbYHhLzt1V1hIeIYiIclRRPAT5k60SukiqjKptd8l2Q9D17us+v7YXsxxk0outQXKICjINBrSVk/2o+VdxY+FDqzaiY9hWSRdTkI7R2OqTpfF8ks3vC5toMDMGH2fUabjBkQ7hKMWgJ/HUgTbob22l9Eso3YmNmvElsMT6lxLZnwHiNfg/5d9tvqxdcu6Q3dccOpQwCZHr1UnKrZBslcK01gKpWiWNFWgdjnQEUeZyyyKyB/BDhHw75FWaOfW2H4L8HFWTXRmXhslGEMT6mHw==
+ b=e1O9LFaYeWokIm42wHZa75RaULlA7+PwuCAvUFtKGJswnXARtyZ2fyRBAF/Lp38/MktU3o+EDi65UNDwnlRLp6cwQkzvHT4QomEHRkJvwQumQ/LgBj6enT9biRqP3Q1obkGW9+ON7qz3YUnILfgTrOFQAANCfi88DVx8eInAd/Sf35XMpXHDBeSJpYYX64Gu3hCCJqLIgdUHaY5Zr5kQLOdrnA5uOhDcv9ryXJqbEF8pXZRqfGpcIjgzsaCaCLLpiiGuXDdejeudKSH8jM1C5Rb25dADLMGOU2e8S2wqVaQQkE/Rc04Ec3fopHlIjdbOcpzengDOjB7V+KLqesiOXA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iw3UioT8Om7/YvfzM5ex+BlSD9f60YIc2e+EVX0dipU=;
- b=VTCf67gg/CKgfl/+palzC+MbENR+U/B67IDEZWx87fzc5x6rHFT483G7Ry1AlT7Owuw5YPQZ8qj+HreQTDmNb1B3IhrsL8gudcd9LomDRUGAnEfr5Ked7HAzGSHJcggorNco/5rTlWfcrLS1Trv2/qADhfIRdsahdmdKhzpsXCyPDI1GfU/80xRjnOOlKFVEYq5XKrLoO2KplCBs3muUTWvPmUh/1UhHTEgQNarFayobK8kB3BDAG2VSgqm1Xg9uE0AYhNMvrMcRGnIYzlVoTz3gnTDFpCzzmMG9SHKcCMessWOC+T0FGg61/djFvxh99qVHASviNJjWVCHm2lK6aA==
+ bh=0iJs9qJQ1bONPlJNCi6upX7UdxMYgDYFf3jHLAURVT0=;
+ b=HhcryniN606SqM3qloi39ihofW0fzC6YjUa1uRnGZikVV3y93iQMCchBNb70gn+jz/nTEDateQ1kS33T0F9wZz+XYef9l5QxocItkJQlUvqWlrqutOCrmrLnYzF0wDq5Ke8GXfe4a2vmp2dUb667RIlpvwFWJ5QuvuqDkD4rY1WULA4p/VBwmwxfAZV0MLEKo17NWJGImSEZgR+zaz2wSrjgroxEl94e1RaHk05MX1VK3y9Wu5mDUdNTynLgElEhmqwwsuJKp3nH6A6h1EamZjTUh9Ml/GvedAysUWn+AimiFVabqK5Y06kAZCh9zqcVw4G8JPlitsxpjDIp7zcy5w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by IA1PR11MB6465.namprd11.prod.outlook.com (2603:10b6:208:3a7::5) with
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0iJs9qJQ1bONPlJNCi6upX7UdxMYgDYFf3jHLAURVT0=;
+ b=FuYt+n1DEYhy/znDPRngH9+DemZ0tZLYQS9v9sz4Lr6D0yrXO/vd7KWAUCkNy3SBfxyh7/JsIEuZiof8BMO5Ehvgs13spLC6S3GVhUYKmuwgsVgdZXMv5oH6y1mlFu79IlUA/aFxSAqBabAdH/Ro8753mgAJNlYzgteL5CuB0TI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM5PR04MB3139.eurprd04.prod.outlook.com (2603:10a6:206:8::20)
+ by AM9PR04MB8652.eurprd04.prod.outlook.com (2603:10a6:20b:43f::21) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.27; Thu, 7 Dec
- 2023 08:22:54 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a%3]) with mapi id 15.20.7068.025; Thu, 7 Dec 2023
- 08:22:54 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: "Cao, Yahui" <yahui.cao@intel.com>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Liu, Lingyu" <lingyu.liu@intel.com>, "Chittim,
- Madhu" <madhu.chittim@intel.com>, "Samudrala, Sridhar"
-	<sridhar.samudrala@intel.com>, "alex.williamson@redhat.com"
-	<alex.williamson@redhat.com>, "jgg@nvidia.com" <jgg@nvidia.com>,
-	"yishaih@nvidia.com" <yishaih@nvidia.com>,
-	"shameerali.kolothum.thodi@huawei.com"
-	<shameerali.kolothum.thodi@huawei.com>, "brett.creeley@amd.com"
-	<brett.creeley@amd.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-Subject: RE: [PATCH iwl-next v4 09/12] ice: Save and load TX Queue head
-Thread-Topic: [PATCH iwl-next v4 09/12] ice: Save and load TX Queue head
-Thread-Index: AQHaHCWC7v6C8L+qAkCS0WhagKZWcrCdjVyQ
-Date: Thu, 7 Dec 2023 08:22:53 +0000
-Message-ID: <BN9PR11MB52766AECA2168F37AEF6995D8C8BA@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20231121025111.257597-1-yahui.cao@intel.com>
- <20231121025111.257597-10-yahui.cao@intel.com>
-In-Reply-To: <20231121025111.257597-10-yahui.cao@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|IA1PR11MB6465:EE_
-x-ms-office365-filtering-correlation-id: af2e0029-7b23-43e5-e577-08dbf6fdb567
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: rRj9+n0u6dLRiciKWzvjrSKvEy3dZ5nGAZObu7gPvsxkA9kl9yTu/rhqUG9ne0MZKTdAN/EhdAsAex0AwF3CriodktofWEu2/bQwFaEFjnxOBSHYRUrJSqaiv639aFHiaIOK1M3X2aTzvykwA77fISXdxg0xjmt8xk3N2NcHaBg4barJzMU3qZwKLIMLCHjuOwoBey2+UnYYD2dZTxjqvNs+Xh1XKj53CiFyAHBd75LQTeQIfZkFSzwX6fk9gj0PnjddLxpIJSLlELoANwRo7tBdMijvXcdrq1aSd5ftAMRJOFEn+Huh3GYidn0s58Bd/EsmWNvBDnN3DgYVR+Agu95j/ZZBc2yaB19kPPVAhRt4Ya7IO/ldNF0sv5vMVDTITfcjqoGW0fqWfVozixA8Ag21e3ox4M6qedejLBkvadYJxvNMcj+PzRaWEiOlZcsIMP9E7tLYYkAjsMwG310S4xhXcm2tJqw7tYLogLgfWpqEZjUZ++ViC14QgGgr4kOa+vyoiudtZZhq+8XoLKNj0/wRVom8uvi1SX33vruCCwhjvpQH+r07xuy81AeBIlLp4l00C9ONKPuCq92h09RrrlwQlJHoCd2yYDgSpvclaXRTATR/+QjB84SxHmZtmRm2
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(346002)(136003)(376002)(366004)(230922051799003)(64100799003)(451199024)(1800799012)(186009)(110136005)(316002)(66556008)(66446008)(66946007)(76116006)(64756008)(54906003)(66476007)(6506007)(9686003)(71200400001)(41300700001)(26005)(7696005)(478600001)(33656002)(38070700009)(38100700002)(86362001)(122000001)(82960400001)(83380400001)(52536014)(7416002)(2906002)(5660300002)(55016003)(8936002)(4326008)(8676002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?TjSZ1e5bzDrWFqhzALMlK3KA/C3XcUko2JU3V5gO9TCJk+Ke7rqKFphDqQRq?=
- =?us-ascii?Q?WrM6T/dPps2G64nSsqKk5L9X33Qda0HQmaJYUkWUHk5tOjyP4XiIZDDPDK4M?=
- =?us-ascii?Q?+bnW7156LHC2gZHDJQkAi9/tEDoRkL3OiWnpAj94lMOIIhQrTqeK+QpEuBCT?=
- =?us-ascii?Q?rUjcfD8PbazViLaEOfD93mmTwn0TL5SNnIuQs9Yr/fX3gF0b1NQMy47qSNHe?=
- =?us-ascii?Q?P+8DbhkgiLsD/EGbGB/0GmgwI+JVISMSw5lPFXahcxjTEoNzCWOOseVGrnWZ?=
- =?us-ascii?Q?ruTjul3liudh9p2pDdIdgJnvttdOLsa6uLsLlArswMQrxKvxnV08FnGCz2wi?=
- =?us-ascii?Q?hfoipAYY6GUqMY5o2vU+IptQnm5d4DtXqJwVm0swkPOa8HNRUW8rYZg2YZew?=
- =?us-ascii?Q?rIlqux48ajc94sKmBCi8UB93+mYEll3Z3mb8ndkDO8vMbfeB/i0/OXjsDAaI?=
- =?us-ascii?Q?3krU0RK0PR7GwF6rH3jsF5YAWM8fz+QmC7+fD0jqKvBC+fWz/i3lQSB2STGR?=
- =?us-ascii?Q?/HCO/P6Ckf4Z0kOiIIWVVjH4n4GSXtejwKPgYr1VV9ggg5NlKVyS/x+LK47Y?=
- =?us-ascii?Q?fVH32vAhB6Kq0tBzNuYuqajwhwhcpeqWx2Jda0yGP0fl0igm7FToZCeGqyrd?=
- =?us-ascii?Q?+66L/w9U7zd/2rkprSy8nJbPN78VGQxG612cSHi5qahXQ375zYFAP8PLIDC2?=
- =?us-ascii?Q?JMteuXj0THzmweLH+hdHzTlUHALgP2rnhOsNFluq7QFpu6556UX/qfzA7LxY?=
- =?us-ascii?Q?5gs9FfnQIKhyddu4+rS3cXl2ctV7c4vqni1rNMUoxYbYutKa4VyL6WpwNZFE?=
- =?us-ascii?Q?v5sFM27oQuXspPukBpAGwi9mReTTciJ+CgijaV6D5AAiVp1eHc68kRJ7REbq?=
- =?us-ascii?Q?ii/+XcWlRloBZOVcznI6oODkflNUJ3rscpGNvPRzxrhdx8+PETuK/IzlGM2E?=
- =?us-ascii?Q?XJETfPDIRA+wpVbHnp4w9UQbl4Z+91ga6bVyE4eXLcatJ1DNqXCWnjiHPYYo?=
- =?us-ascii?Q?kJNDJnCxOkGcQRQN9sFlri8Psvru8OIId5866Cv23Afuj0lF1KM6u8np7fhY?=
- =?us-ascii?Q?l52nESUAzKlf54MgVl8bJY5/vU0LTdEk5w5I3tB6o+nIH9pG7U4FooipLmJF?=
- =?us-ascii?Q?gANs2fmT+x8rvmdY1BW5RKal00wIi8U/aj5dblGQCutGMbH1GADRKT5ty7x6?=
- =?us-ascii?Q?W3AsPGTp6LRD/EfUNSD30dxQrZ4znd/rIMcIDN+AJEnwc6aCBPQMGMyIYm94?=
- =?us-ascii?Q?mO6E07X3FFHwszktIli0r0J2eKBxJ+5XLKeHkyCdi8UDTpBjl5PrNmBCjbyW?=
- =?us-ascii?Q?cCVg9P7g7wCJ8AKGpHlaytp9nx4gzJaYjyjRPn/ekd6Lgvdclq2+zoOOgWrK?=
- =?us-ascii?Q?Nty4BBKMI4wWUtPXgQ+Q2Q/03Sh0Y0Fu8WmxANJz2yZkw/Wf7acUZE2550w8?=
- =?us-ascii?Q?NtGxZz5d0oy5zoXgzRjL9NMvxOB5hPQRKzjEBVz1Kyn/1owKwQTjqF0/UY+X?=
- =?us-ascii?Q?ah9ftyK1O7CRxsI3x6sXKli0ge+bDPLm0UqSOvvHCIsJX3esgPyMZP75irZx?=
- =?us-ascii?Q?hoxv2NRdXr3fDstdSD4NQnRrlsfqK8rvpb/LHzSi?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ 2023 08:47:16 +0000
+Received: from AM5PR04MB3139.eurprd04.prod.outlook.com
+ ([fe80::d6ee:d372:176b:1786]) by AM5PR04MB3139.eurprd04.prod.outlook.com
+ ([fe80::d6ee:d372:176b:1786%5]) with mapi id 15.20.7068.026; Thu, 7 Dec 2023
+ 08:47:16 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shenwei.wang@nxp.com,
+	xiaoning.wang@nxp.com,
+	netdev@vger.kernel.org
+Cc: radu-andrei.bulie@nxp.com,
+	linux-kernel@vger.kernel.org,
+	linux-imx@nxp.com
+Subject: [PATCH net] net: fec: correct queue selection
+Date: Thu,  7 Dec 2023 16:38:01 +0800
+Message-Id: <20231207083801.233704-1-wei.fang@nxp.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SG2PR01CA0137.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:8f::17) To AM5PR04MB3139.eurprd04.prod.outlook.com
+ (2603:10a6:206:8::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM5PR04MB3139:EE_|AM9PR04MB8652:EE_
+X-MS-Office365-Filtering-Correlation-Id: c7ee5707-291a-4a8b-060a-08dbf7011cdf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	HyhwSDLdZjKxK2iSDd5N+L3B963bZgB+aIh1MWkWJ45ezOVugAw0COyrXjaUJ612jBwKNOtWU/qMpp0FKHLj3QFzIOrdNkF3pRcMDcm5Z0haO06xC/Krr1oNMt4biOolTdFsKSfS9RQpeL07wo/0x2ZELquywM1DzWubkblxJl4uyGfcW/oBVQP5XO4UtOLpTbLL78gvZDn00IPhi2avuNqFGw+xlBSeRXZZoZCBfCWKvlxYFBVOGAFLLJOE9ymyB7ak44KfnVuGAXNdtpoH/T6rGhk2KvDfZJjnXAIhcLrSdJA//i2pMfFBagQGCTIEepBFJRohynTJlaQfTzD+I4QKbZzM2RD+j2kaENrcxIK+DYo69fYtNqn4YMQAUc4mOVKEu5MKuFfZoCaLsfLHGvmrn8F5gBcggejuu/GBl42ggvy+BtbQqj4w5QKP/taC+GUAK0szadJVLshXLbXX9ncraIari5EGyHywWq47JfPAsS+89B35ijHFQRPhM73OG6n3ZoL436uRbhx0a6FkQ1sPK+2qfRtr46ShnUBm6YHCqVBJCYyqyPPxkeCi6J1pItxZBzt10Bb9D9QjfT2szntnOsiOLkYBURcZSJZMwuVEaTxAdejAgY8tGdFVPLWA
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM5PR04MB3139.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(376002)(39860400002)(346002)(366004)(230922051799003)(64100799003)(1800799012)(451199024)(186009)(316002)(66556008)(66476007)(66946007)(6512007)(6506007)(36756003)(41300700001)(52116002)(6666004)(83380400001)(26005)(1076003)(6486002)(2616005)(478600001)(38350700005)(86362001)(38100700002)(44832011)(5660300002)(2906002)(8936002)(8676002)(4326008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?yg4X0ejig4FU5+Tm0pPXrJN2oEMm3au8bbbbmxhnFdhskWo/zCe1ka3TfkqW?=
+ =?us-ascii?Q?UCsWvqsj8uYAhkaVlSyPd79MHAeKkmW/glnmazziGJX6149fmsNW3Uk7m2NS?=
+ =?us-ascii?Q?FRCGK+awwDSFOg2vy7iGGAJrB3F/3tEg6MdaIjB3Ti1zJ7YKzCltqg+B4F1T?=
+ =?us-ascii?Q?jT8DcM8LczFo3rmtomYX4829AJ5SEUCRWu6FwIZXGAaCe7k9eJRJz1eV4EZC?=
+ =?us-ascii?Q?wty/Ys1KXV05BV1sh3EjDCkyiQH7hEjLS2eAnHqPTxBFj0D4XincIaHAaGLN?=
+ =?us-ascii?Q?4XM9vx1GGhvbDl0dInsNBr21FnwfLihpiuxtwiBPbi7yLsWRKCIl6XMM685Z?=
+ =?us-ascii?Q?8lXco0fKv/m81KYyKIkhMNZrG/jFMvWxsBG3SNwBmHKWcPbToFTt/L0FejDl?=
+ =?us-ascii?Q?or+tlEMX8C4iy8U+yQQZ2q55/YyM9U14J0oPq/2YDrX19BIJp0MIWRBFY5rO?=
+ =?us-ascii?Q?i9djGWCmwH9aC8SHj6ArR1zWLd5FA8H3c6IJOYfX7qfx1LdEAmLFslTqtppC?=
+ =?us-ascii?Q?wcCkiTmwTkwQUzuQD6CD241pyd+aEBHC+z/HZot6JdEcaQW7yi+r2sVnFwBA?=
+ =?us-ascii?Q?k9KM/fUKwUfOwWnhZz1qqCG3VqACVK5c70dpXq8amPCEfKSrvR5SqIZySgp+?=
+ =?us-ascii?Q?hNm0o9M/INx2Ar2Po1hIlO7jGes10KQFF5pXmRjuHrYKwal/zMs/1Sujmqvt?=
+ =?us-ascii?Q?FKPGLvYZ8kDbyLaNqQx80s7vjP8R5mfIIt6vxwD3TmgJoC3DXwar0UT42Hee?=
+ =?us-ascii?Q?gqCKOc66i6p95798IZyN3U12d/OsqCPZpQzBFsTElLXFM30Atf6TlVPZ7Vx7?=
+ =?us-ascii?Q?T6WHJbe/oMboWMGRwOd52R7k3TIxjm46UDfFyUm3n5R02AGWbOyz3soVZQiE?=
+ =?us-ascii?Q?H31QvysACPEypsdwOV5z2/veADsgPKKAYh1iZUsBawKhr7K8HdrIYkyuUjpY?=
+ =?us-ascii?Q?w7wq4pQezAaET3wMJy2pIJHT3ttUaY1dfLC1+SUyJ0uGb0Qfrt2yDeHYAO5M?=
+ =?us-ascii?Q?4my9nR8SxTGapIBW6ZOzaWpCYScH4/THfgG536OYimLle/MKb5ipqO+ZkTCp?=
+ =?us-ascii?Q?G8iITqI96dwPEKpPVqzv9a42v2zmiY20fosRjNxTJxiilQlYoszWHXxb53F7?=
+ =?us-ascii?Q?wJUF4UvO8tRZqxsvdAkcZbmOUepIj7qJtPIUU/rRk+1WHzjH0eluZAIXIM6o?=
+ =?us-ascii?Q?Z6GdfCcN6l7atxyBysQfUmQMuZ/Gb9V7bm3RII4jEN5+M3YzbzhxtBEVlp73?=
+ =?us-ascii?Q?leSOMV0GMEmkh9a4DK99VLEdbuDW1IovZeUJBgL9TFjzSzkdwrsEApnsWzd9?=
+ =?us-ascii?Q?/ab+VBIselNmlvLIqnOQ2/f5jnBBKzz/3jVBYjgcApB+KYL1Mpy/Pei60Lr1?=
+ =?us-ascii?Q?nLuNWiu155guCfm7pYQY6eqhiWt/6etf66mYuuZ2XHQfO0f5zJm5/6SmUe25?=
+ =?us-ascii?Q?eCOftbj2vfsKM8BkUMa3tmllrLs/XBVbQIHTfX/HGsjFFkSXE0RcySOZ8oRn?=
+ =?us-ascii?Q?P2YoP9nwjQBEumQ4fC0LaNoGWpoSiz0baHSpRGcUA3EypFaLrTfY/OvGs2qh?=
+ =?us-ascii?Q?EqPT7LguBlvtTWdbS7ROM1qcs0WKFfyRQSi0eRlE?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c7ee5707-291a-4a8b-060a-08dbf7011cdf
+X-MS-Exchange-CrossTenant-AuthSource: AM5PR04MB3139.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: af2e0029-7b23-43e5-e577-08dbf6fdb567
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Dec 2023 08:22:53.3215
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Dec 2023 08:47:16.2343
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qYQpUt0LL5E6SnzRE7ccEspw/sSkFSF/OVLDOSSFCJYP/N7U92aaNWkGgANJBgfthXy+iwKFZQ4zZi4E5SmJBw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6465
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cyiShRoVVggoFHOxh0kMAD83brpaIU8UYSecXf5+bT84PkMoDM1IfBVmaoc2PILikCt0+GCMilEyzBcPlxi0MA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8652
 
-> From: Cao, Yahui <yahui.cao@intel.com>
-> Sent: Tuesday, November 21, 2023 10:51 AM
->=20
-> To advance TX Head queue, HW needs to touch memory by DMA. But
-> directly
-> touching VM's memory to advance TX Queue head does not follow vfio
-> migration protocol design, because vIOMMU state is not defined by the
-> protocol. Even this may introduce functional and security issue under
-> hostile guest circumstances.
+From: Radu Bulie <radu-andrei.bulie@nxp.com>
 
-this limitation is not restricted to vIOMMU. Even when it's absent
-there is still no guarantee that the GPA address space has been
-re-attached to this device.
+The old implementation extracted VLAN TCI info from the payload
+before the VLAN tag has been pushed in the payload.
 
->=20
-> In order not to touch any VF memory or IO page table, TX Queue head
-> loading is using PF managed memory and PF isolation domain. This will
+Another problem was that the VLAN TCI was extracted even if the
+packet did not have VLAN protocol header.
 
-PF doesn't manage memory. It's probably clearer to say that TX queue
-is temporarily moved to PF when the head is being restored.
+This resulted in invalid VLAN TCI and as a consequence a random
+queue was computed.
 
-> also introduce another dependency that while switching TX Queue between
-> PF space and VF space, TX Queue head value is not changed. HW provides
-> an indirect context access so that head value can be kept while
-> switching context.
->=20
-> In virtual channel model, VF driver only send TX queue ring base and
-> length info to PF, while rest of the TX queue context are managed by PF.
-> TX queue length must be verified by PF during virtual channel message
-> processing. When PF uses dummy descriptors to advance TX head, it will
-> configure the TX ring base as the new address managed by PF itself. As a
-> result, all of the TX queue context is taken control of by PF and this
-> method won't generate any attacking vulnerability
+This patch fixes the above issues and use the VLAN TCI from the
+skb if it is present or VLAN TCI from payload if present. If no
+VLAN header is present queue 0 is selected.
 
-So basically the key points are:
+Fixes: 52c4a1a85f4b ("net: fec: add ndo_select_queue to fix TX bandwidth fluctuations")
+Signed-off-by: Radu Bulie <radu-andrei.bulie@nxp.com>
+Signed-off-by: Wei Fang <wei.fang@nxp.com>
+---
+ drivers/net/ethernet/freescale/fec_main.c | 27 +++++++++--------------
+ 1 file changed, 11 insertions(+), 16 deletions(-)
 
-1) TX queue head cannot be directly updated via VF mmio interface;
-2) Using dummy descriptors to update TX queue head is possible but it
-    must be done in PF's context;
-3) FW provides a way to keep TX queue head intact when moving
-    the TX queue ownership between VF and PF;
-4) the TX queue context affected by the ownership change is largely
-    initialized by the PF driver already, except ring base/size coming from
-    virtual channel messages. This implies that a malicious guest VF driver
-    cannot attack this small window though the tx head restore is done
-    after all the VF state are restored;
-5) and a missing point is that the temporary owner change doesn't
-    expose the TX queue to the software stack on top of the PF driver
-    otherwise that would be a severe issue.
+diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+index c3b7694a7485..e08c7b572497 100644
+--- a/drivers/net/ethernet/freescale/fec_main.c
++++ b/drivers/net/ethernet/freescale/fec_main.c
+@@ -3731,31 +3731,26 @@ static int fec_set_features(struct net_device *netdev,
+ 	return 0;
+ }
+ 
+-static u16 fec_enet_get_raw_vlan_tci(struct sk_buff *skb)
+-{
+-	struct vlan_ethhdr *vhdr;
+-	unsigned short vlan_TCI = 0;
+-
+-	if (skb->protocol == htons(ETH_P_ALL)) {
+-		vhdr = (struct vlan_ethhdr *)(skb->data);
+-		vlan_TCI = ntohs(vhdr->h_vlan_TCI);
+-	}
+-
+-	return vlan_TCI;
+-}
+-
+ static u16 fec_enet_select_queue(struct net_device *ndev, struct sk_buff *skb,
+ 				 struct net_device *sb_dev)
+ {
+ 	struct fec_enet_private *fep = netdev_priv(ndev);
+-	u16 vlan_tag;
++	u16 vlan_tag = 0;
+ 
+ 	if (!(fep->quirks & FEC_QUIRK_HAS_AVB))
+ 		return netdev_pick_tx(ndev, skb, NULL);
+ 
+-	vlan_tag = fec_enet_get_raw_vlan_tci(skb);
+-	if (!vlan_tag)
++	/* VLAN is present in the payload.*/
++	if (eth_type_vlan(skb->protocol)) {
++		struct vlan_ethhdr *vhdr = skb_vlan_eth_hdr(skb);
++
++		vlan_tag = ntohs(vhdr->h_vlan_TCI);
++	/*  VLAN is present in the skb but not yet pushed in the payload.*/
++	} else if (skb_vlan_tag_present(skb)) {
++		vlan_tag = skb->vlan_tci;
++	} else {
+ 		return vlan_tag;
++	}
+ 
+ 	return fec_enet_vlan_pri_to_queue[vlan_tag >> 13];
+ }
+-- 
+2.25.1
 
-> +static int
-> +ice_migration_save_tx_head(struct ice_vf *vf,
-> +			   struct ice_migration_dev_state *devstate)
-> +{
-> +	struct ice_vsi *vsi =3D ice_get_vf_vsi(vf);
-> +	struct ice_pf *pf =3D vf->pf;
-> +	struct device *dev;
-> +	int i =3D 0;
-> +
-> +	dev =3D ice_pf_to_dev(pf);
-> +
-> +	if (!vsi) {
-> +		dev_err(dev, "VF %d VSI is NULL\n", vf->vf_id);
-> +		return -EINVAL;
-> +	}
-> +
-> +	ice_for_each_txq(vsi, i) {
-> +		u16 tx_head;
-> +		u32 reg;
-> +
-> +		devstate->tx_head[i] =3D 0;
-> +		if (!test_bit(i, vf->txq_ena))
-> +			continue;
-> +
-> +		reg =3D rd32(&pf->hw, QTX_COMM_HEAD(vsi->txq_map[i]));
-> +		tx_head =3D (reg & QTX_COMM_HEAD_HEAD_M)
-> +					>> QTX_COMM_HEAD_HEAD_S;
-> +
-> +		/* 1. If TX head is QTX_COMM_HEAD_HEAD_M marker,
-> which means
-> +		 *    it is the value written by software and there are no
-> +		 *    descriptors write back happened, then there are no
-> +		 *    packets sent since queue enabled.
-
-It's unclear why it's not zero when no packet is sent.
-
-> +static int
-> +ice_migration_inject_dummy_desc(struct ice_vf *vf, struct ice_tx_ring
-> *tx_ring,
-> +				u16 head, dma_addr_t tx_desc_dma)
-
-based on intention this reads clearer to be:
-
-	ice_migration_restore_tx_head()
-
-
-> +
-> +	/* 1.3 Disable TX queue interrupt */
-> +	wr32(hw, QINT_TQCTL(tx_ring->reg_idx), QINT_TQCTL_ITR_INDX_M);
-> +
-> +	/* To disable tx queue interrupt during run time, software should
-> +	 * write mmio to trigger a MSIX interrupt.
-> +	 */
-> +	if (tx_ring->q_vector)
-> +		wr32(hw, GLINT_DYN_CTL(tx_ring->q_vector->reg_idx),
-> +		     (ICE_ITR_NONE << GLINT_DYN_CTL_ITR_INDX_S) |
-> +		     GLINT_DYN_CTL_SWINT_TRIG_M |
-> +		     GLINT_DYN_CTL_INTENA_M);
-
-this needs more explanation as it's not intuitive to disable interrupt by
-triggering another interrupt.
-
-> +
-> +	ice_for_each_txq(vsi, i) {
-> +		struct ice_tx_ring *tx_ring =3D vsi->tx_rings[i];
-> +		u16 *tx_heads =3D devstate->tx_head;
-> +
-> +		/* 1. Skip if TX Queue is not enabled */
-> +		if (!test_bit(i, vf->txq_ena) || tx_heads[i] =3D=3D 0)
-> +			continue;
-> +
-> +		if (tx_heads[i] >=3D tx_ring->count) {
-> +			dev_err(dev, "VF %d: invalid tx ring length to load\n",
-> +				vf->vf_id);
-> +			ret =3D -EINVAL;
-> +			goto err;
-> +		}
-> +
-> +		/* Dummy descriptors must be re-initialized after use, since
-> +		 * it may be written back by HW
-> +		 */
-> +		ice_migration_init_dummy_desc(tx_desc, ring_len,
-> tx_pkt_dma);
-> +		ret =3D ice_migration_inject_dummy_desc(vf, tx_ring,
-> tx_heads[i],
-> +						      tx_desc_dma);
-> +		if (ret)
-> +			goto err;
-> +	}
-> +
-> +err:
-> +	dma_free_coherent(dev, ring_len * sizeof(struct ice_tx_desc),
-> +			  tx_desc, tx_desc_dma);
-> +	dma_free_coherent(dev, SZ_4K, tx_pkt, tx_pkt_dma);
-> +
-> +	return ret;
-
-there is no err unwinding for the tx ring context itself.
-
-> +
-> +	/* Only load the TX Queue head after rest of device state is loaded
-> +	 * successfully.
-> +	 */
-
-"otherwise it might be changed by virtual channel messages e.g. reset"
-
-> @@ -1351,6 +1351,24 @@ static int ice_vc_ena_qs_msg(struct ice_vf *vf, u8
-> *msg)
->  			continue;
->=20
->  		ice_vf_ena_txq_interrupt(vsi, vf_q_id);
-> +
-> +		/* TX head register is a shadow copy of on-die TX head which
-> +		 * maintains the accurate location. And TX head register is
-> +		 * updated only after a packet is sent. If nothing is sent
-> +		 * after the queue is enabled, then the value is the one
-> +		 * updated last time and out-of-date.
-
-when is "last time"? Is it even not updated upon reset?
-
-or does it talk about a disable-enable sequence in which the real TX head
-is left with a stale value from last enable?
-
-> +		 *
-> +		 * QTX_COMM_HEAD.HEAD rang value from 0x1fe0 to 0x1fff
-> is
-> +		 * reserved and will never be used by HW. Manually write a
-> +		 * reserved value into TX head and use this as a marker for
-> +		 * the case that there's no packets sent.
-
-why using a reserved value instead of setting it to 0?
-
-> +		 *
-> +		 * This marker is only used in live migration use case.
-> +		 */
-> +		if (vf->migration_enabled)
-> +			wr32(&vsi->back->hw,
-> +			     QTX_COMM_HEAD(vsi->txq_map[vf_q_id]),
-> +			     QTX_COMM_HEAD_HEAD_M);
 
