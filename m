@@ -1,55 +1,41 @@
-Return-Path: <netdev+bounces-54777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BF21808241
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 08:59:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A5A28082A3
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 09:13:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B81AB20AE1
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 07:59:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0661A1F21B50
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 08:13:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CE4E1DFF0;
-	Thu,  7 Dec 2023 07:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3DDB31A71;
+	Thu,  7 Dec 2023 08:13:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35A32B2
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 23:59:03 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <rcz@pengutronix.de>)
-	id 1rB9Hb-0007wI-Ry; Thu, 07 Dec 2023 08:58:55 +0100
-Received: from [2a0a:edc0:0:1101:1d::54] (helo=dude05.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <rcz@pengutronix.de>)
-	id 1rB9Ha-00E8h2-4m; Thu, 07 Dec 2023 08:58:54 +0100
-Received: from rcz by dude05.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <rcz@pengutronix.de>)
-	id 1rB9Ha-00CyIz-0I;
-	Thu, 07 Dec 2023 08:58:54 +0100
-From: Rouven Czerwinski <r.czerwinski@pengutronix.de>
-To: Johannes Berg <johannes.berg@intel.com>,
-	Josua Mayer <josua@solid-run.com>,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: pza@pengutronix.de,
-	Rouven Czerwinski <r.czerwinski@pengutronix.de>,
-	stable@vger.kernel.org,
-	Johannes Berg <johannes@sipsolutions.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH v2] net: rfkill: gpio: set GPIO direction
-Date: Thu,  7 Dec 2023 08:58:36 +0100
-Message-Id: <20231207075835.3091694-1-r.czerwinski@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231206131336.3099727-1-r.czerwinski@pengutronix.de>
-References: <20231206131336.3099727-1-r.czerwinski@pengutronix.de>
+Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id ABBC3110;
+	Thu,  7 Dec 2023 00:13:05 -0800 (PST)
+X-IronPort-AV: E=Sophos;i="6.04,256,1695654000"; 
+   d="scan'208";a="185639157"
+Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
+  by relmlie5.idc.renesas.com with ESMTP; 07 Dec 2023 17:12:53 +0900
+Received: from localhost.localdomain (unknown [10.166.13.99])
+	by relmlir5.idc.renesas.com (Postfix) with ESMTP id 3F33440108E9;
+	Thu,  7 Dec 2023 17:12:53 +0900 (JST)
+From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+To: s.shtylyov@omp.ru,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Subject: [PATCH net-next v4 0/9] net: rswitch: Add jumbo frames support
+Date: Thu,  7 Dec 2023 17:12:37 +0900
+Message-Id: <20231207081246.1557582-1-yoshihiro.shimoda.uh@renesas.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,53 +43,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: rcz@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Fix the undefined usage of the GPIO consumer API after retrieving the
-GPIO description with GPIO_ASIS. The API documentation mentions that
-GPIO_ASIS won't set a GPIO direction and requires the user to set a
-direction before using the GPIO.
+This patch series is based on the latest net-next.git / main branch.
 
-This can be confirmed on i.MX6 hardware, where rfkill-gpio is no longer
-able to enabled/disable a device, presumably because the GPIO controller
-was never configured for the output direction.
+Changes from v3:
+https://lore.kernel.org/all/20231204012058.3876078-1-yoshihiro.shimoda.uh@renesas.com/
+ - Based on the latest net-next.git / main branch.
+ - Modify for code consistancy in the patch 3/9.
+ - Add a condition in the patch 3/9.
+ - Fix usage of dma_addr in the patch 8/9.
 
-Fixes: b2f750c3a80b ("net: rfkill: gpio: prevent value glitch during probe")
-Cc: stable@vger.kernel.org
-Signed-off-by: Rouven Czerwinski <r.czerwinski@pengutronix.de>
----
-v2:
-- remove the if clauses, the gpiod_direction_* functions can handle NULL
-  gpio descriptors.
+Changes from v2:
+https://lore.kernel.org/all/20231201054655.3731772-1-yoshihiro.shimoda.uh@renesas.com/
+ - Based on the latest net-next.git / main branch.
+ - Fix using a variable in the patch 8/9.
+ - Add Reviewed-by tag in the patch 1/9.
 
- net/rfkill/rfkill-gpio.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Changes from v1:
+https://lore.kernel.org/all/20231127115334.3670790-1-yoshihiro.shimoda.uh@renesas.com/
+ - Based on the latest net-next.git / main branch.
+ - Fix commit descriptions (s/near the future/the near future/).
 
-diff --git a/net/rfkill/rfkill-gpio.c b/net/rfkill/rfkill-gpio.c
-index 5a81505fba9ac..4e32d659524e0 100644
---- a/net/rfkill/rfkill-gpio.c
-+++ b/net/rfkill/rfkill-gpio.c
-@@ -126,6 +126,14 @@ static int rfkill_gpio_probe(struct platform_device *pdev)
- 		return -EINVAL;
- 	}
- 
-+	ret = gpiod_direction_output(rfkill->reset_gpio, true);
-+	if (ret)
-+		return ret;
-+
-+	ret = gpiod_direction_output(rfkill->shutdown_gpio, true);
-+	if (ret)
-+		return ret;
-+
- 	rfkill->rfkill_dev = rfkill_alloc(rfkill->name, &pdev->dev,
- 					  rfkill->type, &rfkill_gpio_ops,
- 					  rfkill);
+Yoshihiro Shimoda (9):
+  net: rswitch: Drop unused argument/return value
+  net: rswitch: Use unsigned int for desc related array index
+  net: rswitch: Use build_skb() for RX
+  net: rswitch: Add unmap_addrs instead of dma address in each desc
+  net: rswitch: Add a setting ext descriptor function
+  net: rswitch: Set GWMDNC register
+  net: rswitch: Add jumbo frames handling for RX
+  net: rswitch: Add jumbo frames handling for TX
+  net: rswitch: Allow jumbo frames
 
-base-commit: 994d5c58e50e91bb02c7be4a91d5186292a895c8
+ drivers/net/ethernet/renesas/Makefile  |   1 -
+ drivers/net/ethernet/renesas/rswitch.c | 377 +++++++++++++++++--------
+ drivers/net/ethernet/renesas/rswitch.h |  43 ++-
+ 3 files changed, 295 insertions(+), 126 deletions(-)
+
 -- 
-2.39.2
+2.34.1
 
 
