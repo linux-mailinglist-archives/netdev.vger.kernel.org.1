@@ -1,90 +1,120 @@
-Return-Path: <netdev+bounces-54699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17082807D89
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 02:02:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4730E807D99
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 02:08:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5B221F21363
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 01:02:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE8E7282092
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 01:08:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F4F37C;
-	Thu,  7 Dec 2023 01:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04517F3;
+	Thu,  7 Dec 2023 01:08:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PgXklL5D"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="lb0l514G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03B8DEE;
-	Wed,  6 Dec 2023 17:02:49 -0800 (PST)
-Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-5c66bbb3d77so274116a12.0;
-        Wed, 06 Dec 2023 17:02:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701910968; x=1702515768; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q0ZHx2dTpeeD/dzT9UX8bmnVSTh3P7Zoy3W1EjS6Yvs=;
-        b=PgXklL5DfrY+z2Sojg4K0GhWAcv8yGpLesQA9JLBMLz8FL9iINIhDv5m/zih91q0Ul
-         buasSlbpFsKmM0sjOpImIvsqkhu6JdGtgUY3HYHvYsmGxGULNFI9LPq7l4ZJsrGj+PGi
-         Gkx7cbQc8snT+K1NbjWi7eYEEd6L13rkHIGrdmCZNBCyBSvvYSxwizZ4b6FZ5lGQtO6q
-         sd12Z2uwcsdUx0iE33sxFEEmNtx72M5k2aHDIKPPVqR0KKIkWjh9a8IMyjcvWj+r1cex
-         UkZT22jxmit3LpaQhw81vgnTp3xUOSN1fa+MNs2p9QTKDgjl3839LcaTPGe/VS5z13E7
-         X0ZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701910968; x=1702515768;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q0ZHx2dTpeeD/dzT9UX8bmnVSTh3P7Zoy3W1EjS6Yvs=;
-        b=jbclxm5/S1Pq2pSzYd5NSwdBCOjJ42ux2yVVoTlT6CvXHSvsCIyqv0XW1ZuzDAXXs4
-         y6Z2JzWpcGnoScWb6joQNbMBbKXGi7oLZvpqjHyd6iSBhfN+JLFTvhoFORh5yCim53m+
-         StFpgf6TjNjqNUM1G4iTPSzWoBzzQEoOqljaiLRWL0YOw4VHPPSrFO/EeL6wtODm04Zt
-         h5xx74d8L5ECxWADtQdeD8iOuFIo26PgoHwHh3Kp8YRkzlK1w2YSsLUo+Ldtt0WmoHew
-         h6r4Ua952o3I6LFb7RYH4GiiPDg7XsHI63rdmoXB/4l+0hfnfEW3LGzNi2W8/58sS/gt
-         c6CA==
-X-Gm-Message-State: AOJu0Yy2Hq26IGayBDIJEePGIB84cg2enyWxGOYJpOZBV3ERThCGYDDB
-	xR2E+YbcsVb4AWV9XNATU3U=
-X-Google-Smtp-Source: AGHT+IF0NVXLnlslRkPt5reTco4DlgSrpI8lg5XgES8+5VA48tmxLztqsza/95Hxskb1PbsMxiLgzQ==
-X-Received: by 2002:a05:6a20:9410:b0:18f:97c:825e with SMTP id hl16-20020a056a20941000b0018f097c825emr1268601pzb.104.1701910968337;
-        Wed, 06 Dec 2023 17:02:48 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id fa37-20020a056a002d2500b006ce93ff8c7esm127179pfb.104.2023.12.06.17.02.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 17:02:47 -0800 (PST)
-Date: Thu, 7 Dec 2023 09:02:43 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Florent Revest <revest@chromium.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jiri@resnulli.us,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, stable@vger.kernel.org
-Subject: Re: [PATCH] team: Fix use-after-free when an option instance
- allocation fails
-Message-ID: <ZXEZs2rOUil8QH8Y@Laptop-X1>
-References: <20231206123719.1963153-1-revest@chromium.org>
- <ZXCNouKlBlAKgll9@Laptop-X1>
- <CABRcYmKK0F1F5SzXoUpG4etDz2eGhJoSZo56PHq7M+MNjcjTKA@mail.gmail.com>
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09A8512F;
+	Wed,  6 Dec 2023 17:08:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1701911315;
+	bh=phe4O51H7/V3YS47hEgMUqHs3d968ZCnQlFDHma9U1Y=;
+	h=Date:From:To:Cc:Subject:From;
+	b=lb0l514GhPPpUFUIO2g5tSXP3nYjAIvM8WKSPJQ/fjLwmG9cLD0f+iEhGrvlvx+yF
+	 obQMBK4np8Rh7BumQsBoT/OkM9nuxFo+AvlN6JnEzVeXENefpZnUBxf6ob9iq1K7gs
+	 KCITTzuDDMHnv0pDEnocyCdfnAHhz0RGuNJoP48tHKFr57T+tyxcvgxW5S38iGriMJ
+	 Xxh/X2WJYdWZ4EcpHN97ubJgevzcjSGmI9KU/c5QvAIHcAEvPHxFEC7tv6H2wXKJMv
+	 7Kk893gKFzyCMtQczY/Ah+tf8w3H5aLUBuiGcEMlE6Mi5x7mZii9/N2s881S4wQNGG
+	 QTFrxiy1MdkZA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Slx3k4BP6z4wc3;
+	Thu,  7 Dec 2023 12:08:34 +1100 (AEDT)
+Date: Thu, 7 Dec 2023 12:08:33 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Paul Moore <paul@paul-moore.com>, Daniel Borkmann
+ <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, Andrii
+ Nakryiko <andrii@kernel.org>
+Cc: bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Casey
+ Schaufler <casey@schaufler-ca.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the security tree with the bpf-next
+ tree
+Message-ID: <20231207120833.46ebfc2d@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABRcYmKK0F1F5SzXoUpG4etDz2eGhJoSZo56PHq7M+MNjcjTKA@mail.gmail.com>
+Content-Type: multipart/signed; boundary="Sig_/XLz+L06gsoqiomsd0nyAVro";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Wed, Dec 06, 2023 at 05:31:58PM +0100, Florent Revest wrote:
-> Thank you for the quick reviews Hangbin & Jiri, I appreciate! :)
-> 
-> I just realized I forgot to CC stable (like I always do... :) maybe I
-> should tattoo it on my arm) Let me know if you'd like a v2 adding:
-> 
-> Cc: stable@vger.kernel.org
+--Sig_/XLz+L06gsoqiomsd0nyAVro
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I think Greg will take care of it. No need to send v2 when there is
-nothing to change.
+Hi all,
 
-Thanks
-Hangbin
+Today's linux-next merge of the security tree got a conflict in:
+
+  include/linux/security.h
+
+between commit:
+
+  d734ca7b33db ("bpf,lsm: add BPF token LSM hooks")
+
+from the bpf-next tree and commit:
+
+  e1ca7129db2c ("LSM: Helpers for attribute names and filling lsm_ctx")
+
+from the security tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc include/linux/security.h
+index 00809d2d5c38,750130a7b9dd..000000000000
+--- a/include/linux/security.h
++++ b/include/linux/security.h
+@@@ -32,7 -32,7 +32,8 @@@
+  #include <linux/string.h>
+  #include <linux/mm.h>
+  #include <linux/sockptr.h>
+ +#include <linux/bpf.h>
++ #include <uapi/linux/lsm.h>
+ =20
+  struct linux_binprm;
+  struct cred;
+
+--Sig_/XLz+L06gsoqiomsd0nyAVro
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmVxGxEACgkQAVBC80lX
+0Gy4Vgf+O274EwUxOtVS9S2Y1V4GBLB4rb1nfBXkGFaZcVFEb0Me3AaxcaEzpg8d
+Kt4r6LSKFPfCR3vLi372ixaQSUJSYthQL8hoUNVDuCo1dVq7I2pFHfH/C/BsSFut
+xww4WgQOAp2iWekkU7/5XjPQLgqDGTd1fB+4fiNTW/2rOluhVOeOsqrf+pfymLHD
+7kwej6pieq63GjksZD2462AGiYkwiS7vedj2smlvYBACVCB5sZ+L1NCWMZE6nKtc
+FG1/UsFpuIBvmaEGz8QlW20AFMB85SqxOnXSG/qvmfi5jINU3y32I6WEBGuGN0xT
+BgO0o1aotXB2X/z9yezZPGO329pBqA==
+=dqeK
+-----END PGP SIGNATURE-----
+
+--Sig_/XLz+L06gsoqiomsd0nyAVro--
 
