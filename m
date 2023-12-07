@@ -1,119 +1,181 @@
-Return-Path: <netdev+bounces-55091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E435C809532
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 23:19:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6737D809538
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 23:24:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D9511F21035
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 22:19:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08DCC1F21030
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 22:24:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF2FF840F4;
-	Thu,  7 Dec 2023 22:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C5F0840E1;
+	Thu,  7 Dec 2023 22:24:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j3jCoQzJ"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="TavaZ//n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 780D21709
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 14:19:14 -0800 (PST)
-Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-5d74186170fso12179247b3.3
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 14:19:14 -0800 (PST)
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 615B1D4A
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 14:24:39 -0800 (PST)
+Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-50bf1e32571so1500968e87.2
+        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 14:24:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701987553; x=1702592353; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZvZDrTBCi1WUCoZlsgsw77VcBIpBgpOe5X2Ytd0Bs+8=;
-        b=j3jCoQzJztRvIqH2m9VHLfW1igOuFSU/jEYngKDSQUSF0z2x/3vr5aqoLZSDfZUpmr
-         +HJ6cK7QGaWgzjuSRHGMY1SSQGvGE5uTmJjA33da7PLWKoW4ZRYJTWWQ55Gg6QsJrFI2
-         hnFX893RxZSMtRzdp1ajGRugLPUYBbu5BEXqh1no8zekqattIwX60VV4F9uWSx2u7jiz
-         vgKdqEdnLP5uZTpmeZzwB6NPRIlV1CjV5MtYSLLpQSp2GBBdPWmi+RtNq0x7Fbau9zGQ
-         omV9beoBamWoYGtXvV9Gm25pEN5bDvT+Gb93lbrsBfr41xgJPz9f8+wH3d3WRaK1dsrI
-         mwiw==
+        d=broadcom.com; s=google; t=1701987877; x=1702592677; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ETEbM5G2P+Llcj+5nGWfTBjz96jt7j02XZOLGwSP5Zg=;
+        b=TavaZ//n/BL8h19I3Y/D/PeIeCCljNurvhDWWZB5rGMXJmXYpBNYv1oMZIrpH6M05J
+         PlhA/YNfhfxfQw3NXIXUvDt4mUgaPxMaEYO7awmMu+DvxqH+hb3rqO5WSqJz9qKDZAn5
+         9JOhvN6KR1y+60FPQityNFS+GJVp2tYmWv8gQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701987553; x=1702592353;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZvZDrTBCi1WUCoZlsgsw77VcBIpBgpOe5X2Ytd0Bs+8=;
-        b=aJedrBH2kKPDbW8nmsSpfdonk64a5JhH1IaoxVmkfA+iX4K719MLVEDgFLrYpGlZIq
-         uqOAjzPy8limBFIQ5C9xHaBlmOJNe5NxxqvU1C1FiAXfLDRHWTr8oAeDZ2Q02v3Tlke1
-         OFyBEQMRADq/+BUvqzO+G+YyACryChX+EYh5ef4vrl+vKwy66wqM0ZbN6eRgKmdx98sV
-         3XlVBQtgA98tSfs9GZ5rE2pap2KzKcDd04+adDPGaQOu1XxzFOLxQMwPvSjVW/+olOaD
-         rCz5DCmpw3u8aqaJQ/hUlWAuUWGSfmtcWFGeZ8s7UF5aOErQtAMjzYniKcIQW2/ohFRv
-         Op0A==
-X-Gm-Message-State: AOJu0Yw7/uWXWniQBz1mAXW08lxcvxK8AO3JkvZBt8WNfEefhaOjD4jW
-	xw35WEEoX5bdqEmfJEXkq20=
-X-Google-Smtp-Source: AGHT+IHHN+UA9JhLl7FXDbLayjC39Zk6hJKQHM5dEd8JYfoOZuwilw1Y4LJp6OUKS7qWB+oelxD8JQ==
-X-Received: by 2002:a0d:ec49:0:b0:5ca:6f39:91d1 with SMTP id r9-20020a0dec49000000b005ca6f3991d1mr3062975ywn.47.1701987553596;
-        Thu, 07 Dec 2023 14:19:13 -0800 (PST)
-Received: from ?IPV6:2600:1700:6cf8:1240:57df:3a91:11ad:dcd? ([2600:1700:6cf8:1240:57df:3a91:11ad:dcd])
-        by smtp.gmail.com with ESMTPSA id y4-20020a0def04000000b005a7daa09f43sm202390ywe.125.2023.12.07.14.19.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Dec 2023 14:19:13 -0800 (PST)
-Message-ID: <2b89a3c1-59fe-4ba6-82de-6f01fbdcdb7f@gmail.com>
-Date: Thu, 7 Dec 2023 14:19:11 -0800
+        d=1e100.net; s=20230601; t=1701987877; x=1702592677;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ETEbM5G2P+Llcj+5nGWfTBjz96jt7j02XZOLGwSP5Zg=;
+        b=gfd51MgwV66Fn9ccW9HaYMHbgcT/h0C2d7eBKRASSF1+9H+MBBIv/J+fE2IeOhJDXb
+         7RNsUPK/iZpuMoNItNBSl124v7FkAwXX7KBr1AIvJa8mCoYx9jEF8yMI6iyygjvlp1ZM
+         GvfZL3rWr2f8MsAp3q9rjiffGJZRFAF34uNS9s8oB4nUEhnUucXLksjwu2pL6+KSKhmn
+         52wev0OxhlhvyQ8KSL0c4waoLZtOqMlqqD76qqy7NS52VW9UXKjIYqxC9L79Tt33eC7N
+         u/BZTViH8uNyE/up7FVYYYpvsKWM3spLYPU0zj6TZdiTyLsvYzotlWsfYHBU75xGs/x0
+         uK7w==
+X-Gm-Message-State: AOJu0YyDKQH8Vst3OcANK+Pu9hWtbI0cou3BYEyoHsBvmJ+djvrdj69V
+	WwqWmTkIHmM5q/h7NdnkIRbpNykXjS5/ruOTjti6MQ==
+X-Google-Smtp-Source: AGHT+IF9V2gIHu6Tm4wAGlAsf9bWO9Gvm0J9StHnWWIXUQUXiQ+XtHC8x9TbB5DmYCARarGfmOZn1saynCF0hP86law=
+X-Received: by 2002:a19:2d5b:0:b0:50b:f798:28be with SMTP id
+ t27-20020a192d5b000000b0050bf79828bemr1978624lft.92.1701987877367; Thu, 07
+ Dec 2023 14:24:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/ipv6: insert the fib6 gc_link of a fib6_info
- only if in fib6.
-Content-Language: en-US
-To: thinker.li@gmail.com, netdev@vger.kernel.org, martin.lau@linux.dev,
- kernel-team@meta.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, edumazet@google.com
-Cc: kuifeng@meta.com, syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com
-References: <20231207221627.746324-1-thinker.li@gmail.com>
-From: Kui-Feng Lee <sinquersw@gmail.com>
-In-Reply-To: <20231207221627.746324-1-thinker.li@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20231207000551.138584-1-michael.chan@broadcom.com>
+ <20231207000551.138584-4-michael.chan@broadcom.com> <20231207102718.4d930353@kernel.org>
+In-Reply-To: <20231207102718.4d930353@kernel.org>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Thu, 7 Dec 2023 14:24:24 -0800
+Message-ID: <CACKFLi=ZV42LZqAC6_cWtLfwURyzd6DW9-BQddbozkBSfr31kg@mail.gmail.com>
+Subject: Re: [PATCH net v2 3/4] bnxt_en: Fix wrong return value check in bnxt_close_nic()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, gospo@broadcom.com, 
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>, 
+	Vikas Gupta <vikas.gupta@broadcom.com>, Somnath Kotur <somnath.kotur@broadcom.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000e07a77060bf2ee64"
 
-Eric Dumazet, could you help to check if the patch works from your side
-with syzbot? Thanks a lot!
+--000000000000e07a77060bf2ee64
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Dec 7, 2023 at 10:27=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Wed,  6 Dec 2023 16:05:50 -0800 Michael Chan wrote:
+> > The wait_event_interruptible_timeout() function returns 0
+> > if the timeout elapsed, -ERESTARTSYS if it was interrupted
+> > by a signal, and the remaining jiffies otherwise if the
+> > condition evaluated to true before the timeout elapsed.
+> >
+> > Driver should have checked for zero return value instead of
+> > a positive value.
+>
+> Not sure how this was not caught earlier, maybe there is a more
+> complicated story behind it. Otherwise you should handle -ERESTARTSYS
+> as well.
 
-On 12/7/23 14:16, thinker.li@gmail.com wrote:
-> From: Kui-Feng Lee <thinker.li@gmail.com>
-> 
-> Check f6i->fib6_node before inserting a f6i (fib6_info) to tb6_gc_hlist.
-> 
-> Previously, it checks only if f6i->fib6_table is not NULL, however it is
-> not enough. When a f6i is removed from a fib6_table, it's fib6_table is not
-> going to be reset. fib6_node is always reset when a f6i is removed from a
-> fib6_table and set when a f6i is added to a fib6_table. By checking
-> fib6_node, adding a f6i t0 tb6_gc_hlist only if f6i is in the table will be
-> enforced.
-> 
-> Fixes: 3dec89b14d37 ("net/ipv6: Remove expired routes with a separated list of routes.")
-> Reported-by: syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com
-> Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: dsahern@kernel.org
-> ---
->   include/net/ip6_fib.h | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
-> index 95ed495c3a40..8477c9ff67ac 100644
-> --- a/include/net/ip6_fib.h
-> +++ b/include/net/ip6_fib.h
-> @@ -512,7 +512,10 @@ static inline void fib6_set_expires_locked(struct fib6_info *f6i,
->   
->   	tb6 = f6i->fib6_table;
->   	f6i->expires = expires;
-> -	if (tb6 && !fib6_has_expires(f6i))
-> +	if (tb6 &&
-> +	    rcu_dereference_protected(f6i->fib6_node,
-> +				      lockdep_is_held(&tb6->tb6_lock)) &&
-> +	    !fib6_has_expires(f6i))
->   		hlist_add_head(&f6i->gc_link, &tb6->tb6_gc_hlist);
->   	f6i->fib6_flags |= RTF_EXPIRES;
->   }
+The code will always proceed to do the close when
+wait_event_interruptible_timeout() returns for any reason.  The check
+is just to log a warning message that the wait has timed out and we're
+closing anyway.
+
+What I can do is to log another warning if the wait is interrupted by
+a signal.  Since we do the close no matter what, the error code should
+not be returned to the caller and the function should be changed to
+void.  Does that sound reasonable?
+
+--000000000000e07a77060bf2ee64
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIEvbhi85Daun0FSPVk0VZnRCA/L/upnI
+Jg2bnu15KddJMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
+NzIyMjQzN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQCSDE9UBBRPS6s5AAk7scwdz3PJ5IRsw69FBgz3VzrElDnn9o0g
+OpF/Aot+SZrbbio17Nc5yH+ndX0rqHc9prffk4SwrykdBrPIrt8Er6xwo/9PL3Y02RTSFzPmeqKY
+eobMyNdvdAShhRDbCpF9/QC/yWeRtpOYitBNPKrBTPbf6U7BKMlh5b+2H/sWxkCAtb4k+7jzR44s
+CFVx/M+GEQmaAKXqnHm6vC6rOFk9Mkw8GMS2SY+7ct7iYG+H695PGKAk73gIG9mXJlhjhw6Esj4S
+WXw+9OIXfUFI07s0c+4JLrDDO4enmfdyi+o8o4iqUAxtKhjxa46XLxUBHoKVYVnC
+--000000000000e07a77060bf2ee64--
 
