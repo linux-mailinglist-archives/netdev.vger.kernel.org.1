@@ -1,266 +1,94 @@
-Return-Path: <netdev+bounces-54926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C937808F21
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:56:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58088808F38
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:00:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 536F128141D
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 17:56:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FAA11F21176
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 378F7495EC;
-	Thu,  7 Dec 2023 17:56:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6114B5CD;
+	Thu,  7 Dec 2023 18:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hZYmWqd1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H4sAwZ4F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AC4D10DE
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 09:56:05 -0800 (PST)
-Received: by mail-yb1-xb31.google.com with SMTP id 3f1490d57ef6-daf7ed42ea6so1322935276.0
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 09:56:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1701971764; x=1702576564; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:references:cc:to:from:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MZTKib6WJWys70Uy5GIkWtyDhIssc1sVOHdmO5UIlz0=;
-        b=hZYmWqd1KzrzccvjoQenYFZFiFWEv0Rxz36Cdnawoz/MTZezENyxCgExS8e2hThjJN
-         hQ4sPAUGVdwuiNTRVqtzXTIBuTPHPYuMDsO/CNYg7ejm3fj71AloPdBnWiMBfD+rP7ri
-         1a4hsxb7MdtmjuRFBRY0amJ+eiB7KzOsmPVBk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701971764; x=1702576564;
-        h=in-reply-to:autocrypt:references:cc:to:from:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MZTKib6WJWys70Uy5GIkWtyDhIssc1sVOHdmO5UIlz0=;
-        b=TG5xwkSTfAI94pMANjJKjdAynQsfeEJZDUt0yYmTPUm6HR2mva5a3+KdBWVfdthWsp
-         R8dWizynBPuXhdKXd0Ni9BdHt1ZukFSUfHdJASBRHBVtg1/Bp9Qxlj+QIF9mDICbo7en
-         TRJWAkmQHdW8vR5iruZD4fDjGywjcXEnMscT8SMaxOCu2Ekpd2oOVkeYX1BWxD+G4P/5
-         gxddSrxXlq7y9IrdAVCwBgrGumQkGiBQsFt700xr+1/WhlhfisXLiGlaaMlSoPzZXujD
-         n0lhbrHnbQAu1TT31lNdMaAFW64LKRonEiIFspfq5B/ZNTz9KEFARIG0yYufC0Ws6Hhi
-         i6eA==
-X-Gm-Message-State: AOJu0YwTtxHFB8CTjPVkmc2JMeeVUENn+9DroH5iLXD7enB5e7f/95b/
-	H/nBRerpRTrlEknscNUPsY1UpA==
-X-Google-Smtp-Source: AGHT+IHwsWbW1yIIS9O+zjCjwTSVSkEBsL656eACoE4y1l8RBrKkDsqn4EdR7Uqgsw10qlQDfaBuDg==
-X-Received: by 2002:a25:ce88:0:b0:db5:4b23:534 with SMTP id x130-20020a25ce88000000b00db54b230534mr2702860ybe.17.1701971764331;
-        Thu, 07 Dec 2023 09:56:04 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id re22-20020a05620a8e1600b0077891d2d12dsm75016qkn.43.2023.12.07.09.56.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Dec 2023 09:56:03 -0800 (PST)
-Message-ID: <f7eb20eb-3f0d-42c5-93fe-a622639c55a6@broadcom.com>
-Date: Thu, 7 Dec 2023 09:56:01 -0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E214B5B4;
+	Thu,  7 Dec 2023 18:00:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2AEECC433C9;
+	Thu,  7 Dec 2023 18:00:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701972027;
+	bh=BNgG2XcLw8MDkFfa2rSgbI3xP88YKF1v7QhBayKpcPo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=H4sAwZ4FeEtxNan7Jo1Rq3udgJdxS8Ps5UqsPC0AfcFrmxRkuSYDO1zqCyCuNBQSR
+	 UQqKdaYMrj2fXB4kd5ysZG+UDNYQ3plGf2zGn2DbDHEJdcOWKxPp0wi+bylp0zIFYq
+	 TTVt63AUrRYksiWu4nT5RJ9zLeFiksSFsDG7tXgiCdbxWMLnI9SNeuuM0tggVi8hvu
+	 JGFdpdRYFjCdv5++WjVm6oEB4OqQOW4B+zBPWaksHtZ4Rx/2jZ75i6JzBYqd7akkmt
+	 uAPEjRjojVTjL3B9QBRBItb4Ou5dbPMnMCpOllMCEDZyq9F42nXyNpcJkXp+prH7Lv
+	 xeJBF/+kB3K8Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 10891C43170;
+	Thu,  7 Dec 2023 18:00:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: phy: Only resume phy if it is suspended
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-To: Justin Chen <justin.chen@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Doug Berger <opendmb@gmail.com>
-Cc: netdev@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, open list <linux-kernel@vger.kernel.org>
-References: <20231205234229.274601-1-justin.chen@broadcom.com>
- <7e3208aa-3adf-47ec-9e95-3c88a121e8a3@lunn.ch>
- <55a08719-cd18-4a01-9a2a-0115065c06a6@broadcom.com>
- <c2ce6d12-fb5e-4067-aa7c-4f57f4eb4613@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- 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
-In-Reply-To: <c2ce6d12-fb5e-4067-aa7c-4f57f4eb4613@broadcom.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000754744060bef2ed8"
-
---000000000000754744060bef2ed8
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/6] netfilter: bpf: fix bad registration on nf_defrag
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170197202706.7796.7312229960355473959.git-patchwork-notify@kernel.org>
+Date: Thu, 07 Dec 2023 18:00:27 +0000
+References: <20231206180357.959930-2-pablo@netfilter.org>
+In-Reply-To: <20231206180357.959930-2-pablo@netfilter.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, fw@strlen.de
 
-Hi Andrew,
+Hello:
 
-On 12/5/23 16:12, Florian Fainelli wrote:
-> On 12/5/23 16:10, Justin Chen wrote:
->>
->>
->> On 12/5/23 4:03 PM, Andrew Lunn wrote:
->>> On Tue, Dec 05, 2023 at 03:42:29PM -0800, Justin Chen wrote:
->>>> Resuming the phy can take quite a bit of time. Lets only resume the
->>>> phy if it is suspended.
->>>
->>> Humm...
->>>
->>> https://lore.kernel.org/netdev/6d45f4da-c45e-4d35-869f-85dd4ec37b31@lunn.ch/T/
->>>
->>> If Broadcom PHYs are slow to resume, maybe you should solve this in
->>> the broadcom resume handler, read the status from the hardware and
->>> only do the resume if the hardware is suspended.
->>>
->>>       Andrew
->>
->> Right... Guess this won't work. It is odd that during resume we call 
->> __phy_resume twice. Once from phy_resume() and another at phy_start(). 
->> Let me rethink this. Thanks for the feedback.
+This series was applied to netdev/net.git (main)
+by Pablo Neira Ayuso <pablo@netfilter.org>:
+
+On Wed,  6 Dec 2023 19:03:52 +0100 you wrote:
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
 > 
-> This might be something for us to figure out on the driver side, I think 
-> historically I have always followed the pattern of doing:
+> We should pass a pointer to global_hook to the get_proto_defrag_hook()
+> instead of its value, since the passed value won't be updated even if
+> the request module was loaded successfully.
 > 
-> phy_suspend()
-> phy_stop()
+> Log:
 > 
-> and
-> 
-> phy_resume()
-> phy_start()
-> 
-> because it used to be necessary to do that way back when...
+> [...]
 
-So we discussed with Justin and Doug about this yesterday and the main 
-reason for the phy_resume() ... MAC initialization ... phy_start() 
-pattern has to do with external RGMII PHYs and the clocking dependency 
-between the MAC and the PHY on the RX path. And also a tiny bit of cargo 
-culting, but shhh.
+Here is the summary with links:
+  - [net,1/6] netfilter: bpf: fix bad registration on nf_defrag
+    https://git.kernel.org/netdev/net/c/1834d62ae885
+  - [net,2/6] netfilter: nft_set_pipapo: skip inactive elements during set walk
+    https://git.kernel.org/netdev/net/c/317eb9685095
+  - [net,3/6] netfilter: nf_tables: fix 'exist' matching on bigendian arches
+    https://git.kernel.org/netdev/net/c/63331e37fb22
+  - [net,4/6] netfilter: nf_tables: bail out on mismatching dynset and set expressions
+    https://git.kernel.org/netdev/net/c/3701cd390fd7
+  - [net,5/6] netfilter: nf_tables: validate family when identifying table via handle
+    https://git.kernel.org/netdev/net/c/f6e1532a2697
+  - [net,6/6] netfilter: xt_owner: Fix for unsafe access of sk->sk_socket
+    https://git.kernel.org/netdev/net/c/7ae836a3d630
 
-When the external RGMII PHYs are suspended they will stop providing a 
-RXC back to the Ethernet MAC and our Ethernet MAC like a lot of designs 
-out there require the RXC in order to be functional and complete its 
-reset procedure correctly (you would think there would be a way to mux 
-in a different clock, but that does not appear to be the case). If we 
-reset the UniMAC block without a RXC we will typically see duplicate 
-packets being received, or absurdly long round trip times as soon as we 
-try to use the RX path.
-
-Doug lifted that requirement in GENET with:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=88f6c8bf1aaed5039923fb4c701cab4d42176275
-
-by delaying the MAC reset until we have a link UP confirmation. Since 
-this is the same UniMAC design in the bcmasp driver we should be able to 
-apply the same strategy and remove the initial phy_resume().
-
-There are also other opportunities for avoiding link disruption upon 
-suspend/resume when Wake-on-LAN is enabled and avoid a re-negotiation of 
-the link, though that's for another set of changes.
+You are awesome, thank you!
 -- 
-Florian
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---000000000000754744060bef2ed8
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
-9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
-AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
-UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
-KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
-nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
-Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
-VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
-ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
-CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
-MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
-d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
-hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
-bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
-BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
-KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
-kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
-2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
-3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
-NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
-AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
-LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIL/oENd0kbzKmtKU
-wSl5uo+7qR+TpFU/8dXndwnxZvmYMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTIzMTIwNzE3NTYwNFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
-AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQDkPNjWUmXW8Cbymc/SJZ/mVoNrnxvMAQSr
-ImFvGg1dYG0FpulUEsER08sv7vysUwCx7IW3fNLXE4GWSFaZzpCKqJoRrdLX/c7hBzTuIhTxQkFQ
-71Ud34v/uaKs1tVYZ3F/we4MJ4CvxUcF3rbAyuA3DvIVP7du2UazbvQUm/R/T11PMro6y3Fif/R8
-Y//CpVBrItN85rmXprjQxtEVJT7VYDV8Ep41ipPJDO4UNu9BvJ8499gaCQ6sdXomVIFNWWDAmJVl
-MmeAIXy/CCdgZGUbZH0OBbIKDtr2FpKRsVQgKigD0A6WEFfsiC/AQUVz1XzVy3M+GJiFkF1MXDC1
-IF1c
---000000000000754744060bef2ed8--
 
