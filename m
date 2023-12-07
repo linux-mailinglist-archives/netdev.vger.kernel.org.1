@@ -1,72 +1,118 @@
-Return-Path: <netdev+bounces-54878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87C0D808BC2
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 16:26:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5885808BCA
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 16:28:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 425AD282763
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 15:26:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8EC91C209C4
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 15:28:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338FF44C83;
-	Thu,  7 Dec 2023 15:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 929A644C89;
+	Thu,  7 Dec 2023 15:28:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="my8BzQNp"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="snOb9ecv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1349A4185B;
-	Thu,  7 Dec 2023 15:26:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36AA7C433C8;
-	Thu,  7 Dec 2023 15:26:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701962775;
-	bh=usRReFCixNKtJkH4TXHx9VWzuWKM1CKrDYSp1IErqio=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=my8BzQNp7/cQN2skGkWsuoIacaJhSXW6GMSFzDZ51jw1r44zEXa4vOxEcdXjrlEc5
-	 w6zgUN1lOrvQuoIq8iJOv03Svf3XEpVrpAL2c1oqB0zl+xBfPLKErN5aejVC1J5mJ+
-	 J6FeP2lI1WtVg6V8ZZ1R9yzLQPXmnchAmUuaIZURzEq6CsetClJjrG7v1dlRBxa+u5
-	 bWtboT2+wODnfwf5yj9y892ulJ8KhA4lvXFpiyZ13Yl9wBNz3gOcVWiu7Lq0dl7Fb1
-	 2WYHQjdUAo/W/AFnn+AL3IbaBK0WYcXAUgLHjROxmBQQ1MJxp6LmGX6z4uKflhcYID
-	 NA75vLQ/tdDjw==
-Message-ID: <72056882-acd4-48e2-a688-b0c0e7e88ab0@kernel.org>
-Date: Thu, 7 Dec 2023 08:26:14 -0700
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8177C10CA;
+	Thu,  7 Dec 2023 07:28:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=oSO91Zjek++1IKXEdE5RYlis15XBD+gc14pgxk+BMSU=; b=snOb9ecvdpUafV+1Kv8SNC57GJ
+	x7/AZCiAkpE/XzFrf7+piCHYMPszK6iqkhe3XvlRx2yU5gcjm088FMML13QyMxSmUZgSzqvUmcNsI
+	KZITbZYDmXgsQqEqy+L60UfhISdR1Cn92aavH1IjrN8ZR7hRCibS76yLWVKjjZLLvurs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rBGHc-002KGh-Uo; Thu, 07 Dec 2023 16:27:24 +0100
+Date: Thu, 7 Dec 2023 16:27:24 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: justinstitt@google.com
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shay Agroskin <shayagr@amazon.com>,
+	Arthur Kiyanovski <akiyano@amazon.com>,
+	David Arinzon <darinzon@amazon.com>, Noam Dagan <ndagan@amazon.com>,
+	Saeed Bishara <saeedb@amazon.com>, Rasesh Mody <rmody@marvell.com>,
+	Sudarsana Kalluru <skalluru@marvell.com>,
+	GR-Linux-NIC-Dev@marvell.com,
+	Dimitris Michailidis <dmichail@fungible.com>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Louis Peens <louis.peens@corigine.com>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Brett Creeley <brett.creeley@amd.com>, drivers@pensando.io,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Ronak Doshi <doshir@vmware.com>,
+	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+	Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>,
+	Dwaipayan Ray <dwaipayanray1@gmail.com>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Hauke Mehrtens <hauke@hauke-m.de>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	UNGLinuxDriver@microchip.com, Jiawen Wu <jiawenwu@trustnetic.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Kees Cook <keescook@chromium.org>, intel-wired-lan@lists.osuosl.org,
+	oss-drivers@corigine.com, linux-hyperv@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next v5 1/3] ethtool: Implement ethtool_puts()
+Message-ID: <6a0340d5-20e0-40ab-822e-d9fc1ce360d9@lunn.ch>
+References: <20231206-ethtool_puts_impl-v5-0-5a2528e17bf8@google.com>
+ <20231206-ethtool_puts_impl-v5-1-5a2528e17bf8@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3 net-next 01/14] selftests/net: add lib.sh
-Content-Language: en-US
-To: Petr Machata <petrm@nvidia.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>,
- linux-kselftest@vger.kernel.org, Po-Hsu Lin <po-hsu.lin@canonical.com>,
- Guillaume Nault <gnault@redhat.com>, James Prestwood <prestwoj@gmail.com>,
- Jaehee Park <jhpark1013@gmail.com>, Ido Schimmel <idosch@nvidia.com>,
- Justin Iurman <justin.iurman@uliege.be>, Xin Long <lucien.xin@gmail.com>,
- James Chapman <jchapman@katalix.com>
-References: <20231202020110.362433-1-liuhangbin@gmail.com>
- <20231202020110.362433-2-liuhangbin@gmail.com>
- <7e73dbfe6cad7d551516d02bb02881d885045498.camel@redhat.com>
- <87jzpr5x0r.fsf@nvidia.com>
- <70497ad83be1c7bd715abc8f29c72ee39a381f58.camel@redhat.com>
- <87y1e646cd.fsf@nvidia.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <87y1e646cd.fsf@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231206-ethtool_puts_impl-v5-1-5a2528e17bf8@google.com>
 
-On 12/7/23 3:34 AM, Petr Machata wrote:
-> But what I object against is that the library uses trap without having a
-> way for user scripts to schedule at-exit work, because that's used
-> literally everywhere in forwarding tests. 
+On Wed, Dec 06, 2023 at 11:16:10PM +0000, justinstitt@google.com wrote:
+> Use strscpy() to implement ethtool_puts().
+> 
+> Functionally the same as ethtool_sprintf() when it's used with two
+> arguments or with just "%s" format specifier.
+> 
+> Signed-off-by: Justin Stitt <justinstitt@google.com>
 
-+1
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
