@@ -1,250 +1,118 @@
-Return-Path: <netdev+bounces-55099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECA04809566
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 23:32:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1916480957B
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 23:38:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A31A51F210A7
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 22:32:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AB041C20B56
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 22:38:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 159E15676A;
-	Thu,  7 Dec 2023 22:32:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8670B56B60;
+	Thu,  7 Dec 2023 22:38:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jVgyz74E"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="qU+EYHE1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8F26A4;
-	Thu,  7 Dec 2023 14:32:20 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6cebbf51742so700864b3a.1;
-        Thu, 07 Dec 2023 14:32:20 -0800 (PST)
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36A45D5B
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 14:38:01 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-6ce7632b032so960210b3a.1
+        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 14:38:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701988340; x=1702593140; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FMK5oBL7ZRsz2fIyOpAup+LzkwMHF1v8UfcRl/00pW4=;
-        b=jVgyz74EA9YH/e4wrnkTRiHle/tsmvlkMVnLqgH1lxIVScjA3FikU1u43v3s/EzfQq
-         Zr/ecCxEnYHKU/nXMEX5gA4Fq5EYYvmFzrGxfEyFwPjbEGwYevQj5rePgrd8knjYMmf2
-         q9yt8xDujDUoDO28aDKxtZni5kEQpQJuoxA0wSZRI2QliMncJCQELAmTBn3/l9eAQJv6
-         3hY69XiCZgS247+wfWC143F4KKR9rgFKKBoiPkxkT1uxROf2HW6HNhTr+8McNJ31fN/b
-         TCC5vr5GK72isb8xmBs+IRjrXXDghPD6CAv0BvKUR3naFmm6rq3jQaQ9yvU3ZlnZ32gG
-         VjZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701988340; x=1702593140;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1701988680; x=1702593480; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FMK5oBL7ZRsz2fIyOpAup+LzkwMHF1v8UfcRl/00pW4=;
-        b=ACFE++F2HEFynL4/M62Vr9U2xW2Myx1UkqEuIZ7KJOKIC+Y2nhLC9waVl95MoCj354
-         +fbWH680PZnfiu3/FeYY6h528CrBJ0JFEt1tOUlJ70303bSJzdwYCJRDl9EWUL2M7dGq
-         YRav+LrpWclHGn/usLia4PMZ6j9b69ihMMwMYj+tQe4BI8Jwzn5B/2fJKRzmzTWelZUM
-         QRdBiGbSpJ07Kp+YTHf9A3f7zryvcvWm/bsHpvif1ilKmNWaHMMgNNSZXq20NWN04El2
-         h6Mp1qv06JGZ+r8Suv01GJMDdDC06bQgi2rew7qwLNBbkKT5I/wt6yOwwleiuIDpmp5P
-         2y+Q==
-X-Gm-Message-State: AOJu0YzLOYZ8ssCNt9PbIeYotQJ/XEkkjZcKAzmu9VydgmBs0yrC+eUp
-	Rq/E6HkGYS++6FugHAAYCKU=
-X-Google-Smtp-Source: AGHT+IGjndnK2BCYLCyacoFwmyubc38b0BJwGWZc02r4foqXNC19yYWn9LMik7KGPp42sJmibTCaIg==
-X-Received: by 2002:a05:6a00:238c:b0:6ce:939e:bed6 with SMTP id f12-20020a056a00238c00b006ce939ebed6mr3760900pfc.34.1701988340144;
-        Thu, 07 Dec 2023 14:32:20 -0800 (PST)
-Received: from MacBook-Pro-49.local ([2620:10d:c090:500::7:6fe4])
-        by smtp.gmail.com with ESMTPSA id gx4-20020a056a001e0400b006cbb71186f7sm286775pfb.29.2023.12.07.14.32.16
+        bh=zNhfnx72PbDv7v1X8Jwhny5ksq2HURuZR8na0czYirM=;
+        b=qU+EYHE1ChneRXBwWcHnS1B224uuGgUiSml/gRamyyw4fHJUxgLmFKzPbTVqZ8oa4V
+         7SOUAVJjhSTWNyEb/TIjCQCWm0it5wWWmb1joVof9huHdh3UFyOOr+wdUGSBOLk5sfZH
+         nxWHNZreNyDQwcyRTtJV8r3GEU1NZv1T5F4AKaVf2U9Dk2FBYlTRjLn+lo/nHRmm1TB5
+         oPRGANDq4RhKHG/YY3KB+k3rHsnMnFY9QF4a0ABAL2+M+SOiEwttU1siaCtuGhRhq9D/
+         G47Xq0FIMYGAdZ+ZrLHtRnsycpnYSY7UjZ5g5XXkQOqvML/JEAIqfAnfJM0zJYhnuN3A
+         aPUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701988680; x=1702593480;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zNhfnx72PbDv7v1X8Jwhny5ksq2HURuZR8na0czYirM=;
+        b=D0rLjvQWGsQY/R1SkDLXiHUxeyn1Wytc+HUoTVVrviIJPEDDMP6X9mfGAjwo9T4Re+
+         KB0ifWERNTHcJuJw1PDV/ZxaTZ56hjkwuZfYbM2HPrLsal+w4bZaj74zwGUuazizkuyD
+         WYF5WNriPAM1/jbcvfZawNATleU8KuWzDu0wakH0/bDlrSYZXw4nwqwb1UfPU70KFUUf
+         iNEN6SD9CMRn0uSdN+khizrpk7KDtgs0aub/bIwYV12Qdu6ECYmwNdmF3Q2HkNhFyPBQ
+         LUKOY8jHdfU6iFVsmEVIq8XzmzUglCxTBlNP5z7v4gK6q+OA5uNEPEryu3Uf4SCbGFA8
+         jLKg==
+X-Gm-Message-State: AOJu0Yws9Ee18Q60edooGWHdhiSLlog0civh1uGCzxZYqtP+ovuVkkd8
+	742XbIkRVVPDrFEXvbNMP/yjgEGn8b76WWGxcuphzg==
+X-Google-Smtp-Source: AGHT+IFdimHuT87AUEW8I2QNQVGvzskt62Uy7XBhe6Y3R1xnCGbjbpYF0FjIRrY38bn11yYVJaIdQQ==
+X-Received: by 2002:a05:6a20:a087:b0:18f:c76a:992e with SMTP id r7-20020a056a20a08700b0018fc76a992emr2352740pzj.109.1701988680556;
+        Thu, 07 Dec 2023 14:38:00 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id jc19-20020a17090325d300b001cc25cfec58sm316488plb.226.2023.12.07.14.38.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Dec 2023 14:32:19 -0800 (PST)
-Date: Thu, 7 Dec 2023 14:32:12 -0800
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Jiri Olsa <olsajiri@gmail.com>, Song Liu <song@kernel.org>, 
-	Song Liu <songliubraving@meta.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Sami Tolvanen <samitolvanen@google.com>, 
-	Kees Cook <keescook@chromium.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, linux-riscv <linux-riscv@lists.infradead.org>, 
-	LKML <linux-kernel@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	bpf <bpf@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, 
-	clang-built-linux <llvm@lists.linux.dev>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	Joao Moreira <joao@overdrivepizza.com>, Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v2 2/2] x86/cfi,bpf: Fix BPF JIT call
-Message-ID: <ivhrgimonsvy3tyj5iidoqmlcyqvtsh2ay3cm3ouemsdbvjzs4@6jlt6zv55tgh>
-References: <20231204111128.GV8262@noisy.programming.kicks-ass.net>
- <20231204125239.GA1319@noisy.programming.kicks-ass.net>
- <ZW4LjmUKj1q6RWdL@krava>
- <20231204181614.GA7299@noisy.programming.kicks-ass.net>
- <20231204183354.GC7299@noisy.programming.kicks-ass.net>
- <CAADnVQJwU5fCLcjBWM9zBY6jUcnME3+p=vvdgKK9FiLPWvXozg@mail.gmail.com>
- <20231206163814.GB36423@noisy.programming.kicks-ass.net>
- <20231206183713.GA35897@noisy.programming.kicks-ass.net>
- <zu5eb2robdqnp2ojwaxjhnglcummrnjaqbw6krdds6qac3bql2@5zx46c2s6ez4>
- <20231207093105.GA28727@noisy.programming.kicks-ass.net>
+        Thu, 07 Dec 2023 14:38:00 -0800 (PST)
+Date: Thu, 7 Dec 2023 14:37:58 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Arjun Mehta <arjunmeht@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: Rx issues with Linux Bridge and thunderbolt-net
+Message-ID: <20231207143758.72764b9f@hermes.local>
+In-Reply-To: <C6FFF684-8F05-47B5-8590-5603859128FC@gmail.com>
+References: <C6FFF684-8F05-47B5-8590-5603859128FC@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231207093105.GA28727@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 07, 2023 at 10:31:05AM +0100, Peter Zijlstra wrote:
-> On Wed, Dec 06, 2023 at 01:39:43PM -0800, Alexei Starovoitov wrote:
-> 
-> 
-> > All is ok until kCFI comes into picture.
-> > Here we probably need to teach arch_prepare_bpf_trampoline() to emit
-> > different __kcfi_typeid depending on kernel function proto,
-> > so that caller hash checking logic won't be tripped.
-> > I suspect that requires to reverse engineer an algorithm of computing kcfi from clang.
-> > other ideas?
-> 
-> I was going to try and extend bpf_struct_ops with a pointer, this
-> pointer will point to a struct of the right type with all ops filled out
-> as stubs.
+On Thu, 7 Dec 2023 12:57:08 -0700
+Arjun Mehta <arjunmeht@gmail.com> wrote:
 
-Right. Something like this, but it's more nuanced.
+> Hi there, I=E2=80=99d like to report what I believe to be a bug with eith=
+er Linux Bridge (maybe and/or thunderbolt-net as well).
+>=20
+> Problem: Rx on bridged Thunderbolt interface are blocked
+>=20
+> Reported Behavior:
+> Tested on Proxmox host via iperf3, between B550 Vision D-P and MacBook Pr=
+o (2019 intel). On a direct interface, thunderbolt bridge Tx and Rx speeds =
+are equal and full speed (in my case 9GB/s each). However, when a thunderbo=
+lt bridge is passed through via Linux Bridge to a VM or container (in my ca=
+se a Proxmox LXC container or VM) the bridge achieves full Tx speeds, but R=
+x speeds are reporting limited to ~30kb/s
+>=20
+> Expected:
+> The VM/CT should have the same general performance for Tx AND Rx as the h=
+ost
+>=20
+> Reproducing:
+> - Setup for the bridge was done by following this guide: https://gist.git=
+hub.com/scyto/67fdc9a517faefa68f730f82d7fa3570
+> - Both devices on Thunderbolt interfaces have static IPs
+> - VM is given the same IP, but unique MAC address
+> - BIOS has Thunderbolt security mode set to =E2=80=9CNo security=E2=80=9D
+>=20
+> Further reading:
+> The problem is outlined more with screenshots and further details in this=
+ Reddit post: https://www.reddit.com/r/Proxmox/comments/17kq5st/slow_rx_spe=
+ed_from_thunderbolt_3_port_to_vm_over/.
+>=20
+> Please let me know if there is any further action I can do to help invest=
+igate or where else I can direct the bug/concern
 
-The bpf_struct_ops concept is a generic mechanism to provide bpf-based callback
-to any set of kernel callbacks.
+Most likely this is a hardware issue on the thunderbolt interface where it =
+will not
+allow sending with a different source MAC address.  Some Wifi interfaces ha=
+ve this
+problem.
 
-bpf tcp CC plugs into:
-struct tcp_congestion_ops {
-        /* do new cwnd calculation (required) */
-        void (*cong_avoid)(struct sock *sk, u32 ack, u32 acked);
+Is Promox using a kernel from upstream Linux repository directly.
+Netdev developers are unwilling to assist if there are any non-upstream ker=
+nel modules in use.
 
-        /* call before changing ca_state (optional) */
-        void (*set_state)(struct sock *sk, u8 new_state);
-
-        /* call when cwnd event occurs (optional) */
-        void (*cwnd_event)(struct sock *sk, enum tcp_ca_event ev);
-  ...
-};
-
-and from bpf side we don't touch tcp kernel bits at all.
-tcp stack doesn't know whether it's calling bpf based CC or builtin CC or CC provided by kernel module.
-
-bpf struct_ops mechanim is a zero cost extension to potentially any kernel mechanism
-that is already setup with callbacks. tcp_congestion_ops is one of them.
-
-The allowlisting of tcp_congestion_ops for bpf use is done in net/ipv4/bpf_tcp_ca.c via:
-
-struct bpf_struct_ops bpf_tcp_congestion_ops = {
-        ...
-        .reg = bpf_tcp_ca_reg,
-        .unreg = bpf_tcp_ca_unreg,
-        ...
-        .name = "tcp_congestion_ops",
-};
-static int bpf_tcp_ca_reg(void *kdata)
-{
-        return tcp_register_congestion_control(kdata);
-}
-and
- int tcp_register_congestion_control(struct tcp_congestion_ops *type);
-is a normal TCP CC registration routine that is used by all CCs.
-
-The bpf struct_ops infra prepares everything inside
-'struct tcp_congestion_ops' that makes it indistinguishable from normal kernel CC,
-except kCFI part. sadly.
-
-The kCFI challenge is that clang may not generate any __cfi + __kcfi_typeid at all.
-Like if vmlinux doesn't have any TCP CCs built-in there will be no kCFI hashes
-in the kernel that represent a required hash to call cong_avoid, set_state, cwnd_event.
-
-At the callsite like in net/ipv4/tcp_input.c
-  icsk->icsk_ca_ops->cong_avoid(sk, ack, acked);
-the clang will compute the kcfi hash, but there will be no __cfi symbol in vmlinux.
-
-If there was one we could teach the verifier to look for __kcfi...cong_avoid
-in kallsyms, then read cfi hash from there and populate it into generated asm
-in arch_prepare_bpf_trampoline.
-
-So I'm thinking to do this:
-
-diff --git a/net/ipv4/bpf_tcp_ca.c b/net/ipv4/bpf_tcp_ca.c
-index c7bbd8f3c708..afaadc2c0827 100644
---- a/net/ipv4/bpf_tcp_ca.c
-+++ b/net/ipv4/bpf_tcp_ca.c
-@@ -283,6 +283,12 @@ struct bpf_struct_ops bpf_tcp_congestion_ops = {
-        .name = "tcp_congestion_ops",
- };
-
-+/* never accessed, here for clang kCFI only */
-+extern void __kcfi_cong_avoid(struct sock *sk, u32 ack, u32 acked);
-+__ADDRESSABLE(__kcfi_cong_avoid);
-+extern void __kcfi_set_state(struct sock *sk, u8 new_state);
-+__ADDRESSABLE(__kcfi_set_state);
-
-To force kcfi generation and then teach struct_ops infra to look
-for __kcfi_typeid___kcfi_##callbackname in kallsyms,
-read kcfi from there and populate into bpf trampoline.
-
-Since kcfi and bpf are not working well, I believe it's bpf folks job to fix it.
-Especially since it's starting to look bpf infra heavy.
-
-If you're interested I can, of course, point to relevant bits in kernel/bpf/bpf_struct_ops.c
-that would need to be extended to support such kcfi_typeid search,
-but I think it's my job to fix it.
-
-If I get stuck, I'll ask for help.
-
-I also researched a different approach.
-llvm does the following to compute the kcfi hash:
-
-llvm::ConstantInt *CodeGenModule::CreateKCFITypeId(QualType T) {
-  if (auto *FnType = T->getAs<FunctionProtoType>())
-    T = getContext().getFunctionType(
-        FnType->getReturnType(), FnType->getParamTypes(),
-        FnType->getExtProtoInfo().withExceptionSpec(EST_None));
-
-  std::string OutName;
-  llvm::raw_string_ostream Out(OutName);
-  getCXXABI().getMangleContext().mangleCanonicalTypeName(
-      T, Out, getCodeGenOpts().SanitizeCfiICallNormalizeIntegers);
-
-  if (getCodeGenOpts().SanitizeCfiICallNormalizeIntegers)
-    Out << ".normalized";
-
-  return llvm::ConstantInt::get(Int32Ty,
-                                static_cast<uint32_t>(llvm::xxHash64(OutName)));
-}
-
-xxhash is already available in the kernel.
-We can add type mangling logic and convert prototype of cong_avoid, set_state, etc
-(that are already available in vmlinux BTF) into a mangled string and
-apply xxhash on that string.
-This way we wouldn't need to add __kcfi stubs to net/ipv4/bpf_tcp_ca.c.
-kcfi will be computed on demand.
-
-> > 
-> > This case is easier to make work with kCFI.
-> > The JIT will use:
-> > cfi_bpf_hash:
-> >       .long   __kcfi_typeid___bpf_prog_runX  
-> > like your patch already does.
-> > And will use
-> > extern u64 __bpf_callback_fn(u64, u64, u64, u64, u64);
-> > cfi_bpf_subprog_hash:
-> >       .long   __kcfi_typeid___bpf_callback_fn
-> > to JIT all subprogs. See bpf_is_subprog().
-> 
-> Aaah!, yes it should be trivial to use another hash value when
-> is_subprog in emit_prologue().
-
-Great. I'll wait for your respin and then will start building "kcfi for struct-ops"
-via one of the two approaches above.
-
-> Yes, we can do that. Plans have changed on my side too -- I'm taking a 6
-> week break soon, so I'll do whatever I can before I'm out, and then
-> continue from whatever state I find when I get back.
-
-6 weeks! Nice. Enjoy the long break.
-Last time I took 3 week PTO in a row I got bored after week 2 and went back to hacking :)
 
