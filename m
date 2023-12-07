@@ -1,94 +1,172 @@
-Return-Path: <netdev+bounces-54823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1E908086B5
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 12:27:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A45B8086BA
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 12:28:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E49C283F1C
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 11:27:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7A3D28417A
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 11:28:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE6A637D27;
-	Thu,  7 Dec 2023 11:27:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hKmLcNgG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1FA137D34;
+	Thu,  7 Dec 2023 11:28:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFB9110C3;
-	Thu,  7 Dec 2023 03:27:19 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 67271E0002;
-	Thu,  7 Dec 2023 11:27:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1701948438;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pkhKb9cna+Ui8j44O1HcDJ/iUVeFsHwWP3sKQpboDq8=;
-	b=hKmLcNgG1Wz6oLkUF3olTFFphoSS+buonhnO6I+jekfB43jFFCevz8DZoyWcmaWlHAK/qI
-	L/ldUATCqbPpsyUN/Ohb8Uz+3JtmVslehv80JbA//Ievye4Dl8GDy6w7Qi2im+HBbZDNIY
-	xm0HYQRIoYBN3Is5ao/Zv2lZGQtibOQNf7Kx15ts649aNZOVfp5i9LXeVqBDxyc6E1bVKf
-	VRCBgapMc21RwnrjhKYWY9q11ttKWmWAAQ77Z2fs2TpCkhXknmZlVgRLPsKgeU0uejHGof
-	hN2+wZ2ZMlaOdQnCRIMjH1LFrJpLrZdKRMmZGtpx05rt9AQ5tWHODd0UuvCgHg==
-Date: Thu, 7 Dec 2023 12:27:16 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Stefan Eichenberger <eichest@gmail.com>
-Cc: mw@semihalf.com, linux@armlinux.org.uk, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: mvpp2: add support for mii
-Message-ID: <20231207122716.7ff58c91@device.home>
-In-Reply-To: <ZXGJXIK3cl/9lfKi@eichest-laptop>
-References: <20231206160125.2383281-1-eichest@gmail.com>
-	<20231206182705.3ff798ad@device.home>
-	<ZXGJXIK3cl/9lfKi@eichest-laptop>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61E1310C2;
+	Thu,  7 Dec 2023 03:28:19 -0800 (PST)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.57])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SmBp05SJ9zYsnN;
+	Thu,  7 Dec 2023 19:27:36 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 7 Dec
+ 2023 19:28:17 +0800
+Subject: Re: [PATCH net-next 6/6] tools: virtio: introduce vhost_net_test
+To: Jason Wang <jasowang@redhat.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Michael S.
+ Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	<virtualization@lists.linux.dev>
+References: <20231205113444.63015-1-linyunsheng@huawei.com>
+ <20231205113444.63015-7-linyunsheng@huawei.com>
+ <CACGkMEvVezZnHK-gRWY+MUd_6awnprb024scqPNmMQ05P8rWTQ@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <424670ab-23d8-663b-10cb-d88906767956@huawei.com>
+Date: Thu, 7 Dec 2023 19:28:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+In-Reply-To: <CACGkMEvVezZnHK-gRWY+MUd_6awnprb024scqPNmMQ05P8rWTQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
 
-Hello Stefan,
+On 2023/12/7 14:00, Jason Wang wrote:
+> On Tue, Dec 5, 2023 at 7:35 PM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+...
 
-On Thu, 7 Dec 2023 10:01:08 +0100
-Stefan Eichenberger <eichest@gmail.com> wrote:
-
-> Hi Maxime,
+>> +
+>> +static int tun_alloc(void)
+>> +{
+>> +       struct ifreq ifr;
+>> +       int fd, e;
+>> +
+>> +       fd = open("/dev/net/tun", O_RDWR);
+>> +       if (fd < 0) {
+>> +               perror("Cannot open /dev/net/tun");
+>> +               return fd;
+>> +       }
+>> +
+>> +       memset(&ifr, 0, sizeof(ifr));
+>> +
+>> +       ifr.ifr_flags = IFF_TUN | IFF_NO_PI;
 > 
-> On Wed, Dec 06, 2023 at 06:27:05PM +0100, Maxime Chevallier wrote:
-> > > @@ -6973,6 +6988,9 @@ static int mvpp2_port_probe(struct platform_device *pdev,
-> > >  				  port->phylink_config.supported_interfaces);
-> > >  			__set_bit(PHY_INTERFACE_MODE_SGMII,
-> > >  				  port->phylink_config.supported_interfaces);
-> > > +		} else if (phy_mode == PHY_INTERFACE_MODE_MII) {
-> > > +			__set_bit(PHY_INTERFACE_MODE_100BASEX,
-> > > +				  port->phylink_config.supported_interfaces);  
-> > 
-> > Can you explain that part ? I don't understand why 100BaseX is being
-> > reported as a supported mode here. This whole section of the function
-> > is about detecting what can be reported based on the presence or not of
-> > a comphy driver / hardcoded comphy config. I don't think the comphy
-> > here has anything to do with MII / 100BaseX
-> > 
-> > If 100BaseX can be carried on MII (which I don't know), shouldn't it be
-> > reported no matter what ?  
+> Why did you use IFF_TUN but not IFF_TAP here?
+
+To be honest, no particular reason, I just picked IFF_TUN and it happened
+to work for me to test changing in vhost_net_build_xdp().
+
+Is there a particular reason you perfer the IFF_TAP over IFF_TUN?
+
 > 
-> I missunderstood that part, I thought it is a translation from interface
-> type to speed but it is obviously not. I already verfied that everything
-> works without this part and will remove it in version 2 of the patch.
-> Thanks a lot for the review!
+>> +       strncpy(ifr.ifr_name, "tun0", IFNAMSIZ);
+> 
+> tun0 is pretty common if there's a VPN. Do we need some randomized name here?
 
-No problem, thanks for the patch :)
+How about something like below?
 
-Maxime
+snprintf(ifr.ifr_name, IFNAMSIZ, "tun_%d", getpid());
 
+> 
+> 
+>> +
+>> +       e = ioctl(fd, TUNSETIFF, (void *) &ifr);
+>> +       if (e < 0) {
+>> +               perror("ioctl[TUNSETIFF]");
+>> +               close(fd);
+>> +               return e;
+>> +       }
+>> +
+>> +       return fd;
+>> +}
+>> +
+>> +/* Unused */
+>> +void *__kmalloc_fake, *__kfree_ignore_start, *__kfree_ignore_end;
+> 
+> Why do we need trick like these here?
 
+That is because of the below error:
+tools/virtio/./linux/kernel.h:58: undefined reference to `__kmalloc_fake'
+
+when virtio_ring.c is compiled in the userspace, the kmalloc raleted function
+is implemented in tools/virtio/./linux/kernel.h, which requires those varibles
+to be defined.
+
+> 
+>> +
+>> +struct vq_info {
+>> +       int kick;
+>> +       int call;
+>> +       int num;
+>> +       int idx;
+>> +       void *ring;
+>> +       /* copy used for control */
+>> +       struct vring vring;
+>> +       struct virtqueue *vq;
+>> +};
+>> +
+>> +struct vdev_info {
+>> +       struct virtio_device vdev;
+>> +       int control;
+>> +       struct pollfd fds[1];
+>> +       struct vq_info vqs[1];
+>> +       int nvqs;
+>> +       void *buf;
+>> +       size_t buf_size;
+>> +       struct vhost_memory *mem;
+>> +};
+>> +
+>> +static struct vhost_vring_file no_backend = { .index = 1, .fd = -1 },
+>> +                                    backend = { .index = 1, .fd = 1 };
+> 
+> A magic number like fd = 1 is pretty confusing.
+> 
+> And I don't see why we need global variables here.
+
+I was using the virtio_test.c as reference, will try to remove it
+if it is possible.
+
+> 
+>> +static const struct vhost_vring_state null_state = {};
+>> +
+
+..
+
+>> +
+>> +done:
+>> +       backend.fd = tun_alloc();
+>> +       assert(backend.fd >= 0);
+>> +       vdev_info_init(&dev, features);
+>> +       vq_info_add(&dev, 256);
+>> +       run_test(&dev, &dev.vqs[0], delayed, batch, reset, nbufs);
+> 
+> I'd expect we are testing some basic traffic here. E.g can we use a
+> packet socket then we can test both tx and rx?
+
+Yes, only rx for tun is tested.
+Do you have an idea how to test the tx too? As I am not familar enough
+with vhost_net and tun yet.
+
+> 
+> Thanks
 
