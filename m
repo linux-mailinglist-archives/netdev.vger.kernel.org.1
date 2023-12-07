@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-54813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BF27808555
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 11:20:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE965808588
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 11:30:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0604A283FA6
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 10:20:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E2B0B220E3
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 10:30:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8271736AFA;
-	Thu,  7 Dec 2023 10:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 780C131728;
+	Thu,  7 Dec 2023 10:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P0GpJwOS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s3mHWfUK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533E63529F;
-	Thu,  7 Dec 2023 10:20:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C726BC433C9;
-	Thu,  7 Dec 2023 10:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 521631DFF2;
+	Thu,  7 Dec 2023 10:30:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BB676C433C9;
+	Thu,  7 Dec 2023 10:30:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701944423;
-	bh=VN5ael7ejZIKhO7wu8DyqQP7P5tXKIv5eQOqK3DVo90=;
+	s=k20201202; t=1701945024;
+	bh=pFq7j9bon22etyXf7357E7ITfs/y8T8hPp68MYGgsiA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=P0GpJwOSjYQJYgtunsRIXTuk45QfxZ06wCJbJkwTk33vBhWmgvdBpZNdtdcz9OhE0
-	 ap6r4zWspCDP7Z0lYkESMgMRxUBT3QkP7wPaPlX5BTVgNVNSp657ThihKWmRhexS1k
-	 86a/M7agO5O0Ejaw/spq+ihEBKNP91I1nwx2WufZFIMbpvPA+j3dRMM3URi3mJMewZ
-	 96zcDfkeY7mH+vQy/Ox+k8FtPXOLe4kQ+IDzq7FgF/WPDyB+dhp4EDOkKLMnyxMSZo
-	 rMRaGclLag12tQJXlQUwOiFSo1ABU35AmjojH0cN7hH8U64JZgNDQ5WwIId/JA8Xnu
-	 KwNcpTZvapqdQ==
+	b=s3mHWfUKPYNJHk5O/3Q3wAceBPtFFF+wY1g+7puzKxTD8GvT0Behe870JMZOGAAs/
+	 g38w4QBBpTxCjdG8J6Nt1fpJ+EDIt9xPN/6l9OQ5iLpX4Nn5ZsJa/pCHhNVefCxglo
+	 /X5Int80ZxfAohDqrWe8HQZY33xAGGFOBxQJvZo7oEwiI3fGUvDTWtqxdCwy4pjEVQ
+	 +QmC2yPnODNy2D3Hz2T2gYMnziIbe6tMAZoQ4Em9HfNPSnxO6kj8rEx5u4f49wgYb3
+	 g+nWeafi2jwbXpmsps2JEPaaIA9niqlXxviMWGUbZLuXAkQnfj/hxlZuVnsT5tJ269
+	 fuYmWrbTC2dPA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A65D3C40C5E;
-	Thu,  7 Dec 2023 10:20:23 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9D22DC43170;
+	Thu,  7 Dec 2023 10:30:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -43,39 +43,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] nfp: flower: fix for take a mutex lock in soft irq
- context and rcu lock
+Subject: Re: [PATCH net-next v7 0/2] net: dsa: microchip: enable setting rmii
+ reference
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170194442367.4036.11698027347829180563.git-patchwork-notify@kernel.org>
-Date: Thu, 07 Dec 2023 10:20:23 +0000
-References: <20231205092625.18197-1-louis.peens@corigine.com>
-In-Reply-To: <20231205092625.18197-1-louis.peens@corigine.com>
-To: Louis Peens <louis.peens@corigine.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- hui.zhou@corigine.com, netdev@vger.kernel.org, stable@vger.kernel.org,
- oss-drivers@corigine.com
+ <170194502463.8570.266673785548513310.git-patchwork-notify@kernel.org>
+Date: Thu, 07 Dec 2023 10:30:24 +0000
+References: <cover.1701770394.git.ante.knezic@helmholz.de>
+In-Reply-To: <cover.1701770394.git.ante.knezic@helmholz.de>
+To: Ante Knezic <ante.knezic@helmholz.de>
+Cc: netdev@vger.kernel.org, woojung.huh@microchip.com, andrew@lunn.ch,
+ f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, marex@denx.de,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ UNGLinuxDriver@microchip.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Tue,  5 Dec 2023 11:26:25 +0200 you wrote:
-> From: Hui Zhou <hui.zhou@corigine.com>
+On Tue, 5 Dec 2023 11:03:37 +0100 you wrote:
+> KSZ88X3 devices can select between internal and external RMII reference clock.
+> This patch series introduces new device tree property for setting reference
+> clock to internal.
 > 
-> The neighbour event callback call the function nfp_tun_write_neigh,
-> this function will take a mutex lock and it is in soft irq context,
-> change the work queue to process the neighbour event.
-> 
-> Move the nfp_tun_write_neigh function out of range rcu_read_lock/unlock()
-> in function nfp_tunnel_request_route_v4 and nfp_tunnel_request_route_v6.
+> ---
+> V7:
+>   - adapt dt schema as suggested by Rob Herring
+> V6:
+>   - use dev->cpu_port and dsa_to_port() instead of parsing the device tree.
+> V5:
+>   - move rmii-clk-internal to be a port device tree property.
+> V4:
+>   - remove rmii_clk_internal from ksz_device, as its not needed any more
+>   - move rmii clk config as well as ksz8795_cpu_interface_select to
+>     ksz8_config_cpu_port
+> V3:
+>   - move ksz_cfg from global switch config to port config as suggested by Vladimir
+>     Oltean
+>   - reverse patch order as suggested by Vladimir Oltean
+>   - adapt dt schema as suggested by Conor Dooley
+> V2:
+>   - don't rely on default register settings - enforce set/clear property as
+>     suggested by Andrew Lunn
+>   - enforce dt schema as suggested by Conor Dooley
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] nfp: flower: fix for take a mutex lock in soft irq context and rcu lock
-    https://git.kernel.org/netdev/net/c/0ad722bd9ee3
+  - [net-next,v7,1/2] dt-bindings: net: microchip,ksz: document microchip,rmii-clk-internal
+    https://git.kernel.org/netdev/net-next/c/8e3bfaab2ad9
+  - [net-next,v7,2/2] net: dsa: microchip: add property to select internal RMII reference clock
+    https://git.kernel.org/netdev/net-next/c/9f19a4ebc80a
 
 You are awesome, thank you!
 -- 
