@@ -1,88 +1,119 @@
-Return-Path: <netdev+bounces-54929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7D7B808F37
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:00:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A672E808F8A
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:04:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96B6B1F2119B
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:00:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 513781F21194
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:04:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7EDD4B5C3;
-	Thu,  7 Dec 2023 18:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77EEA4C3BB;
+	Thu,  7 Dec 2023 18:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I1kmy7ii"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iq1LYhC0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9DDA4B5B2
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 18:00:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 44260C433CB;
-	Thu,  7 Dec 2023 18:00:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701972027;
-	bh=ktLzJMGSuJbVN47s+rs99Zm1xBcnsPw3uH3ENqOgGYs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=I1kmy7iiFoTx5YBdnEio8cdRD8c5xKEsAuVGqNS/R73BoeF3Kansp0hhCc3WpZZRW
-	 69ZyxPQx2sGS+7MUTTNMvPU66UfvZKP7LNCsZDonlUS+ouGwrTyMiOvfGgwtF8ZRVV
-	 hIMbUj7F4ZILcFI7Jrbrx/rCIBsLKci47tTU/Hr9jw4GaZNbKI1WI0QjQgcP7uihaO
-	 GrbU06WvmZEp6kMfKiHhqui6w5fxQT5S/VDpjsip5IN6QvDDuyGcH1a74LU1WxZdXJ
-	 wGcGQTyklv09ndHIda7plm+25x/V4S2Z8ixWoP0JREHyYCv64++Rk/Sfx7izN9rPNO
-	 GnZN8Gc1G85xg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 24A93DD4F1D;
-	Thu,  7 Dec 2023 18:00:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF7F2170E;
+	Thu,  7 Dec 2023 10:03:37 -0800 (PST)
+Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-a1e2f34467aso120574166b.2;
+        Thu, 07 Dec 2023 10:03:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701972216; x=1702577016; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Cyd5phiUGtF3gGm1M6y6XMNxNpiGb0naeJEFalYfR2w=;
+        b=Iq1LYhC0rBbVyQTC6Hg0kvYm9u8ojdK4AUeUmSgXZbod2Q/h6yr0qzEaIOuH7SJIDk
+         Hr2NXVd/YUmiO5GSZqXO97gvw8+QccPW9vSp7t1q+ivhca/LQq7w+JVl/IdvOvEad/O+
+         6CK7q41/Vp5hAR8ztukxW1gtCjAR6COfDAZ9WqK2FtrE4/nDMkKQ1pQbO3eqcoqxeo4K
+         orJ1ZFCM3iyGCNdh1lU8fxqyH2sdTdyo1jwwOKnOSfGMwUwbrsoUT4sT4W6wrjiIbe5U
+         LzsUZ2EqZWyoawYG1NdVULXjq9XeTS88TnHlaePiLcfRzD9JVqATwc5A8axRuhcxAiFj
+         HVYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701972216; x=1702577016;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Cyd5phiUGtF3gGm1M6y6XMNxNpiGb0naeJEFalYfR2w=;
+        b=aEPEGoHVhbKS6pidu2wfs3NNPHZgSqK/yIaISha4xyJLtbxMtmsMW6oXAtKJ2HUaBf
+         Kt/+Jet5fPsGkMA+H+jmZc4YD2KSOoLjuQblc0UxnKKHMBZLiBjtNGqOnfZhzVylbncS
+         u/hV8ubaD+rtcq+4jysV1+FVukLB618/zTSZ+8BxkQv8zFVpywP7zPz+lXuc5bifZv5U
+         R+00o9ADQmzIQD9nigM0jiQNOi5dNs5axv+575HC79cyWg9JyoCjZH5kCqgA6ur9RHef
+         UfRhaCv2vH+d7QMjOD0ozC97LZYbFHMHJruOhkEsrVedsFyWi7KB+/ZzTR4fucz/ylZa
+         Mbug==
+X-Gm-Message-State: AOJu0Yx/oKTTUfKrejvMUpnNU1voT3okID8WaycSROJkrdpYK3RAqnOH
+	06448clEG7E8nlHqM4P8C0I=
+X-Google-Smtp-Source: AGHT+IEb+8/GgdfwY783D66zPQhIszkM1fWsRJgqvO0vREeyx1Z2tXbyEmShioG3fZn9KBdhMDEBMQ==
+X-Received: by 2002:a17:906:fa92:b0:a19:641:66da with SMTP id lt18-20020a170906fa9200b00a19064166damr2080980ejb.7.1701972215689;
+        Thu, 07 Dec 2023 10:03:35 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id vi8-20020a170907d40800b00a1c7b20e9e6sm40275ejc.32.2023.12.07.10.03.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Dec 2023 10:03:35 -0800 (PST)
+Date: Thu, 7 Dec 2023 20:03:32 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com
+Subject: Re: [PATCH net-next 05/15] net: dsa: mt7530: improve code path for
+ setting up port 5
+Message-ID: <20231207180332.ugfp33xcdkw3elrw@skbuf>
+References: <20231118123205.266819-1-arinc.unal@arinc9.com>
+ <20231118123205.266819-6-arinc.unal@arinc9.com>
+ <ZVjNJ0nf7Mp0kHzH@shell.armlinux.org.uk>
+ <5e95a436-189f-412e-b409-89a003003292@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/2] Generic netlink multicast fixes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170197202713.7796.14854919383895548891.git-patchwork-notify@kernel.org>
-Date: Thu, 07 Dec 2023 18:00:27 +0000
-References: <20231206213102.1824398-1-idosch@nvidia.com>
-In-Reply-To: <20231206213102.1824398-1-idosch@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, nhorman@tuxdriver.com,
- yotam.gi@gmail.com, jiri@resnulli.us, johannes@sipsolutions.net,
- jacob.e.keller@intel.com, horms@kernel.org,
- andriy.shevchenko@linux.intel.com, jhs@mojatatu.com
+In-Reply-To: <5e95a436-189f-412e-b409-89a003003292@arinc9.com>
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 6 Dec 2023 23:31:00 +0200 you wrote:
-> Restrict two generic netlink multicast groups - in the "psample" and
-> "NET_DM" families - to be root-only with the appropriate capabilities.
-> See individual patches for more details.
+On Sat, Dec 02, 2023 at 11:36:03AM +0300, Arınç ÜNAL wrote:
+> On 18.11.2023 17:41, Russell King (Oracle) wrote:
+> > > For the cases of PHY muxing or the port being disabled, call
+> > > mt7530_setup_port5() from mt7530_setup(). mt7530_setup_port5() from
+> > > mt753x_phylink_mac_config() won't run when port 5 is disabled or used for
+> > > PHY muxing as port 5 won't be defined on the devicetree.
+> > 
+> > ... and this should state why this needs to happen - in other words,
+> > the commit message should state why is it critical that port 5 is
+> > always setup.
 > 
-> Ido Schimmel (2):
->   psample: Require 'CAP_NET_ADMIN' when joining "packets" group
->   drop_monitor: Require 'CAP_SYS_ADMIN' when joining "events" group
+> Actually, port 5 must not always be setup. With patch 7, I explain this
+> while preventing mt7530_setup_port5() from running if port 5 is disabled.
 > 
-> [...]
+> Arınç
 
-Here is the summary with links:
-  - [net,1/2] psample: Require 'CAP_NET_ADMIN' when joining "packets" group
-    https://git.kernel.org/netdev/net/c/44ec98ea5ea9
-  - [net,2/2] drop_monitor: Require 'CAP_SYS_ADMIN' when joining "events" group
-    https://git.kernel.org/netdev/net/c/e03781879a0d
+Then change that last paragraph. You could say something like this:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+To keep the cases where port 5 isn't controlled by phylink working as
+before, we need to preserve the mt7530_setup_port5() call from mt7530_setup().
 
-
+I think it's a case of saying too much, which sparks too many unresolved
+questions in the reader's mind, which are irrelevant for the purpose of
+this specific change: eliminating the overlap between DSA's setup() time
+and phylink.
 
