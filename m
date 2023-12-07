@@ -1,284 +1,256 @@
-Return-Path: <netdev+bounces-54736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 755D2808036
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 06:32:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A15A180803B
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 06:33:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 253F41F211B5
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 05:32:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5791E281DAA
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 05:33:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13EA10A2B;
-	Thu,  7 Dec 2023 05:32:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2014611181;
+	Thu,  7 Dec 2023 05:33:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MSx/U2ZD"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bpj3YbNL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D865D53
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 21:32:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701927134;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x8AKubdH5eUqbZp9S/sQ4T9pKm0YRUiJhSDS/SdPqZY=;
-	b=MSx/U2ZDQ9UsEageB+5ioVH4cDyhFWck2fIU/A1k9XGyBcYrxeZp5kG/Q9booWdUAEpF13
-	URmJyh2HI+D6w60jPuyKAcw697E4m4u8qRfIm00Jg/lkRJQtdMYpDm9Sfata4n/0wvs323
-	BJdEianGvneavSMirCMDly+L2L8EIis=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-356-pP4cJYQQNviOzWSZqf4NLA-1; Thu, 07 Dec 2023 00:32:13 -0500
-X-MC-Unique: pP4cJYQQNviOzWSZqf4NLA-1
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2865681dcb4so567387a91.3
-        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 21:32:12 -0800 (PST)
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93D99D51
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 21:33:35 -0800 (PST)
+Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-40c0e7b8a9bso7960055e9.3
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 21:33:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1701927214; x=1702532014; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aDh5Ha6meMpNT5PZvdiFsf/a/63SoEjRN6VfIgk3fbs=;
+        b=bpj3YbNLkvzoxEw3xr0u3agkAhCoIuowOElrV/CTMzye8qwEDGvkm7uR0/cuL/ftIt
+         jRquYrxsKhkgv5IE3W4Znm0vKoMxtiibCYaq3PHsXZHiRDE69BXKRvyHra6UJrZOb0yx
+         5oP0oV9Xp+4qIJPjAS4YsUSOoFJLslTrFGhysjrsJRHyvoSBWDBqECcOzT8ZGY4J7FRs
+         FWr8T0YXHfsJoKZ1LEotF/Rto6mU37c+Q6Ovedu0tLngsP9f7fodtv1C90zMwhcIY2Z7
+         ejn6BqFG2uqY7p1NT4CzU3pGdrQ9EcLj/fTLkh8OPizFM0+96H/D4NemDC7T3p/JMVTD
+         N6Wg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701927132; x=1702531932;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x8AKubdH5eUqbZp9S/sQ4T9pKm0YRUiJhSDS/SdPqZY=;
-        b=HScsAlleil6UZarSnSlCtoGpDfUN8Oi6nnM6Sl8ej7NvBs+OA/SA1DcMWBiixpBFkT
-         O9kYeorrjl18ptC4cIKEth90nPdXZBQKTC1Eq9IcsVT/S7AKMgpBS81n7XXF4gaAUhSJ
-         FGb6hPZz+IMcaBUVu3nj3w7/c7+6qbleBFVt6rsPL8qds2DcDImjUUv/cziegf7YFc0p
-         HfkVsWu1Lh7ewfQ6eg5lVTd2VQhCBn4VyLiS+VFwMSOPB9Iz17RjwG+CXRbIrGAefSGQ
-         xNflBFYPygOsxS3J+Z10gxrQow6taxePqxD9HM4z1CFq1ivsDpIW8yfceTmFx/WZmJf0
-         r4Sw==
-X-Gm-Message-State: AOJu0YxB1+8UmZsBLUBpofdmgxRvk5kq1tWXkyBThzx+iwZodQXdm4pp
-	OAqW2wxVz1hananmbTNA1ckYKyL7vbW0bztJ3Tr9hfW415+5AAvg7WjmmgBB/t1wJbvBJ56q+x5
-	0bddo7DaxrpP9VD5znLC3w+tS9BTxHMxg
-X-Received: by 2002:a17:90b:8c4:b0:286:6cc1:866b with SMTP id ds4-20020a17090b08c400b002866cc1866bmr1735468pjb.80.1701927131684;
-        Wed, 06 Dec 2023 21:32:11 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH6XoZVQHN0I8TmPCeCnxuhZW9K7ObTTorIlWlVOqvXJihMRJ//c3mDTg0rJap6u3bSTnnCHjKkz4KP+tc+Vbk=
-X-Received: by 2002:a17:90b:8c4:b0:286:6cc1:866b with SMTP id
- ds4-20020a17090b08c400b002866cc1866bmr1735458pjb.80.1701927131367; Wed, 06
- Dec 2023 21:32:11 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701927214; x=1702532014;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aDh5Ha6meMpNT5PZvdiFsf/a/63SoEjRN6VfIgk3fbs=;
+        b=CwNAuiGDqsw2JebTv51UazKT/cW0xjnN/VU8irCW2BwMSTETkQ8YVJ87BsRtXbktaW
+         WZ7ykK+LGyQiGBP7fqtLoWKUds0qJA8wu6kdgNOgTOCBu4TSzFvcIzaVzwQSLcOjhjAN
+         R/dUcGHIhjanHnfB27unr13OhKys9l9LuCgrZLser0fFxday2xGeirUx23wnW8lMEhtH
+         70QdxB8AtIIR6mwY6CwzdksGT7TAU9ML1k93lnkIhgD5/WmDEyW7zlDi22afXGKfxh4d
+         dwVqbkEFPU0KluFXOmmbBQVu766sFu/ju1uuaftqdr6l2oT621yhv6bEUAlz5WvJ/oTL
+         iTnw==
+X-Gm-Message-State: AOJu0YxSocgpkWS5rrUxzsU0k5k94OK5A0hB05+T4ToTxHG+4bwtZl/a
+	gHIQ1FGUUXreBXk1d8kyc3G7sg==
+X-Google-Smtp-Source: AGHT+IGRMzw6ole/sY4x+aWmyT5JGTFS7U8esyxKHbhMcm0/ifnMUpQvK3RimMuKBvFeDdeF9e+gqQ==
+X-Received: by 2002:a7b:c4c9:0:b0:40b:5e21:dd2b with SMTP id g9-20020a7bc4c9000000b0040b5e21dd2bmr1280861wmk.89.1701927213762;
+        Wed, 06 Dec 2023 21:33:33 -0800 (PST)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id z17-20020a5d4c91000000b003333abf3edfsm459345wrs.47.2023.12.06.21.33.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 21:33:33 -0800 (PST)
+Date: Thu, 7 Dec 2023 08:33:30 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oe-kbuild@lists.linux.dev, Lev Pantiukhin <kndrvt@yandex-team.ru>
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, mitradir@yandex-team.ru,
+	Lev Pantiukhin <kndrvt@yandex-team.ru>,
+	Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Subject: Re: [PATCH] ipvs: add a stateless type of service and a stateless
+ Maglev hashing scheduler
+Message-ID: <db2f0650-6e23-457f-bc5c-f9da0047f37d@suswa.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1701762688.git.hengqi@linux.alibaba.com>
- <245ea32fe5de5eb81b1ed8ec9782023af074e137.1701762688.git.hengqi@linux.alibaba.com>
- <CACGkMEurTAGj+mSEtAiYtGfqy=6sU33xVskAZH47qUi+GcyvWA@mail.gmail.com>
- <ad02f02a-b08f-4061-9aba-cadef02641c8@linux.alibaba.com> <f36e686e13142d885a6e34f0a4dc2e33567ef287.camel@redhat.com>
- <fbea1040-cf84-45e0-b0f5-1d7752339479@linux.alibaba.com> <CACGkMEuU18fn8oC=DPNP3Dk=uE0Rutwib7jkoXEZXV+H4H6VcA@mail.gmail.com>
- <d2cc8026-eaa8-46d2-ac61-9d228bc409cf@linux.alibaba.com>
-In-Reply-To: <d2cc8026-eaa8-46d2-ac61-9d228bc409cf@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 7 Dec 2023 13:31:59 +0800
-Message-ID: <CACGkMEvzhF0yQb5sb22+sh=p1tyNfA5sOuvyj8jjAxthLaxrAw@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 4/5] virtio-net: add spin lock for ctrl cmd access
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, mst@redhat.com, kuba@kernel.org, 
-	yinjun.zhang@corigine.com, edumazet@google.com, davem@davemloft.net, 
-	hawk@kernel.org, john.fastabend@gmail.com, ast@kernel.org, horms@kernel.org, 
-	xuanzhuo@linux.alibaba.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231204152020.472247-1-kndrvt@yandex-team.ru>
 
-On Thu, Dec 7, 2023 at 12:47=E2=80=AFPM Heng Qi <hengqi@linux.alibaba.com> =
-wrote:
->
->
->
-> =E5=9C=A8 2023/12/7 =E4=B8=8B=E5=8D=8812:19, Jason Wang =E5=86=99=E9=81=
-=93:
-> > On Wed, Dec 6, 2023 at 9:03=E2=80=AFPM Heng Qi <hengqi@linux.alibaba.co=
-m> wrote:
-> >>
-> >>
-> >> =E5=9C=A8 2023/12/6 =E4=B8=8B=E5=8D=888:27, Paolo Abeni =E5=86=99=E9=
-=81=93:
-> >>> On Tue, 2023-12-05 at 19:05 +0800, Heng Qi wrote:
-> >>>> =E5=9C=A8 2023/12/5 =E4=B8=8B=E5=8D=884:35, Jason Wang =E5=86=99=E9=
-=81=93:
-> >>>>> On Tue, Dec 5, 2023 at 4:02=E2=80=AFPM Heng Qi <hengqi@linux.alibab=
-a.com> wrote:
-> >>>>>> Currently access to ctrl cmd is globally protected via rtnl_lock a=
-nd works
-> >>>>>> fine. But if dim work's access to ctrl cmd also holds rtnl_lock, d=
-eadlock
-> >>>>>> may occur due to cancel_work_sync for dim work.
-> >>>>> Can you explain why?
-> >>>> For example, during the bus unbind operation, the following call sta=
-ck
-> >>>> occurs:
-> >>>> virtnet_remove -> unregister_netdev -> rtnl_lock[1] -> virtnet_close=
- ->
-> >>>> cancel_work_sync -> virtnet_rx_dim_work -> rtnl_lock[2] (deadlock oc=
-curs).
-> >>>>
-> >>>>>> Therefore, treating
-> >>>>>> ctrl cmd as a separate protection object of the lock is the soluti=
-on and
-> >>>>>> the basis for the next patch.
-> >>>>> Let's don't do that. Reasons are:
-> >>>>>
-> >>>>> 1) virtnet_send_command() may wait for cvq commands for an indefini=
-te time
-> >>>> Yes, I took that into consideration. But ndo_set_rx_mode's need for =
-an
-> >>>> atomic
-> >>>> environment rules out the mutex lock.
-> >>>>
-> >>>>> 2) hold locks may complicate the future hardening works around cvq
-> >>>> Agree, but I don't seem to have thought of a better way besides pass=
-ing
-> >>>> the lock.
-> >>>> Do you have any other better ideas or suggestions?
-> >>> What about:
-> >>>
-> >>> - using the rtnl lock only
-> >>> - virtionet_close() invokes cancel_work(), without flushing the work
-> >>> - virtnet_remove() calls flush_work() after unregister_netdev(),
-> >>> outside the rtnl lock
-> >>>
-> >>> Should prevent both the deadlock and the UaF.
-> >>
-> >> Hi, Paolo and Jason!
-> >>
-> >> Thank you very much for your effective suggestions, but I found anothe=
-r
-> >> solution[1],
-> >> based on the ideas of rtnl_trylock and refill_work, which works very w=
-ell:
-> >>
-> >> [1]
-> >> +static void virtnet_rx_dim_work(struct work_struct *work)
-> >> +{
-> >> +    struct dim *dim =3D container_of(work, struct dim, work);
-> >> +    struct receive_queue *rq =3D container_of(dim,
-> >> +            struct receive_queue, dim);
-> >> +    struct virtnet_info *vi =3D rq->vq->vdev->priv;
-> >> +    struct net_device *dev =3D vi->dev;
-> >> +    struct dim_cq_moder update_moder;
-> >> +    int i, qnum, err;
-> >> +
-> >> +    if (!rtnl_trylock())
-> >> +        return;
-> > Don't we need to reschedule here?
-> >
-> > like
-> >
-> > if (rq->dim_enabled)
-> >         sechedule_work()
-> >
-> > ?
->
-> I think no, we don't need this.
->
-> The work of each queue will be called by "net_dim()->schedule_work()"
-> when napi traffic changes (before schedule_work(), the dim->profile_ix
-> of the corresponding rxq has been updated).
-> So we only need to traverse and update the profiles of all rxqs in the
-> work which is obtaining the rtnl_lock.
+Hi Lev,
 
-Ok, let's have a comment here then.
+kernel test robot noticed the following build warnings:
 
-Thanks
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
->
-> Thanks!
->
-> >
-> > Thanks
-> >
-> >> +
-> >> +    for (i =3D 0; i < vi->curr_queue_pairs; i++) {
-> >> +        rq =3D &vi->rq[i];
-> >> +        dim =3D &rq->dim;
-> >> +        qnum =3D rq - vi->rq;
-> >> +
-> >> +        if (!rq->dim_enabled)
-> >> +            continue;
-> >> +
-> >> +        update_moder =3D net_dim_get_rx_moderation(dim->mode,
-> >> dim->profile_ix);
-> >> +        if (update_moder.usec !=3D rq->intr_coal.max_usecs ||
-> >> +            update_moder.pkts !=3D rq->intr_coal.max_packets) {
-> >> +            err =3D virtnet_send_rx_ctrl_coal_vq_cmd(vi, qnum,
-> >> +                                   update_moder.usec,
-> >> +                                   update_moder.pkts);
-> >> +            if (err)
-> >> +                pr_debug("%s: Failed to send dim parameters on rxq%d\=
-n",
-> >> +                     dev->name, qnum);
-> >> +            dim->state =3D DIM_START_MEASURE;
-> >> +        }
-> >> +    }
-> >> +
-> >> +    rtnl_unlock();
-> >> +}
-> >>
-> >>
-> >> In addition, other optimizations[2] have been tried, but it may be due
-> >> to the sparsely
-> >> scheduled work that the retry condition is always satisfied, affecting
-> >> performance,
-> >> so [1] is the final solution:
-> >>
-> >> [2]
-> >>
-> >> +static void virtnet_rx_dim_work(struct work_struct *work)
-> >> +{
-> >> +    struct dim *dim =3D container_of(work, struct dim, work);
-> >> +    struct receive_queue *rq =3D container_of(dim,
-> >> +            struct receive_queue, dim);
-> >> +    struct virtnet_info *vi =3D rq->vq->vdev->priv;
-> >> +    struct net_device *dev =3D vi->dev;
-> >> +    struct dim_cq_moder update_moder;
-> >> +    int i, qnum, err, count;
-> >> +
-> >> +    if (!rtnl_trylock())
-> >> +        return;
-> >> +retry:
-> >> +    count =3D vi->curr_queue_pairs;
-> >> +    for (i =3D 0; i < vi->curr_queue_pairs; i++) {
-> >> +        rq =3D &vi->rq[i];
-> >> +        dim =3D &rq->dim;
-> >> +        qnum =3D rq - vi->rq;
-> >> +        update_moder =3D net_dim_get_rx_moderation(dim->mode,
-> >> dim->profile_ix);
-> >> +        if (update_moder.usec !=3D rq->intr_coal.max_usecs ||
-> >> +            update_moder.pkts !=3D rq->intr_coal.max_packets) {
-> >> +            --count;
-> >> +            err =3D virtnet_send_rx_ctrl_coal_vq_cmd(vi, qnum,
-> >> +                                   update_moder.usec,
-> >> +                                   update_moder.pkts);
-> >> +            if (err)
-> >> +                pr_debug("%s: Failed to send dim parameters on rxq%d\=
-n",
-> >> +                     dev->name, qnum);
-> >> +            dim->state =3D DIM_START_MEASURE;
-> >> +        }
-> >> +    }
-> >> +
-> >> +    if (need_resched()) {
-> >> +        rtnl_unlock();
-> >> +        schedule();
-> >> +    }
-> >> +
-> >> +    if (count)
-> >> +        goto retry;
-> >> +
-> >> +    rtnl_unlock();
-> >> +}
-> >>
-> >> Thanks a lot!
-> >>
-> >>> Side note: for this specific case any functional test with a
-> >>> CONFIG_LOCKDEP enabled build should suffice to catch the deadlock
-> >>> scenario above.
-> >>>
-> >>> Cheers,
-> >>>
-> >>> Paolo
->
+url:    https://github.com/intel-lab-lkp/linux/commits/Lev-Pantiukhin/ipvs-add-a-stateless-type-of-service-and-a-stateless-Maglev-hashing-scheduler/20231204-232344
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/horms/ipvs-next.git master
+patch link:    https://lore.kernel.org/r/20231204152020.472247-1-kndrvt%40yandex-team.ru
+patch subject: [PATCH] ipvs: add a stateless type of service and a stateless Maglev hashing scheduler
+config: i386-randconfig-141-20231207 (https://download.01.org/0day-ci/archive/20231207/202312070849.i9gwwSH0-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-12) 11.3.0
+reproduce: (https://download.01.org/0day-ci/archive/20231207/202312070849.i9gwwSH0-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+| Closes: https://lore.kernel.org/r/202312070849.i9gwwSH0-lkp@intel.com/
+
+New smatch warnings:
+net/netfilter/ipvs/ip_vs_core.c:545 ip_vs_schedule() error: uninitialized symbol 'need_state'.
+
+vim +/need_state +545 net/netfilter/ipvs/ip_vs_core.c
+
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  440  struct ip_vs_conn *
+190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  441  ip_vs_schedule(struct ip_vs_service *svc, struct sk_buff *skb,
+d4383f04d145cc net/netfilter/ipvs/ip_vs_core.c Jesper Dangaard Brouer 2012-09-26  442  	       struct ip_vs_proto_data *pd, int *ignored,
+d4383f04d145cc net/netfilter/ipvs/ip_vs_core.c Jesper Dangaard Brouer 2012-09-26  443  	       struct ip_vs_iphdr *iph)
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  444  {
+9330419d9aa4f9 net/netfilter/ipvs/ip_vs_core.c Hans Schillstrom       2011-01-03  445  	struct ip_vs_protocol *pp = pd->pp;
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  446  	struct ip_vs_conn *cp = NULL;
+ceec4c38168184 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2013-03-22  447  	struct ip_vs_scheduler *sched;
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  448  	struct ip_vs_dest *dest;
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  449  	__be16 _ports[2], *pptr, cport, vport;
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  450  	const void *caddr, *vaddr;
+3575792e005dc9 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-09-17  451  	unsigned int flags;
+b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  452  	bool need_state;
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  453  
+190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  454  	*ignored = 1;
+2f74713d1436b7 net/netfilter/ipvs/ip_vs_core.c Jesper Dangaard Brouer 2012-09-26  455  	/*
+2f74713d1436b7 net/netfilter/ipvs/ip_vs_core.c Jesper Dangaard Brouer 2012-09-26  456  	 * IPv6 frags, only the first hit here.
+2f74713d1436b7 net/netfilter/ipvs/ip_vs_core.c Jesper Dangaard Brouer 2012-09-26  457  	 */
+6b3d933000cbe5 net/netfilter/ipvs/ip_vs_core.c Gao Feng               2017-11-13  458  	pptr = frag_safe_skb_hp(skb, iph->len, sizeof(_ports), _ports);
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  459  	if (pptr == NULL)
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  460  		return NULL;
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  461  
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  462  	if (likely(!ip_vs_iph_inverse(iph))) {
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  463  		cport = pptr[0];
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  464  		caddr = &iph->saddr;
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  465  		vport = pptr[1];
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  466  		vaddr = &iph->daddr;
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  467  	} else {
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  468  		cport = pptr[1];
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  469  		caddr = &iph->daddr;
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  470  		vport = pptr[0];
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  471  		vaddr = &iph->saddr;
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  472  	}
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  473  
+190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  474  	/*
+190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  475  	 * FTPDATA needs this check when using local real server.
+190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  476  	 * Never schedule Active FTPDATA connections from real server.
+190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  477  	 * For LVS-NAT they must be already created. For other methods
+190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  478  	 * with persistence the connection is created on SYN+ACK.
+190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  479  	 */
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  480  	if (cport == FTPDATA) {
+b0e010c527de74 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  481  		IP_VS_DBG_PKT(12, svc->af, pp, skb, iph->off,
+0d79641a96d612 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  482  			      "Not scheduling FTPDATA");
+190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  483  		return NULL;
+190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  484  	}
+190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  485  
+190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  486  	/*
+a5959d53d6048a net/netfilter/ipvs/ip_vs_core.c Hans Schillstrom       2010-11-19  487  	 *    Do not schedule replies from local real server.
+190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  488  	 */
+802c41adcf3be6 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  489  	if ((!skb->dev || skb->dev->flags & IFF_LOOPBACK)) {
+802c41adcf3be6 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  490  		iph->hdr_flags ^= IP_VS_HDR_INVERSE;
+6ecd754883daff net/netfilter/ipvs/ip_vs_core.c Matteo Croce           2019-01-19  491  		cp = INDIRECT_CALL_1(pp->conn_in_get,
+6ecd754883daff net/netfilter/ipvs/ip_vs_core.c Matteo Croce           2019-01-19  492  				     ip_vs_conn_in_get_proto, svc->ipvs,
+6ecd754883daff net/netfilter/ipvs/ip_vs_core.c Matteo Croce           2019-01-19  493  				     svc->af, skb, iph);
+802c41adcf3be6 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  494  		iph->hdr_flags ^= IP_VS_HDR_INVERSE;
+802c41adcf3be6 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  495  
+802c41adcf3be6 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  496  		if (cp) {
+b0e010c527de74 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  497  			IP_VS_DBG_PKT(12, svc->af, pp, skb, iph->off,
+802c41adcf3be6 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  498  				      "Not scheduling reply for existing"
+802c41adcf3be6 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  499  				      " connection");
+190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  500  			__ip_vs_conn_put(cp);
+190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  501  			return NULL;
+190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  502  		}
+802c41adcf3be6 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  503  	}
+190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  504  
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  505  	/*
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  506  	 *    Persistent service
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  507  	 */
+a5959d53d6048a net/netfilter/ipvs/ip_vs_core.c Hans Schillstrom       2010-11-19  508  	if (svc->flags & IP_VS_SVC_F_PERSISTENT)
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  509  		return ip_vs_sched_persist(svc, skb, cport, vport, ignored,
+d4383f04d145cc net/netfilter/ipvs/ip_vs_core.c Jesper Dangaard Brouer 2012-09-26  510  					   iph);
+a5959d53d6048a net/netfilter/ipvs/ip_vs_core.c Hans Schillstrom       2010-11-19  511  
+190ecd27cd7294 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2010-10-17  512  	*ignored = 0;
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  513  
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  514  	/*
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  515  	 *    Non-persistent service
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  516  	 */
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  517  	if (!svc->fwmark && vport != svc->port) {
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  518  		if (!svc->port)
+1e3e238e9c4bf9 net/netfilter/ipvs/ip_vs_core.c Hannes Eder            2009-08-02  519  			pr_err("Schedule: port zero only supported "
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  520  			       "in persistent services, "
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  521  			       "check your ipvs configuration\n");
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  522  		return NULL;
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  523  	}
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  524  
+ceec4c38168184 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2013-03-22  525  	sched = rcu_dereference(svc->scheduler);
+05f00505a89acd net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2015-06-29  526  	if (sched) {
+05f00505a89acd net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2015-06-29  527  		/* read svc->sched_data after svc->scheduler */
+05f00505a89acd net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2015-06-29  528  		smp_rmb();
+b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  529  		/* we use distinct handler for stateless service */
+b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  530  		if (svc->flags & IP_VS_SVC_F_STATELESS)
+b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  531  			dest = sched->schedule_sl(svc, skb, iph, &need_state);
+b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  532  		else
+bba54de5bdd107 net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2013-06-16  533  			dest = sched->schedule(svc, skb, iph);
+
+need_state not initialized on this path
+
+05f00505a89acd net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2015-06-29  534  	} else {
+05f00505a89acd net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2015-06-29  535  		dest = NULL;
+05f00505a89acd net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2015-06-29  536  	}
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  537  	if (dest == NULL) {
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  538  		IP_VS_DBG(1, "Schedule: no dest found.\n");
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  539  		return NULL;
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  540  	}
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  541  
+b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  542  	/* We use IP_VS_SVC_F_ONEPACKET flag to create no state */
+b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  543  	flags = ((svc->flags & IP_VS_SVC_F_ONEPACKET &&
+b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  544  		  iph->protocol == IPPROTO_UDP) ||
+b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04 @545  		 (svc->flags & IP_VS_SVC_F_STATELESS && !need_state))
+                                                                                                                                         ^^^^^^^^^^
+
+b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  546  		? IP_VS_CONN_F_ONE_PACKET : 0;
+26ec037f9841e4 net/netfilter/ipvs/ip_vs_core.c Nick Chalk             2010-06-22  547  
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  548  	/*
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  549  	 *    Create a connection entry.
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  550  	 */
+f11017ec2d1859 net/netfilter/ipvs/ip_vs_core.c Simon Horman           2010-08-22  551  	{
+f11017ec2d1859 net/netfilter/ipvs/ip_vs_core.c Simon Horman           2010-08-22  552  		struct ip_vs_conn_param p;
+6e67e586e7289c net/netfilter/ipvs/ip_vs_core.c Hans Schillstrom       2011-01-03  553  
+3109d2f2d1fe06 net/netfilter/ipvs/ip_vs_core.c Eric W. Biederman      2015-09-21  554  		ip_vs_conn_fill_param(svc->ipvs, svc->af, iph->protocol,
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  555  				      caddr, cport, vaddr, vport, &p);
+ba38528aae6ee2 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2014-09-09  556  		cp = ip_vs_conn_new(&p, dest->af, &dest->addr,
+ee78378f976488 net/netfilter/ipvs/ip_vs_core.c Alex Gartrell          2015-08-26  557  				    dest->port ? dest->port : vport,
+0e051e683ba4ac net/netfilter/ipvs/ip_vs_core.c Hans Schillstrom       2010-11-19  558  				    flags, dest, skb->mark);
+a5959d53d6048a net/netfilter/ipvs/ip_vs_core.c Hans Schillstrom       2010-11-19  559  		if (!cp) {
+a5959d53d6048a net/netfilter/ipvs/ip_vs_core.c Hans Schillstrom       2010-11-19  560  			*ignored = -1;
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  561  			return NULL;
+f11017ec2d1859 net/netfilter/ipvs/ip_vs_core.c Simon Horman           2010-08-22  562  		}
+a5959d53d6048a net/netfilter/ipvs/ip_vs_core.c Hans Schillstrom       2010-11-19  563  	}
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  564  
+cd17f9ed099ed2 net/ipv4/ipvs/ip_vs_core.c      Julius Volz            2008-09-02  565  	IP_VS_DBG_BUF(6, "Schedule fwd:%c c:%s:%u v:%s:%u "
+cd17f9ed099ed2 net/ipv4/ipvs/ip_vs_core.c      Julius Volz            2008-09-02  566  		      "d:%s:%u conn->flags:%X conn->refcnt:%d\n",
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  567  		      ip_vs_fwd_tag(cp),
+f18ae7206eaebf net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2014-09-09  568  		      IP_VS_DBG_ADDR(cp->af, &cp->caddr), ntohs(cp->cport),
+f18ae7206eaebf net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2014-09-09  569  		      IP_VS_DBG_ADDR(cp->af, &cp->vaddr), ntohs(cp->vport),
+f18ae7206eaebf net/netfilter/ipvs/ip_vs_core.c Julian Anastasov       2014-09-09  570  		      IP_VS_DBG_ADDR(cp->daf, &cp->daddr), ntohs(cp->dport),
+b54ab92b84b616 net/netfilter/ipvs/ip_vs_core.c Reshetova, Elena       2017-03-16  571  		      cp->flags, refcount_read(&cp->refcnt));
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  572  
+b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  573  	if (!(svc->flags & IP_VS_SVC_F_STATELESS) ||
+b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  574  	    (svc->flags & IP_VS_SVC_F_STATELESS && need_state)) {
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  575  		ip_vs_conn_stats(cp, svc);
+b276d504bee439 net/netfilter/ipvs/ip_vs_core.c Lev Pantiukhin         2023-12-04  576  	}
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  577  	return cp;
+^1da177e4c3f41 net/ipv4/ipvs/ip_vs_core.c      Linus Torvalds         2005-04-16  578  }
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
 
