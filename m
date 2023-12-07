@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-54936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C64E7808F9B
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:10:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B5D1808F9A
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:10:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8115B28163C
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A3731F21136
 	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:10:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6E14D10E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 576CC4CE14;
 	Thu,  7 Dec 2023 18:10:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WUxYdcpk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BR2sLRZB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F9094CE1E
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 18:10:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E8395C433CD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38553125CD
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 18:10:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8AF72C433C9;
 	Thu,  7 Dec 2023 18:10:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701972643;
-	bh=J26BJwKNieXZxRG53pLKpiymkMsc2re9G9HyP22wRBQ=;
+	s=k20201202; t=1701972642;
+	bh=wn/rZxaQ6CPwgoghWVPT2OqAL9b44Y+FKEXiemEFjYQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WUxYdcpkHFr+GxiCWQiNl1IXsvD5loVkqUMd7lIbf5UEZPK5FkrI8ffGosanHf07u
-	 IlzY0/r0hUK9kvaRqPxrh23R5scDJC3cffVep2jeTBCctVtCua5/IwLQBdTWJy/LRf
-	 LJl+qyTVUe0urQZKmcoQEVwYT8/XxSrLicsaMsY+gLuejee8tHN8JMk93pFhQ27ZKi
-	 qHVPpxuPqUash9NTsH+wA0KYm6mt6/UOVEvegADo3rlJdXQugHMx6c9GstvAn+g/Kr
-	 DKPnSH7A0nsiT8mVUseAYtl3svPAxEHkkcNzD0Uv+Yavjo8JqAeOM4kSJTOzWyaPc9
-	 60U5shA6f0X+w==
+	b=BR2sLRZBFK/Oivcp9YQ3xIJYkQucj47JQmP2e3RZ/1Lld5zrh1W6LjKmfbA9WjX6+
+	 w/rfuAZE+Nb6YwV7qiuADkII9fWUVf95m/jR1a3Wk+sWKTctXhNvLSBUxX1wZ1en2a
+	 8p3tn4BUg7sutTI5c48bw0z//nDVw43F/FwOWqRLM242jSZdYs/FS9fsp425oY8j/Y
+	 drRGWy6Tr99X1XO9Vp34L84ODZgKsthegMRXT0L8LkcRDxAEN6GAtFCXHGfacGag22
+	 WSmJ1L2gx5/HATBGnB4vZcgmeaH7hejwdpBk/em88MvR//x1X0s6EoYpjDnBOZZ1xS
+	 +2kNvagFMbspg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D3DCAC40C5E;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7089DC43170;
 	Thu,  7 Dec 2023 18:10:42 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,37 +43,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: wangxun: fix changing mac failed when running
+Subject: Re: [PATCH v2 net] net: dsa: microchip: provide a list of valid protocols
+ for xmit handler
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170197264286.15422.2253458440493242642.git-patchwork-notify@kernel.org>
+ <170197264245.15422.7349743280865094840.git-patchwork-notify@kernel.org>
 Date: Thu, 07 Dec 2023 18:10:42 +0000
-References: <20231206095044.17844-1-duanqiangwen@net-swift.com>
-In-Reply-To: <20231206095044.17844-1-duanqiangwen@net-swift.com>
-To: duanqiangwen <duanqiangwen@net-swift.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, mengyuanlou@net-swift.com,
- jiawenwu@trustnetic.com, davem@davemloft.net, andrew@lunn.ch,
- bhelgaas@google.com, maciej.fijalkowski@intel.com
+References: <20231206071655.1626479-1-sean@geanix.com>
+In-Reply-To: <20231206071655.1626479-1-sean@geanix.com>
+To: Sean Nyekjaer <sean@geanix.com>
+Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
+ f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ arun.ramadoss@microchip.com, ceggers@arri.de, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This patch was applied to bpf/bpf.git (master)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  6 Dec 2023 17:50:44 +0800 you wrote:
-> in some bonding mode, service need to change mac when
-> netif is running. Wangxun netdev add IFF_LIVE_ADDR_CHANGE
-> priv_flag to support it.
+On Wed,  6 Dec 2023 08:16:54 +0100 you wrote:
+> Provide a list of valid protocols for which the driver will provide
+> it's deferred xmit handler.
 > 
-> Fixes: 79625f45ca73 ("net: wangxun: Move MAC address handling to libwx")
+> When using DSA_TAG_PROTO_KSZ8795 protocol, it does not provide a
+> "connect" method, therefor ksz_connect() is not allocating ksz_tagger_data.
 > 
-> Signed-off-by: duanqiangwen <duanqiangwen@net-swift.com>
+> This avoids the following null pointer dereference:
+>  ksz_connect_tag_protocol from dsa_register_switch+0x9ac/0xee0
+>  dsa_register_switch from ksz_switch_register+0x65c/0x828
+>  ksz_switch_register from ksz_spi_probe+0x11c/0x168
+>  ksz_spi_probe from spi_probe+0x84/0xa8
+>  spi_probe from really_probe+0xc8/0x2d8
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: wangxun: fix changing mac failed when running
-    https://git.kernel.org/netdev/net-next/c/87e839c82cc3
+  - [v2,net] net: dsa: microchip: provide a list of valid protocols for xmit handler
+    https://git.kernel.org/bpf/bpf/c/1499b89289bf
 
 You are awesome, thank you!
 -- 
