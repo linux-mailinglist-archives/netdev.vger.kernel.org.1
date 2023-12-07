@@ -1,203 +1,116 @@
-Return-Path: <netdev+bounces-54834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18AC080876E
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 13:14:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 36AAF8087B4
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 13:29:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4AF92835A6
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 12:14:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4BA4283BE0
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 12:29:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0893439AF5;
-	Thu,  7 Dec 2023 12:14:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50ECB39FFF;
+	Thu,  7 Dec 2023 12:29:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VIVOQTWA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R3pTQ2P7"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [IPv6:2001:41d0:1004:224b::bc])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF951AC
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 04:14:15 -0800 (PST)
-Message-ID: <098fb386-0309-4313-866a-38e12b54c02a@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1701951254;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5Q1/cOmiqlDFPL84WQ9WoJ1IT+DT2CrNs/gCEPEtEv4=;
-	b=VIVOQTWAU4NIxnQdCOjTRIEYjC1BShDUHfLdnQZsDg0AUq91SXdUAaSpfZcA3Y4W4GVtka
-	IzAh/rS+P/cK+dJOKowDjjN4dtHvx66gDcG0tdTPct2uXWm44qQRvtKrWvq1kx4mpcZ+7+
-	YkJuflOs0LmR+uaK/FL/I893PEjjgnc=
-Date: Thu, 7 Dec 2023 12:14:12 +0000
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8446084;
+	Thu,  7 Dec 2023 04:29:01 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-6ceba6c4b8dso199554b3a.1;
+        Thu, 07 Dec 2023 04:29:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701952141; x=1702556941; darn=vger.kernel.org;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Lid62c13OA13UOuK4ZHFWJw8LQvMIM6OUlJkAmjS2aw=;
+        b=R3pTQ2P71oWwOEsR3F+FIkrEDfQ3pb2aQ792ZWI3Bis/nQHdoXAHTnYxBDSAqoTupG
+         YJEpF2z0uPtVSQAK7dqwfaMgfCqkJ39aUXN59pv19zGa9YTjmkjRYlJNGzbjxnKHaJ+7
+         NzsjEj/BYnw9GZzIzu8n3rIaQCZ8WEw646oZNGC+3+iN8iVgGm1KG21yjJNwBji4Hy1y
+         VPkhsqd3AI+i0H4GxIxqd4UvbA/zVwQDExM9JtkCWDoAE0/1i+X+QIUsK7xdAup5qnih
+         sGIzPaF4ZPHHDypCncitpbEmAjDGigG6M4Vabge6p3wFPyHPmc0Wps7RjoxNoayMvuak
+         yZKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701952141; x=1702556941;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Lid62c13OA13UOuK4ZHFWJw8LQvMIM6OUlJkAmjS2aw=;
+        b=WijmHhYdGuDRUjuZHs8lAmj1b9T1YI+VIXqPYnMemH7KzvszBA7vVG9EKr7O4XHOdc
+         vwui3hrDEchhn695g077pI/xbkz44/R6CK7XK3Yh9i9YxGMLZSWU/eaOCg1WL1ceeTjg
+         V0PBT1dbtkXDPbw1R46Jd2p9HuguBwb7F+JeGnhjYE7WBJAku78FUq5g/OsM4U8PRYZM
+         7qF2QFLbcFzjwz1t7OUnJwSJis+302WWdJgShDzd2Xji2t/24TpSqSP73NcC0a6+Rc5C
+         VVj5DtrWcmBEFz3VbOAp82eg5DddJEWTlXxbV2osmyovDv/xTT9hcvK8BnDZWl8/wFE3
+         b7cw==
+X-Gm-Message-State: AOJu0YwJ/GynaHtpkAUjZVmfinmPCM24NnYjbXPERMQOcxxxC5s4vZGg
+	nEhklZD108jTzuqlqSJrldo=
+X-Google-Smtp-Source: AGHT+IGr5lKAfJ7n2y2wAOLF3nW2W2xMuYwvmOjmc39ExVmCK+JKLpfStp3stmFBqfVmX7pG1JBUcQ==
+X-Received: by 2002:a05:6a20:9381:b0:18d:b43:78ea with SMTP id x1-20020a056a20938100b0018d0b4378eamr2911595pzh.43.1701952140676;
+        Thu, 07 Dec 2023 04:29:00 -0800 (PST)
+Received: from 377044c6c369.cse.ust.hk (191host097.mobilenet.cse.ust.hk. [143.89.191.97])
+        by smtp.gmail.com with ESMTPSA id x20-20020a056a00189400b006ce5066282bsm1164715pfh.34.2023.12.07.04.28.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Dec 2023 04:29:00 -0800 (PST)
+From: Chengfeng Ye <dg573847474@gmail.com>
+To: 3chas3@gmail.com,
+	davem@davemloft.net,
+	horms@kernel.org,
+	kuba@kernel.org
+Cc: linux-atm-general@lists.sourceforge.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Chengfeng Ye <dg573847474@gmail.com>
+Subject: [PATCH v3 1/2] atm: solos-pci: Fix potential deadlock on &cli_queue_lock
+Date: Thu,  7 Dec 2023 12:28:49 +0000
+Message-Id: <20231207122849.41798-1-dg573847474@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v7 1/3] bpf: make common crypto API for TC/XDP
- programs
-Content-Language: en-US
-To: Dan Carpenter <dan.carpenter@linaro.org>, oe-kbuild@lists.linux.dev,
- Vadim Fedorenko <vadfed@meta.com>, Jakub Kicinski <kuba@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Andrii Nakryiko
- <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Mykola Lysenko <mykolal@fb.com>, Herbert Xu <herbert@gondor.apana.org.au>
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
- linux-crypto@vger.kernel.org, bpf@vger.kernel.org
-References: <dc0e2f8e-f82b-4439-b61a-9ab0be9f4e6b@suswa.mountain>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <dc0e2f8e-f82b-4439-b61a-9ab0be9f4e6b@suswa.mountain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 05/12/2023 21:56, Dan Carpenter wrote:
-> Hi Vadim,
-> 
-> kernel test robot noticed the following build warnings:
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/bpf-crypto-add-skcipher-to-bpf-crypto/20231202-091254
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-> patch link:    https://lore.kernel.org/r/20231202010604.1877561-1-vadfed%40meta.com
-> patch subject: [PATCH bpf-next v7 1/3] bpf: make common crypto API for TC/XDP programs
-> config: x86_64-randconfig-161-20231202 (https://download.01.org/0day-ci/archive/20231206/202312060647.2JfAE3rk-lkp@intel.com/config)
-> compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-> reproduce: (https://download.01.org/0day-ci/archive/20231206/202312060647.2JfAE3rk-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> | Closes: https://lore.kernel.org/r/202312060647.2JfAE3rk-lkp@intel.com/
-> 
-> smatch warnings:
-> kernel/bpf/crypto.c:192 bpf_crypto_ctx_create() error: we previously assumed 'ctx' could be null (see line 165)
-> kernel/bpf/crypto.c:192 bpf_crypto_ctx_create() error: potentially dereferencing uninitialized 'ctx'.
-> 
-> vim +/ctx +192 kernel/bpf/crypto.c
-> 
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  122  __bpf_kfunc struct bpf_crypto_ctx *
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  123  bpf_crypto_ctx_create(const char *type__str, const char *algo__str,
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  124  		      const struct bpf_dynptr_kern *pkey,
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  125  		      unsigned int authsize, int *err)
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  126  {
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  127  	const struct bpf_crypto_type *type = bpf_crypto_get_type(type__str);
-> 
-> Delete this assignment.  (Duplicated).
-> 
+As &card->cli_queue_lock is acquired under softirq context along the
+following call chain from solos_bh(), other acquisition of the same
+lock inside process context should disable at least bh to avoid double
+lock.
 
-Ah, yeah, will remove it.
+<deadlock #1>
+console_show()
+--> spin_lock(&card->cli_queue_lock)
+<interrupt>
+   --> solos_bh()
+   --> spin_lock(&card->cli_queue_lock)
 
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  128  	struct bpf_crypto_ctx *ctx;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  129  	const u8 *key;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  130  	u32 key_len;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  131
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  132  	type = bpf_crypto_get_type(type__str);
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  133  	if (IS_ERR(type)) {
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  134  		*err = PTR_ERR(type);
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  135  		return NULL;
-> 
-> Why doesn't this function just return error pointers?
+This flaw was found by an experimental static analysis tool I am
+developing for irq-related deadlock.
 
-bpf_kfuncs cannot return error pointers, it makes BPF verifier very unhappy.
+To prevent the potential deadlock, the patch uses spin_lock_bh()
+on the card->cli_queue_lock under process context code consistently
+to prevent the possible deadlock scenario.
 
-> 
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  136  	}
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  137
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  138  	if (!type->has_algo(algo__str)) {
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  139  		*err = -EOPNOTSUPP;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  140  		goto err;
-> 
-> ctx is uninitialized on this path.
-> 
-Yep, it was already highlighted in the feedback, thanks.
+Signed-off-by: Chengfeng Ye <dg573847474@gmail.com>
+---
+ drivers/atm/solos-pci.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  141  	}
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  142
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  143  	if (!authsize && type->setauthsize) {
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  144  		*err = -EOPNOTSUPP;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  145  		goto err;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  146  	}
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  147
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  148  	if (authsize && !type->setauthsize) {
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  149  		*err = -EOPNOTSUPP;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  150  		goto err;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  151  	}
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  152
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  153  	key_len = __bpf_dynptr_size(pkey);
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  154  	if (!key_len) {
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  155  		*err = -EINVAL;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  156  		goto err;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  157  	}
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  158  	key = __bpf_dynptr_data(pkey, key_len);
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  159  	if (!key) {
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  160  		*err = -EINVAL;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  161  		goto err;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  162  	}
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  163
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  164  	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01 @165  	if (!ctx) {
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  166  		*err = -ENOMEM;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  167  		goto err;
-> 
-> ctx is NULL here.
-> 
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  168  	}
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  169
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  170  	ctx->type = type;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  171  	ctx->tfm = type->alloc_tfm(algo__str);
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  172  	if (IS_ERR(ctx->tfm)) {
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  173  		*err = PTR_ERR(ctx->tfm);
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  174  		ctx->tfm = NULL;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  175  		goto err;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  176  	}
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  177
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  178  	if (authsize) {
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  179  		*err = type->setauthsize(ctx->tfm, authsize);
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  180  		if (*err)
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  181  			goto err;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  182  	}
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  183
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  184  	*err = type->setkey(ctx->tfm, key, key_len);
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  185  	if (*err)
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  186  		goto err;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  187
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  188  	refcount_set(&ctx->usage, 1);
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  189
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  190  	return ctx;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  191  err:
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01 @192  	if (ctx->tfm)
->                                                              ^^^^^^^^
-> NULL dereference.  These two error handling bugs in three lines of code
-> are canonical One Err Label type bugs.  Better to do a ladder where each
-> error label frees the last thing that was allocated.  Easier to review.
-> Then you could delete the "ctx->tfm = NULL;" assignment on line 174.
-> 
-> 	return ctx;
-> 
-> err_free_tfm:
-> 	type->free_tfm(ctx->tfm);
-> err_free_ctx:
-> 	kfree(ctx);
-> err_module_put:
-> 	module_put(type->owner);
-> 
-> 	return NULL;
-> 
-> I have written about this at length on my blog:
-> https://staticthinking.wordpress.com/2022/04/28/free-the-last-thing-style/
-
-Thanks, very good blog post, I'll follow this way in the next version.
-
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  193  		type->free_tfm(ctx->tfm);
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  194  	kfree(ctx);
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  195  	module_put(type->owner);
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  196
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  197  	return NULL;
-> 0c47cb96ac404e Vadim Fedorenko 2023-12-01  198  }
-> 
+diff --git a/drivers/atm/solos-pci.c b/drivers/atm/solos-pci.c
+index 94fbc3abe60e..95f768b28a5e 100644
+--- a/drivers/atm/solos-pci.c
++++ b/drivers/atm/solos-pci.c
+@@ -449,9 +449,9 @@ static ssize_t console_show(struct device *dev, struct device_attribute *attr,
+ 	struct sk_buff *skb;
+ 	unsigned int len;
+ 
+-	spin_lock(&card->cli_queue_lock);
++	spin_lock_bh(&card->cli_queue_lock);
+ 	skb = skb_dequeue(&card->cli_queue[SOLOS_CHAN(atmdev)]);
+-	spin_unlock(&card->cli_queue_lock);
++	spin_unlock_bh(&card->cli_queue_lock);
+ 	if(skb == NULL)
+ 		return sprintf(buf, "No data.\n");
+ 
+-- 
+2.17.1
 
 
