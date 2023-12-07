@@ -1,136 +1,151 @@
-Return-Path: <netdev+bounces-54862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70E368089FD
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 15:15:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23923808A3E
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 15:21:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DC7E1C20C0B
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 14:15:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBD84281B5E
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 14:20:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5172E41849;
-	Thu,  7 Dec 2023 14:15:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13BC341854;
+	Thu,  7 Dec 2023 14:20:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I5uvD8TY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hzdNbJ1m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63C5A10D1
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 06:15:34 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-33349b3f99aso1004784f8f.0
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 06:15:34 -0800 (PST)
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B182730DB
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 06:20:00 -0800 (PST)
+Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so12193a12.0
+        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 06:20:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701958533; x=1702563333; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bOWUB+gryR0TwBFnM8jRyxzuLGSZFI6NALJA9ueIn9g=;
-        b=I5uvD8TYHrHdmFGveCBW46FS1oix6v7GvZaGlYyG1MXMb5uXayWVua+/jDEjcdrmCH
-         Ie89ynVSHeUAeXwXekrkpCqq0kPrad19JMNML7EPk0BhEAGwurIofL4t79nkUesfnDfM
-         OVLF4LARCEstUelnkb5vgqN1+Bd3w5KEUoBZHX27/Gp1oBopX2KzJ2n+UQuHFze+8JR8
-         CCcmufqiFq5ktThQyarm53Msz+OwK0tQlYrFghJg5tDa0nUZuDxZmJhNmb1O72OMx3P1
-         cLxaOyRzBQChf8Qxy5ZUBnNEZZ2pm9c/Af0v8bS6vTCuSMuGrO2iuHMlc5k0PakQQq7A
-         ldTQ==
+        d=google.com; s=20230601; t=1701958797; x=1702563597; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cg+kyvs6whLnp94BpNVRhpcWLXdDwv5DFCjHXa8X9m8=;
+        b=hzdNbJ1mORZNZ6W4cIJfjbmvTEFc5XJQTz7NXrjj3Fij+klTwEv6EgPuDJacDxmHh1
+         ZNcWM/c0TIogF5o0FnpRtlpp6o9rpYPK7vnQd3IqAfn2QzZAiSfDOuKoWYfKkpf2EXCD
+         I/jSBXELtN7jeYJFr/XRRlbMCPvsQijd06h9dKiRQ6qXIvLJIFrBElwC+HreJAhyFW3k
+         rWTb24Drjbl5OBZahiHMT4I0eiChgqbceN46bJrrrfrIbyyTmL2joDelAOxaTWb9rjMA
+         yijnJMIhSQOq0SVPc91tzpXBRTSyMfrUa8QvtIuHEKPKiU03FX5neMEZvjZUGAmgxdwK
+         AZsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701958533; x=1702563333;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bOWUB+gryR0TwBFnM8jRyxzuLGSZFI6NALJA9ueIn9g=;
-        b=rP1CwpWUTo/Z38m6Lv6qeOnytA63b6YOxV32VrKYAP5KIIP3GYSayiyWWgFItkQjBe
-         dMFyCLJ83PSHZyV5zJPgUdUuDAWQzgw6SW+7DjXRtXVeTxI/FJKmLUWFas6hye46kato
-         Bxr4Vt9EqfyFNBdCYmb34hm6dDJY1Fm2CHlQZxf2HBSH/JWP5Whpfg8Oh9J43uB2oYg4
-         UuphTsMKg5JxUp0VdtujCEm8lXTTmE9zgsRH0U93/hMg7KPZEMIwCdARFllJxTZY13v2
-         xQe1M5zYfGik+ME5C+eF/YivKIlhFjFzXhzEiIaa6p1tMTqSWc8sp2DxyWxl62oPCV8R
-         pgEw==
-X-Gm-Message-State: AOJu0YyBvysi0P/noAcUEPp2rPmTBNpuPwW04cliQiYolyOqgDVr5JG7
-	cLQ1icaVt7nErBK4w33vJgE=
-X-Google-Smtp-Source: AGHT+IH5TUvyx7lXeDEUz+2QgYPGvDBZogVbSnKJuebvruJICUw0NHCUC5Dpb3gCznTvosz4SUYF0Q==
-X-Received: by 2002:a05:600c:470e:b0:40b:5e59:c57d with SMTP id v14-20020a05600c470e00b0040b5e59c57dmr1773238wmo.167.1701958532603;
-        Thu, 07 Dec 2023 06:15:32 -0800 (PST)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id u13-20020a05600c19cd00b0040b42df75fcsm2061104wmq.39.2023.12.07.06.15.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Dec 2023 06:15:32 -0800 (PST)
-Subject: Re: [PATCH v4 net-next 6/7] net: ethtool: add a mutex protecting RSS
- contexts
-To: Jakub Kicinski <kuba@kernel.org>, edward.cree@amd.com
-Cc: linux-net-drivers@amd.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, netdev@vger.kernel.org, habetsm.xilinx@gmail.com,
- sudheer.mogilappagari@intel.com, jdamato@fastly.com, andrew@lunn.ch,
- mw@semihalf.com, linux@armlinux.org.uk, sgoutham@marvell.com,
- gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
- saeedm@nvidia.com, leon@kernel.org
-References: <cover.1695838185.git.ecree.xilinx@gmail.com>
- <b5d7b8e243178d63643c8efc1f1c48b3b2468dc7.1695838185.git.ecree.xilinx@gmail.com>
- <20231004161651.76f686f3@kernel.org>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <2ea45188-5554-8067-820d-378cada735ee@gmail.com>
-Date: Thu, 7 Dec 2023 14:15:30 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        d=1e100.net; s=20230601; t=1701958797; x=1702563597;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cg+kyvs6whLnp94BpNVRhpcWLXdDwv5DFCjHXa8X9m8=;
+        b=NFLdPnqCDmfLlTqahCRPtRnvhoemicGIpHTTL4z80HDvcd6Q6wHC+Cbqh68VeibH6a
+         ZLQuya7aMzK4uIldaKyOnV7uaNEFG+bTuxu7iw3/hHun9m/NBpjm7MoB3FFnuTPQ3TDS
+         Kj3XNVkeZIorgsGSMdLuP73xU0jzXMGz02FPeRV4ae3cGvznPxhjLRZQYOfVhIQLDegG
+         bo0it6SiT+t5lzcGAJL6vDnaPrc9zodkTEzayak0UBhZ/3bsxDZIizRaQ8waIxMncrby
+         f7fb4gNazvTwURXV6nC0Gj2QbzxuwmDvnypSazAHdzq+/MkrNX70SjUuanlv70orxhVr
+         kmBw==
+X-Gm-Message-State: AOJu0YyS5fqZa/kRK9IcFxFk/DGtzQiwhnDbTd1UHDLr4VdZTbupMQOJ
+	lphOkRGHcM/keS6mv7BHAu14xqswbB9YcArKkKhIgA==
+X-Google-Smtp-Source: AGHT+IGXOZOZ4pQiJJUXla1388CP6kL+6w7lkaO8vOiBdOjIpyd8gct1j8GkezTmcPoNx9DJuKrdRMDE1v5jm6Av/Es=
+X-Received: by 2002:a50:9f89:0:b0:54b:bf08:a95f with SMTP id
+ c9-20020a509f89000000b0054bbf08a95fmr229791edf.6.1701958796595; Thu, 07 Dec
+ 2023 06:19:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231004161651.76f686f3@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+References: <CABOYnLyH=PmSoP8=PdkyK5VG1vhiG8fHKg2Xie4oBrVeYbdhHw@mail.gmail.com>
+In-Reply-To: <CABOYnLyH=PmSoP8=PdkyK5VG1vhiG8fHKg2Xie4oBrVeYbdhHw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 7 Dec 2023 15:19:45 +0100
+Message-ID: <CANn89i+xOT-CPxyBN5nkfHFN_Z78D3BPQCwN8phRur41CTyJSQ@mail.gmail.com>
+Subject: Re: KMSAN: uninit-value in ip_tunnel_xmit
+To: xingwei lee <xrivendell7@gmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller@googlegroups.com, 
+	syzbot+4a2c52677a8a1aa283cb@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 05/10/2023 00:16, Jakub Kicinski wrote:
-> On Wed, 27 Sep 2023 19:13:37 +0100 edward.cree@amd.com wrote:
->> While this is not needed to serialise the ethtool entry points (which
->>  are all under RTNL), drivers may have cause to asynchronously access
->>  dev->ethtool->rss_ctx; taking dev->ethtool->rss_lock allows them to
->>  do this safely without needing to take the RTNL.
-> 
-> Can we use a replay mechanism, like we do in TC offloads and VxLAN/UDP
-> ports? The driver which lost config can ask for the rss contexts to be
-> "replayed" and the core will issue a series of ->create calls for all
-> existing entries?
-So I tried to prototype this, and unfortunately I ran into a problem.
-While we can replay the contexts alright, that still leaves the ntuple
- filters which we also want to restore, and which might depend on the
- contexts, so that can't be done until after context restore is done.
-So to do this we'd need to *also* have the core replay the filters,
- which would mean adding a filter array to the core similar to this
- context array.  Now that's a thing that might be useful to have,
- enabling netlink dumps and so on, but it would considerably extend
- the scope of this work, in which case who knows if it'll ever be
- ready to merge :S
-Moreover, at least in the case of sfc (as usual, no idea about other
- NICs), the filter table on the device contains more than just ntuple
- filters; stuff like the device's unicast address list, PTP filters
- and representor filters, some of which are required for correct
- operation, live in the same table.
-When coming up after a reset, currently we:
-1) restore RSS contexts
-2) restore all filters (both driver-internal and ethtool ntuple) from
-   the software shadow filter table into the hardware
-3) bring up the NIC datapath.
-Instead we would need to:
-1) restore all the 'internal' filters (which do not, and after these
-   changes could not ever, use custom RSS contexts), and discard all
-   ntuple filters from the software shadow filter table in the driver
-2) request RSS+ntuple replay
-3) bring up the NIC datapath
-4) the replay workitem runs, and reinserts RSS contexts and ntuple
-   filters.
-This would also mean that the default RSS context, which is used by
- the unicast/multicast address and Ethernet broadcast filters, could
- not ever migrate to be tracked in the XArray (otherwise a desirable
- simplification).
+On Thu, Dec 7, 2023 at 2:27=E2=80=AFPM xingwei lee <xrivendell7@gmail.com> =
+wrote:
+>
+> Hello,
+>
+> When fuzzing the latest upstream linux 6.7-rc4,  the following crash
+> was triggered.
+> HEAD commit: bee0e7762ad2c6025b9f5245c040fcc36ef2bde8
+>
+> If you fix this issue, please add the following tag to the commit:
+> Reported-by: xingwei Lee <xrivendell7@gmail.com>
+>
+> console_log: https://gist.github.com/xrivendell7/b41fbc928cd203823783fd90=
+c98b6583#file-console_log
+> report: https://gist.github.com/xrivendell7/b41fbc928cd203823783fd90c98b6=
+583#file-report
+> kernel commit: bee0e7762ad2c6025b9f5245c040fcc36ef2bde8
+> kernel config: https://syzkaller.appspot.com/text?tag=3DKernelConfig&x=3D=
+ce27066613dacbb6
+> repro.c: https://gist.github.com/xrivendell7/b41fbc928cd203823783fd90c98b=
+6583#file-repro-c
+> repro.txt: https://gist.github.com/xrivendell7/b41fbc928cd203823783fd90c9=
+8b6583#file-repro-txt
+>
+> In the lasted kernel: bee0e7762ad2c6025b9f5245c040fcc36ef2bde8 the
+> [  199.471467][ T8590] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> [  199.475015][ T8590] BUG: KMSAN: uninit-value in ip_tunnel_xmit+0x857/0=
+x3e80
+> [  199.478180][ T8590]  ip_tunnel_xmit+0x857/0x3e80
+> [  199.480541][ T8590]  ipgre_xmit+0xd1c/0xe20
+> [  199.482393][ T8590]  dev_hard_start_xmit+0x247/0xa10
+> [  199.484530][ T8590]  __dev_queue_xmit+0x33b8/0x5130
+> [  199.486433][ T8590]  __bpf_redirect+0xdd7/0x1600
+> [  199.488258][ T8590]  bpf_clone_redirect+0x328/0x470
+> [  199.490250][ T8590]  ___bpf_prog_run+0x2180/0xdb80
+> [  199.491997][ T8590]  __bpf_prog_run512+0xb5/0xe0
+> [  199.493691][ T8590]  bpf_test_run+0x482/0xb00
+> [  199.495215][ T8590]  bpf_prog_test_run_skb+0x14e5/0x1f20
+> [  199.497026][ T8590]  bpf_prog_test_run+0x6af/0xac0
+> [  199.498701][ T8590]  __sys_bpf+0x649/0xd60
+> [  199.500029][ T8590]  __x64_sys_bpf+0xa0/0xe0
+> [  199.501411][ T8590]  do_syscall_64+0x44/0x110
+> [  199.502757][ T8590]  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> [  199.504463][ T8590]
+> [  199.505159][ T8590] Uninit was created at:
+> [  199.506344][ T8590]  slab_post_alloc_hook+0x129/0xa70
+> [  199.507690][ T8590]  kmem_cache_alloc_node+0x5e9/0xb10
+> [  199.509191][ T8590]  kmalloc_reserve+0x13d/0x4a0
+> [  199.510411][ T8590]  pskb_expand_head+0x226/0x1a00
+> [  199.511657][ T8590]  skb_ensure_writable+0x3d3/0x460
+> [  199.512905][ T8590]  bpf_clone_redirect+0x17f/0x470
+> [  199.514135][ T8590]  ___bpf_prog_run+0x2180/0xdb80
+> [  199.515325][ T8590]  __bpf_prog_run512+0xb5/0xe0
+> [  199.516479][ T8590]  bpf_test_run+0x482/0xb00
+> [  199.517580][ T8590]  bpf_prog_test_run_skb+0x14e5/0x1f20
+> [  199.518901][ T8590]  bpf_prog_test_run+0x6af/0xac0
+> [  199.520015][ T8590]  __sys_bpf+0x649/0xd60
+> [  199.520996][ T8590]  __x64_sys_bpf+0xa0/0xe0
+> [  199.521949][ T8590]  do_syscall_64+0x44/0x110
+> [  199.522926][ T8590]  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+>
+> and I notice the problem is reported at 2018/2020 and seems fixed twice.
+>
+> https://syzkaller.appspot.com/bug?id=3Df62d236e2fceaeb104f4e8f77d2324ef9d=
+a4b41b
+> https://syzkaller.appspot.com/bug?extid=3D4a2c52677a8a1aa283cb
+>
+>
+>
+> If you fix this issue, please add the following tag to the commit:
+> Reported-by: Yikebaer Aizezi <yikebaer61@gmail.com>
 
-tl;dr: none of this is impossible, but it'd be a lot of work just to
- get rid of one mutex, and would paint us into a bit of a corner.
-So I propose to stick with the locking scheme for now; I'll post v5
- with the other review comments addressed; and if at some point in
- the future core tracking of ntuple filters gets added, we can
- revisit then whether moving to a replay scheme is viable.  Okay?
+I think a fix was merged into the net tree yesterday, please double check.
 
--ed
+80d875cfc9d3711a029f234ef7d680db79e8fa4b ipv4: ip_gre: Avoid
+skb_pull() failure in ipgre_xmit()
 
