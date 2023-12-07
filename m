@@ -1,67 +1,70 @@
-Return-Path: <netdev+bounces-54902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 145EA808E7E
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:21:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B093808E7F
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:21:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C416B209F3
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 17:21:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5C962814B3
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 17:21:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE6E6495CF;
-	Thu,  7 Dec 2023 17:21:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADACC495EC;
+	Thu,  7 Dec 2023 17:21:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="nx++SQsC"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="VSXxRNVr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 391491709
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 09:21:31 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id 98e67ed59e1d1-286d701cabeso1153363a91.3
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 09:21:31 -0800 (PST)
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B72910FC
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 09:21:33 -0800 (PST)
+Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-6cb74a527ceso727762b3a.2
+        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 09:21:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1701969690; x=1702574490; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=l7PKKnQAo+O5VfKxYcWMt1GuL35++NrWKFyJq+n/Luo=;
-        b=nx++SQsCXuXli0xWMCiaib2HNKeY6INBowV6WrOtUT4GwvRRmw8qmnnXy30NmfLW+D
-         L30Zi/Lu+8Fj9Bu/aQbZda7TEI/SjY34d9xnUz81rz5Rv2RwYHXdLLqDj2oxv72wZtCo
-         B+jsw/IXQPboVDVI7xr5SaTlXGEt6tENd2CnHXWgEE1cbeyQHIqT6iyf6WHv2hXBlN+n
-         6PUzv9pzwWnWw2H3otcSgiE6KLlUYm298oD6R9PCjzHTCmT5uovxuqGNKWYnMoQl4f3o
-         yl2w12tHEewUGSVvkosaUNeQU0JrZURLJiIS5YDN5tkhRsrcdevLwiry9SQG1pnHehM+
-         8WbQ==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1701969692; x=1702574492; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=heulfPpJ9MGP7pjH1Ng6D31Ma3get7g7XoGIrJm9YXc=;
+        b=VSXxRNVrPE/6V85Cu01H4MZuXPVri6nO1Ph1IadXDjF4LcCbR5DbLBE1Rs8o8q2RWj
+         PGr44DK1TDU1/tg4pN5IrVP9111NdxJrdVqk2ycXktVHhO0UC9wzqjTQOJvmpxLQX+sv
+         Ue+Pymj3tznJ1SfsrKi5G/zwjlTX7GTnklSDk1Q2scnuX2zxX/2e20vLC2+YZgTEWWSs
+         bWT5cJP3KcfIt1KLeMKIf4odjmXRPN/GzDUoti5uDtDGjeAYmatYiEmp53ZXXYnrsovw
+         sa8frlNTzEiMs84gLIWoySKgSQPOTr/Eg5e2iLDjKsbRjMT+ckfwcHlAE0SRKdw5swxN
+         FD+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701969690; x=1702574490;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l7PKKnQAo+O5VfKxYcWMt1GuL35++NrWKFyJq+n/Luo=;
-        b=C64YYobXNdQtW79FSvAue+gFzCorBDqtz3DyrHmFrNCcNyUmd4436HwTJ1UwfboiAC
-         g5aedZPR6whxTe2DvPWbXLRi9/V94PVZeHEZaI2oR42VAq6DpFQYAG/pKD9OPvL4LH4f
-         cqWfqMG4FntOqgLgstdIC7vW055DDoT5kuQJ262o29NytF4hDW4qNY+4jRlNedEQeMJ4
-         2yP/ZvUMmnGMzgZOACBZKRNFE01yP3XxRaizrEoxxl77Dv3spYBSJIFUgSijVfse7rO4
-         pX4VT4A50ENz0JbYY8GfeLbqjHLsvNVp8RxjPVAQwCxz6ROaJAhztOmo5vhc3gfX/hwB
-         cCqQ==
-X-Gm-Message-State: AOJu0YycFHISBszRM7RHgUSe8WJVMSyKojCyN7+qnquB8MjfMTaCumPQ
-	UiRMTM7UoDTLWaylgvohEdxm8w==
-X-Google-Smtp-Source: AGHT+IEEeNUSouVasCkesfqX1CbVKV6NgQ9SDcehgwSpY7xjHFAPIE9OeXfz96rWBOgU0pY2WenmKA==
-X-Received: by 2002:a17:90a:19c5:b0:285:81a9:4fb4 with SMTP id 5-20020a17090a19c500b0028581a94fb4mr2922210pjj.28.1701969690617;
-        Thu, 07 Dec 2023 09:21:30 -0800 (PST)
-Received: from localhost (fwdproxy-prn-117.fbsv.net. [2a03:2880:ff:75::face:b00c])
-        by smtp.gmail.com with ESMTPSA id nb11-20020a17090b35cb00b0028017a2a8fasm160696pjb.3.2023.12.07.09.21.29
+        d=1e100.net; s=20230601; t=1701969692; x=1702574492;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=heulfPpJ9MGP7pjH1Ng6D31Ma3get7g7XoGIrJm9YXc=;
+        b=D/X9kWrGtY1QhQhTA97HtAm1lsV/1tIkE1N6k3topeiHqfG+7K2cAQX1s1EdZsNN73
+         klC6EUSKy0BucnwFeqB95hH8znTxUm80bQWqkVSbPsnghXOTNnEQTbppFxGGZsO/FX6K
+         s4+F5jbYGbUx8Hu/gdCGfZGwvHutPOw5Va/0Ifl9gNSgbvnmFbU4eqXMKAHLVQUq8Pab
+         D5HrAvtFZM2b9wiKCF5EaoKp5104dMV+s4PzHqIIrftSWIDmrwlNDyucxkzXSbz4C+pB
+         a1XNwEdT8C9RLNNnDchsYuoX1Yxe99IKzld70FgVrNv4+McZLvD0YAZuQK0pIZJNgSki
+         PAyA==
+X-Gm-Message-State: AOJu0YyiOuS3o/WhppvW7X4wnIxBkOjlb566jckRsADT401ZxXimZb+w
+	eidw+Gjs3Y4wdtuVReb8/NEMTw==
+X-Google-Smtp-Source: AGHT+IGcMgxMVo6I885XKd2BKlpemBAz1ZCwbrlQgo4RllrZZcU/3Andz9Pgv7JA6Q+bK6ERd3eS8A==
+X-Received: by 2002:aa7:998f:0:b0:6ce:2732:1e00 with SMTP id k15-20020aa7998f000000b006ce27321e00mr2359817pfh.58.1701969691576;
+        Thu, 07 Dec 2023 09:21:31 -0800 (PST)
+Received: from localhost (fwdproxy-prn-013.fbsv.net. [2a03:2880:ff:d::face:b00c])
+        by smtp.gmail.com with ESMTPSA id j12-20020a056a00234c00b006ce461447f5sm29936pfj.67.2023.12.07.09.21.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Dec 2023 09:21:30 -0800 (PST)
+        Thu, 07 Dec 2023 09:21:31 -0800 (PST)
 From: David Wei <dw@davidwei.uk>
 To: Jakub Kicinski <kuba@kernel.org>,
 	netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 0/3] netdevsim: link and forward skbs between
-Date: Thu,  7 Dec 2023 09:21:14 -0800
-Message-Id: <20231207172117.3671183-1-dw@davidwei.uk>
+Subject: [PATCH net-next 1/3] netdevsim: allow two netdevsim ports to be
+Date: Thu,  7 Dec 2023 09:21:15 -0800
+Message-Id: <20231207172117.3671183-2-dw@davidwei.uk>
 X-Mailer: git-send-email 2.39.3
+In-Reply-To: <20231207172117.3671183-1-dw@davidwei.uk>
+References: <20231207172117.3671183-1-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,25 +73,203 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patchset adds the ability to link two netdevsim ports together and
-forward skbs between them, similar to veth. The goal is to use netdevsim
-for testing features e.g. zero copy Rx using io_uring.
+Add a debugfs file in
+/sys/kernel/debug/netdevsim/netdevsimN/ports/B/link
 
-This feature was tested locally on QEMU, and a selftest is included.
+Writing "M B" to this file will link port A of netdevsim N with port B of
+netdevsim M.
 
-David Wei (3):
-  netdevsim: allow two netdevsim ports to be connected
-  netdevsim: forward skbs from one connected port to another
-  netdevsim: add selftest for forwarding skb between connected ports
+Reading this file will return the linked netdevsim id and port, if any.
 
- drivers/net/netdevsim/bus.c                   |  10 ++
- drivers/net/netdevsim/dev.c                   |  97 +++++++++++++++
- drivers/net/netdevsim/netdev.c                |  25 +++-
- drivers/net/netdevsim/netdevsim.h             |   3 +
- .../drivers/net/netdevsim/forward.sh          | 111 ++++++++++++++++++
- 5 files changed, 241 insertions(+), 5 deletions(-)
- create mode 100755 tools/testing/selftests/drivers/net/netdevsim/forward.sh
+Signed-off-by: David Wei <dw@davidwei.uk>
+---
+ drivers/net/netdevsim/bus.c       | 10 ++++
+ drivers/net/netdevsim/dev.c       | 97 +++++++++++++++++++++++++++++++
+ drivers/net/netdevsim/netdev.c    |  5 ++
+ drivers/net/netdevsim/netdevsim.h |  3 +
+ 4 files changed, 115 insertions(+)
 
+diff --git a/drivers/net/netdevsim/bus.c b/drivers/net/netdevsim/bus.c
+index bcbc1e19edde..3e4378e9dbee 100644
+--- a/drivers/net/netdevsim/bus.c
++++ b/drivers/net/netdevsim/bus.c
+@@ -364,3 +364,13 @@ void nsim_bus_exit(void)
+ 	driver_unregister(&nsim_driver);
+ 	bus_unregister(&nsim_bus);
+ }
++
++struct nsim_bus_dev *nsim_bus_dev_get(unsigned int id)
++{
++	struct nsim_bus_dev *nsim_bus_dev;
++	list_for_each_entry(nsim_bus_dev, &nsim_bus_dev_list, list) {
++		if (nsim_bus_dev->dev.id == id)
++			return nsim_bus_dev;
++	}
++	return NULL;
++}
+diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
+index b4d3b9cde8bd..72ad61f141a2 100644
+--- a/drivers/net/netdevsim/dev.c
++++ b/drivers/net/netdevsim/dev.c
+@@ -25,6 +25,7 @@
+ #include <linux/mutex.h>
+ #include <linux/random.h>
+ #include <linux/rtnetlink.h>
++#include <linux/string.h>
+ #include <linux/workqueue.h>
+ #include <net/devlink.h>
+ #include <net/ip.h>
+@@ -388,6 +389,99 @@ static const struct file_operations nsim_dev_rate_parent_fops = {
+ 	.owner = THIS_MODULE,
+ };
+ 
++static ssize_t nsim_dev_link_read(struct file *file, char __user *data,
++				  size_t count, loff_t *ppos)
++{
++	struct nsim_dev_port *nsim_dev_port;
++	struct netdevsim *peer;
++	unsigned int id, port;
++	char buf[11];
++	ssize_t len;
++
++	nsim_dev_port = file->private_data;
++	peer = nsim_dev_port->ns->peer;
++	if (!peer) {
++		len = scnprintf(buf, sizeof(buf), "\n");
++		goto out;
++	}
++
++	id = peer->nsim_bus_dev->dev.id;
++	port = peer->nsim_dev_port->port_index;
++	len = scnprintf(buf, sizeof(buf), "%u %u\n", id, port);
++
++out:
++	return simple_read_from_buffer(data, count, ppos, buf, len);
++}
++
++static ssize_t nsim_dev_link_write(struct file *file,
++					  const char __user *data,
++					  size_t count, loff_t *ppos)
++{
++	struct nsim_dev_port *nsim_dev_port, *peer_dev_port;
++	struct nsim_bus_dev *peer_bus_dev;
++	struct nsim_dev *peer_dev;
++	unsigned int id, port;
++	char *token, *cur;
++	char buf[10];
++	ssize_t ret;
++
++	if (count >= sizeof(buf))
++		return -ENOSPC;
++
++	ret = copy_from_user(buf, data, count);
++	if (ret)
++		return -EFAULT;
++	buf[count] = '\0';
++
++	cur = buf;
++	token = strsep(&cur, " ");
++	if (!token)
++		return -EINVAL;
++	ret = kstrtouint(token, 10, &id);
++	if (ret)
++		return ret;
++
++	token = strsep(&cur, " ");
++	if (!token)
++		return -EINVAL;
++	ret = kstrtouint(token, 10, &port);
++	if (ret)
++		return ret;
++
++	/* too many args */
++	if (strsep(&cur, " "))
++		return -E2BIG;
++
++	/* cannot link to self */
++	nsim_dev_port = file->private_data;
++	if (nsim_dev_port->ns->nsim_bus_dev->dev.id == id)
++		return -EINVAL;
++
++	/* invalid netdevsim id */
++	peer_bus_dev = nsim_bus_dev_get(id);
++	if (!peer_bus_dev)
++		return -EINVAL;
++
++	peer_dev = dev_get_drvdata(&peer_bus_dev->dev);
++	list_for_each_entry(peer_dev_port, &peer_dev->port_list, list) {
++		if (peer_dev_port->port_index == port) {
++			nsim_dev_port->ns->peer = peer_dev_port->ns;
++			peer_dev_port->ns->peer = nsim_dev_port->ns;
++			return count;
++		}
++	}
++
++	return -EINVAL;
++}
++
++static const struct file_operations nsim_dev_link_fops = {
++	.open = simple_open,
++	.read = nsim_dev_link_read,
++	.write = nsim_dev_link_write,
++	.llseek = generic_file_llseek,
++	.owner = THIS_MODULE,
++};
++
+ static int nsim_dev_port_debugfs_init(struct nsim_dev *nsim_dev,
+ 				      struct nsim_dev_port *nsim_dev_port)
+ {
+@@ -418,6 +512,9 @@ static int nsim_dev_port_debugfs_init(struct nsim_dev *nsim_dev,
+ 	}
+ 	debugfs_create_symlink("dev", nsim_dev_port->ddir, dev_link_name);
+ 
++	debugfs_create_file("link", 0600, nsim_dev_port->ddir,
++			    nsim_dev_port, &nsim_dev_link_fops);
++
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+index aecaf5f44374..1abdcd470f21 100644
+--- a/drivers/net/netdevsim/netdev.c
++++ b/drivers/net/netdevsim/netdev.c
+@@ -388,6 +388,7 @@ nsim_create(struct nsim_dev *nsim_dev, struct nsim_dev_port *nsim_dev_port)
+ 	ns->nsim_dev = nsim_dev;
+ 	ns->nsim_dev_port = nsim_dev_port;
+ 	ns->nsim_bus_dev = nsim_dev->nsim_bus_dev;
++	ns->peer = NULL;
+ 	SET_NETDEV_DEV(dev, &ns->nsim_bus_dev->dev);
+ 	SET_NETDEV_DEVLINK_PORT(dev, &nsim_dev_port->devlink_port);
+ 	nsim_ethtool_init(ns);
+@@ -409,6 +410,10 @@ void nsim_destroy(struct netdevsim *ns)
+ 	struct net_device *dev = ns->netdev;
+ 
+ 	rtnl_lock();
++	if (ns->peer) {
++		ns->peer->peer = NULL;
++		ns->peer = NULL;
++	}
+ 	unregister_netdevice(dev);
+ 	if (nsim_dev_port_is_pf(ns->nsim_dev_port)) {
+ 		nsim_macsec_teardown(ns);
+diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+index 028c825b86db..ac7b34a83585 100644
+--- a/drivers/net/netdevsim/netdevsim.h
++++ b/drivers/net/netdevsim/netdevsim.h
+@@ -125,6 +125,7 @@ struct netdevsim {
+ 	} udp_ports;
+ 
+ 	struct nsim_ethtool ethtool;
++	struct netdevsim *peer;
+ };
+ 
+ struct netdevsim *
+@@ -417,3 +418,5 @@ struct nsim_bus_dev {
+ 
+ int nsim_bus_init(void);
+ void nsim_bus_exit(void);
++
++struct nsim_bus_dev *nsim_bus_dev_get(unsigned int id);
 -- 
 2.39.3
 
