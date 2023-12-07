@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-54930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58088808F38
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:00:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B92D808F36
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:00:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FAA11F21176
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:00:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA846281591
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6114B5CD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AB9B4B5B0;
 	Thu,  7 Dec 2023 18:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H4sAwZ4F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hV2rV9+A"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E214B5B4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6534648CC0;
 	Thu,  7 Dec 2023 18:00:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2AEECC433C9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 31193C433CA;
 	Thu,  7 Dec 2023 18:00:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1701972027;
-	bh=BNgG2XcLw8MDkFfa2rSgbI3xP88YKF1v7QhBayKpcPo=;
+	bh=uu/RVflGmVezJjUQpsx8LNdGcFwmKQvh2wiX4JPP2YQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=H4sAwZ4FeEtxNan7Jo1Rq3udgJdxS8Ps5UqsPC0AfcFrmxRkuSYDO1zqCyCuNBQSR
-	 UQqKdaYMrj2fXB4kd5ysZG+UDNYQ3plGf2zGn2DbDHEJdcOWKxPp0wi+bylp0zIFYq
-	 TTVt63AUrRYksiWu4nT5RJ9zLeFiksSFsDG7tXgiCdbxWMLnI9SNeuuM0tggVi8hvu
-	 JGFdpdRYFjCdv5++WjVm6oEB4OqQOW4B+zBPWaksHtZ4Rx/2jZ75i6JzBYqd7akkmt
-	 uAPEjRjojVTjL3B9QBRBItb4Ou5dbPMnMCpOllMCEDZyq9F42nXyNpcJkXp+prH7Lv
-	 xeJBF/+kB3K8Q==
+	b=hV2rV9+ARMVTv7TuNL/n04VBoZHaGE5h+pcCpU7h7Yie0Xf4yzjfYcJVjLVuLJOsT
+	 G78/FvanmTz/sZdlEs7s/Tf/xu0wqX7L7B+KAhFAtbnEpzIW7Fu/V4RXfdI7uK+RZP
+	 5FFNxqX3+n1vKE10H1NOHF57LJZwwSQh12PcFH8HjZHYm9Kt/cMWvDfST2En5zbbGA
+	 4MDi10XKHW7bSdsg3lQRbCTPK/41b+OUR+bkGboQzQWj4wCEDMyrg9FiXvaQGkjkOV
+	 Z74I8GXfcg5UD7EOfVvuv+U0vFY5oSr8BnKeForeIziZG3ysT6sWvKqaPyMWAnkA9Z
+	 a37yg/Fmsk+rA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 10891C43170;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 19382C40C5E;
 	Thu,  7 Dec 2023 18:00:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,47 +43,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/6] netfilter: bpf: fix bad registration on nf_defrag
+Subject: Re: [PATCH net 0/2] fixes for ktls
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170197202706.7796.7312229960355473959.git-patchwork-notify@kernel.org>
+ <170197202710.7796.9621509944364172901.git-patchwork-notify@kernel.org>
 Date: Thu, 07 Dec 2023 18:00:27 +0000
-References: <20231206180357.959930-2-pablo@netfilter.org>
-In-Reply-To: <20231206180357.959930-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de
+References: <20231206232706.374377-1-john.fastabend@gmail.com>
+In-Reply-To: <20231206232706.374377-1-john.fastabend@gmail.com>
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: kuba@kernel.org, jannh@google.com, daniel@iogearbox.net,
+ borisp@nvidia.com, bpf@vger.kernel.org, netdev@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  6 Dec 2023 19:03:52 +0100 you wrote:
-> From: "D. Wythe" <alibuda@linux.alibaba.com>
+On Wed,  6 Dec 2023 15:27:04 -0800 you wrote:
+> Couple fixes for TLS and BPF interactions.
 > 
-> We should pass a pointer to global_hook to the get_proto_defrag_hook()
-> instead of its value, since the passed value won't be updated even if
-> the request module was loaded successfully.
+> John Fastabend (2):
+>   net: tls, update curr on splice as well
+>   bpf: sockmap, updating the sg structure should also update curr
 > 
-> Log:
-> 
-> [...]
+>  net/core/filter.c | 19 +++++++++++++++++++
+>  net/tls/tls_sw.c  |  2 ++
+>  2 files changed, 21 insertions(+)
 
 Here is the summary with links:
-  - [net,1/6] netfilter: bpf: fix bad registration on nf_defrag
-    https://git.kernel.org/netdev/net/c/1834d62ae885
-  - [net,2/6] netfilter: nft_set_pipapo: skip inactive elements during set walk
-    https://git.kernel.org/netdev/net/c/317eb9685095
-  - [net,3/6] netfilter: nf_tables: fix 'exist' matching on bigendian arches
-    https://git.kernel.org/netdev/net/c/63331e37fb22
-  - [net,4/6] netfilter: nf_tables: bail out on mismatching dynset and set expressions
-    https://git.kernel.org/netdev/net/c/3701cd390fd7
-  - [net,5/6] netfilter: nf_tables: validate family when identifying table via handle
-    https://git.kernel.org/netdev/net/c/f6e1532a2697
-  - [net,6/6] netfilter: xt_owner: Fix for unsafe access of sk->sk_socket
-    https://git.kernel.org/netdev/net/c/7ae836a3d630
+  - [net,1/2] net: tls, update curr on splice as well
+    https://git.kernel.org/netdev/net/c/c5a595000e26
+  - [net,2/2] bpf: sockmap, updating the sg structure should also update curr
+    https://git.kernel.org/netdev/net/c/bb9aefde5bba
 
 You are awesome, thank you!
 -- 
