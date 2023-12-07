@@ -1,102 +1,119 @@
-Return-Path: <netdev+bounces-54751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73A5A80810C
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 07:48:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3AFA808117
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 07:49:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0155D1F21394
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 06:48:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B6F7B20C0E
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 06:49:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6903134D7;
-	Thu,  7 Dec 2023 06:48:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07EAE13FF3;
+	Thu,  7 Dec 2023 06:48:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fHe///dg"
 X-Original-To: netdev@vger.kernel.org
-Received: from zju.edu.cn (spam.zju.edu.cn [61.164.42.155])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1F09010D9;
-	Wed,  6 Dec 2023 22:48:33 -0800 (PST)
-Received: from dinghao.liu$zju.edu.cn ( [10.190.66.146] ) by
- ajax-webmail-mail-app2 (Coremail) ; Thu, 7 Dec 2023 14:46:15 +0800
- (GMT+08:00)
-Date: Thu, 7 Dec 2023 14:46:15 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: dinghao.liu@zju.edu.cn
-To: "Suman Ghosh" <sumang@marvell.com>
-Cc: "Ariel Elior" <aelior@marvell.com>, 
-	"Manish Chopra" <manishc@marvell.com>, 
-	"David S. Miller" <davem@davemloft.net>, 
-	"Eric Dumazet" <edumazet@google.com>, 
-	"Jakub Kicinski" <kuba@kernel.org>, 
-	"Paolo Abeni" <pabeni@redhat.com>, 
-	"Yuval Mintz" <Yuval.Mintz@qlogic.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [EXT] [PATCH] qed: Fix a potential double-free in
- qed_cxt_tables_alloc
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.2-cmXT5 build
- 20230825(e13b6a3b) Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <SJ0PR18MB5216722A40A24102A158A923DB8BA@SJ0PR18MB5216.namprd18.prod.outlook.com>
-References: <20231206064531.6089-1-dinghao.liu@zju.edu.cn>
- <SJ0PR18MB5216D284A0CFEF612721D5FDDB84A@SJ0PR18MB5216.namprd18.prod.outlook.com>
- <7f6e6e60.21d45.18c41ff00b8.Coremail.dinghao.liu@zju.edu.cn>
- <SJ0PR18MB5216722A40A24102A158A923DB8BA@SJ0PR18MB5216.namprd18.prod.outlook.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90C6110E2
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 22:48:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701931728;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UFOBgtGuzzS/PcpQyRYcdxas2wCmUyPkxn+UwmQBEoo=;
+	b=fHe///dgLPTjTfTNpAPaIAQJ8t73AHRlLnxBbKDX6IWOgt08T8Czwu84QkV3vBTk8TaKnv
+	OQW2b+OzMj1zMZrBXcnRapBWarSj8uEyOJanFs1mIS7ud331WEhas2jkBqXIcGX0APjBVI
+	RNOaMKlexhROyXn1vfXXH1DL3AkSEOU=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-618-pND3q3kuPKG-GTvCPLcAcg-1; Thu, 07 Dec 2023 01:48:46 -0500
+X-MC-Unique: pND3q3kuPKG-GTvCPLcAcg-1
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-54c77e011baso248450a12.2
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 22:48:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701931726; x=1702536526;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UFOBgtGuzzS/PcpQyRYcdxas2wCmUyPkxn+UwmQBEoo=;
+        b=pHeACc7NIwSBtixQi0TkfPQAJGtpwS6l5XWo1hGoAmLzN6BH5w+rPVkZSfvkt//AAH
+         sLHiHXpRzLAQ2nO8ZL4WclOtygCz5ymQFrJIfRMqEzlLosytCJXWUrle/RCmSgMt84Jy
+         zeKXjNGonI+a+ilC985PnoR7t3fGAYeAU5fOh3EqSvtzGU5WXp/w9cnhSWlMVhA3ugG8
+         8se0S7gV3q/mycxzfw1G53AMkMpYIMom1hSf+aj0jGuZ3EhD4WajWx6/98NRGod1bIHL
+         V/B7SpXtnwB13Z/KpFMfgwW633AWVVhbsPLTMBbsWTbNeQqOBJQtwpRLiTu3E/CuIJ0W
+         j6Dg==
+X-Gm-Message-State: AOJu0Ywlhns7yWz1QMkbqfAjzgqdfKaOy9Tyo/SdRMI88cLBvbOX1SRi
+	hxDJq03Elp/n3PWyfKChoLNBcd6FNBs98nTXP6PlrUEBboSo2IcQ71gDjgfx81ATcyFphZl/Wvo
+	wjwYiOM2SMAcZqDdp
+X-Received: by 2002:a50:f698:0:b0:54b:2af0:dee2 with SMTP id d24-20020a50f698000000b0054b2af0dee2mr1288736edn.4.1701931725888;
+        Wed, 06 Dec 2023 22:48:45 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHP+ojkzLMHbSqAu0C2ANg33CShDwPxZTAJjmCw0nO8Gd6wnGRVjFY+tgfoLKlBErzzBy1nOA==
+X-Received: by 2002:a50:f698:0:b0:54b:2af0:dee2 with SMTP id d24-20020a50f698000000b0054b2af0dee2mr1288726edn.4.1701931725570;
+        Wed, 06 Dec 2023 22:48:45 -0800 (PST)
+Received: from redhat.com ([2.55.57.48])
+        by smtp.gmail.com with ESMTPSA id z61-20020a509e43000000b0054ce0b24cfdsm404552ede.23.2023.12.06.22.48.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 22:48:44 -0800 (PST)
+Date: Thu, 7 Dec 2023 01:48:40 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Tobias Huschle <huschle@linux.ibm.com>
+Cc: Abel Wu <wuyun.abel@bytedance.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	jasowang@redhat.com
+Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
+ sched/fair: Add lag based placement)
+Message-ID: <20231207014626-mutt-send-email-mst@kernel.org>
+References: <c7b38bc27cc2c480f0c5383366416455@linux.ibm.com>
+ <20231117092318.GJ8262@noisy.programming.kicks-ass.net>
+ <ZVdbdSXg4qefTNtg@DESKTOP-2CCOB1S.>
+ <20231117123759.GP8262@noisy.programming.kicks-ass.net>
+ <46a997c2-5a38-4b60-b589-6073b1fac677@bytedance.com>
+ <ZVyt4UU9+XxunIP7@DESKTOP-2CCOB1S.>
+ <20231122100016.GO8262@noisy.programming.kicks-ass.net>
+ <6564a012.c80a0220.adb78.f0e4SMTPIN_ADDED_BROKEN@mx.google.com>
+ <d4110c79-d64f-49bd-9f69-0a94369b5e86@bytedance.com>
+ <07513.123120701265800278@us-mta-474.us.mimecast.lan>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <13642c61.22e78.18c4306e6f2.Coremail.dinghao.liu@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:by_KCgB37yo3anFlswBXAA--.18674W
-X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/1tbiAgICBmVwRZQ1PQABsJ
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <07513.123120701265800278@us-mta-474.us.mimecast.lan>
 
-PiA+PiA+KysrIGIvZHJpdmVycy9uZXQvZXRoZXJuZXQvcWxvZ2ljL3FlZC9xZWRfY3h0LmMKPiA+
-PiA+QEAgLTkzMyw2ICs5MzMsNyBAQCBzdGF0aWMgdm9pZCBxZWRfaWx0X3NoYWRvd19mcmVlKHN0
-cnVjdCBxZWRfaHdmbgo+ID4+ID4qcF9od2ZuKQo+ID4+ID4gCQlwX2RtYS0+dmlydF9hZGRyID0g
-TlVMTDsKPiA+PiA+IAl9Cj4gPj4gPiAJa2ZyZWUocF9tbmdyLT5pbHRfc2hhZG93KTsKPiA+PiA+
-KwlwX2h3Zm4tPnBfY3h0X21uZ3ItPmlsdF9zaGFkb3cgPSBOVUxMOwo+ID4+IFtTdW1hbl0gSGkg
-RGluZ2hhbywKPiA+Pgo+ID4+IEkgYW0gbm90IHN1cmUgaG93IHRoaXMgd2lsbCBoZWxwIHByZXZl
-bnQgdGhlIGRvdWJsZSBmcmVlIGhlcmU/IElmCj4gPj4gcWVkX2lsdF9zaGFkb3dfYWxsb2MoKSBm
-YWlscyB0byBhbGxvY2F0ZSBtZW1vcnksIHRoZW4gc3RpbGwKPiA+cWVkX2N4dF9tbmdyX2ZyZWUo
-KSB3aWxsIGJlIGNhbGxlZCBhbmQga2ZyZWUoKSB3aWxsIHRyeSB0byBmcmVlIHRoZSBOVUxMCj4g
-PnBvaW50ZXIuIFNob3VsZG4ndCBpdCBiZSBsaWtlIGJlbG93Pwo+ID4+Cj4gPj4gaWYgKHBfbW5n
-ci0+aWx0X3NoYWRvdykKPiA+PiAJS2ZyZWUocF9tbmdyLT5pbHRfc2hhZG93KTsKPiA+PiA+IH0K
-PiA+PiA+Cj4gPj4gPiBzdGF0aWMgaW50IHFlZF9pbHRfYmxrX2FsbG9jKHN0cnVjdCBxZWRfaHdm
-biAqcF9od2ZuLAo+ID4+ID4tLQo+ID4+ID4yLjE3LjEKPiA+PiA+Cj4gPgo+ID5rZnJlZShOVUxM
-KSBpcyBzYWZlIGluIGtlcm5lbC4gQnV0IGtmcmVlKCkgd2lsbCBub3Qgc2V0IHRoZSBmcmVlZAo+
-ID5wb2ludGVyIHRvIE5VTEwuIFRoZXJlZm9yZSwgY2hlY2tpbmcgcF9tbmdyLT5pbHRfc2hhZG93
-IHdpbGwgbm90IHByZXZlbnQKPiA+dGhlIGtmcmVlKCkgZm9yIHRoZSBzZWNvbmQgdGltZS4gTWFu
-eSBkb3VibGUtZnJlZSBidWdzIGFyZSBmaXhlZCBieQo+ID5zZXR0aW5nIHRoZSBmcmVlZCBwb2lu
-dGVyIHRvIE5VTEwgKGUuZy4sCj4gPjZiMGQwNDc3ZmNlNyAoIm1lZGlhOiBkdmItY29yZTogRml4
-IGRvdWJsZSBmcmVlIGluCj4gPmR2Yl9yZWdpc3Rlcl9kZXZpY2UoKSIpKSwgc28gSSBqdXN0IGZp
-eCB0aGlzIGJ1ZyBpbiB0aGUgc2FtZSB3YXkuCj4gPgo+ID5SZWdhcmRzLAo+ID5EaW5naGFvCj4g
-W1N1bWFuXSBPa2F5LCBJIHVuZGVyc3RhbmQuIEFsb25nIHdpdGggdGhpcyBjaGFuZ2UsIEkgaGF2
-ZSBjb3VwbGUgb2Ygc3VnZ2VzdGlvbi4gQnV0IGl0IGlzIHVwIHRvIHlvdSB0byBtYWtlIHRoZW0u
-Cj4gMS4gSW4gdGhlIGJlZ2lubmluZyBvZiB0aGUgZnVuY3Rpb24gcWVkX2lsdF9zaGFkb3dfZnJl
-ZSgpIHNob3VsZCB3ZSBhZGQgYSBjaGVjayBhbmQgcmV0dXJuIGlmIGlsdF9zaGFkZXcgPT0gTlVM
-TD8gU28sIHRoYXQgdGhlIGNvbnRyb2wgZG9lcyBub3QgcmVhY2ggdG8gdGhlIGVuZCBvZiB0aGUg
-ZnVuY3Rpb24/IAo+IDIuIEkgc2VlIGluIHFlZF9pbHRfc2hhZG93X2FsbG9jKCkgd2UgYXJlIGNh
-bGxpbmcgImdvdG8gaWx0X3NoYWRvd19mYWlsIiBldmVuIGlmIHRoZSBrY2FsbG9jKCkgaXMgZmFp
-bGluZy4gSWYga2NhbGxvYygpIGZhaWxzLCB0aGVuIHRoZXJlIGlzIG5vdGhpbmcgdG8gZnJlZSwg
-YW5kIHdlIGNhbiBkaXJlY3RseSByZXR1cm4gZnJvbSB0aGVyZSwgcmlnaHQ/CgpUaGFua3MgZm9y
-IHlvdXIgc3VnZ2VzdGlvbnMhIEZvciB0aGUgZmlyc3Qgc3VnZ2VzdGlvbiwgaWx0X3NoYWRldyBp
-cwpjaGVja2VkIGluIHRoZSBiZWdpbm5pbmcgb2YgdGhlIGZvciBsb29wLCBidXQgaXQgc2VlbXMg
-dGhhdCB3ZSBuZWVkCm5vdCB0byBjaGVjayB0aGlzIHBvaW50ZXIgYXQgZWFjaCBpdGVyYXRpb24u
-IEkgd2lsbCBtb3ZlIGl0IHRvIHRoZQpiZWdpbm5pbmcgb2YgdGhlIGZ1bmN0aW9uLiBJIGFsc28g
-cmVjaGVja2VkIHRoZSBsb29wIGFuZCBmb3VuZCB0aGUgYnVnCmhlcmUgc2hvdWxkIGJlIGEgdXNl
-LWFmdGVyLWZyZWUgaW5zdGVhZCBvZiBkb3VibGUtZnJlZS4gVGhlcmUgaXMgYSAKcG9pbnRlciBk
-ZXJlZmVyZW5jZSAmcF9tbmdyLT5pbHRfc2hhZG93W2ldLCB3aGljaCB3aWxsIGJlCnRyaWdnZXJl
-ZCBiZWZvcmUga2ZyZWUoKS4gSSB3aWxsIHJlc2VuZCBhIG5ldyBwYXRjaCB0byBmaXggdGhpcy4K
-CkZvciB0aGUgc2Vjb25kIHN1Z2dlc3Rpb24sIEkgYWdyZWUgdGhhdCBkaXJlY3RseSByZXR1cm5p
-bmcgd291bGQgYmUgYmV0dGVyLgpJIHdpbGwgZml4IHRoaXMgaW4gdGhlIG5leHQgcGF0Y2ggdmVy
-c2lvbiwgdGhhbmtzIQoKUmVnYXJkcywKRGluZ2hhbwo=
+On Thu, Dec 07, 2023 at 07:22:12AM +0100, Tobias Huschle wrote:
+> 3. vhost looping endlessly, waiting for kworker to be scheduled
+> 
+> I dug a little deeper on what the vhost is doing. I'm not an expert on
+> virtio whatsoever, so these are just educated guesses that maybe
+> someone can verify/correct. Please bear with me probably messing up 
+> the terminology.
+> 
+> - vhost is looping through available queues.
+> - vhost wants to wake up a kworker to process a found queue.
+> - kworker does something with that queue and terminates quickly.
+> 
+> What I found by throwing in some very noisy trace statements was that,
+> if the kworker is not woken up, the vhost just keeps looping accross
+> all available queues (and seems to repeat itself). So it essentially
+> relies on the scheduler to schedule the kworker fast enough. Otherwise
+> it will just keep on looping until it is migrated off the CPU.
+
+
+Normally it takes the buffers off the queue and is done with it.
+I am guessing that at the same time guest is running on some other
+CPU and keeps adding available buffers?
+
+
+-- 
+MST
+
 
