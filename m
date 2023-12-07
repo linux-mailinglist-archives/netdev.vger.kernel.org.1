@@ -1,60 +1,39 @@
-Return-Path: <netdev+bounces-54999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 507BB80923E
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 21:25:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1EDD809240
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 21:26:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6DC61F21153
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 20:25:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DAE71C20492
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 20:26:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51DEE5026E;
-	Thu,  7 Dec 2023 20:25:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1740C5026F;
+	Thu,  7 Dec 2023 20:26:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VdouKteb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DvF7TWnb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58474171B
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 12:24:56 -0800 (PST)
-Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-5d77a1163faso9879497b3.0
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 12:24:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701980695; x=1702585495; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tMyzG6/LQ9fJFBhiWd82aTNJpqAKqu5WvC38KtmseZQ=;
-        b=VdouKtebihw+7+SPLbpKEdbMN8d68rZEsDFvmUnD18bSkttdl2nhNxm/TMqnbpvUMI
-         b9dzRnK11BaU5GB7nHAQb6WeWX0UV7p0qSD5Xg+DiGqJ6pLvCyNOGOCDRp5prDq3tlqY
-         D+PO2HtOBxlNKlceKKjXOTKyyDQUcDTDwFP1zUkmlNyRZk9vsfOGfqnHhjhh6GIUf5ml
-         97kywXyVMRPHsFSIwCj7WGrzi5icH0HetSZKmigDRV/tmeGBVzl1HBbsn7K7kLjlelXA
-         Le7UxI78B2tbfUlselk91cuNbai11sKt8HIyjTSWxtXSbhkZzGkOOX+fVKZ1n4FVD2bM
-         hJ1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701980695; x=1702585495;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tMyzG6/LQ9fJFBhiWd82aTNJpqAKqu5WvC38KtmseZQ=;
-        b=ksbtREzfUYt+7ELxqB+XwjYcF2N5g2cRnoFxn4deqncmaumS2k818YK5HhKoeVo3iK
-         HCPv+Kt2a5eGUQg+RWJ09qK64TxU9l2kXUT6s40KyBK/1G1XlYj0BZBZ1TeQmLZypnJW
-         mzbEoNBPDARvzgEoQqcqF2wxwmz8Iv6zDid10on8Ln7yxSAfrxDk5OX/c4JnTG7auWWP
-         svV002Z8DFS9kCHbLRs12Grqn5ora6j/XgDeapEfuU4CdIvSUwWWM9BuXRbuXhF/Ofya
-         qK4GdGr20oaP5OFekRTDs/bt0ysp2Kuc7CygIM72yRnkAKaPsWPkfF04NrQbECNgafOT
-         5tgg==
-X-Gm-Message-State: AOJu0Yz+hTYPUSGFzvpXUVzGyw0ZLL3rARzq75yV0mDmvc70cuHjxOCj
-	iEgfU3GFFtWccGAZ4Rg+X/Q=
-X-Google-Smtp-Source: AGHT+IEM9dWJM8ql04Ou9wUgUY5GqAbR5WnxTdsydCs0bW1IA+ILaeOytHiTuDOU2TyNlUuoKdxSLg==
-X-Received: by 2002:a0d:d4c5:0:b0:5d7:f227:55d0 with SMTP id w188-20020a0dd4c5000000b005d7f22755d0mr2279787ywd.42.1701980695543;
-        Thu, 07 Dec 2023 12:24:55 -0800 (PST)
-Received: from ?IPV6:2600:1700:6cf8:1240:57df:3a91:11ad:dcd? ([2600:1700:6cf8:1240:57df:3a91:11ad:dcd])
-        by smtp.gmail.com with ESMTPSA id h197-20020a816cce000000b005ccf7fc2197sm136872ywc.24.2023.12.07.12.24.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Dec 2023 12:24:55 -0800 (PST)
-Message-ID: <e4d86104-0b66-4535-85bc-87bea2409a7e@gmail.com>
-Date: Thu, 7 Dec 2023 12:24:53 -0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3E94E61E
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 20:25:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19E33C433C7;
+	Thu,  7 Dec 2023 20:25:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701980759;
+	bh=r6pNC5v7QT5EdXzchmdJJF2GJJSUXK92g5ieduPietg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=DvF7TWnboRelWsdXnyEGz9NOCjYeNibagMjtM92jygcoq/k9i+DSyzK3jMYLs4cgU
+	 PsafU7SE84XUI6qw6vySUqGUwANXIxtkot8rUzd3rJXr39PxYHAwThL6OEeeQ7lilF
+	 3RPOBL4HV5FQT4qIvaSXgdezJ0kpR5IIyEOAIxZ2brRqPieJZnVXbFH2Ebc6z9RClB
+	 WnLfELScPwJ9LYES29MfthFrhTW8D6iFSky/TZblBI1NBC1x9OaSpUaOo03jbjPHBd
+	 DSR+2MuGPi2L/ER4Th1nC2vi8jNSe90UbXybQOXWnrW8PqeXtxAlFco31uIZsA8rv6
+	 uPVcPm4NPcBbg==
+Message-ID: <c76916fb-4d92-442a-b72a-516aa9236d73@kernel.org>
+Date: Thu, 7 Dec 2023 13:25:58 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,39 +41,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next] ipv6: fix warning messages in
- fib6_info_release().
+Subject: Re: [PATCH net-next] ipv6: do not check fib6_has_expires() in
+ fib6_info_release()
 Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, thinker.li@gmail.com
-Cc: netdev@vger.kernel.org, martin.lau@linux.dev, kernel-team@meta.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
- kuifeng@meta.com
-References: <20231207195051.556101-1-thinker.li@gmail.com>
- <CANn89i+CTAYZft=LT+ZH8bg__9p63URnQH=s9=AL7MO4rbvPJg@mail.gmail.com>
-From: Kui-Feng Lee <sinquersw@gmail.com>
-In-Reply-To: <CANn89i+CTAYZft=LT+ZH8bg__9p63URnQH=s9=AL7MO4rbvPJg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com,
+ Kui-Feng Lee <thinker.li@gmail.com>
+References: <20231207201322.549000-1-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20231207201322.549000-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 12/7/23 1:13 PM, Eric Dumazet wrote:
+> My prior patch went a bit too far, because apparently fib6_has_expires()
+> could be true while f6i->gc_link is not hashed yet.
 
+yes, and I got distracted by that stack trace and avoiding errors in the
+create function. The diff I sent does not solve any corruption with list
+since the newly allocated f6i is not linked (and gc-link is initialized).
 
-On 12/7/23 12:04, Eric Dumazet wrote:
-> On Thu, Dec 7, 2023 at 8:50 PM <thinker.li@gmail.com> wrote:
->>
->> From: Kui-Feng Lee <thinker.li@gmail.com>
->>
->> The previous patch doesn't handle the case in ip6_route_info_create().
->> Move calling to fib6_set_expires_locked() to the end of the function to
->> avoid the false alarm of the previous patch.
->>
->> Fixes: 5a08d0065a91 ("ipv6: add debug checks in fib6_info_release()")
+Kui-Feng: no need to send that patch again since it is not really
+changing anything. Let's see if the other warn on triggers.
+
 > 
-> This looks quite wrong.
+> fib6_set_expires_locked() can indeed set RTF_EXPIRES
+> while f6i->fib6_table is NULL.
 > 
-> Let's separate things to have clean stable backports.
+> Original syzbot reports were about corruptions caused
+> by dangling f6i->gc_link.
 > 
-> I will submit my single liner, you will submit a patch fixing your prior commit,
-> otherwise linux-6.6 and linux-6.7 will still have a bug.
+> Fixes: 5a08d0065a91 ("ipv6: add debug checks in fib6_info_release()")
+> Reported-by: syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: David Ahern <dsahern@kernel.org>
+> Cc: Kui-Feng Lee <thinker.li@gmail.com>
+> ---
+>  include/net/ip6_fib.h | 1 -
+>  1 file changed, 1 deletion(-)
+> 
 
-Sure, I am working on that.
+
+Reviewed-by: David Ahern <dsahern@kernel.org>
+
 
