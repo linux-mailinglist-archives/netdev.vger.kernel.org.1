@@ -1,142 +1,121 @@
-Return-Path: <netdev+bounces-54959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66E8980907A
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:46:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 309EA80908B
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 19:50:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 121F21F20F57
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:46:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5319A1C20984
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 18:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 816C42C841;
-	Thu,  7 Dec 2023 18:46:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45E0442ABB;
+	Thu,  7 Dec 2023 18:50:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kACMV1ti"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="D+Bv31+p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66237E0
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 10:46:38 -0800 (PST)
-Received: by mail-yb1-xb2f.google.com with SMTP id 3f1490d57ef6-dae7cc31151so1306785276.3
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 10:46:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701974797; x=1702579597; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8F7lOZCVmdSUUKlTY5pCjlBF+y7hAUCTTCk7yXihrYE=;
-        b=kACMV1ti3dCuADik6J2zCm99f4nj9CYfu6xMLGBwMUCU90uqqwSAj2G5jkhejReegz
-         dTDxbusDjgPHBceJN5vImZeug5GbCfJDDACaNKijUffywDqsar7EezB/be9pKW6QqHKg
-         kbgF2DGsgUSWwUFbEnuv13hxhfxYQmhSl2tjeQPcldT6OEjCZm1RhgoC9aeqPqcMS5aT
-         OQBBaPrk8fiETebl+45663B4LMRaUnwur6IgXAjueK9TW6U+WiehqRCwBk2hCLQIDP76
-         41F/2WoIKi13Gi4FGWkYTqQEII5TNxyExN+cGRBBjzdhW4fKX75lkAbiUbQmV6WwHAlc
-         CHfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701974797; x=1702579597;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8F7lOZCVmdSUUKlTY5pCjlBF+y7hAUCTTCk7yXihrYE=;
-        b=FGSchRVB2XsH2VnszNDGGkXsYO1h5zqGPhupC7erA92vUwm4UFBlIYJJsj+X4Zqogy
-         1VUiOki/svb/xdBSd65Gynhy2Enu3kd6NRWUvY6OxXtjFxAkMM8ealGqoKzDnwdZ+dBk
-         Z1S09W5cih3IcM9cagYcXVoiXcB+HPmvsEeCJmDK6pOcaM4w6K/M/EWjCSGo/DR4C0oj
-         823OfFqVWzJ6mRnMSoLoixr6B9QMzrQe1PegjfqwJX1B0m6o2vtmDQYvgP3RY05MrcpS
-         NaH0Mk1JYvo81n1eIlV3fa7nSdKCrUShxKpVRr0g+Ep9buIRShzkZsnfgBEjhzlcD2la
-         okow==
-X-Gm-Message-State: AOJu0YyFdNBgaBc2tIgNnhPpx8PLkIYuQt+vm176A16/A9v8QyK75Y6U
-	a8wr47TPQwMJgmDq3a5ivok=
-X-Google-Smtp-Source: AGHT+IEJZxSmFmDdukxJpL/OCGsHoPxloyEwXbaKJgoRy0sEQVfGDIi6it83UtLkPPquKWjCucn9GQ==
-X-Received: by 2002:a25:68ce:0:b0:da0:a52d:1be8 with SMTP id d197-20020a2568ce000000b00da0a52d1be8mr2812934ybc.9.1701974797544;
-        Thu, 07 Dec 2023 10:46:37 -0800 (PST)
-Received: from ?IPV6:2600:1700:6cf8:1240:57df:3a91:11ad:dcd? ([2600:1700:6cf8:1240:57df:3a91:11ad:dcd])
-        by smtp.gmail.com with ESMTPSA id 13-20020a25040d000000b00d7f06aa25c5sm78622ybe.58.2023.12.07.10.46.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Dec 2023 10:46:37 -0800 (PST)
-Message-ID: <ca59f955-dc6f-49d8-ae32-fb2d0f7e7522@gmail.com>
-Date: Thu, 7 Dec 2023 10:46:35 -0800
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B37F121;
+	Thu,  7 Dec 2023 10:50:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=SC4n/zXNUUfBAekQk0GSBXQG99rCFLSursm1c12jHB8=; b=D+Bv31+pmR2HKYSu9WWo8G+iKO
+	Q+ym0IM0v5Np/DlRoQZzGADL3Mez59xLnfhj4GN9u8DEOA1ciWeqWxXwq08tv6sNCdJSAsITPtpWR
+	ZggnqmzDkQGBLm9VnQiruV9Two2tFI4Bq6Vc+YTJkndgr5rwuCzQBdaeXq0gZOqgdsIqfVBbt8cxG
+	vJRooJkXsYvWwjbQDWZ48Pt7V0ACG/eauYgwUBSKC9zcbSrI/cwU4jOYSUPfIH7HavLv3FBaJ5BQW
+	YdPOpIMsrJuYZQgN1q/y5DaHHaA0mb1NnzLLDnLwE/ShkalxEWKfvoVLnCLMummC/R5BuQejHTHum
+	4IFd2MrQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38272)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rBJSJ-0001YV-2i;
+	Thu, 07 Dec 2023 18:50:40 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rBJSK-0003xn-Lc; Thu, 07 Dec 2023 18:50:40 +0000
+Date: Thu, 7 Dec 2023 18:50:40 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Justin Chen <justin.chen@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
+	Doug Berger <opendmb@gmail.com>, netdev@vger.kernel.org,
+	bcm-kernel-feedback-list@broadcom.com,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] net: phy: Only resume phy if it is suspended
+Message-ID: <ZXIUAPx1aClSsKED@shell.armlinux.org.uk>
+References: <20231205234229.274601-1-justin.chen@broadcom.com>
+ <7e3208aa-3adf-47ec-9e95-3c88a121e8a3@lunn.ch>
+ <55a08719-cd18-4a01-9a2a-0115065c06a6@broadcom.com>
+ <c2ce6d12-fb5e-4067-aa7c-4f57f4eb4613@broadcom.com>
+ <f7eb20eb-3f0d-42c5-93fe-a622639c55a6@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ipv6: add debug checks in fib6_info_release()
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-Cc: patchwork-bot+netdevbpf@kernel.org, Kui-Feng Lee <thinker.li@gmail.com>,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
-References: <20231205173250.2982846-1-edumazet@google.com>
- <170191862445.7525.14404095197034927243.git-patchwork-notify@kernel.org>
- <CANn89iKcFxJ68+M8UvHzqp1k-FDiZHZ8ujP79WJd1338DVJy6w@mail.gmail.com>
- <c4ca9c7d-12fa-4205-84e2-c1001242fc0d@gmail.com>
- <CANn89iKpM33oQ+2dwoLHzZvECAjwiKJTR3cDM64nE6VvZA99Sg@mail.gmail.com>
- <2ba1bbde-0e80-4b73-be2b-7ce27c784089@gmail.com>
- <CANn89i+2NJ4sp8iGQHG9wKakRD+uzvo7juqAFpE4CdRbg8F6gQ@mail.gmail.com>
-From: Kui-Feng Lee <sinquersw@gmail.com>
-In-Reply-To: <CANn89i+2NJ4sp8iGQHG9wKakRD+uzvo7juqAFpE4CdRbg8F6gQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f7eb20eb-3f0d-42c5-93fe-a622639c55a6@broadcom.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-
-
-On 12/7/23 10:22, Eric Dumazet wrote:
-> On Thu, Dec 7, 2023 at 7:19 PM Kui-Feng Lee <sinquersw@gmail.com> wrote:
->>
->>
->>
->> On 12/7/23 10:10, Eric Dumazet wrote:
->>> On Thu, Dec 7, 2023 at 7:06 PM Kui-Feng Lee <sinquersw@gmail.com> wrote:
->>>
->>>> Do you happen to have a test program that can reproduce it?
->>>
->>> syzbot has a repro, let me release the bug.
->>>
->>> Of course syzbot bisection points to my last patch.
->>
->> I just looked into the code.
->> The origin issue mentioned at the thread head should be something
->> related to a GC change I made. But, the warnings you added doesn't
->> catch the the error correctly.  According to your stacktrace
->>
->>
->>   > ip6_route_add+0x26/0x1f0 net/ipv6/route.c:3843
->>   > ipv6_route_ioctl+0x3ff/0x590 net/ipv6/route.c:4467
->>   > inet6_ioctl+0x265/0x2b0 net/ipv6/af_inet6.c:575
->>   > sock_do_ioctl+0x113/0x270 net/socket.c:1220
->>   > sock_ioctl+0x22e/0x6b0 net/socket.c:1339
->>   > vfs_ioctl fs/ioctl.c:51 [inline]
->>   > __do_sys_ioctl fs/ioctl.c:871 [inline]
->>   > __se_sys_ioctl fs/ioctl.c:857 [inline]
->>   > __x64_sys_ioctl+0x18f/0x210 fs/ioctl.c:857
->>   > do_syscall_x64 arch/x86/entry/common.c:51 [inline]
->>   > do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
->>   > entry_SYSCALL_64_after_hwframe+0x63/0x6b
->>
->> and warning messages you provided
->>
->>   > WARNING: CPU: 0 PID: 5059 at include/net/ip6_fib.h:332
->>   > fib6_info_release include/net/ip6_fib.h:332 [inline]
->>   > WARNING: CPU: 0 PID: 5059 at include/net/ip6_fib.h:332
->>   > ip6_route_info_create+0x1a1a/0x1f10 net/ipv6/route.c:3829
->>
->> It takes place in ip6_route_info_create() to do error handling.
->> It can be fib6_has_expires() in fib6_info_release() in this case.
+On Thu, Dec 07, 2023 at 09:56:01AM -0800, Florian Fainelli wrote:
+> Hi Andrew,
 > 
-> Feel free to amend the patch, but the issue is that we insert a fib
-> gc_link to a list,
-> then free the fi6 object without removing it first from the external list.
+> So we discussed with Justin and Doug about this yesterday and the main
+> reason for the phy_resume() ... MAC initialization ... phy_start() pattern
+> has to do with external RGMII PHYs and the clocking dependency between the
+> MAC and the PHY on the RX path. And also a tiny bit of cargo culting, but
+> shhh.
 > 
-> I added two different warnings, and removing one or both will still
-> keep the bug.
+> When the external RGMII PHYs are suspended they will stop providing a RXC
+> back to the Ethernet MAC and our Ethernet MAC like a lot of designs out
+> there require the RXC in order to be functional and complete its reset
+> procedure correctly (you would think there would be a way to mux in a
+> different clock, but that does not appear to be the case). If we reset the
+> UniMAC block without a RXC we will typically see duplicate packets being
+> received, or absurdly long round trip times as soon as we try to use the RX
+> path.
 
-The gc_link is not inserted here actually. (see my explanation in
-another message.)
+This issue keeps appearing, and I think phylib ought to be doing more
+to support it, rather than ethernet drivers having to play fancy games.
+If one recalls stmmac, that has similar issues - it needs the RXC from
+the PHY to reset properly.
 
-According to the messages in the thread head, it is an issue of dangling
-pointer, right? If I read it correctly, the original issue is gc_link
-pointing to a block of memory that is already free. Am I right?
+I did propose that we have:
 
++#define PHY_F_RXC_ALWAYS_ON    BIT(30)
+
+that can be passed to phy_attach_direct()'s flags, which phylib drivers
+can then act upon to e.g. in the case of at803x, disable their
+hibernation mode which stops the RXC when the system isn't suspended.
+(AT803x Hibernation mode is enabled by default and the PHY automatically
+enters it when the link is down.)
+
+Maybe this flag should be used to determine the resume behaviour,
+e.g. to ensure that the RXC is re-enabled early without the MAC driver
+needing to be involved?
+
+WoL is a different problem - that depends whether the PHY is itself
+doing WoL independently from the MAC, or whether the MAC is involved.
+If the MAC is involved, then clearly the MII link between the PHY and
+MAC needs to be maintained while the system is in low power mode,
+which is an entirely different issue from the RXC being present
+while the MAC is being resumed.
+
+Maybe PHY_F_RXC_ALWAYS_ON is a bad name, as I intended it to only refer
+to while the system is running, not while in low power mode.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
