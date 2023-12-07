@@ -1,64 +1,44 @@
-Return-Path: <netdev+bounces-54743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A95B580809D
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 07:25:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94A818080AC
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 07:29:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35722B20BC7
-	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 06:25:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4874A1F212D9
+	for <lists+netdev@lfdr.de>; Thu,  7 Dec 2023 06:29:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D9E912E43;
-	Thu,  7 Dec 2023 06:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="sRT9geQw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EA1A134D9;
+	Thu,  7 Dec 2023 06:29:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41CB7D5C
-	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 22:25:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1701930344; x=1733466344;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=2jReGGCyRp+y/k5FCZoNO3LYGHtipg7fhNZMQUxKZ74=;
-  b=sRT9geQwO5H/ErVDilCTGWyf80Mw8JVE8mbMAxYJf5GM8Ad6Qj2cSHNP
-   OSDv8puzq6+ojO5E83dbFIPAXpawDldhJ5tc2/noDquzms/6Bt0PBFUEC
-   CV83Q56hlUjqgS/EaDZK9avj/Q2wzbEO42v92Yq+6snSmNE4QMzZ5ZDCO
-   w=;
-X-IronPort-AV: E=Sophos;i="6.04,256,1695686400"; 
-   d="scan'208";a="688864162"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-189d700f.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2023 06:25:38 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
-	by email-inbound-relay-pdx-2b-m6i4x-189d700f.us-west-2.amazon.com (Postfix) with ESMTPS id EB1BA40D52;
-	Thu,  7 Dec 2023 06:25:35 +0000 (UTC)
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:2456]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.28.113:2525] with esmtp (Farcaster)
- id ed85839e-b64d-4a99-9727-ed1e02584826; Thu, 7 Dec 2023 06:25:35 +0000 (UTC)
-X-Farcaster-Flow-ID: ed85839e-b64d-4a99-9727-ed1e02584826
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 7 Dec 2023 06:25:34 +0000
-Received: from 88665a182662.ant.amazon.com (10.118.248.249) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
- Thu, 7 Dec 2023 06:25:30 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <david.laight@aculab.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<jakub@cloudflare.com>, <kuba@kernel.org>, <martineau@kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <stephen@networkplumber.org>,
-	<kuniyu@amazon.com>
-Subject: Re: [PATCH net-next v2] Use READ/WRITE_ONCE() for IP local_port_range.
-Date: Thu, 7 Dec 2023 15:25:20 +0900
-Message-ID: <20231207062520.21109-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <4e505d4198e946a8be03fb1b4c3072b0@AcuMS.aculab.com>
-References: <4e505d4198e946a8be03fb1b4c3072b0@AcuMS.aculab.com>
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C730B10D
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 22:29:23 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0Vy-mJp0_1701930560;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0Vy-mJp0_1701930560)
+          by smtp.aliyun-inc.com;
+          Thu, 07 Dec 2023 14:29:21 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: netdev@vger.kernel.org,
+	virtualization@lists.linux-foundation.org
+Cc: jasowang@redhat.com,
+	mst@redhat.com,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	yinjun.zhang@corigine.com,
+	edumazet@google.com,
+	davem@davemloft.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	ast@kernel.org,
+	horms@kernel.org,
+	xuanzhuo@linux.alibaba.com
+Subject: [PATCH net-next v7 0/4] virtio-net: support dynamic coalescing moderation
+Date: Thu,  7 Dec 2023 14:29:16 +0800
+Message-Id: <cover.1701929854.git.hengqi@linux.alibaba.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,31 +46,104 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWC004.ant.amazon.com (10.13.139.205) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
 
-From: David Laight <David.Laight@ACULAB.COM>
-Date: Wed, 6 Dec 2023 13:44:20 +0000
-> Commit 227b60f5102cd added a seqlock to ensure that the low and high
-> port numbers were always updated together.
-> This is overkill because the two 16bit port numbers can be held in
-> a u32 and read/written in a single instruction.
-> 
-> More recently 91d0b78c5177f added support for finer per-socket limits.
-> The user-supplied value is 'high << 16 | low' but they are held
-> separately and the socket options protected by the socket lock.
-> 
-> Use a u32 containing 'high << 16 | low' for both the 'net' and 'sk'
-> fields and use READ_ONCE()/WRITE_ONCE() to ensure both values are
-> always updated together.
-> 
-> Change (the now trival) inet_get_local_port_range() to a static inline
-> to optimise the calling code.
-> (In particular avoiding returning integers by reference.)
-> 
-> Signed-off-by: David Laight <david.laight@aculab.com>
+Now, virtio-net already supports per-queue moderation parameter
+setting. Based on this, we use the linux dimlib to support
+dynamic coalescing moderation for virtio-net.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Due to some scheduling issues, we only support and test the rx dim.
+
+Some test results:
+
+I. Sockperf UDP
+=================================================
+1. Env
+rxq_0 with affinity to cpu_0.
+
+2. Cmd
+client: taskset -c 0 sockperf tp -p 8989 -i $IP -t 10 -m 16B
+server: taskset -c 0 sockperf sr -p 8989
+
+3. Result
+dim off: 1143277.00 rxpps, throughput 17.844 MBps, cpu is 100%.
+dim on:  1124161.00 rxpps, throughput 17.610 MBps, cpu is 83.5%.
+=================================================
+
+II. Redis
+=================================================
+1. Env
+There are 8 rxqs, and rxq_i with affinity to cpu_i.
+
+2. Result
+When all cpus are 100%, ops/sec of memtier_benchmark client is
+dim off:  978437.23
+dim on:  1143638.28
+=================================================
+
+III. Nginx
+=================================================
+1. Env
+There are 8 rxqs and rxq_i with affinity to cpu_i.
+
+2. Result
+When all cpus are 100%, requests/sec of wrk client is
+dim off:  877931.67
+dim on:  1019160.31
+=================================================
+
+IV. Latency of sockperf udp
+=================================================
+1. Rx cmd
+taskset -c 0 sockperf sr -p 8989
+
+2. Tx cmd
+taskset -c 0 sockperf pp -i ${ip} -p 8989 -t 10
+
+After running this cmd 5 times and averaging the results,
+
+3. Result
+dim off: 17.7735 usec
+dim on:  18.0110 usec
+=================================================
+
+Changelog:
+v6->v7:
+- Drop the patch titled "spin lock for ctrl cmd access"
+- Use rtnl_trylock to avoid the deadlock.
+
+v5->v6:
+- Add patch(4/5): spin lock for ctrl cmd access
+- Patch(5/5):
+   - Use spin lock and cancel_work_sync to synchronize
+
+v4->v5:
+- Patch(4/4):
+   - Fix possible synchronization issues with cancel_work_sync.
+   - Reduce if/else nesting levels
+
+v3->v4:
+- Patch(5/5): drop.
+
+v2->v3:
+- Patch(4/5): some minor modifications.
+
+v1->v2:
+- Patch(2/5): a minor fix.
+- Patch(4/5):
+   - improve the judgment of dim switch conditions.
+   - Cancel the work when vq reset. 
+- Patch(5/5): drop the tx dim implementation.
+
+Heng Qi (4):
+  virtio-net: returns whether napi is complete
+  virtio-net: separate rx/tx coalescing moderation cmds
+  virtio-net: extract virtqueue coalescig cmd for reuse
+  virtio-net: support rx netdim
+
+ drivers/net/virtio_net.c | 297 ++++++++++++++++++++++++++++++++-------
+ 1 file changed, 248 insertions(+), 49 deletions(-)
+
+-- 
+2.19.1.6.gb485710b
+
 
