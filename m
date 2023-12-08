@@ -1,84 +1,119 @@
-Return-Path: <netdev+bounces-55299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13F4D80A2CD
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 13:06:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0934780A30F
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 13:20:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B29701F211A7
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 12:06:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3A232817C8
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 12:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63AA1BDE0;
-	Fri,  8 Dec 2023 12:06:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BE9E1C296;
+	Fri,  8 Dec 2023 12:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kNpdEyU3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o0Mm75HZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [IPv6:2001:41d0:1004:224b::b9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8B671987
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 04:06:43 -0800 (PST)
-Message-ID: <49d5c768-2a05-4f20-99cf-a92aa378ebdd@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1702037202;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PFe7ctH+VkTXULxm2XkM90RYmTcv2+gpmy8zsa6VSog=;
-	b=kNpdEyU31c2/m35Gjr3mJ0VCNwuEVuxffvAzwFCW0pAH/NMp4XMppi9Jf+LmNAOXKp59qr
-	GzacUU4WpcNmIS1wv4LKv8nMrAC7zJsfAhvIK2WdDWeXswjD6RRgqxNpW4Hn4Hlm3gA+Bm
-	eVhLkkALbjGHG72f8zJDcqhDZYM2niY=
-Date: Fri, 8 Dec 2023 12:06:34 +0000
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79CE1BDFD;
+	Fri,  8 Dec 2023 12:20:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 54FDEC433C9;
+	Fri,  8 Dec 2023 12:20:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702038026;
+	bh=cL4G09FMM87FyW6qx9cfGc3SyCcZ7hGoUTZkQ/Jyhwc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=o0Mm75HZaLPa7B8w7uwRvona9U6iSN0xdICbD73DfMBt4z5wdpMQoSqo+1HHXL/mc
+	 2MmDHbwMAU0ioadIuu8Jh9Pwssnh7xm6ZLkpDSX+T0WMBEksUrPXHDhwZcLwBgjZAk
+	 iXCZvxzH6VppHmSrxddnlq3pQHiuJnz6YzB0zmJSkIo4RiZsWMGnG7n1Ie8HoLGiqm
+	 /ULFP3ItYamI40aTRHmHyh0GVKQ1DQbRs6of36zBkD+/5QZm+1IeinD74LmCwku6Tw
+	 ccvhX121fSyo9kFmmad+obR53xkbSiyZb7EiUw2BocVuZyGWAElEmLsMjA3gWb5p8K
+	 ye7BC0m7juWbA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3B711C04E32;
+	Fri,  8 Dec 2023 12:20:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [patch net-next] dpll: remove leftover mode_supported() op and
- use mode_get() instead
-Content-Language: en-US
-To: Jiri Pirko <jiri@resnulli.us>,
- "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-Cc: kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
- saeedm@nvidia.com, leon@kernel.org, richardcochran@gmail.com,
- jonathan.lemon@gmail.com, netdev@vger.kernel.org
-References: <20231207151204.1007797-1-jiri@resnulli.us>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20231207151204.1007797-1-jiri@resnulli.us>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/9] Convert net selftests to run in unique namespace
+ (Part 2)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170203802623.6196.5009719464522054541.git-patchwork-notify@kernel.org>
+Date: Fri, 08 Dec 2023 12:20:26 +0000
+References: <20231206070801.1691247-1-liuhangbin@gmail.com>
+In-Reply-To: <20231206070801.1691247-1-liuhangbin@gmail.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, shuah@kernel.org, dsahern@kernel.org,
+ linux-kselftest@vger.kernel.org, po-hsu.lin@canonical.com, gnault@redhat.com,
+ petrm@nvidia.com, idosch@nvidia.com, razor@blackwall.org,
+ vladimir@nikishkin.pw, roopa@nvidia.com
 
-On 07/12/2023 15:12, Jiri Pirko wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
-> 
-> Mode supported is currently reported to the user exactly the same, as
-> the current mode. That's because mode changing is not implemented.
-> Remove the leftover mode_supported() op and use mode_get() to fill up
-> the supported mode exposed to user.
-> 
-> One, if even, mode changing is going to be introduced, this could be
-> very easily taken back. In the meantime, prevent drivers form
-> implementing this in wrong way (as for example recent netdevsim
-> implementation attempt intended to do).
-> 
+Hello:
 
-I'm OK to remove from ptp_ocp part because it's really only one mode
-supported. But I would like to hear something from Arkadiusz about the
-plans to maybe implement mode change in ice?
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
-> ---
->   drivers/dpll/dpll_netlink.c                   | 16 +++++++-----
->   drivers/net/ethernet/intel/ice/ice_dpll.c     | 26 -------------------
->   .../net/ethernet/mellanox/mlx5/core/dpll.c    |  9 -------
->   drivers/ptp/ptp_ocp.c                         |  8 ------
->   include/linux/dpll.h                          |  3 ---
->   5 files changed, 10 insertions(+), 52 deletions(-)
+On Wed,  6 Dec 2023 15:07:52 +0800 you wrote:
+> Here is the 2nd part of converting net selftests to run in unique namespace.
+> This part converts all bridge, vxlan, vrf tests.
 > 
+> Here is the part 1 link:
+> https://lore.kernel.org/netdev/20231202020110.362433-1-liuhangbin@gmail.com
+> 
+> Hangbin Liu (9):
+>   selftests/net: convert test_bridge_backup_port.sh to run it in unique
+>     namespace
+>   selftests/net: convert test_bridge_neigh_suppress.sh to run it in
+>     unique namespace
+>   selftests/net: convert test_vxlan_mdb.sh to run it in unique namespace
+>   selftests/net: convert test_vxlan_nolocalbypass.sh to run it in unique
+>     namespace
+>   selftests/net: convert test_vxlan_under_vrf.sh to run it in unique
+>     namespace
+>   selftests/net: convert test_vxlan_vnifiltering.sh to run it in unique
+>     namespace
+>   selftests/net: convert vrf_route_leaking.sh to run it in unique
+>     namespace
+>   selftests/net: convert vrf_strict_mode_test.sh to run it in unique
+>     namespace
+>   selftests/net: convert vrf-xfrm-tests.sh to run it in unique namespace
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,1/9] selftests/net: convert test_bridge_backup_port.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/4624a78c18c6
+  - [net-next,2/9] selftests/net: convert test_bridge_neigh_suppress.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/312abe3d93a3
+  - [net-next,3/9] selftests/net: convert test_vxlan_mdb.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/a8258e64ca74
+  - [net-next,4/9] selftests/net: convert test_vxlan_nolocalbypass.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/d79e907b425d
+  - [net-next,5/9] selftests/net: convert test_vxlan_under_vrf.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/d6aab1f63297
+  - [net-next,6/9] selftests/net: convert test_vxlan_vnifiltering.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/5ece8371747d
+  - [net-next,7/9] selftests/net: convert vrf_route_leaking.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/bedc99abcaf8
+  - [net-next,8/9] selftests/net: convert vrf_strict_mode_test.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/51f64acbe36e
+  - [net-next,9/9] selftests/net: convert vrf-xfrm-tests.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/61b12ebe439a
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
