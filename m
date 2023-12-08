@@ -1,65 +1,99 @@
-Return-Path: <netdev+bounces-55396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46DCB80ABAF
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 19:12:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08AD480ABF3
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 19:20:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FFE81C209BC
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 18:12:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 398C01C2096C
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 18:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F21041C82;
-	Fri,  8 Dec 2023 18:12:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B9147A53;
+	Fri,  8 Dec 2023 18:20:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sgwK6dUK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="illhEbZD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D401F61F
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 18:12:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F5EBC433C7;
-	Fri,  8 Dec 2023 18:12:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702059137;
-	bh=TrMyYC46sgdeq5HEr4Veoe5uWZdMdVGOQ4AxMQNhVoE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sgwK6dUK4rP01ONBX8ww3IErWDPQe/9/TzAdfqDmu1laKonvRW9asFiYvNjExTCmj
-	 +SgGJuUhrtWhZVD6WWKeRBJYY4eLYqGoB5bPBX9k1IKANjMiT813XeBG7R7NdbBgLm
-	 49hMG1izHmIvyriftmMO/LIF9z9kTmWK7um5ANdizeMtPLs8tBnvTPzteHN/CXBWRU
-	 V5CTGxJKeyrO3PhEyMPT62cX/4yWHppNSxxfcf2M2npKtnt46MbBcMB7aeVJYfIJNE
-	 IYTjsSnionvjB3TonFpFJ4rl6/epk5HLON5s/nJ3YpsFqwATZtpxCMaKpyY4ANZCaU
-	 DTdpPob4qA4tQ==
-Date: Fri, 8 Dec 2023 10:12:16 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Richard Tresidder <rtresidd@electromag.com.au>
-Cc: netdev@vger.kernel.org
-Subject: Re: STMMAC Ethernet Driver support
-Message-ID: <20231208101216.3fca85b1@kernel.org>
-In-Reply-To: <e5c6c75f-2dfa-4e50-a1fb-6bf4cdb617c2@electromag.com.au>
-References: <e5c6c75f-2dfa-4e50-a1fb-6bf4cdb617c2@electromag.com.au>
+Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4656F19A4
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 10:20:36 -0800 (PST)
+Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-5d7a47d06eeso23031327b3.1
+        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 10:20:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702059635; x=1702664435; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3+stFk45P4mX0uCydM2OcHvjKLv55UJK/nYdB4eIGjE=;
+        b=illhEbZDziVK3QjR6Q7vVjUm3dFMADtdZAM/6WyTdWtbdQkTY/UeMXAbw7Vt82kqaY
+         FSIjCYKkWewLBG1mtTUOOoluWrcMcgywvrPuXLPdqcyeYe7YQGFWPHCXdDU4RIb+Zv6+
+         RMD7if50heRD0TQzDdJ21f4ijFx8VaVqnoim8cHH6hPzMxvwjAxXQOH4cmEzZXUO82D7
+         e8hMOH2o13j6pE+AZkgODIfjY9aTwuCKm62VrN4yKSoX90sdil34PnqGiJzhI38y0ASg
+         OGxnDpskFR9rZ14QbUvHZu9631KN2GWi1ipdUVvqfA64ZSNOkPT9R5/DTBjNqC/JVL36
+         uwqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702059635; x=1702664435;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3+stFk45P4mX0uCydM2OcHvjKLv55UJK/nYdB4eIGjE=;
+        b=oTbNzVPVEJRQ/Cc0xIb20f4QReYjU3I6EmE4GFo8OxHL/qMnQ5ZKHz8QFSvF71o1ZR
+         mKEQ0hzfZhe2GBBmiadtYZKa7HmaITnj0a0fQhF6oee4W633JW4NfA9BCtz4SriYkvFT
+         JHztY+GJP7DrIOsuokjprhq3b/xvj/GvF1MnM+oMDQsXcEYcqR/wxT8NM5i38fXlDKQS
+         t0pt2F+DtyS/300r62Z2adOOWtxGZP9H6v4HIstWtDJJ/xfTlqYvOqmG+4vwE4zXK8b+
+         ySqYvI8E7hSHUhxRVgtRj4q7AQ1iJeU52WO+ULJmrBXpvGMX+xWkysUQwdTenw6TNwcg
+         zCOQ==
+X-Gm-Message-State: AOJu0YxJlvt7Rbcv3+eOJr8PeQwaWs3xL5JnsT4Uyy1wpRgGWtiTeNl+
+	xSlMN8/Do2eSXIqfx+QBGho=
+X-Google-Smtp-Source: AGHT+IHwWDuHdhNyIsLKa46LS8v55SHLyjuygSgJUs4usrosCse4wV87dftmVBZjYEC1+HzR4EC91w==
+X-Received: by 2002:a0d:d8d0:0:b0:5de:a315:b727 with SMTP id a199-20020a0dd8d0000000b005dea315b727mr402668ywe.25.1702059635273;
+        Fri, 08 Dec 2023 10:20:35 -0800 (PST)
+Received: from ?IPV6:2600:1700:6cf8:1240:65fe:fe26:c15:a05c? ([2600:1700:6cf8:1240:65fe:fe26:c15:a05c])
+        by smtp.gmail.com with ESMTPSA id r190-20020a0de8c7000000b005d33b03acd1sm839974ywe.39.2023.12.08.10.20.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Dec 2023 10:20:34 -0800 (PST)
+Message-ID: <8d5af093-54d2-48b3-9753-cc1684598934@gmail.com>
+Date: Fri, 8 Dec 2023 10:20:33 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] ipv6: add debug checks in fib6_info_release()
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
+References: <20231205173250.2982846-1-edumazet@google.com>
+ <2133401f-2ba5-42eb-9158-dcc74db744f5@gmail.com>
+ <CANn89iKTLoBUkOyNnRy486n3HEUKoeFmA90TDc2xiWunK6n_Fg@mail.gmail.com>
+From: Kui-Feng Lee <sinquersw@gmail.com>
+In-Reply-To: <CANn89iKTLoBUkOyNnRy486n3HEUKoeFmA90TDc2xiWunK6n_Fg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, 8 Dec 2023 14:03:25 +0800 Richard Tresidder wrote:
-> I've looked through the diffset 6.3.3 >>> 6.6.3 on the driver
-> drivers\net\ethernet\stmicro\stmmac
-> But nothing is jumping out at me.
+
+
+On 12/8/23 01:18, Eric Dumazet wrote:
+> On Fri, Dec 8, 2023 at 12:02 AM Kui-Feng Lee <sinquersw@gmail.com> wrote:
+>>
+>> Hi Eric, could you also open a bug for this incident?
 > 
-> I could use a pointer as to where to look to start tracing this.
+> What are you asking for exactly ?
+> 
+> We have thousands of syzbot bugs, it is done by a bot, not a human.
 
-Bisection is good way to zero in on the bad change if you don't
-have much hard to rebase code in your tree.
+You mentioned "let me release the bug." [1] Then we have [2].
 
-Otherwise you can dump the relevant registers and the descriptors
-(descriptors_status file in debugfs) and see if driver is doing
-anything differently on the newer kernel?
+By the way, although I am not fixing the issue described by [2],
+I am using that email to talk with syzbot.
+
+[1] 
+https://lore.kernel.org/all/CANn89iKpM33oQ+2dwoLHzZvECAjwiKJTR3cDM64nE6VvZA99Sg@mail.gmail.com/
+[2] https://lore.kernel.org/all/000000000000cb5b07060bef7ac0@google.com/
 
