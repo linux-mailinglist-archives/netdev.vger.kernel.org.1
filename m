@@ -1,114 +1,255 @@
-Return-Path: <netdev+bounces-55486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 847FE80B07F
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 00:19:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F07E80B08E
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 00:25:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B50F31C20A03
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 23:19:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33DD81F2144F
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 23:25:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E0EA5AB9A;
-	Fri,  8 Dec 2023 23:19:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3345ABBB;
+	Fri,  8 Dec 2023 23:25:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XGforaeO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rMZfsgNf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1EF61703
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 15:19:30 -0800 (PST)
-Received: by mail-yb1-xb31.google.com with SMTP id 3f1490d57ef6-db549f869a3so2964144276.1
-        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 15:19:30 -0800 (PST)
+Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF40C172B
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 15:25:14 -0800 (PST)
+Received: by mail-vk1-xa2f.google.com with SMTP id 71dfb90a1353d-4b2dcc7b71dso720517e0c.1
+        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 15:25:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702077570; x=1702682370; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nAyGGJqFh1KsK7YTr3+Ta9gGXVNBP2LzoXFuP7QOOj0=;
-        b=XGforaeOeHmp3IQzM9tybAR3Be3LT4Ywm/aZoYg22qhiMwubMN6mXp5KsGoKJACDdm
-         5x9aQRPLg5vw11Owgwjsj60p7Wx9/FAYQLenrHGAyV/jBaJPz/yPZpVDYPAH2Vo8KX1h
-         nZnCvYmCUTTAaLh/A2kE1xKoR998D45bPY6zD7T3mc+CEW81xp6qUava5EkfuD0tMSFG
-         zyqThQ1BdVVpSCH00GztyCSfDFP0WYM9y+Qzu6cCdLEMHcvLZZtuIKDLUSCf8ebGzwXE
-         8nxNsnCTIbwX217IlzC1ZqDuhy33VdQiG3aUMS8um2TFi7vBTLnjdvyg/TkbENUdWeG5
-         CdrQ==
+        d=google.com; s=20230601; t=1702077914; x=1702682714; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q3tzRei4DqUvL1gHDjLu5ZyN+XyR0fbOVm4A1dgKAmU=;
+        b=rMZfsgNfIBlVfmM5BMuu6izhjLw8tf7OSVrlq0XQSrKAUbMtEZwkGdm7NJcvUIjkhO
+         MfpUNlwFIx72pvw2FXHUJpoB6FAlp2euk5EegmEwpR2XJxbQpf4lj5bozkprsajrDVle
+         xZLduQ/F9vZaZhiIPXIUMAJxIMjaReoTuotPoKPcKLKaXxQktW0iuRymQ/TNsNNQCW5X
+         mWboT2jI90M3URdy+mwzZcYMTCRt++z3e9zdn3P1TAbqiwREVutMY7Ate6kU2Iq4G4SR
+         R7lgPkuJW+rgGlXIrKNlOAegF/GyvJVbKWH4A570ClOYyRscr/vX5LNs/bUtGInjdlro
+         Cthg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702077570; x=1702682370;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nAyGGJqFh1KsK7YTr3+Ta9gGXVNBP2LzoXFuP7QOOj0=;
-        b=HnXYPRv3PrrspeCumKh8+RPDgEgRp3OXsAOir79ZNBLZTA7Npv5jfkyIPTykEpAyyG
-         Rg86vFNZYdwQTdZ0ErFaNshnQFUG5ViE1wKRqsCOrPRkkMC5hMdCy77/gR+Zih/VZdul
-         3dl+e+i9yHYdkUkcrPy32c2fVMsXKbpdbOqhfwSetTmYVdXW/MLwMG67Gs5IUMCMkdBu
-         rZN9C8ZL8Mmos1mgY0Erdjdl1tIOFWdmGXAxnsXRjdYCW9XDmvIlAmQE4Ra8X/5P4peQ
-         gGfRz763x/b8GDVHUxaPpM4+Spt/zcoYmTG9+B0vXl9AF0gL5hvcDq83ZjTBMCdlCP2O
-         OVEg==
-X-Gm-Message-State: AOJu0YxRp/wWZTQHcLr8zDfNJiop4+TroeeLQsMMh5cIiJlJjileztg/
-	5AkDzzqRxrgcnmAXuU4J0TGeAI0ZcSU=
-X-Google-Smtp-Source: AGHT+IEchs4prqf2Z+jROTn5/lOrwfEeCEC7BQcxPHzd8vYKqibGvmz1y9kGcQdTqJrRO8CbS3yCng==
-X-Received: by 2002:a5b:cc1:0:b0:db5:3e6a:e436 with SMTP id e1-20020a5b0cc1000000b00db53e6ae436mr645703ybr.55.1702077569865;
-        Fri, 08 Dec 2023 15:19:29 -0800 (PST)
-Received: from ?IPV6:2600:1700:6cf8:1240:65fe:fe26:c15:a05c? ([2600:1700:6cf8:1240:65fe:fe26:c15:a05c])
-        by smtp.gmail.com with ESMTPSA id g13-20020a258a0d000000b00d8674371317sm909058ybl.36.2023.12.08.15.19.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Dec 2023 15:19:29 -0800 (PST)
-Message-ID: <92dcf735-6e9c-48dc-a020-d4e2658dff19@gmail.com>
-Date: Fri, 8 Dec 2023 15:19:28 -0800
+        d=1e100.net; s=20230601; t=1702077914; x=1702682714;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q3tzRei4DqUvL1gHDjLu5ZyN+XyR0fbOVm4A1dgKAmU=;
+        b=QUzFOf61WtkpzZot/3HYoahJT/fkoMXpICQbyRe89JFC0OLyCrzo+EgDxkPjeKUQ2u
+         KOmDConKmhomlbPANe6vV4t0hlZPiNK+N1v+ebeYQ3k+zwh0dGJsU8/1hxBODjrFp7Vt
+         AffzYNi0w+5AvRrmx1TvqMXKlkN5/Pz6Wag/ng9vLXLmKtLkJcjki5v4yqUhEtQBSbxt
+         vkPIjXU+x/u8HS632ctz8fir+3vVT4TjhAL3mp5k19ZYmU8t3GKIyB5a8nTpQD2viHe9
+         qHn6wGVbkQ4k99kYie7ufpoMBc2EbnuQ4G6h46QHKkcGK+HSbRVm0exl6ttRY+5lh/7r
+         eDfA==
+X-Gm-Message-State: AOJu0YxbteZ56awvPLHMCBtqi2BTOIE55vTBkQOSH8jjpPyE3GjSWSy1
+	oy6ha+qDPc5ABJMP/ILdxc2dGY0JwmWfpuBqUgbDCg==
+X-Google-Smtp-Source: AGHT+IEFKUc5exoP0JWsRvhqP/54jx/lwOw3AZl/60NefSo43kRLaVvc1XrXulWzYoWwJeZdst7FzfPYeaWKAp2Juns=
+X-Received: by 2002:a05:6102:3f0a:b0:464:5036:fb69 with SMTP id
+ k10-20020a0561023f0a00b004645036fb69mr858666vsv.30.1702077913540; Fri, 08 Dec
+ 2023 15:25:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/2] net/ipv6: insert a f6i to a GC list only
- if the f6i is in a fib6_table tree.
-Content-Language: en-US
-To: David Ahern <dsahern@kernel.org>, thinker.li@gmail.com,
- netdev@vger.kernel.org, martin.lau@linux.dev, kernel-team@meta.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
-Cc: kuifeng@meta.com, syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com
-References: <20231208194523.312416-1-thinker.li@gmail.com>
- <20231208194523.312416-2-thinker.li@gmail.com>
- <353fc304-389b-4c16-b78f-20128d688370@kernel.org>
-From: Kui-Feng Lee <sinquersw@gmail.com>
-In-Reply-To: <353fc304-389b-4c16-b78f-20128d688370@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20231208005250.2910004-1-almasrymina@google.com>
+ <20231208005250.2910004-9-almasrymina@google.com> <b07a4eca-0c3d-4620-9f97-b1d2c76642c2@gmail.com>
+In-Reply-To: <b07a4eca-0c3d-4620-9f97-b1d2c76642c2@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 8 Dec 2023 15:25:00 -0800
+Message-ID: <CAHS8izNVFx6oHoo7y86P8Di9VCVe8A_n_9UZFkg5Wnt=A=YcNQ@mail.gmail.com>
+Subject: Re: [net-next v1 08/16] memory-provider: dmabuf devmem memory provider
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
+	David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeelb@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Dec 8, 2023 at 2:56=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.c=
+om> wrote:
+>
+> On 12/8/23 00:52, Mina Almasry wrote:
+...
+> > +     if (pool->p.queue)
+> > +             binding =3D READ_ONCE(pool->p.queue->binding);
+> > +
+> > +     if (binding) {
+> > +             pool->mp_ops =3D &dmabuf_devmem_ops;
+> > +             pool->mp_priv =3D binding;
+> > +     }
+>
+> Hmm, I don't understand why would we replace a nice transparent
+> api with page pool relying on a queue having devmem specific
+> pointer? It seemed more flexible and cleaner in the last RFC.
+>
+
+Jakub requested this change and may chime in, but I suspect it's to
+further abstract the devmem changes from driver. In this iteration,
+the driver grabs the netdev_rx_queue and passes it to the page_pool,
+and any future configurations between the net stack and page_pool can
+be passed this way with the driver unbothered.
+
+> > +
+> >       if (pool->mp_ops) {
+> >               err =3D pool->mp_ops->init(pool);
+> >               if (err) {
+> > @@ -1020,3 +1033,77 @@ void page_pool_update_nid(struct page_pool *pool=
+, int new_nid)
+> >       }
+> >   }
+> >   EXPORT_SYMBOL(page_pool_update_nid);
+> > +
+> > +void __page_pool_iov_free(struct page_pool_iov *ppiov)
+> > +{
+> > +     if (WARN_ON(ppiov->pp->mp_ops !=3D &dmabuf_devmem_ops))
+> > +             return;
+> > +
+> > +     netdev_free_dmabuf(ppiov);
+> > +}
+> > +EXPORT_SYMBOL_GPL(__page_pool_iov_free);
+>
+> I didn't look too deep but I don't think I immediately follow
+> the pp refcounting. It increments pages_state_hold_cnt on
+> allocation, but IIUC doesn't mark skbs for recycle? Then, they all
+> will be put down via page_pool_iov_put_many() bypassing
+> page_pool_return_page() and friends. That will call
+> netdev_free_dmabuf(), which doesn't bump pages_state_release_cnt.
+>
+> At least I couldn't make it work with io_uring, and for my purposes,
+> I forced all puts to go through page_pool_return_page(), which calls
+> the ->release_page callback. The callback will put the reference and
+> ask its page pool to account release_cnt. It also gets rid of
+> __page_pool_iov_free(), as we'd need to add a hook there for
+> customization otherwise.
+>
+> I didn't care about overhead because the hot path for me is getting
+> buffers from a ring, which is somewhat analogous to sock_devmem_dontneed(=
+),
+> but done on pp allocations under napi, and it's done separately.
+>
+> Completely untested with TCP devmem:
+>
+> https://github.com/isilence/linux/commit/14bd56605183dc80b540999e8058c79a=
+c92ae2d8
+>
+
+This was a mistake in the last RFC, which should be fixed in v1. In
+the RFC I was not marking the skbs as skb_mark_for_recycle(), so the
+unreffing path wasn't as expected.
+
+In this iteration, that should be completely fixed. I suspect since I
+just posted this you're actually referring to the issue tested on the
+last RFC? Correct me if wrong.
+
+In this iteration, the reffing story:
+
+- memory provider allocs ppiov and returns it to the page pool with
+ppiov->refcount =3D=3D 1.
+- The page_pool gives the page to the driver. The driver may
+obtain/release references with page_pool_page_[get|put]_many(), but
+the driver is likely not doing that unless it's doing its own page
+recycling.
+- The net stack obtains references via skb_frag_ref() ->
+page_pool_page_get_many()
+- The net stack drops references via skb_frag_unref() ->
+napi_pp_put_page() -> page_pool_return_page() and friends.
+
+Thus, the issue where the unref path was skipping
+page_pool_return_page() and friends should be resolved in this
+iteration, let me know if you think otherwise, but I think this was an
+issue limited to the last RFC.
+
+> > +
+> > +/*** "Dmabuf devmem memory provider" ***/
+> > +
+> > +static int mp_dmabuf_devmem_init(struct page_pool *pool)
+> > +{
+> > +     struct netdev_dmabuf_binding *binding =3D pool->mp_priv;
+> > +
+> > +     if (!binding)
+> > +             return -EINVAL;
+> > +
+> > +     if (!(pool->p.flags & PP_FLAG_DMA_MAP))
+> > +             return -EOPNOTSUPP;
+> > +
+> > +     if (pool->p.flags & PP_FLAG_DMA_SYNC_DEV)
+> > +             return -EOPNOTSUPP;
+> > +
+> > +     netdev_dmabuf_binding_get(binding);
+> > +     return 0;
+> > +}
+> > +
+> > +static struct page *mp_dmabuf_devmem_alloc_pages(struct page_pool *poo=
+l,
+> > +                                              gfp_t gfp)
+> > +{
+> > +     struct netdev_dmabuf_binding *binding =3D pool->mp_priv;
+> > +     struct page_pool_iov *ppiov;
+> > +
+> > +     ppiov =3D netdev_alloc_dmabuf(binding);
+> > +     if (!ppiov)
+> > +             return NULL;
+> > +
+> > +     ppiov->pp =3D pool;
+> > +     pool->pages_state_hold_cnt++;
+> > +     trace_page_pool_state_hold(pool, (struct page *)ppiov,
+> > +                                pool->pages_state_hold_cnt);
+> > +     return (struct page *)((unsigned long)ppiov | PP_IOV);
+> > +}
+> > +
+> > +static void mp_dmabuf_devmem_destroy(struct page_pool *pool)
+> > +{
+> > +     struct netdev_dmabuf_binding *binding =3D pool->mp_priv;
+> > +
+> > +     netdev_dmabuf_binding_put(binding);
+> > +}
+> > +
+> > +static bool mp_dmabuf_devmem_release_page(struct page_pool *pool,
+> > +                                       struct page *page)
+> > +{
+> > +     struct page_pool_iov *ppiov;
+> > +
+> > +     if (WARN_ON_ONCE(!page_is_page_pool_iov(page)))
+> > +             return false;
+> > +
+> > +     ppiov =3D page_to_page_pool_iov(page);
+> > +     page_pool_iov_put_many(ppiov, 1);
+> > +     /* We don't want the page pool put_page()ing our page_pool_iovs. =
+*/
+> > +     return false;
+> > +}
+> > +
+> > +const struct memory_provider_ops dmabuf_devmem_ops =3D {
+> > +     .init                   =3D mp_dmabuf_devmem_init,
+> > +     .destroy                =3D mp_dmabuf_devmem_destroy,
+> > +     .alloc_pages            =3D mp_dmabuf_devmem_alloc_pages,
+> > +     .release_page           =3D mp_dmabuf_devmem_release_page,
+> > +};
+> > +EXPORT_SYMBOL(dmabuf_devmem_ops);
+>
+> --
+> Pavel Begunkov
 
 
 
-On 12/8/23 14:43, David Ahern wrote:
-> On 12/8/23 12:45 PM, thinker.li@gmail.com wrote:
->> From: Kui-Feng Lee <thinker.li@gmail.com>
->>
->> Check f6i->fib6_node and hlist_unhashed(&f6i->gc_link) before inserting a
->> f6i (fib6_info) to tb6_gc_hlist.
->>
->> The current implementation checks if f6i->fib6_table is not NULL to
->> determines if a f6i is on a tree, however it is not enough. When a f6i is
->> removed from a fib6_table, f6i->fib6_table is not reset. However, fib6_node
->> is always reset when a f6i is removed from a fib6_table and is set when a
->> f6i is added to a fib6_table. So, f6i->fib6_node is a reliable way to
->> determine if a f6i is on a tree.
-> 
-> Which is an indication that the table is not the right check but neither
-> is the fib6_node. If expires is set on a route entry, add it to the
-> gc_list; if expires is reset on a route entry, remove it from the
-> gc_list. If the value of expires is changed while on the gc_list list,
-> just update the expires value.
-> 
-
-I don't quite follow you.
-If an entry is not on a tree, why do we still add the entry to the gc 
-list? (This is the reason to check f6i->fib6_node.)
-
-The changes in this patch rely on two indications, 1. if a f6i is on a 
-tree, 2. if a f6i is on a gc list (described in the 3rd paragraph of
-the comment log.)
-An entry is added to a gc list only if it has expires and is not on the 
-list yet. An entry is removed from a gc list only if it is on a gc list.
-And, just like what you said earlier, it just updates the expires value
-while an entry is already on a gc list.
+--=20
+Thanks,
+Mina
 
