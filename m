@@ -1,138 +1,126 @@
-Return-Path: <netdev+bounces-55477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C33E80AFBF
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 23:40:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32CC780AFC6
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 23:41:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 453DE1C20D18
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 22:40:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6308A1C20AC2
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 22:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D77759B45;
-	Fri,  8 Dec 2023 22:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3301381A0;
+	Fri,  8 Dec 2023 22:41:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XX6UcXvx"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wM7mC16Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1446AC3;
-	Fri,  8 Dec 2023 14:40:10 -0800 (PST)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-a1da1017a09so311125366b.3;
-        Fri, 08 Dec 2023 14:40:10 -0800 (PST)
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF2B510CA
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 14:41:02 -0800 (PST)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-5dd3affae03so25993817b3.1
+        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 14:41:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702075208; x=1702680008; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1702075262; x=1702680062; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HYNkiFjVXQKwdJFtKs4YwTgHxo/04KOB0mrqRod0x5w=;
-        b=XX6UcXvxAxRtffKuxKTX8HsoN06x02cASaf5p7TqYFqGjlvuTIiSRDNKP9K7GsR6zU
-         lSKOIIFJy4QADe/wr3t4RXdOpd0TpqcH0QhWpzcy8M7uTN4drGgM6/CX9n1qEhrE8tkB
-         Cxu2iJqYJtWuSK4nrSHUjg741m10WXArswUIz4F8m9mbS/RiBcxasY/U3CR03vBCuRUJ
-         8nxWs5evWKJW4MroDXK/GFSj9ZbvpBGUZzFCWFCZdHAMSJXdaClNMlTmIviCUVPyvRJD
-         5ju/FlJvY77dhu2ZbSb06TeVSqFhVHzArab1+iK3yhq8g2DG+vxNm4eEeuY3u9hrEmBm
-         F2jQ==
+        bh=VOeswBlcwCDEkoDNTvrsGUjCXtw0cH2uUTlFe6lWar0=;
+        b=wM7mC16ZIKoC3HD+mvTeKssI33WXSo8VogE/Vt2ah+CLUma4RBmElfiSJa9dYZ0rXo
+         RySjmrmXFiq7+5vSQgFVxm/P4Rm53+EXKgGpUQI7X/Zwgxr+KsYCuqA5xap9wVcV1Mwg
+         tqHnkjM8+y41Zzz5sfnJwWOXMN3JmZZAdIMGxVnxLbDOwOtbN3weYoxcBvFjAuGZA9Nc
+         5cGuJpa2mcDItGwTecnRxVsHAV6UImnbDMR5qCZ4wK/JaWTIXf4m2NLJn59tGwh/R1oj
+         wLVPE/0q5dPYnisoHKDkev7Zb04DGzSmQajrtaiOtgYGqDc3F5K8+Tge7k9E/IAP68vj
+         cuGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702075208; x=1702680008;
+        d=1e100.net; s=20230601; t=1702075262; x=1702680062;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HYNkiFjVXQKwdJFtKs4YwTgHxo/04KOB0mrqRod0x5w=;
-        b=NQ2iYt0Ejjb99aKA00LSJ93TofzYnjK46bmXZKuY1Eq7exFz8r124AR5bPiW9TibWv
-         ik9Un0oXz+mIxYSf5mqAhj60+jrWnEaiLaVEZzBXp+1aZYroTVJwqeA5e+dq0t/aii68
-         QsaZIUBHgoRywtb/hWRJbv1z5Mse32aaxf89bMlmHz4PXLdW0PHLoHMzCya3uZUfeTAb
-         E10vZPCpFKfjUmeIKa2X8IkHAKR3IP1EXQDWQkUwL8ajNyytPrT1ZeLGuVyg5jCz+VKA
-         YQVp+DZ4VUWuVUKJroEie7i0tqyQCDrDT63nrzszJT2GQAeRM5hNYkmRs2Nra/Sj9k0e
-         KhOw==
-X-Gm-Message-State: AOJu0Yx4k8NaOyqaeGszT0oOhB4uT4NGHd6pr/HklHVjTixZjkRc2MaH
-	X/Ycyg18YuHTGn3lsdp1tSF0LHVkY0SGowa1Dbg=
-X-Google-Smtp-Source: AGHT+IHKjPU34+PthheSZ4vlLXX8zzmlKZvkxUxPxvkXiGlk9AaeBlroiLMo628HbNHn2jSnSul3yna1RU7fsbEm4ms=
-X-Received: by 2002:a17:907:7206:b0:9fe:a881:81ab with SMTP id
- dr6-20020a170907720600b009fea88181abmr363065ejc.53.1702075208436; Fri, 08 Dec
- 2023 14:40:08 -0800 (PST)
+        bh=VOeswBlcwCDEkoDNTvrsGUjCXtw0cH2uUTlFe6lWar0=;
+        b=YVgcUb8Ea2XcUMfE4Ej0pcTOXh1pdgMEO+78MgYwB4M4Z2hCRbZ85sSktn4dMct5dG
+         mpcyMBeD7PHaglWsODmhRL2S3U5bV6h2jRmblI3kCoGhQs4457bPL2SzhiJIPgm7PXrZ
+         dszAUQolzbJUFsnVeZCCyiF4jSVrC3B+4zEGKLhJbPpYT7cx9vSgtHgDUQ3FWl5mPCmf
+         BLVhJ3//QJMsRwr250oGuj2Pi50612m1/EfR7AJVVgXcBxGShF/uYrZUoOKiFwaTFQOC
+         wEHfYPev6eaMq+cJlovKzndWB8S6zj2BVZ+VFuvQ4gU12zNO1xtDlMSxsUIkijZ4pZED
+         kRFg==
+X-Gm-Message-State: AOJu0YwlX9HzHT6rIWgrmwcsS457zxl8tJujJtivagefLsUkapYRs0fq
+	kEBv2ahfJ36vrOx2Bh4/BAoaKvzX+CQDv4h/9oNnqw==
+X-Google-Smtp-Source: AGHT+IGPG6wwjhIhjxmQgzlIWaCeOeh/P8IX+Ckabh/ZFHsfrcrYNpTHGSYKiuj9bBM9VmRxiZerXvj9TmtI01nL+yE=
+X-Received: by 2002:a0d:ff44:0:b0:5d7:1940:b389 with SMTP id
+ p65-20020a0dff44000000b005d71940b389mr788328ywf.85.1702075261922; Fri, 08 Dec
+ 2023 14:41:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231130185229.2688956-1-andrii@kernel.org> <20231130185229.2688956-4-andrii@kernel.org>
- <20231208-besessen-vibrieren-4e963e3ca3ba@brauner>
-In-Reply-To: <20231208-besessen-vibrieren-4e963e3ca3ba@brauner>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Fri, 8 Dec 2023 14:39:56 -0800
-Message-ID: <CAEf4BzbRKxBCzKbOWg0sWMzWurF5RvF5OwizXi7tSC2vM4Zi_w@mail.gmail.com>
-Subject: Re: [PATCH v12 bpf-next 03/17] bpf: introduce BPF token object
-To: Christian Brauner <brauner@kernel.org>
-Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	paul@paul-moore.com, linux-fsdevel@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, keescook@chromium.org, 
-	kernel-team@meta.com, sargun@sargun.me
+References: <20231208193518.2018114-1-vladimir.oltean@nxp.com> <20231208193518.2018114-5-vladimir.oltean@nxp.com>
+In-Reply-To: <20231208193518.2018114-5-vladimir.oltean@nxp.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 8 Dec 2023 23:40:50 +0100
+Message-ID: <CACRpkdYL1C4iTKV1ovX2coTFK4u0Cn4Oqknu7Fxh3k_gk_OWGQ@mail.gmail.com>
+Subject: Re: [PATCH net 4/4] docs: net: dsa: replace TODO section with info
+ about history and devel ideas
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+	Luiz Angelo Daros de Luca <luizluca@gmail.com>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Madhuri Sripada <madhuri.sripada@microchip.com>, Marcin Wojtas <mw@semihalf.com>, 
+	Tobias Waldekranz <tobias@waldekranz.com>, Arun Ramadoss <arun.ramadoss@microchip.com>, 
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Jonathan Corbet <corbet@lwn.net>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 8, 2023 at 5:41=E2=80=AFAM Christian Brauner <brauner@kernel.or=
-g> wrote:
->
-> On Thu, Nov 30, 2023 at 10:52:15AM -0800, Andrii Nakryiko wrote:
-> > Add new kind of BPF kernel object, BPF token. BPF token is meant to
-> > allow delegating privileged BPF functionality, like loading a BPF
-> > program or creating a BPF map, from privileged process to a *trusted*
-> > unprivileged process, all while having a good amount of control over wh=
-ich
-> > privileged operations could be performed using provided BPF token.
-> >
-> > This is achieved through mounting BPF FS instance with extra delegation
-> > mount options, which determine what operations are delegatable, and als=
-o
-> > constraining it to the owning user namespace (as mentioned in the
-> > previous patch).
-> >
-> > BPF token itself is just a derivative from BPF FS and can be created
-> > through a new bpf() syscall command, BPF_TOKEN_CREATE, which accepts BP=
-F
-> > FS FD, which can be attained through open() API by opening BPF FS mount
-> > point. Currently, BPF token "inherits" delegated command, map types,
-> > prog type, and attach type bit sets from BPF FS as is. In the future,
-> > having an BPF token as a separate object with its own FD, we can allow
-> > to further restrict BPF token's allowable set of things either at the
-> > creation time or after the fact, allowing the process to guard itself
-> > further from unintentionally trying to load undesired kind of BPF
-> > programs. But for now we keep things simple and just copy bit sets as i=
-s.
-> >
-> > When BPF token is created from BPF FS mount, we take reference to the
-> > BPF super block's owning user namespace, and then use that namespace fo=
-r
-> > checking all the {CAP_BPF, CAP_PERFMON, CAP_NET_ADMIN, CAP_SYS_ADMIN}
-> > capabilities that are normally only checked against init userns (using
-> > capable()), but now we check them using ns_capable() instead (if BPF
-> > token is provided). See bpf_token_capable() for details.
-> >
-> > Such setup means that BPF token in itself is not sufficient to grant BP=
-F
-> > functionality. User namespaced process has to *also* have necessary
-> > combination of capabilities inside that user namespace. So while
-> > previously CAP_BPF was useless when granted within user namespace, now
-> > it gains a meaning and allows container managers and sys admins to have
-> > a flexible control over which processes can and need to use BPF
-> > functionality within the user namespace (i.e., container in practice).
-> > And BPF FS delegation mount options and derived BPF tokens serve as
-> > a per-container "flag" to grant overall ability to use bpf() (plus furt=
-her
-> > restrict on which parts of bpf() syscalls are treated as namespaced).
-> >
-> > Note also, BPF_TOKEN_CREATE command itself requires ns_capable(CAP_BPF)
-> > within the BPF FS owning user namespace, rounding up the ns_capable()
-> > story of BPF token.
-> >
-> > Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
-> > ---
->
-> Same concerns as in the other mail. For the bpf_token_create() code,
-> Acked-by: Christian Brauner <brauner@kernel.org>
+On Fri, Dec 8, 2023 at 8:36=E2=80=AFPM Vladimir Oltean <vladimir.oltean@nxp=
+.com> wrote:
 
-This patch set has landed in bpf-next and there are a bunch of other
-patches after it, so I presume it will be a bit problematic to add ack
-after the fact. But thanks for taking another look and acking!
+> It was a bit unclear to me what the TODO is about and what is even
+> actionable about it. I had a discussion with Florian about it at NetConf
+> 2023, and it seems that it's about the amount of boilerplate code that
+> exists in switchdev drivers, and how that could be maybe made common
+> with DSA, through something like another library.
+>
+> I think we are seeing a lot of people who are looking at DSA now,
+> and there is a lot of misunderstanding about why things are the way
+> they are, and which are the changes that would benefit the subsystem,
+> compared to the changes that go against DSA's past development trend.
+>
+> I think what is missing is the context, which is admittedly a bit
+> hard to grasp considering there are 15 years of development.
+> Based on the git log and on the discussions where I participated,
+> I tried to cobble up a section about DSA's history. Here and there,
+> I've mentioned the limitations that I am aware of, and some possible
+> ways forward.
+>
+> I'm also personally surprised by the amount of change in DSA over the
+> years, and I hope that putting things into perspective will also
+> encourage others to not think that it's set in stone the way it is now.
+>
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+
+Adding documentation is always good, and the kernel definitely
+looks better after this patch than before so:
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+
+For ease of reading I would personally restructure it a bit, by
+putting in three sections:
+
+- History
+  Pure development history (for the old code maybe add examples
+  of which switches brought about the changes, in the same way
+  that the Ocelot driver is mentioned?)
+
+- Policy
+  Do this, don't do that. The text has a few paragraphs that read
+  like so.
+
+- Future directions
+  What we want to do next, or can be expected for the future,
+  again the text has a few paragraphs that read like that.
+
+Yours,
+Linus Walleij
 
