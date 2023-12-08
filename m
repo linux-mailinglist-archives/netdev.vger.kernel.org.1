@@ -1,172 +1,84 @@
-Return-Path: <netdev+bounces-55402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5A1880AC6B
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 19:47:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAB9F80AC73
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 19:50:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C41E1F2127C
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 18:47:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B8FE2819A1
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 18:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB0001A72E;
-	Fri,  8 Dec 2023 18:47:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E28C32185;
+	Fri,  8 Dec 2023 18:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dwDid3EL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OUjDBMGB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 868DA11F;
-	Fri,  8 Dec 2023 10:46:57 -0800 (PST)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-a06e59384b6so320501466b.1;
-        Fri, 08 Dec 2023 10:46:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702061216; x=1702666016; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+dr8lBkPk/gRBWTFsMFs5wXdj0/vhpvGhmgseUu0tAY=;
-        b=dwDid3ELbjUC/pN5M/iq/HhcnyriHAt7hdjXu8j8BlBaFIrE6jzG/DQQhOh4n28rNZ
-         mzdXFbTY+UTQogXzgWd/8eSs/8h5ikq/rpdPIv7MawUNjHElFqW6qFRQcuII+qTRDhEx
-         u6I9pTjQV4K8cZU/xCZ8ItjSZsCcfcd8lGdpk2QZm5Z9tvXqgnvuqHpMna8FQSVfPJN9
-         470cWSLm8VQc/3AF0MSkZwuBjENFXk07hBTUcktcz2pMdptZR0Ieu9Sl8ACznjGD908y
-         8V8jrqcyrOfDXMFctPx1BMd/852M94YIr4xFk79SC8ggic1B9Ez4j9DOmy6pXw4x9WXg
-         mfFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702061216; x=1702666016;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+dr8lBkPk/gRBWTFsMFs5wXdj0/vhpvGhmgseUu0tAY=;
-        b=R4BbcUMFFFmP8ht/HMCsZgKfj9KyevlHN1/TfrDC2ZvqdGrRcu6+D/S/u7O92TD3WT
-         5C9ol6q6SctpmlwK/xa3XBDQJIzFTThIsGZbXUdNfvWLnAcFRbJyjKyffuEPiyZgkbmJ
-         swqJrILD/XJeeezYZsbhSBcnPDC9JHmJW4w99n+L0zJMSZZkSF29GEryhkijtRl3bCqZ
-         WBqj0ajjCU43YS1bDz6Agtt6Gxbt1xBsMI3JMSnisPlxwNCG5GE4vka93VpUBsq7DznW
-         PDEEk/hVKzj1r3NP2DSsALEERa9MnUBu9wculH0aeyu2hfG2qTkl12Pnup0je0wRDZIl
-         qK2g==
-X-Gm-Message-State: AOJu0YxDSk+AIP0c5e/8/2QvOA+Uu1aBTfx/qSVa5UDrVAUbvyyizyCN
-	f2Wmu+KETw2K8bNrRw3izEE=
-X-Google-Smtp-Source: AGHT+IFqVjj8BiPjTfdPUSjvMIkmUsDvvm2h6RNnCjnqfatSpcv/EcTXmwiu33Eu6zdyUdHxlBmCSA==
-X-Received: by 2002:a17:907:94d5:b0:9b8:b683:5837 with SMTP id dn21-20020a17090794d500b009b8b6835837mr301541ejc.46.1702061215767;
-        Fri, 08 Dec 2023 10:46:55 -0800 (PST)
-Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id d11-20020a170907272b00b00a1e2aa3d094sm1317479ejl.173.2023.12.08.10.46.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Dec 2023 10:46:55 -0800 (PST)
-Date: Fri, 8 Dec 2023 20:46:52 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Simon Horman <horms@kernel.org>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com
-Subject: Re: [PATCH net-next 07/15] net: dsa: mt7530: do not run
- mt7530_setup_port5() if port 5 is disabled
-Message-ID: <20231208184652.k2max4kf7r3fgksg@skbuf>
-References: <20231118123205.266819-1-arinc.unal@arinc9.com>
- <20231118123205.266819-8-arinc.unal@arinc9.com>
- <20231121185358.GA16629@kernel.org>
- <a2826485-70a6-4ba7-89e1-59e68e622901@arinc9.com>
- <90fde560-054e-4188-b15c-df2e082d3e33@moroto.mountain>
- <20231207184015.u7uoyfhdxiyuw6hh@skbuf>
- <9b729dab-aebc-4c0c-a5e1-164845cd0948@suswa.mountain>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E541E12B6C
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 18:50:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2A9FEC433C9;
+	Fri,  8 Dec 2023 18:50:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702061424;
+	bh=sOzOiCooIHWv8JwLcQOBgic7AA/i/2hi5qBpmG99UAQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=OUjDBMGBJIUBC6ckaV9Gmqu7y85/wcFFGAMz0R00eJ9mf/a5NWt9KcjofdBXnXQB+
+	 qj28jcFigGux3yc8FWmKsS2iQycF9hKj0LxjP6kPxVWs7avWpd5htby0gMABGNBOGJ
+	 zTOvmn/BoMftYVhSRfqN5QuOK59vvp29g7s38B+mNJxdnobhcqPTnMkOdyBlHOJjKz
+	 onX836BQUzUueQR8m5SrxkqSfDb33I3xFtxa1m+XyFSeysM4k48qgj5HGBOxmyIqwc
+	 zV8TrwL6+WaCJ8hJn9T+Jlob75GjvWPThThZJczI4hu5SoejK68TWdi5ukl+W84rQD
+	 nPEAA3kRrdsvQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0F572C04E24;
+	Fri,  8 Dec 2023 18:50:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9b729dab-aebc-4c0c-a5e1-164845cd0948@suswa.mountain>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] team: Fix use-after-free when an option instance allocation
+ fails
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170206142405.6428.2927511697282770717.git-patchwork-notify@kernel.org>
+Date: Fri, 08 Dec 2023 18:50:24 +0000
+References: <20231206123719.1963153-1-revest@chromium.org>
+In-Reply-To: <20231206123719.1963153-1-revest@chromium.org>
+To: Florent Revest <revest@chromium.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
 
-On Fri, Dec 08, 2023 at 07:23:38AM +0300, Dan Carpenter wrote:
-> On Thu, Dec 07, 2023 at 08:40:15PM +0200, Vladimir Oltean wrote:
-> > 
-> > We could be more pragmatic about this whole sparse false positive warning,
-> > and just move the "if" block which calls mt7530_setup_port5() right
-> > after the priv->p5_intf_sel assignments, instead of waiting to "break;"
-> > from the for_each_child_of_node() loop.
-> > 
-> > for_each_child_of_node(dn, mac_np) {
-> > 	if (!of_device_is_compatible(mac_np,
-> > 				     "mediatek,eth-mac"))
-> > 		continue;
-> > 
-> > 	ret = of_property_read_u32(mac_np, "reg", &id);
-> > 	if (ret < 0 || id != 1)
-> > 		continue;
-> > 
-> > 	phy_node = of_parse_phandle(mac_np, "phy-handle", 0);
-> > 	if (!phy_node)
-> > 		continue;
-> > 
-> > 	if (phy_node->parent == priv->dev->of_node->parent) {
-> > 		ret = of_get_phy_mode(mac_np, &interface);
-> > 		if (ret && ret != -ENODEV) {
-> > 			of_node_put(mac_np);
-> > 			of_node_put(phy_node);
-> > 			return ret;
-> > 		}
-> > 		id = of_mdio_parse_addr(ds->dev, phy_node);
-> > 		if (id == 0)
-> > 			priv->p5_intf_sel = P5_INTF_SEL_PHY_P0;
-> > 		if (id == 4)
-> > 			priv->p5_intf_sel = P5_INTF_SEL_PHY_P4;
-> > 
-> > 		if (priv->p5_intf_sel == P5_INTF_SEL_PHY_P0 || <---- here
-> > 		    priv->p5_intf_sel == P5_INTF_SEL_PHY_P4)
-> > 			mt7530_setup_port5(ds, interface);
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed,  6 Dec 2023 13:37:18 +0100 you wrote:
+> In __team_options_register, team_options are allocated and appended to
+> the team's option_list.
+> If one option instance allocation fails, the "inst_rollback" cleanup
+> path frees the previously allocated options but doesn't remove them from
+> the team's option_list.
+> This leaves dangling pointers that can be dereferenced later by other
+> parts of the team driver that iterate over options.
 > 
-> This doesn't solve the problem that Smatch doesn't know what the
-> original value of priv->p5_intf_sel.  And also I don't like this code
-> because now we call mt7530_setup_port5() on every iteration after
-> we find the first P5_INTF_SEL_PHY_P0.
+> [...]
 
-You seem to have not parsed the "break" from 4 lines below. There is at
-most one iteration through for_each_child_of_node().
+Here is the summary with links:
+  - team: Fix use-after-free when an option instance allocation fails
+    https://git.kernel.org/netdev/net/c/c12296bbecc4
 
-And why would the "original" value of priv->p5_intf_sel matter? Original
-or modified by the "if (id == 0)" and "if (id == 4)" blocks, the code
-has already executed the of_get_phy_mode(&interface) call, by the time
-we reach the "if" that calls mt7530_setup_port5().
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Hmm, maybe the problem, all along, was that we let the -ENODEV return
-code from of_get_phy_mode() pass through? "interface" will really be
-uninitialized in that case. It's not a false positive.
 
-Instead of:
-
-	ret = of_get_phy_mode(mac_np, &interface);
-	if (ret && ret != -ENODEV) {
-		...
-		return ret;
-	}
-
-it should have been like this, to not complain:
-
-	ret = of_get_phy_mode(mac_np, &interface);
-	if (ret) {
-		...
-		return ret;
-	}
-
-> > 	}
-> > 	of_node_put(mac_np);
-> > 	of_node_put(phy_node);
-> > 	break;
-> > }
 
