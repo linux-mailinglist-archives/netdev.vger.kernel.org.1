@@ -1,69 +1,87 @@
-Return-Path: <netdev+bounces-55172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B8D7809AF1
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 05:20:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1422B809AF5
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 05:23:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DD631C20C61
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 04:20:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44E4F1C20ADA
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 04:23:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC3B9522A;
-	Fri,  8 Dec 2023 04:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B0E3523B;
+	Fri,  8 Dec 2023 04:23:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IggVgGwP"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MbI5cu+v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30AFD171C;
-	Thu,  7 Dec 2023 20:19:57 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1ce28faa92dso12571605ad.2;
-        Thu, 07 Dec 2023 20:19:57 -0800 (PST)
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 560C3171C
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 20:23:45 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-40b27726369so18391585e9.0
+        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 20:23:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702009196; x=1702613996; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1702009424; x=1702614224; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GKFRLwSxv1vJ4nhOqNlCSQcP54rZnxuYa97Rugmsvrg=;
-        b=IggVgGwP+HH44pT5JSqVYrBoPYVUbeDVrHV/LRkO7Ogx3fAW7caMCQzmoSCTvdZdeD
-         nl5k3G195/0M0j/Qa502ICkKWvr8WQFQY0X0URl/RLn001u8ImENMAT4GEEfHcwDop/T
-         mxbgyY6oPNLZ+IwMx/xYlS/oT7/rQ7qkDusmMroVbIw8sMVw5frap1k8nOkEPetO8wGq
-         3sal/oTP6ZblBR2fG+SRWO1DfX1cINe4UCDrfjFh24yZYvX86TgdqYIbiP9LwHYC2pFh
-         Ecfu+g6I13fx/bZD4hYdBwsVsS3K0tqh+aHXValBYAIoUkozaVVu+BS0VSwfNPM/sCVJ
-         e/DA==
+        bh=SPl6U0GokDKYjf8mFtBabOMqth1qqIW6W4U8DQpUoFQ=;
+        b=MbI5cu+vG+FkNB6axRSRHqcLezZQ8RXfRcUsyzkVlOnlrkTFke8AZL6p4RHnrQ+kaj
+         7lfDbYl62k0qRqFJ6uJw25+vDB0uNQDQSS0BZMfw0wYsc2H51tC2YpqPmU+jcI6jeYqg
+         Wgp/qryjFiM6r7thcyyKt+5DpEXCmEZswmVlTfnxD6m+HLGVFkBMsYCr20+3pHwWNjLG
+         33sz7QubTOf6RUmOuENNp8aYF6z0KJA2LKTKVHJy2mMmUwcWF0Cye6lraw47UNYnQOCs
+         En6OTXoo5F/VkRXcXUD7TllTmVIjM2fd2BFCdZ43Tmt9SlQgqDF6KfcrTUwBkKlw5h8+
+         grWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702009196; x=1702613996;
+        d=1e100.net; s=20230601; t=1702009424; x=1702614224;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GKFRLwSxv1vJ4nhOqNlCSQcP54rZnxuYa97Rugmsvrg=;
-        b=GngnwaQWK+nBRGAuq1MOpCfuVmN6qGnbFEGzLJB8ddXx+LwPMUDZYMUYUxFSgfI+uZ
-         dUjYXZikYKfBqNWk42eyPIOeyIdoEZRKY/1WONnhNkKMXlupEDRBBe5hcbpPxr4k/4KA
-         b0Qeu8ljfFaipmSk4G8Xf9k5P7y52ZJmbYUD4f9+cwhalddbb6QSCdG7xGs6em+Mm7R/
-         /uN6KvnoClW56kVCpqTdItNyAGfGmWrbovKwP3l/KQAOe8xgWi2n005Eio2vvhcALz/a
-         Kg4/5nuyIuUGG6R6xOCORihZkvGmfHgHUJ5FzDE0m3B5aenG4Qdas87VpfNgXSmX7uap
-         WBwQ==
-X-Gm-Message-State: AOJu0YxtB97ulCpM4aAVilGXN7uUdvRAJ8nU+Sxtt+dRYm2yvQcC1QRG
-	i/jwJY9UCYYD96WZ3BwqQXM=
-X-Google-Smtp-Source: AGHT+IEPStiPwIuC2knFZwYV9zbYDtl5HZW3T/BSaLsxQVHZ8lxrS4BxdwsdCt2RF0mu/w5F0TNfQA==
-X-Received: by 2002:a17:902:ee4d:b0:1ca:86b:7ed9 with SMTP id 13-20020a170902ee4d00b001ca086b7ed9mr3139371plo.40.1702009196525;
-        Thu, 07 Dec 2023 20:19:56 -0800 (PST)
-Received: from localhost ([2601:647:5b81:12a0:4a12:bf1a:86b1:d99d])
-        by smtp.gmail.com with ESMTPSA id ja17-20020a170902efd100b001bf8779e051sm622269plb.289.2023.12.07.20.19.55
+        bh=SPl6U0GokDKYjf8mFtBabOMqth1qqIW6W4U8DQpUoFQ=;
+        b=IYmmkxAfcSx46ev2I6DU3K9fQjbw/1x+ezoD5kvUiS5zEjY0K2VCWIICvcpjkMu1G6
+         1234l3kQqGDG0xm13f9eeY/OmkjreWSVft2M5gxfCaX5zYXCUGVOrok4HsThVZWEcxVh
+         CnkssZOoka6w1VfmOrGuxIKaw2K+KmAkEZCj9cj33tK5ekEKGWthndJGaLlAqJ5PItu1
+         tPsTWjvZS7GVXKG7XC5jSIhiYDlE5Vkut3cPmkJmZkeGig8kScz3e8FJ4XIA3Tbqps4X
+         S7h1J5tp7QtY7iFMWvZ36zCIqjabjxU6qQXaoQDT0Kl1ReSbi4DOi+BM5BKtcSE2aGsW
+         VU4w==
+X-Gm-Message-State: AOJu0YyeDb4qcaTY2JKploL5RMci9PVmn8Cwcm3F5IeqUcw34zOKKB8q
+	xeedGIGwo4fRsMtxlJznbHfAsA==
+X-Google-Smtp-Source: AGHT+IGb8HNYcf4CwqR2mNQtwvE2sIxWS6ha8l/UWovNTRhq1viL+9jJuZvP6Uejra7pVJ3NHVKIxA==
+X-Received: by 2002:a05:600c:4651:b0:40c:2518:687c with SMTP id n17-20020a05600c465100b0040c2518687cmr1507452wmo.61.1702009423621;
+        Thu, 07 Dec 2023 20:23:43 -0800 (PST)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id gw18-20020a05600c851200b004063c9f68f2sm1470710wmb.26.2023.12.07.20.23.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Dec 2023 20:19:55 -0800 (PST)
-Date: Thu, 7 Dec 2023 20:19:55 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: John Fastabend <john.fastabend@gmail.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, bpf@vger.kernel.org,
-	edumazet@google.com, jakub@cloudflare.com, martin.lau@kernel.org,
-	netdev@vger.kernel.org, amery.hung@bytedance.com
-Subject: Re: [PATCH bpf v2 1/2] bpf: syzkaller found null ptr deref in
- unix_bpf proto add
-Message-ID: <ZXKZa4RRmK2M6iHT@pop-os.localdomain>
-References: <20231201180139.328529-2-john.fastabend@gmail.com>
- <20231201211453.27432-1-kuniyu@amazon.com>
- <656e4758675b9_1bd6e2086f@john.notmuch>
+        Thu, 07 Dec 2023 20:23:43 -0800 (PST)
+Date: Fri, 8 Dec 2023 07:23:38 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Simon Horman <horms@kernel.org>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com
+Subject: Re: [PATCH net-next 07/15] net: dsa: mt7530: do not run
+ mt7530_setup_port5() if port 5 is disabled
+Message-ID: <9b729dab-aebc-4c0c-a5e1-164845cd0948@suswa.mountain>
+References: <20231118123205.266819-1-arinc.unal@arinc9.com>
+ <20231118123205.266819-8-arinc.unal@arinc9.com>
+ <20231121185358.GA16629@kernel.org>
+ <a2826485-70a6-4ba7-89e1-59e68e622901@arinc9.com>
+ <90fde560-054e-4188-b15c-df2e082d3e33@moroto.mountain>
+ <20231207184015.u7uoyfhdxiyuw6hh@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,53 +90,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <656e4758675b9_1bd6e2086f@john.notmuch>
+In-Reply-To: <20231207184015.u7uoyfhdxiyuw6hh@skbuf>
 
-On Mon, Dec 04, 2023 at 01:40:40PM -0800, John Fastabend wrote:
-> Kuniyuki Iwashima wrote:
-> > From: John Fastabend <john.fastabend@gmail.com>
-> > Date: Fri,  1 Dec 2023 10:01:38 -0800
-> > > I added logic to track the sock pair for stream_unix sockets so that we
-> > > ensure lifetime of the sock matches the time a sockmap could reference
-> > > the sock (see fixes tag). I forgot though that we allow af_unix unconnected
-> > > sockets into a sock{map|hash} map.
-> > > 
-> > > This is problematic because previous fixed expected sk_pair() to exist
-> > > and did not NULL check it. Because unconnected sockets have a NULL
-> > > sk_pair this resulted in the NULL ptr dereference found by syzkaller.
-> > > 
-> > > BUG: KASAN: null-ptr-deref in unix_stream_bpf_update_proto+0x72/0x430 net/unix/unix_bpf.c:171
-> > > Write of size 4 at addr 0000000000000080 by task syz-executor360/5073
-> > > Call Trace:
-> > >  <TASK>
-> > >  ...
-> > >  sock_hold include/net/sock.h:777 [inline]
-> > >  unix_stream_bpf_update_proto+0x72/0x430 net/unix/unix_bpf.c:171
-> > >  sock_map_init_proto net/core/sock_map.c:190 [inline]
-> > >  sock_map_link+0xb87/0x1100 net/core/sock_map.c:294
-> > >  sock_map_update_common+0xf6/0x870 net/core/sock_map.c:483
-> > >  sock_map_update_elem_sys+0x5b6/0x640 net/core/sock_map.c:577
-> > >  bpf_map_update_value+0x3af/0x820 kernel/bpf/syscall.c:167
-> > > 
-> > > We considered just checking for the null ptr and skipping taking a ref
-> > > on the NULL peer sock. But, if the socket is then connected() after
-> > > being added to the sockmap we can cause the original issue again. So
-> > > instead this patch blocks adding af_unix sockets that are not in the
-> > > ESTABLISHED state.
-> > 
-> > I'm not sure if someone has the unconnected stream socket use case
-> > though, can't we call additional sock_hold() in connect() by checking
-> > sk_prot under sk_callback_lock ?
+On Thu, Dec 07, 2023 at 08:40:15PM +0200, Vladimir Oltean wrote:
 > 
-> Could be done I guess yes. I'm not sure the utility of it though. I
-> thought above patch was the simplest solution and didn't require touching
-> main af_unix code. I don't actually use the sockmap with af_unix
-> sockets anywhere so maybe someone who is using this can comment if
-> unconnected is needed?
+> We could be more pragmatic about this whole sparse false positive warning,
+> and just move the "if" block which calls mt7530_setup_port5() right
+> after the priv->p5_intf_sel assignments, instead of waiting to "break;"
+> from the for_each_child_of_node() loop.
 > 
+> for_each_child_of_node(dn, mac_np) {
+> 	if (!of_device_is_compatible(mac_np,
+> 				     "mediatek,eth-mac"))
+> 		continue;
+> 
+> 	ret = of_property_read_u32(mac_np, "reg", &id);
+> 	if (ret < 0 || id != 1)
+> 		continue;
+> 
+> 	phy_node = of_parse_phandle(mac_np, "phy-handle", 0);
+> 	if (!phy_node)
+> 		continue;
+> 
+> 	if (phy_node->parent == priv->dev->of_node->parent) {
+> 		ret = of_get_phy_mode(mac_np, &interface);
+> 		if (ret && ret != -ENODEV) {
+> 			of_node_put(mac_np);
+> 			of_node_put(phy_node);
+> 			return ret;
+> 		}
+> 		id = of_mdio_parse_addr(ds->dev, phy_node);
+> 		if (id == 0)
+> 			priv->p5_intf_sel = P5_INTF_SEL_PHY_P0;
+> 		if (id == 4)
+> 			priv->p5_intf_sel = P5_INTF_SEL_PHY_P4;
+> 
+> 		if (priv->p5_intf_sel == P5_INTF_SEL_PHY_P0 || <---- here
+> 		    priv->p5_intf_sel == P5_INTF_SEL_PHY_P4)
+> 			mt7530_setup_port5(ds, interface);
 
-Our use case is also connected unix stream socket, as demonstrated in
-the selftest unix_redir_to_connected().
+This doesn't solve the problem that Smatch doesn't know what the
+original value of priv->p5_intf_sel.  And also I don't like this code
+because now we call mt7530_setup_port5() on every iteration after
+we find the first P5_INTF_SEL_PHY_P0.
 
-Thanks.
+> 	}
+> 	of_node_put(mac_np);
+> 	of_node_put(phy_node);
+> 	break;
+> }
+
+Let's not worry too much about false positives.  We can just ignore
+them.  There is always a trade off between false positives and false
+negatives.  With GCC we try to get a clean run with no warnings, but
+with Smatch I'm targetting the false positive ratio at "this is worth
+reviewing one time."
+
+regards,
+dan carpenter
+
 
