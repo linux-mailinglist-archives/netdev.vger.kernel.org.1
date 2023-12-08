@@ -1,105 +1,113 @@
-Return-Path: <netdev+bounces-55235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8EE9809F4C
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 10:28:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0611D809F4F
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 10:28:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FC0E1F2102B
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 09:28:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90FA1B20B5A
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 09:28:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 224D0125A7;
-	Fri,  8 Dec 2023 09:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 289E4125CE;
+	Fri,  8 Dec 2023 09:28:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Mg2s7S0A"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5B1F1724;
-	Fri,  8 Dec 2023 01:28:13 -0800 (PST)
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3B89RiMA2781900, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3B89RiMA2781900
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 8 Dec 2023 17:27:44 +0800
-Received: from RTEXMBS02.realtek.com.tw (172.21.6.95) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Fri, 8 Dec 2023 17:27:45 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS02.realtek.com.tw (172.21.6.95) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Fri, 8 Dec 2023 17:27:44 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7]) by
- RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7%5]) with mapi id
- 15.01.2375.007; Fri, 8 Dec 2023 17:27:44 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "andrew@lunn.ch"
-	<andrew@lunn.ch>, Ping-Ke Shih <pkshih@realtek.com>,
-        Larry Chiu
-	<larry.chiu@realtek.com>
-Subject: RE: [PATCH net-next v13 01/13] rtase: Add pci table supported in this module
-Thread-Topic: [PATCH net-next v13 01/13] rtase: Add pci table supported in
- this module
-Thread-Index: AQHaI4J1hYqre02tzkGBvHQzDpC7MLCU5PoAgAV9LKCAALy7AIAECGwQ
-Date: Fri, 8 Dec 2023 09:27:44 +0000
-Message-ID: <e5281291c4c04630ab818fdc8394841b@realtek.com>
-References: <20231130114327.1530225-1-justinlai0215@realtek.com>
-	<20231130114327.1530225-2-justinlai0215@realtek.com>
-	<20231201203602.7e380716@kernel.org>
-	<ae4807e31b53452ebf176098d95cf1fb@realtek.com>
- <20231205194050.7033cc2b@kernel.org>
-In-Reply-To: <20231205194050.7033cc2b@kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-kse-serverinfo: RTEXMBS02.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C92CB172E;
+	Fri,  8 Dec 2023 01:28:14 -0800 (PST)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B81KRK0028755;
+	Fri, 8 Dec 2023 01:28:01 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0220;
+ bh=/SbDv81f8aUiAQr9WB+KgRejK4bzCZNzWZChpeYFMdQ=;
+ b=Mg2s7S0AgHZg+UZ8F7cZgKwQNBAdpQZlye56Mx9YFtrg0eOsy+TWqoYNBgm9HOokcjik
+ FDIsraN7ggk/i34x5t6g0c3DpkfYQKBLg9GeouXDvEAIqvaxNgLkKqAW0nPw61gjFrYW
+ EDVgT8pcl8QP6LC7Pgkz7Vu6RiW1KhlbY5h26UkE3hpDTcNfgErDweDUBmZsRLb5CjQu
+ M2idBUC/naRGAucUc7xma37m0OSUx+Zd4Sd5XoGygvvxKra+IVxmXl9ZzEgmOVhUUcPZ
+ jC7xAyHaCOBmij90UmJxVmqKjtjipXcUwuv8Axd8eQk4o8KXdThfV0ES8ATEBssCcQAK og== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3uubddcfuk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Fri, 08 Dec 2023 01:28:01 -0800
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 8 Dec
+ 2023 01:27:59 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Fri, 8 Dec 2023 01:27:59 -0800
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 4E1BB3F7050;
+	Fri,  8 Dec 2023 01:27:55 -0800 (PST)
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <jerinj@marvell.com>, <lcherian@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>, <naveenm@marvell.com>,
+        <edumazet@google.com>, <pabeni@redhat.com>
+Subject: [net] octeontx2-af: Fix pause frame configuration
+Date: Fri, 8 Dec 2023 14:57:54 +0530
+Message-ID: <20231208092754.23462-1-hkelam@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: Hso7myGnRPfBIIAZF8GX1tvom3R3czf0
+X-Proofpoint-GUID: Hso7myGnRPfBIIAZF8GX1tvom3R3czf0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-08_04,2023-12-07_01,2023-05-22_02
 
->=20
-> On Wed, 6 Dec 2023 03:28:32 +0000 Justin Lai wrote:
-> > > > +static void rtase_remove_one(struct pci_dev *pdev) {
-> > > > +     struct net_device *dev =3D pci_get_drvdata(pdev);
-> > > > +     struct rtase_private *tp =3D netdev_priv(dev);
-> > > > +     struct rtase_int_vector *ivec;
-> > > > +     u32 i;
-> > > > +
-> > > > +     for (i =3D 0; i < tp->int_nums; i++) {
-> > > > +             ivec =3D &tp->int_vector[i];
-> > > > +             netif_napi_del(&ivec->napi);
-> > >
-> > > NAPI instances should be added on ndo_open()
-> >
-> > Do you want me to call netif_napi_add() in the .ndo_open function, and
-> > netif_napi_del() in the .ndo_stop function? However, I saw that many
-> > drivers do it in probe and remove. What is the purpose of doing this
-> > in .ndo_open and .ndo_stop?
->=20
-> They will sit in a fixed-size hash table used for NAPI lookup in the core=
-. Not a
-> big deal, but not the best way either.
->=20
-> I think the main thing that prompted me to ask was that I couldn't find
-> napi_disable() in the first few patches. You should probably call it on c=
-lose,
-> otherwise making sure NAPI is not running when you start freeing rings is=
- hard.
-> synchronize_irq() will not help you at all if you're using NAPI.
+The current implementation's default Pause Forward setting is causing
+unnecessary network traffic. This patch disables Pause Forward to
+address this issue.
 
-Thanks, I will call napi_disable() on close to fix this issue.
+Fixes: 1121f6b02e7a ("octeontx2-af: Priority flow control configuration support")
+Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/af/rpm.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rpm.c b/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
+index af21e2030cff..4728ba34b0e3 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
+@@ -373,6 +373,11 @@ void rpm_lmac_pause_frm_config(void *rpmd, int lmac_id, bool enable)
+ 	cfg |= RPMX_MTI_MAC100X_COMMAND_CONFIG_TX_P_DISABLE;
+ 	rpm_write(rpm, lmac_id, RPMX_MTI_MAC100X_COMMAND_CONFIG, cfg);
+ 
++	/* Disable forward pause to driver */
++	cfg = rpm_read(rpm, lmac_id, RPMX_MTI_MAC100X_COMMAND_CONFIG);
++	cfg &= ~RPMX_MTI_MAC100X_COMMAND_CONFIG_PAUSE_FWD;
++	rpm_write(rpm, lmac_id, RPMX_MTI_MAC100X_COMMAND_CONFIG, cfg);
++
+ 	/* Enable channel mask for all LMACS */
+ 	if (is_dev_rpm2(rpm))
+ 		rpm_write(rpm, lmac_id, RPM2_CMR_CHAN_MSK_OR, 0xffff);
+@@ -616,12 +621,10 @@ int rpm_lmac_pfc_config(void *rpmd, int lmac_id, u8 tx_pause, u8 rx_pause, u16 p
+ 
+ 	if (rx_pause) {
+ 		cfg &= ~(RPMX_MTI_MAC100X_COMMAND_CONFIG_RX_P_DISABLE |
+-				RPMX_MTI_MAC100X_COMMAND_CONFIG_PAUSE_IGNORE |
+-				RPMX_MTI_MAC100X_COMMAND_CONFIG_PAUSE_FWD);
++			 RPMX_MTI_MAC100X_COMMAND_CONFIG_PAUSE_IGNORE);
+ 	} else {
+ 		cfg |= (RPMX_MTI_MAC100X_COMMAND_CONFIG_RX_P_DISABLE |
+-				RPMX_MTI_MAC100X_COMMAND_CONFIG_PAUSE_IGNORE |
+-				RPMX_MTI_MAC100X_COMMAND_CONFIG_PAUSE_FWD);
++			RPMX_MTI_MAC100X_COMMAND_CONFIG_PAUSE_IGNORE);
+ 	}
+ 
+ 	if (tx_pause) {
+-- 
+2.17.1
+
 
