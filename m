@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-55180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60E99809B32
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 05:52:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59D03809B33
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 05:52:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E52EEB20D33
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 04:52:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E04B281E38
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 04:52:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D36775221;
-	Fri,  8 Dec 2023 04:52:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF2515231;
+	Fri,  8 Dec 2023 04:52:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NVRINDQ9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GliKuIyG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1946F1720
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 20:52:01 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6ceb93fb381so942089b3a.0
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 20:52:01 -0800 (PST)
+Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F04C210DF
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 20:52:04 -0800 (PST)
+Received: by mail-oi1-x233.google.com with SMTP id 5614622812f47-3b9e6262fccso505562b6e.3
+        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 20:52:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702011119; x=1702615919; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1702011124; x=1702615924; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kpH6jZQ9zwuKUS/xyDafAoPM/JI3TSc6VKYkKHHLkJc=;
-        b=NVRINDQ99SbELl2yxIUHUrIY/EphkpLID8EVVN1Y4qw+A1QD6Bzsp7cKFmgyYffgI5
-         0+fJDhVvlunElwKNtB493PCpnR2jofcgmhwuBvNppsBh3ioSR2KhGR08+E2pPyDt431+
-         ZGdbrGkhCPBuyrN3c3pKgSlEWrctK2fNHp2rJfRuT9DOjoX9/qUJt+yh+Ft9+2KbbHlF
-         70rDwL6jeNBoyhf5pJW7eApiBce1KrEk4+gKvMrUtiAPY61H2NLn3KbZq0DhDp97uS3S
-         P5csgjZeLfEewhSODmDQOKRMRfvRW6WbP3FJFeIJ5WURhQ3EIMPrwdC1qtt15jSJ5PRT
-         WGpw==
+        bh=gaLuLAvvhJHcsb9yo6DwDQL3NLBHLYnwTPlqBlfiIYo=;
+        b=GliKuIyGMkRCMtlAkNn2wTdWMvFuyKTT5oULKdKZi8YgCrf3zAmD/sNSu/Cnq4JAba
+         eHOpUJbBKtF1ngvxwBEC1IWj4smCXjR0IDv48nuM7deL+4rE3xg8E7ISqjn8RLQwGM+i
+         jOLB8e6CdNUnelj9qW1XKBD/DQM8DL7Zj1uFbCrWAyAekBNzbf5fdBt24K+ZAZYhkIN+
+         MAz1l0JZwK5vfRX9d0d0jH1+MlHiF5QdRvMTkHrQZYvwhuHxG5vOJhBGxe0cesitInp5
+         wXyOhykuRw3rMEzUb54XzWGmQzxFdmcTnV7irnvpB0J+qARFv9lUlIb3xETVR8pg7tuB
+         RYvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702011119; x=1702615919;
+        d=1e100.net; s=20230601; t=1702011124; x=1702615924;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kpH6jZQ9zwuKUS/xyDafAoPM/JI3TSc6VKYkKHHLkJc=;
-        b=WekmV+AmYa5tMbAAXM5h3Py7rP+0QH7MjmO+DO0gs10s7Qyuj2LfXj91H8mB/IHlPK
-         LpaeWHAVFofPWID3VuwNPbg4ABqOLpVII8AehUEkxMlzf1ci+K9VRlwgYmKoj9fh0MEK
-         nrZH9ROPnTQcxEcQrm6pP75p0PVdNBK0gtiQkwMNysVU3kri83IhAtzXhjwiJP73i5cJ
-         dXYOLwk75oxhPGqEarQo6wSaF2BrE6x0JoIiDvJYQAfKkjmt6jyuJRw+waEuj8FgDuOr
-         sTltGCucS1CEOKjvAGDtpoV5vYHIQGfOLU1Qk3xC8bS+selG9JoL74x6zkqLPGvusGhn
-         Esrg==
-X-Gm-Message-State: AOJu0YwvVtmBnZnF0uaom8pHLTccOUFOriLF5Qr0U8EAe0331fuwLGAW
-	yRlTvIOlEebcC+BkgAxDgsud6tBWUyE+vOMS
-X-Google-Smtp-Source: AGHT+IEgA7gOazd6nwVESsBj+HX5jRK1MDRamGL65Eqm+w5rlMthhXQYsw6skLnUnpViYZNgIs2sjw==
-X-Received: by 2002:a05:6a21:a5a2:b0:18b:826d:1e89 with SMTP id gd34-20020a056a21a5a200b0018b826d1e89mr444470pzc.12.1702011119655;
-        Thu, 07 Dec 2023 20:51:59 -0800 (PST)
+        bh=gaLuLAvvhJHcsb9yo6DwDQL3NLBHLYnwTPlqBlfiIYo=;
+        b=ezHBuU06s4nrTled4O/rule4dA+7JtiLnIiMcTe11ezmedZXa0nHKUpG5AIkyd+if7
+         0tPdrbIRs9kO73AysA3L2msytDGGTlzr8MiHRTvv4sHrYrqsFOJJ8MpHTHxAxXA9UOlN
+         OKQS9LIjsjsbNfbsonZuqNYuguyV70LodE/0I5tJu0sRy4AHlS8kXGUuhpX6kpSf6MKZ
+         njA6TmvGFOIRRKCfmLW2iRPHfw7j8lFhNp8K2qVdLvjHwqICAYwlQ3azLjDnna/euZm+
+         7NhQdqpyleMtAf1i2MWZ+3baiO84uAy/G5J6djd6X2WQfQ3DDfj1giDlAi4Ijbw/T0Hz
+         O86A==
+X-Gm-Message-State: AOJu0Yz4xC5Nx7ZN3RyRS8lqpjCB7IRrajoYVtXdQLoA7o+d57efUwbF
+	gyEtNBb58LJE9eiSjdHcWUg0oxtEijQdQdwJ
+X-Google-Smtp-Source: AGHT+IGizaBXvO2zagkwxnbAeIA91QDveLCjsbxmmJ1ylOjk8qizP/0fLB96qvQC2Km9rw5QIDXTVg==
+X-Received: by 2002:a54:4483:0:b0:3b9:dd4d:721b with SMTP id v3-20020a544483000000b003b9dd4d721bmr2132687oiv.65.1702011123733;
+        Thu, 07 Dec 2023 20:52:03 -0800 (PST)
 Received: from tresc054937.tre-sc.gov.br ([2804:c:204:200:2be:43ff:febc:c2fb])
-        by smtp.gmail.com with ESMTPSA id f18-20020a056a00229200b006cbae51f335sm657865pfe.144.2023.12.07.20.51.56
+        by smtp.gmail.com with ESMTPSA id f18-20020a056a00229200b006cbae51f335sm657865pfe.144.2023.12.07.20.51.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Dec 2023 20:51:59 -0800 (PST)
+        Thu, 07 Dec 2023 20:52:03 -0800 (PST)
 From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 To: netdev@vger.kernel.org
 Cc: linus.walleij@linaro.org,
@@ -66,9 +66,9 @@ Cc: linus.walleij@linaro.org,
 	pabeni@redhat.com,
 	arinc.unal@arinc9.com,
 	Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Subject: [PATCH net-next 5/7] net: dsa: realtek: merge interface modules into common
-Date: Fri,  8 Dec 2023 01:41:41 -0300
-Message-ID: <20231208045054.27966-6-luizluca@gmail.com>
+Subject: [PATCH net-next 6/7] net: dsa: realtek: migrate user_mii setup to common
+Date: Fri,  8 Dec 2023 01:41:42 -0300
+Message-ID: <20231208045054.27966-7-luizluca@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231208045054.27966-1-luizluca@gmail.com>
 References: <20231208045054.27966-1-luizluca@gmail.com>
@@ -80,91 +80,340 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-As both realtek-common and realtek-{smi,mdio} must always be loaded
-together, we can save some resources merging them into a single module.
+Although there are many mentions to SMI in in the user mdio driver,
+including its compatible string, there is nothing special about the SMI
+interface in the user mdio bus. That way, the code was migrated to the
+common module.
+
+All references to SMI were removed, except for the compatible string
+that will still work but warn about using the mdio node name instead.
+
+The variant ds_ops_{smi,mdio} fields were rename to, respectively,
+ds_ops_custom_user_mdio and ds_ops_default_user_mdio.
+
+The priv->setup_interface() is also gone. If the ds_ops defines
+phy_read/write, it means DSA will handle the user_mii_bus. We don't need
+to check in another place. Also, with the function that would define
+setup_interface() in common, we can call it directly.
 
 Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 ---
- drivers/net/dsa/realtek/Kconfig          | 4 ++--
- drivers/net/dsa/realtek/Makefile         | 8 +++++---
- drivers/net/dsa/realtek/realtek-common.c | 1 +
- drivers/net/dsa/realtek/realtek-mdio.c   | 4 ----
- drivers/net/dsa/realtek/realtek-smi.c    | 4 ----
- 5 files changed, 8 insertions(+), 13 deletions(-)
+ drivers/net/dsa/realtek/realtek-common.c | 67 ++++++++++++++++++++++++
+ drivers/net/dsa/realtek/realtek-common.h |  1 +
+ drivers/net/dsa/realtek/realtek-mdio.c   |  2 +-
+ drivers/net/dsa/realtek/realtek-smi.c    | 61 +--------------------
+ drivers/net/dsa/realtek/realtek.h        |  5 +-
+ drivers/net/dsa/realtek/rtl8365mb.c      | 12 ++---
+ drivers/net/dsa/realtek/rtl8366rb.c      | 12 ++---
+ 7 files changed, 84 insertions(+), 76 deletions(-)
 
-diff --git a/drivers/net/dsa/realtek/Kconfig b/drivers/net/dsa/realtek/Kconfig
-index 9d182fde11b4..6989972eebc3 100644
---- a/drivers/net/dsa/realtek/Kconfig
-+++ b/drivers/net/dsa/realtek/Kconfig
-@@ -16,14 +16,14 @@ menuconfig NET_DSA_REALTEK
- if NET_DSA_REALTEK
- 
- config NET_DSA_REALTEK_MDIO
--	tristate "Realtek MDIO interface support"
-+	bool "Realtek MDIO interface support"
- 	depends on OF
- 	help
- 	  Select to enable support for registering switches configured
- 	  through MDIO.
- 
- config NET_DSA_REALTEK_SMI
--	tristate "Realtek SMI interface support"
-+	bool "Realtek SMI interface support"
- 	depends on OF
- 	help
- 	  Select to enable support for registering switches connected
-diff --git a/drivers/net/dsa/realtek/Makefile b/drivers/net/dsa/realtek/Makefile
-index 5e0c1ef200a3..88f6652f9850 100644
---- a/drivers/net/dsa/realtek/Makefile
-+++ b/drivers/net/dsa/realtek/Makefile
-@@ -1,7 +1,9 @@
- # SPDX-License-Identifier: GPL-2.0
--obj-$(CONFIG_NET_DSA_REALTEK)		+= realtek-common.o
--obj-$(CONFIG_NET_DSA_REALTEK_MDIO) 	+= realtek-mdio.o
--obj-$(CONFIG_NET_DSA_REALTEK_SMI) 	+= realtek-smi.o
-+obj-$(CONFIG_NET_DSA_REALTEK)		+= realtek_common.o
-+realtek_common-objs-y			:= realtek-common.o
-+realtek_common-objs-$(CONFIG_NET_DSA_REALTEK_MDIO) += realtek-mdio.o
-+realtek_common-objs-$(CONFIG_NET_DSA_REALTEK_SMI) += realtek-smi.o
-+realtek_common-objs			:= $(realtek_common-objs-y)
- obj-$(CONFIG_NET_DSA_REALTEK_RTL8366RB) += rtl8366.o
- rtl8366-objs 				:= rtl8366-core.o rtl8366rb.o
- obj-$(CONFIG_NET_DSA_REALTEK_RTL8365MB) += rtl8365mb.o
 diff --git a/drivers/net/dsa/realtek/realtek-common.c b/drivers/net/dsa/realtek/realtek-common.c
-index 75b6aa071990..73c25d114dd3 100644
+index 73c25d114dd3..64a55cb1ea05 100644
 --- a/drivers/net/dsa/realtek/realtek-common.c
 +++ b/drivers/net/dsa/realtek/realtek-common.c
-@@ -132,5 +132,6 @@ void realtek_common_remove(struct realtek_priv *priv)
- EXPORT_SYMBOL(realtek_common_remove);
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0+
  
- MODULE_AUTHOR("Luiz Angelo Daros de Luca <luizluca@gmail.com>");
-+MODULE_AUTHOR("Linus Walleij <linus.walleij@linaro.org>");
- MODULE_DESCRIPTION("Realtek DSA switches common module");
- MODULE_LICENSE("GPL");
+ #include <linux/module.h>
++#include <linux/of_mdio.h>
+ 
+ #include "realtek.h"
+ #include "realtek-common.h"
+@@ -21,6 +22,72 @@ void realtek_common_unlock(void *ctx)
+ }
+ EXPORT_SYMBOL_GPL(realtek_common_unlock);
+ 
++static int realtek_common_user_mdio_read(struct mii_bus *bus, int addr,
++					 int regnum)
++{
++	struct realtek_priv *priv = bus->priv;
++
++	return priv->ops->phy_read(priv, addr, regnum);
++}
++
++static int realtek_common_user_mdio_write(struct mii_bus *bus, int addr,
++					  int regnum, u16 val)
++{
++	struct realtek_priv *priv = bus->priv;
++
++	return priv->ops->phy_write(priv, addr, regnum, val);
++}
++
++int realtek_common_setup_user_mdio(struct dsa_switch *ds)
++{
++	struct realtek_priv *priv =  ds->priv;
++	struct device_node *mdio_np;
++	const char compatible = "realtek,smi-mdio";
++	int ret;
++
++	mdio_np = of_get_child_by_name(priv->dev->of_node, "mdio");
++	if (!mdio_np) {
++		mdio_np = of_get_compatible_child(priv->dev->of_node, compatible);
++		if (!mdio_np) {
++			dev_err(priv->dev, "no MDIO bus node\n");
++			return -ENODEV;
++		}
++		dev_warn(priv->dev,
++			 "Rename node '%s' to 'mdio' and remove compatible '%s'",
++			 mdio_np->name, compatible);
++	}
++
++	priv->user_mii_bus = devm_mdiobus_alloc(priv->dev);
++	if (!priv->user_mii_bus) {
++		ret = -ENOMEM;
++		goto err_put_node;
++	}
++	priv->user_mii_bus->priv = priv;
++	priv->user_mii_bus->name = "Realtek user MII";
++	priv->user_mii_bus->read = realtek_common_user_mdio_read;
++	priv->user_mii_bus->write = realtek_common_user_mdio_write;
++	snprintf(priv->user_mii_bus->id, MII_BUS_ID_SIZE, "Realtek-%d",
++		 ds->index);
++	priv->user_mii_bus->parent = priv->dev;
++	ds->user_mii_bus = priv->user_mii_bus;
++
++	ret = devm_of_mdiobus_register(priv->dev, priv->user_mii_bus, mdio_np);
++	of_node_put(mdio_np);
++	if (ret) {
++		dev_err(priv->dev, "unable to register MDIO bus %s\n",
++			priv->user_mii_bus->id);
++		return ret;
++	}
++
++	return 0;
++
++err_put_node:
++	of_node_put(mdio_np);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(realtek_common_setup_user_mdio);
++
+ struct realtek_priv *
+ realtek_common_probe_pre(struct device *dev, struct regmap_config rc,
+ 			 struct regmap_config rc_nolock)
+diff --git a/drivers/net/dsa/realtek/realtek-common.h b/drivers/net/dsa/realtek/realtek-common.h
+index 405bd0d85d2b..4f8c66167b15 100644
+--- a/drivers/net/dsa/realtek/realtek-common.h
++++ b/drivers/net/dsa/realtek/realtek-common.h
+@@ -7,6 +7,7 @@
+ 
+ void realtek_common_lock(void *ctx);
+ void realtek_common_unlock(void *ctx);
++int realtek_common_setup_user_mdio(struct dsa_switch *ds);
+ struct realtek_priv *
+ realtek_common_probe_pre(struct device *dev, struct regmap_config rc,
+ 			 struct regmap_config rc_nolock);
 diff --git a/drivers/net/dsa/realtek/realtek-mdio.c b/drivers/net/dsa/realtek/realtek-mdio.c
-index 4c9a744b72f8..bb5bff719ae9 100644
+index bb5bff719ae9..37a41bab20b4 100644
 --- a/drivers/net/dsa/realtek/realtek-mdio.c
 +++ b/drivers/net/dsa/realtek/realtek-mdio.c
-@@ -168,7 +168,3 @@ void realtek_mdio_shutdown(struct mdio_device *mdiodev)
- 	dev_set_drvdata(&mdiodev->dev, NULL);
- }
- EXPORT_SYMBOL_GPL(realtek_mdio_shutdown);
--
--MODULE_AUTHOR("Luiz Angelo Daros de Luca <luizluca@gmail.com>");
--MODULE_DESCRIPTION("Driver for Realtek ethernet switch connected via MDIO interface");
--MODULE_LICENSE("GPL");
+@@ -141,7 +141,7 @@ int realtek_mdio_probe(struct mdio_device *mdiodev)
+ 	priv->bus = mdiodev->bus;
+ 	priv->mdio_addr = mdiodev->addr;
+ 	priv->write_reg_noack = realtek_mdio_write;
+-	priv->ds_ops = priv->variant->ds_ops_mdio;
++	priv->ds_ops = priv->variant->ds_ops_default_user_mdio;
+ 
+ 	return realtek_common_probe_post(priv);
+ 
 diff --git a/drivers/net/dsa/realtek/realtek-smi.c b/drivers/net/dsa/realtek/realtek-smi.c
-index 246024eec3bd..1ca2aa784d24 100644
+index 1ca2aa784d24..84dde2123b09 100644
 --- a/drivers/net/dsa/realtek/realtek-smi.c
 +++ b/drivers/net/dsa/realtek/realtek-smi.c
-@@ -443,7 +443,3 @@ void realtek_smi_shutdown(struct platform_device *pdev)
- 	platform_set_drvdata(pdev, NULL);
- }
- EXPORT_SYMBOL_GPL(realtek_smi_shutdown);
+@@ -31,7 +31,6 @@
+ #include <linux/spinlock.h>
+ #include <linux/skbuff.h>
+ #include <linux/of.h>
+-#include <linux/of_mdio.h>
+ #include <linux/delay.h>
+ #include <linux/gpio/consumer.h>
+ #include <linux/platform_device.h>
+@@ -339,63 +338,6 @@ static const struct regmap_config realtek_smi_nolock_regmap_config = {
+ 	.disable_locking = true,
+ };
+ 
+-static int realtek_smi_mdio_read(struct mii_bus *bus, int addr, int regnum)
+-{
+-	struct realtek_priv *priv = bus->priv;
 -
--MODULE_AUTHOR("Linus Walleij <linus.walleij@linaro.org>");
--MODULE_DESCRIPTION("Driver for Realtek ethernet switch connected via SMI interface");
--MODULE_LICENSE("GPL");
+-	return priv->ops->phy_read(priv, addr, regnum);
+-}
+-
+-static int realtek_smi_mdio_write(struct mii_bus *bus, int addr, int regnum,
+-				  u16 val)
+-{
+-	struct realtek_priv *priv = bus->priv;
+-
+-	return priv->ops->phy_write(priv, addr, regnum, val);
+-}
+-
+-static int realtek_smi_setup_mdio(struct dsa_switch *ds)
+-{
+-	struct realtek_priv *priv =  ds->priv;
+-	struct device_node *mdio_np;
+-	int ret;
+-
+-	mdio_np = of_get_compatible_child(priv->dev->of_node, "realtek,smi-mdio");
+-	if (!mdio_np) {
+-		dev_err(priv->dev, "no MDIO bus node\n");
+-		return -ENODEV;
+-	}
+-
+-	priv->user_mii_bus = devm_mdiobus_alloc(priv->dev);
+-	if (!priv->user_mii_bus) {
+-		ret = -ENOMEM;
+-		goto err_put_node;
+-	}
+-	priv->user_mii_bus->priv = priv;
+-	priv->user_mii_bus->name = "SMI user MII";
+-	priv->user_mii_bus->read = realtek_smi_mdio_read;
+-	priv->user_mii_bus->write = realtek_smi_mdio_write;
+-	snprintf(priv->user_mii_bus->id, MII_BUS_ID_SIZE, "SMI-%d",
+-		 ds->index);
+-	priv->user_mii_bus->parent = priv->dev;
+-	ds->user_mii_bus = priv->user_mii_bus;
+-
+-	ret = devm_of_mdiobus_register(priv->dev, priv->user_mii_bus, mdio_np);
+-	of_node_put(mdio_np);
+-	if (ret) {
+-		dev_err(priv->dev, "unable to register MDIO bus %s\n",
+-			priv->user_mii_bus->id);
+-		return ret;
+-	}
+-
+-	return 0;
+-
+-err_put_node:
+-	of_node_put(mdio_np);
+-
+-	return ret;
+-}
+-
+ int realtek_smi_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+@@ -416,8 +358,7 @@ int realtek_smi_probe(struct platform_device *pdev)
+ 		return PTR_ERR(priv->mdio);
+ 
+ 	priv->write_reg_noack = realtek_smi_write_reg_noack;
+-	priv->setup_interface = realtek_smi_setup_mdio;
+-	priv->ds_ops = priv->variant->ds_ops_smi;
++	priv->ds_ops = priv->variant->ds_ops_custom_user_mdio;
+ 
+ 	return realtek_common_probe_post(priv);
+ }
+diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
+index fbd0616c1df3..3fa8479c396f 100644
+--- a/drivers/net/dsa/realtek/realtek.h
++++ b/drivers/net/dsa/realtek/realtek.h
+@@ -71,7 +71,6 @@ struct realtek_priv {
+ 	struct rtl8366_mib_counter *mib_counters;
+ 
+ 	const struct realtek_ops *ops;
+-	int			(*setup_interface)(struct dsa_switch *ds);
+ 	int			(*write_reg_noack)(void *ctx, u32 addr, u32 data);
+ 
+ 	int			vlan_enabled;
+@@ -115,8 +114,8 @@ struct realtek_ops {
+ };
+ 
+ struct realtek_variant {
+-	const struct dsa_switch_ops *ds_ops_smi;
+-	const struct dsa_switch_ops *ds_ops_mdio;
++	const struct dsa_switch_ops *ds_ops_default_user_mdio;
++	const struct dsa_switch_ops *ds_ops_custom_user_mdio;
+ 	const struct realtek_ops *ops;
+ 	unsigned int clk_delay;
+ 	u8 cmd_read;
+diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
+index ac848b965f84..a52fb07504b5 100644
+--- a/drivers/net/dsa/realtek/rtl8365mb.c
++++ b/drivers/net/dsa/realtek/rtl8365mb.c
+@@ -2017,8 +2017,8 @@ static int rtl8365mb_setup(struct dsa_switch *ds)
+ 	if (ret)
+ 		goto out_teardown_irq;
+ 
+-	if (priv->setup_interface) {
+-		ret = priv->setup_interface(ds);
++	if (!priv->ds_ops->phy_read) {
++		ret = realtek_common_setup_user_mdio(ds);
+ 		if (ret) {
+ 			dev_err(priv->dev, "could not set up MDIO bus\n");
+ 			goto out_teardown_irq;
+@@ -2116,7 +2116,7 @@ static int rtl8365mb_detect(struct realtek_priv *priv)
+ 	return 0;
+ }
+ 
+-static const struct dsa_switch_ops rtl8365mb_switch_ops_smi = {
++static const struct dsa_switch_ops rtl8365mb_switch_ops_custom_user_mdio = {
+ 	.get_tag_protocol = rtl8365mb_get_tag_protocol,
+ 	.change_tag_protocol = rtl8365mb_change_tag_protocol,
+ 	.setup = rtl8365mb_setup,
+@@ -2137,7 +2137,7 @@ static const struct dsa_switch_ops rtl8365mb_switch_ops_smi = {
+ 	.port_max_mtu = rtl8365mb_port_max_mtu,
+ };
+ 
+-static const struct dsa_switch_ops rtl8365mb_switch_ops_mdio = {
++static const struct dsa_switch_ops rtl8365mb_switch_ops_default_user_mdio = {
+ 	.get_tag_protocol = rtl8365mb_get_tag_protocol,
+ 	.change_tag_protocol = rtl8365mb_change_tag_protocol,
+ 	.setup = rtl8365mb_setup,
+@@ -2167,8 +2167,8 @@ static const struct realtek_ops rtl8365mb_ops = {
+ };
+ 
+ const struct realtek_variant rtl8365mb_variant = {
+-	.ds_ops_smi = &rtl8365mb_switch_ops_smi,
+-	.ds_ops_mdio = &rtl8365mb_switch_ops_mdio,
++	.ds_ops_default_user_mdio = &rtl8365mb_switch_ops_default_user_mdio,
++	.ds_ops_custom_user_mdio = &rtl8365mb_switch_ops_custom_user_mdio,
+ 	.ops = &rtl8365mb_ops,
+ 	.clk_delay = 10,
+ 	.cmd_read = 0xb9,
+diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realtek/rtl8366rb.c
+index 1cc4de3cf54f..9b6997574d2c 100644
+--- a/drivers/net/dsa/realtek/rtl8366rb.c
++++ b/drivers/net/dsa/realtek/rtl8366rb.c
+@@ -1027,8 +1027,8 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
+ 	if (ret)
+ 		dev_info(priv->dev, "no interrupt support\n");
+ 
+-	if (priv->setup_interface) {
+-		ret = priv->setup_interface(ds);
++	if (!priv->ds_ops->phy_read) {
++		ret = realtek_common_setup_user_mdio(ds);
+ 		if (ret) {
+ 			dev_err(priv->dev, "could not set up MDIO bus\n");
+ 			return -ENODEV;
+@@ -1848,7 +1848,7 @@ static int rtl8366rb_detect(struct realtek_priv *priv)
+ 	return 0;
+ }
+ 
+-static const struct dsa_switch_ops rtl8366rb_switch_ops_smi = {
++static const struct dsa_switch_ops rtl8366rb_switch_ops_custom_user_mdio = {
+ 	.get_tag_protocol = rtl8366_get_tag_protocol,
+ 	.setup = rtl8366rb_setup,
+ 	.phylink_get_caps = rtl8366rb_phylink_get_caps,
+@@ -1872,7 +1872,7 @@ static const struct dsa_switch_ops rtl8366rb_switch_ops_smi = {
+ 	.port_max_mtu = rtl8366rb_max_mtu,
+ };
+ 
+-static const struct dsa_switch_ops rtl8366rb_switch_ops_mdio = {
++static const struct dsa_switch_ops rtl8366rb_switch_ops_default_user_mdio = {
+ 	.get_tag_protocol = rtl8366_get_tag_protocol,
+ 	.setup = rtl8366rb_setup,
+ 	.phy_read = rtl8366rb_dsa_phy_read,
+@@ -1915,8 +1915,8 @@ static const struct realtek_ops rtl8366rb_ops = {
+ };
+ 
+ const struct realtek_variant rtl8366rb_variant = {
+-	.ds_ops_smi = &rtl8366rb_switch_ops_smi,
+-	.ds_ops_mdio = &rtl8366rb_switch_ops_mdio,
++	.ds_ops_default_user_mdio = &rtl8366rb_switch_ops_default_user_mdio,
++	.ds_ops_custom_user_mdio = &rtl8366rb_switch_ops_custom_user_mdio,
+ 	.ops = &rtl8366rb_ops,
+ 	.clk_delay = 10,
+ 	.cmd_read = 0xa9,
 -- 
 2.43.0
 
