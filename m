@@ -1,213 +1,238 @@
-Return-Path: <netdev+bounces-55336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE83C80A695
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 16:07:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6302480A6F7
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 16:12:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43E9BB20B10
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 15:07:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8771F1C20AC3
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 15:12:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8309208D5;
-	Fri,  8 Dec 2023 15:07:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l6CAQDH/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2E5225DC;
+	Fri,  8 Dec 2023 15:12:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8D31198C;
-	Fri,  8 Dec 2023 07:07:11 -0800 (PST)
-Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-50bdec453c8so2561342e87.3;
-        Fri, 08 Dec 2023 07:07:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702048030; x=1702652830; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WF5RVyq6ckUd8DU+aeAoDbJFrmMEuJFqK2TUAQspTEA=;
-        b=l6CAQDH/uRwT8Yd85sQoev8PkVDXy/XSiT+Lf2vyt/JqBpJVMvP2n59Mt78UYT+RBy
-         puZP20s4QkD4s/g/FPNfe5NwqJ2RN85w8SSJDfQDY1oWrmFuUSJUnzsjTpU3bD5eOgbl
-         Uj73QYWYojl9Y0xEV3MSEaZB6oxdRppVR7PrTZlOszUspUsfenHEGVZoqFKpMyED13Jg
-         Fbzw6hALPHr7Xcdc3wQtYE7K/IZfqBVFjCrh1FJmnSTQIHBnibLRCzR2CcN7dyLv/G20
-         fReovEr5yoGs9DwDvX9WuExVA7Qt7RZlFwJe1NdL25XKSqL130RzVxahJ6riOYXkbRGl
-         wGgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702048030; x=1702652830;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WF5RVyq6ckUd8DU+aeAoDbJFrmMEuJFqK2TUAQspTEA=;
-        b=glUjlWVMiqQEI4HsdmMCHGpUuuvP/QhaqlrfIqAY0W0dzzYwnq+MPdZ/f702sWZ6hI
-         3yenKTcD5Bt8odbSINSOZmclYCVvJbCIcDVrB+toM2BYap2MElmfFUT6azG84Yo6MjTZ
-         NCvp+3HW/s/k9jSWqFvII4V4TDlrK1Osc66fZjqmi5BbmouHpRH6sGBBJDHnmLfq7+2U
-         l9YCo+vfuY6AtVqz1FDJ32wB+7sJ2/5+RyaDRMBthx1EqhAdD01F3hbHixseZ7uQpAKm
-         eBvO48HY00AaWBRyRYcDpqwiFGNgci3RUZPS6RnJXhhJYzupMkmdLBGIEKFaWCWXO2dv
-         f6EA==
-X-Gm-Message-State: AOJu0YwaeJbTpQTKFInNsiiVcxZLk64zojfpNzeuNNERhtfSDRhG8SM9
-	RE1Z5/oslaoQybOMfRRHst4=
-X-Google-Smtp-Source: AGHT+IFn0DWLpA9c912lqdnIDk2jEvmPjcyf++uanjHB3XBJDgftEUxNxH3LEfqMKNi2fs+m3cHW3A==
-X-Received: by 2002:ac2:5d31:0:b0:50b:f547:82ba with SMTP id i17-20020ac25d31000000b0050bf54782bamr17911lfb.130.1702048029635;
-        Fri, 08 Dec 2023 07:07:09 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id 5-20020ac25f45000000b0050bf06c8098sm241291lfz.116.2023.12.08.07.07.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Dec 2023 07:07:09 -0800 (PST)
-Date: Fri, 8 Dec 2023 18:07:06 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Andrew Halaney <ahalaney@redhat.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH net-next v3] net: stmmac: don't create a MDIO bus if
- unnecessary
-Message-ID: <hgz3pt625kggix6kzincohw7kr2okcumrwfkmjgiauw2yvhrzt@ekeygo4b7k3b>
-References: <20231207-stmmac-no-mdio-node-v3-1-34b870f2bafb@redhat.com>
- <jz6ot44fjkbmwcezi3fkgqd54nurglblbemrchfgxgq6udlhqz@ntepnnzzelta>
- <hxds75erxqcfkufxnfbyo2up4b4jeicmi3f5xr6qlb3yf7fe76@4byeq62jhu4o>
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D10A32108
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 07:12:14 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rBcWH-0001Lh-Gc; Fri, 08 Dec 2023 16:12:01 +0100
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rBcWG-00ERqP-5p; Fri, 08 Dec 2023 16:12:00 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rBcWG-00BiHM-0N;
+	Fri, 08 Dec 2023 16:12:00 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next v1 1/2] net: phy: c45: add genphy_c45_pma_read_ext_abilities() function
+Date: Fri,  8 Dec 2023 16:11:58 +0100
+Message-Id: <20231208151159.2791794-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <hxds75erxqcfkufxnfbyo2up4b4jeicmi3f5xr6qlb3yf7fe76@4byeq62jhu4o>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, Dec 07, 2023 at 05:07:24PM -0600, Andrew Halaney wrote:
-> On Fri, Dec 08, 2023 at 01:16:12AM +0300, Serge Semin wrote:
-> > On Thu, Dec 07, 2023 at 03:12:40PM -0600, Andrew Halaney wrote:
-> > > The stmmac_dt_phy() function, which parses the devicetree node of the
-> > > MAC and ultimately causes MDIO bus allocation, misinterprets what
-> > > fixed-link means in relation to the MAC's MDIO bus. This results in
-> > > a MDIO bus being created in situations it need not be.
-> > > 
-> > > Currently a MDIO bus is created if the description is either:
-> > > 
-> > >     1. Not fixed-link
-> > >     2. fixed-link but contains a MDIO bus as well
-> > > 
-> > > The "1" case above isn't always accurate. If there's a phy-handle,
-> > > it could be referencing a phy on another MDIO controller's bus[1]. In
-> > > this case currently the MAC will make a MDIO bus and scan it all
-> > > anyways unnecessarily.
-> > > 
-> > > There's also a lot of upstream devicetrees[2] that expect a MDIO bus to
-> > > be created and scanned for a phy. This case can also be inferred from
-> > > the platform description by not having a phy-handle && not being
-> > > fixed-link. This hits case "1" in the current driver's logic.
-> > > 
-> > > Let's improve the logic to create a MDIO bus if either:
-> > > 
-> > 
-> > >     - Devicetree contains a MDIO bus
-> > >     - !fixed-link && !phy-handle (legacy handling)
-> > 
-> > If what you suggest here is a free from regressions semantics change
-> > (really hope it is) I will be with both my hands for it. This will
-> > solve the problem we have with one of our device which doesn't have
-> > SMA interface (hardware designers decided to save ~4K gates of the
-> > chip area) but has a PHY externally attached to the DW XGMAC<->XPCS
-> > interface. PHY is accessible via a GPIO-based MDIO bus. BTW having no
-> > SMA interface available on a DW *MAC device but creating the MDIO-bus
-> > on top of the non-existent SMA CSRs anyway causes having _32_ dummy
-> > PHYs created with zero IDs.
-> 
+Move part of the genphy_c45_pma_read_abilities() code to a separate
+function.
 
-> I hope it is regression free! I have tested both the [1] and [2] cases
-> (I hacked up the devicetree for [1] to make it look like [2]) without
-> any issue.
-> 
+Some PHYs do not implement PMA/PMD status 2 register (Register 1.8) but
+do implement PMA/PMD extended ability register (Register 1.11). To make
+use of it, we need to be able to access this part of code separately.
 
-I doubt you could have tested it on all the possible hardware the
-STMMAC driver supports. The problem is that the DT-bindings thing is a
-kind of contract which can't be changed that easily. It's like ABI but
-for the hardware description so the kernel would bootup correctly on
-the platforms with the old DT blobs. But if the change isn't that
-critical, if the device-tree sources in the kernel fit to the updated
-semantics, if the networking subsystem maintainers aren't against it
-and I guess with the Rob, Krzysztof or Conor blessing (at least it
-won't hurt to add them to the Cc-list together with the devicetree
-mailing-list), then it will likely be accepted.
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+ drivers/net/phy/phy-c45.c | 129 ++++++++++++++++++++++----------------
+ include/linux/phy.h       |   1 +
+ 2 files changed, 75 insertions(+), 55 deletions(-)
 
-> Sorry, I don't have any docs for stmmac hardware so this might be
-> answered in there (or just common net knowledge that I can't find
-> online)... what's SMA stand for? I assume it's the MDIO interface.
+diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
+index 8e6fd4962c48..747d14bf152c 100644
+--- a/drivers/net/phy/phy-c45.c
++++ b/drivers/net/phy/phy-c45.c
+@@ -919,6 +919,79 @@ int genphy_c45_pma_baset1_read_abilities(struct phy_device *phydev)
+ }
+ EXPORT_SYMBOL_GPL(genphy_c45_pma_baset1_read_abilities);
+ 
++/**
++ * genphy_c45_pma_read_ext_abilities - read supported link modes from PMA
++ * @phydev: target phy_device struct
++ *
++ * Read the supported link modes from the PMA/PMD extended ability register
++ * (Register 1.11).
++ */
++int genphy_c45_pma_read_ext_abilities(struct phy_device *phydev)
++{
++	int val;
++
++	val = phy_read_mmd(phydev, MDIO_MMD_PMAPMD, MDIO_PMA_EXTABLE);
++	if (val < 0)
++		return val;
++
++	linkmode_mod_bit(ETHTOOL_LINK_MODE_10000baseLRM_Full_BIT,
++			 phydev->supported,
++			 val & MDIO_PMA_EXTABLE_10GBLRM);
++	linkmode_mod_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
++			 phydev->supported,
++			 val & MDIO_PMA_EXTABLE_10GBT);
++	linkmode_mod_bit(ETHTOOL_LINK_MODE_10000baseKX4_Full_BIT,
++			 phydev->supported,
++			 val & MDIO_PMA_EXTABLE_10GBKX4);
++	linkmode_mod_bit(ETHTOOL_LINK_MODE_10000baseKR_Full_BIT,
++			 phydev->supported,
++			 val & MDIO_PMA_EXTABLE_10GBKR);
++	linkmode_mod_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
++			 phydev->supported,
++			 val & MDIO_PMA_EXTABLE_1000BT);
++	linkmode_mod_bit(ETHTOOL_LINK_MODE_1000baseKX_Full_BIT,
++			 phydev->supported,
++			 val & MDIO_PMA_EXTABLE_1000BKX);
++
++	linkmode_mod_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT,
++			 phydev->supported,
++			 val & MDIO_PMA_EXTABLE_100BTX);
++	linkmode_mod_bit(ETHTOOL_LINK_MODE_100baseT_Half_BIT,
++			 phydev->supported,
++			 val & MDIO_PMA_EXTABLE_100BTX);
++
++	linkmode_mod_bit(ETHTOOL_LINK_MODE_10baseT_Full_BIT,
++			 phydev->supported,
++			 val & MDIO_PMA_EXTABLE_10BT);
++	linkmode_mod_bit(ETHTOOL_LINK_MODE_10baseT_Half_BIT,
++			 phydev->supported,
++			 val & MDIO_PMA_EXTABLE_10BT);
++
++	if (val & MDIO_PMA_EXTABLE_NBT) {
++		val = phy_read_mmd(phydev, MDIO_MMD_PMAPMD,
++				   MDIO_PMA_NG_EXTABLE);
++		if (val < 0)
++			return val;
++
++		linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
++				 phydev->supported,
++				 val & MDIO_PMA_NG_EXTABLE_2_5GBT);
++
++		linkmode_mod_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
++				 phydev->supported,
++				 val & MDIO_PMA_NG_EXTABLE_5GBT);
++	}
++
++	if (val & MDIO_PMA_EXTABLE_BT1) {
++		val = genphy_c45_pma_baset1_read_abilities(phydev);
++		if (val < 0)
++			return val;
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(genphy_c45_pma_read_ext_abilities);
++
+ /**
+  * genphy_c45_pma_read_abilities - read supported link modes from PMA
+  * @phydev: target phy_device struct
+@@ -962,63 +1035,9 @@ int genphy_c45_pma_read_abilities(struct phy_device *phydev)
+ 			 val & MDIO_PMA_STAT2_10GBER);
+ 
+ 	if (val & MDIO_PMA_STAT2_EXTABLE) {
+-		val = phy_read_mmd(phydev, MDIO_MMD_PMAPMD, MDIO_PMA_EXTABLE);
++		val = genphy_c45_pma_read_ext_abilities(phydev);
+ 		if (val < 0)
+ 			return val;
+-
+-		linkmode_mod_bit(ETHTOOL_LINK_MODE_10000baseLRM_Full_BIT,
+-				 phydev->supported,
+-				 val & MDIO_PMA_EXTABLE_10GBLRM);
+-		linkmode_mod_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
+-				 phydev->supported,
+-				 val & MDIO_PMA_EXTABLE_10GBT);
+-		linkmode_mod_bit(ETHTOOL_LINK_MODE_10000baseKX4_Full_BIT,
+-				 phydev->supported,
+-				 val & MDIO_PMA_EXTABLE_10GBKX4);
+-		linkmode_mod_bit(ETHTOOL_LINK_MODE_10000baseKR_Full_BIT,
+-				 phydev->supported,
+-				 val & MDIO_PMA_EXTABLE_10GBKR);
+-		linkmode_mod_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
+-				 phydev->supported,
+-				 val & MDIO_PMA_EXTABLE_1000BT);
+-		linkmode_mod_bit(ETHTOOL_LINK_MODE_1000baseKX_Full_BIT,
+-				 phydev->supported,
+-				 val & MDIO_PMA_EXTABLE_1000BKX);
+-
+-		linkmode_mod_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+-				 phydev->supported,
+-				 val & MDIO_PMA_EXTABLE_100BTX);
+-		linkmode_mod_bit(ETHTOOL_LINK_MODE_100baseT_Half_BIT,
+-				 phydev->supported,
+-				 val & MDIO_PMA_EXTABLE_100BTX);
+-
+-		linkmode_mod_bit(ETHTOOL_LINK_MODE_10baseT_Full_BIT,
+-				 phydev->supported,
+-				 val & MDIO_PMA_EXTABLE_10BT);
+-		linkmode_mod_bit(ETHTOOL_LINK_MODE_10baseT_Half_BIT,
+-				 phydev->supported,
+-				 val & MDIO_PMA_EXTABLE_10BT);
+-
+-		if (val & MDIO_PMA_EXTABLE_NBT) {
+-			val = phy_read_mmd(phydev, MDIO_MMD_PMAPMD,
+-					   MDIO_PMA_NG_EXTABLE);
+-			if (val < 0)
+-				return val;
+-
+-			linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
+-					 phydev->supported,
+-					 val & MDIO_PMA_NG_EXTABLE_2_5GBT);
+-
+-			linkmode_mod_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
+-					 phydev->supported,
+-					 val & MDIO_PMA_NG_EXTABLE_5GBT);
+-		}
+-
+-		if (val & MDIO_PMA_EXTABLE_BT1) {
+-			val = genphy_c45_pma_baset1_read_abilities(phydev);
+-			if (val < 0)
+-				return val;
+-		}
+ 	}
+ 
+ 	/* This is optional functionality. If not supported, we may get an error
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index 6e7ebcc50b85..dbb5e13e3e1b 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -1866,6 +1866,7 @@ int genphy_c45_an_config_aneg(struct phy_device *phydev);
+ int genphy_c45_an_disable_aneg(struct phy_device *phydev);
+ int genphy_c45_read_mdix(struct phy_device *phydev);
+ int genphy_c45_pma_read_abilities(struct phy_device *phydev);
++int genphy_c45_pma_read_ext_abilities(struct phy_device *phydev);
+ int genphy_c45_pma_baset1_read_abilities(struct phy_device *phydev);
+ int genphy_c45_read_eee_abilities(struct phy_device *phydev);
+ int genphy_c45_pma_baset1_read_master_slave(struct phy_device *phydev);
+-- 
+2.39.2
 
-Right. Synopsys names the MDIO-bus interface as Station Management
-Agent MDIO module.
-
-> 
-> I agree though, if you have a phy-handle and no mdio node in your
-> devicetree this patch series should bail out without registering a bus
-> in stmmac_mdio_register().
-
-On the other hand why would the MDIO-bus needed in such case? If the
-phy-handle property is specified with no MDIO-bus DT-subnode, then it
-will point out to a PHY residing an external bus. The only case I can
-imagine though is that the DW XPCS device could be still auto-detected
-on the internal SMA-MDIO-bus. But the only driver which currently has
-XPCS auto-detection activated is the Intel glue layer (see
-dwmac-intel.c and has_xpcs flag), but it doesn't use DT interface
-since it handles a PCIe-based device.  So this case is out of
-brackets.
-
-> 
-> > 
-> > > 
-> > > Below upstream devicetree snippets can be found that explain some of
-> > > the cases above more concretely.
-> 
-> <snip>
-> 
-> > > -	if (mdio) {
-> > > -		plat->mdio_bus_data =
-> > > -			devm_kzalloc(dev, sizeof(struct stmmac_mdio_bus_data),
-> > > -				     GFP_KERNEL);
-> > 
-> > > +	/* Legacy devicetrees allowed for no MDIO bus description and expect
-> > > +	 * the bus to be scanned for devices. If there's no phy or fixed-link
-> > > +	 * described assume this is the case since there must be something
-> > > +	 * connected to the MAC.
-> > > +	 */
-> > > +	legacy_mdio = !of_phy_is_fixed_link(np) && !plat->phy_node;
-> > > +	if (legacy_mdio)
-> > > +		dev_info(dev, "Deprecated MDIO bus assumption used\n");
-> > > +
-> > > +	if (plat->mdio_node || legacy_mdio) {
-> > > +		plat->mdio_bus_data = devm_kzalloc(dev,
-> > 
-> > Special thanks for adding the comment above this code. It will really
-> > save time of figuring out why MDIO-bus needs to be created anyway.
-> > 
-> > > +						   sizeof(struct stmmac_mdio_bus_data),
-> > 
-> > Should v4 is required I would suggest to change this to
-> > sizeof(*plat->mdio_bus_data).
-> > 
-> > Anyway feel free to add:
-> > Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
-> > 
-> > -Serge(y)
-> 
-
-> Sure I will spin v4 to pick that up, thanks for catching it. I'll also
-> improve the motivation in the commit message a hair more per Andrew
-> Lunn's request over here on v2 (and will hold off a little bit just to
-> make sure reviews come in before a respin):
-> 
->     https://lore.kernel.org/netdev/e64b14c3-4b80-4120-8cc4-9baa40cdcb75@lunn.ch/
-
-Ok. Thanks.
-
--Serge(y)
-
-> 
-> Thanks,
-> Andrew
-> 
 
