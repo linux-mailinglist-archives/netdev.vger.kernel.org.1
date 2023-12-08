@@ -1,297 +1,224 @@
-Return-Path: <netdev+bounces-55217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AFBA809D5E
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 08:42:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30538809DD3
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 09:03:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A9541C20A5D
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 07:41:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D6AF280E72
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 08:03:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB3981119A;
-	Fri,  8 Dec 2023 07:41:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBB051094F;
+	Fri,  8 Dec 2023 08:03:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2F4D1728;
-	Thu,  7 Dec 2023 23:41:24 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R511e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=22;SR=0;TI=SMTPD_---0Vy2PAoc_1702021280;
-Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0Vy2PAoc_1702021280)
-          by smtp.aliyun-inc.com;
-          Fri, 08 Dec 2023 15:41:22 +0800
-From: Wen Gu <guwen@linux.alibaba.com>
-To: wintera@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	hca@linux.ibm.com,
-	gor@linux.ibm.com,
-	agordeev@linux.ibm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
+Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDDC5A4;
+	Fri,  8 Dec 2023 00:03:09 -0800 (PST)
+X-QQ-mid: bizesmtp90t1702022541tonirn3a
+Received: from dsp-duanqiangwen.trustnetic.com ( [115.204.154.156])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 08 Dec 2023 16:02:19 +0800 (CST)
+X-QQ-SSF: 01400000000000D0E000000A0000000
+X-QQ-FEAT: C46Rb8GPIEeVb30oRnYgzzzVLJ5NE130+uMrOQIe2NDtC6AKvl2Dk94WyO9k3
+	VxPvRLWUHKab4ZA66I79F5axwKeT7kvdmFPPk7TxRosej48L17eeAwnYZvOTkzJNn0Y757C
+	xwsQRiRyLk85nhPDAdM/YfAexo+wT3zWPWdxW25DGTPofa2wqROu0qpP8eFAagimngbIJF/
+	NV1GhO4EWUDky957CWEu1rF3TUL0jSNoQputctUU2r/3BiZdtdinwtDlMyIrgk/vyFfaByk
+	PUc/9WKe7/sX6JXPD3bz/3fjL+BcV5x53mKVlH2UIUuB+cSoBB1lvjTLd4nXMYpae0zoOGg
+	dN2LkmFM2aot62xCJa5DMfpzB+I2aqtIzlGUtv8WtBPdkR/Fhp/63dQ2OJ3/WOMO1ByTdis
+	I6JP+kt9MS+pjmid157bqQ==
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 8323590272720038665
+From: duanqiangwen <duanqiangwen@net-swift.com>
+To: netdev@vger.kernel.org,
 	kuba@kernel.org,
+	jiawenwu@trustnetic.com,
+	mengyuanlou@net-swift.com,
+	davem@davemloft.net,
 	pabeni@redhat.com,
-	kgraul@linux.ibm.com,
-	jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com,
-	svens@linux.ibm.com,
-	alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	raspl@linux.ibm.com,
-	schnelle@linux.ibm.com,
-	guangguan.wang@linux.alibaba.com,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v5 9/9] net/smc: manage system EID in SMC stack instead of ISM driver
-Date: Fri,  8 Dec 2023 15:40:59 +0800
-Message-Id: <1702021259-41504-10-git-send-email-guwen@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1702021259-41504-1-git-send-email-guwen@linux.alibaba.com>
-References: <1702021259-41504-1-git-send-email-guwen@linux.alibaba.com>
+	yang.lee@linux.alibaba.com,
+	shaozhengchao@huawei.com,
+	error27@gmail.com,
+	andrew@lunn.ch,
+	stable@vger.kernel.org
+Cc: duanqiangwen <duanqiangwen@net-swift.com>
+Subject: [PATCH net v2] net: libwx: fix memory leak on free page
+Date: Fri,  8 Dec 2023 16:02:16 +0800
+Message-Id: <20231208080216.20176-1-duanqiangwen@net-swift.com>
+X-Mailer: git-send-email 2.12.2.windows.1
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrsz:qybglogicsvrsz3a-1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-The System EID (SEID) is an internal EID that is used by the SMCv2
-software stack that has a predefined and constant value representing
-the s390 physical machine that the OS is executing on. So it should
-be managed by SMC stack instead of ISM driver and be consistent for
-all ISMv2 device (including virtual ISM devices) on s390 architecture.
+ifconfig ethx up, will set page->refcount larger than 1,
+and then ifconfig ethx down, calling __page_frag_cache_drain()
+to free pages, it is not compatible with page pool.
+So deleting codes which changing page->refcount.
 
-Suggested-by: Alexandra Winter <wintera@linux.ibm.com>
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+Fixes: 3c47e8ae113a ("net: libwx: Support to receive packets in NAPI")
+
+Signed-off-by: duanqiangwen <duanqiangwen@net-swift.com>
 ---
- drivers/s390/net/ism.h     |  7 -------
- drivers/s390/net/ism_drv.c | 38 ++++++--------------------------------
- include/linux/ism.h        |  1 -
- include/net/smc.h          |  1 -
- net/smc/smc_ism.c          | 33 ++++++++++++++++++++++++---------
- net/smc/smc_ism.h          |  7 +++++++
- 6 files changed, 37 insertions(+), 50 deletions(-)
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c  | 82 ++--------------------------
+ drivers/net/ethernet/wangxun/libwx/wx_type.h |  1 -
+ 2 files changed, 6 insertions(+), 77 deletions(-)
 
-diff --git a/drivers/s390/net/ism.h b/drivers/s390/net/ism.h
-index 70c5bbd..047fa610 100644
---- a/drivers/s390/net/ism.h
-+++ b/drivers/s390/net/ism.h
-@@ -16,7 +16,6 @@
-  */
- #define ISM_DMB_WORD_OFFSET	1
- #define ISM_DMB_BIT_OFFSET	(ISM_DMB_WORD_OFFSET * 32)
--#define ISM_IDENT_MASK		0x00FFFF
- 
- #define ISM_REG_SBA	0x1
- #define ISM_REG_IEQ	0x2
-@@ -192,12 +191,6 @@ struct ism_sba {
- #define ISM_CREATE_REQ(dmb, idx, sf, offset)		\
- 	((dmb) | (idx) << 24 | (sf) << 23 | (offset))
- 
--struct ism_systemeid {
--	u8	seid_string[24];
--	u8	serial_number[4];
--	u8	type[4];
--};
--
- static inline void __ism_read_cmd(struct ism_dev *ism, void *data,
- 				  unsigned long offset, unsigned long len)
- {
-diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
-index 34dd063..2c8e964 100644
---- a/drivers/s390/net/ism_drv.c
-+++ b/drivers/s390/net/ism_drv.c
-@@ -36,6 +36,7 @@
- 						/* a list for fast mapping  */
- static u8 max_client;
- static DEFINE_MUTEX(clients_lock);
-+static bool ism_v2_capable;
- struct ism_dev_list {
- 	struct list_head list;
- 	struct mutex mutex; /* protects ism device list */
-@@ -443,32 +444,6 @@ int ism_move(struct ism_dev *ism, u64 dmb_tok, unsigned int idx, bool sf,
- }
- EXPORT_SYMBOL_GPL(ism_move);
- 
--static struct ism_systemeid SYSTEM_EID = {
--	.seid_string = "IBM-SYSZ-ISMSEID00000000",
--	.serial_number = "0000",
--	.type = "0000",
--};
--
--static void ism_create_system_eid(void)
--{
--	struct cpuid id;
--	u16 ident_tail;
--	char tmp[5];
--
--	get_cpu_id(&id);
--	ident_tail = (u16)(id.ident & ISM_IDENT_MASK);
--	snprintf(tmp, 5, "%04X", ident_tail);
--	memcpy(&SYSTEM_EID.serial_number, tmp, 4);
--	snprintf(tmp, 5, "%04X", id.machine);
--	memcpy(&SYSTEM_EID.type, tmp, 4);
--}
--
--u8 *ism_get_seid(void)
--{
--	return SYSTEM_EID.seid_string;
--}
--EXPORT_SYMBOL_GPL(ism_get_seid);
--
- static void ism_handle_event(struct ism_dev *ism)
- {
- 	struct ism_event *entry;
-@@ -560,7 +535,9 @@ static int ism_dev_init(struct ism_dev *ism)
- 
- 	if (!ism_add_vlan_id(ism, ISM_RESERVED_VLANID))
- 		/* hardware is V2 capable */
--		ism_create_system_eid();
-+		ism_v2_capable = true;
-+	else
-+		ism_v2_capable = false;
- 
- 	mutex_lock(&ism_dev_list.mutex);
- 	mutex_lock(&clients_lock);
-@@ -665,8 +642,7 @@ static void ism_dev_exit(struct ism_dev *ism)
- 	}
- 	mutex_unlock(&clients_lock);
- 
--	if (SYSTEM_EID.serial_number[0] != '0' ||
--	    SYSTEM_EID.type[0] != '0')
-+	if (ism_v2_capable)
- 		ism_del_vlan_id(ism, ISM_RESERVED_VLANID);
- 	unregister_ieq(ism);
- 	unregister_sba(ism);
-@@ -813,8 +789,7 @@ static int smcd_move(struct smcd_dev *smcd, u64 dmb_tok, unsigned int idx,
- 
- static int smcd_supports_v2(void)
- {
--	return SYSTEM_EID.serial_number[0] != '0' ||
--		SYSTEM_EID.type[0] != '0';
-+	return ism_v2_capable;
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+index a5a50b5a8816..11b94f7cb703 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+@@ -160,60 +160,6 @@ static __le32 wx_test_staterr(union wx_rx_desc *rx_desc,
+ 	return rx_desc->wb.upper.status_error & cpu_to_le32(stat_err_bits);
  }
  
- static u64 ism_get_local_gid(struct ism_dev *ism)
-@@ -860,7 +835,6 @@ static inline struct device *smcd_get_dev(struct smcd_dev *dev)
- 	.signal_event = smcd_signal_ieq,
- 	.move_data = smcd_move,
- 	.supports_v2 = smcd_supports_v2,
--	.get_system_eid = ism_get_seid,
- 	.get_local_gid = smcd_get_local_gid,
- 	.get_chid = smcd_get_chid,
- 	.get_dev = smcd_get_dev,
-diff --git a/include/linux/ism.h b/include/linux/ism.h
-index 9a4c204..5428edd 100644
---- a/include/linux/ism.h
-+++ b/include/linux/ism.h
-@@ -86,7 +86,6 @@ int  ism_register_dmb(struct ism_dev *dev, struct ism_dmb *dmb,
- int  ism_unregister_dmb(struct ism_dev *dev, struct ism_dmb *dmb);
- int  ism_move(struct ism_dev *dev, u64 dmb_tok, unsigned int idx, bool sf,
- 	      unsigned int offset, void *data, unsigned int size);
--u8  *ism_get_seid(void);
- 
- const struct smcd_ops *ism_get_smcd_ops(void);
- 
-diff --git a/include/net/smc.h b/include/net/smc.h
-index a0dc1187e..c9dcb30 100644
---- a/include/net/smc.h
-+++ b/include/net/smc.h
-@@ -73,7 +73,6 @@ struct smcd_ops {
- 			 bool sf, unsigned int offset, void *data,
- 			 unsigned int size);
- 	int (*supports_v2)(void);
--	u8* (*get_system_eid)(void);
- 	void (*get_local_gid)(struct smcd_dev *dev, struct smcd_gid *gid);
- 	u16 (*get_chid)(struct smcd_dev *dev);
- 	struct device* (*get_dev)(struct smcd_dev *dev);
-diff --git a/net/smc/smc_ism.c b/net/smc/smc_ism.c
-index a33f861..ac88de2 100644
---- a/net/smc/smc_ism.c
-+++ b/net/smc/smc_ism.c
-@@ -43,6 +43,27 @@ static void smcd_handle_irq(struct ism_dev *ism, unsigned int dmbno,
- };
- #endif
- 
-+static void smc_ism_create_system_eid(void)
-+{
-+	struct smc_ism_seid *seid =
-+		(struct smc_ism_seid *)smc_ism_v2_system_eid;
-+#if IS_ENABLED(CONFIG_S390)
-+	struct cpuid id;
-+	u16 ident_tail;
-+	char tmp[5];
-+
-+	memcpy(seid->seid_string, "IBM-SYSZ-ISMSEID00000000", 24);
-+	get_cpu_id(&id);
-+	ident_tail = (u16)(id.ident & SMC_ISM_IDENT_MASK);
-+	snprintf(tmp, 5, "%04X", ident_tail);
-+	memcpy(seid->serial_number, tmp, 4);
-+	snprintf(tmp, 5, "%04X", id.machine);
-+	memcpy(seid->type, tmp, 4);
-+#else
-+	memset(seid, 0, SMC_MAX_EID_LEN);
-+#endif
-+}
-+
- /* Test if an ISM communication is possible - same CPC */
- int smc_ism_cantalk(struct smcd_gid *peer_gid, unsigned short vlan_id,
- 		    struct smcd_dev *smcd)
-@@ -431,14 +452,8 @@ static void smcd_register_dev(struct ism_dev *ism)
- 
- 	mutex_lock(&smcd_dev_list.mutex);
- 	if (list_empty(&smcd_dev_list.list)) {
--		u8 *system_eid = NULL;
+-static bool wx_can_reuse_rx_page(struct wx_rx_buffer *rx_buffer,
+-				 int rx_buffer_pgcnt)
+-{
+-	unsigned int pagecnt_bias = rx_buffer->pagecnt_bias;
+-	struct page *page = rx_buffer->page;
 -
--		system_eid = smcd->ops->get_system_eid();
--		if (smcd->ops->supports_v2()) {
-+		if (smcd->ops->supports_v2())
- 			smc_ism_v2_capable = true;
--			memcpy(smc_ism_v2_system_eid, system_eid,
--			       SMC_MAX_EID_LEN);
--		}
- 	}
- 	/* sort list: devices without pnetid before devices with pnetid */
- 	if (smcd->pnetid[0])
-@@ -542,10 +557,10 @@ int smc_ism_init(void)
+-	/* avoid re-using remote and pfmemalloc pages */
+-	if (!dev_page_is_reusable(page))
+-		return false;
+-
+-#if (PAGE_SIZE < 8192)
+-	/* if we are only owner of page we can reuse it */
+-	if (unlikely((rx_buffer_pgcnt - pagecnt_bias) > 1))
+-		return false;
+-#endif
+-
+-	/* If we have drained the page fragment pool we need to update
+-	 * the pagecnt_bias and page count so that we fully restock the
+-	 * number of references the driver holds.
+-	 */
+-	if (unlikely(pagecnt_bias == 1)) {
+-		page_ref_add(page, USHRT_MAX - 1);
+-		rx_buffer->pagecnt_bias = USHRT_MAX;
+-	}
+-
+-	return true;
+-}
+-
+-/**
+- * wx_reuse_rx_page - page flip buffer and store it back on the ring
+- * @rx_ring: rx descriptor ring to store buffers on
+- * @old_buff: donor buffer to have page reused
+- *
+- * Synchronizes page for reuse by the adapter
+- **/
+-static void wx_reuse_rx_page(struct wx_ring *rx_ring,
+-			     struct wx_rx_buffer *old_buff)
+-{
+-	u16 nta = rx_ring->next_to_alloc;
+-	struct wx_rx_buffer *new_buff;
+-
+-	new_buff = &rx_ring->rx_buffer_info[nta];
+-
+-	/* update, and store next to alloc */
+-	nta++;
+-	rx_ring->next_to_alloc = (nta < rx_ring->count) ? nta : 0;
+-
+-	/* transfer page from old buffer to new buffer */
+-	new_buff->page = old_buff->page;
+-	new_buff->page_dma = old_buff->page_dma;
+-	new_buff->page_offset = old_buff->page_offset;
+-	new_buff->pagecnt_bias	= old_buff->pagecnt_bias;
+-}
+-
+ static void wx_dma_sync_frag(struct wx_ring *rx_ring,
+ 			     struct wx_rx_buffer *rx_buffer)
  {
- 	int rc = 0;
+@@ -270,8 +216,6 @@ static struct wx_rx_buffer *wx_get_rx_buffer(struct wx_ring *rx_ring,
+ 				      size,
+ 				      DMA_FROM_DEVICE);
+ skip_sync:
+-	rx_buffer->pagecnt_bias--;
+-
+ 	return rx_buffer;
+ }
  
--#if IS_ENABLED(CONFIG_ISM)
- 	smc_ism_v2_capable = false;
--	memset(smc_ism_v2_system_eid, 0, SMC_MAX_EID_LEN);
-+	smc_ism_create_system_eid();
+@@ -280,19 +224,9 @@ static void wx_put_rx_buffer(struct wx_ring *rx_ring,
+ 			     struct sk_buff *skb,
+ 			     int rx_buffer_pgcnt)
+ {
+-	if (wx_can_reuse_rx_page(rx_buffer, rx_buffer_pgcnt)) {
+-		/* hand second half of page back to the ring */
+-		wx_reuse_rx_page(rx_ring, rx_buffer);
+-	} else {
+-		if (!IS_ERR(skb) && WX_CB(skb)->dma == rx_buffer->dma)
+-			/* the page has been released from the ring */
+-			WX_CB(skb)->page_released = true;
+-		else
+-			page_pool_put_full_page(rx_ring->page_pool, rx_buffer->page, false);
+-
+-		__page_frag_cache_drain(rx_buffer->page,
+-					rx_buffer->pagecnt_bias);
+-	}
++	if (!IS_ERR(skb) && WX_CB(skb)->dma == rx_buffer->dma)
++		/* the page has been released from the ring */
++		WX_CB(skb)->page_released = true;
  
-+#if IS_ENABLED(CONFIG_ISM)
- 	rc = ism_register_client(&smc_ism_client);
- #endif
- 	return rc;
-diff --git a/net/smc/smc_ism.h b/net/smc/smc_ism.h
-index 0e5e563..ffff40c 100644
---- a/net/smc/smc_ism.h
-+++ b/net/smc/smc_ism.h
-@@ -16,6 +16,7 @@
- #include "smc.h"
+ 	/* clear contents of rx_buffer */
+ 	rx_buffer->page = NULL;
+@@ -335,11 +269,12 @@ static struct sk_buff *wx_build_skb(struct wx_ring *rx_ring,
+ 		if (size <= WX_RXBUFFER_256) {
+ 			memcpy(__skb_put(skb, size), page_addr,
+ 			       ALIGN(size, sizeof(long)));
+-			rx_buffer->pagecnt_bias++;
+-
++			page_pool_put_full_page(rx_ring->page_pool, rx_buffer->page, false);
+ 			return skb;
+ 		}
  
- #define SMC_VIRTUAL_ISM_CHID_MASK	0xFF00
-+#define SMC_ISM_IDENT_MASK		0x00FFFF
++		skb_mark_for_recycle(skb);
++
+ 		if (!wx_test_staterr(rx_desc, WX_RXD_STAT_EOP))
+ 			WX_CB(skb)->dma = rx_buffer->dma;
  
- struct smcd_dev_list {	/* List of SMCD devices */
- 	struct list_head list;
-@@ -30,6 +31,12 @@ struct smc_ism_vlanid {			/* VLAN id set on ISM device */
- 	refcount_t refcnt;		/* Reference count */
+@@ -382,8 +317,6 @@ static bool wx_alloc_mapped_page(struct wx_ring *rx_ring,
+ 	bi->page_dma = dma;
+ 	bi->page = page;
+ 	bi->page_offset = 0;
+-	page_ref_add(page, USHRT_MAX - 1);
+-	bi->pagecnt_bias = USHRT_MAX;
+ 
+ 	return true;
+ }
+@@ -723,7 +656,6 @@ static int wx_clean_rx_irq(struct wx_q_vector *q_vector,
+ 		/* exit if we failed to retrieve a buffer */
+ 		if (!skb) {
+ 			rx_ring->rx_stats.alloc_rx_buff_failed++;
+-			rx_buffer->pagecnt_bias++;
+ 			break;
+ 		}
+ 
+@@ -2248,8 +2180,6 @@ static void wx_clean_rx_ring(struct wx_ring *rx_ring)
+ 
+ 		/* free resources associated with mapping */
+ 		page_pool_put_full_page(rx_ring->page_pool, rx_buffer->page, false);
+-		__page_frag_cache_drain(rx_buffer->page,
+-					rx_buffer->pagecnt_bias);
+ 
+ 		i++;
+ 		rx_buffer++;
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+index 165e82de772e..83f9bb7b3c22 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+@@ -787,7 +787,6 @@ struct wx_rx_buffer {
+ 	dma_addr_t page_dma;
+ 	struct page *page;
+ 	unsigned int page_offset;
+-	u16 pagecnt_bias;
  };
  
-+struct smc_ism_seid {
-+	u8 seid_string[24];
-+	u8 serial_number[4];
-+	u8 type[4];
-+};
-+
- struct smcd_dev;
- 
- int smc_ism_cantalk(struct smcd_gid *peer_gid, unsigned short vlan_id,
+ struct wx_queue_stats {
 -- 
-1.8.3.1
+2.12.2.windows.1
 
 
