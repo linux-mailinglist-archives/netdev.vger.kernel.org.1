@@ -1,144 +1,128 @@
-Return-Path: <netdev+bounces-55273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8819880A102
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 11:32:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77B8480A10D
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 11:33:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 310F81F2173A
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 10:32:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A92B21C20CAC
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 10:33:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B965918E1C;
-	Fri,  8 Dec 2023 10:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D48B18E38;
+	Fri,  8 Dec 2023 10:32:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cOexIkcr"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Xh8FPfmr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 096CB199F
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 02:31:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702031486;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Tcu3WmbH0rDpAmwPqLlBrIXFmcIviRa8i1AFTtWd1Zs=;
-	b=cOexIkcrsNZ589DDTxh3gqIixiNNnP8xZE8+B6motvcNQXDndK2I1SR5fFdBmJ6ybZ6CuJ
-	i1akEtL/YYuLE4MhUbOys7qr1tjSk1fdFmV2cNwDkMMqG5O9ZhjLMv2HXP3FM5x4GZgb8W
-	oLn11H78pl5gUO6HkzHXj45U0Qe+q7E=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-342-oLgO_GFiNE6dJXgDC2YSgQ-1; Fri, 08 Dec 2023 05:31:25 -0500
-X-MC-Unique: oLgO_GFiNE6dJXgDC2YSgQ-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2c9e510a1c4so13506211fa.3
-        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 02:31:24 -0800 (PST)
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A971324B
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 02:32:34 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1d0b2752dc6so17106165ad.3
+        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 02:32:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1702031554; x=1702636354; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=YssbbUCPI2cVXvHWriFdE5fhn9Moo9Wlhv3uqYqJSwE=;
+        b=Xh8FPfmrGihDVbvCvqyvLIEkN/nTMwBQbdeBdYzU6vcwaJYth2GHEjduYC1ySt8vFp
+         KhLx1gU+NX7qe7OTGUAO7m+ZsqHuI1zF28JyT+tv23Y7TZbrWMXyfy8StfuyDu29OeOf
+         M6pL/jecgFuW0/zeUsRwWSPSMJNd7YmmeLvdXJoNXYkw3nvbZBr/K4yV0F3QUaU1/pe7
+         2UY7Q433JtjjUM11QY7TVR4aKSb8oqopK9yqGfpDtF5YDvT5TzG0EdvCRgVU7IEfHLZx
+         yMe+ybv/6sCQUeq0OCayMubJCxCdWm4JQ9xSwvvNipPnUF4RsXctGL5sqYHN3g74ZYUV
+         NrYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702031483; x=1702636283;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Tcu3WmbH0rDpAmwPqLlBrIXFmcIviRa8i1AFTtWd1Zs=;
-        b=bBxI9zKM/6U7FXFx519Zqkl19F4kqdrsYUgMZuYr5H3gXb643WOS/e6Tv6d/jV7aRb
-         7VKPUr2k56Adzxvar6DfENloNDiT/OBrfrq+wcrIj+uFljgxdwcWDMEu+kdguAxVvpwN
-         VSE8/PnxwcNL2+7Er2fYsC/8rjyp98dHKM3p6tRbMJD4435ejgcmlI27T91jXE1Vsz7c
-         5ac1PcRF+QQJhTg0kRluadnqT3OzX5rdd0nVbAMU1IgPa6sHbxZDgsGoYjwl/saTcfq7
-         X96pvA7p2u5lumzSGlmZPzPyEBqZhr9xdgNHvNyjaUf4pgK8P9gIjQJ2I1sJqA0m/k40
-         j/2Q==
-X-Gm-Message-State: AOJu0YxoISnAKUc8/kcgkXME61+Tl8u7wHDeA2sFOtBQgNM+xnGfczeF
-	51q5ZG0x8YTliwl7CGgCnHvgn9a6XiTmXKNzW6FmoBF5nefWBRTu8RjnxMXY/W3l29QlUotIXHH
-	CuzgRVK0tiMneg1op
-X-Received: by 2002:a2e:8884:0:b0:2ca:56:778f with SMTP id k4-20020a2e8884000000b002ca0056778fmr1257126lji.48.1702031483560;
-        Fri, 08 Dec 2023 02:31:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHKcY1LCS/VjPyEMeTLMNoGPvmPdJg2dsZtFpUis0zp6RJwZ5WMd0CWqzm2EoCROz7SrjQSKA==
-X-Received: by 2002:a2e:8884:0:b0:2ca:56:778f with SMTP id k4-20020a2e8884000000b002ca0056778fmr1257123lji.48.1702031483207;
-        Fri, 08 Dec 2023 02:31:23 -0800 (PST)
-Received: from redhat.com ([2a02:14f:1f0:7466:b10d:58c8:869f:7e91])
-        by smtp.gmail.com with ESMTPSA id cu12-20020a170906ba8c00b00a10f3030e11sm829135ejd.1.2023.12.08.02.31.20
+        d=1e100.net; s=20230601; t=1702031554; x=1702636354;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YssbbUCPI2cVXvHWriFdE5fhn9Moo9Wlhv3uqYqJSwE=;
+        b=GYoF/uF3GxYBmrb+Pod+hu0itjxBOIIDHZs8KjSVouwZDba2uOXYP1KEpk1MIlegFg
+         Hsb48LBZyuJOUIk7WlQd4T2zHRrtSb7RtV1oC8Rk2lEqP3evcqzDOllrh63sR6zz8gzz
+         DstyqhZljipnvHbBUR3r/UuR141ZKgLL4geLGm/wO1j4PInty45i0euZVjsN607dDBXy
+         e0Vyukgsoszmey6t4T8AvEr6IE0bA+/rVKEU2e6tWVw3UJIGW4cYV856WVjB0OUGGwZm
+         NnHSFPDZwOj80Uxta6J6FOW+wcYRnr8b2x0AbSoaMmmlWZdKRR+e5WRkpN7NAiO5JORA
+         gvpw==
+X-Gm-Message-State: AOJu0YxayAhP6+JB6iyD9XdxgVIAZiMi+b3gKNIMcQ3PkLxzd7eTgqaC
+	9GP6QJdJ6qlmFd7XaXFvWBSy
+X-Google-Smtp-Source: AGHT+IGNfp9Ep6LAjKWWdk4BU7zk1Hj3bGaTZHBgdMaZGRdi4WR6/bUXwRY+x/gs7QUpuEH3SEgcTQ==
+X-Received: by 2002:a17:903:244e:b0:1cc:53d1:10b8 with SMTP id l14-20020a170903244e00b001cc53d110b8mr4898083pls.50.1702031553834;
+        Fri, 08 Dec 2023 02:32:33 -0800 (PST)
+Received: from thinkpad ([117.216.123.142])
+        by smtp.gmail.com with ESMTPSA id c21-20020a170902b69500b001d1d1ef8be6sm1347559pls.267.2023.12.08.02.32.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Dec 2023 02:31:22 -0800 (PST)
-Date: Fri, 8 Dec 2023 05:31:18 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Tobias Huschle <huschle@linux.ibm.com>
-Cc: Abel Wu <wuyun.abel@bytedance.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	jasowang@redhat.com
-Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
- sched/fair: Add lag based placement)
-Message-ID: <20231208052150-mutt-send-email-mst@kernel.org>
-References: <ZVdbdSXg4qefTNtg@DESKTOP-2CCOB1S.>
- <20231117123759.GP8262@noisy.programming.kicks-ass.net>
- <46a997c2-5a38-4b60-b589-6073b1fac677@bytedance.com>
- <ZVyt4UU9+XxunIP7@DESKTOP-2CCOB1S.>
- <20231122100016.GO8262@noisy.programming.kicks-ass.net>
- <6564a012.c80a0220.adb78.f0e4SMTPIN_ADDED_BROKEN@mx.google.com>
- <d4110c79-d64f-49bd-9f69-0a94369b5e86@bytedance.com>
- <07513.123120701265800278@us-mta-474.us.mimecast.lan>
- <20231207014626-mutt-send-email-mst@kernel.org>
- <56082.123120804242300177@us-mta-137.us.mimecast.lan>
+        Fri, 08 Dec 2023 02:32:33 -0800 (PST)
+Date: Fri, 8 Dec 2023 16:02:22 +0530
+From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+	Rocky Liao <quic_rjliao@quicinc.com>, Alex Elder <elder@linaro.org>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [RESEND PATCH v2 0/3] Bluetooth: power-on QCA6390 correctly
+Message-ID: <20231208103222.GB3008@thinkpad>
+References: <20231208090936.27769-1-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <56082.123120804242300177@us-mta-137.us.mimecast.lan>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231208090936.27769-1-brgl@bgdev.pl>
 
-On Fri, Dec 08, 2023 at 10:24:16AM +0100, Tobias Huschle wrote:
-> On Thu, Dec 07, 2023 at 01:48:40AM -0500, Michael S. Tsirkin wrote:
-> > On Thu, Dec 07, 2023 at 07:22:12AM +0100, Tobias Huschle wrote:
-> > > 3. vhost looping endlessly, waiting for kworker to be scheduled
-> > > 
-> > > I dug a little deeper on what the vhost is doing. I'm not an expert on
-> > > virtio whatsoever, so these are just educated guesses that maybe
-> > > someone can verify/correct. Please bear with me probably messing up 
-> > > the terminology.
-> > > 
-> > > - vhost is looping through available queues.
-> > > - vhost wants to wake up a kworker to process a found queue.
-> > > - kworker does something with that queue and terminates quickly.
-> > > 
-> > > What I found by throwing in some very noisy trace statements was that,
-> > > if the kworker is not woken up, the vhost just keeps looping accross
-> > > all available queues (and seems to repeat itself). So it essentially
-> > > relies on the scheduler to schedule the kworker fast enough. Otherwise
-> > > it will just keep on looping until it is migrated off the CPU.
-> > 
-> > 
-> > Normally it takes the buffers off the queue and is done with it.
-> > I am guessing that at the same time guest is running on some other
-> > CPU and keeps adding available buffers?
-> > 
+On Fri, Dec 08, 2023 at 10:09:33AM +0100, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> It seems to do just that, there are multiple other vhost instances
-> involved which might keep filling up thoses queues. 
+> Resending with all maintainers in CC.
+> 
+> Patch 1 is just a typo fix as we're already touching this bindings. The
+> second patch adds more regulator definitions and enforces them for the
+> QCA6390 model. The final patch enables the power sequence for the BT
+> module of QCA6390 in the hci_qca driver.
 > 
 
-No vhost is ever only draining queues. Guest is filling them.
+Is bluetooth fully functional without handling WLAN specific resources like
+regulators, enable GPIO? When I checked last time, the chip requires both
+Bluetooth and WLAN resources to become fully operational.
 
-> Unfortunately, this makes the problematic vhost instance to stay on
-> the CPU and prevents said kworker to get scheduled. The kworker is
-> explicitly woken up by vhost, so it wants it to do something.
-> 
-> At this point it seems that there is an assumption about the scheduler
-> in place which is no longer fulfilled by EEVDF. From the discussion so
-> far, it seems like EEVDF does what is intended to do.
-> 
-> Shouldn't there be a more explicit mechanism in use that allows the
-> kworker to be scheduled in favor of the vhost?
-> 
-> It is also concerning that the vhost seems cannot be preempted by the
-> scheduler while executing that loop.
+- Mani
 
-
-Which loop is that, exactly?
+> v1 -> v2:
+> - squashed the two bluetooth patches into one
+> - changed the naming convention for the RFA regulators to follow the
+>   existing ones
+> - added dt-bindings patches
+> 
+> Bartosz Golaszewski (3):
+>   dt-bindings: net: bluetooth: qualcomm: fix a typo
+>   dt-bindings: net: bluetooth: qualcomm: add regulators for QCA6390
+>   Bluetooth: qca: run the power-on/off sequence for QCA6390 too
+> 
+>  .../net/bluetooth/qualcomm-bluetooth.yaml     | 26 ++++++++++++++++++-
+>  drivers/bluetooth/hci_qca.c                   | 14 +++++++++-
+>  2 files changed, 38 insertions(+), 2 deletions(-)
+> 
+> -- 
+> 2.40.1
+> 
+> 
 
 -- 
-MST
-
+மணிவண்ணன் சதாசிவம்
 
