@@ -1,102 +1,187 @@
-Return-Path: <netdev+bounces-55266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A1DF80A05F
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 11:14:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF91680A062
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 11:16:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BFA51C20A41
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 10:14:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A55B92812E6
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 10:16:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA761426B;
-	Fri,  8 Dec 2023 10:13:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F0014271;
+	Fri,  8 Dec 2023 10:16:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="oARunh9m"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bCHuF1vJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C57A1706
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 02:13:55 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-54c671acd2eso2508956a12.1
-        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 02:13:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702030434; x=1702635234; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Emm2+uRMKtIwNKxzicMibCHscqGZ8bqfWrJ38jE7LnQ=;
-        b=oARunh9m4yGIk2RF2g3mV2F9gxAEvo1YQ4Cl/6ujNWxHwiVt7bFB0qjqNd7qXVbB+u
-         lD6Xbof9WH9YB42PoiQr5L88/SCQINnGsyBT99a71vZ8SoOMCKF9fJYU7W6W7ez2psYc
-         PcZT4dBZkJUQXn3gSw5M3JWq51aBHrjN6c9dvGcx0cPON4LBMHYwLeVqhFpnR4YR8v8N
-         12nDj2G4yGt0LO11LfTE+KSkxD6njQYBLVCuJoVyO24/XGSwqXsq5i3ZW1ZSBVx5NWbY
-         PNH/IiRifnUV+BYMxp+4gUluUCAeHpXJ0t40l2pYrnu9gTQZqwXW1s9NJVNCMUu+saZY
-         Hpbw==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 352B91723
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 02:16:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702030559;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MX6evhTqPpwavQwynX3n7pSmcswtMdA0RykzkRNIQhc=;
+	b=bCHuF1vJwtUWSc/7b8gYDUGFORIbSxmqsphsXjYMFRWZbQpD1Oq8EKECyeg36pnYj0X8hV
+	s5KzGWgArjgf/PiBJP2kBZcmXhGJLFkhxNYmth/UpfYesUrHbcqx9ky92QzxHdt0tyj6kS
+	rFY2Ym/b3wzDwLH2ovZKtMCY/MUI0MU=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-522-YYqtTadVMYuo0ppCM3C5Sg-1; Fri, 08 Dec 2023 05:15:57 -0500
+X-MC-Unique: YYqtTadVMYuo0ppCM3C5Sg-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-54c64c3a702so1088205a12.2
+        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 02:15:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702030434; x=1702635234;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Emm2+uRMKtIwNKxzicMibCHscqGZ8bqfWrJ38jE7LnQ=;
-        b=uPfB1MMBbdGLTTB2phMdj8kKCsGuiBVotp5yFjsGBsevRlPWvef+tmGTD6Q9Y8du3s
-         xxP/ulMfWlTE/Z5K1dTyI5i3bMLIbzTCEYP//RCZ0fRbIjktClMEEsUaO8qbYP5tB3nG
-         0A2A3Twj7jJmOYBALr6FvpLGAYVcmkmyTQNmcQX5WDbYHK3CVMvT6vR8diC9l2MR0fSB
-         h+qYarOZlImLF4K8uGqkjuRQnzvHEP9cLxfIAD6Rp6xDa3vFB04fD8Tu32nViol6nyWz
-         Fxwqi9hiT+nIvu12BHd1bVWNw7E4aTaUDffLTvcDuMuiBCIF4VQ+f+lfGW+tbYbJDb4o
-         aq9w==
-X-Gm-Message-State: AOJu0YzNEd5RiE4BbodVmY8eserboJ0WFYob6dVrB5gL1zBGh1zCIRKd
-	4npMWNG+HekcY6+1Y/qQany6CQ==
-X-Google-Smtp-Source: AGHT+IFdnWcE5OCkLq5I23/aMNUrUVXosxGJSO3P3npmsZQ7voNg2SgvIeJec54h0J1grzWAABNwoA==
-X-Received: by 2002:a17:906:897:b0:9e4:b664:baa8 with SMTP id n23-20020a170906089700b009e4b664baa8mr2090996eje.7.1702030433745;
-        Fri, 08 Dec 2023 02:13:53 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id wi6-20020a170906fd4600b00a1cd9151af6sm814044ejb.210.2023.12.08.02.13.52
+        d=1e100.net; s=20230601; t=1702030556; x=1702635356;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MX6evhTqPpwavQwynX3n7pSmcswtMdA0RykzkRNIQhc=;
+        b=a7F+aN4ff7yLmJjfMyh98xeSvXd7o0bYOQ/p7mNzKxfdNU3Wj16849bo+cXagvAlL8
+         jvI5nptBiHoaJapxySoh1dmAICeAMjMzh1ltyBo9KvjRD+w39qH6jUWDtGpJ0RuCRE25
+         3nmsjq2VgElUzTzEGWO+01zn20lZ0+nY0XD10LpoW8ypwTmfMTFSkjiYibZ6Q2zGt2ji
+         Q1+EMasmdeC/KRSNop47NP1Le5NX7eW4e4eWn69QIZBw6TmQ6mS3fTVzOgy7oh/e+xPP
+         AP8cNq1QplIrbkQe6Mf4I4NAAAl2MU8N8H8fCdDaK8NSyunztn6KGLk7XnAbjBTPel8N
+         k/pA==
+X-Gm-Message-State: AOJu0YwE28ZMJvqE6h0GBFy1bsyJDFukrg17L3yHwtB+rvs4VPabs+xB
+	l5K3VuCy9hOTtWChTNxyzeJigmXQb/mpNY5073HAUUcy+v1GmnahYMJM8Ba9tDFZ6F+GshixdWQ
+	x9t4QGD+5hBEIZhcy
+X-Received: by 2002:a50:cc8e:0:b0:54c:6386:a1a3 with SMTP id q14-20020a50cc8e000000b0054c6386a1a3mr2083710edi.15.1702030556508;
+        Fri, 08 Dec 2023 02:15:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHABCxRaD9hK0mI0OvT0IXyPNkLh2JMHZAeWuelR90R+Wkie7Wr6WeoMLFU7DReUQ64cMMuHA==
+X-Received: by 2002:a50:cc8e:0:b0:54c:6386:a1a3 with SMTP id q14-20020a50cc8e000000b0054c6386a1a3mr2083690edi.15.1702030556160;
+        Fri, 08 Dec 2023 02:15:56 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id v21-20020a50d095000000b0054cd6346685sm692755edd.35.2023.12.08.02.15.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Dec 2023 02:13:53 -0800 (PST)
-Date: Fri, 8 Dec 2023 11:13:51 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: David Wei <dw@davidwei.uk>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 0/3] netdevsim: link and forward skbs between
-Message-ID: <ZXLsX0/n2r6sUorb@nanopsycho>
-References: <20231207172117.3671183-1-dw@davidwei.uk>
+        Fri, 08 Dec 2023 02:15:55 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 41AB7FAAB19; Fri,  8 Dec 2023 11:15:55 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>, Jamal Hadi Salim
+ <jhs@mojatatu.com>
+Cc: deb.chatterjee@intel.com, anjali.singhai@intel.com,
+ namrata.limaye@intel.com, mleitner@redhat.com, Mahesh.Shirshyad@amd.com,
+ tomasz.osinski@intel.com, jiri@resnulli.us, xiyou.wangcong@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org,
+ khalidm@nvidia.com, daniel@iogearbox.net, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v9 14/15] p4tc: add set of P4TC table kfuncs
+In-Reply-To: <8faf1308-2f9f-4923-804e-8d9b11ba74e0@linux.dev>
+References: <20231201182904.532825-1-jhs@mojatatu.com>
+ <20231201182904.532825-15-jhs@mojatatu.com>
+ <8faf1308-2f9f-4923-804e-8d9b11ba74e0@linux.dev>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Fri, 08 Dec 2023 11:15:55 +0100
+Message-ID: <87lea5j8ys.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231207172117.3671183-1-dw@davidwei.uk>
+Content-Type: text/plain
 
-"netdevsim: link and forward skbs between"
-I think it there something wrong with your email client, cutting
-subjects like this (all of them).
+Martin KaFai Lau <martin.lau@linux.dev> writes:
 
-Thu, Dec 07, 2023 at 06:21:14PM CET, dw@davidwei.uk wrote:
->This patchset adds the ability to link two netdevsim ports together and
->forward skbs between them, similar to veth. The goal is to use netdevsim
->for testing features e.g. zero copy Rx using io_uring.
+> On 12/1/23 10:29 AM, Jamal Hadi Salim wrote:
+>> We add an initial set of kfuncs to allow interactions from eBPF programs
+>> to the P4TC domain.
+>> 
+>> - bpf_p4tc_tbl_read: Used to lookup a table entry from a BPF
+>> program installed in TC. To find the table entry we take in an skb, the
+>> pipeline ID, the table ID, a key and a key size.
+>> We use the skb to get the network namespace structure where all the
+>> pipelines are stored. After that we use the pipeline ID and the table
+>> ID, to find the table. We then use the key to search for the entry.
+>> We return an entry on success and NULL on failure.
+>> 
+>> - xdp_p4tc_tbl_read: Used to lookup a table entry from a BPF
+>> program installed in XDP. To find the table entry we take in an xdp_md,
+>> the pipeline ID, the table ID, a key and a key size.
+>> We use struct xdp_md to get the network namespace structure where all
+>> the pipelines are stored. After that we use the pipeline ID and the table
+>> ID, to find the table. We then use the key to search for the entry.
+>> We return an entry on success and NULL on failure.
+>> 
+>> - bpf_p4tc_entry_create: Used to create a table entry from a BPF
+>> program installed in TC. To create the table entry we take an skb, the
+>> pipeline ID, the table ID, a key and its size, and an action which will
+>> be associated with the new entry.
+>> We return 0 on success and a negative errno on failure
+>> 
+>> - xdp_p4tc_entry_create: Used to create a table entry from a BPF
+>> program installed in XDP. To create the table entry we take an xdp_md, the
+>> pipeline ID, the table ID, a key and its size, and an action which will
+>> be associated with the new entry.
+>> We return 0 on success and a negative errno on failure
+>> 
+>> - bpf_p4tc_entry_create_on_miss: conforms to PNA "add on miss".
+>> First does a lookup using the passed key and upon a miss will add the entry
+>> to the table.
+>> We return 0 on success and a negative errno on failure
+>> 
+>> - xdp_p4tc_entry_create_on_miss: conforms to PNA "add on miss".
+>> First does a lookup using the passed key and upon a miss will add the entry
+>> to the table.
+>> We return 0 on success and a negative errno on failure
+>> 
+>> - bpf_p4tc_entry_update: Used to update a table entry from a BPF
+>> program installed in TC. To update the table entry we take an skb, the
+>> pipeline ID, the table ID, a key and its size, and an action which will
+>> be associated with the new entry.
+>> We return 0 on success and a negative errno on failure
+>> 
+>> - xdp_p4tc_entry_update: Used to update a table entry from a BPF
+>> program installed in XDP. To update the table entry we take an xdp_md, the
+>> pipeline ID, the table ID, a key and its size, and an action which will
+>> be associated with the new entry.
+>> We return 0 on success and a negative errno on failure
+>> 
+>> - bpf_p4tc_entry_delete: Used to delete a table entry from a BPF
+>> program installed in TC. To delete the table entry we take an skb, the
+>> pipeline ID, the table ID, a key and a key size.
+>> We return 0 on success and a negative errno on failure
+>> 
+>> - xdp_p4tc_entry_delete: Used to delete a table entry from a BPF
+>> program installed in XDP. To delete the table entry we take an xdp_md, the
+>> pipeline ID, the table ID, a key and a key size.
+>> We return 0 on success and a negative errno on failure
 >
->This feature was tested locally on QEMU, and a selftest is included.
+> [ ... ]
 >
->David Wei (3):
->  netdevsim: allow two netdevsim ports to be connected
->  netdevsim: forward skbs from one connected port to another
->  netdevsim: add selftest for forwarding skb between connected ports
+>> +BTF_SET8_START(p4tc_kfunc_check_tbl_set_skb)
+>> +BTF_ID_FLAGS(func, bpf_p4tc_tbl_read, KF_RET_NULL);
+>> +BTF_ID_FLAGS(func, bpf_p4tc_entry_create);
+>> +BTF_ID_FLAGS(func, bpf_p4tc_entry_create_on_miss);
+>> +BTF_ID_FLAGS(func, bpf_p4tc_entry_update);
+>> +BTF_ID_FLAGS(func, bpf_p4tc_entry_delete);
+>> +BTF_SET8_END(p4tc_kfunc_check_tbl_set_skb)
 >
-> drivers/net/netdevsim/bus.c                   |  10 ++
-> drivers/net/netdevsim/dev.c                   |  97 +++++++++++++++
-> drivers/net/netdevsim/netdev.c                |  25 +++-
-> drivers/net/netdevsim/netdevsim.h             |   3 +
-> .../drivers/net/netdevsim/forward.sh          | 111 ++++++++++++++++++
-> 5 files changed, 241 insertions(+), 5 deletions(-)
-> create mode 100755 tools/testing/selftests/drivers/net/netdevsim/forward.sh
->
->-- 
->2.39.3
->
->
+> These create/read/update/delete kfuncs are like defining a new hidden bpf map 
+> type in the kernel. bpf prog can now create its own link-list and rbtree. 
+> sched_ext has already been using it. This is the way the bpf prog should use 
+> instead of creating a new map type.
+
+I don't really think this is an accurate assessment, given Jamal's use
+case. These kfuncs are more akin to the FIB lookup helper, or the
+netfilter kfuncs: they provide lookup into a kernel-internal data
+structure, so that BPF can access that data structure while staying in
+sync with the rest of the kernel.
+
+If this was a BPF-only implementation you'd be right, but given the
+constraint of having the P4 objects represented in the kernel[0], I
+think this is a perfectly reasonable use of kfuncs, even though they
+happen to look like the map API.
+
+-Toke
+
+[0] Whether having those objects represented at all is reasonable is a
+separate discussion, which I believe John et al are having with Jamal in
+a separate subthread. I don't personally have any strong objections to
+doing that.
+
 
