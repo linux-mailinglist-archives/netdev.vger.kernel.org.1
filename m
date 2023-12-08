@@ -1,198 +1,135 @@
-Return-Path: <netdev+bounces-55488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1DF880B098
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 00:31:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DFFC380B0A4
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 00:39:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5AA9D1F21338
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 23:31:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9623E1F212BE
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 23:39:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69AA85ABA7;
-	Fri,  8 Dec 2023 23:31:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02065ABAB;
+	Fri,  8 Dec 2023 23:38:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="PiarAZ04"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RuKS3EA5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3682137
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 15:30:59 -0800 (PST)
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 0E12941516
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 23:30:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1702078258;
-	bh=W4YmvBWrOBzInEYUWdzBgaE35XDrnqoquNNpR5Ozyw8=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID;
-	b=PiarAZ040GF33p0jb9r+7mORf6YvF2Y81kDg5YRAQy6dVNKZYUgxRepXktTJegJsD
-	 yVe+6nrG1tLiJ1f5BDWzNp7sMtACj6rgCf2/hw4qXPqv6tf8uq210AXyaYiggcn9Lt
-	 d8dD5DAHI3FGS0vV//2nhJGSd0jIVj4ht91jsUba/QO2p2G5RZ03WWfqAomQaWGhX/
-	 aQA0ZwBoyJgtnFvv0RJPv1YV80f1WIB9HOIo5ofOSuG4DUBbt1QL7nWmBc6GMgSy3K
-	 pc+EGYVQjf7+Z01AAalIHVGWsB5kEz/k48McVOPTVj63Kris+NgFrew9z6curr5iCF
-	 iF9mp6zY6CVZQ==
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-35d62f23044so25515075ab.1
-        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 15:30:57 -0800 (PST)
+Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36D0E10E0
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 15:38:55 -0800 (PST)
+Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-5d3c7ef7b31so25880887b3.3
+        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 15:38:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702078734; x=1702683534; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gIjQQFFUX9zSCnboPsw1mgqaTeX8KFxb01r9jhyevlI=;
+        b=RuKS3EA5DLzyJTFtGnvREy3PWOi3puxGlxrXtumKyQ84De2f7NElL17U6r0rFnyGUq
+         UdsE2N2O+kG6ijnUCkwv46FuOBPJCErIDdUZfIBB4WVLvAhWCDwyaae++LHkqb27pPuP
+         naZrdpAO0cy4RHtnvRgZopHA63kw8ulUr7uf+xSJeVM3JfC43PXC8KlXtroo3TAzJzaL
+         iijHTcVE1QhiLPsUon1oGNUXTQ1bF+sYsfoBkvkhLxgfB8wFvUsK1MpEo5GhqVi8rnFv
+         Iduwhp0nov6d+MkdrMA6m5OzhaWSJuPck6wYXXsOMyUpvAj7UkWch940RswxUjVpwDbd
+         zYEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702078256; x=1702683056;
-        h=message-id:date:content-transfer-encoding:content-id:mime-version
-         :comments:references:in-reply-to:subject:cc:to:from
+        d=1e100.net; s=20230601; t=1702078734; x=1702683534;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W4YmvBWrOBzInEYUWdzBgaE35XDrnqoquNNpR5Ozyw8=;
-        b=w74H226pKwhEJ+A/aKCQYAaFmP5FemLZykmuBNRKQaM4YnxHdENEUDeekBgsvLRxga
-         q9bHwAJS0RLFIgD4r+BAbONN0oCVi8evGbHtVNhJDF+/BI1F8CkLUkXVH5b1BkeHuz8G
-         cyaz8hxWD9lcwPKIE0TsiGENmZz6pxASFbCGg+eoCxZWqrjCavg6Yyibp0YJFaBGMm9X
-         QH0PhSgiUD2BMOMWtMTEz6pqsfhl6iizJShkcr7Py/K+QTsugThJyuqNQ/b1O3EEoTUl
-         I/LqWhtlEMuxby8ylA/ouS7KGr5sK2BK9t6P4Se+vGSos98ksDdezYTvgaN/TQnraJVg
-         fIWA==
-X-Gm-Message-State: AOJu0Yw9nC6i10Vtl4ptB+e3DqWfRL5sfEFgmYPXQOtvOBRhwOagiv+e
-	X35v2U4qaT9fMTlZPuNPZ8KLUgKBcqrKtmX3WLyYG3ICM1Qdw8R8UGhDJMgWWHA5Vai87vrx04H
-	VaK4F71c5aCOPPBzFifAsdVwGBwMVlfrZCoaPvTtG8g==
-X-Received: by 2002:a92:cdae:0:b0:35d:59a2:1285 with SMTP id g14-20020a92cdae000000b0035d59a21285mr1173532ild.49.1702078255928;
-        Fri, 08 Dec 2023 15:30:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEfsWTaPFJlhMNBh4Ocy0DObSJXiXWvrbBSbZz0L4YyFpOPyuwVQUfGjYVcOrHUq4/BJxnsEw==
-X-Received: by 2002:a92:cdae:0:b0:35d:59a2:1285 with SMTP id g14-20020a92cdae000000b0035d59a21285mr1173517ild.49.1702078255572;
-        Fri, 08 Dec 2023 15:30:55 -0800 (PST)
-Received: from famine.localdomain ([50.125.80.253])
-        by smtp.gmail.com with ESMTPSA id k10-20020a170902694a00b001d0ba4513b0sm2232119plt.287.2023.12.08.15.30.55
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 08 Dec 2023 15:30:55 -0800 (PST)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id CCFF25FFF6; Fri,  8 Dec 2023 15:30:54 -0800 (PST)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id C52D09F88E;
-	Fri,  8 Dec 2023 15:30:54 -0800 (PST)
-From: Jay Vosburgh <jay.vosburgh@canonical.com>
-To: "Ertman, David M" <david.m.ertman@intel.com>
-cc: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-    "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-    "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-    "Brandeburg,
-    Jesse" <jesse.brandeburg@intel.com>,
-    Robert Malz <robert.malz@canonical.com>,
-    Heitor Alves de Siqueira <heitor.de.siqueira@canonical.com>
-Subject: Re: [PATCH iwl-next] ice: alter feature support check for SRIOV and LAG
-In-reply-to: <MW5PR11MB581150E2535B00AD04A37913DD8AA@MW5PR11MB5811.namprd11.prod.outlook.com>
-References: <20231207182158.2199799-1-david.m.ertman@intel.com> <bca6d80f-21de-f6dd-7b86-3daa867323e1@intel.com> <MW5PR11MB581150E2535B00AD04A37913DD8AA@MW5PR11MB5811.namprd11.prod.outlook.com>
-Comments: In-reply-to "Ertman, David M" <david.m.ertman@intel.com>
-   message dated "Fri, 08 Dec 2023 22:24:06 +0000."
-X-Mailer: MH-E 8.6+git; nmh 1.6; Emacs 29.0.50
+        bh=gIjQQFFUX9zSCnboPsw1mgqaTeX8KFxb01r9jhyevlI=;
+        b=B8LvD9XAyY2tYHYo2vH7BxB36IvB4/WOnZyzm+BndHXzi29qSPzAuHdg7D8frHSg4Q
+         v5yBDThS1bJRdajf97KOmK40i8AW5WAcdESzdqh7YGcamHGbgSMff3x/ELFXH815Njk5
+         Vi4/9UIyNB5xUu2vihoUbh1JNXy91p0H8E1uCxy+1oo8ONQahewf9xZCH1JzZzj4ivJs
+         wgj9GMMEVHa1mITL9xI4aTmOF713pRMBrGYr35libQcK/EOXbTu6jsiwPolAlvhi0+9Z
+         GWe+i3X0dDxwF8/dSUNE7mGmKKLMrA1GLBZV2lckjs/O1GMHTncJTw0bsmMwy7EZq+Ua
+         favQ==
+X-Gm-Message-State: AOJu0YyypyZzriGmq6v1BWgkxV8pI9gfnDLhSHTY4DBvJr5DLF2qPLdd
+	KQ9ybD5noeYloInXRktwtT8=
+X-Google-Smtp-Source: AGHT+IFXydUFGphkyg8Jj9oxaVv8btnoFVZq80DimopoNHcfuwJISBuGJah4DheF7k6VQlDz3W4CNQ==
+X-Received: by 2002:a81:8312:0:b0:5d3:42a1:8ce1 with SMTP id t18-20020a818312000000b005d342a18ce1mr780611ywf.23.1702078734401;
+        Fri, 08 Dec 2023 15:38:54 -0800 (PST)
+Received: from ?IPV6:2600:1700:6cf8:1240:65fe:fe26:c15:a05c? ([2600:1700:6cf8:1240:65fe:fe26:c15:a05c])
+        by smtp.gmail.com with ESMTPSA id x8-20020a81b048000000b005df5d592244sm85630ywk.78.2023.12.08.15.38.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Dec 2023 15:38:54 -0800 (PST)
+Message-ID: <3cea4a80-09c0-4a58-87e9-25073b4e9c9f@gmail.com>
+Date: Fri, 8 Dec 2023 15:38:52 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <21389.1702078254.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 08 Dec 2023 15:30:54 -0800
-Message-ID: <21390.1702078254@famine>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/2] net/ipv6: insert a f6i to a GC list only
+ if the f6i is in a fib6_table tree.
+Content-Language: en-US
+From: Kui-Feng Lee <sinquersw@gmail.com>
+To: David Ahern <dsahern@kernel.org>, thinker.li@gmail.com,
+ netdev@vger.kernel.org, martin.lau@linux.dev, kernel-team@meta.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+Cc: kuifeng@meta.com, syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com
+References: <20231208194523.312416-1-thinker.li@gmail.com>
+ <20231208194523.312416-2-thinker.li@gmail.com>
+ <353fc304-389b-4c16-b78f-20128d688370@kernel.org>
+ <92dcf735-6e9c-48dc-a020-d4e2658dff19@gmail.com>
+In-Reply-To: <92dcf735-6e9c-48dc-a020-d4e2658dff19@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Ertman, David M <david.m.ertman@intel.com> wrote:
 
->> -----Original Message-----
->> From: Nguyen, Anthony L <anthony.l.nguyen@intel.com>
->> Sent: Friday, December 8, 2023 1:18 PM
->> To: Ertman, David M <david.m.ertman@intel.com>; intel-wired-
->> lan@lists.osuosl.org
->> Cc: netdev@vger.kernel.org; Brandeburg, Jesse
->> <jesse.brandeburg@intel.com>
->> Subject: Re: [PATCH iwl-next] ice: alter feature support check for SRIO=
-V and
->> LAG
->> =
 
->> =
-
->> =
-
->> On 12/7/2023 10:21 AM, Dave Ertman wrote:
->> > Previously, the ice driver had support for using a hanldler for bondi=
-ng
->> > netdev events to ensure that conflicting features were not allowed to=
- be
->> > activated at the same time.  While this was still in place, additiona=
-l
->> > support was added to specifically support SRIOV and LAG together.  Th=
-ese
->> > both utilized the netdev event handler, but the SRIOV and LAG feature=
- was
->> > behind a capabilities feature check to make sure the current NVM has
->> > support.
->> >
->> > The exclusion part of the event handler should be removed since there=
- are
->> > users who have custom made solutions that depend on the non-exclusion
->> of
->> > features.
->> >
->> > Wrap the creation/registration and cleanup of the event handler and
->> > associated structs in the probe flow with a feature check so that the
->> > only systems that support the full implementation of LAG features wil=
-l
->> > initialize support.  This will leave other systems unhindered with
->> > functionality as it existed before any LAG code was added.
->> =
-
->> This sounds like a bug fix? Should it be for iwl-net?
+On 12/8/23 15:19, Kui-Feng Lee wrote:
+> 
+> 
+> On 12/8/23 14:43, David Ahern wrote:
+>> On 12/8/23 12:45 PM, thinker.li@gmail.com wrote:
+>>> From: Kui-Feng Lee <thinker.li@gmail.com>
+>>>
+>>> Check f6i->fib6_node and hlist_unhashed(&f6i->gc_link) before 
+>>> inserting a
+>>> f6i (fib6_info) to tb6_gc_hlist.
+>>>
+>>> The current implementation checks if f6i->fib6_table is not NULL to
+>>> determines if a f6i is on a tree, however it is not enough. When a 
+>>> f6i is
+>>> removed from a fib6_table, f6i->fib6_table is not reset. However, 
+>>> fib6_node
+>>> is always reset when a f6i is removed from a fib6_table and is set 
+>>> when a
+>>> f6i is added to a fib6_table. So, f6i->fib6_node is a reliable way to
+>>> determine if a f6i is on a tree.
 >>
->
->To my knowledge, this issue has not been reported by any users and was fo=
-und
->through code inspection.  Would you still recommend iwl-net?
+>> Which is an indication that the table is not the right check but neither
+>> is the fib6_node. If expires is set on a route entry, add it to the
+>> gc_list; if expires is reset on a route entry, remove it from the
+>> gc_list. If the value of expires is changed while on the gc_list list,
+>> just update the expires value.
+>>
+> 
+> I don't quite follow you.
+> If an entry is not on a tree, why do we still add the entry to the gc 
+> list? (This is the reason to check f6i->fib6_node.)
+> 
+> The changes in this patch rely on two indications, 1. if a f6i is on a 
+> tree, 2. if a f6i is on a gc list (described in the 3rd paragraph of
+> the comment log.)
+> An entry is added to a gc list only if it has expires and is not on the 
+> list yet. An entry is removed from a gc list only if it is on a gc list.
+> And, just like what you said earlier, it just updates the expires value
+> while an entry is already on a gc list.
 
-	We have a customer experiencing intermittent issues with
-transmit timeouts that go away if we disable the LAG integration as
-suggested at [0] (or don't use bonding).  This is on the Ubuntu 5.15
-based distro kernel, not upstream, but it does not manifest with the OOT
-driver, and seems somehow related to the LAG offloading functionality.
+Add more context here.
 
-	There was also a post to the list describing similar effects
-last month [1], that one seems to be on an Ubuntu 6.2 distro kernel.
+Use rt6_route_rcv() as an example. It looks up or adds a route first.
+Then it changes expires of the route at the very end of the function.
+There is gap between looking up and the modification. The f6i found here
+can be removed from the tree in-between. If the f6i here is added to the
+gc list even it has been removed from the tree, fib6_info_release() at 
+the end of rt6_route_rcv() might free the f6i while the f6i is still in
+the gc list.
 
-	Could these issues be plausibly related to the change in this
-patch?
-
-	-J
-	=
-
-[0]
-https://bugs.launchpad.net/ubuntu/+source/linux/+bug/2036239/comments/40
-[1]
-https://lists.osuosl.org/pipermail/intel-wired-lan/Week-of-Mon-20231120/03=
-8096.html
-
-
-
->DaveE
-> =
-
->> > Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
->> > Signed-off-by: Dave Ertman <david.m.ertman@intel.com>
->> > ---
->> >   drivers/net/ethernet/intel/ice/ice_lag.c | 2 ++
->> >   1 file changed, 2 insertions(+)
->> >
->> > diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c
->> b/drivers/net/ethernet/intel/ice/ice_lag.c
->> > index 280994ee5933..b47cd43ae871 100644
->> > --- a/drivers/net/ethernet/intel/ice/ice_lag.c
->> > +++ b/drivers/net/ethernet/intel/ice/ice_lag.c
->> > @@ -1981,6 +1981,8 @@ int ice_init_lag(struct ice_pf *pf)
->> >   	int n, err;
->> >
->> >   	ice_lag_init_feature_support_flag(pf);
->> > +	if (!ice_is_feature_supported(pf, ICE_F_SRIOV_LAG))
->> > +		return 0;
->> >
->> >   	pf->lag =3D kzalloc(sizeof(*lag), GFP_KERNEL);
->> >   	if (!pf->lag)
-
----
-	-Jay Vosburgh, jay.vosburgh@canonical.com
+This is why it checks if a f6i is on the tree with the protection of
+tb6_lock.
 
