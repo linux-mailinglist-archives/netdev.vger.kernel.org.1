@@ -1,116 +1,250 @@
-Return-Path: <netdev+bounces-55256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71C5A809FF8
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 10:52:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BCC080A02B
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 11:02:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C314281B9A
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 09:52:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC71E1F21713
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 10:02:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B79612B83;
-	Fri,  8 Dec 2023 09:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8898812E44;
+	Fri,  8 Dec 2023 10:02:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="V67GxKH4"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="b76OthSm"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 952F9172B
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 01:52:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=ZfVcCRN7TGJNPU/oKOExKs0+eTvohw5Fj4WDNPwYC6I=; t=1702029141; x=1703238741; 
-	b=V67GxKH4/BY8573xEGJXro4y7tSatk6ZVHS/ifjXHphQpFforoaX5XuB8CB/vJkRnCNBz3pzlQn
-	J1cIkBdbYscYA94x6Xsd+7udTU7zwThS2t4ZZFSH7lwD176/o4kQc7IxBAsvN8AUyhz/3xSQa65rG
-	Yzn7i3wQ3v/wOlGEXYbImmohCQ5EFdvwisj8363A5iZ87lz0d7OmOSurBqvibyd2l6crISScFTw65
-	RrxfM5IXO30/9t54xJOobvkwkA3abj0AuYn7yzz0E8+roaSxAXDRy8JTnmiuL/CsPtddMOpe9BU8I
-	8iwjD4ZEIRaEE73R2ttV9ND9yC4YjAEctG/Q==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rBXWs-00000002g6Q-02dc;
-	Fri, 08 Dec 2023 10:52:18 +0100
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Johannes Berg <johannes.berg@intel.com>
-Subject: [PATCH net-next] Revert "net: rtnetlink: remove local list in __linkwatch_run_queue()"
-Date: Fri,  8 Dec 2023 10:52:15 +0100
-Message-ID: <20231208105214.42304677dc64.I9be9486d2fa97a396d0c73e455d5cab5f376b837@changeid>
-X-Mailer: git-send-email 2.43.0
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0F7E5D5B;
+	Fri,  8 Dec 2023 02:02:40 -0800 (PST)
+Received: by linux.microsoft.com (Postfix, from userid 1099)
+	id E473F20B74C0; Fri,  8 Dec 2023 02:02:38 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E473F20B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1702029758;
+	bh=bC0rZPUj3vdJkI+4wJKSoDBmkdXIOKDY9tHt0bJ5YcM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=b76OthSm/w/9rCAyVWtY2zPWMN2U/BUue3Vv1sIOluxb3aK0za+esDZ+NuwOYvc1E
+	 5deAKd+RE7PEQ5EH09pP4IyHiT+UhGmsiqD1BJYjjve7c2OdUTj0bsvlosi88i5MV8
+	 55z8pbrbuCRq7XxNRNiNFoGgJpIQPwcdbimD/VWI=
+From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	longli@microsoft.com,
+	yury.norov@gmail.com,
+	leon@kernel.org,
+	cai.huoqing@linux.dev,
+	ssengar@linux.microsoft.com,
+	vkuznets@redhat.com,
+	tglx@linutronix.de,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: schakrabarti@microsoft.com,
+	paulros@microsoft.com,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Subject: [PATCH V5 net-next] net: mana: Assigning IRQ affinity on HT cores
+Date: Fri,  8 Dec 2023 02:02:34 -0800
+Message-Id: <1702029754-6520-1-git-send-email-schakrabarti@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Johannes Berg <johannes.berg@intel.com>
+Existing MANA design assigns IRQ to every CPU, including sibling
+hyper-threads. This may cause multiple IRQs to be active simultaneously
+in the same core and may reduce the network performance with RSS.
 
-This reverts commit b8dbbbc535a9 ("net: rtnetlink: remove local list
-in __linkwatch_run_queue()"). It's evidently broken when there's a
-non-urgent work that gets added back, and then the loop can never
-finish.
+Improve the performance by assigning IRQ to non sibling CPUs in local
+NUMA node. The performance improvement we are getting using ntttcp with
+following patch is around 15 percent with existing design and approximately
+11 percent, when trying to assign one IRQ in each core across NUMA nodes,
+if enough cores are present.
 
-While reverting, add a note about that.
-
-Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
-Fixes: b8dbbbc535a9 ("net: rtnetlink: remove local list in __linkwatch_run_queue()")
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Suggested-by: Yury Norov <yury.norov@gmali.com>
+Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
 ---
-Clear case of me being asleep at the wheel ... sorry about that!
----
- net/core/link_watch.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+V4 -> V5:
+* Fixed use of for_each_numa_hop_mask in irq_setup, by using
+visited_cpus to mask previous node mask.
+* Changed the way IRQ0 is gettng assigned, to assign it a
+separate CPU if possible rather than assigning it to a already
+assigned CPU.
+* Added Suggested-by tag.
 
-diff --git a/net/core/link_watch.c b/net/core/link_watch.c
-index 7be5b3ab32bd..429571c258da 100644
---- a/net/core/link_watch.c
-+++ b/net/core/link_watch.c
-@@ -192,6 +192,11 @@ static void __linkwatch_run_queue(int urgent_only)
- #define MAX_DO_DEV_PER_LOOP	100
+V3 -> V4:
+* Used for_each_numa_hop_mask() macro and simplified the code.
+Thanks to Yury Norov for the suggestion.
+* Added code to assign hwc irq separately in mana_gd_setup_irqs.
+
+V2 -> V3:
+* Created a helper function to get the next NUMA with CPU.
+* Added some error checks for unsuccessful memory allocation.
+* Fixed some comments on the code.
+
+V1 -> V2:
+* Simplified the code by removing filter_mask_list and using avail_cpus.
+* Addressed infinite loop issue when there are numa nodes with no CPUs.
+* Addressed uses of local numa node instead of 0 to start.
+* Removed uses of BUG_ON.
+* Placed cpus_read_lock in parent function to avoid num_online_cpus
+  to get changed before function finishes the affinity assignment.
+---
+ .../net/ethernet/microsoft/mana/gdma_main.c   | 92 +++++++++++++++++--
+ 1 file changed, 83 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 6367de0c2c2e..18e8908c5d29 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -1243,15 +1243,56 @@ void mana_gd_free_res_map(struct gdma_resource *r)
+ 	r->size = 0;
+ }
  
- 	int do_dev = MAX_DO_DEV_PER_LOOP;
-+	/* Use a local list here since we add non-urgent
-+	 * events back to the global one when called with
-+	 * urgent_only=1.
-+	 */
-+	LIST_HEAD(wrk);
- 
- 	/* Give urgent case more budget */
- 	if (urgent_only)
-@@ -213,11 +218,12 @@ static void __linkwatch_run_queue(int urgent_only)
- 	clear_bit(LW_URGENT, &linkwatch_flags);
- 
- 	spin_lock_irq(&lweventlist_lock);
--	while (!list_empty(&lweventlist) && do_dev > 0) {
-+	list_splice_init(&lweventlist, &wrk);
++static int irq_setup(int *irqs, int nvec, int start_numa_node)
++{
++	int w, cnt, cpu, err = 0, i = 0;
++	int next_node = start_numa_node;
++	const struct cpumask *next, *prev = cpu_none_mask;
++	cpumask_var_t curr, cpus;
 +
-+	while (!list_empty(&wrk) && do_dev > 0) {
- 		struct net_device *dev;
++	if (!zalloc_cpumask_var(&curr, GFP_KERNEL)) {
++		err = -ENOMEM;
++		return err;
++	}
++	if (!zalloc_cpumask_var(&cpus, GFP_KERNEL)) {
++		err = -ENOMEM;
++		return err;
++	}
++
++	rcu_read_lock();
++	for_each_numa_hop_mask(next, next_node) {
++		cpumask_andnot(curr, next, prev);
++		for (w = cpumask_weight(curr), cnt = 0; cnt < w; ) {
++			cpumask_copy(cpus, curr);
++			for_each_cpu(cpu, cpus) {
++				irq_set_affinity_and_hint(irqs[i], topology_sibling_cpumask(cpu));
++				if (++i == nvec)
++					goto done;
++				cpumask_andnot(cpus, cpus, topology_sibling_cpumask(cpu));
++				++cnt;
++			}
++		}
++		prev = next;
++	}
++done:
++	rcu_read_unlock();
++	free_cpumask_var(curr);
++	free_cpumask_var(cpus);
++	return err;
++}
++
+ static int mana_gd_setup_irqs(struct pci_dev *pdev)
+ {
+-	unsigned int max_queues_per_port = num_online_cpus();
+ 	struct gdma_context *gc = pci_get_drvdata(pdev);
++	unsigned int max_queues_per_port;
+ 	struct gdma_irq_context *gic;
+ 	unsigned int max_irqs, cpu;
+-	int nvec, irq;
++	int start_irq_index = 1;
++	int nvec, *irqs, irq;
+ 	int err, i = 0, j;
  
--		dev = list_first_entry(&lweventlist, struct net_device,
--				       link_watch_list);
-+		dev = list_first_entry(&wrk, struct net_device, link_watch_list);
- 		list_del_init(&dev->link_watch_list);
++	cpus_read_lock();
++	max_queues_per_port = num_online_cpus();
+ 	if (max_queues_per_port > MANA_MAX_NUM_QUEUES)
+ 		max_queues_per_port = MANA_MAX_NUM_QUEUES;
  
- 		if (!netif_device_present(dev) ||
-@@ -235,6 +241,9 @@ static void __linkwatch_run_queue(int urgent_only)
- 		spin_lock_irq(&lweventlist_lock);
+@@ -1261,6 +1302,14 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
+ 	nvec = pci_alloc_irq_vectors(pdev, 2, max_irqs, PCI_IRQ_MSIX);
+ 	if (nvec < 0)
+ 		return nvec;
++	if (nvec <= num_online_cpus())
++		start_irq_index = 0;
++
++	irqs = kmalloc_array((nvec - start_irq_index), sizeof(int), GFP_KERNEL);
++	if (!irqs) {
++		err = -ENOMEM;
++		goto free_irq_vector;
++	}
+ 
+ 	gc->irq_contexts = kcalloc(nvec, sizeof(struct gdma_irq_context),
+ 				   GFP_KERNEL);
+@@ -1287,21 +1336,44 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
+ 			goto free_irq;
+ 		}
+ 
+-		err = request_irq(irq, mana_gd_intr, 0, gic->name, gic);
+-		if (err)
+-			goto free_irq;
+-
+-		cpu = cpumask_local_spread(i, gc->numa_node);
+-		irq_set_affinity_and_hint(irq, cpumask_of(cpu));
++		if (!i) {
++			err = request_irq(irq, mana_gd_intr, 0, gic->name, gic);
++			if (err)
++				goto free_irq;
++
++			/* If number of IRQ is one extra than number of online CPUs,
++			 * then we need to assign IRQ0 (hwc irq) and IRQ1 to
++			 * same CPU.
++			 * Else we will use different CPUs for IRQ0 and IRQ1.
++			 * Also we are using cpumask_local_spread instead of
++			 * cpumask_first for the node, because the node can be
++			 * mem only.
++			 */
++			if (start_irq_index) {
++				cpu = cpumask_local_spread(i, gc->numa_node);
++				irq_set_affinity_and_hint(irq, cpumask_of(cpu));
++			} else {
++				irqs[start_irq_index] = irq;
++			}
++		} else {
++			irqs[i - start_irq_index] = irq;
++			err = request_irq(irqs[i - start_irq_index], mana_gd_intr, 0,
++					  gic->name, gic);
++			if (err)
++				goto free_irq;
++		}
  	}
  
-+	/* Add the remaining work back to lweventlist */
-+	list_splice_init(&wrk, &lweventlist);
-+
- 	if (!list_empty(&lweventlist))
- 		linkwatch_schedule_work(0);
- 	spin_unlock_irq(&lweventlist_lock);
++	err = irq_setup(irqs, (nvec - start_irq_index), gc->numa_node);
++	if (err)
++		goto free_irq;
+ 	err = mana_gd_alloc_res_map(nvec, &gc->msix_resource);
+ 	if (err)
+ 		goto free_irq;
+ 
+ 	gc->max_num_msix = nvec;
+ 	gc->num_msix_usable = nvec;
+-
++	cpus_read_unlock();
+ 	return 0;
+ 
+ free_irq:
+@@ -1314,8 +1386,10 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
+ 	}
+ 
+ 	kfree(gc->irq_contexts);
++	kfree(irqs);
+ 	gc->irq_contexts = NULL;
+ free_irq_vector:
++	cpus_read_unlock();
+ 	pci_free_irq_vectors(pdev);
+ 	return err;
+ }
 -- 
-2.43.0
+2.34.1
 
 
