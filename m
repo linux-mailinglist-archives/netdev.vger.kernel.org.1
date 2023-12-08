@@ -1,387 +1,238 @@
-Return-Path: <netdev+bounces-55258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEB9B80A037
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 11:06:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A88E80A03A
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 11:07:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 460501F21724
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 10:06:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A515C281886
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 10:07:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 272C612E73;
-	Fri,  8 Dec 2023 10:06:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B8A13AC4;
+	Fri,  8 Dec 2023 10:07:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="CpBxuU6Y"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F5G3Kvdm"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8269A1720;
-	Fri,  8 Dec 2023 02:06:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=pk2WF+pQYD1I2cn2HTnDPyRhf3vFGA6EVnaKRf3TzsA=; b=CpBxuU6YlxpoqwBWwJDRHMFEa9
-	99zu8DIOe4NCCUVo309mZwvh4NOh+l/AVZ76qUsu6dD1qPloPjnpbw0tDbFhzuge4qMv7NCY7aLM7
-	GdJKTt3FCnWKzxrpeAn+OEMSgb5g1oDjc+zdrRNA0mkRahsKkKGZuc7qa9RDX4kWhwF3NvnT6/UL+
-	vc5WaS0AQqDxmJycuWyAPUXQ4pkhOXCBCQ8020woU3zKUbc+d1siOBmlHhfSR3KDkwQBTMndFNP++
-	L5d0RWpB+ar2ClZyzyvpR3PJDJBgFZj6xx2DIn+5bTv5XKaiVOnmylelwp21ODFJi6+A4wAU1/C2c
-	Qa6akfOQ==;
-Received: from sslproxy03.your-server.de ([88.198.220.132])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rBXkg-000Pvx-1F; Fri, 08 Dec 2023 11:06:34 +0100
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rBXke-000Ut5-QF; Fri, 08 Dec 2023 11:06:32 +0100
-Subject: Re: [PATCH net-next v9 15/15] p4tc: add P4 classifier
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
- deb.chatterjee@intel.com, anjali.singhai@intel.com,
- namrata.limaye@intel.com, mleitner@redhat.com, Mahesh.Shirshyad@amd.com,
- tomasz.osinski@intel.com, jiri@resnulli.us, xiyou.wangcong@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com,
- toke@redhat.com, bpf@vger.kernel.org
-References: <20231201182904.532825-1-jhs@mojatatu.com>
- <20231201182904.532825-16-jhs@mojatatu.com>
- <656e6f8d7c99f_207cb2087c@john.notmuch>
- <2eb488f9-af4a-4e28-0de0-d4dbc1e166f5@iogearbox.net>
- <CAM0EoM=MJJH9zNdiEHYpkYYQ_7WqobGv_v8wp04R7HhdPW8TxA@mail.gmail.com>
- <50b4dd0b-94fe-36b2-9a69-51847f8a7712@iogearbox.net>
- <CAM0EoMmQpiiEZw_QfXMzWfbb=6_MkLTasjwjL1MVy0nBvMJCsg@mail.gmail.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <c9a53369-b895-d79e-7cc4-ea5663de2d4b@iogearbox.net>
-Date: Fri, 8 Dec 2023 11:06:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E75A210EF
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 02:07:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702030032; x=1733566032;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=KT6LEZl3j8wvrGXloORsPXksnXVfCB3kuawYOGnAwH4=;
+  b=F5G3Kvdm0AwFk/FKDl+AshDbXEFzS7vkcDbzbxYUXztT1Y3UY/2De45G
+   IhocfWgERv7bI2BpDmeJ1Tv3RPZWV6+zvrtNp9h65niv36GYc7lZgPN0m
+   kmGuCnXTfuxaNjz7ahOnQ5FwLJj5RgGpAAAhA1TPIAaCAghzLzqnLLuNF
+   4c6rni3znSHg9O9CbO/PFZq1O8HOUdWtdU46frk+0hJpP6cU3J7L2g1ra
+   zJ5acje4rqgsVV/155rQwijduG6yV4wA4GbFYh6b02I2CUJBMRlWqSQ7m
+   0c+izQPd1G5fs3H/zLz0uKD3dQfnBO75TgZidnYDpHECGsZ3bevBNeTfq
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="7745565"
+X-IronPort-AV: E=Sophos;i="6.04,260,1695711600"; 
+   d="scan'208";a="7745565"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2023 02:07:12 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="801064260"
+X-IronPort-AV: E=Sophos;i="6.04,260,1695711600"; 
+   d="scan'208";a="801064260"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 08 Dec 2023 02:07:11 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 8 Dec 2023 02:07:11 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 8 Dec 2023 02:07:10 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Fri, 8 Dec 2023 02:07:10 -0800
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 8 Dec 2023 02:07:10 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=apz3/y2AqeSzst5qw6adWgxnYCfRubjlO0UHDv3fiFn0Gdgg7yIQx40RW0lCUSA7Ib2fyWsy+WcJTqHiMIzlArbZge7XZo8sg0iI8EeMpjcLZaUiuAuBB/4LGBkmrQp+31Uv0ON/JZ3eGapDEAwEWiLSjPeRhY8qG1NMuhvrcbIqNZusrs1SMRjoxy1fC8tvfU/j1tGCI+DDa/cXYgvRJhjinmluOnnip1ufEYNMSrQqORd6u5xBwazob4BBm6CpgynCn8Cq2v93JrVegoLzEAajAV4Fd+NIk1O8tx9PazFDoaeRhNbaBRiUF4xSgPnFQR7Rh0Tbt9efQz3flRwx4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PKPY334gUjQhiWOH/KZbeVlhs8A6EceowYVsoWZN4mw=;
+ b=YZfyUIJY1u6ZLh8K4+saCn2xyeHIbDFf5A/dbwqXVsAhemPwEx4LvKk4dAAwpezYXMenGQapDNSV9BUfJsac3b8j8oQrUUbO6+LDptuAM5MkMflIBM9pSquPoetkPNUTG67x2z9/JfKhzDtxvmkTm4GtPFEDoZi3RzZzomYeHH3htoWPd7Z1heXDBj8XehZ8+3J3nUNi9dzbBFX9qA0JbVuKb9IhldmOZZcTKnFWLiFmeBagSIWnYgwJAexTyyIjpLIMdq7A49dSLqkivRieuM/jNcgcAy4HxUqiVdqMjk3gtTonF468Y27laOdNjJUA4bo1W6QSIFzlhx9aW0OAxw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BYAPR11MB3672.namprd11.prod.outlook.com (2603:10b6:a03:fa::30)
+ by CY8PR11MB6940.namprd11.prod.outlook.com (2603:10b6:930:58::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.28; Fri, 8 Dec
+ 2023 10:07:08 +0000
+Received: from BYAPR11MB3672.namprd11.prod.outlook.com
+ ([fe80::5112:5e76:3f72:38f7]) by BYAPR11MB3672.namprd11.prod.outlook.com
+ ([fe80::5112:5e76:3f72:38f7%5]) with mapi id 15.20.7068.025; Fri, 8 Dec 2023
+ 10:07:08 +0000
+Message-ID: <f63dca8f-0082-6e22-5ab5-3b940b646053@intel.com>
+Date: Fri, 8 Dec 2023 11:07:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [PATCH iwl-next v3 1/2] ixgbe: Refactor overtemp event handling
+Content-Language: en-US
+To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <anthony.l.nguyen@intel.com>, <netdev@vger.kernel.org>
+References: <20231208090055.303507-1-jedrzej.jagielski@intel.com>
+ <20231208090055.303507-2-jedrzej.jagielski@intel.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+In-Reply-To: <20231208090055.303507-2-jedrzej.jagielski@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR5P281CA0056.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:f0::19) To BYAPR11MB3672.namprd11.prod.outlook.com
+ (2603:10b6:a03:fa::30)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAM0EoMmQpiiEZw_QfXMzWfbb=6_MkLTasjwjL1MVy0nBvMJCsg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27116/Thu Dec  7 09:42:18 2023)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR11MB3672:EE_|CY8PR11MB6940:EE_
+X-MS-Office365-Filtering-Correlation-Id: bc9db77b-d98c-4107-2dd6-08dbf7d56f94
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 3dy2WdfFSk9R0dZyhwtXavZAd/37yLG0Y0LTVp2xEDbe+CucXG0v16wCpX9W1OY75yCy2i7XtepyipdNIwwbbloEID3ymLWQhiLxhNnFblYtrLo4Ru6AhMI5MvWSfm8MHqT9lOcakhFm+W2a1FH9w+/j4RmxOTNDMTEamtN2mOW5k5meFoDLAKiuuvPoSb5OC49o6LtQia7lljwm7Cv0MqTnYA5rJKeTA4lfVa4RfGn6OB8HAQk2yVnlaYW93pFDhwAJ04HIDExgKVBV7AMt5hfJ1hDB8sC5US95SMA1717oI3abKr3GPCPc+E3Iq2UEn5uE33FmgfiI/K+MRKD38lw4tFmheg98wSqY2Y1LvU7NXan8BksfjRaPsfbpTO05Pv2L+OkHd6p2/oVPLiqTmkf+uQBOB4ZGCKWSdJqlLHhTPVQLNrR+Qtw3lxYrl2ZQwxgA7Fmpsd1L8zHfcNfEncQBfRPqcDlvtz6x3za43YMMf1gwHFTldEhR3leQZk6f/FUcF/5pOtU/29UyIz+F6Rw/kNlqUowfHhd9/QJ/jJWuP7BuEoh3xMkNl8Mgim5SQ9vbD7G3mAmHLaT+96+K2D2Pclf3mM8Vfk0ulxpKlMciVb2O1RnVYn3D2qUcOZkrqoB5gkU9ZBIOjEIUoIh2iA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3672.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(376002)(396003)(136003)(366004)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(83380400001)(2616005)(6512007)(26005)(38100700002)(53546011)(4326008)(8936002)(8676002)(2906002)(5660300002)(6486002)(478600001)(41300700001)(6666004)(66476007)(66946007)(66556008)(316002)(6506007)(36756003)(82960400001)(86362001)(31696002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TVg5VjRRSGpaSWZRQ01OVUZlU1A5OWp5eDFmTW5wdzdHSzBpMUZCbmZVWFkv?=
+ =?utf-8?B?OGhmZ3dNQmFMa09ldVJ5cGZ3SHdRS1JTVVNLOWxKZVdKM0JVNnc1Q1RRb0xQ?=
+ =?utf-8?B?c1k0T0RTN3gzZXEybk9aQ1RZcitqQkV5RHNDOUxjd3VWVmdQa0VqMXFpOFAv?=
+ =?utf-8?B?VjByaXUrcHpCV0x0UVU3SW91MXNHV3ZmalRyN3NQNm9Fc29WcVJFKzJmaTly?=
+ =?utf-8?B?WFQrWnBmWkhXMnhHSy9BKy9FMW9ZSHVlTmNGenJKQzZPdzNYVVRRMDQ5ZE9N?=
+ =?utf-8?B?a1U0NGFESEVRN0R6Nk92QU4wMzNscWRjVEpHSExoR3FvaFVkQzVQQk0wamdG?=
+ =?utf-8?B?eUtFU2NQRlRDWTlFV1d0blk4bnVVa3JUYzMzWlRjOUgzNDFwdkdUNzBOZGJi?=
+ =?utf-8?B?OW9lM0ZZTzRCNi9WYUxyQnhuUkMvQ0lleTkvYjVqS2VsZHFyY0ZQdmw5NzQ1?=
+ =?utf-8?B?R0hES1ZNb0lvTVRjRlBxZGNIamFIT1cwWGV5MWs0V3BVMTdxUWlhV1JVYTJz?=
+ =?utf-8?B?TG84T2p0L1ZkTnpFa3c1bHdiclY5WFh5STVaN3M2U3h3eTlIeThZTitsTmpj?=
+ =?utf-8?B?aGRSRkYrL0VzVGs1dDRvb0lhaUhBUDNJcnYwZ010UTRxSjlYM01UcEM5d1Na?=
+ =?utf-8?B?ckhIYWk5NENrTVB3U2dqWnF2N25BcHY0VElzOXpnVWNiTWJldG1OYzBqTWVS?=
+ =?utf-8?B?NzJBZzVocFozK0J2d1JJWGc4amJGVFdvNmtCem9kVTBYZlZzMXh3Z2FESFJr?=
+ =?utf-8?B?ODNnRHhia2p4YnN3ZzZORDlkVzIzMHpxMFdvSTh5U1RSTjNLMC9DYUlNNS9O?=
+ =?utf-8?B?Zk5zbyt0Uzc4c3loTWtKamJJS1FIc01oVHZkclNaQU42czBRNzJiR1pJWDJY?=
+ =?utf-8?B?UlZSOTFJQ3hmUDY1N2pPd1RUbDdiQWJ5MUVSQ3BIV28wYWo5bGZUNDN5ejMx?=
+ =?utf-8?B?cjk4VWdFNXk4WUwyN09RNzMxUWVFeENoTUUxYWVCYjAzdW83bFY4SXNWWVJD?=
+ =?utf-8?B?dUZod3hiV2kwSTM2NEdwdW9tYnl2L3YwdUdrUjJlczRBQmJNQW11a2xHbXB5?=
+ =?utf-8?B?Q204TlZsSmszbGtiMVpCMFBNRFJBKytIa3cwdUtCMWc2NUpiaS9Va004MnBI?=
+ =?utf-8?B?ZU9wZEtneE9UeHR3aTlNS1BZUmd2blNkTHVZdC9rY2VhbUtCNERHbjFKTVk0?=
+ =?utf-8?B?b3ExeFd4N25jY2lNVitPNStPRGhkN2FtYWE0WnExRmdBVmltRUFsV25sQnJQ?=
+ =?utf-8?B?b1dsWUYyQm92anp1SWJQem5lbTc1c3lRTnVTMUZVK1VwV0N2bFo3ODB0SFlR?=
+ =?utf-8?B?aWRqTUdZUkZWZUlSMDN2ZXFBSTB6SGt6N2xhWmFoeWhrRE9nMnNsNjZ5bVMw?=
+ =?utf-8?B?YjMvdDFwU2Uzd05QMnFqanp5ZlJ5c2NZaDFXRE9jdW52TkpDQWJ6dUNMSCt5?=
+ =?utf-8?B?YWZUUGRPYXhGUmUzQnFxMmJkT1BNMndKQXhvTHBsKzV1bVdxM2FUWW5xRVpS?=
+ =?utf-8?B?aUxQNzlQWW9tNG5YRVVYOGVwMFZEdU94UnVTYm0vS0JScWs5R1pMeXJvRDlE?=
+ =?utf-8?B?ODFDWjduaThXb3JNRWpjQzhJWFUvdHZvTER1QjVkM2NCbnl0ZVNpeDZoeUxU?=
+ =?utf-8?B?UDN0S29tTTFyU3BxL3o3SmRSVHRtcGIwbGU1K0cwekU3VzdWdjU0WFU5cGtB?=
+ =?utf-8?B?dkprQWw4UUNndmRTeGsrQ0ZXZHU3THZaM01Rd2ZSelBxZ2dJS1FzMFgreFZ5?=
+ =?utf-8?B?QS9LSzdTV0tpc2NKM05Lc1JXa1piY2M0UlZBUmZSK3BjR3JmallXYit0VUNP?=
+ =?utf-8?B?Ni9XL0EzQ05OTnlsQnZabWZUdlh1MGV3TjYrVnF3OENpbXZBZXA2WWFpNVU4?=
+ =?utf-8?B?aXNjOU44NTUwL1A5Q1NlbzBJQlBpYUJZNEhIbXlTSEpIUitxTEQ5UWJYV1Yv?=
+ =?utf-8?B?TWJJeW56TW1jcmhUWGNVTW13RDNWRmR1cGZTSnJ0Z2dKT2h5UWpxL2lxZk52?=
+ =?utf-8?B?L2VWNzJ1RjlYT0FsbGVvY3UrdzRWVDFzSys0RDFpTGlscXg1TjRKWHE5OWtK?=
+ =?utf-8?B?NGdsR3NlNDhTcStncE1vaEV3bjZBODhBaGFpZWVuSzlrUmhkbWFmVk5Ybkww?=
+ =?utf-8?B?bWlQaU15OXpSRW9qMlhNNjNQQUpYSHYwUkxicUNjOUxJcXhRQ28vVGR4c2VT?=
+ =?utf-8?B?akE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: bc9db77b-d98c-4107-2dd6-08dbf7d56f94
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3672.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Dec 2023 10:07:07.7720
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: v8LgXN1RH3kmRGkk4bTCvmTgCIALSaw/XZPyMuK88giaPWIQAG8ncifke4nHzk35l3sHnS6u6EZSWz/V4c3EovuEcTqQe2zSjv3bYBt+yS0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB6940
+X-OriginatorOrg: intel.com
 
-On 12/6/23 3:59 PM, Jamal Hadi Salim wrote:
-> On Tue, Dec 5, 2023 at 5:32 PM Daniel Borkmann <daniel@iogearbox.net> wrote:
->> On 12/5/23 5:23 PM, Jamal Hadi Salim wrote:
->>> On Tue, Dec 5, 2023 at 8:43 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
->>>> On 12/5/23 1:32 AM, John Fastabend wrote:
->>>>> Jamal Hadi Salim wrote:
->>>>>> Introduce P4 tc classifier. A tc filter instantiated on this classifier
->>>>>> is used to bind a P4 pipeline to one or more netdev ports. To use P4
->>>>>> classifier you must specify a pipeline name that will be associated to
->>>>>> this filter, a s/w parser and datapath ebpf program. The pipeline must have
->>>>>> already been created via a template.
->>>>>> For example, if we were to add a filter to ingress of network interface
->>>>>> device $P0 and associate it to P4 pipeline simple_l3 we'd issue the
->>>>>> following command:
->>>>>
->>>>> In addition to my comments from last iteration.
->>>>>
->>>>>> tc filter add dev $P0 parent ffff: protocol all prio 6 p4 pname simple_l3 \
->>>>>>        action bpf obj $PARSER.o section prog/tc-parser \
->>>>>>        action bpf obj $PROGNAME.o section prog/tc-ingress
->>>>>
->>>>> Having multiple object files is a mistake IMO and will cost
->>>>> performance. Have a single object file avoid stitching together
->>>>> metadata and run to completion. And then run entirely from XDP
->>>>> this is how we have been getting good performance numbers.
->>>>
->>>> +1, fully agree.
->>>
->>> As I stated earlier: while performance is important it is not the
->>> highest priority for what we are doing, rather correctness is. We dont
->>> want to be wrestling with the verifier or some other limitation like
->>> tail call limits to gain some increase in a few kkps. We are taking a
->>> gamble with the parser which is not using any kfuncs at the moment.
->>> Putting them all in one program will increase the risk.
->>
->> I don't think this is a good reason, this corners you into UAPI which
->> later on cannot be changed anymore. If you encounter such issues, then
->> why not bringing up actual concrete examples / limitations you run into
->> to the BPF community and help one way or another to get the verifier
->> improved instead? (Again, see sched_ext as one example improving verifier,
->> but also concrete example bug reports, etc could help.)
+On 12/8/23 10:00, Jedrzej Jagielski wrote:
+> Currently ixgbe driver is notified of overheating events
+> via internal IXGBE_ERR_OVERTEMP error code.
 > 
-> Which uapi are you talking about? The eBPF code gets generated by the
-> compiler. Whether we generate one or 10 programs or where we place
-> them is up to the compiler.
-> We choose today to generate the parser separately - but we can change
-> it in a heartbeat with zero kernel changes.
-
-With UAPI I mean to even have this parser separation. Ideally, this should
-just naturally be a single program as in XDP layer itself. You mentioned
-below you could run the pipeline just in XDP..
-
->>> As i responded to you earlier,  we just dont want to lose
->>> functionality, some sample space:
->>> - we could have multiple pipelines with different priorities - and
->>> each pipeline may have its own logic with many tables etc (and the
->>> choice to iterate the next one is essentially encoded in the tc action
->>> codes)
->>> - we want to be able to split the pipeline into parts that can run _in
->>> unison_ in h/w, xdp, and tc
->>
->> So parser at XDP, but then you push it up the stack (instead of staying
->> only at XDP layer) just to reach into tc layer to perform a corresponding
->> action.. and this just to work around verifier as you say?
+> Change the approach to use freshly introduced is_overtemp
+> function parameter which set when such event occurs.
+> Add new parameter to the check_overtemp() and handle_lasi()
+> phy ops.
 > 
-> You are mixing things. The idea of being able to split a pipeline into
-> hw:xdp:tc is a requirement.  You can run the pipeline fully in XDP  or
-> fully in tc or split it when it makes sense.
-> The idea of splitting the parser from the main p4 control block is for
-> two reasons 1) someone else can generate or handcode the parser if
-> they need to - we feel this is an area that may need to take advantage
-> of features like dynptr etc in the future 2) as a precaution to ensure
-> all P4 programs load. We have no problem putting both in one ebpf prog
-> when we gain confidence that it will _always_ work - it is a mere
-> change to what the compiler generates.
+> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> ---
+> v2: change aproach to use additional function parameter to notify when overheat
 
-The cooperation between BPF progs at different layers (e.g. nfp allowed that
-nicely from a BPF offload PoV) makes sense, just less to split the actions
-within a given layer into multiple units where state needs to be transferred,
-packets reparsed, etc. When you say that "we have no problem putting both in
-one ebpf prog when we gain confidence that it will _always_ work", then should
-this not be the goal to start with? How do you quantify "gain confidence"?
-Test/conformance suite? It would be better to start out with this in the first
-place and fix or collaborate with whatever limits get encountered along the
-way. This would be the case for XDP anyway given you mention you want to
-support this layer.
+on public mailing lists its best to require links to previous versions
 
->>> - we use tc block to map groups of ports heavily
->>> - we use netlink as our control API
->>>
->>>>>> $PROGNAME.o and $PARSER.o is a compilation of the eBPF programs generated
->>>>>> by the P4 compiler and will be the representation of the P4 program.
->>>>>> Note that filter understands that $PARSER.o is a parser to be loaded
->>>>>> at the tc level. The datapath program is merely an eBPF action.
->>>>>>
->>>>>> Note we do support a distinct way of loading the parser as opposed to
->>>>>> making it be an action, the above example would be:
->>>>>>
->>>>>> tc filter add dev $P0 parent ffff: protocol all prio 6 p4 pname simple_l3 \
->>>>>>        prog type tc obj $PARSER.o ... \
->>>>>>        action bpf obj $PROGNAME.o section prog/tc-ingress
->>>>>>
->>>>>> We support two types of loadings of these initial programs in the pipeline
->>>>>> and differentiate between what gets loaded at tc vs xdp by using syntax of
->>>>>>
->>>>>> either "prog type tc obj" or "prog type xdp obj"
->>>>>>
->>>>>> For XDP:
->>>>>>
->>>>>> tc filter add dev $P0 ingress protocol all prio 1 p4 pname simple_l3 \
->>>>>>        prog type xdp obj $PARSER.o section parser/xdp \
->>>>>>        pinned_link /sys/fs/bpf/mylink \
->>>>>>        action bpf obj $PROGNAME.o section prog/tc-ingress
->>>>>
->>>>> I don't think tc should be loading xdp programs. XDP is not 'tc'.
->>>>
->>>> For XDP, we do have a separate attach API, for BPF links we have bpf_xdp_link_attach()
->>>> via bpf(2) and regular progs we have the classic way via dev_change_xdp_fd() with
->>>> IFLA_XDP_* attributes. Mid-term we'll also add bpf_mprog support for XDP to allow
->>>> multi-user attachment. tc kernel code should not add yet another way of attaching XDP,
->>>> this should just reuse existing uapi infra instead from userspace control plane side.
->>>
->>> I am probably missing something. We are not loading the XDP program -
->>> it is preloaded, the only thing the filter does above is grabbing a
->>> reference to it. The P4 pipeline in this case is split into a piece
->>> (the parser) that runs on XDP and some that runs on tc. And as i
->>> mentioned earlier we could go further another piece which is part of
->>> the pipeline may run in hw. And infact in the future a compiler will
->>> be able to generate code that is split across machines. For our s/w
->>> datapath on the same node the only split is between tc and XDP.
->>
->> So it is even worse from a design PoV.
+> ---
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 20 ++++----
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c  | 33 +++++++++----
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h  |  2 +-
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |  4 +-
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c | 47 ++++++++++++-------
+>   5 files changed, 67 insertions(+), 39 deletions(-)
 > 
-> So from a wild accusation that we are loading the program to now a
-> condescending remark we have a bad design.
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> index 227415d61efc..f6200f0d1e06 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> @@ -2756,7 +2756,7 @@ static void ixgbe_check_overtemp_subtask(struct ixgbe_adapter *adapter)
+>   {
+>   	struct ixgbe_hw *hw = &adapter->hw;
+>   	u32 eicr = adapter->interrupt_event;
+> -	s32 rc;
+> +	bool overtemp;
+>   
+>   	if (test_bit(__IXGBE_DOWN, &adapter->state))
+>   		return;
+> @@ -2790,14 +2790,15 @@ static void ixgbe_check_overtemp_subtask(struct ixgbe_adapter *adapter)
+>   		}
+>   
+>   		/* Check if this is not due to overtemp */
+> -		if (hw->phy.ops.check_overtemp(hw) != IXGBE_ERR_OVERTEMP)
+> +		hw->phy.ops.check_overtemp(hw, &overtemp);
 
-It's my opinion, yes, because all the pieces don't really fit naturally
-together. It's all centered around the netlink layer which you call out
-as 'non-negotiable', whereas this would have a better fit for a s/w-based
-solution where you provide a framework for developers from user space.
-Why do you even need an XDP reference in tc layer? Even though the XDP
-loading happens through the regular path anyway.. just to knit the
-different pieces artificially together despite the different existing
-layers & APIs. What should actually sit in user space and orchestrate
-the different generic pieces of the kernel toolbox together, you now try
-to artificially move one one layer down in a /non-generic/ way. Given this
-is trying to target a s/w datapath, I just don't follow why the building
-blocks of this work cannot be done in a /generic/ way. Meaning, generic
-extensions to the kernel infra in a p4-agnostic way, so they are also
-useful and consumable outside of it for tc BPF or XDP users, and then in
-user space the control plane picks all the necessary pieces it needs. (Think
-of an analogy to containers today.. there is no such notion in the kernel
-and the user space infra picks all the necessary pieces such as netns,
-cgroups, etc to flexibly assemble this higher level concept.)
+you newer (at least in the scope of this patch) check return code of
+.check_overtemp(), so you could perhaps instead change it to return
+bool, and just return "true if overtemp detected"?
 
->> The kernel side allows XDP program
->> to be passed to cls_p4, but then it's not doing anything but holding a
->> reference to that BPF program. Iow, you need anyway to go the regular way
->> of bpf_xdp_link_attach() or dev_change_xdp_fd() to install XDP. Why is the
->> reference even needed here, why it cannot be done in user space from your
->> control plane? This again, feels like a shim layer which should live in
->> user space instead.
-> 
-> Our control path goes through tc - where we instantiate the pipeline
-> on typically a tc block. Note: there could be many pipeline instances
-> of the same set of ebpf programs. We need to know which ebpf programs
-> are bound to which pipelines. When a pipeline is instantiated or
-> destroyed it sends (netlink) events to user space. It is only natural
-> to reference the programs which are part of the pipeline at that point
-> i.e loading for tc progs and referencing for xdp. The control is
-> already in user space to create bpf links etc.
-> 
-> Our concern was (if you looked at the RFC discussions earlier on) a)
-> we dont want anyone removing or replacing the XDP program that is part
-> of a P4 pipeline b) we wanted to ensure in the case of a split
-> pipeline that the XDP code that ran before tc part of the pipeline was
-> infact the one that we wanted to run. The original code (before Toke
-> made a suggestion to use bpf links) was passing a cookie from XDP to
-> tc which we would use to solve these concerns. By creating the link in
-> user space we can pass the fd - which is what you are seeing here.
-> That solves both #a and #b.
-> Granted we may be a little paranoid but operationally an important
-> detail is:  if one dumps the tc filter with this approach they know
-> what progs compose the pipeline.
+> +		if (!overtemp)
+>   			return;
+>   
+>   		break;
+>   	case IXGBE_DEV_ID_X550EM_A_1G_T:
+>   	case IXGBE_DEV_ID_X550EM_A_1G_T_L:
+> -		rc = hw->phy.ops.check_overtemp(hw);
+> -		if (rc != IXGBE_ERR_OVERTEMP)
+> +		hw->phy.ops.check_overtemp(hw, &overtemp);
+> +		if (!overtemp)
+>   			return;
+>   		break;
+>   	default:
+> @@ -2807,6 +2808,7 @@ static void ixgbe_check_overtemp_subtask(struct ixgbe_adapter *adapter)
+>   			return;
+>   		break;
+>   	}
+> +
 
-But just holding the reference in the tc cls_p4 code on the XDP program
-doesn't automatically mean that this blocks anything else from happening.
-You still need a user space control plane which creates the link, maybe
-pins it somewhere, and when you need to update the program at the XDP
-layer, then that user space control plane updates the prog @ XDP link. At
-that point the dump in tc has a window of inconsistency given this is
-non-atomic, and given this two-step approach.. what happens when the
-control plane crashesin the middle in the worst case, then would you
-take the XDP link info as source of truth or the cls_p4 dump? Just
-operating on the XDP link without this two-step detour is a much more
-robust approach given you avoid this race altogether.
+I would remove chunks that are whitespace only
 
->>>>>> The theory of operations is as follows:
->>>>>>
->>>>>> ================================1. PARSING================================
->>>>>>
->>>>>> The packet first encounters the parser.
->>>>>> The parser is implemented in ebpf residing either at the TC or XDP
->>>>>> level. The parsed header values are stored in a shared eBPF map.
->>>>>> When the parser runs at XDP level, we load it into XDP using tc filter
->>>>>> command and pin it to a file.
->>>>>>
->>>>>> =============================2. ACTIONS=============================
->>>>>>
->>>>>> In the above example, the P4 program (minus the parser) is encoded in an
->>>>>> action($PROGNAME.o). It should be noted that classical tc actions
->>>>>> continue to work:
->>>>>> IOW, someone could decide to add a mirred action to mirror all packets
->>>>>> after or before the ebpf action.
->>>>>>
->>>>>> tc filter add dev $P0 parent ffff: protocol all prio 6 p4 pname simple_l3 \
->>>>>>        prog type tc obj $PARSER.o section parser/tc-ingress \
->>>>>>        action bpf obj $PROGNAME.o section prog/tc-ingress \
->>>>>>        action mirred egress mirror index 1 dev $P1 \
->>>>>>        action bpf obj $ANOTHERPROG.o section mysect/section-1
->>>>>>
->>>>>> It should also be noted that it is feasible to split some of the ingress
->>>>>> datapath into XDP first and more into TC later (as was shown above for
->>>>>> example where the parser runs at XDP level). YMMV.
->>>>>
->>>>> Is there any performance value in partial XDP and partial TC? The main
->>>>> wins we see in XDP are when we can drop, redirect, etc the packet
->>>>> entirely in XDP and avoid skb altogether.
->>>>>
->>>>>> Co-developed-by: Victor Nogueira <victor@mojatatu.com>
->>>>>> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
->>>>>> Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
->>>>>> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
->>>>>> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
->>>>
->>>> The cls_p4 is roughly a copy of {cls,act}_bpf, and from a BPF community side
->>>> we moved away from this some time ago for the benefit of a better management
->>>> API for tc BPF programs via bpf(2) through bpf_mprog (see libbpf and BPF selftests
->>>> around this), as mentioned earlier. Please use this instead for your userspace
->>>> control plane, otherwise we are repeating the same mistakes from the past again
->>>> that were already fixed.
->>>
->>> Sorry, that is your use case for kubernetes and not ours. We want to
->>
->> There is nothing specific to k8s, it's generic infrastructure for tc BPF
->> and also used outside of k8s scope; please double-check the selftests to
->> get a picture of the API and libbpf integration.
-> 
-> I did and i couldnt see how we can do any of the tcx/mprog using tc to
-> meet our requirements. I may be missing something very obvious but it
-> was why i said it was for your use case not ours. I would be willing
-> to look again if you say it works with tc but do note that I am fine
-> with tc infra where i can add actions, all composed of different
-> programs if i wanted to; and add addendums to use other tc existing
-> (non-ebpf) actions if i needed to. We have what we need working fine,
-> so there has to be a compelling reason to change.
-> I asked you a question earlier whether in your view tc use of ebpf is
-> deprecated. I have seen you make a claim in the past that sched_act
-> was useless and that everyone needs to use sched_cls and you went on
-> to say nobody needs priorities. TBH, that is _your view for your use
-> case_.
+>   	e_crit(drv, "%s\n", ixgbe_overheat_msg);
+>   
+>   	adapter->interrupt_event = 0;
+> @@ -7938,7 +7940,7 @@ static void ixgbe_service_timer(struct timer_list *t)
 
-I do see act_bpf as redundant given the cls_bpf with the direct
-action mode can do everything that is needed with BPF, and whenever
-something was needed, extensions to verifier/helpers/kfuncs/etc were
-sufficient. We've been using this for years this way in production
-with complex programs and never saw a need to utilize any of the
-remaining actions outside of BPF or to have a split of parser/action
-as mentioned above. The additional machinery would also add overhead
-in s/w fast path which can be avoided (if it were e.g. cls_matchall +
-act_bpf). That said, people use cls_bpf in multi-user mode where
-different progs get attached. The priorities was collective BPF
-community feedback that these are hard to use due to the seen
-collisions in practice which led to various hard to debug incidents.
-While this was not my view initially, I agree that the new design
-with before/after and relative prog/link reference is a better ux.
-
->>> use the tc infra. We want to use netlink. I could be misreading what
->>> you are saying but it seems that you are suggesting that tc infra is
->>> now obsolete as far as ebpf is concerned? Overall: It is a bit selfish
->>> to say your use case dictates how other people use ebpf. ebpf is just
->>> a means to an end for us and _is not the end goal_ - just an infra
->>> toolset.
->>
->> Not really, the infrastructure is already there and ready to be used and
->> it supports basic building blocks such as BPF links, relative prog/link
->> dependency resolution, etc, where none of it can be found here. The
->> problem is "we want to use netlink" which is even why you need to push
->> down things like XDP prog, but it's broken by design, really. You are
->> trying to push down a control plane into netlink which should have been
->> a framework in user space.
-> 
-> The netlink part is not negotiable - the cover letter says why and i
-> have explained it 10K times in these threads. You are listing all
-> these tcx features like relativeness for which i have no use for.
-> OTOH, like i said if it works with tc then i would be willing to look
-> at it but there need to be compelling reasons to move to that shiny
-> new infra.
-
-If you don't have a particular case for multi-prog, that is totally
-fine. You mentioned earlier on "we dont want anyone removing or replacing
-the XDP program that is part of a P4 pipeline", and that you are using
-BPF links to solve it, so I presume it would be equally important case
-for the tc BPF program of your P4 pipeline. I presume you use libbpf, so
-here the controller would do exact similar steps on tcx that you do for
-XDP to set up BPF links. But again, my overall comment comes down to
-why it cannot be broken into generic extensions as mentioned above given
-XDP/tc infra is in place.
-
-Thanks,
-Daniel
+[snip]
 
