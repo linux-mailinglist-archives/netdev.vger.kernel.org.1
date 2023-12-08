@@ -1,353 +1,231 @@
-Return-Path: <netdev+bounces-55141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB04B809890
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 02:24:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70DA28098A0
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 02:28:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6559A282084
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 01:24:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CB701C20859
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 01:28:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C05BA110A;
-	Fri,  8 Dec 2023 01:24:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75688136F;
+	Fri,  8 Dec 2023 01:28:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SLkcZAOe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FvSlbqJv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48A2C1706;
-	Thu,  7 Dec 2023 17:24:27 -0800 (PST)
-Received: by mail-oi1-x22d.google.com with SMTP id 5614622812f47-3b9dbbaa9a9so1081773b6e.2;
-        Thu, 07 Dec 2023 17:24:27 -0800 (PST)
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A340B1717;
+	Thu,  7 Dec 2023 17:28:43 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-6cdf3e99621so361533b3a.1;
+        Thu, 07 Dec 2023 17:28:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701998666; x=1702603466; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eMS6+n4aVtzgvgUdw5Q0dkF5eYM0ZjJiDpGVMl5tPXQ=;
-        b=SLkcZAOeTiBhdC1LxgQXNR18tuqYTtMS7rsv4X/GL4HM4uzzd5JpLdCfoRAsL8Bteb
-         8BOe8fS/B4jEUDaLli0tpiAKChnFoiFX7w8yqPUGUOtVTcXOguwV1cJodK/gggYM8/5+
-         9u2TJwU7/hlbCgCFCPJMtPZtn2aktE3oBZHvt41W4BRLdU8HiWwcEp3h5E8k/j1uE0ky
-         wACHg/221s3+LaatOEqztaVoOdV+1C6Ew4ywCYDX58uhoOn5pVqwphOYINbFE23z8Be5
-         /gJscwq3RUVwJVBCAQGni8xhjR7TJFyW+utvQnRO1ADFVZTQylvHSQLaRt9QJV05LUHd
-         /fbg==
+        d=gmail.com; s=20230601; t=1701998923; x=1702603723; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nNIwAtt1u/hcDJlwPdE5PkrgJUQEuR8HwD2r0CEq5+w=;
+        b=FvSlbqJvq+IWShf9FLhA1QtqIVE5GBNOXAZRVKgVFD2lNtZ96QiR1mO/ieg2gmDESM
+         hiJiAZ0PdEcRimaFZ9gfHvqcdBBaHD0hZQtkjdNWwxrUiiFVfQblBLxrxO4opgu8GNvb
+         wwSXOn6lC7OMVyjoOwfjk+/3v5j2V0IJiGfl2qWSZn/Jp66PS2KcXnEb7G1rmDRWtaGt
+         UGLy9wY2YchyJaDb5nrnmaWaccY5Eq34wSCdCjcXLNpzfiFSlXGwwbtYMr1vaQ43d6qK
+         hb6DIrX0zhQ4RQl4R2GHjEM3yIOcHGYMsJNydrUR8ubZAvO8vhEDMhJkgMMPuU/eG2jh
+         DH7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701998666; x=1702603466;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eMS6+n4aVtzgvgUdw5Q0dkF5eYM0ZjJiDpGVMl5tPXQ=;
-        b=MaT0I3Uowmns9N/xQb54Q3tJ8FKVLnzx9PiJ9wClna9gKKHw/f0XuyHVTxwyK6GpVC
-         bxNiegPmC7cFXB9mL9shRyAyfThJPY1Q2mPO15yawLbp3TjQVUoV/JLbBrIGypJ9tXxR
-         twCy+ln8EYz3dhqvvVbFmjV9MXu1pQcqb5j8ARElFIapldLgBOezqxDdg3kzqkJrcP0R
-         AVmC1s4oRRioWJIJKnz8cJsfqrbeXLG2WpJSkKTpfXsmGzDPErbCpBO6Kq4T5MJ20ZBM
-         8ByTEsPPeHk/ZWzeGed/WhCS8Hbzaz7TULX0RNxGfFO3WFOnXFuz1ZGzlxI3JodiRHAI
-         pfBA==
-X-Gm-Message-State: AOJu0YxKxRj44yqAXCE5cDK8icPimUKbJPybUpA5vCJ1PWqWJbgqgE0D
-	tYfM6wwYcirUPfaSeemXNhVrCBaB4DUd3Swj8/8=
-X-Google-Smtp-Source: AGHT+IFW8YM0/X2Dm18iLeCdndAKA2PY30DyHVlPi+CFZUK6JIEbtI71ymaf9+TDJSxjUrs99lTAMx+gjlNGvrne6II=
-X-Received: by 2002:a05:6808:1b26:b0:3b9:db4e:fccc with SMTP id
- bx38-20020a0568081b2600b003b9db4efcccmr2789854oib.11.1701998666382; Thu, 07
- Dec 2023 17:24:26 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701998923; x=1702603723;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nNIwAtt1u/hcDJlwPdE5PkrgJUQEuR8HwD2r0CEq5+w=;
+        b=k/AxhcH93HqGWaIsA/1kveTfn7XbuxpuuTXe7+kiuSEuujHyB0kZ8eGQaE0xgsqamG
+         I8PBujuxYIf5jDjJz4laMKdVQpEmzoOmvOjlB+ZtqSSjZGk4AOUuYGgNbhS0pyq8ILVs
+         BDKc4JcU8OCrRQdv8TEsr9yML3Ha//WGFEqqFiGcST/akkUJlNDIfeqBkywsMyvcPUjj
+         7hYX58B0e4qmWFZ1C5qOAxCu1oF5TXt9od19pMCwirv4n225i11gBt2ql/8ICueSQVXV
+         YXkE91N6mWsIry1lRc0uKrryhnbgB4gc5F3nKIPaHEU+SBWg+2ToTu4u6QBuVBCjtS7L
+         ybLQ==
+X-Gm-Message-State: AOJu0YwW93ysfvsZ/VGgVH0MumfxAL/e+3W8IlLZynqAXNhCDrN/vfR5
+	D2+COMuL4Kh8Y5xlHrjsHGFQIqwMf62xIw==
+X-Google-Smtp-Source: AGHT+IGGRdltUyaOe7ybLE4oh5Er6A9XklGtVr85IGYof1H4qqglCxejdFdLS6U6n8T22klUSFnZ8w==
+X-Received: by 2002:a05:6a20:4308:b0:187:df59:5c43 with SMTP id h8-20020a056a20430800b00187df595c43mr7045161pzk.2.1701998922999;
+        Thu, 07 Dec 2023 17:28:42 -0800 (PST)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id m12-20020a170902768c00b001d076c2e336sm453886pll.100.2023.12.07.17.28.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Dec 2023 17:28:42 -0800 (PST)
+Date: Fri, 08 Dec 2023 10:28:42 +0900 (JST)
+Message-Id: <20231208.102842.1616218749853934366.fujita.tomonori@gmail.com>
+To: benno.lossin@proton.me
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu,
+ miguel.ojeda.sandonis@gmail.com, wedsonaf@gmail.com, aliceryhl@google.com,
+ boqun.feng@gmail.com
+Subject: Re: [PATCH net-next v9 1/4] rust: core abstractions for network
+ PHY drivers
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <9d38d6f9-3b54-4a6f-a19d-3710db171fed@proton.me>
+References: <20231205011420.1246000-1-fujita.tomonori@gmail.com>
+	<20231205011420.1246000-2-fujita.tomonori@gmail.com>
+	<9d38d6f9-3b54-4a6f-a19d-3710db171fed@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231205002613.10219-1-rpearsonhpe@gmail.com> <763abeeb-64b2-496f-9249-b588d1d47e60@linux.dev>
- <7f5d614e-dc1a-47ce-b573-60ba8c5a21fa@linux.dev> <CAJr_XRDphUUTLbXJbbVGjaQ-HBQ59DioQs_0PSVvmLpGiHk1FQ@mail.gmail.com>
- <319ba5c7-1ce8-4417-86de-0b42e8abad16@gmail.com>
-In-Reply-To: <319ba5c7-1ce8-4417-86de-0b42e8abad16@gmail.com>
-From: Greg Sword <gregsword0@gmail.com>
-Date: Fri, 8 Dec 2023 09:24:14 +0800
-Message-ID: <CAEz=Lcu0djkY6JS123C8ePfX2cCyUpDiOhbd27EjqZfKThGN7Q@mail.gmail.com>
-Subject: Re: [PATCH for-next v5 3/7] RDMA/rxe: Register IP mcast address
-To: Bob Pearson <rpearsonhpe@gmail.com>
-Cc: Rain River <rain.1986.08.12@gmail.com>, Zhu Yanjun <yanjun.zhu@linux.dev>, jgg@nvidia.com, 
-	linux-rdma@vger.kernel.org, dsahern@kernel.org, davem@davemloft.net, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 8, 2023 at 3:07=E2=80=AFAM Bob Pearson <rpearsonhpe@gmail.com> =
-wrote:
->
->
->
-> On 12/6/23 19:47, Rain River wrote:
-> > On Tue, Dec 5, 2023 at 6:30=E2=80=AFPM Zhu Yanjun <yanjun.zhu@linux.dev=
-> wrote:
-> >>
-> >>
-> >> =E5=9C=A8 2023/12/5 13:55, Zhu Yanjun =E5=86=99=E9=81=93:
-> >>> Add David S. Miller and  David Ahern.
-> >>>
-> >>> They are the maintainers in netdev and very familiar with mcast.
-> >>>
-> >>> Zhu Yanjun
-> >>>
-> >>> =E5=9C=A8 2023/12/5 8:26, Bob Pearson =E5=86=99=E9=81=93:
-> >>>> Currently the rdma_rxe driver does not receive mcast packets at all.
-> >>>>
-> >>>> Add code to rxe_mcast_add() and rxe_mcast_del() to register/deregist=
-er
-> >>>> the IP mcast address. This is required for mcast traffic to reach th=
-e
-> >>>> rxe driver when coming from an external source.
-> >>>>
-> >>>> Fixes: 8700e3e7c485 ("Soft RoCE driver")
-> >>>> Signed-off-by: Bob Pearson <rpearsonhpe@gmail.com>
-> >>>> ---
-> >>>>    drivers/infiniband/sw/rxe/rxe_mcast.c | 119 +++++++++++++++++++++=
------
-> >>>>    drivers/infiniband/sw/rxe/rxe_net.c   |   2 +-
-> >>>>    drivers/infiniband/sw/rxe/rxe_net.h   |   1 +
-> >>>>    drivers/infiniband/sw/rxe/rxe_verbs.h |   1 +
-> >>>>    4 files changed, 102 insertions(+), 21 deletions(-)
-> >>>>
-> >>>> diff --git a/drivers/infiniband/sw/rxe/rxe_mcast.c
-> >>>> b/drivers/infiniband/sw/rxe/rxe_mcast.c
-> >>>> index 86cc2e18a7fd..54735d07cee5 100644
-> >>>> --- a/drivers/infiniband/sw/rxe/rxe_mcast.c
-> >>>> +++ b/drivers/infiniband/sw/rxe/rxe_mcast.c
-> >>>> @@ -19,38 +19,116 @@
-> >>>>     * mcast packets in the rxe receive path.
-> >>>>     */
-> >>>>    +#include <linux/igmp.h>
-> >>>> +
-> >>>>    #include "rxe.h"
-> >>>>    -/**
-> >>>> - * rxe_mcast_add - add multicast address to rxe device
-> >>>> - * @rxe: rxe device object
-> >>>> - * @mgid: multicast address as a gid
-> >>>> - *
-> >>>> - * Returns 0 on success else an error
-> >>>> - */
-> >>>> -static int rxe_mcast_add(struct rxe_dev *rxe, union ib_gid *mgid)
-> >>>> +static int rxe_mcast_add6(struct rxe_dev *rxe, union ib_gid *mgid)
-> >>>>    {
-> >>>> +    struct in6_addr *addr6 =3D (struct in6_addr *)mgid;
-> >>>> +    struct sock *sk =3D recv_sockets.sk6->sk;
-> >>>>        unsigned char ll_addr[ETH_ALEN];
-> >>>> +    int err;
-> >>>> +
-> >>>> +    spin_lock_bh(&sk->sk_lock.slock);
-> >>>> +    rtnl_lock();
-> >>>> +    err =3D ipv6_sock_mc_join(sk, rxe->ndev->ifindex, addr6);
-> >>
-> >>
-> >> Normally sk_lock is used. Not sure if spin_lock_bh is correct or not.
-> >
-> > ./net/ipv6/addrconf.c-2915-     lock_sock(sk);
-> > ./net/ipv6/addrconf.c-2916-     if (join)
-> > ./net/ipv6/addrconf.c:2917:             ret =3D ipv6_sock_mc_join(sk,
-> > ifindex, addr);
-> > ./net/ipv6/addrconf.c-2918-     else
-> > ./net/ipv6/addrconf.c-2919-             ret =3D ipv6_sock_mc_drop(sk,
-> > ifindex, addr);
-> > ./net/ipv6/addrconf.c-2920-     release_sock(sk);
-> >
-> > Should be lock_sock?
->
-> It works as well as spin_lock_bh() in preventing the RCU splat and
-> looks like the preferred way. I'll make this change.
+On Thu, 07 Dec 2023 17:25:22 +0000
+Benno Lossin <benno.lossin@proton.me> wrote:
 
-This is the implementation of lock_sock. lock_sock has not only spin_lock_b=
-h,
-but also other protections for sk.
-You should use lock_sock, instead of spin_lock_bh.
+> On 12/5/23 02:14, FUJITA Tomonori wrote:
+>> @@ -0,0 +1,754 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +
+>> +// Copyright (C) 2023 FUJITA Tomonori <fujita.tomonori@gmail.com>
+>> +
+>> +//! Network PHY device.
+>> +//!
+>> +//! C headers: [`include/linux/phy.h`](../../../../../../../include/linux/phy.h).
+>> +
+>> +use crate::{bindings, error::*, prelude::*, str::CStr, types::Opaque};
+>> +
+>> +use core::marker::PhantomData;
+>> +
+>> +/// PHY state machine states.
+>> +///
+>> +/// Corresponds to the kernel's [`enum phy_state`].
+>> +///
+>> +/// Some of PHY drivers access to the state of PHY's software state machine.
+> 
+> This sentence reads a bit weird, what are you trying to say?
 
-void lock_sock_nested(struct sock *sk, int subclass)
-{
-        /* The sk_lock has mutex_lock() semantics here. */
-        mutex_acquire(&sk->sk_lock.dep_map, subclass, 0, _RET_IP_);
+It's copy of the PHY doc. For me, it means that if my PHY driver
+doesn't need access to that state, I don't need to know anything about
+this enum.
 
-        might_sleep();
-        spin_lock_bh(&sk->sk_lock.slock);
-        if (sock_owned_by_user_nocheck(sk))
-                __lock_sock(sk);
-        sk->sk_lock.owned =3D 1;
-        spin_unlock_bh(&sk->sk_lock.slock);
-}
-EXPORT_SYMBOL(lock_sock_nested);
 
->
-> Bob
-> >
-> >>
-> >> Please Jason or experts from netdev comment on this.
-> >>
-> >> Thanks,
-> >>
-> >> Zhu Yanjun
-> >>
-> >>
-> >>>> +    rtnl_unlock();
-> >>>> +    spin_unlock_bh(&sk->sk_lock.slock);
-> >>>> +    if (err && err !=3D -EADDRINUSE)
-> >>>> +        goto err_out;
-> >>>>          ipv6_eth_mc_map((struct in6_addr *)mgid->raw, ll_addr);
-> >>>> +    err =3D dev_mc_add(rxe->ndev, ll_addr);
-> >>>> +    if (err)
-> >>>> +        goto err_drop;
-> >>>> +
-> >>>> +    return 0;
-> >>>>    -    return dev_mc_add(rxe->ndev, ll_addr);
-> >>>> +err_drop:
-> >>>> +    spin_lock_bh(&sk->sk_lock.slock);
-> >>>> +    rtnl_lock();
-> >>>> +    ipv6_sock_mc_drop(sk, rxe->ndev->ifindex, addr6);
-> >>>> +    rtnl_unlock();
-> >>>> +    spin_unlock_bh(&sk->sk_lock.slock);
-> >>>> +err_out:
-> >>>> +    return err;
-> >>>>    }
-> >>>>    -/**
-> >>>> - * rxe_mcast_del - delete multicast address from rxe device
-> >>>> - * @rxe: rxe device object
-> >>>> - * @mgid: multicast address as a gid
-> >>>> - *
-> >>>> - * Returns 0 on success else an error
-> >>>> - */
-> >>>> -static int rxe_mcast_del(struct rxe_dev *rxe, union ib_gid *mgid)
-> >>>> +static int rxe_mcast_add(struct rxe_mcg *mcg)
-> >>>>    {
-> >>>> +    struct rxe_dev *rxe =3D mcg->rxe;
-> >>>> +    union ib_gid *mgid =3D &mcg->mgid;
-> >>>>        unsigned char ll_addr[ETH_ALEN];
-> >>>> +    struct ip_mreqn imr =3D {};
-> >>>> +    int err;
-> >>>> +
-> >>>> +    if (mcg->is_ipv6)
-> >>>> +        return rxe_mcast_add6(rxe, mgid);
-> >>>> +
-> >>>> +    imr.imr_multiaddr =3D *(struct in_addr *)(mgid->raw + 12);
-> >>>> +    imr.imr_ifindex =3D rxe->ndev->ifindex;
-> >>>> +    rtnl_lock();
-> >>>> +    err =3D ip_mc_join_group(recv_sockets.sk4->sk, &imr);
-> >>>> +    rtnl_unlock();
-> >>>> +    if (err && err !=3D -EADDRINUSE)
-> >>>> +        goto err_out;
-> >>>> +
-> >>>> +    ip_eth_mc_map(imr.imr_multiaddr.s_addr, ll_addr);
-> >>>> +    err =3D dev_mc_add(rxe->ndev, ll_addr);
-> >>>> +    if (err)
-> >>>> +        goto err_leave;
-> >>>> +
-> >>>> +    return 0;
-> >>>> +
-> >>>> +err_leave:
-> >>>> +    rtnl_lock();
-> >>>> +    ip_mc_leave_group(recv_sockets.sk4->sk, &imr);
-> >>>> +    rtnl_unlock();
-> >>>> +err_out:
-> >>>> +    return err;
-> >>>> +}
-> >>>> +
-> >>>> +static int rxe_mcast_del6(struct rxe_dev *rxe, union ib_gid *mgid)
-> >>>> +{
-> >>>> +    struct sock *sk =3D recv_sockets.sk6->sk;
-> >>>> +    unsigned char ll_addr[ETH_ALEN];
-> >>>> +    int err, err2;
-> >>>>          ipv6_eth_mc_map((struct in6_addr *)mgid->raw, ll_addr);
-> >>>> +    err =3D dev_mc_del(rxe->ndev, ll_addr);
-> >>>> +
-> >>>> +    spin_lock_bh(&sk->sk_lock.slock);
-> >>>> +    rtnl_lock();
-> >>>> +    err2 =3D ipv6_sock_mc_drop(sk, rxe->ndev->ifindex,
-> >>>> +            (struct in6_addr *)mgid);
-> >>>> +    rtnl_unlock();
-> >>>> +    spin_unlock_bh(&sk->sk_lock.slock);
-> >>>> +
-> >>>> +    return err ?: err2;
-> >>>> +}
-> >>>> +
-> >>>> +static int rxe_mcast_del(struct rxe_mcg *mcg)
-> >>>> +{
-> >>>> +    struct rxe_dev *rxe =3D mcg->rxe;
-> >>>> +    union ib_gid *mgid =3D &mcg->mgid;
-> >>>> +    unsigned char ll_addr[ETH_ALEN];
-> >>>> +    struct ip_mreqn imr =3D {};
-> >>>> +    int err, err2;
-> >>>> +
-> >>>> +    if (mcg->is_ipv6)
-> >>>> +        return rxe_mcast_del6(rxe, mgid);
-> >>>> +
-> >>>> +    imr.imr_multiaddr =3D *(struct in_addr *)(mgid->raw + 12);
-> >>>> +    imr.imr_ifindex =3D rxe->ndev->ifindex;
-> >>>> +    ip_eth_mc_map(imr.imr_multiaddr.s_addr, ll_addr);
-> >>>> +    err =3D dev_mc_del(rxe->ndev, ll_addr);
-> >>>> +
-> >>>> +    rtnl_lock();
-> >>>> +    err2 =3D ip_mc_leave_group(recv_sockets.sk4->sk, &imr);
-> >>>> +    rtnl_unlock();
-> >>>>    -    return dev_mc_del(rxe->ndev, ll_addr);
-> >>>> +    return err ?: err2;
-> >>>>    }
-> >>>>      /**
-> >>>> @@ -164,6 +242,7 @@ static void __rxe_init_mcg(struct rxe_dev *rxe,
-> >>>> union ib_gid *mgid,
-> >>>>    {
-> >>>>        kref_init(&mcg->ref_cnt);
-> >>>>        memcpy(&mcg->mgid, mgid, sizeof(mcg->mgid));
-> >>>> +    mcg->is_ipv6 =3D !ipv6_addr_v4mapped((struct in6_addr *)mgid);
-> >>>>        INIT_LIST_HEAD(&mcg->qp_list);
-> >>>>        mcg->rxe =3D rxe;
-> >>>>    @@ -225,7 +304,7 @@ static struct rxe_mcg *rxe_get_mcg(struct
-> >>>> rxe_dev *rxe, union ib_gid *mgid)
-> >>>>        spin_unlock_bh(&rxe->mcg_lock);
-> >>>>          /* add mcast address outside of lock */
-> >>>> -    err =3D rxe_mcast_add(rxe, mgid);
-> >>>> +    err =3D rxe_mcast_add(mcg);
-> >>>>        if (!err)
-> >>>>            return mcg;
-> >>>>    @@ -273,7 +352,7 @@ static void __rxe_destroy_mcg(struct rxe_mcg =
-*mcg)
-> >>>>    static void rxe_destroy_mcg(struct rxe_mcg *mcg)
-> >>>>    {
-> >>>>        /* delete mcast address outside of lock */
-> >>>> -    rxe_mcast_del(mcg->rxe, &mcg->mgid);
-> >>>> +    rxe_mcast_del(mcg);
-> >>>>          spin_lock_bh(&mcg->rxe->mcg_lock);
-> >>>>        __rxe_destroy_mcg(mcg);
-> >>>> diff --git a/drivers/infiniband/sw/rxe/rxe_net.c
-> >>>> b/drivers/infiniband/sw/rxe/rxe_net.c
-> >>>> index 58c3f3759bf0..b481f8da2002 100644
-> >>>> --- a/drivers/infiniband/sw/rxe/rxe_net.c
-> >>>> +++ b/drivers/infiniband/sw/rxe/rxe_net.c
-> >>>> @@ -18,7 +18,7 @@
-> >>>>    #include "rxe_net.h"
-> >>>>    #include "rxe_loc.h"
-> >>>>    -static struct rxe_recv_sockets recv_sockets;
-> >>>> +struct rxe_recv_sockets recv_sockets;
-> >>>>      static struct dst_entry *rxe_find_route4(struct rxe_qp *qp,
-> >>>>                         struct net_device *ndev,
-> >>>> diff --git a/drivers/infiniband/sw/rxe/rxe_net.h
-> >>>> b/drivers/infiniband/sw/rxe/rxe_net.h
-> >>>> index 45d80d00f86b..89cee7d5340f 100644
-> >>>> --- a/drivers/infiniband/sw/rxe/rxe_net.h
-> >>>> +++ b/drivers/infiniband/sw/rxe/rxe_net.h
-> >>>> @@ -15,6 +15,7 @@ struct rxe_recv_sockets {
-> >>>>        struct socket *sk4;
-> >>>>        struct socket *sk6;
-> >>>>    };
-> >>>> +extern struct rxe_recv_sockets recv_sockets;
-> >>>>      int rxe_net_add(const char *ibdev_name, struct net_device *ndev=
-);
-> >>>>    diff --git a/drivers/infiniband/sw/rxe/rxe_verbs.h
-> >>>> b/drivers/infiniband/sw/rxe/rxe_verbs.h
-> >>>> index ccb9d19ffe8a..7be9e6232dd9 100644
-> >>>> --- a/drivers/infiniband/sw/rxe/rxe_verbs.h
-> >>>> +++ b/drivers/infiniband/sw/rxe/rxe_verbs.h
-> >>>> @@ -352,6 +352,7 @@ struct rxe_mcg {
-> >>>>        atomic_t        qp_num;
-> >>>>        u32            qkey;
-> >>>>        u16            pkey;
-> >>>> +    bool            is_ipv6;
-> >>>>    };
-> >>>>      struct rxe_mca {
-> >>
->
+>> +/// [`enum phy_state`]: ../../../../../../../include/linux/phy.h
+>> +#[derive(PartialEq, Eq)]
+>> +pub enum DeviceState {
+>> +    /// PHY device and driver are not ready for anything.
+>> +    Down,
+>> +    /// PHY is ready to send and receive packets.
+>> +    Ready,
+>> +    /// PHY is up, but no polling or interrupts are done.
+>> +    Halted,
+>> +    /// PHY is up, but is in an error state.
+>> +    Error,
+>> +    /// PHY and attached device are ready to do work.
+>> +    Up,
+>> +    /// PHY is currently running.
+>> +    Running,
+>> +    /// PHY is up, but not currently plugged in.
+>> +    NoLink,
+>> +    /// PHY is performing a cable test.
+>> +    CableTest,
+> 
+> I took a look at `enum phy_state` and found that you only copied the
+> first sentence of each state description, why is that?
+
+I thought that the first sentence is enough but I'll copy the full
+description if you prefer.
+
+
+>> +/// A mode of Ethernet communication.
+>> +///
+>> +/// PHY drivers get duplex information from hardware and update the current state.
+> 
+> Are you trying to say that the driver automatically queries the
+> hardware? You could express this more clearly.
+
+It's the copy from the PHY doc. I assume that it's clear for driver
+developers; your driver gets the information from the hardware and
+updates the state via the APIs.
+
+
+>> +pub enum DuplexMode {
+>> +    /// PHY is in full-duplex mode.
+>> +    Full,
+>> +    /// PHY is in half-duplex mode.
+>> +    Half,
+>> +    /// PHY is in unknown duplex mode.
+>> +    Unknown,
+>> +}
+>> +
+>> +/// An instance of a PHY device.
+>> +///
+>> +/// Wraps the kernel's [`struct phy_device`].
+>> +///
+>> +/// A [`Device`] instance is created when a callback in [`Driver`] is executed. A PHY driver
+>> +/// executes [`Driver`]'s methods during the callback.
+>> +///
+>> +/// # Invariants
+>> +///
+>> +/// Referencing a `phy_device` using this struct asserts that you are in
+>> +/// a context where all methods defined on this struct are safe to call.
+> 
+> I know that Alice suggested this, but I reading it now, it sounds a
+> bit weird. When reading this it sounds like a requirement for everyone
+> using a `Device`. It would be better to phrase it so that it sounds like
+> something that users of `Device` can rely upon.
+
+I guess that every reviewer has their preferences. I don't think that
+I can write a comment that makes every reviewer fully happy about.
+
+For me, as Alice said, "at least it is correct". 
+
+
+> Also, I would prefer for this invariant to be a simple one, for example:
+> "The mutex of `self.0` is held".
+> The only problem with that are the `resume` and `suspend` methods.
+> Andrew mentioned that there is some tribal knowledge on this topic, but
+> I don't see this written down anywhere here. I can't really suggest an
+> improvement to invariant without knowing the whole picture.
+> 
+>> +/// [`struct phy_device`]: ../../../../../../../include/linux/phy.h
+>> +// During the calls to most functions in [`Driver`], the C side (`PHYLIB`) holds a lock that is
+>> +// unique for every instance of [`Device`]. `PHYLIB` uses a different serialization technique for
+>> +// [`Driver::resume`] and [`Driver::suspend`]: `PHYLIB` updates `phy_device`'s state with
+>> +// the lock held, thus guaranteeing that [`Driver::resume`] has exclusive access to the instance.
+>> +// [`Driver::resume`] and [`Driver::suspend`] also are called where only one thread can access
+>> +// to the instance.
+>> +#[repr(transparent)]
+>> +pub struct Device(Opaque<bindings::phy_device>);
+>> +
+>> +impl Device {
+>> +    /// Creates a new [`Device`] instance from a raw pointer.
+>> +    ///
+>> +    /// # Safety
+>> +    ///
+>> +    /// For the duration of 'a, the pointer must point at a valid `phy_device`,
+>> +    /// and the caller must be in a context where all methods defined on this struct
+>> +    /// are safe to call.
+>> +    unsafe fn from_raw<'a>(ptr: *mut bindings::phy_device) -> &'a mut Self {
+>> +        // CAST: `Self` is a `repr(transparent)` wrapper around `bindings::phy_device`.
+>> +        let ptr = ptr.cast::<Self>();
+>> +        // SAFETY: by the function requirements the pointer is valid and we have unique access for
+>> +        // the duration of `'a`.
+>> +        unsafe { &mut *ptr }
+>> +    }
+>> +
+>> +    /// Gets the id of the PHY.
+>> +    pub fn phy_id(&self) -> u32 {
+>> +        let phydev = self.0.get();
+>> +        // SAFETY: The struct invariant ensures that we may access
+>> +        // this field without additional synchronization.
+> 
+> At the moment the invariant only states that "all functions on
+> `Device` are safe to call". It does not say anything about accessing
+> fields. I hope this shows why I think the invariant is problematic.
+
+The previous invariant was:
+
+`self.0` is always in a valid state.
+
+https://lore.kernel.org/netdev/20231026001050.1720612-1-fujita.tomonori@gmail.com/T/
+
+It says accessing fields, right? For me, if so, the current invariant
+suggested by Alice also says it.
 
