@@ -1,120 +1,108 @@
-Return-Path: <netdev+bounces-55451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FB5D80AE82
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 22:04:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA7F180AF62
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 23:07:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 151C5B20AFC
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 21:04:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5AA41B20B05
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 22:07:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ACDE5731B;
-	Fri,  8 Dec 2023 21:04:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F2758115;
+	Fri,  8 Dec 2023 22:07:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a6D3M7CD"
+	dkim=pass (2048-bit key) header.d=apple.com header.i=@apple.com header.b="Trs9UdVg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54D3DBD;
-	Fri,  8 Dec 2023 13:04:35 -0800 (PST)
-Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-40c19467a63so28048995e9.3;
-        Fri, 08 Dec 2023 13:04:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702069474; x=1702674274; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D6NtR+oTUIOd2AHKXBfJVs3VbzXFOw3VtZb1y+6tew0=;
-        b=a6D3M7CDcqiuZtCqTSvzJ7k8oed6Ew4yV2mX/vdl94cgE9gPgYLYvw3M61+WxNlU5E
-         cZlq3U14wS/5i54nyxlv2fHwZAQ9RZXXZQOXlkpfxxyUZn+FEU68FzJIOjwD3yT3ykQQ
-         Y/J7NK4NNiemwdlUFFmmlIVBalIESJaUhv49VoxhXvPBg+d45bLAVNkEbOQ0brasAwyz
-         6Fz2QzllfTtYVOnEeWDW1fo8mIeVzXVJ42wmS/mXiSgUW/SxsXzYPnpX9/jjRFg40v3m
-         5ZoWSCzeSv4FUfH7leiB6ZnnNU8rGP18gtGDmkn+bYluKJFa9FzEGRwSA+eJDXTOG/eG
-         FOQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702069474; x=1702674274;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=D6NtR+oTUIOd2AHKXBfJVs3VbzXFOw3VtZb1y+6tew0=;
-        b=QI+Q0/by4A4Jak8lYYiz9Lqx5MxRshGmOxdRsdfZIWm4RdhM/62ZPJt1vpEZ687sIN
-         xGz+u6+tZVVArL6zoeQAk114zIDB0SY7ISo/Y9zYCpnxZxkcDCNlOi94zyR8DLF9Ps66
-         9wyB8UoIjOtcbe80usyy7CYc7FV1Gb9X2QUxDNNsxSxlOCi5RrUFuhjmiB3lKpXxobQM
-         RfEnKrYgkINkneEu7c6Tu74UG0oQt982xSpnpu+RwFwyZB/uRP7wQF8eP7/4Oj5FO/Vu
-         XkPIJr6Z/RvIk2WImVcvd2BVO2/RgmxZ1Fto3kdDfkPeBP1rHk5xcTeH3ZBvSunX93EF
-         9eSg==
-X-Gm-Message-State: AOJu0Yz8j5O7YcuPMDor7aFvpeXW4qhcXjAsmAak+zt9ii7c13KhdfqR
-	kGOf0HDQn1lDbIaDGRVrM2LyzgGjY+LQpXhQxwI=
-X-Google-Smtp-Source: AGHT+IEkTtKeS6XS1G3jyMsgzOhUXClVJ029bbBc4Aqz+vIee0Tzhjlve6H0wlutP+qM9rQB9kK5huFu1aQL+LEf+9E=
-X-Received: by 2002:a1c:4c0a:0:b0:40c:2ad3:1aed with SMTP id
- z10-20020a1c4c0a000000b0040c2ad31aedmr288910wmf.35.1702069473424; Fri, 08 Dec
- 2023 13:04:33 -0800 (PST)
+X-Greylist: delayed 3600 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 08 Dec 2023 14:07:09 PST
+Received: from ma-mailsvcp-mx-lapp02.apple.com (ma-mailsvcp-mx-lapp02.apple.com [17.32.222.23])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E77381BEA
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 14:07:09 -0800 (PST)
+Received: from rn-mailsvcp-mta-lapp03.rno.apple.com
+ (rn-mailsvcp-mta-lapp03.rno.apple.com [10.225.203.151])
+ by ma-mailsvcp-mx-lapp02.apple.com
+ (Oracle Communications Messaging Server 8.1.0.23.20230328 64bit (built Mar 28
+ 2023)) with ESMTPS id <0S5D00CLM9BVQH00@ma-mailsvcp-mx-lapp02.apple.com> for
+ netdev@vger.kernel.org; Fri, 08 Dec 2023 13:07:08 -0800 (PST)
+X-Proofpoint-GUID: FUFF0boUFx5kcfWjg6Sc1wSaMbWkhzBG
+X-Proofpoint-ORIG-GUID: FUFF0boUFx5kcfWjg6Sc1wSaMbWkhzBG
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.619,18.0.997
+ definitions=2023-12-08_14:2023-12-07,2023-12-08 signatures=0
+X-Proofpoint-Spam-Details: rule=interactive_user_notspam
+ policy=interactive_user score=0 mlxlogscore=625 phishscore=0 suspectscore=0
+ mlxscore=0 spamscore=0 adultscore=0 bulkscore=0 malwarescore=0 classifier=spam
+ adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2312080174
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com; h=from :
+ content-type : content-transfer-encoding : mime-version : subject : message-id
+ : date : cc : to; s=20180706; bh=Dm508fVBJoP3f2RwtWsCGCH2wp+FIsxCn4bmoydseAM=;
+ b=Trs9UdVg1KBhUKsPrUQ0yRJPtEkB7r9WY0S8h+201MBpPp28Bx2t7lvDE7yYLeN4Ic/o
+ NO0DsNWT8V/fVARn+yLWKuzI+xXK3f/7wUgvEgeK5Enov1dZfGklGPtMutt9jzpWcMap
+ pfnM3ZhQJkO5amA4D/2jV2/dtKh4ncImMeUFQOzdjwkscbL2N6DkoNvS55ZgYIwJAvhC
+ 1BP8qpmKTUxh1SAtJPybRDAYD0tmj+nIbLk3ubTWA5JfgbTpo454WWScLTaiJwfuYMLH
+ OVlpOkfiyeZp1VEFB8V1cZbm7f6VvBSyCVQj7jHKx/82X/snO2QG8KWnlv95oHYY9/hs qA==
+Received: from rn-mailsvcp-mmp-lapp01.rno.apple.com
+ (rn-mailsvcp-mmp-lapp01.rno.apple.com [17.179.253.14])
+ by rn-mailsvcp-mta-lapp03.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.23.20230328 64bit (built Mar 28
+ 2023)) with ESMTPS id <0S5D005ER9BVTUG0@rn-mailsvcp-mta-lapp03.rno.apple.com>;
+ Fri, 08 Dec 2023 13:07:07 -0800 (PST)
+Received: from process_milters-daemon.rn-mailsvcp-mmp-lapp01.rno.apple.com by
+ rn-mailsvcp-mmp-lapp01.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.23.20230328 64bit (built Mar 28
+ 2023)) id <0S5D00F0093FA400@rn-mailsvcp-mmp-lapp01.rno.apple.com>; Fri,
+ 08 Dec 2023 13:07:07 -0800 (PST)
+X-Va-A:
+X-Va-T-CD: 885f49186fe607d02917e8b1ef4f4a67
+X-Va-E-CD: b23bedd0ab5cf2b394606a3c6f9d645f
+X-Va-R-CD: 2486f0c6f75e1f087ebf3d1a9f17fcad
+X-Va-ID: b5018b07-a0a4-468f-89e2-c348cbbfbd11
+X-Va-CD: 0
+X-V-A:
+X-V-T-CD: 885f49186fe607d02917e8b1ef4f4a67
+X-V-E-CD: b23bedd0ab5cf2b394606a3c6f9d645f
+X-V-R-CD: 2486f0c6f75e1f087ebf3d1a9f17fcad
+X-V-ID: e4a807bd-137d-48bf-92dc-5ac55e676da5
+X-V-CD: 0
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.619,18.0.997
+ definitions=2023-12-08_14:2023-12-07,2023-12-08 signatures=0
+Received: from smtpclient.apple ([17.149.239.4])
+ by rn-mailsvcp-mmp-lapp01.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.23.20230328 64bit (built Mar 28
+ 2023))
+ with ESMTPSA id <0S5D00P259BV6100@rn-mailsvcp-mmp-lapp01.rno.apple.com>; Fri,
+ 08 Dec 2023 13:07:07 -0800 (PST)
+From: Christoph Paasch <cpaasch@apple.com>
+Content-type: text/plain; charset=us-ascii
+Content-transfer-encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231206163814.GB36423@noisy.programming.kicks-ass.net>
- <20231206183713.GA35897@noisy.programming.kicks-ass.net> <zu5eb2robdqnp2ojwaxjhnglcummrnjaqbw6krdds6qac3bql2@5zx46c2s6ez4>
- <20231207093105.GA28727@noisy.programming.kicks-ass.net> <ivhrgimonsvy3tyj5iidoqmlcyqvtsh2ay3cm3ouemsdbvjzs4@6jlt6zv55tgh>
- <20231208102940.GB28727@noisy.programming.kicks-ass.net> <20231208134041.GD28727@noisy.programming.kicks-ass.net>
- <CAADnVQJFB_CPtFS3=VV=RwnP=EQRL3yEsR8wXVcicb07P8NODw@mail.gmail.com>
- <20231208201819.GE36716@noisy.programming.kicks-ass.net> <CAADnVQ+1nVBuKkjdvh0eu19p+J0UqbO9mcCf3yzVeQtALxzQ+Q@mail.gmail.com>
- <20231208205647.GL28727@noisy.programming.kicks-ass.net>
-In-Reply-To: <20231208205647.GL28727@noisy.programming.kicks-ass.net>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Fri, 8 Dec 2023 13:04:22 -0800
-Message-ID: <CAADnVQKjAwWLfn-gBxq03qv4SQTt0YguYSDZXj8L6nmBZqU66g@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] x86/cfi,bpf: Fix BPF JIT call
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Jiri Olsa <olsajiri@gmail.com>, Song Liu <song@kernel.org>, 
-	Song Liu <songliubraving@meta.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Sami Tolvanen <samitolvanen@google.com>, 
-	Kees Cook <keescook@chromium.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, linux-riscv <linux-riscv@lists.infradead.org>, 
-	LKML <linux-kernel@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	bpf <bpf@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, 
-	clang-built-linux <llvm@lists.linux.dev>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	Joao Moreira <joao@overdrivepizza.com>, Mark Rutland <mark.rutland@arm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-version: 1.0 (Mac OS X Mail 16.0 \(3774.300.61.1.2\))
+Subject: mpls_xmit() calls skb_orphan()
+Message-id: <9F1B6AC3-509E-4C64-97A4-47247F25913A@apple.com>
+Date: Fri, 08 Dec 2023 13:06:57 -0800
+Cc: Craig Taylor <cmtaylor@apple.com>
+To: netdev <netdev@vger.kernel.org>, Roopa Prabhu <roopa@cumulusnetworks.com>
+X-Mailer: Apple Mail (2.3774.300.61.1.2)
 
-On Fri, Dec 8, 2023 at 12:56=E2=80=AFPM Peter Zijlstra <peterz@infradead.or=
-g> wrote:
->
-> On Fri, Dec 08, 2023 at 12:45:51PM -0800, Alexei Starovoitov wrote:
->
-> > I mean we don't need to store a pointer to a func in stubs.
-> > Can it be, roughly:
-> >
-> > extern void bpf_tcp_ca_cong_avoid(struct sock *sk, u32 ack, u32 acked);
-> > KCFI_MACRO(hash_of_cong_avoid, bpf_tcp_ca_cong_avoid);
-> > u32 __array_of_kcfi_hash[] =3D {hash_of_cong_avoid, hash_of_set_state,.=
-..};
-> >       .bpf_ops_stubs =3D __array_of_kcfi_hash,
->
-> But then how do I index this array? The bpf_ops_stubs thing having the
-> same layout at the target struct made it easy and we could use 'moff'
-> for both.
->
-> That also remains working if someone adds a member to the struct or
-> moves some members around.
+Hello,
 
-I was thinking to just moff/2 assuming u32 array will have the same order,
-but I missed the fact that init() and release() in tcp_congestion_ops
-come after some variables.
-And you're right it's more fragile when things change in tcp_congestion_ops=
-.
-Storing u32 hash as (void *) into function pointers is just ugly.
-Let's go with your initial approach.
+we observed an issue when running a TCP-connection with BBR on top of an =
+MPLS-tunnel in that we saw a lot of CPU-time spent coming from =
+tcp_pace_kick(), although sch_fq was configured on this host.
+
+The reason for this seems to be because mpls_xmit() calls skb_orphan(), =
+thus settings skb->sk to NULL, preventing the qdisc to set =
+sk_pacing_status (which would allow to avoid the call to =
+tcp_pace_kick()).
+
+The question is: Why is this call to skb_orphan in mpls_xmit necessary ?
+
+
+Thanks,
+Christoph=
 
