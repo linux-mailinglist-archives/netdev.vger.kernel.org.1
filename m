@@ -1,98 +1,136 @@
-Return-Path: <netdev+bounces-55206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B65E0809CF1
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 08:14:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D7843809D2D
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 08:33:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFAB11C20A0A
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 07:14:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EB3F1C209F0
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 07:33:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C22FDF4A;
-	Fri,  8 Dec 2023 07:14:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FEFD101E1;
+	Fri,  8 Dec 2023 07:33:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oSe6712I"
 X-Original-To: netdev@vger.kernel.org
-X-Greylist: delayed 162741 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 07 Dec 2023 23:14:41 PST
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A083710EB
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 23:14:40 -0800 (PST)
-X-QQ-mid:Yeas9t1702019567t333t03269
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [115.204.154.156])
-X-QQ-SSF:00400000000000F0FSF000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 375664412574875027
-To: "'Russell King \(Oracle\)'" <linux@armlinux.org.uk>
-Cc: <davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<andrew@lunn.ch>,
-	<netdev@vger.kernel.org>,
-	<mengyuanlou@net-swift.com>
-References: <20231206095355.1220086-1-jiawenwu@trustnetic.com> <20231206095355.1220086-2-jiawenwu@trustnetic.com> <ZXBjwWjd1Jv8916K@shell.armlinux.org.uk>
-In-Reply-To: <ZXBjwWjd1Jv8916K@shell.armlinux.org.uk>
-Subject: RE: [PATCH net-next v3 1/7] net: ngbe: implement phylink to handle PHY device
-Date: Fri, 8 Dec 2023 15:12:46 +0800
-Message-ID: <06f201da29a5$f1f04910$d5d0db30$@trustnetic.com>
+Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 061A31720
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 23:33:21 -0800 (PST)
+Message-ID: <8faf1308-2f9f-4923-804e-8d9b11ba74e0@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1702020799;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lglskR3KX8IH/WdEpciW9C4YcgXG92rozQyUCJ+NYvs=;
+	b=oSe6712Inb4+L9rwGiPucvw2o9SsNvy80j3VYObt2AJB4KKxlR9fQ8rGIaHz3KHlbbcCH9
+	VDe1RpKET8t+3mCA/5AUS0RogkPmMWaHVSDNglmfQKf7Y78G+mVl3oFwMAAJM2G56gG7J7
+	OS4HLNQS8aoYVNts+sh1h9X9F/EgIeQ=
+Date: Thu, 7 Dec 2023 23:33:13 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+Subject: Re: [PATCH net-next v9 14/15] p4tc: add set of P4TC table kfuncs
+Content-Language: en-US
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: deb.chatterjee@intel.com, anjali.singhai@intel.com,
+ namrata.limaye@intel.com, mleitner@redhat.com, Mahesh.Shirshyad@amd.com,
+ tomasz.osinski@intel.com, jiri@resnulli.us, xiyou.wangcong@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com,
+ toke@redhat.com, daniel@iogearbox.net, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20231201182904.532825-1-jhs@mojatatu.com>
+ <20231201182904.532825-15-jhs@mojatatu.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20231201182904.532825-15-jhs@mojatatu.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQIXPBN5cam3kR8JTO5owVnFd3tKkwGHnNu7Ah1JO9qwB6udIA==
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
+X-Migadu-Flow: FLOW_OUT
 
-On Wednesday, December 6, 2023 8:06 PM, Russell King (Oracle) wrote:
-> On Wed, Dec 06, 2023 at 05:53:49PM +0800, Jiawen Wu wrote:
-> > Add phylink support for Wangxun 1Gb Ethernet controller.
-> >
-> > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> > ---
-> >  drivers/net/ethernet/wangxun/libwx/wx_type.h  |   8 ++
-> >  drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  20 ++-
-> >  drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c | 126 +++++++++++-------
-> >  drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.h |   2 +-
-> >  4 files changed, 93 insertions(+), 63 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> > index 165e82de772e..9225aaf029f8 100644
-> > --- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> > +++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> > @@ -8,6 +8,7 @@
-> >  #include <linux/netdevice.h>
-> >  #include <linux/if_vlan.h>
-> >  #include <net/ip.h>
-> > +#include <linux/phylink.h>
+On 12/1/23 10:29 AM, Jamal Hadi Salim wrote:
+> We add an initial set of kfuncs to allow interactions from eBPF programs
+> to the P4TC domain.
 > 
-> Nit: would be better to keep linux/ includes together (and in
-> alphabetical order to prevent conflicts.)
+> - bpf_p4tc_tbl_read: Used to lookup a table entry from a BPF
+> program installed in TC. To find the table entry we take in an skb, the
+> pipeline ID, the table ID, a key and a key size.
+> We use the skb to get the network namespace structure where all the
+> pipelines are stored. After that we use the pipeline ID and the table
+> ID, to find the table. We then use the key to search for the entry.
+> We return an entry on success and NULL on failure.
 > 
-> > diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-> > index 8db804543e66..c61f4b9d79fa 100644
-> > --- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-> > +++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-> > @@ -9,6 +9,7 @@
-> >  #include <linux/etherdevice.h>
-> >  #include <net/ip.h>
-> >  #include <linux/phy.h>
-> > +#include <linux/phylink.h>
-> >  #include <linux/if_vlan.h>
-> >
-> >  #include "../libwx/wx_type.h"
+> - xdp_p4tc_tbl_read: Used to lookup a table entry from a BPF
+> program installed in XDP. To find the table entry we take in an xdp_md,
+> the pipeline ID, the table ID, a key and a key size.
+> We use struct xdp_md to get the network namespace structure where all
+> the pipelines are stored. After that we use the pipeline ID and the table
+> ID, to find the table. We then use the key to search for the entry.
+> We return an entry on success and NULL on failure.
 > 
-> As wx_type.h includes linux/phylink.h, which is now fundamental for the
-> definition of one of the structures in wx_type.h, the include of
-> linux/phylink.h seems unnecessary here.
+> - bpf_p4tc_entry_create: Used to create a table entry from a BPF
+> program installed in TC. To create the table entry we take an skb, the
+> pipeline ID, the table ID, a key and its size, and an action which will
+> be associated with the new entry.
+> We return 0 on success and a negative errno on failure
+> 
+> - xdp_p4tc_entry_create: Used to create a table entry from a BPF
+> program installed in XDP. To create the table entry we take an xdp_md, the
+> pipeline ID, the table ID, a key and its size, and an action which will
+> be associated with the new entry.
+> We return 0 on success and a negative errno on failure
+> 
+> - bpf_p4tc_entry_create_on_miss: conforms to PNA "add on miss".
+> First does a lookup using the passed key and upon a miss will add the entry
+> to the table.
+> We return 0 on success and a negative errno on failure
+> 
+> - xdp_p4tc_entry_create_on_miss: conforms to PNA "add on miss".
+> First does a lookup using the passed key and upon a miss will add the entry
+> to the table.
+> We return 0 on success and a negative errno on failure
+> 
+> - bpf_p4tc_entry_update: Used to update a table entry from a BPF
+> program installed in TC. To update the table entry we take an skb, the
+> pipeline ID, the table ID, a key and its size, and an action which will
+> be associated with the new entry.
+> We return 0 on success and a negative errno on failure
+> 
+> - xdp_p4tc_entry_update: Used to update a table entry from a BPF
+> program installed in XDP. To update the table entry we take an xdp_md, the
+> pipeline ID, the table ID, a key and its size, and an action which will
+> be associated with the new entry.
+> We return 0 on success and a negative errno on failure
+> 
+> - bpf_p4tc_entry_delete: Used to delete a table entry from a BPF
+> program installed in TC. To delete the table entry we take an skb, the
+> pipeline ID, the table ID, a key and a key size.
+> We return 0 on success and a negative errno on failure
+> 
+> - xdp_p4tc_entry_delete: Used to delete a table entry from a BPF
+> program installed in XDP. To delete the table entry we take an xdp_md, the
+> pipeline ID, the table ID, a key and a key size.
+> We return 0 on success and a negative errno on failure
 
-Should I remove the include of linux/phylink.h that have been added in other .c files?
- 
+[ ... ]
 
+> +BTF_SET8_START(p4tc_kfunc_check_tbl_set_skb)
+> +BTF_ID_FLAGS(func, bpf_p4tc_tbl_read, KF_RET_NULL);
+> +BTF_ID_FLAGS(func, bpf_p4tc_entry_create);
+> +BTF_ID_FLAGS(func, bpf_p4tc_entry_create_on_miss);
+> +BTF_ID_FLAGS(func, bpf_p4tc_entry_update);
+> +BTF_ID_FLAGS(func, bpf_p4tc_entry_delete);
+> +BTF_SET8_END(p4tc_kfunc_check_tbl_set_skb)
+
+These create/read/update/delete kfuncs are like defining a new hidden bpf map 
+type in the kernel. bpf prog can now create its own link-list and rbtree. 
+sched_ext has already been using it. This is the way the bpf prog should use 
+instead of creating a new map type.
 
