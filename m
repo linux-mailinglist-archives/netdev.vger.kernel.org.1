@@ -1,255 +1,362 @@
-Return-Path: <netdev+bounces-55114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CE5880970D
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 01:18:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECD66809734
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 01:28:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C96061F2137B
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 00:18:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F2DFB20DE2
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 00:28:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1610B643;
-	Fri,  8 Dec 2023 00:17:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B588D371;
+	Fri,  8 Dec 2023 00:28:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="aOsXQtc0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aHaeTove"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD13B19BB
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 16:17:29 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6ceb2501f1bso1011385b3a.0
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 16:17:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1701994649; x=1702599449; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JPUIM/SWTOd4abqKXMlSgtSF9VmXa011aEIRqhAxGo0=;
-        b=aOsXQtc0Wu6lQR003eTk/vN9oTPiC+KeDivTqr1JS78DYgZiko/OjN7ErIO4eJCf/I
-         uaoSRC+nDN3lUXtT0A6g2XdAepgdLwGNCglzRfVujiylRFmEaF+OCFZf9QJmOSk/PD2O
-         HXB6dxYCuypR5Snb9Tqk3jAUMu9vQNWguc0Qs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701994649; x=1702599449;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JPUIM/SWTOd4abqKXMlSgtSF9VmXa011aEIRqhAxGo0=;
-        b=qkANzMb0GbfvxZ8PA1hp60Hh0baTiPpc7o+FNUw/zJi2TJxBinBCubO2XdqvAqqpmG
-         2VfkngXDXsQsH3ysGMaOsACFSXb2ImpEeuqnYUzH78SmBpKdJXapj9dNhecx4PCIFoMA
-         M3nG0Btwn7Cl/g5Pgl12mXGkyhag8hZkmN0K7qT3slm2d9QEYUpJTo4HuYwdMKD7xjdL
-         KPRp1AZELlSNJm6tuW8w2Kl4sAlj4BgWH+m4r/TCK61jfiJ14ol3v/3EypLQJvgj0csq
-         WHXCidAwtU1VH8D+2QSSh5kigVcJfj+BJnVBl2029EWqfFBLJVwtYs54Tz1JfuqHvsP7
-         5JSQ==
-X-Gm-Message-State: AOJu0YzvweB883rohRE6V/lIcMmgsiRahRCMSChD8XnwmjuUaLvt73eq
-	az77mEmjVVC3YBQunIPVxWGe0g==
-X-Google-Smtp-Source: AGHT+IGht+/qKPlYplffNFnN4EHKFvEVUDPqqGYa1714U92mo1EIo6IlT1N59atTy/1kptLeaR/K6w==
-X-Received: by 2002:a05:6a00:1806:b0:6cd:d53c:f5ea with SMTP id y6-20020a056a00180600b006cdd53cf5eamr4256416pfa.6.1701994648988;
-        Thu, 07 Dec 2023 16:17:28 -0800 (PST)
-Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id o4-20020a056a0015c400b006cdd369e3d0sm356493pfu.201.2023.12.07.16.17.27
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 07 Dec 2023 16:17:27 -0800 (PST)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	gospo@broadcom.com,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>
-Subject: [PATCH net v3 4/4] bnxt_en: Fix HWTSTAMP_FILTER_ALL packet timestamp logic
-Date: Thu,  7 Dec 2023 16:16:58 -0800
-Message-Id: <20231208001658.14230-5-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20231208001658.14230-1-michael.chan@broadcom.com>
-References: <20231208001658.14230-1-michael.chan@broadcom.com>
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0A9F10DA
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 16:28:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701995313; x=1733531313;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=uQYqQmjx4YVTcA6z0np96qClgbKfihkgZ+0C5xEjn1s=;
+  b=aHaeTove8GZPNXjJT1yLQnUal/c/TnOB/nl1haWWaAM4K3ZuGgAbC6Zl
+   7N+lJtQBeNdx3OdcoQYcJgYIZp14v6eIHT1QfLHBS8bjQ7vvJhhSKnKQL
+   kFenqtBOeKrlsCxXwrS0nW/lCXgIysgIFKFsQRxD/5a9ELkin781ypFWm
+   lDffYby8A9G0hb2+i3ZKwFIG/XTnma9Uz7obF69HKZCdtR6VkGYt2yQ4U
+   IQid1HENaCisKF02+TPcF4H0KaBYRs10dzf0yj1h4Zb2/IxVmbM5tUdyx
+   MpvuGdpuJTEBqIR/o0RW04oyd3ScMZ/c3QbS1T/u0fQaOjjt9Dso0lA74
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="1214577"
+X-IronPort-AV: E=Sophos;i="6.04,259,1695711600"; 
+   d="scan'208";a="1214577"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2023 16:28:32 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="837948234"
+X-IronPort-AV: E=Sophos;i="6.04,259,1695711600"; 
+   d="scan'208";a="837948234"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmsmga008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Dec 2023 16:28:31 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 7 Dec 2023 16:28:31 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 7 Dec 2023 16:28:31 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 7 Dec 2023 16:28:31 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Nkz3YLDWAzSUJGcNW9qQM78cCXpogJRss7/L7EU2Y5VKVIieotnZOoz4hT/75YiDS+rEaqroIAITees8m5tz9myVuqdpkNfrr/8UdBq0JyuSOKVp5OVTlFIO6vWCudWo+HhWFs1qTto/a2ptwfusW2rx64vfJ8vZdAWQSAestHCMiB7xzX7Ocrq1gv8aJZdyH63wxG5nV60g5NqR6290Jn6Jg+EB6gokQ1azArQk3Y+SiLJAd89twOijfKrhxPqJtvUC1GNTc7sj8I2YxsuRz+m76N/E8RN68+OG+anDUwWkRPwU37+rh4gaMZEI29fJXJ1KsoL4JwuhKUi1oq9wjg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/bgyzwDk6+J6N9EPbFBaUSwQts+9JmhuU3Csvilzg0c=;
+ b=ggEqX19c9Obcvx/kTysNXSwPlxg8ii6U+xovGvbl3Z9/f7sMHer3U2381wv2iU+sSj8aXPccr2Aq2zR7xEnrVpqwoc8RY/psk69QQKizr/eCNrrVJ8Kxs9RR8PvNpwMc/f5gr2aNboWiMndG7jphFgGpzpA3MDD3iqJNSrbZXIq4pFoRgatWHeeTnRyS8UPcK2QNMod0tL57raBUOXX925UbSunMS1K4JDjoqQwsko6hzUyyqdLaw4P6AvzaRSpMIyVFG1tNdmsSRjugwo1ckt0+0j16aUyisNayCyEGKUykCFOoxKtJ2zFYJyKEBI5wP1YVoK5Myp1PVFFK2vH5ng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SJ0PR11MB5647.namprd11.prod.outlook.com (2603:10b6:a03:3af::6)
+ by PH0PR11MB7496.namprd11.prod.outlook.com (2603:10b6:510:280::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.25; Fri, 8 Dec
+ 2023 00:28:29 +0000
+Received: from SJ0PR11MB5647.namprd11.prod.outlook.com
+ ([fe80::4d73:9ea:9ca0:ab53]) by SJ0PR11MB5647.namprd11.prod.outlook.com
+ ([fe80::4d73:9ea:9ca0:ab53%4]) with mapi id 15.20.7068.027; Fri, 8 Dec 2023
+ 00:28:29 +0000
+Message-ID: <75bc978a-8184-ffa3-911e-cceacf8adcd0@intel.com>
+Date: Thu, 7 Dec 2023 16:28:27 -0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH net-next v5 2/5] ice: configure FW logging
+To: Jakub Kicinski <kuba@kernel.org>, Tony Nguyen <anthony.l.nguyen@intel.com>
+CC: <davem@davemloft.net>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<netdev@vger.kernel.org>, <jacob.e.keller@intel.com>,
+	<vaishnavi.tipireddy@intel.com>, <horms@kernel.org>, <leon@kernel.org>,
+	"Pucha Himasekhar Reddy" <himasekharx.reddy.pucha@intel.com>
+References: <20231205211251.2122874-1-anthony.l.nguyen@intel.com>
+ <20231205211251.2122874-3-anthony.l.nguyen@intel.com>
+ <20231206195304.6226771d@kernel.org>
+Content-Language: en-US
+From: Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>
+In-Reply-To: <20231206195304.6226771d@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR08CA0055.namprd08.prod.outlook.com
+ (2603:10b6:a03:117::32) To SJ0PR11MB5647.namprd11.prod.outlook.com
+ (2603:10b6:a03:3af::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000007f6c85060bf48241"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ0PR11MB5647:EE_|PH0PR11MB7496:EE_
+X-MS-Office365-Filtering-Correlation-Id: 63b2408f-1223-4305-f8dd-08dbf78499d9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: y1ZFlfy83CExV+UGuP/dRYsxvR4GqB3Pv7s/Q8S989KBqe1f/DplKrMSdU/Tv3kvbVRv8e7EYHkrXfSh2ghuR0622QQjPi2YD2EVZRy+155i+hFdoUrDQXK3kiqyu/xps5B7pn/CDUQU3IleXh0JTr/cVo/0r8/iND0izHw8sxdkkFTf7HAZ3bJYxzHka0IvMqPM4MLTmOgtWoD2royP+wiA7WU1omZi/KZSeiq4U4GRmK1WVky7e41m/gJ0ZupzuP4cr/90Lxzzq/v68gvgC/4Rf2fDKjroEl/K8KDA+uEQb79m61rCTuGCCzBz61SIBNo6K9NWjvxiiKcvI+am1g+3Fu0NXIceck0ts3FgwotiuJSgs69tIdIdD2hXsk2CK2GRnLFyDaqUPxwAsft6C14Uzrc6bPjcnh+rnXfjiktoIACmPKSPJMu6nQxvLZMQ3GK/Oyi+uX2Ik/AkxcWUA1mBQsKYsp86Zidc8JFg6AAf/7GOuf8+qSrdvoR41CWIwcJbKeuso6OsZ1vFcKy/BMRzJmmDtPGA61XUjuQ/IQNAB7CGpyBTsNcRK9bKj5vam5SrydE/nkbUddd5skKETDTHnd5mC+Nb+D2yFHCn3onnBSshnK3JI6W5SAvyzP8GIbfbgo+RvZzD1TYRo2mn5qoMWvn7DaqYHIVMTPjo358078PpN6gGa98ppfRMddlw
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB5647.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(39860400002)(376002)(136003)(346002)(230273577357003)(230173577357003)(230922051799003)(451199024)(186009)(1800799012)(64100799003)(31696002)(86362001)(8676002)(4326008)(36756003)(66556008)(8936002)(5660300002)(110136005)(31686004)(316002)(82960400001)(6636002)(38100700002)(6486002)(478600001)(2906002)(6506007)(66476007)(53546011)(41300700001)(107886003)(6512007)(26005)(2616005)(66899024)(83380400001)(66946007)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZUUwcGJYZnN5US81REpoUDQyZk0xUmxiQm9iamcrQW9MWFVYTmpod2M0THlL?=
+ =?utf-8?B?NWQvNVN0UWlRZWZjOUZ1M2JLOGhBQm8wU2FEalNQVENJZVNhLzJsYmtOdURE?=
+ =?utf-8?B?ODJ2aEpuQldIU2YvMmtNeTFkVDROUGk5SlIwWDB5RXgzZ2t4aEdFZ2JNVkZU?=
+ =?utf-8?B?WTdMSS9lOWNFN0xjenZsQm9paFhUejI3aENsV2tnZ3g3VGY4aXdvcmhqOEVu?=
+ =?utf-8?B?NVVwTUp0VnVJaWIvMzBmSk94STFwVXYwT3dpZFNvOE12MkJoNnQ3TndCSXZu?=
+ =?utf-8?B?SnZlMnB3UW5LUTRZMmlaV05Ed3N5SU1wdWpFUXFHeWtwQ3lJZ2d0WGdUd2xu?=
+ =?utf-8?B?eWJLWmp0Z2liSmdubnZYWStVQldMNm9DTy9ZakhURnVEcERDNkwwWnVmOUFT?=
+ =?utf-8?B?RVRIeTk5NUlsN2NxbGJJZXpJc1lqa285b1p1RFV2cDJkZlFXTUFaMFJ1ZDBS?=
+ =?utf-8?B?ODRKV3hjdlVlMDZ0R3oxUHlFQXZ2Q21wajlid2lWRkxnWjFLSSt1ZlcyNitQ?=
+ =?utf-8?B?WHlWb0FudlN0MDJUakgyZTRsSU1ER2piWDlFSVFPbkNpQzU1OW1sRlRjYkVj?=
+ =?utf-8?B?TllRb3ZJTlErSGJmT2IwaTBKektSN0Zma1dkdjNBRCtDMHlJMWQ3S2JkODVr?=
+ =?utf-8?B?OE5IWW9PME9mNEhKYUd0TXRPNjF4dGlFZ2EyK0NwZkJ6Q2VHWmRRSldvN1BS?=
+ =?utf-8?B?ZFB3ek1jd2llb0JucU1HTWdxL2V6UWNPNENMSFdtMUU3bCtzaXc5MTNwVStL?=
+ =?utf-8?B?K2daSklpV0djSldnZTBNS2NDV0R6dVpNMXpDUE1wUEt3QTRJYXZhQk5mam4w?=
+ =?utf-8?B?aGIxaEh3clZqajhQRHREWHpuaGFVWWFBR0lNQ2w0c2krVXh3bnFvNG1sZG1Z?=
+ =?utf-8?B?Ukc3WDVDL1o4YjAxV2lEVW45QmVpNXBOYVY3a2JZRURhc1ljdWRQcEkyT2Fa?=
+ =?utf-8?B?UVRvSk5sV2RFQVI3MnJYbXo5d3gyRHRUUkh5ajJwSHA0RHBqZGNqZlRleEgy?=
+ =?utf-8?B?UHZPMkF0WUhpcFpLU0RHTTJDdy9RWDFacW96anZTMjdVdmVFMk1PdkM0RFc4?=
+ =?utf-8?B?N2tpQ2Z6Q0VYelN2cDIvZjQ2TnRBU3Q3a0k3VWt1UmJzaWRSc3dyOW9KaXFw?=
+ =?utf-8?B?OEp1SE5DaDVDamFCa0RZZUFXRnNNWmlEdmRDUm1MRC8zeWt4aUcxUHpzNDMx?=
+ =?utf-8?B?VUNNNWlzUEx4YkhmT0MrMkY2dHA3KzVMdStZTm84ZytFQ0JlOFJOZVkvcXU0?=
+ =?utf-8?B?Zzd4TjEzbU85Q2FNSDUrNDNNZy9MeW1jWWhnaDl6QXZoVGhiMWpWencwOU1T?=
+ =?utf-8?B?RUh4NTkwb25wcGJOQWRhNy9ubnRnaGtVRm1tbDlUZzVEQzFwaHFSNTNTMGkx?=
+ =?utf-8?B?blczQW9ieUtEVFVWbTF2eDZqOElEY0dpMjNXRWJoemwveWNhZ3N2aUMvUkdU?=
+ =?utf-8?B?Y3dZS0I2dWIvS2ZPVk5jc0E5QTR5eU1GdjJsTUpKMDJSWDJVK0V3aFRLMVdk?=
+ =?utf-8?B?SnJuSjlZVFlMY0c1cTBtZjFSN1FYUTBYQkhYUFY5WjFtVkhmbUFDWTJteGZH?=
+ =?utf-8?B?K2drWVhEZ0piTXRSM0pKYmxSODlOYURBNkRrWEFjWjdNSnNQUUZ6UmpwNGtJ?=
+ =?utf-8?B?S3I4WUptYnVqbXlkZFptKzl1M01XUnRtUHJqKzJKeTFtdDdWOUdNVGlybWNa?=
+ =?utf-8?B?dUZBRTc3dVYrZi9NOXVCaE9EWWUxQWFTeWhuVXVWS2g3RVN6eG9yQ25jNWJo?=
+ =?utf-8?B?TnJWamNDVUJLM2h5ZC9JRlB6ZXJ6eW5NeVR6Uk5odGNyTVAvYUFGZWJwTVF1?=
+ =?utf-8?B?OFJmUVpTMnJ1eVNTb1BaMGl2c2JlNGt3dlpaWm1mcjFPMEJWSXd6cTltczNI?=
+ =?utf-8?B?em5CTTBtY3dBbE9rcE1TZnVleEZVZWwyaExrV2oyZXhmVlJncGxUakJlR1Ix?=
+ =?utf-8?B?L2hiUHpCdlo0NXR1aFc0RUtWeE81ZEt1cmFEYW10d1NCWmRpV3RrT0RqVGxh?=
+ =?utf-8?B?aE01VjF1L1pTYkFuc2J1VFhPMzg3RzBLRWtQRGlEVnJPd1dtOFl2b0cvOG5H?=
+ =?utf-8?B?MktGeDZtWWZobmdDSWx4aFZ6RHhJSG5reWdibTEyaGJVMVlXbU5KM1dMcGpo?=
+ =?utf-8?B?RFBoRGY2T2tkcHA3S1lqS1Y4SW1KaldjK3UvOGpORlBuYzhmUGRtWDZidnFJ?=
+ =?utf-8?B?YlE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 63b2408f-1223-4305-f8dd-08dbf78499d9
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB5647.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Dec 2023 00:28:29.4380
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: P3iFAgkyrhG2vIhlgxaNpzkbv++TEIVEEttuOkDyXOrKV1ooo7UfZFncx0WYeylHUjA7JYCTBSPLFqgSJpavV13p5Jc4GXC1ZJ36FA7zeg4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7496
+X-OriginatorOrg: intel.com
 
---0000000000007f6c85060bf48241
-Content-Transfer-Encoding: 8bit
+On 12/6/2023 7:53 PM, Jakub Kicinski wrote:
+> On Tue,  5 Dec 2023 13:12:45 -0800 Tony Nguyen wrote:
+>> +/**
+>> + * ice_debugfs_parse_cmd_line - Parse the command line that was passed in
+>> + * @src: pointer to a buffer holding the command line
+>> + * @len: size of the buffer in bytes
+>> + * @argv: pointer to store the command line items
+>> + * @argc: pointer to store the number of command line items
+>> + */
+>> +static ssize_t ice_debugfs_parse_cmd_line(const char __user *src, size_t len,
+>> +					  char ***argv, int *argc)
+>> +{
+>> +	char *cmd_buf, *cmd_buf_tmp;
+>> +
+>> +	cmd_buf = memdup_user(src, len);
+>> +	if (IS_ERR(cmd_buf))
+>> +		return PTR_ERR(cmd_buf);
+>> +	cmd_buf[len] = '\0';
+>> +
+>> +	/* the cmd_buf has a newline at the end of the command so
+>> +	 * remove it
+>> +	 */
+>> +	cmd_buf_tmp = strchr(cmd_buf, '\n');
+>> +	if (cmd_buf_tmp) {
+>> +		*cmd_buf_tmp = '\0';
+>> +		len = (size_t)cmd_buf_tmp - (size_t)cmd_buf;
+>> +	}
+>> +
+>> +	*argv = argv_split(GFP_KERNEL, cmd_buf, argc);
+>> +	kfree(cmd_buf);
+>> +	if (!*argv)
+>> +		return -ENOMEM;
+> 
+> I haven't spotted a single caller wanting this full argc/argv parsing.
+> Can we please not add this complexity until its really needed?
+> 
 
-When the chip is configured to timestamp all receive packets, the
-timestamp in the RX completion is only valid if the metadata
-present flag is not set for packets received on the wire.  In
-addition, internal loopback packets will never have a valid timestamp
-and the timestamp field will always be zero.  We must exclude
-any 0 value in the timestamp field because there is no way to
-determine if it is a loopback packet or not.
+I can remove it, but I use it in all the _write functions. I use the 
+argc to make sure I'm only getting one value to a write and I use 
+argv[0] to deal with the value.
 
-Add a new function bnxt_rx_ts_valid() to check for all timestamp
-valid conditions.
+Honestly I'm not sure how valuable it is to check for a single argument, 
+but I'm fairly certain our validation team will file a bug if they pass 
+more than one argument and something happens :)
 
-Fixes: 66ed81dcedc6 ("bnxt_en: Enable packet timestamping for all RX packets")
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 20 +++++++++++++++++---
- drivers/net/ethernet/broadcom/bnxt/bnxt.h |  8 +++++++-
- 2 files changed, 24 insertions(+), 4 deletions(-)
+Examples of using argv are on lines 358 and 466 of ice_debugfs.c
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index aa1f5b776b5a..579eebb6fc56 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -1759,6 +1759,21 @@ static void bnxt_deliver_skb(struct bnxt *bp, struct bnxt_napi *bnapi,
- 	napi_gro_receive(&bnapi->napi, skb);
- }
- 
-+static bool bnxt_rx_ts_valid(struct bnxt *bp, u32 flags,
-+			     struct rx_cmp_ext *rxcmp1, u32 *cmpl_ts)
-+{
-+	u32 ts = le32_to_cpu(rxcmp1->rx_cmp_timestamp);
-+
-+	if (BNXT_PTP_RX_TS_VALID(flags))
-+		goto ts_valid;
-+	if (!bp->ptp_all_rx_tstamp || !ts || !BNXT_ALL_RX_TS_VALID(flags))
-+		return false;
-+
-+ts_valid:
-+	*cmpl_ts = ts;
-+	return true;
-+}
-+
- /* returns the following:
-  * 1       - 1 packet successfully received
-  * 0       - successful TPA_START, packet not completed yet
-@@ -1784,6 +1799,7 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
- 	struct sk_buff *skb;
- 	struct xdp_buff xdp;
- 	u32 flags, misc;
-+	u32 cmpl_ts;
- 	void *data;
- 	int rc = 0;
- 
-@@ -2006,10 +2022,8 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
- 		}
- 	}
- 
--	if (unlikely((flags & RX_CMP_FLAGS_ITYPES_MASK) ==
--		     RX_CMP_FLAGS_ITYPE_PTP_W_TS) || bp->ptp_all_rx_tstamp) {
-+	if (bnxt_rx_ts_valid(bp, flags, rxcmp1, &cmpl_ts)) {
- 		if (bp->flags & BNXT_FLAG_CHIP_P5) {
--			u32 cmpl_ts = le32_to_cpu(rxcmp1->rx_cmp_timestamp);
- 			u64 ns, ts;
- 
- 			if (!bnxt_get_rx_ts_p5(bp, &ts, cmpl_ts)) {
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 0488b0466015..a7d7b09ea162 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -161,7 +161,7 @@ struct rx_cmp {
- 	#define RX_CMP_FLAGS_ERROR				(1 << 6)
- 	#define RX_CMP_FLAGS_PLACEMENT				(7 << 7)
- 	#define RX_CMP_FLAGS_RSS_VALID				(1 << 10)
--	#define RX_CMP_FLAGS_UNUSED				(1 << 11)
-+	#define RX_CMP_FLAGS_PKT_METADATA_PRESENT		(1 << 11)
- 	 #define RX_CMP_FLAGS_ITYPES_SHIFT			 12
- 	 #define RX_CMP_FLAGS_ITYPES_MASK			 0xf000
- 	 #define RX_CMP_FLAGS_ITYPE_UNKNOWN			 (0 << 12)
-@@ -188,6 +188,12 @@ struct rx_cmp {
- 	__le32 rx_cmp_rss_hash;
- };
- 
-+#define BNXT_PTP_RX_TS_VALID(flags)				\
-+	(((flags) & RX_CMP_FLAGS_ITYPES_MASK) == RX_CMP_FLAGS_ITYPE_PTP_W_TS)
-+
-+#define BNXT_ALL_RX_TS_VALID(flags)				\
-+	!((flags) & RX_CMP_FLAGS_PKT_METADATA_PRESENT)
-+
- #define RX_CMP_HASH_VALID(rxcmp)				\
- 	((rxcmp)->rx_cmp_len_flags_type & cpu_to_le32(RX_CMP_FLAGS_RSS_VALID))
- 
--- 
-2.30.1
+I'm open to changing it, just not sure to what
 
+>> +/**
+>> + * ice_debugfs_module_read - read from 'module' file
+>> + * @filp: the opened file
+>> + * @buffer: where to write the data for the user to read
+>> + * @count: the size of the user's buffer
+>> + * @ppos: file position offset
+>> + */
+>> +static ssize_t ice_debugfs_module_read(struct file *filp, char __user *buffer,
+>> +				       size_t count, loff_t *ppos)
+>> +{
+>> +	struct dentry *dentry = filp->f_path.dentry;
+>> +	struct ice_pf *pf = filp->private_data;
+>> +	int status, module;
+>> +	char *data = NULL;
+>> +
+>> +	/* don't allow commands if the FW doesn't support it */
+>> +	if (!ice_fwlog_supported(&pf->hw))
+>> +		return -EOPNOTSUPP;
+>> +
+>> +	module = ice_find_module_by_dentry(pf, dentry);
+>> +	if (module < 0) {
+>> +		dev_info(ice_pf_to_dev(pf), "unknown module\n");
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	data = vzalloc(ICE_AQ_MAX_BUF_LEN);
+>> +	if (!data) {
+>> +		dev_warn(ice_pf_to_dev(pf), "Unable to allocate memory for FW configuration!\n");
+>> +		return -ENOMEM;
+> 
+> Can we use seq_print() here? It should simplify the reading quite a bit,
+> not sure how well it works with files that can also be written, tho.
+> 
 
---0000000000007f6c85060bf48241
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+I'm probably missing something here, but how do we get more simple than 
+snprintf? I have a function (ice_fwlog_print_module_cfg) that handles 
+whether the user has passed a single module ID or they want data on all 
+the modules, but it all boils down to snprintf.
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIO2I/vSr40x7mCMpU4sqbYptTik6WrJP
-htyd/xowgJ5RMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
-ODAwMTcyOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBMHbvDBfpLWXK9Ne56vLSVJiq0WDL4V5Lf1LnMQdhowzxJ5nb2
-UfzNAA+Rdhdh3WRfXSySJ2qRs9TBHLiCiXWSzkE89c+gOl6+YllUICsL3tQZrR0HTIsiIYz2fIHf
-dS5Hsqf5bDgQf6wnHRm1USS/MtpN5snpvldhEmcPjqcpOcZgMf8f0+paJp+g0hBeXO1Skc81sdQW
-xs8aCgV8WZC0Vvp7eTrZ7Cia+YiqyQDCq30HTmVG4xQeDzfPmEI4KXNnSVqMbc+5CJgPQkdFoqCM
-HBql99+pApM+koGlzrnhDOCN7zGPnRV2jc5Dja4O+3NJCGp5k3B6hOM1Ic+GgXHu
---0000000000007f6c85060bf48241--
+I could get rid of ice_fwlog_print_module_cfg() and replace it inline 
+with the if/else code if that would be clearer, but I'm not sure 
+seq_printf() is helpful because each file is a single quantum of 
+information (with the exception of the file that represents all the 
+modules). I created a special file to represent all the modules, but 
+maybe it's more confusing and I should get rid of it and just make the 
+users specify all of the modules in a script.
+
+Would that be easier? Then there is no if/else it's just a single snprintf.
+
+>> +/**
+>> + * ice_debugfs_fwlog_init - setup the debugfs directory
+>> + * @pf: the ice that is starting up
+>> + */
+>> +void ice_debugfs_fwlog_init(struct ice_pf *pf)
+>> +{
+>> +	const char *name = pci_name(pf->pdev);
+>> +	struct dentry *fw_modules_dir;
+>> +	struct dentry **fw_modules;
+>> +	int i;
+>> +
+>> +	/* only support fw log commands on PF 0 */
+>> +	if (pf->hw.bus.func)
+>> +		return;
+>> +
+>> +	/* allocate space for this first because if it fails then we don't
+>> +	 * need to unwind
+>> +	 */
+>> +	fw_modules = kcalloc(ICE_NR_FW_LOG_MODULES, sizeof(*fw_modules),
+>> +			     GFP_KERNEL);
+>> +
+> 
+> nit: no new line between call and error check
+> 
+
+Will fix
+
+>> +	if (!fw_modules) {
+>> +		pr_info("Unable to allocate space for modules\n");
+> 
+> no warnings on allocation failures, there will be a splat for GFP_KERNEL
+> (checkpatch should catch this)
+> 
+
+OK
+
+>> +		return;
+>> +	}
+>> +
+>> +	pf->ice_debugfs_pf = debugfs_create_dir(name, ice_debugfs_root);
+>> +	if (IS_ERR(pf->ice_debugfs_pf)) {
+>> +		pr_info("init of debugfs PCI dir failed\n");
+>> +		kfree(fw_modules);
+>> +		return;
+>> +	}
+>> +
+>> +	pf->ice_debugfs_pf_fwlog = debugfs_create_dir("fwlog",
+>> +						      pf->ice_debugfs_pf);
+>> +	if (IS_ERR(pf->ice_debugfs_pf)) {
+>> +		pr_info("init of debugfs fwlog dir failed\n");
+> 
+> If GregKH sees all the info message on debugfs failures he may
+> complain, DebugFS is supposed to be completely optional.
+> 
+
+I'll remove them
+
+> Also - free fw_modules ?
+> 
+
+This will get fixed by using goto in error paths as you suggested below
+
+> You probably want to use goto on all error paths here
+>> +/**
+>> + * ice_fwlog_get - Get the firmware logging settings
+>> + * @hw: pointer to the HW structure
+>> + * @cfg: config to populate based on current firmware logging settings
+>> + */
+>> +int ice_fwlog_get(struct ice_hw *hw, struct ice_fwlog_cfg *cfg)
+>> +{
+>> +	if (!ice_fwlog_supported(hw))
+>> +		return -EOPNOTSUPP;
+>> +
+>> +	if (!cfg)
+>> +		return -EINVAL;
+> 
+> can't be, let's avoid defensive programming
+> 
+
+OK
+
+>> +	return ice_aq_fwlog_get(hw, cfg);
+> 
+> 
+>> +void ice_pf_fwlog_update_module(struct ice_pf *pf, int log_level, int module)
+>> +{
+>> +	struct ice_fwlog_module_entry *entries;
+>> +	struct ice_hw *hw = &pf->hw;
+>> +
+>> +	entries = (struct ice_fwlog_module_entry *)hw->fwlog_cfg.module_entries;
+>> +
+>> +	entries[module].log_level = log_level;
+>> +}
+> 
+> Isn't this just
+> 
+> 	hw->fwlog_cfg.module_entries[module].log_level = log_level;
+> 
+> ? The cast specifically look alarming but unnecessary.
+
+Will change
 
