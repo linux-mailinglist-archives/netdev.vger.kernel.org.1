@@ -1,179 +1,289 @@
-Return-Path: <netdev+bounces-55149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B824809931
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 03:30:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96C83809939
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 03:32:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A64651F21165
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 02:30:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B30EC1C20C98
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 02:32:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 653EE37A;
-	Fri,  8 Dec 2023 02:30:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 872A337A;
+	Fri,  8 Dec 2023 02:32:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AKLNFjcd"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="J3Aiyqp7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 688931708
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 18:30:47 -0800 (PST)
-Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-5d226f51f71so15270997b3.3
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 18:30:47 -0800 (PST)
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 120A21709
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 18:32:42 -0800 (PST)
+Received: by mail-pg1-x52c.google.com with SMTP id 41be03b00d2f7-5c659db0ce2so1412493a12.0
+        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 18:32:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702002646; x=1702607446; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gPFzsWif4JOmQ6Tsvqo3ehgr2PEw06oPAeKXnjWTZ+c=;
-        b=AKLNFjcdAxiQgVG2tGNfHabFRlXIDVQl7FDDiHRtKD9pMjX9EhrojHZGU8A6GI4oNB
-         yuMCnerK+tJEml4Qkq9icqwV2xwvoeK4c3hbar3s0V/9enlNP1ZuCkJf90diRqpV3wOC
-         nmNDLwqLuR6QkoayfLCTUQauMxjx7pi/X2oPgwlyqZlIP8K3LtObppjdobIcC8If4vHe
-         kDLgB8Otu2dc/Tx4U8hALyUN6UdexYcVIvow8Va43Jd7CFzAqcx7uZx59q+geKmyMW24
-         Qq1BZ6n1zArFahqBra4afH56O8Sjq/hUEqEyCbQg+z/vN8c75fdYvHvDLmQKFThP0UuG
-         d1Ig==
+        d=broadcom.com; s=google; t=1702002761; x=1702607561; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sK+dpfhTNn2ryOO3zkIQxrXe0eF4GP377XOMqpOvjVM=;
+        b=J3Aiyqp7Mp8ZwSkGaIXodgshkVRpVfGn8fspAuAOiDe/BVXzvplauUDT7WqeyQwn72
+         rmp2DwRswmymNjogO5G2KHKW9/vIqmf09Mb4S8Qee4XWIujccbIBAD3mvVKaDtJjjhBj
+         pdzzVWr9SdcxHlWeq73tn8eeqwqFiy8C9MYus=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702002646; x=1702607446;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gPFzsWif4JOmQ6Tsvqo3ehgr2PEw06oPAeKXnjWTZ+c=;
-        b=OUB8pN/DD5nDCc8wXQJHKikiJF175yeMsRWxt+DvwUcNqRHHhbbM0qGjuIc51hD5mH
-         CHDhjY/8uu+6b3CNAsTjHNKSIi7DjvKLSTccRJVkcB58xtqlaiuE78zwSA5B+BPHTDQC
-         XDi+w4cQceaJjW96KahWy9dZdQLTmlwjI2TSGLW5cSsr4nGlhZFymRjkMHsgtKrpZVfT
-         oYPFbbQAj+N92sU0dW8UMux5kpxlomGWHc9EWh/eCPin/6osQXeqi1rJJRhcyFR37y7o
-         ZQRzIv8rRt3Q63uy4iHFqsPXxk0UgQSMGzkBGSJRIvqg1phJeJKagcJCbkwM4RS0zSHO
-         TVJA==
-X-Gm-Message-State: AOJu0YyoCieTlkcS0kF3t7sHs6Uih8tym77gslVtQbmL61Va1KJ+IvSy
-	44cPYXavMQHstuG8+ZVC3hWzseDJcIE=
-X-Google-Smtp-Source: AGHT+IGvtktP222WoL3SNePrllIsVm4/MIMKU9JQ89aNqrqymBuvUnGxvORvdqIR3IpozaEAmTPLtw==
-X-Received: by 2002:a81:ac0c:0:b0:5d7:1940:dd75 with SMTP id k12-20020a81ac0c000000b005d71940dd75mr3114135ywh.75.1702002646514;
-        Thu, 07 Dec 2023 18:30:46 -0800 (PST)
-Received: from ?IPV6:2600:1700:6cf8:1240:57df:3a91:11ad:dcd? ([2600:1700:6cf8:1240:57df:3a91:11ad:dcd])
-        by smtp.gmail.com with ESMTPSA id y131-20020a0dd689000000b005b59652bcdesm343719ywd.60.2023.12.07.18.30.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Dec 2023 18:30:46 -0800 (PST)
-Message-ID: <831a3aed-8ba3-451f-bd8a-6d8fe63067d1@gmail.com>
-Date: Thu, 7 Dec 2023 18:30:44 -0800
+        d=1e100.net; s=20230601; t=1702002761; x=1702607561;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sK+dpfhTNn2ryOO3zkIQxrXe0eF4GP377XOMqpOvjVM=;
+        b=txB8ZXryMM2rJIBsq/wpAsqYqHYpOkHoU/HoxWFnzhn27EMyCyuD6TPHRbuP39MOof
+         EEpfiiPMCBE8Kyh88MJAPr2ffZ+yW8LqwttiL2TBBh3vNT+y0vRhb7CUpVczmZki7lcz
+         bLMa31cGU3w4sIj+Bmb3/M2B0Uti3gi9t3gDR4JXmjL0sSNHQboDS9qsnIIEhxhMS7R0
+         hIpoo74W17k6ylcFvS18ldoiyhyT2Y9VS29QkDehh0X+Fi6VvVmJ1WSRcYeegkFgTRiS
+         xzhDZujRhJE53IIJdz0AOovFyZtcI3BviA8ejFNsQtHP1c0eggieCjoaKNMdyrhgz3aW
+         lXbg==
+X-Gm-Message-State: AOJu0YycWa6bi0t1prbdt+e7F18BKT+GmCFtjrzJ8W1a74NENRiChYvf
+	G/2+yxhGPO9XwWK4ULE/nXR9dQ==
+X-Google-Smtp-Source: AGHT+IEzveokbMoywO7bnYhPg9EUBTWQ79PqRORS8/rPU6xUCtgIKr75zOGibzyV7HydSoCKic+JYA==
+X-Received: by 2002:a05:6a20:8f24:b0:18b:4dc2:a4c7 with SMTP id b36-20020a056a208f2400b0018b4dc2a4c7mr4129011pzk.14.1702002761513;
+        Thu, 07 Dec 2023 18:32:41 -0800 (PST)
+Received: from amakhalov-build-vm.eng.vmware.com ([128.177.82.146])
+        by smtp.gmail.com with ESMTPSA id pq18-20020a17090b3d9200b00286dfa09e7asm615887pjb.24.2023.12.07.18.32.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Dec 2023 18:32:41 -0800 (PST)
+From: Alexey Makhalov <alexey.makhalov@broadcom.com>
+To: linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	bp@alien8.de,
+	hpa@zytor.com,
+	dave.hansen@linux.intel.com,
+	mingo@redhat.com,
+	tglx@linutronix.de
+Cc: x86@kernel.org,
+	netdev@vger.kernel.org,
+	richardcochran@gmail.com,
+	linux-input@vger.kernel.org,
+	dmitry.torokhov@gmail.com,
+	zackr@vmware.com,
+	linux-graphics-maintainer@vmware.com,
+	pv-drivers@vmware.com,
+	namit@vmware.com,
+	timothym@vmware.com,
+	akaher@vmware.com,
+	jsipek@vmware.com,
+	dri-devel@lists.freedesktop.org,
+	daniel@ffwll.ch,
+	airlied@gmail.com,
+	tzimmermann@suse.de,
+	mripard@kernel.org,
+	maarten.lankhorst@linux.intel.com,
+	horms@kernel.org
+Subject: [PATCH] x86/vmware: Add TDX hypercall support
+Date: Thu,  7 Dec 2023 18:32:33 -0800
+Message-Id: <20231208023233.71170-1-alexey.makhalov@broadcom.com>
+X-Mailer: git-send-email 2.39.0
+In-Reply-To: <64074f04-fd72-488b-831a-ad744bbcd950@broadcom.com>
+References: <64074f04-fd72-488b-831a-ad744bbcd950@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/ipv6: insert the fib6 gc_link of a fib6_info
- only if in fib6.
-Content-Language: en-US
-To: David Ahern <dsahern@kernel.org>, thinker.li@gmail.com,
- netdev@vger.kernel.org, martin.lau@linux.dev, kernel-team@meta.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
-Cc: kuifeng@meta.com, syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com
-References: <20231207221627.746324-1-thinker.li@gmail.com>
- <8f44514b-f5b4-4fd1-b361-32bb10ed14ad@kernel.org>
- <4eebd408-ee47-4ef0-bb72-0c7abad3eecf@kernel.org>
- <dbccbd5d-8968-43cb-9eca-d19cc12f6515@gmail.com>
- <b6fccc0d-c60b-4f11-9ef7-25b01c25425d@kernel.org>
- <b0fe3183-4df9-42bc-84e4-ba8e807318f4@gmail.com>
- <3d9f78ff-15b4-4c66-a007-a82e4be6d510@kernel.org>
-From: Kui-Feng Lee <sinquersw@gmail.com>
-In-Reply-To: <3d9f78ff-15b4-4c66-a007-a82e4be6d510@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+From: Alexey Makhalov <amakhalov@vmware.com>
 
+VMware hypercalls use I/O port, VMCALL or VMMCALL instructions.
+Add __tdx_hypercall path to support TDX guests.
 
-On 12/7/23 17:23, David Ahern wrote:
-> On 12/7/23 6:16 PM, Kui-Feng Lee wrote:
->>
->>
->> On 12/7/23 17:02, David Ahern wrote:
->>> On 12/7/23 4:33 PM, Kui-Feng Lee wrote:
->>>>
->>>>
->>>> On 12/7/23 15:20, David Ahern wrote:
->>>>> On 12/7/23 4:17 PM, David Ahern wrote:
->>>>>> On 12/7/23 3:16 PM, thinker.li@gmail.com wrote:
->>>>>>> From: Kui-Feng Lee <thinker.li@gmail.com>
->>>>>>>
->>>>>>> Check f6i->fib6_node before inserting a f6i (fib6_info) to
->>>>>>> tb6_gc_hlist.
->>>>>>
->>>>>> any place setting expires should know if the entry is in a table or
->>>>>> not.
->>>>>>
->>>>>> And the syzbot report contains a reproducer, a kernel config and other
->>>>>> means to test a patch.
->>>>>>
->>>>>
->>>>> Fundamentally, the set and clear helpers are doing 2 things; they need
->>>>> to be split into separate helpers.
->>>>
->>>> Sorry, I don't follow you.
->>>>
->>>> There are fib6_set_expires_locked()) and fib6_clean_expires_locked(),
->>>> two separate helpers. Is this what you are saying?
->>>>
->>>> Doing checks of f6i->fib6_node in fib6_set_expires_locked() should
->>>> already apply everywhere setting expires, right?
->>>>
->>>> Do I miss anything?
->>>
->>> static inline void fib6_set_expires_locked(struct fib6_info *f6i,
->>>                                              unsigned long expires)
->>> {
->>>           struct fib6_table *tb6;
->>>
->>>           tb6 = f6i->fib6_table;
->>>           f6i->expires = expires;
->>>           if (tb6 && !fib6_has_expires(f6i))
->>>                   hlist_add_head(&f6i->gc_link, &tb6->tb6_gc_hlist);
-> 
-> --> no check that f6i is already in the list yet fib6_set_expires and
-> fib6_set_expires_locked are called on existing entries - entries already
-> in the tree and so *maybe* already linked. See fib6_add_rt2node and most
-> of fib6_set_expires callers.
+No change in high bandwidth hypercalls, as only low bandwidth
+ones are supported for TDX guests.
 
-Although it bases on a false assumption, checking tb6 ensures the
-entry is added to the list only if this f6i is already on the tree.
-The correct one should checks f6i->fib6_node.
-So, with checking f6i->fib6_ndoe and the open code you mentioned,
-fib6_has_expires() does check if a f6i is already in the list.
+Co-developed-by: Tim Merrifield <timothym@vmware.com>
+Signed-off-by: Tim Merrifield <timothym@vmware.com>
+Signed-off-by: Alexey Makhalov <amakhalov@vmware.com>
+Reviewed-by: Nadav Amit <namit@vmware.com>
+---
+ arch/x86/include/asm/vmware.h | 83 +++++++++++++++++++++++++++++++++++
+ arch/x86/kernel/cpu/vmware.c  | 22 ++++++++++
+ 2 files changed, 105 insertions(+)
 
-But, like what you mentioned earlier, hlist_unhashed(&f6i->gc_link) is
-clearer. I will move to ti.
+diff --git a/arch/x86/include/asm/vmware.h b/arch/x86/include/asm/vmware.h
+index 719e41260ece..04c698b905ab 100644
+--- a/arch/x86/include/asm/vmware.h
++++ b/arch/x86/include/asm/vmware.h
+@@ -34,12 +34,65 @@
+ #define VMWARE_CMD_GETHZ		45
+ #define VMWARE_CMD_GETVCPU_INFO		68
+ #define VMWARE_CMD_STEALCLOCK		91
++/*
++ * Hypercall command mask:
++ *   bits[6:0] command, range [0, 127]
++ *   bits[19:16] sub-command, range [0, 15]
++ */
++#define VMWARE_CMD_MASK			0xf007fULL
+ 
+ #define CPUID_VMWARE_FEATURES_ECX_VMMCALL	BIT(0)
+ #define CPUID_VMWARE_FEATURES_ECX_VMCALL	BIT(1)
+ 
+ extern u8 vmware_hypercall_mode;
+ 
++#define VMWARE_TDX_VENDOR_LEAF 0x1af7e4909ULL
++#define VMWARE_TDX_HCALL_FUNC  1
++
++extern unsigned long vmware_tdx_hypercall(struct tdx_module_args *args);
++
++/*
++ * TDCALL[TDG.VP.VMCALL] uses rax (arg0) and rcx (arg2), while the use of
++ * rbp (arg6) is discouraged by the TDX specification. Therefore, we
++ * remap those registers to r12, r13 and r14, respectively.
++ */
++static inline
++unsigned long vmware_tdx_hypercall_args(unsigned long cmd, unsigned long in1,
++					unsigned long in3, unsigned long in4,
++					unsigned long in5, unsigned long in6,
++					uint32_t *out1, uint32_t *out2,
++					uint32_t *out3, uint32_t *out4,
++					uint32_t *out5, uint32_t *out6)
++{
++	unsigned long ret;
++
++	struct tdx_module_args args = {
++		.r13 = cmd,
++		.rbx = in1,
++		.rdx = in3,
++		.rsi = in4,
++		.rdi = in5,
++		.r14 = in6,
++	};
++
++	ret = vmware_tdx_hypercall(&args);
++
++	if (out1)
++		*out1 = args.rbx;
++	if (out2)
++		*out2 = args.r13;
++	if (out3)
++		*out3 = args.rdx;
++	if (out4)
++		*out4 = args.rsi;
++	if (out5)
++		*out5 = args.rdi;
++	if (out6)
++		*out6 = args.r14;
++
++	return ret;
++}
++
+ /*
+  * The low bandwidth call. The low word of edx is presumed to have OUT bit
+  * set. The high word of edx may contain input data from the caller.
+@@ -67,6 +120,11 @@ unsigned long vmware_hypercall1(unsigned long cmd, unsigned long in1)
+ {
+ 	unsigned long out0;
+ 
++	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
++		return vmware_tdx_hypercall_args(cmd, in1, 0, 0, 0, 0,
++						 NULL, NULL, NULL,
++						 NULL, NULL, NULL);
++
+ 	asm_inline volatile (VMWARE_HYPERCALL
+ 		: "=a" (out0)
+ 		: [port] "i" (VMWARE_HYPERVISOR_PORT),
+@@ -85,6 +143,11 @@ unsigned long vmware_hypercall3(unsigned long cmd, unsigned long in1,
+ {
+ 	unsigned long out0;
+ 
++	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
++		return vmware_tdx_hypercall_args(cmd, in1, 0, 0, 0, 0,
++						 out1, out2, NULL,
++						 NULL, NULL, NULL);
++
+ 	asm_inline volatile (VMWARE_HYPERCALL
+ 		: "=a" (out0), "=b" (*out1), "=c" (*out2)
+ 		: [port] "i" (VMWARE_HYPERVISOR_PORT),
+@@ -104,6 +167,11 @@ unsigned long vmware_hypercall4(unsigned long cmd, unsigned long in1,
+ {
+ 	unsigned long out0;
+ 
++	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
++		return vmware_tdx_hypercall_args(cmd, in1, 0, 0, 0, 0,
++						 out1, out2, out3,
++						 NULL, NULL, NULL);
++
+ 	asm_inline volatile (VMWARE_HYPERCALL
+ 		: "=a" (out0), "=b" (*out1), "=c" (*out2), "=d" (*out3)
+ 		: [port] "i" (VMWARE_HYPERVISOR_PORT),
+@@ -123,6 +191,11 @@ unsigned long vmware_hypercall5(unsigned long cmd, unsigned long in1,
+ {
+ 	unsigned long out0;
+ 
++	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
++		return vmware_tdx_hypercall_args(cmd, in1, in3, in4, in5, 0,
++						 NULL, out2, NULL,
++						 NULL, NULL, NULL);
++
+ 	asm_inline volatile (VMWARE_HYPERCALL
+ 		: "=a" (out0), "=c" (*out2)
+ 		: [port] "i" (VMWARE_HYPERVISOR_PORT),
+@@ -145,6 +218,11 @@ unsigned long vmware_hypercall6(unsigned long cmd, unsigned long in1,
+ {
+ 	unsigned long out0;
+ 
++	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
++		return vmware_tdx_hypercall_args(cmd, in1, in3, 0, 0, 0,
++						 NULL, out2, out3,
++						 out4, out5, NULL);
++
+ 	asm_inline volatile (VMWARE_HYPERCALL
+ 		: "=a" (out0), "=c" (*out2), "=d" (*out3), "=S" (*out4),
+ 		  "=D" (*out5)
+@@ -166,6 +244,11 @@ unsigned long vmware_hypercall7(unsigned long cmd, unsigned long in1,
+ {
+ 	unsigned long out0;
+ 
++	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
++		return vmware_tdx_hypercall_args(cmd, in1, in3, in4, in5, 0,
++						 out1, out2, out3,
++						 NULL, NULL, NULL);
++
+ 	asm_inline volatile (VMWARE_HYPERCALL
+ 		: "=a" (out0), "=b" (*out1), "=c" (*out2), "=d" (*out3)
+ 		: [port] "i" (VMWARE_HYPERVISOR_PORT),
+diff --git a/arch/x86/kernel/cpu/vmware.c b/arch/x86/kernel/cpu/vmware.c
+index 3aa1adaed18f..bcf1d0fb3e89 100644
+--- a/arch/x86/kernel/cpu/vmware.c
++++ b/arch/x86/kernel/cpu/vmware.c
+@@ -428,6 +428,28 @@ static bool __init vmware_legacy_x2apic_available(void)
+ 		(eax & BIT(VCPU_LEGACY_X2APIC));
+ }
+ 
++#ifdef CONFIG_INTEL_TDX_GUEST
++unsigned long vmware_tdx_hypercall(struct tdx_module_args *args)
++{
++	if (!hypervisor_is_type(X86_HYPER_VMWARE))
++		return 0;
++
++	if (args->r13 & ~VMWARE_CMD_MASK) {
++		pr_warn("Out of range command %llx\n", args->r13);
++		return 0;
++	}
++
++	args->r10 = VMWARE_TDX_VENDOR_LEAF;
++	args->r11 = VMWARE_TDX_HCALL_FUNC;
++	args->r12 = VMWARE_HYPERVISOR_MAGIC;
++
++	__tdx_hypercall(args);
++
++	return args->r12;
++}
++EXPORT_SYMBOL_GPL(vmware_tdx_hypercall);
++#endif
++
+ #ifdef CONFIG_AMD_MEM_ENCRYPT
+ static void vmware_sev_es_hcall_prepare(struct ghcb *ghcb,
+ 					struct pt_regs *regs)
+-- 
+2.39.0
 
-> 
-> Your selftests only check that entries are removed; it does not check
-> updating the expires time on an existing entry. It does not check a
-> route replace that toggles between no expires value or to an expires
-> (fib6_add_rt2node use of fib6_set_expires_locked) and then replacing
-> that route -- various permutations here.
-> 
-> 
->>>           f6i->fib6_flags |= RTF_EXPIRES;
->>> }
->>>
->>> 1. You are abusing this helper in create_info to set the value of
->>> expires knowing (expecting) tb6 to NOT be set and hence not setting
->>> gc_link so no cleanup is needed on errors.
->>>
->>> 2. You then open code gc_link when adding to the tree.
->>>
->>> I had my reservations when you sent this patch months ago, but I did not
->>> have time to suggest a cleaner approach and now this is where we are --
->>> trying to find some race corrupting the list.
->>
->> So, what you said is to split fib6_set_expires_locked() into two
->> functions. One is setting expires, and the other is adding a f6i to
->> tb6_gc_hlist. fib6_clean_expires_locked() should be split in the same
->> way.
->>
->> Is it correct?
->>
-> 
-> one helper sets expires value and one helper that adds/removes from the
-> gc_link. If it is already linked, then no need to do it again.
-
-Got it!
 
