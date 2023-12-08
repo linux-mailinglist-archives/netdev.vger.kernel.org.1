@@ -1,108 +1,207 @@
-Return-Path: <netdev+bounces-55343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D17BD80A77C
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 16:33:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A24A780A7A6
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 16:41:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77903B20941
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 15:33:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D36E41C2097D
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 15:41:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F4A731583;
-	Fri,  8 Dec 2023 15:33:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F05263218B;
+	Fri,  8 Dec 2023 15:41:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kFJdJfaP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ViMybE+a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B8F8FB;
-	Fri,  8 Dec 2023 07:33:33 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ABEB198E;
+	Fri,  8 Dec 2023 07:41:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702049613; x=1733585613;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=fBpBvVgDI3VB/uh0uVrS3zppoHSQdeCuhhTEagLg3nA=;
-  b=kFJdJfaP1qyVJik2WCEKikSgsEJPDqXGenDfSVwPH8wxDUBuijLaz0My
-   7szgX0v4uywLuB8TQYy1JBL8Np11kTC4eAL5KIrQGyXFcZ4cZ4Of/DemR
-   Ts1/NUQxCXBkl5yQ1Si9+Mq9xBSMoIwysXFlgWXDmeMDVzB/8ECMnh1CH
-   j9BSes9EY7LdmF/RfLTBWHCF4AOBkH1WM/MQs9n2gQOP/68aGfhcH/ncN
-   asCM4FvwlEYkOu6BISyj47ta3UfjggSGjbSAcdAVKZFHd7YGgqbAepiOs
-   z4xb9OhXw2HjrUPhr917ufB2eq6ZXEzoWEVsUzrU2xrHR3tRcM0naDDLC
+  t=1702050065; x=1733586065;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=kuKy0uSZ2sgf2WUnRwww3AtGWNiQbLKjTQKgA9l/IGM=;
+  b=ViMybE+aNvDVaqbxcDI855jc7fdeR+7WXi7c0ZIh3KVABmLVp2PBauIh
+   8MGqC2J3whVjUD86OT8K/BUgG0zTptSoYbFLKy7u0DMK2iLO2Bmr+bW3V
+   wAx23PSQj1PN7kr5S5Q6rXyKeuKIegU43Z+rBEQZ/esZLQR7VyTUaklTB
+   5ONUADL1SbgL2IMR+i/qK4bT6J95pYBR6BZoRz0kH7SZUE9kx+F/02MI2
+   90vTC/QqrWiwUXnofC6aH3ITnrELBpQwHxMR4+ZG752KPlhVlTMRk6YWK
+   pWlIHs+6ICWWxbvMb8nsHgbFROtKkh/F+dtJJLHhx220+xF+8lM4F7/5c
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10918"; a="397211578"
+X-IronPort-AV: E=McAfee;i="6600,9927,10918"; a="1276368"
 X-IronPort-AV: E=Sophos;i="6.04,261,1695711600"; 
-   d="scan'208";a="397211578"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2023 07:33:33 -0800
+   d="scan'208";a="1276368"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2023 07:41:05 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10918"; a="772156050"
 X-IronPort-AV: E=Sophos;i="6.04,261,1695711600"; 
-   d="scan'208";a="772156050"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga002.jf.intel.com with ESMTP; 08 Dec 2023 07:33:30 -0800
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id 7B744154; Fri,  8 Dec 2023 17:33:29 +0200 (EET)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
+   d="scan'208";a="20136875"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orviesa001.jf.intel.com with ESMTP; 08 Dec 2023 07:40:59 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rBcyG-000DuV-07;
+	Fri, 08 Dec 2023 15:40:56 +0000
+Date: Fri, 8 Dec 2023 23:40:13 +0800
+From: kernel test robot <lkp@intel.com>
+To: Mina Almasry <almasrymina@google.com>,
+	Shailend Chand <shailend@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	bpf@vger.kernel.org, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org
+Cc: oe-kbuild-all@lists.linux.dev, Mina Almasry <almasrymina@google.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Kaiyuan Zhang <kaiyuanz@google.com>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>, Jonathan Corbet <corbet@lwn.net>,
+	David Ahern <dsahern@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
 	Eric Dumazet <edumazet@google.com>,
+	Shakeel Butt <shakeelb@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
 	Paolo Abeni <pabeni@redhat.com>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH net-next v1 1/1] net: dl2k: Use proper conversion of dev_addr before IO to device
-Date: Fri,  8 Dec 2023 17:33:27 +0200
-Message-ID: <20231208153327.3306798-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.43.0.rc1.1.gbec44491f096
+	Shuah Khan <skhan@linuxfoundation.org>
+Subject: Re: [net-next v1 06/16] netdev: support binding dma-buf to netdevice
+Message-ID: <202312082303.bCpeCR0q-lkp@intel.com>
+References: <20231208005250.2910004-7-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231208005250.2910004-7-almasrymina@google.com>
 
-The driver is using iowriteXX()/ioreadXX() APIs which are LE IO
-accessors simplified as
+Hi Mina,
 
-  1. Convert given value _from_ CPU _to_ LE
-  2. Write it to the device as is
+kernel test robot noticed the following build warnings:
 
-The dev_addr is a byte stream, but because the driver uses 16-bit
-IO accessors, it wants to perform double conversion on BE CPUs,
-but it took it wrong, as it effectivelly does two times _from_ CPU
-_to_ LE. What it has to do is to consider dev_addr as an array of
-LE16 and hence do _from_ LE _to_ CPU conversion, followed by implied
-_from_ CPU _to_ LE in the iowrite16().
+[auto build test WARNING on net-next/main]
 
-To achieve that, use get_unaligned_le16(). This will make it correct
-and allows to avoid sparse warning as reported by LKP.
+url:    https://github.com/intel-lab-lkp/linux/commits/Mina-Almasry/net-page_pool-factor-out-releasing-DMA-from-releasing-the-page/20231208-085531
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231208005250.2910004-7-almasrymina%40google.com
+patch subject: [net-next v1 06/16] netdev: support binding dma-buf to netdevice
+config: m68k-randconfig-r071-20231208 (https://download.01.org/0day-ci/archive/20231208/202312082303.bCpeCR0q-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231208/202312082303.bCpeCR0q-lkp@intel.com/reproduce)
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202312030058.hfZPTXd7-lkp@intel.com/
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/net/ethernet/dlink/dl2k.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312082303.bCpeCR0q-lkp@intel.com/
 
-diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
-index db6615aa921b..7bfeae04b52b 100644
---- a/drivers/net/ethernet/dlink/dl2k.c
-+++ b/drivers/net/ethernet/dlink/dl2k.c
-@@ -565,8 +565,7 @@ static void rio_hw_init(struct net_device *dev)
- 	 * too. However, it doesn't work on IP1000A so we use 16-bit access.
- 	 */
- 	for (i = 0; i < 3; i++)
--		dw16(StationAddr0 + 2 * i,
--		     cpu_to_le16(((const u16 *)dev->dev_addr)[i]));
-+		dw16(StationAddr0 + 2 * i, get_unaligned_le16(&dev->dev_addr[2 * i]));
- 
- 	set_multicast (dev);
- 	if (np->coalesce) {
+All warnings (new ones prefixed by >>):
+
+   In file included from include/asm-generic/bug.h:22,
+                    from arch/m68k/include/asm/bug.h:32,
+                    from include/linux/bug.h:5,
+                    from include/linux/thread_info.h:13,
+                    from include/asm-generic/preempt.h:5,
+                    from ./arch/m68k/include/generated/asm/preempt.h:1,
+                    from include/linux/preempt.h:79,
+                    from arch/m68k/include/asm/irqflags.h:6,
+                    from include/linux/irqflags.h:17,
+                    from arch/m68k/include/asm/atomic.h:6,
+                    from include/linux/atomic.h:7,
+                    from include/linux/rcupdate.h:25,
+                    from include/linux/rculist.h:11,
+                    from include/linux/pid.h:5,
+                    from include/linux/sched.h:14,
+                    from include/linux/uaccess.h:8,
+                    from net/core/dev.c:71:
+   net/core/dev.c: In function '__netdev_dmabuf_binding_free':
+>> net/core/dev.c:2071:34: warning: format '%lu' expects argument of type 'long unsigned int', but argument 2 has type 'size_t' {aka 'unsigned int'} [-Wformat=]
+    2071 |         if (!WARN(size != avail, "can't destroy genpool. size=%lu, avail=%lu",
+         |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    2072 |                   size, avail))
+         |                   ~~~~            
+         |                   |
+         |                   size_t {aka unsigned int}
+   include/linux/printk.h:427:25: note: in definition of macro 'printk_index_wrap'
+     427 |                 _p_func(_fmt, ##__VA_ARGS__);                           \
+         |                         ^~~~
+   include/linux/printk.h:129:17: note: in expansion of macro 'printk'
+     129 |                 printk(fmt, ##__VA_ARGS__);             \
+         |                 ^~~~~~
+   include/asm-generic/bug.h:176:9: note: in expansion of macro 'no_printk'
+     176 |         no_printk(format);                                              \
+         |         ^~~~~~~~~
+   net/core/dev.c:2071:14: note: in expansion of macro 'WARN'
+    2071 |         if (!WARN(size != avail, "can't destroy genpool. size=%lu, avail=%lu",
+         |              ^~~~
+   net/core/dev.c:2071:65: note: format string is defined here
+    2071 |         if (!WARN(size != avail, "can't destroy genpool. size=%lu, avail=%lu",
+         |                                                               ~~^
+         |                                                                 |
+         |                                                                 long unsigned int
+         |                                                               %u
+   net/core/dev.c:2071:34: warning: format '%lu' expects argument of type 'long unsigned int', but argument 3 has type 'size_t' {aka 'unsigned int'} [-Wformat=]
+    2071 |         if (!WARN(size != avail, "can't destroy genpool. size=%lu, avail=%lu",
+         |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    2072 |                   size, avail))
+         |                         ~~~~~     
+         |                         |
+         |                         size_t {aka unsigned int}
+   include/linux/printk.h:427:25: note: in definition of macro 'printk_index_wrap'
+     427 |                 _p_func(_fmt, ##__VA_ARGS__);                           \
+         |                         ^~~~
+   include/linux/printk.h:129:17: note: in expansion of macro 'printk'
+     129 |                 printk(fmt, ##__VA_ARGS__);             \
+         |                 ^~~~~~
+   include/asm-generic/bug.h:176:9: note: in expansion of macro 'no_printk'
+     176 |         no_printk(format);                                              \
+         |         ^~~~~~~~~
+   net/core/dev.c:2071:14: note: in expansion of macro 'WARN'
+    2071 |         if (!WARN(size != avail, "can't destroy genpool. size=%lu, avail=%lu",
+         |              ^~~~
+   net/core/dev.c:2071:76: note: format string is defined here
+    2071 |         if (!WARN(size != avail, "can't destroy genpool. size=%lu, avail=%lu",
+         |                                                                          ~~^
+         |                                                                            |
+         |                                                                            long unsigned int
+         |                                                                          %u
+
+
+vim +2071 net/core/dev.c
+
+  2060	
+  2061	void __netdev_dmabuf_binding_free(struct netdev_dmabuf_binding *binding)
+  2062	{
+  2063		size_t size, avail;
+  2064	
+  2065		gen_pool_for_each_chunk(binding->chunk_pool,
+  2066					netdev_dmabuf_free_chunk_owner, NULL);
+  2067	
+  2068		size = gen_pool_size(binding->chunk_pool);
+  2069		avail = gen_pool_avail(binding->chunk_pool);
+  2070	
+> 2071		if (!WARN(size != avail, "can't destroy genpool. size=%lu, avail=%lu",
+  2072			  size, avail))
+  2073			gen_pool_destroy(binding->chunk_pool);
+  2074	
+  2075		dma_buf_unmap_attachment(binding->attachment, binding->sgt,
+  2076					 DMA_BIDIRECTIONAL);
+  2077		dma_buf_detach(binding->dmabuf, binding->attachment);
+  2078		dma_buf_put(binding->dmabuf);
+  2079		xa_destroy(&binding->bound_rxq_list);
+  2080		kfree(binding);
+  2081	}
+  2082	
+
 -- 
-2.43.0.rc1.1.gbec44491f096
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
