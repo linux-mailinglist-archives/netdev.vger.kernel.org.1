@@ -1,156 +1,167 @@
-Return-Path: <netdev+bounces-55349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02BA580A81C
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 17:05:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADBA580A829
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 17:06:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 338491C208CC
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 16:05:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57C7C1F21036
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 16:06:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0B84358AB;
-	Fri,  8 Dec 2023 16:05:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D783635289;
+	Fri,  8 Dec 2023 16:06:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XjS8h8+0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OIPwRceU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CEC71985
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 08:05:36 -0800 (PST)
-Received: by mail-oi1-x233.google.com with SMTP id 5614622812f47-3b9e1a3e3f0so1088870b6e.1
-        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 08:05:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702051536; x=1702656336; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e5hzJO8yTOOmWqcY0MuzAVnhi+7X/9ZZXmPHeSk3Rcw=;
-        b=XjS8h8+0Z6me/RkQTkZkgWazG13QaKJ0M1GGalcb9UYTUVGOXLnSVgf9jMfr/fhYUk
-         7/QKZKSyRKz5dHoEaZmAveim1EMi/OG6AnDtze458ascuU+yF7Vu3mesjaigx2nPxKNH
-         QQi8lPRq8Np89Zu0cRFV8TTv0014ynCA/UZ9eTtK7phWXzd/68uyAdE8cxwnszH3e5xo
-         CfHce664Wk5G7/HXyn9gnYTh+ELdyTxn9CU+VGN4uaJoPGWJFRqSgHV6eVIBbpOmIHJr
-         pgk8yKtomYXNjE3X3a44PL6Bl9tNttonD9HFJUWTGgb1Sm5YevnSgI587l//yscygL3W
-         Bv5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702051536; x=1702656336;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=e5hzJO8yTOOmWqcY0MuzAVnhi+7X/9ZZXmPHeSk3Rcw=;
-        b=nZ+jxfLDzIWqy4EpSko+X4htJNzWuBii0UQ0ZiFo6ZBxqffExStqeDboABGSU4g54z
-         ulgRByq5gMAqpO/cUFI+P4qQRqicFW0w0LbsaFJntLYxL4+3J0B4QkeEDU21egnK+CsG
-         UQY2reJH95exTVZlTl87ESD9j/KDCqrm8R6fJ1Sy+JNoXqdiHMqE5Vq1f48SMiiJNeGp
-         uK7Z0QxLjHNufw2BFUuCQQmkTPgPQps45jdqEgnkMpkKecQ7Xrhs4c988ZhXwjPwN0Ba
-         x8OlSAT89kyE4ZvM98+RrHNJfADF76WYjaBxiSFFpVtQH8Ki24gI81KM+vf0W70IwKTq
-         I3mA==
-X-Gm-Message-State: AOJu0YyUzoICDAKYh6sDHF3TEbOEUi5Sq/OjhuSNbalJhDLGSfFA7IKt
-	ps1wX0NaazED1ch+4MGxp0L7ZmKFQH7SGYQ1U8yhSQ==
-X-Google-Smtp-Source: AGHT+IHGL9I69KlXE84BwGl5GPy9pGIJCFOfAY8CuVMTHvJTVezRqKK9zxZSLL0J2ODaF4dUlwCbTKVYsFtIXkR7BGM=
-X-Received: by 2002:a05:6358:60c1:b0:16c:4fe:7bfc with SMTP id
- i1-20020a05635860c100b0016c04fe7bfcmr109970rwi.22.1702051535503; Fri, 08 Dec
- 2023 08:05:35 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B826D347DF
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 16:06:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3FDBC433C8;
+	Fri,  8 Dec 2023 16:06:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702051604;
+	bh=6yqhLJTH7cwdGu7GCwuCX26R5k/m2WdF4DPqxvwFoc4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=OIPwRceUaptuNjQBbl4odDYy8M743FBjDLIL9GcofoZY++eZZzdx1CkcKhQZylBva
+	 newygO4IW0RMIBnPClgB4lze5NpRwXleqVsrZd0y0sf89MI9IEJLkioFY5KOPJT8Gd
+	 thh1XVB7ZTobVaqTimPHYzhAR6efOm4K4yNZy9Ohw1E6ybfe5z58z+MXXSq3Dul1R9
+	 4Ux79+YU9iFuU6NSAZitzMobuKpAEHvh4U6mwXreuGIdO72HCbJtXBpjEDxKh09ZdU
+	 XEMsgqqlTZ0BmVuF8d0ZKeRbWKgtofC+j5WTsC/jcfObrIqgyLDzjKHvexaE5kMXIC
+	 x8OU9lpmasY/w==
+Message-ID: <ac7f9748-7219-4cf1-961d-df4290ccc689@kernel.org>
+Date: Fri, 8 Dec 2023 09:06:43 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231208005250.2910004-1-almasrymina@google.com>
- <20231208005250.2910004-10-almasrymina@google.com> <32211cbf-3a4e-8a86-6214-4304ddb18a98@huawei.com>
-In-Reply-To: <32211cbf-3a4e-8a86-6214-4304ddb18a98@huawei.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 8 Dec 2023 08:05:22 -0800
-Message-ID: <CAHS8izOQcuLPwvDff96fuNB7r6EU9OWt3ShueQp=u7wat3L5LA@mail.gmail.com>
-Subject: Re: [net-next v1 09/16] page_pool: device memory support
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
-	David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeelb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] ipv6: annotate data-races around
+ np->mcast_oif
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20231208101244.1019034-1-edumazet@google.com>
+ <20231208101244.1019034-2-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20231208101244.1019034-2-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 8, 2023 at 1:30=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
-> wrote:
->
->
-> As mentioned before, it seems we need to have the above checking every
-> time we need to do some per-page handling in page_pool core, is there
-> a plan in your mind how to remove those kind of checking in the future?
->
+On 12/8/23 3:12 AM, Eric Dumazet wrote:
+> np->mcast_oif is read locklessly in some contexts.
+> 
+> Make all accesses to this field lockless, adding appropriate
+> annotations.
+> 
+> This also makes setsockopt( IPV6_MULTICAST_IF ) lockless.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  net/dccp/ipv6.c                 |  2 +-
+>  net/ipv6/datagram.c             |  4 +-
+>  net/ipv6/icmp.c                 |  4 +-
+>  net/ipv6/ipv6_sockglue.c        | 74 +++++++++++++++++----------------
+>  net/ipv6/ping.c                 |  4 +-
+>  net/ipv6/raw.c                  |  2 +-
+>  net/ipv6/tcp_ipv6.c             |  2 +-
+>  net/ipv6/udp.c                  |  2 +-
+>  net/l2tp/l2tp_ip6.c             |  2 +-
+>  net/netfilter/ipvs/ip_vs_sync.c |  2 +-
+>  net/rds/tcp_listen.c            |  2 +-
+>  11 files changed, 51 insertions(+), 49 deletions(-)
+> 
 
-I see 2 ways to remove the checking, both infeasible:
 
-1. Allocate a wrapper struct that pulls out all the fields the page pool ne=
-eds:
+> diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
+> index 7d661735cb9d519ab4691979f30365acda0a28c3..fe7e96e69960c013e84b48242e309525f7f618da 100644
+> --- a/net/ipv6/ipv6_sockglue.c
+> +++ b/net/ipv6/ipv6_sockglue.c
+> @@ -509,6 +509,34 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+>  		if (optlen < sizeof(int))
+>  			return -EINVAL;
+>  		return ip6_sock_set_addr_preferences(sk, val);
+> +	case IPV6_MULTICAST_IF:
+> +		if (sk->sk_type == SOCK_STREAM)
+> +			return -ENOPROTOOPT;
+> +		if (optlen < sizeof(int))
+> +			return -EINVAL;
+> +		if (val) {
+> +			struct net_device *dev;
+> +			int bound_dev_if, midx;
+> +
+> +			rcu_read_lock();
+> +
+> +			dev = dev_get_by_index_rcu(net, val);
+> +			if (!dev) {
+> +				rcu_read_unlock();
+> +				return -ENODEV;
+> +			}
+> +			midx = l3mdev_master_ifindex_rcu(dev);
+> +
+> +			rcu_read_unlock();
+> +
+> +			bound_dev_if = READ_ONCE(sk->sk_bound_dev_if);
 
-struct netmem {
-        /* common fields */
-        refcount_t refcount;
-        bool is_pfmemalloc;
-        int nid;
-        ...
-        union {
-                struct dmabuf_genpool_chunk_owner *owner;
-                struct page * page;
-        };
-};
+you snuck in an extra change with that code move.
 
-The page pool can then not care if the underlying memory is iov or
-page. However this introduces significant memory bloat as this struct
-needs to be allocated for each page or ppiov, which I imagine is not
-acceptable for the upside of removing a few static_branch'd if
-statements with no performance cost.
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-2. Create a unified struct for page and dmabuf memory, which the mm
-folks have repeatedly nacked, and I imagine will repeatedly nack in
-the future.
 
-So I imagine the special handling of ppiov in some form is critical
-and the checking may not be removable.
+> +			if (bound_dev_if &&
+> +			    bound_dev_if != val &&
+> +			    (!midx || midx != bound_dev_if))
+> +				return -EINVAL;
+> +		}
+> +		WRITE_ONCE(np->mcast_oif, val);
+> +		return 0;
+>  	}
+>  	if (needs_rtnl)
+>  		rtnl_lock();
+> @@ -860,36 +888,6 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+>  		break;
+>  	}
+>  
+> -	case IPV6_MULTICAST_IF:
+> -		if (sk->sk_type == SOCK_STREAM)
+> -			break;
+> -		if (optlen < sizeof(int))
+> -			goto e_inval;
+> -
+> -		if (val) {
+> -			struct net_device *dev;
+> -			int midx;
+> -
+> -			rcu_read_lock();
+> -
+> -			dev = dev_get_by_index_rcu(net, val);
+> -			if (!dev) {
+> -				rcu_read_unlock();
+> -				retv = -ENODEV;
+> -				break;
+> -			}
+> -			midx = l3mdev_master_ifindex_rcu(dev);
+> -
+> -			rcu_read_unlock();
+> -
+> -			if (sk->sk_bound_dev_if &&
+> -			    sk->sk_bound_dev_if != val &&
+> -			    (!midx || midx != sk->sk_bound_dev_if))
+> -				goto e_inval;
+> -		}
+> -		np->mcast_oif = val;
+> -		retv = 0;
+> -		break;
+>  	case IPV6_ADD_MEMBERSHIP:
+>  	case IPV6_DROP_MEMBERSHIP:
+>  	{
 
-> Even though a static_branch check is added in page_is_page_pool_iov(), it
-> does not make much sense that a core has tow different 'struct' for its
-> most basic data.
->
-> IMHO, the ppiov for dmabuf is forced fitting into page_pool without much
-> design consideration at this point.
->
-...
->
-> For now, the above may work for the the rx part as it seems that you are
-> only enabling rx for dmabuf for now.
->
-> What is the plan to enable tx for dmabuf? If it is also intergrated into
-> page_pool? There was a attempt to enable page_pool for tx, Eric seemed to
-> have some comment about this:
-> https://lkml.kernel.org/netdev/2cf4b672-d7dc-db3d-ce90-15b4e91c4005@huawe=
-i.com/T/#mb6ab62dc22f38ec621d516259c56dd66353e24a2
->
-> If tx is not intergrated into page_pool, do we need to create a new layer=
- for
-> the tx dmabuf?
->
 
-I imagine the TX path will reuse page_pool_iov, page_pool_iov_*()
-helpers, and page_pool_page_*() helpers, but will not need any core
-page_pool changes. This is because the TX path will have to piggyback
-on MSG_ZEROCOPY (devmem is not copyable), so no memory allocation from
-the page_pool (or otherwise) is needed or possible. RFCv1 had a TX
-implementation based on dmabuf pages without page_pool involvement, I
-imagine I'll do something similar.
-
---=20
-Thanks,
-Mina
 
