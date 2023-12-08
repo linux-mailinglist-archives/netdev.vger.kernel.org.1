@@ -1,149 +1,217 @@
-Return-Path: <netdev+bounces-55152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 961E080997C
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 03:47:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C88898099E2
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 03:54:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEAD42821C0
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 02:47:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2B2F1C20C9B
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 02:54:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E94F617FF;
-	Fri,  8 Dec 2023 02:47:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C02B21FC2;
+	Fri,  8 Dec 2023 02:54:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lV3bBVdV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="niPgV1xy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17E06171E
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 18:47:00 -0800 (PST)
-Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-50c0f13ea11so1718166e87.3
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 18:47:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702003618; x=1702608418; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=tEtf2YgUgEwdwnt/GQcXAgJlw3ccfgk9p2/Tj7cEBKA=;
-        b=lV3bBVdVZjie+7T4oge76GJTzEx86JuNfkTz/HksW7VxM0+bEXHy2xpELRq81pgRgn
-         cNXZpAx0m7J73sqnrmenTNOnMZmcsrDeFg9ipGZJnCVqKvBgGbhKJ0g6JJ1yLkIkj269
-         byhA+iqdYXqJOfYhoNM6rzD7TVnT1gvh/LMP5XE9sfsafQThSEUZOqfa4wIghiPsiqqY
-         TRzCnDgaPf9Rpz8cQYAX3NZ1DZlbcXzx9iPScWnqNzAOG1Zbz4Yg8uJ2+/TiLccJJo/2
-         NULUOWkVpNxahpw1rYT/Yjcq+hj1tC5wr/gvHnmnC/D1fnruHy5TnA0qAYYQoFKmNWVE
-         Nm/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702003618; x=1702608418;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tEtf2YgUgEwdwnt/GQcXAgJlw3ccfgk9p2/Tj7cEBKA=;
-        b=rc8JZ8Du2sQW41UCmAk3BH6uvs16fs0DMQtDcRIHfGD1QbWGXKTiZe8VrDjgDVvDRB
-         Y6yvUbvQP8F9txsgaAdczp8GrjMXUg/ZRWfOajGfGymKVsZlE1apsLnEJoV309RscdoV
-         gjssmJTeHoVYckEM/ZNadSZ78eVq39d3lpfSzR/jbg+U6ZJRRDsJZC+BTW+a2rUJKxsN
-         lhKPwz2D1UG+A7MsZFgNRtDocbhYNA9IykTwod7884zyfGsvt9+gr0f2cACjv4Kem4qA
-         kP3xIACmAbwdGgwsVa5BpCVhafpDRLqlW08JfyvPo1gl/j4H9wn6wfMRAWQNNzzCQR/h
-         gkpw==
-X-Gm-Message-State: AOJu0YwjLXOTsTkxbekU59jfmsYuYYDQPBCRfNvg2MlS6p4Kju4l9ujA
-	11OA2AgcwrLoCFHr9n6w6slk07FOTYRJUovGpiM=
-X-Google-Smtp-Source: AGHT+IEW2oxEqStEQUra6TuPHCzx6Jo/+gICcZXoMJ6qc4XlPzCG7akMVXMOOid6jRFdr0G3S3mDdyX/FI4qTKLCYsE=
-X-Received: by 2002:a05:6512:60b:b0:50c:44:919e with SMTP id
- b11-20020a056512060b00b0050c0044919emr1927382lfe.108.1702003617952; Thu, 07
- Dec 2023 18:46:57 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF7321991;
+	Thu,  7 Dec 2023 18:53:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702004030; x=1733540030;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ti6/hj+FFFEnp57nQsmG5vThrO4ZHgMylMpbJIr8FoA=;
+  b=niPgV1xyNdemL4yp53igHAC36rm6kENcRV6IpkKMCtCVxLyytAq7aVQa
+   JHVy8n/b0OgaPE2HyOVMd5DBQhavPfni/kO112s0vswomHmy0+FTSv5mf
+   pOUxP5NDXpabnMS8gDjkEJV+igJoN3ildyxvlVY5BDoB64CvPXZWJbY5p
+   DN/9fLsNFD/MOtctAjZcc2guFZktthm0Qqiyq1qf2JeSORLGKXPtAxZIF
+   fbUl2c+Pcec85RdfzQlmkMBo+lAfXThyD2DlHbiCSzmgEOrWl5MuSpXT0
+   ENDaax20blwfjQt2OsN7ozqy9CF/DNLSQte61e1D04WocBGyFeI8Vam5F
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="7710089"
+X-IronPort-AV: E=Sophos;i="6.04,259,1695711600"; 
+   d="scan'208";a="7710089"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2023 18:53:50 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10917"; a="842446071"
+X-IronPort-AV: E=Sophos;i="6.04,259,1695711600"; 
+   d="scan'208";a="842446071"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmsmga004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Dec 2023 18:53:49 -0800
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 7 Dec 2023 18:53:48 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 7 Dec 2023 18:53:48 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 7 Dec 2023 18:53:47 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YQ5IauT4IKKSzY86B+X4wEY90W+/z4ffUqi+DlNiXjboljB5zTUw7B7gbsAtH8Cnjyon2XFXVrn/1F2hEvrSJaxEWmT7o3ADXa0iMGnOZ/J8Z36fIVBS2POn7NHkqUZnHC7RTBozxEfN1j1wYvb8lF23T5exhLHZ4eYMAuWklNXQK46QWRrIcsO850q3XbSJ7EP38eS4PCHzLIGGnIzUIVgWZh87y9UKBWJ+iAQhOma0U7+9GhDcwNB3jZbyy24/TSmDs0vescceNAh47tmnxks2wpBejAO7/sg9267jjFByiIiDRjt3U6DxVsICb0t+y30WjrnR9lYdKsYhLyxVSA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OMMdb1PpIOBQ4fIzx1FOtGFm4xzhdVVgPxyaIItmXWI=;
+ b=HvRikDw7IOl8KPU0ddZgJ1sMC1nnMf0na4YIQTIQOHEmm+cHvsdHsu6AZz3VyTCRzp+vDJycJQvzDfhk6OjXF0Nfp8/P0ddc5Rhjp7IetoUapdM3r9jXXKKRewa4RywW+s9jKGThPEGL3ZJum0+Xat1h+Id7CI+jEIAZAuBmBDWar4b5UyK2tPbKefhMyW4i9M4pgemH/mHbhcX/KsO6vcXIlvmyUjUU/k4jmoN4il8WPm1V40dw5H6flNnd8CKCnSQwC1Qyh1qlRr1PH1byUcGWxMDu4+N2UmAXWHm++MlxnnvrHgBhCN1ltWbZaKpA1XX/0qKu98rH/zaIDeyeuw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by PH0PR11MB7471.namprd11.prod.outlook.com (2603:10b6:510:28a::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.28; Fri, 8 Dec
+ 2023 02:53:45 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::e7a4:a757:2f2e:f96a]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::e7a4:a757:2f2e:f96a%3]) with mapi id 15.20.7068.025; Fri, 8 Dec 2023
+ 02:53:45 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: "Cao, Yahui" <yahui.cao@intel.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"Liu, Lingyu" <lingyu.liu@intel.com>, "Chittim, Madhu"
+	<madhu.chittim@intel.com>, "Samudrala, Sridhar"
+	<sridhar.samudrala@intel.com>, "alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>, "yishaih@nvidia.com" <yishaih@nvidia.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "brett.creeley@amd.com"
+	<brett.creeley@amd.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
+Subject: RE: [PATCH iwl-next v4 08/12] ice: Save and load RX Queue head
+Thread-Topic: [PATCH iwl-next v4 08/12] ice: Save and load RX Queue head
+Thread-Index: AQHaHCV/OCOKlQEK7EeTKXfnKkai+7CdigMggAB184CAAMp8UA==
+Date: Fri, 8 Dec 2023 02:53:44 +0000
+Message-ID: <BN9PR11MB5276771D5FB2D3CDAC3A70348C8AA@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20231121025111.257597-1-yahui.cao@intel.com>
+ <20231121025111.257597-9-yahui.cao@intel.com>
+ <BN9PR11MB5276DFED75FE8F9372B7A3CE8C8BA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20231207144615.GK2692119@nvidia.com>
+In-Reply-To: <20231207144615.GK2692119@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|PH0PR11MB7471:EE_
+x-ms-office365-filtering-correlation-id: 53c30e7f-3f15-4d64-7d36-08dbf798e4b6
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: tXC7F5dEaYcleAqpE3Jc8HPl+5l3/ttShFLC+sbuPDc0tilsOdJNIdMmxTZOcm+iArf5jdaQEK2kD8hT5LCNZtL8pdVPhSiPf5r8RFc2RaK9EQdBm/r1kPzuNwsD1kqBGea6pmkD35v25l8SmMkshhtRx6DSEcMlbZ1glixc50FdKLl+bmdThhwl+y0jnMFmVigq0jl+h0LGzlc9eZa2ulOUoJGj5a8bZrm25lKt77zq3v/wLE55xyTSWbzmGRKx1U6bLSoNKz1JCY9zjpWY7P7IHF7+WWdJhhT0cUmI+bqKg0dHek7nCEpDafdioLT+Gvx3RVvWQMnilWDLKAXXAQ3ymeTXLw5hvIsedurA6QymAFXdLQc3F1S86IOGaMprkRj9ipRyUTQo5rFEseUtn4bP9waZVzYH9sjNXQRQBYIFbIFi6vgxTbVZ8O2TUrhbVZdHCFvraMq0P5Hmh9tDnWC1YBY0kyY77lO1anIbD2p3L+oYfmA/rX2XBTZxEnvmheTUAX4c3tZBQuoEVSFh3v7KUwaVu1Yd7v0eSZsOs5jAISBTaw0YsLaNNWOEZkeYxGOLLlm4ve5zXYE4Zdn+YptoesuOG7+lw+KIhhdX2afiY1uOuWMPBVmt8Pvc3mWm
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(376002)(136003)(346002)(39860400002)(230922051799003)(451199024)(186009)(1800799012)(64100799003)(478600001)(66556008)(66476007)(66446008)(64756008)(54906003)(76116006)(66946007)(38100700002)(6916009)(55016003)(9686003)(26005)(83380400001)(316002)(71200400001)(7696005)(6506007)(82960400001)(38070700009)(2906002)(8936002)(86362001)(4326008)(8676002)(52536014)(5660300002)(33656002)(7416002)(41300700001)(122000001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?omfidNdVO84O/NiTMnkxMWk4eTEOtpj4RrBjvXWTO7kc/olkJ9EdIpxeCkkJ?=
+ =?us-ascii?Q?hx13js8YVQ9V4EyTFYFxoDCSaL4ICur9fEBNDrBCbZVzEsAS+lNJaXKwyrIS?=
+ =?us-ascii?Q?rpchQ7BjeCyOqr8o5U1bB+ZCH39i+ywhoCppqfasQZyg0NarFzBhoTF4Gx9Q?=
+ =?us-ascii?Q?Ve0aDz8Swm0B9tTc1LKPN6By958SNCyX9ZFP2IvOkn0lnDdchKJXzvkrQyuk?=
+ =?us-ascii?Q?Q56rqKTkoFmgsAtoZzbY32usQ5534TuQQJ+ivMbdeFq7sxPzXXjPrgX2wQtt?=
+ =?us-ascii?Q?urtZWvRzFuRBopsYjf6h0Ri1sjdPDpelPvA+kZEZUefI4x5xPAADMJD4UxVQ?=
+ =?us-ascii?Q?aYtZ6YyWURDNkrxmQQjui1mBQz6vpEZS5Bs8g3z7KC0c8h3bRTHUnPzNFXHw?=
+ =?us-ascii?Q?JikngkIgx8sgPro6bhkGEHaodbwog/wGf7MhyMi+ZJWO27g5iZHKVSWfHqm8?=
+ =?us-ascii?Q?dhYswlMyISOvGugEnYDNhfJoBItnxaCa/gsxkaGPf7PTwRdp2TZc9DHQ2kbe?=
+ =?us-ascii?Q?B7m66tcs+aJvo1MDkiGhxJ2EKSC85yNpfH4yq1GFT61PfCJ9oauuhVDuKB04?=
+ =?us-ascii?Q?twasxCe1b0kNgl4+kp1sD0oNNo3GtiQSU6BPFPTpNr0Np9gDbsl02tVIR8GG?=
+ =?us-ascii?Q?J93Lz1Ty4BnviYCmPkqmsXNIzXdW58NCS1KExc8wohHmLYPrjx6v+4KroFkp?=
+ =?us-ascii?Q?QW7D5YL1cs4tcjvAnHw3MDF4qt+mMYarfQgrbiBEpfRICdYDcdTGNI3gFRaP?=
+ =?us-ascii?Q?BVv+q4jcOuuoIbHURDrpvadf9DiWl/7yz8gDiXGuvWFWS1cefbqfU0EYlUBA?=
+ =?us-ascii?Q?ibnlwiYh6IfCmC/q/N6ck5G3yAQZEcZveiLOUbALAiUdeHe24QW+Wo+/UBbh?=
+ =?us-ascii?Q?EpJlJZFCYD8sL5Uv2adugKe6lNhel+rIsOKcKIndTin6csbR1sshFC01AW6L?=
+ =?us-ascii?Q?V/lQNUb0FGGn+/JHVKTPXtAMHhZSorbd4bRqg4SsKpk5tQgDZtGEL63WKS69?=
+ =?us-ascii?Q?mYXdgzqKmHp5u9ear5vWJDPqwa8817Up6NItqKWKsdbv565imUP1fbXDOmyH?=
+ =?us-ascii?Q?IUaxJOCKf0ApGFJHm9dROVHdl/vGPogemckR77XtkxjNbVyazrMYFdLj7VmS?=
+ =?us-ascii?Q?1bQSeJVeUznmpzYAT7Y2duUIpoyHoYttOhm+2OQVWRasqy7PrESfxnntJGCY?=
+ =?us-ascii?Q?iUCApSRWfNvmdkoaXDa88zoHzpBq9RPexWAepM72RQ8fZwqRUcDIQSzAf1do?=
+ =?us-ascii?Q?eKPqkP1grw5Gch2aTaXNN/hODjICUQ7cRszx/k+gX0MWtECJ9j1qm8uia1nX?=
+ =?us-ascii?Q?F6YC/6N5pUu9O2fZ2SLhi2I4m7TDsuaplu7H7yDPcBFsjckfEikJqzjYX0/J?=
+ =?us-ascii?Q?VY7FxyDuI71cT3D1f51RHsdVOELhcMmRlYc2Kzvflv2xtYb9ACNh5H2X3wpC?=
+ =?us-ascii?Q?cBcsoVFaOF46IsbcJSP1w6ywQuDB8xWSmjDym8U8hZa8bs7DXtcFjx1+Hsvl?=
+ =?us-ascii?Q?XcSrQfhkVZWZg3lRTMqPBdIAUXmGp+AMPXH3baiuoQ2g+ZnWBlQ5+goo/4z/?=
+ =?us-ascii?Q?XshAPPA7NQDBjDMcZGOv8eNNSS2pEjT5R7hBreMc?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231120134818.e2k673xsjec5scy5@skbuf> <b304af68-7ce1-49b5-ab62-5473970e618f@kernel.org>
- <CAJq09z5nOnwtL_rOsmReimt+76uRreDiOW_+9r==YJXF4+2tYg@mail.gmail.com>
- <95381a84-0fd0-4f57-88e4-1ed31d282eee@kernel.org> <7afdc7d6-1382-48c0-844b-790dcb49fdc2@kernel.org>
- <CAJq09z5uVjjE1k2ugVGctsUvn5yLwLQAM6u750Z4Sz7cyW5rVQ@mail.gmail.com>
- <vcq6qsx64ulmhflxm4vji2zelr2xj5l7o35anpq3csxasbiffe@xlugnyxbpyyg>
- <CAJq09z4ZdB9L7ksuN0b+N-LCv+zOvM+5Q9iWXccGN3w54EN1_Q@mail.gmail.com>
- <20231207171941.dhgch5fs6mmke7v7@skbuf> <CAJq09z7j_gNbUcYDWXjzUNAXat-+EyryFJFEqpVG-jPcY4ZmmQ@mail.gmail.com>
- <20231207223143.doivjphfgs4sfvx6@skbuf>
-In-Reply-To: <20231207223143.doivjphfgs4sfvx6@skbuf>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Thu, 7 Dec 2023 23:46:46 -0300
-Message-ID: <CAJq09z70hfygcB5LL3Rp9GQ0180mTJauH6qVeAPqm1zO4HiAAQ@mail.gmail.com>
-Subject: Re: [net-next 2/2] net: dsa: realtek: load switch variants on demand
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <ALSI@bang-olufsen.dk>, 
-	Krzysztof Kozlowski <krzk@kernel.org>, "linus.walleij@linaro.org" <linus.walleij@linaro.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "andrew@lunn.ch" <andrew@lunn.ch>, 
-	"f.fainelli@gmail.com" <f.fainelli@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>, 
-	"pabeni@redhat.com" <pabeni@redhat.com>, "arinc.unal@arinc9.com" <arinc.unal@arinc9.com>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 53c30e7f-3f15-4d64-7d36-08dbf798e4b6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Dec 2023 02:53:44.7185
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 3mkE5qAU8OAkj0/p0jiLdtqgnhPdMgIKoE3C8Lj9aPlWS6zVBv3iM+8HJMWcHnO7qR0KQBmBO6JfmZa23fPq6A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7471
+X-OriginatorOrg: intel.com
 
-> > We discussed something about that in the past:
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Thursday, December 7, 2023 10:46 PM
+>=20
+> On Thu, Dec 07, 2023 at 07:55:17AM +0000, Tian, Kevin wrote:
+> > > From: Cao, Yahui <yahui.cao@intel.com>
+> > > Sent: Tuesday, November 21, 2023 10:51 AM
+> > >
+> > > +
+> > > +		/* Once RX Queue is enabled, network traffic may come in at
+> > > any
+> > > +		 * time. As a result, RX Queue head needs to be loaded
+> > > before
+> > > +		 * RX Queue is enabled.
+> > > +		 * For simplicity and integration, overwrite RX head just after
+> > > +		 * RX ring context is configured.
+> > > +		 */
+> > > +		if (msg_slot->opcode =3D=3D VIRTCHNL_OP_CONFIG_VSI_QUEUES)
+> > > {
+> > > +			ret =3D ice_migration_load_rx_head(vf, devstate);
+> > > +			if (ret) {
+> > > +				dev_err(dev, "VF %d failed to load rx head\n",
+> > > +					vf->vf_id);
+> > > +				goto out_clear_replay;
+> > > +			}
+> > > +		}
+> > > +
 > >
-> > https://lkml.kernel.org/netdev/20220630200423.tieprdu5fpabflj7@bang-olufsen.dk/T/#m04e6cf7d0c1f18b02c2bf40266ada915b1f02f3d
-> >
-> > The code is able to handle only a single node and binding docs say it
-> > should be named "mdio". The compatible string wasn't a requirement
-> > since the beginning and I don't think it is worth it to rename the
-> > compatible string. I suggest we simply switch to
-> > of_get_child_by_name() and look for a node named "mdio". If that node
-> > is not found, we can still look for the old compatible string
-> > (backwards compatibility) and probably warn the "user" (targeting not
-> > the end-user but the one creating the DT for a new device).
-> >
-> > I don't know how to handle the binding docs as the compatible string
-> > is still a requirement for older kernel versions. Is it ok to update
-> > the device-tree bindings docs in such a way it would break old
-> > drivers? Or should we keep it there until the last LTS kernel
-> > requiring it reaches EOL? As device-tree bindings docs should not
-> > consider how the driver was implemented, I think it would be strange
-> > to have a note like "required by kernel up to 6.x".
-> >
-> > Regards,
-> >
-> > Luiz
->
-> And did you ever answer this question?
->
-> "And why do you even need to remove the compatible string from the MDIO
-> node, can't you just ignore it, does it bother you in any way?"
->
-> I'm very confused as to what you're after.
+> > Don't we have the same problem here as for TX head restore that the
+> > vfio migration protocol doesn't carry a way to tell whether the IOAS
+> > associated with the device has been restored then allowing RX DMA
+> > at this point might cause device error?
+>=20
+> Does this trigger a DMA?
 
-The device-tree bindings should delineate the hardware characteristics
-rather than specifying the implementation details of a particular
-driver. The requirement of an "mdio" node with a compatible string
-such as "realtek,smi-mdio" may be misleading, implying a potential
-correlation between the host-switch interface (SMI, SPI, or MDIO) and
-a specific user MDIO it describes. It's important to note that how we
-describe the user mdio could vary for other future switch families,
-but not with a distinct management interface.
+looks yes from the comment
 
-I am currently conducting tests using the same user MDIO driver for
-both realtek-smi and realtek-mdio. However, it's noteworthy that
-unlike realtek-smi, the current user MDIO for realtek-mdio does not
-require a compatible string; only a node named "mdio". Realtek-mdio is
-presently utilizing the generic DSA user MDIO, but you mentioned it's
-not considered a "core functionality." I assume this implies I
-shouldn't depend on it. That's the reason for my switch to the
-existing user MDIO driver from realtek-smi.
+>=20
+> > @Jason, is it a common gap applying to all devices which include a
+> > receiving path from link? How is it handled in mlx migration
+> > driver?
+>=20
+> There should be no DMA until the device is placed in RUNNING. All
+> devices may instantly trigger DMA once placed in RUNNING.
+>=20
+> The VMM must ensure the entire environment is ready to go before
+> putting anything in RUNNING, including having setup the IOMMU.
+>=20
 
-Regarding the absence of a compatible string for realtek-mdio, we have
-a few options: introducing a new compatible string exclusively for
-realtek-mdio, such as "realtek,mdio-mdio"; creating a new generic one
-for both interfaces like "realtek,user-mdio" or "rtl836x-user-mdio";
-or simply ignore the compatible string, as you suggested. However, if
-I opt to ignore it, I presume I should retrieve that node solely based
-on the node name. That's what I'm after. Is my understanding correct?
+ah, yes. that is the right behavior.
 
-I'll post a new series that is still compatible both with old HW
-descriptions and the device-tree bindings. In that way, I'll not touch
-the docs. However, given that the compatible string is unnecessary to
-describe the hardware, and after we modify the code to disregard it,
-it is awkward for the binding documentation to request a compatible
-string that serves no purpose. Shouldn't we consider updating this
-requirement at some point?
+so if there is no other way to block DMA before RUNNING is reached,
+here the RX queue should be left disabled until when transitioning=20
+to RUNNING.
 
-Regards,
-
-Luiz
+Yahui, can you double check?
 
