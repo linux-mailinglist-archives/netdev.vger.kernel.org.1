@@ -1,283 +1,343 @@
-Return-Path: <netdev+bounces-55459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0408A80AF31
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 22:56:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66DB880AF37
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 22:57:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8560E1F21354
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 21:56:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3B472812E7
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 21:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A82458ACB;
-	Fri,  8 Dec 2023 21:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C128B58AC2;
+	Fri,  8 Dec 2023 21:57:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AKmpZVUm"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="uBEOG9xj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20187199B;
-	Fri,  8 Dec 2023 13:56:09 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id 41be03b00d2f7-5c67c1ad5beso2807611a12.1;
-        Fri, 08 Dec 2023 13:56:09 -0800 (PST)
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73418211B
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 13:57:07 -0800 (PST)
+Received: by mail-pg1-x52e.google.com with SMTP id 41be03b00d2f7-5c66e7eafabso2108685a12.0
+        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 13:57:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702072569; x=1702677369; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=m5rsRxwaaPzPBCnMdO8mVS901k6hVY4tBe5CSrs5wdQ=;
-        b=AKmpZVUmj9Fa9i9A38fUd3hL2MAKZW1urU4oonWJuvpfeIHCrTVJJhkRa4DdrveVx6
-         lKVtVKz/pZyT77Zs9SP8QFjVsfBfSanE4ZJ1COg6iKB9M3ShN4VBkrHkrFamqjVyg9J4
-         1n2DYVQbeSSUiWOawgbwUjqYljlQmRf94tToDA5sZ9fQauIYkiZrv/lB4QaasGub2wGg
-         gkMpuH4XIA2AIKOD955fBsTVE39vfxQZi2CGV6Hy6gBIwFwz4lUR98h67gYu4npEbCuv
-         Ra2ry47f92zWkvVoc5R8tFtpfC8MaQHYRaV/auT9N0YF9b/EZ6FarWrhEeAINPRMn+M0
-         Y7wg==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1702072627; x=1702677427; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4K0YXMfUBgdzoJZ1u6s5TSjDhSTbPXlpbYpJmk4yJgE=;
+        b=uBEOG9xj0pLdxBYzqX/DdGJMxUF8/rlIzh7E/UGP8KTlcqJMUfHweSrrkkY0K7yl8N
+         aew78vZVMU6EV9HSB/tIEugKMioPyuY4C+9OgIjsUVCsbeBifanAW3y2WPTo2+dEfRgq
+         NzrPo3CPQpRy2ayfpVQ9JPQq3dFAUTz8MpodjAYe97n3AHIPhMdL0O9ZX3JsveTL3ehu
+         RNY/8pLVL3xXAzPjpUdV3V4OCC93hqTbWxFpnbf7KGhgg70jyaJhS6+skMUQfYpOpXnD
+         zFX2hZQWIfCiiaGbgIHtpqNA+v7AR9+tZm1ri3QfBs0NTrNrxTMtSR26mH2aPEcc6k0u
+         m1Yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702072569; x=1702677369;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m5rsRxwaaPzPBCnMdO8mVS901k6hVY4tBe5CSrs5wdQ=;
-        b=B70yjmcoxHuAv99L6PsrBTFzmEidmymZPZzVuRySLXjGXyhRCGFl7PKyIvVQNcgYof
-         aLGOQe8FlxdXZsM9chxhRVEnmh/52Lrze11VOBJTXwVFNYVOvsGQA0UBZlLm7VbPB6Dj
-         GThRTD8PG+7vBe2rNOlsfZq6FnqBBaVGRaDB52tjCZKGVljsTd8K7W25TQxHnlohruQI
-         VQmLYC+Uhg+9YYWl+EFqt9z9rIguhgui8QKGLGzUR6pE8x9u5GnbMCaGKn0/jffGikBx
-         BOYw8NXpDHP6W9UDfhTiVHjygrRxUWR0x6OWCWYUllb/URwuAh6gj54VFus9DdrrWXI7
-         u68w==
-X-Gm-Message-State: AOJu0YwP8VNBFQqoL2zDKMoRTOTBNSwVzz4TKeqvYM7SV2B5Az8BIyju
-	wMhVGfYo1jfS75w7/qLoJnk=
-X-Google-Smtp-Source: AGHT+IEDOds6psHUyA28rRDLc+k43Ab5CTBxAsqUbN/6lfbsirZi4egvbLT+OezzLDw2GjvI7pOEKA==
-X-Received: by 2002:a17:90a:d143:b0:286:6cd8:ef04 with SMTP id t3-20020a17090ad14300b002866cd8ef04mr2066178pjw.28.1702072568676;
-        Fri, 08 Dec 2023 13:56:08 -0800 (PST)
-Received: from localhost ([216.228.127.130])
-        by smtp.gmail.com with ESMTPSA id p20-20020a63fe14000000b005c67721e6c0sm2014791pgh.53.2023.12.08.13.56.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Dec 2023 13:56:08 -0800 (PST)
-Date: Fri, 8 Dec 2023 13:53:51 -0800
-From: Yury Norov <yury.norov@gmail.com>
-To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
-	leon@kernel.org, cai.huoqing@linux.dev, ssengar@linux.microsoft.com,
-	vkuznets@redhat.com, tglx@linutronix.de,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	schakrabarti@microsoft.com, paulros@microsoft.com
-Subject: Re: [PATCH V5 net-next] net: mana: Assigning IRQ affinity on HT cores
-Message-ID: <ZXOQb+3R0YAT/rAm@yury-ThinkPad>
-References: <1702029754-6520-1-git-send-email-schakrabarti@linux.microsoft.com>
- <ZXMiOwK3sOJNXHxd@yury-ThinkPad>
+        d=1e100.net; s=20230601; t=1702072627; x=1702677427;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4K0YXMfUBgdzoJZ1u6s5TSjDhSTbPXlpbYpJmk4yJgE=;
+        b=Wn2gRChstax2xKTgHZ01JmZVgbxq0gWZdP4VUOP/xXPOLIRPDC7a+7VKAahaIfiUWQ
+         IPSFZABXuiBJli5bc6Uyz58wvmgqZm8BzuXeG0aqZvux7Q7drKbPu5aDG+1xWa/ai5mg
+         vcUxEiYfuJNTf2ttFV4FM9RjQmj8ji/T94WN+Jn8Z6U0Kh6Fljk7vJ5UculgUpj5D+pV
+         7Rtaqtcq8bD2DTTDBn0OtiF0wgCitrI172mWCPjL53He6UJbQCjaORFhobWjUg5uzxBm
+         6vUXArEOLQFiT2OzAQg4R8yv94NbdvUg1PjyAq9M6zJg7qcinWjRTK6iWCLhB2tOkakk
+         hhiA==
+X-Gm-Message-State: AOJu0YzohGhi9UgCe4PasNHIwZP0CblXrCi22tw1WKQSdIQvdyNlcYW3
+	rXZTXRN0Crmwt0gxd23rudAd8w==
+X-Google-Smtp-Source: AGHT+IFrNUjV9BoL6uOpdidBaGRnAu37LKlF42yW/mv6utv+SS6lhfeCHYtMbWoBDD66Kr3q+23edQ==
+X-Received: by 2002:a05:6a20:1445:b0:18b:5b7e:6b9 with SMTP id a5-20020a056a20144500b0018b5b7e06b9mr689584pzi.2.1702072626760;
+        Fri, 08 Dec 2023 13:57:06 -0800 (PST)
+Received: from ?IPV6:2a03:83e0:1256:2:c51:2090:e106:83fa? ([2620:10d:c090:500::5:34a6])
+        by smtp.gmail.com with ESMTPSA id t2-20020a62d142000000b00690c0cf97c9sm2145195pfl.73.2023.12.08.13.57.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Dec 2023 13:57:06 -0800 (PST)
+Message-ID: <0fc35c10-e35b-4bdc-9b9f-22b256921637@davidwei.uk>
+Date: Fri, 8 Dec 2023 13:57:04 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZXMiOwK3sOJNXHxd@yury-ThinkPad>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/3] netdevsim: allow two netdevsim ports to be
+Content-Language: en-GB
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20231207172117.3671183-1-dw@davidwei.uk>
+ <20231207172117.3671183-2-dw@davidwei.uk> <ZXL3L38i8RIFo+nh@nanopsycho>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <ZXL3L38i8RIFo+nh@nanopsycho>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Few more nits
+On 2023-12-08 02:59, Jiri Pirko wrote:
+> Thu, Dec 07, 2023 at 06:21:15PM CET, dw@davidwei.uk wrote:
+>> Add a debugfs file in
+>> /sys/kernel/debug/netdevsim/netdevsimN/ports/B/link
+> 
+> "peer" perhaps?
 
-On Fri, Dec 08, 2023 at 06:03:40AM -0800, Yury Norov wrote:
-> On Fri, Dec 08, 2023 at 02:02:34AM -0800, Souradeep Chakrabarti wrote:
-> > Existing MANA design assigns IRQ to every CPU, including sibling
-> > hyper-threads. This may cause multiple IRQs to be active simultaneously
-> > in the same core and may reduce the network performance with RSS.
-> 
-> Can you add an IRQ distribution diagram to compare before/after
-> behavior, similarly to what I did in the other email?
-> 
-> > Improve the performance by assigning IRQ to non sibling CPUs in local
-> > NUMA node. The performance improvement we are getting using ntttcp with
-> > following patch is around 15 percent with existing design and approximately
-> > 11 percent, when trying to assign one IRQ in each core across NUMA nodes,
-> > if enough cores are present.
-> 
-> How did you measure it? In the other email you said you used perf, can
-> you show your procedure in details?
-> 
-> > Suggested-by: Yury Norov <yury.norov@gmali.com>
-> > Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-> > ---
-> 
-> [...]
-> 
-> >  .../net/ethernet/microsoft/mana/gdma_main.c   | 92 +++++++++++++++++--
-> >  1 file changed, 83 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > index 6367de0c2c2e..18e8908c5d29 100644
-> > --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > @@ -1243,15 +1243,56 @@ void mana_gd_free_res_map(struct gdma_resource *r)
-> >  	r->size = 0;
-> >  }
-> >  
-> > +static int irq_setup(int *irqs, int nvec, int start_numa_node)
-> > +{
-> > +	int w, cnt, cpu, err = 0, i = 0;
-> > +	int next_node = start_numa_node;
-> 
-> What for this?
-> 
-> > +	const struct cpumask *next, *prev = cpu_none_mask;
-> > +	cpumask_var_t curr, cpus;
-> > +
-> > +	if (!zalloc_cpumask_var(&curr, GFP_KERNEL)) {
+Sounds good.
 
-alloc_cpumask_var() here and below, because you initialize them by
-copying
+> 
+>>
+>> Writing "M B" to this file will link port A of netdevsim N with port B of
+>> netdevsim M.
+>>
+>> Reading this file will return the linked netdevsim id and port, if any.
+>>
+>> Signed-off-by: David Wei <dw@davidwei.uk>
+>> ---
+>> drivers/net/netdevsim/bus.c       | 10 ++++
+>> drivers/net/netdevsim/dev.c       | 97 +++++++++++++++++++++++++++++++
+>> drivers/net/netdevsim/netdev.c    |  5 ++
+>> drivers/net/netdevsim/netdevsim.h |  3 +
+>> 4 files changed, 115 insertions(+)
+>>
+>> diff --git a/drivers/net/netdevsim/bus.c b/drivers/net/netdevsim/bus.c
+>> index bcbc1e19edde..3e4378e9dbee 100644
+>> --- a/drivers/net/netdevsim/bus.c
+>> +++ b/drivers/net/netdevsim/bus.c
+>> @@ -364,3 +364,13 @@ void nsim_bus_exit(void)
+>> 	driver_unregister(&nsim_driver);
+>> 	bus_unregister(&nsim_bus);
+>> }
+>> +
+>> +struct nsim_bus_dev *nsim_bus_dev_get(unsigned int id)
+>> +{
+>> +	struct nsim_bus_dev *nsim_bus_dev;
+>> +	list_for_each_entry(nsim_bus_dev, &nsim_bus_dev_list, list) {
+>> +		if (nsim_bus_dev->dev.id == id)
+>> +			return nsim_bus_dev;
+>> +	}
+>> +	return NULL;
+>> +}
+>> diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
+>> index b4d3b9cde8bd..72ad61f141a2 100644
+>> --- a/drivers/net/netdevsim/dev.c
+>> +++ b/drivers/net/netdevsim/dev.c
+>> @@ -25,6 +25,7 @@
+>> #include <linux/mutex.h>
+>> #include <linux/random.h>
+>> #include <linux/rtnetlink.h>
+>> +#include <linux/string.h>
+>> #include <linux/workqueue.h>
+>> #include <net/devlink.h>
+>> #include <net/ip.h>
+>> @@ -388,6 +389,99 @@ static const struct file_operations nsim_dev_rate_parent_fops = {
+>> 	.owner = THIS_MODULE,
+>> };
+>>
+>> +static ssize_t nsim_dev_link_read(struct file *file, char __user *data,
+>> +				  size_t count, loff_t *ppos)
+>> +{
+>> +	struct nsim_dev_port *nsim_dev_port;
+>> +	struct netdevsim *peer;
+>> +	unsigned int id, port;
+>> +	char buf[11];
+> 
+> See below.
+> 
+> 
+>> +	ssize_t len;
+>> +
+>> +	nsim_dev_port = file->private_data;
+>> +	peer = nsim_dev_port->ns->peer;
+>> +	if (!peer) {
+>> +		len = scnprintf(buf, sizeof(buf), "\n");
+>> +		goto out;
+>> +	}
+>> +
+>> +	id = peer->nsim_bus_dev->dev.id;
+>> +	port = peer->nsim_dev_port->port_index;
+>> +	len = scnprintf(buf, sizeof(buf), "%u %u\n", id, port);
+>> +
+>> +out:
+>> +	return simple_read_from_buffer(data, count, ppos, buf, len);
+>> +}
+>> +
+>> +static ssize_t nsim_dev_link_write(struct file *file,
+>> +					  const char __user *data,
+>> +					  size_t count, loff_t *ppos)
+>> +{
+>> +	struct nsim_dev_port *nsim_dev_port, *peer_dev_port;
+>> +	struct nsim_bus_dev *peer_bus_dev;
+>> +	struct nsim_dev *peer_dev;
+>> +	unsigned int id, port;
+>> +	char *token, *cur;
+>> +	char buf[10];
+> 
+> # echo "889879797" >/sys/bus/netdevsim/new_device
+> # devlink dev
+> netdevsim/netdevsim889879797
+> 
+> I don't think that 10/11 is enough.
 
-> > +		err = -ENOMEM;
-> > +		return err;
-> > +	}
-> > +	if (!zalloc_cpumask_var(&cpus, GFP_KERNEL)) {
-> 
->                 free(curr);
-> 
-> > +		err = -ENOMEM;
-> > +		return err;
-> > +	}
-> > +
-> > +	rcu_read_lock();
-> > +	for_each_numa_hop_mask(next, next_node) {
-> > +		cpumask_andnot(curr, next, prev);
-> > +		for (w = cpumask_weight(curr), cnt = 0; cnt < w; ) {
+I took char[10] from nsim_bus_dev_max_vfs_write() which seemed like a
+reasonable amount for 4 digit id and ports. How much space is okay to
+allocate on the stack for this? Can you please point me to where
+new_device_store() is called from? I couldn't find it so I don't know
+how big its char *buf arg is.
 
-OK, if you can't increment inside for-loop, I'd switch it to a
-while-loop:
-                w = cpumask_weight(curr);
-                cnt = 0;
+> 
+> 
+> 
+> 
+>> +	ssize_t ret;
+>> +
+>> +	if (count >= sizeof(buf))
+>> +		return -ENOSPC;
+>> +
+>> +	ret = copy_from_user(buf, data, count);
+>> +	if (ret)
+>> +		return -EFAULT;
+>> +	buf[count] = '\0';
+>> +
+>> +	cur = buf;
+>> +	token = strsep(&cur, " ");
+> 
+> Why you implement this differently, comparing to new_device_store()?
+> Just use sscanf(), no?
 
-		while (cnt < w) {
+I went with strstep() instead of sscanf() because sscanf("%u %u", ...)
+does not fail with echo "1 2 3 4". I'm happy to use sscanf() though if
+this is not an issue.
 
-> > +			cpumask_copy(cpus, curr);
-> > +			for_each_cpu(cpu, cpus) {
-> > +				irq_set_affinity_and_hint(irqs[i], topology_sibling_cpumask(cpu));
-> > +				if (++i == nvec)
-> > +					goto done;
-> 
-> Think what if you're passed with irq_setup(NULL, 0, 0).
-> That's why I suggested to place this check at the beginning.
 > 
 > 
-> > +				cpumask_andnot(cpus, cpus, topology_sibling_cpumask(cpu));
-> > +				++cnt;
-> > +			}
-> > +		}
-> > +		prev = next;
-> > +	}
+>> +	if (!token)
+>> +		return -EINVAL;
+> 
+> In general, in case of user putting in invalid input, please hint him
+> the correct format. Again, see new_device_store().
 
-Don't hesitate to add even more vertical spacing. It's like: "take a
-breath folks, this section is done". :)
+Got it, I'll add an error message.
 
-> > +done:
-> > +	rcu_read_unlock();
-> > +	free_cpumask_var(curr);
-> > +	free_cpumask_var(cpus);
-> > +	return err;
-> > +}
-> > +
-> >  static int mana_gd_setup_irqs(struct pci_dev *pdev)
-> >  {
-> > -	unsigned int max_queues_per_port = num_online_cpus();
-> >  	struct gdma_context *gc = pci_get_drvdata(pdev);
-> > +	unsigned int max_queues_per_port;
-> >  	struct gdma_irq_context *gic;
-> >  	unsigned int max_irqs, cpu;
-> > -	int nvec, irq;
-> > +	int start_irq_index = 1;
-> > +	int nvec, *irqs, irq;
-> >  	int err, i = 0, j;
-> >  
-> > +	cpus_read_lock();
-> > +	max_queues_per_port = num_online_cpus();
-> >  	if (max_queues_per_port > MANA_MAX_NUM_QUEUES)
-> >  		max_queues_per_port = MANA_MAX_NUM_QUEUES;
-> >  
-> > @@ -1261,6 +1302,14 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
-> >  	nvec = pci_alloc_irq_vectors(pdev, 2, max_irqs, PCI_IRQ_MSIX);
-> >  	if (nvec < 0)
-> >  		return nvec;
-> > +	if (nvec <= num_online_cpus())
-> > +		start_irq_index = 0;
-> > +
-> > +	irqs = kmalloc_array((nvec - start_irq_index), sizeof(int), GFP_KERNEL);
-> > +	if (!irqs) {
-> > +		err = -ENOMEM;
-> > +		goto free_irq_vector;
-> > +	}
-> >  
-> >  	gc->irq_contexts = kcalloc(nvec, sizeof(struct gdma_irq_context),
-> >  				   GFP_KERNEL);
-> > @@ -1287,21 +1336,44 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
-> >  			goto free_irq;
-> >  		}
-> >  
-> > -		err = request_irq(irq, mana_gd_intr, 0, gic->name, gic);
-> > -		if (err)
-> > -			goto free_irq;
-> > -
-> > -		cpu = cpumask_local_spread(i, gc->numa_node);
-> > -		irq_set_affinity_and_hint(irq, cpumask_of(cpu));
-> > +		if (!i) {
-> > +			err = request_irq(irq, mana_gd_intr, 0, gic->name, gic);
-> > +			if (err)
-> > +				goto free_irq;
-> > +
-> > +			/* If number of IRQ is one extra than number of online CPUs,
-> > +			 * then we need to assign IRQ0 (hwc irq) and IRQ1 to
-> > +			 * same CPU.
-> > +			 * Else we will use different CPUs for IRQ0 and IRQ1.
-> > +			 * Also we are using cpumask_local_spread instead of
-> > +			 * cpumask_first for the node, because the node can be
-> > +			 * mem only.
-> > +			 */
-> > +			if (start_irq_index) {
-> > +				cpu = cpumask_local_spread(i, gc->numa_node);
 > 
-> I already mentioned that: if i == 0, you don't need to spread, just
-> pick 1st cpu from node.
 > 
-> > +				irq_set_affinity_and_hint(irq, cpumask_of(cpu));
-> > +			} else {
-> > +				irqs[start_irq_index] = irq;
-> > +			}
-> > +		} else {
-> > +			irqs[i - start_irq_index] = irq;
-> > +			err = request_irq(irqs[i - start_irq_index], mana_gd_intr, 0,
-> > +					  gic->name, gic);
-> > +			if (err)
-> > +				goto free_irq;
-> > +		}
-> >  	}
-> >  
-> > +	err = irq_setup(irqs, (nvec - start_irq_index), gc->numa_node);
-> > +	if (err)
-> > +		goto free_irq;
-> >  	err = mana_gd_alloc_res_map(nvec, &gc->msix_resource);
-> >  	if (err)
-> >  		goto free_irq;
-> >  
-> >  	gc->max_num_msix = nvec;
-> >  	gc->num_msix_usable = nvec;
-> > -
-> > +	cpus_read_unlock();
-> >  	return 0;
-> >  
-> >  free_irq:
-> > @@ -1314,8 +1386,10 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
-> >  	}
-> >  
-> >  	kfree(gc->irq_contexts);
-> > +	kfree(irqs);
-> >  	gc->irq_contexts = NULL;
-> >  free_irq_vector:
-> > +	cpus_read_unlock();
-> >  	pci_free_irq_vectors(pdev);
-> >  	return err;
-> >  }
-> > -- 
-> > 2.34.1
+>> +	ret = kstrtouint(token, 10, &id);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	token = strsep(&cur, " ");
+>> +	if (!token)
+>> +		return -EINVAL;
+>> +	ret = kstrtouint(token, 10, &port);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	/* too many args */
+>> +	if (strsep(&cur, " "))
+>> +		return -E2BIG;
+>> +
+>> +	/* cannot link to self */
+>> +	nsim_dev_port = file->private_data;
+>> +	if (nsim_dev_port->ns->nsim_bus_dev->dev.id == id)
+> 
+> Why not? Loopback between 2 ports of same device seems like completely
+> valid scenario.
+
+I'm imagining physical ports which cannot be connected back to itself. When
+would this physical loopback be valid?
+
+> 
+> 
+>> +		return -EINVAL;
+>> +
+>> +	/* invalid netdevsim id */
+>> +	peer_bus_dev = nsim_bus_dev_get(id);
+>> +	if (!peer_bus_dev)
+>> +		return -EINVAL;
+>> +
+>> +	peer_dev = dev_get_drvdata(&peer_bus_dev->dev);
+>> +	list_for_each_entry(peer_dev_port, &peer_dev->port_list, list) {
+>> +		if (peer_dev_port->port_index == port) {
+>> +			nsim_dev_port->ns->peer = peer_dev_port->ns;
+>> +			peer_dev_port->ns->peer = nsim_dev_port->ns;
+>> +			return count;
+>> +		}
+>> +	}
+>> +
+>> +	return -EINVAL;
+>> +}
+>> +
+>> +static const struct file_operations nsim_dev_link_fops = {
+>> +	.open = simple_open,
+>> +	.read = nsim_dev_link_read,
+>> +	.write = nsim_dev_link_write,
+>> +	.llseek = generic_file_llseek,
+>> +	.owner = THIS_MODULE,
+>> +};
+>> +
+>> static int nsim_dev_port_debugfs_init(struct nsim_dev *nsim_dev,
+>> 				      struct nsim_dev_port *nsim_dev_port)
+>> {
+>> @@ -418,6 +512,9 @@ static int nsim_dev_port_debugfs_init(struct nsim_dev *nsim_dev,
+>> 	}
+>> 	debugfs_create_symlink("dev", nsim_dev_port->ddir, dev_link_name);
+>>
+>> +	debugfs_create_file("link", 0600, nsim_dev_port->ddir,
+>> +			    nsim_dev_port, &nsim_dev_link_fops);
+>> +
+>> 	return 0;
+>> }
+>>
+>> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+>> index aecaf5f44374..1abdcd470f21 100644
+>> --- a/drivers/net/netdevsim/netdev.c
+>> +++ b/drivers/net/netdevsim/netdev.c
+>> @@ -388,6 +388,7 @@ nsim_create(struct nsim_dev *nsim_dev, struct nsim_dev_port *nsim_dev_port)
+>> 	ns->nsim_dev = nsim_dev;
+>> 	ns->nsim_dev_port = nsim_dev_port;
+>> 	ns->nsim_bus_dev = nsim_dev->nsim_bus_dev;
+>> +	ns->peer = NULL;
+>> 	SET_NETDEV_DEV(dev, &ns->nsim_bus_dev->dev);
+>> 	SET_NETDEV_DEVLINK_PORT(dev, &nsim_dev_port->devlink_port);
+>> 	nsim_ethtool_init(ns);
+>> @@ -409,6 +410,10 @@ void nsim_destroy(struct netdevsim *ns)
+>> 	struct net_device *dev = ns->netdev;
+>>
+>> 	rtnl_lock();
+>> +	if (ns->peer) {
+>> +		ns->peer->peer = NULL;
+>> +		ns->peer = NULL;
+> 
+> What is this good for?
+
+I want to make sure when a netdevsim is removed, its peer does not
+forward skbs anymore.
+
+> 
+> 
+>> +	}
+>> 	unregister_netdevice(dev);
+>> 	if (nsim_dev_port_is_pf(ns->nsim_dev_port)) {
+>> 		nsim_macsec_teardown(ns);
+>> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+>> index 028c825b86db..ac7b34a83585 100644
+>> --- a/drivers/net/netdevsim/netdevsim.h
+>> +++ b/drivers/net/netdevsim/netdevsim.h
+>> @@ -125,6 +125,7 @@ struct netdevsim {
+>> 	} udp_ports;
+>>
+>> 	struct nsim_ethtool ethtool;
+>> +	struct netdevsim *peer;
+>> };
+>>
+>> struct netdevsim *
+>> @@ -417,3 +418,5 @@ struct nsim_bus_dev {
+>>
+>> int nsim_bus_init(void);
+>> void nsim_bus_exit(void);
+>> +
+>> +struct nsim_bus_dev *nsim_bus_dev_get(unsigned int id);
+>> -- 
+>> 2.39.3
+>>
+>>
 
