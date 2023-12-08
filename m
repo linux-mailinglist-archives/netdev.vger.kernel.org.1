@@ -1,71 +1,77 @@
-Return-Path: <netdev+bounces-55311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 660B780A510
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 15:03:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 722C380A527
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 15:11:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1984C281800
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 14:03:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2BF71C20A5E
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 14:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E832D1DDCA;
-	Fri,  8 Dec 2023 14:03:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 015FF1DDD8;
+	Fri,  8 Dec 2023 14:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fOm59JhL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QjXWUsLg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81A48F9;
-	Fri,  8 Dec 2023 06:03:41 -0800 (PST)
-Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-5d7346442d4so20489317b3.2;
-        Fri, 08 Dec 2023 06:03:41 -0800 (PST)
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19A5610EB;
+	Fri,  8 Dec 2023 06:11:26 -0800 (PST)
+Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-50c04ebe1bbso1991762e87.1;
+        Fri, 08 Dec 2023 06:11:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702044220; x=1702649020; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1702044684; x=1702649484; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vq1VOSqoVjxWvcT4zuInZBLiz41JyrThxjwY/ZgTFVU=;
-        b=fOm59JhL+2qGq1LVM/oE7xTxCeolcamuek9FFvbLaWLe4NVCqnHOaiVQhKQzAbVsoO
-         8IOmOPOlq7Q0yht44wUKi4kNMwRPC4DLYD2C08HJLcUUQobnJAyyGtSHxMpOxS1sEPez
-         JvF0VliM4q4O0OtjjEOdCIHczQnwk+yJXMLRQqox/fX005f5MujtxgNX8ehpSzD69pm3
-         3OrsaUzHggAftxtzzQOwUXB25F0DMBVfmICKfwkN+uqqDfdOXg3W8pR77Yz0Ul2owgNp
-         as4i3JA9fNIo7Z8lhE/91GSA3k1PqeP5deuzdKeVAcQdnihO1tO4swsWNS8MqHtY0II2
-         m/zw==
+        bh=Ofk5EFlKJHCqg0e0b4hwUj6ByVii3nlBz86s3UMME0U=;
+        b=QjXWUsLg24F6bBoLAWT3inePh9UrHcZbukyROPmGhFzA7Closh0Bupoc3TbTti2PbU
+         RSU9dfW/dFxfjct3DqT7TdO5ZUsJhlLqtkxZrKTImVssro9QzrFCIWQjltSMIx90e+Fy
+         d/x1MNDGi9UnTO8v3k429tC3ZXGKatHntO5HLI72CdBPczd/Xw6ujpYp9o57eD1x6Zsq
+         X+3iS4Pi0/Nb3ybQr1UpjTga2ZUfqApbUek129ajr+wd5VIqrzHJ0RtTPxKaA4cxyTxU
+         w1PGAylqrh+HEKlSCBxBeSsktGD0WppwwJlwB1j3Pqg8sMT2Rptb6DKz1wLTAFKI4ABx
+         nssw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702044220; x=1702649020;
+        d=1e100.net; s=20230601; t=1702044684; x=1702649484;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Vq1VOSqoVjxWvcT4zuInZBLiz41JyrThxjwY/ZgTFVU=;
-        b=vghIf+iSQPkZp/iD9ZbzF5dwrkjw/2Xg8igEnM78VBLrp+CKqzfD7ns4d4o/+Aahit
-         MMgOekHIMHE1Tif1hCFULeNozUXWjrRNHYxFqsrtiyHM6SJpt92rfr5FlEAYwh1H7gyJ
-         uBH1IO8KljYaFAlmF1d/qDQZpEWfev0tTupINxK02U8WfqTrRCuxA3ec5kcAlrFYD0Pr
-         1u3u05D/cVnvvoKPPZjQewRDh2dQoeyAzLLv4WlAvNIDT0GsANjZR6YEuS9xsmpoapSs
-         IMIMyuJRbuK2us3SmpqQ61klGSSu3L4xuymKypTFscHWheTuj4DVnMkyl7FhwY3fxMl8
-         FWjg==
-X-Gm-Message-State: AOJu0YyFUbZPMjRajwIs3MI0JBOQOIA5+lbDzuHdXEzyXH5hh/wt22vG
-	+FpqJmaP5Iz1brAYyTOh4xw=
-X-Google-Smtp-Source: AGHT+IFZPGq/PPeI2SQ4w5pXqgaG1TPzCcDB20LoxYTWV05p7WatZaKHyKzuZMA8VTYLe7M1JHSKGw==
-X-Received: by 2002:a81:4990:0:b0:5d7:1941:3579 with SMTP id w138-20020a814990000000b005d719413579mr3614832ywa.96.1702044220488;
-        Fri, 08 Dec 2023 06:03:40 -0800 (PST)
-Received: from localhost ([2601:344:8301:57f0:cd3e:7dc3:93ad:7de2])
-        by smtp.gmail.com with ESMTPSA id o130-20020a0dcc88000000b005d392d15725sm676865ywd.94.2023.12.08.06.03.39
+        bh=Ofk5EFlKJHCqg0e0b4hwUj6ByVii3nlBz86s3UMME0U=;
+        b=sRP4F3o8kcNYiRR5lY995q7ToPSB3g1S0HUVEELI9leInltcQFC7lbvVF+vwc12MUK
+         1sElcDOVuyuz0Iq07GnZZD6t/HkwdsKgzIo6kERedVQonEDo4mISdW8JfLZBCjpEPOpy
+         Z2cBITNIpADSKQROFKE9JN3r3P+h7JH4okX5oWjRsNVU+vcPjV/r+ZLYkAKNIxU5WWms
+         3LM33bzSEIIqPxMd+0jzeSfS2ixjJ83xmfS02tcpTpw9p8/iW5HErffcwM/2nRgl45H6
+         Xh+lBn23LFh1v8ATxVq/wv6LQki0Us1oufubRuFwTE3T8LpVB5PFew2umjbdVb0IoQl0
+         R1hg==
+X-Gm-Message-State: AOJu0YwzTnj/8+wFz85TI9iOb4qe4xMKyXV6Z1+cfI6M37fFX5ZIzFgS
+	1/qxLatYoZb5CqPQa3ldlrk=
+X-Google-Smtp-Source: AGHT+IHQoKexKqSk3g1ukd9drV99fhdVEIs2x55bN7mQBgSXsFoh7P9MpUi5tw0wGeY3is7raDfp6A==
+X-Received: by 2002:a05:6512:3c96:b0:50b:c50c:dbc4 with SMTP id h22-20020a0565123c9600b0050bc50cdbc4mr189960lfv.0.1702044683891;
+        Fri, 08 Dec 2023 06:11:23 -0800 (PST)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id k4-20020a05651210c400b0050bef21a012sm226400lfg.191.2023.12.08.06.11.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Dec 2023 06:03:40 -0800 (PST)
-Date: Fri, 8 Dec 2023 06:03:39 -0800
-From: Yury Norov <yury.norov@gmail.com>
-To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
-	leon@kernel.org, cai.huoqing@linux.dev, ssengar@linux.microsoft.com,
-	vkuznets@redhat.com, tglx@linutronix.de,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	schakrabarti@microsoft.com, paulros@microsoft.com
-Subject: Re: [PATCH V5 net-next] net: mana: Assigning IRQ affinity on HT cores
-Message-ID: <ZXMiOwK3sOJNXHxd@yury-ThinkPad>
-References: <1702029754-6520-1-git-send-email-schakrabarti@linux.microsoft.com>
+        Fri, 08 Dec 2023 06:11:23 -0800 (PST)
+Date: Fri, 8 Dec 2023 17:11:20 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Jose Abreu <Jose.Abreu@synopsys.com>, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, Tomer Maimon <tmaimon77@gmail.com>, 
+	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+	Conor Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, openbmc@lists.ozlabs.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 10/16] net: pcs: xpcs: Add generic DW XPCS
+ MDIO-device support
+Message-ID: <nflj4ajgx3byqhwna2eslldwulbbafmcwba4dwgxo65o5c7pmj@zbgqt2zje4ix>
+References: <20231205103559.9605-1-fancer.lancer@gmail.com>
+ <20231205103559.9605-11-fancer.lancer@gmail.com>
+ <20231205111351.xjjuwpbf7kwg3vuh@skbuf>
+ <uivunnjv5vi3w3fkc5w2f4lem5bingrgajgjfsu2ih7fuhz6hd@3naeubr5spak>
+ <20231205122316.ihhpklv222f5giz3@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,190 +80,188 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1702029754-6520-1-git-send-email-schakrabarti@linux.microsoft.com>
+In-Reply-To: <20231205122316.ihhpklv222f5giz3@skbuf>
 
-On Fri, Dec 08, 2023 at 02:02:34AM -0800, Souradeep Chakrabarti wrote:
-> Existing MANA design assigns IRQ to every CPU, including sibling
-> hyper-threads. This may cause multiple IRQs to be active simultaneously
-> in the same core and may reduce the network performance with RSS.
+Hi Vladimir
 
-Can you add an IRQ distribution diagram to compare before/after
-behavior, similarly to what I did in the other email?
-
-> Improve the performance by assigning IRQ to non sibling CPUs in local
-> NUMA node. The performance improvement we are getting using ntttcp with
-> following patch is around 15 percent with existing design and approximately
-> 11 percent, when trying to assign one IRQ in each core across NUMA nodes,
-> if enough cores are present.
-
-How did you measure it? In the other email you said you used perf, can
-you show your procedure in details?
-
-> Suggested-by: Yury Norov <yury.norov@gmali.com>
-> Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-> ---
-
-[...]
-
->  .../net/ethernet/microsoft/mana/gdma_main.c   | 92 +++++++++++++++++--
->  1 file changed, 83 insertions(+), 9 deletions(-)
+On Tue, Dec 05, 2023 at 02:23:16PM +0200, Vladimir Oltean wrote:
+> On Tue, Dec 05, 2023 at 02:35:46PM +0300, Serge Semin wrote:
+> > Omg, thank you very much for testing the series straight away and
+> > sorry for the immediate trouble it caused. I'll need some more time
+> > for investigation. I'll get back to this topic a bit later on this
+> > week.
 > 
-> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> index 6367de0c2c2e..18e8908c5d29 100644
-> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> @@ -1243,15 +1243,56 @@ void mana_gd_free_res_map(struct gdma_resource *r)
->  	r->size = 0;
->  }
->  
-> +static int irq_setup(int *irqs, int nvec, int start_numa_node)
-> +{
-> +	int w, cnt, cpu, err = 0, i = 0;
-> +	int next_node = start_numa_node;
+> Don't worry, I got suspicious when I was CCed to review only a one-line
+> change in patch 11/16. It's never about that one line, is it?)
 
-What for this?
+Right. I should have added you to the list of recipients of the entire
+series since the patchset changes more than that. The bug you caught
+brightly highlights my mistake. I'll make sure you are in the list.
+I'll add Jiawen and Mengyuan there too since the driver under their
+maintenance is also affected. Hopefully they'll get to test the series
+too.
 
-> +	const struct cpumask *next, *prev = cpu_none_mask;
-> +	cpumask_var_t curr, cpus;
-> +
-> +	if (!zalloc_cpumask_var(&curr, GFP_KERNEL)) {
-> +		err = -ENOMEM;
-> +		return err;
-> +	}
-> +	if (!zalloc_cpumask_var(&cpus, GFP_KERNEL)) {
+> 
+> Anyway, the NULL dev->p is a symptom of device_add() not having been
+> called, most likely from mdio_device_register().
 
-                free(curr);
+Absolutely right. I thought that mdio_device_create() having the
+device_initialize() method called was enough for the device_attach()
+function being happy. It turns out it wasn't and I missed that the
+device_private instance is allocated only on the device registration.
+So I'll need to call mdio_device_register() after all, if I get to
+preserve the current design of the solution.
 
-> +		err = -ENOMEM;
-> +		return err;
-> +	}
-> +
-> +	rcu_read_lock();
-> +	for_each_numa_hop_mask(next, next_node) {
-> +		cpumask_andnot(curr, next, prev);
-> +		for (w = cpumask_weight(curr), cnt = 0; cnt < w; ) {
-> +			cpumask_copy(cpus, curr);
-> +			for_each_cpu(cpu, cpus) {
-> +				irq_set_affinity_and_hint(irqs[i], topology_sibling_cpumask(cpu));
-> +				if (++i == nvec)
-> +					goto done;
+> 
+> I'll be honest and say that I still don't quite understand what you're
+> trying to achieve. You're trying to bind the hardcoded mdio_devices
+> created by xpcs_create() to a driver? 
 
-Think what if you're passed with irq_setup(NULL, 0, 0).
-That's why I suggested to place this check at the beginning.
+My idea was to reuse the mdio_device which has already been created
+either by means of the MDIO-bus OF-subnode or by means of the MDIO-bus
+board_info infrastructure (can be utilized in the SJA1105 or Wangxun
+Tx GBE). The xpcs_create() method then either probes the device on the MDIO
+bus and gets ID from there, or just uses the custom IDs based on the
+OF compatible match table or on the platform_data. If no MDIO-device
+was created my patchset is supposed to preserve the previous
+semantics: create MDIO-device, probe the device on the MDIO-bus, get
+device IDs from there. See the next patch for more details:
+https://lore.kernel.org/netdev/20231205103559.9605-11-fancer.lancer@gmail.com/
 
+> That was attempted a while ago by
+> Sean Anderson with the Lynx PCS. Are you aware of the fact that even in
+> the good case in which binding the driver actually works, the user can
+> then come along and unbind it from the PCS device, and phylink isn't
+> prepared to handle that, so it will crash the kernel upon the next
+> phylink_pcs call?
 
-> +				cpumask_andnot(cpus, cpus, topology_sibling_cpumask(cpu));
-> +				++cnt;
-> +			}
-> +		}
-> +		prev = next;
-> +	}
-> +done:
-> +	rcu_read_unlock();
-> +	free_cpumask_var(curr);
-> +	free_cpumask_var(cpus);
-> +	return err;
-> +}
-> +
->  static int mana_gd_setup_irqs(struct pci_dev *pdev)
->  {
-> -	unsigned int max_queues_per_port = num_online_cpus();
->  	struct gdma_context *gc = pci_get_drvdata(pdev);
-> +	unsigned int max_queues_per_port;
->  	struct gdma_irq_context *gic;
->  	unsigned int max_irqs, cpu;
-> -	int nvec, irq;
-> +	int start_irq_index = 1;
-> +	int nvec, *irqs, irq;
->  	int err, i = 0, j;
->  
-> +	cpus_read_lock();
-> +	max_queues_per_port = num_online_cpus();
->  	if (max_queues_per_port > MANA_MAX_NUM_QUEUES)
->  		max_queues_per_port = MANA_MAX_NUM_QUEUES;
->  
-> @@ -1261,6 +1302,14 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
->  	nvec = pci_alloc_irq_vectors(pdev, 2, max_irqs, PCI_IRQ_MSIX);
->  	if (nvec < 0)
->  		return nvec;
-> +	if (nvec <= num_online_cpus())
-> +		start_irq_index = 0;
-> +
-> +	irqs = kmalloc_array((nvec - start_irq_index), sizeof(int), GFP_KERNEL);
-> +	if (!irqs) {
-> +		err = -ENOMEM;
-> +		goto free_irq_vector;
-> +	}
->  
->  	gc->irq_contexts = kcalloc(nvec, sizeof(struct gdma_irq_context),
->  				   GFP_KERNEL);
-> @@ -1287,21 +1336,44 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
->  			goto free_irq;
->  		}
->  
-> -		err = request_irq(irq, mana_gd_intr, 0, gic->name, gic);
-> -		if (err)
-> -			goto free_irq;
-> -
-> -		cpu = cpumask_local_spread(i, gc->numa_node);
-> -		irq_set_affinity_and_hint(irq, cpumask_of(cpu));
-> +		if (!i) {
-> +			err = request_irq(irq, mana_gd_intr, 0, gic->name, gic);
-> +			if (err)
-> +				goto free_irq;
-> +
-> +			/* If number of IRQ is one extra than number of online CPUs,
-> +			 * then we need to assign IRQ0 (hwc irq) and IRQ1 to
-> +			 * same CPU.
-> +			 * Else we will use different CPUs for IRQ0 and IRQ1.
-> +			 * Also we are using cpumask_local_spread instead of
-> +			 * cpumask_first for the node, because the node can be
-> +			 * mem only.
-> +			 */
-> +			if (start_irq_index) {
-> +				cpu = cpumask_local_spread(i, gc->numa_node);
+To be honest I didn't consider the driver bind/unbind option. But my
+case a bit different. DW XPCS MDIO-device is supposed to be created
+automatically by means of the DW XPCS MI driver from the DT-nodes
+hierarchy like this:
+mdio@1f05d000 {
+	compatible = "snps,dw-xpcs-mi";
+	reg = <0 0x1f05d000 0 0x1000>;
 
-I already mentioned that: if i == 0, you don't need to spread, just
-pick 1st cpu from node.
+	xgmac_pcs: ethernet-pcs@0 {
+		compatible = "snps,dw-xpcs";
+		reg = <0>;
+	};
+};
+The platform-device is created for the mdio@1f05d000 node for which
+the DW XPCS MI driver is loaded, which calls the
+devm_of_mdiobus_register() in the probe() method which registers the
+MDIO-bus and then creates the MDIO-device from the ethernet-pcs@0
+node. The DW XPCS MDIO-device driver is attached to that MDIO-device
+then. In such model the PCS can be supplied to the DW *MAC via the
+"pcs-handle = &xgmac_pcs" property.
 
-> +				irq_set_affinity_and_hint(irq, cpumask_of(cpu));
-> +			} else {
-> +				irqs[start_irq_index] = irq;
-> +			}
-> +		} else {
-> +			irqs[i - start_irq_index] = irq;
-> +			err = request_irq(irqs[i - start_irq_index], mana_gd_intr, 0,
-> +					  gic->name, gic);
-> +			if (err)
-> +				goto free_irq;
-> +		}
->  	}
->  
-> +	err = irq_setup(irqs, (nvec - start_irq_index), gc->numa_node);
-> +	if (err)
-> +		goto free_irq;
->  	err = mana_gd_alloc_res_map(nvec, &gc->msix_resource);
->  	if (err)
->  		goto free_irq;
->  
->  	gc->max_num_msix = nvec;
->  	gc->num_msix_usable = nvec;
-> -
-> +	cpus_read_unlock();
->  	return 0;
->  
->  free_irq:
-> @@ -1314,8 +1386,10 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
->  	}
->  
->  	kfree(gc->irq_contexts);
-> +	kfree(irqs);
->  	gc->irq_contexts = NULL;
->  free_irq_vector:
-> +	cpus_read_unlock();
->  	pci_free_irq_vectors(pdev);
->  	return err;
->  }
-> -- 
-> 2.34.1
+Regarding the current semantics it's preserved in the framework of the
+xpcs_create_byaddr() method (former xpcs_create_mdiodev()) by means of
+the next code snippet:
+        if (mdiobus_is_registered_device(bus, addr)) {
+                mdiodev = bus->mdio_map[addr];
+                mdio_device_get(mdiodev);
+        } else {
+                mdiodev = mdio_device_create(bus, addr);
+                if (IS_ERR(mdiodev))
+                        return ERR_CAST(mdiodev);
+        }
+Device can be automatically created if before registering the MDIO-bus
+the xpcs_create_byaddr() caller registered the MDIO-device board info
+by means of the mdiobus_register_board_info() method. In addition to
+that it's now possible to supply some custom data (custom device IDs
+in my implementation) to the XPCS driver by means of the
+mdio_board_info.platform_data field. See the next patch for
+reference:
+https://lore.kernel.org/netdev/20231205103559.9605-14-fancer.lancer@gmail.com
+
+So what the difference with the Lynx PCS is that in my case the
+MDIO-device is created automatically as a result of the DW XPCS MI
+MDIO-bus registration. Additionally I implemented the MDIO-device
+creation based on the MDIO-board-info, thus there won't be need in the
+calling mdio_device_create() on each xpcs_create_mdiodev() invocation.
+The later part isn't that important in the framework of this
+conversation, but just so you be aware.
+
+Regarding the driver bind/unbind. As I said I didn't actually consider
+that option. On the other hand my DW XPCS MDIO-device driver doesn't
+do actual probe() or remove(). The only implemented thing is the
+of_device_id table, which is used to assign PCS and PMA IDs if
+required based on the DT compatible property. So I can easily drop any
+MDIO device-driver part and parse the of_device_id table right in the
+xpcs_create_bynode(). From that perspective my implementation won't
+differ much from the Lynx PCS design. The only difference will be is
+the way the MDIO-bus is created and registered. In case of Lynx PCS
+the bus is created by the MAC-driver itself. In my case DW XPCS MI is
+currently created in the framework of the separate platform driver. Do
+you think it would be better to follow the Lynx design pattern in
+order to get rid from the possibility of the DW XPCS MI driver being
+unbound behind the STMMAC+XPCS couple back?
+
+In this case the Dw MAC DT-node hierarchy would look like this:
+
+xgmac: ethernet@1f054000 {
+	compatible = "snps,dwxgmac";
+	reg = <0 0x1f054000 0 0x4000>;
+	reg-names = "stmmaceth";
+	ranges;
+
+	...
+
+	pcs-handle = &xgmac_pcs;
+
+	// DW XPCS MI to access the DW XPCS attached to the device
+	mdio@1f05d000 {
+		compatible = "snps,dwmac-mi";
+		reg = <0 0x1f05d000 0 0x1000>;
+
+		xgmac_pcs: ethernet-pcs@0 {
+			compatible = "snps,dw-xpcs";
+			reg = <0>;
+		};
+	};
+
+	// Normal MDIO-bus to access external PHYs (it's also called
+	// as SMA - Station Management Agent - by Synopsys)
+	mdio {
+		compatible = "snps,dwmac-mdio";
+		#address-cells = <1>;
+		#size-cells = <0>;
+	};
+};
+
+I actually thought to use that hardware description pattern instead,
+but after some meditation around that I decided that having the DW
+XPCS device defined separately from the DW MAC node seemed better at
+least from the code separation point of view. Now I think that it
+wasn't the best decision. DW XPCS is always attached to the DW XGMAC
+controller. So it would be more correct having it defined as a
+sub-node. It would also helped to avoid the platform device driver
+bind/unbind problem.
+
+What do you think? Should I re-design my patchset to be supporting the
+design above? (After having conversion with you I am more inclined to
+do that now than to stick with the currently implemented solution.)
+
+> 
+> The pcs-rzn1-miic.c driver puts a device_link to the MAC to at least
+> tear down the whole thing when the PCS is unbound, which is saner than
+> crashing the kernel. I don't see the equivalent protection mechanism here?
+
+You are right. I don't have any equivalent protection here. Thanks for
+suggesting a solution.
+
+> 
+> Can't the xpcs continue to live without a bound driver? Having a
+> compatible string in the OF description is perfectly fine though,
+> and should absolutely not preclude that.
+
+As I explained above Dw XPCS device can live without a bound driver
+because the DW XPCS MDIO-driver doesn't do much but merely gets to be
+bound based on the of_device_id table. In my case the problem is in
+the DW XPCS MI driver which indeed can be detached. Please see my
+long-read text above.
+
+-Serge(y)
 
