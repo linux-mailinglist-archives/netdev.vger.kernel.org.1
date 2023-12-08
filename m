@@ -1,78 +1,177 @@
-Return-Path: <netdev+bounces-55480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64B4E80AFCE
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 23:43:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F18680AFD4
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 23:47:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 957A91C208D4
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 22:43:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CECA31C20CF8
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 22:47:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E625731D;
-	Fri,  8 Dec 2023 22:43:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13E6C59B6F;
+	Fri,  8 Dec 2023 22:46:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M/QkwhKJ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="anFV4EKn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3461FDC
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 22:43:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E4A5C433C8;
-	Fri,  8 Dec 2023 22:43:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702075419;
-	bh=4dk0wB0ntBuE9qKmRgOx/kLpNWsUmXN375Y8A2keUoY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=M/QkwhKJR0AIuK7YvoNb2KtB7CPluRug0UBJ1Na7P1uiQIAr3peCUR1ZVFCHF91KP
-	 kq/zjHeG3IyVmukNPo9rYU41E7Q6qvalxfimfA97sHrkgl5kBcFZyGnVfWMYaJUQBh
-	 UBN6JKqpQTvvKkw5tfcndMe7cyAgFE3I6os7Qe59FaBq0fo7F7RYpAkwsVlnjlF8Wj
-	 hQWxEYlcCELD2ysjH/E/08/F0Gnqmc7gtkKYZ+IITdJ5u/wf2a+jS96rDvv0IxkBZQ
-	 fERfNwTUtE7wPEMow+ozO3sX1x6na5u0thkkVUgLRN1qZFjJRO4Oz4IFjLHvPDw5o1
-	 lu4vW38Q9ucSQ==
-Message-ID: <353fc304-389b-4c16-b78f-20128d688370@kernel.org>
-Date: Fri, 8 Dec 2023 15:43:38 -0700
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39250AC;
+	Fri,  8 Dec 2023 14:46:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=9AtZTt6OGfjsPDJQOtDfx5Cu6irtFkmWZMjDyBOLAY8=; b=anFV4EKnBK8gQJUQaPbHBdGbmh
+	b2Y7tMQ6hHkQDT5vgOGk/97h6xyIa4MDZnDQV4WFLZMH0Moc2XQBReqMlEddNf22x5eaw0zAoXtGq
+	dyQwgTqMZqIOn/1N4xYUukkUwd2BIl/rwN+ayXO0Y2NWwvxlGU3Yxjp8/bdR9jO8fTnclXdXuFPiN
+	/eQ1qV70Ux813zNWm90BtR+BVtsuhQ7+lpHQtd95lVHbKAbeBGyJQhSdn2Nf39E/FRT7aa1T5sy3K
+	KtlIjlSiXtHdzhKo1SHrWhL9Azqgm2vU4mbnqe/RW5vhus/b8/1CvhOM+ExeLbzwwDLJKGTkrTFIZ
+	Ez+2V7qQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rBjba-006iqm-2j;
+	Fri, 08 Dec 2023 22:46:00 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id C66943003F0; Fri,  8 Dec 2023 23:45:57 +0100 (CET)
+Date: Fri, 8 Dec 2023 23:45:57 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Jiri Olsa <olsajiri@gmail.com>, Song Liu <song@kernel.org>,
+	Song Liu <songliubraving@meta.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Arnd Bergmann <arnd@arndb.de>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Kees Cook <keescook@chromium.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	linux-riscv <linux-riscv@lists.infradead.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Network Development <netdev@vger.kernel.org>,
+	bpf <bpf@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>,
+	clang-built-linux <llvm@lists.linux.dev>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Joao Moreira <joao@overdrivepizza.com>,
+	Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v2 2/2] x86/cfi,bpf: Fix BPF JIT call
+Message-ID: <20231208224557.GH36716@noisy.programming.kicks-ass.net>
+References: <20231207093105.GA28727@noisy.programming.kicks-ass.net>
+ <ivhrgimonsvy3tyj5iidoqmlcyqvtsh2ay3cm3ouemsdbvjzs4@6jlt6zv55tgh>
+ <20231208102940.GB28727@noisy.programming.kicks-ass.net>
+ <20231208134041.GD28727@noisy.programming.kicks-ass.net>
+ <20231208172152.GD36716@noisy.programming.kicks-ass.net>
+ <CAADnVQKsnZfFomQ4wTZz=jMZW5QCV2XiXVsi64bghHkAjJtcmA@mail.gmail.com>
+ <20231208203535.GG36716@noisy.programming.kicks-ass.net>
+ <CAADnVQJzCw=qcG+jHBYG0q0SxLPkwghni0wpgV4A4PkpgVbGPw@mail.gmail.com>
+ <20231208205241.GK28727@noisy.programming.kicks-ass.net>
+ <CAADnVQL3KsJONShsstDq5jrpbc_4FOU-VQPJgDCt50N9asoFzA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/2] net/ipv6: insert a f6i to a GC list only
- if the f6i is in a fib6_table tree.
-Content-Language: en-US
-To: thinker.li@gmail.com, netdev@vger.kernel.org, martin.lau@linux.dev,
- kernel-team@meta.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com
-Cc: sinquersw@gmail.com, kuifeng@meta.com,
- syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com
-References: <20231208194523.312416-1-thinker.li@gmail.com>
- <20231208194523.312416-2-thinker.li@gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20231208194523.312416-2-thinker.li@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAADnVQL3KsJONShsstDq5jrpbc_4FOU-VQPJgDCt50N9asoFzA@mail.gmail.com>
 
-On 12/8/23 12:45 PM, thinker.li@gmail.com wrote:
-> From: Kui-Feng Lee <thinker.li@gmail.com>
+On Fri, Dec 08, 2023 at 12:58:01PM -0800, Alexei Starovoitov wrote:
+> On Fri, Dec 8, 2023 at 12:52 PM Peter Zijlstra <peterz@infradead.org> wrote:
+> >
+> > On Fri, Dec 08, 2023 at 12:41:03PM -0800, Alexei Starovoitov wrote:
+> > > On Fri, Dec 8, 2023 at 12:35 PM Peter Zijlstra <peterz@infradead.org> wrote:
+> >
+> > > > -__bpf_kfunc void bpf_task_release(struct task_struct *p)
+> > > > +__bpf_kfunc void bpf_task_release(void *p)
+> > >
+> > > Yeah. That won't work. We need a wrapper.
+> > > Since bpf prog is also calling it directly.
+> > > In progs/task_kfunc_common.h
+> > > void bpf_task_release(struct task_struct *p) __ksym;
+> > >
+> > > than later both libbpf and the verifier check that
+> > > what bpf prog is calling actually matches the proto
+> > > of what is in the kernel.
+> > > Effectively we're doing strong prototype check at load time.
+> >
+> > I'm still somewhat confused on how this works, where does BPF get the
+> > address of the function from? and what should I call the wrapper?
 > 
-> Check f6i->fib6_node and hlist_unhashed(&f6i->gc_link) before inserting a
-> f6i (fib6_info) to tb6_gc_hlist.
+> It starts with
+> register_btf_id_dtor_kfuncs() that takes a set of btf_ids:
+> {btf_id_of_type, btf_id_of_dtor_function}, ...
 > 
-> The current implementation checks if f6i->fib6_table is not NULL to
-> determines if a f6i is on a tree, however it is not enough. When a f6i is
-> removed from a fib6_table, f6i->fib6_table is not reset. However, fib6_node
-> is always reset when a f6i is removed from a fib6_table and is set when a
-> f6i is added to a fib6_table. So, f6i->fib6_node is a reliable way to
-> determine if a f6i is on a tree.
+> Then based on btf_id_of_dtor_function we find its type proto, name, do checks,
+> and eventually:
+> addr = kallsyms_lookup_name(dtor_func_name);
+> field->kptr.dtor = (void *)addr;
+> 
+> bpf_task_release(struct task_struct *p) would need to stay as-is,
+> but we can have a wrapper
+> void bpf_task_release_dtor(void *p)
+> {
+>   bpf_task_release(p);
+> }
+> 
+> And adjust the above lookup with extra "_dtor" suffix.
+> 
+> > > btw instead of EXPORT_SYMBOL_GPL(bpf_task_release)
+> > > can __ADDRESSABLE be used ?
+> > > Since it's not an export symbol.
+> >
+> > No __ADDRESSABLE() is expressly ignored, but we have IBT_NOSEAL() that
+> > should do it. I'll rename the thing and lift it out of x86 to avoid
+> > breaking all other arch builds.
+> 
+> Makes sense.
 
-Which is an indication that the table is not the right check but neither
-is the fib6_node. If expires is set on a route entry, add it to the
-gc_list; if expires is reset on a route entry, remove it from the
-gc_list. If the value of expires is changed while on the gc_list list,
-just update the expires value.
+Ok, did that. Current patches (on top of bpf-next) are here:
 
+  git://git.kernel.org/pub/scm/linux/kernel/git/peterz/queue.git x86/cfi
+
+(really should try and write better changelogs, but it's too late)
+
+The test_progs thing still doesn't run to completion, the next problem
+seems to be bpf_throw():
+
+[  247.720159]  ? die+0xa4/0xd0
+[  247.720216]  ? do_trap+0xa5/0x180
+[  247.720281]  ? __cfi_bpf_prog_8ac473954ac6d431_F+0xd/0x10
+[  247.720368]  ? __cfi_bpf_prog_8ac473954ac6d431_F+0xd/0x10
+[  247.720459]  ? do_error_trap+0xba/0x120
+[  247.720525]  ? __cfi_bpf_prog_8ac473954ac6d431_F+0xd/0x10
+[  247.720614]  ? handle_invalid_op+0x2c/0x40
+[  247.720684]  ? __cfi_bpf_prog_8ac473954ac6d431_F+0xd/0x10
+[  247.720775]  ? exc_invalid_op+0x38/0x60
+[  247.720840]  ? asm_exc_invalid_op+0x1a/0x20
+[  247.720909]  ? 0xffffffffc001ba54
+[  247.720971]  ? __cfi_bpf_prog_8ac473954ac6d431_F+0xd/0x10
+[  247.721063]  ? bpf_throw+0x9b/0xf0
+[  247.721126]  ? bpf_test_run+0x108/0x350
+[  247.721191]  ? bpf_prog_5555714b685bf0cf_exception_throw_always_1+0x26/0x26
+[  247.721301]  ? bpf_test_run+0x108/0x350
+[  247.721368]  bpf_test_run+0x212/0x350
+[  247.721433]  ? slab_build_skb+0x22/0x110
+[  247.721503]  bpf_prog_test_run_skb+0x347/0x4a0
+
+But I'm too tired to think staight. Is  this a bpf_callback_t vs
+bpf_exception_cb difference?
+
+I'll prod more later. Zzzz..
 
