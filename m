@@ -1,191 +1,272 @@
-Return-Path: <netdev+bounces-55301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1022D80A342
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 13:33:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6941180A34F
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 13:35:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41EE81C2099F
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 12:33:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E1B41F214E9
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 12:35:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 907AE11711;
-	Fri,  8 Dec 2023 12:33:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06574125BD;
+	Fri,  8 Dec 2023 12:35:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WkLjTkWm"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="FIAXYAdb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742D51C69F
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 12:33:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54BEAC433C8;
-	Fri,  8 Dec 2023 12:33:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702038785;
-	bh=dlWWj4Bdhqr7C2dVCcyj3+UIMrzJ/knRjMCXsTqUMBc=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=WkLjTkWmIy3XFwJutIPKCWoYB065sAr9z0EO7YDkf+jkg3FMOwiEKDVa6W2vgilbR
-	 DfjJ1iECzdvKfB82trUzmP8JH0BgquQRXYKIULrhVhpXRrlf+bG7wjeH6xuwEpqxtM
-	 MPfa3ehJjrrmXjGXimDPIFZZq+KW1y3pPEVa8+1bgc2y8xYB6GnEiPpxPYcauzb5Gb
-	 fMcnfwsexXNZtsitHTgdBirYecU6+GmODac8cm7OwoBCEIEM9KMtZ84fgssqcIxBg1
-	 Ea6g1wr0zXqdyezohJJmiB2s63C4155I9wRDqOY04DDNjk1FiGk8hZoMTPzkAoxHe2
-	 rBkv5+XGZtPZA==
-Message-ID: <c6ca2492-20a9-47b9-a6ea-3feb6f3cb2d8@kernel.org>
-Date: Fri, 8 Dec 2023 14:33:00 +0200
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id AABDD1985;
+	Fri,  8 Dec 2023 04:35:14 -0800 (PST)
+Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 09A8220B74C0;
+	Fri,  8 Dec 2023 04:35:14 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 09A8220B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1702038914;
+	bh=7mA0Nk9JABJbzejc00vimgy7KH2zEY/kLfO3nzNRrOU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=FIAXYAdbbG7wXaKNZ9umrETLQ81Gi/K/zSK47IYj1vgWGJ5wPChtLP5AXt23/FtWY
+	 Eed/zyw783mRLv952yR/g0zTgvi2jm0zK+97NfdWxtx/r//fSeEYv89DQ8v0jy0xvl
+	 zz/u6tAppPcxRi7D9M5NaAdHiXObeQokUStsOePs=
+From: Konstantin Taranov <kotaranov@linux.microsoft.com>
+To: kotaranov@microsoft.com,
+	kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	kuba@kernel.org,
+	leon@kernel.org,
+	decui@microsoft.com,
+	edumazet@google.com,
+	cai.huoqing@linux.dev,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	longli@microsoft.com
+Cc: linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH] net: mana: add msix index sharing between EQs
+Date: Fri,  8 Dec 2023 04:35:05 -0800
+Message-Id: <1702038905-29520-1-git-send-email-kotaranov@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 net-next 6/8] net: ethernet: ti: am65-cpsw-qos: Add
- Frame Preemption MAC Merge support
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, s-vadapalli@ti.com, r-gunasekaran@ti.com,
- vigneshr@ti.com, srk@ti.com, horms@kernel.org, p-varis@ti.com,
- netdev@vger.kernel.org
-References: <20231201135802.28139-1-rogerq@kernel.org>
- <20231201135802.28139-7-rogerq@kernel.org>
- <20231204123531.tpjbt7byzdnrhs7f@skbuf>
- <8caf8252-4068-4d17-b919-12adfef074e5@kernel.org>
- <7d8fb848-a491-414b-adb8-d26a16a499a4@kernel.org>
-In-Reply-To: <7d8fb848-a491-414b-adb8-d26a16a499a4@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 
+From: Konstantin Taranov <kotaranov@microsoft.com>
 
+This patch allows to assign and poll more than 1 EQ on the same msix index.
+It is achieved by introducing a list of attached EQs in each IRQ context.
+This patch export symbols for creating EQs from other MANA kernel modules.
 
-On 08/12/2023 12:26, Roger Quadros wrote:
-> 
-> 
-> On 08/12/2023 12:13, Roger Quadros wrote:
->>
->>
->> On 04/12/2023 14:35, Vladimir Oltean wrote:
->>> On Fri, Dec 01, 2023 at 03:58:00PM +0200, Roger Quadros wrote:
->>>> Add driver support for viewing / changing the MAC Merge sublayer
->>>> parameters and seeing the verification state machine's current state
->>>> via ethtool.
->>>>
->>>> As hardware does not support interrupt notification for verification
->>>> events we resort to polling on link up. On link up we try a couple of
->>>> times for verification success and if unsuccessful then give up.
->>>>
->>>> The Frame Preemption feature is described in the Technical Reference
->>>> Manual [1] in section:
->>>> 	12.3.1.4.6.7 Intersperced Express Traffic (IET – P802.3br/D2.0)
->>>>
->>>> Due to Silicon Errata i2208 [2] we set limit min IET fragment size to 124.
->>>>
->>>> [1] AM62x TRM - https://www.ti.com/lit/ug/spruiv7a/spruiv7a.pdf
->>>> [2] AM62x Silicon Errata - https://www.ti.com/lit/er/sprz487c/sprz487c.pdf
->>>>
->>>> Signed-off-by: Roger Quadros <rogerq@kernel.org>
->>>> ---
->>>
->>> Actually...
->>>
->>> ld.lld: error: undefined symbol: am65_cpsw_iet_common_enable
->>>>>> referenced by am65-cpsw-ethtool.c:755 (drivers/net/ethernet/ti/am65-cpsw-ethtool.c:755)
->>>>>>               drivers/net/ethernet/ti/am65-cpsw-ethtool.o:(am65_cpsw_set_mm) in archive vmlinux.a
->>>
->>> ld.lld: error: undefined symbol: am65_cpsw_iet_commit_preemptible_tcs
->>>>>> referenced by am65-cpsw-ethtool.c:876 (drivers/net/ethernet/ti/am65-cpsw-ethtool.c:876)
->>>>>>               drivers/net/ethernet/ti/am65-cpsw-ethtool.o:(am65_cpsw_set_mm) in archive vmlinux.a
->>>
->>> cat $KBUILD_OUTPUT/.config | grep AM65
->>> CONFIG_TI_K3_AM65_CPSW_NUSS=y
->>> # CONFIG_TI_K3_AM65_CPSW_SWITCHDEV is not set
->>> # CONFIG_TI_K3_AM65_CPTS is not set
->>> CONFIG_MMC_SDHCI_AM654=y
->>> CONFIG_PHY_AM654_SERDES=m
->>>
->>> am65-cpsw-qos.c is built only if CONFIG_TI_AM65_CPSW_TAS is enabled, yet am65-cpsw-ethtool.c,
->>> built by CONFIG_TI_K3_AM65_CPSW_NUSS, depends on it.
->>
->> Wondering how to fix this the right way. Should set/get_mm fail if CONFIG_TI_AM65_CPSW_TAS is not enabled?
->>
-> 
-> How about this fix?
-> 
-> diff --git a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-> index 1ac4b9b53c93..688291d6038f 100644
-> --- a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-> +++ b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-> @@ -775,6 +775,9 @@ static int am65_cpsw_get_mm(struct net_device *ndev, struct ethtool_mm_state *st
->  	u32 port_ctrl, iet_ctrl, iet_status;
->  	u32 add_frag_size;
->  
-> +	if (!IS_ENABLED(CONFIG_TI_AM65_CPSW_TAS))
-> +		return -EOPNOTSUPP;
-> +
->  	mutex_lock(&priv->mm_lock);
->  
->  	iet_ctrl = readl(port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
-> @@ -827,6 +830,9 @@ static int am65_cpsw_set_mm(struct net_device *ndev, struct ethtool_mm_cfg *cfg,
->  	u32 val, add_frag_size;
->  	int err;
->  
-> +	if (!IS_ENABLED(CONFIG_TI_AM65_CPSW_TAS))
-> +		return -EOPNOTSUPP;
-> +
->  	err = ethtool_mm_frag_size_min_to_add(cfg->tx_min_frag_size, &add_frag_size, extack);
->  	if (err)
->  		return err;
-> diff --git a/drivers/net/ethernet/ti/am65-cpsw-qos.h b/drivers/net/ethernet/ti/am65-cpsw-qos.h
-> index 6df3c2c5a04b..946e89fbb314 100644
-> --- a/drivers/net/ethernet/ti/am65-cpsw-qos.h
-> +++ b/drivers/net/ethernet/ti/am65-cpsw-qos.h
-> @@ -100,6 +100,8 @@ void am65_cpsw_qos_link_up(struct net_device *ndev, int link_speed);
->  void am65_cpsw_qos_link_down(struct net_device *ndev);
->  int am65_cpsw_qos_ndo_tx_p0_set_maxrate(struct net_device *ndev, int queue, u32 rate_mbps);
->  void am65_cpsw_qos_tx_p0_rate_init(struct am65_cpsw_common *common);
-> +void am65_cpsw_iet_commit_preemptible_tcs(struct am65_cpsw_port *port);
-> +void am65_cpsw_iet_common_enable(struct am65_cpsw_common *common);
->  #else
->  static inline int am65_cpsw_qos_ndo_setup_tc(struct net_device *ndev,
->  					     enum tc_setup_type type,
-> @@ -124,10 +126,12 @@ static inline int am65_cpsw_qos_ndo_tx_p0_set_maxrate(struct net_device *ndev,
->  
->  static inline void am65_cpsw_qos_tx_p0_rate_init(struct am65_cpsw_common *common)
->  { }
-> +static inline void am65_cpsw_iet_commit_preemptible_tcs(struct am65_cpsw_port *port)
-> +{ }
-> +static inline void am65_cpsw_iet_common_enable(struct am65_cpsw_common *common)
-> +{ }
->  #endif
->  
-> -void am65_cpsw_iet_commit_preemptible_tcs(struct am65_cpsw_port *port);
-> -void am65_cpsw_iet_common_enable(struct am65_cpsw_common *common);
->  
->  #define AM65_CPSW_REG_CTL			0x004
->  #define AM65_CPSW_PN_REG_CTL			0x004
-> 
-> 
+Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
+---
+ .../net/ethernet/microsoft/mana/gdma_main.c   | 55 ++++++++++++++-----
+ .../net/ethernet/microsoft/mana/hw_channel.c  |  1 +
+ drivers/net/ethernet/microsoft/mana/mana_en.c |  1 +
+ include/net/mana/gdma.h                       |  4 +-
+ 4 files changed, 45 insertions(+), 16 deletions(-)
 
-But,
-
-bool __ethtool_dev_mm_supported(struct net_device *dev)
-{
-	const struct ethtool_ops *ops = dev->ethtool_ops;
-	struct ethtool_mm_state state = {};
-	int ret = -EOPNOTSUPP;
-
-	if (ops && ops->get_mm)
-		ret = ops->get_mm(dev, &state);
-
-	return !ret;
-}
-
-So looks like it is better to not define get_mm/set_mm if CONFIG_TI_AM65_CPSW_TAS is disabled.
-
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 6367de0..82a4534 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -401,6 +401,9 @@ static void mana_gd_process_eq_events(void *arg)
+ 	u32 head, num_eqe;
+ 	int i;
+ 
++	if (eq->id == INVALID_QUEUE_ID)
++		return;
++
+ 	gc = eq->gdma_dev->gdma_context;
+ 
+ 	num_eqe = eq->queue_size / GDMA_EQE_SIZE;
+@@ -414,8 +417,12 @@ static void mana_gd_process_eq_events(void *arg)
+ 
+ 		old_bits = (eq->head / num_eqe - 1) & GDMA_EQE_OWNER_MASK;
+ 		/* No more entries */
+-		if (owner_bits == old_bits)
++		if (owner_bits == old_bits) {
++			/* return here without ringing the doorbell */
++			if (i == 0)
++				return;
+ 			break;
++		}
+ 
+ 		new_bits = (eq->head / num_eqe) & GDMA_EQE_OWNER_MASK;
+ 		if (owner_bits != new_bits) {
+@@ -457,12 +464,16 @@ static int mana_gd_register_irq(struct gdma_queue *queue,
+ 
+ 	spin_lock_irqsave(&r->lock, flags);
+ 
+-	msi_index = find_first_zero_bit(r->map, r->size);
++	if (queue->eq.msix_index == INVALID_PCI_MSIX_INDEX)
++		queue->eq.msix_index = find_first_zero_bit(r->map, r->size);
++
++	msi_index = queue->eq.msix_index;
++
+ 	if (msi_index >= r->size || msi_index >= gc->num_msix_usable) {
+ 		err = -ENOSPC;
++		queue->eq.msix_index = INVALID_PCI_MSIX_INDEX;
+ 	} else {
+ 		bitmap_set(r->map, msi_index, 1);
+-		queue->eq.msix_index = msi_index;
+ 	}
+ 
+ 	spin_unlock_irqrestore(&r->lock, flags);
+@@ -476,9 +487,7 @@ static int mana_gd_register_irq(struct gdma_queue *queue,
+ 
+ 	gic = &gc->irq_contexts[msi_index];
+ 
+-	WARN_ON(gic->handler || gic->arg);
+-
+-	gic->arg = queue;
++	list_add_rcu(&queue->entry, &gic->eq_list);
+ 
+ 	gic->handler = mana_gd_process_eq_events;
+ 
+@@ -493,6 +502,7 @@ static void mana_gd_deregiser_irq(struct gdma_queue *queue)
+ 	struct gdma_resource *r;
+ 	unsigned int msix_index;
+ 	unsigned long flags;
++	struct gdma_queue *eq;
+ 
+ 	gc = gd->gdma_context;
+ 	r = &gc->msix_resource;
+@@ -502,12 +512,19 @@ static void mana_gd_deregiser_irq(struct gdma_queue *queue)
+ 	if (WARN_ON(msix_index >= gc->num_msix_usable))
+ 		return;
+ 
+-	gic = &gc->irq_contexts[msix_index];
+-	gic->handler = NULL;
+-	gic->arg = NULL;
+-
+ 	spin_lock_irqsave(&r->lock, flags);
+-	bitmap_clear(r->map, msix_index, 1);
++	gic = &gc->irq_contexts[msix_index];
++	list_for_each_entry_rcu(eq, &gic->eq_list, entry) {
++		if (queue == eq) {
++			list_del_rcu(&eq->entry);
++			synchronize_rcu();
++			break;
++		}
++	}
++	if (list_empty(&gic->eq_list)) {
++		gic->handler = NULL;
++		bitmap_clear(r->map, msix_index, 1);
++	}
+ 	spin_unlock_irqrestore(&r->lock, flags);
+ 
+ 	queue->eq.msix_index = INVALID_PCI_MSIX_INDEX;
+@@ -587,7 +604,8 @@ static int mana_gd_create_eq(struct gdma_dev *gd,
+ 	u32 log2_num_entries;
+ 	int err;
+ 
+-	queue->eq.msix_index = INVALID_PCI_MSIX_INDEX;
++	queue->eq.msix_index = spec->eq.msix_index;
++	queue->id = INVALID_QUEUE_ID;
+ 
+ 	log2_num_entries = ilog2(queue->queue_size / GDMA_EQE_SIZE);
+ 
+@@ -819,6 +837,7 @@ free_q:
+ 	kfree(queue);
+ 	return err;
+ }
++EXPORT_SYMBOL_NS(mana_gd_create_mana_eq, NET_MANA);
+ 
+ int mana_gd_create_mana_wq_cq(struct gdma_dev *gd,
+ 			      const struct gdma_queue_spec *spec,
+@@ -895,6 +914,7 @@ void mana_gd_destroy_queue(struct gdma_context *gc, struct gdma_queue *queue)
+ 	mana_gd_free_memory(gmi);
+ 	kfree(queue);
+ }
++EXPORT_SYMBOL_NS(mana_gd_destroy_queue, NET_MANA);
+ 
+ int mana_gd_verify_vf_version(struct pci_dev *pdev)
+ {
+@@ -1217,9 +1237,14 @@ int mana_gd_poll_cq(struct gdma_queue *cq, struct gdma_comp *comp, int num_cqe)
+ static irqreturn_t mana_gd_intr(int irq, void *arg)
+ {
+ 	struct gdma_irq_context *gic = arg;
++	struct list_head *eq_list = &gic->eq_list;
++	struct gdma_queue *eq;
+ 
+-	if (gic->handler)
+-		gic->handler(gic->arg);
++	if (gic->handler) {
++		list_for_each_entry_rcu(eq, eq_list, entry) {
++			gic->handler(eq);
++		}
++	}
+ 
+ 	return IRQ_HANDLED;
+ }
+@@ -1272,7 +1297,7 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
+ 	for (i = 0; i < nvec; i++) {
+ 		gic = &gc->irq_contexts[i];
+ 		gic->handler = NULL;
+-		gic->arg = NULL;
++		INIT_LIST_HEAD(&gic->eq_list);
+ 
+ 		if (!i)
+ 			snprintf(gic->name, MANA_IRQ_NAME_SZ, "mana_hwc@pci:%s",
+diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+index 9d1cd3b..0a5fc39 100644
+--- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
++++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+@@ -300,6 +300,7 @@ static int mana_hwc_create_gdma_eq(struct hw_channel_context *hwc,
+ 	spec.eq.context = ctx;
+ 	spec.eq.callback = cb;
+ 	spec.eq.log2_throttle_limit = DEFAULT_LOG2_THROTTLING_FOR_ERROR_EQ;
++	spec.eq.msix_index = INVALID_PCI_MSIX_INDEX;
+ 
+ 	return mana_gd_create_hwc_queue(hwc->gdma_dev, &spec, queue);
+ }
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index fc3d290..8718c04 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -1242,6 +1242,7 @@ static int mana_create_eq(struct mana_context *ac)
+ 	spec.eq.callback = NULL;
+ 	spec.eq.context = ac->eqs;
+ 	spec.eq.log2_throttle_limit = LOG2_EQ_THROTTLE;
++	spec.eq.msix_index = INVALID_PCI_MSIX_INDEX;
+ 
+ 	for (i = 0; i < gc->max_num_queues; i++) {
+ 		err = mana_gd_create_mana_eq(gd, &spec, &ac->eqs[i].eq);
+diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+index 88b6ef7..8d6569d 100644
+--- a/include/net/mana/gdma.h
++++ b/include/net/mana/gdma.h
+@@ -293,6 +293,7 @@ struct gdma_queue {
+ 
+ 	u32 head;
+ 	u32 tail;
++	struct list_head entry;
+ 
+ 	/* Extra fields specific to EQ/CQ. */
+ 	union {
+@@ -328,6 +329,7 @@ struct gdma_queue_spec {
+ 			void *context;
+ 
+ 			unsigned long log2_throttle_limit;
++			unsigned int msix_index;
+ 		} eq;
+ 
+ 		struct {
+@@ -344,7 +346,7 @@ struct gdma_queue_spec {
+ 
+ struct gdma_irq_context {
+ 	void (*handler)(void *arg);
+-	void *arg;
++	struct list_head eq_list;
+ 	char name[MANA_IRQ_NAME_SZ];
+ };
+ 
 -- 
-cheers,
--roger
+2.43.0
+
 
