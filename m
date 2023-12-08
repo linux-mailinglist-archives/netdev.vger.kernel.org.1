@@ -1,113 +1,146 @@
-Return-Path: <netdev+bounces-55236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0611D809F4F
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 10:28:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B522809F50
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 10:28:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90FA1B20B5A
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 09:28:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8239B1C20950
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 09:28:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 289E4125CE;
-	Fri,  8 Dec 2023 09:28:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Mg2s7S0A"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17AA125B0;
+	Fri,  8 Dec 2023 09:28:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C92CB172E;
-	Fri,  8 Dec 2023 01:28:14 -0800 (PST)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B81KRK0028755;
-	Fri, 8 Dec 2023 01:28:01 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-type; s=pfpt0220;
- bh=/SbDv81f8aUiAQr9WB+KgRejK4bzCZNzWZChpeYFMdQ=;
- b=Mg2s7S0AgHZg+UZ8F7cZgKwQNBAdpQZlye56Mx9YFtrg0eOsy+TWqoYNBgm9HOokcjik
- FDIsraN7ggk/i34x5t6g0c3DpkfYQKBLg9GeouXDvEAIqvaxNgLkKqAW0nPw61gjFrYW
- EDVgT8pcl8QP6LC7Pgkz7Vu6RiW1KhlbY5h26UkE3hpDTcNfgErDweDUBmZsRLb5CjQu
- M2idBUC/naRGAucUc7xma37m0OSUx+Zd4Sd5XoGygvvxKra+IVxmXl9ZzEgmOVhUUcPZ
- jC7xAyHaCOBmij90UmJxVmqKjtjipXcUwuv8Axd8eQk4o8KXdThfV0ES8ATEBssCcQAK og== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3uubddcfuk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Fri, 08 Dec 2023 01:28:01 -0800
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 8 Dec
- 2023 01:27:59 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Fri, 8 Dec 2023 01:27:59 -0800
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 4E1BB3F7050;
-	Fri,  8 Dec 2023 01:27:55 -0800 (PST)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <jerinj@marvell.com>, <lcherian@marvell.com>,
-        <sbhatta@marvell.com>, <hkelam@marvell.com>, <naveenm@marvell.com>,
-        <edumazet@google.com>, <pabeni@redhat.com>
-Subject: [net] octeontx2-af: Fix pause frame configuration
-Date: Fri, 8 Dec 2023 14:57:54 +0530
-Message-ID: <20231208092754.23462-1-hkelam@marvell.com>
-X-Mailer: git-send-email 2.17.1
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D79F1735;
+	Fri,  8 Dec 2023 01:28:24 -0800 (PST)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.53])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Smm1X2YcFz1Q6QK;
+	Fri,  8 Dec 2023 17:24:32 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 8 Dec
+ 2023 17:28:21 +0800
+Subject: Re: [PATCH net-next v6 08/12] libie: add Rx buffer management (via
+ Page Pool)
+To: Alexander Lobakin <aleksander.lobakin@intel.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Michal Kubiak
+	<michal.kubiak@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>,
+	Alexander Duyck <alexanderduyck@fb.com>, David Christensen
+	<drc@linux.vnet.ibm.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
+ Apalodimas <ilias.apalodimas@linaro.org>, Paul Menzel
+	<pmenzel@molgen.mpg.de>, <netdev@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <linux-kernel@vger.kernel.org>
+References: <20231207172010.1441468-1-aleksander.lobakin@intel.com>
+ <20231207172010.1441468-9-aleksander.lobakin@intel.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <1103fe8f-04c8-8cc4-8f1b-ff45cea22b54@huawei.com>
+Date: Fri, 8 Dec 2023 17:28:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: Hso7myGnRPfBIIAZF8GX1tvom3R3czf0
-X-Proofpoint-GUID: Hso7myGnRPfBIIAZF8GX1tvom3R3czf0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-08_04,2023-12-07_01,2023-05-22_02
+In-Reply-To: <20231207172010.1441468-9-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
 
-The current implementation's default Pause Forward setting is causing
-unnecessary network traffic. This patch disables Pause Forward to
-address this issue.
+On 2023/12/8 1:20, Alexander Lobakin wrote:
+...
 
-Fixes: 1121f6b02e7a ("octeontx2-af: Priority flow control configuration support")
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
-Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/rpm.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+> +
+> +/**
+> + * libie_rx_page_pool_create - create a PP with the default libie settings
+> + * @bq: buffer queue struct to fill
+> + * @napi: &napi_struct covering this PP (no usage outside its poll loops)
+> + *
+> + * Return: 0 on success, -errno on failure.
+> + */
+> +int libie_rx_page_pool_create(struct libie_buf_queue *bq,
+> +			      struct napi_struct *napi)
+> +{
+> +	struct page_pool_params pp = {
+> +		.flags		= PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
+> +		.order		= LIBIE_RX_PAGE_ORDER,
+> +		.pool_size	= bq->count,
+> +		.nid		= NUMA_NO_NODE,
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rpm.c b/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
-index af21e2030cff..4728ba34b0e3 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
-@@ -373,6 +373,11 @@ void rpm_lmac_pause_frm_config(void *rpmd, int lmac_id, bool enable)
- 	cfg |= RPMX_MTI_MAC100X_COMMAND_CONFIG_TX_P_DISABLE;
- 	rpm_write(rpm, lmac_id, RPMX_MTI_MAC100X_COMMAND_CONFIG, cfg);
- 
-+	/* Disable forward pause to driver */
-+	cfg = rpm_read(rpm, lmac_id, RPMX_MTI_MAC100X_COMMAND_CONFIG);
-+	cfg &= ~RPMX_MTI_MAC100X_COMMAND_CONFIG_PAUSE_FWD;
-+	rpm_write(rpm, lmac_id, RPMX_MTI_MAC100X_COMMAND_CONFIG, cfg);
-+
- 	/* Enable channel mask for all LMACS */
- 	if (is_dev_rpm2(rpm))
- 		rpm_write(rpm, lmac_id, RPM2_CMR_CHAN_MSK_OR, 0xffff);
-@@ -616,12 +621,10 @@ int rpm_lmac_pfc_config(void *rpmd, int lmac_id, u8 tx_pause, u8 rx_pause, u16 p
- 
- 	if (rx_pause) {
- 		cfg &= ~(RPMX_MTI_MAC100X_COMMAND_CONFIG_RX_P_DISABLE |
--				RPMX_MTI_MAC100X_COMMAND_CONFIG_PAUSE_IGNORE |
--				RPMX_MTI_MAC100X_COMMAND_CONFIG_PAUSE_FWD);
-+			 RPMX_MTI_MAC100X_COMMAND_CONFIG_PAUSE_IGNORE);
- 	} else {
- 		cfg |= (RPMX_MTI_MAC100X_COMMAND_CONFIG_RX_P_DISABLE |
--				RPMX_MTI_MAC100X_COMMAND_CONFIG_PAUSE_IGNORE |
--				RPMX_MTI_MAC100X_COMMAND_CONFIG_PAUSE_FWD);
-+			RPMX_MTI_MAC100X_COMMAND_CONFIG_PAUSE_IGNORE);
- 	}
- 
- 	if (tx_pause) {
--- 
-2.17.1
+Is there a reason the NUMA_NO_NODE is used here instead of
+dev_to_node(napi->dev->dev.parent)?
 
+> +		.dev		= napi->dev->dev.parent,
+> +		.netdev		= napi->dev,
+> +		.napi		= napi,
+> +		.dma_dir	= DMA_FROM_DEVICE,
+> +		.offset		= LIBIE_SKB_HEADROOM,
+> +	};
+> +
+> +	/* HW-writeable / syncable length per one page */
+> +	pp.max_len = LIBIE_RX_BUF_LEN(pp.offset);
+> +
+> +	/* HW-writeable length per buffer */
+> +	bq->rx_buf_len = libie_rx_hw_len(&pp);
+> +	/* Buffer size to allocate */
+> +	bq->truesize = roundup_pow_of_two(SKB_HEAD_ALIGN(pp.offset +
+> +							 bq->rx_buf_len));
+> +
+> +	bq->pp = page_pool_create(&pp);
+> +
+> +	return PTR_ERR_OR_ZERO(bq->pp);
+> +}
+> +EXPORT_SYMBOL_NS_GPL(libie_rx_page_pool_create, LIBIE);
+> +
+
+...
+
+> +/**
+> + * libie_rx_sync_for_cpu - synchronize or recycle buffer post DMA
+> + * @buf: buffer to process
+> + * @len: frame length from the descriptor
+> + *
+> + * Process the buffer after it's written by HW. The regular path is to
+> + * synchronize DMA for CPU, but in case of no data it will be immediately
+> + * recycled back to its PP.
+> + *
+> + * Return: true when there's data to process, false otherwise.
+> + */
+> +static inline bool libie_rx_sync_for_cpu(const struct libie_rx_buffer *buf,
+> +					 u32 len)
+> +{
+> +	struct page *page = buf->page;
+> +
+> +	/* Very rare, but possible case. The most common reason:
+> +	 * the last fragment contained FCS only, which was then
+> +	 * stripped by the HW.
+> +	 */
+> +	if (unlikely(!len)) {
+> +		page_pool_recycle_direct(page->pp, page);
+> +		return false;
+> +	}
+> +
+> +	page_pool_dma_sync_for_cpu(page->pp, page, buf->offset, len);
+
+Is there a reason why page_pool_dma_sync_for_cpu() is still used when
+page_pool_create() is called with PP_FLAG_DMA_SYNC_DEV flag? Isn't syncing
+already handled in page_pool core when when PP_FLAG_DMA_SYNC_DEV flag is
+set?
+
+> +
+> +	return true;
+> +}
+>  
+>  /* O(1) converting i40e/ice/iavf's 8/10-bit hardware packet type to a parsed
+>   * bitfield struct.
+> 
 
