@@ -1,141 +1,125 @@
-Return-Path: <netdev+bounces-55408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C73880ACE1
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 20:23:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 45E7780ACEC
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 20:25:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D4B81C208E9
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 19:23:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77A7C1C20B49
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 19:25:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DE714CB20;
-	Fri,  8 Dec 2023 19:23:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F4E04CB29;
+	Fri,  8 Dec 2023 19:25:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="puGdxYqA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dQhKPK3Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-xe34.google.com (mail-vs1-xe34.google.com [IPv6:2607:f8b0:4864:20::e34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD74E198A
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 11:23:16 -0800 (PST)
-Received: by mail-vs1-xe34.google.com with SMTP id ada2fe7eead31-4649e4e6fbfso610050137.1
-        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 11:23:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702063396; x=1702668196; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eNuhxRDBfdQenk+uC5+I+2o2Yad/2wCHUso1pH85sfo=;
-        b=puGdxYqAoQo3bHG294LrXUJmKf0r2uufNMehZOj/ib8lgIMoVsopaKC4B4b6fUFyya
-         +B9rAwaP7t2N4ealA6hhXjhKtZfHcQqR6mND4Wm8Bn+OcwAWZPIz8cpOBRc9eMDbClhr
-         m0HzrbjSOx0Odg45PVXWbTCRw/nXU3Cn7nmp3mL+o1poKncrgSXhF/YFLuLQHGoSStQf
-         RrJGwyuzvUNDUEsmKjSD2uxYZ/BCYB8G86AaueFaliWGMcb/21OR7QeKm0LdzJc1VKhI
-         29fSLZU9MNVBk7gsWs++emPmOErx0U5NoIpQDDk2xKmI0xt174+doddUkTq2O/QdtbwO
-         qpuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702063396; x=1702668196;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eNuhxRDBfdQenk+uC5+I+2o2Yad/2wCHUso1pH85sfo=;
-        b=qRmmVhHA3yhy3iBu1rpjqpLTDGQOG5ayYZLjdLzfB4GM9GKGwWQqNCaNChzTM8RfRn
-         ScQRpaz7t557MWZ/fwgU5ipL3As25FHgilbVlrKD9mO9JXzvthy1Lf0i9lziY1VHDDTx
-         rYQavRet029rVihTmXDHTvXGFkeUDKaWKOJ8PQ+LaAlAM1wvza+mm9Cl12EtwFvZA9kt
-         hFJhd6dKv0adPBLIVK4hoB0LM11Yq/zGMbE0+4OqmTxuPH+Ha9xCNlIDwwgVU9APsYvB
-         osHYfJblPx4p0jEAyqLAYWK1whmNMpaKCXh8ddPWuf0mIc8Ulm9jdKauUSPwSVSn5Hkh
-         CIiQ==
-X-Gm-Message-State: AOJu0YyEvC9PWr/W3Lgg2mxvj4KEcrNQynUmmMBxnjYzqH8yC8NlY574
-	lic0I8LQr44kyM9JvREI7fX52VTJW3ccoRrl+JY/Ftx27k4K2pAhjy2l5g==
-X-Google-Smtp-Source: AGHT+IHb22ZjibDls1yBkhF7QNEaIMpgDSaJZ0OHWa3jb0vnzr6qisUp6akF/Nl59oBqhH37DmVgAI0o7BDgdz/1wpc=
-X-Received: by 2002:a05:6102:38ce:b0:465:e3df:13a with SMTP id
- k14-20020a05610238ce00b00465e3df013amr837357vst.9.1702063395773; Fri, 08 Dec
- 2023 11:23:15 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22DC94AF61;
+	Fri,  8 Dec 2023 19:25:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68266C433C8;
+	Fri,  8 Dec 2023 19:25:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702063545;
+	bh=z3otdfwGLX1f2a+SvSkMwMZKGTLN4cY6uigJoIFO8gc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dQhKPK3QFPl9Y4y8sbGGByFaxlfrHHBrDeR2t0nRF+ZSY8oHD2YtQlpfSwS0bUcMC
+	 5cQbG0I+RUkaUbSqsYWyajZrzXiTtDF3inTnntumVRtejuFCXVALMmWg+0cwc1iUpk
+	 Z+r8QBYBA7qb9jB6svwH93w66rJkBtDOofMbrFrQyPZFuQ6SjeogAahQSRKSzpKReZ
+	 XW8f3hgrcG3j8RrKzzKnZfymmieb9DV7tyw5upJM6+HL9wL6FFIb4JqzfjNbPHJ3Du
+	 EaEioV1pHZ4HoRPRU6nZSC8ZpzJibUXbQQDMxwLTvjV/6LSmWW9broVCN4UAwM8MaI
+	 8ZeKPanJ7KM/A==
+Date: Fri, 8 Dec 2023 19:25:39 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Rob Herring <robh@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Michael Turquette <mturquette@baylibre.com>,
+	Rob Herring <robh+dt@kernel.org>, Stephen Boyd <sboyd@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, linux-can@vger.kernel.org,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	Daire McNamara <daire.mcnamara@microchip.com>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	linux-riscv@lists.infradead.org, Eric Dumazet <edumazet@google.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH RESEND v1 2/7] dt-bindings: can: mpfs: add missing
+ required clock
+Message-ID: <20231208-contusion-professed-3b2235f7d3df@spud>
+References: <20231208-reenter-ajar-b6223e5134b3@spud>
+ <20231208-palpitate-passable-c79bacf2036c@spud>
+ <170206026051.2485962.13304186324857333888.robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231208005250.2910004-1-almasrymina@google.com>
- <20231208005250.2910004-14-almasrymina@google.com> <dd47a2a4-cb80-4164-8855-045999931a8e@kernel.org>
-In-Reply-To: <dd47a2a4-cb80-4164-8855-045999931a8e@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 8 Dec 2023 11:23:04 -0800
-Message-ID: <CAHS8izPwkARkYjPYPY2t-5H=XFTdn=NcWk0EwiCycThR5xFmtg@mail.gmail.com>
-Subject: Re: [net-next v1 13/16] tcp: RX path for devmem TCP
-To: David Ahern <dsahern@kernel.org>
-Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeelb@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="LcNsrkCtTh9NwKDb"
+Content-Disposition: inline
+In-Reply-To: <170206026051.2485962.13304186324857333888.robh@kernel.org>
+
+
+--LcNsrkCtTh9NwKDb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 8, 2023 at 9:55=E2=80=AFAM David Ahern <dsahern@kernel.org> wro=
-te:
->
-> On 12/7/23 5:52 PM, Mina Almasry wrote:
-> > In tcp_recvmsg_locked(), detect if the skb being received by the user
-> > is a devmem skb. In this case - if the user provided the MSG_SOCK_DEVME=
-M
-> > flag - pass it to tcp_recvmsg_devmem() for custom handling.
-> >
-> > tcp_recvmsg_devmem() copies any data in the skb header to the linear
-> > buffer, and returns a cmsg to the user indicating the number of bytes
-> > returned in the linear buffer.
-> >
-> > tcp_recvmsg_devmem() then loops over the unaccessible devmem skb frags,
-> > and returns to the user a cmsg_devmem indicating the location of the
-> > data in the dmabuf device memory. cmsg_devmem contains this information=
-:
-> >
-> > 1. the offset into the dmabuf where the payload starts. 'frag_offset'.
-> > 2. the size of the frag. 'frag_size'.
-> > 3. an opaque token 'frag_token' to return to the kernel when the buffer
-> > is to be released.
-> >
-> > The pages awaiting freeing are stored in the newly added
-> > sk->sk_user_pages, and each page passed to userspace is get_page()'d.
-> > This reference is dropped once the userspace indicates that it is
-> > done reading this page.  All pages are released when the socket is
-> > destroyed.
-> >
-> > Signed-off-by: Willem de Bruijn <willemb@google.com>
-> > Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> >
+On Fri, Dec 08, 2023 at 12:31:00PM -0600, Rob Herring wrote:
+>=20
+> On Fri, 08 Dec 2023 17:12:24 +0000, Conor Dooley wrote:
+> > From: Conor Dooley <conor.dooley@microchip.com>
+> >=20
+> > The CAN controller on PolarFire SoC has an AHB peripheral clock _and_ a
+> > CAN bus clock. The bus clock was omitted when the binding was written,
+> > but is required for operation. Make up for lost time and add it.
+> >=20
+> > Cautionary tale in adding bindings without having implemented a real
+> > user for them perhaps.
+> >=20
+> > Fixes: c878d518d7b6 ("dt-bindings: can: mpfs: document the mpfs CAN con=
+troller")
+> > Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
 > > ---
-> >
-> > Changes in v1:
-> > - Added dmabuf_id to dmabuf_cmsg (David/Stan).
-> > - Devmem -> dmabuf (David).
-> > - Change tcp_recvmsg_dmabuf() check to skb->dmabuf (Paolo).
-> > - Use __skb_frag_ref() & napi_pp_put_page() for refcounting (Yunsheng).
-> >
-> > RFC v3:
-> > - Fixed issue with put_cmsg() failing silently.
-> >
->
-> What happens if a retransmitted packet is received or an rx window is
-> closed and a probe is received where the kernel drops the skb - is the
-> iov reference(s) in the skb returned to the pool by the stack and ready
-> for use again?
+> >  .../devicetree/bindings/net/can/microchip,mpfs-can.yaml    | 7 +++++--
+> >  1 file changed, 5 insertions(+), 2 deletions(-)
+> >=20
+>=20
+> My bot found errors running 'make DT_CHECKER_FLAGS=3D-m dt_binding_check'
+> on your patch (DT_CHECKER_FLAGS is new in v5.13):
+>=20
+> yamllint warnings/errors:
+>=20
+> dtschema/dtc warnings/errors:
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
+et/can/microchip,mpfs-can.yaml: properties:clocks: {'maxItems': 2, 'items':=
+ [{'description': 'AHB peripheral clock'}, {'description': 'CAN bus clock'}=
+]} should not be valid under {'required': ['maxItems']}
+> 	hint: "maxItems" is not needed with an "items" list
+> 	from schema $id: http://devicetree.org/meta-schemas/items.yaml#
 
-When an skb is dropped, skb_frag_unref() is called on the frags, which
-calls napi_pp_put_page(), drops the references, and the iov is
-recycled, yes.
 
---=20
-Thanks,
-Mina
+Oh dear, me of all people.
+
+--LcNsrkCtTh9NwKDb
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZXNtsgAKCRB4tDGHoIJi
+0oSOAQCwrHN/7yWhuuIG7o8zyiDD3sQh9O0ObhobDPMiwzstNAEAwZYfqSjCNUqo
+PRSO8gA7E/ILMPQQJKcY+VOri+ewwAg=
+=IQnv
+-----END PGP SIGNATURE-----
+
+--LcNsrkCtTh9NwKDb--
 
