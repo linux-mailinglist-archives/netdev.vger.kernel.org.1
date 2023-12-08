@@ -1,153 +1,111 @@
-Return-Path: <netdev+bounces-55462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7E9880AF4E
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 23:01:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F23DF80AF54
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 23:04:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CF44281A53
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 22:01:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 815D8B20AE4
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 22:04:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19E3358AD1;
-	Fri,  8 Dec 2023 22:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC21158AD8;
+	Fri,  8 Dec 2023 22:04:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="bGPwk4S7"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="GpUhqjX4"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2088.outbound.protection.outlook.com [40.107.244.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19A711712;
-	Fri,  8 Dec 2023 14:01:32 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZSEIrCgV62V3HEq+zccHZzGYnk3fWhcCdzPwUAjjPWTNj9sK2GApklyYEVB05gI7cBQOtJ8T94GA9iNtThUsjS4EIhcJmf7Mu/51AOzCSHdPOSxUu8uR/yDAD3NQ19sq10BCLie6S4ljJIkWkxUjY3tA564QqKr0juZnMTEFfTJgmobj3x2rB+Uzo4740YRyLdfb3NrfXj6TJ5mGmf8zy+ipusPiwqZyp1sdEQa+8wxiu8A0UqMXWpD5d+vwKSelNTGL61T29LHNJvvrXpMXpTLux4TqMrChjJSpuj4Wo7620H4NEUSRmQVGVpAi9tdto9piXNNxQm6b2XnznfGxag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/ZGlIyA10nj/K3ColeR3Pkq4Mci5xQS1r3Z6xHkTDl0=;
- b=MpsXt+5/ZknvbZvLY8xjcdSIC0kjG414pyDaAHJMeFFcxzgTzJYw1orKrDrlk02QsRRpYnAuEoX7LXwwGTr5brPxRLhKdnsH5B3c5YKCeJijZ+JmGMZNXbyo68DEiwLK/71WcpexZCIYpzeSd4IztCHUT7B6TydP279XP3fqKM6l1wApAI4yHo5/JAnD7IvyXTv18Ats2wJaEVgFx0Oj0VuUpdwOusFI/GgYZ7G7HLeN6oyei2qT8cKyxVG23z9lKd3yANGt1pYYFtWdq2/yJuA9nX8yrbUrNXataMXGlMayNFnRTkFsigpJRdzGX8+nkCX2zyRRBAAw4ZX6cYTzpA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/ZGlIyA10nj/K3ColeR3Pkq4Mci5xQS1r3Z6xHkTDl0=;
- b=bGPwk4S7SP29x6UpIFntbbCgSj4P+vawGO5vGS6GWUnKOv1w0DiZpqMBpp6ERexSo7t8xZRrCOkC0JNm0ngLZQScFj/221LGTV6U8H/9QWHcYV8kr9S7Qq2/QyV3hnjsByuqtVCKS+7r8RanckhErOW32k11AXUAbfhRUT6hUNc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
- by BY5PR12MB4950.namprd12.prod.outlook.com (2603:10b6:a03:1d9::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.28; Fri, 8 Dec
- 2023 22:01:27 +0000
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::bec4:77b3:e1d1:5615]) by PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::bec4:77b3:e1d1:5615%5]) with mapi id 15.20.7068.028; Fri, 8 Dec 2023
- 22:01:27 +0000
-Message-ID: <b465e088-d914-d646-b0c4-69ea18ca11e5@amd.com>
-Date: Fri, 8 Dec 2023 14:01:24 -0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH iwl-next v4 01/12] ice: Add function to get RX queue
- context
-Content-Language: en-US
-To: Yahui Cao <yahui.cao@intel.com>, intel-wired-lan@lists.osuosl.org
-Cc: kvm@vger.kernel.org, netdev@vger.kernel.org, lingyu.liu@intel.com,
- kevin.tian@intel.com, madhu.chittim@intel.com, sridhar.samudrala@intel.com,
- alex.williamson@redhat.com, jgg@nvidia.com, yishaih@nvidia.com,
- shameerali.kolothum.thodi@huawei.com, brett.creeley@amd.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-References: <20231121025111.257597-1-yahui.cao@intel.com>
- <20231121025111.257597-2-yahui.cao@intel.com>
-From: Brett Creeley <bcreeley@amd.com>
-In-Reply-To: <20231121025111.257597-2-yahui.cao@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0060.namprd03.prod.outlook.com
- (2603:10b6:a03:33e::35) To PH0PR12MB7982.namprd12.prod.outlook.com
- (2603:10b6:510:28d::5)
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CB1F10E0
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 14:04:39 -0800 (PST)
+Received: by mail-pg1-x532.google.com with SMTP id 41be03b00d2f7-5c210e34088so2095945a12.2
+        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 14:04:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1702073078; x=1702677878; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NWBbyLhR/se4HbG1atfrY+dKLWbuEayxNh7+RneTVYI=;
+        b=GpUhqjX48UwA5olgvC2QRDCnFYgGZhaM0X+HE9EjtQrLlF6AOrfXZS9TqHvSod+RE0
+         307oPV9BLZBnR3247cgDUQ35TFw5TQH1WEScZoekj682ZuSrjVmKzhrjzjgm4ms9qE1s
+         bV+Vff7AtrOTrrW92ACiOhw8mRKFPPjNzo1cVH6ahgvhNhzi2PcYhgExbO3htd7XSfX1
+         h19gSPj9Im3VxT0aB8H6X4eguaHv4aSDC9AErWDpYpgWnCx86I+BwwPByebeRVFlmqLY
+         6CRXHs7aH6w0VlOFHEKN1MaS0k4JHq0BSbASjYT9OScHFOTU3wq+yggKRPy86EpgAMKO
+         FoCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702073078; x=1702677878;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NWBbyLhR/se4HbG1atfrY+dKLWbuEayxNh7+RneTVYI=;
+        b=IaDGWYXpasi2xmRtlJsm5IPiRutKDRNMFnh8dWOr1F9YUyLk/fR26/ArBZptWF3DpY
+         r/qZ8mEs563B1i3F6iYrxp9+CfGN25I4pyhr8Mk5RvN/tLwbapWdpDFlscY+0FHfEMjT
+         NbbtsnLrwadrVlO+DR0DYW/IepXMnAECiW5vVJUl+1LgBUIDHFVZw9t6QoJLyxfBd0Fm
+         9AVRE2KNfGHPzwmbzVbBHm8BlWqXk4BmWa+9gqStJSdIyxGu29Jf9NWIi9ABULscKrOe
+         hhxSs4F2Lbj7p3+eSgJBYUOYxZ22oBvslzblNGFmyS+GPvG0OZgyZRmoLOW98ThM2FcY
+         d0Iw==
+X-Gm-Message-State: AOJu0Yz+22D0z97Hw02sSYfxLGszu1UbStb1AD+YQK8of8ANLzsoQrPw
+	LOaUwE20s/S4sJKIhi0kDhu45Q==
+X-Google-Smtp-Source: AGHT+IFYM5q3cEbeoyXGhwe2zH6cUFYGF8Xdv1ZFNvlSzWtxaH+ZLg29EO7YeSEkAKWrZyYDQ6Huxw==
+X-Received: by 2002:a17:902:e5c5:b0:1d1:cd8b:8bc2 with SMTP id u5-20020a170902e5c500b001d1cd8b8bc2mr864669plf.33.1702073078589;
+        Fri, 08 Dec 2023 14:04:38 -0800 (PST)
+Received: from ?IPV6:2a03:83e0:1256:2:c51:2090:e106:83fa? ([2620:10d:c090:500::5:34a6])
+        by smtp.gmail.com with ESMTPSA id 5-20020a170902e9c500b001d05433d402sm2182976plk.148.2023.12.08.14.04.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Dec 2023 14:04:38 -0800 (PST)
+Message-ID: <54f9c382-f38b-4847-909a-2f9b122ab6d2@davidwei.uk>
+Date: Fri, 8 Dec 2023 14:04:36 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|BY5PR12MB4950:EE_
-X-MS-Office365-Filtering-Correlation-Id: 29fa15ba-703c-4318-d181-08dbf83939d2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	7tQNl3ZY6eKKEsaB1chd/FGeswKwcFWAtOCT+2atWsE7jkrMhax/o/YgKo8i/2plyfpspu9BES4i15tw4FKUoU6bTddSMBuSDnjE8KuyJDWnatLJifuN5a3Wxg+y9ovwPzXTQZ0gGURGz3wQMm2M/sDpT4RxHdMB7IOMaOjzDx5vHhTWmamehJYsZhEY3hDvEcna1eFakxc1LRcjonQ/FV1NmYqgnM1weRfJ9QY1gHMIvi2DMNmdxoOyKS3Lh0DaSEL8ujQs6RBFE7O/hK0wa5HvZeSQXPvD7XuHtLhM8SpUqeDuHHU0jzX+Li7zfUuvruDDOMotHwu6cs7yViuIIUh5+y+YA8I1NIF+v9I/LoCOT6E5+6Rs4rmFcDJ6Mpx3H68vWrl5DhgU7W4BHahZ+IrJKZq5NDXMAfkVc4ijswflYEGKq/MLodxyt7fVgly1UCHSRe8+OWmpnSxipdtilVFMPXQ0TLocxgnXaXpoKl5MrICepTOUqen6llQiooJ06v8aWKldUQpPxIzAu//nSoyJtPjeb11q0U3MwK4GTg/BRvuxGSRyeOpnSKapeyVmTLezGKE0h0mPrcFkQPw5RH6P5WEEH7mEP1Xj/WsdLAvPB0CyY98RwE9W4ElxkXbwteOvbz6+hJS/xgcR/Wf2SWDmnBjNDfgCixKhFxAdsrZUJHU+zMX1sM5OlOgtgAd6
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(376002)(366004)(396003)(39860400002)(230922051799003)(230173577357003)(230273577357003)(186009)(451199024)(1800799012)(64100799003)(31686004)(6486002)(6666004)(478600001)(38100700002)(26005)(2616005)(6512007)(53546011)(6506007)(4326008)(41300700001)(8676002)(8936002)(2906002)(5660300002)(4744005)(36756003)(66946007)(31696002)(7416002)(66476007)(66556008)(316002)(83380400001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?d2xkZmxkMWVwZGxPN1llM2VTR1Y5VEVuUnlDbnYzWE9CbW5nSHcyeW9kZ1po?=
- =?utf-8?B?VHVHZEdBTG90cnBWVzBSVWNpSDI1c0xTakJjOTJ1cjV5b0JURGMvcVJtSDJk?=
- =?utf-8?B?Mm5ZY1Z3bDY1cEFVRWF0eGwvOFM0ZmhyTG9QWHlzMzNFcDBoTk13bFdJMXhh?=
- =?utf-8?B?NWlZMUY2Z2J4Y3JLM2liOXZFNC9YdG8wNk5rTE9nL2d6SlZKZU83aSsyNDFp?=
- =?utf-8?B?Tmk4b05NRkZIRVJyaGVTK1RuMmxEOWl1TEx3Mi9wS0tOT3JaSkNyd21sVGVu?=
- =?utf-8?B?bkFML3BzVzc1QkZlbmpoaTFBcTdsMTU1bk42SHJQdk9yOHBBTExiaHQvSS81?=
- =?utf-8?B?RW9zSDBEYURIUGRiYnRKVllHQzByck5rZzlzQTNWT0QxTFovV3d0Z29xcHVv?=
- =?utf-8?B?enJRS2tvaGcySWV4NzNmUjZ6NDFxZ2l1dXFUcExHWVZ3YkN1QTQ1SkdsQWxM?=
- =?utf-8?B?UzBIOG1vT05KcW9jOG1BNEJTRjJia2dOVDMxZGJsSDFrbUdZWDcrM3hYMTVX?=
- =?utf-8?B?Mm45R1QzeFBwaUhscGlPc0swZFhWUk5wRWxOMmJWbGxwemNCd2FXdlYwWmlz?=
- =?utf-8?B?N1lyUFdtbWpiaTJ3eGQ2SmxjZCtwQXhZMU9Ed3pMemNQUTdETWJwU2l0a05O?=
- =?utf-8?B?TmRMeWw2R3V4S3gwUHVTbEZ6Z1pOZWtaSXRWaklEcHk1RjhtaDZ2U2pmQkJV?=
- =?utf-8?B?WDl1b29qSWxmUUhCR3ppZXRJd3NBQUMrMmhtUzk3OVNoaUxUYi9KZjZla0RY?=
- =?utf-8?B?bU9DT3BoR0Q1Zm41eGo1SzdnRndheTlFRXFoL3Q5bnV3RHAveFBDdUhIRHVq?=
- =?utf-8?B?UGk4MW1HVnVjMmtIUStQa3J3M2NKbThML21aeGZUTWZaUlZrdnliWVU5NUY2?=
- =?utf-8?B?OVkwRG8rV010VUFlNXhLcEcxRzJuVXVNeHBxV2cxelE4QXlRczJZcytZREtr?=
- =?utf-8?B?T2IweEFQYVU1cENQNTBBQjg3dWcvUytncjllaTQ1YjhzN2lmWk9UOG1wMTE2?=
- =?utf-8?B?UG9wYlFMUkQxZHh0T3BDQytmQzNpRW9CQ1U1dUJHcVI4LytpQUlEbVNINDNV?=
- =?utf-8?B?SHdSUERiN3lRVUFLWjB0eHp2OWZMZlJlMDYyeEhSbmJaTFA4RjhxRkR6TDRY?=
- =?utf-8?B?ZHRqNzFUbzhqRk94dk9pUm1ybU1BZ0s3VGxON0xLR0lSQ01nUlZSaDBpWDNY?=
- =?utf-8?B?UXF2YTNxYjFVQjhGS0djQlgxbjlJMUZMdWhyd28xV2FhMG1rdjRMMGFXWXZS?=
- =?utf-8?B?M0l6T3JITldiNzFxaTRzTmlNUHRVQkxmZDJKTVAwRFJVKzh4SUFyU0x0eXNO?=
- =?utf-8?B?UDZKYWw3NXpXeTJzS3BpZ0prWjN1bjNNQUF6eitsbzI0cW5TTVZUQjVjdU1a?=
- =?utf-8?B?TVphc3lFODFEVU8zVHUvdlFDb0NHcG5rbDBiNlRFVWQxaGRyeU5nczNpOW1l?=
- =?utf-8?B?RDFpQ2N0TVpIQTNBbGludU11V3ZhcWZBL3pucUZrTGx4MVNuNVdhN2xMT3ZK?=
- =?utf-8?B?TDhHd3lobHRkeFlrMk5vdUlpNkUybllxZmViN0hyTW50TWxqR0ZhZkYvWGZp?=
- =?utf-8?B?TXh5bXV3Z2JPUGJaODVmWkJKazNBS09XT0RzSG9vbmY0MCt5dnpwdmY1d1lC?=
- =?utf-8?B?bTVvL2tDOHhkakNLQS84RHdSQndkRklYQWxTazByOGUvVmpOZFBjcFArU0NH?=
- =?utf-8?B?QWE4RnhhRndZVThSYzlxRzJ1cjFsUndSWEsybHY1Y2NmMVRhSFVycksvMzFE?=
- =?utf-8?B?bTBHUnh0S1c1aUxtQkJLaG14djBYcXpwVHBXbGo2MnRUWkJMOHJRNXNzVjAw?=
- =?utf-8?B?TU91K3piNXNEeStVeWVSL3RIUThHbHZKcmpSZzRzN1FJQW1kbDVDMnNUdERF?=
- =?utf-8?B?YWVxTDhIcFlQbWgwN3VrMEdDazlrZ1ZxRkgzVDdxNEVLN0YyMHFxbm1CYThN?=
- =?utf-8?B?UFhkdFZaRDJPeWlrTS9vNkNqRnVoYlVhOUxyMXFNQ0lrMnRYVDE3NEMzbE8v?=
- =?utf-8?B?Q2RCYUVMRytFbWtvdkhVRHpvNTMvNTZFRjZSZmhsL05mNDI2b0xoS3IwN2dp?=
- =?utf-8?B?bW1DWlcyQkFGZHRBclMyNm5SclNzTlFkUWhPTkJMdTBQS3VwcGF0NGFqUDRh?=
- =?utf-8?Q?anL3dwZXlj1oVKTKyF0AHD8gK?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 29fa15ba-703c-4318-d181-08dbf83939d2
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Dec 2023 22:01:27.1473
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cCf4h37Y4GoZIC93E4R7MERQBQ2suSrOzwshCrTye8WWhcMU44hYQav/aA448vN1EhCN5ja41P1uTeqXR5weyA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4950
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/3] netdevsim: allow two netdevsim ports to be
+Content-Language: en-GB
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+References: <20231207172117.3671183-1-dw@davidwei.uk>
+ <20231207172117.3671183-2-dw@davidwei.uk>
+ <20231208095817.5aa69755@kernel.org>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20231208095817.5aa69755@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 11/20/2023 6:51 PM, Yahui Cao wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+On 2023-12-08 09:58, Jakub Kicinski wrote:
+> On Thu,  7 Dec 2023 09:21:15 -0800 David Wei wrote:
+>> +	ret = copy_from_user(buf, data, count);
+>> +	if (ret)
+>> +		return -EFAULT;
+>> +	buf[count] = '\0';
+>> +
+>> +	cur = buf;
+>> +	token = strsep(&cur, " ");
+>> +	if (!token)
+>> +		return -EINVAL;
+>> +	ret = kstrtouint(token, 10, &id);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	token = strsep(&cur, " ");
+>> +	if (!token)
+>> +		return -EINVAL;
+>> +	ret = kstrtouint(token, 10, &port);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	/* too many args */
+>> +	if (strsep(&cur, " "))
+>> +		return -E2BIG;
 > 
-> 
-> Export RX queue context get function which is consumed by linux live
-> migration driver to save and load device state.
+> What's wrong with scanf?
 
-Nit, but I don't think "linux" needs to be mentioned here.
+Also responded to Jiri:
 
-> 
-> Signed-off-by: Yahui Cao <yahui.cao@intel.com>
-> Signed-off-by: Lingyu Liu <lingyu.liu@intel.com>
-> ---
->   drivers/net/ethernet/intel/ice/ice_common.c | 268 ++++++++++++++++++++
->   drivers/net/ethernet/intel/ice/ice_common.h |   5 +
->   2 files changed, 273 insertions(+)
-> 
-
-[...]
+I went with strstep() instead of sscanf() because sscanf("%u %u", ...)
+does not fail with echo "1 2 3 4". I'm happy to use sscanf() though if
+this is not an issue.
 
