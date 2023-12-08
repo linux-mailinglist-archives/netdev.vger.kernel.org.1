@@ -1,78 +1,87 @@
-Return-Path: <netdev+bounces-55303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B802F80A43F
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 14:15:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DDC180A448
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 14:16:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2496DB20C8F
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 13:15:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1999F281BAC
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 13:16:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B5D1C6AF;
-	Fri,  8 Dec 2023 13:14:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ger+sbf5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78CBE1CAA5;
+	Fri,  8 Dec 2023 13:16:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B42ED54;
-	Fri,  8 Dec 2023 05:14:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ZyIwn9UadV4oPIAt3Iw42rESNqNPVByooLrrQQomUoM=; b=ger+sbf5lz0mDcCnoWzUZY5VJZ
-	331/0+XOXQ3TDJx6pxgjZkvNXuIOKiSXl0bnfVoKevRgfS8+oOwPYLaOzzBF9oSFaSCUI4q7beqp6
-	xaWGCzgV5R4wM4L4ANuvF+WoOTV6mxqDlrWxirqTZbivw+YSflI8rsYmr9IKKRdU3oKw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rBagj-002PvD-33; Fri, 08 Dec 2023 14:14:41 +0100
-Date: Fri, 8 Dec 2023 14:14:41 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Andrew Halaney <ahalaney@redhat.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Serge Semin <fancer.lancer@gmail.com>
-Subject: Re: [PATCH net-next v2] net: stmmac: don't create a MDIO bus if
- unnecessary
-Message-ID: <9eddb32d-c798-4e1b-b0ea-c44d31cc29bf@lunn.ch>
-References: <20231206-stmmac-no-mdio-node-v2-1-333cae49b1ca@redhat.com>
- <e64b14c3-4b80-4120-8cc4-9baa40cdcb75@lunn.ch>
- <nx2qggr3aget4t57qbosj6ya5ocq47t6w33ve5ycabs5mzvo7c@vctjvc5gip5d>
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9221199C
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 05:16:31 -0800 (PST)
+Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-6d9dfa56ab2so1847466a34.2
+        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 05:16:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702041391; x=1702646191;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ad2JqdSOjClv5xhQDHopdA3/PJWoAf52L+6eH5Tqlm0=;
+        b=nNW4TlZ5hGKI78th9hP4PWn/CyzjuxGW5s25AxcByY79TBj1pWbTb2kVqEvF5HrH28
+         90igJnzFO9E7m4iBFpCWIvwX6j/y1liQFg1m5wiEmr0Y8nf+Y1ermbL3/C+J6xXsuaBg
+         MpBYbQgwA7KzcNRtcpTeHc1BxMqIkoJPtKbz6Spgr876nXkne07MVQCfcyUwhPQ5zL/w
+         nKaNYdQ8xlBpWIk5ndpa5VUynuUuBhZU2BliMCXVCrLZXMWWRzI1tjY11/ynCK9QFijw
+         7M7Sj6VqN+lNyV3rv6+zfkVkCz0+3n+U5cyaCtk9fxyEbzOM6C9xm8ao33wqZkh7WPAj
+         YCTA==
+X-Gm-Message-State: AOJu0Yyy1RnoXTmLwM0rniIwuVwegL7FlwzQq1i88ziwKZsl0jDQ8rbl
+	djIX/JVdERRhOfLPI/uaPoJCGEXKsVZ/ZcJoRQzw2YKup0No
+X-Google-Smtp-Source: AGHT+IFpWS8JuwydY2By4SE2Rn78je67aA6WeSBzNdV00EhbPRdiY+n9xBxRrsJu/mKz8qY5Qz4rspbVB6tvI52y3jrfli5bmxdT
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <nx2qggr3aget4t57qbosj6ya5ocq47t6w33ve5ycabs5mzvo7c@vctjvc5gip5d>
+X-Received: by 2002:a05:6870:9714:b0:1fb:1b2:fc9d with SMTP id
+ n20-20020a056870971400b001fb01b2fc9dmr25752oaq.5.1702041390325; Fri, 08 Dec
+ 2023 05:16:30 -0800 (PST)
+Date: Fri, 08 Dec 2023 05:16:30 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000076a6ea060bff64b3@google.com>
+Subject: [syzbot] Monthly dccp report (Dec 2023)
+From: syzbot <syzbot+list205929fef9983ad8ebbc@syzkaller.appspotmail.com>
+To: dccp@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-> I know you said the standard is to make the MDIO bus unconditionally, but
-> to me that feels like a waste, and describing say an empty MDIO bus
-> (which would set the phy_mask for us eventually and not scan a
-> bunch of phys, untested but I think that would work) seems like a bad
-> description in the devicetree (I could definitely see describing an
-> empty MDIO bus getting NACKed, but that's a guess).
+Hello dccp maintainers/developers,
 
-DT describes the hardware. The MDIO bus master exists. So typically
-the SoC .dtsi file would include it in the Ethernet node. At the SoC
-level it is empty, unless there is an integrated PHY in the SoC. The
-board .dts file then adds any PHYs to the node which the board
-actually has.
+This is a 31-day syzbot report for the dccp subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/dccp
 
-So i doubt adding an empty MDIO node to the SoC .dtsi file will get
-NACKed, it correctly describes the hardware.
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 5 issues are still open and 6 have been fixed so far.
 
-	Andrew
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 102     Yes   KASAN: use-after-free Read in ccid2_hc_tx_packet_recv
+                  https://syzkaller.appspot.com/bug?extid=554ccde221001ab5479a
+<2> 51      Yes   BUG: "hc->tx_t_ipi == NUM" holds (exception!) at net/dccp/ccids/ccid3.c:LINE/ccid3_update_send_interval()
+                  https://syzkaller.appspot.com/bug?extid=94641ba6c1d768b1e35e
+<3> 23      Yes   general protection fault in dccp_write_xmit (2)
+                  https://syzkaller.appspot.com/bug?extid=c71bc336c5061153b502
+<4> 14      Yes   BUG: stored value of X_recv is zero at net/dccp/ccids/ccid3.c:LINE/ccid3_first_li() (3)
+                  https://syzkaller.appspot.com/bug?extid=2ad8ef335371014d4dc7
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
