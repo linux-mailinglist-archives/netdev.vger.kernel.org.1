@@ -1,150 +1,145 @@
-Return-Path: <netdev+bounces-55376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C935380AACB
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 18:30:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3250E80AAD1
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 18:31:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74D9C1F21116
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 17:30:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 549F31C20825
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 17:31:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98D0239AEF;
-	Fri,  8 Dec 2023 17:30:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C956E39ACC;
+	Fri,  8 Dec 2023 17:30:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PRQFkbvp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NZZVQv7D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8667E121;
-	Fri,  8 Dec 2023 09:30:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702056616; x=1733592616;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+gB2Q0J8HX6MQGePWap2KwWwhmh91nZTU2F3h3jDrQg=;
-  b=PRQFkbvp2z3GeXIPrT5nKHzF/QnUTbxW6mF/eWWdFTijcgLZz+wp4SL8
-   3kpLmPCKoxYNMnhbpmYLF4l5Hju50oTtJeIZLY6hwpGwT9U9Ls3VMiju9
-   vGfO19TsdoXx3cE+6/yevmGPBC7Vxm6htinRyCWo97n9w8QiuYL1tKpC9
-   ig1N3sfr15iTM3V8EFy0u/JjlBRcUtqqtZES0dKgSqj2Ysiazyt8wQWME
-   vCSPh4iLLwBBXMwRlz/71ri/7gszn7FohTKrY5YqNqa/e4evW/E5XRr4+
-   D4iutKMzMpC4QnPSIq1HVlWkLinsL6F0xgnqY4vJ/kSE0GiWvo/qmEv2+
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10918"; a="13132794"
-X-IronPort-AV: E=Sophos;i="6.04,261,1695711600"; 
-   d="scan'208";a="13132794"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2023 09:30:16 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10918"; a="806467994"
-X-IronPort-AV: E=Sophos;i="6.04,261,1695711600"; 
-   d="scan'208";a="806467994"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by orsmga001.jf.intel.com with ESMTP; 08 Dec 2023 09:30:12 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rBefy-000E6q-1w;
-	Fri, 08 Dec 2023 17:30:10 +0000
-Date: Sat, 9 Dec 2023 01:29:32 +0800
-From: kernel test robot <lkp@intel.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org,
-	maciej.fijalkowski@intel.com, echaudro@redhat.com,
-	lorenzo@kernel.org
-Subject: Re: [PATCH bpf 2/3] net: fix usage of multi-buffer BPF helper for ZC
- AF_XDP
-Message-ID: <202312090104.6EOsoGVa-lkp@intel.com>
-References: <20231208112945.313687-3-maciej.fijalkowski@intel.com>
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 316E21738
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 09:30:52 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6ce934e9d51so1812333b3a.1
+        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 09:30:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702056651; x=1702661451; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wl5UZt4oYlqqBEsE/HSUIOZO8FgWoe/bgzIJwRORg44=;
+        b=NZZVQv7DBMbJ/Z1anq9XKymTMMuQu8wLuqXy9/XxYglie0iIy2exrvQ9Y/5FasRrxm
+         w1HgKA2VFYWMUn0/R6PVOFI60qKsUvl9Nv3CtB/e1M7xiu5SJJR+aPjWTtUjbjpkZ8OM
+         pTy28Ihr+e73gWR1x4F5AIfdft/lWxBMSRpqCSHbV3R2w4SHRcxoyKxcJV1GhqK6Cfd/
+         Ir8ut9kbzR/mwb8BGUDkVpdWF7TMfMEtWx96lBQsCI3qsZLH9WU0/KuIp/q2c3aJrU0C
+         /6DhRYy94DlLJm38l5CK3LVwSMetlqSRU8P54EvcJJjOaLh5InEb4CKgm8slI2Gqd+uf
+         xs+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702056651; x=1702661451;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Wl5UZt4oYlqqBEsE/HSUIOZO8FgWoe/bgzIJwRORg44=;
+        b=iV5OjChlreJbUQGCBlFXebETQC0Y8UAtSMoV1lRLLV0AzWUVqvKBjPtfnUzSwVEsA9
+         yPZbBzOqq+aaIBGeyrhCXPI1JZLYy2x38B/u0XW3no7VZty0TtgCvQYPKlhS/2o9lltk
+         iCpgKGhN395bfMF6Uv2McYoFytO7ZbsORVHZQ4M51UC4vqSr35d2qMmeAs3mird47H89
+         yiSzHTJE1IjGBJ/zyMJB504JhH2NB9odKnswhFatRQ7zWU4AZ5KMimrSti79r7v7KOba
+         SacLwYZ7vkthUJMbba83MwP3Uc6DHhxqbu3Pna9HOEBEXWb1+W1VyaoAM8S4nfOGBJ+o
+         FbvQ==
+X-Gm-Message-State: AOJu0YySucPmUqDsYdFS561boa32x8vNJEWOd8mPKOcvZIiN9A3n5LlV
+	3Iv9mn825rtQ9JaoVBmWVuBHPzIwKqQ=
+X-Google-Smtp-Source: AGHT+IGFxRI2i22lp3EwfW70mOT/RA2fdJbDttR1CeY2ge57xim0HKXGUr4OrDo9f/vJcb6tDEuE2Q==
+X-Received: by 2002:a05:6a00:3305:b0:6ce:6007:9bb with SMTP id cq5-20020a056a00330500b006ce600709bbmr367286pfb.60.1702056651194;
+        Fri, 08 Dec 2023 09:30:51 -0800 (PST)
+Received: from smtpclient.apple ([2001:56a:78d6:ff00::184e])
+        by smtp.gmail.com with ESMTPSA id s16-20020a62e710000000b006ce3bf7acc7sm1819873pfh.113.2023.12.08.09.30.50
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 08 Dec 2023 09:30:50 -0800 (PST)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231208112945.313687-3-maciej.fijalkowski@intel.com>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.700.6\))
+Subject: Re: Rx issues with Linux Bridge and thunderbolt-net
+From: Arjun Mehta <arjunmeht@gmail.com>
+In-Reply-To: <20231207143758.72764b9f@hermes.local>
+Date: Fri, 8 Dec 2023 10:30:39 -0700
+Cc: netdev@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <4E2F8965-E609-44F2-A361-270082367DC9@gmail.com>
+References: <C6FFF684-8F05-47B5-8590-5603859128FC@gmail.com>
+ <20231207143758.72764b9f@hermes.local>
+To: Stephen Hemminger <stephen@networkplumber.org>
+X-Mailer: Apple Mail (2.3731.700.6)
 
-Hi Maciej,
+Hi Stephen, thank you for the reply.
 
-kernel test robot noticed the following build errors:
+Proxmox does use a kernel derived from Ubuntu I believe (eg. kernel for =
+Proxmox 8.1 which is what I'm using is 6.5.11-6-pve derived from Ubuntu =
+23.10). Not sure if there have been any modifications to the Linux =
+Bridge in it.
+https://pve.proxmox.com/wiki/Proxmox_VE_Kernel#Proxmox_VE_8.x
 
-[auto build test ERROR on bpf/master]
+Long shot, but do you happen to know of any workarounds with the Wifi =
+interface issue you mentioned that would mitigate this issue? Maybe they =
+would apply here.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Maciej-Fijalkowski/xsk-recycle-buffer-in-case-Rx-queue-was-full/20231208-193306
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git master
-patch link:    https://lore.kernel.org/r/20231208112945.313687-3-maciej.fijalkowski%40intel.com
-patch subject: [PATCH bpf 2/3] net: fix usage of multi-buffer BPF helper for ZC AF_XDP
-config: i386-buildonly-randconfig-003-20231208 (https://download.01.org/0day-ci/archive/20231209/202312090104.6EOsoGVa-lkp@intel.com/config)
-compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231209/202312090104.6EOsoGVa-lkp@intel.com/reproduce)
+I will also post to the Proxmox forums about this issue to flag for =
+them.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312090104.6EOsoGVa-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> net/core/filter.c:4102:3: error: call to undeclared function 'xsk_buff_get_tail'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-                   xsk_buff_get_tail(xdp)->data_end -= shrink;
-                   ^
-   net/core/filter.c:4102:3: note: did you mean 'xsk_buff_get_frag'?
-   include/net/xdp_sock_drv.h:324:32: note: 'xsk_buff_get_frag' declared here
-   static inline struct xdp_buff *xsk_buff_get_frag(struct xdp_buff *first)
-                                  ^
->> net/core/filter.c:4102:27: error: member reference type 'int' is not a pointer
-                   xsk_buff_get_tail(xdp)->data_end -= shrink;
-                   ~~~~~~~~~~~~~~~~~~~~~~  ^
-   net/core/filter.c:4115:14: error: call to undeclared function 'xsk_buff_get_tail'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-                           zc_frag = xsk_buff_get_tail(xdp);
-                                     ^
->> net/core/filter.c:4115:12: error: incompatible integer to pointer conversion assigning to 'struct xdp_buff *' from 'int' [-Wint-conversion]
-                           zc_frag = xsk_buff_get_tail(xdp);
-                                   ^ ~~~~~~~~~~~~~~~~~~~~~~
->> net/core/filter.c:4117:4: error: call to undeclared function 'xsk_buff_tail_del'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-                           xsk_buff_tail_del(zc_frag);
-                           ^
-   5 errors generated.
+Arjun
 
 
-vim +/xsk_buff_get_tail +4102 net/core/filter.c
+> On Dec 7, 2023, at 3:37 PM, Stephen Hemminger =
+<stephen@networkplumber.org> wrote:
+>=20
+> On Thu, 7 Dec 2023 12:57:08 -0700
+> Arjun Mehta <arjunmeht@gmail.com> wrote:
+>=20
+>> Hi there, I=E2=80=99d like to report what I believe to be a bug with =
+either Linux Bridge (maybe and/or thunderbolt-net as well).
+>>=20
+>> Problem: Rx on bridged Thunderbolt interface are blocked
+>>=20
+>> Reported Behavior:
+>> Tested on Proxmox host via iperf3, between B550 Vision D-P and =
+MacBook Pro (2019 intel). On a direct interface, thunderbolt bridge Tx =
+and Rx speeds are equal and full speed (in my case 9GB/s each). However, =
+when a thunderbolt bridge is passed through via Linux Bridge to a VM or =
+container (in my case a Proxmox LXC container or VM) the bridge achieves =
+full Tx speeds, but Rx speeds are reporting limited to ~30kb/s
+>>=20
+>> Expected:
+>> The VM/CT should have the same general performance for Tx AND Rx as =
+the host
+>>=20
+>> Reproducing:
+>> - Setup for the bridge was done by following this guide: =
+https://gist.github.com/scyto/67fdc9a517faefa68f730f82d7fa3570
+>> - Both devices on Thunderbolt interfaces have static IPs
+>> - VM is given the same IP, but unique MAC address
+>> - BIOS has Thunderbolt security mode set to =E2=80=9CNo security=E2=80=9D=
 
-  4097	
-  4098	static void __shrink_data(struct xdp_buff *xdp, struct xdp_mem_info *mem_info,
-  4099				  skb_frag_t *frag, int shrink)
-  4100	{
-  4101		if (mem_info->type == MEM_TYPE_XSK_BUFF_POOL)
-> 4102			xsk_buff_get_tail(xdp)->data_end -= shrink;
-  4103		skb_frag_size_sub(frag, shrink);
-  4104	}
-  4105	
-  4106	static bool shrink_data(struct xdp_buff *xdp, skb_frag_t *frag, int shrink)
-  4107	{
-  4108		struct xdp_mem_info *mem_info = &xdp->rxq->mem;
-  4109	
-  4110		if (skb_frag_size(frag) == shrink) {
-  4111			struct page *page = skb_frag_page(frag);
-  4112			struct xdp_buff *zc_frag = NULL;
-  4113	
-  4114			if (mem_info->type == MEM_TYPE_XSK_BUFF_POOL) {
-> 4115				zc_frag = xsk_buff_get_tail(xdp);
-  4116				xdp_buff_clear_frags_flag(zc_frag);
-> 4117				xsk_buff_tail_del(zc_frag);
-  4118			}
-  4119	
-  4120			__xdp_return(page_address(page), mem_info, false, zc_frag);
-  4121			return true;
-  4122		}
-  4123		__shrink_data(xdp, mem_info, frag, shrink);
-  4124		return false;
-  4125	}
-  4126	
+>>=20
+>> Further reading:
+>> The problem is outlined more with screenshots and further details in =
+this Reddit post: =
+https://www.reddit.com/r/Proxmox/comments/17kq5st/slow_rx_speed_from_thund=
+erbolt_3_port_to_vm_over/.
+>>=20
+>> Please let me know if there is any further action I can do to help =
+investigate or where else I can direct the bug/concern
+>=20
+> Most likely this is a hardware issue on the thunderbolt interface =
+where it will not
+> allow sending with a different source MAC address.  Some Wifi =
+interfaces have this
+> problem.
+>=20
+> Is Promox using a kernel from upstream Linux repository directly.
+> Netdev developers are unwilling to assist if there are any =
+non-upstream kernel modules in use.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+
 
