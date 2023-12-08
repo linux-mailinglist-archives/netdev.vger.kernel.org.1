@@ -1,57 +1,60 @@
-Return-Path: <netdev+bounces-55148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D0C9809929
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 03:27:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B824809931
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 03:30:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08CE31F212AB
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 02:27:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A64651F21165
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 02:30:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4284C1867;
-	Fri,  8 Dec 2023 02:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 653EE37A;
+	Fri,  8 Dec 2023 02:30:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="VhFn13j3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AKLNFjcd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9594F1709
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 18:27:43 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1d045097b4cso12594325ad.0
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 18:27:43 -0800 (PST)
+Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 688931708
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 18:30:47 -0800 (PST)
+Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-5d226f51f71so15270997b3.3
+        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 18:30:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1702002463; x=1702607263; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
+        d=gmail.com; s=20230601; t=1702002646; x=1702607446; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=bYKvR9biHT3dayV04op9dSPEQWRRtNPHfVpKUnfsyTI=;
-        b=VhFn13j3PqZWb5TLNVMvYBK+V5TLVyqMayuvjHvDyM27TAFpwf3ydIrUHG8tP0NGjg
-         sBuigy4LfAo0iq0+besGdnnVIxZJkyW91LPWvRPZvzaNM9//TSdHtI4sn5ht2kdYlsvl
-         f7RLVnWnv2hSjuKhUzZM5kpwoBEj+YjwPX4Nw=
+        bh=gPFzsWif4JOmQ6Tsvqo3ehgr2PEw06oPAeKXnjWTZ+c=;
+        b=AKLNFjcdAxiQgVG2tGNfHabFRlXIDVQl7FDDiHRtKD9pMjX9EhrojHZGU8A6GI4oNB
+         yuMCnerK+tJEml4Qkq9icqwV2xwvoeK4c3hbar3s0V/9enlNP1ZuCkJf90diRqpV3wOC
+         nmNDLwqLuR6QkoayfLCTUQauMxjx7pi/X2oPgwlyqZlIP8K3LtObppjdobIcC8If4vHe
+         kDLgB8Otu2dc/Tx4U8hALyUN6UdexYcVIvow8Va43Jd7CFzAqcx7uZx59q+geKmyMW24
+         Qq1BZ6n1zArFahqBra4afH56O8Sjq/hUEqEyCbQg+z/vN8c75fdYvHvDLmQKFThP0UuG
+         d1Ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702002463; x=1702607263;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1702002646; x=1702607446;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bYKvR9biHT3dayV04op9dSPEQWRRtNPHfVpKUnfsyTI=;
-        b=JWm2KVvhhWgxldBOtq9xmMsj2LlmLkvpiC1wR7C95y+HEXjyBKr8pMWPU2MgjLP7J/
-         fsK+WiuBJjwLEwMBTNi7JuRmfc2lbfcNIPkNDaR1gC23dOfvLw4XO3n9Rc+rU4ZdiDFF
-         +lam4sORWLtDYOoZQc8Qzn4UIYDgYroA1ZdxhTjO2cFJkBGDNEUjCiQJDUpe4aPAfEvm
-         3TVbb6Kjr6VLyFn9aC3aDutZDsMu49L7gThrciR/bOaZKEgh2yzq7XN/lOMGNFIc5brS
-         GprFrS6Lfr75iO57wk6zTtvzy/WesF6uH9CCgF8phXGT6dw8tOV99uPfs7QUe0JHbl8m
-         sKOA==
-X-Gm-Message-State: AOJu0YzIqLOL4kJXEHLl+Z/9gqxUDH3nBhI8FxETOmFu8bY+SVScRHwW
-	Tm1ANg6aC2ykbJN5mAgKm7gZCw==
-X-Google-Smtp-Source: AGHT+IE+YH6XCFuLw8IMGfclF6KPMZA8MDgow7b5AP5v+501j19hkR62ob7PHHZkLnrwYuYQEJvI6w==
-X-Received: by 2002:a17:903:230b:b0:1d0:6ffd:cea8 with SMTP id d11-20020a170903230b00b001d06ffdcea8mr3531967plh.97.1702002462996;
-        Thu, 07 Dec 2023 18:27:42 -0800 (PST)
-Received: from [192.168.0.212] ([50.47.85.47])
-        by smtp.gmail.com with ESMTPSA id a7-20020a170902b58700b001d0c41b1d03sm512054pls.32.2023.12.07.18.27.40
+        bh=gPFzsWif4JOmQ6Tsvqo3ehgr2PEw06oPAeKXnjWTZ+c=;
+        b=OUB8pN/DD5nDCc8wXQJHKikiJF175yeMsRWxt+DvwUcNqRHHhbbM0qGjuIc51hD5mH
+         CHDhjY/8uu+6b3CNAsTjHNKSIi7DjvKLSTccRJVkcB58xtqlaiuE78zwSA5B+BPHTDQC
+         XDi+w4cQceaJjW96KahWy9dZdQLTmlwjI2TSGLW5cSsr4nGlhZFymRjkMHsgtKrpZVfT
+         oYPFbbQAj+N92sU0dW8UMux5kpxlomGWHc9EWh/eCPin/6osQXeqi1rJJRhcyFR37y7o
+         ZQRzIv8rRt3Q63uy4iHFqsPXxk0UgQSMGzkBGSJRIvqg1phJeJKagcJCbkwM4RS0zSHO
+         TVJA==
+X-Gm-Message-State: AOJu0YyoCieTlkcS0kF3t7sHs6Uih8tym77gslVtQbmL61Va1KJ+IvSy
+	44cPYXavMQHstuG8+ZVC3hWzseDJcIE=
+X-Google-Smtp-Source: AGHT+IGvtktP222WoL3SNePrllIsVm4/MIMKU9JQ89aNqrqymBuvUnGxvORvdqIR3IpozaEAmTPLtw==
+X-Received: by 2002:a81:ac0c:0:b0:5d7:1940:dd75 with SMTP id k12-20020a81ac0c000000b005d71940dd75mr3114135ywh.75.1702002646514;
+        Thu, 07 Dec 2023 18:30:46 -0800 (PST)
+Received: from ?IPV6:2600:1700:6cf8:1240:57df:3a91:11ad:dcd? ([2600:1700:6cf8:1240:57df:3a91:11ad:dcd])
+        by smtp.gmail.com with ESMTPSA id y131-20020a0dd689000000b005b59652bcdesm343719ywd.60.2023.12.07.18.30.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Dec 2023 18:27:42 -0800 (PST)
-Message-ID: <64074f04-fd72-488b-831a-ad744bbcd950@broadcom.com>
-Date: Thu, 7 Dec 2023 18:27:39 -0800
+        Thu, 07 Dec 2023 18:30:46 -0800 (PST)
+Message-ID: <831a3aed-8ba3-451f-bd8a-6d8fe63067d1@gmail.com>
+Date: Thu, 7 Dec 2023 18:30:44 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,103 +62,118 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] x86/vmware: Add TDX hypercall support
+Subject: Re: [PATCH net-next] net/ipv6: insert the fib6 gc_link of a fib6_info
+ only if in fib6.
 Content-Language: en-US
-To: Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, hpa@zytor.com, dave.hansen@linux.intel.co,
- bp@alien8.d, mingo@redhat.com, tglx@linutronix.de,
- dave.hansen@linux.intel.com
-Cc: x86@kernel.org, netdev@vger.kernel.org, richardcochran@gmail.com,
- linux-input@vger.kernel.org, dmitry.torokhov@gmail.com, zackr@vmware.com,
- linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
- namit@vmware.com, timothym@vmware.com, akaher@vmware.com, jsipek@vmware.com,
- dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
- tzimmermann@suse.de, mripard@kernel.org, maarten.lankhorst@linux.intel.com,
- horms@kernel.org
-References: <ef8d3e17-7028-47fd-ad31-54dadbb6796d@broadcom.com>
- <20231206071527.59171-1-alexey.makhalov@broadcom.com>
- <53592a3a-3d96-4aa1-8357-ec595f59c5f3@intel.com>
-From: Alexey Makhalov <alexey.makhalov@broadcom.com>
-Autocrypt: addr=alexey.makhalov@broadcom.com; keydata=
- xsFNBGVo9lkBEACeouRIm6Q3QTvjcnPczfBqgLffURstVJz5nqjnrNR4T+8dwNrZB8PTgOWA
- QdGV4bIyqtNG7UHQuZ7sVKr2tx0gYJyQ5uZgncEHB5YIuhQ/CyAHrVmO+5/0/xWCLI0g44rF
- ZJqsYw2JQ2+vayTWbR65rkOiKL8GOVFNZanDg80BRh6qCmCEMXd/tymxvgnvWpHtxMgukexk
- 4vV9nV4XhxRVYdpLk8mBxsh+AEbHE+nbWgIuJDrmrZDGI2Dha7JFoB0Mi6hbbYd9BdkcHKQ7
- 6c+S1xOrZL3jX7OIFhb4NNnEOhh8/+BDlyby478p6YsimNa7TgAUbrygGyfVG8usrZy8SvO+
- vUbVQwqjcJaCK1xazK12dfuZm2kSMJUrJqa9ng6OMjkE2/WrtnK8ruFNSCdytzbuheT0nYUJ
- Uwy84cU4p2K/N2C4vYjcn+IT+l1BFr5FViKYruoRLVH6zK/WOoZjA+Fc6tdM5nC1pgSB9c7h
- XLQqDSzYPzk3nqeHWG1qJ0Hu7pscIrjxyNTIZ5le0TlpblJdoRcL5maDNw22yle8m4D18ERF
- VrqNoqwW8fObMCHbd6C3m75lzerq1HhrSvLyU4UfprEyAcjOI1C0319SXfYlXDjKXRQyaDZP
- wxln8uShSitSSnx0AsSAjcUa8Cc7km81+G2WSK3S2wVIAN11awARAQABzS5BbGV4ZXkgTWFr
- aGFsb3YgPGFsZXhleS5tYWtoYWxvdkBicm9hZGNvbS5jb20+wsGNBBMBCAA3FiEEjLzRtST/
- a5u42vOKbM7yHr5SJ3cFAmVo9lwFCQ0oaIACGwMECwkIBwUVCAkKCwUWAgMBAAAKCRBszvIe
- vlInd0jTD/9bZtjehewLRrW3dRDAbLG/+J5g1K4X5qQPfAo42NrhZQlOTibL7ixwq7NSXynZ
- V4Iu9jHAW++KXjxJzkg7zjBf9OOvvgCpqZGKYgWNvHHnX4eIVh8Ikp5JtvGPMBcRv7lJA5co
- kb+RHo9iRrB1dvRIOsP1SlGS85SiNA0yvmgqwbigLDmDRSWtvvt9XPwU1iqF+1OopT3UE10i
- /z+qE2ogcw2ADveBovq2W4JeQEBvlETwDKOdh8Q3UBHOqrZUrL7YjpUxgmb89FcjdDzUU95I
- fCB5YxF0hUctxFH5Uujh2F4qk0m2rp7+aOGtxWCJUqkHXjgpOoxyn0FPZiZlDkst84NO5OSI
- 5ZFPwaFqxUrFF+cFCY2O/UE2gpoK9Lt3gYNK6o2WIAtufuiYVdK6lANMkBgZ+t2fDLIN147a
- 172zu8XnyJMTo+tVfUjxwqynoR/NSWpVPs0Ck3K0LGjQE0tJ6HZrH0vudXk3YaiqW+D4CtGh
- I17Pk0h6x8LCdjmWmuDXoc99ezOEFSyWuTHjAYxx3cmgSUyIhdHtimuf0CVLTcFoBErb/5pJ
- zjb11Cj0HP87FMH57bnD3qyfkBMOB6tztfdt3vkCBaWkxaiTGXNhwr4IiLUoi90yIdXDMcTj
- /gvnjXgN+31iYgPWgTOdUEQud0DwDwuDwkzx/0x4sF1Dfc7BTQRlaPZcARAAuGkoYKWcrCh8
- 5RffedM6uBZ4p5Z4+RVj05uq7hlAwhHUpLP/XGbgNzhJP375Lonmnuyg2x7oHxfiwOohuuiA
- MnhSeEXn2qWZJuHosrYxs9y2zyiE/GTUAcqKiYBFa/96zOaZjHpNuQ5qSHYL64WhqvtmCQYg
- fL+jes2Z4IXl2R7MrN9OE+G3A3pOAo8TZKUEmlUV85fSmgopIX+hCiSQmRNRtp2jK6hd2+38
- YAXc+eRxYgXKaWX5zeBgNrfM7Oxeh/0iWRZPWstTvVH2xMlzywOB3e/fqg+Q3NlPGDrTyHoc
- L86ZELSLcMTFn+RXw8lX8oVjTcQA0M8sQHB5g0JEWtMsFjnQZkJGCfeh0Odbn/F8nZ6LQQtu
- +fjc/4n9vRun+PZjdhd3W9ZM9D87W9XJg9txIaYnoUXBLLpHK/OirFfr5cJTUf4svtE3EVXb
- x6P9vr7zqUbE0f76h1eDPmyMwFAuibIXhNoEoKQtEjLX9aKgKYny3hczRiuQpA+6U4oTNn4S
- /CEqphLPT53aMH0w4x0CebMPozf24ZE9YphdX8ECclLBlDL1/zx2xKrJNw8v6wdXMSfsybBW
- 98b5b1eVBk1uc1UMlpDl7AIHyCMTjL9Ha85eoya/Hk9l93aVHgK04hOBY2ED1/ZRpj0M5P5m
- tNX1JqZunpyvKooT1PrJr4UAEQEAAcLBfAQYAQgAJhYhBIy80bUk/2ubuNrzimzO8h6+Uid3
- BQJlaPZeBQkNKGiAAhsMAAoJEGzO8h6+Uid3SDoQAI3XXqsehWKvyAVeGXPxmkk+Suos/nJC
- xZWjp4U2xbbegBnNWladZoNdlVW/WV+FSFsN5IWztxQTWBMI12A0dx+Ooi9PSIANnlN+gQsA
- 9WeQ5iDNveEHZyK1GmuqZ3M3YZ1r3T2KyzTnPPZQ1B8gMQ442bOBWe077MqtLaC0J1jHyWHU
- j6BbUCAyR2/OCV/n1bH4wYIm2lgrOd2WuzoAGvju+j2g7hMRxw/xeHeu8S0czHuEZ0dC6fR1
- ZKUOw03+mM/xRzL1be6RVS9AF7R5oDd11RrTOb7k14z0inFqSRrRwzOPKcuMxrApcquar336
- 3FQuLcJLjBo/SAOh2JatOkkwkw5PZseqdwcAk5+wcCbdYy8J8ttR04iV1FzrdQp8HbVxGNo7
- AlDn1qtoHzvJHSQG51tbXWfLIi1ek3tpwJWj08+Zo+M47X6B65g7wdrwCiiFfclhXhI1eJNy
- fqqZgi3rxgu4sc5lmR846emZ/Tx85/nizqWCv7xUBxQwmhRPZRW+37vS2OLpyrTtBj3/tEM9
- m9GMmTZqaJFeK7WCpprJV4jNHpWZuNAsQrdK1MrceIxb0/6wYe0xK79lScxms+zs9pGTrO4U
- 5RoS4gXK65ECcBH8/mumV6oBmLrNxKUrzTczdo9PnkmRyZcAa6AndbjmQDznwxvTZu2LjMPC EuY0
-In-Reply-To: <53592a3a-3d96-4aa1-8357-ec595f59c5f3@intel.com>
+To: David Ahern <dsahern@kernel.org>, thinker.li@gmail.com,
+ netdev@vger.kernel.org, martin.lau@linux.dev, kernel-team@meta.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+Cc: kuifeng@meta.com, syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com
+References: <20231207221627.746324-1-thinker.li@gmail.com>
+ <8f44514b-f5b4-4fd1-b361-32bb10ed14ad@kernel.org>
+ <4eebd408-ee47-4ef0-bb72-0c7abad3eecf@kernel.org>
+ <dbccbd5d-8968-43cb-9eca-d19cc12f6515@gmail.com>
+ <b6fccc0d-c60b-4f11-9ef7-25b01c25425d@kernel.org>
+ <b0fe3183-4df9-42bc-84e4-ba8e807318f4@gmail.com>
+ <3d9f78ff-15b4-4c66-a007-a82e4be6d510@kernel.org>
+From: Kui-Feng Lee <sinquersw@gmail.com>
+In-Reply-To: <3d9f78ff-15b4-4c66-a007-a82e4be6d510@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
 
 
-On 12/7/23 9:12 AM, Dave Hansen wrote:
-> On 12/5/23 23:15, Alexey Makhalov wrote:
->> +#ifdef CONFIG_INTEL_TDX_GUEST
->> +/* Export tdx hypercall and allow it only for VMware guests. */
->> +void vmware_tdx_hypercall_args(struct tdx_module_args *args)
->> +{
->> +	if (hypervisor_is_type(X86_HYPER_VMWARE))
->> +		__tdx_hypercall(args);
->> +}
->> +EXPORT_SYMBOL_GPL(vmware_tdx_hypercall_args);
->> +#endif
+On 12/7/23 17:23, David Ahern wrote:
+> On 12/7/23 6:16 PM, Kui-Feng Lee wrote:
+>>
+>>
+>> On 12/7/23 17:02, David Ahern wrote:
+>>> On 12/7/23 4:33 PM, Kui-Feng Lee wrote:
+>>>>
+>>>>
+>>>> On 12/7/23 15:20, David Ahern wrote:
+>>>>> On 12/7/23 4:17 PM, David Ahern wrote:
+>>>>>> On 12/7/23 3:16 PM, thinker.li@gmail.com wrote:
+>>>>>>> From: Kui-Feng Lee <thinker.li@gmail.com>
+>>>>>>>
+>>>>>>> Check f6i->fib6_node before inserting a f6i (fib6_info) to
+>>>>>>> tb6_gc_hlist.
+>>>>>>
+>>>>>> any place setting expires should know if the entry is in a table or
+>>>>>> not.
+>>>>>>
+>>>>>> And the syzbot report contains a reproducer, a kernel config and other
+>>>>>> means to test a patch.
+>>>>>>
+>>>>>
+>>>>> Fundamentally, the set and clear helpers are doing 2 things; they need
+>>>>> to be split into separate helpers.
+>>>>
+>>>> Sorry, I don't follow you.
+>>>>
+>>>> There are fib6_set_expires_locked()) and fib6_clean_expires_locked(),
+>>>> two separate helpers. Is this what you are saying?
+>>>>
+>>>> Doing checks of f6i->fib6_node in fib6_set_expires_locked() should
+>>>> already apply everywhere setting expires, right?
+>>>>
+>>>> Do I miss anything?
+>>>
+>>> static inline void fib6_set_expires_locked(struct fib6_info *f6i,
+>>>                                              unsigned long expires)
+>>> {
+>>>           struct fib6_table *tb6;
+>>>
+>>>           tb6 = f6i->fib6_table;
+>>>           f6i->expires = expires;
+>>>           if (tb6 && !fib6_has_expires(f6i))
+>>>                   hlist_add_head(&f6i->gc_link, &tb6->tb6_gc_hlist);
 > 
-> I think this is still too generic.  This still allows anything setting
-> X86_HYPER_VMWARE to make any TDX hypercall.
+> --> no check that f6i is already in the list yet fib6_set_expires and
+> fib6_set_expires_locked are called on existing entries - entries already
+> in the tree and so *maybe* already linked. See fib6_add_rt2node and most
+> of fib6_set_expires callers.
+
+Although it bases on a false assumption, checking tb6 ensures the
+entry is added to the list only if this f6i is already on the tree.
+The correct one should checks f6i->fib6_node.
+So, with checking f6i->fib6_ndoe and the open code you mentioned,
+fib6_has_expires() does check if a f6i is already in the list.
+
+But, like what you mentioned earlier, hlist_unhashed(&f6i->gc_link) is
+clearer. I will move to ti.
+
 > 
-> I'd *much* rather you export something like vmware_tdx_hypercall() or
-> even the high-level calls like hypervisor_ppn_reset_all().  The higher
-> level and more specialized the interface, the less likely it is to be
-> abused.
+> Your selftests only check that entries are removed; it does not check
+> updating the expires time on an existing entry. It does not check a
+> route replace that toggles between no expires value or to an expires
+> (fib6_add_rt2node use of fib6_set_expires_locked) and then replacing
+> that route -- various permutations here.
+> 
+> 
+>>>           f6i->fib6_flags |= RTF_EXPIRES;
+>>> }
+>>>
+>>> 1. You are abusing this helper in create_info to set the value of
+>>> expires knowing (expecting) tb6 to NOT be set and hence not setting
+>>> gc_link so no cleanup is needed on errors.
+>>>
+>>> 2. You then open code gc_link when adding to the tree.
+>>>
+>>> I had my reservations when you sent this patch months ago, but I did not
+>>> have time to suggest a cleaner approach and now this is where we are --
+>>> trying to find some race corrupting the list.
+>>
+>> So, what you said is to split fib6_set_expires_locked() into two
+>> functions. One is setting expires, and the other is adding a f6i to
+>> tb6_gc_hlist. fib6_clean_expires_locked() should be split in the same
+>> way.
+>>
+>> Is it correct?
+>>
+> 
+> one helper sets expires value and one helper that adds/removes from the
+> gc_link. If it is already linked, then no need to do it again.
 
-Dave, I understood your point. Please take a look on the next version of 
-the patch.
-
-I export vmware_tdx_hypercall(), while vmware_tdx_hypercall_args() is a
-static inline wrapper on top.
-Most of the vmware hypercall logic plus sanity checks are now in 
-exported function. While only input and output argument handling remains 
-in the wrapper to allow compiler optimization for hypercalls with few 
-argument. Exporting vmware_tdx_hypercall1, vmware_tdx_hypercall3, and so 
-on is not an option either.
-
-Regards,
---Alexey
+Got it!
 
