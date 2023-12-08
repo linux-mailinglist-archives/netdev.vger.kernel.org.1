@@ -1,206 +1,140 @@
-Return-Path: <netdev+bounces-55196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C15C809C9E
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 07:56:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AD25809CC4
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 08:00:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A0AC1F21334
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 06:56:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 164281F2110D
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 07:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D07C67479;
-	Fri,  8 Dec 2023 06:56:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF888D272;
+	Fri,  8 Dec 2023 07:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="B/ZkAX6N"
+	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="WWBA7S3p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BF07172C;
-	Thu,  7 Dec 2023 22:56:32 -0800 (PST)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B84BRcg017039;
-	Thu, 7 Dec 2023 22:56:26 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type; s=pfpt0220; bh=j40vAbxbC9C9HLlER4a3cYonqK/INrKGkTJhBdoOE+Q=;
- b=B/ZkAX6NaT1FBRq2iSRiSFR+6/nvq0UJ3NJ3kr3JQbPUTfqQ4OCEsHsb1hCjnTPEZlyO
- JT9U8RU8MgHuUsEOLTK7rA1fngHrf8BCIB0u4NZbXzM0bzHn49KWFaVMmLSQ089ZDyHC
- cumJs5wqP8fZV4PDp5ang1/8aqApzMMpkpFlwh6Ll6hPsXTYSSvLRbkDSXaO6kW5Mac3
- qT3DgVU8x08/jqSi/Y1TGzV2m0lf/cRp57tjGidBVIG/Zafi1PPHvrElT/ncLX2tMdN/
- fZfN5BJyssWDx7cXve8yz3E4B9WMOA3fcZeOK6Jx9dPAPDP7HqJMkcuMzee18lXWb9ns FA== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3uu8qecnd6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Thu, 07 Dec 2023 22:56:26 -0800
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 7 Dec
- 2023 22:56:25 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Thu, 7 Dec 2023 22:56:24 -0800
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id EA0CE3F70AA;
-	Thu,  7 Dec 2023 22:56:20 -0800 (PST)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <jerinj@marvell.com>, <lcherian@marvell.com>,
-        <sbhatta@marvell.com>, <hkelam@marvell.com>, <naveenm@marvell.com>,
-        <edumazet@google.com>, <pabeni@redhat.com>
-Subject: [net 2/2] octeontx2-af: Update RSS algorithm index
-Date: Fri, 8 Dec 2023 12:26:10 +0530
-Message-ID: <20231208065610.16086-3-hkelam@marvell.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20231208065610.16086-1-hkelam@marvell.com>
-References: <20231208065610.16086-1-hkelam@marvell.com>
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2104.outbound.protection.outlook.com [40.107.243.104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03985173E;
+	Thu,  7 Dec 2023 23:00:27 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=l/V86jzdPYNXscfN1EWNrZy92Bj8lkPGfHOFc0eMWVh2SxNRw6dyvdoWXNfZy/Yvr4m4++6BJt+hB4yqf5cuaFRezi9qKAD52DG7/TFvCUjKhe1GupSO1G5T5Yl7/mTYbiRr6wi4IbHF5vwPTP3Jl4bXvJf56JyHG2phCbv430U7mffyMXShyysLCkOSZ2imWE0XA6uB2HrIbHLv+QkOG0plvj4xQDZiumUuZ/q9WodtdjxEMdjcMj0jrRvCeIwht83dAarcFtXUCBSyX35OvIvsR42ckXLvcAD4SocrZhWf05kpsoY7t83GIMwK2xvL5Ro4Z9WCV9cB+FslW3WZ9g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wtlC+gjkald5hvkvmC0T0FWt1sp+A69zSnaJY8CEuTk=;
+ b=ln0z9Gprv+jo1T4PahMY1LxwHka/WJKKVqFHLIXnN77xELnMCfCyCUS8Moyo05ap7FgmczbrbP4ePuU0Kf2NXs9LJWZaeP4VZKry6YmYBrY3nk7Y4dZX1NmMrNLVv774v8aRLnf+8z8Tpm5aQzLKXj35t53CpWKoPKynAvRO0uiS5wBal8VShuLukcHC6hD0PVhXAwBeLDXNgZI1Tiu2Bymz2PjNIaFq+MFd+nNJJzf3SnfATZh3yRoyRGplo9llAD6purQih2kMnT4C9+LuM9Z3WalGRkqTgKvJrZFKG9pMQbiCw4b5M7/BXv3ygX99HGZwWsSZTD/l/EG4ARrqXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wtlC+gjkald5hvkvmC0T0FWt1sp+A69zSnaJY8CEuTk=;
+ b=WWBA7S3pp162w4TNBq2uz5xTBGZrxCnJXhbWrpJwZLpP9wnfWx0M2ZTUt3GpfgdYe/umBsLMrfqdjMICMxJ75gqJcu5UM36/cNPntKzfGZRPUrMXHDQb6sgrQvAeDUdmud6rWlnMNm13WsQnnvJq0Ag/QIIUI2+KTvv0MN6ltdg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
+ by CH2PR13MB3702.namprd13.prod.outlook.com (2603:10b6:610:a1::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Fri, 8 Dec
+ 2023 07:00:22 +0000
+Received: from BL0PR13MB4403.namprd13.prod.outlook.com
+ ([fe80::d3c0:fa39:cb9e:a536]) by BL0PR13MB4403.namprd13.prod.outlook.com
+ ([fe80::d3c0:fa39:cb9e:a536%7]) with mapi id 15.20.7068.027; Fri, 8 Dec 2023
+ 07:00:22 +0000
+From: Louis Peens <louis.peens@corigine.com>
+To: David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Hui Zhou <hui.zhou@corigine.com>,
+	netdev@vger.kernel.org,
+	stable@vger.kernel.org,
+	oss-drivers@corigine.com
+Subject: [PATCH net 0/2] nfp: flower: a few small conntrack offload fixes
+Date: Fri,  8 Dec 2023 08:59:54 +0200
+Message-Id: <20231208065956.11917-1-louis.peens@corigine.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: JN2P275CA0032.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:2::20)
+ To BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: vA2OjqBjrypEWDePL_qGrGcxm1Nu1hHX
-X-Proofpoint-ORIG-GUID: vA2OjqBjrypEWDePL_qGrGcxm1Nu1hHX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-08_02,2023-12-07_01,2023-05-22_02
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL0PR13MB4403:EE_|CH2PR13MB3702:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1494bda1-0fe9-4b07-fc9b-08dbf7bb5883
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	I5AghBHJ8S7zHE8nC5hLQO0vyubdFrqRgsGocSzKDfrYevASiwsfVD86hTwQyRLk1qSTqJyRyLqNj8Fc7scB+jWNDsYcGajsMa+Mz7acQ3jVhE1JsVIdCFxPr73lItQTu0HARjRvLr7xRpa7hJo2RDDTUt9ByCvzV5Djf/I5UBk9b7oCxYCnLAE+OHq1dP5Izy0g6yVaeecQLvjBLnHOkaBSqhu7aFfZ0CWVjKI4jj4Q3Cmh+jn9OlJdX3P9piqawQKWlYTfkOr+103YS1+m+Aad9ksuoadfmdnT/sjGo2o/NW+gmWlHKVQIzMcat4q1yuRBhclr8EA2A+SkCV5NhBqCa6siB9E8LjotYZNgeCd8DATcpNinXL+D2xK5ihTN9gEB1hYGt7yVZH2/qIR6LRszYG8AOrLttkRzIS+KSfKJKmHgJC7yXDyogYZoVJ1nOIbrEjXH5ElIjM9ixzU1dUhCbs0KEnrlj34mqkCF87rk1wNmnpdmZHcAilew4VcgpGRQ+KDQUZndtBmS9kJbJuDZPCRfgkU3lKJ4WvKeMMmq1+qVyO4WLT0Iuk8A5gTxuVDPAfN6X4bsSS4cPZStalIhAbLT4iEZ/d3q1HF1TeLOEv196JE714c/SgamiA8Vl+lJ9GaD5WHDHurM0vcmvwdo4M9CSLO1dnJKnMl9C2g=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR13MB4403.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39840400004)(346002)(376002)(396003)(136003)(230922051799003)(1800799012)(186009)(451199024)(64100799003)(83380400001)(26005)(1076003)(107886003)(2616005)(2906002)(66946007)(86362001)(44832011)(38100700002)(8936002)(4326008)(5660300002)(4744005)(8676002)(110136005)(66556008)(66476007)(316002)(6512007)(6506007)(52116002)(36756003)(38350700005)(478600001)(6486002)(6666004)(41300700001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?/3UfRLmq40NZjnyWC0oDXVu7JyiG+PFi0Ff6mCAJat+yoOCWbMlroYUoBYi9?=
+ =?us-ascii?Q?IQS99dxDD4V50W5QgRHC4/dyIqS40m+5CTw6xQNzTXXa/QDQLYHUGFz2pQMn?=
+ =?us-ascii?Q?8kb/Vx8FEqRmmsk37iPT2CmeFKIuTshQiIOGUBg2TqpSr885B3V6v+TRuFfU?=
+ =?us-ascii?Q?eXQxjjRTERMmuAbzdGIdHXBTQtvG0LPSQoYJmNjJE6muTTyQP7l7xYbqKCYY?=
+ =?us-ascii?Q?TNejVRTZBPX8136ZrO+9EuOPGhRQXQYvCC5Gv+aHlKwc/A8K9yC2LDheTvt8?=
+ =?us-ascii?Q?pz26V96Aao3Chl8L3y5IN95tc+JJJZnB/OB/H8IumMht4u8vIzOfD4lhoykc?=
+ =?us-ascii?Q?n/bvNSUUrX/Gi6XcWEn1UGTBPjolaeHoeppcEsRvyZWye66xQr8egzCTvSC5?=
+ =?us-ascii?Q?F2CzPBamzB2fSbP75h/OfqgQ/+qpjn6J9cZ6pwbXG3VrPE+Q3t1rN56c60MO?=
+ =?us-ascii?Q?rPhmZxiUqFTZaqPr9AuCv+dvInSeZYXs3y8hHOmmZcB1NyoofBzBuSKtdcRi?=
+ =?us-ascii?Q?p2QHkjFyGnjJWKILRS2+5S/0qtivp1asA5DQFAORdIzfQ80ZOo7u2llZedhc?=
+ =?us-ascii?Q?ChA4kM/4pCPnSPCY5parBpO++k9zltxclSBx6S+c6RPz0pOSUOuPmIjo8V3u?=
+ =?us-ascii?Q?py6EH5Jgoe9mLScLfJKNLkjVYz8AzSSg1Ieeq1zXTmWoLoQD2kP1WlAoqdZA?=
+ =?us-ascii?Q?MmYDPajigAKvwNAACJFhLvoWLf0k+uR+aQNmch5+Jx1cMAOhSYwN9057IvUg?=
+ =?us-ascii?Q?MomgxZK3cu02p5xuFV2IkWr4vlY+G3FBjGdlLYeY+RPmTUCbakos0qLnV6hc?=
+ =?us-ascii?Q?VAe0MUP78K108ZV4UjH/D/dWgkasZhCkzJw18NYzIeG7d1BxonoczhuAjh2X?=
+ =?us-ascii?Q?QMz1wSaPDG77qGC0loSbYwzvI0BhVnLl+fgQb6nUBhWRjygTT+C7rBrB2QXT?=
+ =?us-ascii?Q?ARyxyGxomfutXH/T4bX+R/sFh/oyGnxaF2fI3PmYAKXBwhiNV9FzhnEbYwyG?=
+ =?us-ascii?Q?SFcOS31IclbcKJhMtAkSixCL2gqfUFZNwDx7SQp2kSNuMNJZK5mc36UKhZ4e?=
+ =?us-ascii?Q?K6HZ+jeOsP1SrKgiEDlgGTabTzpDajYLLnwMeU+wAIGzSK6XFdNNvgZFPxB0?=
+ =?us-ascii?Q?GMT2of0fj0U9gmzpdX0nfDTZoD8Z9RZACMXl7iyf7vt1fy5lDyPGeDawcgTd?=
+ =?us-ascii?Q?++AY3YgxFQl9Hny5RwiUqKtAfDw9ByC/XYulvoa8iUBfBUfxMVHa+cBTSf/Y?=
+ =?us-ascii?Q?2oOE4QgoAkfQC7ZY2bpqRL9fk7QJY4hykeajp9vvlP1zHeqY9v+ZG4Ti21l+?=
+ =?us-ascii?Q?+mutW+H3L37RujBSd8PQD7fMo1fmdes5F9lr7VGHktDN0jXjRtQ80gg8J+bx?=
+ =?us-ascii?Q?fsPIzIWmZmwR1Bij2z3C8YoU9qJ2yJ+zxLR5UAwDL/fZAJXsbkz4+uCwqJ8I?=
+ =?us-ascii?Q?CxpDEaQdz6WYhqqx4qQQbbgC94fYHzH+UXVkIj78Ta8/HipMHcesAxG393NL?=
+ =?us-ascii?Q?n7uVHYpgpV3dQejGDqBIQ/DNr3J8eIshf/0gg90f0kDg3UKCZDR3cKA1s93y?=
+ =?us-ascii?Q?TkUuAJ44s2mtDtCD+x+Ex7KEFU+Un7i7IuJGH297E7MaQVIXBskFL6rl7EdN?=
+ =?us-ascii?Q?BA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1494bda1-0fe9-4b07-fc9b-08dbf7bb5883
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR13MB4403.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Dec 2023 07:00:22.3391
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wq2voqW23HYSXvZ+LOjSQUdu7VmxQ+9PJgTr1uxC/XsjStRxay+xN7TtZ3++26OG3EW9rgbo7N89T4zTbCt6IHCb21Ye7IdSnfiwzx2LPvc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR13MB3702
 
-The RSS flow algorithm is not set up correctly for promiscuous or all
-multi MCAM entries. This has an impact on flow distribution.
+This small series addresses two bugs in the nfp conntrack offloading
+code.
 
-This patch fixes the issue by updating flow algorithm index in above
-mentioned MCAM entries.
+The first patch is a check to prevent offloading for a case which is
+currently not supported by the nfp.
 
-Fixes: 967db3529eca ("octeontx2-af: add support for multicast/promisc packet replication feature")
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
-Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
----
- .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 55 +++++++++++++++----
- 1 file changed, 44 insertions(+), 11 deletions(-)
+The second patch fixes up parsing of layer4 mangling code so it can be
+correctly offloaded.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-index f65805860c8d..0bcf3e559280 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-@@ -671,6 +671,7 @@ void rvu_npc_install_promisc_entry(struct rvu *rvu, u16 pcifunc,
- 	int blkaddr, ucast_idx, index;
- 	struct nix_rx_action action = { 0 };
- 	u64 relaxed_mask;
-+	u8 flow_key_alg;
- 
- 	if (!hw->cap.nix_rx_multicast && is_cgx_vf(rvu, pcifunc))
- 		return;
-@@ -701,6 +702,8 @@ void rvu_npc_install_promisc_entry(struct rvu *rvu, u16 pcifunc,
- 		action.op = NIX_RX_ACTIONOP_UCAST;
- 	}
- 
-+	flow_key_alg = action.flow_key_alg;
-+
- 	/* RX_ACTION set to MCAST for CGX PF's */
- 	if (hw->cap.nix_rx_multicast && pfvf->use_mce_list &&
- 	    is_pf_cgxmapped(rvu, rvu_get_pf(pcifunc))) {
-@@ -740,7 +743,7 @@ void rvu_npc_install_promisc_entry(struct rvu *rvu, u16 pcifunc,
- 	req.vf = pcifunc;
- 	req.index = action.index;
- 	req.match_id = action.match_id;
--	req.flow_key_alg = action.flow_key_alg;
-+	req.flow_key_alg = flow_key_alg;
- 
- 	rvu_mbox_handler_npc_install_flow(rvu, &req, &rsp);
- }
-@@ -854,6 +857,7 @@ void rvu_npc_install_allmulti_entry(struct rvu *rvu, u16 pcifunc, int nixlf,
- 	u8 mac_addr[ETH_ALEN] = { 0 };
- 	struct nix_rx_action action = { 0 };
- 	struct rvu_pfvf *pfvf;
-+	u8 flow_key_alg;
- 	u16 vf_func;
- 
- 	/* Only CGX PF/VF can add allmulticast entry */
-@@ -888,6 +892,7 @@ void rvu_npc_install_allmulti_entry(struct rvu *rvu, u16 pcifunc, int nixlf,
- 		*(u64 *)&action = npc_get_mcam_action(rvu, mcam,
- 							blkaddr, ucast_idx);
- 
-+	flow_key_alg = action.flow_key_alg;
- 	if (action.op != NIX_RX_ACTIONOP_RSS) {
- 		*(u64 *)&action = 0;
- 		action.op = NIX_RX_ACTIONOP_UCAST;
-@@ -924,7 +929,7 @@ void rvu_npc_install_allmulti_entry(struct rvu *rvu, u16 pcifunc, int nixlf,
- 	req.vf = pcifunc | vf_func;
- 	req.index = action.index;
- 	req.match_id = action.match_id;
--	req.flow_key_alg = action.flow_key_alg;
-+	req.flow_key_alg = flow_key_alg;
- 
- 	rvu_mbox_handler_npc_install_flow(rvu, &req, &rsp);
- }
-@@ -990,11 +995,38 @@ static void npc_update_vf_flow_entry(struct rvu *rvu, struct npc_mcam *mcam,
- 	mutex_unlock(&mcam->lock);
- }
- 
-+static void npc_update_rx_action_with_alg_idx(struct rvu *rvu, struct nix_rx_action action,
-+					      struct rvu_pfvf *pfvf, int mcam_index, int blkaddr,
-+					      int alg_idx)
-+
-+{
-+	struct npc_mcam *mcam = &rvu->hw->mcam;
-+	struct rvu_hwinfo *hw = rvu->hw;
-+	int bank, op_rss;
-+
-+	if (!is_mcam_entry_enabled(rvu, mcam, blkaddr, mcam_index))
-+		return;
-+
-+	op_rss = (!hw->cap.nix_rx_multicast || !pfvf->use_mce_list);
-+
-+	bank = npc_get_bank(mcam, mcam_index);
-+	mcam_index &= (mcam->banksize - 1);
-+
-+	/* If Rx action is MCAST update only RSS algorithm index */
-+	if (!op_rss) {
-+		*(u64 *)&action = rvu_read64(rvu, blkaddr,
-+				NPC_AF_MCAMEX_BANKX_ACTION(mcam_index, bank));
-+
-+		action.flow_key_alg = alg_idx;
-+	}
-+	rvu_write64(rvu, blkaddr,
-+		    NPC_AF_MCAMEX_BANKX_ACTION(mcam_index, bank), *(u64 *)&action);
-+}
-+
- void rvu_npc_update_flowkey_alg_idx(struct rvu *rvu, u16 pcifunc, int nixlf,
- 				    int group, int alg_idx, int mcam_index)
- {
- 	struct npc_mcam *mcam = &rvu->hw->mcam;
--	struct rvu_hwinfo *hw = rvu->hw;
- 	struct nix_rx_action action;
- 	int blkaddr, index, bank;
- 	struct rvu_pfvf *pfvf;
-@@ -1050,15 +1082,16 @@ void rvu_npc_update_flowkey_alg_idx(struct rvu *rvu, u16 pcifunc, int nixlf,
- 	/* If PF's promiscuous entry is enabled,
- 	 * Set RSS action for that entry as well
- 	 */
--	if ((!hw->cap.nix_rx_multicast || !pfvf->use_mce_list) &&
--	    is_mcam_entry_enabled(rvu, mcam, blkaddr, index)) {
--		bank = npc_get_bank(mcam, index);
--		index &= (mcam->banksize - 1);
-+	npc_update_rx_action_with_alg_idx(rvu, action, pfvf, index, blkaddr,
-+					  alg_idx);
- 
--		rvu_write64(rvu, blkaddr,
--			    NPC_AF_MCAMEX_BANKX_ACTION(index, bank),
--			    *(u64 *)&action);
--	}
-+	index = npc_get_nixlf_mcam_index(mcam, pcifunc,
-+					 nixlf, NIXLF_ALLMULTI_ENTRY);
-+	/* If PF's allmulti  entry is enabled,
-+	 * Set RSS action for that entry as well
-+	 */
-+	npc_update_rx_action_with_alg_idx(rvu, action, pfvf, index, blkaddr,
-+					  alg_idx);
- }
- 
- void npc_enadis_default_mce_entry(struct rvu *rvu, u16 pcifunc,
+Hui Zhou (2):
+  nfp: flower: add hardware offload check for post ct entry
+  nfp: flower: fix hardware offload for the transfer layer port
+
+ .../ethernet/netronome/nfp/flower/conntrack.c | 42 +++++++++++++++++--
+ 1 file changed, 39 insertions(+), 3 deletions(-)
+
 -- 
-2.17.1
+2.34.1
 
 
