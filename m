@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-55321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3693080A632
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 15:52:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EBA7B80A645
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 15:54:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A02071F214EB
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 14:52:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D93A1F2146E
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 14:54:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 930A020308;
-	Fri,  8 Dec 2023 14:52:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38D7E2031A;
+	Fri,  8 Dec 2023 14:54:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="grGzUsrq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VAvE848/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 670BD1BE8;
-	Fri,  8 Dec 2023 06:52:12 -0800 (PST)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-40c09d0b045so25400185e9.0;
-        Fri, 08 Dec 2023 06:52:12 -0800 (PST)
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31DC835AA;
+	Fri,  8 Dec 2023 06:52:13 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-40c039e9719so24711325e9.1;
+        Fri, 08 Dec 2023 06:52:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702047130; x=1702651930; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1702047131; x=1702651931; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=k3CRHE2JlPJvxR2z8QlM71Lcm2zabL9cZ1I1qY4IDPc=;
-        b=grGzUsrqvep430CEdV8YFprBx8rmBxEQNtfiXKP+2a2KYEJke2JxqQnWttFRy4Katn
-         X+K0aCsVsW+J4OdeyExEPOKtlg+Bl7Uib1q68k9EpSxW7r+C8UPbZeC8ThJGZBVp+T4x
-         hPY3TbAud7vIfXGs81qpSkRPXMPXH1YD0NFvIVYTXQAQqJXUVi1a4ndZ4bzdyhK1lGbq
-         dEU59m0q+I8CGqyHZD9+xFzFQ9BnLr6HgdrZVyik6WvLO5GDla3Z5fQyiuRWJJhhLKgb
-         W929lcbzmZ8tgSdOLlzD3oElkNd+j89JA0doNygzLDTRsQux27hhco27DohNSog3ixsr
-         +mDw==
+        bh=5feJ9c621I5/VZmz7DYVtyWPMsJYNgURBm5K+LW+VFE=;
+        b=VAvE848/Z4AsZCW4EnDdXInW35aj5vHwd+v+LiAWGNVd9VNfkEkWH6E8w6WXhLtnMl
+         22GK8JFTxnAn90Pmw71FJ5ufMNhWePVUeN6ml1Y8d3NbnKWh4Qre0kZdveTRCy0/cuxN
+         ITbZD7GwSOr6oD+Rr9E7I3rXra3fftKpx6YFIB1TuuHQ6ukBEbE6O+JJ8J6H5J8j0Dei
+         4f0G+37zF8C12l/s9nlp/BbyINrUCql36goPEThGUu6ovjS5UyxHbasJDBi6jlFb6hdQ
+         B0jydWazDdgaBKKOrlKiK/Etso8Gr5lxR1gl94LLv2ckSdIa02amYLBHvmUSiy24dH2q
+         F2MQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702047130; x=1702651930;
+        d=1e100.net; s=20230601; t=1702047131; x=1702651931;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=k3CRHE2JlPJvxR2z8QlM71Lcm2zabL9cZ1I1qY4IDPc=;
-        b=AW1Rfj7PnmSTQ4wmLEYrJTmSZZlHH/iYgQWs0XZpSiuzRUBKFm0BZr1QUg/WYVNbOm
-         8ENqGLXgr9IrbqUNtC19dafMfLXVN+auVMHhEXbFKdy3Q2tA2kbK4jwSDbQVv6169vQN
-         Bkxl2RpoZ1JRA+ljF6kJ4YHC5J3PJNoZmL7E4R0Hy++Q59nRufSTr5EKwQPOemMpARgX
-         TmaqTKRGYlgJHy1EUp/z4JlTHrxQF4vNXZ6HiZgzzkHc6HFQiU8t7lnxOaCf4PJl2N64
-         fYEWiid3JR0lZQHUrs/2fjlt3OXnYItotH+27jMwTxWgDE9nGfBCxhNxAcff0qcHxP2k
-         PiAg==
-X-Gm-Message-State: AOJu0YxTxi2/tXl+yI+uFbH5z3UxzzFRMb905tZw9RiC71p4ogakcdXh
-	CBvGzsrbWiiW7IGGMBMz+A8=
-X-Google-Smtp-Source: AGHT+IE+Sl9uvm0eP7FJUHY58vaObqFyBtRzEdpfIkIq3tIEwLcDaQIduGUVkPvMv8tYJtW2m6NOnA==
-X-Received: by 2002:a7b:cd12:0:b0:40c:3742:5a3 with SMTP id f18-20020a7bcd12000000b0040c374205a3mr27161wmj.256.1702047130293;
-        Fri, 08 Dec 2023 06:52:10 -0800 (PST)
+        bh=5feJ9c621I5/VZmz7DYVtyWPMsJYNgURBm5K+LW+VFE=;
+        b=u9RXusz4fBWaZL36K50ureiC3odlN1Pc7c9cM+z67cwy1f7tXb0zSepwyF0R676OC2
+         YH55kyFTDxhDVlofWZF0an8baMHlocPpGKFdUEkdAvpokWnCwgOympPe25+8F4y9/XKD
+         xiN7Zw/pD8/IxxGZvgK936fHTG4PpY+RL1NfVxmUKMQ0zE9seuVCGDDUqBI9AFKIUJ3V
+         /bL0WZkqSNidt3uMnp//bY8zzX7rOS3X7qZHeQQRofPi2NJkyUuELBe5b8wBP+vn0oDG
+         WaI/NX8QMuZLKU9NJdOEHlW0EcMIaAAzVXtpIRmu8nTeip4jd9RfB3TvfO0srU9o4WHH
+         egmA==
+X-Gm-Message-State: AOJu0Yz57HOGl1Ja99AekQbP268EWKG2ihEnYoObP1vLl72KsV8CH8rS
+	0XX3wk2/F3TsY+ZX0WSi58Y=
+X-Google-Smtp-Source: AGHT+IG/zXGDmAWkck+f5HF8HcpPavtzuWSCoZICM0+LbFLtrHxewTUfDYWTbtMCc3mbob6q7vyjug==
+X-Received: by 2002:a05:600c:2b0f:b0:40c:33be:d166 with SMTP id y15-20020a05600c2b0f00b0040c33bed166mr49417wme.87.1702047131342;
+        Fri, 08 Dec 2023 06:52:11 -0800 (PST)
 Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id r9-20020a05600c458900b0040b3e79bad3sm3088264wmo.40.2023.12.08.06.52.09
+        by smtp.googlemail.com with ESMTPSA id r9-20020a05600c458900b0040b3e79bad3sm3088264wmo.40.2023.12.08.06.52.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Dec 2023 06:52:09 -0800 (PST)
+        Fri, 08 Dec 2023 06:52:10 -0800 (PST)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
@@ -64,9 +64,9 @@ To: Andrew Lunn <andrew@lunn.ch>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: Christian Marangi <ansuelsmth@gmail.com>
-Subject: [net-next PATCH v4 03/13] net: phy: at803x: raname hw_stats functions to qca83xx specific name
-Date: Fri,  8 Dec 2023 15:51:50 +0100
-Message-Id: <20231208145200.25162-4-ansuelsmth@gmail.com>
+Subject: [net-next PATCH v4 04/13] net: phy: at803x: move qca83xx specific check in dedicated functions
+Date: Fri,  8 Dec 2023 15:51:51 +0100
+Message-Id: <20231208145200.25162-5-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231208145200.25162-1-ansuelsmth@gmail.com>
 References: <20231208145200.25162-1-ansuelsmth@gmail.com>
@@ -78,130 +78,156 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The function and the struct related to hw_stats were specific to qca83xx
-PHY but were called following the convention in the driver of calling
-everything with at803x prefix.
+Rework qca83xx specific check to dedicated function to tidy things up
+and drop useless phy_id check.
 
-To better organize the code, rename these function a more specific name
-to better describe that they are specific to 83xx PHY family.
+Also drop an useless link_change_notify for QCA8337 as it did nothing an
+returned early.
 
 Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
- drivers/net/phy/at803x.c | 44 ++++++++++++++++++++--------------------
- 1 file changed, 22 insertions(+), 22 deletions(-)
+ drivers/net/phy/at803x.c | 68 ++++++++++++++++++++++------------------
+ 1 file changed, 37 insertions(+), 31 deletions(-)
 
 diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
-index b8f3c215d0e8..277a6c27af7c 100644
+index 277a6c27af7c..fa412a4e080d 100644
 --- a/drivers/net/phy/at803x.c
 +++ b/drivers/net/phy/at803x.c
-@@ -295,7 +295,7 @@ struct at803x_hw_stat {
- 	enum stat_access_type access_type;
- };
- 
--static struct at803x_hw_stat at803x_hw_stats[] = {
-+static struct at803x_hw_stat qca83xx_hw_stats[] = {
- 	{ "phy_idle_errors", 0xa, GENMASK(7, 0), PHY},
- 	{ "phy_receive_errors", 0x15, GENMASK(15, 0), PHY},
- 	{ "eee_wake_errors", 0x16, GENMASK(15, 0), MMD},
-@@ -311,7 +311,7 @@ struct at803x_priv {
- 	bool is_1000basex;
- 	struct regulator_dev *vddio_rdev;
- 	struct regulator_dev *vddh_rdev;
--	u64 stats[ARRAY_SIZE(at803x_hw_stats)];
-+	u64 stats[ARRAY_SIZE(qca83xx_hw_stats)];
- };
- 
- struct at803x_context {
-@@ -529,24 +529,24 @@ static void at803x_get_wol(struct phy_device *phydev,
- 		wol->wolopts |= WAKE_MAGIC;
- }
- 
--static int at803x_get_sset_count(struct phy_device *phydev)
-+static int qca83xx_get_sset_count(struct phy_device *phydev)
- {
--	return ARRAY_SIZE(at803x_hw_stats);
-+	return ARRAY_SIZE(qca83xx_hw_stats);
- }
- 
--static void at803x_get_strings(struct phy_device *phydev, u8 *data)
-+static void qca83xx_get_strings(struct phy_device *phydev, u8 *data)
- {
- 	int i;
- 
--	for (i = 0; i < ARRAY_SIZE(at803x_hw_stats); i++) {
-+	for (i = 0; i < ARRAY_SIZE(qca83xx_hw_stats); i++) {
- 		strscpy(data + i * ETH_GSTRING_LEN,
--			at803x_hw_stats[i].string, ETH_GSTRING_LEN);
-+			qca83xx_hw_stats[i].string, ETH_GSTRING_LEN);
+@@ -1623,27 +1623,26 @@ static int qca83xx_config_init(struct phy_device *phydev)
+ 		break;
  	}
+ 
++	/* Following original QCA sourcecode set port to prefer master */
++	phy_set_bits(phydev, MII_CTRL1000, CTL1000_PREFER_MASTER);
++
++	return 0;
++}
++
++static int qca8327_config_init(struct phy_device *phydev)
++{
+ 	/* QCA8327 require DAC amplitude adjustment for 100m set to +6%.
+ 	 * Disable on init and enable only with 100m speed following
+ 	 * qca original source code.
+ 	 */
+-	if (phydev->drv->phy_id == QCA8327_A_PHY_ID ||
+-	    phydev->drv->phy_id == QCA8327_B_PHY_ID)
+-		at803x_debug_reg_mask(phydev, AT803X_DEBUG_ANALOG_TEST_CTRL,
+-				      QCA8327_DEBUG_MANU_CTRL_EN, 0);
++	at803x_debug_reg_mask(phydev, AT803X_DEBUG_ANALOG_TEST_CTRL,
++			      QCA8327_DEBUG_MANU_CTRL_EN, 0);
+ 
+-	/* Following original QCA sourcecode set port to prefer master */
+-	phy_set_bits(phydev, MII_CTRL1000, CTL1000_PREFER_MASTER);
+-
+-	return 0;
++	return qca83xx_config_init(phydev);
  }
  
--static u64 at803x_get_stat(struct phy_device *phydev, int i)
-+static u64 qca83xx_get_stat(struct phy_device *phydev, int i)
+ static void qca83xx_link_change_notify(struct phy_device *phydev)
  {
--	struct at803x_hw_stat stat = at803x_hw_stats[i];
-+	struct at803x_hw_stat stat = qca83xx_hw_stats[i];
- 	struct at803x_priv *priv = phydev->priv;
- 	int val;
- 	u64 ret;
-@@ -567,13 +567,13 @@ static u64 at803x_get_stat(struct phy_device *phydev, int i)
- 	return ret;
- }
+-	/* QCA8337 doesn't require DAC Amplitude adjustement */
+-	if (phydev->drv->phy_id == QCA8337_PHY_ID)
+-		return;
+-
+ 	/* Set DAC Amplitude adjustment to +6% for 100m on link running */
+ 	if (phydev->state == PHY_RUNNING) {
+ 		if (phydev->speed == SPEED_100)
+@@ -1686,19 +1685,6 @@ static int qca83xx_resume(struct phy_device *phydev)
  
--static void at803x_get_stats(struct phy_device *phydev,
--			     struct ethtool_stats *stats, u64 *data)
-+static void qca83xx_get_stats(struct phy_device *phydev,
-+			      struct ethtool_stats *stats, u64 *data)
+ static int qca83xx_suspend(struct phy_device *phydev)
  {
- 	int i;
+-	u16 mask = 0;
+-
+-	/* Only QCA8337 support actual suspend.
+-	 * QCA8327 cause port unreliability when phy suspend
+-	 * is set.
+-	 */
+-	if (phydev->drv->phy_id == QCA8337_PHY_ID) {
+-		genphy_suspend(phydev);
+-	} else {
+-		mask |= ~(BMCR_SPEED1000 | BMCR_FULLDPLX);
+-		phy_modify(phydev, MII_BMCR, mask, 0);
+-	}
+-
+ 	at803x_debug_reg_mask(phydev, AT803X_DEBUG_REG_GREEN,
+ 			      AT803X_DEBUG_GATE_CLK_IN1000, 0);
  
--	for (i = 0; i < ARRAY_SIZE(at803x_hw_stats); i++)
--		data[i] = at803x_get_stat(phydev, i);
-+	for (i = 0; i < ARRAY_SIZE(qca83xx_hw_stats); i++)
-+		data[i] = qca83xx_get_stat(phydev, i);
+@@ -1709,6 +1695,27 @@ static int qca83xx_suspend(struct phy_device *phydev)
+ 	return 0;
  }
  
- static int at803x_suspend(struct phy_device *phydev)
-@@ -2175,9 +2175,9 @@ static struct phy_driver at803x_driver[] = {
++static int qca8337_suspend(struct phy_device *phydev)
++{
++	/* Only QCA8337 support actual suspend. */
++	genphy_suspend(phydev);
++
++	return qca83xx_suspend(phydev);
++}
++
++static int qca8327_suspend(struct phy_device *phydev)
++{
++	u16 mask = 0;
++
++	/* QCA8327 cause port unreliability when phy suspend
++	 * is set.
++	 */
++	mask |= ~(BMCR_SPEED1000 | BMCR_FULLDPLX);
++	phy_modify(phydev, MII_BMCR, mask, 0);
++
++	return qca83xx_suspend(phydev);
++}
++
+ static int qca808x_phy_fast_retrain_config(struct phy_device *phydev)
+ {
+ 	int ret;
+@@ -2170,7 +2177,6 @@ static struct phy_driver at803x_driver[] = {
+ 	.phy_id_mask		= QCA8K_PHY_ID_MASK,
+ 	.name			= "Qualcomm Atheros 8337 internal PHY",
+ 	/* PHY_GBIT_FEATURES */
+-	.link_change_notify	= qca83xx_link_change_notify,
+ 	.probe			= at803x_probe,
  	.flags			= PHY_IS_INTERNAL,
  	.config_init		= qca83xx_config_init,
- 	.soft_reset		= genphy_soft_reset,
--	.get_sset_count		= at803x_get_sset_count,
--	.get_strings		= at803x_get_strings,
--	.get_stats		= at803x_get_stats,
-+	.get_sset_count		= qca83xx_get_sset_count,
-+	.get_strings		= qca83xx_get_strings,
-+	.get_stats		= qca83xx_get_stats,
- 	.suspend		= qca83xx_suspend,
+@@ -2178,7 +2184,7 @@ static struct phy_driver at803x_driver[] = {
+ 	.get_sset_count		= qca83xx_get_sset_count,
+ 	.get_strings		= qca83xx_get_strings,
+ 	.get_stats		= qca83xx_get_stats,
+-	.suspend		= qca83xx_suspend,
++	.suspend		= qca8337_suspend,
  	.resume			= qca83xx_resume,
  }, {
-@@ -2191,9 +2191,9 @@ static struct phy_driver at803x_driver[] = {
+ 	/* QCA8327-A from switch QCA8327-AL1A */
+@@ -2189,12 +2195,12 @@ static struct phy_driver at803x_driver[] = {
+ 	.link_change_notify	= qca83xx_link_change_notify,
+ 	.probe			= at803x_probe,
  	.flags			= PHY_IS_INTERNAL,
- 	.config_init		= qca83xx_config_init,
+-	.config_init		= qca83xx_config_init,
++	.config_init		= qca8327_config_init,
  	.soft_reset		= genphy_soft_reset,
--	.get_sset_count		= at803x_get_sset_count,
--	.get_strings		= at803x_get_strings,
--	.get_stats		= at803x_get_stats,
-+	.get_sset_count		= qca83xx_get_sset_count,
-+	.get_strings		= qca83xx_get_strings,
-+	.get_stats		= qca83xx_get_stats,
- 	.suspend		= qca83xx_suspend,
+ 	.get_sset_count		= qca83xx_get_sset_count,
+ 	.get_strings		= qca83xx_get_strings,
+ 	.get_stats		= qca83xx_get_stats,
+-	.suspend		= qca83xx_suspend,
++	.suspend		= qca8327_suspend,
  	.resume			= qca83xx_resume,
  }, {
-@@ -2207,9 +2207,9 @@ static struct phy_driver at803x_driver[] = {
+ 	/* QCA8327-B from switch QCA8327-BL1A */
+@@ -2205,12 +2211,12 @@ static struct phy_driver at803x_driver[] = {
+ 	.link_change_notify	= qca83xx_link_change_notify,
+ 	.probe			= at803x_probe,
  	.flags			= PHY_IS_INTERNAL,
- 	.config_init		= qca83xx_config_init,
+-	.config_init		= qca83xx_config_init,
++	.config_init		= qca8327_config_init,
  	.soft_reset		= genphy_soft_reset,
--	.get_sset_count		= at803x_get_sset_count,
--	.get_strings		= at803x_get_strings,
--	.get_stats		= at803x_get_stats,
-+	.get_sset_count		= qca83xx_get_sset_count,
-+	.get_strings		= qca83xx_get_strings,
-+	.get_stats		= qca83xx_get_stats,
- 	.suspend		= qca83xx_suspend,
+ 	.get_sset_count		= qca83xx_get_sset_count,
+ 	.get_strings		= qca83xx_get_strings,
+ 	.get_stats		= qca83xx_get_stats,
+-	.suspend		= qca83xx_suspend,
++	.suspend		= qca8327_suspend,
  	.resume			= qca83xx_resume,
  }, {
+ 	/* Qualcomm QCA8081 */
 -- 
 2.40.1
 
