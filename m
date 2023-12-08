@@ -1,108 +1,172 @@
-Return-Path: <netdev+bounces-55401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FBA180AC16
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 19:31:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5A1880AC6B
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 19:47:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B796AB20B75
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 18:31:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C41E1F2127C
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 18:47:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5818B32C95;
-	Fri,  8 Dec 2023 18:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB0001A72E;
+	Fri,  8 Dec 2023 18:47:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dwDid3EL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B174BD;
-	Fri,  8 Dec 2023 10:31:03 -0800 (PST)
-Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-6d9f7af8918so218560a34.0;
-        Fri, 08 Dec 2023 10:31:03 -0800 (PST)
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 868DA11F;
+	Fri,  8 Dec 2023 10:46:57 -0800 (PST)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-a06e59384b6so320501466b.1;
+        Fri, 08 Dec 2023 10:46:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702061216; x=1702666016; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+dr8lBkPk/gRBWTFsMFs5wXdj0/vhpvGhmgseUu0tAY=;
+        b=dwDid3ELbjUC/pN5M/iq/HhcnyriHAt7hdjXu8j8BlBaFIrE6jzG/DQQhOh4n28rNZ
+         mzdXFbTY+UTQogXzgWd/8eSs/8h5ikq/rpdPIv7MawUNjHElFqW6qFRQcuII+qTRDhEx
+         u6I9pTjQV4K8cZU/xCZ8ItjSZsCcfcd8lGdpk2QZm5Z9tvXqgnvuqHpMna8FQSVfPJN9
+         470cWSLm8VQc/3AF0MSkZwuBjENFXk07hBTUcktcz2pMdptZR0Ieu9Sl8ACznjGD908y
+         8V8jrqcyrOfDXMFctPx1BMd/852M94YIr4xFk79SC8ggic1B9Ez4j9DOmy6pXw4x9WXg
+         mfFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702060262; x=1702665062;
-        h=date:subject:message-id:references:in-reply-to:cc:to:from
-         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=v+yJeduNngKCWy3/DH0y84rogwCflce9ufqE8UYu448=;
-        b=DTZWEvGkrzLRVyFaf2n1WVyiGQFjsweGp3Gj2cuBhEKA85U/g2mjBA9ZaICa72S0E8
-         W26fuAQgdKhZ0VIr0Uvlt5xRsIPKzdrfhKhBAEF2E2YYg09TdYbHM94QbD7ougo3g0Bv
-         uBrpSkQLCccLYUtHSBWxfOSb8n0hjSogSyR9a5KtHT+uG5x1Plc3J6U6DWAjyMKecWGA
-         IbpIIgH4iJgW8MC/qXVA290UTny5ho6b/+QCJ1H92LYq+FOtJS49eZ6ImDYlb4la74PK
-         aMBnxcnZGH2BwMyL1Mft0NZTj1aoTGcSy3/N1GC/2D82F9KrUlJ6FJRAMcYLE4gc7m/7
-         CCrQ==
-X-Gm-Message-State: AOJu0Yxlvsv6aTOM1rHC3XDS30O0NntO+L3zEY7VsXHSiqA9HCfV8Obp
-	HI8k5CNbSi6GTay6kIpChg==
-X-Google-Smtp-Source: AGHT+IHXtCU+Df3narf9EUnnld4MDBZ1SkRhwu+ygUAtS6Zf9h8UB7gij98jquMR2wdiE98NTVaiyA==
-X-Received: by 2002:a05:6870:7029:b0:1fb:75b:2fd4 with SMTP id u41-20020a056870702900b001fb075b2fd4mr579114oae.107.1702060262327;
-        Fri, 08 Dec 2023 10:31:02 -0800 (PST)
-Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id hb5-20020a056870780500b001fb1e0a25e8sm507468oab.26.2023.12.08.10.31.00
+        d=1e100.net; s=20230601; t=1702061216; x=1702666016;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+dr8lBkPk/gRBWTFsMFs5wXdj0/vhpvGhmgseUu0tAY=;
+        b=R4BbcUMFFFmP8ht/HMCsZgKfj9KyevlHN1/TfrDC2ZvqdGrRcu6+D/S/u7O92TD3WT
+         5C9ol6q6SctpmlwK/xa3XBDQJIzFTThIsGZbXUdNfvWLnAcFRbJyjKyffuEPiyZgkbmJ
+         swqJrILD/XJeeezYZsbhSBcnPDC9JHmJW4w99n+L0zJMSZZkSF29GEryhkijtRl3bCqZ
+         WBqj0ajjCU43YS1bDz6Agtt6Gxbt1xBsMI3JMSnisPlxwNCG5GE4vka93VpUBsq7DznW
+         PDEEk/hVKzj1r3NP2DSsALEERa9MnUBu9wculH0aeyu2hfG2qTkl12Pnup0je0wRDZIl
+         qK2g==
+X-Gm-Message-State: AOJu0YxDSk+AIP0c5e/8/2QvOA+Uu1aBTfx/qSVa5UDrVAUbvyyizyCN
+	f2Wmu+KETw2K8bNrRw3izEE=
+X-Google-Smtp-Source: AGHT+IFqVjj8BiPjTfdPUSjvMIkmUsDvvm2h6RNnCjnqfatSpcv/EcTXmwiu33Eu6zdyUdHxlBmCSA==
+X-Received: by 2002:a17:907:94d5:b0:9b8:b683:5837 with SMTP id dn21-20020a17090794d500b009b8b6835837mr301541ejc.46.1702061215767;
+        Fri, 08 Dec 2023 10:46:55 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id d11-20020a170907272b00b00a1e2aa3d094sm1317479ejl.173.2023.12.08.10.46.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Dec 2023 10:31:01 -0800 (PST)
-Received: (nullmailer pid 2485978 invoked by uid 1000);
-	Fri, 08 Dec 2023 18:31:00 -0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        Fri, 08 Dec 2023 10:46:55 -0800 (PST)
+Date: Fri, 8 Dec 2023 20:46:52 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Simon Horman <horms@kernel.org>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com
+Subject: Re: [PATCH net-next 07/15] net: dsa: mt7530: do not run
+ mt7530_setup_port5() if port 5 is disabled
+Message-ID: <20231208184652.k2max4kf7r3fgksg@skbuf>
+References: <20231118123205.266819-1-arinc.unal@arinc9.com>
+ <20231118123205.266819-8-arinc.unal@arinc9.com>
+ <20231121185358.GA16629@kernel.org>
+ <a2826485-70a6-4ba7-89e1-59e68e622901@arinc9.com>
+ <90fde560-054e-4188-b15c-df2e082d3e33@moroto.mountain>
+ <20231207184015.u7uoyfhdxiyuw6hh@skbuf>
+ <9b729dab-aebc-4c0c-a5e1-164845cd0948@suswa.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Conor Dooley <conor@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Michael Turquette <mturquette@baylibre.com>, Rob Herring <robh+dt@kernel.org>, Stephen Boyd <sboyd@kernel.org>, Jakub Kicinski <kuba@kernel.org>, linux-can@vger.kernel.org, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Paul Walmsley <paul.walmsley@sifive.com>, Albert Ou <aou@eecs.berkeley.edu>, linux-clk@vger.kernel.org, devicetree@vger.kernel.org, Daire McNamara <daire.mcnamara@microchip.com>, Wolfgang Grandegger <wg@grandegger.com>, Conor Dooley <conor.dooley@microchip.com>, linux-riscv@lists.infradead.org, Eric Dumazet <edumazet@google.com>, Marc Kleine-Budde <mkl@pengutronix.de>, Palmer Dabbelt <palmer@dabbelt.com>, Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
-In-Reply-To: <20231208-palpitate-passable-c79bacf2036c@spud>
-References: <20231208-reenter-ajar-b6223e5134b3@spud>
- <20231208-palpitate-passable-c79bacf2036c@spud>
-Message-Id: <170206026051.2485962.13304186324857333888.robh@kernel.org>
-Subject: Re: [PATCH RESEND v1 2/7] dt-bindings: can: mpfs: add missing
- required clock
-Date: Fri, 08 Dec 2023 12:31:00 -0600
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9b729dab-aebc-4c0c-a5e1-164845cd0948@suswa.mountain>
 
-
-On Fri, 08 Dec 2023 17:12:24 +0000, Conor Dooley wrote:
-> From: Conor Dooley <conor.dooley@microchip.com>
+On Fri, Dec 08, 2023 at 07:23:38AM +0300, Dan Carpenter wrote:
+> On Thu, Dec 07, 2023 at 08:40:15PM +0200, Vladimir Oltean wrote:
+> > 
+> > We could be more pragmatic about this whole sparse false positive warning,
+> > and just move the "if" block which calls mt7530_setup_port5() right
+> > after the priv->p5_intf_sel assignments, instead of waiting to "break;"
+> > from the for_each_child_of_node() loop.
+> > 
+> > for_each_child_of_node(dn, mac_np) {
+> > 	if (!of_device_is_compatible(mac_np,
+> > 				     "mediatek,eth-mac"))
+> > 		continue;
+> > 
+> > 	ret = of_property_read_u32(mac_np, "reg", &id);
+> > 	if (ret < 0 || id != 1)
+> > 		continue;
+> > 
+> > 	phy_node = of_parse_phandle(mac_np, "phy-handle", 0);
+> > 	if (!phy_node)
+> > 		continue;
+> > 
+> > 	if (phy_node->parent == priv->dev->of_node->parent) {
+> > 		ret = of_get_phy_mode(mac_np, &interface);
+> > 		if (ret && ret != -ENODEV) {
+> > 			of_node_put(mac_np);
+> > 			of_node_put(phy_node);
+> > 			return ret;
+> > 		}
+> > 		id = of_mdio_parse_addr(ds->dev, phy_node);
+> > 		if (id == 0)
+> > 			priv->p5_intf_sel = P5_INTF_SEL_PHY_P0;
+> > 		if (id == 4)
+> > 			priv->p5_intf_sel = P5_INTF_SEL_PHY_P4;
+> > 
+> > 		if (priv->p5_intf_sel == P5_INTF_SEL_PHY_P0 || <---- here
+> > 		    priv->p5_intf_sel == P5_INTF_SEL_PHY_P4)
+> > 			mt7530_setup_port5(ds, interface);
 > 
-> The CAN controller on PolarFire SoC has an AHB peripheral clock _and_ a
-> CAN bus clock. The bus clock was omitted when the binding was written,
-> but is required for operation. Make up for lost time and add it.
-> 
-> Cautionary tale in adding bindings without having implemented a real
-> user for them perhaps.
-> 
-> Fixes: c878d518d7b6 ("dt-bindings: can: mpfs: document the mpfs CAN controller")
-> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
-> ---
->  .../devicetree/bindings/net/can/microchip,mpfs-can.yaml    | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
+> This doesn't solve the problem that Smatch doesn't know what the
+> original value of priv->p5_intf_sel.  And also I don't like this code
+> because now we call mt7530_setup_port5() on every iteration after
+> we find the first P5_INTF_SEL_PHY_P0.
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+You seem to have not parsed the "break" from 4 lines below. There is at
+most one iteration through for_each_child_of_node().
 
-yamllint warnings/errors:
+And why would the "original" value of priv->p5_intf_sel matter? Original
+or modified by the "if (id == 0)" and "if (id == 4)" blocks, the code
+has already executed the of_get_phy_mode(&interface) call, by the time
+we reach the "if" that calls mt7530_setup_port5().
 
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.yaml: properties:clocks: {'maxItems': 2, 'items': [{'description': 'AHB peripheral clock'}, {'description': 'CAN bus clock'}]} should not be valid under {'required': ['maxItems']}
-	hint: "maxItems" is not needed with an "items" list
-	from schema $id: http://devicetree.org/meta-schemas/items.yaml#
+Hmm, maybe the problem, all along, was that we let the -ENODEV return
+code from of_get_phy_mode() pass through? "interface" will really be
+uninitialized in that case. It's not a false positive.
 
-doc reference errors (make refcheckdocs):
+Instead of:
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20231208-palpitate-passable-c79bacf2036c@spud
+	ret = of_get_phy_mode(mac_np, &interface);
+	if (ret && ret != -ENODEV) {
+		...
+		return ret;
+	}
 
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
+it should have been like this, to not complain:
 
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
+	ret = of_get_phy_mode(mac_np, &interface);
+	if (ret) {
+		...
+		return ret;
+	}
 
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+> > 	}
+> > 	of_node_put(mac_np);
+> > 	of_node_put(phy_node);
+> > 	break;
+> > }
 
