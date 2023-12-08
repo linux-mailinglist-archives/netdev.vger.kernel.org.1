@@ -1,105 +1,91 @@
-Return-Path: <netdev+bounces-55184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39451809B41
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 06:03:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30D43809B40
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 06:01:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60CA91C20C74
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 05:03:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ABAD3B20D13
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 05:01:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2513E5242;
-	Fri,  8 Dec 2023 05:02:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50329523B;
+	Fri,  8 Dec 2023 05:01:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="EofmHpNL";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="0JoNE5lc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UYkYZaD0"
 X-Original-To: netdev@vger.kernel.org
-X-Greylist: delayed 387 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 07 Dec 2023 21:02:54 PST
-Received: from wnew1-smtp.messagingengine.com (wnew1-smtp.messagingengine.com [64.147.123.26])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF6AB10F7;
-	Thu,  7 Dec 2023 21:02:54 -0800 (PST)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailnew.west.internal (Postfix) with ESMTP id 492732B00124;
-	Thu,  7 Dec 2023 23:56:22 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute6.internal (MEProxy); Thu, 07 Dec 2023 23:56:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:sender
-	:subject:subject:to:to; s=fm1; t=1702011381; x=1702018581; bh=PI
-	Y64CBSNt0PPb9bxeilH/4eQNVTuavlLXd+xLtdLt4=; b=EofmHpNL/cIg5AKToO
-	umxa3/vm8NffW15CQ/NYWKLTmOntZUlTXzL07BQN9Zzd1qkj/zIQY2BNpeU3NNnE
-	DsyuHH3WZaGBzjQorUzlwiFe/4NPCQlENpKqreDBuJVMeLp6sZaNlIXcysHdaNRc
-	VEBzwBp21QplxcXEbl27bmgnF5pmLSDH0ONvG3vpQ7j3dFUXRgm6b+dWV4nd4HGl
-	SWheN6zX7f77TSnmKwBt69fMkeY7vcpYMbjU7GbnOXep63hQWV1N/LSBPbrYOTRp
-	fXLqehXrXtZqsPTcqJbc3tosb+da+i8EQrUzDBVMvjAsRUUs+nAZG0k6OSVXdw8F
-	kR8Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm1; t=1702011381; x=1702018581; bh=PIY64CBSNt0PP
-	b9bxeilH/4eQNVTuavlLXd+xLtdLt4=; b=0JoNE5lcC5CNnZsf0Wrxk0j03GnnD
-	jKhNB/IWHt20uvZzwI8UD4N+ZmDmCB7ssaaymo/kcvUG9aTopzcCzQC/kIar85eH
-	FF73aIfF48k+sJCT6KDh2qwa4MpjeIS8zono/MVUEsiM/KpsAwbbQDRFyrE7JP6t
-	iZ+SdSRt+D8vWJNgNstFf7rxNYiEfRWIO/LXVRKWJEc5rSrblhxPCO3hwsPyJ2MA
-	BWB1vtmLc1nS7dNF4hkptHIe+jCQfQKYq6S23Rj84g4b85QqQsisSTFc2aXhhm3q
-	lfGZwhLYxEqTogHcPiuVYoVmuQyjsJtiomiXqlN1FbTEortKcfJ3ehxew==
-X-ME-Sender: <xms:9aFyZYCQddBddhZLtTdmaCagb1YejJJydeA7lnR9rCFc2q2T68f5Rg>
-    <xme:9aFyZaii19_64B-wL9K1uZUjRIE0pAy_5jb714kJnHdyH6bLJuIQ2-8r6Gk8MGV6-
-    SmpbysNcrM9zQ>
-X-ME-Received: <xmr:9aFyZbmJM6VIeIhwKoz-C4nYvlKCuRI71S6CIsmYX141cRu6ODga5VANakJmYUtEfjoWCeTgzgfOBv2l4u53-EaJGhnT6Spfxg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudekhedgvdduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghg
-    ucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepheegvd
-    evvdeljeeugfdtudduhfekledtiefhveejkeejuefhtdeufefhgfehkeetnecuvehluhhs
-    thgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepghhrvghgsehkrhhorg
-    hhrdgtohhm
-X-ME-Proxy: <xmx:9aFyZexFHU7norGA_X7Vuge-0fgLPT5e-anhtsm-yBQXlpEC96Xu2w>
-    <xmx:9aFyZdSRHOl3NF57458as0Ve8eZCYGAaF_n1-6gqdF1RZ0r7dlPAHg>
-    <xmx:9aFyZZYrhbQQaBlzWULnF1wKDDRQooLtJAJuUYqDs3mhE7PSQ08drQ>
-    <xmx:9aFyZeSODrZnAjSz5JEizXuxoWQeQSuK2TXNjmKIflKUcWV2ydV1ReukdwI>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 7 Dec 2023 23:56:21 -0500 (EST)
-Date: Fri, 8 Dec 2023 05:56:19 +0100
-From: Greg KH <greg@kroah.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Alan Stern <stern@rowland.harvard.edu>,
-	Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
-	davem@davemloft.net, edumazet@google.com,
-	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org, oneukum@suse.com, pabeni@redhat.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v6] net: usb: ax88179_178a: avoid failed operations when
- device is disconnected
-Message-ID: <2023120813-yummy-scrubbed-517e@gregkh>
-References: <0bd3204e-19f4-48de-b42e-a75640a1b1da@rowland.harvard.edu>
- <20231207175007.263907-1-jtornosm@redhat.com>
- <d8c331dd-deb1-4f12-8e66-295bfac8b1d7@rowland.harvard.edu>
- <20231207123256.337753f9@kernel.org>
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 396F910F1
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 21:01:15 -0800 (PST)
+Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-50bf32c0140so1849274e87.1
+        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 21:01:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702011673; x=1702616473; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=V/Xtnj6GEUK5AdH+Hybz5+Go8e3T2cJYiIFn0NCOTMk=;
+        b=UYkYZaD0OyObTQ03VA9969N4CNB2ZW+0RT0O7x/ST1GFKsyoaZPImx9CBfMLit/DKx
+         YJNJiRru61DZtdhhWJS7J9ui8vtCEIo+6Zg87clrYbnSSWZ94QEhfiTdR6kuGds296QN
+         J0RlMDWCzpGMQsUuig4VpOyPY97WOj7SUpMK4rlHjz2QbVsPhOjnSRHzQ9q5wrIaYoSo
+         miIv2Hi301jRAuYW2l45O2mO2ThPMYn8fD0g3kUAgzO/bQwszTgBB3S5c1gmbt2N9JJT
+         BehJRw3JYJc2hbx8hEYgmsmaM1qk2dIdXBH/OAXWzwGlv1Oxr8ynbm1YfVbOcrykkVxB
+         hVDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702011673; x=1702616473;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=V/Xtnj6GEUK5AdH+Hybz5+Go8e3T2cJYiIFn0NCOTMk=;
+        b=NdFR/KpGj8oawyd0+o2AF7ZdM2ylrA4WgbZtuQnJkYF7rCyW8O3O1k6eiBhnrV7cWu
+         YlUWKczxnUSbtNikMwo/Xzo0oFtgzrGUDn3Sy8WHpr4S1L5krUF3N3NRQfUBVq0sX7ZI
+         yHivFwIqflZ4W5WonXAoBZzzst+HEnayUklnG3EwkIGJo6oN3mDBBXyRZZZSd6McTpN3
+         jl5bKgrxRsxlaiVPKC1OB9/PY5NARs8R/LhN9NpQziFCZ4YXe4u/w9MP1xWuJeWZl79W
+         jBQ2R6YKcxrT+FUJapNyTIsq+yfi7DBCw35BwSHmERlrrkuQbLHGkaSVuVX3vbeX32Tu
+         0pAA==
+X-Gm-Message-State: AOJu0Yx9QpTwzyJ+jkW6z7TEqSEnp2yVI0aRduFoXXyH8o+CZtKYfdfP
+	0eyEth4IuDSOj0f9ue6HoT0mj2mjuMKfOZc8Gq5vsm8LEI5uRQ==
+X-Google-Smtp-Source: AGHT+IEhu3LPYg5WEPVUMxM/qSDCu/swF3eNL5AnN9U2//U7yVuDMHRqCRP1GwtLHvdUjeCo2uvfVoQtnDZ38E5DlUQ=
+X-Received: by 2002:a05:6512:10cb:b0:50b:bb95:c367 with SMTP id
+ k11-20020a05651210cb00b0050bbb95c367mr2727815lfg.55.1702011673170; Thu, 07
+ Dec 2023 21:01:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231207123256.337753f9@kernel.org>
+References: <20231208045054.27966-1-luizluca@gmail.com> <20231208045054.27966-5-luizluca@gmail.com>
+In-Reply-To: <20231208045054.27966-5-luizluca@gmail.com>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Fri, 8 Dec 2023 02:01:02 -0300
+Message-ID: <CAJq09z7Xqxs0RFHh5TWG2EvxcAgm2Ot1X-_xkjbJ7EG4_dhf+g@mail.gmail.com>
+Subject: Re: [PATCH net-next 4/7] net: dsa: realtek: create realtek-common
+To: linus.walleij@linaro.org
+Cc: alsi@bang-olufsen.dk, andrew@lunn.ch, f.fainelli@gmail.com, 
+	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, arinc.unal@arinc9.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Dec 07, 2023 at 12:32:56PM -0800, Jakub Kicinski wrote:
-> On Thu, 7 Dec 2023 15:23:23 -0500 Alan Stern wrote:
-> > Acked-by: Alan Stern <stern@rowland.harvard.edu>
-> 
-> FWIW I'm expecting Greg to pick this up for usb.
+> Some code can be shared between both interface modules (MDIO and SMI)
+> and among variants. Currently, these interface functions are shared:
+>
+> - realtek_common_lock
+> - realtek_common_unlock
+> - realtek_common_probe
+> - realtek_common_remove
+>
+> The reset during probe was moved to the last moment before a variant
+> detects the switch. This way, we avoid a reset if anything else fails.
+>
+> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
-Sure, will do!
+Linus, I think I should not have kept your Reviewed-by as there are
+changes like moving the match table out of the common module and
+splitting the probe into pre/post.
 
+Regards,
 
+Luiz
 
