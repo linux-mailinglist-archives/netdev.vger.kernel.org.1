@@ -1,142 +1,353 @@
-Return-Path: <netdev+bounces-55140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBDE880988E
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 02:23:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB04B809890
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 02:24:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 630FF1F210D4
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 01:23:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6559A282084
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 01:24:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F16E110A;
-	Fri,  8 Dec 2023 01:23:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C05BA110A;
+	Fri,  8 Dec 2023 01:24:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LQA1vPec"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SLkcZAOe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149981102
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 01:23:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E4A0C433C8;
-	Fri,  8 Dec 2023 01:23:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701998620;
-	bh=DRoQgWVhITeKBmmdIVUFBoNfGOIPLUltIyJCH5nctoo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=LQA1vPecIseO96rxDxDK9zdRxQZbdKTaO6l9XezncGCOWgOgh3d6k/JoUKUFBN/Nb
-	 mxaYO/ElKAd0UadoRiV+ojgVYAk+BrdsdfY6cUYpkC/OCs93vcdD4+agPkDw3fkj/4
-	 a3gF/K7Q+CzQiCXZJVzGtrCzeo6oKXPCKikHmJOb3w2oQaLEz7YCCIFav+tVp0ygZ4
-	 e3vp0M/DafDY8X/bJtfyGtpE1lkt/LZHENfTplWc5MY1hJGv9HrlnihUSkGUBOZtNp
-	 G8eLFxQyeCxx2+TWSf9f0cPokPkMtVNDcm6XTptP2cMliiyvjH1DBqu4S2vVRFuUI4
-	 IVNxNgw9YWdPg==
-Message-ID: <3d9f78ff-15b4-4c66-a007-a82e4be6d510@kernel.org>
-Date: Thu, 7 Dec 2023 18:23:39 -0700
+Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48A2C1706;
+	Thu,  7 Dec 2023 17:24:27 -0800 (PST)
+Received: by mail-oi1-x22d.google.com with SMTP id 5614622812f47-3b9dbbaa9a9so1081773b6e.2;
+        Thu, 07 Dec 2023 17:24:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701998666; x=1702603466; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eMS6+n4aVtzgvgUdw5Q0dkF5eYM0ZjJiDpGVMl5tPXQ=;
+        b=SLkcZAOeTiBhdC1LxgQXNR18tuqYTtMS7rsv4X/GL4HM4uzzd5JpLdCfoRAsL8Bteb
+         8BOe8fS/B4jEUDaLli0tpiAKChnFoiFX7w8yqPUGUOtVTcXOguwV1cJodK/gggYM8/5+
+         9u2TJwU7/hlbCgCFCPJMtPZtn2aktE3oBZHvt41W4BRLdU8HiWwcEp3h5E8k/j1uE0ky
+         wACHg/221s3+LaatOEqztaVoOdV+1C6Ew4ywCYDX58uhoOn5pVqwphOYINbFE23z8Be5
+         /gJscwq3RUVwJVBCAQGni8xhjR7TJFyW+utvQnRO1ADFVZTQylvHSQLaRt9QJV05LUHd
+         /fbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701998666; x=1702603466;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eMS6+n4aVtzgvgUdw5Q0dkF5eYM0ZjJiDpGVMl5tPXQ=;
+        b=MaT0I3Uowmns9N/xQb54Q3tJ8FKVLnzx9PiJ9wClna9gKKHw/f0XuyHVTxwyK6GpVC
+         bxNiegPmC7cFXB9mL9shRyAyfThJPY1Q2mPO15yawLbp3TjQVUoV/JLbBrIGypJ9tXxR
+         twCy+ln8EYz3dhqvvVbFmjV9MXu1pQcqb5j8ARElFIapldLgBOezqxDdg3kzqkJrcP0R
+         AVmC1s4oRRioWJIJKnz8cJsfqrbeXLG2WpJSkKTpfXsmGzDPErbCpBO6Kq4T5MJ20ZBM
+         8ByTEsPPeHk/ZWzeGed/WhCS8Hbzaz7TULX0RNxGfFO3WFOnXFuz1ZGzlxI3JodiRHAI
+         pfBA==
+X-Gm-Message-State: AOJu0YxKxRj44yqAXCE5cDK8icPimUKbJPybUpA5vCJ1PWqWJbgqgE0D
+	tYfM6wwYcirUPfaSeemXNhVrCBaB4DUd3Swj8/8=
+X-Google-Smtp-Source: AGHT+IFW8YM0/X2Dm18iLeCdndAKA2PY30DyHVlPi+CFZUK6JIEbtI71ymaf9+TDJSxjUrs99lTAMx+gjlNGvrne6II=
+X-Received: by 2002:a05:6808:1b26:b0:3b9:db4e:fccc with SMTP id
+ bx38-20020a0568081b2600b003b9db4efcccmr2789854oib.11.1701998666382; Thu, 07
+ Dec 2023 17:24:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/ipv6: insert the fib6 gc_link of a fib6_info
- only if in fib6.
-Content-Language: en-US
-To: Kui-Feng Lee <sinquersw@gmail.com>, thinker.li@gmail.com,
- netdev@vger.kernel.org, martin.lau@linux.dev, kernel-team@meta.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
-Cc: kuifeng@meta.com, syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com
-References: <20231207221627.746324-1-thinker.li@gmail.com>
- <8f44514b-f5b4-4fd1-b361-32bb10ed14ad@kernel.org>
- <4eebd408-ee47-4ef0-bb72-0c7abad3eecf@kernel.org>
- <dbccbd5d-8968-43cb-9eca-d19cc12f6515@gmail.com>
- <b6fccc0d-c60b-4f11-9ef7-25b01c25425d@kernel.org>
- <b0fe3183-4df9-42bc-84e4-ba8e807318f4@gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <b0fe3183-4df9-42bc-84e4-ba8e807318f4@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20231205002613.10219-1-rpearsonhpe@gmail.com> <763abeeb-64b2-496f-9249-b588d1d47e60@linux.dev>
+ <7f5d614e-dc1a-47ce-b573-60ba8c5a21fa@linux.dev> <CAJr_XRDphUUTLbXJbbVGjaQ-HBQ59DioQs_0PSVvmLpGiHk1FQ@mail.gmail.com>
+ <319ba5c7-1ce8-4417-86de-0b42e8abad16@gmail.com>
+In-Reply-To: <319ba5c7-1ce8-4417-86de-0b42e8abad16@gmail.com>
+From: Greg Sword <gregsword0@gmail.com>
+Date: Fri, 8 Dec 2023 09:24:14 +0800
+Message-ID: <CAEz=Lcu0djkY6JS123C8ePfX2cCyUpDiOhbd27EjqZfKThGN7Q@mail.gmail.com>
+Subject: Re: [PATCH for-next v5 3/7] RDMA/rxe: Register IP mcast address
+To: Bob Pearson <rpearsonhpe@gmail.com>
+Cc: Rain River <rain.1986.08.12@gmail.com>, Zhu Yanjun <yanjun.zhu@linux.dev>, jgg@nvidia.com, 
+	linux-rdma@vger.kernel.org, dsahern@kernel.org, davem@davemloft.net, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/7/23 6:16 PM, Kui-Feng Lee wrote:
-> 
-> 
-> On 12/7/23 17:02, David Ahern wrote:
->> On 12/7/23 4:33 PM, Kui-Feng Lee wrote:
->>>
->>>
->>> On 12/7/23 15:20, David Ahern wrote:
->>>> On 12/7/23 4:17 PM, David Ahern wrote:
->>>>> On 12/7/23 3:16 PM, thinker.li@gmail.com wrote:
->>>>>> From: Kui-Feng Lee <thinker.li@gmail.com>
->>>>>>
->>>>>> Check f6i->fib6_node before inserting a f6i (fib6_info) to
->>>>>> tb6_gc_hlist.
->>>>>
->>>>> any place setting expires should know if the entry is in a table or
->>>>> not.
->>>>>
->>>>> And the syzbot report contains a reproducer, a kernel config and other
->>>>> means to test a patch.
->>>>>
->>>>
->>>> Fundamentally, the set and clear helpers are doing 2 things; they need
->>>> to be split into separate helpers.
->>>
->>> Sorry, I don't follow you.
->>>
->>> There are fib6_set_expires_locked()) and fib6_clean_expires_locked(),
->>> two separate helpers. Is this what you are saying?
->>>
->>> Doing checks of f6i->fib6_node in fib6_set_expires_locked() should
->>> already apply everywhere setting expires, right?
->>>
->>> Do I miss anything?
->>
->> static inline void fib6_set_expires_locked(struct fib6_info *f6i,
->>                                             unsigned long expires)
->> {
->>          struct fib6_table *tb6;
->>
->>          tb6 = f6i->fib6_table;
->>          f6i->expires = expires;
->>          if (tb6 && !fib6_has_expires(f6i))
->>                  hlist_add_head(&f6i->gc_link, &tb6->tb6_gc_hlist);
+On Fri, Dec 8, 2023 at 3:07=E2=80=AFAM Bob Pearson <rpearsonhpe@gmail.com> =
+wrote:
+>
+>
+>
+> On 12/6/23 19:47, Rain River wrote:
+> > On Tue, Dec 5, 2023 at 6:30=E2=80=AFPM Zhu Yanjun <yanjun.zhu@linux.dev=
+> wrote:
+> >>
+> >>
+> >> =E5=9C=A8 2023/12/5 13:55, Zhu Yanjun =E5=86=99=E9=81=93:
+> >>> Add David S. Miller and  David Ahern.
+> >>>
+> >>> They are the maintainers in netdev and very familiar with mcast.
+> >>>
+> >>> Zhu Yanjun
+> >>>
+> >>> =E5=9C=A8 2023/12/5 8:26, Bob Pearson =E5=86=99=E9=81=93:
+> >>>> Currently the rdma_rxe driver does not receive mcast packets at all.
+> >>>>
+> >>>> Add code to rxe_mcast_add() and rxe_mcast_del() to register/deregist=
+er
+> >>>> the IP mcast address. This is required for mcast traffic to reach th=
+e
+> >>>> rxe driver when coming from an external source.
+> >>>>
+> >>>> Fixes: 8700e3e7c485 ("Soft RoCE driver")
+> >>>> Signed-off-by: Bob Pearson <rpearsonhpe@gmail.com>
+> >>>> ---
+> >>>>    drivers/infiniband/sw/rxe/rxe_mcast.c | 119 +++++++++++++++++++++=
+-----
+> >>>>    drivers/infiniband/sw/rxe/rxe_net.c   |   2 +-
+> >>>>    drivers/infiniband/sw/rxe/rxe_net.h   |   1 +
+> >>>>    drivers/infiniband/sw/rxe/rxe_verbs.h |   1 +
+> >>>>    4 files changed, 102 insertions(+), 21 deletions(-)
+> >>>>
+> >>>> diff --git a/drivers/infiniband/sw/rxe/rxe_mcast.c
+> >>>> b/drivers/infiniband/sw/rxe/rxe_mcast.c
+> >>>> index 86cc2e18a7fd..54735d07cee5 100644
+> >>>> --- a/drivers/infiniband/sw/rxe/rxe_mcast.c
+> >>>> +++ b/drivers/infiniband/sw/rxe/rxe_mcast.c
+> >>>> @@ -19,38 +19,116 @@
+> >>>>     * mcast packets in the rxe receive path.
+> >>>>     */
+> >>>>    +#include <linux/igmp.h>
+> >>>> +
+> >>>>    #include "rxe.h"
+> >>>>    -/**
+> >>>> - * rxe_mcast_add - add multicast address to rxe device
+> >>>> - * @rxe: rxe device object
+> >>>> - * @mgid: multicast address as a gid
+> >>>> - *
+> >>>> - * Returns 0 on success else an error
+> >>>> - */
+> >>>> -static int rxe_mcast_add(struct rxe_dev *rxe, union ib_gid *mgid)
+> >>>> +static int rxe_mcast_add6(struct rxe_dev *rxe, union ib_gid *mgid)
+> >>>>    {
+> >>>> +    struct in6_addr *addr6 =3D (struct in6_addr *)mgid;
+> >>>> +    struct sock *sk =3D recv_sockets.sk6->sk;
+> >>>>        unsigned char ll_addr[ETH_ALEN];
+> >>>> +    int err;
+> >>>> +
+> >>>> +    spin_lock_bh(&sk->sk_lock.slock);
+> >>>> +    rtnl_lock();
+> >>>> +    err =3D ipv6_sock_mc_join(sk, rxe->ndev->ifindex, addr6);
+> >>
+> >>
+> >> Normally sk_lock is used. Not sure if spin_lock_bh is correct or not.
+> >
+> > ./net/ipv6/addrconf.c-2915-     lock_sock(sk);
+> > ./net/ipv6/addrconf.c-2916-     if (join)
+> > ./net/ipv6/addrconf.c:2917:             ret =3D ipv6_sock_mc_join(sk,
+> > ifindex, addr);
+> > ./net/ipv6/addrconf.c-2918-     else
+> > ./net/ipv6/addrconf.c-2919-             ret =3D ipv6_sock_mc_drop(sk,
+> > ifindex, addr);
+> > ./net/ipv6/addrconf.c-2920-     release_sock(sk);
+> >
+> > Should be lock_sock?
+>
+> It works as well as spin_lock_bh() in preventing the RCU splat and
+> looks like the preferred way. I'll make this change.
 
---> no check that f6i is already in the list yet fib6_set_expires and
-fib6_set_expires_locked are called on existing entries - entries already
-in the tree and so *maybe* already linked. See fib6_add_rt2node and most
-of fib6_set_expires callers.
+This is the implementation of lock_sock. lock_sock has not only spin_lock_b=
+h,
+but also other protections for sk.
+You should use lock_sock, instead of spin_lock_bh.
 
-Your selftests only check that entries are removed; it does not check
-updating the expires time on an existing entry. It does not check a
-route replace that toggles between no expires value or to an expires
-(fib6_add_rt2node use of fib6_set_expires_locked) and then replacing
-that route -- various permutations here.
+void lock_sock_nested(struct sock *sk, int subclass)
+{
+        /* The sk_lock has mutex_lock() semantics here. */
+        mutex_acquire(&sk->sk_lock.dep_map, subclass, 0, _RET_IP_);
 
+        might_sleep();
+        spin_lock_bh(&sk->sk_lock.slock);
+        if (sock_owned_by_user_nocheck(sk))
+                __lock_sock(sk);
+        sk->sk_lock.owned =3D 1;
+        spin_unlock_bh(&sk->sk_lock.slock);
+}
+EXPORT_SYMBOL(lock_sock_nested);
 
->>          f6i->fib6_flags |= RTF_EXPIRES;
->> }
->>
->> 1. You are abusing this helper in create_info to set the value of
->> expires knowing (expecting) tb6 to NOT be set and hence not setting
->> gc_link so no cleanup is needed on errors.
->>
->> 2. You then open code gc_link when adding to the tree.
->>
->> I had my reservations when you sent this patch months ago, but I did not
->> have time to suggest a cleaner approach and now this is where we are --
->> trying to find some race corrupting the list.
-> 
-> So, what you said is to split fib6_set_expires_locked() into two
-> functions. One is setting expires, and the other is adding a f6i to
-> tb6_gc_hlist. fib6_clean_expires_locked() should be split in the same
-> way.
-> 
-> Is it correct?
-> 
-
-one helper sets expires value and one helper that adds/removes from the
-gc_link. If it is already linked, then no need to do it again.
+>
+> Bob
+> >
+> >>
+> >> Please Jason or experts from netdev comment on this.
+> >>
+> >> Thanks,
+> >>
+> >> Zhu Yanjun
+> >>
+> >>
+> >>>> +    rtnl_unlock();
+> >>>> +    spin_unlock_bh(&sk->sk_lock.slock);
+> >>>> +    if (err && err !=3D -EADDRINUSE)
+> >>>> +        goto err_out;
+> >>>>          ipv6_eth_mc_map((struct in6_addr *)mgid->raw, ll_addr);
+> >>>> +    err =3D dev_mc_add(rxe->ndev, ll_addr);
+> >>>> +    if (err)
+> >>>> +        goto err_drop;
+> >>>> +
+> >>>> +    return 0;
+> >>>>    -    return dev_mc_add(rxe->ndev, ll_addr);
+> >>>> +err_drop:
+> >>>> +    spin_lock_bh(&sk->sk_lock.slock);
+> >>>> +    rtnl_lock();
+> >>>> +    ipv6_sock_mc_drop(sk, rxe->ndev->ifindex, addr6);
+> >>>> +    rtnl_unlock();
+> >>>> +    spin_unlock_bh(&sk->sk_lock.slock);
+> >>>> +err_out:
+> >>>> +    return err;
+> >>>>    }
+> >>>>    -/**
+> >>>> - * rxe_mcast_del - delete multicast address from rxe device
+> >>>> - * @rxe: rxe device object
+> >>>> - * @mgid: multicast address as a gid
+> >>>> - *
+> >>>> - * Returns 0 on success else an error
+> >>>> - */
+> >>>> -static int rxe_mcast_del(struct rxe_dev *rxe, union ib_gid *mgid)
+> >>>> +static int rxe_mcast_add(struct rxe_mcg *mcg)
+> >>>>    {
+> >>>> +    struct rxe_dev *rxe =3D mcg->rxe;
+> >>>> +    union ib_gid *mgid =3D &mcg->mgid;
+> >>>>        unsigned char ll_addr[ETH_ALEN];
+> >>>> +    struct ip_mreqn imr =3D {};
+> >>>> +    int err;
+> >>>> +
+> >>>> +    if (mcg->is_ipv6)
+> >>>> +        return rxe_mcast_add6(rxe, mgid);
+> >>>> +
+> >>>> +    imr.imr_multiaddr =3D *(struct in_addr *)(mgid->raw + 12);
+> >>>> +    imr.imr_ifindex =3D rxe->ndev->ifindex;
+> >>>> +    rtnl_lock();
+> >>>> +    err =3D ip_mc_join_group(recv_sockets.sk4->sk, &imr);
+> >>>> +    rtnl_unlock();
+> >>>> +    if (err && err !=3D -EADDRINUSE)
+> >>>> +        goto err_out;
+> >>>> +
+> >>>> +    ip_eth_mc_map(imr.imr_multiaddr.s_addr, ll_addr);
+> >>>> +    err =3D dev_mc_add(rxe->ndev, ll_addr);
+> >>>> +    if (err)
+> >>>> +        goto err_leave;
+> >>>> +
+> >>>> +    return 0;
+> >>>> +
+> >>>> +err_leave:
+> >>>> +    rtnl_lock();
+> >>>> +    ip_mc_leave_group(recv_sockets.sk4->sk, &imr);
+> >>>> +    rtnl_unlock();
+> >>>> +err_out:
+> >>>> +    return err;
+> >>>> +}
+> >>>> +
+> >>>> +static int rxe_mcast_del6(struct rxe_dev *rxe, union ib_gid *mgid)
+> >>>> +{
+> >>>> +    struct sock *sk =3D recv_sockets.sk6->sk;
+> >>>> +    unsigned char ll_addr[ETH_ALEN];
+> >>>> +    int err, err2;
+> >>>>          ipv6_eth_mc_map((struct in6_addr *)mgid->raw, ll_addr);
+> >>>> +    err =3D dev_mc_del(rxe->ndev, ll_addr);
+> >>>> +
+> >>>> +    spin_lock_bh(&sk->sk_lock.slock);
+> >>>> +    rtnl_lock();
+> >>>> +    err2 =3D ipv6_sock_mc_drop(sk, rxe->ndev->ifindex,
+> >>>> +            (struct in6_addr *)mgid);
+> >>>> +    rtnl_unlock();
+> >>>> +    spin_unlock_bh(&sk->sk_lock.slock);
+> >>>> +
+> >>>> +    return err ?: err2;
+> >>>> +}
+> >>>> +
+> >>>> +static int rxe_mcast_del(struct rxe_mcg *mcg)
+> >>>> +{
+> >>>> +    struct rxe_dev *rxe =3D mcg->rxe;
+> >>>> +    union ib_gid *mgid =3D &mcg->mgid;
+> >>>> +    unsigned char ll_addr[ETH_ALEN];
+> >>>> +    struct ip_mreqn imr =3D {};
+> >>>> +    int err, err2;
+> >>>> +
+> >>>> +    if (mcg->is_ipv6)
+> >>>> +        return rxe_mcast_del6(rxe, mgid);
+> >>>> +
+> >>>> +    imr.imr_multiaddr =3D *(struct in_addr *)(mgid->raw + 12);
+> >>>> +    imr.imr_ifindex =3D rxe->ndev->ifindex;
+> >>>> +    ip_eth_mc_map(imr.imr_multiaddr.s_addr, ll_addr);
+> >>>> +    err =3D dev_mc_del(rxe->ndev, ll_addr);
+> >>>> +
+> >>>> +    rtnl_lock();
+> >>>> +    err2 =3D ip_mc_leave_group(recv_sockets.sk4->sk, &imr);
+> >>>> +    rtnl_unlock();
+> >>>>    -    return dev_mc_del(rxe->ndev, ll_addr);
+> >>>> +    return err ?: err2;
+> >>>>    }
+> >>>>      /**
+> >>>> @@ -164,6 +242,7 @@ static void __rxe_init_mcg(struct rxe_dev *rxe,
+> >>>> union ib_gid *mgid,
+> >>>>    {
+> >>>>        kref_init(&mcg->ref_cnt);
+> >>>>        memcpy(&mcg->mgid, mgid, sizeof(mcg->mgid));
+> >>>> +    mcg->is_ipv6 =3D !ipv6_addr_v4mapped((struct in6_addr *)mgid);
+> >>>>        INIT_LIST_HEAD(&mcg->qp_list);
+> >>>>        mcg->rxe =3D rxe;
+> >>>>    @@ -225,7 +304,7 @@ static struct rxe_mcg *rxe_get_mcg(struct
+> >>>> rxe_dev *rxe, union ib_gid *mgid)
+> >>>>        spin_unlock_bh(&rxe->mcg_lock);
+> >>>>          /* add mcast address outside of lock */
+> >>>> -    err =3D rxe_mcast_add(rxe, mgid);
+> >>>> +    err =3D rxe_mcast_add(mcg);
+> >>>>        if (!err)
+> >>>>            return mcg;
+> >>>>    @@ -273,7 +352,7 @@ static void __rxe_destroy_mcg(struct rxe_mcg =
+*mcg)
+> >>>>    static void rxe_destroy_mcg(struct rxe_mcg *mcg)
+> >>>>    {
+> >>>>        /* delete mcast address outside of lock */
+> >>>> -    rxe_mcast_del(mcg->rxe, &mcg->mgid);
+> >>>> +    rxe_mcast_del(mcg);
+> >>>>          spin_lock_bh(&mcg->rxe->mcg_lock);
+> >>>>        __rxe_destroy_mcg(mcg);
+> >>>> diff --git a/drivers/infiniband/sw/rxe/rxe_net.c
+> >>>> b/drivers/infiniband/sw/rxe/rxe_net.c
+> >>>> index 58c3f3759bf0..b481f8da2002 100644
+> >>>> --- a/drivers/infiniband/sw/rxe/rxe_net.c
+> >>>> +++ b/drivers/infiniband/sw/rxe/rxe_net.c
+> >>>> @@ -18,7 +18,7 @@
+> >>>>    #include "rxe_net.h"
+> >>>>    #include "rxe_loc.h"
+> >>>>    -static struct rxe_recv_sockets recv_sockets;
+> >>>> +struct rxe_recv_sockets recv_sockets;
+> >>>>      static struct dst_entry *rxe_find_route4(struct rxe_qp *qp,
+> >>>>                         struct net_device *ndev,
+> >>>> diff --git a/drivers/infiniband/sw/rxe/rxe_net.h
+> >>>> b/drivers/infiniband/sw/rxe/rxe_net.h
+> >>>> index 45d80d00f86b..89cee7d5340f 100644
+> >>>> --- a/drivers/infiniband/sw/rxe/rxe_net.h
+> >>>> +++ b/drivers/infiniband/sw/rxe/rxe_net.h
+> >>>> @@ -15,6 +15,7 @@ struct rxe_recv_sockets {
+> >>>>        struct socket *sk4;
+> >>>>        struct socket *sk6;
+> >>>>    };
+> >>>> +extern struct rxe_recv_sockets recv_sockets;
+> >>>>      int rxe_net_add(const char *ibdev_name, struct net_device *ndev=
+);
+> >>>>    diff --git a/drivers/infiniband/sw/rxe/rxe_verbs.h
+> >>>> b/drivers/infiniband/sw/rxe/rxe_verbs.h
+> >>>> index ccb9d19ffe8a..7be9e6232dd9 100644
+> >>>> --- a/drivers/infiniband/sw/rxe/rxe_verbs.h
+> >>>> +++ b/drivers/infiniband/sw/rxe/rxe_verbs.h
+> >>>> @@ -352,6 +352,7 @@ struct rxe_mcg {
+> >>>>        atomic_t        qp_num;
+> >>>>        u32            qkey;
+> >>>>        u16            pkey;
+> >>>> +    bool            is_ipv6;
+> >>>>    };
+> >>>>      struct rxe_mca {
+> >>
+>
 
