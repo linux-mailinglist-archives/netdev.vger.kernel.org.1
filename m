@@ -1,126 +1,109 @@
-Return-Path: <netdev+bounces-55478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32CC780AFC6
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 23:41:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC07480AFC7
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 23:42:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6308A1C20AC2
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 22:41:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A5D8B20BB8
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 22:42:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3301381A0;
-	Fri,  8 Dec 2023 22:41:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9849D58AD8;
+	Fri,  8 Dec 2023 22:42:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wM7mC16Z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YD+JEL4R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF2B510CA
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 14:41:02 -0800 (PST)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-5dd3affae03so25993817b3.1
-        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 14:41:02 -0800 (PST)
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8FA910CA;
+	Fri,  8 Dec 2023 14:42:41 -0800 (PST)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-9fa2714e828so335348066b.1;
+        Fri, 08 Dec 2023 14:42:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702075262; x=1702680062; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1702075360; x=1702680160; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VOeswBlcwCDEkoDNTvrsGUjCXtw0cH2uUTlFe6lWar0=;
-        b=wM7mC16ZIKoC3HD+mvTeKssI33WXSo8VogE/Vt2ah+CLUma4RBmElfiSJa9dYZ0rXo
-         RySjmrmXFiq7+5vSQgFVxm/P4Rm53+EXKgGpUQI7X/Zwgxr+KsYCuqA5xap9wVcV1Mwg
-         tqHnkjM8+y41Zzz5sfnJwWOXMN3JmZZAdIMGxVnxLbDOwOtbN3weYoxcBvFjAuGZA9Nc
-         5cGuJpa2mcDItGwTecnRxVsHAV6UImnbDMR5qCZ4wK/JaWTIXf4m2NLJn59tGwh/R1oj
-         wLVPE/0q5dPYnisoHKDkev7Zb04DGzSmQajrtaiOtgYGqDc3F5K8+Tge7k9E/IAP68vj
-         cuGQ==
+        bh=TeRi2RzPavt7MiOm/u+S/euZwULbAuM0F2k9JFYP/T0=;
+        b=YD+JEL4RBIqytoXy6eTlujXpC1PmKY+z8md8Re04D+DJBZHEfDi0h0BhRDZ9r2km75
+         Ex7yeY3CZMmiLoirhgd9TL2OM7bKAj1WSjTTALS2saoCN/S7dGLu7zmBJgLbjc9ny30W
+         +o6FzRUZRGnmhBY+51EeQivt7Ih70fkhY366Dh0e9Kfsot+Gfm8eMvzU0bVBcAMCaLW6
+         i4xeE/yAQsw5GqSkp2pP3NPIH38s5Q3SukSQ/E5ZsSqVqSpLmAlavsA9EtVlfyrz/YRM
+         r3ZAwGBSdu78vjd2Lv+WrRq4M5WJqAkzCYnchnGPZ6DKIuGouVkzCoh3m54g3UEu+IKf
+         17OA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702075262; x=1702680062;
+        d=1e100.net; s=20230601; t=1702075360; x=1702680160;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VOeswBlcwCDEkoDNTvrsGUjCXtw0cH2uUTlFe6lWar0=;
-        b=YVgcUb8Ea2XcUMfE4Ej0pcTOXh1pdgMEO+78MgYwB4M4Z2hCRbZ85sSktn4dMct5dG
-         mpcyMBeD7PHaglWsODmhRL2S3U5bV6h2jRmblI3kCoGhQs4457bPL2SzhiJIPgm7PXrZ
-         dszAUQolzbJUFsnVeZCCyiF4jSVrC3B+4zEGKLhJbPpYT7cx9vSgtHgDUQ3FWl5mPCmf
-         BLVhJ3//QJMsRwr250oGuj2Pi50612m1/EfR7AJVVgXcBxGShF/uYrZUoOKiFwaTFQOC
-         wEHfYPev6eaMq+cJlovKzndWB8S6zj2BVZ+VFuvQ4gU12zNO1xtDlMSxsUIkijZ4pZED
-         kRFg==
-X-Gm-Message-State: AOJu0YwlX9HzHT6rIWgrmwcsS457zxl8tJujJtivagefLsUkapYRs0fq
-	kEBv2ahfJ36vrOx2Bh4/BAoaKvzX+CQDv4h/9oNnqw==
-X-Google-Smtp-Source: AGHT+IGPG6wwjhIhjxmQgzlIWaCeOeh/P8IX+Ckabh/ZFHsfrcrYNpTHGSYKiuj9bBM9VmRxiZerXvj9TmtI01nL+yE=
-X-Received: by 2002:a0d:ff44:0:b0:5d7:1940:b389 with SMTP id
- p65-20020a0dff44000000b005d71940b389mr788328ywf.85.1702075261922; Fri, 08 Dec
- 2023 14:41:01 -0800 (PST)
+        bh=TeRi2RzPavt7MiOm/u+S/euZwULbAuM0F2k9JFYP/T0=;
+        b=jOdNL3Og7jqPMwqPdbfMUfJCzznPnKBSHhYWxUeal4bkFP83sEwbJ36BT1viMR5vmQ
+         Avl9mU2x/bHuPreq7YnKiSWjIiT8/oLsSzd/Q8gnaXRldTtXQJAkoMVB8DCZtj3Qf8zf
+         mhgcGYI2z2a9HD/X5cHPTjB28ubuwzZ9BUiNtWuBqBxaj1oktoM7thD2+Ss/s4CI55N3
+         0ic87ssJO2G0XDlKdegROct+jWTkT+9puud2BfrS9pk8IvW/O3xlBrHm3kA1rHJa53UU
+         sAA3E3k6ojLfL6gSjnfvBEWGOXDI0DvWwaZI0X5yReWA2HTmt69fLMwAo+K9SB3SB9oR
+         Yrqw==
+X-Gm-Message-State: AOJu0Yx9nDJBHGLjOUbpMUS09w7U+alDytKhR3jPOd5Rx4viopJpULOR
+	HaXiNpVn6A2pogzkfrgUQsrWwzAk4uWiskQTyCs=
+X-Google-Smtp-Source: AGHT+IEgLjlBPvK/C3mhbmysRfyejLFP+XOCizODYZ06oxPi7vpNPQr7ZjkldJ0lsIXKQbkmnGvuZu1oi8yHImC1ov8=
+X-Received: by 2002:a17:906:74cf:b0:a19:532c:7678 with SMTP id
+ z15-20020a17090674cf00b00a19532c7678mr350197ejl.30.1702075360276; Fri, 08 Dec
+ 2023 14:42:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231208193518.2018114-1-vladimir.oltean@nxp.com> <20231208193518.2018114-5-vladimir.oltean@nxp.com>
-In-Reply-To: <20231208193518.2018114-5-vladimir.oltean@nxp.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Fri, 8 Dec 2023 23:40:50 +0100
-Message-ID: <CACRpkdYL1C4iTKV1ovX2coTFK4u0Cn4Oqknu7Fxh3k_gk_OWGQ@mail.gmail.com>
-Subject: Re: [PATCH net 4/4] docs: net: dsa: replace TODO section with info
- about history and devel ideas
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Luiz Angelo Daros de Luca <luizluca@gmail.com>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Madhuri Sripada <madhuri.sripada@microchip.com>, Marcin Wojtas <mw@semihalf.com>, 
-	Tobias Waldekranz <tobias@waldekranz.com>, Arun Ramadoss <arun.ramadoss@microchip.com>, 
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Jonathan Corbet <corbet@lwn.net>
+References: <20231207185443.2297160-1-andrii@kernel.org> <20231207185443.2297160-2-andrii@kernel.org>
+ <20231208-pocken-flugverbindung-0e4b956cd089@brauner>
+In-Reply-To: <20231208-pocken-flugverbindung-0e4b956cd089@brauner>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Fri, 8 Dec 2023 14:42:28 -0800
+Message-ID: <CAEf4BzZh9FJAXEfR4F+e30xwSigPdgzmErVxgpeMFjHwoScx1A@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 1/8] bpf: fail BPF_TOKEN_CREATE if no delegation
+ option was set on BPF FS
+To: Christian Brauner <brauner@kernel.org>
+Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	paul@paul-moore.com, linux-fsdevel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, keescook@chromium.org, 
+	kernel-team@meta.com, sargun@sargun.me
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 8, 2023 at 8:36=E2=80=AFPM Vladimir Oltean <vladimir.oltean@nxp=
-.com> wrote:
-
-> It was a bit unclear to me what the TODO is about and what is even
-> actionable about it. I had a discussion with Florian about it at NetConf
-> 2023, and it seems that it's about the amount of boilerplate code that
-> exists in switchdev drivers, and how that could be maybe made common
-> with DSA, through something like another library.
+On Fri, Dec 8, 2023 at 1:49=E2=80=AFPM Christian Brauner <brauner@kernel.or=
+g> wrote:
 >
-> I think we are seeing a lot of people who are looking at DSA now,
-> and there is a lot of misunderstanding about why things are the way
-> they are, and which are the changes that would benefit the subsystem,
-> compared to the changes that go against DSA's past development trend.
+> On Thu, Dec 07, 2023 at 10:54:36AM -0800, Andrii Nakryiko wrote:
+> > It's quite confusing in practice when it's possible to successfully
+> > create a BPF token from BPF FS that didn't have any of delegate_xxx
+> > mount options set up. While it's not wrong, it's actually more
+> > meaningful to reject BPF_TOKEN_CREATE with specific error code (-ENOENT=
+)
+> > to let user-space know that no token delegation is setup up.
+> >
+> > So, instead of creating empty BPF token that will be always ignored
+> > because it doesn't have any of the allow_xxx bits set, reject it with
+> > -ENOENT. If we ever need empty BPF token to be possible, we can support
+> > that with extra flag passed into BPF_TOKEN_CREATE.
+> >
+> > Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> > ---
 >
-> I think what is missing is the context, which is admittedly a bit
-> hard to grasp considering there are 15 years of development.
-> Based on the git log and on the discussions where I participated,
-> I tried to cobble up a section about DSA's history. Here and there,
-> I've mentioned the limitations that I am aware of, and some possible
-> ways forward.
->
-> I'm also personally surprised by the amount of change in DSA over the
-> years, and I hope that putting things into perspective will also
-> encourage others to not think that it's set in stone the way it is now.
->
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Might consider EOPNOTSUPP (or whatever the correct way of spelling this
 
-Adding documentation is always good, and the kernel definitely
-looks better after this patch than before so:
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+I thought about that, but it felt wrong to return "unsupported" error
+code, because BPF token is supported, it's just not setup/delegated on
+that particular instance of BPF FS. So in that sense it felt like "BPF
+token is not there" is more appropriate, which is why I went with
+-ENOENT. And also I was worried that we might add -EOPNOTSUPP for some
+unsupported combinations of flags or something, and then it will
+become confusing to detect when some functionality is really not
+supported, or if BPF token delegation isn't set on BPF FS. I hope that
+makes sense and is not too contrived an argument.
 
-For ease of reading I would personally restructure it a bit, by
-putting in three sections:
 
-- History
-  Pure development history (for the old code maybe add examples
-  of which switches brought about the changes, in the same way
-  that the Ocelot driver is mentioned?)
-
-- Policy
-  Do this, don't do that. The text has a few paragraphs that read
-  like so.
-
-- Future directions
-  What we want to do next, or can be expected for the future,
-  again the text has a few paragraphs that read like that.
-
-Yours,
-Linus Walleij
+> is). Otherwise,
+> Acked-by: Christian Brauner <brauner@kernel.org>
 
