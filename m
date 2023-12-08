@@ -1,152 +1,97 @@
-Return-Path: <netdev+bounces-55173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1422B809AF5
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 05:23:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B2CE809B2D
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 05:51:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44E4F1C20ADA
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 04:23:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3C92B20D13
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 04:51:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B0E3523B;
-	Fri,  8 Dec 2023 04:23:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5994C83;
+	Fri,  8 Dec 2023 04:51:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MbI5cu+v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JfUyJNOy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 560C3171C
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 20:23:45 -0800 (PST)
-Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-40b27726369so18391585e9.0
-        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 20:23:45 -0800 (PST)
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CACE010DF
+	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 20:51:41 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-6ce6b62746dso1210151b3a.2
+        for <netdev@vger.kernel.org>; Thu, 07 Dec 2023 20:51:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702009424; x=1702614224; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SPl6U0GokDKYjf8mFtBabOMqth1qqIW6W4U8DQpUoFQ=;
-        b=MbI5cu+vG+FkNB6axRSRHqcLezZQ8RXfRcUsyzkVlOnlrkTFke8AZL6p4RHnrQ+kaj
-         7lfDbYl62k0qRqFJ6uJw25+vDB0uNQDQSS0BZMfw0wYsc2H51tC2YpqPmU+jcI6jeYqg
-         Wgp/qryjFiM6r7thcyyKt+5DpEXCmEZswmVlTfnxD6m+HLGVFkBMsYCr20+3pHwWNjLG
-         33sz7QubTOf6RUmOuENNp8aYF6z0KJA2LKTKVHJy2mMmUwcWF0Cye6lraw47UNYnQOCs
-         En6OTXoo5F/VkRXcXUD7TllTmVIjM2fd2BFCdZ43Tmt9SlQgqDF6KfcrTUwBkKlw5h8+
-         grWA==
+        d=gmail.com; s=20230601; t=1702011101; x=1702615901; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gUypEyHe6FZ/tY3Lu8OcnY0v8EJ6vWIxwcYdiILbA4s=;
+        b=JfUyJNOyWUHbfpG787TpCSzZwKRa6uEiXXjZs5CTHdllvDOIkURImK7GOLu0yjMVjo
+         iCgHIOjGJQTg/b+lZLEk+lPHtkoYpYwr4+O2M2hwcCD45Lhywpa2DB/UmjQfv5BjgZX2
+         NtugJ+y5WqR9inct+MJEXPCKjmRU9E4WYKEcIvP5bj2xgMJIwuDvMLtxVIDQFBsh1OG7
+         WdeYGhDQxx4Jc3wswTDTXV60jmCMvGHDKuxQUfrOCtk9vsEMwHQ1TAJ/P79MCudcOfAD
+         RbuV3joTV0ZgZQW5W90xPc972xYM3qdLUzJVOhRt8wCtVXgzK7GU9JglFbAsCtzO0kDd
+         y76Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702009424; x=1702614224;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SPl6U0GokDKYjf8mFtBabOMqth1qqIW6W4U8DQpUoFQ=;
-        b=IYmmkxAfcSx46ev2I6DU3K9fQjbw/1x+ezoD5kvUiS5zEjY0K2VCWIICvcpjkMu1G6
-         1234l3kQqGDG0xm13f9eeY/OmkjreWSVft2M5gxfCaX5zYXCUGVOrok4HsThVZWEcxVh
-         CnkssZOoka6w1VfmOrGuxIKaw2K+KmAkEZCj9cj33tK5ekEKGWthndJGaLlAqJ5PItu1
-         tPsTWjvZS7GVXKG7XC5jSIhiYDlE5Vkut3cPmkJmZkeGig8kScz3e8FJ4XIA3Tbqps4X
-         S7h1J5tp7QtY7iFMWvZ36zCIqjabjxU6qQXaoQDT0Kl1ReSbi4DOi+BM5BKtcSE2aGsW
-         VU4w==
-X-Gm-Message-State: AOJu0YyeDb4qcaTY2JKploL5RMci9PVmn8Cwcm3F5IeqUcw34zOKKB8q
-	xeedGIGwo4fRsMtxlJznbHfAsA==
-X-Google-Smtp-Source: AGHT+IGb8HNYcf4CwqR2mNQtwvE2sIxWS6ha8l/UWovNTRhq1viL+9jJuZvP6Uejra7pVJ3NHVKIxA==
-X-Received: by 2002:a05:600c:4651:b0:40c:2518:687c with SMTP id n17-20020a05600c465100b0040c2518687cmr1507452wmo.61.1702009423621;
-        Thu, 07 Dec 2023 20:23:43 -0800 (PST)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id gw18-20020a05600c851200b004063c9f68f2sm1470710wmb.26.2023.12.07.20.23.42
+        d=1e100.net; s=20230601; t=1702011101; x=1702615901;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gUypEyHe6FZ/tY3Lu8OcnY0v8EJ6vWIxwcYdiILbA4s=;
+        b=maAf62R9NuKF/4tU2SGGoghcfQ+LsR1fSPWQPhsHYX8sisFg0K/UoypUSiW5R194UW
+         wxZhIJX7t0893DF/CXxioVQoLKJ0FdRZr2++4NbEfNJGQadtM5ZI6kx37nKkg5/i84H6
+         dgGAyYy2FDk9qX9NUOrNqRazdriVSoYDzLXWmLdYR3lY1UEDm8IDCC5cdzdFVvubcsXa
+         Ea1oRZZrgmfeCDV2/AME8wAZbX1zUTTldNXxDTXwORITxSSoF3tFeKSLAf3xbdC+qAbs
+         axLb3Z+9i1+4nRLhTbhIszX4AWchoHM4Clg88Z0wWcVjZhwVOU8khsjsaC0AmJ82nMMs
+         4VDw==
+X-Gm-Message-State: AOJu0YzbW6qyDcu2qNX8dXZLXfFdtQq1zNeMbVj0MqB9F8NhdvVO1ra1
+	fSkhOw5JkZZcCnkSqqNYbqEaeD/ADkZsidiG
+X-Google-Smtp-Source: AGHT+IGtnJ8OLJG9Fl3GB8GjgYn1mA0iEKj7NLrF52XYNd1ZL9F5iQnAREiAQyIwd+yIX7tyIMeIXA==
+X-Received: by 2002:a05:6a00:8e05:b0:6cd:dece:b73d with SMTP id io5-20020a056a008e0500b006cddeceb73dmr3426349pfb.18.1702011100770;
+        Thu, 07 Dec 2023 20:51:40 -0800 (PST)
+Received: from tresc054937.tre-sc.gov.br ([2804:c:204:200:2be:43ff:febc:c2fb])
+        by smtp.gmail.com with ESMTPSA id f18-20020a056a00229200b006cbae51f335sm657865pfe.144.2023.12.07.20.51.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Dec 2023 20:23:43 -0800 (PST)
-Date: Fri, 8 Dec 2023 07:23:38 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Simon Horman <horms@kernel.org>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com
-Subject: Re: [PATCH net-next 07/15] net: dsa: mt7530: do not run
- mt7530_setup_port5() if port 5 is disabled
-Message-ID: <9b729dab-aebc-4c0c-a5e1-164845cd0948@suswa.mountain>
-References: <20231118123205.266819-1-arinc.unal@arinc9.com>
- <20231118123205.266819-8-arinc.unal@arinc9.com>
- <20231121185358.GA16629@kernel.org>
- <a2826485-70a6-4ba7-89e1-59e68e622901@arinc9.com>
- <90fde560-054e-4188-b15c-df2e082d3e33@moroto.mountain>
- <20231207184015.u7uoyfhdxiyuw6hh@skbuf>
+        Thu, 07 Dec 2023 20:51:40 -0800 (PST)
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linus.walleij@linaro.org,
+	alsi@bang-olufsen.dk,
+	andrew@lunn.ch,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	arinc.unal@arinc9.com
+Subject: [PATCH net-next 0/7] net: dsa: realtek: variants to drivers, interfaces to a common module
+Date: Fri,  8 Dec 2023 01:41:36 -0300
+Message-ID: <20231208045054.27966-1-luizluca@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231207184015.u7uoyfhdxiyuw6hh@skbuf>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 07, 2023 at 08:40:15PM +0200, Vladimir Oltean wrote:
-> 
-> We could be more pragmatic about this whole sparse false positive warning,
-> and just move the "if" block which calls mt7530_setup_port5() right
-> after the priv->p5_intf_sel assignments, instead of waiting to "break;"
-> from the for_each_child_of_node() loop.
-> 
-> for_each_child_of_node(dn, mac_np) {
-> 	if (!of_device_is_compatible(mac_np,
-> 				     "mediatek,eth-mac"))
-> 		continue;
-> 
-> 	ret = of_property_read_u32(mac_np, "reg", &id);
-> 	if (ret < 0 || id != 1)
-> 		continue;
-> 
-> 	phy_node = of_parse_phandle(mac_np, "phy-handle", 0);
-> 	if (!phy_node)
-> 		continue;
-> 
-> 	if (phy_node->parent == priv->dev->of_node->parent) {
-> 		ret = of_get_phy_mode(mac_np, &interface);
-> 		if (ret && ret != -ENODEV) {
-> 			of_node_put(mac_np);
-> 			of_node_put(phy_node);
-> 			return ret;
-> 		}
-> 		id = of_mdio_parse_addr(ds->dev, phy_node);
-> 		if (id == 0)
-> 			priv->p5_intf_sel = P5_INTF_SEL_PHY_P0;
-> 		if (id == 4)
-> 			priv->p5_intf_sel = P5_INTF_SEL_PHY_P4;
-> 
-> 		if (priv->p5_intf_sel == P5_INTF_SEL_PHY_P0 || <---- here
-> 		    priv->p5_intf_sel == P5_INTF_SEL_PHY_P4)
-> 			mt7530_setup_port5(ds, interface);
+The current driver comprises two interface modules (SMI and MDIO) and two family/variant modules (RTL8365MB and RTL8366RB). The SMI and MDIO modules are, respectively, the platform and MDIO drivers that call functions from the variant modules. In this scenario, one interface module can be loaded independently from the other one, but both variants, if not disabled at build time, must be loaded for any type of interface. This approach does not scale well, particularly with the addition of more switch variants (e.g., RTL8366B), resulting in loaded but unused modules. This also seems to be upside down, as the specific driver code normally depends on the more generic functions and not the other way around.
 
-This doesn't solve the problem that Smatch doesn't know what the
-original value of priv->p5_intf_sel.  And also I don't like this code
-because now we call mt7530_setup_port5() on every iteration after
-we find the first P5_INTF_SEL_PHY_P0.
+The series starts with two preliminary patches. The first just cleans an unused function declaration until someone actually references it. The second one moves the of_node_put from the driver remove to just after it was used. We don't really need to keep a reference for that node after the MDIO was registered.
 
-> 	}
-> 	of_node_put(mac_np);
-> 	of_node_put(phy_node);
-> 	break;
-> }
+Each variant module was converted into real drivers, both as a platform driver (for switches connected using the SMI interface) and an MDIO driver (for MDIO connected switches). The relationship between the variant and interface module is also reversed. Now the variant module calls interface functions, depending on both interface modules (if not disabled at build time). Although probably in all devices only one interface will be used, the interface code is multiple times smaller than a variant module, using much fewer resources than the previous code. With variant modules as real drivers, the compatible strings are published only in a single variant module, avoiding conflicts.
 
-Let's not worry too much about false positives.  We can just ignore
-them.  There is always a trade off between false positives and false
-negatives.  With GCC we try to get a clean run with no warnings, but
-with Smatch I'm targetting the false positive ratio at "this is worth
-reviewing one time."
+The patch series also introduces a new common module for functions used by both variants. This module also incorporates the two previous interface modules as they will always be loaded anyway.
 
-regards,
-dan carpenter
+Finally, the series moves the user MII driver from realtek-smi to common. It is now also used by MDIO-connected switches instead of the generic DSA driver.
+
+In the end, the driver relation is simpler, with a common module and multiple independent variant modules, and we require much fewer resources.
+
+Tested with an RTL8367S (RTL8365MB) using MDIO interface and an RTL8366RB (RTL8366) with SMI interface.
+
+--
+
+Luiz
 
 
