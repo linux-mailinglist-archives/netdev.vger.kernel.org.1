@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-55252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B0E8809FE3
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 10:49:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26B2D809FD7
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 10:48:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41D751C20A6D
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 09:49:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C49E51F218D3
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 09:48:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1642217999;
-	Fri,  8 Dec 2023 09:48:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B12FC14A89;
+	Fri,  8 Dec 2023 09:48:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58142D5B;
-	Fri,  8 Dec 2023 01:48:16 -0800 (PST)
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3B89ltxqF802644, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3B89ltxqF802644
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A23E8E;
+	Fri,  8 Dec 2023 01:48:14 -0800 (PST)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3B89ltWH3802647, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3B89ltWH3802647
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Fri, 8 Dec 2023 17:47:55 +0800
 Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.32; Fri, 8 Dec 2023 17:47:55 +0800
+ 15.1.2507.17; Fri, 8 Dec 2023 17:47:56 +0800
 Received: from RTDOMAIN (172.21.210.160) by RTEXMBS04.realtek.com.tw
  (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.7; Fri, 8 Dec 2023
- 17:47:54 +0800
+ 17:47:56 +0800
 From: Justin Lai <justinlai0215@realtek.com>
 To: <kuba@kernel.org>
 CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
@@ -36,9 +36,9 @@ CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
         <andrew@lunn.ch>, <pkshih@realtek.com>, <larry.chiu@realtek.com>,
         Justin Lai
 	<justinlai0215@realtek.com>
-Subject: [PATCH net-next v14 10/13] rtase: Implement ethtool function
-Date: Fri, 8 Dec 2023 17:47:30 +0800
-Message-ID: <20231208094733.1671296-11-justinlai0215@realtek.com>
+Subject: [PATCH net-next v14 11/13] rtase: Add a Makefile in the rtase folder
+Date: Fri, 8 Dec 2023 17:47:31 +0800
+Message-ID: <20231208094733.1671296-12-justinlai0215@realtek.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231208094733.1671296-1-justinlai0215@realtek.com>
 References: <20231208094733.1671296-1-justinlai0215@realtek.com>
@@ -56,181 +56,31 @@ X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
 X-KSE-AntiSpam-Interceptor-Info: fallback
 X-KSE-Antivirus-Interceptor-Info: fallback
 X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
 
-Implement the ethtool function to support users to obtain network card
-information, including obtaining various device settings, Report whether
-physical link is up, Report pause parameters, Set pause parameters,
-Return a set of strings that describe the requested objects, Get number
-of strings that @get_strings will write, Return extended statistics
-about the device.
+Add a Makefile in the rtase folder to build rtase driver.
 
 Signed-off-by: Justin Lai <justinlai0215@realtek.com>
 ---
- .../net/ethernet/realtek/rtase/rtase_main.c   | 144 ++++++++++++++++++
- 1 file changed, 144 insertions(+)
+ drivers/net/ethernet/realtek/rtase/Makefile | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+ create mode 100644 drivers/net/ethernet/realtek/rtase/Makefile
 
-diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-index 1f71ed89e043..c3a9a1e65ac3 100644
---- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-+++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-@@ -1742,9 +1742,153 @@ static void rtase_get_mac_address(struct net_device *dev)
- 	rtase_rar_set(tp, dev->dev_addr);
- }
- 
-+static void rtase_get_drvinfo(struct net_device *dev,
-+			      struct ethtool_drvinfo *drvinfo)
-+{
-+	const struct rtase_private *tp = netdev_priv(dev);
+diff --git a/drivers/net/ethernet/realtek/rtase/Makefile b/drivers/net/ethernet/realtek/rtase/Makefile
+new file mode 100644
+index 000000000000..f29b14687950
+--- /dev/null
++++ b/drivers/net/ethernet/realtek/rtase/Makefile
+@@ -0,0 +1,10 @@
++# SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
++# Copyright(c) 2023 Realtek Semiconductor Corp. All rights reserved.
 +
-+	strscpy(drvinfo->driver, KBUILD_MODNAME, 32);
-+	strscpy(drvinfo->bus_info, pci_name(tp->pdev), 32);
-+}
++#
++# Makefile for the Realtek PCIe driver
++#
 +
-+static int rtase_get_settings(struct net_device *dev,
-+			      struct ethtool_link_ksettings *cmd)
-+{
-+	u32 supported = SUPPORTED_MII | SUPPORTED_Pause | SUPPORTED_Asym_Pause;
++obj-$(CONFIG_RTASE) += rtase.o
 +
-+	ethtool_convert_legacy_u32_to_link_mode(cmd->link_modes.supported,
-+						supported);
-+	cmd->base.speed = SPEED_5000;
-+	cmd->base.duplex = DUPLEX_FULL;
-+	cmd->base.port = PORT_MII;
-+	cmd->base.autoneg = AUTONEG_DISABLE;
-+
-+	return 0;
-+}
-+
-+static void rtase_get_pauseparam(struct net_device *dev,
-+				 struct ethtool_pauseparam *pause)
-+{
-+	const struct rtase_private *tp = netdev_priv(dev);
-+	u16 value = rtase_r16(tp, RTASE_CPLUS_CMD);
-+
-+	pause->autoneg = AUTONEG_DISABLE;
-+
-+	if ((value & (FORCE_TXFLOW_EN | FORCE_RXFLOW_EN)) ==
-+	    (FORCE_TXFLOW_EN | FORCE_RXFLOW_EN)) {
-+		pause->rx_pause = 1;
-+		pause->tx_pause = 1;
-+	} else if ((value & FORCE_TXFLOW_EN)) {
-+		pause->tx_pause = 1;
-+	} else if ((value & FORCE_RXFLOW_EN)) {
-+		pause->rx_pause = 1;
-+	}
-+}
-+
-+static int rtase_set_pauseparam(struct net_device *dev,
-+				struct ethtool_pauseparam *pause)
-+{
-+	const struct rtase_private *tp = netdev_priv(dev);
-+	u16 value = rtase_r16(tp, RTASE_CPLUS_CMD);
-+
-+	if (pause->autoneg)
-+		return -EOPNOTSUPP;
-+
-+	value &= ~(FORCE_TXFLOW_EN | FORCE_RXFLOW_EN);
-+
-+	if (pause->tx_pause)
-+		value |= FORCE_TXFLOW_EN;
-+
-+	if (pause->rx_pause)
-+		value |= FORCE_RXFLOW_EN;
-+
-+	rtase_w16(tp, RTASE_CPLUS_CMD, value);
-+	return 0;
-+}
-+
-+static const char rtase_gstrings[][ETH_GSTRING_LEN] = {
-+	"tx_packets",
-+	"rx_packets",
-+	"tx_errors",
-+	"rx_errors",
-+	"rx_missed",
-+	"align_errors",
-+	"tx_single_collisions",
-+	"tx_multi_collisions",
-+	"unicast",
-+	"broadcast",
-+	"multicast",
-+	"tx_aborted",
-+	"tx_underrun",
-+};
-+
-+static void rtase_get_strings(struct net_device *dev, u32 stringset, u8 *data)
-+{
-+	switch (stringset) {
-+	case ETH_SS_STATS:
-+		memcpy(data, rtase_gstrings, sizeof(rtase_gstrings));
-+		break;
-+	}
-+}
-+
-+static int rtase_get_sset_count(struct net_device *dev, int sset)
-+{
-+	int ret = -EOPNOTSUPP;
-+
-+	switch (sset) {
-+	case ETH_SS_STATS:
-+		ret = ARRAY_SIZE(rtase_gstrings);
-+		break;
-+	}
-+
-+	return ret;
-+}
-+
-+static void rtase_get_ethtool_stats(struct net_device *dev,
-+				    struct ethtool_stats *stats, u64 *data)
-+{
-+	struct rtase_private *tp = netdev_priv(dev);
-+	const struct rtase_counters *counters;
-+
-+	ASSERT_RTNL();
-+
-+	counters = tp->tally_vaddr;
-+	if (!counters)
-+		return;
-+
-+	rtase_dump_tally_counter(tp);
-+
-+	data[0] = le64_to_cpu(counters->tx_packets);
-+	data[1] = le64_to_cpu(counters->rx_packets);
-+	data[2] = le64_to_cpu(counters->tx_errors);
-+	data[3] = le32_to_cpu(counters->rx_errors);
-+	data[4] = le16_to_cpu(counters->rx_missed);
-+	data[5] = le16_to_cpu(counters->align_errors);
-+	data[6] = le32_to_cpu(counters->tx_one_collision);
-+	data[7] = le32_to_cpu(counters->tx_multi_collision);
-+	data[8] = le64_to_cpu(counters->rx_unicast);
-+	data[9] = le64_to_cpu(counters->rx_broadcast);
-+	data[10] = le32_to_cpu(counters->rx_multicast);
-+	data[11] = le16_to_cpu(counters->tx_aborted);
-+	data[12] = le16_to_cpu(counters->tx_underun);
-+}
-+
-+static const struct ethtool_ops rtase_ethtool_ops = {
-+	.get_drvinfo = rtase_get_drvinfo,
-+	.get_link = ethtool_op_get_link,
-+	.get_link_ksettings = rtase_get_settings,
-+	.get_pauseparam = rtase_get_pauseparam,
-+	.set_pauseparam = rtase_set_pauseparam,
-+	.get_strings = rtase_get_strings,
-+	.get_sset_count = rtase_get_sset_count,
-+	.get_ethtool_stats = rtase_get_ethtool_stats,
-+	.get_ts_info = ethtool_op_get_ts_info,
-+};
-+
- static void rtase_init_netdev_ops(struct net_device *dev)
- {
- 	dev->netdev_ops = &rtase_netdev_ops;
-+	dev->ethtool_ops = &rtase_ethtool_ops;
- }
- 
- static void rtase_reset_interrupt(struct pci_dev *pdev,
++rtase-objs := rtase_main.o
 -- 
 2.34.1
 
