@@ -1,34 +1,88 @@
-Return-Path: <netdev+bounces-55174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7120809B22
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 05:47:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39451809B41
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 06:03:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 330121F210FF
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 04:47:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60CA91C20C74
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 05:03:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF1BC15BE;
-	Fri,  8 Dec 2023 04:47:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2513E5242;
+	Fri,  8 Dec 2023 05:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="EofmHpNL";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="0JoNE5lc"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C5D910C8
-	for <netdev@vger.kernel.org>; Thu,  7 Dec 2023 20:47:50 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rBSlz-008JH4-T5; Fri, 08 Dec 2023 12:47:37 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 08 Dec 2023 12:47:45 +0800
-Date: Fri, 8 Dec 2023 12:47:45 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, saeedm@nvidia.com, netdev@vger.kernel.org,
-	tariqt@nvidia.com, jianbol@nvidia.com, leonro@nvidia.com
-Subject: Re: [net V2 08/14] net/mlx5e: Check the number of elements before
- walk TC rhashtable
-Message-ID: <ZXKf8f/hjw1K6Qyp@gondor.apana.org.au>
+X-Greylist: delayed 387 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 07 Dec 2023 21:02:54 PST
+Received: from wnew1-smtp.messagingengine.com (wnew1-smtp.messagingengine.com [64.147.123.26])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF6AB10F7;
+	Thu,  7 Dec 2023 21:02:54 -0800 (PST)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailnew.west.internal (Postfix) with ESMTP id 492732B00124;
+	Thu,  7 Dec 2023 23:56:22 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute6.internal (MEProxy); Thu, 07 Dec 2023 23:56:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm1; t=1702011381; x=1702018581; bh=PI
+	Y64CBSNt0PPb9bxeilH/4eQNVTuavlLXd+xLtdLt4=; b=EofmHpNL/cIg5AKToO
+	umxa3/vm8NffW15CQ/NYWKLTmOntZUlTXzL07BQN9Zzd1qkj/zIQY2BNpeU3NNnE
+	DsyuHH3WZaGBzjQorUzlwiFe/4NPCQlENpKqreDBuJVMeLp6sZaNlIXcysHdaNRc
+	VEBzwBp21QplxcXEbl27bmgnF5pmLSDH0ONvG3vpQ7j3dFUXRgm6b+dWV4nd4HGl
+	SWheN6zX7f77TSnmKwBt69fMkeY7vcpYMbjU7GbnOXep63hQWV1N/LSBPbrYOTRp
+	fXLqehXrXtZqsPTcqJbc3tosb+da+i8EQrUzDBVMvjAsRUUs+nAZG0k6OSVXdw8F
+	kR8Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1702011381; x=1702018581; bh=PIY64CBSNt0PP
+	b9bxeilH/4eQNVTuavlLXd+xLtdLt4=; b=0JoNE5lcC5CNnZsf0Wrxk0j03GnnD
+	jKhNB/IWHt20uvZzwI8UD4N+ZmDmCB7ssaaymo/kcvUG9aTopzcCzQC/kIar85eH
+	FF73aIfF48k+sJCT6KDh2qwa4MpjeIS8zono/MVUEsiM/KpsAwbbQDRFyrE7JP6t
+	iZ+SdSRt+D8vWJNgNstFf7rxNYiEfRWIO/LXVRKWJEc5rSrblhxPCO3hwsPyJ2MA
+	BWB1vtmLc1nS7dNF4hkptHIe+jCQfQKYq6S23Rj84g4b85QqQsisSTFc2aXhhm3q
+	lfGZwhLYxEqTogHcPiuVYoVmuQyjsJtiomiXqlN1FbTEortKcfJ3ehxew==
+X-ME-Sender: <xms:9aFyZYCQddBddhZLtTdmaCagb1YejJJydeA7lnR9rCFc2q2T68f5Rg>
+    <xme:9aFyZaii19_64B-wL9K1uZUjRIE0pAy_5jb714kJnHdyH6bLJuIQ2-8r6Gk8MGV6-
+    SmpbysNcrM9zQ>
+X-ME-Received: <xmr:9aFyZbmJM6VIeIhwKoz-C4nYvlKCuRI71S6CIsmYX141cRu6ODga5VANakJmYUtEfjoWCeTgzgfOBv2l4u53-EaJGhnT6Spfxg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudekhedgvdduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghg
+    ucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepheegvd
+    evvdeljeeugfdtudduhfekledtiefhveejkeejuefhtdeufefhgfehkeetnecuvehluhhs
+    thgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepghhrvghgsehkrhhorg
+    hhrdgtohhm
+X-ME-Proxy: <xmx:9aFyZexFHU7norGA_X7Vuge-0fgLPT5e-anhtsm-yBQXlpEC96Xu2w>
+    <xmx:9aFyZdSRHOl3NF57458as0Ve8eZCYGAaF_n1-6gqdF1RZ0r7dlPAHg>
+    <xmx:9aFyZZYrhbQQaBlzWULnF1wKDDRQooLtJAJuUYqDs3mhE7PSQ08drQ>
+    <xmx:9aFyZeSODrZnAjSz5JEizXuxoWQeQSuK2TXNjmKIflKUcWV2ydV1ReukdwI>
+Feedback-ID: i787e41f1:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 7 Dec 2023 23:56:21 -0500 (EST)
+Date: Fri, 8 Dec 2023 05:56:19 +0100
+From: Greg KH <greg@kroah.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Alan Stern <stern@rowland.harvard.edu>,
+	Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
+	davem@davemloft.net, edumazet@google.com,
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org, oneukum@suse.com, pabeni@redhat.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v6] net: usb: ax88179_178a: avoid failed operations when
+ device is disconnected
+Message-ID: <2023120813-yummy-scrubbed-517e@gregkh>
+References: <0bd3204e-19f4-48de-b42e-a75640a1b1da@rowland.harvard.edu>
+ <20231207175007.263907-1-jtornosm@redhat.com>
+ <d8c331dd-deb1-4f12-8e66-295bfac8b1d7@rowland.harvard.edu>
+ <20231207123256.337753f9@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -37,28 +91,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231205061327.44638-9-saeed@kernel.org>
-X-Newsgroups: apana.lists.os.linux.netdev
+In-Reply-To: <20231207123256.337753f9@kernel.org>
 
-Saeed Mahameed <saeed@kernel.org> wrote:
-> From: Jianbo Liu <jianbol@nvidia.com>
+On Thu, Dec 07, 2023 at 12:32:56PM -0800, Jakub Kicinski wrote:
+> On Thu, 7 Dec 2023 15:23:23 -0500 Alan Stern wrote:
+> > Acked-by: Alan Stern <stern@rowland.harvard.edu>
 > 
-> After IPSec TX tables are destroyed, the flow rules in TC rhashtable,
-> which have the destination to IPSec, are restored to the original
-> one, the uplink.
-> 
-> However, when the device is in switchdev mode and unload driver with
-> IPSec rules configured, TC rhashtable cleanup is done before IPSec
-> cleanup, which means tc_ht->tbl is already freed when walking TC
-> rhashtable, in order to restore the destination. So add the checking
-> before walking to avoid unexpected behavior.
+> FWIW I'm expecting Greg to pick this up for usb.
 
-I'm confused.  If the rhashtable has already been freed, then
-surely you can't even read nelems?
+Sure, will do!
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
 
