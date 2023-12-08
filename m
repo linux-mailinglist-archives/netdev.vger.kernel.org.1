@@ -1,147 +1,118 @@
-Return-Path: <netdev+bounces-55452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52A8580AE93
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 22:07:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF26580AE95
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 22:07:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83DE71C20318
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 21:07:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4EB27B209DD
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 21:07:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2EE15732B;
-	Fri,  8 Dec 2023 21:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97C857304;
+	Fri,  8 Dec 2023 21:07:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r7BdHG8V"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="c3aNGGHQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EF9A1994
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 13:07:15 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-dbc65c58e78so237867276.0
-        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 13:07:15 -0800 (PST)
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93512171E
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 13:07:49 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-2866af9d73bso2147796a91.3
+        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 13:07:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702069634; x=1702674434; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=atKYixDgc1IYLIAixNFTtgRe8JLDt6J5MMwxSW6b7Pg=;
-        b=r7BdHG8VStUbm+h4QyUFMMRIhoNDnQY0D3t/d7dmkMDYDKOyP4v1tYRszFTXTUO31n
-         MxsZetvujkvUK41OaJBcqx0zUSrEdjFPyGJPUMcPxJK1oteunVwzTg48fuUuRaJAyy6d
-         7NWpv1EzHYhMIgyS6r57tlO22qtO711ZfbkMCADPpV+OPF4klJnRZ+1UBbuOSSarB3G8
-         NBAYeJHhb0DQHxsgNwPLd9ozu0J8gQMWNTD7YSwswLPzdhF+p2qVNWx/fzAendxYXIWJ
-         pM63C4V06AW4dRnquvD5EepNv8eamaMt1UunBvdTvkKPajW05e5VgtXtEOyc1wcAMmMp
-         Bh5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702069634; x=1702674434;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1702069669; x=1702674469; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=atKYixDgc1IYLIAixNFTtgRe8JLDt6J5MMwxSW6b7Pg=;
-        b=EigX35FwYbF8qNcLqCXKKNFQsMiySef5ztc/IsRjSK29bzXhC5tW1RtyyrX2xgxzZx
-         97Bsf3o08z7Yc18NCTt8kaqunOefR+5bAkAMUvSBz1Htq3lNiJBnSx47BNiq/VphfxEf
-         IcGgwj7WdYWj38hCmNjvOLqQSBdCx3Ek5dblWpx9kF+6tHjQC39DiIYjUGDh4Zjtgo2/
-         6yN2a15YrL2uMyFDl8H9doehlcFuJ0p7H6Pb5VtSBMuHeS/Qr8p055TCxBzpC/7rpYDQ
-         BPAnqqtC1QS7ScGXN3aF3ExtMiRNmwM5aWPopXoNjTjbUjrJ9oEzXF6CBcKnjh7yPUzb
-         ZWmQ==
-X-Gm-Message-State: AOJu0YyFD5EzXUZ4zMIAAZwt8SOEE/CUNlnGl7O4aLx4abVnH2BmSV54
-	qRbC0k7nJSi4jQUx7BxPNTUnz/K4GHXM
-X-Google-Smtp-Source: AGHT+IHzeDvqNFdRZWKrYRWtX4T16qXBWuRFYuGxk14i3a32wrWAEXwhbb0Cto5r9VdTV4zgSQTlXO1gQzao
-X-Received: from jiangzp-glinux-dev.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:38e4])
- (user=jiangzp job=sendgmr) by 2002:a25:ce4e:0:b0:d9a:61d2:38ca with SMTP id
- x75-20020a25ce4e000000b00d9a61d238camr7101ybe.10.1702069634325; Fri, 08 Dec
- 2023 13:07:14 -0800 (PST)
-Date: Fri,  8 Dec 2023 13:07:06 -0800
+        bh=tkww7Rb4By/r0gHmDvfwdRw28Shse632C6kaDJ7nwkc=;
+        b=c3aNGGHQ1WpS6IGRH/2xeGQm0apdEfSe4mcg4J77buR8TrIAo8Igu+xEEyefIj5dNN
+         HNPbudgyNwHirog/Z1FF36hfqIYbtUnw17GD65nUaKE9HCrmueINoAgkjd+fC2qGH7Ki
+         8BlzWPXlIM9K1GFNDYBUvGwTApi/QjhE5xlIH9ZPvGoQZyjBqO3VlDG7rfpspPxjNIZ8
+         yJcxlAkEP6U+weNxnO/QnfEfKG6yfQ0k3OSaOwTDpkvoAOBFRa+/fMndb3WXr5+q5G6D
+         O8yHziU9WVlq6mCwhZ/ICBmVdUseWiM+0gLzEmqDuSM6HFEGaXGeSlji2ExQl8BwnzD3
+         N7tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702069669; x=1702674469;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tkww7Rb4By/r0gHmDvfwdRw28Shse632C6kaDJ7nwkc=;
+        b=J+ibllC/op6507j/1cWNWnm73PAqSfcB9rrugzi36NPs4uD+IItRvF4IGv/xVffhYl
+         uk8CvBvAtJ3+/Oec6nZD19i1sH0GjLtWNO5789JbORsJQUQQ4BH3PMHxoEfXbyh9yhES
+         dsACllBNMQXTAAjUBk9ajSG2bZnxm0Ywp3q1EC9PJ+KS8rwwpCz/pOQyskieN9KwIIlt
+         IfcMF0yaNegwefK90SFXPjZpZas7FA5zbpuDDHIuVDqI2m2xzPweJ26xSpbvzUuKQj1c
+         hD2I/rHzW7Wfmsyv1teST8Wn32A4lCM/+t+mj52Bi1/VyKgITBc0HluEq++94PJ76KEJ
+         UNZg==
+X-Gm-Message-State: AOJu0Yypj+eNtublgBfud93XbS70GFGkn9Ek4Vaii3NWJ8mlDwsOL+1C
+	bcUb+gL64tFeMadgH5hhPg/ktA==
+X-Google-Smtp-Source: AGHT+IENOucjxXbUsinVAE0/qAj5nUmvcYq2J7wYk7AkZM9ubL8h/3QLHpgdHwOog2J918vS8VNhsw==
+X-Received: by 2002:a17:90a:b395:b0:286:6cc1:8677 with SMTP id e21-20020a17090ab39500b002866cc18677mr640901pjr.92.1702069669022;
+        Fri, 08 Dec 2023 13:07:49 -0800 (PST)
+Received: from [192.168.50.25] ([201.17.86.134])
+        by smtp.gmail.com with ESMTPSA id sh18-20020a17090b525200b00286e0c91d73sm2289167pjb.55.2023.12.08.13.07.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Dec 2023 13:07:48 -0800 (PST)
+Message-ID: <540b2a79-d10e-49a5-8567-2b1b5616ecb8@mojatatu.com>
+Date: Fri, 8 Dec 2023 18:07:43 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20231208130705.kernel.v1.1.Ic5024b3da99b11e39c247a5b8ba44876c18880a0@changeid>
-Subject: [kernel PATCH v1] Bluetooth: btmtksdio: clear BTMTKSDIO_BT_WAKE_ENABLED
- after resume
-From: Zhengping Jiang <jiangzp@google.com>
-To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com
-Cc: chromeos-bluetooth-upstreaming@chromium.org, 
-	Zhengping Jiang <jiangzp@google.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] net/sched: act_api: rely on rcu in
+ tcf_idr_check_alloc
+Content-Language: en-US
+To: Vlad Buslov <vladbu@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, jhs@mojatatu.com,
+ xiyou.wangcong@gmail.com, jiri@resnulli.us, marcelo.leitner@gmail.com
+References: <20231205153012.484687-1-pctammela@mojatatu.com>
+ <20231205153012.484687-2-pctammela@mojatatu.com> <87jzpso53a.fsf@nvidia.com>
+ <77b8d1d8-4ad9-49c7-9c42-612e9de29881@mojatatu.com>
+ <87fs0fodmu.fsf@nvidia.com>
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <87fs0fodmu.fsf@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Always clear BTMTKSDIO_BT_WAKE_ENABLED bit after resume. When Bluetooth
-does not generate interrupts, the bit will not be cleared and causes
-premature wakeup.
+On 06/12/2023 06:52, Vlad Buslov wrote:
+>> Ok, so if I'm binding and it's observed a free index, which means "try to
+>> allocate" and I get a ENOSPC after jumping to new, try again but this time
+>> binding into the allocated action.
+>>
+>> In this scenario when we come back to 'again' we will wait until -EBUSY is
+>> replaced with the real pointer. Seems like a big enough window that any race for
+>> allocating from binding would most probably end up in this contention loop.
+>>
+>> However I think when we have these two retry mechanisms there's a extremely
+>> small window for an infinite loop if an action delete is timed just right, in
+>> between the action pointer is found and when we grab the tcfa_refcnt.
+>>
+>> 	idr_find (pointer)
+>> 	tcfa_refcnt (0)  <-------|
+>> 	again:                   |
+>> 	idr_find (free index!)   |
+>> 	new:                     |
+>> 	idr_alloc_u32 (ENOSPC)   |
+>> 	again:                   |
+>> 	idr_find (EBUSY)         |
+>> 	again:                   |
+>> 	idr_find (pointer)       |
+>> 	<evil delete happens>    |
+>> 	------->>>>--------------|
+> 
+> I'm not sure I'm following. Why would this sequence cause infinite loop?
+> 
 
-Fixes: 4ed924fc122f ("Bluetooth: btmtksdio: enable bluetooth wakeup in system suspend")
-Signed-off-by: Zhengping Jiang <jiangzp@google.com>
----
+Perhaps I was being overly paranoid. Taking a look again it seems that 
+not only an evil delete but also EBUSY must be in the action idr for a 
+long time. I see it now, it looks like it converges.
 
-Changes in v1:
-- Clear BTMTKSDIO_BT_WAKE_ENABLED flag on resume
-
- drivers/bluetooth/btmtksdio.c    | 10 ++++++++++
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_sync.c         |  2 ++
- 3 files changed, 13 insertions(+)
-
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index ff4868c83cd8..8f00b71573c8 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -1296,6 +1296,15 @@ static bool btmtksdio_sdio_inband_wakeup(struct hci_dev *hdev)
- 	return device_may_wakeup(bdev->dev);
- }
- 
-+static void btmtksdio_disable_bt_wakeup(struct hci_dev *hdev)
-+{
-+	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
-+
-+	if (!bdev)
-+		return;
-+	clear_bit(BTMTKSDIO_BT_WAKE_ENABLED, &bdev->tx_state);
-+}
-+
- static bool btmtksdio_sdio_wakeup(struct hci_dev *hdev)
- {
- 	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
-@@ -1363,6 +1372,7 @@ static int btmtksdio_probe(struct sdio_func *func,
- 	hdev->shutdown = btmtksdio_shutdown;
- 	hdev->send     = btmtksdio_send_frame;
- 	hdev->wakeup   = btmtksdio_sdio_wakeup;
-+	hdev->clear_wakeup = btmtksdio_disable_bt_wakeup;
- 	/*
- 	 * If SDIO controller supports wake on Bluetooth, sending a wakeon
- 	 * command is not necessary.
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 0c1754f416bd..4bbd55335269 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -672,6 +672,7 @@ struct hci_dev {
- 	int (*get_codec_config_data)(struct hci_dev *hdev, __u8 type,
- 				     struct bt_codec *codec, __u8 *vnd_len,
- 				     __u8 **vnd_data);
-+	void (*clear_wakeup)(struct hci_dev *hdev);
- };
- 
- #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 3563a90ed2ac..6c4d5ce40524 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -5947,6 +5947,8 @@ int hci_resume_sync(struct hci_dev *hdev)
- 		return 0;
- 
- 	hdev->suspended = false;
-+	if (hdev->clear_wakeup)
-+		hdev->clear_wakeup(hdev);
- 
- 	/* Restore event mask */
- 	hci_set_event_mask_sync(hdev);
--- 
-2.43.0.472.g3155946c3a-goog
-
+I was wondering if instead of looping in 'again:' in either scenarios 
+you presented, what if we return -EAGAIN and let the filter 
+infrastructure retry it under rtnl_lock()? At least will give enough 
+breathing room for a call to schedule() to kick in if needed.
 
