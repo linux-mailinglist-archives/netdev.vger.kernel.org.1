@@ -1,238 +1,172 @@
-Return-Path: <netdev+bounces-55296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B19EA80A24A
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 12:34:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3179480A26E
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 12:42:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEAB81C209E4
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 11:34:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 637191C20AEE
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 11:42:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8F981B289;
-	Fri,  8 Dec 2023 11:34:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1FC51B28C;
+	Fri,  8 Dec 2023 11:42:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Pew3Hjfb"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eaOkcqkQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5096811D;
-	Fri,  8 Dec 2023 03:34:30 -0800 (PST)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B8AiJQr000790;
-	Fri, 8 Dec 2023 03:34:22 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=J+wu6sWtXxwW8UvaSbwtuliOpTnsUCd5lCG2Il6qgpE=;
- b=Pew3HjfbzpGmkxY4C9iMwGqwFnJydbfFEm13ESccBKpGOC1zLlaxSFpuGSDZ6FguL/3C
- LavNc9PYwbGRb03m8hNpihGjubeFCH2LRfip50wLqFzybj1sJyOqv1+UvLwC9ZCnVt5o
- W5InbqDEytbW6xCr9orVyKdRILhZXXPqcY153QgIbcVLmauYaTzRraY4dZlyZRB705aj
- eYcjWNx203t0dLQNwk8yezYKBh285wmy6AewkPBYl4NOZa1ArCocX4sVlYpKpgSVUlr9
- TmBAPRwKV3i9Gpy2TXLGaV3G/PAACrO1+1tUAYHZ/gqKe/ecilaayYQyzOpuLue3J0s/ 6g== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3uv1ncg3q8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Fri, 08 Dec 2023 03:34:21 -0800
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 8 Dec
- 2023 03:34:20 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Fri, 8 Dec 2023 03:34:20 -0800
-Received: from localhost.localdomain (unknown [10.28.36.166])
-	by maili.marvell.com (Postfix) with ESMTP id 29A623F70B8;
-	Fri,  8 Dec 2023 03:34:15 -0800 (PST)
-From: Suman Ghosh <sumang@marvell.com>
-To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <lcherian@marvell.com>,
-        <jerinj@marvell.com>
-CC: Suman Ghosh <sumang@marvell.com>
-Subject: [net PATCH] octeontx2-af: Fix multicast/mirror group lock/unlock issue
-Date: Fri, 8 Dec 2023 17:04:13 +0530
-Message-ID: <20231208113413.4022029-1-sumang@marvell.com>
-X-Mailer: git-send-email 2.25.1
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A80FC1724;
+	Fri,  8 Dec 2023 03:42:02 -0800 (PST)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B8BRl6Q002639;
+	Fri, 8 Dec 2023 11:41:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=aJQu+Av/3MN6IBG2EPgO6rv8bX3z7cMZ1gb+fobzFr4=;
+ b=eaOkcqkQsCSGZjJcxwYC/y0cKI2coV5IKEch9I9FK1OpDb/C3uiPtMi3jbdMlf7MFIU4
+ 4MnvCFjiSCSAZ1BzWoQ6BOKLcFMRrHxFQHanG0Q0Fr1fqV5Qd8CguMZW0hxou+0nin1Z
+ Ye7IpHTMk85Vx/axBanVSqHMwBtLYyXF9A2clj40T9Hry7cagAqK2X1TMjQNRdCWC/5g
+ kGYgUYLA0PW15X0AVzTmqOL5lPDNdKRc1T85ujAJg5QSzXfgZsMPgyHH3MDUsr4Es95k
+ nUS+FBMmqgWMpE7njQkMLO4dlOihkC+sgP+7GsCCUg/6sVhCoZh31f8fJvceyE5hnjjs bQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uv29ggb8q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Dec 2023 11:41:43 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B8Bfh0j012863;
+	Fri, 8 Dec 2023 11:41:43 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uv29ggb8g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Dec 2023 11:41:43 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B8A8DZT001591;
+	Fri, 8 Dec 2023 11:41:42 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3utav2s9vk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Dec 2023 11:41:42 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B8Bfef717105560
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 8 Dec 2023 11:41:40 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 731DE20043;
+	Fri,  8 Dec 2023 11:41:40 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4882420040;
+	Fri,  8 Dec 2023 11:41:40 +0000 (GMT)
+Received: from DESKTOP-2CCOB1S. (unknown [9.171.204.69])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri,  8 Dec 2023 11:41:40 +0000 (GMT)
+Date: Fri, 8 Dec 2023 12:41:38 +0100
+From: Tobias Huschle <huschle@linux.ibm.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Abel Wu <wuyun.abel@bytedance.com>, Peter Zijlstra <peterz@infradead.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev, netdev@vger.kernel.org,
+        jasowang@redhat.com
+Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
+ sched/fair: Add lag based placement)
+Message-ID: <ZXMA8r+T86Is8Ohv@DESKTOP-2CCOB1S.>
+References: <20231117123759.GP8262@noisy.programming.kicks-ass.net>
+ <46a997c2-5a38-4b60-b589-6073b1fac677@bytedance.com>
+ <ZVyt4UU9+XxunIP7@DESKTOP-2CCOB1S.>
+ <20231122100016.GO8262@noisy.programming.kicks-ass.net>
+ <6564a012.c80a0220.adb78.f0e4SMTPIN_ADDED_BROKEN@mx.google.com>
+ <d4110c79-d64f-49bd-9f69-0a94369b5e86@bytedance.com>
+ <07513.123120701265800278@us-mta-474.us.mimecast.lan>
+ <20231207014626-mutt-send-email-mst@kernel.org>
+ <56082.123120804242300177@us-mta-137.us.mimecast.lan>
+ <20231208052150-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: Z6jsMhhMtuF0_aAkEnpD0pt43MNTcdis
-X-Proofpoint-GUID: Z6jsMhhMtuF0_aAkEnpD0pt43MNTcdis
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231208052150-mutt-send-email-mst@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: a1l3gNc8w_7KWEDTL1N2M4KPK0UhgnsI
+X-Proofpoint-ORIG-GUID: 8f6spidwjlhsK31bm9iRrZvQqTJ9wUjF
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-12-08_06,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
+ mlxlogscore=548 priorityscore=1501 suspectscore=0 lowpriorityscore=0
+ spamscore=0 phishscore=0 clxscore=1015 mlxscore=0 bulkscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2312080098
 
-As per the existing implementation, there exists a race between finding
-a multicast/mirror group entry and deleting that entry. The group lock
-was taken and released independently by rvu_nix_mcast_find_grp_elem()
-function. Which is incorrect and group lock should be taken during the
-entire operation of group updation/deletion. This patch fixes the same.
+On Fri, Dec 08, 2023 at 05:31:18AM -0500, Michael S. Tsirkin wrote:
+> On Fri, Dec 08, 2023 at 10:24:16AM +0100, Tobias Huschle wrote:
+> > On Thu, Dec 07, 2023 at 01:48:40AM -0500, Michael S. Tsirkin wrote:
+> > > On Thu, Dec 07, 2023 at 07:22:12AM +0100, Tobias Huschle wrote:
+> > > > 3. vhost looping endlessly, waiting for kworker to be scheduled
+> > > > 
+> > > > I dug a little deeper on what the vhost is doing. I'm not an expert on
+> > > > virtio whatsoever, so these are just educated guesses that maybe
+> > > > someone can verify/correct. Please bear with me probably messing up 
+> > > > the terminology.
+> > > > 
+> > > > - vhost is looping through available queues.
+> > > > - vhost wants to wake up a kworker to process a found queue.
+> > > > - kworker does something with that queue and terminates quickly.
+> > > > 
+> > > > What I found by throwing in some very noisy trace statements was that,
+> > > > if the kworker is not woken up, the vhost just keeps looping accross
+> > > > all available queues (and seems to repeat itself). So it essentially
+> > > > relies on the scheduler to schedule the kworker fast enough. Otherwise
+> > > > it will just keep on looping until it is migrated off the CPU.
+> > > 
+> > > 
+> > > Normally it takes the buffers off the queue and is done with it.
+> > > I am guessing that at the same time guest is running on some other
+> > > CPU and keeps adding available buffers?
+> > > 
+> > 
+> > It seems to do just that, there are multiple other vhost instances
+> > involved which might keep filling up thoses queues. 
+> > 
+> 
+> No vhost is ever only draining queues. Guest is filling them.
+> 
+> > Unfortunately, this makes the problematic vhost instance to stay on
+> > the CPU and prevents said kworker to get scheduled. The kworker is
+> > explicitly woken up by vhost, so it wants it to do something.
+> > 
+> > At this point it seems that there is an assumption about the scheduler
+> > in place which is no longer fulfilled by EEVDF. From the discussion so
+> > far, it seems like EEVDF does what is intended to do.
+> > 
+> > Shouldn't there be a more explicit mechanism in use that allows the
+> > kworker to be scheduled in favor of the vhost?
+> > 
+> > It is also concerning that the vhost seems cannot be preempted by the
+> > scheduler while executing that loop.
+> 
+> 
+> Which loop is that, exactly?
 
-Fixes: 51b2804c19cd ("octeontx2-af: Add new mbox to support multicast/mirror offload")
-Signed-off-by: Suman Ghosh <sumang@marvell.com>
----
+The loop continously passes translate_desc in drivers/vhost/vhost.c
+That's where I put the trace statements.
 
-Note: This is a follow up of
+The overall sequence seems to be (top to bottom):
 
-https://urldefense.proofpoint.com/v2/url?u=https-3A__git.kernel.org_netdev_net-2Dnext_c_51b2804c19cd&d=DwIDaQ&c=nKjWec2b6R0mOyPaz7xtfQ&r=7si3Xn9Ly-Se1a655kvEPIYU0nQ9HPeN280sEUv5ROU&m=NjKPoTkYVlL5Dh4aSr3-dVo-AukiIperlvB0S4_Mqzkyl_VcYAAKrWhkGZE5Cx-p&s=AkBf0454Xm-0adqV0Os7ZE8peaCXtYyuNbCS5kit6Jk&e=
+handle_rx
+get_rx_bufs
+vhost_get_vq_desc
+vhost_get_avail_head
+vhost_get_avail
+__vhost_get_user_slow
+translate_desc               << trace statement in here
+vhost_iotlb_itree_first
 
-and should apply to net-queue tree.
+These functions show up as having increased overhead in perf.
 
- .../ethernet/marvell/octeontx2/af/rvu_nix.c   | 58 +++++++++++++------
- 1 file changed, 40 insertions(+), 18 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-index b01503acd520..0ab5626380c5 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-@@ -6142,14 +6142,12 @@ static struct nix_mcast_grp_elem *rvu_nix_mcast_find_grp_elem(struct nix_mcast_g
- 	struct nix_mcast_grp_elem *iter;
- 	bool is_found = false;
- 
--	mutex_lock(&mcast_grp->mcast_grp_lock);
- 	list_for_each_entry(iter, &mcast_grp->mcast_grp_head, list) {
- 		if (iter->mcast_grp_idx == mcast_grp_idx) {
- 			is_found = true;
- 			break;
- 		}
- 	}
--	mutex_unlock(&mcast_grp->mcast_grp_lock);
- 
- 	if (is_found)
- 		return iter;
-@@ -6162,7 +6160,7 @@ int rvu_nix_mcast_get_mce_index(struct rvu *rvu, u16 pcifunc, u32 mcast_grp_idx)
- 	struct nix_mcast_grp_elem *elem;
- 	struct nix_mcast_grp *mcast_grp;
- 	struct nix_hw *nix_hw;
--	int blkaddr;
-+	int blkaddr, ret;
- 
- 	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NIX, pcifunc);
- 	nix_hw = get_nix_hw(rvu->hw, blkaddr);
-@@ -6170,11 +6168,15 @@ int rvu_nix_mcast_get_mce_index(struct rvu *rvu, u16 pcifunc, u32 mcast_grp_idx)
- 		return NIX_AF_ERR_INVALID_NIXBLK;
- 
- 	mcast_grp = &nix_hw->mcast_grp;
-+	mutex_lock(&mcast_grp->mcast_grp_lock);
- 	elem = rvu_nix_mcast_find_grp_elem(mcast_grp, mcast_grp_idx);
- 	if (!elem)
--		return NIX_AF_ERR_INVALID_MCAST_GRP;
-+		ret = NIX_AF_ERR_INVALID_MCAST_GRP;
-+	else
-+		ret = elem->mce_start_index;
- 
--	return elem->mce_start_index;
-+	mutex_unlock(&mcast_grp->mcast_grp_lock);
-+	return ret;
- }
- 
- void rvu_nix_mcast_flr_free_entries(struct rvu *rvu, u16 pcifunc)
-@@ -6238,7 +6240,7 @@ int rvu_nix_mcast_update_mcam_entry(struct rvu *rvu, u16 pcifunc,
- 	struct nix_mcast_grp_elem *elem;
- 	struct nix_mcast_grp *mcast_grp;
- 	struct nix_hw *nix_hw;
--	int blkaddr;
-+	int blkaddr, ret = 0;
- 
- 	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NIX, pcifunc);
- 	nix_hw = get_nix_hw(rvu->hw, blkaddr);
-@@ -6246,13 +6248,15 @@ int rvu_nix_mcast_update_mcam_entry(struct rvu *rvu, u16 pcifunc,
- 		return NIX_AF_ERR_INVALID_NIXBLK;
- 
- 	mcast_grp = &nix_hw->mcast_grp;
-+	mutex_lock(&mcast_grp->mcast_grp_lock);
- 	elem = rvu_nix_mcast_find_grp_elem(mcast_grp, mcast_grp_idx);
- 	if (!elem)
--		return NIX_AF_ERR_INVALID_MCAST_GRP;
--
--	elem->mcam_index = mcam_index;
-+		ret = NIX_AF_ERR_INVALID_MCAST_GRP;
-+	else
-+		elem->mcam_index = mcam_index;
- 
--	return 0;
-+	mutex_unlock(&mcast_grp->mcast_grp_lock);
-+	return ret;
- }
- 
- int rvu_mbox_handler_nix_mcast_grp_create(struct rvu *rvu,
-@@ -6306,6 +6310,13 @@ int rvu_mbox_handler_nix_mcast_grp_destroy(struct rvu *rvu,
- 		return err;
- 
- 	mcast_grp = &nix_hw->mcast_grp;
-+
-+	/* If AF is requesting for the deletion,
-+	 * then AF is already taking the lock
-+	 */
-+	if (!req->is_af)
-+		mutex_lock(&mcast_grp->mcast_grp_lock);
-+
- 	elem = rvu_nix_mcast_find_grp_elem(mcast_grp, req->mcast_grp_idx);
- 	if (!elem)
- 		return NIX_AF_ERR_INVALID_MCAST_GRP;
-@@ -6333,12 +6344,6 @@ int rvu_mbox_handler_nix_mcast_grp_destroy(struct rvu *rvu,
- 	mutex_unlock(&mcast->mce_lock);
- 
- delete_grp:
--	/* If AF is requesting for the deletion,
--	 * then AF is already taking the lock
--	 */
--	if (!req->is_af)
--		mutex_lock(&mcast_grp->mcast_grp_lock);
--
- 	list_del(&elem->list);
- 	kfree(elem);
- 	mcast_grp->count--;
-@@ -6370,9 +6375,20 @@ int rvu_mbox_handler_nix_mcast_grp_update(struct rvu *rvu,
- 		return err;
- 
- 	mcast_grp = &nix_hw->mcast_grp;
-+
-+	/* If AF is requesting for the updation,
-+	 * then AF is already taking the lock
-+	 */
-+	if (!req->is_af)
-+		mutex_lock(&mcast_grp->mcast_grp_lock);
-+
- 	elem = rvu_nix_mcast_find_grp_elem(mcast_grp, req->mcast_grp_idx);
--	if (!elem)
-+	if (!elem) {
-+		if (!req->is_af)
-+			mutex_unlock(&mcast_grp->mcast_grp_lock);
-+
- 		return NIX_AF_ERR_INVALID_MCAST_GRP;
-+	}
- 
- 	/* If any pcifunc matches the group's pcifunc, then we can
- 	 * delete the entire group.
-@@ -6383,8 +6399,11 @@ int rvu_mbox_handler_nix_mcast_grp_update(struct rvu *rvu,
- 				/* Delete group */
- 				dreq.hdr.pcifunc = elem->pcifunc;
- 				dreq.mcast_grp_idx = elem->mcast_grp_idx;
--				dreq.is_af = req->is_af;
-+				dreq.is_af = 1;
- 				rvu_mbox_handler_nix_mcast_grp_destroy(rvu, &dreq, NULL);
-+				if (!req->is_af)
-+					mutex_unlock(&mcast_grp->mcast_grp_lock);
-+
- 				return 0;
- 			}
- 		}
-@@ -6467,5 +6486,8 @@ int rvu_mbox_handler_nix_mcast_grp_update(struct rvu *rvu,
- 
- done:
- 	mutex_unlock(&mcast->mce_lock);
-+	if (!req->is_af)
-+		mutex_unlock(&mcast_grp->mcast_grp_lock);
-+
- 	return ret;
- }
--- 
-2.25.1
-
+There are multiple loops going on in there.
+Again the disclaimer though, I'm not familiar with that code at all.
 
