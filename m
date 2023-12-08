@@ -1,125 +1,213 @@
-Return-Path: <netdev+bounces-55406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81B9980ACD3
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 20:22:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FE7280ACD8
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 20:22:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CD882818AC
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 19:21:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F48C1F20FD0
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 19:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7A324B137;
-	Fri,  8 Dec 2023 19:21:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB814CB34;
+	Fri,  8 Dec 2023 19:22:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fwWuH2aV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HAN0UxV6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC6C5481D4
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 19:21:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E676C433C7;
-	Fri,  8 Dec 2023 19:21:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702063316;
-	bh=m2N0reCrYzufIq74ZjOW3IINxWdpl5ajaPh74HTVtfY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=fwWuH2aVOfIx3ohpnJC1NML+Fk85e/5BlTVQBfMXZMP0C8QynLb5MpS0+Goirjyab
-	 7SGNWrT1LVhLs1MSQvpieQyuAt3G9dIkT75nA42np9pmvg+6/Ouf3Xe3p7hDlf8mlJ
-	 YrxuLfNdqij2cPy+JkKZ3qlkcnuPsSfEdyX+/pD2aFpxjwZ8Df0KJTATwRISCZ1zAq
-	 ZvtNNUHxmzbMOIFh2AgKOa2HbgjlCLqaG4KcCF2M2JMGbdgFCaXVlcgF1TyDHi+GPw
-	 +eZUrKy4Ow7kuyhkGZtFEZ86CZT05ip88D7AavU3gWIdmg4hhFH7ccmhaFqmWwBhZ/
-	 g1STaHB8fg0hw==
-Message-ID: <02ef5de4-d57f-4037-8968-d9bf791bd903@kernel.org>
-Date: Fri, 8 Dec 2023 12:21:55 -0700
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AAA410D2
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 11:22:20 -0800 (PST)
+Received: by mail-io1-xd34.google.com with SMTP id ca18e2360f4ac-7b71b10391aso25108639f.3
+        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 11:22:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702063339; x=1702668139; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/fl4TQmZ7TqSY+7u7iVEdDd7jYxjMB5PcBQ7oQxgRCs=;
+        b=HAN0UxV6ys8YaXjDivsdosjXOrjl06PVzjpH2uGUPs5RsqNyz/ysrO9CWy6RVg13Em
+         o1xnheW9v3R5B/xzyDnFfqyzhCDAnGNxgu1ZOeb0noyhXzXqIXktsRhkFrU1p0C9y3TY
+         ftnDKEZ12T1NspijOgpRdWkEQ2XXdYXz1fkjSGVsGZH1jjoXbw1ujmvQLDR1YZ7UCuXE
+         BXCf/dqSGgAJejMChBRjSTrHHMQ2TWR0FdTNb8mYl//2KS2jNGUKNBUpdhB4fQn2Qh/7
+         a0qjpcdaKRqNd2cQCwG+PAzkMTDHnoq3069Y+gSpUw2simxV0E5rex2fPmnaCvWTyvtc
+         mhvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702063339; x=1702668139;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/fl4TQmZ7TqSY+7u7iVEdDd7jYxjMB5PcBQ7oQxgRCs=;
+        b=j9KlF3gxJ4WEP4DN44EwBK4aNkzCVdXQUVdug8tT0jjka24D6+3uaGvdzPWt6ROLWS
+         6WUVdKULqLOrroKgRnOVsX6rqqSV3b3Ac5R62VPE7mMsRIUyRmgj8J7WpbWEHwrhI1dn
+         OJq+sWK4bbDluL955gLW0zZUa5HDvcGafztU651B+70xiHDOYVnRPBsj+WQLQHXngPFW
+         DLzKs+4QAmUwRZ+V/kveYPbR22rSNj7Y2Gzm1yC4H0pSV6d1Xr3eRxjytknzNqYPg6Tk
+         0Y+yg41LrFBeddvVx0oDa9i96x2vqZiYjplCSbfVtUc7ktCClQKn6xPHtsFLWsTF7GZc
+         6jCg==
+X-Gm-Message-State: AOJu0YxLTSOq5zgVcZ1MOD8BHQhOhdrdsQrfvY+DRDaS2VNKJU7EizqC
+	6XdxodxCftBBy7vuUVbG0XW5QFxAVyHUx0DsLBhBZQ==
+X-Google-Smtp-Source: AGHT+IFGbgyAI36X5vjbEmXlQUSaq7EUn6+m4ee62vVA8uf/+NBisCPcTr1MgahWOFQEmHtZn4kVezMBf7GaXLpVVcg=
+X-Received: by 2002:a05:6e02:12e4:b0:35e:6ba1:7dfb with SMTP id
+ l4-20020a056e0212e400b0035e6ba17dfbmr710980iln.29.1702063339125; Fri, 08 Dec
+ 2023 11:22:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: selftest fib_nexthop_multiprefix failed due to route mismatch
-Content-Language: en-US
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org
-References: <ZVxQ42hk1dC4qffy@Laptop-X1>
- <01240884-fcc9-46d5-ae98-305151112ebc@kernel.org>
- <ZW_u7VWTpWAuub4L@Laptop-X1>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <ZW_u7VWTpWAuub4L@Laptop-X1>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20231208005250.2910004-1-almasrymina@google.com>
+ <20231208005250.2910004-7-almasrymina@google.com> <5752508c-f7bc-44ac-8778-c807b2ee5831@kernel.org>
+In-Reply-To: <5752508c-f7bc-44ac-8778-c807b2ee5831@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 8 Dec 2023 11:22:08 -0800
+Message-ID: <CAHS8izPsQ2XoJy-vYWkn051Yc=D_kSprtQcG4mmPutf1G3+-aw@mail.gmail.com>
+Subject: Re: [net-next v1 06/16] netdev: support binding dma-buf to netdevice
+To: David Ahern <dsahern@kernel.org>
+Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeelb@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/5/23 8:47 PM, Hangbin Liu wrote:
-> On Tue, Nov 21, 2023 at 09:40:02AM -0800, David Ahern wrote:
->> On 11/20/23 10:40 PM, Hangbin Liu wrote:
->>> Hi David,
->>>
->>> Recently when run fib_nexthop_multiprefix test I saw all IPv6 test failed.
->>> e.g.
->>>
->>> # ./fib_nexthop_multiprefix.sh
->>> TEST: IPv4: host 0 to host 1, mtu 1300                              [ OK ]
->>> TEST: IPv6: host 0 to host 1, mtu 1300                              [FAIL]
->>>
->>> With -v it shows
->>>
->>> COMMAND: ip netns exec h0 /usr/sbin/ping6 -s 1350 -c5 -w5 2001:db8:101::1
->>> PING 2001:db8:101::1(2001:db8:101::1) 1350 data bytes
->>> From 2001:db8:100::64 icmp_seq=1 Packet too big: mtu=1300
->>>
->>> --- 2001:db8:101::1 ping statistics ---
->>> 1 packets transmitted, 0 received, +1 errors, 100% packet loss, time 0ms
->>>
->>> Route get
->>> 2001:db8:101::1 via 2001:db8:100::64 dev eth0 src 2001:db8:100::1 metric 1024 expires 599sec mtu 1300 pref medium
->>> Searching for:
->>>     2001:db8:101::1 from :: via 2001:db8:100::64 dev eth0 src 2001:db8:100::1 .* mtu 1300
->>>
->>> TEST: IPv6: host 0 to host 1, mtu 1300                              [FAIL]
->>>
->>> So we can get the Packet too big from 2001:db8:100::64 successfully. There
->>> is no "from ::" anymore. I plan to fix this issue. But I can't find which
->>> commit changed the behavior and the client could receive Packet too big
->>> message with correct src address.
->>>
->>> Do you have any hints?
->>>
->>> Thanks
->>> Hangbin
->>
->> v6.3.12:
->>
->> $ sudo /mnt/hostshare/fib_nexthop_multiprefix.sh
->> TEST: IPv4: host 0 to host 1, mtu 1300                          [ OK ]
->> TEST: IPv6: host 0 to host 1, mtu 1300                          [ OK ]
->>
->> v6.4.13 all passed as well, so it is something recent. I do not have a
->> 6.5 or 6.6 kernels compiled at the moment.
-> 
-> Hi David,
-> 
-> I re-test this on 6.4.0 and it also failed. So this looks like an env issue
-> on your side?
-> 
-> # uname -r
-> 6.4.0
-> # ./fib_nexthop_multiprefix.sh
-> TEST: IPv4: host 0 to host 1, mtu 1300                              [ OK ]
-> TEST: IPv6: host 0 to host 1, mtu 1300                              [FAIL]
-> 
-> And from the test result, it looks we should receive the Packet too big message
-> from r1. So look the current checking is incorrect and the "from ::" checking
-> should be removed.
-> 
-> Please fix me if I missed anything?
-> 
+On Fri, Dec 8, 2023 at 9:48=E2=80=AFAM David Ahern <dsahern@kernel.org> wro=
+te:
+>
+> On 12/7/23 5:52 PM, Mina Almasry wrote:
+...
+> > +
+> > +     xa_for_each(&binding->bound_rxq_list, xa_idx, rxq) {
+> > +             if (rxq->binding =3D=3D binding) {
+> > +                     /* We hold the rtnl_lock while binding/unbinding
+> > +                      * dma-buf, so we can't race with another thread =
+that
+> > +                      * is also modifying this value. However, the dri=
+ver
+> > +                      * may read this config while it's creating its
+> > +                      * rx-queues. WRITE_ONCE() here to match the
+> > +                      * READ_ONCE() in the driver.
+> > +                      */
+> > +                     WRITE_ONCE(rxq->binding, NULL);
+> > +
+> > +                     rxq_idx =3D get_netdev_rx_queue_index(rxq);
+> > +
+> > +                     netdev_restart_rx_queue(binding->dev, rxq_idx);
+>
+> Blindly restarting a queue when a dmabuf is heavy handed. If the dmabuf
+> has no outstanding references (ie., no references in the RxQ), then no
+> restart is needed.
+>
 
-I ran it in a ubuntu 20.04 VM. Do not recall any specific sysctl
-settings to the VM, but maybe something is different between U20.04 and
-your OS
+I think I need to stop the queue while binding to a dmabuf for the
+sake of concurrency, no? I.e. the softirq thread may be delivering a
+packet, and in parallel a separate thread holds rtnl_lock and tries to
+bind the dma-buf. At that point the page_pool recreation will race
+with the driver doing page_pool_alloc_page(). I don't think I can
+insert a lock to handle this into the rx fast path, no?
 
+Also, this sounds like it requires (lots of) more changes. The
+page_pool + driver need to report how many pending references there
+are (with locking so we don't race with incoming packets), and have
+them reported via an ndo so that we can skip restarting the queue.
+Implementing the changes in to a huge issue but handling the
+concurrency may be a genuine blocker. Not sure it's worth the upside
+of not restarting the single rx queue?
+
+> > +             }
+> > +     }
+> > +
+> > +     xa_erase(&netdev_dmabuf_bindings, binding->id);
+> > +
+> > +     netdev_dmabuf_binding_put(binding);
+> > +}
+> > +
+> > +int netdev_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
+> > +                             struct netdev_dmabuf_binding *binding)
+> > +{
+> > +     struct netdev_rx_queue *rxq;
+> > +     u32 xa_idx;
+> > +     int err;
+> > +
+> > +     rxq =3D __netif_get_rx_queue(dev, rxq_idx);
+> > +
+> > +     if (rxq->binding)
+> > +             return -EEXIST;
+> > +
+> > +     err =3D xa_alloc(&binding->bound_rxq_list, &xa_idx, rxq, xa_limit=
+_32b,
+> > +                    GFP_KERNEL);
+> > +     if (err)
+> > +             return err;
+> > +
+> > +     /* We hold the rtnl_lock while binding/unbinding dma-buf, so we c=
+an't
+> > +      * race with another thread that is also modifying this value. Ho=
+wever,
+> > +      * the driver may read this config while it's creating its * rx-q=
+ueues.
+> > +      * WRITE_ONCE() here to match the READ_ONCE() in the driver.
+> > +      */
+> > +     WRITE_ONCE(rxq->binding, binding);
+> > +
+> > +     err =3D netdev_restart_rx_queue(dev, rxq_idx);
+>
+> Similarly, here binding a dmabuf to a queue. I was expecting the dmabuf
+> binding to add entries to the page pool for the queue.
+
+To be honest, I think maybe there's a slight disconnect between how
+you think the page_pool works, and my primitive understanding of how
+it works. Today, I see a 1:1 mapping between rx-queue and page_pool in
+the code. I don't see 1:many or many:1 mappings.
+
+In theory mapping 1 rx-queue to n page_pools is trivial: the driver
+can call page_pool_create() multiple times to generate n queues and
+decide for incoming packets which one to use.
+
+However, mapping n rx-queues to 1 page_pool seems like a can of worms.
+I see code in the page_pool that looks to me (and Willem) like it's
+safe only because the page_pool is used from the same napi context.
+with a n rx-queueue: 1 page_pool mapping, that is no longer true, no?
+There is a tail end of issues to resolve to be able to map 1 page_pool
+to n queues as I understand and even if resolved I'm not sure the
+maintainers are interested in taking the code.
+
+So, per my humble understanding there is no such thing as "add entries
+to the page pool for the (specific) queue", the page_pool is always
+used by 1 queue.
+
+Note that even though this limitation exists, we still support binding
+1 dma-buf to multiple queues, because multiple page pools can use the
+same netdev_dmabuf_binding. I should add that to the docs.
+
+> If the pool was
+> previously empty, then maybe the queue needs to be "started" in the
+> sense of creating with h/w or just pushing buffers into the queue and
+> moving the pidx.
+>
+>
+
+I don't think it's enough to add buffers to the page_pool, no? The
+existing buffers in the page_pool (host mem) must be purged. I think
+maybe the queue needs to be stopped as well so that we don't race with
+incoming packets and end up with skbs with devmem and non-devmem frags
+(unless you're thinking it becomes a requirement to support that, I
+think things are complicated as-is and it's a good simplification).
+When we already purge the existing buffers & restart the queue, it's
+little effort to migrate this to become in line with Jakub's queue-api
+that he also wants to use for per-queue configuration & ndo_stop/open.
+
+--=20
+Thanks,
+Mina
 
