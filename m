@@ -1,160 +1,138 @@
-Return-Path: <netdev+bounces-55476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 710F480AFB4
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 23:36:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C33E80AFBF
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 23:40:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A128F1C20B78
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 22:36:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 453DE1C20D18
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 22:40:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D8149F79;
-	Fri,  8 Dec 2023 22:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D77759B45;
+	Fri,  8 Dec 2023 22:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JHAcGViN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XX6UcXvx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C318C10CA
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 14:36:44 -0800 (PST)
-Received: by mail-ot1-x330.google.com with SMTP id 46e09a7af769-6d9d2f2b25aso1610680a34.1
-        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 14:36:44 -0800 (PST)
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1446AC3;
+	Fri,  8 Dec 2023 14:40:10 -0800 (PST)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-a1da1017a09so311125366b.3;
+        Fri, 08 Dec 2023 14:40:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702075004; x=1702679804; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AjAI3MUxVIHO3UergoKMVlR3NyTOib7GSFuefs47gBM=;
-        b=JHAcGViN7deS/U/aBeuRpPePy6jylmw/Sl3kRzWmtQDx1/0RJdyW9RnyqzjU5h3EfY
-         u4ape24LM5kx5obEcl1aeocDj9wSGV/PqMp2PS/FhR2EpHvSqZJ5a0MkI783X7L3bjhT
-         DTW+j4lOASsVW1wYQ+oulJ8Hkcg4/OopratQHGVImpvZtAEh3Re8T5bIfm+adEElQekd
-         UpAv12aFGl1eNq5FKwphWLbjVLSvPtzP18KXoXPcbcyYrB+uv4toaV6SdLH/9/kHvp0q
-         lV+X+G0/ma0xlEVwf6A5CdvXVxinZYsJFbWeutjzCH5M4hG08bGsca9/0zXz6hPQ74JX
-         eTFQ==
+        d=gmail.com; s=20230601; t=1702075208; x=1702680008; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HYNkiFjVXQKwdJFtKs4YwTgHxo/04KOB0mrqRod0x5w=;
+        b=XX6UcXvxAxRtffKuxKTX8HsoN06x02cASaf5p7TqYFqGjlvuTIiSRDNKP9K7GsR6zU
+         lSKOIIFJy4QADe/wr3t4RXdOpd0TpqcH0QhWpzcy8M7uTN4drGgM6/CX9n1qEhrE8tkB
+         Cxu2iJqYJtWuSK4nrSHUjg741m10WXArswUIz4F8m9mbS/RiBcxasY/U3CR03vBCuRUJ
+         8nxWs5evWKJW4MroDXK/GFSj9ZbvpBGUZzFCWFCZdHAMSJXdaClNMlTmIviCUVPyvRJD
+         5ju/FlJvY77dhu2ZbSb06TeVSqFhVHzArab1+iK3yhq8g2DG+vxNm4eEeuY3u9hrEmBm
+         F2jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702075004; x=1702679804;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AjAI3MUxVIHO3UergoKMVlR3NyTOib7GSFuefs47gBM=;
-        b=Qn70CSAVKhH5ufKckoQeWQjLtUG5l0pkmHs1het/WEYQ5kGESusOV/rSU2KyWc3IlI
-         +GASkcXqPf079n8PTUqAmw69zFghdfPFQUqLKeIk1xTC1Ox5eH7mcTsNFPFfkWkyOXKy
-         a7af4Lx71DMyaOwmY4RjBBkK6O89PFG5z5Y/4xGzOwiUuIPzi5CdtdK+xH9wQ23f4Sza
-         eEj+RLaJMNYa/xXM2tCL491zGO/shZsXMVw573oePhUUZBelO67wPs2iI4RzsBjPCYPW
-         ++2YZ9VEOXKJhWcwsIeDJ8r5hDY94+9BjQzaS3W4uHymigv30BscS+GagmRE2t99ysJJ
-         FFRQ==
-X-Gm-Message-State: AOJu0YwgR4oJ4QUKVIVAk+ZgTxuUOWhNrT0CzWYKNRWOYg4x7ooCPvbK
-	MeTzOcTPbd/NTTx5uqFkV2U=
-X-Google-Smtp-Source: AGHT+IEbiR6KH2VI3gIqCfT9q1lpZ0sb16BhU4VK4wadZCf/u0qioFHic6Kz0sQ+IACfgt3UAftWPQ==
-X-Received: by 2002:a05:6870:961d:b0:1fb:75b:99b0 with SMTP id d29-20020a056870961d00b001fb075b99b0mr880887oaq.95.1702075004043;
-        Fri, 08 Dec 2023 14:36:44 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id f21-20020a0caa95000000b0067a17c8696esm1146526qvb.82.2023.12.08.14.36.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Dec 2023 14:36:43 -0800 (PST)
-Message-ID: <f4e08518-290d-492f-89ea-31fea9974abe@gmail.com>
-Date: Fri, 8 Dec 2023 14:36:40 -0800
+        d=1e100.net; s=20230601; t=1702075208; x=1702680008;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HYNkiFjVXQKwdJFtKs4YwTgHxo/04KOB0mrqRod0x5w=;
+        b=NQ2iYt0Ejjb99aKA00LSJ93TofzYnjK46bmXZKuY1Eq7exFz8r124AR5bPiW9TibWv
+         ik9Un0oXz+mIxYSf5mqAhj60+jrWnEaiLaVEZzBXp+1aZYroTVJwqeA5e+dq0t/aii68
+         QsaZIUBHgoRywtb/hWRJbv1z5Mse32aaxf89bMlmHz4PXLdW0PHLoHMzCya3uZUfeTAb
+         E10vZPCpFKfjUmeIKa2X8IkHAKR3IP1EXQDWQkUwL8ajNyytPrT1ZeLGuVyg5jCz+VKA
+         YQVp+DZ4VUWuVUKJroEie7i0tqyQCDrDT63nrzszJT2GQAeRM5hNYkmRs2Nra/Sj9k0e
+         KhOw==
+X-Gm-Message-State: AOJu0Yx4k8NaOyqaeGszT0oOhB4uT4NGHd6pr/HklHVjTixZjkRc2MaH
+	X/Ycyg18YuHTGn3lsdp1tSF0LHVkY0SGowa1Dbg=
+X-Google-Smtp-Source: AGHT+IHKjPU34+PthheSZ4vlLXX8zzmlKZvkxUxPxvkXiGlk9AaeBlroiLMo628HbNHn2jSnSul3yna1RU7fsbEm4ms=
+X-Received: by 2002:a17:907:7206:b0:9fe:a881:81ab with SMTP id
+ dr6-20020a170907720600b009fea88181abmr363065ejc.53.1702075208436; Fri, 08 Dec
+ 2023 14:40:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 3/4] docs: net: dsa: update user MDIO bus
- documentation
-Content-Language: en-US
-To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
- Luiz Angelo Daros de Luca <luizluca@gmail.com>,
- =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
- Madhuri Sripada <madhuri.sripada@microchip.com>,
- Marcin Wojtas <mw@semihalf.com>, Linus Walleij <linus.walleij@linaro.org>,
- Tobias Waldekranz <tobias@waldekranz.com>,
- Arun Ramadoss <arun.ramadoss@microchip.com>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Jonathan Corbet <corbet@lwn.net>
-References: <20231208193518.2018114-1-vladimir.oltean@nxp.com>
- <20231208193518.2018114-4-vladimir.oltean@nxp.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20231208193518.2018114-4-vladimir.oltean@nxp.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20231130185229.2688956-1-andrii@kernel.org> <20231130185229.2688956-4-andrii@kernel.org>
+ <20231208-besessen-vibrieren-4e963e3ca3ba@brauner>
+In-Reply-To: <20231208-besessen-vibrieren-4e963e3ca3ba@brauner>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Fri, 8 Dec 2023 14:39:56 -0800
+Message-ID: <CAEf4BzbRKxBCzKbOWg0sWMzWurF5RvF5OwizXi7tSC2vM4Zi_w@mail.gmail.com>
+Subject: Re: [PATCH v12 bpf-next 03/17] bpf: introduce BPF token object
+To: Christian Brauner <brauner@kernel.org>
+Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	paul@paul-moore.com, linux-fsdevel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, keescook@chromium.org, 
+	kernel-team@meta.com, sargun@sargun.me
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/8/23 11:35, Vladimir Oltean wrote:
-> There are people who are trying to push the ds->user_mii_bus feature
-> past its sell-by date. I think part of the problem is the fact that the
-> documentation presents it as this great functionality.
-> 
-> Adapt it to 2023, where we have phy-handle to render it useless, at
-> least with OF.
-> 
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> ---
->   Documentation/networking/dsa/dsa.rst | 36 ++++++++++++++++++++++------
->   1 file changed, 29 insertions(+), 7 deletions(-)
-> 
-> diff --git a/Documentation/networking/dsa/dsa.rst b/Documentation/networking/dsa/dsa.rst
-> index 676c92136a0e..2cd91358421e 100644
-> --- a/Documentation/networking/dsa/dsa.rst
-> +++ b/Documentation/networking/dsa/dsa.rst
-> @@ -397,19 +397,41 @@ perspective::
->   User MDIO bus
->   -------------
->   
-> -In order to be able to read to/from a switch PHY built into it, DSA creates an
-> -user MDIO bus which allows a specific switch driver to divert and intercept
-> -MDIO reads/writes towards specific PHY addresses. In most MDIO-connected
-> -switches, these functions would utilize direct or indirect PHY addressing mode
-> -to return standard MII registers from the switch builtin PHYs, allowing the PHY
-> -library and/or to return link status, link partner pages, auto-negotiation
-> -results, etc.
-> +The framework creates an MDIO bus for user ports (``ds->user_mii_bus``) when
-> +both methods ``ds->ops->phy_read()`` and ``ds->ops->phy_write()`` are present.
-> +However, this pointer may also be populated by the switch driver during the
-> +``ds->ops->setup()`` method, with an MDIO bus managed by the driver.
-> +
-> +Its role is to permit user ports to connect to a PHY (usually internal) when
-> +the more general ``phy-handle`` property is unavailable (either because the
-> +MDIO bus is missing from the OF description, or because probing uses
-> +``platform_data``).
-> +
-> +In most MDIO-connected switches, these functions would utilize direct or
-> +indirect PHY addressing mode to return standard MII registers from the switch
-> +builtin PHYs, allowing the PHY library and/or to return link status, link
-> +partner pages, auto-negotiation results, etc.
+On Fri, Dec 8, 2023 at 5:41=E2=80=AFAM Christian Brauner <brauner@kernel.or=
+g> wrote:
+>
+> On Thu, Nov 30, 2023 at 10:52:15AM -0800, Andrii Nakryiko wrote:
+> > Add new kind of BPF kernel object, BPF token. BPF token is meant to
+> > allow delegating privileged BPF functionality, like loading a BPF
+> > program or creating a BPF map, from privileged process to a *trusted*
+> > unprivileged process, all while having a good amount of control over wh=
+ich
+> > privileged operations could be performed using provided BPF token.
+> >
+> > This is achieved through mounting BPF FS instance with extra delegation
+> > mount options, which determine what operations are delegatable, and als=
+o
+> > constraining it to the owning user namespace (as mentioned in the
+> > previous patch).
+> >
+> > BPF token itself is just a derivative from BPF FS and can be created
+> > through a new bpf() syscall command, BPF_TOKEN_CREATE, which accepts BP=
+F
+> > FS FD, which can be attained through open() API by opening BPF FS mount
+> > point. Currently, BPF token "inherits" delegated command, map types,
+> > prog type, and attach type bit sets from BPF FS as is. In the future,
+> > having an BPF token as a separate object with its own FD, we can allow
+> > to further restrict BPF token's allowable set of things either at the
+> > creation time or after the fact, allowing the process to guard itself
+> > further from unintentionally trying to load undesired kind of BPF
+> > programs. But for now we keep things simple and just copy bit sets as i=
+s.
+> >
+> > When BPF token is created from BPF FS mount, we take reference to the
+> > BPF super block's owning user namespace, and then use that namespace fo=
+r
+> > checking all the {CAP_BPF, CAP_PERFMON, CAP_NET_ADMIN, CAP_SYS_ADMIN}
+> > capabilities that are normally only checked against init userns (using
+> > capable()), but now we check them using ns_capable() instead (if BPF
+> > token is provided). See bpf_token_capable() for details.
+> >
+> > Such setup means that BPF token in itself is not sufficient to grant BP=
+F
+> > functionality. User namespaced process has to *also* have necessary
+> > combination of capabilities inside that user namespace. So while
+> > previously CAP_BPF was useless when granted within user namespace, now
+> > it gains a meaning and allows container managers and sys admins to have
+> > a flexible control over which processes can and need to use BPF
+> > functionality within the user namespace (i.e., container in practice).
+> > And BPF FS delegation mount options and derived BPF tokens serve as
+> > a per-container "flag" to grant overall ability to use bpf() (plus furt=
+her
+> > restrict on which parts of bpf() syscalls are treated as namespaced).
+> >
+> > Note also, BPF_TOKEN_CREATE command itself requires ns_capable(CAP_BPF)
+> > within the BPF FS owning user namespace, rounding up the ns_capable()
+> > story of BPF token.
+> >
+> > Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> > ---
+>
+> Same concerns as in the other mail. For the bpf_token_create() code,
+> Acked-by: Christian Brauner <brauner@kernel.org>
 
-The "and/or" did not read really well with the reset of the sentence, 
-maybe just drop those two words?
-
->   
->   For Ethernet switches which have both external and internal MDIO buses, the
->   user MII bus can be utilized to mux/demux MDIO reads and writes towards either
->   internal or external MDIO devices this switch might be connected to: internal
->   PHYs, external PHYs, or even external switches.
->   
-> +When using OF, the ``ds->user_mii_bus`` can be seen as a legacy feature, rather
-> +than core functionality. Since 2014, the DSA OF bindings support the
-> +``phy-handle`` property, which is a universal mechanism to reference a PHY,
-> +be it internal or external.
-> +
-> +New switch drivers are encouraged to require the more universal ``phy-handle``
-> +property even for user ports with internal PHYs. This allows device trees to
-> +interoperate with simpler variants of the drivers such as those from U-Boot,
-> +which do not have the (redundant) fallback logic for ``ds->user_mii_bus``.
-> +
-> +The only use case for ``ds->user_mii_bus`` in new drivers would be for probing
-> +on non-OF through ``platform_data``. In the distant future where this will be
-> +possible through software nodes, there will be no need for ``ds->user_mii_bus``
-> +in new drivers at all.
-
-That works for me, with the above addressed:
-
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
-
+This patch set has landed in bpf-next and there are a bunch of other
+patches after it, so I presume it will be a bit problematic to add ack
+after the fact. But thanks for taking another look and acking!
 
