@@ -1,144 +1,128 @@
-Return-Path: <netdev+bounces-55419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77B0780AD06
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 20:29:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E7C880AD12
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 20:31:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8F9D1C20D28
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 19:29:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECBC71F20FB3
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 19:31:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D33734CB5F;
-	Fri,  8 Dec 2023 19:29:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 021324CE0E;
+	Fri,  8 Dec 2023 19:31:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="B4LUPAgz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AA19aOJz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54DE01706
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 11:29:32 -0800 (PST)
-Received: by mail-pg1-x533.google.com with SMTP id 41be03b00d2f7-5c65ca2e1eeso1743995a12.2
-        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 11:29:32 -0800 (PST)
+Received: from mail-ua1-x92b.google.com (mail-ua1-x92b.google.com [IPv6:2607:f8b0:4864:20::92b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6737A1734
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 11:31:16 -0800 (PST)
+Received: by mail-ua1-x92b.google.com with SMTP id a1e0cc1a2514c-7c5f29423c5so483561241.1
+        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 11:31:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1702063771; x=1702668571; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1702063875; x=1702668675; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/m2C8F8TxO/qe6PLr2tyxnYNhWwE8d63+ZuL37T31g8=;
-        b=B4LUPAgzpadDOccMVo9dlPODHpAEl0jbMZbYuAvk3adaj8Di6rR177ieqiPIGU4vz0
-         lkMKSMrqjVAGF3TFr6H5k30xZWRTRIlYjEgk7y9tLTpgTcB6fGHSQIQb+VLYu+bcg3E5
-         yJ2gQ+qCab/qqHh1gW7pok+0tvAtBXKnRSDH/QfLy6dGEIobG/h0sAWTb0lnuDatfFjY
-         817hcg+MdOe00JMPIT1AygZwWN39m87VREzTZWFeQT9tUcO1jsncibxTrt7wq8X77Uqz
-         W0bxP+tVZOlfVjQuuxGa2oSdVaPybCfFSvjpb2HIKYCoLH2YlfnTTL/SwwF2ddLcUTEr
-         5J2g==
+        bh=kWu+J+wzMOcih150vf6YNmhjcZNaZMBMCrHoJTVq0Uw=;
+        b=AA19aOJzqgtW3RV80AFQwVMChqnhyx3dotQVTb0hrBmAlbNUmsuBTJtMrljDDTaPE4
+         UT2XZXwwEhyL6RvaC5iWygV0PrrojOamdQDwSsldkfSAMM7VJCtSIzBuUePJhJzEMdpX
+         CPGh4gECrlJoIIISE5H4oez9KZbbP2rZerJwxtlHukbw8x1DHD6xfCD40QWJNSF2TTZv
+         jyd/PaV6H4EEWDsI8Bemrygg75E84QrYgetKO+iTPy9VQtZwScDXn3sfczLGri9aGHpp
+         7vil7CrYcYmsqEFV7IMvKlG6rg+3CTnia8RBmcwiGoSy+xuGXcA38kRCZHFSMQWuS23S
+         tl7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702063771; x=1702668571;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1702063875; x=1702668675;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/m2C8F8TxO/qe6PLr2tyxnYNhWwE8d63+ZuL37T31g8=;
-        b=KuS6xpQPNia7/T93/S5+KWVo2rfLzqLMmwok7FJhzZQuNRRBPCvxQHAXgboD5qxJKJ
-         30C3AShEaXLuxIOHtqDJy2HFyrJYGChU7m2wQPGVHmBNzrdTGKdwhVs17lhGBD4W8ehc
-         2uBDS+HRtrnXx+M/RuGLLolC2zEDPprNlDkKn3ECTSmrBH89mAoxVQVRJWOHDpUhhdZ/
-         KU0BJzl0UhmBXETSfbHh69wmZwSOdpRx/Bjs9h/iSGI9EDLfJIPYX5E4tN6JN9ckrXfk
-         /+4xII8KUk3/uKStyoc6b0ZiL4OUz/lZ0AE7Q7JBDpDVi/lTQd4OhK46XhP4LovgFQ0b
-         ikeg==
-X-Gm-Message-State: AOJu0YwLAt2+QoTrTXFTcDwz7w1DeIrXXenJ8R/NqTwo/39X7exNhado
-	dXN4r8fYF4Y1/cdfIlQyEKj9m/evyQH1jvcQxDQ=
-X-Google-Smtp-Source: AGHT+IE1gJtgHkokh8y5ROrGapv/jMhiwOAzg0JQz7o/qOmy2yUa4ByOCAxi290PjjwHocyG1ygP5A==
-X-Received: by 2002:a05:6a20:8f09:b0:18c:8d0f:a7b7 with SMTP id b9-20020a056a208f0900b0018c8d0fa7b7mr632884pzk.22.1702063771585;
-        Fri, 08 Dec 2023 11:29:31 -0800 (PST)
-Received: from rogue-one.tail33bf8.ts.net ([201.17.86.134])
-        by smtp.gmail.com with ESMTPSA id p4-20020a634204000000b005b856fab5e9sm1916787pga.18.2023.12.08.11.29.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Dec 2023 11:29:31 -0800 (PST)
-From: Pedro Tammela <pctammela@mojatatu.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	marcelo.leitner@gmail.com,
-	vladbu@nvidia.com,
-	horms@kernel.org,
-	Pedro Tammela <pctammela@mojatatu.com>,
-	Jiri Pirko <jiri@nvidia.com>
-Subject: [PATCH net-next v4 7/7] net/sched: cls_api: conditional notification of events
-Date: Fri,  8 Dec 2023 16:28:47 -0300
-Message-Id: <20231208192847.714940-8-pctammela@mojatatu.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231208192847.714940-1-pctammela@mojatatu.com>
-References: <20231208192847.714940-1-pctammela@mojatatu.com>
+        bh=kWu+J+wzMOcih150vf6YNmhjcZNaZMBMCrHoJTVq0Uw=;
+        b=dokOfnQErY6cxZr8R2QqPjjQR1MzJXhF/lJvOQYY40tsBahgqiesw+FDJs4iH+LhSS
+         FFgteM+5Lpabbb8QKFQXDnSB0c/udLUTcvjTvMBJ6sWmbrDj9Yqv8XDucQmSkaCEa6MN
+         4PhTwuT8IngJ8xTa8QNg2LFKJsltQFMAWI8wWYHAZMWQ53O75GkuP2mpUChclRf1CIPi
+         zappAfBamBL5FFFVvPQBnD6L2nGrjFtyIoSK1qf/e69LBN+D8PBL+X6UVnJiQUI1LZEO
+         seRE6TP2lMFsso/h/YD2bQiUqwrVbGrdXFgdvlGZqM4yk+wz50ad3aGfV9RwWIUPi6Qy
+         4EDQ==
+X-Gm-Message-State: AOJu0Yy/90rzVhZ1vpP9wS4gUCYAgCw2rJIkTFjBtX7Si93jxK1KF9oI
+	7XfYlbio8gRNht93J4yQwEfNPuhJSTvN8PmW/8sTa5OeLbBDXoR95bj4/A==
+X-Google-Smtp-Source: AGHT+IEWy2ZoASGB97Xf4UzepNASdfhsiRufEtATUoKuaLdGqOq89E4y/cKAIuTMSGCSkffzh0Lc4oz7kiKBOoq4yro=
+X-Received: by 2002:a05:6102:3ec4:b0:464:40b2:e59f with SMTP id
+ n4-20020a0561023ec400b0046440b2e59fmr628329vsv.32.1702063875124; Fri, 08 Dec
+ 2023 11:31:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231208005250.2910004-1-almasrymina@google.com> <3fea9ae9-e9e6-4ba5-812b-2775a6ed9e6a@kernel.org>
+In-Reply-To: <3fea9ae9-e9e6-4ba5-812b-2775a6ed9e6a@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 8 Dec 2023 11:31:01 -0800
+Message-ID: <CAHS8izOc05jQEhU+s6FZtBN4fynUwVPrKsXBtjYo-X8fHQXOjg@mail.gmail.com>
+Subject: Re: [net-next v1 00/16] Device Memory TCP
+To: David Ahern <dsahern@kernel.org>
+Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeelb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-As of today tc-filter/chain events are unconditionally built and sent to
-RTNLGRP_TC. As with the introduction of rtnl_notify_needed we can check
-before-hand if they are really needed. This will help to alleviate
-system pressure when filters are concurrently added without the rtnl
-lock as in tc-flower.
+On Fri, Dec 8, 2023 at 9:57=E2=80=AFAM David Ahern <dsahern@kernel.org> wro=
+te:
+>
+> On 12/7/23 5:52 PM, Mina Almasry wrote:
+> > Major changes in v1:
+> > --------------
+> >
+> > 1. Implemented MVP queue API ndos to remove the userspace-visible
+> >    driver reset.
+> >
+> > 2. Fixed issues in the napi_pp_put_page() devmem frag unref path.
+> >
+> > 3. Removed RFC tag.
+> >
+> > Many smaller addressed comments across all the patches (patches have
+> > individual change log).
+> >
+> > Full tree including the rest of the GVE driver changes:
+> > https://github.com/mina/linux/commits/tcpdevmem-v1
+> >
+>
+> Still a lot of DEVMEM references (e.g., socket API). Any reason not to
+> move those to DMABUF?
+>
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
----
- net/sched/cls_api.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+In my mind the naming (maybe too silly/complicated, feel free to correct) i=
+s:
 
-diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-index 4050215a532d..437daebc1fc4 100644
---- a/net/sched/cls_api.c
-+++ b/net/sched/cls_api.c
-@@ -2052,6 +2052,9 @@ static int tfilter_notify(struct net *net, struct sk_buff *oskb,
- 	u32 portid = oskb ? NETLINK_CB(oskb).portid : 0;
- 	int err = 0;
- 
-+	if (!unicast && !rtnl_notify_needed(net, n->nlmsg_flags, RTNLGRP_TC))
-+		return 0;
-+
- 	skb = alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
- 	if (!skb)
- 		return -ENOBUFS;
-@@ -2081,6 +2084,9 @@ static int tfilter_del_notify(struct net *net, struct sk_buff *oskb,
- 	u32 portid = oskb ? NETLINK_CB(oskb).portid : 0;
- 	int err;
- 
-+	if (!rtnl_notify_needed(net, n->nlmsg_flags, RTNLGRP_TC))
-+		return tp->ops->delete(tp, fh, last, rtnl_held, extack);
-+
- 	skb = alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
- 	if (!skb)
- 		return -ENOBUFS;
-@@ -2901,6 +2907,9 @@ static int tc_chain_notify(struct tcf_chain *chain, struct sk_buff *oskb,
- 	struct sk_buff *skb;
- 	int err = 0;
- 
-+	if (!unicast && !rtnl_notify_needed(net, flags, RTNLGRP_TC))
-+		return 0;
-+
- 	skb = alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
- 	if (!skb)
- 		return -ENOBUFS;
-@@ -2930,6 +2939,9 @@ static int tc_chain_notify_delete(const struct tcf_proto_ops *tmplt_ops,
- 	struct net *net = block->net;
- 	struct sk_buff *skb;
- 
-+	if (!rtnl_notify_needed(net, flags, RTNLGRP_TC))
-+		return 0;
-+
- 	skb = alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
- 	if (!skb)
- 		return -ENOBUFS;
--- 
-2.40.1
+The feature is devmem TCP because we really care about TCPing into
+device memory. So the uapi/feature name retains devmem.
 
+dmabuf is the abstraction for devmem that we use. In theory someone
+can come up with a driver that doesn't like dmabuf and uses something
+else instead, and the devmem TCP support can be extended to support
+that something else. Functions that handle specifically dmabuf and are
+not generic to support general devmem are named accordingly
+(netdev_alloc_dmabuf/netdev_free_dmabuf)
+
+page_pool_iov is a generic type to support generic non-paged memory,
+functions that are supposed to handle any generic non-paged memory and
+named accordingly (page_pool_iov_get_many).
+
+
+--=20
+Thanks,
+Mina
 
