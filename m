@@ -1,270 +1,92 @@
-Return-Path: <netdev+bounces-55261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 093A380A046
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 11:09:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1328380A058
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 11:12:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7F921F217FA
-	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 10:09:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96BC2B20B89
+	for <lists+netdev@lfdr.de>; Fri,  8 Dec 2023 10:12:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A26E134D5;
-	Fri,  8 Dec 2023 10:09:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 390E114266;
+	Fri,  8 Dec 2023 10:12:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="MGe16gOs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Jh+Y9DFn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA35C171F
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 02:09:42 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-54c1cd8d239so2637775a12.0
-        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 02:09:42 -0800 (PST)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 646731720
+	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 02:12:46 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5d942a656b7so24154557b3.1
+        for <netdev@vger.kernel.org>; Fri, 08 Dec 2023 02:12:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702030181; x=1702634981; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7pkfm2u846CswhZbKMy6jP8JE4kLyiGbzsR8hflSVxo=;
-        b=MGe16gOs6hutySH51peqNXszP5X0aiI9zu8Txy089Q6SehfWeECb75hqICGh7CHo1Y
-         mwpzH5MLePncuiyTJiBrl/HS1aJNwH2Q+c6CJRCyDedzhIMc2A/spCj5JEPZrJA/CME/
-         6+gXzL72O6IWu1KLgkMIyFF5/CTxGnzHtIiAR3mrnn+wk38oSEkq6erfzG1VG3C3rzV/
-         ayERl3ateZi0PLuRhq4vreZMb1j70qt13FuDbHfeYp29r3MHCQ5qoz72BT/rOpW73Ki2
-         h6kImPFOqxfQM6GH64icRWsHTl75AC9h/2hBYjkpPaR3vNtquMxsKHTGwQ86aCOXerwW
-         V/bw==
+        d=google.com; s=20230601; t=1702030365; x=1702635165; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=QIpCoOno9ID2pGmqWj8QvRoGYafFYaUQi5CquZyI9E0=;
+        b=Jh+Y9DFnRWd0zBkOkIKyj0ikgI+Ezg9T8T5x9w+ZFqUCoaZdR1uGag8rCobocXUDs0
+         NlQoPlcydX48dAag35l5T8iRTHgFm7Gwvw4XEY3UWj10MXnJFAiv0qBUwk4L2zRcJNkY
+         eQbc7BEu6aGdsBVQErBENZ17keG22QS5DVh5Fa2SKZKPBMeh4ypQYYqRxQBcer8r9O3U
+         J6x1PXm6zP7kqtX9eMWehmcfcygS/1AYYNrHEQ/Xw5MO/3HYL+b9HPesQbIHhM8CiEpk
+         KWG5IxR9mQESm7nlwFdXNkjCo2pZsSV5LWCROc+YPBpVGc3redYEp10bhb0vI/xXqC0J
+         K/5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702030181; x=1702634981;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7pkfm2u846CswhZbKMy6jP8JE4kLyiGbzsR8hflSVxo=;
-        b=qxHNVaw1ZaTASW2gOU20ksL632gxVROoEvgZSUDRXAmovDW6oLb5Dhsfi0kCfSjYVf
-         ql+jCtkdh+5VMbDurSfDKTidy/Z3gphDzNXyIHSS7iZjXSFCBUi0equ/fXIa0vASSIVC
-         TkdzwTYSJFJNCUVOEYiU97yMrm0KW4Rt8b4q1eEUsE2SvSHr45QcPajitHbzamK9e6Ha
-         ReaMqNqUOvPDKWqKSCdoHCHx3N1IoMYawzY5LgEe2l51nVI9MGlMjhDzAkvEOKy+qDaH
-         upHPkinSXBHmAeQ/bN+Y0NFAqCU3n1cpD9My30VQwmkLj0n8frPxpLcWrHjeRzjHYDXG
-         Zu8Q==
-X-Gm-Message-State: AOJu0Yx5rYbUliktMdxINcYH7LIy7Oxd/KjDHTrTzu4aT78+T+EcGoZu
-	MZaz3mYqVf0V7x5s9piJdduuxg==
-X-Google-Smtp-Source: AGHT+IEHO4jpVyGt5oTDarFOUH6dRO/n2X1rmPG9gcpl06OCfnFqkSfiE8AUtpMX3wGrMQl7r2Qlig==
-X-Received: by 2002:a17:906:4f:b0:a1b:6fbb:d28c with SMTP id 15-20020a170906004f00b00a1b6fbbd28cmr1199505ejg.295.1702030181032;
-        Fri, 08 Dec 2023 02:09:41 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id rg8-20020a1709076b8800b00a0d672bfbb0sm812648ejc.142.2023.12.08.02.09.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Dec 2023 02:09:40 -0800 (PST)
-Date: Fri, 8 Dec 2023 11:09:39 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com, marcelo.leitner@gmail.com,
-	vladbu@nvidia.com
-Subject: Re: [PATCH net-next v3 4/5] net/sched: act_api: conditional
- notification of events
-Message-ID: <ZXLrYwK/UCkq/OiC@nanopsycho>
-References: <20231206164416.543503-1-pctammela@mojatatu.com>
- <20231206164416.543503-5-pctammela@mojatatu.com>
+        d=1e100.net; s=20230601; t=1702030365; x=1702635165;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QIpCoOno9ID2pGmqWj8QvRoGYafFYaUQi5CquZyI9E0=;
+        b=eoAV/C/cWy/LXIsGN/F/7AxrPcVFL+jblsuNcI0SE7SyOPh3ipAMcMJ8akBXcaw6jf
+         pX4eDQgLLTzHOoCqpX6cYc/Md4lp39QOlMZkIVSbbWt6+b/lSvgreoVTfJX5/pJuoVZx
+         bCnzP6vHDm+iQVncnLWe+bkRDLKlGZNQXwGONgCLv4qBWxTO3GXrS8mXHGee2Cbf7CwL
+         Av59Zp3KK85eDFA0zYfe+6KFzyYANsyigHTuEA1EhOsktQDLm+KVwRpoH7wLShMew9yH
+         O7HT7ybFDM1tRwm87W4H3VJt39CufCpz7lVveokGUWDc/7Df/0b9Ac4WGqxY6HioU30B
+         z7Ew==
+X-Gm-Message-State: AOJu0YyglTvqvzfoXZvnnJ5EW7UhoLjlSdUWoUEdH70VJyGfw4+0KN/b
+	kncCMjteLUI1KlBeKBFCDP+I4AqwiPn8hQ==
+X-Google-Smtp-Source: AGHT+IGQUa1qoCjKY7FFnia3C8XoK3sBMkh1PFfr8M7VWKH+cnXiyyUBgsgwVsAP0HJMgkZTAu1wTV9x5+gU4w==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:690c:3184:b0:5d3:7a2b:69ca with SMTP
+ id fd4-20020a05690c318400b005d37a2b69camr46167ywb.8.1702030365545; Fri, 08
+ Dec 2023 02:12:45 -0800 (PST)
+Date: Fri,  8 Dec 2023 10:12:42 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231206164416.543503-5-pctammela@mojatatu.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Message-ID: <20231208101244.1019034-1-edumazet@google.com>
+Subject: [PATCH net-next 0/2] ipv6: more data-race annotations
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Wed, Dec 06, 2023 at 05:44:15PM CET, pctammela@mojatatu.com wrote:
->As of today tc-action events are unconditionally built and sent to
->RTNLGRP_TC. As with the introduction of rtnl_notify_needed we can check
->before-hand if they are really needed.
->
->Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
->---
-> net/sched/act_api.c | 105 ++++++++++++++++++++++++++++++++------------
-> 1 file changed, 76 insertions(+), 29 deletions(-)
->
->diff --git a/net/sched/act_api.c b/net/sched/act_api.c
->index abec5c45b5a4..c15c2083ac84 100644
->--- a/net/sched/act_api.c
->+++ b/net/sched/act_api.c
->@@ -1785,31 +1785,45 @@ static int tcf_action_delete(struct net *net, struct tc_action *actions[])
-> 	return 0;
-> }
-> 
->-static int
->-tcf_reoffload_del_notify(struct net *net, struct tc_action *action)
->+static struct sk_buff *tcf_reoffload_del_notify_msg(struct net *net,
->+						    struct tc_action *action)
-> {
-> 	size_t attr_size = tcf_action_fill_size(action);
-> 	struct tc_action *actions[TCA_ACT_MAX_PRIO] = {
-> 		[0] = action,
-> 	};
->-	const struct tc_action_ops *ops = action->ops;
-> 	struct sk_buff *skb;
->-	int ret;
-> 
->-	skb = alloc_skb(attr_size <= NLMSG_GOODSIZE ? NLMSG_GOODSIZE : attr_size,
->-			GFP_KERNEL);
->+	skb = alloc_skb(max(attr_size, NLMSG_GOODSIZE), GFP_KERNEL);
+Small follow up series, taking care of races around
+np->mcast_oif and np->ucast_oif.
 
-I don't follow. I think you promissed to have this unrelated change as a
-separate patch, right? Could you? Unrelated to this patch.
+Eric Dumazet (2):
+  ipv6: annotate data-races around np->mcast_oif
+  ipv6: annotate data-races around np->ucast_oif
 
+ net/dccp/ipv6.c                 |   2 +-
+ net/ipv6/datagram.c             |   6 +-
+ net/ipv6/icmp.c                 |   8 +-
+ net/ipv6/ipv6_sockglue.c        | 132 ++++++++++++++++----------------
+ net/ipv6/ping.c                 |   8 +-
+ net/ipv6/raw.c                  |   4 +-
+ net/ipv6/tcp_ipv6.c             |   2 +-
+ net/ipv6/udp.c                  |   4 +-
+ net/l2tp/l2tp_ip6.c             |   4 +-
+ net/netfilter/ipvs/ip_vs_sync.c |   2 +-
+ net/rds/tcp_listen.c            |   2 +-
+ 11 files changed, 85 insertions(+), 89 deletions(-)
 
-> 	if (!skb)
->-		return -ENOBUFS;
->+		return ERR_PTR(-ENOBUFS);
-> 
-> 	if (tca_get_fill(skb, actions, 0, 0, 0, RTM_DELACTION, 0, 1, NULL) <= 0) {
-> 		kfree_skb(skb);
->-		return -EINVAL;
->+		return ERR_PTR(-EINVAL);
-> 	}
-> 
->+	return skb;
->+}
->+
->+static int tcf_reoffload_del_notify(struct net *net, struct tc_action *action)
->+{
->+	const struct tc_action_ops *ops = action->ops;
->+	struct sk_buff *skb = NULL;
->+	int ret;
->+
->+	if (!rtnl_notify_needed(net, 0, RTNLGRP_TC))
->+		goto skip_msg;
->+
->+	skb = tcf_reoffload_del_notify_msg(net, action);
->+	if (IS_ERR(skb))
->+		return PTR_ERR(skb);
->+
->+skip_msg:
-> 	ret = tcf_idr_release_unsafe(action);
-> 	if (ret == ACT_P_DELETED) {
-> 		module_put(ops->owner);
->-		ret = rtnetlink_send(skb, net, 0, RTNLGRP_TC, 0);
->+		ret = rtnetlink_maybe_send(skb, net, 0, RTNLGRP_TC, 0);
-> 	} else {
-> 		kfree_skb(skb);
-> 	}
->@@ -1875,25 +1889,42 @@ int tcf_action_reoffload_cb(flow_indr_block_bind_cb_t *cb,
-> 	return 0;
-> }
-> 
->-static int
->-tcf_del_notify(struct net *net, struct nlmsghdr *n, struct tc_action *actions[],
->-	       u32 portid, size_t attr_size, struct netlink_ext_ack *extack)
->+static struct sk_buff *tcf_del_notify_msg(struct net *net, struct nlmsghdr *n,
->+					  struct tc_action *actions[],
->+					  u32 portid, size_t attr_size,
->+					  struct netlink_ext_ack *extack)
-> {
->-	int ret;
-> 	struct sk_buff *skb;
-> 
->-	skb = alloc_skb(attr_size <= NLMSG_GOODSIZE ? NLMSG_GOODSIZE : attr_size,
->-			GFP_KERNEL);
->+	skb = alloc_skb(max(attr_size, NLMSG_GOODSIZE), GFP_KERNEL);
-> 	if (!skb)
->-		return -ENOBUFS;
->+		return ERR_PTR(-ENOBUFS);
-> 
-> 	if (tca_get_fill(skb, actions, portid, n->nlmsg_seq, 0, RTM_DELACTION,
-> 			 0, 2, extack) <= 0) {
-> 		NL_SET_ERR_MSG(extack, "Failed to fill netlink TC action attributes");
-> 		kfree_skb(skb);
->-		return -EINVAL;
->+		return ERR_PTR(-EINVAL);
-> 	}
-> 
->+	return skb;
->+}
->+
->+static int tcf_del_notify(struct net *net, struct nlmsghdr *n,
->+			  struct tc_action *actions[], u32 portid,
->+			  size_t attr_size, struct netlink_ext_ack *extack)
->+{
->+	struct sk_buff *skb = NULL;
->+	int ret;
->+
->+	if (!rtnl_notify_needed(net, n->nlmsg_flags, RTNLGRP_TC))
->+		goto skip_msg;
->+
->+	skb = tcf_del_notify_msg(net, n, actions, portid, attr_size, extack);
->+	if (IS_ERR(skb))
->+		return PTR_ERR(skb);
->+
->+skip_msg:
-> 	/* now do the delete */
-> 	ret = tcf_action_delete(net, actions);
-> 	if (ret < 0) {
->@@ -1902,9 +1933,8 @@ tcf_del_notify(struct net *net, struct nlmsghdr *n, struct tc_action *actions[],
-> 		return ret;
-> 	}
-> 
->-	ret = rtnetlink_send(skb, net, portid, RTNLGRP_TC,
->-			     n->nlmsg_flags & NLM_F_ECHO);
->-	return ret;
->+	return rtnetlink_maybe_send(skb, net, portid, RTNLGRP_TC,
->+				    n->nlmsg_flags & NLM_F_ECHO);
-> }
-> 
-> static int
->@@ -1955,26 +1985,43 @@ tca_action_gd(struct net *net, struct nlattr *nla, struct nlmsghdr *n,
-> 	return ret;
-> }
-> 
->-static int
->-tcf_add_notify(struct net *net, struct nlmsghdr *n, struct tc_action *actions[],
->-	       u32 portid, size_t attr_size, struct netlink_ext_ack *extack)
->+static struct sk_buff *tcf_add_notify_msg(struct net *net, struct nlmsghdr *n,
->+					  struct tc_action *actions[],
->+					  u32 portid, size_t attr_size,
->+					  struct netlink_ext_ack *extack)
-> {
-> 	struct sk_buff *skb;
-> 
->-	skb = alloc_skb(attr_size <= NLMSG_GOODSIZE ? NLMSG_GOODSIZE : attr_size,
->-			GFP_KERNEL);
->+	skb = alloc_skb(max(attr_size, NLMSG_GOODSIZE), GFP_KERNEL);
-> 	if (!skb)
->-		return -ENOBUFS;
->+		return ERR_PTR(-ENOBUFS);
-> 
-> 	if (tca_get_fill(skb, actions, portid, n->nlmsg_seq, n->nlmsg_flags,
-> 			 RTM_NEWACTION, 0, 0, extack) <= 0) {
-> 		NL_SET_ERR_MSG(extack, "Failed to fill netlink attributes while adding TC action");
-> 		kfree_skb(skb);
->-		return -EINVAL;
->+		return ERR_PTR(-EINVAL);
-> 	}
-> 
->-	return rtnetlink_send(skb, net, portid, RTNLGRP_TC,
->-			      n->nlmsg_flags & NLM_F_ECHO);
->+	return skb;
->+}
->+
->+static int tcf_add_notify(struct net *net, struct nlmsghdr *n,
->+			  struct tc_action *actions[], u32 portid,
->+			  size_t attr_size, struct netlink_ext_ack *extack)
->+{
->+	struct sk_buff *skb = NULL;
->+
->+	if (!rtnl_notify_needed(net, n->nlmsg_flags, RTNLGRP_TC))
->+		goto skip_msg;
->+
->+	skb = tcf_add_notify_msg(net, n, actions, portid, attr_size, extack);
->+	if (IS_ERR(skb))
->+		return PTR_ERR(skb);
->+
->+skip_msg:
->+	return rtnetlink_maybe_send(skb, net, portid, RTNLGRP_TC,
->+				    n->nlmsg_flags & NLM_F_ECHO);
-> }
-> 
-> static int tcf_action_add(struct net *net, struct nlattr *nla,
->-- 
->2.40.1
->
+-- 
+2.43.0.472.g3155946c3a-goog
+
 
