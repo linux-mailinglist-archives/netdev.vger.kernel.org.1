@@ -1,105 +1,84 @@
-Return-Path: <netdev+bounces-55568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D69780B607
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 20:23:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99F3B80B68C
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 22:30:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B901BB20B01
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 19:23:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D4B2280FDE
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 21:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 443CB1A27F;
-	Sat,  9 Dec 2023 19:23:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DD581CAA2;
+	Sat,  9 Dec 2023 21:30:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HSD/2mdz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WYR8MLCh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 255DC17752;
-	Sat,  9 Dec 2023 19:23:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31355C433C8;
-	Sat,  9 Dec 2023 19:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05941D691;
+	Sat,  9 Dec 2023 21:30:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 58E99C433C9;
+	Sat,  9 Dec 2023 21:30:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702149793;
-	bh=TzPlrmkILUz/bN6CJlB6+wiIJavVeiqXGYxgCJQNAow=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HSD/2mdzX4CzPAseZG5ABZdKyVeOpNkKf6QYOmhfUOMRncML2X+PT0IuDt7fAQX5D
-	 PK+DiskA6ZFrHpfXiPts0gpXe2MV4gN8M10KqJ4z8sirLlSJoGkMM+H26lfpZs2C5p
-	 xt+3fSzZqYT1xaVXH/TKNGZK7x+DeOtCaxTs8lrObHCW6qwyJJNwQvGS+EgCKlPk83
-	 dbyYLijdfNokS8tCL9IGqgNByNMoQz6ozn9a2IIenWJTr1z5O07JrVakPGYe+/qrbr
-	 6V/s6m86j8nNcpfb2B56f8C/y+aPhw0g/UazvdtvJ8SNMl+xj2MYYMUEmHBJtZKo5T
-	 8QB811M68IPYg==
-Date: Sat, 9 Dec 2023 20:23:09 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, aleksander.lobakin@intel.com,
-	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, lorenzo.bianconi@redhat.com, bpf@vger.kernel.org,
-	toke@redhat.com, willemdebruijn.kernel@gmail.com,
-	jasowang@redhat.com, sdf@google.com
-Subject: Re: [PATCH v3 net-next 2/2] xdp: add multi-buff support for xdp
- running in generic mode
-Message-ID: <ZXS-naeBjoVrGTY9@lore-desk>
-References: <cover.1701437961.git.lorenzo@kernel.org>
- <c9ee1db92c8baa7806f8949186b43ffc13fa01ca.1701437962.git.lorenzo@kernel.org>
- <20231201194829.428a96da@kernel.org>
- <ZW3zvEbI6o4ydM_N@lore-desk>
- <20231204120153.0d51729a@kernel.org>
- <ZW-tX9EAnbw9a2lF@lore-desk>
- <20231205155849.49af176c@kernel.org>
- <4b9804e2-42f0-4aed-b191-2abe24390e37@kernel.org>
- <20231206080333.0aa23754@kernel.org>
+	s=k20201202; t=1702157423;
+	bh=6dtEISSgwJn9p7Or2IXkynPlGkMJOf4k8j6Gb1VPeh4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=WYR8MLChm3LkwfYiJ/Dxbm3EqW+O3T8BfxB0UKRmajJp3ddquv5HlpWzGVaDAejbF
+	 3w/OsfKtAsUTtx2niu/ULIwEyZ+yqnWfpjMlKd1JM0oJQmJPjTf13rKQKycOZvwLPh
+	 7opSkKbWlM8Q0WSpvvSHkE3UmCmfeqVaVGV2qCdfjrCQZ7N8YKqfCm20/8/bQvTy/F
+	 Z3y1LGy7kxgGhkN+SpFOkuqxRM4buE/QV8JQxfFS5FWyWFKaQrz1vojIrqEjHOPEeV
+	 MWHnCdSZTN95RrikzLbZo4Kk8VCVDKdCqFFhgEVXIelloJGGaz787ojFaFrjAEuBki
+	 7qo0uFnQreePw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3FACCC595C5;
+	Sat,  9 Dec 2023 21:30:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="t1YGrjY7i9Wn6Bc/"
-Content-Disposition: inline
-In-Reply-To: <20231206080333.0aa23754@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH RESEND] io_uring/af_unix: disable sending io_uring over
+ sockets
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170215742325.28655.3532464326317595709.git-patchwork-notify@kernel.org>
+Date: Sat, 09 Dec 2023 21:30:23 +0000
+References: <c716c88321939156909cfa1bd8b0faaf1c804103.1701868795.git.asml.silence@gmail.com>
+In-Reply-To: <c716c88321939156909cfa1bd8b0faaf1c804103.1701868795.git.asml.silence@gmail.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: io-uring@vger.kernel.org, axboe@kernel.dk, jannh@google.com,
+ davem@davemloft.net, kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org
+
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Wed,  6 Dec 2023 13:55:19 +0000 you wrote:
+> File reference cycles have caused lots of problems for io_uring
+> in the past, and it still doesn't work exactly right and races with
+> unix_stream_read_generic(). The safest fix would be to completely
+> disallow sending io_uring files via sockets via SCM_RIGHT, so there
+> are no possible cycles invloving registered files and thus rendering
+> SCM accounting on the io_uring side unnecessary.
+> 
+> [...]
+
+Here is the summary with links:
+  - [RESEND] io_uring/af_unix: disable sending io_uring over sockets
+    https://git.kernel.org/netdev/net/c/69db702c8387
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---t1YGrjY7i9Wn6Bc/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-> On Wed, 6 Dec 2023 13:41:49 +0100 Jesper Dangaard Brouer wrote:
-> > BUT then I realized that PP have a weakness, which is the return/free
-> > path that need to take a normal spin_lock, as that can be called from
-> > any CPU (unlike the RX/alloc case).  Thus, I fear that making multiple
-> > devices share a page_pool via softnet_data, increase the chance of lock
-> > contention when packets are "freed" returned/recycled.
->=20
-> I was thinking we can add a pcpu CPU ID to page pool so that
-> napi_pp_put_page() has a chance to realize that its on the "right CPU"
-> and feed the cache directly.
-
-Are we going to use these page_pools just for virtual devices (e.g. veth) or
-even for hw NICs? If we do not bound the page_pool to a netdevice I think we
-can't rely on it to DMA map/unmap the buffer, right?
-Moreover, are we going to rework page_pool stats first? It seems a bit weir=
-d to
-have a percpu struct with a percpu pointer in it, right?
-
-Regards,
-Lorenzo
-
---t1YGrjY7i9Wn6Bc/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZXS+nQAKCRA6cBh0uS2t
-rI8AAQCR4gFHiOVzM3Ez3mjKM2D/21voIJc7XVBmCEWr2M1ziQEAh0uSclRxJvIg
-4PLXdEMjzDB1I4Pq41I8zLChgH2WWgU=
-=ett7
------END PGP SIGNATURE-----
-
---t1YGrjY7i9Wn6Bc/--
 
