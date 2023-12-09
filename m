@@ -1,113 +1,111 @@
-Return-Path: <netdev+bounces-55532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F306A80B358
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 10:05:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E719580B360
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 10:08:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02E131C208F4
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 09:05:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AFA71F2123F
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 09:08:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCE3079FD;
-	Sat,  9 Dec 2023 09:05:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA7A10A3B;
+	Sat,  9 Dec 2023 09:08:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="CH67JK0J"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ii2ukTAr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89554EB
-	for <netdev@vger.kernel.org>; Sat,  9 Dec 2023 01:05:14 -0800 (PST)
-Received: by mail-oi1-x22f.google.com with SMTP id 5614622812f47-3b86f3cdca0so1976739b6e.3
-        for <netdev@vger.kernel.org>; Sat, 09 Dec 2023 01:05:14 -0800 (PST)
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 798FC10D9
+	for <netdev@vger.kernel.org>; Sat,  9 Dec 2023 01:08:14 -0800 (PST)
+Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-54da61eb366so3709238a12.3
+        for <netdev@vger.kernel.org>; Sat, 09 Dec 2023 01:08:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=theori.io; s=google; t=1702112714; x=1702717514; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LQlTLRhrKohgHPSzdkKxnLtFbPFcoNK5KCT+nLgvVuM=;
-        b=CH67JK0Jc8mUoau4RSC/OX8lgvANTnmZK59MhJNpn2GsqhfaY5k/BurSXCzs2iCvUI
-         zQ180dBJnGKz1AjwENppc498Y0JMZhji9pQJc1A6IGnPuLDLs3Y0azo8yt1bJnfR/Y+t
-         gxwS3aiPx7nyatF96RWTEzNJ9j5wNBA8SWxHE=
+        d=gmail.com; s=20230601; t=1702112893; x=1702717693; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3f87JsAhO2n3/DBQNwmnk8srQcnzeNI7BpSQms8kT8Q=;
+        b=Ii2ukTArMmQTP1u4uGYKw9d8P2m/quiuuVf+woygAc1nNQd42+ANFNJUxy47V/bLkV
+         NPGpkma61wDPhrPm+j/x27YInZv0m0RgXwb9gdlNgMyXufCGbRsNZnvtdAfEkTEt6PGf
+         z4yZ6tY/bQLxtYckfj2P5S3fnCFcPrHn6xcIsNCUIglMhiRS9e/kSauuPSWRIgcNa41S
+         VOkaQNc0qDLiRx5AwufTapWPMNWf1Ja4t/IKh1XG6yzAiR2VHDMWditvWqp1secYDxic
+         MXA1Um3zgMkk21FejteO5dPhZpR1b3pTNQUVlBPdE93CYR5Qit83jvpGt0Q504qKZVOw
+         iGmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702112714; x=1702717514;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LQlTLRhrKohgHPSzdkKxnLtFbPFcoNK5KCT+nLgvVuM=;
-        b=nmGgbha7gbwreCz1uOHZzA63l6/bg/q1pGcC6A7wh/sO5ZbUG8Dqk/ofCrsrzxGScm
-         NttLPCiShFce0eedd/gM94PW8YbOQcKi5bum58xmUG68cPexk3VSvZPyFj3ZJTONsfEj
-         1m/8yQkl/l+vEHImkklek2yMA2WouniYuNW5HatcUDP28coFJE45BJhpRL/0S1kM9zw0
-         h9W62mrsdNC9UpxOu5kUlfm4HHIxUYnG5a9SYT7+KX6ANXk84Q1WHVY8DRteGGGHhM4V
-         ZaIlpCJpGhy6Z6K2o5+uKWweyjXNw8xiWK3v+2/YflGxkMtiWg1G2gH/tR41ToSnc58u
-         srUw==
-X-Gm-Message-State: AOJu0Yyi/hiZlMXgx7MzbCcAFqQGtNTMBvK07YYOT283zLig3XoIGn9d
-	nFMR4btQKtKohwWMga43/HeV0g==
-X-Google-Smtp-Source: AGHT+IG9ur6DebYr4Ipb1d9LxsjsMef1uAD5lADFrUvEoy9QM3YO/+CYkICSCHz+fy5sjio7Wed4kg==
-X-Received: by 2002:a05:6808:17a7:b0:3b9:ee89:540b with SMTP id bg39-20020a05680817a700b003b9ee89540bmr1839142oib.67.1702112713842;
-        Sat, 09 Dec 2023 01:05:13 -0800 (PST)
-Received: from v4bel-B760M-AORUS-ELITE-AX ([211.219.71.65])
-        by smtp.gmail.com with ESMTPSA id i4-20020a62c104000000b006ceba4953f6sm2978096pfg.8.2023.12.09.01.05.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Dec 2023 01:05:13 -0800 (PST)
-Date: Sat, 9 Dec 2023 04:05:09 -0500
-From: Hyunwoo Kim <v4bel@theori.io>
-To: davem@davemloft.net, kuba@kernel.org
-Cc: v4bel@theori.io, imv4bel@gmail.com, edumazet@google.com,
-	pabeni@redhat.com, netdev@vger.kernel.org
-Subject: [PATCH net v2] atm: Fix Use-After-Free in do_vcc_ioctl
-Message-ID: <20231209090509.GA401342@v4bel-B760M-AORUS-ELITE-AX>
+        d=1e100.net; s=20230601; t=1702112893; x=1702717693;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3f87JsAhO2n3/DBQNwmnk8srQcnzeNI7BpSQms8kT8Q=;
+        b=Id5AcJ4fqPLOx1ehy/ynGEVzi5e4jx8dDGxjQLl67ci/mkLyhR+mNE5P5yyX8SPuk9
+         ZvwKBdb45V2kN8vygDraGrmG8/vlkqta+iR/PaY81168vnLP0fQ4ozOmaDBafvwXmUnJ
+         uLy0JOPbzxVZLNQZ/zwLV7IioCvT680uNxGp9X2bTtqqyDTGDM0TNNR3+qQTXlfII67u
+         7uSkkdegccez9z8Y76EamAI4+rJ6mbTDUlodkXzHexnExuj37FldiE0f57NxU2mMsIRn
+         4pR4/EVIiG4XYi5xr12RgqqLiKdqUPMc5uHpIyq/Bm95R/MrvxsYgr6tKz/7MpWKqdUN
+         3Kfg==
+X-Gm-Message-State: AOJu0YyW3GEdFPoPJcq3sRJ7RTynMtNptXzM1w2w7966tmSBvMFHWIOO
+	rxkOA8mq4OaEIAtHr/CJ8WLlpdWPgGHkuJHGxaA=
+X-Google-Smtp-Source: AGHT+IHXU8fRDi+VW/OFs+0loVu37FiTxE/Qu9vffPqAeRkdUImOkte700EGhZl10A+/vKgaP+Rh4VQ9ouRXftNz9+g=
+X-Received: by 2002:a17:906:46:b0:a0f:44c6:8eb5 with SMTP id
+ 6-20020a170906004600b00a0f44c68eb5mr580040ejg.22.1702112892672; Sat, 09 Dec
+ 2023 01:08:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20231207183648.2819987-1-anthony.l.nguyen@intel.com> <20231208172001.55550653@kernel.org>
+In-Reply-To: <20231208172001.55550653@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sat, 9 Dec 2023 17:07:35 +0800
+Message-ID: <CAL+tcoAsC6s9DgsY+1_1R-Ut9AQz9rSzY0==774Gr9URZR9LKw@mail.gmail.com>
+Subject: Re: [PATCH net-next] i40e: remove fake support of rx-frames-irq
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net, pabeni@redhat.com, 
+	edumazet@google.com, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>, 
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Because do_vcc_ioctl() accesses sk->sk_receive_queue
-without holding a sk->sk_receive_queue.lock, it can
-cause a race with vcc_recvmsg().
-A use-after-free for skb occurs with the following flow.
-```
-do_vcc_ioctl() -> skb_peek()
-vcc_recvmsg() -> skb_recv_datagram() -> skb_free_datagram()
-```
-Add sk->sk_receive_queue.lock to do_vcc_ioctl() to fix this issue.
+On Sat, Dec 9, 2023 at 9:20=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Thu,  7 Dec 2023 10:36:47 -0800 Tony Nguyen wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > Since we never support this feature for I40E driver, we don't have to
+> > display the value when using 'ethtool -c eth0'.
+> >
+> > Before this patch applied, the rx-frames-irq is 256 which is consistent
+> > with tx-frames-irq. Apparently it could mislead users.
+>
+[...]
+> IIUC now the rx-frames-irq will be 0 / not set, so you should also:
+>
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net=
+/ethernet/intel/i40e/i40e_ethtool.c
+> index a0b10230268d..611996a35943 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
+> @@ -5786,7 +5786,7 @@ static const struct ethtool_ops i40e_ethtool_recove=
+ry_mode_ops =3D {
+>
+>  static const struct ethtool_ops i40e_ethtool_ops =3D {
+>         .supported_coalesce_params =3D ETHTOOL_COALESCE_USECS |
+> -                                    ETHTOOL_COALESCE_MAX_FRAMES_IRQ |
+> +                                    ETHTOOL_COALESCE_TX_MAX_FRAMES_IRQ |
+>                                      ETHTOOL_COALESCE_USE_ADAPTIVE |
+>                                      ETHTOOL_COALESCE_RX_USECS_HIGH |
+>                                      ETHTOOL_COALESCE_TX_USECS_HIGH,
+> --
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
----
-v1 -> v2: Change the code style
----
- net/atm/ioctl.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Thanks for the review, I will add this part into my V2 patch.
 
-diff --git a/net/atm/ioctl.c b/net/atm/ioctl.c
-index 838ebf0cabbf..b7684abcf458 100644
---- a/net/atm/ioctl.c
-+++ b/net/atm/ioctl.c
-@@ -72,15 +72,18 @@ static int do_vcc_ioctl(struct socket *sock, unsigned int cmd,
- 		goto done;
- 	case SIOCINQ:
- 	{
-+		long amount;
- 		struct sk_buff *skb;
- 
- 		if (sock->state != SS_CONNECTED) {
- 			error = -EINVAL;
- 			goto done;
- 		}
-+		spin_lock_irq(&sk->sk_receive_queue.lock);
- 		skb = skb_peek(&sk->sk_receive_queue);
--		error = put_user(skb ? skb->len : 0,
--				 (int __user *)argp) ? -EFAULT : 0;
-+		amount = skb ? skb->len : 0;
-+		spin_unlock_irq(&sk->sk_receive_queue.lock);
-+		error = put_user(amount, (int __user *)argp) ? -EFAULT : 0;
- 		goto done;
- 	}
- 	case ATM_SETSC:
--- 
-2.25.1
+Jason
 
+> pw-bot: cr
+>
 
