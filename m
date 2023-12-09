@@ -1,196 +1,118 @@
-Return-Path: <netdev+bounces-55559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A35080B44A
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 13:46:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C0DF80B525
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 17:05:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E5E4B20AC7
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 12:46:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C1D9B20521
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 16:05:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BA7D14299;
-	Sat,  9 Dec 2023 12:46:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0B2168DE;
+	Sat,  9 Dec 2023 16:05:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OucDDvk/"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xoGJUM7r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4030CF;
-	Sat,  9 Dec 2023 04:46:30 -0800 (PST)
-Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-3333074512bso2109310f8f.1;
-        Sat, 09 Dec 2023 04:46:30 -0800 (PST)
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B46FD10E7
+	for <netdev@vger.kernel.org>; Sat,  9 Dec 2023 08:05:11 -0800 (PST)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-40c31f18274so23116255e9.0
+        for <netdev@vger.kernel.org>; Sat, 09 Dec 2023 08:05:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702125989; x=1702730789; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=xjdryzYl36inEQGef/Je4h5B071Ib3F2VDmAwmitwYo=;
-        b=OucDDvk/KNbR2X0Xbu4A3Up/pTVC3+i4bk49C9TYOvzqA6bOVyfYqqI4poxqLgHTsX
-         wKWMYhv5jiB3T20IZA0/bo/gm7DtrjrhtQ8mbDTqxFBjcMcxIC7nRrRWBYazCosaJKIB
-         1WgieZSZ7aOBTr6PbzogH4BrfATw832FyVdjSCYh3ID3E8E/RmezKF81jWuUjeped3xe
-         8X6jogUIRMdFwyURQeDF/0KGCJiBMSoU4Y00bg1xw/ptyKs57o6+M9ePz+M/aLMlQeod
-         VK4kZphJp2+EvaOwFcfwwcYHtVU5YC20k50P5GUiZXCJb9RNFFsENNcXnWGMaQVqpgk+
-         PJoA==
+        d=linaro.org; s=google; t=1702137910; x=1702742710; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lbsPZUF4ysy0Z2Xnr5Uq7PdWYL0AABtRsCTOnasJIcc=;
+        b=xoGJUM7rfbBmtwsgiY0O1yvMYTlFDOoQczLgB/MlOsCyMIcbkdqQmom9a5Jj5iPvKs
+         JKzoxg3F7qyXecj9zCmHCTXLvSUNm5fN06QIpRsja3SThHwH7sdSm506dkyGQr5laJIM
+         74/n6q0QDuocVfJz3l5zN5LxHfy+O/vNHvqNluOP7DNP6/4UTLKSlwZIFktRnRScG5wI
+         ya7QkbpdvLzpzUGObDk05zr4soz8DnjZNdx0AsetYbCKhZv4iDXl/ao0JPeHz5S6DQx9
+         PX+yl0kx3IFDF1Nzyz1f/9lDvmui5C90HNByMN+7LzhJ2ziz+s8ZQY1DiHYIOs9l9doq
+         cvqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702125989; x=1702730789;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xjdryzYl36inEQGef/Je4h5B071Ib3F2VDmAwmitwYo=;
-        b=XNLgcFFdMOUF2tdNAjPHjYCgCQsejZ1Gcn5qw4R5+XPRVZHGs4qAGZf18SLgX/5CBN
-         e2JobL3lah3m2uba21jj/PIjmsAcSg/JN2f7YFhcryKt8011wCkUSsaA/FJZkTTY3ZGE
-         D+NVYYmiUxtrPX/Qfwhk7uCOASXqrdXRhqySHgfLWSgm+FxFdEppZKqlesEIvQOwnyrR
-         aRnQgJOtGSd3TCwwvTucP+HuJRvtTJrw0Qk6zfBZv5eRaKyfraBsIWmB77bY+HFducU0
-         KaVjiyDja7hhJNXWxy8wiWqvvqbWVRBpC6/2DKcj1tDMRvrMIaNVkgSE+se1y8OhCK+8
-         ISMA==
-X-Gm-Message-State: AOJu0YxF5ZNUYnGuc4h3pvJ7XKblqWl1T0F0VOq39Nlp2L5tR0SgtfTo
-	kQaBCK9CG4QFp6/zPznXP1U=
-X-Google-Smtp-Source: AGHT+IEieSRwwhaURIRh7mltRByGXy6JtzTWhxnklcvsWAvsOtWxPKnn7gd0SkjyFZfvU3/s3j4Auw==
-X-Received: by 2002:a05:600c:748:b0:40c:281a:25ff with SMTP id j8-20020a05600c074800b0040c281a25ffmr783705wmn.101.1702125988658;
-        Sat, 09 Dec 2023 04:46:28 -0800 (PST)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id c11-20020a5d414b000000b0033342f72bf8sm4334859wrq.9.2023.12.09.04.46.27
+        d=1e100.net; s=20230601; t=1702137910; x=1702742710;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lbsPZUF4ysy0Z2Xnr5Uq7PdWYL0AABtRsCTOnasJIcc=;
+        b=KqxwK5+ew65wkYMjTHQgRWTuqB4+BEv5YYsBIooM4gYx4BuokFLZYoU2IJap6LTjGl
+         3j/ZssC4HXL0tGppZJcMdjes1PeV42Fv2gzFuw2STyClT9yCcDyonGKoUnyWvXDy02hg
+         doEKRkdsozaC4y5DzUY1bRgAt24HTgIwrDGoGFfg1lZsYaT6gqumAb+caLd1vFUgMvQi
+         v/d8Hp0OcGl/dzutJ06yBItpgG+WeTkTc3AbPgRwubFPVO/4QQuivkEcKtOpCmcSOfk9
+         97geSmuRkp1XlV/5oLBDKmALEm3OSs+P2InuDpIO2JFBstbPnyJ2op3SZiLTjVOJBXyR
+         QGoA==
+X-Gm-Message-State: AOJu0Yx9nv19OeoU38JwjOmLnwgzLMSZ3vnLEFcaILLgh/Yz720MdbtU
+	L5Cd8Zo4DaHsUDpxfgaEzQX99Q==
+X-Google-Smtp-Source: AGHT+IFkLcBZfcLMdnzbi+IoTj6s/20AM06M7UlkM7GEdf6A91oFcd3ajlkYSGSjJjvizw73O5wocg==
+X-Received: by 2002:a05:600c:45c9:b0:40b:5e21:bdce with SMTP id s9-20020a05600c45c900b0040b5e21bdcemr840742wmo.93.1702137909793;
+        Sat, 09 Dec 2023 08:05:09 -0800 (PST)
+Received: from krzk-bin.. ([178.197.218.27])
+        by smtp.gmail.com with ESMTPSA id mt39-20020a17090761a700b00a0ad10b3f68sm2343077ejc.205.2023.12.09.08.05.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Dec 2023 04:46:28 -0800 (PST)
-Message-ID: <657461a4.5d0a0220.42455.0c13@mx.google.com>
-X-Google-Original-Message-ID: <ZXRhLMemQgponswE@Ansuel-xps.>
-Date: Sat, 9 Dec 2023 13:44:28 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: kernel test robot <lkp@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
+        Sat, 09 Dec 2023 08:05:09 -0800 (PST)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: Kalle Valo <kvalo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: Re: [net-next PATCH 2/2] net: phy: at803x: add LED support for
- qca808x
-References: <20231209014828.28194-2-ansuelsmth@gmail.com>
- <202312092051.FcBofskz-lkp@intel.com>
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	van Spriel <arend@broadcom.com>,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH net-next] dt-bindings: net: wireless: brcm,bcm4329-fmac: allow local-mac-address
+Date: Sat,  9 Dec 2023 17:05:05 +0100
+Message-Id: <20231209160505.237843-1-krzysztof.kozlowski@linaro.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202312092051.FcBofskz-lkp@intel.com>
+Content-Transfer-Encoding: 8bit
 
-On Sat, Dec 09, 2023 at 08:38:38PM +0800, kernel test robot wrote:
-> Hi Christian,
-> 
-> kernel test robot noticed the following build errors:
-> 
-> [auto build test ERROR on net-next/main]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Marangi/net-phy-at803x-add-LED-support-for-qca808x/20231209-095014
-> base:   net-next/main
-> patch link:    https://lore.kernel.org/r/20231209014828.28194-2-ansuelsmth%40gmail.com
-> patch subject: [net-next PATCH 2/2] net: phy: at803x: add LED support for qca808x
-> config: arm-randconfig-003-20231209 (https://download.01.org/0day-ci/archive/20231209/202312092051.FcBofskz-lkp@intel.com/config)
-> compiler: arm-linux-gnueabi-gcc (GCC) 13.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231209/202312092051.FcBofskz-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202312092051.FcBofskz-lkp@intel.com/
-> 
-> All errors (new ones prefixed by >>):
-> 
->    In file included from include/linux/bitops.h:68,
->                     from include/linux/log2.h:12,
->                     from include/asm-generic/div64.h:55,
->                     from arch/arm/include/asm/div64.h:107,
->                     from include/linux/math.h:6,
->                     from include/linux/math64.h:6,
->                     from include/linux/time64.h:5,
->                     from include/linux/restart_block.h:10,
->                     from include/linux/thread_info.h:14,
->                     from include/asm-generic/preempt.h:5,
->                     from ./arch/arm/include/generated/asm/preempt.h:1,
->                     from include/linux/preempt.h:79,
->                     from include/linux/spinlock.h:56,
->                     from include/linux/phy.h:15,
->                     from drivers/net/phy/at803x.c:10:
->    drivers/net/phy/at803x.c: In function 'qca808x_led_hw_control_get':
-> >> drivers/net/phy/at803x.c:2270:25: error: 'TRIGGER_NETDEV_LINK_2500' undeclared (first use in this function); did you mean 'TRIGGER_NETDEV_LINK_1000'?
->     2270 |                 set_bit(TRIGGER_NETDEV_LINK_2500, rules);
->          |                         ^~~~~~~~~~~~~~~~~~~~~~~~
->    arch/arm/include/asm/bitops.h:183:31: note: in definition of macro 'ATOMIC_BITOP'
->      183 |         (__builtin_constant_p(nr) ? ____atomic_##name(nr, p) : _##name(nr,p))
->          |                               ^~
->    drivers/net/phy/at803x.c:2270:17: note: in expansion of macro 'set_bit'
->     2270 |                 set_bit(TRIGGER_NETDEV_LINK_2500, rules);
->          |                 ^~~~~~~
->    drivers/net/phy/at803x.c:2270:25: note: each undeclared identifier is reported only once for each function it appears in
->     2270 |                 set_bit(TRIGGER_NETDEV_LINK_2500, rules);
->          |                         ^~~~~~~~~~~~~~~~~~~~~~~~
->    arch/arm/include/asm/bitops.h:183:31: note: in definition of macro 'ATOMIC_BITOP'
->      183 |         (__builtin_constant_p(nr) ? ____atomic_##name(nr, p) : _##name(nr,p))
->          |                               ^~
->    drivers/net/phy/at803x.c:2270:17: note: in expansion of macro 'set_bit'
->     2270 |                 set_bit(TRIGGER_NETDEV_LINK_2500, rules);
->          |                 ^~~~~~~
-> 
-> 
-> vim +2270 drivers/net/phy/at803x.c
+Some boards come with local-mac-address property.  Allow it, and
+mac-address as well, to fix dtbs_check warnings like:
 
-Hi,
-this error is caused by the lack of the commits for the recently added
-support for additional link speed in the netdev LED trigger.
+  apple/t8103-j456.dtb: network@0,0: Unevaluated properties are not allowed ('local-mac-address' was unexpected)
 
-These additional modes has been merged in Lee tree but I guess we need
-an immutable branch for net-next to actually use them?
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ .../devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml  | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-> 
->   2242	
->   2243	static int qca808x_led_hw_control_get(struct phy_device *phydev, u8 index,
->   2244					      unsigned long *rules)
->   2245	{
->   2246		u16 reg;
->   2247		int val;
->   2248	
->   2249		if (index > 2)
->   2250			return -EINVAL;
->   2251	
->   2252		/* Check if we have hw control enabled */
->   2253		if (qca808x_led_hw_control_status(phydev, index))
->   2254			return -EINVAL;
->   2255	
->   2256		reg = QCA808X_MMD7_LED_CTRL(index);
->   2257	
->   2258		val = phy_read_mmd(phydev, MDIO_MMD_AN, reg);
->   2259		if (val & QCA808X_LED_TX_BLINK)
->   2260			set_bit(TRIGGER_NETDEV_TX, rules);
->   2261		if (val & QCA808X_LED_RX_BLINK)
->   2262			set_bit(TRIGGER_NETDEV_RX, rules);
->   2263		if (val & QCA808X_LED_SPEED10_ON)
->   2264			set_bit(TRIGGER_NETDEV_LINK_10, rules);
->   2265		if (val & QCA808X_LED_SPEED100_ON)
->   2266			set_bit(TRIGGER_NETDEV_LINK_100, rules);
->   2267		if (val & QCA808X_LED_SPEED1000_ON)
->   2268			set_bit(TRIGGER_NETDEV_LINK_1000, rules);
->   2269		if (val & QCA808X_LED_SPEED2500_ON)
-> > 2270			set_bit(TRIGGER_NETDEV_LINK_2500, rules);
->   2271		if (val & QCA808X_LED_HALF_DUPLEX_ON)
->   2272			set_bit(TRIGGER_NETDEV_HALF_DUPLEX, rules);
->   2273		if (val & QCA808X_LED_FULL_DUPLEX_ON)
->   2274			set_bit(TRIGGER_NETDEV_FULL_DUPLEX, rules);
->   2275	
->   2276		return 0;
->   2277	}
->   2278	
-> 
-> -- 
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
-
+diff --git a/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml b/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
+index 4aa521f1be8c..4c8a7950c83e 100644
+--- a/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
++++ b/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
+@@ -67,6 +67,9 @@ properties:
+     description: Name for the OOB IRQ, this must be set to "host-wake".
+     const: host-wake
+ 
++  local-mac-address: true
++  mac-address: true
++
+   brcm,drive-strength:
+     $ref: /schemas/types.yaml#/definitions/uint32
+     description: Drive strength used for the SDIO pins on the device in mA.
+@@ -148,6 +151,8 @@ examples:
+         interrupt-parent = <&gpio>;
+         interrupts = <24 IRQ_TYPE_EDGE_FALLING>;
+         interrupt-names = "host-wake";
++        /* To be filled by the bootloader */
++        local-mac-address = [00 00 00 00 00 00];
+         reset-gpios = <&gpio 23 GPIO_ACTIVE_LOW>;
+         brcm,ccode-map = "JP-JP-78", "US-Q2-86";
+       };
 -- 
-	Ansuel
+2.34.1
+
 
