@@ -1,108 +1,72 @@
-Return-Path: <netdev+bounces-55542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0993280B38A
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 11:05:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2970E80B391
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 11:20:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2F3D1F21052
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 10:05:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C30401F20FD2
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 10:20:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBAF011C8E;
-	Sat,  9 Dec 2023 10:05:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="Oe9dcVWc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FEE711C95;
+	Sat,  9 Dec 2023 10:20:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B15091703
-	for <netdev@vger.kernel.org>; Sat,  9 Dec 2023 02:05:43 -0800 (PST)
-Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-1f055438492so2018501fac.3
-        for <netdev@vger.kernel.org>; Sat, 09 Dec 2023 02:05:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=theori.io; s=google; t=1702116343; x=1702721143; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=s5PCTRTJRZnHK1MRbANCAmJkU16b0mVctmay1KaTY14=;
-        b=Oe9dcVWcGt38FFugG/p/rM+T2epgZb+dJRdQT9xt2VuSDCDLvIU9VqMWtIk1beFZUo
-         WDWbJt+KSid8TNEpnSYt1cRLr3H+0gSQMweiKN0yzCzzeR6I/WIZZYer9sQYDQU0ROq0
-         r9N+hyL9aIXJFc4QbNI7k32C0HEByOb4ZWV3w=
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92E3EEB
+	for <netdev@vger.kernel.org>; Sat,  9 Dec 2023 02:20:03 -0800 (PST)
+Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-58db2015327so3146461eaf.1
+        for <netdev@vger.kernel.org>; Sat, 09 Dec 2023 02:20:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702116343; x=1702721143;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1702117203; x=1702722003;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s5PCTRTJRZnHK1MRbANCAmJkU16b0mVctmay1KaTY14=;
-        b=NhecGSL4wTU773ywsAAvq27qATM+Lh5E7bHhb5cM2rF9IqwzNcGstKtz+evVvv0BiD
-         VqE4p9uXcUq1IyybQoqpU3Xk4TH5nw3Q4riYz7fJRmqE9rA5+svwwOR0t+xgA4j+4DOZ
-         6iqvBmMdyDGsFuah/XFCRPaQqsOilgRECdjvgJrTp8genPr6QiqokoavSUS0rkFn83rD
-         HgOXItYQ5yH5VXMu2RBYiWc8rD5250t9csd6H69mqZCaHso7v0E+1cilj0A1M3JyoPcB
-         LfktJuFCyG1TjlnyqwLcQHaQD/krR0qF88uxW1nmDfD7xh6QvOuNimmMjlxWBDVVvP0w
-         moOQ==
-X-Gm-Message-State: AOJu0YyYgqTkvLNzYXBm026PDM/9mbnJL22+dLQB9Sc7OFU4U88jYy8G
-	vQuUXAqf62b6wkPaYyU7rGjNLw==
-X-Google-Smtp-Source: AGHT+IFqUTfK53OGgVUo3hyrpGjNPYDkuoBGZ7aTIyivGMBPwZwtRUuRlEC6XuuIsvCmvt2qXtNnvA==
-X-Received: by 2002:a05:6870:d18c:b0:1fb:2bec:9fb5 with SMTP id a12-20020a056870d18c00b001fb2bec9fb5mr2088274oac.0.1702116343074;
-        Sat, 09 Dec 2023 02:05:43 -0800 (PST)
-Received: from v4bel-B760M-AORUS-ELITE-AX ([211.219.71.65])
-        by smtp.gmail.com with ESMTPSA id 17-20020aa79111000000b006ce6c661701sm2642953pfh.139.2023.12.09.02.05.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Dec 2023 02:05:42 -0800 (PST)
-Date: Sat, 9 Dec 2023 05:05:38 -0500
-From: Hyunwoo Kim <v4bel@theori.io>
-To: ralf@linux-mips.org, edumazet@google.com
-Cc: v4bel@theori.io, imv4bel@gmail.com, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, linux-hams@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v4] net/rose: Fix Use-After-Free in rose_ioctl
-Message-ID: <20231209100538.GA407321@v4bel-B760M-AORUS-ELITE-AX>
+        bh=gzTKkayoaN26UAkjoOlMDL5VfK6M0KZqgpnzmdfUgck=;
+        b=mdY6OEo2FQh0a8R7W1Nm2xvHZgPneibc+hOJ9k79rMYitS8BdsINxYmPapoG4+yh0I
+         hnIIkb6FIyh9TH0BktNq9WyX76N20gS9cGFFAvpln27G9Wx6W54w9B5wXOxmGknb4sty
+         NQ+sJFd+F4J9QvRsYxUQWjk7DGUsW8mMDN/F2Rj4gVGLLSAUkNEsNgN/Q4L492NivTIi
+         EneIzzhMJkxUg0gvPI/T6i3Tra6IeKHJWlWobXnKjMSrImOHHV7VDC4iU+fzB2Zyo/JD
+         3YgJdpaCE/BfI4sXrRfXqHMaxwsHro4b4Pg52svGAbVEffTxd585nFrLCPPzg6kX0HPx
+         5vYQ==
+X-Gm-Message-State: AOJu0YzA5E/s0n42bVDx2xkkqdUq7iOqFjExJlH4E5EJG+zeDu1S+yJQ
+	khD0WJ4eHV++0HRAVlBfihS/R8QXSlZVZeQ9SgyYxJEUXR4H
+X-Google-Smtp-Source: AGHT+IEk926lM5pj/9LbooEoD3qXdZbKj4Vj79uN+R/s5Tnixbsp0bpX7U6paOZtjG/0nJtrWkQ9ZXqn7OCoT5Sag8emrp72f4kV
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+X-Received: by 2002:a4a:dfba:0:b0:590:8aa7:1e1c with SMTP id
+ k26-20020a4adfba000000b005908aa71e1cmr739667ook.1.1702117202886; Sat, 09 Dec
+ 2023 02:20:02 -0800 (PST)
+Date: Sat, 09 Dec 2023 02:20:02 -0800
+In-Reply-To: <f8bda66b-bb17-4bf8-b97a-4f7f0788d28f@siddh.me>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003e8971060c110bcc@google.com>
+Subject: Re: [syzbot] [net?] [nfc?] KASAN: slab-use-after-free Read in nfc_alloc_send_skb
+From: syzbot <syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com>
+To: code@siddh.me, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Because rose_ioctl() accesses sk->sk_receive_queue
-without holding a sk->sk_receive_queue.lock, it can
-cause a race with rose_accept().
-A use-after-free for skb occurs with the following flow.
-```
-rose_ioctl() -> skb_peek()
-rose_accept() -> skb_dequeue() -> kfree_skb()
-```
-Add sk->sk_receive_queue.lock to rose_ioctl() to fix this issue.
+Hello,
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
----
-v1 -> v2: Use sk->sk_receive_queue.lock instead of lock_sock.
-v2 -> v3: Change spin_lock to spin_lock_irq
-v3 -> v4: Delete old comments
----
- net/rose/af_rose.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
-index 0cc5a4e19900..ecb91ad4ce63 100644
---- a/net/rose/af_rose.c
-+++ b/net/rose/af_rose.c
-@@ -1315,9 +1315,11 @@ static int rose_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
- 	case TIOCINQ: {
- 		struct sk_buff *skb;
- 		long amount = 0L;
--		/* These two are safe on a single CPU system as only user tasks fiddle here */
-+
-+		spin_lock_irq(&sk->sk_receive_queue.lock);
- 		if ((skb = skb_peek(&sk->sk_receive_queue)) != NULL)
- 			amount = skb->len;
-+		spin_unlock_irq(&sk->sk_receive_queue.lock);
- 		return put_user(amount, (unsigned int __user *) argp);
- 	}
- 
--- 
-2.25.1
+Reported-and-tested-by: syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com
 
+Tested on:
+
+commit:         f2e8a57e Merge tag 'scsi-fixes' of git://git.kernel.or..
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+console output: https://syzkaller.appspot.com/x/log.txt?x=117f5cf4e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=99a0b898611ad691
+dashboard link: https://syzkaller.appspot.com/bug?extid=bbe84a4010eeea00982d
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=134888b6e80000
+
+Note: testing is done by a robot and is best-effort only.
 
