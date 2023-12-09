@@ -1,136 +1,157 @@
-Return-Path: <netdev+bounces-55523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8483B80B200
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 05:20:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AD7A80B212
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 05:51:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 818FD1C20BDA
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 04:20:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B545E1C20BE1
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 04:51:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9A311386;
-	Sat,  9 Dec 2023 04:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED5E715B5;
+	Sat,  9 Dec 2023 04:51:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SZq+7p+N"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KeESuLTe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9053A1107;
-	Sat,  9 Dec 2023 04:20:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8C7FC433C8;
-	Sat,  9 Dec 2023 04:20:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702095612;
-	bh=TdKoeYJCmyQ3JKD16K1s4NTFRZ9JYlkC3z82L25IMLk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SZq+7p+NKT2MXm0FV9mEvEHC6nMEhkB/wQW6MCdKZV0MpgZo+hJJdiR6SDe+wG56Z
-	 o95UHAJKMTANcMMg4g7KDlIhEkB3M1nrgHznj/2uQghQIrEwTwMei7n9+pJXcaZE8X
-	 D1sf9eBnbI7SmjIKgVJMxPNR87poc8/HAGwgiurxtN/kw97wsW6PckiDGBfr3kl2lV
-	 giLvCprU9zZlk25TzEfPGaWJWD5+0ooGkXlKyLjNJzDpDc+puDAeWlQB/Ylk28H9wZ
-	 Y1maZVajOiyHsmoPipm3viNTC+0JKXC3JRaKLt+M3sDkKEnoqi1JDWYwBYFnqUZrap
-	 x4IK5+QJl42sw==
-Date: Fri, 8 Dec 2023 20:24:44 -0800
-From: Bjorn Andersson <andersson@kernel.org>
-To: Sneh Shah <quic_snehshah@quicinc.com>
-Cc: Vinod Koul <vkoul@kernel.org>, 
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kernel@quicinc.com, Andrew Halaney <ahalaney@redhat.com>
-Subject: Re: [PATCH net v3] net: stmmac: update Rx clk divider for 10M SGMII
-Message-ID: <5luxwdjyzkg5o6w27mqixggr65ebosnn53vaqrbtsclfudet4v@kse23pgyj7ld>
-References: <20231208062502.13124-1-quic_snehshah@quicinc.com>
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8E9110DF;
+	Fri,  8 Dec 2023 20:51:40 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-332fd78fa9dso2566897f8f.3;
+        Fri, 08 Dec 2023 20:51:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702097499; x=1702702299; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E9jLsGhfGkMZnWhDYfHQ0jvQvXqjfciOlusSLK9GhRY=;
+        b=KeESuLTeX8T5ede0i/kSECpSnduJslTf/82J4Z57rkWkSf8dSMVICt52nYkMFTOITW
+         099C3aWGMtSw770fNLMxYbnj8Flv7HGJMeJpx8n29C0BMB+kz4LKbf26wUiYEVblcqIV
+         eJ8kmYDYcNE8tfSblEWCCPuvlQ3sIoo3DhX/ssxWrC8rnhS9czhqJAmkrmA9WOD3ILP1
+         o3Vj1z3dABjSQA3jPb9x9rm6dDK+EO1NpB+Sb/FmhNhAwpJM4qECPWTrf5YHCr/+8iNw
+         puYmU9Fvq4imcj/3AzNgZ4XiuRgkS2XibAg3jB69haE6GgMTNRlrxNG9Dehpb6ffErJ/
+         KmPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702097499; x=1702702299;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E9jLsGhfGkMZnWhDYfHQ0jvQvXqjfciOlusSLK9GhRY=;
+        b=AeMAll1+7Hm+LqvEgTNXH0lzxGQd4etsowOeyJqcehBysYX5I4uc9Bn/MeYGzNIATK
+         yLBMYbR/TPVfdBazATRCdYDkV5ACWwR+DXXvHkqlbdHklegH/ug7DMclYdEl5i5VGRDx
+         ItNK+dxzOLR7/4oRJqk6HKC/c2A5dskk82CsyTfZENAtSPjwXavvsj1JN/NWcykxBhJM
+         px07D4wQwEGJCLANU0RO1ophOJr/50eKInDah80Nmivxk3tPQgSDR5VWVLYRklF8CeRd
+         sXN1uGZoP2G5QVErF5YbJ4tN0PJeDUkmEsZUSFnaBK4cXauohmYLCv+04+rHD78zjNB9
+         1+eQ==
+X-Gm-Message-State: AOJu0YyiAm7KxmTwW4K2yvhry/jBGf0KDBa9HkklvsuoE/W6DggJA4xe
+	b2VWKJndrwX0/dEB2ZjxJB8qBxffeQ0xqXUlzbc=
+X-Google-Smtp-Source: AGHT+IGWegoXbG6riU09aOxjScmI6QdU76ibtag8Pupqd8K6QoQZC3fgz8qhZUFCULCtLMsl2YQJg9oU3fR3idrWio4=
+X-Received: by 2002:adf:ce8d:0:b0:333:49a8:73e4 with SMTP id
+ r13-20020adfce8d000000b0033349a873e4mr197659wrn.201.1702097499187; Fri, 08
+ Dec 2023 20:51:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231208062502.13124-1-quic_snehshah@quicinc.com>
+References: <20231207093105.GA28727@noisy.programming.kicks-ass.net>
+ <ivhrgimonsvy3tyj5iidoqmlcyqvtsh2ay3cm3ouemsdbvjzs4@6jlt6zv55tgh>
+ <20231208102940.GB28727@noisy.programming.kicks-ass.net> <20231208134041.GD28727@noisy.programming.kicks-ass.net>
+ <20231208172152.GD36716@noisy.programming.kicks-ass.net> <CAADnVQKsnZfFomQ4wTZz=jMZW5QCV2XiXVsi64bghHkAjJtcmA@mail.gmail.com>
+ <20231208203535.GG36716@noisy.programming.kicks-ass.net> <CAADnVQJzCw=qcG+jHBYG0q0SxLPkwghni0wpgV4A4PkpgVbGPw@mail.gmail.com>
+ <20231208205241.GK28727@noisy.programming.kicks-ass.net> <CAADnVQL3KsJONShsstDq5jrpbc_4FOU-VQPJgDCt50N9asoFzA@mail.gmail.com>
+ <20231208224557.GH36716@noisy.programming.kicks-ass.net>
+In-Reply-To: <20231208224557.GH36716@noisy.programming.kicks-ass.net>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 8 Dec 2023 20:51:27 -0800
+Message-ID: <CAADnVQ+Z7UcXXBBhMubhcMM=R-dExk-uHtfOLtoLxQ1XxEpqEA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] x86/cfi,bpf: Fix BPF JIT call
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Jiri Olsa <olsajiri@gmail.com>, Song Liu <song@kernel.org>, 
+	Song Liu <songliubraving@meta.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Sami Tolvanen <samitolvanen@google.com>, 
+	Kees Cook <keescook@chromium.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, linux-riscv <linux-riscv@lists.infradead.org>, 
+	LKML <linux-kernel@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
+	bpf <bpf@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, 
+	clang-built-linux <llvm@lists.linux.dev>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Joao Moreira <joao@overdrivepizza.com>, Mark Rutland <mark.rutland@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 08, 2023 at 11:55:02AM +0530, Sneh Shah wrote:
-> SGMII 10MBPS mode needs RX clock divider to avoid drops in Rx.
-> Update configure SGMII function with rx clk divider programming.
+On Fri, Dec 8, 2023 at 2:46=E2=80=AFPM Peter Zijlstra <peterz@infradead.org=
+> wrote:
+>
+>
+> Ok, did that. Current patches (on top of bpf-next) are here:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/peterz/queue.git x86/cfi
 
-Are you trying saying that the RX clock is completely wrong in 10MBps
-mode? Or is the RX clock good, but without some division of some other
-clock signal you loose some packets now and then?
+Looks really great. The last patch is cleaner than I expected. Good idea.
 
-Please write your commit message such that it describe the actual
-problem you're having. This will help others to know if this fix is
-applicable to some issue they are seeing on their hardware, now and in
-the future.
+> (really should try and write better changelogs, but it's too late)
 
-> 
-> Fixes: 463120c31c58 ("net: stmmac: dwmac-qcom-ethqos: add support for SGMII")
-> Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
-> ---
-> v3 changelog:
-> - Added comment to explain why MAC needs to be reconfigured for SGMII
-> v2 changelog:
-> - Use FIELD_PREP to prepare bifield values in place of GENMASK
-> - Add fixes tag
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> index d3bf42d0fceb..ab2245995bc6 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> @@ -34,6 +34,7 @@
->  #define RGMII_CONFIG_LOOPBACK_EN		BIT(2)
->  #define RGMII_CONFIG_PROG_SWAP			BIT(1)
->  #define RGMII_CONFIG_DDR_MODE			BIT(0)
-> +#define RGMII_CONFIG_SGMII_CLK_DVDR		GENMASK(18, 10)
+commit logs look fine except the "pilfer" word that I had to look up
+in the dictionary :)
 
-This new bitfield overlaps with existing fields, is it the same
-register? Did the fields move? Is it applicable to all versions?
+> [  247.721063]  ? bpf_throw+0x9b/0xf0
+> [  247.721126]  ? bpf_test_run+0x108/0x350
+> [  247.721191]  ? bpf_prog_5555714b685bf0cf_exception_throw_always_1+0x26=
+/0x26
+> [  247.721301]  ? bpf_test_run+0x108/0x350
+> [  247.721368]  bpf_test_run+0x212/0x350
+> [  247.721433]  ? slab_build_skb+0x22/0x110
+> [  247.721503]  bpf_prog_test_run_skb+0x347/0x4a0
+>
+> But I'm too tired to think staight. Is  this a bpf_callback_t vs
+> bpf_exception_cb difference?
 
-What will existing writes to RGMII_IO_MACRO_CONFIG do to this new
-layout? What will the new write do to hardware with the existing field
-layout?
+Yep.
+It's easy to fix:
+diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+index 0e162eae8639..e36b3f41751e 100644
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -1484,7 +1484,7 @@ struct bpf_prog_aux {
+        int cgroup_atype; /* enum cgroup_bpf_attach_type */
+        struct bpf_map *cgroup_storage[MAX_BPF_CGROUP_STORAGE_TYPE];
+        char name[BPF_OBJ_NAME_LEN];
+-       unsigned int (*bpf_exception_cb)(u64 cookie, u64 sp, u64 bp);
++       u64 (*bpf_exception_cb)(u64 cookie, u64 sp, u64 bp, u64, u64);
+ #ifdef CONFIG_SECURITY
+        void *security;
+ #endif
+diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
+index fe229b28e4a9..650ebe8ff183 100644
+--- a/kernel/bpf/helpers.c
++++ b/kernel/bpf/helpers.c
+@@ -2537,7 +2537,7 @@ __bpf_kfunc void bpf_throw(u64 cookie)
+         * which skips compiler generated instrumentation to do the same.
+         */
+        kasan_unpoison_task_stack_below((void *)(long)ctx.sp);
+-       ctx.aux->bpf_exception_cb(cookie, ctx.sp, ctx.bp);
++       ctx.aux->bpf_exception_cb(cookie, ctx.sp, ctx.bp, 0, 0);
+        WARN(1, "A call to BPF exception callback should never return\n");
+ }
 
->  
->  /* SDCC_HC_REG_DLL_CONFIG fields */
->  #define SDCC_DLL_CONFIG_DLL_RST			BIT(30)
-> @@ -598,6 +599,9 @@ static int ethqos_configure_rgmii(struct qcom_ethqos *ethqos)
->  	return 0;
->  }
->  
-> +/* On interface toggle MAC registetrs gets reset.
-> + * Configure MAC block for SGMII on ethernet phy link up
-> + */
->  static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
->  {
->  	int val;
-> @@ -617,6 +621,9 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
->  	case SPEED_10:
->  		val |= ETHQOS_MAC_CTRL_PORT_SEL;
->  		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
-> +		rgmii_updatel(ethqos, RGMII_CONFIG_SGMII_CLK_DVDR,
-> +			      FIELD_PREP(RGMII_CONFIG_SGMII_CLK_DVDR, 0x31),
+and with that all of test_progs runs successfully without CFI panics.
+*happy dance*
 
-Is this just a magic constant, or does 0x31 of some convenient unit?
-Could we give it name/define?
+Only test_progs -t btf/line_info fails suspiciously.
+There we check that line info embedded in the prog looks sane.
+New cfi preamble is probably tripping something.
+It could be a test issue. I'll investigate. It's not a blocker.
 
-Regards,
-Bjorn
-
-> +			      RGMII_IO_MACRO_CONFIG);
->  		break;
->  	}
->  
-> -- 
-> 2.17.1
-> 
-> 
+Do you mind resending the whole set so that BPF CI can test it
+on different archs ?
 
