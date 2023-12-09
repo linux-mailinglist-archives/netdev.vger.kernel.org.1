@@ -1,74 +1,196 @@
-Return-Path: <netdev+bounces-55558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA66F80B446
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 13:41:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A35080B44A
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 13:46:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06B471C20992
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 12:41:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E5E4B20AC7
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 12:46:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41D861427A;
-	Sat,  9 Dec 2023 12:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BA7D14299;
+	Sat,  9 Dec 2023 12:46:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OucDDvk/"
 X-Original-To: netdev@vger.kernel.org
-Received: from zju.edu.cn (mail.zju.edu.cn [61.164.42.155])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 86593A6;
-	Sat,  9 Dec 2023 04:41:21 -0800 (PST)
-Received: from dinghao.liu$zju.edu.cn ( [10.181.205.210] ) by
- ajax-webmail-mail-app4 (Coremail) ; Sat, 9 Dec 2023 20:40:54 +0800
- (GMT+08:00)
-Date: Sat, 9 Dec 2023 20:40:54 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: dinghao.liu@zju.edu.cn
-To: "Jakub Kicinski" <kuba@kernel.org>
-Cc: "Ariel Elior" <aelior@marvell.com>, 
-	"Manish Chopra" <manishc@marvell.com>, 
-	"David S. Miller" <davem@davemloft.net>, 
-	"Eric Dumazet" <edumazet@google.com>, 
-	"Paolo Abeni" <pabeni@redhat.com>, 
-	"Yuval Mintz" <Yuval.Mintz@qlogic.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] [v2] qed: Fix a potential use-after-free in
- qed_cxt_tables_alloc
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.2-cmXT5 build
- 20230825(e13b6a3b) Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <20231208155957.088c372b@kernel.org>
-References: <20231207093606.17868-1-dinghao.liu@zju.edu.cn>
- <20231208155957.088c372b@kernel.org>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4030CF;
+	Sat,  9 Dec 2023 04:46:30 -0800 (PST)
+Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-3333074512bso2109310f8f.1;
+        Sat, 09 Dec 2023 04:46:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702125989; x=1702730789; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=xjdryzYl36inEQGef/Je4h5B071Ib3F2VDmAwmitwYo=;
+        b=OucDDvk/KNbR2X0Xbu4A3Up/pTVC3+i4bk49C9TYOvzqA6bOVyfYqqI4poxqLgHTsX
+         wKWMYhv5jiB3T20IZA0/bo/gm7DtrjrhtQ8mbDTqxFBjcMcxIC7nRrRWBYazCosaJKIB
+         1WgieZSZ7aOBTr6PbzogH4BrfATw832FyVdjSCYh3ID3E8E/RmezKF81jWuUjeped3xe
+         8X6jogUIRMdFwyURQeDF/0KGCJiBMSoU4Y00bg1xw/ptyKs57o6+M9ePz+M/aLMlQeod
+         VK4kZphJp2+EvaOwFcfwwcYHtVU5YC20k50P5GUiZXCJb9RNFFsENNcXnWGMaQVqpgk+
+         PJoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702125989; x=1702730789;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xjdryzYl36inEQGef/Je4h5B071Ib3F2VDmAwmitwYo=;
+        b=XNLgcFFdMOUF2tdNAjPHjYCgCQsejZ1Gcn5qw4R5+XPRVZHGs4qAGZf18SLgX/5CBN
+         e2JobL3lah3m2uba21jj/PIjmsAcSg/JN2f7YFhcryKt8011wCkUSsaA/FJZkTTY3ZGE
+         D+NVYYmiUxtrPX/Qfwhk7uCOASXqrdXRhqySHgfLWSgm+FxFdEppZKqlesEIvQOwnyrR
+         aRnQgJOtGSd3TCwwvTucP+HuJRvtTJrw0Qk6zfBZv5eRaKyfraBsIWmB77bY+HFducU0
+         KaVjiyDja7hhJNXWxy8wiWqvvqbWVRBpC6/2DKcj1tDMRvrMIaNVkgSE+se1y8OhCK+8
+         ISMA==
+X-Gm-Message-State: AOJu0YxF5ZNUYnGuc4h3pvJ7XKblqWl1T0F0VOq39Nlp2L5tR0SgtfTo
+	kQaBCK9CG4QFp6/zPznXP1U=
+X-Google-Smtp-Source: AGHT+IEieSRwwhaURIRh7mltRByGXy6JtzTWhxnklcvsWAvsOtWxPKnn7gd0SkjyFZfvU3/s3j4Auw==
+X-Received: by 2002:a05:600c:748:b0:40c:281a:25ff with SMTP id j8-20020a05600c074800b0040c281a25ffmr783705wmn.101.1702125988658;
+        Sat, 09 Dec 2023 04:46:28 -0800 (PST)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id c11-20020a5d414b000000b0033342f72bf8sm4334859wrq.9.2023.12.09.04.46.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 Dec 2023 04:46:28 -0800 (PST)
+Message-ID: <657461a4.5d0a0220.42455.0c13@mx.google.com>
+X-Google-Original-Message-ID: <ZXRhLMemQgponswE@Ansuel-xps.>
+Date: Sat, 9 Dec 2023 13:44:28 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: kernel test robot <lkp@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: Re: [net-next PATCH 2/2] net: phy: at803x: add LED support for
+ qca808x
+References: <20231209014828.28194-2-ansuelsmth@gmail.com>
+ <202312092051.FcBofskz-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <15e70d8.29a3c.18c4e985043.Coremail.dinghao.liu@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cS_KCgA3PDRWYHRl7WJrAA--.21118W
-X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/1tbiAgoEBmV0OhUDUwAAsk
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202312092051.FcBofskz-lkp@intel.com>
 
-PiBPbiBUaHUsICA3IERlYyAyMDIzIDE3OjM2OjA2ICswODAwIERpbmdoYW8gTGl1IHdyb3RlOgo+
-ID4gdjI6IC1DaGFuZ2UgdGhlIGJ1ZyB0eXBlIGZyb20gZG91YmxlLWZyZWUgdG8gdXNlLWFmdGVy
-LWZyZWUuCj4gPiAgICAgLU1vdmUgdGhlIG51bGwgY2hlY2sgYWdhaW5zdCBwX21uZ3ItPmlsdF9z
-aGFkb3cgdG8gdGhlIGJlZ2lubmluZwo+ID4gICAgICBvZiB0aGUgZnVuY3Rpb24gcWVkX2lsdF9z
-aGFkb3dfZnJlZSgpLgo+ID4gICAgIC1XaGVuIGtjYWxsb2MoKSBmYWlscyBpbiBxZWRfaWx0X3No
-YWRvd19hbGxvYygpLCBqdXN0IHJldHVybgo+ID4gICAgICBiZWNhdXNlIHRoZXJlIGlzIG5vdGhp
-bmcgdG8gZnJlZS4KPiAKPiBUaGlzIHJlZmFjdG9yaW5nIGlzIG5vdCBhY2NlcHRhYmxlIGFzIHBh
-cnQgb2YgYSBmaXgsIHNvcnJ5Lgo+IAo+ID4gQEAgLTkzMyw2ICs5MzYsNyBAQCBzdGF0aWMgdm9p
-ZCBxZWRfaWx0X3NoYWRvd19mcmVlKHN0cnVjdCBxZWRfaHdmbiAqcF9od2ZuKQo+ID4gIAkJcF9k
-bWEtPnZpcnRfYWRkciA9IE5VTEw7Cj4gPiAgCX0KPiA+ICAJa2ZyZWUocF9tbmdyLT5pbHRfc2hh
-ZG93KTsKPiA+ICsJcF9od2ZuLT5wX2N4dF9tbmdyLT5pbHRfc2hhZG93ID0gTlVMTDsKPiAKPiBX
-aHkgZG8geW91IGRlcmVmZXJlbmNlIHBfaHdmbiBoZXJlPwo+IFNlZW1zIG1vcmUgbmF0dXJhbCB0
-byB1c2U6Cj4gCj4gCXBfbW5nci0+aWx0X3NoYWRvdyA9IE5VTEw7Cj4gCj4gc2luY2UgdGhhdCdz
-IHRoZSBleGFjdCBwb2ludGVyIHRoYXQgd2FzIHBhc3NlZCB0byBmcmVlLgo+IC0tIAo+IHB3LWJv
-dDogY3IKCkkgd2lsbCByZXNlbmQgYSBuZXcgcGF0Y2ggdG8gZml4IHRoaXMsIHRoYW5rcyEKClJl
-Z2FyZHMsCkRpbmdoYW8K
+On Sat, Dec 09, 2023 at 08:38:38PM +0800, kernel test robot wrote:
+> Hi Christian,
+> 
+> kernel test robot noticed the following build errors:
+> 
+> [auto build test ERROR on net-next/main]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Marangi/net-phy-at803x-add-LED-support-for-qca808x/20231209-095014
+> base:   net-next/main
+> patch link:    https://lore.kernel.org/r/20231209014828.28194-2-ansuelsmth%40gmail.com
+> patch subject: [net-next PATCH 2/2] net: phy: at803x: add LED support for qca808x
+> config: arm-randconfig-003-20231209 (https://download.01.org/0day-ci/archive/20231209/202312092051.FcBofskz-lkp@intel.com/config)
+> compiler: arm-linux-gnueabi-gcc (GCC) 13.2.0
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231209/202312092051.FcBofskz-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202312092051.FcBofskz-lkp@intel.com/
+> 
+> All errors (new ones prefixed by >>):
+> 
+>    In file included from include/linux/bitops.h:68,
+>                     from include/linux/log2.h:12,
+>                     from include/asm-generic/div64.h:55,
+>                     from arch/arm/include/asm/div64.h:107,
+>                     from include/linux/math.h:6,
+>                     from include/linux/math64.h:6,
+>                     from include/linux/time64.h:5,
+>                     from include/linux/restart_block.h:10,
+>                     from include/linux/thread_info.h:14,
+>                     from include/asm-generic/preempt.h:5,
+>                     from ./arch/arm/include/generated/asm/preempt.h:1,
+>                     from include/linux/preempt.h:79,
+>                     from include/linux/spinlock.h:56,
+>                     from include/linux/phy.h:15,
+>                     from drivers/net/phy/at803x.c:10:
+>    drivers/net/phy/at803x.c: In function 'qca808x_led_hw_control_get':
+> >> drivers/net/phy/at803x.c:2270:25: error: 'TRIGGER_NETDEV_LINK_2500' undeclared (first use in this function); did you mean 'TRIGGER_NETDEV_LINK_1000'?
+>     2270 |                 set_bit(TRIGGER_NETDEV_LINK_2500, rules);
+>          |                         ^~~~~~~~~~~~~~~~~~~~~~~~
+>    arch/arm/include/asm/bitops.h:183:31: note: in definition of macro 'ATOMIC_BITOP'
+>      183 |         (__builtin_constant_p(nr) ? ____atomic_##name(nr, p) : _##name(nr,p))
+>          |                               ^~
+>    drivers/net/phy/at803x.c:2270:17: note: in expansion of macro 'set_bit'
+>     2270 |                 set_bit(TRIGGER_NETDEV_LINK_2500, rules);
+>          |                 ^~~~~~~
+>    drivers/net/phy/at803x.c:2270:25: note: each undeclared identifier is reported only once for each function it appears in
+>     2270 |                 set_bit(TRIGGER_NETDEV_LINK_2500, rules);
+>          |                         ^~~~~~~~~~~~~~~~~~~~~~~~
+>    arch/arm/include/asm/bitops.h:183:31: note: in definition of macro 'ATOMIC_BITOP'
+>      183 |         (__builtin_constant_p(nr) ? ____atomic_##name(nr, p) : _##name(nr,p))
+>          |                               ^~
+>    drivers/net/phy/at803x.c:2270:17: note: in expansion of macro 'set_bit'
+>     2270 |                 set_bit(TRIGGER_NETDEV_LINK_2500, rules);
+>          |                 ^~~~~~~
+> 
+> 
+> vim +2270 drivers/net/phy/at803x.c
+
+Hi,
+this error is caused by the lack of the commits for the recently added
+support for additional link speed in the netdev LED trigger.
+
+These additional modes has been merged in Lee tree but I guess we need
+an immutable branch for net-next to actually use them?
+
+> 
+>   2242	
+>   2243	static int qca808x_led_hw_control_get(struct phy_device *phydev, u8 index,
+>   2244					      unsigned long *rules)
+>   2245	{
+>   2246		u16 reg;
+>   2247		int val;
+>   2248	
+>   2249		if (index > 2)
+>   2250			return -EINVAL;
+>   2251	
+>   2252		/* Check if we have hw control enabled */
+>   2253		if (qca808x_led_hw_control_status(phydev, index))
+>   2254			return -EINVAL;
+>   2255	
+>   2256		reg = QCA808X_MMD7_LED_CTRL(index);
+>   2257	
+>   2258		val = phy_read_mmd(phydev, MDIO_MMD_AN, reg);
+>   2259		if (val & QCA808X_LED_TX_BLINK)
+>   2260			set_bit(TRIGGER_NETDEV_TX, rules);
+>   2261		if (val & QCA808X_LED_RX_BLINK)
+>   2262			set_bit(TRIGGER_NETDEV_RX, rules);
+>   2263		if (val & QCA808X_LED_SPEED10_ON)
+>   2264			set_bit(TRIGGER_NETDEV_LINK_10, rules);
+>   2265		if (val & QCA808X_LED_SPEED100_ON)
+>   2266			set_bit(TRIGGER_NETDEV_LINK_100, rules);
+>   2267		if (val & QCA808X_LED_SPEED1000_ON)
+>   2268			set_bit(TRIGGER_NETDEV_LINK_1000, rules);
+>   2269		if (val & QCA808X_LED_SPEED2500_ON)
+> > 2270			set_bit(TRIGGER_NETDEV_LINK_2500, rules);
+>   2271		if (val & QCA808X_LED_HALF_DUPLEX_ON)
+>   2272			set_bit(TRIGGER_NETDEV_HALF_DUPLEX, rules);
+>   2273		if (val & QCA808X_LED_FULL_DUPLEX_ON)
+>   2274			set_bit(TRIGGER_NETDEV_FULL_DUPLEX, rules);
+>   2275	
+>   2276		return 0;
+>   2277	}
+>   2278	
+> 
+> -- 
+> 0-DAY CI Kernel Test Service
+> https://github.com/intel/lkp-tests/wiki
+
+-- 
+	Ansuel
 
