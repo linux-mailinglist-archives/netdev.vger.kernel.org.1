@@ -1,129 +1,148 @@
-Return-Path: <netdev+bounces-55536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BECC280B369
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 10:21:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1136F80B36F
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 10:27:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEF701C20A6E
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 09:21:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94965B20AE4
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 09:27:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD8611188;
-	Sat,  9 Dec 2023 09:21:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF5F610977;
+	Sat,  9 Dec 2023 09:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cBi1y0ZT"
+	dkim=pass (1024-bit key) header.d=siddh.me header.i=code@siddh.me header.b="JAwJECmp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F29E71A1
-	for <netdev@vger.kernel.org>; Sat,  9 Dec 2023 01:21:13 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1d053c45897so25983485ad.2
-        for <netdev@vger.kernel.org>; Sat, 09 Dec 2023 01:21:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702113673; x=1702718473; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bblvwmXoSojziLcRhLwTRwHqvOAy0kdN8M7lX+Jxd5M=;
-        b=cBi1y0ZT0XSFjVu1JLlx3bAvplkmmT0IOFFUngetLc/qo42nWVrjh5Y+SkR6E9AMZ8
-         Eh+x2uYQHDhcrgg+vKY373So42coWMkro9XhK+VxeQdHRQ6B2pgH4L1e9YBcHMKmpEWL
-         9EHltBPmYg2WhGiwisd05ODHw9T2Nb1iw6Gd1aEcmQHHg3/N51Km6TySGFzSI1vxwgK5
-         5HzgrpYa7aKA9J8Vmv1HA1sbpxYwjn6FlTG8C8ihQ6/F46t10QtSVq6Aj1djxVm4zhjA
-         TVxXrD+EU4f9DlCr/7HzoU+xY59/c279uTcO5T+H5XrjwH4H7jJjubHyjbE0hqC7o7Xu
-         V+Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702113673; x=1702718473;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bblvwmXoSojziLcRhLwTRwHqvOAy0kdN8M7lX+Jxd5M=;
-        b=L68HjCzhjidLes1r0XErq93grQ0Tjb3lqbr/SybDQtxi+NV8hnnCX369tV9GqrmsnA
-         n5HThOQvqqCP6N5ZT3BrJkjSu2O0WJwRa20VEjvuEiccQllTF7Si254IHyVubhBFkEcX
-         2kr1iBtbkDEhcXd3sdicSXGbMNtVLV0C8AC2npkAppx9h8+BfBJAKQsKB+3cuJSRiSZP
-         +MgAQEYe0kWa10QEoI19eqMTCQ8ZSE6zvhylf7zNnnExrorN4gwD5xukBGXK9u2sihJm
-         910S0BXzMQJImAhLFo6R7o0OMO+C0YIptCyMJJkDx0rrL7U5n/Wwj1F3WJskYGulhFmi
-         GijQ==
-X-Gm-Message-State: AOJu0YxY7tr6TnulStD3gh1uqHyhnbeBjSysTwBCQphTu50PjWq2fzqj
-	8Ywnojjpdm/dBWtg+oebVZUvSwS0Q+3BIg==
-X-Google-Smtp-Source: AGHT+IH4yx6pDxp/SMKIA9w78JG3/EcKyybmaFR7EE+OJm+nQ+almJ/er2zPN+uFjBiBOCZcl3c5kw==
-X-Received: by 2002:a17:902:ce84:b0:1d0:9201:5335 with SMTP id f4-20020a170902ce8400b001d092015335mr1438142plg.13.1702113673325;
-        Sat, 09 Dec 2023 01:21:13 -0800 (PST)
-Received: from KERNELXING-MB0.tencent.com ([114.253.37.67])
-        by smtp.gmail.com with ESMTPSA id q3-20020a170902f78300b001d083fed5f3sm3023978pln.60.2023.12.09.01.21.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Dec 2023 01:21:12 -0800 (PST)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH iwl-next v2] i40e: remove fake support of rx-frames-irq
-Date: Sat,  9 Dec 2023 17:20:51 +0800
-Message-Id: <20231209092051.43875-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+Received: from sender-of-o51.zoho.in (sender-of-o51.zoho.in [103.117.158.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A59B1A1;
+	Sat,  9 Dec 2023 01:27:19 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1702114030; cv=none; 
+	d=zohomail.in; s=zohoarc; 
+	b=c4EPJskWDNc3xa89EkEHx6QoCE59/qC470swWT/Eb/hfEXWL/QFCATp3EsdeOpFEaS/4fDl9tjql2+Zi0iZ44BzggDldqKvlK6Uc2z+NJvtxWexMMAV6zUb5/SGBn/c0JAky7lt7X2keTxVLQvI3vjyMUYKgOHhP+BprhkbfE/8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
+	t=1702114030; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=9HifBpJc5qMXAFdtxZd4YRtuBh2XKnXg7W7+1B+UIHk=; 
+	b=NxyfT1MOLDabvesW0fyORNyeulsyiEVF0/5zlITUiOLKYvh1YeraV9dn9nZc3YNgLxy1tco+Ic4LLvepfNlP97NEpfQL7XI4Le7KgG4+heNBPWCYHh1Qdjqxoykv2RFS43ievf1bauR8Onsl5s2EjD55t16o69itm1hholEDSRo=
+ARC-Authentication-Results: i=1; mx.zohomail.in;
+	dkim=pass  header.i=siddh.me;
+	spf=pass  smtp.mailfrom=code@siddh.me;
+	dmarc=pass header.from=<code@siddh.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1702114030;
+	s=zmail; d=siddh.me; i=code@siddh.me;
+	h=Message-ID:Date:Date:MIME-Version:To:To:Cc:Cc:References:Subject:Subject:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=9HifBpJc5qMXAFdtxZd4YRtuBh2XKnXg7W7+1B+UIHk=;
+	b=JAwJECmpxynQp4r0Y6oOA5IYCQs0OI/CNGRfldpkA21wFrFyC7HohqaRxFFiXbUK
+	WlYwOsiqqW1crsg8s4IILM2lwo0ZvI3jRikuxiRdQWJ/6/OsuQhNbxqCp5YPE/GKhZC
+	vzNXD+/jRK7ty6bW2wKThbNpkPSNvuHgUQVmj0K4=
+Received: from [192.168.1.12] (110.227.243.208 [110.227.243.208]) by mx.zoho.in
+	with SMTPS id 1702114029175807.7530028703645; Sat, 9 Dec 2023 14:57:09 +0530 (IST)
+Message-ID: <3753ec68-b5e3-40f7-8abe-6e4c737fa5f7@siddh.me>
+Date: Sat, 9 Dec 2023 14:57:01 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+To: syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com
+References: <000000000000cb112e0609b419d3@google.com>
+Subject: Re: [syzbot] [net?] [nfc?] KASAN: slab-use-after-free Read in
+ nfc_alloc_send_skb
+Content-Language: en-US, en-GB, hi-IN
+From: Siddh Raman Pant <code@siddh.me>
+In-Reply-To: <000000000000cb112e0609b419d3@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-From: Jason Xing <kernelxing@tencent.com>
+#syz test https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git main
 
-Since we never support this feature for I40E driver, we don't have to
-display the value when using 'ethtool -c eth0'.
-
-Before this patch applied, the rx-frames-irq is 256 which is consistent
-with tx-frames-irq. Apparently it could mislead users.
-
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
-v2: use the correct params in i40e_ethtool.c file as suggested by Jakub.
----
- drivers/net/ethernet/intel/i40e/i40e_ethtool.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ net/nfc/llcp_core.c | 40 +++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 37 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-index eb9a7b32af73..bf7ebc561d09 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-@@ -2895,7 +2895,6 @@ static int __i40e_get_coalesce(struct net_device *netdev,
- 	struct i40e_vsi *vsi = np->vsi;
+diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+index 1dac28136e6a..fadc8a9ec4df 100644
+--- a/net/nfc/llcp_core.c
++++ b/net/nfc/llcp_core.c
+@@ -145,6 +145,13 @@ static void nfc_llcp_socket_release(struct nfc_llcp_local *local, bool device,
  
- 	ec->tx_max_coalesced_frames_irq = vsi->work_limit;
--	ec->rx_max_coalesced_frames_irq = vsi->work_limit;
+ static struct nfc_llcp_local *nfc_llcp_local_get(struct nfc_llcp_local *local)
+ {
++	/* Since using nfc_llcp_local may result in usage of nfc_dev, whenever
++	 * we hold a reference to local, we also need to hold a reference to
++	 * the device to avoid UAF.
++	 */
++	if (!nfc_get_device(local->dev->idx))
++		return NULL;
++
+ 	kref_get(&local->ref);
  
- 	/* rx and tx usecs has per queue value. If user doesn't specify the
- 	 * queue, return queue 0's value to represent.
-@@ -3029,7 +3028,7 @@ static int __i40e_set_coalesce(struct net_device *netdev,
- 	struct i40e_pf *pf = vsi->back;
- 	int i;
+ 	return local;
+@@ -177,10 +184,18 @@ static void local_release(struct kref *ref)
  
--	if (ec->tx_max_coalesced_frames_irq || ec->rx_max_coalesced_frames_irq)
-+	if (ec->tx_max_coalesced_frames_irq)
- 		vsi->work_limit = ec->tx_max_coalesced_frames_irq;
+ int nfc_llcp_local_put(struct nfc_llcp_local *local)
+ {
++	struct nfc_dev *dev;
++	int ret;
++
+ 	if (local == NULL)
+ 		return 0;
  
- 	if (queue < 0) {
-@@ -5788,7 +5787,7 @@ static const struct ethtool_ops i40e_ethtool_recovery_mode_ops = {
+-	return kref_put(&local->ref, local_release);
++	dev = local->dev;
++
++	ret = kref_put(&local->ref, local_release);
++	nfc_put_device(dev);
++
++	return ret;
+ }
  
- static const struct ethtool_ops i40e_ethtool_ops = {
- 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
--				     ETHTOOL_COALESCE_MAX_FRAMES_IRQ |
-+				     ETHTOOL_COALESCE_TX_MAX_FRAMES_IRQ |
- 				     ETHTOOL_COALESCE_USE_ADAPTIVE |
- 				     ETHTOOL_COALESCE_RX_USECS_HIGH |
- 				     ETHTOOL_COALESCE_TX_USECS_HIGH,
+ static struct nfc_llcp_sock *nfc_llcp_sock_get(struct nfc_llcp_local *local,
+@@ -959,8 +974,18 @@ static void nfc_llcp_recv_connect(struct nfc_llcp_local *local,
+ 	}
+ 
+ 	new_sock = nfc_llcp_sock(new_sk);
+-	new_sock->dev = local->dev;
++
+ 	new_sock->local = nfc_llcp_local_get(local);
++	if (!new_sock->local) {
++		reason = LLCP_DM_REJ;
++		release_sock(&sock->sk);
++		sock_put(&sock->sk);
++		sock_put(&new_sock->sk);
++		nfc_llcp_sock_free(new_sock);
++		goto fail;
++	}
++
++	new_sock->dev = local->dev;
+ 	new_sock->rw = sock->rw;
+ 	new_sock->miux = sock->miux;
+ 	new_sock->nfc_protocol = sock->nfc_protocol;
+@@ -1597,7 +1622,16 @@ int nfc_llcp_register_device(struct nfc_dev *ndev)
+ 	if (local == NULL)
+ 		return -ENOMEM;
+ 
+-	local->dev = ndev;
++	/* As we are going to initialize local's refcount, we need to get the
++	 * nfc_dev to avoid UAF, otherwise there is no point in continuing.
++	 * See nfc_llcp_local_get().
++	 */
++	local->dev = nfc_get_device(ndev->idx);
++	if (!local->dev) {
++		kfree(local);
++		return -ENODEV;
++	}
++
+ 	INIT_LIST_HEAD(&local->list);
+ 	kref_init(&local->ref);
+ 	mutex_init(&local->sdp_lock);
 -- 
-2.37.3
+2.42.0
 
 
