@@ -1,148 +1,216 @@
-Return-Path: <netdev+bounces-55537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1136F80B36F
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 10:27:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC29780B367
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 10:17:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94965B20AE4
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 09:27:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 557E81F210E6
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 09:17:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF5F610977;
-	Sat,  9 Dec 2023 09:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siddh.me header.i=code@siddh.me header.b="JAwJECmp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15BA6D519;
+	Sat,  9 Dec 2023 09:17:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sender-of-o51.zoho.in (sender-of-o51.zoho.in [103.117.158.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A59B1A1;
-	Sat,  9 Dec 2023 01:27:19 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1702114030; cv=none; 
-	d=zohomail.in; s=zohoarc; 
-	b=c4EPJskWDNc3xa89EkEHx6QoCE59/qC470swWT/Eb/hfEXWL/QFCATp3EsdeOpFEaS/4fDl9tjql2+Zi0iZ44BzggDldqKvlK6Uc2z+NJvtxWexMMAV6zUb5/SGBn/c0JAky7lt7X2keTxVLQvI3vjyMUYKgOHhP+BprhkbfE/8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
-	t=1702114030; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=9HifBpJc5qMXAFdtxZd4YRtuBh2XKnXg7W7+1B+UIHk=; 
-	b=NxyfT1MOLDabvesW0fyORNyeulsyiEVF0/5zlITUiOLKYvh1YeraV9dn9nZc3YNgLxy1tco+Ic4LLvepfNlP97NEpfQL7XI4Le7KgG4+heNBPWCYHh1Qdjqxoykv2RFS43ievf1bauR8Onsl5s2EjD55t16o69itm1hholEDSRo=
-ARC-Authentication-Results: i=1; mx.zohomail.in;
-	dkim=pass  header.i=siddh.me;
-	spf=pass  smtp.mailfrom=code@siddh.me;
-	dmarc=pass header.from=<code@siddh.me>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1702114030;
-	s=zmail; d=siddh.me; i=code@siddh.me;
-	h=Message-ID:Date:Date:MIME-Version:To:To:Cc:Cc:References:Subject:Subject:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=9HifBpJc5qMXAFdtxZd4YRtuBh2XKnXg7W7+1B+UIHk=;
-	b=JAwJECmpxynQp4r0Y6oOA5IYCQs0OI/CNGRfldpkA21wFrFyC7HohqaRxFFiXbUK
-	WlYwOsiqqW1crsg8s4IILM2lwo0ZvI3jRikuxiRdQWJ/6/OsuQhNbxqCp5YPE/GKhZC
-	vzNXD+/jRK7ty6bW2wKThbNpkPSNvuHgUQVmj0K4=
-Received: from [192.168.1.12] (110.227.243.208 [110.227.243.208]) by mx.zoho.in
-	with SMTPS id 1702114029175807.7530028703645; Sat, 9 Dec 2023 14:57:09 +0530 (IST)
-Message-ID: <3753ec68-b5e3-40f7-8abe-6e4c737fa5f7@siddh.me>
-Date: Sat, 9 Dec 2023 14:57:01 +0530
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D2CA10E6
+	for <netdev@vger.kernel.org>; Sat,  9 Dec 2023 01:17:46 -0800 (PST)
+Received: from canpemm500010.china.huawei.com (unknown [172.30.72.54])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SnMq80HGGzsRxB;
+	Sat,  9 Dec 2023 17:17:40 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by canpemm500010.china.huawei.com
+ (7.192.105.118) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Sat, 9 Dec
+ 2023 17:17:41 +0800
+From: Liu Jian <liujian56@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <jiri@resnulli.us>, <vladimir.oltean@nxp.com>,
+	<andrew@lunn.ch>, <d-tatianin@yandex-team.ru>, <justin.chen@broadcom.com>,
+	<rkannoth@marvell.com>, <idosch@nvidia.com>, <jdamato@fastly.com>,
+	<netdev@vger.kernel.org>
+CC: <liujian56@huawei.com>
+Subject: [PATCH next] net: update the vlan filter info synchronously when modifying the features of netdev
+Date: Sat, 9 Dec 2023 17:29:21 +0800
+Message-ID: <20231209092921.1454609-1-liujian56@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- syzkaller-bugs@googlegroups.com
-References: <000000000000cb112e0609b419d3@google.com>
-Subject: Re: [syzbot] [net?] [nfc?] KASAN: slab-use-after-free Read in
- nfc_alloc_send_skb
-Content-Language: en-US, en-GB, hi-IN
-From: Siddh Raman Pant <code@siddh.me>
-In-Reply-To: <000000000000cb112e0609b419d3@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ canpemm500010.china.huawei.com (7.192.105.118)
+X-CFilter-Loop: Reflected
 
-#syz test https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git main
+I got the bleow warning trace:
 
+WARNING: CPU: 4 PID: 4056 at net/core/dev.c:11066 unregister_netdevice_many_notify
+CPU: 4 PID: 4056 Comm: ip Not tainted 6.7.0-rc4+ #15
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+RIP: 0010:unregister_netdevice_many_notify+0x9a4/0x9b0
+Call Trace:
+ rtnl_dellink
+ rtnetlink_rcv_msg
+ netlink_rcv_skb
+ netlink_unicast
+ netlink_sendmsg
+ __sock_sendmsg
+ ____sys_sendmsg
+ ___sys_sendmsg
+ __sys_sendmsg
+ do_syscall_64
+ entry_SYSCALL_64_after_hwframe
+
+It can be repoduced via:
+
+    ip netns add ns1
+    ip netns exec ns1 ip link add bond0 type bond mode 0
+    ip netns exec ns1 ip link add bond_slave_1 type veth peer veth2
+    ip netns exec ns1 ip link set bond_slave_1 master bond0
+[1] ip netns exec ns1 ethtool -K bond0 rx-vlan-filter off
+[2] ip netns exec ns1 ip link add link bond_slave_1 name bond_slave_1.0 type vlan id 0
+[3] ip netns exec ns1 ip link add link bond0 name bond0.0 type vlan id 0
+[4] ip netns exec ns1 ip link set bond_slave_1 nomaster
+[5] ip netns exec ns1 ip link del veth2
+    ip netns del ns1
+
+This is all caused by command [1] turning off the rx-vlan-filter function
+of bond0. The reason is the same as commit 01f4fd270870 ("bonding: Fix
+incorrect deletion of ETH_P_8021AD protocol vid from slaves"). Commands
+[2] [3] add the same vid to slave and master respectively, causing
+command [4] to empty slave->vlan_info. The following command [5] triggers
+this problem.
+
+To fix the problem, we could update the vlan filter information
+synchronously when modifying the features of netdev.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Liu Jian <liujian56@huawei.com>
 ---
- net/nfc/llcp_core.c | 40 +++++++++++++++++++++++++++++++++++++---
- 1 file changed, 37 insertions(+), 3 deletions(-)
+ net/8021q/vlan_core.c  | 21 ++++++++++++++++++++-
+ net/ethtool/features.c | 19 ++++++++++++++++++-
+ net/ethtool/ioctl.c    | 18 +++++++++++++++++-
+ 3 files changed, 55 insertions(+), 3 deletions(-)
 
-diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
-index 1dac28136e6a..fadc8a9ec4df 100644
---- a/net/nfc/llcp_core.c
-+++ b/net/nfc/llcp_core.c
-@@ -145,6 +145,13 @@ static void nfc_llcp_socket_release(struct nfc_llcp_local *local, bool device,
- 
- static struct nfc_llcp_local *nfc_llcp_local_get(struct nfc_llcp_local *local)
- {
-+	/* Since using nfc_llcp_local may result in usage of nfc_dev, whenever
-+	 * we hold a reference to local, we also need to hold a reference to
-+	 * the device to avoid UAF.
-+	 */
-+	if (!nfc_get_device(local->dev->idx))
-+		return NULL;
-+
- 	kref_get(&local->ref);
- 
- 	return local;
-@@ -177,10 +184,18 @@ static void local_release(struct kref *ref)
- 
- int nfc_llcp_local_put(struct nfc_llcp_local *local)
- {
-+	struct nfc_dev *dev;
-+	int ret;
-+
- 	if (local == NULL)
+diff --git a/net/8021q/vlan_core.c b/net/8021q/vlan_core.c
+index 0beb44f2fe1f..e94b509386bb 100644
+--- a/net/8021q/vlan_core.c
++++ b/net/8021q/vlan_core.c
+@@ -407,6 +407,12 @@ int vlan_vids_add_by_dev(struct net_device *dev,
  		return 0;
  
--	return kref_put(&local->ref, local_release);
-+	dev = local->dev;
-+
-+	ret = kref_put(&local->ref, local_release);
-+	nfc_put_device(dev);
-+
-+	return ret;
- }
- 
- static struct nfc_llcp_sock *nfc_llcp_sock_get(struct nfc_llcp_local *local,
-@@ -959,8 +974,18 @@ static void nfc_llcp_recv_connect(struct nfc_llcp_local *local,
+ 	list_for_each_entry(vid_info, &vlan_info->vid_list, list) {
++		if (!(by_dev->features & NETIF_F_HW_VLAN_CTAG_FILTER) &&
++		    vid_info->proto == htons(ETH_P_8021Q))
++			continue;
++		if (!(by_dev->features & NETIF_F_HW_VLAN_STAG_FILTER) &&
++		    vid_info->proto == htons(ETH_P_8021AD))
++			continue;
+ 		err = vlan_vid_add(dev, vid_info->proto, vid_info->vid);
+ 		if (err)
+ 			goto unwind;
+@@ -417,6 +423,12 @@ int vlan_vids_add_by_dev(struct net_device *dev,
+ 	list_for_each_entry_continue_reverse(vid_info,
+ 					     &vlan_info->vid_list,
+ 					     list) {
++		if (!(by_dev->features & NETIF_F_HW_VLAN_CTAG_FILTER) &&
++		    vid_info->proto == htons(ETH_P_8021Q))
++			continue;
++		if (!(by_dev->features & NETIF_F_HW_VLAN_STAG_FILTER) &&
++		    vid_info->proto == htons(ETH_P_8021AD))
++			continue;
+ 		vlan_vid_del(dev, vid_info->proto, vid_info->vid);
  	}
  
- 	new_sock = nfc_llcp_sock(new_sk);
--	new_sock->dev = local->dev;
-+
- 	new_sock->local = nfc_llcp_local_get(local);
-+	if (!new_sock->local) {
-+		reason = LLCP_DM_REJ;
-+		release_sock(&sock->sk);
-+		sock_put(&sock->sk);
-+		sock_put(&new_sock->sk);
-+		nfc_llcp_sock_free(new_sock);
-+		goto fail;
-+	}
-+
-+	new_sock->dev = local->dev;
- 	new_sock->rw = sock->rw;
- 	new_sock->miux = sock->miux;
- 	new_sock->nfc_protocol = sock->nfc_protocol;
-@@ -1597,7 +1622,16 @@ int nfc_llcp_register_device(struct nfc_dev *ndev)
- 	if (local == NULL)
- 		return -ENOMEM;
+@@ -436,8 +448,15 @@ void vlan_vids_del_by_dev(struct net_device *dev,
+ 	if (!vlan_info)
+ 		return;
  
--	local->dev = ndev;
-+	/* As we are going to initialize local's refcount, we need to get the
-+	 * nfc_dev to avoid UAF, otherwise there is no point in continuing.
-+	 * See nfc_llcp_local_get().
-+	 */
-+	local->dev = nfc_get_device(ndev->idx);
-+	if (!local->dev) {
-+		kfree(local);
-+		return -ENODEV;
+-	list_for_each_entry(vid_info, &vlan_info->vid_list, list)
++	list_for_each_entry(vid_info, &vlan_info->vid_list, list) {
++		if (!(by_dev->features & NETIF_F_HW_VLAN_CTAG_FILTER) &&
++		    vid_info->proto == htons(ETH_P_8021Q))
++			continue;
++		if (!(by_dev->features & NETIF_F_HW_VLAN_STAG_FILTER) &&
++		    vid_info->proto == htons(ETH_P_8021AD))
++			continue;
+ 		vlan_vid_del(dev, vid_info->proto, vid_info->vid);
 +	}
+ }
+ EXPORT_SYMBOL(vlan_vids_del_by_dev);
+ 
+diff --git a/net/ethtool/features.c b/net/ethtool/features.c
+index a79af8c25a07..dee6d17c5b50 100644
+--- a/net/ethtool/features.c
++++ b/net/ethtool/features.c
+@@ -1,5 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ 
++#include <linux/if_vlan.h>
+ #include "netlink.h"
+ #include "common.h"
+ #include "bitset.h"
+@@ -278,8 +279,24 @@ int ethnl_set_features(struct sk_buff *skb, struct genl_info *info)
+ 					  wanted_diff_mask, new_active,
+ 					  active_diff_mask, compact);
+ 	}
+-	if (mod)
++	if (mod) {
++		bitmap_xor(active_diff_mask, old_active, new_active,
++			   NETDEV_FEATURE_COUNT);
++		if (test_bit(NETIF_F_HW_VLAN_CTAG_FILTER_BIT, active_diff_mask)) {
++			if (test_bit(NETIF_F_HW_VLAN_CTAG_FILTER_BIT, new_active))
++				vlan_get_rx_ctag_filter_info(dev);
++			else
++				vlan_drop_rx_ctag_filter_info(dev);
++		}
++		if (test_bit(NETIF_F_HW_VLAN_STAG_FILTER_BIT, active_diff_mask)) {
++			if (test_bit(NETIF_F_HW_VLAN_STAG_FILTER_BIT, new_active))
++				vlan_get_rx_stag_filter_info(dev);
++			else
++				vlan_drop_rx_stag_filter_info(dev);
++		}
 +
- 	INIT_LIST_HEAD(&local->list);
- 	kref_init(&local->ref);
- 	mutex_init(&local->sdp_lock);
+ 		netdev_features_change(dev);
++	}
+ 
+ out_rtnl:
+ 	rtnl_unlock();
+diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
+index 0b0ce4f81c01..df7f65ca10b2 100644
+--- a/net/ethtool/ioctl.c
++++ b/net/ethtool/ioctl.c
+@@ -3055,8 +3055,24 @@ __dev_ethtool(struct net *net, struct ifreq *ifr, void __user *useraddr,
+ 	if (dev->ethtool_ops->complete)
+ 		dev->ethtool_ops->complete(dev);
+ 
+-	if (old_features != dev->features)
++	if (old_features != dev->features) {
++		netdev_features_t diff = old_features ^ dev->features;
++
++		if (diff & NETIF_F_HW_VLAN_CTAG_FILTER) {
++			if (dev->features & NETIF_F_HW_VLAN_CTAG_FILTER)
++				vlan_get_rx_ctag_filter_info(dev);
++			else
++				vlan_drop_rx_ctag_filter_info(dev);
++		}
++		if (diff & NETIF_F_HW_VLAN_STAG_FILTER) {
++			if (dev->features & NETIF_F_HW_VLAN_STAG_FILTER)
++				vlan_get_rx_stag_filter_info(dev);
++			else
++				vlan_drop_rx_stag_filter_info(dev);
++		}
++
+ 		netdev_features_change(dev);
++	}
+ out:
+ 	if (dev->dev.parent)
+ 		pm_runtime_put(dev->dev.parent);
 -- 
-2.42.0
+2.34.1
 
 
