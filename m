@@ -1,76 +1,105 @@
-Return-Path: <netdev+bounces-55567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 031EF80B5FA
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 20:11:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D69780B607
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 20:23:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2B9D280FF1
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 19:11:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B901BB20B01
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 19:23:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D7019BCF;
-	Sat,  9 Dec 2023 19:11:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 443CB1A27F;
+	Sat,  9 Dec 2023 19:23:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JwYAfxWz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HSD/2mdz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774B01944E
-	for <netdev@vger.kernel.org>; Sat,  9 Dec 2023 19:11:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6D8FC433C7;
-	Sat,  9 Dec 2023 19:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 255DC17752;
+	Sat,  9 Dec 2023 19:23:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31355C433C8;
+	Sat,  9 Dec 2023 19:23:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702149110;
-	bh=GoCf7IwFe+k6fUAIEuS1Bv4Gt8vQiC8SZUGXlwqNP14=;
+	s=k20201202; t=1702149793;
+	bh=TzPlrmkILUz/bN6CJlB6+wiIJavVeiqXGYxgCJQNAow=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JwYAfxWz/Df9+K8+uODNixBenK018c+cULFPVo3AGdn8/km789jmrQDYpXgRqzkEo
-	 dXIFMhQa6QVAEnDv8dCpcQJgZZEBfeAfk77SYbQdg/AkCKzowdJBQIL3NuWZRs6X5M
-	 Cf4xbmuqCaU6twGy+HbUEx73seYsDhuu9VZOV+aiqaAR1EuGQQSGyZYswNvmSHS1Ow
-	 ZImqyTovXdZri7TCWvpyaucHDdbnycZoovR2gwOvIadbKgxv94ztXZjqO3/m3Zm8LN
-	 3kawYMtQBOH6DnmKOrXaRxebNg7Lb94raNdALbGEFvClLQ6vJ1p1YuXTDI7DcMraft
-	 wSHe2nEQI8mTQ==
-Date: Sat, 9 Dec 2023 19:11:45 +0000
-From: Simon Horman <horms@kernel.org>
-To: Kunwu Chan <chentao@kylinos.cn>
-Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, jeffrey.t.kirsher@intel.com,
-	shannon.nelson@amd.com, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Kunwu Chan <kunwu.chan@hotmail.com>
-Subject: Re: [PATCH v5 iwl-next] i40e: Use correct buffer size in
- i40e_dbg_command_read
-Message-ID: <20231209191145.GD5817@kernel.org>
-References: <20231208031950.47410-1-chentao@kylinos.cn>
+	b=HSD/2mdzX4CzPAseZG5ABZdKyVeOpNkKf6QYOmhfUOMRncML2X+PT0IuDt7fAQX5D
+	 PK+DiskA6ZFrHpfXiPts0gpXe2MV4gN8M10KqJ4z8sirLlSJoGkMM+H26lfpZs2C5p
+	 xt+3fSzZqYT1xaVXH/TKNGZK7x+DeOtCaxTs8lrObHCW6qwyJJNwQvGS+EgCKlPk83
+	 dbyYLijdfNokS8tCL9IGqgNByNMoQz6ozn9a2IIenWJTr1z5O07JrVakPGYe+/qrbr
+	 6V/s6m86j8nNcpfb2B56f8C/y+aPhw0g/UazvdtvJ8SNMl+xj2MYYMUEmHBJtZKo5T
+	 8QB811M68IPYg==
+Date: Sat, 9 Dec 2023 20:23:09 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, aleksander.lobakin@intel.com,
+	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, lorenzo.bianconi@redhat.com, bpf@vger.kernel.org,
+	toke@redhat.com, willemdebruijn.kernel@gmail.com,
+	jasowang@redhat.com, sdf@google.com
+Subject: Re: [PATCH v3 net-next 2/2] xdp: add multi-buff support for xdp
+ running in generic mode
+Message-ID: <ZXS-naeBjoVrGTY9@lore-desk>
+References: <cover.1701437961.git.lorenzo@kernel.org>
+ <c9ee1db92c8baa7806f8949186b43ffc13fa01ca.1701437962.git.lorenzo@kernel.org>
+ <20231201194829.428a96da@kernel.org>
+ <ZW3zvEbI6o4ydM_N@lore-desk>
+ <20231204120153.0d51729a@kernel.org>
+ <ZW-tX9EAnbw9a2lF@lore-desk>
+ <20231205155849.49af176c@kernel.org>
+ <4b9804e2-42f0-4aed-b191-2abe24390e37@kernel.org>
+ <20231206080333.0aa23754@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="t1YGrjY7i9Wn6Bc/"
+Content-Disposition: inline
+In-Reply-To: <20231206080333.0aa23754@kernel.org>
+
+
+--t1YGrjY7i9Wn6Bc/
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231208031950.47410-1-chentao@kylinos.cn>
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 08, 2023 at 11:19:50AM +0800, Kunwu Chan wrote:
-> The size of "i40e_dbg_command_buf" is 256, the size of "name"
-> depends on "IFNAMSIZ", plus a null character and format size,
-> the total size is more than 256.
-> 
-> Improve readability and maintainability by replacing a hardcoded string
-> allocation and formatting by the use of the kasprintf() helper.
-> 
-> Fixes: 02e9c290814c ("i40e: debugfs interface")
-> Suggested-by: Simon Horman <horms@kernel.org>
-> Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Suggested-by: Tony Nguyen <anthony.l.nguyen@intel.com>
-> Cc: Kunwu Chan <kunwu.chan@hotmail.com>
-> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+> On Wed, 6 Dec 2023 13:41:49 +0100 Jesper Dangaard Brouer wrote:
+> > BUT then I realized that PP have a weakness, which is the return/free
+> > path that need to take a normal spin_lock, as that can be called from
+> > any CPU (unlike the RX/alloc case).  Thus, I fear that making multiple
+> > devices share a page_pool via softnet_data, increase the chance of lock
+> > contention when packets are "freed" returned/recycled.
+>=20
+> I was thinking we can add a pcpu CPU ID to page pool so that
+> napi_pp_put_page() has a chance to realize that its on the "right CPU"
+> and feed the cache directly.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Are we going to use these page_pools just for virtual devices (e.g. veth) or
+even for hw NICs? If we do not bound the page_pool to a netdevice I think we
+can't rely on it to DMA map/unmap the buffer, right?
+Moreover, are we going to rework page_pool stats first? It seems a bit weir=
+d to
+have a percpu struct with a percpu pointer in it, right?
 
+Regards,
+Lorenzo
+
+--t1YGrjY7i9Wn6Bc/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZXS+nQAKCRA6cBh0uS2t
+rI8AAQCR4gFHiOVzM3Ez3mjKM2D/21voIJc7XVBmCEWr2M1ziQEAh0uSclRxJvIg
+4PLXdEMjzDB1I4Pq41I8zLChgH2WWgU=
+=ett7
+-----END PGP SIGNATURE-----
+
+--t1YGrjY7i9Wn6Bc/--
 
