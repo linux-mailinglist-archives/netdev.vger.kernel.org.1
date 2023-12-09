@@ -1,65 +1,86 @@
-Return-Path: <netdev+bounces-55510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60D9380B168
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 02:27:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B639A80B16D
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 02:30:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14C281F21424
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 01:27:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBD4F1C20D66
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 01:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D64480E;
-	Sat,  9 Dec 2023 01:27:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD45D810;
+	Sat,  9 Dec 2023 01:30:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UbAnk2hK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XslYQBbC"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [IPv6:2001:41d0:203:375::ad])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76DC810FA
-	for <netdev@vger.kernel.org>; Fri,  8 Dec 2023 17:27:51 -0800 (PST)
-Message-ID: <e89bdb40-b385-42be-9c49-8039bf935b4f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1702085269;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4zraGspQIXEmmFnTBHY2t8soO8id4z4C9boCojvHRKA=;
-	b=UbAnk2hKDTkZPMKiPRTz0dqqbavtxB7oFczJF8Ks7YjCR54Jf9E9wGPmaZ9e2iknS02JVD
-	nZY036byG+AV9qZcxeohRrk1Hs5MX0IPFlKKgAjkI/neiRQDeTEuGO3/WXkvz5wWUk0URY
-	xwur7ixWutZ0kPmWMHiGBM5BXNUZIxs=
-Date: Fri, 8 Dec 2023 17:27:45 -0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5D680E
+	for <netdev@vger.kernel.org>; Sat,  9 Dec 2023 01:30:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 08B90C43391;
+	Sat,  9 Dec 2023 01:30:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702085424;
+	bh=OUXQXRNrn0qruMAxko1OUePwJGDkB2lJwccaep8maLY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XslYQBbC1CPdqqCn0nUY88KZkXh+1fV/G0sFvI8YL0FFxctAgIzNkG2gcACBXUQye
+	 zlQ9rEs4j72phbxXYIP7NTY56NRhaqKAJ2eyTyuMw/QpMi6jBr44cu4WTJz1Z5hqSU
+	 7ki5iD62CjDuNwczoCnTMH0MeMlHpU+/kkFGbalvW9Y1rZ9yfdSMmTy4oIrs9slqQB
+	 mzMGn6+eleF8iIUeTH4ldNWLdrTdEA/InrFOtP67Lzt3cRYnKzExk0IrDDRChfV2RB
+	 5d/2Yq8ctAb7HPKpy2w8Fken5iFe3khK9/ksGBhvL5er1v1kJP3vHwO1pxPFock6iZ
+	 urpHe6sRF8YNQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E5B60DD4F1E;
+	Sat,  9 Dec 2023 01:30:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v4 bpf-next 3/3] selftest: bpf: Test
- bpf_sk_assign_tcp_reqsk().
-Content-Language: en-US
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
- daniel@iogearbox.net, edumazet@google.com, kuni1840@gmail.com,
- netdev@vger.kernel.org
-References: <7e04fc5f-30a9-468e-bf07-49b00040b6db@linux.dev>
- <20231207065656.23862-1-kuniyu@amazon.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20231207065656.23862-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] ipv6: do not check fib6_has_expires() in
+ fib6_info_release()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170208542393.22393.12653821622545796367.git-patchwork-notify@kernel.org>
+Date: Sat, 09 Dec 2023 01:30:23 +0000
+References: <20231207201322.549000-1-edumazet@google.com>
+In-Reply-To: <20231207201322.549000-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ dsahern@kernel.org, netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com, thinker.li@gmail.com
 
-On 12/6/23 10:56 PM, Kuniyuki Iwashima wrote:
->>> +#define BPF_F_CURRENT_NETNS	(-1)
->> This should be already in the vmlinux.h
-> I thought so, but the kernel robot complained ...
-> https://lore.kernel.org/bpf/202311222353.3MM8wxm0-lkp@intel.com/
+Hello:
 
-may be the BPF_F_CURRENT_NETNS is not used in the net/core/filter.c and then not 
-get into the vmlinux's btf...
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-just pass -1 for now.
+On Thu,  7 Dec 2023 20:13:22 +0000 you wrote:
+> My prior patch went a bit too far, because apparently fib6_has_expires()
+> could be true while f6i->gc_link is not hashed yet.
+> 
+> fib6_set_expires_locked() can indeed set RTF_EXPIRES
+> while f6i->fib6_table is NULL.
+> 
+> Original syzbot reports were about corruptions caused
+> by dangling f6i->gc_link.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] ipv6: do not check fib6_has_expires() in fib6_info_release()
+    https://git.kernel.org/netdev/net-next/c/a3c205d0560f
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
