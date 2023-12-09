@@ -1,113 +1,191 @@
-Return-Path: <netdev+bounces-55547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C7CA80B3A1
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 11:38:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F53780B3AE
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 11:40:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E87B28102B
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 10:37:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07A74281028
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 10:40:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E79EC125B3;
-	Sat,  9 Dec 2023 10:37:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 206CE134A7;
+	Sat,  9 Dec 2023 10:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="yiNqIcAo"
+	dkim=pass (1024-bit key) header.d=siddh.me header.i=code@siddh.me header.b="lm9ZMG3d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C88EF9
-	for <netdev@vger.kernel.org>; Sat,  9 Dec 2023 02:37:53 -0800 (PST)
-Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-33340c50af9so2985799f8f.3
-        for <netdev@vger.kernel.org>; Sat, 09 Dec 2023 02:37:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702118272; x=1702723072; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RD+0dX0solrlL5ajoIfWf8xwttsASZtvCAvC75BHHzg=;
-        b=yiNqIcAorbLE8gPVMaNYzAqRgf3Oxsognt6rSqNOcbTDnugIIuN9xczlciOMkXqGHU
-         e4cx64Iw3ku9QyqDzWbA8eLNIR08t0k7m6g21n7uqLlrO1r+lVNKPRCuhrkiKN6onB0r
-         GzeH3rN8JPvyg2q4DMGv5DqQ5KgfBTsMkOhs5Iv8AKEi4pKwXo3OwrkmRl+/vLYCGUW9
-         7EInpmfmqk4xLpFU3T+RgtTz+4Chg8w7lAjngO2BS+Ll9B6U0XdHEzIpckCluq6T41Fk
-         FmuLDNWlFbN1nVZ1fO7UGZgazP8C5UOEOJ51umEfDcaMh7Q4rPiyzhTDdPe8Kwlb0FMS
-         tc+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702118272; x=1702723072;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RD+0dX0solrlL5ajoIfWf8xwttsASZtvCAvC75BHHzg=;
-        b=okefCuCUcriUjNkx0mjAcu/UOxiVF8F/FH72nfZrODUYeCeEmkTgZZA9rExim44h+r
-         qPR76peZ2b8Nrl+giJOql1RP3pVBwaovsUSmblji7F+zvxFRR1pbhs2o2bXS75+2Umzq
-         0VvRryW8bF+UhJlw8Uc8vPVQoQIeIcEvWMKk1oaTCDnqkuJJr4EknT+tMcuppNkK8Zpi
-         SAgYKaqN6tM+k3ERG4ovQ+eJqCXLctss+uY7NrxDtvoki5Q6L7B06ac+7wDY9LioO9BO
-         C21MmaRb5dI359c2/TE2D326fpdOCZocH8fxsG+QEPOTEd0eGMFw757C49SbfLfE8uBA
-         B0jg==
-X-Gm-Message-State: AOJu0YzBFnaFKHIC9Dp6Kkg9bLziXZaZ4PKG3tM/1wXSDT7w3arm5qtF
-	4z5aqnJP7ptuYD3kdhLNAws4xA==
-X-Google-Smtp-Source: AGHT+IFk+2Unu1gvHcfAXT+paZJlFyaYl71JIijh7SLpWTybjHo5ccJye9QRC46yEsRyZTAYHzNpaw==
-X-Received: by 2002:adf:a3d4:0:b0:333:2fd2:3bb3 with SMTP id m20-20020adfa3d4000000b003332fd23bb3mr609918wrb.108.1702118271996;
-        Sat, 09 Dec 2023 02:37:51 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id re14-20020a170907a2ce00b00a1f751d2ba4sm1359318ejc.99.2023.12.09.02.37.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Dec 2023 02:37:51 -0800 (PST)
-Date: Sat, 9 Dec 2023 11:37:50 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>,
-	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com, saeedm@nvidia.com, leon@kernel.org,
-	richardcochran@gmail.com, jonathan.lemon@gmail.com,
-	netdev@vger.kernel.org
-Subject: Re: [patch net-next] dpll: remove leftover mode_supported() op and
- use mode_get() instead
-Message-ID: <ZXRDfqlF/cf30N3V@nanopsycho>
-References: <20231207151204.1007797-1-jiri@resnulli.us>
- <49d5c768-2a05-4f20-99cf-a92aa378ebdd@linux.dev>
+Received: from sender-of-o51.zoho.in (sender-of-o51.zoho.in [103.117.158.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6077171F;
+	Sat,  9 Dec 2023 02:39:52 -0800 (PST)
+Delivered-To: code@siddh.me
+ARC-Seal: i=1; a=rsa-sha256; t=1702118382; cv=none; 
+	d=zohomail.in; s=zohoarc; 
+	b=AVrQ/ysMKMSAl5QtZnj9Z735CLkzpX4+J/HnIaqMQ0I6eMs1kT0XKLrfcoHq7cPcAPqOF4sz8HFkIRF3iFEfP2yZXhMPccx+iaWGxwq9HMW/BCDUJ7iCqHBv7pZYvl/zqbjLVLIUISlM8cyu5/5+RvjUNWLhMWA7jSqJxLL/AGw=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
+	t=1702118382; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=+bjE8y7qxzm5fd5c6hUxFUvplwzAKWfcAwdB+YAuia4=; 
+	b=GZFWV36SJXa1vhgfFvL9kYArIfhLHjJaWtCPGx+90GXMcDUqgcFkgzU0ciY5Gm5TYJK7cznXmPrXP1MkAF47yR43qUWBtwpBI4ZpVphPMh+wZ9z9wez2KrLNbIzvN4NRd6FrvbRX9OIobZ1MiOBBWT9nPS/S9rJSdwbXwkfvW7w=
+ARC-Authentication-Results: i=1; mx.zohomail.in;
+	dkim=pass  header.i=siddh.me;
+	spf=pass  smtp.mailfrom=code@siddh.me;
+	dmarc=pass header.from=<code@siddh.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1702118382;
+	s=zmail; d=siddh.me; i=code@siddh.me;
+	h=Message-ID:Date:Date:MIME-Version:To:To:Cc:Cc:References:Subject:Subject:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=+bjE8y7qxzm5fd5c6hUxFUvplwzAKWfcAwdB+YAuia4=;
+	b=lm9ZMG3dVggEF83WY35kHidw0ZhPHEHsYho8f4ddADgr3ioKWYE5kApWFpty78BB
+	4eYME6dBJ1DaANN4JUMTYrVkFCE1WEDn4N2lsgrl/IivupM0ubBcXK/NUxbAbrzXiaU
+	b1Z/SLUXAf0vKeToU0syFTTCkpVZX4gkl0r8pl/I=
+Received: from [192.168.1.12] (110.227.243.208 [110.227.243.208]) by mx.zoho.in
+	with SMTPS id 1702118381370822.2200951610104; Sat, 9 Dec 2023 16:09:41 +0530 (IST)
+Message-ID: <aa9e49a1-7450-4df4-8848-8b2b5a868c28@siddh.me>
+Date: Sat, 9 Dec 2023 16:09:33 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <49d5c768-2a05-4f20-99cf-a92aa378ebdd@linux.dev>
+User-Agent: Mozilla Thunderbird
+To: syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com
+Cc: code@siddh.me, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com
+References: <0000000000003e8971060c110bcc@google.com>
+Subject: Re: [syzbot] [net?] [nfc?] KASAN: slab-use-after-free Read in
+ nfc_alloc_send_skb
+Content-Language: en-US, en-GB, hi-IN
+From: Siddh Raman Pant <code@siddh.me>
+In-Reply-To: <0000000000003e8971060c110bcc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-Fri, Dec 08, 2023 at 01:06:34PM CET, vadim.fedorenko@linux.dev wrote:
->On 07/12/2023 15:12, Jiri Pirko wrote:
->> From: Jiri Pirko <jiri@nvidia.com>
->> 
->> Mode supported is currently reported to the user exactly the same, as
->> the current mode. That's because mode changing is not implemented.
->> Remove the leftover mode_supported() op and use mode_get() to fill up
->> the supported mode exposed to user.
->> 
->> One, if even, mode changing is going to be introduced, this could be
->> very easily taken back. In the meantime, prevent drivers form
->> implementing this in wrong way (as for example recent netdevsim
->> implementation attempt intended to do).
->> 
->
->I'm OK to remove from ptp_ocp part because it's really only one mode
->supported. But I would like to hear something from Arkadiusz about the
->plans to maybe implement mode change in ice?
+Final test
 
-As I wrote in the patch description, if ever there is going
-to be implementation, this could be very easily taken back. Now for
-sure there was already attempt to misimplement this :)
+#syz test https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
 
->
->> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
->> ---
->>   drivers/dpll/dpll_netlink.c                   | 16 +++++++-----
->>   drivers/net/ethernet/intel/ice/ice_dpll.c     | 26 -------------------
->>   .../net/ethernet/mellanox/mlx5/core/dpll.c    |  9 -------
->>   drivers/ptp/ptp_ocp.c                         |  8 ------
->>   include/linux/dpll.h                          |  3 ---
->>   5 files changed, 10 insertions(+), 52 deletions(-)
->> 
->
+---
+ net/nfc/llcp_core.c | 55 ++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 42 insertions(+), 13 deletions(-)
+
+diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+index 1dac28136e6a..0ae89ab42aaa 100644
+--- a/net/nfc/llcp_core.c
++++ b/net/nfc/llcp_core.c
+@@ -145,6 +145,13 @@ static void nfc_llcp_socket_release(struct nfc_llcp_local *local, bool device,
+ 
+ static struct nfc_llcp_local *nfc_llcp_local_get(struct nfc_llcp_local *local)
+ {
++	/* Since using nfc_llcp_local may result in usage of nfc_dev, whenever
++	 * we hold a reference to local, we also need to hold a reference to
++	 * the device to avoid UAF.
++	 */
++	if (!nfc_get_device(local->dev->idx))
++		return NULL;
++
+ 	kref_get(&local->ref);
+ 
+ 	return local;
+@@ -177,10 +184,18 @@ static void local_release(struct kref *ref)
+ 
+ int nfc_llcp_local_put(struct nfc_llcp_local *local)
+ {
++	struct nfc_dev *dev;
++	int ret;
++
+ 	if (local == NULL)
+ 		return 0;
+ 
+-	return kref_put(&local->ref, local_release);
++	dev = local->dev;
++
++	ret = kref_put(&local->ref, local_release);
++	nfc_put_device(dev);
++
++	return ret;
+ }
+ 
+ static struct nfc_llcp_sock *nfc_llcp_sock_get(struct nfc_llcp_local *local,
+@@ -930,9 +945,7 @@ static void nfc_llcp_recv_connect(struct nfc_llcp_local *local,
+ 
+ 	if (sk_acceptq_is_full(parent)) {
+ 		reason = LLCP_DM_REJ;
+-		release_sock(&sock->sk);
+-		sock_put(&sock->sk);
+-		goto fail;
++		goto fail_put_sock;
+ 	}
+ 
+ 	if (sock->ssap == LLCP_SDP_UNBOUND) {
+@@ -942,9 +955,7 @@ static void nfc_llcp_recv_connect(struct nfc_llcp_local *local,
+ 
+ 		if (ssap == LLCP_SAP_MAX) {
+ 			reason = LLCP_DM_REJ;
+-			release_sock(&sock->sk);
+-			sock_put(&sock->sk);
+-			goto fail;
++			goto fail_put_sock;
+ 		}
+ 
+ 		sock->ssap = ssap;
+@@ -953,14 +964,18 @@ static void nfc_llcp_recv_connect(struct nfc_llcp_local *local,
+ 	new_sk = nfc_llcp_sock_alloc(NULL, parent->sk_type, GFP_ATOMIC, 0);
+ 	if (new_sk == NULL) {
+ 		reason = LLCP_DM_REJ;
+-		release_sock(&sock->sk);
+-		sock_put(&sock->sk);
+-		goto fail;
++		goto fail_put_sock;
+ 	}
+ 
+ 	new_sock = nfc_llcp_sock(new_sk);
+-	new_sock->dev = local->dev;
++
+ 	new_sock->local = nfc_llcp_local_get(local);
++	if (!new_sock->local) {
++		reason = LLCP_DM_REJ;
++		goto fail_free_new_sock;
++	}
++
++	new_sock->dev = local->dev;
+ 	new_sock->rw = sock->rw;
+ 	new_sock->miux = sock->miux;
+ 	new_sock->nfc_protocol = sock->nfc_protocol;
+@@ -1004,8 +1019,13 @@ static void nfc_llcp_recv_connect(struct nfc_llcp_local *local,
+ 
+ 	return;
+ 
++fail_free_new_sock:
++	sock_put(&new_sock->sk);
++	nfc_llcp_sock_free(new_sock);
++fail_put_sock:
++	release_sock(&sock->sk);
++	sock_put(&sock->sk);
+ fail:
+-	/* Send DM */
+ 	nfc_llcp_send_dm(local, dsap, ssap, reason);
+ }
+ 
+@@ -1597,7 +1617,16 @@ int nfc_llcp_register_device(struct nfc_dev *ndev)
+ 	if (local == NULL)
+ 		return -ENOMEM;
+ 
+-	local->dev = ndev;
++	/* As we are going to initialize local's refcount, we need to get the
++	 * nfc_dev to avoid UAF, otherwise there is no point in continuing.
++	 * See nfc_llcp_local_get().
++	 */
++	local->dev = nfc_get_device(ndev->idx);
++	if (!local->dev) {
++		kfree(local);
++		return -ENODEV;
++	}
++
+ 	INIT_LIST_HEAD(&local->list);
+ 	kref_init(&local->ref);
+ 	mutex_init(&local->sdp_lock);
+-- 
+2.42.0
+
 
