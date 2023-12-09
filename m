@@ -1,224 +1,112 @@
-Return-Path: <netdev+bounces-55529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5EE580B319
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 09:15:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F306A80B358
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 10:05:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 354C21F211D3
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 08:15:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02E131C208F4
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 09:05:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62ACDC8E2;
-	Sat,  9 Dec 2023 08:15:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCE3079FD;
+	Sat,  9 Dec 2023 09:05:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="A/kVLwQI"
+	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="CH67JK0J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F319137;
-	Sat,  9 Dec 2023 00:15:18 -0800 (PST)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B984onV022969;
-	Sat, 9 Dec 2023 00:15:11 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=pfpt0220;
- bh=EVcOrvA1I3aNP1SHeVpDUNayuysOpaFv6oAonAxyMJA=;
- b=A/kVLwQIlveq8EVPnFqlvEsG95kxhlK6s6jUTm+S1l09HCzGQMWDqKsQWhUmrBhJHEBO
- QxKpAxEQfJ/LG5KNRC1Vg2bD8O+Vshd8uHRbqzOEUhdBEu5o+gcPjHB93yEPVaggOujs
- KWequEw9YSlwFAgKqp01//IwyYHJ7p1nQK4Ps50Hf6K9GY7Vw9eRSpja1XVmfiJ43/Sr
- ujKcW1S86GVTGIpELQ7bkSJQZg+IlehdmVg+KabRreFeStuS4PPCmjP+phB1/ixQS+YK
- MuY8j2jDbTDcXew6Minhc0jqz69iLw//iuHGFjL0lRBKH0s9f+KJy48BTKxo9y1i7rZj Dg== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3uubddfkhp-6
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Sat, 09 Dec 2023 00:15:11 -0800
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sat, 9 Dec
- 2023 00:15:03 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Sat, 9 Dec 2023 00:15:02 -0800
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id 5CA0B3F70CD;
-	Sat,  9 Dec 2023 00:15:02 -0800 (PST)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
-        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
-        <kheib@redhat.com>, <konguyen@redhat.com>,
-        Shinas Rasheed
-	<srasheed@marvell.com>,
-        Veerasenareddy Burru <vburru@marvell.com>,
-        "Sathesh
- Edara" <sedara@marvell.com>,
-        Eric Dumazet <edumazet@google.com>
-Subject: [PATCH net-next v2 4/4] octeon_ep: support firmware notifications for VFs
-Date: Sat, 9 Dec 2023 00:14:50 -0800
-Message-ID: <20231209081450.2613561-5-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231209081450.2613561-1-srasheed@marvell.com>
-References: <20231209081450.2613561-1-srasheed@marvell.com>
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89554EB
+	for <netdev@vger.kernel.org>; Sat,  9 Dec 2023 01:05:14 -0800 (PST)
+Received: by mail-oi1-x22f.google.com with SMTP id 5614622812f47-3b86f3cdca0so1976739b6e.3
+        for <netdev@vger.kernel.org>; Sat, 09 Dec 2023 01:05:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=theori.io; s=google; t=1702112714; x=1702717514; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LQlTLRhrKohgHPSzdkKxnLtFbPFcoNK5KCT+nLgvVuM=;
+        b=CH67JK0Jc8mUoau4RSC/OX8lgvANTnmZK59MhJNpn2GsqhfaY5k/BurSXCzs2iCvUI
+         zQ180dBJnGKz1AjwENppc498Y0JMZhji9pQJc1A6IGnPuLDLs3Y0azo8yt1bJnfR/Y+t
+         gxwS3aiPx7nyatF96RWTEzNJ9j5wNBA8SWxHE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702112714; x=1702717514;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LQlTLRhrKohgHPSzdkKxnLtFbPFcoNK5KCT+nLgvVuM=;
+        b=nmGgbha7gbwreCz1uOHZzA63l6/bg/q1pGcC6A7wh/sO5ZbUG8Dqk/ofCrsrzxGScm
+         NttLPCiShFce0eedd/gM94PW8YbOQcKi5bum58xmUG68cPexk3VSvZPyFj3ZJTONsfEj
+         1m/8yQkl/l+vEHImkklek2yMA2WouniYuNW5HatcUDP28coFJE45BJhpRL/0S1kM9zw0
+         h9W62mrsdNC9UpxOu5kUlfm4HHIxUYnG5a9SYT7+KX6ANXk84Q1WHVY8DRteGGGHhM4V
+         ZaIlpCJpGhy6Z6K2o5+uKWweyjXNw8xiWK3v+2/YflGxkMtiWg1G2gH/tR41ToSnc58u
+         srUw==
+X-Gm-Message-State: AOJu0Yyi/hiZlMXgx7MzbCcAFqQGtNTMBvK07YYOT283zLig3XoIGn9d
+	nFMR4btQKtKohwWMga43/HeV0g==
+X-Google-Smtp-Source: AGHT+IG9ur6DebYr4Ipb1d9LxsjsMef1uAD5lADFrUvEoy9QM3YO/+CYkICSCHz+fy5sjio7Wed4kg==
+X-Received: by 2002:a05:6808:17a7:b0:3b9:ee89:540b with SMTP id bg39-20020a05680817a700b003b9ee89540bmr1839142oib.67.1702112713842;
+        Sat, 09 Dec 2023 01:05:13 -0800 (PST)
+Received: from v4bel-B760M-AORUS-ELITE-AX ([211.219.71.65])
+        by smtp.gmail.com with ESMTPSA id i4-20020a62c104000000b006ceba4953f6sm2978096pfg.8.2023.12.09.01.05.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 Dec 2023 01:05:13 -0800 (PST)
+Date: Sat, 9 Dec 2023 04:05:09 -0500
+From: Hyunwoo Kim <v4bel@theori.io>
+To: davem@davemloft.net, kuba@kernel.org
+Cc: v4bel@theori.io, imv4bel@gmail.com, edumazet@google.com,
+	pabeni@redhat.com, netdev@vger.kernel.org
+Subject: [PATCH net v2] atm: Fix Use-After-Free in do_vcc_ioctl
+Message-ID: <20231209090509.GA401342@v4bel-B760M-AORUS-ELITE-AX>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: VdLjfmQdxx_8RMUtG-LkekZ_u_CHeh9H
-X-Proofpoint-GUID: VdLjfmQdxx_8RMUtG-LkekZ_u_CHeh9H
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Notifications from firmware to vf has to pass through PF
-control mbox and via PF-VF mailboxes. The notifications have to
-be parsed out from the control mbox and passed to the
-PF-VF mailbox in order to reach the corresponding VF.
-Version compatibility should also be checked before messages
-are passed to the mailboxes.
+Because do_vcc_ioctl() accesses sk->sk_receive_queue
+without holding a sk->sk_receive_queue.lock, it can
+cause a race with vcc_recvmsg().
+A use-after-free for skb occurs with the following flow.
+```
+do_vcc_ioctl() -> skb_peek()
+vcc_recvmsg() -> skb_recv_datagram() -> skb_free_datagram()
+```
+Add sk->sk_receive_queue.lock to do_vcc_ioctl() to fix this issue.
 
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
 ---
-V2:
-  - No changes
+v1 -> v2: Change the code style
+---
+ net/atm/ioctl.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-V1: https://lore.kernel.org/all/20231208070352.2606192-5-srasheed@marvell.com/
-
- .../marvell/octeon_ep/octep_ctrl_net.c        |  6 ++
- .../marvell/octeon_ep/octep_pfvf_mbox.c       | 58 +++++++++++++++++++
- .../marvell/octeon_ep/octep_pfvf_mbox.h       |  2 +
- 3 files changed, 66 insertions(+)
-
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-index 9dff2166dbb7..01b7be154c38 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-@@ -13,6 +13,7 @@
- #include "octep_config.h"
- #include "octep_main.h"
- #include "octep_ctrl_net.h"
-+#include "octep_pfvf_mbox.h"
+diff --git a/net/atm/ioctl.c b/net/atm/ioctl.c
+index 838ebf0cabbf..b7684abcf458 100644
+--- a/net/atm/ioctl.c
++++ b/net/atm/ioctl.c
+@@ -72,15 +72,18 @@ static int do_vcc_ioctl(struct socket *sock, unsigned int cmd,
+ 		goto done;
+ 	case SIOCINQ:
+ 	{
++		long amount;
+ 		struct sk_buff *skb;
  
- /* Control plane version */
- #define OCTEP_CP_VERSION_CURRENT	OCTEP_CP_VERSION(1, 0, 0)
-@@ -329,6 +330,11 @@ static int process_mbox_notify(struct octep_device *oct,
- 	    octep_ctrl_net_f2h_cmd_versions[cmd] < OCTEP_CP_VERSION_CURRENT)
- 		return -EOPNOTSUPP;
- 
-+	if (msg->hdr.s.is_vf) {
-+		octep_pfvf_notify(oct, msg);
-+		return 0;
-+	}
-+
- 	switch (cmd) {
- 	case OCTEP_CTRL_NET_F2H_CMD_LINK_STATUS:
- 		if (netif_running(netdev)) {
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
-index 57e0184840c2..387a07456f54 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
-@@ -22,6 +22,15 @@
- #include "octep_pfvf_mbox.h"
- #include "octep_ctrl_net.h"
- 
-+/* When a new command is implemented, the below table should be updated
-+ * with new command and it's version info.
-+ */
-+static u32 pfvf_cmd_versions[OCTEP_PFVF_MBOX_CMD_MAX] = {
-+	[0 ... OCTEP_PFVF_MBOX_CMD_DEV_REMOVE] = OCTEP_PFVF_MBOX_VERSION_V1,
-+	[OCTEP_PFVF_MBOX_CMD_GET_FW_INFO ... OCTEP_PFVF_MBOX_NOTIF_LINK_STATUS] =
-+		OCTEP_PFVF_MBOX_VERSION_V2
-+};
-+
- static void octep_pfvf_validate_version(struct octep_device *oct,  u32 vf_id,
- 					union octep_pfvf_mbox_word cmd,
- 					union octep_pfvf_mbox_word *rsp)
-@@ -88,6 +97,34 @@ static void octep_pfvf_set_rx_state(struct octep_device *oct, u32 vf_id,
- 	rsp->s_link_state.type = OCTEP_PFVF_MBOX_TYPE_RSP_ACK;
- }
- 
-+static int octep_send_notification(struct octep_device *oct, u32 vf_id,
-+				   union octep_pfvf_mbox_word cmd)
-+{
-+	u32 max_rings_per_vf, vf_mbox_queue;
-+	struct octep_mbox *mbox;
-+
-+	/* check if VF PF Mailbox is compatible for this notification */
-+	if (pfvf_cmd_versions[cmd.s.opcode] > oct->vf_info[vf_id].mbox_version) {
-+		dev_dbg(&oct->pdev->dev, "VF Mbox doesn't support Notification:%d on VF ver:%d\n",
-+			cmd.s.opcode, oct->vf_info[vf_id].mbox_version);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	max_rings_per_vf = CFG_GET_MAX_RPVF(oct->conf);
-+	vf_mbox_queue = vf_id * max_rings_per_vf;
-+	if (!oct->mbox[vf_mbox_queue]) {
-+		dev_err(&oct->pdev->dev, "Notif obtained for bad mbox vf %d\n", vf_id);
-+		return -EINVAL;
-+	}
-+	mbox = oct->mbox[vf_mbox_queue];
-+
-+	mutex_lock(&mbox->lock);
-+	writeq(cmd.u64, mbox->pf_vf_data_reg);
-+	mutex_unlock(&mbox->lock);
-+
-+	return 0;
-+}
-+
- static void octep_pfvf_set_mtu(struct octep_device *oct, u32 vf_id,
- 			       union octep_pfvf_mbox_word cmd,
- 			       union octep_pfvf_mbox_word *rsp)
-@@ -327,6 +364,27 @@ static void octep_pfvf_pf_get_data(struct octep_device *oct,
+ 		if (sock->state != SS_CONNECTED) {
+ 			error = -EINVAL;
+ 			goto done;
+ 		}
++		spin_lock_irq(&sk->sk_receive_queue.lock);
+ 		skb = skb_peek(&sk->sk_receive_queue);
+-		error = put_user(skb ? skb->len : 0,
+-				 (int __user *)argp) ? -EFAULT : 0;
++		amount = skb ? skb->len : 0;
++		spin_unlock_irq(&sk->sk_receive_queue.lock);
++		error = put_user(amount, (int __user *)argp) ? -EFAULT : 0;
+ 		goto done;
  	}
- }
- 
-+void octep_pfvf_notify(struct octep_device *oct, struct octep_ctrl_mbox_msg *msg)
-+{
-+	union octep_pfvf_mbox_word notif = { 0 };
-+	struct octep_ctrl_net_f2h_req *req;
-+
-+	req = (struct octep_ctrl_net_f2h_req *)msg->sg_list[0].msg;
-+	switch (req->hdr.s.cmd) {
-+	case OCTEP_CTRL_NET_F2H_CMD_LINK_STATUS:
-+		notif.s_link_status.opcode = OCTEP_PFVF_MBOX_NOTIF_LINK_STATUS;
-+		notif.s_link_status.status = req->link.state;
-+		break;
-+	default:
-+		pr_info("Unknown mbox notif for vf: %u\n",
-+			req->hdr.s.cmd);
-+		return;
-+	}
-+
-+	notif.s.type = OCTEP_PFVF_MBOX_TYPE_CMD;
-+	octep_send_notification(oct, msg->hdr.s.vf_idx, notif);
-+}
-+
- void octep_pfvf_mbox_work(struct work_struct *work)
- {
- 	struct octep_pfvf_mbox_wk *wk = container_of(work, struct octep_pfvf_mbox_wk, work);
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h
-index c18a9f26fc31..0dc6eead292a 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h
-@@ -37,6 +37,7 @@ enum octep_pfvf_mbox_opcode {
- 	OCTEP_PFVF_MBOX_CMD_DEV_REMOVE,
- 	OCTEP_PFVF_MBOX_CMD_GET_FW_INFO,
- 	OCTEP_PFVF_MBOX_CMD_SET_OFFLOADS,
-+	OCTEP_PFVF_MBOX_NOTIF_LINK_STATUS,
- 	OCTEP_PFVF_MBOX_CMD_MAX,
- };
- 
-@@ -162,4 +163,5 @@ union octep_pfvf_mbox_word {
- void octep_pfvf_mbox_work(struct work_struct *work);
- int octep_setup_pfvf_mbox(struct octep_device *oct);
- void octep_delete_pfvf_mbox(struct octep_device *oct);
-+void octep_pfvf_notify(struct octep_device *oct, struct octep_ctrl_mbox_msg *msg);
- #endif
+ 	case ATM_SETSC:
 -- 
 2.25.1
 
