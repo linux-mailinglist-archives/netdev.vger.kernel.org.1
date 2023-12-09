@@ -1,101 +1,211 @@
-Return-Path: <netdev+bounces-55578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A13AD80B6F1
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 23:51:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3554380B796
+	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 00:29:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 415C51F21013
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 22:51:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFE1A280F35
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 23:29:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3636D1C68D;
-	Sat,  9 Dec 2023 22:51:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7F6B1EA7E;
+	Sat,  9 Dec 2023 23:29:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I3tpzAHz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b6Hyp1OB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3E63115;
-	Sat,  9 Dec 2023 14:51:38 -0800 (PST)
-Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-3332ad5b3e3so3170159f8f.2;
-        Sat, 09 Dec 2023 14:51:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702162297; x=1702767097; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jiKQMydv0yccuw3WqYLVo3Netyg+0OTtTTWArCeoSKY=;
-        b=I3tpzAHzzJPp2aZUlnspAbs+YrXXvhGV4/fWlAuJQdsGhhMA6uRo1GDLO3ujL1nhG3
-         N3mdoUf2m+GMtcPj79CaKwtveDfRTztVC4saeivZ/h1L1h7U1aRnECNHRVpenmSrF9mE
-         VmfWmkcNZBsvRCgQzFb8eWSi8uvn7LmbZoMh/4VcONYQYDHg59OGGmP5Ca6lENA0MLMp
-         AG8Kcm1+FcSRr9MeA49BsYgQ5X3xEw7Kog6QNyql6j0CIOWhNHX7vOBgQf+Pkjdbk6Bw
-         mjZzlpUObTcthoWdHCNR2TUvzxsO1ttlEXYOQM7a7up9iAE/t1EBAOcrNOlygoBsgTRw
-         x3Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702162297; x=1702767097;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jiKQMydv0yccuw3WqYLVo3Netyg+0OTtTTWArCeoSKY=;
-        b=iKNVrPz6+vWFiGxVatWq39OlKxiHEidAzHiC4O/bGj4aC0zoVRYl+8v8yd+QvRta+1
-         +OhWQBki1uIlF/HSJbpM3Dr4vd7klcwouTgoEozMQnn8CGiuKkqZPeb+Z/b7NW7K/imI
-         GK8T+mDLLMrA/qFZYkJF57Ih9tj/9DzZoFx9buJtBN3/31bZ+jq5K5JN6jorJ4b5qIro
-         aM4I9IwzP0eZWHoeKJcYu0OnUt2Esrv5bCEMFrsNDUQr93BDsRgj7x1o0DYngK8W9vv3
-         mmzHm3vV3en0Pb/m4h5zbgLSeZClRLpLT2werppldSTe5prylj1xcf9EvXCFgX/KOLHr
-         hA1g==
-X-Gm-Message-State: AOJu0YxVdtMUoUQBtqqKlVa+sNm0rY87Aq5G7E705xMD7J9bNzEKRvu+
-	j23wWBgdjTsoc8GAi0b2/v8=
-X-Google-Smtp-Source: AGHT+IF5XBRzg6/xP8NjgYbvmYKrwvHLZUyBo/spRGo9BW2cjYArKW/xqCqXEeiK7aMEBoXd/nu8SQ==
-X-Received: by 2002:a05:6000:4d0:b0:332:eeba:ee8b with SMTP id h16-20020a05600004d000b00332eebaee8bmr913794wri.24.1702162296902;
-        Sat, 09 Dec 2023 14:51:36 -0800 (PST)
-Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id w14-20020a5d608e000000b003333c2c313bsm5157467wrt.100.2023.12.09.14.51.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Dec 2023 14:51:36 -0800 (PST)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Tariq Toukan <tariqt@nvidia.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] mlx4: Fix spelling mistake: "mape" -> "map"
-Date: Sat,  9 Dec 2023 22:51:35 +0000
-Message-Id: <20231209225135.4055334-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.39.2
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 645C379C6;
+	Sat,  9 Dec 2023 23:29:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DB64C433C8;
+	Sat,  9 Dec 2023 23:29:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702164551;
+	bh=c9kOjfPZi63X+asNNxhMNmUxQDfFEzKNIVa3FVoqTpU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=b6Hyp1OBNvus/wYWvXxgvsrIZmxWDbJmG7M94TiargWR0ivsB/QtcAV15++RbJpw4
+	 0aBA5M26kNQea5FdiS2dxZto+AGylSMARPzNHWPxVoeLKiA0l6cIpNgoAMvW7REZqh
+	 c2PQK/kmpYgy9PugIfR9kwNsrZdY4LqqihHztRYSxkc0KCU4dNqt/0Wv0kcB+cWFox
+	 YUDbgRYcK7BMoi+NkWVzj/MJSIR5RKcu5gsSTeGkzfQCwahZHG3Vhh7dbv3fYM7C0m
+	 IQsB2hHL6ZcSA5LR7vaDJi4nu1TqHUL4AZvEpnYmBrscOL9JKv+KMYpX68+ufgKMLS
+	 bL2ldjH3T1UQA==
+Message-ID: <279a2999-3c0a-4839-aa2e-602864197410@kernel.org>
+Date: Sat, 9 Dec 2023 16:29:09 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next v1 06/16] netdev: support binding dma-buf to netdevice
+Content-Language: en-US
+To: Mina Almasry <almasrymina@google.com>
+Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ bpf@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann
+ <arnd@arndb.de>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeelb@google.com>, Willem de Bruijn <willemb@google.com>,
+ Kaiyuan Zhang <kaiyuanz@google.com>
+References: <20231208005250.2910004-1-almasrymina@google.com>
+ <20231208005250.2910004-7-almasrymina@google.com>
+ <5752508c-f7bc-44ac-8778-c807b2ee5831@kernel.org>
+ <CAHS8izPsQ2XoJy-vYWkn051Yc=D_kSprtQcG4mmPutf1G3+-aw@mail.gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <CAHS8izPsQ2XoJy-vYWkn051Yc=D_kSprtQcG4mmPutf1G3+-aw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-There is a spelling mistake in a mlx4_err error message. Fix it.
+On 12/8/23 12:22 PM, Mina Almasry wrote:
+> On Fri, Dec 8, 2023 at 9:48 AM David Ahern <dsahern@kernel.org> wrote:
+>>
+>> On 12/7/23 5:52 PM, Mina Almasry wrote:
+> ...
+>>> +
+>>> +     xa_for_each(&binding->bound_rxq_list, xa_idx, rxq) {
+>>> +             if (rxq->binding == binding) {
+>>> +                     /* We hold the rtnl_lock while binding/unbinding
+>>> +                      * dma-buf, so we can't race with another thread that
+>>> +                      * is also modifying this value. However, the driver
+>>> +                      * may read this config while it's creating its
+>>> +                      * rx-queues. WRITE_ONCE() here to match the
+>>> +                      * READ_ONCE() in the driver.
+>>> +                      */
+>>> +                     WRITE_ONCE(rxq->binding, NULL);
+>>> +
+>>> +                     rxq_idx = get_netdev_rx_queue_index(rxq);
+>>> +
+>>> +                     netdev_restart_rx_queue(binding->dev, rxq_idx);
+>>
+>> Blindly restarting a queue when a dmabuf is heavy handed. If the dmabuf
+>> has no outstanding references (ie., no references in the RxQ), then no
+>> restart is needed.
+>>
+> 
+> I think I need to stop the queue while binding to a dmabuf for the
+> sake of concurrency, no? I.e. the softirq thread may be delivering a
+> packet, and in parallel a separate thread holds rtnl_lock and tries to
+> bind the dma-buf. At that point the page_pool recreation will race
+> with the driver doing page_pool_alloc_page(). I don't think I can
+> insert a lock to handle this into the rx fast path, no?
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- drivers/net/ethernet/mellanox/mlx4/main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I think it depends on the details of how entries are added and removed
+from the pool. I am behind on the pp details at this point, so I do need
+to do some homework.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/main.c b/drivers/net/ethernet/mellanox/mlx4/main.c
-index 2581226836b5..43cbe4e5d0c4 100644
---- a/drivers/net/ethernet/mellanox/mlx4/main.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/main.c
-@@ -1508,7 +1508,7 @@ static int mlx4_port_map_set(struct mlx4_dev *dev, struct mlx4_port_map *v2p)
- 			priv->v2p.port1 = port1;
- 			priv->v2p.port2 = port2;
- 		} else {
--			mlx4_err(dev, "Failed to change port mape: %d\n", err);
-+			mlx4_err(dev, "Failed to change port map: %d\n", err);
- 		}
- 	}
- 
--- 
-2.39.2
+> 
+> Also, this sounds like it requires (lots of) more changes. The
+> page_pool + driver need to report how many pending references there
+> are (with locking so we don't race with incoming packets), and have
+> them reported via an ndo so that we can skip restarting the queue.
+> Implementing the changes in to a huge issue but handling the
+> concurrency may be a genuine blocker. Not sure it's worth the upside
+> of not restarting the single rx queue?
+
+It has to do with the usability of this overall solution. As I mentioned
+most ML use cases can (and will want to) use many memory allocations for
+receiving packets - e.g., allocations per message and receiving multiple
+messages per socket connection.
+
+> 
+>>> +             }
+>>> +     }
+>>> +
+>>> +     xa_erase(&netdev_dmabuf_bindings, binding->id);
+>>> +
+>>> +     netdev_dmabuf_binding_put(binding);
+>>> +}
+>>> +
+>>> +int netdev_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
+>>> +                             struct netdev_dmabuf_binding *binding)
+>>> +{
+>>> +     struct netdev_rx_queue *rxq;
+>>> +     u32 xa_idx;
+>>> +     int err;
+>>> +
+>>> +     rxq = __netif_get_rx_queue(dev, rxq_idx);
+>>> +
+>>> +     if (rxq->binding)
+>>> +             return -EEXIST;
+>>> +
+>>> +     err = xa_alloc(&binding->bound_rxq_list, &xa_idx, rxq, xa_limit_32b,
+>>> +                    GFP_KERNEL);
+>>> +     if (err)
+>>> +             return err;
+>>> +
+>>> +     /* We hold the rtnl_lock while binding/unbinding dma-buf, so we can't
+>>> +      * race with another thread that is also modifying this value. However,
+>>> +      * the driver may read this config while it's creating its * rx-queues.
+>>> +      * WRITE_ONCE() here to match the READ_ONCE() in the driver.
+>>> +      */
+>>> +     WRITE_ONCE(rxq->binding, binding);
+>>> +
+>>> +     err = netdev_restart_rx_queue(dev, rxq_idx);
+>>
+>> Similarly, here binding a dmabuf to a queue. I was expecting the dmabuf
+>> binding to add entries to the page pool for the queue.
+> 
+> To be honest, I think maybe there's a slight disconnect between how
+> you think the page_pool works, and my primitive understanding of how
+> it works. Today, I see a 1:1 mapping between rx-queue and page_pool in
+> the code. I don't see 1:many or many:1 mappings.
+
+I am not referring to 1:N or N:1 for page pool and queues. I am
+referring to entries within a single page pool for a single Rx queue.
+
+
+> 
+> In theory mapping 1 rx-queue to n page_pools is trivial: the driver
+> can call page_pool_create() multiple times to generate n queues and
+> decide for incoming packets which one to use.
+> 
+> However, mapping n rx-queues to 1 page_pool seems like a can of worms.
+> I see code in the page_pool that looks to me (and Willem) like it's
+> safe only because the page_pool is used from the same napi context.
+> with a n rx-queueue: 1 page_pool mapping, that is no longer true, no?
+> There is a tail end of issues to resolve to be able to map 1 page_pool
+> to n queues as I understand and even if resolved I'm not sure the
+> maintainers are interested in taking the code.
+> 
+> So, per my humble understanding there is no such thing as "add entries
+> to the page pool for the (specific) queue", the page_pool is always
+> used by 1 queue.
+> 
+> Note that even though this limitation exists, we still support binding
+> 1 dma-buf to multiple queues, because multiple page pools can use the
+> same netdev_dmabuf_binding. I should add that to the docs.
+> 
+>> If the pool was
+>> previously empty, then maybe the queue needs to be "started" in the
+>> sense of creating with h/w or just pushing buffers into the queue and
+>> moving the pidx.
+>>
+>>
+> 
+> I don't think it's enough to add buffers to the page_pool, no? The
+> existing buffers in the page_pool (host mem) must be purged. I think
+> maybe the queue needs to be stopped as well so that we don't race with
+> incoming packets and end up with skbs with devmem and non-devmem frags
+> (unless you're thinking it becomes a requirement to support that, I
+> think things are complicated as-is and it's a good simplification).
+> When we already purge the existing buffers & restart the queue, it's
+> little effort to migrate this to become in line with Jakub's queue-api
+> that he also wants to use for per-queue configuration & ndo_stop/open.
+> 
 
 
