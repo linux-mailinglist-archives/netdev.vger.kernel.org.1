@@ -1,125 +1,122 @@
-Return-Path: <netdev+bounces-55552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D1AD80B3DF
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 12:03:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17F4080B3E2
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 12:05:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F84FB20A99
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 11:03:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49AA11C20992
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 11:05:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0A6013ADE;
-	Sat,  9 Dec 2023 11:03:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06BE613FE6;
+	Sat,  9 Dec 2023 11:05:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ApGBqD90"
+	dkim=pass (1024-bit key) header.d=siddh.me header.i=code@siddh.me header.b="nGaHO5hV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CF0010E0
-	for <netdev@vger.kernel.org>; Sat,  9 Dec 2023 03:03:41 -0800 (PST)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-40c2db0ca48so20155e9.1
-        for <netdev@vger.kernel.org>; Sat, 09 Dec 2023 03:03:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702119819; x=1702724619; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qI6xmx95agIR2TNeVHdA7LNV7ZwckJuCguJdbZbP9lc=;
-        b=ApGBqD90wH7R16aLVblV8x+8edLzMKLBOojQ0HAmFtPOzcRWXp3jRH6GvESaNy1E2l
-         4lbGs58b7+OPuRZEShypax3Rvkn2QIATvuw3yRY1e96+wgAYyMC9zFY5ov0aPiAfVZxz
-         fDg9NjRQi4mG9QyP7H+bJpPcqguLSrgebpDW4na1aqfQ0VqAsJNssJst+Guby0SfJ1bM
-         ibb671oYyKAgHVOvU5yygJy5EKB9aic4VYeaCdzKi9/KLrw2C5QiVnESHthsLhYTva0H
-         m0j9/16OIir3HLPs4SIDTgSSR7YVkdLY+5Pr+8brq7FdV5mA7KaJwy1bEbZZuPTBC2Vl
-         m/Rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702119819; x=1702724619;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qI6xmx95agIR2TNeVHdA7LNV7ZwckJuCguJdbZbP9lc=;
-        b=l4q5lBHFIw8TckcwO+W6gzFzdy0lI94207YizsmKDg7G6FOB6SXbS6238MOJSV7mb7
-         VHxUTeZXHUHBw5+qIbmfymUhFGNaKY4tkpA7whpM8C/+9lISUqJudy50kPQDZmdpvdYR
-         xGmomX1JO7aP+O1qBcX7uqSJ7g5iRKy6d97KjUfXyHt5vL4ddxNrdtYBF2h5tyO/b3wK
-         zQlE7KSfPcl43M+Kyy/IWL51qMq2tKcipYwhi4kc5vjXRW7U40oIchtDkhAOTC4lvCgB
-         CdLUkq+t3TTPjFTZHM8qaJVKm1wV1K/vrG2XjcQIveBFNAjQ0Nbtjovg5nYDVVNlDFW4
-         kY4Q==
-X-Gm-Message-State: AOJu0Yw987GGJElId7qMt5wEwRAaqd8NOjul+Xnr37DzmmVB14sje1D2
-	+DliT4NFJSR4uatuNhe+MH1HR3KlJfeZvGSzmoUqnA==
-X-Google-Smtp-Source: AGHT+IF+yEW6SmM51p0Q2+P3Tb1NdPqtpvvdtQwM30w+bdl8MkJkX2SdlEiWzaRVnf9pIEZBDpuEsHP67vv7B25i4rc=
-X-Received: by 2002:a05:600c:2804:b0:40b:2ec6:2a87 with SMTP id
- m4-20020a05600c280400b0040b2ec62a87mr125095wmb.5.1702119819398; Sat, 09 Dec
- 2023 03:03:39 -0800 (PST)
+Received: from sender-of-o51.zoho.in (sender-of-o51.zoho.in [103.117.158.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05C3210E0;
+	Sat,  9 Dec 2023 03:05:07 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1702119865; cv=none; 
+	d=zohomail.in; s=zohoarc; 
+	b=ePOROXgNLRYfFMrTZ5fDHg5lgnPbYUnvAeaUNEM4fFG5a7y07UN1sEFQZhBqWX9PwLwYlSapL48xoq/pDmDjZOST5VFx62eF/rmwLoeSoQ8tA0DBs/arV8vpbS/5Utm4CyKjSj6hlXK7lnc+vZNkX1UV18+eGajihZkzCsfnV0c=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
+	t=1702119865; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=MXhcSyzmKjfefxZKd0I1TvledRLZO0z+eiFwOUBU9X0=; 
+	b=J+T5te1OKoXrwhQBT7ujz99ae6gpizDOyNjLJaKxADZZNOiyus6mT+uccK2qKCzkLFEJvse5HciZ8l7cytkG7wnhH56PNqL4oqYY5JjoddaYyRcpolgxzxZn/rq/8vo+5nFwoODihhpV74txIaPwWoBgfnjUvmYXIvrJGGDnFw0=
+ARC-Authentication-Results: i=1; mx.zohomail.in;
+	dkim=pass  header.i=siddh.me;
+	spf=pass  smtp.mailfrom=code@siddh.me;
+	dmarc=pass header.from=<code@siddh.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1702119865;
+	s=zmail; d=siddh.me; i=code@siddh.me;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=MXhcSyzmKjfefxZKd0I1TvledRLZO0z+eiFwOUBU9X0=;
+	b=nGaHO5hVfYcm2an8TgYyWoah4TxDbCu1IvMOt7goaGPveqF9i5mza2okyVUYiixR
+	NSfIm9oMoyqAJd5I3Jxn01Zx9bWw8FeAXYz3nkS+50y89awTJ8aipmUb51n/pS9VCTO
+	b0crK/ArjlFDJEqK8P6719mNBQMorY+8x82UeEDo=
+Received: from kampyooter.. (110.227.243.208 [110.227.243.208]) by mx.zoho.in
+	with SMTPS id 1702119864675642.5508323354376; Sat, 9 Dec 2023 16:34:24 +0530 (IST)
+From: Siddh Raman Pant <code@siddh.me>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Suman Ghosh <sumang@marvell.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v4 0/2] nfc: Fix UAF during datagram sending caused by missing refcounting
+Date: Sat,  9 Dec 2023 16:34:19 +0530
+Message-ID: <cover.1702118242.git.code@siddh.me>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231208182049.33775-1-dipiets@amazon.com>
-In-Reply-To: <20231208182049.33775-1-dipiets@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 9 Dec 2023 12:03:25 +0100
-Message-ID: <CANn89i+BNkkg1nauBiKH-CfjFHOaR_56Fq6d1PiQ1TSXdFUCAw@mail.gmail.com>
-Subject: Re: [PATCH] tcp: disable tcp_autocorking for socket when TCP_NODELAY
- flag is set
-To: Salvatore Dipietro <dipiets@amazon.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, blakgeof@amazon.com, 
-	alisaidi@amazon.com, benh@amazon.com, dipietro.salvatore@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-On Fri, Dec 8, 2023 at 7:23=E2=80=AFPM Salvatore Dipietro <dipiets@amazon.c=
-om> wrote:
->
-> Based on the tcp man page, if TCP_NODELAY is set, it disables Nagle's alg=
-orithm
-> and packets are sent as soon as possible. However in the `tcp_push` funct=
-ion
-> where autocorking is evaluated the `nonagle` value set by TCP_NODELAY is =
-not
-> considered which can trigger unexpected corking of packets and induce del=
-ays.
->
-> For example, if two packets are generated as part of a server's reply, if=
- the
-> first one is not transmitted on the wire quickly enough, the second packe=
-t can
-> trigger the autocorking in `tcp_push` and be delayed instead of sent as s=
-oon as
-> possible. It will either wait for additional packets to be coalesced or a=
-n ACK
-> from the client before transmitting the corked packet. This can interact =
-badly
-> if the receiver has tcp delayed acks enabled, introducing 40ms extra dela=
-y in
-> completion times. It is not always possible to control who has delayed ac=
-ks
-> set, but it is possible to adjust when and how autocorking is triggered.
-> Patch prevents autocorking if the TCP_NODELAY flag is set on the socket.
->
-> Patch has been tested using an AWS c7g.2xlarge instance with Ubuntu 22.04=
- and
-> Apache Tomcat 9.0.83 running the basic servlet below:
->
-> import java.io.IOException;
-> import java.io.OutputStreamWriter;
-> import java.io.PrintWriter;
-> import javax.servlet.ServletException;
-> import javax.servlet.http.HttpServlet;
-> import javax.servlet.http.HttpServletRequest;
-> import javax.servlet.http.HttpServletResponse;
->
-> Signed-off-by: Salvatore Dipietro <dipiets@amazon.com>
-> ---
+(Very sorry for the delay in sending this.)
 
-Very nice catch.
+For connectionless transmission, llcp_sock_sendmsg() codepath will
+eventually call nfc_alloc_send_skb() which takes in an nfc_dev as
+an argument for calculating the total size for skb allocation.
 
-I suggest this patch lands in net tree, what about we add a Fixes: tag ?
+virtual_ncidev_close() codepath eventually releases socket by calling
+nfc_llcp_socket_release() (which sets the sk->sk_state to LLCP_CLOSED)
+and afterwards the nfc_dev will be eventually freed.
 
-Fixes: f54b311142a9 ("tcp: auto corking")
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+When an ndev gets freed, llcp_sock_sendmsg() will result in an
+use-after-free as it
 
-Thanks !
+(1) doesn't have any checks in place for avoiding the datagram sending.
+
+(2) calls nfc_llcp_send_ui_frame(), which also has a do-while loop
+    which can race with freeing. This loop contains the call to
+    nfc_alloc_send_skb() where we dereference the nfc_dev pointer.
+
+nfc_dev is being freed because we do not hold a reference to it when
+we hold a reference to llcp_local. Thus, virtual_ncidev_close()
+eventually calls nfc_release() due to refcount going to 0.
+
+Since state has to be LLCP_BOUND for datagram sending, we can bail out
+early in llcp_sock_sendmsg().
+
+Please review and let me know if any errors are there, and hopefully
+this gets accepted.
+
+Thanks,
+Siddh
+
+Changes in v4:
+- Fix put ordering and comments.
+- Separate freeing in recv() into end labels.
+- Remove obvious comment and add reasoning.
+- Picked up r-bs by Suman.
+
+Changes in v3:
+- Fix missing freeing statements.
+
+Changes in v2:
+- Add net-next in patch subject.
+- Removed unnecessary extra lock and hold nfc_dev ref when holding llcp_sock.
+- Remove last formatting patch.
+- Picked up r-b from Krzysztof for LLCP_BOUND patch.
+
+Siddh Raman Pant (2):
+  nfc: llcp_core: Hold a ref to llcp_local->dev when holding a ref to
+    llcp_local
+  nfc: Do not send datagram if socket state isn't LLCP_BOUND
+
+ net/nfc/llcp_core.c | 55 ++++++++++++++++++++++++++++++++++-----------
+ net/nfc/llcp_sock.c |  5 +++++
+ 2 files changed, 47 insertions(+), 13 deletions(-)
+
+-- 
+2.42.0
+
 
