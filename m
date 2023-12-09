@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-55561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA63580B557
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 18:02:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17D9E80B55C
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 18:05:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65B932811EE
-	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 17:02:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB8141F21175
+	for <lists+netdev@lfdr.de>; Sat,  9 Dec 2023 17:05:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 759FB168D2;
-	Sat,  9 Dec 2023 17:02:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BEEA17722;
+	Sat,  9 Dec 2023 17:05:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DB/SMpLN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kuW3s/gq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571592563
-	for <netdev@vger.kernel.org>; Sat,  9 Dec 2023 17:02:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E851C433C7;
-	Sat,  9 Dec 2023 17:02:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6B5187C
+	for <netdev@vger.kernel.org>; Sat,  9 Dec 2023 17:05:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9783C433C7;
+	Sat,  9 Dec 2023 17:04:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702141368;
-	bh=nRJiA/c/xx7fFzg+0MvluRUxFBY1g4LX9RtAoR1rb7o=;
+	s=k20201202; t=1702141504;
+	bh=23L3WN6QiOepynHV4/l1rgY8ayFp8shdyR9qFwIfo4U=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DB/SMpLN3+TSmIJTzyBHUsFWgUxwjdSaEWhrwKajdPhTmjj29bhCaUo+Zw8tMAcBU
-	 r738kfP9NIslgrbcsmvxqIQCp9Ml+JACSPnN8T+2l7A3Up0BZmxk537Qkh4YRjvhKk
-	 W1T+uHnXLv14X7u5PyCRIPjh42BzD+/jddjwXIP5//E8eCtDTpoGWoQOynniJhRtvw
-	 U9BRNCgB/3WIGqoH7yF+urooe72ZwdZTc4Z12dp6XKjRTMqNL/yOi59W2Eg1TKzDzY
-	 GxWZhJgE/2admwfwdhjDYOXEm3UNFjhz6sMSypzc9EZvAK+t8OTlYIJl5FoS73S/9y
-	 VKQxpiTGaMOnw==
-Date: Sat, 9 Dec 2023 17:02:41 +0000
+	b=kuW3s/gq4XmvI+zazP8ZslY+PEh1eN/BTZsf9FuLTCy32Wy27zQJQDo+9kpSkce3w
+	 z36SwtpUkKPn35Wgp/vZK0KiGYpa4onEEzFdybM0ipkJlaz0x/jCIqga5fMvFx44SJ
+	 IWSwlPu/c84PKciUaUW/SOuUBj5p9kxhCWB2ImoSdTDP42v5W5rhUqrf/27jXDyS6n
+	 0nqwiHIsmRP3hsU/nzMGz0hBqRo5ogqw71a8gCh7KPRy2v2Itk6+FqUjQ34oIBokQW
+	 k7OjDpgnPDDvxBSXWIMCGGQg2adV8tUHfv36S2tuQf/JwF7Jm0m0zJZfBhlg7Cw08u
+	 wvHZh7zjxuItA==
+Date: Sat, 9 Dec 2023 17:04:57 +0000
 From: Simon Horman <horms@kernel.org>
 To: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Cc: davem@davemloft.net, netdev@vger.kernel.org,
@@ -53,11 +53,11 @@ Cc: davem@davemloft.net, netdev@vger.kernel.org,
 	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
 	Oleksij Rempel <o.rempel@pengutronix.de>,
 	=?utf-8?Q?Nicol=C3=B2?= Veronese <nicveronese@gmail.com>
-Subject: Re: [RFC PATCH net-next v3 01/13] net: phy: Introduce ethernet link
- topology representation
-Message-ID: <20231209170241.GA5817@kernel.org>
+Subject: Re: [RFC PATCH net-next v3 07/13] net: ethtool: Introduce a command
+ to list PHYs on an interface
+Message-ID: <20231209170457.GB5817@kernel.org>
 References: <20231201163704.1306431-1-maxime.chevallier@bootlin.com>
- <20231201163704.1306431-2-maxime.chevallier@bootlin.com>
+ <20231201163704.1306431-8-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,136 +66,68 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231201163704.1306431-2-maxime.chevallier@bootlin.com>
+In-Reply-To: <20231201163704.1306431-8-maxime.chevallier@bootlin.com>
 
-On Fri, Dec 01, 2023 at 05:36:51PM +0100, Maxime Chevallier wrote:
-> Link topologies containing multiple network PHYs attached to the same
-> net_device can be found when using a PHY as a media converter for use
-> with an SFP connector, on which an SFP transceiver containing a PHY can
-> be used.
+On Fri, Dec 01, 2023 at 05:36:57PM +0100, Maxime Chevallier wrote:
+> As we have the ability to track the PHYs connected to a net_device
+> through the link_topology, we can expose this list to userspace. This
+> allows userspace to use these identifiers for phy-specific commands and
+> take the decision of which PHY to target by knowing the link topology.
 > 
-> With the current model, the transceiver's PHY can't be used for
-> operations such as cable testing, timestamping, macsec offload, etc.
-> 
-> The reason being that most of the logic for these configuration, coming
-> from either ethtool netlink or ioctls tend to use netdev->phydev, which
-> in multi-phy systems will reference the PHY closest to the MAC.
-> 
-> Introduce a numbering scheme allowing to enumerate PHY devices that
-> belong to any netdev, which can in turn allow userspace to take more
-> precise decisions with regard to each PHY's configuration.
-> 
-> The numbering is maintained per-netdev, in a phy_device_list.
-> The numbering works similarly to a netdevice's ifindex, with
-> identifiers that are only recycled once INT_MAX has been reached.
-> 
-> This prevents races that could occur between PHY listing and SFP
-> transceiver removal/insertion.
-> 
-> The identifiers are assigned at phy_attach time, as the numbering
-> depends on the netdevice the phy is attached to.
+> Add PHY_GET and PHY_DUMP, which can be a filtered DUMP operation to list
+> devices on only one interface.
 > 
 > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
+...
+
+> diff --git a/net/ethtool/phy.c b/net/ethtool/phy.c
+
+...
+
+> +static int ethnl_phy_dump_one_dev(struct sk_buff *skb, struct net_device *dev,
+> +				  struct netlink_callback *cb)
+> +{
+> +	struct ethnl_phy_dump_ctx *ctx = (void *)cb->ctx;
+> +	struct phy_req_info *pri = ctx->phy_req_info;
+> +	struct phy_device_node *pdn;
+> +	unsigned long index = 1;
+> +	void *ehdr;
+> +	int ret;
+> +
+> +	pri->base.dev = dev;
+> +
+> +	xa_for_each(&dev->link_topo.phys, index, pdn) {
+> +		ehdr = ethnl_dump_put(skb, cb,
+> +				      ETHTOOL_MSG_PHY_GET_REPLY);
+> +		if (!ehdr) {
+> +			ret = -EMSGSIZE;
+> +			break;
+> +		}
+> +
+> +		ret = ethnl_fill_reply_header(skb, dev,
+> +					      ETHTOOL_A_PHY_HEADER);
+> +		if (ret < 0) {
+> +			genlmsg_cancel(skb, ehdr);
+> +			break;
+> +		}
+> +
+> +		memcpy(&pri->pdn, pdn, sizeof(*pdn));
+> +		ret = ethnl_phy_fill_reply(&pri->base, skb);
+> +
+> +		genlmsg_end(skb, ehdr);
+> +	}
+> +
+> +	return ret;
+
 Hi Maxime,
 
-some minor feedback from my side.
+I am unsure if this can happen (or if I flagged this before)
+but if the loop runs zero times then ret is uninitialised here.
 
-...
+Flagged by Smatch
 
-> diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-> index f65e85c91fc1..3cf7774df57e 100644
-> --- a/drivers/net/phy/Makefile
-> +++ b/drivers/net/phy/Makefile
-> @@ -2,7 +2,7 @@
->  # Makefile for Linux PHY drivers
->  
->  libphy-y			:= phy.o phy-c45.o phy-core.o phy_device.o \
-> -				   linkmode.o
-> +				   linkmode.o phy_link_topology.o
->  mdio-bus-y			+= mdio_bus.o mdio_device.o
->  
->  ifdef CONFIG_MDIO_DEVICE
-> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-
-...
-
-> @@ -265,6 +266,14 @@ static void phy_mdio_device_remove(struct mdio_device *mdiodev)
->  
->  static struct phy_driver genphy_driver;
->  
-> +static struct phy_link_topology *phy_get_link_topology(struct phy_device *phydev)
-> +{
-> +	if (phydev->attached_dev)
-> +		return &phydev->attached_dev->link_topo;
-> +
-> +	return NULL;
-> +}
-> +
-
-This function is declared static but is unused, which causes
-allmodconfig W=1 builds to fail. Perhaps it could be introduced
-in a latter patch where it is used?
-
-...
-
-> diff --git a/drivers/net/phy/phy_link_topology.c b/drivers/net/phy/phy_link_topology.c
-
-...
-
-> +void phy_link_topo_init(struct phy_link_topology *topo)
-> +{
-> +	xa_init_flags(&topo->phys, XA_FLAGS_ALLOC1);
-> +	topo->next_phy_index = 1;
 > +}
 
 ...
-
-> diff --git a/include/linux/phy_link_topology.h b/include/linux/phy_link_topology.h
-
-...
-
-> +#else
-> +static struct phy_device *phy_link_topo_get_phy(struct phy_link_topology *topo,
-> +						u32 phyindex)
-> +{
-> +	return NULL;
-> +}
-> +
-> +static int phy_link_topo_add_phy(struct phy_link_topology *topo,
-> +				 struct phy_device *phy,
-> +				 enum phy_upstream upt, void *upstream)
-> +{
-> +	return 0;
-> +}
-> +
-> +static void phy_link_topo_del_phy(struct phy_link_topology *topo,
-> +				  struct phy_device *phy)
-> +{
-> +}
-> +#endif
-
-nit: functions in .h should be declared static inline
-
-...
-
-> diff --git a/net/core/dev.c b/net/core/dev.c
-
-...
-
-> @@ -10832,6 +10833,8 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
->  #ifdef CONFIG_NET_SCHED
->  	hash_init(dev->qdisc_hash);
->  #endif
-> +	phy_link_topo_init(&dev->link_topo);
-> +
-
-I don't think this can work unless PHYLIB is compiled as a built-in.
-
->  	dev->priv_flags = IFF_XMIT_DST_RELEASE | IFF_XMIT_DST_RELEASE_PERM;
->  	setup(dev);
->  
-> -- 
-> 2.42.0
-> 
 
