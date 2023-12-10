@@ -1,147 +1,219 @@
-Return-Path: <netdev+bounces-55587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A180D80B85B
-	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 03:02:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AD8980B880
+	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 04:05:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22245B208B7
-	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 02:02:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8EC46B20A52
+	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 03:05:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4372A10E5;
-	Sun, 10 Dec 2023 02:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86B6615AB;
+	Sun, 10 Dec 2023 03:05:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LoxyH//m"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A28B510C
-	for <netdev@vger.kernel.org>; Sat,  9 Dec 2023 18:02:06 -0800 (PST)
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Snp601qLRzWh9c;
-	Sun, 10 Dec 2023 10:02:00 +0800 (CST)
-Received: from kwepemi500026.china.huawei.com (unknown [7.221.188.247])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4386018006C;
-	Sun, 10 Dec 2023 10:02:04 +0800 (CST)
-Received: from localhost.localdomain (10.175.104.82) by
- kwepemi500026.china.huawei.com (7.221.188.247) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 10 Dec 2023 10:02:03 +0800
-From: Dong Chenchen <dongchenchen2@huawei.com>
-To: <edumazet@google.com>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <ncardwell@google.com>, <yuehaibing@huawei.com>, <weiyongjun1@huawei.com>,
-	<netdev@vger.kernel.org>, Dong Chenchen <dongchenchen2@huawei.com>
-Subject: [PATCH net] net: Remove acked SYN flag from packet in the transmit queue correctly
-Date: Sun, 10 Dec 2023 10:02:00 +0800
-Message-ID: <20231210020200.1539875-1-dongchenchen2@huawei.com>
-X-Mailer: git-send-email 2.25.1
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0379B3;
+	Sat,  9 Dec 2023 19:05:01 -0800 (PST)
+Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-40c1e3ea2f2so36402845e9.2;
+        Sat, 09 Dec 2023 19:05:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702177500; x=1702782300; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Wxl9nnVIfiBOr8Rw+j4D/uD/Nj3r0oHUhj6QGiUGdeU=;
+        b=LoxyH//m1WFoAMXNwx3y8v+IwHs6ATUWaj36ukRaIT4y83df4SPIPRUfmUMMy8R3XX
+         Ues1NiyS+Q+YNwVa9L6lXBfKABFGkF/c7+RzNIrE4X7aySTz+KqMNMmNfdDWXqX45VtW
+         B0yzygKqaqRG7mw1i1q5E32ybQ93m3CP1PEx0mF5GTk9Bdd3c+L/QlBbV20FiPyDTsJ0
+         MGdB+RQ1lz0r6WSkSO1QDdXgfIQ7GYhzH9S73cyFLo8mtRkfznLYVt58V0kHpXXsuQdN
+         iiY7kS0/HZWZbMzKKiEPRGgRcdjQDpSDueXV+1Zq6Wwh4z926z5fObOSIqdqEnqEO2SO
+         o+nQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702177500; x=1702782300;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wxl9nnVIfiBOr8Rw+j4D/uD/Nj3r0oHUhj6QGiUGdeU=;
+        b=P8ar+Epx4ClcZp/udhkseNpty+T5ylx98BzwMkuiFHBnX6doNdPxGB9Nv2buqIWAcI
+         Bknpum3/GXCx8m+gQDVHXHXx5i7IQ84/cd1XfQfKJrY4e16fx8cRFmwNs3W89zMJU2gv
+         ivc2xBip95ONWt7/CrHEpVy94SdA0H/RpsqkCrfS2VNOV3boBZOGYf+o6MKiL9eyJIqo
+         XAAjswsdRiKK0FYLh5BgFkTf+v/v0T9e31NCuSoaYlspuPWkIuXizduIpYl+wUFU63OX
+         bb4LOUdonodr04UoRF3elaaKYLE5zJ4NXN/6ZS9aH13cteitMGEsLu6JntvZjS+6Fs7u
+         /DCA==
+X-Gm-Message-State: AOJu0YwJ0zpnSO4XgLAscswxIqDppGM0aic2MHJj2t2sH1CpKY+YRpel
+	MSTKgtb3g2pfXJ/AxZqqDFg=
+X-Google-Smtp-Source: AGHT+IHJipyQW4yFkljRQowJvIeShM9YAuwDKB6t4bKW0HKwLGG9Hrotr1J6QPfjejCHHrlkaexSCA==
+X-Received: by 2002:adf:e282:0:b0:332:ef1e:bb88 with SMTP id v2-20020adfe282000000b00332ef1ebb88mr1266810wri.33.1702177500084;
+        Sat, 09 Dec 2023 19:05:00 -0800 (PST)
+Received: from [192.168.8.100] ([85.255.236.102])
+        by smtp.gmail.com with ESMTPSA id fm21-20020a05600c0c1500b0040c03c3289bsm8341129wmb.37.2023.12.09.19.04.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 09 Dec 2023 19:04:59 -0800 (PST)
+Message-ID: <b1aea7bc-9627-499a-9bee-d2cc07856978@gmail.com>
+Date: Sun, 10 Dec 2023 03:03:37 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next v1 08/16] memory-provider: dmabuf devmem memory
+ provider
+Content-Language: en-US
+To: Mina Almasry <almasrymina@google.com>
+Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ bpf@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann
+ <arnd@arndb.de>, David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeelb@google.com>, Willem de Bruijn <willemb@google.com>,
+ Kaiyuan Zhang <kaiyuanz@google.com>
+References: <20231208005250.2910004-1-almasrymina@google.com>
+ <20231208005250.2910004-9-almasrymina@google.com>
+ <b07a4eca-0c3d-4620-9f97-b1d2c76642c2@gmail.com>
+ <CAHS8izNVFx6oHoo7y86P8Di9VCVe8A_n_9UZFkg5Wnt=A=YcNQ@mail.gmail.com>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAHS8izNVFx6oHoo7y86P8Di9VCVe8A_n_9UZFkg5Wnt=A=YcNQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemi500026.china.huawei.com (7.221.188.247)
 
-syzkaller report:
+On 12/8/23 23:25, Mina Almasry wrote:
+> On Fri, Dec 8, 2023 at 2:56 PM Pavel Begunkov <asml.silence@gmail.com> wrote:
+>>
+>> On 12/8/23 00:52, Mina Almasry wrote:
+> ...
+>>> +     if (pool->p.queue)
+>>> +             binding = READ_ONCE(pool->p.queue->binding);
+>>> +
+>>> +     if (binding) {
+>>> +             pool->mp_ops = &dmabuf_devmem_ops;
+>>> +             pool->mp_priv = binding;
+>>> +     }
+>>
+>> Hmm, I don't understand why would we replace a nice transparent
+>> api with page pool relying on a queue having devmem specific
+>> pointer? It seemed more flexible and cleaner in the last RFC.
+>>
+> 
+> Jakub requested this change and may chime in, but I suspect it's to
+> further abstract the devmem changes from driver. In this iteration,
+> the driver grabs the netdev_rx_queue and passes it to the page_pool,
+> and any future configurations between the net stack and page_pool can
+> be passed this way with the driver unbothered.
 
- kernel BUG at net/core/skbuff.c:3452!
- invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
- CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.7.0-rc4-00009-gbee0e7762ad2-dirty #135
- RIP: 0010:skb_copy_and_csum_bits (net/core/skbuff.c:3452)
- Call Trace:
- icmp_glue_bits (net/ipv4/icmp.c:357)
- __ip_append_data.isra.0 (net/ipv4/ip_output.c:1165)
- ip_append_data (net/ipv4/ip_output.c:1362 net/ipv4/ip_output.c:1341)
- icmp_push_reply (net/ipv4/icmp.c:370)
- __icmp_send (./include/net/route.h:252 net/ipv4/icmp.c:772)
- ip_fragment.constprop.0 (./include/linux/skbuff.h:1234 net/ipv4/ip_output.c:592 net/ipv4/ip_output.c:577)
- __ip_finish_output (net/ipv4/ip_output.c:311 net/ipv4/ip_output.c:295)
- ip_output (net/ipv4/ip_output.c:427)
- __ip_queue_xmit (net/ipv4/ip_output.c:535)
- __tcp_transmit_skb (net/ipv4/tcp_output.c:1462)
- __tcp_retransmit_skb (net/ipv4/tcp_output.c:3387)
- tcp_retransmit_skb (net/ipv4/tcp_output.c:3404)
- tcp_retransmit_timer (net/ipv4/tcp_timer.c:604)
- tcp_write_timer (./include/linux/spinlock.h:391 net/ipv4/tcp_timer.c:716)
+Ok, that makes sense, but even if passed via an rx queue I'd
+at least hope it keeping abstract provider parameters, e.g.
+ops, but not hard coded with devmem specific code.
 
-The panic issue was trigered by tcp simultaneous initiation.
-The initiation process is as follows:
+It might even be better done with a helper like
+create_page_pool_from_queue(), unless there is some deeper
+interaction b/w pp and rx queues is predicted.
 
-      TCP A                                            TCP B
+>>> +
+>>>        if (pool->mp_ops) {
+>>>                err = pool->mp_ops->init(pool);
+>>>                if (err) {
+>>> @@ -1020,3 +1033,77 @@ void page_pool_update_nid(struct page_pool *pool, int new_nid)
+>>>        }
+>>>    }
+>>>    EXPORT_SYMBOL(page_pool_update_nid);
+>>> +
+>>> +void __page_pool_iov_free(struct page_pool_iov *ppiov)
+>>> +{
+>>> +     if (WARN_ON(ppiov->pp->mp_ops != &dmabuf_devmem_ops))
+>>> +             return;
+>>> +
+>>> +     netdev_free_dmabuf(ppiov);
+>>> +}
+>>> +EXPORT_SYMBOL_GPL(__page_pool_iov_free);
+>>
+>> I didn't look too deep but I don't think I immediately follow
+>> the pp refcounting. It increments pages_state_hold_cnt on
+>> allocation, but IIUC doesn't mark skbs for recycle? Then, they all
+>> will be put down via page_pool_iov_put_many() bypassing
+>> page_pool_return_page() and friends. That will call
+>> netdev_free_dmabuf(), which doesn't bump pages_state_release_cnt.
+>>
+>> At least I couldn't make it work with io_uring, and for my purposes,
+>> I forced all puts to go through page_pool_return_page(), which calls
+>> the ->release_page callback. The callback will put the reference and
+>> ask its page pool to account release_cnt. It also gets rid of
+>> __page_pool_iov_free(), as we'd need to add a hook there for
+>> customization otherwise.
+>>
+>> I didn't care about overhead because the hot path for me is getting
+>> buffers from a ring, which is somewhat analogous to sock_devmem_dontneed(),
+>> but done on pp allocations under napi, and it's done separately.
+>>
+>> Completely untested with TCP devmem:
+>>
+>> https://github.com/isilence/linux/commit/14bd56605183dc80b540999e8058c79ac92ae2d8
+>>
+> 
+> This was a mistake in the last RFC, which should be fixed in v1. In
+> the RFC I was not marking the skbs as skb_mark_for_recycle(), so the
+> unreffing path wasn't as expected.
+> 
+> In this iteration, that should be completely fixed. I suspect since I
+> just posted this you're actually referring to the issue tested on the
+> last RFC? Correct me if wrong.
 
-  1.  CLOSED                                           CLOSED
+Right, it was with RFCv3
 
-  2.  SYN-SENT     --> <SEQ=100><CTL=SYN>              ...
+> In this iteration, the reffing story:
+> 
+> - memory provider allocs ppiov and returns it to the page pool with
+> ppiov->refcount == 1.
+> - The page_pool gives the page to the driver. The driver may
+> obtain/release references with page_pool_page_[get|put]_many(), but
+> the driver is likely not doing that unless it's doing its own page
+> recycling.
+> - The net stack obtains references via skb_frag_ref() ->
+> page_pool_page_get_many()
+> - The net stack drops references via skb_frag_unref() ->
+> napi_pp_put_page() -> page_pool_return_page() and friends.
+> 
+> Thus, the issue where the unref path was skipping
+> page_pool_return_page() and friends should be resolved in this
+> iteration, let me know if you think otherwise, but I think this was an
+> issue limited to the last RFC.
 
-  3.  SYN-RECEIVED <-- <SEQ=300><CTL=SYN>              <-- SYN-SENT
+Then page_pool_iov_put_many() should and supposedly would never be
+called by non devmap code because all puts must circle back into
+->release_page. Why adding it to into page_pool_page_put_many()?
 
-  4.               ... <SEQ=100><CTL=SYN>              --> SYN-RECEIVED
+@@ -731,6 +731,29 @@ __page_pool_put_page(struct page_pool *pool, struct page *page,
++	if (page_is_page_pool_iov(page)) {
+...
++		page_pool_page_put_many(page, 1);
++		return NULL;
++	}
 
-  5.  SYN-RECEIVED --> <SEQ=100><ACK=301><CTL=SYN,ACK> ...
+Well, I'm looking at this new branch from Patch 10, it can put
+the buffer, but what if we race at it's actually the final put?
+Looks like nobody is going to to bump up pages_state_release_cnt
 
-  // TCP B: not send challenge ack for ack limit or packet loss
-  // TCP A: close
-	tcp_close
-	   tcp_send_fin
-              if (!tskb && tcp_under_memory_pressure(sk))
-                  tskb = skb_rb_last(&sk->tcp_rtx_queue); //pick SYN_ACK packet
-           TCP_SKB_CB(tskb)->tcp_flags |= TCPHDR_FIN;  // set FIN flag
+If you remove the branch, let it fall into ->release and rely
+on refcounting there, then the callback could also fix up
+release_cnt or ask pp to do it, like in the patch I linked above
 
-  6.  FIN_WAIT_1  --> <SEQ=100><ACK=301><END_SEQ=102><CTL=SYN,FIN,ACK> ...
-
-  // TCP B: send challenge ack to SYN_FIN_ACK
-
-  7.               ... <SEQ=301><ACK=101><CTL=ACK>   <-- SYN-RECEIVED //challenge ack
-
-  // TCP A:  <SND.UNA=101>
-
-  8.  FIN_WAIT_1 --> <SEQ=101><ACK=301><END_SEQ=102><CTL=SYN,FIN,ACK> ... // retransmit panic
-
-	__tcp_retransmit_skb  //skb->len=0
-	    tcp_trim_head
-		len = tp->snd_una - TCP_SKB_CB(skb)->seq // len=101-100
-		    __pskb_trim_head
-			skb->data_len -= len // skb->len=-1, wrap around
-	    ... ...
-	    ip_fragment
-		icmp_glue_bits //BUG_ON
-
-If we use tcp_trim_head() to remove acked SYN from packet that contains data
-or other flags, skb->len will be incorrectly decremented. We can remove SYN
-flag that has been acked from rtx_queue earlier than tcp_trim_head(), which
-can fix the problem mentioned above.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Co-developed-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
----
- net/ipv4/tcp_output.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index eb13a55d660c..aa8983e9ef9f 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -3293,7 +3293,13 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
- 	if (skb_still_in_host_queue(sk, skb))
- 		return -EBUSY;
- 
-+start:
- 	if (before(TCP_SKB_CB(skb)->seq, tp->snd_una)) {
-+		if (unlikely(TCP_SKB_CB(skb)->tcp_flags & TCPHDR_SYN)) {
-+			TCP_SKB_CB(skb)->tcp_flags &= ~TCPHDR_SYN;
-+			TCP_SKB_CB(skb)->seq++;
-+			goto start;
-+		}
- 		if (unlikely(before(TCP_SKB_CB(skb)->end_seq, tp->snd_una))) {
- 			WARN_ON_ONCE(1);
- 			return -EINVAL;
 -- 
-2.25.1
-
+Pavel Begunkov
 
