@@ -1,78 +1,132 @@
-Return-Path: <netdev+bounces-55652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9549780BD5F
-	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 22:38:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AB2C80BD70
+	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 22:54:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC35C1C2037B
-	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 21:38:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2573E1F20ED2
+	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 21:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F8C71CF88;
-	Sun, 10 Dec 2023 21:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF3D51CFA8;
+	Sun, 10 Dec 2023 21:54:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H3gB1fzc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com [209.85.161.71])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7F44E4
-	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 13:38:04 -0800 (PST)
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-58d336d8f91so4461319eaf.1
-        for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 13:38:04 -0800 (PST)
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03DBCCF;
+	Sun, 10 Dec 2023 13:54:05 -0800 (PST)
+Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2ca1e6a94a4so49058671fa.0;
+        Sun, 10 Dec 2023 13:54:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702245243; x=1702850043; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5BzhCYsOZapAFD897Nx82YDtzNYYx8urjaCEnmiHd3w=;
+        b=H3gB1fzcdlI4zMq5cUKyCFIb6U1woji1MMc5pcC5J+ECT70sNPailhPpluOERtLyxY
+         9x4ZMOLyJ7+tHIPffCXihVie3M6nhhZYokPjM7hJu9fSeiDyZUw8vAH2oBXfJHywVnF+
+         yR/Mg4jQPynK0ZDWPPKi6vXf3TyVOXmzOaWOOLfUhJoX3HepSPtq9i3HuL/TgyPWgBm9
+         /AimqWsMruZ5g6x2PdDql8MIvUNB1g5mru298nUnFIwqis4rHQufIbCXgMd3OH/YGRHx
+         yEAFDABMsXtOUxQ0C/Es/NDDeFniffYue8bUb0hLAj1oFsMQ7w6xhXjMBf6L/MMgEntI
+         P9Xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702244284; x=1702849084;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FxbULe4PoOvzjabcg4fEcKZ0w6jpN2DX8HCoWUa20UI=;
-        b=CJuDQIHuxt//wdT5CVkz+E+qPAus3pi1Wa6KSAb5YHpni6mStbv6MwohPAC6Ux2Dmm
-         T+KwJlqWSy9KB0gtNMSJnsKRZDPTsxPf8h0hkDqz1aFdGX8NuMVPRzoPCjqOCOpj31jU
-         Gj670OrYlWZaFRSJR9Z5DVfd079pFwQykG//ch3IoEMYQupWFV49I4t4ncMpzhEKd6gG
-         LlL+hrn4rxlbr+5bSg76AmL5UF6A+oaze9P3e3GGCuEZ6wKTexPfguys31zGVMSKw+52
-         9Q2qXEtrbXWhOrhBQtvGUhkETZwAi0qo5lDAkZH/sJ8NDt4ux3MDRGbs5FU+tGJEoUyZ
-         P6AA==
-X-Gm-Message-State: AOJu0Yz6Nvxd+4M2WAnl9eoxn43RjWLwMvbJVUG6xNOL3PduT0beiOru
-	FBucjaM9FJpndcSBa/zdSSPEOru/tFLWRro/YM6+jYMGUK5X
-X-Google-Smtp-Source: AGHT+IG9DQLdvnLT0V8GX0PFxpAMf98FGEWIzJmw6MJpQyI9/LylpQvIZnjj43QjmR+t8LtI3LBVYY4Lf7uVAvGv+6QcNI9rEgwO
+        d=1e100.net; s=20230601; t=1702245243; x=1702850043;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5BzhCYsOZapAFD897Nx82YDtzNYYx8urjaCEnmiHd3w=;
+        b=iR4oAv+i/HR/KxRNQCdKFogxh7efsdBDEhMkGHY3mwuVRfDMEFdaa7GRTOT5N8yZpQ
+         phc29rBzeYTAeeTIo6N+5SSfaBuYuH5LpoPuktu02XwW5iwy1l8rEMsNn7pi8wD82mZB
+         Mb1ll+LbZ3JVm5spmS6okqTv5dnq91VArQyffcgOLz+A6ze7vm1lmvRC+uDFWHI1FlBM
+         8Xc5A8XMgG6VIzAl39mvxQmuZMihIs4RGloO8t6D3McXbB+IszuwQbeyDAfTttRqq/fY
+         q9eoFqwbfCaU2NuLVHPATPlps3v3q4NRqwbvdWke6zboX1TKFpfbwx5gQBb8FnuCvQu5
+         Oyzg==
+X-Gm-Message-State: AOJu0YzPgZZ5+Bm7UGXEcN+mBrs5o6nC2ld82bCDm/AOcq7miVFga4bo
+	/fhbD6G46q1jpPjdylKAa0o=
+X-Google-Smtp-Source: AGHT+IEfKA7MW9B2gqdrOJvd3Ro3fzvD+AnicTEHeOn2LgYKq2XR4eo43oWQzCKiOAiyI7gQJrc0XQ==
+X-Received: by 2002:a05:6512:b88:b0:50d:438e:dbdd with SMTP id b8-20020a0565120b8800b0050d438edbddmr1084532lfv.136.1702245243124;
+        Sun, 10 Dec 2023 13:54:03 -0800 (PST)
+Received: from fr.lan ([81.200.16.167])
+        by smtp.googlemail.com with ESMTPSA id i21-20020a056512341500b0050bf20118e2sm901930lfr.30.2023.12.10.13.54.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 10 Dec 2023 13:54:02 -0800 (PST)
+From: Ivan Mikhaylov <fr0st61te@gmail.com>
+To: patrick@stwcx.xyz
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	peter@pjd.dev,
+	sam@mendozajonas.com
+Subject: Re: [PATCH net-next v2 3/3] net/ncsi: Add NC-SI 1.2 Get MC MAC Address command
+Date: Mon, 11 Dec 2023 00:53:56 +0300
+Message-ID: <20231210215356.4154-1-fr0st61te@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20231114160737.3209218-4-patrick@stwcx.xyz>
+References: <20231114160737.3209218-4-patrick@stwcx.xyz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6830:4105:b0:6d9:e284:81c5 with SMTP id
- w5-20020a056830410500b006d9e28481c5mr3333431ott.2.1702244284139; Sun, 10 Dec
- 2023 13:38:04 -0800 (PST)
-Date: Sun, 10 Dec 2023 13:38:04 -0800
-In-Reply-To: <0000000000002e8d4a06085267f3@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e08cbb060c2ea1ca@google.com>
-Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in ptp_read
-From: syzbot <syzbot+9704e6f099d952508943@syzkaller.appspotmail.com>
-To: davem@davemloft.net, eadavis@qq.com, eadavis@sina.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, reibax@gmail.com, 
-	richardcochran@gmail.com, syzkaller-bugs@googlegroups.com, 
-	twuufnxlz@gmail.com, wojciech.drewek@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot suspects this issue was fixed by commit:
+Patrick, Peter,
 
-commit b714ca2ccf6a90733f6ceb14abb6ce914f8832c3
-Author: Edward Adam Davis <eadavis@qq.com>
-Date:   Tue Nov 7 08:00:40 2023 +0000
+> +static int ncsi_rsp_handler_gmcma(struct ncsi_request *nr)
+> +{
+> +	struct ncsi_dev_priv *ndp = nr->ndp;
+> +	struct net_device *ndev = ndp->ndev.dev;
+> +	struct ncsi_rsp_gmcma_pkt *rsp;
+> +	struct sockaddr saddr;
+> +	int ret = -1;
+> +	int i;
+> +
+> +	rsp = (struct ncsi_rsp_gmcma_pkt *)skb_network_header(nr->rsp);
+> +	saddr.sa_family = ndev->type;
+> +	ndev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
+> +
+> +	netdev_info(ndev, "NCSI: Received %d provisioned MAC addresses\n",
+> +		    rsp->address_count);
+> +	for (i = 0; i < rsp->address_count; i++) {
+> +		netdev_info(ndev, "NCSI: MAC address %d: %02x:%02x:%02x:%02x:%02x:%02x\n",
+> +			    i, rsp->addresses[i][0], rsp->addresses[i][1],
+> +			    rsp->addresses[i][2], rsp->addresses[i][3],
+> +			    rsp->addresses[i][4], rsp->addresses[i][5]);
+> +	}
+> +
+> +	for (i = 0; i < rsp->address_count; i++) {
+> +		memcpy(saddr.sa_data, &rsp->addresses[i], ETH_ALEN);
+> +		ret = ndev->netdev_ops->ndo_set_mac_address(ndev, &saddr);
+> +		if (ret < 0) {
+> +			netdev_warn(ndev, "NCSI: Unable to assign %pM to device\n",
+> +				    saddr.sa_data);
+> +			continue;
+> +		}
+> +		netdev_warn(ndev, "NCSI: Set MAC address to %pM\n", saddr.sa_data);
+> +		break;
+> +	}
+> +
+> +	ndp->gma_flag = ret == 0;
+> +	return ret;
+> +}
 
-    ptp: ptp_read should not release queue
+seems very similar to ncsi_rsp_handler_oem_gma except address_count, why it
+shouldn't be part of this call with additional param? What's inside it just
+code duplicity of ncsi_rsp_handler_oem_gma.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10477d6ce80000
-start commit:   4bbdb725a36b Merge tag 'iommu-updates-v6.7' of git://git.k..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=beb32a598fd79db9
-dashboard link: https://syzkaller.appspot.com/bug?extid=9704e6f099d952508943
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17233388e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17a3f898e80000
+And as we talked in openbmc mailing list, ndo_set_mac_address do not notify
+network layer about mac change and this fixed part already in
+ncsi_rsp_handler_oem_gma with 790071347a0a1a89e618eedcd51c687ea783aeb3 .
 
-If the result looks correct, please mark the issue as fixed by replying with:
+David, any actions should be needed about fixing it in net-next? Need it to
+put patch above with fix or do the revert from net-next and make it right?
 
-#syz fix: ptp: ptp_read should not release queue
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Thanks.
 
