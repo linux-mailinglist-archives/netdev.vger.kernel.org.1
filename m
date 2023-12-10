@@ -1,132 +1,101 @@
-Return-Path: <netdev+bounces-55653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AB2C80BD70
-	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 22:54:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6C5980BD88
+	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 23:09:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2573E1F20ED2
-	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 21:54:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40DEBB207D5
+	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 22:09:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF3D51CFA8;
-	Sun, 10 Dec 2023 21:54:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73CE51D52B;
+	Sun, 10 Dec 2023 22:09:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H3gB1fzc"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="IUXkpbzm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03DBCCF;
-	Sun, 10 Dec 2023 13:54:05 -0800 (PST)
-Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2ca1e6a94a4so49058671fa.0;
-        Sun, 10 Dec 2023 13:54:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702245243; x=1702850043; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5BzhCYsOZapAFD897Nx82YDtzNYYx8urjaCEnmiHd3w=;
-        b=H3gB1fzcdlI4zMq5cUKyCFIb6U1woji1MMc5pcC5J+ECT70sNPailhPpluOERtLyxY
-         9x4ZMOLyJ7+tHIPffCXihVie3M6nhhZYokPjM7hJu9fSeiDyZUw8vAH2oBXfJHywVnF+
-         yR/Mg4jQPynK0ZDWPPKi6vXf3TyVOXmzOaWOOLfUhJoX3HepSPtq9i3HuL/TgyPWgBm9
-         /AimqWsMruZ5g6x2PdDql8MIvUNB1g5mru298nUnFIwqis4rHQufIbCXgMd3OH/YGRHx
-         yEAFDABMsXtOUxQ0C/Es/NDDeFniffYue8bUb0hLAj1oFsMQ7w6xhXjMBf6L/MMgEntI
-         P9Xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702245243; x=1702850043;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5BzhCYsOZapAFD897Nx82YDtzNYYx8urjaCEnmiHd3w=;
-        b=iR4oAv+i/HR/KxRNQCdKFogxh7efsdBDEhMkGHY3mwuVRfDMEFdaa7GRTOT5N8yZpQ
-         phc29rBzeYTAeeTIo6N+5SSfaBuYuH5LpoPuktu02XwW5iwy1l8rEMsNn7pi8wD82mZB
-         Mb1ll+LbZ3JVm5spmS6okqTv5dnq91VArQyffcgOLz+A6ze7vm1lmvRC+uDFWHI1FlBM
-         8Xc5A8XMgG6VIzAl39mvxQmuZMihIs4RGloO8t6D3McXbB+IszuwQbeyDAfTttRqq/fY
-         q9eoFqwbfCaU2NuLVHPATPlps3v3q4NRqwbvdWke6zboX1TKFpfbwx5gQBb8FnuCvQu5
-         Oyzg==
-X-Gm-Message-State: AOJu0YzPgZZ5+Bm7UGXEcN+mBrs5o6nC2ld82bCDm/AOcq7miVFga4bo
-	/fhbD6G46q1jpPjdylKAa0o=
-X-Google-Smtp-Source: AGHT+IEfKA7MW9B2gqdrOJvd3Ro3fzvD+AnicTEHeOn2LgYKq2XR4eo43oWQzCKiOAiyI7gQJrc0XQ==
-X-Received: by 2002:a05:6512:b88:b0:50d:438e:dbdd with SMTP id b8-20020a0565120b8800b0050d438edbddmr1084532lfv.136.1702245243124;
-        Sun, 10 Dec 2023 13:54:03 -0800 (PST)
-Received: from fr.lan ([81.200.16.167])
-        by smtp.googlemail.com with ESMTPSA id i21-20020a056512341500b0050bf20118e2sm901930lfr.30.2023.12.10.13.54.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 10 Dec 2023 13:54:02 -0800 (PST)
-From: Ivan Mikhaylov <fr0st61te@gmail.com>
-To: patrick@stwcx.xyz
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	peter@pjd.dev,
-	sam@mendozajonas.com
-Subject: Re: [PATCH net-next v2 3/3] net/ncsi: Add NC-SI 1.2 Get MC MAC Address command
-Date: Mon, 11 Dec 2023 00:53:56 +0300
-Message-ID: <20231210215356.4154-1-fr0st61te@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231114160737.3209218-4-patrick@stwcx.xyz>
-References: <20231114160737.3209218-4-patrick@stwcx.xyz>
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E6BCCF;
+	Sun, 10 Dec 2023 14:09:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1702246168;
+	bh=OROGTPtbJutOQnBMNLV3FocVvjzRnNq1pdem+YbzpjQ=;
+	h=Date:From:To:Cc:Subject:From;
+	b=IUXkpbzmZ3U3/BcrEuL0hppS9JGRHxfHRD9cXR5ubgfQAFywjJGO557J63KcVGI20
+	 WssSHY2EcrG2zcCFasy7DnPAZG8Lq1fAzOBh10ywJh0xzqNUUDC0II8uGzRUc0oTHn
+	 AFU6vR7uHiMHp8+j+8+5KZ9SKMkGmETM2hR/zRZ2vBgRj+vWhds9WzTtqMqu2VMZ2G
+	 HU3EKjXSL2uESk8Q1EaEqoaRXiSi8+4buyWrDPcgHYIRGRtwH3vGEftM7YMRszSNUN
+	 lP/4Ju5q++mALGaVW7Bzjifc77DO0ShK2oPde2g2DMLdEHfrqA6irxmB6uVYNRGBkl
+	 F/LxKl1Iuu/hQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4SpJvC5mCQz4xNH;
+	Mon, 11 Dec 2023 09:09:27 +1100 (AEDT)
+Date: Mon, 11 Dec 2023 09:09:25 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: Signed-off-by missing for commit in the net tree
+Message-ID: <20231211090925.7fd8f13e@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/d_7Zd95mnAuihsd3lX4NG=W";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Patrick, Peter,
+--Sig_/d_7Zd95mnAuihsd3lX4NG=W
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> +static int ncsi_rsp_handler_gmcma(struct ncsi_request *nr)
-> +{
-> +	struct ncsi_dev_priv *ndp = nr->ndp;
-> +	struct net_device *ndev = ndp->ndev.dev;
-> +	struct ncsi_rsp_gmcma_pkt *rsp;
-> +	struct sockaddr saddr;
-> +	int ret = -1;
-> +	int i;
-> +
-> +	rsp = (struct ncsi_rsp_gmcma_pkt *)skb_network_header(nr->rsp);
-> +	saddr.sa_family = ndev->type;
-> +	ndev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
-> +
-> +	netdev_info(ndev, "NCSI: Received %d provisioned MAC addresses\n",
-> +		    rsp->address_count);
-> +	for (i = 0; i < rsp->address_count; i++) {
-> +		netdev_info(ndev, "NCSI: MAC address %d: %02x:%02x:%02x:%02x:%02x:%02x\n",
-> +			    i, rsp->addresses[i][0], rsp->addresses[i][1],
-> +			    rsp->addresses[i][2], rsp->addresses[i][3],
-> +			    rsp->addresses[i][4], rsp->addresses[i][5]);
-> +	}
-> +
-> +	for (i = 0; i < rsp->address_count; i++) {
-> +		memcpy(saddr.sa_data, &rsp->addresses[i], ETH_ALEN);
-> +		ret = ndev->netdev_ops->ndo_set_mac_address(ndev, &saddr);
-> +		if (ret < 0) {
-> +			netdev_warn(ndev, "NCSI: Unable to assign %pM to device\n",
-> +				    saddr.sa_data);
-> +			continue;
-> +		}
-> +		netdev_warn(ndev, "NCSI: Set MAC address to %pM\n", saddr.sa_data);
-> +		break;
-> +	}
-> +
-> +	ndp->gma_flag = ret == 0;
-> +	return ret;
-> +}
+Hi all,
 
-seems very similar to ncsi_rsp_handler_oem_gma except address_count, why it
-shouldn't be part of this call with additional param? What's inside it just
-code duplicity of ncsi_rsp_handler_oem_gma.
+Commits
 
-And as we talked in openbmc mailing list, ndo_set_mac_address do not notify
-network layer about mac change and this fixed part already in
-ncsi_rsp_handler_oem_gma with 790071347a0a1a89e618eedcd51c687ea783aeb3 .
+  762a55a54eec ("net/mlx5e: Disable IPsec offload support if not FW steerin=
+g")
+  4e25b661f484 ("net/mlx5e: Check the number of elements before walk TC rha=
+shtable")
+  baac8351f74c ("net/mlx5e: Reduce eswitch mode_lock protection context")
+  c2bf84f1d1a1 ("net/mlx5e: Tidy up IPsec NAT-T SA discovery")
+  dddb49b63d86 ("net/mlx5e: Add IPsec and ASO syndromes check in HW")
+  5ad00dee43b9 ("net/mlx5e: Remove exposure of IPsec RX flow steering struc=
+t")
+  94af50c0a9bb ("net/mlx5e: Unify esw and normal IPsec status table creatio=
+n/destruction")
+  3d42c8cc67a8 ("net/mlx5e: Ensure that IPsec sequence packet number starts=
+ from 1")
+  a5e400a985df ("net/mlx5e: Honor user choice of IPsec replay window size")
 
-David, any actions should be needed about fixing it in net-next? Need it to
-put patch above with fix or do the revert from net-next and make it right?
+are missing a Signed-off-by from their committer.
 
-Thanks.
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/d_7Zd95mnAuihsd3lX4NG=W
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmV2NxUACgkQAVBC80lX
+0GzzRwf/ewfEc9Fzn2p4QT9ZS4aW734CBHhh8ZQSDRrH5X9Z3CLByM7uK93znOFn
+MzYcurhbOmIzQsFrvYPLK/gY56moh8ZEGtgj5Xj49u+YlS1j/F3fpJH04mA65l5T
+ni3ZyHy2sHipALotVKrijtROiZRAxp3VZXijOnlewOCYUyuNbxTLOI3wlDJWqN1t
+T2rnJQgpNKhrRFo4M7M86gLq+xCy7tZet37SlLbb+Qamnp5pPEKjRm0OirvMCMBy
+mkjjGJnoshGUbBMI2IZ+wlBNV/QNBz6tMsNfKGGB3Q68PD0l9rfGkXLlmkv6B9ZG
+J02jXucSbzAAf4W+TTJb4JJn1VT4yA==
+=JYZc
+-----END PGP SIGNATURE-----
+
+--Sig_/d_7Zd95mnAuihsd3lX4NG=W--
 
