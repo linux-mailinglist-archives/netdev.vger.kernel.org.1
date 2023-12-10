@@ -1,94 +1,156 @@
-Return-Path: <netdev+bounces-55638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A508880BC02
-	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 16:31:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B6D780BC6B
+	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 18:44:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EFEE280E35
-	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 15:31:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C8951C203DE
+	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 17:44:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFCC316415;
-	Sun, 10 Dec 2023 15:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00661199C3;
+	Sun, 10 Dec 2023 17:44:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R1HU4EBJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nAI01CW+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DDD993;
-	Sun, 10 Dec 2023 07:31:43 -0800 (PST)
-Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-33349b3f99aso3474282f8f.0;
-        Sun, 10 Dec 2023 07:31:43 -0800 (PST)
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87E72FA
+	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 09:44:28 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1d0538d9bbcso33925985ad.3
+        for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 09:44:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702222302; x=1702827102; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=GF8i3poUteh3o919bjsXzMrd6WqhLvjOQXB7N4HHdfQ=;
-        b=R1HU4EBJwvaasSQhRKioWHxk/YFYad9sd1U4NaIxcXj9qbQ5ioqU0aVKHPnzA42V2T
-         du7WJ6UieDPtNbPHpe6Bdooqqti7l4C3h9FwQhbLYb+QyPImj2JC8DzOFF72+toVu2O7
-         pyjbqQ+KWeccn44aUteDBzZad//+s5znEqAvjZTDkvQtgGse+ufYIKJSkNsDtM2OqeUy
-         uDGi3dCjXNgIJtyy9hibrSMyAOfS9c4xGE9SwhoVzOa4puAOr7J5qqm+ZGfDkREhEHyo
-         OvXl8rHzl1XHQwNDjIznR34FdtnJ1UshDXPA9tdj+6pM2EVy6txojDuaiVW6mxbeDRnc
-         Zkrw==
+        d=gmail.com; s=20230601; t=1702230268; x=1702835068; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SS1+OVcRNomKHQX5A4fgIMvgK+UxWWAQ3wRRF1rhvuE=;
+        b=nAI01CW+z9a6IB1Y+OSsRDjx4AA8mc1iXRXH3imRWdmBNJ/YJLmxOC493CXzbbg75P
+         dHQJC1GNsM4g2lMASR4ECVaw7y4X+tFo7CPsqzMrIRtvIxPzcYy+T87Fw89b/yV9d7q/
+         x/P6ZIAc8ORhNugV15sotrbeL7JQ7YlqZfEdoHxLs9gU3I03znr9utYBdWVHLBgWbbnI
+         gdHlqx0ykkH9GNADGzrRUYWXGvYD+djn/ubKDmdZ0OkDE8cSHKtpxfR9fGJQAx8lL7de
+         RkuelWGBNPeg90PSCmN8QAMDfURpERHVPpf/46oj3iJwc9eBTl6VaJ91RUDDGH/+CRXl
+         cUhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702222302; x=1702827102;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GF8i3poUteh3o919bjsXzMrd6WqhLvjOQXB7N4HHdfQ=;
-        b=M/P4YocnJiu0K1TTfhXqArDD1kneAYwNBCnc/YqfsFQ5BGa3mmLpdLu5n7cVFJwjKS
-         Ie2effs/Fw02TcRw9AvmGh2MDUaofv3cxoGFgv+p0CP5h03QXYEx+HWltnxEchlXtFYo
-         ZSeCIPwmBRxUYtr+6OoHC2gEeV2FxYCqn5TWQRisiENOT9jEM7xy5qZQywATEa+f3U61
-         hVeV4F8wby2yCcrt2JgjwPUARTVWoi6oQpK0R+KVrhLkX2eDQBU2RhTVaBMXZkomYlee
-         hpCJbOU8bnT0vMRebyvbA3ulVeTbtu1UnQhW5IQCwu58V8gjoH/2JcjOlKkHI0MbIKaO
-         9vvw==
-X-Gm-Message-State: AOJu0YxZEU2s7ytFQ7F6LgaLUpohIkPmiCPolJdkH/yQJkjFlgtvGLiX
-	+UiwagZ2LCUeo0cgTbSrpIk=
-X-Google-Smtp-Source: AGHT+IE3R74vScOl5coFe9Lm7wXjc0ov+CrKHcfP0Z7APVRBXVfi9GKJi/TlS2jtn0nIPOU0Q+TsAw==
-X-Received: by 2002:a05:6000:4c4:b0:333:28f6:d9e3 with SMTP id h4-20020a05600004c400b0033328f6d9e3mr1568200wri.33.1702222301651;
-        Sun, 10 Dec 2023 07:31:41 -0800 (PST)
-Received: from [192.168.1.95] (host-176-36-0-241.b024.la.net.ua. [176.36.0.241])
-        by smtp.gmail.com with ESMTPSA id o10-20020a5d58ca000000b0033338c3ba42sm6554854wrf.111.2023.12.10.07.31.40
+        d=1e100.net; s=20230601; t=1702230268; x=1702835068;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SS1+OVcRNomKHQX5A4fgIMvgK+UxWWAQ3wRRF1rhvuE=;
+        b=PKyNpESHD3veJ9K0o7eUAZvc55p/qCQCV7Y5EiIfRZL0zIKJPnkiainLNadlILFm8M
+         6OaS2V+n26KlQMkpNeKHiwnh50BNHXV1bKJds5GG/1KQ91VIlawHLJI7wujy5x+5rlTk
+         5qOfBYRysywd0FLmPnYWICuhFEULV+ynbk1sMgBWIThs4lSb2mXDG53GURtQtT9HFjBZ
+         4v8sWT1WcgkZysPXO0HA760xCU4OSBbhDQSCXl2nr5aHx1VtwozPXXc904HxIpzu05Re
+         laU8viafYBhCBokhRBDoXHF6pxv+aFx1hvEUNdrjrSuPS0KNKHrtXD148mTHgBxCvZAr
+         o1Lw==
+X-Gm-Message-State: AOJu0YwglWK/2sUQj9JbjMm5syefSiv3u+QkG30vAuaGw6dRGB7Yaycm
+	jBtl7JhVmOhBnaiEmq0qI4M=
+X-Google-Smtp-Source: AGHT+IEhF96xvo6Xnp1QVoczPAt+WLXoaEfAplAdMoxSob7xeDJzlmD+JZ56b+Ee55a/ToSSI8RsIA==
+X-Received: by 2002:a17:902:f690:b0:1d0:c502:e0b3 with SMTP id l16-20020a170902f69000b001d0c502e0b3mr3734235plg.36.1702230267783;
+        Sun, 10 Dec 2023 09:44:27 -0800 (PST)
+Received: from swarup-virtual-machine ([171.76.80.2])
+        by smtp.gmail.com with ESMTPSA id w13-20020a170902a70d00b001cf6453b237sm5015101plq.236.2023.12.10.09.44.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 10 Dec 2023 07:31:41 -0800 (PST)
-Message-ID: <bbf5098d5ff81bf9d65315522e9999a818ae25a3.camel@gmail.com>
-Subject: Re: [PATCH bpf-next 3/8] libbpf: further decouple feature checking
- logic from bpf_object
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, paul@paul-moore.com, brauner@kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	keescook@chromium.org, kernel-team@meta.com, sargun@sargun.me
-Date: Sun, 10 Dec 2023 17:31:40 +0200
-In-Reply-To: <20231207185443.2297160-4-andrii@kernel.org>
-References: <20231207185443.2297160-1-andrii@kernel.org>
-	 <20231207185443.2297160-4-andrii@kernel.org>
-Autocrypt: addr=eddyz87@gmail.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.1 
+        Sun, 10 Dec 2023 09:44:27 -0800 (PST)
+Date: Sun, 10 Dec 2023 23:14:21 +0530
+From: swarup <swarupkotikalapudi@gmail.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel-mentees@lists.linuxfoundation.org
+Subject: Re: [PATCH net-next v5] netlink: specs: devlink: add some(not all)
+ missing attributes in devlink.yaml
+Message-ID: <ZXX49ULoUPOznKhP@swarup-virtual-machine>
+References: <20231202123048.1059412-1-swarupkotikalapudi@gmail.com>
+ <20231205191944.6738deb7@kernel.org>
+ <ZXAoGhUnBFzQxD0f@nanopsycho>
+ <20231206080611.4ba32142@kernel.org>
+ <ZXNgrTDRd+nFa1Ad@swarup-virtual-machine>
+ <ZXWlTYyPF0nj1wof@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZXWlTYyPF0nj1wof@nanopsycho>
 
-> diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
-> index a6b8d6f70918..af5e777efcbd 100644
-> --- a/tools/lib/bpf/libbpf.c
-> +++ b/tools/lib/bpf/libbpf.c
-> @@ -637,6 +637,7 @@ struct elf_state {
->  };
-> =20
->  struct usdt_manager;
-> +struct kern_feature_cache;
+On Sun, Dec 10, 2023 at 12:47:25PM +0100, Jiri Pirko wrote:
+> Fri, Dec 08, 2023 at 07:30:05PM CET, swarupkotikalapudi@gmail.com wrote:
+> >On Wed, Dec 06, 2023 at 08:06:11AM -0800, Jakub Kicinski wrote:
+> >> On Wed, 6 Dec 2023 08:51:54 +0100 Jiri Pirko wrote:
+> >> > My "suggested-by" is probably fine as I suggested Swarup to make the patch :)
+> >> 
+> >> Ah, I didn't realize, sorry :) Just mine needs to go then.
+> >
+> >Hi Jiri,
+> >
+> >Please find answer for some quesion from you.
+> >
+> >1. I removed the Fixes tag.
+> >
+> >2. I removed Jakub's name from Suggested-by tag.
+> >
+> >3. I added new line as suggested.
+> >
+> >   value: ## or number, is used only if there is a gap or
+> >   missing attribute just above of any attribute which is not yet filled.    
+> >
+> >4. dl-attr-stats has a value 0 as shown below for this reason:
+> >    name: dl-attr-stats
+> >    name-prefix: devlink-attr-
+> >    attributes:
+> >      - name: stats-rx-packets
+> >        type: u64
+> >        value: 0 <-- 0 is added here due to below mentioned reason
+> >                     but mainly to match order of stats unnamed enum declared in include/uapi/linux/devlink.h
+> 
+> So, by default, it starts with 1?
+>
+Hi Jiri,
 
-Nit: this forward declaration is not necessary.
+Yes it seems by default it starts with 1
+e.g. below is test result when value is not added
+
+git diff Documentation/netlink/specs/devlink.yaml
+diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
+index c3a438197964..9d0e684da574 100644
+--- a/Documentation/netlink/specs/devlink.yaml
++++ b/Documentation/netlink/specs/devlink.yaml
+@@ -1191,7 +1191,6 @@ attribute-sets:
+     attributes:
+       - name: stats-rx-packets
+         type: u64
+-        value: 0
+       -
+         name: stats-rx-bytes
+         type: u64
+
+sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml --do trap-get --json '{"bus-name": "netdevsim", "dev-name": "netdevsim1", "trap-name": "ttl_value_is_too_small"}' --process-unknown
+{'bus-name': 'netdevsim',
+ 'dev-name': 'netdevsim1',
+ 'stats': {'UnknownAttr(0)': b'iW*\x00\x00\x00\x00\x00',
+           'stats-rx-bytes': 62,
+           'stats-rx-packets': 394034238},
+ 'trap-action': 'trap',
+ 'trap-generic': True,
+ 'trap-group-name': 'l3_exceptions',
+ 'trap-metadata': {'trap-metadata-type-in-port': True},
+ 'trap-name': 'ttl_value_is_too_small',
+ 'trap-type': 'exception'}
+
+Thanks,
+Swarup
 
 
+ 
+> 
+> >      -
+> >        name: stats-rx-bytes
+> >        type: u64
+> >      -
+> >        name: stats-rx-dropped
+> >        type: u64
 
