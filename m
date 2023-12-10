@@ -1,104 +1,125 @@
-Return-Path: <netdev+bounces-55636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BACC80BBE2
-	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 16:16:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3473A80BBFD
+	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 16:30:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51F9F1C2088D
-	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 15:16:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85BB8280D8B
+	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 15:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB3F156FC;
-	Sun, 10 Dec 2023 15:16:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DD9316415;
+	Sun, 10 Dec 2023 15:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iLn8Ed2d"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DNHNYhTp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEC0EF0
-	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 07:16:31 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id 98e67ed59e1d1-2866fe08b32so2589887a91.2
-        for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 07:16:31 -0800 (PST)
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DBB7FA;
+	Sun, 10 Dec 2023 07:30:26 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-336210c34ebso266795f8f.1;
+        Sun, 10 Dec 2023 07:30:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702221391; x=1702826191; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=bUOhGKebMTgquZ1Ef3JsJH3ulECY6eY7Ie5uuF7eE9I=;
-        b=iLn8Ed2d174KimEYSlOZr+n5YtCIPNWtXs8a87hcAfGHWAjpfFEPwS7rIrdfARMSyR
-         yRVRk1QAxVpW/W5hUI6r2DzLpDHD6exu/Ip3JwVLsA/+MQ1S+HmcuMfotnLbLMgGaO4Y
-         m9A9QiZLNdd1lU22Juz4maLLNejb1k9fUOVfGP82PPoP88MicHDxO9zEs5nWsruTb5Ns
-         HLyTqvbQYTBxjhpRGcruYqpFgq0Mbqr9g63Oi8MzllPAq23eVaJWAeLQEVd+EhrzbFkU
-         0Z11NbbaeSYNX6JYEYXgOclm/1/plcddfWDpwsSAde3qF1Ah9v5Hg4USvkRg0iHVAm5W
-         5pJw==
+        d=gmail.com; s=20230601; t=1702222225; x=1702827025; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xaVMYhrpoa/YqfB7r9ICllcqtbstEQQi97r/qMUiRCw=;
+        b=DNHNYhTpaCRmBRaCd6vk/OnJQBJeST3Iu8Le1Bkg3uhrVFowrB8YomqzLlKPfGfd7M
+         03ss9rSj55OU/QuqozFFAd9D87yMpgBI9vQ6Keegp696u35pD8AmqZxDw5Fyz8oL5szm
+         0m55UXOzHICxXzrqZ9lm8xfoUUKfpjzUhz9t/w93fH84vGK9PJ42OA4rTagnhaZTzbO7
+         4mLoO7g0DL8HfGo8JEoctoGoBY55voKpOB3UJXbsrg60neOiP5B93InXa0h0JVYxNwG2
+         77rYHVgB+eMhvgdmBewz7OCFfHd3mmg2mloP4r2Fd6NnSxDt3bwEwWA0StCEcR3FBDDR
+         Divw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702221391; x=1702826191;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bUOhGKebMTgquZ1Ef3JsJH3ulECY6eY7Ie5uuF7eE9I=;
-        b=IOB8YvXz1meTBFAuj15xGy2KapzShB8ifwYC8yWBa1EHDREhpdUgjA1skGIQvzVx3Y
-         jJMnbocNQfLmjTSdkmjcDa/8sfCeKA1VjNtcvhtCnSKyTn54Ulr7MnkxpyCgWHhKtjTm
-         ZQFv8FVbik/rekPUx9t6HZvgu9PE7svM6gJWr291UHsoJuf/jYdPiAjRXy00CWaiy6o+
-         t1PIG7tDh5rxfz6/DwzaPVtr00VcEE6bjKIantTmcoMKky40heseMkbwpAGblYcplAxO
-         Eb6i4tiqWR1H3qifZ58PKQAkAyVocGQcdTYj7UXoXN7EDqQ4ThQOnaCcV4o0ME7QVCjk
-         diaw==
-X-Gm-Message-State: AOJu0YwQsJeBuprkJecJGOAOZgmpZidsdRHZa2n671SeEogK/kk0ql4W
-	S3Pj0ZN+hLdw04naTiS+gFCaIhlOq3bg2eSNfXC/ydJ743iZR9hO
-X-Google-Smtp-Source: AGHT+IGJuyXqKj+B+WkRnixfOYD4kaH0JeM2vfiq69XGGLTOHD9BDRA4iDgNBpUUZth5PAt/TXl06wSZRsK+umLWnDY=
-X-Received: by 2002:a17:90b:68a:b0:288:9756:5da9 with SMTP id
- m10-20020a17090b068a00b0028897565da9mr1121701pjz.30.1702221391046; Sun, 10
- Dec 2023 07:16:31 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702222225; x=1702827025;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xaVMYhrpoa/YqfB7r9ICllcqtbstEQQi97r/qMUiRCw=;
+        b=oQ1aZBHLp/8WEMxgiuH30+0pnurxnv88f9nuD4Czj+dQhy4GWGl3d9ckQ+Eq4mW3xd
+         JNtwEtT99A7zk8OKjZyA5EJdz1D3ZwC4f/yZYMff+HwchOcUAZLCF24/J2VW6rfNQYtO
+         h/ZwbVI8v3AiJXlitEUX1XreyGg00TbiAiqGM4Z7724di7xj+oz0QWkV8nmGw4Qg9J78
+         HzOVZ40bGYP/+AEs0R8jLBjnJx1W0urF2xHi3JY4BpfaCsITc7Kkbd1JZew2r0Fn12u1
+         czfSNyGkrNIya8F9fMxnPUiD7nVEnB2cuB9hP9PC02K+gWoxpG3GkegEk8yK7BdqRdXl
+         /ang==
+X-Gm-Message-State: AOJu0YygdEYuyu41Cn2YsjxQThV4BTMBNAdKPNdkWKowxe9FPAdFCpFS
+	E6rIQFTbEVFI6nG3W9S4M3w=
+X-Google-Smtp-Source: AGHT+IG2AG3IBlHUI7YtIdQyEH/qzPalkwYp9vjItbp41rRAxUIlbSJl40T+/hE6se6K2YudybHMrg==
+X-Received: by 2002:a05:6000:111:b0:333:16:7a85 with SMTP id o17-20020a056000011100b0033300167a85mr1164456wrx.11.1702222224555;
+        Sun, 10 Dec 2023 07:30:24 -0800 (PST)
+Received: from [192.168.1.95] (host-176-36-0-241.b024.la.net.ua. [176.36.0.241])
+        by smtp.gmail.com with ESMTPSA id p18-20020a5d6392000000b003333a216682sm6508763wru.97.2023.12.10.07.30.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 10 Dec 2023 07:30:23 -0800 (PST)
+Message-ID: <ce4bd46009b9b0b8fb2dbec83eaa3e4c476bb050.camel@gmail.com>
+Subject: Re: [PATCH bpf-next 0/8] BPF token support in libbpf's BPF object
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, paul@paul-moore.com, brauner@kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	keescook@chromium.org, kernel-team@meta.com, sargun@sargun.me
+Date: Sun, 10 Dec 2023 17:30:22 +0200
+In-Reply-To: <20231207185443.2297160-1-andrii@kernel.org>
+References: <20231207185443.2297160-1-andrii@kernel.org>
+Autocrypt: addr=eddyz87@gmail.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: ditang chen <ditang.c@gmail.com>
-Date: Sun, 10 Dec 2023 23:16:20 +0800
-Message-ID: <CAHnGgyF-oAnCd+NdvdZVzhE4VZLnK+BcVBH3gQqm9v0Q1s_QGw@mail.gmail.com>
-Subject: [PATCH] net: netperf TCP_CRR test fails in bonding interfaces(mode 0)
-To: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-Reproduce
-1. client/server:
-# modprobe bonding
-# ifconfig enp1s3 down
-# ifconfig enp2s3 down
-# echo "+bond0" > /sys/class/net/bonding_masters
-# edho "enp1s3" > /sys/class/net/bond0/bonding/slaves
-# edho "enp2s3" > /sys/class/net/bond0/bonding/slaves
-# ifconfig bond0 up
+On Thu, 2023-12-07 at 10:54 -0800, Andrii Nakryiko wrote:
+> Add fuller support for BPF token in high-level BPF object APIs. This is t=
+he
+> most frequently used way to work with BPF using libbpf, so supporting BPF
+> token there is critical.
+>=20
+> Patch #1 is improving kernel-side BPF_TOKEN_CREATE behavior by rejecting =
+to
+> create "empty" BPF token with no delegation. This seems like saner behavi=
+or
+> which also makes libbpf's caching better overall. If we ever want to crea=
+te
+> BPF token with no delegate_xxx options set on BPF FS, we can use a new fl=
+ag to
+> enable that.
+>=20
+> Patches #2-#5 refactor libbpf internals, mostly feature detection code, t=
+o
+> prepare it from BPF token FD.
+>=20
+> Patch #6 adds options to pass BPF token into BPF object open options. It =
+also
+> adds implicit BPF token creation logic to BPF object load step, even with=
+out
+> any explicit involvement of the user. If the environment is setup properl=
+y,
+> BPF token will be created transparently and used implicitly. This allows =
+for
+> all existing application to gain BPF token support by just linking with
+> latest version of libbpf library. No source code modifications are requir=
+ed.
+> All that under assumption that privileged container management agent prop=
+erly
+> set up default BPF FS instance at /sys/bpf/fs to allow BPF token creation=
+.
+>=20
+> Patches #7-#8 adds more selftests, validating BPF object APIs work as exp=
+ected
+> under unprivileged user namespaced conditions in the presence of BPF toke=
+n.
 
-2. server
-# ifconfig bond0 192.168.50.101
-# netserver -D -d -f
+fwiw, I've read through this patch-set and have not noticed any issues,
+all seems good to me. Not sure if that worth much as I'm not terribly
+familiar with code base yet.
 
-3. client
-# ifconfig bond0 192.168.50.100
-# netperf -t TCP_CRR -H 192.168.50.101 -l 3600
-
-netperf may terminated with "netperf:send_omni:recv_data failed:
-Connection reset by peer".
-the client correctly establishes connection and then send its
-data(psh+ack), but if the server process the data(psh+ack) before the
-ack, and then server side just resets connection.
-
----
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 8afb0950a697..630bbe78539f 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -6502,8 +6502,11 @@ int tcp_rcv_state_process(struct sock *sk,
-struct sk_buff *skb)
-                goto discard;
-
-        case TCP_LISTEN:
--               if (th->ack)
-+               if (th->ack) {
-+                       if (th->psh)
-+                               goto discard;
-                        return 1;
-+               }
+[...]
 
