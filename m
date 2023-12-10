@@ -1,299 +1,160 @@
-Return-Path: <netdev+bounces-55602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07A3C80BA40
-	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 12:02:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0568580BA4A
+	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 12:10:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6ABE3B20A58
-	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 11:02:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B06291F20FAF
+	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 11:10:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF18847B;
-	Sun, 10 Dec 2023 11:02:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C069D8494;
+	Sun, 10 Dec 2023 11:10:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=rwahl@gmx.de header.b="tbRxF4EI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E74kN/au"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BF4FD1;
-	Sun, 10 Dec 2023 03:02:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.de; s=s31663417;
-	t=1702206128; x=1702810928; i=rwahl@gmx.de;
-	bh=umoV7rOUxfbzITiKQLobTxX64+i9fe0nWUeWUl30t38=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
-	b=tbRxF4EIP8gAjRaD0p/eTQ3hbBAUxh+iCcUG735ZYqsZ8QHorkFEhr7pEnXYWP0X
-	 ++rWQyWeRb/wxtxOhj4oubIcH3pAVHN7g3NwtCRMnqC5UACfYgHF/CD+ttwOZBhdb
-	 KpgZojHX30MYwkJHdqjhJwBIJeqFrjKSbG6DLCBx96/foFosCi0+DaCLqaauGmHFy
-	 ZsRZNs5GeeFot2Ufr9Q7+d7QeAdug0dHHd67i1cogacWCB87VpI8YwPT8UwwKCEgv
-	 qJgyZ0uw7ekpVxuCkA4Q5ALchuVUnZIHAdVMnkC/mhXQGgT/D24Q8Hls/Jb1QqD0F
-	 X2NBwhqXGugeNUOOkA==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from rohan.localdomain ([84.156.159.24]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MBUmD-1r4t2t1aqF-00D0OA; Sun, 10
- Dec 2023 12:02:08 +0100
-From: Ronald Wahl <rwahl@gmx.de>
-To: rwahl@gmx.de
-Cc: Ronald Wahl <ronald.wahl@raritan.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] net: ks8851: Fix TX stall caused by TX buffer overrun
-Date: Sun, 10 Dec 2023 12:01:29 +0100
-Message-ID: <20231210110130.935911-1-rwahl@gmx.de>
-X-Mailer: git-send-email 2.43.0
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF727CE
+	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 03:10:38 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5d749e4fa3dso43336497b3.1
+        for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 03:10:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702206638; x=1702811438; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:mime-version
+         :message-id:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9JYbP30LV20QRsL/owp33BeqXTpPwV3QAP/6cuUo5hc=;
+        b=E74kN/auDyAit29igGbKpsF+MQ8z1b8gsQEko146tPkhXgpZL334e/K4eKvlWMdZfO
+         bEv5aAnfShLaYKevE+ILYbJE79Dfm6WIr2zDFFuwo8L67y3euD4iJLYRw+6gSJMIMlhO
+         tWLPqEErzTTwsVAYjjPGo14O1p7ljpnIcMSPtDgm7pdJpuF+/A+/4bjhk42C4be/ehDi
+         JIlR/dxklgVrZePnjWnoJ3JwI0gDOI34szVuQ1AnQTdh3GBGGL0Jg6hyglNUW5NGG+2n
+         w5ws7/GdqfWGcBmcbNT1SM/+bAMq6ir23Fzd6F6ReVlVEHTOFjopF5FHL3V2Jyuu8wMz
+         58aQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702206638; x=1702811438;
+        h=content-transfer-encoding:cc:to:from:subject:mime-version
+         :message-id:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9JYbP30LV20QRsL/owp33BeqXTpPwV3QAP/6cuUo5hc=;
+        b=JEPaPHEQetXshz5Lk4ajAbVHe5Q7ihuRsA1bxCORHj0niATwBn/Zjcd2HlAWazEhmk
+         +g/YEVSXc/RjxZuJtXwC11Bev4iX3I2Klu1XZZtr7Sxy6pD/pyUSQpzOElq4RI7V20Hp
+         UwnUW9UW9mnconRZ/ZFVzdTc9kK/thK7N9Kr2ZJphvg/P89jqLTQd5PpbDKSSzBopKaF
+         3zm0RGP+ExTKvFaFq+oeGgrwNzPwTZ3r1Gbt3MTH+6ruusDywdzWf7BeARCt1R8xjC26
+         +YrDQ849srTpa9bj8KgfgovsMJspX8YWkBFtTVx+7Zjyrqvp9SCC73NQM9EKPSAGaFYN
+         DLSw==
+X-Gm-Message-State: AOJu0YxYlaZgOZI5AydDQ2KYE4tkWQIlXBS9yRefZHi4W+/1i/dV328L
+	3esnzEA159uHTlkbzJYeHQCRoX1O
+X-Google-Smtp-Source: AGHT+IHaR4GlzWwKbCnH171TNpxU4/2eP7fVsiz3k4TqKAq6nOCwwhlz6S7hNs2Ah6N7B2oe38Rt+Uyo
+X-Received: from athina.mtv.corp.google.com ([2620:15c:211:200:5ede:596c:db09:feb])
+ (user=maze job=sendgmr) by 2002:a05:6902:9:b0:db5:382f:3997 with SMTP id
+ l9-20020a056902000900b00db5382f3997mr16597ybh.11.1702206637803; Sun, 10 Dec
+ 2023 03:10:37 -0800 (PST)
+Date: Sun, 10 Dec 2023 03:10:32 -0800
+Message-Id: <20231210111033.1823491-1-maze@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Subject: [PATCH] net: sysctl: fix edge case wrt. sysctl write access
+From: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>
+To: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <zenczykowski@gmail.com>
+Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Flavio Crisciani <fcrisciani@google.com>, 
+	"Theodore Y. Ts'o" <tytso@google.com>, "Eric W. Biederman" <ebiederm@xmission.com>, 
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:YhUQ+G+3yiK4Zntu6DyMKg01202gIqNCj6TaJswXKXOVEGtwiDx
- 6XRcYfTCfnA/cVQdQeZaXmS617TuLfUuhI0kCfa4ay7dolR/dIHBLmzJ//lLFo0v+gJqFA9
- 5kg9EanSgLX2GYq1yM0Vm/ykQT/ftr/HPTWL3kK7rz4c8h7+0C9iyzu8NBuko3ginYkvSuS
- z0forCvrCTsBlZ4GCoKxA==
-UI-OutboundReport: notjunk:1;M01:P0:JBLd1JxHl84=;BA5ofJUH8pPhHBFPdMD1zOhw4lZ
- JdeWJPeTMEemNE82UxH30UldL9F/tMAkZrbc4unhBNmuGYUoT/nvIZXmvYURazz16MKGQvvm+
- 7mTxgDGcmlRfNpMUaIv+D3rAuqISGPL+0A4NKimwx8cwkN28p5xmKpX2GC60Xmiu/wj2YlIHo
- LaTwAjeTjbA1ArMlIrcoZlfxSFV0GxkZocUAkadkSAxXqBqdk06xAKTT572vbHpB1ARsqrQZJ
- sUj/pTLdefCOPnRG7DHqZjy5Qmr2bRUo9Qb2VLysFhqxoQ/zWNCivWeMTEM/doBgAKkX4iWvd
- 5QCPfGy2kuDmHqJq++yqrGE3Ext8qm3xbhyUEtssn0uUPa+x1//pRxypENeJ0wSRASADvZ2c0
- iaBoZ3WOD4kOF65vwpvqkpUBtYla0bL5MgUSq2pAWs9BgfXKjoSomUIuQanMtlNyaQ0SEIBHN
- 7JpgazDUnVlY3RfIJnA7Vyhrc2LTvz9i1Uh7LXjThhp7tnyABk5SXd7skLoxW/7F4lTs8rzYP
- LyRvSpU51ubbSN6ZMA+mgQ5KTqR/Bk9KEcvc/8UqNqGg0V31xw2qDItPLWDYq3lm3Tgzq7ldP
- nv4zzJAkOTV4BPoqhGr1kb1KOSzbVMk3M548m0bMnUz39ugku7gN4WPcaxn0HMPwL04DPCzjX
- V20z89MmDWqUsarEg1O5Oq3EaKZ7NTd/NithcjopWnww0YE84hobAc7MeJE7BTEt2rNXViGc/
- bTiL0w+foPkXMKLruFHVD/T4zcImb/dk9GyVANYqwkAM+zt79MidBsr+JQS1Lvzo+H+hYnUkq
- s57Ps5G5daEsG6N3hab64U6e6Tv4jZrvaIHrmd5pO0Lk92L02Fy0yiRTJoeh3doClroi9RIBq
- vX5lhzQcwRZM5932Bi0/0aSM8RfsC9fMQ8QQxOQYQTjY7Q/10Kzx/b/DftGPHmVC9PLIaysyg
- yZSWoNmlS1Gb41KYiL4w/90UwuE=
 
-From: Ronald Wahl <ronald.wahl@raritan.com>
+The clear intent of net_ctl_permissions() is that having CAP_NET_ADMIN
+grants write access to networking sysctls.
 
-There is a bug in the ks8851 Ethernet driver that more data is written
-to the hardware TX buffer than actually available. This is caused by
-wrong accounting of the free TX buffer space.
+However, it turns out there is an edge case where this is insufficient:
+inode_permission() has an additional check on HAS_UNMAPPED_ID(inode)
+which can return -EACCES and thus block *all* write access.
 
-The driver maintains a tx_space variable that represents the TX buffer
-space that is deemed to be free. The ks8851_start_xmit_spi() function
-adds an SKB to a queue if tx_space is large enough and reduces tx_space
-by the amount of buffer space it will later need in the TX buffer and
-then schedules a work item. If there is not enough space then the TX
-queue is stopped.
+Note: AFAICT this check is wrt. the uid/gid mapping that was
+active at the time the filesystem (ie. proc) was mounted.
 
-The worker function ks8851_tx_work() dequeues all the SKBs and writes
-the data into the hardware TX buffer. The last packet will trigger an
-interrupt after it was send. Here it is assumed that all data fits into
-the TX buffer.
+In order for this check to not fail, we need net_ctl_set_ownership()
+to set valid uid/gid.  It is not immediately clear what value
+to use, nor what values are guaranteed to work.
+It does make sense that /proc/sys/net appear to be owned by root
+from within the netns owning userns.  As such we only modify
+what happens if the code fails to map uid/gid 0.
+Currently the code just fails to do anything, which in practice
+results in using the zeroes of freshly allocated memory,
+and we thus end up with global root.
+With this change we instead use the uid/gid of the owning userns.
+While it is probably (?) theoretically possible for this to *also*
+be unmapped from the /proc filesystem's point of view, this seems
+much less likely to happen in practice.
 
-In the interrupt routine (which runs asynchronously because it is a
-threaded interrupt) tx_space is updated with the current value from the
-hardware. Also the TX queue is woken up again.
+The old code is observed to fail in a relatively complex setup,
+within a global root created user namespace with selectively
+mapped uid/gids (not including global root) and /proc mounted
+afterwards (so this /proc mount does not have global root mapped).
+Within this user namespace another non privileged task creates
+a new user namespace, maps it's own uid/gid (but not uid/gid 0),
+and then creates a network namespace.  It cannot write to networking
+sysctls even though it does have CAP_NET_ADMIN.
 
-Now it could happen that after data was sent to the hardware and before
-handling the TX interrupt new data is queued in ks8851_start_xmit_spi()
-when the TX buffer space had still some space left. When the interrupt
-is actually handled tx_space is updated from the hardware but now we
-already have new SKBs queued that have not been written to the hardware
-TX buffer yet. Since tx_space has been overwritten by the value from the
-hardware the space is not accounted for.
+This is because net_ctl_set_ownership fails to map uid/gid 0
+(because uid/gid 0 are *not* mapped in the owning 2nd level user_ns),
+and falls back to global root.
+But global root is not mapped in the 1st level user_ns,
+which was inherited by the /proc mount, and thus fails...
 
-Now we have more data queued then buffer space available in the hardware
-and ks8851_tx_work() will potentially overrun the hardware TX buffer. In
-many cases it will still work because often the buffer is written out
-fast enough so that no overrun occurs but for example if the peer
-throttles us via flow control then an overrun may happen.
+Note: the uid/gid of networking sysctls is of purely superficial
+importance, outside of this UNMAPPED check, it does not actually
+affect access, and only affects display.
 
-This can be fixed in different ways. The most simple way would be to set
-tx_space to 0 before writing data to the hardware TX buffer preventing
-the queuing of more SKBs until the TX interrupt has been handled. I have
-choosen a slightly more efficient (and still rather simple) way and
-track the amount of data that is already queued and not yet written to
-the hardware. When new SKBs are to be queued the already queued amount
-of data is honoured when checking free TX buffer space.
+Access is always based on whether you are *global* root uid
+(or have CAP_NET_ADMIN over the netns) for user write access bits
+(or are in *global* root gid for group write access bits).
 
-I tested this with a setup of two linked KS8851 running iperf3 between
-the two in bidirectional mode. Before the fix I got a stall after some
-minutes. With the fix I saw now issues anymore after hours.
+Cc: Flavio Crisciani <fcrisciani@google.com>
+Cc: "Theodore Y. Ts'o" <tytso@google.com>
+Cc: "Eric W. Biederman" <ebiederm@xmission.com>
+Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Fixes: e79c6a4fc923 ("net: make net namespace sysctls belong to container's=
+ owner")
+Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
+---
+ net/sysctl_net.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org
-Cc: stable@vger.kernel.org # 5.10+
-Signed-off-by: Ronald Wahl <ronald.wahl@raritan.com>
-=2D--
- drivers/net/ethernet/micrel/ks8851.h        |  1 +
- drivers/net/ethernet/micrel/ks8851_common.c | 21 +++++------
- drivers/net/ethernet/micrel/ks8851_spi.c    | 41 +++++++++++++--------
- 3 files changed, 37 insertions(+), 26 deletions(-)
-
-diff --git a/drivers/net/ethernet/micrel/ks8851.h b/drivers/net/ethernet/m=
-icrel/ks8851.h
-index fecd43754cea..ce7e524f2542 100644
-=2D-- a/drivers/net/ethernet/micrel/ks8851.h
-+++ b/drivers/net/ethernet/micrel/ks8851.h
-@@ -399,6 +399,7 @@ struct ks8851_net {
- 	struct work_struct	rxctrl_work;
-
- 	struct sk_buff_head	txq;
-+	unsigned int		queued_len;
-
- 	struct eeprom_93cx6	eeprom;
- 	struct regulator	*vdd_reg;
-diff --git a/drivers/net/ethernet/micrel/ks8851_common.c b/drivers/net/eth=
-ernet/micrel/ks8851_common.c
-index cfbc900d4aeb..daab9358124b 100644
-=2D-- a/drivers/net/ethernet/micrel/ks8851_common.c
-+++ b/drivers/net/ethernet/micrel/ks8851_common.c
-@@ -362,16 +362,17 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
- 		handled |=3D IRQ_RXPSI;
-
- 	if (status & IRQ_TXI) {
--		handled |=3D IRQ_TXI;
+diff --git a/net/sysctl_net.c b/net/sysctl_net.c
+index 051ed5f6fc93..ded399f380d9 100644
+--- a/net/sysctl_net.c
++++ b/net/sysctl_net.c
+@@ -58,16 +58,11 @@ static void net_ctl_set_ownership(struct ctl_table_head=
+er *head,
+ 				  kuid_t *uid, kgid_t *gid)
+ {
+ 	struct net *net =3D container_of(head->set, struct net, sysctls);
+-	kuid_t ns_root_uid;
+-	kgid_t ns_root_gid;
++	kuid_t ns_root_uid =3D make_kuid(net->user_ns, 0);
++	kgid_t ns_root_gid =3D make_kgid(net->user_ns, 0);
+=20
+-	ns_root_uid =3D make_kuid(net->user_ns, 0);
+-	if (uid_valid(ns_root_uid))
+-		*uid =3D ns_root_uid;
 -
--		/* no lock here, tx queue should have been stopped */
-+		unsigned short tx_space =3D ks8851_rdreg16(ks, KS_TXMIR);
-+		netif_dbg(ks, intr, ks->netdev,
-+			  "%s: txspace %d\n", __func__, tx_space);
-
--		/* update our idea of how much tx space is available to the
--		 * system */
--		ks->tx_space =3D ks8851_rdreg16(ks, KS_TXMIR);
-+		spin_lock(&ks->statelock);
-+		ks->tx_space =3D tx_space;
-+		if (netif_queue_stopped(ks->netdev))
-+			netif_wake_queue(ks->netdev);
-+		spin_unlock(&ks->statelock);
-
--		netif_dbg(ks, intr, ks->netdev,
--			  "%s: txspace %d\n", __func__, ks->tx_space);
-+		handled |=3D IRQ_TXI;
- 	}
-
- 	if (status & IRQ_RXI)
-@@ -414,9 +415,6 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
- 	if (status & IRQ_LCI)
- 		mii_check_link(&ks->mii);
-
--	if (status & IRQ_TXI)
--		netif_wake_queue(ks->netdev);
--
- 	return IRQ_HANDLED;
+-	ns_root_gid =3D make_kgid(net->user_ns, 0);
+-	if (gid_valid(ns_root_gid))
+-		*gid =3D ns_root_gid;
++	*uid =3D uid_valid(ns_root_uid) ? ns_root_uid : net->user_ns->owner;
++	*gid =3D gid_valid(ns_root_gid) ? ns_root_gid : net->user_ns->group;
  }
-
-@@ -500,6 +498,7 @@ static int ks8851_net_open(struct net_device *dev)
- 	ks8851_wrreg16(ks, KS_ISR, ks->rc_ier);
- 	ks8851_wrreg16(ks, KS_IER, ks->rc_ier);
-
-+	ks->queued_len =3D 0;
- 	netif_start_queue(ks->netdev);
-
- 	netif_dbg(ks, ifup, ks->netdev, "network device up\n");
-diff --git a/drivers/net/ethernet/micrel/ks8851_spi.c b/drivers/net/ethern=
-et/micrel/ks8851_spi.c
-index 70bc7253454f..eb089b3120bc 100644
-=2D-- a/drivers/net/ethernet/micrel/ks8851_spi.c
-+++ b/drivers/net/ethernet/micrel/ks8851_spi.c
-@@ -286,6 +286,18 @@ static void ks8851_wrfifo_spi(struct ks8851_net *ks, =
-struct sk_buff *txp,
- 		netdev_err(ks->netdev, "%s: spi_sync() failed\n", __func__);
- }
-
-+/**
-+ * calc_txlen - calculate size of message to send packet
-+ * @len: Length of data
-+ *
-+ * Returns the size of the TXFIFO message needed to send
-+ * this packet.
-+ */
-+static unsigned int calc_txlen(unsigned int len)
-+{
-+	return ALIGN(len + 4, 4);
-+}
-+
- /**
-  * ks8851_rx_skb_spi - receive skbuff
-  * @ks: The device state
-@@ -310,6 +322,8 @@ static void ks8851_tx_work(struct work_struct *work)
- 	unsigned long flags;
- 	struct sk_buff *txb;
- 	bool last;
-+	unsigned short tx_space;
-+	unsigned int dequeued_len =3D 0;
-
- 	kss =3D container_of(work, struct ks8851_net_spi, tx_work);
- 	ks =3D &kss->ks8851;
-@@ -320,6 +334,7 @@ static void ks8851_tx_work(struct work_struct *work)
- 	while (!last) {
- 		txb =3D skb_dequeue(&ks->txq);
- 		last =3D skb_queue_empty(&ks->txq);
-+		dequeued_len +=3D calc_txlen(txb->len);
-
- 		if (txb) {
- 			ks8851_wrreg16_spi(ks, KS_RXQCR,
-@@ -332,6 +347,13 @@ static void ks8851_tx_work(struct work_struct *work)
- 		}
- 	}
-
-+	tx_space =3D ks8851_rdreg16_spi(ks, KS_TXMIR);
-+
-+	spin_lock(&ks->statelock);
-+	ks->queued_len -=3D dequeued_len;
-+	ks->tx_space =3D tx_space;
-+	spin_unlock(&ks->statelock);
-+
- 	ks8851_unlock_spi(ks, &flags);
- }
-
-@@ -346,18 +368,6 @@ static void ks8851_flush_tx_work_spi(struct ks8851_ne=
-t *ks)
- 	flush_work(&kss->tx_work);
- }
-
--/**
-- * calc_txlen - calculate size of message to send packet
-- * @len: Length of data
-- *
-- * Returns the size of the TXFIFO message needed to send
-- * this packet.
-- */
--static unsigned int calc_txlen(unsigned int len)
--{
--	return ALIGN(len + 4, 4);
--}
--
- /**
-  * ks8851_start_xmit_spi - transmit packet using SPI
-  * @skb: The buffer to transmit
-@@ -386,16 +396,17 @@ static netdev_tx_t ks8851_start_xmit_spi(struct sk_b=
-uff *skb,
-
- 	spin_lock(&ks->statelock);
-
--	if (needed > ks->tx_space) {
-+	if (ks->queued_len + needed > ks->tx_space) {
- 		netif_stop_queue(dev);
- 		ret =3D NETDEV_TX_BUSY;
- 	} else {
--		ks->tx_space -=3D needed;
-+		ks->queued_len +=3D needed;
- 		skb_queue_tail(&ks->txq, skb);
- 	}
-
- 	spin_unlock(&ks->statelock);
--	schedule_work(&kss->tx_work);
-+	if (ret =3D=3D NETDEV_TX_OK)
-+		schedule_work(&kss->tx_work);
-
- 	return ret;
- }
-=2D-
-2.43.0
+=20
+ static struct ctl_table_root net_sysctl_root =3D {
+--=20
+2.43.0.472.g3155946c3a-goog
 
 
