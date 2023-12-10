@@ -1,99 +1,75 @@
-Return-Path: <netdev+bounces-55649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7F7980BCC2
-	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 20:40:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 182BB80BCD0
+	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 20:53:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1BFB1C203BB
-	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 19:40:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A18EE1F20F02
+	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 19:53:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2AD51C2B1;
-	Sun, 10 Dec 2023 19:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 861251C683;
+	Sun, 10 Dec 2023 19:53:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IrIzYwhI"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VQUL9XDr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3EAB1C29A;
-	Sun, 10 Dec 2023 19:40:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 29537C433C9;
-	Sun, 10 Dec 2023 19:40:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702237226;
-	bh=YgF9ROEN1Nze2v7u2x3i8aMWf38cmiNWT54E7R8vwzk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IrIzYwhIk4M4SpGHt5RqP2JVva0ZiBfIuv9tZ2xNtb7fndbIz4goQZPwNkZg7jFxi
-	 ZBnE0oNKVrQqzFFJq67hZytq+8cQCsztHRK0HsEzZU3ieck3atmF2vgTwwJv/ZJcWA
-	 jY5JqKBP9A9T+iKtgj2U8SMXiINEdVM3p0kff6VOUlP3ZZU/CH7eEdLojbl4tg+2QT
-	 rc2NyoxQcV1ZCiY48yqwyMtz2VQe/Ma/pLPP6sDpYQtfq/3O9Mffc0ZMdNiYC6RRp6
-	 kra+S1EFMqaglfBPxxs73nibnzXNGg3tOqGzfoXPChjJV0RbCSgaVQgTXslXCNVKKs
-	 O8h0wdXidEKcw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 116A2C595CE;
-	Sun, 10 Dec 2023 19:40:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEF3AF1
+	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 11:53:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=k9BvOQCDihWFs6btfwK8gJPhn3WeEDmZpDFy9mNdRjI=; b=VQUL9XDrVFYlCgDik2qKn24zN1
+	dNBh8BK7ljUqy2QbXpWKOpavT5DLACF5HV71fFBrbs6EU8dgeHqF7O1yqN7QSICylVRHwbb3Ct64c
+	85OF9l/GVVzQWH6Sg05m7rgl19OhQ2du8CXjlAhI+YC1Q5YrS+JB390+sY9384+M5KU8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rCPrw-002XvX-8P; Sun, 10 Dec 2023 20:53:40 +0100
+Date: Sun, 10 Dec 2023 20:53:40 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Gregory CLEMENT <gregory.clement@bootlin.com>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>,
+	Sven Auhagen <sven.auhagen@voleatech.de>,
+	thomas.petazzoni@bootlin.com, netdev <netdev@vger.kernel.org>
+Subject: Re: mvneta crash in page pool code
+Message-ID: <f297f634-329c-4e6c-86e7-3e0db9ebe4ba@lunn.ch>
+References: <ea0efd7d-8325-4e38-88f8-5ad63f1b17bc@lunn.ch>
+ <871qbwemvb.fsf@BL-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/9] net: rswitch: Add jumbo frames support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170223722606.14740.8136418854142677445.git-patchwork-notify@kernel.org>
-Date: Sun, 10 Dec 2023 19:40:26 +0000
-References: <20231208041030.2497657-1-yoshihiro.shimoda.uh@renesas.com>
-In-Reply-To: <20231208041030.2497657-1-yoshihiro.shimoda.uh@renesas.com>
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <871qbwemvb.fsf@BL-laptop>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Fri,  8 Dec 2023 13:10:21 +0900 you wrote:
-> This patch series is based on the latest net-next.git / main branch.
+On Fri, Dec 08, 2023 at 04:26:48PM +0100, Gregory CLEMENT wrote:
+> Hi Andrew,
 > 
-> Changes from v4:
-> https://lore.kernel.org/all/20231207081246.1557582-1-yoshihiro.shimoda.uh@renesas.com/
->  - Based on the latest net-next.git / main branch.
->  - Drop unnecessary change of Makefile in the patch 2/9.
+> > Hi Folks
+> >
+> > I just booted net-next/main on a Marvell RDK with an mvneta. It throws
+> > an Opps and dies.
+> >
+> > My setup might be a little bit unusual, i have NFS root over one of
+> > the instances of mvneta, and a Marvell switch on the other
+> > instance. So i included a bit more context.
+> >
+> > I don't have time to debug this at the moment. Maybe later i can do a
+> > bisect.
 > 
-> [...]
+> is it solved by
+> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=ca8add922f9c ?
 
-Here is the summary with links:
-  - [net-next,v5,1/9] net: rswitch: Drop unused argument/return value
-    https://git.kernel.org/netdev/net-next/c/c7e0022390d4
-  - [net-next,v5,2/9] net: rswitch: Use unsigned int for desc related array index
-    https://git.kernel.org/netdev/net-next/c/885703418453
-  - [net-next,v5,3/9] net: rswitch: Use build_skb() for RX
-    https://git.kernel.org/netdev/net-next/c/6a203cb5165d
-  - [net-next,v5,4/9] net: rswitch: Add unmap_addrs instead of dma address in each desc
-    https://git.kernel.org/netdev/net-next/c/271e015b9153
-  - [net-next,v5,5/9] net: rswitch: Add a setting ext descriptor function
-    https://git.kernel.org/netdev/net-next/c/fcff581ee430
-  - [net-next,v5,6/9] net: rswitch: Set GWMDNC register
-    https://git.kernel.org/netdev/net-next/c/9c90316a1170
-  - [net-next,v5,7/9] net: rswitch: Add jumbo frames handling for RX
-    https://git.kernel.org/netdev/net-next/c/933416cc59b1
-  - [net-next,v5,8/9] net: rswitch: Add jumbo frames handling for TX
-    https://git.kernel.org/netdev/net-next/c/d2c96b9d5f83
-  - [net-next,v5,9/9] net: rswitch: Allow jumbo frames
-    https://git.kernel.org/netdev/net-next/c/c71517fe7353
+Hi Gregory
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This problem has been solved in net-next by a patch from Eric.
 
-
+     Andrew
 
