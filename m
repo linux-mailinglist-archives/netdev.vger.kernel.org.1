@@ -1,93 +1,108 @@
-Return-Path: <netdev+bounces-55641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F9E480BC81
-	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 19:06:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB14280BC9E
+	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 19:54:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CEF21C20381
-	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 18:06:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65870B207FC
+	for <lists+netdev@lfdr.de>; Sun, 10 Dec 2023 18:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC4E51A27D;
-	Sun, 10 Dec 2023 18:06:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 909AC1A5A0;
+	Sun, 10 Dec 2023 18:54:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="zQmSwO9F"
+	dkim=pass (2048-bit key) header.d=sandelman.ca header.i=@sandelman.ca header.b="EL3dE5GC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8875BCE
-	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 10:06:28 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1d06d42a58aso34145015ad.0
-        for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 10:06:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1702231588; x=1702836388; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L6X4Sv45Bn19Fs41anTWfCiVYhBCsENhz4BlH3cMM7s=;
-        b=zQmSwO9FXfSmYwwm2vYVFP6YVi/MXHAA+L+EiCkogCCgSFqD4SfoUQ9E68hMwJNf/e
-         2ssYAk8pY3XE/bXlkYE/eJqI5v0QFjx4dy+8eT8wB7lnN3hhy4nhzKSuyJTiKe6deEHx
-         59UfSd47yVkLK2rB0fflekUrOXhY2ei5KRxojVUwn8yoYvS0BLy6DLHXrOp0jOEs3UBb
-         ZeCrFmqROoiNaCq41BNopMoKSRzbwAfpSUbdvpdUtOvgfadcEX0Ftxp3Bi6xTqTmU+6A
-         Xn+qYYXPGwpkz+hqPQp477AfUViAQCCarl/uim3XEE6WaAAXhHu9PubAWJOD7puh8YHT
-         Sl+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702231588; x=1702836388;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=L6X4Sv45Bn19Fs41anTWfCiVYhBCsENhz4BlH3cMM7s=;
-        b=WLeTWjAiS43FLpPWIH2RSKVPlw4RzP/XfG9SCwSbCbANTd5cM+kEcWToPp/XRW5ijV
-         6VhKTTnzRA97FwydnlA6h6hELPx2tsQQ7IVm+TyXqGmQLpIqoIvJDPMMFA7RywDoCwVi
-         1p6aol4zyFzjI7lLtqpHsz/mOSv70iYmQ1vbKw9PffTZeP2S76QKjHHQ6wxcaUVK+VN7
-         oeAIIGV3Himlzo0MyUy3Tv/VJVQKFId4s7esuzxtoYj/EJsyob3lNNNwkugfxN7GmvEi
-         kXmGPZ0XnzvqzYV9JvtCyFaJ/PTsukafKtHLO7GZDssSxEc6fN1P1AxKhpVyRSp2ZJ55
-         QMwQ==
-X-Gm-Message-State: AOJu0Yw06lyViH1adHSb0+bL2dFDo7kV7+DHbIUEmMrES9vXgs09PwF5
-	zTU18qCX4FkwVnGNnQMqZELW3g==
-X-Google-Smtp-Source: AGHT+IFdNzphkzTyrXl6sM+S+JDGngtMBFYoU6wwsQL5hI8Voplza1eR/GwoPFx9iF6bldWDqe8QuA==
-X-Received: by 2002:a17:902:c94d:b0:1d0:6ffd:e2bc with SMTP id i13-20020a170902c94d00b001d06ffde2bcmr3517906pla.86.1702231588024;
-        Sun, 10 Dec 2023 10:06:28 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id i9-20020a17090332c900b001d07b659f91sm5042699plr.6.2023.12.10.10.06.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 10 Dec 2023 10:06:27 -0800 (PST)
-Date: Sun, 10 Dec 2023 10:06:25 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: ditang chen <ditang.c@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH] net: netperf TCP_CRR test fails in bonding
- interfaces(mode 0)
-Message-ID: <20231210100615.521f290e@hermes.local>
-In-Reply-To: <CAHnGgyF-oAnCd+NdvdZVzhE4VZLnK+BcVBH3gQqm9v0Q1s_QGw@mail.gmail.com>
-References: <CAHnGgyF-oAnCd+NdvdZVzhE4VZLnK+BcVBH3gQqm9v0Q1s_QGw@mail.gmail.com>
+X-Greylist: delayed 394 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 10 Dec 2023 10:54:14 PST
+Received: from tuna.sandelman.ca (tuna.sandelman.ca [209.87.249.19])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E463D95
+	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 10:54:14 -0800 (PST)
+Received: from localhost (localhost [127.0.0.1])
+	by tuna.sandelman.ca (Postfix) with ESMTP id B229F1800F;
+	Sun, 10 Dec 2023 13:47:37 -0500 (EST)
+Received: from tuna.sandelman.ca ([127.0.0.1])
+	by localhost (localhost [127.0.0.1]) (amavisd-new, port 10024)
+	with LMTP id wQjBjc7C-lVr; Sun, 10 Dec 2023 13:47:35 -0500 (EST)
+Received: from sandelman.ca (obiwan.sandelman.ca [IPv6:2607:f0b0:f:2::247])
+	by tuna.sandelman.ca (Postfix) with ESMTP id A7D7A1800C;
+	Sun, 10 Dec 2023 13:47:35 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sandelman.ca;
+	s=mail; t=1702234055;
+	bh=QphxznjkhXHX+kh4bhaDhMyx0bJB04o0vglcWjvMXUM=;
+	h=From:To:cc:Subject:In-Reply-To:References:Date:From;
+	b=EL3dE5GCP3F81Sv1WbihMuEGMEkuET/HVoa4uEB/0/K9gGeYrauapYKqReNbj507Q
+	 NSfURcamzZUgWAFIJKKUCcsQHbbg5q7d4VOdPZJpDys3XbjvwJvNVkqyyo82qCa2oZ
+	 agwwAU+T1qpi/KZ+DoNh8wjt7E2IYPoUtZjc8bTm1XX6dVSXQzHnQE1D8VaAscUu/D
+	 xOUy/k9W/QEc123IveAjHrumK7BsUR0d6AFd27MhIOYPIAP0roeZqW3p+Zbd0piJ4V
+	 GfAhL06zq2ntVBhCNWRJY7/6+b9mIFnplm0hklSIsjuGaEt91lVMK48T02EZxgdm6j
+	 0Fa7961w7dQmQ==
+Received: from localhost (localhost [IPv6:::1])
+	by sandelman.ca (Postfix) with ESMTP id 9FB372A6;
+	Sun, 10 Dec 2023 13:47:35 -0500 (EST)
+From: Michael Richardson <mcr@sandelman.ca>
+To: Eyal Birger <eyal.birger@gmail.com>
+cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+    kuba@kernel.org, pabeni@redhat.com, steffen.klassert@secunet.com,
+    herbert@gondor.apana.org.au, pablo@netfilter.org, paul@nohats.ca,
+    nharold@google.com, devel@linux-ipsec.org, netdev@vger.kernel.org
+Subject: Re: [devel-ipsec] [PATCH ipsec-next, v2] xfrm: support sending NAT keepalives in ESP in UDP states
+In-Reply-To: <20231210180116.1737411-1-eyal.birger@gmail.com>
+References: <20231210180116.1737411-1-eyal.birger@gmail.com>
+X-Mailer: MH-E 8.6+git; nmh 1.7+dev; GNU Emacs 28.2
+X-Face: $\n1pF)h^`}$H>Hk{L"x@)JS7<%Az}5RyS@k9X%29-lHB$Ti.V>2bi.~ehC0;<'$9xN5Ub#
+ z!G,p`nR&p7Fz@^UXIn156S8.~^@MJ*mMsD7=QFeq%AL4m<nPbLgmtKK-5dC@#:k
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
+Date: Sun, 10 Dec 2023 13:47:35 -0500
+Message-ID: <15709.1702234055@localhost>
 
-On Sun, 10 Dec 2023 23:16:20 +0800
-ditang chen <ditang.c@gmail.com> wrote:
+--=-=-=
+Content-Type: text/plain
 
-> 1. client/server:
-> # modprobe bonding
-> # ifconfig enp1s3 down
-> # ifconfig enp2s3 down
-> # echo "+bond0" > /sys/class/net/bonding_masters
-> # edho "enp1s3" > /sys/class/net/bond0/bonding/slaves
-> # edho "enp2s3" > /sys/class/net/bond0/bonding/slaves
-> # ifconfig bond0 up
 
-This is a really old legacy way to configure bonding.
-The better method is:
++		BUILD_BUG_ON(XFRMA_MAX != XFRMA_NAT_KEEPALIVE_INTERVAL);
 
-# ip link add dev bond0 type bond
-# ip link set dev enp1s3 down master bond0
-# ip link set dev enp2s3 down master bond0
-# ip link set dev bond0 up
+This code was there before, and you are just updating it, but I gotta wonder
+about it.  It feels very not-DRY.
+It seems to be testing that XFRMA_MAX was updated correctly in the header
+file, and I guess I'm dubious about where it is being done.
+
+I said last year at the workshop that I'd start a tree on documentation for
+XFRM stuff, and I've managed to actually start that, and I'll attempt to use
+this new addition as template.
+
+As a general comment, until this work is RCU'ed I'm wondering how it will
+perform on systems with thousands of SAs. As you say: this is a place for
+improvement.  If no keepalives are set, does the code need to walk the xfrm
+states at all.  I wonder if that might mitigate the situation for bigger
+systems that have not yet adapted.  I don't see a way to not include this
+code.
+
+
+
+
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFFBAEBCgAvFiEEbsyLEzg/qUTA43uogItw+93Q3WUFAmV2B8cRHG1jckBzYW5k
+ZWxtYW4uY2EACgkQgItw+93Q3WVFaAgAhbQRe6GVdaXpKqSTwMZg9YARXlt+mGdp
+wbNBxMihO944rRpBBTjF7WbUumKTYmsROvmauhRyzhYdtSlkTQ3nbfQWwf5k+5d0
+QptnBr82kiSkNGyM5ezx8NOa8RE6u7KSAIoLjp3Z7/uMpbKmGlhmO3Nyu9JgIOej
+1aZ0lamGVr7E0CUPuWLwNW3JNwPGtOq4q2W7LRg0bJggHvU5Od95k+HXq7jDXxYm
+En3SrD0Jnivzt0OYhqmo/lkd69iEQHfIhn+iRrrtFxuM9Hoi/jnYyntGE4qwTTc2
+5TCm2C6HD4qfbU0A+xP3xA3aN0aEbr8vRex1l73lry2OC7UsWoyBRQ==
+=Bh0k
+-----END PGP SIGNATURE-----
+--=-=-=--
 
