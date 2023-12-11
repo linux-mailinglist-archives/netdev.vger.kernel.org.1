@@ -1,57 +1,44 @@
-Return-Path: <netdev+bounces-55836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B76F80C6B2
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 11:34:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 037AC80C6BB
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 11:36:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98B8E1C209A0
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:34:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31AF91C209C4
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:36:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DEE625554;
-	Mon, 11 Dec 2023 10:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AAB625548;
+	Mon, 11 Dec 2023 10:36:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3F29BD7;
-	Mon, 11 Dec 2023 02:34:13 -0800 (PST)
-Received: from loongson.cn (unknown [112.20.109.254])
-	by gateway (Coremail) with SMTP id _____8Cxueij5XZlTQIAAA--.44S3;
-	Mon, 11 Dec 2023 18:34:11 +0800 (CST)
-Received: from localhost.localdomain (unknown [112.20.109.254])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Dx_y+d5XZlRXRbAA--.5580S3;
-	Mon, 11 Dec 2023 18:34:08 +0800 (CST)
-From: Yanteng Si <siyanteng@loongson.cn>
-To: andrew@lunn.ch,
-	tsbogend@alpha.franken.de
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org,
-	peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8538FD0
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 02:36:10 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R491e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VyGKYut_1702290967;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VyGKYut_1702290967)
+          by smtp.aliyun-inc.com;
+          Mon, 11 Dec 2023 18:36:08 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: netdev@vger.kernel.org,
+	virtualization@lists.linux-foundation.org
+Cc: jasowang@redhat.com,
+	mst@redhat.com,
 	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com,
-	devicetree@vger.kernel.org,
-	linux-mips@vger.kernel.org,
-	chenhuacai@loongson.cn,
-	netdev@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	chris.chenfeiyang@gmail.com,
-	Yanteng Si <siyanteng@loongson.cn>,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Jiaxun Yang <jiaxun.yang@flygoat.com>
-Subject: [PATCH v1 net 3/3] MIPS: dts: loongson: drop incorrect dwmac fallback compatible
-Date: Mon, 11 Dec 2023 18:33:54 +0800
-Message-Id: <a3c895063983e4ce023093f04bb9911fa01bcc55.1702289232.git.siyanteng@loongson.cn>
-X-Mailer: git-send-email 2.31.4
-In-Reply-To: <cover.1702289232.git.siyanteng@loongson.cn>
-References: <cover.1702289232.git.siyanteng@loongson.cn>
+	kuba@kernel.org,
+	yinjun.zhang@corigine.com,
+	edumazet@google.com,
+	davem@davemloft.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	ast@kernel.org,
+	horms@kernel.org,
+	xuanzhuo@linux.alibaba.com
+Subject: [PATCH net-next v8 0/4] virtio-net: support dynamic coalescing moderation
+Date: Mon, 11 Dec 2023 18:36:03 +0800
+Message-Id: <cover.1702275514.git.hengqi@linux.alibaba.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,72 +46,108 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8Dx_y+d5XZlRXRbAA--.5580S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7Kr4xJry7GFyxXF17CF1xJFc_yoW8Cr45pr
-	17Can2kr1fur1Syrn5JFW8WF4xCFZ8KFsI9FsrGr1UWasIq3Wjvr1fJF4ftrs8ZFWrXayF
-	93y8WrWUGF48CabCm3ZEXasCq-sJn29KB7ZKAUJUUUUA529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBvb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
-	wI0_Gr1j6F4UJwAaw2AFwI0_Jw0_GFyle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
-	xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
-	Wrv_ZF1lYx0Ex4A2jsIE14v26F4j6r4UJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2
-	Ij64vIr41lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Y
-	z7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-	8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE
-	2Ix0cI8IcVAFwI0_Ar0_tr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6x
-	AIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Cr0_Gr1UMIIF0xvEx4A2jsIE
-	c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jDl1kUUUUU=
 
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Now, virtio-net already supports per-queue moderation parameter
+setting. Based on this, we use the linux dimlib to support
+dynamic coalescing moderation for virtio-net.
 
-Device binds to proper PCI ID (LOONGSON, 0x7a03), already listed in DTS,
-so checking for some other compatible does not make sense.  It cannot be
-bound to unsupported platform.
+Due to some scheduling issues, we only support and test the rx dim.
 
-Drop useless, incorrect (space in between) and undocumented compatible.
+Some test results:
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-Acked-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
----
- arch/mips/boot/dts/loongson/loongson64-2k1000.dtsi | 3 +--
- arch/mips/boot/dts/loongson/ls7a-pch.dtsi          | 3 +--
- 2 files changed, 2 insertions(+), 4 deletions(-)
+I. Sockperf UDP
+=================================================
+1. Env
+rxq_0 with affinity to cpu_0.
 
-diff --git a/arch/mips/boot/dts/loongson/loongson64-2k1000.dtsi b/arch/mips/boot/dts/loongson/loongson64-2k1000.dtsi
-index f878f47e4501..ee3e2153dd13 100644
---- a/arch/mips/boot/dts/loongson/loongson64-2k1000.dtsi
-+++ b/arch/mips/boot/dts/loongson/loongson64-2k1000.dtsi
-@@ -130,8 +130,7 @@ gmac@3,0 {
- 				compatible = "pci0014,7a03.0",
- 						   "pci0014,7a03",
- 						   "pciclass0c0320",
--						   "pciclass0c03",
--						   "loongson, pci-gmac";
-+						   "pciclass0c03";
- 
- 				reg = <0x1800 0x0 0x0 0x0 0x0>;
- 				interrupts = <12 IRQ_TYPE_LEVEL_LOW>,
-diff --git a/arch/mips/boot/dts/loongson/ls7a-pch.dtsi b/arch/mips/boot/dts/loongson/ls7a-pch.dtsi
-index 7c69e8245c2f..cce9428afc41 100644
---- a/arch/mips/boot/dts/loongson/ls7a-pch.dtsi
-+++ b/arch/mips/boot/dts/loongson/ls7a-pch.dtsi
-@@ -193,8 +193,7 @@ gmac@3,0 {
- 				compatible = "pci0014,7a03.0",
- 						   "pci0014,7a03",
- 						   "pciclass020000",
--						   "pciclass0200",
--						   "loongson, pci-gmac";
-+						   "pciclass0200";
- 
- 				reg = <0x1800 0x0 0x0 0x0 0x0>;
- 				interrupts = <12 IRQ_TYPE_LEVEL_HIGH>,
+2. Cmd
+client: taskset -c 0 sockperf tp -p 8989 -i $IP -t 10 -m 16B
+server: taskset -c 0 sockperf sr -p 8989
+
+3. Result
+dim off: 1143277.00 rxpps, throughput 17.844 MBps, cpu is 100%.
+dim on:  1124161.00 rxpps, throughput 17.610 MBps, cpu is 83.5%.
+=================================================
+
+II. Redis
+=================================================
+1. Env
+There are 8 rxqs, and rxq_i with affinity to cpu_i.
+
+2. Result
+When all cpus are 100%, ops/sec of memtier_benchmark client is
+dim off:  978437.23
+dim on:  1143638.28
+=================================================
+
+III. Nginx
+=================================================
+1. Env
+There are 8 rxqs and rxq_i with affinity to cpu_i.
+
+2. Result
+When all cpus are 100%, requests/sec of wrk client is
+dim off:  877931.67
+dim on:  1019160.31
+=================================================
+
+IV. Latency of sockperf udp
+=================================================
+1. Rx cmd
+taskset -c 0 sockperf sr -p 8989
+
+2. Tx cmd
+taskset -c 0 sockperf pp -i ${ip} -p 8989 -t 10
+
+After running this cmd 5 times and averaging the results,
+
+3. Result
+dim off: 17.7735 usec
+dim on:  18.0110 usec
+=================================================
+
+Changelog:
+v7->v8:
+- Add select DIMLIB.
+
+v6->v7:
+- Drop the patch titled "spin lock for ctrl cmd access"
+- Use rtnl_trylock to avoid the deadlock.
+
+v5->v6:
+- Add patch(4/5): spin lock for ctrl cmd access
+- Patch(5/5):
+   - Use spin lock and cancel_work_sync to synchronize
+
+v4->v5:
+- Patch(4/4):
+   - Fix possible synchronization issues with cancel_work_sync.
+   - Reduce if/else nesting levels
+
+v3->v4:
+- Patch(5/5): drop.
+
+v2->v3:
+- Patch(4/5): some minor modifications.
+
+v1->v2:
+- Patch(2/5): a minor fix.
+- Patch(4/5):
+   - improve the judgment of dim switch conditions.
+   - Cancel the work when vq reset. 
+- Patch(5/5): drop the tx dim implementation.
+
+Heng Qi (4):
+  virtio-net: returns whether napi is complete
+  virtio-net: separate rx/tx coalescing moderation cmds
+  virtio-net: extract virtqueue coalescig cmd for reuse
+  virtio-net: support rx netdim
+
+ drivers/net/Kconfig      |   1 +
+ drivers/net/virtio_net.c | 297 ++++++++++++++++++++++++++++++++-------
+ 2 files changed, 249 insertions(+), 49 deletions(-)
+
 -- 
-2.31.4
+2.19.1.6.gb485710b
 
 
