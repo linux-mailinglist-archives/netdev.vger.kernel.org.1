@@ -1,126 +1,149 @@
-Return-Path: <netdev+bounces-55681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 985B080BF6A
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 03:51:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 868CF80BF74
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 03:51:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7F771C2089B
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 02:50:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DFACEB20851
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 02:51:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 862A415495;
-	Mon, 11 Dec 2023 02:50:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 868C815AC7;
+	Mon, 11 Dec 2023 02:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ku7Os8NR"
+	dkim=pass (2048-bit key) header.d=stwcx.xyz header.i=@stwcx.xyz header.b="KDltS9Sc";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="2/JLh+Kl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDA751BC6
-	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 18:50:48 -0800 (PST)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-50bce78f145so4473407e87.0
-        for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 18:50:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702263046; x=1702867846; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nNTdlhKPOpcCfnnKOcOQH+xUH2YOWzC/u7MDpXunjGA=;
-        b=Ku7Os8NRaHFjCd0kCsh80hy5pCb7qp+d4idIs9rD8n9V3A82vz3YqAYtE2aGQYQlam
-         4PCMPO9y+bCw40Nxl8gsOBtdxWsm0Nx3CW352fkOYtm6mzmTrrIaQCNlpZcYD+UHg9xY
-         hoF2gwfvTKVrSOZbgqnNWVIYLiuRc3qKeRq1lrR5TqN6dEdDgofUAB6uYWrIHXP2FnrN
-         hTKnXtRw0ZM410cVPhlYS9za1V570NJcSmOUwPHDbVMaJXqUZa9n6GYZnVMLj4cyp0Gs
-         XQ5zJnLBltsQ+tDPNH1pl+YPZ+fB9Dv7QUrHm87A/AkGa4FZedg6UdWUk+K0WNWIREE8
-         AUrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702263046; x=1702867846;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nNTdlhKPOpcCfnnKOcOQH+xUH2YOWzC/u7MDpXunjGA=;
-        b=eWh8/gvCZEghAEm5PXAlLgDZSnaufVfItxvbD6wCv8GVczTGoS86pBKsG1uQJrclVg
-         8qxq63ChvOSVQQL/BFTetjXqjktRjf918fWeM09Zbp6tppS89pe19e3b4uQ9Fiq5ppQr
-         /onAahbIZw6lpehCWm5V/QNdOlnBUwnzc8ge0nZ72JUUfGhwVkQwOGr4bj7JGBTvvSCB
-         pYnARP6kfkmgZMTdK732LCHq4zkY58MadbgM3zUsgfv8Ls5XfqpmmMm8kodu0bkaXSwA
-         BwQltBbl95ZKnFJJfXggqgvcTkxLSPf6O45ASp7aWVWsbVWOL33biIoTGFQCXIwyHUii
-         ekPQ==
-X-Gm-Message-State: AOJu0Yx1ScBt8MsdqS8M1AnZSfLquWdFGbdMRew0WCuxBSMJokSFbj23
-	N+4SOLI76YZdUKp2Rzj36fbH4yjfV6lFX4dawKg=
-X-Google-Smtp-Source: AGHT+IEV181f++J0q+7XvbplvaqiLzcEDK8roGcdP3HxF6NzUSzycEoe06zLiv08LAmxEvwGXjTJkEnd56kVcRYJkIs=
-X-Received: by 2002:a05:6512:40d:b0:50c:f7a:befd with SMTP id
- u13-20020a056512040d00b0050c0f7abefdmr849577lfk.21.1702263046203; Sun, 10 Dec
- 2023 18:50:46 -0800 (PST)
+Received: from wout1-smtp.messagingengine.com (wout1-smtp.messagingengine.com [64.147.123.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 629EF1FE8;
+	Sun, 10 Dec 2023 18:51:02 -0800 (PST)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+	by mailout.west.internal (Postfix) with ESMTP id 0DB723200A9D;
+	Sun, 10 Dec 2023 21:50:58 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute3.internal (MEProxy); Sun, 10 Dec 2023 21:50:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stwcx.xyz; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm3; t=1702263058; x=1702349458; bh=4J
+	cWAGFDAKqU0mXy71u7gfYt92DBUCLVc/XBkrUumIY=; b=KDltS9ScE28iWnXFTe
+	ybWLpPM5SNGL1hKC3iFLgi4DGgPmzez4toJ7OzOxoetvY1O5TJJLXLQ626mJZDNP
+	+2PVp9UbADk8jzX41Z/y5AxH+G5lj4qaUecXJxbo2Gh3UXN1OiylX0AVDIkA3S/N
+	wydlgo73UbFcnvvFfTQqr1UWZklZdyj+6Cqck3MFI/TJJ0u0OiFXGc9ke9v9PONq
+	7vjp7SgpiCrCuW/7UUYRP2rWACoG/YNV/Gw8g+D4M4NrNCXmXk+FScsw4seroNof
+	1SRJa2OLDSTV0cdEJbuuRF/qnYwAMWIKDGVXL0hBUan/Ftuak9MzTaSGf1W945dI
+	5AyQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1702263058; x=1702349458; bh=4JcWAGFDAKqU0
+	mXy71u7gfYt92DBUCLVc/XBkrUumIY=; b=2/JLh+Kl9NVINPXq99u/g7xozl+y6
+	ns4zJpIPDx7EPWdOL24RYzBJxS5RgiPFgxNPYSgMB1sgL2ooPV1/ByP8MbuslhN1
+	xC90YXnTcUz88isHTmm6nznXLzaI5OTL00ZR+fQjqHFfZ3s622vdVyWrCFUTCOwe
+	T70A2SfDjwKC4ARgEdhI4qcFp20n1SiWWmNOmi9JKlSjFU+ihtf08odUcNRCKr91
+	ALVADD0TAle9BYTcrlLp9rwM3Og64DLiWSnhh7YFvqSVpEZ/iwstw9+UKVzhQ+wY
+	zgxjij66HG/K5+peBjiShENXypMjSAnMfH2r40kBQqIiSo0Ciw0cgizLg==
+X-ME-Sender: <xms:Enl2ZZ-guBsx3FebNJixt9YSkFIbwssNqnVCm0IUZzYC0PGeL6UGwQ>
+    <xme:Enl2ZdtZdeq0-3H-VrPb4eQ2qDGIkJWNgBC4LcR-9CnFxYl8FiovBWCkAfNtBe9E4
+    MV1PTJccHFFwc7ONag>
+X-ME-Received: <xmr:Enl2ZXBc9vn8rXvaDZmt1Y_Zna_6X2UOkfc7OIwacvpwGJlW86utDiVZ8vw4PGqhOasWnsUYoxaxh7r0pSdOv371Z5BQdg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudeluddghedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucgfrhhlucfvnfffucdlfeehmdenucfjughrpeffhf
+    fvvefukfhfgggtuggjsehgtderredttddvnecuhfhrohhmpefrrghtrhhitghkucghihhl
+    lhhirghmshcuoehprghtrhhitghksehsthiftgigrdighiiiqeenucggtffrrghtthgvrh
+    hnpeehfeejheeftdejiedvfeekffehledukeduleelffekgfdtleduledvtdegtdehkeen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehprghtrh
+    hitghksehsthiftgigrdighiii
+X-ME-Proxy: <xmx:Enl2ZddnFWEtlkdUchpd_LhaZLfvFstGsYtlS__Zfi0jdoNC9mpJ3Q>
+    <xmx:Enl2ZeMk4PmFi5xsqngbgl8_-ol2ZtavQcMDAiG5jn-iVs2ga-0CpQ>
+    <xmx:Enl2ZflCviGy2JFRWnVjz0_x0-_3NdtvF8xhv8Go6kw-2UW7RXsZww>
+    <xmx:Enl2ZdcQJTz8R22Q8VWEOFNrywA377FsFj1U05_cESBtm1Vm4mQ7xQ>
+Feedback-ID: i68a1478a:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 10 Dec 2023 21:50:57 -0500 (EST)
+Date: Sun, 10 Dec 2023 20:50:56 -0600
+From: Patrick Williams <patrick@stwcx.xyz>
+To: Ivan Mikhaylov <fr0st61te@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, peter@pjd.dev, sam@mendozajonas.com
+Subject: Re: [PATCH net-next v2 3/3] net/ncsi: Add NC-SI 1.2 Get MC MAC
+ Address command
+Message-ID: <ZXZ5EOSJAekCiT44@heinlein.vulture-banana.ts.net>
+References: <20231114160737.3209218-4-patrick@stwcx.xyz>
+ <20231210215356.4154-1-fr0st61te@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231209-rtl8366rb-mtu-fix-v1-0-df863e2b2b2a@linaro.org> <20231209-rtl8366rb-mtu-fix-v1-1-df863e2b2b2a@linaro.org>
-In-Reply-To: <20231209-rtl8366rb-mtu-fix-v1-1-df863e2b2b2a@linaro.org>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Sun, 10 Dec 2023 23:50:35 -0300
-Message-ID: <CAJq09z6PLo7YhON57YwVWwbHNZQZg_2VK5e=W=Zc2YUEo3Kt_Q@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] net: dsa: realtek: Rename bogus RTL8368S variable
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="+15r0ml6tBo+jei6"
+Content-Disposition: inline
+In-Reply-To: <20231210215356.4154-1-fr0st61te@gmail.com>
+
+
+--+15r0ml6tBo+jei6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Em s=C3=A1b., 9 de dez. de 2023 =C3=A0s 19:37, Linus Walleij
-<linus.walleij@linaro.org> escreveu:
->
-> Rename the register name to RTL8366RB instead of the bogus
-> RTL8368S (internal product name?)
->
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+On Mon, Dec 11, 2023 at 12:53:56AM +0300, Ivan Mikhaylov wrote:
+>=20
+> seems very similar to ncsi_rsp_handler_oem_gma except address_count, why =
+it
+> shouldn't be part of this call with additional param? What's inside it ju=
+st
+> code duplicity of ncsi_rsp_handler_oem_gma.
+>=20
+> And as we talked in openbmc mailing list, ndo_set_mac_address do not noti=
+fy
+> network layer about mac change and this fixed part already in
+> ncsi_rsp_handler_oem_gma with 790071347a0a1a89e618eedcd51c687ea783aeb3 .
+>=20
+> David, any actions should be needed about fixing it in net-next? Need it =
+to
+> put patch above with fix or do the revert from net-next and make it right?
 
-Reviewed-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+I agree that both of your recommendations might make the code better,
+but I don't see why we would need to revert it.  The code does the
+intended function for many use cases, even if you've identified a few
+where calling `dev_set_mac_address` would be better.
 
-> ---
->  drivers/net/dsa/realtek/rtl8366rb.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realte=
-k/rtl8366rb.c
-> index b39b719a5b8f..887afd1392cb 100644
-> --- a/drivers/net/dsa/realtek/rtl8366rb.c
-> +++ b/drivers/net/dsa/realtek/rtl8366rb.c
-> @@ -117,10 +117,11 @@
->         RTL8366RB_STP_STATE((port), RTL8366RB_STP_MASK)
->
->  /* CPU port control reg */
-> -#define RTL8368RB_CPU_CTRL_REG         0x0061
-> -#define RTL8368RB_CPU_PORTS_MSK                0x00FF
-> +#define RTL8366RB_CPU_CTRL_REG         0x0061
-> +#define RTL8366RB_CPU_PORTS_MSK                0x00FF
->  /* Disables inserting custom tag length/type 0x8899 */
-> -#define RTL8368RB_CPU_NO_TAG           BIT(15)
-> +#define RTL8366RB_CPU_NO_TAG           BIT(15)
-> +#define RTL8366RB_CPU_TAG_SIZE         4
->
->  #define RTL8366RB_SMAR0                        0x0070 /* bits 0..15 */
->  #define RTL8366RB_SMAR1                        0x0071 /* bits 16..31 */
-> @@ -912,10 +913,10 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
->
->         /* Enable CPU port with custom DSA tag 8899.
->          *
-> -        * If you set RTL8368RB_CPU_NO_TAG (bit 15) in this registers
-> +        * If you set RTL8366RB_CPU_NO_TAG (bit 15) in this register
->          * the custom tag is turned off.
->          */
-> -       ret =3D regmap_update_bits(priv->map, RTL8368RB_CPU_CTRL_REG,
-> +       ret =3D regmap_update_bits(priv->map, RTL8366RB_CPU_CTRL_REG,
->                                  0xFFFF,
->                                  BIT(priv->cpu_port));
->         if (ret)
->
-> --
-> 2.34.1
->
->
+Either you or I can send a "Fixes: " on this commit to improve the
+handling as you're proposing.  While the change is likely trivial, I
+have not had any chance to test it yet, so I've not sent it up myself.
+If you want to refactor the code to reduce duplication, I think that should
+be an entirely separate proposal.
+
+--=20
+Patrick Williams
+
+--+15r0ml6tBo+jei6
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEBGD9ii4LE9cNbqJBqwNHzC0AwRkFAmV2eQ8ACgkQqwNHzC0A
+wRmp3A/+NnxL8+c3M1OsmMuJUdi5Fe2npPOc/1Xl5ZNPQQ7JrAb4bOjLNcWpUD9b
+Z3R2rEzRHNoWQvI4f2T34Sx/z2/Pelmvii9P85YkubOfl6tq+YXY5sDDomjtZmnI
+CTQmO8QU8AB7tVS+4t3ElcRE/hKmKzpZNcTFk7mOFXOphO6jpNiVphqHsJoLv9pL
+VaPuRdyKoEfRjjAF05wkjnFW95SyyNnwd4GpxCX1gaem44mLXtISPy8TxI9W8XFU
+EVVW+MItPTNtpm8daHgBN7dojAZjlD8To9hcrLCYq0jOHuPD2XZT2yIiPYba4rpx
+Ee/hR3u32P0NYqbku8L7eut7JXD0ThjPvvZaUUd72vI2HjkTG0Wep08kUxbokD7+
+iU2E7SOhT7PxpceUcTpuGVYDFPfcr0JtET7b4fxl41XVQiXHP33RqYipIVNX3w/1
+ZS5aSoflE5a8YRMSXUtq69cMbJgcHvjzlxHKZt1boL7l3rWBgeEWX+dXWrO3rVmX
+IUh7cxQJQIey30+8Ld1E28mhomykNGwb+zajV5fZhEO2MANi5mOn+QXGgzAi+bTX
+Fl4Awrg2B6uO+F5SDGGhv11rtKPUMZBVABEsitvI0cCTGbfEkNdaRqOxG3w0WR9f
+65KwbXs0uMKSsIz2THSXnQ/kww2jOfJtNfCAVwl+OP5PZWBMks0=
+=Fw1V
+-----END PGP SIGNATURE-----
+
+--+15r0ml6tBo+jei6--
 
