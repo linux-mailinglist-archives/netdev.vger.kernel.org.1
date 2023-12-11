@@ -1,55 +1,56 @@
-Return-Path: <netdev+bounces-55895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76BDB80CB94
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:53:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8242080CBA7
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:53:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A833A1C212B8
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:53:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2F3DB2135D
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:53:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BDC647794;
-	Mon, 11 Dec 2023 13:53:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 288634778A;
+	Mon, 11 Dec 2023 13:53:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J/BvRMdQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tz9t/wNr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB7F4778D;
-	Mon, 11 Dec 2023 13:53:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E4FFC433CB;
-	Mon, 11 Dec 2023 13:53:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06D834776B;
+	Mon, 11 Dec 2023 13:53:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CCCDC433C8;
+	Mon, 11 Dec 2023 13:53:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702302792;
-	bh=fgN+YDhf8a3nw9oZAz0gxAwY5i58ycVwFHLHFzYEZ08=;
+	s=k20201202; t=1702302815;
+	bh=lwKy+lY0I4t6JD+inUnKQb7hfXk6DjIgfY2rpHK+CfQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=J/BvRMdQGYC5PfS0rnUOwYUwTyB7sDIZb5maRSgVqrgh641oRv7/cD9PvocLZaDCG
-	 q30N/HFb8X1dnEWwr4vmXeKZYvktWr4JLXnR4M0avgSPVCdwEWHUZYj7+QSquMHs4M
-	 2n61fsO/mT1QFmdrCAcB11eoQaMTskzqgB6qFlwRPpSyecQjTbpyD2gcv0rCrgvueI
-	 9ryggNRM2HwazYAfV0hTBBRUb1f+kB7iXQH/XG9ub76Vn8UW4tR3CFvVKZN7EqpnuF
-	 C8J05/mr6uBkTE2iz2TJc/Juu8RugvsfhmSnG9eEQvFRKr8u2ix97E9pt9IjQ8wsCK
-	 uU7SVz/sTFwHQ==
+	b=tz9t/wNrTu7I6xSJc+IPSW2dbqWTJ539ityECh2Is/fYUbvLkhA+VPzKgbrqd9Ar7
+	 0M1bvl3tDGD+jnsQcnR7sm1Kvu17zGsMj0omHw2BUL1Gb0Q9R5k1AO4AFe2plzZSRS
+	 YCHZEgx7Ut/z1PkPG1Oy+GyT6IUEN+fMUdo00PfMsa+/Ml/R3Rs7wC0YUDuDnTFsEN
+	 XJm6yxr+Qm3DJuMZ14l3nNxoQ8r1Xj3bwGw23btdxUC6IceluhIPfkgFk4y6i6k0k2
+	 WWid7fhDPTkS/h2p66kMIDLtVnrwXcApxBquOI8r5OnjZrzOb4NkYqNSif77G7Es9P
+	 buFM8kaJ8GZkQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Thinh Tran <thinhtr@linux.vnet.ibm.com>,
-	Venkata Sai Duggi <venkata.sai.duggi@ibm.com>,
-	David Christensen <drc@linux.vnet.ibm.com>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Kelly Kane <kelly@hawknetworks.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	pavan.chebbi@broadcom.com,
-	mchan@broadcom.com,
 	davem@davemloft.net,
 	edumazet@google.com,
-	pabeni@redhat.com,
+	kuba@kernel.org,
+	gregkh@linuxfoundation.org,
+	hayeswang@realtek.com,
+	dianders@chromium.org,
+	grundler@chromium.org,
+	bjorn@mork.no,
+	linux-usb@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 27/47] net/tg3: fix race condition in tg3_reset_task()
-Date: Mon, 11 Dec 2023 08:50:28 -0500
-Message-ID: <20231211135147.380223-27-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 37/47] r8152: add vendor/device ID pair for ASUS USB-C2500
+Date: Mon, 11 Dec 2023 08:50:38 -0500
+Message-ID: <20231211135147.380223-37-sashal@kernel.org>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231211135147.380223-1-sashal@kernel.org>
 References: <20231211135147.380223-1-sashal@kernel.org>
@@ -64,92 +65,48 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.5
 Content-Transfer-Encoding: 8bit
 
-From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+From: Kelly Kane <kelly@hawknetworks.com>
 
-[ Upstream commit 16b55b1f2269962fb6b5154b8bf43f37c9a96637 ]
+[ Upstream commit 7037d95a047cd89b1f680eed253c6ab586bef1ed ]
 
-When an EEH error is encountered by a PCI adapter, the EEH driver
-modifies the PCI channel's state as shown below:
+The ASUS USB-C2500 is an RTL8156 based 2.5G Ethernet controller.
 
-   enum {
-      /* I/O channel is in normal state */
-      pci_channel_io_normal = (__force pci_channel_state_t) 1,
+Add the vendor and product ID values to the driver. This makes Ethernet
+work with the adapter.
 
-      /* I/O to channel is blocked */
-      pci_channel_io_frozen = (__force pci_channel_state_t) 2,
-
-      /* PCI card is dead */
-      pci_channel_io_perm_failure = (__force pci_channel_state_t) 3,
-   };
-
-If the same EEH error then causes the tg3 driver's transmit timeout
-logic to execute, the tg3_tx_timeout() function schedules a reset
-task via tg3_reset_task_schedule(), which may cause a race condition
-between the tg3 and EEH driver as both attempt to recover the HW via
-a reset action.
-
-EEH driver gets error event
---> eeh_set_channel_state()
-    and set device to one of
-    error state above           scheduler: tg3_reset_task() get
-                                returned error from tg3_init_hw()
-                             --> dev_close() shuts down the interface
-tg3_io_slot_reset() and
-tg3_io_resume() fail to
-reset/resume the device
-
-To resolve this issue, we avoid the race condition by checking the PCI
-channel state in the tg3_reset_task() function and skip the tg3 driver
-initiated reset when the PCI channel is not in the normal state.  (The
-driver has no access to tg3 device registers at this point and cannot
-even complete the reset task successfully without external assistance.)
-We'll leave the reset procedure to be managed by the EEH driver which
-calls the tg3_io_error_detected(), tg3_io_slot_reset() and
-tg3_io_resume() functions as appropriate.
-
-Adding the same checking in tg3_dump_state() to avoid dumping all
-device registers when the PCI channel is not in the normal state.
-
-Signed-off-by: Thinh Tran <thinhtr@linux.vnet.ibm.com>
-Tested-by: Venkata Sai Duggi <venkata.sai.duggi@ibm.com>
-Reviewed-by: David Christensen <drc@linux.vnet.ibm.com>
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
-Link: https://lore.kernel.org/r/20231201001911.656-1-thinhtr@linux.vnet.ibm.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Kelly Kane <kelly@hawknetworks.com>
+Link: https://lore.kernel.org/r/20231203011712.6314-1-kelly@hawknetworks.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/broadcom/tg3.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ drivers/net/usb/r8152.c   | 1 +
+ include/linux/usb/r8152.h | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index 22b00912f7ac8..95d476ec14f5e 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -6439,6 +6439,14 @@ static void tg3_dump_state(struct tg3 *tp)
- 	int i;
- 	u32 *regs;
+diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+index be18d72cefcce..7a669f2c77fc0 100644
+--- a/drivers/net/usb/r8152.c
++++ b/drivers/net/usb/r8152.c
+@@ -10001,6 +10001,7 @@ static const struct usb_device_id rtl8152_table[] = {
+ 	{ USB_DEVICE(VENDOR_ID_NVIDIA,  0x09ff) },
+ 	{ USB_DEVICE(VENDOR_ID_TPLINK,  0x0601) },
+ 	{ USB_DEVICE(VENDOR_ID_DLINK,   0xb301) },
++	{ USB_DEVICE(VENDOR_ID_ASUS,    0x1976) },
+ 	{}
+ };
  
-+	/* If it is a PCI error, all registers will be 0xffff,
-+	 * we don't dump them out, just report the error and return
-+	 */
-+	if (tp->pdev->error_state != pci_channel_io_normal) {
-+		netdev_err(tp->dev, "PCI channel ERROR!\n");
-+		return;
-+	}
-+
- 	regs = kzalloc(TG3_REG_BLK_SIZE, GFP_ATOMIC);
- 	if (!regs)
- 		return;
-@@ -11170,7 +11178,8 @@ static void tg3_reset_task(struct work_struct *work)
- 	rtnl_lock();
- 	tg3_full_lock(tp, 0);
+diff --git a/include/linux/usb/r8152.h b/include/linux/usb/r8152.h
+index 287e9d83fb8bc..33a4c146dc19c 100644
+--- a/include/linux/usb/r8152.h
++++ b/include/linux/usb/r8152.h
+@@ -30,6 +30,7 @@
+ #define VENDOR_ID_NVIDIA		0x0955
+ #define VENDOR_ID_TPLINK		0x2357
+ #define VENDOR_ID_DLINK			0x2001
++#define VENDOR_ID_ASUS			0x0b05
  
--	if (tp->pcierr_recovery || !netif_running(tp->dev)) {
-+	if (tp->pcierr_recovery || !netif_running(tp->dev) ||
-+	    tp->pdev->error_state != pci_channel_io_normal) {
- 		tg3_flag_clear(tp, RESET_TASK_PENDING);
- 		tg3_full_unlock(tp);
- 		rtnl_unlock();
+ #if IS_REACHABLE(CONFIG_USB_RTL8152)
+ extern u8 rtl8152_get_version(struct usb_interface *intf);
 -- 
 2.42.0
 
