@@ -1,126 +1,186 @@
-Return-Path: <netdev+bounces-55764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B150080C364
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 09:38:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABE8580C379
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 09:41:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BF84280D3A
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 08:38:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22D6AB2090C
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 08:41:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABCEE20DE1;
-	Mon, 11 Dec 2023 08:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA06B20DFD;
+	Mon, 11 Dec 2023 08:41:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="zjPZ/ejB"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="S07VF9zu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4F168E
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 00:38:01 -0800 (PST)
-Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-a1db6c63028so469590666b.2
-        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 00:38:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702283880; x=1702888680; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BJOM5zNqGOjXI+bDyadob+wY0R+4R9z5TZtHlUGlNFI=;
-        b=zjPZ/ejBDfKdDg4Ld+wBI/NDxq5atMPMpJh23xumQQG/eB5cfgULW0LsCIOzAB+nfO
-         F0dbS4L32r0+2V6X0f1vvJeE3xtyT8IsqIm4i0d8t0TIunrpG/vrrz/cyvauKTw6jiFs
-         JtSBqPZib0YyWVv7FucVVO3ydBWVtGCkPS/W6UfXsk5AAJGI/v9v6lJAxohn5h2GatXY
-         v+ZyCRAC/U9Z6gqx/R/kaIXyLeLUq/aIkc/z0Gv3n0nkcU1yvPbrMdtrt0yJlW6Kv0Rs
-         23AxgVwy98PkNsTf5UyLQH7RICeq3/LfE98HBDfiaxISbBzfMxDaIMTOr8go1HxnxP7+
-         FhtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702283880; x=1702888680;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BJOM5zNqGOjXI+bDyadob+wY0R+4R9z5TZtHlUGlNFI=;
-        b=oUPVrZs8bgndxG5QrAwg2gD9yR2kwtTvipnaeJ1J2fbtKJgadzQj8+ocrgkvHNLZKW
-         /Kno0gY28Zl9x03xeLViTqxM7RGpbvS0NPi106Rx6R8nL6pE67fs7QqkOh482Tov3eZE
-         9LsGpJa0TwJTr8iFEBewJ1xzxZ8qb3C1KHTRlWTzeotlpyCI4IgqhkKgebSpoJ3v69ZF
-         A4lZuBQWXMLZ6o6TzYnj+h3KAM+9nA9/HWtbswqAzRyo0G9lTL/8fgE4V9Hz7l9Jrp6S
-         TFrdohW4t28UI8ixWouagocZVCOzf3z55WITNucb5m5xJ1a/yv7ntf2NzVuGTPvl+V+y
-         R0dw==
-X-Gm-Message-State: AOJu0YxJKml914WYRa1khNWcusimEDsz34ZV2pL4WGC/IopQAgdln6Y3
-	gWOAfIU71dU7YPJG3VwvlGgKG3e2Q/HK46bxPmo=
-X-Google-Smtp-Source: AGHT+IGe0DiRECqWz2CdGjcd2eodl/kLnj/vlAVEvciYhqTrf1asix5NMmO0N0zDCSvd5dNmtUH4Aw==
-X-Received: by 2002:a17:907:2d90:b0:a19:a19a:ead6 with SMTP id gt16-20020a1709072d9000b00a19a19aead6mr2546537ejc.143.1702283880146;
-        Mon, 11 Dec 2023 00:38:00 -0800 (PST)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id ub27-20020a170907c81b00b00a1df4387f16sm4521601ejc.95.2023.12.11.00.37.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 00:37:59 -0800 (PST)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	vadim.fedorenko@linux.dev,
-	arkadiusz.kubalewski@intel.com,
-	gregkh@linuxfoundation.org,
-	hdthky0@gmail.com,
-	michal.michalik@intel.com,
-	milena.olech@intel.com
-Subject: [patch net] dpll: sanitize possible null pointer dereference in dpll_pin_parent_pin_set()
-Date: Mon, 11 Dec 2023 09:37:58 +0100
-Message-ID: <20231211083758.1082853-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.43.0
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0A13C2;
+	Mon, 11 Dec 2023 00:41:25 -0800 (PST)
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BB5e83k028548;
+	Mon, 11 Dec 2023 08:41:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=OloedqYYUwZtP1M5Bxe8DI7g155sUm6orY/Vc0ddjpQ=; b=S0
+	7VF9zuMN40gCdvHqZEoX31bTBTiH6yAPJRNo3yN0WZK62FAyZW4NYpZBJRqomyJB
+	berLXW7aag42QXv1pkJNxX7ka1pRJsHjqIid2BBBYm3CYrwiD9aeMoFT4FK8YqYF
+	+pAh6TtWrycQUzlRxjML2k+fhkp73QKJvTwL7OE2vaIP5vNInoSE+KFiKDYd8IJc
+	jN+AWwJZIwnNrPS03EB3Oqhh5Ajx07QT5/bEz7dCWDf3nfPzMZYkKagGF+qMREwx
+	WW75AR3S2+dpSBmr2eQEEurk5q4xvup3zMJquTdj9dlsuALiepRC6gjxzEodzKej
+	OA+8cxjnnWlldENNjioQ==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uvnhdtq45-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Dec 2023 08:41:06 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BB8f5J6018074
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Dec 2023 08:41:05 GMT
+Received: from [10.217.91.61] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 11 Dec
+ 2023 00:40:57 -0800
+Message-ID: <9d8250a9-8e00-4233-8bd9-9e49bd15fac5@quicinc.com>
+Date: Mon, 11 Dec 2023 14:10:54 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] net: stmmac: update Rx clk divider for 10M SGMII
+Content-Language: en-US
+To: Bjorn Andersson <andersson@kernel.org>
+CC: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu
+	<joabreu@synopsys.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@quicinc.com>, Andrew Halaney <ahalaney@redhat.com>
+References: <20231208062502.13124-1-quic_snehshah@quicinc.com>
+ <5luxwdjyzkg5o6w27mqixggr65ebosnn53vaqrbtsclfudet4v@kse23pgyj7ld>
+From: Sneh Shah <quic_snehshah@quicinc.com>
+In-Reply-To: <5luxwdjyzkg5o6w27mqixggr65ebosnn53vaqrbtsclfudet4v@kse23pgyj7ld>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: wRHaFD2ugsi6Wj-ZGlreTuhfCFad-N5a
+X-Proofpoint-ORIG-GUID: wRHaFD2ugsi6Wj-ZGlreTuhfCFad-N5a
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
+ malwarescore=0 spamscore=0 suspectscore=0 phishscore=0 priorityscore=1501
+ clxscore=1015 adultscore=0 lowpriorityscore=0 mlxscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2311290000
+ definitions=main-2312110073
 
-From: Jiri Pirko <jiri@nvidia.com>
 
-User may not pass DPLL_A_PIN_STATE attribute in the pin set operation
-message. Sanitize that by checking if the attr pointer is not null
-and process the passed state attribute value only in that case.
 
-Reported-by: Xingyuan Mo <hdthky0@gmail.com>
-Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base functions")
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- drivers/dpll/dpll_netlink.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+On 12/9/2023 9:54 AM, Bjorn Andersson wrote:
+> On Fri, Dec 08, 2023 at 11:55:02AM +0530, Sneh Shah wrote:
+>> SGMII 10MBPS mode needs RX clock divider to avoid drops in Rx.
+>> Update configure SGMII function with rx clk divider programming.
+> 
+> Are you trying saying that the RX clock is completely wrong in 10MBps
+> mode? Or is the RX clock good, but without some division of some other
+> clock signal you loose some packets now and then?
 
-diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
-index 442a0ebeb953..ce7cf736f020 100644
---- a/drivers/dpll/dpll_netlink.c
-+++ b/drivers/dpll/dpll_netlink.c
-@@ -925,7 +925,6 @@ dpll_pin_parent_pin_set(struct dpll_pin *pin, struct nlattr *parent_nest,
- 			struct netlink_ext_ack *extack)
- {
- 	struct nlattr *tb[DPLL_A_PIN_MAX + 1];
--	enum dpll_pin_state state;
- 	u32 ppin_idx;
- 	int ret;
- 
-@@ -936,10 +935,14 @@ dpll_pin_parent_pin_set(struct dpll_pin *pin, struct nlattr *parent_nest,
- 		return -EINVAL;
- 	}
- 	ppin_idx = nla_get_u32(tb[DPLL_A_PIN_PARENT_ID]);
--	state = nla_get_u32(tb[DPLL_A_PIN_STATE]);
--	ret = dpll_pin_on_pin_state_set(pin, ppin_idx, state, extack);
--	if (ret)
--		return ret;
-+
-+	if (tb[DPLL_A_PIN_STATE]) {
-+		enum dpll_pin_state state = nla_get_u32(tb[DPLL_A_PIN_STATE]);
-+
-+		ret = dpll_pin_on_pin_state_set(pin, ppin_idx, state, extack);
-+		if (ret)
-+			return ret;
-+	}
- 
- 	return 0;
- }
--- 
-2.43.0
+Without the divider, Rx clock is completely wrong. All the packets will dropped.  
+> 
+> Please write your commit message such that it describe the actual
+> problem you're having. This will help others to know if this fix is
+> applicable to some issue they are seeing on their hardware, now and in
+> the future.
+> 
+Rx clock divider is must for 10M SGMII to work for my hardware. Hence, It was mentioned that SGMII needs Rx clock divider for 10MBPS to work.
+Will update the commit message to emphasize on how rx clock is completely wrong without this.
+>>
+>> Fixes: 463120c31c58 ("net: stmmac: dwmac-qcom-ethqos: add support for SGMII")
+>> Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
+>> ---
+>> v3 changelog:
+>> - Added comment to explain why MAC needs to be reconfigured for SGMII
+>> v2 changelog:
+>> - Use FIELD_PREP to prepare bifield values in place of GENMASK
+>> - Add fixes tag
+>> ---
+>>  drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 7 +++++++
+>>  1 file changed, 7 insertions(+)
+>>
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+>> index d3bf42d0fceb..ab2245995bc6 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+>> @@ -34,6 +34,7 @@
+>>  #define RGMII_CONFIG_LOOPBACK_EN		BIT(2)
+>>  #define RGMII_CONFIG_PROG_SWAP			BIT(1)
+>>  #define RGMII_CONFIG_DDR_MODE			BIT(0)
+>> +#define RGMII_CONFIG_SGMII_CLK_DVDR		GENMASK(18, 10)
+> 
+> This new bitfield overlaps with existing fields, is it the same
+> register? Did the fields move? Is it applicable to all versions?
+> 
+It is same register but bitfield is moved for new SGMII based HW version. Not applicable to older version. few bitfields of older HW version's RGMII register are repurposed in the new hw version for SGMII config.
 
+> What will existing writes to RGMII_IO_MACRO_CONFIG do to this new
+> layout? What will the new write do to hardware with the existing field
+> layout?
+> 
+we have two functions to configure MAC IOMACRO interface.
+1. ethqos_configure_sgmii( this used this new bifield) 2. ethqos_configure_rgmii ( this used old layout)
+Old HW version uses ethqos_configure_rgmii only. New HW version used ethqos_configure_sgmii only.
+
+Old HW version is not going to use this new layout. New HW version is not going to use old layout configuration.
+
+>>  
+>>  /* SDCC_HC_REG_DLL_CONFIG fields */
+>>  #define SDCC_DLL_CONFIG_DLL_RST			BIT(30)
+>> @@ -598,6 +599,9 @@ static int ethqos_configure_rgmii(struct qcom_ethqos *ethqos)
+>>  	return 0;
+>>  }
+>>  
+>> +/* On interface toggle MAC registetrs gets reset.
+>> + * Configure MAC block for SGMII on ethernet phy link up
+>> + */
+>>  static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
+>>  {
+>>  	int val;
+>> @@ -617,6 +621,9 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
+>>  	case SPEED_10:
+>>  		val |= ETHQOS_MAC_CTRL_PORT_SEL;
+>>  		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
+>> +		rgmii_updatel(ethqos, RGMII_CONFIG_SGMII_CLK_DVDR,
+>> +			      FIELD_PREP(RGMII_CONFIG_SGMII_CLK_DVDR, 0x31),
+> 
+> Is this just a magic constant, or does 0x31 of some convenient unit?
+> Could we give it name/define?
+> 
+It is just a constant based on programming guide of HW.  Will add a #define for it.
+> Regards,
+> Bjorn
+> 
+>> +			      RGMII_IO_MACRO_CONFIG);
+>>  		break;
+>>  	}
+>>  
+>> -- 
+>> 2.17.1
+>>
+>>
 
