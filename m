@@ -1,200 +1,102 @@
-Return-Path: <netdev+bounces-55829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A4C680C63B
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 11:20:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4C2080C63F
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 11:21:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BCA1281768
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:20:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 779B2B20EC9
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F648249EE;
-	Mon, 11 Dec 2023 10:19:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZJjVECif"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 159B524A02;
+	Mon, 11 Dec 2023 10:20:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0215DC3
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 02:19:54 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-54f4f7e88feso3751566a12.3
-        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 02:19:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702289992; x=1702894792; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pbJH3swBnrwAhmGqDMGSc/B4DsQizuTOvVJjLJU1KRI=;
-        b=ZJjVECifJzRvIQ0eghQt83qMMpJgIquXfd8M/1kI+ZLFrbcRC+mauB/D5oNBGllhwQ
-         GJFhT2nYp22kRgq0vPExjiiMR31Twk+8vXjNOKUy54FJfGGg/cdKbWL49sZMaXbub20k
-         6dMa+6kfJAN1X46Z/O/YS6yoMwKR5Nb8cJghsqkH5fLKcW2HXJc2opQird3ABfKqLLwG
-         nHavD5P17l6KOou1JVnVdnsroDx/sN0UHgwTbq6FQbgI18YZRkbnHyvlMQBjstDw+1F/
-         zDeuVXPPwLGtWxIAT5epDvcYyIuSIQGAPgWdcx+ill4D4K76alsIZCoIa5EtuMmwdCUf
-         aOCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702289992; x=1702894792;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pbJH3swBnrwAhmGqDMGSc/B4DsQizuTOvVJjLJU1KRI=;
-        b=Na48kl2Wbufbesw+5o6Eme8o+LPB0ve9snnRrP0aQxqCbHgLqDRs0l7HQJNnug1lbP
-         WG+FrGRCeLlM6dUpypp/GtwGBMd6Ko+4+rebf15rPzNn/ZWrArVW9kzciIBWX/0qf03K
-         bgFmxIEbGESAwNwcx5iYE+geQbE5e9MZDu/+6YWf6GatglgkkMIRW94ilrGyLNTyr1cj
-         mYZRJH9EL3PY7aaP9S1dAk4kqAn9EQA/UBgL6bTAj1KXDEv43IpMjHxY5B1IWKCOBD73
-         Xvvxp8GmUZCQ60eqD9bTh81rnK3cEWWJ3NMV6rtSFsHy11tiN7voiFZDXwsXApkSvFEu
-         1Dfg==
-X-Gm-Message-State: AOJu0YyBeUklNchtpQdwZAGr1a73CndA6cttszFTmYVcnFF1d8ViBHCA
-	dIAtSLhZEmDue1vAECURqMOuJA==
-X-Google-Smtp-Source: AGHT+IG2DDH8vlUb7UxXrRJZyEl0POduE9xN32zkG/2NBiYALr8zaWt6hqMSOtiX0vvQzOohG/ym7Q==
-X-Received: by 2002:a17:906:116:b0:a1b:7df6:11dd with SMTP id 22-20020a170906011600b00a1b7df611ddmr2147250eje.80.1702289992450;
-        Mon, 11 Dec 2023 02:19:52 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.218.27])
-        by smtp.gmail.com with ESMTPSA id mm15-20020a1709077a8f00b00a1b6ec7a88asm4581996ejc.113.2023.12.11.02.19.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Dec 2023 02:19:52 -0800 (PST)
-Message-ID: <b855eceb-05f4-4376-be62-2301d42575e7@linaro.org>
-Date: Mon, 11 Dec 2023 11:19:50 +0100
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9F25591;
+	Mon, 11 Dec 2023 02:20:52 -0800 (PST)
+Received: from loongson.cn (unknown [112.20.109.254])
+	by gateway (Coremail) with SMTP id _____8CxhfCD4nZllAEAAA--.38S3;
+	Mon, 11 Dec 2023 18:20:51 +0800 (CST)
+Received: from localhost.localdomain (unknown [112.20.109.254])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Cxjd6A4nZlgnBbAA--.7604S2;
+	Mon, 11 Dec 2023 18:20:49 +0800 (CST)
+From: Yanteng Si <siyanteng@loongson.cn>
+To: andrew@lunn.ch,
+	tsbogend@alpha.franken.de
+Cc: Yanteng Si <siyanteng@loongson.cn>,
+	robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org,
+	peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com,
+	devicetree@vger.kernel.org,
+	linux-mips@vger.kernel.org,
+	chenhuacai@loongson.cn,
+	netdev@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	chris.chenfeiyang@gmail.com
+Subject: [PATCH v1 net 0/3] Some bug fixes
+Date: Mon, 11 Dec 2023 18:20:32 +0800
+Message-Id: <cover.1702289232.git.siyanteng@loongson.cn>
+X-Mailer: git-send-email 2.31.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH 1/2] dt-bindings: Document QCA808x PHYs
-Content-Language: en-US
-To: Christian Marangi <ansuelsmth@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20231209014828.28194-1-ansuelsmth@gmail.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20231209014828.28194-1-ansuelsmth@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Cxjd6A4nZlgnBbAA--.7604S2
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj9xXoWrtrW5GFy8tF1kXrW5AF43urX_yoWfWFX_CF
+	Z3K348GF4fWFW7J3s29Fs8Zr1agrWDG3W5CFW5JF4fW39rtrnxZrWUCFZ7WF17WFWa9rs3
+	Jr4vgr1rCwn7WosvyTuYvTs0mTUanT9S1TB71UUUUbDqnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbSxYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6r4UJVWxJr1ln4kS14v26r1q6r43M2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
+	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q
+	6rW5McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
+	vIr41lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_
+	Jr0_Gr1l4IxYO2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
+	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0
+	cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8V
+	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E
+	14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUstxhDUUUU
 
-On 09/12/2023 02:48, Christian Marangi wrote:
-> Add Documentation for QCA808x PHYs for the additional property for the
-> active high LED setting and also document the LED configuration for this
-> PHY.
-> 
+* Put Krzysztof's patch into my thread, pick Conor's Reviewed-by
+  tag and Jiaxun's Acked-by tag.(prev version is RFC patch)
 
-Please use subject prefixes matching the subsystem. You can get them for
-example with `git log --oneline -- DIRECTORY_OR_FILE` on the directory
-your patch is touching.
+* I fixed an Oops related to mdio, mainly to ensure that
+  mdio is initialized before use, because it will be used
+  in a series of patches I am working on.
 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
->  .../devicetree/bindings/net/qca,qca808x.yaml  | 66 +++++++++++++++++++
->  1 file changed, 66 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/qca,qca808x.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/qca,qca808x.yaml b/Documentation/devicetree/bindings/net/qca,qca808x.yaml
-> new file mode 100644
-> index 000000000000..73cfff357311
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/qca,qca808x.yaml
-> @@ -0,0 +1,66 @@
-> +# SPDX-License-Identifier: GPL-2.0+
-
-Dual license as checkpath and writing-bindings ask.
-
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/qca,qca808x.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Qualcomm Atheros QCA808X PHY
-> +
-> +maintainers:
-> +  - Christian Marangi <ansuelsmth@gmail.com>
-> +
-> +description:
-> +  Bindings for Qualcomm Atheros QCA808X PHYs
-
-Drop "Bindings for" and then entire sentence seems not useful.
-
-> +
-> +  QCA808X PHYs can have up to 3 LEDs attached.
-> +  All 3 LEDs are disabled by default.
-> +  2 LEDs have dedicated pins with the 3rd LED having the
-> +  double function of Interrupt LEDs/GPIO or additional LED.
-> +
-> +  By default this special PIN is set to LED function.
-> +
-> +allOf:
-> +  - $ref: ethernet-phy.yaml#
-> +
-> +select:
-> +  properties:
-> +    compatible:
-> +      contains:
-> +        enum:
-> +          - ethernet-phy-id004d.d101
-
-I have impression that this is continuation of some other patchset...
-Anyway, id004d.d101 is specific to QCA808x?
-
-> +  required:
-> +    - compatible
-> +
-> +properties:
-> +  qca,led-active-high:
-> +    description: Set all the LEDs to active high to be turned on.
-> +    type: boolean
+see <https://lore.kernel.org/loongarch/cover.1699533745.git.siyanteng@loongson.cn/T/#t>
 
 
-Best regards,
-Krzysztof
+Krzysztof Kozlowski (2):
+  stmmac: dwmac-loongson: drop useless check for compatible fallback
+  MIPS: dts: loongson: drop incorrect dwmac fallback compatible
+
+Yanteng Si (1):
+  stmmac: dwmac-loongson: Make sure MDIO is initialized before use
+
+ .../boot/dts/loongson/loongson64-2k1000.dtsi  |  3 +--
+ arch/mips/boot/dts/loongson/ls7a-pch.dtsi     |  3 +--
+ .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 19 ++++++-------------
+ 3 files changed, 8 insertions(+), 17 deletions(-)
+
+-- 
+2.31.4
 
 
