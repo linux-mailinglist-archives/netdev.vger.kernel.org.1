@@ -1,229 +1,293 @@
-Return-Path: <netdev+bounces-55730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3665480C166
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 07:34:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DDF8580C16E
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 07:37:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27BD51C20998
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 06:34:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15DE91C2095D
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 06:37:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CDA200B7;
-	Mon, 11 Dec 2023 06:34:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 365EC1F188;
+	Mon, 11 Dec 2023 06:37:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="BiBHlaki"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="QCT+HK0W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D732E10C;
-	Sun, 10 Dec 2023 22:34:15 -0800 (PST)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BALXQr9013888;
-	Sun, 10 Dec 2023 22:34:09 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	pfpt0220; bh=6zOpeS+kHPoXeM1GXZo57RXPx7qkXIxstVOPaI4PLho=; b=BiB
-	HlakiPQljHT65tTy9mvpW5ZVZda+jnPILPWD6lNMt4tHVVwQPSVHZ5cxm0rd8QKK
-	N9kxfZLlQUhBEyphaO7YHbPZCKDLHSoXcr0LcXNDZQ7WUeN52J7ShLLFAH4d2XH1
-	coyWpC5Tv3duzylh/wgca+HUax5FRRS4uY9OhojemgmeFUlwP3eaxxsddoPc1VXS
-	u9lgzlLM38qOKWGMSydK4eCqrf3Ui6NdFxCcPP1pvL7YmhszM8BVCns7GaTPpRp7
-	AMM66KFBjLscETNkN68epVj8UcSGygRLWn+qtKT7IW1xWg1HK3O2c+kzNxu5RXFH
-	qqHidToQVr+giEZROHA==
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3uw8xqa5xf-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Sun, 10 Dec 2023 22:34:09 -0800 (PST)
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 10 Dec
- 2023 22:34:07 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Sun, 10 Dec 2023 22:34:07 -0800
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id F2CFC3F70AA;
-	Sun, 10 Dec 2023 22:34:06 -0800 (PST)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
-        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
-        <kheib@redhat.com>, <konguyen@redhat.com>,
-        Shinas Rasheed
-	<srasheed@marvell.com>,
-        Veerasenareddy Burru <vburru@marvell.com>,
-        "Sathesh
- Edara" <sedara@marvell.com>,
-        Eric Dumazet <edumazet@google.com>
-Subject: [PATCH net-next v3 4/4] octeon_ep: support firmware notifications for VFs
-Date: Sun, 10 Dec 2023 22:33:55 -0800
-Message-ID: <20231211063355.2630028-5-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231211063355.2630028-1-srasheed@marvell.com>
-References: <20231211063355.2630028-1-srasheed@marvell.com>
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0330495;
+	Sun, 10 Dec 2023 22:37:27 -0800 (PST)
+Received: by linux.microsoft.com (Postfix, from userid 1099)
+	id 6431220B74C0; Sun, 10 Dec 2023 22:37:26 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6431220B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1702276646;
+	bh=plvwsq/k0bUEpqQI6kSEXAfkzMO9ufErkwbSyDLrpro=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QCT+HK0WSXxvxXDdsu/zd+ld9FUITryrxN2I5Z9hNlGE35pZ4vvppuFLwgx3WEiQl
+	 r55nPqP7tFwaoYlYWi5Abi3+0mAITnNoh5jeYFmriCA5tM1xp/dLDV3dwLs1m1uEST
+	 OnGHIuAPqD98a/CJnitIldsExxy0rGQ0qhjwCtGA=
+Date: Sun, 10 Dec 2023 22:37:26 -0800
+From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
+	leon@kernel.org, cai.huoqing@linux.dev, ssengar@linux.microsoft.com,
+	vkuznets@redhat.com, tglx@linutronix.de,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	schakrabarti@microsoft.com, paulros@microsoft.com
+Subject: Re: [PATCH V5 net-next] net: mana: Assigning IRQ affinity on HT cores
+Message-ID: <20231211063726.GA4977@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1702029754-6520-1-git-send-email-schakrabarti@linux.microsoft.com>
+ <ZXMiOwK3sOJNXHxd@yury-ThinkPad>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: Q-g9Jo2Snk1u3v_4lASkbtOvABmVwGVv
-X-Proofpoint-ORIG-GUID: Q-g9Jo2Snk1u3v_4lASkbtOvABmVwGVv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZXMiOwK3sOJNXHxd@yury-ThinkPad>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Notifications from firmware to vf has to pass through PF
-control mbox and via PF-VF mailboxes. The notifications have to
-be parsed out from the control mbox and passed to the
-PF-VF mailbox in order to reach the corresponding VF.
-Version compatibility should also be checked before messages
-are passed to the mailboxes.
+On Fri, Dec 08, 2023 at 06:03:39AM -0800, Yury Norov wrote:
+> On Fri, Dec 08, 2023 at 02:02:34AM -0800, Souradeep Chakrabarti wrote:
+> > Existing MANA design assigns IRQ to every CPU, including sibling
+> > hyper-threads. This may cause multiple IRQs to be active simultaneously
+> > in the same core and may reduce the network performance with RSS.
+> 
+> Can you add an IRQ distribution diagram to compare before/after
+> behavior, similarly to what I did in the other email?
+> 
+Let's consider this topology:
 
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
-V3:
-  - No changes
+Node            0               1
+Core        0       1       2       3
+CPU       0   1   2   3   4   5   6   7
 
-V2: https://lore.kernel.org/all/20231209081450.2613561-5-srasheed@marvell.com/
-  - No changes
-
-V1: https://lore.kernel.org/all/20231208070352.2606192-5-srasheed@marvell.com/
-
- .../marvell/octeon_ep/octep_ctrl_net.c        |  6 ++
- .../marvell/octeon_ep/octep_pfvf_mbox.c       | 58 +++++++++++++++++++
- .../marvell/octeon_ep/octep_pfvf_mbox.h       |  2 +
- 3 files changed, 66 insertions(+)
-
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-index 9dff2166dbb7..01b7be154c38 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-@@ -13,6 +13,7 @@
- #include "octep_config.h"
- #include "octep_main.h"
- #include "octep_ctrl_net.h"
-+#include "octep_pfvf_mbox.h"
+ Before  
+ IRQ     Nodes   Cores   CPUs
+ 0       1       0       0
+ 1       1       1       2
+ 2       1       0       1
+ 3       1       1       3
+ 4       2       2       4
+ 5       2       3       6
+ 6       2       2       5
+ 7       2       3       7
  
- /* Control plane version */
- #define OCTEP_CP_VERSION_CURRENT	OCTEP_CP_VERSION(1, 0, 0)
-@@ -329,6 +330,11 @@ static int process_mbox_notify(struct octep_device *oct,
- 	    octep_ctrl_net_f2h_cmd_versions[cmd] < OCTEP_CP_VERSION_CURRENT)
- 		return -EOPNOTSUPP;
- 
-+	if (msg->hdr.s.is_vf) {
-+		octep_pfvf_notify(oct, msg);
-+		return 0;
-+	}
-+
- 	switch (cmd) {
- 	case OCTEP_CTRL_NET_F2H_CMD_LINK_STATUS:
- 		if (netif_running(netdev)) {
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
-index 57e0184840c2..387a07456f54 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
-@@ -22,6 +22,15 @@
- #include "octep_pfvf_mbox.h"
- #include "octep_ctrl_net.h"
- 
-+/* When a new command is implemented, the below table should be updated
-+ * with new command and it's version info.
-+ */
-+static u32 pfvf_cmd_versions[OCTEP_PFVF_MBOX_CMD_MAX] = {
-+	[0 ... OCTEP_PFVF_MBOX_CMD_DEV_REMOVE] = OCTEP_PFVF_MBOX_VERSION_V1,
-+	[OCTEP_PFVF_MBOX_CMD_GET_FW_INFO ... OCTEP_PFVF_MBOX_NOTIF_LINK_STATUS] =
-+		OCTEP_PFVF_MBOX_VERSION_V2
-+};
-+
- static void octep_pfvf_validate_version(struct octep_device *oct,  u32 vf_id,
- 					union octep_pfvf_mbox_word cmd,
- 					union octep_pfvf_mbox_word *rsp)
-@@ -88,6 +97,34 @@ static void octep_pfvf_set_rx_state(struct octep_device *oct, u32 vf_id,
- 	rsp->s_link_state.type = OCTEP_PFVF_MBOX_TYPE_RSP_ACK;
- }
- 
-+static int octep_send_notification(struct octep_device *oct, u32 vf_id,
-+				   union octep_pfvf_mbox_word cmd)
-+{
-+	u32 max_rings_per_vf, vf_mbox_queue;
-+	struct octep_mbox *mbox;
-+
-+	/* check if VF PF Mailbox is compatible for this notification */
-+	if (pfvf_cmd_versions[cmd.s.opcode] > oct->vf_info[vf_id].mbox_version) {
-+		dev_dbg(&oct->pdev->dev, "VF Mbox doesn't support Notification:%d on VF ver:%d\n",
-+			cmd.s.opcode, oct->vf_info[vf_id].mbox_version);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	max_rings_per_vf = CFG_GET_MAX_RPVF(oct->conf);
-+	vf_mbox_queue = vf_id * max_rings_per_vf;
-+	if (!oct->mbox[vf_mbox_queue]) {
-+		dev_err(&oct->pdev->dev, "Notif obtained for bad mbox vf %d\n", vf_id);
-+		return -EINVAL;
-+	}
-+	mbox = oct->mbox[vf_mbox_queue];
-+
-+	mutex_lock(&mbox->lock);
-+	writeq(cmd.u64, mbox->pf_vf_data_reg);
-+	mutex_unlock(&mbox->lock);
-+
-+	return 0;
-+}
-+
- static void octep_pfvf_set_mtu(struct octep_device *oct, u32 vf_id,
- 			       union octep_pfvf_mbox_word cmd,
- 			       union octep_pfvf_mbox_word *rsp)
-@@ -327,6 +364,27 @@ static void octep_pfvf_pf_get_data(struct octep_device *oct,
- 	}
- }
- 
-+void octep_pfvf_notify(struct octep_device *oct, struct octep_ctrl_mbox_msg *msg)
-+{
-+	union octep_pfvf_mbox_word notif = { 0 };
-+	struct octep_ctrl_net_f2h_req *req;
-+
-+	req = (struct octep_ctrl_net_f2h_req *)msg->sg_list[0].msg;
-+	switch (req->hdr.s.cmd) {
-+	case OCTEP_CTRL_NET_F2H_CMD_LINK_STATUS:
-+		notif.s_link_status.opcode = OCTEP_PFVF_MBOX_NOTIF_LINK_STATUS;
-+		notif.s_link_status.status = req->link.state;
-+		break;
-+	default:
-+		pr_info("Unknown mbox notif for vf: %u\n",
-+			req->hdr.s.cmd);
-+		return;
-+	}
-+
-+	notif.s.type = OCTEP_PFVF_MBOX_TYPE_CMD;
-+	octep_send_notification(oct, msg->hdr.s.vf_idx, notif);
-+}
-+
- void octep_pfvf_mbox_work(struct work_struct *work)
- {
- 	struct octep_pfvf_mbox_wk *wk = container_of(work, struct octep_pfvf_mbox_wk, work);
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h
-index c18a9f26fc31..0dc6eead292a 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h
-@@ -37,6 +37,7 @@ enum octep_pfvf_mbox_opcode {
- 	OCTEP_PFVF_MBOX_CMD_DEV_REMOVE,
- 	OCTEP_PFVF_MBOX_CMD_GET_FW_INFO,
- 	OCTEP_PFVF_MBOX_CMD_SET_OFFLOADS,
-+	OCTEP_PFVF_MBOX_NOTIF_LINK_STATUS,
- 	OCTEP_PFVF_MBOX_CMD_MAX,
- };
- 
-@@ -162,4 +163,5 @@ union octep_pfvf_mbox_word {
- void octep_pfvf_mbox_work(struct work_struct *work);
- int octep_setup_pfvf_mbox(struct octep_device *oct);
- void octep_delete_pfvf_mbox(struct octep_device *oct);
-+void octep_pfvf_notify(struct octep_device *oct, struct octep_ctrl_mbox_msg *msg);
- #endif
--- 
-2.25.1
+ Now
+ IRQ     Nodes   Cores   CPUs
+ 0       1       0       0-1
+ 1       1       1       2-3
+ 2       1       0       0-1
+ 3       1       1       2-3
+ 4       2       2       4-5
+ 5       2       3       6-7
+ 6       2       2       4-5
+ 7       2       3       6-7
+> > Improve the performance by assigning IRQ to non sibling CPUs in local
+> > NUMA node. The performance improvement we are getting using ntttcp with
+> > following patch is around 15 percent with existing design and approximately
+> > 11 percent, when trying to assign one IRQ in each core across NUMA nodes,
+> > if enough cores are present.
+> 
+> How did you measure it? In the other email you said you used perf, can
+> you show your procedure in details?
+I have used ntttcp for performance analysis, by perf I had meant performance
+analysis. I have used ntttcp with following parameters
+ntttcp -r -m 64 <receiver> 
 
+ntttcp -s <receiver side ip address>  -m 64 <sender>
+Both the VMs are in same Azure subnet and private IP address is used.
+MTU and tcp buffer is set accordingly and number of channels are set using ethtool
+accordingly for best performance. Also irqbalance was disabled.
+https://github.com/microsoft/ntttcp-for-linux
+https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-bandwidth-testing?tabs=linux
+
+> 
+> > Suggested-by: Yury Norov <yury.norov@gmali.com>
+> > Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+> > ---
+> 
+> [...]
+> 
+> >  .../net/ethernet/microsoft/mana/gdma_main.c   | 92 +++++++++++++++++--
+> >  1 file changed, 83 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > index 6367de0c2c2e..18e8908c5d29 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > @@ -1243,15 +1243,56 @@ void mana_gd_free_res_map(struct gdma_resource *r)
+> >  	r->size = 0;
+> >  }
+> >  
+> > +static int irq_setup(int *irqs, int nvec, int start_numa_node)
+> > +{
+> > +	int w, cnt, cpu, err = 0, i = 0;
+> > +	int next_node = start_numa_node;
+> 
+> What for this?
+This is the local numa node, from where to start hopping.
+Please see how we are calling irq_setup(). We are passing the array of allocated irqs, total
+number of irqs allocated, and the local numa node to the device.
+> 
+> > +	const struct cpumask *next, *prev = cpu_none_mask;
+> > +	cpumask_var_t curr, cpus;
+> > +
+> > +	if (!zalloc_cpumask_var(&curr, GFP_KERNEL)) {
+> > +		err = -ENOMEM;
+> > +		return err;
+> > +	}
+> > +	if (!zalloc_cpumask_var(&cpus, GFP_KERNEL)) {
+> 
+>                 free(curr);
+Will fix it in next version. Thanks for pointing.
+> 
+> > +		err = -ENOMEM;
+> > +		return err;
+> > +	}
+> > +
+> > +	rcu_read_lock();
+> > +	for_each_numa_hop_mask(next, next_node) {
+> > +		cpumask_andnot(curr, next, prev);
+> > +		for (w = cpumask_weight(curr), cnt = 0; cnt < w; ) {
+> > +			cpumask_copy(cpus, curr);
+> > +			for_each_cpu(cpu, cpus) {
+> > +				irq_set_affinity_and_hint(irqs[i], topology_sibling_cpumask(cpu));
+> > +				if (++i == nvec)
+> > +					goto done;
+> 
+> Think what if you're passed with irq_setup(NULL, 0, 0).
+> That's why I suggested to place this check at the beginning.
+> 
+irq_setup() is a helper function for mana_gd_setup_irqs(), which already takes
+care of no NULL pointer for irqs, and 0 number of interrupts can not be passed.
+
+nvec = pci_alloc_irq_vectors(pdev, 2, max_irqs, PCI_IRQ_MSIX);
+if (nvec < 0)
+	return nvec;
+> 
+> > +				cpumask_andnot(cpus, cpus, topology_sibling_cpumask(cpu));
+> > +				++cnt;
+> > +			}
+> > +		}
+> > +		prev = next;
+> > +	}
+> > +done:
+> > +	rcu_read_unlock();
+> > +	free_cpumask_var(curr);
+> > +	free_cpumask_var(cpus);
+> > +	return err;
+> > +}
+> > +
+> >  static int mana_gd_setup_irqs(struct pci_dev *pdev)
+> >  {
+> > -	unsigned int max_queues_per_port = num_online_cpus();
+> >  	struct gdma_context *gc = pci_get_drvdata(pdev);
+> > +	unsigned int max_queues_per_port;
+> >  	struct gdma_irq_context *gic;
+> >  	unsigned int max_irqs, cpu;
+> > -	int nvec, irq;
+> > +	int start_irq_index = 1;
+> > +	int nvec, *irqs, irq;
+> >  	int err, i = 0, j;
+> >  
+> > +	cpus_read_lock();
+> > +	max_queues_per_port = num_online_cpus();
+> >  	if (max_queues_per_port > MANA_MAX_NUM_QUEUES)
+> >  		max_queues_per_port = MANA_MAX_NUM_QUEUES;
+> >  
+> > @@ -1261,6 +1302,14 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
+> >  	nvec = pci_alloc_irq_vectors(pdev, 2, max_irqs, PCI_IRQ_MSIX);
+> >  	if (nvec < 0)
+> >  		return nvec;
+> > +	if (nvec <= num_online_cpus())
+> > +		start_irq_index = 0;
+> > +
+> > +	irqs = kmalloc_array((nvec - start_irq_index), sizeof(int), GFP_KERNEL);
+> > +	if (!irqs) {
+> > +		err = -ENOMEM;
+> > +		goto free_irq_vector;
+> > +	}
+> >  
+> >  	gc->irq_contexts = kcalloc(nvec, sizeof(struct gdma_irq_context),
+> >  				   GFP_KERNEL);
+> > @@ -1287,21 +1336,44 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
+> >  			goto free_irq;
+> >  		}
+> >  
+> > -		err = request_irq(irq, mana_gd_intr, 0, gic->name, gic);
+> > -		if (err)
+> > -			goto free_irq;
+> > -
+> > -		cpu = cpumask_local_spread(i, gc->numa_node);
+> > -		irq_set_affinity_and_hint(irq, cpumask_of(cpu));
+> > +		if (!i) {
+> > +			err = request_irq(irq, mana_gd_intr, 0, gic->name, gic);
+> > +			if (err)
+> > +				goto free_irq;
+> > +
+> > +			/* If number of IRQ is one extra than number of online CPUs,
+> > +			 * then we need to assign IRQ0 (hwc irq) and IRQ1 to
+> > +			 * same CPU.
+> > +			 * Else we will use different CPUs for IRQ0 and IRQ1.
+> > +			 * Also we are using cpumask_local_spread instead of
+> > +			 * cpumask_first for the node, because the node can be
+> > +			 * mem only.
+> > +			 */
+> > +			if (start_irq_index) {
+> > +				cpu = cpumask_local_spread(i, gc->numa_node);
+> 
+> I already mentioned that: if i == 0, you don't need to spread, just
+> pick 1st cpu from node.
+The reason I have picked cpumask_local_spread here, is that, the gc->numa_node 
+can be a memory only node, in that case we need to jump to next node to get the CPU.
+Which cpumask_local_spread() using sched_numa_find_nth_cpu() takes care off.
+> 
+> > +				irq_set_affinity_and_hint(irq, cpumask_of(cpu));
+> > +			} else {
+> > +				irqs[start_irq_index] = irq;
+> > +			}
+> > +		} else {
+> > +			irqs[i - start_irq_index] = irq;
+> > +			err = request_irq(irqs[i - start_irq_index], mana_gd_intr, 0,
+> > +					  gic->name, gic);
+> > +			if (err)
+> > +				goto free_irq;
+> > +		}
+> >  	}
+> >  
+> > +	err = irq_setup(irqs, (nvec - start_irq_index), gc->numa_node);
+> > +	if (err)
+> > +		goto free_irq;
+> >  	err = mana_gd_alloc_res_map(nvec, &gc->msix_resource);
+> >  	if (err)
+> >  		goto free_irq;
+> >  
+> >  	gc->max_num_msix = nvec;
+> >  	gc->num_msix_usable = nvec;
+> > -
+> > +	cpus_read_unlock();
+> >  	return 0;
+> >  
+> >  free_irq:
+> > @@ -1314,8 +1386,10 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
+> >  	}
+> >  
+> >  	kfree(gc->irq_contexts);
+> > +	kfree(irqs);
+> >  	gc->irq_contexts = NULL;
+> >  free_irq_vector:
+> > +	cpus_read_unlock();
+> >  	pci_free_irq_vectors(pdev);
+> >  	return err;
+> >  }
+> > -- 
+> > 2.34.1
 
