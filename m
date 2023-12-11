@@ -1,205 +1,114 @@
-Return-Path: <netdev+bounces-55886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9366180CB1A
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:35:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07EB380CB26
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:37:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 646E11C20F85
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:35:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B80B2281B8B
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:37:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9305D3F8D4;
-	Mon, 11 Dec 2023 13:35:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EE773F8D1;
+	Mon, 11 Dec 2023 13:37:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cU9Wnc13"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="exadUWhc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CCB2C3;
-	Mon, 11 Dec 2023 05:35:41 -0800 (PST)
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BBCfvm6014022;
-	Mon, 11 Dec 2023 13:35:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=JAO7RAzqIufMkqXyBj2RDXc5OJpGZGCJxGWVA2r+BIE=;
- b=cU9Wnc13nl1ldvsI59qkPgqSwzHgjrFM2c2DVHC1iUx7qkrzMSBT4Lg27Lx5yXsk47RE
- DwshL7/iLkbrge8+wld2DzyzJmrrCuDhLoBS05uiCETysfcaNPik0Kcw/UgAOK+KttwI
- qJeLq4qQbZg4bStFBCtu+gJGdmt66TvTSN257lY9t+Hz2U8PmXK8luvd83AGdJtLs2Ec
- qb5vS9IO55LhsnQ8uGBaF+kB3TNHpRNiGNUydcECMQouh3cf34zy9gMbp/NQpIufbMa9
- kgFQTJYujTUOE8LwqzUCvT0eAvDWazJdR0WvcQT2MtJvvgs0cV048o9qoGchfJH/EXqL Bg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uwwgaauey-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Dec 2023 13:35:36 +0000
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BBDO37J001880;
-	Mon, 11 Dec 2023 13:35:36 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uwwgaauec-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Dec 2023 13:35:35 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BBAspTq012588;
-	Mon, 11 Dec 2023 13:35:35 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uw3jnhm0m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Dec 2023 13:35:35 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BBDZWaW14942970
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 11 Dec 2023 13:35:32 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D5B912004B;
-	Mon, 11 Dec 2023 13:35:31 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CB81F20043;
-	Mon, 11 Dec 2023 13:35:30 +0000 (GMT)
-Received: from [9.171.1.164] (unknown [9.171.1.164])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 11 Dec 2023 13:35:30 +0000 (GMT)
-Message-ID: <fb2365f6-1237-4f22-9897-5676757e5157@linux.ibm.com>
-Date: Mon, 11 Dec 2023 14:35:30 +0100
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67381F60B
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 13:37:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE30CC433C9;
+	Mon, 11 Dec 2023 13:37:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702301864;
+	bh=qlCi/i5ZtFO1V/UD7klRCv102FsIAb4RVquJmLbmht4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=exadUWhcCCxY79D+MTvmvv9ipeXSLpbHLc9t6pog8kd1GU5ZhXVaja6Z7UOnlZdfj
+	 YD1h4EkXDM8ZevhPPr4NvUFeqQ+MIqr7y6k9e0Kv0eP73Ot5EYG8G6X48/HbB8NRk+
+	 kdzmIedxiejhkCXprMC89T4VUx/GP96q+LjZo90sxD/Gwk9mkOUUFS4hdFtCnSPaub
+	 L0UPXzOVn7qP76BOjc0FPq8pvgPlymewiFxCpa//X2uNeLzbHZSjTxO4gsuTQHh8Lq
+	 xpLsjhb/3RChq2ViuUZ6i4t/aASXJ5V5pYRNOj7DLZ1iDicVA2TaD4c1UzN8hnLJwY
+	 +ZAvP3mIItPoQ==
+Date: Mon, 11 Dec 2023 13:37:38 +0000
+From: Simon Horman <horms@kernel.org>
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, daniel@iogearbox.net, dcaratti@redhat.com,
+	netdev@vger.kernel.org, kernel@mojatatu.com
+Subject: Re: [PATCH net-next v3 1/3] net: sched: Move drop_reason to struct
+ tc_skb_cb
+Message-ID: <20231211133738.GL5817@kernel.org>
+References: <20231205205030.3119672-1-victor@mojatatu.com>
+ <20231205205030.3119672-2-victor@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 2/9] net/smc: introduce sub-functions for
- smc_clc_send_confirm_accept()
-Content-Language: en-US
-To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        kgraul@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, raspl@linux.ibm.com, schnelle@linux.ibm.com,
-        guangguan.wang@linux.alibaba.com, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1702021259-41504-1-git-send-email-guwen@linux.alibaba.com>
- <1702021259-41504-3-git-send-email-guwen@linux.alibaba.com>
- <ac3c0823-8705-4225-96c8-ed7bc55d1bfc@linux.ibm.com>
- <9a6d57c0-f5b4-9b2c-dc5f-dc47d0518141@linux.alibaba.com>
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <9a6d57c0-f5b4-9b2c-dc5f-dc47d0518141@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: nvWSigTNjRKeB0k24C_PLqi6Z4_D9fIY
-X-Proofpoint-ORIG-GUID: Xm1LkjuJPOyctm3kFAYKDGShQp_5pLlv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-11_07,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 adultscore=0 priorityscore=1501 mlxlogscore=782
- impostorscore=0 bulkscore=0 clxscore=1015 mlxscore=0 phishscore=0
- malwarescore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2312110110
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231205205030.3119672-2-victor@mojatatu.com>
 
-
-
-On 11.12.23 13:15, Wen Gu wrote:
->>> +    clc = (struct smc_clc_msg_accept_confirm *)clc_v2;
->>
->> Why is this cast neccessary? (Here as well as in smcr_clc_prep_confirm_accept
->> and in smc_clc_send_confirm_accept)
->> smc_clc_msg_accept_confirm_v2 has hdr and d0 as well.
+On Tue, Dec 05, 2023 at 05:50:28PM -0300, Victor Nogueira wrote:
+> Move drop_reason from struct tcf_result to skb cb - more specifically to
+> struct tc_skb_cb. With that, we'll be able to also set the drop reason for
+> the remaining qdiscs (aside from clsact) that do not have access to
+> tcf_result when time comes to set the skb drop reason.
 > 
-> I think the cast is to imply that v2 is an expansion of v1, or v1 is the base of v2.
-> So here using clc(v1) reperesents their common set.
+> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+
+Hi Victor,
+
+The nit below notwithstanding, this looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+> ---
+>  include/net/pkt_cls.h     | 14 ++++++++++++--
+>  include/net/pkt_sched.h   |  3 ++-
+>  include/net/sch_generic.h |  1 -
+>  net/core/dev.c            |  4 ++--
+>  net/sched/act_api.c       |  2 +-
+>  net/sched/cls_api.c       | 23 ++++++++---------------
+>  6 files changed, 25 insertions(+), 22 deletions(-)
 > 
-> If we use smc_clc_msg_accept_confirm_v2 for all, I think readers may be tempted to
-> check whether the hdr and d0 in 'smc_clc_msg_accept_confirm_v2' are also applicable to v1.
-> 
-> And there are settings below that are specific for v1. It may be confusing if we
-> change it like this:
-> 
-> if (version == SMC_V1) {
->     clc_v2->hdr.length = htons(SMCD_CLC_ACCEPT_CONFIRM_LEN);
-> } else {
-> 
-> 
->>
->> IMO, it would be a nice seperate patch to get rid of the 2 type defs for
->> smc_clc_msg_accept_confirm and smc_clc_msg_accept_confirm_v2
->> and all the related casting anyhow.
->>
-> 
-> Do you mean to define only smc_clc_msg_accept_confirm_v2 or define with the name
-> of smc_clc_msg_accept_confirm but the contents of smc_clc_msg_accept_confirm_v2?
-> 
-> I have a different opinion on this, since I think the smc_clc_msg_accept_confirm
-> and smc_clc_msg_accept_confirm_v2 clearly shows the difference between v1 and
-> v2 messages and remind people what is currently working on. So I perfer to keep them.
-> Am I missing something?
-> 
+> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+> index a76c9171db0e..761e4500cca0 100644
+> --- a/include/net/pkt_cls.h
+> +++ b/include/net/pkt_cls.h
+> @@ -154,10 +154,20 @@ __cls_set_class(unsigned long *clp, unsigned long cl)
+>  	return xchg(clp, cl);
+>  }
+>  
+> -static inline void tcf_set_drop_reason(struct tcf_result *res,
+> +struct tc_skb_cb;
+> +
+> +static inline struct tc_skb_cb *tc_skb_cb(const struct sk_buff *skb);
+> +
 
+nit: It's not very important, as this code disappears in the next patch,
+     but FWIIW I don't think the forward declarations of
+     tc_skb_cb (struct or function) are needed.
 
-This is a discussion about coding style, readability and maintainability (avoid future errors).
-And the code works today and the rest is opinions. That said, let me list some arguments why
-I don't like the casts.
+> +static inline enum skb_drop_reason
+> +tcf_get_drop_reason(const struct sk_buff *skb)
+> +{
+> +	return tc_skb_cb(skb)->drop_reason;
+> +}
+> +
+> +static inline void tcf_set_drop_reason(const struct sk_buff *skb,
+>  				       enum skb_drop_reason reason)
+>  {
+> -	res->drop_reason = reason;
+> +	tc_skb_cb(skb)->drop_reason = reason;
+>  }
+>  
+>  static inline void
 
-Casts in general break the type checking of the compiler.
-
-In some places e.g. clc.d0 points to struct smc_clc_msg_accept_confirm in other
-places it points to struct smc_clc_msg_accept_confirm_v2.
-This makes it hard to find all places where e.g. d0 is altered. (e.g. with an IDE).
-
-You say: "smc_clc_msg_accept_confirm
-> and smc_clc_msg_accept_confirm_v2 clearly shows the difference between v1 and
-> v2 messages"
-But that is not even the case in the code that this patch changes:
-In smcd_clc_prep_confirm_accept() you pass a struct smc_clc_msg_accept_confirm_v2
-cast it to v1 (even in the v2 case) and then use the v1 layout for the common fields and
-the v1-only fields. So I don't think that helps very much.
-
-The v2 messages were explicitely defined for compatibility. i.e.
-all v1 fields are still available. It would be good to see that in the code as well.
-With 2 differnet structs you don't emphasize that.
-
-With future changes somebody could easily make a mistake that the 2 structures don't 
-have the same size anymore. And then the casting can lead to out-of-bound error that
-are hard to find.
-
-We want v2 to be the usual case and v1 to be the exception for backwards compatibility.
-FOr historic reasons, the code looks as if v2 is the exception. I'd rather point out the 
-remaining v1 cases.
-
-
-
-I could envision something like:
-
-struct smc_clc_msg_accept_confirm {	/* clc accept / confirm message */
-	struct smc_clc_msg_hdr hdr;
-	union {
-		struct { /* SMC-R */
-			struct smcr_clc_msg_accept_confirm r0;
-			/* v2 only, reserved and ignored in v1: */
-			u8 eid[SMC_MAX_EID_LEN];
-			u8 reserved6[8];
-		} r1;
-		struct { /* SMC-D */
-			struct smcd_clc_msg_accept_confirm_common d0;
-			/* v2 only, reserved and ignored in v1: */
-			__be16 chid;
-			u8 eid[SMC_MAX_EID_LEN];
-			__be64 gid_ext;
-		} __packed d1;
-	};
-};
-
-And then only use this one structure.
-
-
-
-
-
-
-
-
+...
 
