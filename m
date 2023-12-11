@@ -1,119 +1,213 @@
-Return-Path: <netdev+bounces-55787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 680B480C548
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:53:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EF6A80C57F
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 11:03:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8829B20B8E
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 09:53:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA2121F2102D
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD9D21A04;
-	Mon, 11 Dec 2023 09:53:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B5321DA42;
+	Mon, 11 Dec 2023 10:03:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hLaiH5iW"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="3oYITDvQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [IPv6:2a00:1098:ed:100::25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5804E3;
+	Mon, 11 Dec 2023 02:03:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1702288623;
+	bh=6CjA6ctA+aoJ56ri2JQzkYVkT8sdbfqFhgd6RJqEU/E=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=3oYITDvQJx1zk9TEUDxJKSR7CtnfJS8tOHjRIqY+CVN5nPLVi3axYYancoJclYNg6
+	 af1PASxwqNDLIXKoe8aaTmNcSgjxGm2gsT88etR5bn9HeRhezw7hNBYYN7kkiY7Xxe
+	 KK5VCCNJCtLV/9P0LOxNP6wnWD1yEAhsgJQfE+L1H5F2JvlgdmEcmXIAQv1EtfYUgB
+	 N50An+R4NgSH/EocAuTVa3Rm/ooQRqZnHOIkeM3w8d09bxkbgnjeaDzaA2JhiLT0XF
+	 zWsKtS8jmd3caZJ96JPdAE29+X5yA6hjayookgBLZjU6vEi+nGOlFxWupvdExVzb9h
+	 e4mwvDLSh3L/A==
+Received: from [IPV6:fd00::2a:39ce] (cola.collaboradmins.com [IPv6:2a01:4f8:1c1c:5717::1])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F09E219FE
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 09:53:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71A14C433C7;
-	Mon, 11 Dec 2023 09:53:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702288414;
-	bh=RPdfDOpfiLZcdJaTDPN9N5jZHZuWzkzNihgGSQCCDTM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hLaiH5iWOGE6t/pXw4EzMsYUcIzwQzavt/ocJHBoeUFFW8HzLsvsLETOA6aaGcnQW
-	 TDs58Iq5Xzgt6cldaHcabLkUibvk6X6jgrqB6BSaK8CyXeywGMCzENXVvT96qbqpw0
-	 zknDRVV6W+PTW6/pe5U9nkV4+DlTqrWI4rMnHVmdWNyKxhqnRpcm0xTYVG61uU2bdX
-	 5K8KT0cMINieOTVjm2Wru5F4Knm8908qHnY/wqyXHv4Na1gbGPhxcWvm9jNm6iB41H
-	 944/BEwCbkO3F7TQTA7EsCxATp0uSDfR6Hsa/f+DnAwvdiOmOGm3qrfNmYPvbeYdPR
-	 9DH3xm30H2LLg==
-Date: Mon, 11 Dec 2023 10:53:29 +0100
-From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>, Paolo Abeni
- <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, David Miller
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 net-next] r8169: add support for LED's on
- RTL8168/RTL8101
-Message-ID: <20231211105329.598473b9@dellmb>
-In-Reply-To: <8861e5b7-b1f5-4ae7-9115-76d7256dec62@gmail.com>
-References: <8861e5b7-b1f5-4ae7-9115-76d7256dec62@gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
+	(Authenticated sender: kholk11)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 5C303378140F;
+	Mon, 11 Dec 2023 09:57:01 +0000 (UTC)
+Message-ID: <060c8068-0f9b-40b4-89ed-3b968e4b0071@collabora.com>
+Date: Mon, 11 Dec 2023 10:57:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 4/4] clk: mediatek: add drivers for MT7988 SoC
+Content-Language: en-US
+To: Daniel Golle <daniel@makrotopia.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Sabrina Dubroca <sd@queasysnail.net>, Jianhui Zhao <zhaojh329@gmail.com>,
+ Chen-Yu Tsai <wenst@chromium.org>, "Garmin.Chang"
+ <Garmin.Chang@mediatek.com>, Sam Shih <sam.shih@mediatek.com>,
+ Markus Schneider-Pargmann <msp@baylibre.com>,
+ Alexandre Mergnat <amergnat@baylibre.com>,
+ Jiasheng Jiang <jiasheng@iscas.ac.cn>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Chanwoo Choi <cw00.choi@samsung.com>,
+ Dan Carpenter <dan.carpenter@linaro.org>,
+ James Liao <jamesjj.liao@mediatek.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org
+References: <097e82b0d66570763d64be1715517d8b032fcf95.1702158423.git.daniel@makrotopia.org>
+ <879b5bbcb165aa3f059a41218142b27e5f64597f.1702158423.git.daniel@makrotopia.org>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+In-Reply-To: <879b5bbcb165aa3f059a41218142b27e5f64597f.1702158423.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hello Heiner,
-
-On Fri, 8 Dec 2023 18:48:27 +0100
-Heiner Kallweit <hkallweit1@gmail.com> wrote:
-
-> +static void rtl8168_setup_ldev(struct r8169_led_classdev *ldev,
-> +			       struct net_device *ndev, int index)
-> +{
-> +	struct rtl8169_private *tp = netdev_priv(ndev);
-> +	struct led_classdev *led_cdev = &ldev->led;
-> +	char led_name[LED_MAX_NAME_SIZE];
+Il 09/12/23 22:56, Daniel Golle ha scritto:
+> From: Sam Shih <sam.shih@mediatek.com>
+> 
+> Add APMIXED, ETH, INFRACFG and TOPCKGEN clock drivers which are
+> typical MediaTek designs.
+> 
+> Also add driver for XFIPLL clock generating the 156.25MHz clock for
+> the XFI SerDes. It needs an undocumented software workaround and has
+> an unknown internal design.
+> 
+> Signed-off-by: Sam Shih <sam.shih@mediatek.com>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+> v4:
+>   * make use of existing GATE_MTK_FLAGS macro
+>   * reformat to max. 100 columns
+>   * cosmetics
+> 
+> v3: use git --from ...
+> v2: no changes
+> 
+> 
+>   drivers/clk/mediatek/Kconfig               |   9 +
+>   drivers/clk/mediatek/Makefile              |   5 +
+>   drivers/clk/mediatek/clk-mt7988-apmixed.c  | 102 +++++++
+>   drivers/clk/mediatek/clk-mt7988-eth.c      | 133 +++++++++
+>   drivers/clk/mediatek/clk-mt7988-infracfg.c | 274 +++++++++++++++++
+>   drivers/clk/mediatek/clk-mt7988-topckgen.c | 325 +++++++++++++++++++++
+>   drivers/clk/mediatek/clk-mt7988-xfipll.c   |  78 +++++
+>   7 files changed, 926 insertions(+)
+>   create mode 100644 drivers/clk/mediatek/clk-mt7988-apmixed.c
+>   create mode 100644 drivers/clk/mediatek/clk-mt7988-eth.c
+>   create mode 100644 drivers/clk/mediatek/clk-mt7988-infracfg.c
+>   create mode 100644 drivers/clk/mediatek/clk-mt7988-topckgen.c
+>   create mode 100644 drivers/clk/mediatek/clk-mt7988-xfipll.c
+> 
+> diff --git a/drivers/clk/mediatek/Kconfig b/drivers/clk/mediatek/Kconfig
+> index 48b42d11111cd..70a005e7e1b18 100644
+> --- a/drivers/clk/mediatek/Kconfig
+> +++ b/drivers/clk/mediatek/Kconfig
+> @@ -423,6 +423,15 @@ config COMMON_CLK_MT7986_ETHSYS
+>   	  This driver adds support for clocks for Ethernet and SGMII
+>   	  required on MediaTek MT7986 SoC.
+>   
+> +config COMMON_CLK_MT7988
+> +	tristate "Clock driver for MediaTek MT7988"
+> +	depends on ARCH_MEDIATEK || COMPILE_TEST
+> +	select COMMON_CLK_MEDIATEK
+> +	default ARCH_MEDIATEK
+> +	help
+> +	  This driver supports MediaTek MT7988 basic clocks and clocks
+> +	  required for various periperals found on this SoC.
 > +
-> +	ldev->ndev = ndev;
-> +	ldev->index = index;
+>   config COMMON_CLK_MT8135
+>   	tristate "Clock driver for MediaTek MT8135"
+>   	depends on (ARCH_MEDIATEK && ARM) || COMPILE_TEST
+> diff --git a/drivers/clk/mediatek/Makefile b/drivers/clk/mediatek/Makefile
+> index dbeaa5b41177d..eeccfa039896f 100644
+> --- a/drivers/clk/mediatek/Makefile
+> +++ b/drivers/clk/mediatek/Makefile
+> @@ -62,6 +62,11 @@ obj-$(CONFIG_COMMON_CLK_MT7986) += clk-mt7986-apmixed.o
+>   obj-$(CONFIG_COMMON_CLK_MT7986) += clk-mt7986-topckgen.o
+>   obj-$(CONFIG_COMMON_CLK_MT7986) += clk-mt7986-infracfg.o
+>   obj-$(CONFIG_COMMON_CLK_MT7986_ETHSYS) += clk-mt7986-eth.o
+> +obj-$(CONFIG_COMMON_CLK_MT7988) += clk-mt7988-apmixed.o
+> +obj-$(CONFIG_COMMON_CLK_MT7988) += clk-mt7988-topckgen.o
+> +obj-$(CONFIG_COMMON_CLK_MT7988) += clk-mt7988-infracfg.o
+> +obj-$(CONFIG_COMMON_CLK_MT7988) += clk-mt7988-eth.o
+> +obj-$(CONFIG_COMMON_CLK_MT7988) += clk-mt7988-xfipll.o
+>   obj-$(CONFIG_COMMON_CLK_MT8135) += clk-mt8135-apmixedsys.o clk-mt8135.o
+>   obj-$(CONFIG_COMMON_CLK_MT8167) += clk-mt8167-apmixedsys.o clk-mt8167.o
+>   obj-$(CONFIG_COMMON_CLK_MT8167_AUDSYS) += clk-mt8167-aud.o
+> diff --git a/drivers/clk/mediatek/clk-mt7988-apmixed.c b/drivers/clk/mediatek/clk-mt7988-apmixed.c
+> new file mode 100644
+> index 0000000000000..02eb6354b01a8
+> --- /dev/null
+> +++ b/drivers/clk/mediatek/clk-mt7988-apmixed.c
+> @@ -0,0 +1,102 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (c) 2023 MediaTek Inc.
+> + * Author: Sam Shih <sam.shih@mediatek.com>
+> + * Author: Xiufeng Li <Xiufeng.Li@mediatek.com>
+> + */
 > +
-> +	r8169_get_led_name(tp, index, led_name, LED_MAX_NAME_SIZE);
-> +	led_cdev->name = led_name;
-> +	led_cdev->default_trigger = "netdev";
-> +	led_cdev->hw_control_trigger = "netdev";
-> +	led_cdev->flags |= LED_RETAIN_AT_SHUTDOWN;
-> +	led_cdev->hw_control_is_supported = rtl8168_led_hw_control_is_supported;
-> +	led_cdev->hw_control_set = rtl8168_led_hw_control_set;
-> +	led_cdev->hw_control_get = rtl8168_led_hw_control_get;
-> +	led_cdev->hw_control_get_device = r8169_led_hw_control_get_device;
+> +#include <linux/clk-provider.h>
+> +#include <linux/of.h>
+> +#include <linux/of_address.h>
+> +#include <linux/of_device.h>
+> +#include <linux/platform_device.h>
+> +#include "clk-mtk.h"
+> +#include "clk-gate.h"
+> +#include "clk-mux.h"
+> +#include "clk-pll.h"
+> +#include <dt-bindings/clock/mediatek,mt7988-clk.h>
 > +
-> +	/* ignore errors */
-> +	devm_led_classdev_register(&ndev->dev, led_cdev);
-> +}
+> +#define MT7988_PLL_FMAX (2500UL * MHZ)
+> +#define MT7988_PCW_CHG_SHIFT 2
+> +
+> +#define PLL(_id, _name, _reg, _pwr_reg, _en_mask, _flags, _rst_bar_mask, _pcwbits, _pd_reg,      \
+> +	    _pd_shift, _tuner_reg, _tuner_en_reg, _tuner_en_bit, _pcw_reg, _pcw_shift,           \
+> +	    _pcw_chg_reg)                                                                        \
+> +	{                                                                                        \
+> +		.id = _id, .name = _name, .reg = _reg, .pwr_reg = _pwr_reg, .en_mask = _en_mask, \
+> +		.flags = _flags, .rst_bar_mask = BIT(_rst_bar_mask), .fmax = MT7988_PLL_FMAX,    \
+> +		.pcwbits = _pcwbits, .pd_reg = _pd_reg, .pd_shift = _pd_shift,                   \
+> +		.tuner_reg = _tuner_reg, .tuner_en_reg = _tuner_en_reg,                          \
+> +		.tuner_en_bit = _tuner_en_bit, .pcw_reg = _pcw_reg, .pcw_shift = _pcw_shift,     \
+> +		.pcw_chg_reg = _pcw_chg_reg, .pcw_chg_shift = MT7988_PCW_CHG_SHIFT,              \
+> +		.parent_name = "clkxtal",                                                        \
+> +	}
 
-...
+I think that there was a bit of misunderstanding here: I said 100cols, and that's
+fine, but I wanted you to do that with everything but the macros, following what
+was done in all the other MediaTek clock drivers.
 
-> +void r8169_get_led_name(struct rtl8169_private *tp, int idx,
-> +			char *buf, int buf_len)
-> +{
-> +	snprintf(buf, buf_len, "r8169-%x%x-led%d",
-> +		 pci_domain_nr(tp->pci_dev->bus),
-> +		 pci_dev_id(tp->pci_dev), idx);
-> +}
+Can you please change the macros again?
 
-Please look at Documentation/leds/leds-class.rst:
-  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/leds/leds-class.rst?h=v6.7-rc5
+Also, there's some discrepancy in the usage of tabulations vs spaces, please fix.
 
-LED devices should have name in the format
-  "devicename:color:function"
-Where color is one from the led_colors array from
-drivers/leds/led-core.c (or omitted if you cannot know) and function is
-one from the LED_FUNCTION_ macros from
-include/dt-bindings/leds/common.h.
+#define PLL(....)*TAB*\
 
-When skipping color, you should keep the colon sign, i.e.
-  usbnet0::lan
+....
 
-Regarding the devicename part: originally it was thought to be
-something like eth0 (like the LED for mmc0 has devicename mmc0),
-but since network interfaces can be renamed and their names are not
-guaranteeed to be persisnet across boots, maybe you can reuse the
-Predictable Network Interface Names scheme for USB devices
-  https://www.freedesktop.org/software/systemd/man/latest/systemd.net-naming-scheme.html
+	{										\
+		.id = _id,							\
+		.name = _name,							\
+		.reg = _reg,							\
+		.pwr_reg = _pwr_reg,						\
+		.en_mask = _en_mask,						\
+		...etc etc etc...						\
+}
 
-Please don't put the driver name (r8169) there.
-
-Marek
+Thanks,
+Angelo
 
