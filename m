@@ -1,282 +1,332 @@
-Return-Path: <netdev+bounces-55703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C38D80C035
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 05:05:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CEF0380C05A
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 05:21:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1202280CBB
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 04:04:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67B54280C67
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 04:21:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FE2418051;
-	Mon, 11 Dec 2023 04:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30BDD1947F;
+	Mon, 11 Dec 2023 04:21:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VaDRWRM1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aPB+fB03"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F28E2F1
-	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 20:04:50 -0800 (PST)
-Received: by mail-vk1-xa2f.google.com with SMTP id 71dfb90a1353d-4b2ceee07e5so2307240e0c.1
-        for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 20:04:50 -0800 (PST)
+Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 536B0DA
+	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 20:21:33 -0800 (PST)
+Received: by mail-vs1-xe2c.google.com with SMTP id ada2fe7eead31-46603b0de2fso649041137.3
+        for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 20:21:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702267490; x=1702872290; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1702268492; x=1702873292; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VRqbtjk8rq4zydD2Xsjk5a3+pHw9ItIcSF2MB1yehQo=;
-        b=VaDRWRM1KRnktwFxZ92SGWHc1wbhGhcnjpbwvr7zS/PYf7hQmZDMYJBrBxhQ4eVjnA
-         Q+c2MzggIH/mQZjlACA44bUtyaF2Fd2UijObUiaGn0cfrabnnsoeH7776n8Xgitmi1yY
-         yjxFOAmF5tRy3PfE+F2GcW7IlBjeQdWuhMuwuIp3C33DpBBBGJiiYMoQ6zPce2JeeAaB
-         trzubaUeLVF7btf1C6JnWpEiFKOGS9XLFm+btbsaj6YpJ0LgWiubuabKMyNLHJXnPux4
-         vx0wSYQPT9j+ECQZ/fRwvyVnjJKc8Dhw82g/lYSA61ce8PUrx2nAlKy5Czg24W3W5u4b
-         GQpA==
+        bh=H8/aEGODWLQyR+Ehqt9zVQlYBaFeN9s1x0j4MUOMfuY=;
+        b=aPB+fB03P1mjYsUmPh+v1cgP1L+iI3kIry6eKGm6t3MGZ/PcdmAvmT9pTkWmw1ciot
+         z9sLY57mJOLOoNHdK9CIeB6pnn9l2EbeBN7VZTkPlk6+tyJTbNyUm3mZ4/ztebF9bwdH
+         MOcO76ILsXgQ0Iu6E2gVYalReZJRETqbmckRjemNJXhFT2VV3e0959HXwiZd0fpebgIc
+         rjQVX7TYHKsmbj1YQlcb5S0FxMoTmw9kq0oKRup5+tyBZhbOAQvyAL+LT1J0QVzZ6Bl+
+         Rw2iGuexqhb2lsWh+RysR4+hP4Lnut7BNkJ3wf3D0McYhWhzgBiElnsZpw3gATYPJuQ2
+         H3gQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702267490; x=1702872290;
+        d=1e100.net; s=20230601; t=1702268492; x=1702873292;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VRqbtjk8rq4zydD2Xsjk5a3+pHw9ItIcSF2MB1yehQo=;
-        b=VYRTRTAd67M1lkIMSIMBOEpr3Ts2CvLWDixckNwdsjOFmIwa+KE3viTu+TxnLTwy0f
-         db47VWNqeYeQ20+p/4yAx9RVN0JzQxF+ERrUqJ9RO5BqQf7JasGVkFfGfI4KjHpqmpGz
-         ya3+NOfHFg3yrFSdWM5n7N45PH34Z/YRB/Sioo/utEolbaw2Wkmg443D2BXnBk3H93TH
-         B88Ug1nhSA6VXta486obsqw4jG4+roMMvzcnE9lQxbDj0bR8OK4FPRqYifPun4gJbC1t
-         1OKCiERV7dF2keYUcENvye9MPxzH85/NXSXO/VZbCYYIMpNg6wDt1pcyDU0w7XfWuGzH
-         uSDw==
-X-Gm-Message-State: AOJu0YwqvFaRGt6LKZ4eoK5NcrGFDOdry1IZT3Gs5t45bnWVk9B+/EZb
-	aPJ7oJrlYxSBXOKm7NsdczHRbyms4TnjBsmkJjBe9A==
-X-Google-Smtp-Source: AGHT+IGAfd74P9yx0nc2KiABSnElGYTnepENJsYtWliZ+g0y9LWw0IHdbTNPBs473It21Lgw8vWq6UsEAVUukNqm/hI=
-X-Received: by 2002:a05:6122:18aa:b0:496:80b6:2fd1 with SMTP id
- bi42-20020a05612218aa00b0049680b62fd1mr2519624vkb.5.1702267489809; Sun, 10
- Dec 2023 20:04:49 -0800 (PST)
+        bh=H8/aEGODWLQyR+Ehqt9zVQlYBaFeN9s1x0j4MUOMfuY=;
+        b=tWZMXT1Q5/iSKAaeFOIoZxgkAn703F+7fV/tmPpApk21/MPN2Th4IsbG/lUXsRvznL
+         abIrwV10zpmcViL4n4qy8v6UWHx+WSAt0lB7yMloOFyEtlA+AAmb489Wlxd5DCGhSsmW
+         J2uh/ggrLgcIo+pSNMRE8cGYKtHoMUtpwO87hnHG+/0KLi/qdjTX5Pd3K13BlfGkxfZa
+         qIOGjCIr7K7ptVnHVCknblHnDamE3TsWD/K5YcWwdZ7bIdpsfsBOwnzPAWxR3wPVKqkr
+         AIyPN6YorQvIcOyQl+KpPIKpvQV+V7P52r5KfmVpefQ72r/PrfP9K4WJ0YoINQJK7Evg
+         SBjg==
+X-Gm-Message-State: AOJu0Yz2m7JgHtKnH932ibpBwb/RM3MvW2WUNHhzErR1vs+52mIJLwgW
+	mziSoUvjEthRbZt8+8f/l0vxW+UiNp298sIIr1PjCg==
+X-Google-Smtp-Source: AGHT+IEHw5pq3fytxwBk+eZGmvzRYn/8p+W9cVF0ENu6U7xeRe54oCpUeMlsmrnzh19Jo757GGewV5ZEfwxBhu8cAcE=
+X-Received: by 2002:a05:6102:54a1:b0:464:84e4:fa70 with SMTP id
+ bk33-20020a05610254a100b0046484e4fa70mr2257691vsb.24.1702268492207; Sun, 10
+ Dec 2023 20:21:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231208005250.2910004-1-almasrymina@google.com>
- <20231208005250.2910004-10-almasrymina@google.com> <32211cbf-3a4e-8a86-6214-4304ddb18a98@huawei.com>
- <CAHS8izOQcuLPwvDff96fuNB7r6EU9OWt3ShueQp=u7wat3L5LA@mail.gmail.com>
- <92e30bd9-6df4-b72f-7bcd-f4fe5670eba2@huawei.com> <CAHS8izPEFsqw50qgM+sPot6XVvOExpd+DrwrmPSR3zsWGLysRw@mail.gmail.com>
-In-Reply-To: <CAHS8izPEFsqw50qgM+sPot6XVvOExpd+DrwrmPSR3zsWGLysRw@mail.gmail.com>
+References: <20231206105419.27952-1-liangchen.linux@gmail.com>
+ <20231206105419.27952-5-liangchen.linux@gmail.com> <CAHS8izNQeSwWQ9NwiDUcPoSX1WONG4JYu2rfpqF3+4xkxE=Wyw@mail.gmail.com>
+ <CAKhg4t+LpF=G0DBhbuRYtxKyTrMiR3pSc15sY42kc57iGQfPmw@mail.gmail.com>
+In-Reply-To: <CAKhg4t+LpF=G0DBhbuRYtxKyTrMiR3pSc15sY42kc57iGQfPmw@mail.gmail.com>
 From: Mina Almasry <almasrymina@google.com>
-Date: Sun, 10 Dec 2023 20:04:36 -0800
-Message-ID: <CAHS8izN6Cbjy0FCYhJyNsP396XfgJ_nTFXWuHb5QWNct=PifAg@mail.gmail.com>
-Subject: Re: [net-next v1 09/16] page_pool: device memory support
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
-	David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeelb@google.com>
+Date: Sun, 10 Dec 2023 20:21:21 -0800
+Message-ID: <CAHS8izPpWZvOSswHP0n-_nBiUMw8Ay2iM4yFE-HZenHv51iBHA@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 4/4] skbuff: Optimization of SKB coalescing
+ for page pool
+To: Liang Chen <liangchen.linux@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, hawk@kernel.org, ilias.apalodimas@linaro.org, 
+	linyunsheng@huawei.com, netdev@vger.kernel.org, linux-mm@kvack.org, 
+	jasowang@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Dec 10, 2023 at 6:26=E2=80=AFPM Mina Almasry <almasrymina@google.co=
-m> wrote:
+On Sun, Dec 10, 2023 at 7:38=E2=80=AFPM Liang Chen <liangchen.linux@gmail.c=
+om> wrote:
 >
-> On Sun, Dec 10, 2023 at 6:04=E2=80=AFPM Yunsheng Lin <linyunsheng@huawei.=
+> On Sat, Dec 9, 2023 at 10:18=E2=80=AFAM Mina Almasry <almasrymina@google.=
 com> wrote:
 > >
-> > On 2023/12/9 0:05, Mina Almasry wrote:
-> > > On Fri, Dec 8, 2023 at 1:30=E2=80=AFAM Yunsheng Lin <linyunsheng@huaw=
-ei.com> wrote:
-> > >>
-> > >>
-> > >> As mentioned before, it seems we need to have the above checking eve=
-ry
-> > >> time we need to do some per-page handling in page_pool core, is ther=
-e
-> > >> a plan in your mind how to remove those kind of checking in the futu=
-re?
-> > >>
+> > On Wed, Dec 6, 2023 at 2:54=E2=80=AFAM Liang Chen <liangchen.linux@gmai=
+l.com> wrote:
 > > >
-> > > I see 2 ways to remove the checking, both infeasible:
+> > > In order to address the issues encountered with commit 1effe8ca4e34
+> > > ("skbuff: fix coalescing for page_pool fragment recycling"), the
+> > > combination of the following condition was excluded from skb coalesci=
+ng:
 > > >
-> > > 1. Allocate a wrapper struct that pulls out all the fields the page p=
-ool needs:
+> > > from->pp_recycle =3D 1
+> > > from->cloned =3D 1
+> > > to->pp_recycle =3D 1
 > > >
-> > > struct netmem {
-> > >         /* common fields */
-> > >         refcount_t refcount;
-> > >         bool is_pfmemalloc;
-> > >         int nid;
-> > >         ...
-> > >         union {
-> > >                 struct dmabuf_genpool_chunk_owner *owner;
-> > >                 struct page * page;
-> > >         };
-> > > };
+> > > However, with page pool environments, the aforementioned combination =
+can
+> > > be quite common(ex. NetworkMananger may lead to the additional
+> > > packet_type being registered, thus the cloning). In scenarios with a
+> > > higher number of small packets, it can significantly affect the succe=
+ss
+> > > rate of coalescing. For example, considering packets of 256 bytes siz=
+e,
+> > > our comparison of coalescing success rate is as follows:
 > > >
-> > > The page pool can then not care if the underlying memory is iov or
-> > > page. However this introduces significant memory bloat as this struct
-> > > needs to be allocated for each page or ppiov, which I imagine is not
-> > > acceptable for the upside of removing a few static_branch'd if
-> > > statements with no performance cost.
+> > > Without page pool: 70%
+> > > With page pool: 13%
 > > >
-> > > 2. Create a unified struct for page and dmabuf memory, which the mm
-> > > folks have repeatedly nacked, and I imagine will repeatedly nack in
-> > > the future.
+> > > Consequently, this has an impact on performance:
 > > >
-> > > So I imagine the special handling of ppiov in some form is critical
-> > > and the checking may not be removable.
-> >
-> > If the above is true, perhaps devmem is not really supposed to be inter=
-gated
-> > into page_pool.
-> >
-> > Adding a checking for every per-page handling in page_pool core is just=
- too
-> > hacky to be really considerred a longterm solution.
-> >
->
-> The only other option is to implement another page_pool for ppiov and
-> have the driver create page_pool or ppiov_pool depending on the state
-> of the netdev_rx_queue (or some helper in the net stack to do that for
-> the driver). This introduces some code duplication. The ppiov_pool &
-> page_pool would look similar in implementation.
->
-> But this was all discussed in detail in RFC v2 and the last response I
-> heard from Jesper was in favor if this approach, if I understand
-> correctly:
->
-> https://lore.kernel.org/netdev/7aedc5d5-0daf-63be-21bc-3b724cc1cab9@redha=
-t.com/
->
-> Would love to have the maintainer weigh in here.
->
-
-I should note we may be able to remove some of the checking, but maybe not =
-all.
-
-- Checks that disable page fragging for ppiov can be removed once
-ppiov has frag support (in this series or follow up).
-
-- If we use page->pp_frag_count (or page->pp_ref_count) for
-refcounting ppiov, we can remove the if checking in the refcounting.
-
-- We may be able to store the dma_addr of the ppiov in page->dma_addr,
-but I'm unsure if that actually works, because the dma_buf dmaddr is
-dma_addr_t (u32 or u64), but page->dma_addr is unsigned long (4 bytes
-I think). But if it works for pages I may be able to make it work for
-ppiov as well.
-
-- Checks that obtain the page->pp can work with ppiov if we align the
-offset of page->pp and ppiov->pp.
-
-- Checks around page->pp_magic can be removed if we also have offset
-aligned ppiov->pp_magic.
-
-Sadly I don't see us removing the checking for these other cases:
-
-- page_is_pfmemalloc(): I'm not allowed to pass a non-struct page into
-that helper.
-
-- page_to_nid(): I'm not allowed to pass a non-struct page into that helper=
-.
-
-- page_pool_free_va(): ppiov have no va.
-
-- page_pool_sync_for_dev/page_pool_dma_map: ppiov backed by dma-buf
-fundamentally can't get mapped again.
-
-Are the removal (or future removal) of these checks enough to resolve this?
-
-> > It is somewhat ironical that devmem is using static_branch to alliviate=
- the
-> > performance impact for normal memory at the possible cost of performanc=
-e
-> > degradation for devmem, does it not defeat some purpose of intergating =
-devmem
-> > to page_pool?
-> >
->
-> I don't see the issue. The static branch sets the non-ppiov path as
-> default if no memory providers are in use, and flips it when they are,
-> making the default branch prediction ideal in both cases.
->
+> > > Without page pool: 2.57 Gbits/sec
+> > > With page pool: 2.26 Gbits/sec
 > > >
-> > >> Even though a static_branch check is added in page_is_page_pool_iov(=
-), it
-> > >> does not make much sense that a core has tow different 'struct' for =
-its
-> > >> most basic data.
-> > >>
-> > >> IMHO, the ppiov for dmabuf is forced fitting into page_pool without =
-much
-> > >> design consideration at this point.
-> > >>
-> > > ...
-> > >>
-> > >> For now, the above may work for the the rx part as it seems that you=
- are
-> > >> only enabling rx for dmabuf for now.
-> > >>
-> > >> What is the plan to enable tx for dmabuf? If it is also intergrated =
-into
-> > >> page_pool? There was a attempt to enable page_pool for tx, Eric seem=
-ed to
-> > >> have some comment about this:
-> > >> https://lkml.kernel.org/netdev/2cf4b672-d7dc-db3d-ce90-15b4e91c4005@=
-huawei.com/T/#mb6ab62dc22f38ec621d516259c56dd66353e24a2
-> > >>
-> > >> If tx is not intergrated into page_pool, do we need to create a new =
-layer for
-> > >> the tx dmabuf?
-> > >>
+> > > Therefore, it seems worthwhile to optimize this scenario and enable
+> > > coalescing of this particular combination. To achieve this, we need t=
+o
+> > > ensure the correct increment of the "from" SKB page's page pool
+> > > reference count (pp_ref_count).
 > > >
-> > > I imagine the TX path will reuse page_pool_iov, page_pool_iov_*()
-> > > helpers, and page_pool_page_*() helpers, but will not need any core
-> > > page_pool changes. This is because the TX path will have to piggyback
-> >
-> > We may need another bit/flags checking to demux between page_pool owned
-> > devmem and non-page_pool owned devmem.
-> >
->
-> The way I'm imagining the support, I don't see the need for such
-> flags. We'd be re-using generic helpers like
-> page_pool_iov_get_dma_address() and what not that don't need that
-> checking.
->
-> > Also calling page_pool_*() on non-page_pool owned devmem is confusing
-> > enough that we may need a thin layer handling non-page_pool owned devme=
-m
-> > in the end.
-> >
->
-> The page_pool_page* & page_pool_iov* functions can be renamed if
-> confusing. I would think that's no issue (note that the page_pool_*
-> functions need not be called for TX path).
->
-> > > on MSG_ZEROCOPY (devmem is not copyable), so no memory allocation fro=
-m
-> > > the page_pool (or otherwise) is needed or possible. RFCv1 had a TX
-> > > implementation based on dmabuf pages without page_pool involvement, I
-> > > imagine I'll do something similar.
-> > It would be good to have a tx implementation for the next version, so
-> > that we can have a whole picture of devmem.
-> >
+> > > Following this optimization, the success rate of coalescing measured =
+in
+> > > our environment has improved as follows:
 > > >
->
->
->
-> --
-> Thanks,
-> Mina
-
-
-
+> > > With page pool: 60%
+> > >
+> > > This success rate is approaching the rate achieved without using page
+> > > pool, and the performance has also been improved:
+> > >
+> > > With page pool: 2.52 Gbits/sec
+> > >
+> > > Below is the performance comparison for small packets before and afte=
+r
+> > > this optimization. We observe no impact to packets larger than 4K.
+> > >
+> > > packet size     before      after       improved
+> > > (bytes)         (Gbits/sec) (Gbits/sec)
+> > > 128             1.19        1.27        7.13%
+> > > 256             2.26        2.52        11.75%
+> > > 512             4.13        4.81        16.50%
+> > > 1024            6.17        6.73        9.05%
+> > > 2048            14.54       15.47       6.45%
+> > > 4096            25.44       27.87       9.52%
+> > >
+> > > Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
+> > > Reviewed-by: Yunsheng Lin <linyunsheng@huawei.com>
+> > > Suggested-by: Jason Wang <jasowang@redhat.com>
+> > > ---
+> > >  include/net/page_pool/helpers.h |  5 ++++
+> > >  net/core/skbuff.c               | 41 +++++++++++++++++++++++--------=
 --
+> > >  2 files changed, 34 insertions(+), 12 deletions(-)
+> > >
+> > > diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/=
+helpers.h
+> > > index 9dc8eaf8a959..268bc9d9ffd3 100644
+> > > --- a/include/net/page_pool/helpers.h
+> > > +++ b/include/net/page_pool/helpers.h
+> > > @@ -278,6 +278,11 @@ static inline long page_pool_unref_page(struct p=
+age *page, long nr)
+> > >         return ret;
+> > >  }
+> > >
+> > > +static inline void page_pool_ref_page(struct page *page)
+> > > +{
+> > > +       atomic_long_inc(&page->pp_ref_count);
+> > > +}
+> > > +
+> > >  static inline bool page_pool_is_last_ref(struct page *page)
+> > >  {
+> > >         /* If page_pool_unref_page() returns 0, we were the last user=
+ */
+> > > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > > index 7e26b56cda38..3c2515a29376 100644
+> > > --- a/net/core/skbuff.c
+> > > +++ b/net/core/skbuff.c
+> > > @@ -947,6 +947,24 @@ static bool skb_pp_recycle(struct sk_buff *skb, =
+void *data, bool napi_safe)
+> > >         return napi_pp_put_page(virt_to_page(data), napi_safe);
+> > >  }
+> > >
+> > > +/**
+> > > + * skb_pp_frag_ref() - Increase fragment reference count of a page
+> > > + * @page:      page of the fragment on which to increase a reference
+> > > + *
+> > > + * Increase fragment reference count (pp_ref_count) on a page, but i=
+f it is
+> > > + * not a page pool page, fallback to increase a reference(_refcount)=
+ on a
+> > > + * normal page.
+> > > + */
+> > > +static void skb_pp_frag_ref(struct page *page)
+> > > +{
+> > > +       struct page *head_page =3D compound_head(page);
+> > > +
+> > > +       if (likely(is_pp_page(head_page)))
+> > > +               page_pool_ref_page(head_page);
+> > > +       else
+> > > +               page_ref_inc(head_page);
+> > > +}
+> > > +
+> >
+> > I am confused by this, why add a new helper instead of modifying the
+> > existing helper, skb_frag_ref()?
+> >
+> > My mental model is that if the net stack wants to acquire a reference
+> > on a frag, it calls skb_frag_ref(), and if it wants to drop a
+> > reference on a frag, it should call skb_frag_unref(). Internally
+> > skb_frag_ref/unref() can do all sorts of checking to decide whether to
+> > increment page->refcount or page->pp_ref_count. I can't wrap my head
+> > around the introduction of skb_pp_frag_ref(), but no equivalent
+> > skb_pp_frag_unref().
+> >
+> > But even if skb_pp_frag_unref() was added, when should the net stack
+> > use skb_frag_ref/unref, and when should the stack use
+> > skb_pp_ref/unref? The docs currently describe what the function does,
+> > but when a program unfamiliar with the page pool should use it.
+> >
+> > >  static void skb_kfree_head(void *head, unsigned int end_offset)
+> > >  {
+> > >         if (end_offset =3D=3D SKB_SMALL_HEAD_HEADROOM)
+> > > @@ -5769,17 +5787,12 @@ bool skb_try_coalesce(struct sk_buff *to, str=
+uct sk_buff *from,
+> > >                 return false;
+> > >
+> > >         /* In general, avoid mixing page_pool and non-page_pool alloc=
+ated
+> > > -        * pages within the same SKB. Additionally avoid dealing with=
+ clones
+> > > -        * with page_pool pages, in case the SKB is using page_pool f=
+ragment
+> > > -        * references (page_pool_alloc_frag()). Since we only take fu=
+ll page
+> > > -        * references for cloned SKBs at the moment that would result=
+ in
+> > > -        * inconsistent reference counts.
+> > > -        * In theory we could take full references if @from is cloned=
+ and
+> > > -        * !@to->pp_recycle but its tricky (due to potential race wit=
+h
+> > > -        * the clone disappearing) and rare, so not worth dealing wit=
+h.
+> > > +        * pages within the same SKB. In theory we could take full
+> > > +        * references if @from is cloned and !@to->pp_recycle but its
+> > > +        * tricky (due to potential race with the clone disappearing)=
+ and
+> > > +        * rare, so not worth dealing with.
+> > >          */
+> > > -       if (to->pp_recycle !=3D from->pp_recycle ||
+> > > -           (from->pp_recycle && skb_cloned(from)))
+> > > +       if (to->pp_recycle !=3D from->pp_recycle)
+> > >                 return false;
+> > >
+> > >         if (len <=3D skb_tailroom(to)) {
+> > > @@ -5836,8 +5849,12 @@ bool skb_try_coalesce(struct sk_buff *to, stru=
+ct sk_buff *from,
+> > >         /* if the skb is not cloned this does nothing
+> > >          * since we set nr_frags to 0.
+> > >          */
+> > > -       for (i =3D 0; i < from_shinfo->nr_frags; i++)
+> > > -               __skb_frag_ref(&from_shinfo->frags[i]);
+> > > +       if (from->pp_recycle)
+> > > +               for (i =3D 0; i < from_shinfo->nr_frags; i++)
+> > > +                       skb_pp_frag_ref(skb_frag_page(&from_shinfo->f=
+rags[i]));
+> > > +       else
+> > > +               for (i =3D 0; i < from_shinfo->nr_frags; i++)
+> > > +                       __skb_frag_ref(&from_shinfo->frags[i]);
+> >
+> > You added a check here to use skb_pp_frag_ref() instead of
+> > skb_frag_ref() here, but it's not clear to me why other callsites of
+> > skb_frag_ref() don't need to be modified in the same way after your
+> > patch.
+> >
+> > After your patch:
+> >
+> > skb_frag_ref() will always increment page->_refcount
+> > skb_frag_unref() will either decrement page->_refcount or decrement
+> > page->pp_ref_count (depending on the value of skb->pp_recycle).
+> > skb_pp_frag_ref() will either increment page->_refcount or increment
+> > page->pp_ref_count (depending on the value of is_pp_page(), not
+> > skb->pp_recycle).
+> > skb_pp_frag_unref() doesn't exist.
+> >
+> > Is this not confusing? Can we streamline things:
+> >
+> > skb_frag_ref() increments page->pp_ref_count for skb->pp_recycle,
+> > page->_refcount otherwise.
+> > skb_frag_unref() decrement page->pp_ref_count for skb->pp_recycle,
+> > page->_refcount otherwise.
+> >
+> > Or am I missing something that causes us to require this asymmetric
+> > reference counting?
+> >
+>
+> This idea was previously implemented, as shown here:
+> https://lore.kernel.org/all/20211009093724.10539-5-linyunsheng@huawei.com=
+/.
+> But implementing this would result in some unnecessary overhead, since
+> currently, 'skb_try_coalesce' is the only place where the page pool
+> reference count for skb frag might be increased. I would prefer to
+> move the logic to '__skb_frag_ref' when such a need becomes more
+> common. Thanks!
+>
+
+Is it possible/desirable to add a comment to skb_frag_ref() that it
+should not be used with skb->pp_recycle? At least I was tripped by
+this, but maybe it's considered obvious somehow.
+
+But I feel like this maybe needs to be fixed. Why does the page_pool
+need a separate page->pp_ref_count? Why not use page->_refcount like
+the rest of the code? Is there a history here behind this decision
+that you can point me to? It seems to me that
+incrementing/decrementing page->pp_ref_count may be equivalent to
+doing the same on page->_refcount.
+
+> > >
+> > >         to->truesize +=3D delta;
+> > >         to->len +=3D len;
+> > > --
+> > > 2.31.1
+> > >
+> > >
+> >
+> >
+> > --
+> > Thanks,
+> > Mina
+
+
+
+--=20
 Thanks,
 Mina
 
