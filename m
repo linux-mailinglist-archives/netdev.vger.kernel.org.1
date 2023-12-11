@@ -1,106 +1,140 @@
-Return-Path: <netdev+bounces-55843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34A4F80C6FE
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 11:46:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B89D780C772
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 11:57:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 634AB1C209B4
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:46:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA53C1C20D2C
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD40425563;
-	Mon, 11 Dec 2023 10:46:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZGfejTqw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3922D618;
+	Mon, 11 Dec 2023 10:57:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15D48186
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 02:46:32 -0800 (PST)
-Message-ID: <ffd827e6-95ed-4d96-b5ad-ec1f5b8d4e24@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1702291590;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+O6sOe34KvM3cp6aR9Fc5LCSSgtwUH7iUeiskiKEYZg=;
-	b=ZGfejTqwvwEqAjj1aGPHyFyPTRrSRUUJS0Ya4Q1Ca1rQJ787fEK9pb8h24jaoF4JN1llsN
-	aoQ977XnHr8a5w33RoNT230/+CSurDzIRw5GV8XCCPs8cVNqm+ym+5vDwXM95OcVcNaJ0u
-	gEGHWl3RMRzvGtTJaVqqwT6DQ6lQ2f8=
-Date: Mon, 11 Dec 2023 10:46:24 +0000
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D6559A;
+	Mon, 11 Dec 2023 02:57:17 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0VyGZV2y_1702292234;
+Received: from 30.221.130.53(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VyGZV2y_1702292234)
+          by smtp.aliyun-inc.com;
+          Mon, 11 Dec 2023 18:57:15 +0800
+Message-ID: <64e8d13a-5811-774b-9e94-20ff747b1d0d@linux.alibaba.com>
+Date: Mon, 11 Dec 2023 18:57:13 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [patch net] dpll: sanitize possible null pointer dereference in
- dpll_pin_parent_pin_set()
-Content-Language: en-US
-To: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org
-Cc: kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, arkadiusz.kubalewski@intel.com,
- gregkh@linuxfoundation.org, hdthky0@gmail.com, michal.michalik@intel.com,
- milena.olech@intel.com
-References: <20231211083758.1082853-1-jiri@resnulli.us>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20231211083758.1082853-1-jiri@resnulli.us>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next v5 2/9] net/smc: introduce sub-functions for
+ smc_clc_send_confirm_accept()
+To: Alexandra Winter <wintera@linux.ibm.com>, wenjia@linux.ibm.com,
+ hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kgraul@linux.ibm.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, raspl@linux.ibm.com,
+ schnelle@linux.ibm.com, guangguan.wang@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <1702021259-41504-1-git-send-email-guwen@linux.alibaba.com>
+ <1702021259-41504-3-git-send-email-guwen@linux.alibaba.com>
+ <4ad3a168-f506-fc21-582d-fe8764f404c0@linux.alibaba.com>
+ <3b3b5b33-1088-47c3-8cbc-4079c6ff472e@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <3b3b5b33-1088-47c3-8cbc-4079c6ff472e@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 11/12/2023 08:37, Jiri Pirko wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
-> 
-> User may not pass DPLL_A_PIN_STATE attribute in the pin set operation
-> message. Sanitize that by checking if the attr pointer is not null
-> and process the passed state attribute value only in that case.
-> 
-> Reported-by: Xingyuan Mo <hdthky0@gmail.com>
-> Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base functions")
-> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
-> ---
->   drivers/dpll/dpll_netlink.c | 13 ++++++++-----
->   1 file changed, 8 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
-> index 442a0ebeb953..ce7cf736f020 100644
-> --- a/drivers/dpll/dpll_netlink.c
-> +++ b/drivers/dpll/dpll_netlink.c
-> @@ -925,7 +925,6 @@ dpll_pin_parent_pin_set(struct dpll_pin *pin, struct nlattr *parent_nest,
->   			struct netlink_ext_ack *extack)
->   {
->   	struct nlattr *tb[DPLL_A_PIN_MAX + 1];
-> -	enum dpll_pin_state state;
->   	u32 ppin_idx;
->   	int ret;
->   
-> @@ -936,10 +935,14 @@ dpll_pin_parent_pin_set(struct dpll_pin *pin, struct nlattr *parent_nest,
->   		return -EINVAL;
->   	}
->   	ppin_idx = nla_get_u32(tb[DPLL_A_PIN_PARENT_ID]);
-> -	state = nla_get_u32(tb[DPLL_A_PIN_STATE]);
-> -	ret = dpll_pin_on_pin_state_set(pin, ppin_idx, state, extack);
-> -	if (ret)
-> -		return ret;
-> +
-> +	if (tb[DPLL_A_PIN_STATE]) {
-> +		enum dpll_pin_state state = nla_get_u32(tb[DPLL_A_PIN_STATE]);
-> +
-> +		ret = dpll_pin_on_pin_state_set(pin, ppin_idx, state, extack);
-> +		if (ret)
-> +			return ret;
-> +	}
->   
->   	return 0;
->   }
 
-I don't believe that "set" command without set value should return 0
-meaning "request was completed successfully". Maybe it's better to add 
-another check like for DPLL_A_PIN_PARENT_ID and fill extack with
-description?
 
+On 2023/12/11 17:47, Alexandra Winter wrote:
+> 
+> 
+> On 09.12.23 03:50, Wen Gu wrote:
+>>
+>>
+>> On 2023/12/8 15:40, Wen Gu wrote:
+>>
+>>> There is a large if-else block in smc_clc_send_confirm_accept() and it
+>>> is better to split it into two sub-functions.
+>>>
+>>> Suggested-by: Alexandra Winter <wintera@linux.ibm.com>
+>>> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+>>> ---
+>>>    net/smc/smc_clc.c | 196 +++++++++++++++++++++++++++++++-----------------------
+>>>    1 file changed, 114 insertions(+), 82 deletions(-)
+>>>
+>>> diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
+>>> index 0fcb035..52b4ea9 100644
+>>> --- a/net/smc/smc_clc.c
+>>> +++ b/net/smc/smc_clc.c
+>>> @@ -998,6 +998,111 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini)
+>>>        return reason_code;
+>>>    }
+>>>    +static void smcd_clc_prep_confirm_accept(struct smc_connection *conn,
+>>> +                struct smc_clc_msg_accept_confirm_v2 *clc_v2,
+>>
+>> checkpatch will complain 'Alignment should match open parenthesis' here.
+>> But in order to make the length less than 80 columns, there seems to be
+>> no other good way.
+>>
+>>> +                int first_contact, u8 version,
+>>> +                u8 *eid, struct smc_init_info *ini,
+>>> +                int *fce_len,
+>>> +                struct smc_clc_first_contact_ext_v2x *fce_v2x,
+>>> +                struct smc_clc_msg_trail *trl)
+>>> +{
+>> <...>
+>>
+>>> +
+>>> +static void smcr_clc_prep_confirm_accept(struct smc_connection *conn,
+>>> +                struct smc_clc_msg_accept_confirm_v2 *clc_v2,
+>>
+>> And here.
+>>
+>>> +                int first_contact, u8 version,
+>>> +                u8 *eid, struct smc_init_info *ini,
+>>> +                int *fce_len,
+>>> +                struct smc_clc_first_contact_ext_v2x *fce_v2x,
+>>> +                struct smc_clc_fce_gid_ext *gle,
+>>> +                struct smc_clc_msg_trail *trl)
+>>> +{
+>> <...>
+>>
+> 
+> 
+> You could shorten the names of the functions
+
+Thank you. I thought about that too, but I think shortening the name may
+have an impact on the understanding.
+
+
+
+I think the following may be another way out and checkpatch is happy:
+
++static void
++smcd_clc_prep_confirm_accept(struct smc_connection *conn,
++                             struct smc_clc_msg_accept_confirm_v2 *clc_v2,
++                             int first_contact, u8 version,
++                             u8 *eid, struct smc_init_info *ini,
++                             int *fce_len,
++                             struct smc_clc_first_contact_ext_v2x *fce_v2x,
++                             struct smc_clc_msg_trail *trl)
+
+and
+
++static void
++smcr_clc_prep_confirm_accept(struct smc_connection *conn,
++                             struct smc_clc_msg_accept_confirm_v2 *clc_v2,
++                             int first_contact, u8 version,
++                             u8 *eid, struct smc_init_info *ini,
++                             int *fce_len,
++                             struct smc_clc_first_contact_ext_v2x *fce_v2x,
++                             struct smc_clc_fce_gid_ext *gle,
++                             struct smc_clc_msg_trail *trl)
 
