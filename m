@@ -1,151 +1,136 @@
-Return-Path: <netdev+bounces-55872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E622B80C9B7
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:26:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C34D80C9EE
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:33:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F3851F21161
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 12:26:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A8EBB2098C
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 12:33:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 402823B2A7;
-	Mon, 11 Dec 2023 12:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C6983B7A7;
+	Mon, 11 Dec 2023 12:33:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sFaicvBJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Bz0iL+yR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243B639AE5
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 12:26:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E3F7C433C8;
-	Mon, 11 Dec 2023 12:25:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702297563;
-	bh=8eH90tIOYIey9KHKlCcSawRSMqikjOiZSb7nrsddSW0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=sFaicvBJ4/bL7bmRhgMM9AJPEukQ1E4qrhSnMDJIoPmNogg37hudxoTv0WiOfF8TF
-	 8er7HYlxDUtGnf65Nj2yniGqdxb26/i5GMnW6saEeoSSZa0gkIVKnLf9y0GTMHMQqh
-	 e0fwVa7+Quqnor6rPV1w0l07lHqdqY/uUcEPJ8qshMdwn/lN1bnDrIiC0a3Qut2i1Z
-	 45nXw6TyzEAXe9n5Mm5L4C8VriavgNCi4ARoWxpde3Sn/SjY8Hvc7k+tKu/OcMeKT8
-	 sDax9eBotWovg3m2seOJsmZwlaWz55R3r53tiscc5X2LCN9qCdYcezBfS0dHXBt7tS
-	 fAOBnXORDbcHQ==
-Message-ID: <0d2bfc00-86e4-440b-95d2-d25afd15c69f@kernel.org>
-Date: Mon, 11 Dec 2023 14:25:35 +0200
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2BCA8E;
+	Mon, 11 Dec 2023 04:33:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702298011; x=1733834011;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=LkVViNkwO7QQP+f8k/J3d57xIdGBSObZp2X787WTBXs=;
+  b=Bz0iL+yRQ4my/Xg8WPzBa8nIHN6ETCgKeA0PaAU7rwLBqh0xqG0MZApF
+   a3nNbkEmp9x6mTX2FastmZ0x57K2RZxAVsHZEVR29JH9f108f2j0+1X3J
+   w7cfNeMNejTZEIZd1+m9DUmiR0FhHK9A+HwqLDYhgsdlLt3BYNHyi+8kI
+   zXeJt1/zRf3vXGXG4zLf6XQ+ITI7NyLY55e8UGxs/7O6yqep+K/V16GGZ
+   opLvv6BRhQI+kUsCx1FKpyO9lGPpxKqzdTpwxNkdwUTj73VygGPola4X7
+   Ste8tYUiuTrU7axYDyQcUJDddK0Mym6TnbS5MriIasL8hsHWUgVwVzSbB
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10920"; a="391808850"
+X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
+   d="scan'208";a="391808850"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2023 04:33:31 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
+   d="scan'208";a="21069107"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orviesa001.jf.intel.com with ESMTP; 11 Dec 2023 04:33:28 -0800
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH iwl-net v2] idpf: fix corrupted frames and skb leaks in singleq mode
+Date: Mon, 11 Dec 2023 13:31:44 +0100
+Message-ID: <20231211123144.3759488-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 net-next 6/8] net: ethernet: ti: am65-cpsw-qos: Add
- Frame Preemption MAC Merge support
-Content-Language: en-US
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, s-vadapalli@ti.com, r-gunasekaran@ti.com,
- vigneshr@ti.com, srk@ti.com, horms@kernel.org, p-varis@ti.com,
- netdev@vger.kernel.org
-References: <20231201135802.28139-1-rogerq@kernel.org>
- <20231201135802.28139-7-rogerq@kernel.org>
- <20231204123531.tpjbt7byzdnrhs7f@skbuf>
- <8caf8252-4068-4d17-b919-12adfef074e5@kernel.org>
- <7d8fb848-a491-414b-adb8-d26a16a499a4@kernel.org>
- <20231211121105.l5nk47b5uaptzhay@skbuf>
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20231211121105.l5nk47b5uaptzhay@skbuf>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+idpf_ring::skb serves only for keeping an incomplete frame between
+several NAPI Rx polling cycles, as one cycle may end up before
+processing the end of packet descriptor. The pointer is taken from
+the ring onto the stack before entering the loop and gets written
+there after the loop exits. When inside the loop, only the onstack
+pointer is used.
+For some reason, the logics is broken in the singleq mode, where the
+pointer is taken from the ring each iteration. This means that if a
+frame got fragmented into several descriptors, each fragment will have
+its own skb, but only the last one will be passed up the stack
+(containing garbage), leaving the rest leaked.
+Then, on ifdown, rxq::skb is being freed only in the splitq mode, while
+it can point to a valid skb in singleq as well. This can lead to a yet
+another skb leak.
+Just don't touch the ring skb field inside the polling loop, letting
+the onstack skb pointer work as expected: build a new skb if it's the
+first frame descriptor and attach a frag otherwise. On ifdown, free
+rxq::skb unconditionally if the pointer is non-NULL.
 
+Fixes: a5ab9ee0df0b ("idpf: add singleq start_xmit and napi poll")
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+---
+Tony, please add it to dev-queue instead of the first revision.
 
-On 11/12/2023 14:11, Vladimir Oltean wrote:
-> On Fri, Dec 08, 2023 at 12:26:24PM +0200, Roger Quadros wrote:
->> On 08/12/2023 12:13, Roger Quadros wrote:
->>> Wondering how to fix this the right way. Should set/get_mm fail if CONFIG_TI_AM65_CPSW_TAS is not enabled?
->>>
->>
->> How about this fix?
->>
->> diff --git a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
->> index 1ac4b9b53c93..688291d6038f 100644
->> --- a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
->> +++ b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
->> @@ -775,6 +775,9 @@ static int am65_cpsw_get_mm(struct net_device *ndev, struct ethtool_mm_state *st
->>  	u32 port_ctrl, iet_ctrl, iet_status;
->>  	u32 add_frag_size;
->>  
->> +	if (!IS_ENABLED(CONFIG_TI_AM65_CPSW_TAS))
->> +		return -EOPNOTSUPP;
->> +
->>  	mutex_lock(&priv->mm_lock);
->>  
->>  	iet_ctrl = readl(port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
->> @@ -827,6 +830,9 @@ static int am65_cpsw_set_mm(struct net_device *ndev, struct ethtool_mm_cfg *cfg,
->>  	u32 val, add_frag_size;
->>  	int err;
->>  
->> +	if (!IS_ENABLED(CONFIG_TI_AM65_CPSW_TAS))
->> +		return -EOPNOTSUPP;
->> +
->>  	err = ethtool_mm_frag_size_min_to_add(cfg->tx_min_frag_size, &add_frag_size, extack);
->>  	if (err)
->>  		return err;
->> diff --git a/drivers/net/ethernet/ti/am65-cpsw-qos.h b/drivers/net/ethernet/ti/am65-cpsw-qos.h
->> index 6df3c2c5a04b..946e89fbb314 100644
->> --- a/drivers/net/ethernet/ti/am65-cpsw-qos.h
->> +++ b/drivers/net/ethernet/ti/am65-cpsw-qos.h
->> @@ -100,6 +100,8 @@ void am65_cpsw_qos_link_up(struct net_device *ndev, int link_speed);
->>  void am65_cpsw_qos_link_down(struct net_device *ndev);
->>  int am65_cpsw_qos_ndo_tx_p0_set_maxrate(struct net_device *ndev, int queue, u32 rate_mbps);
->>  void am65_cpsw_qos_tx_p0_rate_init(struct am65_cpsw_common *common);
->> +void am65_cpsw_iet_commit_preemptible_tcs(struct am65_cpsw_port *port);
->> +void am65_cpsw_iet_common_enable(struct am65_cpsw_common *common);
->>  #else
->>  static inline int am65_cpsw_qos_ndo_setup_tc(struct net_device *ndev,
->>  					     enum tc_setup_type type,
->> @@ -124,10 +126,12 @@ static inline int am65_cpsw_qos_ndo_tx_p0_set_maxrate(struct net_device *ndev,
->>  
->>  static inline void am65_cpsw_qos_tx_p0_rate_init(struct am65_cpsw_common *common)
->>  { }
->> +static inline void am65_cpsw_iet_commit_preemptible_tcs(struct am65_cpsw_port *port)
->> +{ }
->> +static inline void am65_cpsw_iet_common_enable(struct am65_cpsw_common *common)
->> +{ }
->>  #endif
->>  
->> -void am65_cpsw_iet_commit_preemptible_tcs(struct am65_cpsw_port *port);
->> -void am65_cpsw_iet_common_enable(struct am65_cpsw_common *common);
->>  
->>  #define AM65_CPSW_REG_CTL			0x004
->>  #define AM65_CPSW_PN_REG_CTL			0x004
->>
->>
->> -- 
->> cheers,
->> -roger
-> 
-> I don't know, does it sound like it is related?
-> 
-> config TI_AM65_CPSW_TAS
-> 	bool "Enable TAS offload in AM65 CPSW"
-> 	depends on TI_K3_AM65_CPSW_NUSS && NET_SCH_TAPRIO && TI_K3_AM65_CPTS
-> 	help
-> 	  Say y here to support Time Aware Shaper(TAS) offload in AM65 CPSW.
-> 	  AM65 CPSW hardware supports Enhanced Scheduled Traffic (EST)
-> 	  defined in IEEE 802.1Q 2018. The EST scheduler runs on CPTS and the
-> 	  TAS/EST schedule is updated in the Fetch RAM memory of the CPSW.
+From v1[0]:
+* fix the related skb leak on ifdown;
+* fix subject prefix;
+* pick Reviewed-bys.
 
-The config option mentions only about TAS/EST 802.1Qbv.
-Maybe it needs to be extended to include IET/Frame-preeption 802.1Qbu as well?
+[0] https://lore.kernel.org/all/20231201143821.1091005-1-aleksander.lobakin@intel.com
+---
+ drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c | 1 -
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c         | 2 +-
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-This is the simplest way as the file am65-cpsw-qos.c can be completely omitted if
-TI_AM65_CPSW_TSN is not set.
-
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
+index 81288a17da2a..20c4b3a64710 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
+@@ -1044,7 +1044,6 @@ static int idpf_rx_singleq_clean(struct idpf_queue *rx_q, int budget)
+ 		}
+ 
+ 		idpf_rx_sync_for_cpu(rx_buf, fields.size);
+-		skb = rx_q->skb;
+ 		if (skb)
+ 			idpf_rx_add_frag(rx_buf, skb, fields.size);
+ 		else
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index 1f728a9004d9..9e942e5baf39 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -396,7 +396,7 @@ static void idpf_rx_desc_rel(struct idpf_queue *rxq, bool bufq, s32 q_model)
+ 	if (!rxq)
+ 		return;
+ 
+-	if (!bufq && idpf_is_queue_model_split(q_model) && rxq->skb) {
++	if (rxq->skb) {
+ 		dev_kfree_skb_any(rxq->skb);
+ 		rxq->skb = NULL;
+ 	}
 -- 
-cheers,
--roger
+2.43.0
+
 
