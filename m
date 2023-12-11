@@ -1,172 +1,165 @@
-Return-Path: <netdev+bounces-56019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 230B680D4DE
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 19:01:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1A8480D4F6
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 19:08:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 540E61C208D4
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 18:01:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 982FE1F21630
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 18:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B9664F203;
-	Mon, 11 Dec 2023 18:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B11B4F21C;
+	Mon, 11 Dec 2023 18:08:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JhS3mulj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HQlnKKQi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFB3F98
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 10:01:05 -0800 (PST)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-a1d93da3eb7so556483466b.0
-        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 10:01:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702317664; x=1702922464; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Oih71XhHF6ujiKAxYDkqouB2sQ0yEjdxmK5GTiHqg/Q=;
-        b=JhS3muljE3oDbyCaJa4kQtNo3A44wSSSpKCV651mcW8XYpv6OXNXlmdOUsKE4XsbPC
-         GzFuTIiG2t+xDLrYDDjO2ie1+cWT6k+/GRpKr2fzgsg2fQu5W/sZQYzD8tGS2MgyObx+
-         sdiJC6FQavyzKze/vf7ItU5zr5zNlCxPrJeUw71kn5yuHrU+b3pkm3AtrvXI1NJXmqVP
-         dAPhjmrCadd4NTuX3hpaDq6lLeCAyHQHNZw/fRQNC2QOYZ8DOcFBBWhqAVkfY8lMM/Kq
-         d/BoFZx6od84TdiuGLPrmteDp9w0erF6DsILk5naCTYF8ZGizAB1TWA0Pv0L0L+ljdtP
-         9irA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702317664; x=1702922464;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Oih71XhHF6ujiKAxYDkqouB2sQ0yEjdxmK5GTiHqg/Q=;
-        b=wmF346vOusNKuHp4QnJw751X97skm0mYH8zXy9nCBF0DeKBQWviezVUIDIX+98+MSD
-         ydaSPxiW4be0P4/mBXG96N6z1v6Z0hiQfbApoPMNW3yFUtjPVGgmQ4Vjz5V6uWIfZvQd
-         b4+VuU8x+IQpzlfyWQLgv/wF5JLsa/ghraIWmvW3SFivEm2SZ074D0GUle6o5Ks8Az9V
-         PCtJv5xhO+5H1oHFiNotGpSPzraUdAxKK9LysGWlbT7uX1EgPJR4XTTbwcx4FVzJNqO9
-         8610OROpO1oFDuZ9tFp7fycHRErEIhV2bdQW8N2FNiAMcLkQqdKLV8dsQ8e0QtzWG7xL
-         ElWg==
-X-Gm-Message-State: AOJu0Yw1OxKiGhxtVQzP6mUgWtjmVsgzgqSyTZPFgpB4FJkK2orGruK/
-	rAF+kyZuMznOJmJ9WqCGOYg=
-X-Google-Smtp-Source: AGHT+IEjenm2FSJUCshi8UVywu59w4WeYbceM0rXqOTq+75UVjNBni6xBwdPR8RjHf85AyjQkd/gFg==
-X-Received: by 2002:a17:906:7310:b0:a18:ab2f:467f with SMTP id di16-20020a170906731000b00a18ab2f467fmr2870742ejc.37.1702317664104;
-        Mon, 11 Dec 2023 10:01:04 -0800 (PST)
-Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id ub27-20020a170907c81b00b00a1df4387f16sm5211675ejc.95.2023.12.11.10.01.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 10:01:03 -0800 (PST)
-Date: Mon, 11 Dec 2023 20:01:01 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: Alvin =?utf-8?Q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	"linus.walleij@linaro.org" <linus.walleij@linaro.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"andrew@lunn.ch" <andrew@lunn.ch>,
-	"f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"arinc.unal@arinc9.com" <arinc.unal@arinc9.com>
-Subject: Re: [net-next 2/2] net: dsa: realtek: load switch variants on demand
-Message-ID: <20231211180101.twpcepmdivsi7ymn@skbuf>
-References: <95381a84-0fd0-4f57-88e4-1ed31d282eee@kernel.org>
- <7afdc7d6-1382-48c0-844b-790dcb49fdc2@kernel.org>
- <CAJq09z5uVjjE1k2ugVGctsUvn5yLwLQAM6u750Z4Sz7cyW5rVQ@mail.gmail.com>
- <vcq6qsx64ulmhflxm4vji2zelr2xj5l7o35anpq3csxasbiffe@xlugnyxbpyyg>
- <CAJq09z4ZdB9L7ksuN0b+N-LCv+zOvM+5Q9iWXccGN3w54EN1_Q@mail.gmail.com>
- <20231207171941.dhgch5fs6mmke7v7@skbuf>
- <CAJq09z7j_gNbUcYDWXjzUNAXat-+EyryFJFEqpVG-jPcY4ZmmQ@mail.gmail.com>
- <20231207223143.doivjphfgs4sfvx6@skbuf>
- <CAJq09z70hfygcB5LL3Rp9GQ0180mTJauH6qVeAPqm1zO4HiAAQ@mail.gmail.com>
- <CAJq09z70hfygcB5LL3Rp9GQ0180mTJauH6qVeAPqm1zO4HiAAQ@mail.gmail.com>
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8679595;
+	Mon, 11 Dec 2023 10:08:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702318119; x=1733854119;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=zsHw8c+yNsgNCrRgEh9GvMAaMJXHxP/gdyNdElE3dk0=;
+  b=HQlnKKQiDoZ3kwztSPtqoh1ltPlKiqIBzO9SxKKDOFpYKye8GAJqAlD/
+   RtjEEhGVylp02QZuArCpPGYvMiMEWl3p5m0AjlmsD9+zwjtKkRb17iuPy
+   fUrvHFxmiPkihDEyq0fewHilmfaTq8X06f8TQKXryhB0oLN8U8zEhH3Mc
+   oIrAnJNiXWPL7YKvB8dgwmPM66FIF3HeHzC4SFt1oIeXCrSCY7OYRAkGY
+   xtFd5mQqUoDVzaODK5jsBeqNSLq7or0eiCh5fgQEmUdEYASFDG2YHG1s0
+   GVzCSkssnwhs+j5OW8QNsZB/WXTuz3OlkWkJ3T4i3kXqV1Xxd2kA9WL4v
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="425810997"
+X-IronPort-AV: E=Sophos;i="6.04,268,1695711600"; 
+   d="scan'208";a="425810997"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2023 10:08:38 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,268,1695711600"; 
+   d="scan'208";a="17595834"
+Received: from ashnaupa-mobl1.amr.corp.intel.com (HELO vcostago-mobl3) ([10.209.96.90])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2023 10:08:37 -0800
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Rodrigo CADORE CATALDO <rodrigo.cadore@l-acoustics.com>, Rodrigo Cataldo
+ via B4
+ Relay <devnull+rodrigo.cadore.l-acoustics.com@kernel.org>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Aravindhan
+ Gunasekaran <aravindhan.gunasekaran@intel.com>, Mallikarjuna Chilakala
+ <mallikarjuna.chilakala@intel.com>
+Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Kurt
+ Kanzenbach <kurt@linutronix.de>
+Subject: RE: [PATCH iwl-net] igc: Fix hicredit calculation
+In-Reply-To: <PR0P264MB1930850228C3F58EE8B7F9FAC88FA@PR0P264MB1930.FRAP264.PROD.OUTLOOK.COM>
+References: <20231208-igc-fix-hicredit-calc-v1-1-7e505fbe249d@l-acoustics.com>
+ <871qbwry9y.fsf@intel.com>
+ <PR0P264MB1930850228C3F58EE8B7F9FAC88FA@PR0P264MB1930.FRAP264.PROD.OUTLOOK.COM>
+Date: Mon, 11 Dec 2023 10:08:37 -0800
+Message-ID: <87v894r4re.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJq09z70hfygcB5LL3Rp9GQ0180mTJauH6qVeAPqm1zO4HiAAQ@mail.gmail.com>
- <CAJq09z70hfygcB5LL3Rp9GQ0180mTJauH6qVeAPqm1zO4HiAAQ@mail.gmail.com>
+Content-Type: text/plain
 
-On Thu, Dec 07, 2023 at 11:46:46PM -0300, Luiz Angelo Daros de Luca wrote:
-> The device-tree bindings should delineate the hardware characteristics
-> rather than specifying the implementation details of a particular
-> driver. The requirement of an "mdio" node with a compatible string
-> such as "realtek,smi-mdio" may be misleading, implying a potential
-> correlation between the host-switch interface (SMI, SPI, or MDIO) and
-> a specific user MDIO it describes. It's important to note that how we
-> describe the user mdio could vary for other future switch families,
-> but not with a distinct management interface.
+Rodrigo CADORE CATALDO <rodrigo.cadore@l-acoustics.com> writes:
 
-Agree, "realtek,smi-mdio" is not a great compatible string. But it is an
-established compatible string.
+>> -----Original Message-----
+>> From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+>> 
+>> Rodrigo Cataldo via B4 Relay
+>> <devnull+rodrigo.cadore.l-acoustics.com@kernel.org> writes:
+>> 
+>> > From: Rodrigo Cataldo <rodrigo.cadore@l-acoustics.com>
+>> >
+>> > According to the Intel Software Manual for I225, Section 7.5.2.7,
+>> > hicredit should be multiplied by the constant link-rate value, 0x7736.
+>> >
+>> > Currently, the old constant link-rate value, 0x7735, from the boards
+>> > supported on igb are being used, most likely due to a copy'n'paste, as
+>> > the rest of the logic is the same for both drivers.
+>> >
+>> > Update hicredit accordingly.
+>> >
+>> > Fixes: 1ab011b0bf07 ("igc: Add support for CBS offloading")
+>> > Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+>> > Signed-off-by: Rodrigo Cataldo <rodrigo.cadore@l-acoustics.com>
+>> > ---
+>> 
+>> Very good catch.
+>> 
+>> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+>> 
+>> Just for curiosity, my test machines are busy right now, what kind of
+>> difference are you seeing?
+>> 
+>
+> Hello Vinicius, thank you for the ACK.
+>
+> For our internal setup, this does not make a difference. My understanding is 
+> that hicredit is used for non-SR traffic mixed with SR traffic (i.e., hicredit is
+> directly related to the max non-SR frame size). But our setup does not mix
+> them (q0 is used only for milan audio/clock SR class A).
 
-> I am currently conducting tests using the same user MDIO driver for
-> both realtek-smi and realtek-mdio. However, it's noteworthy that
-> unlike realtek-smi, the current user MDIO for realtek-mdio does not
-> require a compatible string; only a node named "mdio". Realtek-mdio is
-> presently utilizing the generic DSA user MDIO, but you mentioned it's
-> not considered a "core functionality." I assume this implies I
-> shouldn't depend on it. That's the reason for my switch to the
-> existing user MDIO driver from realtek-smi.
-> 
-> Regarding the absence of a compatible string for realtek-mdio, we have
-> a few options: introducing a new compatible string exclusively for
-> realtek-mdio, such as "realtek,mdio-mdio"; creating a new generic one
-> for both interfaces like "realtek,user-mdio" or "rtl836x-user-mdio";
+I see.
 
-The naming choice really looks like the secondary problem here.
-But what about "realtek,rtl8365mb-mdio" and "realtek,rtl8366rb-mdio" as
-a secondary compatible string for SMI, and primary compatible string for
-MDIO-connected switches?
+>
+> Let me know if you think we need a testcase for this.
+>
 
-> or simply ignore the compatible string, as you suggested. However, if
-> I opt to ignore it, I presume I should retrieve that node solely based
-> on the node name. That's what I'm after. Is my understanding correct?
+It was just curiority. No need. Thanks.
 
-You could do that. There's a very high chance that the node was named
-"mdio". The schema says it should be called "mdio", _and_ be compatible
-with realtek,smi-mdio. If anyone comes and complains (very unlikely),
-just say "hey, even Documentation/devicetree/bindings/net/dsa/realtek-smi.txt
-said you should name the node 'mdio'"!
+>> > This is a simple fix for the credit calculation on igc devices
+>> > (i225/i226) to match the Intel software manual.
+>> >
+>> > This is my first contribution to the Linux Kernel. Apologies for any
+>> > mistakes and let me know if I improve anything.
+>> > ---
+>> >  drivers/net/ethernet/intel/igc/igc_tsn.c | 2 +-
+>> >  1 file changed, 1 insertion(+), 1 deletion(-)
+>> >
+>> > diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c
+>> b/drivers/net/ethernet/intel/igc/igc_tsn.c
+>> > index a9c08321aca9..22cefb1eeedf 100644
+>> > --- a/drivers/net/ethernet/intel/igc/igc_tsn.c
+>> > +++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
+>> > @@ -227,7 +227,7 @@ static int igc_tsn_enable_offload(struct igc_adapter
+>> *adapter)
+>> >                       wr32(IGC_TQAVCC(i), tqavcc);
+>> >
+>> >                       wr32(IGC_TQAVHC(i),
+>> > -                          0x80000000 + ring->hicredit * 0x7735);
+>> > +                          0x80000000 + ring->hicredit * 0x7736);
+>> >               } else {
+>> >                       /* Disable any CBS for the queue */
+>> >                       txqctl &= ~(IGC_TXQCTL_QAV_SEL_MASK);
+>> >
+>> > ---
+>> > base-commit: 2078a341f5f609d55667c2dc6337f90d8f322b8f
+>> > change-id: 20231206-igc-fix-hicredit-calc-028bf73c50a8
+>> >
+>> > Best regards,
+>> > --
+>> > Rodrigo Cataldo <rodrigo.cadore@l-acoustics.com>
+>> >
+>> 
+>> Cheers,
+>> --
+>> Vinicius
+>
+> Best Regards,
+> Rodrigo Cataldo
 
-> I'll post a new series that is still compatible both with old HW
-> descriptions and the device-tree bindings. In that way, I'll not touch
-> the docs.
 
-> However, given that the compatible string is unnecessary to describe
-> the hardware, and after we modify the code to disregard it, it is
-> awkward for the binding documentation to request a compatible string
-> that serves no purpose. Shouldn't we consider updating this
-> requirement at some point?
-> 
-> Regards,
-> 
-> Luiz
-
-Not everything that is in the device tree has to be used. It is a
-description of the hardware, not a rigid set of instructions for what
-the OS has to do. The OS still does whatever it wants based on that info.
-
-You can ask anyone about this. See Thomas Petazzoni's slides as just one
-example.
-https://elinux.org/images/f/f9/Petazzoni-device-tree-dummies_0.pdf
-
-| The Device Tree is really a hardware description language.
-| It should describe the hardware layout, and how it works.
-| But it should not describe which particular hardware configuration you’re interested in.
-| As an example:
-| You may describe in the DT whether a particular piece of hardware supports DMA or not.
-| But you may not describe in the DT if you want to use DMA or not.
-
-It's a really weak argument for recommending users to remove the compatible
-string, thereby deliberately breaking ABI compatibility in one direction,
-to literally _no_ benefit.
-
-Compatible strings for MDIO controllers are, in essence, not strange.
-They are independent devices which could reasonably be bound to their
-own drivers. I don't see what's awkward about this.
+Cheers,
+-- 
+Vinicius
 
