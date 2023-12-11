@@ -1,237 +1,124 @@
-Return-Path: <netdev+bounces-56119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA5E280DE55
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 23:34:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C9D180DE57
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 23:34:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA6B11C2157F
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 22:34:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 473C41F2148C
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 22:34:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3180F56751;
-	Mon, 11 Dec 2023 22:34:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6AF15579F;
+	Mon, 11 Dec 2023 22:34:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="WalfjvWP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pl79AuKH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BFD7AD
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 14:34:09 -0800 (PST)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-50be58a751cso5733916e87.2
-        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 14:34:09 -0800 (PST)
+Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69ED5AD;
+	Mon, 11 Dec 2023 14:34:35 -0800 (PST)
+Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-5d7346442d4so48469777b3.2;
+        Mon, 11 Dec 2023 14:34:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1702334048; x=1702938848; darn=vger.kernel.org;
-        h=content-transfer-encoding:organization:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=fktK+FqKP4B225M6qYTWB00oFsvOERim7cHismtvLGs=;
-        b=WalfjvWPTLb93riLGSyE/SG5QgyaPTW0ugugnxq+Q/kEFSI9RnC2nJziOA1dPB0yji
-         fpKPljXCI8iv3UKxxEDkti3ipunYwC9Xmpj3gzu2NdpOoeXs8n+jDlLGp+U59gaHZYoE
-         84QXyJvixGxoRcSevSBU/Uu9zT+6lLpME/w4MTgpesD9RE36+WwaFDNmoB+ceFvlOQoZ
-         1yvd+H81hQqTFGojEHdRRslt0cFTJzMc5AzgoSRXOpxPP/Te+sQxoyR4Cu0EVE367isU
-         Lvzki/JQKqlTld92cQX1RZyd11RGFzu4DwAK4Cet9sTeoxuSptPb8I1zMHmWQdV9yBgf
-         JreQ==
+        d=gmail.com; s=20230601; t=1702334074; x=1702938874; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=weETpER/W9eWKpDs0aTzW8/kqujO5Ns20F+TiP+lNxc=;
+        b=Pl79AuKHMkBMVGDU1JhLlZWOW82hDx+5kpah8WvIfmhdo3NFuiBWyiTL4jHiJ+vw3Y
+         FD+a5CS0d/gsGgkN/H85162od3MZJM9TjNwgNiOFxN817dCnCtm4IrCcxIWcDYAtbbo4
+         1446I//YBfT6gMBKLfZXnLtY33YDdLUg1vrKoUXr3E7OtpOpkCu25VlVO9ZzgQ2vNrpB
+         R+4cnnTMzwEFLdOzgH2Zvr8fJBN7gtXPaPoAeklKOt3s4iKdw0fkU4WjOKA562qk5MHx
+         UrGZZWbGE1Hpta5GDVnoav1GSnRKn8yvdUhiggFBgeeEWE+Lv4W9tM6nhn6G3vYydW7/
+         ZH7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702334048; x=1702938848;
-        h=content-transfer-encoding:organization:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fktK+FqKP4B225M6qYTWB00oFsvOERim7cHismtvLGs=;
-        b=fJwr8vPrUgQ5woIaf0ijtnN5IH4FbopaZ0ouvTryn1neVvrabUOCp5wLvpbONef/sf
-         BzQVTA00y/foR7JiOAXabZyPszmBh7SNd1yqnh8tMeDFwCC52IHMiRT56TjHJhCVEo3Q
-         sLuFER+CGyYcZMjgCG8mR/iajgSP8H5jVFjUXLVL+csULBI6RgRWoDn3mEixoJHeNkxg
-         W+e/XBgZO849tLy6GRAdNQCtv77HITRIf3ZZMxefiPTq/Edd8P/lxi8Hm9jdxUA1Krx6
-         hb3HHWX76g+eknRxtcZ1/ozvRYxjXcIY5x1wXsuq4mB1guCOqgxBv6GIZDU1k+MjCF+W
-         nUdg==
-X-Gm-Message-State: AOJu0Yx5PN5W00v6Q/dsRmC4zOwcsQLwAhAvbWPr1umXlLULyPS0PSxm
-	b0Z3yjiKRALvjaYKNpmHmylHyA==
-X-Google-Smtp-Source: AGHT+IFwUTYMTowNL86e/mt1fmSwURHQAIqMrZOMTjdpSt3qnhVaPGIgJw24n0/o5IhmREDkDS+jIA==
-X-Received: by 2002:a05:6512:2147:b0:50b:fa85:c147 with SMTP id s7-20020a056512214700b0050bfa85c147mr2016604lfr.132.1702334047429;
-        Mon, 11 Dec 2023 14:34:07 -0800 (PST)
-Received: from wkz-x13.addiva.ad (h-158-174-187-194.NA.cust.bahnhof.se. [158.174.187.194])
-        by smtp.gmail.com with ESMTPSA id f17-20020a05651232d100b0050bfc6dbb8asm1217649lfg.302.2023.12.11.14.34.05
+        d=1e100.net; s=20230601; t=1702334074; x=1702938874;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=weETpER/W9eWKpDs0aTzW8/kqujO5Ns20F+TiP+lNxc=;
+        b=J6vcHbs2TcXDlP88yz0kttxNPvJEYz581ya0CxBzw/9XBol4i2Db6XqLAGg6tnqBYS
+         7k9r2B7QFiI2yl4ydw/t1CYnkycDpf/H0X1QsdW9dc0nfyfU3LvWXybiffL5GUg7Sm3R
+         wP0oJfQnoffWQHZI9WtysE927RjBiqyz/wATIM73I9dbnLXn3H59h11JSUOtQy2npjIK
+         Ye9SECjAeqXrkDAu1BRqw9Dj6vOglrXkuW8XZBXFxt6jlzrQC4e+NcgdTKPGyccz9EvV
+         7rzv7PXh8q+57GHKxO51YGgNiubnN7Vn+hAdGy5BcTAiWpQZDhHt71KfsTh8A6da5ULP
+         tFHw==
+X-Gm-Message-State: AOJu0Yx1PQJgu6sqGdNkJgnUL0JnZ0p56IEEu76A3jNCsm0MoiI2FiBu
+	cRCmZFYesBogcbybC6u/aDs=
+X-Google-Smtp-Source: AGHT+IFimdgWnRBEGiupflIWc8T6D9ybHk5AtdinAtNWHe5eWoKDkGhnHAT7dqZcZW2Yc4O6uagmwQ==
+X-Received: by 2002:a0d:d994:0:b0:5d7:1941:3576 with SMTP id b142-20020a0dd994000000b005d719413576mr3132315ywe.93.1702334074480;
+        Mon, 11 Dec 2023 14:34:34 -0800 (PST)
+Received: from localhost ([2601:344:8301:57f0:38aa:1c88:df05:9b73])
+        by smtp.gmail.com with ESMTPSA id e3-20020a0dc203000000b005c5a08c5c15sm3297708ywd.136.2023.12.11.14.34.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 14:34:06 -0800 (PST)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: andrew@lunn.ch,
-	f.fainelli@gmail.com,
-	olteanv@gmail.com,
-	netdev@vger.kernel.org
-Subject: [PATCH v3 net-next 8/8] selftests: forwarding: ethtool_rmon: Add histogram counter test
-Date: Mon, 11 Dec 2023 23:33:46 +0100
-Message-Id: <20231211223346.2497157-9-tobias@waldekranz.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231211223346.2497157-1-tobias@waldekranz.com>
-References: <20231211223346.2497157-1-tobias@waldekranz.com>
+        Mon, 11 Dec 2023 14:34:33 -0800 (PST)
+Date: Mon, 11 Dec 2023 14:34:33 -0800
+From: Yury Norov <yury.norov@gmail.com>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: linux-kernel@vger.kernel.org, Karsten Graul <kgraul@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	Jan Kara <jack@suse.cz>,
+	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
+	Matthew Wilcox <willy@infradead.org>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
+	Alexey Klimov <klimov.linux@gmail.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>
+Subject: Re: [PATCH v2 31/35] net: smc: use find_and_set_bit() in
+ smc_wr_tx_get_free_slot_index()
+Message-ID: <ZXeOef/60Crhrm2Y@yury-ThinkPad>
+References: <20231203192422.539300-1-yury.norov@gmail.com>
+ <20231203193307.542794-1-yury.norov@gmail.com>
+ <20231203193307.542794-30-yury.norov@gmail.com>
+ <b344c321-b481-48b0-8165-c3ab604fc397@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Addiva Elektronik
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b344c321-b481-48b0-8165-c3ab604fc397@linux.ibm.com>
 
-Validate the operation of rx and tx histogram counters, if supported
-by the interface, by sending batches of packets targeted for each
-bucket.
+On Mon, Dec 04, 2023 at 10:40:20AM +0100, Alexandra Winter wrote:
+> 
+> 
+> On 03.12.23 20:33, Yury Norov wrote:
+> > The function opencodes find_and_set_bit() with a for_each() loop. Use
+> > it, and make the whole function a simple almost one-liner.
+> > 
+> > While here, drop explicit initialization of *idx, because it's already
+> > initialized by the caller in case of ENOLINK, or set properly with
+> > ->wr_tx_mask, if nothing is found, in case of EBUSY.
+> > 
+> > CC: Tony Lu <tonylu@linux.alibaba.com>
+> > CC: Alexandra Winter <wintera@linux.ibm.com>
+> > Signed-off-by: Yury Norov <yury.norov@gmail.com>
+> > ---
+> 
+> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+> 
+> 
+> Thanks a lot for the great helper function!
+> I guess the top-level maintainers will figure out, how this series best finds its way upstream.
 
-Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
----
- .../testing/selftests/net/forwarding/Makefile |   1 +
- .../selftests/net/forwarding/ethtool_rmon.sh  | 106 ++++++++++++++++++
- tools/testing/selftests/net/forwarding/lib.sh |   9 ++
- 3 files changed, 116 insertions(+)
- create mode 100755 tools/testing/selftests/net/forwarding/ethtool_rmon.sh
+Thanks, Alexandra. :)
 
-diff --git a/tools/testing/selftests/net/forwarding/Makefile b/tools/testing/selftests/net/forwarding/Makefile
-index df593b7b3e6b..452693514be4 100644
---- a/tools/testing/selftests/net/forwarding/Makefile
-+++ b/tools/testing/selftests/net/forwarding/Makefile
-@@ -17,6 +17,7 @@ TEST_PROGS = bridge_fdb_learning_limit.sh \
- 	dual_vxlan_bridge.sh \
- 	ethtool_extended_state.sh \
- 	ethtool_mm.sh \
-+	ethtool_rmon.sh \
- 	ethtool.sh \
- 	gre_custom_multipath_hash.sh \
- 	gre_inner_v4_multipath.sh \
-diff --git a/tools/testing/selftests/net/forwarding/ethtool_rmon.sh b/tools/testing/selftests/net/forwarding/ethtool_rmon.sh
-new file mode 100755
-index 000000000000..73e3fbe28f37
---- /dev/null
-+++ b/tools/testing/selftests/net/forwarding/ethtool_rmon.sh
-@@ -0,0 +1,106 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+ALL_TESTS="
-+	rmon_rx_histogram
-+	rmon_tx_histogram
-+"
-+
-+NUM_NETIFS=2
-+source lib.sh
-+
-+bucket_test()
-+{
-+	local set=$1; shift
-+	local bucket=$1; shift
-+	local len=$1; shift
-+	local num_rx=10000
-+	local num_tx=20000
-+	local expected=
-+	local before=
-+	local after=
-+	local delta=
-+
-+	# Mausezahn does not include FCS bytes in its length - but the
-+	# histogram counters do
-+	len=$((len - 4))
-+
-+	before=$(ethtool --json -S $h2 --groups rmon | \
-+		jq -r ".[0].rmon[\"${set}-pktsNtoM\"][$bucket].val")
-+
-+	# Send 10k one way and 20k in the other, to detect counters
-+	# mapped to the wrong direction
-+	$MZ $h1 -q -c $num_rx -p $len -a own -b bcast -d 10us
-+	$MZ $h2 -q -c $num_tx -p $len -a own -b bcast -d 10us
-+
-+	after=$(ethtool --json -S $h2 --groups rmon | \
-+		jq -r ".[0].rmon[\"${set}-pktsNtoM\"][$bucket].val")
-+
-+	delta=$((after - before))
-+
-+	expected=$([ $set = rx ] && echo $num_rx || echo $num_tx)
-+
-+	# Allow some extra tolerance for other packets sent by the stack
-+	[ $delta -ge $expected ] && [ $delta -le $((expected + 100)) ]
-+}
-+
-+rmon_histogram()
-+{
-+	local set=$1; shift
-+	local nbuckets=0
-+
-+	RET=0
-+
-+	while read -r -a bucket; do
-+		bucket_test $set $nbuckets ${bucket[0]}
-+		check_err "$?" "Verification failed for bucket ${bucket[0]}-${bucket[1]}"
-+		nbuckets=$((nbuckets + 1))
-+	done < <(ethtool --json -S $h2 --groups rmon | \
-+		jq -r ".[0].rmon[\"${set}-pktsNtoM\"][]|[.low, .high, .val]|@tsv" 2>/dev/null)
-+
-+	if [ $nbuckets -eq 0 ]; then
-+		log_test_skip "$h2 does not support $set histogram counters"
-+		return
-+	fi
-+
-+	log_test "$set histogram counters"
-+}
-+
-+rmon_rx_histogram()
-+{
-+	rmon_histogram rx
-+}
-+
-+rmon_tx_histogram()
-+{
-+	rmon_histogram tx
-+}
-+
-+setup_prepare()
-+{
-+	h1=${NETIFS[p1]}
-+	h2=${NETIFS[p2]}
-+
-+	for iface in $h1 $h2; do
-+		ip link set dev $iface up
-+	done
-+}
-+
-+cleanup()
-+{
-+	pre_cleanup
-+
-+	for iface in $h2 $h1; do
-+		ip link set dev $iface down
-+	done
-+}
-+
-+check_ethtool_counter_group_support
-+trap cleanup EXIT
-+
-+setup_prepare
-+setup_wait
-+
-+tests_run
-+
-+exit $EXIT_STATUS
-diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-index 8f6ca458af9a..e3740163c384 100755
---- a/tools/testing/selftests/net/forwarding/lib.sh
-+++ b/tools/testing/selftests/net/forwarding/lib.sh
-@@ -146,6 +146,15 @@ check_ethtool_mm_support()
- 	fi
- }
- 
-+check_ethtool_counter_group_support()
-+{
-+	ethtool --help 2>&1| grep -- '--all-groups' &> /dev/null
-+	if [[ $? -ne 0 ]]; then
-+		echo "SKIP: ethtool too old; it is missing standard counter group support"
-+		exit $ksft_skip
-+	fi
-+}
-+
- check_locked_port_support()
- {
- 	if ! bridge -d link show | grep -q " locked"; then
--- 
-2.34.1
+People in this thread say just pick their subsystem patch together
+with #1. So, I'm going to send v3 with some minor tweaks, and if
+everything is OK, will pull all this in my bitmap-for-next branch.
 
+Thanks,
+Yury
 
