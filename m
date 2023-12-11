@@ -1,172 +1,186 @@
-Return-Path: <netdev+bounces-55894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C99180CB7C
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:52:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED61D80CBBB
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:53:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58B7E281F4F
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:52:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D3211C21296
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:53:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB79B47787;
-	Mon, 11 Dec 2023 13:52:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F318247A45;
+	Mon, 11 Dec 2023 13:53:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SDebUDFF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L8nKFyWn"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8831710DA
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 05:52:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702302762;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rAKJhgDZFjppnOq8yVAY97GiR5RWWlY/Hz8yw7/jdJE=;
-	b=SDebUDFFBnLqU5rnsO1DODWgnERbu6YQVOIalE6LKSOLXlEVuxNBNgAFhw2J9WV1Ml8yIU
-	jVCcY/TT0jG+qb9pPuFW6oj4RA2nlkM7rTB7iR+ZCv7JeYlzEll2OJx4+sx4zBPqbGxSGz
-	Pf2YfNnI7ADwnHXmRh2LGEwl5ZaqWAo=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-515-VVvXWqwYOC-qzjAy_b8l-w-1; Mon, 11 Dec 2023 08:52:41 -0500
-X-MC-Unique: VVvXWqwYOC-qzjAy_b8l-w-1
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-67a940dcd1aso63738786d6.3
-        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 05:52:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702302761; x=1702907561;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rAKJhgDZFjppnOq8yVAY97GiR5RWWlY/Hz8yw7/jdJE=;
-        b=QDrcwiIE26VOT/Y7g6jpelB1QCJnnpiQVhoCMh4q46GCOsfiCSbvPF3DG1BXtPGml5
-         AuCSdSArde6KYqyeBSSYSToz0WIirW2JT+MHG+US6NmlToD9BqLY862V6iaKgZ7/iQ3N
-         yD0m4ltN6iYAS5tQFA5cMrVLEEaFI1PVPfVheeL4Y6NxFMb5Pu6XT5gLTasAqvzFXVjt
-         69EwTNYNSyM9DEONIh31NPgI2Y4puOwhGG7lGPrpDaEcCHprUCcb6aJF4S8S8MnA5htn
-         LV1NDuo0tNGRIyX8nk3Nx9m0taINeixQqvgvWqTxjrhKxRutJW3dahTa2L/xDWJaC6ON
-         xv+g==
-X-Gm-Message-State: AOJu0Yzz+0WkM8MjUTtdZazugO6v1pdAJ160YsP5FA0nCRmE6ziE5AOr
-	1CN6IwcUvh9iHvJlVJNe2ZT93JZv3qmxwmuOYmkBhy4KLZhaqcIWB0tNk2cVxc0n/4JJ1a4OqAq
-	8u7R3q1HJNn3qNgqi
-X-Received: by 2002:ad4:452a:0:b0:67a:5887:b55d with SMTP id l10-20020ad4452a000000b0067a5887b55dmr4932130qvu.49.1702302760907;
-        Mon, 11 Dec 2023 05:52:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGzx/nt6T6DLUCU49cSJD+NhxTBsGn6eVt/zPBsL7ZgqtW6sJsBZ5K+Q5WGQkXV6vBLIadoeg==
-X-Received: by 2002:ad4:452a:0:b0:67a:5887:b55d with SMTP id l10-20020ad4452a000000b0067a5887b55dmr4932121qvu.49.1702302760605;
-        Mon, 11 Dec 2023 05:52:40 -0800 (PST)
-Received: from fedora ([2600:1700:1ff0:d0e0::37])
-        by smtp.gmail.com with ESMTPSA id tc6-20020a05620a2cc600b0077db614cb7fsm2936968qkn.8.2023.12.11.05.52.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 05:52:40 -0800 (PST)
-Date: Mon, 11 Dec 2023 07:52:37 -0600
-From: Andrew Halaney <ahalaney@redhat.com>
-To: Suraj Jaiswal <quic_jsuraj@quicinc.com>
-Cc: Vinod Koul <vkoul@kernel.org>, 
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>, Andy Gross <agross@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, Prasad Sodagudi <psodagud@quicinc.com>, 
-	Rob Herring <robh@kernel.org>, kernel@quicinc.com
-Subject: Re: [PATCH net-next v5 1/3] dt-bindings: net: qcom,ethqos: add
- binding doc for safety IRQ for sa8775p
-Message-ID: <2ihncgvnfxgzj5kfm3eedvj3jvru7fokpno5pdzgtnuuy2mpqf@sfuzuugeuxzh>
-References: <20231211080153.3005122-1-quic_jsuraj@quicinc.com>
- <20231211080153.3005122-2-quic_jsuraj@quicinc.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C6347A41
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 13:53:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5324BC433CD;
+	Mon, 11 Dec 2023 13:53:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702302834;
+	bh=8e8vQE70TfsTGeC+ewIHkiniZer9gGFAlcUgFP8KlDo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=L8nKFyWnOjDJobGOr48MeChHm9Cnmg963UAqSvR6+Xa+YGhCpvbEHqHjThCP+RSqt
+	 rf/8krZonUlBQsI9w4g72WAhA08R1zUavq5Zwl1EaZD9WXS0rXzFz6p746JMJ/Jj/b
+	 vrvIeSPtQSB9kNuwO91o94O/iGRDFlNuujM3X7D44khacdq0pLUkcxXtwcHQvbbBn2
+	 LmnIQ2kx7D/1yHcQmx2QEFCJbPPEhSmvq2EfeHgTuBP4k9jj2XeJrBp4SpJ2cJyP5s
+	 B9kWjz/HAnvhFDhQe7I9X/dCCPn46YkBubvb0HSCAhRDwWAWsLG3DEVBc+o9DYozeE
+	 szg5xWMAv4lsw==
+Message-ID: <15f77150-f946-46a9-9af4-383f9be23369@kernel.org>
+Date: Mon, 11 Dec 2023 15:53:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231211080153.3005122-2-quic_jsuraj@quicinc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] selftests: forwarding: ethtool_mm: support devices
+ that don't support pmac stats
+Content-Language: en-US
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, shuah@kernel.org, s-vadapalli@ti.com,
+ r-gunasekaran@ti.com, vigneshr@ti.com, srk@ti.com, horms@kernel.org,
+ p-varis@ti.com, netdev@vger.kernel.org
+References: <20231211120138.5461-1-rogerq@kernel.org>
+ <20231211120138.5461-1-rogerq@kernel.org>
+ <20231211120138.5461-3-rogerq@kernel.org>
+ <20231211120138.5461-3-rogerq@kernel.org>
+ <20231211132415.ilhkajslbxf3wxjn@skbuf>
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20231211132415.ilhkajslbxf3wxjn@skbuf>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 11, 2023 at 01:31:51PM +0530, Suraj Jaiswal wrote:
-> Add binding doc for safety IRQ. The safety IRQ will be
-> triggered for ECC(error correction code), DPP(data path
-> parity), FSM(finite state machine) error.
+
+
+On 11/12/2023 15:24, Vladimir Oltean wrote:
+> On Mon, Dec 11, 2023 at 02:01:38PM +0200, Roger Quadros wrote:
+>> Some devices do not support individual 'pmac' and 'emac' stats.
+>> For such devices, resort to 'aggregate' stats.
+>>
+>> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+>> ---
+>>  tools/testing/selftests/net/forwarding/ethtool_mm.sh | 7 +++++++
+>>  1 file changed, 7 insertions(+)
+>>
+>> diff --git a/tools/testing/selftests/net/forwarding/ethtool_mm.sh b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+>> index 6212913f4ad1..e3f2e62029ca 100755
+>> --- a/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+>> +++ b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+>> @@ -26,6 +26,13 @@ traffic_test()
+>>  	local delta=
+>>  
+>>  	before=$(ethtool_std_stats_get $if "eth-mac" "FramesTransmittedOK" $src)
+>> +	# some devices don't support individual pmac/emac stats,
+>> +	# use aggregate stats for them.
+>> +        if [ "$before" == null ]; then
+>> +                src="aggregate"
+>> +                before=$(ethtool_std_stats_get $if "eth-mac" "FramesTransmittedOO
+>> +K" $src)
+>> +        fi
 > 
-> Signed-off-by: Suraj Jaiswal <quic_jsuraj@quicinc.com>
+> 1. please follow the existing indentation scheme, don't mix tabs with spaces
 
-Rob gave you his Reviewed-by over here on the last revision:
+Sure. Will fix.
 
-    https://lore.kernel.org/netdev/170206782161.2661547.16311911491075108498.robh@kernel.org/
+> 2. someone mangled your patch into invalid bash syntax, splitting a line
+>    into 2
+> 3. "FramesTransmittedOOK" has an extra "O"
 
-in the future if someone gives you a tag you should add it to the patch
-for the next revision you send out (assuming you have to send out
-another version, otherwise the maintainers will collect the tags when
-they merge that version of the series). If the patches change a lot then
-it makes sense to remove the tag since it wasn't what they reviewed, but
-in this case you've only expanded a comment in the commit message so it is
-appropriate to be present.
+Will fix. The mangling happened at my end.
 
+> 4. it would be preferable if you could evaluate only once whether pMAC
+>    counters are reported, set a global variable, and in traffic_test(),
+>    if that variable is true, override $src with "aggregate".
+> 5. why did you split the selftest patches out of the am65-cpsw patch
+>    set? It is for the am65-cpsw that they are needed.
+
+Needed for the tests to pass, yes.
+I'll add them back at the beginning of the series.
+
+> 
+>>  
+>>  	$MZ $if -q -c $num_pkts -p 64 -b bcast -t ip -R $PREEMPTIBLE_PRIO
+>>  
+>> -- 
+>> 2.34.1
+>>
+> 
+> Something like this?
+
+Thanks for the hint!
+
+> 
+> From ef5688a78908d99b607909fd7c93829c6a018b61 Mon Sep 17 00:00:00 2001
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Date: Mon, 11 Dec 2023 15:21:25 +0200
+> Subject: [PATCH] selftests: forwarding: ethtool_mm: fall back to aggregate if
+>  device does not report pMAC stats
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 > ---
->  Documentation/devicetree/bindings/net/qcom,ethqos.yaml | 9 ++++++---
->  Documentation/devicetree/bindings/net/snps,dwmac.yaml  | 6 ++++--
->  2 files changed, 10 insertions(+), 5 deletions(-)
+>  tools/testing/selftests/net/forwarding/ethtool_mm.sh | 11 +++++++++++
+>  tools/testing/selftests/net/forwarding/lib.sh        |  8 ++++++++
+>  2 files changed, 19 insertions(+)
 > 
-> diff --git a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-> index 7bdb412a0185..93d21389e518 100644
-> --- a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-> +++ b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-> @@ -37,12 +37,14 @@ properties:
->      items:
->        - description: Combined signal for various interrupt events
->        - description: The interrupt that occurs when Rx exits the LPI state
-> +      - description: The interrupt that occurs when HW safety error triggered
+> diff --git a/tools/testing/selftests/net/forwarding/ethtool_mm.sh b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+> index 39e736f30322..2740133f95ec 100755
+> --- a/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+> +++ b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+> @@ -25,6 +25,10 @@ traffic_test()
+>  	local after=
+>  	local delta=
 >  
->    interrupt-names:
->      minItems: 1
->      items:
->        - const: macirq
-> -      - const: eth_lpi
-> +      - enum: [eth_lpi, safety]
-> +      - const: safety
+> +	if [ has_pmac_stats[$netif] = false ]; then
+> +		src="aggregate"
+> +	fi
+> +
+>  	before=$(ethtool_std_stats_get $if "eth-mac" "FramesTransmittedOK" $src)
 >  
->    clocks:
->      maxItems: 4
-> @@ -89,8 +91,9 @@ examples:
->                 <&gcc GCC_ETH_PTP_CLK>,
->                 <&gcc GCC_ETH_RGMII_CLK>;
->        interrupts = <GIC_SPI 56 IRQ_TYPE_LEVEL_HIGH>,
-> -                   <GIC_SPI 55 IRQ_TYPE_LEVEL_HIGH>;
-> -      interrupt-names = "macirq", "eth_lpi";
-> +                   <GIC_SPI 55 IRQ_TYPE_LEVEL_HIGH>,
-> +                   <GIC_SPI 782 IRQ_TYPE_LEVEL_HIGH>;
-> +      interrupt-names = "macirq", "eth_lpi", "safety";
+>  	$MZ $if -q -c $num_pkts -p 64 -b bcast -t ip -R $PREEMPTIBLE_PRIO
+> @@ -284,6 +288,13 @@ for netif in ${NETIFS[@]}; do
+>  		echo "SKIP: $netif does not support MAC Merge"
+>  		exit $ksft_skip
+>  	fi
+> +
+> +	if check_ethtool_pmac_std_stats_support $netif; then
+> +		has_pmac_stats[$netif]=true
+> +	else
+> +		has_pmac_stats[$netif]=false
+> +		echo "$netif does not report pMAC statistics, falling back to aggregate"
+> +	fi
+>  done
 >  
->        rx-fifo-depth = <4096>;
->        tx-fifo-depth = <4096>;
-> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> index 5c2769dc689a..3b46d69ea97d 100644
-> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> @@ -107,13 +107,15 @@ properties:
->        - description: Combined signal for various interrupt events
->        - description: The interrupt to manage the remote wake-up packet detection
->        - description: The interrupt that occurs when Rx exits the LPI state
-> +      - description: The interrupt that occurs when HW safety error triggered
+>  trap cleanup EXIT
+> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+> index 8f6ca458af9a..82ac6a066729 100755
+> --- a/tools/testing/selftests/net/forwarding/lib.sh
+> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+> @@ -146,6 +146,14 @@ check_ethtool_mm_support()
+>  	fi
+>  }
 >  
->    interrupt-names:
->      minItems: 1
->      items:
->        - const: macirq
-> -      - enum: [eth_wake_irq, eth_lpi]
-> -      - const: eth_lpi
-> +      - enum: [eth_wake_irq, eth_lpi, safety]
-> +      - enum: [eth_wake_irq, eth_lpi, safety]
-> +      - enum: [eth_wake_irq, eth_lpi, safety]
->  
->    clocks:
->      minItems: 1
-> -- 
-> 2.25.1
-> 
+> +check_ethtool_pmac_std_stats_support()
+> +{
+> +	local dev=$1; shift
+> +
+> +	[ -n "$(ethtool --json -S $dev --all-groups --src pmac 2>/dev/null | \
+> +		jq '.[]')" ]
+> +}
+> +
+>  check_locked_port_support()
+>  {
+>  	if ! bridge -d link show | grep -q " locked"; then
 
+-- 
+cheers,
+-roger
 
