@@ -1,136 +1,110 @@
-Return-Path: <netdev+bounces-55873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C34D80C9EE
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:33:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7BB580C9F3
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:35:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A8EBB2098C
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 12:33:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 820CC1F2109A
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 12:35:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C6983B7A7;
-	Mon, 11 Dec 2023 12:33:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 457F13B7AF;
+	Mon, 11 Dec 2023 12:35:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Bz0iL+yR"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="uExf5nda"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2BCA8E;
-	Mon, 11 Dec 2023 04:33:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702298011; x=1733834011;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=LkVViNkwO7QQP+f8k/J3d57xIdGBSObZp2X787WTBXs=;
-  b=Bz0iL+yRQ4my/Xg8WPzBa8nIHN6ETCgKeA0PaAU7rwLBqh0xqG0MZApF
-   a3nNbkEmp9x6mTX2FastmZ0x57K2RZxAVsHZEVR29JH9f108f2j0+1X3J
-   w7cfNeMNejTZEIZd1+m9DUmiR0FhHK9A+HwqLDYhgsdlLt3BYNHyi+8kI
-   zXeJt1/zRf3vXGXG4zLf6XQ+ITI7NyLY55e8UGxs/7O6yqep+K/V16GGZ
-   opLvv6BRhQI+kUsCx1FKpyO9lGPpxKqzdTpwxNkdwUTj73VygGPola4X7
-   Ste8tYUiuTrU7axYDyQcUJDddK0Mym6TnbS5MriIasL8hsHWUgVwVzSbB
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10920"; a="391808850"
-X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
-   d="scan'208";a="391808850"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2023 04:33:31 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
-   d="scan'208";a="21069107"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by orviesa001.jf.intel.com with ESMTP; 11 Dec 2023 04:33:28 -0800
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-net v2] idpf: fix corrupted frames and skb leaks in singleq mode
-Date: Mon, 11 Dec 2023 13:31:44 +0100
-Message-ID: <20231211123144.3759488-1-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.43.0
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64C4AA1
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 04:35:15 -0800 (PST)
+Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-a1da1017a09so534622466b.3
+        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 04:35:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702298114; x=1702902914; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=okeZz+/5q28Go+s8k/ynMlYtWODeKp/iZbr3JW3CH84=;
+        b=uExf5nda+hurv4+9BRyNF+muklXHygd/5yJxjSTrL7sK475ZsuHwTZCwwjo/JE7EGM
+         GvJmGm2EcNioTmH8tQgw7VUso++imaV3YEJy/Ozd3HjcCkR6jXDdlEfx94AfVKHlEeQ1
+         jTCX4SCzgYgUjEDhdzcybnqHio+o5/QT8iw2NMMIsiX3ZTMp34kYwk8vmrmV3houKO28
+         Mk5oLSlT8KrPEPvhB3DzZb0IqyyholUEfirIhJb4I8tU6haDM3xg8eC4dEvFr3+Dv4+O
+         8sFTL8bPqysCL2+gVFAYWtYN/NETW5ihKL4KQgceNW20E3aj7i7VH286NAVs+KxZUUuE
+         9Iiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702298114; x=1702902914;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=okeZz+/5q28Go+s8k/ynMlYtWODeKp/iZbr3JW3CH84=;
+        b=fASe4VEC8bkGneNqWl0ToP6+YBk62Aiab88jkFSNv2lDIMbB6FNqTnsxLJMARKcBkX
+         KCvi8YTADqeLA7gKQOEhtj5Kad7WiE7S5qAIwm7NZGKpQvNtZjGCklnNZ/NnmWGUFYz5
+         Y7u8I9h7F0MUhGpjXyzxaU2Iwo9DiKnQqUPuPl7pCz0gc1AQIsrZrzJyc0bdwAmFqM6r
+         gCYSWRTLHi8PmN6rO6ADT8rSrvRGxk3jMoJiRm3Jyv93ByJW5U+eHEW7QBMP3bFBePDb
+         FkmiK5oGB94xhU1di92KmdTuwBMorY0E6DR0iP5SIc1Dz7WjRWxTR+iQ/NQZqYkkOlHa
+         rmGw==
+X-Gm-Message-State: AOJu0YxcQnp+Ki2wAOU1V4zR6RPhvnyYksnw79SgfiHT7JrKhpNjxKVI
+	MJXz4DdTw3a2mnIVmHHtdGUCuw==
+X-Google-Smtp-Source: AGHT+IEeNSumf/Z5NdDQ1ZCLP4y0DB4LAifdgyxvXATDzBm3pM14+UCAg7G1tScr8WOo3kRn3GhEgQ==
+X-Received: by 2002:a17:906:3519:b0:a00:152a:1ec4 with SMTP id r25-20020a170906351900b00a00152a1ec4mr2373236eja.11.1702298113511;
+        Mon, 11 Dec 2023 04:35:13 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id so7-20020a170907390700b00a1f747f762asm4092619ejc.112.2023.12.11.04.35.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Dec 2023 04:35:12 -0800 (PST)
+Date: Mon, 11 Dec 2023 13:35:11 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: swarup <swarupkotikalapudi@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel-mentees@lists.linuxfoundation.org
+Subject: Re: [PATCH net-next v6] netlink: specs: devlink: add some(not all)
+ missing attributes in devlink.yaml
+Message-ID: <ZXcB/6tv/kuX4R91@nanopsycho>
+References: <20231208182515.1206616-1-swarupkotikalapudi@gmail.com>
+ <ZXbaauFOfttLCe78@nanopsycho>
+ <ZXb+fRawVUgU+lrX@swarup-virtual-machine>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZXb+fRawVUgU+lrX@swarup-virtual-machine>
 
-idpf_ring::skb serves only for keeping an incomplete frame between
-several NAPI Rx polling cycles, as one cycle may end up before
-processing the end of packet descriptor. The pointer is taken from
-the ring onto the stack before entering the loop and gets written
-there after the loop exits. When inside the loop, only the onstack
-pointer is used.
-For some reason, the logics is broken in the singleq mode, where the
-pointer is taken from the ring each iteration. This means that if a
-frame got fragmented into several descriptors, each fragment will have
-its own skb, but only the last one will be passed up the stack
-(containing garbage), leaving the rest leaked.
-Then, on ifdown, rxq::skb is being freed only in the splitq mode, while
-it can point to a valid skb in singleq as well. This can lead to a yet
-another skb leak.
-Just don't touch the ring skb field inside the polling loop, letting
-the onstack skb pointer work as expected: build a new skb if it's the
-first frame descriptor and attach a frag otherwise. On ifdown, free
-rxq::skb unconditionally if the pointer is non-NULL.
+Mon, Dec 11, 2023 at 01:20:13PM CET, swarupkotikalapudi@gmail.com wrote:
+>esOn Mon, Dec 11, 2023 at 10:46:18AM +0100, Jiri Pirko wrote:
+>> Fri, Dec 08, 2023 at 07:25:15PM CET, swarupkotikalapudi@gmail.com wrote:
+>> >Add some missing(not all) attributes in devlink.yaml.
+>> >
+>> >Signed-off-by: Swarup Laxman Kotiaklapudi <swarupkotikalapudi@gmail.com>
+>> >Suggested-by: Jiri Pirko <jiri@resnulli.us>
+>> >---
+>> >V6:
+>> >  - Fix review comments
+>> 
+>> Would be nice to list what changes you actually did.
+>> 
+>> Nevertheless, patch looks fine to me.
+>> 
+>> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+>
+>Hi Jiri,
+>
+>Do you mean in the commit message, i should have listed all the changes?
 
-Fixes: a5ab9ee0df0b ("idpf: add singleq start_xmit and napi poll")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
-Tony, please add it to dev-queue instead of the first revision.
+In the changelog (the line I commented), you should try to describe what
+exactly did you change from the last version, so the reviewer knows what
+to focus on and what to expect.
 
-From v1[0]:
-* fix the related skb leak on ifdown;
-* fix subject prefix;
-* pick Reviewed-bys.
+>Please clarify, if required i update the commit message.
 
-[0] https://lore.kernel.org/all/20231201143821.1091005-1-aleksander.lobakin@intel.com
----
- drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c | 1 -
- drivers/net/ethernet/intel/idpf/idpf_txrx.c         | 2 +-
- 2 files changed, 1 insertion(+), 2 deletions(-)
+No, next time.
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-index 81288a17da2a..20c4b3a64710 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-@@ -1044,7 +1044,6 @@ static int idpf_rx_singleq_clean(struct idpf_queue *rx_q, int budget)
- 		}
- 
- 		idpf_rx_sync_for_cpu(rx_buf, fields.size);
--		skb = rx_q->skb;
- 		if (skb)
- 			idpf_rx_add_frag(rx_buf, skb, fields.size);
- 		else
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 1f728a9004d9..9e942e5baf39 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -396,7 +396,7 @@ static void idpf_rx_desc_rel(struct idpf_queue *rxq, bool bufq, s32 q_model)
- 	if (!rxq)
- 		return;
- 
--	if (!bufq && idpf_is_queue_model_split(q_model) && rxq->skb) {
-+	if (rxq->skb) {
- 		dev_kfree_skb_any(rxq->skb);
- 		rxq->skb = NULL;
- 	}
--- 
-2.43.0
 
+>
+>Thanks,
+>Swarup
 
