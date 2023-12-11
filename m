@@ -1,187 +1,173 @@
-Return-Path: <netdev+bounces-55868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3F3080C93C
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:15:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39B2580C95D
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:18:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F9F81F21659
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 12:15:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CEAF7B20DF1
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 12:18:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E0D3A279;
-	Mon, 11 Dec 2023 12:15:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC29C3A29D;
+	Mon, 11 Dec 2023 12:18:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CKE3WHOf"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10BF711F;
-	Mon, 11 Dec 2023 04:15:30 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R571e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0VyIPaKz_1702296927;
-Received: from 30.221.130.53(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VyIPaKz_1702296927)
-          by smtp.aliyun-inc.com;
-          Mon, 11 Dec 2023 20:15:28 +0800
-Message-ID: <9a6d57c0-f5b4-9b2c-dc5f-dc47d0518141@linux.alibaba.com>
-Date: Mon, 11 Dec 2023 20:15:26 +0800
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 108078E;
+	Mon, 11 Dec 2023 04:18:22 -0800 (PST)
+Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-40c0fc1cf3dso46256905e9.0;
+        Mon, 11 Dec 2023 04:18:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702297100; x=1702901900; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=QiV4Bcxzf25dJHNqzSbQoSLWzyN0MNcOZek8LpkVKp8=;
+        b=CKE3WHOfp5JHMH3wQiwlKMtmgOyh3UmLdClzIG4DNSMGuuVDKLAHXJ/UJx3XkbQ7bo
+         WeTck7iVJ8luuXg6o9GmVCRaKgg7iVdi1E73wyk82jGTKHaff3PhNnYurPf9NEJCyiC6
+         PFHwYSnPH+j/hzL5Z5mwc3HjJyfdmVDEYREy2aaRw4/yTmsUakyAaDwqDA9Ghe8Wag6q
+         d3wLCwcpJ5N4u0BSj98u/oPOq8ePZr81SnmN/1F0P3DHt0dLYbI71t3Z6nWNyHq+PvbQ
+         a74BcdpuPm2MRRGd9eo7qjk4T4bwJkp8b5t+Nb7pMJFnj8x8gEztFyN5MFTy/5WHLW11
+         bMjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702297100; x=1702901900;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QiV4Bcxzf25dJHNqzSbQoSLWzyN0MNcOZek8LpkVKp8=;
+        b=bcePS31RzEcIoW0aLcsWH7oq4FmID9XsZtYyL2JOZYpqqC4rlbmBzC1OQecFXxKZ+o
+         YC6bQ+OaBiYN+AnJJHMc8T2jM5AHTBk6FlBwjGNmRZl911MKFHaC1UW/WaIf6RUK0rtp
+         tc/Oi3r1amQc5ZDIWCeGG0g5nJ3xi+vUzdqTsCA7nQtK3l2Ma/nAvn1rrQkBzjOpJM1B
+         sQqlQjo4t8zMZzbgY/efTDyGbYMhTQv0eW3YP41kXNEFPttQbGIzfUb6BfF8/iBWvv9A
+         JTr1UEa5ld3ieasgWKrFiDLNQH4CCv6GLluYB+PUBD2rS46VkZIj2d2tVFZ8JzsGXRk5
+         dZKw==
+X-Gm-Message-State: AOJu0Yy5hOEhg7n82f4+2BhY9nEMEH7PG91NG/Hcutrx73PfMtqJ1j4U
+	nTw7EcDBPjNiqa++8kt9acs=
+X-Google-Smtp-Source: AGHT+IE6K37AePv5EZZBztKb3nE9ejxdrzxZNJcnN083N38EoiRyMtue+Eo9A0d+n4EwUgjzIx50KQ==
+X-Received: by 2002:a05:600c:81b:b0:40b:5e59:c590 with SMTP id k27-20020a05600c081b00b0040b5e59c590mr2083036wmp.186.1702297100030;
+        Mon, 11 Dec 2023 04:18:20 -0800 (PST)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id b1-20020a05600c4e0100b00405959469afsm12923793wmq.3.2023.12.11.04.18.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Dec 2023 04:18:19 -0800 (PST)
+Message-ID: <6576fe0b.050a0220.e99f3.b2b5@mx.google.com>
+X-Google-Original-Message-ID: <ZXb-CAFPxqA5v4Ff@Ansuel-xps.>
+Date: Mon, 11 Dec 2023 13:18:16 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH 1/2] dt-bindings: Document QCA808x PHYs
+References: <20231209014828.28194-1-ansuelsmth@gmail.com>
+ <b855eceb-05f4-4376-be62-2301d42575e7@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net-next v5 2/9] net/smc: introduce sub-functions for
- smc_clc_send_confirm_accept()
-To: Alexandra Winter <wintera@linux.ibm.com>, wenjia@linux.ibm.com,
- hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, kgraul@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, raspl@linux.ibm.com,
- schnelle@linux.ibm.com, guangguan.wang@linux.alibaba.com,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <1702021259-41504-1-git-send-email-guwen@linux.alibaba.com>
- <1702021259-41504-3-git-send-email-guwen@linux.alibaba.com>
- <ac3c0823-8705-4225-96c8-ed7bc55d1bfc@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <ac3c0823-8705-4225-96c8-ed7bc55d1bfc@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b855eceb-05f4-4376-be62-2301d42575e7@linaro.org>
 
-
-
-On 2023/12/11 18:43, Alexandra Winter wrote:
+On Mon, Dec 11, 2023 at 11:19:50AM +0100, Krzysztof Kozlowski wrote:
+> On 09/12/2023 02:48, Christian Marangi wrote:
+> > Add Documentation for QCA808x PHYs for the additional property for the
+> > active high LED setting and also document the LED configuration for this
+> > PHY.
+> > 
 > 
+> Please use subject prefixes matching the subsystem. You can get them for
+> example with `git log --oneline -- DIRECTORY_OR_FILE` on the directory
+> your patch is touching.
+>
+
+Yes sorry.
+
+> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > ---
+> >  .../devicetree/bindings/net/qca,qca808x.yaml  | 66 +++++++++++++++++++
+> >  1 file changed, 66 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/net/qca,qca808x.yaml
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/qca,qca808x.yaml b/Documentation/devicetree/bindings/net/qca,qca808x.yaml
+> > new file mode 100644
+> > index 000000000000..73cfff357311
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/qca,qca808x.yaml
+> > @@ -0,0 +1,66 @@
+> > +# SPDX-License-Identifier: GPL-2.0+
 > 
-> On 08.12.23 08:40, Wen Gu wrote:
->> There is a large if-else block in smc_clc_send_confirm_accept() and it
->> is better to split it into two sub-functions.
->>
->> Suggested-by: Alexandra Winter <wintera@linux.ibm.com>
->> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
->> ---
-> 
-> Thank you very much Wen Gu for improving the codebase.
-> 
-I'm glad I could help.
-
-> 
->>   net/smc/smc_clc.c | 196 +++++++++++++++++++++++++++++++-----------------------
->>   1 file changed, 114 insertions(+), 82 deletions(-)
->>
->> diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
->> index 0fcb035..52b4ea9 100644
->> --- a/net/smc/smc_clc.c
->> +++ b/net/smc/smc_clc.c
->> @@ -998,6 +998,111 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini)
->>   	return reason_code;
->>   }
->>   
->> +static void smcd_clc_prep_confirm_accept(struct smc_connection *conn,
->> +				struct smc_clc_msg_accept_confirm_v2 *clc_v2,
->> +				int first_contact, u8 version,
->> +				u8 *eid, struct smc_init_info *ini,
->> +				int *fce_len,
->> +				struct smc_clc_first_contact_ext_v2x *fce_v2x,
->> +				struct smc_clc_msg_trail *trl)
->> +{
->> +	struct smcd_dev *smcd = conn->lgr->smcd;
->> +	struct smc_clc_msg_accept_confirm *clc;
->> +	int len;
->> +
->> +	/* SMC-D specific settings */
->> +	clc = (struct smc_clc_msg_accept_confirm *)clc_v2;
-> 
-> Why is this cast neccessary? (Here as well as in smcr_clc_prep_confirm_accept
-> and in smc_clc_send_confirm_accept)
-> smc_clc_msg_accept_confirm_v2 has hdr and d0 as well.
-
-I think the cast is to imply that v2 is an expansion of v1, or v1 is the base of v2.
-So here using clc(v1) reperesents their common set.
-
-If we use smc_clc_msg_accept_confirm_v2 for all, I think readers may be tempted to
-check whether the hdr and d0 in 'smc_clc_msg_accept_confirm_v2' are also applicable to v1.
-
-And there are settings below that are specific for v1. It may be confusing if we
-change it like this:
-
-if (version == SMC_V1) {
-	clc_v2->hdr.length = htons(SMCD_CLC_ACCEPT_CONFIRM_LEN);
-} else {
-
-
-> 
-> IMO, it would be a nice seperate patch to get rid of the 2 type defs for
-> smc_clc_msg_accept_confirm and smc_clc_msg_accept_confirm_v2
-> and all the related casting anyhow.
+> Dual license as checkpath and writing-bindings ask.
 > 
 
-Do you mean to define only smc_clc_msg_accept_confirm_v2 or define with the name
-of smc_clc_msg_accept_confirm but the contents of smc_clc_msg_accept_confirm_v2?
+Oh didn't notice the warning.
 
-I have a different opinion on this, since I think the smc_clc_msg_accept_confirm
-and smc_clc_msg_accept_confirm_v2 clearly shows the difference between v1 and
-v2 messages and remind people what is currently working on. So I perfer to keep them.
-Am I missing something?
-
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/qca,qca808x.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Qualcomm Atheros QCA808X PHY
+> > +
+> > +maintainers:
+> > +  - Christian Marangi <ansuelsmth@gmail.com>
+> > +
+> > +description:
+> > +  Bindings for Qualcomm Atheros QCA808X PHYs
 > 
-> 
->> +	memcpy(clc->hdr.eyecatcher, SMCD_EYECATCHER,
->> +	       sizeof(SMCD_EYECATCHER));
->> +	clc->hdr.typev1 = SMC_TYPE_D;
->> +	clc->d0.gid = htonll(smcd->ops->get_local_gid(smcd));
->> +	clc->d0.token = htonll(conn->rmb_desc->token);
->> +	clc->d0.dmbe_size = conn->rmbe_size_comp;
->> +	clc->d0.dmbe_idx = 0;
->> +	memcpy(&clc->d0.linkid, conn->lgr->id, SMC_LGR_ID_SIZE);
->> +	if (version == SMC_V1) {
->> +		clc->hdr.length = htons(SMCD_CLC_ACCEPT_CONFIRM_LEN);
->> +	} else {
->> +		clc_v2->d1.chid = htons(smc_ism_get_chid(smcd));
->> +		if (eid && eid[0])
->> +			memcpy(clc_v2->d1.eid, eid, SMC_MAX_EID_LEN);
->> +		len = SMCD_CLC_ACCEPT_CONFIRM_LEN_V2;
->> +		if (first_contact) {
->> +			*fce_len = smc_clc_fill_fce_v2x(fce_v2x, ini);
->> +			len += *fce_len;
->> +		}
->> +		clc_v2->hdr.length = htons(len);
->> +	}
->> +	memcpy(trl->eyecatcher, SMCD_EYECATCHER,
->> +	       sizeof(SMCD_EYECATCHER));
->> +}
->> +
->> +static void smcr_clc_prep_confirm_accept(struct smc_connection *conn,
->> +				struct smc_clc_msg_accept_confirm_v2 *clc_v2,
->> +				int first_contact, u8 version,
->> +				u8 *eid, struct smc_init_info *ini,
->> +				int *fce_len,
->> +				struct smc_clc_first_contact_ext_v2x *fce_v2x,
->> +				struct smc_clc_fce_gid_ext *gle,
->> +				struct smc_clc_msg_trail *trl)
->> +{
->> +	struct smc_clc_msg_accept_confirm *clc;
->> +	struct smc_link *link = conn->lnk;
->> +	int len;
->> +
->> +	/* SMC-R specific settings */
->> +	clc = (struct smc_clc_msg_accept_confirm *)clc_v2;
-> 
-> Why is this cast neccessary?
-> smc_clc_msg_accept_confirm_v2 has hdr and r0 as well.
-> 
-Similar thought as SMCD.
-
->> +	memcpy(clc->hdr.eyecatcher, SMC_EYECATCHER,
->> +	       sizeof(SMC_EYECATCHER));
->> +	clc->hdr.typev1 = SMC_TYPE_R;
->> +	clc->hdr.length = htons(SMCR_CLC_ACCEPT_CONFIRM_LEN);
-> 
-> ^^ this is overwritten below, so no need to set it here.
+> Drop "Bindings for" and then entire sentence seems not useful.
 > 
 
-Good catch! It will be removed. Thank you.
+Was following the pattern used for other qcom PHY. Ok will drop!
 
-<...>
+> > +
+> > +  QCA808X PHYs can have up to 3 LEDs attached.
+> > +  All 3 LEDs are disabled by default.
+> > +  2 LEDs have dedicated pins with the 3rd LED having the
+> > +  double function of Interrupt LEDs/GPIO or additional LED.
+> > +
+> > +  By default this special PIN is set to LED function.
+> > +
+> > +allOf:
+> > +  - $ref: ethernet-phy.yaml#
+> > +
+> > +select:
+> > +  properties:
+> > +    compatible:
+> > +      contains:
+> > +        enum:
+> > +          - ethernet-phy-id004d.d101
+> 
+> I have impression that this is continuation of some other patchset...
+> Anyway, id004d.d101 is specific to QCA808x?
+> 
+
+I used enum assuming eventually more qca808x PHY will come... Yes that
+ID is specific and it's the id of QCA8081. Better to use const?
+
+> > +  required:
+> > +    - compatible
+> > +
+> > +properties:
+> > +  qca,led-active-high:
+> > +    description: Set all the LEDs to active high to be turned on.
+> > +    type: boolean
+> 
+> 
+> Best regards,
+> Krzysztof
+> 
+
+-- 
+	Ansuel
 
