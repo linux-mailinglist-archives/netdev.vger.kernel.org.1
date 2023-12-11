@@ -1,156 +1,69 @@
-Return-Path: <netdev+bounces-55912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67E5680CCBE
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:03:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC1BE80CCCD
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:04:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0400B2115A
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:03:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A4A91F2109A
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:04:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CEFB48785;
-	Mon, 11 Dec 2023 14:03:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758D8482F5;
+	Mon, 11 Dec 2023 14:04:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Be6O/9D8"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eraxT1UA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AB75482E5;
-	Mon, 11 Dec 2023 14:03:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B611C433CA;
-	Mon, 11 Dec 2023 14:03:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702303399;
-	bh=HwE8OCG01c1CUG5IAC4Wgos4t4/iBkjYuR74ICahtYM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Be6O/9D8PeEqAo9O3w3LCM79P8yOiuyVoGMAFkU7VUNP0ae5Q5fvP0odaZBiqIIkA
-	 c4WMqxtr7+JBIuZ7EJPO7QbrUSBLioGu+hgo3HH/SgygN9xJvnZvKPYLCQpJt++3lq
-	 PXoxMD3Jm2CDBeoUs6onKjjMZErNSGYK054MSMpWhs/2CRsdjvqqPuVUGnCHiY8G3+
-	 H5c5W6HtR5wkTi4TkFGZi2gHJPWeFYsCv+rjLltLGnQgjsSVmpl6ItheQyNwrZeJaW
-	 raShnxdn2ScuVkFNJ+Ch4F4p1umOx7eVaKn2l4xOGXJeOqRC1MjH2UrDts/2q5mA7j
-	 7u6fAIbvxKlHw==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Thinh Tran <thinhtr@linux.vnet.ibm.com>,
-	Venkata Sai Duggi <venkata.sai.duggi@ibm.com>,
-	David Christensen <drc@linux.vnet.ibm.com>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	pavan.chebbi@broadcom.com,
-	mchan@broadcom.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 3/5] net/tg3: fix race condition in tg3_reset_task()
-Date: Mon, 11 Dec 2023 09:03:08 -0500
-Message-ID: <20231211140311.392827-3-sashal@kernel.org>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231211140311.392827-1-sashal@kernel.org>
-References: <20231211140311.392827-1-sashal@kernel.org>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADAC34C3B;
+	Mon, 11 Dec 2023 06:04:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Oq7uN0UA4e29OD1T/vJ5LTgmVczpGSvVwmcHIE/xouM=; b=eraxT1UAAa6Sj6qX+sOaBE8kHv
+	fce9Pos6BoTdmvZDq+hOl4chP+zWCLsbnvjLCgt6qaMBnYfO3mHSY/2WcMU7Q9qZdHAyLKebQ8nVn
+	52Vc0fgtZKOmHXVqHDAxJA1qV94bRxsow/e/230BJgXz3O2lMmI6DnyZU6SjtWZvfKIQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rCgsq-002coy-7j; Mon, 11 Dec 2023 15:03:44 +0100
+Date: Mon, 11 Dec 2023 15:03:44 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: tsbogend@alpha.franken.de, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	devicetree@vger.kernel.org, linux-mips@vger.kernel.org,
+	chenhuacai@loongson.cn, netdev@vger.kernel.org,
+	loongarch@lists.linux.dev, chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH v1 net 1/3] stmmac: dwmac-loongson: Make sure MDIO is
+ initialized before use
+Message-ID: <0fb4ecea-9db9-4cea-b8f0-3f3b210b1ced@lunn.ch>
+References: <cover.1702289232.git.siyanteng@loongson.cn>
+ <b6059c83049c7a4c97b2c9dfd348b198a8ec1b14.1702289232.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.14.332
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b6059c83049c7a4c97b2c9dfd348b198a8ec1b14.1702289232.git.siyanteng@loongson.cn>
 
-From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+On Mon, Dec 11, 2023 at 06:33:11PM +0800, Yanteng Si wrote:
+> Generic code will use mdio. If it is not initialized before use,
+> the kernel will Oops.
+> 
+> Fixes: 30bba69d7db4 ("stmmac: pci: Add dwmac support for Loongson")
+> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
 
-[ Upstream commit 16b55b1f2269962fb6b5154b8bf43f37c9a96637 ]
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-When an EEH error is encountered by a PCI adapter, the EEH driver
-modifies the PCI channel's state as shown below:
-
-   enum {
-      /* I/O channel is in normal state */
-      pci_channel_io_normal = (__force pci_channel_state_t) 1,
-
-      /* I/O to channel is blocked */
-      pci_channel_io_frozen = (__force pci_channel_state_t) 2,
-
-      /* PCI card is dead */
-      pci_channel_io_perm_failure = (__force pci_channel_state_t) 3,
-   };
-
-If the same EEH error then causes the tg3 driver's transmit timeout
-logic to execute, the tg3_tx_timeout() function schedules a reset
-task via tg3_reset_task_schedule(), which may cause a race condition
-between the tg3 and EEH driver as both attempt to recover the HW via
-a reset action.
-
-EEH driver gets error event
---> eeh_set_channel_state()
-    and set device to one of
-    error state above           scheduler: tg3_reset_task() get
-                                returned error from tg3_init_hw()
-                             --> dev_close() shuts down the interface
-tg3_io_slot_reset() and
-tg3_io_resume() fail to
-reset/resume the device
-
-To resolve this issue, we avoid the race condition by checking the PCI
-channel state in the tg3_reset_task() function and skip the tg3 driver
-initiated reset when the PCI channel is not in the normal state.  (The
-driver has no access to tg3 device registers at this point and cannot
-even complete the reset task successfully without external assistance.)
-We'll leave the reset procedure to be managed by the EEH driver which
-calls the tg3_io_error_detected(), tg3_io_slot_reset() and
-tg3_io_resume() functions as appropriate.
-
-Adding the same checking in tg3_dump_state() to avoid dumping all
-device registers when the PCI channel is not in the normal state.
-
-Signed-off-by: Thinh Tran <thinhtr@linux.vnet.ibm.com>
-Tested-by: Venkata Sai Duggi <venkata.sai.duggi@ibm.com>
-Reviewed-by: David Christensen <drc@linux.vnet.ibm.com>
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
-Link: https://lore.kernel.org/r/20231201001911.656-1-thinhtr@linux.vnet.ibm.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/net/ethernet/broadcom/tg3.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index fa89d71336c6a..20ec767179ecb 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -6434,6 +6434,14 @@ static void tg3_dump_state(struct tg3 *tp)
- 	int i;
- 	u32 *regs;
- 
-+	/* If it is a PCI error, all registers will be 0xffff,
-+	 * we don't dump them out, just report the error and return
-+	 */
-+	if (tp->pdev->error_state != pci_channel_io_normal) {
-+		netdev_err(tp->dev, "PCI channel ERROR!\n");
-+		return;
-+	}
-+
- 	regs = kzalloc(TG3_REG_BLK_SIZE, GFP_ATOMIC);
- 	if (!regs)
- 		return;
-@@ -11159,7 +11167,8 @@ static void tg3_reset_task(struct work_struct *work)
- 	rtnl_lock();
- 	tg3_full_lock(tp, 0);
- 
--	if (tp->pcierr_recovery || !netif_running(tp->dev)) {
-+	if (tp->pcierr_recovery || !netif_running(tp->dev) ||
-+	    tp->pdev->error_state != pci_channel_io_normal) {
- 		tg3_flag_clear(tp, RESET_TASK_PENDING);
- 		tg3_full_unlock(tp);
- 		rtnl_unlock();
--- 
-2.42.0
-
+    Andrew
 
