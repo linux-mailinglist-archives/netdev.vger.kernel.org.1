@@ -1,158 +1,145 @@
-Return-Path: <netdev+bounces-56051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8814A80DA17
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 19:59:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BEEC380DA98
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 20:10:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 926E0B218A6
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 18:59:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 675BEB21526
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 19:10:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 233EA537F7;
-	Mon, 11 Dec 2023 18:58:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E924524BB;
+	Mon, 11 Dec 2023 19:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="NSlHwU6H"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DXZXHnvW"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2079.outbound.protection.outlook.com [40.107.93.79])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4769DB
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 10:58:31 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PNwKgkj2vIwR1Bw0U/7ZJPv2IZxwVb7CTxyT0NIL4pS8QoLYpgg52t5cVzpKdNhbWvf4cAl0IbBKX4ZpR6mDI/tSn9NmFJCzH/xosqFSzw7iYJ92B5snYqJjBxi6/eYvafqEK/hu9SorGS46piuY4GXTZzvFuRLzjkc2E6VU9DSOBznmDbv2DIMOCWMOKJj4slHUDukM+IqXHUfmVvbjzzGv8Gx7pbwz6iqlz9j+K0WqkdiTN4r5jOBTy38/AjZtR3+1NaL3/mJtaz+F0r4IiaNL3YwfVBXGhvT+YMrYqpcVuvqaJ3zyvlbeRNbdJYkH8l52zGA97pJs4zlMer2NSQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9zJLb1MeZEmq22+DwtJXUd5sfLp66UlF2tspdckrzeQ=;
- b=PxkphozNcKO38i+E9OZ3MLf9poa5hrlRO4AiuhFVoAQ3q0AUJFQvjSDOZwtQiv5HhG3lAG9ZM5JS5JXbA0Hs0YjW8z21ImLZt0krlEhXHCGSoNXbc8X7rJQuM2ZDnRs+8Px2yOfDjrsRZzgq9eRxpY02yjCKiKCPAGHmKxSe5tUwW9oNEYv9HhCKVuOSiHdt2v89WKzTV8ciizvEBAlZff9ktRJumGEaXKAVQZb9FGSoq+Xz2iyH3vAQ3VCwDtTNsyXKcv3RIAsLkm9eb24moxtJukI0LAR92+hAedjnZNmK0MVrDWg7lVKyHSGr+zZsydTK8YSd/lPE9aLVkfstyg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9zJLb1MeZEmq22+DwtJXUd5sfLp66UlF2tspdckrzeQ=;
- b=NSlHwU6HDki9h71bkLWXCZf1QsQ2yigG3hTylvJfnZLLFu9D/sRvG6BLyZ8lkOoQOWPfSoj1cMEdqYpoS2mNz3HZit0obHC/2iDY71U3fmX2ymJ2Np+1f5WRjKAxdnE+OhZ4mK9OPpuIMEQhCP9/MuMnYFho1OEf86aEi7G/oIo=
-Received: from CH5P222CA0009.NAMP222.PROD.OUTLOOK.COM (2603:10b6:610:1ee::25)
- by MN2PR12MB4333.namprd12.prod.outlook.com (2603:10b6:208:1d3::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Mon, 11 Dec
- 2023 18:58:29 +0000
-Received: from DS1PEPF00017093.namprd03.prod.outlook.com
- (2603:10b6:610:1ee:cafe::a8) by CH5P222CA0009.outlook.office365.com
- (2603:10b6:610:1ee::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32 via Frontend
- Transport; Mon, 11 Dec 2023 18:58:28 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS1PEPF00017093.mail.protection.outlook.com (10.167.17.136) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7091.18 via Frontend Transport; Mon, 11 Dec 2023 18:58:28 +0000
-Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Mon, 11 Dec
- 2023 12:58:26 -0600
-From: Shannon Nelson <shannon.nelson@amd.com>
-To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<edumazet@google.com>, <pabeni@redhat.com>
-CC: <brett.creeley@amd.com>, <drivers@pensando.io>, Shannon Nelson
-	<shannon.nelson@amd.com>
-Subject: [PATCH net-next 8/8] ionic: fill out pci error handlers
-Date: Mon, 11 Dec 2023 10:58:04 -0800
-Message-ID: <20231211185804.18668-9-shannon.nelson@amd.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20231211185804.18668-1-shannon.nelson@amd.com>
-References: <20231211185804.18668-1-shannon.nelson@amd.com>
+Received: from mail-oa1-x4a.google.com (mail-oa1-x4a.google.com [IPv6:2001:4860:4864:20::4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0321EBD
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 11:10:04 -0800 (PST)
+Received: by mail-oa1-x4a.google.com with SMTP id 586e51a60fabf-1ef4f8d294eso7379877fac.1
+        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 11:10:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702321803; x=1702926603; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=pLJuiH0afxkaD2YOLBf8rgHfrGxhKASBgMKSWQ9l3mE=;
+        b=DXZXHnvWDv1GI9kRvrmRjIx3m4w0oTSRYgeKHGm4CwXW/tMsCg/+wi861aOf8Sgf7R
+         EfwTiB/u9o3jZYKgDVsLxHNgoQlclQM8Q9oB2zjj5uP4WXafk+AAS5w+1+rZiHLy/VMd
+         yGJ8WGJCdPYaYy8b+Q1fIKmxwoAXQO9go0xtIkcpYXffAdyTq+ClrG7If+nEbURcov3C
+         YN2iqYt/ymSkBL3b4QVuHaqOGyIEq/g1vuaoytBAYcizwy1flPTYkStBjKadZ72tn58F
+         igw70YImFR9E7k68vHr0d4oO9CRbDgPHldWj4Zqr9wj4cD4E9BAQGxFmfswK9wtX1Ng5
+         EZ8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702321803; x=1702926603;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pLJuiH0afxkaD2YOLBf8rgHfrGxhKASBgMKSWQ9l3mE=;
+        b=nh5yg8TxhGakyWqqAs6lEn06OFwMNJ5YACPmaLMmaB2ITSPcxDg3pkvgyQ9gbSNGxB
+         Algh0sTlloUERT3PJczu3yVPixq6+oY08Wbi5arYwPsQYACVNTYIxj0RXIGxsbMIvAXZ
+         /ImvOvX9Os5VHb3xkF4YDccrMdpQr3JeQxn5LDtVm/MdZ4HTsVqKo0GsG3vd9Wr4UvPu
+         PNy2UgUdKEjFKlHlyOWhCkUOwmHwlHpSHFN/TuEX1Avi4kR1yuj+DWSA7bnphObWcvpI
+         k+mu3l6jYPIFveDXjjf5foPTjmEA8UL4tidVUNnZ5Kt4dqj469iuLc33SUZUI7F1O4I1
+         NlJQ==
+X-Gm-Message-State: AOJu0YzZxutu/AUDgVeNHC1gXqSp7xY1+UIu29a8ktJVgppbmBdR0z3a
+	Oo1eRwlZH2w1i+ZrUbB93xk1jb3G2Eo93GjhUQ==
+X-Google-Smtp-Source: AGHT+IHvKqZP7f3jQfiI7xCBWbc5qtLEWaeWmYvrD28lL4j/tV/o+OHKvd7szRecAtwyGcYAOPdL5mAJDugJ7cETuQ==
+X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
+ (user=justinstitt job=sendgmr) by 2002:a05:6870:e415:b0:1fb:1176:50ff with
+ SMTP id n21-20020a056870e41500b001fb117650ffmr5427291oag.6.1702321803322;
+ Mon, 11 Dec 2023 11:10:03 -0800 (PST)
+Date: Mon, 11 Dec 2023 19:10:00 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017093:EE_|MN2PR12MB4333:EE_
-X-MS-Office365-Filtering-Correlation-Id: ae16e821-8246-46f6-0607-08dbfa7b299d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	bho4lzy2aH+3CmqrDGgdDFFV/IqUVz0iG54E4375JJTCrvCpaxJDG9vxSerKwx2z1HFNtbBCHYrbHDlVnU1S3g2DFTW+PM6fHOl/lz0sWf212Bz1R/EqsnSwgVrX54rHB0OFZQTqL76ngMnVsVr2cOeJKPabMlfM5vYTE6IOgp/Z4XRDJ6rMRwfwNf+3EprrVcuQUyeB1lB/EBi7uOfHJcjW/UkdcIen4M37j4omRIoZAGl4B3/yjywXdFnwJHo10ZqO/syai7hW+bzZtcZTFK2x15ovkI7oeRkv1UTE99Sjg1cP/dBnEV4vPHTa1DKOiDbfN7GWZOA/6Qkfj8RlzsMzAHfMm8SDHh/0bjuM1RwJXYooR4hTcZEx3NWLyjruOUMUTokVjanmatYPomYRR7BaOHFFE29J3r316h3d4QcxDrcMb4ojtkP/qXfZK/SzC68B6R1AMrodI0RNEdaNbS9P2fj02f7TnCLIqDrk4QX558Z0wsXGtNy/Ax+nwg2QrlyAuySoxGAtIaODWo0EryfDGs5IJFgxIsVUv6IIMAkbcsk93wtXfHHJWz6vUjZCBPF7klsDvMoLYnhPAfwjlFGp8OPp4vL5M8jovltFv7kvPnBmklbDaD1DHTgDBNXkeMus20sYAPYAOy0nqAM1x8fmCetHW2OMH3BhrXpg4NP9XOW2oL56vb+Rlzbp6I/zB8NTl8wfY/SYv/Fo1pgStd+XhFClfm79nzDeQw9pt5GXf7d11qijjnbqzS7qLUuEK4u8EHtuW0jAhPy4g+aXQQ==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(396003)(39860400002)(346002)(136003)(230922051799003)(186009)(1800799012)(82310400011)(64100799003)(451199024)(46966006)(36840700001)(40470700004)(40460700003)(2906002)(41300700001)(36860700001)(110136005)(36756003)(86362001)(356005)(82740400003)(2616005)(81166007)(1076003)(83380400001)(336012)(426003)(16526019)(26005)(478600001)(47076005)(6666004)(4326008)(5660300002)(44832011)(316002)(70586007)(54906003)(70206006)(8936002)(8676002)(40480700001)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2023 18:58:28.8353
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ae16e821-8246-46f6-0607-08dbfa7b299d
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF00017093.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4333
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAIded2UC/5WNvQrCMBRGX0UyG8kPVuvke4hDc+9tGrBJSUqwl
+ L67aR3ETZcPzjecM7NE0VFil93MImWXXPAF9H7HoGu8Je6wMFNCaSmk4mmMHoaJY3SZYuKeRt6
+ jC++xQxngBhFrQgGVFqyohkite26Z271w59IY4rRVs1zfPwNZcskbUxtRQQvYmKsNwT7oAKFna yGrj1WJ049WVaygznhUiBpb+rIuy/ICm7kPhi8BAAA=
+X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1702321802; l=2882;
+ i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
+ bh=eLgUSsGRn6KvttCFjRNfTegIE4/MfMaKpVwBfZ9Mjyw=; b=4k3Sy8wCNWvA4Zo9ZylXCECbUz9MlMkk4n1/lpfkHH9mPOzfccsgiWsA7pNu7eVmRvk5OA8R3
+ ZGAN8m2trIxBVgmT/c0T+5IdaK9w5hrN5MwA5ExGe5c9OEfdps0SHAN
+X-Mailer: b4 0.12.3
+Message-ID: <20231211-strncpy-drivers-net-mdio-mdio-gpio-c-v3-1-76dea53a1a52@google.com>
+Subject: [PATCH v3] net: mdio-gpio: replace deprecated strncpy with strscpy
+From: Justin Stitt <justinstitt@google.com>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, Justin Stitt <justinstitt@google.com>
+Content-Type: text/plain; charset="utf-8"
 
-Set up the pci_error_handlers error_detected and resume to be useful in
-handling AER events.  If the error detected is pci_channel_io_frozen we
-set up to do an FLR at the end of the AER handling - this tends to clear
-things up well enough that traffic can continue.  Else, let the AER/PCI
-machinery do what is needed for the less serious errors seen.
+strncpy() is deprecated for use on NUL-terminated destination strings
+[1] and as such we should prefer more robust and less ambiguous string
+interfaces.
 
-Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+We expect new_bus->id to be NUL-terminated but not NUL-padded based on
+its prior assignment through snprintf:
+|       snprintf(new_bus->id, MII_BUS_ID_SIZE, "gpio-%x", bus_id);
+
+Due to this, a suitable replacement is `strscpy` [2] due to the fact
+that it guarantees NUL-termination on the destination buffer without
+unnecessarily NUL-padding.
+
+We can also use sizeof() instead of a length macro as this more closely
+ties the maximum buffer size to the destination buffer. Do this for two
+instances.
+
+Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+Link: https://github.com/KSPP/linux/issues/90
+Cc: linux-hardening@vger.kernel.org
+Signed-off-by: Justin Stitt <justinstitt@google.com>
 ---
- .../ethernet/pensando/ionic/ionic_bus_pci.c   | 25 +++++++++++++++++++
- 1 file changed, 25 insertions(+)
+Changes in v3:
+- swap another instance of MII_BUS_ID_SIZE to sizeof() (thanks Russell)
+- rebase onto mainline bee0e7762ad2c602
+- Link to v2: https://lore.kernel.org/r/20231207-strncpy-drivers-net-mdio-mdio-gpio-c-v2-1-c28d52dd3dfe@google.com
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-index 60e64ef043af..c49aa358e424 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-@@ -469,10 +469,35 @@ static void ionic_reset_done(struct pci_dev *pdev)
- 		__func__, err ? "failed" : "done");
- }
+Changes in v2:
+- change subject line as it was causing problems in patchwork with
+  "superseded" label being improperly applied.
+- update commit msg with rationale around sizeof() (thanks Kees)
+- Link to v1 (lore): https://lore.kernel.org/r/20231012-strncpy-drivers-net-mdio-mdio-gpio-c-v1-1-ab9b06cfcdab@google.com
+- Link to v1 (patchwork): https://patchwork.kernel.org/project/netdevbpf/patch/20231012-strncpy-drivers-net-mdio-mdio-gpio-c-v1-1-ab9b06cfcdab@google.com/
+- Link to other patch with same subject message: https://patchwork.kernel.org/project/netdevbpf/patch/20231012-strncpy-drivers-net-phy-mdio_bus-c-v1-1-15242e6f9ec4@google.com/
+---
+Note: build-tested only.
+
+Found with: $ rg "strncpy\("
+---
+ drivers/net/mdio/mdio-gpio.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/mdio/mdio-gpio.c b/drivers/net/mdio/mdio-gpio.c
+index 897b88c50bbb..778db310a28d 100644
+--- a/drivers/net/mdio/mdio-gpio.c
++++ b/drivers/net/mdio/mdio-gpio.c
+@@ -123,9 +123,9 @@ static struct mii_bus *mdio_gpio_bus_init(struct device *dev,
+ 	new_bus->parent = dev;
  
-+static pci_ers_result_t ionic_pci_error_detected(struct pci_dev *pdev,
-+						 pci_channel_state_t error)
-+{
-+	if (error == pci_channel_io_frozen) {
-+		ionic_reset_prepare(pdev);
-+		return PCI_ERS_RESULT_NEED_RESET;
-+	}
-+
-+	return PCI_ERS_RESULT_NONE;
-+}
-+
-+static void ionic_pci_error_resume(struct pci_dev *pdev)
-+{
-+	struct ionic *ionic = pci_get_drvdata(pdev);
-+	struct ionic_lif *lif = ionic->lif;
-+
-+	if (lif && test_bit(IONIC_LIF_F_FW_RESET, lif->state))
-+		pci_reset_function_locked(pdev);
-+}
-+
- static const struct pci_error_handlers ionic_err_handler = {
- 	/* FLR handling */
- 	.reset_prepare      = ionic_reset_prepare,
- 	.reset_done         = ionic_reset_done,
-+
-+	/* PCI bus error detected on this device */
-+	.error_detected     = ionic_pci_error_detected,
-+	.resume		    = ionic_pci_error_resume,
-+
- };
+ 	if (bus_id != -1)
+-		snprintf(new_bus->id, MII_BUS_ID_SIZE, "gpio-%x", bus_id);
++		snprintf(new_bus->id, sizeof(new_bus->id), "gpio-%x", bus_id);
+ 	else
+-		strncpy(new_bus->id, "gpio", MII_BUS_ID_SIZE);
++		strscpy(new_bus->id, "gpio", sizeof(new_bus->id));
  
- static struct pci_driver ionic_driver = {
--- 
-2.17.1
+ 	if (pdata) {
+ 		new_bus->phy_mask = pdata->phy_mask;
+
+---
+base-commit: bee0e7762ad2c6025b9f5245c040fcc36ef2bde8
+change-id: 20231012-strncpy-drivers-net-mdio-mdio-gpio-c-bddd9ed0c630
+
+Best regards,
+--
+Justin Stitt <justinstitt@google.com>
 
 
