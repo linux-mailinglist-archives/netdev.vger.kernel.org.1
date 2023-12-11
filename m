@@ -1,139 +1,72 @@
-Return-Path: <netdev+bounces-55825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B64180C614
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 11:11:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 526BE80C5FD
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 11:10:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 002BE1F2143A
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:11:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 834D21C20D71
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:10:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99E452D63B;
-	Mon, 11 Dec 2023 10:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aW5TJsPi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD09722EE3;
+	Mon, 11 Dec 2023 10:09:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DC20E8;
-	Mon, 11 Dec 2023 02:10:24 -0800 (PST)
-Received: by mail-ot1-x32f.google.com with SMTP id 46e09a7af769-6d9d0d0e083so3411118a34.2;
-        Mon, 11 Dec 2023 02:10:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702289423; x=1702894223; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pMa41XF+hwSqPxO7tGAD0COLCNlUqX7ebtlUkJcEZus=;
-        b=aW5TJsPiKtHapUqYbfqJKGm+XDD17F5A7l+lQX/bKA9fB9QKB0TCNuUAU9eZWmPDYL
-         A86i8PlyYUj2niUXv3ZexH/TpbXoCymrS+Vx4QCremumJUeeMWIjc8jb1qZISUbSJllx
-         +7lWDEvoKRcNSBIqiYfAII6Vo3+DXc9BmMDoFHWVnBAn9JTHhJ0zW3KEf6AsbuG21zi0
-         49UBTmL7offUnhZgWL+pk9dnSifKuQtRoUn+UpH//AyOdcaSSEwWH/2wcKsAnDUOey1D
-         U+twj1pD/a7q8PKvGNFCfkRh4GuogtaDHKRDqWz2dubqD36DdKXDqtuMYx6oF8MrH39R
-         bq3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702289423; x=1702894223;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pMa41XF+hwSqPxO7tGAD0COLCNlUqX7ebtlUkJcEZus=;
-        b=vBf3/y/ks7gEJoE1C9q6a6uNKKXlFpaafAVWg80CmmNruyW5hXk+3ivRsWErD6CKUf
-         GSEMNfJ8KV+QevNOEDPo793CgPv8VbyrzYDvkzyopSw8f0yseJT6ttVMYRtg29DOG12V
-         OYLWltLdI8kwF55fxp5wQr5z4T9kZKoDscKXMv0QR51hTKiY6PLM2ekmJbKvuD8HBErE
-         f3CamofhW605rKzpDQTNiD/mtZI6EYlUSbL4D/b8C5bEY0F62frSLuSVA45L/AhYIifZ
-         09nv3CQ4vPCpEq4G7lh3ycCcbRtFKFQBh9vvilSWQSCa1msbfsQ8Ct5nl9a8g1QoLrwd
-         XVHQ==
-X-Gm-Message-State: AOJu0YxJzOK4QxabTscT/7+ia/Q4TxoyWn/kcN6JOXsof9Jd6F8fFDL9
-	piPBGyJ/f1pcroNKxg0B2hVEa8bJT3O7JdIn
-X-Google-Smtp-Source: AGHT+IGNwz6Ri5YdJZWQ7k5JV2hte+Ad5Nvgw0lSu5rj9IzMjD118mwcN9SHQ4/hM3hF8aigD4orPg==
-X-Received: by 2002:a05:6830:1e83:b0:6d9:a60e:e3e5 with SMTP id n3-20020a0568301e8300b006d9a60ee3e5mr3494242otr.35.1702289423510;
-        Mon, 11 Dec 2023 02:10:23 -0800 (PST)
-Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id o17-20020a656151000000b005c2420fb198sm5151733pgv.37.2023.12.11.02.10.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 02:10:23 -0800 (PST)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	Po-Hsu Lin <po-hsu.lin@canonical.com>,
-	Andrea Mayer <andrea.mayer@uniroma2.it>,
-	Amit Cohen <amcohen@nvidia.com>,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH net-next 13/13] selftests/net: convert fdb_flush.sh to run it in unique namespace
-Date: Mon, 11 Dec 2023 18:09:25 +0800
-Message-ID: <20231211100925.3249265-14-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231211100925.3249265-1-liuhangbin@gmail.com>
-References: <20231211100925.3249265-1-liuhangbin@gmail.com>
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B855107;
+	Mon, 11 Dec 2023 02:09:51 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0VyFRZUV_1702289387;
+Received: from 30.221.130.53(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VyFRZUV_1702289387)
+          by smtp.aliyun-inc.com;
+          Mon, 11 Dec 2023 18:09:49 +0800
+Message-ID: <1c14f769-8da2-fdac-cec2-a59ab69284ad@linux.alibaba.com>
+Date: Mon, 11 Dec 2023 18:09:45 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next v5 7/9] net/smc: support extended GID in SMC-D
+ lgr netlink attribute
+To: Alexandra Winter <wintera@linux.ibm.com>, wenjia@linux.ibm.com,
+ hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kgraul@linux.ibm.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, raspl@linux.ibm.com,
+ schnelle@linux.ibm.com, guangguan.wang@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <1702021259-41504-1-git-send-email-guwen@linux.alibaba.com>
+ <1702021259-41504-8-git-send-email-guwen@linux.alibaba.com>
+ <8b651c68-c51d-49a9-9df0-58e9110fa47d@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <8b651c68-c51d-49a9-9df0-58e9110fa47d@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Here is the test result after conversion.
-]# ./fdb_flush.sh
-TEST: vx10: Expected 5 FDB entries, got 5                           [ OK ]
-TEST: vx20: Expected 5 FDB entries, got 5                           [ OK ]
-...
-TEST: vx10: Expected 5 FDB entries, got 5                           [ OK ]
-TEST: Test entries with dst 192.0.2.1                               [ OK ]
 
-Acked-by: David Ahern <dsahern@kernel.org>
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
- tools/testing/selftests/net/fdb_flush.sh | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/tools/testing/selftests/net/fdb_flush.sh b/tools/testing/selftests/net/fdb_flush.sh
-index 90e7a29e0476..d5e3abb8658c 100755
---- a/tools/testing/selftests/net/fdb_flush.sh
-+++ b/tools/testing/selftests/net/fdb_flush.sh
-@@ -5,6 +5,8 @@
- # Check that flush works as expected with all the supported arguments and verify
- # some combinations of arguments.
- 
-+source lib.sh
-+
- FLUSH_BY_STATE_TESTS="
- 	vxlan_test_flush_by_permanent
- 	vxlan_test_flush_by_nopermanent
-@@ -739,10 +741,9 @@ bridge_vxlan_test_flush()
- 
- setup()
- {
--	IP="ip -netns ns1"
--	BRIDGE="bridge -netns ns1"
--
--	ip netns add ns1
-+	setup_ns NS
-+	IP="ip -netns ${NS}"
-+	BRIDGE="bridge -netns ${NS}"
- 
- 	$IP link add name vx10 type vxlan id 1000 dstport "$VXPORT"
- 	$IP link add name vx20 type vxlan id 2000 dstport "$VXPORT"
-@@ -759,7 +760,7 @@ cleanup()
- 	$IP link del dev vx20
- 	$IP link del dev vx10
- 
--	ip netns del ns1
-+	cleanup_ns ${NS}
- }
- 
- ################################################################################
--- 
-2.43.0
+On 2023/12/11 17:39, Alexandra Winter wrote:
+> 
+> 
+> On 08.12.23 08:40, Wen Gu wrote:
+>> Virtual ISM devices introduced in SMCv2.1 requires a 128 bit extended
+>> GID vs. the existing ISM 64bit GID. So the 2nd 64 bit of extended GID
+>> should be included in SMC-D linkgroup netlink attribute as well.
+>>
+>> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+>> ---
+> 
+> This patch did not apply cleanly.
+> Please always base patches on the current net-next
 
+Strange.. I can apply them cleanly with the latest net-next
+(6e944cc68633 ("Merge branch 'rswitch-jumbo-frames'")).
+
+Could you please try again? Thanks.
 
