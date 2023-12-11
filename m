@@ -1,156 +1,111 @@
-Return-Path: <netdev+bounces-55899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B834180CBEF
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:56:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 930A280CBE2
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:55:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72F8328185B
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:56:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C26191C21347
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:55:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3801647A61;
-	Mon, 11 Dec 2023 13:56:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BDBC47A42;
+	Mon, 11 Dec 2023 13:55:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iUx8E6+D"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1CQSVdej"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1785E47A5A;
-	Mon, 11 Dec 2023 13:56:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6792AC433CB;
-	Mon, 11 Dec 2023 13:56:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702302961;
-	bh=uP1VjsneWpfR4iUeZhrkYgu+kGytmeEBdGkWjX6Y7VE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iUx8E6+DBl0QQUUoMlctYC+3uQV9vWTVjohKuJKpIc4ga6Y4VO8ltwWnBkk8b3MF1
-	 A8Zibl12oxWT6BPORI5QNyGQxRdOpoZyQDHVKJjw/h+Sy2xb4yA8LhSnNbnT3ZPh/N
-	 3VJ3Iw9Q7fGatZEKVirtAxcFzLVRf5SblbiqH5ZP8AxaS9jhSVfp3kTd8FNNYheVbk
-	 TrsZ6KeGUnNGzN/WanWkQbQqu0XO3w8Je/SZ9o04dDj+9ipz7StE2lysSBZio6fEI/
-	 7NniJOwoJ+xv3IGW4qHLei4JjLWnjKa8H14+qpkLJbNqF8M1AGiCAYrOwD75d+ZcDC
-	 eiWRPVqnphFPA==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Thinh Tran <thinhtr@linux.vnet.ibm.com>,
-	Venkata Sai Duggi <venkata.sai.duggi@ibm.com>,
-	David Christensen <drc@linux.vnet.ibm.com>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	pavan.chebbi@broadcom.com,
-	mchan@broadcom.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 16/29] net/tg3: fix race condition in tg3_reset_task()
-Date: Mon, 11 Dec 2023 08:54:00 -0500
-Message-ID: <20231211135457.381397-16-sashal@kernel.org>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231211135457.381397-1-sashal@kernel.org>
-References: <20231211135457.381397-1-sashal@kernel.org>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB23812E;
+	Mon, 11 Dec 2023 05:55:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=a5KlyULzT0peuZ0c1QWXDeAwyadS1a4REYYtErhjE+A=; b=1CQSVdejU3ZzLEn2q0Fn/CRiw6
+	ofo935OiRRj+zg2q8PJUmbmZnLm7uOOeblonKXNxqHr5k0MFhQBvzz8igGt0VyYzA2MgtKyMPh2Mj
+	w5tBE+e5kab9YD2PWkOtKPYKb8TCcABIttfQ/nrEv8dJ/k5yOH553EB21IQQVXSDOOfA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rCgkD-002cfT-2r; Mon, 11 Dec 2023 14:54:49 +0100
+Date: Mon, 11 Dec 2023 14:54:49 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/3] net: microchip_t1s: additional phy support and
+ collision detect handling
+Message-ID: <e4e675be-bbef-4fff-8bc2-d07bc1981ae2@lunn.ch>
+References: <20231127104045.96722-1-ramon.nordin.rodriguez@ferroamp.se>
+ <d79803b5-60ec-425b-8c5c-3e96ff351e09@lunn.ch>
+ <ZWS2GYBGGZg2MS0d@debian>
+ <270f74c0-4a1d-4a82-a77c-0e8a8982e80f@lunn.ch>
+ <ZXWqrPkaJD2i5g-d@builder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.66
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZXWqrPkaJD2i5g-d@builder>
 
-From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+> ## with collision detection enabled
+> 
+> iperf3 normal
+> - - - - - - - - - - - - - - - - - - - - - - - - -
+> [ ID] Interval           Transfer     Bitrate         Retr
+> [  5]   0.00-10.00  sec  5.54 MBytes  4.65 Mbits/sec    0             sender
+> [  5]   0.00-10.01  sec  5.40 MBytes  4.53 Mbits/sec                  receiver
+> 
+> iperf3 reverse
+> - - - - - - - - - - - - - - - - - - - - - - - - -
+> [ ID] Interval           Transfer     Bitrate         Retr
+> [  5]   0.00-10.00  sec   929 KBytes   761 Kbits/sec  293             sender
+> [  5]   0.00-10.00  sec   830 KBytes   680 Kbits/sec                  receiver
+> 
+> 
+> ## with collision detection disabled
+> 
+> iperf3 normal
+> - - - - - - - - - - - - - - - - - - - - - - - - -
+> [ ID] Interval           Transfer     Bitrate         Retr
+> [  5]   0.00-10.00  sec  6.39 MBytes  5.36 Mbits/sec    0             sender
+> [  5]   0.00-10.04  sec  6.19 MBytes  5.17 Mbits/sec                  receiver
+> 
+> iperf3 reverse
+> - - - - - - - - - - - - - - - - - - - - - - - - -
+> [ ID] Interval           Transfer     Bitrate         Retr
+> [  5]   0.00-10.27  sec  1.10 MBytes   897 Kbits/sec  268             sender
+> [  5]   0.00-10.00  sec  1.01 MBytes   843 Kbits/sec                  receiver
+> 
+> # Conclusions
+> 
+> The arm system running the lan865x macphy uses a not yet mainlined driver, see
+> https://lore.kernel.org/all/20231023154649.45931-1-Parthiban.Veerasooran@microchip.com/
+> 
+> The lan865x driver crashed out every once in a while on reverse mode, there
+> is definetly something biased in the driver for tx over rx.
+>
+> Then again it's not accepted yet.
+> 
+> Disabling collision detection seemes to have an positive effect.
+> Slightly higher speeds and slightly fewer retransmissions.
 
-[ Upstream commit 16b55b1f2269962fb6b5154b8bf43f37c9a96637 ]
+I would want to first understand why there is such a big difference
+with the direction. Is it TCP backing off because of the packet loss?
+Or is there some other problem.
 
-When an EEH error is encountered by a PCI adapter, the EEH driver
-modifies the PCI channel's state as shown below:
+Maybe try with UDP streams, say with a bandwidth of 5Mbps. Do you
+loose 4Mbps in one direction? Or a much smaller number of packets.
 
-   enum {
-      /* I/O channel is in normal state */
-      pci_channel_io_normal = (__force pci_channel_state_t) 1,
+Are there any usable statistics? FCS errors?
 
-      /* I/O to channel is blocked */
-      pci_channel_io_frozen = (__force pci_channel_state_t) 2,
-
-      /* PCI card is dead */
-      pci_channel_io_perm_failure = (__force pci_channel_state_t) 3,
-   };
-
-If the same EEH error then causes the tg3 driver's transmit timeout
-logic to execute, the tg3_tx_timeout() function schedules a reset
-task via tg3_reset_task_schedule(), which may cause a race condition
-between the tg3 and EEH driver as both attempt to recover the HW via
-a reset action.
-
-EEH driver gets error event
---> eeh_set_channel_state()
-    and set device to one of
-    error state above           scheduler: tg3_reset_task() get
-                                returned error from tg3_init_hw()
-                             --> dev_close() shuts down the interface
-tg3_io_slot_reset() and
-tg3_io_resume() fail to
-reset/resume the device
-
-To resolve this issue, we avoid the race condition by checking the PCI
-channel state in the tg3_reset_task() function and skip the tg3 driver
-initiated reset when the PCI channel is not in the normal state.  (The
-driver has no access to tg3 device registers at this point and cannot
-even complete the reset task successfully without external assistance.)
-We'll leave the reset procedure to be managed by the EEH driver which
-calls the tg3_io_error_detected(), tg3_io_slot_reset() and
-tg3_io_resume() functions as appropriate.
-
-Adding the same checking in tg3_dump_state() to avoid dumping all
-device registers when the PCI channel is not in the normal state.
-
-Signed-off-by: Thinh Tran <thinhtr@linux.vnet.ibm.com>
-Tested-by: Venkata Sai Duggi <venkata.sai.duggi@ibm.com>
-Reviewed-by: David Christensen <drc@linux.vnet.ibm.com>
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
-Link: https://lore.kernel.org/r/20231201001911.656-1-thinhtr@linux.vnet.ibm.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/net/ethernet/broadcom/tg3.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index 85570e40c8e9b..95e478882ec13 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -6447,6 +6447,14 @@ static void tg3_dump_state(struct tg3 *tp)
- 	int i;
- 	u32 *regs;
- 
-+	/* If it is a PCI error, all registers will be 0xffff,
-+	 * we don't dump them out, just report the error and return
-+	 */
-+	if (tp->pdev->error_state != pci_channel_io_normal) {
-+		netdev_err(tp->dev, "PCI channel ERROR!\n");
-+		return;
-+	}
-+
- 	regs = kzalloc(TG3_REG_BLK_SIZE, GFP_ATOMIC);
- 	if (!regs)
- 		return;
-@@ -11175,7 +11183,8 @@ static void tg3_reset_task(struct work_struct *work)
- 	rtnl_lock();
- 	tg3_full_lock(tp, 0);
- 
--	if (tp->pcierr_recovery || !netif_running(tp->dev)) {
-+	if (tp->pcierr_recovery || !netif_running(tp->dev) ||
-+	    tp->pdev->error_state != pci_channel_io_normal) {
- 		tg3_flag_clear(tp, RESET_TASK_PENDING);
- 		tg3_full_unlock(tp);
- 		rtnl_unlock();
--- 
-2.42.0
-
+    Andrew
 
