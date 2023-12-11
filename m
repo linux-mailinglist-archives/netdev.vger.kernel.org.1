@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-55699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F03A80C024
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 04:53:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA71F80C025
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 04:53:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8AFFBB20952
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 03:53:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 950F5280C63
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 03:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9BEF168C4;
-	Mon, 11 Dec 2023 03:53:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9EDD168C6;
+	Mon, 11 Dec 2023 03:53:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jEbyzVmX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CVkoZ1/E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D389FF1
-	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 19:53:21 -0800 (PST)
-Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-5d3d5b10197so32879417b3.2
-        for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 19:53:21 -0800 (PST)
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0316F1
+	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 19:53:27 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id 98e67ed59e1d1-28862fdfb44so2958651a91.0
+        for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 19:53:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702266801; x=1702871601; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1702266807; x=1702871607; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=J730iItaW8fpD9bcYiCc3WSDtwgBtsyA2Jb0R83edv4=;
-        b=jEbyzVmXtx93SPZBlUQnFwIcDofx8tluURMOzs53HtLaF3SzAIZJ4Wym1WEnVIIzXr
-         meAGY0Z06w+H0ehJl/2vMNWrVPtqimvW3ozO4dJVnfvPF6XpmIpmmEfmpg2mPlIkhnSF
-         bXRLILsg4XcVH9EkjJb3X7g6tlzIJZeUkYdoQk+Sxl/soKN71ljBk8rRHXWqFTnPE0o1
-         hzNjLAEEciA0SZ4Zc3IWTI6u5DQruNxElY9Mr1vykkzA2U38FtSv+kt/l71Ia9IE0jwY
-         exf29mjNmSpRlxcAH3u59+a6gbXElCMFKfm/q0JakptRRNRH5nDHpAX8OqjeKi3aZksJ
-         j4ew==
+        bh=G2d8n0WXue9ygrbxloUCx8WAoE9HhkQ6PXxWrjAEYxU=;
+        b=CVkoZ1/EqOhWB+lBgbfq4Bzh2V1BIROBlPUH5YNmyscLc5gv+b9vza8oMD8xvQw4/U
+         gK6wNkzmnYYx5nUxLv/hCT5W+qLWbeY4cl0rwzKnfFXFF620FX5TVAILKvvlIRDNwZJ9
+         ZdtbGXhaPnTSu9LGyLzs8fSrbSMoiwHx258deoIrEdr4QYS7UifvS+kTc2eMejSdUJk4
+         oZI3/wqgKq8KTzJ45QmoJapWALNkzQA5TFb9a66XH5v95Unpz9Ywyq/RI6kbNfce2V2n
+         lgJcoLpCziB+PzPJZNqi+os4lLRCRlJB0CrNoDRuER4fUC2RMZHPWk4YCVz7NvztepVW
+         SM4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702266801; x=1702871601;
+        d=1e100.net; s=20230601; t=1702266807; x=1702871607;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=J730iItaW8fpD9bcYiCc3WSDtwgBtsyA2Jb0R83edv4=;
-        b=vJvIXCBjz2q8BvRErpk+mIn4L03DabgjXgalQLSxtD4SzYs8ZtCI+g8jkC4Vo6+x0W
-         Va9O3kUm1F5cfxgCXXAswcRswe47mLdCsP3PU7gzQ7/48/gq3vPnUK4qWyyBasfk8fUk
-         r5SZGjVvnKDlRdIqapDIiHU0P/0UJnhFPQ0atUo3r1m6dmcFTtyDpVmiMcfKQHGH+vrP
-         x7tdIqF+iIsPt+M981TAdGW/+qcixRphAY1YjkPjizt/xws0xJraaVsQJsLy2vnRG5w8
-         bVeAY0+0XTBx/ZxQGejhsjiYKBkpo6dp8LIehk5hbNb9Ve4Vh0bR4l9IZ+R42rKV+VuB
-         TJdA==
-X-Gm-Message-State: AOJu0YywxVKJDUR2ENxFhSSfTMOzkS5TLSAI8xvWjvp6G/wmoj6iFQ9x
-	eqSfTHlF5+xjKvfL9jP6sZY=
-X-Google-Smtp-Source: AGHT+IHcK2/Q8KqUlgqgd9YgADevE8eOhbq+FQOnrZxm7i37nZvpcynhBH5Vgt0k8DumJ+fezNSkrA==
-X-Received: by 2002:a81:8406:0:b0:5d4:2ab1:9f0a with SMTP id u6-20020a818406000000b005d42ab19f0amr2593146ywf.42.1702266800986;
-        Sun, 10 Dec 2023 19:53:20 -0800 (PST)
+        bh=G2d8n0WXue9ygrbxloUCx8WAoE9HhkQ6PXxWrjAEYxU=;
+        b=ryf5OTMvcbpXc6i1df7proUIm67qiSsTgglKA0t8+tiy3PuO1pUH//IwUMftYZEylv
+         CZqlAEltZMzGkdW1zhHNLiOzxudRVtU4MMpwiMALgyM+nEH69rrQXgFLzUF6E7SUgFy5
+         iuuTz+h2xPqSKgmGSDxVIoo//6firflMkRDv8XQfCXJirEC7e84vwd1Pq9O68QCtsae1
+         UY2k/3silM/Tuzy+px6tXWGO4glhmt9LHCmYHW15Tag+F9jUs48CXLot5vv+LhgCRoGv
+         83LEapFVpmqc+kl1pp9EApyrTXIe6Rsjun1viqPwj2cO+vPPo/0ICrtnWGObxyDHG4M+
+         d4UQ==
+X-Gm-Message-State: AOJu0Yw6TpxHgStOs0MEIYlNZI025eUigiHG0FthOFZYKQGIiMC7jn3/
+	O7m4nxLRu/S7cfJXPAxoycgNTK0Rjeo=
+X-Google-Smtp-Source: AGHT+IF/9zzYT5dBgAhPgi9UwWntEpQIso8WA4BYMk8jEYQTrt8722TIA7PHJFeT1xdLlXRfSo/WOA==
+X-Received: by 2002:a17:902:d4c5:b0:1d0:91c3:aaf2 with SMTP id o5-20020a170902d4c500b001d091c3aaf2mr1656471plg.25.1702266806761;
+        Sun, 10 Dec 2023 19:53:26 -0800 (PST)
 Received: from localhost.localdomain ([89.187.161.180])
-        by smtp.gmail.com with ESMTPSA id b8-20020a170903228800b001d052d1aaf2sm5411491plh.101.2023.12.10.19.53.14
+        by smtp.gmail.com with ESMTPSA id b8-20020a170903228800b001d052d1aaf2sm5411491plh.101.2023.12.10.19.53.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 10 Dec 2023 19:53:20 -0800 (PST)
+        Sun, 10 Dec 2023 19:53:25 -0800 (PST)
 From: Liang Chen <liangchen.linux@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -66,9 +66,9 @@ Cc: netdev@vger.kernel.org,
 	jasowang@redhat.com,
 	almasrymina@google.com,
 	liangchen.linux@gmail.com
-Subject: [PATCH net-next v8 2/4] page_pool: halve BIAS_MAX for multiple user references of a fragment
-Date: Mon, 11 Dec 2023 11:52:41 +0800
-Message-Id: <20231211035243.15774-3-liangchen.linux@gmail.com>
+Subject: [PATCH net-next v8 3/4] skbuff: Add a function to check if a page belongs to page_pool
+Date: Mon, 11 Dec 2023 11:52:42 +0800
+Message-Id: <20231211035243.15774-4-liangchen.linux@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20231211035243.15774-1-liangchen.linux@gmail.com>
 References: <20231211035243.15774-1-liangchen.linux@gmail.com>
@@ -80,33 +80,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Referring to patch [1], in order to support multiple users referencing the
-same fragment and prevent overflow from pp_ref_count growing, the initial
-value of pp_ref_count is halved, leaving room for pp_ref_count to increment
-before the page is drained.
-
-[1]
-https://lore.kernel.org/all/20211009093724.10539-3-linyunsheng@huawei.com/
+Wrap code for checking if a page is a page_pool page into a
+function for better readability and ease of reuse.
 
 Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
 Reviewed-by: Yunsheng Lin <linyunsheng@huawei.com>
 ---
- net/core/page_pool.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/core/skbuff.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 106220b1f89c..436f7ffea7b4 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -26,7 +26,7 @@
- #define DEFER_TIME (msecs_to_jiffies(1000))
- #define DEFER_WARN_INTERVAL (60 * HZ)
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index b157efea5dea..7e26b56cda38 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -890,6 +890,11 @@ static void skb_clone_fraglist(struct sk_buff *skb)
+ 		skb_get(list);
+ }
  
--#define BIAS_MAX	LONG_MAX
-+#define BIAS_MAX	(LONG_MAX >> 1)
++static bool is_pp_page(struct page *page)
++{
++	return (page->pp_magic & ~0x3UL) == PP_SIGNATURE;
++}
++
+ #if IS_ENABLED(CONFIG_PAGE_POOL)
+ bool napi_pp_put_page(struct page *page, bool napi_safe)
+ {
+@@ -905,7 +910,7 @@ bool napi_pp_put_page(struct page *page, bool napi_safe)
+ 	 * and page_is_pfmemalloc() is checked in __page_pool_put_page()
+ 	 * to avoid recycling the pfmemalloc page.
+ 	 */
+-	if (unlikely((page->pp_magic & ~0x3UL) != PP_SIGNATURE))
++	if (unlikely(!is_pp_page(page)))
+ 		return false;
  
- #ifdef CONFIG_PAGE_POOL_STATS
- /* alloc_stat_inc is intended to be used in softirq context */
+ 	pp = page->pp;
 -- 
 2.31.1
 
