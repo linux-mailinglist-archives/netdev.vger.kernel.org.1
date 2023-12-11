@@ -1,110 +1,139 @@
-Return-Path: <netdev+bounces-56081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ABFD80DBD6
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 21:42:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EA5E80DBFD
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 21:49:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C02FB281C3D
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 20:42:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B7ED1F21563
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 20:49:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9377D53E3C;
-	Mon, 11 Dec 2023 20:42:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06B8C5466C;
+	Mon, 11 Dec 2023 20:49:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lfAdm+YZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7F79D6;
-	Mon, 11 Dec 2023 12:42:10 -0800 (PST)
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-1faecf57bedso3489012fac.3;
-        Mon, 11 Dec 2023 12:42:10 -0800 (PST)
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DC529F;
+	Mon, 11 Dec 2023 12:49:28 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-33334480eb4so5566780f8f.0;
+        Mon, 11 Dec 2023 12:49:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702327766; x=1702932566; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=FNt1leGWwF6iMNgl8vh4qT6p47tEM1r7xJkmF3rIPw0=;
+        b=lfAdm+YZKUmrhoa0+b7TXXu4yEaexLEknsBKbF89xi5NJTQZZBWcyqGYd74ivxcV3N
+         GSuiFYZgRe1TvwEzHTjzmkf5KV4VRaipmH+vfSaRZYsRgaYVf8IkIQGjyngRp4yjwbu0
+         6xcLJBI5nxAzqT6R3liS5H5lw0mriiqtm+Zus+Q/U93V3fC9KvBCRwrLR+QIPlzLU5dy
+         0paZK/BzmKUV3VdnjYFWINbPGkC7mIq/PzHVMVRy4EKlVqE5dKRUnjQQGO/YJaPYIwmC
+         zJeglbS2DeHjDQpaCaO3KSO72dgLnit6sL06QyhfF5oJ2DNATFFoLHnW/qIB0Ko1j54c
+         Ih+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702327330; x=1702932130;
-        h=date:subject:message-id:references:in-reply-to:cc:to:from
-         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=DFKQb/7yTTyqP+WONQNsPnQPZNy6QiIP6BOSliRozLg=;
-        b=qbtDXrEYb0KufNqIcKtyyPgy/5LUEqF4teDklozOdAvC+aulDWhdghFjMpMDgp7GD9
-         XHT9kJS7WrjBXCY4YjRHqkGz+3g5NcP0upSW+Pjhb21PHJ18Mp6sQ846f+kZ9OEGlXvq
-         vVP93AVv9E7RIF9BQhSltQF7CeNSSMDGhJJzJq6DBX83ZpPKsip7V1Ero0jK0/AaYtaT
-         kcdPxx+zxf+KNE4soUid2LQNNYl2uJKA/gcl7b5dMYd2uxTesMXPnDu4vCXRMeoJP+Wt
-         JV/FBxiAGwygzN2OIOmpOwo5UgZEBKmWep53og/RilhPUPcfNSL8F+cgBCW89JduJ+uH
-         Gqwg==
-X-Gm-Message-State: AOJu0YwMP66+a5OH5Hlamp4Si8BKZJKAnH3wB5ud3fnIl0hwUnHVfKdj
-	EfYw0sjVnU9o0i9m47LkVg==
-X-Google-Smtp-Source: AGHT+IERzgL6eT6297cLEdH1ofw1Mjm0oIzNAtg0LSFt/ya3Ieo/FesvjdPlj5Ed946IaU5+wZT0RQ==
-X-Received: by 2002:a05:6870:f155:b0:1fb:412:c2eb with SMTP id l21-20020a056870f15500b001fb0412c2ebmr6180027oac.50.1702327329989;
-        Mon, 11 Dec 2023 12:42:09 -0800 (PST)
-Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id gy16-20020a056870289000b001fb1bf9f5ddsm2656238oab.21.2023.12.11.12.42.08
+        d=1e100.net; s=20230601; t=1702327766; x=1702932566;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FNt1leGWwF6iMNgl8vh4qT6p47tEM1r7xJkmF3rIPw0=;
+        b=VFr+AZ2nI8Lnb2MrzJy2v2HF9CWFbhQd9L1tvWY6yo7QQRhdfhY6URk4U03FRL0tH3
+         ABubsiK5w3dDThoIUe8DWhwipOiaYgTAxVlJ4IPP9uHRJJlXW7NdVSpx3irdjgmToXx/
+         vkGkkP2Vz5bdX3/vGqkneq6kOyfq7piVYSa4fExvaR4LZA7VXzYnoT61KkZ3xW85DeWH
+         nTls4AH5ZQyO/acUPViXxYpVep2EgGe1JS14lhiXOgtrNVwcgJv9GxvBNlFyfkYX062r
+         9Bus3DmQtnqzpVBwcjqv+U8SCYdV+BX/sHGQi/JUfK90WdYG4tnXuXxbqk7MOx/ibGEF
+         yOmg==
+X-Gm-Message-State: AOJu0Ywwd7LAS/42a/YrHXq3sZTTSi8FTGBBJpZ4Y9Kih7xM+5zlDZQP
+	t9PtRyeF2Y277mJjakW3BFg=
+X-Google-Smtp-Source: AGHT+IH2XFdFabW6X217F3scHBOkH/lG9jnSJEwVmN7ZeT+/bl8+IDli3a7laaNgA/b33aOEYwS0ZA==
+X-Received: by 2002:a5d:61d1:0:b0:333:2fd2:2eda with SMTP id q17-20020a5d61d1000000b003332fd22edamr2434593wrv.83.1702327766165;
+        Mon, 11 Dec 2023 12:49:26 -0800 (PST)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id o10-20020a5d58ca000000b0033338c3ba42sm9375414wrf.111.2023.12.11.12.49.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 12:42:09 -0800 (PST)
-Received: (nullmailer pid 2870910 invoked by uid 1000);
-	Mon, 11 Dec 2023 20:42:08 -0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        Mon, 11 Dec 2023 12:49:25 -0800 (PST)
+Message-ID: <657775d5.5d0a0220.20552.2a2d@mx.google.com>
+X-Google-Original-Message-ID: <ZXd10iNX_S5S0vib@Ansuel-xps.>
+Date: Mon, 11 Dec 2023 21:49:22 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Rob Herring <robh@kernel.org>
+Cc: Rob Herring <robh+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [net-next RFC PATCH v2 3/4] dt-bindings: net: Document QCA808x
+ PHYs
+References: <20231211192318.16450-1-ansuelsmth@gmail.com>
+ <20231211192318.16450-3-ansuelsmth@gmail.com>
+ <170232732808.2870894.17994101779465776370.robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Rob Herring <robh+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org, devicetree@vger.kernel.org, Russell King <linux@armlinux.org.uk>, Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Florian Fainelli <f.fainelli@gmail.com>, Eric Dumazet <edumazet@google.com>, Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
-In-Reply-To: <20231211192318.16450-3-ansuelsmth@gmail.com>
-References: <20231211192318.16450-1-ansuelsmth@gmail.com>
- <20231211192318.16450-3-ansuelsmth@gmail.com>
-Message-Id: <170232732808.2870894.17994101779465776370.robh@kernel.org>
-Subject: Re: [net-next RFC PATCH v2 3/4] dt-bindings: net: Document QCA808x
- PHYs
-Date: Mon, 11 Dec 2023 14:42:08 -0600
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <170232732808.2870894.17994101779465776370.robh@kernel.org>
 
-
-On Mon, 11 Dec 2023 20:23:17 +0100, Christian Marangi wrote:
-> Add Documentation for QCA808x PHYs for the additional LED configuration
-> for this PHY.
+On Mon, Dec 11, 2023 at 02:42:08PM -0600, Rob Herring wrote:
 > 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
-> Changes v2:
-> - Fix License warning from checkpatch
-> - Drop redundant Description phrase
-> - Improve commit tile
-> - Drop special property (generalized)
+> On Mon, 11 Dec 2023 20:23:17 +0100, Christian Marangi wrote:
+> > Add Documentation for QCA808x PHYs for the additional LED configuration
+> > for this PHY.
+> > 
+> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > ---
+> > Changes v2:
+> > - Fix License warning from checkpatch
+> > - Drop redundant Description phrase
+> > - Improve commit tile
+> > - Drop special property (generalized)
+> > 
+> >  .../devicetree/bindings/net/qca,qca808x.yaml  | 58 +++++++++++++++++++
+> >  1 file changed, 58 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/net/qca,qca808x.yaml
+> > 
 > 
->  .../devicetree/bindings/net/qca,qca808x.yaml  | 58 +++++++++++++++++++
->  1 file changed, 58 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/qca,qca808x.yaml
+> My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+> on your patch (DT_CHECKER_FLAGS is new in v5.13):
 > 
+> yamllint warnings/errors:
+> 
+> dtschema/dtc warnings/errors:
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/qca,qca808x.yaml: 'anyOf' conditional failed, one must be fixed:
+> 	'properties' is a required property
+> 	'patternProperties' is a required property
+> 	hint: Metaschema for devicetree binding documentation
+> 	from schema $id: http://devicetree.org/meta-schemas/core.yaml#
+> 
+> doc reference errors (make refcheckdocs):
+> 
+> See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20231211192318.16450-3-ansuelsmth@gmail.com
+> 
+> The base for the series is generally the latest rc1. A different dependency
+> should be noted in *this* patch.
+> 
+> If you already ran 'make dt_binding_check' and didn't see the above
+> error(s), then make sure 'yamllint' is installed and dt-schema is up to
+> date:
+> 
+> pip3 install dtschema --upgrade
+> 
+> Please check and re-submit after running the above command yourself. Note
+> that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+> your schema. However, it must be unset to test all examples with your schema.
+>
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+Erm sorry for the bot error... But How to handle this? 
 
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/qca,qca808x.yaml: 'anyOf' conditional failed, one must be fixed:
-	'properties' is a required property
-	'patternProperties' is a required property
-	hint: Metaschema for devicetree binding documentation
-	from schema $id: http://devicetree.org/meta-schemas/core.yaml#
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20231211192318.16450-3-ansuelsmth@gmail.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+-- 
+	Ansuel
 
