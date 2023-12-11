@@ -1,214 +1,104 @@
-Return-Path: <netdev+bounces-55771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A98C80C459
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:21:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D300380C465
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:22:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1AE51F212B1
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 09:21:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89D801F212B4
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 09:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 110712111C;
-	Mon, 11 Dec 2023 09:21:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA6392111C;
+	Mon, 11 Dec 2023 09:22:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=l-acoustics.com header.i=@l-acoustics.com header.b="QoaMBSeD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QPpnOV53"
 X-Original-To: netdev@vger.kernel.org
-Received: from FRA01-MR2-obe.outbound.protection.outlook.com (mail-mr2fra01on2073.outbound.protection.outlook.com [40.107.9.73])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F78CF1;
-	Mon, 11 Dec 2023 01:21:11 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N7mcOeS7tynqSmldQL+6D+FQ3YtZBGvCvV94pYP1DN4fKHA/DsEjBWJfw+5KwjseYPr51NTXodQ5M/zebtFcqgzje97uK2wQWXXf6m+7VWFnuLyGMQwghbDnwmHh+VfvIpJWsC7w37G0/844tdHa0MwuYzXpOlrTKs069bDZRn0qo/zWD99GaCBjux546sorVqgH+8Mnv8HmUjltEqEpZiCP1xR6ziA6v54VTHQN+tx3Rvz6zGwDQ45lAeK+Ovh3osKDAZMtxbutiaZFvElmJITFNyIK8VdVQYRf9Cp7B2Vn2Gv5n7JavS+xfKh3Sp0U0A9L+YsrLZ/85KWOj2yVWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=awwjAMgbXXYN54U1bi/n81pbAi8/wZat4WA8YvoDdj4=;
- b=Am75HVnF2dSaptwcnJnf4aTLaPKxn3Dbc4So2We0V66Em1V06DQcaKmOp0AqE0HIqo05ngbm9suLlF9ga7PR8kMXNaSukhvhCY7RZigAyLxM3LwpnMaFPk4XDXmtfijoOHPkX1t0ierwuKKkwpKzxs8ZTmU+TN85TH0QhV6X+Zp9h8boSsVos7eW/nNLyea8gnuuAulYDMmhWdPEavL4h6ZVn56EpB+JVhIq8zPTW72w4lfXZ8gUY6v3GZarLCuJfhqPr6Ld78Mi9dn4rGs1gzqLyJQxxKvwSaYIeAwXXN0lqXfRIj6y5Dc8Choxyenpy2yh3eNUrZXdAAsrTs5EHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=l-acoustics.com; dmarc=pass action=none
- header.from=l-acoustics.com; dkim=pass header.d=l-acoustics.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=l-acoustics.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=awwjAMgbXXYN54U1bi/n81pbAi8/wZat4WA8YvoDdj4=;
- b=QoaMBSeDmaBICyEw4SAagOKJQyV2r6m1VxZA/hNTqRhnm0oQqYQ2p/PjXHpAqbn8Cd5L5/4c4H7y5DDm8GXtpEvkzkdK8/WW7zvkWgMpvAkAVFxjYSwvhHjCWD3WP43l5g2wCOLu1PMEnT+WZCfaSa16bP09JQ8kqw4yx3KtdU4=
-Received: from PR0P264MB1930.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:166::9)
- by PR0P264MB1675.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:16e::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Mon, 11 Dec
- 2023 09:21:06 +0000
-Received: from PR0P264MB1930.FRAP264.PROD.OUTLOOK.COM
- ([fe80::4d53:e595:fb67:236c]) by PR0P264MB1930.FRAP264.PROD.OUTLOOK.COM
- ([fe80::4d53:e595:fb67:236c%7]) with mapi id 15.20.7068.031; Mon, 11 Dec 2023
- 09:21:06 +0000
-From: Rodrigo CADORE CATALDO <rodrigo.cadore@l-acoustics.com>
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>, Rodrigo Cataldo via B4
- Relay <devnull+rodrigo.cadore.l-acoustics.com@kernel.org>, Jesse Brandeburg
-	<jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Aravindhan
- Gunasekaran <aravindhan.gunasekaran@intel.com>, Mallikarjuna Chilakala
-	<mallikarjuna.chilakala@intel.com>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Kurt
- Kanzenbach <kurt@linutronix.de>
-Subject: RE: [PATCH iwl-net] igc: Fix hicredit calculation
-Thread-Topic: [PATCH iwl-net] igc: Fix hicredit calculation
-Thread-Index: AQHaKecFHk6smFyQW0il44pqHqUJh7CgIKqAgAOvtWA=
-Date: Mon, 11 Dec 2023 09:21:06 +0000
-Message-ID:
- <PR0P264MB1930850228C3F58EE8B7F9FAC88FA@PR0P264MB1930.FRAP264.PROD.OUTLOOK.COM>
-References: <20231208-igc-fix-hicredit-calc-v1-1-7e505fbe249d@l-acoustics.com>
- <871qbwry9y.fsf@intel.com>
-In-Reply-To: <871qbwry9y.fsf@intel.com>
-Accept-Language: en-US, fr-FR
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=l-acoustics.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PR0P264MB1930:EE_|PR0P264MB1675:EE_
-x-ms-office365-filtering-correlation-id: c8d76467-707b-4ad4-63a9-08dbfa2a8148
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- q4XhDGZ1LlNU2QS56YsNCrHn3Zhh0rjExNS2Vg5VgHS5PPN5v6bVC3CA9/WkEycf9ToQtAvqKNOX3NfD/Q2QRSUZRJcwtI0aFjTAc2ORHSWG+oHPs2ajyL7LQkOk9Hwyedjo+pAMI+x6hTCs3cxf/5j5GllDVOsiFOf/+boCaKgeVG/11hGhmsOieXBgXm46PpmcWdqpHndGioQFSCAft6vCNRL5GejZz1toLD0WEasDKbJs1bqdIZBV0GYagLNLeJHbi43UyhIEbHbNEZqhh8U0euP5HckivVD6OO2G25T71cqSHMVz4lrnyE0AKKttfbfCTqhrHvFl/LSI27M1vXxYPOtnZcxLvPUcHGCej9ZW3z1yRGzhEdMIDgBlH9fYhJbBqhAl7RwAdT/qmJrwDKlxQyLN3fgLq8Wzm0ETQOC9HKCayZjOCYSJlq1KEISpYIpQoWWjcMKCjqgRnN6O8teVVVjeq9VmMOhurhKsOLYFATGFNjIfUITopMTfNbCQJH/2uEys+lSRpuRq5RB8ojoVFgh+EwKJO7MuXfqaLEVBYm0VViqGUjwWgPkbbw0kA9ryZHTjYr3nag1cnSb2+AXDxrJd08Rn3OfO8bEOrj/P4G8BwvKqEkin/mpxpAnrAdLBQ7XtFwvyUHOfHZk2yiCGuY9uLiged/CTj4vl8YQ=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PR0P264MB1930.FRAP264.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(346002)(39850400004)(376002)(366004)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(9686003)(55236004)(26005)(478600001)(7696005)(71200400001)(6506007)(83380400001)(7416002)(5660300002)(41300700001)(2906002)(76116006)(54906003)(66446008)(64756008)(66476007)(66946007)(110136005)(52536014)(316002)(66556008)(8936002)(8676002)(4326008)(38070700009)(38100700002)(921008)(86362001)(122000001)(33656002)(55016003)(341764005);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?VBSXMZnUKBtkcZvu7m2bNqOnTpTyzD3Tf37eyvO8G88Xjvr9AVPcUXjq/YcV?=
- =?us-ascii?Q?2O5WAqY1pMzbsNfpwk4aeYVXKkDC3Xk4uv4/2+SYdJcIjv2HbaOKol3pY6An?=
- =?us-ascii?Q?z10AWp4UoElysByiePBzvv9+YBhVH4yTolNSMyze2XOSUA1q7p/OS7VvJk58?=
- =?us-ascii?Q?D4A/1XRXznqjzs9v7VO4Ld9hN8tGmGvghUw5jr2kI2g0hoKvK9LmMa0Ixqqj?=
- =?us-ascii?Q?pr3px1Ffp9S+pW86mIxVjFMuvOhnwBnW/Tv29+uVJuaUZH1zpU0ceCj+4EMC?=
- =?us-ascii?Q?tEm5IQDYXZhMy1ESB8fkzacoFE7Elbqsa9dHCdYYTcqgyVLoAqygC0CAMmmB?=
- =?us-ascii?Q?h3TiYVSZbhoCqK4l4kXIyq/09sdZ/WgqRI+9OVMVHAf+uhwkXyBhB/NQnRh0?=
- =?us-ascii?Q?uoTHAwTKjaO6eZrmi2ubEBhiZWo0KQHmOjPYTAyHv9XRWB9o7GU0/wIAjrZs?=
- =?us-ascii?Q?3Qj5lkia22xXXPMNCNKcVQiZFmLlSpVEJYnaP+b14VvKTbqPzIxbWnPM5D4X?=
- =?us-ascii?Q?K0JFsDEOom9CMv6xxZHz5Sis7JV+8FHYdSmwTYTsWN+1YdNTe81agfVRDdlu?=
- =?us-ascii?Q?5ni2atVZnOi5CHAwkP6/HAFhc2D6w+0/BsB8BPfyzxbeWWrdO0Ci5WLfRAvE?=
- =?us-ascii?Q?xj/zEKFpSuNHkPlZ3asOUqCPSw/x8Gz9vi8445NJELpST7DRuCg/gJyF0ykw?=
- =?us-ascii?Q?INvBdtnD68FmrYknyY3Uj2zcmDfp5DRgXBC99DUhTF3F8+2bv2ChtG9Sdozt?=
- =?us-ascii?Q?l+Ruc3LwgzcwacVMN3JjZQlKkzlSSVWLAnUX10MJysQ3ocXuXXb3vnXvoEAW?=
- =?us-ascii?Q?wmnfweTubxf08FRoV+aMRWT21aqR22pOVNqBNROKxTR50R+y4KH9yIM10wiW?=
- =?us-ascii?Q?EKcJUAJ/S3RlTV/dwszLlHvPEroLIa7cK5FQEuTfKEdWqjEAXmRyZu1N8ngz?=
- =?us-ascii?Q?sx8UQIGg9WQsDbNxk0O3ba7pv+8WjSYgrtqg2TR6eOO6h8LlLmkYNcC9kc3h?=
- =?us-ascii?Q?GCt8torB/dCQlzlclolAHgZu0vs4sNtfRI4Hn/BmpVLb3OjjzIpGbmLFTLc2?=
- =?us-ascii?Q?oh84ZYOUoXOp+yklwhkmGtsaQWgzw7HYLJCG1+morz7NYkd/ST5gopZWWgJo?=
- =?us-ascii?Q?aivkuqri8Ek1rLuBYnQcwlJJoylXbs4AfqeJyvIgltUjDsFiR7ESDOSM6XcT?=
- =?us-ascii?Q?fNy6re+6FMPvy+NAr0WvLcqFDZ6vRbRoazG7sEN+eDI2h9rP+XLkdlAbLuhy?=
- =?us-ascii?Q?Z/ZTTJu0kqOl9P/iOJ31ZN4VLdMI0zAVAwt2P9hZVfGUasjDCjOf9es5AgSw?=
- =?us-ascii?Q?jHg+Nb+AoQwDCpg1X/1b5BS2CRa6Mreys8X2xpvl14zrR93B3dX97u8MctkD?=
- =?us-ascii?Q?6ho2aCPbO1WrnyV22nPSERJZnK7p0gWjX2hhpF8560/cghr34tz5foRfrs3m?=
- =?us-ascii?Q?aXx8BBrz9YeXIyKsyDOQpz7hd84lbfzaDiwBFWam8BXCGAGXeUHtIcoknzSk?=
- =?us-ascii?Q?pq2sUwH1dgPOWSsG39XchyZnCUb8PFzrOuwdjMcLy6wvDY9iaBSw69ClRaqd?=
- =?us-ascii?Q?oQMqeirl2ihWMEmeKu5JXOWtfx85uGChh+gd4wPjj+kp+knzDTA/6quuDZkh?=
- =?us-ascii?Q?2A=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B21CCE
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 01:22:27 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1d0b2752dc6so37027735ad.3
+        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 01:22:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702286546; x=1702891346; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XKohCFNCdsaXRchCfw8hU3DzqxTEDNzYha22s0KIoIk=;
+        b=QPpnOV53t3qgKcUsN3wuvgTWuWFzzLcWK58wQ1ch7J3dx1ETtKiqEp+CTrvTI4VXQ8
+         mUJF+EwEbA5nq9RWGgnE3SuIdx6sXYMXx5jvC0kFpY5TGmED/S/WhRo0PeTk/6DrwujI
+         RkDI8fWRarCtZR7KmjgqDUFag72t3mhqAtuhoHkgdK8Snw3YYskny5p2OzRLZVLdGLc/
+         wbPNcfu9SPIrW7XiD7121T7Ee23D0D60C8BEEWohNWbPet7L3dD2P34ZK41SoKc3/flm
+         7FTdi0yoOpaKh5dTAcnBVwXIfef7WB6iqvncdu49LR3pEzeoazbt1D86fKTL/+8NWiuc
+         82pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702286546; x=1702891346;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XKohCFNCdsaXRchCfw8hU3DzqxTEDNzYha22s0KIoIk=;
+        b=DpTn+eFUY7CVo+Ovp6TBGY4ddNI4O47+q2NldWZw9Sx8gcZi+fkVUPDHQKjn7j7HOr
+         u/yJIOkcNFu09m26s2GE6fI5KgqlgbOBPo7hO8n4sNgx0vgn6NtC1UKKXv5ABDIEdnRO
+         ABy4lIIiLglTsXLZ7meR9PSxomeOwm2WOIJpkwzyKfwmGeXWmyv/pxfWjCM4r5h9S9Cn
+         uQQPLop8kAItDbc5VmsYTiIStTha193KuB4p4+np14RlWmSyaIw6dxUzm7iR80cbWEDw
+         gbtjt8QTd2wd8WiQcH7c85RvB2t2bkPc3iGt/ssfUZa7+WY0hQmnso5WCy2hbKGlCksl
+         MzwA==
+X-Gm-Message-State: AOJu0YyZ+8/V5TEqPZohuePpzbXJvzx2Dsm+wmqNeBACUap65uvR4IPi
+	hX+g6Vb8yCAg+gyc6ZNzJak1rTkWi44QCuhD
+X-Google-Smtp-Source: AGHT+IG72P9IBHv39vBgp6Oiq8wvNqlnp6mU5DK187UnVJinaeKx+HBLacEaF7O6H62aRgon1kyV0Q==
+X-Received: by 2002:a17:903:2448:b0:1d0:8cb5:49dd with SMTP id l8-20020a170903244800b001d08cb549ddmr4191178pls.69.1702286546220;
+        Mon, 11 Dec 2023 01:22:26 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id g14-20020a1709029f8e00b001d0d3795b25sm6129435plq.172.2023.12.11.01.22.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Dec 2023 01:22:25 -0800 (PST)
+Date: Mon, 11 Dec 2023 17:22:22 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: selftest fib_nexthop_multiprefix failed due to route mismatch
+Message-ID: <ZXbUzpDGErm-JXSC@Laptop-X1>
+References: <ZVxQ42hk1dC4qffy@Laptop-X1>
+ <01240884-fcc9-46d5-ae98-305151112ebc@kernel.org>
+ <ZW_u7VWTpWAuub4L@Laptop-X1>
+ <02ef5de4-d57f-4037-8968-d9bf791bd903@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: l-acoustics.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PR0P264MB1930.FRAP264.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: c8d76467-707b-4ad4-63a9-08dbfa2a8148
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Dec 2023 09:21:06.7155
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 68e431e8-d632-483e-ae79-f28a7b4c69e6
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: BIubNvrBLx31+S2mEAu2McHrsEn8e3zHteKhDAXR0Cl5ZhXoxN2OYi3VBUV+55nxEm8aPBq/o8lVKIja4Xv8Kc7/oztH3Mvg0nlXi6h3Oqg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR0P264MB1675
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <02ef5de4-d57f-4037-8968-d9bf791bd903@kernel.org>
 
-> -----Original Message-----
-> From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
->=20
-> Rodrigo Cataldo via B4 Relay
-> <devnull+rodrigo.cadore.l-acoustics.com@kernel.org> writes:
->=20
-> > From: Rodrigo Cataldo <rodrigo.cadore@l-acoustics.com>
-> >
-> > According to the Intel Software Manual for I225, Section 7.5.2.7,
-> > hicredit should be multiplied by the constant link-rate value, 0x7736.
-> >
-> > Currently, the old constant link-rate value, 0x7735, from the boards
-> > supported on igb are being used, most likely due to a copy'n'paste, as
-> > the rest of the logic is the same for both drivers.
-> >
-> > Update hicredit accordingly.
-> >
-> > Fixes: 1ab011b0bf07 ("igc: Add support for CBS offloading")
-> > Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
-> > Signed-off-by: Rodrigo Cataldo <rodrigo.cadore@l-acoustics.com>
-> > ---
->=20
-> Very good catch.
->=20
-> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
->=20
-> Just for curiosity, my test machines are busy right now, what kind of
-> difference are you seeing?
->=20
+On Fri, Dec 08, 2023 at 12:21:55PM -0700, David Ahern wrote:
+> > Hi David,
+> > 
+> > I re-test this on 6.4.0 and it also failed. So this looks like an env issue
+> > on your side?
+> > 
+> > # uname -r
+> > 6.4.0
+> > # ./fib_nexthop_multiprefix.sh
+> > TEST: IPv4: host 0 to host 1, mtu 1300                              [ OK ]
+> > TEST: IPv6: host 0 to host 1, mtu 1300                              [FAIL]
+> > 
+> > And from the test result, it looks we should receive the Packet too big message
+> > from r1. So look the current checking is incorrect and the "from ::" checking
+> > should be removed.
+> > 
+> > Please fix me if I missed anything?
+> > 
+> 
+> I ran it in a ubuntu 20.04 VM. Do not recall any specific sysctl
+> settings to the VM, but maybe something is different between U20.04 and
+> your OS
 
-Hello Vinicius, thank you for the ACK.
+OK, I got the reason. The "from ::1" is put in rt6_fill_node()
+when CONFIG_IPV6_SUBTREES is enabled. I will fix this grep issue
+in my next selftests namespace conversion patch set.
 
-For our internal setup, this does not make a difference. My understanding i=
-s=20
-that hicredit is used for non-SR traffic mixed with SR traffic (i.e., hicre=
-dit is
-directly related to the max non-SR frame size). But our setup does not mix
-them (q0 is used only for milan audio/clock SR class A).
-
-Let me know if you think we need a testcase for this.
-
-> > This is a simple fix for the credit calculation on igc devices
-> > (i225/i226) to match the Intel software manual.
-> >
-> > This is my first contribution to the Linux Kernel. Apologies for any
-> > mistakes and let me know if I improve anything.
-> > ---
-> >  drivers/net/ethernet/intel/igc/igc_tsn.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c
-> b/drivers/net/ethernet/intel/igc/igc_tsn.c
-> > index a9c08321aca9..22cefb1eeedf 100644
-> > --- a/drivers/net/ethernet/intel/igc/igc_tsn.c
-> > +++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
-> > @@ -227,7 +227,7 @@ static int igc_tsn_enable_offload(struct igc_adapte=
-r
-> *adapter)
-> >                       wr32(IGC_TQAVCC(i), tqavcc);
-> >
-> >                       wr32(IGC_TQAVHC(i),
-> > -                          0x80000000 + ring->hicredit * 0x7735);
-> > +                          0x80000000 + ring->hicredit * 0x7736);
-> >               } else {
-> >                       /* Disable any CBS for the queue */
-> >                       txqctl &=3D ~(IGC_TXQCTL_QAV_SEL_MASK);
-> >
-> > ---
-> > base-commit: 2078a341f5f609d55667c2dc6337f90d8f322b8f
-> > change-id: 20231206-igc-fix-hicredit-calc-028bf73c50a8
-> >
-> > Best regards,
-> > --
-> > Rodrigo Cataldo <rodrigo.cadore@l-acoustics.com>
-> >
->=20
-> Cheers,
-> --
-> Vinicius
-
-Best Regards,
-Rodrigo Cataldo
+Thanks
+Hangbin
 
