@@ -1,262 +1,240 @@
-Return-Path: <netdev+bounces-55864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A86580C924
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:12:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A436980C902
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:07:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EE1D1F21814
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 12:12:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33AC5281BB7
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 12:07:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B551039869;
-	Mon, 11 Dec 2023 12:12:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90BC438FAB;
+	Mon, 11 Dec 2023 12:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="Fl9xYbyE"
 X-Original-To: netdev@vger.kernel.org
-X-Greylist: delayed 1228 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 11 Dec 2023 04:12:16 PST
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E0B4F2;
-	Mon, 11 Dec 2023 04:12:16 -0800 (PST)
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Spg7z2kdDz1vnkK;
-	Mon, 11 Dec 2023 19:51:43 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 759501A016F;
-	Mon, 11 Dec 2023 19:51:46 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 11 Dec
- 2023 19:51:46 +0800
-Subject: Re: [net-next v1 09/16] page_pool: device memory support
-To: Mina Almasry <almasrymina@google.com>
-CC: Shailend Chand <shailend@google.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-arch@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<bpf@vger.kernel.org>, <linux-media@vger.kernel.org>,
-	<dri-devel@lists.freedesktop.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst
-	<jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
-	<ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, David Ahern
-	<dsahern@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
-	=?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>, Harshitha
- Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeelb@google.com>
-References: <20231208005250.2910004-1-almasrymina@google.com>
- <20231208005250.2910004-10-almasrymina@google.com>
- <32211cbf-3a4e-8a86-6214-4304ddb18a98@huawei.com>
- <CAHS8izOQcuLPwvDff96fuNB7r6EU9OWt3ShueQp=u7wat3L5LA@mail.gmail.com>
- <92e30bd9-6df4-b72f-7bcd-f4fe5670eba2@huawei.com>
- <CAHS8izPEFsqw50qgM+sPot6XVvOExpd+DrwrmPSR3zsWGLysRw@mail.gmail.com>
- <CAHS8izN6Cbjy0FCYhJyNsP396XfgJ_nTFXWuHb5QWNct=PifAg@mail.gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <59e07233-24cb-7fb2-1aee-e1cf7eb72fa9@huawei.com>
-Date: Mon, 11 Dec 2023 19:51:45 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E4B8106;
+	Mon, 11 Dec 2023 04:07:11 -0800 (PST)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 9F018120009;
+	Mon, 11 Dec 2023 15:07:07 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 9F018120009
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1702296427;
+	bh=JzRw1YBG7f3oyr2RSRgTAcTcb1RpGTdfB0MlDiBeNMY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=Fl9xYbyE7vkGTZbfOZpwHZYW6bqdqx7Lvrfr+nuUwVECVTntTRMjTx1hiF0x1o0kT
+	 Va2C9poiamtVwx8OqqpCvLIRuKG13doXix1Ai3CBcuAJGBar3kahzvqIOWRgvQ4JaW
+	 AGNNeoLkvJHb2+mRdEe0jlco0xf6H5i9Lh0OjlxpD/uUrYB5EErAqIGHPcdrO0in1Q
+	 hygPPibh8o5xek6aHo/tl6QmZUkoy4EXMmT5ZOa9Y0Vb0RCCb4vVgHEnNf4hjeC5SW
+	 R5lKIxP3Kc6KXS2f8AixqWHtyKnAtB9DuNr454OkSFEWyUuqPxrP1ZFMp8KUyzW2eJ
+	 B9S+Y3Rcb/LWA==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Mon, 11 Dec 2023 15:07:07 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 11 Dec 2023 15:07:07 +0300
+Message-ID: <8687bc31-92a7-8ff4-168f-f194180d0cbf@salutedevices.com>
+Date: Mon, 11 Dec 2023 14:58:49 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHS8izN6Cbjy0FCYhJyNsP396XfgJ_nTFXWuHb5QWNct=PifAg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH net-next v7 3/4] virtio/vsock: fix logic which reduces
+ credit update messages
 Content-Language: en-US
+To: Stefano Garzarella <sgarzare@redhat.com>
+CC: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi
+	<stefanha@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
+	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20231206211849.2707151-1-avkrasnov@salutedevices.com>
+ <20231206211849.2707151-4-avkrasnov@salutedevices.com>
+ <20231206165045-mutt-send-email-mst@kernel.org>
+ <d9d1ec6a-dd9b-61d9-9211-52e9437cbb1f@salutedevices.com>
+ <20231206170640-mutt-send-email-mst@kernel.org>
+ <d30a1df7-ecda-652d-8c98-853308a560c9@salutedevices.com>
+ <s5v5hbr2memhwoqm3fxbkq6qsocs43qgyhx432zzy6ugbqhuu2@rsnm3kiwfwjm>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <s5v5hbr2memhwoqm3fxbkq6qsocs43qgyhx432zzy6ugbqhuu2@rsnm3kiwfwjm>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 182013 [Dec 11 2023]
+X-KSMG-AntiSpam-Version: 6.0.0.2
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 6 0.3.6 62f5a4619c57459c9a142aa1486ed27913162963, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/12/11 10:21:00 #22658245
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On 2023/12/11 12:04, Mina Almasry wrote:
-> On Sun, Dec 10, 2023 at 6:26 PM Mina Almasry <almasrymina@google.com> wrote:
+
+
+On 11.12.2023 15:01, Stefano Garzarella wrote:
+> On Thu, Dec 07, 2023 at 01:50:05AM +0300, Arseniy Krasnov wrote:
 >>
->> On Sun, Dec 10, 2023 at 6:04 PM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>
+>> On 07.12.2023 01:08, Michael S. Tsirkin wrote:
+>>> On Thu, Dec 07, 2023 at 12:52:51AM +0300, Arseniy Krasnov wrote:
+>>>>
+>>>>
+>>>> On 07.12.2023 00:53, Michael S. Tsirkin wrote:
+>>>>> On Thu, Dec 07, 2023 at 12:18:48AM +0300, Arseniy Krasnov wrote:
+>>>>>> Add one more condition for sending credit update during dequeue from
+>>>>>> stream socket: when number of bytes in the rx queue is smaller than
+>>>>>> SO_RCVLOWAT value of the socket. This is actual for non-default value
+>>>>>> of SO_RCVLOWAT (e.g. not 1) - idea is to "kick" peer to continue data
+>>>>>> transmission, because we need at least SO_RCVLOWAT bytes in our rx
+>>>>>> queue to wake up user for reading data (in corner case it is also
+>>>>>> possible to stuck both tx and rx sides, this is why 'Fixes' is used).
+>>>>>> Also handle case when 'fwd_cnt' wraps, while 'last_fwd_cnt' is still
+>>>>>> not.
+>>>>>>
+>>>>>> Fixes: b89d882dc9fc ("vsock/virtio: reduce credit update messages")
+>>>>>> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>>>>>> ---
+>>>>>>  Changelog:
+>>>>>>  v6 -> v7:
+>>>>>>   * Handle wrap of 'fwd_cnt'.
+>>>>>>   * Do to send credit update when 'fwd_cnt' == 'last_fwd_cnt'.
+>>>>>>
+>>>>>>  net/vmw_vsock/virtio_transport_common.c | 18 +++++++++++++++---
+>>>>>>  1 file changed, 15 insertions(+), 3 deletions(-)
+>>>>>>
+>>>>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>>>>> index e137d740804e..39f8660d825d 100644
+>>>>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>>>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>>>>> @@ -558,6 +558,8 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+>>>>>>      struct virtio_vsock_sock *vvs = vsk->trans;
+>>>>>>      size_t bytes, total = 0;
+>>>>>>      struct sk_buff *skb;
+>>>>>> +    u32 fwd_cnt_delta;
+>>>>>> +    bool low_rx_bytes;
+>>>>>>      int err = -EFAULT;
+>>>>>>      u32 free_space;
+>>>>>>
+>>>>>> @@ -601,7 +603,15 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+>>>>>>          }
+>>>>>>      }
+>>>>>>
+>>>>>> -    free_space = vvs->buf_alloc - (vvs->fwd_cnt - vvs->last_fwd_cnt);
+>>>>>> +    /* Handle wrap of 'fwd_cnt'. */
+>>>>>> +    if (vvs->fwd_cnt < vvs->last_fwd_cnt)
+>>>>>> +        fwd_cnt_delta = vvs->fwd_cnt + (U32_MAX - vvs->last_fwd_cnt);
+>>>>>
+>>>>> Are you sure there's no off by one here? for example if fwd_cnt is 0
+>>>>> and last_fwd_cnt is 0xfffffffff then apparently delta is 0.
+>>>>
+>>>> Seems yes, I need +1 here
 >>>
->>> On 2023/12/9 0:05, Mina Almasry wrote:
->>>> On Fri, Dec 8, 2023 at 1:30 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
->>>>>
->>>>>
->>>>> As mentioned before, it seems we need to have the above checking every
->>>>> time we need to do some per-page handling in page_pool core, is there
->>>>> a plan in your mind how to remove those kind of checking in the future?
->>>>>
->>>>
->>>> I see 2 ways to remove the checking, both infeasible:
->>>>
->>>> 1. Allocate a wrapper struct that pulls out all the fields the page pool needs:
->>>>
->>>> struct netmem {
->>>>         /* common fields */
->>>>         refcount_t refcount;
->>>>         bool is_pfmemalloc;
->>>>         int nid;
->>>>         ...
->>>>         union {
->>>>                 struct dmabuf_genpool_chunk_owner *owner;
->>>>                 struct page * page;
->>>>         };
->>>> };
->>>>
->>>> The page pool can then not care if the underlying memory is iov or
->>>> page. However this introduces significant memory bloat as this struct
->>>> needs to be allocated for each page or ppiov, which I imagine is not
->>>> acceptable for the upside of removing a few static_branch'd if
->>>> statements with no performance cost.
->>>>
->>>> 2. Create a unified struct for page and dmabuf memory, which the mm
->>>> folks have repeatedly nacked, and I imagine will repeatedly nack in
->>>> the future.
->>>>
->>>> So I imagine the special handling of ppiov in some form is critical
->>>> and the checking may not be removable.
+>>> And then you will get a nop, because assigning U32_MAX + 1 to u32
+>>> gives you 0. Adding () does nothing to change the result,
+>>> + and - are commutative.
+>>
+>> Ahh, unsigned here, yes.
+> 
+> Ooops, sorry I was confused here!
+> 
+>>
+>> @Stefano, what did You mean about wrapping here?
+>>
+>> I think Michael is right, for example
+> 
+> Yep, I agree!
+> Sorry for this wrong suggestion!
+
+Got it! I'll remove it, no problem 
+
+Thanks, Arseniy
+
+> 
+> Stefano
+> 
+>>
+>> vvs->fwd_cnt wraps and now == 5
+>> vvs->last_fwd_cnt == 0xffffffff
+>>
+>> now delta before this patch will be 6 - correct value
+>>
+>> May be I didn't get your idea, so implement it very naive?
+>>
+>> Thanks, Arseniy
+>>
 >>>
->>> If the above is true, perhaps devmem is not really supposed to be intergated
->>> into page_pool.
 >>>
->>> Adding a checking for every per-page handling in page_pool core is just too
->>> hacky to be really considerred a longterm solution.
->>>
->>
->> The only other option is to implement another page_pool for ppiov and
->> have the driver create page_pool or ppiov_pool depending on the state
->> of the netdev_rx_queue (or some helper in the net stack to do that for
->> the driver). This introduces some code duplication. The ppiov_pool &
->> page_pool would look similar in implementation.
-
-I think there is a design pattern already to deal with this kind of problem,
-refactoring common code used by both page_pool and ppiov into a library to
-aovid code duplication if most of them have similar implementation.
-
->>
->> But this was all discussed in detail in RFC v2 and the last response I
->> heard from Jesper was in favor if this approach, if I understand
->> correctly:
->>
->> https://lore.kernel.org/netdev/7aedc5d5-0daf-63be-21bc-3b724cc1cab9@redhat.com/
->>
->> Would love to have the maintainer weigh in here.
->>
-> 
-> I should note we may be able to remove some of the checking, but maybe not all.
-> 
-> - Checks that disable page fragging for ppiov can be removed once
-> ppiov has frag support (in this series or follow up).
-> 
-> - If we use page->pp_frag_count (or page->pp_ref_count) for
-> refcounting ppiov, we can remove the if checking in the refcounting.
-> 
-> - We may be able to store the dma_addr of the ppiov in page->dma_addr,
-> but I'm unsure if that actually works, because the dma_buf dmaddr is
-> dma_addr_t (u32 or u64), but page->dma_addr is unsigned long (4 bytes
-> I think). But if it works for pages I may be able to make it work for
-> ppiov as well.
-> 
-> - Checks that obtain the page->pp can work with ppiov if we align the
-> offset of page->pp and ppiov->pp.
-> 
-> - Checks around page->pp_magic can be removed if we also have offset
-> aligned ppiov->pp_magic.
-> 
-> Sadly I don't see us removing the checking for these other cases:
-> 
-> - page_is_pfmemalloc(): I'm not allowed to pass a non-struct page into
-> that helper.
-
-We can do similar trick like above as bit 1 of page->pp_magic is used to
-indicate that if it is a pfmemalloc page.
-
-> 
-> - page_to_nid(): I'm not allowed to pass a non-struct page into that helper.
-
-Yes, this one need special case.
-
-> 
-> - page_pool_free_va(): ppiov have no va.
-
-Doesn't the skb_frags_readable() checking will protect the page_pool_free_va()
-from being called on devmem?
-
-> 
-> - page_pool_sync_for_dev/page_pool_dma_map: ppiov backed by dma-buf
-> fundamentally can't get mapped again.
-
-Can we just fail the page_pool creation with PP_FLAG_DMA_MAP and
-DMA_ATTR_SKIP_CPU_SYNC flags for devmem provider?
-
-> 
-> Are the removal (or future removal) of these checks enough to resolve this?
-
-Yes, that is somewhat similar to my proposal, the biggest objection seems to
-be that we need to have a safe type checking for it to work correctly.
-
-> 
->>> It is somewhat ironical that devmem is using static_branch to alliviate the
->>> performance impact for normal memory at the possible cost of performance
->>> degradation for devmem, does it not defeat some purpose of intergating devmem
->>> to page_pool?
->>>
->>
->> I don't see the issue. The static branch sets the non-ppiov path as
->> default if no memory providers are in use, and flips it when they are,
->> making the default branch prediction ideal in both cases.
-
-You are assuming the we are not using page pool for both normal memory and
-devmem at the same. But a generic solution should not have that assumption
-as my understanding.
-
->>
+>>>>>
+>>>>>
+>>>>>> +    else
+>>>>>> +        fwd_cnt_delta = vvs->fwd_cnt - vvs->last_fwd_cnt;
+>>>>>
+>>>>> I actually don't see what is wrong with just
+>>>>>     fwd_cnt_delta = vvs->fwd_cnt - vvs->last_fwd_cnt
+>>>>> 32 bit unsigned math will I think handle wrap around correctly.
+>>>>>
+>>>>> And given buf_alloc is also u32 - I don't see where the bug is in
+>>>>> the original code.
 >>>>
->>>>> Even though a static_branch check is added in page_is_page_pool_iov(), it
->>>>> does not make much sense that a core has tow different 'struct' for its
->>>>> most basic data.
->>>>>
->>>>> IMHO, the ppiov for dmabuf is forced fitting into page_pool without much
->>>>> design consideration at this point.
->>>>>
->>>> ...
->>>>>
->>>>> For now, the above may work for the the rx part as it seems that you are
->>>>> only enabling rx for dmabuf for now.
->>>>>
->>>>> What is the plan to enable tx for dmabuf? If it is also intergrated into
->>>>> page_pool? There was a attempt to enable page_pool for tx, Eric seemed to
->>>>> have some comment about this:
->>>>> https://lkml.kernel.org/netdev/2cf4b672-d7dc-db3d-ce90-15b4e91c4005@huawei.com/T/#mb6ab62dc22f38ec621d516259c56dd66353e24a2
->>>>>
->>>>> If tx is not intergrated into page_pool, do we need to create a new layer for
->>>>> the tx dmabuf?
->>>>>
+>>>> I think problem is when fwd_cnt wraps, while last_fwd_cnt is not. In this
+>>>> case fwd_cnt_delta will be too big, so we won't send credit update which
+>>>> leads to stall for sender
 >>>>
->>>> I imagine the TX path will reuse page_pool_iov, page_pool_iov_*()
->>>> helpers, and page_pool_page_*() helpers, but will not need any core
->>>> page_pool changes. This is because the TX path will have to piggyback
+>>>> Thanks, Arseniy
 >>>
->>> We may need another bit/flags checking to demux between page_pool owned
->>> devmem and non-page_pool owned devmem.
+>>> Care coming up with an example?
+>>>
+>>>
+>>>>>
+>>>>>
+>>>>>> +
+>>>>>> +    free_space = vvs->buf_alloc - fwd_cnt_delta;
+>>>>>> +    low_rx_bytes = (vvs->rx_bytes <
+>>>>>> +            sock_rcvlowat(sk_vsock(vsk), 0, INT_MAX));
+>>>>>>
+>>>>>>      spin_unlock_bh(&vvs->rx_lock);
+>>>>>>
+>>>>>> @@ -611,9 +621,11 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+>>>>>>       * too high causes extra messages. Too low causes transmitter
+>>>>>>       * stalls. As stalls are in theory more expensive than extra
+>>>>>>       * messages, we set the limit to a high value. TODO: experiment
+>>>>>> -     * with different values.
+>>>>>> +     * with different values. Also send credit update message when
+>>>>>> +     * number of bytes in rx queue is not enough to wake up reader.
+>>>>>>       */
+>>>>>> -    if (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
+>>>>>> +    if (fwd_cnt_delta &&
+>>>>>> +        (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE || low_rx_bytes))
+>>>>>>          virtio_transport_send_credit_update(vsk);
+>>>>>>
+>>>>>>      return total;
+>>>>>> -- 
+>>>>>> 2.25.1
+>>>>>
 >>>
 >>
->> The way I'm imagining the support, I don't see the need for such
->> flags. We'd be re-using generic helpers like
->> page_pool_iov_get_dma_address() and what not that don't need that
->> checking.
->>
->>> Also calling page_pool_*() on non-page_pool owned devmem is confusing
->>> enough that we may need a thin layer handling non-page_pool owned devmem
->>> in the end.
->>>
->>
->> The page_pool_page* & page_pool_iov* functions can be renamed if
->> confusing. I would think that's no issue (note that the page_pool_*
-
-When you rename those functions, you will have a thin layer automatically.
-
->> functions need not be called for TX path).
->>
->>>> on MSG_ZEROCOPY (devmem is not copyable), so no memory allocation from
->>>> the page_pool (or otherwise) is needed or possible. RFCv1 had a TX
->>>> implementation based on dmabuf pages without page_pool involvement, I
->>>> imagine I'll do something similar.
->>> It would be good to have a tx implementation for the next version, so
->>> that we can have a whole picture of devmem.
+> 
 
