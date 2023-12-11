@@ -1,181 +1,157 @@
-Return-Path: <netdev+bounces-56014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBED480D40A
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 18:36:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9980280D438
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 18:40:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66E0C1F2198A
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 17:36:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 454E91F219E6
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 17:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875BD4E601;
-	Mon, 11 Dec 2023 17:36:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD51D4E634;
+	Mon, 11 Dec 2023 17:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="loMjJRWM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ILT7ZiPQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A804E1AD;
-	Mon, 11 Dec 2023 17:36:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B601C43397;
-	Mon, 11 Dec 2023 17:36:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A21D4E601;
+	Mon, 11 Dec 2023 17:40:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28A99C433C8;
+	Mon, 11 Dec 2023 17:40:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702316215;
-	bh=jnf9dg13SzBYTXr+GBpBiKbCKE+W4egIWCJCCgVUAwg=;
+	s=k20201202; t=1702316424;
+	bh=hOU4jYl2zjD7dm4WiF388gDlJNEcYLRmL4FrrPgk5yA=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=loMjJRWMoMUGhMgm+YrnxZIpLCV3bDvtka0s23uKcX4z16ASC0s+UuYVJHGeBIYIB
-	 N27ZdO+4F8Lawqz9kb2Luwv9DyGq9QaTgPhpxI9eRVt5CsaJ/8hXk/1FrinkdTkG2l
-	 6DkZXddgjOC/nFXYY5q29djDfkZBGH+J+BAfsiySfpReSSCj43HJsZ98xx7K7bowh9
-	 XTlgW15lmK6opKpi3nU9cVIARat90LwpmncgYWKqsZuE8dv7mkglGhaEryRg2Soeal
-	 I1BlECQqH9HuKD3JA8HOwUOv2Bv48o7Cu4IgQR9V5VwfHj28+3s95m0s9ceGCoV8ju
-	 oWcQ6PJw8bn4w==
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-50be3611794so5575609e87.0;
-        Mon, 11 Dec 2023 09:36:55 -0800 (PST)
-X-Gm-Message-State: AOJu0YzzOzvob9fUgTBTHuY2N5lt+aYjf8lB+d3p76MnrLK6nXxdsepD
-	k8DQhRcTK/6iwXYaGWMtYBpHGjs4GZ/6J5WSPA==
-X-Google-Smtp-Source: AGHT+IHTBVeYuUBoGJIP6ycY2EOkZoObSSDfVZqLhoI3Lxe7oVt2ihkbRec/l/L5HGnrywwvadEcHP4hGnXcj/srfPU=
-X-Received: by 2002:a05:6512:68a:b0:50d:15be:f07e with SMTP id
- t10-20020a056512068a00b0050d15bef07emr2866329lfe.74.1702316213414; Mon, 11
- Dec 2023 09:36:53 -0800 (PST)
+	b=ILT7ZiPQGYhBDRi5b3lf2uIdYB4fRbuh2WtUGL5lqBhOSH9SQvJlRI4vIBz2v17S+
+	 blGaty3kzjUowjXu+vwC+cpgSyt00WKM35hBVSFNoLhiDqRYp1qNOKsm9iz9+8yiST
+	 Q7K6KPtg6FMORGKJpZx3r5qFsWADIKZ7z27AI70Za4hAoGh4qLSigaBPpfhbzDtG4B
+	 WegId6wDnidKSJcRZAEmY6Gsyb2qXOjKSyhqb3S+T2soCbbL8ZCGJnTGo/vdm3VtFH
+	 5din7ZlxT5L0DDzybGDn3dJwXQ4AqFpESE3FPPogtTM2eGc+sDPJnDgua4TycmkKSN
+	 p4xYROwwpkw+g==
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-50bef9b7a67so5378236e87.1;
+        Mon, 11 Dec 2023 09:40:24 -0800 (PST)
+X-Gm-Message-State: AOJu0YzJcd3YEJQ+ACZdrqlHk0GTTyqjPJZRsUdvkqqPNe2zlYKaxz51
+	2qxhxzSHuFpFiIVtjJjx7ryxgkkPkIYrvW+S2VY=
+X-Google-Smtp-Source: AGHT+IFTGNQtSpFmM7O8UeOW1n7sWiGpQ/OA3GeoRRIZNv3WRNPCLATv59ZjIlJ2ZFi1fcYwSJZuwHeltryOcI6rOhc=
+X-Received: by 2002:a2e:b046:0:b0:2ca:34cd:77e4 with SMTP id
+ d6-20020a2eb046000000b002ca34cd77e4mr1895908ljl.103.1702316422374; Mon, 11
+ Dec 2023 09:40:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <097e82b0d66570763d64be1715517d8b032fcf95.1702158423.git.daniel@makrotopia.org>
- <879b5bbcb165aa3f059a41218142b27e5f64597f.1702158423.git.daniel@makrotopia.org>
-In-Reply-To: <879b5bbcb165aa3f059a41218142b27e5f64597f.1702158423.git.daniel@makrotopia.org>
-From: Rob Herring <robh+dt@kernel.org>
-Date: Mon, 11 Dec 2023 11:36:41 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqJVY3-UneaoUNt6aGa2kU_3EVAwxJfY_mYZPyp=L=Bjtw@mail.gmail.com>
-Message-ID: <CAL_JsqJVY3-UneaoUNt6aGa2kU_3EVAwxJfY_mYZPyp=L=Bjtw@mail.gmail.com>
-Subject: Re: [PATCH v4 4/4] clk: mediatek: add drivers for MT7988 SoC
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Sabrina Dubroca <sd@queasysnail.net>, Jianhui Zhao <zhaojh329@gmail.com>, 
-	Chen-Yu Tsai <wenst@chromium.org>, "Garmin.Chang" <Garmin.Chang@mediatek.com>, 
-	Sam Shih <sam.shih@mediatek.com>, Markus Schneider-Pargmann <msp@baylibre.com>, 
-	Alexandre Mergnat <amergnat@baylibre.com>, Jiasheng Jiang <jiasheng@iscas.ac.cn>, 
-	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, 
-	Frank Wunderlich <frank-w@public-files.de>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Chanwoo Choi <cw00.choi@samsung.com>, Dan Carpenter <dan.carpenter@linaro.org>, 
-	James Liao <jamesjj.liao@mediatek.com>, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
-	netdev@vger.kernel.org
+References: <20231015141644.260646-1-akihiko.odaki@daynix.com>
+ <CAADnVQLfUDmgYng8Cw1hiZOMfWNWLjbn7ZGc4yOEz-XmeFEz5Q@mail.gmail.com>
+ <2594bb24-74dc-4785-b46d-e1bffcc3e7ed@daynix.com> <CAADnVQ+J+bOtvEfdvgUse_Rr07rM5KOZ5DtAmHDgRmi70W68+g@mail.gmail.com>
+ <CACGkMEs22078F7rSLEz6eQabkZZ=kujSONUNMThZz5Gp=YiidQ@mail.gmail.com>
+ <CAADnVQLt8NWvP8qGWMPx=12PwWWE69P7aS2dbm=khAJkCnJEoQ@mail.gmail.com>
+ <9a4853ad-5ef4-4b15-a49e-9edb5ae4468e@daynix.com> <6253fb6b-9a53-484a-9be5-8facd46c051e@daynix.com>
+ <CAPhsuW5JYoM-Mkehdy=FQsG1nvjbYGzwRZx8BkpG1P7cHdD=eQ@mail.gmail.com>
+ <dba89d4b-84aa-4c9f-b016-56fd3ade04b2@daynix.com> <CAPhsuW5KLgt_gsih7zi+T99iYVbt7hk7=OCwYzin-H3=OhF54Q@mail.gmail.com>
+ <a1f09866-a443-4f74-8025-6cdb32eb1d2c@daynix.com> <CAPhsuW4o5o41a+jVjgGP+Ck3eUD8w6coLXMTYewXKJYmciLLnQ@mail.gmail.com>
+ <664003d3-aadb-4938-80f6-67fab1c9dcdd@daynix.com> <d30a038b-d10f-468d-8879-478a6c5b814b@daynix.com>
+ <CAPhsuW5CMYiOMUDCgfQyo=K31igZZ+BgXyL6yfq1OG3r2CzQ4g@mail.gmail.com> <49a5b971-ae97-4118-ae20-f651ad14bed7@daynix.com>
+In-Reply-To: <49a5b971-ae97-4118-ae20-f651ad14bed7@daynix.com>
+From: Song Liu <song@kernel.org>
+Date: Mon, 11 Dec 2023 09:40:10 -0800
+X-Gmail-Original-Message-ID: <CAPhsuW7E6Dyp8VTiuwbreB18Lt93n9Fa2hdd2sEschUDzgQiSg@mail.gmail.com>
+Message-ID: <CAPhsuW7E6Dyp8VTiuwbreB18Lt93n9Fa2hdd2sEschUDzgQiSg@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 1/7] bpf: Introduce BPF_PROG_TYPE_VNET_HASH
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Jason Wang <jasowang@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Dec 9, 2023 at 3:56=E2=80=AFPM Daniel Golle <daniel@makrotopia.org>=
- wrote:
+On Sun, Dec 10, 2023 at 9:04=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix=
+.com> wrote:
 >
-> From: Sam Shih <sam.shih@mediatek.com>
+[...]
+> >
+> > I don't think we can provide stability guarantees before seeing somethi=
+ng
+> > being used in the field. How do we know it will be useful forever? If a
+> > couple years later, there is only one person using it somewhere in the
+> > world, why should we keep supporting it? If there are millions of virtu=
+al
+> > machines using it, why would you worry about it being removed?
 >
-> Add APMIXED, ETH, INFRACFG and TOPCKGEN clock drivers which are
-> typical MediaTek designs.
+> I have a different opinion about providing stability guarantees; I
+> believe it is safe to provide such a guarantee without actual use in a
+> field. We develop features expecting there are real uses, and if it
+> turns out otherwise, we can break the stated guarantee since there is no
+> real use cases anyway. It is fine even breaking UAPIs in such a case,
+> which is stated in Documentation/admin-guide/reporting-regressions.rst.
 >
-> Also add driver for XFIPLL clock generating the 156.25MHz clock for
-> the XFI SerDes. It needs an undocumented software workaround and has
-> an unknown internal design.
->
-> Signed-off-by: Sam Shih <sam.shih@mediatek.com>
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
-> v4:
->  * make use of existing GATE_MTK_FLAGS macro
->  * reformat to max. 100 columns
->  * cosmetics
->
-> v3: use git --from ...
-> v2: no changes
->
->
->  drivers/clk/mediatek/Kconfig               |   9 +
->  drivers/clk/mediatek/Makefile              |   5 +
->  drivers/clk/mediatek/clk-mt7988-apmixed.c  | 102 +++++++
->  drivers/clk/mediatek/clk-mt7988-eth.c      | 133 +++++++++
->  drivers/clk/mediatek/clk-mt7988-infracfg.c | 274 +++++++++++++++++
->  drivers/clk/mediatek/clk-mt7988-topckgen.c | 325 +++++++++++++++++++++
->  drivers/clk/mediatek/clk-mt7988-xfipll.c   |  78 +++++
->  7 files changed, 926 insertions(+)
->  create mode 100644 drivers/clk/mediatek/clk-mt7988-apmixed.c
->  create mode 100644 drivers/clk/mediatek/clk-mt7988-eth.c
->  create mode 100644 drivers/clk/mediatek/clk-mt7988-infracfg.c
->  create mode 100644 drivers/clk/mediatek/clk-mt7988-topckgen.c
->  create mode 100644 drivers/clk/mediatek/clk-mt7988-xfipll.c
->
-> diff --git a/drivers/clk/mediatek/Kconfig b/drivers/clk/mediatek/Kconfig
-> index 48b42d11111cd..70a005e7e1b18 100644
-> --- a/drivers/clk/mediatek/Kconfig
-> +++ b/drivers/clk/mediatek/Kconfig
-> @@ -423,6 +423,15 @@ config COMMON_CLK_MT7986_ETHSYS
->           This driver adds support for clocks for Ethernet and SGMII
->           required on MediaTek MT7986 SoC.
->
-> +config COMMON_CLK_MT7988
-> +       tristate "Clock driver for MediaTek MT7988"
-> +       depends on ARCH_MEDIATEK || COMPILE_TEST
-> +       select COMMON_CLK_MEDIATEK
-> +       default ARCH_MEDIATEK
-> +       help
-> +         This driver supports MediaTek MT7988 basic clocks and clocks
-> +         required for various periperals found on this SoC.
-> +
->  config COMMON_CLK_MT8135
->         tristate "Clock driver for MediaTek MT8135"
->         depends on (ARCH_MEDIATEK && ARM) || COMPILE_TEST
-> diff --git a/drivers/clk/mediatek/Makefile b/drivers/clk/mediatek/Makefil=
-e
-> index dbeaa5b41177d..eeccfa039896f 100644
-> --- a/drivers/clk/mediatek/Makefile
-> +++ b/drivers/clk/mediatek/Makefile
-> @@ -62,6 +62,11 @@ obj-$(CONFIG_COMMON_CLK_MT7986) +=3D clk-mt7986-apmixe=
-d.o
->  obj-$(CONFIG_COMMON_CLK_MT7986) +=3D clk-mt7986-topckgen.o
->  obj-$(CONFIG_COMMON_CLK_MT7986) +=3D clk-mt7986-infracfg.o
->  obj-$(CONFIG_COMMON_CLK_MT7986_ETHSYS) +=3D clk-mt7986-eth.o
-> +obj-$(CONFIG_COMMON_CLK_MT7988) +=3D clk-mt7988-apmixed.o
-> +obj-$(CONFIG_COMMON_CLK_MT7988) +=3D clk-mt7988-topckgen.o
-> +obj-$(CONFIG_COMMON_CLK_MT7988) +=3D clk-mt7988-infracfg.o
-> +obj-$(CONFIG_COMMON_CLK_MT7988) +=3D clk-mt7988-eth.o
-> +obj-$(CONFIG_COMMON_CLK_MT7988) +=3D clk-mt7988-xfipll.o
->  obj-$(CONFIG_COMMON_CLK_MT8135) +=3D clk-mt8135-apmixedsys.o clk-mt8135.=
-o
->  obj-$(CONFIG_COMMON_CLK_MT8167) +=3D clk-mt8167-apmixedsys.o clk-mt8167.=
-o
->  obj-$(CONFIG_COMMON_CLK_MT8167_AUDSYS) +=3D clk-mt8167-aud.o
-> diff --git a/drivers/clk/mediatek/clk-mt7988-apmixed.c b/drivers/clk/medi=
-atek/clk-mt7988-apmixed.c
-> new file mode 100644
-> index 0000000000000..02eb6354b01a8
-> --- /dev/null
-> +++ b/drivers/clk/mediatek/clk-mt7988-apmixed.c
-> @@ -0,0 +1,102 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (c) 2023 MediaTek Inc.
-> + * Author: Sam Shih <sam.shih@mediatek.com>
-> + * Author: Xiufeng Li <Xiufeng.Li@mediatek.com>
-> + */
-> +
-> +#include <linux/clk-provider.h>
-> +#include <linux/of.h>
+> So I rather feel easy about guaranteeing UAPI stability; we can just
+> guarantee the UAPI-level stability for a particular kfunc and use it
+> from QEMU expecting the stability. If the feature is found not useful,
+> QEMU and the kernel can just remove it.
 
-> +#include <linux/of_address.h>
-> +#include <linux/of_device.h>
+It appears that we more or less agree that this feature may not be
+something we will support forever.
 
-You probably don't need these 2 headers and the implicit includes
-of_device.h makes are dropped now in linux-next. Please check what you
-actually need and make them explicit.
+> I'm more concerned about the other case, which means that there will be
+> wide uses of this feature. A kernel developer may assume the stability
+> of the interface is like one of kernel internal APIs
+> (Documentation/bpf/kfuncs.rst says kfuncs are like EXPORT_SYMBOL_GPL)
+> and decide to change it, breaking old QEMU binaries and that's something
+> I would like to avoid.
+>
+> Regarding the breakage scenario, I think we can avoid the kfuncs removal
+> just by saying "we won't remove them". I'm more worried the case that a
+> change in the BPF kfunc infrastucture requires to recompile the binary.
+>
+> So, in short, I don't think we can say "kfuncs are like
+> EXPORT_SYMBOL_GPL" and "you can freely use kfuncs in a normal userspace
+> application like QEMU" at the same time.
+>
+> >
+[...]
+>
+> >
+> > I would recommend you give option 2 a try and share the code. This is
+> > probably the best way to move the discussion forward.
+>
+> I'd like to add a documentation change to say the added kfuncs are
+> exceptional cases that are not like EXPORT_SYMBOL_GPL in that case. Will
+> it work?
 
-Rob
+It will not.
+
+The BPF community had a lot of discussions about the stability of BPF APIs,=
+ for
+example in [1]. Therefore, this is not a light decision.
+
+AFAICT, what is being proposed in this RFC is way less stable than many kfu=
+ncs
+we added recently. We are not changing the stability guarantee for this. Le=
+t's
+invest our time wisely and work on more meaningful things, for example, a
+prototype that may actually get accepted.
+
+Thanks,
+Song
+
+[1] https://lore.kernel.org/bpf/20221207205537.860248-1-joannelkoong@gmail.=
+com/
 
