@@ -1,124 +1,150 @@
-Return-Path: <netdev+bounces-56120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C9D180DE57
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 23:34:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6BA480DE8E
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 23:50:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 473C41F2148C
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 22:34:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69FF62825DB
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 22:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6AF15579F;
-	Mon, 11 Dec 2023 22:34:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4174D55C2B;
+	Mon, 11 Dec 2023 22:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pl79AuKH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BiM3KdWY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69ED5AD;
-	Mon, 11 Dec 2023 14:34:35 -0800 (PST)
-Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-5d7346442d4so48469777b3.2;
-        Mon, 11 Dec 2023 14:34:35 -0800 (PST)
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B93CB8;
+	Mon, 11 Dec 2023 14:50:22 -0800 (PST)
+Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-54f4f7d082cso5136357a12.0;
+        Mon, 11 Dec 2023 14:50:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702334074; x=1702938874; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=weETpER/W9eWKpDs0aTzW8/kqujO5Ns20F+TiP+lNxc=;
-        b=Pl79AuKHMkBMVGDU1JhLlZWOW82hDx+5kpah8WvIfmhdo3NFuiBWyiTL4jHiJ+vw3Y
-         FD+a5CS0d/gsGgkN/H85162od3MZJM9TjNwgNiOFxN817dCnCtm4IrCcxIWcDYAtbbo4
-         1446I//YBfT6gMBKLfZXnLtY33YDdLUg1vrKoUXr3E7OtpOpkCu25VlVO9ZzgQ2vNrpB
-         R+4cnnTMzwEFLdOzgH2Zvr8fJBN7gtXPaPoAeklKOt3s4iKdw0fkU4WjOKA562qk5MHx
-         UrGZZWbGE1Hpta5GDVnoav1GSnRKn8yvdUhiggFBgeeEWE+Lv4W9tM6nhn6G3vYydW7/
-         ZH7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702334074; x=1702938874;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1702335021; x=1702939821; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=weETpER/W9eWKpDs0aTzW8/kqujO5Ns20F+TiP+lNxc=;
-        b=J6vcHbs2TcXDlP88yz0kttxNPvJEYz581ya0CxBzw/9XBol4i2Db6XqLAGg6tnqBYS
-         7k9r2B7QFiI2yl4ydw/t1CYnkycDpf/H0X1QsdW9dc0nfyfU3LvWXybiffL5GUg7Sm3R
-         wP0oJfQnoffWQHZI9WtysE927RjBiqyz/wATIM73I9dbnLXn3H59h11JSUOtQy2npjIK
-         Ye9SECjAeqXrkDAu1BRqw9Dj6vOglrXkuW8XZBXFxt6jlzrQC4e+NcgdTKPGyccz9EvV
-         7rzv7PXh8q+57GHKxO51YGgNiubnN7Vn+hAdGy5BcTAiWpQZDhHt71KfsTh8A6da5ULP
-         tFHw==
-X-Gm-Message-State: AOJu0Yx1PQJgu6sqGdNkJgnUL0JnZ0p56IEEu76A3jNCsm0MoiI2FiBu
-	cRCmZFYesBogcbybC6u/aDs=
-X-Google-Smtp-Source: AGHT+IFimdgWnRBEGiupflIWc8T6D9ybHk5AtdinAtNWHe5eWoKDkGhnHAT7dqZcZW2Yc4O6uagmwQ==
-X-Received: by 2002:a0d:d994:0:b0:5d7:1941:3576 with SMTP id b142-20020a0dd994000000b005d719413576mr3132315ywe.93.1702334074480;
-        Mon, 11 Dec 2023 14:34:34 -0800 (PST)
-Received: from localhost ([2601:344:8301:57f0:38aa:1c88:df05:9b73])
-        by smtp.gmail.com with ESMTPSA id e3-20020a0dc203000000b005c5a08c5c15sm3297708ywd.136.2023.12.11.14.34.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 14:34:33 -0800 (PST)
-Date: Mon, 11 Dec 2023 14:34:33 -0800
-From: Yury Norov <yury.norov@gmail.com>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, Karsten Graul <kgraul@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	Jan Kara <jack@suse.cz>,
-	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
-	Matthew Wilcox <willy@infradead.org>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
-	Alexey Klimov <klimov.linux@gmail.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>
-Subject: Re: [PATCH v2 31/35] net: smc: use find_and_set_bit() in
- smc_wr_tx_get_free_slot_index()
-Message-ID: <ZXeOef/60Crhrm2Y@yury-ThinkPad>
-References: <20231203192422.539300-1-yury.norov@gmail.com>
- <20231203193307.542794-1-yury.norov@gmail.com>
- <20231203193307.542794-30-yury.norov@gmail.com>
- <b344c321-b481-48b0-8165-c3ab604fc397@linux.ibm.com>
+        bh=Y2M/QtM4srk5RtLbPaKHdlp0MRAZCUQFxeHkHv+g5gA=;
+        b=BiM3KdWYfmckd/UVNUdRdZJYUdL+2s2+pvVIdd6TbMMJ9SIamRQWqCWLfMcJQGmTpd
+         VgvOu7mZvuKiRVPuteRc4RhQol3mGBxXtY6bvB5zkBHwl12RNvFHBzGrdmWbN7Cun8f+
+         PRC/xn571c7NMe1opK3bxE1TlZKxNs977oU5r63B6zb4/htBG2kzcP9MI98AFtztyzZv
+         68wuQ43KZSNYP+pLln+UWEj8impAsNfee6l6lt9LmOpAU8LcTOQQDUAEIrm3HLmB8ZVM
+         MsiUXyfJ5pN/H75Kqh+7qS5/QXL5Z5KDXekRocLXgblwcFbyqwGOBFSwQFPsriUc9OJ3
+         pJdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702335021; x=1702939821;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Y2M/QtM4srk5RtLbPaKHdlp0MRAZCUQFxeHkHv+g5gA=;
+        b=v/LFq/i7W8tBJ2C+ZSEjDpnbMJ1SDEO4xndC3In3HTsrkfzIN0GDpf72GbJjb/XPyq
+         2AAEpLAXuGPRiQCCJQIOXLJX6/LuN6Hs7qHPnoi5YoBMZ6adWCkIE2oB/56sRM/0XTMT
+         Tn25IcCbkIjjV7vYMpXgQ08NiSRCCsvXZznbbQgx47q+qit8noU09u5umiv2/kq/rj5A
+         baHwB2gffT2eELovYuGqUhp3NwUCtyGb0MTHYgTHeOYbru7oxA0afz/FyG2nQriRyz2Q
+         Uo636qV2D3V56TJEksbPXDqZaG+Eupj1QR4foTn19YC8L2bpKS5y+4vaFdKB50aCOZr9
+         hZdg==
+X-Gm-Message-State: AOJu0YwsefTaQoiwEMmATA/4XyLY49BoohiEXeOvBLtm7/hHTpeqqRwc
+	mUTTFF3ywxhypiiobuLVJtnICkGOER3ZBCh6FsI=
+X-Google-Smtp-Source: AGHT+IEl7LLXN0ptIhesaEPKAxJzCshfTvbMLJ0xi6Dkzcss2G7d2XM76ZzbLJvOATg2ZmA/J2KgZLy6deCMQm8GDk4=
+X-Received: by 2002:a17:906:69d5:b0:a19:a19b:78a4 with SMTP id
+ g21-20020a17090669d500b00a19a19b78a4mr2636059ejs.103.1702335020465; Mon, 11
+ Dec 2023 14:50:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b344c321-b481-48b0-8165-c3ab604fc397@linux.ibm.com>
+References: <20231207185443.2297160-1-andrii@kernel.org> <20231207185443.2297160-4-andrii@kernel.org>
+ <657781ec1712_edaa208f5@john.notmuch>
+In-Reply-To: <657781ec1712_edaa208f5@john.notmuch>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Mon, 11 Dec 2023 14:50:08 -0800
+Message-ID: <CAEf4BzYmZjBd5ps-iKjyxLvQ=iD3z092+M_deV5ze0eJXGoFsg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 3/8] libbpf: further decouple feature checking
+ logic from bpf_object
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	paul@paul-moore.com, brauner@kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, keescook@chromium.org, 
+	kernel-team@meta.com, sargun@sargun.me
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 04, 2023 at 10:40:20AM +0100, Alexandra Winter wrote:
-> 
-> 
-> On 03.12.23 20:33, Yury Norov wrote:
-> > The function opencodes find_and_set_bit() with a for_each() loop. Use
-> > it, and make the whole function a simple almost one-liner.
-> > 
-> > While here, drop explicit initialization of *idx, because it's already
-> > initialized by the caller in case of ENOLINK, or set properly with
-> > ->wr_tx_mask, if nothing is found, in case of EBUSY.
-> > 
-> > CC: Tony Lu <tonylu@linux.alibaba.com>
-> > CC: Alexandra Winter <wintera@linux.ibm.com>
-> > Signed-off-by: Yury Norov <yury.norov@gmail.com>
+On Mon, Dec 11, 2023 at 1:41=E2=80=AFPM John Fastabend <john.fastabend@gmai=
+l.com> wrote:
+>
+> Andrii Nakryiko wrote:
+> > Add feat_supported() helper that accepts feature cache instead of
+> > bpf_object. This allows low-level code in bpf.c to not know or care
+> > about higher-level concept of bpf_object, yet it will be able to utiliz=
+e
+> > custom feature checking in cases where BPF token might influence the
+> > outcome.
+> >
+> > Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
 > > ---
-> 
-> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
-> 
-> 
-> Thanks a lot for the great helper function!
-> I guess the top-level maintainers will figure out, how this series best finds its way upstream.
+>
+> ...
+>
+> > diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
+> > index a6b8d6f70918..af5e777efcbd 100644
+> > --- a/tools/lib/bpf/libbpf.c
+> > +++ b/tools/lib/bpf/libbpf.c
+> > @@ -637,6 +637,7 @@ struct elf_state {
+> >  };
+> >
+> >  struct usdt_manager;
+> > +struct kern_feature_cache;
+> >
+> >  struct bpf_object {
+> >       char name[BPF_OBJ_NAME_LEN];
+> > @@ -5063,17 +5064,14 @@ static struct kern_feature_desc {
+> >       },
+> >  };
+> >
+> > -bool kernel_supports(const struct bpf_object *obj, enum kern_feature_i=
+d feat_id)
+> > +bool feat_supported(struct kern_feature_cache *cache, enum kern_featur=
+e_id feat_id)
+> >  {
+> >       struct kern_feature_desc *feat =3D &feature_probes[feat_id];
+> > -     struct kern_feature_cache *cache =3D &feature_cache;
+> >       int ret;
+> >
+> > -     if (obj && obj->gen_loader)
+> > -             /* To generate loader program assume the latest kernel
+> > -              * to avoid doing extra prog_load, map_create syscalls.
+> > -              */
+> > -             return true;
+> > +     /* assume global feature cache, unless custom one is provided */
+> > +     if (!cache)
+> > +             cache =3D &feature_cache;
+>
+> Why expose a custom cache at all? Where would that be used? I guess we ar=
+e
+> looking at libbpf_internal APIs so maybe not a big deal.
 
-Thanks, Alexandra. :)
+bpf_object with token_fd set will have to use a separate non-global
+feature cache. Couple that with me moving this code into a separate
+features.c file in one of the next patches, we need to have some
+internal interface to make this happen.
 
-People in this thread say just pick their subsystem patch together
-with #1. So, I'm going to send v3 with some minor tweaks, and if
-everything is OK, will pull all this in my bitmap-for-next branch.
+Also, bpf.c is also using feature detectors, but today they all use
+unprivileged program types, so I didn't add custom feature_cache there
+just yet. But if in the future we have more complicated feature
+detectors that will rely on privileged programs/maps, we'd need to
+pass custom feature_cache from bpf.c as well.
 
-Thanks,
-Yury
+>
+> >
+> >       if (READ_ONCE(cache->res[feat_id]) =3D=3D FEAT_UNKNOWN) {
+> >               ret =3D feat->probe();
+> > @@ -5090,6 +5088,17 @@ bool kernel_supports(const struct bpf_object *ob=
+j, enum kern_feature_id feat_id)
+> >       return READ_ONCE(cache->res[feat_id]) =3D=3D FEAT_SUPPORTED;
+> >  }
+>
+> Acked-by: John Fastabend <john.fastabend@gmail.com>
 
