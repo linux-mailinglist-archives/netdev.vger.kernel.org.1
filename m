@@ -1,126 +1,164 @@
-Return-Path: <netdev+bounces-55663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C732580BE9A
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 01:56:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A421480BEC6
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 02:41:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2531C280BE6
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 00:56:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DD111F20620
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 01:41:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D96612D;
-	Mon, 11 Dec 2023 00:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDDAEC2C6;
+	Mon, 11 Dec 2023 01:41:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RQE0G6Qy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qR17lPs4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A855A93;
-	Sun, 10 Dec 2023 16:56:29 -0800 (PST)
-Received: by mail-oo1-xc32.google.com with SMTP id 006d021491bc7-58cf894544cso2406440eaf.3;
-        Sun, 10 Dec 2023 16:56:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702256189; x=1702860989; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=MkKF7z5dWVDcPQzuq7xOJ4bZ1tfD8dwgDZR7n/xoOlk=;
-        b=RQE0G6QyBTFXXy5SINlw/AZj1AB4EojGBqsGNS1hs5CPUgHGfUQovqhL6cfltmv2FY
-         5tJoY7Iho4sjgn+iV8yKrIUlNAq8e2lcc3Aoe5hA9rX3qnQTWCcZbBsfrk2xQkTC40zz
-         hdu/fAf1xla0DoYn4dWtfuD7hFC/5alPvDor0KFcfw0y2jDPwMNjHiMcCIcpgXuk/+5s
-         /hrwYJ44BtXeBhtMgR9LFiyTX98Btd2ubpu0qaG66KSWtM3vAo7xMMrj+7skuqudMpvb
-         eAXblRi1T+uc5s9ziBQi/+jhpyHSY0OZZX4gkSAnp7yO7SRQRSaT3Vb0QLabtazmlB+b
-         e2Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702256189; x=1702860989;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MkKF7z5dWVDcPQzuq7xOJ4bZ1tfD8dwgDZR7n/xoOlk=;
-        b=C9Nmq9sLTuvgqDqv0/DhadtVRiy2H7wpBtHib3luxDoICI5TAlx3az9pMbOgKnd5w9
-         p00uvX0WNMySIH5Du+4biPu0oKbxjoud29yl4qfZw4vyD1tWnBkI60BwSAGfMfNa0H1s
-         6JOY10fCwccwXt0nCtGmfFaCXrYuvjXv4SrwGlV0DyNtQsdBZthcNwJSB9TgWhvmwEhx
-         LlbPcs96TFN2O/5dkZyPECfprUknqbaU65DDn/s6yqreJGwh3BRL3f4WCiQL89gEkwIQ
-         j+FcJATbcFqVmBRkaiJtmTlGqSr9x3gIRbXa0Ql3r2XE+MiQV1kZD1b1i4KRymgKXlmI
-         T7EQ==
-X-Gm-Message-State: AOJu0YyLZgHHj+xfWqpuBTsIs9xMSwAApPtvJxPix0ZyHQbF+HTnks9s
-	uXWaGMoTsmdnBCSVij4JvL4=
-X-Google-Smtp-Source: AGHT+IGWIZHlQFtXq9tSPrSlxJuM8nLM3S8tcQSZ3mBktGDR4ydqRkFq+ewYgtBoz1cB/923/0T/VA==
-X-Received: by 2002:a4a:58cd:0:b0:590:c350:34c3 with SMTP id f196-20020a4a58cd000000b00590c35034c3mr1184594oob.5.1702256188874;
-        Sun, 10 Dec 2023 16:56:28 -0800 (PST)
-Received: from ?IPV6:2603:8081:1405:679b:34a2:c217:379f:32fb? (2603-8081-1405-679b-34a2-c217-379f-32fb.res6.spectrum.com. [2603:8081:1405:679b:34a2:c217:379f:32fb])
-        by smtp.gmail.com with ESMTPSA id v17-20020a056820005100b0059091609e98sm1455957oob.34.2023.12.10.16.56.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 10 Dec 2023 16:56:28 -0800 (PST)
-Message-ID: <baadce1c-7fd7-4756-9d4a-4a79483e576e@gmail.com>
-Date: Sun, 10 Dec 2023 18:56:26 -0600
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CC4C612D;
+	Mon, 11 Dec 2023 01:41:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F14A9C43395;
+	Mon, 11 Dec 2023 01:41:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702258866;
+	bh=MBOze/c93zYR/s0Tv/psL8lZsa2zAA8epMJdS8MTA48=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=qR17lPs4JMPnH4HZ6ahTIg4TYdw9Z4XEBYFJPU0HqGvQbsEA0QxrteiBI65X0D8wM
+	 OnS+34BNKvsvb7nxZvu3bIFA/LezLHP88kiCw7rXdNOBkbjqjORpXBWYYfYSJCt0q9
+	 2d3TkFNtGktLG+F+95I8YIUrrIFrV4hwTZwW72HEi/SKVOS1p3IekzaLsbSF2ikZnw
+	 q4UCfhQejMRxVHD94ZpJUBrJHFFEQ4e/M/LidZJOEs1GY6tmxMEXinp2TyJHkLSskv
+	 luB8LytAXsQ1RptemeRh0Va7+XGeR/CIiqGvs2FQEEeVPQAslDf3xAlhmqNbBDGsst
+	 uW9/xpQAU60RA==
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2c9efa1ab7fso47837391fa.0;
+        Sun, 10 Dec 2023 17:41:05 -0800 (PST)
+X-Gm-Message-State: AOJu0Yzf2HbO/DTwEGwALmGOL/a6eS7TlzY/75tCyFtE4vopVXpWSqon
+	1GzTgWGdsTC+GxU8ePqYW/9pUC01i5WRXgv5Cas=
+X-Google-Smtp-Source: AGHT+IHifpFa36iHpb1+GyluGw6IQnLTC075/8t8iOHLtdbD3dWDzZ8fH9kQh4f8GxIkuv9w02XPsx/dXrcydyPkjDw=
+X-Received: by 2002:a2e:7e05:0:b0:2ca:1bb4:4426 with SMTP id
+ z5-20020a2e7e05000000b002ca1bb44426mr543816ljc.207.1702258864030; Sun, 10 Dec
+ 2023 17:41:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH for-next v6 3/7] RDMA/rxe: Register IP mcast address
-To: David Ahern <dsahern@kernel.org>, jgg@nvidia.com, yanjun.zhu@linux.dev,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org, rain.1986.08.12@gmail.com
-References: <20231207192907.10113-1-rpearsonhpe@gmail.com>
- <20231207192907.10113-4-rpearsonhpe@gmail.com>
- <7e370f63-f256-45f3-89c9-7774877afaba@kernel.org>
-Content-Language: en-US
-From: Bob Pearson <rpearsonhpe@gmail.com>
-In-Reply-To: <7e370f63-f256-45f3-89c9-7774877afaba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20231015141644.260646-1-akihiko.odaki@daynix.com>
+ <20231015141644.260646-2-akihiko.odaki@daynix.com> <CAADnVQLfUDmgYng8Cw1hiZOMfWNWLjbn7ZGc4yOEz-XmeFEz5Q@mail.gmail.com>
+ <2594bb24-74dc-4785-b46d-e1bffcc3e7ed@daynix.com> <CAADnVQ+J+bOtvEfdvgUse_Rr07rM5KOZ5DtAmHDgRmi70W68+g@mail.gmail.com>
+ <CACGkMEs22078F7rSLEz6eQabkZZ=kujSONUNMThZz5Gp=YiidQ@mail.gmail.com>
+ <CAADnVQLt8NWvP8qGWMPx=12PwWWE69P7aS2dbm=khAJkCnJEoQ@mail.gmail.com>
+ <9a4853ad-5ef4-4b15-a49e-9edb5ae4468e@daynix.com> <6253fb6b-9a53-484a-9be5-8facd46c051e@daynix.com>
+ <CAPhsuW5JYoM-Mkehdy=FQsG1nvjbYGzwRZx8BkpG1P7cHdD=eQ@mail.gmail.com>
+ <dba89d4b-84aa-4c9f-b016-56fd3ade04b2@daynix.com> <CAPhsuW5KLgt_gsih7zi+T99iYVbt7hk7=OCwYzin-H3=OhF54Q@mail.gmail.com>
+ <a1f09866-a443-4f74-8025-6cdb32eb1d2c@daynix.com> <CAPhsuW4o5o41a+jVjgGP+Ck3eUD8w6coLXMTYewXKJYmciLLnQ@mail.gmail.com>
+ <664003d3-aadb-4938-80f6-67fab1c9dcdd@daynix.com> <d30a038b-d10f-468d-8879-478a6c5b814b@daynix.com>
+In-Reply-To: <d30a038b-d10f-468d-8879-478a6c5b814b@daynix.com>
+From: Song Liu <song@kernel.org>
+Date: Sun, 10 Dec 2023 17:40:52 -0800
+X-Gmail-Original-Message-ID: <CAPhsuW5CMYiOMUDCgfQyo=K31igZZ+BgXyL6yfq1OG3r2CzQ4g@mail.gmail.com>
+Message-ID: <CAPhsuW5CMYiOMUDCgfQyo=K31igZZ+BgXyL6yfq1OG3r2CzQ4g@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 1/7] bpf: Introduce BPF_PROG_TYPE_VNET_HASH
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Jason Wang <jasowang@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Sat, Dec 9, 2023 at 11:03=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix=
+.com> wrote:
+>
+> On 2023/11/22 14:36, Akihiko Odaki wrote:
+> > On 2023/11/22 14:25, Song Liu wrote:
+[...]
+>
+> Now the discussion is stale again so let me summarize the discussion:
+>
+> A tuntap device can have an eBPF steering program to let the userspace
+> decide which tuntap queue should be used for each packet. QEMU uses this
+> feature to implement the RSS algorithm for virtio-net emulation. Now,
+> the virtio specification has a new feature to report hash values
+> calculated with the RSS algorithm. The goal of this RFC is to report
+> such hash values from the eBPF steering program to the userspace.
+>
+> There are currently three ideas to implement the proposal:
+>
+> 1. Abandon eBPF steering program and implement RSS in the kernel.
+>
+> It is possible to implement the RSS algorithm in the kernel as it's
+> strictly defined in the specification. However, there are proposals for
+> relevant virtio specification changes, and abandoning eBPF steering
+> program will loose the ability to implement those changes in the
+> userspace. There are concerns that this lead to more UAPI changes in the
+> end.
+>
+> 2. Add BPF kfuncs.
+>
+> Adding BPF kfuncs is *the* standard way to add BPF interfaces. hid-bpf
+> is a good reference for this.
+>
+> The problem with BPF kfuncs is that kfuncs are not considered as stable
+> as UAPI. In my understanding, it is not problematic for things like
+> hid-bpf because programs using those kfuncs affect the entire system
+> state and expected to be centrally managed. Such BPF programs can be
+> updated along with the kernel in a manner similar to kernel modules.
+>
+> The use case of tuntap steering/hash reporting is somewhat different
+> though; the eBPF program is more like a part of application (QEMU or
+> potentially other VMM) and thus needs to be portable. For example, a
+> user may expect a Debian container with QEMU installed to work on Fedora.
+>
+> BPF kfuncs do still provide some level of stability, but there is no
+> documentation that tell how stable they are. The worst case scenario I
+> can imagine is that a future legitimate BPF change breaks QEMU, letting
+> the "no regressions" rule force the change to be reverted. Some
+> assurance that kind scenario will not happen is necessary in my opinion.
 
+I don't think we can provide stability guarantees before seeing something
+being used in the field. How do we know it will be useful forever? If a
+couple years later, there is only one person using it somewhere in the
+world, why should we keep supporting it? If there are millions of virtual
+machines using it, why would you worry about it being removed?
 
-On 12/8/23 09:50, David Ahern wrote:
-> On 12/7/23 12:29 PM, Bob Pearson wrote:
->> diff --git a/drivers/infiniband/sw/rxe/rxe_mcast.c b/drivers/infiniband/sw/rxe/rxe_mcast.c
->> index 86cc2e18a7fd..5236761892dd 100644
->> --- a/drivers/infiniband/sw/rxe/rxe_mcast.c
->> +++ b/drivers/infiniband/sw/rxe/rxe_mcast.c
->> @@ -19,38 +19,116 @@
->>    * mcast packets in the rxe receive path.
->>    */
->>   
->> +#include <linux/igmp.h>
->> +
->>   #include "rxe.h"
->>   
->> -/**
->> - * rxe_mcast_add - add multicast address to rxe device
->> - * @rxe: rxe device object
->> - * @mgid: multicast address as a gid
->> - *
->> - * Returns 0 on success else an error
->> - */
->> -static int rxe_mcast_add(struct rxe_dev *rxe, union ib_gid *mgid)
->> +static int rxe_mcast_add6(struct rxe_dev *rxe, union ib_gid *mgid)
->>   {
->> +	struct in6_addr *addr6 = (struct in6_addr *)mgid;
->> +	struct sock *sk = recv_sockets.sk6->sk;
->>   	unsigned char ll_addr[ETH_ALEN];
->> +	int err;
->> +
->> +	lock_sock(sk);
->> +	rtnl_lock();
-> 
-> reverse the order. rtnl is always taken first, then socket lock.
-> 
-> Actually, I think it would be better to avoid burying this logic in the
-> rxe driver. Can you try using the setsockopt API? I think it is now
-> usable within the kernel again after the refactoring for io_uring.
-> 
-> 
-David,
+>
+> 3. Add BPF program type derived from the conventional steering program ty=
+pe
+>
+> In principle, it's just to add a feature to report four more bytes to
+> the conventional steering program. However, BPF program types are frozen
+> for feature additions and the proposed change will break the feature free=
+ze.
+>
+> So what's next? I'm inclined to option 3 due to its minimal ABI/API
+> change, but I'm also fine with option 2 if it is possible to guarantee
+> the ABI/API stability necessary to run pre-built QEMUs on future kernel
+> versions by e.g., explicitly stating the stability of kfuncs. If no
+> objection arises, I'll resend this series with the RFC prefix dropped
+> for upstream inclusion. If it's decided to go for option 1 or 2, I'll
+> post a new version of the series implementing the idea.
 
-Thanks for looking at this. What is the in kernel setsock api? I'll give 
-it a try but I am not sure what to call.
+Probably a dumb question, but does this RFC fall into option 3? If
+that's the case, I seriously don't think it's gonna happen.
 
-Bob
-> 
-> 
+I would recommend you give option 2 a try and share the code. This is
+probably the best way to move the discussion forward.
+
+Thanks,
+Song
 
