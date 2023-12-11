@@ -1,191 +1,848 @@
-Return-Path: <netdev+bounces-55709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF23F80C078
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 05:55:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C83FC80C088
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 06:02:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3DA42B207F1
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 04:55:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91C5BB20342
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 05:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 592961A5A6;
-	Mon, 11 Dec 2023 04:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F225B1C29E;
+	Mon, 11 Dec 2023 05:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TdOp8L59"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GYrHcmYS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4763EEA
-	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 20:55:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702270532; x=1733806532;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=mu/PM2TGRlY87mB2lNk+bDY2qKQsbZF9Plpq5Fcg9nc=;
-  b=TdOp8L5915i5ZudvepQEEokpJvjXRXnTSnul/9FpAq95IeBCnd2+A/Ht
-   XurQyj7VPzzIraP25vqCffDLk7tR3BBN9rnrXW3xsrhsa0UOFFbumJBp3
-   75iF1PWbGW+XMZ8jRZhS35RGWVLs/mj1lgjMHTTFPG/4IGAxpXRlLZBGX
-   YMwr0jxERa6HTpn511x90t3fFAmg7rCDg8yvQGV2spqMy1CKRC4r+ktxf
-   xqknUJPiP6wmmwhPyI/6IPh2PSZfXqcEqXUuP3//rINiMc+ufmKikICrV
-   VuQyLXoYfXvSaivchMytMebLCIFXkSTg9gUYTGLBHTppRS8wUSleZMqPI
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10920"; a="1666890"
-X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
-   d="scan'208";a="1666890"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2023 20:55:32 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10920"; a="946159829"
-X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
-   d="scan'208";a="946159829"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Dec 2023 20:55:31 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 10 Dec 2023 20:55:31 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 10 Dec 2023 20:55:31 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Sun, 10 Dec 2023 20:55:31 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Sun, 10 Dec 2023 20:55:30 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bYzZxb8StozwuKtbVMJA6nvDog5fFJm2g+zuY52TgU405rzFPKPr1XmfX1+6aqzhNKsnLMFRX5xwC/LLhzxb0s0/V5Omp/VOW2qlRED2vSDgvxMVj0bmItWh5CJw6B430Ss6MxwQYuTFbqSlMeB2C4ZFbnpz7gtcena9vRtCgKdHFmZL3a1/3W5BC90mGh54FazYeqTpwaDGMejfHpTS5EA6XYdo5vp4/N7YZexX+ET7lwaJ/uiBHloR6LiqaVb3XqtmnHftIH9Wum7PTXjBIuSNAQ39N8DevaZH37w0/IqBK2rZppocf96yOW/sq+4GqXJsofgLO2Gqg9xNTcNDpA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=O4YFGKoc+TPIOoCrtgxPlfYmiDgZVvh7nN8/hsX10KI=;
- b=Z++ug1pQroS07VDs7b8mYFAXjwdVqTpQHlK24mUppSDFsmJTI+WiofKOc3oxgmHwexTx/3lo9NrmKMMdfvoCcUFfbJSPt3Z1jSZLdm5U5ecFLhwfJBS0ieOi6l2ozygY/NDVtXCUIZjnNpoSdvEzvBCrV13d/uis1nDEN29+GSfoYK7z73FzEFILMpohYxmFXOddurRtb8Akg8EftsfDAE8JRhVD7R2JRaGE8X+zAa47F8dfFl0cXFVuS+04vMbBqsSGNPMQ1h5cVdEImws5lVpmAEorldNh5jp4+Y9ocHN3r5sZxSqJJ6UnusCEMvxmPY6Sf/NC05ZIvORTCDzXbw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL0PR11MB3122.namprd11.prod.outlook.com (2603:10b6:208:75::32)
- by SN7PR11MB6653.namprd11.prod.outlook.com (2603:10b6:806:26f::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Mon, 11 Dec
- 2023 04:55:27 +0000
-Received: from BL0PR11MB3122.namprd11.prod.outlook.com
- ([fe80::954:6050:f988:740f]) by BL0PR11MB3122.namprd11.prod.outlook.com
- ([fe80::954:6050:f988:740f%4]) with mapi id 15.20.7068.031; Mon, 11 Dec 2023
- 04:55:27 +0000
-From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
-To: mschmidt <mschmidt@redhat.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Greenwalt, Paul"
-	<paul.greenwalt@intel.com>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "Brandeburg, Jesse"
-	<jesse.brandeburg@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH net] ice: fix theoretical out-of-bounds
- access in ethtool link modes
-Thread-Topic: [Intel-wired-lan] [PATCH net] ice: fix theoretical out-of-bounds
- access in ethtool link modes
-Thread-Index: AQHaI66D8bVBU2eaCEWK/h1KRtI3NbCjlMWw
-Date: Mon, 11 Dec 2023 04:55:27 +0000
-Message-ID: <BL0PR11MB3122C204A8FD85F7FFF839CFBD8FA@BL0PR11MB3122.namprd11.prod.outlook.com>
-References: <20231130165806.135668-1-mschmidt@redhat.com>
-In-Reply-To: <20231130165806.135668-1-mschmidt@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL0PR11MB3122:EE_|SN7PR11MB6653:EE_
-x-ms-office365-filtering-correlation-id: 09dc8b6c-8ca3-40d8-67df-08dbfa0564b8
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: SjRNQAVWLMTjbYpISIdqlEBFYMoH+sOnRZ34y9RSwiqkYY1ozHroPbRUi7DVAf9168khVLOR+Bly7nVUgpZL8B2pK1O+Xbv8v+D4y07Qv7ndhzgWTYngaT9IuaT5Zlz7fGfy6tNSbY02eHqD3lKxDfUKh4ueGGWKt8CwVlkuEG2iSGSZmuEBNtYHa+qc6WYQzbG3fps/xqNHOgfJaCCm9/xgUjekSZdWRCoVSFuO/65NsEPYaazXYP2+50ViCQ8TgJl0CL4Y3yQFTXonrmSlXAXOx2vZ7BLEjTftKBeG2FbkG/5LUTojP8GfQA8xUGWXnML+7EVDjjQnS9zwGi+sro2TJ/oDVRdJpnKefUfy68BIK9vpUfpciQIYLBuRevmMjt+IeFfocBgyw6uWJzGJhw1L2glWa3UwXiC4apvThuNQCtpVnAXaamW3tZZwoQUb17xzEqcc+O56R3sbrbWIEBjSYr3r4JmIN0MqICLb5sOplC3fZcUxrL6k6ApOZSzg6wB9jO2z22Ona4JMdIlLPczWi++okEyWGYULKG8eMHDcVKgECoi1qgJmrcOB9G1LYWSYR6ONgZP8PbLmlAQwzR9Z12OwUZ9ZFVdG26eDjodHb6HuYbmjj+aB22LjE3Fy
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3122.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(346002)(136003)(366004)(396003)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(2906002)(41300700001)(38100700002)(122000001)(33656002)(110136005)(86362001)(82960400001)(9686003)(107886003)(26005)(478600001)(71200400001)(53546011)(6506007)(7696005)(83380400001)(4326008)(52536014)(5660300002)(316002)(76116006)(66556008)(66476007)(66446008)(64756008)(54906003)(66946007)(38070700009)(8936002)(8676002)(55016003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?UploBdBVDDsvUlGjkHxQPx+ZAzrstVojxFqdjsSmsEnfpD0nta20tjCTsKCc?=
- =?us-ascii?Q?Xz3cpmnEiZb/UO4ZkKct9h/L660wOBGoKQRLOzXlJHQAxyaf6tbeZm0Cch8b?=
- =?us-ascii?Q?4JzZ8To0OW8xipZzG8YuDDLM88Sjziu4ulAlUABoloRdAULwoIYKapZTmIEO?=
- =?us-ascii?Q?YRLCCp0uQSlostAMG3LLuXxpec7CMb7P+hrXPqPfA+NUVGtvDQR3PszO1lKu?=
- =?us-ascii?Q?e91nRQl+WCob9U+Z+nOqwhv4BHeENOtQQafHwJtfegYSDBt4wzRVVIBy1iZK?=
- =?us-ascii?Q?6OWmJ9UDnXvwEp9+V37XklCxstp5XGGCdfbCy8s6HAHgNB9x/EJP/Qy3DEkO?=
- =?us-ascii?Q?H2UxYe71eFcB3t33obJMa1VRnxSfguihAP5jzjctP4ShCsxyAGJ4tqueL1NV?=
- =?us-ascii?Q?fTxhcq+hKWRfgn4CLy0ttuOSDtDq3UyUie/Szgiwlz7BgJfJ5kzrfEb2z22c?=
- =?us-ascii?Q?mNSiwfXsXuHWJxb2BC9vibo38VIdSwGNti7oaCJNUo43hNbE3Qfhi1Ap7w6f?=
- =?us-ascii?Q?Kh3qQobUtZpAsKgiM7NORcu6Qudw34i0yM/JZfK1fRb4GqFA8XBDiwoowkEG?=
- =?us-ascii?Q?bnnG7HgSdhyPCieNkKE83ixxbouTK4WuL4WcOMSYSTlKzURJtdAsdgeVhdUm?=
- =?us-ascii?Q?2dP65XQOeVIUJE6ZH5mE2KOJ+M+yRlJz07snglHQEnW4tNmN8uUu/+RdQZVN?=
- =?us-ascii?Q?IHDKNGRHf8bFosAgdEupuu4H5EkM2mXelMjlA2wVOPTPpsok2EoBLTjRftTF?=
- =?us-ascii?Q?SGwyMoKvOtrhccbsexb8bSFPh2TXB0ZSZVNymD55c6KFNTY5QToZxyProPyc?=
- =?us-ascii?Q?PoR1oe0CtGq8Zn06zyZin3ScEvmeBPYtocXZxXmuCuSl6vREk0YzlnElst9r?=
- =?us-ascii?Q?Q0t4EuoCus5V6hOqqq6hWXLARBM05l7marfho3kk1PPmN822Mpwqt7uptwtn?=
- =?us-ascii?Q?Gus/X9tE4jmjWj3KUW6eotfT6YxoqazIlyzI0gLpIn1L/k0HEoloOQUyqhgI?=
- =?us-ascii?Q?rglX8DgFk950FFvLryqY0KJrFG+ausjPL+JZFBYgI5PnKcG68udALg+0lemf?=
- =?us-ascii?Q?eVhDsjEdLulzrAjWrBvHHm4oqYFUEH5Fhg0xcDVdy9+lrVeabh6PDdZ2YWpy?=
- =?us-ascii?Q?Ojc10uPYD6AgnXcuGCf0NVUN6UaNPiOquBXwHFVJl2Kt5j2ULdXFyWXXHjEP?=
- =?us-ascii?Q?X+dMHbkzPtJ6othz3wq5fH1weXiyCPipvicQadwjG/8iUdtHfK2ejdde4R9l?=
- =?us-ascii?Q?JUc2BiEQ11evYuwzxRLbl0L+v25scwMo6RWV4f7HQuUC98sVg554l+QOLyDm?=
- =?us-ascii?Q?kz/m+QkAe/psSf/UauBEKzvc9UAuzsKbLhdoJ0vwfQpagX2Ly8UUwDW8L5qg?=
- =?us-ascii?Q?h7xynaYEcCpT6rAhxOLonsr1vVyu4iKwmuvH8fYb7Yq224L3XRIYlbPEqeOa?=
- =?us-ascii?Q?Rk4uxWdb+hBj8QpJMH2lisixV1ptmRdGKbnVHf0pMDrL5iGlohU7uHvKuEia?=
- =?us-ascii?Q?3PmODUridq8MtH8WV6OS2poPP6agwlumACVkysIDZis9MtOlZYrfWozpVCWq?=
- =?us-ascii?Q?qz/U9OEf3m+BzKhh1EoxC5WvZJGRyqb2edEo6sPntw9PFPv/4Gd2K6fF9HQh?=
- =?us-ascii?Q?8Q=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C84FEA
+	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 21:02:32 -0800 (PST)
+Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-50bfa7f7093so5120525e87.0
+        for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 21:02:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702270950; x=1702875750; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=tAu5cnEeQYJPt7HvKDRTWT2xlpazvLS8i4k5JL7a/1U=;
+        b=GYrHcmYSXzfj4Tj8t4hliM4KmSshrj+TD2TGkPEmqC/EzHNXC8oLm57JyuGnmkXzvN
+         W6qZIFkA83b2rj3r2sMHDbY7olT+dgqsd65m+9jP+MPZrqLYF/1moxWhqRARppcGwMuI
+         rBYT2GBXJAHd+m6v5JRAFvQvOyG3qcqz75xywVE5Js26cMaTCdB0ljW1wv9P9K0Ur6AB
+         L/fU961lqWHmUYOr9K/br/Ax0a3oXfOj8J0Wk+6LraDXLOcMZgHUti/GFYiX2PrhMi+1
+         BWq11RVD+/U70PIGiq7O1dfE94tz174dlYxqXYTUhGK5ry3toOlBKxbvFqJ5vtMKVc0R
+         2z4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702270950; x=1702875750;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tAu5cnEeQYJPt7HvKDRTWT2xlpazvLS8i4k5JL7a/1U=;
+        b=LuFpfMVED/lMBHE9RjYhXi/LlSK1KgFC93v7GOUFj1M1ft9XuNdkuBvtf4i7/LnYzc
+         zPNzfOBVk/5TfUsyzQecfIaNrMQHLSI8qZkWQuJePHwEL1JfpmFdXYBeK154td9LQ8cU
+         GL3nScK1AXm7c5gxA83hu1Sj9XB9PeG3/smiV484WAR5ikoi35RltaBB0gwWFYU8d+vo
+         ipWrZuqociXKiyluVU1kOF3qwR1sJxmynslo+FEvj6mxfA7wqq3s7JT/UPfIdv8WA/ux
+         /vE3VcJr5Fpg6UHg+vb4BFgKIVMjHtzV3S7Qnq+Xvf4iUbR0sIrmraNtmrlai/dCsJzY
+         60dQ==
+X-Gm-Message-State: AOJu0YzY0cSwysXxU6hiWW7+dHVSaLApPQ4icQ5Ak5hrBHMvT0M5mmhX
+	xjdYD/OEtqBwss69wt4pLkvMg73hfXngqEMEZf8=
+X-Google-Smtp-Source: AGHT+IEH1pq5zD6831HnY6iUih55F5MD5l9CUQ9zyFGOEDDVdlrI85vXXtt27lpFLE3+QCm0iWoY4ccQlew3PHVkFIc=
+X-Received: by 2002:a19:8c05:0:b0:50b:f836:9027 with SMTP id
+ o5-20020a198c05000000b0050bf8369027mr1885921lfd.93.1702270950008; Sun, 10 Dec
+ 2023 21:02:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3122.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 09dc8b6c-8ca3-40d8-67df-08dbfa0564b8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Dec 2023 04:55:27.4167
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: RZwwFDCBZzN5DZS5wiqBbE6lFXT21im/3OnQusQoWYP4mngRwpjs/9M+CuF1WRd+YjsrUsNQHT8+a4cl7+u7UUjkJ2X3RyVsQeEsfnxD6LWQQ3YUvln6hUfJksq7V+Wo
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6653
-X-OriginatorOrg: intel.com
+References: <20231208045054.27966-1-luizluca@gmail.com> <20231208045054.27966-5-luizluca@gmail.com>
+ <hycvlka3sdsbpgq6al2wsqaqnaczvz5stxicjuxntsbfo6kzgj@evunbox7qcct>
+In-Reply-To: <hycvlka3sdsbpgq6al2wsqaqnaczvz5stxicjuxntsbfo6kzgj@evunbox7qcct>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Mon, 11 Dec 2023 02:02:18 -0300
+Message-ID: <CAJq09z73Q5uu_Nx_kbxSCjc7JwxvoQzLp+=5WX6b2dn6+SH3Ew@mail.gmail.com>
+Subject: Re: [PATCH net-next 4/7] net: dsa: realtek: create realtek-common
+To: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linus.walleij@linaro.org" <linus.walleij@linaro.org>, "andrew@lunn.ch" <andrew@lunn.ch>, 
+	"f.fainelli@gmail.com" <f.fainelli@gmail.com>, "olteanv@gmail.com" <olteanv@gmail.com>, 
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>, 
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
+	"arinc.unal@arinc9.com" <arinc.unal@arinc9.com>
+Content-Type: text/plain; charset="UTF-8"
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of M=
-ichal Schmidt
-> Sent: Thursday, November 30, 2023 10:28 PM
-> To: netdev@vger.kernel.org
-> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Greenwalt, Paul <paul=
-.greenwalt@intel.com>; intel-wired-lan@lists.osuosl.org; Brandeburg, Jesse =
-<jesse.brandeburg@intel.com>
-> Subject: [Intel-wired-lan] [PATCH net] ice: fix theoretical out-of-bounds=
- access in ethtool link modes
+> On Fri, Dec 08, 2023 at 01:41:40AM -0300, Luiz Angelo Daros de Luca wrote:
+> > Some code can be shared between both interface modules (MDIO and SMI)
+> > and among variants. Currently, these interface functions are shared:
+> >
+> > - realtek_common_lock
+> > - realtek_common_unlock
+> > - realtek_common_probe
+> > - realtek_common_remove
+> >
+> > The reset during probe was moved to the last moment before a variant
+> > detects the switch. This way, we avoid a reset if anything else fails.
+> >
+> > Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+> > Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+> > ---
+> >  drivers/net/dsa/realtek/Makefile         |   1 +
+> >  drivers/net/dsa/realtek/realtek-common.c | 136 +++++++++++++++++++++++
+> >  drivers/net/dsa/realtek/realtek-common.h |  16 +++
+> >  drivers/net/dsa/realtek/realtek-mdio.c   | 121 ++------------------
+> >  drivers/net/dsa/realtek/realtek-smi.c    | 124 +++------------------
+> >  drivers/net/dsa/realtek/realtek.h        |   6 +-
+> >  drivers/net/dsa/realtek/rtl8365mb.c      |   9 +-
+> >  drivers/net/dsa/realtek/rtl8366rb.c      |   9 +-
+> >  8 files changed, 194 insertions(+), 228 deletions(-)
+> >  create mode 100644 drivers/net/dsa/realtek/realtek-common.c
+> >  create mode 100644 drivers/net/dsa/realtek/realtek-common.h
+> >
+> > diff --git a/drivers/net/dsa/realtek/Makefile b/drivers/net/dsa/realtek/Makefile
+> > index 0aab57252a7c..5e0c1ef200a3 100644
+> > --- a/drivers/net/dsa/realtek/Makefile
+> > +++ b/drivers/net/dsa/realtek/Makefile
+> > @@ -1,4 +1,5 @@
+> >  # SPDX-License-Identifier: GPL-2.0
+> > +obj-$(CONFIG_NET_DSA_REALTEK)                += realtek-common.o
 >
-> To map phy types reported by the hardware to ethtool link mode bits,
-> ice uses two lookup tables (phy_type_low_lkup, phy_type_high_lkup).
-> The "low" table has 64 elements to cover every possible bit the hardware
-> may report, but the "high" table has only 13. If the hardware reports a
-> higher bit in phy_types_high, the driver would access memory beyond the
-> lookup table's end.
->
-> Instead of iterating through all 64 bits of phy_types_{low,high}, use
-> the sizes of the respective lookup tables.
->
-> Fixes: 9136e1f1e5c3 ("ice: refactor PHY type to ethtool link mode")
-> Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_ethtool.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
+> No corresponding Kconfig change?
 
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
-ntingent worker at Intel)
+NET_DSA_REALTEK already existed for "Realtek Ethernet switch family
+support" entry to the Realtek DSA switch submenu. In the way we used
+to use it, I believe it should be a bool entry, not a tristate. Now,
+with a common module, a tristate fits just fine. So, by mistake, no
+change is needed.
 
+> >  obj-$(CONFIG_NET_DSA_REALTEK_MDIO)   += realtek-mdio.o
+> >  obj-$(CONFIG_NET_DSA_REALTEK_SMI)    += realtek-smi.o
+> >  obj-$(CONFIG_NET_DSA_REALTEK_RTL8366RB) += rtl8366.o
+> > diff --git a/drivers/net/dsa/realtek/realtek-common.c b/drivers/net/dsa/realtek/realtek-common.c
+> > new file mode 100644
+> > index 000000000000..75b6aa071990
+> > --- /dev/null
+> > +++ b/drivers/net/dsa/realtek/realtek-common.c
+> > @@ -0,0 +1,136 @@
+> > +// SPDX-License-Identifier: GPL-2.0+
+> > +
+> > +#include <linux/module.h>
+> > +
+> > +#include "realtek.h"
+> > +#include "realtek-common.h"
+> > +
+> > +void realtek_common_lock(void *ctx)
+> > +{
+> > +     struct realtek_priv *priv = ctx;
+> > +
+> > +     mutex_lock(&priv->map_lock);
+> > +}
+> > +EXPORT_SYMBOL_GPL(realtek_common_lock);
+> > +
+> > +void realtek_common_unlock(void *ctx)
+> > +{
+> > +     struct realtek_priv *priv = ctx;
+> > +
+> > +     mutex_unlock(&priv->map_lock);
+> > +}
+> > +EXPORT_SYMBOL_GPL(realtek_common_unlock);
+> > +
+> > +struct realtek_priv *
+> > +realtek_common_probe_pre(struct device *dev, struct regmap_config rc,
+> > +                      struct regmap_config rc_nolock)
+> > +{
+> > +     const struct realtek_variant *var;
+> > +     struct realtek_priv *priv;
+> > +     struct device_node *np;
+> > +     int ret;
+> > +
+> > +     var = of_device_get_match_data(dev);
+> > +     if (!var)
+> > +             return ERR_PTR(-EINVAL);
+> > +
+> > +     priv = devm_kzalloc(dev, size_add(sizeof(*priv), var->chip_data_sz),
+> > +                         GFP_KERNEL);
+> > +     if (!priv)
+> > +             return ERR_PTR(-ENOMEM);
+> > +
+> > +     mutex_init(&priv->map_lock);
+> > +
+> > +     rc.lock_arg = priv;
+> > +     priv->map = devm_regmap_init(dev, NULL, priv, &rc);
+> > +     if (IS_ERR(priv->map)) {
+> > +             ret = PTR_ERR(priv->map);
+> > +             dev_err(dev, "regmap init failed: %d\n", ret);
+> > +             return ERR_PTR(ret);
+> > +     }
+> > +
+> > +     priv->map_nolock = devm_regmap_init(dev, NULL, priv, &rc_nolock);
+> > +     if (IS_ERR(priv->map_nolock)) {
+> > +             ret = PTR_ERR(priv->map_nolock);
+> > +             dev_err(dev, "regmap init failed: %d\n", ret);
+> > +             return ERR_PTR(ret);
+> > +     }
+> > +
+> > +     /* Link forward and backward */
+> > +     priv->dev = dev;
+> > +     priv->variant = var;
+> > +     priv->ops = var->ops;
+> > +     priv->chip_data = (void *)priv + sizeof(*priv);
+> > +
+> > +     dev_set_drvdata(dev, priv);
+> > +     spin_lock_init(&priv->lock);
+> > +
+> > +     np = dev->of_node;
+>
+> This is kind of a pointless variable, just do
+> of_property_read_bool(dev->of_node, ...) below.
+
+OK.
+
+>
+> > +
+> > +     priv->leds_disabled = of_property_read_bool(np, "realtek,disable-leds");
+> > +
+> > +     /* TODO: if power is software controlled, set up any regulators here */
+> > +
+> > +     priv->reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
+> > +     if (IS_ERR(priv->reset)) {
+> > +             dev_err(dev, "failed to get RESET GPIO\n");
+> > +             return ERR_CAST(priv->reset);
+> > +     }
+> > +     if (priv->reset) {
+> > +             gpiod_set_value(priv->reset, 1);
+> > +             dev_dbg(dev, "asserted RESET\n");
+> > +             msleep(REALTEK_HW_STOP_DELAY);
+> > +             gpiod_set_value(priv->reset, 0);
+> > +             msleep(REALTEK_HW_START_DELAY);
+> > +             dev_dbg(dev, "deasserted RESET\n");
+> > +     }
+> > +
+> > +     return priv;
+> > +}
+> > +EXPORT_SYMBOL(realtek_common_probe_pre);
+> > +
+> > +int realtek_common_probe_post(struct realtek_priv *priv)
+> > +{
+> > +     int ret;
+> > +
+> > +     ret = priv->ops->detect(priv);
+> > +     if (ret) {
+> > +             dev_err(priv->dev, "unable to detect switch\n");
+>
+> dev_err_probe()?
+
+I'm not sure if detect() is able to return -EPROBE. At least for SMI,
+gpio read/write never returns errors. However, it will not hurt to use
+dev_err_probe() here.
+
+>
+> > +             return ret;
+> > +     }
+> > +
+> > +     priv->ds = devm_kzalloc(priv->dev, sizeof(*priv->ds), GFP_KERNEL);
+> > +     if (!priv->ds)
+> > +             return -ENOMEM;
+>
+> I guess this could actually just be embedded in realtek_priv and then
+> you don't need to allocate it dynamically here.
+
+It makes sense. However, shouldn't it be a different commit? This one
+is just moving stuff to a common file, not trying to optimize de code.
+
+> > +
+> > +     priv->ds->priv = priv;
+> > +     priv->ds->dev = priv->dev;
+> > +     priv->ds->ops = priv->ds_ops;
+> > +     priv->ds->num_ports = priv->num_ports;
+> > +
+> > +     ret = dsa_register_switch(priv->ds);
+> > +     if (ret) {
+> > +             dev_err_probe(priv->dev, ret, "unable to register switch\n");
+> > +             return ret;
+> > +     }
+> > +
+> > +     return 0;
+> > +}
+> > +EXPORT_SYMBOL(realtek_common_probe_post);
+> > +
+> > +void realtek_common_remove(struct realtek_priv *priv)
+> > +{
+> > +     if (!priv)
+> > +             return;
+> > +
+> > +     dsa_unregister_switch(priv->ds);
+> > +
+> > +     /* leave the device reset asserted */
+> > +     if (priv->reset)
+> > +             gpiod_set_value(priv->reset, 1);
+> > +}
+> > +EXPORT_SYMBOL(realtek_common_remove);
+> > +
+> > +MODULE_AUTHOR("Luiz Angelo Daros de Luca <luizluca@gmail.com>");
+> > +MODULE_DESCRIPTION("Realtek DSA switches common module");
+> > +MODULE_LICENSE("GPL");
+> > diff --git a/drivers/net/dsa/realtek/realtek-common.h b/drivers/net/dsa/realtek/realtek-common.h
+> > new file mode 100644
+> > index 000000000000..405bd0d85d2b
+> > --- /dev/null
+> > +++ b/drivers/net/dsa/realtek/realtek-common.h
+> > @@ -0,0 +1,16 @@
+> > +/* SPDX-License-Identifier: GPL-2.0+ */
+> > +
+> > +#ifndef _REALTEK_INTERFACE_H
+> > +#define _REALTEK_INTERFACE_H
+> > +
+> > +#include <linux/regmap.h>
+> > +
+> > +void realtek_common_lock(void *ctx);
+> > +void realtek_common_unlock(void *ctx);
+> > +struct realtek_priv *
+> > +realtek_common_probe_pre(struct device *dev, struct regmap_config rc,
+> > +                      struct regmap_config rc_nolock);
+> > +int realtek_common_probe_post(struct realtek_priv *priv);
+>
+> Maybe it is worth describing what these functions do with a comment.
+>
+> pre:  sets up driver private data struct, sets up regmaps, issues
+>       hardware reset
+>
+> post: registers the dsa switch, calls detect() and then expects
+>       priv->num_ports to be set
+
+Sure. I'm not sure about the "expects". If I need something, I should
+check and fail. The DSA switch will already fail to register without a
+non-zero number of ports. (although too silently for my taste).
+
+I don't like names that need too much explanation. It is just a
+symptom of a bad name. Would it make more sense to have
+
+realtek_common_probe_pre -> realtek_common_probe
+realtek_common_probe_post -> realtek_common_register_switch (although
+it is also detecting the switch)
+
+?
+
+> The detect() function in itself is a bit funny. Maybe it's not even
+> necessary. Both chip variants set a static num_ports value anyway. You
+> can maybe dump detect() completely and move that code into the
+> variant-specific probe between the calls to common_probe_{pre,post}().
+
+The probe is not variant-specific but interface-specific. We could,
+indeed, put a static num_ports into realtek_variant and use it.
+However, the main use for detect is to validate you really got a
+supported switch, with the setups being a secondary function. I would
+leave it as is for now. I'm trying to keep the series as small as
+possible.
+
+> > +void realtek_common_remove(struct realtek_priv *priv);
+> > +
+> > +#endif
+>
+> #endif /* _REALTEK_INTERFACE_H */
+>
+> Actually shouldn't it be _REALTEK_COMMON_H?
+
+Yes, bad ctrl+c/ctrl+v from Vladmir example code.
+
+> > diff --git a/drivers/net/dsa/realtek/realtek-mdio.c b/drivers/net/dsa/realtek/realtek-mdio.c
+> > index 58966d0625c8..4c9a744b72f8 100644
+> > --- a/drivers/net/dsa/realtek/realtek-mdio.c
+> > +++ b/drivers/net/dsa/realtek/realtek-mdio.c
+> > @@ -26,6 +26,7 @@
+> >
+> >  #include "realtek.h"
+> >  #include "realtek-mdio.h"
+> > +#include "realtek-common.h"
+> >
+> >  /* Read/write via mdiobus */
+> >  #define REALTEK_MDIO_CTRL0_REG               31
+> > @@ -100,20 +101,6 @@ static int realtek_mdio_read(void *ctx, u32 reg, u32 *val)
+> >       return ret;
+> >  }
+> >
+> > -static void realtek_mdio_lock(void *ctx)
+> > -{
+> > -     struct realtek_priv *priv = ctx;
+> > -
+> > -     mutex_lock(&priv->map_lock);
+> > -}
+> > -
+> > -static void realtek_mdio_unlock(void *ctx)
+> > -{
+> > -     struct realtek_priv *priv = ctx;
+> > -
+> > -     mutex_unlock(&priv->map_lock);
+> > -}
+> > -
+> >  static const struct regmap_config realtek_mdio_regmap_config = {
+> >       .reg_bits = 10, /* A4..A0 R4..R0 */
+> >       .val_bits = 16,
+> > @@ -124,8 +111,8 @@ static const struct regmap_config realtek_mdio_regmap_config = {
+> >       .reg_read = realtek_mdio_read,
+> >       .reg_write = realtek_mdio_write,
+> >       .cache_type = REGCACHE_NONE,
+> > -     .lock = realtek_mdio_lock,
+> > -     .unlock = realtek_mdio_unlock,
+> > +     .lock = realtek_common_lock,
+> > +     .unlock = realtek_common_unlock,
+> >  };
+> >
+> >  static const struct regmap_config realtek_mdio_nolock_regmap_config = {
+> > @@ -143,98 +130,21 @@ static const struct regmap_config realtek_mdio_nolock_regmap_config = {
+> >
+> >  int realtek_mdio_probe(struct mdio_device *mdiodev)
+> >  {
+> > -     struct realtek_priv *priv;
+> >       struct device *dev = &mdiodev->dev;
+> > -     const struct realtek_variant *var;
+> > -     struct regmap_config rc;
+> > -     struct device_node *np;
+> > -     int ret;
+> > -
+> > -     var = of_device_get_match_data(dev);
+> > -     if (!var)
+> > -             return -EINVAL;
+> > -
+> > -     priv = devm_kzalloc(&mdiodev->dev,
+> > -                         size_add(sizeof(*priv), var->chip_data_sz),
+> > -                         GFP_KERNEL);
+> > -     if (!priv)
+> > -             return -ENOMEM;
+> > -
+> > -     mutex_init(&priv->map_lock);
+> > -
+> > -     rc = realtek_mdio_regmap_config;
+> > -     rc.lock_arg = priv;
+> > -     priv->map = devm_regmap_init(dev, NULL, priv, &rc);
+> > -     if (IS_ERR(priv->map)) {
+> > -             ret = PTR_ERR(priv->map);
+> > -             dev_err(dev, "regmap init failed: %d\n", ret);
+> > -             return ret;
+> > -     }
+> > +     struct realtek_priv *priv;
+> >
+> > -     rc = realtek_mdio_nolock_regmap_config;
+> > -     priv->map_nolock = devm_regmap_init(dev, NULL, priv, &rc);
+> > -     if (IS_ERR(priv->map_nolock)) {
+> > -             ret = PTR_ERR(priv->map_nolock);
+> > -             dev_err(dev, "regmap init failed: %d\n", ret);
+> > -             return ret;
+> > -     }
+> > +     priv = realtek_common_probe_pre(dev, realtek_mdio_regmap_config,
+> > +                                     realtek_mdio_nolock_regmap_config);
+> > +     if (IS_ERR(priv))
+> > +             return PTR_ERR(priv);
+> >
+> > -     priv->mdio_addr = mdiodev->addr;
+> >       priv->bus = mdiodev->bus;
+> > -     priv->dev = &mdiodev->dev;
+> > -     priv->chip_data = (void *)priv + sizeof(*priv);
+> > -
+> > -     priv->clk_delay = var->clk_delay;
+> > -     priv->cmd_read = var->cmd_read;
+> > -     priv->cmd_write = var->cmd_write;
+> > -     priv->ops = var->ops;
+> > -
+> > +     priv->mdio_addr = mdiodev->addr;
+> >       priv->write_reg_noack = realtek_mdio_write;
+> > +     priv->ds_ops = priv->variant->ds_ops_mdio;
+> >
+> > -     np = dev->of_node;
+> > -
+> > -     dev_set_drvdata(dev, priv);
+> > -
+> > -     /* TODO: if power is software controlled, set up any regulators here */
+> > -     priv->leds_disabled = of_property_read_bool(np, "realtek,disable-leds");
+> > -
+> > -     priv->reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
+> > -     if (IS_ERR(priv->reset)) {
+> > -             dev_err(dev, "failed to get RESET GPIO\n");
+> > -             return PTR_ERR(priv->reset);
+> > -     }
+> > -
+> > -     if (priv->reset) {
+> > -             gpiod_set_value(priv->reset, 1);
+> > -             dev_dbg(dev, "asserted RESET\n");
+> > -             msleep(REALTEK_HW_STOP_DELAY);
+> > -             gpiod_set_value(priv->reset, 0);
+> > -             msleep(REALTEK_HW_START_DELAY);
+> > -             dev_dbg(dev, "deasserted RESET\n");
+> > -     }
+> > -
+> > -     ret = priv->ops->detect(priv);
+> > -     if (ret) {
+> > -             dev_err(dev, "unable to detect switch\n");
+> > -             return ret;
+> > -     }
+> > -
+> > -     priv->ds = devm_kzalloc(dev, sizeof(*priv->ds), GFP_KERNEL);
+> > -     if (!priv->ds)
+> > -             return -ENOMEM;
+> > -
+> > -     priv->ds->dev = dev;
+> > -     priv->ds->num_ports = priv->num_ports;
+> > -     priv->ds->priv = priv;
+> > -     priv->ds->ops = var->ds_ops_mdio;
+> > -
+> > -     ret = dsa_register_switch(priv->ds);
+> > -     if (ret) {
+> > -             dev_err(priv->dev, "unable to register switch ret = %d\n", ret);
+> > -             return ret;
+> > -     }
+> > +     return realtek_common_probe_post(priv);
+> >
+> > -     return 0;
+> >  }
+> >  EXPORT_SYMBOL_GPL(realtek_mdio_probe);
+> >
+> > @@ -242,14 +152,7 @@ void realtek_mdio_remove(struct mdio_device *mdiodev)
+> >  {
+> >       struct realtek_priv *priv = dev_get_drvdata(&mdiodev->dev);
+> >
+> > -     if (!priv)
+> > -             return;
+> > -
+> > -     dsa_unregister_switch(priv->ds);
+> > -
+> > -     /* leave the device reset asserted */
+> > -     if (priv->reset)
+> > -             gpiod_set_value(priv->reset, 1);
+> > +     realtek_common_remove(priv);
+> >  }
+> >  EXPORT_SYMBOL_GPL(realtek_mdio_remove);
+> >
+> > diff --git a/drivers/net/dsa/realtek/realtek-smi.c b/drivers/net/dsa/realtek/realtek-smi.c
+> > index 55586d158c0e..246024eec3bd 100644
+> > --- a/drivers/net/dsa/realtek/realtek-smi.c
+> > +++ b/drivers/net/dsa/realtek/realtek-smi.c
+> > @@ -41,12 +41,13 @@
+> >
+> >  #include "realtek.h"
+> >  #include "realtek-smi.h"
+> > +#include "realtek-common.h"
+> >
+> >  #define REALTEK_SMI_ACK_RETRY_COUNT          5
+> >
+> >  static inline void realtek_smi_clk_delay(struct realtek_priv *priv)
+> >  {
+> > -     ndelay(priv->clk_delay);
+> > +     ndelay(priv->variant->clk_delay);
+> >  }
+> >
+> >  static void realtek_smi_start(struct realtek_priv *priv)
+> > @@ -209,7 +210,7 @@ static int realtek_smi_read_reg(struct realtek_priv *priv, u32 addr, u32 *data)
+> >       realtek_smi_start(priv);
+> >
+> >       /* Send READ command */
+> > -     ret = realtek_smi_write_byte(priv, priv->cmd_read);
+> > +     ret = realtek_smi_write_byte(priv, priv->variant->cmd_read);
+> >       if (ret)
+> >               goto out;
+> >
+> > @@ -250,7 +251,7 @@ static int realtek_smi_write_reg(struct realtek_priv *priv,
+> >       realtek_smi_start(priv);
+> >
+> >       /* Send WRITE command */
+> > -     ret = realtek_smi_write_byte(priv, priv->cmd_write);
+> > +     ret = realtek_smi_write_byte(priv, priv->variant->cmd_write);
+> >       if (ret)
+> >               goto out;
+> >
+> > @@ -311,20 +312,6 @@ static int realtek_smi_read(void *ctx, u32 reg, u32 *val)
+> >       return realtek_smi_read_reg(priv, reg, val);
+> >  }
+> >
+> > -static void realtek_smi_lock(void *ctx)
+> > -{
+> > -     struct realtek_priv *priv = ctx;
+> > -
+> > -     mutex_lock(&priv->map_lock);
+> > -}
+> > -
+> > -static void realtek_smi_unlock(void *ctx)
+> > -{
+> > -     struct realtek_priv *priv = ctx;
+> > -
+> > -     mutex_unlock(&priv->map_lock);
+> > -}
+> > -
+> >  static const struct regmap_config realtek_smi_regmap_config = {
+> >       .reg_bits = 10, /* A4..A0 R4..R0 */
+> >       .val_bits = 16,
+> > @@ -335,8 +322,8 @@ static const struct regmap_config realtek_smi_regmap_config = {
+> >       .reg_read = realtek_smi_read,
+> >       .reg_write = realtek_smi_write,
+> >       .cache_type = REGCACHE_NONE,
+> > -     .lock = realtek_smi_lock,
+> > -     .unlock = realtek_smi_unlock,
+> > +     .lock = realtek_common_lock,
+> > +     .unlock = realtek_common_unlock,
+> >  };
+> >
+> >  static const struct regmap_config realtek_smi_nolock_regmap_config = {
+> > @@ -411,100 +398,28 @@ static int realtek_smi_setup_mdio(struct dsa_switch *ds)
+> >
+> >  int realtek_smi_probe(struct platform_device *pdev)
+> >  {
+> > -     const struct realtek_variant *var;
+> >       struct device *dev = &pdev->dev;
+> >       struct realtek_priv *priv;
+> > -     struct regmap_config rc;
+> > -     struct device_node *np;
+> > -     int ret;
+> > -
+> > -     var = of_device_get_match_data(dev);
+> > -     np = dev->of_node;
+> > -
+> > -     priv = devm_kzalloc(dev, sizeof(*priv) + var->chip_data_sz, GFP_KERNEL);
+> > -     if (!priv)
+> > -             return -ENOMEM;
+> > -     priv->chip_data = (void *)priv + sizeof(*priv);
+> > -
+> > -     mutex_init(&priv->map_lock);
+> > -
+> > -     rc = realtek_smi_regmap_config;
+> > -     rc.lock_arg = priv;
+> > -     priv->map = devm_regmap_init(dev, NULL, priv, &rc);
+> > -     if (IS_ERR(priv->map)) {
+> > -             ret = PTR_ERR(priv->map);
+> > -             dev_err(dev, "regmap init failed: %d\n", ret);
+> > -             return ret;
+> > -     }
+> > -
+> > -     rc = realtek_smi_nolock_regmap_config;
+> > -     priv->map_nolock = devm_regmap_init(dev, NULL, priv, &rc);
+> > -     if (IS_ERR(priv->map_nolock)) {
+> > -             ret = PTR_ERR(priv->map_nolock);
+> > -             dev_err(dev, "regmap init failed: %d\n", ret);
+> > -             return ret;
+> > -     }
+> > -
+> > -     /* Link forward and backward */
+> > -     priv->dev = dev;
+> > -     priv->clk_delay = var->clk_delay;
+> > -     priv->cmd_read = var->cmd_read;
+> > -     priv->cmd_write = var->cmd_write;
+> > -     priv->ops = var->ops;
+> > -
+> > -     priv->setup_interface = realtek_smi_setup_mdio;
+> > -     priv->write_reg_noack = realtek_smi_write_reg_noack;
+> > -
+> > -     dev_set_drvdata(dev, priv);
+> > -     spin_lock_init(&priv->lock);
+> >
+> > -     /* TODO: if power is software controlled, set up any regulators here */
+> > -
+> > -     priv->reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
+> > -     if (IS_ERR(priv->reset)) {
+> > -             dev_err(dev, "failed to get RESET GPIO\n");
+> > -             return PTR_ERR(priv->reset);
+> > -     }
+> > -     if (priv->reset) {
+> > -             gpiod_set_value(priv->reset, 1);
+> > -             dev_dbg(dev, "asserted RESET\n");
+> > -             msleep(REALTEK_HW_STOP_DELAY);
+> > -             gpiod_set_value(priv->reset, 0);
+> > -             msleep(REALTEK_HW_START_DELAY);
+> > -             dev_dbg(dev, "deasserted RESET\n");
+> > -     }
+> > +     priv = realtek_common_probe_pre(dev, realtek_smi_regmap_config,
+> > +                                     realtek_smi_nolock_regmap_config);
+> > +     if (IS_ERR(priv))
+> > +             return PTR_ERR(priv);
+> >
+> >       /* Fetch MDIO pins */
+> >       priv->mdc = devm_gpiod_get_optional(dev, "mdc", GPIOD_OUT_LOW);
+> >       if (IS_ERR(priv->mdc))
+> >               return PTR_ERR(priv->mdc);
+> > +
+> >       priv->mdio = devm_gpiod_get_optional(dev, "mdio", GPIOD_OUT_LOW);
+> >       if (IS_ERR(priv->mdio))
+> >               return PTR_ERR(priv->mdio);
+> >
+> > -     priv->leds_disabled = of_property_read_bool(np, "realtek,disable-leds");
+> > -
+> > -     ret = priv->ops->detect(priv);
+> > -     if (ret) {
+> > -             dev_err(dev, "unable to detect switch\n");
+> > -             return ret;
+> > -     }
+> > -
+> > -     priv->ds = devm_kzalloc(dev, sizeof(*priv->ds), GFP_KERNEL);
+> > -     if (!priv->ds)
+> > -             return -ENOMEM;
+> > -
+> > -     priv->ds->dev = dev;
+> > -     priv->ds->num_ports = priv->num_ports;
+> > -     priv->ds->priv = priv;
+> > +     priv->write_reg_noack = realtek_smi_write_reg_noack;
+> > +     priv->setup_interface = realtek_smi_setup_mdio;
+> > +     priv->ds_ops = priv->variant->ds_ops_smi;
+> >
+> > -     priv->ds->ops = var->ds_ops_smi;
+> > -     ret = dsa_register_switch(priv->ds);
+> > -     if (ret) {
+> > -             dev_err_probe(dev, ret, "unable to register switch\n");
+> > -             return ret;
+> > -     }
+> > -     return 0;
+> > +     return (priv);
+>
+> ret = realtek_common_probe_post(priv);
+> if (ret)
+>   return ret;
+>
+> return 0;
+
+The ret variable is no more. Is it worth it to replace a single line
+with 4 more?
+
+> >  }
+> >  EXPORT_SYMBOL_GPL(realtek_smi_probe);
+> >
+> > @@ -512,14 +427,7 @@ void realtek_smi_remove(struct platform_device *pdev)
+> >  {
+> >       struct realtek_priv *priv = platform_get_drvdata(pdev);
+> >
+> > -     if (!priv)
+> > -             return;
+> > -
+> > -     dsa_unregister_switch(priv->ds);
+> > -
+> > -     /* leave the device reset asserted */
+> > -     if (priv->reset)
+> > -             gpiod_set_value(priv->reset, 1);
+> > +     realtek_common_remove(priv);
+> >  }
+> >  EXPORT_SYMBOL_GPL(realtek_smi_remove);
+> >
+> > diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
+> > index e9ee778665b2..fbd0616c1df3 100644
+> > --- a/drivers/net/dsa/realtek/realtek.h
+> > +++ b/drivers/net/dsa/realtek/realtek.h
+> > @@ -58,11 +58,9 @@ struct realtek_priv {
+> >       struct mii_bus          *bus;
+> >       int                     mdio_addr;
+> >
+> > -     unsigned int            clk_delay;
+> > -     u8                      cmd_read;
+> > -     u8                      cmd_write;
+> >       spinlock_t              lock; /* Locks around command writes */
+> >       struct dsa_switch       *ds;
+> > +     const struct dsa_switch_ops *ds_ops;
+> >       struct irq_domain       *irqdomain;
+> >       bool                    leds_disabled;
+> >
+> > @@ -79,6 +77,8 @@ struct realtek_priv {
+> >       int                     vlan_enabled;
+> >       int                     vlan4k_enabled;
+> >
+> > +     const struct realtek_variant *variant;
+> > +
+> >       char                    buf[4096];
+> >       void                    *chip_data; /* Per-chip extra variant data */
+> >  };
+> > diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
+> > index 526bf98cef1d..ac848b965f84 100644
+> > --- a/drivers/net/dsa/realtek/rtl8365mb.c
+> > +++ b/drivers/net/dsa/realtek/rtl8365mb.c
+> > @@ -103,6 +103,7 @@
+> >  #include "realtek.h"
+> >  #include "realtek-smi.h"
+> >  #include "realtek-mdio.h"
+> > +#include "realtek-common.h"
+> >
+> >  /* Family-specific data and limits */
+> >  #define RTL8365MB_PHYADDRMAX         7
+> > @@ -691,7 +692,7 @@ static int rtl8365mb_phy_ocp_read(struct realtek_priv *priv, int phy,
+> >       u32 val;
+> >       int ret;
+> >
+> > -     mutex_lock(&priv->map_lock);
+> > +     realtek_common_lock(priv);
+> >
+> >       ret = rtl8365mb_phy_poll_busy(priv);
+> >       if (ret)
+> > @@ -724,7 +725,7 @@ static int rtl8365mb_phy_ocp_read(struct realtek_priv *priv, int phy,
+> >       *data = val & 0xFFFF;
+> >
+> >  out:
+> > -     mutex_unlock(&priv->map_lock);
+> > +     realtek_common_unlock(priv);
+> >
+> >       return ret;
+> >  }
+> > @@ -735,7 +736,7 @@ static int rtl8365mb_phy_ocp_write(struct realtek_priv *priv, int phy,
+> >       u32 val;
+> >       int ret;
+> >
+> > -     mutex_lock(&priv->map_lock);
+> > +     realtek_common_lock(priv);
+> >
+> >       ret = rtl8365mb_phy_poll_busy(priv);
+> >       if (ret)
+> > @@ -766,7 +767,7 @@ static int rtl8365mb_phy_ocp_write(struct realtek_priv *priv, int phy,
+> >               goto out;
+> >
+> >  out:
+> > -     mutex_unlock(&priv->map_lock);
+> > +     realtek_common_unlock(priv);
+> >
+> >       return 0;
+> >  }
+> > diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realtek/rtl8366rb.c
+> > index 09c17de19457..1cc4de3cf54f 100644
+> > --- a/drivers/net/dsa/realtek/rtl8366rb.c
+> > +++ b/drivers/net/dsa/realtek/rtl8366rb.c
+> > @@ -24,6 +24,7 @@
+> >  #include "realtek.h"
+> >  #include "realtek-smi.h"
+> >  #include "realtek-mdio.h"
+> > +#include "realtek-common.h"
+> >
+> >  #define RTL8366RB_PORT_NUM_CPU               5
+> >  #define RTL8366RB_NUM_PORTS          6
+> > @@ -1707,7 +1708,7 @@ static int rtl8366rb_phy_read(struct realtek_priv *priv, int phy, int regnum)
+> >       if (phy > RTL8366RB_PHY_NO_MAX)
+> >               return -EINVAL;
+> >
+> > -     mutex_lock(&priv->map_lock);
+> > +     realtek_common_lock(priv);
+> >
+> >       ret = regmap_write(priv->map_nolock, RTL8366RB_PHY_ACCESS_CTRL_REG,
+> >                          RTL8366RB_PHY_CTRL_READ);
+> > @@ -1735,7 +1736,7 @@ static int rtl8366rb_phy_read(struct realtek_priv *priv, int phy, int regnum)
+> >               phy, regnum, reg, val);
+> >
+> >  out:
+> > -     mutex_unlock(&priv->map_lock);
+> > +     realtek_common_unlock(priv);
+> >
+> >       return ret;
+> >  }
+> > @@ -1749,7 +1750,7 @@ static int rtl8366rb_phy_write(struct realtek_priv *priv, int phy, int regnum,
+> >       if (phy > RTL8366RB_PHY_NO_MAX)
+> >               return -EINVAL;
+> >
+> > -     mutex_lock(&priv->map_lock);
+> > +     realtek_common_lock(priv);
+> >
+> >       ret = regmap_write(priv->map_nolock, RTL8366RB_PHY_ACCESS_CTRL_REG,
+> >                          RTL8366RB_PHY_CTRL_WRITE);
+> > @@ -1766,7 +1767,7 @@ static int rtl8366rb_phy_write(struct realtek_priv *priv, int phy, int regnum,
+> >               goto out;
+> >
+> >  out:
+> > -     mutex_unlock(&priv->map_lock);
+> > +     realtek_common_unlock(priv);
+> >
+> >       return ret;
+> >  }
+> > --
+> > 2.43.0
+> >
+
+Regards,
+
+Luiz
 
