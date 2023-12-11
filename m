@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-55918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C17C80CD95
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:11:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA3E980CD96
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:11:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D528E281D52
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:11:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26326B20A1F
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:11:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A49748CD8;
-	Mon, 11 Dec 2023 14:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 192A0495C0;
+	Mon, 11 Dec 2023 14:08:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="f4OU8TbS"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dq4IW8l6"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2085.outbound.protection.outlook.com [40.107.223.85])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1B803C33
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 06:08:18 -0800 (PST)
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2067.outbound.protection.outlook.com [40.107.101.67])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8414EA271
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 06:08:20 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HjDeJ17lIV8ej2D9hSlu8EoBEDSkuhdiyAIs7R7I9GbBqwAQwqHGy3r4iZFDqjZIz01NRbIk/29SQKNOiHeD6u7jRx+TUgDiwBEnQqd+FQDwAdf/W88yTvUSQzKJiHFWoZ8iGu+ArRdTvxp2ufm+EEHfEraYBON08SqkdJDeTQ7EOo2s9BIM3YkybxKzSiWdwIlbpyhOHV5rfxC9BXHWVzGYFXsFqPUxilAVZU08ZrCtIsG0Nclo9lYyq1yOZINDFiigcsSwII68lBcc2CbSBohyAk1ZHaLTOOZO/nEsMIBdudH0Ay4S3tyAb6dXD1G2rer+XRUHk7LrbykbeBSjcg==
+ b=Umv1nmPhnCVmeS2ZZLXzQk4dz8sRpS1/gtN3sDNmKP+iOgOc5QzoBP7QPcCxWole1zqDYPqCzNMXvVfCAaIZTga7RXMovDbEEE00xaxo7dZNkV+znYt4fDPVRguA5vbDDNw1oxWeMOYHf4AZr4rwCcEvre8ouco6OAg1xdMX2/Fix2SDCQLH5ScTOcgDnrjPiN/l4fpeFMDUIp2ow1iktN55ARJevHlzgEsCiyn/zlEES7/1+6WbYIwmjwuFXsY2H1E0bK/AGE7mRvQXBWXFJNycInliOoOF6LHEsmVTdGXjsPeMj6vePQ6idGgH8haJCy2m9RUMzsiok9lq0fKShw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Bj2hadTYtWINkR+AsDGSoZ0RNbRtYHHCKLO6YrOkUfI=;
- b=Qu0a3iias9nF1OZqXn2Nin7kGVxrCi1Hg4yKiUABbOtrNwvKRJW6SPGKwJXPx4LnFYcNoyJpsvriNewGkaojTWMcDpBJ9qB/VqM4VvIpjh7WfoHwHe9aCyVHeCNhOaVQRVMQRzvHr+8axmn1zfowlhcT3mc1B8Oy2Qf8rczoUS7OKw26l1AP3EpWtdg9tBKHmvLkF3pB3dE5JGrdKx/nxlMotzXDA916nMuYVcCiCoZUPHuvn8TPfEgbgOeItZ21JbaWwPSo0ZlU8gEErSYukS0mecORFhZO3T0owyYba+D1qh994zlQvnqnCcZ6a8UKhLIKjIJMHN/sqtfPlsVySQ==
+ bh=I8R1UQsiA6dDOkuokHfnYZDxZ0EZG/j2KbSFQ1QdATY=;
+ b=ZJ0tckOLIH/q/CBCF5PpPUDkTRRvkHpiGRsL0+cephoGtBoNNTJMP2cvtpog8icEFzVhECC5MlkcJbF3hNeQN8QUZTXxfcI7ihcAf0Nap3AeurLpD1G9VXDnd5AlDzFUpdT5R++PHSDY7QAj1kH0KN6Zz+//OjboTzJ4l1VHjauVvdedZsu04zHFfhyWkmxyYuvIT40nAFPdguXRTFBbrKBtRUj0Tqs60HSDVxqECF3ny7DNQUJZNnBfdphtUt2r4/V3OqStqIiSO3OlxsfoA8Uj0Iqwr57k20v7WqACV8JHrkIrQg6FZFYqgIFI0FNiEK/8qCtJRikBl4uSdvskbQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Bj2hadTYtWINkR+AsDGSoZ0RNbRtYHHCKLO6YrOkUfI=;
- b=f4OU8TbStef03i4qOsR2U8QoeEgk9ok9U9yUKuNpGVZV+Gv2aoOq/qCTJKGcezwx1xlPYEpOOedMuqqhOLTB1tsTH/Vm/eHnzcrf6P/X+I7foBFbJf7y6DYs8UmzMRZmmOgF41BmL/vu+dukAWoC5PRU6MOEhka+po4gNKqXnek3Et+WumRliG/PUUoE8kHUhQ53Z0n/pSTUJBVrRc6sGqRY3Ef1nRhQNkY4B/6pmu4pd+Hs2c7horh68nM1BOEBumg/MXeUBDt6pyO0zNhTUB3mc1I01S++PxXc1vHDA+Mho/xiE0I8h3YnhIPEHTe7kNHYTWPApyDzmtI4uBuNOw==
+ bh=I8R1UQsiA6dDOkuokHfnYZDxZ0EZG/j2KbSFQ1QdATY=;
+ b=dq4IW8l63I0AE/ZdDSFNdGXwIpKHN45P3RN79DAqZ3R1pbyexowQx+pDDA4ULe3dLNF+rllhyX5OqWMRiZONIyBE4g53mfh5IS+S94+eYJKBMkHxj/6SZYkygrVtC0vaXOQM3OvFSZgQWPR30gEM4zyjBPpgRnJGTNZ8bSp7r/UYUYVbYc6zuFicFekswjI67eiENQqcuinmXDNz4tAa6JAguesWRskosJ8rzaS6T2XdMhzZuF26GKpESbyNTdXXtiuQFXd3NqSc4/SvnlEh9NtWDflUgsDnX88Y++ilTXnirxXnuCS7ku/HYAqSZa76tlQA1EUn2AqRclnb0nadHg==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from MN2PR12MB4373.namprd12.prod.outlook.com (2603:10b6:208:261::8)
  by BY5PR12MB4193.namprd12.prod.outlook.com (2603:10b6:a03:20c::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Mon, 11 Dec
- 2023 14:07:54 +0000
+ 2023 14:07:56 +0000
 Received: from MN2PR12MB4373.namprd12.prod.outlook.com
  ([fe80::ff68:f81b:d451:9765]) by MN2PR12MB4373.namprd12.prod.outlook.com
  ([fe80::ff68:f81b:d451:9765%4]) with mapi id 15.20.7068.031; Mon, 11 Dec 2023
- 14:07:54 +0000
+ 14:07:56 +0000
 From: Benjamin Poirier <bpoirier@nvidia.com>
 To: netdev@vger.kernel.org
 Cc: Petr Machata <petrm@nvidia.com>,
 	Roopa Prabhu <roopa@nvidia.com>
-Subject: [PATCH iproute2-next 03/20] bridge: vni: Fix duplicate group and remote error messages
-Date: Mon, 11 Dec 2023 09:07:15 -0500
-Message-ID: <20231211140732.11475-4-bpoirier@nvidia.com>
+Subject: [PATCH iproute2-next 04/20] bridge: vni: Report duplicate vni argument using duparg()
+Date: Mon, 11 Dec 2023 09:07:16 -0500
+Message-ID: <20231211140732.11475-5-bpoirier@nvidia.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231211140732.11475-1-bpoirier@nvidia.com>
 References: <20231211140732.11475-1-bpoirier@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: YQBPR01CA0049.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:c01:2::21) To MN2PR12MB4373.namprd12.prod.outlook.com
+X-ClientProxiedBy: YQBPR01CA0124.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:c01:1::24) To MN2PR12MB4373.namprd12.prod.outlook.com
  (2603:10b6:208:261::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -67,124 +67,87 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: MN2PR12MB4373:EE_|BY5PR12MB4193:EE_
-X-MS-Office365-Filtering-Correlation-Id: 07d0f304-e90b-47f8-6346-08dbfa5291f6
+X-MS-Office365-Filtering-Correlation-Id: 756999a5-06ef-4ba5-97fc-08dbfa5292e9
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	Qs+msj9au6r4RWwymMicH728qeySKj4Ln0CUadMVbF6HTQA9ZS732B6Fcw80bMn4H7pv2nYm+nD++ZghxtsGWBxzX8ngISwF1LaN0AMW/1WQ+7Wks3qB2R8WrqkG29J+TrCWWLn1+5WR5+yBuAy/gK7i7spPf78pi+RC1MOJZCeUNONz+QHq8SmSMPBgy2a3L97ZlxBfXhFuly0MhfVyRwPpqayHQO/kv78njlz5MoW8dmGOox61lTQJYIu3lsgu3eVel91eBCxCgFwCRpdDHG+6gH+EoCoa3jOIZqAFAqOIeTX56mjMoF6RtOjcX+qjoeqcKXOkBoYZ3dbDHSE8ogVQCPNHeJx0r/59eH0h5bHHTT7s5H8oJXgfzhAapv4O8cQoMHcsq7GlH7QSakklBXWN7wOiHepCMTsHcG71hwaNmzjyYhkL7l05+vSVYcBmj6kvBAQmogX70TdyJ6yk/8aOFSij5rf7N7dGsK2HqtxBb+lKZ3Igk04CKuMJtl+1Pahcghpn/uwNSL3KpC2hdnjpHtYVWoctJSTZ6MkuGtTbPSYdpTAodyF/ZfQgyPFv
+	05sQqyS7dLAbj6gpdiD5vDZncjqHE3HtXc2rs1ZZTsDAvthFcUyoIvxZaHBA6b11uR5rI4oTvtxF4DUz+mKEcM5JTqtA9izRrg/MNBzTxi81N7krCUJ8Ay5QW9t2Bw7rPjGgK9of6m9WtN1fGre3afW1cKJI80lWPhIdVOOtDxFOd7bSpZbB8MY/e1Z8laL/taMf4zOFEB+Wezb/k4qpVEBJ7lvMg0lselDwKBmifJDb+lK8jb2tugsw2QyuX5f4fFypqYN6O6TZjpG9rkCc9U2vpCNQxxfz4gI9xilW8RZXKQqsn0Rz22XjFZVA0SKU//aHc9Dfrx86GJ333JB/L+k9E5Tx5wB5Y42jhz1NB51GZQSyBUkhg4rRVXE8wiwskWeR/zfgCoLD9nPgWtCSyHLCJuOpOV6Y+Kqt/AfGdFKUae5lcju/biSHuenhIzjmpyT/ryKmqYa1paAHp+aFtzdXxjn7OeDDyXzVUJc79CdYrG5UPXRjB8ksYHwvSHMFSWgoFNkTxraFHPWuk6dq46KT2wfbTMCnPrsCJ+z6HWoXfsWmf7ZehXVfNGjrHQSN
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4373.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(396003)(376002)(346002)(39860400002)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(41300700001)(2906002)(316002)(6916009)(66946007)(66476007)(66556008)(54906003)(15650500001)(5660300002)(8676002)(8936002)(4326008)(86362001)(36756003)(6512007)(6666004)(6506007)(83380400001)(107886003)(26005)(2616005)(1076003)(6486002)(478600001)(38100700002);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4373.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(396003)(376002)(346002)(39860400002)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(41300700001)(4744005)(2906002)(316002)(6916009)(66946007)(66476007)(66556008)(54906003)(5660300002)(8676002)(8936002)(4326008)(86362001)(36756003)(6512007)(6666004)(6506007)(83380400001)(107886003)(26005)(2616005)(1076003)(6486002)(478600001)(38100700002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?aQznP7Omv8Em2yNo+O/2WYa7u5qYUK6kl9Uz/EVpR01TnKdeiu+Gz4rwnNLD?=
- =?us-ascii?Q?/+1f+dPTeZoVN0McZq4MrJL81W1b+kHtoVd04k7rGgq1lUD1sfOsBun57Mql?=
- =?us-ascii?Q?EBuEp8wDwdrh+YZB+h88MPbZZYIpxo8vPaEwCtxBi1uxBn5ic56v2zVlCPNn?=
- =?us-ascii?Q?YDoBKr5w1cBQqE+9DI+z5cJkGRlD8D/g4KIzROrAlrrMGBIev1enINYS1cZT?=
- =?us-ascii?Q?4fgGWd0l1ftefsqiyuXRVKf2JTDPy/0nIkOIW224i4bLCcIQLd3cFRkWQ83Z?=
- =?us-ascii?Q?Nk4CBRB/R8oj8yHvJlF98gmi+hiD5NAKn/OU/Tik6hAEsK1ag9LY3xa+6Ven?=
- =?us-ascii?Q?DJ+F2ZAAzdN/axMp3ALVru3muQ+I3PbWJ4LukQB65KeTpycxGc+tqiIPE1BP?=
- =?us-ascii?Q?iqpn3Lai8PGgadZ7/DkdXSX//dQF4/w75SKPFvrSycAfLpTCMjaeegDjh47F?=
- =?us-ascii?Q?XGW8ze7JLyMf0YaX9TBow2lAj7cnAkeoBhyEPwOEPrlazVcSckKkwBOXies4?=
- =?us-ascii?Q?RFp8ONl1W3tq2C9bi3Cdm6/tb0KKiNxrMCHMNHDgKtrJG71yd9RzgSkfZ6vB?=
- =?us-ascii?Q?0SFG5CpQuRLAtUwXeBAlQL7znc07xriOeBQ12piiBrrwUwyVMW8FVb93AJ8f?=
- =?us-ascii?Q?JZhrq+3Ymm4RJP06MF2VOD6nT28UqXU59Y0r9QvOEHH1W/u8DylOwhQzaMdU?=
- =?us-ascii?Q?Kk22VC9JoTM0f5QSbt2v+gGNmDr95xKrAlJjM4VuMJQSxghAxOB2WZf2s4CE?=
- =?us-ascii?Q?CqVGUT9CK/1U4+WSnxgtm7rkoo3gRyBLmvwZZFtfAeqm+R+M9RRdZI/RPaVV?=
- =?us-ascii?Q?nuPKe4v/7VxtP/HwKAlG5UfdnltQD9yUB1VS0AtD2NXA1ioW0XI/sy/iP/cX?=
- =?us-ascii?Q?dnLn/Kiu4ga4SgW0sxH0lScNDBV7aBVedlNzo1UBKt88Refvg7b46bIC6DnB?=
- =?us-ascii?Q?c6HC6tE8cOSUig4Ys1elvXDPiX2ptVrULegb3sR4rVuo568MwpxUhMtfb48Y?=
- =?us-ascii?Q?djjT8lE49cmDiXLKDIj2Q6oV+EHfo+IRnMuEqLZfQo8xDEtPk7RMT4ehsLy/?=
- =?us-ascii?Q?f/QvSdcIy5IOQUCDa/F+D+em9Z7NZ7FfS/EsliZ9oNP+xq+v4ICrfnt68el2?=
- =?us-ascii?Q?CdYKGkEoxnkhIqsNpx/mVghRpTbZ6fgxcTyGUNYv3rE64pZ6I2f6Q9kJN57/?=
- =?us-ascii?Q?bsU93QNCfJD1zuDRK2aRca1IJoaFi+6qyhLAgk0DdOLLduvRnCJM+T19myCC?=
- =?us-ascii?Q?hhyuBgljZvxiOxK/shd5KVh9oZyBpNKHpgsBgFuiq5K7IK9U3k5FiYU5oiZF?=
- =?us-ascii?Q?ud2J498l9h0jR/5q2txEw/0uuHBGPsC48dU0ooRHzLyeZy13C55eEhob25XT?=
- =?us-ascii?Q?8vrtpbTQ3cnIYLTQIdZbapu1DQocZqvWqgmoA94xNJ3M677hKX6iz50to/zu?=
- =?us-ascii?Q?VHJV97/OPF4/pfS48h2dECGS/qwr3S+6XyDMPe/5r8U9lw6tm+tKGiMyCxQC?=
- =?us-ascii?Q?dFzcsrNAq3cf3oK/TUI8quqNZM+0pW+dKDVPh+rCx+edRDzodWMCWp3XTFfH?=
- =?us-ascii?Q?FYgI1EzxiMN2H5x6N6VjYfMsLqIBWtIStQkv6dL4?=
+	=?us-ascii?Q?pqVzXjegoOvLijk2nTGvI08EiX7T5lHfMLed1ZLYCtl+DX9RuT1tfTCu6R6+?=
+ =?us-ascii?Q?YmX9Ojs8u01GcZFESjy496ACzFyKQ2Dh73ENsdrCtWqPEzFsEK58pLFPtWqX?=
+ =?us-ascii?Q?BPPRbKyWYHVSg/eeoYNZbGTyylz7nqFJkoYeQ/oBdAcXQsUxDpGk0U1LDDYy?=
+ =?us-ascii?Q?hhSrzsg34jqidL8xBxXQ/e8MhkAvjD31/QPazdneFdayHDIsLFG+hj87oNWt?=
+ =?us-ascii?Q?WSZnq/TPRYoRHSlTq/WdZfqqAyt9DZIf7QrkfjiSJBOyhkVpZbN+kYNZOBn2?=
+ =?us-ascii?Q?U9El/LW86c4mOIQCZFY1+3ESZy+5+bgjVX41aXpTMOPvem1EZWPLH5hPRB5m?=
+ =?us-ascii?Q?OBJ0GWgYbVcKRhQqyK5HGPJPpqGyxxnGy4IvAqMArde2lyK/M1GjWxYPgW2l?=
+ =?us-ascii?Q?jweRDWLBtGArDy6VjnXjsXGEvbFgMF3getYtNq3nGY+qRPtHGBGbw+JigB4Q?=
+ =?us-ascii?Q?+iaaQ7FT60dcK2d6Yoht53HHCoKWRWkWkuzpBMdcSc0iRqXxqZ55DZU/POHf?=
+ =?us-ascii?Q?roWh0pqpMKPXUEDygEzs4L4mmVExxHMhA2ixQaMQYOUSiPaoLRbvQK1azCTG?=
+ =?us-ascii?Q?jF3vXdXDQonBkbxrkM7yRNdDgKVPv8oNw1LMwFbJDIb1LNy19wepUahGW3Pc?=
+ =?us-ascii?Q?7UOunwC2RGfwlxHsK2A7gsSIbVXj15W4TkH42DdTAliWFXTOVtOSHzLCT2VA?=
+ =?us-ascii?Q?a9CsD1bwoM7P7IEPPq9Qv5VwJRxVD//XDmD6W6NzBDnPkiCM56FykkyiAmgH?=
+ =?us-ascii?Q?wCO7V9wZtMFeHVTAZGA9W36JeVX075SsAVV9Hr8olAyfKC+GflAuw62KOjcG?=
+ =?us-ascii?Q?UiM6DsFwggUBYBWKF+UZpZStyV6NBymCyIWJ2cI2qIP0HPyFNqIg+UajA2aK?=
+ =?us-ascii?Q?aA3R75SA+H+rL72TO+m6YKJebTQ45SIjluQRMQaYEKoVrI9B0GEypPUf1R1l?=
+ =?us-ascii?Q?lTuyPJ1WsBrkXW2meLkcmIg1edSomIBWK5FYg7AFs4EIpUeC+mcVJRQ+ahri?=
+ =?us-ascii?Q?GVb9iAy1qYePI7I/Sj3samHFKZwKrvoRjitnR2QK90GNvGlJcMXNCyzHsUK5?=
+ =?us-ascii?Q?kEcW/yIO4wAh1uUew15tyVsxs/5oFFYu0oA97PT4lViJw21lbaOUzjTafpiQ?=
+ =?us-ascii?Q?do5ty9TcWvYOyKGXROtlGR5OpkxY91LXXIBQzMCi+BVcASiCiNMO36+I2yI+?=
+ =?us-ascii?Q?C/5oifcBnkPHeCQZIDuTOPcKfgLg5rXM9NCbufFb5/DLhuTLceHu785RxHX+?=
+ =?us-ascii?Q?8Q70rYNpECPJJPlSvTigb0sDrrPRf5tSbhwDsEqFtjAGo007h+yFOF79r9P1?=
+ =?us-ascii?Q?qAF7kPhB7MoDmbAxdjVenJeh5Oh2UbAGEvmbz2SMSt0xwj9TUNMlfM0MK/s8?=
+ =?us-ascii?Q?xoLjQmSeMzC9PtwjxZ9QFeJC0Q2LIz21Ap3soFYWPStCw1VW3/5uxEOYeLTd?=
+ =?us-ascii?Q?9AZZladfGgdY6AFiu0ozigcP3zgUWiCHfxoz6q7Mqq+v8JnkAhfkZoJOyjwe?=
+ =?us-ascii?Q?P7If+5fUJ8VW+vjR5pqONF374xf7DWOzVDHNYrDsF8OiWAFAQMuiq4JVZm79?=
+ =?us-ascii?Q?96txN9U5iIO6oeT9IZ0M4GLwvFZKyRiY7h6l1Fku?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 07d0f304-e90b-47f8-6346-08dbfa5291f6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 756999a5-06ef-4ba5-97fc-08dbfa5292e9
 X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4373.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2023 14:07:54.7611
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2023 14:07:56.3245
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Y/w1rCI+GqvhsR/gAm5hVvfIoX8jHFLaVvAumf3z/kQ/uZodPh117qsKcKeTHq77eT3xxfFs1Qdca2QEeMkv6Q==
+X-MS-Exchange-CrossTenant-UserPrincipalName: +h7MYV2byyT1BSCfRVpTvblUu6P9K0Y9FSou9aIHwNRNCYsWe3w0JNVl4SqB8txAdDDPRyz5y9tnwZOsg/XN5Q==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4193
 
-Consider the following command with a duplicated "remote" argument:
-$ bridge vni add vni 150 remote 10.0.0.1 remote 10.0.0.2 dev vxlan2
-Error: argument "remote" is wrong: duplicate group
+When there is a duplicate 'vni' option, report the error using duparg()
+instead of the generic invarg().
 
-The error message is misleading because there is no "group" argument. Both
-of the "group" and "remote" options specify a destination address and are
-mutually exclusive so change the variable name and error messages
-accordingly.
+Before:
+$ bridge vni add vni 100 vni 101 dev vxlan2
+Error: argument "101" is wrong: duplicate vni
 
-The result is:
-$ ./bridge/bridge vni add vni 150 remote 10.0.0.1 remote 10.0.0.2 dev vxlan2
-Error: duplicate "destination": "10.0.0.2" is the second value.
+After:
+$ ./bridge/bridge vni add vni 100 vni 101 dev vxlan2
+Error: duplicate "vni": "101" is the second value.
 
 Fixes: 45cd32f9f7d5 ("bridge: vxlan device vnifilter support")
 Reviewed-by: Petr Machata <petrm@nvidia.com>
 Tested-by: Petr Machata <petrm@nvidia.com>
 Signed-off-by: Benjamin Poirier <bpoirier@nvidia.com>
 ---
- bridge/vni.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ bridge/vni.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/bridge/vni.c b/bridge/vni.c
-index 33e50d18..56def2f7 100644
+index 56def2f7..ecd4c2b5 100644
 --- a/bridge/vni.c
 +++ b/bridge/vni.c
-@@ -92,7 +92,7 @@ static int vni_modify(int cmd, int argc, char **argv)
- 		.n.nlmsg_type = cmd,
- 		.tmsg.family = PF_BRIDGE,
- 	};
--	bool group_present = false;
-+	bool daddr_present = false;
- 	inet_prefix daddr;
- 	char *vni = NULL;
- 	char *d = NULL;
-@@ -107,19 +107,19 @@ static int vni_modify(int cmd, int argc, char **argv)
- 				invarg("duplicate vni", *argv);
+@@ -104,7 +104,7 @@ static int vni_modify(int cmd, int argc, char **argv)
+ 		} else if (strcmp(*argv, "vni") == 0) {
+ 			NEXT_ARG();
+ 			if (vni)
+-				invarg("duplicate vni", *argv);
++				duparg("vni", *argv);
  			vni = *argv;
  		} else if (strcmp(*argv, "group") == 0) {
--			if (group_present)
--				invarg("duplicate group", *argv);
  			NEXT_ARG();
-+			if (daddr_present)
-+				duparg("destination", *argv);
- 			get_addr(&daddr, *argv, AF_UNSPEC);
- 			if (!is_addrtype_inet_multi(&daddr))
- 				invarg("invalid group address", *argv);
--			group_present = true;
-+			daddr_present = true;
- 		} else if (strcmp(*argv, "remote") == 0) {
--			if (group_present)
--				invarg("duplicate group", *argv);
- 			NEXT_ARG();
-+			if (daddr_present)
-+				duparg("destination", *argv);
- 			get_addr(&daddr, *argv, AF_UNSPEC);
--			group_present = true;
-+			daddr_present = true;
- 		} else {
- 			if (strcmp(*argv, "help") == 0)
- 				usage();
-@@ -133,7 +133,7 @@ static int vni_modify(int cmd, int argc, char **argv)
- 	}
- 
- 	parse_vni_filter(vni, &req.n, sizeof(req),
--			 (group_present ? &daddr : NULL));
-+			 (daddr_present ? &daddr : NULL));
- 
- 	req.tmsg.ifindex = ll_name_to_index(d);
- 	if (req.tmsg.ifindex == 0) {
 -- 
 2.43.0
 
