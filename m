@@ -1,93 +1,247 @@
-Return-Path: <netdev+bounces-55826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D65E080C61C
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 11:12:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85A5280C627
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 11:13:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EBE91F202CD
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:12:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B54191C209A0
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:13:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C969C22321;
-	Mon, 11 Dec 2023 10:12:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0102224D3;
+	Mon, 11 Dec 2023 10:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ntcoumax"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="L2YKvBxp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4B511715
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 10:12:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02E2DC433C7;
-	Mon, 11 Dec 2023 10:12:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702289527;
-	bh=7ZXmd5rh4Rqq/IAxc7eaZo+Bf3FwdWSw0W4uYwdYPqc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ntcoumaxavZrdA6pD8HO9I8uUIV8ziJTPWMNGRdwJjYSchwfy9H3CNL2ebURgN+3B
-	 R0hm53oQ01uvFLYMR8UUxe2p+tdRc8kFvfQn2MM8crnkyHeMKJuQo2gzWiw7BM3jck
-	 ke2parp67vwgAdLXklisge+oUonDNQJ05JtAxeK3rbrrxRl835/3eDCCgvtrQpN1dN
-	 Sezx3LN/WrHm1hyH8h1plqEnMHvQisygz1TIktV2Qg3mfo2QjRAW0E2rcIVy6x7E82
-	 iOfm6FluXlUeI/74HWL+xiFzLO1XRUKn/fYxJUJ5oOerHDynszMbzXxOwebxcHLGl1
-	 XSMI0dwCT41+Q==
-Message-ID: <6f7f7724-12a0-45d5-80dc-a811b58783c8@kernel.org>
-Date: Mon, 11 Dec 2023 11:12:01 +0100
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A54CFC;
+	Mon, 11 Dec 2023 02:13:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702289591; x=1733825591;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=PAzQ2POEDQ4yXdZ1yPECepn6T6BLWb6YQiAAJ3pszMo=;
+  b=L2YKvBxpsfvrhTqgkHWCL72THq7Ps9CKF8oe/hR08sYrOv4uVN29hBrT
+   BLtztVFLQDlcE8HXe/qRoY4zVYmIzRId9Zf/UPMQyU0FWRbbF9mlm5IGU
+   TzwxmlQJ1eYEEnAon8kPpX3Usz7OEN8ehyRetHDqIiW7btRSF4q9SI1cj
+   H2yZWTkfgcmVJEDklu9jejfdoH0F5ogS3d8k8/aBR7b4JuMx1S8n8O25Z
+   q9IaiGD0CpLU883D1SZQa5NUbPEEPP9OdUlOInNJO9tsdrsuLv45bRedm
+   bcYDO+BDt0wpYGpBGLXYDnJf6Kyk5PrTYRqAuoUjaU+lUHgyY13/YeS35
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10920"; a="1750579"
+X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
+   d="scan'208";a="1750579"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2023 02:13:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10920"; a="776610685"
+X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
+   d="scan'208";a="776610685"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Dec 2023 02:13:07 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 11 Dec 2023 02:13:07 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 11 Dec 2023 02:13:07 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 11 Dec 2023 02:13:04 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XSfoxCL81oPw/DYb3JS79eX3hMQzunN4NsmVavBuV9nid1/czeFAh0U4K6gBSGf4cprAcD2wHqbL8ylfPN6LU0/S0y7MrTgx2uxtYbHOSfgyhKSMLHb0ytN4mTAuU4fQ5qNKAzNe4yJ8WOeIvRFrujDI9AZBpUu/r1HvXRtw30stnDhhIdwa3nS7SFDTl3ebDfetl7XotVxYpPkCOlsLPXILW43+FFkRSF8gwbU6TzPe61JH7namDwbqAI4ZScXCn5T5qQEB7+g1myWOkjiT4yvLEuqLemI4ZtF2aaTSWQggwYEyLMnQoWFCaJwiwDYjZId7wfpc7wqglwuhZ++roA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3ur85iY9xDixXPT9eu8dMwXTuO3CWtjWCvGCO/DL6P4=;
+ b=hXmUoxEv+7LZ5TdqA5uhtv7yfyH6c6ZGw3b8sj8F4CnKfNgF0y46OyuwoDpBrPuu8frDcP3wrD5/9ytA0Nu2/+rwX+g6YwZnC3ggcuUMnUkg6XqopxWQhuwryGLH3iOpaHU4ZxspAzzWU6wbE42WUtq/r9/xBQx/Vw+2RJ8T9nJbWszX4x4W1qWWb+rEQO8TY7bJR9bFXGEuBQ7bI74n8eq6pirRXkvfSUAaZiOFf2i7dZ0xVak2MRkpzG4Po/rzuKweMrCrD/A7EBNLoZjY2ngvoCKGcpw3jAlPjEAVF0/Vy37AeRVnTy+lQWObpmEGqOwwzhBbhZUcFEDLdTQCMQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BYAPR11MB3672.namprd11.prod.outlook.com (2603:10b6:a03:fa::30)
+ by SA1PR11MB7038.namprd11.prod.outlook.com (2603:10b6:806:2b3::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Mon, 11 Dec
+ 2023 10:12:52 +0000
+Received: from BYAPR11MB3672.namprd11.prod.outlook.com
+ ([fe80::5112:5e76:3f72:38f7]) by BYAPR11MB3672.namprd11.prod.outlook.com
+ ([fe80::5112:5e76:3f72:38f7%5]) with mapi id 15.20.7068.031; Mon, 11 Dec 2023
+ 10:12:52 +0000
+Message-ID: <b9c33092-6268-ef89-4401-0cf438ee8a4a@intel.com>
+Date: Mon, 11 Dec 2023 11:12:37 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [PATCH] ice: Fix some null pointer dereference issues in
+ ice_ptp.c
+Content-Language: en-US
+To: Kunwu Chan <chentao@kylinos.cn>, <jesse.brandeburg@intel.com>,
+	<anthony.l.nguyen@intel.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <richardcochran@gmail.com>,
+	<jacob.e.keller@intel.com>, <karol.kolacinski@intel.com>
+CC: <michal.michalik@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Kunwu Chan
+	<kunwu.chan@hotmail.com>
+References: <20231211062649.247148-1-chentao@kylinos.cn>
+ <447d130a-e1ac-02f6-e168-b04bfa9c6004@intel.com>
+ <3231a5d7-29bc-4464-a26c-803b95774f86@kylinos.cn>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+In-Reply-To: <3231a5d7-29bc-4464-a26c-803b95774f86@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR3P281CA0075.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:1f::23) To BYAPR11MB3672.namprd11.prod.outlook.com
+ (2603:10b6:a03:fa::30)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 2/4] page_pool: halve BIAS_MAX for multiple
- user references of a fragment
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: netdev@vger.kernel.org, linux-mm@kvack.org, kuba@kernel.org,
- ilias.apalodimas@linaro.org, jasowang@redhat.com, linyunsheng@huawei.com,
- Liang Chen <liangchen.linux@gmail.com>, edumazet@google.com,
- davem@davemloft.net, almasrymina@google.com, pabeni@redhat.com
-References: <20231211035243.15774-1-liangchen.linux@gmail.com>
- <20231211035243.15774-3-liangchen.linux@gmail.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20231211035243.15774-3-liangchen.linux@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR11MB3672:EE_|SA1PR11MB7038:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1c201c8e-2f1d-41f3-35b1-08dbfa31bbd1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: daiQuxaka78KBGPD0wh8yrG6ZNYqLPMvNPI2T/2RU04jiqSxUxADuuk9Fnv+21beqmcxLFrbTwbFngGYZ68Lg//5/B8hiv20XzMycoBAJPhlbuxcmzdIOjhGIJheo3Kmt2Z2J/sMVucFeOU4gYsLYl7NNmZPRdhXq3aFRanKesg3+/Nl4GBZA5B3RrAcaSI1w5h/qfd2I1Oxxk+2WTbcOtfCNRwCDVzTjX0WNXCyhAdjvxMdNWj3TILuXG8pyLPoYuNpMftJ9LGlWKHvpQyzGPCaCHAdjEUhCwrQCJcaGJ1Xx6CUWFMtbifvJbXae7SyNIqj1gG7PsZeuyLa83FiiMVPjvC4HeWDVwUs798k1XIlCcYz3ApH36v0HCBYtN8KxCKvnCTbAVJ5GuZUIulO+dd4N4UwxacAnT0WZsfaOiLI61evSYRi4gICa+HVNYvD1vFQj/0nXnBKaeg07aEfTMB4Twoo+R1OZhcaldTjVE93bPkejcQsTk9NE/UcbR79knsSkw0IkTQfzACqoaerT+SfwDs7dvCTYGw0GVr/iYO9+/Fkj0mmU5o63MSJ5lJFrH0qJJDLK4w25nln1ea/+jRSgd3gwQ3Q6lsVLf/tA9IRWAwKk0qwuKvG/uGK6rh5mCSsAZT6WlF+V5YMczgp/Um/QzeLU+1fxQJSfTeClY+SWmD/R/mrIRwe7B3tR56raO77CnedoghALcWUxvteLeBOgIvpMvSuyV97Th4sErE=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3672.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(39860400002)(366004)(376002)(136003)(230173577357003)(230273577357003)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(31686004)(45080400002)(26005)(2616005)(6512007)(478600001)(53546011)(6666004)(6506007)(921008)(82960400001)(38100700002)(31696002)(86362001)(36756003)(41300700001)(66476007)(66556008)(66946007)(5660300002)(2906002)(7416002)(6486002)(83380400001)(4326008)(6636002)(316002)(966005)(8936002)(8676002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TzB2WmxPQ3hiSGVZZjI0YitsTXN3SnhRRFhUNVZ3UTMvQzB1L0UvRFFpUUZY?=
+ =?utf-8?B?dVdObXROMHcvU29TdURRVU1rV0tJaTdQMnNoN0dhWjdYdzI0MmdpMjRqNjNJ?=
+ =?utf-8?B?VE9UNUVUWkJxRlgzS2xjZGZjbkR3QmNIdVlnSHZTTSt5LytqQVlRRDRhMytL?=
+ =?utf-8?B?bHZ6RS9yY3JJUEYvWGlrdTM3UEd5cWc4M1Z2VHdNeE5MY1NsNWU3Y1ZRcWNE?=
+ =?utf-8?B?OXNzNjc4OHhBSnQ3bnNHNDRJZzhxMlRYeCtTYnRzMmJsQ3Myd0NsQmZ3b3hU?=
+ =?utf-8?B?U1ZmdllBemtJVXZTUHpKT1Rkd3Z3OHNXTmNVd0Q1RC9Iei8xQ0I3SmZpNEJn?=
+ =?utf-8?B?Q3Y3RUlCVXF5cHplRmNTbWlqdjR3VGNUb1EvMlk5Z0VtMDA0UGd0UHc4N3Zk?=
+ =?utf-8?B?aEZUWTZ4dk1BbWxFRWJnZWVRbGI1Z0VuaGRKSUYzR1hCdkJmbDh4OEozTGQw?=
+ =?utf-8?B?TmR6aXdzSHZGUjljUjBmTXk2Q2doSGx4Z2Y4VzdYVkhER0tIWHBUWHNoMnlU?=
+ =?utf-8?B?M3RqTmUvR3VmN2ZrRkVSWWwvWS9sa2dXVEgvaDh3RWJnNE1oTlljUzJPbFh6?=
+ =?utf-8?B?d1BTb29BbS9LVHlmYis2YVNOc0tkZzE5Qll6Y2JFK0dyZnhkNzVDdlFZUFpM?=
+ =?utf-8?B?TW1FVVo4YnZaNzJpWmJCSHNJZ3F5aWo0Mnc0RUlsZlZRa1l5ZnU4UHVvY3Zt?=
+ =?utf-8?B?bFVGRHZOY2lJUmMvV0N1V25ldjRLaUNONlc0T2cvOWlKZjM1c0prNWRHUFhv?=
+ =?utf-8?B?Sk9mQjhGQlNPZW9YMDBPMTNUYVgzWjBDclNmQTRZeitpSUNLZC9lb1c0b1cx?=
+ =?utf-8?B?ZG9IMk01MkRDSzVXM29ZaVZ2TzR0NVhtcEpRQXdpbGc4TS9VcWd4Uk14K2RQ?=
+ =?utf-8?B?cmdEcHFVM2FuWngyYUNtOUFEaXJiUXZhWDdjUUVrdXVoU3FCbzd0K1VvZ0lT?=
+ =?utf-8?B?SDNrTHhhb1Rjb1ZKdkZEZGt5cVdkZnA1dFhXNzV6Qy8zMEdhZWs5alBHQ0Fo?=
+ =?utf-8?B?aEZaZDBCZzFSN05LTlF1aENaVlRCNjNoY2VBZGptYnViT1duTmkzK3ZSOTVq?=
+ =?utf-8?B?V1hjWEVxc1g4V0dWNGZHR0k1NG03ZjhIc0JNbXpnZGNzcVR6aWZQclVYekgz?=
+ =?utf-8?B?aG1nOWU2OGtybWRHVXVGbVRDQnNMMXJMazBjRE9lY0F6MTdNRDVCRmszbHU1?=
+ =?utf-8?B?YXRFNm5JRFNCb0VNaFdSdm4wRXZ2WVEzY0N3Z0dCNmN6L0VIMDFrUHBIR0Zy?=
+ =?utf-8?B?V0tadW1VRjZsRnZsTDhCR2VsNFkwS2U3SVI0WDJTS0t4REVHTno0VW15dmVG?=
+ =?utf-8?B?TjlFKzJBVTJYbmRaS0V2eUFlMUZDOStVOTZuVURCUWQ4Wk1wd012M2pSUGdS?=
+ =?utf-8?B?UXhsOEJKZnl6eGJjS1J6NHZYRk1wRzdyZnlicG43MWEvSDBMVGt1cE9ZSEZ6?=
+ =?utf-8?B?ZUpmalYyR0s5N0l1QmVjMVh0Qmh1RFNxRGRhbkNHMkdtZlA0Z2Vaa2ZoMTBO?=
+ =?utf-8?B?YkQwRlhESDZKUjhCc3gyT20wT2xqdlh3VFp2d3hBanp5b1EzbFhPRmZZVEJQ?=
+ =?utf-8?B?OUJ1TFlnanM3VS9qZ3A2anNqUVZHZE9pT3lFanNRZUNlNUcrWFlZQnlWS01l?=
+ =?utf-8?B?SGpzb04vRi8xdjFyaGdMZ2F3MFFrbDhQQVlad0luV1h4dTFUd0hYRU5FQmRP?=
+ =?utf-8?B?UTlvS1JSWTRpUHdVb1VkZGszMVYvWDVCWGdvdWtyNTFzRCt6NWNiNFlOb2Zi?=
+ =?utf-8?B?Zk8zeGdaSnc4Tyt5L1JSSStlZSsyS2lxYnJPRWpPWC9OUGlDM0M4K01sMzJP?=
+ =?utf-8?B?U0VCZ0dGR0g3K3ZYc2VsbUFwQXFUVndxNmpkcVJ5R1E2emxZczhmUTdSME9l?=
+ =?utf-8?B?eWhZT0pyd2Z1blBLN0FmUlFiZDFuK1BoQ3ZCSGwzM1BEa3Z5SnZlck0xdjdq?=
+ =?utf-8?B?Y2hVc2JsV09jcWI1bkNtQjB0dnJsWjlNWEtsQytLQUZLeGRsUklBcVVLYkZC?=
+ =?utf-8?B?VG5XQkMxNjdNM1ZjYU14UkFOMnhFQVJXSmdRMzhDVHI5Szgvb3pDVkVJUU14?=
+ =?utf-8?B?RjlONEpHU2lMQkJheVZqdmhneGJYYzNCSERXTzg0cGk3RzZUR21zSHRkREtr?=
+ =?utf-8?B?S1JHTlRuTWxCWi9vMEFMSGgxOXVjNXlUTFcyRlNYcmRiUC9IQkU2ejhsSTRp?=
+ =?utf-8?B?a3c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c201c8e-2f1d-41f3-35b1-08dbfa31bbd1
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3672.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2023 10:12:51.6294
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YZpinkLvnrnugchrQGSNn7XuE56St4HxHh1e28H+daaMcPWQ06AgvaHOsdXvhhyQ91SD295EsXuwcCMecUOZZ0lHI/435Wv+ccJLtks2Y1Y=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB7038
+X-OriginatorOrg: intel.com
 
-Hi Alex,
-
-For page_pool BIAS stuff I would really appreciate your review please.
--Jesper
-
-
-On 11/12/2023 04.52, Liang Chen wrote:
-> Referring to patch [1], in order to support multiple users referencing the
-> same fragment and prevent overflow from pp_ref_count growing, the initial
-> value of pp_ref_count is halved, leaving room for pp_ref_count to increment
-> before the page is drained.
+On 12/11/23 10:32, Kunwu Chan wrote:
+> Thanks for your suggestion.
 > 
-> [1]
-> https://lore.kernel.org/all/20211009093724.10539-3-linyunsheng@huawei.com/
+> I made the patch based on linux-next.git(tag:next-20231211).
 > 
-> Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
-> Reviewed-by: Yunsheng Lin <linyunsheng@huawei.com>
-> ---
->   net/core/page_pool.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> Our code is just self-similar, i didn't override the old name.
+> I keep the logic as it was before.
+> The newest code is:
 > 
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 106220b1f89c..436f7ffea7b4 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -26,7 +26,7 @@
->   #define DEFER_TIME (msecs_to_jiffies(1000))
->   #define DEFER_WARN_INTERVAL (60 * HZ)
->   
-> -#define BIAS_MAX	LONG_MAX
-> +#define BIAS_MAX	(LONG_MAX >> 1)
->   
->   #ifdef CONFIG_PAGE_POOL_STATS
->   /* alloc_stat_inc is intended to be used in softirq context */
+> https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/drivers/net/ethernet/intel/ice/ice_ptp.c#n2747
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/drivers/net/ethernet/intel/ice/ice_ptp.c#n2993
+> 
+
+sure, I just checked those, no huge benefit of dedup
+
+> I'll update v2 patch with:
+> 1. update suject prefix to "[PATCH v2 iwl-next]"
+> 2. remove 'dev_err'
+> 
+> 
+> Thanks again,
+> Kunwu
+
+Thank you too
+
+> 
+> On 2023/12/11 15:15, Przemek Kitszel wrote:
+>> On 12/11/23 07:26, Kunwu Chan wrote:
+>>> devm_kasprintf() returns a pointer to dynamically allocated memory
+>>> which can be NULL upon failure.
+>>>
+>>> Fixes: d938a8cca88a ("ice: Auxbus devices & driver for E822 TS")
+>>> Cc: Kunwu Chan <kunwu.chan@hotmail.com>
+>>> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+>>
+>> I would suggest adding "iwl-net" as a target here
+>>
+>>> ---
+>>>   drivers/net/ethernet/intel/ice/ice_ptp.c | 6 ++++++
+>>>   1 file changed, 6 insertions(+)
+>>>
+>>> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c 
+>>> b/drivers/net/ethernet/intel/ice/ice_ptp.c
+>>> index 1eddcbe89b0c..59794ce4f243 100644
+>>> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
+>>> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+>>> @@ -2668,6 +2668,8 @@ static int 
+>>> ice_ptp_register_auxbus_driver(struct ice_pf *pf)
+>>>       name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
+>>>                     pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
+>>>                     ice_get_ptp_src_clock_index(&pf->hw));
+>>> +    if (!name)
+>>> +        return -ENOMEM;
+>>>       aux_driver->name = name;
+>>>       aux_driver->shutdown = ice_ptp_auxbus_shutdown;
+>>> @@ -2929,6 +2931,10 @@ static int ice_ptp_create_auxbus_device(struct 
+>>> ice_pf *pf)
+>>>       name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
+>>>                     pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
+>>>                     ice_get_ptp_src_clock_index(&pf->hw));
+>>> +    if (!name) {
+>>> +        dev_err(dev, "Failed to allocate memory\n");
+>>
+>> Kuba @ [1]:
+>> no warnings on allocation failures, there will be a splat for GFP_KERNEL
+>> (checkpatch should catch this)
+>>
+>> [1] https://lore.kernel.org/netdev/20231206195304.6226771d@kernel.org/T/
+>>
+>> so just "return -ENOMEM" would be sufficient
+>>
+>>> +        return -ENOMEM;
+>>> +    }
+>>>       aux_dev->name = name;
+>>>       aux_dev->id = id;
+>>
+>> I didn't checked but having same code in two places raises questions.
+>> Are you overwriting old name here, or our code is just self similar?
+> 
+
 
