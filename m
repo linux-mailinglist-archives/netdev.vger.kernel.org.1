@@ -1,122 +1,101 @@
-Return-Path: <netdev+bounces-55966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4DAE80D003
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 16:47:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E17DD80D007
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 16:48:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FD29282178
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:47:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16C841C2134B
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:48:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6263D4BAAF;
-	Mon, 11 Dec 2023 15:47:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 435884BAA5;
+	Mon, 11 Dec 2023 15:48:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jPorHHnr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XZ1zwVLz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 466E2111
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 07:47:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702309640;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IZlJdJgXVbL3FV2sl0lv/ikQI4rT8wZ5WPDilRcK534=;
-	b=jPorHHnrSjn9oejcUCp7SHchnmlAZB5M9Fl7S+y0A69Lw6PpxP7y7dTGGjGyrsQtpoqznL
-	PToImhlQIMOdk1tRxHwUlDnBI8alh3xgfyKwLtpOcgqeGjoL/7Bn3wXeTFUjo1eWhe4qvd
-	h7z33BqxkG98a8ayiSBgqYC0v8akyMA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-640-XsmvzFAvOgeG1NKyZZ3RsA-1; Mon, 11 Dec 2023 10:47:18 -0500
-X-MC-Unique: XsmvzFAvOgeG1NKyZZ3RsA-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40c49cb08fcso5686215e9.2
-        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 07:47:18 -0800 (PST)
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7966EEA;
+	Mon, 11 Dec 2023 07:48:08 -0800 (PST)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-40c32df9174so38086985e9.3;
+        Mon, 11 Dec 2023 07:48:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702309687; x=1702914487; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=wq1z89F5gUStStS9kY9mGX61kbmqB7xupwhoSFkx1p4=;
+        b=XZ1zwVLzNkiimZwhd6I1SE2YfbWTYQOvymNpzOYdRXInEOPv/eBNpUvdkn0iD4QFWr
+         qaoqEVgdlMB63DPa4r7Kej7Kno/3nPZRarSZo3lS6TDfLNPD+trtxtkz/NFwutbRu30h
+         Q5OLdSxL/zlpKEPzu0t9HIuq3Jp0/Hesit3+Yc9VjuumWG3bbk8V4YIQtj8TU7VfAJXU
+         MCvjoAiEjPwyY4We5PbsZCBHJr1aMchXmgGFU5tlbADYWeCHACbN+TwnMhC1Sd9S/Txc
+         nAsZxV8Q5JtwPyLDGhSCxFfKdfQZERNDMU7lOTg/JSR02tPEVhKnZ/mlJ0AwJ2stKXh3
+         wXFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702309637; x=1702914437;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1702309687; x=1702914487;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IZlJdJgXVbL3FV2sl0lv/ikQI4rT8wZ5WPDilRcK534=;
-        b=M5K8bQ5D357+OOlpB2KFwX0LpiHZ38eemXufIDWC4vglV3nW5KzOCGZoIhYdEJTsIM
-         69k0LJJlLffPX3EYK7hG5xP7SC/oqDreGMiMWz3fYvNBHeyhLRO20jijYURJiVpDSqt5
-         nRQ+dsmYLAjRHxxUyIKpBYPkuHsPUIPa/Qctx2woStiFb+dgfxz7bwlECSdpxcucjgA6
-         D/z1l/tx2I2QCnLD6t7JCp5OPXyBepB2n1a9j1F1eGSckO5l4d/WBHOeanuf5Khv+FOd
-         KRhOZYw7gjMCwD6EM7kjM1FcXhxUpFGT0gOYCZk6pnTwcybq5nnBEfVtWYGqxLWZZerl
-         +Vfw==
-X-Gm-Message-State: AOJu0Yx172HSf08+xJALKTvll49OGWYWUSTicDkQi9V+VlZWrkCzUo/S
-	638ZDI+81Td1fUSfT6PCusGBsr6RIT1dq3dclNDFWwljC6VrQlMXE/ipgt1qZfsgvdh8M5mvXXs
-	4FGIgnDZs3X0K9ssV
-X-Received: by 2002:a05:600c:1f08:b0:40c:3e98:5309 with SMTP id bd8-20020a05600c1f0800b0040c3e985309mr2116101wmb.98.1702309637340;
-        Mon, 11 Dec 2023 07:47:17 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGpH0te5s/Q1Xr8W7VeRGbO99gtL3UMDIEk2Fm7MvD8T4ecMB/fJcg5Sa0456ul8XolChfdVA==
-X-Received: by 2002:a05:600c:1f08:b0:40c:3e98:5309 with SMTP id bd8-20020a05600c1f0800b0040c3e985309mr2116092wmb.98.1702309636881;
-        Mon, 11 Dec 2023 07:47:16 -0800 (PST)
-Received: from sgarzare-redhat ([78.209.43.40])
-        by smtp.gmail.com with ESMTPSA id t13-20020a05600c450d00b00405c7591b09sm13401013wmo.35.2023.12.11.07.47.15
+        bh=wq1z89F5gUStStS9kY9mGX61kbmqB7xupwhoSFkx1p4=;
+        b=faQBJHh1GyLZEpq5mF93ISDH5OKvzP/Hod4R5udMrbSYTFfe9ZuyU2xCRxClMqr9QA
+         Y2yI3HmS8bJPoNO5o5arWps2lIKvvHQayhtdeEyM6VZyx1rWCPwdv72Y9jlAitkg5V16
+         0NMqxjmJ2d4bX6+nOu6FaFBYp/3L+WBS742rx7dWx8gow5tn53JvcAXUFJ6/xpmCjSvS
+         pcUYAbPQCekB/Y+KKVPlMqJjAyVEpyINQyttzfJLyfxmgVb5Ly7Y2ZVa6ia59OZwOtSB
+         RlIFFDs6jEANYs+O7cId+B9g5D1qOYMc9uXVKnVDt2ucUAq8dGwJQvD9KrfXDkh9PjX7
+         003A==
+X-Gm-Message-State: AOJu0Yygx9XhTmtrBeUCpBHjeORVLKjVCwtTL+FtHCDMzmB6i2xjzqXi
+	cYy36ZbArr965MoTHx0NZ08=
+X-Google-Smtp-Source: AGHT+IHJiNmLLwj1NImOACKxGQaWC3n6aUQwSFRmZNd9rYrwlW8jp/SEDWCsEBA9znsukqIdRpxNAw==
+X-Received: by 2002:a7b:cbd5:0:b0:40b:5e1e:fb9a with SMTP id n21-20020a7bcbd5000000b0040b5e1efb9amr1724029wmi.79.1702309686560;
+        Mon, 11 Dec 2023 07:48:06 -0800 (PST)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id o9-20020a05600c4fc900b004094d4292aesm13197492wmq.18.2023.12.11.07.48.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 07:47:16 -0800 (PST)
-Date: Mon, 11 Dec 2023 16:45:09 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Nikolay Kuratov <kniv@yandex-team.ru>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [PATCH] vsock/virtio: Fix unsigned integer wrap around in
- virtio_transport_has_space()
-Message-ID: <t6mnn7lyusvwt4knlxkgaajphhs6es5xr6hr7iixtwrfcljw67@foceocwkayk2>
-References: <20231211142505.4076725-1-kniv@yandex-team.ru>
+        Mon, 11 Dec 2023 07:48:06 -0800 (PST)
+Message-ID: <65772f36.050a0220.678b6.ef84@mx.google.com>
+X-Google-Original-Message-ID: <ZXcvM2Sl-7IZ0EA2@Ansuel-xps.>
+Date: Mon, 11 Dec 2023 16:48:03 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH 1/2] dt-bindings: Document QCA808x PHYs
+References: <20231209014828.28194-1-ansuelsmth@gmail.com>
+ <242759d9-327d-4fde-b2a0-24566cf5bf25@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231211142505.4076725-1-kniv@yandex-team.ru>
+In-Reply-To: <242759d9-327d-4fde-b2a0-24566cf5bf25@lunn.ch>
 
-On Mon, Dec 11, 2023 at 05:25:05PM +0300, Nikolay Kuratov wrote:
->We need to do signed arithmetic if we expect condition
->`if (bytes < 0)` to be possible
->
->Found by Linux Verification Center (linuxtesting.org) with SVACE
->
-
-We should add:
-
-Fixes: 06a8fc78367d ("VSOCK: Introduce virtio_vsock_common.ko")
-
->Signed-off-by: Nikolay Kuratov <kniv@yandex-team.ru>
->---
-> net/vmw_vsock/virtio_transport_common.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index c8e162c9d1df..6df246b53260 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -843,7 +843,7 @@ static s64 virtio_transport_has_space(struct vsock_sock *vsk)
-> 	struct virtio_vsock_sock *vvs = vsk->trans;
-> 	s64 bytes;
->
->-	bytes = vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
->+	bytes = (s64)vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
-
-If we respect the credit, this should not happen. It can happen, though,
-that the receiver changes its buffer size while we're communicating,
-and if it reduces it, this could happen. So yes, we need to fix it!
-
-Thanks!
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
-> 	if (bytes < 0)
-> 		bytes = 0;
->
->-- 
->2.34.1
+On Mon, Dec 11, 2023 at 04:44:06PM +0100, Andrew Lunn wrote:
+> > +properties:
+> > +  qca,led-active-high:
+> > +    description: Set all the LEDs to active high to be turned on.
+> > +    type: boolean
+> 
+> I would of expected active high is the default. An active low property
+> would make more sense. It should also be a generic property, not a
+> vendor property. As such, we either want the phylib core to parse it,
+> or the LED core.
 >
 
+Mhhh with a generic property and LED core or phylib handling it... How
+it would work applying that setting on PHY side?
+
+Adding the check to the set_brightness set_blink hw_control API?
+
+-- 
+	Ansuel
 
