@@ -1,98 +1,132 @@
-Return-Path: <netdev+bounces-55768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5D8680C38B
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 09:47:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D6A680C556
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:57:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C2DA1F20F33
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 08:47:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB8CC1F20F9C
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 09:57:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 532F620DF7;
-	Mon, 11 Dec 2023 08:46:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qcDKzfe9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E36EB21A10;
+	Mon, 11 Dec 2023 09:57:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379D8125DC
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 08:46:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D44DBC433C7;
-	Mon, 11 Dec 2023 08:46:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702284417;
-	bh=zjlRUhnaZnjsZZughQI/BxjLVo+4gBWoqW3Nl+z5Khw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qcDKzfe9rsmIXuu2kqeOHU7yRm2NbwkVuULN0FrjITTjlxqmzO422rRbPkyU8nL4L
-	 UD+X9olvrhTq7AGWbcm4s9wEwH/am42xmw/Wwhro9OC85ij8IXXU0D7Bf/cDVeBWFN
-	 STOVjZIn/TIkJ9MLNOBNFRHaGE6ovx32H5ebWrpYvstzSSonepFSKAwzII3+VSZviS
-	 9SJf/NMBMoajszoJdo7OsdrMw0krOIB/J94WbDMJuryfWNoqMA6JCHouatti3sNbDG
-	 zXWSvluvyvp/HH7gLjm0K2jsmu5lJPaNQkWX+IoMKXirMi8vqnvf+IKjPV9YL0pG0o
-	 yO+uop5kGmZMA==
-Date: Mon, 11 Dec 2023 10:46:52 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Shinas Rasheed <srasheed@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, hgani@marvell.com,
-	vimleshk@marvell.com, egallen@redhat.com, mschmidt@redhat.com,
-	pabeni@redhat.com, horms@kernel.org, kuba@kernel.org,
-	davem@davemloft.net, wizhao@redhat.com, kheib@redhat.com,
-	konguyen@redhat.com, Veerasenareddy Burru <vburru@marvell.com>,
-	Sathesh Edara <sedara@marvell.com>,
-	Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next v3 2/4] octeon_ep: PF-VF mailbox version support
-Message-ID: <20231211084652.GC4870@unreal>
-References: <20231211063355.2630028-1-srasheed@marvell.com>
- <20231211063355.2630028-3-srasheed@marvell.com>
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 67AE0C2
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 01:57:37 -0800 (PST)
+Received: from loongson.cn (unknown [112.20.109.254])
+	by gateway (Coremail) with SMTP id _____8BxK+kP3XZlLgAAAA--.1S3;
+	Mon, 11 Dec 2023 17:57:35 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.109.254])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxfS+4zHZldVpbAA--.5265S3;
+	Mon, 11 Dec 2023 16:47:53 +0800 (CST)
+Message-ID: <54242b04-0f9f-4384-a0c9-1add2b15c2d7@loongson.cn>
+Date: Mon, 11 Dec 2023 16:47:52 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231211063355.2630028-3-srasheed@marvell.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 5/9] net: stmmac: dwmac-loongson: Add full PCI support
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, fancer.lancer@gmail.com,
+ Jose.Abreu@synopsys.com, chenhuacai@loongson.cn, linux@armlinux.org.uk,
+ dongbiao@loongson.cn, guyinggang@loongson.cn, netdev@vger.kernel.org,
+ loongarch@lists.linux.dev, chris.chenfeiyang@gmail.com
+References: <cover.1699533745.git.siyanteng@loongson.cn>
+ <0e9dd61f05571b01de369e449106db3ac2dd56da.1699533745.git.siyanteng@loongson.cn>
+ <52a727bb-29d0-4d5c-9043-95903f7b9892@lunn.ch>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <52a727bb-29d0-4d5c-9043-95903f7b9892@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8DxfS+4zHZldVpbAA--.5265S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7Cr1xGFy8Gr1xAr1fXF1DArc_yoW8Ww4xp3
+	95AF15ZrykXry7uayUZayxJ3W8Xr48Zry8Cw47Cr12v3WFvr1ftF15KrW7CryxArZIkw40
+	9w1jqF4vkFsYkacCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUU9Kb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWUJVW8JwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWU
+	twAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
+	kF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4U
+	MxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI
+	0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE
+	14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20x
+	vaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWU
+	JVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcbAwUUUUU
 
-On Sun, Dec 10, 2023 at 10:33:53PM -0800, Shinas Rasheed wrote:
-> Add PF-VF mailbox initial version support
-> 
-> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
-> ---
 
-<...>
+在 2023/11/12 04:24, Andrew Lunn 写道:
+>> -	res.irq = of_irq_get_byname(np, "macirq");
+>> -	if (res.irq < 0) {
+>> -		dev_err(&pdev->dev, "IRQ macirq not found\n");
+>> -		ret = -ENODEV;
+>> -		goto err_disable_msi;
+>> -	}
+>> -
+>> -	res.wol_irq = of_irq_get_byname(np, "eth_wake_irq");
+>> -	if (res.wol_irq < 0) {
+>> -		dev_info(&pdev->dev,
+>> -			 "IRQ eth_wake_irq not found, using macirq\n");
+>> -		res.wol_irq = res.irq;
+>> -	}
+>> -
+>> -	res.lpi_irq = of_irq_get_byname(np, "eth_lpi");
+>> -	if (res.lpi_irq < 0) {
+>> -		dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
+>> -		ret = -ENODEV;
+>> -		goto err_disable_msi;
+>> +	if (np) {
+>> +		res.irq = of_irq_get_byname(np, "macirq");
+>> +		if (res.irq < 0) {
+>> +			dev_err(&pdev->dev, "IRQ macirq not found\n");
+>> +			ret = -ENODEV;
+>> +			goto err_disable_msi;
+>> +		}
+>> +
+>> +		res.wol_irq = of_irq_get_byname(np, "eth_wake_irq");
+>> +		if (res.wol_irq < 0) {
+>> +			dev_info(&pdev->dev,
+>> +				 "IRQ eth_wake_irq not found, using macirq\n");
+>> +			res.wol_irq = res.irq;
+>> +		}
+>> +
+>> +		res.lpi_irq = of_irq_get_byname(np, "eth_lpi");
+>> +		if (res.lpi_irq < 0) {
+>> +			dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
+>> +			ret = -ENODEV;
+>> +			goto err_disable_msi;
+>> +		}
+> This is where a refactoring patch is useful. Have one patch which
+> moves this code into a helper function. The commit message can say it
+> just moves code around, but there is no functional change. The second
+> patch then moves the call to the helper inside the if (np).
 
-> @@ -28,10 +28,18 @@ static void octep_pfvf_validate_version(struct octep_device *oct,  u32 vf_id,
->  {
->  	u32 vf_version = (u32)cmd.s_version.version;
->  
-> -	if (vf_version <= OCTEP_PFVF_MBOX_VERSION_V1)
-> -		rsp->s_version.type = OCTEP_PFVF_MBOX_TYPE_RSP_ACK;
-> +	dev_dbg(&oct->pdev->dev, "VF id:%d VF version:%d PF version:%d\n",
-> +		vf_id, vf_version, OCTEP_PFVF_MBOX_VERSION_CURRENT);
-> +	if (vf_version < OCTEP_PFVF_MBOX_VERSION_CURRENT)
-> +		rsp->s_version.version = vf_version;
->  	else
-> -		rsp->s_version.type = OCTEP_PFVF_MBOX_TYPE_RSP_NACK;
-> +		rsp->s_version.version = OCTEP_PFVF_MBOX_VERSION_CURRENT;
-> +
-> +	oct->vf_info[vf_id].mbox_version = rsp->s_version.version;
-> +	dev_dbg(&oct->pdev->dev, "VF id:%d negotiated VF version:%d\n",
-> +		vf_id, oct->vf_info[vf_id].mbox_version);
-> +
-> +	rsp->s_version.type = OCTEP_PFVF_MBOX_TYPE_RSP_ACK;
->  }
+Thanks for your advice!
 
-<...>
 
-> +#define OCTEP_PFVF_MBOX_VERSION_CURRENT	OCTEP_PFVF_MBOX_VERSION_V1
+In fact, we have already done this in <[PATCH v5 6/9] net: stmmac: 
+dwmac-loongson: Add MSI support>, and the function is 
+loongson_dwmac_config_legacy().
 
-This architecture design is unlikely to work in the real world unless
-you control both PF and VF environment. Mostly PF is running some old
-legacy distribution while VFs run more modern OS and this check will
-prevent to run new driver in VF.
 
-Thanks
+Thanks,
+
+Yanteng
+
+
+>
+>        Andrew
+
 
