@@ -1,156 +1,196 @@
-Return-Path: <netdev+bounces-55904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 751CE80CC53
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:00:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBAFA80CC46
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:59:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A61BA1C2093D
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:00:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86FF7280D1F
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:59:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C6A8482C4;
-	Mon, 11 Dec 2023 14:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A533481AC;
+	Mon, 11 Dec 2023 13:59:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DIFn/ZYX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RWECisDW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFFBC1F60B;
-	Mon, 11 Dec 2023 14:00:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36F58C433C9;
-	Mon, 11 Dec 2023 14:00:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101281F60B
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 13:59:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BFA7C433C8;
+	Mon, 11 Dec 2023 13:59:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702303209;
-	bh=/E6nsoNxSxBlDumXRRDkrD+zQkcxuqlaJOwxQsE/9OY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DIFn/ZYXBfCa2+feNeMlV/vKSC8Alppynm0lhI3glH8DoZpvkpuXHYmnVmY6eDHDd
-	 sJ/NJcalQbQYp/QNEmVbmaKARJhJKwGSHBm7WpfcheBSZ/wfcvx0ML/Tb3nQN/3bDb
-	 MkfgmeB6MhCxNDPmeW7WgdWeWEC5tuo4tX9hGLQz2KYKzscJ1W6Ikfmuk3Nmu+bEaE
-	 CkT7VpTPXwsKRUKWEfueDszcF6ArmTVEFFquG0C/r4vv83np+N1cUNIONL6rhcjRLe
-	 seZulQu85nt41oGmd1PkatwhTUn9OWenk19/LEftPtqegwvQaJiEE5h/sUrfkcNv8A
-	 FR+7J7H07ePRw==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Thinh Tran <thinhtr@linux.vnet.ibm.com>,
-	Venkata Sai Duggi <venkata.sai.duggi@ibm.com>,
-	David Christensen <drc@linux.vnet.ibm.com>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	pavan.chebbi@broadcom.com,
-	mchan@broadcom.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 11/19] net/tg3: fix race condition in tg3_reset_task()
-Date: Mon, 11 Dec 2023 08:57:45 -0500
-Message-ID: <20231211135908.385694-11-sashal@kernel.org>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231211135908.385694-1-sashal@kernel.org>
-References: <20231211135908.385694-1-sashal@kernel.org>
+	s=k20201202; t=1702303188;
+	bh=rU5y8TREUm+Fh2v6xsqVQRML7ECeO9i2H0Ir2DKyCXg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=RWECisDWqFWgce/TRfMtx/5S5i/lmqy+C0BXcE9QhFukbF9UXsyzJogCbcOlSzrSU
+	 6Qz5mbiM6eseokiD9Kubd3NsagddTxajm9nsI9FMjR+rcIIDZ6yxFbmwMg6y33KRDQ
+	 mt8QT7mjXPX2RxWcmwSVrbrikmnzpCt+Lfw6Ae/BAB+cSXG2qZDt6ZHt/tRNRla+vh
+	 SIwqjDnbiU5QZhSHuCmZwcsTBUSvsdx/2bF+8cu00aWU3i0sq1TjN7L5X0hxSt9814
+	 wGDmffwlvhJYJg5dxNyIrwzBUDQkTxSPfMGwVXYcS2G2ar2MpjUQv0kUhxAX1iCn5n
+	 GIYpdCCN6xOEQ==
+Message-ID: <54e4634d-2dd4-4180-939d-32d070b0aa59@kernel.org>
+Date: Mon, 11 Dec 2023 15:59:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.142
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 net-next 6/8] net: ethernet: ti: am65-cpsw-qos: Add
+ Frame Preemption MAC Merge support
+Content-Language: en-US
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, s-vadapalli@ti.com, r-gunasekaran@ti.com,
+ vigneshr@ti.com, srk@ti.com, horms@kernel.org, p-varis@ti.com,
+ netdev@vger.kernel.org
+References: <20231201135802.28139-1-rogerq@kernel.org>
+ <20231201135802.28139-7-rogerq@kernel.org>
+ <20231207152409.v5nhbgn4pwdqunzw@skbuf>
+ <ba4dcbe2-1dc4-4a64-92af-71d6a2783902@kernel.org>
+ <20231211132901.deqy2zpnxzowflud@skbuf>
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20231211132901.deqy2zpnxzowflud@skbuf>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
 
-[ Upstream commit 16b55b1f2269962fb6b5154b8bf43f37c9a96637 ]
 
-When an EEH error is encountered by a PCI adapter, the EEH driver
-modifies the PCI channel's state as shown below:
+On 11/12/2023 15:29, Vladimir Oltean wrote:
+> On Fri, Dec 08, 2023 at 03:43:45PM +0200, Roger Quadros wrote:
+>> How do the below 2 patches look to resolve this?
+>>
+>> From af2a8503dc04c54d6eaf50954628009aba54e2c8 Mon Sep 17 00:00:00 2001
+>> From: Roger Quadros <rogerq@kernel.org>
+>> Date: Fri, 8 Dec 2023 15:11:06 +0200
+>> Subject: [PATCH] net: ethernet: ti: am65-cpsw: Fix get_eth_mac_stats
+>>
+>> We do not support individual stats for PMAC and EMAC so
+>> report only aggregate stats.
+>>
+>> Fixes: 67372d7a85fcd ("net: ethernet: am65-cpsw: Add standard Ethernet MAC stats to ethtool")
+>> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+>> ---
+>>  drivers/net/ethernet/ti/am65-cpsw-ethtool.c | 37 ++++++++++++---------
+>>  1 file changed, 22 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
+>> index 44e01d68db39..934b03382508 100644
+>> --- a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
+>> +++ b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
+>> @@ -671,21 +671,28 @@ static void am65_cpsw_get_eth_mac_stats(struct net_device *ndev,
+>>  
+>>  	stats = port->stat_base;
+>>  
+>> -	s->FramesTransmittedOK = readl_relaxed(&stats->tx_good_frames);
+>> -	s->SingleCollisionFrames = readl_relaxed(&stats->tx_single_coll_frames);
+>> -	s->MultipleCollisionFrames = readl_relaxed(&stats->tx_mult_coll_frames);
+>> -	s->FramesReceivedOK = readl_relaxed(&stats->rx_good_frames);
+>> -	s->FrameCheckSequenceErrors = readl_relaxed(&stats->rx_crc_errors);
+>> -	s->AlignmentErrors = readl_relaxed(&stats->rx_align_code_errors);
+>> -	s->OctetsTransmittedOK = readl_relaxed(&stats->tx_octets);
+>> -	s->FramesWithDeferredXmissions = readl_relaxed(&stats->tx_deferred_frames);
+>> -	s->LateCollisions = readl_relaxed(&stats->tx_late_collisions);
+>> -	s->CarrierSenseErrors = readl_relaxed(&stats->tx_carrier_sense_errors);
+>> -	s->OctetsReceivedOK = readl_relaxed(&stats->rx_octets);
+>> -	s->MulticastFramesXmittedOK = readl_relaxed(&stats->tx_multicast_frames);
+>> -	s->BroadcastFramesXmittedOK = readl_relaxed(&stats->tx_broadcast_frames);
+>> -	s->MulticastFramesReceivedOK = readl_relaxed(&stats->rx_multicast_frames);
+>> -	s->BroadcastFramesReceivedOK = readl_relaxed(&stats->rx_broadcast_frames);
+>> +        switch (s->src) {
+>> +	case ETHTOOL_MAC_STATS_SRC_AGGREGATE:
+>> +		s->FramesTransmittedOK = readl_relaxed(&stats->tx_good_frames);
+>> +		s->SingleCollisionFrames = readl_relaxed(&stats->tx_single_coll_frames);
+>> +		s->MultipleCollisionFrames = readl_relaxed(&stats->tx_mult_coll_frames);
+>> +		s->FramesReceivedOK = readl_relaxed(&stats->rx_good_frames);
+>> +		s->FrameCheckSequenceErrors = readl_relaxed(&stats->rx_crc_errors);
+>> +		s->AlignmentErrors = readl_relaxed(&stats->rx_align_code_errors);
+>> +		s->OctetsTransmittedOK = readl_relaxed(&stats->tx_octets);
+>> +		s->FramesWithDeferredXmissions = readl_relaxed(&stats->tx_deferred_frames);
+>> +		s->LateCollisions = readl_relaxed(&stats->tx_late_collisions);
+>> +		s->CarrierSenseErrors = readl_relaxed(&stats->tx_carrier_sense_errors);
+>> +		s->OctetsReceivedOK = readl_relaxed(&stats->rx_octets);
+>> +		s->MulticastFramesXmittedOK = readl_relaxed(&stats->tx_multicast_frames);
+>> +		s->BroadcastFramesXmittedOK = readl_relaxed(&stats->tx_broadcast_frames);
+>> +		s->MulticastFramesReceivedOK = readl_relaxed(&stats->rx_multicast_frames);
+>> +		s->BroadcastFramesReceivedOK = readl_relaxed(&stats->rx_broadcast_frames);
+>> +		break;
+>> +	default:
+>> +		break;
+>> +	}
+>>  };
+> 
+> 	if (s->src != ETHTOOL_MAC_STATS_SRC_AGGREGATE)
+> 		return;
 
-   enum {
-      /* I/O channel is in normal state */
-      pci_channel_io_normal = (__force pci_channel_state_t) 1,
+Is better.
 
-      /* I/O to channel is blocked */
-      pci_channel_io_frozen = (__force pci_channel_state_t) 2,
+> 
+> Also, again, tabs mixed with spaces. What editor are you using, notepad?
 
-      /* PCI card is dead */
-      pci_channel_io_perm_failure = (__force pci_channel_state_t) 3,
-   };
+I'm using vim but I didn't run checkpatch on it before pasting
+it here for quick feedback.
 
-If the same EEH error then causes the tg3 driver's transmit timeout
-logic to execute, the tg3_tx_timeout() function schedules a reset
-task via tg3_reset_task_schedule(), which may cause a race condition
-between the tg3 and EEH driver as both attempt to recover the HW via
-a reset action.
+> 
+>>  
+>>  static int am65_cpsw_get_ethtool_ts_info(struct net_device *ndev,
+>>
+>> base-commit: a78e0a2c4353d6c100e45c5ef738113bf2d0fda5
+>> -- 
+>> 2.34.1
+>>
+>>
+>>
+>>
+>> From 0b20d8b8ef110d886396ee2486f3a9e20170cc85 Mon Sep 17 00:00:00 2001
+>> From: Roger Quadros <rogerq@kernel.org>
+>> Date: Fri, 8 Dec 2023 15:38:57 +0200
+>> Subject: [PATCH] selftests: forwarding: ethtool_mm: support devices that don't
+>>  support pmac stats
+>>
+>> Some devices do not support individual 'pmac' and 'emac' stats.
+>> For such devices, resort to 'aggregate' stats.
+>>
+>> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+>> ---
+>>  tools/testing/selftests/net/forwarding/ethtool_mm.sh | 7 +++++++
+>>  1 file changed, 7 insertions(+)
+>>
+>> diff --git a/tools/testing/selftests/net/forwarding/ethtool_mm.sh b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+>> index 6212913f4ad1..e3f2e62029ca 100755
+>> --- a/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+>> +++ b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+>> @@ -26,6 +26,13 @@ traffic_test()
+>>  	local delta=
+>>  
+>>  	before=$(ethtool_std_stats_get $if "eth-mac" "FramesTransmittedOK" $src)
+>> +	# some devices don't support individual pmac/emac stats,
+>> +	# use aggregate stats for them.
+>> +        if [ "$before" == null ]; then
+>> +                src="aggregate"
+>> +                before=$(ethtool_std_stats_get $if "eth-mac" "FramesTransmittedOO
+>> +K" $src)
+>> +        fi
+>>  
+>>  	$MZ $if -q -c $num_pkts -p 64 -b bcast -t ip -R $PREEMPTIBLE_PRIO
+>>  
+>>
+>> base-commit: af2a8503dc04c54d6eaf50954628009aba54e2c8
+>> -- 
+>> 2.34.1
+>>
+>> -- 
+>> cheers,
+>> -roger
+> 
+> I commented on the second patch when you submitted it.
 
-EEH driver gets error event
---> eeh_set_channel_state()
-    and set device to one of
-    error state above           scheduler: tg3_reset_task() get
-                                returned error from tg3_init_hw()
-                             --> dev_close() shuts down the interface
-tg3_io_slot_reset() and
-tg3_io_resume() fail to
-reset/resume the device
-
-To resolve this issue, we avoid the race condition by checking the PCI
-channel state in the tg3_reset_task() function and skip the tg3 driver
-initiated reset when the PCI channel is not in the normal state.  (The
-driver has no access to tg3 device registers at this point and cannot
-even complete the reset task successfully without external assistance.)
-We'll leave the reset procedure to be managed by the EEH driver which
-calls the tg3_io_error_detected(), tg3_io_slot_reset() and
-tg3_io_resume() functions as appropriate.
-
-Adding the same checking in tg3_dump_state() to avoid dumping all
-device registers when the PCI channel is not in the normal state.
-
-Signed-off-by: Thinh Tran <thinhtr@linux.vnet.ibm.com>
-Tested-by: Venkata Sai Duggi <venkata.sai.duggi@ibm.com>
-Reviewed-by: David Christensen <drc@linux.vnet.ibm.com>
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
-Link: https://lore.kernel.org/r/20231201001911.656-1-thinhtr@linux.vnet.ibm.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/net/ethernet/broadcom/tg3.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index 2c41852a082bb..7b49befed7332 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -6448,6 +6448,14 @@ static void tg3_dump_state(struct tg3 *tp)
- 	int i;
- 	u32 *regs;
- 
-+	/* If it is a PCI error, all registers will be 0xffff,
-+	 * we don't dump them out, just report the error and return
-+	 */
-+	if (tp->pdev->error_state != pci_channel_io_normal) {
-+		netdev_err(tp->dev, "PCI channel ERROR!\n");
-+		return;
-+	}
-+
- 	regs = kzalloc(TG3_REG_BLK_SIZE, GFP_ATOMIC);
- 	if (!regs)
- 		return;
-@@ -11177,7 +11185,8 @@ static void tg3_reset_task(struct work_struct *work)
- 	rtnl_lock();
- 	tg3_full_lock(tp, 0);
- 
--	if (tp->pcierr_recovery || !netif_running(tp->dev)) {
-+	if (tp->pcierr_recovery || !netif_running(tp->dev) ||
-+	    tp->pdev->error_state != pci_channel_io_normal) {
- 		tg3_flag_clear(tp, RESET_TASK_PENDING);
- 		tg3_full_unlock(tp);
- 		rtnl_unlock();
 -- 
-2.42.0
-
+cheers,
+-roger
 
