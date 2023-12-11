@@ -1,147 +1,156 @@
-Return-Path: <netdev+bounces-55686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CBB080BFE3
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 04:31:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAC2180BFF3
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 04:38:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B7CA280C54
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 03:31:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3897BB208A3
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 03:38:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1AE615E8B;
-	Mon, 11 Dec 2023 03:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E74816425;
+	Mon, 11 Dec 2023 03:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NDkB5k+L"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Ug928xMk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DC42ED
-	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 19:31:21 -0800 (PST)
-Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2c9efa1ab7fso48473601fa.0
-        for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 19:31:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702265480; x=1702870280; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gQSL4X30hGfSGTxRuYdgtKDfvYwjWus1QS3Y5VELUiA=;
-        b=NDkB5k+LkF9u3Oa8b/KMMIzsvn+yhxbHdqFmibM+brgHIJNCN8SCLaqv6RPh1GU5FS
-         r9lk5Xvf+qK2vpmPSw1/twvmL+LeGFukYkDiLElT644zAXDB1d2s9/IXexr0OcnbMhk0
-         D8e6YOSAbd5q8AgcKNOn83gDKLSKPZqnV2YmIEOMwqVG9jtLnM5ytQy2kmH9e7QHzPpi
-         yA9iuX2NdhzJ5AyxzPFJF+zEX4CqQ/WG6KXge44ay9RyqdR4PvRxYHa+ZH4DQFwriTYc
-         xWnH5un7OU2KqYbCCpZ7f7qJwXtINr17RXulZTcrTOpf14L+fQCru+FWylv64HLY/2kq
-         B/KQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702265480; x=1702870280;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gQSL4X30hGfSGTxRuYdgtKDfvYwjWus1QS3Y5VELUiA=;
-        b=aApiu0mL1+0hGULCYHjGwt54YAQ2EkrOcy+MdXvBBDOPcI3rJYYpGPHrN9vUlOdOK8
-         xvpQRVUrtKOxQ6MTr6Lac9ghXV3Myaq+szj+QtDhPXvBwAReQqrttpt/95vBuh4DuvCV
-         7dI0llyetCFHZVD3A72fWjw7RTfYNDvF/35oL/aXqJhUq5EeRKlxEZTBUw1TeWRwI9ob
-         kl5u7AQEX5ZbjrdHVurpctdeRyMc5JuhjrDrLMUw8bseHF39S8PmtKpqPTNbOw+0gvAC
-         vhHAHCIEduum/yqbD4ICwgSJYKkxVq7HeKXJ0eDAbv+EBJl1AJ2Ein8GXKlchaU7MVGn
-         Epnw==
-X-Gm-Message-State: AOJu0Yxy4WCjGtLJJHNZiXrU0Ey3fqmAwtfGzNqjxsxNbPocutSmxiK0
-	sbydxwmEFQgXuexrl21Mj5jA6OsJH8rtEByMB9E=
-X-Google-Smtp-Source: AGHT+IE1adiREpDOlI+/gfB18LJB7AaiHcJG2gpFXbiATLuTpugOdaHu3uWiIuOgFyFgQyY/HhAeJsPRdtGCmB+Di+Q=
-X-Received: by 2002:a2e:9d51:0:b0:2c9:f658:6a37 with SMTP id
- y17-20020a2e9d51000000b002c9f6586a37mr600097ljj.66.1702265479415; Sun, 10 Dec
- 2023 19:31:19 -0800 (PST)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F18B9EA;
+	Sun, 10 Dec 2023 19:37:59 -0800 (PST)
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BB2twI1015931;
+	Mon, 11 Dec 2023 03:37:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:subject:date:message-id:mime-version:content-type
+	:content-transfer-encoding:to:cc; s=qcppdkim1; bh=Iy3NMnpxBD83P5
+	N/K9x9lC3sCgLsQgh+v9RxbcLUjgA=; b=Ug928xMkFx6VOkdTclV9KSIKnh8y3c
+	X4F4NVtfHLKfcXaBteUvHH6kKLKBLzf0E9OTQtOXdrMc/G4aXYU7B4PxXT2K2fzn
+	SLOdTLj5/zF3zUQlf4QLO/YHZa8fVuoTOCRjPEAgcUcS9cXUetsJ/PsMbF3cmGqg
+	D6/j71v6Ob5OnUQbf6nk+fdn0EIJUULlrhYVkPt+OVvKdrLgBpr44/hi6+0xOvFY
+	fqSSvfHHVnNlAJ8V4RIULaMqLMKf431jTu7Npdw09bPf8vNp4iw825GXxyAyNIQW
+	UKqGy/9wOFBf88TkjRqKSR71EvGhc3WimjoE2Zd3o2ECytR3DuKPc7LA==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uvnyva3q4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Dec 2023 03:37:38 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BB3bbSb025980
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Dec 2023 03:37:37 GMT
+Received: from hu-kathirav-blr.qualcomm.com (10.80.80.8) by
+ nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Sun, 10 Dec 2023 19:37:32 -0800
+From: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
+Subject: [PATCH v3 0/8] Add NSS clock controller support for Qualcomm
+ IPQ5332
+Date: Mon, 11 Dec 2023 09:07:22 +0530
+Message-ID: <20231211-ipq5332-nsscc-v3-0-ad13bef9b137@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231206105419.27952-1-liangchen.linux@gmail.com>
- <20231206105419.27952-2-liangchen.linux@gmail.com> <20231208173816.2f32ad0f@kernel.org>
-In-Reply-To: <20231208173816.2f32ad0f@kernel.org>
-From: Liang Chen <liangchen.linux@gmail.com>
-Date: Mon, 11 Dec 2023 11:31:06 +0800
-Message-ID: <CAKhg4tKXfos+M=rmu25B=dCmS_uzmBy743BB=6NBZgBMWnHobA@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 1/4] page_pool: transition to reference count
- management after page draining
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	hawk@kernel.org, ilias.apalodimas@linaro.org, linyunsheng@huawei.com, 
-	netdev@vger.kernel.org, linux-mm@kvack.org, jasowang@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPKDdmUC/3XMOw7CMBBF0a1EU2PkD7YEFftAKaxhQqbASTzBA
+ kXeOyY95X3SOxsIZSaBS7dBpsLCU2rhDh3gGNODFN9bg9XWGe204nnxzlmVRBBVpIhnMt7pk4f
+ 2mTMN/N69W996ZFmn/Nn5Yn/rP6kYpVUwwUaLwQ86XpcXIyc84vSEvtb6BZFlmaSsAAAA
+To: Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Michael Turquette
+	<mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>, Rob Herring
+	<robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Catalin Marinas
+	<catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>
+CC: <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        "Kathiravan
+ Thirumoorthy" <quic_kathirav@quicinc.com>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski@linaro.org>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1702265852; l=2439;
+ i=quic_kathirav@quicinc.com; s=20230906; h=from:subject:message-id;
+ bh=upKaqzFbEzN+y31BgMHs8lWTIVyBiWK2BO9X4S1Ib/k=;
+ b=PDC6disO4cR2ZUaL3Gr0QHV6bZTB8dd4XZ3tV7knt50w6UoD7f0dHdnXwdd4J0XIA1uiJhpr8
+ Z2tscxI8PsqBuqHw6fV+l9qcRnhUDFx1F73ZGUd9wGVFUZv6fhkiOpH
+X-Developer-Key: i=quic_kathirav@quicinc.com; a=ed25519;
+ pk=xWsR7pL6ch+vdZ9MoFGEaP61JUaRf0XaZYWztbQsIiM=
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: Q0yBZLv1tvIeg5cZV2N1RQuzUMm8M81P
+X-Proofpoint-ORIG-GUID: Q0yBZLv1tvIeg5cZV2N1RQuzUMm8M81P
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ mlxlogscore=999 suspectscore=0 spamscore=0 bulkscore=0 clxscore=1015
+ phishscore=0 adultscore=0 mlxscore=0 lowpriorityscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2312110028
 
-On Sat, Dec 9, 2023 at 9:38=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Wed,  6 Dec 2023 18:54:16 +0800 Liang Chen wrote:
-> > -/* pp_frag_count represents the number of writers who can update the p=
-age
-> > +/* pp_ref_count represents the number of writers who can update the pa=
-ge
-> >   * either by updating skb->data or via DMA mappings for the device.
-> >   * We can't rely on the page refcnt for that as we don't know who migh=
-t be
-> >   * holding page references and we can't reliably destroy or sync DMA m=
-appings
-> >   * of the fragments.
-> >   *
-> > - * When pp_frag_count reaches 0 we can either recycle the page if the =
-page
-> > + * pp_ref_count initially corresponds to the number of fragments. Howe=
-ver,
-> > + * when multiple users start to reference a single fragment, for examp=
-le in
-> > + * skb_try_coalesce, the pp_ref_count will become greater than the num=
-ber of
-> > + * fragments.
-> > + *
-> > + * When pp_ref_count reaches 0 we can either recycle the page if the p=
-age
-> >   * refcnt is 1 or return it back to the memory allocator and destroy a=
-ny
-> >   * mappings we have.
-> >   */
->
-> Sorry to nit pick but I think this whole doc has to be rewritten
-> completely. It does state the most important thing which is that
-> the caller must have just allocated the page.
->
-> How about:
->
-> /**
->  * page_pool_fragment_page() - split a fresh page into fragments
->  * @.. fill these in
->  *
->  * pp_ref_count represents the number of outstanding references
->  * to the page, which will be freed using page_pool APIs (rather
->  * than page allocator APIs like put_page()). Such references are
->  * usually held by page_pool-aware objects like skbs marked for
->  * page pool recycling.
->  *
->  * This helper allows the caller to take (set) multiple references
->  * to a freshly allocated page. The page must be freshly allocated
->  * (have a pp_ref_count of 1). This is commonly done by drivers
->  * and "fragment allocators" to save atomic operations - either
->  * when they know upfront how many references they will need; or
->  * to take MAX references and return the unused ones with a single
->  * atomic dec(), instead of performing multiple atomic inc()
->  * operations.
->  */
->
-> I think that's more informative at this stage of evolution of
-> the  page pool API, when most users aren't experts on internals.
-> But feel free to disagree..
->
+Add bindings, driver and devicetree node for networking sub system clock
+controller on IPQ5332. Some of the nssnoc clocks present in GCC driver is
+enabled by default and its RCG is configured by bootloaders, so enable
+those clocks in driver probe.
 
-Thanks for the help! This is certainly better.
+The NSS clock controller driver depends on the below patchset which adds
+support for multiple configurations for same frequency.
+https://lore.kernel.org/linux-arm-msm/20231124151847.1915-1-ansuelsmth@gmail.com/
 
-> >  static inline void page_pool_fragment_page(struct page *page, long nr)
-> >  {
-> > -     atomic_long_set(&page->pp_frag_count, nr);
-> > +     atomic_long_set(&page->pp_ref_count, nr);
-> >  }
->
-> The code itself and rest of the patches LGTM, although it would be
-> great to get ACKs from pp maintainers..
+Signed-off-by: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
+---
+Changes in v3:
+- Collected the tags
+- Dropped the dt-binding patch 3/9
+- Cleaned up the header file inclusion and updated the module
+  description in the driver
+- Used the decimal number instead of hex in the NSSCC node
+- Link to v2: https://lore.kernel.org/r/20231121-ipq5332-nsscc-v2-0-a7ff61beab72@quicinc.com
+
+Changes in v2:
+- Change logs are in respective patches
+- Link to v1: https://lore.kernel.org/r/20231030-ipq5332-nsscc-v1-0-6162a2c65f0a@quicinc.com
+
+---
+Kathiravan Thirumoorthy (8):
+      clk: qcom: ipq5332: add const qualifier to the clk_init_data structure
+      clk: qcom: ipq5332: enable few nssnoc clocks in driver probe
+      dt-bindings: clock: ipq5332: add definition for GPLL0_OUT_AUX clock
+      clk: qcom: ipq5332: add gpll0_out_aux clock
+      dt-bindings: clock: add Qualcomm IPQ5332 NSSCC clock and reset definitions
+      clk: qcom: add NSS clock Controller driver for Qualcomm IPQ5332
+      arm64: dts: qcom: ipq5332: add support for the NSSCC
+      arm64: defconfig: build NSS Clock Controller driver for Qualcomm IPQ5332
+
+ .../bindings/clock/qcom,ipq5332-nsscc.yaml         |   60 ++
+ arch/arm64/boot/dts/qcom/ipq5332.dtsi              |   28 +
+ arch/arm64/configs/defconfig                       |    1 +
+ drivers/clk/qcom/Kconfig                           |    7 +
+ drivers/clk/qcom/Makefile                          |    1 +
+ drivers/clk/qcom/gcc-ipq5332.c                     |  122 +--
+ drivers/clk/qcom/nsscc-ipq5332.c                   | 1031 ++++++++++++++++++++
+ include/dt-bindings/clock/qcom,ipq5332-gcc.h       |    1 +
+ include/dt-bindings/clock/qcom,ipq5332-nsscc.h     |   86 ++
+ 9 files changed, 1260 insertions(+), 77 deletions(-)
+---
+base-commit: bc63de6e6ba0b16652c5fb4b9c9916b9e7ca1f23
+change-id: 20231030-ipq5332-nsscc-aeac9e153045
+
+Best regards,
+-- 
+Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
+
 
