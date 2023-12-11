@@ -1,130 +1,165 @@
-Return-Path: <netdev+bounces-55956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE5F580CF59
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 16:21:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC4F680CF60
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 16:24:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6517F1F21672
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:21:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EC14B212BF
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:24:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C62FA4AF75;
-	Mon, 11 Dec 2023 15:21:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1gHoyuRt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B22B3B184;
+	Mon, 11 Dec 2023 15:24:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A437EB;
-	Mon, 11 Dec 2023 07:21:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=YcekLTjh5+mk+lg76W+7hew/vEd7NOWaaenP7iwljuk=; b=1gHoyuRtBp6OwbKss/KRVZRgTx
-	sitogZHN0shuA9eFrOI+8VEWHffM/iBomO4CuhwApypwyYqt/41wPkzxPuoP97UqdiylyQhzGN9X2
-	bOUbmeHrtcj2+cUQjbE8gzPxRetCjMcwU5kb1dIFwBM5ZxtbzatjKnHkMh4U3GGAMZS0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rCi6H-002dIn-QD; Mon, 11 Dec 2023 16:21:41 +0100
-Date: Mon, 11 Dec 2023 16:21:41 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v1 2/2] net: phy: Add support for the DP83TG720S
- Ethernet PHY
-Message-ID: <cfd4f8bd-a06a-4489-8304-e9576151dbce@lunn.ch>
-References: <20231208151159.2791794-1-o.rempel@pengutronix.de>
- <20231208151159.2791794-2-o.rempel@pengutronix.de>
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 009EEDC;
+	Mon, 11 Dec 2023 07:24:01 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R371e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0VyJONX._1702308238;
+Received: from 30.221.130.53(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VyJONX._1702308238)
+          by smtp.aliyun-inc.com;
+          Mon, 11 Dec 2023 23:23:59 +0800
+Message-ID: <7ff3001a-4254-0382-f8c8-6ebf2807346a@linux.alibaba.com>
+Date: Mon, 11 Dec 2023 23:23:57 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231208151159.2791794-2-o.rempel@pengutronix.de>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next v5 2/9] net/smc: introduce sub-functions for
+ smc_clc_send_confirm_accept()
+To: Alexandra Winter <wintera@linux.ibm.com>, wenjia@linux.ibm.com,
+ hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kgraul@linux.ibm.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, raspl@linux.ibm.com,
+ schnelle@linux.ibm.com, guangguan.wang@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <1702021259-41504-1-git-send-email-guwen@linux.alibaba.com>
+ <1702021259-41504-3-git-send-email-guwen@linux.alibaba.com>
+ <ac3c0823-8705-4225-96c8-ed7bc55d1bfc@linux.ibm.com>
+ <9a6d57c0-f5b4-9b2c-dc5f-dc47d0518141@linux.alibaba.com>
+ <fb2365f6-1237-4f22-9897-5676757e5157@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <fb2365f6-1237-4f22-9897-5676757e5157@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Dec 08, 2023 at 04:11:59PM +0100, Oleksij Rempel wrote:
-> The DP83TG720S-Q1 device is an IEEE 802.3bp and Open Alliance compliant
-> automotive Ethernet physical layer transceiver.
+
+
+On 2023/12/11 21:35, Alexandra Winter wrote:
 > 
-> This driver was tested with i.MX8MP EQOS (stmmac) on the MAC side and
-> TI same PHY on other side.
 > 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> ---
->  drivers/net/phy/Kconfig     |  13 +++
->  drivers/net/phy/Makefile    |   1 +
->  drivers/net/phy/dp83tg720.c | 190 ++++++++++++++++++++++++++++++++++++
->  3 files changed, 204 insertions(+)
->  create mode 100644 drivers/net/phy/dp83tg720.c
+> On 11.12.23 13:15, Wen Gu wrote:
+>>>> +    clc = (struct smc_clc_msg_accept_confirm *)clc_v2;
+>>>
+>>> Why is this cast neccessary? (Here as well as in smcr_clc_prep_confirm_accept
+>>> and in smc_clc_send_confirm_accept)
+>>> smc_clc_msg_accept_confirm_v2 has hdr and d0 as well.
+>>
+>> I think the cast is to imply that v2 is an expansion of v1, or v1 is the base of v2.
+>> So here using clc(v1) reperesents their common set.
+>>
+>> If we use smc_clc_msg_accept_confirm_v2 for all, I think readers may be tempted to
+>> check whether the hdr and d0 in 'smc_clc_msg_accept_confirm_v2' are also applicable to v1.
+>>
+>> And there are settings below that are specific for v1. It may be confusing if we
+>> change it like this:
+>>
+>> if (version == SMC_V1) {
+>>      clc_v2->hdr.length = htons(SMCD_CLC_ACCEPT_CONFIRM_LEN);
+>> } else {
+>>
+>>
+>>>
+>>> IMO, it would be a nice seperate patch to get rid of the 2 type defs for
+>>> smc_clc_msg_accept_confirm and smc_clc_msg_accept_confirm_v2
+>>> and all the related casting anyhow.
+>>>
+>>
+>> Do you mean to define only smc_clc_msg_accept_confirm_v2 or define with the name
+>> of smc_clc_msg_accept_confirm but the contents of smc_clc_msg_accept_confirm_v2?
+>>
+>> I have a different opinion on this, since I think the smc_clc_msg_accept_confirm
+>> and smc_clc_msg_accept_confirm_v2 clearly shows the difference between v1 and
+>> v2 messages and remind people what is currently working on. So I perfer to keep them.
+>> Am I missing something?
+>>
 > 
-> diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-> index 25cfc5ded1da..bab10c796f24 100644
-> --- a/drivers/net/phy/Kconfig
-> +++ b/drivers/net/phy/Kconfig
-> @@ -372,6 +372,19 @@ config DP83TC811_PHY
->  	help
->  	  Supports the DP83TC811 PHY.
->  
-> +config DP83TG720_PHY
-> +	tristate "Texas Instruments DP83TG720 Ethernet 1000Base-T1 PHY"
-> +	help
-> +	  The DP83TG720S-Q1 is an automotive Ethernet physical layer
-> +	  transceiver compliant with IEEE 802.3bp and Open Alliance
-> +	  standards. It supports key functions necessary for
-> +	  transmitting and receiving data over both unshielded and
-> +	  shielded single twisted-pair cables. This device offers
-> +	  flexible xMII interface options, including support for both
-> +	  RGMII and SGMII MAC interfaces. It's suitable for applications
-> +	  requiring high-speed data transmission in automotive
-> +	  networking environments.
-> +
->  config DP83848_PHY
->  	tristate "Texas Instruments DP83848 PHY"
->  	help
-> diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-> index f65e85c91fc1..defaef190962 100644
-> --- a/drivers/net/phy/Makefile
-> +++ b/drivers/net/phy/Makefile
-> @@ -56,6 +56,7 @@ obj-$(CONFIG_DP83848_PHY)	+= dp83848.o
->  obj-$(CONFIG_DP83867_PHY)	+= dp83867.o
->  obj-$(CONFIG_DP83869_PHY)	+= dp83869.o
->  obj-$(CONFIG_DP83TC811_PHY)	+= dp83tc811.o
-> +obj-$(CONFIG_DP83TG720_PHY)	+= dp83tg720.o
->  obj-$(CONFIG_DP83TD510_PHY)	+= dp83td510.o
+> 
+> This is a discussion about coding style, readability and maintainability (avoid future errors).
+> And the code works today and the rest is opinions. That said, let me list some arguments why
+> I don't like the casts.
+> 
+> Casts in general break the type checking of the compiler.
+> 
+> In some places e.g. clc.d0 points to struct smc_clc_msg_accept_confirm in other
+> places it points to struct smc_clc_msg_accept_confirm_v2.
+> This makes it hard to find all places where e.g. d0 is altered. (e.g. with an IDE).
+> 
+> You say: "smc_clc_msg_accept_confirm
+>> and smc_clc_msg_accept_confirm_v2 clearly shows the difference between v1 and
+>> v2 messages"
+> But that is not even the case in the code that this patch changes:
+> In smcd_clc_prep_confirm_accept() you pass a struct smc_clc_msg_accept_confirm_v2
+> cast it to v1 (even in the v2 case) and then use the v1 layout for the common fields and
+> the v1-only fields. So I don't think that helps very much.
+> 
+> The v2 messages were explicitely defined for compatibility. i.e.
+> all v1 fields are still available. It would be good to see that in the code as well.
+> With 2 differnet structs you don't emphasize that.
+> 
+> With future changes somebody could easily make a mistake that the 2 structures don't
+> have the same size anymore. And then the casting can lead to out-of-bound error that
+> are hard to find.
+> 
+> We want v2 to be the usual case and v1 to be the exception for backwards compatibility.
+> FOr historic reasons, the code looks as if v2 is the exception. I'd rather point out the
+> remaining v1 cases.
+> 
+> 
+> 
+> I could envision something like:
+> 
+> struct smc_clc_msg_accept_confirm {	/* clc accept / confirm message */
+> 	struct smc_clc_msg_hdr hdr;
+> 	union {
+> 		struct { /* SMC-R */
+> 			struct smcr_clc_msg_accept_confirm r0;
+> 			/* v2 only, reserved and ignored in v1: */
+> 			u8 eid[SMC_MAX_EID_LEN];
+> 			u8 reserved6[8];
+> 		} r1;
+> 		struct { /* SMC-D */
+> 			struct smcd_clc_msg_accept_confirm_common d0;
+> 			/* v2 only, reserved and ignored in v1: */
+> 			__be16 chid;
+> 			u8 eid[SMC_MAX_EID_LEN];
+> 			__be64 gid_ext;
+> 		} __packed d1;
+> 	};
+> };
+> 
+> And then only use this one structure.
+> 
 
-Maybe it should come after CONFIG_DP83TD510_PHY in a strict sort ? I
-also wounder about the Kconfig, which should be sorted on the tristate
-string.
+Thank you Sandy for the detailed explanation.
 
->  obj-$(CONFIG_FIXED_PHY)		+= fixed_phy.o
->  obj-$(CONFIG_ICPLUS_PHY)	+= icplus.o
-> +		/* After HW reset we need to restore master/slave configuration.
-> +		 */
-> +		if (phydev->drv->config_aneg) {
+What I considered, as mentioned above, is that if the two are combined,
+it may be difficult to distinguish according to the name what situation
+I am in, v1 or v2?
 
-This test is a bit strange. You know it exists, its this driver and
-the function is there. Why not call it directly?
+But I do agree with your concern about the potential errors that caused
+by future divergence of the two struct if they are defined separately.
 
-> +			ret = phydev->drv->config_aneg(phydev);
-> +			if (ret)
-> +				return ret;
-> +		}
+I will try to combine them into one struct in a seperate patch.
 
+Thank you.
 
-    Andrew
-
----
-pw-bot: cr
 
