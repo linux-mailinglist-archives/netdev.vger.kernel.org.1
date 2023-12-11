@@ -1,98 +1,156 @@
-Return-Path: <netdev+bounces-56067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D37C280DB57
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 21:14:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 970C480DB5A
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 21:17:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 876AC1F21A62
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 20:14:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE59A281FDF
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 20:17:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 245AE5380E;
-	Mon, 11 Dec 2023 20:14:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE8D53814;
+	Mon, 11 Dec 2023 20:17:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FL0fmRjE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NktsonRg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03DAB51036
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 20:14:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A780C433C8;
-	Mon, 11 Dec 2023 20:14:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702325650;
-	bh=1Xtip+7vpslDMt+EAlOYykStn1lMrjnsm0PG/aFT3lc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FL0fmRjEtdFc6xX6XIthj3lBq4lv0BgbGAUj8ztWy+gxPy4ndQUS7sAu1ADc1TN/O
-	 ME1ZTTSjRU980syPqJFHPi9bqDGcH8Xn3C00RvFfytaj8f0Q6MlX2S9CRB4eJsQBHv
-	 2GCAQRmRmspQQ1KJNQMq1zjkEksjWIgiTvBjWHu4mtPUaymmSWcjLMtV/IWNqtnghY
-	 mp7FCXXxukF9UCo88CRuGMjj7tVLIFSiqbi2U3ZzuZTQGafQiTRusVUhzIKeYVYlfj
-	 nuU85A/6OY6enMRJDty/w8eoMIrJuL5Xb7YQnDOW/fVOYLNMIe+KThLzWHAqqm4mNU
-	 ECjfuEu1UmyvQ==
-Date: Mon, 11 Dec 2023 12:14:09 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Cc: Liang Chen <liangchen.linux@gmail.com>, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, hawk@kernel.org,
- linyunsheng@huawei.com, netdev@vger.kernel.org, linux-mm@kvack.org,
- jasowang@redhat.com, almasrymina@google.com
-Subject: Re: [PATCH net-next v8 4/4] skbuff: Optimization of SKB coalescing
- for page pool
-Message-ID: <20231211121409.5cfaebd5@kernel.org>
-In-Reply-To: <CAC_iWjJX3ixPevJAVpszx7nVMb99EtmEeeQcoqxd0GWocK0zkw@mail.gmail.com>
-References: <20231211035243.15774-1-liangchen.linux@gmail.com>
-	<20231211035243.15774-5-liangchen.linux@gmail.com>
-	<CAC_iWjJX3ixPevJAVpszx7nVMb99EtmEeeQcoqxd0GWocK0zkw@mail.gmail.com>
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D94D8C4;
+	Mon, 11 Dec 2023 12:17:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702325870; x=1733861870;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=lifVkN0Anjy9swzdNdFNqAoI7xT5sDXmb3KqliJOUpI=;
+  b=NktsonRgev4YlluYKYJcq7I+OtRoigNdLxRqArfIHA3v/+VKU5aCU2uG
+   WybjdzmEplw+YifLZ0Msj0gz0NT2zayhR2ABR56hfyAXswXHeEnOhFexL
+   r3PgfmrBdyWB75346AYF/uyXTx5BBRT9LklM3eu5qoTqWRyxIGhK8afqw
+   q7WJXV9r5avOrs7al3HdEwx+vj83L5TAluUimrYrFCzbnzc7yoM4RJ9Dk
+   qMi6669fp3U/l0aMx/ELO/I0gEuAlIgSdFSKVcWOpXZOlB9aYmzA20Ae1
+   +TZyYSQsbEpNFyMpVw7QXQ6zGju0DRHqwwO6Rugr/IdOxVHnrzYA2ZUIs
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="391875063"
+X-IronPort-AV: E=Sophos;i="6.04,268,1695711600"; 
+   d="scan'208";a="391875063"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2023 12:17:31 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="863927876"
+X-IronPort-AV: E=Sophos;i="6.04,268,1695711600"; 
+   d="scan'208";a="863927876"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by FMSMGA003.fm.intel.com with ESMTP; 11 Dec 2023 12:17:26 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rCmiL-000IRy-1z;
+	Mon, 11 Dec 2023 20:17:23 +0000
+Date: Tue, 12 Dec 2023 04:16:42 +0800
+From: kernel test robot <lkp@intel.com>
+To: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Luka Perkov <luka.perkov@sartura.hr>,
+	Robert Marko <robert.marko@sartura.hr>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@somainline.org>
+Subject: Re: [PATCH net-next v3 5/8] net: qualcomm: ipqess: add bridge
+ offloading features to the IPQESS driver
+Message-ID: <202312120428.xmRLjyHQ-lkp@intel.com>
+References: <20231114105600.1012056-6-romain.gantois@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231114105600.1012056-6-romain.gantois@bootlin.com>
 
-On Mon, 11 Dec 2023 09:46:55 +0200 Ilias Apalodimas wrote:
-> As I said in the past the patch look correct. I don't like the fact
-> that more pp internals creep into the default network stack, but
-> perhaps this is fine with the bigger adoption?
-> Jakub any thoughts/objections?
+Hi Romain,
 
-Now that you asked... the helper does seem to be in sort of 
-a in-between state of being skb specific.
+kernel test robot noticed the following build warnings:
 
-What worries me is that this:
+[auto build test WARNING on net-next/main]
 
-+/**
-+ * skb_pp_frag_ref() - Increase fragment reference count of a page
-+ * @page:	page of the fragment on which to increase a reference
-+ *
-+ * Increase fragment reference count (pp_ref_count) on a page, but if it is
-+ * not a page pool page, fallback to increase a reference(_refcount) on a
-+ * normal page.
-+ */
-+static void skb_pp_frag_ref(struct page *page)
-+{
-+	struct page *head_page = compound_head(page);
-+
-+	if (likely(is_pp_page(head_page)))
-+		page_pool_ref_page(head_page);
-+	else
-+		page_ref_inc(head_page);
-+}
+url:    https://github.com/intel-lab-lkp/linux/commits/Romain-Gantois/dt-bindings-net-Introduce-the-Qualcomm-IPQESS-Ethernet-switch/20231114-185953
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231114105600.1012056-6-romain.gantois%40bootlin.com
+patch subject: [PATCH net-next v3 5/8] net: qualcomm: ipqess: add bridge offloading features to the IPQESS driver
+config: arc-randconfig-r112-20231116 (https://download.01.org/0day-ci/archive/20231212/202312120428.xmRLjyHQ-lkp@intel.com/config)
+compiler: arc-elf-gcc (GCC) 13.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20231212/202312120428.xmRLjyHQ-lkp@intel.com/reproduce)
 
-doesn't even document that the caller must make sure that the skb
-which owns this page is marked for pp recycling. The caller added
-by this patch does that, but we should indicate somewhere that doing
-skb_pp_frag_ref() for frag in a non-pp-recycling skb is not correct.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312120428.xmRLjyHQ-lkp@intel.com/
 
-We can either lean in the direction of making it less skb specific,
-put the code in page_pool.c / helpers.h and make it clear that the
-caller has to be careful.
-Or we make it more skb specific, take a skb pointer as arg, and also
-look at its recycling marking..
-or just improve the kdoc.
+sparse warnings: (new ones prefixed by >>)
+>> drivers/net/dsa/qca/qca8k-8xxx.c:1982:5: sparse: sparse: symbol 'qca8k_dsa_port_fdb_dump' was not declared. Should it be static?
+>> drivers/net/dsa/qca/qca8k-8xxx.c:1988:6: sparse: sparse: symbol 'qca8k_dsa_port_stp_state_set' was not declared. Should it be static?
+>> drivers/net/dsa/qca/qca8k-8xxx.c:1995:6: sparse: sparse: symbol 'qca8k_dsa_port_fast_age' was not declared. Should it be static?
+>> drivers/net/dsa/qca/qca8k-8xxx.c:2000:5: sparse: sparse: symbol 'qca8k_dsa_set_ageing_time' was not declared. Should it be static?
+>> drivers/net/dsa/qca/qca8k-8xxx.c:2005:5: sparse: sparse: symbol 'qca8k_dsa_port_vlan_filtering' was not declared. Should it be static?
+>> drivers/net/dsa/qca/qca8k-8xxx.c:2012:5: sparse: sparse: symbol 'qca8k_dsa_vlan_add' was not declared. Should it be static?
+
+vim +/qca8k_dsa_port_fdb_dump +1982 drivers/net/dsa/qca/qca8k-8xxx.c
+
+  1981	
+> 1982	int qca8k_dsa_port_fdb_dump(struct dsa_switch *ds, int port,
+  1983				    dsa_fdb_dump_cb_t *cb, void *data)
+  1984	{
+  1985		return qca8k_port_fdb_dump(ds->priv, port, cb, data);
+  1986	}
+  1987	
+> 1988	void qca8k_dsa_port_stp_state_set(struct dsa_switch *ds, int port,
+  1989					  u8 state)
+  1990	{
+  1991		qca8k_port_stp_state_set(ds->priv, port, state,
+  1992					 dsa_to_port(ds, port)->learning, true);
+  1993	}
+  1994	
+> 1995	void qca8k_dsa_port_fast_age(struct dsa_switch *ds, int port)
+  1996	{
+  1997		qca8k_port_fast_age(ds->priv, port);
+  1998	}
+  1999	
+> 2000	int qca8k_dsa_set_ageing_time(struct dsa_switch *ds, unsigned int msecs)
+  2001	{
+  2002		return qca8k_set_ageing_time(ds->priv, msecs);
+  2003	}
+  2004	
+> 2005	int qca8k_dsa_port_vlan_filtering(struct dsa_switch *ds, int port,
+  2006					  bool vlan_filtering,
+  2007					  struct netlink_ext_ack *extack)
+  2008	{
+  2009		return qca8k_port_vlan_filtering(ds->priv, port, vlan_filtering);
+  2010	}
+  2011	
+> 2012	int qca8k_dsa_vlan_add(struct dsa_switch *ds, int port,
+  2013			       const struct switchdev_obj_port_vlan *vlan,
+  2014			       struct netlink_ext_ack *extack)
+  2015	{
+  2016		return qca8k_port_vlan_add(ds->priv, port, vlan, extack);
+  2017	}
+  2018	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
