@@ -1,266 +1,156 @@
-Return-Path: <netdev+bounces-56078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 799E180DB83
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 21:21:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50C1880DB8B
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 21:23:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B5981C215EA
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 20:21:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 021DF280C9F
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 20:23:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 767C054FA6;
-	Mon, 11 Dec 2023 20:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1E9753E0E;
+	Mon, 11 Dec 2023 20:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="aeW1ti57";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="088O33oF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rk1spu1J"
 X-Original-To: netdev@vger.kernel.org
-Received: from new1-smtp.messagingengine.com (new1-smtp.messagingengine.com [66.111.4.221])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63AD4EA;
-	Mon, 11 Dec 2023 12:20:50 -0800 (PST)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-	by mailnew.nyi.internal (Postfix) with ESMTP id 32F8A580969;
-	Mon, 11 Dec 2023 15:20:49 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute3.internal (MEProxy); Mon, 11 Dec 2023 15:20:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to; s=fm3; t=1702326049; x=
-	1702333249; bh=Xy5DWhMcuaQWz9hFzj8IU9Hd0UISUG5+/EyW9nquCao=; b=a
-	eW1ti57qzoaxP6yiQ6R8Uzqrl/PgidoKozz4Oi4F0HhFC6v/EYY8CEv6EnN+19tt
-	WMDFRVTyeSRIFMTUiDOeDiNKa5bVQ4xMdGqANf35W6qPGQWo1dNtTMpBaG+oR1Mg
-	uz+xCU5+YccjVRyzqf9KAZo3C3cZmmx5GZpoDpwzJ+X1CDt+SAPbFyeYuu1Ohbqd
-	6U9L5ECSjewM1QqaOLS9J8Ns85jcDi8btJAhwaPLTXXIK2Hm7wsEp+pbVrifkAk3
-	A9FBJln3a9zOzgytPqA2C9aa+EyE7lRF99TzFVGkx+fcX8qxH+4E/dmeIrdW6k+c
-	r6deCuRVQTwQ743QpxRUA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1702326049; x=
-	1702333249; bh=Xy5DWhMcuaQWz9hFzj8IU9Hd0UISUG5+/EyW9nquCao=; b=0
-	88O33oFs9OE2kSeXuCcfbIPuXTF08SvbIK63kJo7adenS35G5cIJ1X8sIgt5ENGs
-	RDi5fyMwE5T4IZmUUCiEHSJ1iNRytRRA3/llORpNphsG1AxpLsvyilZb1wbWLzgb
-	4vZcFZqo0B8IUT7j2oEXvlI9w5Jy7bdiCxmBdUkHz2ijSVLgrbpfPjSMi+90DC/s
-	2U4B61+4CqxluOoHWBIFiRtCxQsF/0QXVF1Bs02xBf8ymzDAnHcdBQiaZFd9GGzs
-	rynoEhHPfuLFjv6LrQ6XVRTvOY+wGSh7ngrYn250BAZuOSRc1DJGWSyQBugvkluX
-	Vi0SBk94P5EykoLKvlI4Q==
-X-ME-Sender: <xms:IG93ZflDiZHZu17F1siOQ3VKnF7SzkZgZn6pYC0TJ-zNI7SjBlGSXA>
-    <xme:IG93ZS3DBSofpNMRclotQiNLlfNvnNIkDRz5ibPawVVVuAnXvU99OQalhTxeociOG
-    kdSqY7WX06ZYrV2oQ>
-X-ME-Received: <xmr:IG93ZVrgqvwHp_WPvd_RsUPkKQP57JPzijk06MAHqHKeAgAbtUrZuH6IZJgCC2bV8hiyeSUcV3qYKAHs94qbuF6EBHRem0HHtYEx_l1xcCE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudelvddgudefkecutefuodetggdotefrod
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5504DC4;
+	Mon, 11 Dec 2023 12:23:44 -0800 (PST)
+Received: by mail-qt1-x82c.google.com with SMTP id d75a77b69052e-42589694492so38594371cf.1;
+        Mon, 11 Dec 2023 12:23:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702326223; x=1702931023; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NPO8q1BoUD7beNI5e00JNk8Wd2TUaPKn/aNL8u/igNE=;
+        b=Rk1spu1Jt0CKu95ie2XkWaXHgXYH3N7BE+6fiyjsoa/B2zA8W+nnaew4J17nIVgoMo
+         xFAt9YRFLbOj0yWV07CUJo7/YHaDptXegP8r7n9fqpqiOuOyxp8wHrWI+I+fKuXV745R
+         AuGNNyOXxUKbHED5pUhMJnGMYFTg0zegkeXZXwqkwSk8s5ZT3j8FGIGjhbQSNTTEKjRp
+         GWuD2NPDEYid56LroXsCdywIU21aTAq/lb7x6uvCE4P0Ps97l1Bv/ua/SqAy7NO8yXuH
+         19nf6CPTZz1yfPyuuqGqLR0aoROk//bSAQBrWKwvgavAqHNd166SCStHkkAJNYjDe3tP
+         scjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702326223; x=1702931023;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NPO8q1BoUD7beNI5e00JNk8Wd2TUaPKn/aNL8u/igNE=;
+        b=irIGMXFSS4tXMIc8dQeKgH5LVKIP0iZOh26C3vjZnM2bMi/OnL0G8WxcWWMuuDJEnP
+         BnohhFnaOqmU/mjTFwdnHzna7SlkY4hce20+UTUgRVIEHWrZMXxPmMw6N9HFgetpk4P/
+         /AxmlSZlUDH20xnA7i3ssqFK13CsVpbvIxMI/4wKqd1a0coWSXCDMeGyUyXBMGubQmLI
+         Ey7Qp3ws3j+HA7CPmXTIZ9GFyWdwACvh7RIrb9kj2mRFWoVGG1JVXHO7ts4LsMdPRPhH
+         rtQ57nLlsnPTN7DkRkqgmEW/jT+4/ev/NlfITySFJmlZMyWgPEZheY9pnelgsH70TWiT
+         9Gqg==
+X-Gm-Message-State: AOJu0YxRljdPvSaxNTPUdhMxWp3QGJbZuaQqjBILv5T2ykvUy441JTsp
+	kIdFOd26Z6caCzWvMX85HWY=
+X-Google-Smtp-Source: AGHT+IEWAr+T2+PRfHNiBcNfvqg7qbWqm9B20iNs/KYvXoR0He+IWr3yNx4yQ7zFsEWWzl+FQZAThA==
+X-Received: by 2002:ac8:5aca:0:b0:425:4043:5f2f with SMTP id d10-20020ac85aca000000b0042540435f2fmr7817094qtd.109.1702326223439;
+        Mon, 11 Dec 2023 12:23:43 -0800 (PST)
+Received: from auth2-smtp.messagingengine.com (auth2-smtp.messagingengine.com. [66.111.4.228])
+        by smtp.gmail.com with ESMTPSA id x8-20020ac85388000000b00423e5a44857sm3464194qtp.23.2023.12.11.12.23.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Dec 2023 12:23:42 -0800 (PST)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+	by mailauth.nyi.internal (Postfix) with ESMTP id 7E4E627C005B;
+	Mon, 11 Dec 2023 15:23:42 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Mon, 11 Dec 2023 15:23:42 -0500
+X-ME-Sender: <xms:zm93ZWtRBOWd3s8yY_ffUQ9Il8hCUkXBv20tWHhDx3NxIm6agqH5ig>
+    <xme:zm93ZbfoloTIvFx8SmsCFOzW1HfuzYW_AMqNOi2Bwt3mZDXCSCIuNLti7xRkv03Yf
+    WXGW4Z04NpqFAc5vQ>
+X-ME-Received: <xmr:zm93ZRzYaTt_YWpwvlNZCAtIhwqvjBDT0mgQyKbrl_0PBKz5sGCWaV4quICF_g>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudelvddgudeflecutefuodetggdotefrod
     ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecufghrlhcuvffnffculdefhedmnecujfgurhephf
-    fvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepffgrnhhivghlucgiuhcu
-    oegugihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpefgfefggeejhfduie
-    ekvdeuteffleeifeeuvdfhheejleejjeekgfffgefhtddtteenucevlhhushhtvghrufhi
-    iigvpedvnecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdighiii
-X-ME-Proxy: <xmx:IW93ZXnOLT6Vwk8S9VkBL1Aufd1VnURaJLkiUqt0XNxEkOlCUU_y_Q>
-    <xmx:IW93Zd1j0SJNITU2HkKjR5bQb83dGRcEmmzKB5RfY8fMWPH9KVAcdg>
-    <xmx:IW93ZWuvgimhpgg7RijojC_Tfcjuo8WKSxid7fE-Nt5dtDM9joje5A>
-    <xmx:IW93ZYH32qoE11hM9hbqa8-cMM6TJzfV5Vz70FHhPfqafmYVjkWR7w>
-Feedback-ID: i6a694271:Fastmail
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpeffhffvvefukfhfgggtuggjsehttdortddttddvnecuhfhrohhmpeeuohhq
+    uhhnucfhvghnghcuoegsohhquhhnrdhfvghnghesghhmrghilhdrtghomheqnecuggftrf
+    grthhtvghrnhepvdejleeukeekudfhieegjeduteffkeevleeuieevffefieduuddtveet
+    tdeugfdvnecuffhomhgrihhnpehruhhsthdqlhgrnhhgrdhorhhgpdhkvghrnhgvlhdroh
+    hrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegs
+    ohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdeiledvgeehtdeige
+    dqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppehgmhgrihhlrdgtohhmsehfihig
+    mhgvrdhnrghmvg
+X-ME-Proxy: <xmx:zm93ZROY7SoqjQYjlqiAt4kbIXUnHqGyIlya1iwjPNmdSTvVacXeZg>
+    <xmx:zm93ZW-WkqWuOjTEdq8TAI2Vy_eQfvp7ct7CP1DM39zSQstuYtOFxQ>
+    <xmx:zm93ZZVjzKO1_oRKQi5dpUR9rMAAWaMwJ5OchFysXRhqwQBTIOcKDg>
+    <xmx:zm93ZaT_7o3IdxNaCnmfwgg1o6lXInzKv9Am97Mp7TMcxZxHcqYDow>
+Feedback-ID: iad51458e:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 11 Dec 2023 15:20:47 -0500 (EST)
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: daniel@iogearbox.net,
-	davem@davemloft.net,
-	shuah@kernel.org,
-	ast@kernel.org,
-	john.fastabend@gmail.com,
-	kuba@kernel.org,
-	andrii@kernel.org,
-	hawk@kernel.org,
-	steffen.klassert@secunet.com,
-	antony.antony@secunet.com,
-	alexei.starovoitov@gmail.com,
-	yonghong.song@linux.dev,
-	eddyz87@gmail.com,
-	eyal.birger@gmail.com
-Cc: mykolal@fb.com,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devel@linux-ipsec.org
-Subject: [PATCH bpf-next v5 9/9] bpf: xfrm: Add selftest for bpf_xdp_get_xfrm_state()
-Date: Mon, 11 Dec 2023 13:20:13 -0700
-Message-ID: <8ec1b885d2e13fcd20944cce9edc0340d993d044.1702325874.git.dxu@dxuuu.xyz>
-X-Mailer: git-send-email 2.42.1
-In-Reply-To: <cover.1702325874.git.dxu@dxuuu.xyz>
-References: <cover.1702325874.git.dxu@dxuuu.xyz>
+ 11 Dec 2023 15:23:41 -0500 (EST)
+Date: Mon, 11 Dec 2023 12:23:38 -0800
+From: Boqun Feng <boqun.feng@gmail.com>
+To: netdev@vger.kernel.org
+Cc: rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu,
+	miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me,
+	wedsonaf@gmail.com, aliceryhl@google.com,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>
+Subject: Re: [net-next PATCH] rust: net: phy: Correct the safety comment for
+ impl Sync
+Message-ID: <ZXdvytghVcqgwzxa@boqun-archlinux>
+References: <20231210234924.1453917-2-fujita.tomonori@gmail.com>
+ <20231211194909.588574-1-boqun.feng@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231211194909.588574-1-boqun.feng@gmail.com>
 
-This commit extends test_tunnel selftest to test the new XDP xfrm state
-lookup kfunc.
++ Tomo
 
-Co-developed-by: Antony Antony <antony.antony@secunet.com>
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
-Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
----
- .../selftests/bpf/prog_tests/test_tunnel.c    | 20 ++++++--
- .../selftests/bpf/progs/test_tunnel_kern.c    | 51 +++++++++++++++++++
- 2 files changed, 67 insertions(+), 4 deletions(-)
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_tunnel.c b/tools/testing/selftests/bpf/prog_tests/test_tunnel.c
-index 2d7f8fa82ebd..fc804095d578 100644
---- a/tools/testing/selftests/bpf/prog_tests/test_tunnel.c
-+++ b/tools/testing/selftests/bpf/prog_tests/test_tunnel.c
-@@ -278,7 +278,7 @@ static int add_xfrm_tunnel(void)
- 	SYS(fail,
- 	    "ip netns exec at_ns0 "
- 		"ip xfrm state add src %s dst %s proto esp "
--			"spi %d reqid 1 mode tunnel "
-+			"spi %d reqid 1 mode tunnel replay-window 42 "
- 			"auth-trunc 'hmac(sha1)' %s 96 enc 'cbc(aes)' %s",
- 	    IP4_ADDR_VETH0, IP4_ADDR1_VETH1, XFRM_SPI_IN_TO_OUT, XFRM_AUTH, XFRM_ENC);
- 	SYS(fail,
-@@ -292,7 +292,7 @@ static int add_xfrm_tunnel(void)
- 	SYS(fail,
- 	    "ip netns exec at_ns0 "
- 		"ip xfrm state add src %s dst %s proto esp "
--			"spi %d reqid 2 mode tunnel "
-+			"spi %d reqid 2 mode tunnel replay-window 42 "
- 			"auth-trunc 'hmac(sha1)' %s 96 enc 'cbc(aes)' %s",
- 	    IP4_ADDR1_VETH1, IP4_ADDR_VETH0, XFRM_SPI_OUT_TO_IN, XFRM_AUTH, XFRM_ENC);
- 	SYS(fail,
-@@ -313,7 +313,7 @@ static int add_xfrm_tunnel(void)
- 	 */
- 	SYS(fail,
- 	    "ip xfrm state add src %s dst %s proto esp "
--		    "spi %d reqid 1 mode tunnel "
-+		    "spi %d reqid 1 mode tunnel replay-window 42 "
- 		    "auth-trunc 'hmac(sha1)' %s 96  enc 'cbc(aes)' %s",
- 	    IP4_ADDR_VETH0, IP4_ADDR1_VETH1, XFRM_SPI_IN_TO_OUT, XFRM_AUTH, XFRM_ENC);
- 	SYS(fail,
-@@ -325,7 +325,7 @@ static int add_xfrm_tunnel(void)
- 	/* root -> at_ns0 */
- 	SYS(fail,
- 	    "ip xfrm state add src %s dst %s proto esp "
--		    "spi %d reqid 2 mode tunnel "
-+		    "spi %d reqid 2 mode tunnel replay-window 42 "
- 		    "auth-trunc 'hmac(sha1)' %s 96  enc 'cbc(aes)' %s",
- 	    IP4_ADDR1_VETH1, IP4_ADDR_VETH0, XFRM_SPI_OUT_TO_IN, XFRM_AUTH, XFRM_ENC);
- 	SYS(fail,
-@@ -628,8 +628,10 @@ static void test_xfrm_tunnel(void)
- {
- 	DECLARE_LIBBPF_OPTS(bpf_tc_hook, tc_hook,
- 			    .attach_point = BPF_TC_INGRESS);
-+	LIBBPF_OPTS(bpf_xdp_attach_opts, opts);
- 	struct test_tunnel_kern *skel = NULL;
- 	struct nstoken *nstoken;
-+	int xdp_prog_fd;
- 	int tc_prog_fd;
- 	int ifindex;
- 	int err;
-@@ -654,6 +656,14 @@ static void test_xfrm_tunnel(void)
- 	if (attach_tc_prog(&tc_hook, tc_prog_fd, -1))
- 		goto done;
- 
-+	/* attach xdp prog to tunnel dev */
-+	xdp_prog_fd = bpf_program__fd(skel->progs.xfrm_get_state_xdp);
-+	if (!ASSERT_GE(xdp_prog_fd, 0, "bpf_program__fd"))
-+		goto done;
-+	err = bpf_xdp_attach(ifindex, xdp_prog_fd, XDP_FLAGS_REPLACE, &opts);
-+	if (!ASSERT_OK(err, "bpf_xdp_attach"))
-+		goto done;
-+
- 	/* ping from at_ns0 namespace test */
- 	nstoken = open_netns("at_ns0");
- 	err = test_ping(AF_INET, IP4_ADDR_TUNL_DEV1);
-@@ -667,6 +677,8 @@ static void test_xfrm_tunnel(void)
- 		goto done;
- 	if (!ASSERT_EQ(skel->bss->xfrm_remote_ip, 0xac100164, "remote_ip"))
- 		goto done;
-+	if (!ASSERT_EQ(skel->bss->xfrm_replay_window, 42, "replay_window"))
-+		goto done;
- 
- done:
- 	delete_xfrm_tunnel();
-diff --git a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-index 3a59eb9c34de..c0dd38616562 100644
---- a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-+++ b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-@@ -30,6 +30,10 @@ int bpf_skb_set_fou_encap(struct __sk_buff *skb_ctx,
- 			  struct bpf_fou_encap *encap, int type) __ksym;
- int bpf_skb_get_fou_encap(struct __sk_buff *skb_ctx,
- 			  struct bpf_fou_encap *encap) __ksym;
-+struct xfrm_state *
-+bpf_xdp_get_xfrm_state(struct xdp_md *ctx, struct bpf_xfrm_state_opts *opts,
-+		       u32 opts__sz) __ksym;
-+void bpf_xdp_xfrm_state_release(struct xfrm_state *x) __ksym;
- 
- struct {
- 	__uint(type, BPF_MAP_TYPE_ARRAY);
-@@ -950,4 +954,51 @@ int xfrm_get_state(struct __sk_buff *skb)
- 	return TC_ACT_OK;
- }
- 
-+volatile int xfrm_replay_window = 0;
-+
-+SEC("xdp")
-+int xfrm_get_state_xdp(struct xdp_md *xdp)
-+{
-+	struct bpf_xfrm_state_opts opts = {};
-+	struct xfrm_state *x = NULL;
-+	struct ip_esp_hdr *esph;
-+	struct bpf_dynptr ptr;
-+	u8 esph_buf[8] = {};
-+	u8 iph_buf[20] = {};
-+	struct iphdr *iph;
-+	u32 off;
-+
-+	if (bpf_dynptr_from_xdp(xdp, 0, &ptr))
-+		goto out;
-+
-+	off = sizeof(struct ethhdr);
-+	iph = bpf_dynptr_slice(&ptr, off, iph_buf, sizeof(iph_buf));
-+	if (!iph || iph->protocol != IPPROTO_ESP)
-+		goto out;
-+
-+	off += sizeof(struct iphdr);
-+	esph = bpf_dynptr_slice(&ptr, off, esph_buf, sizeof(esph_buf));
-+	if (!esph)
-+		goto out;
-+
-+	opts.netns_id = BPF_F_CURRENT_NETNS;
-+	opts.daddr.a4 = iph->daddr;
-+	opts.spi = esph->spi;
-+	opts.proto = IPPROTO_ESP;
-+	opts.family = AF_INET;
-+
-+	x = bpf_xdp_get_xfrm_state(xdp, &opts, sizeof(opts));
-+	if (!x || opts.error)
-+		goto out;
-+
-+	if (!x->replay_esn)
-+		goto out;
-+
-+	xfrm_replay_window = x->replay_esn->replay_window;
-+out:
-+	if (x)
-+		bpf_xdp_xfrm_state_release(x);
-+	return XDP_PASS;
-+}
-+
- char _license[] SEC("license") = "GPL";
--- 
-2.42.1
-
+On Mon, Dec 11, 2023 at 11:49:09AM -0800, Boqun Feng wrote:
+> The current safety comment for impl Sync for DriverVTable has two
+> problem:
+> 
+> * the correctness is unclear, since all types impl Any[1], therefore all
+>   types have a `&self` method (Any::type_id).
+> 
+> * it doesn't explain why useless of immutable references can ensure the
+>   safety.
+> 
+> Fix this by rewritting the comment.
+> 
+> [1]: https://doc.rust-lang.org/std/any/trait.Any.html
+> 
+> Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
+> ---
+> This is a follow-up for my ignored feedback:
+> 
+> 	https://lore.kernel.org/rust-for-linux/ZV5FjEM1EWm6iTAm@boqun-archlinux/	
+> 
+> Honestly, I believe that people who are active in the review process all
+> get it right, but I want to make sure who read the code later can also
+> understand it and reuse the reasoning in their code. Hence this
+> improvement.
+> 
+> Tomo, feel free to fold it in your patch if you and others think the
+> wording is fine.
+> 
+>  rust/kernel/net/phy.rs | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
+> index d9cec139324a..e3377f8f36b7 100644
+> --- a/rust/kernel/net/phy.rs
+> +++ b/rust/kernel/net/phy.rs
+> @@ -489,8 +489,8 @@ impl<T: Driver> Adapter<T> {
+>  #[repr(transparent)]
+>  pub struct DriverVTable(Opaque<bindings::phy_driver>);
+>  
+> -// SAFETY: `DriverVTable` has no &self methods, so immutable references to it
+> -// are useless.
+> +// SAFETY: `DriverVTable` doesn't expose any &self method to access internal data, so it's safe to
+> +// share `&DriverVTable` across execution context boundries.
+>  unsafe impl Sync for DriverVTable {}
+>  
+>  /// Creates a [`DriverVTable`] instance from [`Driver`].
+> -- 
+> 2.43.0
+> 
 
