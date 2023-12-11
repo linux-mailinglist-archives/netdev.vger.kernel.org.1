@@ -1,62 +1,51 @@
-Return-Path: <netdev+bounces-55794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A53180C580
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 11:03:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7826C80C582
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 11:04:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA7DB1F2102D
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:03:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34BA92816E8
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:04:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 298472208C;
-	Mon, 11 Dec 2023 10:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14D981DFCD;
+	Mon, 11 Dec 2023 10:04:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WuCSBzfs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MXHIOlGf"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D439DBD
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 02:03:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702289014;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FBY56C7pG8mBzo3mVC/Zv2Peov9lg+Ssv7EHttFe0bM=;
-	b=WuCSBzfsUUjBPzHFdZTA8XRoDqKECtqr8FXS1OOkATWWEbinxwzylu3mStaksFa7m9ubcW
-	sEixOVMOqjWbzcNz3DDdgzQC9sb5Fu1Xm02H95TaaHWweO8741pPM3fdTPhidK3DjSIySm
-	KsE8oGoc08+RpMmzA6tm8TlL0WVlVBg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-516-gq8mYUtHNoy7-u7M7fqzfA-1; Mon, 11 Dec 2023 05:03:31 -0500
-X-MC-Unique: gq8mYUtHNoy7-u7M7fqzfA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3190A88FA25;
-	Mon, 11 Dec 2023 10:03:31 +0000 (UTC)
-Received: from calimero.vinschen.de (unknown [10.39.192.55])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0EEE3492BE6;
-	Mon, 11 Dec 2023 10:03:30 +0000 (UTC)
-Received: by calimero.vinschen.de (Postfix, from userid 500)
-	id 276BBA807CF; Mon, 11 Dec 2023 11:03:29 +0100 (CET)
-Date: Mon, 11 Dec 2023 11:03:29 +0100
-From: Corinna Vinschen <vinschen@redhat.com>
-To: Richard Tresidder <rtresidd@electromag.com.au>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-Subject: Re: STMMAC Ethernet Driver support
-Message-ID: <ZXbecbaUnTwiX3l1@calimero.vinschen.de>
-Mail-Followup-To: Richard Tresidder <rtresidd@electromag.com.au>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-References: <e5c6c75f-2dfa-4e50-a1fb-6bf4cdb617c2@electromag.com.au>
- <20231208101216.3fca85b1@kernel.org>
- <8a0850d8-a2e4-4eb0-81e1-d067f18c2263@electromag.com.au>
- <41903b8b-d145-4fdf-a942-79d7f88f9068@electromag.com.au>
- <f47b0230-1513-4a81-9d78-3f092b979c48@electromag.com.au>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE96A1D6AE;
+	Mon, 11 Dec 2023 10:04:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A977DC433CA;
+	Mon, 11 Dec 2023 10:03:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702289041;
+	bh=r68d1duxP7xVgr46w0Z1vpdCRfKjkuAvt5GXFsR/z7g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MXHIOlGf4lSZ5mNEGbLKruvFEoWXfev6kp70IJ8A50CBg2/uFwlVM54P2u24CC/4t
+	 zsS1WNETrapEIZi6N9I+3eFv9yMl7QJxo5YH0l09GHpIfYRyrTVnhgZh8WvJPcMj7u
+	 f8Mfw5jYavhVKx3zCf6gRr60WQvRXH3eEWQV8UeFbelkKP/GMfc04atjd7uSdQ1j/Y
+	 r69o1IHF82uCwzNY7qV2FrFWov1LYnQPLX5HpJTJlDNELxBxv8+Ei8QGGa5eMyrbGF
+	 RzgoNJAfoX2FAhlbINZ2BVDYwuUhE456a7wSH0FUpwB/3ZQ2wW6d3chMn3ycfnCrzq
+	 5RY7x/2a89xpw==
+Date: Mon, 11 Dec 2023 11:03:55 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, paul@paul-moore.com,
+	linux-fsdevel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, keescook@chromium.org,
+	kernel-team@meta.com, sargun@sargun.me
+Subject: Re: [PATCH v12 bpf-next 03/17] bpf: introduce BPF token object
+Message-ID: <20231211-wahnwitzig-entzogen-2b720296349c@brauner>
+References: <20231130185229.2688956-1-andrii@kernel.org>
+ <20231130185229.2688956-4-andrii@kernel.org>
+ <20231208-besessen-vibrieren-4e963e3ca3ba@brauner>
+ <CAEf4BzbRKxBCzKbOWg0sWMzWurF5RvF5OwizXi7tSC2vM4Zi_w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,88 +55,65 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <f47b0230-1513-4a81-9d78-3f092b979c48@electromag.com.au>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+In-Reply-To: <CAEf4BzbRKxBCzKbOWg0sWMzWurF5RvF5OwizXi7tSC2vM4Zi_w@mail.gmail.com>
 
-On Dec 11 17:23, Richard Tresidder wrote:
+On Fri, Dec 08, 2023 at 02:39:56PM -0800, Andrii Nakryiko wrote:
+> On Fri, Dec 8, 2023 at 5:41 AM Christian Brauner <brauner@kernel.org> wrote:
+> >
+> > On Thu, Nov 30, 2023 at 10:52:15AM -0800, Andrii Nakryiko wrote:
+> > > Add new kind of BPF kernel object, BPF token. BPF token is meant to
+> > > allow delegating privileged BPF functionality, like loading a BPF
+> > > program or creating a BPF map, from privileged process to a *trusted*
+> > > unprivileged process, all while having a good amount of control over which
+> > > privileged operations could be performed using provided BPF token.
+> > >
+> > > This is achieved through mounting BPF FS instance with extra delegation
+> > > mount options, which determine what operations are delegatable, and also
+> > > constraining it to the owning user namespace (as mentioned in the
+> > > previous patch).
+> > >
+> > > BPF token itself is just a derivative from BPF FS and can be created
+> > > through a new bpf() syscall command, BPF_TOKEN_CREATE, which accepts BPF
+> > > FS FD, which can be attained through open() API by opening BPF FS mount
+> > > point. Currently, BPF token "inherits" delegated command, map types,
+> > > prog type, and attach type bit sets from BPF FS as is. In the future,
+> > > having an BPF token as a separate object with its own FD, we can allow
+> > > to further restrict BPF token's allowable set of things either at the
+> > > creation time or after the fact, allowing the process to guard itself
+> > > further from unintentionally trying to load undesired kind of BPF
+> > > programs. But for now we keep things simple and just copy bit sets as is.
+> > >
+> > > When BPF token is created from BPF FS mount, we take reference to the
+> > > BPF super block's owning user namespace, and then use that namespace for
+> > > checking all the {CAP_BPF, CAP_PERFMON, CAP_NET_ADMIN, CAP_SYS_ADMIN}
+> > > capabilities that are normally only checked against init userns (using
+> > > capable()), but now we check them using ns_capable() instead (if BPF
+> > > token is provided). See bpf_token_capable() for details.
+> > >
+> > > Such setup means that BPF token in itself is not sufficient to grant BPF
+> > > functionality. User namespaced process has to *also* have necessary
+> > > combination of capabilities inside that user namespace. So while
+> > > previously CAP_BPF was useless when granted within user namespace, now
+> > > it gains a meaning and allows container managers and sys admins to have
+> > > a flexible control over which processes can and need to use BPF
+> > > functionality within the user namespace (i.e., container in practice).
+> > > And BPF FS delegation mount options and derived BPF tokens serve as
+> > > a per-container "flag" to grant overall ability to use bpf() (plus further
+> > > restrict on which parts of bpf() syscalls are treated as namespaced).
+> > >
+> > > Note also, BPF_TOKEN_CREATE command itself requires ns_capable(CAP_BPF)
+> > > within the BPF FS owning user namespace, rounding up the ns_capable()
+> > > story of BPF token.
+> > >
+> > > Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> > > ---
+> >
+> > Same concerns as in the other mail. For the bpf_token_create() code,
+> > Acked-by: Christian Brauner <brauner@kernel.org>
 > 
-> > Richard Tresidder
-> > 
-> > 
-> > On 9/12/2023 3:06 pm, Richard Tresidder wrote:
-> > > On 9/12/2023 2:12 am, Jakub Kicinski wrote:
-> > > > On Fri, 8 Dec 2023 14:03:25 +0800 Richard Tresidder wrote:
-> > > > > I've looked through the diffset 6.3.3 >>> 6.6.3 on the driver
-> > > > > drivers\net\ethernet\stmicro\stmmac
-> > > > > But nothing is jumping out at me.
-> > > > > 
-> > > > > I could use a pointer as to where to look to start tracing this.
-> > > > Bisection is good way to zero in on the bad change if you don't
-> > > > have much hard to rebase code in your tree.
-> > > > 
-> > > > Otherwise you can dump the relevant registers and the descriptors
-> > > > (descriptors_status file in debugfs) and see if driver is doing
-> > > > anything differently on the newer kernel?
-> > > > 
-> > > Thanks Jakub
-> > >   Yep I think I'll have to start bisecting things on Monday.
-> > > Luckily to work through this I shouldn't have to merge very much.
-> > > Have a great weekend
-> > > 
-> > > Cheers
-> > >   Richard Tresidder
-> > > 
-> > Hi Jakub
-> >    Ok the bad commit is the following:
-> > ************************************
-> > 6b2c6e4a938fece9b539c8085f21d17c5e6eb9de is the first bad commit
-> > commit 6b2c6e4a938fece9b539c8085f21d17c5e6eb9de
-> > Author: Corinna Vinschen <vinschen@redhat.com>
-> > Date:   Mon Apr 17 21:28:45 2023 +0200
-> > 
-> >     net: stmmac: propagate feature flags to vlan
-> > 
-> >     stmmac_dev_probe doesn't propagate feature flags to VLANs.  So
-> > features
-> >     like offloading don't correspond with the general features and it's
-> > not
-> >     possible to manipulate features via ethtool -K to affect VLANs.
-> > 
-> >     Propagate feature flags to vlan features.  Drop TSO feature because
-> >     it does not work on VLANs yet.
-> > 
-> >     Signed-off-by: Corinna Vinschen <vinschen@redhat.com>
-> >     Link:
-> > https://lore.kernel.org/r/20230417192845.590034-1-vinschen@redhat.com
-> >     Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> > 
-> >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> > ****************************************
-> > From back in the work for 6.4-rc1
-> > 
-> > Theres a single line addition  approx line 7506
-> > drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > 
-> > ndev->vlan_features |= ndev->features;
+> This patch set has landed in bpf-next and there are a bunch of other
+> patches after it, so I presume it will be a bit problematic to add ack
+> after the fact. But thanks for taking another look and acking!
 
-This is missing the 2nd line
-
-    ndev->vlan_features &= ~NETIF_F_TSO;
-
-I assume that another flag or two have to be dropped from being
-propagated as well.  That may depend on the platform, just like the
-feature flags depend on STMMAC_VLAN_TAG_USED, for instance.
-
-I'm sorry, but I'm not working on stmmac anymore.  Can you perhaps test
-removing flags from vlan_features and see what actual flag is breaking
-your scenario?
-
-Other than that, maybe reverting the patch is the better option and the
-vlan_feature flags should be set explicitely in the various
-platform-specific code.
-
-
-Corinna
-
+Yeah, I don't mind. :)
 
