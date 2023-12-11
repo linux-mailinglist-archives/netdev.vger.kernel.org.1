@@ -1,208 +1,147 @@
-Return-Path: <netdev+bounces-55685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12CC680BFBF
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 04:15:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CBB080BFE3
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 04:31:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A989280C1A
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 03:14:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B7CA280C54
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 03:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78AB415AF7;
-	Mon, 11 Dec 2023 03:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1AE615E8B;
+	Mon, 11 Dec 2023 03:31:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iMRPUcmY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NDkB5k+L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DE829D
-	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 19:14:53 -0800 (PST)
-Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-50bf37fd2bbso5141538e87.0
-        for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 19:14:53 -0800 (PST)
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DC42ED
+	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 19:31:21 -0800 (PST)
+Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2c9efa1ab7fso48473601fa.0
+        for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 19:31:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702264491; x=1702869291; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=dt0zuupP+ohC9RzBBk25aI8KsFg2z2sq2OKR+xgeiCY=;
-        b=iMRPUcmY/LYSsjbAO9XTDWTpiKD3DkMWgLRQnGQY5G0k0YDec6R+6ZxmzT690N3lkh
-         70UaMjXvfAdTOxb0HVgb6sPzrbgVz4FeNCH6C7YhXjZb6QtLU8NoU4ARpqygt6qWkvxz
-         BcjoYFER00eik3311NslXVocbsMnYohFv2SmkCHG/t9o1z9necxolw3tI0Xj3gWJDj+G
-         WNuEUNv2jYAusYbqaSRlxMatscC9yD81pUEcZAo/2xEhtyK9JyxpbWBQNJbJvAeOPzn1
-         MBpuGfnn053cdJcnFy5r6yVpAp2WeO5KTKAgsJNZIl8YYv6yospValezXGA6gAcYipMB
-         L0cw==
+        d=gmail.com; s=20230601; t=1702265480; x=1702870280; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gQSL4X30hGfSGTxRuYdgtKDfvYwjWus1QS3Y5VELUiA=;
+        b=NDkB5k+LkF9u3Oa8b/KMMIzsvn+yhxbHdqFmibM+brgHIJNCN8SCLaqv6RPh1GU5FS
+         r9lk5Xvf+qK2vpmPSw1/twvmL+LeGFukYkDiLElT644zAXDB1d2s9/IXexr0OcnbMhk0
+         D8e6YOSAbd5q8AgcKNOn83gDKLSKPZqnV2YmIEOMwqVG9jtLnM5ytQy2kmH9e7QHzPpi
+         yA9iuX2NdhzJ5AyxzPFJF+zEX4CqQ/WG6KXge44ay9RyqdR4PvRxYHa+ZH4DQFwriTYc
+         xWnH5un7OU2KqYbCCpZ7f7qJwXtINr17RXulZTcrTOpf14L+fQCru+FWylv64HLY/2kq
+         B/KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702264491; x=1702869291;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dt0zuupP+ohC9RzBBk25aI8KsFg2z2sq2OKR+xgeiCY=;
-        b=QPN+b2H79GT3UkEqA7p4TgFq6rzPV2pzK/tlHjBLkB1KxP/qUqur0zZfx3352LXimW
-         li6zJe+ky3oCKAfqFiZOV2ZK9+N+1YvrvUraOzIoZSGhjixAt2cVUT5PkJK+70KMCRTZ
-         CL6Kt4FCQm6DyyLdEr89SMMg+tHbqiRNfl/JVeUE8S5m7IQTA4DRR9qPnCAYD+v1dm/4
-         0dRKLT+r8gTXbIF+igcZBBlFp8zIvws8fozYcQFNxQORNUg8ncyL7DveaE7YcEs3y/fm
-         Z1L7MJt6GHwp0JGx6ccsWr0+yn23tzHoPTcH4jYJcqaQqG3IBDZEXBuKCdP/mOwZdTTl
-         ACFw==
-X-Gm-Message-State: AOJu0YxhrE1ekrzXJ8evkVeX9B25ShcH7Oa1yQSDjc6gqrYZQ0Lnc9fp
-	bWR3QlgZRvtZOzQNGbJqH2W30uxT6NbYgKmfVsA=
-X-Google-Smtp-Source: AGHT+IE35u0R4TyBQ8tCLwZKDE6ohRIHshbN9HaM/IojXCrn8Id2PSNswfOHFj6bINZb/Lwl/V0jEfq+GjGbKqs4zH0=
-X-Received: by 2002:a05:6512:3c9f:b0:50b:e20b:93eb with SMTP id
- h31-20020a0565123c9f00b0050be20b93ebmr2338976lfv.60.1702264490703; Sun, 10
- Dec 2023 19:14:50 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702265480; x=1702870280;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gQSL4X30hGfSGTxRuYdgtKDfvYwjWus1QS3Y5VELUiA=;
+        b=aApiu0mL1+0hGULCYHjGwt54YAQ2EkrOcy+MdXvBBDOPcI3rJYYpGPHrN9vUlOdOK8
+         xvpQRVUrtKOxQ6MTr6Lac9ghXV3Myaq+szj+QtDhPXvBwAReQqrttpt/95vBuh4DuvCV
+         7dI0llyetCFHZVD3A72fWjw7RTfYNDvF/35oL/aXqJhUq5EeRKlxEZTBUw1TeWRwI9ob
+         kl5u7AQEX5ZbjrdHVurpctdeRyMc5JuhjrDrLMUw8bseHF39S8PmtKpqPTNbOw+0gvAC
+         vhHAHCIEduum/yqbD4ICwgSJYKkxVq7HeKXJ0eDAbv+EBJl1AJ2Ein8GXKlchaU7MVGn
+         Epnw==
+X-Gm-Message-State: AOJu0Yxy4WCjGtLJJHNZiXrU0Ey3fqmAwtfGzNqjxsxNbPocutSmxiK0
+	sbydxwmEFQgXuexrl21Mj5jA6OsJH8rtEByMB9E=
+X-Google-Smtp-Source: AGHT+IE1adiREpDOlI+/gfB18LJB7AaiHcJG2gpFXbiATLuTpugOdaHu3uWiIuOgFyFgQyY/HhAeJsPRdtGCmB+Di+Q=
+X-Received: by 2002:a2e:9d51:0:b0:2c9:f658:6a37 with SMTP id
+ y17-20020a2e9d51000000b002c9f6586a37mr600097ljj.66.1702265479415; Sun, 10 Dec
+ 2023 19:31:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231209-rtl8366rb-mtu-fix-v1-0-df863e2b2b2a@linaro.org> <20231209-rtl8366rb-mtu-fix-v1-2-df863e2b2b2a@linaro.org>
-In-Reply-To: <20231209-rtl8366rb-mtu-fix-v1-2-df863e2b2b2a@linaro.org>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Mon, 11 Dec 2023 00:14:39 -0300
-Message-ID: <CAJq09z4fJmc9=CwdVSS_+LfOS9ax+voWrkPMwDmiBtrCwzc20A@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] net: dsa: realtek: Rewrite RTL8366RB MTU handling
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org
+References: <20231206105419.27952-1-liangchen.linux@gmail.com>
+ <20231206105419.27952-2-liangchen.linux@gmail.com> <20231208173816.2f32ad0f@kernel.org>
+In-Reply-To: <20231208173816.2f32ad0f@kernel.org>
+From: Liang Chen <liangchen.linux@gmail.com>
+Date: Mon, 11 Dec 2023 11:31:06 +0800
+Message-ID: <CAKhg4tKXfos+M=rmu25B=dCmS_uzmBy743BB=6NBZgBMWnHobA@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 1/4] page_pool: transition to reference count
+ management after page draining
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	hawk@kernel.org, ilias.apalodimas@linaro.org, linyunsheng@huawei.com, 
+	netdev@vger.kernel.org, linux-mm@kvack.org, jasowang@redhat.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> The MTU callbacks are in layer 1 size, so for example 1500
-> bytes is a normal setting. Cache this size, and only add
-> the layer 2 framing right before choosing the setting. On
-> the CPU port this will however include the DSA tag since
-> this is transmitted from the parent ethernet interface!
+On Sat, Dec 9, 2023 at 9:38=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
 >
-> Add the layer 2 overhead such as ethernet and VLAN framing
-> and FCS before selecting the size in the register.
+> On Wed,  6 Dec 2023 18:54:16 +0800 Liang Chen wrote:
+> > -/* pp_frag_count represents the number of writers who can update the p=
+age
+> > +/* pp_ref_count represents the number of writers who can update the pa=
+ge
+> >   * either by updating skb->data or via DMA mappings for the device.
+> >   * We can't rely on the page refcnt for that as we don't know who migh=
+t be
+> >   * holding page references and we can't reliably destroy or sync DMA m=
+appings
+> >   * of the fragments.
+> >   *
+> > - * When pp_frag_count reaches 0 we can either recycle the page if the =
+page
+> > + * pp_ref_count initially corresponds to the number of fragments. Howe=
+ver,
+> > + * when multiple users start to reference a single fragment, for examp=
+le in
+> > + * skb_try_coalesce, the pp_ref_count will become greater than the num=
+ber of
+> > + * fragments.
+> > + *
+> > + * When pp_ref_count reaches 0 we can either recycle the page if the p=
+age
+> >   * refcnt is 1 or return it back to the memory allocator and destroy a=
+ny
+> >   * mappings we have.
+> >   */
 >
-> This will make the code easier to understand.
+> Sorry to nit pick but I think this whole doc has to be rewritten
+> completely. It does state the most important thing which is that
+> the caller must have just allocated the page.
 >
-> The rtl8366rb_max_mtu() callback returns a bogus MTU
-> just subtracting the CPU tag, which is the only thing
-> we should NOT subtract. Return the correct layer 1
-> max MTU after removing headers and checksum.
+> How about:
 >
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> /**
+>  * page_pool_fragment_page() - split a fresh page into fragments
+>  * @.. fill these in
+>  *
+>  * pp_ref_count represents the number of outstanding references
+>  * to the page, which will be freed using page_pool APIs (rather
+>  * than page allocator APIs like put_page()). Such references are
+>  * usually held by page_pool-aware objects like skbs marked for
+>  * page pool recycling.
+>  *
+>  * This helper allows the caller to take (set) multiple references
+>  * to a freshly allocated page. The page must be freshly allocated
+>  * (have a pp_ref_count of 1). This is commonly done by drivers
+>  * and "fragment allocators" to save atomic operations - either
+>  * when they know upfront how many references they will need; or
+>  * to take MAX references and return the unused ones with a single
+>  * atomic dec(), instead of performing multiple atomic inc()
+>  * operations.
+>  */
+>
+> I think that's more informative at this stage of evolution of
+> the  page pool API, when most users aren't experts on internals.
+> But feel free to disagree..
+>
 
-Don't we need a Fixes tag?
+Thanks for the help! This is certainly better.
 
-> ---
->  drivers/net/dsa/realtek/rtl8366rb.c | 48 +++++++++++++++++++++++--------------
->  1 file changed, 30 insertions(+), 18 deletions(-)
+> >  static inline void page_pool_fragment_page(struct page *page, long nr)
+> >  {
+> > -     atomic_long_set(&page->pp_frag_count, nr);
+> > +     atomic_long_set(&page->pp_ref_count, nr);
+> >  }
 >
-> diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realtek/rtl8366rb.c
-> index 887afd1392cb..e3b6a470ca67 100644
-> --- a/drivers/net/dsa/realtek/rtl8366rb.c
-> +++ b/drivers/net/dsa/realtek/rtl8366rb.c
-> @@ -15,6 +15,7 @@
->  #include <linux/bitops.h>
->  #include <linux/etherdevice.h>
->  #include <linux/if_bridge.h>
-> +#include <linux/if_vlan.h>
->  #include <linux/interrupt.h>
->  #include <linux/irqdomain.h>
->  #include <linux/irqchip/chained_irq.h>
-> @@ -929,15 +930,19 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
->         if (ret)
->                 return ret;
->
-> -       /* Set maximum packet length to 1536 bytes */
-> +       /* Set default maximum packet length to 1536 bytes */
->         ret = regmap_update_bits(priv->map, RTL8366RB_SGCR,
->                                  RTL8366RB_SGCR_MAX_LENGTH_MASK,
->                                  RTL8366RB_SGCR_MAX_LENGTH_1536);
->         if (ret)
->                 return ret;
-> -       for (i = 0; i < RTL8366RB_NUM_PORTS; i++)
-> -               /* layer 2 size, see rtl8366rb_change_mtu() */
-> -               rb->max_mtu[i] = 1532;
-> +       for (i = 0; i < RTL8366RB_NUM_PORTS; i++) {
-> +               if (i == priv->cpu_port)
-> +                       /* CPU port need to also accept the tag */
-> +                       rb->max_mtu[i] = ETH_DATA_LEN + RTL8366RB_CPU_TAG_SIZE;
-> +               else
-> +                       rb->max_mtu[i] = ETH_DATA_LEN;
-> +       }
->
->         /* Disable learning for all ports */
->         ret = regmap_write(priv->map, RTL8366RB_PORT_LEARNDIS_CTRL,
-> @@ -1442,24 +1447,29 @@ static int rtl8366rb_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
->         /* Roof out the MTU for the entire switch to the greatest
->          * common denominator: the biggest set for any one port will
->          * be the biggest MTU for the switch.
-> -        *
-> -        * The first setting, 1522 bytes, is max IP packet 1500 bytes,
-> -        * plus ethernet header, 1518 bytes, plus CPU tag, 4 bytes.
-> -        * This function should consider the parameter an SDU, so the
-> -        * MTU passed for this setting is 1518 bytes. The same logic
-> -        * of subtracting the DSA tag of 4 bytes apply to the other
-> -        * settings.
->          */
-> -       max_mtu = 1518;
-> +       max_mtu = ETH_DATA_LEN;
->         for (i = 0; i < RTL8366RB_NUM_PORTS; i++) {
->                 if (rb->max_mtu[i] > max_mtu)
->                         max_mtu = rb->max_mtu[i];
->         }
-
-I'm not sure you need this old code. Whenever you change the MTU in a
-user port, it will also call rtl8366rb_change_mtu() for the CPU port
-if the max MTU changes. A call to change both the port and the CPU
-port makes sense when you need to update something inside the switch
-to set the MTU per port. However, these realtek switches only have a
-global MTU size for all ports. What I did in rtl8365mb is to ignore
-any MTU change except it is related to the CPU port. I hope this is a
-"core feature" that you can rely on.
-
-If that works for you, you can also drop the rb->max_mtu and the code
-in rtl8366rb_setup(), calling rtl8366rb_change_mtu() for the CPU port
-instead.
-
-> -       if (max_mtu <= 1518)
-> +
-> +       /* Translate to layer 2 size.
-> +        * Add ethernet and (possible) VLAN headers, and checksum to the size.
-> +        * For ETH_DATA_LEN (1500 bytes) this will add up to 1522 bytes.
-> +        */
-> +       max_mtu += VLAN_ETH_HLEN;
-> +       max_mtu += ETH_FCS_LEN;
-> +
-> +       if (max_mtu <= 1522)
->                 len = RTL8366RB_SGCR_MAX_LENGTH_1522;
-> -       else if (max_mtu > 1518 && max_mtu <= 1532)
-> +       else if (max_mtu > 1522 && max_mtu <= 1536)
-> +               /* This will be the most common default if using VLAN and
-> +                * CPU tagging on a port as both VLAN and CPU tag will
-> +                * result in 1518 + 4 + 4 = 1526 bytes.
-> +                */
->                 len = RTL8366RB_SGCR_MAX_LENGTH_1536;
-> -       else if (max_mtu > 1532 && max_mtu <= 1548)
-> +       else if (max_mtu > 1536 && max_mtu <= 1552)
->                 len = RTL8366RB_SGCR_MAX_LENGTH_1552;
->         else
->                 len = RTL8366RB_SGCR_MAX_LENGTH_16000;
-> @@ -1471,10 +1481,12 @@ static int rtl8366rb_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
->
->  static int rtl8366rb_max_mtu(struct dsa_switch *ds, int port)
->  {
-> -       /* The max MTU is 16000 bytes, so we subtract the CPU tag
-> -        * and the max presented to the system is 15996 bytes.
-> +       /* The max MTU is 16000 bytes, so we subtract the ethernet
-> +        * headers with VLAN and checksum and arrive at
-> +        * 16000 - 18 - 4 = 15978. This does not include the CPU tag
-> +        * since that is added to the requested MTU by the DSA framework.
->          */
-> -       return 15996;
-> +       return 16000 - VLAN_ETH_HLEN - ETH_FCS_LEN;
->  }
->
->  static int rtl8366rb_get_vlan_4k(struct realtek_priv *priv, u32 vid,
->
-> --
-> 2.34.1
->
->
+> The code itself and rest of the patches LGTM, although it would be
+> great to get ACKs from pp maintainers..
 
