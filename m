@@ -1,64 +1,156 @@
-Return-Path: <netdev+bounces-55892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E23080CB4D
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:45:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76BDB80CB94
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:53:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BB481C20F6C
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:45:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A833A1C212B8
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:53:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE333FE2E;
-	Mon, 11 Dec 2023 13:45:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BDC647794;
+	Mon, 11 Dec 2023 13:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AriWX0iH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J/BvRMdQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9279A3D97E
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 13:45:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D307C433C7;
-	Mon, 11 Dec 2023 13:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB7F4778D;
+	Mon, 11 Dec 2023 13:53:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E4FFC433CB;
+	Mon, 11 Dec 2023 13:53:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702302317;
-	bh=VvIH4ZYMBYZb7GOf40/uW38wshvq5Z4eZKrLVedN16s=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=AriWX0iH/O+lkkrp0npP2ZLTMQvusGjbp2AkyKk0VMtv9b0JcVW3/1d3fvTRnt+uJ
-	 w8Wv2RJBD/OCEHVDFrB69UlWZ/T7tj5Mul+TGd4jlgMoe/mXGA+TMles6peA15SlYu
-	 SGMVfOXlScJS+DmxNbRpMYHACY+qK9KC7CsULCnNBH5a7CounWPkqouJ++ZSym6YXa
-	 eV/MmaLwS6RIDvuw6upOvPaUeW7oW2+BeLKpWn3D8W0d10H7iVXrKslT+qu65231Pl
-	 G/odkLqsUISV/fIGmzXPE98coPJAujLlkyUWuPihfWZLqbwPtuZx8ZkZhC4aCK/6sj
-	 G1tb2E/yNEoXQ==
-Message-ID: <a5e53cfe-9b62-41b5-aa7e-44b1de9a2cf6@kernel.org>
-Date: Mon, 11 Dec 2023 06:45:16 -0700
+	s=k20201202; t=1702302792;
+	bh=fgN+YDhf8a3nw9oZAz0gxAwY5i58ycVwFHLHFzYEZ08=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=J/BvRMdQGYC5PfS0rnUOwYUwTyB7sDIZb5maRSgVqrgh641oRv7/cD9PvocLZaDCG
+	 q30N/HFb8X1dnEWwr4vmXeKZYvktWr4JLXnR4M0avgSPVCdwEWHUZYj7+QSquMHs4M
+	 2n61fsO/mT1QFmdrCAcB11eoQaMTskzqgB6qFlwRPpSyecQjTbpyD2gcv0rCrgvueI
+	 9ryggNRM2HwazYAfV0hTBBRUb1f+kB7iXQH/XG9ub76Vn8UW4tR3CFvVKZN7EqpnuF
+	 C8J05/mr6uBkTE2iz2TJc/Juu8RugvsfhmSnG9eEQvFRKr8u2ix97E9pt9IjQ8wsCK
+	 uU7SVz/sTFwHQ==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Thinh Tran <thinhtr@linux.vnet.ibm.com>,
+	Venkata Sai Duggi <venkata.sai.duggi@ibm.com>,
+	David Christensen <drc@linux.vnet.ibm.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	pavan.chebbi@broadcom.com,
+	mchan@broadcom.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 27/47] net/tg3: fix race condition in tg3_reset_task()
+Date: Mon, 11 Dec 2023 08:50:28 -0500
+Message-ID: <20231211135147.380223-27-sashal@kernel.org>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231211135147.380223-1-sashal@kernel.org>
+References: <20231211135147.380223-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: selftest fib_nexthop_multiprefix failed due to route mismatch
-Content-Language: en-US
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org
-References: <ZVxQ42hk1dC4qffy@Laptop-X1>
- <01240884-fcc9-46d5-ae98-305151112ebc@kernel.org>
- <ZW_u7VWTpWAuub4L@Laptop-X1>
- <02ef5de4-d57f-4037-8968-d9bf791bd903@kernel.org>
- <ZXbUzpDGErm-JXSC@Laptop-X1>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <ZXbUzpDGErm-JXSC@Laptop-X1>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.6.5
+Content-Transfer-Encoding: 8bit
 
-On 12/11/23 2:22 AM, Hangbin Liu wrote:
-> OK, I got the reason. The "from ::1" is put in rt6_fill_node() when
-> CONFIG_IPV6_SUBTREES is enabled. I will fix this grep issue in my next
-> selftests namespace conversion patch set. Thanks Hangbin
+From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
 
-thank you for the persistence in tracking this down.
+[ Upstream commit 16b55b1f2269962fb6b5154b8bf43f37c9a96637 ]
+
+When an EEH error is encountered by a PCI adapter, the EEH driver
+modifies the PCI channel's state as shown below:
+
+   enum {
+      /* I/O channel is in normal state */
+      pci_channel_io_normal = (__force pci_channel_state_t) 1,
+
+      /* I/O to channel is blocked */
+      pci_channel_io_frozen = (__force pci_channel_state_t) 2,
+
+      /* PCI card is dead */
+      pci_channel_io_perm_failure = (__force pci_channel_state_t) 3,
+   };
+
+If the same EEH error then causes the tg3 driver's transmit timeout
+logic to execute, the tg3_tx_timeout() function schedules a reset
+task via tg3_reset_task_schedule(), which may cause a race condition
+between the tg3 and EEH driver as both attempt to recover the HW via
+a reset action.
+
+EEH driver gets error event
+--> eeh_set_channel_state()
+    and set device to one of
+    error state above           scheduler: tg3_reset_task() get
+                                returned error from tg3_init_hw()
+                             --> dev_close() shuts down the interface
+tg3_io_slot_reset() and
+tg3_io_resume() fail to
+reset/resume the device
+
+To resolve this issue, we avoid the race condition by checking the PCI
+channel state in the tg3_reset_task() function and skip the tg3 driver
+initiated reset when the PCI channel is not in the normal state.  (The
+driver has no access to tg3 device registers at this point and cannot
+even complete the reset task successfully without external assistance.)
+We'll leave the reset procedure to be managed by the EEH driver which
+calls the tg3_io_error_detected(), tg3_io_slot_reset() and
+tg3_io_resume() functions as appropriate.
+
+Adding the same checking in tg3_dump_state() to avoid dumping all
+device registers when the PCI channel is not in the normal state.
+
+Signed-off-by: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+Tested-by: Venkata Sai Duggi <venkata.sai.duggi@ibm.com>
+Reviewed-by: David Christensen <drc@linux.vnet.ibm.com>
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+Link: https://lore.kernel.org/r/20231201001911.656-1-thinhtr@linux.vnet.ibm.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/broadcom/tg3.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+index 22b00912f7ac8..95d476ec14f5e 100644
+--- a/drivers/net/ethernet/broadcom/tg3.c
++++ b/drivers/net/ethernet/broadcom/tg3.c
+@@ -6439,6 +6439,14 @@ static void tg3_dump_state(struct tg3 *tp)
+ 	int i;
+ 	u32 *regs;
+ 
++	/* If it is a PCI error, all registers will be 0xffff,
++	 * we don't dump them out, just report the error and return
++	 */
++	if (tp->pdev->error_state != pci_channel_io_normal) {
++		netdev_err(tp->dev, "PCI channel ERROR!\n");
++		return;
++	}
++
+ 	regs = kzalloc(TG3_REG_BLK_SIZE, GFP_ATOMIC);
+ 	if (!regs)
+ 		return;
+@@ -11170,7 +11178,8 @@ static void tg3_reset_task(struct work_struct *work)
+ 	rtnl_lock();
+ 	tg3_full_lock(tp, 0);
+ 
+-	if (tp->pcierr_recovery || !netif_running(tp->dev)) {
++	if (tp->pcierr_recovery || !netif_running(tp->dev) ||
++	    tp->pdev->error_state != pci_channel_io_normal) {
+ 		tg3_flag_clear(tp, RESET_TASK_PENDING);
+ 		tg3_full_unlock(tp);
+ 		rtnl_unlock();
+-- 
+2.42.0
+
 
