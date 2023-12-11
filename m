@@ -1,324 +1,419 @@
-Return-Path: <netdev+bounces-56041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB95A80D8DA
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 19:49:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC50280D9B4
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 19:56:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DC0E1F219A5
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 18:49:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF3671C216D4
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 18:56:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A5F51C47;
-	Mon, 11 Dec 2023 18:49:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A7651C5C;
+	Mon, 11 Dec 2023 18:56:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="NU6LdAur"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="teP89eo+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC59AB4;
-	Mon, 11 Dec 2023 10:49:19 -0800 (PST)
-Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 3BBBp5DM026654;
-	Mon, 11 Dec 2023 19:48:12 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=y0BmSNYVc0wIoHagTE06vyC2a0PPdmZEKhzR/LzDmMc=; b=NU
-	6LdAuryyO6Ga1iwo5fQKJ4qt9KbKn770wj6T3gOQHQH8X5YbAp1+UV3/jhMHhLrs
-	cf5mSXZ+UTzH0IXqI3h/LIIq5QIYYW0JPDmAqjQUc1aPNF0Ma3JyG/rrVmHw4NIS
-	i641bFyjuG8jMIKmysY4F/IOKWvTkxue2uVsKSDu9/se3G4zEsNkFwInrwuVGRTj
-	cwRV24hHks2klsL1XGlPPhAQIeOHuwrnpM9F9zvKVUUCKQjmj+FFHa1Y5jCuEL1K
-	15E0I2+Dq2va+7kSS2LAGto2F1rUuEr4bHq8oJ+8C739i5sAghX5YEM2SwfrphHm
-	4ltMRuMz9SbyWhuVmt6A==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3uvgf1g1sr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Dec 2023 19:48:12 +0100 (CET)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 70B9010005C;
-	Mon, 11 Dec 2023 19:48:09 +0100 (CET)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 34D44252238;
-	Mon, 11 Dec 2023 19:48:09 +0100 (CET)
-Received: from [10.252.9.5] (10.252.9.5) by SHFDAG1NODE1.st.com (10.75.129.69)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 11 Dec
- 2023 19:48:07 +0100
-Message-ID: <719399bd-273d-40b5-b512-59a2e09ddbf8@foss.st.com>
-Date: Mon, 11 Dec 2023 19:48:02 +0100
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90ED321B8;
+	Mon, 11 Dec 2023 18:56:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AE5AC433C8;
+	Mon, 11 Dec 2023 18:56:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702320970;
+	bh=AhEJzLRNnF//o4btxFf0wfbAQQHwZk8WnH6CwtL7800=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=teP89eo+VeXm53rwGkHXfMmtwmasOUG3QbsYR4NBrG4Rq84F+KjyBxOJWn3Nn0AAE
+	 mNBd2W+g7Tuzstztn7467Kn5vDUgR9t0CVtn/0Pp/77KlRsiQae48Fwh+19ojTrvvZ
+	 s/yRv6dKeGlfx6WwFVyFm4chsBKUg1tL+rHq9V19bV03YR42EUCcwnHbWKor6Zi3wr
+	 84H5H8BqHwESkSoAfvLPQqvZ6SGWGj0HNqz3xbU5ju5LMDVX2h550voQ5vZhJPKyQh
+	 SMg++pbz8nrnBwL+yZ6d3QcIcv8z93DQuJs/i/tBS58rC8Rdkl8FiQ1HjSqZvU/vYQ
+	 IABVkR4x8XRiw==
+Message-ID: <a30b00df8b40ca94d0ff243c0305f36c7cbafc43.camel@kernel.org>
+Subject: Re: [PATCH v8 3/3] NFSD: add rpc_status netlink support
+From: Jeff Layton <jlayton@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>, linux-nfs@vger.kernel.org
+Cc: lorenzo.bianconi@redhat.com, chuck.lever@oracle.com, neilb@suse.de, 
+	netdev@vger.kernel.org
+Date: Mon, 11 Dec 2023 13:56:08 -0500
+In-Reply-To: <ac18892ea3f718c63f0a12e39aeaac812c081515.1694436263.git.lorenzo@kernel.org>
+References: <cover.1694436263.git.lorenzo@kernel.org>
+	 <ac18892ea3f718c63f0a12e39aeaac812c081515.1694436263.git.lorenzo@kernel.org>
+Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
+ keydata=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
+	kZWuOsJdJQdmwlWC5L5ln9xgfr/4mOY38B0U=
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.2 (3.50.2-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 00/13] Introduce STM32 Firewall framework
-Content-Language: en-US
-To: <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-        <conor+dt@kernel.org>, <alexandre.torgue@foss.st.com>,
-        <vkoul@kernel.org>, <jic23@kernel.org>, <olivier.moysan@foss.st.com>,
-        <arnaud.pouliquen@foss.st.com>, <mchehab@kernel.org>,
-        <fabrice.gasnier@foss.st.com>, <andi.shyti@kernel.org>,
-        <ulf.hansson@linaro.org>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <hugues.fruchet@foss.st.com>, <lee@kernel.org>,
-        <will@kernel.org>, <catalin.marinas@arm.com>, <arnd@kernel.org>,
-        <richardcochran@gmail.com>, Frank Rowand <frowand.list@gmail.com>,
-        <peng.fan@oss.nxp.com>, <lars@metafoo.de>, <rcsekar@samsung.com>,
-        <wg@grandegger.com>, <mkl@pengutronix.de>
-CC: <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
-        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
-        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-phy@lists.infradead.org>,
-        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-usb@vger.kernel.org>
-References: <20231211183044.808204-1-gatien.chevallier@foss.st.com>
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <20231211183044.808204-1-gatien.chevallier@foss.st.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EQNCAS1NODE4.st.com (10.75.129.82) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-11_08,2023-12-07_01,2023-05-22_02
 
-Hi,
+On Mon, 2023-09-11 at 14:49 +0200, Lorenzo Bianconi wrote:
+> Introduce rpc_status netlink support for NFSD in order to dump pending
+> RPC requests debugging information from userspace.
+>=20
+> Tested-by: Jeff Layton <jlayton@kernel.org>
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  fs/nfsd/nfsctl.c           | 192 ++++++++++++++++++++++++++++++++++++-
+>  fs/nfsd/nfsd.h             |  16 ++++
+>  fs/nfsd/nfssvc.c           |  15 +++
+>  fs/nfsd/state.h            |   2 -
+>  include/linux/sunrpc/svc.h |   1 +
+>  5 files changed, 222 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
+> index 1be66088849c..b862a759ea15 100644
+> --- a/fs/nfsd/nfsctl.c
+> +++ b/fs/nfsd/nfsctl.c
+> @@ -26,6 +26,7 @@
+>  #include "pnfs.h"
+>  #include "filecache.h"
+>  #include "trace.h"
+> +#include "nfs_netlink_gen.h"
+> =20
+>  /*
+>   *	We have a single directory with several nodes in it.
+> @@ -1497,17 +1498,199 @@ unsigned int nfsd_net_id;
+> =20
+>  int nfsd_server_nl_rpc_status_get_start(struct netlink_callback *cb)
+>  {
+> -	return 0;
+> +	struct nfsd_net *nn =3D net_generic(sock_net(cb->skb->sk), nfsd_net_id)=
+;
+> +	int ret =3D -ENODEV;
+> +
+> +	mutex_lock(&nfsd_mutex);
+> +	if (nn->nfsd_serv) {
+> +		svc_get(nn->nfsd_serv);
+> +		ret =3D 0;
+> +	}
+> +	mutex_unlock(&nfsd_mutex);
+> +
+> +	return ret;
+>  }
 
-I messed up when squashing.
+I think there is a potential race above. Once you've dropped the
+nfsd_mutex, there is no guarantee that the nn->nfsd_serv will still be
+set when you come back to put the serv. That means that we could oops
+when we hit the _done method below.
 
-I did not restore the ETZPC/RIFSC "simple-bus" compatible for stm32mp15
-and stm32mp25 SoC device trees.
+Is it possible to stash a pointer to the serv while we hold the
+reference?
 
-I apologize for this inconvenience and will resend the patchset with
-this compatible correctly restored.
+> =20
+> -int nfsd_server_nl_rpc_status_get_done(struct netlink_callback *cb)
+> +static int nfsd_genl_rpc_status_compose_msg(struct sk_buff *skb,
+> +					    struct netlink_callback *cb,
+> +					    struct nfsd_genl_rqstp *rqstp)
+>  {
+> +	void *hdr;
+> +	int i;
+> +
+> +	hdr =3D genlmsg_put(skb, NETLINK_CB(cb->skb).portid, cb->nlh->nlmsg_seq=
+,
+> +			  &nfsd_server_nl_family, NLM_F_MULTI,
+> +			  NFSD_CMD_RPC_STATUS_GET);
+> +	if (!hdr)
+> +		return -ENOBUFS;
+> +
+> +	if (nla_put_be32(skb, NFSD_ATTR_RPC_STATUS_XID, rqstp->rq_xid) ||
+> +	    nla_put_u32(skb, NFSD_ATTR_RPC_STATUS_FLAGS, rqstp->rq_flags) ||
+> +	    nla_put_u32(skb, NFSD_ATTR_RPC_STATUS_PROG, rqstp->rq_prog) ||
+> +	    nla_put_u32(skb, NFSD_ATTR_RPC_STATUS_PROC, rqstp->rq_proc) ||
+> +	    nla_put_u8(skb, NFSD_ATTR_RPC_STATUS_VERSION, rqstp->rq_vers) ||
+> +	    nla_put_s64(skb, NFSD_ATTR_RPC_STATUS_SERVICE_TIME,
+> +			ktime_to_us(rqstp->rq_stime),
+> +			NFSD_ATTR_RPC_STATUS_PAD))
+> +		return -ENOBUFS;
+> +
+> +	switch (rqstp->saddr.sa_family) {
+> +	case AF_INET: {
+> +		const struct sockaddr_in *s_in, *d_in;
+> +
+> +		s_in =3D (const struct sockaddr_in *)&rqstp->saddr;
+> +		d_in =3D (const struct sockaddr_in *)&rqstp->daddr;
+> +		if (nla_put_in_addr(skb, NFSD_ATTR_RPC_STATUS_SADDR4,
+> +				    s_in->sin_addr.s_addr) ||
+> +		    nla_put_in_addr(skb, NFSD_ATTR_RPC_STATUS_DADDR4,
+> +				    d_in->sin_addr.s_addr) ||
+> +		    nla_put_be16(skb, NFSD_ATTR_RPC_STATUS_SPORT,
+> +				 s_in->sin_port) ||
+> +		    nla_put_be16(skb, NFSD_ATTR_RPC_STATUS_DPORT,
+> +				 d_in->sin_port))
+> +			return -ENOBUFS;
+> +		break;
+> +	}
+> +	case AF_INET6: {
+> +		const struct sockaddr_in6 *s_in, *d_in;
+> +
+> +		s_in =3D (const struct sockaddr_in6 *)&rqstp->saddr;
+> +		d_in =3D (const struct sockaddr_in6 *)&rqstp->daddr;
+> +		if (nla_put_in6_addr(skb, NFSD_ATTR_RPC_STATUS_SADDR6,
+> +				     &s_in->sin6_addr) ||
+> +		    nla_put_in6_addr(skb, NFSD_ATTR_RPC_STATUS_DADDR6,
+> +				     &d_in->sin6_addr) ||
+> +		    nla_put_be16(skb, NFSD_ATTR_RPC_STATUS_SPORT,
+> +				 s_in->sin6_port) ||
+> +		    nla_put_be16(skb, NFSD_ATTR_RPC_STATUS_DPORT,
+> +				 d_in->sin6_port))
+> +			return -ENOBUFS;
+> +		break;
+> +	}
+> +	default:
+> +		break;
+> +	}
+> +
+> +	if (rqstp->opcnt) {
+> +		struct nlattr *attr;
+> +
+> +		attr =3D nla_nest_start(skb, NFSD_ATTR_RPC_STATUS_COMPOND_OP);
+> +		if (!attr)
+> +			return -ENOBUFS;
+> +
+> +		for (i =3D 0; i < rqstp->opcnt; i++) {
+> +			struct nlattr *op_attr;
+> +
+> +			op_attr =3D nla_nest_start(skb, i);
+> +			if (!op_attr)
+> +				return -ENOBUFS;
+> +
+> +			if (nla_put_u32(skb, NFSD_ATTR_RPC_STATUS_COMP_OP,
+> +					rqstp->opnum[i]))
+> +				return -ENOBUFS;
+> +
+> +			nla_nest_end(skb, op_attr);
+> +		}
+> +
+> +		nla_nest_end(skb, attr);
+> +	}
+> +
+> +	genlmsg_end(skb, hdr);
+> +
+>  	return 0;
+>  }
+> =20
+>  int nfsd_server_nl_rpc_status_get_dumpit(struct sk_buff *skb,
+>  					 struct netlink_callback *cb)
+>  {
+> +	struct nfsd_net *nn =3D net_generic(sock_net(skb->sk), nfsd_net_id);
+> +	int i, ret, rqstp_index;
+> +
+> +	rcu_read_lock();
+> +
+> +	for (i =3D 0; i < nn->nfsd_serv->sv_nrpools; i++) {
+> +		struct svc_rqst *rqstp;
+> +
+> +		if (i < cb->args[0]) /* already consumed */
+> +			continue;
+> +
+> +		rqstp_index =3D 0;
+> +		list_for_each_entry_rcu(rqstp,
+> +				&nn->nfsd_serv->sv_pools[i].sp_all_threads,
+> +				rq_all) {
+> +			struct nfsd_genl_rqstp genl_rqstp;
+> +			unsigned int status_counter;
+> +
+> +			if (rqstp_index++ < cb->args[1]) /* already consumed */
+> +				continue;
+> +			/*
+> +			 * Acquire rq_status_counter before parsing the rqst
+> +			 * fields. rq_status_counter is set to an odd value in
+> +			 * order to notify the consumers the rqstp fields are
+> +			 * meaningful.
+> +			 */
+> +			status_counter =3D
+> +				smp_load_acquire(&rqstp->rq_status_counter);
+> +			if (!(status_counter & 1))
+> +				continue;
+> +
+> +			genl_rqstp.rq_xid =3D rqstp->rq_xid;
+> +			genl_rqstp.rq_flags =3D rqstp->rq_flags;
+> +			genl_rqstp.rq_vers =3D rqstp->rq_vers;
+> +			genl_rqstp.rq_prog =3D rqstp->rq_prog;
+> +			genl_rqstp.rq_proc =3D rqstp->rq_proc;
+> +			genl_rqstp.rq_stime =3D rqstp->rq_stime;
+> +			genl_rqstp.opcnt =3D 0;
+> +			memcpy(&genl_rqstp.daddr, svc_daddr(rqstp),
+> +			       sizeof(struct sockaddr));
+> +			memcpy(&genl_rqstp.saddr, svc_addr(rqstp),
+> +			       sizeof(struct sockaddr));
+> +
+> +#ifdef CONFIG_NFSD_V4
+> +			if (rqstp->rq_vers =3D=3D NFS4_VERSION &&
+> +			    rqstp->rq_proc =3D=3D NFSPROC4_COMPOUND) {
+> +				/* NFSv4 compund */
+> +				struct nfsd4_compoundargs *args;
+> +				int j;
+> +
+> +				args =3D rqstp->rq_argp;
+> +				genl_rqstp.opcnt =3D args->opcnt;
+> +				for (j =3D 0; j < genl_rqstp.opcnt; j++)
+> +					genl_rqstp.opnum[j] =3D
+> +						args->ops[j].opnum;
+> +			}
+> +#endif /* CONFIG_NFSD_V4 */
+> +
+> +			/*
+> +			 * Acquire rq_status_counter before reporting the rqst
+> +			 * fields to the user.
+> +			 */
+> +			if (smp_load_acquire(&rqstp->rq_status_counter) !=3D
+> +			    status_counter)
+> +				continue;
+> +
+> +			ret =3D nfsd_genl_rpc_status_compose_msg(skb, cb,
+> +							       &genl_rqstp);
+> +			if (ret)
+> +				goto out;
+> +		}
+> +	}
+> +
+> +	cb->args[0] =3D i;
+> +	cb->args[1] =3D rqstp_index;
+> +	ret =3D skb->len;
+> +out:
+> +	rcu_read_unlock();
+> +
+> +	return ret;
+> +}
+> +
+> +int nfsd_server_nl_rpc_status_get_done(struct netlink_callback *cb)
+> +{
+> +	mutex_lock(&nfsd_mutex);
+> +	nfsd_put(sock_net(cb->skb->sk));
+> +	mutex_unlock(&nfsd_mutex);
+> +
+>  	return 0;
+>  }
+> =20
 
-Best regards,
-Gatien
+I think there is a potential race above. Once you've=20
 
-On 12/11/23 19:30, Gatien Chevallier wrote:
-> Introduce STM32 Firewall framework for STM32MP1x and STM32MP2x
-> platforms. STM32MP1x(ETZPC) and STM32MP2x(RIFSC) Firewall controllers
-> register to the framework to offer firewall services such as access
-> granting.
-> 
-> This series of patches is a new approach on the previous STM32 system
-> bus, history is available here:
-> https://lore.kernel.org/lkml/20230127164040.1047583/
-> 
-> The need for such framework arises from the fact that there are now
-> multiple hardware firewalls implemented across multiple products.
-> Drivers are shared between different products, using the same code.
-> When it comes to firewalls, the purpose mostly stays the same: Protect
-> hardware resources. But the implementation differs, and there are
-> multiple types of firewalls: peripheral, memory, ...
-> 
-> Some hardware firewall controllers such as the RIFSC implemented on
-> STM32MP2x platforms may require to take ownership of a resource before
-> being able to use it, hence the requirement for firewall services to
-> take/release the ownership of such resources.
-> 
-> On the other hand, hardware firewall configurations are becoming
-> more and more complex. These mecanisms prevent platform crashes
-> or other firewall-related incoveniences by denying access to some
-> resources.
-> 
-> The stm32 firewall framework offers an API that is defined in
-> firewall controllers drivers to best fit the specificity of each
-> firewall.
-> 
-> For every peripherals protected by either the ETZPC or the RIFSC, the
-> firewall framework checks the firewall controlelr registers to see if
-> the peripheral's access is granted to the Linux kernel. If not, the
-> peripheral is configured as secure, the node is marked populated,
-> so that the driver is not probed for that device.
-> 
-> The firewall framework relies on the access-controller device tree
-> binding. It is used by peripherals to reference a domain access
-> controller. In this case a firewall controller. The bus uses the ID
-> referenced by the access-controller property to know where to look
-> in the firewall to get the security configuration for the peripheral.
-> This allows a device tree description rather than a hardcoded peripheral
-> table in the bus driver.
-> 
-> The STM32 ETZPC device is responsible for filtering accesses based on
-> security level, or co-processor isolation for any resource connected
-> to it.
-> 
-> The RIFSC is responsible for filtering accesses based on Compartment
-> ID / security level / privilege level for any resource connected to
-> it.
-> 
-> STM32MP13/15/25 SoC device tree files are updated in this series to
-> implement this mecanism.
-> 
-> Changes in V7:
-> 	- Separate indentation changes from access-controllers changes
-> 	  in the device tree file commits
-> 	- Select OF_DYNAMIC when STM32_FIREWALL is set in order to use
-> 	  of_detach_node() in the firewall framework
-> 	- Handle previously non-present RNG and HASH nodes in the
-> 	  STM32MP13 device tree file
-> 
-> Changes in V6:
-> 	- Rename access-controller to access-controllers
-> 	- Remove access-controller-provider
-> 	- Update device trees and other bindings accordingly
-> 	- Rework ETZPC/RIFSC bindings to define what access-controllers
-> 	  cells contain inside #access-controller-cells
-> 	- Some other minor fixes
-> 
-> Changes in V5:
-> 	- Integrate and rework the "feature-domains" binding patch in
-> 	  this patchset. The binding is renamed to "access-controller"
-> 	- Rename every feature-domain* reference to access-control*
-> 	  ones
-> 	- Correct loop bug and missing select STM32_FIREWALL in 32-bit
-> 	  platform Kconfig
-> 	
-> 
-> Changes in V4:
-> 	- Fix typo in commit message and YAML check errors in
-> 	  "dt-bindings: Document common device controller bindings"
-> 	  Note: This patch should be ignored as stated in the cover
-> 	  letter. I've done this to avoid errors on this series of
-> 	  patch
-> 	- Correct code syntax/style issues reported by Simon Horman
-> 	- Added Jonathan's tag for IIO on the treewide patch
-> 
-> Changes in V3:
-> 
-> 	Change incorrect ordering for bindings commits leading
-> 	to an error while running
-> 	"make DT_CHECKER_FLAGS=-m dt_binding_check"
-> 
-> Changes in V2:
-> 
-> 	generic:
-> 		- Add fw_devlink dependency for "feature-domains"
-> 		  property.
-> 
-> 	bindings:
-> 		- Corrected YAMLS errors highlighted by Rob's robot
-> 		- Firewall controllers YAMLs no longer define the
-> 		  maxItems for the "feature-domains" property
-> 		- Renamed st,stm32-rifsc.yaml to
-> 		  st,stm32mp25-rifsc.yaml
-> 		- Fix examples in YAML files
-> 		- Change feature-domains maxItems to 2 in firewall
-> 		  consumer files as there should not be more than
-> 		  2 entries for now
-> 		- Declare "feature-domain-names" as an optional
-> 		  property for firewall controllers child nodes.
-> 		- Add missing "feature-domains" property declaration
-> 		  in bosch,m_can.yaml and st,stm32-cryp.yaml files
-> 
-> 	firewall framework:
-> 		- Support multiple entries for "feature-domains"
-> 		  property
-> 		- Better handle the device-tree parsing using
-> 		  phandle+args APIs
-> 		- Remove "resource firewall" type
-> 		- Add a field for the name of the firewall entry
-> 		- Fix licenses
-> 	
-> 	RIFSC:
-> 		- Add controller name
-> 		- Driver is now a module_platform_driver
-> 		- Fix license
-> 
-> 	ETZPC:
-> 		- Add controller name
-> 		- Driver is now a module_platform_driver
-> 		- Fix license
-> 
-> 	Device trees:
-> 		- Fix rifsc node name
-> 		- Move the "ranges" property under the
-> 		  "feature-domains" one
-> 
-> Gatien Chevallier (12):
->    dt-bindings: treewide: add access-controllers description
->    dt-bindings: bus: document RIFSC
->    dt-bindings: bus: document ETZPC
->    firewall: introduce stm32_firewall framework
->    of: property: fw_devlink: Add support for "access-controller"
->    bus: rifsc: introduce RIFSC firewall controller driver
->    arm64: dts: st: add RIFSC as an access controller for STM32MP25x
->      boards
->    bus: etzpc: introduce ETZPC firewall controller driver
->    ARM: dts: stm32: add ETZPC as a system bus for STM32MP15x boards
->    ARM: dts: stm32: put ETZPC as an access controller for STM32MP15x
->      boards
->    ARM: dts: stm32: add ETZPC as a system bus for STM32MP13x boards
->    ARM: dts: stm32: put ETZPC as an access controller for STM32MP13x
->      boards
-> 
-> Oleksii Moisieiev (1):
->    dt-bindings: document generic access controllers
-> 
->   .../access-controllers.yaml                   |   84 +
->   .../bindings/bus/st,stm32-etzpc.yaml          |   87 +
->   .../bindings/bus/st,stm32mp25-rifsc.yaml      |   96 +
->   .../bindings/crypto/st,stm32-cryp.yaml        |    4 +
->   .../bindings/crypto/st,stm32-hash.yaml        |    4 +
->   .../devicetree/bindings/dma/st,stm32-dma.yaml |    4 +
->   .../bindings/dma/st,stm32-dmamux.yaml         |    4 +
->   .../devicetree/bindings/i2c/st,stm32-i2c.yaml |    4 +
->   .../bindings/iio/adc/st,stm32-adc.yaml        |    4 +
->   .../bindings/iio/adc/st,stm32-dfsdm-adc.yaml  |    4 +
->   .../bindings/iio/dac/st,stm32-dac.yaml        |    4 +
->   .../bindings/media/cec/st,stm32-cec.yaml      |    4 +
->   .../bindings/media/st,stm32-dcmi.yaml         |    4 +
->   .../memory-controllers/st,stm32-fmc2-ebi.yaml |    4 +
->   .../bindings/mfd/st,stm32-lptimer.yaml        |    4 +
->   .../bindings/mfd/st,stm32-timers.yaml         |    4 +
->   .../devicetree/bindings/mmc/arm,pl18x.yaml    |    4 +
->   .../bindings/net/can/bosch,m_can.yaml         |    4 +
->   .../devicetree/bindings/net/stm32-dwmac.yaml  |    4 +
->   .../bindings/phy/phy-stm32-usbphyc.yaml       |    4 +
->   .../bindings/regulator/st,stm32-vrefbuf.yaml  |    4 +
->   .../devicetree/bindings/rng/st,stm32-rng.yaml |    4 +
->   .../bindings/serial/st,stm32-uart.yaml        |    4 +
->   .../bindings/sound/st,stm32-i2s.yaml          |    4 +
->   .../bindings/sound/st,stm32-sai.yaml          |    4 +
->   .../bindings/sound/st,stm32-spdifrx.yaml      |    4 +
->   .../bindings/spi/st,stm32-qspi.yaml           |    4 +
->   .../devicetree/bindings/spi/st,stm32-spi.yaml |    4 +
->   .../devicetree/bindings/usb/dwc2.yaml         |    4 +
->   MAINTAINERS                                   |    7 +
->   arch/arm/boot/dts/st/stm32mp131.dtsi          | 1063 ++++---
->   arch/arm/boot/dts/st/stm32mp133.dtsi          |   51 +-
->   arch/arm/boot/dts/st/stm32mp13xc.dtsi         |   19 +-
->   arch/arm/boot/dts/st/stm32mp13xf.dtsi         |   19 +-
->   arch/arm/boot/dts/st/stm32mp151.dtsi          | 2756 +++++++++--------
->   arch/arm/boot/dts/st/stm32mp153.dtsi          |   52 +-
->   arch/arm/boot/dts/st/stm32mp15xc.dtsi         |   19 +-
->   arch/arm/mach-stm32/Kconfig                   |    1 +
->   arch/arm64/Kconfig.platforms                  |    1 +
->   arch/arm64/boot/dts/st/stm32mp251.dtsi        |    6 +-
->   drivers/bus/Kconfig                           |   10 +
->   drivers/bus/Makefile                          |    1 +
->   drivers/bus/stm32_etzpc.c                     |  141 +
->   drivers/bus/stm32_firewall.c                  |  294 ++
->   drivers/bus/stm32_firewall.h                  |   83 +
->   drivers/bus/stm32_rifsc.c                     |  252 ++
->   drivers/of/property.c                         |    2 +
->   include/linux/bus/stm32_firewall_device.h     |  141 +
->   48 files changed, 3351 insertions(+), 1938 deletions(-)
->   create mode 100644 Documentation/devicetree/bindings/access-controllers/access-controllers.yaml
->   create mode 100644 Documentation/devicetree/bindings/bus/st,stm32-etzpc.yaml
->   create mode 100644 Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml
->   create mode 100644 drivers/bus/stm32_etzpc.c
->   create mode 100644 drivers/bus/stm32_firewall.c
->   create mode 100644 drivers/bus/stm32_firewall.h
->   create mode 100644 drivers/bus/stm32_rifsc.c
->   create mode 100644 include/linux/bus/stm32_firewall_device.h
-> 
+
+> @@ -1605,6 +1788,10 @@ static int __init init_nfsd(void)
+>  	retval =3D register_filesystem(&nfsd_fs_type);
+>  	if (retval)
+>  		goto out_free_all;
+> +	retval =3D genl_register_family(&nfsd_server_nl_family);
+> +	if (retval)
+> +		goto out_free_all;
+> +
+>  	return 0;
+>  out_free_all:
+>  	nfsd4_destroy_laundry_wq();
+> @@ -1629,6 +1816,7 @@ static int __init init_nfsd(void)
+> =20
+>  static void __exit exit_nfsd(void)
+>  {
+> +	genl_unregister_family(&nfsd_server_nl_family);
+>  	unregister_filesystem(&nfsd_fs_type);
+>  	nfsd4_destroy_laundry_wq();
+>  	unregister_cld_notifier();
+> diff --git a/fs/nfsd/nfsd.h b/fs/nfsd/nfsd.h
+> index 11c14faa6c67..d787bd38c053 100644
+> --- a/fs/nfsd/nfsd.h
+> +++ b/fs/nfsd/nfsd.h
+> @@ -62,6 +62,22 @@ struct readdir_cd {
+>  	__be32			err;	/* 0, nfserr, or nfserr_eof */
+>  };
+> =20
+> +/* Maximum number of operations per session compound */
+> +#define NFSD_MAX_OPS_PER_COMPOUND	50
+> +
+> +struct nfsd_genl_rqstp {
+> +	struct sockaddr daddr;
+> +	struct sockaddr saddr;
+> +	unsigned long rq_flags;
+> +	ktime_t rq_stime;
+> +	__be32 rq_xid;
+> +	u32 rq_vers;
+> +	u32 rq_prog;
+> +	u32 rq_proc;
+> +	/* NFSv4 compund */
+> +	u32 opnum[NFSD_MAX_OPS_PER_COMPOUND];
+> +	u16 opcnt;
+> +};
+> =20
+>  extern struct svc_program	nfsd_program;
+>  extern const struct svc_version	nfsd_version2, nfsd_version3, nfsd_versi=
+on4;
+> diff --git a/fs/nfsd/nfssvc.c b/fs/nfsd/nfssvc.c
+> index 1582af33e204..fad34a7325b3 100644
+> --- a/fs/nfsd/nfssvc.c
+> +++ b/fs/nfsd/nfssvc.c
+> @@ -998,6 +998,15 @@ int nfsd_dispatch(struct svc_rqst *rqstp)
+>  	if (!proc->pc_decode(rqstp, &rqstp->rq_arg_stream))
+>  		goto out_decode_err;
+> =20
+> +	/*
+> +	 * Release rq_status_counter setting it to an odd value after the rpc
+> +	 * request has been properly parsed. rq_status_counter is used to
+> +	 * notify the consumers if the rqstp fields are stable
+> +	 * (rq_status_counter is odd) or not meaningful (rq_status_counter
+> +	 * is even).
+> +	 */
+> +	smp_store_release(&rqstp->rq_status_counter, rqstp->rq_status_counter |=
+ 1);
+> +
+>  	rp =3D NULL;
+>  	switch (nfsd_cache_lookup(rqstp, &rp)) {
+>  	case RC_DOIT:
+> @@ -1015,6 +1024,12 @@ int nfsd_dispatch(struct svc_rqst *rqstp)
+>  	if (!proc->pc_encode(rqstp, &rqstp->rq_res_stream))
+>  		goto out_encode_err;
+> =20
+> +	/*
+> +	 * Release rq_status_counter setting it to an even value after the rpc
+> +	 * request has been properly processed.
+> +	 */
+> +	smp_store_release(&rqstp->rq_status_counter, rqstp->rq_status_counter +=
+ 1);
+> +
+>  	nfsd_cache_update(rqstp, rp, rqstp->rq_cachetype, statp + 1);
+>  out_cached_reply:
+>  	return 1;
+> diff --git a/fs/nfsd/state.h b/fs/nfsd/state.h
+> index cbddcf484dba..41bdc913fa71 100644
+> --- a/fs/nfsd/state.h
+> +++ b/fs/nfsd/state.h
+> @@ -174,8 +174,6 @@ static inline struct nfs4_delegation *delegstateid(st=
+ruct nfs4_stid *s)
+> =20
+>  /* Maximum number of slots per session. 160 is useful for long haul TCP =
+*/
+>  #define NFSD_MAX_SLOTS_PER_SESSION     160
+> -/* Maximum number of operations per session compound */
+> -#define NFSD_MAX_OPS_PER_COMPOUND	50
+>  /* Maximum  session per slot cache size */
+>  #define NFSD_SLOT_CACHE_SIZE		2048
+>  /* Maximum number of NFSD_SLOT_CACHE_SIZE slots per session */
+> diff --git a/include/linux/sunrpc/svc.h b/include/linux/sunrpc/svc.h
+> index dbf5b21feafe..caa20defd255 100644
+> --- a/include/linux/sunrpc/svc.h
+> +++ b/include/linux/sunrpc/svc.h
+> @@ -251,6 +251,7 @@ struct svc_rqst {
+>  						 * net namespace
+>  						 */
+>  	void **			rq_lease_breaker; /* The v4 client breaking a lease */
+> +	unsigned int		rq_status_counter; /* RPC processing counter */
+>  };
+> =20
+>  /* bits for rq_flags */
+
+--=20
+Jeff Layton <jlayton@kernel.org>
 
