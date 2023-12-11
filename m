@@ -1,176 +1,119 @@
-Return-Path: <netdev+bounces-55786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0349080C531
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:49:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 680B480C548
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:53:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DCD71C209CF
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 09:49:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8829B20B8E
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 09:53:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E20E6219F2;
-	Mon, 11 Dec 2023 09:49:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD9D21A04;
+	Mon, 11 Dec 2023 09:53:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="eDWpKhKe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hLaiH5iW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FFC4D7;
-	Mon, 11 Dec 2023 01:49:00 -0800 (PST)
-Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BB5Eh5v030119;
-	Mon, 11 Dec 2023 01:48:44 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	PPS06212021; bh=PoiiWUzRFeTheOdRjkrDEE8JNrQqQk/GgJ9siaFpBAU=; b=
-	eDWpKhKefghm9RTliDC4eJNHjb3aF2Lhv286zyaI0uUgc+dXWzis3f+vqmL71o2H
-	LKJ26zOnT1zGXduqBKfUuAJbLY3PvfB/EtOPbx8mMrygysTWwiLu+4Qn8mQP1tQg
-	e2xA2ODi1cUG4vJRdbWSwUjDcIihUGDCyUpSrnPXxdnMnqifnrljGxqpk0jnG15h
-	U3AYxt6UI2y9NbMxO6rlJm96s3/PJSw4gcvQ7YuzT7BGFmPAPcYP3brJiXg8eYb5
-	z50SSoRSDaGQnm17ArbCZQfF0ZBxg+AQBXIeCq6GqR1iPeWBl2mipQ08q5TCwfLD
-	Wu304vH33JT1KVC2Wp/h5A==
-Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3uvmd49bg3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Mon, 11 Dec 2023 01:48:43 -0800 (PST)
-Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 11 Dec 2023 01:48:47 -0800
-Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Mon, 11 Dec 2023 01:48:45 -0800
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <syzbot+006987d1be3586e13555@syzkaller.appspotmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <mani@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-        <syzkaller-bugs@googlegroups.com>
-Subject: [PATCH] radix-tree: fix memory leak in radix_tree_insert
-Date: Mon, 11 Dec 2023 17:48:39 +0800
-Message-ID: <20231211094840.642118-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <000000000000bfba3a060bf4ffcf@google.com>
-References: <000000000000bfba3a060bf4ffcf@google.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F09E219FE
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 09:53:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71A14C433C7;
+	Mon, 11 Dec 2023 09:53:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702288414;
+	bh=RPdfDOpfiLZcdJaTDPN9N5jZHZuWzkzNihgGSQCCDTM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hLaiH5iWOGE6t/pXw4EzMsYUcIzwQzavt/ocJHBoeUFFW8HzLsvsLETOA6aaGcnQW
+	 TDs58Iq5Xzgt6cldaHcabLkUibvk6X6jgrqB6BSaK8CyXeywGMCzENXVvT96qbqpw0
+	 zknDRVV6W+PTW6/pe5U9nkV4+DlTqrWI4rMnHVmdWNyKxhqnRpcm0xTYVG61uU2bdX
+	 5K8KT0cMINieOTVjm2Wru5F4Knm8908qHnY/wqyXHv4Na1gbGPhxcWvm9jNm6iB41H
+	 944/BEwCbkO3F7TQTA7EsCxATp0uSDfR6Hsa/f+DnAwvdiOmOGm3qrfNmYPvbeYdPR
+	 9DH3xm30H2LLg==
+Date: Mon, 11 Dec 2023 10:53:29 +0100
+From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>, Paolo Abeni
+ <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, David Miller
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 net-next] r8169: add support for LED's on
+ RTL8168/RTL8101
+Message-ID: <20231211105329.598473b9@dellmb>
+In-Reply-To: <8861e5b7-b1f5-4ae7-9115-76d7256dec62@gmail.com>
+References: <8861e5b7-b1f5-4ae7-9115-76d7256dec62@gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: pNPi7wZfZzeAjCWv6vYlAjJ8orPVZAcd
-X-Proofpoint-ORIG-GUID: pNPi7wZfZzeAjCWv6vYlAjJ8orPVZAcd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-16_25,2023-11-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=900 bulkscore=0
- phishscore=0 spamscore=0 adultscore=0 malwarescore=0 clxscore=1011
- mlxscore=0 priorityscore=1501 lowpriorityscore=0 suspectscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2312110079
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-[Syz report]
-BUG: memory leak
-unreferenced object 0xffff88810bbf56d8 (size 576):
-  comm "syz-executor250", pid 5051, jiffies 4294951219 (age 12.920s)
-  hex dump (first 32 bytes):
-    3c 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00  <...............
-    f0 a9 2d 0c 81 88 ff ff f0 56 bf 0b 81 88 ff ff  ..-......V......
-  backtrace:
-    [<ffffffff81631398>] kmemleak_alloc_recursive include/linux/kmemleak.h:42 [inline]
-    [<ffffffff81631398>] slab_post_alloc_hook mm/slab.h:766 [inline]
-    [<ffffffff81631398>] slab_alloc_node mm/slub.c:3478 [inline]
-    [<ffffffff81631398>] slab_alloc mm/slub.c:3486 [inline]
-    [<ffffffff81631398>] __kmem_cache_alloc_lru mm/slub.c:3493 [inline]
-    [<ffffffff81631398>] kmem_cache_alloc+0x298/0x430 mm/slub.c:3502
-    [<ffffffff84b5094c>] radix_tree_node_alloc.constprop.0+0x7c/0x1a0 lib/radix-tree.c:276
-    [<ffffffff84b524cf>] __radix_tree_create lib/radix-tree.c:624 [inline]
-    [<ffffffff84b524cf>] radix_tree_insert+0x14f/0x360 lib/radix-tree.c:712
-    [<ffffffff84ae105d>] qrtr_tx_wait net/qrtr/af_qrtr.c:277 [inline]
-    [<ffffffff84ae105d>] qrtr_node_enqueue+0x57d/0x630 net/qrtr/af_qrtr.c:348
-    [<ffffffff84ae26f6>] qrtr_bcast_enqueue+0x66/0xd0 net/qrtr/af_qrtr.c:891
-    [<ffffffff84ae32d2>] qrtr_sendmsg+0x232/0x450 net/qrtr/af_qrtr.c:992
-    [<ffffffff83ec3c32>] sock_sendmsg_nosec net/socket.c:730 [inline]
-    [<ffffffff83ec3c32>] __sock_sendmsg+0x52/0xa0 net/socket.c:745
-    [<ffffffff83ec3d7b>] sock_write_iter+0xfb/0x180 net/socket.c:1158
-    [<ffffffff816961a7>] call_write_iter include/linux/fs.h:2020 [inline]
-    [<ffffffff816961a7>] new_sync_write fs/read_write.c:491 [inline]
-    [<ffffffff816961a7>] vfs_write+0x327/0x590 fs/read_write.c:584
-    [<ffffffff816966fb>] ksys_write+0x13b/0x170 fs/read_write.c:637
-    [<ffffffff84b6ddcf>] do_syscall_x64 arch/x86/entry/common.c:51 [inline]
-    [<ffffffff84b6ddcf>] do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
-    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0x6b
+Hello Heiner,
 
-[Analysis]
-When creating child nodes, if not all child nodes used to store indexes are created,
-so the child nodes created before the failure should be released.
+On Fri, 8 Dec 2023 18:48:27 +0100
+Heiner Kallweit <hkallweit1@gmail.com> wrote:
 
-Reported-and-tested-by: syzbot+006987d1be3586e13555@syzkaller.appspotmail.com
-Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
----
- lib/radix-tree.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+> +static void rtl8168_setup_ldev(struct r8169_led_classdev *ldev,
+> +			       struct net_device *ndev, int index)
+> +{
+> +	struct rtl8169_private *tp = netdev_priv(ndev);
+> +	struct led_classdev *led_cdev = &ldev->led;
+> +	char led_name[LED_MAX_NAME_SIZE];
+> +
+> +	ldev->ndev = ndev;
+> +	ldev->index = index;
+> +
+> +	r8169_get_led_name(tp, index, led_name, LED_MAX_NAME_SIZE);
+> +	led_cdev->name = led_name;
+> +	led_cdev->default_trigger = "netdev";
+> +	led_cdev->hw_control_trigger = "netdev";
+> +	led_cdev->flags |= LED_RETAIN_AT_SHUTDOWN;
+> +	led_cdev->hw_control_is_supported = rtl8168_led_hw_control_is_supported;
+> +	led_cdev->hw_control_set = rtl8168_led_hw_control_set;
+> +	led_cdev->hw_control_get = rtl8168_led_hw_control_get;
+> +	led_cdev->hw_control_get_device = r8169_led_hw_control_get_device;
+> +
+> +	/* ignore errors */
+> +	devm_led_classdev_register(&ndev->dev, led_cdev);
+> +}
 
-diff --git a/lib/radix-tree.c b/lib/radix-tree.c
-index a89df8afa510..c5caf5b7523a 100644
---- a/lib/radix-tree.c
-+++ b/lib/radix-tree.c
-@@ -616,9 +616,10 @@ static int __radix_tree_create(struct radix_tree_root *root,
- 	struct radix_tree_node *node = NULL, *child;
- 	void __rcu **slot = (void __rcu **)&root->xa_head;
- 	unsigned long maxindex;
--	unsigned int shift, offset = 0;
-+	unsigned int shift, offset = 0, mmshift = 0;
- 	unsigned long max = index;
- 	gfp_t gfp = root_gfp_mask(root);
-+	int ret;
- 
- 	shift = radix_tree_load_root(root, &child, &maxindex);
- 
-@@ -628,6 +629,7 @@ static int __radix_tree_create(struct radix_tree_root *root,
- 		if (error < 0)
- 			return error;
- 		shift = error;
-+		mmshift = error;
- 		child = rcu_dereference_raw(root->xa_head);
- 	}
- 
-@@ -637,8 +639,10 @@ static int __radix_tree_create(struct radix_tree_root *root,
- 			/* Have to add a child node.  */
- 			child = radix_tree_node_alloc(gfp, node, root, shift,
- 							offset, 0, 0);
--			if (!child)
--				return -ENOMEM;
-+			if (!child) {
-+				 ret = -ENOMEM;
-+				 goto freec;
-+			}
- 			rcu_assign_pointer(*slot, node_to_entry(child));
- 			if (node)
- 				node->count++;
-@@ -656,6 +660,17 @@ static int __radix_tree_create(struct radix_tree_root *root,
- 	if (slotp)
- 		*slotp = slot;
- 	return 0;
-+freec:
-+	if (mmshift > 0) {
-+		struct radix_tree_node *pn;
-+		while (shift < mmshift && node) {
-+			pn = node->parent;
-+			radix_tree_node_rcu_free(&node->rcu_head);
-+			shift += RADIX_TREE_MAP_SHIFT;
-+			node = pn;
-+		}
-+	}
-+	return ret;
- }
- 
- /*
--- 
-2.43.0
+...
 
+> +void r8169_get_led_name(struct rtl8169_private *tp, int idx,
+> +			char *buf, int buf_len)
+> +{
+> +	snprintf(buf, buf_len, "r8169-%x%x-led%d",
+> +		 pci_domain_nr(tp->pci_dev->bus),
+> +		 pci_dev_id(tp->pci_dev), idx);
+> +}
+
+Please look at Documentation/leds/leds-class.rst:
+  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/leds/leds-class.rst?h=v6.7-rc5
+
+LED devices should have name in the format
+  "devicename:color:function"
+Where color is one from the led_colors array from
+drivers/leds/led-core.c (or omitted if you cannot know) and function is
+one from the LED_FUNCTION_ macros from
+include/dt-bindings/leds/common.h.
+
+When skipping color, you should keep the colon sign, i.e.
+  usbnet0::lan
+
+Regarding the devicename part: originally it was thought to be
+something like eth0 (like the LED for mmc0 has devicename mmc0),
+but since network interfaces can be renamed and their names are not
+guaranteeed to be persisnet across boots, maybe you can reuse the
+Predictable Network Interface Names scheme for USB devices
+  https://www.freedesktop.org/software/systemd/man/latest/systemd.net-naming-scheme.html
+
+Please don't put the driver name (r8169) there.
+
+Marek
 
