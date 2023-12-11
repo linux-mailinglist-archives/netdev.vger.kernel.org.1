@@ -1,332 +1,190 @@
-Return-Path: <netdev+bounces-55704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEF0380C05A
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 05:21:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C73980C065
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 05:42:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67B54280C67
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 04:21:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F5FCB20800
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 04:42:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30BDD1947F;
-	Mon, 11 Dec 2023 04:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E21019BB8;
+	Mon, 11 Dec 2023 04:42:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aPB+fB03"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OJjgmk4B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 536B0DA
-	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 20:21:33 -0800 (PST)
-Received: by mail-vs1-xe2c.google.com with SMTP id ada2fe7eead31-46603b0de2fso649041137.3
-        for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 20:21:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702268492; x=1702873292; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H8/aEGODWLQyR+Ehqt9zVQlYBaFeN9s1x0j4MUOMfuY=;
-        b=aPB+fB03P1mjYsUmPh+v1cgP1L+iI3kIry6eKGm6t3MGZ/PcdmAvmT9pTkWmw1ciot
-         z9sLY57mJOLOoNHdK9CIeB6pnn9l2EbeBN7VZTkPlk6+tyJTbNyUm3mZ4/ztebF9bwdH
-         MOcO76ILsXgQ0Iu6E2gVYalReZJRETqbmckRjemNJXhFT2VV3e0959HXwiZd0fpebgIc
-         rjQVX7TYHKsmbj1YQlcb5S0FxMoTmw9kq0oKRup5+tyBZhbOAQvyAL+LT1J0QVzZ6Bl+
-         Rw2iGuexqhb2lsWh+RysR4+hP4Lnut7BNkJ3wf3D0McYhWhzgBiElnsZpw3gATYPJuQ2
-         H3gQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702268492; x=1702873292;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H8/aEGODWLQyR+Ehqt9zVQlYBaFeN9s1x0j4MUOMfuY=;
-        b=tWZMXT1Q5/iSKAaeFOIoZxgkAn703F+7fV/tmPpApk21/MPN2Th4IsbG/lUXsRvznL
-         abIrwV10zpmcViL4n4qy8v6UWHx+WSAt0lB7yMloOFyEtlA+AAmb489Wlxd5DCGhSsmW
-         J2uh/ggrLgcIo+pSNMRE8cGYKtHoMUtpwO87hnHG+/0KLi/qdjTX5Pd3K13BlfGkxfZa
-         qIOGjCIr7K7ptVnHVCknblHnDamE3TsWD/K5YcWwdZ7bIdpsfsBOwnzPAWxR3wPVKqkr
-         AIyPN6YorQvIcOyQl+KpPIKpvQV+V7P52r5KfmVpefQ72r/PrfP9K4WJ0YoINQJK7Evg
-         SBjg==
-X-Gm-Message-State: AOJu0Yz2m7JgHtKnH932ibpBwb/RM3MvW2WUNHhzErR1vs+52mIJLwgW
-	mziSoUvjEthRbZt8+8f/l0vxW+UiNp298sIIr1PjCg==
-X-Google-Smtp-Source: AGHT+IEHw5pq3fytxwBk+eZGmvzRYn/8p+W9cVF0ENu6U7xeRe54oCpUeMlsmrnzh19Jo757GGewV5ZEfwxBhu8cAcE=
-X-Received: by 2002:a05:6102:54a1:b0:464:84e4:fa70 with SMTP id
- bk33-20020a05610254a100b0046484e4fa70mr2257691vsb.24.1702268492207; Sun, 10
- Dec 2023 20:21:32 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCCC2E8
+	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 20:42:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702269731; x=1733805731;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=yrY2cZgTPIjQGF3OUP0jtzAopAthM8CfcMv5TjbSQmc=;
+  b=OJjgmk4BS3n7K02deoYU46/s4dGOMV7dHMBYAeF0pxHOdQHI8Jf8CLEf
+   CEjEc25w5R2/SyTjhsJLzfnwIqD1UzcQdnbYDtjkBt/UuclQYWBqaoBF2
+   +knuEA6lt9Uvk1cEfpprpl9QkMfHBPBx6FisKulNbUUM26kK+4rz8DFzj
+   XBgLN8ymHitPbq9pFvQ3nTX1HhurZ86ta0Jn5lGh6drq224IB06N/nX3V
+   5eLrX120SIjoIJDowKmfA6Mq76HEhe595kl2VGs2X/u3i77/U1OnZuPIp
+   kY+tNBEaoxLEo3h+f5b2xg8yKCWP+W+TezwNC4AgUZjGw30GFgMOAdioT
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10920"; a="480784178"
+X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
+   d="scan'208";a="480784178"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2023 20:42:11 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10920"; a="772896927"
+X-IronPort-AV: E=Sophos;i="6.04,267,1695711600"; 
+   d="scan'208";a="772896927"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Dec 2023 20:42:11 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sun, 10 Dec 2023 20:42:10 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sun, 10 Dec 2023 20:42:10 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Sun, 10 Dec 2023 20:42:10 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Sun, 10 Dec 2023 20:42:09 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Wbtn/BmZ3UyHckjeF838wa8Fed6joOT76kgJ3EWj/jOS6c2S0+zwlwrR3ZsklzrzkanNomaX1jsN3dcYzBPyvY/UGkAba84+O4ANxwuW0H820TO/3/PI5cSpluZ/Hx5CRNHFqP0fgkwFYUxZKyDInsWKicFhP2szDJzz34v3erC8/PeaV9h8s0YXUZjz3hUq6Oju6vejffZUGXyY6AkG6K0kl+LviYprB//tZbIt/oIT0rPrc+MjQIlxu1ZSETRVyJMdyvuyBjtnQRdZiaExYgYh8pObOuyUSygkMWC0mGiIWuO0f4UG4vtZnT+Hr2c67shxQVWP6Cu3BOl0688CyQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7M4ANUXBV1K3gSqzANXxyGNdCghXpXp9CtUpxR7hrbA=;
+ b=WjTXGHbL8NP6z66dHCsEE282N6aO/lDNPDYic4Xg6M+m/vuN+rgq9GNg6ei8t6BTGJkzVBTgYGpAuloHpELlHiFIwZ3DvAQQWiJvG6KdX3Z1sRRnThNQacUvOr7wI9gIBwHQjCPDYkTj83kmceUt5Vz5UXVkxxx04fEHy7bxW1qKdE7ljpMtTHTpF79WFMCN6W1xOx3nqhTNDaqtjMuNPPpP0DTzOZ7tWyZdL/CVXMiXAp2eZLNJ2y9pjlZwTt7QFzCyNFDokN4+bZ2svcE8Z7jbAPWK3oFz0kvDM7omKE+sAAqpmIaqwSK/hjRPzdLYPfjzSD13JWjUqikmqEyIIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com (2603:10b6:208:75::32)
+ by CH0PR11MB5690.namprd11.prod.outlook.com (2603:10b6:610:ed::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Mon, 11 Dec
+ 2023 04:42:05 +0000
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::954:6050:f988:740f]) by BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::954:6050:f988:740f%4]) with mapi id 15.20.7068.031; Mon, 11 Dec 2023
+ 04:42:04 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: "Kolacinski, Karol" <karol.kolacinski@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "Michalik, Michal" <michal.michalik@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"Kolacinski, Karol" <karol.kolacinski@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH v2 iwl-next 1/2] ice: Schedule service
+ task in IRQ top half
+Thread-Topic: [Intel-wired-lan] [PATCH v2 iwl-next 1/2] ice: Schedule service
+ task in IRQ top half
+Thread-Index: AQHaIsFX0uZdUdRikkaTz6AY4o/bOLCjktDg
+Date: Mon, 11 Dec 2023 04:42:03 +0000
+Message-ID: <BL0PR11MB3122ACC8A0DF4F77DF5EE3BEBD8FA@BL0PR11MB3122.namprd11.prod.outlook.com>
+References: <20231129124023.741299-1-karol.kolacinski@intel.com>
+In-Reply-To: <20231129124023.741299-1-karol.kolacinski@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL0PR11MB3122:EE_|CH0PR11MB5690:EE_
+x-ms-office365-filtering-correlation-id: 984a2b63-d88a-4813-9611-08dbfa03858e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: N/8f2zDfIiHIfjZ/a0oULuAghUiK2uHDyjZVoBxy9iZ9TI0mKgSdq+7UySAMUWPbqekIcfKROV3Giu7zAIIxCep8EjCrBZxgzH+KoqwMUGC7765MWQmgxn4ma16mSDkVj4oJ2lCcff9Z/QCE+Z9folnhwizBvxfJmrI2PPeAF+8oyQ9YJB/fpkrcuQCJkNwtllJK0HKrS/dO57rum2r5Ai7cGfS12zr6yWJJfyKyGGcMUb5UlIaIVpgCSDnA74ivURRHNUftAn8YQF1btEiDcTdREy8X/0Zna4Lmq2zpzq1Qdbk40cgbJuAGqEtWALSYW5U1IB02c/XlLLLH+mArX1j1n5LHGSupFNKQKx4BRVxMftbG7NRtD3zqScj5aLG9guG+5wqGZBaX57PFuMXuVXyR8RNklsvHps4B8ddcXWe1GxAtq3VjBwOIZKnu8z2gb5tBrJ9AePOyxpW04Sxou7CWRLu5tXTgKjuRr6ubW1gtVy+ju6q+YX7Oopj7Ud/5tSkfdr21jW2u9pJqnQuqq6zkLp8WNJ8Hvic1UmtCNNBj20zLQDOnTfUosRCP/Th16AIdpcCBn80RjcJYVSqJUKjXqzkJjRlVWuNDxd8+XqkmiXS3+kYg1xRgOypFDSrL
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3122.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(39860400002)(376002)(396003)(136003)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(4326008)(8676002)(8936002)(52536014)(5660300002)(7696005)(6506007)(53546011)(71200400001)(107886003)(9686003)(66446008)(64756008)(66556008)(66476007)(66946007)(76116006)(110136005)(54906003)(316002)(478600001)(41300700001)(38070700009)(4744005)(2906002)(33656002)(86362001)(82960400001)(122000001)(26005)(55016003)(38100700002)(83380400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?J9IQZgZFSm4dD04bIVKdPEbl/GTIW8w4MDB4UV7wm4CSH80b7lSp2IxBQFIV?=
+ =?us-ascii?Q?HKYsv2QnPL3PDL7oz7tD1h86xqfcOh/nlgG7GXCmYgf/ley4aKkD9zZ+L/9H?=
+ =?us-ascii?Q?PhDw3D12z86Lm1ftA8tNABQ6y8a5vuJyR0OYZEPz83pq8ipI/zbc3vyi6GbP?=
+ =?us-ascii?Q?ybu5nqn6H7296za/3+D2ng9q+n2J4Aggy7CUL+e2OWd4teadYgxcVFk+/AKx?=
+ =?us-ascii?Q?fHKfEegMSvivjzlEXx49FY5uvkvDJ0bj2/B0xm3BirmEfJy0WT1KoH9Z9adU?=
+ =?us-ascii?Q?ZdQBFKu9UbfahgkNR8FXB5pSthVX9t483di5KOgLwl0Uxvg/g6kqkQFbspm4?=
+ =?us-ascii?Q?8r4KCK96eEz05px5sekBiyMCGml2xIZxoYZs0nwypVmhlYivWxAunwWqFHXQ?=
+ =?us-ascii?Q?ZNbpQ8VzSfpHRNdFlubb5F0uPyuHzwhgqaL1UsF9VpBdvONuCeenOI/kL0GN?=
+ =?us-ascii?Q?Y1VQB11MaMUdhS1BKBfB9WCeirKcpVa1O1pKNUpoDANcsGtUand2PG8xdP5l?=
+ =?us-ascii?Q?KOtOqaxVdxXmRiL0NUWmSTQj2ouTe/ygrWbQ/zPBv/NKSqHeS8Y6dIY2N0oP?=
+ =?us-ascii?Q?XacroM2WapZFsfaAxhvxhhpimPQ3wXKqTiHTVixnJPs1/j93NZYMzWpN1k0Z?=
+ =?us-ascii?Q?ZC7mr5VYaVvO3E53ir2gUFVpUUIaeHfnfaUHH2taIszS4vxtJ62eFMK5yX1t?=
+ =?us-ascii?Q?5R4G2S+UedxxiXV0Wv2ER/P60GNWARFn4mt+N39/eatmIiIRZIvXMZIBM1df?=
+ =?us-ascii?Q?HlIgQxoUI8LZMnqcHHl2/Re4WiMZKdVgUCG2Xc2dNLF4BUgaNOT+AWJAm0pK?=
+ =?us-ascii?Q?eU4I32Z0r/l0w/JMH7W5f05uvP81bgOLs+QcTG0h4tmJGsMscxC++vrZ+Ost?=
+ =?us-ascii?Q?xK9ti75p+ChjSJa0oBEs3DjMTxb544La+ZHgrz+1aLAHGmPqCMvmi0chhdoN?=
+ =?us-ascii?Q?PzHTy8Noakw1phYFh6l9r83BCrQDxNcc1cEK+4eoSQdGcELAAnugoNabDxUh?=
+ =?us-ascii?Q?wkyy6Boml7j3PVUybv5fIbDs8bINy60u3ogJw4BsGpkUJSCkVKAAEiQGn6O4?=
+ =?us-ascii?Q?wufgEt5ZWcU2o/DKJukahWhPC+/8tqTBQ+a+CW7sFowz53AUynU5560oNb6F?=
+ =?us-ascii?Q?LgJMu2f3CnEBlnasxrNIIFB7TO+tNGyImEOkJSkFdG6nWGmcrYcHLyxE/8en?=
+ =?us-ascii?Q?UACt2KUxqrrJsLMBuxFcsQ7dLUKTLw60BwsPkbpPx7UKXNPXsYzrkkkB/3TN?=
+ =?us-ascii?Q?UEN6VuBqAE9n2Wft2P85DeALCvdIQ571xZrRMVGgDTAZ0hyKR4Vp+K+TBPh5?=
+ =?us-ascii?Q?lAG8oIAKh4MLFPWqVIPzLBfZXHCZPlNJDOXURPCXPmQ30QH3hDRtt6lToroc?=
+ =?us-ascii?Q?cuhkRJG0vsf0woq1UU3lWRY9/NfAjb1gONhdcpl22vuMN8YUPlJ6JFGqXwfC?=
+ =?us-ascii?Q?fR/rB4MqqLqYuDjCkU4CzkH/WBmrYPFLvYDcUf0ivTPdbThEQyo19cBh65QD?=
+ =?us-ascii?Q?OY+zzy51llZmzW5R+6x0GkwW6pxQ423lHoga4oT5d8ybhnR//onH8/pxzJN3?=
+ =?us-ascii?Q?x7OnkRyv2D1OH16FJbrZVd80j2NJsS/9BUF3iEUaa4ASZt5t/ny1jsaeNuwW?=
+ =?us-ascii?Q?8w=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231206105419.27952-1-liangchen.linux@gmail.com>
- <20231206105419.27952-5-liangchen.linux@gmail.com> <CAHS8izNQeSwWQ9NwiDUcPoSX1WONG4JYu2rfpqF3+4xkxE=Wyw@mail.gmail.com>
- <CAKhg4t+LpF=G0DBhbuRYtxKyTrMiR3pSc15sY42kc57iGQfPmw@mail.gmail.com>
-In-Reply-To: <CAKhg4t+LpF=G0DBhbuRYtxKyTrMiR3pSc15sY42kc57iGQfPmw@mail.gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Sun, 10 Dec 2023 20:21:21 -0800
-Message-ID: <CAHS8izPpWZvOSswHP0n-_nBiUMw8Ay2iM4yFE-HZenHv51iBHA@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 4/4] skbuff: Optimization of SKB coalescing
- for page pool
-To: Liang Chen <liangchen.linux@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, hawk@kernel.org, ilias.apalodimas@linaro.org, 
-	linyunsheng@huawei.com, netdev@vger.kernel.org, linux-mm@kvack.org, 
-	jasowang@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3122.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 984a2b63-d88a-4813-9611-08dbfa03858e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Dec 2023 04:42:03.5588
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: SQ4ZrYYPfM9jygrE/mjCFbo3L6t80Wdh5bBtEzPyqqUYXLqSNjwURMXzLadWFJkK3cw4v3eFTVpSDtle2YwVxecmFfuDKI8RAT4jYM0GsWvrLzef2KWBLKt0zxG/RB73
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5690
+X-OriginatorOrg: intel.com
 
-On Sun, Dec 10, 2023 at 7:38=E2=80=AFPM Liang Chen <liangchen.linux@gmail.c=
-om> wrote:
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of K=
+arol Kolacinski
+> Sent: Wednesday, November 29, 2023 6:10 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: Michalik, Michal <michal.michalik@intel.com>; netdev@vger.kernel.org;=
+ Brandeburg, Jesse <jesse.brandeburg@intel.com>; Kolacinski, Karol <karol.k=
+olacinski@intel.com>; Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitsz=
+el, Przemyslaw <przemyslaw.kitszel@intel.com>
+> Subject: [Intel-wired-lan] [PATCH v2 iwl-next 1/2] ice: Schedule service =
+task in IRQ top half
 >
-> On Sat, Dec 9, 2023 at 10:18=E2=80=AFAM Mina Almasry <almasrymina@google.=
-com> wrote:
-> >
-> > On Wed, Dec 6, 2023 at 2:54=E2=80=AFAM Liang Chen <liangchen.linux@gmai=
-l.com> wrote:
-> > >
-> > > In order to address the issues encountered with commit 1effe8ca4e34
-> > > ("skbuff: fix coalescing for page_pool fragment recycling"), the
-> > > combination of the following condition was excluded from skb coalesci=
-ng:
-> > >
-> > > from->pp_recycle =3D 1
-> > > from->cloned =3D 1
-> > > to->pp_recycle =3D 1
-> > >
-> > > However, with page pool environments, the aforementioned combination =
-can
-> > > be quite common(ex. NetworkMananger may lead to the additional
-> > > packet_type being registered, thus the cloning). In scenarios with a
-> > > higher number of small packets, it can significantly affect the succe=
-ss
-> > > rate of coalescing. For example, considering packets of 256 bytes siz=
-e,
-> > > our comparison of coalescing success rate is as follows:
-> > >
-> > > Without page pool: 70%
-> > > With page pool: 13%
-> > >
-> > > Consequently, this has an impact on performance:
-> > >
-> > > Without page pool: 2.57 Gbits/sec
-> > > With page pool: 2.26 Gbits/sec
-> > >
-> > > Therefore, it seems worthwhile to optimize this scenario and enable
-> > > coalescing of this particular combination. To achieve this, we need t=
-o
-> > > ensure the correct increment of the "from" SKB page's page pool
-> > > reference count (pp_ref_count).
-> > >
-> > > Following this optimization, the success rate of coalescing measured =
-in
-> > > our environment has improved as follows:
-> > >
-> > > With page pool: 60%
-> > >
-> > > This success rate is approaching the rate achieved without using page
-> > > pool, and the performance has also been improved:
-> > >
-> > > With page pool: 2.52 Gbits/sec
-> > >
-> > > Below is the performance comparison for small packets before and afte=
-r
-> > > this optimization. We observe no impact to packets larger than 4K.
-> > >
-> > > packet size     before      after       improved
-> > > (bytes)         (Gbits/sec) (Gbits/sec)
-> > > 128             1.19        1.27        7.13%
-> > > 256             2.26        2.52        11.75%
-> > > 512             4.13        4.81        16.50%
-> > > 1024            6.17        6.73        9.05%
-> > > 2048            14.54       15.47       6.45%
-> > > 4096            25.44       27.87       9.52%
-> > >
-> > > Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
-> > > Reviewed-by: Yunsheng Lin <linyunsheng@huawei.com>
-> > > Suggested-by: Jason Wang <jasowang@redhat.com>
-> > > ---
-> > >  include/net/page_pool/helpers.h |  5 ++++
-> > >  net/core/skbuff.c               | 41 +++++++++++++++++++++++--------=
---
-> > >  2 files changed, 34 insertions(+), 12 deletions(-)
-> > >
-> > > diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/=
-helpers.h
-> > > index 9dc8eaf8a959..268bc9d9ffd3 100644
-> > > --- a/include/net/page_pool/helpers.h
-> > > +++ b/include/net/page_pool/helpers.h
-> > > @@ -278,6 +278,11 @@ static inline long page_pool_unref_page(struct p=
-age *page, long nr)
-> > >         return ret;
-> > >  }
-> > >
-> > > +static inline void page_pool_ref_page(struct page *page)
-> > > +{
-> > > +       atomic_long_inc(&page->pp_ref_count);
-> > > +}
-> > > +
-> > >  static inline bool page_pool_is_last_ref(struct page *page)
-> > >  {
-> > >         /* If page_pool_unref_page() returns 0, we were the last user=
- */
-> > > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > > index 7e26b56cda38..3c2515a29376 100644
-> > > --- a/net/core/skbuff.c
-> > > +++ b/net/core/skbuff.c
-> > > @@ -947,6 +947,24 @@ static bool skb_pp_recycle(struct sk_buff *skb, =
-void *data, bool napi_safe)
-> > >         return napi_pp_put_page(virt_to_page(data), napi_safe);
-> > >  }
-> > >
-> > > +/**
-> > > + * skb_pp_frag_ref() - Increase fragment reference count of a page
-> > > + * @page:      page of the fragment on which to increase a reference
-> > > + *
-> > > + * Increase fragment reference count (pp_ref_count) on a page, but i=
-f it is
-> > > + * not a page pool page, fallback to increase a reference(_refcount)=
- on a
-> > > + * normal page.
-> > > + */
-> > > +static void skb_pp_frag_ref(struct page *page)
-> > > +{
-> > > +       struct page *head_page =3D compound_head(page);
-> > > +
-> > > +       if (likely(is_pp_page(head_page)))
-> > > +               page_pool_ref_page(head_page);
-> > > +       else
-> > > +               page_ref_inc(head_page);
-> > > +}
-> > > +
-> >
-> > I am confused by this, why add a new helper instead of modifying the
-> > existing helper, skb_frag_ref()?
-> >
-> > My mental model is that if the net stack wants to acquire a reference
-> > on a frag, it calls skb_frag_ref(), and if it wants to drop a
-> > reference on a frag, it should call skb_frag_unref(). Internally
-> > skb_frag_ref/unref() can do all sorts of checking to decide whether to
-> > increment page->refcount or page->pp_ref_count. I can't wrap my head
-> > around the introduction of skb_pp_frag_ref(), but no equivalent
-> > skb_pp_frag_unref().
-> >
-> > But even if skb_pp_frag_unref() was added, when should the net stack
-> > use skb_frag_ref/unref, and when should the stack use
-> > skb_pp_ref/unref? The docs currently describe what the function does,
-> > but when a program unfamiliar with the page pool should use it.
-> >
-> > >  static void skb_kfree_head(void *head, unsigned int end_offset)
-> > >  {
-> > >         if (end_offset =3D=3D SKB_SMALL_HEAD_HEADROOM)
-> > > @@ -5769,17 +5787,12 @@ bool skb_try_coalesce(struct sk_buff *to, str=
-uct sk_buff *from,
-> > >                 return false;
-> > >
-> > >         /* In general, avoid mixing page_pool and non-page_pool alloc=
-ated
-> > > -        * pages within the same SKB. Additionally avoid dealing with=
- clones
-> > > -        * with page_pool pages, in case the SKB is using page_pool f=
-ragment
-> > > -        * references (page_pool_alloc_frag()). Since we only take fu=
-ll page
-> > > -        * references for cloned SKBs at the moment that would result=
- in
-> > > -        * inconsistent reference counts.
-> > > -        * In theory we could take full references if @from is cloned=
- and
-> > > -        * !@to->pp_recycle but its tricky (due to potential race wit=
-h
-> > > -        * the clone disappearing) and rare, so not worth dealing wit=
-h.
-> > > +        * pages within the same SKB. In theory we could take full
-> > > +        * references if @from is cloned and !@to->pp_recycle but its
-> > > +        * tricky (due to potential race with the clone disappearing)=
- and
-> > > +        * rare, so not worth dealing with.
-> > >          */
-> > > -       if (to->pp_recycle !=3D from->pp_recycle ||
-> > > -           (from->pp_recycle && skb_cloned(from)))
-> > > +       if (to->pp_recycle !=3D from->pp_recycle)
-> > >                 return false;
-> > >
-> > >         if (len <=3D skb_tailroom(to)) {
-> > > @@ -5836,8 +5849,12 @@ bool skb_try_coalesce(struct sk_buff *to, stru=
-ct sk_buff *from,
-> > >         /* if the skb is not cloned this does nothing
-> > >          * since we set nr_frags to 0.
-> > >          */
-> > > -       for (i =3D 0; i < from_shinfo->nr_frags; i++)
-> > > -               __skb_frag_ref(&from_shinfo->frags[i]);
-> > > +       if (from->pp_recycle)
-> > > +               for (i =3D 0; i < from_shinfo->nr_frags; i++)
-> > > +                       skb_pp_frag_ref(skb_frag_page(&from_shinfo->f=
-rags[i]));
-> > > +       else
-> > > +               for (i =3D 0; i < from_shinfo->nr_frags; i++)
-> > > +                       __skb_frag_ref(&from_shinfo->frags[i]);
-> >
-> > You added a check here to use skb_pp_frag_ref() instead of
-> > skb_frag_ref() here, but it's not clear to me why other callsites of
-> > skb_frag_ref() don't need to be modified in the same way after your
-> > patch.
-> >
-> > After your patch:
-> >
-> > skb_frag_ref() will always increment page->_refcount
-> > skb_frag_unref() will either decrement page->_refcount or decrement
-> > page->pp_ref_count (depending on the value of skb->pp_recycle).
-> > skb_pp_frag_ref() will either increment page->_refcount or increment
-> > page->pp_ref_count (depending on the value of is_pp_page(), not
-> > skb->pp_recycle).
-> > skb_pp_frag_unref() doesn't exist.
-> >
-> > Is this not confusing? Can we streamline things:
-> >
-> > skb_frag_ref() increments page->pp_ref_count for skb->pp_recycle,
-> > page->_refcount otherwise.
-> > skb_frag_unref() decrement page->pp_ref_count for skb->pp_recycle,
-> > page->_refcount otherwise.
-> >
-> > Or am I missing something that causes us to require this asymmetric
-> > reference counting?
-> >
+> Schedule service task and EXTTS in the top half to avoid bottom half
+> scheduling if possible, which significantly reduces timestamping delay.
 >
-> This idea was previously implemented, as shown here:
-> https://lore.kernel.org/all/20211009093724.10539-5-linyunsheng@huawei.com=
-/.
-> But implementing this would result in some unnecessary overhead, since
-> currently, 'skb_try_coalesce' is the only place where the page pool
-> reference count for skb frag might be increased. I would prefer to
-> move the logic to '__skb_frag_ref' when such a need becomes more
-> common. Thanks!
+> Co-developed-by: Michal Michalik <michal.michalik@intel.com>
+> Signed-off-by: Michal Michalik <michal.michalik@intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> ---
+> V1 -> V2: Added missing opening curly brace
+>
+>  drivers/net/ethernet/intel/ice/ice.h      |  1 -
+>  drivers/net/ethernet/intel/ice/ice_main.c | 20 +++++++++++---------
+>  2 files changed, 11 insertions(+), 10 deletions(-)
 >
 
-Is it possible/desirable to add a comment to skb_frag_ref() that it
-should not be used with skb->pp_recycle? At least I was tripped by
-this, but maybe it's considered obvious somehow.
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
-But I feel like this maybe needs to be fixed. Why does the page_pool
-need a separate page->pp_ref_count? Why not use page->_refcount like
-the rest of the code? Is there a history here behind this decision
-that you can point me to? It seems to me that
-incrementing/decrementing page->pp_ref_count may be equivalent to
-doing the same on page->_refcount.
-
-> > >
-> > >         to->truesize +=3D delta;
-> > >         to->len +=3D len;
-> > > --
-> > > 2.31.1
-> > >
-> > >
-> >
-> >
-> > --
-> > Thanks,
-> > Mina
-
-
-
---=20
-Thanks,
-Mina
 
