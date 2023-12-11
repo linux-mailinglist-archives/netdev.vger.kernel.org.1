@@ -1,88 +1,130 @@
-Return-Path: <netdev+bounces-55955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 624AE80CF4F
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 16:20:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE5F580CF59
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 16:21:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A9881C2032E
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:20:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6517F1F21672
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:21:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF4474AF6C;
-	Mon, 11 Dec 2023 15:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C62FA4AF75;
+	Mon, 11 Dec 2023 15:21:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tjQ2WhGV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1gHoyuRt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CECCB4A9B4;
-	Mon, 11 Dec 2023 15:20:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 39412C433C8;
-	Mon, 11 Dec 2023 15:20:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702308024;
-	bh=wpf+bASBdSApYA5KHuCKBINYKnKCNqiT7s48jGBlCBI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tjQ2WhGVdCCxv8ZJZXgtiYXjr6oBC1qm+TzUX6y/lUmMoUAf88o2Vx2Wa6zfAETfr
-	 joVXzKsu+U8C5JvJktnynCmESQ1nWy0oYq+79ed+V8NpcEv31ndk17Qtr1sHLwpsL5
-	 zX1059GmVO5HAgQatB+qWh30wvbMgDLa3pbWNUE83YHFjZzRSup2vTV9R7DYLa0BIM
-	 PiCs8Ppqx1ZcAhwePOkO8rhQIEMjOAvNLVqH0L/2SQgC04rvxTO9Vs4Oiuq9xCAWvT
-	 NalgHdv0unjLkky/+XPnR/3DqWA2Lzvjs53q9i9e9Z2xgYTw08Lh3bwC99ORIG9MQy
-	 zgy52CliGdPDw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 23D67C04E32;
-	Mon, 11 Dec 2023 15:20:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A437EB;
+	Mon, 11 Dec 2023 07:21:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=YcekLTjh5+mk+lg76W+7hew/vEd7NOWaaenP7iwljuk=; b=1gHoyuRtBp6OwbKss/KRVZRgTx
+	sitogZHN0shuA9eFrOI+8VEWHffM/iBomO4CuhwApypwyYqt/41wPkzxPuoP97UqdiylyQhzGN9X2
+	bOUbmeHrtcj2+cUQjbE8gzPxRetCjMcwU5kb1dIFwBM5ZxtbzatjKnHkMh4U3GGAMZS0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rCi6H-002dIn-QD; Mon, 11 Dec 2023 16:21:41 +0100
+Date: Mon, 11 Dec 2023 16:21:41 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v1 2/2] net: phy: Add support for the DP83TG720S
+ Ethernet PHY
+Message-ID: <cfd4f8bd-a06a-4489-8304-e9576151dbce@lunn.ch>
+References: <20231208151159.2791794-1-o.rempel@pengutronix.de>
+ <20231208151159.2791794-2-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v4 0/2] Allow data_meta size > 32
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170230802414.23251.1943018178265573871.git-patchwork-notify@kernel.org>
-Date: Mon, 11 Dec 2023 15:20:24 +0000
-References: <20231206205919.404415-1-larysa.zaremba@intel.com>
-In-Reply-To: <20231206205919.404415-1-larysa.zaremba@intel.com>
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
- daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
- edumazet@google.com, magnus.karlsson@gmail.com,
- willemdebruijn.kernel@gmail.com, linyunsheng@huawei.com,
- maciej.fijalkowski@intel.com, john.fastabend@gmail.com,
- aleksander.lobakin@intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231208151159.2791794-2-o.rempel@pengutronix.de>
 
-Hello:
-
-This series was applied to bpf/bpf-next.git (master)
-by Daniel Borkmann <daniel@iogearbox.net>:
-
-On Wed,  6 Dec 2023 21:59:17 +0100 you wrote:
-> Currently, there is no reason for data_meta to be limited to 32 bytes.
-> Loosen this limitation and make maximum meta size 252 (max value of u8,
-> aligned to 4). Details in the second patch.
+On Fri, Dec 08, 2023 at 04:11:59PM +0100, Oleksij Rempel wrote:
+> The DP83TG720S-Q1 device is an IEEE 802.3bp and Open Alliance compliant
+> automotive Ethernet physical layer transceiver.
 > 
-> Also, modify the selftest, so test_xdp_context_error does not complain
-> about the unexpected success.
+> This driver was tested with i.MX8MP EQOS (stmmac) on the MAC side and
+> TI same PHY on other side.
 > 
-> [...]
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> ---
+>  drivers/net/phy/Kconfig     |  13 +++
+>  drivers/net/phy/Makefile    |   1 +
+>  drivers/net/phy/dp83tg720.c | 190 ++++++++++++++++++++++++++++++++++++
+>  3 files changed, 204 insertions(+)
+>  create mode 100644 drivers/net/phy/dp83tg720.c
+> 
+> diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+> index 25cfc5ded1da..bab10c796f24 100644
+> --- a/drivers/net/phy/Kconfig
+> +++ b/drivers/net/phy/Kconfig
+> @@ -372,6 +372,19 @@ config DP83TC811_PHY
+>  	help
+>  	  Supports the DP83TC811 PHY.
+>  
+> +config DP83TG720_PHY
+> +	tristate "Texas Instruments DP83TG720 Ethernet 1000Base-T1 PHY"
+> +	help
+> +	  The DP83TG720S-Q1 is an automotive Ethernet physical layer
+> +	  transceiver compliant with IEEE 802.3bp and Open Alliance
+> +	  standards. It supports key functions necessary for
+> +	  transmitting and receiving data over both unshielded and
+> +	  shielded single twisted-pair cables. This device offers
+> +	  flexible xMII interface options, including support for both
+> +	  RGMII and SGMII MAC interfaces. It's suitable for applications
+> +	  requiring high-speed data transmission in automotive
+> +	  networking environments.
+> +
+>  config DP83848_PHY
+>  	tristate "Texas Instruments DP83848 PHY"
+>  	help
+> diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
+> index f65e85c91fc1..defaef190962 100644
+> --- a/drivers/net/phy/Makefile
+> +++ b/drivers/net/phy/Makefile
+> @@ -56,6 +56,7 @@ obj-$(CONFIG_DP83848_PHY)	+= dp83848.o
+>  obj-$(CONFIG_DP83867_PHY)	+= dp83867.o
+>  obj-$(CONFIG_DP83869_PHY)	+= dp83869.o
+>  obj-$(CONFIG_DP83TC811_PHY)	+= dp83tc811.o
+> +obj-$(CONFIG_DP83TG720_PHY)	+= dp83tg720.o
+>  obj-$(CONFIG_DP83TD510_PHY)	+= dp83td510.o
 
-Here is the summary with links:
-  - [bpf-next,v4,1/2] selftests/bpf: increase invalid metadata size
-    https://git.kernel.org/bpf/bpf-next/c/15c79c6507c0
-  - [bpf-next,v4,2/2] net, xdp: allow metadata > 32
-    https://git.kernel.org/bpf/bpf-next/c/2ebe81c81435
+Maybe it should come after CONFIG_DP83TD510_PHY in a strict sort ? I
+also wounder about the Kconfig, which should be sorted on the tristate
+string.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+>  obj-$(CONFIG_FIXED_PHY)		+= fixed_phy.o
+>  obj-$(CONFIG_ICPLUS_PHY)	+= icplus.o
+> +		/* After HW reset we need to restore master/slave configuration.
+> +		 */
+> +		if (phydev->drv->config_aneg) {
+
+This test is a bit strange. You know it exists, its this driver and
+the function is there. Why not call it directly?
+
+> +			ret = phydev->drv->config_aneg(phydev);
+> +			if (ret)
+> +				return ret;
+> +		}
 
 
+    Andrew
+
+---
+pw-bot: cr
 
