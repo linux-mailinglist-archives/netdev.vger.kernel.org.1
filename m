@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-55983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4CB080D240
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 17:41:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E66F380D242
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 17:41:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A5EC2816CD
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 16:41:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D6311C213CE
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 16:41:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 003AF1F16B;
-	Mon, 11 Dec 2023 16:40:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C47D3B785;
+	Mon, 11 Dec 2023 16:41:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hrkrjmgh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e2TEWRyD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E24F98E;
-	Mon, 11 Dec 2023 08:40:55 -0800 (PST)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40c1e3ea2f2so49220745e9.2;
-        Mon, 11 Dec 2023 08:40:55 -0800 (PST)
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59C7B8E;
+	Mon, 11 Dec 2023 08:40:59 -0800 (PST)
+Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-40c3fe6c1b5so18794775e9.2;
+        Mon, 11 Dec 2023 08:40:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702312854; x=1702917654; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dkCf0DhZvaO2gkb8ogtkdmwQwzvrHCMJQPh/ypY2+UA=;
-        b=HrkrjmghCxeBfUrKoseS/rzYVwJwcTUPAQUMPULZlqDtVC2GFAs2pneVZCRokXwend
-         mX4VDlav5WwvsEOHeC3dQJZOIqUd/1UNUwPZ55JSJMAvAVGOrkLZrUnpRx/bcejjw3Ct
-         RBaNADp7cXVshTqh30v1MNCpVc0RhdoH2ZYMP4M1VzCf7PzkBzAxsOOPrJgrK3xn0lQh
-         k9IaH6rSVQQ8VYdHrp5zZFkkcRlwdc26CIXMX1I8iN6oku28HRLEI9Np/2AyxNXwiMmJ
-         Cvp2UUkax6KJd5d/nZIe1wrC9ybSkEMso0dAP4UU2ncOuwP/6hCqa00rO8SIQx+K5Qxg
-         8FiQ==
+        d=gmail.com; s=20230601; t=1702312857; x=1702917657; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JMq84b1ixh7LsEvwYtWDIyUwWStfl0XyTRo6LMJFqeE=;
+        b=e2TEWRyDhkcSruW/b2mQEv9f803D2O87UnhU/W56CFD3347w1wk6F+rkk0pLbMpMrQ
+         J7S2Wb31o0jC7KlJk0c9fy0xjnP5zztmfUnmchchy4RVkhjsSCzUez2ElNGNSs/of080
+         GQ6azCa/DrQ3srREX+QEBWzS8kl/LFEue6sJJ8iAjsGvPCiEOHOQfhPnzI0Kj+kmMycJ
+         45sFrNk5uEn0UNmJncg4RS4NGxvgFS+FF5MRP/l+ID9oX0PPwqtbKyAx/BoqqeyQ5ohK
+         Nxtttv+fhh4/keXn0r6iyFWLxOeSlG0rfsTt26iJtilE2xFvWvuZXnyX1ObnAvGBRT2j
+         gqUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702312854; x=1702917654;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dkCf0DhZvaO2gkb8ogtkdmwQwzvrHCMJQPh/ypY2+UA=;
-        b=iyIKDXiepDWobK5ql9wu7/krX5o9Rs0dBZByXBGbdZRL4iwTEPSNG90ngYOt8GSESX
-         zzm7MD2bp2SWmG0JBtB7M46mGpzHNGB+97P6ov2zmljSL7XZFm+E/t6IKngL8qEh8TXK
-         8ZQxXd9xCuAL8FzfY4X/BKIV+uTa8vJwwT7IGrAMtBm0HPUuJVt2DJTRT2dogl40f8LZ
-         wYW3UAkXEOMbGojCxgwKPuBRKAIteUAudlz4+5CmaHV6DDH9wjsrRjtqPCJYfxZhlLbc
-         mJ2kV/5Ntrpo6iisByqhuaDUleNuhr6E4gWkbEZIJ66r/fhEjl36lEkzdKzj+UeUzBfZ
-         v7hQ==
-X-Gm-Message-State: AOJu0YwIj331kETePO30UazmxkRcaZck53O/PElp70DdYXiKH5z2pIos
-	Pdw8dmnVhuWr94W3D3sU7m/ems4Nb4MCag==
-X-Google-Smtp-Source: AGHT+IH5VkYMmuyZECS86G/xP1g4J8VVdveSnbzr2Q8HGc12HRJSDfIjBcpfk6dF/fvjcxLr6K2Ynw==
-X-Received: by 2002:a05:600c:4f87:b0:40c:3e9f:c777 with SMTP id n7-20020a05600c4f8700b0040c3e9fc777mr2230516wmq.62.1702312853513;
-        Mon, 11 Dec 2023 08:40:53 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702312857; x=1702917657;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JMq84b1ixh7LsEvwYtWDIyUwWStfl0XyTRo6LMJFqeE=;
+        b=rChagLd3toAgVmpnbyVq3HfehMYUftrr6a0+VOTQ3c3jwJZZXOlEqFxKeCQpRq8N9A
+         XNd390oL31EoogfbP4A3fG+opQMP11tcCQO6JfUOg1wVqytWF+4spQQUFB2RlOwIGRAr
+         CcBANSZuJ3oMFZZ05E2d7FVgvtNbqZvn2BQpdjpKCP3EUEVuaiByP015ByAluKtDaouB
+         5jpowAblQQFbfsWWczxggncDPW8SMT68o8fgCKRGVKySUXzQhP0znsrm+KP1DKi+a02M
+         oip8DP8C6sJfAC/pKg8pUd061ZLreN1c9K46J23KdojXdXaFpBr0LNgvXg0/9RioNcmO
+         G7Tg==
+X-Gm-Message-State: AOJu0Yw12nbcRspyBGWQFzExphuLyXAqc5VX3SALVk3cnrifvz4BsH/n
+	evlDurnV6QnyGHt6jPVLqm8RqxKKjfzRRA==
+X-Google-Smtp-Source: AGHT+IGQ27lvIADIzR1rsQC1lh3WGxdrUezHNgsu2JCSVO9hPxfEnY56AN572YbCA0eCFK61vv/nvA==
+X-Received: by 2002:a05:600c:21c7:b0:40c:28de:63d5 with SMTP id x7-20020a05600c21c700b0040c28de63d5mr2412495wmj.144.1702312855127;
+        Mon, 11 Dec 2023 08:40:55 -0800 (PST)
 Received: from imac.fritz.box ([2a02:8010:60a0:0:4c3e:5ea1:9128:f0b4])
-        by smtp.gmail.com with ESMTPSA id n9-20020a05600c4f8900b0040c41846923sm7418679wmq.26.2023.12.11.08.40.52
+        by smtp.gmail.com with ESMTPSA id n9-20020a05600c4f8900b0040c41846923sm7418679wmq.26.2023.12.11.08.40.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 08:40:52 -0800 (PST)
+        Mon, 11 Dec 2023 08:40:54 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -63,10 +64,12 @@ To: netdev@vger.kernel.org,
 	Jacob Keller <jacob.e.keller@intel.com>
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v2 00/11] tools/net/ynl: Add 'sub-message' support to ynl
-Date: Mon, 11 Dec 2023 16:40:28 +0000
-Message-ID: <20231211164039.83034-1-donald.hunter@gmail.com>
+Subject: [PATCH net-next v2 01/11] tools/net/ynl-gen-rst: Use bullet lists for attribute-set entries
+Date: Mon, 11 Dec 2023 16:40:29 +0000
+Message-ID: <20231211164039.83034-2-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231211164039.83034-1-donald.hunter@gmail.com>
+References: <20231211164039.83034-1-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,60 +78,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patchset adds a 'sub-message' attribute type to the netlink-raw
-schema and implements it in ynl. This provides support for kind-specific
-options attributes as used in rt_link and tc raw netlink families.
+The generated .rst for attribute-sets currently uses a sub-sub-heading
+for each individual attribute. Change this to use a bullet list the
+attributes in an attribute-set. It is more compact and readable.
 
-A description of the new 'sub-message' attribute type and the
-corresponding sub-message definitions is provided in patch 5.
+Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+---
+ tools/net/ynl/ynl-gen-rst.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The patchset includes updates to the rt_link spec and a new tc spec that
-make use of the new 'sub-message' attribute type.
-
-As mentioned in patch 7, encode support is not yet implemented in ynl
-and support for sub-message selectors at a different nest level from the
-key attribute is not yet supported. I plan to work on these in folloup
-patches.
-
-Patches 1-4 are cleanups and fixes in ynl
-Patches 5-7 add sub-message support to the schema and ynl with
-documentation updates.
-Patch 8 adds binary and pad support to structs in netlink-raw.
-Patches 9-10 contain specs that use the sub-message attribute type.
-Patch 11 updates ynl-gen-rst to include sub-messages
-
-Changes since v1: (all reported by Jakub Kicinski, thanks!)
- - Added cleanups for ynl and generated netlink docs
- - Describe sub-messages in netlink docs
- - Cleaned up unintended indent changes
- - Cleaned up rt-link sub-message definitions
- - Cleaned up array index expressions to follow python style
- - Added sub-messages to generated netlink spec docs
-
-Donald Hunter (11):
-  tools/net/ynl-gen-rst: Use bullet lists for attribute-set entries
-  tools/net/ynl-gen-rst: Sort the index of generated netlink specs
-  doc/netlink: Regenerate netlink .rst files if ynl-gen-rst changes
-  tools/net/ynl: Use consistent array index expression formatting
-  doc/netlink: Add sub-message support to netlink-raw
-  doc/netlink: Document the sub-message format for netlink-raw
-  tools/net/ynl: Add 'sub-message' attribute decoding to ynl
-  tools/net/ynl: Add binary and pad support to structs for tc
-  doc/netlink/specs: add sub-message type to rt_link family
-  doc/netlink/specs: Add a spec for tc
-  tools/net/ynl-gen-rst: Add sub-messages to generated docs
-
- Documentation/Makefile                        |    7 +-
- Documentation/netlink/netlink-raw.yaml        |   53 +-
- Documentation/netlink/specs/rt_link.yaml      |  436 +++-
- Documentation/netlink/specs/tc.yaml           | 2036 +++++++++++++++++
- .../userspace-api/netlink/netlink-raw.rst     |   75 +-
- tools/net/ynl/lib/nlspec.py                   |   55 +
- tools/net/ynl/lib/ynl.py                      |   94 +-
- tools/net/ynl/ynl-gen-rst.py                  |   27 +-
- 8 files changed, 2748 insertions(+), 35 deletions(-)
- create mode 100644 Documentation/netlink/specs/tc.yaml
-
+diff --git a/tools/net/ynl/ynl-gen-rst.py b/tools/net/ynl/ynl-gen-rst.py
+index b6292109e236..a1d046c60512 100755
+--- a/tools/net/ynl/ynl-gen-rst.py
++++ b/tools/net/ynl/ynl-gen-rst.py
+@@ -240,7 +240,7 @@ def parse_attr_sets(entries: List[Dict[str, Any]]) -> str:
+                 # Add the attribute type in the same line
+                 attr_line += f" ({inline(type_)})"
+ 
+-            lines.append(rst_subsubsection(attr_line))
++            lines.append(rst_bullet(attr_line))
+ 
+             for k in attr.keys():
+                 if k in preprocessed + ignored:
 -- 
 2.42.0
 
