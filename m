@@ -1,102 +1,105 @@
-Return-Path: <netdev+bounces-56108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4BB480DD91
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 22:52:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8381E80DE36
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 23:27:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AFB91F217CF
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 21:52:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D50728189C
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 22:27:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 676C054FAE;
-	Mon, 11 Dec 2023 21:52:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F282955793;
+	Mon, 11 Dec 2023 22:27:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ryhl.io header.i=@ryhl.io header.b="jDz4rv+L";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="vqA43849"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="ZZlSJsiA";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Xeo/K0ah"
 X-Original-To: netdev@vger.kernel.org
-Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8193A9D;
-	Mon, 11 Dec 2023 13:52:19 -0800 (PST)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-	by mailout.west.internal (Postfix) with ESMTP id 2C34132025A3;
-	Mon, 11 Dec 2023 16:52:18 -0500 (EST)
+Received: from out2-smtp.messagingengine.com (out2-smtp.messagingengine.com [66.111.4.26])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64813AD;
+	Mon, 11 Dec 2023 14:26:59 -0800 (PST)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+	by mailout.nyi.internal (Postfix) with ESMTP id 0F6535C0275;
+	Mon, 11 Dec 2023 17:26:56 -0500 (EST)
 Received: from mailfrontend2 ([10.202.2.163])
-  by compute3.internal (MEProxy); Mon, 11 Dec 2023 16:52:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ryhl.io; h=cc:cc
-	:content-transfer-encoding:content-type:content-type:date:date
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to; s=fm1; t=
-	1702331537; x=1702417937; bh=gbiIgn1KFAe/YepTTKMaxq02R5X8K1U/X34
-	xm6H/x4o=; b=jDz4rv+Los8dNzijhtGsxdsyVIHA+jaKQErEDBuBEZTDaeispEt
-	d08/0HUucFtc0mUp4rcE3GXBOVzTcToIFnx9YmfCPWgG+AHTADkzriN6g20JSGhH
-	9zIyj8D0YNCtGWkI7CvKmWXH+MW1nZjBuQGVMQ8qFqESQFu/NosTZy/YY9WBBrz7
-	Dq2czSwwvy8ePUqUSakYyfkZ2CILgznDpZyIY/ufSNsiqD35605kpJAaIfk80sPD
-	Z4gstloiUrIy/WISXDszzBOjuBRaybyVYeLf3wfYSBJ9xJTmEqRFQ2WhnQzoZRzJ
-	IfpGf78go78SuLqGMI+vjyUHRjfMhpDyhRg==
+  by compute4.internal (MEProxy); Mon, 11 Dec 2023 17:26:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm3; t=1702333616; x=1702420016; bh=hZ
+	hhMs/oMiL/6xoxqOZLivYo3XO3IpkCCaEeLusob9M=; b=ZZlSJsiAKQqBrDDSFB
+	87xSTMwEmeD4Ul/8LLjgGcgGTeU4fmnJ8gwJ3aqu/pnqv/wZGejm2uAYruGGtE2q
+	oPi5j3YP+7O2XBHARLrUR2mzOJaZwAO62r53Q1IG5V3MnJ2DlZlKq2ZS7jssNqwM
+	6PbQ8WfwLovpbVuJuabNayY5P1GlDXGpqDAtPmVlYDWb0P0I6Rjtbtf/aqEyQCty
+	ltZaIq6WTM7zMeZMLVLLQlCeRZmH4B5zM/X2urSo+esbdKoc0R9AdmsyXOQ5+d3u
+	tRWJCGBtjKeBpOwXMqd1WoQ5ijJ3ik4ngrdppv7CN0ssTnkfSf0OwQrfWPcoPCEh
+	MnBw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
-	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1702331537; x=1702417937; bh=gbiIgn1KFAe/YepTTKMaxq02R5X8K1U/X34
-	xm6H/x4o=; b=vqA43849e+LIDdGHwyRjpGvBtT/CygwXcme28LJVY+bhdpRzHKV
-	DLY23IXymz1BrIBpA3+6zMTx8NEhjvk+sBjaPS39mxO7lEYvEBQA6ueQVyPWyJas
-	rSNqPQanFy9hifauz6JFMWkdkowo9Tc56GqRpOFxf45PHZ/+qtUcjSrL2B+Ug6BA
-	NN5h5PvM5wRhkblo4ObD962U/IO7L0310LZdQhTBKjLocqjnGUF1NBLuCQk2ApuI
-	nQL+7ohMkXVZuG10mxPdfS3xm3WmXbqFIb+uDr2q8r63LA/U+jlvLkio2QlstdVL
-	WANdmV7UPmtK0TpLXaYAIFp0EaVCbE6ZSlw==
-X-ME-Sender: <xms:kYR3ZdDR_zU0hM7mMyZ0Wzbu-lkLefqtz7uRh7fLhPcbOWfHrl7wdw>
-    <xme:kYR3ZbhRI-hnyaA5NvR1qYJTmD1QZRDgctg5jfV4ALUsJUd5WTXaxjnBdHGktGHuZ
-    TOw4VmbY2sMQqDaAw>
-X-ME-Received: <xmr:kYR3ZYlzdW_dijKhf-_t6t8NCQp32sIj6e-x4tWT4e5kyI7KcCf8mltu11N3ASrUqKxyz3yiwyMtylG4bt5XbKXACV128ZNz3aHH>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudelvddgudehiecutefuodetggdotefrod
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1702333616; x=1702420016; bh=hZhhMs/oMiL/6
+	xoxqOZLivYo3XO3IpkCCaEeLusob9M=; b=Xeo/K0ahAmVTZeokWnp7xEQ+u0aEL
+	4YbAWpU0IE7M2syCD/aa6cW0jkJ6TNbaYV2d2CIKyNjjaaJyCvj8ZTvqzptrIE4u
+	2Wcf/bNc6UdLaObumqjIGabAO1YXqI4IfgLblMPZEaSGO9Fv8i1EXkkLrIDP26Gm
+	ndEkfUntR5T9TSUS8dhu0pJ9NsWO3vorrO+WhA8DqGEq6w0oNGpPIsXGWGPmBbZT
+	bThaPnBszkUbxSCkXwOWYG5EjgBCqyAvLENNbvCb1fN5QPVfCgebJS32WJtkjss1
+	CgjSAeOqMWXLY8JSN07J8rAYwaoRS3EKYOaVpt48IddYTZ3o9+JbP2+Fg==
+X-ME-Sender: <xms:rox3ZWFI0QmnvR_DlW8BNPsfqUobIAIzah1eeu20qsY_ScuNU9K3eA>
+    <xme:rox3ZXUThVSebZroGKHG-3knIyokjwCwacFAdeK-IwzqUbntYfVg054CzNTHQxkQ3
+    IgBxbHEZztO0CxGaQ>
+X-ME-Received: <xmr:rox3ZQK_YOkh4D-sdjuRxaxR5-Q13qsOF3zHQtDSsSRwJzKly9MbfOyV6mzUL6iSqQ22oF6-AQSt76HGuqTU0Jpjry5rUlbRdk7z>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudelvddgudeifecutefuodetggdotefrod
     ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
     necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefkffggfgfuvfevfhfhjggtgfesthejredttddvjeenucfhrhhomheptehl
-    ihgtvgcutfihhhhluceorghlihgtvgesrhihhhhlrdhioheqnecuggftrfgrthhtvghrnh
-    epfefguefgtdeghfeuieduffejhfevueehueehkedvteefgfehhedtffdutdfgudejnecu
-    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghlihgtvg
-    esrhihhhhlrdhioh
-X-ME-Proxy: <xmx:kYR3ZXyz_o9hO5erd6p1qiom84r5EtvRmGuMB01-NSH1xjW9cwcG1g>
-    <xmx:kYR3ZSSYR1-_N6X__Q05nHOOoP62bGNZGH0YXLHFv6QXgMmvYlhlRg>
-    <xmx:kYR3Zaa7Qt47Gbtq-zYny-zlLiBfCe2GqJOZUycx6cwiK4VOE9huyQ>
-    <xmx:kYR3ZVFQfCmX_kurQocuPgxQIJxMyapXAoORs7oqiHXAxIialbnGYw>
-Feedback-ID: i56684263:Fastmail
+    enfghrlhcuvffnffculdejtddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtsfdt
+    tddtvdenucfhrhhomhepffgrnhhivghlucgiuhcuoegugihusegugihuuhhurdighiiiqe
+    enucggtffrrghtthgvrhhnpedvfeekteduudefieegtdehfeffkeeuudekheduffduffff
+    gfegiedttefgvdfhvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrih
+    hlfhhrohhmpegugihusegugihuuhhurdighiii
+X-ME-Proxy: <xmx:rox3ZQGMiGCjcRMPwFqqUxiau4S2YwKaVwW9uXsQMOYpAkSAsAIUrg>
+    <xmx:rox3ZcVGHPMvW5m042T2xM4xFlH25Phot2b0OQozOmmdGEtGI7lhkA>
+    <xmx:rox3ZTO8IX_yb928rnqy91Sikx0trMIQ0L_u3dWrsozRPhiUwSGvWw>
+    <xmx:sIx3ZSZnPC-rQ_kddp6XKVVsS-e_CQk9K-VeGIN1Jl5VnlrJd6sIZw>
+Feedback-ID: i6a694271:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 11 Dec 2023 16:52:15 -0500 (EST)
-Message-ID: <8c85a579-c36e-459e-9dd7-b2fba36fc46f@ryhl.io>
-Date: Mon, 11 Dec 2023 22:52:15 +0100
+ 11 Dec 2023 17:26:53 -0500 (EST)
+Date: Mon, 11 Dec 2023 15:26:52 -0700
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: Eyal Birger <eyal.birger@gmail.com>
+Cc: daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
+	Herbert Xu <herbert@gondor.apana.org.au>, ast@kernel.org, john.fastabend@gmail.com, kuba@kernel.org, 
+	steffen.klassert@secunet.com, pabeni@redhat.com, hawk@kernel.org, antony.antony@secunet.com, 
+	alexei.starovoitov@gmail.com, yonghong.song@linux.dev, eddyz87@gmail.com, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	devel@linux-ipsec.org
+Subject: Re: [PATCH bpf-next v5 1/9] bpf: xfrm: Add bpf_xdp_get_xfrm_state()
+ kfunc
+Message-ID: <2hcvru32qvfuhlvfdnayvn4kk4uq7caahloaabdzvxbpxfn6re@f5inqdnr4f5j>
+References: <cover.1702325874.git.dxu@dxuuu.xyz>
+ <e8029421b1a0d045fadb214ba919cc25efab4952.1702325874.git.dxu@dxuuu.xyz>
+ <CAHsH6Gt4k3myGhyznhvhknup+U+aWq3dsMuhaWD=p1RWd+ABKw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 4/4] net: phy: add Rust Asix PHY driver
-Content-Language: en-US-large
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org
-Cc: rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu,
- miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me, wedsonaf@gmail.com,
- aliceryhl@google.com, boqun.feng@gmail.com
-References: <20231210234924.1453917-1-fujita.tomonori@gmail.com>
- <20231210234924.1453917-5-fujita.tomonori@gmail.com>
-From: Alice Ryhl <alice@ryhl.io>
-In-Reply-To: <20231210234924.1453917-5-fujita.tomonori@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHsH6Gt4k3myGhyznhvhknup+U+aWq3dsMuhaWD=p1RWd+ABKw@mail.gmail.com>
 
-On 12/11/23 00:49, FUJITA Tomonori wrote:
-> This is the Rust implementation of drivers/net/phy/ax88796b.c. The
-> features are equivalent. You can choose C or Rust version kernel
-> configuration.
+On Mon, Dec 11, 2023 at 01:39:00PM -0800, Eyal Birger wrote:
+> Hi Daniel,
 > 
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> Reviewed-by: Trevor Gross <tmgross@umich.edu>
-> Reviewed-by: Benno Lossin <benno.lossin@proton.me>
+> Tiny nits below in case you respin this for other reasons:
 
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+Ack. Will fixup if I respin. Otherwise I can do a followup.
+
+[...]
+
+Thanks,
+Daniel
 
