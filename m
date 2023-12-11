@@ -1,116 +1,94 @@
-Return-Path: <netdev+bounces-55866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0C0180C92A
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:13:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B5BE80C92C
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:14:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF06F1C20F17
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 12:13:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4FDC1F216E5
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 12:14:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C9E3985E;
-	Mon, 11 Dec 2023 12:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 356D039862;
+	Mon, 11 Dec 2023 12:14:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KUCBgbmD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NVED9p66"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [IPv6:2001:41d0:1004:224b::ba])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE1809B
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 04:13:50 -0800 (PST)
-Message-ID: <936d6f77-a36a-466c-9ca6-99da8feb5e2e@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1702296828;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Jm1pg7Z8VtSQ4x24bAoDdq1mHtt6XR6SaNfnCMEe6MM=;
-	b=KUCBgbmD57K0bbxsVWA4CqUEihZkaOFTB14i0piVofDzYP91xKqvXZQjw3kN8/hNWgqK4x
-	jKmlHgOHJTIlnBNDDMUOsdLKGFKXXSS1KQA+CrrWOYLDlWEzunrlBWYngjjND072dBRzDG
-	QsaicQRHXd5LMWpuQPLNdVjceDjcT5o=
-Date: Mon, 11 Dec 2023 12:13:44 +0000
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D5F1F612
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 12:14:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05243C433C7;
+	Mon, 11 Dec 2023 12:14:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702296858;
+	bh=uV0+ph2kWvrsjdsxLRZm7vmxpk47FipXRAv2sxnGka8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=NVED9p66ydbmRK9iz6Q7WCigJpP6ShQfBE2O6mcAwXMDH5k1Wd/6EhLFs/1WmnQaK
+	 meG43MrZ4hRIGkv+m56HyzG4wPMvjA/o4aZAVxuNU6kozh7iXqGeXvXWRyxGizXgwl
+	 dIo8SFj2ODA4P47N9KlbuBSafMneE9Rwczlhnsk55kztYwVm4Oit7fFsENIWXbOQba
+	 Q8eLqpBK4P6tFStn4nRUeZIRaa+0iTzwpXd2IY+vMSYH2FuRgvs3txAqy0gr9L4R+/
+	 13qiZDQmPBDjPoY9DFgZiLoDOhP8ICnmA7e5EVlSBF3ew/l2bBx8RLMChnnyVHNBv3
+	 v7W91W5n3oMNQ==
+Message-ID: <4a162951-7f62-499e-98b4-cb0410cd9b1e@kernel.org>
+Date: Mon, 11 Dec 2023 14:14:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [patch net] dpll: sanitize possible null pointer dereference in
- dpll_pin_parent_pin_set()
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 net-next 6/8] net: ethernet: ti: am65-cpsw-qos: Add
+ Frame Preemption MAC Merge support
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, s-vadapalli@ti.com, r-gunasekaran@ti.com,
+ vigneshr@ti.com, srk@ti.com, horms@kernel.org, p-varis@ti.com,
+ netdev@vger.kernel.org
+References: <20231201135802.28139-1-rogerq@kernel.org>
+ <20231201135802.28139-7-rogerq@kernel.org>
+ <20231204123531.tpjbt7byzdnrhs7f@skbuf>
+ <8caf8252-4068-4d17-b919-12adfef074e5@kernel.org>
+ <7d8fb848-a491-414b-adb8-d26a16a499a4@kernel.org>
+ <c6ca2492-20a9-47b9-a6ea-3feb6f3cb2d8@kernel.org>
+ <20231211121240.ooufyapz6rswyrbn@skbuf>
 Content-Language: en-US
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- davem@davemloft.net, edumazet@google.com, arkadiusz.kubalewski@intel.com,
- gregkh@linuxfoundation.org, hdthky0@gmail.com, michal.michalik@intel.com,
- milena.olech@intel.com
-References: <20231211083758.1082853-1-jiri@resnulli.us>
- <ffd827e6-95ed-4d96-b5ad-ec1f5b8d4e24@linux.dev>
- <ZXb10Wdef76u2xBy@nanopsycho>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <ZXb10Wdef76u2xBy@nanopsycho>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20231211121240.ooufyapz6rswyrbn@skbuf>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 11/12/2023 11:43, Jiri Pirko wrote:
-> Mon, Dec 11, 2023 at 11:46:24AM CET, vadim.fedorenko@linux.dev wrote:
->> On 11/12/2023 08:37, Jiri Pirko wrote:
->>> From: Jiri Pirko <jiri@nvidia.com>
->>>
->>> User may not pass DPLL_A_PIN_STATE attribute in the pin set operation
->>> message. Sanitize that by checking if the attr pointer is not null
->>> and process the passed state attribute value only in that case.
->>>
->>> Reported-by: Xingyuan Mo <hdthky0@gmail.com>
->>> Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base functions")
->>> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
->>> ---
->>>    drivers/dpll/dpll_netlink.c | 13 ++++++++-----
->>>    1 file changed, 8 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
->>> index 442a0ebeb953..ce7cf736f020 100644
->>> --- a/drivers/dpll/dpll_netlink.c
->>> +++ b/drivers/dpll/dpll_netlink.c
->>> @@ -925,7 +925,6 @@ dpll_pin_parent_pin_set(struct dpll_pin *pin, struct nlattr *parent_nest,
->>>    			struct netlink_ext_ack *extack)
->>>    {
->>>    	struct nlattr *tb[DPLL_A_PIN_MAX + 1];
->>> -	enum dpll_pin_state state;
->>>    	u32 ppin_idx;
->>>    	int ret;
->>> @@ -936,10 +935,14 @@ dpll_pin_parent_pin_set(struct dpll_pin *pin, struct nlattr *parent_nest,
->>>    		return -EINVAL;
->>>    	}
->>>    	ppin_idx = nla_get_u32(tb[DPLL_A_PIN_PARENT_ID]);
->>> -	state = nla_get_u32(tb[DPLL_A_PIN_STATE]);
->>> -	ret = dpll_pin_on_pin_state_set(pin, ppin_idx, state, extack);
->>> -	if (ret)
->>> -		return ret;
->>> +
->>> +	if (tb[DPLL_A_PIN_STATE]) {
->>> +		enum dpll_pin_state state = nla_get_u32(tb[DPLL_A_PIN_STATE]);
->>> +
->>> +		ret = dpll_pin_on_pin_state_set(pin, ppin_idx, state, extack);
->>> +		if (ret)
->>> +			return ret;
->>> +	}
->>>    	return 0;
->>>    }
+
+
+On 11/12/2023 14:12, Vladimir Oltean wrote:
+> On Fri, Dec 08, 2023 at 02:33:00PM +0200, Roger Quadros wrote:
+>> But,
 >>
->> I don't believe that "set" command without set value should return 0
->> meaning "request was completed successfully". Maybe it's better to add
->> another check like for DPLL_A_PIN_PARENT_ID and fill extack with
->> description?
+>> bool __ethtool_dev_mm_supported(struct net_device *dev)
+>> {
+>> 	const struct ethtool_ops *ops = dev->ethtool_ops;
+>> 	struct ethtool_mm_state state = {};
+>> 	int ret = -EOPNOTSUPP;
+>>
+>> 	if (ops && ops->get_mm)
+>> 		ret = ops->get_mm(dev, &state);
+>>
+>> 	return !ret;
+>> }
+>>
+>> So looks like it is better to not define get_mm/set_mm if CONFIG_TI_AM65_CPSW_TAS is disabled.
 > 
-> Please see dpll_pin_parent_device_set(). State here is treated exactly
-> the same as there. It makes sense during set operation to process only
-> the attributes that are passed. In the future, dpll_pin_parent_pin_set()
-> can process more attributes, lets be prepared for that.
+> Why not? __ethtool_dev_mm_supported() returns true if os->get_mm() is
+> implemented and returns 0. You return -EOPNOTSUPP, and that's different
+> from 0.
 
-Ok, let's be ready.
+Yes, I realized it eventually. Better to define it and return -EOPNOTSUPP if
+CONFIG_TI_AM65_CPSW_TAS is not enabled.
 
-Acked-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+-- 
+cheers,
+-roger
 
