@@ -1,44 +1,40 @@
-Return-Path: <netdev+bounces-55678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C59D80BF2C
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 03:32:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9D7680BF0B
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 03:23:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E323B207D2
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 02:32:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90FC11F20D4B
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 02:23:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22DD71388;
-	Mon, 11 Dec 2023 02:32:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 397ED11CAB;
+	Mon, 11 Dec 2023 02:23:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8FF0BD;
-	Sun, 10 Dec 2023 18:32:08 -0800 (PST)
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4SpQCk3H1Gz1FDhX;
-	Mon, 11 Dec 2023 10:09:06 +0800 (CST)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B314BD;
+	Sun, 10 Dec 2023 18:23:03 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4SpQWh22NYz14M0c;
+	Mon, 11 Dec 2023 10:22:56 +0800 (CST)
 Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id 138A41A016F;
-	Mon, 11 Dec 2023 10:12:40 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 3E321180069;
+	Mon, 11 Dec 2023 10:23:01 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.2) by
  kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 11 Dec 2023 10:12:39 +0800
+ 15.1.2507.35; Mon, 11 Dec 2023 10:23:00 +0800
 From: Jijie Shao <shaojijie@huawei.com>
-To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
+To: <mkubecek@suse.cz>
 CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next 6/6] net: sfp: Synchronize some CMIS transceiver modules from ethtool
-Date: Mon, 11 Dec 2023 10:08:16 +0800
-Message-ID: <20231211020816.69434-7-shaojijie@huawei.com>
+	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <lanhao@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH ethtool] net: ethtool: Add default branch to sff8636_show_all_ioctl switch
+Date: Mon, 11 Dec 2023 10:18:21 +0800
+Message-ID: <20231211021821.110467-1-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20231211020816.69434-1-shaojijie@huawei.com>
-References: <20231211020816.69434-1-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,48 +48,41 @@ X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
 
 From: Hao Lan <lanhao@huawei.com>
 
-Currently, the SFF-8024 Identifier Values that according to the standard
-support for the Common Management Interface Specification (CMIS)
-based on standard identifier values in the ethtool is more than in the
-kernel. When the driver needs to use a newer Identifier Value, the kernel
-interface does not support it. Therefore, we synchronize the CMIS mode
-Identifier Values which supported by the ethtool to the kernel.
+The current sff8636_show_all_ioctl code uses a switch statement
+to determine the module type, and exits directly with a return statement
+when a match is found. However, when the module type cannot be matched,
+the sff8636_memory_map_init_buf and sff8636_show_all_common functions
+are executed. This writing style is not intuitive enough.
+Therefore, this patch adding a default branch in the switch statement
+to improve the readability of the code.
 
-ethtool links:
-Link:https://lore.kernel.org/all/1471959033-1053-3-git-send-email-vidya@cumulusnetworks.com/
-Link:https://lore.kernel.org/all/20200813150826.16680-1-popadrian1996@gmail.com/
-Link:https://lore.kernel.org/all/20220207091231.2047315-1-danieller@nvidia.com/
-Link:https://lore.kernel.org/all/1623949504-51291-3-git-send-email-moshe@nvidia.com/
-Link:https://lore.kernel.org/all/20231030072353.1031217-1-idosch@nvidia.com/
 Signed-off-by: Hao Lan <lanhao@huawei.com>
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
- include/linux/sfp.h | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ qsfp.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/sfp.h b/include/linux/sfp.h
-index 9346cd44814d..e0b333d9e999 100644
---- a/include/linux/sfp.h
-+++ b/include/linux/sfp.h
-@@ -284,6 +284,18 @@ enum {
- 	SFF8024_ID_QSFP_8438		= 0x0c,
- 	SFF8024_ID_QSFP_8436_8636	= 0x0d,
- 	SFF8024_ID_QSFP28_8636		= 0x11,
-+	SFF8024_ID_CXP2			= 0x12,
-+	SFF8024_ID_CDFP			= 0x13,
-+	SFF8024_ID_HD4X_FANOUT		= 0x14,
-+	SFF8024_ID_HD8X_FANOUT		= 0x15,
-+	SFF8024_ID_CDFP_S3		= 0x16,
-+	SFF8024_ID_MICRO_QSFP		= 0x17,
-+	SFF8024_ID_QSFP_DD		= 0x18,
-+	SFF8024_ID_OSFP			= 0x19,
-+	SFF8024_ID_DSFP			= 0x1B,
-+	SFF8024_ID_QSFP_PLUS_CMIS	= 0x1E,
-+	SFF8024_ID_SFP_DD_CMIS		= 0x1F,
-+	SFF8024_ID_SFP_PLUS_CMIS	= 0x20,
+diff --git a/qsfp.c b/qsfp.c
+index eedf688..a2921fb 100644
+--- a/qsfp.c
++++ b/qsfp.c
+@@ -985,11 +985,12 @@ void sff8636_show_all_ioctl(const __u8 *id, __u32 eeprom_len)
+ 	case SFF8024_ID_SFP_DD_CMIS:
+ 	case SFF8024_ID_SFP_PLUS_CMIS:
+ 		cmis_show_all_ioctl(id);
+-		return;
++		break;
++	default:
++		sff8636_memory_map_init_buf(&map, id, eeprom_len);
++		sff8636_show_all_common(&map);
++		break;
+ 	}
+-
+-	sff8636_memory_map_init_buf(&map, id, eeprom_len);
+-	sff8636_show_all_common(&map);
+ }
  
- 	SFF8024_ENCODING_UNSPEC		= 0x00,
- 	SFF8024_ENCODING_8B10B		= 0x01,
+ static void sff8636_request_init(struct ethtool_module_eeprom *request, u8 page,
 -- 
 2.30.0
 
