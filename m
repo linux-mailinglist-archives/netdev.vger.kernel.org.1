@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-55948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9846580CEE9
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 16:03:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96CAA80CEEB
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 16:03:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4997C1F21963
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:03:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51D93281C4F
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:03:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 556494AF68;
-	Mon, 11 Dec 2023 15:02:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C7664A99C;
+	Mon, 11 Dec 2023 15:02:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nQRCg9js"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YIho58oD"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62B83AB
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 07:02:41 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FFD5A9
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 07:02:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702306961; x=1733842961;
+  t=1702306963; x=1733842963;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=j6DwR0DXFRVZLn9/54Z9i2WMLsQgbvqgmtInAGVCmD4=;
-  b=nQRCg9jsppE4bDvfsxN5q2m2XkuPIGwbNVUa05WCYHfcu7SF/F0dB+Z6
-   Y9Vd1oRonxLOs+B+FLMN3QR31SKw7F4bMKud8zzBLFYdz10A8RSoRW02+
-   SI5yckDxVKZug0w2C0EJmxtJuQbz6cG9EpvuDMeuGgeJV2i9tSNeW8fZt
-   aEr94sngckci+n3/vWV/dYXLlKjZDzSfqeKRtkm/TeuIMwJvSG56nZDGh
-   oU5RpCuRKT/DyyUI7b6JolUH8tw1eYXDBuXQx2gPMYO0fohNyaqkF3qA2
-   1y8atyl1mJiPq11E/1cU9D5NFgt+VYvHeKbMLYFqgpkcN8aRadLkXG0fw
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="393532313"
+  bh=VnwyVz/als6ND0e+M5LMpjpd2Guu+1/tbRYrhW2T/qs=;
+  b=YIho58oDCTGBKqtWODBQ+WC7CxyfzcUd6b4J0BoSWL8yq8QdZD9GLulT
+   lANuAxxv9I5ffBiWX3KZIu7WX4A3f5hW1a/FjchGTeDDMBxPq6Sot9m9Y
+   CeJukVzZgEMP6oM+9GYXbiIqnIPaKY0tb9FF5GuQgvnFBbUkMgmJXjo5R
+   cMCuR0d+OHMnViNrcJ0FHu/bquW8UqyQOO9QWK63SQhaKb5/H7wo49aoq
+   7/gCP6eMa4y9LsEGrZu+F7dP6i8wIIM3IixYHvdBENZx/ctJX6f3IVz83
+   F0Pi2WjnJNJrVfudmRsAk2drak7SLzRQQtBsj5iLUmcmTRLW5C3roRpBY
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="393532322"
 X-IronPort-AV: E=Sophos;i="6.04,268,1695711600"; 
-   d="scan'208";a="393532313"
+   d="scan'208";a="393532322"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2023 07:02:41 -0800
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2023 07:02:43 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="773090870"
+X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="773090878"
 X-IronPort-AV: E=Sophos;i="6.04,268,1695711600"; 
-   d="scan'208";a="773090870"
+   d="scan'208";a="773090878"
 Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
-  by orsmga002.jf.intel.com with ESMTP; 11 Dec 2023 07:02:39 -0800
+  by orsmga002.jf.intel.com with ESMTP; 11 Dec 2023 07:02:41 -0800
 From: Karol Kolacinski <karol.kolacinski@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -49,9 +49,9 @@ Cc: netdev@vger.kernel.org,
 	jesse.brandeburg@intel.com,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: [PATCH v2 iwl-next 4/6] ice: rename ice_ptp_tx_cfg_intr
-Date: Mon, 11 Dec 2023 16:02:24 +0100
-Message-Id: <20231211150226.295090-5-karol.kolacinski@intel.com>
+Subject: [PATCH v2 iwl-next 5/6] ice: factor out ice_ptp_rebuild_owner()
+Date: Mon, 11 Dec 2023 16:02:25 +0100
+Message-Id: <20231211150226.295090-6-karol.kolacinski@intel.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231211150226.295090-1-karol.kolacinski@intel.com>
 References: <20231211150226.295090-1-karol.kolacinski@intel.com>
@@ -66,80 +66,186 @@ Content-Transfer-Encoding: 8bit
 
 From: Jacob Keller <jacob.e.keller@intel.com>
 
-The ice_ptp_tx_cfg_intr() function sends a control queue message to
-configure the PHY timestamp interrupt block. This is a very similar name
-to a function which is used to configure the MAC Other Interrupt Cause
-Enable register.
+The ice_ptp_reset() function uses a goto to skip past clock owner
+operations if performing a PF reset or if the device is not the clock
+owner. This is a bit confusing. Factor this out into
+ice_ptp_rebuild_owner() instead.
 
-Rename this function to ice_ptp_cfg_phy_interrupt in order to make it
-more obvious to the reader what action it performs, and distinguish it
-from other similarly named functions.
+The ice_ptp_reset() function is called by ice_rebuild() to restore PTP
+functionality after a device reset. Follow the convention set by the
+ice_main.c file and rename this function to ice_ptp_rebuild(), in the
+same way that we have ice_prepare_for_reset() and
+ice_ptp_prepare_for_reset().
 
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ptp.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_main.c |  2 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c  | 66 ++++++++++++++---------
+ drivers/net/ethernet/intel/ice/ice_ptp.h  |  6 +--
+ 3 files changed, 44 insertions(+), 30 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 3d2d8728d9e3..d1bc1cc855e8 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -7497,7 +7497,7 @@ static void ice_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
+ 	 * fail.
+ 	 */
+ 	if (test_bit(ICE_FLAG_PTP_SUPPORTED, pf->flags))
+-		ice_ptp_reset(pf, reset_type);
++		ice_ptp_rebuild(pf, reset_type);
+ 
+ 	if (ice_is_feature_supported(pf, ICE_F_GNSS))
+ 		ice_gnss_init(pf);
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 670d4f1c3db9..d0d30723d6dd 100644
+index d0d30723d6dd..2f862b2e1a90 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -1455,14 +1455,14 @@ void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup)
+@@ -2671,11 +2671,13 @@ void ice_ptp_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
  }
  
  /**
-- * ice_ptp_tx_ena_intr - Enable or disable the Tx timestamp interrupt
-+ * ice_ptp_cfg_phy_interrupt - Configure PHY interrupt settings
-  * @pf: PF private structure
-  * @ena: bool value to enable or disable interrupt
-  * @threshold: Minimum number of packets at which intr is triggered
-  *
-  * Utility function to enable or disable Tx timestamp interrupt and threshold
+- * ice_ptp_reset - Initialize PTP hardware clock support after reset
++ * ice_ptp_rebuild_owner - Initialize PTP clock owner after reset
+  * @pf: Board private structure
+- * @reset_type: the reset type being performed
++ *
++ * Companion function for ice_ptp_rebuild() which handles tasks that only the
++ * PTP clock owner instance should perform.
   */
--static int ice_ptp_tx_ena_intr(struct ice_pf *pf, bool ena, u32 threshold)
-+static int ice_ptp_cfg_phy_interrupt(struct ice_pf *pf, bool ena, u32 threshold)
+-void ice_ptp_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
++static int ice_ptp_rebuild_owner(struct ice_pf *pf)
  {
- 	struct ice_hw *hw = &pf->hw;
- 	int err = 0;
-@@ -2680,8 +2680,8 @@ void ice_ptp_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
  	struct ice_ptp *ptp = &pf->ptp;
  	struct ice_hw *hw = &pf->hw;
- 	struct timespec64 ts;
--	int err, itr = 1;
+@@ -2683,34 +2685,21 @@ void ice_ptp_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
  	u64 time_diff;
-+	int err;
+ 	int err;
  
- 	if (ptp->state != ICE_PTP_RESETTING) {
- 		if (ptp->state == ICE_PTP_READY) {
-@@ -2734,7 +2734,7 @@ void ice_ptp_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
+-	if (ptp->state != ICE_PTP_RESETTING) {
+-		if (ptp->state == ICE_PTP_READY) {
+-			ice_ptp_prepare_for_reset(pf, reset_type);
+-		} else {
+-			err = -EINVAL;
+-			dev_err(ice_pf_to_dev(pf), "PTP was not initialized\n");
+-			goto err;
+-		}
+-	}
+-
+-	if (reset_type == ICE_RESET_PFR || !ice_pf_src_tmr_owned(pf))
+-		goto pfr;
+-
+ 	err = ice_ptp_init_phc(hw);
+ 	if (err)
+-		goto err;
++		return err;
  
+ 	/* Acquire the global hardware lock */
+ 	if (!ice_ptp_lock(hw)) {
+ 		err = -EBUSY;
+-		goto err;
++		return err;
+ 	}
+ 
+ 	/* Write the increment time value to PHY and LAN */
+ 	err = ice_ptp_write_incval(hw, ice_base_incval(pf));
+ 	if (err) {
+ 		ice_ptp_unlock(hw);
+-		goto err;
++		return err;
+ 	}
+ 
+ 	/* Write the initial Time value to PHY and LAN using the cached PHC
+@@ -2726,7 +2715,7 @@ void ice_ptp_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
+ 	err = ice_ptp_write_init(pf, &ts);
+ 	if (err) {
+ 		ice_ptp_unlock(hw);
+-		goto err;
++		return err;
+ 	}
+ 
+ 	/* Release the global hardware lock */
+@@ -2735,11 +2724,41 @@ void ice_ptp_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
  	if (!ice_is_e810(hw)) {
  		/* Enable quad interrupts */
--		err = ice_ptp_tx_ena_intr(pf, true, itr);
-+		err = ice_ptp_cfg_phy_interrupt(pf, true, 1);
+ 		err = ice_ptp_cfg_phy_interrupt(pf, true, 1);
++		if (err)
++			return err;
++
++		ice_ptp_restart_all_phy(pf);
++	}
++
++	return 0;
++}
++
++/**
++ * ice_ptp_rebuild - Initialize PTP hardware clock support after reset
++ * @pf: Board private structure
++ * @reset_type: the reset type being performed
++ */
++void ice_ptp_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
++{
++	struct ice_ptp *ptp = &pf->ptp;
++	int err;
++
++	if (ptp->state != ICE_PTP_RESETTING) {
++		if (ptp->state == ICE_PTP_READY) {
++			ice_ptp_prepare_for_reset(pf, reset_type);
++		} else {
++			err = -EINVAL;
++			dev_err(ice_pf_to_dev(pf), "PTP was not initialized\n");
++			goto err;
++		}
++	}
++
++	if (ice_pf_src_tmr_owned(pf) && reset_type != ICE_RESET_PFR) {
++		err = ice_ptp_rebuild_owner(pf);
  		if (err)
  			goto err;
  	}
-@@ -2985,7 +2985,7 @@ static int ice_ptp_init_owner(struct ice_pf *pf)
+ 
+-pfr:
+ 	/* Init Tx structures */
+ 	if (ice_is_e810(&pf->hw)) {
+ 		err = ice_ptp_init_tx_e810(pf, &ptp->port.tx);
+@@ -2754,11 +2773,6 @@ void ice_ptp_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
+ 
+ 	ptp->state = ICE_PTP_READY;
+ 
+-	/* Restart the PHY timestamping block */
+-	if (!test_bit(ICE_PFR_REQ, pf->state) &&
+-	    ice_pf_src_tmr_owned(pf))
+-		ice_ptp_restart_all_phy(pf);
+-
+ 	/* Start periodic work going */
+ 	kthread_queue_delayed_work(ptp->kworker, &ptp->work, 0);
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
+index 8bc352055ff1..f055f2a643da 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
+@@ -317,7 +317,7 @@ enum ice_tx_tstamp_work ice_ptp_process_ts(struct ice_pf *pf);
+ void
+ ice_ptp_rx_hwtstamp(struct ice_rx_ring *rx_ring,
+ 		    union ice_32b_rx_flex_desc *rx_desc, struct sk_buff *skb);
+-void ice_ptp_reset(struct ice_pf *pf, enum ice_reset_req reset_type);
++void ice_ptp_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type);
+ void ice_ptp_prepare_for_reset(struct ice_pf *pf,
+ 			       enum ice_reset_req reset_type);
+ void ice_ptp_init(struct ice_pf *pf);
+@@ -354,8 +354,8 @@ static inline bool ice_ptp_process_ts(struct ice_pf *pf)
+ static inline void
+ ice_ptp_rx_hwtstamp(struct ice_rx_ring *rx_ring,
+ 		    union ice_32b_rx_flex_desc *rx_desc, struct sk_buff *skb) { }
+-static inline void ice_ptp_reset(struct ice_pf *pf,
+-				 enum ice_reset_req reset_type)
++static inline void ice_ptp_rebuild(struct ice_pf *pf,
++				   enum ice_reset_req reset_type)
  {
- 	struct ice_hw *hw = &pf->hw;
- 	struct timespec64 ts;
--	int err, itr = 1;
-+	int err;
+ }
  
- 	err = ice_ptp_init_phc(hw);
- 	if (err) {
-@@ -3020,7 +3020,7 @@ static int ice_ptp_init_owner(struct ice_pf *pf)
- 
- 	if (!ice_is_e810(hw)) {
- 		/* Enable quad interrupts */
--		err = ice_ptp_tx_ena_intr(pf, true, itr);
-+		err = ice_ptp_cfg_phy_interrupt(pf, true, 1);
- 		if (err)
- 			goto err_exit;
- 	}
 -- 
 2.40.1
 
