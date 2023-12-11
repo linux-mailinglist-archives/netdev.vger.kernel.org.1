@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-55926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E0B280CD9E
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:12:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65DF980CDA2
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:12:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4183B1C212CE
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:12:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CECA4B215C8
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:12:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 859164D117;
-	Mon, 11 Dec 2023 14:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF85A4D59A;
+	Mon, 11 Dec 2023 14:08:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="f9dCSt1P"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QFvzNu+t"
 X-Original-To: netdev@vger.kernel.org
 Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2065.outbound.protection.outlook.com [40.107.243.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAAC12113
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 06:08:40 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 251E82115
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 06:08:47 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=f26RdZzcRxuG3W4dZ55ELs+rXqxqakdAjEe/uGPxsGBjUADJSNV9hEtf0AylOFvPBirJdXQf0B/RwJBLXupcSHVW247KAxU0G+nACS4gQFxQVTuI+zQN5HNmAN5woXfcQW8ucvC91KVYz9Fncak8wV4tqjypumjkFrKhP4mKGP6i4+4yh8z/LgnAnJ0S/Kys47S3Z9sAIIfQjxZBzhvwvQSX3S2olLhWnNEhjA1gL8wmLQXcRjCJ2qydhj10Gk/9Qum4Gn4y0MKtpbuAnpKD2KRFMgQPOGQNcYnD1LThnz6aEGM15rTnlOVDaROcRQflrR2vbzLAoAuhWrlNNKC6xg==
+ b=YlTgzG+OJlInf+vIPYH509W14ZamGc6i0ICczn7IA8d2rHcDDYGcyUl4gm567waTDMHUmsbH1W0xBqdKjrC51cNqgTfZtbxHjJnDtUZV/faHLFUlkSEB7VskoxqsP52kXgSoGlGZzEc4KDLZEKQyjJb/B9ivvQATGjbDdMXYK/WuVoEi59PSge8MQkN9ni9+FbqqALinT7XcWSClJFLHXXrb2GEwhuF3hPZpaqKX3GIGqI5znpSI8LQ9Bp0qHDhpdRe0l/uQdUY6pSA3dc1kdjCrhlSFHK+IKt7QUKqb4xtWC7GwUiTDOM0somHxD1XquZSig1hkGj7VVLUyF9Bk8A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wEQshub/1/xJ1F043v9d07mHlf+sScRDh2PcizKwZTI=;
- b=g1LrXXJKwSslYQXnqNP81BuhgVtcMNjtD8JY0wh+SVu8UZ6GL5F4qyt1Qy0PZ7RMS+5CjW8JwBZd1SyTs8jcRJpCWTBqEpavS+YyLrNjjvR3BemctNFTG5lgiY1zJf4EeN0zLOTrkRU+wbIha1Q9syrdpMHup0F03boQt5CKDvSnxVnZV2i6A2rqD8REvE3Ajv0Kx0QWMmF0XHpIQtLUFELcXnJSs5R2J2uO7Qlmco1gPM+UspDKRFf5efbY2D8x8WWGX8Fw99CWU2CRlFF89g8vbHju9SoBAsQz8NihE0cnxnC86hwQJc8mYIaHEH23+GIVlbKCaaSUgIJxtPu+KQ==
+ bh=2y7nbb0vnAYfLBOXRjELDsfoAaUOLNFUFIkL/wwnUv4=;
+ b=bGoreglCtYiwVyTzpNzfTyLrn8XFe+eFSRqcghSuEC6Dd26rXbdaXhxN91zM1Li1n6OtMEUlUTOzoED2MzocrPiwNOvH03Quu+x/4cmx/6yg+C+qvW9UVgyYckH7ffAJk2CjDtKc8UjK+IR10iFeN8p3Af8q/fCE8cn2nkFePZTEFgW+vzKBTvHbFotpN4WnZK7ywf14RiEAU2ymJcntgHQWtYdSEQdyNuMPBmW36MYWxMp9m41md7Vc9ZGzEsivnoW5zNmdj8kBu6fcYIXqBD4gpKkqzPrYD7hCBTvs2TR8I6DBTaYN3jx+WsQwD1zx/umENFYxbIoXrfnt2IinZw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wEQshub/1/xJ1F043v9d07mHlf+sScRDh2PcizKwZTI=;
- b=f9dCSt1PuGgUmxBQviqLg6APInMveViut9KjHeeRMm44iANHWtZb+npZF5WUYv7wNa4U0pUyC2XqwHYGkC3FSAk8D3C3JXry09bzP8UtS/xal1TYQjXop7yhAG4Fuvy9ZVwVPF6gr4pm5HP2CtGMA8TGmZK0hE6z7sxp0/6NB30VhIdm1RvQHRuqXR//xfiInyP+O41U509/8FqdDvxO9Xyq+agzgnrt687oQfm+LYgkfM0xubF8ELZ1RvjswoSSTfhKNvFbLuC+3Ajayb3zDso6smR75L41BbweeawZwqgz7jaHg9SHpi/zMMkd+ZhciZDEoGQJsWLlLBT420WTdQ==
+ bh=2y7nbb0vnAYfLBOXRjELDsfoAaUOLNFUFIkL/wwnUv4=;
+ b=QFvzNu+t76BSqbrv4GCOSqEXTqnjlAgsw5qviZih7HCeTLcq/7QXQXDPVmFeTpnrFgiQa0+mxT8KxLotCgHG7RednjVdKGL8WHmK5txv3WrkgarWKW8fhB4xLzuUskTk1N34QVRLBJRTMGJiTtKsmWKKAeTNUGsdQeacjhJ5E8sCikNZHlwDK3eKafIOpc0txOWdVTfUMFJqvUZTRl5aUo/DTwXfe/Ig6m6WiqG4TLI1l7QUjPP5cnfQz5ZQF7+yAy2VAJUQ8m5AbyfMJi/tyKoPgHYfvHg+uY9Kj5V4/i5AO5Yu4AVE/I5d1p1ilmMyg95kVpFybYkqAwWW3w6KoA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from MN2PR12MB4373.namprd12.prod.outlook.com (2603:10b6:208:261::8)
  by DM4PR12MB6136.namprd12.prod.outlook.com (2603:10b6:8:a9::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Mon, 11 Dec
- 2023 14:08:20 +0000
+ 2023 14:08:22 +0000
 Received: from MN2PR12MB4373.namprd12.prod.outlook.com
  ([fe80::ff68:f81b:d451:9765]) by MN2PR12MB4373.namprd12.prod.outlook.com
  ([fe80::ff68:f81b:d451:9765%4]) with mapi id 15.20.7068.031; Mon, 11 Dec 2023
- 14:08:20 +0000
+ 14:08:22 +0000
 From: Benjamin Poirier <bpoirier@nvidia.com>
 To: netdev@vger.kernel.org
 Cc: Petr Machata <petrm@nvidia.com>,
 	Roopa Prabhu <roopa@nvidia.com>
-Subject: [PATCH iproute2-next 16/20] bridge: vni: Indent statistics with 2 spaces
-Date: Mon, 11 Dec 2023 09:07:28 -0500
-Message-ID: <20231211140732.11475-17-bpoirier@nvidia.com>
+Subject: [PATCH iproute2-next 17/20] bridge: Deduplicate print_range()
+Date: Mon, 11 Dec 2023 09:07:29 -0500
+Message-ID: <20231211140732.11475-18-bpoirier@nvidia.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231211140732.11475-1-bpoirier@nvidia.com>
 References: <20231211140732.11475-1-bpoirier@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: YQBPR01CA0130.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:c01:1::30) To MN2PR12MB4373.namprd12.prod.outlook.com
+X-ClientProxiedBy: YQXP288CA0032.CANP288.PROD.OUTLOOK.COM
+ (2603:10b6:c00:41::42) To MN2PR12MB4373.namprd12.prod.outlook.com
  (2603:10b6:208:261::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -67,119 +67,154 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: MN2PR12MB4373:EE_|DM4PR12MB6136:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6f514781-4eee-4ba3-4c9a-08dbfa52a108
+X-MS-Office365-Filtering-Correlation-Id: 56adb06c-132a-4f27-30eb-08dbfa52a22b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	k6wah/MO0f5RWr1Uk1RkLFNX0suU2oKj7C86O8i9diKUBdRDeD2mMPjZXMB7uQNrjOiI1RsVzXUnzN89Rzf7fbsO0YiOXTVACKimO8TdlaeCmTyvAfNY+fmBQAN83i5AyEYgcUXUpOkKcvxCWKdGhS5gwzuPKkSkgQd5pTKugUHjYpoMGfcSq2rKFfqEQJ5GMmPwqTfs/Wa8RtGzZLu9vYNfRZ27bb8HWsaxHbbQ6+UZZAu7REtoVdVpuWr8pQ8BcCSjITLiDKwo/66mNeUiOjEoR67ktAYV89qrfsvTeqVh8bLL+aiB94xYHb9SRLOtNBviC9f/muGxXua4N6l+z0gLIrBzCe7oelrMT+Iqa7Hszb4vIUHCXCnNkuCJ1GsX38qaWZz7z8/rWuRE+GZWCLGHEASH6c95luJGAynZFhsL5oD8l/zPJxNafXYggMHogxCCA616V9eNmhoBFnZH67Dv9cJd6gyT0VrRP4XXTZJ/u+a6hasLpH9hbRc2rTNqbkG4QKYO0lGkr3cZiMWBbE33DNP9hXAdrquOjYmmjvU27e/GX+4y3JaaBaWKjR78
+	iuCBX6x9g10pbGX9Wa8RULz9RCu2pr0CkXvUDHzLtofM956G35Xj2PV2UtqAqLczeIP5t0g21HyRmYVkIQU89BebGK2z2ZAhSuEzwEifmB47dWIHf9qeztZpYaPA9fBdnQg/VAJKJib0+5ZpoVIDxKTkP6WqcAI2UyDa4emCkeoxWfNJFRqqkWcTqHEe7IZGhNDAT99tgZNo8StfpOWj99JrjcgfU0FX+Tk3L7vTbpOxZVD/lYAwURJ83VUJY+W9Qb0CckEnFR/eV574Yj42evgzoMfLPzZO0mTwpeBh04LWzT723rBDZ+OqJS7qB2WKc4GZ1zCqgG34S+YkssEnoJxlSi+EuVQtChwBm6Xl9yWxm+w3nVDOFeHCfGB7zncuF7H2jUivtkdbNrqQBEhmKt++QAyuqXNwl/csqajtbYHNWnqL7Pt+FUQuk5yOCIPW/yDWBUp4Bye1+FyxXDgdmfwItgj78h+8RBVzHzz6qiMAuvItgHHgjWmDGIaVRV9/ydpK6bj2EgZXOOrowOPdL46N7dqzaZjfoK5f9B1jFaLU4/nVvxvsLT58HC0sDQ82
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4373.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(396003)(136003)(376002)(346002)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(6512007)(6506007)(1076003)(5660300002)(26005)(2616005)(107886003)(36756003)(66946007)(6486002)(54906003)(66476007)(66556008)(6916009)(2906002)(83380400001)(41300700001)(478600001)(86362001)(8676002)(8936002)(4326008)(316002)(38100700002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?D36iBQR/9hGcsTm/eAeU2Oaw3Nx0QUNKRWhcYb/aC4rWuM4K0QEvtBRhrVEP?=
- =?us-ascii?Q?e9iTxUhfCzZUUARymGsUDOJgdt5n13TlTolFf5iqZfKVObEs2DaR3kWkHlY3?=
- =?us-ascii?Q?j0fnEvwLXnF9/YZjbfdso3eX0iQh5zfQSBxDB/6tUJLMwhnKUXZakqWKgrD8?=
- =?us-ascii?Q?+w6T222YbEKBwxCL80Bz3xwhrXQoIf0mC2nC9P3I17seyklYStgDbY8V77Tx?=
- =?us-ascii?Q?WIWDtKEOJ3ciXQdW6ArtCkhL3XFoyuraIFaE8wDZIPEGUN5wk/eMWw51kr5L?=
- =?us-ascii?Q?OkknlJ2SuBVq3UzlrDE+ncKjUNd1MsQLfuv51hSW2X8Fu4kzUvu8tKGTkOSG?=
- =?us-ascii?Q?y84vCJfIrOfvUXen074DJeWTQyQYlSkMmwJ846Gd2VHpSuEjkv80z793QOFw?=
- =?us-ascii?Q?F66iZbCY9w1W76EiZ89Ks1Cdh2SJrukpnJg9cOFMaiP7B7lz4EI1SDM03nZv?=
- =?us-ascii?Q?8gmPhsO3fHQhDkGtKTdmzyFCbL5nqGvtPGiKCpnqQNfdts0da4AvurmLqGnG?=
- =?us-ascii?Q?nXCU2P9hksw6aidsZ9QVsCzW7KqSXasJCLBYNxmAiiNlp8y+CVNKzAdmVkfp?=
- =?us-ascii?Q?XX/eUjf1Gy0NNd+AWu0h+fHhmuKG8CTbdaFTgpspW3OVSo7mm7FsUg6vLy5Y?=
- =?us-ascii?Q?01kl0b/UZtcv5b3qlrDA3ST8k/AwJpXseexXE9FhsfnaSH58Z8TAkmeYsDqq?=
- =?us-ascii?Q?mDW8ZfldXscQe/0KLS98pCJW6c/ThFppejY2AV+oVuzQEi95EsU7Qq8HyoFf?=
- =?us-ascii?Q?ge3GhLh5TqzuknbUIL7AIdSHR5qQxK5kRA7R7YkSbJzYjaet3+jdpjDjJfS7?=
- =?us-ascii?Q?SLnNLiQ6jUbP3nGp7M9b2QaJR5Q20IRTaFy3j7/oelu0rAuXNt7H9Cxce+m7?=
- =?us-ascii?Q?RRu7GtoI94WmUZpjkTHRyli1seSY9ckmENEE9FmmDmGPalWOnU34E75blQcN?=
- =?us-ascii?Q?gdB3fIWdjF2O5oLVn6RA20BOQLD/QkIwiYipF41MGN2UBCA/tERTaF7tfrYH?=
- =?us-ascii?Q?rPdFv8/LS7e4927jGuMZGPFZvcI4IG7XMnbiW7KVSCe580VztV5N+BaW6d05?=
- =?us-ascii?Q?9PSOGBWc3yHg7ym+ZbweYLJjkgpn1OJfzXdNc0MkMtFKLly4PyTarPUry7p2?=
- =?us-ascii?Q?INuM6r+iS8qVj5tPBM/1iCvpi3p4SxqalhNTAyGZVbUuWLgN0HA9nU5REu0C?=
- =?us-ascii?Q?U+Cd7Utbopiof+cmb/xxvqtTsdPfnTm50fR5IDpDXzvk+BDsP9qRiDcCvL8L?=
- =?us-ascii?Q?yUgO9GYmhMA+Y8s3+l5rfgWy+aBhbnWFvf0eBhOwHm+nmmOvsbVWp7rtMEwH?=
- =?us-ascii?Q?StRTsztATGQc2ICmqfPOMIniavZ3sx9PLVy4wfg2ETTFMwd5j2qKOSbuVtiO?=
- =?us-ascii?Q?FWZosF4RM1Ffu/MGeD8A7gze166x1ynmeXVikYZzrSpivnuBtY+6AaGMnwar?=
- =?us-ascii?Q?gZBCGZn8yab9W6wWDRqg83GgtAGMLX9XXd3PCW+Lm6o8Sko9Z9WlS/Us5AYe?=
- =?us-ascii?Q?F34N+9U7YOaUuszAPUh7glYI7OsI/R6EVKBzmKQtNU5kSFThLCWC44i/iUif?=
- =?us-ascii?Q?mVVOPbzUCkctEeyZB0bDLDhN0OpAFRZ3N/ezw2fp?=
+	=?us-ascii?Q?tfsV3JzQzNPVPA0ZyQw4vAkiewTuzn4a65mqD0WC8H/Y7Jf14ZtRVuSGWBTA?=
+ =?us-ascii?Q?9i9lzXUu2lCpHyJp8Lrd2y6Y56TUw9uFfT38PgdJbzUZucSX/b3QSgR9N5tb?=
+ =?us-ascii?Q?jm9pZ3vRlbsfSjN/aE1OlO84DKbCKr/i8gWeA8VSmH2i7ez5RWyEyYZFOGb7?=
+ =?us-ascii?Q?clRc1sFcSNMH3hj7tkk8kyTw9e4bvdMyE7kJlZbUGrPtOTXAPFNUAY5oGwFK?=
+ =?us-ascii?Q?jgr0GEpAxWw9wJE5j27Vl9ljCnmpwK3Aaz53da2d08QnRxAatJu6OD/D5XK4?=
+ =?us-ascii?Q?TwykIYKXUUVNVrNi8CHKO3X18GmCdvCDRnnzfnbghsLEF6gK3RKAKT6ESlg/?=
+ =?us-ascii?Q?KfGCA/GZ3HD9upuAynV6ivr6szDKCrJPSzuHjnPe4cevBvqFTRb6+eki2msb?=
+ =?us-ascii?Q?DCihx2e5OB4tQUJ2BeLRG937a8Fy2xqvBCtvwRR/IEV8BNNv/XqvxUpLBNM0?=
+ =?us-ascii?Q?BxvHvMzn4+rTu5IaOq1xY+BLwtMQmwsDfCM6Thz+jbFvnH0vjEKVpB3BO9EO?=
+ =?us-ascii?Q?9ISMt2swCS6M4qsfxElYmaOo4mFK3vuslxVF9khseBD8LOzNQzcKjsbYYHji?=
+ =?us-ascii?Q?QaDDd0nqMHNsn920+KD1JqlrF8u9G+HCQdBm8vCmZ31KDFQ9050e+Rudkylr?=
+ =?us-ascii?Q?m4TNNRDa/1/RtY0bYBVU4nVeqPG4aN7DI5Q7AKH4WHHfBWzIc+duGsbHiClQ?=
+ =?us-ascii?Q?0B/SDIZd1xP5T+d5mLlEdWP+IyT2VQjYGIvpw5N5hxaO2P3OwXzld7nXmma5?=
+ =?us-ascii?Q?R9x8Nr3y9Py8q0NNnnhPAh2QzsdGGQRqNxpmJGIKUXIsB29l5LI5USioVWeH?=
+ =?us-ascii?Q?SDzb38LzP14XU3J1aI877z3JeAzhf/60fQOvDGNKqd+yJUl5tESZBy39HRg+?=
+ =?us-ascii?Q?ZrfNw27rrgWG/fEdNqEgcoRO7ojUJ9d8252vdAymi3F/XvEqOprnbkka/6vj?=
+ =?us-ascii?Q?1O179wnENRi2CztpDOfTJWM3g0HsJ4++H0O+axYbjhXtTDW6LfRHPAK8mla/?=
+ =?us-ascii?Q?zJrx9THY5Xmaf5DEmAmxLffxBDAPZp9XpU1e9YWefW+PZ2KVJgJOxCZ4smCr?=
+ =?us-ascii?Q?eSUCt7SMSPP4MoHlfl46wabCh3nRL9cL8PTUFd5SqTIqgLjgksUZjRZ+BxsF?=
+ =?us-ascii?Q?tAKFUmELTuoXqgEy3y2+FFMoac5ZsjuDZ/aUESC8kN2kYozToFHw9D8/JemF?=
+ =?us-ascii?Q?gm3yfw89+jtCNB0I/+/rIKFSYIy+cqD2HB1kE7AWFjDkZ+F7qEv2xmApy8fn?=
+ =?us-ascii?Q?iBwfSbx9j+x9SGfZdVEQ3Icsg8bMNgtMeRU6km/2CaxE0OPzzGJml7jG6d5P?=
+ =?us-ascii?Q?+rQ8XVwpAttg5zRdfwyTg8LFzZjQkVfzhInNLPWAIaYcZVTzzPfFLKjUNZgY?=
+ =?us-ascii?Q?+2xHtXIXi4kyD4uuurIJDmcxVeVcbcCYotghi2XrWqfp/udJSCayrPI7Sqj2?=
+ =?us-ascii?Q?Cbw5uYNbvyc21uTXnbZraYAuhD/m9hcnZiLUITuN8EubrqkaPBZ4pAFZAVN0?=
+ =?us-ascii?Q?P7lU/2czyUO25oN6AaYItp8qNHJbfVN8UXjQG6bBefeZY0uFbQ1i5Eg+y6jl?=
+ =?us-ascii?Q?cqy2t57cuKbEPbvhLNdUV2dTzBBkl4N3GzMbBTl1?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6f514781-4eee-4ba3-4c9a-08dbfa52a108
+X-MS-Exchange-CrossTenant-Network-Message-Id: 56adb06c-132a-4f27-30eb-08dbfa52a22b
 X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4373.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2023 14:08:20.0316
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2023 14:08:21.9569
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: H4hPVEw5emgc45K/UNJjuWtn0bF3FUY8ch5EdZzl62cSEYzeNRC4XvJoqRPhrYPwHhQwn9TppIPJNj7sBZg4DA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: TYkjWAlKM3PEMzAnVe5W7BTowGoBL5QZjncVERHXKTXb0PmEED0UjY3fbuyoxYIqD44RkRZWCM0cUfhkPXegbw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6136
 
-`bridge -s vlan` indents statistics with 2 spaces compared to the vlan id
-column while `bridge -s vni` indents them with 1 space. Change `bridge vni`
-to match the behavior of `bridge vlan` since that second command predates
-`bridge vni`.
-
-Before:
-$ bridge -s vni
-dev               vni                group/remote
-vxlan1            4001
-                   RX: bytes 0 pkts 0 drops 0 errors 0
-                   TX: bytes 0 pkts 0 drops 0 errors 0
-                  4002               10.0.0.1
-                   RX: bytes 0 pkts 0 drops 0 errors 0
-                   TX: bytes 0 pkts 0 drops 0 errors 0
-vxlan2            100
-                   RX: bytes 0 pkts 0 drops 0 errors 0
-                   TX: bytes 0 pkts 0 drops 0 errors 0
-
-After:
-$ bridge -s vni
-dev               vni                group/remote
-vxlan1            4001
-                    RX: bytes 0 pkts 0 drops 0 errors 0
-                    TX: bytes 0 pkts 0 drops 0 errors 0
-                  4002               10.0.0.1
-                    RX: bytes 0 pkts 0 drops 0 errors 0
-                    TX: bytes 0 pkts 0 drops 0 errors 0
-vxlan2            100
-                    RX: bytes 0 pkts 0 drops 0 errors 0
-                    TX: bytes 0 pkts 0 drops 0 errors 0
+The two implementations are now identical so keep only one instance and
+move it to json_print.c where there are already a few other specialized
+printing functions.
 
 Reviewed-by: Petr Machata <petrm@nvidia.com>
 Tested-by: Petr Machata <petrm@nvidia.com>
 Signed-off-by: Benjamin Poirier <bpoirier@nvidia.com>
 ---
- bridge/vni.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ bridge/vlan.c        | 14 --------------
+ bridge/vni.c         | 14 --------------
+ include/json_print.h |  2 ++
+ lib/json_print.c     | 14 ++++++++++++++
+ 4 files changed, 16 insertions(+), 28 deletions(-)
 
+diff --git a/bridge/vlan.c b/bridge/vlan.c
+index 7a175b04..05e6a620 100644
+--- a/bridge/vlan.c
++++ b/bridge/vlan.c
+@@ -590,20 +590,6 @@ static void close_vlan_port(void)
+ 	close_json_object();
+ }
+ 
+-static unsigned int print_range(const char *name, __u32 start, __u32 id)
+-{
+-	char end[64];
+-	int width;
+-
+-	snprintf(end, sizeof(end), "%sEnd", name);
+-
+-	width = print_uint(PRINT_ANY, name, "%u", start);
+-	if (start != id)
+-		width += print_uint(PRINT_ANY, end, "-%u", id);
+-
+-	return width;
+-}
+-
+ static void print_vlan_tunnel_info(struct rtattr *tb, int ifindex)
+ {
+ 	struct rtattr *i, *list = tb;
 diff --git a/bridge/vni.c b/bridge/vni.c
-index e9943872..2c6d506a 100644
+index 2c6d506a..ffc3e188 100644
 --- a/bridge/vni.c
 +++ b/bridge/vni.c
-@@ -187,8 +187,8 @@ static void print_vnifilter_entry_stats(struct rtattr *stats_attr)
- 			   RTA_PAYLOAD(stats_attr), NLA_F_NESTED);
+@@ -163,20 +163,6 @@ static void close_vni_port(void)
+ 	close_json_object();
+ }
  
- 	print_nl();
--	print_string(PRINT_FP, NULL, "%-" __stringify(IFNAMSIZ) "s   ", "");
--	print_string(PRINT_FP, NULL, "RX: ", "");
-+	print_string(PRINT_FP, NULL, "%-" __stringify(IFNAMSIZ) "s    RX: ",
-+		     "");
+-static unsigned int print_range(const char *name, __u32 start, __u32 id)
+-{
+-	char end[64];
+-	int width;
+-
+-	snprintf(end, sizeof(end), "%sEnd", name);
+-
+-	width = print_uint(PRINT_ANY, name, "%u", start);
+-	if (start != id)
+-		width += print_uint(PRINT_ANY, end, "-%u", id);
+-
+-	return width;
+-}
+-
+ static void print_vnifilter_entry_stats(struct rtattr *stats_attr)
+ {
+ 	struct rtattr *stb[VNIFILTER_ENTRY_STATS_MAX+1];
+diff --git a/include/json_print.h b/include/json_print.h
+index 0b1d84f7..86dc5f16 100644
+--- a/include/json_print.h
++++ b/include/json_print.h
+@@ -97,6 +97,8 @@ static inline int print_rate(bool use_iec, enum output_type t,
+ 	return print_color_rate(use_iec, t, COLOR_NONE, key, fmt, rate);
+ }
  
- 	if (stb[VNIFILTER_ENTRY_STATS_RX_BYTES]) {
- 		stat = rta_getattr_u64(stb[VNIFILTER_ENTRY_STATS_RX_BYTES]);
-@@ -208,8 +208,8 @@ static void print_vnifilter_entry_stats(struct rtattr *stats_attr)
- 	}
++unsigned int print_range(const char *name, __u32 start, __u32 id);
++
+ int print_color_bool_opt(enum output_type type, enum color_attr color,
+ 			 const char *key, bool value, bool show);
  
- 	print_nl();
--	print_string(PRINT_FP, NULL, "%-" __stringify(IFNAMSIZ) "s   ", "");
--	print_string(PRINT_FP, NULL, "TX: ", "");
-+	print_string(PRINT_FP, NULL, "%-" __stringify(IFNAMSIZ) "s    TX: ",
-+		     "");
- 
- 	if (stb[VNIFILTER_ENTRY_STATS_TX_BYTES]) {
- 		stat = rta_getattr_u64(stb[VNIFILTER_ENTRY_STATS_TX_BYTES]);
+diff --git a/lib/json_print.c b/lib/json_print.c
+index 602de027..072105c0 100644
+--- a/lib/json_print.c
++++ b/lib/json_print.c
+@@ -374,3 +374,17 @@ int print_color_rate(bool use_iec, enum output_type type, enum color_attr color,
+ 	free(buf);
+ 	return rc;
+ }
++
++unsigned int print_range(const char *name, __u32 start, __u32 id)
++{
++	char end[64];
++	int width;
++
++	snprintf(end, sizeof(end), "%sEnd", name);
++
++	width = print_uint(PRINT_ANY, name, "%u", start);
++	if (start != id)
++		width += print_uint(PRINT_ANY, end, "-%u", id);
++
++	return width;
++}
 -- 
 2.43.0
 
