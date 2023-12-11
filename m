@@ -1,165 +1,108 @@
-Return-Path: <netdev+bounces-55957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC4F680CF60
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 16:24:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 638A880CF78
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 16:27:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EC14B212BF
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:24:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94EC71C21269
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:27:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B22B3B184;
-	Mon, 11 Dec 2023 15:24:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 004B44AF9D;
+	Mon, 11 Dec 2023 15:27:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 009EEDC;
-	Mon, 11 Dec 2023 07:24:01 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R371e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0VyJONX._1702308238;
-Received: from 30.221.130.53(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VyJONX._1702308238)
-          by smtp.aliyun-inc.com;
-          Mon, 11 Dec 2023 23:23:59 +0800
-Message-ID: <7ff3001a-4254-0382-f8c8-6ebf2807346a@linux.alibaba.com>
-Date: Mon, 11 Dec 2023 23:23:57 +0800
+Received: from netrider.rowland.org (netrider.rowland.org [192.131.102.5])
+	by lindbergh.monkeyblade.net (Postfix) with SMTP id 83643DC
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 07:27:11 -0800 (PST)
+Received: (qmail 132862 invoked by uid 1000); 11 Dec 2023 10:27:10 -0500
+Date: Mon, 11 Dec 2023 10:27:10 -0500
+From: Alan Stern <stern@rowland.harvard.edu>
+To: Douglas Anderson <dianders@chromium.org>
+Cc: linux-usb@vger.kernel.org,
+  Greg Kroah-Hartman <gregkh@linuxfoundation.org>, netdev@vger.kernel.org,
+  =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
+  Eric Dumazet <edumazet@google.com>, Hayes Wang <hayeswang@realtek.com>,
+  Brian Geffon <bgeffon@google.com>, "David S . Miller" <davem@davemloft.net>,
+  Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+  Grant Grundler <grundler@chromium.org>, Paolo Abeni <pabeni@redhat.com>,
+  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] usb: core: Fix crash w/ usb_choose_configuration() if
+ no driver
+Message-ID: <1ec52764-7fd9-484f-bcdc-bbf97194deef@rowland.harvard.edu>
+References: <20231211070808.v2.1.If27eb3bf7812f91ab83810f232292f032f4203e0@changeid>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net-next v5 2/9] net/smc: introduce sub-functions for
- smc_clc_send_confirm_accept()
-To: Alexandra Winter <wintera@linux.ibm.com>, wenjia@linux.ibm.com,
- hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, kgraul@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, raspl@linux.ibm.com,
- schnelle@linux.ibm.com, guangguan.wang@linux.alibaba.com,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <1702021259-41504-1-git-send-email-guwen@linux.alibaba.com>
- <1702021259-41504-3-git-send-email-guwen@linux.alibaba.com>
- <ac3c0823-8705-4225-96c8-ed7bc55d1bfc@linux.ibm.com>
- <9a6d57c0-f5b4-9b2c-dc5f-dc47d0518141@linux.alibaba.com>
- <fb2365f6-1237-4f22-9897-5676757e5157@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <fb2365f6-1237-4f22-9897-5676757e5157@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231211070808.v2.1.If27eb3bf7812f91ab83810f232292f032f4203e0@changeid>
 
+On Mon, Dec 11, 2023 at 07:08:14AM -0800, Douglas Anderson wrote:
+> It's possible that usb_choose_configuration() can get called when a
+> USB device has no driver. In this case the recent commit a87b8e3be926
+> ("usb: core: Allow subclassed USB drivers to override
+> usb_choose_configuration()") can cause a crash since it dereferenced
+> the driver structure without checking for NULL. Let's add a check.
+> 
+> A USB device with no driver is an anomaly, so make
+> usb_choose_configuration() return immediately if there is no driver.
+> 
+> This was seen in the real world when usbguard got ahold of a r8152
+> device at the wrong time. It can also be simulated via this on a
+> computer with one r8152-based USB Ethernet adapter:
+>   cd /sys/bus/usb/drivers/r8152-cfgselector
+>   to_unbind="$(ls -d *-*)"
+>   real_dir="$(readlink -f "${to_unbind}")"
+>   echo "${to_unbind}" > unbind
+>   cd "${real_dir}"
+>   echo 0 > authorized
+>   echo 1 > authorized
+> 
+> Fixes: a87b8e3be926 ("usb: core: Allow subclassed USB drivers to override usb_choose_configuration()")
+> Signed-off-by: Douglas Anderson <dianders@chromium.org>
+> ---
+> 
+> Changes in v2:
+> - Return immediately if no driver, as per Alan.
+> 
+>  drivers/usb/core/generic.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/usb/core/generic.c b/drivers/usb/core/generic.c
+> index dcb897158228..2be1e8901e2f 100644
+> --- a/drivers/usb/core/generic.c
+> +++ b/drivers/usb/core/generic.c
+> @@ -59,7 +59,11 @@ int usb_choose_configuration(struct usb_device *udev)
+>  	int num_configs;
+>  	int insufficient_power = 0;
+>  	struct usb_host_config *c, *best;
+> -	struct usb_device_driver *udriver = to_usb_device_driver(udev->dev.driver);
+> +	struct usb_device_driver *udriver;
+> +
+> +	if (!udev->dev.driver)
+> +		return -1;
 
+This is a rather unusual condition.  It would be good to put a comment 
+just before the test, explaining that if a USB device (not an interface) 
+doesn't have a driver then the kernel has no business trying to select 
+or install a configuration for it.
 
-On 2023/12/11 21:35, Alexandra Winter wrote:
-> 
-> 
-> On 11.12.23 13:15, Wen Gu wrote:
->>>> +    clc = (struct smc_clc_msg_accept_confirm *)clc_v2;
->>>
->>> Why is this cast neccessary? (Here as well as in smcr_clc_prep_confirm_accept
->>> and in smc_clc_send_confirm_accept)
->>> smc_clc_msg_accept_confirm_v2 has hdr and d0 as well.
->>
->> I think the cast is to imply that v2 is an expansion of v1, or v1 is the base of v2.
->> So here using clc(v1) reperesents their common set.
->>
->> If we use smc_clc_msg_accept_confirm_v2 for all, I think readers may be tempted to
->> check whether the hdr and d0 in 'smc_clc_msg_accept_confirm_v2' are also applicable to v1.
->>
->> And there are settings below that are specific for v1. It may be confusing if we
->> change it like this:
->>
->> if (version == SMC_V1) {
->>      clc_v2->hdr.length = htons(SMCD_CLC_ACCEPT_CONFIRM_LEN);
->> } else {
->>
->>
->>>
->>> IMO, it would be a nice seperate patch to get rid of the 2 type defs for
->>> smc_clc_msg_accept_confirm and smc_clc_msg_accept_confirm_v2
->>> and all the related casting anyhow.
->>>
->>
->> Do you mean to define only smc_clc_msg_accept_confirm_v2 or define with the name
->> of smc_clc_msg_accept_confirm but the contents of smc_clc_msg_accept_confirm_v2?
->>
->> I have a different opinion on this, since I think the smc_clc_msg_accept_confirm
->> and smc_clc_msg_accept_confirm_v2 clearly shows the difference between v1 and
->> v2 messages and remind people what is currently working on. So I perfer to keep them.
->> Am I missing something?
->>
-> 
-> 
-> This is a discussion about coding style, readability and maintainability (avoid future errors).
-> And the code works today and the rest is opinions. That said, let me list some arguments why
-> I don't like the casts.
-> 
-> Casts in general break the type checking of the compiler.
-> 
-> In some places e.g. clc.d0 points to struct smc_clc_msg_accept_confirm in other
-> places it points to struct smc_clc_msg_accept_confirm_v2.
-> This makes it hard to find all places where e.g. d0 is altered. (e.g. with an IDE).
-> 
-> You say: "smc_clc_msg_accept_confirm
->> and smc_clc_msg_accept_confirm_v2 clearly shows the difference between v1 and
->> v2 messages"
-> But that is not even the case in the code that this patch changes:
-> In smcd_clc_prep_confirm_accept() you pass a struct smc_clc_msg_accept_confirm_v2
-> cast it to v1 (even in the v2 case) and then use the v1 layout for the common fields and
-> the v1-only fields. So I don't think that helps very much.
-> 
-> The v2 messages were explicitely defined for compatibility. i.e.
-> all v1 fields are still available. It would be good to see that in the code as well.
-> With 2 differnet structs you don't emphasize that.
-> 
-> With future changes somebody could easily make a mistake that the 2 structures don't
-> have the same size anymore. And then the casting can lead to out-of-bound error that
-> are hard to find.
-> 
-> We want v2 to be the usual case and v1 to be the exception for backwards compatibility.
-> FOr historic reasons, the code looks as if v2 is the exception. I'd rather point out the
-> remaining v1 cases.
-> 
-> 
-> 
-> I could envision something like:
-> 
-> struct smc_clc_msg_accept_confirm {	/* clc accept / confirm message */
-> 	struct smc_clc_msg_hdr hdr;
-> 	union {
-> 		struct { /* SMC-R */
-> 			struct smcr_clc_msg_accept_confirm r0;
-> 			/* v2 only, reserved and ignored in v1: */
-> 			u8 eid[SMC_MAX_EID_LEN];
-> 			u8 reserved6[8];
-> 		} r1;
-> 		struct { /* SMC-D */
-> 			struct smcd_clc_msg_accept_confirm_common d0;
-> 			/* v2 only, reserved and ignored in v1: */
-> 			__be16 chid;
-> 			u8 eid[SMC_MAX_EID_LEN];
-> 			__be64 gid_ext;
-> 		} __packed d1;
-> 	};
-> };
-> 
-> And then only use this one structure.
-> 
+Along with the comment, feel free to add:
 
-Thank you Sandy for the detailed explanation.
+Reviewed-by: Alan Stern <stern@rowland.harvard.edu>
 
-What I considered, as mentioned above, is that if the two are combined,
-it may be difficult to distinguish according to the name what situation
-I am in, v1 or v2?
+Alan Stern
 
-But I do agree with your concern about the potential errors that caused
-by future divergence of the two struct if they are defined separately.
-
-I will try to combine them into one struct in a seperate patch.
-
-Thank you.
-
+> +	udriver = to_usb_device_driver(udev->dev.driver);
+>  
+>  	if (usb_device_is_owned(udev))
+>  		return 0;
+> -- 
+> 2.43.0.472.g3155946c3a-goog
+> 
 
