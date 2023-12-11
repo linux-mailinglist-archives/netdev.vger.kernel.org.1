@@ -1,65 +1,156 @@
-Return-Path: <netdev+bounces-55908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9E9B80CC7A
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:01:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB01680CC9D
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:02:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A7CEB21350
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:01:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0D6F28183C
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:02:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B1F2482D6;
-	Mon, 11 Dec 2023 14:01:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B274482E6;
+	Mon, 11 Dec 2023 14:02:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0T7OMB/A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="baKnYNyC"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 705C5F3;
-	Mon, 11 Dec 2023 06:01:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3lSnL8uvBeA4AV6Ywgmq37nYOceo3gVzdnHuyj44eCg=; b=0T7OMB/AVoyPdiycJCqbDQqlGB
-	txr3s5nkFNyIeVzRUSTVCh07N2RyrD0B+6ayRw4cVXShUHIMsGdoF/4b9uVaS9/U6yNrN44FoN+5T
-	DTwowUB7MxS7U5W0C6A6P2HuIlNsNqTZPE8cYOuM96t0bHMrSDE4UByrcehSm8wFPdoY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rCgqp-002cmG-To; Mon, 11 Dec 2023 15:01:39 +0100
-Date: Mon, 11 Dec 2023 15:01:39 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com,
-	benno.lossin@proton.me, wedsonaf@gmail.com, aliceryhl@google.com,
-	boqun.feng@gmail.com
-Subject: Re: [PATCH net-next v10 4/4] net: phy: add Rust Asix PHY driver
-Message-ID: <d7e3b4e9-fad2-4033-b79d-de812f88ff7d@lunn.ch>
-References: <20231210234924.1453917-1-fujita.tomonori@gmail.com>
- <20231210234924.1453917-5-fujita.tomonori@gmail.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BBEB482CB;
+	Mon, 11 Dec 2023 14:02:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1058C433CA;
+	Mon, 11 Dec 2023 14:02:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702303363;
+	bh=DcyRBQghAEDYdsobnNJjsQmjXbVGrdpzxORTviMmKm0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=baKnYNyCC4UinxgNwfxxv92phVvyBLQFdX6a5rL5PUb7V7R2tn/nx41KQR16MV2/z
+	 5/eodOjrkbgRm65ehcarJWLR6JYWuPTw63HcSljEN1qyHAxuS04//+LoCS9yfsvmK+
+	 TAobMj17MJTNbhPGDxWnAqBZXHRqa8A1x2o6vcgW/DQX/NZ1VYrl9uc6OtF8FmbfWC
+	 q3rzuP5+khsFxggGYIUzSikVhLtbaweTG2/kRjq9Q/FqXuOKNiR35Cih3gE6thHtco
+	 NiM/ySxgn/syGpWbxmjsEGLwLKceSnU3OAay+niZ87uC9SLP5Rf3mp0no49c31vvpt
+	 X5EO+JvlCV3zg==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Thinh Tran <thinhtr@linux.vnet.ibm.com>,
+	Venkata Sai Duggi <venkata.sai.duggi@ibm.com>,
+	David Christensen <drc@linux.vnet.ibm.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	pavan.chebbi@broadcom.com,
+	mchan@broadcom.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 08/12] net/tg3: fix race condition in tg3_reset_task()
+Date: Mon, 11 Dec 2023 09:02:01 -0500
+Message-ID: <20231211140219.392379-8-sashal@kernel.org>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231211140219.392379-1-sashal@kernel.org>
+References: <20231211140219.392379-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231210234924.1453917-5-fujita.tomonori@gmail.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 5.4.263
+Content-Transfer-Encoding: 8bit
 
-On Mon, Dec 11, 2023 at 08:49:24AM +0900, FUJITA Tomonori wrote:
-> This is the Rust implementation of drivers/net/phy/ax88796b.c. The
-> features are equivalent. You can choose C or Rust version kernel
-> configuration.
-> 
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> Reviewed-by: Trevor Gross <tmgross@umich.edu>
-> Reviewed-by: Benno Lossin <benno.lossin@proton.me>
+From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+[ Upstream commit 16b55b1f2269962fb6b5154b8bf43f37c9a96637 ]
 
-    Andrew
+When an EEH error is encountered by a PCI adapter, the EEH driver
+modifies the PCI channel's state as shown below:
+
+   enum {
+      /* I/O channel is in normal state */
+      pci_channel_io_normal = (__force pci_channel_state_t) 1,
+
+      /* I/O to channel is blocked */
+      pci_channel_io_frozen = (__force pci_channel_state_t) 2,
+
+      /* PCI card is dead */
+      pci_channel_io_perm_failure = (__force pci_channel_state_t) 3,
+   };
+
+If the same EEH error then causes the tg3 driver's transmit timeout
+logic to execute, the tg3_tx_timeout() function schedules a reset
+task via tg3_reset_task_schedule(), which may cause a race condition
+between the tg3 and EEH driver as both attempt to recover the HW via
+a reset action.
+
+EEH driver gets error event
+--> eeh_set_channel_state()
+    and set device to one of
+    error state above           scheduler: tg3_reset_task() get
+                                returned error from tg3_init_hw()
+                             --> dev_close() shuts down the interface
+tg3_io_slot_reset() and
+tg3_io_resume() fail to
+reset/resume the device
+
+To resolve this issue, we avoid the race condition by checking the PCI
+channel state in the tg3_reset_task() function and skip the tg3 driver
+initiated reset when the PCI channel is not in the normal state.  (The
+driver has no access to tg3 device registers at this point and cannot
+even complete the reset task successfully without external assistance.)
+We'll leave the reset procedure to be managed by the EEH driver which
+calls the tg3_io_error_detected(), tg3_io_slot_reset() and
+tg3_io_resume() functions as appropriate.
+
+Adding the same checking in tg3_dump_state() to avoid dumping all
+device registers when the PCI channel is not in the normal state.
+
+Signed-off-by: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+Tested-by: Venkata Sai Duggi <venkata.sai.duggi@ibm.com>
+Reviewed-by: David Christensen <drc@linux.vnet.ibm.com>
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+Link: https://lore.kernel.org/r/20231201001911.656-1-thinhtr@linux.vnet.ibm.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/broadcom/tg3.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+index 90bfaea6d6292..74710f523f356 100644
+--- a/drivers/net/ethernet/broadcom/tg3.c
++++ b/drivers/net/ethernet/broadcom/tg3.c
+@@ -6460,6 +6460,14 @@ static void tg3_dump_state(struct tg3 *tp)
+ 	int i;
+ 	u32 *regs;
+ 
++	/* If it is a PCI error, all registers will be 0xffff,
++	 * we don't dump them out, just report the error and return
++	 */
++	if (tp->pdev->error_state != pci_channel_io_normal) {
++		netdev_err(tp->dev, "PCI channel ERROR!\n");
++		return;
++	}
++
+ 	regs = kzalloc(TG3_REG_BLK_SIZE, GFP_ATOMIC);
+ 	if (!regs)
+ 		return;
+@@ -11196,7 +11204,8 @@ static void tg3_reset_task(struct work_struct *work)
+ 	rtnl_lock();
+ 	tg3_full_lock(tp, 0);
+ 
+-	if (tp->pcierr_recovery || !netif_running(tp->dev)) {
++	if (tp->pcierr_recovery || !netif_running(tp->dev) ||
++	    tp->pdev->error_state != pci_channel_io_normal) {
+ 		tg3_flag_clear(tp, RESET_TASK_PENDING);
+ 		tg3_full_unlock(tp);
+ 		rtnl_unlock();
+-- 
+2.42.0
+
 
