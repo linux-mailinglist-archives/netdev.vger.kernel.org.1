@@ -1,227 +1,144 @@
-Return-Path: <netdev+bounces-55903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63AD680CC4C
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:00:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 263EA80CC6B
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:00:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 170E828100E
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:00:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5C611F20C73
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:00:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112C0482C1;
-	Mon, 11 Dec 2023 14:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5112482C6;
+	Mon, 11 Dec 2023 14:00:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="YGEmrRc1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IZ+Q1ocQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [IPv6:2a00:1098:ed:100::25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83E33478A;
-	Mon, 11 Dec 2023 05:59:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1702303189;
-	bh=dKIWPsl1+iB2/HkzpJsN57Kk1dREJYExJbg+W32xu7M=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=YGEmrRc1jEJzfPPF6dLbd4heZq9uLnyF4pej2TSkPXZLgrVyhmu7OqHPZ/0jcl64t
-	 t+KUNzhJXuzEGlo/xfv9iZqv4eSRp/turrbYd63mibACbd3cUlMGxGwNloE6Hu6C0T
-	 bEHMjdbzd03fJ5iUlhHrIoXhghvM0fKdWDYwx8ZP/a6rGL9ZfdMcTrRlIcWA/nhyXO
-	 KuGhiV+v2xBkPfkLNsGyMnHP5sCnO7G83SFrUJVcRsAl6oF65vdFTBs1JJ0VRyNK+c
-	 /xZ83+DtdN9XTwo39xLwW84zGhdZjBM9iu5shi+/fKdNSZE1Ifpwfp9XkRAc67AnJ6
-	 dt9L3hQiw+9oQ==
-Received: from [IPV6:fd00::2a:39ce] (cola.collaboradmins.com [IPv6:2a01:4f8:1c1c:5717::1])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 70134378110F;
-	Mon, 11 Dec 2023 13:59:47 +0000 (UTC)
-Message-ID: <4fce268c-4ef1-4361-b524-4c9bf9b60370@collabora.com>
-Date: Mon, 11 Dec 2023 14:59:46 +0100
+Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA4934C1F;
+	Mon, 11 Dec 2023 06:00:25 -0800 (PST)
+Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-5e180547bdeso1458317b3.1;
+        Mon, 11 Dec 2023 06:00:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702303225; x=1702908025; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LNTv7V3EOxu8et+zxKRKRD7xOGYn8t55trHPfKfBcwo=;
+        b=IZ+Q1ocQvf0EqoQJMZXvl9CRIrLkCY6CYBMV5lgvT66wedCAAJppYZb3DjQlMCmbu8
+         J8jjzu0nmdf6uK8Q8RO7RP+4qjVTNZKM9QCgDjDeUjCBkPnXxcY4VZjackjUhy0kWNZW
+         yERJ+A9HEmCayllSlY142FulW0EGKwmUB9bPw95ZnDTF3XWsdH33enaRUa2kUktPFwTo
+         HxIS3aawvm2IIHF1d5Mf38J/Yl1fgIqYDsIoZuIiU3HOwKUjyTo37ypqvmDPKIwzMLzN
+         tXaY+QnrYDbrh/phk6+Y3ekSI+ao6CtT8w6pKMv8fZOPKH7vwoWNhv5i0Fngg1DpYJJF
+         EkOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702303225; x=1702908025;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LNTv7V3EOxu8et+zxKRKRD7xOGYn8t55trHPfKfBcwo=;
+        b=N+qzxX8CAPXo2FDt41QceFBuxHpL2V++3+o1fK/RPGPS4ty30uUaEwNtGI7wLpCYMp
+         DryWHj8R3soNjkz3S6EdIqz2OKK0zeA6pg+B5QiDYED2+bmyx2ttnSGINtf0MzTv3pLq
+         /8BSfgZY5pHcgV6GvOFFmyj5MOKkj97qdLMzVdEUCnAC4LMRlLENTIrmqRx38IdoE0/Q
+         MAcD3D44BkkCblJUIpcC4yO5mwbkmCfQHdFg8k4cIyZLdiMSwJpsbvSPhTv9nLUJa5N3
+         br5Hm/nxlnf22UnACSUaAUeBAteYb3G+rEcNTGeeh+nsDAlXjCZLRxlaJvu0GvxExtvT
+         vzgg==
+X-Gm-Message-State: AOJu0YytMVsS83ZiByk2VA+DCcjGFaljHlCM3/gssarfegmNHS7g45wE
+	2uc2dLBKXNAE+Jj2xgtaQBg=
+X-Google-Smtp-Source: AGHT+IGLhyIF/d5QvpkeI4/4kwHQ1QkLNBHHxOYgnuqRp9V6jzQy+pH/7dtnS4EyBFrob/ltOoRX4g==
+X-Received: by 2002:a5b:784:0:b0:d9a:d8bd:7b9c with SMTP id b4-20020a5b0784000000b00d9ad8bd7b9cmr2783952ybq.11.1702303224510;
+        Mon, 11 Dec 2023 06:00:24 -0800 (PST)
+Received: from localhost ([2601:344:8301:57f0:f798:e824:429f:84b0])
+        by smtp.gmail.com with ESMTPSA id k18-20020a258c12000000b00d9cbf2aabc6sm2514846ybl.14.2023.12.11.06.00.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Dec 2023 06:00:23 -0800 (PST)
+Date: Mon, 11 Dec 2023 06:00:22 -0800
+From: Yury Norov <yury.norov@gmail.com>
+To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
+	leon@kernel.org, cai.huoqing@linux.dev, ssengar@linux.microsoft.com,
+	vkuznets@redhat.com, tglx@linutronix.de,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	schakrabarti@microsoft.com, paulros@microsoft.com
+Subject: Re: [PATCH V5 net-next] net: mana: Assigning IRQ affinity on HT cores
+Message-ID: <ZXcV9pXmg+GE2BCF@yury-ThinkPad>
+References: <1702029754-6520-1-git-send-email-schakrabarti@linux.microsoft.com>
+ <ZXMiOwK3sOJNXHxd@yury-ThinkPad>
+ <ZXOQb+3R0YAT/rAm@yury-ThinkPad>
+ <20231211065323.GB4977@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 3/4] clk: mediatek: Add pcw_chg_shift control
-To: Daniel Golle <daniel@makrotopia.org>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Sabrina Dubroca <sd@queasysnail.net>, Jianhui Zhao <zhaojh329@gmail.com>,
- Chen-Yu Tsai <wenst@chromium.org>, "Garmin.Chang"
- <Garmin.Chang@mediatek.com>, Sam Shih <sam.shih@mediatek.com>,
- Markus Schneider-Pargmann <msp@baylibre.com>,
- Alexandre Mergnat <amergnat@baylibre.com>,
- Jiasheng Jiang <jiasheng@iscas.ac.cn>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- Frank Wunderlich <frank-w@public-files.de>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Chanwoo Choi <cw00.choi@samsung.com>,
- Dan Carpenter <dan.carpenter@linaro.org>,
- James Liao <jamesjj.liao@mediatek.com>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- netdev@vger.kernel.org
-References: <097e82b0d66570763d64be1715517d8b032fcf95.1702158423.git.daniel@makrotopia.org>
- <28c8ccd234ba311591b6db0de131fde36d3ec409.1702158423.git.daniel@makrotopia.org>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Content-Language: en-US
-In-Reply-To: <28c8ccd234ba311591b6db0de131fde36d3ec409.1702158423.git.daniel@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231211065323.GB4977@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 
-Il 09/12/23 22:56, Daniel Golle ha scritto:
-> From: Sam Shih <sam.shih@mediatek.com>
-> 
-> Introduce pcw_chg_shfit control to replace hardcoded PCW_CHG_MASK macro.
-> This will needed for clocks on the MT7988 SoC.
-> 
-> Signed-off-by: Sam Shih <sam.shih@mediatek.com>
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
-> v4: always set .pcw_chg_shift if .pcw_chg_reg is used instead of
->      having an if-expression in mtk_pll_set_rate_regs().
-> v3: use git --from ...
-> v2: no changes
-> 
->   drivers/clk/mediatek/clk-mt6779.c            | 1 +
->   drivers/clk/mediatek/clk-mt8183-apmixedsys.c | 1 +
->   drivers/clk/mediatek/clk-mt8188-apmixedsys.c | 1 +
->   drivers/clk/mediatek/clk-mt8192-apmixedsys.c | 1 +
->   drivers/clk/mediatek/clk-mt8195-apmixedsys.c | 1 +
->   drivers/clk/mediatek/clk-mt8365-apmixedsys.c | 1 +
->   drivers/clk/mediatek/clk-pll.c               | 3 +--
->   drivers/clk/mediatek/clk-pll.h               | 2 ++
->   8 files changed, 9 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/clk/mediatek/clk-mt6779.c b/drivers/clk/mediatek/clk-mt6779.c
-> index ffedb1fe3c672..e66461f341dd3 100644
-> --- a/drivers/clk/mediatek/clk-mt6779.c
-> +++ b/drivers/clk/mediatek/clk-mt6779.c
-> @@ -1166,6 +1166,7 @@ static const struct mtk_gate apmixed_clks[] = {
->   		.pcw_reg = _pcw_reg,					\
->   		.pcw_shift = _pcw_shift,				\
->   		.pcw_chg_reg = _pcw_chg_reg,				\
-> +		.pcw_chg_shift = PCW_CHG_SHIFT,				\
->   		.div_table = _div_table,				\
->   	}
->   
-> diff --git a/drivers/clk/mediatek/clk-mt8183-apmixedsys.c b/drivers/clk/mediatek/clk-mt8183-apmixedsys.c
-> index 2b261c0e2b61d..184e0cd1dde29 100644
-> --- a/drivers/clk/mediatek/clk-mt8183-apmixedsys.c
-> +++ b/drivers/clk/mediatek/clk-mt8183-apmixedsys.c
-> @@ -75,6 +75,7 @@ static const struct mtk_gate apmixed_clks[] = {
->   		.pcw_reg = _pcw_reg,					\
->   		.pcw_shift = _pcw_shift,				\
->   		.pcw_chg_reg = _pcw_chg_reg,				\
-> +		.pcw_chg_shift = PCW_CHG_SHIFT,				\
->   		.div_table = _div_table,				\
->   	}
->   
-> diff --git a/drivers/clk/mediatek/clk-mt8188-apmixedsys.c b/drivers/clk/mediatek/clk-mt8188-apmixedsys.c
-> index 41ab4d6896a49..87c5dfa3d1ac4 100644
-> --- a/drivers/clk/mediatek/clk-mt8188-apmixedsys.c
-> +++ b/drivers/clk/mediatek/clk-mt8188-apmixedsys.c
-> @@ -53,6 +53,7 @@ static const struct mtk_gate apmixed_clks[] = {
->   		.pcw_reg = _pcw_reg,					\
->   		.pcw_shift = _pcw_shift,				\
->   		.pcw_chg_reg = _pcw_chg_reg,				\
-> +		.pcw_chg_shift = PCW_CHG_SHIFT,				\
->   		.en_reg = _en_reg,					\
->   		.pll_en_bit = _pll_en_bit,				\
->   	}
-> diff --git a/drivers/clk/mediatek/clk-mt8192-apmixedsys.c b/drivers/clk/mediatek/clk-mt8192-apmixedsys.c
-> index 3590932acc63a..67bf5ef3f0033 100644
-> --- a/drivers/clk/mediatek/clk-mt8192-apmixedsys.c
-> +++ b/drivers/clk/mediatek/clk-mt8192-apmixedsys.c
-> @@ -56,6 +56,7 @@ static const struct mtk_gate apmixed_clks[] = {
->   		.pcw_reg = _pcw_reg,					\
->   		.pcw_shift = _pcw_shift,				\
->   		.pcw_chg_reg = _pcw_chg_reg,				\
-> +		.pcw_chg_shift = PCW_CHG_SHIFT,				\
->   		.en_reg = _en_reg,					\
->   		.pll_en_bit = _pll_en_bit,				\
->   	}
-> diff --git a/drivers/clk/mediatek/clk-mt8195-apmixedsys.c b/drivers/clk/mediatek/clk-mt8195-apmixedsys.c
-> index 44a4c85a67ef5..ccd6bac7cb1fc 100644
-> --- a/drivers/clk/mediatek/clk-mt8195-apmixedsys.c
-> +++ b/drivers/clk/mediatek/clk-mt8195-apmixedsys.c
-> @@ -54,6 +54,7 @@ static const struct mtk_gate apmixed_clks[] = {
->   		.pcw_reg = _pcw_reg,					\
->   		.pcw_shift = _pcw_shift,				\
->   		.pcw_chg_reg = _pcw_chg_reg,				\
-> +		.pcw_chg_shift = PCW_CHG_SHIFT,				\
->   		.en_reg = _en_reg,					\
->   		.pll_en_bit = _pll_en_bit,				\
->   	}
-> diff --git a/drivers/clk/mediatek/clk-mt8365-apmixedsys.c b/drivers/clk/mediatek/clk-mt8365-apmixedsys.c
-> index 9b0bc5daeac06..daddca6db44e7 100644
-> --- a/drivers/clk/mediatek/clk-mt8365-apmixedsys.c
-> +++ b/drivers/clk/mediatek/clk-mt8365-apmixedsys.c
-> @@ -39,6 +39,7 @@
->   		.pcw_reg = _pcw_reg,					\
->   		.pcw_shift = _pcw_shift,				\
->   		.pcw_chg_reg = _pcw_chg_reg,				\
-> +		.pcw_chg_shift = PCW_CHG_SHIFT,				\
->   		.div_table = _div_table,				\
->   	}
->   
-> diff --git a/drivers/clk/mediatek/clk-pll.c b/drivers/clk/mediatek/clk-pll.c
-> index 513ab6b1b3229..139b01ab8d140 100644
-> --- a/drivers/clk/mediatek/clk-pll.c
-> +++ b/drivers/clk/mediatek/clk-pll.c
-> @@ -23,7 +23,6 @@
->   #define CON0_BASE_EN		BIT(0)
->   #define CON0_PWR_ON		BIT(0)
->   #define CON0_ISO_EN		BIT(1)
-> -#define PCW_CHG_MASK		BIT(31)
->   
->   #define AUDPLL_TUNER_EN		BIT(31)
->   
-> @@ -114,7 +113,7 @@ static void mtk_pll_set_rate_regs(struct mtk_clk_pll *pll, u32 pcw,
->   			pll->data->pcw_shift);
->   	val |= pcw << pll->data->pcw_shift;
->   	writel(val, pll->pcw_addr);
-> -	chg = readl(pll->pcw_chg_addr) | PCW_CHG_MASK;
-> +	chg = readl(pll->pcw_chg_addr) | BIT(pll->data->pcw_chg_shift);
->   	writel(chg, pll->pcw_chg_addr);
->   	if (pll->tuner_addr)
->   		writel(val + 1, pll->tuner_addr);
-> diff --git a/drivers/clk/mediatek/clk-pll.h b/drivers/clk/mediatek/clk-pll.h
-> index f17278ff15d78..84bd8df13e2e5 100644
-> --- a/drivers/clk/mediatek/clk-pll.h
-> +++ b/drivers/clk/mediatek/clk-pll.h
-> @@ -22,6 +22,7 @@ struct mtk_pll_div_table {
->   #define HAVE_RST_BAR	BIT(0)
->   #define PLL_AO		BIT(1)
->   #define POSTDIV_MASK	GENMASK(2, 0)
-> +#define PCW_CHG_SHIFT	31
->   
->   struct mtk_pll_data {
->   	int id;
-> @@ -48,6 +49,7 @@ struct mtk_pll_data {
->   	const char *parent_name;
->   	u32 en_reg;
->   	u8 pll_en_bit; /* Assume 0, indicates BIT(0) by default */
-> +	u8 pcw_chg_shift;
+On Sun, Dec 10, 2023 at 10:53:23PM -0800, Souradeep Chakrabarti wrote:
+> On Fri, Dec 08, 2023 at 01:53:51PM -0800, Yury Norov wrote:
+> > Few more nits
+> > 
+> > On Fri, Dec 08, 2023 at 06:03:40AM -0800, Yury Norov wrote:
+> > > On Fri, Dec 08, 2023 at 02:02:34AM -0800, Souradeep Chakrabarti wrote:
+> > > > Existing MANA design assigns IRQ to every CPU, including sibling
+> > > > hyper-threads. This may cause multiple IRQs to be active simultaneously
+> > > > in the same core and may reduce the network performance with RSS.
+> > > 
+> > > Can you add an IRQ distribution diagram to compare before/after
+> > > behavior, similarly to what I did in the other email?
+> > > 
+> > > > Improve the performance by assigning IRQ to non sibling CPUs in local
+> > > > NUMA node. The performance improvement we are getting using ntttcp with
+> > > > following patch is around 15 percent with existing design and approximately
+> > > > 11 percent, when trying to assign one IRQ in each core across NUMA nodes,
+> > > > if enough cores are present.
+> > > 
+> > > How did you measure it? In the other email you said you used perf, can
+> > > you show your procedure in details?
+> > > 
+> > > > Suggested-by: Yury Norov <yury.norov@gmali.com>
+> > > > Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+> > > > ---
+> > > 
+> > > [...]
+> > > 
+> > > >  .../net/ethernet/microsoft/mana/gdma_main.c   | 92 +++++++++++++++++--
+> > > >  1 file changed, 83 insertions(+), 9 deletions(-)
+> > > > 
+> > > > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > > > index 6367de0c2c2e..18e8908c5d29 100644
+> > > > --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > > > +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > > > @@ -1243,15 +1243,56 @@ void mana_gd_free_res_map(struct gdma_resource *r)
+> > > >  	r->size = 0;
+> > > >  }
+> > > >  
+> > > > +static int irq_setup(int *irqs, int nvec, int start_numa_node)
+> > > > +{
+> > > > +	int w, cnt, cpu, err = 0, i = 0;
+> > > > +	int next_node = start_numa_node;
+> > > 
+> > > What for this?
+> > > 
+> > > > +	const struct cpumask *next, *prev = cpu_none_mask;
+> > > > +	cpumask_var_t curr, cpus;
+> > > > +
+> > > > +	if (!zalloc_cpumask_var(&curr, GFP_KERNEL)) {
+> > 
+> > alloc_cpumask_var() here and below, because you initialize them by
+> > copying
+> I have used zalloc here as prev gets initialized after the first hop, before that
+> it may contain unwanted values, which may impact cpumask_andnot(curr, next, prev).
+> Regarding curr I will change it to alloc_cpumask_var().
+> Please let me know if that sounds right.
 
-Ok this is better - please call this "pcw_chg_bit" (same for the definition).
+What? prev is initialized at declaration:
+        
+        const struct cpumask *next, *prev = cpu_none_mask;
 
-Also, since it is impossible for PCW_CHG to be 0, please add a sanity check at
-the beginning of function mtk_clk_register_pll_ops(), like so:
-
-if (!data->pcw_chg_bit) {
-	pr_warn("Invalid PCW_CHG bit for pll %s", data->name);
-	return ERR_PTR(-EINVAL);
-}
-
-...like that, we're fully covered for eventual mistakes during porting (etc).
-
-Cheers,
-Angelo
 
