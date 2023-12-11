@@ -1,85 +1,248 @@
-Return-Path: <netdev+bounces-56062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A513880DAEF
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 20:32:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65DAB80DB17
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 20:49:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46060B21488
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 19:32:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 953F71C21583
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 19:48:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C75152F8D;
-	Mon, 11 Dec 2023 19:32:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07ACA52F9C;
+	Mon, 11 Dec 2023 19:48:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VwB9x+sO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K9lASk5B"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5198551C37
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 19:32:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D2D7C433C7;
-	Mon, 11 Dec 2023 19:32:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702323124;
-	bh=LPLfUWNHRirQ2vRL7AGp6B484wCdzz0S+UFQPz/KsoA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VwB9x+sOUVbTtmBWRUy+VcMJJhSqr4uK6nArQznkfV64srs/Xvp9Ds4x+F+t9zTMh
-	 JteyfGFGQNd5t/MoOlYbcgqwDqRwSDzPEL5u+Gsjj4hWd5hp+xGSo2utrDbK0kBher
-	 P+qiZ2DsTpKJT74b3N8q5CVqWIoWC4NZljasrOQFhFRY7gjeFSSkdHsXlkIqVwU+z2
-	 cCjYkas+BvKCp4czZu3zoGcaABpP+MqW0SE1q4mVmT5Dpe7P5ZRFFjNE6uveDcnk3+
-	 ihorlEMBdWet1+6NYcy78JuZSIR3dBp6kyumCPsxLREgsHItvGslBNtzb6/fcWoDEA
-	 zQDht5IpGuymg==
-Date: Mon, 11 Dec 2023 11:32:03 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Liang Chen <liangchen.linux@gmail.com>, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, hawk@kernel.org,
- ilias.apalodimas@linaro.org, linyunsheng@huawei.com,
- netdev@vger.kernel.org, linux-mm@kvack.org, jasowang@redhat.com
-Subject: Re: [PATCH net-next v7 4/4] skbuff: Optimization of SKB coalescing
- for page pool
-Message-ID: <20231211113203.2ae8bccf@kernel.org>
-In-Reply-To: <CAHS8izPpWZvOSswHP0n-_nBiUMw8Ay2iM4yFE-HZenHv51iBHA@mail.gmail.com>
-References: <20231206105419.27952-1-liangchen.linux@gmail.com>
-	<20231206105419.27952-5-liangchen.linux@gmail.com>
-	<CAHS8izNQeSwWQ9NwiDUcPoSX1WONG4JYu2rfpqF3+4xkxE=Wyw@mail.gmail.com>
-	<CAKhg4t+LpF=G0DBhbuRYtxKyTrMiR3pSc15sY42kc57iGQfPmw@mail.gmail.com>
-	<CAHS8izPpWZvOSswHP0n-_nBiUMw8Ay2iM4yFE-HZenHv51iBHA@mail.gmail.com>
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45A3AD2
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 11:48:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702324132;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tEGu5Pqve0aT3zGM/NWkBL3jW0pZ4kUH+m9rr+P8JqA=;
+	b=K9lASk5BTVoLhP7jcslyZXa6BIXTZwsg6vKAh9H37nd9b7d7e81kD0+stmcbFY9wd1spS3
+	19fDcZqK+nl1Tm3/bPNIc13LOecIvzpiXfagK3bdzCB2wccZiF1GHdWjWAkZqLqkoYDv/7
+	Av5aNgTwPNdq7Pu6ms8mM/+h4KU1nWQ=
+Received: from mail-yb1-f198.google.com (mail-yb1-f198.google.com
+ [209.85.219.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-342-ZvWnOYFwMOq8ygaYbnRVmQ-1; Mon, 11 Dec 2023 14:48:51 -0500
+X-MC-Unique: ZvWnOYFwMOq8ygaYbnRVmQ-1
+Received: by mail-yb1-f198.google.com with SMTP id 3f1490d57ef6-db7dd9a8bd6so5061034276.1
+        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 11:48:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702324130; x=1702928930;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tEGu5Pqve0aT3zGM/NWkBL3jW0pZ4kUH+m9rr+P8JqA=;
+        b=cdEY9uVFZ6tNGELphmIdFGJqlD+gIzsit0tzwKbrtnp3hOZfyc/HzHDj+u0I0E8O83
+         YPDHNiI/zmMesXmbS0XVUJtPDS5ATZ0ltpXzTTbBbDpQ5A7acdGQON2AI8IIuRwhnjUc
+         dcS/YFhJmrMrcggDWI3HbLDuT/BGL+nVbgo8ZtmSS5jWx3fUp4DSOjBtv4XLTZW66p6m
+         pnZCA/GlKxswj9wpO8sId+iBTYBWno/3yrUHQwfzEk3Zj10xradAlkjNsz2t52ibxkfg
+         Bwk4apULemm253Gt3eavvz9rY4u21uZWACoZXifwsjNijdbTo3pE/NcCsBCD6OpXcqd4
+         WSKw==
+X-Gm-Message-State: AOJu0Yx1pnU1OsxFNe1UXKvw8gMHF6DkOYNqTEN6QCfKiemSgn4r/Owq
+	JjmcJU/dg0EvSuWAMtPDaAbDV8v5Jv2LWKVs7Af6y/JCqSWYjMa9zjMErr0x2eT5rUVVgZBy5rW
+	WSMd8ep3Ba2W1lwZ+39fiuhcf
+X-Received: by 2002:a05:6902:248:b0:db5:4669:fdb1 with SMTP id k8-20020a056902024800b00db54669fdb1mr2857467ybs.39.1702324130037;
+        Mon, 11 Dec 2023 11:48:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFMzXiz7DxmAMKunWzpipPJqY65gNgsQH47Q99/oPZT0u0DHwZNoplAe6V+UQ1a5fGUPA4YiQ==
+X-Received: by 2002:a05:6902:248:b0:db5:4669:fdb1 with SMTP id k8-20020a056902024800b00db54669fdb1mr2857455ybs.39.1702324129663;
+        Mon, 11 Dec 2023 11:48:49 -0800 (PST)
+Received: from fedora ([2600:1700:1ff0:d0e0::37])
+        by smtp.gmail.com with ESMTPSA id p5-20020a05621415c500b0067ac2df0199sm3527653qvz.128.2023.12.11.11.48.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Dec 2023 11:48:49 -0800 (PST)
+Date: Mon, 11 Dec 2023 13:48:47 -0600
+From: Andrew Halaney <ahalaney@redhat.com>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH net-next v3] net: stmmac: don't create a MDIO bus if
+ unnecessary
+Message-ID: <slq3uvpe424lxksgc2ho4q5apon6yqyvmq3ubpmx3z5ln5yhqf@klnkglqb6o6r>
+References: <20231207-stmmac-no-mdio-node-v3-1-34b870f2bafb@redhat.com>
+ <jz6ot44fjkbmwcezi3fkgqd54nurglblbemrchfgxgq6udlhqz@ntepnnzzelta>
+ <hxds75erxqcfkufxnfbyo2up4b4jeicmi3f5xr6qlb3yf7fe76@4byeq62jhu4o>
+ <hgz3pt625kggix6kzincohw7kr2okcumrwfkmjgiauw2yvhrzt@ekeygo4b7k3b>
+ <h5ucipgjtsesrz3jyul5xohu4pqom56v6ayx7aonnfesret3ht@wmblmndj6zir>
+ <hpqssnt7odmuuyhsljuqovmwatdjz4s6kix6abq7lrvyciawy5@5ypscmmivnmh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <hpqssnt7odmuuyhsljuqovmwatdjz4s6kix6abq7lrvyciawy5@5ypscmmivnmh>
 
-On Sun, 10 Dec 2023 20:21:21 -0800 Mina Almasry wrote:
-> Is it possible/desirable to add a comment to skb_frag_ref() that it
-> should not be used with skb->pp_recycle? At least I was tripped by
-> this, but maybe it's considered obvious somehow.
+On Mon, Dec 11, 2023 at 08:27:46PM +0300, Serge Semin wrote:
+> On Fri, Dec 08, 2023 at 10:50:29AM -0600, Andrew Halaney wrote:
+> > On Fri, Dec 08, 2023 at 06:07:06PM +0300, Serge Semin wrote:
+> > > On Thu, Dec 07, 2023 at 05:07:24PM -0600, Andrew Halaney wrote:
+> > > > On Fri, Dec 08, 2023 at 01:16:12AM +0300, Serge Semin wrote:
+> > > > > On Thu, Dec 07, 2023 at 03:12:40PM -0600, Andrew Halaney wrote:
+> > > > > > The stmmac_dt_phy() function, which parses the devicetree node of the
+> > > > > > MAC and ultimately causes MDIO bus allocation, misinterprets what
+> > > > > > fixed-link means in relation to the MAC's MDIO bus. This results in
+> > > > > > a MDIO bus being created in situations it need not be.
+> > > > > > 
+> > > > > > Currently a MDIO bus is created if the description is either:
+> > > > > > 
+> > > > > >     1. Not fixed-link
+> > > > > >     2. fixed-link but contains a MDIO bus as well
+> > > > > > 
+> > > > > > The "1" case above isn't always accurate. If there's a phy-handle,
+> > > > > > it could be referencing a phy on another MDIO controller's bus[1]. In
+> > > > > > this case currently the MAC will make a MDIO bus and scan it all
+> > > > > > anyways unnecessarily.
+> > > > > > 
+> > > > > > There's also a lot of upstream devicetrees[2] that expect a MDIO bus to
+> > > > > > be created and scanned for a phy. This case can also be inferred from
+> > > > > > the platform description by not having a phy-handle && not being
+> > > > > > fixed-link. This hits case "1" in the current driver's logic.
+> > > > > > 
+> > > > > > Let's improve the logic to create a MDIO bus if either:
+> > > > > > 
+> > > > > 
+> > > > > >     - Devicetree contains a MDIO bus
+> > > > > >     - !fixed-link && !phy-handle (legacy handling)
+> > > > > 
+> > > > > If what you suggest here is a free from regressions semantics change
+> > > > > (really hope it is) I will be with both my hands for it. This will
+> > > > > solve the problem we have with one of our device which doesn't have
+> > > > > SMA interface (hardware designers decided to save ~4K gates of the
+> > > > > chip area) but has a PHY externally attached to the DW XGMAC<->XPCS
+> > > > > interface. PHY is accessible via a GPIO-based MDIO bus. BTW having no
+> > > > > SMA interface available on a DW *MAC device but creating the MDIO-bus
+> > > > > on top of the non-existent SMA CSRs anyway causes having _32_ dummy
+> > > > > PHYs created with zero IDs.
+> > > > 
+> > > 
+> > > > I hope it is regression free! I have tested both the [1] and [2] cases
+> > > > (I hacked up the devicetree for [1] to make it look like [2]) without
+> > > > any issue.
+> > > > 
+> > > 
+> > > I doubt you could have tested it on all the possible hardware the
+> > > STMMAC driver supports. The problem is that the DT-bindings thing is a
+> > > kind of contract which can't be changed that easily. It's like ABI but
+> > > for the hardware description so the kernel would bootup correctly on
+> > > the platforms with the old DT blobs. But if the change isn't that
+> > > critical, if the device-tree sources in the kernel fit to the updated
+> > > semantics, if the networking subsystem maintainers aren't against it
+> > > and I guess with the Rob, Krzysztof or Conor blessing (at least it
+> > > won't hurt to add them to the Cc-list together with the devicetree
+> > > mailing-list), then it will likely be accepted.
+> > 
 > 
-> But I feel like this maybe needs to be fixed. Why does the page_pool
-> need a separate page->pp_ref_count? Why not use page->_refcount like
-> the rest of the code? Is there a history here behind this decision
-> that you can point me to? It seems to me that
-> incrementing/decrementing page->pp_ref_count may be equivalent to
-> doing the same on page->_refcount.
+> > To be clear, I don't think we're violating the dt-binding ABI contract
+> > here. My intention is that all the existing use cases continue to work,
+> > and this just improves one use case. I did a write up
+> > over on v2 about the use cases I see and the current logic vs what
+> > changes with this patch series:
+> > 
+> >     https://lore.kernel.org/netdev/plvbqgi2bwlv5quvpiwplq7cxx6m5rl3ghnfhuxfx4bpuhyihl@zmydwrtwdeg6/
+> > 
+> > Please comment if you think I have broken some backwards
+> > compatibility.
+> 
+> To shortly sum up so I didn't miss something. Current semantics of the
+> MDIO-bus registration is:
+> if !fixed-link || mdio_node_present
+>     create MDIO-bus
+> and the semantics of the PHY auto-probe (legacy) is:
+> if !(fixed-link || mdio_node_present || phy_node_present)
+>     auto-probe PHY
 
-Does reading the contents of the comment I proposed here:
-https://lore.kernel.org/all/20231208173816.2f32ad0f@kernel.org/
-elucidate it? The pp_ref_count means the holder is aware that 
-they can't release the reference by calling put_page().
-Because (a) we may need to clean up the pp state, unmap DMA etc.
-and (b) one day it may not even be a real page (your work).
+I think phy_node_present doesn't belong in the current view of the
+semantics for PHY auto-probe (legacy). This devicetree would trigger a
+PHY auto-probe/scan on ethernet0's MAC's MDIO bus:
 
-TBH I'm partial to the rename from patch 1, so I wouldn't delay this
-work any more :) But you have a point that we should inspect the code
-and consider making the semantics of skb_frag_ref() stronger all by
-itself, without the need to add a new flavor of the helper..
-Are you okay with leaving that as a follow up or do you reckon it's
-easy enough we should push for it now?
+	random-mdio-bus {
+		rgmii_phy: phy@0 {
+		};
+	};
+
+	ethernet0 {
+		phy-handle = <&rgmii_phy>;
+	};
+
+The assumption I make in this patch is that nothing useful could be on
+ethernet0's MDIO bus, it certainly at least is not the phy the MAC uses.
+
+> 
+> You are changing the MDIO-bus creation semantics to:
+> if !(fixed-link || phy_node_present) || mdio_node_present
+>     create MDIO-bus
+> with no change in the PHY auto-probe semantics:
+> if !(fixed-link || mdio_node_present || phy_node_present)
+>     auto-probe PHY
+
+Unfortunately as I highlighted above this logic (while accurate to the
+patch under review) is a change from the prior logic for the "auto-probe
+PHY" case.
+
+> 
+> So the change is that if a PHY-handle is specified the MDIO-bus won't
+> be created with the rest conditions being the same.
+> 
+> The only concern I had was the so called legacy case and a possibility
+> to have MDIO-bus with other than PHY devices. Based on the pseudo-code
+> above the former case won't be affected since having PHY-node
+> specified didn't triggered MDIO-bus auto-probe even before your
+> change. The later case concerns for instance the DW XPCS devices which
+
+As I've realized in your response here, there is the possibility that
+something is on the MDIO bus in the ethernet0 exmpale bus above, and would
+probe, in the before handling. So I guess this isn't totally backwards
+compatible. Gah, thanks for highlighting.
+
+I'm not sure in practice if anyone out there is really relying on that
+or not. I can get away with the "no auto-probe/scan of bus" optimization I
+really desire by describing my MDIO bus as disabled in the devicetree
+(need to send patches to do that in the dts and handle it gracefully in
+stmmac). I'm wondering if I should keep forth with this patch as is, or
+if I should keep the same logic but clean it up a bit as is done in the
+current patch... I guess probably the latter.
+
+> on some platforms could be found on the DW MAC MDIO bus with not
+> having PHY living on that bus. But DW XPCS auto-probing currently is
+> only supported by the non-OF platforms (it's Intel). Thus your change
+> is supposed to be safe here too.
+> 
+> So to speak AFAICS from the STMMAC MDIO OF stuff your solution isn't
+> supposed to cause regressions and break the current DTs backward
+> compatibility indeed.
+> 
+> Regarding the ideal implementation. What could be much better is to
+> implement the next semantics:
+> if SMA-capability-detected &&
+>    (!mdio_node_present || (mdio_node_present && mdio_node_enabled))
+>     create MDIO-bus
+> and preserve the PHY auto-probe semantics for backwards compatibility.
+> Regarding the SMA-capability flag, it has been presented since DW GMAC
+> v3.50, so since very much early DW MAC releases. But even for the
+> early devices I think it could be auto-detected by checking the SMA
+> CSRs writability. At least DW XGMAC AFAICS has the command CSR not
+> writable if SMA is unavailable.
+> 
+> But I guess it's a matter of another patch.
+> 
+
+I like that logic for what it is worth, although would be unsure of
+verifying the SMA-capability-detected part of it. But I wouldn't mind
+seeing that patch :)
+
 
