@@ -1,93 +1,74 @@
-Return-Path: <netdev+bounces-56127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5FCF80DEBA
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 23:58:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD71380DEC1
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 23:59:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B5661F2190B
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 22:58:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FEED2825C6
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 22:59:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BB7455C37;
-	Mon, 11 Dec 2023 22:58:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10D1F55C3E;
+	Mon, 11 Dec 2023 22:59:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PaL8/0vM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V/ayCjsP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D39AE19D
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 14:58:01 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-286f8ee27aeso5237146a91.3
-        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 14:58:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702335481; x=1702940281; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LSs3WksmerOZPHJ1LU9TrjNbQyPbeVFhDZ7M205aQKA=;
-        b=PaL8/0vM0Hx4nxTwq3W0Goj2bpsPOxjUq6Ycbo5qaEVXG7uF4Y68lRpmyKBjnOzDgV
-         V7WQ/IKiJbR1dCGbiMrxUL67T1O//5E5oFrvEy9DmIozLeLNiA5UM5vFB6cui7O9O6b3
-         I3eh0nRZ65zLlSSCYmBN2asvuLdBPx2sV0BjyXySjKnrEBDm257zmKTaVSMyt5t2y3Gs
-         9QTQ0ZuYgJckc8dZOMEpiv0JypAYWrGCpWQRgbu2i1sdv2Z0ohHvm5d1VgLNuDoQ//QL
-         mwu9GY26nW8M0gRpRdBSqawdChR/fojbGSdCy8PyTvHoAQ0/Ml0deQwPpMl9WWuTealj
-         8AXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702335481; x=1702940281;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LSs3WksmerOZPHJ1LU9TrjNbQyPbeVFhDZ7M205aQKA=;
-        b=UREBZNfofMSZ2SfwWFuP+a4EfTalDuwzvocMJKuqEXgeqe+JaEBP0Vn92FFsD4+WC0
-         Xzkl/mL1zx4eDOzLJCWv1vLJBawRRRriuzSxqqBAK89vpr8EghUXqErA7WF/o0kHfx+4
-         o6+oduHPSFZu6newl5cDbny5gi7NQrxBe42SLrUatQ2Yr2tNcFK1X3CZmBfBeCVjkP77
-         EqgPDdYA6+SNhxtibt6zis6bmKfZSLK1snF4gHYkeuQdf5uv5oml1ggUs7DPiEeUiYl9
-         /UD8EhnVx6cG0GvNxj7p5e2YZ2WWAFrwOZ7l29o3b123rd+71aU+z68btAMUBUWch/cT
-         rP/Q==
-X-Gm-Message-State: AOJu0Yxios7BEOuqf0Bm3bMEDx0OmPYdTfMpO6Th1Xsyps0UlgZSre0f
-	9Gl8Vz7uVqgfMlTyGPAKsQA=
-X-Google-Smtp-Source: AGHT+IGZTD4RyshO1XNj9PQgJS3Dx3jhVg1WqdXuPxYvcZusvuo/1OO77ETpqA5CibInLR+WAjOd9Q==
-X-Received: by 2002:a17:90a:fd13:b0:28a:9f67:e9d0 with SMTP id cv19-20020a17090afd1300b0028a9f67e9d0mr1468889pjb.92.1702335481275;
-        Mon, 11 Dec 2023 14:58:01 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id qj12-20020a17090b28cc00b0028672a85808sm7594587pjb.35.2023.12.11.14.57.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Dec 2023 14:58:00 -0800 (PST)
-Message-ID: <d0c8b805-fe33-40d4-bb44-8e6258d2b9de@gmail.com>
-Date: Mon, 11 Dec 2023 14:57:58 -0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75FA55C26
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 22:59:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C5B7C433C8;
+	Mon, 11 Dec 2023 22:59:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702335585;
+	bh=t7nQKTTeGh65bU29w+Bc8SK2+uEhQ8nX0LrViq7JYqk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=V/ayCjsP1FkvVFM17OEH03CfEKEOd2MP64ffO019moohHMBAdYMxM5wQ7lLiPowaw
+	 gxescu6QOlqk99izlWGLWswXQLkz5ItDrmoIvvWQodLnU/faMboH+eT+XG0OrS1Q2h
+	 tRi4+rt1enNLzJtYP+djQEOAHnND0Sz51/8/5xFqWeXdymJfoZ9AdvRT6fsuKu/EfF
+	 WLPhwPCLSMFAewuDZvjD4tNBsUa3gJpGoyIren8v1orQnVNzQnDK1BDCpiYv7in+2X
+	 sxXVAxPiGeW3FNMlzlnF2SAmfftk6XZwbbKVPltqcpp9HpRvIPK/zFqQpkdVC8UwhT
+	 hfmR1+icdW39A==
+Date: Mon, 11 Dec 2023 14:59:44 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Jianheng Zhang <Jianheng.Zhang@synopsys.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <Jose.Abreu@synopsys.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, "open list:STMMAC ETHERNET DRIVER"
+ <netdev@vger.kernel.org>, "moderated list:ARM/STM32 ARCHITECTURE"
+ <linux-stm32@st-md-mailman.stormreply.com>, "moderated list:ARM/STM32
+ ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, open list
+ <linux-kernel@vger.kernel.org>, James Li <James.Li1@synopsys.com>, Martin
+ McKenny <Martin.McKenny@synopsys.com>
+Subject: Re: [PATCH net-next] net: stmmac: xgmac3+: add FPE handshaking
+ support
+Message-ID: <20231211145944.0be51404@kernel.org>
+In-Reply-To: <zx7tfojtnzuhcpglkeiwg6ep265xpcb5lmz6fgjjugc2tue6qe@cmuqtneujsvb>
+References: <CY5PR12MB63726FED738099761A9B81E7BF8FA@CY5PR12MB6372.namprd12.prod.outlook.com>
+	<zx7tfojtnzuhcpglkeiwg6ep265xpcb5lmz6fgjjugc2tue6qe@cmuqtneujsvb>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 net-next 5/8] net: dsa: mv88e6xxx: Add "eth-mac"
- counter group support
-Content-Language: en-US
-To: Tobias Waldekranz <tobias@waldekranz.com>, davem@davemloft.net,
- kuba@kernel.org
-Cc: andrew@lunn.ch, olteanv@gmail.com, netdev@vger.kernel.org,
- Vladimir Oltean <vladimir.oltean@nxp.com>
-References: <20231211223346.2497157-1-tobias@waldekranz.com>
- <20231211223346.2497157-6-tobias@waldekranz.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20231211223346.2497157-6-tobias@waldekranz.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 12/11/23 14:33, Tobias Waldekranz wrote:
-> Report the applicable subset of an mv88e6xxx port's counters using
-> ethtool's standardized "eth-mac" counter group.
+On Mon, 11 Dec 2023 14:14:00 +0300 Serge Semin wrote:
+> Although in this case AFAICS the implementation is simpler and the
+> only difference is in the CSR offset and the frame preemption residue
+> queue ID setting. All of that can be easily solved in the same way as
+> it was done for EST (see the link above).
 > 
-> Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
+> Jakub, what do you think?
 
-Not usually fond of defining a macro with a local scope, but no strong 
-objection either:
-
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
-
+Yup, less code duplication would be great. Highest prio, tho, is to
+focus on Vladimir's comment around this driver seemingly implementing
+FPE but not using the common ethtool APIs to configure it, yet :(
 
