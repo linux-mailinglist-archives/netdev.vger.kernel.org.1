@@ -1,250 +1,229 @@
-Return-Path: <netdev+bounces-55746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F0E180C1DD
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 08:27:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DFE080C203
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 08:37:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05446280CFD
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 07:27:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC2261F20F75
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 07:37:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C343B200C5;
-	Mon, 11 Dec 2023 07:27:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 619D62030C;
+	Mon, 11 Dec 2023 07:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TCs/ceZN"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ugdyuHFQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A3DCDB
-	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 23:27:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702279620;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yzl/uXMUGCBrEhgpFoMPCiMftRl1HpCdIgUDcqQab60=;
-	b=TCs/ceZNlUmBJnaQ+aFgAjYutP5EfaS/DBUVVF8MtyTtsNgUPkQwoCDvOe3xjnOPRwKq/P
-	pnn0cqBTHybSw9gZiErd+uwSKBcnbu86Igq6J49XsRvVSDnFsNAMJp/Mk2Xrw3GWlE+4VR
-	bdqPSQm9GBBgasUvtGBdtdjGza2jGpQ=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-547-uVTIQSJgNQOFHyqXgF6BfA-1; Mon, 11 Dec 2023 02:26:58 -0500
-X-MC-Unique: uVTIQSJgNQOFHyqXgF6BfA-1
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5c624e68b45so2157500a12.3
-        for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 23:26:58 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702279617; x=1702884417;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yzl/uXMUGCBrEhgpFoMPCiMftRl1HpCdIgUDcqQab60=;
-        b=eRi05n857WgL9paHZMzwPC3iRQD9Ew9obIXkf1H897oMV0yzpDWbMCHojsMZeZ+GZ/
-         eOqpGNJKjl/CAzVsVYsrb4G7B1lcoS4rucJswjdU/xJkTBUQKShfUGg167qkM7c4yFKV
-         lGvY4divjHanQYUsBDEdZ/4/0RI/+7t0XvIGwRmH57btJ2Jn6cHCPUS5IQlrgQHylp7U
-         abwmOFrzgvZ6/VGZ2n/uL40Zzd08z4p0TmJBAbjWNwuBrHUE9Q3Ou10tLXgosLfh6X7A
-         QT6TV0LRtuD/9VXnOvfifXZ5lfOD5WTsvxgm6+/YPDWNN/KsV7+TeAnOHAMxhfjCIFXY
-         x3DQ==
-X-Gm-Message-State: AOJu0YyqeVizpQTkeodlpf4YFjuvItuczqAR2zHiZItCGcxDwS4oAXOh
-	jCxKNQxJToBiafYOVgi4b9O2mP9EWKx2qyqsEh4s8bL2sfbM6uHdlA0xCUcF2t9gsX04wYjYYAg
-	SsDEMlZfGzPqmrk5zDq5A0E5t+QmNHtf3
-X-Received: by 2002:a05:6a20:2448:b0:18f:97c:ba1a with SMTP id t8-20020a056a20244800b0018f097cba1amr1702202pzc.116.1702279617593;
-        Sun, 10 Dec 2023 23:26:57 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFtMCW4/nYLJbNDFq92ZIWWhnreabLLEHm6wAXBKkoi7VBSJcNSpG3StpjW99D/ZfXuO/jDlH3z/lbO+PhUoEo=
-X-Received: by 2002:a05:6a20:2448:b0:18f:97c:ba1a with SMTP id
- t8-20020a056a20244800b0018f097cba1amr1702190pzc.116.1702279617283; Sun, 10
- Dec 2023 23:26:57 -0800 (PST)
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA8ABD9;
+	Sun, 10 Dec 2023 23:37:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1702280234; x=1733816234;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=pj/cgiUePVjPbayu83AiUtERDLzf+E8Y0VRWmq4GI54=;
+  b=ugdyuHFQyShPvZPFBXA6J4xbPBTPWWD0yDFrzAslGuI2mL0kDsL4VMWM
+   FcK3gcQYX86ksyGLhMr668VJuO9LSkNw/34nethX5L4m+4v7y4V6Aob9u
+   wWa1YvZ/kfs3a7znSW9P86o/Ck0+ImMS6801y6ioL0UkHbrs8seFBIdMH
+   U=;
+X-IronPort-AV: E=Sophos;i="6.04,267,1695686400"; 
+   d="scan'208";a="689603159"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-5eae960a.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2023 07:37:08 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
+	by email-inbound-relay-pdx-2c-m6i4x-5eae960a.us-west-2.amazon.com (Postfix) with ESMTPS id 55C3540D54;
+	Mon, 11 Dec 2023 07:37:07 +0000 (UTC)
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:24275]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.19.169:2525] with esmtp (Farcaster)
+ id a7f083f5-a8da-46a4-b147-eb079216c623; Mon, 11 Dec 2023 07:37:06 +0000 (UTC)
+X-Farcaster-Flow-ID: a7f083f5-a8da-46a4-b147-eb079216c623
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 11 Dec 2023 07:37:06 +0000
+Received: from 88665a182662.ant.amazon.com (10.119.13.105) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 11 Dec 2023 07:37:02 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: Eric Dumazet <edumazet@google.com>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <bpf@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: [PATCH v5 bpf-next 0/6] bpf: tcp: Support arbitrary SYN Cookie at TC.
+Date: Mon, 11 Dec 2023 16:36:44 +0900
+Message-ID: <20231211073650.90819-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <46a997c2-5a38-4b60-b589-6073b1fac677@bytedance.com>
- <ZVyt4UU9+XxunIP7@DESKTOP-2CCOB1S.> <20231122100016.GO8262@noisy.programming.kicks-ass.net>
- <6564a012.c80a0220.adb78.f0e4SMTPIN_ADDED_BROKEN@mx.google.com>
- <d4110c79-d64f-49bd-9f69-0a94369b5e86@bytedance.com> <07513.123120701265800278@us-mta-474.us.mimecast.lan>
- <20231207014626-mutt-send-email-mst@kernel.org> <56082.123120804242300177@us-mta-137.us.mimecast.lan>
- <20231208052150-mutt-send-email-mst@kernel.org> <53044.123120806415900549@us-mta-342.us.mimecast.lan>
- <20231209053443-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20231209053443-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 11 Dec 2023 15:26:46 +0800
-Message-ID: <CACGkMEuSGT-e-i-8U7hum-N_xEnsEKL+_07Mipf6gMLFFhj2Aw@mail.gmail.com>
-Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
- sched/fair: Add lag based placement)
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Tobias Huschle <huschle@linux.ibm.com>, Abel Wu <wuyun.abel@bytedance.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWC002.ant.amazon.com (10.13.139.222) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-On Sat, Dec 9, 2023 at 6:42=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com> =
-wrote:
->
-> On Fri, Dec 08, 2023 at 12:41:38PM +0100, Tobias Huschle wrote:
-> > On Fri, Dec 08, 2023 at 05:31:18AM -0500, Michael S. Tsirkin wrote:
-> > > On Fri, Dec 08, 2023 at 10:24:16AM +0100, Tobias Huschle wrote:
-> > > > On Thu, Dec 07, 2023 at 01:48:40AM -0500, Michael S. Tsirkin wrote:
-> > > > > On Thu, Dec 07, 2023 at 07:22:12AM +0100, Tobias Huschle wrote:
-> > > > > > 3. vhost looping endlessly, waiting for kworker to be scheduled
-> > > > > >
-> > > > > > I dug a little deeper on what the vhost is doing. I'm not an ex=
-pert on
-> > > > > > virtio whatsoever, so these are just educated guesses that mayb=
-e
-> > > > > > someone can verify/correct. Please bear with me probably messin=
-g up
-> > > > > > the terminology.
-> > > > > >
-> > > > > > - vhost is looping through available queues.
-> > > > > > - vhost wants to wake up a kworker to process a found queue.
-> > > > > > - kworker does something with that queue and terminates quickly=
-.
-> > > > > >
-> > > > > > What I found by throwing in some very noisy trace statements wa=
-s that,
-> > > > > > if the kworker is not woken up, the vhost just keeps looping ac=
-cross
-> > > > > > all available queues (and seems to repeat itself). So it essent=
-ially
-> > > > > > relies on the scheduler to schedule the kworker fast enough. Ot=
-herwise
-> > > > > > it will just keep on looping until it is migrated off the CPU.
-> > > > >
-> > > > >
-> > > > > Normally it takes the buffers off the queue and is done with it.
-> > > > > I am guessing that at the same time guest is running on some othe=
-r
-> > > > > CPU and keeps adding available buffers?
-> > > > >
-> > > >
-> > > > It seems to do just that, there are multiple other vhost instances
-> > > > involved which might keep filling up thoses queues.
-> > > >
-> > >
-> > > No vhost is ever only draining queues. Guest is filling them.
-> > >
-> > > > Unfortunately, this makes the problematic vhost instance to stay on
-> > > > the CPU and prevents said kworker to get scheduled. The kworker is
-> > > > explicitly woken up by vhost, so it wants it to do something.
+Under SYN Flood, the TCP stack generates SYN Cookie to remain stateless
+for the connection request until a valid ACK is responded to the SYN+ACK.
 
-It looks to me vhost doesn't use workqueue but the worker by itself.
+The cookie contains two kinds of host-specific bits, a timestamp and
+secrets, so only can it be validated by the generator.  It means SYN
+Cookie consumes network resources between the client and the server;
+intermediate nodes must remember which nodes to route ACK for the cookie.
 
-> > > >
-> > > > At this point it seems that there is an assumption about the schedu=
-ler
-> > > > in place which is no longer fulfilled by EEVDF. From the discussion=
- so
-> > > > far, it seems like EEVDF does what is intended to do.
-> > > >
-> > > > Shouldn't there be a more explicit mechanism in use that allows the
-> > > > kworker to be scheduled in favor of the vhost?
+SYN Proxy reduces such unwanted resource allocation by handling 3WHS at
+the edge network.  After SYN Proxy completes 3WHS, it forwards SYN to the
+backend server and completes another 3WHS.  However, since the server's
+ISN differs from the cookie, the proxy must manage the ISN mappings and
+fix up SEQ/ACK numbers in every packet for each connection.  If a proxy
+node goes down, all the connections through it are terminated.  Keeping
+a state at proxy is painful from that perspective.
 
-Vhost did a brunch of copy_from_user() which should trigger
-__might_fault() so a __might_sleep() most of the case.
+At AWS, we use a dirty hack to build truly stateless SYN Proxy at scale.
+Our SYN Proxy consists of the front proxy layer and the backend kernel
+module.  (See slides of LPC2023 [0], p37 - p48)
 
-> > > >
-> > > > It is also concerning that the vhost seems cannot be preempted by t=
-he
-> > > > scheduler while executing that loop.
-> > >
-> > >
-> > > Which loop is that, exactly?
-> >
-> > The loop continously passes translate_desc in drivers/vhost/vhost.c
-> > That's where I put the trace statements.
-> >
-> > The overall sequence seems to be (top to bottom):
-> >
-> > handle_rx
-> > get_rx_bufs
-> > vhost_get_vq_desc
-> > vhost_get_avail_head
-> > vhost_get_avail
-> > __vhost_get_user_slow
-> > translate_desc               << trace statement in here
-> > vhost_iotlb_itree_first
->
-> I wonder why do you keep missing cache and re-translating.
-> Is pr_debug enabled for you? If not could you check if it
-> outputs anything?
-> Or you can tweak:
->
-> #define vq_err(vq, fmt, ...) do {                                  \
->                 pr_debug(pr_fmt(fmt), ##__VA_ARGS__);       \
->                 if ((vq)->error_ctx)                               \
->                                 eventfd_signal((vq)->error_ctx, 1);\
->         } while (0)
->
-> to do pr_err if you prefer.
->
-> > These functions show up as having increased overhead in perf.
-> >
-> > There are multiple loops going on in there.
-> > Again the disclaimer though, I'm not familiar with that code at all.
->
->
-> So there's a limit there: vhost_exceeds_weight should requeue work:
->
->         } while (likely(!vhost_exceeds_weight(vq, ++recv_pkts, total_len)=
-));
->
-> then we invoke scheduler each time before re-executing it:
->
->
-> {
->         struct vhost_worker *worker =3D data;
->         struct vhost_work *work, *work_next;
->         struct llist_node *node;
->
->         node =3D llist_del_all(&worker->work_list);
->         if (node) {
->                 __set_current_state(TASK_RUNNING);
->
->                 node =3D llist_reverse_order(node);
->                 /* make sure flag is seen after deletion */
->                 smp_wmb();
->                 llist_for_each_entry_safe(work, work_next, node, node) {
->                         clear_bit(VHOST_WORK_QUEUED, &work->flags);
->                         kcov_remote_start_common(worker->kcov_handle);
->                         work->fn(work);
->                         kcov_remote_stop();
->                         cond_resched();
->                 }
->         }
->
->         return !!node;
-> }
->
-> These are the byte and packet limits:
->
-> /* Max number of bytes transferred before requeueing the job.
->  * Using this limit prevents one virtqueue from starving others. */
-> #define VHOST_NET_WEIGHT 0x80000
->
-> /* Max number of packets transferred before requeueing the job.
->  * Using this limit prevents one virtqueue from starving others with smal=
-l
->  * pkts.
->  */
-> #define VHOST_NET_PKT_WEIGHT 256
->
->
-> Try reducing the VHOST_NET_WEIGHT limit and see if that improves things a=
-ny?
+The cookie that SYN Proxy generates differs from the kernel's cookie in
+that it contains a secret (called rolling salt) (i) shared by all the proxy
+nodes so that any node can validate ACK and (ii) updated periodically so
+that old cookies cannot be validated and we need not encode a timestamp for
+the cookie.  Also, ISN contains WScale, SACK, and ECN, not in TS val.  This
+is not to sacrifice any connection quality, where some customers turn off
+TCP timestamps option due to retro CVE.
 
-Or a dirty hack like cond_resched() in translate_desc().
+After 3WHS, the proxy restores SYN, encapsulates ACK into SYN, and forward
+the TCP-in-TCP packet to the backend server.  Our kernel module works at
+Netfilter input/output hooks and first feeds SYN to the TCP stack to
+initiate 3WHS.  When the module is triggered for SYN+ACK, it looks up the
+corresponding request socket and overwrites tcp_rsk(req)->snt_isn with the
+proxy's cookie.  Then, the module can complete 3WHS with the original ACK
+as is.
 
-Thanks
+This way, our SYN Proxy does not manage the ISN mappings nor wait for
+SYN+ACK from the backend thus can remain stateless.  It's working very
+well for high-bandwidth services like multiple Tbps, but we are looking
+for a way to drop the dirty hack and further optimise the sequences.
+
+If we could validate an arbitrary SYN Cookie on the backend server with
+BPF, the proxy would need not restore SYN nor pass it.  After validating
+ACK, the proxy node just needs to forward it, and then the server can do
+the lightweight validation (e.g. check if ACK came from proxy nodes, etc)
+and create a connection from the ACK.
+
+This series allows us to create a full sk from an arbitrary SYN Cookie,
+which is done in 3 steps.
+
+  1) At tc, BPF prog calls a new kfunc to create a reqsk and configure
+     it based on the argument populated from SYN Cookie.  The reqsk has
+     its listener as req->rsk_listener and is passed to the TCP stack as
+     skb->sk.
+
+  2) During TCP socket lookup for the skb, skb_steal_sock() returns a
+     listener in the reuseport group that inet_reqsk(skb->sk)->rsk_listener
+     belongs to.
+
+  3) In cookie_v[46]_check(), the reqsk (skb->sk) is fully initialised and
+     a full sk is created.
+
+The kfunc usage is as follows:
+
+    struct tcp_cookie_attributes attr = {
+        .tcp_opt = {
+            .mss_clamp = mss,
+            .wscale_ok = wscale_ok,
+            .rcv_scale = recv_scale, /* Server's WScale < 15 */
+            .snd_scale = send_scale, /* Client's WScale < 15 */
+            .tstamp_ok = tstamp_ok,
+            .rcv_tsval = tsval,
+            .rcv_tsecr = tsecr,
+            .sack_ok = sack_ok,
+        },
+        .ecn_ok = ecn_ok,
+        .usec_ts_ok = usec_ts_ok,
+    };
+
+    skc = bpf_skc_lookup_tcp(...);
+    sk = (struct sock *)bpf_skc_to_tcp_sock(skc);
+    bpf_sk_assign_tcp_reqsk(skb, sk, attr, sizeof(attr));
+    bpf_sk_release(skc);
+
+[0]: https://lpc.events/event/17/contributions/1645/attachments/1350/2701/SYN_Proxy_at_Scale_with_BPF.pdf
 
 
->
-> --
-> MST
->
+Changes:
+  v5:
+    * Split patch 1-3
+    * Patch 3
+      * Clear req->rsk_listener in skb_steal_sock()
+    * Patch 4 & 5
+      * Move sysctl validation and tsoff init from cookie_bpf_check() to kfunc
+    * Patch 5
+      * Do not increment LINUX_MIB_SYNCOOKIES(RECV|FAILED)
+    * Patch 6
+      * Remove __always_inline
+      * Test if tcp_handle_{syn,ack}() is executed
+      * Move some definition to bpf_tracing_net.h
+      * s/BPF_F_CURRENT_NETNS/-1/
+
+  v4: https://lore.kernel.org/bpf/20231205013420.88067-1-kuniyu@amazon.com/
+    * Patch 1 & 2
+      * s/CONFIG_SYN_COOKIE/CONFIG_SYN_COOKIES/
+    * Patch 1
+      * Don't set rcv_wscale for BPF SYN Cookie case.
+    * Patch 2
+      * Add test for tcp_opt.{unused,rcv_wscale} in kfunc
+      * Modify skb_steal_sock() to avoid resetting skb-sk
+      * Support SO_REUSEPORT lookup
+    * Patch 3
+      * Add CONFIG_SYN_COOKIES to Kconfig for CI
+      * Define BPF_F_CURRENT_NETNS
+
+  v3: https://lore.kernel.org/netdev/20231121184245.69569-1-kuniyu@amazon.com/
+    * Guard kfunc and req->syncookie part in inet6?_steal_sock() with
+      CONFIG_SYN_COOKIE
+
+  v2: https://lore.kernel.org/netdev/20231120222341.54776-1-kuniyu@amazon.com/
+    * Drop SOCK_OPS and move SYN Cookie validation logic to TC with kfunc.
+    * Add cleanup patches to reduce discrepancy between cookie_v[46]_check()
+
+  v1: https://lore.kernel.org/bpf/20231013220433.70792-1-kuniyu@amazon.com/
+
+
+Kuniyuki Iwashima (6):
+  tcp: Move tcp_ns_to_ts() to tcp.h
+  tcp: Move skb_steal_sock() to request_sock.h
+  bpf: tcp: Handle BPF SYN Cookie in skb_steal_sock().
+  bpf: tcp: Handle BPF SYN Cookie in cookie_v[46]_check().
+  bpf: tcp: Support arbitrary SYN Cookie.
+  selftest: bpf: Test bpf_sk_assign_tcp_reqsk().
+
+ include/net/request_sock.h                    |  39 ++
+ include/net/sock.h                            |  25 -
+ include/net/tcp.h                             |  35 ++
+ net/core/filter.c                             | 118 +++-
+ net/core/sock.c                               |  14 +-
+ net/ipv4/syncookies.c                         |  40 +-
+ net/ipv6/syncookies.c                         |  13 +-
+ tools/testing/selftests/bpf/bpf_kfuncs.h      |  10 +
+ tools/testing/selftests/bpf/config            |   1 +
+ .../bpf/prog_tests/tcp_custom_syncookie.c     | 169 +++++
+ .../selftests/bpf/progs/bpf_tracing_net.h     |  17 +
+ .../selftests/bpf/progs/test_siphash.h        |  64 ++
+ .../bpf/progs/test_tcp_custom_syncookie.c     | 580 ++++++++++++++++++
+ .../bpf/progs/test_tcp_custom_syncookie.h     | 140 +++++
+ 14 files changed, 1219 insertions(+), 46 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_siphash.h
+ create mode 100644 tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.h
+
+-- 
+2.30.2
 
 
