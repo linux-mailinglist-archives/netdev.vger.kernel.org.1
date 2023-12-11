@@ -1,80 +1,159 @@
-Return-Path: <netdev+bounces-55974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56CBB80D03C
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 16:58:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2741E80D06A
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 17:03:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 569D11C2098D
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:58:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF8A128212E
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 16:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8BF4C3A5;
-	Mon, 11 Dec 2023 15:58:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22B9F4C3B7;
+	Mon, 11 Dec 2023 16:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="RDahEyiw"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OCwFfVwv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0B9ED67
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 07:58:13 -0800 (PST)
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1570830DB
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 08:02:07 -0800 (PST)
+Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-54c846da5e9so4413043a12.3
+        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 08:02:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1702310294; x=1733846294;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=HXYwtHf1crZ+2R2c/ebu/5qXB2tr3ce7Wh+7+A6s3a4=;
-  b=RDahEyiwofZOUkNeCmV6FVfH73NaooSFrDOznoBJnzUdp1zxRuF64xgF
-   bjYfLTaJIHYnC+IfUO8oUHeLMeWG5ZwUZZzPb5WyMt0Q5gFGJf3RHtA21
-   SjyhmmRb/E5X2ZqFGc9DcBuNFdOdJgaVxLowNLkXK+ZPoOpB+zExMNOpz
-   c=;
-X-IronPort-AV: E=Sophos;i="6.04,268,1695686400"; 
-   d="scan'208";a="373069424"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-e7094f15.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2023 15:58:11 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
-	by email-inbound-relay-pdx-2c-m6i4x-e7094f15.us-west-2.amazon.com (Postfix) with ESMTPS id 3F74240BBD;
-	Mon, 11 Dec 2023 15:58:10 +0000 (UTC)
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:39557]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.54.33:2525] with esmtp (Farcaster)
- id 6e28f5eb-e4d4-4630-8c60-59d7042c6070; Mon, 11 Dec 2023 15:58:09 +0000 (UTC)
-X-Farcaster-Flow-ID: 6e28f5eb-e4d4-4630-8c60-59d7042c6070
-Received: from EX19D003UWC004.ant.amazon.com (10.13.138.150) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 11 Dec 2023 15:58:09 +0000
-Received: from EX19MTAUEA001.ant.amazon.com (10.252.134.203) by
- EX19D003UWC004.ant.amazon.com (10.13.138.150) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 11 Dec 2023 15:58:09 +0000
-Received: from dev-dsk-abuehaze-1c-21d23c85.eu-west-1.amazon.com
- (10.13.244.41) by mail-relay.amazon.com (10.252.134.102) with Microsoft SMTP
- Server id 15.2.1118.40 via Frontend Transport; Mon, 11 Dec 2023 15:58:09
- +0000
-Received: by dev-dsk-abuehaze-1c-21d23c85.eu-west-1.amazon.com (Postfix, from userid 5005603)
-	id D84D9172A; Mon, 11 Dec 2023 15:58:08 +0000 (UTC)
-From: Hazem Mohamed Abuelfotoh <abuehaze@amazon.com>
-To: <edumazet@google.com>
-CC: <alisaidi@amazon.com>, <benh@amazon.com>, <blakgeof@amazon.com>,
-	<davem@davemloft.net>, <dipietro.salvatore@gmail.com>, <dipiets@amazon.com>,
-	<dsahern@kernel.org>, <kuba@kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>
-Subject: [PATCH] tcp: disable tcp_autocorking for socket when TCP_NODELAY flag is set
-Date: Mon, 11 Dec 2023 15:58:08 +0000
-Message-ID: <20231211155808.14804-1-abuehaze@amazon.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <CANn89i+BNkkg1nauBiKH-CfjFHOaR_56Fq6d1PiQ1TSXdFUCAw@mail.gmail.com>
-References: <CANn89i+BNkkg1nauBiKH-CfjFHOaR_56Fq6d1PiQ1TSXdFUCAw@mail.gmail.com>
+        d=linaro.org; s=google; t=1702310520; x=1702915320; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7Okbr2xMaqB+FVqmRCMmyai5v39yBJ8fTHKO9ikJ2HU=;
+        b=OCwFfVwvac+2GclXEp6G9Meea/GkTFp7pgXEpH5U+XW1vkGLVcxOPaoygS6ACz+4tG
+         gsuH0yOYNte5gpbo7XCSUbHcWwnqsqZI6urqZ6m1djlQ6WoP46r+0J9/ymrPbkYlPUQb
+         kW41a2zKHAtfAQSXd+Ql52vn6d5Zm7bb72iy8JCZzlemXJkaOzF3IDaMJ0caIduCeZhk
+         RWfwtSpGp+PUeKaNWCb/2n6P3qn4BAfssPFwnv+tpwHIuXUrfdDykSGCSoxyGvcwP49a
+         E6QNeyMLLqBorNPKZ8ceFSXjxNQRB130cufaa/mbxEjvFebBQiu9Pf8w7leuwTUlFjUh
+         HqIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702310520; x=1702915320;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7Okbr2xMaqB+FVqmRCMmyai5v39yBJ8fTHKO9ikJ2HU=;
+        b=Qs6oCGgJMPD/qY+WNG/nvtJZknbn9zjxJQKEvi72XgKHLMwb0f3V22lvsFKs7K1hjr
+         Unz1TkFYXQYqZaP6f5sqpSLTkFdHXasQpRsy2qzZhZG7sCmM5lBYCSF922UwJokuye0v
+         De7ZKhr7jc5yv3VOdyKIp1NF1/t+Dp9Luwcc3waxUZhw6THTWOfH4+WVu5jNnSLBhyFw
+         lpIcwoCM4Lqft6kg0Idx8xhSALKUYfIZLS2X7Wa4FaWib5SOm57n4v1xahh8T5LhFQsB
+         n4RtYS1/82AoU1tkTebpWxCv9ZoW/KIVY+geUcxVJlvI3Y9wusJ2lwOxbDSLMCP4YYt5
+         CFfw==
+X-Gm-Message-State: AOJu0YysA20AOF14d+AKrepmKxwW6ZbDRWIMmY+LenqgMPkk9BVCONEx
+	4HlPBJLeySE6Yowig3qpTRbGqA==
+X-Google-Smtp-Source: AGHT+IErHSccCpJH+V20VZ4gcOLXydqMQ4aSqHFGp/AGp/CrITMNJuu5AsATpG94MrIdFWMNhIIxVQ==
+X-Received: by 2002:a50:9356:0:b0:54b:1bf2:2f30 with SMTP id n22-20020a509356000000b0054b1bf22f30mr3370304eda.8.1702310520105;
+        Mon, 11 Dec 2023 08:02:00 -0800 (PST)
+Received: from ?IPV6:2a04:ee41:3:e085:3572:d83d:98f3:19dd? ([2a04:ee41:3:e085:3572:d83d:98f3:19dd])
+        by smtp.gmail.com with ESMTPSA id a30-20020a509b5e000000b0054c792ad4ecsm3911671edj.82.2023.12.11.08.01.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Dec 2023 08:01:59 -0800 (PST)
+Message-ID: <3b4d8d01-8082-41fb-91f3-5ae5c3ca5bfe@linaro.org>
+Date: Mon, 11 Dec 2023 17:01:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-Precedence: Bulk
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH 1/2] dt-bindings: Document QCA808x PHYs
+Content-Language: en-US
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231209014828.28194-1-ansuelsmth@gmail.com>
+ <b855eceb-05f4-4376-be62-2301d42575e7@linaro.org>
+ <6576fe0b.050a0220.e99f3.b2b5@mx.google.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <6576fe0b.050a0220.e99f3.b2b5@mx.google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-It will be good to submit another version changing the documentation https://docs.kernel.org/networking/timestamping.html editing "It can prevent the situation by always flushing the TCP stack in between requests, for instance by enabling TCP_NODELAY and disabling TCP_CORK and autocork." to "It can prevent the situation by always flushing the TCP stack in between requests, for instance by enabling TCP_NODELAY and disabling TCP_CORK."
+On 11/12/2023 13:18, Christian Marangi wrote:
+>>> +  QCA808X PHYs can have up to 3 LEDs attached.
+>>> +  All 3 LEDs are disabled by default.
+>>> +  2 LEDs have dedicated pins with the 3rd LED having the
+>>> +  double function of Interrupt LEDs/GPIO or additional LED.
+>>> +
+>>> +  By default this special PIN is set to LED function.
+>>> +
+>>> +allOf:
+>>> +  - $ref: ethernet-phy.yaml#
+>>> +
+>>> +select:
+>>> +  properties:
+>>> +    compatible:
+>>> +      contains:
+>>> +        enum:
+>>> +          - ethernet-phy-id004d.d101
+>>
+>> I have impression that this is continuation of some other patchset...
+>> Anyway, id004d.d101 is specific to QCA808x?
+>>
+> 
+> I used enum assuming eventually more qca808x PHY will come... Yes that
+> ID is specific and it's the id of QCA8081. Better to use const?
+
+No, it is fine. I just wanted to be sure that this will not be matched
+by other bindings.
+
+Best regards,
+Krzysztof
 
 
