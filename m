@@ -1,159 +1,176 @@
-Return-Path: <netdev+bounces-55785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C3AA80C523
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:47:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0349080C531
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 10:49:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E63A31F21061
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 09:47:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DCD71C209CF
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 09:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFB432137F;
-	Mon, 11 Dec 2023 09:47:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E20E6219F2;
+	Mon, 11 Dec 2023 09:49:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SSfIJueF"
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="eDWpKhKe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5BE9B0;
-	Mon, 11 Dec 2023 01:47:17 -0800 (PST)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BB9OsPO008442;
-	Mon, 11 Dec 2023 09:47:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=qA5ZVdBUHXONJSbk1B6ONk+koVB9zZViE+crch+rfkk=;
- b=SSfIJueFh3baXq2llKtGGt5uFYOajSYH6r+FIySa/biy61KiOSKrxkWUB6StK05PhEnQ
- OMl36CfTYgiPIELDCn+WWcrphMLdcQ71YjOKlzSjMH1TH3P6oFeDglklPdp46YObK1/R
- uWaYDSxBbvScnXHkEN1ljC7QveDY3ljhynaZ53d/43x7PY807A0zAEARFYwZdOPzBP5e
- DpON+2EnxpiA7VSieAlT8x3OHqCWxqilm4Dd1IjT0cJPhJodtlweK1W0ctO7xvxip6Ig
- 3W49JAOvStEjAdh+11+s9hmoHq9VhywGOdZcnzOkYkbck2hQjhFZsOj+EnXZRxgRsLOc 6g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uwys50hvf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Dec 2023 09:47:13 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BB9PsTL011078;
-	Mon, 11 Dec 2023 09:47:12 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uwys50huy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Dec 2023 09:47:12 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BB6mkWa008544;
-	Mon, 11 Dec 2023 09:47:11 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3uw2jt0qrq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Dec 2023 09:47:11 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BB9l8Ml18416158
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 11 Dec 2023 09:47:09 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D375620040;
-	Mon, 11 Dec 2023 09:47:08 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9447F20043;
-	Mon, 11 Dec 2023 09:47:07 +0000 (GMT)
-Received: from [9.171.1.164] (unknown [9.171.1.164])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 11 Dec 2023 09:47:07 +0000 (GMT)
-Message-ID: <3b3b5b33-1088-47c3-8cbc-4079c6ff472e@linux.ibm.com>
-Date: Mon, 11 Dec 2023 10:47:07 +0100
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FFC4D7;
+	Mon, 11 Dec 2023 01:49:00 -0800 (PST)
+Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BB5Eh5v030119;
+	Mon, 11 Dec 2023 01:48:44 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding:content-type; s=
+	PPS06212021; bh=PoiiWUzRFeTheOdRjkrDEE8JNrQqQk/GgJ9siaFpBAU=; b=
+	eDWpKhKefghm9RTliDC4eJNHjb3aF2Lhv286zyaI0uUgc+dXWzis3f+vqmL71o2H
+	LKJ26zOnT1zGXduqBKfUuAJbLY3PvfB/EtOPbx8mMrygysTWwiLu+4Qn8mQP1tQg
+	e2xA2ODi1cUG4vJRdbWSwUjDcIihUGDCyUpSrnPXxdnMnqifnrljGxqpk0jnG15h
+	U3AYxt6UI2y9NbMxO6rlJm96s3/PJSw4gcvQ7YuzT7BGFmPAPcYP3brJiXg8eYb5
+	z50SSoRSDaGQnm17ArbCZQfF0ZBxg+AQBXIeCq6GqR1iPeWBl2mipQ08q5TCwfLD
+	Wu304vH33JT1KVC2Wp/h5A==
+Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3uvmd49bg3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Mon, 11 Dec 2023 01:48:43 -0800 (PST)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 11 Dec 2023 01:48:47 -0800
+Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Mon, 11 Dec 2023 01:48:45 -0800
+From: Lizhi Xu <lizhi.xu@windriver.com>
+To: <syzbot+006987d1be3586e13555@syzkaller.appspotmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <mani@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+        <syzkaller-bugs@googlegroups.com>
+Subject: [PATCH] radix-tree: fix memory leak in radix_tree_insert
+Date: Mon, 11 Dec 2023 17:48:39 +0800
+Message-ID: <20231211094840.642118-1-lizhi.xu@windriver.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <000000000000bfba3a060bf4ffcf@google.com>
+References: <000000000000bfba3a060bf4ffcf@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 2/9] net/smc: introduce sub-functions for
- smc_clc_send_confirm_accept()
-Content-Language: en-US
-To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        kgraul@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, raspl@linux.ibm.com, schnelle@linux.ibm.com,
-        guangguan.wang@linux.alibaba.com, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1702021259-41504-1-git-send-email-guwen@linux.alibaba.com>
- <1702021259-41504-3-git-send-email-guwen@linux.alibaba.com>
- <4ad3a168-f506-fc21-582d-fe8764f404c0@linux.alibaba.com>
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <4ad3a168-f506-fc21-582d-fe8764f404c0@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: dZDYn_0Xjx9uV1UNXaJKRwR5kolgRSZx
-X-Proofpoint-GUID: 4g6xtjCVpjoErk9ewx3B4joiBrjmdCfA
+Content-Type: text/plain
+X-Proofpoint-GUID: pNPi7wZfZzeAjCWv6vYlAjJ8orPVZAcd
+X-Proofpoint-ORIG-GUID: pNPi7wZfZzeAjCWv6vYlAjJ8orPVZAcd
 X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-11_03,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- mlxscore=0 impostorscore=0 clxscore=1015 adultscore=0 phishscore=0
- spamscore=0 malwarescore=0 mlxlogscore=999 priorityscore=1501
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2312110079
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-16_25,2023-11-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=900 bulkscore=0
+ phishscore=0 spamscore=0 adultscore=0 malwarescore=0 clxscore=1011
+ mlxscore=0 priorityscore=1501 lowpriorityscore=0 suspectscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2312110079
 
+[Syz report]
+BUG: memory leak
+unreferenced object 0xffff88810bbf56d8 (size 576):
+  comm "syz-executor250", pid 5051, jiffies 4294951219 (age 12.920s)
+  hex dump (first 32 bytes):
+    3c 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00  <...............
+    f0 a9 2d 0c 81 88 ff ff f0 56 bf 0b 81 88 ff ff  ..-......V......
+  backtrace:
+    [<ffffffff81631398>] kmemleak_alloc_recursive include/linux/kmemleak.h:42 [inline]
+    [<ffffffff81631398>] slab_post_alloc_hook mm/slab.h:766 [inline]
+    [<ffffffff81631398>] slab_alloc_node mm/slub.c:3478 [inline]
+    [<ffffffff81631398>] slab_alloc mm/slub.c:3486 [inline]
+    [<ffffffff81631398>] __kmem_cache_alloc_lru mm/slub.c:3493 [inline]
+    [<ffffffff81631398>] kmem_cache_alloc+0x298/0x430 mm/slub.c:3502
+    [<ffffffff84b5094c>] radix_tree_node_alloc.constprop.0+0x7c/0x1a0 lib/radix-tree.c:276
+    [<ffffffff84b524cf>] __radix_tree_create lib/radix-tree.c:624 [inline]
+    [<ffffffff84b524cf>] radix_tree_insert+0x14f/0x360 lib/radix-tree.c:712
+    [<ffffffff84ae105d>] qrtr_tx_wait net/qrtr/af_qrtr.c:277 [inline]
+    [<ffffffff84ae105d>] qrtr_node_enqueue+0x57d/0x630 net/qrtr/af_qrtr.c:348
+    [<ffffffff84ae26f6>] qrtr_bcast_enqueue+0x66/0xd0 net/qrtr/af_qrtr.c:891
+    [<ffffffff84ae32d2>] qrtr_sendmsg+0x232/0x450 net/qrtr/af_qrtr.c:992
+    [<ffffffff83ec3c32>] sock_sendmsg_nosec net/socket.c:730 [inline]
+    [<ffffffff83ec3c32>] __sock_sendmsg+0x52/0xa0 net/socket.c:745
+    [<ffffffff83ec3d7b>] sock_write_iter+0xfb/0x180 net/socket.c:1158
+    [<ffffffff816961a7>] call_write_iter include/linux/fs.h:2020 [inline]
+    [<ffffffff816961a7>] new_sync_write fs/read_write.c:491 [inline]
+    [<ffffffff816961a7>] vfs_write+0x327/0x590 fs/read_write.c:584
+    [<ffffffff816966fb>] ksys_write+0x13b/0x170 fs/read_write.c:637
+    [<ffffffff84b6ddcf>] do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+    [<ffffffff84b6ddcf>] do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
+[Analysis]
+When creating child nodes, if not all child nodes used to store indexes are created,
+so the child nodes created before the failure should be released.
 
-On 09.12.23 03:50, Wen Gu wrote:
-> 
-> 
-> On 2023/12/8 15:40, Wen Gu wrote:
-> 
->> There is a large if-else block in smc_clc_send_confirm_accept() and it
->> is better to split it into two sub-functions.
->>
->> Suggested-by: Alexandra Winter <wintera@linux.ibm.com>
->> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
->> ---
->>   net/smc/smc_clc.c | 196 +++++++++++++++++++++++++++++++-----------------------
->>   1 file changed, 114 insertions(+), 82 deletions(-)
->>
->> diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
->> index 0fcb035..52b4ea9 100644
->> --- a/net/smc/smc_clc.c
->> +++ b/net/smc/smc_clc.c
->> @@ -998,6 +998,111 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini)
->>       return reason_code;
->>   }
->>   +static void smcd_clc_prep_confirm_accept(struct smc_connection *conn,
->> +                struct smc_clc_msg_accept_confirm_v2 *clc_v2,
-> 
-> checkpatch will complain 'Alignment should match open parenthesis' here.
-> But in order to make the length less than 80 columns, there seems to be
-> no other good way.
-> 
->> +                int first_contact, u8 version,
->> +                u8 *eid, struct smc_init_info *ini,
->> +                int *fce_len,
->> +                struct smc_clc_first_contact_ext_v2x *fce_v2x,
->> +                struct smc_clc_msg_trail *trl)
->> +{
-> <...>
-> 
->> +
->> +static void smcr_clc_prep_confirm_accept(struct smc_connection *conn,
->> +                struct smc_clc_msg_accept_confirm_v2 *clc_v2,
-> 
-> And here.
-> 
->> +                int first_contact, u8 version,
->> +                u8 *eid, struct smc_init_info *ini,
->> +                int *fce_len,
->> +                struct smc_clc_first_contact_ext_v2x *fce_v2x,
->> +                struct smc_clc_fce_gid_ext *gle,
->> +                struct smc_clc_msg_trail *trl)
->> +{
-> <...>
-> 
+Reported-and-tested-by: syzbot+006987d1be3586e13555@syzkaller.appspotmail.com
+Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+---
+ lib/radix-tree.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
+diff --git a/lib/radix-tree.c b/lib/radix-tree.c
+index a89df8afa510..c5caf5b7523a 100644
+--- a/lib/radix-tree.c
++++ b/lib/radix-tree.c
+@@ -616,9 +616,10 @@ static int __radix_tree_create(struct radix_tree_root *root,
+ 	struct radix_tree_node *node = NULL, *child;
+ 	void __rcu **slot = (void __rcu **)&root->xa_head;
+ 	unsigned long maxindex;
+-	unsigned int shift, offset = 0;
++	unsigned int shift, offset = 0, mmshift = 0;
+ 	unsigned long max = index;
+ 	gfp_t gfp = root_gfp_mask(root);
++	int ret;
+ 
+ 	shift = radix_tree_load_root(root, &child, &maxindex);
+ 
+@@ -628,6 +629,7 @@ static int __radix_tree_create(struct radix_tree_root *root,
+ 		if (error < 0)
+ 			return error;
+ 		shift = error;
++		mmshift = error;
+ 		child = rcu_dereference_raw(root->xa_head);
+ 	}
+ 
+@@ -637,8 +639,10 @@ static int __radix_tree_create(struct radix_tree_root *root,
+ 			/* Have to add a child node.  */
+ 			child = radix_tree_node_alloc(gfp, node, root, shift,
+ 							offset, 0, 0);
+-			if (!child)
+-				return -ENOMEM;
++			if (!child) {
++				 ret = -ENOMEM;
++				 goto freec;
++			}
+ 			rcu_assign_pointer(*slot, node_to_entry(child));
+ 			if (node)
+ 				node->count++;
+@@ -656,6 +660,17 @@ static int __radix_tree_create(struct radix_tree_root *root,
+ 	if (slotp)
+ 		*slotp = slot;
+ 	return 0;
++freec:
++	if (mmshift > 0) {
++		struct radix_tree_node *pn;
++		while (shift < mmshift && node) {
++			pn = node->parent;
++			radix_tree_node_rcu_free(&node->rcu_head);
++			shift += RADIX_TREE_MAP_SHIFT;
++			node = pn;
++		}
++	}
++	return ret;
+ }
+ 
+ /*
+-- 
+2.43.0
 
-You could shorten the names of the functions
 
