@@ -1,216 +1,86 @@
-Return-Path: <netdev+bounces-56136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 473EE80DF5A
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:17:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7036680DF65
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:22:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE65E282606
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 23:17:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A12111C2146F
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 23:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7D6056745;
-	Mon, 11 Dec 2023 23:17:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F12B156745;
+	Mon, 11 Dec 2023 23:22:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UHLNimI1"
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="JjIdSjMj";
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="Odnq8u7w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60A9A9A;
-	Mon, 11 Dec 2023 15:17:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702336634; x=1733872634;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Ck35hHnCHFtH+d2GzNW7cjDeYHKAdUN4ZsaO0xxGAYs=;
-  b=UHLNimI1LelydaQiGSTQ3hybOJ+yJ2Sxafvaf3/x7gPJKQpFoFM4zIib
-   f3z87HL5sGbArumVRSOSE4YF/InKQjJdpx1p277IkIj7BUZzvzNStJkgv
-   EW/rK1j0OHdNfZcCTBIdgL/n/8N7H17vr75v0Rp/24CbCMzgbeW7SsgMS
-   guFB7Tt5NHWKcsaAVvsiCrWRtGj0nSiH5GGEbm3BYN6hdk3KsHhoo3RhC
-   rL/PoXJAAZPYusL8ofbgDEtX7CDxboggrJKISKZdMf4l9PWxEIxZrkppJ
-   9HJa1ahqJTcsmvrcEkjAOG8oGj1x1eVs+BJdSuH0sNDZ+cHwO7iIBlUui
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="374230372"
-X-IronPort-AV: E=Sophos;i="6.04,268,1695711600"; 
-   d="scan'208";a="374230372"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2023 15:17:13 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="722996351"
-X-IronPort-AV: E=Sophos;i="6.04,268,1695711600"; 
-   d="scan'208";a="722996351"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by orsmga003.jf.intel.com with ESMTP; 11 Dec 2023 15:17:10 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rCpWM-000IYd-2i;
-	Mon, 11 Dec 2023 23:17:07 +0000
-Date: Tue, 12 Dec 2023 07:16:50 +0800
-From: kernel test robot <lkp@intel.com>
-To: Lizhi Xu <lizhi.xu@windriver.com>,
-	syzbot+006987d1be3586e13555@syzkaller.appspotmail.com
-Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, mani@kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH] radix-tree: fix memory leak in radix_tree_insert
-Message-ID: <202312120651.92GGXeX4-lkp@intel.com>
-References: <20231211094840.642118-1-lizhi.xu@windriver.com>
+Received: from nautica.notk.org (ipv6.notk.org [IPv6:2001:41d0:1:7a93::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E362BD1;
+	Mon, 11 Dec 2023 15:21:58 -0800 (PST)
+Received: by nautica.notk.org (Postfix, from userid 108)
+	id 6543DC01F; Tue, 12 Dec 2023 00:21:57 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
+	t=1702336917; bh=RctkjfZ/uke+J5C79Z3MVEHpAx1sc8x3waMFXiBIDT4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JjIdSjMjQL1JNut9IMYjBi4vvLTZvW49XIyfzyrcGkc9fQ85zliwL6U6rxPDPqMmb
+	 IXzxVpNzwNpm97PPSpYXVUZAE3dg0r0R71S9J6MmumATGg73Dqp/fygMtBgNfUjEs8
+	 fgJqGNO9W20aCUKHSoh4ff0Yzkh40KTKGWPooQ9uLN91kHumfHfTt+Fzvqn8iW8mlJ
+	 MOqbA1mzfpFl5jxissQRMP6m+DtPkQxKmK2ACnZRe2QUuVhcLgYDzKP+4dAJzdtU2t
+	 03DbS0O0ojMCYpD3yVAwIK27C1QvWqTXHGlK2crugSrn26iKGmIyoC7GYCHJ8HVIs0
+	 aFmdgfL+pCmfg==
+X-Spam-Level: 
+Received: from gaia (localhost [127.0.0.1])
+	by nautica.notk.org (Postfix) with ESMTPS id 82DE3C009;
+	Tue, 12 Dec 2023 00:21:49 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
+	t=1702336916; bh=RctkjfZ/uke+J5C79Z3MVEHpAx1sc8x3waMFXiBIDT4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Odnq8u7wg88pa7i3Cw+3L4vmH+F6XkDUyoXumbgLwUo0ceDH5mmCZKmL+hTZvzKe5
+	 8bAGrTyAen597zv7HoUof6QTJhO05gha1cqezTNsi1RdU/ogMJaPdnYUZdySGfCApi
+	 fK3f9zVZGAVCVWOh2f70vqExnq1KfWQFQAskQnWYbfY+Zr8pTllIw42f7iPg3qdfVI
+	 Ed/m06uM6UwZdHHIIodZBe1uekJO/U4+jBw5N4h0YLJDb7WcPNhkfRjXw81x+Xj2IN
+	 uijtgLj1G550fCAoVd8OgoO+5cFpjGaZHNGoIDZy0+ETkig9erb0BiOGNkLtrG9VIt
+	 occqrp8xWhEuA==
+Received: from localhost (gaia [local])
+	by gaia (OpenSMTPD) with ESMTPA id 4e583e84;
+	Mon, 11 Dec 2023 23:21:45 +0000 (UTC)
+Date: Tue, 12 Dec 2023 08:21:30 +0900
+From: Dominique Martinet <asmadeus@codewreck.org>
+To: Christian Schoenebeck <linux_oss@crudebyte.com>
+Cc: Fedor Pchelkin <pchelkin@ispras.ru>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	v9fs@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Alexey Khoroshilov <khoroshilov@ispras.ru>,
+	lvc-project@linuxtesting.org
+Subject: Re: [PATCH v4] net: 9p: avoid freeing uninit memory in p9pdu_vreadf
+Message-ID: <ZXeZevFb1oDvMFns@codewreck.org>
+References: <20231206200913.16135-1-pchelkin@ispras.ru>
+ <1808202.Umia7laAZq@silver>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231211094840.642118-1-lizhi.xu@windriver.com>
+In-Reply-To: <1808202.Umia7laAZq@silver>
 
-Hi Lizhi,
+Christian Schoenebeck wrote on Thu, Dec 07, 2023 at 01:54:02PM +0100:
+> I just checked whether this could create a leak, but it looks clean, so LGTM:
 
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on akpm-mm/mm-nonmm-unstable]
-[also build test WARNING on linus/master v6.7-rc5 next-20231211]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Lizhi-Xu/radix-tree-fix-memory-leak-in-radix_tree_insert/20231211-174951
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-nonmm-unstable
-patch link:    https://lore.kernel.org/r/20231211094840.642118-1-lizhi.xu%40windriver.com
-patch subject: [PATCH] radix-tree: fix memory leak in radix_tree_insert
-config: i386-randconfig-061-20231212 (https://download.01.org/0day-ci/archive/20231212/202312120651.92GGXeX4-lkp@intel.com/config)
-compiler: gcc-7 (Ubuntu 7.5.0-6ubuntu2) 7.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231212/202312120651.92GGXeX4-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312120651.92GGXeX4-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
-   lib/radix-tree.c:266:36: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct xa_node *nodes @@     got struct xa_node [noderef] __rcu *parent @@
-   lib/radix-tree.c:266:36: sparse:     expected struct xa_node *nodes
-   lib/radix-tree.c:266:36: sparse:     got struct xa_node [noderef] __rcu *parent
-   lib/radix-tree.c:284:29: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct xa_node [noderef] __rcu *parent @@     got struct xa_node *parent @@
-   lib/radix-tree.c:284:29: sparse:     expected struct xa_node [noderef] __rcu *parent
-   lib/radix-tree.c:284:29: sparse:     got struct xa_node *parent
-   lib/radix-tree.c:344:38: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct xa_node [noderef] __rcu *parent @@     got struct xa_node *nodes @@
-   lib/radix-tree.c:344:38: sparse:     expected struct xa_node [noderef] __rcu *parent
-   lib/radix-tree.c:344:38: sparse:     got struct xa_node *nodes
-   lib/radix-tree.c:446:54: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct xa_node [noderef] __rcu *parent @@     got struct xa_node *node @@
-   lib/radix-tree.c:446:54: sparse:     expected struct xa_node [noderef] __rcu *parent
-   lib/radix-tree.c:446:54: sparse:     got struct xa_node *node
-   lib/radix-tree.c:558:24: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct xa_node *parent @@     got struct xa_node [noderef] __rcu *parent @@
-   lib/radix-tree.c:558:24: sparse:     expected struct xa_node *parent
-   lib/radix-tree.c:558:24: sparse:     got struct xa_node [noderef] __rcu *parent
->> lib/radix-tree.c:653:28: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct xa_node *pn @@     got struct xa_node [noderef] __rcu *parent @@
-   lib/radix-tree.c:653:28: sparse:     expected struct xa_node *pn
-   lib/radix-tree.c:653:28: sparse:     got struct xa_node [noderef] __rcu *parent
-   lib/radix-tree.c:687:31: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct xa_node *[assigned] child @@     got struct xa_node [noderef] __rcu *parent @@
-   lib/radix-tree.c:687:31: sparse:     expected struct xa_node *[assigned] child
-   lib/radix-tree.c:687:31: sparse:     got struct xa_node [noderef] __rcu *parent
-   lib/radix-tree.c:962:22: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct xa_node *node @@     got struct xa_node [noderef] __rcu *parent @@
-   lib/radix-tree.c:962:22: sparse:     expected struct xa_node *node
-   lib/radix-tree.c:962:22: sparse:     got struct xa_node [noderef] __rcu *parent
-   lib/radix-tree.c:1022:22: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct xa_node *node @@     got struct xa_node [noderef] __rcu *parent @@
-   lib/radix-tree.c:1022:22: sparse:     expected struct xa_node *node
-   lib/radix-tree.c:1022:22: sparse:     got struct xa_node [noderef] __rcu *parent
-   lib/radix-tree.c:1542:38: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct xa_node *[assigned] node @@     got struct xa_node [noderef] __rcu *parent @@
-   lib/radix-tree.c:1542:38: sparse:     expected struct xa_node *[assigned] node
-   lib/radix-tree.c:1542:38: sparse:     got struct xa_node [noderef] __rcu *parent
-   lib/radix-tree.c:1602:28: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct xa_node *nodes @@     got struct xa_node [noderef] __rcu *parent @@
-   lib/radix-tree.c:1602:28: sparse:     expected struct xa_node *nodes
-   lib/radix-tree.c:1602:28: sparse:     got struct xa_node [noderef] __rcu *parent
-
-vim +653 lib/radix-tree.c
-
-   581	
-   582	/**
-   583	 *	__radix_tree_create	-	create a slot in a radix tree
-   584	 *	@root:		radix tree root
-   585	 *	@index:		index key
-   586	 *	@nodep:		returns node
-   587	 *	@slotp:		returns slot
-   588	 *
-   589	 *	Create, if necessary, and return the node and slot for an item
-   590	 *	at position @index in the radix tree @root.
-   591	 *
-   592	 *	Until there is more than one item in the tree, no nodes are
-   593	 *	allocated and @root->xa_head is used as a direct slot instead of
-   594	 *	pointing to a node, in which case *@nodep will be NULL.
-   595	 *
-   596	 *	Returns -ENOMEM, or 0 for success.
-   597	 */
-   598	static int __radix_tree_create(struct radix_tree_root *root,
-   599			unsigned long index, struct radix_tree_node **nodep,
-   600			void __rcu ***slotp)
-   601	{
-   602		struct radix_tree_node *node = NULL, *child;
-   603		void __rcu **slot = (void __rcu **)&root->xa_head;
-   604		unsigned long maxindex;
-   605		unsigned int shift, offset = 0, mmshift = 0;
-   606		unsigned long max = index;
-   607		gfp_t gfp = root_gfp_mask(root);
-   608		int ret;
-   609	
-   610		shift = radix_tree_load_root(root, &child, &maxindex);
-   611	
-   612		/* Make sure the tree is high enough.  */
-   613		if (max > maxindex) {
-   614			int error = radix_tree_extend(root, gfp, max, shift);
-   615			if (error < 0)
-   616				return error;
-   617			shift = error;
-   618			mmshift = error;
-   619			child = rcu_dereference_raw(root->xa_head);
-   620		}
-   621	
-   622		while (shift > 0) {
-   623			shift -= RADIX_TREE_MAP_SHIFT;
-   624			if (child == NULL) {
-   625				/* Have to add a child node.  */
-   626				child = radix_tree_node_alloc(gfp, node, root, shift,
-   627								offset, 0, 0);
-   628				if (!child) {
-   629					 ret = -ENOMEM;
-   630					 goto freec;
-   631				}
-   632				rcu_assign_pointer(*slot, node_to_entry(child));
-   633				if (node)
-   634					node->count++;
-   635			} else if (!radix_tree_is_internal_node(child))
-   636				break;
-   637	
-   638			/* Go a level down */
-   639			node = entry_to_node(child);
-   640			offset = radix_tree_descend(node, &child, index);
-   641			slot = &node->slots[offset];
-   642		}
-   643	
-   644		if (nodep)
-   645			*nodep = node;
-   646		if (slotp)
-   647			*slotp = slot;
-   648		return 0;
-   649	freec:
-   650		if (mmshift > 0) {
-   651			struct radix_tree_node *pn;
-   652			while (shift < mmshift && node) {
- > 653				pn = node->parent;
-   654				radix_tree_node_rcu_free(&node->rcu_head);
-   655				shift += RADIX_TREE_MAP_SHIFT;
-   656				node = pn;
-   657			}
-   658		}
-   659		return ret;
-   660	}
-   661	
+Right, either version look good to me.
+I don't have a hard preference here, I've finished testing and just
+updated the patch -- thanks for your comments & review
+(and thanks Simon as well!)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Dominique Martinet | Asmadeus
 
