@@ -1,134 +1,262 @@
-Return-Path: <netdev+bounces-55854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41CAD80C879
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 12:51:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A86580C924
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:12:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5AEDB20EC6
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 11:50:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EE1D1F21814
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 12:12:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F04838DDA;
-	Mon, 11 Dec 2023 11:50:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZOOokYmG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B551039869;
+	Mon, 11 Dec 2023 12:12:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 432D69B;
-	Mon, 11 Dec 2023 03:50:52 -0800 (PST)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BBBnDu1019329;
-	Mon, 11 Dec 2023 11:50:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=g/OpsuF0w/ezjdOt1y1XRBvIP8co9yItLc4jPWanbV0=;
- b=ZOOokYmGmmVp51O0dGWUb90Pc3CKvxJp1s3jtuYeivB9BWiENkynUsjTPG0WSHA9JQmU
- qqUNQq5Uy7CR4Cv7VWNJQ+fZ5szid2D+hBrhCbS6X26TSCnFGh9SeDmdnuXrc+sRujmM
- P2xPOY+oyUsXM5NfIm5mHOKTxjC5DvGAyYfvoX6JLFVbtuf7V1sBta54AFe5HlIVmLb/
- aq08YZsoWJETms1X5pvZg+n/kWcStobnnVlNJDge3FLOyL8f4uqCDffg3f7SfWfZfA6T
- SBNo6EPT2vOevZzR7USd22VDfyAoNchNQJUiW9ws3RO0gN9+sBnnqZWrcbO99TmDI/hl Vw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ux1vq81ax-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Dec 2023 11:50:44 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BBBnwHp021051;
-	Mon, 11 Dec 2023 11:50:43 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ux1vq81ad-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Dec 2023 11:50:43 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BB9sDxZ013874;
-	Mon, 11 Dec 2023 11:50:42 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3uw591rgdr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Dec 2023 11:50:42 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BBBod4v27853536
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 11 Dec 2023 11:50:39 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BB4D320040;
-	Mon, 11 Dec 2023 11:50:39 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7D9EC20043;
-	Mon, 11 Dec 2023 11:50:38 +0000 (GMT)
-Received: from [9.171.1.164] (unknown [9.171.1.164])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 11 Dec 2023 11:50:38 +0000 (GMT)
-Message-ID: <a7abaf57-a49a-4a31-a7e6-0d5312367480@linux.ibm.com>
-Date: Mon, 11 Dec 2023 12:50:38 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 7/9] net/smc: support extended GID in SMC-D
- lgr netlink attribute
-Content-Language: en-US
-To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        kgraul@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, raspl@linux.ibm.com, schnelle@linux.ibm.com,
-        guangguan.wang@linux.alibaba.com, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1702021259-41504-1-git-send-email-guwen@linux.alibaba.com>
- <1702021259-41504-8-git-send-email-guwen@linux.alibaba.com>
- <8b651c68-c51d-49a9-9df0-58e9110fa47d@linux.ibm.com>
- <1c14f769-8da2-fdac-cec2-a59ab69284ad@linux.alibaba.com>
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <1c14f769-8da2-fdac-cec2-a59ab69284ad@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Pa-SLE7kdb9xgaosGmzVJpt4wpjlfvWN
-X-Proofpoint-ORIG-GUID: jdoe_snMf-7DmBs02uL24sx8-JQ6gp8N
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+X-Greylist: delayed 1228 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 11 Dec 2023 04:12:16 PST
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E0B4F2;
+	Mon, 11 Dec 2023 04:12:16 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Spg7z2kdDz1vnkK;
+	Mon, 11 Dec 2023 19:51:43 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 759501A016F;
+	Mon, 11 Dec 2023 19:51:46 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 11 Dec
+ 2023 19:51:46 +0800
+Subject: Re: [net-next v1 09/16] page_pool: device memory support
+To: Mina Almasry <almasrymina@google.com>
+CC: Shailend Chand <shailend@google.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<bpf@vger.kernel.org>, <linux-media@vger.kernel.org>,
+	<dri-devel@lists.freedesktop.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst
+	<jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+	<ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, David Ahern
+	<dsahern@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+	=?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>, Harshitha
+ Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeelb@google.com>
+References: <20231208005250.2910004-1-almasrymina@google.com>
+ <20231208005250.2910004-10-almasrymina@google.com>
+ <32211cbf-3a4e-8a86-6214-4304ddb18a98@huawei.com>
+ <CAHS8izOQcuLPwvDff96fuNB7r6EU9OWt3ShueQp=u7wat3L5LA@mail.gmail.com>
+ <92e30bd9-6df4-b72f-7bcd-f4fe5670eba2@huawei.com>
+ <CAHS8izPEFsqw50qgM+sPot6XVvOExpd+DrwrmPSR3zsWGLysRw@mail.gmail.com>
+ <CAHS8izN6Cbjy0FCYhJyNsP396XfgJ_nTFXWuHb5QWNct=PifAg@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <59e07233-24cb-7fb2-1aee-e1cf7eb72fa9@huawei.com>
+Date: Mon, 11 Dec 2023 19:51:45 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-11_04,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
- priorityscore=1501 lowpriorityscore=0 spamscore=0 bulkscore=0
- impostorscore=0 mlxscore=0 malwarescore=0 mlxlogscore=749 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2312110095
+In-Reply-To: <CAHS8izN6Cbjy0FCYhJyNsP396XfgJ_nTFXWuHb5QWNct=PifAg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-
-
-On 11.12.23 11:09, Wen Gu wrote:
-> 
-> 
-> On 2023/12/11 17:39, Alexandra Winter wrote:
+On 2023/12/11 12:04, Mina Almasry wrote:
+> On Sun, Dec 10, 2023 at 6:26 PM Mina Almasry <almasrymina@google.com> wrote:
 >>
->>
->> On 08.12.23 08:40, Wen Gu wrote:
->>> Virtual ISM devices introduced in SMCv2.1 requires a 128 bit extended
->>> GID vs. the existing ISM 64bit GID. So the 2nd 64 bit of extended GID
->>> should be included in SMC-D linkgroup netlink attribute as well.
+>> On Sun, Dec 10, 2023 at 6:04 PM Yunsheng Lin <linyunsheng@huawei.com> wrote:
 >>>
->>> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
->>> ---
+>>> On 2023/12/9 0:05, Mina Almasry wrote:
+>>>> On Fri, Dec 8, 2023 at 1:30 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>>>>
+>>>>>
+>>>>> As mentioned before, it seems we need to have the above checking every
+>>>>> time we need to do some per-page handling in page_pool core, is there
+>>>>> a plan in your mind how to remove those kind of checking in the future?
+>>>>>
+>>>>
+>>>> I see 2 ways to remove the checking, both infeasible:
+>>>>
+>>>> 1. Allocate a wrapper struct that pulls out all the fields the page pool needs:
+>>>>
+>>>> struct netmem {
+>>>>         /* common fields */
+>>>>         refcount_t refcount;
+>>>>         bool is_pfmemalloc;
+>>>>         int nid;
+>>>>         ...
+>>>>         union {
+>>>>                 struct dmabuf_genpool_chunk_owner *owner;
+>>>>                 struct page * page;
+>>>>         };
+>>>> };
+>>>>
+>>>> The page pool can then not care if the underlying memory is iov or
+>>>> page. However this introduces significant memory bloat as this struct
+>>>> needs to be allocated for each page or ppiov, which I imagine is not
+>>>> acceptable for the upside of removing a few static_branch'd if
+>>>> statements with no performance cost.
+>>>>
+>>>> 2. Create a unified struct for page and dmabuf memory, which the mm
+>>>> folks have repeatedly nacked, and I imagine will repeatedly nack in
+>>>> the future.
+>>>>
+>>>> So I imagine the special handling of ppiov in some form is critical
+>>>> and the checking may not be removable.
+>>>
+>>> If the above is true, perhaps devmem is not really supposed to be intergated
+>>> into page_pool.
+>>>
+>>> Adding a checking for every per-page handling in page_pool core is just too
+>>> hacky to be really considerred a longterm solution.
+>>>
 >>
->> This patch did not apply cleanly.
->> Please always base patches on the current net-next
-> 
-> Strange.. I can apply them cleanly with the latest net-next
-> (6e944cc68633 ("Merge branch 'rswitch-jumbo-frames'")).
-> 
-> Could you please try again? Thanks.
-> 
+>> The only other option is to implement another page_pool for ppiov and
+>> have the driver create page_pool or ppiov_pool depending on the state
+>> of the netdev_rx_queue (or some helper in the net stack to do that for
+>> the driver). This introduces some code duplication. The ppiov_pool &
+>> page_pool would look similar in implementation.
 
-Sorry, the patches were somehow re-ordered when I downloaded them from
-https://lore.kernel.org/netdev/4ad3a168-f506-fc21-582d-fe8764f404c0@linux.alibaba.com/t.mbox.gz
+I think there is a design pattern already to deal with this kind of problem,
+refactoring common code used by both page_pool and ppiov into a library to
+aovid code duplication if most of them have similar implementation.
 
-Everything is ok with this patch.
+>>
+>> But this was all discussed in detail in RFC v2 and the last response I
+>> heard from Jesper was in favor if this approach, if I understand
+>> correctly:
+>>
+>> https://lore.kernel.org/netdev/7aedc5d5-0daf-63be-21bc-3b724cc1cab9@redhat.com/
+>>
+>> Would love to have the maintainer weigh in here.
+>>
+> 
+> I should note we may be able to remove some of the checking, but maybe not all.
+> 
+> - Checks that disable page fragging for ppiov can be removed once
+> ppiov has frag support (in this series or follow up).
+> 
+> - If we use page->pp_frag_count (or page->pp_ref_count) for
+> refcounting ppiov, we can remove the if checking in the refcounting.
+> 
+> - We may be able to store the dma_addr of the ppiov in page->dma_addr,
+> but I'm unsure if that actually works, because the dma_buf dmaddr is
+> dma_addr_t (u32 or u64), but page->dma_addr is unsigned long (4 bytes
+> I think). But if it works for pages I may be able to make it work for
+> ppiov as well.
+> 
+> - Checks that obtain the page->pp can work with ppiov if we align the
+> offset of page->pp and ppiov->pp.
+> 
+> - Checks around page->pp_magic can be removed if we also have offset
+> aligned ppiov->pp_magic.
+> 
+> Sadly I don't see us removing the checking for these other cases:
+> 
+> - page_is_pfmemalloc(): I'm not allowed to pass a non-struct page into
+> that helper.
+
+We can do similar trick like above as bit 1 of page->pp_magic is used to
+indicate that if it is a pfmemalloc page.
+
+> 
+> - page_to_nid(): I'm not allowed to pass a non-struct page into that helper.
+
+Yes, this one need special case.
+
+> 
+> - page_pool_free_va(): ppiov have no va.
+
+Doesn't the skb_frags_readable() checking will protect the page_pool_free_va()
+from being called on devmem?
+
+> 
+> - page_pool_sync_for_dev/page_pool_dma_map: ppiov backed by dma-buf
+> fundamentally can't get mapped again.
+
+Can we just fail the page_pool creation with PP_FLAG_DMA_MAP and
+DMA_ATTR_SKIP_CPU_SYNC flags for devmem provider?
+
+> 
+> Are the removal (or future removal) of these checks enough to resolve this?
+
+Yes, that is somewhat similar to my proposal, the biggest objection seems to
+be that we need to have a safe type checking for it to work correctly.
+
+> 
+>>> It is somewhat ironical that devmem is using static_branch to alliviate the
+>>> performance impact for normal memory at the possible cost of performance
+>>> degradation for devmem, does it not defeat some purpose of intergating devmem
+>>> to page_pool?
+>>>
+>>
+>> I don't see the issue. The static branch sets the non-ppiov path as
+>> default if no memory providers are in use, and flips it when they are,
+>> making the default branch prediction ideal in both cases.
+
+You are assuming the we are not using page pool for both normal memory and
+devmem at the same. But a generic solution should not have that assumption
+as my understanding.
+
+>>
+>>>>
+>>>>> Even though a static_branch check is added in page_is_page_pool_iov(), it
+>>>>> does not make much sense that a core has tow different 'struct' for its
+>>>>> most basic data.
+>>>>>
+>>>>> IMHO, the ppiov for dmabuf is forced fitting into page_pool without much
+>>>>> design consideration at this point.
+>>>>>
+>>>> ...
+>>>>>
+>>>>> For now, the above may work for the the rx part as it seems that you are
+>>>>> only enabling rx for dmabuf for now.
+>>>>>
+>>>>> What is the plan to enable tx for dmabuf? If it is also intergrated into
+>>>>> page_pool? There was a attempt to enable page_pool for tx, Eric seemed to
+>>>>> have some comment about this:
+>>>>> https://lkml.kernel.org/netdev/2cf4b672-d7dc-db3d-ce90-15b4e91c4005@huawei.com/T/#mb6ab62dc22f38ec621d516259c56dd66353e24a2
+>>>>>
+>>>>> If tx is not intergrated into page_pool, do we need to create a new layer for
+>>>>> the tx dmabuf?
+>>>>>
+>>>>
+>>>> I imagine the TX path will reuse page_pool_iov, page_pool_iov_*()
+>>>> helpers, and page_pool_page_*() helpers, but will not need any core
+>>>> page_pool changes. This is because the TX path will have to piggyback
+>>>
+>>> We may need another bit/flags checking to demux between page_pool owned
+>>> devmem and non-page_pool owned devmem.
+>>>
+>>
+>> The way I'm imagining the support, I don't see the need for such
+>> flags. We'd be re-using generic helpers like
+>> page_pool_iov_get_dma_address() and what not that don't need that
+>> checking.
+>>
+>>> Also calling page_pool_*() on non-page_pool owned devmem is confusing
+>>> enough that we may need a thin layer handling non-page_pool owned devmem
+>>> in the end.
+>>>
+>>
+>> The page_pool_page* & page_pool_iov* functions can be renamed if
+>> confusing. I would think that's no issue (note that the page_pool_*
+
+When you rename those functions, you will have a thin layer automatically.
+
+>> functions need not be called for TX path).
+>>
+>>>> on MSG_ZEROCOPY (devmem is not copyable), so no memory allocation from
+>>>> the page_pool (or otherwise) is needed or possible. RFCv1 had a TX
+>>>> implementation based on dmabuf pages without page_pool involvement, I
+>>>> imagine I'll do something similar.
+>>> It would be good to have a tx implementation for the next version, so
+>>> that we can have a whole picture of devmem.
 
