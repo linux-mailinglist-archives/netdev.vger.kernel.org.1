@@ -1,39 +1,42 @@
-Return-Path: <netdev+bounces-55902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBAFA80CC46
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:59:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63AD680CC4C
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:00:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86FF7280D1F
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:59:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 170E828100E
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:00:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A533481AC;
-	Mon, 11 Dec 2023 13:59:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112C0482C1;
+	Mon, 11 Dec 2023 14:00:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RWECisDW"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="YGEmrRc1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [IPv6:2a00:1098:ed:100::25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83E33478A;
+	Mon, 11 Dec 2023 05:59:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1702303189;
+	bh=dKIWPsl1+iB2/HkzpJsN57Kk1dREJYExJbg+W32xu7M=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=YGEmrRc1jEJzfPPF6dLbd4heZq9uLnyF4pej2TSkPXZLgrVyhmu7OqHPZ/0jcl64t
+	 t+KUNzhJXuzEGlo/xfv9iZqv4eSRp/turrbYd63mibACbd3cUlMGxGwNloE6Hu6C0T
+	 bEHMjdbzd03fJ5iUlhHrIoXhghvM0fKdWDYwx8ZP/a6rGL9ZfdMcTrRlIcWA/nhyXO
+	 KuGhiV+v2xBkPfkLNsGyMnHP5sCnO7G83SFrUJVcRsAl6oF65vdFTBs1JJ0VRyNK+c
+	 /xZ83+DtdN9XTwo39xLwW84zGhdZjBM9iu5shi+/fKdNSZE1Ifpwfp9XkRAc67AnJ6
+	 dt9L3hQiw+9oQ==
+Received: from [IPV6:fd00::2a:39ce] (cola.collaboradmins.com [IPv6:2a01:4f8:1c1c:5717::1])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101281F60B
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 13:59:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BFA7C433C8;
-	Mon, 11 Dec 2023 13:59:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702303188;
-	bh=rU5y8TREUm+Fh2v6xsqVQRML7ECeO9i2H0Ir2DKyCXg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RWECisDWqFWgce/TRfMtx/5S5i/lmqy+C0BXcE9QhFukbF9UXsyzJogCbcOlSzrSU
-	 6Qz5mbiM6eseokiD9Kubd3NsagddTxajm9nsI9FMjR+rcIIDZ6yxFbmwMg6y33KRDQ
-	 mt8QT7mjXPX2RxWcmwSVrbrikmnzpCt+Lfw6Ae/BAB+cSXG2qZDt6ZHt/tRNRla+vh
-	 SIwqjDnbiU5QZhSHuCmZwcsTBUSvsdx/2bF+8cu00aWU3i0sq1TjN7L5X0hxSt9814
-	 wGDmffwlvhJYJg5dxNyIrwzBUDQkTxSPfMGwVXYcS2G2ar2MpjUQv0kUhxAX1iCn5n
-	 GIYpdCCN6xOEQ==
-Message-ID: <54e4634d-2dd4-4180-939d-32d070b0aa59@kernel.org>
-Date: Mon, 11 Dec 2023 15:59:42 +0200
+	(Authenticated sender: kholk11)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 70134378110F;
+	Mon, 11 Dec 2023 13:59:47 +0000 (UTC)
+Message-ID: <4fce268c-4ef1-4361-b524-4c9bf9b60370@collabora.com>
+Date: Mon, 11 Dec 2023 14:59:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,156 +44,184 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 net-next 6/8] net: ethernet: ti: am65-cpsw-qos: Add
- Frame Preemption MAC Merge support
-Content-Language: en-US
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, s-vadapalli@ti.com, r-gunasekaran@ti.com,
- vigneshr@ti.com, srk@ti.com, horms@kernel.org, p-varis@ti.com,
+Subject: Re: [PATCH v4 3/4] clk: mediatek: Add pcw_chg_shift control
+To: Daniel Golle <daniel@makrotopia.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Sabrina Dubroca <sd@queasysnail.net>, Jianhui Zhao <zhaojh329@gmail.com>,
+ Chen-Yu Tsai <wenst@chromium.org>, "Garmin.Chang"
+ <Garmin.Chang@mediatek.com>, Sam Shih <sam.shih@mediatek.com>,
+ Markus Schneider-Pargmann <msp@baylibre.com>,
+ Alexandre Mergnat <amergnat@baylibre.com>,
+ Jiasheng Jiang <jiasheng@iscas.ac.cn>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Chanwoo Choi <cw00.choi@samsung.com>,
+ Dan Carpenter <dan.carpenter@linaro.org>,
+ James Liao <jamesjj.liao@mediatek.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
  netdev@vger.kernel.org
-References: <20231201135802.28139-1-rogerq@kernel.org>
- <20231201135802.28139-7-rogerq@kernel.org>
- <20231207152409.v5nhbgn4pwdqunzw@skbuf>
- <ba4dcbe2-1dc4-4a64-92af-71d6a2783902@kernel.org>
- <20231211132901.deqy2zpnxzowflud@skbuf>
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20231211132901.deqy2zpnxzowflud@skbuf>
-Content-Type: text/plain; charset=UTF-8
+References: <097e82b0d66570763d64be1715517d8b032fcf95.1702158423.git.daniel@makrotopia.org>
+ <28c8ccd234ba311591b6db0de131fde36d3ec409.1702158423.git.daniel@makrotopia.org>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Content-Language: en-US
+In-Reply-To: <28c8ccd234ba311591b6db0de131fde36d3ec409.1702158423.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-
-
-On 11/12/2023 15:29, Vladimir Oltean wrote:
-> On Fri, Dec 08, 2023 at 03:43:45PM +0200, Roger Quadros wrote:
->> How do the below 2 patches look to resolve this?
->>
->> From af2a8503dc04c54d6eaf50954628009aba54e2c8 Mon Sep 17 00:00:00 2001
->> From: Roger Quadros <rogerq@kernel.org>
->> Date: Fri, 8 Dec 2023 15:11:06 +0200
->> Subject: [PATCH] net: ethernet: ti: am65-cpsw: Fix get_eth_mac_stats
->>
->> We do not support individual stats for PMAC and EMAC so
->> report only aggregate stats.
->>
->> Fixes: 67372d7a85fcd ("net: ethernet: am65-cpsw: Add standard Ethernet MAC stats to ethtool")
->> Signed-off-by: Roger Quadros <rogerq@kernel.org>
->> ---
->>  drivers/net/ethernet/ti/am65-cpsw-ethtool.c | 37 ++++++++++++---------
->>  1 file changed, 22 insertions(+), 15 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
->> index 44e01d68db39..934b03382508 100644
->> --- a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
->> +++ b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
->> @@ -671,21 +671,28 @@ static void am65_cpsw_get_eth_mac_stats(struct net_device *ndev,
->>  
->>  	stats = port->stat_base;
->>  
->> -	s->FramesTransmittedOK = readl_relaxed(&stats->tx_good_frames);
->> -	s->SingleCollisionFrames = readl_relaxed(&stats->tx_single_coll_frames);
->> -	s->MultipleCollisionFrames = readl_relaxed(&stats->tx_mult_coll_frames);
->> -	s->FramesReceivedOK = readl_relaxed(&stats->rx_good_frames);
->> -	s->FrameCheckSequenceErrors = readl_relaxed(&stats->rx_crc_errors);
->> -	s->AlignmentErrors = readl_relaxed(&stats->rx_align_code_errors);
->> -	s->OctetsTransmittedOK = readl_relaxed(&stats->tx_octets);
->> -	s->FramesWithDeferredXmissions = readl_relaxed(&stats->tx_deferred_frames);
->> -	s->LateCollisions = readl_relaxed(&stats->tx_late_collisions);
->> -	s->CarrierSenseErrors = readl_relaxed(&stats->tx_carrier_sense_errors);
->> -	s->OctetsReceivedOK = readl_relaxed(&stats->rx_octets);
->> -	s->MulticastFramesXmittedOK = readl_relaxed(&stats->tx_multicast_frames);
->> -	s->BroadcastFramesXmittedOK = readl_relaxed(&stats->tx_broadcast_frames);
->> -	s->MulticastFramesReceivedOK = readl_relaxed(&stats->rx_multicast_frames);
->> -	s->BroadcastFramesReceivedOK = readl_relaxed(&stats->rx_broadcast_frames);
->> +        switch (s->src) {
->> +	case ETHTOOL_MAC_STATS_SRC_AGGREGATE:
->> +		s->FramesTransmittedOK = readl_relaxed(&stats->tx_good_frames);
->> +		s->SingleCollisionFrames = readl_relaxed(&stats->tx_single_coll_frames);
->> +		s->MultipleCollisionFrames = readl_relaxed(&stats->tx_mult_coll_frames);
->> +		s->FramesReceivedOK = readl_relaxed(&stats->rx_good_frames);
->> +		s->FrameCheckSequenceErrors = readl_relaxed(&stats->rx_crc_errors);
->> +		s->AlignmentErrors = readl_relaxed(&stats->rx_align_code_errors);
->> +		s->OctetsTransmittedOK = readl_relaxed(&stats->tx_octets);
->> +		s->FramesWithDeferredXmissions = readl_relaxed(&stats->tx_deferred_frames);
->> +		s->LateCollisions = readl_relaxed(&stats->tx_late_collisions);
->> +		s->CarrierSenseErrors = readl_relaxed(&stats->tx_carrier_sense_errors);
->> +		s->OctetsReceivedOK = readl_relaxed(&stats->rx_octets);
->> +		s->MulticastFramesXmittedOK = readl_relaxed(&stats->tx_multicast_frames);
->> +		s->BroadcastFramesXmittedOK = readl_relaxed(&stats->tx_broadcast_frames);
->> +		s->MulticastFramesReceivedOK = readl_relaxed(&stats->rx_multicast_frames);
->> +		s->BroadcastFramesReceivedOK = readl_relaxed(&stats->rx_broadcast_frames);
->> +		break;
->> +	default:
->> +		break;
->> +	}
->>  };
+Il 09/12/23 22:56, Daniel Golle ha scritto:
+> From: Sam Shih <sam.shih@mediatek.com>
 > 
-> 	if (s->src != ETHTOOL_MAC_STATS_SRC_AGGREGATE)
-> 		return;
-
-Is better.
-
+> Introduce pcw_chg_shfit control to replace hardcoded PCW_CHG_MASK macro.
+> This will needed for clocks on the MT7988 SoC.
 > 
-> Also, again, tabs mixed with spaces. What editor are you using, notepad?
-
-I'm using vim but I didn't run checkpatch on it before pasting
-it here for quick feedback.
-
+> Signed-off-by: Sam Shih <sam.shih@mediatek.com>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+> v4: always set .pcw_chg_shift if .pcw_chg_reg is used instead of
+>      having an if-expression in mtk_pll_set_rate_regs().
+> v3: use git --from ...
+> v2: no changes
 > 
->>  
->>  static int am65_cpsw_get_ethtool_ts_info(struct net_device *ndev,
->>
->> base-commit: a78e0a2c4353d6c100e45c5ef738113bf2d0fda5
->> -- 
->> 2.34.1
->>
->>
->>
->>
->> From 0b20d8b8ef110d886396ee2486f3a9e20170cc85 Mon Sep 17 00:00:00 2001
->> From: Roger Quadros <rogerq@kernel.org>
->> Date: Fri, 8 Dec 2023 15:38:57 +0200
->> Subject: [PATCH] selftests: forwarding: ethtool_mm: support devices that don't
->>  support pmac stats
->>
->> Some devices do not support individual 'pmac' and 'emac' stats.
->> For such devices, resort to 'aggregate' stats.
->>
->> Signed-off-by: Roger Quadros <rogerq@kernel.org>
->> ---
->>  tools/testing/selftests/net/forwarding/ethtool_mm.sh | 7 +++++++
->>  1 file changed, 7 insertions(+)
->>
->> diff --git a/tools/testing/selftests/net/forwarding/ethtool_mm.sh b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
->> index 6212913f4ad1..e3f2e62029ca 100755
->> --- a/tools/testing/selftests/net/forwarding/ethtool_mm.sh
->> +++ b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
->> @@ -26,6 +26,13 @@ traffic_test()
->>  	local delta=
->>  
->>  	before=$(ethtool_std_stats_get $if "eth-mac" "FramesTransmittedOK" $src)
->> +	# some devices don't support individual pmac/emac stats,
->> +	# use aggregate stats for them.
->> +        if [ "$before" == null ]; then
->> +                src="aggregate"
->> +                before=$(ethtool_std_stats_get $if "eth-mac" "FramesTransmittedOO
->> +K" $src)
->> +        fi
->>  
->>  	$MZ $if -q -c $num_pkts -p 64 -b bcast -t ip -R $PREEMPTIBLE_PRIO
->>  
->>
->> base-commit: af2a8503dc04c54d6eaf50954628009aba54e2c8
->> -- 
->> 2.34.1
->>
->> -- 
->> cheers,
->> -roger
+>   drivers/clk/mediatek/clk-mt6779.c            | 1 +
+>   drivers/clk/mediatek/clk-mt8183-apmixedsys.c | 1 +
+>   drivers/clk/mediatek/clk-mt8188-apmixedsys.c | 1 +
+>   drivers/clk/mediatek/clk-mt8192-apmixedsys.c | 1 +
+>   drivers/clk/mediatek/clk-mt8195-apmixedsys.c | 1 +
+>   drivers/clk/mediatek/clk-mt8365-apmixedsys.c | 1 +
+>   drivers/clk/mediatek/clk-pll.c               | 3 +--
+>   drivers/clk/mediatek/clk-pll.h               | 2 ++
+>   8 files changed, 9 insertions(+), 2 deletions(-)
 > 
-> I commented on the second patch when you submitted it.
+> diff --git a/drivers/clk/mediatek/clk-mt6779.c b/drivers/clk/mediatek/clk-mt6779.c
+> index ffedb1fe3c672..e66461f341dd3 100644
+> --- a/drivers/clk/mediatek/clk-mt6779.c
+> +++ b/drivers/clk/mediatek/clk-mt6779.c
+> @@ -1166,6 +1166,7 @@ static const struct mtk_gate apmixed_clks[] = {
+>   		.pcw_reg = _pcw_reg,					\
+>   		.pcw_shift = _pcw_shift,				\
+>   		.pcw_chg_reg = _pcw_chg_reg,				\
+> +		.pcw_chg_shift = PCW_CHG_SHIFT,				\
+>   		.div_table = _div_table,				\
+>   	}
+>   
+> diff --git a/drivers/clk/mediatek/clk-mt8183-apmixedsys.c b/drivers/clk/mediatek/clk-mt8183-apmixedsys.c
+> index 2b261c0e2b61d..184e0cd1dde29 100644
+> --- a/drivers/clk/mediatek/clk-mt8183-apmixedsys.c
+> +++ b/drivers/clk/mediatek/clk-mt8183-apmixedsys.c
+> @@ -75,6 +75,7 @@ static const struct mtk_gate apmixed_clks[] = {
+>   		.pcw_reg = _pcw_reg,					\
+>   		.pcw_shift = _pcw_shift,				\
+>   		.pcw_chg_reg = _pcw_chg_reg,				\
+> +		.pcw_chg_shift = PCW_CHG_SHIFT,				\
+>   		.div_table = _div_table,				\
+>   	}
+>   
+> diff --git a/drivers/clk/mediatek/clk-mt8188-apmixedsys.c b/drivers/clk/mediatek/clk-mt8188-apmixedsys.c
+> index 41ab4d6896a49..87c5dfa3d1ac4 100644
+> --- a/drivers/clk/mediatek/clk-mt8188-apmixedsys.c
+> +++ b/drivers/clk/mediatek/clk-mt8188-apmixedsys.c
+> @@ -53,6 +53,7 @@ static const struct mtk_gate apmixed_clks[] = {
+>   		.pcw_reg = _pcw_reg,					\
+>   		.pcw_shift = _pcw_shift,				\
+>   		.pcw_chg_reg = _pcw_chg_reg,				\
+> +		.pcw_chg_shift = PCW_CHG_SHIFT,				\
+>   		.en_reg = _en_reg,					\
+>   		.pll_en_bit = _pll_en_bit,				\
+>   	}
+> diff --git a/drivers/clk/mediatek/clk-mt8192-apmixedsys.c b/drivers/clk/mediatek/clk-mt8192-apmixedsys.c
+> index 3590932acc63a..67bf5ef3f0033 100644
+> --- a/drivers/clk/mediatek/clk-mt8192-apmixedsys.c
+> +++ b/drivers/clk/mediatek/clk-mt8192-apmixedsys.c
+> @@ -56,6 +56,7 @@ static const struct mtk_gate apmixed_clks[] = {
+>   		.pcw_reg = _pcw_reg,					\
+>   		.pcw_shift = _pcw_shift,				\
+>   		.pcw_chg_reg = _pcw_chg_reg,				\
+> +		.pcw_chg_shift = PCW_CHG_SHIFT,				\
+>   		.en_reg = _en_reg,					\
+>   		.pll_en_bit = _pll_en_bit,				\
+>   	}
+> diff --git a/drivers/clk/mediatek/clk-mt8195-apmixedsys.c b/drivers/clk/mediatek/clk-mt8195-apmixedsys.c
+> index 44a4c85a67ef5..ccd6bac7cb1fc 100644
+> --- a/drivers/clk/mediatek/clk-mt8195-apmixedsys.c
+> +++ b/drivers/clk/mediatek/clk-mt8195-apmixedsys.c
+> @@ -54,6 +54,7 @@ static const struct mtk_gate apmixed_clks[] = {
+>   		.pcw_reg = _pcw_reg,					\
+>   		.pcw_shift = _pcw_shift,				\
+>   		.pcw_chg_reg = _pcw_chg_reg,				\
+> +		.pcw_chg_shift = PCW_CHG_SHIFT,				\
+>   		.en_reg = _en_reg,					\
+>   		.pll_en_bit = _pll_en_bit,				\
+>   	}
+> diff --git a/drivers/clk/mediatek/clk-mt8365-apmixedsys.c b/drivers/clk/mediatek/clk-mt8365-apmixedsys.c
+> index 9b0bc5daeac06..daddca6db44e7 100644
+> --- a/drivers/clk/mediatek/clk-mt8365-apmixedsys.c
+> +++ b/drivers/clk/mediatek/clk-mt8365-apmixedsys.c
+> @@ -39,6 +39,7 @@
+>   		.pcw_reg = _pcw_reg,					\
+>   		.pcw_shift = _pcw_shift,				\
+>   		.pcw_chg_reg = _pcw_chg_reg,				\
+> +		.pcw_chg_shift = PCW_CHG_SHIFT,				\
+>   		.div_table = _div_table,				\
+>   	}
+>   
+> diff --git a/drivers/clk/mediatek/clk-pll.c b/drivers/clk/mediatek/clk-pll.c
+> index 513ab6b1b3229..139b01ab8d140 100644
+> --- a/drivers/clk/mediatek/clk-pll.c
+> +++ b/drivers/clk/mediatek/clk-pll.c
+> @@ -23,7 +23,6 @@
+>   #define CON0_BASE_EN		BIT(0)
+>   #define CON0_PWR_ON		BIT(0)
+>   #define CON0_ISO_EN		BIT(1)
+> -#define PCW_CHG_MASK		BIT(31)
+>   
+>   #define AUDPLL_TUNER_EN		BIT(31)
+>   
+> @@ -114,7 +113,7 @@ static void mtk_pll_set_rate_regs(struct mtk_clk_pll *pll, u32 pcw,
+>   			pll->data->pcw_shift);
+>   	val |= pcw << pll->data->pcw_shift;
+>   	writel(val, pll->pcw_addr);
+> -	chg = readl(pll->pcw_chg_addr) | PCW_CHG_MASK;
+> +	chg = readl(pll->pcw_chg_addr) | BIT(pll->data->pcw_chg_shift);
+>   	writel(chg, pll->pcw_chg_addr);
+>   	if (pll->tuner_addr)
+>   		writel(val + 1, pll->tuner_addr);
+> diff --git a/drivers/clk/mediatek/clk-pll.h b/drivers/clk/mediatek/clk-pll.h
+> index f17278ff15d78..84bd8df13e2e5 100644
+> --- a/drivers/clk/mediatek/clk-pll.h
+> +++ b/drivers/clk/mediatek/clk-pll.h
+> @@ -22,6 +22,7 @@ struct mtk_pll_div_table {
+>   #define HAVE_RST_BAR	BIT(0)
+>   #define PLL_AO		BIT(1)
+>   #define POSTDIV_MASK	GENMASK(2, 0)
+> +#define PCW_CHG_SHIFT	31
+>   
+>   struct mtk_pll_data {
+>   	int id;
+> @@ -48,6 +49,7 @@ struct mtk_pll_data {
+>   	const char *parent_name;
+>   	u32 en_reg;
+>   	u8 pll_en_bit; /* Assume 0, indicates BIT(0) by default */
+> +	u8 pcw_chg_shift;
 
--- 
-cheers,
--roger
+Ok this is better - please call this "pcw_chg_bit" (same for the definition).
+
+Also, since it is impossible for PCW_CHG to be 0, please add a sanity check at
+the beginning of function mtk_clk_register_pll_ops(), like so:
+
+if (!data->pcw_chg_bit) {
+	pr_warn("Invalid PCW_CHG bit for pll %s", data->name);
+	return ERR_PTR(-EINVAL);
+}
+
+...like that, we're fully covered for eventual mistakes during porting (etc).
+
+Cheers,
+Angelo
 
