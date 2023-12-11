@@ -1,97 +1,57 @@
-Return-Path: <netdev+bounces-56138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27E2B80DF6C
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:23:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 049F680DF6D
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:23:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56FD91C2146C
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 23:23:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 043D61C214D6
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 23:23:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5285C5674A;
-	Mon, 11 Dec 2023 23:23:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B275D5674C;
+	Mon, 11 Dec 2023 23:23:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zgq3VvaK"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="F6dnW5mB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02046D2;
-	Mon, 11 Dec 2023 15:23:00 -0800 (PST)
-Received: by mail-ot1-x336.google.com with SMTP id 46e09a7af769-6d9fa8f6535so1327432a34.0;
-        Mon, 11 Dec 2023 15:22:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702336979; x=1702941779; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sBc3RVMEdIV+PcybiPyI6RRAR6wYLfXV8lTtKJEw3y4=;
-        b=Zgq3VvaKPcBE4oT6WtEQq1UCBvuGTxPBgPYOjscwcLD5LmhlRtSrJVDtYYVw9w3MWf
-         bD3pvVe9GerwdD8pV8BrkJJ+AI3MIV9HhITHeUzfzXDXu3rD7mi2LBKlPmUDlHcs4kKc
-         /z5OwzvCVM6mQxJ0551a//sey5tMrIJiFNcbYOxvCYAVt1FFQf57I9xQQaHcSXUArXY4
-         Y7KggPOH3Mj5qeHk77p9zvUQcs3/jLRCIumjfIBE+jdeK/KDV77KlEiNVBFehQJc+THN
-         xwFGYRl0rnKvFGF5iPAirCDpB763VSyErdliDW+uA61bql6w6ruKBxjQdPpHv62Zzh/3
-         9Qmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702336979; x=1702941779;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sBc3RVMEdIV+PcybiPyI6RRAR6wYLfXV8lTtKJEw3y4=;
-        b=MbZwjedusbYIjzpPaWm5ZInHbmFz1sPhAHkjj7/BvcFEFEct4VyHv6HFjwFE9XTYUb
-         MIJfd//A7A8qiw5UguEGdC3i9a1ILJ5QKR6NxVUsDSf6R+SrKSgRAeyxs2W+KbX4fXYc
-         JBGj52qMUlvOcH6HmJa4qp9SJ/CqOdHq2AdHWNPH5z7iYRsnDT76ad6wk+PCYNM+tzId
-         SiSjvNa5EgE+3Q01VmvZvsBo2s7JjGadoym+iYyO+iDNeEyQG0AwL3+S96Q/mSFop7Ng
-         DetJ3Kou/kZ3ulssA59/RGJAqTcZhpJrgD/CaKS31IUHVObC41vJJynYH/vkl8qVrJCq
-         JFaQ==
-X-Gm-Message-State: AOJu0Yxy2Gm9ekmWdkDia7FBoxb6C3zm5HRUfXXuA+1tawL4lT3fpbda
-	YTKBM+Gq8kI8cOBNNyHyFl0=
-X-Google-Smtp-Source: AGHT+IEQZlmCz43qg4ru6VmokJLzle7IU1Z6nd9cFUL/38Wa4PsIMrBGKY1l9OlBOeW2xr4jrMHbvg==
-X-Received: by 2002:a9d:6492:0:b0:6da:1b80:7e25 with SMTP id g18-20020a9d6492000000b006da1b807e25mr1532989otl.73.1702336979290;
-        Mon, 11 Dec 2023 15:22:59 -0800 (PST)
-Received: from auth1-smtp.messagingengine.com (auth1-smtp.messagingengine.com. [66.111.4.227])
-        by smtp.gmail.com with ESMTPSA id bk40-20020a05620a1a2800b0077da8c0936asm3277617qkb.107.2023.12.11.15.22.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 15:22:59 -0800 (PST)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-	by mailauth.nyi.internal (Postfix) with ESMTP id 7D02327C005B;
-	Mon, 11 Dec 2023 18:22:58 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute3.internal (MEProxy); Mon, 11 Dec 2023 18:22:58 -0500
-X-ME-Sender: <xms:0pl3ZTUEJSlfeuB_zSL4cK-Qhck1r1HLQpWWPryCJJiiMjuz7nBPUA>
-    <xme:0pl3ZbmEXOXgXDLFjm2gB60hEAE4ZtJc-lVuDcdWP0qasvaz6AK0GTJtGJTLZgiNg
-    F8V6VZcHrx-mAKGTA>
-X-ME-Received: <xmr:0pl3ZfYQj4fFP5l40RE1GB971j22G1iuy3QnmcUYrVDgxFHLq7g_yluzC1k>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudelfedgtdelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepuehoqhhu
-    nhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrdgtohhmqeenucggtffrrg
-    htthgvrhhnpeejiefhtdeuvdegvddtudffgfegfeehgfdtiedvveevleevhfekhefftdek
-    ieehvdenucffohhmrghinheprhhushhtqdhlrghnghdrohhrghenucevlhhushhtvghruf
-    hiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgr
-    uhhthhhpvghrshhonhgrlhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsoh
-    hquhhnrdhfvghngheppehgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvg
-X-ME-Proxy: <xmx:0pl3ZeWo0nzoAUN3DbMxCZfvfRmmVHdJ4KEn__31QUekvSa6n0GDng>
-    <xmx:0pl3Zdlrz-6raDZMgwDy0Jf2F1rboM7ROzpOw1ETnWlCT_N0T9pP1g>
-    <xmx:0pl3Zbd9KCRxY59y-csrmFnMrbw3Jg8cef4Ad_T0Atd7rvWa46GwYw>
-    <xmx:0pl3ZejMp9tNFggJkBN5tmbd6dH7FSo87DgU7kZisYG1rWed66d14g>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 11 Dec 2023 18:22:57 -0500 (EST)
-Date: Mon, 11 Dec 2023 15:22:54 -0800
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Alice Ryhl <alice@ryhl.io>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
-	tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com,
-	benno.lossin@proton.me, wedsonaf@gmail.com, aliceryhl@google.com,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>
-Subject: Re: [net-next PATCH] rust: net: phy: Correct the safety comment for
- impl Sync
-Message-ID: <ZXeZzvMszYo6ow-q@boqun-archlinux>
-References: <20231210234924.1453917-2-fujita.tomonori@gmail.com>
- <20231211194909.588574-1-boqun.feng@gmail.com>
- <c833e8c5-0787-45e6-a069-2874104fa8a7@ryhl.io>
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6067CF;
+	Mon, 11 Dec 2023 15:23:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=jrCVMJHthbqeGM1aFmtvmFcFPoeI3AQf6oEdNuwB7Ek=; b=F6dnW5mBJVog++to6z1R9NmBkI
+	jGfXAd1fYlZ+0hwwuh88UATilbj9bYLTK/P3djKdlQ7dcrqn2gACCuRUQ0KKzhyEugJD7bpsk3cza
+	I+9F1h35IGE1cqRJbjZSIq1idA+iSmf+8lYIqjXwt0asHxsVX6S/QEt67byLyouTT4OGt3poyaGIE
+	fXC0EyIGAYrghsjnAFUrA53htVG9t9pQEc/fmwFasz7HZMNeQjvT8PSjmtyMII5tnXI4sDS4wywxy
+	lcX8jw4rBt4LhLYa+Kkdgfv8HK1lnwL5v7420WBa52wmr6y8AbgyUZzV8K3bP2yr45Oew+CqbjWFc
+	zlflsvHA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58904)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rCpby-00067g-33;
+	Mon, 11 Dec 2023 23:22:55 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rCpbz-0008FZ-Pr; Mon, 11 Dec 2023 23:22:55 +0000
+Date: Mon, 11 Dec 2023 23:22:55 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Justin Stitt <justinstitt@google.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v3] net: mdio-gpio: replace deprecated strncpy with
+ strscpy
+Message-ID: <ZXeZz4JcJAIMJLTy@shell.armlinux.org.uk>
+References: <20231211-strncpy-drivers-net-mdio-mdio-gpio-c-v3-1-76dea53a1a52@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,38 +60,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c833e8c5-0787-45e6-a069-2874104fa8a7@ryhl.io>
+In-Reply-To: <20231211-strncpy-drivers-net-mdio-mdio-gpio-c-v3-1-76dea53a1a52@google.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Dec 11, 2023 at 10:50:02PM +0100, Alice Ryhl wrote:
-> On 12/11/23 20:49, Boqun Feng wrote:
-> > The current safety comment for impl Sync for DriverVTable has two
-> > problem:
-> > 
-> > * the correctness is unclear, since all types impl Any[1], therefore all
-> >    types have a `&self` method (Any::type_id).
-> > 
-> > * it doesn't explain why useless of immutable references can ensure the
-> >    safety.
-> > 
-> > Fix this by rewritting the comment.
-> > 
-> > [1]: https://doc.rust-lang.org/std/any/trait.Any.html
-> > 
-> > Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
+On Mon, Dec 11, 2023 at 07:10:00PM +0000, Justin Stitt wrote:
+> strncpy() is deprecated for use on NUL-terminated destination strings
+> [1] and as such we should prefer more robust and less ambiguous string
+> interfaces.
 > 
-> It's fine if you want to change it,
-
-Does it mean you are OK with the new version in this patch? If so...
-
-> but I think the current safety comment is good enough.
-
-... let's change it since the current version doesn't look good enough
-to me as I explained above (it's not wrong, but less straight-forward to
-me).
-
-Regards,
-Boqun
-
+> We expect new_bus->id to be NUL-terminated but not NUL-padded based on
+> its prior assignment through snprintf:
+> |       snprintf(new_bus->id, MII_BUS_ID_SIZE, "gpio-%x", bus_id);
 > 
-> Alice
+> Due to this, a suitable replacement is `strscpy` [2] due to the fact
+> that it guarantees NUL-termination on the destination buffer without
+> unnecessarily NUL-padding.
+> 
+> We can also use sizeof() instead of a length macro as this more closely
+> ties the maximum buffer size to the destination buffer. Do this for two
+> instances.
+> 
+> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+> Link: https://github.com/KSPP/linux/issues/90
+> Cc: linux-hardening@vger.kernel.org
+> Signed-off-by: Justin Stitt <justinstitt@google.com>
+
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+
+Thanks!
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
