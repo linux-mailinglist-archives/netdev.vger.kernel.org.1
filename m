@@ -1,130 +1,115 @@
-Return-Path: <netdev+bounces-55851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3AB380C7DB
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 12:23:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCB3180C825
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 12:37:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10CE628170F
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 11:23:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 276F62810F2
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 11:37:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C19D7364C0;
-	Mon, 11 Dec 2023 11:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F72B2D02A;
+	Mon, 11 Dec 2023 11:37:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fS0qaeX8"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="U284KQe8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4CBA3454A
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 11:23:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F2E8C433C8;
-	Mon, 11 Dec 2023 11:23:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702293790;
-	bh=RvXeZsCsTRB/ykFjhY8FOPGVRNC7qDb5nFcV0xvctXA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fS0qaeX8EfWKEh9IFSNTv9viV0+RH5CMAUNGSPtr0gzzUh3wQ1OQWEYPuGog/n7qa
-	 JG9vgFJieBvXCujm3q+AGF5r8aHBCkm8Ev14Zf9GpaVsm5ATjGJA7p0a6t3+RZgjjj
-	 zHbJiq93+6efh3/fgpfwAV8HtmmyJwsDuHmkQMkP89sohR/RpB2vS0WAyxSdCLgRkw
-	 BZ5Vf9/B4yqGg/VWi1U27vhwXs/xk2fU77XUQucztqh37e9OWdKr2hZIuQoKz+1Dpb
-	 hy9m9kaBsWbkDmwO+cca9g0ykwF5DHT+pqop0MjRzCuWWFB1q8g9VMhPhAM2HGky7y
-	 zoodfxRSjtLOQ==
-Date: Mon, 11 Dec 2023 13:23:05 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Shinas Rasheed <srasheed@marvell.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Haseeb Gani <hgani@marvell.com>,
-	Vimlesh Kumar <vimleshk@marvell.com>,
-	"egallen@redhat.com" <egallen@redhat.com>,
-	"mschmidt@redhat.com" <mschmidt@redhat.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"wizhao@redhat.com" <wizhao@redhat.com>,
-	"kheib@redhat.com" <kheib@redhat.com>,
-	"konguyen@redhat.com" <konguyen@redhat.com>,
-	Veerasenareddy Burru <vburru@marvell.com>,
-	Sathesh B Edara <sedara@marvell.com>,
-	Eric Dumazet <edumazet@google.com>
-Subject: Re: [EXT] Re: [PATCH net-next v3 2/4] octeon_ep: PF-VF mailbox
- version support
-Message-ID: <20231211112305.GD4870@unreal>
-References: <20231211063355.2630028-1-srasheed@marvell.com>
- <20231211063355.2630028-3-srasheed@marvell.com>
- <20231211084652.GC4870@unreal>
- <PH0PR18MB4734652F50856F52507577ADC78FA@PH0PR18MB4734.namprd18.prod.outlook.com>
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8041B6;
+	Mon, 11 Dec 2023 03:37:20 -0800 (PST)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BB9qqjl019534;
+	Mon, 11 Dec 2023 11:37:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=sGwW86/Z0Trc+yHiYF3uNzOJmXmzBEn/37dRO0PcYgg=;
+ b=U284KQe8vLFE8g1g0tzsggf3uc2sW6EOO+rRFnn5MoiZWuvfCrzIkZnzAkTOtvo0S6fd
+ 4waVClC5ImQuOknHYRf79eYJb6keQFhN4JDUM295fBA2xEm9rvp/45ZFkx+2v26pWr5s
+ 2E0sR4lozMT13axoXlWFXi7mVPPFIjrGx8I7MC6P+T6Kvin9Wgr9MeVEBNgNGyoy7Pl2
+ +lBYMZWmgRgQtjC//w7jijSCc5WgXyqLF699mEtOEnEXpO/cX3f6k0H7DQXAxnSLI21a
+ GgnWihzhSTTtsJfn2reIM8oVg2mc/w9s4iy5yqbMrCs2GSTaICTiIiwJyRfWRdLtNKqc bg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uwwj9q60q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Dec 2023 11:37:17 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BB9tEmS025166;
+	Mon, 11 Dec 2023 11:37:16 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uwwj9q604-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Dec 2023 11:37:16 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BB9E18L004101;
+	Mon, 11 Dec 2023 11:37:15 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3uw4sk0nkt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Dec 2023 11:37:15 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BBBbCE544827054
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 11 Dec 2023 11:37:12 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4B7B920043;
+	Mon, 11 Dec 2023 11:37:12 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 010B920040;
+	Mon, 11 Dec 2023 11:37:11 +0000 (GMT)
+Received: from [9.171.1.164] (unknown [9.171.1.164])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 11 Dec 2023 11:37:10 +0000 (GMT)
+Message-ID: <021fe50f-a70b-4d2d-b16f-25954be4e31f@linux.ibm.com>
+Date: Mon, 11 Dec 2023 12:37:10 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PH0PR18MB4734652F50856F52507577ADC78FA@PH0PR18MB4734.namprd18.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 6/9] net/smc: compatible with 128-bits
+ extended GID of virtual ISM device
+Content-Language: en-US
+To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        kgraul@linux.ibm.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, raspl@linux.ibm.com, schnelle@linux.ibm.com,
+        guangguan.wang@linux.alibaba.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1702021259-41504-1-git-send-email-guwen@linux.alibaba.com>
+ <1702021259-41504-7-git-send-email-guwen@linux.alibaba.com>
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <1702021259-41504-7-git-send-email-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: GF6X_gFLrDcAbTt6A9cnT5hygbTNdeBS
+X-Proofpoint-ORIG-GUID: DZ81H8hgjrB2_emnFSsBbm218YoM7fuH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-11_04,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=845
+ lowpriorityscore=0 malwarescore=0 clxscore=1015 spamscore=0 bulkscore=0
+ adultscore=0 phishscore=0 suspectscore=0 priorityscore=1501
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2312110093
 
-On Mon, Dec 11, 2023 at 10:31:32AM +0000, Shinas Rasheed wrote:
-> Hi Leon,
+
+
+On 08.12.23 08:40, Wen Gu wrote:
+> According to virtual ISM support feature defined by SMCv2.1, GIDs of
+> virtual ISM device are UUIDs defined by RFC4122, which are 128-bits
+> long. So some adaptation work is required. And note that the GIDs of
+> existing platform firmware ISM devices still remain 64-bits long.
 > 
-> > > @@ -28,10 +28,18 @@ static void octep_pfvf_validate_version(struct
-> > octep_device *oct,  u32 vf_id,
-> > >  {
-> > >  	u32 vf_version = (u32)cmd.s_version.version;
-> > >
-> > > -	if (vf_version <= OCTEP_PFVF_MBOX_VERSION_V1)
-> > > -		rsp->s_version.type = OCTEP_PFVF_MBOX_TYPE_RSP_ACK;
-> > > +	dev_dbg(&oct->pdev->dev, "VF id:%d VF version:%d PF
-> > version:%d\n",
-> > > +		vf_id, vf_version, OCTEP_PFVF_MBOX_VERSION_CURRENT);
-> > > +	if (vf_version < OCTEP_PFVF_MBOX_VERSION_CURRENT)
-> > > +		rsp->s_version.version = vf_version;
-> > >  	else
-> > > -		rsp->s_version.type = OCTEP_PFVF_MBOX_TYPE_RSP_NACK;
-> > > +		rsp->s_version.version =
-> > OCTEP_PFVF_MBOX_VERSION_CURRENT;
-> > > +
-> > > +	oct->vf_info[vf_id].mbox_version = rsp->s_version.version;
-> > > +	dev_dbg(&oct->pdev->dev, "VF id:%d negotiated VF version:%d\n",
-> > > +		vf_id, oct->vf_info[vf_id].mbox_version);
-> > > +
-> > > +	rsp->s_version.type = OCTEP_PFVF_MBOX_TYPE_RSP_ACK;
-> > >  }
-> > 
-> > <...>
-> > 
-> > > +#define OCTEP_PFVF_MBOX_VERSION_CURRENT
-> > 	OCTEP_PFVF_MBOX_VERSION_V1
-> > 
-> > This architecture design is unlikely to work in the real world unless
-> > you control both PF and VF environment. Mostly PF is running some old
-> > legacy distribution while VFs run more modern OS and this check will
-> > prevent to run new driver in VF.
-> > 
-> > Thanks
-> 
-> Thanks for the review. This version validation only concerns regarding the control net API layer (which is used to communicate with
-> the firmware). In the case you have described, this instead enables new VF drivers to atleast work atop legacy PF drivers (note legacy here still
-> refers to PF drivers which support this backward compatibility), although they might not be able to use the latest control net functionalities that they
-> have been enabled for.
+> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+> ---
 
-The question what will be in X years from now, when you will have v100?
-Will you fallback to v0 for backward compatibility? 
-
-> 
-> In the absence of such a backward compatibility, VF drivers would issue control net requests which PF drivers wouldn't know, only leading to logs of
-> incompatibility errors and erroneous usage. 
-> 
-> Also again please note that this version compatibility only concerns the control net infrastructure and API (the control plane).
-
-It doesn't matter, even in best scenario, you can't guarantee that code in VM actually
-implements version Y fully and will need to check correctness per-command anyway.
-
-Thanks
-
-> 
+Thank you Wen Gu.
+Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
 
