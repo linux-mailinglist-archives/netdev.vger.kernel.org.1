@@ -1,102 +1,85 @@
-Return-Path: <netdev+bounces-55996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D629180D2E4
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 17:54:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 265C980D315
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 18:01:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D524F1C21182
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 16:54:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53E8B1C21132
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 17:00:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2E3948CEA;
-	Mon, 11 Dec 2023 16:54:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16C5E4CDF5;
+	Mon, 11 Dec 2023 17:00:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SB6X5S1s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cysm9a7O"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85285BD
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 08:54:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702313642;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0TaQIjCMRtqoHv9s+WpKU6yUC9m6qOxRLwTnSkQyVwE=;
-	b=SB6X5S1skqHpMNLMJ2h3ZlCJvj6aYXWrCinhkYPfPoAod+dTkigTREAQwGL7ASo8ypRfrU
-	azqK4/fM3KC3Rj5SLqFSXcfzI0T9eGjU35rhymupnPZJXpzJVig7JpAkYdI4djTEAifHCq
-	g5eMAXvWmIvmQ57Xn4jP2Xgib/DG3Jo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-206-rJqAq6peMi2PLhaMBl3Pgg-1; Mon, 11 Dec 2023 11:54:01 -0500
-X-MC-Unique: rJqAq6peMi2PLhaMBl3Pgg-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3334286b720so4154923f8f.1
-        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 08:54:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702313640; x=1702918440;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0TaQIjCMRtqoHv9s+WpKU6yUC9m6qOxRLwTnSkQyVwE=;
-        b=tFQINKBvYBWmENMKEyME6g3b8DQ1ksrNSfMcsNqo/9jVM7hxhoqdRttms7EC0cx+py
-         0XDcw0rH5kjZduqUmHyGetAUsoSQY8u5e04XegPMlOpCVAaFq7VQbYItu7EE9mZNFiV5
-         5tKnTy/GKyck7TnCR8DcqeNJuhJHsCiyOo6oWXvUuuvZRa0uY0DZqy6Zki0kGb/nmU+R
-         2ej4d+Q72O5LT18k4omYhJ0n18lPjbHDCN7odZ++EtQhvwxdTXMeqhZEA5howY+3YVpQ
-         yJpL7MZHVItJ9UyHsirQtexl0+NUgRIcFpiUfYpH2J8te9ZQHELlD175kgmYZU8Wtlp4
-         ySAw==
-X-Gm-Message-State: AOJu0YxcuGotgPTfgb20XvLnSshTjoU6aHAIoGFnv2GmzHryLY2wUsoL
-	wDN1SAOKF0N9dshzXMz/aXIKqeQphox//+vZQ/fOe6PWI9JOQ9og6pdGGGO+srWb8mKgJYHUnJT
-	KtIMCYoi+QSFcNEyP
-X-Received: by 2002:a05:600c:450e:b0:40b:5f03:b3c8 with SMTP id t14-20020a05600c450e00b0040b5f03b3c8mr1125890wmo.234.1702313640094;
-        Mon, 11 Dec 2023 08:54:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFtiBxrV84vG/3P94lY/VLzXMvM+oAghyKtAHVVBITjmPRXIgn0MXg5y1PSG2jZcwLid9jfxg==
-X-Received: by 2002:a05:600c:450e:b0:40b:5f03:b3c8 with SMTP id t14-20020a05600c450e00b0040b5f03b3c8mr1125883wmo.234.1702313639719;
-        Mon, 11 Dec 2023 08:53:59 -0800 (PST)
-Received: from redhat.com ([2a06:c701:73ff:4f00:b091:120e:5537:ac67])
-        by smtp.gmail.com with ESMTPSA id k17-20020adfe8d1000000b00332fa6cc8acsm8943445wrn.87.2023.12.11.08.53.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 08:53:58 -0800 (PST)
-Date: Mon, 11 Dec 2023 11:53:56 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Tobias Huschle <huschle@linux.ibm.com>,
-	Abel Wu <wuyun.abel@bytedance.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
- sched/fair: Add lag based placement)
-Message-ID: <20231211115329-mutt-send-email-mst@kernel.org>
-References: <20231122100016.GO8262@noisy.programming.kicks-ass.net>
- <6564a012.c80a0220.adb78.f0e4SMTPIN_ADDED_BROKEN@mx.google.com>
- <d4110c79-d64f-49bd-9f69-0a94369b5e86@bytedance.com>
- <07513.123120701265800278@us-mta-474.us.mimecast.lan>
- <20231207014626-mutt-send-email-mst@kernel.org>
- <56082.123120804242300177@us-mta-137.us.mimecast.lan>
- <20231208052150-mutt-send-email-mst@kernel.org>
- <53044.123120806415900549@us-mta-342.us.mimecast.lan>
- <20231209053443-mutt-send-email-mst@kernel.org>
- <CACGkMEuSGT-e-i-8U7hum-N_xEnsEKL+_07Mipf6gMLFFhj2Aw@mail.gmail.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5D53B785;
+	Mon, 11 Dec 2023 17:00:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 495B0C433CA;
+	Mon, 11 Dec 2023 17:00:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702314054;
+	bh=Op3LbJY6uVtV2cruzQREIzqD6tOJ53Bfr8SRwtGAB04=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Cysm9a7O7bbkfr/ta/yL1pxWw9ibP8wg1wUwrWk+aQJF7cgO2e/htXFCWogkCuhim
+	 lGItMcmzRHsGctJwgSHy8ckjUMbZco6azuTVIuVPs3seqOsVODKznbL4OdZJqe5wzW
+	 2vaxcDuFz5iJHWLC+NGQboEgHsOops9aNDi0HZ1eT/W5zZ4etmicsSFUqMy2WGDKbV
+	 Gz9xQIdBT+eTU90gOXQKZNe2ZZz6t1si8kE4EB2vRKOHgEl/OvA+0Lau0n2tDYrewa
+	 7ksT8aEfocC0IrOeKlz2nLZRP7Fs8BkWJresYqYvWjjpFp23BEdC4oMhrCGid47nzR
+	 8dBzqj72HnZGA==
+Date: Mon, 11 Dec 2023 09:00:53 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, aleksander.lobakin@intel.com,
+ netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, lorenzo.bianconi@redhat.com, bpf@vger.kernel.org,
+ toke@redhat.com, willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+ sdf@google.com
+Subject: Re: [PATCH v3 net-next 2/2] xdp: add multi-buff support for xdp
+ running in generic mode
+Message-ID: <20231211090053.21cb357d@kernel.org>
+In-Reply-To: <ZXS-naeBjoVrGTY9@lore-desk>
+References: <cover.1701437961.git.lorenzo@kernel.org>
+	<c9ee1db92c8baa7806f8949186b43ffc13fa01ca.1701437962.git.lorenzo@kernel.org>
+	<20231201194829.428a96da@kernel.org>
+	<ZW3zvEbI6o4ydM_N@lore-desk>
+	<20231204120153.0d51729a@kernel.org>
+	<ZW-tX9EAnbw9a2lF@lore-desk>
+	<20231205155849.49af176c@kernel.org>
+	<4b9804e2-42f0-4aed-b191-2abe24390e37@kernel.org>
+	<20231206080333.0aa23754@kernel.org>
+	<ZXS-naeBjoVrGTY9@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACGkMEuSGT-e-i-8U7hum-N_xEnsEKL+_07Mipf6gMLFFhj2Aw@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 11, 2023 at 03:26:46PM +0800, Jason Wang wrote:
-> > Try reducing the VHOST_NET_WEIGHT limit and see if that improves things any?
-> 
-> Or a dirty hack like cond_resched() in translate_desc().
+On Sat, 9 Dec 2023 20:23:09 +0100 Lorenzo Bianconi wrote:
+> Are we going to use these page_pools just for virtual devices (e.g. veth) or
+> even for hw NICs? If we do not bound the page_pool to a netdevice I think we
+> can't rely on it to DMA map/unmap the buffer, right?
 
-what do you mean, exactly?
+Right, I don't think it's particularly useful for HW NICs.
+Maybe for allocating skb heads? We could possibly kill
+struct page_frag_1k and use PP page / frag instead.
+But not sure how Eric would react :)
 
--- 
-MST
+> Moreover, are we going to rework page_pool stats first? It seems a bit weird to
+> have a percpu struct with a percpu pointer in it, right?
 
+The per-CPU stuff is for recycling, IIRC. Even if PP is for a single
+CPU we can still end up freeing packets which used its pages anywhere
+in the system.
+
+I don't disagree that we may end up with a lot of stats on a large
+system, but seems tangential to per-cpu page pools.
 
