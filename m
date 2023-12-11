@@ -1,186 +1,156 @@
-Return-Path: <netdev+bounces-55897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED61D80CBBB
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:53:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B834180CBEF
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 14:56:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D3211C21296
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:53:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72F8328185B
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:56:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F318247A45;
-	Mon, 11 Dec 2023 13:53:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3801647A61;
+	Mon, 11 Dec 2023 13:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L8nKFyWn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iUx8E6+D"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C6347A41
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 13:53:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5324BC433CD;
-	Mon, 11 Dec 2023 13:53:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1785E47A5A;
+	Mon, 11 Dec 2023 13:56:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6792AC433CB;
+	Mon, 11 Dec 2023 13:56:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702302834;
-	bh=8e8vQE70TfsTGeC+ewIHkiniZer9gGFAlcUgFP8KlDo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=L8nKFyWnOjDJobGOr48MeChHm9Cnmg963UAqSvR6+Xa+YGhCpvbEHqHjThCP+RSqt
-	 rf/8krZonUlBQsI9w4g72WAhA08R1zUavq5Zwl1EaZD9WXS0rXzFz6p746JMJ/Jj/b
-	 vrvIeSPtQSB9kNuwO91o94O/iGRDFlNuujM3X7D44khacdq0pLUkcxXtwcHQvbbBn2
-	 LmnIQ2kx7D/1yHcQmx2QEFCJbPPEhSmvq2EfeHgTuBP4k9jj2XeJrBp4SpJ2cJyP5s
-	 B9kWjz/HAnvhFDhQe7I9X/dCCPn46YkBubvb0HSCAhRDwWAWsLG3DEVBc+o9DYozeE
-	 szg5xWMAv4lsw==
-Message-ID: <15f77150-f946-46a9-9af4-383f9be23369@kernel.org>
-Date: Mon, 11 Dec 2023 15:53:47 +0200
+	s=k20201202; t=1702302961;
+	bh=uP1VjsneWpfR4iUeZhrkYgu+kGytmeEBdGkWjX6Y7VE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=iUx8E6+DBl0QQUUoMlctYC+3uQV9vWTVjohKuJKpIc4ga6Y4VO8ltwWnBkk8b3MF1
+	 A8Zibl12oxWT6BPORI5QNyGQxRdOpoZyQDHVKJjw/h+Sy2xb4yA8LhSnNbnT3ZPh/N
+	 3VJ3Iw9Q7fGatZEKVirtAxcFzLVRf5SblbiqH5ZP8AxaS9jhSVfp3kTd8FNNYheVbk
+	 TrsZ6KeGUnNGzN/WanWkQbQqu0XO3w8Je/SZ9o04dDj+9ipz7StE2lysSBZio6fEI/
+	 7NniJOwoJ+xv3IGW4qHLei4JjLWnjKa8H14+qpkLJbNqF8M1AGiCAYrOwD75d+ZcDC
+	 eiWRPVqnphFPA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Thinh Tran <thinhtr@linux.vnet.ibm.com>,
+	Venkata Sai Duggi <venkata.sai.duggi@ibm.com>,
+	David Christensen <drc@linux.vnet.ibm.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	pavan.chebbi@broadcom.com,
+	mchan@broadcom.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 16/29] net/tg3: fix race condition in tg3_reset_task()
+Date: Mon, 11 Dec 2023 08:54:00 -0500
+Message-ID: <20231211135457.381397-16-sashal@kernel.org>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231211135457.381397-1-sashal@kernel.org>
+References: <20231211135457.381397-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] selftests: forwarding: ethtool_mm: support devices
- that don't support pmac stats
-Content-Language: en-US
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shuah@kernel.org, s-vadapalli@ti.com,
- r-gunasekaran@ti.com, vigneshr@ti.com, srk@ti.com, horms@kernel.org,
- p-varis@ti.com, netdev@vger.kernel.org
-References: <20231211120138.5461-1-rogerq@kernel.org>
- <20231211120138.5461-1-rogerq@kernel.org>
- <20231211120138.5461-3-rogerq@kernel.org>
- <20231211120138.5461-3-rogerq@kernel.org>
- <20231211132415.ilhkajslbxf3wxjn@skbuf>
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20231211132415.ilhkajslbxf3wxjn@skbuf>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.1.66
+Content-Transfer-Encoding: 8bit
 
+From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
 
+[ Upstream commit 16b55b1f2269962fb6b5154b8bf43f37c9a96637 ]
 
-On 11/12/2023 15:24, Vladimir Oltean wrote:
-> On Mon, Dec 11, 2023 at 02:01:38PM +0200, Roger Quadros wrote:
->> Some devices do not support individual 'pmac' and 'emac' stats.
->> For such devices, resort to 'aggregate' stats.
->>
->> Signed-off-by: Roger Quadros <rogerq@kernel.org>
->> ---
->>  tools/testing/selftests/net/forwarding/ethtool_mm.sh | 7 +++++++
->>  1 file changed, 7 insertions(+)
->>
->> diff --git a/tools/testing/selftests/net/forwarding/ethtool_mm.sh b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
->> index 6212913f4ad1..e3f2e62029ca 100755
->> --- a/tools/testing/selftests/net/forwarding/ethtool_mm.sh
->> +++ b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
->> @@ -26,6 +26,13 @@ traffic_test()
->>  	local delta=
->>  
->>  	before=$(ethtool_std_stats_get $if "eth-mac" "FramesTransmittedOK" $src)
->> +	# some devices don't support individual pmac/emac stats,
->> +	# use aggregate stats for them.
->> +        if [ "$before" == null ]; then
->> +                src="aggregate"
->> +                before=$(ethtool_std_stats_get $if "eth-mac" "FramesTransmittedOO
->> +K" $src)
->> +        fi
-> 
-> 1. please follow the existing indentation scheme, don't mix tabs with spaces
+When an EEH error is encountered by a PCI adapter, the EEH driver
+modifies the PCI channel's state as shown below:
 
-Sure. Will fix.
+   enum {
+      /* I/O channel is in normal state */
+      pci_channel_io_normal = (__force pci_channel_state_t) 1,
 
-> 2. someone mangled your patch into invalid bash syntax, splitting a line
->    into 2
-> 3. "FramesTransmittedOOK" has an extra "O"
+      /* I/O to channel is blocked */
+      pci_channel_io_frozen = (__force pci_channel_state_t) 2,
 
-Will fix. The mangling happened at my end.
+      /* PCI card is dead */
+      pci_channel_io_perm_failure = (__force pci_channel_state_t) 3,
+   };
 
-> 4. it would be preferable if you could evaluate only once whether pMAC
->    counters are reported, set a global variable, and in traffic_test(),
->    if that variable is true, override $src with "aggregate".
-> 5. why did you split the selftest patches out of the am65-cpsw patch
->    set? It is for the am65-cpsw that they are needed.
+If the same EEH error then causes the tg3 driver's transmit timeout
+logic to execute, the tg3_tx_timeout() function schedules a reset
+task via tg3_reset_task_schedule(), which may cause a race condition
+between the tg3 and EEH driver as both attempt to recover the HW via
+a reset action.
 
-Needed for the tests to pass, yes.
-I'll add them back at the beginning of the series.
+EEH driver gets error event
+--> eeh_set_channel_state()
+    and set device to one of
+    error state above           scheduler: tg3_reset_task() get
+                                returned error from tg3_init_hw()
+                             --> dev_close() shuts down the interface
+tg3_io_slot_reset() and
+tg3_io_resume() fail to
+reset/resume the device
 
-> 
->>  
->>  	$MZ $if -q -c $num_pkts -p 64 -b bcast -t ip -R $PREEMPTIBLE_PRIO
->>  
->> -- 
->> 2.34.1
->>
-> 
-> Something like this?
+To resolve this issue, we avoid the race condition by checking the PCI
+channel state in the tg3_reset_task() function and skip the tg3 driver
+initiated reset when the PCI channel is not in the normal state.  (The
+driver has no access to tg3 device registers at this point and cannot
+even complete the reset task successfully without external assistance.)
+We'll leave the reset procedure to be managed by the EEH driver which
+calls the tg3_io_error_detected(), tg3_io_slot_reset() and
+tg3_io_resume() functions as appropriate.
 
-Thanks for the hint!
+Adding the same checking in tg3_dump_state() to avoid dumping all
+device registers when the PCI channel is not in the normal state.
 
-> 
-> From ef5688a78908d99b607909fd7c93829c6a018b61 Mon Sep 17 00:00:00 2001
-> From: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Date: Mon, 11 Dec 2023 15:21:25 +0200
-> Subject: [PATCH] selftests: forwarding: ethtool_mm: fall back to aggregate if
->  device does not report pMAC stats
-> 
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> ---
->  tools/testing/selftests/net/forwarding/ethtool_mm.sh | 11 +++++++++++
->  tools/testing/selftests/net/forwarding/lib.sh        |  8 ++++++++
->  2 files changed, 19 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/net/forwarding/ethtool_mm.sh b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
-> index 39e736f30322..2740133f95ec 100755
-> --- a/tools/testing/selftests/net/forwarding/ethtool_mm.sh
-> +++ b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
-> @@ -25,6 +25,10 @@ traffic_test()
->  	local after=
->  	local delta=
->  
-> +	if [ has_pmac_stats[$netif] = false ]; then
-> +		src="aggregate"
-> +	fi
-> +
->  	before=$(ethtool_std_stats_get $if "eth-mac" "FramesTransmittedOK" $src)
->  
->  	$MZ $if -q -c $num_pkts -p 64 -b bcast -t ip -R $PREEMPTIBLE_PRIO
-> @@ -284,6 +288,13 @@ for netif in ${NETIFS[@]}; do
->  		echo "SKIP: $netif does not support MAC Merge"
->  		exit $ksft_skip
->  	fi
-> +
-> +	if check_ethtool_pmac_std_stats_support $netif; then
-> +		has_pmac_stats[$netif]=true
-> +	else
-> +		has_pmac_stats[$netif]=false
-> +		echo "$netif does not report pMAC statistics, falling back to aggregate"
-> +	fi
->  done
->  
->  trap cleanup EXIT
-> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-> index 8f6ca458af9a..82ac6a066729 100755
-> --- a/tools/testing/selftests/net/forwarding/lib.sh
-> +++ b/tools/testing/selftests/net/forwarding/lib.sh
-> @@ -146,6 +146,14 @@ check_ethtool_mm_support()
->  	fi
->  }
->  
-> +check_ethtool_pmac_std_stats_support()
-> +{
-> +	local dev=$1; shift
-> +
-> +	[ -n "$(ethtool --json -S $dev --all-groups --src pmac 2>/dev/null | \
-> +		jq '.[]')" ]
-> +}
-> +
->  check_locked_port_support()
->  {
->  	if ! bridge -d link show | grep -q " locked"; then
+Signed-off-by: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+Tested-by: Venkata Sai Duggi <venkata.sai.duggi@ibm.com>
+Reviewed-by: David Christensen <drc@linux.vnet.ibm.com>
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+Link: https://lore.kernel.org/r/20231201001911.656-1-thinhtr@linux.vnet.ibm.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/broadcom/tg3.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+index 85570e40c8e9b..95e478882ec13 100644
+--- a/drivers/net/ethernet/broadcom/tg3.c
++++ b/drivers/net/ethernet/broadcom/tg3.c
+@@ -6447,6 +6447,14 @@ static void tg3_dump_state(struct tg3 *tp)
+ 	int i;
+ 	u32 *regs;
+ 
++	/* If it is a PCI error, all registers will be 0xffff,
++	 * we don't dump them out, just report the error and return
++	 */
++	if (tp->pdev->error_state != pci_channel_io_normal) {
++		netdev_err(tp->dev, "PCI channel ERROR!\n");
++		return;
++	}
++
+ 	regs = kzalloc(TG3_REG_BLK_SIZE, GFP_ATOMIC);
+ 	if (!regs)
+ 		return;
+@@ -11175,7 +11183,8 @@ static void tg3_reset_task(struct work_struct *work)
+ 	rtnl_lock();
+ 	tg3_full_lock(tp, 0);
+ 
+-	if (tp->pcierr_recovery || !netif_running(tp->dev)) {
++	if (tp->pcierr_recovery || !netif_running(tp->dev) ||
++	    tp->pdev->error_state != pci_channel_io_normal) {
+ 		tg3_flag_clear(tp, RESET_TASK_PENDING);
+ 		tg3_full_unlock(tp);
+ 		rtnl_unlock();
 -- 
-cheers,
--roger
+2.42.0
+
 
