@@ -1,251 +1,250 @@
-Return-Path: <netdev+bounces-55745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6270C80C1D4
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 08:21:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F0E180C1DD
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 08:27:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E14591F2100F
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 07:21:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05446280CFD
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 07:27:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C23F5200B7;
-	Mon, 11 Dec 2023 07:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C343B200C5;
+	Mon, 11 Dec 2023 07:27:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="bX99QMAU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TCs/ceZN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84178D7;
-	Sun, 10 Dec 2023 23:20:35 -0800 (PST)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BANVUVQ031546;
-	Sun, 10 Dec 2023 23:20:24 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	pfpt0220; bh=yNYAIrwTD20qL7CUtnmLkE9u1cyS+7sEopBVngAZgiY=; b=bX9
-	9QMAUgwNt/aXiHYQ2cZbrQQEH92MAKui7wkSICJOQZWclwKs0Ux6WjjMAgkpDCUP
-	h07pltm7n7ktzd1x6/Dlc7GYUo6b6tduF16G+Hf9fKlCjKHbDEfBAZ2BRs0EYwuw
-	J/AgY0lHbi89rrxUNLrPKrWw+H6LVX4YcsleUqnX1S1chdndhUgPp4YMx5ssWRtV
-	oTA3fbKnU9gQQeHsEKzRVpDzP0stvsJLTNY+Rq8y4w5iDJcieZKYX7g0s0PNa83k
-	bBrW8U1rCZ7obsqWZMnBIyhTfM5KD0g64zN5HPtGa3dkXDqee+b/WRHOiZfcU+s5
-	+FQNpPJJzUNQ5UCEHJA==
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3uvrmjkmmv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Sun, 10 Dec 2023 23:20:24 -0800 (PST)
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 10 Dec
- 2023 23:20:21 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Sun, 10 Dec 2023 23:20:21 -0800
-Received: from localhost.localdomain (unknown [10.28.36.175])
-	by maili.marvell.com (Postfix) with ESMTP id 3FDF43F70AF;
-	Sun, 10 Dec 2023 23:20:15 -0800 (PST)
-From: Srujana Challa <schalla@marvell.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>, <kuba@kernel.org>
-CC: <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <bbrezillon@kernel.org>,
-        <arno@natisbad.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-        <corbet@lwn.net>, <sgoutham@marvell.com>, <bbhushan2@marvell.com>,
-        <jerinj@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>,
-        <lcherian@marvell.com>, <gakula@marvell.com>,
-        <ndabilpuram@marvell.com>, <schalla@marvell.com>
-Subject: [PATCH net-next v1 10/10] crypto: octeontx2: support setting ctx ilen for inline CPT LF
-Date: Mon, 11 Dec 2023 12:49:13 +0530
-Message-ID: <20231211071913.151225-11-schalla@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231211071913.151225-1-schalla@marvell.com>
-References: <20231211071913.151225-1-schalla@marvell.com>
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A3DCDB
+	for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 23:27:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702279620;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yzl/uXMUGCBrEhgpFoMPCiMftRl1HpCdIgUDcqQab60=;
+	b=TCs/ceZNlUmBJnaQ+aFgAjYutP5EfaS/DBUVVF8MtyTtsNgUPkQwoCDvOe3xjnOPRwKq/P
+	pnn0cqBTHybSw9gZiErd+uwSKBcnbu86Igq6J49XsRvVSDnFsNAMJp/Mk2Xrw3GWlE+4VR
+	bdqPSQm9GBBgasUvtGBdtdjGza2jGpQ=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-547-uVTIQSJgNQOFHyqXgF6BfA-1; Mon, 11 Dec 2023 02:26:58 -0500
+X-MC-Unique: uVTIQSJgNQOFHyqXgF6BfA-1
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5c624e68b45so2157500a12.3
+        for <netdev@vger.kernel.org>; Sun, 10 Dec 2023 23:26:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702279617; x=1702884417;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yzl/uXMUGCBrEhgpFoMPCiMftRl1HpCdIgUDcqQab60=;
+        b=eRi05n857WgL9paHZMzwPC3iRQD9Ew9obIXkf1H897oMV0yzpDWbMCHojsMZeZ+GZ/
+         eOqpGNJKjl/CAzVsVYsrb4G7B1lcoS4rucJswjdU/xJkTBUQKShfUGg167qkM7c4yFKV
+         lGvY4divjHanQYUsBDEdZ/4/0RI/+7t0XvIGwRmH57btJ2Jn6cHCPUS5IQlrgQHylp7U
+         abwmOFrzgvZ6/VGZ2n/uL40Zzd08z4p0TmJBAbjWNwuBrHUE9Q3Ou10tLXgosLfh6X7A
+         QT6TV0LRtuD/9VXnOvfifXZ5lfOD5WTsvxgm6+/YPDWNN/KsV7+TeAnOHAMxhfjCIFXY
+         x3DQ==
+X-Gm-Message-State: AOJu0YyqeVizpQTkeodlpf4YFjuvItuczqAR2zHiZItCGcxDwS4oAXOh
+	jCxKNQxJToBiafYOVgi4b9O2mP9EWKx2qyqsEh4s8bL2sfbM6uHdlA0xCUcF2t9gsX04wYjYYAg
+	SsDEMlZfGzPqmrk5zDq5A0E5t+QmNHtf3
+X-Received: by 2002:a05:6a20:2448:b0:18f:97c:ba1a with SMTP id t8-20020a056a20244800b0018f097cba1amr1702202pzc.116.1702279617593;
+        Sun, 10 Dec 2023 23:26:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFtMCW4/nYLJbNDFq92ZIWWhnreabLLEHm6wAXBKkoi7VBSJcNSpG3StpjW99D/ZfXuO/jDlH3z/lbO+PhUoEo=
+X-Received: by 2002:a05:6a20:2448:b0:18f:97c:ba1a with SMTP id
+ t8-20020a056a20244800b0018f097cba1amr1702190pzc.116.1702279617283; Sun, 10
+ Dec 2023 23:26:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: F8B28BQLOLFHqX0OeVJOCAvfC_6Z_syF
-X-Proofpoint-ORIG-GUID: F8B28BQLOLFHqX0OeVJOCAvfC_6Z_syF
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+References: <46a997c2-5a38-4b60-b589-6073b1fac677@bytedance.com>
+ <ZVyt4UU9+XxunIP7@DESKTOP-2CCOB1S.> <20231122100016.GO8262@noisy.programming.kicks-ass.net>
+ <6564a012.c80a0220.adb78.f0e4SMTPIN_ADDED_BROKEN@mx.google.com>
+ <d4110c79-d64f-49bd-9f69-0a94369b5e86@bytedance.com> <07513.123120701265800278@us-mta-474.us.mimecast.lan>
+ <20231207014626-mutt-send-email-mst@kernel.org> <56082.123120804242300177@us-mta-137.us.mimecast.lan>
+ <20231208052150-mutt-send-email-mst@kernel.org> <53044.123120806415900549@us-mta-342.us.mimecast.lan>
+ <20231209053443-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20231209053443-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 11 Dec 2023 15:26:46 +0800
+Message-ID: <CACGkMEuSGT-e-i-8U7hum-N_xEnsEKL+_07Mipf6gMLFFhj2Aw@mail.gmail.com>
+Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
+ sched/fair: Add lag based placement)
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Tobias Huschle <huschle@linux.ibm.com>, Abel Wu <wuyun.abel@bytedance.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Nithin Dabilpuram <ndabilpuram@marvell.com>
+On Sat, Dec 9, 2023 at 6:42=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com> =
+wrote:
+>
+> On Fri, Dec 08, 2023 at 12:41:38PM +0100, Tobias Huschle wrote:
+> > On Fri, Dec 08, 2023 at 05:31:18AM -0500, Michael S. Tsirkin wrote:
+> > > On Fri, Dec 08, 2023 at 10:24:16AM +0100, Tobias Huschle wrote:
+> > > > On Thu, Dec 07, 2023 at 01:48:40AM -0500, Michael S. Tsirkin wrote:
+> > > > > On Thu, Dec 07, 2023 at 07:22:12AM +0100, Tobias Huschle wrote:
+> > > > > > 3. vhost looping endlessly, waiting for kworker to be scheduled
+> > > > > >
+> > > > > > I dug a little deeper on what the vhost is doing. I'm not an ex=
+pert on
+> > > > > > virtio whatsoever, so these are just educated guesses that mayb=
+e
+> > > > > > someone can verify/correct. Please bear with me probably messin=
+g up
+> > > > > > the terminology.
+> > > > > >
+> > > > > > - vhost is looping through available queues.
+> > > > > > - vhost wants to wake up a kworker to process a found queue.
+> > > > > > - kworker does something with that queue and terminates quickly=
+.
+> > > > > >
+> > > > > > What I found by throwing in some very noisy trace statements wa=
+s that,
+> > > > > > if the kworker is not woken up, the vhost just keeps looping ac=
+cross
+> > > > > > all available queues (and seems to repeat itself). So it essent=
+ially
+> > > > > > relies on the scheduler to schedule the kworker fast enough. Ot=
+herwise
+> > > > > > it will just keep on looping until it is migrated off the CPU.
+> > > > >
+> > > > >
+> > > > > Normally it takes the buffers off the queue and is done with it.
+> > > > > I am guessing that at the same time guest is running on some othe=
+r
+> > > > > CPU and keeps adding available buffers?
+> > > > >
+> > > >
+> > > > It seems to do just that, there are multiple other vhost instances
+> > > > involved which might keep filling up thoses queues.
+> > > >
+> > >
+> > > No vhost is ever only draining queues. Guest is filling them.
+> > >
+> > > > Unfortunately, this makes the problematic vhost instance to stay on
+> > > > the CPU and prevents said kworker to get scheduled. The kworker is
+> > > > explicitly woken up by vhost, so it wants it to do something.
 
-Provide an option in Inline IPsec configure mailbox to configure the
-CPT_AF_LFX_CTL:CTX_ILEN for inline CPT LF attached to CPT RVU PF.
-This is needed to set the ctx ilen to size of inbound SA for
-HW errata IPBUCPT-38756. Not setting this would lead to new context's
-not being fetched.
+It looks to me vhost doesn't use workqueue but the worker by itself.
 
-Also set FLR_FLUSH in CPT_LF_CTX_CTL for CPT LF's as workaround
-for same errata.
+> > > >
+> > > > At this point it seems that there is an assumption about the schedu=
+ler
+> > > > in place which is no longer fulfilled by EEVDF. From the discussion=
+ so
+> > > > far, it seems like EEVDF does what is intended to do.
+> > > >
+> > > > Shouldn't there be a more explicit mechanism in use that allows the
+> > > > kworker to be scheduled in favor of the vhost?
 
-Signed-off-by: Nithin Dabilpuram <ndabilpuram@marvell.com>
----
- .../marvell/octeontx2/otx2_cpt_common.h       |  2 ++
- .../marvell/octeontx2/otx2_cpt_hw_types.h     |  4 ++-
- drivers/crypto/marvell/octeontx2/otx2_cptlf.c | 32 +++++++++++++++++++
- drivers/crypto/marvell/octeontx2/otx2_cptlf.h | 19 +++++++++++
- .../marvell/octeontx2/otx2_cptpf_mbox.c       |  5 +++
- 5 files changed, 61 insertions(+), 1 deletion(-)
+Vhost did a brunch of copy_from_user() which should trigger
+__might_fault() so a __might_sleep() most of the case.
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-index db19dba4f3d9..26c7d1bd6ef0 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-@@ -59,6 +59,8 @@ struct otx2_cpt_rx_inline_lf_cfg {
- 	u32 credit_th;
- 	u16 bpid;
- 	u32 reserved;
-+	u8 ctx_ilen_valid : 1;
-+	u8 ctx_ilen : 7;
- };
- 
- /*
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
-index 06bcf49ee379..7e746a4def86 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
-@@ -102,6 +102,7 @@
- #define OTX2_CPT_LF_Q_INST_PTR          (0x110)
- #define OTX2_CPT_LF_Q_GRP_PTR           (0x120)
- #define OTX2_CPT_LF_NQX(a)              (0x400 | (a) << 3)
-+#define OTX2_CPT_LF_CTX_CTL             (0x500)
- #define OTX2_CPT_LF_CTX_FLUSH           (0x510)
- #define OTX2_CPT_LF_CTX_ERR             (0x520)
- #define OTX2_CPT_RVU_FUNC_BLKADDR_SHIFT 20
-@@ -472,7 +473,8 @@ union otx2_cptx_af_lf_ctrl {
- 		u64 cont_err:1;
- 		u64 reserved_11_15:5;
- 		u64 nixtx_en:1;
--		u64 reserved_17_47:31;
-+		u64 ctx_ilen:3;
-+		u64 reserved_17_47:28;
- 		u64 grp:8;
- 		u64 reserved_56_63:8;
- 	} s;
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptlf.c b/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
-index c3bafd9a11dd..777474d48ae4 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
-@@ -106,6 +106,32 @@ static int cptlf_set_grp_and_pri(struct otx2_cptlfs_info *lfs,
- 	return ret;
- }
- 
-+static int cptlf_set_ctx_ilen(struct otx2_cptlfs_info *lfs, int ctx_ilen)
-+{
-+	union otx2_cptx_af_lf_ctrl lf_ctrl;
-+	struct otx2_cptlf_info *lf;
-+	int slot, ret = 0;
-+
-+	for (slot = 0; slot < lfs->lfs_num; slot++) {
-+		lf = &lfs->lf[slot];
-+
-+		ret = otx2_cpt_read_af_reg(lfs->mbox, lfs->pdev,
-+					   CPT_AF_LFX_CTL(lf->slot),
-+					   &lf_ctrl.u, lfs->blkaddr);
-+		if (ret)
-+			return ret;
-+
-+		lf_ctrl.s.ctx_ilen = ctx_ilen;
-+
-+		ret = otx2_cpt_write_af_reg(lfs->mbox, lfs->pdev,
-+					    CPT_AF_LFX_CTL(lf->slot),
-+					    lf_ctrl.u, lfs->blkaddr);
-+		if (ret)
-+			return ret;
-+	}
-+	return ret;
-+}
-+
- static void cptlf_hw_init(struct otx2_cptlfs_info *lfs)
- {
- 	/* Disable instruction queues */
-@@ -443,6 +469,12 @@ int otx2_cptlf_init(struct otx2_cptlfs_info *lfs, u8 eng_grp_mask, int pri,
- 	if (ret)
- 		goto free_iq;
- 
-+	if (lfs->ctx_ilen_ovrd) {
-+		ret = cptlf_set_ctx_ilen(lfs, lfs->ctx_ilen);
-+		if (ret)
-+			goto free_iq;
-+	}
-+
- 	return 0;
- 
- free_iq:
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptlf.h b/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
-index 315a89a9bcb6..6e5dd9af94b7 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
-@@ -120,6 +120,8 @@ struct otx2_cptlfs_info {
- 	atomic_t state;         /* LF's state. started/reset */
- 	int blkaddr;            /* CPT blkaddr: BLKADDR_CPT0/BLKADDR_CPT1 */
- 	int global_slot;        /* Global slot across the blocks */
-+	u8 ctx_ilen;
-+	u8 ctx_ilen_ovrd;
- };
- 
- static inline void otx2_cpt_free_instruction_queues(
-@@ -309,6 +311,19 @@ static inline void otx2_cptlf_set_iqueue_exec(struct otx2_cptlf_info *lf,
- 			 OTX2_CPT_LF_INPROG, lf_inprog.u);
- }
- 
-+static inline void otx2_cptlf_set_ctx_flr_flush(struct otx2_cptlf_info *lf)
-+{
-+	u8 blkaddr = lf->lfs->blkaddr;
-+	u64 val;
-+
-+	val = otx2_cpt_read64(lf->lfs->reg_base, blkaddr, lf->slot,
-+			      OTX2_CPT_LF_CTX_CTL);
-+	val |= BIT_ULL(0);
-+
-+	otx2_cpt_write64(lf->lfs->reg_base, blkaddr, lf->slot,
-+			 OTX2_CPT_LF_CTX_CTL, val);
-+}
-+
- static inline void otx2_cptlf_enable_iqueue_exec(struct otx2_cptlf_info *lf)
- {
- 	otx2_cptlf_set_iqueue_exec(lf, true);
-@@ -324,6 +339,10 @@ static inline void otx2_cptlf_enable_iqueues(struct otx2_cptlfs_info *lfs)
- 	int slot;
- 
- 	for (slot = 0; slot < lfs->lfs_num; slot++) {
-+		/* Enable flush on FLR for Errata */
-+		if (is_dev_cn10kb(lfs->pdev))
-+			otx2_cptlf_set_ctx_flr_flush(&lfs->lf[slot]);
-+
- 		otx2_cptlf_enable_iqueue_exec(&lfs->lf[slot]);
- 		otx2_cptlf_enable_iqueue_enq(&lfs->lf[slot]);
- 	}
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-index 5d63763db2af..ec1ac7e836a3 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-@@ -267,6 +267,9 @@ static int handle_msg_rx_inline_ipsec_lf_cfg(struct otx2_cptpf_dev *cptpf,
- 	otx2_cptlf_set_dev_info(&cptpf->lfs, cptpf->pdev, cptpf->reg_base,
- 				&cptpf->afpf_mbox, BLKADDR_CPT0);
- 	cptpf->lfs.global_slot = 0;
-+	cptpf->lfs.ctx_ilen_ovrd = cfg_req->ctx_ilen_valid;
-+	cptpf->lfs.ctx_ilen = cfg_req->ctx_ilen;
-+
- 	ret = otx2_inline_cptlf_setup(cptpf, &cptpf->lfs, egrp, num_lfs);
- 	if (ret) {
- 		dev_err(&cptpf->pdev->dev, "Inline-Ipsec CPT0 LF setup failed.\n");
-@@ -279,6 +282,8 @@ static int handle_msg_rx_inline_ipsec_lf_cfg(struct otx2_cptpf_dev *cptpf,
- 					cptpf->reg_base, &cptpf->afpf_mbox,
- 					BLKADDR_CPT1);
- 		cptpf->cpt1_lfs.global_slot = num_lfs;
-+		cptpf->cpt1_lfs.ctx_ilen_ovrd = cfg_req->ctx_ilen_valid;
-+		cptpf->cpt1_lfs.ctx_ilen = cfg_req->ctx_ilen;
- 		ret = otx2_inline_cptlf_setup(cptpf, &cptpf->cpt1_lfs, egrp,
- 					      num_lfs);
- 		if (ret) {
--- 
-2.25.1
+> > > >
+> > > > It is also concerning that the vhost seems cannot be preempted by t=
+he
+> > > > scheduler while executing that loop.
+> > >
+> > >
+> > > Which loop is that, exactly?
+> >
+> > The loop continously passes translate_desc in drivers/vhost/vhost.c
+> > That's where I put the trace statements.
+> >
+> > The overall sequence seems to be (top to bottom):
+> >
+> > handle_rx
+> > get_rx_bufs
+> > vhost_get_vq_desc
+> > vhost_get_avail_head
+> > vhost_get_avail
+> > __vhost_get_user_slow
+> > translate_desc               << trace statement in here
+> > vhost_iotlb_itree_first
+>
+> I wonder why do you keep missing cache and re-translating.
+> Is pr_debug enabled for you? If not could you check if it
+> outputs anything?
+> Or you can tweak:
+>
+> #define vq_err(vq, fmt, ...) do {                                  \
+>                 pr_debug(pr_fmt(fmt), ##__VA_ARGS__);       \
+>                 if ((vq)->error_ctx)                               \
+>                                 eventfd_signal((vq)->error_ctx, 1);\
+>         } while (0)
+>
+> to do pr_err if you prefer.
+>
+> > These functions show up as having increased overhead in perf.
+> >
+> > There are multiple loops going on in there.
+> > Again the disclaimer though, I'm not familiar with that code at all.
+>
+>
+> So there's a limit there: vhost_exceeds_weight should requeue work:
+>
+>         } while (likely(!vhost_exceeds_weight(vq, ++recv_pkts, total_len)=
+));
+>
+> then we invoke scheduler each time before re-executing it:
+>
+>
+> {
+>         struct vhost_worker *worker =3D data;
+>         struct vhost_work *work, *work_next;
+>         struct llist_node *node;
+>
+>         node =3D llist_del_all(&worker->work_list);
+>         if (node) {
+>                 __set_current_state(TASK_RUNNING);
+>
+>                 node =3D llist_reverse_order(node);
+>                 /* make sure flag is seen after deletion */
+>                 smp_wmb();
+>                 llist_for_each_entry_safe(work, work_next, node, node) {
+>                         clear_bit(VHOST_WORK_QUEUED, &work->flags);
+>                         kcov_remote_start_common(worker->kcov_handle);
+>                         work->fn(work);
+>                         kcov_remote_stop();
+>                         cond_resched();
+>                 }
+>         }
+>
+>         return !!node;
+> }
+>
+> These are the byte and packet limits:
+>
+> /* Max number of bytes transferred before requeueing the job.
+>  * Using this limit prevents one virtqueue from starving others. */
+> #define VHOST_NET_WEIGHT 0x80000
+>
+> /* Max number of packets transferred before requeueing the job.
+>  * Using this limit prevents one virtqueue from starving others with smal=
+l
+>  * pkts.
+>  */
+> #define VHOST_NET_PKT_WEIGHT 256
+>
+>
+> Try reducing the VHOST_NET_WEIGHT limit and see if that improves things a=
+ny?
+
+Or a dirty hack like cond_resched() in translate_desc().
+
+Thanks
+
+
+>
+> --
+> MST
+>
 
 
