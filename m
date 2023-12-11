@@ -1,144 +1,227 @@
-Return-Path: <netdev+bounces-55859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8FFA80C8E7
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:02:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5386180C8DD
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 13:02:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5851E1F20FA1
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 12:02:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B1451F217CF
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 12:02:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B03038F9A;
-	Mon, 11 Dec 2023 12:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3E803986D;
+	Mon, 11 Dec 2023 12:01:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mj3kZ5yE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E9/Dxd9m"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2056.outbound.protection.outlook.com [40.107.243.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D44D1BD2
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 04:02:30 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GnkMaC9AwITSgb3rdJcSd3q8uKzlK8aFH8kxqTxQoXi44Le6ZTRjntzcN6x9C+OVT4oqRdVcxK0n7vWKRRB0/Iw1UGxABzdfQLTwXm01jUQtkgbm7czE9EelFVuNeAD1dNSQSUgHzZeM/DIGbivsEJ48Ia2dZsr4HRZXQTKVQQworviPPp0R3T/ymigFcCK3gMeoWoJ9/T51R5g381CZFOvnLEosw3K4C5GcpD+MDV5PIKlo4woFW4sjgpKqCJ/C3O+StItFU9msehLRbp1XWNBudTxEVgR+F+cpuJmGIT6QV2BLtV5nIJvLU6LkRovkdzXizuNNA42Hy7Ve0AQZwQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WYNT3H4jgZO9Ik1XXrR4ez8Kub1YqLgOzAy4bARSXhI=;
- b=jvrvEvuMY5DwE2C6GVhBM05YsGvbrNrl93kbwOBJ0arnuigXS+bf+he79VZ5BI8GLUL8WsV8Fy3rTq20IM66Iv2g1iQBmAhqxDRgFuM3BjkMws1pMSXUUpiq2U38txVPN9flGwyc/QMBdR5XfNXCtzbACsMGC+3gFN9NCNAlCdLZSPzPKiEsW9rngeI58xYN0Lt+7rbbqkuiJ0HtzLuprAR2T0qk6IZDrH1BhskdS9JKEmFdpeO4b0tp0Mmt5W7dG9xEVA3SFIfKQVedGWhzEVa62JXBB27Hv16qGwqnrGZjt5WUZ/5tMKP3xLCLNT5fAEIVA2UuBoy4ZYER4VxVaA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WYNT3H4jgZO9Ik1XXrR4ez8Kub1YqLgOzAy4bARSXhI=;
- b=mj3kZ5yECTnFYVHeKjtSi7h/GdDbT7SXJcMPZyvW7trLEZRHlBqHpOz+J3WKajgDb1V6xQPHr/Tlp2SQghjx3zQZCUXPuNHoDv/TNxndvxW3sp0t4cfn9Aj/JLy2aJb+W7pKUnEhg5Zph1w3R5YUs/OqrW95FVTtkuqKBjktqku15hjQTQ4RrW2eEvXqlVc2GyYPSiF4tV9yd/wXbrcGz5PrIMVcehoa2Us0gA7qVovj2pGH2cyiPgCqleBchxeYTsI7Wmbm+Sf7UFkrFQ688vh9Gfl7Tk9JIRtPStRVjZGC7jnYb98EuFep65euve5vBm7JranCPPK8MjfqCsuqEw==
-Received: from PR0P264CA0136.FRAP264.PROD.OUTLOOK.COM (2603:10a6:100:1a::28)
- by CY8PR12MB7658.namprd12.prod.outlook.com (2603:10b6:930:9e::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Mon, 11 Dec
- 2023 12:02:28 +0000
-Received: from SN1PEPF0002529D.namprd05.prod.outlook.com
- (2603:10a6:100:1a:cafe::40) by PR0P264CA0136.outlook.office365.com
- (2603:10a6:100:1a::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32 via Frontend
- Transport; Mon, 11 Dec 2023 12:02:27 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SN1PEPF0002529D.mail.protection.outlook.com (10.167.242.4) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7091.18 via Frontend Transport; Mon, 11 Dec 2023 12:02:26 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 11 Dec
- 2023 04:02:10 -0800
-Received: from localhost.localdomain (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 11 Dec
- 2023 04:02:08 -0800
-From: Petr Machata <petrm@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>
-CC: Shuah Khan <shuah@kernel.org>, Petr Machata <petrm@nvidia.com>,
-	<mlxsw@nvidia.com>, Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH net-next] selftests: forwarding: Import top-level lib.sh through $lib_dir
-Date: Mon, 11 Dec 2023 13:01:06 +0100
-Message-ID: <a1c56680a5041ae337a6a44a7091bd8f781c1970.1702295081.git.petrm@nvidia.com>
-X-Mailer: git-send-email 2.41.0
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2B1010D9
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 04:01:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702296108;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bqzvj1BVA/xUscvTFwnIQ16B6kfl78jXgo5T95qDUwM=;
+	b=E9/Dxd9mvCgfL6uQPEBenTc/UVLMOwN9ELCCQncTNzwTLih1ISskxe67l5tE4f4mo7cNab
+	yA0Fm//Aq/cc+1Pt+UHsHiuWmqoOMCqG3RGr1eTcj79W5AbVRGv8qK2OCQUPDRiDnKW/s4
+	pUx8phtqjOmFbIlD1E9jh5yjQjVjvd8=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-628-dIE88yWZM9id0eaPKkRWHw-1; Mon, 11 Dec 2023 07:01:47 -0500
+X-MC-Unique: dIE88yWZM9id0eaPKkRWHw-1
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-67a8a7f2c76so60010256d6.1
+        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 04:01:47 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702296107; x=1702900907;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bqzvj1BVA/xUscvTFwnIQ16B6kfl78jXgo5T95qDUwM=;
+        b=MDUzxQyu4/jJKvX4K1Oe+shVSuRd3US4m9lar3SRHzRbDDZB3lOVxBZt6NYcYkEDYl
+         r0jKrAUJ++JoiqtUNmXyUUH8YFVjmz/4uKvKmvmxmkeQ6O09f+NqrL2vjNBxrp8pFfwW
+         xjBclq8AopiXCuLpqfCDDeI9WBROOlllq+ILlJ1zG+0MzUzI3b9R66qrXr04F4xB6PCI
+         B9MH2mASRZzg4Qy8YxrUwqLYzOYgISkDb3kHH1DQFqE5rqb1usELBE/wJLSO8jaAnc+z
+         stnqPPUHgGXMDUIfwv3UasJ84I/Q1Uti/tv7DSWtwmH1ut2STy43yJhtt2ZrnCtkwdAG
+         kJkQ==
+X-Gm-Message-State: AOJu0Yz6A9uDrdxJysMKFMEpYrRqv1lU8PXXGSQBH0OI8HjzsvqK2xMY
+	7BYwCaU87lxodPwbjLRlDWx7ISD4SIGTnQ18QPdPq2a+PVjqwMJ2RTg0Bls0LP6YTJ7NwKz5H6C
+	NvNGs+I1uZYHyc1LC
+X-Received: by 2002:a05:6214:f66:b0:67a:b963:5ae with SMTP id iy6-20020a0562140f6600b0067ab96305aemr9074358qvb.45.1702296106730;
+        Mon, 11 Dec 2023 04:01:46 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEJe0L6QdS4nGwvEb9tjBx33wTgJG4fosHSmbpSVi1Tq8yvZi8qUQYj5rcbM7XZsEBl/CmTNw==
+X-Received: by 2002:a05:6214:f66:b0:67a:b963:5ae with SMTP id iy6-20020a0562140f6600b0067ab96305aemr9074332qvb.45.1702296106415;
+        Mon, 11 Dec 2023 04:01:46 -0800 (PST)
+Received: from sgarzare-redhat ([95.131.45.143])
+        by smtp.gmail.com with ESMTPSA id v16-20020a0cf910000000b0067a53aa6df2sm3232285qvn.46.2023.12.11.04.01.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Dec 2023 04:01:46 -0800 (PST)
+Date: Mon, 11 Dec 2023 13:01:16 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v7 3/4] virtio/vsock: fix logic which reduces
+ credit update messages
+Message-ID: <s5v5hbr2memhwoqm3fxbkq6qsocs43qgyhx432zzy6ugbqhuu2@rsnm3kiwfwjm>
+References: <20231206211849.2707151-1-avkrasnov@salutedevices.com>
+ <20231206211849.2707151-4-avkrasnov@salutedevices.com>
+ <20231206165045-mutt-send-email-mst@kernel.org>
+ <d9d1ec6a-dd9b-61d9-9211-52e9437cbb1f@salutedevices.com>
+ <20231206170640-mutt-send-email-mst@kernel.org>
+ <d30a1df7-ecda-652d-8c98-853308a560c9@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002529D:EE_|CY8PR12MB7658:EE_
-X-MS-Office365-Filtering-Correlation-Id: a829711b-df3d-4cfd-ddd8-08dbfa410af1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	atxtVu1xvSiCer7xRdhSGowNBaS+4AEMrNVN9OlfUmpVTINfqsj3oZCxMIo91GH79qaaAzwozFzyAy1b1t96wew/wh4KT3xKMwWzXs4AEs7UqSQc2+HVoi1xJ9ZrnRmz5B35w9AWgAMJ2o8MhZQU8vNw0NJmwP+EWixHPlaJHvd7OHZVviBoJe0A2UE5EibL3TA1KsF8O2sfUN5o5HuKAzF6ZsEfA2yL3th6dtlyQBlFLbMO2lV9Ak/X44p/vEvHcM88eO45XdgB1iMP5GwsSo85s4xrLaZdkbI+NbsvqOSoUtHsff8UbSZO/DEuc0sMxFs2Gtwpx9zASRRMWD86kQmsZDoEWsfplLpRl+VHMXF+vL6rBxyv3hLHfa+nOVq104bLDrqxbAqTSsCCCggPfj+Do6wzAY2fRSEVeyC6XG4FMcKC8cg0aCv8WjvnVhUFJl8TfVJUfzHDyQA7R0FptOR8uMP1BbfDzE6CS5TE9q683X0Bx4AUQ9MNP3QGEDl6CP77+uJG3dtuA5TLzynYTQKGcr8+yiYM5SYrVJho0E1skyphFgcKTpnfoT/X3t7n6DjtlrbknAm1Q1aWvhq7bEZoDyYMemodylxA426LZl9rdb82AXMU2hoQgBLN+/5ONEFMSEg3OIvzD+atVMCpCvK8wWR4YD6lS/jNDvcz4bYFVY5JTuG/9KgBS08/Zt5b5ZYCKEY7WWCiJCeYWexfW/pjRJJ9+3QeyUAwRXDe7xlWX+2c1HU4pKJjmJiD9yrq
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(396003)(376002)(346002)(39860400002)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(82310400011)(36840700001)(46966006)(40470700004)(83380400001)(2906002)(82740400003)(41300700001)(478600001)(356005)(7636003)(70206006)(70586007)(54906003)(426003)(40480700001)(110136005)(316002)(86362001)(4326008)(8936002)(8676002)(40460700003)(36756003)(47076005)(5660300002)(36860700001)(336012)(26005)(16526019)(2616005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2023 12:02:26.5092
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a829711b-df3d-4cfd-ddd8-08dbfa410af1
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002529D.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7658
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <d30a1df7-ecda-652d-8c98-853308a560c9@salutedevices.com>
 
-The commit cited below moved code from net/forwarding/lib.sh to net/lib.sh,
-and had the former source the latter. This causes issues with selftests
-from directories other than net/forwarding/, in particular drivers/net/...
-For those files, the line "source ../lib.sh" would look for lib.sh in the
-directory above the script file's one, which is incorrect. The way these
-selftests source net/forwarding/lib.sh is like this:
+On Thu, Dec 07, 2023 at 01:50:05AM +0300, Arseniy Krasnov wrote:
+>
+>
+>On 07.12.2023 01:08, Michael S. Tsirkin wrote:
+>> On Thu, Dec 07, 2023 at 12:52:51AM +0300, Arseniy Krasnov wrote:
+>>>
+>>>
+>>> On 07.12.2023 00:53, Michael S. Tsirkin wrote:
+>>>> On Thu, Dec 07, 2023 at 12:18:48AM +0300, Arseniy Krasnov wrote:
+>>>>> Add one more condition for sending credit update during dequeue from
+>>>>> stream socket: when number of bytes in the rx queue is smaller than
+>>>>> SO_RCVLOWAT value of the socket. This is actual for non-default value
+>>>>> of SO_RCVLOWAT (e.g. not 1) - idea is to "kick" peer to continue data
+>>>>> transmission, because we need at least SO_RCVLOWAT bytes in our rx
+>>>>> queue to wake up user for reading data (in corner case it is also
+>>>>> possible to stuck both tx and rx sides, this is why 'Fixes' is used).
+>>>>> Also handle case when 'fwd_cnt' wraps, while 'last_fwd_cnt' is still
+>>>>> not.
+>>>>>
+>>>>> Fixes: b89d882dc9fc ("vsock/virtio: reduce credit update messages")
+>>>>> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>>>>> ---
+>>>>>  Changelog:
+>>>>>  v6 -> v7:
+>>>>>   * Handle wrap of 'fwd_cnt'.
+>>>>>   * Do to send credit update when 'fwd_cnt' == 'last_fwd_cnt'.
+>>>>>
+>>>>>  net/vmw_vsock/virtio_transport_common.c | 18 +++++++++++++++---
+>>>>>  1 file changed, 15 insertions(+), 3 deletions(-)
+>>>>>
+>>>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>>>> index e137d740804e..39f8660d825d 100644
+>>>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>>>> @@ -558,6 +558,8 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+>>>>>  	struct virtio_vsock_sock *vvs = vsk->trans;
+>>>>>  	size_t bytes, total = 0;
+>>>>>  	struct sk_buff *skb;
+>>>>> +	u32 fwd_cnt_delta;
+>>>>> +	bool low_rx_bytes;
+>>>>>  	int err = -EFAULT;
+>>>>>  	u32 free_space;
+>>>>>
+>>>>> @@ -601,7 +603,15 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+>>>>>  		}
+>>>>>  	}
+>>>>>
+>>>>> -	free_space = vvs->buf_alloc - (vvs->fwd_cnt - vvs->last_fwd_cnt);
+>>>>> +	/* Handle wrap of 'fwd_cnt'. */
+>>>>> +	if (vvs->fwd_cnt < vvs->last_fwd_cnt)
+>>>>> +		fwd_cnt_delta = vvs->fwd_cnt + (U32_MAX - vvs->last_fwd_cnt);
+>>>>
+>>>> Are you sure there's no off by one here? for example if fwd_cnt is 0
+>>>> and last_fwd_cnt is 0xfffffffff then apparently delta is 0.
+>>>
+>>> Seems yes, I need +1 here
+>>
+>> And then you will get a nop, because assigning U32_MAX + 1 to u32
+>> gives you 0. Adding () does nothing to change the result,
+>> + and - are commutative.
+>
+>Ahh, unsigned here, yes.
 
-	lib_dir=$(dirname $0)/../../../net/forwarding
-	source $lib_dir/lib.sh
+Ooops, sorry I was confused here!
 
-Reuse the variable lib_dir, if set, in net/forwarding/lib.sh to source
-net/lib.sh as well.
+>
+>@Stefano, what did You mean about wrapping here?
+>
+>I think Michael is right, for example
 
-Fixes: 25ae948b4478 ("selftests/net: add lib.sh")
-Cc: Hangbin Liu <liuhangbin@gmail.com>
-Signed-off-by: Petr Machata <petrm@nvidia.com>
----
- tools/testing/selftests/net/forwarding/lib.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yep, I agree!
+Sorry for this wrong suggestion!
 
-diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-index 038b7d956722..0feb4e400110 100755
---- a/tools/testing/selftests/net/forwarding/lib.sh
-+++ b/tools/testing/selftests/net/forwarding/lib.sh
-@@ -38,7 +38,7 @@ if [[ -f $relative_path/forwarding.config ]]; then
- 	source "$relative_path/forwarding.config"
- fi
- 
--source ../lib.sh
-+source ${lib_dir-.}/../lib.sh
- ##############################################################################
- # Sanity checks
- 
--- 
-2.41.0
+Stefano
+
+>
+>vvs->fwd_cnt wraps and now == 5
+>vvs->last_fwd_cnt == 0xffffffff
+>
+>now delta before this patch will be 6 - correct value
+>
+>May be I didn't get your idea, so implement it very naive?
+>
+>Thanks, Arseniy
+>
+>>
+>>
+>>>>
+>>>>
+>>>>> +	else
+>>>>> +		fwd_cnt_delta = vvs->fwd_cnt - vvs->last_fwd_cnt;
+>>>>
+>>>> I actually don't see what is wrong with just
+>>>> 	fwd_cnt_delta = vvs->fwd_cnt - vvs->last_fwd_cnt
+>>>> 32 bit unsigned math will I think handle wrap around correctly.
+>>>>
+>>>> And given buf_alloc is also u32 - I don't see where the bug is in
+>>>> the original code.
+>>>
+>>> I think problem is when fwd_cnt wraps, while last_fwd_cnt is not. In this
+>>> case fwd_cnt_delta will be too big, so we won't send credit update which
+>>> leads to stall for sender
+>>>
+>>> Thanks, Arseniy
+>>
+>> Care coming up with an example?
+>>
+>>
+>>>>
+>>>>
+>>>>> +
+>>>>> +	free_space = vvs->buf_alloc - fwd_cnt_delta;
+>>>>> +	low_rx_bytes = (vvs->rx_bytes <
+>>>>> +			sock_rcvlowat(sk_vsock(vsk), 0, INT_MAX));
+>>>>>
+>>>>>  	spin_unlock_bh(&vvs->rx_lock);
+>>>>>
+>>>>> @@ -611,9 +621,11 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+>>>>>  	 * too high causes extra messages. Too low causes transmitter
+>>>>>  	 * stalls. As stalls are in theory more expensive than extra
+>>>>>  	 * messages, we set the limit to a high value. TODO: experiment
+>>>>> -	 * with different values.
+>>>>> +	 * with different values. Also send credit update message when
+>>>>> +	 * number of bytes in rx queue is not enough to wake up reader.
+>>>>>  	 */
+>>>>> -	if (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
+>>>>> +	if (fwd_cnt_delta &&
+>>>>> +	    (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE || low_rx_bytes))
+>>>>>  		virtio_transport_send_credit_update(vsk);
+>>>>>
+>>>>>  	return total;
+>>>>> --
+>>>>> 2.25.1
+>>>>
+>>
+>
 
 
