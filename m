@@ -1,99 +1,190 @@
-Return-Path: <netdev+bounces-55968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-55969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19DBA80D00C
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 16:49:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C265A80D012
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 16:51:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B99181F2195A
-	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:49:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAC281C2097C
+	for <lists+netdev@lfdr.de>; Mon, 11 Dec 2023 15:51:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D57C4BAAA;
-	Mon, 11 Dec 2023 15:49:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6F034BAB1;
+	Mon, 11 Dec 2023 15:50:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YjrW7ehp"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="myE9lvUk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7C16A1;
-	Mon, 11 Dec 2023 07:49:05 -0800 (PST)
-Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-40c2bb872e2so42747655e9.3;
-        Mon, 11 Dec 2023 07:49:05 -0800 (PST)
+Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4941ABD
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 07:50:53 -0800 (PST)
+Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-5cbcfdeaff3so45779157b3.0
+        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 07:50:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702309744; x=1702914544; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=aks+T2RWp+y47yPnFcNxGDqSMNoe71C5oOgiPokDMdQ=;
-        b=YjrW7ehpDJFdNpPGizOZ4OGLkNl2Fc/dPQs0k1wop/TC9ntuHag3EPX6s0UWeB79Vh
-         SFDtnoBycjR9hpEASBqW+Y9Q37RX6l/XkPMGQXSxUbmSV/68eb1J8gfBpTy2giqv/ami
-         vmgrCWA4hLohTamwsIKUZlh6ZxFaKlKuyyfH3nGNHL2ctdwRuaUtX0GRjafGtqNwlm+W
-         IeQpuVFHjSyLpplwPVsymdInM1Y7kSiyrghX+gON67FUF06cR65ZffNPtHwnIC9ZY/yf
-         TS9hqcXKdgXiTagbxI4zwLO+VAXaNxKv0tQWGjIMpZXFR2Uq5MxblPCuHf1j3O5ro/Xa
-         Tvtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702309744; x=1702914544;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1702309852; x=1702914652; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aks+T2RWp+y47yPnFcNxGDqSMNoe71C5oOgiPokDMdQ=;
-        b=hqk5WB3aEzGEzql8+pHim77WZtxWzohY/ybyxhdCHuw23yGOCzaaDBuzyGWO3WK3VH
-         sPtyyvBChJZJ7YzYBnjAcsXVMQAxV/VK+xrQbSArf438U3yGNDOJIAKcYswMlhi5rTkt
-         yRw65xV3f/MUL2o1SYttU4GstxpNYe2eHt2tTRTWiTOF++xmPp31A06nXoYoT3IbCFli
-         qSvSogi2lPSypPLQEcgc+evKkQQ+hTO1hNpDAQlLg3jkGMFMeLGapIAXGPkXTIFrzYJQ
-         4+Ef/wl8Qhpp+igJoZo6zanK9RLhW473UbYMczEpxaWNmlmOIvwwGVLNUZJVLERqvNG5
-         hfdw==
-X-Gm-Message-State: AOJu0YwgVKx12zVKREu0kDZSQp6tg/AMNbwuCfBK9H/1ZBw0l2rfvYHH
-	JrNHRRZQdJhB8lns+8IoPq8=
-X-Google-Smtp-Source: AGHT+IFDUkEZ2kjIUnbrZbnNL2NpdVGrdjYTtXF9+NMVopavJIKSOLRrF6f0TEY+PC9zv7nRJyumgA==
-X-Received: by 2002:a05:600c:4448:b0:40c:3ec0:d705 with SMTP id v8-20020a05600c444800b0040c3ec0d705mr939053wmn.272.1702309743881;
-        Mon, 11 Dec 2023 07:49:03 -0800 (PST)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id q14-20020a05600c46ce00b0040c4c9c52a3sm1699344wmo.12.2023.12.11.07.49.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 07:49:03 -0800 (PST)
-Message-ID: <65772f6f.050a0220.8a2bb.80c7@mx.google.com>
-X-Google-Original-Message-ID: <ZXcvbHLS8fEFKbal@Ansuel-xps.>
-Date: Mon, 11 Dec 2023 16:49:00 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH 1/2] dt-bindings: Document QCA808x PHYs
-References: <20231209014828.28194-1-ansuelsmth@gmail.com>
- <242759d9-327d-4fde-b2a0-24566cf5bf25@lunn.ch>
+        bh=hps0C64CoyNeD9MOSqRfmVP377j1eR0EFq8kZD/E3j0=;
+        b=myE9lvUkldtzVyjBaAipYRhXpKYaXiYLgDgq/liuPzcDXV7lzSvxb+yZpcvOAkNavg
+         bR8p/gHII6LM84O3lU+meFin05Ls6KqT8pNSF5qpxhsvu+bNsopNxnDrDe6VUpkMNoDq
+         hRVfRuCayWIcwnLExm9BxgkQnhjC2Kjd2gkATPaSHotQytdCuLR6yuiu9m8zELPfWBL6
+         sH1J//pCCJ0afHYBlG4CN5OMs7GIm1Nf81quGw4ldSyMLCn566WQc3GBn14/ch1tJcI8
+         mfbhSUakdfxwVLzjTlNCX6kimDgyVZHPDA9VaAf8QRLx6keZ3KjRCAB40q4CDHzGpXbd
+         brbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702309852; x=1702914652;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hps0C64CoyNeD9MOSqRfmVP377j1eR0EFq8kZD/E3j0=;
+        b=DEKqxb+kS6hCvr2fqcGvwxHwzytLg8g7Ws/nhlbUFE3ERS9M7JuJtwsRAKzxnywLmK
+         yBy0HniAsyJ+LucSbpxC140Ev7PfrqDt8cANH8g8rV351ptToBkdh25KQZg7tTevJ++e
+         xuQLd+nCSfcO200CJQQ6gpbjfFGOujco0F3wD2/gavLmTjY8EndseiVO3ZGmxNgjehMn
+         80/SURepmIty74Ht8Pzo+nwFrwqTwGx3msxPNXJu9/Og0t/d6SWpWY1WrJVqZsvULIHA
+         Gp6AzMYUMtM6sfw/O2UC+StZlXUS0wNmr4MNnDeEP2iwRrvkr70v9e4ftkPaSW7nolLI
+         TD4g==
+X-Gm-Message-State: AOJu0YwlTrDo469Ox+FhwWL+kCfFAVoMTVvZNXFslY2dqHyv8eGX+hLA
+	sqsnjYr7ykS0FlrxVuMBAKzsPBq74DGC082mM2ZCp1C+NibRZYF9VU1KvQ==
+X-Google-Smtp-Source: AGHT+IEHvRtjcWoge/0SGBLgFkiVduhipMufd0l6ExNwyZAbsDHpBKUXuq56riIRzXT/jw0OWrHOdBF3OMaVuyXiXJA=
+X-Received: by 2002:a81:698b:0:b0:5d7:1940:f3f3 with SMTP id
+ e133-20020a81698b000000b005d71940f3f3mr3858978ywc.91.1702309852470; Mon, 11
+ Dec 2023 07:50:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <242759d9-327d-4fde-b2a0-24566cf5bf25@lunn.ch>
+References: <cover.1674233458.git.dcaratti@redhat.com> <5fdd584d53f0807f743c07b1c0381cf5649495cd.1674233458.git.dcaratti@redhat.com>
+ <CAM0EoMn4C-zwrTCGzKzuRYukxoqBa8tyHyFDwUSZYwkMOUJ4Lw@mail.gmail.com>
+ <CAKa-r6sNMq5b=PiUhm0U=COV1fE=HL_CjOPxchs1WpWi4-_XNA@mail.gmail.com>
+ <CAM0EoMm6QHzFdFLJ8Q1nO6W-m47tkxzVp7k2rAZYJZNXCCbM9g@mail.gmail.com>
+ <CAM0EoMmvjwxLmdT5pQJ-hXVMA2OJUfy8TJKDxZ=vf+Thzza0=Q@mail.gmail.com> <ZXcJrNZxt5uY1sdn@dcaratti.users.ipa.redhat.com>
+In-Reply-To: <ZXcJrNZxt5uY1sdn@dcaratti.users.ipa.redhat.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 11 Dec 2023 10:50:40 -0500
+Message-ID: <CAM0EoMmxv79t=5yuUTHsnOYPnePfCA_hPBGu99W52JJrNS=V3g@mail.gmail.com>
+Subject: Re: Mirred broken WAS(Re: [PATCH net-next 2/2] act_mirred: use the
+ backlog for nested calls to mirred ingress
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, Xin Long <lucien.xin@gmail.com>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, wizhao@redhat.com, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Florian Westphal <fw@strlen.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 11, 2023 at 04:44:06PM +0100, Andrew Lunn wrote:
-> > +properties:
-> > +  qca,led-active-high:
-> > +    description: Set all the LEDs to active high to be turned on.
-> > +    type: boolean
-> 
-> I would of expected active high is the default. An active low property
-> would make more sense. It should also be a generic property, not a
-> vendor property. As such, we either want the phylib core to parse it,
-> or the LED core.
+Hi Davide,
+
+On Mon, Dec 11, 2023 at 8:08=E2=80=AFAM Davide Caratti <dcaratti@redhat.com=
+> wrote:
+>
+> hello Jamal,
+>
+> On Thu, Dec 07, 2023 at 09:10:13AM -0500, Jamal Hadi Salim wrote:
+> > Hi Davide,
+> >
+>
+> [...]
+>
+> > > > > I am afraid this broke things. Here's a simple use case which cau=
+ses
+> > > > > an infinite loop (that we found while testing blockcasting but
+> > > > > simplified to demonstrate the issue):
+> > > >
+> > > > [...]
+> > > >
+> > > > > sudo ip netns exec p4node tc qdisc add dev port0 clsact
+> > > > > sudo ip netns exec p4node tc filter add dev port0 ingress protoco=
+l ip
+> > > > > prio 10 matchall action mirred ingress redirect dev port0
+> > > >
+> > > > the above rule is taking packets from port0 ingress and putting it
+> > > > again in the mirred ingress of the same device, hence the loop.
+> > >
+> > > Right - that was intentional to show the loop. We are worrying about
+> > > extending mirred now to also broadcast (see the blockcast discussion)
+> > > to more ports making the loop even worse. The loop should terminate a=
+t
+> > > some point - in this case it does not...
+> > >
+> > > > I don't see it much different than what we can obtain with bridges:
+> > > >
+> > > > # ip link add name one type veth peer name two
+> > > > # ip link add name three type veth peer name four
+> > > > # for n in even odd; do ip link add name $n type bridge; done
+> > > > # for n in one two three four even odd; do ip link set dev $n up; d=
+one
+> > > > # for n in one three; do ip link set dev $n master odd; done
+> > > > # for n in two four; do ip link set dev $n master even; done
+> > > >
+> > >
+> > > Sure that is another way to reproduce.
+> >
+> > Ok, so i can verify that re-introduction of the ttl field in the
+> > skb[1] fixes the issue. But restoring that patch may cause too much
+> > bikeshedding. Victor will work on a better approach using the cb
+> > struct instead - there may. Are you able to test with/out your patch
+> > and see if this same patch fixes it?
+>
+> I'm also more optimistic on the use of qdisc cb for that purpose :)
+> Just share the code, i will be happy to review/test.
+> With regular TC mirred, the deadlock happened with TCP and SCTP socket
+> locks, as they were sending an ACK back for a packet that was sent by
+> the peer using egress->ingress.
+>
+> AFAIR there is a small reproducer in tc_actions.sh kselftest, namely
+>
+> mirred_egress_to_ingress_tcp_test()
+>
+> maybe it's useful for pre-verification also.
 >
 
-Also sorry for the double email... Any help for the problem of the
-missing link_2500 define in net-next? (merged in Lee tree?)
+Ah, good - didnt realize there was a reproducer for your use case.
+We'll try it out.
 
--- 
-	Ansuel
+> [...]
+>
+> my 2 cents  below:
+>
+> > > I dont think we can run something equivalent inside the kernel. The
+> > > ttl worked fine. BTW, the example shown breaks even when you have
+> > > everything running on a single cpu (and packets being queued on the
+> > > backlog)
+>
+> [...]
+>
+> > > Yes, we need to make sure those are fixed with whatever replacement..
+> > > The loops will happen even on egress->egress (the example only showed
+> > > ingress-ingress).
+>
+> if you try to make a loop using mirred egress/redirect, the first packet
+> will trigger a deadlock on the root qdisc lock - see [1]. It's worse
+> than a loop, because user can't fix it by just removing the "offending"
+> mirred action. Would the ttl be helpful here?
+>
+
+Possible. So the test is just to create a loop?
+Lets test with the reproducer you pointed out then see where we go from the=
+re.
+
+> (in the meanwhile, I ill try to figure out if it's possible at least to
+> silence false lockdep warnings without using dynamic keys, as per
+> Eric reply).
+>
+
+Sorry, wasnt helpful - i have been in travel mode for the last week.
+
+cheers,
+jamal
+> TIA!
+>
+> --
+> davide
+>
+> [1] https://github.com/multipath-tcp/mptcp_net-next/issues/451#issuecomme=
+nt-1782690200
+>
+>
 
