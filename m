@@ -1,120 +1,113 @@
-Return-Path: <netdev+bounces-56509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6E7C80F279
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 17:29:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB0A680F2CB
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 17:34:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91DB21F214B7
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 16:29:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5AEE2810C5
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 16:34:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D8877F2D;
-	Tue, 12 Dec 2023 16:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5299078E61;
+	Tue, 12 Dec 2023 16:34:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PUMX9KRL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H9sQ8j1f"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4964745C4;
-	Tue, 12 Dec 2023 16:29:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 944BAC433C8;
-	Tue, 12 Dec 2023 16:29:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702398583;
-	bh=4JW2S8XtH2w0oEakH/oOgs84YyeslEKxjY8L2izjfDk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PUMX9KRLgK/+PuRSRYFVx98x9iA0mSlMupFig+yV0Uw5dFXtiUNE406wFDEwI22l9
-	 iP+br3B9xrKSyP76l6Pff/jLfR+X4sMQjOrgUMiM0/GvjuG34XXlSGcEa+X+QG6THd
-	 Uds+8/topXVekPryazuwUyuLpJk8bXXwibuyOKR+4W16ORWQyk3lv94goxS/eEOCeS
-	 ynLhYh/YBWQQ5YaX98NbpRQzUGcyD3Nttu8a00ol+S2d61QwbpaaE/Wb5O7/S/mKV9
-	 oK3+qT19TFPUAJEnKBz4mNLWouagrb35WTWBNUXWXpm2oYfDLn8yQ5zd7YdOFSMqwJ
-	 KHZEI4f2RUZ9A==
-Date: Tue, 12 Dec 2023 16:29:35 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chunfeng Yun <chunfeng.yun@mediatek.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexander Couzens <lynxis@fe80.eu>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org
-Subject: Re: [RFC PATCH net-next v3 6/8] dt-bindings: net: mediatek: remove
- wrongly added clocks and SerDes
-Message-ID: <20231212-operative-stubbly-2104c96bdee5@spud>
-References: <cover.1702352117.git.daniel@makrotopia.org>
- <5859da6629b8b6c100eca4062dd193105bf829ba.1702352117.git.daniel@makrotopia.org>
+Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CA53CA;
+	Tue, 12 Dec 2023 08:34:04 -0800 (PST)
+Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-5e266e8d39eso2066937b3.1;
+        Tue, 12 Dec 2023 08:34:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702398844; x=1703003644; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tQQid16GHvnaAbZDXuQkDV5jUsLgdBWxDY6lNDo1oPs=;
+        b=H9sQ8j1fiRZpYcqEEIN8G5ISwagxt8ZN/q5pDUYNwLbeBdWwX6MgQ1O0FpsbFnrB2N
+         yy4Sx54ERsaIl4ZEP+JkNZyrfZvkM8kuGvWFzOLLDtzJjjLFf/4XZY8AKKR2zQ8eimCp
+         154KRylzd4H0tiaohrch0AwttZhjLcZyiI0CQuCLyb6UzK8IiRa8mWs11PBNzPvimY/Q
+         7sluQhhMxxnKcnEiYQjqsEm0DyD7aSA9fyWIDSlFRBVRQDUNV01Fe+Sc3GLDPX8tTpNP
+         F6zGndn8woOXwbcyiHSwiOrjMvlaqODX03iIeqGiWuRY464fv+252Tn30dEVpmhSKHyW
+         4afg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702398844; x=1703003644;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tQQid16GHvnaAbZDXuQkDV5jUsLgdBWxDY6lNDo1oPs=;
+        b=GKx40R6aBIS0Qxe80kLOh3JCVQvUE0R9lxa3Qw6em26JmlfwakU1zDaIr30qidSjHC
+         apTfw11LGqbYoNGViQB87Khn8IC7hBuQUwo7c8Cs7x82uE4qqwgsxBpVBLajw273ZKWx
+         xRP4GOwBYo+k+/B1LORmyFIMmoF/5Po9GSqPvdOYzfmzn6T11NzlEDbzOSBgAUpJNM5b
+         nhkiNofPFUT2/oy15oLmxEqb+P8ji0IePgSWJ0dzHehA40Qqepp++WY9q7fy4isTxqS2
+         s0qcPnIoxHmCazClpP5jWwTB+8f2Ufv5/VDrNtU0h3x6a5OPq722AVshoerAnVdCTflT
+         42Gg==
+X-Gm-Message-State: AOJu0YzbXxx6aT7Cay2ArQ/XuNSig0qQOu1f4i496eFA1a7HZYNSMvX/
+	Bk/UKtVYqkADEKyc2f2qA5tYvk1PCz9VrQ==
+X-Google-Smtp-Source: AGHT+IGUMfA963Iva3P4h6VxRTz6ACMNoJFaBpjoNF2iLJIc3MZ40Jgs6Zf05O3kHPg2oOV2DUsu6g==
+X-Received: by 2002:a0d:e28e:0:b0:5d3:37fe:54ce with SMTP id l136-20020a0de28e000000b005d337fe54cemr5304212ywe.8.1702398843573;
+        Tue, 12 Dec 2023 08:34:03 -0800 (PST)
+Received: from localhost ([2601:344:8301:57f0:38aa:1c88:df05:9b73])
+        by smtp.gmail.com with ESMTPSA id d63-20020a0ddb42000000b005845e6f9b50sm566704ywe.113.2023.12.12.08.34.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Dec 2023 08:34:02 -0800 (PST)
+Date: Tue, 12 Dec 2023 08:34:02 -0800
+From: Yury Norov <yury.norov@gmail.com>
+To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
+	leon@kernel.org, cai.huoqing@linux.dev, ssengar@linux.microsoft.com,
+	vkuznets@redhat.com, tglx@linutronix.de,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	schakrabarti@microsoft.com, paulros@microsoft.com
+Subject: Re: [PATCH V5 net-next] net: mana: Assigning IRQ affinity on HT cores
+Message-ID: <ZXiLetPnY5TlAQGY@yury-ThinkPad>
+References: <1702029754-6520-1-git-send-email-schakrabarti@linux.microsoft.com>
+ <ZXMiOwK3sOJNXHxd@yury-ThinkPad>
+ <20231211063726.GA4977@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <ZXcrHc5QGPTZtXKf@yury-ThinkPad>
+ <20231212113856.GA17123@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="+o7guYCYluYJGIdc"
-Content-Disposition: inline
-In-Reply-To: <5859da6629b8b6c100eca4062dd193105bf829ba.1702352117.git.daniel@makrotopia.org>
-
-
---+o7guYCYluYJGIdc
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20231212113856.GA17123@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 
-On Tue, Dec 12, 2023 at 03:48:10AM +0000, Daniel Golle wrote:
-> Several clocks as well as both sgmiisys phandles were added by mistake
-> to the Ethernet bindings for MT7988.
->=20
-> This happened because the vendor driver which served as a reference
-> uses a high number of syscon phandles to access various parts of the
-> SoC which wasn't acceptable upstream. Hence several parts which have
-> never previously been supported (such SerDes PHY and USXGMII PCS) have
-> been moved to separate drivers which also result in a much more sane
-> device tree.
->=20
-> Quickly align the bindings with the upcoming reality of the drivers
-> actually adding full support for this SoC.
->=20
-> Fixes: c94a9aabec36 ("dt-bindings: net: mediatek,net: add mt7988-eth bind=
-ing")
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > > > > +	rcu_read_lock();
+> > > > > +	for_each_numa_hop_mask(next, next_node) {
+> > > > > +		cpumask_andnot(curr, next, prev);
+> > > > > +		for (w = cpumask_weight(curr), cnt = 0; cnt < w; ) {
+> > > > > +			cpumask_copy(cpus, curr);
+> > > > > +			for_each_cpu(cpu, cpus) {
+> > > > > +				irq_set_affinity_and_hint(irqs[i], topology_sibling_cpumask(cpu));
+> > > > > +				if (++i == nvec)
+> > > > > +					goto done;
+> > > > 
+> > > > Think what if you're passed with irq_setup(NULL, 0, 0).
+> > > > That's why I suggested to place this check at the beginning.
+> > > > 
+> > > irq_setup() is a helper function for mana_gd_setup_irqs(), which already takes
+> > > care of no NULL pointer for irqs, and 0 number of interrupts can not be passed.
+> > > 
+> > > nvec = pci_alloc_irq_vectors(pdev, 2, max_irqs, PCI_IRQ_MSIX);
+> > > if (nvec < 0)
+> > > 	return nvec;
+> > 
+> > I know that. But still it's a bug. The common convention is that if a
+> > 0-length array is passed to a function, it should not dereference the
+> > pointer.
+> > 
+> I will add one if check in the begining of irq_setup() to verify the pointer
+> and the nvec number.
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
-
-Cheers,
-Conor.
-
---+o7guYCYluYJGIdc
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZXiKbwAKCRB4tDGHoIJi
-0i6mAP4xedv8lwi5+7mG3Qv7H3gtEeZ+DpqQpCRsutWbDn8KZwD7BsjQ2fZrh+hO
-LiWdVCZSG8Ibj8eKPbm5Qai3qluMGgA=
-=F1mi
------END PGP SIGNATURE-----
-
---+o7guYCYluYJGIdc--
+Yes you can, but what for? This is an error anyways, and you don't
+care about early return. So instead of adding and bearing extra logic,
+I'd just swap 2 lines of existing code.
 
