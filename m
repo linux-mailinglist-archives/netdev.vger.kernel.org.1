@@ -1,60 +1,58 @@
-Return-Path: <netdev+bounces-56484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E207880F11B
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 16:32:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECDA080F13E
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 16:38:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64E401F210A4
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 15:32:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FCF82816A6
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 15:38:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A17E76DAB;
-	Tue, 12 Dec 2023 15:32:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91F1876DC4;
+	Tue, 12 Dec 2023 15:38:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="43JsCCCD"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Yn07hkSg"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2041.outbound.protection.outlook.com [40.107.95.41])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46ED395
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 07:32:21 -0800 (PST)
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2070.outbound.protection.outlook.com [40.107.95.70])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 374B9E4
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 07:38:38 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RlrNrY16apWaywvdBmpIEhjq+7QfCD+eVuQf+PcXUX6EFseIRvk6AdUHK1MqOlkeH9WV2BvaeJ6HTOo4IfrxUzCWUrhhvTASAgqGX+YkKxHLL7GcnFjMf4TDAd5cnOPrtVwXCBsErNSvK5RbgfrBFTKBLZBQpQFO47bbCS2DjH6VKaj1qNMRxq28vWawL1W47L2IopZeXl6dsg81O3WEr/AQX2X/bKOPaA+5LRhik8y2xbFZnr7SGA3q83p8ATWFPUnqR/5WCQw/5kERsZV+SxjqsfSe+Xuhg4s12SPuYUc8RqzqTUCUIsHvkIAtenBLDS/TnExue3AA/DsV7fzkpg==
+ b=CPqNXfOAm6wAO2U9hj3fMasCGti1rqMdt1O9y3+NuOWWSkRfV4evXSj3MBMQLUDkqVTN6h6valW0aXGxWDRZurjQNJtnnnWHebk3Fak464DnMBt3CPLwpuoUMIZ+Y1Lf4qQbZ/xiKTqcepmmLYLzOsfQaPN7BNShphtQIUXaCL3d43/uqLGRWb6x82r5KAO2ZamajsbJpffXiyVE/wGQRvKXIBafmxpJqGq5YPEzr7DNfTRx7kHOXa6ekgfH1lyyS0/NABFRvacgtJJW61vhUCNXjF+T6QbfTr8tEAik/ZIUj6kjgLIMUwWqHDTjrVpEHxbLdjj4qVizfgvYuU7e2Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=meWXbYALqIzvSZMtt35dLAmdlyomf4Flu7WTDwSlNSE=;
- b=bH1kGmxUEAFVOJEI0Ra6Ru7GHNmiBq7gClewr+Wq/Kd0i6S/OSzIiXGvtKNUnbdmb84sB7p9y/k8iwKT9jFQDQucNx63DwD/AAhT8IM21xI8Vy9SDvvW8eU4tFLL1Zh8ftMmkhX8zLakyd2GUw/JA2JxDlsJDo7+K+O+ZljKybvSQXyLQbjEO+KcGKkGtOhpep2DuIRGxPAKhlMKNHbBGNXABgUzEPcUZTUk2F3BLKvNp1efhDLp1lsf8yrM0HmlUry7gih96X8eNCMo38e1D87zNx0e2/XN/Core52VQNFWxhDMx4gyEN+jdy4KBA/aFUyb1Mg8cEBt8BuJ0e9kkA==
+ bh=J68EffhYMY5sZLPjSe61jNsPfH2Aq/MvMhB8wtHwkY0=;
+ b=Fxak13o5LpzMS6cmi7sFo9b5wVozwZ1DIob3q/qM0bAWFguR2JLShIlG3cFpZQqOit4MR071EcIIh4gkiJL3vlqgTIDOELf88FyKudka8xDgJPTS88Bmz/BnXiPF3jBVlLm1n4wUB4wU0dVNA/b1EVaIhYm2DyIFUsN6ZFSJy5Y+s46pf4BvtUPYvodIW5lZISu/9Hq0zNaww+4P9OhuomJ9le6ZmNeIGNFSeol2C2tEbp9triH2E/n6S14oNJv89tkmXMz8iuAPo+uO4kU0BmUmHw4Ql2po4bWM7fLlyQ7/WG2BC9j8CPrikfWeO0PpF3BgV5kKGJngQIcxw2ydgA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=meWXbYALqIzvSZMtt35dLAmdlyomf4Flu7WTDwSlNSE=;
- b=43JsCCCD7T3NSDvHAUhfBZPr0pQq+XQKYgYXVc5hMbpSCXYiabNJtngGEiSPyP2ACD6+ff+/D/IATO0qrX7cXBfvWivQeG+xC+dBjGntQi5MBvf++uFl0g22fHgp/kry6CkVk/pYo49gH4j9JsVQxR6KBf6HXI2Rulwgj3quW8Q=
+ bh=J68EffhYMY5sZLPjSe61jNsPfH2Aq/MvMhB8wtHwkY0=;
+ b=Yn07hkSgPoswfPH8bnkN5DhToBIqfn9O/cpjtnLC9n0ftomeoIVUuw0r1ulneEqcmxrAP3Fc0frfV0ieCupyzgwQXcqBVBejIZr4UXopVRtG+xzkFrSC8Jzp1jRanv7R4lFDPSr3lL0thgVDjytg8SMi3zOj5/IajBWsAXBVsc4=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
- by IA1PR12MB8358.namprd12.prod.outlook.com (2603:10b6:208:3fa::17) with
+ by PH7PR12MB7260.namprd12.prod.outlook.com (2603:10b6:510:208::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.26; Tue, 12 Dec
- 2023 15:32:17 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.33; Tue, 12 Dec
+ 2023 15:38:33 +0000
 Received: from BL1PR12MB5732.namprd12.prod.outlook.com
  ([fe80::1d68:1eb8:d7dc:4b43]) by BL1PR12MB5732.namprd12.prod.outlook.com
  ([fe80::1d68:1eb8:d7dc:4b43%6]) with mapi id 15.20.7068.033; Tue, 12 Dec 2023
- 15:32:17 +0000
-Message-ID: <3067eb09-7277-4fb2-8c79-dcb2d500e15b@amd.com>
-Date: Tue, 12 Dec 2023 09:32:15 -0600
+ 15:38:33 +0000
+Message-ID: <68c52e74-dd8d-4211-bdb9-9541b41c6900@amd.com>
+Date: Tue, 12 Dec 2023 09:38:31 -0600
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 net-next 2/3] amd-xgbe: add support for Crater ethernet
- device
+Subject: Re: [PATCH v3 net-next 3/3] amd-xgbe: use smn functions to avoid race
 Content-Language: en-US
 To: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, Shyam-sundar.S-k@amd.com,
- Sudheesh Mavila <sudheesh.mavila@amd.com>
+ pabeni@redhat.com, Shyam-sundar.S-k@amd.com
 References: <20231212053723.443772-1-Raju.Rangoju@amd.com>
- <20231212053723.443772-3-Raju.Rangoju@amd.com>
+ <20231212053723.443772-4-Raju.Rangoju@amd.com>
 From: Tom Lendacky <thomas.lendacky@amd.com>
 Autocrypt: addr=thomas.lendacky@amd.com; keydata=
  xsFNBFaNZYkBEADxg5OW/ajpUG7zgnUQPsMqWPjeAxtu4YH3lCUjWWcbUgc2qDGAijsLTFv1
@@ -100,11 +98,11 @@ Autocrypt: addr=thomas.lendacky@amd.com; keydata=
  6irTe/qtb/1CMFFtcqDorjI3hkc10N0jzPOsjS8bhpwKeUwGsgvXWGEqwlEDs2rswfAU/tGZ
  7L30CgQ9itbxnlaOz1LkKOTuuxx4A+MDMCHbUMAAP9Eoh/L1ZU0z71xDyJ53WPBd9Izfr9wJ
  1NhFSLKvfA==
-In-Reply-To: <20231212053723.443772-3-Raju.Rangoju@amd.com>
+In-Reply-To: <20231212053723.443772-4-Raju.Rangoju@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN1PR12CA0091.namprd12.prod.outlook.com
- (2603:10b6:802:21::26) To BL1PR12MB5732.namprd12.prod.outlook.com
+X-ClientProxiedBy: DS7PR06CA0009.namprd06.prod.outlook.com
+ (2603:10b6:8:2a::28) To BL1PR12MB5732.namprd12.prod.outlook.com
  (2603:10b6:208:387::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -113,335 +111,262 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|IA1PR12MB8358:EE_
-X-MS-Office365-Filtering-Correlation-Id: d62fef83-578b-4256-4531-08dbfb278627
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|PH7PR12MB7260:EE_
+X-MS-Office365-Filtering-Correlation-Id: 867d8bbd-2b66-4941-bd51-08dbfb286649
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	MxDLdPJ8iXNRzhiEkVWhJTNWvqRY9JBeA3mTNp7t8zg4fX9gMzKEAp7LbbFwHTBjK671BVCF1/xFrSdjh00wTJ8M7RBNgq00iWh+tX/43nKUtJBklAQ+vWC324d7+WUkw10L2kJo0uEMtRsGiUUhxqp1dKe2FTw5qJziDynEJkbqJsmTsOcc9wfS4f39mNBPXl6I8JCcD/X2sE7XhTMT7MGDN5BNflazlc4qhTpN1EPyg11kus7qY5u7GgHmwHSxoqOtoQ318m7ZOu6lntLYLXvNWNo2tL2DgOLSA5cueifQBUQR8OaYlDUdFIooyLvP4XmyIZ2vS84o1Q/V945gtrjZUxVvMITjUSheVdVivOuhYB+/eAJtReIDur2nvvWRMrrxWE/U4Sad2L1762gZsJn7ijxrU7GI+jHlqLGLuUUeGtjulIa8B3FatW40bLnphmmVF87mDIeep5P9mYP/AXra9Blvoc+vC5gQw8sXcVOW4ngYscIQXY5dggq1mJSvdf8rhh3jJGopiAvUkGyOMnFaOtb5ktxi/zutoEX9JlZuNC5Um01uhIwvlLWChGKr+wGvh0SEYOyv1nDKZOyrgJu+YsQ5XF8/C494iwIMpuLgyZF95ol55Pazx7KJ8pjYUG0w2BnEtdzRNiFNyclvIA==
+	ccRqS1EzA680u40vKVKeXmP+KcrRIXsjUtzJOrtjUGitpTrN0g5v1i4aJaQeKBL//Gw9usE4I+kXgq0HPk9CDcfUS+Gr0HvfF4CHhUDBhAVEzq0CKAUcOZPCP/mJnQi6yIvQrLpMh+5dlkxH7IQwJogRpzi+GiD1QTUiReO0E7GioZF6W4sgemIz7CZJylssWSrCCwbV89qGlNZ2e6O+cC6wjjYzXoPYlpMgeAsEG2ruxxwnOwALQV85CWNvP/iBbdjt+V1haJL26koZkXZsaO5p+4kbEfmZ9dkvgJ8T3sAwTT43LtOYb+JubEF3xo+onVtfrF6G+Zq7PHv2A4c3NeY/+xXw32FNOJ8N8BiLoDIqoXBdvTGP8XRhsNg6rbT4IH0r2GiO8yZjIsvPQugYiGoYQX31wtLZSNbiS+G2/aHXzJZY/4QNPCfWPXoa1MnCkKhDmwZFW9KfQSMG3qfmK+wiYfRLfKEoDvNic/v2OOiTt2J1KygapGZRXxVw3CsVyfuKgfUvcVTdYzeg/141FUkJXelyguDXGFRqiSMMfhtxi6kEt2epMOtMR717sqMopCN4YgwpskosvCqtlESVrfMLFU4i60UblkOoihrDOyoAcMT5dJND7amB7PiTRc9MQvzwdKnT+yQhP/oaABX6Hw==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(136003)(346002)(39860400002)(396003)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(8936002)(4326008)(8676002)(2906002)(31686004)(316002)(5660300002)(66476007)(66556008)(66946007)(478600001)(6486002)(26005)(36756003)(6506007)(6512007)(53546011)(41300700001)(2616005)(83380400001)(86362001)(31696002)(38100700002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(376002)(396003)(39860400002)(136003)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(83380400001)(6512007)(38100700002)(26005)(2616005)(4326008)(8936002)(8676002)(316002)(5660300002)(2906002)(6486002)(478600001)(53546011)(41300700001)(66476007)(66556008)(66946007)(6506007)(36756003)(31696002)(86362001)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RU9TMEd6cjFvU2puVWh2MWpUZUxXSWMvT1hnMWNSVkVSM2sySDh6U24vL0ty?=
- =?utf-8?B?aFpZWlVoSE1mN3lMSHgwYnBIb21OS21ZUFQvZ2JiQWNFR0dqWm0xL2FxUDRN?=
- =?utf-8?B?L2ZzdTRoa0p0UXVOa1VYOFFBSjZtaXc1TFJPOUJJSlVVeHdKNnIzeEpJTENL?=
- =?utf-8?B?THp5OGo1TW1zS2hDYklIYzhNaEdQZEtIeXpWR1A1eFhBZks4bGwzUmFuaTho?=
- =?utf-8?B?TGx5Zi9EdTVLdlcvVTVYZzVtRTJiV1d0bUFWSzB1Z2I3YjBLOGowd04zOGxm?=
- =?utf-8?B?cWwxd2YrclV5OSsyYjBqRjA5QTQ2d1NLVlhWd3hVOVNYelpUVWpUWkkvWVY4?=
- =?utf-8?B?amYrelZTZHRPSmRrSHBiazZBT29KTkZoaVQvZmJoYjRUZS9RVS96TmlGYmRK?=
- =?utf-8?B?bzJSQXI3ZFo1MDZyOFZWNkhsdlFmYkpKcDF2N0Z1eDNrcmljNndZR0ZJNDhZ?=
- =?utf-8?B?SnB1NjByQmV2dXJtWnc4TnFGT3Ixbk5IYXFuR0JpRDBoL2lYKzZuUVlzZDZj?=
- =?utf-8?B?Y1l4NUgvcUZWTlVYY0V2U2VsNTMzQzd3NFJ2dnlNU1c1SnFqdnNvWHduM0p4?=
- =?utf-8?B?Y1R4UmMrU1ZsQkdJQXRSZjBzYThCaHR0TkZoQ2ZBbDlRajZCQU1nMTRyUGYx?=
- =?utf-8?B?cS9nTDFUTjNyOGROaXJwR1VZSVhYQ0w4cnBjVWtnRkZ5WEpVMXJ0cm1NS29V?=
- =?utf-8?B?L3NDcEJEQU52SmkxaExyRU1QeHNsL3lIMjl0YVlRMmRmbkI0MlA0Z2dsNjNy?=
- =?utf-8?B?QkVicC9sSjJOMjVaMlI1ZkpUb08xYWt1WE82Q0VHYUg2UjBkTHE2dlVaZFNW?=
- =?utf-8?B?bFJBVmMwYVVKZG5zQXI3WnBUZ3pyZEwzNVVIaklHanM0TlExczlsRE56T1Bx?=
- =?utf-8?B?NzVUZzB1QW9GWHFjME5HWGY5NTMvbmRrdVIweEg2Tk8xWEhpSWEyb1E2RzVh?=
- =?utf-8?B?Tk9oWWpOeUREVFhkNUhacEozdGd5T2x6UjlLYlBwMkZUcG4rdEk1S1gyaEhE?=
- =?utf-8?B?U0svMENmZXZGdndsRTQ2aWdaTi9iVEJBc25CYktKbzlrYndNSFMxWGpYYWxI?=
- =?utf-8?B?NU5jT1lYUEY2MXdXWGRqL3ZibVI0Ni85dlFZcmhleWN0eVhqZHRvT3F5eEU3?=
- =?utf-8?B?ZFdDSVF4Qnd2T1JoYXY3ZGhDb2FFemtDaDRla0xRUW8ybzg2MlY5RTdORjlS?=
- =?utf-8?B?aTdWanJuWnJzMTkzU0dqS0RQNnkyQWgwWHFBL3c5N0x3cnFmQ1pvTzdlaGM2?=
- =?utf-8?B?VEozSHFrUnREKzhIYkk1YU4zNTQrN2xqcndzUlAva0hQL2RWdXhWV1o2U0Fv?=
- =?utf-8?B?d2FKalJqOGM4ZWNvdnY2enJDZ244QUpFdytYNFV2U3Z0U3padnZscUV5WFVZ?=
- =?utf-8?B?Nkx1VXE5MkJOaXF0NzVoM1BqYW9yMXkxdXQ1eTJPNURFOWJXK2NUUlhqdzFE?=
- =?utf-8?B?cWxTbGx1VTBmUWIzbnZ4Qnl1WWM4UUZEVlhWZlNmYk5jWlcrOGVmc09KMW9h?=
- =?utf-8?B?cE50eWdiMFpnNHRaTzZpS1YwMU5yQjA2ZDI2c2NTcFFHVCt1blkzUzAwaEpZ?=
- =?utf-8?B?VGRpanpRK1lmQ29OQytVSi95Y201MXprNnRrNWlXaVdhUzR1R0ZjYTNCeFVz?=
- =?utf-8?B?SHh5RFc4YUxyVmVGMTQycVYyWXJYVWhQRGFaelVUTzkyL1dUMFdrYTYwUVpR?=
- =?utf-8?B?VDNRSVdRdG5LSW1QOHo1bWhyMkgzMVNxa1kvQUhSaklQaE8vY2VVcEJQRjRD?=
- =?utf-8?B?NzlyS3JrUHlpWXhDcDBLb05VWkhzaDVPVzZBRmsxaHB5UUNPVXNibVF4TnpQ?=
- =?utf-8?B?Sno1VmlyY0NXRExVREtUUDRablpQako1cERYN3ZSZ1ZkSG5Hd2tFeVVqV3RH?=
- =?utf-8?B?ZGwvaUpEZFRsSmY0YWJUSWQ5T2tyUSs5T3hzOUxNY2RDd3VXdFhkYWtxbUlt?=
- =?utf-8?B?dFp1U29rSENHWkZQNDlFaGdIK056YjZLVWw1UlNCSDAzQWhsNW9HR3NIV3d2?=
- =?utf-8?B?RWJwN3Y2bmZCN2RCejJIUGphd1pRYVdweXVnN3dJKy9HYVZOcnY2TEJ6U1ZG?=
- =?utf-8?B?QnpkQ0FwQmFkN1FJTndPZkIwYXlMdXFKelVjazhsSEJMTVRTa2hUQlErREJS?=
- =?utf-8?Q?nQZlbc27QSCzYMkDd9Ho+qwQl?=
+	=?utf-8?B?bjJHeEJBVis2b1I5dHVqNzJreXpqVUlUMzNCMFJmc205dnA1NENCeWpLRVBo?=
+ =?utf-8?B?S1JWNUVnWG9MeWFuZHF1VU9rWnZ6NTZ0S0dESzYwK1ZleU9NWU9rMUExVjhV?=
+ =?utf-8?B?RUU5cHB3N25iR0x3RjlLcHA0WUhUTmFtOXlkNEhDZ2MrQVRybXRSVzNuNmhF?=
+ =?utf-8?B?a0JPTWpYUXJLMldFU1JFQkRNYldmMGtMMUNZQ2VBMGFqKzBXWlkxT1lPMThH?=
+ =?utf-8?B?cGFMOFZuUmhndXQxb2JwWVFNZHg0bEpYcHRhUUxrU3A0emt5Y1lNZS9nNmFq?=
+ =?utf-8?B?MFpiZUtLMHZrOEJ3SnFpNWtabjhPVFdRZmtjTzl6KzV5VytBVmtYeTQ2RGFy?=
+ =?utf-8?B?NTdBOXZ0Q1Z0MGtNTHIwV1pjZElXRDJqUTFQY3dlQVZHUUNJV0MvUkxuRCto?=
+ =?utf-8?B?ejNlRVNUbXh3c3IwbDFxajZIRDZWQi9xRUdHcjlDMkJlRUtFVGtORkVNUy9x?=
+ =?utf-8?B?TExSVHdteUFXZWJwZ2NwVm94eXBPVXhWQjU0M3RLNmJEV3NPb3BhK2xGSFdG?=
+ =?utf-8?B?Y1Qvd1IxTjZ0TWFWU1kwUVNoMnJpb3UxTUFmUk00YjcvcXFVeWRNUHJISVRa?=
+ =?utf-8?B?SWxiWmk1SFg1a2drMld2WXQ5U1JLTDVmTzl5U2E2a05GNkZ5a250S2V6aklw?=
+ =?utf-8?B?blkzNitpUnZ3MlNYOUtOK1Z4RFBxNzJqVExhVEpsR2p5S05zZ0NsVHZVTUJI?=
+ =?utf-8?B?SjR3OHZ6UVA1SWI5OFZjMGlaQWZzZG5GNG1TYUJjRkphNXJYbVZaL1pHY1Nr?=
+ =?utf-8?B?aHNvY0R3STJPdXZjWkRHM1FMM3Y3RWlDb0pYSGhqVUIvU2gvZnJHUUFxWEIr?=
+ =?utf-8?B?UWdKV3N2NENWR1ZsNkcrbGZZUmRzYkJqRE5IQll4cE1XK29VRUhlUDhoUjNi?=
+ =?utf-8?B?aG1tNjFWTVo2U05hYVN5ZnFKa0xYcGJ5eW11U21RRVJCYStVbnhIUFRkbnpj?=
+ =?utf-8?B?Z2VTVGZWTlFzeEdqejR2Z1hEcFRKdkNrQ04zcGwySnlkMmR1UVNpTStDbUkx?=
+ =?utf-8?B?VmhEeWtNRUNmbnE1UnJrNUpOYXNsUDRHeUJGdUFSdHgrK1dDRUZzODVwemE2?=
+ =?utf-8?B?OXFMTDBoNzdPNGdxbk13SjVuV0pkS0p5NW9YSk9jNmxLbEVYcnVqUG8xOEtr?=
+ =?utf-8?B?Y0p1MFc4WWpsWENiM3FuMkR6Y3lOK1I3cVZKY1pYMklTYWV5M01FaDFSMjFF?=
+ =?utf-8?B?TERNbHRxNkI1YzFoOUJrWUZUVlBEV1d0aC9VRG5CaXlaVXNObzZHWTNNUWd1?=
+ =?utf-8?B?aWxYekxaUkZ3WHhFc1Y1MWhCcndJc2xYckRWdDhSNHhMeFhtS3M4dTNtM2VE?=
+ =?utf-8?B?b3p0QUJ4bUR2V1orQzNTVnBOdStTQmpBTnlmelliUEtpZTdHRWlOS2RYSE80?=
+ =?utf-8?B?c1B2TVVwZHFoYW1TbUdQZ0hGa25MOEF2YXV4M09zNlVFZ3JKbHVLS0QyMjB6?=
+ =?utf-8?B?dkM3M2xtZFhqc3pPWC91aXphZDVDWkJ3SnVKcy9jWm00MjF2aHYzMjRncnZE?=
+ =?utf-8?B?RDh2NVlGTmY0WmU5S2NwYzdWMEgyN3NwTFAvYWVvMUZsVHkwKzRIc3NzZE1o?=
+ =?utf-8?B?NGhXK1FmYklYQUV4a2tWTytxQlR6WTFLNFVKK1d2c3NVYmtWd2JvbExGZXBI?=
+ =?utf-8?B?RkRxb1MzaHcvT1Y1dkRPYXdKR2lCbkNNakFJbGZPcHZUcU9CanlPaGVET1FN?=
+ =?utf-8?B?U21kNGNpSEZKNFk3cWJncmlWcWlaMENwbEFRWkRJN1NzeG1KL1I1c205a2pw?=
+ =?utf-8?B?Tzl4eVFaeFNJQ1JRZDBiOVp5RlVadmdNeWtvRTh0V0dlcktPUS9zYlZuelA2?=
+ =?utf-8?B?N1dqNDVCekpuQmdTQXdzQWFYbE11NEpOalJXTFpwYUUrc1JsTStCVUFTcEtV?=
+ =?utf-8?B?UEd6cjFEODUyUjlNZ2p3Qy9uMHIwWUszLzVzQTJ6a2YyZmt1YlY5aFhGTG52?=
+ =?utf-8?B?M0Z4bmJvRmlUTmVZM25zOUZOUDlCQkVVVGhHZXNNcExNWUk5Z0w1SHIyRUh3?=
+ =?utf-8?B?c0RQSlR1ZjB0N1YvMTR4WFlVbjVKQW53djVxMENyYlA1T2FkQWtoMURNQnYr?=
+ =?utf-8?B?UXRWRGxTTE8rMlVhQkdUY0RTSzNSc0lZTWNldzMzaWF0K1oxRzZCSmRQOFpJ?=
+ =?utf-8?Q?0jMweGGDl7Kn/kuehzLoEG17Y?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d62fef83-578b-4256-4531-08dbfb278627
+X-MS-Exchange-CrossTenant-Network-Message-Id: 867d8bbd-2b66-4941-bd51-08dbfb286649
 X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2023 15:32:17.7394
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2023 15:38:33.7694
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: D1CdIeEBk9YIolBkbU61KXnu0C2SCTJYr182Amvim4sV/hwcctlUpWtG5QU7DlYO9GZpa3Rn/CyDxfbE5w6GKg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8358
+X-MS-Exchange-CrossTenant-UserPrincipalName: TNJKWiOumMJgVVxWbzUE8SBB7sQoSNOU/4zZGHAOU4EflYakBPV+VB+NDRYtQuV7aQs8sPH69pH+NdziE4/u+w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7260
 
 On 12/11/23 23:37, Raju Rangoju wrote:
-> Add the necessary support to enable Crater ethernet device. Since the
-> BAR1 address cannot be used to access the XPCS registers on Crater, use
-> the pci_{read/write}_config_dword calls. Also, include the new pci device
-> id 0x1641 to register Crater device with PCIe.
+> Some of the ethernet add-in-cards have dual PHY but share a single MDIO
+> line (between the ports). In such cases, link inconsistencies are
+> noticed during the heavy traffic and during reboot stress tests.
 > 
-> Co-developed-by: Sudheesh Mavila <sudheesh.mavila@amd.com>
-> Signed-off-by: Sudheesh Mavila <sudheesh.mavila@amd.com>
+> So, use the SMN calls to avoid the race conditions.
+
+So this patch replaces all the PCI accesses you added in patch #2, so why 
+not just do this from the start?
+
+> 
 > Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
 > ---
->   drivers/net/ethernet/amd/xgbe/xgbe-common.h |  5 ++
->   drivers/net/ethernet/amd/xgbe/xgbe-dev.c    | 93 +++++++++++++++++++++
->   drivers/net/ethernet/amd/xgbe/xgbe-pci.c    | 35 +++++++-
->   drivers/net/ethernet/amd/xgbe/xgbe.h        |  6 ++
->   4 files changed, 137 insertions(+), 2 deletions(-)
+>   drivers/net/ethernet/amd/xgbe/xgbe-dev.c | 33 ++++++------------------
+>   drivers/net/ethernet/amd/xgbe/xgbe-pci.c | 10 +++----
+>   drivers/net/ethernet/amd/xgbe/xgbe-smn.h | 27 +++++++++++++++++++
+>   drivers/net/ethernet/amd/xgbe/xgbe.h     |  2 +-
+>   4 files changed, 41 insertions(+), 31 deletions(-)
+>   create mode 100644 drivers/net/ethernet/amd/xgbe/xgbe-smn.h
 > 
-> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-common.h b/drivers/net/ethernet/amd/xgbe/xgbe-common.h
-> index 3b70f6737633..e1f70f0528ef 100644
-> --- a/drivers/net/ethernet/amd/xgbe/xgbe-common.h
-> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-common.h
-> @@ -900,6 +900,11 @@
->   #define PCS_V2_RV_WINDOW_SELECT		0x1064
->   #define PCS_V2_YC_WINDOW_DEF		0x18060
->   #define PCS_V2_YC_WINDOW_SELECT		0x18064
-> +#define PCS_V2_RN_WINDOW_DEF		0xF8078
-> +#define PCS_V2_RN_WINDOW_SELECT		0xF807c
-
-Should this be PCS_V3_ (here and below) ??
-
-> +
-> +#define PCS_RN_SMN_BASE_ADDR		0x11E00000
-> +#define PCS_RN_PORT_ADDR_SIZE		0x100000
-
-All hex characters should be consistent and in lower case.
-
->   
->   /* PCS register entry bit positions and sizes */
->   #define PCS_V2_WINDOW_DEF_OFFSET_INDEX	6
 > diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-> index 6cd003c24a64..a9eb2ffa9f73 100644
+> index a9eb2ffa9f73..8d8876ab258c 100644
 > --- a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
 > +++ b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-> @@ -120,6 +120,7 @@
->   #include <linux/bitrev.h>
->   #include <linux/crc32.h>
->   #include <linux/crc32poly.h>
-> +#include <linux/pci.h>
+> @@ -124,6 +124,7 @@
 >   
 >   #include "xgbe.h"
 >   #include "xgbe-common.h"
-> @@ -1165,6 +1166,92 @@ static unsigned int get_index_offset(struct xgbe_prv_data *pdata, unsigned int m
->   	return pdata->xpcs_window + (mmd_address & pdata->xpcs_window_mask);
->   }
+> +#include "xgbe-smn.h"
 >   
-> +static int xgbe_read_mmd_regs_v3(struct xgbe_prv_data *pdata, int prtad,
-> +				 int mmd_reg)
-> +{
-> +	unsigned int mmd_address, index, offset;
-> +	struct pci_dev *rdev;
-> +	unsigned long flags;
-> +	int mmd_data;
-> +
-> +	rdev = pci_get_domain_bus_and_slot(0, 0, PCI_DEVFN(0, 0));
-> +	if (!rdev)
-> +		return 0;
-> +
-> +	mmd_address = get_mmd_address(pdata, mmd_reg);
-> +
-> +	/* The PCS registers are accessed using mmio. The underlying
-> +	 * management interface uses indirect addressing to access the MMD
-> +	 * register sets. This requires accessing of the PCS register in two
-> +	 * phases, an address phase and a data phase.
-> +	 *
-> +	 * The mmio interface is based on 16-bit offsets and values. All
-> +	 * register offsets must therefore be adjusted by left shifting the
-> +	 * offset 1 bit and reading 16 bits of data.
-> +	 */
-> +	offset = get_index_offset(pdata, mmd_address, &index);
-> +
-> +	spin_lock_irqsave(&pdata->xpcs_lock, flags);
-> +	pci_write_config_dword(rdev, 0x60, (pdata->xphy_base + pdata->xpcs_window_sel_reg));
-> +	pci_write_config_dword(rdev, 0x64, index);
-> +	pci_write_config_dword(rdev, 0x60, pdata->xphy_base + offset);
-> +	pci_read_config_dword(rdev, 0x64, &mmd_data);
-> +	mmd_data = (offset % 4) ? FIELD_GET(XGBE_GEN_HI_MASK, mmd_data) :
-> +				  FIELD_GET(XGBE_GEN_LO_MASK, mmd_data);
-> +	pci_dev_put(rdev);
-> +
-> +	spin_unlock_irqrestore(&pdata->xpcs_lock, flags);
-> +
-> +	return mmd_data;
-> +}
-> +
-> +static void xgbe_write_mmd_regs_v3(struct xgbe_prv_data *pdata, int prtad,
-> +				   int mmd_reg, int mmd_data)
-> +{
-> +	unsigned int mmd_address, index, offset, ctr_mmd_data;
-> +	struct pci_dev *rdev;
-> +	unsigned long flags;
-> +
-> +	rdev = pci_get_domain_bus_and_slot(0, 0, PCI_DEVFN(0, 0));
-> +	if (!rdev)
-> +		return;
-> +
-> +	mmd_address = get_mmd_address(pdata, mmd_reg);
-> +
-> +	/* The PCS registers are accessed using mmio. The underlying
-> +	 * management interface uses indirect addressing to access the MMD
-> +	 * register sets. This requires accessing of the PCS register in two
-> +	 * phases, an address phase and a data phase.
-> +	 *
-> +	 * The mmio interface is based on 16-bit offsets and values. All
-> +	 * register offsets must therefore be adjusted by left shifting the
-> +	 * offset 1 bit and writing 16 bits of data.
-> +	 */
-> +	offset = get_index_offset(pdata, mmd_address, &index);
-> +
-> +	spin_lock_irqsave(&pdata->xpcs_lock, flags);
-> +	pci_write_config_dword(rdev, 0x60, (pdata->xphy_base + pdata->xpcs_window_sel_reg));
-> +	pci_write_config_dword(rdev, 0x64, index);
-> +	pci_write_config_dword(rdev, 0x60, pdata->xphy_base + offset);
-> +	pci_read_config_dword(rdev, 0x64, &ctr_mmd_data);
-> +	if (offset % 4) {
-> +		ctr_mmd_data = FIELD_PREP(XGBE_GEN_HI_MASK, mmd_data) |
-> +			       FIELD_GET(XGBE_GEN_LO_MASK, ctr_mmd_data);
-> +	} else {
-> +		ctr_mmd_data = FIELD_PREP(XGBE_GEN_HI_MASK,
-> +					  FIELD_GET(XGBE_GEN_HI_MASK, ctr_mmd_data)) |
-> +			       FIELD_GET(XGBE_GEN_LO_MASK, mmd_data);
-> +	}
-
-Braces aren't necessary.
-
-Also, just curious, what is the "ctr" prefix meant to imply here?
-
-
-> +
-> +	pci_write_config_dword(rdev, 0x60, (pdata->xphy_base + pdata->xpcs_window_sel_reg));
-> +	pci_write_config_dword(rdev, 0x64, index);
-> +	pci_write_config_dword(rdev, 0x60, (pdata->xphy_base + offset));
-> +	pci_write_config_dword(rdev, 0x64, ctr_mmd_data);
-> +	pci_dev_put(rdev);
-> +
-> +	spin_unlock_irqrestore(&pdata->xpcs_lock, flags);
-> +}
-> +
->   static int xgbe_read_mmd_regs_v2(struct xgbe_prv_data *pdata, int prtad,
+>   static inline unsigned int xgbe_get_max_frame(struct xgbe_prv_data *pdata)
+>   {
+> @@ -1170,14 +1171,9 @@ static int xgbe_read_mmd_regs_v3(struct xgbe_prv_data *pdata, int prtad,
 >   				 int mmd_reg)
 >   {
-> @@ -1274,6 +1361,9 @@ static int xgbe_read_mmd_regs(struct xgbe_prv_data *pdata, int prtad,
->   	case XGBE_XPCS_ACCESS_V1:
->   		return xgbe_read_mmd_regs_v1(pdata, prtad, mmd_reg);
+>   	unsigned int mmd_address, index, offset;
+> -	struct pci_dev *rdev;
+>   	unsigned long flags;
+>   	int mmd_data;
 >   
-> +	case XGBE_XPCS_ACCESS_V3:
-> +		return xgbe_read_mmd_regs_v3(pdata, prtad, mmd_reg);
-> +
->   	case XGBE_XPCS_ACCESS_V2:
->   	default:
->   		return xgbe_read_mmd_regs_v2(pdata, prtad, mmd_reg);
-> @@ -1287,6 +1377,9 @@ static void xgbe_write_mmd_regs(struct xgbe_prv_data *pdata, int prtad,
->   	case XGBE_XPCS_ACCESS_V1:
->   		return xgbe_write_mmd_regs_v1(pdata, prtad, mmd_reg, mmd_data);
+> -	rdev = pci_get_domain_bus_and_slot(0, 0, PCI_DEVFN(0, 0));
+> -	if (!rdev)
+> -		return 0;
+> -
+>   	mmd_address = get_mmd_address(pdata, mmd_reg);
 >   
-> +	case XGBE_XPCS_ACCESS_V3:
-> +		return xgbe_write_mmd_regs_v3(pdata, prtad, mmd_reg, mmd_data);
+>   	/* The PCS registers are accessed using mmio. The underlying
+> @@ -1192,13 +1188,10 @@ static int xgbe_read_mmd_regs_v3(struct xgbe_prv_data *pdata, int prtad,
+>   	offset = get_index_offset(pdata, mmd_address, &index);
+>   
+>   	spin_lock_irqsave(&pdata->xpcs_lock, flags);
+> -	pci_write_config_dword(rdev, 0x60, (pdata->xphy_base + pdata->xpcs_window_sel_reg));
+> -	pci_write_config_dword(rdev, 0x64, index);
+> -	pci_write_config_dword(rdev, 0x60, pdata->xphy_base + offset);
+> -	pci_read_config_dword(rdev, 0x64, &mmd_data);
+> +	amd_smn_write(0, (pdata->smn_base + pdata->xpcs_window_sel_reg), index);
+> +	amd_smn_read(0, pdata->smn_base + offset, &mmd_data);
+>   	mmd_data = (offset % 4) ? FIELD_GET(XGBE_GEN_HI_MASK, mmd_data) :
+>   				  FIELD_GET(XGBE_GEN_LO_MASK, mmd_data);
+> -	pci_dev_put(rdev);
+>   
+>   	spin_unlock_irqrestore(&pdata->xpcs_lock, flags);
+>   
+> @@ -1209,13 +1202,8 @@ static void xgbe_write_mmd_regs_v3(struct xgbe_prv_data *pdata, int prtad,
+>   				   int mmd_reg, int mmd_data)
+>   {
+>   	unsigned int mmd_address, index, offset, ctr_mmd_data;
+> -	struct pci_dev *rdev;
+>   	unsigned long flags;
+>   
+> -	rdev = pci_get_domain_bus_and_slot(0, 0, PCI_DEVFN(0, 0));
+> -	if (!rdev)
+> -		return;
+> -
+>   	mmd_address = get_mmd_address(pdata, mmd_reg);
+>   
+>   	/* The PCS registers are accessed using mmio. The underlying
+> @@ -1230,10 +1218,9 @@ static void xgbe_write_mmd_regs_v3(struct xgbe_prv_data *pdata, int prtad,
+>   	offset = get_index_offset(pdata, mmd_address, &index);
+>   
+>   	spin_lock_irqsave(&pdata->xpcs_lock, flags);
+> -	pci_write_config_dword(rdev, 0x60, (pdata->xphy_base + pdata->xpcs_window_sel_reg));
+> -	pci_write_config_dword(rdev, 0x64, index);
+> -	pci_write_config_dword(rdev, 0x60, pdata->xphy_base + offset);
+> -	pci_read_config_dword(rdev, 0x64, &ctr_mmd_data);
+> +	amd_smn_write(0, (pdata->smn_base + pdata->xpcs_window_sel_reg), index);
+> +	amd_smn_read(0, pdata->smn_base + offset, &ctr_mmd_data);
 > +
->   	case XGBE_XPCS_ACCESS_V2:
->   	default:
->   		return xgbe_write_mmd_regs_v2(pdata, prtad, mmd_reg, mmd_data);
+>   	if (offset % 4) {
+>   		ctr_mmd_data = FIELD_PREP(XGBE_GEN_HI_MASK, mmd_data) |
+>   			       FIELD_GET(XGBE_GEN_LO_MASK, ctr_mmd_data);
+> @@ -1243,12 +1230,8 @@ static void xgbe_write_mmd_regs_v3(struct xgbe_prv_data *pdata, int prtad,
+>   			       FIELD_GET(XGBE_GEN_LO_MASK, mmd_data);
+>   	}
+>   
+> -	pci_write_config_dword(rdev, 0x60, (pdata->xphy_base + pdata->xpcs_window_sel_reg));
+> -	pci_write_config_dword(rdev, 0x64, index);
+> -	pci_write_config_dword(rdev, 0x60, (pdata->xphy_base + offset));
+> -	pci_write_config_dword(rdev, 0x64, ctr_mmd_data);
+> -	pci_dev_put(rdev);
+> -
+> +	amd_smn_write(0, (pdata->smn_base + pdata->xpcs_window_sel_reg), index);
+> +	amd_smn_write(0, (pdata->smn_base + offset), ctr_mmd_data);
+>   	spin_unlock_irqrestore(&pdata->xpcs_lock, flags);
+>   }
+>   
 > diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-pci.c b/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
-> index 8b0c1e450b7e..db3e8aac3339 100644
+> index db3e8aac3339..135128b5be90 100644
 > --- a/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
 > +++ b/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
-> @@ -295,15 +295,28 @@ static int xgbe_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->   		/* Yellow Carp devices do not need rrc */
->   		pdata->vdata->enable_rrc = 0;
+> @@ -121,6 +121,7 @@
+>   
+>   #include "xgbe.h"
+>   #include "xgbe-common.h"
+> +#include "xgbe-smn.h"
+>   
+>   static int xgbe_config_multi_msi(struct xgbe_prv_data *pdata)
+>   {
+> @@ -304,18 +305,17 @@ static int xgbe_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>   		pdata->xpcs_window_sel_reg = PCS_V2_WINDOW_SELECT;
 >   		break;
-> +	case 0x1630:
+>   	}
+> +	pci_dev_put(rdev);
+>   
+>   	/* Configure the PCS indirect addressing support */
+>   	if (pdata->vdata->xpcs_access == XGBE_XPCS_ACCESS_V3) {
+>   		reg = XP_IOREAD(pdata, XP_PROP_0);
+> -		pdata->xphy_base = PCS_RN_SMN_BASE_ADDR +
+> -				   (PCS_RN_PORT_ADDR_SIZE * XP_GET_BITS(reg, XP_PROP_0, PORT_ID));
+> -		pci_write_config_dword(rdev, 0x60, pdata->xphy_base + (pdata->xpcs_window_def_reg));
+> -		pci_read_config_dword(rdev, 0x64, &reg);
+> +		pdata->smn_base = PCS_RN_SMN_BASE_ADDR +
+> +				  (PCS_RN_PORT_ADDR_SIZE * XP_GET_BITS(reg, XP_PROP_0, PORT_ID));
+> +		amd_smn_read(0, pdata->smn_base + (pdata->xpcs_window_def_reg), &reg);
+>   	} else {
+>   		reg = XPCS32_IOREAD(pdata, pdata->xpcs_window_def_reg);
+>   	}
+> -	pci_dev_put(rdev);
+>   
+>   	pdata->xpcs_window = XPCS_GET_BITS(reg, PCS_V2_WINDOW_DEF, OFFSET);
+>   	pdata->xpcs_window <<= 6;
+> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-smn.h b/drivers/net/ethernet/amd/xgbe/xgbe-smn.h
+> new file mode 100644
+> index 000000000000..bd25ddc7c869
+> --- /dev/null
+> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-smn.h
+> @@ -0,0 +1,27 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * AMD 10Gb Ethernet driver
+> + *
+> + * Copyright (c) 2023, Advanced Micro Devices, Inc.
+> + * All Rights Reserved.
+> + *
+> + * Author: Raju Rangoju <Raju.Rangoju@amd.com>
+> + */
 
-What PCI ID is this, it doesn't match the 0x1641 added below?
+Shouldn't this license match the license in all the other files?
+
+Also, you need header protection here, e.g.:
+
+#ifndef __XGBE_SMN_H__
+#define __XGBE_SMN_H__
+
+and a #endif at the end.
 
 Thanks,
 Tom
 
-> +		pdata->xpcs_window_def_reg = PCS_V2_RN_WINDOW_DEF;
-> +		pdata->xpcs_window_sel_reg = PCS_V2_RN_WINDOW_SELECT;
-> +		break;
->   	default:
->   		pdata->xpcs_window_def_reg = PCS_V2_WINDOW_DEF;
->   		pdata->xpcs_window_sel_reg = PCS_V2_WINDOW_SELECT;
->   		break;
->   	}
-> -	pci_dev_put(rdev);
->   
->   	/* Configure the PCS indirect addressing support */
-> -	reg = XPCS32_IOREAD(pdata, pdata->xpcs_window_def_reg);
-> +	if (pdata->vdata->xpcs_access == XGBE_XPCS_ACCESS_V3) {
-> +		reg = XP_IOREAD(pdata, XP_PROP_0);
-> +		pdata->xphy_base = PCS_RN_SMN_BASE_ADDR +
-> +				   (PCS_RN_PORT_ADDR_SIZE * XP_GET_BITS(reg, XP_PROP_0, PORT_ID));
-> +		pci_write_config_dword(rdev, 0x60, pdata->xphy_base + (pdata->xpcs_window_def_reg));
-> +		pci_read_config_dword(rdev, 0x64, &reg);
-> +	} else {
-> +		reg = XPCS32_IOREAD(pdata, pdata->xpcs_window_def_reg);
-> +	}
-> +	pci_dev_put(rdev);
 > +
->   	pdata->xpcs_window = XPCS_GET_BITS(reg, PCS_V2_WINDOW_DEF, OFFSET);
->   	pdata->xpcs_window <<= 6;
->   	pdata->xpcs_window_size = XPCS_GET_BITS(reg, PCS_V2_WINDOW_DEF, SIZE);
-> @@ -481,6 +494,22 @@ static int __maybe_unused xgbe_pci_resume(struct device *dev)
->   	return ret;
->   }
->   
-> +static struct xgbe_version_data xgbe_v3 = {
-> +	.init_function_ptrs_phy_impl	= xgbe_init_function_ptrs_phy_v2,
-> +	.xpcs_access			= XGBE_XPCS_ACCESS_V3,
-> +	.mmc_64bit			= 1,
-> +	.tx_max_fifo_size		= 65536,
-> +	.rx_max_fifo_size		= 65536,
-> +	.tx_tstamp_workaround		= 1,
-> +	.ecc_support			= 1,
-> +	.i2c_support			= 1,
-> +	.irq_reissue_support		= 1,
-> +	.tx_desc_prefetch		= 5,
-> +	.rx_desc_prefetch		= 5,
-> +	.an_cdr_workaround		= 0,
-> +	.enable_rrc			= 0,
-> +};
+> +#ifdef CONFIG_AMD_NB
 > +
->   static struct xgbe_version_data xgbe_v2a = {
->   	.init_function_ptrs_phy_impl	= xgbe_init_function_ptrs_phy_v2,
->   	.xpcs_access			= XGBE_XPCS_ACCESS_V2,
-> @@ -518,6 +547,8 @@ static const struct pci_device_id xgbe_pci_table[] = {
->   	  .driver_data = (kernel_ulong_t)&xgbe_v2a },
->   	{ PCI_VDEVICE(AMD, 0x1459),
->   	  .driver_data = (kernel_ulong_t)&xgbe_v2b },
-> +	{ PCI_VDEVICE(AMD, 0x1641),
-> +	  .driver_data = (kernel_ulong_t)&xgbe_v3 },
->   	/* Last entry must be zero */
->   	{ 0, }
->   };
+> +#include <asm/amd_nb.h>
+> +
+> +#else
+> +
+> +static inline int amd_smn_write(u16 node, u32 address, u32 value)
+> +{
+> +	return -ENODEV;
+> +}
+> +
+> +static inline int amd_smn_read(u16 node, u32 address, u32 *value)
+> +{
+> +	return -ENODEV;
+> +}
+> +
+> +#endif
 > diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ethernet/amd/xgbe/xgbe.h
-> index ad136ed493ed..dbb1faaf6185 100644
+> index dbb1faaf6185..ba45ab0adb8c 100644
 > --- a/drivers/net/ethernet/amd/xgbe/xgbe.h
 > +++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
-> @@ -347,6 +347,10 @@
->   		    (_src)->link_modes._sname,		\
->   		    __ETHTOOL_LINK_MODE_MASK_NBITS)
->   
-> +/* Generic low and high masks */
-> +#define XGBE_GEN_HI_MASK	GENMASK(31, 16)
-> +#define XGBE_GEN_LO_MASK	GENMASK(15, 0)
-> +
->   struct xgbe_prv_data;
->   
->   struct xgbe_packet_data {
-> @@ -565,6 +569,7 @@ enum xgbe_speed {
->   enum xgbe_xpcs_access {
->   	XGBE_XPCS_ACCESS_V1 = 0,
->   	XGBE_XPCS_ACCESS_V2,
-> +	XGBE_XPCS_ACCESS_V3,
->   };
->   
->   enum xgbe_an_mode {
-> @@ -1056,6 +1061,7 @@ struct xgbe_prv_data {
+> @@ -1061,7 +1061,7 @@ struct xgbe_prv_data {
 >   	struct device *dev;
 >   	struct platform_device *phy_platdev;
 >   	struct device *phy_dev;
-> +	unsigned int xphy_base;
+> -	unsigned int xphy_base;
+> +	unsigned int smn_base;
 >   
 >   	/* Version related data */
 >   	struct xgbe_version_data *vdata;
