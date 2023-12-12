@@ -1,113 +1,349 @@
-Return-Path: <netdev+bounces-56524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB0A680F2CB
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 17:34:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F19CA80F2D6
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 17:34:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5AEE2810C5
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 16:34:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FE551C20D97
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 16:34:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5299078E61;
-	Tue, 12 Dec 2023 16:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9234278E61;
+	Tue, 12 Dec 2023 16:34:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H9sQ8j1f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gFmCRVTw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CA53CA;
-	Tue, 12 Dec 2023 08:34:04 -0800 (PST)
-Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-5e266e8d39eso2066937b3.1;
-        Tue, 12 Dec 2023 08:34:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702398844; x=1703003644; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tQQid16GHvnaAbZDXuQkDV5jUsLgdBWxDY6lNDo1oPs=;
-        b=H9sQ8j1fiRZpYcqEEIN8G5ISwagxt8ZN/q5pDUYNwLbeBdWwX6MgQ1O0FpsbFnrB2N
-         yy4Sx54ERsaIl4ZEP+JkNZyrfZvkM8kuGvWFzOLLDtzJjjLFf/4XZY8AKKR2zQ8eimCp
-         154KRylzd4H0tiaohrch0AwttZhjLcZyiI0CQuCLyb6UzK8IiRa8mWs11PBNzPvimY/Q
-         7sluQhhMxxnKcnEiYQjqsEm0DyD7aSA9fyWIDSlFRBVRQDUNV01Fe+Sc3GLDPX8tTpNP
-         F6zGndn8woOXwbcyiHSwiOrjMvlaqODX03iIeqGiWuRY464fv+252Tn30dEVpmhSKHyW
-         4afg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702398844; x=1703003644;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tQQid16GHvnaAbZDXuQkDV5jUsLgdBWxDY6lNDo1oPs=;
-        b=GKx40R6aBIS0Qxe80kLOh3JCVQvUE0R9lxa3Qw6em26JmlfwakU1zDaIr30qidSjHC
-         apTfw11LGqbYoNGViQB87Khn8IC7hBuQUwo7c8Cs7x82uE4qqwgsxBpVBLajw273ZKWx
-         xRP4GOwBYo+k+/B1LORmyFIMmoF/5Po9GSqPvdOYzfmzn6T11NzlEDbzOSBgAUpJNM5b
-         nhkiNofPFUT2/oy15oLmxEqb+P8ji0IePgSWJ0dzHehA40Qqepp++WY9q7fy4isTxqS2
-         s0qcPnIoxHmCazClpP5jWwTB+8f2Ufv5/VDrNtU0h3x6a5OPq722AVshoerAnVdCTflT
-         42Gg==
-X-Gm-Message-State: AOJu0YzbXxx6aT7Cay2ArQ/XuNSig0qQOu1f4i496eFA1a7HZYNSMvX/
-	Bk/UKtVYqkADEKyc2f2qA5tYvk1PCz9VrQ==
-X-Google-Smtp-Source: AGHT+IGUMfA963Iva3P4h6VxRTz6ACMNoJFaBpjoNF2iLJIc3MZ40Jgs6Zf05O3kHPg2oOV2DUsu6g==
-X-Received: by 2002:a0d:e28e:0:b0:5d3:37fe:54ce with SMTP id l136-20020a0de28e000000b005d337fe54cemr5304212ywe.8.1702398843573;
-        Tue, 12 Dec 2023 08:34:03 -0800 (PST)
-Received: from localhost ([2601:344:8301:57f0:38aa:1c88:df05:9b73])
-        by smtp.gmail.com with ESMTPSA id d63-20020a0ddb42000000b005845e6f9b50sm566704ywe.113.2023.12.12.08.34.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 08:34:02 -0800 (PST)
-Date: Tue, 12 Dec 2023 08:34:02 -0800
-From: Yury Norov <yury.norov@gmail.com>
-To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
-	leon@kernel.org, cai.huoqing@linux.dev, ssengar@linux.microsoft.com,
-	vkuznets@redhat.com, tglx@linutronix.de,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	schakrabarti@microsoft.com, paulros@microsoft.com
-Subject: Re: [PATCH V5 net-next] net: mana: Assigning IRQ affinity on HT cores
-Message-ID: <ZXiLetPnY5TlAQGY@yury-ThinkPad>
-References: <1702029754-6520-1-git-send-email-schakrabarti@linux.microsoft.com>
- <ZXMiOwK3sOJNXHxd@yury-ThinkPad>
- <20231211063726.GA4977@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <ZXcrHc5QGPTZtXKf@yury-ThinkPad>
- <20231212113856.GA17123@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7000F28E6;
+	Tue, 12 Dec 2023 16:34:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D525C433C7;
+	Tue, 12 Dec 2023 16:34:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702398880;
+	bh=g2a56e62f1QR0Jl7KNZYJTND0ori66RuqZzkYc6oMlM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gFmCRVTwPW/8FgmP7cYdIf0PGDjGM/re2ld590en2DBn4UYcNh9iw+22jKNVRcor5
+	 Gi3+cL050zhrp1mi8HCTQInUcrUxLfAyzfpZRv415+TskrRtNde+gl/hcLQcg+HPdi
+	 XP+nb8XkQXpBYFuOnOL0W/cXWAcZeGwXXDRhoN0X9OobPo5KfgNJg24e3Zel/bEQtl
+	 qiUR6tove+QGmVFyNZnD3BSzZLZH+ZiP1fCI/WdDxhRWb/HkJtcexsuQoiYORedSF9
+	 eYJOOcmkr4+ZecZpvzJj0VFuDb2JMN+JfeNak80+B9zCnQq0keO2FmJoqeq/pERblV
+	 MRhzIu+jZaxZw==
+Date: Tue, 12 Dec 2023 16:34:32 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chunfeng Yun <chunfeng.yun@mediatek.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexander Couzens <lynxis@fe80.eu>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org
+Subject: Re: [RFC PATCH net-next v3 7/8] dt-bindings: net: mediatek,net: fix
+ and complete mt7988-eth binding
+Message-ID: <20231212-unlinked-audio-94132ec03663@spud>
+References: <cover.1702352117.git.daniel@makrotopia.org>
+ <ac6a7277fc534f610386bc51b2ff87beade03be8.1702352117.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="8FGijifStTHJdg+0"
+Content-Disposition: inline
+In-Reply-To: <ac6a7277fc534f610386bc51b2ff87beade03be8.1702352117.git.daniel@makrotopia.org>
+
+
+--8FGijifStTHJdg+0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231212113856.GA17123@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+Content-Transfer-Encoding: quoted-printable
 
-> > > > > +	rcu_read_lock();
-> > > > > +	for_each_numa_hop_mask(next, next_node) {
-> > > > > +		cpumask_andnot(curr, next, prev);
-> > > > > +		for (w = cpumask_weight(curr), cnt = 0; cnt < w; ) {
-> > > > > +			cpumask_copy(cpus, curr);
-> > > > > +			for_each_cpu(cpu, cpus) {
-> > > > > +				irq_set_affinity_and_hint(irqs[i], topology_sibling_cpumask(cpu));
-> > > > > +				if (++i == nvec)
-> > > > > +					goto done;
-> > > > 
-> > > > Think what if you're passed with irq_setup(NULL, 0, 0).
-> > > > That's why I suggested to place this check at the beginning.
-> > > > 
-> > > irq_setup() is a helper function for mana_gd_setup_irqs(), which already takes
-> > > care of no NULL pointer for irqs, and 0 number of interrupts can not be passed.
-> > > 
-> > > nvec = pci_alloc_irq_vectors(pdev, 2, max_irqs, PCI_IRQ_MSIX);
-> > > if (nvec < 0)
-> > > 	return nvec;
-> > 
-> > I know that. But still it's a bug. The common convention is that if a
-> > 0-length array is passed to a function, it should not dereference the
-> > pointer.
-> > 
-> I will add one if check in the begining of irq_setup() to verify the pointer
-> and the nvec number.
+On Tue, Dec 12, 2023 at 03:51:01AM +0000, Daniel Golle wrote:
+> Complete support for MT7988 which comes with 3 MACs, SRAM for DMA
+> descriptors and uses a dedicated PCS for the SerDes units.
 
-Yes you can, but what for? This is an error anyways, and you don't
-care about early return. So instead of adding and bearing extra logic,
-I'd just swap 2 lines of existing code.
+The commit message here seems a bit incomplete, mostly a lack of an
+explanation for why the model was initially incorrect.
+
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+
+Cheers,
+Conor.
+
+>=20
+> Fixes: c94a9aabec36 ("dt-bindings: net: mediatek,net: add mt7988-eth bind=
+ing")
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+>  .../devicetree/bindings/net/mediatek,net.yaml | 148 +++++++++++++++++-
+>  1 file changed, 146 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/mediatek,net.yaml b/Do=
+cumentation/devicetree/bindings/net/mediatek,net.yaml
+> index 030d106bc7d3f..ca0667c51c1c2 100644
+> --- a/Documentation/devicetree/bindings/net/mediatek,net.yaml
+> +++ b/Documentation/devicetree/bindings/net/mediatek,net.yaml
+> @@ -28,7 +28,10 @@ properties:
+>        - ralink,rt5350-eth
+> =20
+>    reg:
+> -    maxItems: 1
+> +    minItems: 1
+> +    items:
+> +      - description: Base of registers used to program the ethernet cont=
+roller
+> +      - description: SRAM region used for DMA descriptors
+> =20
+>    clocks: true
+>    clock-names: true
+> @@ -115,6 +118,9 @@ allOf:
+>                - mediatek,mt7623-eth
+>      then:
+>        properties:
+> +        reg:
+> +          maxItems: 1
+> +
+>          interrupts:
+>            maxItems: 3
+> =20
+> @@ -149,6 +155,9 @@ allOf:
+>                - mediatek,mt7621-eth
+>      then:
+>        properties:
+> +        reg:
+> +          maxItems: 1
+> +
+>          interrupts:
+>            maxItems: 1
+> =20
+> @@ -174,6 +183,9 @@ allOf:
+>              const: mediatek,mt7622-eth
+>      then:
+>        properties:
+> +        reg:
+> +          maxItems: 1
+> +
+>          interrupts:
+>            maxItems: 3
+> =20
+> @@ -215,6 +227,9 @@ allOf:
+>              const: mediatek,mt7629-eth
+>      then:
+>        properties:
+> +        reg:
+> +          maxItems: 1
+> +
+>          interrupts:
+>            maxItems: 3
+> =20
+> @@ -257,6 +272,9 @@ allOf:
+>              const: mediatek,mt7981-eth
+>      then:
+>        properties:
+> +        reg:
+> +          maxItems: 1
+> +
+>          interrupts:
+>            minItems: 4
+> =20
+> @@ -295,6 +313,9 @@ allOf:
+>              const: mediatek,mt7986-eth
+>      then:
+>        properties:
+> +        reg:
+> +          maxItems: 1
+> +
+>          interrupts:
+>            minItems: 4
+> =20
+> @@ -333,8 +354,12 @@ allOf:
+>              const: mediatek,mt7988-eth
+>      then:
+>        properties:
+> +        reg:
+> +          minItems: 2
+> +
+>          interrupts:
+>            minItems: 4
+> +          maxItems: 4
+> =20
+>          clocks:
+>            minItems: 24
+> @@ -368,7 +393,7 @@ allOf:
+>              - const: top_netsys_warp_sel
+> =20
+>  patternProperties:
+> -  "^mac@[0-1]$":
+> +  "^mac@[0-2]$":
+>      type: object
+>      unevaluatedProperties: false
+>      allOf:
+> @@ -382,6 +407,9 @@ patternProperties:
+>        reg:
+>          maxItems: 1
+> =20
+> +      phys:
+> +        maxItems: 1
+> +
+>      required:
+>        - reg
+>        - compatible
+> @@ -559,3 +587,118 @@ examples:
+>          };
+>        };
+>      };
+> +
+> +  - |
+> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
+> +    #include <dt-bindings/interrupt-controller/irq.h>
+> +    #include <dt-bindings/clock/mediatek,mt7988-clk.h>
+> +
+> +    soc {
+> +      #address-cells =3D <2>;
+> +      #size-cells =3D <2>;
+> +
+> +      ethernet@15100000 {
+> +        compatible =3D "mediatek,mt7988-eth";
+> +        reg =3D <0 0x15100000 0 0x80000>, <0 0x15400000 0 0x380000>;
+> +        interrupts =3D <GIC_SPI 196 IRQ_TYPE_LEVEL_HIGH>,
+> +                     <GIC_SPI 197 IRQ_TYPE_LEVEL_HIGH>,
+> +                     <GIC_SPI 198 IRQ_TYPE_LEVEL_HIGH>,
+> +                     <GIC_SPI 199 IRQ_TYPE_LEVEL_HIGH>;
+> +
+> +        clocks =3D <&ethsys CLK_ETHDMA_XGP1_EN>,
+> +                 <&ethsys CLK_ETHDMA_XGP2_EN>,
+> +                 <&ethsys CLK_ETHDMA_XGP3_EN>,
+> +                 <&ethsys CLK_ETHDMA_FE_EN>,
+> +                 <&ethsys CLK_ETHDMA_GP2_EN>,
+> +                 <&ethsys CLK_ETHDMA_GP1_EN>,
+> +                 <&ethsys CLK_ETHDMA_GP3_EN>,
+> +                 <&ethsys CLK_ETHDMA_ESW_EN>,
+> +                 <&ethsys CLK_ETHDMA_CRYPT0_EN>,
+> +                 <&ethwarp CLK_ETHWARP_WOCPU2_EN>,
+> +                 <&ethwarp CLK_ETHWARP_WOCPU1_EN>,
+> +                 <&ethwarp CLK_ETHWARP_WOCPU0_EN>,
+> +                 <&topckgen CLK_TOP_ETH_GMII_SEL>,
+> +                 <&topckgen CLK_TOP_ETH_REFCK_50M_SEL>,
+> +                 <&topckgen CLK_TOP_ETH_SYS_200M_SEL>,
+> +                 <&topckgen CLK_TOP_ETH_SYS_SEL>,
+> +                 <&topckgen CLK_TOP_ETH_XGMII_SEL>,
+> +                 <&topckgen CLK_TOP_ETH_MII_SEL>,
+> +                 <&topckgen CLK_TOP_NETSYS_SEL>,
+> +                 <&topckgen CLK_TOP_NETSYS_500M_SEL>,
+> +                 <&topckgen CLK_TOP_NETSYS_PAO_2X_SEL>,
+> +                 <&topckgen CLK_TOP_NETSYS_SYNC_250M_SEL>,
+> +                 <&topckgen CLK_TOP_NETSYS_PPEFB_250M_SEL>,
+> +                 <&topckgen CLK_TOP_NETSYS_WARP_SEL>;
+> +
+> +        clock-names =3D "xgp1", "xgp2", "xgp3", "fe", "gp2", "gp1",
+> +                      "gp3", "esw", "crypto",
+> +                      "ethwarp_wocpu2", "ethwarp_wocpu1",
+> +                      "ethwarp_wocpu0", "top_eth_gmii_sel",
+> +                      "top_eth_refck_50m_sel", "top_eth_sys_200m_sel",
+> +                      "top_eth_sys_sel", "top_eth_xgmii_sel",
+> +                      "top_eth_mii_sel", "top_netsys_sel",
+> +                      "top_netsys_500m_sel", "top_netsys_pao_2x_sel",
+> +                      "top_netsys_sync_250m_sel",
+> +                      "top_netsys_ppefb_250m_sel",
+> +                      "top_netsys_warp_sel";
+> +        assigned-clocks =3D <&topckgen CLK_TOP_NETSYS_2X_SEL>,
+> +                          <&topckgen CLK_TOP_NETSYS_GSW_SEL>,
+> +                          <&topckgen CLK_TOP_USXGMII_SBUS_0_SEL>,
+> +                          <&topckgen CLK_TOP_USXGMII_SBUS_1_SEL>,
+> +                          <&topckgen CLK_TOP_SGM_0_SEL>,
+> +                          <&topckgen CLK_TOP_SGM_1_SEL>;
+> +        assigned-clock-parents =3D <&apmixedsys CLK_APMIXED_NET2PLL>,
+> +                                 <&topckgen CLK_TOP_NET1PLL_D4>,
+> +                                 <&topckgen CLK_TOP_NET1PLL_D8_D4>,
+> +                                 <&topckgen CLK_TOP_NET1PLL_D8_D4>,
+> +                                 <&apmixedsys CLK_APMIXED_SGMPLL>,
+> +                                 <&apmixedsys CLK_APMIXED_SGMPLL>;
+> +        mediatek,ethsys =3D <&ethsys>;
+> +        mediatek,infracfg =3D <&topmisc>;
+> +        #address-cells =3D <1>;
+> +        #size-cells =3D <0>;
+> +
+> +        mac@0 {
+> +          compatible =3D "mediatek,eth-mac";
+> +          reg =3D <0>;
+> +          phy-mode =3D "internal"; /* CPU port of built-in 1GE switch */
+> +
+> +          fixed-link {
+> +            speed =3D <10000>;
+> +            full-duplex;
+> +            pause;
+> +          };
+> +        };
+> +
+> +        mac@1 {
+> +          compatible =3D "mediatek,eth-mac";
+> +          reg =3D <1>;
+> +          phy-handle =3D <&int_2p5g_phy>;
+> +        };
+> +
+> +        mac@2 {
+> +          compatible =3D "mediatek,eth-mac";
+> +          reg =3D <2>;
+> +          pcs-handle =3D <&usxgmiisys0>, <&sgmii0>;
+> +          phys =3D <&pextp0>;
+> +        };
+> +
+> +        mdio_bus: mdio-bus {
+> +          #address-cells =3D <1>;
+> +          #size-cells =3D <0>;
+> +
+> +          /* external PHY */
+> +          phy0: ethernet-phy@0 {
+> +            reg =3D <0>;
+> +            compatible =3D "ethernet-phy-ieee802.3-c45";
+> +          };
+> +
+> +          /* internal 2.5G PHY */
+> +          int_2p5g_phy: ethernet-phy@15 {
+> +            reg =3D <15>;
+> +            compatible =3D "ethernet-phy-ieee802.3-c45";
+> +            phy-mode =3D "internal";
+> +          };
+> +        };
+> +      };
+> +    };
+> --=20
+> 2.43.0
+
+--8FGijifStTHJdg+0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZXiLmAAKCRB4tDGHoIJi
+0gKhAP0cowuWKOEDUrNq/7GVx1mPlrZE+DmnToliFSL5YQENwQEAmjtvITQ66Vld
++gvLnpUy+BZwmvAFqpcz9Ugxp9jGVQ8=
+=M8e+
+-----END PGP SIGNATURE-----
+
+--8FGijifStTHJdg+0--
 
