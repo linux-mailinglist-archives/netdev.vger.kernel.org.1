@@ -1,324 +1,231 @@
-Return-Path: <netdev+bounces-56458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88BCF80EF3F
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 15:47:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F17C580EF68
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 15:56:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16E9C1F2152C
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:47:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81A481F21532
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:56:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F015C745E7;
-	Tue, 12 Dec 2023 14:47:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 547AF745E0;
+	Tue, 12 Dec 2023 14:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nTnDX5dR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XVV/2AyN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29341D40
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 06:47:29 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-50bfa5a6cffso6596351e87.0
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 06:47:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702392447; x=1702997247; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=svSGkfXxoPYjvETADo38bpUlqdTTk6pLGr40su5OtW8=;
-        b=nTnDX5dRv4zCBEDfRkfcYuVCl/vE25w3FMur5nsi8CgW510HrLDFELeAfyQEFsJtVp
-         3ChMDv1PAFvf0x/pKsJDEdfKvehLJSkYKZYfvdAXjOGqKoMbJqC/DDpeMZAQiWWtn68H
-         VfnJSDxNJUIRkRavSwmvQj5VzEhKT7lwoQjpWasjQKlaUS+NThK4El0OCiVZx+Hln7aL
-         NAlRdw0UPHaSav3/g9VAsA4UVxZFo1+pCIvJUP3nH6thQHC1I+8KCbZmD5uIEnyQDpzZ
-         GO9Q8qvXlYcfd0+RFoElVfIA6BAbmQj7SrYhyRp4zUTHs23cvIZ+uSFhXwwbp669zjxF
-         hsmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702392447; x=1702997247;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=svSGkfXxoPYjvETADo38bpUlqdTTk6pLGr40su5OtW8=;
-        b=pMUQEfNbRQB7gla5hoqiooKGMDyMAgbp4IRwccd5DTrb0X1yQa6zQtd+XlwXxGl8+Z
-         JW8uxeNOmJj9uYR0k1BSU6+ok65QQoXgVBqM3xAj/qHMr9avBPnLiwmQNA553fOHUmMz
-         vDlB8iuvr8Lsi8qC9jcKL3/ibageRCzOFAjPvFusAwrelAHzu+QiUkDqxte32cutGcPN
-         tFaMTV8T9MLG98AF67+qWvFz+sewpF9HsEWNRFjY8n0KHOt0u42T6gLXRTfmj+UceRaa
-         AAsqPNDobMiTsr6S3QuMvmsF3bP1dZfhWhsNsii6BtLgwtLMN3F97ALFTYoiWX10/hND
-         tlPQ==
-X-Gm-Message-State: AOJu0YzMMW7PiDXdiaLXElCZBqFswuIrhRK8ngaoJbP4hmdExl4rmnDY
-	RvvBk7sWLvwrB2HnoR7+Z+gOd3438vBL5dr54o1mAw==
-X-Google-Smtp-Source: AGHT+IED/VHAjdNhXHhxtPXZM7il0IVlK/nYNiYW3GnuP2eS4BonMypWtmsPI7HmlT4ntgc0d0NHzIrC3bW94tUsnXw=
-X-Received: by 2002:a05:6512:ac8:b0:50b:feb2:dac9 with SMTP id
- n8-20020a0565120ac800b0050bfeb2dac9mr3712110lfu.2.1702392446733; Tue, 12 Dec
- 2023 06:47:26 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97CF0D3
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 06:56:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702392989; x=1733928989;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=rtJ1TpolWl/YBfRHUC7KrytBuUFTlnN1c8GTu2B9qwg=;
+  b=XVV/2AyNTwXunm76ib1z4OfblUdO+N5OzYjEUiFHOW4dpl+oVQy5zRr+
+   Z/sOtUm3xpdoUy4+9T6GyUdo8iaGTQxe0mNC7MqH09XhUY2PzEkbLEGC9
+   8TBDIpGCCbtS9aVsBz4JOeFawdvlttWXKOu/938hhPivhYfiXM3gY6z3J
+   JuG0ghrJo/rn6UwZq9SFJLr0L0D/hStpdTt5EpG4RLXBfzIhoDXYjIdcL
+   ylAVR15o2NIbmAqoD2t23bn1N8C07NOvXGgoe7BeTUXyhMfRQ8Fe4/gGH
+   YncOhqE78rsXZJBTICQCBlZyZ5ZFNf3/5Uhrkm/nWtBgGSYtFgNOkquX2
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="374972146"
+X-IronPort-AV: E=Sophos;i="6.04,270,1695711600"; 
+   d="scan'208";a="374972146"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 06:56:28 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,270,1695711600"; 
+   d="scan'208";a="17637353"
+Received: from kkazimiedevpc.igk.intel.com (HELO localhost.igk.intel.com) ([10.102.102.224])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 06:56:26 -0800
+From: Michal Kubiak <michal.kubiak@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: aleksander.lobakin@intel.com,
+	larysa.zaremba@intel.com,
+	alan.brady@intel.com,
+	joshua.a.hay@intel.com,
+	emil.s.tantilov@intel.com,
+	maciej.fijalkowski@intel.com,
+	netdev@vger.kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Michal Kubiak <michal.kubiak@intel.com>
+Subject: [PATCH iwl-net] idpf: enable WB_ON_ITR
+Date: Tue, 12 Dec 2023 15:55:46 +0100
+Message-Id: <20231212145546.396273-1-michal.kubiak@intel.com>
+X-Mailer: git-send-email 2.33.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231208005250.2910004-1-almasrymina@google.com>
- <20231208005250.2910004-3-almasrymina@google.com> <CAC_iWjKikzwpjR0hBjYuRxgYjyqp_EYrrxoveB_2DgCxk6vWYw@mail.gmail.com>
-In-Reply-To: <CAC_iWjKikzwpjR0hBjYuRxgYjyqp_EYrrxoveB_2DgCxk6vWYw@mail.gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 12 Dec 2023 06:47:14 -0800
-Message-ID: <CAHS8izOX5DmyT88tGJbbxoy1NScnscw3cXMFauhTfJ7m+Gb9wA@mail.gmail.com>
-Subject: Re: [net-next v1 02/16] net: page_pool: create hooks for custom page providers
-To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeelb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 12, 2023 at 12:07=E2=80=AFAM Ilias Apalodimas
-<ilias.apalodimas@linaro.org> wrote:
->
-> Hi Mina,
->
-> Apologies for not participating in the party earlier.
->
+From: Joshua Hay <joshua.a.hay@intel.com>
 
-No worries, thanks for looking.
+Tell hardware to writeback completed descriptors even when interrupts
+are disabled. Otherwise, descriptors might not be written back until
+the hardware can flush a full cacheline of descriptors. This can cause
+unnecessary delays when traffic is light (or even trigger Tx queue
+timeout).
 
-> On Fri, 8 Dec 2023 at 02:52, Mina Almasry <almasrymina@google.com> wrote:
-> >
-> > From: Jakub Kicinski <kuba@kernel.org>
-> >
-> > The page providers which try to reuse the same pages will
-> > need to hold onto the ref, even if page gets released from
-> > the pool - as in releasing the page from the pp just transfers
-> > the "ownership" reference from pp to the provider, and provider
-> > will wait for other references to be gone before feeding this
-> > page back into the pool.
-> >
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> >
-> > ---
-> >
-> > This is implemented by Jakub in his RFC:
-> > https://lore.kernel.org/netdev/f8270765-a27b-6ccf-33ea-cda097168d79@red=
-hat.com/T/
-> >
-> > I take no credit for the idea or implementation; I only added minor
-> > edits to make this workable with device memory TCP, and removed some
-> > hacky test code. This is a critical dependency of device memory TCP
-> > and thus I'm pulling it into this series to make it revewable and
-> > mergable.
-> >
-> > RFC v3 -> v1
-> > - Removed unusued mem_provider. (Yunsheng).
-> > - Replaced memory_provider & mp_priv with netdev_rx_queue (Jakub).
-> >
-> > ---
-> >  include/net/page_pool/types.h | 12 ++++++++++
-> >  net/core/page_pool.c          | 43 +++++++++++++++++++++++++++++++----
-> >  2 files changed, 50 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/include/net/page_pool/types.h b/include/net/page_pool/type=
-s.h
-> > index ac286ea8ce2d..0e9fa79a5ef1 100644
-> > --- a/include/net/page_pool/types.h
-> > +++ b/include/net/page_pool/types.h
-> > @@ -51,6 +51,7 @@ struct pp_alloc_cache {
-> >   * @dev:       device, for DMA pre-mapping purposes
-> >   * @netdev:    netdev this pool will serve (leave as NULL if none or m=
-ultiple)
-> >   * @napi:      NAPI which is the sole consumer of pages, otherwise NUL=
-L
-> > + * @queue:     struct netdev_rx_queue this page_pool is being created =
-for.
-> >   * @dma_dir:   DMA mapping direction
-> >   * @max_len:   max DMA sync memory size for PP_FLAG_DMA_SYNC_DEV
-> >   * @offset:    DMA sync address offset for PP_FLAG_DMA_SYNC_DEV
-> > @@ -63,6 +64,7 @@ struct page_pool_params {
-> >                 int             nid;
-> >                 struct device   *dev;
-> >                 struct napi_struct *napi;
-> > +               struct netdev_rx_queue *queue;
-> >                 enum dma_data_direction dma_dir;
-> >                 unsigned int    max_len;
-> >                 unsigned int    offset;
-> > @@ -125,6 +127,13 @@ struct page_pool_stats {
-> >  };
-> >  #endif
-> >
-> > +struct memory_provider_ops {
-> > +       int (*init)(struct page_pool *pool);
-> > +       void (*destroy)(struct page_pool *pool);
-> > +       struct page *(*alloc_pages)(struct page_pool *pool, gfp_t gfp);
-> > +       bool (*release_page)(struct page_pool *pool, struct page *page)=
-;
-> > +};
-> > +
-> >  struct page_pool {
-> >         struct page_pool_params_fast p;
-> >
-> > @@ -174,6 +183,9 @@ struct page_pool {
-> >          */
-> >         struct ptr_ring ring;
-> >
-> > +       void *mp_priv;
-> > +       const struct memory_provider_ops *mp_ops;
-> > +
-> >  #ifdef CONFIG_PAGE_POOL_STATS
-> >         /* recycle stats are per-cpu to avoid locking */
-> >         struct page_pool_recycle_stats __percpu *recycle_stats;
-> > diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> > index ca1b3b65c9b5..f5c84d2a4510 100644
-> > --- a/net/core/page_pool.c
-> > +++ b/net/core/page_pool.c
-> > @@ -25,6 +25,8 @@
-> >
-> >  #include "page_pool_priv.h"
-> >
-> > +static DEFINE_STATIC_KEY_FALSE(page_pool_mem_providers);
->
-> We could add the existing page pool mechanisms as another 'provider',
-> but I assume this is coded like this for performance reasons (IOW skip
-> the expensive ptr call for the default case?)
->
+Fixes: c2d548cad150 ("idpf: add TX splitq napi poll support")
+Fixes: a5ab9ee0df0b ("idpf: add singleq start_xmit and napi poll")
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
+Co-developed-by: Michal Kubiak <michal.kubiak@intel.com>
+Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
+---
+ drivers/net/ethernet/intel/idpf/idpf_dev.c    |  2 ++
+ .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  6 ++++-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  7 +++++-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   | 23 +++++++++++++++++++
+ drivers/net/ethernet/intel/idpf/idpf_vf_dev.c |  2 ++
+ 5 files changed, 38 insertions(+), 2 deletions(-)
 
-Correct, it's done like this for performance reasons.
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_dev.c b/drivers/net/ethernet/intel/idpf/idpf_dev.c
+index 34ad1ac46b78..2c6776086130 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_dev.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_dev.c
+@@ -96,8 +96,10 @@ static int idpf_intr_reg_init(struct idpf_vport *vport)
+ 		intr->dyn_ctl = idpf_get_reg_addr(adapter,
+ 						  reg_vals[vec_id].dyn_ctl_reg);
+ 		intr->dyn_ctl_intena_m = PF_GLINT_DYN_CTL_INTENA_M;
++		intr->dyn_ctl_intena_msk_m = PF_GLINT_DYN_CTL_INTENA_MSK_M;
+ 		intr->dyn_ctl_itridx_s = PF_GLINT_DYN_CTL_ITR_INDX_S;
+ 		intr->dyn_ctl_intrvl_s = PF_GLINT_DYN_CTL_INTERVAL_S;
++		intr->dyn_ctl_wb_on_itr_m = PF_GLINT_DYN_CTL_WB_ON_ITR_M;
+ 
+ 		spacing = IDPF_ITR_IDX_SPACING(reg_vals[vec_id].itrn_index_spacing,
+ 					       IDPF_PF_ITR_IDX_SPACING);
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
+index 81288a17da2a..8e1478b7d86c 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
+@@ -1168,8 +1168,10 @@ int idpf_vport_singleq_napi_poll(struct napi_struct *napi, int budget)
+ 						    &work_done);
+ 
+ 	/* If work not completed, return budget and polling will return */
+-	if (!clean_complete)
++	if (!clean_complete) {
++		idpf_vport_intr_set_wb_on_itr(q_vector);
+ 		return budget;
++	}
+ 
+ 	work_done = min_t(int, work_done, budget - 1);
+ 
+@@ -1178,6 +1180,8 @@ int idpf_vport_singleq_napi_poll(struct napi_struct *napi, int budget)
+ 	 */
+ 	if (likely(napi_complete_done(napi, work_done)))
+ 		idpf_vport_intr_update_itr_ena_irq(q_vector);
++	else
++		idpf_vport_intr_set_wb_on_itr(q_vector);
+ 
+ 	return work_done;
+ }
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index 1646ff3877ba..b496566ee2aa 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -3639,6 +3639,7 @@ void idpf_vport_intr_update_itr_ena_irq(struct idpf_q_vector *q_vector)
+ 					      IDPF_NO_ITR_UPDATE_IDX, 0);
+ 
+ 	writel(intval, q_vector->intr_reg.dyn_ctl);
++	q_vector->wb_on_itr = false;
+ }
+ 
+ /**
+@@ -3930,8 +3931,10 @@ static int idpf_vport_splitq_napi_poll(struct napi_struct *napi, int budget)
+ 	clean_complete &= idpf_tx_splitq_clean_all(q_vector, budget, &work_done);
+ 
+ 	/* If work not completed, return budget and polling will return */
+-	if (!clean_complete)
++	if (!clean_complete) {
++		idpf_vport_intr_set_wb_on_itr(q_vector);
+ 		return budget;
++	}
+ 
+ 	work_done = min_t(int, work_done, budget - 1);
+ 
+@@ -3940,6 +3943,8 @@ static int idpf_vport_splitq_napi_poll(struct napi_struct *napi, int budget)
+ 	 */
+ 	if (likely(napi_complete_done(napi, work_done)))
+ 		idpf_vport_intr_update_itr_ena_irq(q_vector);
++	else
++		idpf_vport_intr_set_wb_on_itr(q_vector);
+ 
+ 	/* Switch to poll mode in the tear-down path after sending disable
+ 	 * queues virtchnl message, as the interrupts will be disabled after
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
+index df76493faa75..50761c2d9f3b 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
+@@ -495,9 +495,11 @@ struct idpf_vec_regs {
+ struct idpf_intr_reg {
+ 	void __iomem *dyn_ctl;
+ 	u32 dyn_ctl_intena_m;
++	u32 dyn_ctl_intena_msk_m;
+ 	u32 dyn_ctl_itridx_s;
+ 	u32 dyn_ctl_itridx_m;
+ 	u32 dyn_ctl_intrvl_s;
++	u32 dyn_ctl_wb_on_itr_m;
+ 	void __iomem *rx_itr;
+ 	void __iomem *tx_itr;
+ 	void __iomem *icr_ena;
+@@ -534,6 +536,7 @@ struct idpf_q_vector {
+ 	struct napi_struct napi;
+ 	u16 v_idx;
+ 	struct idpf_intr_reg intr_reg;
++	bool wb_on_itr;
+ 
+ 	u16 num_txq;
+ 	struct idpf_queue **tx;
+@@ -973,6 +976,26 @@ static inline void idpf_rx_sync_for_cpu(struct idpf_rx_buf *rx_buf, u32 len)
+ 				      page_pool_get_dma_dir(pp));
+ }
+ 
++/**
++ * idpf_vport_intr_set_wb_on_itr - enable descriptor writeback on disabled interrupts
++ * @q_vector: pointer to queue vector struct
++ */
++static inline void idpf_vport_intr_set_wb_on_itr(struct idpf_q_vector *q_vector)
++{
++	struct idpf_intr_reg *reg;
++
++	if (q_vector->wb_on_itr)
++		return;
++
++	reg = &q_vector->intr_reg;
++
++	writel(reg->dyn_ctl_wb_on_itr_m | reg->dyn_ctl_intena_msk_m |
++	       IDPF_NO_ITR_UPDATE_IDX << reg->dyn_ctl_itridx_s,
++	       reg->dyn_ctl);
++
++	q_vector->wb_on_itr = true;
++}
++
+ int idpf_vport_singleq_napi_poll(struct napi_struct *napi, int budget);
+ void idpf_vport_init_num_qs(struct idpf_vport *vport,
+ 			    struct virtchnl2_create_vport *vport_msg);
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
+index 8ade4e3a9fe1..f5b0a0666636 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
+@@ -96,7 +96,9 @@ static int idpf_vf_intr_reg_init(struct idpf_vport *vport)
+ 		intr->dyn_ctl = idpf_get_reg_addr(adapter,
+ 						  reg_vals[vec_id].dyn_ctl_reg);
+ 		intr->dyn_ctl_intena_m = VF_INT_DYN_CTLN_INTENA_M;
++		intr->dyn_ctl_intena_msk_m = VF_INT_DYN_CTLN_INTENA_MSK_M;
+ 		intr->dyn_ctl_itridx_s = VF_INT_DYN_CTLN_ITR_INDX_S;
++		intr->dyn_ctl_wb_on_itr_m = VF_INT_DYN_CTLN_WB_ON_ITR_M;
+ 
+ 		spacing = IDPF_ITR_IDX_SPACING(reg_vals[vec_id].itrn_index_spacing,
+ 					       IDPF_VF_ITR_IDX_SPACING);
+-- 
+2.33.1
 
-> > +
-> >  #define DEFER_TIME (msecs_to_jiffies(1000))
-> >  #define DEFER_WARN_INTERVAL (60 * HZ)
-> >
-> > @@ -174,6 +176,7 @@ static int page_pool_init(struct page_pool *pool,
-> >                           const struct page_pool_params *params)
-> >  {
-> >         unsigned int ring_qsize =3D 1024; /* Default */
-> > +       int err;
-> >
-> >         memcpy(&pool->p, &params->fast, sizeof(pool->p));
-> >         memcpy(&pool->slow, &params->slow, sizeof(pool->slow));
-> > @@ -234,10 +237,25 @@ static int page_pool_init(struct page_pool *pool,
-> >         /* Driver calling page_pool_create() also call page_pool_destro=
-y() */
-> >         refcount_set(&pool->user_cnt, 1);
-> >
-> > +       if (pool->mp_ops) {
-> > +               err =3D pool->mp_ops->init(pool);
-> > +               if (err) {
-> > +                       pr_warn("%s() mem-provider init failed %d\n",
-> > +                               __func__, err);
-> > +                       goto free_ptr_ring;
-> > +               }
-> > +
-> > +               static_branch_inc(&page_pool_mem_providers);
-> > +       }
-> > +
-> >         if (pool->p.flags & PP_FLAG_DMA_MAP)
-> >                 get_device(pool->p.dev);
-> >
-> >         return 0;
-> > +
-> > +free_ptr_ring:
-> > +       ptr_ring_cleanup(&pool->ring, NULL);
-> > +       return err;
-> >  }
-> >
-> >  static void page_pool_uninit(struct page_pool *pool)
-> > @@ -519,7 +537,10 @@ struct page *page_pool_alloc_pages(struct page_poo=
-l *pool, gfp_t gfp)
-> >                 return page;
-> >
-> >         /* Slow-path: cache empty, do real allocation */
-> > -       page =3D __page_pool_alloc_pages_slow(pool, gfp);
-> > +       if (static_branch_unlikely(&page_pool_mem_providers) && pool->m=
-p_ops)
->
-> Why do we need && pool->mp_ops? On the init function, we only bump
-> page_pool_mem_providers if the ops are there
->
-
-Note that page_pool_mem_providers is a static variable (not part of
-the page_pool struct), so if you have 2 page_pools on the system, one
-using devmem and one not, we need to check pool->mp_ops to make sure
-this page_pool is using a memory provider.
-
-> > +               page =3D pool->mp_ops->alloc_pages(pool, gfp);
-> > +       else
-> > +               page =3D __page_pool_alloc_pages_slow(pool, gfp);
-> >         return page;
-> >  }
-> >  EXPORT_SYMBOL(page_pool_alloc_pages);
-> > @@ -576,10 +597,13 @@ void __page_pool_release_page_dma(struct page_poo=
-l *pool, struct page *page)
-> >  void page_pool_return_page(struct page_pool *pool, struct page *page)
-> >  {
-> >         int count;
-> > +       bool put;
-> >
-> > -       __page_pool_release_page_dma(pool, page);
-> > -
-> > -       page_pool_clear_pp_info(page);
-> > +       put =3D true;
-> > +       if (static_branch_unlikely(&page_pool_mem_providers) && pool->m=
-p_ops)
->
-> ditto
->
-> > +               put =3D pool->mp_ops->release_page(pool, page);
-> > +       else
-> > +               __page_pool_release_page_dma(pool, page);
-> >
-> >         /* This may be the last page returned, releasing the pool, so
-> >          * it is not safe to reference pool afterwards.
-> > @@ -587,7 +611,10 @@ void page_pool_return_page(struct page_pool *pool,=
- struct page *page)
-> >         count =3D atomic_inc_return_relaxed(&pool->pages_state_release_=
-cnt);
-> >         trace_page_pool_state_release(pool, page, count);
-> >
-> > -       put_page(page);
-> > +       if (put) {
-> > +               page_pool_clear_pp_info(page);
-> > +               put_page(page);
-> > +       }
-> >         /* An optimization would be to call __free_pages(page, pool->p.=
-order)
-> >          * knowing page is not part of page-cache (thus avoiding a
-> >          * __page_cache_release() call).
-> > @@ -857,6 +884,12 @@ static void __page_pool_destroy(struct page_pool *=
-pool)
-> >
-> >         page_pool_unlist(pool);
-> >         page_pool_uninit(pool);
-> > +
-> > +       if (pool->mp_ops) {
->
-> Same here. Using a mix of pool->mp_ops and page_pool_mem_providers
-> will work, but since we always check the ptr on init, can't we simply
-> rely on page_pool_mem_providers for the rest of the code?
->
-> Thanks
-> /Ilias
-> > +               pool->mp_ops->destroy(pool);
-> > +               static_branch_dec(&page_pool_mem_providers);
-> > +       }
-> > +
-> >         kfree(pool);
-> >  }
-> >
-> > --
-> > 2.43.0.472.g3155946c3a-goog
-> >
-
-
-
---
-Thanks,
-Mina
 
