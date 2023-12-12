@@ -1,2423 +1,334 @@
-Return-Path: <netdev+bounces-56361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D7C980E987
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 11:55:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99AB980E97B
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 11:52:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6207F1C20AD4
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:55:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F288281B26
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:52:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16E735CD07;
-	Tue, 12 Dec 2023 10:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E14555C915;
+	Tue, 12 Dec 2023 10:51:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ybn+vKlk"
+	dkim=pass (2048-bit key) header.d=synopsys.com header.i=@synopsys.com header.b="Xu7A6uuK";
+	dkim=pass (2048-bit key) header.d=synopsys.com header.i=@synopsys.com header.b="Z5yqDMU2";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=synopsys.com header.i=@synopsys.com header.b="szlUAxLy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73411AC
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 02:55:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702378542; x=1733914542;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=AVWRQHPkF30Ts4t0u4NMxAj61SvoWIgnZtAuekTUbVA=;
-  b=Ybn+vKlkYLZWbdbGM1yhKOs/duhhcp1zjvW9I6dqgIORA/0b4qbz4s4y
-   fxgwak04Y9XEW1r56KwBzNpv58xpScV2kksBgcjnWrfwpIGaYJZAsdT/8
-   44LpbqlFvtEcex24nZQoam2McXWB8LHblvkmgU/uoEqa7hG6Nd9N7D53B
-   MsedffX1fkmWcw+HQfSmh0jwTMAGtfpGhSpkhCulNlTAwFdWxLXlomO4s
-   Nkvvyk5KWuvuc4dpzMYkIXqcGTVzwAfSmG7HyFPDnxDFKkhMIP15GbTvk
-   HBIUGTQJlL0VVSGiiThE2uXU7C+kB1i0NGhKg1Yze8lS0WGQxCNXTVn1s
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="8158905"
-X-IronPort-AV: E=Sophos;i="6.04,269,1695711600"; 
-   d="scan'208";a="8158905"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 02:55:41 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="864161638"
-X-IronPort-AV: E=Sophos;i="6.04,269,1695711600"; 
-   d="scan'208";a="864161638"
-Received: from os-delivery.igk.intel.com ([10.102.18.218])
-  by FMSMGA003.fm.intel.com with ESMTP; 12 Dec 2023 02:55:38 -0800
-From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-next v4 2/2] ixgbe: Refactor returning internal error codes
-Date: Tue, 12 Dec 2023 11:46:42 +0100
-Message-Id: <20231212104642.316887-3-jedrzej.jagielski@intel.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20231212104642.316887-1-jedrzej.jagielski@intel.com>
-References: <20231212104642.316887-1-jedrzej.jagielski@intel.com>
+Received: from mx0a-00230701.pphosted.com (mx0a-00230701.pphosted.com [148.163.156.19])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71F7EA0;
+	Tue, 12 Dec 2023 02:51:53 -0800 (PST)
+Received: from pps.filterd (m0297266.ppops.net [127.0.0.1])
+	by mx0a-00230701.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BCAKYjj027719;
+	Tue, 12 Dec 2023 02:51:09 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=synopsys.com; h=
+	from:to:cc:subject:date:message-id:references:in-reply-to
+	:content-type:content-transfer-encoding:mime-version; s=
+	pfptdkimsnps; bh=wMmWxkAoC2SDhXlT0wocv4z8LBgZHz2J0IEepSHevCA=; b=
+	Xu7A6uuKlR+c2xAp4s+XV7SWk6c5VQnSwuCEkB1RImmvmqX3/8q7LrneIUeLx0yN
+	cyHpbRRkHmWd8Jieknd3/K84X13p5TZJJYb6Hwyy50z8JqLmAm1iaAHp+tYJn8uY
+	rmYaKWtFqD08vbmdQPQwt6TO3MPM6wAghObzW2KRvqwXf74qUrav31MawYiHdzkK
+	vlIbGGsQGrf0/GrfwEIRuwdi8h93HbGkgVVGtNaojMKbmi9/nB8neBmosZMY/O8H
+	KLI+rldHB+cGqOvJrsV3JPJD7cCQGJkQc1zp0AMo+TNuwVHYDFkzr68ie7OEkca+
+	a16BFBgFUrquLlr9fGDtrQ==
+Received: from smtprelay-out1.synopsys.com (smtprelay-out1.synopsys.com [149.117.87.133])
+	by mx0a-00230701.pphosted.com (PPS) with ESMTPS id 3uxcr3tkpf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 Dec 2023 02:51:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=synopsys.com; s=mail;
+	t=1702378268; bh=wMmWxkAoC2SDhXlT0wocv4z8LBgZHz2J0IEepSHevCA=;
+	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
+	b=Z5yqDMU2KgnSwD8yXGINnxjzNzM4bhSiQvOi4zFcZ4eYJDMBeX5a3guuGgAp9QZF4
+	 nD5VVg9s+yV/Hlich84k/4ek7D76GtY5fY4NIinnd2Fpp8/rhWZClcI/9DDI/xWWix
+	 JVhj9y7sWzs4zVq5GoNzJa36NVKbNnSyeXV8jtXe5H355R+AtW1NigyUWU0PBY6bRX
+	 nKBUKZjhbiGMvWki2KqgIUKf1wrcgMqCHqdPgeVhkXXdMxoSR1VMbs/i50Me2QMtIN
+	 OCK0IDuryCtp10IdesxcSOaaxUDcrHv6p+8aIUYvcTnzCU2Q8J1GK0PhJXEUW2Ca1r
+	 x+fWjmAxwvO7g==
+Received: from mailhost.synopsys.com (sv1-mailhost2.synopsys.com [10.205.2.132])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits)
+	 client-signature RSA-PSS (2048 bits))
+	(Client CN "mailhost.synopsys.com", Issuer "SNPSica2" (verified OK))
+	by smtprelay-out1.synopsys.com (Postfix) with ESMTPS id 1698740362;
+	Tue, 12 Dec 2023 10:51:04 +0000 (UTC)
+Received: from o365relay-in.synopsys.com (sv2-o365relay3.synopsys.com [10.202.1.139])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(Client CN "o365relay-in.synopsys.com", Issuer "Entrust Certification Authority - L1K" (verified OK))
+	by mailhost.synopsys.com (Postfix) with ESMTPS id 80787A0073;
+	Tue, 12 Dec 2023 10:51:02 +0000 (UTC)
+Authentication-Results: o365relay-in.synopsys.com; dmarc=pass (p=reject dis=none) header.from=synopsys.com
+Authentication-Results: o365relay-in.synopsys.com; spf=pass smtp.mailfrom=synopsys.com
+Authentication-Results: o365relay-in.synopsys.com;
+	dkim=pass (1024-bit key; unprotected) header.d=synopsys.com header.i=@synopsys.com header.a=rsa-sha256 header.s=selector1 header.b=szlUAxLy;
+	dkim-atps=neutral
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2168.outbound.protection.outlook.com [104.47.59.168])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client CN "mail.protection.outlook.com", Issuer "DigiCert Cloud Services CA-1" (verified OK))
+	by o365relay-in.synopsys.com (Postfix) with ESMTPS id 94404401C4;
+	Tue, 12 Dec 2023 10:50:59 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dXg6BTsrPQ4M+PZNSll1biMVnnX9SZ4cY0kg+Dy+/V47D3X8pKS70x3SFx1jXBVFlYNZzaRIYjWRADAFVbjZQFZIcIfq+IPzFJPjwxL1QLEDoUE8p1QCBwE+7LsK3BwbNhLTjDvIAi0h6s+88TvDsxd3F1u9M+RwxxSUXYMM248SKw3c5ni/IjgfC+Ekj//yvazGL2NL6fSw9y+x61MbMalQIXsivnArbX+tJF0ok270RhmQb6M/8o5yWyrEO12cM2UPMmf98HwArBnDONwSYm3Txaf5xJ+Fua+BFpwztI940cQKYyOdKr6JxItoV/z/IrFVf88C/pjiTyxUJQ066g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wMmWxkAoC2SDhXlT0wocv4z8LBgZHz2J0IEepSHevCA=;
+ b=f29sDch67uieWCVKxKpG/HkTYHEyd50i/EefHW7Wp/X17erqooAckNECg287KIFh5oAr3c24AW2hxXscxleOjqiGmheeU4x3PJxG828gzpn6MenAQ5t4j7xrZokaJCXu+mCkRWHLq4kj5BDc4zmXhdHES7ooh5C0CXr9toNhoo7wejcX7Y5HFsxx6o4EMbe8/RFNBJw0qPwMEKL1QSCl8fs+roqOSksB/Ymb7OVFz9dr92Tv8nKacPNcEwibNFt6j/uYhVSBO8h8Q6uEvYHZ2eBBQU5cixHZkzfWLJlGxKUsKBoIZ3YtuX0VBoQYsb7MGc8LsYP9ccnNI+R9Jof6Nw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=synopsys.com; dmarc=pass action=none header.from=synopsys.com;
+ dkim=pass header.d=synopsys.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=synopsys.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wMmWxkAoC2SDhXlT0wocv4z8LBgZHz2J0IEepSHevCA=;
+ b=szlUAxLyKRtvq1GzA0t646yOOZOlcNS8+jMHsClMmhTfWunbOtCYFJG70IJ8gYM9NrKGyaJmQN3dpKg9rQL5HGja8EHLzSb0J0wYSudaW2i4wysBMjIfVuhKwUFEVa/BiLdPW12O/da86oGHfLvjvH4PBaSxinNUPkydQPXjTuY=
+Received: from SA0PR12MB4413.namprd12.prod.outlook.com (2603:10b6:806:9e::9)
+ by SJ1PR12MB6098.namprd12.prod.outlook.com (2603:10b6:a03:45f::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Tue, 12 Dec
+ 2023 10:50:55 +0000
+Received: from SA0PR12MB4413.namprd12.prod.outlook.com
+ ([fe80::12ba:707d:284:a4de]) by SA0PR12MB4413.namprd12.prod.outlook.com
+ ([fe80::12ba:707d:284:a4de%7]) with mapi id 15.20.7091.022; Tue, 12 Dec 2023
+ 10:50:54 +0000
+X-SNPS-Relay: synopsys.com
+From: Jiangfeng Ma <Jiangfeng.Ma@synopsys.com>
+To: Serge Semin <fancer.lancer@gmail.com>,
+        Maxime Chevallier
+	<maxime.chevallier@bootlin.com>
+CC: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu <Jose.Abreu@synopsys.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Simon Horman <horms@kernel.org>, Andrew Halaney <ahalaney@redhat.com>,
+        Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+        Shenwei Wang <shenwei.wang@nxp.com>,
+        Johannes Zink <j.zink@pengutronix.de>,
+        "Russell King  (Oracle" <rmk+kernel@armlinux.org.uk>,
+        Jochen Henneberg <jh@henneberg-systemdesign.com>,
+        "open list:STMMAC ETHERNET DRIVER" <netdev@vger.kernel.org>,
+        "moderated  list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>,
+        "moderated list:ARM/STM32  ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        James Li <James.Li1@synopsys.com>,
+        Martin McKenny <Martin.McKenny@synopsys.com>
+Subject: 
+ =?utf-8?B?5Zue5aSNOiBbUEFUQ0hdIG5ldDpzdG1tYWM6c3RtbWFjX3BsYXRmb3JtOkFk?=
+ =?utf-8?Q?d_snps,xpcs_devicetree_parsing?=
+Thread-Topic: [PATCH] net:stmmac:stmmac_platform:Add snps,xpcs devicetree
+ parsing
+Thread-Index: AdopoV2G4U4p6KhERnimGhWz15HefgADSasAAA0RnAAAt6TJAA==
+Date: Tue, 12 Dec 2023 10:50:53 +0000
+Message-ID: 
+ <SA0PR12MB4413305305D47CAAAFEAD528D98EA@SA0PR12MB4413.namprd12.prod.outlook.com>
+References: 
+ <SA0PR12MB44138E48A245378CF54D2F9ED98AA@SA0PR12MB4413.namprd12.prod.outlook.com>
+ <20231208091408.071680db@device.home>
+ <uzss3af2cklc5bx5apszoegafeaaiv7o7iwgrgrml4grkyev6p@6tme4hdb4mkn>
+In-Reply-To: <uzss3af2cklc5bx5apszoegafeaaiv7o7iwgrgrml4grkyev6p@6tme4hdb4mkn>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-dg-ref: 
+ PG1ldGE+PGF0IG5tPSJib2R5LnR4dCIgcD0iYzpcdXNlcnNcamlhbWFcYXBwZGF0YVxyb2FtaW5nXDA5ZDg0OWI2LTMyZDMtNGE0MC04NWVlLTZiODRiYTI5ZTM1Ylxtc2dzXG1zZy00Zjc4M2Y4Mi05OGRjLTExZWUtYmFhMy1jYzk2ZTU2NGY4OGJcYW1lLXRlc3RcNGY3ODNmODQtOThkYy0xMWVlLWJhYTMtY2M5NmU1NjRmODhiYm9keS50eHQiIHN6PSI5Njg2IiB0PSIxMzM0Njg1MTg0OTg4NzEzODgiIGg9InJwTnN6OG5wWWFrdS9aOEY0QUZ1WE5uelUvWT0iIGlkPSIiIGJsPSIwIiBibz0iMSIvPjwvbWV0YT4=
+x-dg-rorf: true
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA0PR12MB4413:EE_|SJ1PR12MB6098:EE_
+x-ms-office365-filtering-correlation-id: ecc451f9-039b-4333-216c-08dbfb0036b2
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ 20pvaX8Uknqx/NhU1PxA8hgPh7eDoQWiF+BaG/5/Ax7ZLWx422Fz2oc7fDMzLXF6g1A8oynMfshe7988d/iR+AvLmPdMsEv4hdpy1hccGEqNetYz/636+Wax6BcHFx+Pf/LRXN5GlIaWJ5BIZGokWYjw1Rxsq9x2JYdjfFMvp+CdJoBj6DrXGJhvjfMSpvyTvaRJ79Id5sm1YOx0j3AHDcg4g8rfm9O46KPFoMz6YqasWhnS4m2Naz9qYkeiASZ62R+qWZhzU2FqxmSrtXrwAwP2IK2r6tC8/Uh7v77BtljCUh/3ad/aoYa+R1LFdNkMQwamvw7Ho2A33x15oNkKhLtCsk4AgdcvHnHiQjkMk38hFxsEacnjJdVJpSY4CCVzXHNqBNc3+LhF3mTXoICT8/2g7mWd1F8z5b33B4zEDx0qBuTaYofecQKhKqY/3Et278KO0kPGJEtuIX+FDJ812Irov09yj6chJRrbC3VlsgYmtqFqeXKE4lIXK0iLMF94l+5642iX/kBzcB5jEQwalN2jsytWKde4H08WQrXpuZ2uj5xXqPObCir74zLHnb2XtMMhTz3M+NcEmOsb08Wvl7dinG2DIzLTqm9mcKdcMaM=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR12MB4413.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(376002)(346002)(366004)(136003)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(86362001)(7696005)(6506007)(2906002)(7416002)(66556008)(110136005)(66446008)(66946007)(66476007)(64756008)(54906003)(52536014)(9686003)(71200400001)(122000001)(33656002)(38100700002)(4326008)(8936002)(5660300002)(224303003)(316002)(55016003)(76116006)(478600001)(966005)(41300700001)(107886003)(38070700009)(26005)(83380400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?utf-8?B?dWxJQTFBVDlSRlEzcjFDY0VNUWtPRGIrYjJzZlA5NzcxTXNZenkyekE4Zi90?=
+ =?utf-8?B?V081OFhYVlJ6Q0JiQW5paUY3MHh6R1JvaDhWT0RVdlVDS3lIVndyVmdNUSs1?=
+ =?utf-8?B?aWVnYlBBRkVRK1pIZzZmengvWUNrM0xPbG1CS29LQ0JoZnE0Z3dqMFg4bVZN?=
+ =?utf-8?B?SVVzanI4VDdyMitJT0lTc3pkRThGY0NHSVEySkRoSlFmOXQvaWZOOXkvbzc0?=
+ =?utf-8?B?Vk9TZ2FuSEdjTnpoeXdYWXlLMStFbmRFRTNaQWdnOWc3UG45OWxTVWZQdkJs?=
+ =?utf-8?B?Tjl4ZjR5Y2NpNEFmbW96YzlxQVh6ejNsMmgrKyt3bFQ1eFJGN2IzZGpXdlFV?=
+ =?utf-8?B?TWl1S0NpZzVPZkMwNENMQWRpVGo5eXVxOTVSMmNJUFNiS2dOK2c2c2tmT1c2?=
+ =?utf-8?B?czNCOWJtYzMxdmhsZG5xbFQ5MjlrUGZhakZUYU1JMENhd1AvSEZmK3JxQ0pC?=
+ =?utf-8?B?UFJPa09XbmcxZm55eTM0SXFBQmtoWUUxeEZmTWphSFJKM0FzYXJpdWJ0NUFm?=
+ =?utf-8?B?T0JyVzQ4Y29TalE0cmR5cjIxbWpjazM3UUpjM1gzbHNqOHBoYzBGRzcwaFJr?=
+ =?utf-8?B?MmFCRjBRWk11ZGhnL2dESHVaNEtaYnZpM1YyT3FCT1hUdWdxUFM4TjIxV3hr?=
+ =?utf-8?B?enFlUEF1UnZwTHJWUGYyY1ZoWnhCNjZnZEZwZm4wa3J5T0N3cWVUNUltSUVm?=
+ =?utf-8?B?WnlBTXY4dlpxWjE2RWZKNXVqdktLS2NwWXZvQ3gzVzEzZC9INytuWWtuTTgx?=
+ =?utf-8?B?ajRkRDF2K3Fmb0hFTk9XUklNSjc2SExUVEhkY2FYZjNsRnpHejdiK1l6ekc1?=
+ =?utf-8?B?QWNGVzd2WkoyNElVR0k4eEVocGdSazVBQ0phSXI4NXNieUpuMVBUeVZKcStV?=
+ =?utf-8?B?eDhLMmZ6UTlPSTlKWTBDaml1TGpPOGJRaHFFTzhLZjJyTnF2RXZ0b1RjNW5G?=
+ =?utf-8?B?QkcrT3pmeXVibTJmcG15emUvYis2LzdqRzJsVUJscVZ5VlhoSnJoSzNQODdo?=
+ =?utf-8?B?dm4zYW9lQkNPcmc1eFI0K0VpR21VSklNNFIwWkE2bE9DNHFObGUvV1BVckoy?=
+ =?utf-8?B?Nmtrb2MxeHNndFFKTWVwY1V1VlpXN01JbkdKWnViMjg2b2JpdGZkNWpTVTBH?=
+ =?utf-8?B?cThRd1FUeXc3aklZUGErWTdHY203elg5ZkoxZlBNS2FLcGI5ZnN2bi82Rlhv?=
+ =?utf-8?B?cmEwU3dtQWwvcThhSVB4ZWJib1dXWDdBcDdFazhCa2o3MHQyS2FVZlBkeW9l?=
+ =?utf-8?B?SWxsTmkrdHVkV1o3U1RWVzVLUTYwVmNEdG5pUFkybTZlaUpqN3pMQXVEUjJq?=
+ =?utf-8?B?QjlET3c2c2hlQVcvUi8ySXoySm9NeEtVcEhCOFdOdDk0Yy84V0xNRElVei82?=
+ =?utf-8?B?cVVRYTNKOXZ4S0grWStxenQ3eDVCTmg3VVJGdE8zMVpuc0lZM1VyUmlJYUJT?=
+ =?utf-8?B?c2xJU1czSjR2NW15QUVJRjNKSzNPN2lUWnNQVkQ4dVdnRmpPdFhkbzJaU3FN?=
+ =?utf-8?B?b0Q1Yk9qZ3hETU1EbFpxMkowT2VxZzArVVNyRnZDRWpSNGxXaHF6NXB6V2pp?=
+ =?utf-8?B?c1FHQVhwM0h6TmdUK0lGT0VFU3MzRDMvdndTMHV4QXRQUmhNbnhHOXVkUE45?=
+ =?utf-8?B?MjlObFdCU1JGZGZGQUVOUExXYm12dUhIcUVUQTFiNWZuK1B6VnJkZ1diNTF0?=
+ =?utf-8?B?UVhBOGd3UllBSnlNUDNLV1psTmVGdGowTkVRQVdHQ3pCN2V6bEpOUytoZ3pw?=
+ =?utf-8?B?MzdvMUgxM0xESXUyUDNNTmI3bENsQkk3MTBvcEs3cjIzOVVoNU1aZzNOWlVp?=
+ =?utf-8?B?VWc5Tlg4aFNmM0JqbkZhaWwvZ1VSc3VYRXlhbi96Q3FqUlhQTlZKaUlKWWtH?=
+ =?utf-8?B?M0ZnYU8zUkV5K1hyWVZxbmRIQW1oNzkzT2NvWTFlcmtSSWhobmcvK1FPMW8z?=
+ =?utf-8?B?VnU5M1dtK0dYZFFxUTJjRUFDb3V5dTA5ODgvR2pJZ0VkM0F3bTd1RkVyd28x?=
+ =?utf-8?B?K1ExbVRXZ2ZkWXFLRXNiWGRxRldHR3NJbTBWNU1LQ216bmpQU1p4eVBwb214?=
+ =?utf-8?B?VFFPVzB3ZGFOcVRRL0FsRkJOQ1F1SUp6dDNxUVZzUGZsVXR2YndzaUdJaWJL?=
+ =?utf-8?Q?6sus=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	=?utf-8?B?SjU3bk12QmYzQzI1VGtoallxT3FRNHRob09PYThZaFdGcTcrd0pzUHYxN2Q3?=
+ =?utf-8?B?RS9DQVUwZ2RuVEpSdkJ4eStOaWlLZlQ0U3JXKzZ1ZEg5aWxoMUVDV2ZsWExV?=
+ =?utf-8?B?eENJWCtHMXdKbmRGRGdFcG5uT3R4eEJjWSt6Q1lWTHZ0YWNPek1qUzRGNEpk?=
+ =?utf-8?B?bzZZYVJFSnVPQmxYNWQwMXlzd1JpMm9hb0lDOGRRY2xPbmQ5UTBvelEvODBS?=
+ =?utf-8?B?NjQ0eEhPeTFUbXI2d3N1SysvSU5OMmxHZVJ0eGkrbHRtNFA3alRnNmRWZVYx?=
+ =?utf-8?B?Z2JpdDdmYUQ5Uk5mVUZhd0E1Y3lzNmtSYktEOElQRHRLejVBM1BJMmwzUkxm?=
+ =?utf-8?B?MjVXRUNOSFI4dlNLWXNQZkMxbGNJbWNGd2lJNnZVNFVmajIzQWZFaGFVQzRD?=
+ =?utf-8?B?aVllRzByc1VPbEJZVFEvRUhNS1Y3cmU4UWJMT3RFM1JmUzMybmNXSmNjSWVX?=
+ =?utf-8?B?VDBUS2JIQ0FaVmFEMkloczdMcDVMdlJZU2VFcXJ1WGxhK2RZTWI4N1Fpa1Rm?=
+ =?utf-8?B?Z0w4T01Sa3IwN2FSSVNkYWs4NWNkTDhGaWJLZlM2WW1UQ3JQU2VVOXc5Zkdq?=
+ =?utf-8?B?QVE2Skdnc0RiUzJkdnhxelZ4eXRENjA0bklnL2t3c21COUlFaFZnd25FK1ZR?=
+ =?utf-8?B?emxDQnBreDZzTUwzZ0tpTWxuVTNJRkU2NlNRUUdZdTkwY21Ca2tFS0xrZklh?=
+ =?utf-8?B?TFFvUkhRSFc2RlR6RUJuZGUzaHFZS01NdTZxb2plUTg1NlAwTWRWby9tOU0r?=
+ =?utf-8?B?S3lmMVBIRlNqNFgvTFgxdFFpV3hYRzBiZHFURVhxcHpvaFRaRm5pcmVVM2hD?=
+ =?utf-8?B?T0c4VElINk1OUWE2TS9vMG9GQmRtRmVBR1JsOXBwTDY1cjd6MVR3ZjE5d2RH?=
+ =?utf-8?B?NGI0YUpxNjNDKzdlcmxWRVdmcFh4MUl0NXhsZ09oUE1YU0VHS21RR0d3cTVu?=
+ =?utf-8?B?NUI5NTVzMWh1aW1udUdkeFFrRmF4RnRyVU40clhXQ0FTQUwwRXdIRm0vMjNI?=
+ =?utf-8?B?SEtZdnBFb2FqbGtkcHhLZGlQWEFFR0FKR1hEeHhsUVNvNElDUSsvRTBjS3JW?=
+ =?utf-8?B?MEhLZThyZHJKVEVMMUJyZ0pDeVJUTWdLQnNCVmJ0Z2N0dFRnVSszUTZPQzFx?=
+ =?utf-8?B?NUU3eCtJY3luSDAvMmhmcldGRWtoT0VLSGJYTHRGRnpvSFhhUVJ2eXA2S21L?=
+ =?utf-8?B?YmlhRVVaNno5amZqUHdFZzREZVI2R0RoNWpld1Y3UUp4dm9GdDdwUTlaNkhy?=
+ =?utf-8?B?RjdNZWdOZVEvalVBd05xNjJQV0ljYnRtQmY2aWl0NGpjaVc4Y0xZNklFeDY4?=
+ =?utf-8?B?R3YvSzFMQWV2bE01T0NsaWN0b3BVMjU5OWwvTmFBem5saGI3TEw4eEdxb3Va?=
+ =?utf-8?B?blU2MTZPY3YzeVl2RS90amRneWpwdU1pd2NZWFhjQ2Q2ZkNsdUpyZHRxRTB6?=
+ =?utf-8?B?d0RwS1BRZnN3WXB3OWkvdzJKNzZ6RUpRT2JHbzE4S0pYbHdRK1RRaDRjMUp6?=
+ =?utf-8?B?anlmMEthcjJmOVJJenkzNE54alYvTmh3NytrU1lLOVJ4bHpRWHhpZG9oWXFY?=
+ =?utf-8?B?K0ZlZVdjRngxMldUbk1rbWVPYW1oN08wdGZ5MlNjQldsWEgxR0h5NkZ5MEhJ?=
+ =?utf-8?B?RVBxQ3BVT21ML3g4cmwxT3U3UldJdWRYOWQ0UDluTTArdzllbmJua0FRTFBk?=
+ =?utf-8?B?L2dtdzM5S3dSdmo1QmUzc2pYUTJJM01PKzZNNWltWnpPUjB2R2txa3cya0NR?=
+ =?utf-8?B?WWE5dU9vM3daNGh3Q3V3QlRKcElkMkhtNEhvbGNXYmdBZk1mUGcwQXVydTI0?=
+ =?utf-8?Q?ILnOWK3vOEIMTqiB/Dxi2kdR4orff6lMAfo90=3D?=
+X-OriginatorOrg: synopsys.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA0PR12MB4413.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ecc451f9-039b-4333-216c-08dbfb0036b2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Dec 2023 10:50:53.8893
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: c33c9f88-1eb7-4099-9700-16013fd9e8aa
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: J+XBMT8Oio4t6oqKDMzIv4c5V5xT2AGFxDAXRKCUY9znYv3CrRa8yPk7YLUKbxLOf6ncYmo6hWUzYc9fFtKlAg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6098
+X-Proofpoint-ORIG-GUID: YMRiRQVBERzf_K6FMyttcifBnrvmOMou
+X-Proofpoint-GUID: YMRiRQVBERzf_K6FMyttcifBnrvmOMou
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_active_cloned_notspam policy=outbound_active_cloned score=0
+ mlxscore=0 suspectscore=0 mlxlogscore=999 impostorscore=0 malwarescore=0
+ adultscore=0 bulkscore=0 clxscore=1011 lowpriorityscore=0 phishscore=0
+ priorityscore=1501 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2311290000 definitions=main-2312120087
 
-Change returning codes to the kernel ones instead of
-the internal ones for the entire ixgbe driver.
-
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
----
-v3: do not use ENOSYS; rebase
----
- .../net/ethernet/intel/ixgbe/ixgbe_82598.c    |  36 ++---
- .../net/ethernet/intel/ixgbe/ixgbe_82599.c    |  61 ++++----
- .../net/ethernet/intel/ixgbe/ixgbe_common.c   | 145 ++++++++----------
- .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |   2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  26 ++--
- drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.c  |  34 ++--
- drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.h  |   1 -
- drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c  |  84 +++++-----
- .../net/ethernet/intel/ixgbe/ixgbe_sriov.c    |   2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |  39 -----
- drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c |  44 +++---
- drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c | 109 ++++++-------
- 12 files changed, 266 insertions(+), 317 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_82598.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_82598.c
-index 0470b69d834c..6835d5f18753 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_82598.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_82598.c
-@@ -123,14 +123,14 @@ static s32 ixgbe_init_phy_ops_82598(struct ixgbe_hw *hw)
- 		if (ret_val)
- 			return ret_val;
- 		if (hw->phy.sfp_type == ixgbe_sfp_type_unknown)
--			return IXGBE_ERR_SFP_NOT_SUPPORTED;
-+			return -EOPNOTSUPP;
- 
- 		/* Check to see if SFP+ module is supported */
- 		ret_val = ixgbe_get_sfp_init_sequence_offsets(hw,
- 							    &list_offset,
- 							    &data_offset);
- 		if (ret_val)
--			return IXGBE_ERR_SFP_NOT_SUPPORTED;
-+			return -EOPNOTSUPP;
- 		break;
- 	default:
- 		break;
-@@ -213,7 +213,7 @@ static s32 ixgbe_get_link_capabilities_82598(struct ixgbe_hw *hw,
- 		break;
- 
- 	default:
--		return IXGBE_ERR_LINK_SETUP;
-+		return -EIO;
- 	}
- 
- 	return 0;
-@@ -283,7 +283,7 @@ static s32 ixgbe_fc_enable_82598(struct ixgbe_hw *hw)
- 
- 	/* Validate the water mark configuration */
- 	if (!hw->fc.pause_time)
--		return IXGBE_ERR_INVALID_LINK_SETTINGS;
-+		return -EINVAL;
- 
- 	/* Low water mark of zero causes XOFF floods */
- 	for (i = 0; i < MAX_TRAFFIC_CLASS; i++) {
-@@ -292,7 +292,7 @@ static s32 ixgbe_fc_enable_82598(struct ixgbe_hw *hw)
- 			if (!hw->fc.low_water[i] ||
- 			    hw->fc.low_water[i] >= hw->fc.high_water[i]) {
- 				hw_dbg(hw, "Invalid water mark configuration\n");
--				return IXGBE_ERR_INVALID_LINK_SETTINGS;
-+				return -EINVAL;
- 			}
- 		}
- 	}
-@@ -369,7 +369,7 @@ static s32 ixgbe_fc_enable_82598(struct ixgbe_hw *hw)
- 		break;
- 	default:
- 		hw_dbg(hw, "Flow control param set incorrectly\n");
--		return IXGBE_ERR_CONFIG;
-+		return -EIO;
- 	}
- 
- 	/* Set 802.3x based flow control settings. */
-@@ -438,7 +438,7 @@ static s32 ixgbe_start_mac_link_82598(struct ixgbe_hw *hw,
- 				msleep(100);
- 			}
- 			if (!(links_reg & IXGBE_LINKS_KX_AN_COMP)) {
--				status = IXGBE_ERR_AUTONEG_NOT_COMPLETE;
-+				status = -EIO;
- 				hw_dbg(hw, "Autonegotiation did not complete.\n");
- 			}
- 		}
-@@ -478,7 +478,7 @@ static s32 ixgbe_validate_link_ready(struct ixgbe_hw *hw)
- 
- 	if (timeout == IXGBE_VALIDATE_LINK_READY_TIMEOUT) {
- 		hw_dbg(hw, "Link was indicated but link is down\n");
--		return IXGBE_ERR_LINK_SETUP;
-+		return -EIO;
- 	}
- 
- 	return 0;
-@@ -594,7 +594,7 @@ static s32 ixgbe_setup_mac_link_82598(struct ixgbe_hw *hw,
- 	speed &= link_capabilities;
- 
- 	if (speed == IXGBE_LINK_SPEED_UNKNOWN)
--		return IXGBE_ERR_LINK_SETUP;
-+		return -EINVAL;
- 
- 	/* Set KX4/KX support according to speed requested */
- 	else if (link_mode == IXGBE_AUTOC_LMS_KX4_AN ||
-@@ -701,9 +701,9 @@ static s32 ixgbe_reset_hw_82598(struct ixgbe_hw *hw)
- 
- 		/* Init PHY and function pointers, perform SFP setup */
- 		phy_status = hw->phy.ops.init(hw);
--		if (phy_status == IXGBE_ERR_SFP_NOT_SUPPORTED)
-+		if (phy_status == -EOPNOTSUPP)
- 			return phy_status;
--		if (phy_status == IXGBE_ERR_SFP_NOT_PRESENT)
-+		if (phy_status == -ENOENT)
- 			goto mac_reset_top;
- 
- 		hw->phy.ops.reset(hw);
-@@ -727,7 +727,7 @@ static s32 ixgbe_reset_hw_82598(struct ixgbe_hw *hw)
- 		udelay(1);
- 	}
- 	if (ctrl & IXGBE_CTRL_RST) {
--		status = IXGBE_ERR_RESET_FAILED;
-+		status = -EIO;
- 		hw_dbg(hw, "Reset polling failed to complete.\n");
- 	}
- 
-@@ -789,7 +789,7 @@ static s32 ixgbe_set_vmdq_82598(struct ixgbe_hw *hw, u32 rar, u32 vmdq)
- 	/* Make sure we are using a valid rar index range */
- 	if (rar >= rar_entries) {
- 		hw_dbg(hw, "RAR index %d is out of range.\n", rar);
--		return IXGBE_ERR_INVALID_ARGUMENT;
-+		return -EINVAL;
- 	}
- 
- 	rar_high = IXGBE_READ_REG(hw, IXGBE_RAH(rar));
-@@ -814,7 +814,7 @@ static s32 ixgbe_clear_vmdq_82598(struct ixgbe_hw *hw, u32 rar, u32 vmdq)
- 	/* Make sure we are using a valid rar index range */
- 	if (rar >= rar_entries) {
- 		hw_dbg(hw, "RAR index %d is out of range.\n", rar);
--		return IXGBE_ERR_INVALID_ARGUMENT;
-+		return -EINVAL;
- 	}
- 
- 	rar_high = IXGBE_READ_REG(hw, IXGBE_RAH(rar));
-@@ -845,7 +845,7 @@ static s32 ixgbe_set_vfta_82598(struct ixgbe_hw *hw, u32 vlan, u32 vind,
- 	u32 vftabyte;
- 
- 	if (vlan > 4095)
--		return IXGBE_ERR_PARAM;
-+		return -EINVAL;
- 
- 	/* Determine 32-bit word position in array */
- 	regindex = (vlan >> 5) & 0x7F;   /* upper seven bits */
-@@ -964,7 +964,7 @@ static s32 ixgbe_read_i2c_phy_82598(struct ixgbe_hw *hw, u8 dev_addr,
- 		gssr = IXGBE_GSSR_PHY0_SM;
- 
- 	if (hw->mac.ops.acquire_swfw_sync(hw, gssr) != 0)
--		return IXGBE_ERR_SWFW_SYNC;
-+		return -EBUSY;
- 
- 	if (hw->phy.type == ixgbe_phy_nl) {
- 		/*
-@@ -993,7 +993,7 @@ static s32 ixgbe_read_i2c_phy_82598(struct ixgbe_hw *hw, u8 dev_addr,
- 
- 		if (sfp_stat != IXGBE_I2C_EEPROM_STATUS_PASS) {
- 			hw_dbg(hw, "EEPROM read did not pass.\n");
--			status = IXGBE_ERR_SFP_NOT_PRESENT;
-+			status = -ENOENT;
- 			goto out;
- 		}
- 
-@@ -1003,7 +1003,7 @@ static s32 ixgbe_read_i2c_phy_82598(struct ixgbe_hw *hw, u8 dev_addr,
- 
- 		*eeprom_data = (u8)(sfp_data >> 8);
- 	} else {
--		status = IXGBE_ERR_PHY;
-+		status = -EIO;
- 	}
- 
- out:
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
-index 58ea959a4482..339e106a5732 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
-@@ -117,7 +117,7 @@ static s32 ixgbe_setup_sfp_modules_82599(struct ixgbe_hw *hw)
- 		ret_val = hw->mac.ops.acquire_swfw_sync(hw,
- 							IXGBE_GSSR_MAC_CSR_SM);
- 		if (ret_val)
--			return IXGBE_ERR_SWFW_SYNC;
-+			return -EBUSY;
- 
- 		if (hw->eeprom.ops.read(hw, ++data_offset, &data_value))
- 			goto setup_sfp_err;
-@@ -144,7 +144,7 @@ static s32 ixgbe_setup_sfp_modules_82599(struct ixgbe_hw *hw)
- 
- 		if (ret_val) {
- 			hw_dbg(hw, " sfp module setup not complete\n");
--			return IXGBE_ERR_SFP_SETUP_NOT_COMPLETE;
-+			return -EIO;
- 		}
- 	}
- 
-@@ -159,7 +159,7 @@ static s32 ixgbe_setup_sfp_modules_82599(struct ixgbe_hw *hw)
- 	usleep_range(hw->eeprom.semaphore_delay * 1000,
- 		     hw->eeprom.semaphore_delay * 2000);
- 	hw_err(hw, "eeprom read at offset %d failed\n", data_offset);
--	return IXGBE_ERR_SFP_SETUP_NOT_COMPLETE;
-+	return -EIO;
- }
- 
- /**
-@@ -184,7 +184,7 @@ static s32 prot_autoc_read_82599(struct ixgbe_hw *hw, bool *locked,
- 		ret_val = hw->mac.ops.acquire_swfw_sync(hw,
- 					IXGBE_GSSR_MAC_CSR_SM);
- 		if (ret_val)
--			return IXGBE_ERR_SWFW_SYNC;
-+			return -EBUSY;
- 
- 		*locked = true;
- 	}
-@@ -219,7 +219,7 @@ static s32 prot_autoc_write_82599(struct ixgbe_hw *hw, u32 autoc, bool locked)
- 		ret_val = hw->mac.ops.acquire_swfw_sync(hw,
- 					IXGBE_GSSR_MAC_CSR_SM);
- 		if (ret_val)
--			return IXGBE_ERR_SWFW_SYNC;
-+			return -EBUSY;
- 
- 		locked = true;
- 	}
-@@ -400,7 +400,7 @@ static s32 ixgbe_get_link_capabilities_82599(struct ixgbe_hw *hw,
- 		break;
- 
- 	default:
--		return IXGBE_ERR_LINK_SETUP;
-+		return -EIO;
- 	}
- 
- 	if (hw->phy.multispeed_fiber) {
-@@ -541,7 +541,7 @@ static s32 ixgbe_start_mac_link_82599(struct ixgbe_hw *hw,
- 				msleep(100);
- 			}
- 			if (!(links_reg & IXGBE_LINKS_KX_AN_COMP)) {
--				status = IXGBE_ERR_AUTONEG_NOT_COMPLETE;
-+				status = -EIO;
- 				hw_dbg(hw, "Autoneg did not complete.\n");
- 			}
- 		}
-@@ -794,7 +794,7 @@ static s32 ixgbe_setup_mac_link_82599(struct ixgbe_hw *hw,
- 	speed &= link_capabilities;
- 
- 	if (speed == IXGBE_LINK_SPEED_UNKNOWN)
--		return IXGBE_ERR_LINK_SETUP;
-+		return -EINVAL;
- 
- 	/* Use stored value (EEPROM defaults) of AUTOC to find KR/KX4 support*/
- 	if (hw->mac.orig_link_settings_stored)
-@@ -861,8 +861,7 @@ static s32 ixgbe_setup_mac_link_82599(struct ixgbe_hw *hw,
- 					msleep(100);
- 				}
- 				if (!(links_reg & IXGBE_LINKS_KX_AN_COMP)) {
--					status =
--						IXGBE_ERR_AUTONEG_NOT_COMPLETE;
-+					status = -EIO;
- 					hw_dbg(hw, "Autoneg did not complete.\n");
- 				}
- 			}
-@@ -927,7 +926,7 @@ static s32 ixgbe_reset_hw_82599(struct ixgbe_hw *hw)
- 	/* Identify PHY and related function pointers */
- 	status = hw->phy.ops.init(hw);
- 
--	if (status == IXGBE_ERR_SFP_NOT_SUPPORTED)
-+	if (status == -EOPNOTSUPP)
- 		return status;
- 
- 	/* Setup SFP module if there is one present. */
-@@ -936,7 +935,7 @@ static s32 ixgbe_reset_hw_82599(struct ixgbe_hw *hw)
- 		hw->phy.sfp_setup_needed = false;
- 	}
- 
--	if (status == IXGBE_ERR_SFP_NOT_SUPPORTED)
-+	if (status == -EOPNOTSUPP)
- 		return status;
- 
- 	/* Reset PHY */
-@@ -974,7 +973,7 @@ static s32 ixgbe_reset_hw_82599(struct ixgbe_hw *hw)
- 	}
- 
- 	if (ctrl & IXGBE_CTRL_RST_MASK) {
--		status = IXGBE_ERR_RESET_FAILED;
-+		status = -EIO;
- 		hw_dbg(hw, "Reset polling failed to complete.\n");
- 	}
- 
-@@ -1093,7 +1092,7 @@ static s32 ixgbe_fdir_check_cmd_complete(struct ixgbe_hw *hw, u32 *fdircmd)
- 		udelay(10);
- 	}
- 
--	return IXGBE_ERR_FDIR_CMD_INCOMPLETE;
-+	return -EIO;
- }
- 
- /**
-@@ -1155,7 +1154,7 @@ s32 ixgbe_reinit_fdir_tables_82599(struct ixgbe_hw *hw)
- 	}
- 	if (i >= IXGBE_FDIR_INIT_DONE_POLL) {
- 		hw_dbg(hw, "Flow Director Signature poll time exceeded!\n");
--		return IXGBE_ERR_FDIR_REINIT_FAILED;
-+		return -EIO;
- 	}
- 
- 	/* Clear FDIR statistics registers (read to clear) */
-@@ -1387,7 +1386,7 @@ s32 ixgbe_fdir_add_signature_filter_82599(struct ixgbe_hw *hw,
- 		break;
- 	default:
- 		hw_dbg(hw, " Error on flow type input\n");
--		return IXGBE_ERR_CONFIG;
-+		return -EIO;
- 	}
- 
- 	/* configure FDIRCMD register */
-@@ -1546,7 +1545,7 @@ s32 ixgbe_fdir_set_input_mask_82599(struct ixgbe_hw *hw,
- 		break;
- 	default:
- 		hw_dbg(hw, " Error on vm pool mask\n");
--		return IXGBE_ERR_CONFIG;
-+		return -EIO;
- 	}
- 
- 	switch (input_mask->formatted.flow_type & IXGBE_ATR_L4TYPE_MASK) {
-@@ -1555,14 +1554,14 @@ s32 ixgbe_fdir_set_input_mask_82599(struct ixgbe_hw *hw,
- 		if (input_mask->formatted.dst_port ||
- 		    input_mask->formatted.src_port) {
- 			hw_dbg(hw, " Error on src/dst port mask\n");
--			return IXGBE_ERR_CONFIG;
-+			return -EIO;
- 		}
- 		break;
- 	case IXGBE_ATR_L4TYPE_MASK:
- 		break;
- 	default:
- 		hw_dbg(hw, " Error on flow type mask\n");
--		return IXGBE_ERR_CONFIG;
-+		return -EIO;
- 	}
- 
- 	switch (ntohs(input_mask->formatted.vlan_id) & 0xEFFF) {
-@@ -1583,7 +1582,7 @@ s32 ixgbe_fdir_set_input_mask_82599(struct ixgbe_hw *hw,
- 		break;
- 	default:
- 		hw_dbg(hw, " Error on VLAN mask\n");
--		return IXGBE_ERR_CONFIG;
-+		return -EIO;
- 	}
- 
- 	switch ((__force u16)input_mask->formatted.flex_bytes & 0xFFFF) {
-@@ -1595,7 +1594,7 @@ s32 ixgbe_fdir_set_input_mask_82599(struct ixgbe_hw *hw,
- 		break;
- 	default:
- 		hw_dbg(hw, " Error on flexible byte mask\n");
--		return IXGBE_ERR_CONFIG;
-+		return -EIO;
- 	}
- 
- 	/* Now mask VM pool and destination IPv6 - bits 5 and 2 */
-@@ -1824,7 +1823,7 @@ static s32 ixgbe_identify_phy_82599(struct ixgbe_hw *hw)
- 
- 	/* Return error if SFP module has been detected but is not supported */
- 	if (hw->phy.type == ixgbe_phy_sfp_unsupported)
--		return IXGBE_ERR_SFP_NOT_SUPPORTED;
-+		return -EOPNOTSUPP;
- 
- 	return status;
- }
-@@ -1863,13 +1862,13 @@ static s32 ixgbe_enable_rx_dma_82599(struct ixgbe_hw *hw, u32 regval)
-  *  Verifies that installed the firmware version is 0.6 or higher
-  *  for SFI devices. All 82599 SFI devices should have version 0.6 or higher.
-  *
-- *  Returns IXGBE_ERR_EEPROM_VERSION if the FW is not present or
-- *  if the FW version is not supported.
-+ *  Return: -EACCES if the FW is not present or if the FW version is
-+ *  not supported.
-  **/
- static s32 ixgbe_verify_fw_version_82599(struct ixgbe_hw *hw)
- {
--	s32 status = IXGBE_ERR_EEPROM_VERSION;
- 	u16 fw_offset, fw_ptp_cfg_offset;
-+	s32 status = -EACCES;
- 	u16 offset;
- 	u16 fw_version = 0;
- 
-@@ -1883,7 +1882,7 @@ static s32 ixgbe_verify_fw_version_82599(struct ixgbe_hw *hw)
- 		goto fw_version_err;
- 
- 	if (fw_offset == 0 || fw_offset == 0xFFFF)
--		return IXGBE_ERR_EEPROM_VERSION;
-+		return -EACCES;
- 
- 	/* get the offset to the Pass Through Patch Configuration block */
- 	offset = fw_offset + IXGBE_FW_PASSTHROUGH_PATCH_CONFIG_PTR;
-@@ -1891,7 +1890,7 @@ static s32 ixgbe_verify_fw_version_82599(struct ixgbe_hw *hw)
- 		goto fw_version_err;
- 
- 	if (fw_ptp_cfg_offset == 0 || fw_ptp_cfg_offset == 0xFFFF)
--		return IXGBE_ERR_EEPROM_VERSION;
-+		return -EACCES;
- 
- 	/* get the firmware version */
- 	offset = fw_ptp_cfg_offset + IXGBE_FW_PATCH_VERSION_4;
-@@ -1905,7 +1904,7 @@ static s32 ixgbe_verify_fw_version_82599(struct ixgbe_hw *hw)
- 
- fw_version_err:
- 	hw_err(hw, "eeprom read at offset %d failed\n", offset);
--	return IXGBE_ERR_EEPROM_VERSION;
-+	return -EACCES;
- }
- 
- /**
-@@ -2038,7 +2037,7 @@ static s32 ixgbe_reset_pipeline_82599(struct ixgbe_hw *hw)
- 
- 	if (!(anlp1_reg & IXGBE_ANLP1_AN_STATE_MASK)) {
- 		hw_dbg(hw, "auto negotiation not completed\n");
--		ret_val = IXGBE_ERR_RESET_FAILED;
-+		ret_val = -EIO;
- 		goto reset_pipeline_out;
- 	}
- 
-@@ -2087,7 +2086,7 @@ static s32 ixgbe_read_i2c_byte_82599(struct ixgbe_hw *hw, u8 byte_offset,
- 
- 		if (!timeout) {
- 			hw_dbg(hw, "Driver can't access resource, acquiring I2C bus timeout.\n");
--			status = IXGBE_ERR_I2C;
-+			status = -EIO;
- 			goto release_i2c_access;
- 		}
- 	}
-@@ -2141,7 +2140,7 @@ static s32 ixgbe_write_i2c_byte_82599(struct ixgbe_hw *hw, u8 byte_offset,
- 
- 		if (!timeout) {
- 			hw_dbg(hw, "Driver can't access resource, acquiring I2C bus timeout.\n");
--			status = IXGBE_ERR_I2C;
-+			status = -EIO;
- 			goto release_i2c_access;
- 		}
- 	}
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_common.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_common.c
-index 7d7bd44448c4..876d5b497049 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_common.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_common.c
-@@ -124,7 +124,7 @@ s32 ixgbe_setup_fc_generic(struct ixgbe_hw *hw)
- 	 */
- 	if (hw->fc.strict_ieee && hw->fc.requested_mode == ixgbe_fc_rx_pause) {
- 		hw_dbg(hw, "ixgbe_fc_rx_pause not valid in strict IEEE mode\n");
--		return IXGBE_ERR_INVALID_LINK_SETTINGS;
-+		return -EINVAL;
- 	}
- 
- 	/*
-@@ -215,7 +215,7 @@ s32 ixgbe_setup_fc_generic(struct ixgbe_hw *hw)
- 		break;
- 	default:
- 		hw_dbg(hw, "Flow control param set incorrectly\n");
--		return IXGBE_ERR_CONFIG;
-+		return -EIO;
- 	}
- 
- 	if (hw->mac.type != ixgbe_mac_X540) {
-@@ -500,7 +500,7 @@ s32 ixgbe_read_pba_string_generic(struct ixgbe_hw *hw, u8 *pba_num,
- 
- 	if (pba_num == NULL) {
- 		hw_dbg(hw, "PBA string buffer was null\n");
--		return IXGBE_ERR_INVALID_ARGUMENT;
-+		return -EINVAL;
- 	}
- 
- 	ret_val = hw->eeprom.ops.read(hw, IXGBE_PBANUM0_PTR, &data);
-@@ -526,7 +526,7 @@ s32 ixgbe_read_pba_string_generic(struct ixgbe_hw *hw, u8 *pba_num,
- 		/* we will need 11 characters to store the PBA */
- 		if (pba_num_size < 11) {
- 			hw_dbg(hw, "PBA string buffer too small\n");
--			return IXGBE_ERR_NO_SPACE;
-+			return -ENOSPC;
- 		}
- 
- 		/* extract hex string from data and pba_ptr */
-@@ -563,13 +563,13 @@ s32 ixgbe_read_pba_string_generic(struct ixgbe_hw *hw, u8 *pba_num,
- 
- 	if (length == 0xFFFF || length == 0) {
- 		hw_dbg(hw, "NVM PBA number section invalid length\n");
--		return IXGBE_ERR_PBA_SECTION;
-+		return -EIO;
- 	}
- 
- 	/* check if pba_num buffer is big enough */
- 	if (pba_num_size  < (((u32)length * 2) - 1)) {
- 		hw_dbg(hw, "PBA string buffer too small\n");
--		return IXGBE_ERR_NO_SPACE;
-+		return -ENOSPC;
- 	}
- 
- 	/* trim pba length from start of string */
-@@ -805,7 +805,7 @@ s32 ixgbe_led_on_generic(struct ixgbe_hw *hw, u32 index)
- 	u32 led_reg = IXGBE_READ_REG(hw, IXGBE_LEDCTL);
- 
- 	if (index > 3)
--		return IXGBE_ERR_PARAM;
-+		return -EINVAL;
- 
- 	/* To turn on the LED, set mode to ON. */
- 	led_reg &= ~IXGBE_LED_MODE_MASK(index);
-@@ -826,7 +826,7 @@ s32 ixgbe_led_off_generic(struct ixgbe_hw *hw, u32 index)
- 	u32 led_reg = IXGBE_READ_REG(hw, IXGBE_LEDCTL);
- 
- 	if (index > 3)
--		return IXGBE_ERR_PARAM;
-+		return -EINVAL;
- 
- 	/* To turn off the LED, set mode to OFF. */
- 	led_reg &= ~IXGBE_LED_MODE_MASK(index);
-@@ -903,11 +903,8 @@ s32 ixgbe_write_eeprom_buffer_bit_bang_generic(struct ixgbe_hw *hw, u16 offset,
- 
- 	hw->eeprom.ops.init_params(hw);
- 
--	if (words == 0)
--		return IXGBE_ERR_INVALID_ARGUMENT;
--
--	if (offset + words > hw->eeprom.word_size)
--		return IXGBE_ERR_EEPROM;
-+	if (words == 0 || (offset + words > hw->eeprom.word_size))
-+		return -EINVAL;
- 
- 	/*
- 	 * The EEPROM page size cannot be queried from the chip. We do lazy
-@@ -961,7 +958,7 @@ static s32 ixgbe_write_eeprom_buffer_bit_bang(struct ixgbe_hw *hw, u16 offset,
- 
- 	if (ixgbe_ready_eeprom(hw) != 0) {
- 		ixgbe_release_eeprom(hw);
--		return IXGBE_ERR_EEPROM;
-+		return -EIO;
- 	}
- 
- 	for (i = 0; i < words; i++) {
-@@ -1027,7 +1024,7 @@ s32 ixgbe_write_eeprom_generic(struct ixgbe_hw *hw, u16 offset, u16 data)
- 	hw->eeprom.ops.init_params(hw);
- 
- 	if (offset >= hw->eeprom.word_size)
--		return IXGBE_ERR_EEPROM;
-+		return -EINVAL;
- 
- 	return ixgbe_write_eeprom_buffer_bit_bang(hw, offset, 1, &data);
- }
-@@ -1049,11 +1046,8 @@ s32 ixgbe_read_eeprom_buffer_bit_bang_generic(struct ixgbe_hw *hw, u16 offset,
- 
- 	hw->eeprom.ops.init_params(hw);
- 
--	if (words == 0)
--		return IXGBE_ERR_INVALID_ARGUMENT;
--
--	if (offset + words > hw->eeprom.word_size)
--		return IXGBE_ERR_EEPROM;
-+	if (words == 0 || (offset + words > hw->eeprom.word_size))
-+		return -EINVAL;
- 
- 	/*
- 	 * We cannot hold synchronization semaphores for too long
-@@ -1098,7 +1092,7 @@ static s32 ixgbe_read_eeprom_buffer_bit_bang(struct ixgbe_hw *hw, u16 offset,
- 
- 	if (ixgbe_ready_eeprom(hw) != 0) {
- 		ixgbe_release_eeprom(hw);
--		return IXGBE_ERR_EEPROM;
-+		return -EIO;
- 	}
- 
- 	for (i = 0; i < words; i++) {
-@@ -1141,7 +1135,7 @@ s32 ixgbe_read_eeprom_bit_bang_generic(struct ixgbe_hw *hw, u16 offset,
- 	hw->eeprom.ops.init_params(hw);
- 
- 	if (offset >= hw->eeprom.word_size)
--		return IXGBE_ERR_EEPROM;
-+		return -EINVAL;
- 
- 	return ixgbe_read_eeprom_buffer_bit_bang(hw, offset, 1, data);
- }
-@@ -1164,11 +1158,8 @@ s32 ixgbe_read_eerd_buffer_generic(struct ixgbe_hw *hw, u16 offset,
- 
- 	hw->eeprom.ops.init_params(hw);
- 
--	if (words == 0)
--		return IXGBE_ERR_INVALID_ARGUMENT;
--
--	if (offset >= hw->eeprom.word_size)
--		return IXGBE_ERR_EEPROM;
-+	if (words == 0 || offset >= hw->eeprom.word_size)
-+		return -EINVAL;
- 
- 	for (i = 0; i < words; i++) {
- 		eerd = ((offset + i) << IXGBE_EEPROM_RW_ADDR_SHIFT) |
-@@ -1261,11 +1252,8 @@ s32 ixgbe_write_eewr_buffer_generic(struct ixgbe_hw *hw, u16 offset,
- 
- 	hw->eeprom.ops.init_params(hw);
- 
--	if (words == 0)
--		return IXGBE_ERR_INVALID_ARGUMENT;
--
--	if (offset >= hw->eeprom.word_size)
--		return IXGBE_ERR_EEPROM;
-+	if (words == 0 || offset >= hw->eeprom.word_size)
-+		return -EINVAL;
- 
- 	for (i = 0; i < words; i++) {
- 		eewr = ((offset + i) << IXGBE_EEPROM_RW_ADDR_SHIFT) |
-@@ -1327,7 +1315,7 @@ static s32 ixgbe_poll_eerd_eewr_done(struct ixgbe_hw *hw, u32 ee_reg)
- 		}
- 		udelay(5);
- 	}
--	return IXGBE_ERR_EEPROM;
-+	return -EIO;
- }
- 
- /**
-@@ -1343,7 +1331,7 @@ static s32 ixgbe_acquire_eeprom(struct ixgbe_hw *hw)
- 	u32 i;
- 
- 	if (hw->mac.ops.acquire_swfw_sync(hw, IXGBE_GSSR_EEP_SM) != 0)
--		return IXGBE_ERR_SWFW_SYNC;
-+		return -EBUSY;
- 
- 	eec = IXGBE_READ_REG(hw, IXGBE_EEC(hw));
- 
-@@ -1365,7 +1353,7 @@ static s32 ixgbe_acquire_eeprom(struct ixgbe_hw *hw)
- 		hw_dbg(hw, "Could not acquire EEPROM grant\n");
- 
- 		hw->mac.ops.release_swfw_sync(hw, IXGBE_GSSR_EEP_SM);
--		return IXGBE_ERR_EEPROM;
-+		return -EIO;
- 	}
- 
- 	/* Setup EEPROM for Read/Write */
-@@ -1418,7 +1406,7 @@ static s32 ixgbe_get_eeprom_semaphore(struct ixgbe_hw *hw)
- 		swsm = IXGBE_READ_REG(hw, IXGBE_SWSM(hw));
- 		if (swsm & IXGBE_SWSM_SMBI) {
- 			hw_dbg(hw, "Software semaphore SMBI between device drivers not granted.\n");
--			return IXGBE_ERR_EEPROM;
-+			return -EIO;
- 		}
- 	}
- 
-@@ -1446,7 +1434,7 @@ static s32 ixgbe_get_eeprom_semaphore(struct ixgbe_hw *hw)
- 	if (i >= timeout) {
- 		hw_dbg(hw, "SWESMBI Software EEPROM semaphore not granted.\n");
- 		ixgbe_release_eeprom_semaphore(hw);
--		return IXGBE_ERR_EEPROM;
-+		return -EIO;
- 	}
- 
- 	return 0;
-@@ -1502,7 +1490,7 @@ static s32 ixgbe_ready_eeprom(struct ixgbe_hw *hw)
- 	 */
- 	if (i >= IXGBE_EEPROM_MAX_RETRY_SPI) {
- 		hw_dbg(hw, "SPI EEPROM Status error\n");
--		return IXGBE_ERR_EEPROM;
-+		return -EIO;
- 	}
- 
- 	return 0;
-@@ -1714,7 +1702,7 @@ s32 ixgbe_calc_eeprom_checksum_generic(struct ixgbe_hw *hw)
- 	for (i = IXGBE_PCIE_ANALOG_PTR; i < IXGBE_FW_PTR; i++) {
- 		if (hw->eeprom.ops.read(hw, i, &pointer)) {
- 			hw_dbg(hw, "EEPROM read failed\n");
--			return IXGBE_ERR_EEPROM;
-+			return -EIO;
- 		}
- 
- 		/* If the pointer seems invalid */
-@@ -1723,7 +1711,7 @@ s32 ixgbe_calc_eeprom_checksum_generic(struct ixgbe_hw *hw)
- 
- 		if (hw->eeprom.ops.read(hw, pointer, &length)) {
- 			hw_dbg(hw, "EEPROM read failed\n");
--			return IXGBE_ERR_EEPROM;
-+			return -EIO;
- 		}
- 
- 		if (length == 0xFFFF || length == 0)
-@@ -1732,7 +1720,7 @@ s32 ixgbe_calc_eeprom_checksum_generic(struct ixgbe_hw *hw)
- 		for (j = pointer + 1; j <= pointer + length; j++) {
- 			if (hw->eeprom.ops.read(hw, j, &word)) {
- 				hw_dbg(hw, "EEPROM read failed\n");
--				return IXGBE_ERR_EEPROM;
-+				return -EIO;
- 			}
- 			checksum += word;
- 		}
-@@ -1785,7 +1773,7 @@ s32 ixgbe_validate_eeprom_checksum_generic(struct ixgbe_hw *hw,
- 	 * calculated checksum
- 	 */
- 	if (read_checksum != checksum)
--		status = IXGBE_ERR_EEPROM_CHECKSUM;
-+		status = -EIO;
- 
- 	/* If the user cares, return the calculated checksum */
- 	if (checksum_val)
-@@ -1844,7 +1832,7 @@ s32 ixgbe_set_rar_generic(struct ixgbe_hw *hw, u32 index, u8 *addr, u32 vmdq,
- 	/* Make sure we are using a valid rar index range */
- 	if (index >= rar_entries) {
- 		hw_dbg(hw, "RAR index %d is out of range.\n", index);
--		return IXGBE_ERR_INVALID_ARGUMENT;
-+		return -EINVAL;
- 	}
- 
- 	/* setup VMDq pool selection before this RAR gets enabled */
-@@ -1896,7 +1884,7 @@ s32 ixgbe_clear_rar_generic(struct ixgbe_hw *hw, u32 index)
- 	/* Make sure we are using a valid rar index range */
- 	if (index >= rar_entries) {
- 		hw_dbg(hw, "RAR index %d is out of range.\n", index);
--		return IXGBE_ERR_INVALID_ARGUMENT;
-+		return -EINVAL;
- 	}
- 
- 	/*
-@@ -2145,7 +2133,7 @@ s32 ixgbe_fc_enable_generic(struct ixgbe_hw *hw)
- 
- 	/* Validate the water mark configuration. */
- 	if (!hw->fc.pause_time)
--		return IXGBE_ERR_INVALID_LINK_SETTINGS;
-+		return -EINVAL;
- 
- 	/* Low water mark of zero causes XOFF floods */
- 	for (i = 0; i < MAX_TRAFFIC_CLASS; i++) {
-@@ -2154,7 +2142,7 @@ s32 ixgbe_fc_enable_generic(struct ixgbe_hw *hw)
- 			if (!hw->fc.low_water[i] ||
- 			    hw->fc.low_water[i] >= hw->fc.high_water[i]) {
- 				hw_dbg(hw, "Invalid water mark configuration\n");
--				return IXGBE_ERR_INVALID_LINK_SETTINGS;
-+				return -EINVAL;
- 			}
- 		}
- 	}
-@@ -2211,7 +2199,7 @@ s32 ixgbe_fc_enable_generic(struct ixgbe_hw *hw)
- 		break;
- 	default:
- 		hw_dbg(hw, "Flow control param set incorrectly\n");
--		return IXGBE_ERR_CONFIG;
-+		return -EIO;
- 	}
- 
- 	/* Set 802.3x based flow control settings. */
-@@ -2268,7 +2256,7 @@ s32 ixgbe_negotiate_fc(struct ixgbe_hw *hw, u32 adv_reg, u32 lp_reg,
- 		       u32 adv_sym, u32 adv_asm, u32 lp_sym, u32 lp_asm)
- {
- 	if ((!(adv_reg)) ||  (!(lp_reg)))
--		return IXGBE_ERR_FC_NOT_NEGOTIATED;
-+		return -EINVAL;
- 
- 	if ((adv_reg & adv_sym) && (lp_reg & lp_sym)) {
- 		/*
-@@ -2320,7 +2308,7 @@ static s32 ixgbe_fc_autoneg_fiber(struct ixgbe_hw *hw)
- 	linkstat = IXGBE_READ_REG(hw, IXGBE_PCS1GLSTA);
- 	if ((!!(linkstat & IXGBE_PCS1GLSTA_AN_COMPLETE) == 0) ||
- 	    (!!(linkstat & IXGBE_PCS1GLSTA_AN_TIMED_OUT) == 1))
--		return IXGBE_ERR_FC_NOT_NEGOTIATED;
-+		return -EIO;
- 
- 	pcs_anadv_reg = IXGBE_READ_REG(hw, IXGBE_PCS1GANA);
- 	pcs_lpab_reg = IXGBE_READ_REG(hw, IXGBE_PCS1GANLP);
-@@ -2352,12 +2340,12 @@ static s32 ixgbe_fc_autoneg_backplane(struct ixgbe_hw *hw)
- 	 */
- 	links = IXGBE_READ_REG(hw, IXGBE_LINKS);
- 	if ((links & IXGBE_LINKS_KX_AN_COMP) == 0)
--		return IXGBE_ERR_FC_NOT_NEGOTIATED;
-+		return -EIO;
- 
- 	if (hw->mac.type == ixgbe_mac_82599EB) {
- 		links2 = IXGBE_READ_REG(hw, IXGBE_LINKS2);
- 		if ((links2 & IXGBE_LINKS2_AN_SUPPORTED) == 0)
--			return IXGBE_ERR_FC_NOT_NEGOTIATED;
-+			return -EIO;
- 	}
- 	/*
- 	 * Read the 10g AN autoc and LP ability registers and resolve
-@@ -2406,8 +2394,8 @@ static s32 ixgbe_fc_autoneg_copper(struct ixgbe_hw *hw)
-  **/
- void ixgbe_fc_autoneg(struct ixgbe_hw *hw)
- {
--	s32 ret_val = IXGBE_ERR_FC_NOT_NEGOTIATED;
- 	ixgbe_link_speed speed;
-+	s32 ret_val = -EIO;
- 	bool link_up;
- 
- 	/*
-@@ -2509,7 +2497,7 @@ static u32 ixgbe_pcie_timeout_poll(struct ixgbe_hw *hw)
-  *  @hw: pointer to hardware structure
-  *
-  *  Disables PCI-Express primary access and verifies there are no pending
-- *  requests. IXGBE_ERR_PRIMARY_REQUESTS_PENDING is returned if primary disable
-+ *  requests. -EALREADY is returned if primary disable
-  *  bit hasn't caused the primary requests to be disabled, else 0
-  *  is returned signifying primary requests disabled.
-  **/
-@@ -2574,7 +2562,7 @@ static s32 ixgbe_disable_pcie_primary(struct ixgbe_hw *hw)
- 	}
- 
- 	hw_dbg(hw, "PCIe transaction pending bit also did not clear.\n");
--	return IXGBE_ERR_PRIMARY_REQUESTS_PENDING;
-+	return -EALREADY;
- }
- 
- /**
-@@ -2599,7 +2587,7 @@ s32 ixgbe_acquire_swfw_sync(struct ixgbe_hw *hw, u32 mask)
- 		 * SW_FW_SYNC bits (not just NVM)
- 		 */
- 		if (ixgbe_get_eeprom_semaphore(hw))
--			return IXGBE_ERR_SWFW_SYNC;
-+			return -EBUSY;
- 
- 		gssr = IXGBE_READ_REG(hw, IXGBE_GSSR);
- 		if (!(gssr & (fwmask | swmask))) {
-@@ -2619,7 +2607,7 @@ s32 ixgbe_acquire_swfw_sync(struct ixgbe_hw *hw, u32 mask)
- 		ixgbe_release_swfw_sync(hw, gssr & (fwmask | swmask));
- 
- 	usleep_range(5000, 10000);
--	return IXGBE_ERR_SWFW_SYNC;
-+	return -EBUSY;
- }
- 
- /**
-@@ -2756,7 +2744,7 @@ s32 ixgbe_blink_led_start_generic(struct ixgbe_hw *hw, u32 index)
- 	s32 ret_val;
- 
- 	if (index > 3)
--		return IXGBE_ERR_PARAM;
-+		return -EINVAL;
- 
- 	/*
- 	 * Link must be up to auto-blink the LEDs;
-@@ -2802,7 +2790,7 @@ s32 ixgbe_blink_led_stop_generic(struct ixgbe_hw *hw, u32 index)
- 	s32 ret_val;
- 
- 	if (index > 3)
--		return IXGBE_ERR_PARAM;
-+		return -EINVAL;
- 
- 	ret_val = hw->mac.ops.prot_autoc_read(hw, &locked, &autoc_reg);
- 	if (ret_val)
-@@ -2962,7 +2950,7 @@ s32 ixgbe_clear_vmdq_generic(struct ixgbe_hw *hw, u32 rar, u32 vmdq)
- 	/* Make sure we are using a valid rar index range */
- 	if (rar >= rar_entries) {
- 		hw_dbg(hw, "RAR index %d is out of range.\n", rar);
--		return IXGBE_ERR_INVALID_ARGUMENT;
-+		return -EINVAL;
- 	}
- 
- 	mpsar_lo = IXGBE_READ_REG(hw, IXGBE_MPSAR_LO(rar));
-@@ -3013,7 +3001,7 @@ s32 ixgbe_set_vmdq_generic(struct ixgbe_hw *hw, u32 rar, u32 vmdq)
- 	/* Make sure we are using a valid rar index range */
- 	if (rar >= rar_entries) {
- 		hw_dbg(hw, "RAR index %d is out of range.\n", rar);
--		return IXGBE_ERR_INVALID_ARGUMENT;
-+		return -EINVAL;
- 	}
- 
- 	if (vmdq < 32) {
-@@ -3090,7 +3078,7 @@ static s32 ixgbe_find_vlvf_slot(struct ixgbe_hw *hw, u32 vlan, bool vlvf_bypass)
- 	 * will simply bypass the VLVF if there are no entries present in the
- 	 * VLVF that contain our VLAN
- 	 */
--	first_empty_slot = vlvf_bypass ? IXGBE_ERR_NO_SPACE : 0;
-+	first_empty_slot = vlvf_bypass ? -ENOSPC : 0;
- 
- 	/* add VLAN enable bit for comparison */
- 	vlan |= IXGBE_VLVF_VIEN;
-@@ -3114,7 +3102,7 @@ static s32 ixgbe_find_vlvf_slot(struct ixgbe_hw *hw, u32 vlan, bool vlvf_bypass)
- 	if (!first_empty_slot)
- 		hw_dbg(hw, "No space in VLVF.\n");
- 
--	return first_empty_slot ? : IXGBE_ERR_NO_SPACE;
-+	return first_empty_slot ? : -ENOSPC;
- }
- 
- /**
-@@ -3134,7 +3122,7 @@ s32 ixgbe_set_vfta_generic(struct ixgbe_hw *hw, u32 vlan, u32 vind,
- 	s32 vlvf_index;
- 
- 	if ((vlan > 4095) || (vind > 63))
--		return IXGBE_ERR_PARAM;
-+		return -EINVAL;
- 
- 	/*
- 	 * this is a 2 part operation - first the VFTA, then the
-@@ -3610,7 +3598,8 @@ u8 ixgbe_calculate_checksum(u8 *buffer, u32 length)
-  *
-  *  Communicates with the manageability block. On success return 0
-  *  else returns semaphore error when encountering an error acquiring
-- *  semaphore or IXGBE_ERR_HOST_INTERFACE_COMMAND when command fails.
-+ *  semaphore, -EINVAL when incorrect patameters passed or -EIO when
-+ *  command fails.
-  *
-  *  This function assumes that the IXGBE_GSSR_SW_MNG_SM semaphore is held
-  *  by the caller.
-@@ -3623,7 +3612,7 @@ s32 ixgbe_hic_unlocked(struct ixgbe_hw *hw, u32 *buffer, u32 length,
- 
- 	if (!length || length > IXGBE_HI_MAX_BLOCK_BYTE_LENGTH) {
- 		hw_dbg(hw, "Buffer length failure buffersize-%d.\n", length);
--		return IXGBE_ERR_HOST_INTERFACE_COMMAND;
-+		return -EINVAL;
- 	}
- 
- 	/* Set bit 9 of FWSTS clearing FW reset indication */
-@@ -3634,13 +3623,13 @@ s32 ixgbe_hic_unlocked(struct ixgbe_hw *hw, u32 *buffer, u32 length,
- 	hicr = IXGBE_READ_REG(hw, IXGBE_HICR);
- 	if (!(hicr & IXGBE_HICR_EN)) {
- 		hw_dbg(hw, "IXGBE_HOST_EN bit disabled.\n");
--		return IXGBE_ERR_HOST_INTERFACE_COMMAND;
-+		return -EIO;
- 	}
- 
- 	/* Calculate length in DWORDs. We must be DWORD aligned */
- 	if (length % sizeof(u32)) {
- 		hw_dbg(hw, "Buffer length failure, not aligned to dword");
--		return IXGBE_ERR_INVALID_ARGUMENT;
-+		return -EINVAL;
- 	}
- 
- 	dword_len = length >> 2;
-@@ -3665,7 +3654,7 @@ s32 ixgbe_hic_unlocked(struct ixgbe_hw *hw, u32 *buffer, u32 length,
- 	/* Check command successful completion. */
- 	if ((timeout && i == timeout) ||
- 	    !(IXGBE_READ_REG(hw, IXGBE_HICR) & IXGBE_HICR_SV))
--		return IXGBE_ERR_HOST_INTERFACE_COMMAND;
-+		return -EIO;
- 
- 	return 0;
- }
-@@ -3685,7 +3674,7 @@ s32 ixgbe_hic_unlocked(struct ixgbe_hw *hw, u32 *buffer, u32 length,
-  *  in these cases.
-  *
-  *  Communicates with the manageability block.  On success return 0
-- *  else return IXGBE_ERR_HOST_INTERFACE_COMMAND.
-+ *  else return -EIO or -EINVAL.
-  **/
- s32 ixgbe_host_interface_command(struct ixgbe_hw *hw, void *buffer,
- 				 u32 length, u32 timeout,
-@@ -3700,7 +3689,7 @@ s32 ixgbe_host_interface_command(struct ixgbe_hw *hw, void *buffer,
- 
- 	if (!length || length > IXGBE_HI_MAX_BLOCK_BYTE_LENGTH) {
- 		hw_dbg(hw, "Buffer length failure buffersize-%d.\n", length);
--		return IXGBE_ERR_HOST_INTERFACE_COMMAND;
-+		return -EINVAL;
- 	}
- 	/* Take management host interface semaphore */
- 	status = hw->mac.ops.acquire_swfw_sync(hw, IXGBE_GSSR_SW_MNG_SM);
-@@ -3730,7 +3719,7 @@ s32 ixgbe_host_interface_command(struct ixgbe_hw *hw, void *buffer,
- 
- 	if (length < round_up(buf_len, 4) + hdr_size) {
- 		hw_dbg(hw, "Buffer not large enough for reply message.\n");
--		status = IXGBE_ERR_HOST_INTERFACE_COMMAND;
-+		status = -EIO;
- 		goto rel_out;
- 	}
- 
-@@ -3761,8 +3750,8 @@ s32 ixgbe_host_interface_command(struct ixgbe_hw *hw, void *buffer,
-  *
-  *  Sends driver version number to firmware through the manageability
-  *  block.  On success return 0
-- *  else returns IXGBE_ERR_SWFW_SYNC when encountering an error acquiring
-- *  semaphore or IXGBE_ERR_HOST_INTERFACE_COMMAND when command fails.
-+ *  else returns -EBUSY when encountering an error acquiring
-+ *  semaphore or -EIO when command fails.
-  **/
- s32 ixgbe_set_fw_drv_ver_generic(struct ixgbe_hw *hw, u8 maj, u8 min,
- 				 u8 build, u8 sub, __always_unused u16 len,
-@@ -3798,7 +3787,7 @@ s32 ixgbe_set_fw_drv_ver_generic(struct ixgbe_hw *hw, u8 maj, u8 min,
- 		    FW_CEM_RESP_STATUS_SUCCESS)
- 			ret_val = 0;
- 		else
--			ret_val = IXGBE_ERR_HOST_INTERFACE_COMMAND;
-+			ret_val = -EIO;
- 
- 		break;
- 	}
-@@ -3896,14 +3885,14 @@ static s32 ixgbe_get_ets_data(struct ixgbe_hw *hw, u16 *ets_cfg,
- 		return status;
- 
- 	if ((*ets_offset == 0x0000) || (*ets_offset == 0xFFFF))
--		return IXGBE_NOT_IMPLEMENTED;
-+		return -EOPNOTSUPP;
- 
- 	status = hw->eeprom.ops.read(hw, *ets_offset, ets_cfg);
- 	if (status)
- 		return status;
- 
- 	if ((*ets_cfg & IXGBE_ETS_TYPE_MASK) != IXGBE_ETS_TYPE_EMC_SHIFTED)
--		return IXGBE_NOT_IMPLEMENTED;
-+		return -EOPNOTSUPP;
- 
- 	return 0;
- }
-@@ -3926,7 +3915,7 @@ s32 ixgbe_get_thermal_sensor_data_generic(struct ixgbe_hw *hw)
- 
- 	/* Only support thermal sensors attached to physical port 0 */
- 	if ((IXGBE_READ_REG(hw, IXGBE_STATUS) & IXGBE_STATUS_LAN_ID_1))
--		return IXGBE_NOT_IMPLEMENTED;
-+		return -EOPNOTSUPP;
- 
- 	status = ixgbe_get_ets_data(hw, &ets_cfg, &ets_offset);
- 	if (status)
-@@ -3986,7 +3975,7 @@ s32 ixgbe_init_thermal_sensor_thresh_generic(struct ixgbe_hw *hw)
- 
- 	/* Only support thermal sensors attached to physical port 0 */
- 	if ((IXGBE_READ_REG(hw, IXGBE_STATUS) & IXGBE_STATUS_LAN_ID_1))
--		return IXGBE_NOT_IMPLEMENTED;
-+		return -EOPNOTSUPP;
- 
- 	status = ixgbe_get_ets_data(hw, &ets_cfg, &ets_offset);
- 	if (status)
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-index 4dd897806fa5..e47461f3eaef 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-@@ -3370,7 +3370,7 @@ static int ixgbe_get_module_eeprom(struct net_device *dev,
- {
- 	struct ixgbe_adapter *adapter = netdev_priv(dev);
- 	struct ixgbe_hw *hw = &adapter->hw;
--	s32 status = IXGBE_ERR_PHY_ADDR_INVALID;
-+	s32 status = -EFAULT;
- 	u8 databyte = 0xFF;
- 	int i = 0;
- 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 9bff614788a2..40c860de061b 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -5513,7 +5513,7 @@ static int ixgbe_non_sfp_link_config(struct ixgbe_hw *hw)
- {
- 	u32 speed;
- 	bool autoneg, link_up = false;
--	int ret = IXGBE_ERR_LINK_SETUP;
-+	int ret = -EIO;
- 
- 	if (hw->mac.ops.check_link)
- 		ret = hw->mac.ops.check_link(hw, &speed, &link_up, false);
-@@ -5984,13 +5984,13 @@ void ixgbe_reset(struct ixgbe_adapter *adapter)
- 	err = hw->mac.ops.init_hw(hw);
- 	switch (err) {
- 	case 0:
--	case IXGBE_ERR_SFP_NOT_PRESENT:
--	case IXGBE_ERR_SFP_NOT_SUPPORTED:
-+	case -ENOENT:
-+	case -EOPNOTSUPP:
- 		break;
--	case IXGBE_ERR_PRIMARY_REQUESTS_PENDING:
-+	case -EALREADY:
- 		e_dev_err("primary disable timed out\n");
- 		break;
--	case IXGBE_ERR_EEPROM_VERSION:
-+	case -EACCES:
- 		/* We are running on a pre-production device, log a warning */
- 		e_dev_warn("This device is a pre-production adapter/LOM. "
- 			   "Please be aware there may be issues associated with "
-@@ -7830,10 +7830,10 @@ static void ixgbe_sfp_detection_subtask(struct ixgbe_adapter *adapter)
- 	adapter->sfp_poll_time = jiffies + IXGBE_SFP_POLL_JIFFIES - 1;
- 
- 	err = hw->phy.ops.identify_sfp(hw);
--	if (err == IXGBE_ERR_SFP_NOT_SUPPORTED)
-+	if (err == -EOPNOTSUPP)
- 		goto sfp_out;
- 
--	if (err == IXGBE_ERR_SFP_NOT_PRESENT) {
-+	if (err == -ENOENT) {
- 		/* If no cable is present, then we need to reset
- 		 * the next time we find a good cable. */
- 		adapter->flags2 |= IXGBE_FLAG2_SFP_NEEDS_RESET;
-@@ -7859,7 +7859,7 @@ static void ixgbe_sfp_detection_subtask(struct ixgbe_adapter *adapter)
- 	else
- 		err = hw->mac.ops.setup_sfp(hw);
- 
--	if (err == IXGBE_ERR_SFP_NOT_SUPPORTED)
-+	if (err == -EOPNOTSUPP)
- 		goto sfp_out;
- 
- 	adapter->flags |= IXGBE_FLAG_NEED_LINK_CONFIG;
-@@ -7868,8 +7868,8 @@ static void ixgbe_sfp_detection_subtask(struct ixgbe_adapter *adapter)
- sfp_out:
- 	clear_bit(__IXGBE_IN_SFP_INIT, &adapter->state);
- 
--	if ((err == IXGBE_ERR_SFP_NOT_SUPPORTED) &&
--	    (adapter->netdev->reg_state == NETREG_REGISTERED)) {
-+	if (err == -EOPNOTSUPP &&
-+	    adapter->netdev->reg_state == NETREG_REGISTERED) {
- 		e_dev_err("failed to initialize because an unsupported "
- 			  "SFP+ module type was detected.\n");
- 		e_dev_err("Reload the driver after installing a "
-@@ -10921,9 +10921,9 @@ static int ixgbe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	err = hw->mac.ops.reset_hw(hw);
- 	hw->phy.reset_if_overtemp = false;
- 	ixgbe_set_eee_capable(adapter);
--	if (err == IXGBE_ERR_SFP_NOT_PRESENT) {
-+	if (err == -ENOENT) {
- 		err = 0;
--	} else if (err == IXGBE_ERR_SFP_NOT_SUPPORTED) {
-+	} else if (err == -EOPNOTSUPP) {
- 		e_dev_err("failed to load because an unsupported SFP+ or QSFP module type was detected.\n");
- 		e_dev_err("Reload the driver after installing a supported module.\n");
- 		goto err_sw_init;
-@@ -11142,7 +11142,7 @@ static int ixgbe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 
- 	/* reset the hardware with the new settings */
- 	err = hw->mac.ops.start_hw(hw);
--	if (err == IXGBE_ERR_EEPROM_VERSION) {
-+	if (err == -EACCES) {
- 		/* We are running on a pre-production device, log a warning */
- 		e_dev_warn("This device is a pre-production adapter/LOM. "
- 			   "Please be aware there may be issues associated "
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.c
-index 5679293e53f7..fe7ef5773369 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.c
-@@ -24,7 +24,7 @@ s32 ixgbe_read_mbx(struct ixgbe_hw *hw, u32 *msg, u16 size, u16 mbx_id)
- 		size = mbx->size;
- 
- 	if (!mbx->ops)
--		return IXGBE_ERR_MBX;
-+		return -EIO;
- 
- 	return mbx->ops->read(hw, msg, size, mbx_id);
- }
-@@ -43,10 +43,10 @@ s32 ixgbe_write_mbx(struct ixgbe_hw *hw, u32 *msg, u16 size, u16 mbx_id)
- 	struct ixgbe_mbx_info *mbx = &hw->mbx;
- 
- 	if (size > mbx->size)
--		return IXGBE_ERR_MBX;
-+		return -EINVAL;
- 
- 	if (!mbx->ops)
--		return IXGBE_ERR_MBX;
-+		return -EIO;
- 
- 	return mbx->ops->write(hw, msg, size, mbx_id);
- }
-@@ -63,7 +63,7 @@ s32 ixgbe_check_for_msg(struct ixgbe_hw *hw, u16 mbx_id)
- 	struct ixgbe_mbx_info *mbx = &hw->mbx;
- 
- 	if (!mbx->ops)
--		return IXGBE_ERR_MBX;
-+		return -EIO;
- 
- 	return mbx->ops->check_for_msg(hw, mbx_id);
- }
-@@ -80,7 +80,7 @@ s32 ixgbe_check_for_ack(struct ixgbe_hw *hw, u16 mbx_id)
- 	struct ixgbe_mbx_info *mbx = &hw->mbx;
- 
- 	if (!mbx->ops)
--		return IXGBE_ERR_MBX;
-+		return -EIO;
- 
- 	return mbx->ops->check_for_ack(hw, mbx_id);
- }
-@@ -97,7 +97,7 @@ s32 ixgbe_check_for_rst(struct ixgbe_hw *hw, u16 mbx_id)
- 	struct ixgbe_mbx_info *mbx = &hw->mbx;
- 
- 	if (!mbx->ops)
--		return IXGBE_ERR_MBX;
-+		return -EIO;
- 
- 	return mbx->ops->check_for_rst(hw, mbx_id);
- }
-@@ -115,12 +115,12 @@ static s32 ixgbe_poll_for_msg(struct ixgbe_hw *hw, u16 mbx_id)
- 	int countdown = mbx->timeout;
- 
- 	if (!countdown || !mbx->ops)
--		return IXGBE_ERR_MBX;
-+		return -EIO;
- 
- 	while (mbx->ops->check_for_msg(hw, mbx_id)) {
- 		countdown--;
- 		if (!countdown)
--			return IXGBE_ERR_MBX;
-+			return -EIO;
- 		udelay(mbx->usec_delay);
- 	}
- 
-@@ -140,12 +140,12 @@ static s32 ixgbe_poll_for_ack(struct ixgbe_hw *hw, u16 mbx_id)
- 	int countdown = mbx->timeout;
- 
- 	if (!countdown || !mbx->ops)
--		return IXGBE_ERR_MBX;
-+		return -EIO;
- 
- 	while (mbx->ops->check_for_ack(hw, mbx_id)) {
- 		countdown--;
- 		if (!countdown)
--			return IXGBE_ERR_MBX;
-+			return -EIO;
- 		udelay(mbx->usec_delay);
- 	}
- 
-@@ -169,7 +169,7 @@ static s32 ixgbe_read_posted_mbx(struct ixgbe_hw *hw, u32 *msg, u16 size,
- 	s32 ret_val;
- 
- 	if (!mbx->ops)
--		return IXGBE_ERR_MBX;
-+		return -EIO;
- 
- 	ret_val = ixgbe_poll_for_msg(hw, mbx_id);
- 	if (ret_val)
-@@ -197,7 +197,7 @@ static s32 ixgbe_write_posted_mbx(struct ixgbe_hw *hw, u32 *msg, u16 size,
- 
- 	/* exit if either we can't write or there isn't a defined timeout */
- 	if (!mbx->ops || !mbx->timeout)
--		return IXGBE_ERR_MBX;
-+		return -EIO;
- 
- 	/* send msg */
- 	ret_val = mbx->ops->write(hw, msg, size, mbx_id);
-@@ -217,7 +217,7 @@ static s32 ixgbe_check_for_bit_pf(struct ixgbe_hw *hw, u32 mask, s32 index)
- 		return 0;
- 	}
- 
--	return IXGBE_ERR_MBX;
-+	return -EIO;
- }
- 
- /**
-@@ -238,7 +238,7 @@ static s32 ixgbe_check_for_msg_pf(struct ixgbe_hw *hw, u16 vf_number)
- 		return 0;
- 	}
- 
--	return IXGBE_ERR_MBX;
-+	return -EIO;
- }
- 
- /**
-@@ -259,7 +259,7 @@ static s32 ixgbe_check_for_ack_pf(struct ixgbe_hw *hw, u16 vf_number)
- 		return 0;
- 	}
- 
--	return IXGBE_ERR_MBX;
-+	return -EIO;
- }
- 
- /**
-@@ -295,7 +295,7 @@ static s32 ixgbe_check_for_rst_pf(struct ixgbe_hw *hw, u16 vf_number)
- 		return 0;
- 	}
- 
--	return IXGBE_ERR_MBX;
-+	return -EIO;
- }
- 
- /**
-@@ -317,7 +317,7 @@ static s32 ixgbe_obtain_mbx_lock_pf(struct ixgbe_hw *hw, u16 vf_number)
- 	if (p2v_mailbox & IXGBE_PFMAILBOX_PFU)
- 		return 0;
- 
--	return IXGBE_ERR_MBX;
-+	return -EIO;
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.h
-index 8f4316b19278..6434c190e7a4 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.h
-@@ -7,7 +7,6 @@
- #include "ixgbe_type.h"
- 
- #define IXGBE_VFMAILBOX_SIZE        16 /* 16 32 bit words - 64 bytes */
--#define IXGBE_ERR_MBX               -100
- 
- #define IXGBE_VFMAILBOX             0x002FC
- #define IXGBE_VFMBMEM               0x00200
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
-index 343c3ca9b1c9..9fa0676cfff6 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
-@@ -102,7 +102,7 @@ s32 ixgbe_read_i2c_combined_generic_int(struct ixgbe_hw *hw, u8 addr,
- 	csum = ~csum;
- 	do {
- 		if (lock && hw->mac.ops.acquire_swfw_sync(hw, swfw_mask))
--			return IXGBE_ERR_SWFW_SYNC;
-+			return -EBUSY;
- 		ixgbe_i2c_start(hw);
- 		/* Device Address and write indication */
- 		if (ixgbe_out_i2c_byte_ack(hw, addr))
-@@ -150,7 +150,7 @@ s32 ixgbe_read_i2c_combined_generic_int(struct ixgbe_hw *hw, u8 addr,
- 			hw_dbg(hw, "I2C byte read combined error.\n");
- 	} while (retry < max_retry);
- 
--	return IXGBE_ERR_I2C;
-+	return -EIO;
- }
- 
- /**
-@@ -179,7 +179,7 @@ s32 ixgbe_write_i2c_combined_generic_int(struct ixgbe_hw *hw, u8 addr,
- 	csum = ~csum;
- 	do {
- 		if (lock && hw->mac.ops.acquire_swfw_sync(hw, swfw_mask))
--			return IXGBE_ERR_SWFW_SYNC;
-+			return -EBUSY;
- 		ixgbe_i2c_start(hw);
- 		/* Device Address and write indication */
- 		if (ixgbe_out_i2c_byte_ack(hw, addr))
-@@ -215,7 +215,7 @@ s32 ixgbe_write_i2c_combined_generic_int(struct ixgbe_hw *hw, u8 addr,
- 			hw_dbg(hw, "I2C byte write combined error.\n");
- 	} while (retry < max_retry);
- 
--	return IXGBE_ERR_I2C;
-+	return -EIO;
- }
- 
- /**
-@@ -262,8 +262,8 @@ static bool ixgbe_probe_phy(struct ixgbe_hw *hw, u16 phy_addr)
-  **/
- s32 ixgbe_identify_phy_generic(struct ixgbe_hw *hw)
- {
-+	u32 status = -EFAULT;
- 	u32 phy_addr;
--	u32 status = IXGBE_ERR_PHY_ADDR_INVALID;
- 
- 	if (!hw->phy.phy_semaphore_mask) {
- 		if (hw->bus.lan_id)
-@@ -281,7 +281,7 @@ s32 ixgbe_identify_phy_generic(struct ixgbe_hw *hw)
- 		if (ixgbe_probe_phy(hw, phy_addr))
- 			return 0;
- 		else
--			return IXGBE_ERR_PHY_ADDR_INVALID;
-+			return -EFAULT;
- 	}
- 
- 	for (phy_addr = 0; phy_addr < IXGBE_MAX_PHY_ADDR; phy_addr++) {
-@@ -457,7 +457,7 @@ s32 ixgbe_reset_phy_generic(struct ixgbe_hw *hw)
- 
- 	if (ctrl & MDIO_CTRL1_RESET) {
- 		hw_dbg(hw, "PHY reset polling failed to complete.\n");
--		return IXGBE_ERR_RESET_FAILED;
-+		return -EIO;
- 	}
- 
- 	return 0;
-@@ -500,7 +500,7 @@ s32 ixgbe_read_phy_reg_mdi(struct ixgbe_hw *hw, u32 reg_addr, u32 device_type,
- 
- 	if ((command & IXGBE_MSCA_MDI_COMMAND) != 0) {
- 		hw_dbg(hw, "PHY address command did not complete.\n");
--		return IXGBE_ERR_PHY;
-+		return -EIO;
- 	}
- 
- 	/* Address cycle complete, setup and write the read
-@@ -527,7 +527,7 @@ s32 ixgbe_read_phy_reg_mdi(struct ixgbe_hw *hw, u32 reg_addr, u32 device_type,
- 
- 	if ((command & IXGBE_MSCA_MDI_COMMAND) != 0) {
- 		hw_dbg(hw, "PHY read command didn't complete\n");
--		return IXGBE_ERR_PHY;
-+		return -EIO;
- 	}
- 
- 	/* Read operation is complete.  Get the data
-@@ -559,7 +559,7 @@ s32 ixgbe_read_phy_reg_generic(struct ixgbe_hw *hw, u32 reg_addr,
- 						phy_data);
- 		hw->mac.ops.release_swfw_sync(hw, gssr);
- 	} else {
--		return IXGBE_ERR_SWFW_SYNC;
-+		return -EBUSY;
- 	}
- 
- 	return status;
-@@ -604,7 +604,7 @@ s32 ixgbe_write_phy_reg_mdi(struct ixgbe_hw *hw, u32 reg_addr,
- 
- 	if ((command & IXGBE_MSCA_MDI_COMMAND) != 0) {
- 		hw_dbg(hw, "PHY address cmd didn't complete\n");
--		return IXGBE_ERR_PHY;
-+		return -EIO;
- 	}
- 
- 	/*
-@@ -632,7 +632,7 @@ s32 ixgbe_write_phy_reg_mdi(struct ixgbe_hw *hw, u32 reg_addr,
- 
- 	if ((command & IXGBE_MSCA_MDI_COMMAND) != 0) {
- 		hw_dbg(hw, "PHY write cmd didn't complete\n");
--		return IXGBE_ERR_PHY;
-+		return -EIO;
- 	}
- 
- 	return 0;
-@@ -657,7 +657,7 @@ s32 ixgbe_write_phy_reg_generic(struct ixgbe_hw *hw, u32 reg_addr,
- 						 phy_data);
- 		hw->mac.ops.release_swfw_sync(hw, gssr);
- 	} else {
--		return IXGBE_ERR_SWFW_SYNC;
-+		return -EBUSY;
- 	}
- 
- 	return status;
-@@ -1430,7 +1430,7 @@ s32 ixgbe_reset_phy_nl(struct ixgbe_hw *hw)
- 
- 	if ((phy_data & MDIO_CTRL1_RESET) != 0) {
- 		hw_dbg(hw, "PHY reset did not complete.\n");
--		return IXGBE_ERR_PHY;
-+		return -EIO;
- 	}
- 
- 	/* Get init offsets */
-@@ -1486,12 +1486,12 @@ s32 ixgbe_reset_phy_nl(struct ixgbe_hw *hw)
- 				hw_dbg(hw, "SOL\n");
- 			} else {
- 				hw_dbg(hw, "Bad control value\n");
--				return IXGBE_ERR_PHY;
-+				return -EIO;
- 			}
- 			break;
- 		default:
- 			hw_dbg(hw, "Bad control type\n");
--			return IXGBE_ERR_PHY;
-+			return -EIO;
- 		}
- 	}
- 
-@@ -1499,7 +1499,7 @@ s32 ixgbe_reset_phy_nl(struct ixgbe_hw *hw)
- 
- err_eeprom:
- 	hw_err(hw, "eeprom read at offset %d failed\n", data_offset);
--	return IXGBE_ERR_PHY;
-+	return -EIO;
- }
- 
- /**
-@@ -1517,10 +1517,10 @@ s32 ixgbe_identify_module_generic(struct ixgbe_hw *hw)
- 		return ixgbe_identify_qsfp_module_generic(hw);
- 	default:
- 		hw->phy.sfp_type = ixgbe_sfp_type_not_present;
--		return IXGBE_ERR_SFP_NOT_PRESENT;
-+		return -ENOENT;
- 	}
- 
--	return IXGBE_ERR_SFP_NOT_PRESENT;
-+	return -ENOENT;
- }
- 
- /**
-@@ -1545,7 +1545,7 @@ s32 ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
- 
- 	if (hw->mac.ops.get_media_type(hw) != ixgbe_media_type_fiber) {
- 		hw->phy.sfp_type = ixgbe_sfp_type_not_present;
--		return IXGBE_ERR_SFP_NOT_PRESENT;
-+		return -ENOENT;
- 	}
- 
- 	/* LAN ID is needed for sfp_type determination */
-@@ -1560,7 +1560,7 @@ s32 ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
- 
- 	if (identifier != IXGBE_SFF_IDENTIFIER_SFP) {
- 		hw->phy.type = ixgbe_phy_sfp_unsupported;
--		return IXGBE_ERR_SFP_NOT_SUPPORTED;
-+		return -EOPNOTSUPP;
- 	}
- 	status = hw->phy.ops.read_i2c_eeprom(hw,
- 					     IXGBE_SFF_1GBE_COMP_CODES,
-@@ -1751,7 +1751,7 @@ s32 ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
- 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core0 ||
- 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core1)) {
- 		hw->phy.type = ixgbe_phy_sfp_unsupported;
--		return IXGBE_ERR_SFP_NOT_SUPPORTED;
-+		return -EOPNOTSUPP;
- 	}
- 
- 	/* Anything else 82598-based is supported */
-@@ -1775,7 +1775,7 @@ s32 ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
- 		}
- 		hw_dbg(hw, "SFP+ module not supported\n");
- 		hw->phy.type = ixgbe_phy_sfp_unsupported;
--		return IXGBE_ERR_SFP_NOT_SUPPORTED;
-+		return -EOPNOTSUPP;
- 	}
- 	return 0;
- 
-@@ -1785,7 +1785,7 @@ s32 ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
- 		hw->phy.id = 0;
- 		hw->phy.type = ixgbe_phy_unknown;
- 	}
--	return IXGBE_ERR_SFP_NOT_PRESENT;
-+	return -ENOENT;
- }
- 
- /**
-@@ -1812,7 +1812,7 @@ static s32 ixgbe_identify_qsfp_module_generic(struct ixgbe_hw *hw)
- 
- 	if (hw->mac.ops.get_media_type(hw) != ixgbe_media_type_fiber_qsfp) {
- 		hw->phy.sfp_type = ixgbe_sfp_type_not_present;
--		return IXGBE_ERR_SFP_NOT_PRESENT;
-+		return -ENOENT;
- 	}
- 
- 	/* LAN ID is needed for sfp_type determination */
-@@ -1826,7 +1826,7 @@ static s32 ixgbe_identify_qsfp_module_generic(struct ixgbe_hw *hw)
- 
- 	if (identifier != IXGBE_SFF_IDENTIFIER_QSFP_PLUS) {
- 		hw->phy.type = ixgbe_phy_sfp_unsupported;
--		return IXGBE_ERR_SFP_NOT_SUPPORTED;
-+		return -EOPNOTSUPP;
- 	}
- 
- 	hw->phy.id = identifier;
-@@ -1894,7 +1894,7 @@ static s32 ixgbe_identify_qsfp_module_generic(struct ixgbe_hw *hw)
- 		} else {
- 			/* unsupported module type */
- 			hw->phy.type = ixgbe_phy_sfp_unsupported;
--			return IXGBE_ERR_SFP_NOT_SUPPORTED;
-+			return -EOPNOTSUPP;
- 		}
- 	}
- 
-@@ -1954,7 +1954,7 @@ static s32 ixgbe_identify_qsfp_module_generic(struct ixgbe_hw *hw)
- 			}
- 			hw_dbg(hw, "QSFP module not supported\n");
- 			hw->phy.type = ixgbe_phy_sfp_unsupported;
--			return IXGBE_ERR_SFP_NOT_SUPPORTED;
-+			return -EOPNOTSUPP;
- 		}
- 		return 0;
- 	}
-@@ -1965,7 +1965,7 @@ static s32 ixgbe_identify_qsfp_module_generic(struct ixgbe_hw *hw)
- 	hw->phy.id = 0;
- 	hw->phy.type = ixgbe_phy_unknown;
- 
--	return IXGBE_ERR_SFP_NOT_PRESENT;
-+	return -ENOENT;
- }
- 
- /**
-@@ -1985,14 +1985,14 @@ s32 ixgbe_get_sfp_init_sequence_offsets(struct ixgbe_hw *hw,
- 	u16 sfp_type = hw->phy.sfp_type;
- 
- 	if (hw->phy.sfp_type == ixgbe_sfp_type_unknown)
--		return IXGBE_ERR_SFP_NOT_SUPPORTED;
-+		return -EOPNOTSUPP;
- 
- 	if (hw->phy.sfp_type == ixgbe_sfp_type_not_present)
--		return IXGBE_ERR_SFP_NOT_PRESENT;
-+		return -ENOENT;
- 
- 	if ((hw->device_id == IXGBE_DEV_ID_82598_SR_DUAL_PORT_EM) &&
- 	    (hw->phy.sfp_type == ixgbe_sfp_type_da_cu))
--		return IXGBE_ERR_SFP_NOT_SUPPORTED;
-+		return -EOPNOTSUPP;
- 
- 	/*
- 	 * Limiting active cables and 1G Phys must be initialized as
-@@ -2013,11 +2013,11 @@ s32 ixgbe_get_sfp_init_sequence_offsets(struct ixgbe_hw *hw,
- 	if (hw->eeprom.ops.read(hw, IXGBE_PHY_INIT_OFFSET_NL, list_offset)) {
- 		hw_err(hw, "eeprom read at %d failed\n",
- 		       IXGBE_PHY_INIT_OFFSET_NL);
--		return IXGBE_ERR_SFP_NO_INIT_SEQ_PRESENT;
-+		return -EIO;
- 	}
- 
- 	if ((!*list_offset) || (*list_offset == 0xFFFF))
--		return IXGBE_ERR_SFP_NO_INIT_SEQ_PRESENT;
-+		return -EIO;
- 
- 	/* Shift offset to first ID word */
- 	(*list_offset)++;
-@@ -2036,7 +2036,7 @@ s32 ixgbe_get_sfp_init_sequence_offsets(struct ixgbe_hw *hw,
- 				goto err_phy;
- 			if ((!*data_offset) || (*data_offset == 0xFFFF)) {
- 				hw_dbg(hw, "SFP+ module not supported\n");
--				return IXGBE_ERR_SFP_NOT_SUPPORTED;
-+				return -EOPNOTSUPP;
- 			} else {
- 				break;
- 			}
-@@ -2049,14 +2049,14 @@ s32 ixgbe_get_sfp_init_sequence_offsets(struct ixgbe_hw *hw,
- 
- 	if (sfp_id == IXGBE_PHY_INIT_END_NL) {
- 		hw_dbg(hw, "No matching SFP+ module found\n");
--		return IXGBE_ERR_SFP_NOT_SUPPORTED;
-+		return -EOPNOTSUPP;
- 	}
- 
- 	return 0;
- 
- err_phy:
- 	hw_err(hw, "eeprom read at offset %d failed\n", *list_offset);
--	return IXGBE_ERR_PHY;
-+	return -EIO;
- }
- 
- /**
-@@ -2151,7 +2151,7 @@ static s32 ixgbe_read_i2c_byte_generic_int(struct ixgbe_hw *hw, u8 byte_offset,
- 
- 	do {
- 		if (lock && hw->mac.ops.acquire_swfw_sync(hw, swfw_mask))
--			return IXGBE_ERR_SWFW_SYNC;
-+			return -EBUSY;
- 
- 		ixgbe_i2c_start(hw);
- 
-@@ -2267,7 +2267,7 @@ static s32 ixgbe_write_i2c_byte_generic_int(struct ixgbe_hw *hw, u8 byte_offset,
- 	u32 swfw_mask = hw->phy.phy_semaphore_mask;
- 
- 	if (lock && hw->mac.ops.acquire_swfw_sync(hw, swfw_mask))
--		return IXGBE_ERR_SWFW_SYNC;
-+		return -EBUSY;
- 
- 	do {
- 		ixgbe_i2c_start(hw);
-@@ -2509,7 +2509,7 @@ static s32 ixgbe_get_i2c_ack(struct ixgbe_hw *hw)
- 
- 	if (ack == 1) {
- 		hw_dbg(hw, "I2C ack was not received.\n");
--		status = IXGBE_ERR_I2C;
-+		status = -EIO;
- 	}
- 
- 	ixgbe_lower_i2c_clk(hw, &i2cctl);
-@@ -2581,7 +2581,7 @@ static s32 ixgbe_clock_out_i2c_bit(struct ixgbe_hw *hw, bool data)
- 		udelay(IXGBE_I2C_T_LOW);
- 	} else {
- 		hw_dbg(hw, "I2C data was not set to %X\n", data);
--		return IXGBE_ERR_I2C;
-+		return -EIO;
- 	}
- 
- 	return 0;
-@@ -2677,7 +2677,7 @@ static s32 ixgbe_set_i2c_data(struct ixgbe_hw *hw, u32 *i2cctl, bool data)
- 	*i2cctl = IXGBE_READ_REG(hw, IXGBE_I2CCTL(hw));
- 	if (data != ixgbe_get_i2c_data(hw, i2cctl)) {
- 		hw_dbg(hw, "Error - I2C data was not set to %X.\n", data);
--		return IXGBE_ERR_I2C;
-+		return -EIO;
- 	}
- 
- 	return 0;
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-index f8c6ca9fea82..9880ae914c42 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-@@ -1325,7 +1325,7 @@ static int ixgbe_rcv_msg_from_vf(struct ixgbe_adapter *adapter, u32 vf)
- 		break;
- 	default:
- 		e_err(drv, "Unhandled Msg %8.8x\n", msgbuf[0]);
--		retval = IXGBE_ERR_MBX;
-+		retval = -EIO;
- 		break;
- 	}
- 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-index 91c9ecca4cb5..61b9774b3d31 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-@@ -3665,45 +3665,6 @@ struct ixgbe_info {
- 	const u32			*mvals;
- };
- 
--
--/* Error Codes */
--#define IXGBE_ERR_EEPROM                        -1
--#define IXGBE_ERR_EEPROM_CHECKSUM               -2
--#define IXGBE_ERR_PHY                           -3
--#define IXGBE_ERR_CONFIG                        -4
--#define IXGBE_ERR_PARAM                         -5
--#define IXGBE_ERR_MAC_TYPE                      -6
--#define IXGBE_ERR_UNKNOWN_PHY                   -7
--#define IXGBE_ERR_LINK_SETUP                    -8
--#define IXGBE_ERR_ADAPTER_STOPPED               -9
--#define IXGBE_ERR_INVALID_MAC_ADDR              -10
--#define IXGBE_ERR_DEVICE_NOT_SUPPORTED          -11
--#define IXGBE_ERR_PRIMARY_REQUESTS_PENDING      -12
--#define IXGBE_ERR_INVALID_LINK_SETTINGS         -13
--#define IXGBE_ERR_AUTONEG_NOT_COMPLETE          -14
--#define IXGBE_ERR_RESET_FAILED                  -15
--#define IXGBE_ERR_SWFW_SYNC                     -16
--#define IXGBE_ERR_PHY_ADDR_INVALID              -17
--#define IXGBE_ERR_I2C                           -18
--#define IXGBE_ERR_SFP_NOT_SUPPORTED             -19
--#define IXGBE_ERR_SFP_NOT_PRESENT               -20
--#define IXGBE_ERR_SFP_NO_INIT_SEQ_PRESENT       -21
--#define IXGBE_ERR_NO_SAN_ADDR_PTR               -22
--#define IXGBE_ERR_FDIR_REINIT_FAILED            -23
--#define IXGBE_ERR_EEPROM_VERSION                -24
--#define IXGBE_ERR_NO_SPACE                      -25
--#define IXGBE_ERR_OVERTEMP                      -26
--#define IXGBE_ERR_FC_NOT_NEGOTIATED             -27
--#define IXGBE_ERR_FC_NOT_SUPPORTED              -28
--#define IXGBE_ERR_SFP_SETUP_NOT_COMPLETE        -30
--#define IXGBE_ERR_PBA_SECTION                   -31
--#define IXGBE_ERR_INVALID_ARGUMENT              -32
--#define IXGBE_ERR_HOST_INTERFACE_COMMAND        -33
--#define IXGBE_ERR_FDIR_CMD_INCOMPLETE		-38
--#define IXGBE_ERR_FW_RESP_INVALID		-39
--#define IXGBE_ERR_TOKEN_RETRY			-40
--#define IXGBE_NOT_IMPLEMENTED                   0x7FFFFFFF
--
- #define IXGBE_FUSES0_GROUP(_i)		(0x11158 + ((_i) * 4))
- #define IXGBE_FUSES0_300MHZ		BIT(5)
- #define IXGBE_FUSES0_REV_MASK		(3u << 6)
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c
-index e127070a59f4..57a912e4653f 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c
-@@ -84,7 +84,7 @@ s32 ixgbe_reset_hw_X540(struct ixgbe_hw *hw)
- 	status = hw->mac.ops.acquire_swfw_sync(hw, swfw_mask);
- 	if (status) {
- 		hw_dbg(hw, "semaphore failed with %d", status);
--		return IXGBE_ERR_SWFW_SYNC;
-+		return -EBUSY;
- 	}
- 
- 	ctrl = IXGBE_CTRL_RST;
-@@ -103,7 +103,7 @@ s32 ixgbe_reset_hw_X540(struct ixgbe_hw *hw)
- 	}
- 
- 	if (ctrl & IXGBE_CTRL_RST_MASK) {
--		status = IXGBE_ERR_RESET_FAILED;
-+		status = -EIO;
- 		hw_dbg(hw, "Reset polling failed to complete.\n");
- 	}
- 	msleep(100);
-@@ -220,7 +220,7 @@ static s32 ixgbe_read_eerd_X540(struct ixgbe_hw *hw, u16 offset, u16 *data)
- 	s32 status;
- 
- 	if (hw->mac.ops.acquire_swfw_sync(hw, IXGBE_GSSR_EEP_SM))
--		return IXGBE_ERR_SWFW_SYNC;
-+		return -EBUSY;
- 
- 	status = ixgbe_read_eerd_generic(hw, offset, data);
- 
-@@ -243,7 +243,7 @@ static s32 ixgbe_read_eerd_buffer_X540(struct ixgbe_hw *hw,
- 	s32 status;
- 
- 	if (hw->mac.ops.acquire_swfw_sync(hw, IXGBE_GSSR_EEP_SM))
--		return IXGBE_ERR_SWFW_SYNC;
-+		return -EBUSY;
- 
- 	status = ixgbe_read_eerd_buffer_generic(hw, offset, words, data);
- 
-@@ -264,7 +264,7 @@ static s32 ixgbe_write_eewr_X540(struct ixgbe_hw *hw, u16 offset, u16 data)
- 	s32 status;
- 
- 	if (hw->mac.ops.acquire_swfw_sync(hw, IXGBE_GSSR_EEP_SM))
--		return IXGBE_ERR_SWFW_SYNC;
-+		return -EBUSY;
- 
- 	status = ixgbe_write_eewr_generic(hw, offset, data);
- 
-@@ -287,7 +287,7 @@ static s32 ixgbe_write_eewr_buffer_X540(struct ixgbe_hw *hw,
- 	s32 status;
- 
- 	if (hw->mac.ops.acquire_swfw_sync(hw, IXGBE_GSSR_EEP_SM))
--		return IXGBE_ERR_SWFW_SYNC;
-+		return -EBUSY;
- 
- 	status = ixgbe_write_eewr_buffer_generic(hw, offset, words, data);
- 
-@@ -324,7 +324,7 @@ static s32 ixgbe_calc_eeprom_checksum_X540(struct ixgbe_hw *hw)
- 	for (i = 0; i < checksum_last_word; i++) {
- 		if (ixgbe_read_eerd_generic(hw, i, &word)) {
- 			hw_dbg(hw, "EEPROM read failed\n");
--			return IXGBE_ERR_EEPROM;
-+			return -EIO;
- 		}
- 		checksum += word;
- 	}
-@@ -349,7 +349,7 @@ static s32 ixgbe_calc_eeprom_checksum_X540(struct ixgbe_hw *hw)
- 
- 		if (ixgbe_read_eerd_generic(hw, pointer, &length)) {
- 			hw_dbg(hw, "EEPROM read failed\n");
--			return IXGBE_ERR_EEPROM;
-+			return -EIO;
- 		}
- 
- 		/* Skip pointer section if length is invalid. */
-@@ -360,7 +360,7 @@ static s32 ixgbe_calc_eeprom_checksum_X540(struct ixgbe_hw *hw)
- 		for (j = pointer + 1; j <= pointer + length; j++) {
- 			if (ixgbe_read_eerd_generic(hw, j, &word)) {
- 				hw_dbg(hw, "EEPROM read failed\n");
--				return IXGBE_ERR_EEPROM;
-+				return -EIO;
- 			}
- 			checksum += word;
- 		}
-@@ -397,7 +397,7 @@ static s32 ixgbe_validate_eeprom_checksum_X540(struct ixgbe_hw *hw,
- 	}
- 
- 	if (hw->mac.ops.acquire_swfw_sync(hw, IXGBE_GSSR_EEP_SM))
--		return IXGBE_ERR_SWFW_SYNC;
-+		return -EBUSY;
- 
- 	status = hw->eeprom.ops.calc_checksum(hw);
- 	if (status < 0)
-@@ -418,7 +418,7 @@ static s32 ixgbe_validate_eeprom_checksum_X540(struct ixgbe_hw *hw,
- 	 */
- 	if (read_checksum != checksum) {
- 		hw_dbg(hw, "Invalid EEPROM checksum");
--		status = IXGBE_ERR_EEPROM_CHECKSUM;
-+		status = -EIO;
- 	}
- 
- 	/* If the user cares, return the calculated checksum */
-@@ -455,7 +455,7 @@ static s32 ixgbe_update_eeprom_checksum_X540(struct ixgbe_hw *hw)
- 	}
- 
- 	if (hw->mac.ops.acquire_swfw_sync(hw, IXGBE_GSSR_EEP_SM))
--		return  IXGBE_ERR_SWFW_SYNC;
-+		return  -EBUSY;
- 
- 	status = hw->eeprom.ops.calc_checksum(hw);
- 	if (status < 0)
-@@ -490,7 +490,7 @@ static s32 ixgbe_update_flash_X540(struct ixgbe_hw *hw)
- 	s32 status;
- 
- 	status = ixgbe_poll_flash_update_done_X540(hw);
--	if (status == IXGBE_ERR_EEPROM) {
-+	if (status == -EIO) {
- 		hw_dbg(hw, "Flash update time out\n");
- 		return status;
- 	}
-@@ -540,7 +540,7 @@ static s32 ixgbe_poll_flash_update_done_X540(struct ixgbe_hw *hw)
- 			return 0;
- 		udelay(5);
- 	}
--	return IXGBE_ERR_EEPROM;
-+	return -EIO;
- }
- 
- /**
-@@ -575,7 +575,7 @@ s32 ixgbe_acquire_swfw_sync_X540(struct ixgbe_hw *hw, u32 mask)
- 		 * SW_FW_SYNC bits (not just NVM)
- 		 */
- 		if (ixgbe_get_swfw_sync_semaphore(hw))
--			return IXGBE_ERR_SWFW_SYNC;
-+			return -EBUSY;
- 
- 		swfw_sync = IXGBE_READ_REG(hw, IXGBE_SWFW_SYNC(hw));
- 		if (!(swfw_sync & (fwmask | swmask | hwmask))) {
-@@ -599,7 +599,7 @@ s32 ixgbe_acquire_swfw_sync_X540(struct ixgbe_hw *hw, u32 mask)
- 	 * bits in the SW_FW_SYNC register.
- 	 */
- 	if (ixgbe_get_swfw_sync_semaphore(hw))
--		return IXGBE_ERR_SWFW_SYNC;
-+		return -EBUSY;
- 	swfw_sync = IXGBE_READ_REG(hw, IXGBE_SWFW_SYNC(hw));
- 	if (swfw_sync & (fwmask | hwmask)) {
- 		swfw_sync |= swmask;
-@@ -622,11 +622,11 @@ s32 ixgbe_acquire_swfw_sync_X540(struct ixgbe_hw *hw, u32 mask)
- 			rmask |= IXGBE_GSSR_I2C_MASK;
- 		ixgbe_release_swfw_sync_X540(hw, rmask);
- 		ixgbe_release_swfw_sync_semaphore(hw);
--		return IXGBE_ERR_SWFW_SYNC;
-+		return -EBUSY;
- 	}
- 	ixgbe_release_swfw_sync_semaphore(hw);
- 
--	return IXGBE_ERR_SWFW_SYNC;
-+	return -EBUSY;
- }
- 
- /**
-@@ -680,7 +680,7 @@ static s32 ixgbe_get_swfw_sync_semaphore(struct ixgbe_hw *hw)
- 	if (i == timeout) {
- 		hw_dbg(hw,
- 		       "Software semaphore SMBI between device drivers not granted.\n");
--		return IXGBE_ERR_EEPROM;
-+		return -EIO;
- 	}
- 
- 	/* Now get the semaphore between SW/FW through the REGSMP bit */
-@@ -697,7 +697,7 @@ static s32 ixgbe_get_swfw_sync_semaphore(struct ixgbe_hw *hw)
- 	 */
- 	hw_dbg(hw, "REGSMP Software NVM semaphore not granted\n");
- 	ixgbe_release_swfw_sync_semaphore(hw);
--	return IXGBE_ERR_EEPROM;
-+	return -EIO;
- }
- 
- /**
-@@ -768,7 +768,7 @@ s32 ixgbe_blink_led_start_X540(struct ixgbe_hw *hw, u32 index)
- 	bool link_up;
- 
- 	if (index > 3)
--		return IXGBE_ERR_PARAM;
-+		return -EINVAL;
- 
- 	/* Link should be up in order for the blink bit in the LED control
- 	 * register to work. Force link and speed in the MAC if link is down.
-@@ -804,7 +804,7 @@ s32 ixgbe_blink_led_stop_X540(struct ixgbe_hw *hw, u32 index)
- 	u32 ledctl_reg;
- 
- 	if (index > 3)
--		return IXGBE_ERR_PARAM;
-+		return -EINVAL;
- 
- 	/* Restore the LED to its default value. */
- 	ledctl_reg = IXGBE_READ_REG(hw, IXGBE_LEDCTL);
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-index 59dd38dd8248..e479235042ca 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-@@ -206,13 +206,13 @@ static s32 ixgbe_reset_cs4227(struct ixgbe_hw *hw)
- 	}
- 	if (retry == IXGBE_CS4227_RETRIES) {
- 		hw_err(hw, "CS4227 reset did not complete\n");
--		return IXGBE_ERR_PHY;
-+		return -EIO;
- 	}
- 
- 	status = ixgbe_read_cs4227(hw, IXGBE_CS4227_EEPROM_STATUS, &value);
- 	if (status || !(value & IXGBE_CS4227_EEPROM_LOAD_OK)) {
- 		hw_err(hw, "CS4227 EEPROM did not load successfully\n");
--		return IXGBE_ERR_PHY;
-+		return -EIO;
- 	}
- 
- 	return 0;
-@@ -350,13 +350,13 @@ static s32 ixgbe_identify_phy_x550em(struct ixgbe_hw *hw)
- static s32 ixgbe_read_phy_reg_x550em(struct ixgbe_hw *hw, u32 reg_addr,
- 				     u32 device_type, u16 *phy_data)
- {
--	return IXGBE_NOT_IMPLEMENTED;
-+	return -EOPNOTSUPP;
- }
- 
- static s32 ixgbe_write_phy_reg_x550em(struct ixgbe_hw *hw, u32 reg_addr,
- 				      u32 device_type, u16 phy_data)
- {
--	return IXGBE_NOT_IMPLEMENTED;
-+	return -EOPNOTSUPP;
- }
- 
- /**
-@@ -463,7 +463,7 @@ s32 ixgbe_fw_phy_activity(struct ixgbe_hw *hw, u16 activity,
- 		--retries;
- 	} while (retries > 0);
- 
--	return IXGBE_ERR_HOST_INTERFACE_COMMAND;
-+	return -EIO;
- }
- 
- static const struct {
-@@ -511,7 +511,7 @@ static s32 ixgbe_get_phy_id_fw(struct ixgbe_hw *hw)
- 	hw->phy.id |= phy_id_lo & IXGBE_PHY_REVISION_MASK;
- 	hw->phy.revision = phy_id_lo & ~IXGBE_PHY_REVISION_MASK;
- 	if (!hw->phy.id || hw->phy.id == IXGBE_PHY_REVISION_MASK)
--		return IXGBE_ERR_PHY_ADDR_INVALID;
-+		return -EFAULT;
- 
- 	hw->phy.autoneg_advertised = hw->phy.speeds_supported;
- 	hw->phy.eee_speeds_supported = IXGBE_LINK_SPEED_100_FULL |
-@@ -568,7 +568,7 @@ static s32 ixgbe_setup_fw_link(struct ixgbe_hw *hw)
- 
- 	if (hw->fc.strict_ieee && hw->fc.requested_mode == ixgbe_fc_rx_pause) {
- 		hw_err(hw, "rx_pause not valid in strict IEEE mode\n");
--		return IXGBE_ERR_INVALID_LINK_SETTINGS;
-+		return -EINVAL;
- 	}
- 
- 	switch (hw->fc.requested_mode) {
-@@ -677,7 +677,7 @@ static s32 ixgbe_iosf_wait(struct ixgbe_hw *hw, u32 *ctrl)
- 		*ctrl = command;
- 	if (i == IXGBE_MDIO_COMMAND_TIMEOUT) {
- 		hw_dbg(hw, "IOSF wait timed out\n");
--		return IXGBE_ERR_PHY;
-+		return -EIO;
- 	}
- 
- 	return 0;
-@@ -716,7 +716,7 @@ static s32 ixgbe_read_iosf_sb_reg_x550(struct ixgbe_hw *hw, u32 reg_addr,
- 	if ((command & IXGBE_SB_IOSF_CTRL_RESP_STAT_MASK) != 0) {
- 		error = FIELD_GET(IXGBE_SB_IOSF_CTRL_CMPL_ERR_MASK, command);
- 		hw_dbg(hw, "Failed to read, error %x\n", error);
--		return IXGBE_ERR_PHY;
-+		return -EIO;
- 	}
- 
- 	if (!ret)
-@@ -751,9 +751,9 @@ static s32 ixgbe_get_phy_token(struct ixgbe_hw *hw)
- 	if (token_cmd.hdr.cmd_or_resp.ret_status == FW_PHY_TOKEN_OK)
- 		return 0;
- 	if (token_cmd.hdr.cmd_or_resp.ret_status != FW_PHY_TOKEN_RETRY)
--		return IXGBE_ERR_FW_RESP_INVALID;
-+		return -EIO;
- 
--	return IXGBE_ERR_TOKEN_RETRY;
-+	return -EAGAIN;
- }
- 
- /**
-@@ -779,7 +779,7 @@ static s32 ixgbe_put_phy_token(struct ixgbe_hw *hw)
- 		return status;
- 	if (token_cmd.hdr.cmd_or_resp.ret_status == FW_PHY_TOKEN_OK)
- 		return 0;
--	return IXGBE_ERR_FW_RESP_INVALID;
-+	return -EIO;
- }
- 
- /**
-@@ -943,7 +943,7 @@ static s32 ixgbe_checksum_ptr_x550(struct ixgbe_hw *hw, u16 ptr,
- 		local_buffer = buf;
- 	} else {
- 		if (buffer_size < ptr)
--			return  IXGBE_ERR_PARAM;
-+			return  -EINVAL;
- 		local_buffer = &buffer[ptr];
- 	}
- 
-@@ -961,7 +961,7 @@ static s32 ixgbe_checksum_ptr_x550(struct ixgbe_hw *hw, u16 ptr,
- 	}
- 
- 	if (buffer && ((u32)start + (u32)length > buffer_size))
--		return IXGBE_ERR_PARAM;
-+		return -EINVAL;
- 
- 	for (i = start; length; i++, length--) {
- 		if (i == bufsz && !buffer) {
-@@ -1013,7 +1013,7 @@ static s32 ixgbe_calc_checksum_X550(struct ixgbe_hw *hw, u16 *buffer,
- 		local_buffer = eeprom_ptrs;
- 	} else {
- 		if (buffer_size < IXGBE_EEPROM_LAST_WORD)
--			return IXGBE_ERR_PARAM;
-+			return -EINVAL;
- 		local_buffer = buffer;
- 	}
- 
-@@ -1149,7 +1149,7 @@ static s32 ixgbe_validate_eeprom_checksum_X550(struct ixgbe_hw *hw,
- 	 * calculated checksum
- 	 */
- 	if (read_checksum != checksum) {
--		status = IXGBE_ERR_EEPROM_CHECKSUM;
-+		status = -EIO;
- 		hw_dbg(hw, "Invalid EEPROM checksum");
- 	}
- 
-@@ -1204,7 +1204,7 @@ static s32 ixgbe_write_ee_hostif_X550(struct ixgbe_hw *hw, u16 offset, u16 data)
- 		hw->mac.ops.release_swfw_sync(hw, IXGBE_GSSR_EEP_SM);
- 	} else {
- 		hw_dbg(hw, "write ee hostif failed to get semaphore");
--		status = IXGBE_ERR_SWFW_SYNC;
-+		status = -EBUSY;
- 	}
- 
- 	return status;
-@@ -1415,7 +1415,7 @@ static s32 ixgbe_write_iosf_sb_reg_x550(struct ixgbe_hw *hw, u32 reg_addr,
- 	if ((command & IXGBE_SB_IOSF_CTRL_RESP_STAT_MASK) != 0) {
- 		error = FIELD_GET(IXGBE_SB_IOSF_CTRL_CMPL_ERR_MASK, command);
- 		hw_dbg(hw, "Failed to write, error %x\n", error);
--		return IXGBE_ERR_PHY;
-+		return -EIO;
- 	}
- 
- out:
-@@ -1558,7 +1558,7 @@ static s32 ixgbe_setup_ixfi_x550em(struct ixgbe_hw *hw, ixgbe_link_speed *speed)
- 
- 	/* iXFI is only supported with X552 */
- 	if (mac->type != ixgbe_mac_X550EM_x)
--		return IXGBE_ERR_LINK_SETUP;
-+		return -EIO;
- 
- 	/* Disable AN and force speed to 10G Serial. */
- 	status = ixgbe_read_iosf_sb_reg_x550(hw,
-@@ -1580,7 +1580,7 @@ static s32 ixgbe_setup_ixfi_x550em(struct ixgbe_hw *hw, ixgbe_link_speed *speed)
- 		break;
- 	default:
- 		/* Other link speeds are not supported by internal KR PHY. */
--		return IXGBE_ERR_LINK_SETUP;
-+		return -EINVAL;
- 	}
- 
- 	status = ixgbe_write_iosf_sb_reg_x550(hw,
-@@ -1611,7 +1611,7 @@ static s32 ixgbe_supported_sfp_modules_X550em(struct ixgbe_hw *hw, bool *linear)
- {
- 	switch (hw->phy.sfp_type) {
- 	case ixgbe_sfp_type_not_present:
--		return IXGBE_ERR_SFP_NOT_PRESENT;
-+		return -ENOENT;
- 	case ixgbe_sfp_type_da_cu_core0:
- 	case ixgbe_sfp_type_da_cu_core1:
- 		*linear = true;
-@@ -1630,7 +1630,7 @@ static s32 ixgbe_supported_sfp_modules_X550em(struct ixgbe_hw *hw, bool *linear)
- 	case ixgbe_sfp_type_1g_cu_core0:
- 	case ixgbe_sfp_type_1g_cu_core1:
- 	default:
--		return IXGBE_ERR_SFP_NOT_SUPPORTED;
-+		return -EOPNOTSUPP;
- 	}
- 
- 	return 0;
-@@ -1660,7 +1660,7 @@ ixgbe_setup_mac_link_sfp_x550em(struct ixgbe_hw *hw,
- 	 * there is no reason to configure CS4227 and SFP not present error is
- 	 * not accepted in the setup MAC link flow.
- 	 */
--	if (status == IXGBE_ERR_SFP_NOT_PRESENT)
-+	if (status == -ENOENT)
- 		return 0;
- 
- 	if (status)
-@@ -1718,7 +1718,7 @@ static s32 ixgbe_setup_sfi_x550a(struct ixgbe_hw *hw, ixgbe_link_speed *speed)
- 		break;
- 	default:
- 		/* Other link speeds are not supported by internal PHY. */
--		return IXGBE_ERR_LINK_SETUP;
-+		return -EINVAL;
- 	}
- 
- 	(void)mac->ops.write_iosf_sb_reg(hw,
-@@ -1803,7 +1803,7 @@ ixgbe_setup_mac_link_sfp_n(struct ixgbe_hw *hw, ixgbe_link_speed speed,
- 	/* If no SFP module present, then return success. Return success since
- 	 * SFP not present error is not excepted in the setup MAC link flow.
- 	 */
--	if (ret_val == IXGBE_ERR_SFP_NOT_PRESENT)
-+	if (ret_val == -ENOENT)
- 		return 0;
- 
- 	if (ret_val)
-@@ -1853,7 +1853,7 @@ ixgbe_setup_mac_link_sfp_x550a(struct ixgbe_hw *hw, ixgbe_link_speed speed,
- 	/* If no SFP module present, then return success. Return success since
- 	 * SFP not present error is not excepted in the setup MAC link flow.
- 	 */
--	if (ret_val == IXGBE_ERR_SFP_NOT_PRESENT)
-+	if (ret_val == -ENOENT)
- 		return 0;
- 
- 	if (ret_val)
-@@ -1863,7 +1863,7 @@ ixgbe_setup_mac_link_sfp_x550a(struct ixgbe_hw *hw, ixgbe_link_speed speed,
- 	ixgbe_setup_kr_speed_x550em(hw, speed);
- 
- 	if (hw->phy.mdio.prtad == MDIO_PRTAD_NONE)
--		return IXGBE_ERR_PHY_ADDR_INVALID;
-+		return -EFAULT;
- 
- 	/* Get external PHY SKU id */
- 	ret_val = hw->phy.ops.read_reg(hw, IXGBE_CS4227_EFUSE_PDF_SKU,
-@@ -1962,7 +1962,7 @@ static s32 ixgbe_check_link_t_X550em(struct ixgbe_hw *hw,
- 	u16 i, autoneg_status;
- 
- 	if (hw->mac.ops.get_media_type(hw) != ixgbe_media_type_copper)
--		return IXGBE_ERR_CONFIG;
-+		return -EIO;
- 
- 	status = ixgbe_check_mac_link_generic(hw, speed, link_up,
- 					      link_up_wait_to_complete);
-@@ -2145,7 +2145,7 @@ static s32 ixgbe_setup_sgmii_fw(struct ixgbe_hw *hw, ixgbe_link_speed speed,
-  */
- static void ixgbe_fc_autoneg_sgmii_x550em_a(struct ixgbe_hw *hw)
- {
--	s32 status = IXGBE_ERR_FC_NOT_NEGOTIATED;
-+	s32 status = -EIO;
- 	u32 info[FW_PHY_ACT_DATA_COUNT] = { 0 };
- 	ixgbe_link_speed speed;
- 	bool link_up;
-@@ -2165,7 +2165,7 @@ static void ixgbe_fc_autoneg_sgmii_x550em_a(struct ixgbe_hw *hw)
- 	/* Check if auto-negotiation has completed */
- 	status = ixgbe_fw_phy_activity(hw, FW_PHY_ACT_GET_LINK_INFO, &info);
- 	if (status || !(info[0] & FW_PHY_ACT_GET_LINK_INFO_AN_COMPLETE)) {
--		status = IXGBE_ERR_FC_NOT_NEGOTIATED;
-+		status = -EIO;
- 		goto out;
- 	}
- 
-@@ -2699,7 +2699,7 @@ static s32 ixgbe_setup_internal_phy_t_x550em(struct ixgbe_hw *hw)
- 	u16 speed;
- 
- 	if (hw->mac.ops.get_media_type(hw) != ixgbe_media_type_copper)
--		return IXGBE_ERR_CONFIG;
-+		return -EIO;
- 
- 	if (!(hw->mac.type == ixgbe_mac_X550EM_x &&
- 	      !(hw->phy.nw_mng_if_sel & IXGBE_NW_MNG_IF_SEL_INT_PHY_MODE))) {
-@@ -2742,7 +2742,7 @@ static s32 ixgbe_setup_internal_phy_t_x550em(struct ixgbe_hw *hw)
- 		break;
- 	default:
- 		/* Internal PHY does not support anything else */
--		return IXGBE_ERR_INVALID_LINK_SETTINGS;
-+		return -EINVAL;
- 	}
- 
- 	return ixgbe_setup_ixfi_x550em(hw, &force_speed);
-@@ -2774,7 +2774,7 @@ static s32 ixgbe_led_on_t_x550em(struct ixgbe_hw *hw, u32 led_idx)
- 	u16 phy_data;
- 
- 	if (led_idx >= IXGBE_X557_MAX_LED_INDEX)
--		return IXGBE_ERR_PARAM;
-+		return -EINVAL;
- 
- 	/* To turn on the LED, set mode to ON. */
- 	hw->phy.ops.read_reg(hw, IXGBE_X557_LED_PROVISIONING + led_idx,
-@@ -2796,7 +2796,7 @@ static s32 ixgbe_led_off_t_x550em(struct ixgbe_hw *hw, u32 led_idx)
- 	u16 phy_data;
- 
- 	if (led_idx >= IXGBE_X557_MAX_LED_INDEX)
--		return IXGBE_ERR_PARAM;
-+		return -EINVAL;
- 
- 	/* To turn on the LED, set mode to ON. */
- 	hw->phy.ops.read_reg(hw, IXGBE_X557_LED_PROVISIONING + led_idx,
-@@ -2820,8 +2820,9 @@ static s32 ixgbe_led_off_t_x550em(struct ixgbe_hw *hw, u32 led_idx)
-  *
-  *  Sends driver version number to firmware through the manageability
-  *  block.  On success return 0
-- *  else returns IXGBE_ERR_SWFW_SYNC when encountering an error acquiring
-- *  semaphore or IXGBE_ERR_HOST_INTERFACE_COMMAND when command fails.
-+ *  else returns -EBUSY when encountering an error acquiring
-+ *  semaphore, -EIO when command fails or -ENIVAL when incorrect
-+ *  params passed.
-  **/
- static s32 ixgbe_set_fw_drv_ver_x550(struct ixgbe_hw *hw, u8 maj, u8 min,
- 				     u8 build, u8 sub, u16 len,
-@@ -2832,7 +2833,7 @@ static s32 ixgbe_set_fw_drv_ver_x550(struct ixgbe_hw *hw, u8 maj, u8 min,
- 	int i;
- 
- 	if (!len || !driver_ver || (len > sizeof(fw_cmd.driver_string)))
--		return IXGBE_ERR_INVALID_ARGUMENT;
-+		return -EINVAL;
- 
- 	fw_cmd.hdr.cmd = FW_CEM_CMD_DRIVER_INFO;
- 	fw_cmd.hdr.buf_len = FW_CEM_CMD_DRIVER_INFO_LEN + len;
-@@ -2857,7 +2858,7 @@ static s32 ixgbe_set_fw_drv_ver_x550(struct ixgbe_hw *hw, u8 maj, u8 min,
- 
- 		if (fw_cmd.hdr.cmd_or_resp.ret_status !=
- 		    FW_CEM_RESP_STATUS_SUCCESS)
--			return IXGBE_ERR_HOST_INTERFACE_COMMAND;
-+			return -EIO;
- 		return 0;
- 	}
- 
-@@ -2914,7 +2915,7 @@ static s32 ixgbe_setup_fc_x550em(struct ixgbe_hw *hw)
- 	/* Validate the requested mode */
- 	if (hw->fc.strict_ieee && hw->fc.requested_mode == ixgbe_fc_rx_pause) {
- 		hw_err(hw, "ixgbe_fc_rx_pause not valid in strict IEEE mode\n");
--		return IXGBE_ERR_INVALID_LINK_SETTINGS;
-+		return -EINVAL;
- 	}
- 
- 	/* 10gig parts do not have a word in the EEPROM to determine the
-@@ -2949,7 +2950,7 @@ static s32 ixgbe_setup_fc_x550em(struct ixgbe_hw *hw)
- 		break;
- 	default:
- 		hw_err(hw, "Flow control param set incorrectly\n");
--		return IXGBE_ERR_CONFIG;
-+		return -EIO;
- 	}
- 
- 	switch (hw->device_id) {
-@@ -2993,8 +2994,8 @@ static s32 ixgbe_setup_fc_x550em(struct ixgbe_hw *hw)
- static void ixgbe_fc_autoneg_backplane_x550em_a(struct ixgbe_hw *hw)
- {
- 	u32 link_s1, lp_an_page_low, an_cntl_1;
--	s32 status = IXGBE_ERR_FC_NOT_NEGOTIATED;
- 	ixgbe_link_speed speed;
-+	s32 status = -EIO;
- 	bool link_up;
- 
- 	/* AN should have completed when the cable was plugged in.
-@@ -3020,7 +3021,7 @@ static void ixgbe_fc_autoneg_backplane_x550em_a(struct ixgbe_hw *hw)
- 
- 	if (status || (link_s1 & IXGBE_KRM_LINK_S1_MAC_AN_COMPLETE) == 0) {
- 		hw_dbg(hw, "Auto-Negotiation did not complete\n");
--		status = IXGBE_ERR_FC_NOT_NEGOTIATED;
-+		status = -EIO;
- 		goto out;
- 	}
- 
-@@ -3257,8 +3258,8 @@ static s32 ixgbe_init_phy_ops_X550em(struct ixgbe_hw *hw)
- 
- 	/* Identify the PHY or SFP module */
- 	ret_val = phy->ops.identify(hw);
--	if (ret_val == IXGBE_ERR_SFP_NOT_SUPPORTED ||
--	    ret_val == IXGBE_ERR_PHY_ADDR_INVALID)
-+	if (ret_val == -EOPNOTSUPP ||
-+	    ret_val == -EFAULT)
- 		return ret_val;
- 
- 	/* Setup function pointers based on detected hardware */
-@@ -3466,8 +3467,8 @@ static s32 ixgbe_reset_hw_X550em(struct ixgbe_hw *hw)
- 
- 	/* PHY ops must be identified and initialized prior to reset */
- 	status = hw->phy.ops.init(hw);
--	if (status == IXGBE_ERR_SFP_NOT_SUPPORTED ||
--	    status == IXGBE_ERR_PHY_ADDR_INVALID)
-+	if (status == -EOPNOTSUPP ||
-+	    status == -EFAULT)
- 		return status;
- 
- 	/* start the external PHY */
-@@ -3483,7 +3484,7 @@ static s32 ixgbe_reset_hw_X550em(struct ixgbe_hw *hw)
- 		hw->phy.sfp_setup_needed = false;
- 	}
- 
--	if (status == IXGBE_ERR_SFP_NOT_SUPPORTED)
-+	if (status == -EOPNOTSUPP)
- 		return status;
- 
- 	/* Reset PHY */
-@@ -3507,7 +3508,7 @@ static s32 ixgbe_reset_hw_X550em(struct ixgbe_hw *hw)
- 	status = hw->mac.ops.acquire_swfw_sync(hw, swfw_mask);
- 	if (status) {
- 		hw_dbg(hw, "semaphore failed with %d", status);
--		return IXGBE_ERR_SWFW_SYNC;
-+		return -EBUSY;
- 	}
- 
- 	ctrl |= IXGBE_READ_REG(hw, IXGBE_CTRL);
-@@ -3525,7 +3526,7 @@ static s32 ixgbe_reset_hw_X550em(struct ixgbe_hw *hw)
- 	}
- 
- 	if (ctrl & IXGBE_CTRL_RST_MASK) {
--		status = IXGBE_ERR_RESET_FAILED;
-+		status = -EIO;
- 		hw_dbg(hw, "Reset polling failed to complete.\n");
- 	}
- 
-@@ -3621,7 +3622,7 @@ static s32 ixgbe_setup_fc_backplane_x550em_a(struct ixgbe_hw *hw)
- 	/* Validate the requested mode */
- 	if (hw->fc.strict_ieee && hw->fc.requested_mode == ixgbe_fc_rx_pause) {
- 		hw_err(hw, "ixgbe_fc_rx_pause not valid in strict IEEE mode\n");
--		return IXGBE_ERR_INVALID_LINK_SETTINGS;
-+		return -EINVAL;
- 	}
- 
- 	if (hw->fc.requested_mode == ixgbe_fc_default)
-@@ -3678,7 +3679,7 @@ static s32 ixgbe_setup_fc_backplane_x550em_a(struct ixgbe_hw *hw)
- 		break;
- 	default:
- 		hw_err(hw, "Flow control param set incorrectly\n");
--		return IXGBE_ERR_CONFIG;
-+		return -EIO;
- 	}
- 
- 	status = hw->mac.ops.write_iosf_sb_reg(hw,
-@@ -3774,7 +3775,7 @@ static s32 ixgbe_acquire_swfw_sync_x550em_a(struct ixgbe_hw *hw, u32 mask)
- 			return 0;
- 		if (hmask)
- 			ixgbe_release_swfw_sync_X540(hw, hmask);
--		if (status != IXGBE_ERR_TOKEN_RETRY)
-+		if (status != -EAGAIN)
- 			return status;
- 		msleep(FW_PHY_TOKEN_DELAY);
- 	}
-@@ -3818,7 +3819,7 @@ static s32 ixgbe_read_phy_reg_x550a(struct ixgbe_hw *hw, u32 reg_addr,
- 	s32 status;
- 
- 	if (hw->mac.ops.acquire_swfw_sync(hw, mask))
--		return IXGBE_ERR_SWFW_SYNC;
-+		return -EBUSY;
- 
- 	status = hw->phy.ops.read_reg_mdi(hw, reg_addr, device_type, phy_data);
- 
-@@ -3844,7 +3845,7 @@ static s32 ixgbe_write_phy_reg_x550a(struct ixgbe_hw *hw, u32 reg_addr,
- 	s32 status;
- 
- 	if (hw->mac.ops.acquire_swfw_sync(hw, mask))
--		return IXGBE_ERR_SWFW_SYNC;
-+		return -EBUSY;
- 
- 	status = ixgbe_write_phy_reg_mdi(hw, reg_addr, device_type, phy_data);
- 	hw->mac.ops.release_swfw_sync(hw, mask);
--- 
-2.31.1
-
+DQoNCj4gLS0tLS3pgq7ku7bljp/ku7YtLS0tLQ0KPiDlj5Hku7bkuro6IFNlcmdlIFNlbWluIDxm
+YW5jZXIubGFuY2VyQGdtYWlsLmNvbT4NCj4g5Y+R6YCB5pe26Ze0OiBGcmlkYXksIERlY2VtYmVy
+IDgsIDIwMjMgMTA6MjggUE0NCj4g5pS25Lu25Lq6OiBNYXhpbWUgQ2hldmFsbGllciA8bWF4aW1l
+LmNoZXZhbGxpZXJAYm9vdGxpbi5jb20+OyBKaWFuZ2ZlbmcgTWEgPGppYW1hQHN5bm9wc3lzLmNv
+bT4NCj4g5oqE6YCBOiBKaWFuZ2ZlbmcgTWEgPGppYW1hQHN5bm9wc3lzLmNvbT47IEFsZXhhbmRy
+ZSBUb3JndWUgPGFsZXhhbmRyZS50b3JndWVAZm9zcy5zdC5jb20+OyBKb3NlDQo+IEFicmV1IDxq
+b2FicmV1QHN5bm9wc3lzLmNvbT47IERhdmlkIFMuIE1pbGxlciA8ZGF2ZW1AZGF2ZW1sb2Z0Lm5l
+dD47IEVyaWMgRHVtYXpldA0KPiA8ZWR1bWF6ZXRAZ29vZ2xlLmNvbT47IEpha3ViIEtpY2luc2tp
+IDxrdWJhQGtlcm5lbC5vcmc+OyBQYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+Ow0KPiBN
+YXhpbWUgQ29xdWVsaW4gPG1jb3F1ZWxpbi5zdG0zMkBnbWFpbC5jb20+OyBTaW1vbiBIb3JtYW4g
+PGhvcm1zQGtlcm5lbC5vcmc+OyBBbmRyZXcNCj4gSGFsYW5leSA8YWhhbGFuZXlAcmVkaGF0LmNv
+bT47IEJhcnRvc3ogR29sYXN6ZXdza2kgPGJhcnRvc3ouZ29sYXN6ZXdza2lAbGluYXJvLm9yZz47
+IFNoZW53ZWkNCj4gV2FuZyA8c2hlbndlaS53YW5nQG54cC5jb20+OyBKb2hhbm5lcyBaaW5rIDxq
+LnppbmtAcGVuZ3V0cm9uaXguZGU+OyBSdXNzZWxsIEtpbmcgKE9yYWNsZQ0KPiA8cm1rK2tlcm5l
+bEBhcm1saW51eC5vcmcudWs+OyBKb2NoZW4gSGVubmViZXJnIDxqaEBoZW5uZWJlcmctc3lzdGVt
+ZGVzaWduLmNvbT47IG9wZW4NCj4gbGlzdDpTVE1NQUMgRVRIRVJORVQgRFJJVkVSIDxuZXRkZXZA
+dmdlci5rZXJuZWwub3JnPjsgbW9kZXJhdGVkIGxpc3Q6QVJNL1NUTTMyDQo+IEFSQ0hJVEVDVFVS
+RSA8bGludXgtc3RtMzJAc3QtbWQtbWFpbG1hbi5zdG9ybXJlcGx5LmNvbT47IG1vZGVyYXRlZCBs
+aXN0OkFSTS9TVE0zMg0KPiBBUkNISVRFQ1RVUkUgPGxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5m
+cmFkZWFkLm9yZz47IG9wZW4gbGlzdCA8bGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZz47IEph
+bWVzDQo+IExpIDxsaWphbWVzQHN5bm9wc3lzLmNvbT47IE1hcnRpbiBNY0tlbm55IDxtbWNrZW5u
+eUBzeW5vcHN5cy5jb20+DQo+IOS4u+mimDogUmU6IFtQQVRDSF0gbmV0OnN0bW1hYzpzdG1tYWNf
+cGxhdGZvcm06QWRkIHNucHMseHBjcyBkZXZpY2V0cmVlIHBhcnNpbmcNCj4gDQpIaSBNYXhpbWUs
+IFNlcmdlDQpUaGFua3MgZm9yIHlvdXIgcmV2aWV3IQ0KDQo+IEhpIE1heGltZSwgSmlhbmdmZW5n
+DQo+IA0KPiBPbiBGcmksIERlYyAwOCwgMjAyMyBhdCAwOToxNDowOEFNICswMTAwLCBNYXhpbWUg
+Q2hldmFsbGllciB3cm90ZToNCj4gPiBIZWxsbywNCj4gPg0KPiA+IE9uIEZyaSwgOCBEZWMgMjAy
+MyAwNzowMjoxOSArMDAwMA0KPiA+IEppYW5nZmVuZyBNYSA8SmlhbmdmZW5nLk1hQHN5bm9wc3lz
+LmNvbT4gd3JvdGU6DQo+ID4NCj4gPiA+IEluIG9yZGVyIHRvIHNldHVwIHhwY3MsIGhhc194cGNz
+IG11c3QgYmUgc2V0IHRvIGEgbm9uLXplcm8gdmFsdWUuDQo+ID4gPiBBZGQgbmV3IG9wdGlvbmFs
+IGRldmljZXRyZWUgcHJvcGVydGllcyByZXByZXNlbnRpbmcgdGhpcy4NCj4gPiA+DQo+ID4gPiBJ
+ZiBoYXNfeHBjcyBpcyBzZXQgdG8gdHJ1ZSwgdGhlbiB4cGNzX2FuX2luYmFuZCBzaG91bGQgcHJl
+ZmVyYWJseSBiZQ0KPiA+ID4gY29uc2lzdGVudCB3aXRoIGl0LCBPdGhlcndpc2UsIHNvbWUgZXJy
+b3JzIG1heSBvY2N1ciB3aGVuIHN0YXJ0aW5nDQo+ID4gPiB0aGUgbmV0d29yaywgRm9yIGV4YW1w
+bGUsIHRoZSBwaHkgaW50ZXJmYWNlIHRoYXQgeHBjcyBhbHJlYWR5IHN1cHBvcnRzLA0KPiA+ID4g
+YnV0IGxpbmsgdXAgZmFpbHMuDQo+ID4NCj4gPiBDYW4geW91IGVsYWJvcmF0ZSBvbiB3aHkgeW91
+IG5lZWQgdGhpcywgYW5kIG9uIHdoaWNoIHBsYXRmb3JtDQo+ID4gZXNwZWNpYWxseSA/IFVzdWFs
+bHkgZHJpdmVycyBmb3IgdGhlIHZhcmlvdXMgc3RtbWFjIHZhcmlhbnRzIGtub3cgaWYNCj4gPiB0
+aGV5IGhhdmUgWFBDUyBvciBub3QsIG9yIGNhbiBndWVzcyBpdCBiYXNlZCBvbiBzb21lIGluZm8g
+c3VjaCBhcyB0aGUNCj4gPiBjb25maWd1cmVkIFBIWSBtb2RlIChkd21hYy1pbnRlbCkuDQoNClRo
+ZXJlIGlzIG5vIHNwZWNpZmljIHBsYXRmb3JtIGhlcmUuIEkgdXRpbGl6ZSB0aGUgZHdtY2FjLWdl
+bmVyaWMgcGxhdGZvcm0sDQphbmQgeHBjcyBpcyB1dGlsaXplZCBhcyB0aGUgTURJTyBkZXZpY2Ug
+b3IgaXQgY2FuIGJlIHNlZW4gYXMgYSBDNDUgUEhZLg0KV2hpbGUgaXQncyBzb21ldGltZXMgcG9z
+c2libGUgdG8gZGVkdWNlIHRoZSBwcmVzZW5jZSBvZiB4cGNzIGJhc2VkIG9uIGluZm9ybWF0aW9u
+DQpzdWNoIGFzIHRoZSBwaHkgbW9kZSAoZHdtYWMtaW50ZWwpLCB0aGlzIGlzIG5vdCBhbHdheXMg
+YSBkZWZpbml0aXZlIGluZGljYXRvci4NCkZvciBpbnN0YW5jZSwgdGhlIHN1cHBvcnQgb2YgU0dN
+SUkgYnkgWFBDUyBkb2Vzbid0IGltcGx5DQp0aGF0IGFsbCBTR01JSS1zdXBwb3J0aW5nIFBIWXMg
+aW5jbHVkZSBYUENTLiBCdXQgYXMgU2VyZ2UgbWVudGlvbmVkLCB1c2luZyBwY3MtaGFuZGxlLA0K
+b3IgcGNzLWhhbmRsZS1uYW1lIG1pZ2h0IGJlIGEgbW9yZSBlZmZlY3RpdmUgYXBwcm9hY2guDQo+
+ID4NCj4gPiBCZXNpZGVzIHRoYXQsIHRoZXJlIGFyZSBhIGZldyBpc3N1ZXMgd2l0aCB5b3VyIHN1
+Ym1pc3Npb24uIElmIERUIGlzIHRoZQ0KPiA+IHdheSB0byBnbyAoYW5kIEkgZG9uJ3Qgc2F5IGl0
+IGlzKSwgeW91IHdvdWxkIGFsc28gbmVlZCB0byB1cGRhdGUgdGhlDQo+ID4gYmluZGluZ3MgdG8g
+ZG9jdW1lbnQgdGhhdCBwcm9wZXJ0eS4NCj4gPg0KPiA+ID4gVGhlIHR5cGVzIG9mIGhhc194cGNz
+IGFuZCB4cGNzX2FuX2luYmFuZCBhcmUgdW5zaWduZWQgaW50LA0KPiA+ID4gYW5kIGdlbmVyYWxs
+eSB1c2VkIGFzIGZsYWdzLiBTbyBpdCBtYXkgYmUgbW9yZSByZWFzb25hYmxlIHRvIHNldCB0aGVt
+IHRvDQo+ID4gPiBib29sIHR5cGUuIFRoaXMgY2FuIGFsc28gYmUgY29uZmlybWVkIGZyb20gdGhl
+IHR5cGUgb2YgQG92cl9hbl9pbmJhbmQuDQo+ID4NCj4gPiBBbmQgdGhpcyBwYXJ0IHdvdWxkIGdv
+IGludG8gYSBzZXBhcmF0ZSBwYXRjaC4NClNvcnJ5IGZvciB0aGlzIGlzc3VlLCBJIHdpbGwgY3Jl
+YXRlIHRoZSBwYXRjaCBzZXBhcmF0ZWx5IGxhdGVyLg0KPiANCj4gSW4gYWRkaXRpb24gdG8gd2hh
+dCBNYXhpbWUgYWxyZWFkeSBzYWlkIGhhdmluZyBEVC1iaW5kaW5ncyBhZGp1c3RlZCB0bw0KPiBm
+aXQgdG8gdGhlIHBhdHRlcm4gaW1wbGVtZW50ZWQgaW4gdGhlIHNvZnR3YXJlIHBhcnQgaXMgYSB3
+cm9uZyB3YXkgdG8NCj4gZ28uIFRoZSBiZXN0IGNob2ljZSBpbiB0aGlzIGNhc2UgaXMgdG8gYWRk
+IHRoZSBEVyBYUENTIERULW5vZGUgdG8gdGhlDQo+IERXIE1BQyBNRElPL01JIGJ1cyBhbmQgdGhl
+biB1c2UgdGhlICJwY3MtaGFuZGxlIiB0byBpbmZvcm0gdGhlIE1BQw0KPiAobWFpbmx5IGl0J3Mg
+ZHJpdmVyKSBvZiB3aGF0IFBDUy1kZXZpY2UgaXMgYWN0dWFsbHkgYXR0YWNoZWQgdG8gaXQuDQo+
+IFRoZSBzZXJpZXMgSSBzdWJtaXR0ZWQgb24gdGhpcyB3ZWVrIGlzIGV4YWN0bHkgYWJvdXQgdGhh
+dDoNCj4gaHR0cHM6Ly91cmxkZWZlbnNlLmNvbS92My9fX2h0dHBzOi8vbG9yZS5rZXJuZWwub3Jn
+L25ldGRldi8yMDIzMTIwNTEwMzU1OS45NjA1LTEtZmFuY2VyLmxhbmNlckBnDQo+IG1haWwuY29t
+L19fOyEhQTRGMlI5R19wZyFZNlIzV1pXSGVCZHJrWmtsYnFyQVFBUmJIblEtZ19UYmI2cjVJcWNz
+U0hNUV9sNHJPekxMZ1p2TFBsNllQDQo+IEJZZmVyYmpyYmpaQTZfWHZTU1N2a1YzNWVvMmpXUHok
+DQo+IEkgZ3Vlc3MgSSdsbCBuZWVkIGFib3V0IGEgbW9udGggb3Igc28gdG8gc2V0dGxlIGFsbCB0
+aGUgY29tbWVudHMsIGJ1dA0KPiB0aGUgc29sdXRpb24gaW1wbGVtZW50ZWQgdGhlcmUgd2lsbCBi
+ZSBiZXR0ZXIgdGhhbiB0aGlzIG9uZSByZWFsbHkuDQo+DQpZZXMsIEkgYWdyZWUgdGhhdCBiaW5k
+aW5nIHRoZSB4cGNzIHZpYSB0aGUgInBjcy1oYW5kbGUiIERUIGZpcm13YXJlIG5vZGUgDQppcyBh
+IGJldHRlciB3YXkuIGJ1dCB0aGUgY3VycmVudCBtZXRob2Qgb2YgYmluZGluZyB4cGNzIHRocm91
+Z2ggc2Nhbm5pbmcgDQphZGRyZXNzZXMgc3RpbGwgcmVsaWVzIG9uIG1kaW9fYnVzX2RhdGEtPmhh
+c194cGNzLiANClRoZSAxNnRoIHBhdGNoIGluIHlvdXIgcGF0Y2hzZXQgYWxzbyBtZW50aW9ucyB0
+aGUgZGlmZmljdWx0eSBvZiANCm9idGFpbmluZyBoYXNfeHBjcy4gVGhlcmVmb3JlLCBjYW4gd2Ug
+YWRkIHBhcnNpbmcgb2YgcGNzLWhhbmRsZS1uYW1lcyANCmluIHRoZSBwbGF0Zm9ybSB0byBkZXRl
+cm1pbmUgaWYgdGhlIHhwY3MgZXhpc3RzLCBsaWtlIHRoaXM6DQoNCmlmIChwbGF0LT5tZGlvX2J1
+c19kYXRhKSB7DQoJcmMgPSBvZl9wcm9wZXJ0eV9tYXRjaF9zdHJpbmcobnAsICJwY3MtaGFuZGxl
+LW5hbWVzIiwgImR3LXhwY3MiKTsNCglpZiAocmMgPj0gMCkgew0KCQlwbGF0LT5tZGlvX2J1c19k
+YXRhLT5oYXNfeHBjcyA9IHRydWU7DQoJCXBsYXQtPm1kaW9fYnVzX2RhdGEtPnhwY3NfYW5faW5i
+YW5kID0gdHJ1ZTsNCgl9DQp9DQoNClRoYW5rcywNCkppYW5nZmVuZw0KDQo+IC1TZXJnZSh5KQ0K
+PiANCj4gPg0KPiA+IFRoYW5rcywNCj4gPg0KPiA+IE1heGltZQ0KPiA+DQo=
 
