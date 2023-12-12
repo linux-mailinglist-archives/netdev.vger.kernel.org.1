@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-56377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B937180EAAB
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 12:43:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FCFB80EAAD
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 12:43:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA24D1C20C92
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 11:43:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B44701F21E73
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 11:43:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C96B5DF2D;
-	Tue, 12 Dec 2023 11:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 443935DF02;
+	Tue, 12 Dec 2023 11:43:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ge+dpE01"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cIkUjDq4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D940EB;
-	Tue, 12 Dec 2023 03:42:56 -0800 (PST)
-Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-40c317723a8so46199105e9.3;
-        Tue, 12 Dec 2023 03:42:56 -0800 (PST)
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96025C3;
+	Tue, 12 Dec 2023 03:42:58 -0800 (PST)
+Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-33340c50af9so5591520f8f.3;
+        Tue, 12 Dec 2023 03:42:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702381375; x=1702986175; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1702381376; x=1702986176; darn=vger.kernel.org;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZkMi5XsECucibhGSAnp7TelBnOBpnxzR3nugb8GXnNs=;
-        b=Ge+dpE01WYJ+/iL1gjl6dcpyg4uMbcnr5VfElJq7Q/iLQIpfBiQXPG4Mt2wPSPFYgO
-         u5lclVCdme+nzAFiWHUqTdWZP1K4bIyHD6+5Li7affbj3622ExzlGSXkFMJeEPkLDCcR
-         T3vF7bA92J0RQxWYY3VrTdpMhpdXRFD83cPP1S6vnfjf0yj6S6w4FA0JvGA+xDAuvjjm
-         bhodE878sPlCeSO8QFk7jTxpkpLgRXZtxLOeyxQLcx3Nal4VJNXlHug5sWCNrzb5JT86
-         T+KIUW1/fsaMabTLig339hFc4q9Z5osaR3DNxgg8JaCK4cc1005qzQKFanZEUyawkQPk
-         TaDA==
+        bh=rL1bOb2mLG2xSb1vMtfKL9p1Rwmx1hkRrqERQhLV3xI=;
+        b=cIkUjDq4ZQ1TSh1axPiYQg/NjwAEsy8iqv0ihQNvc9tucNWJItnDlD6ZZJmMl/Al5X
+         JzN1BMN0/sPI9ZYB5YpqNvv5wPpf+nta/bgLScJ5x6SXMJikoJw5CiH75VVhozNhqvOF
+         dA8B922KMT2YjjcbtSVfHfCZC78xY+ciBbO1v5e2V7bCsvqw/BtX1UW4cViPRknoY0ag
+         883U02+aQ1U2qENUYNuu8QW2cHkmhrjhXVZP4TMIadVg9LLlHOsfCg2Hr+JoanI+Ujzz
+         DnHjE87DEYNacTZz3MJS1InMyqSyv4lEZk29O7cRlLBE8IY9DXjObtgAwpV3WCErpoTg
+         D9Lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702381375; x=1702986175;
+        d=1e100.net; s=20230601; t=1702381376; x=1702986176;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZkMi5XsECucibhGSAnp7TelBnOBpnxzR3nugb8GXnNs=;
-        b=tgQnbwwfj0mtRyc6C25CLTPKm85jVWFqyN/tLlz5/IGDr79NIwuN0zZH6QL2MjcPgn
-         qI3EdZQ1IUvt3C3CCIswga3r0ZB3ycED/L0lnmao+DcPi5LtL9f02fH51z5RO68d/DmY
-         QGEnO8ylgWCIgbSTQcCyjtNqaUBo95/YPqf1Iboaejkmk+jWp4m4znonLLD7ACBr9duH
-         BEhx4wmZtCeQCG5pyUIhc46DoSRulIrfdZgC4kEtmMqYsry8dtxd9fgTRpb+dLwSgTym
-         Gci2CeC8mrWkjawbup9d/rBYmAK4cx448g7XZH3iUJJj/y2o+Xpx3fu7wmlMme6seIxG
-         ow9g==
-X-Gm-Message-State: AOJu0YzwAj4LqiYWEoePBs4+cGpVso88BavwUhRsAuTJQ9MS3rYMW/vk
-	vm0OyuwHwf8Iu7Xn3A3zTIdpgtc5tZzyRg==
-X-Google-Smtp-Source: AGHT+IGaQALHnVIFfcRh9sMD23gar/5ia/T/A6d3fD//Hhq9xktocTCi2RSwpijWjNp1rtgj3gIjTw==
-X-Received: by 2002:a05:600c:45d0:b0:40c:4575:2044 with SMTP id s16-20020a05600c45d000b0040c45752044mr2088896wmo.174.1702381374732;
-        Tue, 12 Dec 2023 03:42:54 -0800 (PST)
+        bh=rL1bOb2mLG2xSb1vMtfKL9p1Rwmx1hkRrqERQhLV3xI=;
+        b=IgdgcoUZTdUUgsj+CuY7TIThoejgCQ1ySK0wSB+RGC6qcpebSjMgoKTnnjN2hjX2HT
+         UorWliNjLqY9Rjs0vvS05X5x3AIxpJKYj8qnDPiqVwLnHaGN2g7L1KoGZXnWN+bqqcq4
+         vR0thwkshfHik5eLYbjd/RP0N7WLXWYvHbWAw3JGrGhp95fJ/QRy8OX4O0lNr42u8bEv
+         xsXr4AAW1641TaZpXhru5ZbQWNpALRqdZc29NdnFBBpMeXA05POmcGpYhCHo4KAPzBTi
+         RuJlIn44LR2vPXJvl6K4g7hJvUfA/TLT3Nukj2XlfvZpMp540TGtZ5wswi8OcIl4n2N/
+         b7Kg==
+X-Gm-Message-State: AOJu0YyYRs+8NN3jwXL06xExLsVaMx018JNYKmM0l/5y+fZhKBKLUJl6
+	h7HXY8MvOZLX0yWETlPPBm0=
+X-Google-Smtp-Source: AGHT+IGnTefpQ78PurhhoAdtZA4Hh+joS3/MDIbTEot4jw7bhssxml21mf8goutlZxqQc08bC/rgsw==
+X-Received: by 2002:a5d:4b0f:0:b0:333:2fd2:3bcd with SMTP id v15-20020a5d4b0f000000b003332fd23bcdmr1943475wrq.134.1702381376210;
+        Tue, 12 Dec 2023 03:42:56 -0800 (PST)
 Received: from imac ([2a02:8010:60a0:0:4c3e:5ea1:9128:f0b4])
-        by smtp.gmail.com with ESMTPSA id p8-20020a05600c358800b0040b40468c98sm18059615wmq.10.2023.12.12.03.42.53
+        by smtp.gmail.com with ESMTPSA id n10-20020a5d4c4a000000b003333abf3edfsm10617321wrt.47.2023.12.12.03.42.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 03:42:54 -0800 (PST)
+        Tue, 12 Dec 2023 03:42:55 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
  Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Jonathan
  Corbet <corbet@lwn.net>,  linux-doc@vger.kernel.org,  Jacob Keller
  <jacob.e.keller@intel.com>,  donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v2 06/11] doc/netlink: Document the sub-message
- format for netlink-raw
-In-Reply-To: <20231211175634.3ac1ea07@kernel.org> (Jakub Kicinski's message of
-	"Mon, 11 Dec 2023 17:56:34 -0800")
-Date: Tue, 12 Dec 2023 11:32:53 +0000
-Message-ID: <m24jgn8xlm.fsf@gmail.com>
+Subject: Re: [PATCH net-next v2 08/11] tools/net/ynl: Add binary and pad
+ support to structs for tc
+In-Reply-To: <20231211180436.5560720e@kernel.org> (Jakub Kicinski's message of
+	"Mon, 11 Dec 2023 18:04:36 -0800")
+Date: Tue, 12 Dec 2023 11:36:03 +0000
+Message-ID: <m2zfyf7ivw.fsf@gmail.com>
 References: <20231211164039.83034-1-donald.hunter@gmail.com>
-	<20231211164039.83034-7-donald.hunter@gmail.com>
-	<20231211175634.3ac1ea07@kernel.org>
+	<20231211164039.83034-9-donald.hunter@gmail.com>
+	<20231211180436.5560720e@kernel.org>
 User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -78,45 +78,22 @@ Content-Type: text/plain
 
 Jakub Kicinski <kuba@kernel.org> writes:
 
-> On Mon, 11 Dec 2023 16:40:34 +0000 Donald Hunter wrote:
->> +Sub-messages
->> +------------
->> +
->> +Several raw netlink families such as rt_link and tc have type-specific
->> +sub-messages. These sub-messages can appear as an attribute in a top-level or a
->> +nested attribute space.
->> +
->> +A sub-message attribute uses the value of another attribute as a selector key to
->> +choose the right sub-message format. For example if the following attribute has
->> +already been decoded:
+> On Mon, 11 Dec 2023 16:40:36 +0000 Donald Hunter wrote:
+>>                  description: The netlink attribute type
 >
-> We may want to explain why we call this thing "sub-message". How about:
+> We should perhaps "touch up" this doc, and add that for the use of pad
+> within structs len is required. Would be even better if you could
+> convince json schema to validate that. The example that starts with 
+> a comment:
 >
->   Several raw netlink families such as rt_link and tc use attribute
->   nesting as an abstraction to carry module specific information.
->   Conceptually it looks as follows::
+>   # type property is only required if not in subset definition
 >
->     [OUTER NEST OR MESSAGE LEVEL]
->       [GENERIC ATTR 1]
->       [GENERIC ATTR 2]
->       [GENERIC ATTR 3]
->       [GENERIC ATTR - wrapper]
->         [MODULE SPECIFIC ATTR 1]
->         [MODULE SPECIFIC ATTR 2]
->
->   The GENERIC ATTRs at the outer level are defined in the core (or rt_link
->   or core TC), while specific drivers / TC classifiers, qdiscs etc. can
->   carry their own information wrapped in the "GENERIC ATTR - wrapper".
->   Even though the example above shows attributes nesting inside the wrapper,
->   the modules generally have full freedom of defining the format of the nest.
->   In practice payload of the wrapper attr has very similar characteristics
->   to a netlink message. It may contain a fixed header / structure, netlink
->   attributes, or both. Because of those shared characteristics we refer
->   to the payload of the wrapper attribute as a sub-message.
+> should be pretty close to what we need here?
 
-I'll incorporate into next revision. Thanks!
+Yep, I'll update the description and see if I can get the schema
+validation to play nice.
 
->> +A sub-message attribute uses the value of another attribute as a selector key to
->> +choose the right sub-message format. For example if the following attribute has
->> +already been decoded:
+>
+>> -                enum: [ u8, u16, u32, u64, s8, s16, s32, s64, string, binary ]
+>> +                enum: [ u8, u16, u32, u64, s8, s16, s32, s64, string, binary, pad ]
 
