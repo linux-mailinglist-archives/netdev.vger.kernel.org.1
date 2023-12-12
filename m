@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-56208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A229F80E2A5
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 04:20:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5312F80E2A6
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 04:20:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57D7F1F21C79
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 03:20:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4DFE8B216B4
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 03:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 286158828;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63C5C8C18;
 	Tue, 12 Dec 2023 03:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hLDf8MTK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SOhqUiw+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7F179E0
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 03:20:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C9649C433C8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 463838835
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 03:20:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BAFE6C433C9;
 	Tue, 12 Dec 2023 03:20:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1702351225;
-	bh=904puYQsBkTzdQniJcHEpofJ4NJsJwMekQa4mCR3E14=;
+	bh=xcUWuYpi+Xr+dYEylOPBmhRhJFHpRKmSnDZRNCDpfD0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hLDf8MTKoBe9N13ZOLtRMd4a27X7dDciTAWhBRDbjzQgl7vI+B0QZrrQhjqLHldxz
-	 prC8+x9j+2zpP+73a4xcQO1Rfw9KWtuUCyZ3g9907NDAJVgOzPj3n0BviMoK8tbi1H
-	 maam3lxNvJYvPnKjCNBVhPPaqqv/yub2/KxJeYiR0lwy1UMJsDuJYZx1WghDfG+4bj
-	 tVhW3DGp0ANzRpieDyKmrTiDE321U4Z4R0h/SecrZP3a3DC4sf6nhXTM1jzpkhH37F
-	 Hkgl+MzAv4KIWwev3m0aiBmCG2e2FEhukatxWzdjQyT0OwhhkgjkCrHTL9RSLxcN8t
-	 cx5fTl4gRIlOg==
+	b=SOhqUiw+D9KvJdQgmsSD1W9CWVFXaTSDELYYYk4TRY1HUZUESOiI3QnQMC32KNVDN
+	 RwDFref+Kd4pcw/4x4XqxJ4JdGVYVZQCpgUwGMX7jyHGCiJaGkTxKSx9iZEVVlXKux
+	 gUfW1k3CHhO2LXazerq463uGJaIuTfwdnSP+PZ/wSsQhF03heVrwuzKiQ5EUdUcApK
+	 8w9Nrdo69URl2ELl+lsBlz0MNU6inn1y2oqpYOPQbkkOkWthjVNHbnPlniYjOBmC/D
+	 0ytp5ZIgQlSEKOw/3MZPW3+dr/tjwj6TMFToq1ZhA+ajD37l4lt144SlWHu6ffci6k
+	 8zWo0fRX2ndZA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B16ABDD4F0E;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A7EB1DFC906;
 	Tue, 12 Dec 2023 03:20:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,62 +43,52 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v6] netlink: specs: devlink: add some(not all)
- missing attributes in devlink.yaml
+Subject: Re: [PATCH net-next v4 0/7] net/sched: conditional notification of events
+ for cls and act
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170235122572.10568.5224501495681522792.git-patchwork-notify@kernel.org>
+ <170235122568.10568.16601661067155468388.git-patchwork-notify@kernel.org>
 Date: Tue, 12 Dec 2023 03:20:25 +0000
-References: <20231208182515.1206616-1-swarupkotikalapudi@gmail.com>
-In-Reply-To: <20231208182515.1206616-1-swarupkotikalapudi@gmail.com>
-To: swarup <swarupkotikalapudi@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, jiri@resnulli.us, netdev@vger.kernel.org,
- linux-kernel-mentees@lists.linuxfoundation.org
+References: <20231208192847.714940-1-pctammela@mojatatu.com>
+In-Reply-To: <20231208192847.714940-1-pctammela@mojatatu.com>
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, jhs@mojatatu.com,
+ xiyou.wangcong@gmail.com, jiri@resnulli.us, marcelo.leitner@gmail.com,
+ vladbu@nvidia.com, horms@kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  8 Dec 2023 23:55:15 +0530 you wrote:
-> Add some missing(not all) attributes in devlink.yaml.
+On Fri,  8 Dec 2023 16:28:40 -0300 you wrote:
+> This is an optimization we have been leveraging on P4TC but we believe
+> it will benefit rtnl users in general.
 > 
-> Signed-off-by: Swarup Laxman Kotiaklapudi <swarupkotikalapudi@gmail.com>
-> Suggested-by: Jiri Pirko <jiri@resnulli.us>
-> ---
-> V6:
->   - Fix review comments
-> V5:
->   - https://lore.kernel.org/all/20231202123048.1059412-1-swarupkotikalapudi@gmail.com/
->     Keep stats enum as unnamed in /uapi/linux/devlink.h
->     to avoid kernel build failure
-> V4: https://lore.kernel.org/all/20231126105246.195288-1-swarupkotikalapudi@gmail.com/
->   - Change the commit message
-> V3: https://lore.kernel.org/all/20231123100119.148324-1-swarupkotikalapudi@gmail.com/
->   - enum name added for stats and trap-metadata enum used by trap command
->     in include/uapi/linux/devlink.h
->   - Fix generated userspace file's compilation issue
->     due to V1 and V2 patchset
->   - Move some attributes e.g. nested-devlink and param again as a TODO,
->     which needs some discussion and will be fixed in a new patchset
-> V2: https://lore.kernel.org/all/20231122143033.89856-1-swarupkotikalapudi@gmail.com/
->   - Rebase to net-next tree
->   - param-value-data data type is dynamic, hence to accomndate
->     all data type make it as string type
->   - Change nested attribute to use correct fields
->     based on driver code e.g. region-snapshots,
->     region-snapshot, region-chunks, region-chunk,
->     linecard-supported-types, health-reporter,
->     linecard-supported-types, nested-devlink
->     and param's attributes
-> V1: https://lore.kernel.org/all/ZVNPi7pmJIDJ6Ms7@swarup-virtual-machine/
+> It's common to allocate an skb, build a notification message and then
+> broadcast an event. In the absence of any user space listeners, these
+> resources (cpu and memory operations) are wasted. In cases where the subsystem
+> is lockless (such as in tc-flower) this waste is more prominent. For the
+> scenarios where the rtnl_lock is held it is not as prominent.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v6] netlink: specs: devlink: add some(not all) missing attributes in devlink.yaml
-    https://git.kernel.org/netdev/net-next/c/68c84289bcc0
+  - [net-next,v4,1/7] rtnl: add helper to check if rtnl group has listeners
+    https://git.kernel.org/netdev/net-next/c/c5e2a973448d
+  - [net-next,v4,2/7] rtnl: add helper to check if a notification is needed
+    https://git.kernel.org/netdev/net-next/c/8439109b76a3
+  - [net-next,v4,3/7] rtnl: add helper to send if skb is not null
+    https://git.kernel.org/netdev/net-next/c/ddb6b284bdc3
+  - [net-next,v4,4/7] net/sched: act_api: don't open code max()
+    https://git.kernel.org/netdev/net-next/c/c73724bfde09
+  - [net-next,v4,5/7] net/sched: act_api: conditional notification of events
+    https://git.kernel.org/netdev/net-next/c/8d4390f51920
+  - [net-next,v4,6/7] net/sched: cls_api: remove 'unicast' argument from delete notification
+    https://git.kernel.org/netdev/net-next/c/e522755520ef
+  - [net-next,v4,7/7] net/sched: cls_api: conditional notification of events
+    https://git.kernel.org/netdev/net-next/c/93775590b1ee
 
 You are awesome, thank you!
 -- 
