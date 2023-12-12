@@ -1,152 +1,114 @@
-Return-Path: <netdev+bounces-56304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 149F780E773
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:22:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F31A980E77D
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:23:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 97648B20DA7
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 09:22:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FA071C2164E
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 09:23:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0673A584DD;
-	Tue, 12 Dec 2023 09:22:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB79584DD;
+	Tue, 12 Dec 2023 09:23:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="aeiMKbIp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hyh58MHr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 256C3101;
-	Tue, 12 Dec 2023 01:22:33 -0800 (PST)
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BC7hVg4030233;
-	Tue, 12 Dec 2023 09:22:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id; s=qcppdkim1; bh=l8zaNlEzCFdd
-	J7GdqVAcppaYhBgAvRyZ9QUKgjvXKaE=; b=aeiMKbIpxLVlx5kNw8rKOQGHlxO3
-	J9+0v4xmX6QTsjq6uf4YUQJFgWbqDJ9mwzw4Wp8+ABb8St4FK619S4fz42RjOYhg
-	bYo0G9hfT4pcHZU5f2+6/Ja45d9fSlmC/BHr70TsyiZgtpM/iqadpyRcpO+ReU74
-	MzZs8Ox7fxOH3y7FntUuwHVYBgI8L4nTsn0j52urGhmcf6PrAGE0Rogic/rV0cV5
-	5BkJhbT7iwNCwFH/4C+vfRj25AwZJ1S6frdV0xPDKsIg6LlM1ZBCptBmIlE0eQfm
-	w/JRJIjaiFzyReCof+0UOGX3OMxF9IPWeiRhk7wtal6wuxekK3jF3GGRVA==
-Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uxkc806xq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 12 Dec 2023 09:22:17 +0000 (GMT)
-Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 3BC9MDQu003963;
-	Tue, 12 Dec 2023 09:22:13 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 3uvhakhnmy-1;
-	Tue, 12 Dec 2023 09:22:13 +0000
-Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BC9MClj003954;
-	Tue, 12 Dec 2023 09:22:12 GMT
-Received: from hu-maiyas-hyd.qualcomm.com (hu-snehshah-hyd.qualcomm.com [10.147.246.35])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 3BC9MCeE003952;
-	Tue, 12 Dec 2023 09:22:12 +0000
-Received: by hu-maiyas-hyd.qualcomm.com (Postfix, from userid 2319345)
-	id 99D6A5001C6; Tue, 12 Dec 2023 14:52:11 +0530 (+0530)
-From: Sneh Shah <quic_snehshah@quicinc.com>
-To: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc: Sneh Shah <quic_snehshah@quicinc.com>, kernel@quicinc.com,
-        Andrew Halaney <ahalaney@redhat.com>
-Subject: [PATCH net v4] net: stmmac: dwmac-qcom-ethqos: Fix drops in 10M SGMII RX
-Date: Tue, 12 Dec 2023 14:52:08 +0530
-Message-Id: <20231212092208.22393-1-quic_snehshah@quicinc.com>
-X-Mailer: git-send-email 2.17.1
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: pDPfPCDoTvWSercp_38-MWIPTU2YRGPX
-X-Proofpoint-ORIG-GUID: pDPfPCDoTvWSercp_38-MWIPTU2YRGPX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 mlxlogscore=999 suspectscore=0 bulkscore=0
- malwarescore=0 adultscore=0 impostorscore=0 spamscore=0 mlxscore=0
- phishscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2312120073
+Received: from mail-ua1-x92c.google.com (mail-ua1-x92c.google.com [IPv6:2607:f8b0:4864:20::92c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F35FF5
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 01:23:42 -0800 (PST)
+Received: by mail-ua1-x92c.google.com with SMTP id a1e0cc1a2514c-7c5060a9e5bso1706965241.0
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 01:23:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702373021; x=1702977821; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TUd+xJBalOQAWlVtKqp2TzvFJgkF52NQ9jKhRyu6zf0=;
+        b=Hyh58MHrRypDZ9Pb/9prTpxrvpIRvjnuFT2hIR2rVwMIkWg/qP3B7w7pMyuuUS/3+N
+         9rsq7fOJH0P/lS3Ntd8D7UAmXbgxJnVZogXzONwrtkEd1lt+MDLM5pmNaFRJMBHlN/e2
+         YuYa6MPPKzWl44Zp/Mp7zfZb4cmegyFwVKZFdY2tKjDua+sSUnD9Lz2Mpgn5V3ioCxRD
+         CG2DuiQ71ueuevfCKg8IwXGQ5Aq93B7BL8YNVnnVMuGVTHSps08Moe4ddeuveWMC60Bt
+         OWI+TeZ20U9Gaf3MLzM6DiiinGefbGiMu8B2XX26SD68DurKd8TBt/5vjIv8Ujje0dCl
+         dJqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702373021; x=1702977821;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TUd+xJBalOQAWlVtKqp2TzvFJgkF52NQ9jKhRyu6zf0=;
+        b=O/vrLCw0DJVTJ55GhvnUHhfyPPqXkStlgFmU9eNOyZNXk/vhu5pWtpCBPSsr/gX0rY
+         FCWlM/cbHGilUvAiTtcnNsHYSUQKPibS/u+gBljNI9QLZK8oT9Py3x5xnbFhZzULWrsB
+         C4QR7eVspD1e243Dc6xKXaT8/dLFFmKjYisXUqFGQkQ74kGfJaMF+0giFoGa4dMRo6R7
+         sWA97Y5C9YDxF8gcP61nCQo7jIw01j5lbWtMbK/zfG+nEWTFfVoNSR7sD+JcrxsBBbog
+         m8aTAvLSn4g0VJadHZSSO40wpcG+KEJIqHngloMOTkZykrvNCNxp4ql6KgnzBbWSIuox
+         /rxQ==
+X-Gm-Message-State: AOJu0Yx5Zod8+uHT5j33ssUZSNfFRwP07nlP83NtVVv+iFrm40DdukFb
+	SOlDI95MuSc/9naMsWXs1jpXz2p9Fncd8XAYUsqe7w==
+X-Google-Smtp-Source: AGHT+IFgUCvvmzmX278q9Co+7QDNrP8fTgs5dO167XgwKzPZkRE3j0AtMw1ja2f/aExIsIQLu3r25rvviPcmOCdi/SU=
+X-Received: by 2002:a05:6102:4413:b0:464:8960:4827 with SMTP id
+ df19-20020a056102441300b0046489604827mr3363440vsb.7.1702373020886; Tue, 12
+ Dec 2023 01:23:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20231210234924.1453917-1-fujita.tomonori@gmail.com>
+ <20231210234924.1453917-2-fujita.tomonori@gmail.com> <ccf2b9af-1c8c-44c4-bb93-51dd9ea1cccf@ryhl.io>
+ <20231212.081505.1423250811446494582.fujita.tomonori@gmail.com>
+In-Reply-To: <20231212.081505.1423250811446494582.fujita.tomonori@gmail.com>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Tue, 12 Dec 2023 10:23:30 +0100
+Message-ID: <CAH5fLghyo3vdrQvQgRsMHp6Hh1=L5+PqHbfBXoF7t4E4URN_vw@mail.gmail.com>
+Subject: Re: [PATCH net-next v10 1/4] rust: core abstractions for network PHY drivers
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: alice@ryhl.io, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	andrew@lunn.ch, tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com, 
+	benno.lossin@proton.me, wedsonaf@gmail.com, boqun.feng@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In 10M SGMII mode all the packets are being dropped due to wrong Rx clock.
-SGMII 10MBPS mode needs RX clock divider programmed to avoid drops in Rx.
-Update configure SGMII function with Rx clk divider programming.
+On Tue, Dec 12, 2023 at 12:15=E2=80=AFAM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+>
+> On Mon, 11 Dec 2023 22:46:01 +0100
+> Alice Ryhl <alice@ryhl.io> wrote:
+> >> +    /// Gets the state of PHY state machine states.
+> >> +    pub fn state(&self) -> DeviceState {
+> >> +        let phydev =3D self.0.get();
+> >> +        // SAFETY: The struct invariant ensures that we may access
+> >> +        // this field without additional synchronization.
+> >> +        let state =3D unsafe { (*phydev).state };
+> >> + // TODO: this conversion code will be replaced with automatically
+> >> generated code by bindgen
+> >> +        // when it becomes possible.
+> >> +        // better to call WARN_ONCE() when the state is out-of-range.
+> >
+> > Did you mix up two comments here? This doesn't parse in my brain.
+>
+> I'll remove the second comment because all we have to do here is using
+> bindgen.
+>
+>
+> >> +    /// Reads a given C22 PHY register.
+> >> + // This function reads a hardware register and updates the stats so
+> >> takes `&mut self`.
+> >> +    pub fn read(&mut self, regnum: u16) -> Result<u16> {
+> >> +        let phydev =3D self.0.get();
+> >> + // SAFETY: `phydev` is pointing to a valid object by the type
+> >> invariant of `Self`.
+> >> +        // So an FFI call with a valid pointer.
+> >
+> > This sentence also doesn't parse in my brain. Perhaps "So it's just an
+> > FFI call" or similar?
+>
+> "So it's just an FFI call" looks good. I'll fix all the places that
+> use the same comment.
 
-Fixes: 463120c31c58 ("net: stmmac: dwmac-qcom-ethqos: add support for SGMII")
-Tested-by: Andrew Halaney <ahalaney@redhat.com>
-Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
----
-v4 changelog:
-- Updated commit message to add more details on why 10M SGMII Rx is failing
-- Added a macro for Rx clock divider value
-v3 changelog:
-- Added comment to explain why MAC needs to be reconfigured for SGMII
-v2 changelog:
-- Use FIELD_PREP to prepare bifield values in place of GENMASK
-- Add fixes tag
----
- .../net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+If you make those two comment changes, then you can add
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index d3bf42d0fceb..31631e3f89d0 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -34,6 +34,7 @@
- #define RGMII_CONFIG_LOOPBACK_EN		BIT(2)
- #define RGMII_CONFIG_PROG_SWAP			BIT(1)
- #define RGMII_CONFIG_DDR_MODE			BIT(0)
-+#define RGMII_CONFIG_SGMII_CLK_DVDR		GENMASK(18, 10)
- 
- /* SDCC_HC_REG_DLL_CONFIG fields */
- #define SDCC_DLL_CONFIG_DLL_RST			BIT(30)
-@@ -78,6 +79,8 @@
- #define ETHQOS_MAC_CTRL_SPEED_MODE		BIT(14)
- #define ETHQOS_MAC_CTRL_PORT_SEL		BIT(15)
- 
-+#define SGMII_10M_RX_CLK_DVDR			0x31
-+
- struct ethqos_emac_por {
- 	unsigned int offset;
- 	unsigned int value;
-@@ -598,6 +601,9 @@ static int ethqos_configure_rgmii(struct qcom_ethqos *ethqos)
- 	return 0;
- }
- 
-+/* On interface toggle MAC registers gets reset.
-+ * Configure MAC block for SGMII on ethernet phy link up
-+ */
- static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
- {
- 	int val;
-@@ -617,6 +623,10 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
- 	case SPEED_10:
- 		val |= ETHQOS_MAC_CTRL_PORT_SEL;
- 		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
-+		rgmii_updatel(ethqos, RGMII_CONFIG_SGMII_CLK_DVDR,
-+			      FIELD_PREP(RGMII_CONFIG_SGMII_CLK_DVDR,
-+					 SGMII_10M_RX_CLK_DVDR),
-+			      RGMII_IO_MACRO_CONFIG);
- 		break;
- 	}
- 
--- 
-2.17.1
-
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 
