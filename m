@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-56339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8C1980E8E5
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 11:17:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E689780E8E7
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 11:17:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C33BF1C20A41
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:17:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 918E428183C
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:17:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E84245A101;
-	Tue, 12 Dec 2023 10:17:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F9755B5C2;
+	Tue, 12 Dec 2023 10:17:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="CiBren3R"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="QqRTRfQx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16B6F95
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 02:17:41 -0800 (PST)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-a1c7d8f89a5so726690466b.2
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 02:17:41 -0800 (PST)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C713A9C
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 02:17:42 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-54cde11d0f4so7638802a12.2
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 02:17:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702376259; x=1702981059; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702376261; x=1702981061; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=33J8BP2HLxzySsghbviJPGk4M7islA6m5mnPAfoHhcc=;
-        b=CiBren3RGg4mshnxl+1u9smFN9yfniEWAN979GHLAgbm9HrPsRRa71h0Si+dUpk+2p
-         8JKDcZ42lt2k8lv/0bHEXjLTCUJn8X5suiLT+E7R1v/Ow/1oIEEmr87eRm77TX9/L75P
-         gqJwGtu1+6OQG2yB2fG6FVBFZHSJ6+z63lIZUUZpafKuCt3TTgkhz65YZkz7zyKeEJ64
-         S/tvOIjyuRZfvoHeK657/4hmjFBBW7TE/HShAJESsFBjMhtaQ9AFwAJoVhkoLOJ+/zx0
-         GQMf6DlpQ3pOulH/MkUt7XOW7/zOMzMkrMqTpvwBCrfn1zG84sMu157f8tkt/lC/T1Qq
-         NC3w==
+        bh=kPya/tj37w3+Pavkqq2uQ8tsfkZUvXPv2JD2RPZVhGQ=;
+        b=QqRTRfQxRMjw3XMKqbTXmC5XaU6C6JoCsUa6x8mM6Aa8W+CSDyky2aQkAGraEFx04F
+         q7Hkp10cQ0siCpurg21kHiwuVCPNrXNlgX1ivcivtREYugyMQ1ljyFaAT6oBmXcncAM4
+         28y5VxcC3GVcB+Gu6bpGCuoS3Oj1l915fOak4uq6alHtO0i7cEKEMckQnIHsse2ztSQy
+         Ks1ZnJgPkw35j9nIajwDUCQp2S5GJvyHsaEBT9QoDWRxlQhCSuera0F/n3jxFtnOB9oj
+         /SKZjT5dsvSRMqv0njt/I31LHmyNN/y56pFpKPQ9lh+JhLX5g5cO5NVG0LarHkzv9hzr
+         fYbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702376259; x=1702981059;
+        d=1e100.net; s=20230601; t=1702376261; x=1702981061;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=33J8BP2HLxzySsghbviJPGk4M7islA6m5mnPAfoHhcc=;
-        b=f/kE8Ce1ksOX+k8THMEQ86k175x54WhFTAwPiWSCsAve1YfSbWVxYFUmlktngRcLep
-         yeu2cCMHYAtosQlSAFkUtbfNZ4TjO6dZAR8cO5/9NfMbDtWiy9iv12gq6vdWvbUclSfe
-         LTzANdW535B36gVFgzulGF+Rzq4x1BkcQt3B3cn6iXIR8geKMUWSwHKMA9vHm1x3iNce
-         Ja0pG2cIjks6HUPdUkYItx4n63e938Dc6bi15Yauj9lsQjNzOtGGpxslAiNedz7DRZQy
-         ZsUQcMpH1MQZ7KSMMqvIXXjTz2AdNAB+ck5OJmHB9VC6XQdJU5mHpjKMJreduaXpE6eP
-         dVTA==
-X-Gm-Message-State: AOJu0Yzk/kQbF2m8UpPaUheh9wFE3Q0tPrj4jKP1LegClAhO7vtIf3cV
-	xf2ZUsK6vO06eX4GCJr8r2wByT+W2LJl4OXaCLo=
-X-Google-Smtp-Source: AGHT+IHko3KlqmwsuEfbz7gKz1U457yfEDEvJ5nHQ7y1DP7dk6hDyL0y29sVOs4gCOkTfre5RzdYKg==
-X-Received: by 2002:a17:906:dfd0:b0:a19:a1ba:da41 with SMTP id jt16-20020a170906dfd000b00a19a1bada41mr3091607ejc.104.1702376259542;
-        Tue, 12 Dec 2023 02:17:39 -0800 (PST)
+        bh=kPya/tj37w3+Pavkqq2uQ8tsfkZUvXPv2JD2RPZVhGQ=;
+        b=wyplI9dPa6TUg7Tg8Q7DUk8HHz4VFcQ3U/l74Csi8CFd9Et4VPjvgHB3shQ4ivXNKa
+         TqHUcvkq0ng+nKrOpgCVF8fC7dlFYdCdywDiK8iiyxJ0GP6jB1CVjhXilpN5kOTHnvh8
+         miSSA4QWB7l1bp43HUpF44K5/F0578RXEbpu/LWasmkcU06SOJV4vIYcVhjt/HYQTWqc
+         z+b4s+vOnRRRi7SStdLw7GfIWj3zSzYmoys9f2s50cAahSA8MRD+aO47Y9LN39Ca+Cq5
+         foeHt5Rl5YfBvP0+LAHQTVgULxYF4Za4kWm7ORdG8bC7+2dZB5ADV2TFWGTijk43/5an
+         Dd0A==
+X-Gm-Message-State: AOJu0YzcGmTARPOhKAzJhetr7JNVttLgCoMaqBPkdTg/+n7Blku4SNWf
+	S9nWErnvis8x9R8PKQmxbmR1npi++QLF9B4lQgk=
+X-Google-Smtp-Source: AGHT+IF63VD2bnYi8sMWPaOdqBrn2k/UHFLcq2LN+BlOdid8DEUi+hR5PUwN8wJ7R2AT0Th4yMUD0A==
+X-Received: by 2002:a50:ba86:0:b0:550:5182:8075 with SMTP id x6-20020a50ba86000000b0055051828075mr3053479ede.27.1702376261130;
+        Tue, 12 Dec 2023 02:17:41 -0800 (PST)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id cw15-20020a170907160f00b00a1937153bddsm5976834ejd.20.2023.12.12.02.17.38
+        by smtp.gmail.com with ESMTPSA id k13-20020a50cb8d000000b0054cc7a4dc4csm4447793edi.13.2023.12.12.02.17.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 02:17:39 -0800 (PST)
+        Tue, 12 Dec 2023 02:17:40 -0800 (PST)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -67,9 +67,9 @@ Cc: kuba@kernel.org,
 	sdf@google.com,
 	horms@kernel.org,
 	przemyslaw.kitszel@intel.com
-Subject: [patch net-next v6 1/9] devlink: use devl_is_registered() helper instead xa_get_mark()
-Date: Tue, 12 Dec 2023 11:17:28 +0100
-Message-ID: <20231212101736.1112671-2-jiri@resnulli.us>
+Subject: [patch net-next v6 2/9] devlink: introduce __devl_is_registered() helper and use it instead of xa_get_mark()
+Date: Tue, 12 Dec 2023 11:17:29 +0100
+Message-ID: <20231212101736.1112671-3-jiri@resnulli.us>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231212101736.1112671-1-jiri@resnulli.us>
 References: <20231212101736.1112671-1-jiri@resnulli.us>
@@ -83,87 +83,79 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Instead of checking the xarray mark directly using xa_get_mark() helper
-use devl_is_registered() helper which wraps it up. Note that there are
-couple more users of xa_get_mark() left which are going to be handled
-by the next patch.
+Introduce __devl_is_registered() which does not assert on devlink
+instance lock and use it in notifications which may be called
+without devlink instance lock held.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
- net/devlink/dev.c  | 4 ++--
- net/devlink/rate.c | 2 +-
- net/devlink/trap.c | 9 ++++++---
- 3 files changed, 9 insertions(+), 6 deletions(-)
+ net/devlink/devl_internal.h | 7 ++++++-
+ net/devlink/linecard.c      | 2 +-
+ net/devlink/port.c          | 2 +-
+ net/devlink/region.c        | 3 ++-
+ 4 files changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/net/devlink/dev.c b/net/devlink/dev.c
-index 918a0395b03e..3fe93c8a9fe2 100644
---- a/net/devlink/dev.c
-+++ b/net/devlink/dev.c
-@@ -202,7 +202,7 @@ static void devlink_notify(struct devlink *devlink, enum devlink_command cmd)
- 	int err;
+diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
+index 5ea2e2012e93..59ae4761d10a 100644
+--- a/net/devlink/devl_internal.h
++++ b/net/devlink/devl_internal.h
+@@ -91,10 +91,15 @@ extern struct genl_family devlink_nl_family;
  
- 	WARN_ON(cmd != DEVLINK_CMD_NEW && cmd != DEVLINK_CMD_DEL);
--	WARN_ON(!xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED));
-+	WARN_ON(!devl_is_registered(devlink));
+ struct devlink *devlinks_xa_find_get(struct net *net, unsigned long *indexp);
  
- 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
- 	if (!msg)
-@@ -999,7 +999,7 @@ static void __devlink_flash_update_notify(struct devlink *devlink,
- 		cmd != DEVLINK_CMD_FLASH_UPDATE_END &&
- 		cmd != DEVLINK_CMD_FLASH_UPDATE_STATUS);
++static inline bool __devl_is_registered(struct devlink *devlink)
++{
++	return xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED);
++}
++
+ static inline bool devl_is_registered(struct devlink *devlink)
+ {
+ 	devl_assert_locked(devlink);
+-	return xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED);
++	return __devl_is_registered(devlink);
+ }
+ 
+ static inline void devl_dev_lock(struct devlink *devlink, bool dev_lock)
+diff --git a/net/devlink/linecard.c b/net/devlink/linecard.c
+index 2f1c317b64cd..9d080ac1734b 100644
+--- a/net/devlink/linecard.c
++++ b/net/devlink/linecard.c
+@@ -136,7 +136,7 @@ static void devlink_linecard_notify(struct devlink_linecard *linecard,
+ 	WARN_ON(cmd != DEVLINK_CMD_LINECARD_NEW &&
+ 		cmd != DEVLINK_CMD_LINECARD_DEL);
  
 -	if (!xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED))
-+	if (!devl_is_registered(devlink))
++	if (!__devl_is_registered(devlink))
  		return;
  
  	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
-diff --git a/net/devlink/rate.c b/net/devlink/rate.c
-index 94b289b93ff2..e2190cf22beb 100644
---- a/net/devlink/rate.c
-+++ b/net/devlink/rate.c
-@@ -146,7 +146,7 @@ static void devlink_rate_notify(struct devlink_rate *devlink_rate,
+diff --git a/net/devlink/port.c b/net/devlink/port.c
+index 7634f187fa50..f229a8699214 100644
+--- a/net/devlink/port.c
++++ b/net/devlink/port.c
+@@ -512,7 +512,7 @@ static void devlink_port_notify(struct devlink_port *devlink_port,
  
- 	WARN_ON(cmd != DEVLINK_CMD_RATE_NEW && cmd != DEVLINK_CMD_RATE_DEL);
+ 	WARN_ON(cmd != DEVLINK_CMD_PORT_NEW && cmd != DEVLINK_CMD_PORT_DEL);
  
 -	if (!xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED))
-+	if (!devl_is_registered(devlink))
++	if (!__devl_is_registered(devlink))
  		return;
  
  	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
-diff --git a/net/devlink/trap.c b/net/devlink/trap.c
-index c26313e7ca08..908085e2c990 100644
---- a/net/devlink/trap.c
-+++ b/net/devlink/trap.c
-@@ -1173,7 +1173,8 @@ devlink_trap_group_notify(struct devlink *devlink,
+diff --git a/net/devlink/region.c b/net/devlink/region.c
+index e3bab458db94..b65181aa269a 100644
+--- a/net/devlink/region.c
++++ b/net/devlink/region.c
+@@ -234,7 +234,8 @@ static void devlink_nl_region_notify(struct devlink_region *region,
+ 	struct sk_buff *msg;
  
- 	WARN_ON_ONCE(cmd != DEVLINK_CMD_TRAP_GROUP_NEW &&
- 		     cmd != DEVLINK_CMD_TRAP_GROUP_DEL);
+ 	WARN_ON(cmd != DEVLINK_CMD_REGION_NEW && cmd != DEVLINK_CMD_REGION_DEL);
 -	if (!xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED))
 +
-+	if (!devl_is_registered(devlink))
++	if (!__devl_is_registered(devlink))
  		return;
  
- 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
-@@ -1234,7 +1235,8 @@ static void devlink_trap_notify(struct devlink *devlink,
- 
- 	WARN_ON_ONCE(cmd != DEVLINK_CMD_TRAP_NEW &&
- 		     cmd != DEVLINK_CMD_TRAP_DEL);
--	if (!xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED))
-+
-+	if (!devl_is_registered(devlink))
- 		return;
- 
- 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
-@@ -1710,7 +1712,8 @@ devlink_trap_policer_notify(struct devlink *devlink,
- 
- 	WARN_ON_ONCE(cmd != DEVLINK_CMD_TRAP_POLICER_NEW &&
- 		     cmd != DEVLINK_CMD_TRAP_POLICER_DEL);
--	if (!xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED))
-+
-+	if (!devl_is_registered(devlink))
- 		return;
- 
- 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+ 	msg = devlink_nl_region_notify_build(region, snapshot, cmd, 0, 0);
 -- 
 2.43.0
 
