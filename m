@@ -1,83 +1,417 @@
-Return-Path: <netdev+bounces-56403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D15E880EBBC
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 13:26:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8937580EBFA
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 13:38:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BAFC1F2155B
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 12:26:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A278281365
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 12:38:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462C35EE6B;
-	Tue, 12 Dec 2023 12:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A24985B5AB;
+	Tue, 12 Dec 2023 12:37:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k8cQIYXB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6924F4
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 04:26:03 -0800 (PST)
-Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-59127c4e538so1092467eaf.0
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 04:26:03 -0800 (PST)
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0C5894;
+	Tue, 12 Dec 2023 04:37:54 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-3362216835eso1548648f8f.3;
+        Tue, 12 Dec 2023 04:37:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702384673; x=1702989473; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aqVEiehGB93HQ19d7TI9TDkVLe/UWdQF1ND0VBnLrHk=;
+        b=k8cQIYXBPUYMjWQRHzJTkO1wMGnQFMXYMGvrKWj6xG8Bhx4jpPlnPBIg7z1N8dQ6mS
+         TaiRAcanrvrMRWdL3Co1mMV3VzYXc5Ty9hRrNa81m2J/Ms19g9tU5gVl7PjXJR2azKbB
+         Ws8mkzX77T0jKKAxee4W8uwtQnV2KeArOpNoJKQdTK+dYu/z7DWvk4bD9/+2qaXrvMvY
+         qvBh0AsJYnxowncimRyYGKMi/Es1sjdY2QbQHa/stnZG0aEJ3pm6H/RlK+KML1NMLNpa
+         0Myy/2t5WFEZR9E0qQFoxEMr2TOgQq0p20Vhi3oQttF3VeQyrv6o2ZufiX4ErzNezv6C
+         jNLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702383963; x=1702988763;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IB8C7XyMYQp9js6I3u3+HREkfx35O/WPhq62642Tn6U=;
-        b=DyI1SpR9Im3a4+9JSc0wwHOy8eEoiXRPlu2aYWZnT/LoUXYzeCGed5eBv+DcBJmqxr
-         1u1xV0fVL0FCO6To8L3V2U/WTpBxrTfLARr+2+SHSgqJXFD+5QmTXlPlB3O4RwIdzoXC
-         1JE7z+8jG0tN8H8/qZeJUkPcNK0N3CmOKuzmVPtEETqoJ6V6/vv3iVBfCL4NA1ctAwzu
-         R8PbrVYhTTFUEXm2Tlo8WhMf+8CWDxuYA1Ehhl3G31doKxGJVrWrF4X+JV56GmsVwvTm
-         Vwv45vGKo0wTzAI7g3SuaYATavNxLa9uir6JWOb1sD7yPb15lPUSfjIgDCp2eDaG10R8
-         TOtw==
-X-Gm-Message-State: AOJu0YztuRfVpmxcsPWwHMa5gWdwCOTimaZB/FzVsnny4eV6u1JH4dy8
-	NJwGVT2A4dNNnh+rhvWbPar7KtPM0w+FAEwodJQm1N1ZpHtV
-X-Google-Smtp-Source: AGHT+IGFW5g3e6mA+LgWx2H/a9Cj4ZanQsFcd4iCXcghjcM04EBeoSn1GE5TRIxUvox8ZXjQik4AEtVZhFon/5TqCSJsXq9c+Xd+
+        d=1e100.net; s=20230601; t=1702384673; x=1702989473;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aqVEiehGB93HQ19d7TI9TDkVLe/UWdQF1ND0VBnLrHk=;
+        b=B+15asbYceRVGQBNYOLx/PF3puakzfhHLKtx6oTnbkp/FTVFYlPnk9DXpJe04fH3Gp
+         H0nYu60D6YcBETXJ3Qw8v7fuO/35NGV8CFEsahRYVxG3uxvt6XSbuFRAsAXlTsftKGFp
+         hEWiG5n+E/7m4oX9rTei7LrcWS4fdpvDlymrwOYIB/hgOUMFfyQpqQD5Tfyl2kW/1jwH
+         CzRDZZKh0yIN32yYq9xIkwSQLmSEHJ/NzLX8cXzgB7ak7JeSOsBizjUptm6FFPXvECQL
+         uopz/UxUB7qK2n5fVj+2yWtl7cgEA6krWAwOovNAnUaqEmVy1f0zoz4HLJM+YUngK4Ex
+         8Sjg==
+X-Gm-Message-State: AOJu0YzA7qX2RlWUVU5SBqVCsLLGIr1Y++6aygMgBNBdzUb7udA1SNs3
+	+ryyzUSt3WNVAaUYeZb19eh/khelnFY=
+X-Google-Smtp-Source: AGHT+IG2JMX4pnt0kGW4xCcn7KSFVk6mCmW8PWQKwiqmIhz+l0NLuGq6AdAB0zoyR7HNAeZweLXvBw==
+X-Received: by 2002:a05:600c:4f94:b0:40c:5528:b482 with SMTP id n20-20020a05600c4f9400b0040c5528b482mr263384wmq.11.1702384672700;
+        Tue, 12 Dec 2023 04:37:52 -0800 (PST)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id o12-20020a05600c4fcc00b0040c552a1338sm214890wmq.1.2023.12.12.04.37.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Dec 2023 04:37:51 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	David Epping <david.epping@missinglinkelectronics.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Harini Katakam <harini.katakam@amd.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [net-next PATCH v5 1/3] net: phy: extend PHY package API to support multiple global address
+Date: Tue, 12 Dec 2023 13:37:41 +0100
+Message-Id: <20231212123743.29829-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a4a:3149:0:b0:58e:2832:83d5 with SMTP id
- v9-20020a4a3149000000b0058e283283d5mr2236155oog.1.1702383962863; Tue, 12 Dec
- 2023 04:26:02 -0800 (PST)
-Date: Tue, 12 Dec 2023 04:26:02 -0800
-In-Reply-To: <000000000000e7765006072e9591@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000060c000060c4f2747@google.com>
-Subject: Re: [syzbot] [bpf?] [trace?] possible deadlock in task_fork_fair
-From: syzbot <syzbot+1a93ee5d329e97cfbaff@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, brauner@kernel.org, 
-	daniel@iogearbox.net, elic@nvidia.com, haoluo@google.com, jasowang@redhat.com, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	martin.lau@linux.dev, mathieu.desnoyers@efficios.com, mhiramat@kernel.org, 
-	mst@redhat.com, netdev@vger.kernel.org, parav@nvidia.com, rostedt@goodmis.org, 
-	sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com, 
-	tglx@linutronix.de, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot has bisected this issue to:
+Current API for PHY package are limited to single address to configure
+global settings for the PHY package.
 
-commit a3c06ae158dd6fa8336157c31d9234689d068d02
-Author: Parav Pandit <parav@nvidia.com>
-Date:   Tue Jan 5 10:32:03 2021 +0000
+It was found that some PHY package (for example the qca807x, a PHY
+package that is shipped with a bundle of 5 PHY) requires multiple PHY
+address to configure global settings. An example scenario is a PHY that
+have a dedicated PHY for PSGMII/serdes calibrarion and have a specific
+PHY in the package where the global PHY mode is set and affects every
+other PHY in the package.
 
-    vdpa_sim_net: Add support for user supported devices
+Change the API in the following way:
+- Change phy_package_join() to take the base addr of the PHY package
+  instead of the global PHY addr.
+- Make __/phy_package_write/read() require an additional arg that
+  select what global PHY address to use by passing the offset from the
+  base addr passed on phy_package_join().
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14c0b21ee80000
-start commit:   2ebe81c81435 net, xdp: Allow metadata > 32
-git tree:       bpf-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16c0b21ee80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12c0b21ee80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f8715b6ede5c4b90
-dashboard link: https://syzkaller.appspot.com/bug?extid=1a93ee5d329e97cfbaff
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=148b2632e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11aae88ee80000
+Each user of this API is updated to follow this new implementation
+following a pattern where an enum is defined to declare the offset of the
+addr.
 
-Reported-by: syzbot+1a93ee5d329e97cfbaff@syzkaller.appspotmail.com
-Fixes: a3c06ae158dd ("vdpa_sim_net: Add support for user supported devices")
+We also drop the check if shared is defined as any user of the
+phy_package_read/write is expected to use phy_package_join first. Misuse
+of this will correctly trigger a kernel panic for NULL pointer
+exception.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+---
+Changes v2:
+- Make kernel panic if shared is not init (bugged scenario)
+- Fix some confusing comments
+
+ drivers/net/phy/bcm54140.c       | 16 +++++++++----
+ drivers/net/phy/mscc/mscc.h      |  5 ++++
+ drivers/net/phy/mscc/mscc_main.c |  4 ++--
+ drivers/net/phy/phy_device.c     | 35 ++++++++++++++-------------
+ include/linux/phy.h              | 41 +++++++++++++++++++-------------
+ 5 files changed, 63 insertions(+), 38 deletions(-)
+
+diff --git a/drivers/net/phy/bcm54140.c b/drivers/net/phy/bcm54140.c
+index d43076592f81..2eea3d09b1e6 100644
+--- a/drivers/net/phy/bcm54140.c
++++ b/drivers/net/phy/bcm54140.c
+@@ -128,6 +128,10 @@
+ #define BCM54140_DEFAULT_DOWNSHIFT 5
+ #define BCM54140_MAX_DOWNSHIFT 9
+ 
++enum bcm54140_global_phy {
++	BCM54140_BASE_ADDR = 0,
++};
++
+ struct bcm54140_priv {
+ 	int port;
+ 	int base_addr;
+@@ -429,11 +433,13 @@ static int bcm54140_base_read_rdb(struct phy_device *phydev, u16 rdb)
+ 	int ret;
+ 
+ 	phy_lock_mdio_bus(phydev);
+-	ret = __phy_package_write(phydev, MII_BCM54XX_RDB_ADDR, rdb);
++	ret = __phy_package_write(phydev, BCM54140_BASE_ADDR,
++				  MII_BCM54XX_RDB_ADDR, rdb);
+ 	if (ret < 0)
+ 		goto out;
+ 
+-	ret = __phy_package_read(phydev, MII_BCM54XX_RDB_DATA);
++	ret = __phy_package_read(phydev, BCM54140_BASE_ADDR,
++				 MII_BCM54XX_RDB_DATA);
+ 
+ out:
+ 	phy_unlock_mdio_bus(phydev);
+@@ -446,11 +452,13 @@ static int bcm54140_base_write_rdb(struct phy_device *phydev,
+ 	int ret;
+ 
+ 	phy_lock_mdio_bus(phydev);
+-	ret = __phy_package_write(phydev, MII_BCM54XX_RDB_ADDR, rdb);
++	ret = __phy_package_write(phydev, BCM54140_BASE_ADDR,
++				  MII_BCM54XX_RDB_ADDR, rdb);
+ 	if (ret < 0)
+ 		goto out;
+ 
+-	ret = __phy_package_write(phydev, MII_BCM54XX_RDB_DATA, val);
++	ret = __phy_package_write(phydev, BCM54140_BASE_ADDR,
++				  MII_BCM54XX_RDB_DATA, val);
+ 
+ out:
+ 	phy_unlock_mdio_bus(phydev);
+diff --git a/drivers/net/phy/mscc/mscc.h b/drivers/net/phy/mscc/mscc.h
+index 7a962050a4d4..6a3d8a754eb8 100644
+--- a/drivers/net/phy/mscc/mscc.h
++++ b/drivers/net/phy/mscc/mscc.h
+@@ -416,6 +416,11 @@ struct vsc8531_private {
+  * gpio_lock: used for PHC operations. Common for all PHYs as the load/save GPIO
+  * is shared.
+  */
++
++enum vsc85xx_global_phy {
++	VSC88XX_BASE_ADDR = 0,
++};
++
+ struct vsc85xx_shared_private {
+ 	struct mutex gpio_lock;
+ };
+diff --git a/drivers/net/phy/mscc/mscc_main.c b/drivers/net/phy/mscc/mscc_main.c
+index 4171f01d34e5..6f74ce0ab1aa 100644
+--- a/drivers/net/phy/mscc/mscc_main.c
++++ b/drivers/net/phy/mscc/mscc_main.c
+@@ -711,7 +711,7 @@ int phy_base_write(struct phy_device *phydev, u32 regnum, u16 val)
+ 		dump_stack();
+ 	}
+ 
+-	return __phy_package_write(phydev, regnum, val);
++	return __phy_package_write(phydev, VSC88XX_BASE_ADDR, regnum, val);
+ }
+ 
+ /* phydev->bus->mdio_lock should be locked when using this function */
+@@ -722,7 +722,7 @@ int phy_base_read(struct phy_device *phydev, u32 regnum)
+ 		dump_stack();
+ 	}
+ 
+-	return __phy_package_read(phydev, regnum);
++	return __phy_package_read(phydev, VSC88XX_BASE_ADDR, regnum);
+ }
+ 
+ u32 vsc85xx_csr_read(struct phy_device *phydev,
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 478126f6b5bc..424cbb13de13 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -1648,20 +1648,22 @@ EXPORT_SYMBOL_GPL(phy_driver_is_genphy_10g);
+ /**
+  * phy_package_join - join a common PHY group
+  * @phydev: target phy_device struct
+- * @addr: cookie and PHY address for global register access
++ * @base_addr: cookie and base PHY address of PHY package for offset
++ *   calculation of global register access
+  * @priv_size: if non-zero allocate this amount of bytes for private data
+  *
+  * This joins a PHY group and provides a shared storage for all phydevs in
+  * this group. This is intended to be used for packages which contain
+  * more than one PHY, for example a quad PHY transceiver.
+  *
+- * The addr parameter serves as a cookie which has to have the same value
+- * for all members of one group and as a PHY address to access generic
+- * registers of a PHY package. Usually, one of the PHY addresses of the
+- * different PHYs in the package provides access to these global registers.
++ * The base_addr parameter serves as cookie which has to have the same values
++ * for all members of one group and as the base PHY address of the PHY package
++ * for offset calculation to access generic registers of a PHY package.
++ * Usually, one of the PHY addresses of the different PHYs in the package
++ * provides access to these global registers.
+  * The address which is given here, will be used in the phy_package_read()
+- * and phy_package_write() convenience functions. If your PHY doesn't have
+- * global registers you can just pick any of the PHY addresses.
++ * and phy_package_write() convenience functions as base and added to the
++ * passed offset in those functions.
+  *
+  * This will set the shared pointer of the phydev to the shared storage.
+  * If this is the first call for a this cookie the shared storage will be
+@@ -1671,17 +1673,17 @@ EXPORT_SYMBOL_GPL(phy_driver_is_genphy_10g);
+  * Returns < 1 on error, 0 on success. Esp. calling phy_package_join()
+  * with the same cookie but a different priv_size is an error.
+  */
+-int phy_package_join(struct phy_device *phydev, int addr, size_t priv_size)
++int phy_package_join(struct phy_device *phydev, int base_addr, size_t priv_size)
+ {
+ 	struct mii_bus *bus = phydev->mdio.bus;
+ 	struct phy_package_shared *shared;
+ 	int ret;
+ 
+-	if (addr < 0 || addr >= PHY_MAX_ADDR)
++	if (base_addr < 0 || base_addr >= PHY_MAX_ADDR)
+ 		return -EINVAL;
+ 
+ 	mutex_lock(&bus->shared_lock);
+-	shared = bus->shared[addr];
++	shared = bus->shared[base_addr];
+ 	if (!shared) {
+ 		ret = -ENOMEM;
+ 		shared = kzalloc(sizeof(*shared), GFP_KERNEL);
+@@ -1693,9 +1695,9 @@ int phy_package_join(struct phy_device *phydev, int addr, size_t priv_size)
+ 				goto err_free;
+ 			shared->priv_size = priv_size;
+ 		}
+-		shared->addr = addr;
++		shared->base_addr = base_addr;
+ 		refcount_set(&shared->refcnt, 1);
+-		bus->shared[addr] = shared;
++		bus->shared[base_addr] = shared;
+ 	} else {
+ 		ret = -EINVAL;
+ 		if (priv_size && priv_size != shared->priv_size)
+@@ -1733,7 +1735,7 @@ void phy_package_leave(struct phy_device *phydev)
+ 		return;
+ 
+ 	if (refcount_dec_and_mutex_lock(&shared->refcnt, &bus->shared_lock)) {
+-		bus->shared[shared->addr] = NULL;
++		bus->shared[shared->base_addr] = NULL;
+ 		mutex_unlock(&bus->shared_lock);
+ 		kfree(shared->priv);
+ 		kfree(shared);
+@@ -1752,7 +1754,8 @@ static void devm_phy_package_leave(struct device *dev, void *res)
+  * devm_phy_package_join - resource managed phy_package_join()
+  * @dev: device that is registering this PHY package
+  * @phydev: target phy_device struct
+- * @addr: cookie and PHY address for global register access
++ * @base_addr: cookie and base PHY address of PHY package for offset
++ *   calculation of global register access
+  * @priv_size: if non-zero allocate this amount of bytes for private data
+  *
+  * Managed phy_package_join(). Shared storage fetched by this function,
+@@ -1760,7 +1763,7 @@ static void devm_phy_package_leave(struct device *dev, void *res)
+  * phy_package_join() for more information.
+  */
+ int devm_phy_package_join(struct device *dev, struct phy_device *phydev,
+-			  int addr, size_t priv_size)
++			  int base_addr, size_t priv_size)
+ {
+ 	struct phy_device **ptr;
+ 	int ret;
+@@ -1770,7 +1773,7 @@ int devm_phy_package_join(struct device *dev, struct phy_device *phydev,
+ 	if (!ptr)
+ 		return -ENOMEM;
+ 
+-	ret = phy_package_join(phydev, addr, priv_size);
++	ret = phy_package_join(phydev, base_addr, priv_size);
+ 
+ 	if (!ret) {
+ 		*ptr = phydev;
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index e5f1f41e399c..51702e349d83 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -327,7 +327,8 @@ struct mdio_bus_stats {
+ 
+ /**
+  * struct phy_package_shared - Shared information in PHY packages
+- * @addr: Common PHY address used to combine PHYs in one package
++ * @base_addr: Base PHY address of PHY package used to combine PHYs
++ *   in one package and for offset calculation of phy_package_read/write
+  * @refcnt: Number of PHYs connected to this shared data
+  * @flags: Initialization of PHY package
+  * @priv_size: Size of the shared private data @priv
+@@ -338,7 +339,7 @@ struct mdio_bus_stats {
+  * phy_package_leave().
+  */
+ struct phy_package_shared {
+-	int addr;
++	int base_addr;
+ 	refcount_t refcnt;
+ 	unsigned long flags;
+ 	size_t priv_size;
+@@ -1972,10 +1973,10 @@ int phy_ethtool_get_link_ksettings(struct net_device *ndev,
+ int phy_ethtool_set_link_ksettings(struct net_device *ndev,
+ 				   const struct ethtool_link_ksettings *cmd);
+ int phy_ethtool_nway_reset(struct net_device *ndev);
+-int phy_package_join(struct phy_device *phydev, int addr, size_t priv_size);
++int phy_package_join(struct phy_device *phydev, int base_addr, size_t priv_size);
+ void phy_package_leave(struct phy_device *phydev);
+ int devm_phy_package_join(struct device *dev, struct phy_device *phydev,
+-			  int addr, size_t priv_size);
++			  int base_addr, size_t priv_size);
+ 
+ int __init mdio_bus_init(void);
+ void mdio_bus_exit(void);
+@@ -1998,46 +1999,54 @@ int __phy_hwtstamp_set(struct phy_device *phydev,
+ 		       struct kernel_hwtstamp_config *config,
+ 		       struct netlink_ext_ack *extack);
+ 
+-static inline int phy_package_read(struct phy_device *phydev, u32 regnum)
++static inline int phy_package_read(struct phy_device *phydev,
++				   unsigned int addr_offset, u32 regnum)
+ {
+ 	struct phy_package_shared *shared = phydev->shared;
++	int addr = shared->base_addr + addr_offset;
+ 
+-	if (!shared)
++	if (addr >= PHY_MAX_ADDR)
+ 		return -EIO;
+ 
+-	return mdiobus_read(phydev->mdio.bus, shared->addr, regnum);
++	return mdiobus_read(phydev->mdio.bus, addr, regnum);
+ }
+ 
+-static inline int __phy_package_read(struct phy_device *phydev, u32 regnum)
++static inline int __phy_package_read(struct phy_device *phydev,
++				     unsigned int addr_offset, u32 regnum)
+ {
+ 	struct phy_package_shared *shared = phydev->shared;
++	int addr = shared->base_addr + addr_offset;
+ 
+-	if (!shared)
++	if (addr >= PHY_MAX_ADDR)
+ 		return -EIO;
+ 
+-	return __mdiobus_read(phydev->mdio.bus, shared->addr, regnum);
++	return __mdiobus_read(phydev->mdio.bus, addr, regnum);
+ }
+ 
+ static inline int phy_package_write(struct phy_device *phydev,
+-				    u32 regnum, u16 val)
++				    unsigned int addr_offset, u32 regnum,
++				    u16 val)
+ {
+ 	struct phy_package_shared *shared = phydev->shared;
++	int addr = shared->base_addr + addr_offset;
+ 
+-	if (!shared)
++	if (addr >= PHY_MAX_ADDR)
+ 		return -EIO;
+ 
+-	return mdiobus_write(phydev->mdio.bus, shared->addr, regnum, val);
++	return mdiobus_write(phydev->mdio.bus, addr, regnum, val);
+ }
+ 
+ static inline int __phy_package_write(struct phy_device *phydev,
+-				      u32 regnum, u16 val)
++				      unsigned int addr_offset, u32 regnum,
++				      u16 val)
+ {
+ 	struct phy_package_shared *shared = phydev->shared;
++	int addr = shared->base_addr + addr_offset;
+ 
+-	if (!shared)
++	if (addr >= PHY_MAX_ADDR)
+ 		return -EIO;
+ 
+-	return __mdiobus_write(phydev->mdio.bus, shared->addr, regnum, val);
++	return __mdiobus_write(phydev->mdio.bus, addr, regnum, val);
+ }
+ 
+ static inline bool __phy_package_set_once(struct phy_device *phydev,
+-- 
+2.40.1
+
 
