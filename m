@@ -1,63 +1,66 @@
-Return-Path: <netdev+bounces-56161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DA6080E07B
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 01:52:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 235F880E07C
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 01:52:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67FD22825EC
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:52:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD3BF1F21C28
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:52:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4C62647;
-	Tue, 12 Dec 2023 00:51:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2247839B;
+	Tue, 12 Dec 2023 00:51:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="GB8MU0fv"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Yku+/dm/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58DC999
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:51:48 -0800 (PST)
-Received: by mail-qt1-x82f.google.com with SMTP id d75a77b69052e-425c9cd7dd2so7291321cf.2
-        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:51:48 -0800 (PST)
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68555A6
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:51:50 -0800 (PST)
+Received: by mail-qt1-x833.google.com with SMTP id d75a77b69052e-425a2b4df7bso28950281cf.0
+        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:51:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1702342307; x=1702947107; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1702342309; x=1702947109; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zhmud6rNG2vA24AXXNtsQgp6NcXH4CphmkbZl0Gzdcw=;
-        b=GB8MU0fvCRrvlbOlU5z5v1GhLyGu0vxa2pFTTXdfkpASJjH9qTkRqe7vFip/pXFe3Q
-         3BFoiq+azS36mnehsUnqV16AVKBZ8iYWYuUpQZw0cF8EkL82y2M8ryeZMuiob/LaXF+/
-         skSdzwIJyfbJRY0UIGBEqwUmsTFevieMKqxhM=
+        bh=aelxwKrcpUovV+lrvFh8GS5TLlt4A+P3CdYnZDF2F/w=;
+        b=Yku+/dm/cH+/hFoDnsKYhIIxs/e2XvQpHroMLXqozetr4dkjj1GQKzkMHUoAozHuia
+         7JjUS8/9+dcYepTPFQOlyohwTGpw81T+nBH/yk7xC10oLgkT81BiyonYoc6bE/MddAQ1
+         LfWxz1X+g+gsFuuEbLMmV2H+MPw+0ja9WwBJE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702342307; x=1702947107;
+        d=1e100.net; s=20230601; t=1702342309; x=1702947109;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zhmud6rNG2vA24AXXNtsQgp6NcXH4CphmkbZl0Gzdcw=;
-        b=IUZpSA+Fh+8dsG3muGWoxk9P8uPXGIO6clKsaND8JnYSXWEx/sjv7SQn7u8hzIUP6I
-         bGj7qNm9W9i72jCk8bwQV0HCeek1KbNrQR12FCAoIWoxWO/5jthlNY9leiEl9b79FMG5
-         cQU+pULYd7MxP7ws+lCUhLA6nnbBOmPD6VDUGzndSQ+EgPBAZED0PDhU/xeogMzUouvw
-         Pg8vn8oCuqA+OKrHOuhdn9RPL4+855HNNPQ/iajDzqLdM8v/qYqlGLK6+PMM4CWfN42U
-         hlMSfAaB74vFpFHl61BtQBe4/CbzO1VjCFMZv6O5f0oKNaSfQPrZ8xOS+ercfstSdsz8
-         RAQA==
-X-Gm-Message-State: AOJu0Yw0pgGw/7D3BKrubOlh2lIs9m96FOXhDnERyBISIc06pusX01R+
-	B/xgl+xIAcpt5eJdXWD2Cln51fRx7RyBaETzjeU=
-X-Google-Smtp-Source: AGHT+IGPq+Xlynhc914qVmk2lubMaXXxG4nMzNn3kfu2io3uH3UHnO1rwm0h5QkeJUO1stGynILXyg==
-X-Received: by 2002:a05:622a:1792:b0:425:85eb:c2b1 with SMTP id s18-20020a05622a179200b0042585ebc2b1mr4740281qtk.15.1702342307361;
-        Mon, 11 Dec 2023 16:51:47 -0800 (PST)
+        bh=aelxwKrcpUovV+lrvFh8GS5TLlt4A+P3CdYnZDF2F/w=;
+        b=WMNakwdWuwWJ2fmp/Dqlo5MMKDDGm+r/in7YQW4A+q/VK/I8cHCl88Fp4ezuTL/Soo
+         IQfTjehtp1LyqJidG+Yj94+ks09HOGRK1XoQQMPBEkHpl7Zdkt/v61DbUPrg7AullvBI
+         tal0kjg4j8NGxkPE+CE98QkSYWvpiBYqoPeSLNXhva53AmupFk4YyMZimWAcpzcasorL
+         MhBJlocjgAL914KPGsp7tcMMHEep3G4TBO99Oi34bXIr4wozmIbrc0nQc+zgUE9vjFBj
+         AlFE2CN0W9as1IMZl27CTdnK6tnLyPni3I0++3P7DlKVnx/Am83hO/alHTALyJ6m0NBN
+         AF0A==
+X-Gm-Message-State: AOJu0YxpAYyEkuDD+RnbgPYm3lpdbiDc3AgHVlPZgvuUY8oYqbVImWpJ
+	HCBMBBRBmxdQv13fU72GI9eaXQ==
+X-Google-Smtp-Source: AGHT+IHH4KnZGqbhTxGq39hEVczEoou9+1LzRp/2NKu+++dNjSFt3phDOo+GwxdOFc1+tn15GVHsiw==
+X-Received: by 2002:ac8:7e88:0:b0:425:a282:71af with SMTP id w8-20020ac87e88000000b00425a28271afmr8195649qtj.35.1702342309504;
+        Mon, 11 Dec 2023 16:51:49 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id r5-20020ac87945000000b00423ea1b31b3sm3619664qtt.66.2023.12.11.16.51.46
+        by smtp.gmail.com with ESMTPSA id r5-20020ac87945000000b00423ea1b31b3sm3619664qtt.66.2023.12.11.16.51.47
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 11 Dec 2023 16:51:47 -0800 (PST)
+        Mon, 11 Dec 2023 16:51:48 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	gospo@broadcom.com
-Subject: [PATCH net-next 03/13] bnxt_en: Fix TX ring indexing logic
-Date: Mon, 11 Dec 2023 16:51:12 -0800
-Message-Id: <20231212005122.2401-4-michael.chan@broadcom.com>
+	gospo@broadcom.com,
+	Somnath Kotur <somnath.kotur@broadcom.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Hongguang Gao <hongguang.gao@broadcom.com>
+Subject: [PATCH net-next 04/13] bnxt_en: Prevent TX timeout with a very small TX ring
+Date: Mon, 11 Dec 2023 16:51:13 -0800
+Message-Id: <20231212005122.2401-5-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231212005122.2401-1-michael.chan@broadcom.com>
 References: <20231212005122.2401-1-michael.chan@broadcom.com>
@@ -68,54 +71,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000008a028b060c457460"
+	boundary="000000000000a955ce060c4574f2"
 
---0000000000008a028b060c457460
+--000000000000a955ce060c4574f2
 Content-Transfer-Encoding: 8bit
 
-Two spots were missed when modifying the TX ring indexing logic.
-The use of unmasked TX index in bnxt_tx_int() will cause unnecessary
-__bnxt_tx_int() calls.  The same issue in bnxt_tx_int_xdp() can
-result in illegal array index.
+If xmit_more condition is true, the driver may set the
+TX_BD_FLAGS_NO_CMPL flag.  If after this packet, the TX ring can no
+longer hold a packet with maximum fragments, we will stop the TX
+queue.  When this happens, we must clear the TX_BD_FLAGS_NO_CMPL flag
+on the last packet or there will be no completion and cause TX
+timeout.
 
-Fixes: 6d1add95536b ("bnxt_en: Modify TX ring indexing logic.")
+Fixes: c1056a59aee1 ("bnxt_en: Optimize xmit_more TX path")
+Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 2 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 114beaa95e78..83a47feaf869 100644
+index 83a47feaf869..cc6cab340423 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -781,7 +781,7 @@ static void bnxt_tx_int(struct bnxt *bp, struct bnxt_napi *bnapi, int budget)
- 	int i;
+@@ -666,8 +666,11 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ tx_done:
  
- 	bnxt_for_each_napi_tx(i, bnapi, txr) {
--		if (txr->tx_hw_cons != txr->tx_cons)
-+		if (txr->tx_hw_cons != RING_TX(bp, txr->tx_cons))
- 			__bnxt_tx_int(bp, txr, budget);
- 	}
- 	bnapi->events &= ~BNXT_TX_CMP_EVENT;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-index 4791f6a14e55..037624f17aea 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-@@ -173,7 +173,7 @@ void bnxt_tx_int_xdp(struct bnxt *bp, struct bnxt_napi *bnapi, int budget)
- 	bnapi->events &= ~BNXT_TX_CMP_EVENT;
- 	WRITE_ONCE(txr->tx_cons, tx_cons);
- 	if (rx_doorbell_needed) {
--		tx_buf = &txr->tx_buf_ring[last_tx_cons];
-+		tx_buf = &txr->tx_buf_ring[RING_TX(bp, last_tx_cons)];
- 		bnxt_db_write(bp, &rxr->rx_db, tx_buf->rx_prod);
+ 	if (unlikely(bnxt_tx_avail(bp, txr) <= MAX_SKB_FRAGS + 1)) {
+-		if (netdev_xmit_more() && !tx_buf->is_push)
++		if (netdev_xmit_more() && !tx_buf->is_push) {
++			txbd0->tx_bd_len_flags_type &=
++				cpu_to_le32(~TX_BD_FLAGS_NO_CMPL);
+ 			bnxt_txr_db_kick(bp, txr, prod);
++		}
  
- 	}
+ 		netif_txq_try_stop(txq, bnxt_tx_avail(bp, txr),
+ 				   bp->tx_wake_thresh);
 -- 
 2.30.1
 
 
---0000000000008a028b060c457460
+--000000000000a955ce060c4574f2
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -186,14 +184,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILIucX4pHudvYMmX7rAfq9pKgLxOr4u2
-oP5gbGxBE/ltMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIx
-MjAwNTE0N1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEICEcc7msAbHHNhkDf3A4+YZ5F+UtNZha
+CqiBOhPppDSVMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIx
+MjAwNTE0OVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQA+YnjGYHZd2jyAmbGz1c4j8CzI27imUU2o7EuIcne0ahR8NGqw
-9LGEuYWTugB1qED+VXREnZAM9gjcGR8QuTpa1nVBEmCstyZwryU6Er1PoZro2GZtMgUKOcTXo+b9
-Atn0Be4P919BjsLDYEXcCg1tkEGD7YBWOj0ICwML2qfkpV19INcH7KCKt5+OW792KjPhgqPJ5++c
-Sb+ZopfhsTbZStxiv9ZfoHwVnJxF7Y1QIpjBuK7gllcHx4wQAcdEMOVa9oy+f0SG47iMvHanC5G2
-LqLRke4MY6AnZqwa8/A1JP17UzbJva7cjkDhPCt3ZWHNgrwWeVZah0byXKLF8cOh
---0000000000008a028b060c457460--
+ATANBgkqhkiG9w0BAQEFAASCAQAxHkTeyDYlTsq5WG5g2U8exIb9AGNdITGXsCNVqVJnWYRdYKRD
+8tna2I7GOam5uhW58ddMU1c4cRuSsKKmhTMcFwLNVqff+ovYE2000cXsPoM/oE31+1ySCPEiaUjZ
+0Q1dk7PDJBrRq9nb5W1Gzdz1cMpuJKxUZZr0nPfMvpyKWXhk53KUI5p3q/oSuqHbADn2YEgDi4Yg
+VIH6jmFxpbUF1NXZ72N4MvpkSv/7ev3Xw17BbjUhiYQenbh+aT+6lyKRwA7bPPYM7C5zytiqrwE0
+wdxya8GYP3JCbckVK3BLiZFhwo9LRUfAkKT/3S+Cxwib927XWdXLE893X8HsnLDY
+--000000000000a955ce060c4574f2--
 
