@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-56168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B26CB80E082
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 01:52:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C58B80E083
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 01:52:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3416DB21300
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:52:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E88C5B212B8
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:52:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6657EDC;
-	Tue, 12 Dec 2023 00:52:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8431910EB;
+	Tue, 12 Dec 2023 00:52:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="bCiRRHDC"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DhSa6EHH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FB4ABE
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:51:59 -0800 (PST)
-Received: by mail-qk1-x732.google.com with SMTP id af79cd13be357-77f35009e78so303632985a.1
-        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:51:59 -0800 (PST)
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9997299
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:52:00 -0800 (PST)
+Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-423d9d508d1so37925921cf.1
+        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:52:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1702342318; x=1702947118; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1702342320; x=1702947120; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JJBMsv3FVn06uzjMtoqqWU5dW2ns332Qp8sF2/jzitk=;
-        b=bCiRRHDC3UhEakEevsxzuLQ/1olQdIEgNMWzw4hBRwWcTcy3qisIjaHRL8TewdIAGk
-         qdR+DfM7RQnc/vql3ynUSudVvAS4giqkyAAxWE2bIsR6RHwTq3YzoHIVrAPWYFN9b7fY
-         CsAVHhHOaUZs1nxOsFe5LgIwOjzd4koCLJfvw=
+        bh=Y31AXfseHY/Z2MxXIG+382UCPQ7kYpOYr14O/Eow5PY=;
+        b=DhSa6EHH+hK3ilRr9ZLjs9Jks8wOWahu8JG2Icp8QN/soSDVVi8TItD4pHaboE6Jz1
+         U1EdUKXEInPMTDz7itiYEfi/hOv+ujF97WINi7M3ZAj3l45rm59rYGZb4andQqu8Bozi
+         OSeFWaDsC0b4z1WRQ5T0k8R2BeOl99AaRH6t4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702342318; x=1702947118;
+        d=1e100.net; s=20230601; t=1702342320; x=1702947120;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JJBMsv3FVn06uzjMtoqqWU5dW2ns332Qp8sF2/jzitk=;
-        b=NjGMhA60NKVwjSMZvTB9SEOQRRUkx3Mb/ISjM1FoihhBryqI/L9FE2CRwaiAV/Ife5
-         h2gLp3X1AgkATcvtB7vr8hSqqVLMK3ZgxwiOKLGL1g8JRsUvt06VfntDaMTPqQlGVOzD
-         bFP2qTjRw7o5CUfG1mTsFwDYu0ZKXrgpj2PThF/HJjuBvPHRdob7dVVgg0zl3owOkIR6
-         2rc0XxushT+ePAN/sm8O5rrrziUYLYb3p28CE6JrN06WDnoZQOTZ668MrVgtxaVho+1I
-         ghB7FOF6J9Vzaez6GTgn1p4xnezigOqYQnuxu0fgWu23489yeZ+16ncgMciog3VFp5no
-         80TA==
-X-Gm-Message-State: AOJu0YzSerI/qnQTaylx9wVTx1c4aQQox0anaf1VX8ttplsJB2Kvlf1e
-	IMSWOyt84Bpk92tGHQnwE7G1Sg==
-X-Google-Smtp-Source: AGHT+IFDnqGeMTN31a9a/LwGsRbOn9ka7r1yPZMk/goWdNQLP/rSOsu7+zvMUkhRWtQm6Aj9ch51lw==
-X-Received: by 2002:ac8:58c6:0:b0:425:a72b:9a69 with SMTP id u6-20020ac858c6000000b00425a72b9a69mr7695260qta.20.1702342318240;
-        Mon, 11 Dec 2023 16:51:58 -0800 (PST)
+        bh=Y31AXfseHY/Z2MxXIG+382UCPQ7kYpOYr14O/Eow5PY=;
+        b=e+w5cjKi5lWs2sctrqVMwgcCqcB97HahFMFad6pdf+brcp1+z7dIvIkQ7M6kHHvpJj
+         g3GnmHZvVuALSStbNgJxnN6KRB2D31nKt7teSzuI7STGv+7sxPrP123dDgxdOXL7r2XK
+         JW9LobQQQFU7Ek/sYB1ZbWrzju+36M+AgYNBs0kYTvk8rsP4ON9/uCWXlbKAKISwu39B
+         glxWrTQgG0/BNNfMjlCP6fYIjKRG3hk1kj0bjr6uhZJwIuIb2dWArSW3eeGJgu4jp6fc
+         IXwaIq8Sg6rjP/lO1pF2f+ovp7JcxFszz3r88W0D3vfHqjVVkSY0Qj7bLtbbJAS+m4CU
+         fbFg==
+X-Gm-Message-State: AOJu0Yw81ymSwczctNPrbA2j2U0S4D2ZoGqZGdRJMz4BpLIjd5j+bufS
+	ARLNMk7ZIcYVwJNUracbFd4g6QgYMlLgj73/d5k=
+X-Google-Smtp-Source: AGHT+IHZizINclv8TsAsCbL7yHI0AqJ4xn4Sq3UBdijdduq+wVjMBLrpL/NA9s9orxUk5cYjPYdCRA==
+X-Received: by 2002:ac8:4e92:0:b0:41e:ae5a:2b96 with SMTP id 18-20020ac84e92000000b0041eae5a2b96mr8488650qtp.13.1702342319647;
+        Mon, 11 Dec 2023 16:51:59 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id r5-20020ac87945000000b00423ea1b31b3sm3619664qtt.66.2023.12.11.16.51.56
+        by smtp.gmail.com with ESMTPSA id r5-20020ac87945000000b00423ea1b31b3sm3619664qtt.66.2023.12.11.16.51.58
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 11 Dec 2023 16:51:57 -0800 (PST)
+        Mon, 11 Dec 2023 16:51:59 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -55,10 +55,11 @@ Cc: netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	gospo@broadcom.com,
-	Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
-Subject: [PATCH net-next 10/13] bnxt_en: add rx_filter_miss extended stats
-Date: Mon, 11 Dec 2023 16:51:19 -0800
-Message-Id: <20231212005122.2401-11-michael.chan@broadcom.com>
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>
+Subject: [PATCH net-next 11/13] bnxt_en: Add support for UDP GSO on 5760X chips
+Date: Mon, 11 Dec 2023 16:51:20 -0800
+Message-Id: <20231212005122.2401-12-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231212005122.2401-1-michael.chan@broadcom.com>
 References: <20231212005122.2401-1-michael.chan@broadcom.com>
@@ -69,42 +70,94 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000002f4480060c4575a9"
+	boundary="000000000000454968060c45757c"
 
---0000000000002f4480060c4575a9
+--000000000000454968060c45757c
 Content-Transfer-Encoding: 8bit
 
-From: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
+The new 5760X chips supports UDP GSO.  Tested using udpgso_bench_tx.
 
-rx_filter_miss counter is newly added to the rx_port_stats_ext
-stats structure for newer chips.  Newer firmware will return the
-structure size that includes this counter.  Add this entry to
-the bnxt_port_stats_ext_arr array and the ethtool -S code will
-pick up this counter if it is supported.
-
-Signed-off-by: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 21 ++++++++++++++++++---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h |  1 +
+ 2 files changed, 19 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index bb9cab821587..45ce7e2e3662 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -461,6 +461,7 @@ static const struct {
- 	BNXT_RX_STATS_EXT_DISCARD_COS_ENTRIES,
- 	BNXT_RX_STATS_EXT_ENTRY(rx_fec_corrected_blocks),
- 	BNXT_RX_STATS_EXT_ENTRY(rx_fec_uncorrectable_blocks),
-+	BNXT_RX_STATS_EXT_ENTRY(rx_filter_miss),
- };
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 3594290e187a..be3fa0545fdc 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -587,12 +587,21 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
  
- static const struct {
+ 	txbd1->tx_bd_hsize_lflags = lflags;
+ 	if (skb_is_gso(skb)) {
++		bool udp_gso = !!(skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4);
+ 		u32 hdr_len;
+ 
+-		if (skb->encapsulation)
+-			hdr_len = skb_inner_tcp_all_headers(skb);
+-		else
++		if (skb->encapsulation) {
++			if (udp_gso)
++				hdr_len = skb_inner_transport_offset(skb) +
++					  sizeof(struct udphdr);
++			else
++				hdr_len = skb_inner_tcp_all_headers(skb);
++		} else if (udp_gso) {
++			hdr_len = skb_transport_offset(skb) +
++				  sizeof(struct udphdr);
++		} else {
+ 			hdr_len = skb_tcp_all_headers(skb);
++		}
+ 
+ 		txbd1->tx_bd_hsize_lflags |= cpu_to_le32(TX_BD_FLAGS_LSO |
+ 					TX_BD_FLAGS_T_IPID |
+@@ -8345,6 +8354,8 @@ static int __bnxt_hwrm_func_qcaps(struct bnxt *bp)
+ 	flags_ext2 = le32_to_cpu(resp->flags_ext2);
+ 	if (flags_ext2 & FUNC_QCAPS_RESP_FLAGS_EXT2_RX_ALL_PKTS_TIMESTAMPS_SUPPORTED)
+ 		bp->fw_cap |= BNXT_FW_CAP_RX_ALL_PKT_TS;
++	if (flags_ext2 & FUNC_QCAPS_RESP_FLAGS_EXT2_UDP_GSO_SUPPORTED)
++		bp->flags |= BNXT_FLAG_UDP_GSO_CAP;
+ 
+ 	bp->tx_push_thresh = 0;
+ 	if ((flags & FUNC_QCAPS_RESP_FLAGS_PUSH_MODE_SUPPORTED) &&
+@@ -14351,6 +14362,8 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 			   NETIF_F_GSO_UDP_TUNNEL_CSUM | NETIF_F_GSO_GRE_CSUM |
+ 			   NETIF_F_GSO_PARTIAL | NETIF_F_RXHASH |
+ 			   NETIF_F_RXCSUM | NETIF_F_GRO;
++	if (bp->flags & BNXT_FLAG_UDP_GSO_CAP)
++		dev->hw_features |= NETIF_F_GSO_UDP_L4;
+ 
+ 	if (BNXT_SUPPORTS_TPA(bp))
+ 		dev->hw_features |= NETIF_F_LRO;
+@@ -14361,6 +14374,8 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 			NETIF_F_GSO_UDP_TUNNEL | NETIF_F_GSO_GRE |
+ 			NETIF_F_GSO_UDP_TUNNEL_CSUM | NETIF_F_GSO_GRE_CSUM |
+ 			NETIF_F_GSO_IPXIP4 | NETIF_F_GSO_PARTIAL;
++	if (bp->flags & BNXT_FLAG_UDP_GSO_CAP)
++		dev->hw_enc_features |= NETIF_F_GSO_UDP_L4;
+ 	if (bp->flags & BNXT_FLAG_CHIP_P7)
+ 		dev->udp_tunnel_nic_info = &bnxt_udp_tunnels_p7;
+ 	else
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index 15d33f4a61c2..1269463b9b04 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -2044,6 +2044,7 @@ struct bnxt {
+ 	#define BNXT_FLAG_MULTI_HOST	0x100000
+ 	#define BNXT_FLAG_DSN_VALID	0x200000
+ 	#define BNXT_FLAG_DOUBLE_DB	0x400000
++	#define BNXT_FLAG_UDP_GSO_CAP	0x800000
+ 	#define BNXT_FLAG_CHIP_NITRO_A0	0x1000000
+ 	#define BNXT_FLAG_DIM		0x2000000
+ 	#define BNXT_FLAG_ROCE_MIRROR_CAP	0x4000000
 -- 
 2.30.1
 
 
---0000000000002f4480060c4575a9
+--000000000000454968060c45757c
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -175,14 +228,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILIebvCV6subvq/NX0PdvQuRUGB4TmE8
-NyzRA2qhgnccMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIx
-MjAwNTE1OFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILuDiX/NmjMncqMHvyJFgpAT/zkMNWEj
+Q9dq8joKUif5MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIx
+MjAwNTIwMFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCSS+nmpmA+gfTFhxhflOAqTL5nY+mXUmAqd10ZL3KaFVG0H+IH
-lO9ngR8ROWdpQsx8AGST455/FFDaiKmz8pljBLJF/NVLsWAkU4eRBRAMDUGzJBBxVSCNXstg9mJk
-ouJjh+QcH9fOq3q+NEcxQsbAg5+213q+ovCsvgPgJU82Qm7bTscntJGbjuKJk8ULM8l8wSx6K5QG
-T5Q/9QKRBdV5/G+2uZ3jTVSUHFhr33qzYTahVCtwWH5iIP/5LEKWH+z6O4pHTVMAKN8b00kbKO0r
-jrgCrwYhe3UAnF996q6kkFRFxLyAxb0StwpazvdK16uRowphZA54WdK+oD9bAfH1
---0000000000002f4480060c4575a9--
+ATANBgkqhkiG9w0BAQEFAASCAQCdl74RacIHNcxpLMAryMnLVHSV8FaNPJvBV9jpeNWtLZp43bpK
+v1Wv4KS7x1s2KGbH3OkcUT0JHK2sYkrHuJdi7zDhR3OhN76q/It+MBISrQiPuHaOA/byaOIk9ovh
+RIj0mEX5tKYpd1LTQTob7K6SOiOsG3xWFW2RVsrO9RWiSrVP4tS468b00CKGXKGMP/ATz2o/MBnw
+3eXhVCa2Sy4oFiTIiaZmDmnxYWLt1OE1eKRx6lfNbsl66QOERCs1bxdreurH5Q2f4SCbS+e+YTKf
+tgg2+IJHMoxhxnph/sTOC4P5wX8JoNiQpIKHYYbl5Mp+9azuGnjQdrO1T1kawA0f
+--000000000000454968060c45757c--
 
