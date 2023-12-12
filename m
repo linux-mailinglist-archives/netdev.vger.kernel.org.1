@@ -1,125 +1,91 @@
-Return-Path: <netdev+bounces-56413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A38D80EC9A
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 13:54:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 352C980EC9B
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 13:55:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEB291F2156F
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 12:54:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7B621F213F0
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 12:55:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD69960ED1;
-	Tue, 12 Dec 2023 12:54:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B6EB60ED1;
+	Tue, 12 Dec 2023 12:55:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MQuO2Peu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QNfdxRqx"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 931FDEE;
-	Tue, 12 Dec 2023 04:54:21 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BDDDBE0005;
-	Tue, 12 Dec 2023 12:54:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1702385660;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SUAQ6qv2aDc1m39TxOBaleeDpMHPGrbRMQ0hbDXfaoc=;
-	b=MQuO2Peu2llqSqRR1/YYvEdJdNUf+iPUYijiG0G0ljrK6Kxmy5nmYPEfdiPlRgp5Nl+aGn
-	DkK6lPCLNdX4jgZZZQH50s1pYP0QCtcZXZCdaT5siIkf+oEH8r/YkowVTv+RUjUITj6llU
-	xFKF0rdyfMxCs4Af+4k8/onZDL3nntonTknSTqNyVw45zj09tGmXemDqw1P5mF+f/joSte
-	i7wXbG9l8DMdGVMqvstAh0uHspm9hJ7LiNmEEHGMceFCiQHRomZobD25BIJsFxVwhibl7w
-	NWtyT4VPqO/OLs7Yp7GNfTPGYT08lOiNCAMtiPrJ30UMjr3CyzR2lepTxaeEzQ==
-Date: Tue, 12 Dec 2023 13:54:17 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Luo Jie <quic_luoj@quicinc.com>
-Cc: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
- <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
- <pabeni@redhat.com>, <robh+dt@kernel.org>,
- <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
- <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
- <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
- <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
-Subject: Re: [PATCH v2 3/5] net: mdio: ipq4019: configure CMN PLL clock for
- ipq5332
-Message-ID: <20231212135417.67ece4d0@device.home>
-In-Reply-To: <20231212115151.20016-4-quic_luoj@quicinc.com>
-References: <20231212115151.20016-1-quic_luoj@quicinc.com>
-	<20231212115151.20016-4-quic_luoj@quicinc.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B30CF95;
+	Tue, 12 Dec 2023 04:55:12 -0800 (PST)
+Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-5d3c7ef7b31so54741537b3.3;
+        Tue, 12 Dec 2023 04:55:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702385712; x=1702990512; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QwH0v1dmFbIofoPEMzbKt7PH0sNIOX6i59AMfWzszAM=;
+        b=QNfdxRqxj944OPDoehcVw+j2A4C9XMg+P24i0UC0LLNK2d/YYIUyRh8InqXupmIS/Z
+         26culEQEER0s339aB5KiLsFYC8S2WEB2lDzymdeUEeH9OQE0M77T7/IH8JyjkrCK4Zzb
+         8pBEqdFRhxglO8OaDo2Zz/fC+oim/9u5dmiQTEDS2w5o1BFEVk1KSk/1YEHLYCbknkS0
+         lwU4JeSWrYmonpE3GHVOyvJgaMC4lZTZyO5e87F+9JIWTJHqs1RBex8T3WtnSLuPiwMw
+         Y/2Fcu+ZdZUQ6DJphsu6kud3haZ5r0XkdbdZrtz9NWVvkeXhQ6j3plp8Es+Yqzd2qVNQ
+         jfqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702385712; x=1702990512;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QwH0v1dmFbIofoPEMzbKt7PH0sNIOX6i59AMfWzszAM=;
+        b=hFQ7DfmF8EJ4Utp3gFUtW31Ct/zTh8QSL2PHNO8+H75aC2PiWCNhRybxIi+qnN+rqK
+         +1VMFpeZgyuJ+Lv/s8SmKFaHNn2siAFC4WBBMA5/xfPF1YyakG79jjC8NBzZwrKeuzXf
+         nUtlb27nxstO2Z/JuSOLRM6AMsxgUAanPElHC+aPRpd2qfd93LmohBOTNjBlQ3pznaIx
+         4g+3kKwmjD9kxJ6vwQSgutTvEpMwg1ZHWZqZ8IBGGiVusSGqXSj547jYMBBcOV9vIS5B
+         iEBuD35/H5noBdbshh1BCPQkXgvAOTQGX4XUi/YstTxNCMQJdctE4g5+FIKmcCMgbXoe
+         AgFQ==
+X-Gm-Message-State: AOJu0YxLU2eOjb6z9DyI33EVYzm0Bjz3U/rGp3yYpw/qGSIlzWi/fQVf
+	mV6iphGoDI1Tq8PD6IA/aGLrlv/98J3upVerXEM=
+X-Google-Smtp-Source: AGHT+IEZGi1XU5hesgfZcTt3MyndEAv7ghTWWCk4kEY/ZnuncxmsuCAk9kYi98T7zGo17WihKVSacGeYvbTeuy8CKqM=
+X-Received: by 2002:a81:4947:0:b0:5e2:2927:a09f with SMTP id
+ w68-20020a814947000000b005e22927a09fmr344215ywa.12.1702385711925; Tue, 12 Dec
+ 2023 04:55:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+References: <ZXeuI3eulyIlrAvL@boqun-archlinux> <20231212.104650.32537188558147645.fujita.tomonori@gmail.com>
+ <ZXfFzKYMxBt7OhrM@boqun-archlinux> <20231212.130410.1213689699686195367.fujita.tomonori@gmail.com>
+In-Reply-To: <20231212.130410.1213689699686195367.fujita.tomonori@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Tue, 12 Dec 2023 13:55:00 +0100
+Message-ID: <CANiq72kh5K2O8bPyhfTJsxXfbG-2f35tPqKxm9Kg2JT6+4DMFw@mail.gmail.com>
+Subject: Re: [PATCH net-next v10 1/4] rust: core abstractions for network PHY drivers
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: boqun.feng@gmail.com, alice@ryhl.io, netdev@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu, 
+	benno.lossin@proton.me, wedsonaf@gmail.com, aliceryhl@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Tue, Dec 12, 2023 at 5:04=E2=80=AFAM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+>
+> The C side people read the Rust code before changing the C code? Let's
+> see.
 
-I have some more minor comments for yoi :)
+In the beginning, it is true that developers may forget often. But it
+is still the case that they need to be mindful of the Rust side, just
+like when changing some C function you need to take care of changing
+its callers. That is also why we want to have maintainers of each
+subsystem onboard.
 
-On Tue, 12 Dec 2023 19:51:48 +0800
-Luo Jie <quic_luoj@quicinc.com> wrote:
+In some cases it may be useful to annotate/mark the C side with a
+comment warning about it (or similar) if you think it is likely that a
+change on the C side will go unnoticed.
 
-> The reference clock of CMN PLL block is selectable, the internal
-> 48MHZ is used by default.
-> 
-> The output clock of CMN PLL block is for providing the clock
-> source of ethernet device(such as qca8084), there are 1 * 25MHZ
-> and 3 * 50MHZ output clocks available for the ethernet devices.
-> 
-> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
-> ---
-
-[...]
-
-> +/* For the CMN PLL block, the reference clock can be configured according to
-> + * the device tree property "cmn-reference-clock", the internal 48MHZ is used
-> + * by default on the ipq533 platform.
-> + *
-> + * The output clock of CMN PLL block is provided to the ethernet devices,
-> + * threre are 4 CMN PLL output clocks (1*25MHZ + 3*50MHZ) enabled by default.
-> + *
-> + * Such as the output 50M clock for the qca8084 ethernet PHY.
-> + */
-> +static int ipq_cmn_clock_config(struct mii_bus *bus)
-> +{
-> +	int ret;
-> +	u32 reg_val, src_sel, ref_clk;
-> +	struct ipq4019_mdio_data *priv;
-
-Here you should also use reverse christmas-tree notation
-
-[...]
-
-> @@ -317,6 +441,17 @@ static int ipq4019_mdio_probe(struct platform_device *pdev)
->  		}
->  	}
->  
-> +	/* The CMN block resource is for providing clock source to ethernet,
-> +	 * which can be optionally configured on the platform ipq9574 and
-> +	 * ipq5332.
-> +	 */
-> +	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "cmn_blk");
-> +	if (res) {
-> +		priv->cmn_membase = devm_ioremap_resource(&pdev->dev, res);
-> +		if (IS_ERR(priv->cmn_membase))
-> +			return PTR_ERR(priv->cmn_membase);
-> +	}
-> +
-
-And here you can simplify a bit by using
-devm_platform_ioremap_resource_byname()
-
-Thanks,
-
-Maxime
-
+Cheers,
+Miguel
 
