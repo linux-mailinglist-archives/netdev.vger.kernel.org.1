@@ -1,119 +1,102 @@
-Return-Path: <netdev+bounces-56447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C526080EEAE
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 15:27:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 973E080EECC
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 15:29:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55017B20D81
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:27:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D9B31F211A6
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:29:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7DDE7318E;
-	Tue, 12 Dec 2023 14:27:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BF2073196;
+	Tue, 12 Dec 2023 14:29:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UIduafO1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oIsr77O5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C132FD
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 06:27:05 -0800 (PST)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-54dca2a3f16so10521019a12.0
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 06:27:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702391224; x=1702996024; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bCZPRFlYELlSqnd7f+LApbuWWSOTUwHuWf2lhre3cTY=;
-        b=UIduafO1DT3E/9yl00OWV+EjecVJ2FWvoAE4REaS2pOQdZ5ihOPnmfePL8xZYamHU+
-         0bXdkQaFPcH+FNZUpV7sZkEfd1gxLFPT7iafcK+X1tDXmEDEmcxRpFnLgOAi5rKjJSJE
-         kPh9hyCUmvQcO6XQlE9+02ZQ9DAaghh/c0BDDAnoU0hXa9ki1ZKwacHa16PIjHxqmaqU
-         wx1GQSmZ2SY8SXxd7oAzT5MhZ2IaE6sVCFpAlw4lA3vJU6CF9WDBKObpxNNV3XxiTls4
-         qYzMjNmnbxO2y0Fdcv2yT4IOj3kaBYFvTAcGYv5O4HzqMn0R7j8VITzuWnP+Jdg5UaMy
-         +51Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702391224; x=1702996024;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bCZPRFlYELlSqnd7f+LApbuWWSOTUwHuWf2lhre3cTY=;
-        b=skMptx5IM5fw+GFdCFBStTt2ak0ZXVrE+GMErIKNjAeaOr/YL9b1SmDWJHS50cuY6y
-         RQourpZmpbumlDrZBD+RFguqHpjYpkFPYlHeGZpHDoSLittfUsyKfAcvtdmgkRv8FAvG
-         frvfk0LrUPjWBDht2AUIHGbfN8ulDA7hIRJC/3IAXm9pS0mGSZ6aVyxvE3aUOhfxE/T8
-         q3kODpmULAAKozB33waA6PnyVCVCh0dFQTayPv/0nNP6RzgcqXX2QRxAZDHDbNRt1Zhk
-         ee7vBp0UYyKo/Umv2bz64y17hbGoJwI244o7vxE6d2xsrwV9QpfVH1Vfs8QOXrJIBGq3
-         X6gw==
-X-Gm-Message-State: AOJu0Yx+nUdt5r5MCMPwB76PsAst4aK31TwG+4deHMKocd2TPf0k1kkW
-	addF3auV2L1TPgsK7DSFLjeisBiri50wPvBHOW/Jtg==
-X-Google-Smtp-Source: AGHT+IEOyCkF2DgwL7RBhVnTjCksBIhJaDTVsJX1VcMmek5dl3277Sns8cp70gbrdUy6r5MpVMdk0OJS5kwbSqhfdhU=
-X-Received: by 2002:a17:906:51de:b0:9f2:859f:713e with SMTP id
- v30-20020a17090651de00b009f2859f713emr7079811ejk.3.1702391223630; Tue, 12 Dec
- 2023 06:27:03 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACB4CF2;
+	Tue, 12 Dec 2023 06:29:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702391388; x=1733927388;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=xv2qt7/sAoWAEZQgV2h0LqG0rMAj+aEH2dHkRRXSC5I=;
+  b=oIsr77O5j0zkwxlUXfDleZ0ccRz9XLOqxGfnqREsWGHMMg4/LbmZVOIs
+   fx284UHlddnwenHpMAdGh4xUFSoUZMWuDHM6G3hcoX4B/EDVrSv4xR84I
+   S62VDRsyamvIddYj8EsbvNLJ5q6MTmv48AX3FFrG7JK/NHFm7g/8oWeXb
+   kRwTW0UweVcZtVG4kCsHi1cUrYUyaPmtF/qbm1cxl5MJeLrfTOtvKqhiZ
+   xoWFEXvfIcFsl4Wrw2f2QknZ0d6zqUA2fkeNy2qT/VNflQvEMvdexuLHm
+   ABbipL2jpSqOwxYBsE/4ULVVrS/sfCpBAAAUjsol3hLqQNqNZAtumehEV
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="1887329"
+X-IronPort-AV: E=Sophos;i="6.04,270,1695711600"; 
+   d="scan'208";a="1887329"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 06:29:48 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="1104923742"
+X-IronPort-AV: E=Sophos;i="6.04,270,1695711600"; 
+   d="scan'208";a="1104923742"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by fmsmga005.fm.intel.com with ESMTP; 12 Dec 2023 06:29:44 -0800
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Michal Kubecek <mkubecek@suse.cz>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Paul Greenwalt <paul.greenwalt@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/2] idpf: add get/set for Ethtool's header split ringparam
+Date: Tue, 12 Dec 2023 15:27:50 +0100
+Message-ID: <20231212142752.935000-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231208005250.2910004-1-almasrymina@google.com>
- <20231208005250.2910004-9-almasrymina@google.com> <20231212122535.GA3029808@nvidia.com>
-In-Reply-To: <20231212122535.GA3029808@nvidia.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 12 Dec 2023 06:26:51 -0800
-Message-ID: <CAHS8izMVMx0fpT=dWsnD7piqs1g7Fam8Xf5dK3iOFNxeOQD9vQ@mail.gmail.com>
-Subject: Re: [net-next v1 08/16] memory-provider: dmabuf devmem memory provider
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
-	David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeelb@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>, Christoph Hellwig <hch@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 12, 2023 at 4:25=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com> wr=
-ote:
->
-> On Thu, Dec 07, 2023 at 04:52:39PM -0800, Mina Almasry wrote:
->
-> > +static inline struct page_pool_iov *page_to_page_pool_iov(struct page =
-*page)
-> > +{
-> > +     if (page_is_page_pool_iov(page))
-> > +             return (struct page_pool_iov *)((unsigned long)page & ~PP=
-_IOV);
-> > +
-> > +     DEBUG_NET_WARN_ON_ONCE(true);
-> > +     return NULL;
-> > +}
->
-> We already asked not to do this, please do not allocate weird things
-> can call them 'struct page' when they are not. It undermines the
-> maintainability of the mm to have things mis-typed like
-> this. Introduce a new type for your thing so the compiler can check it
-> properly.
->
+Currently, the header split feature (putting headers in one smaller
+buffer and then the data in a separate bigger one) is always enabled
+in idpf when supported.
+One may want to not have fragmented frames per each packet, for example,
+to avoid XDP frags. To better optimize setups for particular workloads,
+add ability to switch the header split state on and off via Ethtool's
+ringparams, as well as to query the current status.
+There's currently only GET in the Ethtool Netlink interface for now,
+so add SET first. I suspect idpf is not the only one supporting this.
 
-There is a new type introduced, it's the page_pool_iov. We set the LSB
-on page_pool_iov* and cast it to page* only to avoid the churn of
-renaming page* to page_pool_iov* in the page_pool and all the net
-drivers using it. Is that not a reasonable compromise in your opinion?
-Since the LSB is set on the resulting page pointers, they are not
-actually usuable as pages, and are never passed to mm APIs per your
-requirement.
+Alexander Lobakin (1):
+  ethtool: add SET for TCP_DATA_SPLIT ringparam
 
---=20
-Thanks,
-Mina
+Michal Kubiak (1):
+  idpf: add get/set for Ethtool's header split ringparam
+
+ drivers/net/ethernet/intel/idpf/idpf.h        |  7 +-
+ .../net/ethernet/intel/idpf/idpf_ethtool.c    | 11 ++++
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    | 65 +++++++++++++++++++
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 12 ++--
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   |  2 +
+ include/linux/ethtool.h                       |  2 +
+ net/ethtool/rings.c                           | 12 ++++
+ 7 files changed, 104 insertions(+), 7 deletions(-)
+
+-- 
+2.43.0
+
 
