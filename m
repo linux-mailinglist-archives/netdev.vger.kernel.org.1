@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-56159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E61DC80E079
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 01:51:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29B7180E07A
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 01:52:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CB551F21BBD
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:51:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7429CB21714
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:52:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2266C639;
-	Tue, 12 Dec 2023 00:51:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AD76EDC;
+	Tue, 12 Dec 2023 00:51:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WP7SBu98"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="P/w+Tobs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC2ADA6
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:51:45 -0800 (PST)
-Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-77f8308616eso37638885a.2
-        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:51:45 -0800 (PST)
+Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17F6DB3
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:51:47 -0800 (PST)
+Received: by mail-qt1-x831.google.com with SMTP id d75a77b69052e-425baafa3c3so18275941cf.0
+        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:51:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1702342305; x=1702947105; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1702342306; x=1702947106; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=I/PK91kUO/CCAwjCt15o7px/ZKEUyN3JIcrH6rtuZho=;
-        b=WP7SBu987YVrRk6W/R5eVPhyXcWQN5wHW/oMstdU8zF4qqnBZzmiHwMVniH0KyZezh
-         ZgvWb95ZDlE+z+Jv7EDLpqvIFH1sqbUqcEhEe0nKEPTXa24UYr3lsMuV1EwkMQ8LdUTB
-         mKbhXz6WeX/BFB3KlVxp7eiygwTFSHawxI4tA=
+        bh=VNAhbz/3JFmavnnVl0fxEttHYiHJ/95LJZIsp5PVOsQ=;
+        b=P/w+TobszbxurpzIB+Pen93+TjCR00Ggbj6Rj55aPTDrKPT3NDXtiKPIq4IGxKWkXC
+         7tB7YHZMXnxka8t/Z7+Qtn4V0/nqd8wKImjNUHFBrX4bBBpzAKyhVJY6u7W5q4xSRhnC
+         wTD5vl8lFNmvFNYVYX8LZgQjQQPmpkKvmvAdA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702342305; x=1702947105;
+        d=1e100.net; s=20230601; t=1702342306; x=1702947106;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I/PK91kUO/CCAwjCt15o7px/ZKEUyN3JIcrH6rtuZho=;
-        b=hjSopr8T8UWCCBnu5E9U3gSyjb17Ec/n4r/XNzFyxMt7wTm1ix/pGn24Lg/az61S/6
-         PKk405ali+JmPO0zNJwnH/YmuISn6HVPgg3x68g3vJARb2uBFl1TnbFRP85OqTBgwrpf
-         LWmbxgmHPyaAOVFk0l+tjXU6UrP+pfjmttUIZKdjGCgjOcA3oAwj87y2MWwXyrIwjNis
-         2kLhs2tdwi4NPREK/KbSAFklE5Q+zacao1aLhwYsQnZxyShyZv118sE5BxFdcT02aNbn
-         NWo1WkhGAcuZWc5Ae+0aHnEJDJvvID+OFNXgTZCkJii9yumAGDCMXN/mUaGnkcogDq3X
-         0PtA==
-X-Gm-Message-State: AOJu0Yx9hnm3p9PNlCiYk/ivD6QW3H1DoHShnzkL7gvAw3IAd0P3AYoL
-	S49g+gGx/x75Bwk7NH4xu+MLfFZ42Cvm+fMYsag=
-X-Google-Smtp-Source: AGHT+IF41m66EyCBuStgRbd7mlaXNngkMhu3Uusk/Y/tWOFx40rqknxXtvpHNPZMhRBWtGDQED9IGQ==
-X-Received: by 2002:a05:622a:341:b0:425:a60b:4d94 with SMTP id r1-20020a05622a034100b00425a60b4d94mr8482836qtw.21.1702342304734;
-        Mon, 11 Dec 2023 16:51:44 -0800 (PST)
+        bh=VNAhbz/3JFmavnnVl0fxEttHYiHJ/95LJZIsp5PVOsQ=;
+        b=kYMmKtMFI6nDdXj0oX9gLBMwHf9s4hPt7c8WMnJqwxhCDZiG9Kh6NZnIVpiP625M/0
+         LVUvlVyEvGRk3Ay0MZIVtH5+sd8beNyMiQD3ibHi+QqkWMBGVMzmbL8aF4Ul4+JIJctm
+         cY9qOkEmqvgMxB9xEfNbmArmNJClUqw3fybfVh/rw/+Mz0b1b67Ix574snQ+bQX3bIVm
+         YXLRT92TbEfsBv2gfkG4DoCunSC4VLLkHVIOIlQHG8gl+mJuqCt/0o0JFrx+Fwv0pT6F
+         gg6+QmBShgf0Alf/qh3L4TzhxWyPyprWblfo9eEGMdhsMgxKMk+RN33CuOG21jrBmLVl
+         KM9w==
+X-Gm-Message-State: AOJu0YxuNdqzm4kHuAbCyUNslXAHsT7UDx8uGp+qTvtew2iNb3++wPih
+	j9rlCYyAhetZ9mVFsiERC0WMYA==
+X-Google-Smtp-Source: AGHT+IEwxJmur6f7NI72c3kkQJ9GSly4tL9h2ePK9SjEhaQZBhIYMobDvdbrC2Z65OWP1WrJXh8QJg==
+X-Received: by 2002:a05:622a:5c8:b0:425:9ddf:2bc8 with SMTP id d8-20020a05622a05c800b004259ddf2bc8mr8400458qtb.135.1702342306116;
+        Mon, 11 Dec 2023 16:51:46 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id r5-20020ac87945000000b00423ea1b31b3sm3619664qtt.66.2023.12.11.16.51.43
+        by smtp.gmail.com with ESMTPSA id r5-20020ac87945000000b00423ea1b31b3sm3619664qtt.66.2023.12.11.16.51.44
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 11 Dec 2023 16:51:44 -0800 (PST)
+        Mon, 11 Dec 2023 16:51:45 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -55,10 +55,10 @@ Cc: netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	gospo@broadcom.com,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>
-Subject: [PATCH net-next 01/13] bnxt_en: Fix trimming of P5 RX and TX rings
-Date: Mon, 11 Dec 2023 16:51:10 -0800
-Message-Id: <20231212005122.2401-2-michael.chan@broadcom.com>
+	Somnath Kotur <somnath.kotur@broadcom.com>
+Subject: [PATCH net-next 02/13] bnxt_en: Fix AGG ring check logic in bnxt_check_rings()
+Date: Mon, 11 Dec 2023 16:51:11 -0800
+Message-Id: <20231212005122.2401-3-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231212005122.2401-1-michael.chan@broadcom.com>
 References: <20231212005122.2401-1-michael.chan@broadcom.com>
@@ -69,73 +69,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000616060060c457478"
+	boundary="00000000000076bfd1060c457429"
 
---000000000000616060060c457478
+--00000000000076bfd1060c457429
 Content-Transfer-Encoding: 8bit
 
-The recent commit to trim the RX and TX rings on P5 chips by assigning
-each with max CP rings divided by 2 is not correct.  Max CP rings
-divided by 2 may be bigger than the original RX or TX and would
-lead to failure.  In other words, we may be checking for increased
-RX/TX rings than required and it may fail.
+From: Somnath Kotur <somnath.kotur@broadcom.com>
 
-Fix it by calling __bnxt_trim_rings() instead that would properly
-trim RX and TX without the possibility of increasing their values.
+_bnxt_get_max_rings() that is invoked in bnxt_check_rings() already
+accounts for the AGG ring(s) and gives a max value based on that.
+Increasing for AGG rings before calling _bnxt_get_max_rings() will
+result in checking for twice the number of rings than required and
+it can fail.  Fix it by adjusting for AGG rings after calling
+_bnxt_get_max_rings().
 
 Fixes: f5b29c6afe36 ("bnxt_en: Add helper to get the number of CP rings required for TX rings")
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 92a54113f872..7afbbc71f92f 100644
+index 7afbbc71f92f..114beaa95e78 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -6489,6 +6489,8 @@ static void bnxt_hwrm_ring_free(struct bnxt *bp, bool close_path)
- 	}
- }
+@@ -12724,14 +12724,14 @@ int bnxt_check_rings(struct bnxt *bp, int tx, int rx, bool sh, int tcs,
+ 	if (tcs)
+ 		tx_sets = tcs;
  
-+static int __bnxt_trim_rings(struct bnxt *bp, int *rx, int *tx, int max,
-+			     bool shared);
- static int bnxt_trim_rings(struct bnxt *bp, int *rx, int *tx, int max,
- 			   bool shared);
+-	if (bp->flags & BNXT_FLAG_AGG_RINGS)
+-		rx_rings <<= 1;
+-
+ 	_bnxt_get_max_rings(bp, &max_rx, &max_tx, &max_cp);
  
-@@ -6532,8 +6534,9 @@ static int bnxt_hwrm_get_rings(struct bnxt *bp)
- 			if (bp->flags & BNXT_FLAG_AGG_RINGS)
- 				rx >>= 1;
- 			if (cp < (rx + tx)) {
--				rx = cp / 2;
--				tx = rx;
-+				rc = __bnxt_trim_rings(bp, &rx, &tx, cp, false);
-+				if (rc)
-+					return rc;
- 				if (bp->flags & BNXT_FLAG_AGG_RINGS)
- 					rx <<= 1;
- 				hw_resc->resv_rx_rings = rx;
-@@ -13885,9 +13888,12 @@ static void _bnxt_get_max_rings(struct bnxt *bp, int *max_rx, int *max_tx,
- 	if (bp->flags & BNXT_FLAG_AGG_RINGS)
- 		*max_rx >>= 1;
- 	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
--		if (*max_cp < (*max_rx + *max_tx)) {
--			*max_rx = *max_cp / 2;
--			*max_tx = *max_rx;
-+		int rc;
+ 	if (max_rx < rx_rings)
+ 		return -ENOMEM;
+ 
++	if (bp->flags & BNXT_FLAG_AGG_RINGS)
++		rx_rings <<= 1;
 +
-+		rc = __bnxt_trim_rings(bp, max_rx, max_tx, *max_cp, false);
-+		if (rc) {
-+			*max_rx = 0;
-+			*max_tx = 0;
- 		}
- 		/* On P5 chips, max_cp output param should be available NQs */
- 		*max_cp = max_irq;
+ 	tx_rings_needed = tx * tx_sets + tx_xdp;
+ 	if (max_tx < tx_rings_needed)
+ 		return -ENOMEM;
 -- 
 2.30.1
 
 
---000000000000616060060c457478
+--00000000000076bfd1060c457429
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -206,14 +187,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIA/KeawNL1q87x6rGZ5k7S64B8+rvX/t
-iBPV1jCNiWUIMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIx
-MjAwNTE0NVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIOdr1rSVI5s8daZdllfJEOmzo7Mg8P+4
+7wMxS6r9xmciMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIx
+MjAwNTE0NlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCc7mbVxfJQRBvSJ3YUPQNB/CPCD9jAO8gngbtiu0qAjVHGRS29
-6cpo+1tS2DynXXuiq1LSnxge32W7aGnwGzDhGPfKlc75OvTxXtrH+CtiyDChb9OBOftbw7Bi+77L
-V5PCtMwmi3/qefFh4YVThaiWGphaL7V/gUIpPw8b6hZmpd6y6NF/tVDavRv8I/yFcOLTBmFfoOYU
-dRmwtq8I+SZXbCP/rlXowD2AwfhJcLLjAkt5FLiBw5slPYaXRJdt69dkvi+WkPdjS/PtnzmWfFkt
-Hy0lMOUfO4I7UyXVxyEsfw8ipA42AFNLtU0q+1sckvbCl3ObZw/aMS5FhsA6Mg6B
---000000000000616060060c457478--
+ATANBgkqhkiG9w0BAQEFAASCAQAP/5WvVNPeYP3KHdiFValYJST5Zw+UGt3RUEGhv3DyV4y281Fa
+84gBi8rXxuvOl4C8Zh0ujHd3/7cKH5fV2BdiLWrlAKzb5MmdcnZciKxUIF4ikt7U3LfEMSKzN+gs
+xpU16waBjls8MnxD1Av0bFMeQag33DIsipwLOAI6Rof6oNcpk97dcYoT8MRyPpyXurY8+894YFF/
+7JKH2IXwgs/9kHUXww40E/DlL6jpj+sy2HhUnYpMrSkzKgr5v4j/g3b9kghhWqTedvEbY20LfHI8
+szgtYDG4bAfsu5S3lbjOKQR82ZG0tKlUWqBI0toYQyEuOVhP0janzUmJkkoP6Nxm
+--00000000000076bfd1060c457429--
 
