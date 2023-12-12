@@ -1,245 +1,168 @@
-Return-Path: <netdev+bounces-56461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 275B580EF70
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 15:58:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 144D480EF78
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 15:58:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D63E0281A9F
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:58:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 410BE1C20ACE
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB40A745E2;
-	Tue, 12 Dec 2023 14:57:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7744745F7;
+	Tue, 12 Dec 2023 14:58:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="GE5x9u0z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Di+xUrDN"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2083.outbound.protection.outlook.com [40.107.6.83])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFCFAC3
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 06:57:54 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HibFMT1mOYabZ5SSbZQdHlQmPkk+ua5VTx30gyi/P4WwB/YRhZoBwE9Yia5QIht9iG65w6BU+VrMm47kJ1RbOMDwaDytLJP+h6xqlj+qePkSCGM8OvqUx6S4uZogfd7qFaeyKFgBl1TrrPLJqIWXsbnwKfiFDN2PoqgdS/j8ZxUT248OCkxh+rD1dkBS8gYWtA5hiyt34GLAgTDejHzOMYIDzAeajkZ4WNiObcwGMM+hkthbYvbBs9RM4jGucKZZXQKULltAC8Iiyrcwkb7xUFf22Waisr/pSyvI/k9V7JMXoWVpM+qZPDDGqkd8/ru9BDhS865ICv+D6fbEswIA0Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UJ3EIptdm2ugHWZLdQb4CAYHXOi4VGl+OgfVLHpXghI=;
- b=N6lqSsa/N1JtPBfn/cfsMhj6PWO24hHSXsqueL103t6DplRf8mnALa8dE8Qp17LgYmLW/AvwlNXmqUbI75ah73IXc1Z/jbuh33LYP+ZG7ywN2xzqEh1P7lE9vTD62Ae97KrtmdDFmc+cM91vBxB5aod2i6OmKzwDdPNhVABt0xdbWm4Jym7YCLBfpJu67Rr/z9FACwfEwjbidq8ehXYq+GKIIVOnncb0OkjrM2KcENw/3OZ7ZHEpcKN1w94fVWhJuBryA0XN5nc5m82MmaoH9C8hXs3VBA6ITlyRBnoMFUhavsdqzyEPOjrpmCcQkpEhu3OF/hGQyc7XzJMG70ZmKA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UJ3EIptdm2ugHWZLdQb4CAYHXOi4VGl+OgfVLHpXghI=;
- b=GE5x9u0zWm26pLGKh0h3GwDYpK0bHIkJErMaTNeqAz5z8U8tQEIPYIrHQezsefozCKP6h16dSSECh753IESRaD+J1qCIl/gcqYlKGt2wen7COvwmH+fJ3K1hp3GCI8wO11cxikkZbg4YmOv2M4Zv3v/jfvIjN0ih7/23/g3rERs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by GVXPR04MB9950.eurprd04.prod.outlook.com (2603:10a6:150:11a::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.33; Tue, 12 Dec
- 2023 14:57:52 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7068.033; Tue, 12 Dec 2023
- 14:57:51 +0000
-Date: Tue, 12 Dec 2023 16:57:48 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, shuah@kernel.org, s-vadapalli@ti.com,
-	r-gunasekaran@ti.com, vigneshr@ti.com, srk@ti.com, horms@kernel.org,
-	p-varis@ti.com, netdev@vger.kernel.org
-Subject: Re: [PATCH 2/2] selftests: forwarding: ethtool_mm: support devices
- that don't support pmac stats
-Message-ID: <20231212145748.zuhn4o5j63ejcfyz@skbuf>
-References: <20231211120138.5461-1-rogerq@kernel.org>
- <20231211120138.5461-1-rogerq@kernel.org>
- <20231211120138.5461-3-rogerq@kernel.org>
- <20231211120138.5461-3-rogerq@kernel.org>
- <20231211132415.ilhkajslbxf3wxjn@skbuf>
- <59f0dc65-127d-4668-9662-3eee2ab7af8a@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <59f0dc65-127d-4668-9662-3eee2ab7af8a@kernel.org>
-X-ClientProxiedBy: FR4P281CA0290.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:e7::20) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 125E6EA
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 06:58:32 -0800 (PST)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-50e0ba402b4so736075e87.1
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 06:58:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702393110; x=1702997910; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gzl81dpk3U9T9CudLlEFGkOzt7MaXHqDfkakdpQfiFo=;
+        b=Di+xUrDNquCXrbE4D+7pfjphiGfnnFvnJ9/Q4O0j/kgCgfP9AwhW6edileG02zHDCK
+         Ug2WZfJv083gx7y1zC5N5OA4s2BF+Hgsf4WwxYweX2huuzD1r9O1C3Nf8JmTd223jhpo
+         +5K34kx0JBlvAkN3qJK0TBeNvaqFoyOzPY09+zdHmT/gWAZ249Fuiyo7zUphSdV5997y
+         vj8XnTZFDeNqWujeHGTInKUIXjEymntsdhGdsU/8Ku2S46luA28K2kGokU9NNgogSVdF
+         LfZgPfe/YbCJ/TAWwjQD4MwRNdA17G43XaNJaX/g0EqK03F/9MT2NYNODogcWcseI4zZ
+         s8CQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702393110; x=1702997910;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gzl81dpk3U9T9CudLlEFGkOzt7MaXHqDfkakdpQfiFo=;
+        b=Gab+ut1O826YrE6BA1U2qPKZFs8tpDbM8f4rkJVqhhwbXOdOiQv5xidFrakvBbAmw4
+         PHrkFUKPg0f2f1xkXLQVW+Abm22DJsReD0HOhOTuiqFEdrnfMULqn6O7r9nAgyMVDGhY
+         1QHFdVY31FZnmKoVrYgpV1+GW2qgW06HKbpp3P4zA92L0vGoZQfDDbLqeNwrbZx5hMFG
+         /H0H5Pli+gVplmoAv0uaVOISi4L5xyAQExZ4aA578feVAPWoO2wdlBKprpjuGvKDliln
+         Tk1v9BzYOmuZdCQMIPpeFqhcUe7woE+fHrVJi8cs7HjOKRR6lBVGFpfCYvA35OM8nYaN
+         kerA==
+X-Gm-Message-State: AOJu0Yy94B/qJCBEcR2IBPZ2iGj70mmLsn37NWu/f1ryYdy7UX3TFdlU
+	nbxhgKJKkZcA2nolhVkKu8mzCmN67WatGo52EB+iKw==
+X-Google-Smtp-Source: AGHT+IERGuBL77UBvy25wKoqAwiWF0N6xvXc57i2t65+NTiYJO5PTJJ6k/4UPi+3laDB/s1BgrFICZhicXsZkg8qeMk=
+X-Received: by 2002:ac2:5b4f:0:b0:50b:fa9b:1649 with SMTP id
+ i15-20020ac25b4f000000b0050bfa9b1649mr3304569lfp.73.1702393109803; Tue, 12
+ Dec 2023 06:58:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|GVXPR04MB9950:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1ee1bf08-d338-46e6-e99c-08dbfb22b6aa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Inh1vjuZ80mHcb4cddHyYdRimnfGB/rcc/jU0uidg+im2IdU684MTa+lp8DNdRyiQd6HFQM0g9MehVEV9Aplf/zfqShzK8LTNwACQLOqBOCwd+DjYcyJHyB9UKTUSzKY9hIlahFRCBOoza+6xUOHDmb86wTSeMWiBJdfFzXuKJhUtqB/aibmZEzebs+3fOBD6JBQEpqWLmAHWZQAFulTW0r/6oJyvjLAI17fQzeKVzjfiZLJ1ONclHqUwXM1WDkRG+Ro0FcivkVzEnc2WNvqEjXIUNhRRd9Eyq8HlfwL0emiKgBC9pfxH+6nWw3ovVNgPHLJKNPR24TYI47IVpC8ZfHo5FjrhynpJEdtjzMQC271s0dL3rhP6OBCeSGovTpI2MvvgUgY4kvWu88gUrDaAS7V2rFjXDGYEGoUT/nax1odRfpBggIgALVBVq5NPh2OytOwMZpG065l4BdiHErBk/q01FOQ2CSI09Guoi2t0Cq0+5eadVQTKxr9QqDPNjjT1voW5qqZhSOghczBKYrxQDqumJJklAo6d44vBMduix6M8ikLyaqbz9QZZbK4Ygh/
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(136003)(376002)(39860400002)(366004)(346002)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(5660300002)(7416002)(44832011)(2906002)(8936002)(8676002)(4326008)(316002)(66476007)(66556008)(6916009)(38100700002)(66946007)(41300700001)(6506007)(6666004)(86362001)(33716001)(478600001)(83380400001)(6486002)(1076003)(6512007)(9686003)(26005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?9rfnh3ZaRbKUKBjy9GUvAyIlpjrVmQPl9TSrlLltykcZWBMb9TCdFeq7HqCI?=
- =?us-ascii?Q?ZU+U7bXmNpn5EeUNjnU/I0P++ODEiEeorBE3pSiOIALN6J1rrVhTC1IRgM8O?=
- =?us-ascii?Q?LDBF9UsKAJeW4ASqGhimKUwEoi+Xn+vjGaeCCxa+idUvsZFXRr16ItGiFc3n?=
- =?us-ascii?Q?bTJsozbJsx0WKmDL1+Z+1s0JTfr1F6nSJG5cnAgoBOd7+IY1OhOZXS/oyQg8?=
- =?us-ascii?Q?wq5ZCvfUUWA92kDCicx5ruJIUEDrVaO51C07H4AxXvyfRLsNLpGW6jXjMLe2?=
- =?us-ascii?Q?kFihgXa/weKw++RPRZ9yXBgQT01UH9Weey1MJftixdJMNZyAIWo+d0XH8QpT?=
- =?us-ascii?Q?erZjoCpUMorY4mKuXUzjuaShUTPi9XZFCjqEiIXxlxY2knlgocImRq6FxcNd?=
- =?us-ascii?Q?yPED7S2TVIsfT/0ug++Bx8je1sW4V/6vZ+TFbLYTe4t2H773leUwcz/uh/R7?=
- =?us-ascii?Q?MedOFqZ0Xll7djyMoQ9lmpXHBV2V7Aq8jp+ZOirJXMz3opZ7J6AXe+qGkudZ?=
- =?us-ascii?Q?W+HKwBxuWpU05L6+XwJTnjWmh/PIHpoImtN5R/6XXdrwVoSnR2GBalxpRoXG?=
- =?us-ascii?Q?I6ozJCRRQqHUgy5YDsltdsi7tAdD+0QK/E8bJrOzEDfKOxZI8ggqLM7RYggJ?=
- =?us-ascii?Q?OvaMq5I255oH64G+F5D2V/Ra9sboWRmHjtbTZe2uUqfczQg5b/tiJGUZkQ+2?=
- =?us-ascii?Q?JtM/kcYz8BxGYSuB4YKrKxCI2p5VwfQYtC5bBn5F3ZqeXKgn13UL7xePShbP?=
- =?us-ascii?Q?BWfytP3tS6kUCqCnDdJhCstyEruxzTLlnYYlesNwq3GkG75OxQqrUGYJkAmg?=
- =?us-ascii?Q?IldjC/Mz77qZXv2Ph0zuJ3eZEm3exY0eHuNYzI1HH7S/BkmqcXGeTVZtXXCt?=
- =?us-ascii?Q?Sz0vP60MRMLtxHzHkVOG5AUQUyu8X8Gc2Y7j/pkHWFP57tknwmKbfNMslaaG?=
- =?us-ascii?Q?qiaBkYsdb7ndl9kqHjimDdKo/Tr8r697Z5EtnYsxviXnhWf9wd0bxrDQsaPE?=
- =?us-ascii?Q?1uARRsxCdy2hqYMhzJ+sXpENuwIsqutOhsOvde3lzN0UmZgZfUNhmgPyFyNC?=
- =?us-ascii?Q?OtRqG/7sbxLmI1/Lc5R+tSnZGcAkmL4mwXO0/M0G2ZzjQqeh1f1r4KB9aaGM?=
- =?us-ascii?Q?OMQYTjYg+iFnl9DtT3c88L5AxD4ceRXJAcd3oUis5CZMR2NYLfft/R9fHqob?=
- =?us-ascii?Q?NHyMyqOp/tawPEzytbUcJE3qYSbsuFit81joJjCASILTFpnL8ju11ZVfO59n?=
- =?us-ascii?Q?LWYf/kcgBTorInfuiEQE8Lesos86gPwGw5TD/dAD1PzfZ14XJyF5ZFlIj+/c?=
- =?us-ascii?Q?KneuHSKxNqEFK2lDydxpcxr+ZCpBdJQmgDBkVDATil4hfVx0nXxg2DBQC1yU?=
- =?us-ascii?Q?yCWFT+CiyAyJ9vcdIlRSb/pU0kaKVc7vwN1IYgzP7azINIc7acKXpDpv/Hf5?=
- =?us-ascii?Q?dlchUsxVcnqh5fIIoU2Cuizg8u9+e8Fe2DKwFxMLDdE4BNfymMZ7eJOMcnaG?=
- =?us-ascii?Q?s2BfdrF0D6p8tmo3c9GX7F7OvzbGbVQnoNBtdWSDXXJtJ+i6O7IOiEwZlWm5?=
- =?us-ascii?Q?51S6i/ZZcBbJIRRw/ceE6kKzlAhxywxEOFj268A8yX9kPLQMVf5yw/PSRMxR?=
- =?us-ascii?Q?wg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1ee1bf08-d338-46e6-e99c-08dbfb22b6aa
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2023 14:57:51.6985
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 69VhJRENQ8Mq1DezEGaBDXWSpuXk8QrclSxPYBej/PC3LkDaE2XSLD68/m4MUPN5xLR+EHrxedBMo9ci70xRWQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB9950
+References: <20231208005250.2910004-1-almasrymina@google.com>
+ <20231208005250.2910004-9-almasrymina@google.com> <20231212122535.GA3029808@nvidia.com>
+ <CAHS8izMVMx0fpT=dWsnD7piqs1g7Fam8Xf5dK3iOFNxeOQD9vQ@mail.gmail.com> <20231212143942.GF3014157@nvidia.com>
+In-Reply-To: <20231212143942.GF3014157@nvidia.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 12 Dec 2023 06:58:17 -0800
+Message-ID: <CAHS8izNHtemjjkMf43grCHP1RZ=2UFiMtgea0M6+PaAgC=DDMQ@mail.gmail.com>
+Subject: Re: [net-next v1 08/16] memory-provider: dmabuf devmem memory provider
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
+	David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeelb@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>, Christoph Hellwig <hch@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 12, 2023 at 04:07:18PM +0200, Roger Quadros wrote:
-> What is the proper way to run the script?
-> 
-> I've been hardcoding the following in the script.
-> 
-> NETIFS=( "eth0" "eth1" )
-> 
-> in setup_prepare()
-> 	h1=eth0
-> 	h2=eth1
-> 
-> and run the script like so
-> 
-> ./run_kselftest.sh -t net/forwarding:ethtool_mm.sh
+On Tue, Dec 12, 2023 at 6:39=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com> wr=
+ote:
+>
+> On Tue, Dec 12, 2023 at 06:26:51AM -0800, Mina Almasry wrote:
+> > On Tue, Dec 12, 2023 at 4:25=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com=
+> wrote:
+> > >
+> > > On Thu, Dec 07, 2023 at 04:52:39PM -0800, Mina Almasry wrote:
+> > >
+> > > > +static inline struct page_pool_iov *page_to_page_pool_iov(struct p=
+age *page)
+> > > > +{
+> > > > +     if (page_is_page_pool_iov(page))
+> > > > +             return (struct page_pool_iov *)((unsigned long)page &=
+ ~PP_IOV);
+> > > > +
+> > > > +     DEBUG_NET_WARN_ON_ONCE(true);
+> > > > +     return NULL;
+> > > > +}
+> > >
+> > > We already asked not to do this, please do not allocate weird things
+> > > can call them 'struct page' when they are not. It undermines the
+> > > maintainability of the mm to have things mis-typed like
+> > > this. Introduce a new type for your thing so the compiler can check i=
+t
+> > > properly.
+> > >
+> >
+> > There is a new type introduced, it's the page_pool_iov. We set the LSB
+> > on page_pool_iov* and cast it to page* only to avoid the churn of
+> > renaming page* to page_pool_iov* in the page_pool and all the net
+> > drivers using it. Is that not a reasonable compromise in your opinion?
+> > Since the LSB is set on the resulting page pointers, they are not
+> > actually usuable as pages, and are never passed to mm APIs per your
+> > requirement.
+>
+> There were two asks, the one you did was to never pass this non-struct
+> page memory to the mm, which is great.
+>
+> The other was to not mistype things, and don't type something as
+> struct page when it is, in fact, not.
+>
+> I fear what you've done is make it so only one driver calls these
+> special functions and left the other drivers passing the struct page
+> directly to the mm and sort of obfuscating why it is OK based on this
+> netdev knowledge of not enabling/using the static branch in the other
+> cases.
+>
 
-IDK. I rsync the selftest dir to my board and do:
+Jason, we set the LSB on page_pool_iov pointers before casting it to
+struct page pointers. The resulting pointers are not useable as page
+pointers at all.
 
-$ cd selftests/net/forwarding
-$ ./ethtool.mm eth0 eth1
+In order to use the resulting pointers, the driver _must_ use the
+special functions that first clear the LSB. It is impossible for the
+driver to 'accidentally' use the resulting page pointers with the LSB
+set - the kernel would just crash trying to dereference such a
+pointer.
 
-Running through run_kselftest.sh is probably better. I think that also
-supports passing the network interfaces as arguments, no need to hack up
-the script.
+The way it works currently is that drivers that support devmem TCP
+will declare that support to the net stack, and use the special
+functions that clear the LSB and cast the struct back to
+page_pool_iov. The drivers that don't support devmem TCP will not
+declare support and will get pages allocated from the mm stack from
+the page_pool and use them as pages normally.
 
-> > diff --git a/tools/testing/selftests/net/forwarding/ethtool_mm.sh b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
-> > index 39e736f30322..2740133f95ec 100755
-> > --- a/tools/testing/selftests/net/forwarding/ethtool_mm.sh
-> > +++ b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
-> > @@ -25,6 +25,10 @@ traffic_test()
-> >  	local after=
-> >  	local delta=
-> >  
-> > +	if [ has_pmac_stats[$netif] = false ]; then
-> 
-> This should be
-> 	if [ ${has_pmac_stats[$if]} = false ]; then
-> 
-> otherwise it doesn't work.
+> Perhaps you can simply avoid this by arranging for this driver to also
+> exclusively use some special type to indicate the dual nature of the
+> pointer and leave the other drivers as using the struct page version.
+>
 
-Makes sense.
+This is certainly possible, but it requires us to rename all the page
+pointers in the page_pool to the new type, and requires the driver
+adding devmem TCP support to rename all the page* pointer instances to
+the new type. It's possible but it introduces lots of code churn. Is
+the LSB + cast not a reasonable compromise here? I feel like the trick
+of setting the least significant bit on a pointer to indicate it's
+something else has a fair amount of precedent in the kernel.
 
-> > +		src="aggregate"
-> > +	fi
-> > +
-> >  	before=$(ethtool_std_stats_get $if "eth-mac" "FramesTransmittedOK" $src)
-> >  
-> >  	$MZ $if -q -c $num_pkts -p 64 -b bcast -t ip -R $PREEMPTIBLE_PRIO
-> > @@ -284,6 +288,13 @@ for netif in ${NETIFS[@]}; do
-> >  		echo "SKIP: $netif does not support MAC Merge"
-> >  		exit $ksft_skip
-> >  	fi
-> > +
-> > +	if check_ethtool_pmac_std_stats_support $netif; then
-> > +		has_pmac_stats[$netif]=true
-> 
-> 
-> > +	else
-> > +		has_pmac_stats[$netif]=false
-> > +		echo "$netif does not report pMAC statistics, falling back to aggregate"
-> > +	fi
-> >  done
-> >  
-> >  trap cleanup EXIT
-> > diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-> > index 8f6ca458af9a..82ac6a066729 100755
-> > --- a/tools/testing/selftests/net/forwarding/lib.sh
-> > +++ b/tools/testing/selftests/net/forwarding/lib.sh
-> > @@ -146,6 +146,14 @@ check_ethtool_mm_support()
-> >  	fi
-> >  }
-> >  
-> > +check_ethtool_pmac_std_stats_support()
-> > +{
-> > +	local dev=$1; shift
-> > +
-> > +	[ -n "$(ethtool --json -S $dev --all-groups --src pmac 2>/dev/null | \
-> > +		jq '.[]')" ]
-> 
-> This is evaluating to true instead of false on my platform so something needs to be fixed here.
-> 
-> Below is the output of "ethtool --json -S eth0 --all-groups --src pmac"
-> 
-> [ {
->         "ifname": "eth0",
->         "eth-phy": {},
->         "eth-mac": {},
->         "eth-ctrl": {},
->         "rmon": {}
->     } ]
-> 
-> I suppose we want to check if eth-mac has anything or not.
-> 
-> Something like this works
-> 
-> 	[ 0 -ne $(ethtool --json -S $dev --all-groups --src pmac 2>/dev/null \
-> 		| jq '.[]."eth-mac" | length') ]
-> 
-> OK?
-
-Maybe giving the stats group as argument instead of hardcoding "eth-mac"
-would make sense. I hoped we could avoid hardcoding one particular group
-of counters in check_ethtool_pmac_std_stats_support().
-
-> > +}
-> > +
-> >  check_locked_port_support()
-> >  {
-> >  	if ! bridge -d link show | grep -q " locked"; then
-> 
-> also I had to revert a recent commit 
-> 
-> 25ae948b4478 ("selftests/net: add lib.sh")
-> 
-> else i get an error message syaing ../lib.sh not found.
-> Looks like that is not getting deployed on kselftest-install
-> 
-> I will report this in the original patch thread as well.
-
-I'm not using that part, so I didn't notice it :)
+--
+Thanks,
+Mina
 
