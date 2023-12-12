@@ -1,299 +1,318 @@
-Return-Path: <netdev+bounces-56405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53D8980EBFE
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 13:38:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37BE580EC36
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 13:41:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 767291C20AF7
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 12:38:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A47BA1F2142E
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 12:41:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F00815FF0B;
-	Tue, 12 Dec 2023 12:38:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BB5E5FF0C;
+	Tue, 12 Dec 2023 12:41:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WfEvKaOC"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="DP9TISn8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 997B0CA;
-	Tue, 12 Dec 2023 04:37:57 -0800 (PST)
-Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-3332f1512e8so5216691f8f.2;
-        Tue, 12 Dec 2023 04:37:57 -0800 (PST)
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B3F9CA
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 04:41:21 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1d307cf18fdso11748245ad.3
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 04:41:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702384676; x=1702989476; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=M+NoPfid+7puCdo9sPDvLb7zjUyvTkje5iwQvI0aUXs=;
-        b=WfEvKaOC7IunAbmL2INIRuNOivmbuJS9r886wPoLsBadp1m0gSBTWEVPqlF7vmw6Hv
-         Int2y/nhZtrJlH6fmSB2d1bz9KEBJVp/AmB0aeHDaiKeVwDsjbXB97Fv/RqqyPNaAOHf
-         DESQad97cc9HmPbylzzcyh5yLsjgOdml+Uts6MsMQMw9FSl+6x4i4Kl8ZgCdIGVh0zaP
-         iZaKprjQuDyRj0GkUsdjtUM7mEQaPLzJFIPnLJDMRlM49oqW0u951zrv7vd/8iumI5GG
-         Q0LMS+H5s+QdH9FakGJIyrrRSvbaTN7j52fv+V+nQFO3+nX4sY2H/e8jbCsy2XPoYio2
-         vRFQ==
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1702384881; x=1702989681; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=o0UI/+qhCr+lBggOzWzGiJKh9KuolOqGxWBzrz2xh3g=;
+        b=DP9TISn8zf08FZXUq56BoHUgCAQHw+p9tIUnqHGu9kzaFh8CvJVKQD+K8IUAUCtVR0
+         lyPznRnfzDlqiorl06ViVw9LnVtKzX7k3f7vAYE8hLjRXndwSDZvYL/UDohFk/VEfq3h
+         4pSpSuYXDIyAKm6xrSAUL3J6LDNrNsd0l/IHWeexFNdVd6w3LyI9bxI5MO9+7kbDY5wv
+         CNWRjOQUnS7j0XIlut8HA4dFAM88Ik2XjDqYf3mm8G2nyE86EddsaoXvhBrAOpgEY9xx
+         uDu34XkgBzk9jOb/oXm20erZUTK0yXNdcXLC8w7UTcTIgN/D2M+ArGxVv5CmrFMYzHg5
+         UJBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702384676; x=1702989476;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M+NoPfid+7puCdo9sPDvLb7zjUyvTkje5iwQvI0aUXs=;
-        b=jx2Wgqg5D0I3y1+SPWQ8YIQkT9b5uWWaDzuObjWBe3OAvOb/OO2PzkTVIAw8jpYDqn
-         iSlQHLSgnHF8mT7XO4Emx8dHCD1ZKOlZEQnMICHutuweYDe/GtBVUL1rLXKCFzcTvCFy
-         iJrPg4gLpM4zmTTeKOMLxgYjtMlS4ZLX2p6IfS46y0y32mCX9LvPwXvHWdB3skpp/aO2
-         iArdI5B3DyzrhNx61q/qk6ImNNxv9ceUkt+Gr/Z/baFSrqFX9ly7YUWLQ3/e/FjQxoUn
-         V2OpER2jqLzMlhZ8Cir6TOEn1Uge1kIN5wSTUw516JchmOvuRyXF3P6OdmsXUlCNqfvk
-         30lQ==
-X-Gm-Message-State: AOJu0YxZGov1QJSA5ORPnIcS+l1RcgfHMDxxlUIQ/bppCkOym2FslrTY
-	9W7k4BGtwUw4mdxZe1dMRHk=
-X-Google-Smtp-Source: AGHT+IEHAHhVKkWk55roEEIbIKKtUna1tr6SgO8v6ZoCpb3I8MNpNNzue8zDqGm+cu8ZJUbIJ9oo4Q==
-X-Received: by 2002:a05:600c:304a:b0:40c:233f:e02a with SMTP id n10-20020a05600c304a00b0040c233fe02amr3520971wmh.7.1702384675674;
-        Tue, 12 Dec 2023 04:37:55 -0800 (PST)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id o12-20020a05600c4fcc00b0040c552a1338sm214890wmq.1.2023.12.12.04.37.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 04:37:55 -0800 (PST)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Harini Katakam <harini.katakam@amd.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [net-next PATCH v5 3/3] net: phy: add support for PHY package MMD read/write
-Date: Tue, 12 Dec 2023 13:37:43 +0100
-Message-Id: <20231212123743.29829-3-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231212123743.29829-1-ansuelsmth@gmail.com>
-References: <20231212123743.29829-1-ansuelsmth@gmail.com>
+        d=1e100.net; s=20230601; t=1702384881; x=1702989681;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=o0UI/+qhCr+lBggOzWzGiJKh9KuolOqGxWBzrz2xh3g=;
+        b=ic1F/NyQ8eotvvu8MoNf2oBwVSaXus8dWhpuW9HNFLXAH1vAlYoZn9iecxqOE6WaR2
+         AIR++GEsa275oxYVge4yim+OqE5Y3cd01h6IalnsVq+Kg3ChiteelCLayggAQZwT72My
+         I1R5pN06FUP6JoQ9rFk0AyhIQZX08P08+dMuOIHqcnMPoyss+8mCHxCwTwUhoY0kyC1L
+         N8yJowjE3MmkQcH1Suf257HCjYWGfsCUQexc7CUbMKKBsAbUeJPm6mhrczd+cVmdvZ84
+         TGSojU7jD9yAfSuXgLi0JK6wbRgujW5Xm8AlcTPdd5t78+adafuIK/7MOy6vFSFZD9S6
+         T66g==
+X-Gm-Message-State: AOJu0Yw+l3a7IsUnwLFb8nqQrrSiq+tP3joEsjCec0+qFWfZDKcMrLOE
+	jVNFrIlAcp+OcS62BpU/oJf9yg==
+X-Google-Smtp-Source: AGHT+IHS/Z+mwvpoVVeNK3a4KjPTd64ECoTEIFO60YHkegn5DEbwuewms4n2mKqZR5d7o3VqKAPu8g==
+X-Received: by 2002:a17:902:704c:b0:1d0:6ffd:cec8 with SMTP id h12-20020a170902704c00b001d06ffdcec8mr3005669plt.129.1702384880602;
+        Tue, 12 Dec 2023 04:41:20 -0800 (PST)
+Received: from [157.82.205.15] ([157.82.205.15])
+        by smtp.gmail.com with ESMTPSA id h2-20020a170902704200b001d06b63bb98sm8500451plt.71.2023.12.12.04.41.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Dec 2023 04:41:20 -0800 (PST)
+Message-ID: <e256c6df-0a66-4f86-ae96-bff17920c2fb@daynix.com>
+Date: Tue, 12 Dec 2023 21:41:13 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Should I add BPF kfuncs for userspace apps? And how?
+Content-Language: en-US
+To: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, Yuri Benditovich
+ <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>,
+ Benjamin Tissoires <bentiss@kernel.org>, bpf <bpf@vger.kernel.org>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, kvm@vger.kernel.org,
+ LKML <linux-kernel@vger.kernel.org>,
+ virtualization@lists.linux-foundation.org,
+ "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+ Network Development <netdev@vger.kernel.org>
+References: <2f33be45-fe11-4b69-8e89-4d2824a0bf01@daynix.com>
+ <CAO-hwJJhzHtKrUEw0zrjgub3+eapgJG-zsG0HRB=PaPi6BxG+w@mail.gmail.com>
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CAO-hwJJhzHtKrUEw0zrjgub3+eapgJG-zsG0HRB=PaPi6BxG+w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Some PHY in PHY package may require to read/write MMD regs to correctly
-configure the PHY package.
+On 2023/12/12 19:39, Benjamin Tissoires wrote:
+> Hi,
+> 
+> On Tue, Dec 12, 2023 at 9:11 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+>> Hi,
 
-Add support for these additional required function in both lock and no
-lock variant.
+Hi,
 
-It's assumed that the entire PHY package is either C22 or C45. We use
-C22 or C45 way of writing/reading to mmd regs based on the passed phydev
-whether it's C22 or C45.
+Thanks for reply.
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
-Changes v5:
-- Improve function description
-Changes v4:
-- Drop function comments in header file
-Changes v3:
-- Move in phy-core.c from phy.h
-- Base c45 from phydev
-Changes v2:
-- Rework to use newly introduced helper
-- Add common check for regnum and devad
+>>
+>> It is said eBPF is a safe way to extend kernels and that is very
+>> attarctive, but we need to use kfuncs to add new usage of eBPF and
+>> kfuncs are said as unstable as EXPORT_SYMBOL_GPL. So now I'd like to ask
+>> some questions:
+>>
+>> 1) Which should I choose, BPF kfuncs or ioctl, when adding a new feature
+>> for userspace apps?
+>> 2) How should I use BPF kfuncs from userspace apps if I add them?
+>>
+>> Here, a "userspace app" means something not like a system-wide daemon
+>> like systemd (particularly, I have QEMU in mind). I'll describe the
+>> context more below:
+> 
+> I'm probably not the best person in the world to answer your
+> questions, Alexei and others from the BPF core group are, but given
+> that you pointed at a thread I was involved in, I feel I can give you
+> a few pointers.
+> 
+> But first and foremost, I encourage you to schedule an agenda item in
+> the BPF office hour[4]. Being able to talk with the core people
+> directly was tremendously helpful to me to understand their point.
 
- drivers/net/phy/phy-core.c | 144 +++++++++++++++++++++++++++++++++++++
- include/linux/phy.h        |  16 +++++
- 2 files changed, 160 insertions(+)
+I prefer emails because I'm not very fluent when speaking in English and 
+may have a difficultly to listen to other people, but I may try it in 
+future.
 
-diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
-index b729ac8b2640..8132ed83cff8 100644
---- a/drivers/net/phy/phy-core.c
-+++ b/drivers/net/phy/phy-core.c
-@@ -650,6 +650,150 @@ int phy_write_mmd(struct phy_device *phydev, int devad, u32 regnum, u16 val)
- }
- EXPORT_SYMBOL(phy_write_mmd);
- 
-+/**
-+ * __phy_package_read_mmd - read MMD reg relative to PHY package base addr
-+ * @phydev: The phy_device struct
-+ * @addr_offset: The offset to be added to PHY package base_addr
-+ * @devad: The MMD to read from
-+ * @regnum: The register on the MMD to read
-+ *
-+ * Convenience helper for reading a register of an MMD on a given PHY
-+ * using the PHY package base address. The base address is added to
-+ * the addr_offset value.
-+ *
-+ * Same calling rules as for __phy_read();
-+ *
-+ * NOTE: It's assumed that the entire PHY package is either C22 or C45.
-+ */
-+int __phy_package_read_mmd(struct phy_device *phydev,
-+			   unsigned int addr_offset, int devad,
-+			   u32 regnum)
-+{
-+	struct phy_package_shared *shared = phydev->shared;
-+	int addr = shared->base_addr + addr_offset;
-+
-+	if (addr >= PHY_MAX_ADDR)
-+		return -EIO;
-+
-+	if (regnum > (u16)~0 || devad > 32)
-+		return -EINVAL;
-+
-+	return mmd_phy_read(phydev->mdio.bus, addr, phydev->is_c45, devad,
-+			    regnum);
-+}
-+EXPORT_SYMBOL(__phy_package_read_mmd);
-+
-+/**
-+ * phy_package_read_mmd - read MMD reg relative to PHY package base addr
-+ * @phydev: The phy_device struct
-+ * @addr_offset: The offset to be added to PHY package base_addr
-+ * @devad: The MMD to read from
-+ * @regnum: The register on the MMD to read
-+ *
-+ * Convenience helper for reading a register of an MMD on a given PHY
-+ * using the PHY package base address. The base address is added to
-+ * the addr_offset value.
-+ *
-+ * Same calling rules as for phy_read();
-+ *
-+ * NOTE: It's assumed that the entire PHY package is either C22 or C45.
-+ */
-+int phy_package_read_mmd(struct phy_device *phydev,
-+			 unsigned int addr_offset, int devad,
-+			 u32 regnum)
-+{
-+	struct phy_package_shared *shared = phydev->shared;
-+	int addr = shared->base_addr + addr_offset;
-+	int val;
-+
-+	if (addr >= PHY_MAX_ADDR)
-+		return -EIO;
-+
-+	if (regnum > (u16)~0 || devad > 32)
-+		return -EINVAL;
-+
-+	phy_lock_mdio_bus(phydev);
-+	val = mmd_phy_read(phydev->mdio.bus, addr, phydev->is_c45, devad,
-+			   regnum);
-+	phy_unlock_mdio_bus(phydev);
-+
-+	return val;
-+}
-+EXPORT_SYMBOL(phy_package_read_mmd);
-+
-+/**
-+ * __phy_package_write_mmd - write MMD reg relative to PHY package base addr
-+ * @phydev: The phy_device struct
-+ * @addr_offset: The offset to be added to PHY package base_addr
-+ * @devad: The MMD to write to
-+ * @regnum: The register on the MMD to write
-+ * @val: value to write to @regnum
-+ *
-+ * Convenience helper for writing a register of an MMD on a given PHY
-+ * using the PHY package base address. The base address is added to
-+ * the addr_offset value.
-+ *
-+ * Same calling rules as for __phy_write();
-+ *
-+ * NOTE: It's assumed that the entire PHY package is either C22 or C45.
-+ */
-+int __phy_package_write_mmd(struct phy_device *phydev,
-+			    unsigned int addr_offset, int devad,
-+			    u32 regnum, u16 val)
-+{
-+	struct phy_package_shared *shared = phydev->shared;
-+	int addr = shared->base_addr + addr_offset;
-+
-+	if (addr >= PHY_MAX_ADDR)
-+		return -EIO;
-+
-+	if (regnum > (u16)~0 || devad > 32)
-+		return -EINVAL;
-+
-+	return mmd_phy_write(phydev->mdio.bus, addr, phydev->is_c45, devad,
-+			     regnum, val);
-+}
-+EXPORT_SYMBOL(__phy_package_write_mmd);
-+
-+/**
-+ * __phy_package_write_mmd - write MMD reg relative to PHY package base addr
-+ * @phydev: The phy_device struct
-+ * @addr_offset: The offset to be added to PHY package base_addr
-+ * @devad: The MMD to write to
-+ * @regnum: The register on the MMD to write
-+ * @val: value to write to @regnum
-+ *
-+ * Convenience helper for writing a register of an MMD on a given PHY
-+ * using the PHY package base address. The base address is added to
-+ * the addr_offset value.
-+ *
-+ * Same calling rules as for phy_write();
-+ *
-+ * NOTE: It's assumed that the entire PHY package is either C22 or C45.
-+ */
-+int phy_package_write_mmd(struct phy_device *phydev,
-+			  unsigned int addr_offset, int devad,
-+			  u32 regnum, u16 val)
-+{
-+	struct phy_package_shared *shared = phydev->shared;
-+	int addr = shared->base_addr + addr_offset;
-+	int ret;
-+
-+	if (addr >= PHY_MAX_ADDR)
-+		return -EIO;
-+
-+	if (regnum > (u16)~0 || devad > 32)
-+		return -EINVAL;
-+
-+	phy_lock_mdio_bus(phydev);
-+	ret = mmd_phy_write(phydev->mdio.bus, addr, phydev->is_c45, devad,
-+			    regnum, val);
-+	phy_unlock_mdio_bus(phydev);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL(phy_package_write_mmd);
-+
- /**
-  * phy_modify_changed - Function for modifying a PHY register
-  * @phydev: the phy_device struct
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 51702e349d83..f58a9ff52e0d 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -2049,6 +2049,22 @@ static inline int __phy_package_write(struct phy_device *phydev,
- 	return __mdiobus_write(phydev->mdio.bus, addr, regnum, val);
- }
- 
-+int __phy_package_read_mmd(struct phy_device *phydev,
-+			   unsigned int addr_offset, int devad,
-+			   u32 regnum);
-+
-+int phy_package_read_mmd(struct phy_device *phydev,
-+			 unsigned int addr_offset, int devad,
-+			 u32 regnum);
-+
-+int __phy_package_write_mmd(struct phy_device *phydev,
-+			    unsigned int addr_offset, int devad,
-+			    u32 regnum, u16 val);
-+
-+int phy_package_write_mmd(struct phy_device *phydev,
-+			  unsigned int addr_offset, int devad,
-+			  u32 regnum, u16 val);
-+
- static inline bool __phy_package_set_once(struct phy_device *phydev,
- 					  unsigned int b)
- {
--- 
-2.40.1
+> 
+> 
+>>
+>> ---
+>>
+>> I'm working on a new feature that aids virtio-net implementations using
+>> tuntap virtual network device. You can see [1] for details, but
+>> basically it's to extend BPF_PROG_TYPE_SOCKET_FILTER to report four more
+>> bytes.
+>>
+>> However, with long discussions we have confirmed extending
+>> BPF_PROG_TYPE_SOCKET_FILTER is not going to happen, and adding kfuncs is
+>> the way forward. So I decided how to add kfuncs to the kernel and how to
+>> use it. There are rich documentations for the kernel side, but I found
+>> little about the userspace. The best I could find is a systemd change
+>> proposal that is based on WIP kernel changes[2].
+> 
+> Yes, as Alexei already replied, BPF is not adding new stable APIs,
+> only kfuncs. The reason being that once it's marked as stable, you
+> can't really remove it, even if you think it's badly designed and
+> useless.
+> 
+> Kfuncs, OTOH are "unstable" by default meaning that the constraints
+> around it are more relaxed.
+> 
+> However, "unstable" doesn't mean "unusable". It just means that the
+> kernel might or might not have the function when you load your program
+> in userspace. So you have to take that fact into account from day one,
+> both from the kernel side and the userspace side. The kernel docs have
+> a nice paragraph explaining that situation and makes the distinction
+> between relatively unused kfuncs, and well known established ones.
+> 
+> Regarding the systemd discussion you are mentioning ([2]), this is
+> something that I have on my plate for a long time. I think I even
+> mentioned it to Alexei at Kernel Recipes this year, and he frowned his
+> eyebrows when I mentioned it. And looking at the systemd code and the
+> benefits over a plain ioctl, it is clearer that in that case, a plain
+> ioctl is better, mostly because we already know the API and the
+> semantic.
+> 
+> A kfunc would be interesting in cases where you are not sure about the
+> overall design, and so you can give a shot at various API solutions
+> without having to keep your bad v1 design forever.
+> 
+>>
+>> So now I'm wondering how I should use BPF kfuncs from userspace apps if
+>> I add them. In the systemd discussion, it is told that Linus said it's
+>> fine to use BPF kfuncs in a private infrastructure big companies own, or
+>> in systemd as those users know well about the system[3]. Indeed, those
+>> users should be able to make more assumptions on the kernel than
+>> "normal" userspace applications can.
+>>
+>> Returning to my proposal, I'm proposing a new feature to be used by QEMU
+>> or other VMM applications. QEMU is more like a normal userspace
+>> application, and usually does not make much assumptions on the kernel it
+>> runs on. For example, it's generally safe to run a Debian container
+>> including QEMU installed with apt on Fedora. BPF kfuncs may work even in
+>> such a situation thanks to CO-RE, but it sounds like *accidentally*
+>> creating UAPIs.
+>>
+>> Considering all above, how can I integrate BPF kfuncs to the application?
+> 
+> FWIW, I'm not sure you can rely on BPF calls from a container. There
+> is a high chance the syscall gets disabled by the runtime.
 
+Right. Container runtimes will not pass CAP_BPF by default, but that 
+restriction can be lifted and I think that's a valid scenario.
+
+> 
+>>
+>> If BPF kfuncs are like EXPORT_SYMBOL_GPL, the natural way to handle them
+>> is to think of BPF programs as some sort of kernel modules and
+>> incorporate logic that behaves like modprobe. More concretely, I can put
+>> eBPF binaries to a directory like:
+>> /usr/local/share/qemu/ebpf/$KERNEL_RELEASE
+> 
+> I would advise against that (one program per kernel release). Simply
+> because your kfunc may or may not have been backported to kernel
+> release v6.X.Y+1 while it was not there when v6.X.Y was out. So
+> relying on the kernel number is just going to be a headache.
+> 
+> As I understand it, the way forward is to rely on the kernel, libbpf
+> and CO-RE: if the function is not available, the program will simply
+> not load, and you'll know that this version of the code is not
+> available (or has changed API).
+> 
+> So what I would do if some kfunc API is becoming deprecated, is
+> embedding both code paths in the same BPF unit, but marking them as
+> not loaded by libppf. Then I can load the compilation unit, try v2 of
+> the API, and if it's not available, try v1, and if not, then mention
+> that I can not rely on BPF. Of course, this can also be done with
+> separate compilation units.
+
+Doesn't it mean that the kernel is free to break old versions of QEMU 
+including BPF programs? That's something I'd like to avoid.
+
+> 
+>>
+>> Then, QEMU can uname() and get the path to the binary. It will give an
+>> error if it can't find the binary for the current kernel so that it
+>> won't create accidental UAPIs.
+>>
+>> The obvious downside of this is that it complicates packaging a lot; it
+>> requires packaging QEMU eBPF binaries each time a new kernel comes up.
+>> This complexity is centrally managed by modprobe for kernel modules, but
+>> apparently each application needs to take care of it for BPF programs.
+> 
+> For my primary use case: HID-BPF, I put kfuncs in kernel v6.3 and
+> given that I haven't touch this part of the API, the same compilation
+> unit compiled in the v6.3 era still works on a v6.7-rcx, so no, IMO
+> it's not complex and doesn't require to follow the kernel releases
+> (which is the whole point of HID-BPF FWIW).
+
+I also expect BPF kfuncs will work well for long if I introduce its 
+usage to QEMU in practice. That said, the interface stability is about 
+when something unexpected happens. What if the interface QEMU relies on 
+is deemed sub-optimal? Without following kernel releases, QEMU may 
+accidentally lose the feature relying on eBPF.
+
+> 
+>>
+>> In conclusion, I see too much complexity to use BPF in a userspace
+>> application, which we didn't have to care for
+>> BPF_PROG_TYPE_SOCKET_FILTER. Isn't there a better way? Or shouldn't I
+>> use BPF in my case in the first place?
+> 
+> Given that I'm not a network person, I'm not sure about your use case,
+> but I would make my decision based on:
+> - do I know exactly what I want to achieve and I'm confident that I'll
+> write the proper kernel API from day one? (if not then kfuncs is
+> appealing because  it's less workload in the long run, but userspace
+> needs to be slightly smarter)
+
+Personally I'm confident that the initial UAPI design will not do a bad 
+thing at least. However, there is a high chance that the design needs to 
+be extended to accommodate new features.
+
+> - are all of my use cases covered by using BPF? (what happens if I run
+> QEMU in a container?) -> BPF might or might not be a solution
+
+Yes. Containers can be used to 1) have a different userspace or 2) 
+isolate things for security.
+
+Regarding 2), QEMU and libvirt has sandbox mechanisms so we can rely on 
+them instead of containers so we can just pass capabilities to the 
+container. At least, we can always have a setuid helper outside 
+container, and pass around file descriptors it generates.
+
+So 1) is the only problem that matters.
+
+> 
+> But the nice thing about using BPF kfuncs is that it allows you to
+> have a testing (not-)UAPI kernel interface. You can then implement the
+> userspace changes and see how it behaves. And then, once you got the
+> right design, you can decide to promote it to a proper syscall or
+> ioctl if you want.
+
+I expect it's possible to have testing ioctls. Quickly searching online, 
+there are experimental ioctls[1][2]. I also know DRM has a relaxed 
+policy for closed-source userspace[3].
+
+So I'm seeing the distinction of UAPI/kfunc even less definitive; UAPIs 
+can also be broken if the subsystem maintainers agree and there is no 
+real user. I also think it's natural to say a kfunc will be stable as 
+long as there is a user, but it contradicts with the current situation. 
+kfunc is expressed as EXPORT_SYMBOL_GPL in the documentation, and Linus 
+expects kfunc is for users like big companies or systemd, which closely 
+follow the kernel, according to the systemd discussion I cited in the 
+last email.
+
+According to the discussion above, it may be better off abandoning BPF 
+and implementing all in kernel, with ioctl as I have a (hopefully) sound 
+idea of UAPI design. But I'll also continue considering the BPF option; 
+BPF is still attractive due to its extensibility and safety.
+
+Regards,
+Akihiko Odaki
+
+[1] 
+https://www.kernel.org/doc/html/v6.6/userspace-api/media/v4l/hist-v4l2.html?highlight=experimental#experimental-api-elements
+[2] 
+https://www.kernel.org/doc/html/v6.6/userspace-api/media/dvb/dmx-expbuf.html?highlight=experimental
+[3] 
+https://www.kernel.org/doc/html/v6.6/gpu/drm-uapi.html#open-source-userspace-requirements
 
