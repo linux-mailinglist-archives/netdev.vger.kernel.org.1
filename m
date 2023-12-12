@@ -1,126 +1,79 @@
-Return-Path: <netdev+bounces-56256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1823380E3EF
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 06:43:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4174580E417
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 06:58:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 171B91C21AFC
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 05:43:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BCF81C21B0A
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 05:58:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F74B15AC3;
-	Tue, 12 Dec 2023 05:43:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5E5156F1;
+	Tue, 12 Dec 2023 05:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YhOHsMUx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1FF8BD;
-	Mon, 11 Dec 2023 21:43:43 -0800 (PST)
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-6d9dadc3dc0so3923875a34.1;
-        Mon, 11 Dec 2023 21:43:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702359823; x=1702964623;
-        h=date:subject:message-id:references:in-reply-to:cc:to:from
-         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=G/kRQnlrmzAaEgbJW/nHYsdkLSYAXxTeBfYcPh2ZwjE=;
-        b=P1XzrPVWGP6ie+YFuOl9VUB0psNVvZrEQgyMWN3DG2OhY/dWMd7lfBZYI1vUF0OG93
-         oOHDnOglvErCBw5uBGbTttnX2ulFWrza9dwocAJ/XbiTnZLy+cGBfdSLwE1l0OiRqDae
-         iamVAcuydQrJbKCSg6bDEkn//6lm10NjQ/JGW9A9mwSkJTAXwGRLlLlBDopkby3KXb1e
-         xKzopaJbfVOd0jRS50HmgdX/ZfCXZz1+LTQJuzQyP/smkXfYqZyI6mhO+vbXEZEh+OpV
-         BBLU9Jdt2AdY1lOGJne/k5Ejplk4g3izXeBvmsdqHecjUEfH9DZ9mzP7+c4xeuXueIRO
-         KsOQ==
-X-Gm-Message-State: AOJu0Yxu9w5JlzxaRhWNkqlfgEXrm949UyuR620x+23jyuJVtabGiU4a
-	Fodjq/b/Q9MtiyZg4SuI7g==
-X-Google-Smtp-Source: AGHT+IHfJVsFVCXlkAo5HjVP5AjAq4xIe1OLORfTZofd6AI7iHeRszHF1WOfLlCCf48/2Or6Rr6kNw==
-X-Received: by 2002:a05:6830:20d9:b0:6d8:49a1:c52b with SMTP id z25-20020a05683020d900b006d849a1c52bmr5865800otq.27.1702359822924;
-        Mon, 11 Dec 2023 21:43:42 -0800 (PST)
-Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id r6-20020a9d7506000000b006ce2fce83cbsm2071485otk.25.2023.12.11.21.43.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 21:43:41 -0800 (PST)
-Received: (nullmailer pid 39734 invoked by uid 1000);
-	Tue, 12 Dec 2023 05:43:35 -0000
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8bit
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2451DA1;
+	Mon, 11 Dec 2023 21:58:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=lgLwTEhQVr7SeOkAbXZIpqhiCYecdKkb92XRhk3Nnto=; b=YhOHsMUxRMFey39Ub+BOoHUSpN
+	6MD2YvGw42vNtElnYki1NxJH9KlY8dt3Xm1HkV2P6cve8n0OT2lWYfK3Du2qGpAm+OR+Cys5wPkIf
+	LE4znGLFwFzfwfuhB6/ZRcFvqHR3KNSaEVVBM4sFec7GGKvkoEBEVIp1GDKF6IeHVHVxytGCrpZCx
+	1faM9v6zX2g+69mh7wf3OyXFWKq/ZNrIB+bGXJyrwEC02dodJ4tmwi4CT68czYOjwgp+Y+4GW16Am
+	Y55OjcCnUTKf5hamO76diNt+t88idSnTc+d8igc/Ad7wSE/4sh15ZHLMvQYX/GREDrEwnDJrL70OT
+	pMrg2+hQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1rCvmR-00ApZl-36;
+	Tue, 12 Dec 2023 05:58:07 +0000
+Date: Mon, 11 Dec 2023 21:58:07 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	bpf@vger.kernel.org, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Shakeel Butt <shakeelb@google.com>,
+	Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [net-next v1 00/16] Device Memory TCP
+Message-ID: <ZXf2b/Bmupwm9LaD@infradead.org>
+References: <20231208005250.2910004-1-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Vinod Koul <vkoul@kernel.org>, John Crispin <john@phrozen.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Rob Herring <robh+dt@kernel.org>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
-	devicetree@vger.kernel.org, Alexander Couzens <lynxis@fe80.eu>, netdev@vger.kernel.org, 
-	Chunfeng Yun <chunfeng.yun@mediatek.com>, SkyLake Huang <SkyLake.Huang@mediatek.com>, 
-	Sean Wang <sean.wang@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, 
-	Matthias Brugger <matthias.bgg@gmail.com>, linux-kernel@vger.kernel.org, 
-	linux-phy@lists.infradead.org, Qingfang Deng <dqfext@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	linux-mediatek@lists.infradead.org, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Kishon Vijay Abraham I <kishon@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>
-In-Reply-To: <5859da6629b8b6c100eca4062dd193105bf829ba.1702352117.git.daniel@makrotopia.org>
-References: <cover.1702352117.git.daniel@makrotopia.org>
- <5859da6629b8b6c100eca4062dd193105bf829ba.1702352117.git.daniel@makrotopia.org>
-Message-Id: <170235981509.39662.6730294984307830032.robh@kernel.org>
-Subject: Re: [RFC PATCH net-next v3 6/8] dt-bindings: net: mediatek: remove
- wrongly added clocks and SerDes
-Date: Mon, 11 Dec 2023 23:43:35 -0600
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231208005250.2910004-1-almasrymina@google.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-
-On Tue, 12 Dec 2023 03:48:10 +0000, Daniel Golle wrote:
-> Several clocks as well as both sgmiisys phandles were added by mistake
-> to the Ethernet bindings for MT7988.
-> 
-> This happened because the vendor driver which served as a reference
-> uses a high number of syscon phandles to access various parts of the
-> SoC which wasn't acceptable upstream. Hence several parts which have
-> never previously been supported (such SerDes PHY and USXGMII PCS) have
-> been moved to separate drivers which also result in a much more sane
-> device tree.
-> 
-> Quickly align the bindings with the upcoming reality of the drivers
-> actually adding full support for this SoC.
-> 
-> Fixes: c94a9aabec36 ("dt-bindings: net: mediatek,net: add mt7988-eth binding")
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
->  .../devicetree/bindings/net/mediatek,net.yaml | 32 ++++---------------
->  1 file changed, 7 insertions(+), 25 deletions(-)
-> 
-
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
-
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-Documentation/devicetree/bindings/net/pcs/mediatek,usxgmii.example.dts:18:18: fatal error: dt-bindings/clock/mediatek,mt7988-clk.h: No such file or directory
-make[2]: *** [scripts/Makefile.lib:419: Documentation/devicetree/bindings/net/pcs/mediatek,usxgmii.example.dtb] Error 1
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/5859da6629b8b6c100eca4062dd193105bf829ba.1702352117.git.daniel@makrotopia.org
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+Please don't spread scatterlists further.  They are a bad data structure
+that mix input data (page, offset, len) and output data (phys_addr,
+dma_offset, dma_len), and do in a horrible way for iommmu mappings that
+can coalesce.  Jason and coworkers have been looking into the long
+overdue API to better support batch mapping of better data structures,
+and this is a prime example of new code that should be using.
 
