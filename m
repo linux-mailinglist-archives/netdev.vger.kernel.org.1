@@ -1,68 +1,61 @@
-Return-Path: <netdev+bounces-56561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4D3F80F609
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 20:08:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92E9580F628
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 20:11:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F0051F216A9
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 19:08:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F7B7281E9F
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 19:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 460B280057;
-	Tue, 12 Dec 2023 19:08:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0B0780056;
+	Tue, 12 Dec 2023 19:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Au4hC/1g"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="AB8mY2O5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F1980047;
-	Tue, 12 Dec 2023 19:08:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D54B9C433C8;
-	Tue, 12 Dec 2023 19:08:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702408094;
-	bh=jhISTjjXnV6IhH0cY8Vge/0tePQdfehvyIi305w0McY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Au4hC/1gn8GAGqeNMIHMx+pf9H5e6cZx6if1YTAQ6myI1fcVcXp5E5HE2JZd7l5Ox
-	 z67YTPNEYCNjnSuydNuYjf11+fIKfzPgHgAvXDJMesthEcR7qviRft/QV/5zK2IHqc
-	 ruHQ42BTGcBdnaq77FMuM0r1fOHC9LqNVWjgGTPuAoXZTpwGA7dF5WXD028QLwM5fU
-	 83R8uUGoHmwAgKnoHD0ERZyXGTjjQTXsSeJdhkJcoe/E2jvGdjrJ/mAO3N0OzKkaja
-	 5wgu6LG6g2ra++dYX1DnvaNKyc0fxe1LJrSA1Kpyox0qvKLpHzYMqlHmzVyMur9vKu
-	 ehmZCE5A0RUew==
-Date: Tue, 12 Dec 2023 19:08:06 +0000
-From: Simon Horman <horms@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	bpf@vger.kernel.org, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	Shakeel Butt <shakeelb@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>
-Subject: Re: [net-next v1 14/16] net: add SO_DEVMEM_DONTNEED setsockopt to
- release RX frags
-Message-ID: <20231212190806.GB5817@kernel.org>
-References: <20231208005250.2910004-1-almasrymina@google.com>
- <20231208005250.2910004-15-almasrymina@google.com>
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93C9B9F;
+	Tue, 12 Dec 2023 11:11:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=zu77ILlFi8UZdCwbbdfAli/r3ogJZ+gYD8KfnKz3Xto=; b=AB8mY2O5mM4iFFqvSp5DxuKAuA
+	3UDwlqlPYgVWn6YxS3AaRoWtBp9CQ68IQ0DuFL02tdbw+EX/7Q9AaDDztULKReD7U0zeTHDb2SiAB
+	Xg7P+/CZ2c9W/af8rDdr8aPb8tjeOcQmIxUL942L/03Y9eh5FOY9CVSHSflzZ1KrEGb2POHKc1+dM
+	2lpJJUYMMtLR9A2lEnef9sftipoOsK6cfi21cm1GJaxExy53Xap7TF+mAgbvnuc9PMVdBb7VQpEK+
+	ofcLhNWqlIRrRXqDQJXBC4Je4I14PQRM4wA1HEEiN50g5f21yZ40gweyU+u3kXzwIDQoZRw3CcnRu
+	bSHtO2jQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41348)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rD89y-0007IH-0F;
+	Tue, 12 Dec 2023 19:11:14 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rD89z-0000h5-Ik; Tue, 12 Dec 2023 19:11:15 +0000
+Date: Tue, 12 Dec 2023 19:11:15 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Luo Jie <quic_luoj@quicinc.com>, agross@kernel.org,
+	andersson@kernel.org, konrad.dybcio@linaro.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	robert.marko@sartura.hr, linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, quic_srichara@quicinc.com
+Subject: Re: [PATCH v2 1/5] net: mdio: ipq4019: move eth_ldo_rdy before MDIO
+ bus register
+Message-ID: <ZXiwU7XnIeSY1NG4@shell.armlinux.org.uk>
+References: <20231212115151.20016-1-quic_luoj@quicinc.com>
+ <20231212115151.20016-2-quic_luoj@quicinc.com>
+ <20231212135001.6bf40e4d@device.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,73 +64,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231208005250.2910004-15-almasrymina@google.com>
+In-Reply-To: <20231212135001.6bf40e4d@device.home>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Dec 07, 2023 at 04:52:45PM -0800, Mina Almasry wrote:
-> Add an interface for the user to notify the kernel that it is done
-> reading the devmem dmabuf frags returned as cmsg. The kernel will
-> drop the reference on the frags to make them available for re-use.
+On Tue, Dec 12, 2023 at 01:50:01PM +0100, Maxime Chevallier wrote:
+> Hello,
 > 
-> Signed-off-by: Willem de Bruijn <willemb@google.com>
-> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> On Tue, 12 Dec 2023 19:51:46 +0800
+> Luo Jie <quic_luoj@quicinc.com> wrote:
+> > @@ -252,11 +244,32 @@ static int ipq4019_mdio_probe(struct platform_device *pdev)
+> >  	if (IS_ERR(priv->mdio_clk))
+> >  		return PTR_ERR(priv->mdio_clk);
+> >  
+> > -	/* The platform resource is provided on the chipset IPQ5018 */
+> > -	/* This resource is optional */
+> > -	res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
+> > -	if (res)
+> > -		priv->eth_ldo_rdy = devm_ioremap_resource(&pdev->dev, res);
+> > +	/* These platform resources are provided on the chipset IPQ5018 or
+> > +	 * IPQ5332.
+> > +	 */
+> > +	/* This resource are optional */
+> > +	for (index = 0; index < ETH_LDO_RDY_CNT; index++) {
+> > +		res = platform_get_resource(pdev, IORESOURCE_MEM, index + 1);
+> > +		if (res) {
+> > +			priv->eth_ldo_rdy[index] = devm_ioremap(&pdev->dev,
+> > +								res->start,
+> > +								resource_size(res));
+> 
+> You can simplify that sequence by using
+> devm_platform_get_and_ioremap_resource(), which will do both the
+> platform_get_resource and the devm_ioremap at once for you.
 
-...
+Sadly it can't if resources are optional. __devm_ioremap_resource()
+which will be capped by devm_platform_get_and_ioremap_resource() will
+be passed a NULL 'res', which will lead to:
 
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index fef349dd72fa..521bdc4ff260 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -1051,6 +1051,41 @@ static int sock_reserve_memory(struct sock *sk, int bytes)
->  	return 0;
->  }
->  
-> +static noinline_for_stack int
-> +sock_devmem_dontneed(struct sock *sk, sockptr_t optval, unsigned int optlen)
-> +{
-> +	struct dmabuf_token tokens[128];
+        if (!res || resource_type(res) != IORESOURCE_MEM) {
+                dev_err(dev, "invalid resource %pR\n", res);
+                return IOMEM_ERR_PTR(-EINVAL);
+        }
 
-Hi Mina,
+There isn't an "optional" version of
+devm_platform_get_and_ioremap_resource().
 
-I am guessing it is mostly due to the line above,
-but on x86 32bit builds I see:
-
-	warning: the frame size of 1048 bytes is larger than 1024 bytes [-Wframe-larger-than
-
-> +	unsigned int num_tokens, i, j;
-> +	int ret;
-> +
-> +	if (sk->sk_type != SOCK_STREAM || sk->sk_protocol != IPPROTO_TCP)
-> +		return -EBADF;
-> +
-> +	if (optlen % sizeof(struct dmabuf_token) || optlen > sizeof(tokens))
-> +		return -EINVAL;
-> +
-> +	num_tokens = optlen / sizeof(struct dmabuf_token);
-> +	if (copy_from_sockptr(tokens, optval, optlen))
-> +		return -EFAULT;
-> +
-> +	ret = 0;
-> +	for (i = 0; i < num_tokens; i++) {
-> +		for (j = 0; j < tokens[i].token_count; j++) {
-> +			struct page *page = xa_erase(&sk->sk_user_pages,
-> +						     tokens[i].token_start + j);
-> +
-> +			if (page) {
-> +				if (WARN_ON_ONCE(!napi_pp_put_page(page,
-> +								   false)))
-> +					page_pool_page_put_many(page, 1);
-> +				ret++;
-> +			}
-> +		}
-> +	}
-> +
-> +	return ret;
-> +}
-> +
->  void sockopt_lock_sock(struct sock *sk)
->  {
->  	/* When current->bpf_ctx is set, the setsockopt is called from
-
-...
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
