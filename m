@@ -1,275 +1,158 @@
-Return-Path: <netdev+bounces-56156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8747D80E03F
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 01:27:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4C4A80E074
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 01:49:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1195FB20F88
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:27:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF1391C2144F
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:49:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ECAC375;
-	Tue, 12 Dec 2023 00:27:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A22E539B;
+	Tue, 12 Dec 2023 00:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RpWetFEP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KbhA7Ddi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD348A2;
-	Mon, 11 Dec 2023 16:26:56 -0800 (PST)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-6ce94f62806so2865700b3a.1;
-        Mon, 11 Dec 2023 16:26:56 -0800 (PST)
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0362E99;
+	Mon, 11 Dec 2023 16:49:48 -0800 (PST)
+Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-77f320ca2d5so379772385a.1;
+        Mon, 11 Dec 2023 16:49:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702340816; x=1702945616; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1702342187; x=1702946987; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jSQyFr2oOPN4eJKATcaaKNeRdXLlB+uMHIeYmedc82w=;
-        b=RpWetFEPDqRP6m14yFSAA1TnG6sajGueoR/JZWYzKGLv0CeT7h6GDuRin35dKUphu4
-         Ci4SblY7YDf8Mx4g01au8rIv2Hg8rtx2PpplxYDPnEqkaUCkB0SzoZv/Cvly5RUJ3hsc
-         1NUom1grgtc0GJT3eVP4ooKpJjjLTFRAjTsy75ZxWiP6CDQ1VvORIofMByXUK/5F3YDV
-         5qZ9FjyH/MyAsmMoxKOj7wQKqU9icuDoMESrJukqz+hDw5YP7mnY34StHesGOJXm34Fc
-         22N7rvbXtbmHLdUojczz1c6o5Py1bAL0vRfzIwi87oKFdZF+Pt/+L7SNMCkeaIfolrU9
-         aSCA==
+        bh=VqLY/u4bvnBwh4bnY6OxwjJDU9FT7fMClax0nElNopo=;
+        b=KbhA7DdinYjb2F89wkZ0lglCpd5K4qt+w04PZFdYqwzXgu04DjFRH7ODpQOpiLruf+
+         pprQE8PzJZVyskRIfMNAO/SJobLTrUQKSmCU27ylUKiKJL9SuLzmgrD8H5xphvS2awoL
+         hDmgOKgNTV/pbyfGK6GlBvdkwaSvCJVSFiqsd3T9rC/wn36YFmneV8ZA33P9P9/AjC1R
+         qaSOuO6vQ5KvsetE6s3M/ECqzH19X8BsDfFH62NhU8lXKRpBWo22ngUy1cmcNOVs3Low
+         AWJKlun7Q9EREo3I/D326WxKTc2LIpprjHga1ddRBySPlbLjha5aALFIK1kMbNH2Ex6Q
+         H89w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702340816; x=1702945616;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jSQyFr2oOPN4eJKATcaaKNeRdXLlB+uMHIeYmedc82w=;
-        b=FXtlLKISfxN+3BJsknA02cYi+hr1+zpQDfiilml8PX4wHxXfSR88daQaH16bLpZr+v
-         nUdmuuKT8eU5AHWkx6Ss0dcaQWx4Ed76+T9aR4G7DDURCEI/aFLTxZzkY45uzUIgmBqw
-         R+rbnNaVwd5HkDTkavrk0GJqqfsCgscg30c/XLOvzMe8ggjM8JT3Rv1gWM56Y7oSW63P
-         oJY05/LMzzc33wmPWxzp2fDSlp6C+2DAaMxDFmE0fwKM3vQgRjb/WpOwNemvZPrhT92B
-         lW09fJ3NvaStY51pJfR8yM3HYb6Esz3z9KpCMiILBQq1lQCkwfn/c/+ZW6/yMhugkCJW
-         DeYw==
-X-Gm-Message-State: AOJu0YxUAytdHNzI6O2Xz8Kdh/yTyr2zjo+dhGe7TPIhRqzZ/NEBDGKl
-	JMbYWoAMFRwBQjKYdJtjlGw=
-X-Google-Smtp-Source: AGHT+IE9bubbYpMbmSeuNhsCa9D4nLlifwvJI5f8ivdhlvLDMDlxjL6HtD236PupYxryjevy5xZzVA==
-X-Received: by 2002:a05:6a20:918d:b0:190:46c8:a3dc with SMTP id v13-20020a056a20918d00b0019046c8a3dcmr2647560pzd.5.1702340816197;
-        Mon, 11 Dec 2023 16:26:56 -0800 (PST)
-Received: from localhost ([98.97.32.4])
-        by smtp.gmail.com with ESMTPSA id q19-20020a170902bd9300b001cc2ebd2c2csm7285851pls.256.2023.12.11.16.26.55
+        d=1e100.net; s=20230601; t=1702342187; x=1702946987;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VqLY/u4bvnBwh4bnY6OxwjJDU9FT7fMClax0nElNopo=;
+        b=R2p+7eAMgZVumrdK1uClR10x7ss/MrS4o0mHrNX/5m/BG6C14FTyC1aVoZo7gx95Aj
+         JuUA3VyXQn0P9VeXmL354wH+x3B3r3oM6PGn9apoPIXrN1k/BRhcJ9uvh7zsvyw6J6mk
+         L8kUQwqskv9Yj8Sw4eVmdWKSfWsVfyvQWlqu4CKAZdAMYCYz6Yx7R4y3VMCOiQT2EMHH
+         hajoh9ufHkPE5N5iXvUE9GoBjtH7AoiLuEvOANZI9Yba8IuWFgM3e6oE5QBeYICSjRbK
+         onRsWszI7jrkitzwyTcaZdswLJjgaThGHJHQl2k/sjk2wxJ1Cl5k1yFkg6ZeT8S+EVXB
+         8Cjg==
+X-Gm-Message-State: AOJu0YzfkBPe+7FcRm+U95xTOwpcP5tyoRFLLaojwGTZuVHFAgFUH2aG
+	rJkQq4QvUy+9PVwjOs2HIXU=
+X-Google-Smtp-Source: AGHT+IFQwfihMHJtYIz93PxDCAlJP5Q7EprZ6W+bVsK3qL4XaGTZn2/VKLBUd4n90HuFAN2oxUtuwA==
+X-Received: by 2002:a05:620a:6007:b0:77f:2f54:f990 with SMTP id dw7-20020a05620a600700b0077f2f54f990mr8573162qkb.67.1702342187079;
+        Mon, 11 Dec 2023 16:49:47 -0800 (PST)
+Received: from auth1-smtp.messagingengine.com (auth1-smtp.messagingengine.com. [66.111.4.227])
+        by smtp.gmail.com with ESMTPSA id ov11-20020a05620a628b00b0077d7e9a134bsm3336384qkn.129.2023.12.11.16.49.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 16:26:55 -0800 (PST)
-Date: Mon, 11 Dec 2023 16:26:54 -0800
-From: John Fastabend <john.fastabend@gmail.com>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>, 
- John Fastabend <john.fastabend@gmail.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, 
- bpf@vger.kernel.org, 
- netdev@vger.kernel.org, 
- paul@paul-moore.com, 
- brauner@kernel.org, 
- linux-fsdevel@vger.kernel.org, 
- linux-security-module@vger.kernel.org, 
- keescook@chromium.org, 
- kernel-team@meta.com, 
- sargun@sargun.me
-Message-ID: <6577a8ce777d9_1449c20858@john.notmuch>
-In-Reply-To: <CAEf4BzYZ0Xkme8pwWoXE5wvQhp+DzUixn3ueJMFmDqUk9Dox7A@mail.gmail.com>
-References: <20231207185443.2297160-1-andrii@kernel.org>
- <20231207185443.2297160-7-andrii@kernel.org>
- <657793942699a_edaa208bc@john.notmuch>
- <CAEf4BzYZ0Xkme8pwWoXE5wvQhp+DzUixn3ueJMFmDqUk9Dox7A@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 6/8] libbpf: wire up BPF token support at BPF
- object level
+        Mon, 11 Dec 2023 16:49:46 -0800 (PST)
+Received: from compute7.internal (compute7.nyi.internal [10.202.2.48])
+	by mailauth.nyi.internal (Postfix) with ESMTP id 2AEB927C005A;
+	Mon, 11 Dec 2023 19:49:44 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute7.internal (MEProxy); Mon, 11 Dec 2023 19:49:44 -0500
+X-ME-Sender: <xms:J653ZXgWsN1ZxbmnLYwet5xXCveCp6NwwoTc25C9xT12X_EtGQcyaA>
+    <xme:J653ZUB9v6YKPHiuu9P4IAfbBA4JH8tfya_j7t9A1JEmKrSGZMK716yUzkJk3ACMh
+    xnCR2DqEHkyb0Q8ag>
+X-ME-Received: <xmr:J653ZXEscPg8BPAbm2WiWGU7FsOzWFG6YtW1zUrwffkFnpGJsKJEf3_J330Ptg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudelfedgvdejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepuehoqhhu
+    nhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrdgtohhmqeenucggtffrrg
+    htthgvrhhnpeehudfgudffffetuedtvdehueevledvhfelleeivedtgeeuhfegueeviedu
+    ffeivdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    gsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdeiledvgeehtdei
+    gedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppehgmhgrihhlrdgtohhmsehfih
+    igmhgvrdhnrghmvg
+X-ME-Proxy: <xmx:J653ZUTev8rRUAhs34lQ66jFe8ZwUQNy1BySx04BJRg54MaNznxmdg>
+    <xmx:J653ZUx_VtCo04U9lr56zgOQONBxAmYK9E5KkBoUOr5CPWAY3zxMug>
+    <xmx:J653Za4XKS5xf3dPVN8MWXFDxmA7_v3_AhCNsHKQxRuOFzP7AmAxyA>
+    <xmx:J653ZQcYWU5jts4OA3Byh4h78pLVft9-kjumgLz8NoeUZrWcfaHiOw>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 11 Dec 2023 19:49:43 -0500 (EST)
+Date: Mon, 11 Dec 2023 16:49:39 -0800
+From: Boqun Feng <boqun.feng@gmail.com>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: alice@ryhl.io, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
+	andrew@lunn.ch, tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com,
+	benno.lossin@proton.me, wedsonaf@gmail.com, aliceryhl@google.com
+Subject: Re: [PATCH net-next v10 1/4] rust: core abstractions for network PHY
+ drivers
+Message-ID: <ZXeuI3eulyIlrAvL@boqun-archlinux>
+References: <ccf2b9af-1c8c-44c4-bb93-51dd9ea1cccf@ryhl.io>
+ <20231212.081505.1423250811446494582.fujita.tomonori@gmail.com>
+ <ZXed8cQLJhDSTuXG@boqun-archlinux>
+ <20231212.084753.1364639100103922268.fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231212.084753.1364639100103922268.fujita.tomonori@gmail.com>
 
-Andrii Nakryiko wrote:
-> On Mon, Dec 11, 2023 at 2:56=E2=80=AFPM John Fastabend <john.fastabend@=
-gmail.com> wrote:
-> >
-> > Andrii Nakryiko wrote:
-> > > Add BPF token support to BPF object-level functionality.
-> > >
-> > > BPF token is supported by BPF object logic either as an explicitly
-> > > provided BPF token from outside (through BPF FS path or explicit BP=
-F
-> > > token FD), or implicitly (unless prevented through
-> > > bpf_object_open_opts).
-> > >
-> > > Implicit mode is assumed to be the most common one for user namespa=
-ced
-> > > unprivileged workloads. The assumption is that privileged container=
+On Tue, Dec 12, 2023 at 08:47:53AM +0900, FUJITA Tomonori wrote:
+> On Mon, 11 Dec 2023 15:40:33 -0800
+> Boqun Feng <boqun.feng@gmail.com> wrote:
+> 
+> > On Tue, Dec 12, 2023 at 08:15:05AM +0900, FUJITA Tomonori wrote:
+> > [...]
+> >> >> +    /// Reads a given C22 PHY register.
+> >> >> + // This function reads a hardware register and updates the stats so
+> >> >> takes `&mut self`.
+> >> >> +    pub fn read(&mut self, regnum: u16) -> Result<u16> {
+> >> >> +        let phydev = self.0.get();
+> >> >> + // SAFETY: `phydev` is pointing to a valid object by the type
+> >> >> invariant of `Self`.
+> >> >> +        // So an FFI call with a valid pointer.
+> >> > 
+> >> > This sentence also doesn't parse in my brain. Perhaps "So it's just an
+> >> > FFI call" or similar?
+> >> 
+> >> "So it's just an FFI call" looks good. I'll fix all the places that
+> >> use the same comment.
+> > 
+> > I would also mention that `(*phydev).mdio.addr` is smaller than
+> > PHY_MAX_ADDR (per C side invariants in mdio maybe), since otherwise
+> > mdiobus_read() would cause out-of-bound accesses at ->stats. The safety
+> > comments are supposed to describe why calling the C function won't cause
+> > memory safety issues..
+> 
+> (*phydev).mdio.addr is managed in the C side and Rust code doesn't
 
-> > > manager sets up default BPF FS mount point at /sys/fs/bpf with BPF =
-token
-> > > delegation options (delegate_{cmds,maps,progs,attachs} mount option=
-s).
-> > > BPF object during loading will attempt to create BPF token from
-> > > /sys/fs/bpf location, and pass it for all relevant operations
-> > > (currently, map creation, BTF load, and program load).
-> > >
-> > > In this implicit mode, if BPF token creation fails due to whatever
-> > > reason (BPF FS is not mounted, or kernel doesn't support BPF token,=
+It's OK to rely on C side to give a correct addr value.
 
-> > > etc), this is not considered an error. BPF object loading sequence =
-will
-> > > proceed with no BPF token.
-> > >
-> > > In explicit BPF token mode, user provides explicitly either custom =
-BPF
-> > > FS mount point path or creates BPF token on their own and just pass=
-es
-> > > token FD directly. In such case, BPF object will either dup() token=
- FD
-> > > (to not require caller to hold onto it for entire duration of BPF o=
-bject
-> > > lifetime) or will attempt to create BPF token from provided BPF FS
-> > > location. If BPF token creation fails, that is considered a critica=
-l
-> > > error and BPF object load fails with an error.
-> > >
-> > > Libbpf provides a way to disable implicit BPF token creation, if it=
+> touch it (doesn't need to know anything about it). What safety comment
+> should be written here?
 
-> > > causes any troubles (BPF token is designed to be completely optiona=
-l and
-> > > shouldn't cause any problems even if provided, but in the world of =
-BPF
-> > > LSM, custom security logic can be installed that might change outco=
-me
-> > > dependin on the presence of BPF token). To disable libbpf's default=
- BPF
-> > > token creation behavior user should provide either invalid BPF toke=
-n FD
-> > > (negative), or empty bpf_token_path option.
-> > >
-> > > BPF token presence can influence libbpf's feature probing, so if BP=
-F
-> > > object has associated BPF token, feature probing is instructed to u=
-se
-> > > BPF object-specific feature detection cache and token FD.
-> > >
-> > > Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
-> > > ---
-> > >  tools/lib/bpf/btf.c             |   7 +-
-> > >  tools/lib/bpf/libbpf.c          | 120 ++++++++++++++++++++++++++++=
-++--
-> > >  tools/lib/bpf/libbpf.h          |  28 +++++++-
-> > >  tools/lib/bpf/libbpf_internal.h |  17 ++++-
-> > >  4 files changed, 160 insertions(+), 12 deletions(-)
-> > >
-> >
-> > ...
-> >
-> > >
-> > > +static int bpf_object_prepare_token(struct bpf_object *obj)
-> > > +{
-> > > +     const char *bpffs_path;
-> > > +     int bpffs_fd =3D -1, token_fd, err;
-> > > +     bool mandatory;
-> > > +     enum libbpf_print_level level =3D LIBBPF_DEBUG;
-> >
-> > redundant set on level?
-> >
-> =
+Basically, here Rust just does the same as C does in phy_read(), right?
+So why phy_read() is implemented correctly, because C side maintains the
+`(*phydev).mdio.addr` in that way. We ususally don't call it out in C
+code, since it's obvious(TM), and there is no safe/unsafe boundary in C
+side. But in Rust code, that matters. Yes, Rust doesn't control the
+value of `(*phydev).mdio.addr`, but Rust chooses to trust C, in other
+words, as long as C side holds the invariants, calling mdiobus_read() is
+safe here. How about 
 
-> yep, removed initialization
-> =
+// SAFETY: `phydev` points to valid object per the type invariant of
+// `Self`, also `(*phydev).mdio` is totally maintained by C in a way
+// that `(*phydev).mdio.bus` is a pointer to a valid `mii_bus` and
+// `(*phydev).mdio.addr` is less than PHY_MAX_ADDR, so it's safe to call
+// `mdiobus_read`.
 
-> > > +
-> > > +     /* token is already set up */
-> > > +     if (obj->token_fd > 0)
-> > > +             return 0;
-> > > +     /* token is explicitly prevented */
-> > > +     if (obj->token_fd < 0) {
-> > > +             pr_debug("object '%s': token is prevented, skipping..=
-.\n", obj->name);
-> > > +             /* reset to zero to avoid extra checks during map_cre=
-ate and prog_load steps */
-> > > +             obj->token_fd =3D 0;
-> > > +             return 0;
-> > > +     }
-> > > +
-> > > +     mandatory =3D obj->token_path !=3D NULL;
-> > > +     level =3D mandatory ? LIBBPF_WARN : LIBBPF_DEBUG;
-> > > +
-> > > +     bpffs_path =3D obj->token_path ?: BPF_FS_DEFAULT_PATH;
-> > > +     bpffs_fd =3D open(bpffs_path, O_DIRECTORY, O_RDWR);
-> > > +     if (bpffs_fd < 0) {
-> > > +             err =3D -errno;
-> > > +             __pr(level, "object '%s': failed (%d) to open BPF FS =
-mount at '%s'%s\n",
-> > > +                  obj->name, err, bpffs_path,
-> > > +                  mandatory ? "" : ", skipping optional step...");=
+?
 
-> > > +             return mandatory ? err : 0;
-> > > +     }
-> > > +
-> > > +     token_fd =3D bpf_token_create(bpffs_fd, 0);
-> >
-> > Did this get tested on older kernels? In that case TOKEN_CREATE will
-> > fail with -EINVAL.
-> =
-
-> yep, I did actually test, it will generate expected *debug*-level
-> "failed to create BPF token" message
-
-Great.
-
-> =
-
-> >
-> > > +     close(bpffs_fd);
-> > > +     if (token_fd < 0) {
-> > > +             if (!mandatory && token_fd =3D=3D -ENOENT) {
-> > > +                     pr_debug("object '%s': BPF FS at '%s' doesn't=
- have BPF token delegation set up, skipping...\n",
-> > > +                              obj->name, bpffs_path);
-> > > +                     return 0;
-> > > +             }
-> >
-> > Isn't there a case here we should give a warning about?  If BPF_TOKEN=
-_CREATE
-> > exists and !mandatory, but default BPFFS failed for enomem, or eperm =
-reasons?
-> > If the user reall/y doesn't want tokens here they should maybe overri=
-de with
-> > -1 token? My thought is if you have delegations set up then something=
- on the
-> > system is trying to configure this and an error might be ok? I'm aski=
-ng just
-> > because I paused on it for a bit not sure either way at the moment. I=
- might
-> > imagine a lazy program not specifying the default bpffs, but also rea=
-lly
-> > thinking its going to get a valid token.
-> =
-
-> Interesting perspective! I actually came from the direction that BPF
-> token is not really all that common and expected thing, and so in
-> majority of cases (at least for some time) we won't be expecting to
-> have BPF FS with delegation options. So emitting a warning that
-> "something something BPF token failed" would be disconcerting to most
-> users.
-> =
-
-> What's the worst that would happen if BPF token was expected but we
-> failed to instantiate it? You'll get a BPF object load failure with
-> -EPERM, so it will be a pretty clear signal that whatever delegation
-> was supposed to happen didn't happen.
-> =
-
-> Also, if a user wants a BPF token for sure, they can explicitly set
-> bpf_token_path =3D "/sys/fs/bpf" and then it becomes mandatory.
-> =
-
-> So tl;dr, my perspective is that most users won't know or care about
-> BPF tokens. If sysadmin set up BPF FS correctly, it should just work
-> without the BPF application being aware. But for those rare cases
-> where a BPF token is expected and necessary, explicit bpf_token_path
-> or bpf_token_fd is the way to fail early, if something is not set up
-> the way it is expected.
-
-Works for me. I don't have a strong opinion either way.=
+Regards,
+Boqun
 
