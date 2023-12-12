@@ -1,190 +1,204 @@
-Return-Path: <netdev+bounces-56504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9997E80F264
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 17:24:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99E4A80F269
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 17:26:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 022B2B20A3F
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 16:24:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55167281A68
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 16:26:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF6277F24;
-	Tue, 12 Dec 2023 16:24:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD52C77F27;
+	Tue, 12 Dec 2023 16:26:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QREA5gfn"
+	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="BW//IBTO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 482657765B;
-	Tue, 12 Dec 2023 16:24:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2E91C433C8;
-	Tue, 12 Dec 2023 16:24:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702398268;
-	bh=ta9qDCjTjWyR69j+7I8MCMvgrq55mLcwFImJg/bIQqQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QREA5gfn0t5sFMgfMcbuSLToFiNaFbG2PP5+kap/TYoImqaFVXsuQZbwHsfEBj4G9
-	 wd1pVutWwMd2x7Q73CID/VvF/hVszlWNzNOr1WFVtEwuBmMj9klBvcbmOoNDsDfq4e
-	 pTCgr1EIqC+xZ4Tuyr8ViEqaedZ0As6Jfi+jdL6Y07o9WcOxTSscexH0uK16lQSNYh
-	 ADyRNuh824v/9OvV7VkjXcjGu11lgEbIhgsJyy5twFGNYF04k4y9qfQJ2eDR4YkafI
-	 esdU5n+FCz3yVoITRk8NJZLj9lEfpvnEZeY6glFGugS27Aup+X2j25OJVf3FNJdcsO
-	 D9Dx76SbASWFA==
-Date: Tue, 12 Dec 2023 16:24:20 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chunfeng Yun <chunfeng.yun@mediatek.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexander Couzens <lynxis@fe80.eu>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org
-Subject: Re: [RFC PATCH net-next v3 4/8] dt-bindings: net: pcs: add bindings
- for MediaTek USXGMII PCS
-Message-ID: <20231212-panhandle-pasty-243c3556ea51@spud>
-References: <cover.1702352117.git.daniel@makrotopia.org>
- <510af8550385da947e2e2516629c4fbed7fc0f64.1702352117.git.daniel@makrotopia.org>
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC1E2DB;
+	Tue, 12 Dec 2023 08:26:40 -0800 (PST)
+Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id 5914C1DFFE;
+	Tue, 12 Dec 2023 18:26:39 +0200 (EET)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id 3FB141E050;
+	Tue, 12 Dec 2023 18:26:39 +0200 (EET)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id A2B593C07C9;
+	Tue, 12 Dec 2023 18:26:36 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1702398397; bh=A73Da8Wws5MkcUHMuvOI8wVJOuiARSqG0iwVcVpJLr8=;
+	h=From:To:Cc:Subject:Date;
+	b=BW//IBTOI9IBDFoYzQJBKlTASyWkvc7NtleDy7CHEAwU6tsUkRCD4SGO0BaI3+EIm
+	 ls6G9ATaxfxw1pJKWrgu2oh5J/rhbDrUSXjU+adz6CAjcPqr0dAhDuVeFnKuLsfRtV
+	 FhyRdSPP6SdboQaFx3lXg+o0hT7nlCyhP8DPAwnc=
+Received: from ja.home.ssi.bg (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 3BCGQTdc094044;
+	Tue, 12 Dec 2023 18:26:29 +0200
+Received: (from root@localhost)
+	by ja.home.ssi.bg (8.17.1/8.17.1/Submit) id 3BCGQQEu094039;
+	Tue, 12 Dec 2023 18:26:26 +0200
+From: Julian Anastasov <ja@ssi.bg>
+To: Simon Horman <horms@verge.net.au>
+Cc: lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        netdev@vger.kernel.org, Dust Li <dust.li@linux.alibaba.com>,
+        Jiejian Wu <jiejian@linux.alibaba.com>,
+        Jiri Wiesner <jwiesner@suse.de>
+Subject: [PATCHv2 RFC net-next 00/14] ipvs: per-net tables and optimizations
+Date: Tue, 12 Dec 2023 18:24:30 +0200
+Message-ID: <20231212162444.93801-1-ja@ssi.bg>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="YruC2MCzDdXijj9+"
-Content-Disposition: inline
-In-Reply-To: <510af8550385da947e2e2516629c4fbed7fc0f64.1702352117.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
+
+	Hello,
+
+	This patchset targets more netns isolation when IPVS
+is used in large setups and also includes some optimizations.
+This is a RFC submission to get wider review and comments.
+
+	First patch adds useful wrappers to rculist_bl, the
+hlist_bl methods IPVS will use in the following patches. The other
+patches are IPVS-specific.
+
+	The following patches will:
+
+* Convert the global __ip_vs_mutex to per-net service_mutex and
+  switch the service tables to be per-net, cowork by Jiejian Wu and
+  Dust Li
+
+* Convert some code that walks the service lists to use RCU instead of
+  the service_mutex
+
+* We used two tables for services (non-fwmark and fwmark), merge them
+  into single svc_table
+
+* The list for unavailable destinations (dest_trash) holds dsts and
+  thus dev references causing extra work for the ip_vs_dst_event() dev
+  notifier handler. Change this by dropping the reference when dest
+  is removed and saved into dest_trash. The dest_trash will need more
+  changes to make it light for lookups. TODO.
+
+* On new connection we can do multiple lookups for services by tryng
+  different fallback options. Add more counters for service types, so
+  that we can avoid unneeded lookups for services.
+
+* Add infrastructure for resizable hash tables based on hlist_bl
+  which we will use for services and connections: hlists with
+  per-bucket bit lock in the heads. The resizing delays RCU lookups
+  on a bucket level with seqcounts which are protected with spin locks.
+
+* Change the 256-bucket service hash table to be resizable in the
+  range of 4..20 bits depending on the added services and use jhash
+  hashing to reduce the collisions.
+
+* Change the global connection table to be per-net and resizable
+  in the range of 256..ip_vs_conn_tab_size. As the connections are
+  hashed by using remote addresses and ports, use siphash instead
+  of jhash for better security.
+
+* As the connection table is not fixed size, show its current size
+  to user space
+
+* As the connection table is not global anymore, the no_cport and
+  dropentry counters can be per-net
+
+* Make the connection hashing more secure for setups with multiple
+  services. Hashing only by remote address and port (client info)
+  is not enough. To reduce the possible hash collisions add the
+  used virtual address/port (local info) into the hash and as a side
+  effect the MASQ connections will be double hashed into the
+  hash table to match the traffic from real servers:
+    OLD:
+    - all methods: c_list node: proto, caddr:cport
+    NEW:
+    - all methods: hn0 node (dir 0): proto, caddr:cport -> vaddr:vport
+    - MASQ method: hn1 node (dir 1): proto, daddr:dport -> caddr:cport
+
+* Add /proc/net/ip_vs_status to show current state of IPVS, per-net
+
+cat /proc/net/ip_vs_status
+Conns:	9401
+Conn buckets:	524288 (19 bits, lfactor 5)
+Conn buckets empty:	505633 (96%)
+Conn buckets len-1:	18322 (98%)
+Conn buckets len-2:	329 (1%)
+Conn buckets len-3:	3 (0%)
+Conn buckets len-4:	1 (0%)
+Services:	12
+Service buckets:	128 (7 bits, lfactor 3)
+Service buckets empty:	116 (90%)
+Service buckets len-1:	12 (100%)
+Stats thread slots:	1 (max 16)
+Stats chain max len:	16
+Stats thread ests:	38400
+
+It shows the table size, the load factor, how many are the empty
+buckets, with percents from the all buckets, the number of buckets
+with length 1..7 where len-7 catches all len>=7 (zero values are
+not shown). The len-N percents ignore the empty buckets, so they
+are relative among all len-N buckets. It shows that large lfactor
+is needed to achieve len-1 buckets to be ~98%. Only real tests can
+show if relying on len-1 buckets is a better option because the
+hash table becomes too large with multiple connections. And as
+every table uses random key, the services may not avoid collision
+in all cases.
+
+* add conn_lfactor and svc_lfactor sysctl vars, so that one can tune
+  the connection/service hash table sizing
+
+Changes in v2:
+Patch 1:
+* add comments to hlist_bl_for_each_entry_continue_rcu and fix
+  sparse warnings
+Patch 9:
+* Simon Kirby reports that backup server crashes if conn_tab is not
+  created. Create it just to sync conns before any services are added.
+Patch 11:
+* kernel test robot reported for dropentry_counters problem when
+  compiling with !CONFIG_SYSCTL, so it is time to wrap todrop_entry,
+  ip_vs_conn_ops_mode and ip_vs_random_dropentry under CONFIG_SYSCTL
+Patch 13:
+* remove extra old_gen assignment at start of ip_vs_status_show()
+
+Jiejian Wu (1):
+  ipvs: make ip_vs_svc_table and ip_vs_svc_fwm_table per netns
+
+Julian Anastasov (13):
+  rculist_bl: add hlist_bl_for_each_entry_continue_rcu
+  ipvs: some service readers can use RCU
+  ipvs: use single svc table
+  ipvs: do not keep dest_dst after dest is removed
+  ipvs: use more counters to avoid service lookups
+  ipvs: add resizable hash tables
+  ipvs: use resizable hash table for services
+  ipvs: switch to per-net connection table
+  ipvs: show the current conn_tab size to users
+  ipvs: no_cport and dropentry counters can be per-net
+  ipvs: use more keys for connection hashing
+  ipvs: add ip_vs_status info
+  ipvs: add conn_lfactor and svc_lfactor sysctl vars
+
+ Documentation/networking/ipvs-sysctl.rst |   31 +
+ include/linux/rculist_bl.h               |   49 +-
+ include/net/ip_vs.h                      |  395 ++++++-
+ net/netfilter/ipvs/ip_vs_conn.c          | 1074 ++++++++++++++-----
+ net/netfilter/ipvs/ip_vs_core.c          |  171 ++-
+ net/netfilter/ipvs/ip_vs_ctl.c           | 1231 ++++++++++++++++------
+ net/netfilter/ipvs/ip_vs_est.c           |   18 +-
+ net/netfilter/ipvs/ip_vs_pe_sip.c        |    4 +-
+ net/netfilter/ipvs/ip_vs_sync.c          |   23 +
+ net/netfilter/ipvs/ip_vs_xmit.c          |   39 +-
+ 10 files changed, 2342 insertions(+), 693 deletions(-)
+
+-- 
+2.43.0
 
 
---YruC2MCzDdXijj9+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Dec 12, 2023 at 03:47:31AM +0000, Daniel Golle wrote:
-> MediaTek's USXGMII can be found in the MT7988 SoC. We need to access
-> it in order to configure and monitor the Ethernet SerDes link in
-> USXGMII, 10GBase-R and 5GBase-R mode. By including a wrapped
-> legacy 1000Base-X/2500Base-X/Cisco SGMII LynxI PCS as well, those
-> interface modes are also available.
->=20
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
->  .../bindings/net/pcs/mediatek,usxgmii.yaml    | 60 +++++++++++++++++++
->  1 file changed, 60 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/pcs/mediatek,us=
-xgmii.yaml
->=20
-> diff --git a/Documentation/devicetree/bindings/net/pcs/mediatek,usxgmii.y=
-aml b/Documentation/devicetree/bindings/net/pcs/mediatek,usxgmii.yaml
-> new file mode 100644
-> index 0000000000000..0cdaa3545edb0
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/pcs/mediatek,usxgmii.yaml
-> @@ -0,0 +1,60 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/pcs/mediatek,usxgmii.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: MediaTek USXGMII PCS
-> +
-> +maintainers:
-> +  - Daniel Golle <daniel@makrotopia.org>
-> +
-> +description:
-> +  The MediaTek USXGMII PCS provides physical link control and status
-> +  for USXGMII, 10GBase-R and 5GBase-R links on the SerDes interfaces
-> +  provided by the PEXTP PHY.
-> +  In order to also support legacy 2500Base-X, 1000Base-X and Cisco
-> +  SGMII an existing mediatek,*-sgmiisys LynxI PCS is wrapped to
-> +  provide those interfaces modes on the same SerDes interfaces shared
-> +  with the USXGMII PCS.
-> +
-> +properties:
-> +  $nodename:
-> +    pattern: "^pcs@[0-9a-f]+$"
-> +
-> +  compatible:
-> +    const: mediatek,mt7988-usxgmiisys
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    items:
-> +      - description: USXGMII top-level clock
-> +
-> +  resets:
-> +    items:
-> +      - description: XFI reset
-
-For this two, why not just "maxItems: 1", since there are only one of
-each?
-
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - clocks
-> +  - resets
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/clock/mediatek,mt7988-clk.h>
-
-> +    #define MT7988_TOPRGU_XFI0_GRST 12
-
-Why? You can just put the raw numbers here and avoid the issues with the
-bot being unable to test your series.
-
-> +    soc {
-> +      #address-cells =3D <2>;
-> +      #size-cells =3D <2>;
-> +        usxgmiisys0: pcs@10080000 {
-> +          compatible =3D "mediatek,mt7988-usxgmiisys";
-> +          reg =3D <0 0x10080000 0 0x1000>;
-> +          clocks =3D <&topckgen CLK_TOP_USXGMII_SBUS_0_SEL>;
-> +          resets =3D <&watchdog MT7988_TOPRGU_XFI0_GRST>;
-> +        };
-> +    };
-> --=20
-> 2.43.0
-
---YruC2MCzDdXijj9+
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZXiJNAAKCRB4tDGHoIJi
-0gh/AP9oyVQ1N3J5pkEjMly0tOqZP7FqsYaPHKpAmHAo3tjaRAEApbppZl/Wk2dK
-aaGNYg45wHQl3e7wiQc2iLV/iy3CkgU=
-=IpBA
------END PGP SIGNATURE-----
-
---YruC2MCzDdXijj9+--
 
