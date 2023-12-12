@@ -1,244 +1,309 @@
-Return-Path: <netdev+bounces-56544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11A8780F4EC
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 18:51:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF45480F4FE
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 18:54:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87C921F21708
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 17:51:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDB32281DB5
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 17:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8D6D7D8B6;
-	Tue, 12 Dec 2023 17:51:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D196C7D8B8;
+	Tue, 12 Dec 2023 17:53:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="HwT2nbkZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U5FghooL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFF7C83;
-	Tue, 12 Dec 2023 09:51:28 -0800 (PST)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 7D5FD100049;
-	Tue, 12 Dec 2023 20:51:27 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 7D5FD100049
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1702403487;
-	bh=yGJlOf/j2McGPzvljEr6MMisBrMZAZjoccSqTDW4uRI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=HwT2nbkZMMUfG+DcLYYdXbAFOzWmYbAiTgiStOJHzJon4H0V6FpYVQYy8DzMUF4eg
-	 ssqLixs3C0TJOodMS3BPA6x3wqkStgi2uZNs8OyqBGmaXxqSLHoWFTla0y1X8WtBFS
-	 hGQnq4aNseFR1RFquhM9okKSTRlU1jxD+FXCB+VK8MpESfiUvRWtxArrbQ8wqIcG/M
-	 Mo8n4oohTiczMTowa7YprzLYFkwAVkL9VyHqUWmxMpq9GLTTLopJN3voste/JtYgOW
-	 UzmH31wgPN/WU09FZLCfC1+VctVeqkIys+9HSkKRdV0HG+cJC75AVVFDsljI/PoSZI
-	 fXwZDKvTn0ZGA==
-Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Tue, 12 Dec 2023 20:51:27 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 12 Dec 2023 20:51:26 +0300
-Message-ID: <7b362aef-6774-0e08-81e9-0a6f7f616290@salutedevices.com>
-Date: Tue, 12 Dec 2023 20:43:07 +0300
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D37483
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 09:53:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702403630;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DdlHDXKia7dZsATDkFa8oWY9uFwh0XkWCfO7wMb7BdI=;
+	b=U5FghooLuAhUJi56mePBhn+Fa93DWlYRYaDepYRFoDs0N9b2uztwK2gMq7qMr1IfNT/L3y
+	PwdhnpB3cKVnABEaAqTaHGYx8AFnK5P2SacYI++cZY81/GtyEhsnpMfeGxl6FwrECZTZtd
+	2gno94LYbVX/lfKJz1zntV4F5cX5trc=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-107-rIK6fZeOPluNWpX-sg60wQ-1; Tue, 12 Dec 2023 12:53:49 -0500
+X-MC-Unique: rIK6fZeOPluNWpX-sg60wQ-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-77f515c2a5fso593144585a.1
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 09:53:49 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702403628; x=1703008428;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DdlHDXKia7dZsATDkFa8oWY9uFwh0XkWCfO7wMb7BdI=;
+        b=W5KMeq/3AXrwTm0DAms5vbLASpn/yRbtW8PG4YA5FQyv6PVg3vTcY1qaZrarNHi0uA
+         dL50+GaIbUbJMS+DvZWzqYQyrf0Mb2/sjk7S+iEGvoVHBMrntwacRjmnyPXloeQST4nY
+         yrcRrdG/Ew8RFQxeMuu/ipaiz8w3/aCxfRsuZSjXzgouTJX6QKpBWlrzHpQ7jo4d+hWZ
+         i11bFJW73hXKxFnV69wDzeoFC7hNGweh9sXEAHqYhRI5hv74jo92uCNUZcMzx56FLmJD
+         FUa3YMjA6fznX+tWS+XA3TQXmUY+E/9Gjyzl5cQkZ0aRJFwH4z2BzJwmgcMIctdFAWNM
+         LruA==
+X-Gm-Message-State: AOJu0YzgDzcWsRGNVLsLIA8EB6x3KBz1LVywv61O5uFFPEW22A/dcgTi
+	68E/heAwzVCuj+S06pyv1XwWI7vvKTuicZYP+ZrV0UrK1qfrJ215AAMLisOGNd7Ii6OGnR3rkZJ
+	7RnMBg9YFyZyU9KX6
+X-Received: by 2002:a05:620a:1787:b0:77f:3d4a:6dcc with SMTP id ay7-20020a05620a178700b0077f3d4a6dccmr9193575qkb.8.1702403628498;
+        Tue, 12 Dec 2023 09:53:48 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHo+zoJmze0Y/kUaT4ct5ONqWmBVqq2jGqNbXv6BFGF3NJSoybXPW+YABIfoKfhOnFfXTSh+g==
+X-Received: by 2002:a05:620a:1787:b0:77f:3d4a:6dcc with SMTP id ay7-20020a05620a178700b0077f3d4a6dccmr9193564qkb.8.1702403628126;
+        Tue, 12 Dec 2023 09:53:48 -0800 (PST)
+Received: from fedora ([2600:1700:1ff0:d0e0::37])
+        by smtp.gmail.com with ESMTPSA id bl10-20020a05620a1a8a00b0077d8fdc7e84sm3890632qkb.5.2023.12.12.09.53.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Dec 2023 09:53:47 -0800 (PST)
+Date: Tue, 12 Dec 2023 11:53:45 -0600
+From: Andrew Halaney <ahalaney@redhat.com>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH net-next v3] net: stmmac: don't create a MDIO bus if
+ unnecessary
+Message-ID: <726fd37c4ayubzzdyfh2cd3dkqdqzzkjcak4po7iudb73nnmp3@rq5j63ik2tvv>
+References: <20231207-stmmac-no-mdio-node-v3-1-34b870f2bafb@redhat.com>
+ <jz6ot44fjkbmwcezi3fkgqd54nurglblbemrchfgxgq6udlhqz@ntepnnzzelta>
+ <hxds75erxqcfkufxnfbyo2up4b4jeicmi3f5xr6qlb3yf7fe76@4byeq62jhu4o>
+ <hgz3pt625kggix6kzincohw7kr2okcumrwfkmjgiauw2yvhrzt@ekeygo4b7k3b>
+ <h5ucipgjtsesrz3jyul5xohu4pqom56v6ayx7aonnfesret3ht@wmblmndj6zir>
+ <hpqssnt7odmuuyhsljuqovmwatdjz4s6kix6abq7lrvyciawy5@5ypscmmivnmh>
+ <slq3uvpe424lxksgc2ho4q5apon6yqyvmq3ubpmx3z5ln5yhqf@klnkglqb6o6r>
+ <4e42erte4zvx77vgj77kcal2ss4nma3ggm3wa6wssleuubtzit@gbkbbudjfwhz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v8 0/4] send credit update during setting
- SO_RCVLOWAT
-Content-Language: en-US
-To: "Michael S. Tsirkin" <mst@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
-	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20231211211658.2904268-1-avkrasnov@salutedevices.com>
- <20231212105423-mutt-send-email-mst@kernel.org>
- <d27f22f0-0f1e-e1bb-5b13-a524dc6e94d7@salutedevices.com>
- <20231212111131-mutt-send-email-mst@kernel.org>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <20231212111131-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 182068 [Dec 12 2023]
-X-KSMG-AntiSpam-Version: 6.1.0.3
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, smtp.sberdevices.ru:5.0.1,7.1.1;lore.kernel.org:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1;100.64.160.123:7.1.2;git.kernel.org:7.1.1;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2023/12/12 17:04:00
-X-KSMG-LinksScanning: Clean, bases: 2023/12/12 17:03:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/12/12 12:50:00 #22667219
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4e42erte4zvx77vgj77kcal2ss4nma3ggm3wa6wssleuubtzit@gbkbbudjfwhz>
 
-
-
-On 12.12.2023 19:12, Michael S. Tsirkin wrote:
-> On Tue, Dec 12, 2023 at 06:59:03PM +0300, Arseniy Krasnov wrote:
->>
->>
->> On 12.12.2023 18:54, Michael S. Tsirkin wrote:
->>> On Tue, Dec 12, 2023 at 12:16:54AM +0300, Arseniy Krasnov wrote:
->>>> Hello,
->>>>
->>>>                                DESCRIPTION
->>>>
->>>> This patchset fixes old problem with hungup of both rx/tx sides and adds
->>>> test for it. This happens due to non-default SO_RCVLOWAT value and
->>>> deferred credit update in virtio/vsock. Link to previous old patchset:
->>>> https://lore.kernel.org/netdev/39b2e9fd-601b-189d-39a9-914e5574524c@sberdevices.ru/
->>>
->>>
->>> Patchset:
->>>
->>> Acked-by: Michael S. Tsirkin <mst@redhat.com>
->>
->> Thanks!
->>
->>>
->>>
->>> But I worry whether we actually need 3/8 in net not in net-next.
->>
->> Because of "Fixes" tag ? I think this problem is not critical and reproducible
->> only in special cases, but i'm not familiar with netdev process so good, so I don't
->> have strong opinion. I guess @Stefano knows better.
->>
->> Thanks, Arseniy
+On Tue, Dec 12, 2023 at 01:42:35PM +0300, Serge Semin wrote:
+> On Mon, Dec 11, 2023 at 01:48:47PM -0600, Andrew Halaney wrote:
+> > On Mon, Dec 11, 2023 at 08:27:46PM +0300, Serge Semin wrote:
+> > > On Fri, Dec 08, 2023 at 10:50:29AM -0600, Andrew Halaney wrote:
+> > > > On Fri, Dec 08, 2023 at 06:07:06PM +0300, Serge Semin wrote:
+> > > > > On Thu, Dec 07, 2023 at 05:07:24PM -0600, Andrew Halaney wrote:
+> > > > > > On Fri, Dec 08, 2023 at 01:16:12AM +0300, Serge Semin wrote:
+> > > > > > > On Thu, Dec 07, 2023 at 03:12:40PM -0600, Andrew Halaney wrote:
+> > > > > > > > The stmmac_dt_phy() function, which parses the devicetree node of the
+> > > > > > > > MAC and ultimately causes MDIO bus allocation, misinterprets what
+> > > > > > > > fixed-link means in relation to the MAC's MDIO bus. This results in
+> > > > > > > > a MDIO bus being created in situations it need not be.
+> > > > > > > > 
+> > > > > > > > Currently a MDIO bus is created if the description is either:
+> > > > > > > > 
+> > > > > > > >     1. Not fixed-link
+> > > > > > > >     2. fixed-link but contains a MDIO bus as well
+> > > > > > > > 
+> > > > > > > > The "1" case above isn't always accurate. If there's a phy-handle,
+> > > > > > > > it could be referencing a phy on another MDIO controller's bus[1]. In
+> > > > > > > > this case currently the MAC will make a MDIO bus and scan it all
+> > > > > > > > anyways unnecessarily.
+> > > > > > > > 
+> > > > > > > > There's also a lot of upstream devicetrees[2] that expect a MDIO bus to
+> > > > > > > > be created and scanned for a phy. This case can also be inferred from
+> > > > > > > > the platform description by not having a phy-handle && not being
+> > > > > > > > fixed-link. This hits case "1" in the current driver's logic.
+> > > > > > > > 
+> > > > > > > > Let's improve the logic to create a MDIO bus if either:
+> > > > > > > > 
+> > > > > > > 
+> > > > > > > >     - Devicetree contains a MDIO bus
+> > > > > > > >     - !fixed-link && !phy-handle (legacy handling)
+> > > > > > > 
+> > > > > > > If what you suggest here is a free from regressions semantics change
+> > > > > > > (really hope it is) I will be with both my hands for it. This will
+> > > > > > > solve the problem we have with one of our device which doesn't have
+> > > > > > > SMA interface (hardware designers decided to save ~4K gates of the
+> > > > > > > chip area) but has a PHY externally attached to the DW XGMAC<->XPCS
+> > > > > > > interface. PHY is accessible via a GPIO-based MDIO bus. BTW having no
+> > > > > > > SMA interface available on a DW *MAC device but creating the MDIO-bus
+> > > > > > > on top of the non-existent SMA CSRs anyway causes having _32_ dummy
+> > > > > > > PHYs created with zero IDs.
+> > > > > > 
+> > > > > 
+> > > > > > I hope it is regression free! I have tested both the [1] and [2] cases
+> > > > > > (I hacked up the devicetree for [1] to make it look like [2]) without
+> > > > > > any issue.
+> > > > > > 
+> > > > > 
+> > > > > I doubt you could have tested it on all the possible hardware the
+> > > > > STMMAC driver supports. The problem is that the DT-bindings thing is a
+> > > > > kind of contract which can't be changed that easily. It's like ABI but
+> > > > > for the hardware description so the kernel would bootup correctly on
+> > > > > the platforms with the old DT blobs. But if the change isn't that
+> > > > > critical, if the device-tree sources in the kernel fit to the updated
+> > > > > semantics, if the networking subsystem maintainers aren't against it
+> > > > > and I guess with the Rob, Krzysztof or Conor blessing (at least it
+> > > > > won't hurt to add them to the Cc-list together with the devicetree
+> > > > > mailing-list), then it will likely be accepted.
+> > > > 
+> > > 
+> > > > To be clear, I don't think we're violating the dt-binding ABI contract
+> > > > here. My intention is that all the existing use cases continue to work,
+> > > > and this just improves one use case. I did a write up
+> > > > over on v2 about the use cases I see and the current logic vs what
+> > > > changes with this patch series:
+> > > > 
+> > > >     https://lore.kernel.org/netdev/plvbqgi2bwlv5quvpiwplq7cxx6m5rl3ghnfhuxfx4bpuhyihl@zmydwrtwdeg6/
+> > > > 
+> > > > Please comment if you think I have broken some backwards
+> > > > compatibility.
+> > > 
+> > > To shortly sum up so I didn't miss something. Current semantics of the
+> > > MDIO-bus registration is:
+> > > if !fixed-link || mdio_node_present
+> > >     create MDIO-bus
+> > > and the semantics of the PHY auto-probe (legacy) is:
+> > > if !(fixed-link || mdio_node_present || phy_node_present)
+> > >     auto-probe PHY
+> > 
 > 
-> Fixes means "if you have that other commit then you need this commit
-> too". I think as a minimum you need to rearrange patches to make the
-> fix go in first. We don't want a regression followed by a fix.
+> > I think phy_node_present doesn't belong in the current view of the
+> > semantics for PHY auto-probe (legacy). This devicetree would trigger a
+> > PHY auto-probe/scan on ethernet0's MAC's MDIO bus:
+> > 
+> > 	random-mdio-bus {
+> > 		rgmii_phy: phy@0 {
+> > 		};
+> > 	};
+> > 
+> > 	ethernet0 {
+> > 		phy-handle = <&rgmii_phy>;
+> > 	};
+> 
+> Em, unless I miss something, but on STMMAC it wont due to the next
+> statement: stmmac_mdio_register():
+> 	if (priv->plat->phy_node || mdio_node)
+> 		goto bus_register_done;
+> 
+> Note by the "PHY auto-probe (legacy)" semantics I meant the algo
+> implemented at the bottom of the stmmac_mdio_register() method. If no
+> PHY-node or MDIO-node specified it tries to find any PHY on the
+> DW MAC SMA MDIO bus and use it in the driver.
+> 
+> If what you meant was the PHY auto-probe/scan executed in the
+> __mdiobus_register() method, then I guess it's relevant only _if_ the
+> stmmac_mdio_register() method performs the legacy auto-probing too.
+> Yes, the MDIO/PHY subsystem _will_ scan the MDIO-bus for PHYs, but
+> they won't be utilized in the STMMAC driver due to the conditional
+> statement above. In other words I guess the scanning performed in
+> __mdiobus_register() will be pointless anyway in that case, since no
+> detected PHY-devices will be actually used afterwards.
+> 
 
-I see, ok, @Stefano WDYT? I think rearrange doesn't break anything, because this
-patch fixes problem that is not related with the new patches from this patchset.
+Yes, I was referring to the __mdiobus_register() bit, and I now see what
+you mean. So in the example I painted above the stmmac_mdio_register()
+auto-probing would not happen since the phy-handle exists (and therefore
+phy_node).
 
-Thanks, Arseniy
+So the only change here is that the __mdiobus_register() scan wouldn't
+happen, but since stmmac is the only MAC that would attach to a phy on
+that bus it doesn't matter (the phy is already acquired by the
+phy-handle).
+
+> > 
+> > The assumption I make in this patch is that nothing useful could be on
+> > ethernet0's MDIO bus, it certainly at least is not the phy the MAC uses.
+> > 
+> > > 
+> > > You are changing the MDIO-bus creation semantics to:
+> > > if !(fixed-link || phy_node_present) || mdio_node_present
+> > >     create MDIO-bus
+> > > with no change in the PHY auto-probe semantics:
+> > > if !(fixed-link || mdio_node_present || phy_node_present)
+> > >     auto-probe PHY
+> > 
+> > Unfortunately as I highlighted above this logic (while accurate to the
+> > patch under review) is a change from the prior logic for the "auto-probe
+> > PHY" case.
+> > 
+> > > 
+> > > So the change is that if a PHY-handle is specified the MDIO-bus won't
+> > > be created with the rest conditions being the same.
+> > > 
+> > > The only concern I had was the so called legacy case and a possibility
+> > > to have MDIO-bus with other than PHY devices. Based on the pseudo-code
+> > > above the former case won't be affected since having PHY-node
+> > > specified didn't triggered MDIO-bus auto-probe even before your
+> > > change. The later case concerns for instance the DW XPCS devices which
+> > 
+> > As I've realized in your response here, there is the possibility that
+> > something is on the MDIO bus in the ethernet0 exmpale bus above, and would
+> > probe, in the before handling. So I guess this isn't totally backwards
+> > compatible. Gah, thanks for highlighting.
+> 
+> AFAICS what you suggest won't break currently supported by the STMMAC
+> driver _platforms_. This is what actually matters. The legacy PHY
+> auto-probing will work as before. None of the OF-based platforms
+> currently expect having non-PHY devices on the bus.
+
+I agree, you've talked me off the edge of the cliff. Thanks so much for
+your help in all this.
 
 > 
->>>
->>> Thanks!
->>>
->>>> Here is what happens step by step:
->>>>
->>>>                                   TEST
->>>>
->>>>                             INITIAL CONDITIONS
->>>>
->>>> 1) Vsock buffer size is 128KB.
->>>> 2) Maximum packet size is also 64KB as defined in header (yes it is
->>>>    hardcoded, just to remind about that value).
->>>> 3) SO_RCVLOWAT is default, e.g. 1 byte.
->>>>
->>>>
->>>>                                  STEPS
->>>>
->>>>             SENDER                              RECEIVER
->>>> 1) sends 128KB + 1 byte in a
->>>>    single buffer. 128KB will
->>>>    be sent, but for 1 byte
->>>>    sender will wait for free
->>>>    space at peer. Sender goes
->>>>    to sleep.
->>>>
->>>>
->>>> 2)                                     reads 64KB, credit update not sent
->>>> 3)                                     sets SO_RCVLOWAT to 64KB + 1
->>>> 4)                                     poll() -> wait forever, there is
->>>>                                        only 64KB available to read.
->>>>
->>>> So in step 4) receiver also goes to sleep, waiting for enough data or
->>>> connection shutdown message from the sender. Idea to fix it is that rx
->>>> kicks tx side to continue transmission (and may be close connection)
->>>> when rx changes number of bytes to be woken up (e.g. SO_RCVLOWAT) and
->>>> this value is bigger than number of available bytes to read.
->>>>
->>>> I've added small test for this, but not sure as it uses hardcoded value
->>>> for maximum packet length, this value is defined in kernel header and
->>>> used to control deferred credit update. And as this is not available to
->>>> userspace, I can't control test parameters correctly (if one day this
->>>> define will be changed - test may become useless). 
->>>>
->>>> Head for this patchset is:
->>>> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=021b0c952f226236f2edf89c737efb9a28d1422d
->>>>
->>>> Link to v1:
->>>> https://lore.kernel.org/netdev/20231108072004.1045669-1-avkrasnov@salutedevices.com/
->>>> Link to v2:
->>>> https://lore.kernel.org/netdev/20231119204922.2251912-1-avkrasnov@salutedevices.com/
->>>> Link to v3:
->>>> https://lore.kernel.org/netdev/20231122180510.2297075-1-avkrasnov@salutedevices.com/
->>>> Link to v4:
->>>> https://lore.kernel.org/netdev/20231129212519.2938875-1-avkrasnov@salutedevices.com/
->>>> Link to v5:
->>>> https://lore.kernel.org/netdev/20231130130840.253733-1-avkrasnov@salutedevices.com/
->>>> Link to v6:
->>>> https://lore.kernel.org/netdev/20231205064806.2851305-1-avkrasnov@salutedevices.com/
->>>> Link to v7:
->>>> https://lore.kernel.org/netdev/20231206211849.2707151-1-avkrasnov@salutedevices.com/
->>>>
->>>> Changelog:
->>>> v1 -> v2:
->>>>  * Patchset rebased and tested on new HEAD of net-next (see hash above).
->>>>  * New patch is added as 0001 - it removes return from SO_RCVLOWAT set
->>>>    callback in 'af_vsock.c' when transport callback is set - with that
->>>>    we can set 'sk_rcvlowat' only once in 'af_vsock.c' and in future do
->>>>    not copy-paste it to every transport. It was discussed in v1.
->>>>  * See per-patch changelog after ---.
->>>> v2 -> v3:
->>>>  * See changelog after --- in 0003 only (0001 and 0002 still same).
->>>> v3 -> v4:
->>>>  * Patchset rebased and tested on new HEAD of net-next (see hash above).
->>>>  * See per-patch changelog after ---.
->>>> v4 -> v5:
->>>>  * Change patchset tag 'RFC' -> 'net-next'.
->>>>  * See per-patch changelog after ---.
->>>> v5 -> v6:
->>>>  * New patch 0003 which sends credit update during reading bytes from
->>>>    socket.
->>>>  * See per-patch changelog after ---.
->>>> v6 -> v7:
->>>>  * Patchset rebased and tested on new HEAD of net-next (see hash above).
->>>>  * See per-patch changelog after ---.
->>>> v7 -> v8:
->>>>  * See per-patch changelog after ---.
->>>>
->>>> Arseniy Krasnov (4):
->>>>   vsock: update SO_RCVLOWAT setting callback
->>>>   virtio/vsock: send credit update during setting SO_RCVLOWAT
->>>>   virtio/vsock: fix logic which reduces credit update messages
->>>>   vsock/test: two tests to check credit update logic
->>>>
->>>>  drivers/vhost/vsock.c                   |   1 +
->>>>  include/linux/virtio_vsock.h            |   1 +
->>>>  include/net/af_vsock.h                  |   2 +-
->>>>  net/vmw_vsock/af_vsock.c                |   9 +-
->>>>  net/vmw_vsock/hyperv_transport.c        |   4 +-
->>>>  net/vmw_vsock/virtio_transport.c        |   1 +
->>>>  net/vmw_vsock/virtio_transport_common.c |  43 +++++-
->>>>  net/vmw_vsock/vsock_loopback.c          |   1 +
->>>>  tools/testing/vsock/vsock_test.c        | 175 ++++++++++++++++++++++++
->>>>  9 files changed, 229 insertions(+), 8 deletions(-)
->>>>
->>>> -- 
->>>> 2.25.1
->>>
+> > 
+> > I'm not sure in practice if anyone out there is really relying on that
+> > or not. I can get away with the "no auto-probe/scan of bus" optimization I
+> > really desire by describing my MDIO bus as disabled in the devicetree
+> > (need to send patches to do that in the dts and handle it gracefully in
+> > stmmac). I'm wondering if I should keep forth with this patch as is, or
+> > if I should keep the same logic but clean it up a bit as is done in the
+> > current patch... I guess probably the latter.
 > 
+> It's better to limit some complicated logic before somebody tries to
+> use it to bypass a harder but correct way of directly defining all
+> devices (including non-PHY ones) in dts. Seeing presumably no
+> currently supported platform will be broken I think you should keep
+> the patch as is.
+
+Agreed. I'll send a new version this evening with your tags, Andrew
+Lunn's requested motivation in commit message, etc. Thanks!
+
+> 
+> -Serge(y)
+> 
+> > 
+> > > on some platforms could be found on the DW MAC MDIO bus with not
+> > > having PHY living on that bus. But DW XPCS auto-probing currently is
+> > > only supported by the non-OF platforms (it's Intel). Thus your change
+> > > is supposed to be safe here too.
+> > > 
+> > > So to speak AFAICS from the STMMAC MDIO OF stuff your solution isn't
+> > > supposed to cause regressions and break the current DTs backward
+> > > compatibility indeed.
+> > > 
+> > > Regarding the ideal implementation. What could be much better is to
+> > > implement the next semantics:
+> > > if SMA-capability-detected &&
+> > >    (!mdio_node_present || (mdio_node_present && mdio_node_enabled))
+> > >     create MDIO-bus
+> > > and preserve the PHY auto-probe semantics for backwards compatibility.
+> > > Regarding the SMA-capability flag, it has been presented since DW GMAC
+> > > v3.50, so since very much early DW MAC releases. But even for the
+> > > early devices I think it could be auto-detected by checking the SMA
+> > > CSRs writability. At least DW XGMAC AFAICS has the command CSR not
+> > > writable if SMA is unavailable.
+> > > 
+> > > But I guess it's a matter of another patch.
+> > > 
+> > 
+> > I like that logic for what it is worth, although would be unsure of
+> > verifying the SMA-capability-detected part of it. But I wouldn't mind
+> > seeing that patch :)
+> > 
+> 
+
 
