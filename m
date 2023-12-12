@@ -1,61 +1,65 @@
-Return-Path: <netdev+bounces-56563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7237280F641
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 20:13:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2585F80F651
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 20:14:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A33901C20D34
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 19:13:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 569FD1C20D0D
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 19:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE0FD81E24;
-	Tue, 12 Dec 2023 19:13:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A34381E31;
+	Tue, 12 Dec 2023 19:14:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zxKdCh8u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u9gl44nT"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BECB4127;
-	Tue, 12 Dec 2023 11:13:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=qpEUckSGc7ggePcRYae27HGr8y3eNljZxImsxdDOJIM=; b=zxKdCh8uTLT2S58p+CI+1L4rla
-	qhxaieC+LkURfKvqOsW533AvoCBQudLWklzyAQjmzt72gaNJlIlJDzml6Eakm57Izb7tbm7ADejfu
-	DJK8mFr6OC+uhPsqG1JIwX2LlmVvFhNwwL94MIAlO0rlpXC+uUJQffyHGMdVq+Yd7Ng86NWPUZWau
-	lb2Jh+iAfbYC+qchT4gxwL5UP61hYUHYzt1SwxjY+oNPhIfLW1rofLsdf21Dhun2XEk8lYbGuiXiC
-	V0Rz7vhyoP9G9cG7a54bRODE/bWXZXXGse+dcRlM+Up9GMTDRPkH9/z6epERJTl2188PkBlM0abG4
-	bepoJFdg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51180)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rD8BW-0007Ib-0t;
-	Tue, 12 Dec 2023 19:12:50 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rD8BX-0000hC-Kq; Tue, 12 Dec 2023 19:12:51 +0000
-Date: Tue, 12 Dec 2023 19:12:51 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Luo Jie <quic_luoj@quicinc.com>, agross@kernel.org,
-	andersson@kernel.org, konrad.dybcio@linaro.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
-	robert.marko@sartura.hr, linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, quic_srichara@quicinc.com
-Subject: Re: [PATCH v2 3/5] net: mdio: ipq4019: configure CMN PLL clock for
- ipq5332
-Message-ID: <ZXiws6Tka5ENm6gA@shell.armlinux.org.uk>
-References: <20231212115151.20016-1-quic_luoj@quicinc.com>
- <20231212115151.20016-4-quic_luoj@quicinc.com>
- <20231212135417.67ece4d0@device.home>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD4A280059;
+	Tue, 12 Dec 2023 19:14:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B19FC433C7;
+	Tue, 12 Dec 2023 19:14:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702408452;
+	bh=jfJ0OG1jhC1TwOyrhyKpWYMGrNHXhy6qAspQp8BrzWs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=u9gl44nTCJgaqnzRkDIohjT3NlWPJJa/xDes26AfFQfmtNc2cfCuCd70WURIpsEls
+	 vTZdu0MOZxt7XB2RoDt3NiKq0uZ0e5XZ9uNAJvt20SeYNL3Xnev1VOWhSDgT1cLHKO
+	 UzAbw2cpbggtF8AKB+xIzHnQW+N3E8y0VN03Sx8xuf6xSXbWBlqTx0DkvlJGiyTCHv
+	 Pn9XBi+4REFO/1aggIX1ADNZxAcOPZjzUtdYPvmGKd9kwXCW92/oirZULVxo77Eat3
+	 6uRKCSS5S1kMdmbIvOp4MFWEThbL6iJKtUsHbQc5uHQLX7S+inbhcpAYL5tX1R7y0R
+	 68pLVmdZZ2tDg==
+Date: Tue, 12 Dec 2023 19:14:04 +0000
+From: Simon Horman <horms@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	bpf@vger.kernel.org, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Shakeel Butt <shakeelb@google.com>
+Subject: Re: [net-next v1 15/16] net: add devmem TCP documentation
+Message-ID: <20231212191404.GC5817@kernel.org>
+References: <20231208005250.2910004-1-almasrymina@google.com>
+ <20231208005250.2910004-16-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,34 +68,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231212135417.67ece4d0@device.home>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20231208005250.2910004-16-almasrymina@google.com>
 
-On Tue, Dec 12, 2023 at 01:54:17PM +0100, Maxime Chevallier wrote:
-> Hello,
+On Thu, Dec 07, 2023 at 04:52:46PM -0800, Mina Almasry wrote:
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> ---
+>  Documentation/networking/devmem.rst | 270 ++++++++++++++++++++++++++++
+>  1 file changed, 270 insertions(+)
+>  create mode 100644 Documentation/networking/devmem.rst
 > 
-> I have some more minor comments for yoi :)
-> 
-> On Tue, 12 Dec 2023 19:51:48 +0800
-> Luo Jie <quic_luoj@quicinc.com> wrote:
-> > +	/* The CMN block resource is for providing clock source to ethernet,
-> > +	 * which can be optionally configured on the platform ipq9574 and
-> > +	 * ipq5332.
-> > +	 */
-> > +	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "cmn_blk");
-> > +	if (res) {
-> > +		priv->cmn_membase = devm_ioremap_resource(&pdev->dev, res);
-> > +		if (IS_ERR(priv->cmn_membase))
-> > +			return PTR_ERR(priv->cmn_membase);
-> > +	}
-> > +
-> 
-> And here you can simplify a bit by using
-> devm_platform_ioremap_resource_byname()
+> diff --git a/Documentation/networking/devmem.rst b/Documentation/networking/devmem.rst
+> new file mode 100644
+> index 000000000000..ed0d9c88b708
+> --- /dev/null
+> +++ b/Documentation/networking/devmem.rst
+> @@ -0,0 +1,270 @@
 
-Not if the resource is optional.
+Hi Mina,
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Please consider adding an SPDX header here.
+
+And please consider adding devmem to index.rxt,
+as make htmldocs currently warns:
+
+  .../devmem.rst: WARNING: document isn't included in any toctree
+
+....
 
