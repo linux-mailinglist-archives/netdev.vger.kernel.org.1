@@ -1,231 +1,116 @@
-Return-Path: <netdev+bounces-56460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F17C580EF68
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 15:56:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F1B980EF67
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 15:56:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81A481F21532
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:56:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 270271F214F9
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:56:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 547AF745E0;
-	Tue, 12 Dec 2023 14:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CAD0745E0;
+	Tue, 12 Dec 2023 14:55:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XVV/2AyN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LJbBhVV9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97CF0D3
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 06:56:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702392989; x=1733928989;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=rtJ1TpolWl/YBfRHUC7KrytBuUFTlnN1c8GTu2B9qwg=;
-  b=XVV/2AyNTwXunm76ib1z4OfblUdO+N5OzYjEUiFHOW4dpl+oVQy5zRr+
-   Z/sOtUm3xpdoUy4+9T6GyUdo8iaGTQxe0mNC7MqH09XhUY2PzEkbLEGC9
-   8TBDIpGCCbtS9aVsBz4JOeFawdvlttWXKOu/938hhPivhYfiXM3gY6z3J
-   JuG0ghrJo/rn6UwZq9SFJLr0L0D/hStpdTt5EpG4RLXBfzIhoDXYjIdcL
-   ylAVR15o2NIbmAqoD2t23bn1N8C07NOvXGgoe7BeTUXyhMfRQ8Fe4/gGH
-   YncOhqE78rsXZJBTICQCBlZyZ5ZFNf3/5Uhrkm/nWtBgGSYtFgNOkquX2
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="374972146"
-X-IronPort-AV: E=Sophos;i="6.04,270,1695711600"; 
-   d="scan'208";a="374972146"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 06:56:28 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,270,1695711600"; 
-   d="scan'208";a="17637353"
-Received: from kkazimiedevpc.igk.intel.com (HELO localhost.igk.intel.com) ([10.102.102.224])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 06:56:26 -0800
-From: Michal Kubiak <michal.kubiak@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: aleksander.lobakin@intel.com,
-	larysa.zaremba@intel.com,
-	alan.brady@intel.com,
-	joshua.a.hay@intel.com,
-	emil.s.tantilov@intel.com,
-	maciej.fijalkowski@intel.com,
-	netdev@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Michal Kubiak <michal.kubiak@intel.com>
-Subject: [PATCH iwl-net] idpf: enable WB_ON_ITR
-Date: Tue, 12 Dec 2023 15:55:46 +0100
-Message-Id: <20231212145546.396273-1-michal.kubiak@intel.com>
-X-Mailer: git-send-email 2.33.1
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76A67ED
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 06:55:53 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5d1b2153ba1so49078967b3.2
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 06:55:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702392952; x=1702997752; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7rLdS3DdixJrv3ZBmVRiErlPRp5xsbOeyrzK+E5VPtA=;
+        b=LJbBhVV9aGrbjt10N9vw/gGLNtqiwHGqKKANn7RBOHQgM5d4DrFR3dY8pM7TecvfRK
+         A837/sUhOWPq3Cg6zwqZpJ959jdK761WAg/Et87XG6ZjP4WmendsXFO6NqLcLbzH5z1/
+         WKWQTXXsemfXevhvyRavI9vBhIgiqq6F0Jo9HqnfBl3rdW3gjjgHNVhxT7j5KGKheEVm
+         kVfdQNDTvtwzlgkgIwh4nKCtWAihioY1G5CtstwQ0uKCoon87dDcDU4/QjYKiovN2bb7
+         ZXpBi0z8mnoCHwdlTpQkJhn6pqU4GyjEIiCej885tnhwlvDlqedf7ow4t0S7EslfAuAG
+         k3Fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702392952; x=1702997752;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7rLdS3DdixJrv3ZBmVRiErlPRp5xsbOeyrzK+E5VPtA=;
+        b=Yt18CZ6o2BOdSpB6bvCxo7efEk7cxZPHbrYUHhdLkCwlalBtjuzbuFmF96h0byNOVc
+         lCk5T6FsUSm5n/jwBgpeFd2Hg8FhUda/XXEwdBIPUQNqZxRwJ+bESK6szUAqsenq9ES6
+         7T3wjzKiMgW+FwK0PMvL6wHeqhENkRGUgiI1ko+hvkV1+FGtJdLA0QtCTDmSnGpRKMjP
+         ywf4Jc4/eYX/MElwxLcauE0obd66AX5BXmP4YdcIVs4f4T2Ysl7OSkteVUtmB839CvVj
+         o2maGfl86+z309Ne4MZ0Iu832dEjU3J6WytmWN0r7jOVahBiMf9SHMxaIsJIb/3zVclZ
+         8qRQ==
+X-Gm-Message-State: AOJu0YxaZrcglc7Z3tdIkDNPuei4d1RMafh3qX2m9/ofPLbNC6pbvQ05
+	2DItGp23HBoI/PTTzJNXpXI940jSshfbzA==
+X-Google-Smtp-Source: AGHT+IEX+VOBlwmznBQ9L/oGuRDL1FPdLaYQ0+5I5XGLSwCz6Vr8VzJGrPg7jSaFizkEQlYKqApJ/C/mlmf94w==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:d0cb:0:b0:db5:47bd:8b14 with SMTP id
+ h194-20020a25d0cb000000b00db547bd8b14mr46464ybg.4.1702392952591; Tue, 12 Dec
+ 2023 06:55:52 -0800 (PST)
+Date: Tue, 12 Dec 2023 14:55:50 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Message-ID: <20231212145550.3872051-1-edumazet@google.com>
+Subject: [PATCH net-next] sctp: support MSG_ERRQUEUE flag in recvmsg()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Xin Long <lucien.xin@gmail.com>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Joshua Hay <joshua.a.hay@intel.com>
+For some reason sctp_poll() generates EPOLLERR if sk->sk_error_queue
+is not empty but recvmsg() can not drain the error queue yet.
 
-Tell hardware to writeback completed descriptors even when interrupts
-are disabled. Otherwise, descriptors might not be written back until
-the hardware can flush a full cacheline of descriptors. This can cause
-unnecessary delays when traffic is light (or even trigger Tx queue
-timeout).
+This is needed to better support timestamping.
 
-Fixes: c2d548cad150 ("idpf: add TX splitq napi poll support")
-Fixes: a5ab9ee0df0b ("idpf: add singleq start_xmit and napi poll")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-Co-developed-by: Michal Kubiak <michal.kubiak@intel.com>
-Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
+I had to export inet_recv_error(), since sctp
+can be compiled as a module.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Xin Long <lucien.xin@gmail.com>
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Cc: Willem de Bruijn <willemb@google.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_dev.c    |  2 ++
- .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  6 ++++-
- drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  7 +++++-
- drivers/net/ethernet/intel/idpf/idpf_txrx.h   | 23 +++++++++++++++++++
- drivers/net/ethernet/intel/idpf/idpf_vf_dev.c |  2 ++
- 5 files changed, 38 insertions(+), 2 deletions(-)
+ net/ipv4/af_inet.c | 1 +
+ net/sctp/socket.c  | 3 +++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_dev.c b/drivers/net/ethernet/intel/idpf/idpf_dev.c
-index 34ad1ac46b78..2c6776086130 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_dev.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_dev.c
-@@ -96,8 +96,10 @@ static int idpf_intr_reg_init(struct idpf_vport *vport)
- 		intr->dyn_ctl = idpf_get_reg_addr(adapter,
- 						  reg_vals[vec_id].dyn_ctl_reg);
- 		intr->dyn_ctl_intena_m = PF_GLINT_DYN_CTL_INTENA_M;
-+		intr->dyn_ctl_intena_msk_m = PF_GLINT_DYN_CTL_INTENA_MSK_M;
- 		intr->dyn_ctl_itridx_s = PF_GLINT_DYN_CTL_ITR_INDX_S;
- 		intr->dyn_ctl_intrvl_s = PF_GLINT_DYN_CTL_INTERVAL_S;
-+		intr->dyn_ctl_wb_on_itr_m = PF_GLINT_DYN_CTL_WB_ON_ITR_M;
- 
- 		spacing = IDPF_ITR_IDX_SPACING(reg_vals[vec_id].itrn_index_spacing,
- 					       IDPF_PF_ITR_IDX_SPACING);
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-index 81288a17da2a..8e1478b7d86c 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-@@ -1168,8 +1168,10 @@ int idpf_vport_singleq_napi_poll(struct napi_struct *napi, int budget)
- 						    &work_done);
- 
- 	/* If work not completed, return budget and polling will return */
--	if (!clean_complete)
-+	if (!clean_complete) {
-+		idpf_vport_intr_set_wb_on_itr(q_vector);
- 		return budget;
-+	}
- 
- 	work_done = min_t(int, work_done, budget - 1);
- 
-@@ -1178,6 +1180,8 @@ int idpf_vport_singleq_napi_poll(struct napi_struct *napi, int budget)
- 	 */
- 	if (likely(napi_complete_done(napi, work_done)))
- 		idpf_vport_intr_update_itr_ena_irq(q_vector);
-+	else
-+		idpf_vport_intr_set_wb_on_itr(q_vector);
- 
- 	return work_done;
+diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+index fbeacf04dbf3744e5888360e0b74bf6f70ff214f..835f4f9d98d25559fb8965a7531c6863448a55c2 100644
+--- a/net/ipv4/af_inet.c
++++ b/net/ipv4/af_inet.c
+@@ -1633,6 +1633,7 @@ int inet_recv_error(struct sock *sk, struct msghdr *msg, int len, int *addr_len)
+ #endif
+ 	return -EINVAL;
  }
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 1646ff3877ba..b496566ee2aa 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -3639,6 +3639,7 @@ void idpf_vport_intr_update_itr_ena_irq(struct idpf_q_vector *q_vector)
- 					      IDPF_NO_ITR_UPDATE_IDX, 0);
++EXPORT_SYMBOL(inet_recv_error);
  
- 	writel(intval, q_vector->intr_reg.dyn_ctl);
-+	q_vector->wb_on_itr = false;
- }
+ int inet_gro_complete(struct sk_buff *skb, int nhoff)
+ {
+diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+index 7f89e43154c091f6f7a3c995c1ba8abb62a8e767..5fb02bbb4b349ef9ab9c2790cccb30fb4c4e897c 100644
+--- a/net/sctp/socket.c
++++ b/net/sctp/socket.c
+@@ -2099,6 +2099,9 @@ static int sctp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 	pr_debug("%s: sk:%p, msghdr:%p, len:%zd, flags:0x%x, addr_len:%p)\n",
+ 		 __func__, sk, msg, len, flags, addr_len);
  
- /**
-@@ -3930,8 +3931,10 @@ static int idpf_vport_splitq_napi_poll(struct napi_struct *napi, int budget)
- 	clean_complete &= idpf_tx_splitq_clean_all(q_vector, budget, &work_done);
- 
- 	/* If work not completed, return budget and polling will return */
--	if (!clean_complete)
-+	if (!clean_complete) {
-+		idpf_vport_intr_set_wb_on_itr(q_vector);
- 		return budget;
-+	}
- 
- 	work_done = min_t(int, work_done, budget - 1);
- 
-@@ -3940,6 +3943,8 @@ static int idpf_vport_splitq_napi_poll(struct napi_struct *napi, int budget)
- 	 */
- 	if (likely(napi_complete_done(napi, work_done)))
- 		idpf_vport_intr_update_itr_ena_irq(q_vector);
-+	else
-+		idpf_vport_intr_set_wb_on_itr(q_vector);
- 
- 	/* Switch to poll mode in the tear-down path after sending disable
- 	 * queues virtchnl message, as the interrupts will be disabled after
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index df76493faa75..50761c2d9f3b 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -495,9 +495,11 @@ struct idpf_vec_regs {
- struct idpf_intr_reg {
- 	void __iomem *dyn_ctl;
- 	u32 dyn_ctl_intena_m;
-+	u32 dyn_ctl_intena_msk_m;
- 	u32 dyn_ctl_itridx_s;
- 	u32 dyn_ctl_itridx_m;
- 	u32 dyn_ctl_intrvl_s;
-+	u32 dyn_ctl_wb_on_itr_m;
- 	void __iomem *rx_itr;
- 	void __iomem *tx_itr;
- 	void __iomem *icr_ena;
-@@ -534,6 +536,7 @@ struct idpf_q_vector {
- 	struct napi_struct napi;
- 	u16 v_idx;
- 	struct idpf_intr_reg intr_reg;
-+	bool wb_on_itr;
- 
- 	u16 num_txq;
- 	struct idpf_queue **tx;
-@@ -973,6 +976,26 @@ static inline void idpf_rx_sync_for_cpu(struct idpf_rx_buf *rx_buf, u32 len)
- 				      page_pool_get_dma_dir(pp));
- }
- 
-+/**
-+ * idpf_vport_intr_set_wb_on_itr - enable descriptor writeback on disabled interrupts
-+ * @q_vector: pointer to queue vector struct
-+ */
-+static inline void idpf_vport_intr_set_wb_on_itr(struct idpf_q_vector *q_vector)
-+{
-+	struct idpf_intr_reg *reg;
++	if (unlikely(flags & MSG_ERRQUEUE))
++		return inet_recv_error(sk, msg, len, addr_len);
 +
-+	if (q_vector->wb_on_itr)
-+		return;
-+
-+	reg = &q_vector->intr_reg;
-+
-+	writel(reg->dyn_ctl_wb_on_itr_m | reg->dyn_ctl_intena_msk_m |
-+	       IDPF_NO_ITR_UPDATE_IDX << reg->dyn_ctl_itridx_s,
-+	       reg->dyn_ctl);
-+
-+	q_vector->wb_on_itr = true;
-+}
-+
- int idpf_vport_singleq_napi_poll(struct napi_struct *napi, int budget);
- void idpf_vport_init_num_qs(struct idpf_vport *vport,
- 			    struct virtchnl2_create_vport *vport_msg);
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-index 8ade4e3a9fe1..f5b0a0666636 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-@@ -96,7 +96,9 @@ static int idpf_vf_intr_reg_init(struct idpf_vport *vport)
- 		intr->dyn_ctl = idpf_get_reg_addr(adapter,
- 						  reg_vals[vec_id].dyn_ctl_reg);
- 		intr->dyn_ctl_intena_m = VF_INT_DYN_CTLN_INTENA_M;
-+		intr->dyn_ctl_intena_msk_m = VF_INT_DYN_CTLN_INTENA_MSK_M;
- 		intr->dyn_ctl_itridx_s = VF_INT_DYN_CTLN_ITR_INDX_S;
-+		intr->dyn_ctl_wb_on_itr_m = VF_INT_DYN_CTLN_WB_ON_ITR_M;
+ 	lock_sock(sk);
  
- 		spacing = IDPF_ITR_IDX_SPACING(reg_vals[vec_id].itrn_index_spacing,
- 					       IDPF_VF_ITR_IDX_SPACING);
+ 	if (sctp_style(sk, TCP) && !sctp_sstate(sk, ESTABLISHED) &&
 -- 
-2.33.1
+2.43.0.472.g3155946c3a-goog
 
 
