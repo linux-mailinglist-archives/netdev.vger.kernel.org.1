@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-56170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F158280E084
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 01:52:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F165280E085
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 01:53:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 998E71F21BEF
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:52:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7EF12825A6
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:53:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C9EE5CBD;
-	Tue, 12 Dec 2023 00:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38E6E63C4;
+	Tue, 12 Dec 2023 00:52:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="H3elgDAT"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="b/vjbFu5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BA72B3
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:52:02 -0800 (PST)
-Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-4254223c150so37232761cf.1
-        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:52:02 -0800 (PST)
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D41BB8
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:52:03 -0800 (PST)
+Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-425952708afso35202771cf.0
+        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:52:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1702342321; x=1702947121; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1702342322; x=1702947122; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dd/pNLH0aZ4KKkS06SKGs/okNQiZTfx+tNh61rLozpI=;
-        b=H3elgDATKtNi/6tXm60nHEwKva31RL44+4kW7ox9/P1VM3+00sCoCHgmbgyZDePlVf
-         sURJ4tRTfCGr4gJcSzDm3yV4O9V+UhUlbjJNgGzrTIcAWGP2fP6g6Ijr0myT4PEBCa32
-         TYm+IGQ14r/6R/bRRVbx08DrNmkbpRpQ3YxFs=
+        bh=A03aN42yKFJNYwriH9O+9ACFYNFi/+3xamR20lCO7dY=;
+        b=b/vjbFu5wnP1ORM7H95U6vzssS3jMclBBEGVHwqA6aqqc/7XDnVBEO1CMSUwBJJQdH
+         XuOCWD9yoock5ffTO9G7wR16rFsS+eFwiE888gP+LOALgxUe6AS5kATByj5lcN2mN5on
+         yyug29x/0dtlMPasKs8HYPhzpwrZj4wWwBULc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702342321; x=1702947121;
+        d=1e100.net; s=20230601; t=1702342322; x=1702947122;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dd/pNLH0aZ4KKkS06SKGs/okNQiZTfx+tNh61rLozpI=;
-        b=D4be9yd4hRDBgpOYEjC+EFui4E/FPgN3Qs82IgdANkvogRGX7nQPlqjnewul831AIg
-         al1tokfWatjVh0Ztxxcc7vR9AONeKBPRdXUIUzzRgRJSpYB5rp4NoWjdoZgbXUvdpMCC
-         3V6+7A0T/dJbmcdfwl9VcRLcBjxkb2nxaqw+kKT7Yjb7g+p2WtIIuiEFgJ13BQbqTd2K
-         TnRHntABfpb0qLA66FkTHmrotYmz76UFOk0fA9qduTVCn2YZ0NtZ+XQSaV4P9S4zmiw7
-         cdtGqdVIabMEVh6VP6Vc6TljGb7VBl28qEq/VN+HsGCfFTAjTKsbwCnMfO7t2aX7JjgE
-         yOaQ==
-X-Gm-Message-State: AOJu0YwRKlPEDw/PSOFNQjt1nFT6NBQib04e8ez8I7f3EUO/h3Z51pMU
-	Bf6tiKQJLypS3kJ5RNC0PvGleQ==
-X-Google-Smtp-Source: AGHT+IGzO81o/G4pqxO+8y1SYU2OvZcsu3MwtpOShvjmistG8G//kV1NeZH6KSgglcFvmobntJCoSA==
-X-Received: by 2002:ac8:7e88:0:b0:425:4043:50e1 with SMTP id w8-20020ac87e88000000b00425404350e1mr8025266qtj.112.1702342321100;
-        Mon, 11 Dec 2023 16:52:01 -0800 (PST)
+        bh=A03aN42yKFJNYwriH9O+9ACFYNFi/+3xamR20lCO7dY=;
+        b=iw9xukUeJMDOI1mcmAP0z/UZtdcT5KQvS3CD3LDmZIpe/O31j81qnTBiJH1+lx4FZf
+         RQr7qGQtygeNzy1tUlVA10Veq7LjV1fpIsZvKvO7ri0lnK05rvBIDW2nVKCv5suWqYde
+         xI3/4c5+LphHTLNvxtrfEScHAWgu4RkuWW5SuJF8ybX1rKzVzvJCScsJmSvhYMO00DpW
+         3dUxeFjShgWCS1St1ItBIsODOc4VdAutG4LcHRcniF7VmiZCcVID1I4ItGQS987xkmwy
+         dqSHZyHQbJzPVOKfbFgim2dTyaoFKpDbhqUkD04G2rJ8d/BuBj/sbEo3vqE6TgBqnfxS
+         g9Ew==
+X-Gm-Message-State: AOJu0YynTNJvN4nI9bpYoG3OotG3CWWx3KhxEh+n0lJfORLuH6FNnE48
+	xW/g0C1TQOPgxvxrJZaKN3qC5Q==
+X-Google-Smtp-Source: AGHT+IHkpwJzBtGVoOJaX4wvS0TUxxu9z0V6oXqRg3Sb7WV311XiFGP/nAL/nQfnlESZK2cw6bGZ/g==
+X-Received: by 2002:ac8:5dce:0:b0:425:4042:f45c with SMTP id e14-20020ac85dce000000b004254042f45cmr7615400qtx.64.1702342322504;
+        Mon, 11 Dec 2023 16:52:02 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id r5-20020ac87945000000b00423ea1b31b3sm3619664qtt.66.2023.12.11.16.51.59
+        by smtp.gmail.com with ESMTPSA id r5-20020ac87945000000b00423ea1b31b3sm3619664qtt.66.2023.12.11.16.52.01
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 11 Dec 2023 16:52:00 -0800 (PST)
+        Mon, 11 Dec 2023 16:52:02 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -55,11 +55,10 @@ Cc: netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	gospo@broadcom.com,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Subject: [PATCH net-next 12/13] bnxt_en: Skip nic close/open when configuring tstamp filters
-Date: Mon, 11 Dec 2023 16:51:21 -0800
-Message-Id: <20231212005122.2401-13-michael.chan@broadcom.com>
+	Pavan Chebbi <pavan.chebbi@broadcom.com>
+Subject: [PATCH net-next 13/13] bnxt_en: Make PTP TX timestamp HWRM query silent
+Date: Mon, 11 Dec 2023 16:51:22 -0800
+Message-Id: <20231212005122.2401-14-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231212005122.2401-1-michael.chan@broadcom.com>
 References: <20231212005122.2401-1-michael.chan@broadcom.com>
@@ -70,121 +69,56 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000005b176f060c45758c"
+	boundary="000000000000703dfc060c45750a"
 
---0000000000005b176f060c45758c
+--000000000000703dfc060c45750a
 Content-Transfer-Encoding: 8bit
 
 From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
-We don't have to close and open the nic to make sure we have
-valid rx timestamps. Once we have the timestamp filter applied to
-the HW and the timestamp_fld_format bit is cleared in the rx
-completion and the timestamp is non-zero, we can be sure that rx
-timestamp is valid data.
+In a busy network, especially with flow control enabled, we may
+experience timestamp query failures fairly regularly. After a while,
+dmesg may be flooded with timestamp query failure error messages.
 
-Skip close/open when we set any timestamp filter.
+Silence the error message from the low level hwrm function that
+sends the firmware message.  Change netdev_err() to netdev_WARN_ONCE()
+if this FW call ever fails.
 
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 29 +++++++------------
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  2 +-
- 2 files changed, 11 insertions(+), 20 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-index a1ec39b46518..3d1c36d384c2 100644
+index 3d1c36d384c2..adad188e38b8 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-@@ -319,15 +319,17 @@ static int bnxt_ptp_cfg_event(struct bnxt *bp, u8 event)
- 	return hwrm_req_send(bp, req);
- }
- 
--void bnxt_ptp_cfg_tstamp_filters(struct bnxt *bp)
-+int bnxt_ptp_cfg_tstamp_filters(struct bnxt *bp)
- {
- 	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
- 	struct hwrm_port_mac_cfg_input *req;
-+	int rc;
- 
- 	if (!ptp || !ptp->tstamp_filters)
--		return;
-+		return -EIO;
- 
--	if (hwrm_req_init(bp, req, HWRM_PORT_MAC_CFG))
-+	rc = hwrm_req_init(bp, req, HWRM_PORT_MAC_CFG);
-+	if (rc)
- 		goto out;
- 
- 	if (!(bp->fw_cap & BNXT_FW_CAP_RX_ALL_PKT_TS) && (ptp->tstamp_filters &
-@@ -342,15 +344,17 @@ void bnxt_ptp_cfg_tstamp_filters(struct bnxt *bp)
- 	req->enables = cpu_to_le32(PORT_MAC_CFG_REQ_ENABLES_RX_TS_CAPTURE_PTP_MSG_TYPE);
- 	req->rx_ts_capture_ptp_msg_type = cpu_to_le16(ptp->rxctl);
- 
--	if (!hwrm_req_send(bp, req)) {
-+	rc = hwrm_req_send(bp, req);
-+	if (!rc) {
- 		bp->ptp_all_rx_tstamp = !!(ptp->tstamp_filters &
- 					   PORT_MAC_CFG_REQ_FLAGS_ALL_RX_TS_CAPTURE_ENABLE);
--		return;
-+		return 0;
+@@ -129,7 +129,7 @@ static int bnxt_hwrm_port_ts_query(struct bnxt *bp, u32 flags, u64 *ts)
  	}
- 	ptp->tstamp_filters = 0;
- out:
- 	bp->ptp_all_rx_tstamp = 0;
- 	netdev_warn(bp->dev, "Failed to configure HW packet timestamp filters\n");
-+	return rc;
- }
+ 	resp = hwrm_req_hold(bp, req);
  
- void bnxt_ptp_reapply_pps(struct bnxt *bp)
-@@ -494,7 +498,6 @@ static int bnxt_hwrm_ptp_cfg(struct bnxt *bp)
- {
- 	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
- 	u32 flags = 0;
--	int rc = 0;
+-	rc = hwrm_req_send(bp, req);
++	rc = hwrm_req_send_silent(bp, req);
+ 	if (!rc)
+ 		*ts = le64_to_cpu(resp->ptp_msg_ts);
+ 	hwrm_req_drop(bp, req);
+@@ -684,8 +684,8 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
+ 		timestamp.hwtstamp = ns_to_ktime(ns);
+ 		skb_tstamp_tx(ptp->tx_skb, &timestamp);
+ 	} else {
+-		netdev_err(bp->dev, "TS query for TX timer failed rc = %x\n",
+-			   rc);
++		netdev_WARN_ONCE(bp->dev,
++				 "TS query for TX timer failed rc = %x\n", rc);
+ 	}
  
- 	switch (ptp->rx_filter) {
- 	case HWTSTAMP_FILTER_ALL:
-@@ -519,19 +522,7 @@ static int bnxt_hwrm_ptp_cfg(struct bnxt *bp)
- 
- 	ptp->tstamp_filters = flags;
- 
--	if (netif_running(bp->dev)) {
--		if (ptp->rx_filter == HWTSTAMP_FILTER_ALL) {
--			rc = bnxt_close_nic(bp, false, false);
--			if (!rc)
--				rc = bnxt_open_nic(bp, false, false);
--		} else {
--			bnxt_ptp_cfg_tstamp_filters(bp);
--		}
--		if (!rc && !ptp->tstamp_filters)
--			rc = -EIO;
--	}
--
--	return rc;
-+	return bnxt_ptp_cfg_tstamp_filters(bp);
- }
- 
- int bnxt_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-index 34162e07a119..fce8dc39a7d0 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-@@ -137,7 +137,7 @@ do {						\
- int bnxt_ptp_parse(struct sk_buff *skb, u16 *seq_id, u16 *hdr_off);
- void bnxt_ptp_update_current_time(struct bnxt *bp);
- void bnxt_ptp_pps_event(struct bnxt *bp, u32 data1, u32 data2);
--void bnxt_ptp_cfg_tstamp_filters(struct bnxt *bp);
-+int bnxt_ptp_cfg_tstamp_filters(struct bnxt *bp);
- void bnxt_ptp_reapply_pps(struct bnxt *bp);
- int bnxt_hwtstamp_set(struct net_device *dev, struct ifreq *ifr);
- int bnxt_hwtstamp_get(struct net_device *dev, struct ifreq *ifr);
+ 	dev_kfree_skb_any(ptp->tx_skb);
 -- 
 2.30.1
 
 
---0000000000005b176f060c45758c
+--000000000000703dfc060c45750a
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -255,14 +189,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIILlZg1u3AFJTLhQhCqmbRzck0cuKorO
-KlycwdvM9sZ6MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIx
-MjAwNTIwMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJ3x5rt8MM1Kzil9XD2Y73DWAAEAAG1u
+VSWUm/lTY+uhMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIx
+MjAwNTIwMlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQA2QwfvEPI1Nrc/+xXLVPYDXtbCZLm8NyAfHc+ZNviK5TpEUYUP
-rxbIUwQZTMB3bkLkDjgL+9+bd9tiys1/zW/ET2pWbpWlIZtFDGq9oFXGVMbrozqb5Lw5zCalYWCa
-b9OK+cL8Ajz35LPF2KxMY0fu+Cu+FrtpgbU32xS8rIE5VITDpVHOi2/XlCz72qshaq/CLXQlY5Og
-HFh33Sa4eBzFmhGXhwRWB/z4AKJ19F9suljxJH2pH5ym0cLO2u2j1ZG+c/ZMaFD814GXi5NVkkVD
-6W1tqWpNn2415wHcucHW5oRPAQnlXk0BrdamaKBnahhOOSqm9A27gNjy/f8HTYee
---0000000000005b176f060c45758c--
+ATANBgkqhkiG9w0BAQEFAASCAQAcoYjn6Us9Lqd88mHwZN7+ZaP2W6VNduNs2zK6D2NjiEdpkobR
+cNBy2B0o6ysPz6zalm5exkVisABx/pTnGLsTa40gjEMLfNW2LNUxDyVJFALpLGNdVGBXnJ2cpsj0
+AN+/dJnJCydhQKUmwzxp3PISojH8TarToWq3NKn/eYWm1Fsytw9yONUVAMXbbDCnyrgt2gvxaosA
+Z5czI5ie/5G1Ub2ke4jt5wCjaxs6TyT6J3oon2ld9CGj5YcGrKd0Dqfvch3W1+gBUwISj4YdJztY
+UD7GJ2sj3AfMRT99EFEuJdF80wyI23Hr/2hikEeVwWznTSCjvVZrcNjNHnmdQsim
+--000000000000703dfc060c45750a--
 
