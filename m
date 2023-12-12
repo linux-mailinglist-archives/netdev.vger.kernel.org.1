@@ -1,134 +1,137 @@
-Return-Path: <netdev+bounces-56614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3113380F9FB
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 23:13:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 95DB180F9FE
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 23:16:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB3531F21484
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 22:13:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D005B1F2185A
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 22:15:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D78764CE1;
-	Tue, 12 Dec 2023 22:13:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF3A564CE9;
+	Tue, 12 Dec 2023 22:15:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="GPB73mA3"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cUuFc8yQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5BEBB3
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 14:13:15 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-6ce972ac39dso4103127b3a.3
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 14:13:15 -0800 (PST)
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DFBDD0
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 14:15:50 -0800 (PST)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-5e180547bdeso16490227b3.1
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 14:15:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1702419195; x=1703023995; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zz+Y7OFi5O5xALvZiSlWGcTk94UQ+2tG5uPBEil1mKc=;
-        b=GPB73mA3KLi4f9uNLtezlYvZ8bMAJ9GNgzvIGJjvSHR3t5bv/uh4JktQXcEwHLYIXk
-         y177Hs4uMQQg2Y3iJ6UnOhmF2p1qAw9A0ZgTEOYk7nap0QsS5N/aBGJ7Q2THHNVBwcAD
-         waO+FYSd2lyrG8hF4LTFiRsWlIfJJwPLT/K6U=
+        d=linaro.org; s=google; t=1702419350; x=1703024150; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=sesFDYuvisaQAeLJLAlKFp7z3aGtkUSoKH2xPGkQRmE=;
+        b=cUuFc8yQvnOMN0kK9NcB9AS1ArV9f3fHHKU0IXuc5stHJHjnFC7g0OtlF2dCxA9MzH
+         x2j6+1yQoIbGnicFx04PcjXVsh/RHbE6ewMSNpSZRBJQWB51HM74G7VUsf8RZExiQTXS
+         Wi+XNzOJlpWEPZMFBtzIaViMGEEeglvpgz/baK2Jzajqa++yF2RjQQTC+M/5K5m9tdDp
+         OKDwKuNfyCmaBbkfR5bvnKsNwrKZAuxrt5ZrdN9mp1F2F0x9geCN3VLI1rfFYxzeSU5d
+         /vnY8orNcyWgjZkrCQtUZy7zQKhFRtif2zPvlqv+78aEjk7fwAeAfJ+2uhprEQkxo9EM
+         WIQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702419195; x=1703023995;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1702419350; x=1703024150;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=zz+Y7OFi5O5xALvZiSlWGcTk94UQ+2tG5uPBEil1mKc=;
-        b=uatz+YaekMYu2GWdOAvdR3u+HRF5GbVAahcLOyiFx3VCDHc77SjWRvfTRunZddbGv1
-         ALvMj9rWGeZuWQk732EhhvHwkO4L4kQXdMObwklR2Cznm+6yW07FFm29ztxrUME60Sh6
-         q7CC0c6R7liuF3R1Tai2RQF6ZhfVinajsj6NzvDVk2RePA0NhY7JXftUSTFNKKSWrJU3
-         B3u6EDzfYyqABfuzAEvi9Hrxt852hsQdPWsNZDyO74k6EqZEfZD9FwMVbscq7XfkcH0U
-         1VbbVxdKt2zW8aQELEuqE4zVGUDt7vWQZQPbePvddqZMXOAT2vTawiMDS4ZbmtLG89qy
-         WrUw==
-X-Gm-Message-State: AOJu0YyRFQ8LQwbbO1GcBsp46W7kp5f822GVv9DZBKm6sDkGXWZQu0NK
-	16WoSlbMeSaUiZLhR9ULcQBRyg==
-X-Google-Smtp-Source: AGHT+IEWBKRXGUYKGQlw/ie1e8izpaxG2e22iJf+rKDEmrtEqp67ZIhooSrIcuGmEgZ+sAjKFUS5Uw==
-X-Received: by 2002:a05:6a00:398c:b0:6d0:99da:3d35 with SMTP id fi12-20020a056a00398c00b006d099da3d35mr2585995pfb.42.1702419195217;
-        Tue, 12 Dec 2023 14:13:15 -0800 (PST)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id t27-20020a056a00139b00b006cd08377a13sm8588242pfg.190.2023.12.12.14.13.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 14:13:14 -0800 (PST)
-From: Kees Cook <keescook@chromium.org>
-To: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-Cc: Kees Cook <keescook@chromium.org>,
-	kernel test robot <lkp@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH] amd-xgbe: Avoid potential string truncation in name
-Date: Tue, 12 Dec 2023 14:13:12 -0800
-Message-Id: <20231212221312.work.830-kees@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        bh=sesFDYuvisaQAeLJLAlKFp7z3aGtkUSoKH2xPGkQRmE=;
+        b=VeCJ0OyvNzK3LroCC7SQ4NYV5OzW6n2c4QviXvn8yiFFi5pc4vGZCiGThdaTSvTO1e
+         NLUUNhc3aTNuvMBAA0Dy2XOx/YZOrBjLeNKSaB7Z+wdFShdz3h47sW9QvIfEg7IACZrC
+         4v0b4+JfsjAdW/Xcx9/dSymE58pyx67IRLD84EyN1FFy2rqFqlgz5s0hxtsonElRzvlQ
+         m6MR4i+Ir6aujZ3HAShKeB96no8OVgUiuMZfF0QvuyQ5HlIhvhywoFpgbgZLt90Yptju
+         PmS/UcKS2Mm2Nb4/oUtdrqSuY3R9stSss80YwxOFqzLv/VlZTTciCWWf4Jn753BvkE4l
+         LWng==
+X-Gm-Message-State: AOJu0Ywi0T7VR/yCY9TYzZbZO6bc3Sa2zD8RB3CQKq+ogb4l+8Ivnsz0
+	o9OYCoYRdLSup+N1qG9XnATjd3nRqhT9t/m8eVOXfA==
+X-Google-Smtp-Source: AGHT+IGGyJlE32Nn0xvD8pTWqNKXufszc7hVjv2yNNUS0YVajqTHhbf2kFuywehaBgET5yUsVEcXfOU4GbPchRYGqZM=
+X-Received: by 2002:a0d:dc07:0:b0:5d3:66ad:f8f6 with SMTP id
+ f7-20020a0ddc07000000b005d366adf8f6mr5195337ywe.24.1702419349823; Tue, 12 Dec
+ 2023 14:15:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2121; i=keescook@chromium.org;
- h=from:subject:message-id; bh=0SDaP7ngg2pX0pwKb/HXuBG4QGzcvWu5mlfJ4RHu8Zk=;
- b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBleNr4UaAfdD0Y2y5yQf7Jeyn1JWreRU2mq7NQo
- QbLQgl8hTmJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZXja+AAKCRCJcvTf3G3A
- JghBD/4uiMgovzu3/1hYGRlACubDv9q2+Kux+qaJ3L5hFEg9NnCi4mRKBDkQ6Bn+/NIwUV+xhUy
- 0fx2ZmBMdIp6hclimldAs8Jiw0QnsFR4J4/4LMalltpdilZvi8Rwjz0/H66WbE8/Ny2Qz9EUZsg
- xChbel3UWk/FB4EVyXZe1mGSeY4ZaNr/LF5JMKm5x34+7VOzDq7N2SxixbkG+HNm8VexdHhCNrV
- 6XZmUB4YKCO4DIZMGHo/wn3RVlAfTjmJghAqLvNyePo+mt5SYaH6xmxBfvme39P0l3l1it+EGI6
- ieWT3a/jpcr6laME+sdkAGhX85Hn4aw79ke7KcS/v2fvuLsrQDM/XwWjATeuDIMVYIxSFYDWoZN
- tgUgxO6a2RwtcmC9JB35mAIheKAtHL8KZmffQc6fHORc0xQpdacJfM94B6/JP6r9VFU/MKMbd2J
- CUwUSb1Kka684PSvO1BhDA7+Jnztn3Vf0czVDI11LqtiBl5W76AaRenfpL584xGlTyaA3TzA3Wf
- JpCQdoFmhtK95c4AHPTOU4yFKi7/PXJSmqUOT9ahKsYoRuyH2/wS+8FhENxqHP1q4kI1nF2+k1g
- e51oAMUeMr5X+CHKYekW6k2Rw2bt/zbTviYO0pgr7W2iDuK9r4tRVMJ0iApYeozQQ41+JmAUGrB
- U+jyEDr hdGGCquw==
-X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+References: <20231128132534.258459-1-herve.codina@bootlin.com>
+In-Reply-To: <20231128132534.258459-1-herve.codina@bootlin.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Tue, 12 Dec 2023 23:15:38 +0100
+Message-ID: <CACRpkdYT1J7noFUhObFgfA60XQAfL4rb=knEmWS__TKKtCMh7Q@mail.gmail.com>
+Subject: Re: [PATCH 0/5] Add support for framer infrastructure and PEF2256 framer
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Lee Jones <lee@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, 
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Build with W=1 were warning about a potential string truncation:
+Hi Herve, Jakub, Mark,
 
-drivers/net/ethernet/amd/xgbe/xgbe-drv.c: In function 'xgbe_alloc_channels':
-drivers/net/ethernet/amd/xgbe/xgbe-drv.c:211:73: warning: '%u' directive output may be truncated writing between 1 and 10 bytes into a region of size 8 [-Wformat-truncation=]
-  211 |                 snprintf(channel->name, sizeof(channel->name), "channel-%u", i);
-      |                                                                         ^~
-drivers/net/ethernet/amd/xgbe/xgbe-drv.c:211:64: note: directive argument in the range [0, 4294967294]
-  211 |                 snprintf(channel->name, sizeof(channel->name), "channel-%u", i);
-      |                                                                ^~~~~~~~~~~~
-drivers/net/ethernet/amd/xgbe/xgbe-drv.c:211:17: note: 'snprintf' output between 10 and 19 bytes into a destination of size 16
-  211 |                 snprintf(channel->name, sizeof(channel->name), "channel-%u", i);
-      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+here is an immutable tag for the PEF2256 framer, as promised.
 
-Increase the size of the "name" buffer to handle the full format range.
+I have already merged it into the pinctrl tree for starters.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202312100937.ZPZCARhB-lkp@intel.com/
-Cc: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- drivers/net/ethernet/amd/xgbe/xgbe.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yours,
+Linus Walleij
 
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ethernet/amd/xgbe/xgbe.h
-index ad136ed493ed..f01a1e566da6 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe.h
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
-@@ -495,7 +495,7 @@ struct xgbe_ring {
-  * a DMA channel.
-  */
- struct xgbe_channel {
--	char name[16];
-+	char name[20];
- 
- 	/* Address of private data area for device */
- 	struct xgbe_prv_data *pdata;
--- 
-2.34.1
+The following changes since commit b85ea95d086471afb4ad062012a4d73cd328fa86:
 
+  Linux 6.7-rc1 (2023-11-12 16:19:07 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/linusw/linux-pinctrl.git
+tags/pef2256-framer
+
+for you to fetch changes up to 1e95d20ae8e6a383b4c1dd2282e5259790724037:
+
+  MAINTAINERS: Add the Lantiq PEF2256 driver entry (2023-12-12 23:05:25 +0100)
+
+----------------------------------------------------------------
+Immutable tag for the PEF2256 framer
+
+----------------------------------------------------------------
+Herve Codina (5):
+      net: wan: Add framer framework support
+      dt-bindings: net: Add the Lantiq PEF2256 E1/T1/J1 framer
+      net: wan: framer: Add support for the Lantiq PEF2256 framer
+      pinctrl: Add support for the Lantic PEF2256 pinmux
+      MAINTAINERS: Add the Lantiq PEF2256 driver entry
+
+ .../devicetree/bindings/net/lantiq,pef2256.yaml    | 213 +++++
+ MAINTAINERS                                        |   8 +
+ drivers/net/wan/Kconfig                            |   2 +
+ drivers/net/wan/Makefile                           |   2 +
+ drivers/net/wan/framer/Kconfig                     |  42 +
+ drivers/net/wan/framer/Makefile                    |   7 +
+ drivers/net/wan/framer/framer-core.c               | 882 +++++++++++++++++++++
+ drivers/net/wan/framer/pef2256/Makefile            |   8 +
+ drivers/net/wan/framer/pef2256/pef2256-regs.h      | 250 ++++++
+ drivers/net/wan/framer/pef2256/pef2256.c           | 880 ++++++++++++++++++++
+ drivers/pinctrl/Kconfig                            |  15 +
+ drivers/pinctrl/Makefile                           |   1 +
+ drivers/pinctrl/pinctrl-pef2256.c                  | 358 +++++++++
+ include/linux/framer/framer-provider.h             | 194 +++++
+ include/linux/framer/framer.h                      | 205 +++++
+ include/linux/framer/pef2256.h                     |  31 +
+ 16 files changed, 3098 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/lantiq,pef2256.yaml
+ create mode 100644 drivers/net/wan/framer/Kconfig
+ create mode 100644 drivers/net/wan/framer/Makefile
+ create mode 100644 drivers/net/wan/framer/framer-core.c
+ create mode 100644 drivers/net/wan/framer/pef2256/Makefile
+ create mode 100644 drivers/net/wan/framer/pef2256/pef2256-regs.h
+ create mode 100644 drivers/net/wan/framer/pef2256/pef2256.c
+ create mode 100644 drivers/pinctrl/pinctrl-pef2256.c
+ create mode 100644 include/linux/framer/framer-provider.h
+ create mode 100644 include/linux/framer/framer.h
+ create mode 100644 include/linux/framer/pef2256.h
 
