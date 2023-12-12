@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-56165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F420580E07F
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 01:52:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A34280E080
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 01:52:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49465B210F4
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:52:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B456FB21310
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:52:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A09180C;
-	Tue, 12 Dec 2023 00:51:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36161639;
+	Tue, 12 Dec 2023 00:51:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="CaCh1NWV"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="JOPrcZf0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8695299
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:51:54 -0800 (PST)
-Received: by mail-qt1-x82e.google.com with SMTP id d75a77b69052e-425922f5b89so34917861cf.0
-        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:51:54 -0800 (PST)
+Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62726A6
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:51:56 -0800 (PST)
+Received: by mail-qt1-x829.google.com with SMTP id d75a77b69052e-42589694492so39940871cf.1
+        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:51:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1702342313; x=1702947113; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1702342315; x=1702947115; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/FQLSzIEljtj9qMhFQjt2/nf1M48P3DkoQUJaRn/gds=;
-        b=CaCh1NWV+x1gxRN8ZN9LnrBSNgTEisY8LixjAR/9k9hbpfwWTdiISGm8LDXChfOEfL
-         Au8+5JLzpdV8RkbhPoEqW/w2CCZKu1sdLixYeKfYCh8PbUnQOcLqQ4qByBBXVDD1Yulj
-         ATyzNWUVRiUfAK/IoodvZFLsJmz61AslPlYZI=
+        bh=SERu6RxsbEVFhDOFKQ6k8RPmhIGpfdfq8Cwt3oIkPZA=;
+        b=JOPrcZf04h97MCxeNwNR1W2FdQYxI3yVDPzt+ittKMRYB94AWzF0DTbTZO9BH4iK/U
+         W84xsIOcBtVjUzvKuA/uyXvGVreeQfPGHoQ4boByETNEQ7QWDf16mCstzDTKD8fxz/sm
+         xTVIhuN+dBSmuOXQOlmwSejlofSa+wZcxuxms=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702342313; x=1702947113;
+        d=1e100.net; s=20230601; t=1702342315; x=1702947115;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/FQLSzIEljtj9qMhFQjt2/nf1M48P3DkoQUJaRn/gds=;
-        b=EfZH44348LxaURXZwXhV4/Hx1QbK9linGLHMG44eSxM6YC1dKSbrKQTQRvPMFyTKaO
-         5XYEoaFgDxCpYC0+9e9N9zyCgHbKzq0f1fpstQ7Ip6bQrqDWiVwvkCv+AdidDdkQIE5q
-         79fFY7+m3WQ1zHrkvZlQCbmxvnkz6kNrsxZhda+gn1Fn/l0qy/JasM3+VDPs9d2Q81re
-         TYxsn+1QgYQMKgB3alvSdCOXaneTOh1xfa5P6R5kMqI5fFzSLlz822DdPmj8ZpV8xWF+
-         mNxwQFUfOj9x+IjnbBRh6i1Ea6joLfdD+Aa779mjzrrqEpk5spNLGdtP+YE7uAiOml0j
-         flnA==
-X-Gm-Message-State: AOJu0YzCJb6DpfDIOp2hLqOv7Qa2f2SCTeHbg8FBRk+6yMqwfYaNzRYM
-	2s4EoEimdyo1od43dnSuliHRqA==
-X-Google-Smtp-Source: AGHT+IF2ZB9iePLPYmeFIEQadMXffBZSqzyZJWP9CSnZOGyTlqau4Szhp9m48F6Cu8dgDKCZ14UlsA==
-X-Received: by 2002:a05:622a:30e:b0:425:9e14:3f1f with SMTP id q14-20020a05622a030e00b004259e143f1fmr7339755qtw.120.1702342313585;
-        Mon, 11 Dec 2023 16:51:53 -0800 (PST)
+        bh=SERu6RxsbEVFhDOFKQ6k8RPmhIGpfdfq8Cwt3oIkPZA=;
+        b=YKEDm9zhtzXoo4/IjPHvnhsR8HVe9hI4e5ksNAq3iFHavXm8wqmU34QlKwLTvW9v1E
+         zT+Y/Ef0jSXZlTleMPjV6PuQyJOLsTI+ohOZstjTcBbFd4xYgelrTY8JER+29fGMNXpd
+         kx850nKKWDVe8a5M0BOTBXUQ2/PHtBkKXDq7t6GT6y3YfkEw5VG1xCELRCdmIlG99JXm
+         +NuZgGLNS7whAa3FCD0aGjp9ylGvm7JTGaCrungCMOFl+lpyOOUQj0Roum2+h9yPPUR3
+         sNhMzVVVCWx2tqT6Dea0ogQqK/Ulfvsuz+GDAyDbrqju90oMgqL1Yazql70Axu1XdHxP
+         U/sQ==
+X-Gm-Message-State: AOJu0YyGA7uKIuCPCisjigLJUJ529/W+Izj2W7+YBTeiuOV8qX5EUzwZ
+	DfFVnn/TTAA6v5M4vtFG0vAWYg==
+X-Google-Smtp-Source: AGHT+IEqPcbY+X0FJiv+y/ozmmAGv2ksTG9MUqyI7eWQAfKu/fIRmigU9iVvxUsWBanTrassEHPGPQ==
+X-Received: by 2002:ac8:7f0c:0:b0:425:4043:5f0e with SMTP id f12-20020ac87f0c000000b0042540435f0emr6682465qtk.76.1702342315375;
+        Mon, 11 Dec 2023 16:51:55 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id r5-20020ac87945000000b00423ea1b31b3sm3619664qtt.66.2023.12.11.16.51.52
+        by smtp.gmail.com with ESMTPSA id r5-20020ac87945000000b00423ea1b31b3sm3619664qtt.66.2023.12.11.16.51.53
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 11 Dec 2023 16:51:53 -0800 (PST)
+        Mon, 11 Dec 2023 16:51:54 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -55,10 +55,12 @@ Cc: netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	gospo@broadcom.com,
+	Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>,
+	Ajit Khaparde <ajit.khaparde@broadcom.com>,
 	Somnath Kotur <somnath.kotur@broadcom.com>
-Subject: [PATCH net-next 07/13] bnxt_en: Use proper TUNNEL_DST_PORT_ALLOC* commands
-Date: Mon, 11 Dec 2023 16:51:16 -0800
-Message-Id: <20231212005122.2401-8-michael.chan@broadcom.com>
+Subject: [PATCH net-next 08/13] bnxt_en: Add support for VXLAN GPE
+Date: Mon, 11 Dec 2023 16:51:17 -0800
+Message-Id: <20231212005122.2401-9-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231212005122.2401-1-michael.chan@broadcom.com>
 References: <20231212005122.2401-1-michael.chan@broadcom.com>
@@ -69,42 +71,152 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000e87c6d060c4574d2"
+	boundary="00000000000004ee11060c45753c"
 
---000000000000e87c6d060c4574d2
+--00000000000004ee11060c45753c
 Content-Transfer-Encoding: 8bit
 
-In bnxt_udp_tunnel_set_port(), use the proper ALLOC commands instead
-of the FREE commands for correctness.  The ALLOC and FREE commands
-happen to be identical so this is just a cosmetic fix for correctness.
+Add a new bnxt_udp_tunnels_p7 struct to support the new P7 chips that
+can parse VXLAN GPE packets.  Add VXLAN GPE tunnel type handling to
+the .set_port() and .unset_port() functions.  .ndo_features_check()
+is also enhanced to support VXLAN GPE which may encapsulate inner
+IP packets instead of ethernet packets.
 
+Reviewed-by: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
+Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
 Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 43 ++++++++++++++++++++---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h |  2 ++
+ 2 files changed, 40 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 42a52ee8c1bc..f2e8904de97f 100644
+index f2e8904de97f..b9eb3e0c5995 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -13673,9 +13673,9 @@ static int bnxt_udp_tunnel_set_port(struct net_device *netdev, unsigned int tabl
- 	unsigned int cmd;
+@@ -5179,6 +5179,11 @@ static int bnxt_hwrm_tunnel_dst_port_free(struct bnxt *bp, u8 tunnel_type)
+ 		bp->nge_port = 0;
+ 		bp->nge_fw_dst_port_id = INVALID_HW_RING_ID;
+ 		break;
++	case TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_VXLAN_GPE:
++		req->tunnel_dst_port_id = cpu_to_le16(bp->vxlan_gpe_fw_dst_port_id);
++		bp->vxlan_gpe_port = 0;
++		bp->vxlan_gpe_fw_dst_port_id = INVALID_HW_RING_ID;
++		break;
+ 	default:
+ 		break;
+ 	}
+@@ -5222,6 +5227,11 @@ static int bnxt_hwrm_tunnel_dst_port_alloc(struct bnxt *bp, __be16 port,
+ 		bp->nge_port = port;
+ 		bp->nge_fw_dst_port_id = le16_to_cpu(resp->tunnel_dst_port_id);
+ 		break;
++	case TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_VXLAN_GPE:
++		bp->vxlan_gpe_port = port;
++		bp->vxlan_gpe_fw_dst_port_id =
++			le16_to_cpu(resp->tunnel_dst_port_id);
++		break;
+ 	default:
+ 		break;
+ 	}
+@@ -12002,9 +12012,10 @@ static bool bnxt_udp_tunl_check(struct bnxt *bp, struct sk_buff *skb)
+ 	struct udphdr *uh = udp_hdr(skb);
+ 	__be16 udp_port = uh->dest;
+ 
+-	if (udp_port != bp->vxlan_port && udp_port != bp->nge_port)
++	if (udp_port != bp->vxlan_port && udp_port != bp->nge_port &&
++	    udp_port != bp->vxlan_gpe_port)
+ 		return false;
+-	if (skb->inner_protocol_type == ENCAP_TYPE_ETHER) {
++	if (skb->inner_protocol == htons(ETH_P_TEB)) {
+ 		struct ethhdr *eh = inner_eth_hdr(skb);
+ 
+ 		switch (eh->h_proto) {
+@@ -12015,6 +12026,11 @@ static bool bnxt_udp_tunl_check(struct bnxt *bp, struct sk_buff *skb)
+ 						 skb_inner_network_offset(skb),
+ 						 NULL);
+ 		}
++	} else if (skb->inner_protocol == htons(ETH_P_IP)) {
++		return true;
++	} else if (skb->inner_protocol == htons(ETH_P_IPV6)) {
++		return bnxt_exthdr_check(bp, skb, skb_inner_network_offset(skb),
++					 NULL);
+ 	}
+ 	return false;
+ }
+@@ -13674,8 +13690,10 @@ static int bnxt_udp_tunnel_set_port(struct net_device *netdev, unsigned int tabl
  
  	if (ti->type == UDP_TUNNEL_TYPE_VXLAN)
--		cmd = TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_VXLAN;
-+		cmd = TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_VXLAN;
- 	else
--		cmd = TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_GENEVE;
-+		cmd = TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_GENEVE;
+ 		cmd = TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_VXLAN;
+-	else
++	else if (ti->type == UDP_TUNNEL_TYPE_GENEVE)
+ 		cmd = TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_GENEVE;
++	else
++		cmd = TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_VXLAN_GPE;
  
  	return bnxt_hwrm_tunnel_dst_port_alloc(bp, ti->port, cmd);
  }
+@@ -13688,8 +13706,10 @@ static int bnxt_udp_tunnel_unset_port(struct net_device *netdev, unsigned int ta
+ 
+ 	if (ti->type == UDP_TUNNEL_TYPE_VXLAN)
+ 		cmd = TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_VXLAN;
+-	else
++	else if (ti->type == UDP_TUNNEL_TYPE_GENEVE)
+ 		cmd = TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_GENEVE;
++	else
++		cmd = TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_VXLAN_GPE;
+ 
+ 	return bnxt_hwrm_tunnel_dst_port_free(bp, cmd);
+ }
+@@ -13703,6 +13723,16 @@ static const struct udp_tunnel_nic_info bnxt_udp_tunnels = {
+ 		{ .n_entries = 1, .tunnel_types = UDP_TUNNEL_TYPE_VXLAN,  },
+ 		{ .n_entries = 1, .tunnel_types = UDP_TUNNEL_TYPE_GENEVE, },
+ 	},
++}, bnxt_udp_tunnels_p7 = {
++	.set_port	= bnxt_udp_tunnel_set_port,
++	.unset_port	= bnxt_udp_tunnel_unset_port,
++	.flags		= UDP_TUNNEL_NIC_INFO_MAY_SLEEP |
++			  UDP_TUNNEL_NIC_INFO_OPEN_ONLY,
++	.tables		= {
++		{ .n_entries = 1, .tunnel_types = UDP_TUNNEL_TYPE_VXLAN,  },
++		{ .n_entries = 1, .tunnel_types = UDP_TUNNEL_TYPE_GENEVE, },
++		{ .n_entries = 1, .tunnel_types = UDP_TUNNEL_TYPE_VXLAN_GPE, },
++	},
+ };
+ 
+ static int bnxt_bridge_getlink(struct sk_buff *skb, u32 pid, u32 seq,
+@@ -14298,7 +14328,10 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 			NETIF_F_GSO_UDP_TUNNEL | NETIF_F_GSO_GRE |
+ 			NETIF_F_GSO_UDP_TUNNEL_CSUM | NETIF_F_GSO_GRE_CSUM |
+ 			NETIF_F_GSO_IPXIP4 | NETIF_F_GSO_PARTIAL;
+-	dev->udp_tunnel_nic_info = &bnxt_udp_tunnels;
++	if (bp->flags & BNXT_FLAG_CHIP_P7)
++		dev->udp_tunnel_nic_info = &bnxt_udp_tunnels_p7;
++	else
++		dev->udp_tunnel_nic_info = &bnxt_udp_tunnels;
+ 
+ 	dev->gso_partial_features = NETIF_F_GSO_UDP_TUNNEL_CSUM |
+ 				    NETIF_F_GSO_GRE_CSUM;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index 67915ab13f50..609f4073f5ff 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -2284,8 +2284,10 @@ struct bnxt {
+ 
+ 	u16			vxlan_fw_dst_port_id;
+ 	u16			nge_fw_dst_port_id;
++	u16			vxlan_gpe_fw_dst_port_id;
+ 	__be16			vxlan_port;
+ 	__be16			nge_port;
++	__be16			vxlan_gpe_port;
+ 	u8			port_partition_type;
+ 	u8			port_count;
+ 	u16			br_mode;
 -- 
 2.30.1
 
 
---000000000000e87c6d060c4574d2
+--00000000000004ee11060c45753c
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -175,14 +287,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJjQ+JOlL1fjjZcHltCuw5eYxjaevOn5
-mfDOrn44y9ZPMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIx
-MjAwNTE1M1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILXSXQuonlTaLJFRwQ1srbNFevPyapfG
+tqumO5Pmt00wMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIx
+MjAwNTE1NVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBP28CJ6dpaSaOWIo/jQL+kJz9G/opWLOuvy+a1iPp/NqBx/xKM
-q57/rTFFyb0kf8QOX9zRnc2digxQGjf0rl2Bj99eA+Pd7SYIZEkVBSo2UVv0FvRK3hcsS11zCGhe
-F/8oGFbWFcePd+ggKIB4WkGMczcvINzx7ai/JsoEdArwKB6MQSk7Dlx7EPCkbdmCiQETkQpv4U+v
-fb6lHbvoMPdpmXAFXYlSDEJzjKio0qCKstUwMAOE2t78xpgGcpuEtHz4Y2gP2ve3m99rp3dAy2PV
-AblgDo72Yl2BT6AguobWdQQ2CeX776LCMKQU6OjtCVOlWmI9OX8NNvZdQVuZdiEn
---000000000000e87c6d060c4574d2--
+ATANBgkqhkiG9w0BAQEFAASCAQClLEnvrC5k8DW6hi/LTdZnX1C36pGu1E2RAB9uZunf6jQewtkm
+dOBCoa0Bh7vDQKzL3ii9zT5WLc2B/9aADmlB+SiP9iWJp01Ktgvcv6R8s1lvEztpsupya29vg2qf
+HQwgbhfvhlM/hpZ8NmmZD8PcYQ+ljDD3b56SXvVtea0EeHQDuNvRJykKbKQw63YNjky+il9jjwmn
+66E3PI3IwsGBsTgX5Wm8SI9Bask9TQBB2fNeP1aR+HVtedGSD3bYSiHwF7Qj0raEbooI6cdiHYhA
+g1SFlCOFYywH4ZRHtEaORCeKxCj6eBZUwO5kkms+tSk38nnAhY3Lt+EfFcGCbZyD
+--00000000000004ee11060c45753c--
 
