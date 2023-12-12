@@ -1,114 +1,119 @@
-Return-Path: <netdev+bounces-56446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 909DC80EE86
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 15:19:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C526080EEAE
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 15:27:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0C651C20AC5
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:19:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55017B20D81
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:27:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98F5C73177;
-	Tue, 12 Dec 2023 14:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7DDE7318E;
+	Tue, 12 Dec 2023 14:27:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="juN+FD4m"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UIduafO1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-xc2c.google.com (mail-oo1-xc2c.google.com [IPv6:2607:f8b0:4864:20::c2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A50E8F
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 06:19:15 -0800 (PST)
-Received: by mail-oo1-xc2c.google.com with SMTP id 006d021491bc7-5910b21896eso1082948eaf.0
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 06:19:15 -0800 (PST)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C132FD
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 06:27:05 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-54dca2a3f16so10521019a12.0
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 06:27:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702390754; x=1702995554; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1702391224; x=1702996024; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9+iG7jHdvIfqMzPDtzAk2IrM1w134VeGVNuUxajbE2c=;
-        b=juN+FD4mqNLHRSGKN9iw0OFgvQ6U608nekZgi3Pqj37GLC1KNuSrQCBLa+1bFqAgf9
-         KKEr5DNZHOagoVpVF50W1DZQ2+xIQOxAxhfDqXpeHPPq65nKqrR0NGlFanz7grsbab41
-         qFHOA6fuli77wwyltZnb9uoIOYBGyuh+ziUSxHO+c1nh5Cd2XU+iRQao75jiTejaYYr9
-         oKx+Ue5vtqg/81iUwbHt3Pmz0352ZdwF0jYHDFpb49dYiWYFlgGA0jmCcaUZDdcVURHs
-         XIknO/wxYGyKYumZUzeAvq8ySVZIi0Z+GsBk1lwSI64hZszbv/XlwwZ9mmt0rI/d7WHp
-         JJXg==
+        bh=bCZPRFlYELlSqnd7f+LApbuWWSOTUwHuWf2lhre3cTY=;
+        b=UIduafO1DT3E/9yl00OWV+EjecVJ2FWvoAE4REaS2pOQdZ5ihOPnmfePL8xZYamHU+
+         0bXdkQaFPcH+FNZUpV7sZkEfd1gxLFPT7iafcK+X1tDXmEDEmcxRpFnLgOAi5rKjJSJE
+         kPh9hyCUmvQcO6XQlE9+02ZQ9DAaghh/c0BDDAnoU0hXa9ki1ZKwacHa16PIjHxqmaqU
+         wx1GQSmZ2SY8SXxd7oAzT5MhZ2IaE6sVCFpAlw4lA3vJU6CF9WDBKObpxNNV3XxiTls4
+         qYzMjNmnbxO2y0Fdcv2yT4IOj3kaBYFvTAcGYv5O4HzqMn0R7j8VITzuWnP+Jdg5UaMy
+         +51Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702390754; x=1702995554;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=9+iG7jHdvIfqMzPDtzAk2IrM1w134VeGVNuUxajbE2c=;
-        b=SRoFXnaBAKPqZTMMbFOB2VZA5FaxPyHdQmj702tvVi38RRSeDMdtP/k7oC/A/vdrMi
-         3DzFMYOwXf3Q1omaTSo0l6tMvumr8D9banBuKjQVuD/DQEA9W7LTKvxvkLQSJTGUwEzp
-         czdBLSHdgeoNJgNzzFtpj+wvkHL0IoAJTTGpm6gSSTJWAITXDqphVKv+keaAONt9MRmd
-         NraCCRilMbpfOLgiVauTWECLrUoFiRuKnxzUaCi0/e6S8Hc+YkI0fh+NSJPUWV2NpSNO
-         2oB87ixs7+MJu7iBmhuo7dkRavsqZH1XSZcjwQJl6t7lhXmvJwoRLaDmfCxTfrUr8ZKV
-         1NJQ==
-X-Gm-Message-State: AOJu0YxWgu9uePYpF5mRuP7ie/dRASd6oYvB6EV7wX17Uj6gjgmlczt6
-	1iXJldixg+uWClq1QOO2/lQ=
-X-Google-Smtp-Source: AGHT+IF40F1NYE8FXT4TNUmVADdoDwKphVAaLMi93H2Iq5OJgyUHIUl4txCKJz5d/VxiNTYr0Gkz4g==
-X-Received: by 2002:a05:6359:a2a:b0:170:17eb:1e9 with SMTP id el42-20020a0563590a2a00b0017017eb01e9mr2944301rwb.44.1702390754082;
-        Tue, 12 Dec 2023 06:19:14 -0800 (PST)
-Received: from localhost (114.66.194.35.bc.googleusercontent.com. [35.194.66.114])
-        by smtp.gmail.com with ESMTPSA id l2-20020a0ce6c2000000b0067ac2df0199sm5291qvn.128.2023.12.12.06.19.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 06:19:13 -0800 (PST)
-Date: Tue, 12 Dec 2023 09:19:13 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, 
- eric.dumazet@gmail.com, 
- Eric Dumazet <edumazet@google.com>, 
- Willem de Bruijn <willemb@google.com>
-Message-ID: <65786be1539d6_27f3a52943@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20231212110608.3673677-1-edumazet@google.com>
-References: <20231212110608.3673677-1-edumazet@google.com>
-Subject: Re: [PATCH net-next] docs: networking: timestamping: mention MSG_EOR
- flag
+        d=1e100.net; s=20230601; t=1702391224; x=1702996024;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bCZPRFlYELlSqnd7f+LApbuWWSOTUwHuWf2lhre3cTY=;
+        b=skMptx5IM5fw+GFdCFBStTt2ak0ZXVrE+GMErIKNjAeaOr/YL9b1SmDWJHS50cuY6y
+         RQourpZmpbumlDrZBD+RFguqHpjYpkFPYlHeGZpHDoSLittfUsyKfAcvtdmgkRv8FAvG
+         frvfk0LrUPjWBDht2AUIHGbfN8ulDA7hIRJC/3IAXm9pS0mGSZ6aVyxvE3aUOhfxE/T8
+         q3kODpmULAAKozB33waA6PnyVCVCh0dFQTayPv/0nNP6RzgcqXX2QRxAZDHDbNRt1Zhk
+         ee7vBp0UYyKo/Umv2bz64y17hbGoJwI244o7vxE6d2xsrwV9QpfVH1Vfs8QOXrJIBGq3
+         X6gw==
+X-Gm-Message-State: AOJu0Yx+nUdt5r5MCMPwB76PsAst4aK31TwG+4deHMKocd2TPf0k1kkW
+	addF3auV2L1TPgsK7DSFLjeisBiri50wPvBHOW/Jtg==
+X-Google-Smtp-Source: AGHT+IEOyCkF2DgwL7RBhVnTjCksBIhJaDTVsJX1VcMmek5dl3277Sns8cp70gbrdUy6r5MpVMdk0OJS5kwbSqhfdhU=
+X-Received: by 2002:a17:906:51de:b0:9f2:859f:713e with SMTP id
+ v30-20020a17090651de00b009f2859f713emr7079811ejk.3.1702391223630; Tue, 12 Dec
+ 2023 06:27:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20231208005250.2910004-1-almasrymina@google.com>
+ <20231208005250.2910004-9-almasrymina@google.com> <20231212122535.GA3029808@nvidia.com>
+In-Reply-To: <20231212122535.GA3029808@nvidia.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 12 Dec 2023 06:26:51 -0800
+Message-ID: <CAHS8izMVMx0fpT=dWsnD7piqs1g7Fam8Xf5dK3iOFNxeOQD9vQ@mail.gmail.com>
+Subject: Re: [net-next v1 08/16] memory-provider: dmabuf devmem memory provider
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
+	David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeelb@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>, Christoph Hellwig <hch@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Eric Dumazet wrote:
-> TCP got MSG_EOR support in linux-4.7.
-> 
-> This is a canonical way of making sure no coalescing
-> will be performed on the skb, even if it could not be
-> immediately sent.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Martin KaFai Lau <kafai@fb.com
-> Cc: Willem de Bruijn <willemb@google.com>
+On Tue, Dec 12, 2023 at 4:25=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com> wr=
+ote:
+>
+> On Thu, Dec 07, 2023 at 04:52:39PM -0800, Mina Almasry wrote:
+>
+> > +static inline struct page_pool_iov *page_to_page_pool_iov(struct page =
+*page)
+> > +{
+> > +     if (page_is_page_pool_iov(page))
+> > +             return (struct page_pool_iov *)((unsigned long)page & ~PP=
+_IOV);
+> > +
+> > +     DEBUG_NET_WARN_ON_ONCE(true);
+> > +     return NULL;
+> > +}
+>
+> We already asked not to do this, please do not allocate weird things
+> can call them 'struct page' when they are not. It undermines the
+> maintainability of the mm to have things mis-typed like
+> this. Introduce a new type for your thing so the compiler can check it
+> properly.
+>
 
-Acked-by: Willem de Bruijn <willemb@google.com>
+There is a new type introduced, it's the page_pool_iov. We set the LSB
+on page_pool_iov* and cast it to page* only to avoid the churn of
+renaming page* to page_pool_iov* in the page_pool and all the net
+drivers using it. Is that not a reasonable compromise in your opinion?
+Since the LSB is set on the resulting page pointers, they are not
+actually usuable as pages, and are never passed to mm APIs per your
+requirement.
 
-> ---
->  Documentation/networking/timestamping.rst | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/networking/timestamping.rst b/Documentation/networking/timestamping.rst
-> index f17c01834a1230d31957112bb7f9c207e9178ecc..5e93cd71f99f1b17169b31f2ff93e8bd5220e5cd 100644
-> --- a/Documentation/networking/timestamping.rst
-> +++ b/Documentation/networking/timestamping.rst
-> @@ -357,7 +357,8 @@ enabling SOF_TIMESTAMPING_OPT_ID and comparing the byte offset at
->  send time with the value returned for each timestamp. It can prevent
->  the situation by always flushing the TCP stack in between requests,
->  for instance by enabling TCP_NODELAY and disabling TCP_CORK and
-> -autocork.
-> +autocork. After linux-4.7, a better way to prevent coalescing is
-> +to use MSG_EOR flag at sendmsg() time.
-
-Good catch. We could even remove the old deprecated suggestion, and
-drop the versioning, as this Documentation ships with the kernel to
-which it applies.
-
+--=20
+Thanks,
+Mina
 
