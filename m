@@ -1,150 +1,118 @@
-Return-Path: <netdev+bounces-56437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E903680EDA1
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:31:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5679580EDAD
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:32:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CC21281711
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 13:31:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AD7C1C20B82
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 13:32:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB2861FDF;
-	Tue, 12 Dec 2023 13:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5346ABAD;
+	Tue, 12 Dec 2023 13:32:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com [209.85.210.70])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D7BDB3
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 05:31:32 -0800 (PST)
-Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-6d9e9926cf0so4504795a34.0
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 05:31:32 -0800 (PST)
+Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com [209.85.160.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8043CA
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 05:32:34 -0800 (PST)
+Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-1fb2b95e667so10675658fac.3
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 05:32:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702387891; x=1702992691;
+        d=1e100.net; s=20230601; t=1702387954; x=1702992754;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=QSGDZEWTgdWKW8bU16gxzUuZI6p71C2F9ES7PF52wuQ=;
-        b=E7BTtpXRrq+YY2kLRVdwiAHPptzx34PQy90fYn8S6KdPK70lGw1FD/+yiNX1nFFPD5
-         Rh8zqcea+c1URKDHJBuTwSHybXfNgJBMBxRXMjqTCZY5GF+lNL8n4qtY5jJ8W7eq8GNq
-         SE9RrYh7ezc51oLRVOQXihARMy6BmY0EmZkbYBNxmvrd1LG9xaqWXAwUKLecoQkgFGug
-         WlXqn8eYl+77FlDFOp3Gz8Gmc7qeQYfx9MhrN/UkrMrGUErjBFNbJkigfpzQJzqpPN6L
-         HSacxYwnNMhZqfGMeVIV7pT+be6J+QIbde+5oO6mqlr+VrYLWoxYWM+9eu0abBAgt+SA
-         0fSA==
-X-Gm-Message-State: AOJu0YwUqg4SldSbf78Lsbkr/8E6NaEyx82FZ7sPRSNQ3PGOBV1fogAB
-	ijR2AQKTthz4sn3hYtmLbADlIepY2o3WSUzubVwYH/iAo3+r
-X-Google-Smtp-Source: AGHT+IEtLFT/5pTNgXyNPBuCvorTcXlt6L2a4nXbt78DHq3Dk44P3pbZSY/IoDi4XlSs0dsTao+8swekJJn+GxbuhNrq+2N2Qzge
+        bh=PiUMOSfB7TGElnVi94lRD1/E9g74PJg+G3h2QqiiwOI=;
+        b=UmlEQKs9npTs3/KkeKj5XWSk0oKQ76XnLAXCThh7TdOK5QakuAQL6KOP4GgSY4HZ2z
+         Yhmi8KfXgME68ub/JBrZHI5SHHlgYMiBLPMt/TyNYGUfAG0loL9H8pcBYWU8JgYWPt1n
+         U91LoHs9KJsJd222BjLPcj3PbkOrlrMmyIyF4JWbN6FCUzIZ0U0IxMIZzXZXhegovhv0
+         Q8alSIqi9bfRj9r4iCW4rW35QWaB9uhN3hlHPXSxxRMkrh5optih+MbN2vWXp9tz21/8
+         sfQIwgaHUXdk4XhBqfiONPXqzrXP+BCVh2BgEwGW0RGOGDOSoEYUr+2nCZMMq3u9zdBZ
+         VRqg==
+X-Gm-Message-State: AOJu0YywsCRfE/Iz9vSFO+1i6jmpDcViLDTaCzTwDDQec2oqkzyKPSwi
+	cQva0l/tTf/L4J2S0CHQYFfAq9MLUx2aWpXjavO2+OKjcl/w
+X-Google-Smtp-Source: AGHT+IHrTgmlvePZwnuqOFL24bg77d58BohTmzPYbFFyGvj2SpG4Fmb2pmyqs+tIodgCwKtr5nfGWGbWEwKg3XGAX5uEN64Zk81A
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6830:4089:b0:6d9:d8fb:6a87 with SMTP id
- x9-20020a056830408900b006d9d8fb6a87mr2030860ott.0.1702387891663; Tue, 12 Dec
- 2023 05:31:31 -0800 (PST)
-Date: Tue, 12 Dec 2023 05:31:31 -0800
+X-Received: by 2002:a05:6870:a44d:b0:1fa:da03:e9ec with SMTP id
+ n13-20020a056870a44d00b001fada03e9ecmr7171013oal.10.1702387953700; Tue, 12
+ Dec 2023 05:32:33 -0800 (PST)
+Date: Tue, 12 Dec 2023 05:32:33 -0800
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000008d76f3060c5011b9@google.com>
-Subject: [syzbot] [net?] net-next test error: INFO: rcu detected stall in corrupted
-From: syzbot <syzbot+018508de386acb3db791@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
+Message-ID: <0000000000004017b3060c501517@google.com>
+Subject: [syzbot] [kernel?] net-next test error: WARNING in rcu_check_gp_start_stall
+From: syzbot <syzbot+caa85c9208da01314296@syzkaller.appspotmail.com>
+To: davem@davemloft.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Level: **
 
 Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    18c5c0a845b3 nfp: support UDP segmentation offload
+HEAD commit:    36b0bdb6d330 Merge branch 'net-selftests-unique-namespace'
 git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1193f02ae80000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1317a8b6e80000
 kernel config:  https://syzkaller.appspot.com/x/.config?x=c8b9f7eef8021c3a
-dashboard link: https://syzkaller.appspot.com/bug?extid=018508de386acb3db791
+dashboard link: https://syzkaller.appspot.com/bug?extid=caa85c9208da01314296
 compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/c0e6af27a24f/disk-18c5c0a8.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e07826060ecb/vmlinux-18c5c0a8.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d2e5f8236344/bzImage-18c5c0a8.xz
+disk image: https://storage.googleapis.com/syzbot-assets/2203b492b321/disk-36b0bdb6.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/94047f2e6d6b/vmlinux-36b0bdb6.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/1a4bb64744b6/bzImage-36b0bdb6.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+018508de386acb3db791@syzkaller.appspotmail.com
+Reported-by: syzbot+caa85c9208da01314296@syzkaller.appspotmail.com
 
-rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-rcu: 	0-...!: (1 GPs behind) idle=0984/1/0x4000000000000000 softirq=5654/5658 fqs=2
-rcu: 	(detected by 1, t=10502 jiffies, g=6801, q=19 ncpus=2)
-Sending NMI from CPU 1 to CPUs 0:
-NMI backtrace for cpu 0
-CPU: 0 PID: 54 Comm: kworker/0:2 Not tainted 6.7.0-rc4-syzkaller-00854-g18c5c0a845b3 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
-Workqueue: events linkwatch_event
-RIP: 0010:write_comp_data+0x0/0x80 kernel/kcov.c:230
-Code: 65 8b 15 fb 2c 7c 7e 81 e2 00 01 ff 00 75 10 65 48 8b 04 25 c0 bc 03 00 48 8b 80 f0 15 00 00 c3 66 2e 0f 1f 84 00 00 00 00 00 <49> 89 d2 49 89 f8 49 89 f1 65 48 8b 14 25 c0 bc 03 00 65 8b 05 bf
-RSP: 0018:ffffc90000bf7c48 EFLAGS: 00000046
-RAX: 0000000000000000 RBX: ffff888019b706a8 RCX: ffffffff8876e316
-RDX: 0000000000000001 RSI: 0000000000000000 RDI: 0000000000000005
-RBP: dffffc0000000000 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000003 R12: 00000000000000bd
-R13: 0000000000000001 R14: ffff888019b70000 R15: ffff888019b706b0
-FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000562e3da92000 CR3: 000000006c097000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <NMI>
- </NMI>
- <TASK>
- __linkwatch_run_queue+0xc6/0x460 net/core/link_watch.c:223
- linkwatch_event+0x8f/0xc0 net/core/link_watch.c:273
- process_one_work+0x886/0x15d0 kernel/workqueue.c:2627
- process_scheduled_works kernel/workqueue.c:2700 [inline]
- worker_thread+0x8b9/0x1290 kernel/workqueue.c:2781
- kthread+0x2c6/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
- </TASK>
-rcu: rcu_preempt kthread starved for 10498 jiffies! g6801 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=1
-rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-rcu: RCU grace-period kthread stack dump:
-task:rcu_preempt     state:R  running task     stack:28752 pid:17    tgid:17    ppid:2      flags:0x00004000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5376 [inline]
- __schedule+0xedb/0x5af0 kernel/sched/core.c:6688
- __schedule_loop kernel/sched/core.c:6763 [inline]
- schedule+0xe9/0x270 kernel/sched/core.c:6778
- schedule_timeout+0x137/0x290 kernel/time/timer.c:2167
- rcu_gp_fqs_loop+0x1ec/0xb10 kernel/rcu/tree.c:1631
- rcu_gp_kthread+0x24b/0x380 kernel/rcu/tree.c:1830
- kthread+0x2c6/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
- </TASK>
-rcu: Stack dump where RCU GP kthread last ran:
-CPU: 1 PID: 48 Comm: kworker/u4:3 Not tainted 6.7.0-rc4-syzkaller-00854-g18c5c0a845b3 #0
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 48 at kernel/rcu/tree_stall.h:990 rcu_check_gp_start_stall.part.0+0x1c4/0x4b0 kernel/rcu/tree_stall.h:990
+Modules linked in:
+CPU: 0 PID: 48 Comm: kworker/u4:3 Not tainted 6.7.0-rc4-syzkaller-00835-g36b0bdb6d330 #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
 Workqueue: events_unbound toggle_allocation_gate
-RIP: 0010:csd_lock_wait kernel/smp.c:311 [inline]
-RIP: 0010:smp_call_function_many_cond+0x4e4/0x1550 kernel/smp.c:855
-Code: 0b 00 85 ed 74 4d 48 b8 00 00 00 00 00 fc ff df 4d 89 f4 4c 89 f5 49 c1 ec 03 83 e5 07 49 01 c4 83 c5 03 e8 ae c0 0b 00 f3 90 <41> 0f b6 04 24 40 38 c5 7c 08 84 c0 0f 85 24 0e 00 00 8b 43 08 31
-RSP: 0018:ffffc90000b8f930 EFLAGS: 00000293
-RAX: 0000000000000000 RBX: ffff8880b98441a0 RCX: ffffffff817bd538
-RDX: ffff888016e99dc0 RSI: ffffffff817bd512 RDI: 0000000000000005
-RBP: 0000000000000003 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000006 R12: ffffed1017308835
-R13: 0000000000000001 R14: ffff8880b98441a8 R15: ffff8880b993d8c0
-FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+RIP: 0010:rcu_check_gp_start_stall.part.0+0x1c4/0x4b0 kernel/rcu/tree_stall.h:990
+Code: 88 5d 01 00 00 be 04 00 00 00 48 c7 c7 c0 6a 80 92 e8 e0 57 6d 00 b8 01 00 00 00 87 05 d5 48 0f 11 85 c0 0f 85 39 01 00 00 90 <0f> 0b 90 48 81 fd c0 6f fb 8c 48 c7 c3 f8 2e 19 8f 74 5a 48 b8 00
+RSP: 0018:ffffc90000007df0 EFLAGS: 00010046
+RAX: 0000000000000000 RBX: 0000000000002904 RCX: ffffffff817121e0
+RDX: fffffbfff2500d58 RSI: 0000000000000004 RDI: ffffffff92806ac0
+RBP: ffffffff8cfb6fc0 R08: 0000000000000001 R09: fffffbfff2500d58
+R10: 0000000000000003 R11: 0000000000000005 R12: 1ffffffff1981e40
+R13: 0000000000000246 R14: ffffffff8cfb6fc0 R15: ffff8880b983d612
+FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
 CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f0c25cc35c0 CR3: 000000000cd77000 CR4: 00000000003506f0
+CR2: 00005625fd4c8000 CR3: 000000000cd77000 CR4: 00000000003506f0
 DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
 DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 Call Trace:
  <IRQ>
+ rcu_check_gp_start_stall kernel/rcu/tree_stall.h:953 [inline]
+ rcu_core+0x4e1/0x1680 kernel/rcu/tree.c:2426
+ __do_softirq+0x21a/0x8de kernel/softirq.c:553
+ invoke_softirq kernel/softirq.c:427 [inline]
+ __irq_exit_rcu kernel/softirq.c:632 [inline]
+ irq_exit_rcu+0xb7/0x120 kernel/softirq.c:644
+ sysvec_apic_timer_interrupt+0x95/0xb0 arch/x86/kernel/apic/apic.c:1076
  </IRQ>
  <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:649
+RIP: 0010:__sanitizer_cov_trace_pc+0x34/0x60 kernel/kcov.c:207
+Code: bc 03 00 65 8b 05 f4 26 7c 7e a9 00 01 ff 00 48 8b 34 24 74 0f f6 c4 01 74 35 8b 82 fc 15 00 00 85 c0 74 2b 8b 82 d8 15 00 00 <83> f8 02 75 20 48 8b 8a e0 15 00 00 8b 92 dc 15 00 00 48 8b 01 48
+RSP: 0018:ffffc90000b8f928 EFLAGS: 00000246
+RAX: 0000000000000000 RBX: ffff8880b9941a60 RCX: ffffffff817bd538
+RDX: ffff8880136ebb80 RSI: ffffffff817bd512 RDI: 0000000000000005
+RBP: 0000000000000003 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000006 R12: ffffed101732834d
+R13: 0000000000000001 R14: ffff8880b9941a68 R15: ffff8880b983d8c0
+ rep_nop arch/x86/include/asm/vdso/processor.h:13 [inline]
+ cpu_relax arch/x86/include/asm/vdso/processor.h:18 [inline]
+ csd_lock_wait kernel/smp.c:311 [inline]
+ smp_call_function_many_cond+0x4e2/0x1550 kernel/smp.c:855
  on_each_cpu_cond_mask+0x40/0x90 kernel/smp.c:1023
  on_each_cpu include/linux/smp.h:71 [inline]
  text_poke_sync arch/x86/kernel/alternative.c:2006 [inline]
@@ -165,6 +133,25 @@ Call Trace:
  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
  ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
  </TASK>
+----------------
+Code disassembly (best guess):
+   0:	bc 03 00 65 8b       	mov    $0x8b650003,%esp
+   5:	05 f4 26 7c 7e       	add    $0x7e7c26f4,%eax
+   a:	a9 00 01 ff 00       	test   $0xff0100,%eax
+   f:	48 8b 34 24          	mov    (%rsp),%rsi
+  13:	74 0f                	je     0x24
+  15:	f6 c4 01             	test   $0x1,%ah
+  18:	74 35                	je     0x4f
+  1a:	8b 82 fc 15 00 00    	mov    0x15fc(%rdx),%eax
+  20:	85 c0                	test   %eax,%eax
+  22:	74 2b                	je     0x4f
+  24:	8b 82 d8 15 00 00    	mov    0x15d8(%rdx),%eax
+* 2a:	83 f8 02             	cmp    $0x2,%eax <-- trapping instruction
+  2d:	75 20                	jne    0x4f
+  2f:	48 8b 8a e0 15 00 00 	mov    0x15e0(%rdx),%rcx
+  36:	8b 92 dc 15 00 00    	mov    0x15dc(%rdx),%edx
+  3c:	48 8b 01             	mov    (%rcx),%rax
+  3f:	48                   	rex.W
 
 
 ---
