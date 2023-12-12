@@ -1,49 +1,50 @@
-Return-Path: <netdev+bounces-56200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00CD680E27B
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 04:08:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DA1980E289
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 04:14:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A751C1F21B79
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 03:08:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E9401C21414
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 03:14:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF072524E;
-	Tue, 12 Dec 2023 03:08:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E6B0525F;
+	Tue, 12 Dec 2023 03:14:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cgw5LTG9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mGGI4j1K"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA534436;
-	Tue, 12 Dec 2023 03:08:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B681C433C8;
-	Tue, 12 Dec 2023 03:08:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D866103
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 03:14:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5684CC433C8;
+	Tue, 12 Dec 2023 03:14:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702350530;
-	bh=PacZo1dSyjuMTMTPcET3mNgd2NapBBAOTRpPuVaYDZI=;
+	s=k20201202; t=1702350889;
+	bh=STg08q9IfAR0tNeI5v/tHfkB1R036nNdGe+t8ciundo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Cgw5LTG9O7ZCS2qh87mez7MOKLqMvcTTRySUEa32FFEGKp15GiR7a2cgTFeHNDMOq
-	 rjOTff3cw6m7z51C8fLh2BFsIuAH4gP0OBfGzn3N0pJ4bfECchg2AyknDIqDzKdWJR
-	 6vsppOLfEPjK6JtWSdOmgReGvZYWhYE6NFAiEoIxjLQq7oJXCsdVKd754AGTc7p9xX
-	 /gIqymnq0qUFYqJHDjneQOGndbiQucVhGV3LOlW6rix/kgkYjJ+4lmmJLvG07XdXl8
-	 b1RweM2c+dLf2ZrZw+mje2B8k8ZShJI3rszz79OMv6TT/3R1Hfzqxkzhf+qpOhD29K
-	 X5V/8qrGV35WA==
-Date: Mon, 11 Dec 2023 19:08:49 -0800
+	b=mGGI4j1KtWPXG5XGxthX++rr+bHOo5M5KapVd0sqkY+j1yldnfhLfC4aaACy1aWI2
+	 ud0jdHjYUeKrctIRwt2fGHY9fRzK5bwfSYJ1KmR9YncddGbA++5VzbVI2pvgtJqbAh
+	 yYw+fBJxNluQopj+4tE4bB2UFGzhvbfup8GwOhnz9qe/gfII8lLoJobSRIyKsnzAif
+	 49FFgsq4s72rZtT3vv0H+HOlgZH0Y7Sbmx9caRGP3B5Px3bbJEqSUbHf0swUY/tPJq
+	 kMmhT82qgp3Bm5cewmGktHqixr54eFUb27YsauJjURm38BnJUVlEUlaAqoWBTvuQSj
+	 JqU+tbzbPG3/Q==
+Date: Mon, 11 Dec 2023 19:14:47 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Louis Peens <louis.peens@corigine.com>
-Cc: David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Hui
- Zhou <hui.zhou@corigine.com>, netdev@vger.kernel.org,
- stable@vger.kernel.org, oss-drivers@corigine.com
-Subject: Re: [PATCH net 2/2] nfp: flower: fix hardware offload for the
- transfer layer port
-Message-ID: <20231211190849.6c7d5246@kernel.org>
-In-Reply-To: <20231208065956.11917-3-louis.peens@corigine.com>
-References: <20231208065956.11917-1-louis.peens@corigine.com>
-	<20231208065956.11917-3-louis.peens@corigine.com>
+To: Zhipeng Lu <alexious@zju.edu.cn>
+Cc: Chris Snook <chris.snook@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Yuanjun Gong
+ <ruc_gongyuanjun@163.com>, Jie Yang <jie.yang@atheros.com>, Jeff Garzik
+ <jgarzik@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] [v2] ethernet: atheros: fix a memleak in
+ atl1e_setup_ring_resources
+Message-ID: <20231211191447.0408689d@kernel.org>
+In-Reply-To: <20231208082316.3384650-1-alexious@zju.edu.cn>
+References: <20231208082316.3384650-1-alexious@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,27 +54,27 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri,  8 Dec 2023 08:59:56 +0200 Louis Peens wrote:
-> +		if (mangle_action->mangle.offset == offsetof(struct tcphdr, source)) {
-> +			mangle_action->mangle.val =
-> +				(__force u32)cpu_to_be32(mangle_action->mangle.val << 16);
-> +			mangle_action->mangle.mask =
-> +				(__force u32)cpu_to_be32(mangle_action->mangle.mask << 16 | 0xFFFF);
+On Fri,  8 Dec 2023 16:23:14 +0800 Zhipeng Lu wrote:
+> v2: Setting tx_ring->tx_buffer to NULL after free.
 
-This a bit odd. Here you fill in the "other half" of the mask with Fs...
+Having closer look at this driver  - it tries to free both on close and
+remove, so seems like we do indeed have to NULL-out the pointer, sigh.
 
-> +		}
-> +		if (mangle_action->mangle.offset == offsetof(struct tcphdr, dest)) {
-> +			mangle_action->mangle.offset = 0;
-> +			mangle_action->mangle.val =
-> +				(__force u32)cpu_to_be32(mangle_action->mangle.val);
-> +			mangle_action->mangle.mask =
-> +				(__force u32)cpu_to_be32(mangle_action->mangle.mask);
-> +		}
+> diff --git a/drivers/net/ethernet/atheros/atl1e/atl1e_main.c b/drivers/net/ethernet/atheros/atl1e/atl1e_main.c
+> index 5935be190b9e..1bffe77439ac 100644
+> --- a/drivers/net/ethernet/atheros/atl1e/atl1e_main.c
+> +++ b/drivers/net/ethernet/atheros/atl1e/atl1e_main.c
+> @@ -866,6 +866,8 @@ static int atl1e_setup_ring_resources(struct atl1e_adapter *adapter)
+>  		netdev_err(adapter->netdev, "offset(%d) > ring size(%d) !!\n",
+>  			   offset, adapter->ring_size);
+>  		err = -1;
+> +		kfree(tx_ring->tx_buffer);
+> +		tx_ring->tx_buffer = NULL;
+>  		goto failed;
 
-.. but here you just let it be zero.
-
-If it's correct it'd be good to explain in the commit msg why.
+Please add a new jump target, tho, and move the freeing there.
+There's a small chance someone will add more code to this function
+and it will need to copy / paste this unwind.
 -- 
 pw-bot: cr
 
