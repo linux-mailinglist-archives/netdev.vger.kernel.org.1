@@ -1,168 +1,124 @@
-Return-Path: <netdev+bounces-56462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 144D480EF78
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 15:58:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55E2180EF9A
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 16:06:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 410BE1C20ACE
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:58:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B1051C20AB5
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 15:06:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7744745F7;
-	Tue, 12 Dec 2023 14:58:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 083DE745F0;
+	Tue, 12 Dec 2023 15:06:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Di+xUrDN"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="O0VS//xs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 125E6EA
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 06:58:32 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-50e0ba402b4so736075e87.1
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 06:58:31 -0800 (PST)
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31B33AA
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 07:06:09 -0800 (PST)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2c9f85eff28so87005731fa.3
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 07:06:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702393110; x=1702997910; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gzl81dpk3U9T9CudLlEFGkOzt7MaXHqDfkakdpQfiFo=;
-        b=Di+xUrDNquCXrbE4D+7pfjphiGfnnFvnJ9/Q4O0j/kgCgfP9AwhW6edileG02zHDCK
-         Ug2WZfJv083gx7y1zC5N5OA4s2BF+Hgsf4WwxYweX2huuzD1r9O1C3Nf8JmTd223jhpo
-         +5K34kx0JBlvAkN3qJK0TBeNvaqFoyOzPY09+zdHmT/gWAZ249Fuiyo7zUphSdV5997y
-         vj8XnTZFDeNqWujeHGTInKUIXjEymntsdhGdsU/8Ku2S46luA28K2kGokU9NNgogSVdF
-         LfZgPfe/YbCJ/TAWwjQD4MwRNdA17G43XaNJaX/g0EqK03F/9MT2NYNODogcWcseI4zZ
-         s8CQ==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702393567; x=1702998367; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sZvNMph3E1B1Qj51Fir7QeBjDM+Jb2la/yuZ9W8sQic=;
+        b=O0VS//xsLWbkPbkNF/qruOaXkpCxvL8FITmUUnWEt+sdrW83J9fBh2rKnXhebwFXY1
+         BJP/mnamY8Hef8+R2mT5Ml93WRa9wiF8OhW6iyWw13hy34zHdvNXOiO35f8odGFmmT/6
+         mocfYfATvTY14JrQSxAU/CflxgW45I4e7kMAIoXU416/Ilig7FhV80NE3tHZ9waQkJJJ
+         oB+TWElUJktpm1IVTiAIUClxKgSNEP8mc737PMe7KdxPH0gmuXuugRyYhef7GGxNOH2i
+         lM1AZI0F8ppZM8tRFqSo4VjKOe296ZjRaSKXKp1AUwnF233g+lbF/wm+kwPVhEONsmOw
+         gtfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702393110; x=1702997910;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gzl81dpk3U9T9CudLlEFGkOzt7MaXHqDfkakdpQfiFo=;
-        b=Gab+ut1O826YrE6BA1U2qPKZFs8tpDbM8f4rkJVqhhwbXOdOiQv5xidFrakvBbAmw4
-         PHrkFUKPg0f2f1xkXLQVW+Abm22DJsReD0HOhOTuiqFEdrnfMULqn6O7r9nAgyMVDGhY
-         1QHFdVY31FZnmKoVrYgpV1+GW2qgW06HKbpp3P4zA92L0vGoZQfDDbLqeNwrbZx5hMFG
-         /H0H5Pli+gVplmoAv0uaVOISi4L5xyAQExZ4aA578feVAPWoO2wdlBKprpjuGvKDliln
-         Tk1v9BzYOmuZdCQMIPpeFqhcUe7woE+fHrVJi8cs7HjOKRR6lBVGFpfCYvA35OM8nYaN
-         kerA==
-X-Gm-Message-State: AOJu0Yy94B/qJCBEcR2IBPZ2iGj70mmLsn37NWu/f1ryYdy7UX3TFdlU
-	nbxhgKJKkZcA2nolhVkKu8mzCmN67WatGo52EB+iKw==
-X-Google-Smtp-Source: AGHT+IERGuBL77UBvy25wKoqAwiWF0N6xvXc57i2t65+NTiYJO5PTJJ6k/4UPi+3laDB/s1BgrFICZhicXsZkg8qeMk=
-X-Received: by 2002:ac2:5b4f:0:b0:50b:fa9b:1649 with SMTP id
- i15-20020ac25b4f000000b0050bfa9b1649mr3304569lfp.73.1702393109803; Tue, 12
- Dec 2023 06:58:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702393567; x=1702998367;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sZvNMph3E1B1Qj51Fir7QeBjDM+Jb2la/yuZ9W8sQic=;
+        b=hSwxwi2mb8xMJykInkPFOm4EnCg4VrChGOCwXs/ZDujDEKYr8SCSnfrHYLcHQSj0Bt
+         bYKZ8vwhnQsgNLb2F+yBCdGkYCvlz95A3C6a3mUpZKt3LUhUuqf8wflPTOejrllIroIj
+         9Zabl18MMgbLIrnXRmnPqlh3z8DEv/5U38b3qZUtVUItkFzxYMNtwjUTTCmNHvafXZft
+         NAEvC04KoSCNuZt/Eo19XbbdOeYxlQ0WMOmeXouvDElA8O8KPgNGkJjGueMKIqZCAfyJ
+         arlurWRM7Ncx3jGt8um7dNGT5xANdBWlhFodQvhmDtWpyuDicUY9OwWyEns3ezgUGPSC
+         i4eg==
+X-Gm-Message-State: AOJu0YzlvaCpSnLpnnmmTfFYO31nAQ6n6zEHHl5G1J1cW+uvopv8n3jI
+	KvCp0m/qJo4k0quzAygipwqTYhOK4KIfZra25fM=
+X-Google-Smtp-Source: AGHT+IFfGn5e+wlN0blJ5oDiJS8lSjoJ9dSOiAxZUrjMsvRnHeVIuq2hR4XRTf6mF6fpvk6EWT8unA==
+X-Received: by 2002:a05:6512:3d8f:b0:500:daf6:3898 with SMTP id k15-20020a0565123d8f00b00500daf63898mr3683109lfv.26.1702393567194;
+        Tue, 12 Dec 2023 07:06:07 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id hw18-20020a170907a0d200b00a1cbe52300csm6403376ejc.56.2023.12.12.07.06.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Dec 2023 07:06:06 -0800 (PST)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	vadim.fedorenko@linux.dev,
+	arkadiusz.kubalewski@intel.com
+Subject: [patch net-next] dpll: allocate pin ids in cycle
+Date: Tue, 12 Dec 2023 16:06:05 +0100
+Message-ID: <20231212150605.1141261-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231208005250.2910004-1-almasrymina@google.com>
- <20231208005250.2910004-9-almasrymina@google.com> <20231212122535.GA3029808@nvidia.com>
- <CAHS8izMVMx0fpT=dWsnD7piqs1g7Fam8Xf5dK3iOFNxeOQD9vQ@mail.gmail.com> <20231212143942.GF3014157@nvidia.com>
-In-Reply-To: <20231212143942.GF3014157@nvidia.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 12 Dec 2023 06:58:17 -0800
-Message-ID: <CAHS8izNHtemjjkMf43grCHP1RZ=2UFiMtgea0M6+PaAgC=DDMQ@mail.gmail.com>
-Subject: Re: [net-next v1 08/16] memory-provider: dmabuf devmem memory provider
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
-	David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeelb@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>, Christoph Hellwig <hch@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 12, 2023 at 6:39=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com> wr=
-ote:
->
-> On Tue, Dec 12, 2023 at 06:26:51AM -0800, Mina Almasry wrote:
-> > On Tue, Dec 12, 2023 at 4:25=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com=
-> wrote:
-> > >
-> > > On Thu, Dec 07, 2023 at 04:52:39PM -0800, Mina Almasry wrote:
-> > >
-> > > > +static inline struct page_pool_iov *page_to_page_pool_iov(struct p=
-age *page)
-> > > > +{
-> > > > +     if (page_is_page_pool_iov(page))
-> > > > +             return (struct page_pool_iov *)((unsigned long)page &=
- ~PP_IOV);
-> > > > +
-> > > > +     DEBUG_NET_WARN_ON_ONCE(true);
-> > > > +     return NULL;
-> > > > +}
-> > >
-> > > We already asked not to do this, please do not allocate weird things
-> > > can call them 'struct page' when they are not. It undermines the
-> > > maintainability of the mm to have things mis-typed like
-> > > this. Introduce a new type for your thing so the compiler can check i=
-t
-> > > properly.
-> > >
-> >
-> > There is a new type introduced, it's the page_pool_iov. We set the LSB
-> > on page_pool_iov* and cast it to page* only to avoid the churn of
-> > renaming page* to page_pool_iov* in the page_pool and all the net
-> > drivers using it. Is that not a reasonable compromise in your opinion?
-> > Since the LSB is set on the resulting page pointers, they are not
-> > actually usuable as pages, and are never passed to mm APIs per your
-> > requirement.
->
-> There were two asks, the one you did was to never pass this non-struct
-> page memory to the mm, which is great.
->
-> The other was to not mistype things, and don't type something as
-> struct page when it is, in fact, not.
->
-> I fear what you've done is make it so only one driver calls these
-> special functions and left the other drivers passing the struct page
-> directly to the mm and sort of obfuscating why it is OK based on this
-> netdev knowledge of not enabling/using the static branch in the other
-> cases.
->
+From: Jiri Pirko <jiri@nvidia.com>
 
-Jason, we set the LSB on page_pool_iov pointers before casting it to
-struct page pointers. The resulting pointers are not useable as page
-pointers at all.
+Pin ID is just a number. Nobody should rely on a certain value, instead,
+user should use either pin-id-get op or RTNetlink to get it.
 
-In order to use the resulting pointers, the driver _must_ use the
-special functions that first clear the LSB. It is impossible for the
-driver to 'accidentally' use the resulting page pointers with the LSB
-set - the kernel would just crash trying to dereference such a
-pointer.
+Unify the pin ID allocation behavior with what there is already
+implemented for dpll devices.
 
-The way it works currently is that drivers that support devmem TCP
-will declare that support to the net stack, and use the special
-functions that clear the LSB and cast the struct back to
-page_pool_iov. The drivers that don't support devmem TCP will not
-declare support and will get pages allocated from the mm stack from
-the page_pool and use them as pages normally.
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+ drivers/dpll/dpll_core.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-> Perhaps you can simply avoid this by arranging for this driver to also
-> exclusively use some special type to indicate the dual nature of the
-> pointer and leave the other drivers as using the struct page version.
->
+diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+index 3568149b9562..1eca8cc271f8 100644
+--- a/drivers/dpll/dpll_core.c
++++ b/drivers/dpll/dpll_core.c
+@@ -22,7 +22,8 @@ DEFINE_MUTEX(dpll_lock);
+ DEFINE_XARRAY_FLAGS(dpll_device_xa, XA_FLAGS_ALLOC);
+ DEFINE_XARRAY_FLAGS(dpll_pin_xa, XA_FLAGS_ALLOC);
+ 
+-static u32 dpll_xa_id;
++static u32 dpll_device_xa_id;
++static u32 dpll_pin_xa_id;
+ 
+ #define ASSERT_DPLL_REGISTERED(d)	\
+ 	WARN_ON_ONCE(!xa_get_mark(&dpll_device_xa, (d)->id, DPLL_REGISTERED))
+@@ -246,7 +247,7 @@ dpll_device_alloc(const u64 clock_id, u32 device_idx, struct module *module)
+ 	dpll->clock_id = clock_id;
+ 	dpll->module = module;
+ 	ret = xa_alloc_cyclic(&dpll_device_xa, &dpll->id, dpll, xa_limit_32b,
+-			      &dpll_xa_id, GFP_KERNEL);
++			      &dpll_device_xa_id, GFP_KERNEL);
+ 	if (ret < 0) {
+ 		kfree(dpll);
+ 		return ERR_PTR(ret);
+@@ -446,7 +447,8 @@ dpll_pin_alloc(u64 clock_id, u32 pin_idx, struct module *module,
+ 	refcount_set(&pin->refcount, 1);
+ 	xa_init_flags(&pin->dpll_refs, XA_FLAGS_ALLOC);
+ 	xa_init_flags(&pin->parent_refs, XA_FLAGS_ALLOC);
+-	ret = xa_alloc(&dpll_pin_xa, &pin->id, pin, xa_limit_16b, GFP_KERNEL);
++	ret = xa_alloc_cyclic(&dpll_pin_xa, &pin->id, pin, xa_limit_32b,
++			      &dpll_pin_xa_id, GFP_KERNEL);
+ 	if (ret)
+ 		goto err;
+ 	return pin;
+-- 
+2.43.0
 
-This is certainly possible, but it requires us to rename all the page
-pointers in the page_pool to the new type, and requires the driver
-adding devmem TCP support to rename all the page* pointer instances to
-the new type. It's possible but it introduces lots of code churn. Is
-the LSB + cast not a reasonable compromise here? I feel like the trick
-of setting the least significant bit on a pointer to indicate it's
-something else has a fair amount of precedent in the kernel.
-
---
-Thanks,
-Mina
 
