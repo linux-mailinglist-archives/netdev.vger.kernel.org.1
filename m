@@ -1,200 +1,161 @@
-Return-Path: <netdev+bounces-56276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73AE180E596
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 09:12:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B86DB80E59C
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 09:12:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4763281E57
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 08:12:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D43B8281EA6
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 08:12:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6BD18B0B;
-	Tue, 12 Dec 2023 08:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFA8318B19;
+	Tue, 12 Dec 2023 08:12:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZDvzT+jQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8FDFB8
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 00:11:44 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VyLmTHU_1702368701;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VyLmTHU_1702368701)
-          by smtp.aliyun-inc.com;
-          Tue, 12 Dec 2023 16:11:42 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux-foundation.org
-Subject: [PATCH v1] virtio_net: fix missing dma unmap for resize
-Date: Tue, 12 Dec 2023 16:11:41 +0800
-Message-Id: <20231212081141.39757-1-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D5EEC7
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 00:12:28 -0800 (PST)
+Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-50bf1e32571so6320915e87.2
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 00:12:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1702368747; x=1702973547; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=cLK67MZ2cMXqVULAwpdm/zZK5C57DrnMrrkfs3M5C2A=;
+        b=ZDvzT+jQKYRl5fjH8/Y0Y/bXhW56+dGYsw+jbmNhgafCApf1iQWv0jnCo607aHTjhW
+         p15FRq7frwgqnkSvUe+9uD8Y2B9Q3Sf+d8EMgtdqc6AuH1uqNwbtzNtiH1lAM6HVHorH
+         ZBssx+/OeaVdHbt+MjpML7Wp1ZCqavgUHnOSC+c1uP3CIret40TWknIPa0fQqxRgJ7pC
+         QGCY+gpPQukFXzkipUOqMf+yxOuryg/uJnYPTOGvlmB15hn/ySakbx9uY5HBqRyheRUY
+         ZpMOGZbda7Z3+va/r6JeUC3BaLBlZaeR0dCDTThdI3VkNY64qhSeJNLykTSHZRwJbVB1
+         6PtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702368747; x=1702973547;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cLK67MZ2cMXqVULAwpdm/zZK5C57DrnMrrkfs3M5C2A=;
+        b=eXs+Qj34yEYL9fJjyoMyH+5VdRq7zAg70AxzavlCi1H1Ij8URJpJUR9aFK6Wi32umJ
+         /tf0h86gauUlOQRFHECZeMWi8lDxn/DF28fLBQlhB7SmqNhvPaUSQ42eeeSe0ozJdmr6
+         d8eAuqHPaHcTaTn/LaweP1OBOZgP30jH8pb1el/0C/jzU0G+Q5qBeMMO1Ts5XTJSmNxU
+         cH+DLYrKLy1mJRAFsPeLOp3PyFwAkFGB03fM4drNn2hy95254PpQOgm+6wzOrF5Cr7dB
+         KZ/DFzX9mlUv6HKYIcjab9vGqQTvcKsMr9iqGQGKn/t0IPce1o0Te85w+DhMa09c+MvS
+         xsyQ==
+X-Gm-Message-State: AOJu0Yw6RwWV5XZoFW7VzKkfbj+fwPJN88bKkCECOR7H45KlmmQp5pyX
+	pooqdSJbHCxcjGkqS9APRqS48NBIk6509+EL9Q76Wg==
+X-Google-Smtp-Source: AGHT+IE/4NCAGrcWlk83IyW9mzgbqR3p3HmgUFXHYCCu/8mM+LfWDqVB4qdieN1J9FLWy4acb9y4oFfWbA7pp1ExuZI=
+X-Received: by 2002:a05:6512:2312:b0:50b:f6d2:8569 with SMTP id
+ o18-20020a056512231200b0050bf6d28569mr2921097lfu.129.1702368746841; Tue, 12
+ Dec 2023 00:12:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Git-Hash: 9b708181512b
-Content-Transfer-Encoding: 8bit
+References: <20231208005250.2910004-1-almasrymina@google.com> <20231208005250.2910004-2-almasrymina@google.com>
+In-Reply-To: <20231208005250.2910004-2-almasrymina@google.com>
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Date: Tue, 12 Dec 2023 10:11:50 +0200
+Message-ID: <CAC_iWjLfc_2cEzRQDRvG1abMYH6dPhc2-c0-skUD1tjdKVFcKw@mail.gmail.com>
+Subject: Re: [net-next v1 01/16] net: page_pool: factor out releasing DMA from
+ releasing the page
+To: Mina Almasry <almasrymina@google.com>
+Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeelb@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-For rq, we have three cases getting buffers from virtio core:
+On Fri, 8 Dec 2023 at 02:52, Mina Almasry <almasrymina@google.com> wrote:
+>
+> From: Jakub Kicinski <kuba@kernel.org>
+>
+> Releasing the DMA mapping will be useful for other types
+> of pages, so factor it out. Make sure compiler inlines it,
+> to avoid any regressions.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+>
+> ---
+>
+> This is implemented by Jakub in his RFC:
+>
+> https://lore.kernel.org/netdev/f8270765-a27b-6ccf-33ea-cda097168d79@redhat.com/T/
+>
+> I take no credit for the idea or implementation. This is a critical
+> dependency of device memory TCP and thus I'm pulling it into this series
+> to make it revewable and mergable.
+>
+> ---
+>  net/core/page_pool.c | 25 ++++++++++++++++---------
+>  1 file changed, 16 insertions(+), 9 deletions(-)
+>
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index c2e7c9a6efbe..ca1b3b65c9b5 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -548,21 +548,16 @@ s32 page_pool_inflight(const struct page_pool *pool, bool strict)
+>         return inflight;
+>  }
+>
+> -/* Disconnects a page (from a page_pool).  API users can have a need
+> - * to disconnect a page (from a page_pool), to allow it to be used as
+> - * a regular page (that will eventually be returned to the normal
+> - * page-allocator via put_page).
+> - */
+> -static void page_pool_return_page(struct page_pool *pool, struct page *page)
+> +static __always_inline
+> +void __page_pool_release_page_dma(struct page_pool *pool, struct page *page)
+>  {
+>         dma_addr_t dma;
+> -       int count;
+>
+>         if (!(pool->p.flags & PP_FLAG_DMA_MAP))
+>                 /* Always account for inflight pages, even if we didn't
+>                  * map them
+>                  */
+> -               goto skip_dma_unmap;
+> +               return;
+>
+>         dma = page_pool_get_dma_addr(page);
+>
+> @@ -571,7 +566,19 @@ static void page_pool_return_page(struct page_pool *pool, struct page *page)
+>                              PAGE_SIZE << pool->p.order, pool->p.dma_dir,
+>                              DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING);
+>         page_pool_set_dma_addr(page, 0);
+> -skip_dma_unmap:
+> +}
+> +
+> +/* Disconnects a page (from a page_pool).  API users can have a need
+> + * to disconnect a page (from a page_pool), to allow it to be used as
+> + * a regular page (that will eventually be returned to the normal
+> + * page-allocator via put_page).
+> + */
+> +void page_pool_return_page(struct page_pool *pool, struct page *page)
+> +{
+> +       int count;
+> +
+> +       __page_pool_release_page_dma(pool, page);
+> +
+>         page_pool_clear_pp_info(page);
+>
+>         /* This may be the last page returned, releasing the pool, so
+> --
+> 2.43.0.472.g3155946c3a-goog
+>
 
-1. virtqueue_get_buf{,_ctx}
-2. virtqueue_detach_unused_buf
-3. callback for virtqueue_resize
-
-But in commit 295525e29a5b("virtio_net: merge dma operations when
-filling mergeable buffers"), I missed the dma unmap for the #3 case.
-
-That will leak some memory, because I did not release the pages referred
-by the unused buffers.
-
-If we do such script, we will make the system OOM.
-
-    while true
-    do
-            ethtool -G ens4 rx 128
-            ethtool -G ens4 rx 256
-            free -m
-    done
-
-Fixes: 295525e29a5b ("virtio_net: merge dma operations when filling mergeable buffers")
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
----
-
-v1: rename to virtnet_rq_free_buf_check_dma()
-
- drivers/net/virtio_net.c | 60 ++++++++++++++++++++--------------------
- 1 file changed, 30 insertions(+), 30 deletions(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index d16f592c2061..58ebbffeb952 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -334,7 +334,6 @@ struct virtio_net_common_hdr {
- 	};
- };
-
--static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf);
- static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf);
-
- static bool is_xdp_frame(void *ptr)
-@@ -408,6 +407,17 @@ static struct page *get_a_page(struct receive_queue *rq, gfp_t gfp_mask)
- 	return p;
- }
-
-+static void virtnet_rq_free_buf(struct virtnet_info *vi,
-+				struct receive_queue *rq, void *buf)
-+{
-+	if (vi->mergeable_rx_bufs)
-+		put_page(virt_to_head_page(buf));
-+	else if (vi->big_packets)
-+		give_pages(rq, buf);
-+	else
-+		put_page(virt_to_head_page(buf));
-+}
-+
- static void enable_delayed_refill(struct virtnet_info *vi)
- {
- 	spin_lock_bh(&vi->refill_lock);
-@@ -634,17 +644,6 @@ static void *virtnet_rq_get_buf(struct receive_queue *rq, u32 *len, void **ctx)
- 	return buf;
- }
-
--static void *virtnet_rq_detach_unused_buf(struct receive_queue *rq)
--{
--	void *buf;
--
--	buf = virtqueue_detach_unused_buf(rq->vq);
--	if (buf && rq->do_dma)
--		virtnet_rq_unmap(rq, buf, 0);
--
--	return buf;
--}
--
- static void virtnet_rq_init_one_sg(struct receive_queue *rq, void *buf, u32 len)
- {
- 	struct virtnet_rq_dma *dma;
-@@ -744,6 +743,20 @@ static void virtnet_rq_set_premapped(struct virtnet_info *vi)
- 	}
- }
-
-+static void virtnet_rq_free_buf_check_dma(struct virtqueue *vq, void *buf)
-+{
-+	struct virtnet_info *vi = vq->vdev->priv;
-+	struct receive_queue *rq;
-+	int i = vq2rxq(vq);
-+
-+	rq = &vi->rq[i];
-+
-+	if (rq->do_dma)
-+		virtnet_rq_unmap(rq, buf, 0);
-+
-+	virtnet_rq_free_buf(vi, rq, buf);
-+}
-+
- static void free_old_xmit_skbs(struct send_queue *sq, bool in_napi)
- {
- 	unsigned int len;
-@@ -1764,7 +1777,7 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
- 	if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
- 		pr_debug("%s: short packet %i\n", dev->name, len);
- 		DEV_STATS_INC(dev, rx_length_errors);
--		virtnet_rq_free_unused_buf(rq->vq, buf);
-+		virtnet_rq_free_buf(vi, rq, buf);
- 		return;
- 	}
-
-@@ -2392,7 +2405,7 @@ static int virtnet_rx_resize(struct virtnet_info *vi,
- 	if (running)
- 		napi_disable(&rq->napi);
-
--	err = virtqueue_resize(rq->vq, ring_num, virtnet_rq_free_unused_buf);
-+	err = virtqueue_resize(rq->vq, ring_num, virtnet_rq_free_buf_check_dma);
- 	if (err)
- 		netdev_err(vi->dev, "resize rx fail: rx queue index: %d err: %d\n", qindex, err);
-
-@@ -4031,19 +4044,6 @@ static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf)
- 		xdp_return_frame(ptr_to_xdp(buf));
- }
-
--static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf)
--{
--	struct virtnet_info *vi = vq->vdev->priv;
--	int i = vq2rxq(vq);
--
--	if (vi->mergeable_rx_bufs)
--		put_page(virt_to_head_page(buf));
--	else if (vi->big_packets)
--		give_pages(&vi->rq[i], buf);
--	else
--		put_page(virt_to_head_page(buf));
--}
--
- static void free_unused_bufs(struct virtnet_info *vi)
- {
- 	void *buf;
-@@ -4057,10 +4057,10 @@ static void free_unused_bufs(struct virtnet_info *vi)
- 	}
-
- 	for (i = 0; i < vi->max_queue_pairs; i++) {
--		struct receive_queue *rq = &vi->rq[i];
-+		struct virtqueue *vq = vi->rq[i].vq;
-
--		while ((buf = virtnet_rq_detach_unused_buf(rq)) != NULL)
--			virtnet_rq_free_unused_buf(rq->vq, buf);
-+		while ((buf = virtqueue_detach_unused_buf(vq)) != NULL)
-+			virtnet_rq_free_buf_check_dma(vq, buf);
- 		cond_resched();
- 	}
- }
---
-2.32.0.3.g01195cf9f
-
+Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
 
