@@ -1,107 +1,121 @@
-Return-Path: <netdev+bounces-56424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5671F80ECE4
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:10:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A327E80ECF6
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:14:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 886CB1C20A5F
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 13:10:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7B5E1C20AB6
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 13:14:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A90761669;
-	Tue, 12 Dec 2023 13:10:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED326166F;
+	Tue, 12 Dec 2023 13:14:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="aW8gD0JR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N15Vzw1O"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::225])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E4FDF4;
-	Tue, 12 Dec 2023 05:10:31 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 031601C0007;
-	Tue, 12 Dec 2023 13:10:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1702386629;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=atELFnnIPthqWoz2bHuN1bLUw36gajFDes0IJ/cmoaA=;
-	b=aW8gD0JRdbGr0NXlm1/llPif8XCoQDwRZP9mhQl30Bb1nhbVJ9YfMP6npegebx2FhmVNuG
-	cFg4LCrmzoeje3lshNHVDKmZf1t7Biz89foTOLpNkFOu5URuDBnXqAOnlyHnExKYETXjNc
-	6gyGq10FG130gPiUsJixdIYmMFH2V4BB/Nl3LhmsabozpPhSY0zlivgkaONO4sFxJMwpXV
-	qYDLYX6x6mQDv/xjZhsz2UwwzkGmbRLu9lNcEXBQKFsZHrg7kZvoEqhbyielS3ubVC5E8z
-	Fe+NxJa+T/WhdwwNnh1z2EWAC9Nj9Z2FVwER92sEp5heBmkwYlmjR9SSGd7MnQ==
-Date: Tue, 12 Dec 2023 14:10:26 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Simon Horman <horms@kernel.org>, davem@davemloft.net,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell
- King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
- Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
- <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
- Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Jonathan Corbet <corbet@lwn.net>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Piergiorgio Beruto
- <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>
-Subject: Re: [RFC PATCH net-next v3 01/13] net: phy: Introduce ethernet link
- topology representation
-Message-ID: <20231212141026.37e7af58@device.home>
-In-Reply-To: <67557c83-4318-4557-ac96-858053b5f89b@lunn.ch>
-References: <20231201163704.1306431-1-maxime.chevallier@bootlin.com>
-	<20231201163704.1306431-2-maxime.chevallier@bootlin.com>
-	<20231209170241.GA5817@kernel.org>
-	<20231211120623.03b1ced4@device.home>
-	<67557c83-4318-4557-ac96-858053b5f89b@lunn.ch>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D484B3;
+	Tue, 12 Dec 2023 05:14:15 -0800 (PST)
+Received: by mail-oi1-x233.google.com with SMTP id 5614622812f47-3b9f11fee25so704664b6e.1;
+        Tue, 12 Dec 2023 05:14:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702386854; x=1702991654; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=stDkgdoFk0XfmYwjrEqVrLdT/Qh3MCip8pO7lUFKZX8=;
+        b=N15Vzw1O7q07AGFIFRPfh+yCQHEmyfvMvBzOx5u/1ys5y/44pbZZ/tDDLz3agnFH8v
+         LRRNvkb9ajUlLsfmFVzy3o9tDnjmNhtIZGmNs/Tg6Qod8pxqdcExBtW/kO+qSGBCx3d1
+         vZlm+1dUqcsYxcZyo+zKniRd6twvF9nj2DSd6tfKHPeh5waoq75SDSPmtZLUGPAgTZoP
+         z/GhGcULi3wXaMnox6aiXxAf6Z9K5Vm6l4Yk75AVFiF3YwIDnxKxExwUsXBrBSwBE2VW
+         PpTmEQXJHVsFy+1Wa50C3QJtEVENpBTXz2sbzUQMQw1PruG66n37Tv7Dn6DU4hH4gltb
+         QE9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702386854; x=1702991654;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=stDkgdoFk0XfmYwjrEqVrLdT/Qh3MCip8pO7lUFKZX8=;
+        b=Jn5rjaLxIhMuxbwXhCrmi5OJs705jz6rpw9nQQqnn84aORdrM/fGTcUvizGoQfy643
+         MxY0ZBvdO2TN/h+ro5yyndpTMGLrB/hmCXTttNQduGFeobXy2+1+9p8TbrQFDJhaAU5/
+         gePcwpy+Y4iy3Ujces/Rfll2dmq61ttWh6M5Vm8v3lPdelmPevzY/sFY2y3v8vV3Z7hY
+         JRsA5n++9uc6oP95RUnUJE0vO2d6GhTq86vtCSPcp8o9/fO0XixxWxHfY2CYnVHHxina
+         m4e147In2JQWYbVXGbaDP1CG+hHuR5v0Oe8YCzamwP8xneUYeka64bXnnxVc8WoBtVhf
+         xe0g==
+X-Gm-Message-State: AOJu0Yz7P/P+z48ic/OjWmLZhlAKbZgSbgrDf2IMBZJoxKIB3+bIZNpR
+	Pf2J+1X1Ym9usxAzwaZXiHzaXihjw+7Lo1qOTHQ=
+X-Google-Smtp-Source: AGHT+IE3wz9HTHyYZ4+Lo9d8+GOwzJctb4smYkI63Bkdba2mY6t3XVYydLAQHDNX0sIllWcM4QY28mDDUJ0FCNZGGFE=
+X-Received: by 2002:a05:6358:71b:b0:16e:4d4c:68a2 with SMTP id
+ e27-20020a056358071b00b0016e4d4c68a2mr10370064rwj.2.1702386854289; Tue, 12
+ Dec 2023 05:14:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+References: <20231212125713.336271-1-maciej.fijalkowski@intel.com> <20231212125713.336271-2-maciej.fijalkowski@intel.com>
+In-Reply-To: <20231212125713.336271-2-maciej.fijalkowski@intel.com>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Tue, 12 Dec 2023 14:14:02 +0100
+Message-ID: <CAJ8uoz3XnapArhHjb1yX5q7YrFUgrO2mWgvDDsTBVzTCr=Yzxw@mail.gmail.com>
+Subject: Re: [PATCH v2 bpf 1/3] xsk: recycle buffer in case Rx queue was full
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com, 
+	bjorn@kernel.org, echaudro@redhat.com, lorenzo@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 11 Dec 2023 15:09:09 +0100
-Andrew Lunn <andrew@lunn.ch> wrote:
+On Tue, 12 Dec 2023 at 13:58, Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> Add missing xsk_buff_free() call when __xsk_rcv_zc() failed to produce
+> descriptor to XSK Rx queue.
 
-> > > > @@ -10832,6 +10833,8 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
-> > > >  #ifdef CONFIG_NET_SCHED
-> > > >  	hash_init(dev->qdisc_hash);
-> > > >  #endif
-> > > > +	phy_link_topo_init(&dev->link_topo);
-> > > > +    
-> > > 
-> > > I don't think this can work unless PHYLIB is compiled as a built-in.  
-> > 
-> > Inded, I need to better clarify and document the dependency with
-> > PHYLIB.  
-> 
-> It is getting harder and harder to make the phylib core a module :-(
-> 
-> How much work does phy_link_topo_init() do? Could it be an inline
-> function? Are there other dependencies?
+Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
 
-Sorry about that, I'll make sure it works with phylib entirely disabled
-for next version. I try to keep the integration with net_device minimal
-and avoid any dependency bloat, we don't need much besides xarray stuff
-(hence the fact there are 2 headers, the phy_link_topology_core.h
-containing the bare minimum), but I did miss that.
-
-> Also look at ethtool_phy_ops and e.g. how plca_get_cfg_prepare_data()
-> uses it.
-
-Thanks, indeed that's a good example. I'll also address that in the
-netlink part as well.
-
-Thanks,
-
-Maxime
+> Fixes: 24ea50127ecf ("xsk: support mbuf on ZC RX")
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> ---
+>  net/xdp/xsk.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> index 281d49b4fca4..bd4abb200fa9 100644
+> --- a/net/xdp/xsk.c
+> +++ b/net/xdp/xsk.c
+> @@ -167,8 +167,10 @@ static int xsk_rcv_zc(struct xdp_sock *xs, struct xdp_buff *xdp, u32 len)
+>                 contd = XDP_PKT_CONTD;
+>
+>         err = __xsk_rcv_zc(xs, xskb, len, contd);
+> -       if (err || likely(!frags))
+> -               goto out;
+> +       if (err)
+> +               goto err;
+> +       if (likely(!frags))
+> +               return 0;
+>
+>         xskb_list = &xskb->pool->xskb_list;
+>         list_for_each_entry_safe(pos, tmp, xskb_list, xskb_list_node) {
+> @@ -177,11 +179,13 @@ static int xsk_rcv_zc(struct xdp_sock *xs, struct xdp_buff *xdp, u32 len)
+>                 len = pos->xdp.data_end - pos->xdp.data;
+>                 err = __xsk_rcv_zc(xs, pos, len, contd);
+>                 if (err)
+> -                       return err;
+> +                       goto err;
+>                 list_del(&pos->xskb_list_node);
+>         }
+>
+> -out:
+> +       return 0;
+> +err:
+> +       xsk_buff_free(xdp);
+>         return err;
+>  }
+>
+> --
+> 2.34.1
+>
+>
 
