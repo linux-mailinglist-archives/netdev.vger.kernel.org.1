@@ -1,137 +1,147 @@
-Return-Path: <netdev+bounces-56615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95DB180F9FE
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 23:16:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4005B80F9FF
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 23:16:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D005B1F2185A
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 22:15:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A1681C20A60
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 22:16:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF3A564CE9;
-	Tue, 12 Dec 2023 22:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D4EA63575;
+	Tue, 12 Dec 2023 22:16:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cUuFc8yQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZK6nB9tv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DFBDD0
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 14:15:50 -0800 (PST)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-5e180547bdeso16490227b3.1
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 14:15:50 -0800 (PST)
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23721D3;
+	Tue, 12 Dec 2023 14:16:26 -0800 (PST)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-40c19f5f822so35203375e9.1;
+        Tue, 12 Dec 2023 14:16:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702419350; x=1703024150; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=sesFDYuvisaQAeLJLAlKFp7z3aGtkUSoKH2xPGkQRmE=;
-        b=cUuFc8yQvnOMN0kK9NcB9AS1ArV9f3fHHKU0IXuc5stHJHjnFC7g0OtlF2dCxA9MzH
-         x2j6+1yQoIbGnicFx04PcjXVsh/RHbE6ewMSNpSZRBJQWB51HM74G7VUsf8RZExiQTXS
-         Wi+XNzOJlpWEPZMFBtzIaViMGEEeglvpgz/baK2Jzajqa++yF2RjQQTC+M/5K5m9tdDp
-         OKDwKuNfyCmaBbkfR5bvnKsNwrKZAuxrt5ZrdN9mp1F2F0x9geCN3VLI1rfFYxzeSU5d
-         /vnY8orNcyWgjZkrCQtUZy7zQKhFRtif2zPvlqv+78aEjk7fwAeAfJ+2uhprEQkxo9EM
-         WIQw==
+        d=gmail.com; s=20230601; t=1702419384; x=1703024184; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4jwb5Ba5qERmLre1QT18SnMWZ03g/ub2BxGPMWa4ABU=;
+        b=ZK6nB9tv9a1qpD4lwdCdR0GyDtrAGLLZF35FWi6vJMC+4ZieuvJ/9MwDxlmcNhZm8W
+         QQIQbTkjQQx8MamnCZgbFUGgeIWw0fgXWA4glutA2RVySs2PbSjVIS4BlBgs5T6Gybia
+         xZCR3O3HoH03X1qpiT7xdOzcnyo/OVLAnTjuLbl/Pm2HzWgudxRgNRpriIy8Il3x7EJ5
+         9WYM4nNIxwHiwqNjpG2b0P1JvUVFJh3CKSQR7vOSiimd3vz8iIZweUmCaeD9Mb5yLgNa
+         kGiOar/Pd1u1qkLyLDm2NeMpE9skr/N6+0957BCyiy5yyT3tnKY+Z+8kkVCRg+e3QO2V
+         JXvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702419350; x=1703024150;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1702419384; x=1703024184;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=sesFDYuvisaQAeLJLAlKFp7z3aGtkUSoKH2xPGkQRmE=;
-        b=VeCJ0OyvNzK3LroCC7SQ4NYV5OzW6n2c4QviXvn8yiFFi5pc4vGZCiGThdaTSvTO1e
-         NLUUNhc3aTNuvMBAA0Dy2XOx/YZOrBjLeNKSaB7Z+wdFShdz3h47sW9QvIfEg7IACZrC
-         4v0b4+JfsjAdW/Xcx9/dSymE58pyx67IRLD84EyN1FFy2rqFqlgz5s0hxtsonElRzvlQ
-         m6MR4i+Ir6aujZ3HAShKeB96no8OVgUiuMZfF0QvuyQ5HlIhvhywoFpgbgZLt90Yptju
-         PmS/UcKS2Mm2Nb4/oUtdrqSuY3R9stSss80YwxOFqzLv/VlZTTciCWWf4Jn753BvkE4l
-         LWng==
-X-Gm-Message-State: AOJu0Ywi0T7VR/yCY9TYzZbZO6bc3Sa2zD8RB3CQKq+ogb4l+8Ivnsz0
-	o9OYCoYRdLSup+N1qG9XnATjd3nRqhT9t/m8eVOXfA==
-X-Google-Smtp-Source: AGHT+IGGyJlE32Nn0xvD8pTWqNKXufszc7hVjv2yNNUS0YVajqTHhbf2kFuywehaBgET5yUsVEcXfOU4GbPchRYGqZM=
-X-Received: by 2002:a0d:dc07:0:b0:5d3:66ad:f8f6 with SMTP id
- f7-20020a0ddc07000000b005d366adf8f6mr5195337ywe.24.1702419349823; Tue, 12 Dec
- 2023 14:15:49 -0800 (PST)
+        bh=4jwb5Ba5qERmLre1QT18SnMWZ03g/ub2BxGPMWa4ABU=;
+        b=SS/T5bjYR7aZXVRgP5tNFsqy8XKpU+c+U3oJwgVhLvcTAwQOuBo7Vm48iLXtyGLggm
+         5X9eITBgcKwKQz7y8MfD5gbRk3IhT8BPjwuET6ZyKS+To4Q/R9k+qnK3Hns22BY+UqcU
+         /s/1vJYhfiwepJm4x7F87Pt1H5gTL2G6pwuueB/WOvYlZaKHp5jfmrIPi+/oW3eqI3YF
+         hahWYYMF1n8hR9eSVE0L2Ujr04S8mVBUBR/wcEBf5UEVJW4GLbAf4tTL/cT/dFvvIQZg
+         qKSswk8YF8WIvmU1UF7DB4pSIb7hCmjmvyGp//CL5sSTQr/DUmcMj1ApvPNTXgDjHb5f
+         KJrA==
+X-Gm-Message-State: AOJu0YwEG23/r5VztMH9fQGqIhx+MGrtTOi6tZAVW/ofPe3FqGKhqusM
+	X769QXpEd0lWHySCgUf1jrpjxTC03EtfZA==
+X-Google-Smtp-Source: AGHT+IFZ6CmvLjMGzbIKpueWU/S6VccC4x+tVwV0E4RPKHxBdVLSelkdIuRPFp45O3cumQg2oGyHiA==
+X-Received: by 2002:a05:600c:4709:b0:40b:5e4a:2368 with SMTP id v9-20020a05600c470900b0040b5e4a2368mr3637354wmo.106.1702419383583;
+        Tue, 12 Dec 2023 14:16:23 -0800 (PST)
+Received: from imac.fritz.box ([2a02:8010:60a0:0:a1a0:2c27:44f7:b972])
+        by smtp.gmail.com with ESMTPSA id a18-20020a5d5092000000b00333415503a7sm11680482wrt.22.2023.12.12.14.16.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Dec 2023 14:16:22 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Breno Leitao <leitao@debian.org>
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v3 00/13] tools/net/ynl: Add 'sub-message' support to ynl
+Date: Tue, 12 Dec 2023 22:15:39 +0000
+Message-ID: <20231212221552.3622-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231128132534.258459-1-herve.codina@bootlin.com>
-In-Reply-To: <20231128132534.258459-1-herve.codina@bootlin.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 12 Dec 2023 23:15:38 +0100
-Message-ID: <CACRpkdYT1J7noFUhObFgfA60XQAfL4rb=knEmWS__TKKtCMh7Q@mail.gmail.com>
-Subject: Re: [PATCH 0/5] Add support for framer infrastructure and PEF2256 framer
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Lee Jones <lee@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Herve, Jakub, Mark,
+This patchset adds a 'sub-message' attribute type to the netlink-raw
+schema and implements it in ynl. This provides support for kind-specific
+options attributes as used in rt_link and tc raw netlink families.
 
-here is an immutable tag for the PEF2256 framer, as promised.
+A description of the new 'sub-message' attribute type and the
+corresponding sub-message definitions is provided in patch 3.
 
-I have already merged it into the pinctrl tree for starters.
+The patchset includes updates to the rt_link spec and a new tc spec that
+make use of the new 'sub-message' attribute type.
 
-Yours,
-Linus Walleij
+As mentioned in patch 4, encode support is not yet implemented in ynl
+and support for sub-message selectors at a different nest level from the
+key attribute is not yet supported. I plan to work on these in folloup
+patches.
 
-The following changes since commit b85ea95d086471afb4ad062012a4d73cd328fa86:
+Patches 1 is code cleanup in ynl
+Patches 2-4 add sub-message support to the schema and ynl with
+documentation updates.
+Patch 5 adds binary and pad support to structs in netlink-raw.
+Patches 6-8 contain specs that use the sub-message attribute type.
+Patches 9-13 update ynl-gen-rst and its make target
 
-  Linux 6.7-rc1 (2023-11-12 16:19:07 -0800)
+Changes since v2: (reported by Jakub Kicinski and Breno Leitao)
+ - Fixed ynl-gen-c breakage
+ - Added schema constraint for pad/binary & len
+ - Improved description text in raw schema
+ - Used | for all multi-line text in schema
+ - Updated docs with explanation of what a sub-message is
+ - Reverted change in ynl-gen-rst
+ - Added ynl-gen-rst patches and grouped them all at end of patchset
 
-are available in the Git repository at:
+Changes since v1: (reported by Jakub Kicinski, thanks!)
+ - Added cleanups for ynl and generated netlink docs
+ - Describe sub-messages in netlink docs
+ - Cleaned up unintended indent changes
+ - Cleaned up rt-link sub-message definitions
+ - Cleaned up array index expressions to follow python style
+ - Added sub-messages to generated netlink spec docs
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/linusw/linux-pinctrl.git
-tags/pef2256-framer
+Donald Hunter (13):
+  tools/net/ynl: Use consistent array index expression formatting
+  doc/netlink: Add sub-message support to netlink-raw
+  doc/netlink: Document the sub-message format for netlink-raw
+  tools/net/ynl: Add 'sub-message' attribute decoding to ynl
+  tools/net/ynl: Add binary and pad support to structs for tc
+  doc/netlink/specs: Add sub-message type to rt_link family
+  doc/netlink/specs: use pad in structs in rt_link
+  doc/netlink/specs: Add a spec for tc
+  doc/netlink: Regenerate netlink .rst files if ynl-gen-rst changes
+  tools/net/ynl-gen-rst: Add sub-messages to generated docs
+  tools/net/ynl-gen-rst: Sort the index of generated netlink specs
+  tools/net/ynl-gen-rst: Remove bold from attribute-set headings
+  tools/net/ynl-gen-rst: Remove extra indentation from generated docs
 
-for you to fetch changes up to 1e95d20ae8e6a383b4c1dd2282e5259790724037:
+ Documentation/Makefile                        |    8 +-
+ Documentation/netlink/netlink-raw.yaml        |   65 +-
+ Documentation/netlink/specs/rt_link.yaml      |  449 +++-
+ Documentation/netlink/specs/tc.yaml           | 2037 +++++++++++++++++
+ .../userspace-api/netlink/netlink-raw.rst     |   96 +-
+ tools/net/ynl/lib/nlspec.py                   |   55 +
+ tools/net/ynl/lib/ynl.py                      |   94 +-
+ tools/net/ynl/ynl-gen-rst.py                  |   31 +-
+ 8 files changed, 2789 insertions(+), 46 deletions(-)
+ create mode 100644 Documentation/netlink/specs/tc.yaml
 
-  MAINTAINERS: Add the Lantiq PEF2256 driver entry (2023-12-12 23:05:25 +0100)
+-- 
+2.42.0
 
-----------------------------------------------------------------
-Immutable tag for the PEF2256 framer
-
-----------------------------------------------------------------
-Herve Codina (5):
-      net: wan: Add framer framework support
-      dt-bindings: net: Add the Lantiq PEF2256 E1/T1/J1 framer
-      net: wan: framer: Add support for the Lantiq PEF2256 framer
-      pinctrl: Add support for the Lantic PEF2256 pinmux
-      MAINTAINERS: Add the Lantiq PEF2256 driver entry
-
- .../devicetree/bindings/net/lantiq,pef2256.yaml    | 213 +++++
- MAINTAINERS                                        |   8 +
- drivers/net/wan/Kconfig                            |   2 +
- drivers/net/wan/Makefile                           |   2 +
- drivers/net/wan/framer/Kconfig                     |  42 +
- drivers/net/wan/framer/Makefile                    |   7 +
- drivers/net/wan/framer/framer-core.c               | 882 +++++++++++++++++++++
- drivers/net/wan/framer/pef2256/Makefile            |   8 +
- drivers/net/wan/framer/pef2256/pef2256-regs.h      | 250 ++++++
- drivers/net/wan/framer/pef2256/pef2256.c           | 880 ++++++++++++++++++++
- drivers/pinctrl/Kconfig                            |  15 +
- drivers/pinctrl/Makefile                           |   1 +
- drivers/pinctrl/pinctrl-pef2256.c                  | 358 +++++++++
- include/linux/framer/framer-provider.h             | 194 +++++
- include/linux/framer/framer.h                      | 205 +++++
- include/linux/framer/pef2256.h                     |  31 +
- 16 files changed, 3098 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/lantiq,pef2256.yaml
- create mode 100644 drivers/net/wan/framer/Kconfig
- create mode 100644 drivers/net/wan/framer/Makefile
- create mode 100644 drivers/net/wan/framer/framer-core.c
- create mode 100644 drivers/net/wan/framer/pef2256/Makefile
- create mode 100644 drivers/net/wan/framer/pef2256/pef2256-regs.h
- create mode 100644 drivers/net/wan/framer/pef2256/pef2256.c
- create mode 100644 drivers/pinctrl/pinctrl-pef2256.c
- create mode 100644 include/linux/framer/framer-provider.h
- create mode 100644 include/linux/framer/framer.h
- create mode 100644 include/linux/framer/pef2256.h
 
