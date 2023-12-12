@@ -1,52 +1,54 @@
-Return-Path: <netdev+bounces-56641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC64E80FB3F
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 00:20:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CCC680FB46
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 00:23:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86912281FDC
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 23:20:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 615671C20D6A
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 23:23:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF8FE6472A;
-	Tue, 12 Dec 2023 23:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E9266472E;
+	Tue, 12 Dec 2023 23:23:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="seNusqXb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BtEAI2K9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A47756470B
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 23:20:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB36CC433C8;
-	Tue, 12 Dec 2023 23:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4291A660E3
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 23:23:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B611C433C7;
+	Tue, 12 Dec 2023 23:23:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702423222;
-	bh=MmuTxz83cx0n6rxBCcxvgqykYUBl9tgr/pJ/GiWM7m4=;
+	s=k20201202; t=1702423428;
+	bh=KwRraPl+S6WmazlLNqOJ7U472XTL+/fDGulYB+j/FLk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=seNusqXb36VT70NM24G3CFxzt/BfIWZGd/uw4bohuVn1NxOGzFvQSjxO/JMYuiqYb
-	 ydn6LffW/t3l0JT0daqOGkmVfJ8CgXMJwxrleNy8AiUmb03ieMSvnrKTDDOBjb1zp2
-	 r/+QH7/32OfnnZJ2XsgqA9b6JNJZmOLvr+5sGYCNBOxCsV2Yel5iKuevc7fKX/33f+
-	 dj5fs8Ll5W+eYO4atEyS1CECRtY4psP+oEuQrjThJYBN2jAZ/5klO90mOCR0aMXl3g
-	 TqfoyNi91vCdl3YzcfESaeKcbNzs3TFcAsVoWO7ZhohvoIQ5AQTQWES68W6Mnc+U8P
-	 0zn5jAmYXm9PA==
-Date: Tue, 12 Dec 2023 15:20:20 -0800
+	b=BtEAI2K97P4K3o2dTr9wLUIpp5Fd7FshRQzuKgCImTlqG7pISseimEd/dyIWmN3qp
+	 SnyunpjfhBl978TWs57HDJf0wyhZzAXq8wqNdH077Mn7Xggx602NtRwtwQy/zJg4DY
+	 eFaW0MNfUc/KBzIzvV4qCGdQeYvtdlDWKLEYQbOvCFtkE8FvTYRWI4JzkmatZ+FFsl
+	 JUxq1BBpkAz2IY5Mm1txEtBKcnbRe0TxQ3IwK7wCBdBw98vmA2k14p47ymK2nXSegA
+	 wVMaU8WlhtppPwey/4s66Hh46QeWbd1UMIBFEBEoID0J2h0e7346dii8RGNyhib6WQ
+	 EX5BxvpaWIdDw==
+Date: Tue, 12 Dec 2023 15:23:47 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Cc: Kunwu Chan <chentao@kylinos.cn>, <anthony.l.nguyen@intel.com>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <jacob.e.keller@intel.com>, <przemyslaw.kitszel@intel.com>,
- <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, Kunwu Chan <kunwu.chan@hotmail.com>
-Subject: Re: [PATCH] iavf: Fix null pointer dereference in
- iavf_print_link_message
-Message-ID: <20231212152020.4a24b2f7@kernel.org>
-In-Reply-To: <6ba1e424-9903-43db-b567-32a864b896c9@intel.com>
-References: <20231211025927.233449-1-chentao@kylinos.cn>
-	<20231212132851.59054654@kernel.org>
-	<6ba1e424-9903-43db-b567-32a864b896c9@intel.com>
+To: Jianheng Zhang <Jianheng.Zhang@synopsys.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <Jose.Abreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, James Li <James.Li1@synopsys.com>,
+ Martin McKenny <Martin.McKenny@synopsys.com>, "open list:STMMAC ETHERNET
+ DRIVER" <netdev@vger.kernel.org>, "moderated list:ARM/STM32 ARCHITECTURE"
+ <linux-stm32@st-md-mailman.stormreply.com>, "moderated list:ARM/STM32
+ ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, open list
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 net-next] net: stmmac: xgmac3+: add FPE handshaking
+ support
+Message-ID: <20231212152347.167007f3@kernel.org>
+In-Reply-To: <CY5PR12MB63727C24923AE855CFF0D425BF8EA@CY5PR12MB6372.namprd12.prod.outlook.com>
+References: <CY5PR12MB63727C24923AE855CFF0D425BF8EA@CY5PR12MB6372.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,29 +58,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 12 Dec 2023 15:05:19 -0800 Jesse Brandeburg wrote:
-> On 12/12/2023 1:28 PM, Jakub Kicinski wrote:
-> > On Mon, 11 Dec 2023 10:59:27 +0800 Kunwu Chan wrote:  
-> >> kasprintf() returns a pointer to dynamically allocated memory
-> >> which can be NULL upon failure.
-> >>
-> >> Fixes: 1978d3ead82c ("intel: fix string truncation warnings")  
-> > 
-> > No need for the allocation here, print to a buffer on the stack.  
+On Tue, 12 Dec 2023 14:05:02 +0000 Jianheng Zhang wrote:
+> Adds the HW specific support for Frame Preemption handshaking on XGMAC3+
+> cores.
 > 
-> Sure, but I think that just takes us full circle back to where we
-> started. reverting this to the previous code will add back W=1 warnings.
-> 
-> The whole point of the commit mentioned above was to get a reasonable
-> implementation that won't cause string truncation warnings. Is there
-> some trick I don't know about to get an allocation which will not
-> trigger snprintf and friends to print warnings from -Wformat-truncation
+> Signed-off-by: Jianheng Zhang <Jianheng.Zhang@synopsys.com>
 
-Hm, it'd be nice if there was a flavor of snprintf which explicitly
-doesn't trigger this warning. Or perhaps a marking for the output
-buffer that says "truncation OK".
-
-Absent that, can we print to a buffer on the stack and copy?
-The link message is probably meh, but automation may get quite
-confused if a NIC suddenly stops reporting FW version..
+I defer to Vladimir on whether to trust that the follow up with
+the ethtool API support will come later (and not require rewrite
+of existing code); or we should request that it's part of the same
+series.
+-- 
+pw-bot: needs-ack
 
