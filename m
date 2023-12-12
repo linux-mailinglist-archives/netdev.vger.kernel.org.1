@@ -1,103 +1,97 @@
-Return-Path: <netdev+bounces-56331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F01F80E8B9
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 11:10:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 879E980E8BD
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 11:10:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 607C81C20B54
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:10:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6A7E1C20BA8
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 463C359B7B;
-	Tue, 12 Dec 2023 10:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 559545B1F0;
+	Tue, 12 Dec 2023 10:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UyFfNCUz"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="ctJFeN6W"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6B5DA6
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 02:09:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702375770;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6M/XvsgEA+noH1tcrJHEuC0orIXI1iUMmdFqUMBoqe8=;
-	b=UyFfNCUz8tWT+uR46YMHm7dhcGlOQ2WxldBMJV7VUtlriCoVqNulxi51ZGCkDVNyyVl/nW
-	n6QNstKcwTz1ZZYdH6zNYYGz5is1rOkigvKlbfWc+JIOoULGtdJNTMgBpnUmdDYdi8M2tu
-	9m6/BimFVTaz+gjis6UpXeIdgoxkhls=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-551-jHAmhI_2M463wfBFIQ5YKw-1; Tue, 12 Dec 2023 05:09:29 -0500
-X-MC-Unique: jHAmhI_2M463wfBFIQ5YKw-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a1e27c6de0eso116501666b.1
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 02:09:29 -0800 (PST)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 997D9E3
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 02:10:05 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-54dcfca54e0so7023389a12.1
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 02:10:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1702375804; x=1702980604; darn=vger.kernel.org;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=uHaTRxRyLv7/yiIgXr1TfZzs8xAqS4kO7LTDaQBlb7c=;
+        b=ctJFeN6WTQe1ItffKwuVXOAFCSWVgqLg8EV9jywWen7CaTF62EttxtbqSi9OuiwICV
+         MLKZYWFPn6gKBdoDuZAi88oB6HEuwda8h2JRy5I0kDtDgsNLcb03u7SO2RI3HloV/n94
+         MRYjIYEQJQNTGiD3Fx8yTbOEqsF0BK0Kf7W2o32NvGh2TLe2Pd+GBr/WMvlfsRVMGmKG
+         MnY93KK8s6xTvdfaAcukJJt4EHaDVO88fKF7hc2RN6SnK9CsJ+AkntE4bj341rRdyEza
+         /Esv+FrTRLv6zvCuhCN4doJr2za4SdV1YX7ymaMGyQn8mPgzRAn4zx/FIVwiaxGE7B+F
+         J3OQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702375768; x=1702980568;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6M/XvsgEA+noH1tcrJHEuC0orIXI1iUMmdFqUMBoqe8=;
-        b=rlrhkqe7JjAmc6VZoOhGuyhdztM4WhRLN7CTEbKOAFqQPogKJYxHmu73u9k9L42hXI
-         jhPHpkdqiwj/qsSqsdZHUb1bg1wjx9ulRHjZgSJWRbCsWLcRSPmiGIpHYtIzIUqJ2MLP
-         HDYbyLexOWwqYDwLrC2leEr/quNADKh5IgHFKQuMcsYIVdoAfFIZK7yGPqJ+kjgKLtBq
-         ja7gR0olnWPp0ig3ZF9UY6AEhhsPBg0za5nB7qTONHEKiwCT9x9mgZPVwyk3aWQtGqaS
-         QbiSRCK5L6KqLIHTC5+UbesRiFFQiizOYo2HM0DTyIQM3mVYfZXQb1T5P6FxFDTvluuC
-         zhMw==
-X-Gm-Message-State: AOJu0YxqHkjCpf1arZwuhw6Gjr6zcyj3nNPJWl/3397DlNB/suxrVI+9
-	m1RStbLn04VNb6LTjfbSu9JpyBRZjIYvxoTOX2Is42nFM8M/x7qb9FUs92ZjAByHW+hmUtfm/Bn
-	VdBJ42k32dnwfbK6q
-X-Received: by 2002:a17:906:99cf:b0:a1c:5944:29bb with SMTP id s15-20020a17090699cf00b00a1c594429bbmr6089855ejn.7.1702375768353;
-        Tue, 12 Dec 2023 02:09:28 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGMk1yIC7lV8N6DHVhTHBZBSHd+M1WbawYmyYj2VdjRNDphGCbZUoQdjg2Snt8KS+xKq/RRMg==
-X-Received: by 2002:a17:906:99cf:b0:a1c:5944:29bb with SMTP id s15-20020a17090699cf00b00a1c594429bbmr6089833ejn.7.1702375767944;
-        Tue, 12 Dec 2023 02:09:27 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-249-182.dyn.eolo.it. [146.241.249.182])
-        by smtp.gmail.com with ESMTPSA id rr17-20020a170907899100b00a1d457954d6sm5994983ejc.75.2023.12.12.02.09.26
+        d=1e100.net; s=20230601; t=1702375804; x=1702980604;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uHaTRxRyLv7/yiIgXr1TfZzs8xAqS4kO7LTDaQBlb7c=;
+        b=WkbmVk4DNY6HvtH4DmXW9HYNSpByHGHkYD9iA4Ein7Dm/t36C2lDDd04mpdekuQqHA
+         mIpP3ShhxvMlSOr3kRe/0jPMxNcNSzWFkRGS85jFhC91JQ9nCRpnuukHFlj40qGRBURn
+         zP2ifXmfzO0KM8wkQ/3NhwdwCtNoDNgZ2IoWP2hkoq2R6qTR9NxbnDzM1o0T4hJ00l93
+         ABj3B1BA4DzOqanFn6OUZ9jqjVOwpA5HHurasHITeqUDstPWOm/t7HWlU/y4ulrhHcYD
+         /ux+JbzeJkY9xmB4Dx2t5Pg6TypGLP353mPiGWPISh2md/grgBYPAZdz1RO4vJYPQm/d
+         RNpQ==
+X-Gm-Message-State: AOJu0YxDb8BtCnLl/NY80bRg944aXAbnPJX9378jUX5OPv9MjZE02YqB
+	kdvcKztZ0PR+hUsriIHDOibM2A==
+X-Google-Smtp-Source: AGHT+IEmSmQR3yM+snpCqYj0exuWRJzJ/MbXpjvCDBhBOG2SlCeXCFB2wst2urjDnOjXQ+xGmsZfcQ==
+X-Received: by 2002:a17:907:d92:b0:a1b:7b6f:7aad with SMTP id go18-20020a1709070d9200b00a1b7b6f7aadmr4113760ejc.92.1702375804053;
+        Tue, 12 Dec 2023 02:10:04 -0800 (PST)
+Received: from cloudflare.com ([2a09:bac5:5064:2dc::49:1d2])
+        by smtp.gmail.com with ESMTPSA id so7-20020a170907390700b00a1f7ae3dfbcsm4998578ejc.174.2023.12.12.02.10.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 02:09:27 -0800 (PST)
-Message-ID: <955d390c57a93406d40985fbd1856bd1c500d75c.camel@redhat.com>
-Subject: Re: [PATCH net-next v14 08/13] rtase: Implement net_device_ops
-From: Paolo Abeni <pabeni@redhat.com>
-To: Justin Lai <justinlai0215@realtek.com>, kuba@kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, andrew@lunn.ch, pkshih@realtek.com,
- larry.chiu@realtek.com
-Date: Tue, 12 Dec 2023 11:09:26 +0100
-In-Reply-To: <20231208094733.1671296-9-justinlai0215@realtek.com>
-References: <20231208094733.1671296-1-justinlai0215@realtek.com>
-	 <20231208094733.1671296-9-justinlai0215@realtek.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        Tue, 12 Dec 2023 02:10:03 -0800 (PST)
+References: <20231201180139.328529-1-john.fastabend@gmail.com>
+User-agent: mu4e 1.6.10; emacs 28.3
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: John Fastabend <john.fastabend@gmail.com>, Daniel Borkmann
+ <borkmann@iogearbox.net>
+Cc: martin.lau@kernel.org, edumazet@google.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH bpf v2 0/2]  bpf fix for unconnect af_unix socket
+Date: Tue, 12 Dec 2023 11:09:36 +0100
+In-reply-to: <20231201180139.328529-1-john.fastabend@gmail.com>
+Message-ID: <878r5zrati.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
 
-On Fri, 2023-12-08 at 17:47 +0800, Justin Lai wrote:
-> +static netdev_features_t rtase_fix_features(struct net_device *dev,
-> +					    netdev_features_t features)
-> +{
-> +	netdev_features_t features_fix =3D features;
-> +
-> +	if (dev->mtu > MSS_MAX)
-> +		features_fix &=3D ~NETIF_F_ALL_TSO;
-> +
-> +	if (dev->mtu > ETH_DATA_LEN)
-> +		features_fix &=3D ~NETIF_F_ALL_TSO;
+On Fri, Dec 01, 2023 at 10:01 AM -08, John Fastabend wrote:
+> Eric reported a syzbot splat from a null ptr deref from recent fix to
+> resolve a use-after-free with af-unix stream sockets and BPF sockmap
+> usage.
+>
+> The issue is I missed is we allow unconnected af_unix STREAM sockets to
+> be added to the sockmap. Fix this by blocking unconnected sockets.
+>
+> v2: change sk_is_unix to sk_is_stream_unix (Eric) and remove duplicate
+>     ASSERTS in selftests the xsocket helper already marks FAIL (Jakub)
+>
+> John Fastabend (2):
+>   bpf: syzkaller found null ptr deref in unix_bpf proto add
+>   bpf: sockmap, test for unconnected af_unix sock
+>
+>  include/net/sock.h                            |  5 +++
+>  net/core/sock_map.c                           |  2 ++
+>  .../selftests/bpf/prog_tests/sockmap_basic.c  | 34 +++++++++++++++++++
+>  3 files changed, 41 insertions(+)
 
-This latter condition is strictly more restrictive than the previous
-one, you can drop the latter. Also could you please drop a note about
-the why of it?
+For the series:
 
-Cheers,
-
-Paolo
-
+Acked-by: Jakub Sitnicki <jakub@cloudflare.com>
 
