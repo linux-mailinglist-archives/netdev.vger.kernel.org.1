@@ -1,220 +1,149 @@
-Return-Path: <netdev+bounces-56222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A074F80E31A
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 04:57:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 326AD80E324
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 05:01:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C61F282126
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 03:57:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8B651F220AF
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 04:01:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84826BE4D;
-	Tue, 12 Dec 2023 03:57:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E11CC148;
+	Tue, 12 Dec 2023 04:01:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W1lwv4he"
 X-Original-To: netdev@vger.kernel.org
-Received: from anchovy2.45ru.net.au (anchovy2.45ru.net.au [203.30.46.146])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FADCCD
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 19:57:46 -0800 (PST)
-Received: (qmail 4698 invoked by uid 5089); 12 Dec 2023 03:57:44 -0000
-Received: by simscan 1.2.0 ppid: 4475, pid: 4477, t: 2.0227s
-         scanners: regex: 1.2.0 attach: 1.2.0 clamav: 0.88.3/m:40/d:1950 spam: 3.1.4
-X-Spam-Level: 
-Received: from unknown (HELO ?192.168.2.4?) (rtresidd@electromag.com.au@203.59.235.95)
-  by anchovy3.45ru.net.au with ESMTPA; 12 Dec 2023 03:57:41 -0000
-Message-ID: <8ba4d31f-9436-43ad-afd7-997a4d3a4bf2@electromag.com.au>
-Date: Tue, 12 Dec 2023 11:57:22 +0800
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE31E94;
+	Mon, 11 Dec 2023 20:01:19 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-55193d5e8cdso18622a12.1;
+        Mon, 11 Dec 2023 20:01:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702353678; x=1702958478; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/EidiZCNULSAajLAFQxtw/FmzbQlFlMFC8XdMcEUFUk=;
+        b=W1lwv4heaJK9WGDs/u7clHsdkhkAYzH2NJWmkpkLBX3rR+kNqSabN+jAxu2WtEQ+MP
+         WzOfY1jaO8154kbTtecre5XYH7C493tQOy2SnVYwEViLYZP36erP+67vIPsU/Sq+OJYm
+         xHwJjdqDKY08THTclQ+bEBTLTJSjIe9IScPWBVsWAsXUxHVsBYN3DKmNEeG6bxO/QYqF
+         I2XhbLweTV3DcOUPzo3DJEjaF2mSx7NdyQipDo9KH2FF6J2PL3Yy1gtCs1pbjTAFFj3q
+         4ZpA933X2hGJL0bBnBnfXJNPQGLPnpdlrHIufq7NgwYIyXGd06UCO1mBass0Ed5kNlAs
+         vvVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702353678; x=1702958478;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/EidiZCNULSAajLAFQxtw/FmzbQlFlMFC8XdMcEUFUk=;
+        b=FP0oLBq5PfmXlAyfGaoBVXnhmN1X9ymlWQ6KnFy2s4MEu4RR92nfmxTnpoou2NfKrU
+         j2La0bHgYYFr1vwEdsEDZgV16NtvaHPSt4um91YQvMta0KXwsJ29rEaeULnaSH8knEJe
+         PDrbh62Y4AlPxcfVMJISJNL72DkYjT4rIzvfNV/1fyxSPwI5jFA4z0AMLlR5Q9KNs6lx
+         cw7EF1n6Mw9R7U7V7+ihnk5nacc8M+o4zrKcBbJPQYWWc+UIEpojsDh+ToVq72HyTQOD
+         yfJR6H336rYuf3jsTNy36FKWwv3LLQwliyW0rHgJ097H/lqqLCk70M08Zspiil5vtrIo
+         +2Tw==
+X-Gm-Message-State: AOJu0YxKpOYmDMfui/nPIKIdsjhGHhLcnPKrEImchAPTYk0HZ8q1s9RJ
+	TeKaoqW1c7uhGxdiREJyGzThHw1KtEIm14SBy3c=
+X-Google-Smtp-Source: AGHT+IEvbseHAT2zVelMSrUH3n8lUBT+bpmTqv+366RIJDikfD+cb0zeuxNmtbf6QH82bANaA/r0gKN/5EkrSrTjYJ0=
+X-Received: by 2002:a17:906:f848:b0:9bf:7ae7:fd6c with SMTP id
+ ks8-20020a170906f84800b009bf7ae7fd6cmr2118954ejb.10.1702353678210; Mon, 11
+ Dec 2023 20:01:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: STMMAC Ethernet Driver support
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, vinschen@redhat.com,
-  netdev@vger.kernel.org
-References: <e5c6c75f-2dfa-4e50-a1fb-6bf4cdb617c2@electromag.com.au>
- <20231208101216.3fca85b1@kernel.org>
- <8a0850d8-a2e4-4eb0-81e1-d067f18c2263@electromag.com.au>
- <41903b8b-d145-4fdf-a942-79d7f88f9068@electromag.com.au>
- <f47b0230-1513-4a81-9d78-3f092b979c48@electromag.com.au>
- <2139624b-e098-457a-bda4-0387d576b53a@lunn.ch>
-From: Richard Tresidder <rtresidd@electromag.com.au>
-In-Reply-To: <2139624b-e098-457a-bda4-0387d576b53a@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20231207222755.3920286-1-andrii@kernel.org> <20231207222755.3920286-2-andrii@kernel.org>
+ <CAADnVQK6WWcgKtPNQrGe9dM7x1iMOyL943PVrJjT6ueBDFRyQw@mail.gmail.com>
+In-Reply-To: <CAADnVQK6WWcgKtPNQrGe9dM7x1iMOyL943PVrJjT6ueBDFRyQw@mail.gmail.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Mon, 11 Dec 2023 20:01:06 -0800
+Message-ID: <CAEf4BzYHHdQsaGBFXnY8omP4hv_tUjqxHWTNoEugi3acrE5q=A@mail.gmail.com>
+Subject: Re: [PATCH RFC bpf-next 1/3] bpf: add mapper macro for bpf_cmd enum
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, Paul Moore <paul@paul-moore.com>, 
+	Christian Brauner <brauner@kernel.org>, Linux-Fsdevel <linux-fsdevel@vger.kernel.org>, 
+	LSM List <linux-security-module@vger.kernel.org>, Kees Cook <keescook@chromium.org>, 
+	Kernel Team <kernel-team@meta.com>, Sargun Dhillon <sargun@sargun.me>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-<font face="monospace">Richard Tresidder</font>
-
-
-On 12/12/2023 12:16 am, Andrew Lunn wrote:
->> We use the SOC's internal  STMMAC interface to connect to a Marvel switch IC
->> and expose each port individually using vlan, I'd forgot that part.
->> It's an  88E6352-xx-TFJ2I000  device utilising the 'marvell,mv88e6085'
->> compatible driver  in drivers\net\dsa\mv88e6xxx
-> Its odd you need VLANs. Each port should already be exposed to the
-> host as netdev interfaces. That is what DSA does.
+On Mon, Dec 11, 2023 at 6:40=E2=80=AFPM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
 >
->       Andrew
-Hi Andrew
-    I'll read further on that one as this is the first time I've had to 
-dig into this side of the system.
-It had always "just worked".
-The ports show up in an 'ip l' list in the same style as a vlan with an 
-@ symbol, naming isn't quite vlan style though.
-That in concert with the fact this 'vlan_feature' line broke things has 
-possibly distorted my view of how they're propagated.
-It's a rather trimmed down busybox image, so I'm missing some tools I'd 
-usually use to examine stuff.
+> On Thu, Dec 7, 2023 at 2:28=E2=80=AFPM Andrii Nakryiko <andrii@kernel.org=
+> wrote:
+> >
+> > +#define __BPF_CMD_MAPPER(FN, ctx...)                                  =
+ \
+> > +       FN(BPF_MAP_CREATE, 0)                                          =
+ \
+> > +       FN(BPF_MAP_LOOKUP_ELEM, 1)                                     =
+ \
+> > +       FN(BPF_MAP_UPDATE_ELEM, 2)                                     =
+ \
+> > +       FN(BPF_MAP_DELETE_ELEM, 3)                                     =
+ \
+> > +       FN(BPF_MAP_GET_NEXT_KEY, 4)                                    =
+ \
+>
+> So macro conversion across 4 main enums in uapi/bpf.h
+> is just to do:
+> +static const struct constant_table cmd_kvs[] =3D {
+> +       __BPF_CMD_MAPPER(__BPF_KV_FN)
+> +       {}
+> +};
+>
+> on the kernel side,
+> right?
 
-This is the config in the dts
-**************************************
-//------------------------------------------------------------------------------
-// connected to dsa network switch
-&gmac1 {
-   clock-names = "stmmaceth", "clk_ptp_ref";
-   clocks = <&emac1_clk &hps_eosc1>;
-   f2h_ptp_ref_clk;
-   fixed-link {
-     speed = <1000>;
-     full-duplex;
-   };
-};
+Right.
 
-//------------------------------------------------------------------------------
-&mdio1 {
-   #address-cells = <1>;
-   #size-cells = <0>;
+>
+> While in libbpf we already hard code name to value in arrays:
+> prog_type_name[], map_type_name[]
+>
+> which probably will remain as-is, since libbpf needs to be
+> built independently from the kernel.
+> (unless we will say that tools/uapi/bpf.h is part of libbpf,
+> which probably not a good way).
 
-   switch0: switch0@0 {
-     compatible = "marvell,mv88e6085";
-     #address-cells = <1>;
-     reg = <0>;
-     //reset-gpios = <&pio_a0 2 GPIO_ACTIVE_LOW>;
+No, we can easily use this on the libbpf side as well. Libbpf syncs
+the latest UAPI headers ([0]) and uses them during build time.
 
-     dsa,member = <0 0>;
+  [0] https://github.com/libbpf/libbpf/tree/master/include/uapi/linux
 
-     ports {
-       #address-cells = <1>;
-       #size-cells = <0>;
+>
+> There are more pros than cons in this enum uglification,
+> but cons are definitely staring in the face.
+>
+> Have you considered other options?
+> Like using vmlinix BTF for parsing bpffs delegation?
+> [14083] ENUM 'bpf_cmd' encoding=3DUNSIGNED size=3D4 vlen=3D39
+>         'BPF_MAP_CREATE' val=3D0
+>         'BPF_MAP_LOOKUP_ELEM' val=3D1
+>         'BPF_MAP_UPDATE_ELEM' val=3D2
+>         'BPF_MAP_DELETE_ELEM' val=3D3
+>         'BPF_MAP_GET_NEXT_KEY' val=3D4
+>         'BPF_PROG_LOAD' val=3D5
+>
+> Names and values are available.
+> btf_find_by_name_kind(vmlinux_btf, "bpd_cmd", BTF_KIND_ENUM);
+> is fast enough.
+>
+> I suspect you'll argue that you don't want to tie in
+> bpffs delegation parsing with BTF ;)
+>
 
-       port@2 {
-         reg = <2>;
-         label = "lan1";
-         phy-handle = <&switch1phy2>;
-       };
+Yep, that's the reason I didn't go for it in the initial version, of
+course. But it's fine.
 
-       port@3 {
-         reg = <3>;
-         label = "lan2";
-         phy-handle = <&switch1phy3>;
-       };
+> While I can preemptively answer that in the case vmlinux BTF
+> is not available it's fine not to parse names and rely on hex.
 
-       port@4 {
-         reg = <4>;
-         label = "lan3";
-         phy-handle = <&switch1phy4>;
-       };
-
-       port@5 {
-         reg = <5>;
-         label = "wifi";
-         fixed-link {
-           speed = <100>;
-           full-duplex;
-         };
-       };
-
-       port@6 {
-         reg = <6>;
-         label = "cpu";
-         ethernet = <&gmac1>;
-         fixed-link {
-           speed = <1000>;
-           full-duplex;
-         };
-       };
-
-     };
-
-     mdio {
-       #address-cells = <1>;
-       #size-cells = <0>;
-       switch1phy2: switch1phy2@2 {
-         reg = <2>;
-         marvell,reg-init = <0 0x10 0 0x0200>; // Sense only on Rx 
-Energy Detect, no FLPs sents
-       };
-       switch1phy3: switch1phy3@3 {
-         reg = <3>;
-         marvell,reg-init = <0 0x10 0 0x0200>; // Sense only on Rx 
-Energy Detect, no FLPs sents
-       };
-       switch1phy4: switch1phy4@4 {
-         reg = <4>;
-         marvell,reg-init = <0 0x10 0 0x0200>; // Sense only on Rx 
-Energy Detect, no FLPs sents
-       };
-     };
-
-     };
-};
-*************************************************
-
-This is how they appear using 'ip l'
-The @ symbol got me as I've usually associated this with vlan's in my 
-day to day networking.
-But the config files don't configure them as vlans.
-*************************************************
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
-     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1508 qdisc mq qlen 1000
-     link/ether 04:91:62:cf:4f:06 brd ff:ff:ff:ff:ff:ff
-3: sit0@NONE: <NOARP> mtu 1480 qdisc noop qlen 1000
-     link/sit 0.0.0.0 brd 0.0.0.0
-4: lan1@eth0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue 
-qlen 1000
-     link/ether 04:91:62:cf:4f:06 brd ff:ff:ff:ff:ff:ff
-5: lan2@eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue 
-qlen 1000
-     link/ether 04:91:62:cf:4f:06 brd ff:ff:ff:ff:ff:ff
-6: lan3@eth0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue 
-qlen 1000
-     link/ether 04:91:62:cf:4f:06 brd ff:ff:ff:ff:ff:ff
-7: wifi@eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue 
-qlen 1000
-     link/ether 04:91:62:cf:4f:06 brd ff:ff:ff:ff:ff:ff
-
-*************************************************
-
-And these are the systemd config files
-No vlan mentioned in there..
-*************************************************
-/etc/systemd/network/eth0.network
-[Match]
-Name=eth0
-
-[Network]
-
-/etc/systemd/network/lan.network
-[Match]
-Name=lan*
-
-[Network]
-DHCP=yes
-BindCarrier=eth0
-LinkLocalAddressing=yes
-
-[DHCP]
-UseDomains=yes
-ClientIdentifier=mac
-
-*************************************************
-
-Cheers
-    Richard
+It's fine, I can do optional BTF-based parsing, if that's what you prefer.
 
