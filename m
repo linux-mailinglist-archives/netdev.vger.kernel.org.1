@@ -1,108 +1,117 @@
-Return-Path: <netdev+bounces-56228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C76880E372
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 05:46:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DF7380E373
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 05:46:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C981F1F21EF9
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 04:46:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBB04282383
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 04:46:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE3BD510;
-	Tue, 12 Dec 2023 04:45:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FC8FD510;
+	Tue, 12 Dec 2023 04:46:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="nvi2wL0U"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fixjunTy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACF0EA6
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 20:45:51 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6ce40061e99so786270b3a.0
-        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 20:45:51 -0800 (PST)
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 517A99B
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 20:46:48 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1d05e4a94c3so46003825ad.1
+        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 20:46:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1702356350; x=1702961150; darn=vger.kernel.org;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YzW6ne78hOyVBwyJBdluG6G3urLMiolMojmNa+NoQdE=;
-        b=nvi2wL0UDtdu/2NKSAK/bwR+VvCcNRx1At5zauChmbK+kRz9r7BfRsui0RevWbRXof
-         vAkVpvFE5vEY4XrqHHJixGRTXb/wIeL4EAmx33BuL9yEtxkeilV4mAFsUWEThrQMyFgG
-         dvIbU6wLaqzdfTjgT5tQvcyG/S7HfYY+sxnzFAyVQvmGhErcgj+WgUnrozW2ILcBflH2
-         ONJAtOHewDcP88+AAOfr+/bZ/A9KwKBDvOTQdTxiKouLzgexy0nyHJCS3QE6Daua/dQu
-         cPEbioRPi1dTBx7rPxUVoqhxYuRwXDFXDZCUEqf6rgxKF7gqjs05DX+1yAXfrQsXbs92
-         cmSg==
+        d=gmail.com; s=20230601; t=1702356408; x=1702961208; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QOHMCE8SbYViYKM+gAXWxTdAxXP0rvaIbcht/d8n6Hg=;
+        b=fixjunTypsAIObn8CkkU6ABwaxLljNhHDtZ0oqmnM8pBY6drnxf7+XZdXLH6xUZecV
+         R8gYB4oAfGIFoprfapCLumt0f+rwH2mlnnH5otiuTQI5nmZY6PQALlMZhYK2SgLyr9Xk
+         y0G6wUiJ8gJIjSiMqZgJHXTcpc1j8TIOllMto5jzhvUh/lsMpxUoO7ejtjP2yVpbhhHY
+         U7F24NrK5aoOm6eIbbTG96ketuHNV4TGE2fcm1CpH+bNbL+n8QG6QgxOZf8dG1IC/0S/
+         cr8hFS2gEZlUK6TkdA5O2Qz7XZyVHmG6FxMdrMan/x0nQgM7gojRaqHsH1NC/BB2Lxx4
+         J/AQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702356350; x=1702961150;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YzW6ne78hOyVBwyJBdluG6G3urLMiolMojmNa+NoQdE=;
-        b=NfYtNkX+7m2V8PbkOmic3th+FTIEYlsges3D/mGnhKmQowN0WrnDwcjngk/bM9ovC8
-         YKlaga4pUBh5gSVZtWxG/cjDoeaxyalN9wit1dUGp0rtrESJeupZzruOz2FjTohcOqUF
-         kixoVYqbxbRI3AwEg+gNjeEWTUG64pkijdlvfdHWklWa20h8nOM81cZPy5FUcU6VKhJq
-         /x7Rrpp6sCQYA1o0haRW3om5IqTBs/WnYniziLX3qBIkvdCv8DC++eV2n80tppkiW7Jl
-         BwhwFZiwGiWDMR2y9ey63Eo/+gKc0gMYz8eotA2vMxHWPbpwR/d8sPds7bGNpH1ocgQ/
-         FLNg==
-X-Gm-Message-State: AOJu0Yz3a99YGdWfn8u1RDgccWcLRfTvUQuIJFstMlzZdZ4B3/8BlPH6
-	ZfDEqOJ91VLyqxMLR8T8u0cmnbf5Hnjx26XfgcYdPg==
-X-Google-Smtp-Source: AGHT+IFeVarIjV/fmLCRlJK7v2wGXjcnIKXEDjNmlMbIoWER8XgjJrTP3GxTfPQuISj35Gsn/z0Skw==
-X-Received: by 2002:a05:6a00:4b4a:b0:6ce:720e:23e with SMTP id kr10-20020a056a004b4a00b006ce720e023emr11977411pfb.1.1702356350458;
-        Mon, 11 Dec 2023 20:45:50 -0800 (PST)
-Received: from smtpclient.apple ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id l2-20020a6542c2000000b005c621e0de25sm6176085pgp.71.2023.12.11.20.45.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Dec 2023 20:45:48 -0800 (PST)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From: Jens Axboe <axboe@kernel.dk>
+        d=1e100.net; s=20230601; t=1702356408; x=1702961208;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QOHMCE8SbYViYKM+gAXWxTdAxXP0rvaIbcht/d8n6Hg=;
+        b=RU+HOYksC8R8+ePwjaHXZAKNQdcr1F/3QfRfmbCEtG7fkaxAtxW8CY5l+vz+E7umRj
+         1nFiUbQYkZu3s3lFqzQViELFt5rXmPoSLKBhw83ze+YNP/w/fXnWNkmQjw/XEMcUpzCs
+         Ho+Za6ghSYxbUm8O/8jNo/ZiM1rG+j4lmixVqYUxJHepLpetszBgHALlRSN91cS5OWMw
+         H8XZENMpHXVg1dsSh+B3jSj2d9LqfCcdPRHMs0OlLPxorI/3QbNfP9q/b1iMtZl+sqDg
+         fTgzI7TCAbKMZvKmuVqOIaGlDItofBiwI9ZAfeSjNtca/98sF3/IAyDNcCzLU2rD7W4U
+         7ezA==
+X-Gm-Message-State: AOJu0Yy/E75Vy4v+TYTivigzYgJFLkLyul747SdKlfJli7po50MLAT//
+	TT58TV9jaXv7pv2yE/gGveA=
+X-Google-Smtp-Source: AGHT+IFAHSN00lNacpLH640iju74Vcrj+ZbS0ULyrmsYtiKQNU7egtiasm4kkDNaA6Rcc0GRFD+WIA==
+X-Received: by 2002:a17:903:32c8:b0:1d0:5806:f45d with SMTP id i8-20020a17090332c800b001d05806f45dmr5882500plr.42.1702356407670;
+        Mon, 11 Dec 2023 20:46:47 -0800 (PST)
+Received: from localhost.localdomain ([89.187.161.180])
+        by smtp.gmail.com with ESMTPSA id c3-20020a170902848300b001d33e6521b9sm36143plo.14.2023.12.11.20.46.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Dec 2023 20:46:46 -0800 (PST)
+From: Liang Chen <liangchen.linux@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	hawk@kernel.org,
+	ilias.apalodimas@linaro.org,
+	linyunsheng@huawei.com
+Cc: netdev@vger.kernel.org,
+	linux-mm@kvack.org,
+	jasowang@redhat.com,
+	almasrymina@google.com,
+	liangchen.linux@gmail.com
+Subject: [PATCH net-next v9 0/4] skbuff: Optimize SKB coalescing for page pool
+Date: Tue, 12 Dec 2023 12:46:10 +0800
+Message-Id: <20231212044614.42733-1-liangchen.linux@gmail.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH RESEND] io_uring/af_unix: disable sending io_uring over sockets
-Date: Mon, 11 Dec 2023 21:45:38 -0700
-Message-Id: <105F23B4-F0B6-41E3-A795-F1B8E754A160@kernel.dk>
-References: <20231211183953.58c80c5c@kernel.org>
-Cc: Pavel Begunkov <asml.silence@gmail.com>,
- patchwork-bot+netdevbpf@kernel.org, io-uring@vger.kernel.org,
- jannh@google.com, davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- netdev@vger.kernel.org
-In-Reply-To: <20231211183953.58c80c5c@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-X-Mailer: iPhone Mail (21B101)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Dec 11, 2023, at 7:39=E2=80=AFPM, Jakub Kicinski <kuba@kernel.org> wrote:=
+The combination of the following condition was excluded from skb coalescing:
 
->=20
-> =EF=BB=BFOn Sun, 10 Dec 2023 01:18:00 +0000 Pavel Begunkov wrote:
->>> Here is the summary with links:
->>>   - [RESEND] io_uring/af_unix: disable sending io_uring over sockets
->>>     https://git.kernel.org/netdev/net/c/69db702c8387 =20
->>=20
->> It has already been taken by Jens into the io_uring tree, and a pr
->> with it was merged by Linus. I think it should be dropped from
->> the net tree?
->=20
-> Ugh, I think if I revert it now it can only hurt.
-> Git will figure out that the change is identical, and won't complain
-> at the merge (unless we change it again on top, IIUC).
+from->pp_recycle = 1
+from->cloned = 1
+to->pp_recycle = 1
 
-Yeah, git will handle it just fine, it=E2=80=99ll just be an empty duplicate=
-. Annoying, but not the end of the world.=20
+With page pool in use, this combination can be quite common(ex.
+NetworkMananger may lead to the additional packet_type being registered,
+thus the cloning). In scenarios with a higher number of small packets, it
+can significantly affect the success rate of coalescing.
 
-> If I may, however, in the most polite way possible put forward
-> the suggestion to send a notification to the list when patch is
-> applied, it helps avoid such confusion... I do hate most automated
-> emails myself, but an "applied" notification is good.
+This patchset aims to optimize this scenario and enable coalescing of this
+particular combination. That also involves supporting multiple users
+referencing the same fragment of a pp page to accomondate the need to
+increment the "from" SKB page's pp page reference count.
 
-I did do that, I always do. But looks like b4 replies to the first email rat=
-her than the one that had netdev cc=E2=80=99ed, which may be why this happen=
-ed in the first place.=20
+Changes from v8:
+- improve kdoc for skb_pp_frag_ref
 
-=E2=80=94=20
-Jens Axboe
+Liang Chen (4):
+  page_pool: transition to reference count management after page
+    draining
+  page_pool: halve BIAS_MAX for multiple user references of a fragment
+  skbuff: Add a function to check if a page belongs to page_pool
+  skbuff: Optimization of SKB coalescing for page pool
+
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  4 +-
+ include/linux/mm_types.h                      |  2 +-
+ include/net/page_pool/helpers.h               | 65 +++++++++++--------
+ include/net/page_pool/types.h                 |  6 +-
+ net/core/page_pool.c                          | 14 ++--
+ net/core/skbuff.c                             | 50 ++++++++++----
+ 6 files changed, 89 insertions(+), 52 deletions(-)
+
+-- 
+2.31.1
 
 
