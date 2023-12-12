@@ -1,75 +1,86 @@
-Return-Path: <netdev+bounces-56317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C1D080E843
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:54:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0330C80E859
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:57:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CD561C20A7B
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 09:54:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2AD62812E5
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 09:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4598559144;
-	Tue, 12 Dec 2023 09:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E735914E;
+	Tue, 12 Dec 2023 09:57:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BFs0Vsbj"
+	dkim=pass (1024-bit key) header.d=riseup.net header.i=@riseup.net header.b="G/fV2qeH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx1.riseup.net (mx1.riseup.net [198.252.153.129])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59E49FD
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 01:57:23 -0800 (PST)
+Received: from fews01-sea.riseup.net (fews01-sea-pn.riseup.net [10.0.1.109])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB9D58ADA;
-	Tue, 12 Dec 2023 09:54:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D57EDC433C7;
-	Tue, 12 Dec 2023 09:54:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702374881;
-	bh=g44so0aXENb1ZbYVlFiZWeI/HIvhAHxzBBi5p4XGpb8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BFs0VsbjwcxWVEkl3pXaSvyYM4X2Whkvb6oF9daOqpon9n89n7CCqsti8gUebdR2R
-	 +clPMLnHbXFu+jQwf8uQvDs/tq+mKSCExqEkGkjpIROV45xBnjwYIh5V0qlIfRkyq5
-	 bx6Ythe77BYpy+bOer+3uX6ncBG4HON8uowwMv5zNo6O2J5PwNjmk85saMFDiez1o8
-	 4S1rKVJcYFWQ99fbKhm4DQgjhg2+U0ShImfMsXbYl+PZ6fq7zAxmg489KMVIr+m9DO
-	 o3s0GpVg9aia5ugwjeKG33JFwAKTK+j0i5mIPiwMhmqIk8reskp5bMzQA7zDFmjEJW
-	 iucHoZIM+mC+w==
-Date: Tue, 12 Dec 2023 09:54:35 +0000
-From: Simon Horman <horms@kernel.org>
-To: Rouven Czerwinski <r.czerwinski@pengutronix.de>
-Cc: Johannes Berg <johannes.berg@intel.com>,
-	Josua Mayer <josua@solid-run.com>, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	pza@pengutronix.de, stable@vger.kernel.org,
-	Johannes Berg <johannes@sipsolutions.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH v2] net: rfkill: gpio: set GPIO direction
-Message-ID: <20231212095435.GT5817@kernel.org>
-References: <20231206131336.3099727-1-r.czerwinski@pengutronix.de>
- <20231207075835.3091694-1-r.czerwinski@pengutronix.de>
+	by mx1.riseup.net (Postfix) with ESMTPS id 4SqDYL0dhDzDrRM;
+	Tue, 12 Dec 2023 09:57:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=riseup.net; s=squak;
+	t=1702375041; bh=T2p932hhf/t1ELCg3vzJT0DL6+JnVOd0apGLSkwLy2g=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=G/fV2qeH0CGR7kNB/gzf8HB8A9xjj9Ew9/U9D5F6LjF+Iaflm42OZMNFExgJVlPPB
+	 7cLYTVyMtu3WD2WlbnDH6kqBKRNoO9uv+VH0DJ270AphegvrFWvdH5EB/RAbAiGfFg
+	 iC5pc0WdFLJGx0NSsED+e0Fk01oRUKE+SvtkEyKA=
+X-Riseup-User-ID: D1B3507E71595E12C760C7F32A909C3EC4E44D597829D7D5FEBF00FC9C995999
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	 by fews01-sea.riseup.net (Postfix) with ESMTPSA id 4SqDYJ60zmzJn4h;
+	Tue, 12 Dec 2023 09:57:08 +0000 (UTC)
+Message-ID: <6715f514-f3a7-4297-8720-53872eea8056@riseup.net>
+Date: Tue, 12 Dec 2023 10:57:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231207075835.3091694-1-r.czerwinski@pengutronix.de>
+Subject: Re: Preferred term for netdev master / slave
+To: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org
+References: <m2plzc96m4.fsf@gmail.com>
+Content-Language: en-US
+From: "Fernando F. Mancera" <ffmancera@riseup.net>
+In-Reply-To: <m2plzc96m4.fsf@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 07, 2023 at 08:58:36AM +0100, Rouven Czerwinski wrote:
-> Fix the undefined usage of the GPIO consumer API after retrieving the
-> GPIO description with GPIO_ASIS. The API documentation mentions that
-> GPIO_ASIS won't set a GPIO direction and requires the user to set a
-> direction before using the GPIO.
-> 
-> This can be confirmed on i.MX6 hardware, where rfkill-gpio is no longer
-> able to enabled/disable a device, presumably because the GPIO controller
-> was never configured for the output direction.
-> 
-> Fixes: b2f750c3a80b ("net: rfkill: gpio: prevent value glitch during probe")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Rouven Czerwinski <r.czerwinski@pengutronix.de>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+
+On 11/12/2023 15:05, Donald Hunter wrote:
+> I'm working on updates to the YNL spec for RTLINK and per
+> Documentation/process/coding-style I want to avoid any new use
+> of master / slave.
+> 
+> Recommended replacements include:
+> 
+>      '{primary,main} / {secondary,replica,subordinate}'
+>      '{initiator,requester} / {target,responder}'
+>      '{controller,host} / {device,worker,proxy}'
+> 
+> Is there an existing preference for what to use in the context
+> of e.g. bridge master / slave?
+> 
+
+Hi Donald,
+
+In other projects like NetworkManager, rust-netlink libraries.. the 
+terms that are being used in the context of linux bridging are 
+controller / port.
+
+> If not, then how about one of:
+> 
+>      primary / secondary
+>      main / subordinate
+> 
+> Thanks!
+> 
+
+Thanks!
 
