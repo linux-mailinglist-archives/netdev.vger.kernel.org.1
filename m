@@ -1,220 +1,86 @@
-Return-Path: <netdev+bounces-56605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5140880F9B0
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 22:47:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AE0D80F9BD
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 22:48:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CBE628214D
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 21:47:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8E98282177
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 21:48:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB66164CD0;
-	Tue, 12 Dec 2023 21:47:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36C7E64CC4;
+	Tue, 12 Dec 2023 21:48:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lOnfHrn4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X+eSgxEe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D3EDE4;
-	Tue, 12 Dec 2023 13:47:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702417630; x=1733953630;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=0mWQEe17c6d1pEUZXCBP0jonexlm/pdHfLDHkhLBifY=;
-  b=lOnfHrn4HxFFIgmx9GdVcWszQ12ZywvqOO43Mnsu61xCjNiaM7A2SgCM
-   pt5yAH6VWaXTyNLiaKjTkDbtUc2eCFdonJoBdGRsv2j5dVWbCjR8JzcwG
-   1I0EhnqVWNA56Mzk+2RxbB0w++JzLbtouCNuePlNRFnefJl1Q09tBEg+y
-   eyCUAYMISO7k3rUGTokwv9RJYrAPXSQe9uRcx92h7ucY+ZlGpibhwoH8C
-   rEWJiZBfIvcu2jydEdE7GQhTxvJodPL29E8qwo3Mbf2Ps0uukOBZIvoyq
-   C7Zx6CQTUQieB5SK5ei4yclGzd7pB3MaCz2ZNvGd/hSjnL0lUqSUnMpbc
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="481074734"
-X-IronPort-AV: E=Sophos;i="6.04,271,1695711600"; 
-   d="scan'208";a="481074734"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 13:47:10 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="864375324"
-X-IronPort-AV: E=Sophos;i="6.04,271,1695711600"; 
-   d="scan'208";a="864375324"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by FMSMGA003.fm.intel.com with ESMTP; 12 Dec 2023 13:47:06 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rDAam-000JlX-18;
-	Tue, 12 Dec 2023 21:47:04 +0000
-Date: Wed, 13 Dec 2023 05:46:24 +0800
-From: kernel test robot <lkp@intel.com>
-To: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	lorenzo.bianconi@redhat.com, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com, bpf@vger.kernel.org,
-	hawk@kernel.org, toke@redhat.com, willemdebruijn.kernel@gmail.com,
-	jasowang@redhat.com, sdf@google.com
-Subject: Re: [PATCH v4 net-next 1/3] net: introduce page_pool pointer in
- softnet_data percpu struct
-Message-ID: <202312130546.Kst7VY7F-lkp@intel.com>
-References: <2a267c8f331996de0e26568472c45fe78eb67e1d.1702375338.git.lorenzo@kernel.org>
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBA17AB;
+	Tue, 12 Dec 2023 13:48:51 -0800 (PST)
+Received: by mail-oi1-x22f.google.com with SMTP id 5614622812f47-3b9fcb3223dso3098054b6e.3;
+        Tue, 12 Dec 2023 13:48:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702417731; x=1703022531; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9kBxEu0vCdxYr+LePyndeYizjAKEIkcRyk6dRNxawLU=;
+        b=X+eSgxEenfT6erotoWWnN8Nrnzwqdqmf+VN/Ek9Vbl9WdPmiFmSpBcQuVr3vFYRFTQ
+         xhk8vOIiGOTv5g9oz/Rf/C3Kj0C4nazJ4Q8K0H0+LUyayQDwcJFhV5eUOXt0XQVPG6h0
+         IOOtVKT0fLRmsyzEbuBkFcl7m9vNXjgT3nV7YciTR/Zw4OMRZom1JH2qo3GWi7q9RTTc
+         zNReNoJb2/tBnAr+BrbHLOuO3132b/Uufnw0gIgjXB1i1+5MXj4iSn658sqUzBMZmGIm
+         3V3nhEZ/sSQYh2sNZW+4cu58SxIDmUHlxKzEY2M8IZb7/71msiQsEx82z3Y4dbNv64I6
+         ZmRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702417731; x=1703022531;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9kBxEu0vCdxYr+LePyndeYizjAKEIkcRyk6dRNxawLU=;
+        b=lodd5CXI0pnCmMlVT5AfJWToXBk8uo8wYs8gwwTlWcvif9XaR/+E842cdd4qm+2irK
+         Shr5PB5dbPIkiuzaoAPuEB5KJ94g0gap4S3HqQmLxQHZlgtR3anrbarlBoMVYiDEaGLD
+         OYokHx1RqezvaUvroCHgKbCpO7AhSXqzjme/ANUT0JIzQ1Ph2HR6WH+NUfY6rc8mPGuM
+         Ds7Cf+9FrsCd914sRoFUR0jLaz2WBzUqVBZMxyGq2do+JEHNPDi6XTJ2FehGDhZXNdJG
+         vBLW7KlCXVLZi2iNOBDJETuYkHKLpkomE4d59pLEjJ044E0gWh70oiC0LZtCq4Tth8DX
+         REdA==
+X-Gm-Message-State: AOJu0YzsEEDOVjZYbEH+yPudQJLA4F3Tn3N5YTJ5nIJZtg5ciV1ctkOX
+	P8mj9bxE7dqgOv0rm9yildRMLHXznnOIh6D/TyI=
+X-Google-Smtp-Source: AGHT+IGf0dbxxsxdxyAG6vGPt61OFf+3pdNzC7neho9FWsMA3qKht/LKQFyvpNoAOwEnTghdEyo5MBQzOrmwe9Rr25M=
+X-Received: by 2002:a05:6870:e388:b0:203:f96:d5a9 with SMTP id
+ x8-20020a056870e38800b002030f96d5a9mr902602oad.41.1702417731051; Tue, 12 Dec
+ 2023 13:48:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2a267c8f331996de0e26568472c45fe78eb67e1d.1702375338.git.lorenzo@kernel.org>
+References: <20231211164039.83034-1-donald.hunter@gmail.com>
+ <20231211164039.83034-4-donald.hunter@gmail.com> <ZXjFB90lpIQqbFtE@gmail.com>
+In-Reply-To: <ZXjFB90lpIQqbFtE@gmail.com>
+From: Donald Hunter <donald.hunter@gmail.com>
+Date: Tue, 12 Dec 2023 21:48:39 +0000
+Message-ID: <CAD4GDZwQTWYHPq6wPPt+B=W9SFG-4Wb3NDp9Laaat7nq0jvU7Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 03/11] doc/netlink: Regenerate netlink .rst
+ files if ynl-gen-rst changes
+To: Breno Leitao <leitao@debian.org>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, 
+	Jacob Keller <jacob.e.keller@intel.com>, donald.hunter@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Lorenzo,
+On Tue, 12 Dec 2023 at 20:39, Breno Leitao <leitao@debian.org> wrote:
+>
+> > +$(YNL_RST_DIR)/%.rst: $(YNL_TOOL)
+> > +$(YNL_RST_DIR)/%.rst: $(YNL_YAML_DIR)/%.yaml $(YNL_TOOL)
+> > +     $(YNL_TOOL) -i $< -o $@
+>
+> Why do you need both lines here? Isn't the last line enough?
+>
+>         $(YNL_RST_DIR)/%.rst: $(YNL_YAML_DIR)/%.yaml $(YNL_TOOL)
 
-kernel test robot noticed the following build errors:
+Good catch. I didn't intend to leave that first line in.
 
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Lorenzo-Bianconi/net-introduce-page_pool-pointer-in-softnet_data-percpu-struct/20231212-181103
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/2a267c8f331996de0e26568472c45fe78eb67e1d.1702375338.git.lorenzo%40kernel.org
-patch subject: [PATCH v4 net-next 1/3] net: introduce page_pool pointer in softnet_data percpu struct
-config: um-allnoconfig (https://download.01.org/0day-ci/archive/20231213/202312130546.Kst7VY7F-lkp@intel.com/config)
-compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231213/202312130546.Kst7VY7F-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312130546.Kst7VY7F-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   /usr/bin/ld: init/main.o: warning: relocation in read-only section `.ref.text'
-   /usr/bin/ld: warning: .tmp_vmlinux.kallsyms1 has a LOAD segment with RWX permissions
-   /usr/bin/ld: net/core/dev.o: in function `net_dev_init':
->> net/core/dev.c:11734: undefined reference to `page_pool_create'
-   /usr/bin/ld: warning: creating DT_TEXTREL in a PIE
-   clang: error: linker command failed with exit code 1 (use -v to see invocation)
-
-
-vim +11734 net/core/dev.c
-
- 11667	
- 11668	/*
- 11669	 *	Initialize the DEV module. At boot time this walks the device list and
- 11670	 *	unhooks any devices that fail to initialise (normally hardware not
- 11671	 *	present) and leaves us with a valid list of present and active devices.
- 11672	 *
- 11673	 */
- 11674	
- 11675	#define SD_PAGE_POOL_RING_SIZE	256
- 11676	/*
- 11677	 *       This is called single threaded during boot, so no need
- 11678	 *       to take the rtnl semaphore.
- 11679	 */
- 11680	static int __init net_dev_init(void)
- 11681	{
- 11682		struct softnet_data *sd;
- 11683		int i, rc = -ENOMEM;
- 11684	
- 11685		BUG_ON(!dev_boot_phase);
- 11686	
- 11687		net_dev_struct_check();
- 11688	
- 11689		if (dev_proc_init())
- 11690			goto out;
- 11691	
- 11692		if (netdev_kobject_init())
- 11693			goto out;
- 11694	
- 11695		INIT_LIST_HEAD(&ptype_all);
- 11696		for (i = 0; i < PTYPE_HASH_SIZE; i++)
- 11697			INIT_LIST_HEAD(&ptype_base[i]);
- 11698	
- 11699		if (register_pernet_subsys(&netdev_net_ops))
- 11700			goto out;
- 11701	
- 11702		/*
- 11703		 *	Initialise the packet receive queues.
- 11704		 */
- 11705	
- 11706		for_each_possible_cpu(i) {
- 11707			struct work_struct *flush = per_cpu_ptr(&flush_works, i);
- 11708			struct page_pool_params page_pool_params = {
- 11709				.pool_size = SD_PAGE_POOL_RING_SIZE,
- 11710				.nid = NUMA_NO_NODE,
- 11711			};
- 11712	
- 11713			INIT_WORK(flush, flush_backlog);
- 11714	
- 11715			sd = &per_cpu(softnet_data, i);
- 11716			skb_queue_head_init(&sd->input_pkt_queue);
- 11717			skb_queue_head_init(&sd->process_queue);
- 11718	#ifdef CONFIG_XFRM_OFFLOAD
- 11719			skb_queue_head_init(&sd->xfrm_backlog);
- 11720	#endif
- 11721			INIT_LIST_HEAD(&sd->poll_list);
- 11722			sd->output_queue_tailp = &sd->output_queue;
- 11723	#ifdef CONFIG_RPS
- 11724			INIT_CSD(&sd->csd, rps_trigger_softirq, sd);
- 11725			sd->cpu = i;
- 11726	#endif
- 11727			INIT_CSD(&sd->defer_csd, trigger_rx_softirq, sd);
- 11728			spin_lock_init(&sd->defer_lock);
- 11729	
- 11730			init_gro_hash(&sd->backlog);
- 11731			sd->backlog.poll = process_backlog;
- 11732			sd->backlog.weight = weight_p;
- 11733	
- 11734			sd->page_pool = page_pool_create(&page_pool_params);
- 11735			if (IS_ERR(sd->page_pool)) {
- 11736				sd->page_pool = NULL;
- 11737				goto out;
- 11738			}
- 11739			page_pool_set_cpuid(sd->page_pool, i);
- 11740		}
- 11741	
- 11742		dev_boot_phase = 0;
- 11743	
- 11744		/* The loopback device is special if any other network devices
- 11745		 * is present in a network namespace the loopback device must
- 11746		 * be present. Since we now dynamically allocate and free the
- 11747		 * loopback device ensure this invariant is maintained by
- 11748		 * keeping the loopback device as the first device on the
- 11749		 * list of network devices.  Ensuring the loopback devices
- 11750		 * is the first device that appears and the last network device
- 11751		 * that disappears.
- 11752		 */
- 11753		if (register_pernet_device(&loopback_net_ops))
- 11754			goto out;
- 11755	
- 11756		if (register_pernet_device(&default_device_ops))
- 11757			goto out;
- 11758	
- 11759		open_softirq(NET_TX_SOFTIRQ, net_tx_action);
- 11760		open_softirq(NET_RX_SOFTIRQ, net_rx_action);
- 11761	
- 11762		rc = cpuhp_setup_state_nocalls(CPUHP_NET_DEV_DEAD, "net/dev:dead",
- 11763					       NULL, dev_cpu_dead);
- 11764		WARN_ON(rc < 0);
- 11765		rc = 0;
- 11766	out:
- 11767		if (rc < 0) {
- 11768			for_each_possible_cpu(i) {
- 11769				sd = &per_cpu(softnet_data, i);
- 11770				if (!sd->page_pool)
- 11771					continue;
- 11772	
- 11773				page_pool_destroy(sd->page_pool);
- 11774				sd->page_pool = NULL;
- 11775			}
- 11776		}
- 11777	
- 11778		return rc;
- 11779	}
- 11780	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks!
 
