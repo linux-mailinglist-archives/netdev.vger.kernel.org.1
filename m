@@ -1,159 +1,220 @@
-Return-Path: <netdev+bounces-56604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF92180F9A1
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 22:45:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5140880F9B0
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 22:47:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5EED282072
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 21:45:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CBE628214D
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 21:47:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC7DF64149;
-	Tue, 12 Dec 2023 21:45:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB66164CD0;
+	Tue, 12 Dec 2023 21:47:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jrn4Jmrw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lOnfHrn4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BCACB3
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 13:45:29 -0800 (PST)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-a1e7971db2aso711184166b.3
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 13:45:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702417528; x=1703022328; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JJCdGKISotv2pJZ+hBcpKEM/45HxdS8m491Gp3+BQ4k=;
-        b=jrn4JmrwLj/wAYQmTRabSvSJ5jluhWevaSXS8+Wvx0kjluYQ+VLJJE7oXPaPm+SLXe
-         aL3rUiQJHI08+wMMocMdzAu6/vRTu1zfrQOiWUNqsH626nkGmRZiTIjAeM7v2E95xv6q
-         w+2aqXe77wi1QFnQvveXOISK6AvSVGFLkPBZta0T/1f5JUkA2iyrlAOmAsP0aKvY/kws
-         YBvGsN/vUYs6Qs7j5NRIJcN9lUiwaOsH4yMbtUekdb6rZxCgRHDpIM/8hIcyCebAnLoN
-         oxpK1hZAQlvWmEOADv9xyO9q5kl7b98GOhUrcLO9knhBHYhuPl9gSBMgcKg7VSj9ggoT
-         USRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702417528; x=1703022328;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JJCdGKISotv2pJZ+hBcpKEM/45HxdS8m491Gp3+BQ4k=;
-        b=MGoMdU2k/1jKZHfMUtJO6KItCTDbEGC3WeFn2uxUwAVnJ92ulVUgc20MSZpkuFVZLL
-         DLjnyLaFUZpK/tTtQME7SlamOv7HckYCdUQ9zfxfyUKtMzc/i7lizsDByNdF2eFfhadq
-         FH5m4Fu7ZvorSlzIGlNOTc/bthIk7BFea6d2oEXrp/shg5kVK/tIq3447lFFFMvi7MdN
-         OLZWjOv/kg9Fi931/vmqP5IHOI9Z/WykqdWAw/afx173gcNX9CTY/Euz6U8qO1NYI9BN
-         ukKaQFAdZ/ZBsTgw2SW77WrXw8ap4gHGMP4h/n9wA4LFJ9hrOnyIKQNGZxtTlebihbrO
-         5CcQ==
-X-Gm-Message-State: AOJu0Yx87vc8uTL8cY/vluw0+cWdWAYsQQxlOvNAko0FHN5SN6hjdTdr
-	p+ObTLmIAP00FFCYDAln6jOSKeJeAcCItgiyvX/QBw==
-X-Google-Smtp-Source: AGHT+IGf5gzmD+F1vkXOu2tcCBuGrRoRRXqRBUwUV+cVy2Hso3cw8EdmMC/vWvmcYkVNE5dnxlCx+uUI1L46s1J0lTg=
-X-Received: by 2002:a17:906:2d2:b0:a1f:821a:11ae with SMTP id
- 18-20020a17090602d200b00a1f821a11aemr3419980ejk.20.1702417527636; Tue, 12 Dec
- 2023 13:45:27 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D3EDE4;
+	Tue, 12 Dec 2023 13:47:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702417630; x=1733953630;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=0mWQEe17c6d1pEUZXCBP0jonexlm/pdHfLDHkhLBifY=;
+  b=lOnfHrn4HxFFIgmx9GdVcWszQ12ZywvqOO43Mnsu61xCjNiaM7A2SgCM
+   pt5yAH6VWaXTyNLiaKjTkDbtUc2eCFdonJoBdGRsv2j5dVWbCjR8JzcwG
+   1I0EhnqVWNA56Mzk+2RxbB0w++JzLbtouCNuePlNRFnefJl1Q09tBEg+y
+   eyCUAYMISO7k3rUGTokwv9RJYrAPXSQe9uRcx92h7ucY+ZlGpibhwoH8C
+   rEWJiZBfIvcu2jydEdE7GQhTxvJodPL29E8qwo3Mbf2Ps0uukOBZIvoyq
+   C7Zx6CQTUQieB5SK5ei4yclGzd7pB3MaCz2ZNvGd/hSjnL0lUqSUnMpbc
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="481074734"
+X-IronPort-AV: E=Sophos;i="6.04,271,1695711600"; 
+   d="scan'208";a="481074734"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 13:47:10 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="864375324"
+X-IronPort-AV: E=Sophos;i="6.04,271,1695711600"; 
+   d="scan'208";a="864375324"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by FMSMGA003.fm.intel.com with ESMTP; 12 Dec 2023 13:47:06 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rDAam-000JlX-18;
+	Tue, 12 Dec 2023 21:47:04 +0000
+Date: Wed, 13 Dec 2023 05:46:24 +0800
+From: kernel test robot <lkp@intel.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	lorenzo.bianconi@redhat.com, davem@davemloft.net, kuba@kernel.org,
+	edumazet@google.com, pabeni@redhat.com, bpf@vger.kernel.org,
+	hawk@kernel.org, toke@redhat.com, willemdebruijn.kernel@gmail.com,
+	jasowang@redhat.com, sdf@google.com
+Subject: Re: [PATCH v4 net-next 1/3] net: introduce page_pool pointer in
+ softnet_data percpu struct
+Message-ID: <202312130546.Kst7VY7F-lkp@intel.com>
+References: <2a267c8f331996de0e26568472c45fe78eb67e1d.1702375338.git.lorenzo@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <MEYP282MB2697C6AC993637C6E866E492BB8FA@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
-In-Reply-To: <MEYP282MB2697C6AC993637C6E866E492BB8FA@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
-From: Loic Poulain <loic.poulain@linaro.org>
-Date: Tue, 12 Dec 2023 22:44:51 +0100
-Message-ID: <CAMZdPi-ZxN+eGpHERe1XQ2hyu==bnwx2oHcbzVFtgcfS1k6C_w@mail.gmail.com>
-Subject: Re: [net-next v4 0/5] net: wwan: t7xx: fw flashing & coredump support
-To: Jinjian Song <SongJinJian@hotmail.com>
-Cc: "chandrashekar.devegowda@intel.com" <chandrashekar.devegowda@intel.com>, 
-	"chiranjeevi.rapolu@linux.intel.com" <chiranjeevi.rapolu@linux.intel.com>, "corbet@lwn.net" <corbet@lwn.net>, 
-	"danielwinkler@google.com" <danielwinkler@google.com>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"edumazet@google.com" <edumazet@google.com>, "haijun.liu@mediatek.com" <haijun.liu@mediatek.com>, 
-	"jiri@resnulli.us" <jiri@resnulli.us>, "johannes@sipsolutions.net" <johannes@sipsolutions.net>, 
-	"kuba@kernel.org" <kuba@kernel.org>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linuxwwan@intel.com" <linuxwwan@intel.com>, 
-	"m.chetan.kumar@linux.intel.com" <m.chetan.kumar@linux.intel.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "nmarupaka@google.com" <nmarupaka@google.com>, 
-	"pabeni@redhat.com" <pabeni@redhat.com>, 
-	"ricardo.martinez@linux.intel.com" <ricardo.martinez@linux.intel.com>, 
-	"ryazanov.s.a@gmail.com" <ryazanov.s.a@gmail.com>, "vsankar@lenovo.com" <vsankar@lenovo.com>, 
-	Joey Zhao <joey.zhao@fibocom.com>, "Qifeng Liu(Qifeng)" <liuqf@fibocom.com>, 
-	"Fuqiang Yan(Felix)" <felix.yan@fibocom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2a267c8f331996de0e26568472c45fe78eb67e1d.1702375338.git.lorenzo@kernel.org>
 
-Hi Jinjian,
+Hi Lorenzo,
 
-On Mon, 11 Dec 2023 at 03:06, Jinjian Song <SongJinJian@hotmail.com> wrote:
->
-> > > > Mon, Sep 18, 2023 at 08:56:26AM CEST, SongJinJian@hotmail.com wrote=
-:
-> > > >Tue, Sep 12, 2023 at 11:48:40AM CEST, songjinjian@hotmail.com wrote:
-> > > >>>Adds support for t7xx wwan device firmware flashing & coredump
-> > > >>>collection using devlink.
-> > > >
-> > > >>I don't believe that use of devlink is correct here. It seems like =
-a misfit. IIUC, what you need is to communicate with the modem. Basically a=
- communication channel to modem. The other wwan drivers implement these cha=
-nnels in _ctrl.c files, using multiple protocols. Why can't you do somethin=
-g similar and let devlink out of this please?
-> > > >
-> > > >>Until you put in arguments why you really need devlink and why is i=
-t a good fit, I'm against this. Please don't send any other versions of thi=
-s patchset that use devlink.
-> > > >
-> > > > Yes, t7xx driver need communicate with modem with a communication c=
-hannel to modem.
-> > > > I took a look at the _ctrl.c files under wwan directory, it seemed =
-the implementation can be well integrated with QualCommon's modem, if we do=
- like this, I think we need modem firmware change, maybe not be suitable fo=
-r current MTK modem directly.
-> > > > Except for Qualcomm modem driver, there is also an Intel wwan
-> > > > driver 'iosm' and it use devlink to implement firmware
-> > > > flash(https://www.kernel.org/doc/html/latest/networking/devlink/io
-> > > > sm.html), Intel and MTK design and use devlink to do this work on
-> > >
-> > > If that exists, I made a mistake as a gatekeeper. That usage looks
-> > > wrong.
-> > >
-> > > > 'mtk_t7xx' driver and I continue to do this work.
-> > > >
-> > > > I think devlink framework can support this scene and if we use devl=
-ink we don't need to develop other flash tools or other user space applicat=
-ions, use upstream devlink commands directly.
-> > >
-> > > Please don't.
->
-> > So this is clear that devlink should not be used for this wwan
-> firmware upgrade, if you still want to abstract the fastboot protocol par=
-t, maybe the easier would be to move on the generic firmware framework, and=
- especially the firmware upload API which seems to be a good fit here? http=
-s://docs.kernel.org/driver-api/firmware/fw_upload.html#firmware-upload-api
->
-> 1.This API seemed fit here, but I haven't find the refer to use the API, =
-codes in /lib/test_firmware.c shown some intruduce, I think if I'm consider=
- how to implement ops.prepare(what to verify, it seemed modem will do that)=
- and ops.poll_complete? And it seemed request_firmware API also can recieve=
- the data from use space, is it a way to use sysfs to trigger request firmw=
-are to kernel?
->
-> In addition to this, I may have to create sysfs interface to pass the fir=
-mware partition parameter.And find a nother way to export the coredump port=
- to user space.
->
-> 2.How about we add a new WWAN port type, abstract fastboot and dump chann=
-el, like WWAN_PORT_XXX, then use this port with WWAN framework to handle fi=
-rmware ops and dump ops.
->
-> Hope to get your advice, thanks very much.
->
-> I want to implement it use the way of title 2, create a new WWAN port typ=
-e used for the channel with modem.
+kernel test robot noticed the following build errors:
 
-I understand that the firmware update may not be as simple as
-submitting a single blob, and so firmware-upload-api may not be easy
-to use as is. But can you elaborate a bit on 'abstracting fastboot',
-not sure why it is necessary to add another abstraction level when
-fastboot is already supported by open source tools/libraries.
+[auto build test ERROR on net-next/main]
 
-Regards,
-Loic
+url:    https://github.com/intel-lab-lkp/linux/commits/Lorenzo-Bianconi/net-introduce-page_pool-pointer-in-softnet_data-percpu-struct/20231212-181103
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/2a267c8f331996de0e26568472c45fe78eb67e1d.1702375338.git.lorenzo%40kernel.org
+patch subject: [PATCH v4 net-next 1/3] net: introduce page_pool pointer in softnet_data percpu struct
+config: um-allnoconfig (https://download.01.org/0day-ci/archive/20231213/202312130546.Kst7VY7F-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231213/202312130546.Kst7VY7F-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312130546.Kst7VY7F-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   /usr/bin/ld: init/main.o: warning: relocation in read-only section `.ref.text'
+   /usr/bin/ld: warning: .tmp_vmlinux.kallsyms1 has a LOAD segment with RWX permissions
+   /usr/bin/ld: net/core/dev.o: in function `net_dev_init':
+>> net/core/dev.c:11734: undefined reference to `page_pool_create'
+   /usr/bin/ld: warning: creating DT_TEXTREL in a PIE
+   clang: error: linker command failed with exit code 1 (use -v to see invocation)
+
+
+vim +11734 net/core/dev.c
+
+ 11667	
+ 11668	/*
+ 11669	 *	Initialize the DEV module. At boot time this walks the device list and
+ 11670	 *	unhooks any devices that fail to initialise (normally hardware not
+ 11671	 *	present) and leaves us with a valid list of present and active devices.
+ 11672	 *
+ 11673	 */
+ 11674	
+ 11675	#define SD_PAGE_POOL_RING_SIZE	256
+ 11676	/*
+ 11677	 *       This is called single threaded during boot, so no need
+ 11678	 *       to take the rtnl semaphore.
+ 11679	 */
+ 11680	static int __init net_dev_init(void)
+ 11681	{
+ 11682		struct softnet_data *sd;
+ 11683		int i, rc = -ENOMEM;
+ 11684	
+ 11685		BUG_ON(!dev_boot_phase);
+ 11686	
+ 11687		net_dev_struct_check();
+ 11688	
+ 11689		if (dev_proc_init())
+ 11690			goto out;
+ 11691	
+ 11692		if (netdev_kobject_init())
+ 11693			goto out;
+ 11694	
+ 11695		INIT_LIST_HEAD(&ptype_all);
+ 11696		for (i = 0; i < PTYPE_HASH_SIZE; i++)
+ 11697			INIT_LIST_HEAD(&ptype_base[i]);
+ 11698	
+ 11699		if (register_pernet_subsys(&netdev_net_ops))
+ 11700			goto out;
+ 11701	
+ 11702		/*
+ 11703		 *	Initialise the packet receive queues.
+ 11704		 */
+ 11705	
+ 11706		for_each_possible_cpu(i) {
+ 11707			struct work_struct *flush = per_cpu_ptr(&flush_works, i);
+ 11708			struct page_pool_params page_pool_params = {
+ 11709				.pool_size = SD_PAGE_POOL_RING_SIZE,
+ 11710				.nid = NUMA_NO_NODE,
+ 11711			};
+ 11712	
+ 11713			INIT_WORK(flush, flush_backlog);
+ 11714	
+ 11715			sd = &per_cpu(softnet_data, i);
+ 11716			skb_queue_head_init(&sd->input_pkt_queue);
+ 11717			skb_queue_head_init(&sd->process_queue);
+ 11718	#ifdef CONFIG_XFRM_OFFLOAD
+ 11719			skb_queue_head_init(&sd->xfrm_backlog);
+ 11720	#endif
+ 11721			INIT_LIST_HEAD(&sd->poll_list);
+ 11722			sd->output_queue_tailp = &sd->output_queue;
+ 11723	#ifdef CONFIG_RPS
+ 11724			INIT_CSD(&sd->csd, rps_trigger_softirq, sd);
+ 11725			sd->cpu = i;
+ 11726	#endif
+ 11727			INIT_CSD(&sd->defer_csd, trigger_rx_softirq, sd);
+ 11728			spin_lock_init(&sd->defer_lock);
+ 11729	
+ 11730			init_gro_hash(&sd->backlog);
+ 11731			sd->backlog.poll = process_backlog;
+ 11732			sd->backlog.weight = weight_p;
+ 11733	
+ 11734			sd->page_pool = page_pool_create(&page_pool_params);
+ 11735			if (IS_ERR(sd->page_pool)) {
+ 11736				sd->page_pool = NULL;
+ 11737				goto out;
+ 11738			}
+ 11739			page_pool_set_cpuid(sd->page_pool, i);
+ 11740		}
+ 11741	
+ 11742		dev_boot_phase = 0;
+ 11743	
+ 11744		/* The loopback device is special if any other network devices
+ 11745		 * is present in a network namespace the loopback device must
+ 11746		 * be present. Since we now dynamically allocate and free the
+ 11747		 * loopback device ensure this invariant is maintained by
+ 11748		 * keeping the loopback device as the first device on the
+ 11749		 * list of network devices.  Ensuring the loopback devices
+ 11750		 * is the first device that appears and the last network device
+ 11751		 * that disappears.
+ 11752		 */
+ 11753		if (register_pernet_device(&loopback_net_ops))
+ 11754			goto out;
+ 11755	
+ 11756		if (register_pernet_device(&default_device_ops))
+ 11757			goto out;
+ 11758	
+ 11759		open_softirq(NET_TX_SOFTIRQ, net_tx_action);
+ 11760		open_softirq(NET_RX_SOFTIRQ, net_rx_action);
+ 11761	
+ 11762		rc = cpuhp_setup_state_nocalls(CPUHP_NET_DEV_DEAD, "net/dev:dead",
+ 11763					       NULL, dev_cpu_dead);
+ 11764		WARN_ON(rc < 0);
+ 11765		rc = 0;
+ 11766	out:
+ 11767		if (rc < 0) {
+ 11768			for_each_possible_cpu(i) {
+ 11769				sd = &per_cpu(softnet_data, i);
+ 11770				if (!sd->page_pool)
+ 11771					continue;
+ 11772	
+ 11773				page_pool_destroy(sd->page_pool);
+ 11774				sd->page_pool = NULL;
+ 11775			}
+ 11776		}
+ 11777	
+ 11778		return rc;
+ 11779	}
+ 11780	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
