@@ -1,70 +1,64 @@
-Return-Path: <netdev+bounces-56183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF4B980E1D3
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 03:30:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAFDF80E1D9
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 03:30:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99CF5282719
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 02:30:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 924BE1F21B95
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 02:30:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E461F611A;
-	Tue, 12 Dec 2023 02:28:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F13188C01;
+	Tue, 12 Dec 2023 02:28:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="div8NoT3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MUXJt/Hu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1437114;
-	Mon, 11 Dec 2023 18:28:25 -0800 (PST)
-Received: by mail-yb1-xb2b.google.com with SMTP id 3f1490d57ef6-dafe04717baso5072473276.1;
-        Mon, 11 Dec 2023 18:28:25 -0800 (PST)
+Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A426137;
+	Mon, 11 Dec 2023 18:28:33 -0800 (PST)
+Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-5d2d0661a8dso51964567b3.2;
+        Mon, 11 Dec 2023 18:28:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702348104; x=1702952904; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1702348112; x=1702952912; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K5dLrjk8RGdEFK2IC/mT3GdPdKaiYDerbdLTf1ASMu8=;
-        b=div8NoT3hGC25kZssriOXiz4HMqfwc5EWDH2eeYR8CYshwy27Of7YnsHZsBHqUKGQD
-         7q7xr2LP6cXJ9mRdl6Vb9yXDKlyUSU2rz2UH3Tms2aGmdhD6Kog8v5nXp46bvQTppxvM
-         LCEQFPOWrhBHxMrxbEbEJ1uF78OU8zTR66idqST6Ir2M+b/JHjWTKfPcXReXp02k3zHS
-         w6GKxQ5xTBJz6OTOjzHdE5wJwX99JFVpxBu5hyo7shKnc58KkCW45QxsiPmm5Gn42a/G
-         fMkGy7cC1mMgwGBAfVf6tZK/Q9hVEddiOlyOdJzgjGQjSZWRs/+O5uM+ze1hh2EIGHO5
-         nePg==
+        bh=9k5eqiGBj5/5DwPtrpE4m/Ucis1bOkRyK/lvgWCjgQY=;
+        b=MUXJt/HuzQG0n1pJk75TJsqno0B2RvcwtJqS6p6vIJlgw1ENOKUWFBLtN9sECruBaA
+         BT7mTAvsKZpNTqJqeoHviKjchN1kfYKsQ4ubVXQdE/KLdbzJ7cep2jg1k73GwscQIcqk
+         gy0oFv+aixeijNbjGhyx6qDshbtGJg6ytqNbfI9Lf6Lv23VsIu4CEU9WU8kXTjsW+Etd
+         6BTxKdXV2xKa96TsV9wQTIBLNNQ3oszSQcw+k/V7NrruYlaDdYTwxPaAFySc/dgAanTo
+         W/qi3vCWyxQhTRoO1FD8FNdfZ6XQCqv7HcCvZSj1X+4OvRJJ7aetyb+9aPX4gMnA6hCp
+         cDRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702348104; x=1702952904;
+        d=1e100.net; s=20230601; t=1702348112; x=1702952912;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=K5dLrjk8RGdEFK2IC/mT3GdPdKaiYDerbdLTf1ASMu8=;
-        b=aA0Cwq3xj+JSItZXSxBt16hCmfrAFKaDwEnwDai3rqOgBKuVaNw6k6QOmnZJMkOd8o
-         d5vjPXBJhAG7OOYbO1KGytiguuUfJOoIFjUcow52ddn/IHcgE1m06LgpVukvq71b3Dxt
-         s6ZhKY4dfGVH3bUuwZYpVEuaH6ddLcBQ7QQiMIU2eoc4vX7CdOuRtLsg3MFvKzUmBgHI
-         5B4tumE0icbbLmp9O2fMGiB7Bit0tGUfLwX7v69QUXkKRGuPEoxLWNsLvrGFbDw7DE3Q
-         NGCg6eVOY1VX05cD5OsUKpJ1O4Rixv1Sfd/f0cEljibRcSZxjXEk2P+b71CHwxrgbVY5
-         XRBw==
-X-Gm-Message-State: AOJu0YwUNdzjKEDCT1uXtbjHmN7y1vs+i2LLUyJwYTWSJivl9rHcOyLW
-	nZAw/4O+QfjYmfrshiDW6vFt+uiLe8pLLw==
-X-Google-Smtp-Source: AGHT+IHp1dJVq6AiSkWUXT6teibC9JRWOJxb+fMHX6K4A08kJLb31Z2LLH3UPUp5SLKf8329TyCHhA==
-X-Received: by 2002:a05:690c:2c01:b0:5df:5d59:6d71 with SMTP id eo1-20020a05690c2c0100b005df5d596d71mr3494936ywb.21.1702348104547;
-        Mon, 11 Dec 2023 18:28:24 -0800 (PST)
+        bh=9k5eqiGBj5/5DwPtrpE4m/Ucis1bOkRyK/lvgWCjgQY=;
+        b=ntA55nGPN+V0t5PPS9K4HGaTv8qFmHRbK0iflEpdbhW1vyrEtNLzU3b5YWSoSRStrB
+         TrCHjjPqCNi4vjPIWwWO5Gy9D5x+9AxdIa9MsxXVIjySOkilODoYVhDUnlTc3P8iXlGl
+         kE82tM/kl5+QYZJK17LNV/LLiUCppm/fcUcdqf3nopxM2ZqX86F4X5IdNXKkmAX23dNU
+         JjeYMuKEwmmEdq0YD+8+NKDDbdNsWzuJwwoKHwkwBwvLRpiLBg7pg23gN7WAW5UeANs0
+         ktImQWH52cCyh7/PSynTxjZAlDBcDIEeKwWINbSpobwCtMcyoG7d0Mv/xFqgH/Le7t3z
+         UqAQ==
+X-Gm-Message-State: AOJu0YwAeJhOXqdgraCkXo0Hg3mlJtbtt4s39pTb66cMQ0cZRdel/tpr
+	2HKobexFJ9HzZa3ehRy30cLb4S6NwSRiMg==
+X-Google-Smtp-Source: AGHT+IGv28WoB4lgSsY3KnWz4m20syHxTtIOJodmzHgYhM/BE/Qtyrxdpfg0dGSVdZSH2dpq9w2ttg==
+X-Received: by 2002:a81:8245:0:b0:5d7:1940:b399 with SMTP id s66-20020a818245000000b005d71940b399mr4634837ywf.101.1702348112320;
+        Mon, 11 Dec 2023 18:28:32 -0800 (PST)
 Received: from localhost ([2601:344:8301:57f0:38aa:1c88:df05:9b73])
-        by smtp.gmail.com with ESMTPSA id j62-20020a0dc741000000b005da626a84a2sm3445778ywd.30.2023.12.11.18.28.23
+        by smtp.gmail.com with ESMTPSA id v6-20020a81a546000000b005ca4e49bb54sm3359875ywg.142.2023.12.11.18.28.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 18:28:24 -0800 (PST)
+        Mon, 11 Dec 2023 18:28:32 -0800 (PST)
 From: Yury Norov <yury.norov@gmail.com>
 To: linux-kernel@vger.kernel.org,
-	Edward Cree <ecree.xilinx@gmail.com>,
-	Martin Habets <habetsm.xilinx@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-net-drivers@amd.com
-Cc: Jan Kara <jack@suse.cz>,
+	Karsten Keil <isdn@linux-pingi.de>,
+	netdev@vger.kernel.org
+Cc: Yury Norov <yury.norov@gmail.com>,
+	Jan Kara <jack@suse.cz>,
 	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
 	Matthew Wilcox <willy@infradead.org>,
 	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
@@ -73,9 +67,9 @@ Cc: Jan Kara <jack@suse.cz>,
 	Alexey Klimov <klimov.linux@gmail.com>,
 	Bart Van Assche <bvanassche@acm.org>,
 	Sergey Shtylyov <s.shtylyov@omp.ru>
-Subject: [PATCH v3 21/35] sfc: optimize the driver by using atomic find_bit() API
-Date: Mon, 11 Dec 2023 18:27:35 -0800
-Message-Id: <20231212022749.625238-22-yury.norov@gmail.com>
+Subject: [PATCH v3 26/35] mISDN: optimize get_free_devid()
+Date: Mon, 11 Dec 2023 18:27:40 -0800
+Message-Id: <20231212022749.625238-27-yury.norov@gmail.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231212022749.625238-1-yury.norov@gmail.com>
 References: <20231212022749.625238-1-yury.norov@gmail.com>
@@ -87,73 +81,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-SFC code traverses rps_slot_map and rxq_retry_mask bit by bit. Simplify
-it by using dedicated atomic find_bit() functions, as they skip already
-clear bits.
+get_free_devid() traverses each bit in device_ids in an open-coded loop.
+Simplify it by using the dedicated find_and_set_bit().
+
+It makes the whole function a nice one-liner, and because MAX_DEVICE_ID
+is a small constant-time value (63), on 64-bit platforms find_and_set_bit()
+call will be optimized to:
+
+	ffs();
+	test_and_set_bit().
 
 Signed-off-by: Yury Norov <yury.norov@gmail.com>
-Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
 ---
- drivers/net/ethernet/sfc/rx_common.c         |  4 +---
- drivers/net/ethernet/sfc/siena/rx_common.c   |  4 +---
- drivers/net/ethernet/sfc/siena/siena_sriov.c | 14 ++++++--------
- 3 files changed, 8 insertions(+), 14 deletions(-)
+ drivers/isdn/mISDN/core.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/sfc/rx_common.c b/drivers/net/ethernet/sfc/rx_common.c
-index d2f35ee15eff..0112968b3fe7 100644
---- a/drivers/net/ethernet/sfc/rx_common.c
-+++ b/drivers/net/ethernet/sfc/rx_common.c
-@@ -950,9 +950,7 @@ int efx_filter_rfs(struct net_device *net_dev, const struct sk_buff *skb,
- 	int rc;
+diff --git a/drivers/isdn/mISDN/core.c b/drivers/isdn/mISDN/core.c
+index ab8513a7acd5..c829c4eac0e2 100644
+--- a/drivers/isdn/mISDN/core.c
++++ b/drivers/isdn/mISDN/core.c
+@@ -197,14 +197,9 @@ get_mdevice_count(void)
+ static int
+ get_free_devid(void)
+ {
+-	u_int	i;
++	int i = find_and_set_bit((u_long *)&device_ids, MAX_DEVICE_ID + 1);
  
- 	/* find a free slot */
--	for (slot_idx = 0; slot_idx < EFX_RPS_MAX_IN_FLIGHT; slot_idx++)
--		if (!test_and_set_bit(slot_idx, &efx->rps_slot_map))
+-	for (i = 0; i <= MAX_DEVICE_ID; i++)
+-		if (!test_and_set_bit(i, (u_long *)&device_ids))
 -			break;
-+	slot_idx = find_and_set_bit(&efx->rps_slot_map, EFX_RPS_MAX_IN_FLIGHT);
- 	if (slot_idx >= EFX_RPS_MAX_IN_FLIGHT)
- 		return -EBUSY;
+-	if (i > MAX_DEVICE_ID)
+-		return -EBUSY;
+-	return i;
++	return i <= MAX_DEVICE_ID ? i : -EBUSY;
+ }
  
-diff --git a/drivers/net/ethernet/sfc/siena/rx_common.c b/drivers/net/ethernet/sfc/siena/rx_common.c
-index 4579f43484c3..160b16aa7486 100644
---- a/drivers/net/ethernet/sfc/siena/rx_common.c
-+++ b/drivers/net/ethernet/sfc/siena/rx_common.c
-@@ -958,9 +958,7 @@ int efx_siena_filter_rfs(struct net_device *net_dev, const struct sk_buff *skb,
- 	int rc;
- 
- 	/* find a free slot */
--	for (slot_idx = 0; slot_idx < EFX_RPS_MAX_IN_FLIGHT; slot_idx++)
--		if (!test_and_set_bit(slot_idx, &efx->rps_slot_map))
--			break;
-+	slot_idx = find_and_set_bit(&efx->rps_slot_map, EFX_RPS_MAX_IN_FLIGHT);
- 	if (slot_idx >= EFX_RPS_MAX_IN_FLIGHT)
- 		return -EBUSY;
- 
-diff --git a/drivers/net/ethernet/sfc/siena/siena_sriov.c b/drivers/net/ethernet/sfc/siena/siena_sriov.c
-index 8353c15dc233..554b799288b8 100644
---- a/drivers/net/ethernet/sfc/siena/siena_sriov.c
-+++ b/drivers/net/ethernet/sfc/siena/siena_sriov.c
-@@ -722,14 +722,12 @@ static int efx_vfdi_fini_all_queues(struct siena_vf *vf)
- 					     efx_vfdi_flush_wake(vf),
- 					     timeout);
- 		rxqs_count = 0;
--		for (index = 0; index < count; ++index) {
--			if (test_and_clear_bit(index, vf->rxq_retry_mask)) {
--				atomic_dec(&vf->rxq_retry_count);
--				MCDI_SET_ARRAY_DWORD(
--					inbuf, FLUSH_RX_QUEUES_IN_QID_OFST,
--					rxqs_count, vf_offset + index);
--				rxqs_count++;
--			}
-+		for_each_test_and_clear_bit(index, vf->rxq_retry_mask, count) {
-+			atomic_dec(&vf->rxq_retry_count);
-+			MCDI_SET_ARRAY_DWORD(
-+				inbuf, FLUSH_RX_QUEUES_IN_QID_OFST,
-+				rxqs_count, vf_offset + index);
-+			rxqs_count++;
- 		}
- 	}
- 
+ int
 -- 
 2.40.1
 
