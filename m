@@ -1,90 +1,79 @@
-Return-Path: <netdev+bounces-56570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45EF280F698
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 20:25:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1412E80F6A6
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 20:27:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 773201C20D97
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 19:25:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E434B20EBA
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 19:27:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6923781E43;
-	Tue, 12 Dec 2023 19:24:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBB2681E50;
+	Tue, 12 Dec 2023 19:27:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lxSJcR2H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hqztavui"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A51D81E40;
-	Tue, 12 Dec 2023 19:24:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C062C433C8;
-	Tue, 12 Dec 2023 19:24:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EDF80059
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 19:27:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2394C433CA;
+	Tue, 12 Dec 2023 19:27:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702409096;
-	bh=YKUYPwfQBBW92BlkDApqDnDZn5/rc1aNpNwEcRqPpiY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lxSJcR2HGJyqL+55l1Kg16M+VJ2anthTLtAk0B5+O7iAKLbca6n4BpExge9JA7x3z
-	 OLoXWRkR3QmOdFqcPAuMVXRgujLPnwIpLvjwotzOFx3XGUOsCrOKPf/E60zi1VRdlk
-	 3oDYEo/97GAfEdj0EWcqsk8B4FMpISVyuw4001UTHAY3B9+vOdeGzkEDRrf4XmmPmH
-	 GL0fs+SvkJjtMj2aNv7u7cfssgx0T9gluceqPyyCV5aqs3ldUZJEB7i04FkLn7wZNa
-	 IH9OvqEPYVwPNcu7BU+w6hDi8n+zYlwe4adVSYD1bKQVMVszzTM4B8h/GqpCHgsgcT
-	 PgHt+inMkgCsg==
-Date: Tue, 12 Dec 2023 19:24:52 +0000
-From: Simon Horman <horms@kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: netdev@vger.kernel.org, kernel test robot <lkp@intel.com>,
-	Gregory Greenman <gregory.greenman@intel.com>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	linux-wireless@vger.kernel.org, Kalle Valo <kvalo@kernel.org>,
-	Johannes Berg <johannes@sipsolutions.net>
-Subject: Re: [PATCH] wifi: iwlwifi: fw/dbg: fix all kernel-doc warnings
-Message-ID: <20231212192452.GD5817@kernel.org>
-References: <20231208220945.20628-1-rdunlap@infradead.org>
+	s=k20201202; t=1702409258;
+	bh=/cJEqTxk/CbtjQIWxlbZtNd3vqq4MbKnFPuX7Jd+ots=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Hqztavui8CRP+Ml4w7lGCsb4/nmAXu2/48mPx4jh+/i4BJt7l4zLWC0D6ROr/ar7u
+	 lyDGJ4cIH/pL5/IzVGomF+W7N63GoDxlWYd/CPcDV4ahGZeBcNPXV+UxcMVQvMJhTn
+	 SLQN2nX0L5pXZff0Ro05+kSQ/W24RYNPmunvbrn2LBmZ9fCZr91UOX+MY0wOYlH/Xc
+	 +Cft2dqwIor0nG8bXnKtdqYEvA/vp00LKNsuSJHGOIqy6A4duP4BcYUJYbSiHXhwQK
+	 /2RDbOR7wxtNTXNlFaIJuDgzPtwtZ3vDOymgH9zaD7BcKy4Y2hyRPRK8m9QMr8bwfW
+	 lTlHkzIwX1cRg==
+Date: Tue, 12 Dec 2023 11:27:35 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <andrew@lunn.ch>,
+ <pkshih@realtek.com>, <larry.chiu@realtek.com>
+Subject: Re: [PATCH net-next v14 03/13] rtase: Implement the rtase_down
+ function
+Message-ID: <20231212112735.180d455f@kernel.org>
+In-Reply-To: <20231208094733.1671296-4-justinlai0215@realtek.com>
+References: <20231208094733.1671296-1-justinlai0215@realtek.com>
+	<20231208094733.1671296-4-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231208220945.20628-1-rdunlap@infradead.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 08, 2023 at 02:09:45PM -0800, Randy Dunlap wrote:
-> kernel test robot reports:
-> drivers/net/wireless/intel/iwlwifi/fw/dbg.c:86: warning: Excess struct/union/enum/typedef member 'trans_len' description in 'iwl_fw_dump_ptrs'
-> 
-> scripts/kernel-doc no longer emits the warning that is reported by
-> the 0-day kernel test robot, but the reported struct does contain the
-> Excess line, so remove that line as well as fix other kernel-doc
-> warnings in this source file:
-> 
-> dbg.c:1732: warning: contents before sections
-> dbg.c:1736: warning: No description found for return value of 'mask_apply_and_normalize'
-> dbg.c:2202: warning: missing initial short description on line:
->  * iwl_dump_ini_mem
-> dbg.c:2207: warning: contents before sections
-> dbg.c:2215: warning: No description found for return value of 'iwl_dump_ini_mem'
-> 
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202311250305.tf8Cus1Y-lkp@intel.com/
-> Closes: https://lore.kernel.org/oe-kbuild-all/202312060810.QT9zourt-lkp@intel.com/
-> Cc: Gregory Greenman <gregory.greenman@intel.com>
-> Cc: Miri Korenblit <miriam.rachel.korenblit@intel.com>
-> Cc: linux-wireless@vger.kernel.org
-> Cc: Kalle Valo <kvalo@kernel.org>
-> Cc: Johannes Berg <johannes@sipsolutions.net>
+On Fri, 8 Dec 2023 17:47:23 +0800 Justin Lai wrote:
+> +	netif_stop_queue(dev);
 
-Thanks Randy,
+You most likely want to stop the napi before you call this.
+Otherwise NAPI can do some clean up and restart the queue.
 
-I'm unable to reproduce the "other warnings".
-But these changes do look good to me.
+> +	/* give a racing hard_start_xmit a few cycles to complete */
+> +	synchronize_rcu();
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Call netif_tx_disable() instead of stop_queue(), it takes the tx lock
+so you don't have to worry about in-flight packets.
 
-...
+> +	netif_carrier_off(dev);
+> +
+> +	for (i = 0; i < tp->int_nums; i++) {
+> +		ivec = &tp->int_vector[i];
+> +		synchronize_irq(ivec->irq);
+
+Why?
+
+> +		/* wait for any pending NAPI task to complete */
+> +		napi_disable(&ivec->napi);
+> +	}
 
