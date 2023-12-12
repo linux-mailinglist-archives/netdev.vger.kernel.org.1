@@ -1,107 +1,262 @@
-Return-Path: <netdev+bounces-56350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B91280E936
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 11:36:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EE9F80E951
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 11:40:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC025281578
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:36:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 088832815E4
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:39:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6CFE51C37;
-	Tue, 12 Dec 2023 10:36:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A05D5C09A;
+	Tue, 12 Dec 2023 10:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JqMv8FKw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dsD84DuG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D0A79F;
-	Tue, 12 Dec 2023 02:36:34 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id 98e67ed59e1d1-286f3e0d010so1610978a91.0;
-        Tue, 12 Dec 2023 02:36:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702377393; x=1702982193; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RvcdwgxZ2kCJNVDoUSBD6tBiTD2/scMMhEPOsBUMcZw=;
-        b=JqMv8FKwbT+Pli1AXgTQlJTednpOjdIHPKKJJFaZJeF9ESRMAVSyGCX4SQUn7kF4nG
-         hJI9ZkiZkoDMf2PFzhTS2fEHAwgkOeMnallVDVTGk/E4meC7Niv2hHWaDxSFFCdzccuW
-         rWvWgGaNvKExJOKQc//ztKW04KscPowv8aBg88PaUSENVZN0SrfwyOIUGwB/EO3zf7PQ
-         jJrK4JbFVwMB8DLkHt5oBzSuY4UCXLZX7d9gmv4nMH0jg92wNNvwY3nzxp6r6GiOCkwr
-         7tQrL6OBbq5FNbL3tOz+uVcR9GFGXI6t+irRmM59juxgy0kBE1FFoOMoKlAWGXXNPxB2
-         QbbA==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFE8FBE
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 02:39:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702377592;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fggtRaV/8orZgO1gMNRIxp3acepW1r0vajRNrmoShyY=;
+	b=dsD84DuGgw+2f6NVx6hbYWa7MrGJTNEJDCHGfsoCGdwAxRNJq/FTpe0iLlTqQHgI5dlBHy
+	TnRWum0S8lclnIq+8zRy5Cs/jzTPH1paQmGMQazIEgkYlWNW3I5Bgf5KVuttL9CNYTs9JI
+	tgby5wYGvQa+f6VAG5k7vK2VZZNMTH0=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-683-bRgl7zEhOCSAPgsLftXuIA-1; Tue, 12 Dec 2023 05:39:51 -0500
+X-MC-Unique: bRgl7zEhOCSAPgsLftXuIA-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a1f93205e60so83885966b.3
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 02:39:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702377393; x=1702982193;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=RvcdwgxZ2kCJNVDoUSBD6tBiTD2/scMMhEPOsBUMcZw=;
-        b=fftsLGFcP+7tQD5FoZFXuVSYsbij9nQROl8er4ZGvdQdNOKR06vT0DD6vPMvKrJZZJ
-         DX9SMBVTAh2/+Jq0lqLCX42CLaL0OLr/d6qC0CY93qqhWfDX0yllpWhX0/wlJVdXh3vc
-         CeX6Sm2z+NX/ohFCkvkbFzOkJDfESD6wrhZHCwVny4gF2/gdu9cxGmKe3jpZoI9m1QuH
-         7RdmemMaWPazzPX2T7Q34A+cdW8jGQrPV6rJ0QdxAnLezWxZ7WlZ5sKWIpiAcS50mAKP
-         vF7n4beOYocH/m6/tFZJY8UpggVzRfh61PdYbWQbkwuupBE0xVC40ifZuHtmUgf7xkZG
-         ldmQ==
-X-Gm-Message-State: AOJu0Ywqn3K8iEkbbsCMnwFv8NJe4DddT0sN/flE2gQxzPZsrGtNY6rj
-	YTs8dRTGtGj0jfUlbOaczQcLWqass/rpp5d0
-X-Google-Smtp-Source: AGHT+IGjPCuulZv/1RfF+goXdNPkIsIeQA8U/8N7Ia18iChIodw1XB9Of/mf/Ks7XADORYjp+WznpQ==
-X-Received: by 2002:a17:90a:c285:b0:286:bf9e:a6 with SMTP id f5-20020a17090ac28500b00286bf9e00a6mr10323037pjt.4.1702377393539;
-        Tue, 12 Dec 2023 02:36:33 -0800 (PST)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id nu4-20020a17090b1b0400b0028865708d09sm10033439pjb.29.2023.12.12.02.36.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 02:36:33 -0800 (PST)
-Date: Tue, 12 Dec 2023 19:36:32 +0900 (JST)
-Message-Id: <20231212.193632.117477874141101308.fujita.tomonori@gmail.com>
-To: aliceryhl@google.com
-Cc: fujita.tomonori@gmail.com, boqun.feng@gmail.com, alice@ryhl.io,
- netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
- tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com,
- benno.lossin@proton.me, wedsonaf@gmail.com
-Subject: Re: [net-next PATCH] rust: net: phy: Correct the safety comment
- for impl Sync
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <CAH5fLgiQd=9k5OaEKUjLw9WFSXW-kujNveN3cXdvqW-xNp5PSg@mail.gmail.com>
-References: <ZXeZzvMszYo6ow-q@boqun-archlinux>
-	<20231212.085505.1804120029445582408.fujita.tomonori@gmail.com>
-	<CAH5fLgiQd=9k5OaEKUjLw9WFSXW-kujNveN3cXdvqW-xNp5PSg@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1702377587; x=1702982387;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fggtRaV/8orZgO1gMNRIxp3acepW1r0vajRNrmoShyY=;
+        b=VlqOnjtqq5SgPBP11eSYOs5Q+2kaalXLcRMNskKVxeSj+XQCfSlH8IlbtCxgUJswAN
+         jhBIvqbo8aB4r1ICgP77hE6aDLA53swYjm9p81b7+jjYp23A6aUHt7JsfBE9Ww7jTrfV
+         BKWg9T+6KR84+DMLeL78jv0CcTWhH5M4DvKTmQrhasE9g2fXgZ71wcFHnJO+oKzMww46
+         oI/GtLBCh/0dQsWUEdiqcg6JdokZqLcxfd0HAiTTcxxz2PqOgyw2eF2tMR8LtsgnM0En
+         Uh7VZpYQQ7xkFDkqacpjcAF7mc3tbmgw70lHIkQ0RR3Q5izcbiDw82khNw3C0ebQ+dVa
+         4cvw==
+X-Gm-Message-State: AOJu0Yw1a0UWeG0D6gOLoMxDoPEmyiBYK/ZcKqhjoQVCGd3ZTSn+RFux
+	uIidw+DUeinSay6Upai9y7czZEfAONKmiMvvNG8mdngLqyY0POQbpVJMLgaV8JjyM9fUE1fQgDp
+	Rmai391GIoCo/7rrjn6+mhdUGF9nICp0p
+X-Received: by 2002:a17:906:5194:b0:a1a:4a36:66fc with SMTP id y20-20020a170906519400b00a1a4a3666fcmr1343880ejk.16.1702377587466;
+        Tue, 12 Dec 2023 02:39:47 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE1s9ejU0QHSLLSTC9/iMEf46k/k5nUUYOzmG44Y4BEDGsQWW58tFcSfCa8zIUz3Ryox9pKp23WQ8EeadbhgOA=
+X-Received: by 2002:a17:906:5194:b0:a1a:4a36:66fc with SMTP id
+ y20-20020a170906519400b00a1a4a3666fcmr1343842ejk.16.1702377586761; Tue, 12
+ Dec 2023 02:39:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=utf-8
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+References: <2f33be45-fe11-4b69-8e89-4d2824a0bf01@daynix.com>
+In-Reply-To: <2f33be45-fe11-4b69-8e89-4d2824a0bf01@daynix.com>
+From: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+Date: Tue, 12 Dec 2023 11:39:34 +0100
+Message-ID: <CAO-hwJJhzHtKrUEw0zrjgub3+eapgJG-zsG0HRB=PaPi6BxG+w@mail.gmail.com>
+Subject: Re: Should I add BPF kfuncs for userspace apps? And how?
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Jason Wang <jasowang@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
+	Benjamin Tissoires <bentiss@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, kvm@vger.kernel.org, 
+	LKML <linux-kernel@vger.kernel.org>, virtualization@lists.linux-foundation.org, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-T24gVHVlLCAxMiBEZWMgMjAyMyAxMDoxNzo0MCArMDEwMA0KQWxpY2UgUnlobCA8YWxpY2VyeWhs
-QGdvb2dsZS5jb20+IHdyb3RlOg0KDQo+IE9uIFR1ZSwgRGVjIDEyLCAyMDIzIGF0IDEyOjU14oCv
-QU0gRlVKSVRBIFRvbW9ub3JpDQo+IDxmdWppdGEudG9tb25vcmlAZ21haWwuY29tPiB3cm90ZToN
-Cj4+DQo+PiBPbiBNb24sIDExIERlYyAyMDIzIDE1OjIyOjU0IC0wODAwDQo+PiBCb3F1biBGZW5n
-IDxib3F1bi5mZW5nQGdtYWlsLmNvbT4gd3JvdGU6DQo+Pg0KPj4gPiBPbiBNb24sIERlYyAxMSwg
-MjAyMyBhdCAxMDo1MDowMlBNICswMTAwLCBBbGljZSBSeWhsIHdyb3RlOg0KPj4gPj4gT24gMTIv
-MTEvMjMgMjA6NDksIEJvcXVuIEZlbmcgd3JvdGU6DQo+PiA+PiA+IFRoZSBjdXJyZW50IHNhZmV0
-eSBjb21tZW50IGZvciBpbXBsIFN5bmMgZm9yIERyaXZlclZUYWJsZSBoYXMgdHdvDQo+PiA+PiA+
-IHByb2JsZW06DQo+PiA+PiA+DQo+PiA+PiA+ICogdGhlIGNvcnJlY3RuZXNzIGlzIHVuY2xlYXIs
-IHNpbmNlIGFsbCB0eXBlcyBpbXBsIEFueVsxXSwgdGhlcmVmb3JlIGFsbA0KPj4gPj4gPiAgICB0
-eXBlcyBoYXZlIGEgYCZzZWxmYCBtZXRob2QgKEFueTo6dHlwZV9pZCkuDQo+PiA+PiA+DQo+PiA+
-PiA+ICogaXQgZG9lc24ndCBleHBsYWluIHdoeSB1c2VsZXNzIG9mIGltbXV0YWJsZSByZWZlcmVu
-Y2VzIGNhbiBlbnN1cmUgdGhlDQo+PiA+PiA+ICAgIHNhZmV0eS4NCj4+ID4+ID4NCj4+ID4+ID4g
-Rml4IHRoaXMgYnkgcmV3cml0dGluZyB0aGUgY29tbWVudC4NCj4+ID4+ID4NCj4+ID4+ID4gWzFd
-OiBodHRwczovL2RvYy5ydXN0LWxhbmcub3JnL3N0ZC9hbnkvdHJhaXQuQW55Lmh0bWwNCj4+ID4+
-ID4NCj4+ID4+ID4gU2lnbmVkLW9mZi1ieTogQm9xdW4gRmVuZyA8Ym9xdW4uZmVuZ0BnbWFpbC5j
-b20+DQo+PiA+Pg0KPj4gPj4gSXQncyBmaW5lIGlmIHlvdSB3YW50IHRvIGNoYW5nZSBpdCwNCj4+
-ID4NCj4+ID4gRG9lcyBpdCBtZWFuIHlvdSBhcmUgT0sgd2l0aCB0aGUgbmV3IHZlcnNpb24gaW4g
-dGhpcyBwYXRjaD8gSWYgc28uLi4NCj4+ID4NCj4+ID4+IGJ1dCBJIHRoaW5rIHRoZSBjdXJyZW50
-IHNhZmV0eSBjb21tZW50IGlzIGdvb2QgZW5vdWdoLg0KPj4gPg0KPj4gPiAuLi4gbGV0J3MgY2hh
-bmdlIGl0IHNpbmNlIHRoZSBjdXJyZW50IHZlcnNpb24gZG9lc24ndCBsb29rIGdvb2QgZW5vdWdo
-DQo+PiA+IHRvIG1lIGFzIEkgZXhwbGFpbmVkIGFib3ZlIChpdCdzIG5vdCB3cm9uZywgYnV0IGxl
-c3Mgc3RyYWlnaHQtZm9yd2FyZCB0bw0KPj4gPiBtZSkuDQo+Pg0KPj4gSSdsbCBsZWF2ZSB0aGlz
-IGFsb25lIGFuZCB3YWl0IGZvciBvcGluaW9ucyBmcm9tIG90aGVyIHJldmlld2VycyBzaW5jZQ0K
-Pj4geW91IGd1eXMgaGF2ZSBkaWZmZXJlbnQgb3B0aW9ucy4gSXQncyBpbXByb3ZlbWVudCBzbyBJ
-IGRvbid0IG5lZWQgdG8NCj4+IGh1cnJ5Lg0KPiANCj4gVG8gY2xhcmlmeSwgdGhlIG1vZGlmaWVk
-IHNhZmV0eSBjb21tZW50IGlzIGFsc28gb2theSB3aXRoIG1lLg0KDQpUaGFua3MgZm9yIHRoZSBj
-bGFyaWZpY2F0aW9uLiBUaGVuIEknbGwgZm9sZCB0aGlzIGluIHRoZSBwYXRjaHNldC4NCg==
+Hi,
+
+On Tue, Dec 12, 2023 at 9:11=E2=80=AFAM Akihiko Odaki <akihiko.odaki@daynix=
+.com> wrote:
+>
+> Hi,
+>
+> It is said eBPF is a safe way to extend kernels and that is very
+> attarctive, but we need to use kfuncs to add new usage of eBPF and
+> kfuncs are said as unstable as EXPORT_SYMBOL_GPL. So now I'd like to ask
+> some questions:
+>
+> 1) Which should I choose, BPF kfuncs or ioctl, when adding a new feature
+> for userspace apps?
+> 2) How should I use BPF kfuncs from userspace apps if I add them?
+>
+> Here, a "userspace app" means something not like a system-wide daemon
+> like systemd (particularly, I have QEMU in mind). I'll describe the
+> context more below:
+
+I'm probably not the best person in the world to answer your
+questions, Alexei and others from the BPF core group are, but given
+that you pointed at a thread I was involved in, I feel I can give you
+a few pointers.
+
+But first and foremost, I encourage you to schedule an agenda item in
+the BPF office hour[4]. Being able to talk with the core people
+directly was tremendously helpful to me to understand their point.
+
+
+>
+> ---
+>
+> I'm working on a new feature that aids virtio-net implementations using
+> tuntap virtual network device. You can see [1] for details, but
+> basically it's to extend BPF_PROG_TYPE_SOCKET_FILTER to report four more
+> bytes.
+>
+> However, with long discussions we have confirmed extending
+> BPF_PROG_TYPE_SOCKET_FILTER is not going to happen, and adding kfuncs is
+> the way forward. So I decided how to add kfuncs to the kernel and how to
+> use it. There are rich documentations for the kernel side, but I found
+> little about the userspace. The best I could find is a systemd change
+> proposal that is based on WIP kernel changes[2].
+
+Yes, as Alexei already replied, BPF is not adding new stable APIs,
+only kfuncs. The reason being that once it's marked as stable, you
+can't really remove it, even if you think it's badly designed and
+useless.
+
+Kfuncs, OTOH are "unstable" by default meaning that the constraints
+around it are more relaxed.
+
+However, "unstable" doesn't mean "unusable". It just means that the
+kernel might or might not have the function when you load your program
+in userspace. So you have to take that fact into account from day one,
+both from the kernel side and the userspace side. The kernel docs have
+a nice paragraph explaining that situation and makes the distinction
+between relatively unused kfuncs, and well known established ones.
+
+Regarding the systemd discussion you are mentioning ([2]), this is
+something that I have on my plate for a long time. I think I even
+mentioned it to Alexei at Kernel Recipes this year, and he frowned his
+eyebrows when I mentioned it. And looking at the systemd code and the
+benefits over a plain ioctl, it is clearer that in that case, a plain
+ioctl is better, mostly because we already know the API and the
+semantic.
+
+A kfunc would be interesting in cases where you are not sure about the
+overall design, and so you can give a shot at various API solutions
+without having to keep your bad v1 design forever.
+
+>
+> So now I'm wondering how I should use BPF kfuncs from userspace apps if
+> I add them. In the systemd discussion, it is told that Linus said it's
+> fine to use BPF kfuncs in a private infrastructure big companies own, or
+> in systemd as those users know well about the system[3]. Indeed, those
+> users should be able to make more assumptions on the kernel than
+> "normal" userspace applications can.
+>
+> Returning to my proposal, I'm proposing a new feature to be used by QEMU
+> or other VMM applications. QEMU is more like a normal userspace
+> application, and usually does not make much assumptions on the kernel it
+> runs on. For example, it's generally safe to run a Debian container
+> including QEMU installed with apt on Fedora. BPF kfuncs may work even in
+> such a situation thanks to CO-RE, but it sounds like *accidentally*
+> creating UAPIs.
+>
+> Considering all above, how can I integrate BPF kfuncs to the application?
+
+FWIW, I'm not sure you can rely on BPF calls from a container. There
+is a high chance the syscall gets disabled by the runtime.
+
+>
+> If BPF kfuncs are like EXPORT_SYMBOL_GPL, the natural way to handle them
+> is to think of BPF programs as some sort of kernel modules and
+> incorporate logic that behaves like modprobe. More concretely, I can put
+> eBPF binaries to a directory like:
+> /usr/local/share/qemu/ebpf/$KERNEL_RELEASE
+
+I would advise against that (one program per kernel release). Simply
+because your kfunc may or may not have been backported to kernel
+release v6.X.Y+1 while it was not there when v6.X.Y was out. So
+relying on the kernel number is just going to be a headache.
+
+As I understand it, the way forward is to rely on the kernel, libbpf
+and CO-RE: if the function is not available, the program will simply
+not load, and you'll know that this version of the code is not
+available (or has changed API).
+
+So what I would do if some kfunc API is becoming deprecated, is
+embedding both code paths in the same BPF unit, but marking them as
+not loaded by libppf. Then I can load the compilation unit, try v2 of
+the API, and if it's not available, try v1, and if not, then mention
+that I can not rely on BPF. Of course, this can also be done with
+separate compilation units.
+
+>
+> Then, QEMU can uname() and get the path to the binary. It will give an
+> error if it can't find the binary for the current kernel so that it
+> won't create accidental UAPIs.
+>
+> The obvious downside of this is that it complicates packaging a lot; it
+> requires packaging QEMU eBPF binaries each time a new kernel comes up.
+> This complexity is centrally managed by modprobe for kernel modules, but
+> apparently each application needs to take care of it for BPF programs.
+
+For my primary use case: HID-BPF, I put kfuncs in kernel v6.3 and
+given that I haven't touch this part of the API, the same compilation
+unit compiled in the v6.3 era still works on a v6.7-rcx, so no, IMO
+it's not complex and doesn't require to follow the kernel releases
+(which is the whole point of HID-BPF FWIW).
+
+>
+> In conclusion, I see too much complexity to use BPF in a userspace
+> application, which we didn't have to care for
+> BPF_PROG_TYPE_SOCKET_FILTER. Isn't there a better way? Or shouldn't I
+> use BPF in my case in the first place?
+
+Given that I'm not a network person, I'm not sure about your use case,
+but I would make my decision based on:
+- do I know exactly what I want to achieve and I'm confident that I'll
+write the proper kernel API from day one? (if not then kfuncs is
+appealing because  it's less workload in the long run, but userspace
+needs to be slightly smarter)
+- are all of my use cases covered by using BPF? (what happens if I run
+QEMU in a container?) -> BPF might or might not be a solution
+
+But the nice thing about using BPF kfuncs is that it allows you to
+have a testing (not-)UAPI kernel interface. You can then implement the
+userspace changes and see how it behaves. And then, once you got the
+right design, you can decide to promote it to a proper syscall or
+ioctl if you want.
+
+Cheers,
+Benjamin
+
+>
+> Thanks,
+> Akihiko Odaki
+>
+> [1]
+> https://lore.kernel.org/all/20231015141644.260646-1-akihiko.odaki@daynix.=
+com/
+> [2] https://github.com/systemd/systemd/pull/29797
+> [3] https://github.com/systemd/systemd/pull/29797#discussion_r1384637939
+>
+
+[4] https://docs.google.com/spreadsheets/d/1LfrDXZ9-fdhvPEp_LHkxAMYyxxpwBXj=
+ywWa0AejEveU
+
 
