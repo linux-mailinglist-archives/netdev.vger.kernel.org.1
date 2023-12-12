@@ -1,258 +1,149 @@
-Return-Path: <netdev+bounces-56537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56542-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98F7A80F44B
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 18:18:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 889B580F4D9
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 18:46:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC0BE1C20BEA
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 17:18:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF739B20BB2
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 17:46:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481067B3D9;
-	Tue, 12 Dec 2023 17:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 616B87D8AB;
+	Tue, 12 Dec 2023 17:46:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="Nm4erwdM"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="sNefzD1F"
 X-Original-To: netdev@vger.kernel.org
-Received: from HK2P15301CU002.outbound.protection.outlook.com (unknown [52.101.128.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B010E3;
-	Tue, 12 Dec 2023 09:18:36 -0800 (PST)
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2057.outbound.protection.outlook.com [40.107.237.57])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D76FA83
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 09:46:11 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ark1b/irkqKMz75lJ0OT1HFbvLdPkJunQ47u4H11yagNDNIonzYhY2dsoBTYNlNwySGvgIvoHUGMEX0Tk5N3M60Xy9tEBxPTYsN6vv5udbbiJo720+GemkkUGhNwzcaDcBEf1plB/K2OIrrbfkAAKIRm55kv/VaXo1IEKh0j5PJmmriOI9mBgiyhmRxjKLWv5Z3VKM27mcrj4Rwjl5gs5IWybev9dcI19oYFqxqlvmdLcvLzB6X24TawWkhXvsoN4pnnIJ9BZizu0WzStZrZGvNrR8wRge6Z4SMq8N1TnRUC80yIjWoOg42IgJCPg3MYsTPOrbArOEQVCAMGRgXeJw==
+ b=QKnuF2qgxemICc52Im5R2mdsPJq/FGIybo6LuD6Tjsmpu2c+tGrV6FvjU3PNoE6OQT+EEBWOUuGQIwBbLXG0TzhnwrNHbohTJrsX/kdSDpwR74u4xbQao0GeaA8Epe+ZqHqs968JFNkC91xCJdRaqCIAt6KhYV0KvYT2OmG+98wg7Qxb/krwX7mUpFZuseOSjKf1QAycnp/AoJxgVbJxhNE8S0KYP9wsUb7cHK6VBKwO2vYSOp5IhgZL1b2gLDpTDrIfgOLlTa3AVbrVVepSf8lEJ51xljyEyEYybxXt8KnMlHhw4OeJP+fo2AuCVISIzSSi2FkUAGJBUckeoXBvkg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AmMUPoDrlHbFCFhvRhw7/azpHV3GvanZ8BAo8wVY+IA=;
- b=iXiRPjLXblA3XUJoDW7aGiSanpSLLWA0xRBywUSDadnW3MgLxt8EtMRKypEQGhAgAnRp7TGEipWouNwZ8/UvwA5tnZXDToyRYZ784XmcaBBt7KVd9Vsyr6QcCzbtZwUyPtartJDpXFz7voyi5GXLH6yIuCTPyh/bGk+2c+zE/13CGsVNPQtVeKmJd9VYvLz616PL5uRlZk3N81zMpE8Of33AxvaiEWvQAavtQOqpRv6XgNliDYHyfiRkzYISrPy3iidnipSWeBDDTMGuggKriI6Zfg8Uj3raIhurhWmv3qcQaEplO/m3Q8+wBmsb4vnO3RBJR19IeiOZidNxkwoDJg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ bh=RcAtR2u/JEZ4Gk5w1cM87eTJFyr2yUHTk+PbB/wJOyI=;
+ b=VZPwCJryuKgBL0m9k+uBB4Pm2wkndcCulR4Gl83W4W9IiFA4xCKdL4gzy18VrLqiEdOnPH6W62Lywq+xxVTfwetEnFrM7StzLHqZNqSnkJtbDqSOiK3wwqHy5db6cyW6J0PD5VGFuUPhH/oQG01z3//CSQ1HZccvqCRXIeC/NY/7h4Irrl2AlCpf3Gr1eotNmIqd2XjjdqlqCrXabqYALjXa4aFDMXS2nHxEK0IyP+ZnZfCz066v/x2vBXNtPfwqI5frrhlhpleOmS/mP5cQX4uwNvj0o6AwfxMiLuRjYXly0LfGYf4AIcjhQ3rAIVJFsHCJFiWOJ4Lp+rq6C5tZhw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AmMUPoDrlHbFCFhvRhw7/azpHV3GvanZ8BAo8wVY+IA=;
- b=Nm4erwdMUcj2vMEpya91WFdHubhtstNTSxB4VHw00BwojwCzl74QdoPvKymqPqN6x8c6CwkVwhUckYRcEWl4JCMh4xb2YFMbmSuS2AdOUZa9f/9n+90HTYMXM9iQ19uw/GhF885Q7dj5i0K+mAMX2NqYyE8zGelW7aHJ4TQsPps=
-Received: from PUZP153MB0788.APCP153.PROD.OUTLOOK.COM (2603:1096:301:fc::10)
- by SI2P153MB0444.APCP153.PROD.OUTLOOK.COM (2603:1096:4:e9::7) with Microsoft
+ bh=RcAtR2u/JEZ4Gk5w1cM87eTJFyr2yUHTk+PbB/wJOyI=;
+ b=sNefzD1F5SuHsjgbONTSfaYC8DZIDMcmX0Jpqh0WOVpnwsoIy28Wg3ZkQc0VrIfBmgcDwUegx2nUrC1WQ+5LIqP4WU5ejBPEKfvrZEJzbdThRAW/1aBp4pdNr0FY9YgbYxvyd4DAxT1ANQ9A5hT7IzBPfGP2fAThkCuz3bcv4+AN2ShF0WZ/HmbhhzjBovYZdbRa5XLthrLcMRFVLjQP2+G5zoMsJAn0xEZAnyXvH6Qw6LgU+bBKWsWOxNFdkrcpq/A3LzHnhJAsrGAo7G1kcLddl/coSrixC/Vf26EySr6OKT3k5mMuhXKT+VdJgkBw+aTrVGVwE93putj8NWLhIw==
+Received: from BL1PR13CA0086.namprd13.prod.outlook.com (2603:10b6:208:2b8::31)
+ by CH3PR12MB8282.namprd12.prod.outlook.com (2603:10b6:610:124::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.33; Tue, 12 Dec
+ 2023 17:46:07 +0000
+Received: from MN1PEPF0000ECD9.namprd02.prod.outlook.com
+ (2603:10b6:208:2b8:cafe::49) by BL1PR13CA0086.outlook.office365.com
+ (2603:10b6:208:2b8::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.23 via Frontend
+ Transport; Tue, 12 Dec 2023 17:46:07 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ MN1PEPF0000ECD9.mail.protection.outlook.com (10.167.242.138) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7113.7; Tue, 12 Dec 2023 17:18:31 +0000
-Received: from PUZP153MB0788.APCP153.PROD.OUTLOOK.COM
- ([fe80::a516:f38b:f94e:b77a]) by PUZP153MB0788.APCP153.PROD.OUTLOOK.COM
- ([fe80::a516:f38b:f94e:b77a%7]) with mapi id 15.20.7113.001; Tue, 12 Dec 2023
- 17:18:31 +0000
-From: Souradeep Chakrabarti <schakrabarti@microsoft.com>
-To: Yury Norov <yury.norov@gmail.com>, Souradeep Chakrabarti
-	<schakrabarti@linux.microsoft.com>
-CC: KY Srinivasan <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, Long Li <longli@microsoft.com>,
-	"leon@kernel.org" <leon@kernel.org>, "cai.huoqing@linux.dev"
-	<cai.huoqing@linux.dev>, "ssengar@linux.microsoft.com"
-	<ssengar@linux.microsoft.com>, "vkuznets@redhat.com" <vkuznets@redhat.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>, "linux-hyperv@vger.kernel.org"
-	<linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>, Paul Rosswurm <paulros@microsoft.com>
-Subject: RE: [EXTERNAL] Re: [PATCH V5 net-next] net: mana: Assigning IRQ
- affinity on HT cores
-Thread-Topic: [EXTERNAL] Re: [PATCH V5 net-next] net: mana: Assigning IRQ
- affinity on HT cores
-Thread-Index: AQHaLO/QR3tf0roc2kSw9A6kOF+FyrCl2CcAgAAJA9A=
-Date: Tue, 12 Dec 2023 17:18:31 +0000
-Message-ID:
- <PUZP153MB07885B197469B61D8907B1E3CC8EA@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
-References:
- <1702029754-6520-1-git-send-email-schakrabarti@linux.microsoft.com>
- <ZXMiOwK3sOJNXHxd@yury-ThinkPad>
- <20231211063726.GA4977@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <ZXcrHc5QGPTZtXKf@yury-ThinkPad>
- <20231212113856.GA17123@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <ZXiLetPnY5TlAQGY@yury-ThinkPad>
-In-Reply-To: <ZXiLetPnY5TlAQGY@yury-ThinkPad>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=0e7e8a57-51b3-47c4-96e2-b50e522ec308;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2023-12-12T17:06:17Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PUZP153MB0788:EE_|SI2P153MB0444:EE_
-x-ms-office365-filtering-correlation-id: 5c9c0f7f-4db8-43e2-fab7-08dbfb365d1c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- X8XGRopp97LLKlMiCexzDy6e2laDytV2cmrQyh2El6g2psFD62dvGeLAO1VHRf81VbHmikdX9SWRg+I3OAXWxWehlShAUaWtPF9PXm+6im4y7z8fvmskm7BgVTo1V0Xrsx7WjDWbJfqmiNPHPQmhpq1NHzyoWJLZlsp1VzP/mRb5ITNkBBaT8lqw512NJKw3YyFMq6miiOtfB2mBfYJuAuCDs5CMQQpEnVoSnSIQQxGc00rledkmveNnxwLHDRBIWAobBzawRngSFkvufguoH4OshLbMiHPVHeYW8xTzeMq3YopIlLpdiJcC2NdpvrFLsYbQu4aDJtMJA5NttX6Tk+567M5CT+n+BV3ibu/PC4QXOGJ+acETdann1qqHRhSBCZGNG0Kj5kH9XuBbEPRlFYr6xJo82cain8nyQvsZTb6OhfUkxCjVap1+P+ubSxXb5oHVu6mLnctbL6tFfcTRX3hcqw9A+9X8KyC90yHE9uW6Lwmx3t5kU8jnF1Mnf0pv2cEUMX/XpUZamEFucx7lVhhVnjYbBUlvkSWbx9JLcNi61RtU4PhrD3mgmQTjODeZlTrOHHiM4diK1/EC1nFfswI7NpgLoOXwGcP6ZFdB/hljl3r5baoMy69GkKZ5q9c/mprYGiRGN3D1n722lMNJIlG6zX1uhUmV93CLxjdcEGZCPsi3nxT2K6ye62FHLwPXmjQ7a/u5wAIYxQIRa5En1Q==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PUZP153MB0788.APCP153.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(376002)(39860400002)(346002)(396003)(230273577357003)(230173577357003)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(107886003)(83380400001)(38070700009)(86362001)(33656002)(82950400001)(82960400001)(122000001)(38100700002)(316002)(54906003)(64756008)(52536014)(8936002)(66446008)(8676002)(110136005)(66556008)(66946007)(76116006)(66476007)(55016003)(5660300002)(7416002)(4326008)(2906002)(71200400001)(41300700001)(26005)(478600001)(10290500003)(8990500004)(9686003)(7696005)(6506007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?yIKDYkhypvGUYjjc4ma8jyX7NeSTOESSu1Q6S4S7y0fpN73bMKMje8JJzGhQ?=
- =?us-ascii?Q?u+8GB2SApltw7nySJLRr2MZyapoBVyor37t/aHls288bOyskltoc39TYzNc7?=
- =?us-ascii?Q?rtDpC7gf//WFKDXHSG8jxb3lTzJtWNiw5ot7FGDhDPIk5NDZ5OegwQr7ghgS?=
- =?us-ascii?Q?jHSuiU1kjTYdKqIQG20JQvW4bDrhTMY/iSbHxWODeD3WDUKzK+psyXdcZLiD?=
- =?us-ascii?Q?IBoqExQw1/Bl0JKOoyeRrWtXVCPslgLTlKJbyyDRGt2AE/LWUptTKBjDa9xQ?=
- =?us-ascii?Q?pso4su7fY3YttlZ4G+XUpiAxfKakgPQldyIGtkVX+GGZdCN610s/woZD7q23?=
- =?us-ascii?Q?35QDfZ/OS305R6SM6hss5tk2QvExsKgWvrI1124edBWorNixLvOzmZTBu8xB?=
- =?us-ascii?Q?ism+yPAvMKJ8c4hMPHvBPD3ULsbILyPORgPTds8oJYipCsySSQ/eQPJVH4W1?=
- =?us-ascii?Q?eoWI3pbgw9i+4AR5sj2fjH8p4siM6132axr5V0ebK3BIiiXSqrPCNtrPEvSX?=
- =?us-ascii?Q?r9CEIUzGdhS1StdkE1LdpTs/pqFIprEeP6fGlO+kqoxqglQAriQP/yXiUVp/?=
- =?us-ascii?Q?FndS/gRnfaTPH07sQs0ejIVImVYQKdiRsTjQUN9RHEnr7WYiqMKcTX0jVU1l?=
- =?us-ascii?Q?Q7O2UihYFyVJI06OAt/L2jVM+sj3njubDQSZ5scqnO7kh7kn3SrLmgIPBWt1?=
- =?us-ascii?Q?e7JWztvPh/wNAysJD4RNjNE7Baft1KI9xadQ5P8nFiDeyYq3mVGfAjC1m//n?=
- =?us-ascii?Q?16bL7Rn31oECum2uVEct0ABbDeDsxvEZAXGP0AlOhbXI0IwHyv0fgb2u1BFR?=
- =?us-ascii?Q?h3C9DNr7TysPmIpJdgO/T1tDHuRvd7rRDl8Q/FakZLya4DH+HnDiqx18cMl9?=
- =?us-ascii?Q?9DxNKx3bEIRgRpZE+ivY13VOMwpbz2h6RmD8VpKvQ8rz0WJPS+QSg/jKjSSx?=
- =?us-ascii?Q?g/lPEr4MoPOg0c2LndCV6Y6Do7hCQ4mdmMHuOaTsLj89GJHXnee5F1X5uZix?=
- =?us-ascii?Q?OhwxY3Mb1mkMslNThL8pAedHn0Y2A32phLXIcsQhDw3Y5htqTKwBsr3cIRK0?=
- =?us-ascii?Q?4Rxn+xKWMPVBf4r3nWwWoTH4E+Ak7Ts0bpq3xmQR2k0WefS/xawgxwYZ5a5G?=
- =?us-ascii?Q?vPPzXehGFLzujk3uPEPrMHj3kd65SUEuK/2Ufzkof2N6dp06zfCgVed26rwd?=
- =?us-ascii?Q?6Qsu+s9dN+BYDXs9txaBT9H7aiIIIMs0G794P3A2T4xUORSNg6hkSXFCQ1OW?=
- =?us-ascii?Q?Zyfrauh6vwv6UDDwtciSUQhLvt4Ys1GnTFkuExiCcWEdtDGdVwxhNQV56d+b?=
- =?us-ascii?Q?tTJXFUtfpjad7rTlXiaS+C7k9jwHyrw8HexjWOKRUje/Mqr7qNxBGv+Y10zy?=
- =?us-ascii?Q?KP6vWkgpz9T1Lg14iMf1v5cpTJgGMOtuWwTrLkH7WpcDzilP+SS4HE5R/gL7?=
- =?us-ascii?Q?39oi6Zhr5DBeg8608yC6I/cXRybZsrIfA+PJIGehlYr9TQ6nsBF7yQrG87jL?=
- =?us-ascii?Q?Ohnf8kTJfqSeB7hhhFzfRRdn/X0v8yHulcXa?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ 15.20.7091.26 via Frontend Transport; Tue, 12 Dec 2023 17:46:06 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 12 Dec
+ 2023 09:45:40 -0800
+Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 12 Dec
+ 2023 09:45:37 -0800
+References: <a1c56680a5041ae337a6a44a7091bd8f781c1970.1702295081.git.petrm@nvidia.com>
+ <ZXcERjbKl2JFClEz@Laptop-X1>
+User-agent: mu4e 1.8.11; emacs 28.3
+From: Petr Machata <petrm@nvidia.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+CC: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, <netdev@vger.kernel.org>, Shuah Khan
+	<shuah@kernel.org>, <mlxsw@nvidia.com>
+Subject: Re: [PATCH net-next] selftests: forwarding: Import top-level lib.sh
+ through $lib_dir
+Date: Tue, 12 Dec 2023 18:22:28 +0100
+In-Reply-To: <ZXcERjbKl2JFClEz@Laptop-X1>
+Message-ID: <87fs07mi0w.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PUZP153MB0788.APCP153.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5c9c0f7f-4db8-43e2-fab7-08dbfb365d1c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Dec 2023 17:18:31.1910
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD9:EE_|CH3PR12MB8282:EE_
+X-MS-Office365-Filtering-Correlation-Id: f55edde3-0a65-4b0b-89f9-08dbfb3a3815
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	q89C8SEL5V0zI/iZyo0pFvr6aJ0WqeUafV7zGDEoj92cYRCBCGYldoyDu+jzhEJm1Isc7mNzLm7eRgSfbbe0nE6HTT7UmGzbDAjY1A9bP+bbMJUOwI7iCzlvp29+BwrwOoQRfmAl91tLRIUzDacmTPYIglBmZZgI1vZq7kyy1vmttMgOX2F/K+OKhB6Vc54/UejjSbT5gEMT0Q82eVfz/8NynJl0zhT42W2FhPIXQKWTZv58ykx5vg6yCuS7MGpy/xSHC44WnYzGBTalIYpFVta+Y9zmVSG3UBAqS+Cg88MoRI0KeCGu4I6r2CQ9SdQnM8jC3GJW2H4pNxBarVLkAxZAPU/CHkbM31R8r/r+KzShU4AnDWv+R6bN4+D1qV5+HcvxZrwlMWr7xmDGVGTen891ahe4BZz4e/1k5fhAdaxOZPlVOzbWPyBTmxkBcuqVWd+ImZQkgpZJ1x17pQ0/T82lQ6id64qgVhpJzB5O0ELmOAgfS6avcNlGJke9F+dDrmxnawn8vR/Mv6BNDO3ootGZlp+LtGwCWL9SKcZaEKkg19gh3NC8vM2fvmZtENgxtRD+te0u49I5n5evaCXOV5O4DmZeCZHdY/+xP6oU3OvTZVUd5x8zjDQBjhQWVjaN7SUg3cX+YDFLw9cF304At1OD4paaPSDnQIPHaBjmQO5KEYUUZR7qCc/nh+KXkP1L6X/nHcL3Qy7JuEaqTh05rXd3XFbgjjBAeY4r0fzT5Iu3f2bvLJQ7sn0Dv+NAAMW+
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(346002)(136003)(39860400002)(396003)(376002)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(82310400011)(36840700001)(40470700004)(46966006)(41300700001)(36860700001)(107886003)(26005)(336012)(426003)(2616005)(47076005)(16526019)(82740400003)(36756003)(86362001)(356005)(7636003)(8936002)(5660300002)(8676002)(6916009)(316002)(4326008)(2906002)(6666004)(54906003)(70586007)(70206006)(478600001)(40460700003)(40480700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2023 17:46:06.8636
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8l5ElsoCt/TA/hRWhIZQUeVZy1szfoWMxYpxZKVRwumFuK0QNUlLVSPSSUNJjkd3mc8OgoAbpnUIyHFYExS66AM083YvCB6CohD9AygGp70=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SI2P153MB0444
+X-MS-Exchange-CrossTenant-Network-Message-Id: f55edde3-0a65-4b0b-89f9-08dbfb3a3815
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000ECD9.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8282
 
 
+Hangbin Liu <liuhangbin@gmail.com> writes:
 
->-----Original Message-----
->From: Yury Norov <yury.norov@gmail.com>
->Sent: Tuesday, December 12, 2023 10:04 PM
->To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
->Cc: KY Srinivasan <kys@microsoft.com>; Haiyang Zhang
-><haiyangz@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
-><decui@microsoft.com>; davem@davemloft.net; edumazet@google.com;
->kuba@kernel.org; pabeni@redhat.com; Long Li <longli@microsoft.com>;
->leon@kernel.org; cai.huoqing@linux.dev; ssengar@linux.microsoft.com;
->vkuznets@redhat.com; tglx@linutronix.de; linux-hyperv@vger.kernel.org;
->netdev@vger.kernel.org; linux-kernel@vger.kernel.org; linux-
->rdma@vger.kernel.org; Souradeep Chakrabarti <schakrabarti@microsoft.com>;
->Paul Rosswurm <paulros@microsoft.com>
->Subject: [EXTERNAL] Re: [PATCH V5 net-next] net: mana: Assigning IRQ affin=
-ity on
->HT cores
+> On Mon, Dec 11, 2023 at 01:01:06PM +0100, Petr Machata wrote:
 >
->[Some people who received this message don't often get email from
->yury.norov@gmail.com. Learn why this is important at
->https://aka.ms/LearnAboutSenderIdentification ]
+>> @@ -38,7 +38,7 @@ if [[ -f $relative_path/forwarding.config ]]; then
+>>  	source "$relative_path/forwarding.config"
+>>  fi
+>>  
+>> -source ../lib.sh
+>> +source ${lib_dir-.}/../lib.sh
+>>  ##############################################################################
+>>  # Sanity checks
 >
->> > > > > +     rcu_read_lock();
->> > > > > +     for_each_numa_hop_mask(next, next_node) {
->> > > > > +             cpumask_andnot(curr, next, prev);
->> > > > > +             for (w =3D cpumask_weight(curr), cnt =3D 0; cnt < =
-w; ) {
->> > > > > +                     cpumask_copy(cpus, curr);
->> > > > > +                     for_each_cpu(cpu, cpus) {
->> > > > > +                             irq_set_affinity_and_hint(irqs[i],
->topology_sibling_cpumask(cpu));
->> > > > > +                             if (++i =3D=3D nvec)
->> > > > > +                                     goto done;
->> > > >
->> > > > Think what if you're passed with irq_setup(NULL, 0, 0).
->> > > > That's why I suggested to place this check at the beginning.
->> > > >
->> > > irq_setup() is a helper function for mana_gd_setup_irqs(), which
->> > > already takes care of no NULL pointer for irqs, and 0 number of inte=
-rrupts can
->not be passed.
->> > >
->> > > nvec =3D pci_alloc_irq_vectors(pdev, 2, max_irqs, PCI_IRQ_MSIX); if
->> > > (nvec < 0)
->> > >   return nvec;
->> >
->> > I know that. But still it's a bug. The common convention is that if
->> > a 0-length array is passed to a function, it should not dereference
->> > the pointer.
->> >
->> I will add one if check in the begining of irq_setup() to verify the
->> pointer and the nvec number.
+> Hi Petr,
 >
->Yes you can, but what for? This is an error anyways, and you don't care ab=
-out early
->return. So instead of adding and bearing extra logic, I'd just swap 2 line=
-s of existing
->code.
-Problem with the code you had proposed is shown below:
+> Thanks for the report. However, this doesn't fix the soft link scenario. e.g.
+> The bonding tests tools/testing/selftests/drivers/net/bonding add a soft link
+> net_forwarding_lib.sh and source it directly in dev_addr_lists.sh.
 
-> ./a.out
- i is 1
- i is 2
- i is 3
- i is 4
- i is 5
- i is 6
- i is 7
- i is 8
- i is 9
- i is 10
-in done
-lisatest ~
-> cat test3.c
-#include<stdio.h>
+I see, I didn't realize those exist.
 
-main() {
-        int i =3D 0, cur, nvec =3D 10;
-        for (cur =3D 0; cur < 20; cur++) {
-                if (i++ =3D=3D nvec)
-                        goto done;
-                printf(" i is %d\n", i);
-        }
-done:                                                                      =
-                                                                           =
-                                                                           =
-                                                     =20
-printf("in done\n");
-}
+> So how about something like:
+>
+> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+> index 8f6ca458af9a..7f90248e05d6 100755
+> --- a/tools/testing/selftests/net/forwarding/lib.sh
+> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+> @@ -38,7 +38,8 @@ if [[ -f $relative_path/forwarding.config ]]; then
+>         source "$relative_path/forwarding.config"
+>  fi
+>
+> -source ../lib.sh
+> +forwarding_dir=$(dirname $(readlink -f $BASH_SOURCE))
+> +source ${forwarding_dir}/../lib.sh
 
-So now it is because post increment operator in i++,
-For that reason in the posposed code we will hit irqs[nvec], which may caus=
-e crash, as size of
-irqs is nvec.
-
-Now if we preincrement, then we will loop correctly, but nvec =3D=3D 0 chec=
-k will not happen.
-
-Like here with preincrement in above code we are not hitting (i =3D=3D nvec=
-) .
-> ./a.out
- i is 1
- i is 2
- i is 3
- i is 4
- i is 5
- i is 6
- i is 7
- i is 8
- i is 9
-in done
-
-So with preincrement if we want the check for nvec =3D=3D 0, we will need t=
-he check with extra if condition
-before the loop.
+Yep, that's gonna work.
+I'll pass through our tests and send later this week.
 
