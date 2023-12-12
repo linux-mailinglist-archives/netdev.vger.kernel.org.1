@@ -1,221 +1,132 @@
-Return-Path: <netdev+bounces-56211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D11EC80E2CB
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 04:29:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68FFC80E2E7
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 04:46:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BE251F21B8B
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 03:29:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F666B219A2
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 03:46:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7F88C1B;
-	Tue, 12 Dec 2023 03:29:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0E378F77;
+	Tue, 12 Dec 2023 03:46:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08D6BB3
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 19:29:47 -0800 (PST)
-X-QQ-mid: bizesmtp83t1702351747tj5obqj0
-Received: from dsp-duanqiangwen.trustnetic.com ( [115.204.154.156])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 12 Dec 2023 11:29:05 +0800 (CST)
-X-QQ-SSF: 01400000000000D0E000000A0000000
-X-QQ-FEAT: XBN7tc9DADIXYZxKY7Eqe1TftXsgoLT/7obc2R3wT3ZFou5tj5HSg+6B5ituM
-	N9Oh7xqpCFLBArg9zqmHBBKOj6njN1YG7b6ohtm6C7kH0JARAr6LhrQ+dboTPMX4enMLNvI
-	pyC+tX9b/odJrB2+yu46BxJlTGw24v1QHcxYO1HMpVx8ISK1Uq7hkxLTl+ihuD7/r4lmNBN
-	u6gwMCDsJfrvokRoPctoiwDSNU7NaTRv8sFCynyRCiVwR70rEW3KZ0lHUzhCbbeg0jNbaQK
-	rqgje9E9m466vww+dEbXwWkQnxLt8y9Zf0pqy0pMztLz57sX8XXldGpuPVk7xi5AZciSCC/
-	WAGgzIngsE4mkElVBBoDEpKBDymm1lemwg7Uk/kjTbPwsIW31ZAF3MQnbmXfV7j2uKtBep4
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 15395382305379667556
-From: duanqiangwen <duanqiangwen@net-swift.com>
-To: netdev@vger.kernel.org,
-	kuba@kernel.org,
-	jiawenwu@trustnetic.com,
-	mengyuanlou@net-swift.com,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	yang.lee@linux.alibaba.com,
-	shaozhengchao@huawei.com,
-	horms@kernel.org
-Cc: duanqiangwen <duanqiangwen@net-swift.com>
-Subject: [PATCH net v3] net: libwx: fix memory leak on free page
-Date: Tue, 12 Dec 2023 11:29:02 +0800
-Message-Id: <20231212032902.23180-1-duanqiangwen@net-swift.com>
-X-Mailer: git-send-email 2.12.2.windows.1
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrsz:qybglogicsvrsz3a-1
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5C17AC;
+	Mon, 11 Dec 2023 19:46:07 -0800 (PST)
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1rCtiL-0002os-2z;
+	Tue, 12 Dec 2023 03:45:47 +0000
+Date: Tue, 12 Dec 2023 03:45:42 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chunfeng Yun <chunfeng.yun@mediatek.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexander Couzens <lynxis@fe80.eu>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org
+Subject: [RFC PATCH net-next v3 0/8] Add support for 10G Ethernet SerDes on
+ MT7988
+Message-ID: <cover.1702352117.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-ifconfig ethx up, will set page->refcount larger than 1,
-and then ifconfig ethx down, calling __page_frag_cache_drain()
-to free pages, it is not compatible with page pool.
-So deleting codes which changing page->refcount.
+This series aims to add support for GMAC2 and GMAC3 of the MediaTek MT7988 SoC.
+While the vendor SDK stuffs all this into their Ethernet driver, I've tried to
+seperate things into a PHY driver, a PCS driver as well as changes to the
+existing Ethernet and LynxI PCS driver.
 
-Fixes: 3c47e8ae113a ("net: libwx: Support to receive packets in NAPI")
-Signed-off-by: duanqiangwen <duanqiangwen@net-swift.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_lib.c  | 83 +++-------------------------
- drivers/net/ethernet/wangxun/libwx/wx_type.h |  1 -
- 2 files changed, 7 insertions(+), 77 deletions(-)
+ +--------------+   +----------------+   +------------------+
+ |              +---|  USXGMII PCS   |---+                  |
+ | Ethernet MAC |   +----------------+   | PEXTP SerDes PHY |
+ |              +---|   SGMII PCS    |---+                  |
+ +--------------+   +----------------+   +------------------+
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index a5a50b5a8816..0e42476b2c29 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -160,60 +160,6 @@ static __le32 wx_test_staterr(union wx_rx_desc *rx_desc,
- 	return rx_desc->wb.upper.status_error & cpu_to_le32(stat_err_bits);
- }
+Alltogether this allows using GMAC2 and GMAC3 with all possible interface modes,
+including in-band-status if needed.
+
+Note that this series depends on series "dt-bindings: clock: mediatek:
+add MT7988 clock IDs"[1] as well as "dt-bindings: watchdog:
+mediatek,mtk-wdt: add MT7988 watchdog and toprgu"[2] being merged
+before.
+
+[1]: https://patchwork.kernel.org/project/linux-arm-kernel/list/?series=809031
+[2]: https://patchwork.kernel.org/project/linux-arm-kernel/list/?series=802588
+
+Changes since RFC v2:
+ - use clk_bulk_* when ever feasible
+ - rework Ethernet <-> PCS driver link, use device_link
  
--static bool wx_can_reuse_rx_page(struct wx_rx_buffer *rx_buffer,
--				 int rx_buffer_pgcnt)
--{
--	unsigned int pagecnt_bias = rx_buffer->pagecnt_bias;
--	struct page *page = rx_buffer->page;
--
--	/* avoid re-using remote and pfmemalloc pages */
--	if (!dev_page_is_reusable(page))
--		return false;
--
--#if (PAGE_SIZE < 8192)
--	/* if we are only owner of page we can reuse it */
--	if (unlikely((rx_buffer_pgcnt - pagecnt_bias) > 1))
--		return false;
--#endif
--
--	/* If we have drained the page fragment pool we need to update
--	 * the pagecnt_bias and page count so that we fully restock the
--	 * number of references the driver holds.
--	 */
--	if (unlikely(pagecnt_bias == 1)) {
--		page_ref_add(page, USHRT_MAX - 1);
--		rx_buffer->pagecnt_bias = USHRT_MAX;
--	}
--
--	return true;
--}
--
--/**
-- * wx_reuse_rx_page - page flip buffer and store it back on the ring
-- * @rx_ring: rx descriptor ring to store buffers on
-- * @old_buff: donor buffer to have page reused
-- *
-- * Synchronizes page for reuse by the adapter
-- **/
--static void wx_reuse_rx_page(struct wx_ring *rx_ring,
--			     struct wx_rx_buffer *old_buff)
--{
--	u16 nta = rx_ring->next_to_alloc;
--	struct wx_rx_buffer *new_buff;
--
--	new_buff = &rx_ring->rx_buffer_info[nta];
--
--	/* update, and store next to alloc */
--	nta++;
--	rx_ring->next_to_alloc = (nta < rx_ring->count) ? nta : 0;
--
--	/* transfer page from old buffer to new buffer */
--	new_buff->page = old_buff->page;
--	new_buff->page_dma = old_buff->page_dma;
--	new_buff->page_offset = old_buff->page_offset;
--	new_buff->pagecnt_bias	= old_buff->pagecnt_bias;
--}
--
- static void wx_dma_sync_frag(struct wx_ring *rx_ring,
- 			     struct wx_rx_buffer *rx_buffer)
- {
-@@ -270,8 +216,6 @@ static struct wx_rx_buffer *wx_get_rx_buffer(struct wx_ring *rx_ring,
- 				      size,
- 				      DMA_FROM_DEVICE);
- skip_sync:
--	rx_buffer->pagecnt_bias--;
--
- 	return rx_buffer;
- }
- 
-@@ -280,19 +224,9 @@ static void wx_put_rx_buffer(struct wx_ring *rx_ring,
- 			     struct sk_buff *skb,
- 			     int rx_buffer_pgcnt)
- {
--	if (wx_can_reuse_rx_page(rx_buffer, rx_buffer_pgcnt)) {
--		/* hand second half of page back to the ring */
--		wx_reuse_rx_page(rx_ring, rx_buffer);
--	} else {
--		if (!IS_ERR(skb) && WX_CB(skb)->dma == rx_buffer->dma)
--			/* the page has been released from the ring */
--			WX_CB(skb)->page_released = true;
--		else
--			page_pool_put_full_page(rx_ring->page_pool, rx_buffer->page, false);
--
--		__page_frag_cache_drain(rx_buffer->page,
--					rx_buffer->pagecnt_bias);
--	}
-+	if (!IS_ERR(skb) && WX_CB(skb)->dma == rx_buffer->dma)
-+		/* the page has been released from the ring */
-+		WX_CB(skb)->page_released = true;
- 
- 	/* clear contents of rx_buffer */
- 	rx_buffer->page = NULL;
-@@ -335,11 +269,12 @@ static struct sk_buff *wx_build_skb(struct wx_ring *rx_ring,
- 		if (size <= WX_RXBUFFER_256) {
- 			memcpy(__skb_put(skb, size), page_addr,
- 			       ALIGN(size, sizeof(long)));
--			rx_buffer->pagecnt_bias++;
--
-+			page_pool_put_full_page(rx_ring->page_pool, rx_buffer->page, true);
- 			return skb;
- 		}
- 
-+		skb_mark_for_recycle(skb);
-+
- 		if (!wx_test_staterr(rx_desc, WX_RXD_STAT_EOP))
- 			WX_CB(skb)->dma = rx_buffer->dma;
- 
-@@ -382,8 +317,6 @@ static bool wx_alloc_mapped_page(struct wx_ring *rx_ring,
- 	bi->page_dma = dma;
- 	bi->page = page;
- 	bi->page_offset = 0;
--	page_ref_add(page, USHRT_MAX - 1);
--	bi->pagecnt_bias = USHRT_MAX;
- 
- 	return true;
- }
-@@ -723,7 +656,6 @@ static int wx_clean_rx_irq(struct wx_q_vector *q_vector,
- 		/* exit if we failed to retrieve a buffer */
- 		if (!skb) {
- 			rx_ring->rx_stats.alloc_rx_buff_failed++;
--			rx_buffer->pagecnt_bias++;
- 			break;
- 		}
- 
-@@ -2248,8 +2180,7 @@ static void wx_clean_rx_ring(struct wx_ring *rx_ring)
- 
- 		/* free resources associated with mapping */
- 		page_pool_put_full_page(rx_ring->page_pool, rx_buffer->page, false);
--		__page_frag_cache_drain(rx_buffer->page,
--					rx_buffer->pagecnt_bias);
-+
- 
- 		i++;
- 		rx_buffer++;
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index 165e82de772e..83f9bb7b3c22 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -787,7 +787,6 @@ struct wx_rx_buffer {
- 	dma_addr_t page_dma;
- 	struct page *page;
- 	unsigned int page_offset;
--	u16 pagecnt_bias;
- };
- 
- struct wx_queue_stats {
+Changes since RFC v1:
+ - drop patch inhibiting SGMII AN in 2500Base-X mode
+ - make pcs-mtk-lynxi a proper platform driver
+ - ... hence allowing to remove all the wrappers from the usxgmii driver
+ - attach PEXTP to MAC instead of to USXGMII PCS
+
+Daniel Golle (8):
+  dt-bindings: phy: mediatek,xfi-pextp: add new bindings
+  phy: add driver for MediaTek pextp 10GE SerDes PHY
+  net: pcs: pcs-mtk-lynxi: add platform driver for MT7988
+  dt-bindings: net: pcs: add bindings for MediaTek USXGMII PCS
+  net: pcs: add driver for MediaTek USXGMII PCS
+  dt-bindings: net: mediatek: remove wrongly added clocks and SerDes
+  dt-bindings: net: mediatek,net: fix and complete mt7988-eth binding
+  net: ethernet: mtk_eth_soc: add paths and SerDes modes for MT7988
+
+ .../devicetree/bindings/net/mediatek,net.yaml | 180 +++++--
+ .../bindings/net/pcs/mediatek,usxgmii.yaml    |  60 +++
+ .../bindings/phy/mediatek,xfi-pextp.yaml      |  80 +++
+ MAINTAINERS                                   |   3 +
+ drivers/net/ethernet/mediatek/mtk_eth_path.c  | 122 ++++-
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c   | 291 +++++++++--
+ drivers/net/ethernet/mediatek/mtk_eth_soc.h   | 107 +++-
+ drivers/net/pcs/Kconfig                       |  11 +
+ drivers/net/pcs/Makefile                      |   1 +
+ drivers/net/pcs/pcs-mtk-lynxi.c               | 226 ++++++++-
+ drivers/net/pcs/pcs-mtk-usxgmii.c             | 456 ++++++++++++++++++
+ drivers/phy/mediatek/Kconfig                  |  11 +
+ drivers/phy/mediatek/Makefile                 |   1 +
+ drivers/phy/mediatek/phy-mtk-pextp.c          | 361 ++++++++++++++
+ include/linux/pcs/pcs-mtk-lynxi.h             |  11 +
+ include/linux/pcs/pcs-mtk-usxgmii.h           |  27 ++
+ 16 files changed, 1859 insertions(+), 89 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/pcs/mediatek,usxgmii.yaml
+ create mode 100644 Documentation/devicetree/bindings/phy/mediatek,xfi-pextp.yaml
+ create mode 100644 drivers/net/pcs/pcs-mtk-usxgmii.c
+ create mode 100644 drivers/phy/mediatek/phy-mtk-pextp.c
+ create mode 100644 include/linux/pcs/pcs-mtk-usxgmii.h
+
 -- 
-2.12.2.windows.1
-
+2.43.0
 
