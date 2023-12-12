@@ -1,80 +1,61 @@
-Return-Path: <netdev+bounces-56609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FD9B80F9D2
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 22:58:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6541F80F9E8
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 23:07:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3FEC3B20E61
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 21:58:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C8D3282125
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 22:07:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60FD164CD0;
-	Tue, 12 Dec 2023 21:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DE3664CD6;
+	Tue, 12 Dec 2023 22:07:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E5YB8JO2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c28QQVrI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 216E7B7
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 13:58:06 -0800 (PST)
-Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-33635163fe6so765241f8f.3
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 13:58:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702418284; x=1703023084; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1J1irfOIdDfRUtbhTevlTRDLDx7FojFxldGLahywxd4=;
-        b=E5YB8JO2mj3Colyh0xWO+e+1jlpOtD0MVsbUK4MOKhlTDpaRZDIjhds5IB++M1Edbc
-         blzGpFcrKWW0kKoqVXEgav/tqZ8aRkt2ObgEqPBmDK58W9NYv57V1AnQQmS8UNjdbLHC
-         xZTxXafOdtThTCL+OmUPsre3Uzy8wiOhh9fgMw6e33+zAN2Wfvi1w2YxyrEZDhXEVchY
-         HGqKQxoQjsH0ydBQXholA6HUCv5m7qqpgE2/kMzhX7uhVp4Fa05T/eqH+HaXP/C+g/n8
-         ITFJnBP9+3gHl+kNc/dqidP458Bx0XxjZ1YOkCHFCRLH/vZhpJWznfRlMOuR7nZyp440
-         loOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702418284; x=1703023084;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1J1irfOIdDfRUtbhTevlTRDLDx7FojFxldGLahywxd4=;
-        b=qrV8LuM7+Y5hp3NuZmpAZ3V4qs4XXrMzDwMMVkBHrwwfH2NXkZGRAXLq+/nHk5mS6K
-         xbFn9eTbwXldPCPEEZefwgJYwr5H5WEDv2ZIrIfcDbFd1sEVyyJsfDTRmvslsVlXe8GO
-         2fH1jm7WWCmjapBifU9Tj4/wW8Y95BulX04I1mFi5TVH5uJn/ZJH36dL+vSgjt6ITbws
-         QAEh4Ju1QqRHm0HU/Kf0vB2AHUhCKUI2nNrmsljbk9VPnGeYLTwFxOXZKX8Dt+7SJ49p
-         7820/7KyNwclVyIlCtNQyGOSFi7sZ8UYoNFpK5khJlQiIwCAPEidDXF59axR/x+yxRZJ
-         S/bA==
-X-Gm-Message-State: AOJu0YxKGwlFTYwE/yGxPPTKmugkaGlhepUKh3oZ48M7B/s/FPWAVK2a
-	2Se9vJfg7wxBP0XkGbtBZPc=
-X-Google-Smtp-Source: AGHT+IHhyYNYyulI6zijXP8vU7fxslVD0hWubLqRgAgnSx1e45/2XJQqsrDfWEgsbOkmbEU9Cr3u4w==
-X-Received: by 2002:adf:fc49:0:b0:333:3fc7:f2b3 with SMTP id e9-20020adffc49000000b003333fc7f2b3mr3295889wrs.35.1702418284131;
-        Tue, 12 Dec 2023 13:58:04 -0800 (PST)
-Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id cx14-20020a05640222ae00b0054cb07a17ebsm5061295edb.31.2023.12.12.13.58.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 13:58:03 -0800 (PST)
-Date: Tue, 12 Dec 2023 23:58:01 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: Alvin =?utf-8?Q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linus.walleij@linaro.org" <linus.walleij@linaro.org>,
-	"andrew@lunn.ch" <andrew@lunn.ch>,
-	"f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"arinc.unal@arinc9.com" <arinc.unal@arinc9.com>
-Subject: Re: [PATCH net-next 2/7] net: dsa: realtek: put of node after MDIO
- registration
-Message-ID: <20231212215801.ey74tgywufywa3ip@skbuf>
-References: <20231208045054.27966-1-luizluca@gmail.com>
- <20231208045054.27966-3-luizluca@gmail.com>
- <CAJq09z7yykDsh2--ZahDX=Pto9SF+EQUo5hBnrLiWNALeVY_Bw@mail.gmail.com>
- <i3qp6sjkgqw2mgkbkrpgwxlbcdblwfp6vpohpfnb7tnq77mrpc@hrr3iv2flvqh>
- <CAJq09z45WQv-F9dw-y13E_6DXAfmpxH20JnRoO10za3cuS2kZw@mail.gmail.com>
- <20231211171143.yrvtw7l6wihkbeur@skbuf>
- <CAJq09z6G+yyQ9NLmfTLYRKnNzoP_=AUC5TibQCNPysb6GsBjqA@mail.gmail.com>
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7390B3
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 14:07:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702418830; x=1733954830;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=gF4NV3sPXbLNb0apMwwjJkvtIYedbKUgsadWLmmNhcI=;
+  b=c28QQVrIFlEMTowPuA+D+oSa51LYWSL4ZSD/emI5lux0BwLjm/aysBnu
+   5U1ew63MPOe1/pzs+ZQaX2iijyWuWq/V5XJ8XFoANGSfKhv4wANVZYyYh
+   JrAV1XONOgXj7pwfh/SOYKrbDqhYTk4qionmBqWVWKMhYXstDGvGgHHFt
+   cVJSWlk38SrJY9YSRBq3+Xslc/F+uMiGawLhcr0D5p/m6b5tNbGsOJuG8
+   AGfE1z0QGfi+NDAjmnWpmYngSsyT+vWpD/gNcPkLBLsQ/mFnBmXEHFv1I
+   PMNWhEmitDi48f0WwbhN5wn018GzyBFRxK7yWyNQDUrk64n9rGs3WnPbE
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="2046851"
+X-IronPort-AV: E=Sophos;i="6.04,271,1695711600"; 
+   d="scan'208";a="2046851"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 14:07:10 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="946940975"
+X-IronPort-AV: E=Sophos;i="6.04,271,1695711600"; 
+   d="scan'208";a="946940975"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga005.jf.intel.com with ESMTP; 12 Dec 2023 14:07:07 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rDAu9-000Jml-06;
+	Tue, 12 Dec 2023 22:07:05 +0000
+Date: Wed, 13 Dec 2023 06:06:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: edward.cree@amd.com, linux-net-drivers@amd.com, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+Cc: oe-kbuild-all@lists.linux.dev, Edward Cree <ecree.xilinx@gmail.com>,
+	netdev@vger.kernel.org, habetsm.xilinx@gmail.com,
+	Jonathan Cooper <jonathan.s.cooper@amd.com>
+Subject: Re: [PATCH net-next 3/7] sfc: debugfs for (nic) RX queues
+Message-ID: <202312130527.xlkFaOuC-lkp@intel.com>
+References: <a5c5491d3d0b58b8f8dff65cb53f892d7b13c32a.1702314695.git.ecree.xilinx@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,106 +64,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAJq09z6G+yyQ9NLmfTLYRKnNzoP_=AUC5TibQCNPysb6GsBjqA@mail.gmail.com>
+In-Reply-To: <a5c5491d3d0b58b8f8dff65cb53f892d7b13c32a.1702314695.git.ecree.xilinx@gmail.com>
 
-On Tue, Dec 12, 2023 at 12:47:57AM -0300, Luiz Angelo Daros de Luca wrote:
-> The unregistration happens only in mdiobus_unregister(), where, I
-> guess, it should avoid OF-specific code. Even if we put OF code there,
-> we would need to know during mdiobus_unregister() if the
-> bus->dev.of_node was gotten by of_mdio or someone else.
-> 
-> I believe it is not nice to externally assign dev.of_node directly to
-> mdiobus but realtek switch driver is doing just that and others might
-> be doing the same thing.
+Hi,
 
-Well, make up your mind: earlier you said the user_mii_bus->dev.of_node
-assignment from the Realtek DSA driver is redundant, because
-devm_of_mdiobus_register() -> ... -> __of_mdiobus_register() does it
-anyway. So if it's redundant, you can remove it and nothing changes.
-What's so "not nice" about it that's worth complaining?
+kernel test robot noticed the following build warnings:
 
-Are you trying to say that you're concerned that some drivers might be
-populating the mii_bus->dev.of_node manually, and then proceeding to
-call the _non-OF_ mdiobus_register() variant?
+[auto build test WARNING on net-next/main]
 
-Some drivers like bcm_sf2.c? :)
+url:    https://github.com/intel-lab-lkp/linux/commits/edward-cree-amd-com/sfc-initial-debugfs-implementation/20231212-013223
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/a5c5491d3d0b58b8f8dff65cb53f892d7b13c32a.1702314695.git.ecree.xilinx%40gmail.com
+patch subject: [PATCH net-next 3/7] sfc: debugfs for (nic) RX queues
+config: mips-ip27_defconfig (https://download.01.org/0day-ci/archive/20231213/202312130527.xlkFaOuC-lkp@intel.com/config)
+compiler: mips64-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231213/202312130527.xlkFaOuC-lkp@intel.com/reproduce)
 
-That will be a problem, yes. If a clean result is the goal, I guess some
-consolidation needs to be done before any new rule could be added.
-Otherwise, yeah, we can just snap on one more lazy layer of complexity,
-no problem. My 2 cents.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312130527.xlkFaOuC-lkp@intel.com/
 
-> The delegation of of_node_get/put to the caller seems to be just an
-> easy workaround the fact that there is no good place to put a node
-> that of_mdio would get. For devm functions, we could include the
-> get/put call creating a new devm_of_mdiobus_unregister() but I believe
-> devm and non-devm needs to be equivalent (except for the resource
-> deallocation).
+All warnings (new ones prefixed by >>):
 
-How did we get here, who suggested to get and put the references to the
-OF node outside of the OF MDIO API?
+   In file included from drivers/net/ethernet/sfc/efx.c:36:
+>> drivers/net/ethernet/sfc/debugfs.h:60:5: warning: no previous prototype for 'efx_init_debugfs_rx_queue' [-Wmissing-prototypes]
+      60 | int efx_init_debugfs_rx_queue(struct efx_rx_queue *rx_queue)
+         |     ^~~~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/net/ethernet/sfc/debugfs.h:64:6: warning: no previous prototype for 'efx_fini_debugfs_rx_queue' [-Wmissing-prototypes]
+      64 | void efx_fini_debugfs_rx_queue(struct efx_rx_queue *rx_queue) {}
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/sfc/debugfs.h:66:5: warning: no previous prototype for 'efx_init_debugfs_channel' [-Wmissing-prototypes]
+      66 | int efx_init_debugfs_channel(struct efx_channel *channel)
+         |     ^~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/sfc/debugfs.h:70:6: warning: no previous prototype for 'efx_fini_debugfs_channel' [-Wmissing-prototypes]
+      70 | void efx_fini_debugfs_channel(struct efx_channel *channel) {}
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~
 
-> > If you want, you could make the OF MDIO API get() and put() the reference,
-> > instead of using something it doesn't fully own. But currently the code
-> > doesn't do that. Try to acknowledge what exists, first.
-> 
-> What I saw in other drivers outside drivers/net is that one that
-> allocates the dev will get the node before assigning dev.of_node and
-> put it before freeing the device. The mdiobus case seems to be
-> different. I believe it would make the code more robust if we could
-> fix that inside OF MDIO API and not just document its behavior. It
-> will also not break existing uses as extra get/put's are OK.
-> 
-> I believe we could add an unregister callback to mii_bus. It wouldn't
-> be too complex:
-> 
-> From b5b059ea4491e9f745872220fb94d8105e2d7d43 Mon Sep 17 00:00:00 2001
-> From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-> Date: Tue, 12 Dec 2023 00:26:06 -0300
-> Subject: [PATCH] net: mdio: get/put device node during (un)registration
-> 
-> __of_mdiobus_register() was storing the device node in dev.of_node
-> without increasing its refcount. It was implicitly delegating to the
-> caller to maintain the node allocated until mdiobus was unregistered.
-> 
-> Now, the __of_mdiobus_register() will get the node before assigning it,
-> and of_mdiobus_unregister_callback() will be called at the end of
-> mdio_unregister().
-> 
-> Drivers can now put the node just after the MDIO registration.
-> 
-> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-> ---
-> drivers/net/mdio/of_mdio.c | 12 +++++++++++-
-> drivers/net/phy/mdio_bus.c |  3 +++
-> include/linux/phy.h        |  3 +++
-> 3 files changed, 17 insertions(+), 1 deletion(-)
 
-I don't mean to be rude, but I don't have the time to dig into this any
-further, sorry. If you are truly committed to better the phylib API,
-please bring it up with the phylib people instead. I literally only
-care about the thing that Alvin pointed out, which is that you made
-unjustified changes to a DSA driver.
+vim +/efx_init_debugfs_rx_queue +60 drivers/net/ethernet/sfc/debugfs.h
 
-> If we don't fix that in OF MDIO API, we would need to fix
-> fe7324b932222 as well, moving the put to the dsa_switch_teardown().
+    59	
+  > 60	int efx_init_debugfs_rx_queue(struct efx_rx_queue *rx_queue)
+    61	{
+    62		return 0;
+    63	}
+  > 64	void efx_fini_debugfs_rx_queue(struct efx_rx_queue *rx_queue) {}
+    65	
 
-Oh, couldn't we straight-up revert that instead? :) The user_mii_bus
-is created by DSA for compatibility with non-OF. I cannot understand
-why you insist to attach an OF node to it.
-
-But otherwise, yes, it is the same situation: of_node_put(), called
-before unregistering an MDIO bus registered with of_mdiobus_register(),
-means that the full OF API on this MDIO bus may not work correctly.
-I don't know the exact conditions though. It might be marginal or even
-a bug that's impossible to trigger. I haven't tested anything.
-
-In any case, while I encourage you to make OF node refcounting work in
-the way that you think is intuitive, I want to be clear about one thing,
-and that is that I'm not onboard with modifying phylib to make a non
-use-case in DSA work, aka OF-aware user_mii_bus (an oxymoron).
-
-I understand why a driver may want a ds->user_mii_bus. And I understand
-why a driver may want an MDIO bus with an of_node. What I don't understand
-is who might want both at the same time, and why.
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
