@@ -1,103 +1,152 @@
-Return-Path: <netdev+bounces-56303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CF0E80E752
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:20:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 149F780E773
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:22:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47AE91C2140C
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 09:20:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 97648B20DA7
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 09:22:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D07D1584D8;
-	Tue, 12 Dec 2023 09:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0673A584DD;
+	Tue, 12 Dec 2023 09:22:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JxT400n6"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="aeiMKbIp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FE03DB;
-	Tue, 12 Dec 2023 01:20:20 -0800 (PST)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2ca0715f0faso75163131fa.0;
-        Tue, 12 Dec 2023 01:20:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702372818; x=1702977618; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rksCD0YvwRVPdr9cALicJG1jtcdwoAy/N1wXuToJ/sU=;
-        b=JxT400n6Ifdf+AWxMyE2fNIf0sFC3S0juv/30GItoXMujRL7pnYm4cDdxAUesZVbl2
-         hw4j9f/6kl9jBUmaOZE9grImZ1G7Eb8HJ54U0q0w1c58sjqUPOJ7pTFToeQT2EUO279A
-         S1caps9sVMdkFBykM0usmt8MxrHjOyYXdHEffNle9p9KjTw6uJP2EqIFR8I2+m8bX1nP
-         e6TJarUqrDbc5tv0+3HsisfuVoyF5c7hZwwX4tghlMSRXJcKmL4cwlp3II/UlfI25nOo
-         uiIt8s/kWDEJZfuS9YMnUHRZEkh0ASyK6kq4ZTDcVHW9ZzUZMn5H9KZKg1yy9I3kMk1i
-         Jkxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702372818; x=1702977618;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rksCD0YvwRVPdr9cALicJG1jtcdwoAy/N1wXuToJ/sU=;
-        b=SFyuneQOKeycOFV3BqrXz5DeklizPaDf20zikgRcqULlHllEBACsuk2aEl4zN7Q9oG
-         RITroujbCZXYRiyh0sU7bQrGwkxoqSuuI2kvpHuWJBdWuHHjtikbyPYSm4f2Z43CEqmE
-         US7DQqZ3NyBie0uzgL8N40/ennXDOzOXcen+5HUd91CGTSOl2B0VHXEoCj8Mh5a9Q5lt
-         zOO+QSwyABSW2e9oVRYXVDfO/isPUTCxJpN4PcqXskHWZxGK5uRRQ74VBMWEoN5xaMLF
-         eDfJquyBcERx9nKIdhfsUv5dJ82gO/dDZCJYIn+s0/BNqKfR0XhG0LLohFq/EPfjOdwx
-         /ZNg==
-X-Gm-Message-State: AOJu0Yxm3oMEEPr4T6bpvoIFFtmQRlaGP9hFfHpi1b+12Rq1OPHhAv+K
-	aIJWg2K/F/heqmatImZZClQ=
-X-Google-Smtp-Source: AGHT+IFBfXFN9YMbampOxy4UlOpmDcj+w/s3WuIJrPWhqFQHlOAYZA7vdH0HKg760a+7o1+41h3Taw==
-X-Received: by 2002:a2e:711:0:b0:2cc:1dc8:af0b with SMTP id 17-20020a2e0711000000b002cc1dc8af0bmr1600707ljh.36.1702372818014;
-        Tue, 12 Dec 2023 01:20:18 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id ce26-20020a2eab1a000000b002ca00b027ccsm1447690ljb.123.2023.12.12.01.20.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 01:20:17 -0800 (PST)
-Date: Tue, 12 Dec 2023 12:20:15 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jianheng Zhang <Jianheng.Zhang@synopsys.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <Jose.Abreu@synopsys.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	"open list:STMMAC ETHERNET DRIVER" <netdev@vger.kernel.org>, 
-	"moderated list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>, 
-	"moderated list:ARM/STM32 ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, open list <linux-kernel@vger.kernel.org>, 
-	James Li <James.Li1@synopsys.com>, Martin McKenny <Martin.McKenny@synopsys.com>
-Subject: Re: [PATCH net-next] net: stmmac: xgmac3+: add FPE handshaking
- support
-Message-ID: <edfg5hbcysvah5lnxoeygjn3qz2243c6o5ilt4uyeggegu5wzd@t2ngy4xikpio>
-References: <CY5PR12MB63726FED738099761A9B81E7BF8FA@CY5PR12MB6372.namprd12.prod.outlook.com>
- <zx7tfojtnzuhcpglkeiwg6ep265xpcb5lmz6fgjjugc2tue6qe@cmuqtneujsvb>
- <20231211145944.0be51404@kernel.org>
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 256C3101;
+	Tue, 12 Dec 2023 01:22:33 -0800 (PST)
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BC7hVg4030233;
+	Tue, 12 Dec 2023 09:22:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id; s=qcppdkim1; bh=l8zaNlEzCFdd
+	J7GdqVAcppaYhBgAvRyZ9QUKgjvXKaE=; b=aeiMKbIpxLVlx5kNw8rKOQGHlxO3
+	J9+0v4xmX6QTsjq6uf4YUQJFgWbqDJ9mwzw4Wp8+ABb8St4FK619S4fz42RjOYhg
+	bYo0G9hfT4pcHZU5f2+6/Ja45d9fSlmC/BHr70TsyiZgtpM/iqadpyRcpO+ReU74
+	MzZs8Ox7fxOH3y7FntUuwHVYBgI8L4nTsn0j52urGhmcf6PrAGE0Rogic/rV0cV5
+	5BkJhbT7iwNCwFH/4C+vfRj25AwZJ1S6frdV0xPDKsIg6LlM1ZBCptBmIlE0eQfm
+	w/JRJIjaiFzyReCof+0UOGX3OMxF9IPWeiRhk7wtal6wuxekK3jF3GGRVA==
+Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uxkc806xq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 Dec 2023 09:22:17 +0000 (GMT)
+Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+	by APBLRPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 3BC9MDQu003963;
+	Tue, 12 Dec 2023 09:22:13 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 3uvhakhnmy-1;
+	Tue, 12 Dec 2023 09:22:13 +0000
+Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BC9MClj003954;
+	Tue, 12 Dec 2023 09:22:12 GMT
+Received: from hu-maiyas-hyd.qualcomm.com (hu-snehshah-hyd.qualcomm.com [10.147.246.35])
+	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 3BC9MCeE003952;
+	Tue, 12 Dec 2023 09:22:12 +0000
+Received: by hu-maiyas-hyd.qualcomm.com (Postfix, from userid 2319345)
+	id 99D6A5001C6; Tue, 12 Dec 2023 14:52:11 +0530 (+0530)
+From: Sneh Shah <quic_snehshah@quicinc.com>
+To: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc: Sneh Shah <quic_snehshah@quicinc.com>, kernel@quicinc.com,
+        Andrew Halaney <ahalaney@redhat.com>
+Subject: [PATCH net v4] net: stmmac: dwmac-qcom-ethqos: Fix drops in 10M SGMII RX
+Date: Tue, 12 Dec 2023 14:52:08 +0530
+Message-Id: <20231212092208.22393-1-quic_snehshah@quicinc.com>
+X-Mailer: git-send-email 2.17.1
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: pDPfPCDoTvWSercp_38-MWIPTU2YRGPX
+X-Proofpoint-ORIG-GUID: pDPfPCDoTvWSercp_38-MWIPTU2YRGPX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 mlxlogscore=999 suspectscore=0 bulkscore=0
+ malwarescore=0 adultscore=0 impostorscore=0 spamscore=0 mlxscore=0
+ phishscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2312120073
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231211145944.0be51404@kernel.org>
 
-On Mon, Dec 11, 2023 at 02:59:44PM -0800, Jakub Kicinski wrote:
-> On Mon, 11 Dec 2023 14:14:00 +0300 Serge Semin wrote:
-> > Although in this case AFAICS the implementation is simpler and the
-> > only difference is in the CSR offset and the frame preemption residue
-> > queue ID setting. All of that can be easily solved in the same way as
-> > it was done for EST (see the link above).
-> > 
-> > Jakub, what do you think?
-> 
-> Yup, less code duplication would be great. Highest prio, tho, is to
-> focus on Vladimir's comment around this driver seemingly implementing
-> FPE but not using the common ethtool APIs to configure it, yet :(
+In 10M SGMII mode all the packets are being dropped due to wrong Rx clock.
+SGMII 10MBPS mode needs RX clock divider programmed to avoid drops in Rx.
+Update configure SGMII function with Rx clk divider programming.
 
-Fully agree. If that required to refactor the currently implemented
-handshaking algo (looking not that safe and clumsy a bit), it would
-have been even better. Although I guess refactoring the code
-duplication could be done as a preparation patch anyway or as a patch
-which would convert the feature-specific callbacks to be suitable for
-the 802.3 MAC Merge layer.
+Fixes: 463120c31c58 ("net: stmmac: dwmac-qcom-ethqos: add support for SGMII")
+Tested-by: Andrew Halaney <ahalaney@redhat.com>
+Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
+---
+v4 changelog:
+- Updated commit message to add more details on why 10M SGMII Rx is failing
+- Added a macro for Rx clock divider value
+v3 changelog:
+- Added comment to explain why MAC needs to be reconfigured for SGMII
+v2 changelog:
+- Use FIELD_PREP to prepare bifield values in place of GENMASK
+- Add fixes tag
+---
+ .../net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
--Serge(y)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+index d3bf42d0fceb..31631e3f89d0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+@@ -34,6 +34,7 @@
+ #define RGMII_CONFIG_LOOPBACK_EN		BIT(2)
+ #define RGMII_CONFIG_PROG_SWAP			BIT(1)
+ #define RGMII_CONFIG_DDR_MODE			BIT(0)
++#define RGMII_CONFIG_SGMII_CLK_DVDR		GENMASK(18, 10)
+ 
+ /* SDCC_HC_REG_DLL_CONFIG fields */
+ #define SDCC_DLL_CONFIG_DLL_RST			BIT(30)
+@@ -78,6 +79,8 @@
+ #define ETHQOS_MAC_CTRL_SPEED_MODE		BIT(14)
+ #define ETHQOS_MAC_CTRL_PORT_SEL		BIT(15)
+ 
++#define SGMII_10M_RX_CLK_DVDR			0x31
++
+ struct ethqos_emac_por {
+ 	unsigned int offset;
+ 	unsigned int value;
+@@ -598,6 +601,9 @@ static int ethqos_configure_rgmii(struct qcom_ethqos *ethqos)
+ 	return 0;
+ }
+ 
++/* On interface toggle MAC registers gets reset.
++ * Configure MAC block for SGMII on ethernet phy link up
++ */
+ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
+ {
+ 	int val;
+@@ -617,6 +623,10 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
+ 	case SPEED_10:
+ 		val |= ETHQOS_MAC_CTRL_PORT_SEL;
+ 		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
++		rgmii_updatel(ethqos, RGMII_CONFIG_SGMII_CLK_DVDR,
++			      FIELD_PREP(RGMII_CONFIG_SGMII_CLK_DVDR,
++					 SGMII_10M_RX_CLK_DVDR),
++			      RGMII_IO_MACRO_CONFIG);
+ 		break;
+ 	}
+ 
+-- 
+2.17.1
+
 
