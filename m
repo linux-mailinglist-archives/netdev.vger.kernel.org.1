@@ -1,178 +1,174 @@
-Return-Path: <netdev+bounces-56582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6112880F7D9
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 21:26:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86E6380F7EC
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 21:29:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 005FCB20E23
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 20:26:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 405C0282055
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 20:29:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF95F63C0E;
-	Tue, 12 Dec 2023 20:26:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6189963C1B;
+	Tue, 12 Dec 2023 20:29:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DpQZLdIS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D9gobhbf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C92FBC
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 12:25:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702412758; x=1733948758;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ShU3x8zcFhiiKxZVBruiDPx0rJANmV4IUQZtaK+tLG8=;
-  b=DpQZLdIS22rYsm8CoVADAHRB/zoM0rUTbO2iewSt7FpmDIXopd35Kzrt
-   cH4XSifNCTjsC2ShD2yt8lz3xOn4u877TB7ihA+iM0a6+wLb40tZLuPuQ
-   CmElnmPLCJHZV7S9OFZteDfPdA7nh0UAghP72msfET73NOod2FWv0f4TF
-   LKrAZtFPu8S1UBn7Z9AJoj/iZcxIrqs86mYHu1x8VikyHU8z20HzAEdKt
-   keYP1Ed2FQpNW77sVL+YaRb8R2t1fEHegCi/j3ZnXpdRoeLO3spTabWQR
-   Bqz28H0ffJGn06oCSt+Sush3tJqOek/xhiq9UArOrC+RCbaA9z8XK2q5N
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="397650962"
-X-IronPort-AV: E=Sophos;i="6.04,271,1695711600"; 
-   d="scan'208";a="397650962"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 12:25:58 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="1020847391"
-X-IronPort-AV: E=Sophos;i="6.04,271,1695711600"; 
-   d="scan'208";a="1020847391"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by fmsmga006.fm.intel.com with ESMTP; 12 Dec 2023 12:25:54 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rD9KB-000JfH-1N;
-	Tue, 12 Dec 2023 20:25:51 +0000
-Date: Wed, 13 Dec 2023 04:25:05 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jiawen Wu <jiawenwu@trustnetic.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linux@armlinux.org.uk, andrew@lunn.ch, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, mengyuanlou@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: Re: [PATCH net-next v4 5/8] net: wangxun: add ethtool_ops for ring
- parameters
-Message-ID: <202312130411.eLnRwdT9-lkp@intel.com>
-References: <20231212080438.1361308-6-jiawenwu@trustnetic.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4565763C11
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 20:29:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7C61C433C7;
+	Tue, 12 Dec 2023 20:29:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702412977;
+	bh=msSCeA8YNuYhmkjZ3lbzSEV9WWadnTg5nSpnxpoeWeA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=D9gobhbfM+nIOKEBsi5aE3xriCB0eGKLE1GvoWGLWCb/mDBRYJ13gvTWpfdO2plk3
+	 d9n1x+Y044aqk9/89xQl+xK2HKDTlBWVTgseEIiNOO0y+HvyHPFS7Qb8NAtAZMFCeC
+	 TqGu424nSDGWIDjpY3GVQzA2KK3nfe1Aa6EXLgUN8odBVIxKHUwWA7u9y51yrgHUVl
+	 9vAUDzvERqV9tXpLKZ+Qm6uhQ6c6VUyjeetmjCaVhFeeplGxCy5TiUjkHtOUGV133A
+	 S4sVIepodBYEp7M6P8Lzrxl8N1NXQHH9szT5VDq9DvhehdwDy0tv7EN2IgJN0nRY0g
+	 hqn1JVz7QWrZg==
+Date: Tue, 12 Dec 2023 12:29:35 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Wei <dw@davidwei.uk>
+Cc: Jiri Pirko <jiri@resnulli.us>, Sabrina Dubroca <sd@queasysnail.net>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2 3/3] netdevsim: add selftest for forwarding
+ skb between connected ports
+Message-ID: <20231212122935.4e23dd08@kernel.org>
+In-Reply-To: <20231210010448.816126-4-dw@davidwei.uk>
+References: <20231210010448.816126-1-dw@davidwei.uk>
+	<20231210010448.816126-4-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231212080438.1361308-6-jiawenwu@trustnetic.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Jiawen,
+On Sat,  9 Dec 2023 17:04:48 -0800 David Wei wrote:
+> From: David Wei <davidhwei@meta.com>
+> 
+> Connect two netdevsim ports in different namespaces together, then send
+> packets between them using socat.
+> 
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> ---
+>  .../selftests/drivers/net/netdevsim/peer.sh   | 111 ++++++++++++++++++
+>  1 file changed, 111 insertions(+)
+>  create mode 100755 tools/testing/selftests/drivers/net/netdevsim/peer.sh
 
-kernel test robot noticed the following build errors:
+You need to include this script in the Makefile so it gets run
 
-[auto build test ERROR on net-next/main]
+> diff --git a/tools/testing/selftests/drivers/net/netdevsim/peer.sh b/tools/testing/selftests/drivers/net/netdevsim/peer.sh
+> new file mode 100755
+> index 000000000000..d1d59a932174
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/net/netdevsim/peer.sh
+> @@ -0,0 +1,111 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +
+> +NSIM_DEV_SYS=/sys/bus/netdevsim
+> +NSIM_DEV_DFS=/sys/kernel/debug/netdevsim/netdevsim
+> +
+> +socat_check()
+> +{
+> +	if [ ! -x "$(command -v socat)" ]; then
+> +		echo "socat command not found. Skipping test"
+> +		return 1
+> +	fi
+> +
+> +	return 0
+> +}
+> +
+> +setup_ns()
+> +{
+> +	set -e
+> +	ip netns add nssv
+> +	ip netns add nscl
+> +
+> +	ip link set eni1np1 netns nssv
+> +	ip link set eni2np1 netns nscl
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jiawen-Wu/net-libwx-add-phylink-to-libwx/20231212-161804
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231212080438.1361308-6-jiawenwu%40trustnetic.com
-patch subject: [PATCH net-next v4 5/8] net: wangxun: add ethtool_ops for ring parameters
-config: mips-allmodconfig (https://download.01.org/0day-ci/archive/20231213/202312130411.eLnRwdT9-lkp@intel.com/config)
-compiler: mips-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231213/202312130411.eLnRwdT9-lkp@intel.com/reproduce)
+This assumes you have systemd renaming interfaces.
+I can find out what the netdev is called from sysfs.
+After you create the nsim device in its sysfs dir
+there will be a dir "net" and in it you'll have
+a subdir with the same name as the netdev.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312130411.eLnRwdT9-lkp@intel.com/
+> +	ip netns exec nssv ip addr add '192.168.1.1/24' dev eni1np1
+> +	ip netns exec nscl ip addr add '192.168.1.2/24' dev eni2np1
+> +
+> +	ip netns exec nssv ip link set dev eni1np1 up
+> +	ip netns exec nscl ip link set dev eni2np1 up
+> +	set +e
+> +}
+> +
+> +cleanup_ns()
+> +{
+> +	ip netns del nscl
+> +	ip netns del nssv
+> +}
+> +
+> +###
+> +### Code start
+> +###
+> +
+> +modprobe netdevsim
+> +
+> +# linking
+> +
+> +echo 1 > ${NSIM_DEV_SYS}/new_device
 
-All error/warnings (new ones prefixed by >>):
+Use $RANDOM to generate a random device ID.
 
-   drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c: In function 'ngbe_set_ringparam':
->> drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c:83:21: error: implicit declaration of function 'vmalloc'; did you mean 'kvmalloc'? [-Werror=implicit-function-declaration]
-      83 |         temp_ring = vmalloc(i * sizeof(struct wx_ring));
-         |                     ^~~~~~~
-         |                     kvmalloc
->> drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c:83:19: warning: assignment to 'struct wx_ring *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-      83 |         temp_ring = vmalloc(i * sizeof(struct wx_ring));
-         |                   ^
->> drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c:90:9: error: implicit declaration of function 'vfree'; did you mean 'kvfree'? [-Werror=implicit-function-declaration]
-      90 |         vfree(temp_ring);
-         |         ^~~~~
-         |         kvfree
-   cc1: some warnings being treated as errors
---
-   drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c: In function 'txgbe_set_ringparam':
->> drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c:50:21: error: implicit declaration of function 'vmalloc'; did you mean 'kvmalloc'? [-Werror=implicit-function-declaration]
-      50 |         temp_ring = vmalloc(i * sizeof(struct wx_ring));
-         |                     ^~~~~~~
-         |                     kvmalloc
->> drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c:50:19: warning: assignment to 'struct wx_ring *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-      50 |         temp_ring = vmalloc(i * sizeof(struct wx_ring));
-         |                   ^
->> drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c:57:9: error: implicit declaration of function 'vfree'; did you mean 'kvfree'? [-Werror=implicit-function-declaration]
-      57 |         vfree(temp_ring);
-         |         ^~~~~
-         |         kvfree
-   cc1: some warnings being treated as errors
+> +echo "2 0" > ${NSIM_DEV_DFS}1/ports/0/peer 2>/dev/null
+> +if [ $? -eq 0 ]; then
+> +	echo "linking with non-existent netdevsim should fail"
+> +	exit 1
+> +fi
+> +
+> +echo 2 > /sys/bus/netdevsim/new_device
+> +
+> +echo "2 0" > ${NSIM_DEV_DFS}1/ports/0/peer
+> +if [ $? -ne 0 ]; then
+> +	echo "linking netdevsim1 port0 with netdevsim2 port0 should succeed"
+> +	exit 1
+> +fi
+> +
+> +# argument error checking
+> +
+> +echo "2 1" > ${NSIM_DEV_DFS}1/ports/0/peer 2>/dev/null
+> +if [ $? -eq 0 ]; then
+> +	echo "linking with non-existent port in a netdevsim should fail"
+> +	exit 1
+> +fi
+> +
+> +echo "1 0" > ${NSIM_DEV_DFS}1/ports/0/peer 2>/dev/null
+> +if [ $? -eq 0 ]; then
+> +	echo "linking with self should fail"
+> +	exit 1
+> +fi
+> +
+> +echo "2 a" > ${NSIM_DEV_DFS}1/ports/0/peer 2>/dev/null
+> +if [ $? -eq 0 ]; then
+> +	echo "invalid arg should fail"
+> +	exit 1
+> +fi
+> +
+> +# send/recv packets
+> +
+> +socat_check || exit 1
 
-
-vim +83 drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-
-    46	
-    47	static int ngbe_set_ringparam(struct net_device *netdev,
-    48				      struct ethtool_ringparam *ring,
-    49				      struct kernel_ethtool_ringparam *kernel_ring,
-    50				      struct netlink_ext_ack *extack)
-    51	{
-    52		struct wx *wx = netdev_priv(netdev);
-    53		u32 new_rx_count, new_tx_count;
-    54		struct wx_ring *temp_ring;
-    55		int i, err = 0;
-    56	
-    57		if (ring->rx_mini_pending || ring->rx_jumbo_pending)
-    58			return -EOPNOTSUPP;
-    59	
-    60		new_tx_count = clamp_t(u32, ring->tx_pending, WX_MIN_TXD, WX_MAX_TXD);
-    61		new_tx_count = ALIGN(new_tx_count, WX_REQ_TX_DESCRIPTOR_MULTIPLE);
-    62	
-    63		new_rx_count = clamp_t(u32, ring->rx_pending, WX_MIN_RXD, WX_MAX_RXD);
-    64		new_rx_count = ALIGN(new_rx_count, WX_REQ_RX_DESCRIPTOR_MULTIPLE);
-    65	
-    66		if (new_tx_count == wx->tx_ring_count &&
-    67		    new_rx_count == wx->rx_ring_count)
-    68			return 0;
-    69	
-    70		if (!netif_running(wx->netdev)) {
-    71			for (i = 0; i < wx->num_tx_queues; i++)
-    72				wx->tx_ring[i]->count = new_tx_count;
-    73			for (i = 0; i < wx->num_rx_queues; i++)
-    74				wx->rx_ring[i]->count = new_rx_count;
-    75			wx->tx_ring_count = new_tx_count;
-    76			wx->rx_ring_count = new_rx_count;
-    77	
-    78			return 0;
-    79		}
-    80	
-    81		/* allocate temporary buffer to store rings in */
-    82		i = max_t(int, wx->num_tx_queues, wx->num_rx_queues);
-  > 83		temp_ring = vmalloc(i * sizeof(struct wx_ring));
-    84		if (!temp_ring)
-    85			return -ENOMEM;
-    86	
-    87		ngbe_down(wx);
-    88	
-    89		wx_set_ring(wx, new_tx_count, new_rx_count, temp_ring);
-  > 90		vfree(temp_ring);
-    91	
-    92		wx_configure(wx);
-    93		ngbe_up(wx);
-    94	
-    95		return err;
-    96	}
-    97	
-
+There's a magic return value for skipping kselftests, 1 means fail.
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+pw-bot: cr
 
