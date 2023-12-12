@@ -1,227 +1,87 @@
-Return-Path: <netdev+bounces-56532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9953980F393
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 17:51:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 773AB80F3CE
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 17:57:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 552A52815E5
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 16:51:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A834C1C20A96
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 16:57:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C7687A23B;
-	Tue, 12 Dec 2023 16:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B82067B3AE;
+	Tue, 12 Dec 2023 16:57:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NaS58RMi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6DCCCF
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 08:51:19 -0800 (PST)
-Received: from [141.14.30.220] (rabammel.molgen.mpg.de [141.14.30.220])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 9796461E5FE03;
-	Tue, 12 Dec 2023 17:50:56 +0100 (CET)
-Message-ID: <78ecdb9f-25e9-4847-87ed-6e8b44a7c71d@molgen.mpg.de>
-Date: Tue, 12 Dec 2023 17:50:55 +0100
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F7BA172B
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 08:57:44 -0800 (PST)
+Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-54c77d011acso13851a12.1
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 08:57:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702400263; x=1703005063; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LwudvX5vfK23B4UQIeq9h7dkxNvLHif10IbZjPRn0ng=;
+        b=NaS58RMiCzCqKPiWTlLWs+qHJDFdSH0PzSw69ELDqb75xpBkCub8YxlU0L5T8HSaM8
+         TZ0TSoyP/U2jHg1TEZANu+3ZrGSYUqZ1xffvf2vgyokEUUSLx/sWpIRMMlB/x/7bwAGY
+         jNQ+5p1bKsUVwjNXoxnCpXhSMTSUkg4tJ/GX6KUkloPuUj0saCOmJOpTKb8mUMxwG+BR
+         VlM5IY9UYU7f0a9kdnZmux9lVwEDWkpefsaZ54OO/J3WALXPJWuFajARTGAN0NlY56Js
+         rAqlvnnl4ZY7Wfd18hmno5WMH0pGSukP+FAHak6lclEuHSFSy86sTOM5wF/g1YH5YStu
+         rXow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702400263; x=1703005063;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LwudvX5vfK23B4UQIeq9h7dkxNvLHif10IbZjPRn0ng=;
+        b=RjBPh0+rRHNDicBp++nYJXFPNOoFbqm+Lp0nO9oWIcUlPEINDrpy6G4dk7h+ozfaqJ
+         Gxgl7AUL993OHIfY0MOBL58zLcv7ZKTIYHZg8DHii71WDj8uIU73onTjyMy/YjGO5t8c
+         wGBAHY3wiQjZOadPvyBwBEA41fY/axFt+1ioD+pGbA6/W9OvCzTYm1/rpxbn7EaUqD9J
+         M331ZnzRCXv5iGgXnaMKV3JOwmlGF+ENzHp/b9Qb/lIeF/hPnTcN/3DEUUX9w5jhghk0
+         u+JBdwR19Pt8zTcNMbjZBe0CdEQC6i1QIVLcVDvMmy0vk14gRuW8DJRZiW0BgVBWv5tH
+         TJww==
+X-Gm-Message-State: AOJu0YwIlLjI3t4240LmJsk2IyI/IU0DCD89QVJB92DKQ47pXaVy5T8V
+	19kCHPQffMVD/6hEwDpNFu6m6Pq2YM4aLbHHgryHXw==
+X-Google-Smtp-Source: AGHT+IEUrGLbyIxVjcxYXRKZ8o9x73q2VNkOCq1Qk5CHYcL+/o7Avu/zTmXgwJg6kvcb47I6J7rpJJULjxaKBr7V62g=
+X-Received: by 2002:a50:c192:0:b0:54c:f4fd:3427 with SMTP id
+ m18-20020a50c192000000b0054cf4fd3427mr370617edf.7.1702400262453; Tue, 12 Dec
+ 2023 08:57:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] idpf: enable WB_ON_ITR
-To: Michal Kubiak <michal.kubiak@intel.com>,
- Joshua Hay <joshua.a.hay@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, maciej.fijalkowski@intel.com,
- emil.s.tantilov@intel.com, larysa.zaremba@intel.com, netdev@vger.kernel.org,
- aleksander.lobakin@intel.com, alan.brady@intel.com,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-References: <20231212145546.396273-1-michal.kubiak@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20231212145546.396273-1-michal.kubiak@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20231205205030.3119672-1-victor@mojatatu.com> <20231205205030.3119672-3-victor@mojatatu.com>
+ <20231211182534.09392034@kernel.org> <CAM0EoMkYq+qqO6pwMy_G58_+PCT6A6EGtpPJXPkvQ1=aVvY=Sw@mail.gmail.com>
+In-Reply-To: <CAM0EoMkYq+qqO6pwMy_G58_+PCT6A6EGtpPJXPkvQ1=aVvY=Sw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 12 Dec 2023 17:57:28 +0100
+Message-ID: <CANn89i+-G0gTF=Vmr5NprYizdqXqpoQC5OvnXbc-7dA47tcdyQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/3] net: sched: Make tc-related drop reason
+ more flexible for remaining qdiscs
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Victor Nogueira <victor@mojatatu.com>, xiyou.wangcong@gmail.com, 
+	jiri@resnulli.us, davem@davemloft.net, pabeni@redhat.com, 
+	daniel@iogearbox.net, dcaratti@redhat.com, netdev@vger.kernel.org, 
+	kernel@mojatatu.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Dear Michal, dear Joshua,
+On Tue, Dec 12, 2023 at 5:28=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
 
+>
+> So when we looked at this code there was some mystery. It wasnt clear
+> how to_free could have more than one skb.
 
-Thank you for your patch.
+Some qdisc can free skbs at enqueue() time in  a batch for performance
+reason (fq_codel_drop() is such an instance)
 
-On 12/12/23 15:55, Michal Kubiak wrote:
-> From: Joshua Hay <joshua.a.hay@intel.com>
-> 
-> Tell hardware to writeback completed descriptors even when interrupts
-
-Should you resend, the verb is spelled with a space: write back.
-
-> are disabled. Otherwise, descriptors might not be written back until
-> the hardware can flush a full cacheline of descriptors. This can cause
-> unnecessary delays when traffic is light (or even trigger Tx queue
-> timeout).
-
-How can the problem be reproduced and the patch be verified?
-
-
-Kind regards,
-
-Paul
-
-
-> Fixes: c2d548cad150 ("idpf: add TX splitq napi poll support")
-> Fixes: a5ab9ee0df0b ("idpf: add singleq start_xmit and napi poll")
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-> Co-developed-by: Michal Kubiak <michal.kubiak@intel.com>
-> Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
-> ---
->  drivers/net/ethernet/intel/idpf/idpf_dev.c    |  2 ++
->  .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  6 ++++-
->  drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  7 +++++-
->  drivers/net/ethernet/intel/idpf/idpf_txrx.h   | 23 +++++++++++++++++++
->  drivers/net/ethernet/intel/idpf/idpf_vf_dev.c |  2 ++
->  5 files changed, 38 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_dev.c b/drivers/net/ethernet/intel/idpf/idpf_dev.c
-> index 34ad1ac46b78..2c6776086130 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_dev.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_dev.c
-> @@ -96,8 +96,10 @@ static int idpf_intr_reg_init(struct idpf_vport *vport)
->  		intr->dyn_ctl = idpf_get_reg_addr(adapter,
->  						  reg_vals[vec_id].dyn_ctl_reg);
->  		intr->dyn_ctl_intena_m = PF_GLINT_DYN_CTL_INTENA_M;
-> +		intr->dyn_ctl_intena_msk_m = PF_GLINT_DYN_CTL_INTENA_MSK_M;
->  		intr->dyn_ctl_itridx_s = PF_GLINT_DYN_CTL_ITR_INDX_S;
->  		intr->dyn_ctl_intrvl_s = PF_GLINT_DYN_CTL_INTERVAL_S;
-> +		intr->dyn_ctl_wb_on_itr_m = PF_GLINT_DYN_CTL_WB_ON_ITR_M;
->  
->  		spacing = IDPF_ITR_IDX_SPACING(reg_vals[vec_id].itrn_index_spacing,
->  					       IDPF_PF_ITR_IDX_SPACING);
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-> index 81288a17da2a..8e1478b7d86c 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-> @@ -1168,8 +1168,10 @@ int idpf_vport_singleq_napi_poll(struct napi_struct *napi, int budget)
->  						    &work_done);
->  
->  	/* If work not completed, return budget and polling will return */
-> -	if (!clean_complete)
-> +	if (!clean_complete) {
-> +		idpf_vport_intr_set_wb_on_itr(q_vector);
->  		return budget;
-> +	}
->  
->  	work_done = min_t(int, work_done, budget - 1);
->  
-> @@ -1178,6 +1180,8 @@ int idpf_vport_singleq_napi_poll(struct napi_struct *napi, int budget)
->  	 */
->  	if (likely(napi_complete_done(napi, work_done)))
->  		idpf_vport_intr_update_itr_ena_irq(q_vector);
-> +	else
-> +		idpf_vport_intr_set_wb_on_itr(q_vector);
->  
->  	return work_done;
->  }
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> index 1646ff3877ba..b496566ee2aa 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> @@ -3639,6 +3639,7 @@ void idpf_vport_intr_update_itr_ena_irq(struct idpf_q_vector *q_vector)
->  					      IDPF_NO_ITR_UPDATE_IDX, 0);
->  
->  	writel(intval, q_vector->intr_reg.dyn_ctl);
-> +	q_vector->wb_on_itr = false;
->  }
->  
->  /**
-> @@ -3930,8 +3931,10 @@ static int idpf_vport_splitq_napi_poll(struct napi_struct *napi, int budget)
->  	clean_complete &= idpf_tx_splitq_clean_all(q_vector, budget, &work_done);
->  
->  	/* If work not completed, return budget and polling will return */
-> -	if (!clean_complete)
-> +	if (!clean_complete) {
-> +		idpf_vport_intr_set_wb_on_itr(q_vector);
->  		return budget;
-> +	}
->  
->  	work_done = min_t(int, work_done, budget - 1);
->  
-> @@ -3940,6 +3943,8 @@ static int idpf_vport_splitq_napi_poll(struct napi_struct *napi, int budget)
->  	 */
->  	if (likely(napi_complete_done(napi, work_done)))
->  		idpf_vport_intr_update_itr_ena_irq(q_vector);
-> +	else
-> +		idpf_vport_intr_set_wb_on_itr(q_vector);
->  
->  	/* Switch to poll mode in the tear-down path after sending disable
->  	 * queues virtchnl message, as the interrupts will be disabled after
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-> index df76493faa75..50761c2d9f3b 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-> @@ -495,9 +495,11 @@ struct idpf_vec_regs {
->  struct idpf_intr_reg {
->  	void __iomem *dyn_ctl;
->  	u32 dyn_ctl_intena_m;
-> +	u32 dyn_ctl_intena_msk_m;
->  	u32 dyn_ctl_itridx_s;
->  	u32 dyn_ctl_itridx_m;
->  	u32 dyn_ctl_intrvl_s;
-> +	u32 dyn_ctl_wb_on_itr_m;
->  	void __iomem *rx_itr;
->  	void __iomem *tx_itr;
->  	void __iomem *icr_ena;
-> @@ -534,6 +536,7 @@ struct idpf_q_vector {
->  	struct napi_struct napi;
->  	u16 v_idx;
->  	struct idpf_intr_reg intr_reg;
-> +	bool wb_on_itr;
->  
->  	u16 num_txq;
->  	struct idpf_queue **tx;
-> @@ -973,6 +976,26 @@ static inline void idpf_rx_sync_for_cpu(struct idpf_rx_buf *rx_buf, u32 len)
->  				      page_pool_get_dma_dir(pp));
->  }
->  
-> +/**
-> + * idpf_vport_intr_set_wb_on_itr - enable descriptor writeback on disabled interrupts
-> + * @q_vector: pointer to queue vector struct
-> + */
-> +static inline void idpf_vport_intr_set_wb_on_itr(struct idpf_q_vector *q_vector)
-> +{
-> +	struct idpf_intr_reg *reg;
-> +
-> +	if (q_vector->wb_on_itr)
-> +		return;
-> +
-> +	reg = &q_vector->intr_reg;
-> +
-> +	writel(reg->dyn_ctl_wb_on_itr_m | reg->dyn_ctl_intena_msk_m |
-> +	       IDPF_NO_ITR_UPDATE_IDX << reg->dyn_ctl_itridx_s,
-> +	       reg->dyn_ctl);
-> +
-> +	q_vector->wb_on_itr = true;
-> +}
-> +
->  int idpf_vport_singleq_napi_poll(struct napi_struct *napi, int budget);
->  void idpf_vport_init_num_qs(struct idpf_vport *vport,
->  			    struct virtchnl2_create_vport *vport_msg);
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-> index 8ade4e3a9fe1..f5b0a0666636 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-> @@ -96,7 +96,9 @@ static int idpf_vf_intr_reg_init(struct idpf_vport *vport)
->  		intr->dyn_ctl = idpf_get_reg_addr(adapter,
->  						  reg_vals[vec_id].dyn_ctl_reg);
->  		intr->dyn_ctl_intena_m = VF_INT_DYN_CTLN_INTENA_M;
-> +		intr->dyn_ctl_intena_msk_m = VF_INT_DYN_CTLN_INTENA_MSK_M;
->  		intr->dyn_ctl_itridx_s = VF_INT_DYN_CTLN_ITR_INDX_S;
-> +		intr->dyn_ctl_wb_on_itr_m = VF_INT_DYN_CTLN_WB_ON_ITR_M;
->  
->  		spacing = IDPF_ITR_IDX_SPACING(reg_vals[vec_id].itrn_index_spacing,
->  					       IDPF_VF_ITR_IDX_SPACING);
+I agree that all skbs in this list have probably the same drop_reason ?
 
