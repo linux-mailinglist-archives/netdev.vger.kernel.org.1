@@ -1,96 +1,179 @@
-Return-Path: <netdev+bounces-56632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E892A80FA7B
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 23:40:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09F4A80FA8A
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 23:49:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 186061C20DE1
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 22:40:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A28E1281BEF
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 22:49:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C76ABC2EE;
-	Tue, 12 Dec 2023 22:40:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 133C21A739;
+	Tue, 12 Dec 2023 22:49:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="fhjqgjQD"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HsO1x5sF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-40134.protonmail.ch (mail-40134.protonmail.ch [185.70.40.134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1655CB2
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 14:40:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1702420818; x=1702680018;
-	bh=ykaoMZQh8JhRUub7yjof2pF9x4HUjbMvHg7m4xyvkF4=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=fhjqgjQD5sBx6/a8k/qX4MOOi7Nbac6W7jdmT46JZAxUVg5p1f5XaliHGQxMEGZ+G
-	 sZEr69TiO9mnbTsRa68LpuV8suonJH//nm20uYee3hclRNOKtubCmvT0j1v6V/WUT9
-	 dnuC2B3ecsbm/KSAp5clqveJpj2lBN02QH6y5Z76rIa6C6DaWi+PqwhPJGyw0vuAQ5
-	 FnZzYPCPJCSJJI9G4x8727JwEsrBQy6+jId2Eex8YZEXsqwjcv6vJonxnMAs04V9Gn
-	 lRROhAFS4wbJLi69MAKLkZLFUU7qnHk6S5tMj2+mRnD6TRzqH68eVirOVtbuQRRJf1
-	 fdP0DOHcQqo4Q==
-Date: Tue, 12 Dec 2023 22:40:01 +0000
-To: Boqun Feng <boqun.feng@gmail.com>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, alice@ryhl.io, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com, wedsonaf@gmail.com, aliceryhl@google.com
-Subject: Re: [PATCH net-next v10 1/4] rust: core abstractions for network PHY drivers
-Message-ID: <e9997f99-7261-4e9e-b465-e3869b6f4a6f@proton.me>
-In-Reply-To: <ZXjBKEBUrisSJ7Gx@boqun-archlinux>
-References: <ZXfFzKYMxBt7OhrM@boqun-archlinux> <20231212.130410.1213689699686195367.fujita.tomonori@gmail.com> <ZXf5g5srNnCtgcL5@Boquns-Mac-mini.home> <20231212.220216.1253919664184581703.fujita.tomonori@gmail.com> <544015ec-52a4-4253-a064-8a2b370c06dc@proton.me> <ZXjBKEBUrisSJ7Gx@boqun-archlinux>
-Feedback-ID: 71780778:user:proton
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95324AA
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 14:49:35 -0800 (PST)
+Message-ID: <6436a347-c4b1-4260-8f4f-96ed133626a8@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1702421373;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0nsWTOhCGXNAvvoNntKuIieUmUGFpzsKdJEkYYNqg5E=;
+	b=HsO1x5sF+1snzbLUHDunpv606DwjR5FyzqZlagz1c0o28u9EPDe1X/64GnTccEEyn0bU/f
+	/YVFJWEMz5DSJOU0Md0nwHKo5lh3mjokp8swFpnULsUj4TTIOefIsCNb6bQQ0BJiaEwEST
+	CEBgRuQa5KFLjmi/grUw6f9mEQpDMUM=
+Date: Tue, 12 Dec 2023 14:49:28 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v2 1/2] ss: add support for BPF socket-local storage
+Content-Language: en-US
+To: Quentin Deslandes <qde@naccy.de>
+Cc: David Ahern <dsahern@gmail.com>, Martin KaFai Lau
+ <martin.lau@kernel.org>, kernel-team@meta.com, netdev@vger.kernel.org
+References: <20231208145720.411075-1-qde@naccy.de>
+ <20231208145720.411075-2-qde@naccy.de>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20231208145720.411075-2-qde@naccy.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 12/12/23 21:23, Boqun Feng wrote:
-> On Tue, Dec 12, 2023 at 05:35:34PM +0000, Benno Lossin wrote:
->> [1]: Technically it is a combination of the following invariants:
->> - the `mdio` field of `struct phy_device` is a valid `struct mido_device=
-`
->> - the `bus` field of `struct mdio_device` is a valid pointer to a valid
->>   `struct mii_bus`.
->>
->>> If phy_read() is called here, I assume that you are happy about the
->>> above comment. The way to call mdiobus_read() here is safe because it
->>> just an open code of phy_read(). Simply adding it works for you?
->>>
->>> // SAFETY: `phydev` is pointing to a valid object by the type invariant=
- of `Self`.
->>> // So it's just an FFI call, open code of `phy_read()`.
->>
->> This would be fine if we decide to go with the exception I detailed
->> above. Although instead of "open code" I would write "see implementation
->> of `phy_read()`".
->>
->=20
-> So the rationale here is the callsite of mdiobus_read() is just a
-> open-code version of phy_read(), so if we meet the same requirement of
-> phy_read(), we should be safe here. Maybe:
->=20
-> =09"... open code of `phy_read()` with a valid phy_device pointer
-> =09`phydev`"
->=20
-> ?
+On 12/8/23 6:57 AM, Quentin Deslandes wrote:
+> +static inline bool bpf_map_opts_is_enabled(void)
 
-Hmm that might be OK if we add "TODO: replace this with `phy_read` once
-bindgen can handle static inline functions.".
+nit.
 
-Actually, why can't we just use the normal `rust_helper_*` approach? So
-just create a `rust_helper_phy_read` that calls `phy_read`. Then call
-that from the rust side. Doing this means that we can just keep the
-invariants of `struct phy_device` opaque to the Rust side.
-That would probably be preferable to adding the `TODO`, since when
-bindgen has this feature available, we will automatically handle this
-and not forget it. Also we have no issue with diverging code.
+This is the only "inline" usage in this file. I would avoid it and depend on the 
+compiler to decide.
 
---=20
-Cheers,
-Benno
+> +{
+> +	return bpf_map_opts.nr_maps;
+> +}
+> +
+
+[ ... ]
+
+>   static int inet_show_sock(struct nlmsghdr *nlh,
+>   			  struct sockstat *s)
+>   {
+> @@ -3381,8 +3620,8 @@ static int inet_show_sock(struct nlmsghdr *nlh,
+>   	struct inet_diag_msg *r = NLMSG_DATA(nlh);
+>   	unsigned char v6only = 0;
+>   
+> -	parse_rtattr(tb, INET_DIAG_MAX, (struct rtattr *)(r+1),
+> -		     nlh->nlmsg_len - NLMSG_LENGTH(sizeof(*r)));
+> +	parse_rtattr_flags(tb, INET_DIAG_MAX, (struct rtattr *)(r+1),
+> +		nlh->nlmsg_len - NLMSG_LENGTH(sizeof(*r)), NLA_F_NESTED);
+>   
+>   	if (tb[INET_DIAG_PROTOCOL])
+>   		s->type = rta_getattr_u8(tb[INET_DIAG_PROTOCOL]);
+> @@ -3479,6 +3718,11 @@ static int inet_show_sock(struct nlmsghdr *nlh,
+>   	}
+>   	sctp_ino = s->ino;
+>   
+> +	if (tb[INET_DIAG_SK_BPF_STORAGES]) {
+> +		field_set(COL_SKSTOR);
+> +		show_sk_bpf_storages(tb[INET_DIAG_SK_BPF_STORAGES]);
+> +	}
+> +
+>   	return 0;
+>   }
+>   
+> @@ -3560,13 +3804,14 @@ static int sockdiag_send(int family, int fd, int protocol, struct filter *f)
+>   {
+>   	struct sockaddr_nl nladdr = { .nl_family = AF_NETLINK };
+>   	DIAG_REQUEST(req, struct inet_diag_req_v2 r);
+> +	struct rtattr *bpf_stgs_rta = NULL;
+>   	char    *bc = NULL;
+>   	int	bclen;
+>   	__u32	proto;
+>   	struct msghdr msg;
+>   	struct rtattr rta_bc;
+>   	struct rtattr rta_proto;
+> -	struct iovec iov[5];
+> +	struct iovec iov[6];
+>   	int iovlen = 1;
+>   
+>   	if (family == PF_UNSPEC)
+> @@ -3619,6 +3864,17 @@ static int sockdiag_send(int family, int fd, int protocol, struct filter *f)
+>   		iovlen += 2;
+>   	}
+>   
+> +	if (bpf_map_opts_is_enabled()) {
+
+This will have compiler error when HAVE_LIBBPF is not set.
+
+> +		bpf_stgs_rta = bpf_map_opts_alloc_rta();
+> +		if (!bpf_stgs_rta) {
+> +			fprintf(stderr, "ss: cannot alloc request for --bpf-map\n");
+> +			return -1;
+> +		}
+> +
+> +		iov[iovlen++] = (struct iovec){ bpf_stgs_rta, bpf_stgs_rta->rta_len };
+> +		req.nlh.nlmsg_len += bpf_stgs_rta->rta_len;
+> +	}
+> +
+>   	msg = (struct msghdr) {
+>   		.msg_name = (void *)&nladdr,
+>   		.msg_namelen = sizeof(nladdr),
+
+[ ... ]
+
+> @@ -5712,6 +5982,16 @@ int main(int argc, char *argv[])
+>   		case OPT_INET_SOCKOPT:
+>   			show_inet_sockopt = 1;
+>   			break;
+> +#ifdef HAVE_LIBBPF
+> +		case OPT_BPF_MAPS:
+> +			if (bpf_map_opts_add_all())
+> +				exit(1);
+> +			break;
+> +		case OPT_BPF_MAP_ID:
+> +			if (bpf_map_opts_add_id(optarg))
+> +				exit(1);
+> +			break;
+> +#endif
+>   		case 'h':
+>   			help();
+>   		case '?':
+> @@ -5810,6 +6090,9 @@ int main(int argc, char *argv[])
+>   	if (!(current_filter.states & (current_filter.states - 1)))
+>   		columns[COL_STATE].disabled = 1;
+>   
+> +	if (bpf_map_opts.nr_maps)
+
+same here when HAVE_LIBBPF is not set
+
+> +		columns[COL_SKSTOR].disabled = 0;
+> +
+>   	if (show_header)
+>   		print_header();
+>   
+> @@ -5845,6 +6128,7 @@ int main(int argc, char *argv[])
+>   
+>   	if (show_processes || show_threads || show_proc_ctx || show_sock_ctx)
+>   		user_ent_destroy();
+> +	bpf_map_opts_destroy();
+
+same here.
+
+A #ifdef is needed.
+Another option is to create an empty or always-return-false function.
+
+>   
+>   	render();
+>   
 
 
