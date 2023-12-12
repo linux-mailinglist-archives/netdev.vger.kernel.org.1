@@ -1,163 +1,197 @@
-Return-Path: <netdev+bounces-56338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 420DC80E8DA
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 11:13:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFB7E80E8E6
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 11:17:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 667C81C20C3C
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:13:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F693B20E71
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:17:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2E395A0EC;
-	Tue, 12 Dec 2023 10:13:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287A55B5B7;
+	Tue, 12 Dec 2023 10:17:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nabijaczleweli.xyz header.i=@nabijaczleweli.xyz header.b="ZU9lbK0R"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="dcYNv8AT"
 X-Original-To: netdev@vger.kernel.org
-Received: from tarta.nabijaczleweli.xyz (tarta.nabijaczleweli.xyz [139.28.40.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 531CB19F;
-	Tue, 12 Dec 2023 02:12:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
-	s=202305; t=1702375975;
-	bh=XiOBb6P57asxhXUqF6o8dX8NQpgZ1/qlFGt6+205E9w=;
-	h=Date:From:To:Subject:References:In-Reply-To:From;
-	b=ZU9lbK0RZzdSsInvI8z6QMcZ/XDf2Hc+ZSU41pM7IAWZzlT5X1VzbB3bzTqqhZnsj
-	 HpZAPs1CvELOwffrO7yXxL4+mebVIkgC4AMBhV4yggThKpbfuMhxFRIrxO9hDLbiaU
-	 kqvDE+0uNlpwgs04+0H+h0kczUaF8hzPO2+XUOM9MD76VysjRpK9Hl2lHq+KX7F/lf
-	 OPGFZUtMau3mPGvCn7W1YSDAZqB2uQ79ViMR62wNJPD8pa6NCJM6M4QatgZCANjMVA
-	 MSNhZKZUXZCCS6vN9g4iTmnLYtpWZbsVSOAo4crQHompF6atfDC4dPcDcrSDcJ38RE
-	 NEPIz/z31IdsA==
-Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
-	by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id 4F3E413780;
-	Tue, 12 Dec 2023 11:12:55 +0100 (CET)
-Date: Tue, 12 Dec 2023 11:12:55 +0100
-From: 
-	Ahelenia =?utf-8?Q?Ziemia=C5=84ska?= <nabijaczleweli@nabijaczleweli.xyz>
-To: Eric Dumazet <edumazet@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: [PATCH RESEND 09/11] net/tcp: tcp_splice_read: always do
- non-blocking reads
-Message-ID: <1d44f2f64c18151d103ee045d1e3ce7a7d5534273.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
-User-Agent: NeoMutt/20231103
-References: <cover.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5B0492
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 02:17:39 -0800 (PST)
+Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-54dccf89cfdso7133078a12.0
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 02:17:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702376258; x=1702981058; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IyFz37zOopijAs6FvGs9QhUXSjjHqSSR9f3mj9EE3Lk=;
+        b=dcYNv8AT5SIvuM4lcLDrZFDm6ZxZn9Hx/qn0SH65jFd6xxS0sITBu5NZfJBV0NQxTD
+         e4GgmuyxrN5YWEEIw7FQZtznV0rAzKEV2UxCg8Idm+fwzHdX7odao4OknUq2Kyh6UkU1
+         xkLrWGQLP+TSBTlVv0BeBnhyqKkNxaWcBi53lIGVZ4+mG4gxo/VKTGdwDLGipUSTWXnA
+         j4dXNb9jk/2cAy9hepl1aT/X5hE6Wds1RhAhcD8M+1ip83LKD3EB0aQacmfLMY3XBcBe
+         ONfG0j4vzhL8i8o+89UE8QMTPPyRcixerar1HcpMC8xMu8scpobQ7oL8BaJesq2Yytel
+         OG9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702376258; x=1702981058;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IyFz37zOopijAs6FvGs9QhUXSjjHqSSR9f3mj9EE3Lk=;
+        b=mpPpVn1WJgJCP6nGLyQ/rYHmJRMzm4dN7ZxUZDdmAsDVascxFTy6z8OoBSp7UE9Ad7
+         MKCALrU6Q+8H0qzwDleMpQcfqswiL3fR4KJPI6yarpjTzhOO5uueOa2ZGlJA8lZaqupL
+         OS53JHdfOpwi4BUH4e3r8YDaUDoUeXLHqVfFQ+S3yD0/BbOF82BSjDwkX8w9MKzDrw7t
+         NU9N15FXLz4yaxvhkj55SSOUMF7zqxhYP7kn2TRybK7bcjFDitG8zLL6THCTNzUBpdZj
+         hg6EuFAl/IQ4t3krNyCgLNM5a3AfnEiw9NYi9MFj5RKm6wdNqR9AcXX6XtbS1ZMwgz7u
+         /bMw==
+X-Gm-Message-State: AOJu0YwWvyHsAjhJjd5tT2mTS1RY6H1rBopHXPmE/eP/j0HiPS1RFK3C
+	74SJJpgoKw5RGaR3u1upxY9SVUUCNhhzORJEW+w=
+X-Google-Smtp-Source: AGHT+IFZAprxrA5q+J0jssi1IEfkogw8dvcU1bVZFyJtqBwuT5fem0vHv3Q+dtkMv88IBoUHY0385Q==
+X-Received: by 2002:a50:8e15:0:b0:54c:4837:9a96 with SMTP id 21-20020a508e15000000b0054c48379a96mr3716015edw.61.1702376257968;
+        Tue, 12 Dec 2023 02:17:37 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id dk11-20020a0564021d8b00b0054c8415f834sm4607360edb.34.2023.12.12.02.17.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Dec 2023 02:17:37 -0800 (PST)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	jacob.e.keller@intel.com,
+	jhs@mojatatu.com,
+	johannes@sipsolutions.net,
+	andriy.shevchenko@linux.intel.com,
+	amritha.nambiar@intel.com,
+	sdf@google.com,
+	horms@kernel.org,
+	przemyslaw.kitszel@intel.com
+Subject: [patch net-next v6 0/9] devlink: introduce notifications filtering
+Date: Tue, 12 Dec 2023 11:17:27 +0100
+Message-ID: <20231212101736.1112671-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="czo5rnf2ad2yjhau"
-Content-Disposition: inline
-In-Reply-To: <1cover.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
+Content-Transfer-Encoding: 8bit
 
+From: Jiri Pirko <jiri@nvidia.com>
 
---czo5rnf2ad2yjhau
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Currently the user listening on a socket for devlink notifications
+gets always all messages for all existing devlink instances and objects,
+even if he is interested only in one of those. That may cause
+unnecessary overhead on setups with thousands of instances present.
 
-Otherwise we risk sleeping with the pipe locked for indeterminate
-lengths of time.
+User is currently able to narrow down the devlink objects replies
+to dump commands by specifying select attributes.
 
-sock_rcvtimeo() returns 0 if the second argument is true, so the
-explicit re-try loop for empty read conditions can be removed
-entirely.
+Allow similar approach for notifications providing user a new
+notify-filter-set command to select attributes with values
+the notification message has to match. In that case, it is delivered
+to the socket.
 
-Link: https://lore.kernel.org/linux-fsdevel/qk6hjuam54khlaikf2ssom6custxf5i=
-s2ekkaequf4hvode3ls@zgf7j5j4ubvw/t/#u
-Signed-off-by: Ahelenia Ziemia=C5=84ska <nabijaczleweli@nabijaczleweli.xyz>
+Note that the filtering is done per-socket, so multiple users may
+specify different selection of attributes with values.
+
+This patchset initially introduces support for following attributes:
+DEVLINK_ATTR_BUS_NAME
+DEVLINK_ATTR_DEV_NAME
+DEVLINK_ATTR_PORT_INDEX
+
+Patches #1 - #4 are preparations in devlink code, patch #3 is
+                an optimization done on the way.
+Patches #5 - #7 are preparations in netlink and generic netlink code.
+Patch #8 is the main one in this set implementing of
+         the notify-filter-set command and the actual
+         per-socket filtering.
+Patch #9 extends the infrastructure allowing to filter according
+         to a port index.
+
+Example:
+$ devlink mon port pci/0000:08:00.0/32768
+[port,new] pci/0000:08:00.0/32768: type notset flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
+  function:
+    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
+[port,new] pci/0000:08:00.0/32768: type eth flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
+  function:
+    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
+[port,new] pci/0000:08:00.0/32768: type eth netdev eth3 flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
+  function:
+    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
+[port,new] pci/0000:08:00.0/32768: type eth netdev eth3 flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
+  function:
+    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
+[port,new] pci/0000:08:00.0/32768: type eth flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
+  function:
+    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
+[port,new] pci/0000:08:00.0/32768: type notset flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
+  function:
+    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
+[port,del] pci/0000:08:00.0/32768: type notset flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
+  function:
+    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
+
 ---
- net/ipv4/tcp.c | 30 +++---------------------------
- 1 file changed, 3 insertions(+), 27 deletions(-)
+v5->v6:
+- in patch #5 added family removal handling of privs destruction,
+  couple other things, see the patch changelog for details
+v4->v5:
+- converted priv pointer in netlink_sock to genl_sock container,
+  containing xarray pointer
+- introduced per-family init/destroy callbacks and priv_size to allocate
+  per-sock private, converted devlink to that
+- see patches #5 and #8 for more details
+v3->v4:
+- converted from sk_user_data pointer use to nlk(sk)->priv pointer and
+  allow priv to be stored for multiple generic netlink families, see
+  patch #5 for more details
+v2->v3:
+- small cosmetical fixes in patch #6
+v1->v2:
+- added patch #6, fixed generated docs
+- see individual patches for details
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 3f66cdeef7de..09b562e2c1bf 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -782,7 +782,6 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *pp=
-os,
- 		.len =3D len,
- 		.flags =3D flags,
- 	};
--	long timeo;
- 	ssize_t spliced;
- 	int ret;
-=20
-@@ -797,7 +796,6 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *pp=
-os,
-=20
- 	lock_sock(sk);
-=20
--	timeo =3D sock_rcvtimeo(sk, sock->file->f_flags & O_NONBLOCK);
- 	while (tss.len) {
- 		ret =3D __tcp_splice_read(sk, &tss);
- 		if (ret < 0)
-@@ -821,35 +819,13 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *=
-ppos,
- 				ret =3D -ENOTCONN;
- 				break;
- 			}
--			if (!timeo) {
--				ret =3D -EAGAIN;
--				break;
--			}
--			/* if __tcp_splice_read() got nothing while we have
--			 * an skb in receive queue, we do not want to loop.
--			 * This might happen with URG data.
--			 */
--			if (!skb_queue_empty(&sk->sk_receive_queue))
--				break;
--			sk_wait_data(sk, &timeo, NULL);
--			if (signal_pending(current)) {
--				ret =3D sock_intr_errno(timeo);
--				break;
--			}
--			continue;
-+			ret =3D -EAGAIN;
-+			break;
- 		}
- 		tss.len -=3D ret;
- 		spliced +=3D ret;
-=20
--		if (!tss.len || !timeo)
--			break;
--		release_sock(sk);
--		lock_sock(sk);
--
--		if (sk->sk_err || sk->sk_state =3D=3D TCP_CLOSE ||
--		    (sk->sk_shutdown & RCV_SHUTDOWN) ||
--		    signal_pending(current))
--			break;
-+		break;
- 	}
-=20
- 	release_sock(sk);
---=20
-2.39.2
+Jiri Pirko (9):
+  devlink: use devl_is_registered() helper instead xa_get_mark()
+  devlink: introduce __devl_is_registered() helper and use it instead of
+    xa_get_mark()
+  devlink: send notifications only if there are listeners
+  devlink: introduce a helper for netlink multicast send
+  genetlink: introduce per-sock family private storage
+  netlink: introduce typedef for filter function
+  genetlink: introduce helpers to do filtered multicast
+  devlink: add a command to set notification filter and use it for
+    multicasts
+  devlink: extend multicast filtering by port index
 
---czo5rnf2ad2yjhau
-Content-Type: application/pgp-signature; name="signature.asc"
+ Documentation/netlink/specs/devlink.yaml |  11 ++
+ drivers/connector/connector.c            |   5 +-
+ include/linux/connector.h                |   3 +-
+ include/linux/netlink.h                  |   6 +-
+ include/net/genetlink.h                  |  51 +++++-
+ include/net/netlink.h                    |  31 +++-
+ include/uapi/linux/devlink.h             |   2 +
+ net/devlink/dev.c                        |  13 +-
+ net/devlink/devl_internal.h              |  59 ++++++-
+ net/devlink/health.c                     |  10 +-
+ net/devlink/linecard.c                   |   5 +-
+ net/devlink/netlink.c                    | 116 +++++++++++++
+ net/devlink/netlink_gen.c                |  16 +-
+ net/devlink/netlink_gen.h                |   4 +-
+ net/devlink/param.c                      |   5 +-
+ net/devlink/port.c                       |   8 +-
+ net/devlink/rate.c                       |   5 +-
+ net/devlink/region.c                     |   6 +-
+ net/devlink/trap.c                       |  18 +-
+ net/netlink/af_netlink.c                 |   5 +-
+ net/netlink/af_netlink.h                 |   7 +
+ net/netlink/genetlink.c                  | 207 ++++++++++++++++++++++-
+ 22 files changed, 539 insertions(+), 54 deletions(-)
 
------BEGIN PGP SIGNATURE-----
+-- 
+2.43.0
 
-iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmV4MiYACgkQvP0LAY0m
-WPG3pw/6AkQyD3FZBepovZHpwSZiqDwdJ9GGHQ77hQiX8gJnNC+TGeFLAF1+nw1O
-QMj+1IeWG9LEeZOVTUJ68lOTDxWkSUOCCHg7H4gWXOX01bdSNpjlEpg5A57ywcE0
-/aZ24rp3Cd0mnAFH46+GMS7A3DnAkV4YsnwdlJkUTODJbezpgZ6Z7Z7bK9ybeAFM
-vmUnIwOwO+laatF6fKqV/W8GMyQ8c5wQDFOuvwFAyQ6iK0nwFT6fb8GaFKeKC9n9
-XsZubuU0sNanrheeOfe5EB4fwWc4T0R9QoEWrl8afOZLd1O0N18PtkNaP4UiilrH
-8p5HWhGfX1m49nUENqq7n2ywAjdRq1+PyUPPrIWqFu/3+wtV5RGgnKuPKlXxKuow
-FJfxO8LQvu/ZgX/tzEefKtAUC+pPblGXIKZbSeq1jahq4Lbw8B/x/FYW/ikBeta8
-F8CiYtZ0bMHao4Z/ng8GUfb0iKr0usQdGpFhfSdjkl8c+0yY5Is5+6q2cPIwnqIj
-Wqc9AvFO+3pcslrwIDiuxe/F6VlRQYOar71iJaO0C1uJpsjY2g2z3cuTr5r4RSRb
-4JTaRpL4obBnaWCzFFmxYyuVP7jb9oK/XzjuWELkbZVsW0xiFHO1zdHaQ7cCHO1u
-vKIhu3Ugwd72ArwRshXMGFVg2rmTyfugVtXrL/tfv8zDrpHYapk=
-=1yQZ
------END PGP SIGNATURE-----
-
---czo5rnf2ad2yjhau--
 
