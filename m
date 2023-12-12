@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-56427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E155580ED0E
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:16:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9156880ED3F
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:18:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DA2C1C20A87
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 13:16:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E222B20BB5
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 13:18:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D17E61676;
-	Tue, 12 Dec 2023 13:16:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1CEB61680;
+	Tue, 12 Dec 2023 13:18:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iEft57K0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VnI+7MND"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6647109
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 05:16:23 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E147129
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 05:18:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702386983;
+	s=mimecast20190719; t=1702387112;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=31wrvrreNEeInHOXuhN21MS2MQUmzm4Dvi8rAQtOaUU=;
-	b=iEft57K0li+n2oYWmapKmUdoKisQAd775nkwOKneGAMbVRH7jbCp1ga7NJLWt8eXRityq0
-	YDSDrFtckvk5cXEjmhPX30d8+Jv8kqhpyp1WcHFpc9Mp4s95MSWYZ9hm7Uu03sDIINAGVP
-	l9li2w5v81o8330/W/4UqOjh9Btn5mw=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=YtAY/8Q29keHt7QBoc7eICnjFln2HFGD2DIjEnbsd1I=;
+	b=VnI+7MNDuz90qQww75/4W8UoDJZwf9SBa2ZuCVEztQ8sZGr69eXxKrXx8pcbI/ot+Mvi1h
+	EIsFaoo+hBGqQ8yER9Mer+Wb6EocBEis11cbfDUnfk7nVc5L4HZd+2VYgAK1dNzH01zizH
+	/pwKUx7QkszGkaSDQ/CU3Pfv/4L7rRg=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-30-ZqFNwAp2Pmmii8oYuHD0_g-1; Tue, 12 Dec 2023 08:16:21 -0500
-X-MC-Unique: ZqFNwAp2Pmmii8oYuHD0_g-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a1d27c45705so121206866b.0
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 05:16:21 -0800 (PST)
+ us-mta-577-faQ91B_xMUWFQzqEId62Yw-1; Tue, 12 Dec 2023 08:18:31 -0500
+X-MC-Unique: faQ91B_xMUWFQzqEId62Yw-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2cc31ee9981so49381fa.0
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 05:18:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702386980; x=1702991780;
+        d=1e100.net; s=20230601; t=1702387109; x=1702991909;
         h=mime-version:user-agent:content-transfer-encoding:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=31wrvrreNEeInHOXuhN21MS2MQUmzm4Dvi8rAQtOaUU=;
-        b=Jj4S0QprWIkcqeJtTVVVN5dmy/sA502m3IKWHeXonWJYxQ0OGgHQHGxhnDe+sdRXIP
-         1fiMlhneBOUVwuC09QoaIB8H3rjZMs1HKqzVv5WQguGutXUE5gTjQBy1B+msHtuZ0w5L
-         XpI2WNXyiklfZv3c9jYwOVrRQ6G6iHrSISlDtDl9IY2lZFhfraWQA3Htd+67eDlquhzy
-         OpcAPwddxQ5A9jQecV6XC4ASmp2WkMFjllkiv74y4WZxDI2r6ySxPcg7inXcVoemOUxd
-         SI8SN3iZUQDrapHCUhMXCvq5tCLbkgqJq1e2+l2HbmeoUGZB9ZBtldsq6YEeb3Lr4yM5
-         xb2Q==
-X-Gm-Message-State: AOJu0YylHxm6UdqNlOSdsoxfHr/KNT3IP5VqkLiumW7sw1cZ3M2vWmlD
-	eS4ZKCuMm4ev19rqfrxWQChnaYxHBkGoagiW6ZKsDURo8WebM1MHCQ1swtGhZorOyIaCsG+Kuvm
-	78C7howKdmkLHaWkltABpPxHA
-X-Received: by 2002:a17:906:99cf:b0:a1c:5944:29bb with SMTP id s15-20020a17090699cf00b00a1c594429bbmr6450387ejn.7.1702386980289;
-        Tue, 12 Dec 2023 05:16:20 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG2ZLRjLhUTpIIGlTgfEva2UaraTVf0p1iAzwo3/M7gSzZ2erm9hLDOHhzvdgR1wjPWws1Shw==
-X-Received: by 2002:a17:906:99cf:b0:a1c:5944:29bb with SMTP id s15-20020a17090699cf00b00a1c594429bbmr6450367ejn.7.1702386979905;
-        Tue, 12 Dec 2023 05:16:19 -0800 (PST)
+        bh=YtAY/8Q29keHt7QBoc7eICnjFln2HFGD2DIjEnbsd1I=;
+        b=l8q2Y7jzqq+egxTJXI4QK48A1JRLU90+Rte6+SgVLgznEjOrGoFfWJqLGCZcYjWzMy
+         ZmQnp+uzmCd3/2Y+DUsYOCJkkPz+BiC6iyqzmfMoVg5YkiqgW5RYw5YIuOfL9S9+rNkL
+         t37jnv6+Vs7WQ1iDq16Uqi8qdtH1NE19xXOmu3KovVgdPJUhXyKuMGiN9HyCS8qxjXQ1
+         mr0BRohIXYL34rjdriUx9nDHeiFsGlkjFUA+IPsfegh5XFRJ5R6PlFfgqKBMntNPvB9z
+         +3ybbXbVo1qaYcN3GvH3uDzb4nfJgOakrfWMkUm8cyCUiRwrfkvl14KJKX+uyFeRhblU
+         UOxw==
+X-Gm-Message-State: AOJu0YxbU97A2al/ZelMZozSYxi9sN78gHQAgVCc42bTZznH/BtULiHv
+	RLg0MrU36bk2PqlgWSYIa3aneSVY6WDwAHnq6R+t9iqJEKJOqXXg+1thYwZPq6kSGw7DB+MXjvV
+	IaWFwfz3pl3NviAjA79tWcEpM
+X-Received: by 2002:ac2:5f99:0:b0:50b:fea2:29c with SMTP id r25-20020ac25f99000000b0050bfea2029cmr4620139lfe.6.1702387109505;
+        Tue, 12 Dec 2023 05:18:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFWUIyyGidc4iOeWtSOGBALG4qvZLnE7/PtKfgojArm+pEG1pi9RRlNo2w4Kx4/ZwXfGmP68g==
+X-Received: by 2002:ac2:5f99:0:b0:50b:fea2:29c with SMTP id r25-20020ac25f99000000b0050bfea2029cmr4620130lfe.6.1702387109123;
+        Tue, 12 Dec 2023 05:18:29 -0800 (PST)
 Received: from gerbillo.redhat.com (146-241-249-182.dyn.eolo.it. [146.241.249.182])
-        by smtp.gmail.com with ESMTPSA id ub26-20020a170907c81a00b00a1c96e987c4sm6307592ejc.101.2023.12.12.05.16.18
+        by smtp.gmail.com with ESMTPSA id vw18-20020a170907059200b00a1712cbddebsm6216701ejb.187.2023.12.12.05.18.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 05:16:19 -0800 (PST)
-Message-ID: <ddeff631a676d2763eb42fa620672c57743c514e.camel@redhat.com>
+        Tue, 12 Dec 2023 05:18:28 -0800 (PST)
+Message-ID: <525abd42a7a5b45bb70e184b9c3e6b7e37b48339.camel@redhat.com>
 Subject: Re: [PATCH net-next 2/2] net: dsa: realtek: Rewrite RTL8366RB MTU
  handling
 From: Paolo Abeni <pabeni@redhat.com>
@@ -69,10 +69,11 @@ To: Linus Walleij <linus.walleij@linaro.org>, Alvin =?UTF-8?Q?=C5=A0ipraga?=
  Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
  Kicinski <kuba@kernel.org>
 Cc: netdev@vger.kernel.org
-Date: Tue, 12 Dec 2023 14:16:18 +0100
-In-Reply-To: <20231209-rtl8366rb-mtu-fix-v1-2-df863e2b2b2a@linaro.org>
+Date: Tue, 12 Dec 2023 14:18:27 +0100
+In-Reply-To: <ddeff631a676d2763eb42fa620672c57743c514e.camel@redhat.com>
 References: <20231209-rtl8366rb-mtu-fix-v1-0-df863e2b2b2a@linaro.org>
 	 <20231209-rtl8366rb-mtu-fix-v1-2-df863e2b2b2a@linaro.org>
+	 <ddeff631a676d2763eb42fa620672c57743c514e.camel@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
@@ -83,33 +84,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Sat, 2023-12-09 at 23:37 +0100, Linus Walleij wrote:
-> The MTU callbacks are in layer 1 size, so for example 1500
-> bytes is a normal setting. Cache this size, and only add
-> the layer 2 framing right before choosing the setting. On
-> the CPU port this will however include the DSA tag since
-> this is transmitted from the parent ethernet interface!
+On Tue, 2023-12-12 at 14:16 +0100, Paolo Abeni wrote:
+> On Sat, 2023-12-09 at 23:37 +0100, Linus Walleij wrote:
+> > The MTU callbacks are in layer 1 size, so for example 1500
+> > bytes is a normal setting. Cache this size, and only add
+> > the layer 2 framing right before choosing the setting. On
+> > the CPU port this will however include the DSA tag since
+> > this is transmitted from the parent ethernet interface!
+> >=20
+> > Add the layer 2 overhead such as ethernet and VLAN framing
+> > and FCS before selecting the size in the register.
+> >=20
+> > This will make the code easier to understand.
+> >=20
+> > The rtl8366rb_max_mtu() callback returns a bogus MTU
+> > just subtracting the CPU tag, which is the only thing
+> > we should NOT subtract. Return the correct layer 1
+> > max MTU after removing headers and checksum.
+> >=20
+> > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 >=20
-> Add the layer 2 overhead such as ethernet and VLAN framing
-> and FCS before selecting the size in the register.
+> FTR, my understanding is that the possible MTU API changes still under
+> discussion, are somewhat orthogonal to this patch, which is suitable
+> as-is for net.
+
+Typo above -> 'net-next'.
+
 >=20
-> This will make the code easier to understand.
+> I'm applying this fixes right now.
 >=20
-> The rtl8366rb_max_mtu() callback returns a bogus MTU
-> just subtracting the CPU tag, which is the only thing
-> we should NOT subtract. Return the correct layer 1
-> max MTU after removing headers and checksum.
+> Cheers,
 >=20
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-
-FTR, my understanding is that the possible MTU API changes still under
-discussion, are somewhat orthogonal to this patch, which is suitable
-as-is for net.
-
-I'm applying this fixes right now.
-
-Cheers,
-
-Paolo=20
+> Paolo=20
 
 
