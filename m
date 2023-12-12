@@ -1,224 +1,132 @@
-Return-Path: <netdev+bounces-56153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E447D80DFD4
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 01:06:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BA7080DFDF
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 01:13:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21E141C214E7
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:06:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D046E1F210AC
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:13:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD27375;
-	Tue, 12 Dec 2023 00:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF96D625;
+	Tue, 12 Dec 2023 00:13:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hz1lYfhf"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 578CDB8;
-	Mon, 11 Dec 2023 16:05:53 -0800 (PST)
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1rCqHJ-00020L-1F;
-	Tue, 12 Dec 2023 00:05:38 +0000
-Date: Tue, 12 Dec 2023 00:05:35 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: phy: skip LED triggers on PHYs on SFP modules
-Message-ID: <102a9dce38bdf00215735d04cd4704458273ad9c.1702339354.git.daniel@makrotopia.org>
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50B98AD
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:13:51 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-28659b38bc7so4959455a91.0
+        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:13:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702340031; x=1702944831; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ScQZLhcNPTzdV1j1C4hAKQFBwcpgFYv9Fvct2PilQKA=;
+        b=hz1lYfhfQPhHWibO4VKADqS5MnvhJBAOGwfEH4vr6+FYYF8jTiA32AMiyIL+3sLWsv
+         r43Sdz6eLrXeTf7WgQuvjA44Er3e3IVSRp9JR4M+H4HM3SS+0KrYWwASA1LSYuBKsnCZ
+         m0XSAZv52azoviuiPTUqUH3UtcJK9cn6cse6VMiD/kFLNd5KlVq7+124ia8KIT7UDn8y
+         LGOLfxQD7RVLtlO5lNa62xecjDls9SicNt95Q8rA7Kz/tUY6DurGy3tg+Qrd5yPaZJ1X
+         KVxLziMoPwBqbJnZNwKOMJVlKf498J7KgH413j0jxLK6eO1bWrzDtERCuGs1065Dv7cp
+         x/CA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702340031; x=1702944831;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ScQZLhcNPTzdV1j1C4hAKQFBwcpgFYv9Fvct2PilQKA=;
+        b=HxasVCqBFl8bpjUG5Mt5Hf9p1zYq0BH4ayCHBGnAqXXoR3mCMizBfd6GhnCsTdOLgg
+         klAooa77kYorR74dfHrGU32WE7Jbf35eJnDIV8v4+YHXNJilOcWYdStdwjpOHgMwgSeW
+         dgtf4gHf537PXiAa7n2QRg8GsoB0YUa4orPLynpcsEAUeLqPID0udelKdhfTVzDtJZbn
+         ighy194sKGXeGcmKNdtcgG6/JZwgiBwRYn/xlPwDnq4c1bkCdgzb8daRznF2mWsBcr6F
+         YQsuhAk6HtOcDpGfGgvoZIWibfDR7jOQLi7EGKHJ9yuaZ6BgMDpRRBtZt8bDvicqjaiu
+         Hbog==
+X-Gm-Message-State: AOJu0YwfpXUUUsZ0zTCwJnq6WQRzABjDiLEPMJsok8gFYdGQeNsAhn0u
+	S6mIyjNXeaSSkNf5SBvWYxQ=
+X-Google-Smtp-Source: AGHT+IHzrT8T21hiUAMqxZOPG2c1TfHWIGcZVGsu2Rz6Ho/2dw9d5PeVoKorCt+0OMAgMt7Fs5DLDg==
+X-Received: by 2002:a17:90a:744a:b0:286:9b7a:93c8 with SMTP id o10-20020a17090a744a00b002869b7a93c8mr3718488pjk.53.1702340030585;
+        Mon, 11 Dec 2023 16:13:50 -0800 (PST)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id gg9-20020a17090b0a0900b0028679f2ee38sm94537pjb.0.2023.12.11.16.13.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Dec 2023 16:13:49 -0800 (PST)
+Message-ID: <a82b3ba5-6c1b-44de-ba27-4b5f49c67bc3@gmail.com>
+Date: Mon, 11 Dec 2023 16:13:46 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 net-next 6/8] net: dsa: mv88e6xxx: Limit histogram
+ counters to ingress traffic
+Content-Language: en-US
+To: Tobias Waldekranz <tobias@waldekranz.com>, davem@davemloft.net,
+ kuba@kernel.org
+Cc: andrew@lunn.ch, olteanv@gmail.com, netdev@vger.kernel.org
+References: <20231211223346.2497157-1-tobias@waldekranz.com>
+ <20231211223346.2497157-7-tobias@waldekranz.com>
+ <aeac0d23-26e3-4415-9a77-f649d3d48536@gmail.com>
+ <87plzc8g9f.fsf@waldekranz.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <87plzc8g9f.fsf@waldekranz.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Calling led_trigger_register() when attaching a PHY located on an SFP
-module potentially (and practically) leads into a deadlock.
-Fix this by not calling led_trigger_register() for PHYs localted on SFP
-modules as such modules actually never got any LEDs.
+On 12/11/23 15:35, Tobias Waldekranz wrote:
+> On mon, dec 11, 2023 at 15:03, Florian Fainelli <f.fainelli@gmail.com> wrote:
+>> On 12/11/23 14:33, Tobias Waldekranz wrote:
+>>> Chips in this family only has one set of histogram counters, which can
+>>> be used to count ingressing and/or egressing traffic. mv88e6xxx has,
+>>> up until this point, kept the hardware default of counting both
+>>> directions.
+>>
+>> s/has/have/
+>>
+>>>
+>>> In the mean time, standard counter group support has been added to
+>>> ethtool. Via that interface, drivers may report ingress-only and
+>>> egress-only histograms separately - but not combined.
+>>>
+>>> In order for mv88e6xxx to maximalize amount of diagnostic information
+>>> that can be exported via standard interfaces, we opt to limit the
+>>> histogram counters to ingress traffic only. Which will allow us to
+>>> export them via the standard "rmon" group in an upcoming commit.
+>>
+>> s/maximalize/maximize/
+>>
+>>>
+>>> The reason for choosing ingress-only over egress-only, is to be
+>>> compatible with RFC2819 (RMON MIB).
+>>>
+>>> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
+>>
+>> Out of curiosity: does this commit and the next one need to be swapped
+>> in order to surprises if someone happened to be bisecting across this
+>> patch series?
+> 
+> I'm not sure I follow. This commit only changes the behavior of the
+> existing counters (ethtool -S). If it was swapped with the next one,
+> then there would be one commit in the history in which the "rmon"
+> histogram counters would report the wrong values (the bug pointed out by
+> Vladimir on v2)
 
-======================================================
-WARNING: possible circular locking dependency detected
-6.7.0-rc4-next-20231208+ #0 Tainted: G           O
-------------------------------------------------------
-kworker/u8:2/43 is trying to acquire lock:
-ffffffc08108c4e8 (triggers_list_lock){++++}-{3:3}, at: led_trigger_register+0x4c/0x1a8
+Right, somehow I thought there was provision for reporting the TX 
+histograms through the rmon interface which your subsequent patch would 
+do, but it does not appear so, never mind then.
 
-but task is already holding lock:
-ffffff80c5c6f318 (&sfp->sm_mutex){+.+.}-{3:3}, at: cleanup_module+0x2ba8/0x3120 [sfp]
+> 
+>> Unless there is something else that needs to be addressed, please
+>> address the two typos above, regardless:
+> 
+> s/Unless/If/?
 
-which lock already depends on the new lock.
-
-the existing dependency chain (in reverse order) is:
-
--> #3 (&sfp->sm_mutex){+.+.}-{3:3}:
-       __mutex_lock+0x88/0x7a0
-       mutex_lock_nested+0x20/0x28
-       cleanup_module+0x2ae0/0x3120 [sfp]
-       sfp_register_bus+0x5c/0x9c
-       sfp_register_socket+0x48/0xd4
-       cleanup_module+0x271c/0x3120 [sfp]
-       platform_probe+0x64/0xb8
-       really_probe+0x17c/0x3c0
-       __driver_probe_device+0x78/0x164
-       driver_probe_device+0x3c/0xd4
-       __driver_attach+0xec/0x1f0
-       bus_for_each_dev+0x60/0xa0
-       driver_attach+0x20/0x28
-       bus_add_driver+0x108/0x208
-       driver_register+0x5c/0x118
-       __platform_driver_register+0x24/0x2c
-       init_module+0x28/0xa7c [sfp]
-       do_one_initcall+0x70/0x2ec
-       do_init_module+0x54/0x1e4
-       load_module+0x1b78/0x1c8c
-       __do_sys_init_module+0x1bc/0x2cc
-       __arm64_sys_init_module+0x18/0x20
-       invoke_syscall.constprop.0+0x4c/0xdc
-       do_el0_svc+0x3c/0xbc
-       el0_svc+0x34/0x80
-       el0t_64_sync_handler+0xf8/0x124
-       el0t_64_sync+0x150/0x154
-
--> #2 (rtnl_mutex){+.+.}-{3:3}:
-       __mutex_lock+0x88/0x7a0
-       mutex_lock_nested+0x20/0x28
-       rtnl_lock+0x18/0x20
-       set_device_name+0x30/0x130
-       netdev_trig_activate+0x13c/0x1ac
-       led_trigger_set+0x118/0x234
-       led_trigger_write+0x104/0x17c
-       sysfs_kf_bin_write+0x64/0x80
-       kernfs_fop_write_iter+0x128/0x1b4
-       vfs_write+0x178/0x2a4
-       ksys_write+0x58/0xd4
-       __arm64_sys_write+0x18/0x20
-       invoke_syscall.constprop.0+0x4c/0xdc
-       do_el0_svc+0x3c/0xbc
-       el0_svc+0x34/0x80
-       el0t_64_sync_handler+0xf8/0x124
-       el0t_64_sync+0x150/0x154
-
--> #1 (&led_cdev->trigger_lock){++++}-{3:3}:
-       down_write+0x4c/0x13c
-       led_trigger_write+0xf8/0x17c
-       sysfs_kf_bin_write+0x64/0x80
-       kernfs_fop_write_iter+0x128/0x1b4
-       vfs_write+0x178/0x2a4
-       ksys_write+0x58/0xd4
-       __arm64_sys_write+0x18/0x20
-       invoke_syscall.constprop.0+0x4c/0xdc
-       do_el0_svc+0x3c/0xbc
-       el0_svc+0x34/0x80
-       el0t_64_sync_handler+0xf8/0x124
-       el0t_64_sync+0x150/0x154
-
--> #0 (triggers_list_lock){++++}-{3:3}:
-       __lock_acquire+0x12a0/0x2014
-       lock_acquire+0x100/0x2ac
-       down_write+0x4c/0x13c
-       led_trigger_register+0x4c/0x1a8
-       phy_led_triggers_register+0x9c/0x214
-       phy_attach_direct+0x154/0x36c
-       phylink_attach_phy+0x30/0x60
-       phylink_sfp_connect_phy+0x140/0x510
-       sfp_add_phy+0x34/0x50
-       init_module+0x15c/0xa7c [sfp]
-       cleanup_module+0x1d94/0x3120 [sfp]
-       cleanup_module+0x2bb4/0x3120 [sfp]
-       process_one_work+0x1f8/0x4ec
-       worker_thread+0x1e8/0x3d8
-       kthread+0x104/0x110
-       ret_from_fork+0x10/0x20
-
-other info that might help us debug this:
-
-Chain exists of:
-  triggers_list_lock --> rtnl_mutex --> &sfp->sm_mutex
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&sfp->sm_mutex);
-                               lock(rtnl_mutex);
-                               lock(&sfp->sm_mutex);
-  lock(triggers_list_lock);
-
- *** DEADLOCK ***
-
-4 locks held by kworker/u8:2/43:
- #0: ffffff80c000f938 ((wq_completion)events_power_efficient){+.+.}-{0:0}, at: process_one_work+0x150/0x4ec
- #1: ffffffc08214bde8 ((work_completion)(&(&sfp->timeout)->work)){+.+.}-{0:0}, at: process_one_work+0x150/0x4ec
- #2: ffffffc0810902f8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock+0x18/0x20
- #3: ffffff80c5c6f318 (&sfp->sm_mutex){+.+.}-{3:3}, at: cleanup_module+0x2ba8/0x3120 [sfp]
-
-stack backtrace:
-CPU: 0 PID: 43 Comm: kworker/u8:2 Tainted: G           O       6.7.0-rc4-next-20231208+ #0
-Hardware name: Bananapi BPI-R4 (DT)
-Workqueue: events_power_efficient cleanup_module [sfp]
-Call trace:
- dump_backtrace+0xa8/0x10c
- show_stack+0x14/0x1c
- dump_stack_lvl+0x5c/0xa0
- dump_stack+0x14/0x1c
- print_circular_bug+0x328/0x430
- check_noncircular+0x124/0x134
- __lock_acquire+0x12a0/0x2014
- lock_acquire+0x100/0x2ac
- down_write+0x4c/0x13c
- led_trigger_register+0x4c/0x1a8
- phy_led_triggers_register+0x9c/0x214
- phy_attach_direct+0x154/0x36c
- phylink_attach_phy+0x30/0x60
- phylink_sfp_connect_phy+0x140/0x510
- sfp_add_phy+0x34/0x50
- init_module+0x15c/0xa7c [sfp]
- cleanup_module+0x1d94/0x3120 [sfp]
- cleanup_module+0x2bb4/0x3120 [sfp]
- process_one_work+0x1f8/0x4ec
- worker_thread+0x1e8/0x3d8
- kthread+0x104/0x110
- ret_from_fork+0x10/0x20
-
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/net/phy/phy_device.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index d2caa89bf1fb8..08b87d7396eb9 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -1558,7 +1558,8 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
- 		goto error;
- 
- 	phy_resume(phydev);
--	phy_led_triggers_register(phydev);
-+	if (!phydev->is_on_sfp_module)
-+		phy_led_triggers_register(phydev);
- 
- 	/**
- 	 * If the external phy used by current mac interface is managed by
-@@ -1827,7 +1828,8 @@ void phy_detach(struct phy_device *phydev)
- 	}
- 	phydev->phylink = NULL;
- 
--	phy_led_triggers_unregister(phydev);
-+	if (!phydev->is_on_sfp_module)
-+		phy_led_triggers_unregister(phydev);
- 
- 	if (phydev->mdio.dev.driver)
- 		module_put(phydev->mdio.dev.driver->owner);
+Yes, the latter!
 -- 
-2.43.0
+Florian
+
 
