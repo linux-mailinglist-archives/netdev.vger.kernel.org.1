@@ -1,624 +1,340 @@
-Return-Path: <netdev+bounces-56217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C4E080E2F7
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 04:48:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C405880E2F8
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 04:48:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5977B219C7
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 03:48:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 501431F21DCE
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 03:48:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0E39479;
-	Tue, 12 Dec 2023 03:48:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0A119473;
+	Tue, 12 Dec 2023 03:48:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZPjl6spV"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61DF8AC;
-	Mon, 11 Dec 2023 19:48:05 -0800 (PST)
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1rCtkL-0002sc-2v;
-	Tue, 12 Dec 2023 03:47:51 +0000
-Date: Tue, 12 Dec 2023 03:47:47 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chunfeng Yun <chunfeng.yun@mediatek.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexander Couzens <lynxis@fe80.eu>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org
-Subject: [RFC PATCH net-next v3 5/8] net: pcs: add driver for MediaTek
- USXGMII PCS
-Message-ID: <07845ec900ba41ff992875dce12c622277592c32.1702352117.git.daniel@makrotopia.org>
-References: <cover.1702352117.git.daniel@makrotopia.org>
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 378DAD9
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 19:48:11 -0800 (PST)
+Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-50bf26b677dso4964157e87.2
+        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 19:48:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702352889; x=1702957689; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=gHM7RLH512MW5VIJP4EUDkytCBtarcrMVa3cPG31NzM=;
+        b=ZPjl6spVR/K+KrrzdwvlXEgNwcsHAZWf44GQwMs3keA9W2JbUPpBmiPPslAGPgkiT3
+         IWwSueZVfX1kOsVlvCinGTq4zej5FV8hZDTRgnrB+lj0jcVX1er7IJoJAlJCeeMphakl
+         tSRn80E6+MkW+eQniwg9VFqiXLHJZqWKgu03lvROwvexOJcU2yFytqpW2CO+oP8buLeu
+         LGIqWWg2TFSbv8eJwEo+eXk6Z2HkXVBetCRy5W951tNcqVY4aegY3xFoPptzb5fmjxlx
+         4QQ8TNH1fRKIi1ToX2NHvlLhVvswr4Rap6W7Gay/Y4C325BuKuhYZOV4l3jP8zpZ/3X2
+         c5YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702352889; x=1702957689;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gHM7RLH512MW5VIJP4EUDkytCBtarcrMVa3cPG31NzM=;
+        b=skI6JvdXDEYYUH29wH2TAsKTRn+ayberfOYszFwUe+1wyrMMdCI0N2ys+4/yaozKeB
+         dx6tTZQP2Kb9lJSJONhOPlouJS0vQFHaBFNI/h6aeEogvteBn/9gSves/XiClLSUBGfF
+         vPro0VDqt6YYjo0rYqF+I37WEkm53ExZ5WR/KHBEmocUOA8Q6PUOSxyUbZiHZtGnc1G/
+         VIg52cc/rm5tqoi2bg7/yU9aw3eDSRf2n3kbYHeXoONWlHthYV9Xzn/0dZIkyU1SG/6l
+         Sg5IbQ7D1lOT+Fb9CPmGXnexZsZIQnXIYoevt9ehwHvTJb16wyVaB4WOAtr7FKV+i8Qh
+         rRJA==
+X-Gm-Message-State: AOJu0YxhBA4X5RfwutbL00TPBR3jmN79782wGe0tvScS57N+xUKIwE8a
+	ayubXAx9cbNzkrgE86boNURh0icYONyVfAp3FnQ=
+X-Google-Smtp-Source: AGHT+IEa5Q08YiVcpoIm8Hou4qnewVGN6jjHurHLcXsoUii0+lrpNib8d/Tfl+fvXUhf6jaWENu7BVr2TLBjfRi/1P0=
+X-Received: by 2002:a05:6512:234a:b0:50c:a39:ee22 with SMTP id
+ p10-20020a056512234a00b0050c0a39ee22mr2137814lfu.33.1702352889118; Mon, 11
+ Dec 2023 19:48:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1702352117.git.daniel@makrotopia.org>
+References: <20231208045054.27966-1-luizluca@gmail.com> <20231208045054.27966-3-luizluca@gmail.com>
+ <CAJq09z7yykDsh2--ZahDX=Pto9SF+EQUo5hBnrLiWNALeVY_Bw@mail.gmail.com>
+ <i3qp6sjkgqw2mgkbkrpgwxlbcdblwfp6vpohpfnb7tnq77mrpc@hrr3iv2flvqh>
+ <CAJq09z45WQv-F9dw-y13E_6DXAfmpxH20JnRoO10za3cuS2kZw@mail.gmail.com> <20231211171143.yrvtw7l6wihkbeur@skbuf>
+In-Reply-To: <20231211171143.yrvtw7l6wihkbeur@skbuf>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Tue, 12 Dec 2023 00:47:57 -0300
+Message-ID: <CAJq09z6G+yyQ9NLmfTLYRKnNzoP_=AUC5TibQCNPysb6GsBjqA@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/7] net: dsa: realtek: put of node after MDIO registration
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <ALSI@bang-olufsen.dk>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linus.walleij@linaro.org" <linus.walleij@linaro.org>, "andrew@lunn.ch" <andrew@lunn.ch>, 
+	"f.fainelli@gmail.com" <f.fainelli@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>, 
+	"pabeni@redhat.com" <pabeni@redhat.com>, "arinc.unal@arinc9.com" <arinc.unal@arinc9.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Add driver for USXGMII PCS found in the MediaTek MT7988 SoC and supporting
-USXGMII, 10GBase-R and 5GBase-R interface modes.
+> > Reviewing the code again, I believe it was not just misplacing the
+> > of_put_node() but probably calling it twice.
+> >
+> > devm_mdiobus_alloc() doesn't set the dev in mii_bus. So, dev is all
+> > zeros. The dev.of_node normal place to be defined is:
+> >
+> > devm_of_mdiobus_register()
+> >   __devm_of_mdiobus_register()
+> >     __of_mdiobus_register()
+> >       device_set_node()
+> >
+> > The only way for that value, set by the line I removed, to persist is
+> > when the devm_of_mdiobus_register() fails before device_set_node().
+>
+> Did you consider that __of_mdiobus_register() -> device_set_node() is
+> actually overwriting priv->user_mii_bus->dev.of_node with the same value?
+> So the reference to mdio_np persists even if technically overwritten.
+> The fact that the assignment looks redundant is another story.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Yes, I believe it is just redundant.
+
+> > My guess is that it was set to be used by realtek_smi_remove() if it
+> > is called when registration fails. However, in that case, both
+> > realtek_smi_setup_mdio() and realtek_smi_setup_mdio() would put the
+>
+> You listed the same function name twice. You meant realtek_smi_remove()
+> the second time?
+
+yes
+
+> > node. So, either the line is useless or it will effectively result in
+> > calling of_node_put() twice.
+>
+> False logic, since realtek_smi_remove() is not called when probe() fails.
+> ds->ops->setup() is called from probe() context. So no double of_node_put().
+> That's a general rule with the kernel API. When a setup API function fails,
+> it is responsible of cleaning up the temporary things it did. The
+> teardown API function is only called when the setup was performed fully.
+
+So, "the line is useless".
+
+> (the only exception I'm aware of is the Qdisc API, but that's not
+> exactly the best model to follow)
+>
+> > If I really needed to put that node in the realtek_smi_remove(), I
+> > would use a dedicated field in realtek_priv instead of reusing a
+> > reference for it inside another structure.
+> >
+> > I'll add some notes to the commit message about all these but moving
+> > the of_node_put() to the same function that gets the node solved all
+> > the issues.
+>
+> "Solved all the issues" - what are those issues, first of all?
+
+1) the useless assignment
+2) the (possible) double of_node_put(), which proved to be false.
+
+> The simple fact is: of_get_compatible_child() returns an OF node with an
+> elevated refcount. It passes it to of_mdiobus_register() which does not
+> take ownership of it per se, but assigns it to bus->dev.of_node, which
+> is accessible until device_del() from mdiobus_unregister().
+
+Normally, when you have a refcount system, whenever you have a
+reference to an object, you should increase the refcount. I thought
+that every time you assign a kobject to a structure, you should get it
+as well (and put it when you deallocate it). But that's just what I
+would expect, not something I found in docs.
+
+I see distinct behaviors with methods that assign the dev.of_node
+using device_set_node() in OF MDIO API code and that's not good:
+
+static int of_mdiobus_register_device(struct mii_bus *mdio,
+                                     struct device_node *child, u32 addr)
+{
+       (...)
+       fwnode_handle_get(fwnode);
+       device_set_node(&mdiodev->dev, fwnode);
+       (...)
+}
+
+int fwnode_mdiobus_phy_device_register(struct mii_bus *mdio,
+                                      struct phy_device *phy,
+                                      struct fwnode_handle *child, u32 addr)
+{
+       (...)
+       fwnode_handle_get(child);
+       device_set_node(&phy->mdio.dev, child);
+       (...)
+}
+
+int of_mdiobus_phy_device_register(struct mii_bus *mdio, struct phy_device *phy,
+                                  struct device_node *child, u32 addr)
+{
+       return fwnode_mdiobus_phy_device_register(mdio, phy,
+                                                 of_fwnode_handle(child),
+}
+
+int __of_mdiobus_register(struct mii_bus *mdio, struct device_node *np,
+                         struct module *owner)
+{
+       (...)
+       device_set_node(&mdio->dev, of_fwnode_handle(np));
+       (...)
+       for_each_available_child_of_node(np, child) {
+                (...)
+                if (of_mdiobus_child_is_phy(child))
+                       rc = of_mdiobus_register_phy(mdio, child, addr);
+               else
+                       rc = of_mdiobus_register_device(mdio, child, addr);
+       }
+})
+
+Each deals differently with the device_node it receives. Both
+of_mdiobus_register_phy and of_mdiobus_register_device gets the child
+before assigning it to the device but not __of_mdiobus_register. Why?
+
+After some more study, I think it is just because, while an
+of_node_get() just before device_set_node() fits nicely in
+__of_mdiobus_register(), there is not a good place in of_mdio to put
+it. We don't have an of_mdiobus_unregister(). The unregistration
+happens only in mdiobus_unregister(), where, I guess, it should avoid
+OF-specific code. Even if we put OF code there, we would need to know
+during mdiobus_unregister() if the bus->dev.of_node was gotten by
+of_mdio or someone else. I believe it is not nice to externally assign
+dev.of_node directly to mdiobus but realtek switch driver is doing
+just that and others might be doing the same thing.
+
+The delegation of of_node_get/put to the caller seems to be just an
+easy workaround the fact that there is no good place to put a node
+that of_mdio would get. For devm functions, we could include the
+get/put call creating a new devm_of_mdiobus_unregister() but I believe
+devm and non-devm needs to be equivalent (except for the resource
+deallocation).
+
+> The PHY library does not make the ownership rules of the of_node very
+> clear, but since it takes no reference on it, it will fail in subtle
+> ways if you pull the carpet from under its feet.
+>
+> For example, I expect of_mdio_find_bus() to fail. That is used only
+> rarely, like by the MDIO mux driver which I suppose you haven't tested.
+
+No, I didn't test it. In fact, most embedded devices will not use
+dynamic OF and all those of_node_get/put will be a noop.
+
+> If you want, you could make the OF MDIO API get() and put() the reference,
+> instead of using something it doesn't fully own. But currently the code
+> doesn't do that. Try to acknowledge what exists, first.
+
+What I saw in other drivers outside drivers/net is that one that
+allocates the dev will get the node before assigning dev.of_node and
+put it before freeing the device. The mdiobus case seems to be
+different. I believe it would make the code more robust if we could
+fix that inside OF MDIO API and not just document its behavior. It
+will also not break existing uses as extra get/put's are OK.
+
+I believe we could add an unregister callback to mii_bus. It wouldn't
+be too complex:
+
+From b5b059ea4491e9f745872220fb94d8105e2d7d43 Mon Sep 17 00:00:00 2001
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Tue, 12 Dec 2023 00:26:06 -0300
+Subject: [PATCH] net: mdio: get/put device node during (un)registration
+
+__of_mdiobus_register() was storing the device node in dev.of_node
+without increasing its refcount. It was implicitly delegating to the
+caller to maintain the node allocated until mdiobus was unregistered.
+
+Now, the __of_mdiobus_register() will get the node before assigning it,
+and of_mdiobus_unregister_callback() will be called at the end of
+mdio_unregister().
+
+Drivers can now put the node just after the MDIO registration.
+
+Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 ---
- MAINTAINERS                         |   2 +
- drivers/net/pcs/Kconfig             |  11 +
- drivers/net/pcs/Makefile            |   1 +
- drivers/net/pcs/pcs-mtk-usxgmii.c   | 456 ++++++++++++++++++++++++++++
- include/linux/pcs/pcs-mtk-usxgmii.h |  27 ++
- 5 files changed, 497 insertions(+)
- create mode 100644 drivers/net/pcs/pcs-mtk-usxgmii.c
- create mode 100644 include/linux/pcs/pcs-mtk-usxgmii.h
+drivers/net/mdio/of_mdio.c | 12 +++++++++++-
+drivers/net/phy/mdio_bus.c |  3 +++
+include/linux/phy.h        |  3 +++
+3 files changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b2772cfe2a704..bf798f3b2c0c9 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -13500,7 +13500,9 @@ M:	Daniel Golle <daniel@makrotopia.org>
- L:	netdev@vger.kernel.org
- S:	Maintained
- F:	drivers/net/pcs/pcs-mtk-lynxi.c
-+F:	drivers/net/pcs/pcs-mtk-usxgmii.c
- F:	include/linux/pcs/pcs-mtk-lynxi.h
-+F:	include/linux/pcs/pcs-mtk-usxgmii.h
- 
- MEDIATEK ETHERNET PHY DRIVERS
- M:	Daniel Golle <daniel@makrotopia.org>
-diff --git a/drivers/net/pcs/Kconfig b/drivers/net/pcs/Kconfig
-index 87cf308fc6d8b..55a6865bdaba3 100644
---- a/drivers/net/pcs/Kconfig
-+++ b/drivers/net/pcs/Kconfig
-@@ -25,6 +25,17 @@ config PCS_MTK_LYNXI
- 	  This module provides helpers to phylink for managing the LynxI PCS
- 	  which is part of MediaTek's SoC and Ethernet switch ICs.
- 
-+config PCS_MTK_USXGMII
-+	tristate "MediaTek USXGMII PCS"
-+	select PCS_MTK_LYNXI
-+	select PHY_MTK_PEXTP
-+	select PHYLINK
-+	help
-+	  This module provides a driver for MediaTek's USXGMII PCS supporting
-+	  10GBase-R, 5GBase-R and USXGMII interface modes.
-+	  1000Base-X, 2500Base-X and Cisco SGMII are supported on the same
-+	  differential pairs via an embedded LynxI PHY.
-+
- config PCS_RZN1_MIIC
- 	tristate "Renesas RZ/N1 MII converter"
- 	depends on OF && (ARCH_RZN1 || COMPILE_TEST)
-diff --git a/drivers/net/pcs/Makefile b/drivers/net/pcs/Makefile
-index fb1694192ae63..cc355152ca1ca 100644
---- a/drivers/net/pcs/Makefile
-+++ b/drivers/net/pcs/Makefile
-@@ -6,4 +6,5 @@ pcs_xpcs-$(CONFIG_PCS_XPCS)	:= pcs-xpcs.o pcs-xpcs-nxp.o pcs-xpcs-wx.o
- obj-$(CONFIG_PCS_XPCS)		+= pcs_xpcs.o
- obj-$(CONFIG_PCS_LYNX)		+= pcs-lynx.o
- obj-$(CONFIG_PCS_MTK_LYNXI)	+= pcs-mtk-lynxi.o
-+obj-$(CONFIG_PCS_MTK_USXGMII)	+= pcs-mtk-usxgmii.o
- obj-$(CONFIG_PCS_RZN1_MIIC)	+= pcs-rzn1-miic.o
-diff --git a/drivers/net/pcs/pcs-mtk-usxgmii.c b/drivers/net/pcs/pcs-mtk-usxgmii.c
-new file mode 100644
-index 0000000000000..190bc51739a40
---- /dev/null
-+++ b/drivers/net/pcs/pcs-mtk-usxgmii.c
-@@ -0,0 +1,456 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2023 MediaTek Inc.
-+ * Author: Henry Yen <henry.yen@mediatek.com>
-+ *         Daniel Golle <daniel@makrotopia.org>
-+ */
-+
-+#include <linux/clk.h>
-+#include <linux/io.h>
-+#include <linux/mfd/syscon.h>
-+#include <linux/mdio.h>
-+#include <linux/mutex.h>
-+#include <linux/of.h>
-+#include <linux/of_platform.h>
-+#include <linux/reset.h>
-+#include <linux/pcs/pcs-mtk-usxgmii.h>
-+#include <linux/platform_device.h>
-+
-+/* USXGMII subsystem config registers */
-+/* Register to control speed */
-+#define RG_PHY_TOP_SPEED_CTRL1			0x80c
-+#define USXGMII_RATE_UPDATE_MODE		BIT(31)
-+#define USXGMII_MAC_CK_GATED			BIT(29)
-+#define USXGMII_IF_FORCE_EN			BIT(28)
-+#define USXGMII_RATE_ADAPT_MODE			GENMASK(10, 8)
-+#define USXGMII_RATE_ADAPT_MODE_X1		0
-+#define USXGMII_RATE_ADAPT_MODE_X2		1
-+#define USXGMII_RATE_ADAPT_MODE_X4		2
-+#define USXGMII_RATE_ADAPT_MODE_X10		3
-+#define USXGMII_RATE_ADAPT_MODE_X100		4
-+#define USXGMII_RATE_ADAPT_MODE_X5		5
-+#define USXGMII_RATE_ADAPT_MODE_X50		6
-+#define USXGMII_XFI_RX_MODE			GENMASK(6, 4)
-+#define USXGMII_XFI_TX_MODE			GENMASK(2, 0)
-+#define USXGMII_XFI_MODE_10G			0
-+#define USXGMII_XFI_MODE_5G			1
-+#define USXGMII_XFI_MODE_2P5G			3
-+
-+/* Register to control PCS AN */
-+#define RG_PCS_AN_CTRL0				0x810
-+#define USXGMII_AN_RESTART			BIT(31)
-+#define USXGMII_AN_SYNC_CNT			GENMASK(30, 11)
-+#define USXGMII_AN_ENABLE			BIT(0)
-+
-+#define RG_PCS_AN_CTRL2				0x818
-+#define USXGMII_LINK_TIMER_IDLE_DETECT		GENMASK(29, 20)
-+#define USXGMII_LINK_TIMER_COMP_ACK_DETECT	GENMASK(19, 10)
-+#define USXGMII_LINK_TIMER_AN_RESTART		GENMASK(9, 0)
-+
-+/* Register to read PCS AN status */
-+#define RG_PCS_AN_STS0				0x81c
-+#define USXGMII_LPA				GENMASK(15, 0)
-+#define USXGMII_LPA_LATCH			BIT(31)
-+
-+/* Register to read PCS link status */
-+#define RG_PCS_RX_STATUS0			0x904
-+#define RG_PCS_RX_STATUS_UPDATE			BIT(16)
-+#define RG_PCS_RX_LINK_STATUS			BIT(2)
-+
-+/* struct mtk_usxgmii_pcs - This structure holds each usxgmii PCS
-+ * @pcs:		Phylink PCS structure
-+ * @dev:		Pointer to device structure
-+ * @base:		IO memory to access PCS hardware
-+ * @clk:		Pointer to USXGMII clk
-+ * @reset:		Pointer to USXGMII reset control
-+ * @interface:		Currently selected interface mode
-+ * @neg_mode:		Currently used phylink neg_mode
-+ * @node:		List node
-+ */
-+struct mtk_usxgmii_pcs {
-+	struct phylink_pcs		pcs;
-+	struct device			*dev;
-+	void __iomem			*base;
-+	struct clk			*clk;
-+	struct reset_control		*reset;
-+	phy_interface_t			interface;
-+	unsigned int			neg_mode;
-+	struct list_head		node;
-+};
-+
-+static LIST_HEAD(mtk_usxgmii_pcs_instances);
-+static DEFINE_MUTEX(instance_mutex);
-+
-+static u32 mtk_r32(struct mtk_usxgmii_pcs *mpcs, unsigned int reg)
+diff --git a/drivers/net/mdio/of_mdio.c b/drivers/net/mdio/of_mdio.c
+index 64ebcb6d235c..9b6cab6154e0 100644
+--- a/drivers/net/mdio/of_mdio.c
++++ b/drivers/net/mdio/of_mdio.c
+@@ -139,6 +139,11 @@ bool of_mdiobus_child_is_phy(struct device_node *child)
+}
+EXPORT_SYMBOL(of_mdiobus_child_is_phy);
+
++static void __of_mdiobus_unregister_callback(struct mii_bus *mdio)
 +{
-+	return ioread32(mpcs->base + reg);
++       of_node_put(mdio->dev.of_node);
 +}
 +
-+static void mtk_m32(struct mtk_usxgmii_pcs *mpcs, unsigned int reg, u32 mask, u32 set)
-+{
-+	u32 val;
-+
-+	val = ioread32(mpcs->base + reg);
-+	val &= ~mask;
-+	val |= set;
-+	iowrite32(val, mpcs->base + reg);
-+}
-+
-+static struct mtk_usxgmii_pcs *pcs_to_mtk_usxgmii_pcs(struct phylink_pcs *pcs)
-+{
-+	return container_of(pcs, struct mtk_usxgmii_pcs, pcs);
-+}
-+
-+static void mtk_usxgmii_reset(struct mtk_usxgmii_pcs *mpcs)
-+{
-+	reset_control_assert(mpcs->reset);
-+	udelay(100);
-+	reset_control_deassert(mpcs->reset);
-+
-+	mdelay(10);
-+}
-+
-+static int mtk_usxgmii_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
-+				  phy_interface_t interface,
-+				  const unsigned long *advertising,
-+				  bool permit_pause_to_mac)
-+{
-+	struct mtk_usxgmii_pcs *mpcs = pcs_to_mtk_usxgmii_pcs(pcs);
-+	unsigned int an_ctrl = 0, link_timer = 0, xfi_mode = 0, adapt_mode = 0;
-+	bool mode_changed = false;
-+
-+	if (interface == PHY_INTERFACE_MODE_USXGMII) {
-+		an_ctrl = FIELD_PREP(USXGMII_AN_SYNC_CNT, 0x1FF) | USXGMII_AN_ENABLE;
-+		link_timer = FIELD_PREP(USXGMII_LINK_TIMER_IDLE_DETECT, 0x7B) |
-+			     FIELD_PREP(USXGMII_LINK_TIMER_COMP_ACK_DETECT, 0x7B) |
-+			     FIELD_PREP(USXGMII_LINK_TIMER_AN_RESTART, 0x7B);
-+		xfi_mode = FIELD_PREP(USXGMII_XFI_RX_MODE, USXGMII_XFI_MODE_10G) |
-+			   FIELD_PREP(USXGMII_XFI_TX_MODE, USXGMII_XFI_MODE_10G);
-+	} else if (interface == PHY_INTERFACE_MODE_10GBASER) {
-+		an_ctrl = FIELD_PREP(USXGMII_AN_SYNC_CNT, 0x1FF);
-+		link_timer = FIELD_PREP(USXGMII_LINK_TIMER_IDLE_DETECT, 0x7B) |
-+			     FIELD_PREP(USXGMII_LINK_TIMER_COMP_ACK_DETECT, 0x7B) |
-+			     FIELD_PREP(USXGMII_LINK_TIMER_AN_RESTART, 0x7B);
-+		xfi_mode = FIELD_PREP(USXGMII_XFI_RX_MODE, USXGMII_XFI_MODE_10G) |
-+			   FIELD_PREP(USXGMII_XFI_TX_MODE, USXGMII_XFI_MODE_10G);
-+		adapt_mode = USXGMII_RATE_UPDATE_MODE;
-+	} else if (interface == PHY_INTERFACE_MODE_5GBASER) {
-+		an_ctrl = FIELD_PREP(USXGMII_AN_SYNC_CNT, 0xFF);
-+		link_timer = FIELD_PREP(USXGMII_LINK_TIMER_IDLE_DETECT, 0x3D) |
-+			     FIELD_PREP(USXGMII_LINK_TIMER_COMP_ACK_DETECT, 0x3D) |
-+			     FIELD_PREP(USXGMII_LINK_TIMER_AN_RESTART, 0x3D);
-+		xfi_mode = FIELD_PREP(USXGMII_XFI_RX_MODE, USXGMII_XFI_MODE_5G) |
-+			   FIELD_PREP(USXGMII_XFI_TX_MODE, USXGMII_XFI_MODE_5G);
-+		adapt_mode = USXGMII_RATE_UPDATE_MODE;
-+	} else {
-+		return -EINVAL;
-+	}
-+
-+	adapt_mode |= FIELD_PREP(USXGMII_RATE_ADAPT_MODE, USXGMII_RATE_ADAPT_MODE_X1);
-+
-+	if (mpcs->interface != interface) {
-+		mpcs->interface = interface;
-+		mode_changed = true;
-+	}
-+
-+	mtk_usxgmii_reset(mpcs);
-+
-+	/* Setup USXGMII AN ctrl */
-+	mtk_m32(mpcs, RG_PCS_AN_CTRL0,
-+		USXGMII_AN_SYNC_CNT | USXGMII_AN_ENABLE,
-+		an_ctrl);
-+
-+	mtk_m32(mpcs, RG_PCS_AN_CTRL2,
-+		USXGMII_LINK_TIMER_IDLE_DETECT |
-+		USXGMII_LINK_TIMER_COMP_ACK_DETECT |
-+		USXGMII_LINK_TIMER_AN_RESTART,
-+		link_timer);
-+
-+	mpcs->neg_mode = neg_mode;
-+
-+	/* Gated MAC CK */
-+	mtk_m32(mpcs, RG_PHY_TOP_SPEED_CTRL1,
-+		USXGMII_MAC_CK_GATED, USXGMII_MAC_CK_GATED);
-+
-+	/* Enable interface force mode */
-+	mtk_m32(mpcs, RG_PHY_TOP_SPEED_CTRL1,
-+		USXGMII_IF_FORCE_EN, USXGMII_IF_FORCE_EN);
-+
-+	/* Setup USXGMII adapt mode */
-+	mtk_m32(mpcs, RG_PHY_TOP_SPEED_CTRL1,
-+		USXGMII_RATE_UPDATE_MODE | USXGMII_RATE_ADAPT_MODE,
-+		adapt_mode);
-+
-+	/* Setup USXGMII speed */
-+	mtk_m32(mpcs, RG_PHY_TOP_SPEED_CTRL1,
-+		USXGMII_XFI_RX_MODE | USXGMII_XFI_TX_MODE,
-+		xfi_mode);
-+
-+	usleep_range(1, 10);
-+
-+	/* Un-gated MAC CK */
-+	mtk_m32(mpcs, RG_PHY_TOP_SPEED_CTRL1, USXGMII_MAC_CK_GATED, 0);
-+
-+	usleep_range(1, 10);
-+
-+	/* Disable interface force mode for the AN mode */
-+	if (an_ctrl & USXGMII_AN_ENABLE)
-+		mtk_m32(mpcs, RG_PHY_TOP_SPEED_CTRL1, USXGMII_IF_FORCE_EN, 0);
-+
-+	return mode_changed;
-+}
-+
-+static void mtk_usxgmii_pcs_get_fixed_speed(struct mtk_usxgmii_pcs *mpcs,
-+					    struct phylink_link_state *state)
-+{
-+	u32 val = mtk_r32(mpcs, RG_PHY_TOP_SPEED_CTRL1);
-+	int speed;
-+
-+	/* Calculate speed from interface speed and rate adapt mode */
-+	switch (FIELD_GET(USXGMII_XFI_RX_MODE, val)) {
-+	case USXGMII_XFI_MODE_10G:
-+		speed = 10000;
-+		break;
-+	case USXGMII_XFI_MODE_5G:
-+		speed = 5000;
-+		break;
-+	case USXGMII_XFI_MODE_2P5G:
-+		speed = 2500;
-+		break;
-+	default:
-+		state->speed = SPEED_UNKNOWN;
-+		return;
-+	}
-+
-+	switch (FIELD_GET(USXGMII_RATE_ADAPT_MODE, val)) {
-+	case USXGMII_RATE_ADAPT_MODE_X100:
-+		speed /= 100;
-+		break;
-+	case USXGMII_RATE_ADAPT_MODE_X50:
-+		speed /= 50;
-+		break;
-+	case USXGMII_RATE_ADAPT_MODE_X10:
-+		speed /= 10;
-+		break;
-+	case USXGMII_RATE_ADAPT_MODE_X5:
-+		speed /= 5;
-+		break;
-+	case USXGMII_RATE_ADAPT_MODE_X4:
-+		speed /= 4;
-+		break;
-+	case USXGMII_RATE_ADAPT_MODE_X2:
-+		speed /= 2;
-+		break;
-+	case USXGMII_RATE_ADAPT_MODE_X1:
-+		break;
-+	default:
-+		state->speed = SPEED_UNKNOWN;
-+		return;
-+	}
-+
-+	state->speed = speed;
-+	state->duplex = DUPLEX_FULL;
-+}
-+
-+static void mtk_usxgmii_pcs_get_an_state(struct mtk_usxgmii_pcs *mpcs,
-+					 struct phylink_link_state *state)
-+{
-+	u16 lpa;
-+
-+	/* Refresh LPA by toggling LPA_LATCH */
-+	mtk_m32(mpcs, RG_PCS_AN_STS0, USXGMII_LPA_LATCH, USXGMII_LPA_LATCH);
-+	ndelay(1020);
-+	mtk_m32(mpcs, RG_PCS_AN_STS0, USXGMII_LPA_LATCH, 0);
-+	ndelay(1020);
-+	lpa = FIELD_GET(USXGMII_LPA, mtk_r32(mpcs, RG_PCS_AN_STS0));
-+
-+	phylink_decode_usxgmii_word(state, lpa);
-+}
-+
-+static void mtk_usxgmii_pcs_get_state(struct phylink_pcs *pcs,
-+				      struct phylink_link_state *state)
-+{
-+	struct mtk_usxgmii_pcs *mpcs = pcs_to_mtk_usxgmii_pcs(pcs);
-+
-+	/* Refresh USXGMII link status by toggling RG_PCS_AN_STATUS_UPDATE */
-+	mtk_m32(mpcs, RG_PCS_RX_STATUS0, RG_PCS_RX_STATUS_UPDATE,
-+		RG_PCS_RX_STATUS_UPDATE);
-+	ndelay(1020);
-+	mtk_m32(mpcs, RG_PCS_RX_STATUS0, RG_PCS_RX_STATUS_UPDATE, 0);
-+	ndelay(1020);
-+
-+	/* Read USXGMII link status */
-+	state->link = FIELD_GET(RG_PCS_RX_LINK_STATUS,
-+				mtk_r32(mpcs, RG_PCS_RX_STATUS0));
-+
-+	/* Continuously repeat re-configuration sequence until link comes up */
-+	if (!state->link) {
-+		mtk_usxgmii_pcs_config(pcs, mpcs->neg_mode,
-+				       state->interface, NULL, false);
-+		return;
-+	}
-+
-+	if (FIELD_GET(USXGMII_AN_ENABLE, mtk_r32(mpcs, RG_PCS_AN_CTRL0)))
-+		mtk_usxgmii_pcs_get_an_state(mpcs, state);
-+	else
-+		mtk_usxgmii_pcs_get_fixed_speed(mpcs, state);
-+}
-+
-+static void mtk_usxgmii_pcs_restart_an(struct phylink_pcs *pcs)
-+{
-+	struct mtk_usxgmii_pcs *mpcs = pcs_to_mtk_usxgmii_pcs(pcs);
-+
-+	mtk_m32(mpcs, RG_PCS_AN_CTRL0, USXGMII_AN_RESTART, USXGMII_AN_RESTART);
-+}
-+
-+static void mtk_usxgmii_pcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
-+				    phy_interface_t interface,
-+				    int speed, int duplex)
-+{
-+	/* Reconfiguring USXGMII to ensure the quality of the RX signal
-+	 * after the line side link up.
-+	 */
-+	mtk_usxgmii_pcs_config(pcs, neg_mode, interface, NULL, false);
-+}
-+
-+static void mtk_usxgmii_pcs_disable(struct phylink_pcs *pcs)
-+{
-+	struct mtk_usxgmii_pcs *mpcs = pcs_to_mtk_usxgmii_pcs(pcs);
-+
-+	mpcs->interface = PHY_INTERFACE_MODE_NA;
-+	mpcs->neg_mode = -1;
-+}
-+
-+static const struct phylink_pcs_ops mtk_usxgmii_pcs_ops = {
-+	.pcs_config = mtk_usxgmii_pcs_config,
-+	.pcs_get_state = mtk_usxgmii_pcs_get_state,
-+	.pcs_an_restart = mtk_usxgmii_pcs_restart_an,
-+	.pcs_link_up = mtk_usxgmii_pcs_link_up,
-+	.pcs_disable = mtk_usxgmii_pcs_disable,
-+};
-+
-+static int mtk_usxgmii_probe(struct platform_device *pdev)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct mtk_usxgmii_pcs *mpcs;
-+
-+	mpcs = devm_kzalloc(dev, sizeof(*mpcs), GFP_KERNEL);
-+	if (!mpcs)
-+		return -ENOMEM;
-+
-+	mpcs->base = devm_platform_ioremap_resource(pdev, 0);
-+	if (IS_ERR(mpcs->base))
-+		return PTR_ERR(mpcs->base);
-+
-+	mpcs->dev = dev;
-+	mpcs->pcs.ops = &mtk_usxgmii_pcs_ops;
-+	mpcs->pcs.poll = true;
-+	mpcs->pcs.neg_mode = true;
-+	mpcs->interface = PHY_INTERFACE_MODE_NA;
-+	mpcs->neg_mode = -1;
-+
-+	mpcs->clk = devm_clk_get_enabled(mpcs->dev, NULL);
-+	if (IS_ERR(mpcs->clk))
-+		return PTR_ERR(mpcs->clk);
-+
-+	mpcs->reset = devm_reset_control_get_shared(dev, NULL);
-+	if (IS_ERR(mpcs->reset))
-+		return PTR_ERR(mpcs->reset);
-+
-+	reset_control_deassert(mpcs->reset);
-+
-+	platform_set_drvdata(pdev, mpcs);
-+
-+	mutex_lock(&instance_mutex);
-+	list_add_tail(&mpcs->node, &mtk_usxgmii_pcs_instances);
-+	mutex_unlock(&instance_mutex);
-+
-+	return 0;
-+}
-+
-+static int mtk_usxgmii_remove(struct platform_device *pdev)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct mtk_usxgmii_pcs *cur, *tmp;
-+
-+	mutex_lock(&instance_mutex);
-+	list_for_each_entry_safe(cur, tmp, &mtk_usxgmii_pcs_instances, node)
-+		if (cur->dev == dev) {
-+			list_del(&cur->node);
-+			break;
-+		}
-+	mutex_unlock(&instance_mutex);
-+
-+	return 0;
-+}
-+
-+static const struct of_device_id mtk_usxgmii_of_mtable[] = {
-+	{ .compatible = "mediatek,mt7988-usxgmiisys" },
-+	{ /* sentinel */ },
-+};
-+MODULE_DEVICE_TABLE(of, mtk_usxgmii_of_mtable);
-+
-+struct phylink_pcs *mtk_usxgmii_pcs_get(struct device *dev, struct device_node *np)
-+{
-+	struct platform_device *pdev;
-+	struct mtk_usxgmii_pcs *mpcs;
-+
-+	if (!np)
-+		return NULL;
-+
-+	if (!of_device_is_available(np))
-+		return ERR_PTR(-ENODEV);
-+
-+	if (!of_match_node(mtk_usxgmii_of_mtable, np))
-+		return ERR_PTR(-EINVAL);
-+
-+	pdev = of_find_device_by_node(np);
-+	if (!pdev || !platform_get_drvdata(pdev)) {
-+		if (pdev)
-+			put_device(&pdev->dev);
-+		return ERR_PTR(-EPROBE_DEFER);
-+	}
-+
-+	mpcs = platform_get_drvdata(pdev);
-+	device_link_add(dev, mpcs->dev, DL_FLAG_AUTOREMOVE_CONSUMER);
-+
-+	return &mpcs->pcs;
-+}
-+EXPORT_SYMBOL(mtk_usxgmii_pcs_get);
-+
-+void mtk_usxgmii_pcs_put(struct phylink_pcs *pcs)
-+{
-+	struct mtk_usxgmii_pcs *cur, *mpcs = NULL;
-+
-+	if (!pcs)
-+		return;
-+
-+	mutex_lock(&instance_mutex);
-+	list_for_each_entry(cur, &mtk_usxgmii_pcs_instances, node)
-+		if (pcs == &cur->pcs) {
-+			mpcs = cur;
-+			break;
-+		}
-+	mutex_unlock(&instance_mutex);
-+
-+	if (WARN_ON(!mpcs))
-+		return;
-+
-+	put_device(mpcs->dev);
-+}
-+EXPORT_SYMBOL(mtk_usxgmii_pcs_put);
-+
-+static struct platform_driver mtk_usxgmii_driver = {
-+	.driver = {
-+		.name			= "mtk_usxgmii",
-+		.suppress_bind_attrs	= true,
-+		.of_match_table		= mtk_usxgmii_of_mtable,
-+	},
-+	.probe = mtk_usxgmii_probe,
-+	.remove = mtk_usxgmii_remove,
-+};
-+module_platform_driver(mtk_usxgmii_driver);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("MediaTek USXGMII PCS driver");
-+MODULE_AUTHOR("Daniel Golle <daniel@makrotopia.org>");
-diff --git a/include/linux/pcs/pcs-mtk-usxgmii.h b/include/linux/pcs/pcs-mtk-usxgmii.h
-new file mode 100644
-index 0000000000000..ef936d9c5f116
---- /dev/null
-+++ b/include/linux/pcs/pcs-mtk-usxgmii.h
-@@ -0,0 +1,27 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __LINUX_PCS_MTK_USXGMII_H
-+#define __LINUX_PCS_MTK_USXGMII_H
-+
-+#include <linux/phylink.h>
-+
-+/**
-+ * mtk_usxgmii_select_pcs() - Get MediaTek PCS instance
-+ * @np:		Pointer to device node indentifying a MediaTek USXGMII PCS
-+ * @mode:	Ethernet PHY interface mode
-+ *
-+ * Return PCS identified by a device node and the PHY interface mode in use
-+ *
-+ * Return:	Pointer to phylink PCS instance of NULL
-+ */
-+#if IS_ENABLED(CONFIG_PCS_MTK_USXGMII)
-+struct phylink_pcs *mtk_usxgmii_pcs_get(struct device *dev, struct device_node *np);
-+void mtk_usxgmii_pcs_put(struct phylink_pcs *pcs);
-+#else
-+static inline struct phylink_pcs *mtk_usxgmii_pcs_get(struct device *dev, struct device_node *np)
-+{
-+	return NULL;
-+}
-+static inline void mtk_usxgmii_pcs_put(struct phylink_pcs *pcs) { }
-+#endif /* IS_ENABLED(CONFIG_PCS_MTK_USXGMII) */
-+
-+#endif /* __LINUX_PCS_MTK_USXGMII_H */
--- 
+/**
+ * __of_mdiobus_register - Register mii_bus and create PHYs from the device tree
+ * @mdio: pointer to mii_bus structure
+@@ -166,6 +171,8 @@ int __of_mdiobus_register(struct mii_bus *mdio,
+struct device_node *np,
+        * the device tree are populated after the bus has been registered */
+       mdio->phy_mask = ~0;
+
++       mdio->__unregister_callback = __of_mdiobus_unregister_callback;
++       of_node_get(np);
+       device_set_node(&mdio->dev, of_fwnode_handle(np));
+
+       /* Get bus level PHY reset GPIO details */
+@@ -177,7 +184,7 @@ int __of_mdiobus_register(struct mii_bus *mdio,
+struct device_node *np,
+       /* Register the MDIO bus */
+       rc = __mdiobus_register(mdio, owner);
+       if (rc)
+-               return rc;
++               goto put_node;
+
+       /* Loop over the child nodes and register a phy_device for each phy */
+       for_each_available_child_of_node(np, child) {
+@@ -237,6 +244,9 @@ int __of_mdiobus_register(struct mii_bus *mdio,
+struct device_node *np,
+unregister:
+       of_node_put(child);
+       mdiobus_unregister(mdio);
++
++put_node:
++       of_node_put(np);
+       return rc;
+}
+EXPORT_SYMBOL(__of_mdiobus_register);
+diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
+index 25dcaa49ab8b..1229b8e4c53b 100644
+--- a/drivers/net/phy/mdio_bus.c
++++ b/drivers/net/phy/mdio_bus.c
+@@ -787,6 +787,9 @@ void mdiobus_unregister(struct mii_bus *bus)
+               gpiod_set_value_cansleep(bus->reset_gpiod, 1);
+
+       device_del(&bus->dev);
++
++       if (bus->__unregister_callback)
++               bus->__unregister_callback(bus);
+}
+EXPORT_SYMBOL(mdiobus_unregister);
+
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index e5f1f41e399c..2b383da4d825 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -433,6 +433,9 @@ struct mii_bus {
+
+       /** @shared: shared state across different PHYs */
+       struct phy_package_shared *shared[PHY_MAX_ADDR];
++
++       /** @__unregister_callback: called at the last step of unregistration */
++       void (*__unregister_callback)(struct mii_bus *bus);
+};
+#define to_mii_bus(d) container_of(d, struct mii_bus, dev)
+
+--
 2.43.0
+
+If we don't fix that in OF MDIO API, we would need to fix
+fe7324b932222 as well, moving the put to the dsa_switch_teardown().
+
+Regards,
+
+Luiz
 
