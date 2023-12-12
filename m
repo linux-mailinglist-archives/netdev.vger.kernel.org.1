@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-56344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BC1A80E8EA
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 11:18:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4470D80E8EC
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 11:18:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 010DC1F21976
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:18:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B80F11F21AC6
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:18:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E7F5AB88;
-	Tue, 12 Dec 2023 10:17:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B890A5C07A;
+	Tue, 12 Dec 2023 10:17:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="rvE+nqWp"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="xCrqYk7f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DE9A9C
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 02:17:49 -0800 (PST)
-Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-548ce39b101so7757041a12.2
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 02:17:49 -0800 (PST)
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4381F92
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 02:17:51 -0800 (PST)
+Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-9fa2714e828so716895766b.1
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 02:17:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702376268; x=1702981068; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702376269; x=1702981069; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=n6p6PhL6pJJB1VojYjKvy33GJM9rz1keLAcljTX9SbA=;
-        b=rvE+nqWpwqTckTStifewI9yqKvZrpelscKj/wOQ5tpmHJxUPrtLkqpo40OzJFoDFhQ
-         KuWth9hh9lCXlWOTFZL80h/HLZLgHL+7XRDaI2gIQ+/iJCxug97hgTchfTo6puOqq9/J
-         C/AVK6+4Eq2+kDp51eLHZESVgsjC/fhH+kn2addWzg972ZuWe13KbupmYd9TsuB/unJH
-         XU/DAIUM4mr44o7b3YMeFi60eeLGQ8glwBr49+rEGvlwSl7uO32WCHUGlyTgTyvDfnRS
-         j4lTjGLxibmUga0juumf98yFivrM/spRjUUM2fbVhNOSch3je1yDW5wMRecyxlUjnugK
-         ZDbw==
+        bh=Gvq7X9IR33uLz+NOli+ik7mMtRRti1WP//ME+EWKFLc=;
+        b=xCrqYk7fLNRCFvRTY1mn9WUWK9a8uLzwvbG9WGs4snOfgF+2KZb/A+RgIbuY5trNR5
+         qUOPAgCzuMMHZ9koW7MmtVskY7NS7HebFCREx/BMS0IBdfM5mFZdgcGRkl8PSijf/b1N
+         W9yNFr1Et8bUyqdiRyXOAkCR8XXHyOLkSguJ67rZs5Asd1ytE8a3yePaL/IhDuYtI0mg
+         gUjmJRw/QsQ6xRN3Ccp2awZsUCy/XCYe1ZnJjBWNAmFKn5R4X6yTsZpd9bXYgJ+a/Fgm
+         Q51m3R/ZD1fUdkMnk0OlzWejaGC8+3y1Na6aolnjqKWK/Zf5fKzKw2h+LVDBQxPrfOQD
+         ZvPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702376268; x=1702981068;
+        d=1e100.net; s=20230601; t=1702376269; x=1702981069;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=n6p6PhL6pJJB1VojYjKvy33GJM9rz1keLAcljTX9SbA=;
-        b=YZpPX5uI31f9GeL4BqUCt3Z94/08Agev8fUDa006+Fx7dBfO5YDxMEqKRx42aHAD/3
-         QpEEG5YcoKYYGe7Yz6Q063qEIgZ/YyesZ+CsgTXt6FGqq6Mweqm5NMUqZL8U/6gJ530J
-         AS9ElhDn223zJkRSN3mX1iOMSZX8nHFODyoz5amlxWKPh2ie/bmgpHQXzoRzwDkP2Caj
-         YSpg/gcQUGgoEnJTkmrdUlFORkh2/16vx9oexzJwhWpUTpMcl2ULlng6rFPtrVsiEWIJ
-         2cbp0SMU00bBqbMwaxdpwN3Uq6JYob/J6djzdJmw01ExIwifVad6ti0WuH0T7XlkZbvl
-         dKag==
-X-Gm-Message-State: AOJu0YzbBAfFQ9sLxa6hXeLwEO790gbpIE2eSFNslOvAT6YTH4G/VS7T
-	z3boTHUdfmK2brYIsDhnhNAjVHKdeGHpsw05kv8=
-X-Google-Smtp-Source: AGHT+IEccQ3er4ntByT3BHLOUspHUHzCL8OAfed6JY7w6x7ObvgEIl/Rs0ZgwaeAe829VF5rhS07yA==
-X-Received: by 2002:a05:6402:2152:b0:54c:4837:7d0a with SMTP id bq18-20020a056402215200b0054c48377d0amr2083720edb.73.1702376267956;
-        Tue, 12 Dec 2023 02:17:47 -0800 (PST)
+        bh=Gvq7X9IR33uLz+NOli+ik7mMtRRti1WP//ME+EWKFLc=;
+        b=AQXw+u6eVnMYbQaGCDub+ebeuWZQ0U063bmE2KWZCpub4unJ4yRodImLJER7qkoKT3
+         M1ce9BHMbAAXDJlDOkkGmDETjl+vBUHO411Cirwy7dsdSw3Xnk6KQ0DUW899+uxWcPkE
+         Ognc5t0XdnmAoPUHcizzcYJhnI0j6YkuLAZJ+0qsQ1I7Tg3AiI5F9ejs6/kQgF7atsmQ
+         j4mcD+hws6XU4Unewe6QcXQJq27xyGp8k6ADdebZcFMAJUvM0cdrzHxlToBfDjSBtMvQ
+         cDesjg/E7ZJMp0PIdpSu4kF4XIxGHRBYDmwOTQamEO5q5KNIVqzK2nbj3aZgenwbcenT
+         miAA==
+X-Gm-Message-State: AOJu0YzjVaieTgG8a60HdKxQPriVRz4eiYZePILMOjg7wk9MBJL7IcS1
+	YG5MM3kMFMZLYGOL98XYVKueG9mqmWv/z/jU70U=
+X-Google-Smtp-Source: AGHT+IFLXzl33h/5IQ56s7iw09G7bVbx8QsiX4NhwJcfOKMBMwuvG7N4KyH0ECzwgIv1y7rgbfAKvA==
+X-Received: by 2002:a17:906:184:b0:a19:a19b:55ce with SMTP id 4-20020a170906018400b00a19a19b55cemr2655303ejb.94.1702376269749;
+        Tue, 12 Dec 2023 02:17:49 -0800 (PST)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id s28-20020a50ab1c000000b0054c6b50df3asm4740868edc.92.2023.12.12.02.17.47
+        by smtp.gmail.com with ESMTPSA id ll9-20020a170907190900b00a1da2f7c1d8sm6026586ejc.77.2023.12.12.02.17.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 02:17:47 -0800 (PST)
+        Tue, 12 Dec 2023 02:17:49 -0800 (PST)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -67,9 +67,9 @@ Cc: kuba@kernel.org,
 	sdf@google.com,
 	horms@kernel.org,
 	przemyslaw.kitszel@intel.com
-Subject: [patch net-next v6 6/9] netlink: introduce typedef for filter function
-Date: Tue, 12 Dec 2023 11:17:33 +0100
-Message-ID: <20231212101736.1112671-7-jiri@resnulli.us>
+Subject: [patch net-next v6 7/9] genetlink: introduce helpers to do filtered multicast
+Date: Tue, 12 Dec 2023 11:17:34 +0100
+Message-ID: <20231212101736.1112671-8-jiri@resnulli.us>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231212101736.1112671-1-jiri@resnulli.us>
 References: <20231212101736.1112671-1-jiri@resnulli.us>
@@ -83,88 +83,138 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Make the code using filter function a bit nicer by consolidating the
-filter function arguments using typedef.
+Currently it is possible for netlink kernel user to pass custom
+filter function to broadcast send function netlink_broadcast_filtered().
+However, this is not exposed to multicast send and to generic
+netlink users.
 
-Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Extend the api and introduce a netlink helper nlmsg_multicast_filtered()
+and a generic netlink helper genlmsg_multicast_netns_filtered()
+to allow generic netlink families to specify filter function
+while sending multicast messages.
+
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
-v2->v3:
-- left the original .c and .h arg names and types
-  inconsistencies for cn_netlink_send_mult() and
-  netlink_broadcast_filtered()
 v1->v2:
-- new patch
+- used netlink_filter_fn introduce by the previous patch
+- added return comments to silence scripts/kernel-doc warnings
 ---
- drivers/connector/connector.c | 5 ++---
- include/linux/connector.h     | 3 +--
- include/linux/netlink.h       | 6 ++++--
- net/netlink/af_netlink.c      | 3 +--
- 4 files changed, 8 insertions(+), 9 deletions(-)
+ include/net/genetlink.h | 35 +++++++++++++++++++++++++++++++----
+ include/net/netlink.h   | 31 +++++++++++++++++++++++++++----
+ 2 files changed, 58 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/connector/connector.c b/drivers/connector/connector.c
-index 7f7b94f616a6..4028e8eeba82 100644
---- a/drivers/connector/connector.c
-+++ b/drivers/connector/connector.c
-@@ -59,9 +59,8 @@ static int cn_already_initialized;
-  * both, or if both are zero then the group is looked up and sent there.
-  */
- int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid, u32 __group,
--	gfp_t gfp_mask,
--	int (*filter)(struct sock *dsk, struct sk_buff *skb, void *data),
--	void *filter_data)
-+			 gfp_t gfp_mask, netlink_filter_fn filter,
-+			 void *filter_data)
+diff --git a/include/net/genetlink.h b/include/net/genetlink.h
+index 7df3ca11070a..3dedb6268d5e 100644
+--- a/include/net/genetlink.h
++++ b/include/net/genetlink.h
+@@ -453,6 +453,35 @@ static inline void genlmsg_cancel(struct sk_buff *skb, void *hdr)
+ 		nlmsg_cancel(skb, hdr - GENL_HDRLEN - NLMSG_HDRLEN);
+ }
+ 
++/**
++ * genlmsg_multicast_netns_filtered - multicast a netlink message
++ *				      to a specific netns with filter
++ *				      function
++ * @family: the generic netlink family
++ * @net: the net namespace
++ * @skb: netlink message as socket buffer
++ * @portid: own netlink portid to avoid sending to yourself
++ * @group: offset of multicast group in groups array
++ * @flags: allocation flags
++ * @filter: filter function
++ * @filter_data: filter function private data
++ *
++ * Return: 0 on success, negative error code for failure.
++ */
++static inline int
++genlmsg_multicast_netns_filtered(const struct genl_family *family,
++				 struct net *net, struct sk_buff *skb,
++				 u32 portid, unsigned int group, gfp_t flags,
++				 netlink_filter_fn filter,
++				 void *filter_data)
++{
++	if (WARN_ON_ONCE(group >= family->n_mcgrps))
++		return -EINVAL;
++	group = family->mcgrp_offset + group;
++	return nlmsg_multicast_filtered(net->genl_sock, skb, portid, group,
++					flags, filter, filter_data);
++}
++
+ /**
+  * genlmsg_multicast_netns - multicast a netlink message to a specific netns
+  * @family: the generic netlink family
+@@ -466,10 +495,8 @@ static inline int genlmsg_multicast_netns(const struct genl_family *family,
+ 					  struct net *net, struct sk_buff *skb,
+ 					  u32 portid, unsigned int group, gfp_t flags)
  {
- 	struct cn_callback_entry *__cbq;
- 	unsigned int size;
-diff --git a/include/linux/connector.h b/include/linux/connector.h
-index cec2d99ae902..70bc1160f3d8 100644
---- a/include/linux/connector.h
-+++ b/include/linux/connector.h
-@@ -100,8 +100,7 @@ void cn_del_callback(const struct cb_id *id);
-  */
- int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid,
- 			 u32 group, gfp_t gfp_mask,
--			 int (*filter)(struct sock *dsk, struct sk_buff *skb,
--				       void *data),
-+			 netlink_filter_fn filter,
- 			 void *filter_data);
+-	if (WARN_ON_ONCE(group >= family->n_mcgrps))
+-		return -EINVAL;
+-	group = family->mcgrp_offset + group;
+-	return nlmsg_multicast(net->genl_sock, skb, portid, group, flags);
++	return genlmsg_multicast_netns_filtered(family, net, skb, portid,
++						group, flags, NULL, NULL);
+ }
  
  /**
-diff --git a/include/linux/netlink.h b/include/linux/netlink.h
-index abe91ed6b9aa..1a4445bf2ab9 100644
---- a/include/linux/netlink.h
-+++ b/include/linux/netlink.h
-@@ -228,10 +228,12 @@ bool netlink_strict_get_check(struct sk_buff *skb);
- int netlink_unicast(struct sock *ssk, struct sk_buff *skb, __u32 portid, int nonblock);
- int netlink_broadcast(struct sock *ssk, struct sk_buff *skb, __u32 portid,
- 		      __u32 group, gfp_t allocation);
-+
-+typedef int (*netlink_filter_fn)(struct sock *dsk, struct sk_buff *skb, void *data);
-+
- int netlink_broadcast_filtered(struct sock *ssk, struct sk_buff *skb,
- 			       __u32 portid, __u32 group, gfp_t allocation,
--			       int (*filter)(struct sock *dsk,
--					     struct sk_buff *skb, void *data),
-+			       netlink_filter_fn filter,
- 			       void *filter_data);
- int netlink_set_err(struct sock *ssk, __u32 portid, __u32 group, int code);
- int netlink_register_notifier(struct notifier_block *nb);
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index 5683b0ca23b1..0efc1bd451fc 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -1519,8 +1519,7 @@ static void do_one_broadcast(struct sock *sk,
- int netlink_broadcast_filtered(struct sock *ssk, struct sk_buff *skb,
- 			       u32 portid,
- 			       u32 group, gfp_t allocation,
--			       int (*filter)(struct sock *dsk,
--					     struct sk_buff *skb, void *data),
-+			       netlink_filter_fn filter,
- 			       void *filter_data)
+diff --git a/include/net/netlink.h b/include/net/netlink.h
+index 28039e57070a..c19ff921b661 100644
+--- a/include/net/netlink.h
++++ b/include/net/netlink.h
+@@ -1087,27 +1087,50 @@ static inline void nlmsg_free(struct sk_buff *skb)
+ }
+ 
+ /**
+- * nlmsg_multicast - multicast a netlink message
++ * nlmsg_multicast_filtered - multicast a netlink message with filter function
+  * @sk: netlink socket to spread messages to
+  * @skb: netlink message as socket buffer
+  * @portid: own netlink portid to avoid sending to yourself
+  * @group: multicast group id
+  * @flags: allocation flags
++ * @filter: filter function
++ * @filter_data: filter function private data
++ *
++ * Return: 0 on success, negative error code for failure.
+  */
+-static inline int nlmsg_multicast(struct sock *sk, struct sk_buff *skb,
+-				  u32 portid, unsigned int group, gfp_t flags)
++static inline int nlmsg_multicast_filtered(struct sock *sk, struct sk_buff *skb,
++					   u32 portid, unsigned int group,
++					   gfp_t flags,
++					   netlink_filter_fn filter,
++					   void *filter_data)
  {
- 	struct net *net = sock_net(ssk);
+ 	int err;
+ 
+ 	NETLINK_CB(skb).dst_group = group;
+ 
+-	err = netlink_broadcast(sk, skb, portid, group, flags);
++	err = netlink_broadcast_filtered(sk, skb, portid, group, flags,
++					 filter, filter_data);
+ 	if (err > 0)
+ 		err = 0;
+ 
+ 	return err;
+ }
+ 
++/**
++ * nlmsg_multicast - multicast a netlink message
++ * @sk: netlink socket to spread messages to
++ * @skb: netlink message as socket buffer
++ * @portid: own netlink portid to avoid sending to yourself
++ * @group: multicast group id
++ * @flags: allocation flags
++ */
++static inline int nlmsg_multicast(struct sock *sk, struct sk_buff *skb,
++				  u32 portid, unsigned int group, gfp_t flags)
++{
++	return nlmsg_multicast_filtered(sk, skb, portid, group, flags,
++					NULL, NULL);
++}
++
+ /**
+  * nlmsg_unicast - unicast a netlink message
+  * @sk: netlink socket to spread message to
 -- 
 2.43.0
 
