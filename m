@@ -1,200 +1,353 @@
-Return-Path: <netdev+bounces-56456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AACA680EEFC
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 15:39:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45F6480EF31
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 15:46:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE0B51C20AEA
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:39:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE9E2281AF9
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:46:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CBB4745D1;
-	Tue, 12 Dec 2023 14:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F231F745DD;
+	Tue, 12 Dec 2023 14:46:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lXhvQM4U"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gw+3HsHh"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2058.outbound.protection.outlook.com [40.107.96.58])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FEDDD2;
-	Tue, 12 Dec 2023 06:39:47 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JGWKSkukbtknhxGOtHugGyz8SJYWAZxF1MbG3h6d4X/eXQ8Qr4pDf5DzWzWRLQMLSCyrvfwApGC8V2FJJTqwbeJ2GfYeI79aOUoTuY1c65dl6VnI5SlDvNr4vsoeQ+h+0/iOpsEb0ImIv/c3rRkBlBeR6Ixp8eSkb/okoWRWGk1EPtXnUHrx507iropkTJDJ6S4Wz4kU+2uzPjgo8/i8CTp/UTjx4A/2m0pQFXWNIk/wkfKSjvgvZdatOV1ocqvYc6Unm5gwTtQIFhcHP/jWw+jFIU8vbDaaQmskL2GV26TpUYDlll4QXdYomVxd4dQudGGtAVwaykDZfQd1xf/4Dg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=60HBBWINjhv3np+zHYZFIeDsai/Y2e+4IoMDbnDWuoc=;
- b=YIC4ufIZ7S5SL2Ee/NjpnfzL6TF79NoD4Ts1ZXQkBrHgyuqmniOPXrGuSDoJLfPchHomqpvwZRBzexa14SQWA3c95KuHIr/ly7MVVGzkw4hgboOhRNsLUYa4wmpygFq5JlAil2eMjVV+GSDplWV78BectsSleUCYRMAL+v/A8Ajz//Z86gP+0pB61shnXTeZPwyDakI/lLi5L625/Uk8AI1bLBFmG0CcQGTjJ5CRK1x8EcV2mGqIBSjK3j29ELnSBQpE1zJtIhB8zclX5yrruWThYMnhxs4UVDbWBUJaRTyIr9eNhySnJg+gJbzI33yuR8WqyjtPk4CZ1KX/DjD/ZA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=60HBBWINjhv3np+zHYZFIeDsai/Y2e+4IoMDbnDWuoc=;
- b=lXhvQM4UWNBxe01wW9kR8JC3GPJ3NMYcdb8QbhNsGgfj/KDrLEdEq2j9JCwdofLIpoiGJYJdkhQlEkS0Czn1+QbtQlM5Y9A4d6BV+mzJG3ulnf1SqSgulKXzTEbQsWc3IFZPNCJdjWktRujU/s8/Q93p4EPOjyaYGTb5D8aAffR7whsQ9loBODfvT5BCiZn0PGbY2zDuQ8jsSGTRk2w8rMPL3LlRIgvPPTArQ4MdO5yqEQt/SRXKu9mvBM46wHJUwAtD7NDPjKBtByOwKbMMEIPn9smMS6m+biE6Opl8G8J2GDWejh30Q6NPfL5dhkcAYHuw+m7OpFrUTbpom3GEgA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by PH7PR12MB7889.namprd12.prod.outlook.com (2603:10b6:510:27f::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.26; Tue, 12 Dec
- 2023 14:39:44 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7091.022; Tue, 12 Dec 2023
- 14:39:44 +0000
-Date: Tue, 12 Dec 2023 10:39:42 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	bpf@vger.kernel.org, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A2881BD9
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 06:46:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702392387;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y8Ls3k4OLqAXdAO2oDj775VG4CjskNZZKzFBZns4rfY=;
+	b=gw+3HsHhBAj41MeXVj5WPCQyb9HoO7UbF+v9zeA9jr6Y2flUU7YXZH1OLZc42hvraeTPNr
+	Da8qcPbaeUm1mvHUuWjOS7PIC+qsuVLqj+xmB7Zg3C5Vaazamyy3x03P1GHKS8wUBc4fDE
+	PXE4QLJnmyhD+OiZyyPZpOeA800+plE=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-10-x3bcL5NYNR6aT9ys9ue44w-1; Tue,
+ 12 Dec 2023 09:46:24 -0500
+X-MC-Unique: x3bcL5NYNR6aT9ys9ue44w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 361261E441D3;
+	Tue, 12 Dec 2023 14:46:22 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.2])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id AFA6840C6EB9;
+	Tue, 12 Dec 2023 14:46:19 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Markus Suvanto <markus.suvanto@gmail.com>,
+	Marc Dionne <marc.dionne@auristor.com>
+Cc: David Howells <dhowells@redhat.com>,
+	linux-afs@lists.infradead.org,
+	keyrings@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wang Lei <wang840925@gmail.com>,
+	Jeff Layton <jlayton@redhat.com>,
+	Steve French <sfrench@us.ibm.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	Shakeel Butt <shakeelb@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>,
-	Christoph Hellwig <hch@infradead.org>
-Subject: Re: [net-next v1 08/16] memory-provider: dmabuf devmem memory
- provider
-Message-ID: <20231212143942.GF3014157@nvidia.com>
-References: <20231208005250.2910004-1-almasrymina@google.com>
- <20231208005250.2910004-9-almasrymina@google.com>
- <20231212122535.GA3029808@nvidia.com>
- <CAHS8izMVMx0fpT=dWsnD7piqs1g7Fam8Xf5dK3iOFNxeOQD9vQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izMVMx0fpT=dWsnD7piqs1g7Fam8Xf5dK3iOFNxeOQD9vQ@mail.gmail.com>
-X-ClientProxiedBy: MN2PR20CA0021.namprd20.prod.outlook.com
- (2603:10b6:208:e8::34) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v3 3/3] keys, dns: Allow key types (eg. DNS) to be reclaimed immediately on expiry
+Date: Tue, 12 Dec 2023 14:46:11 +0000
+Message-ID: <20231212144611.3100234-4-dhowells@redhat.com>
+In-Reply-To: <20231212144611.3100234-1-dhowells@redhat.com>
+References: <20231212144611.3100234-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB7889:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5680d03c-e323-4f5b-7afb-08dbfb202e7c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	UuIYqwdDMapiqaAI841n5k2jvrudkwDIgnYHWPZxTfVMmUjFJj9cyAVWy4NP2CkYl7Onm2TocgQqRvyltAsswnRV/k1FvWckTdLe+TFu7vnRBu/btHqeLwXO95Ei8/JcKHEAoLZw1U1aBnFUn3BlEIl9IB/PBdvoZRFI3loZipW8bCzYnZzt5kR4umA8d+x8I4jlulPLxCFf5i8iV8P0US0/YrZUJAw6ow7EEvIU1h8bRx5dikzUSPtnQKTsFj83dJNBjd7PpnWT2B3i7vdfPydL96BWkQ/2p5IncrNmXoukNdoAzzN9u6deJ+iIp70X4iP1YAsBjPENLpqll+5H1+i9Xs51f4+x+BEM5NXNP781oY+7Q4qg4uPeA55nEwDO8074v1zjT3WdDCUneXgrUkW31QkFKvQsCXiVL3TgOmvcITXf1nqcXViLcEdcP9CjlgXlpBNwL/JSKX2y59c1UD9iU/Zfnxs25CzBbc5MrctdL6PwugaedwaoNmK55cuOLHS44lXV4atsOzmVa/GFSzhN/Ox9mWdTE+Fh9DOyEhhBnRA0oGUyngcAZJpJGfAV
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(346002)(366004)(396003)(136003)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(41300700001)(2906002)(8676002)(8936002)(316002)(5660300002)(7416002)(7406005)(4326008)(6512007)(6506007)(6486002)(2616005)(478600001)(54906003)(86362001)(33656002)(36756003)(66946007)(66556008)(66476007)(6916009)(38100700002)(53546011)(26005)(1076003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bTA2TnpCMjVPaHVZTWJnaWo5RmJ2UlZleEhyOUNXYWtRN2U0dzFDeHpldXlj?=
- =?utf-8?B?b1dUOVJWU1F2dm9obmUwRVJrWUZCUmtSeGJmNjk5RGhISTYyNjdNTXovYkJz?=
- =?utf-8?B?TXcyNFc0YXFUd3pNK0xzZ1h1VzJMakZuSUUxcEJsdjhvV1YvOHJlU1hCRjhL?=
- =?utf-8?B?cmV3UG1DWVIwRHdBL3luUG9BMk5LWitSZGZIWGdic2VCeEpKV0NBeE50bHRs?=
- =?utf-8?B?bFRWdDZuZHkwNnJrR3JHemRubk9PZFdyVGVtM3A0YVM3TkZtaXRjQUNBVjlK?=
- =?utf-8?B?SFdQeGZpRCtFdmpHT2NXTlhBTHlwaW54UkNBd0lHdXdwTFh2SUYwT0poUEJX?=
- =?utf-8?B?NnNVSkhoSVJSMll3OTREZGRvYXR3dVFXSHRnMXFVM3gyL0xTQ1lzZllNRlBn?=
- =?utf-8?B?cjQwUEJLc3lETmJMN1J0bkt3WG50N3RiZ1R3MlhyZk9CYXJ6R3AwcnFtd2oz?=
- =?utf-8?B?ckl4aUVkNEZHV0hEZHVmcXBkZldtekFKQjZxWDZuczdsamIweDlDQ2xwaFFK?=
- =?utf-8?B?WlErb3lYeTM2TXVweVAzRkRQcnNEdzhjUXpRY3JCeVdJN2NnWHpBekJVL1FR?=
- =?utf-8?B?WncrOWo3TUxrZDlYMU5ObVRMa29nblViVFFMN0tGQmk1bHVpWThDM3VnTG5h?=
- =?utf-8?B?R3pWSTJpdndKTXVXendHeXlkVXpPdk5BdGJIUG96cUt3ZFV5Ri9oK09JTkVQ?=
- =?utf-8?B?YVU0SEhGUUdUcGRqN1plNjJWUzZTTmgyK1dvYklYS3l1QVFvY0pPSWt1QXVX?=
- =?utf-8?B?TURhUkFSN1ZRcExUOXUvcmF3cWtKbDRmdG1rTVp3ckp3S3p2NlNrZjVQNkVu?=
- =?utf-8?B?YXRHaFg1czZSSlQrUW1DcU1ZVzhwRFlyWWxjcXE1S05NTXV5UjJjS3pvZFJC?=
- =?utf-8?B?eUJra3lOa3ZkdVVKaUlCbzF4WlBxU3E5WTZWZDlTdzRsa20wc1hTSkNTTDRq?=
- =?utf-8?B?OFV6d2VFczQxdzg5VkJmK3JXbkc1YTdQSWt5eUdjVVQ0WU5lNmc0Unpncmlk?=
- =?utf-8?B?SVdXTlJuMm5wUmRwZzFwSWNiTjcrZGJnNDVOdWJZYTkwd3VFaExRWk1PV1F1?=
- =?utf-8?B?R2tEenFMc2poQWJDdnhtZDhOLzk1TVBDNVZGK0ZSd25pTk1oM0ZkSnVOVHo2?=
- =?utf-8?B?cnFVSkJVb29qeGhBdzhvbnlZNVhrYWc3RkVKZDVjSWREQ0ZudGRQaXBKZllk?=
- =?utf-8?B?NzhWYnA0cTc2U1UzRlNoQkdXNm9EajZ4ek0rTjdVZkMvYTdHalAySHFqcVVX?=
- =?utf-8?B?VWU5SGpoLzlZc25qa3FzZkZrc3lnSHF6RFRDbzVFUTBPU1FHRGkxTTBqTGVN?=
- =?utf-8?B?YXdjQkZnQ3pzVUlJWG9HWHZMTVI0N0hxSUVDbEI2WXcxZFJtNHpadjZ5RlA4?=
- =?utf-8?B?VC9NQXl2STFXaHkwNmdFRzVaMDMyZzBBQTN5NUZodFFuVTRPZWI4QUhzdENK?=
- =?utf-8?B?OWQ0WUc0K01mVE5mRXNBUWlhd3NYVUE5bUMzb1krUEFOeHFBdDVoV1JvN0RF?=
- =?utf-8?B?aW42QVBCUUk1bGtTTUU4b056SXJseVNSVU5hMlZ4MHRSYmc3THplaFNhRXlB?=
- =?utf-8?B?QXlTOTRNU2NKL1liMVBSYU9iT1daYXliOU4xY0VIYytzU2xjQk9HYlArODRZ?=
- =?utf-8?B?SWczOTd6NHNVVW56YmtHRTZ5QngrMVZBUXh6R1hxbTJmNm5IK0NnRWJaSVk4?=
- =?utf-8?B?UHFnaW1WWHV3S2EyK0ZKWjZMd1NKbUI0ck5WRDEvbUdId256MnNjUnBFVGFu?=
- =?utf-8?B?OHArYXgwUGxRcFQ5NlZnZFBYNUlBQzV5Sml0NUI1V1ZrMG0yM2lQRU9Sdkhi?=
- =?utf-8?B?TzFzeEZ3UU5HSVlpOG9xMXQ3UzRxRnhST0tDcnZOS2NNaVBJUVoxTHpNQnJQ?=
- =?utf-8?B?bUtuc2NERFRLb3M4L1lvWVc4M25WNS9mVkoya05TOUc5bUNzWjBlNlF2VnRT?=
- =?utf-8?B?alc3bklYN0tsWXlRcEdsdlRJR05teWxnMmNBeVlQbGtZL1RhQzlUbW1lbGl2?=
- =?utf-8?B?MlZicHRKY3krcHZCaUNSLy9VbkJuL284ZE1iYkJIQTQxNzFPUDdxbXlLY2px?=
- =?utf-8?B?REZweFRzc2lnMGEydDFHTWp0cElJbEsxUGNoVklwVEVvTWpuVFArbUppWVhx?=
- =?utf-8?Q?VaUq6bnBhoGbuM0LBLJFvV3iZ?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5680d03c-e323-4f5b-7afb-08dbfb202e7c
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2023 14:39:44.2602
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: F+AmbUoeP0zhwQ8FxJf57G0tD0LUPLeDwMN9DgfIKdBe5xIHaAAYBvGyeVIBWV9B
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7889
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-On Tue, Dec 12, 2023 at 06:26:51AM -0800, Mina Almasry wrote:
-> On Tue, Dec 12, 2023 at 4:25 AM Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >
-> > On Thu, Dec 07, 2023 at 04:52:39PM -0800, Mina Almasry wrote:
-> >
-> > > +static inline struct page_pool_iov *page_to_page_pool_iov(struct page *page)
-> > > +{
-> > > +     if (page_is_page_pool_iov(page))
-> > > +             return (struct page_pool_iov *)((unsigned long)page & ~PP_IOV);
-> > > +
-> > > +     DEBUG_NET_WARN_ON_ONCE(true);
-> > > +     return NULL;
-> > > +}
-> >
-> > We already asked not to do this, please do not allocate weird things
-> > can call them 'struct page' when they are not. It undermines the
-> > maintainability of the mm to have things mis-typed like
-> > this. Introduce a new type for your thing so the compiler can check it
-> > properly.
-> >
-> 
-> There is a new type introduced, it's the page_pool_iov. We set the LSB
-> on page_pool_iov* and cast it to page* only to avoid the churn of
-> renaming page* to page_pool_iov* in the page_pool and all the net
-> drivers using it. Is that not a reasonable compromise in your opinion?
-> Since the LSB is set on the resulting page pointers, they are not
-> actually usuable as pages, and are never passed to mm APIs per your
-> requirement.
+If a key has an expiration time, then when that time passes, the key is
+left around for a certain amount of time before being collected (5 mins by
+default) so that EKEYEXPIRED can be returned instead of ENOKEY.  This is a
+problem for DNS keys because we want to redo the DNS lookup immediately at
+that point.
 
-There were two asks, the one you did was to never pass this non-struct
-page memory to the mm, which is great.
+Fix this by allowing key types to be marked such that keys of that type
+don't have this extra period, but are reclaimed as soon as they expire and
+turn this on for dns_resolver-type keys.  To make this easier to handle,
+key->expiry is changed to be permanent if TIME64_MAX rather than 0.
 
-The other was to not mistype things, and don't type something as
-struct page when it is, in fact, not.
+Furthermore, give such new-style negative DNS results a 10s default expiry
+if no other expiry time is set rather than allowing it to stick around
+indefinitely.  This shouldn't be zero as ls will follow a failing stat call
+immediately with a second with AT_SYMLINK_NOFOLLOW added.
 
-I fear what you've done is make it so only one driver calls these
-special functions and left the other drivers passing the struct page
-directly to the mm and sort of obfuscating why it is OK based on this
-netdev knowledge of not enabling/using the static branch in the other
-cases.
+Fixes: 1a4240f4764a ("DNS: Separate out CIFS DNS Resolver code")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Wang Lei <wang840925@gmail.com>
+cc: Jeff Layton <jlayton@redhat.com>
+cc: Steve French <sfrench@us.ibm.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: Jarkko Sakkinen <jarkko@kernel.org>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: linux-afs@lists.infradead.org
+cc: linux-cifs@vger.kernel.org
+cc: linux-nfs@vger.kernel.org
+cc: ceph-devel@vger.kernel.org
+cc: keyrings@vger.kernel.org
+cc: netdev@vger.kernel.org
+---
 
-Perhaps you can simply avoid this by arranging for this driver to also
-exclusively use some special type to indicate the dual nature of the
-pointer and leave the other drivers as using the struct page version.
+Notes:
+    Changes
+    =======
+    ver #3)
+     - Don't add to TIME64_MAX (ie. permanent) when checking expiry time.
 
-Jason
+ include/linux/key-type.h   |  1 +
+ net/dns_resolver/dns_key.c | 10 +++++++++-
+ security/keys/gc.c         | 31 +++++++++++++++++++++----------
+ security/keys/internal.h   | 11 ++++++++++-
+ security/keys/key.c        | 15 +++++----------
+ security/keys/proc.c       |  2 +-
+ 6 files changed, 47 insertions(+), 23 deletions(-)
+
+diff --git a/include/linux/key-type.h b/include/linux/key-type.h
+index 7d985a1dfe4a..5caf3ce82373 100644
+--- a/include/linux/key-type.h
++++ b/include/linux/key-type.h
+@@ -73,6 +73,7 @@ struct key_type {
+ 
+ 	unsigned int flags;
+ #define KEY_TYPE_NET_DOMAIN	0x00000001 /* Keys of this type have a net namespace domain */
++#define KEY_TYPE_INSTANT_REAP	0x00000002 /* Keys of this type don't have a delay after expiring */
+ 
+ 	/* vet a description */
+ 	int (*vet_description)(const char *description);
+diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+index 01e54b46ae0b..3233f4f25fed 100644
+--- a/net/dns_resolver/dns_key.c
++++ b/net/dns_resolver/dns_key.c
+@@ -91,6 +91,7 @@ const struct cred *dns_resolver_cache;
+ static int
+ dns_resolver_preparse(struct key_preparsed_payload *prep)
+ {
++	const struct dns_server_list_v1_header *v1;
+ 	const struct dns_payload_header *bin;
+ 	struct user_key_payload *upayload;
+ 	unsigned long derrno;
+@@ -122,6 +123,13 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
+ 			return -EINVAL;
+ 		}
+ 
++		v1 = (const struct dns_server_list_v1_header *)bin;
++		if ((v1->status != DNS_LOOKUP_GOOD &&
++		     v1->status != DNS_LOOKUP_GOOD_WITH_BAD)) {
++			if (prep->expiry == TIME64_MAX)
++				prep->expiry = ktime_get_real_seconds() + 10;
++		}
++
+ 		result_len = datalen;
+ 		goto store_result;
+ 	}
+@@ -314,7 +322,7 @@ static long dns_resolver_read(const struct key *key,
+ 
+ struct key_type key_type_dns_resolver = {
+ 	.name		= "dns_resolver",
+-	.flags		= KEY_TYPE_NET_DOMAIN,
++	.flags		= KEY_TYPE_NET_DOMAIN | KEY_TYPE_INSTANT_REAP,
+ 	.preparse	= dns_resolver_preparse,
+ 	.free_preparse	= dns_resolver_free_preparse,
+ 	.instantiate	= generic_key_instantiate,
+diff --git a/security/keys/gc.c b/security/keys/gc.c
+index 3c90807476eb..eaddaceda14e 100644
+--- a/security/keys/gc.c
++++ b/security/keys/gc.c
+@@ -66,6 +66,19 @@ void key_schedule_gc(time64_t gc_at)
+ 	}
+ }
+ 
++/*
++ * Set the expiration time on a key.
++ */
++void key_set_expiry(struct key *key, time64_t expiry)
++{
++	key->expiry = expiry;
++	if (expiry != TIME64_MAX) {
++		if (!(key->type->flags & KEY_TYPE_INSTANT_REAP))
++			expiry += key_gc_delay;
++		key_schedule_gc(expiry);
++	}
++}
++
+ /*
+  * Schedule a dead links collection run.
+  */
+@@ -176,7 +189,6 @@ static void key_garbage_collector(struct work_struct *work)
+ 	static u8 gc_state;		/* Internal persistent state */
+ #define KEY_GC_REAP_AGAIN	0x01	/* - Need another cycle */
+ #define KEY_GC_REAPING_LINKS	0x02	/* - We need to reap links */
+-#define KEY_GC_SET_TIMER	0x04	/* - We need to restart the timer */
+ #define KEY_GC_REAPING_DEAD_1	0x10	/* - We need to mark dead keys */
+ #define KEY_GC_REAPING_DEAD_2	0x20	/* - We need to reap dead key links */
+ #define KEY_GC_REAPING_DEAD_3	0x40	/* - We need to reap dead keys */
+@@ -184,21 +196,17 @@ static void key_garbage_collector(struct work_struct *work)
+ 
+ 	struct rb_node *cursor;
+ 	struct key *key;
+-	time64_t new_timer, limit;
++	time64_t new_timer, limit, expiry;
+ 
+ 	kenter("[%lx,%x]", key_gc_flags, gc_state);
+ 
+ 	limit = ktime_get_real_seconds();
+-	if (limit > key_gc_delay)
+-		limit -= key_gc_delay;
+-	else
+-		limit = key_gc_delay;
+ 
+ 	/* Work out what we're going to be doing in this pass */
+ 	gc_state &= KEY_GC_REAPING_DEAD_1 | KEY_GC_REAPING_DEAD_2;
+ 	gc_state <<= 1;
+ 	if (test_and_clear_bit(KEY_GC_KEY_EXPIRED, &key_gc_flags))
+-		gc_state |= KEY_GC_REAPING_LINKS | KEY_GC_SET_TIMER;
++		gc_state |= KEY_GC_REAPING_LINKS;
+ 
+ 	if (test_and_clear_bit(KEY_GC_REAP_KEYTYPE, &key_gc_flags))
+ 		gc_state |= KEY_GC_REAPING_DEAD_1;
+@@ -233,8 +241,11 @@ static void key_garbage_collector(struct work_struct *work)
+ 			}
+ 		}
+ 
+-		if (gc_state & KEY_GC_SET_TIMER) {
+-			if (key->expiry > limit && key->expiry < new_timer) {
++		expiry = key->expiry;
++		if (expiry != TIME64_MAX) {
++			if (!(key->type->flags & KEY_TYPE_INSTANT_REAP))
++				expiry += key_gc_delay;
++			if (expiry > limit && expiry < new_timer) {
+ 				kdebug("will expire %x in %lld",
+ 				       key_serial(key), key->expiry - limit);
+ 				new_timer = key->expiry;
+@@ -276,7 +287,7 @@ static void key_garbage_collector(struct work_struct *work)
+ 	 */
+ 	kdebug("pass complete");
+ 
+-	if (gc_state & KEY_GC_SET_TIMER && new_timer != (time64_t)TIME64_MAX) {
++	if (new_timer != TIME64_MAX) {
+ 		new_timer += key_gc_delay;
+ 		key_schedule_gc(new_timer);
+ 	}
+diff --git a/security/keys/internal.h b/security/keys/internal.h
+index 471cf36dedc0..2cffa6dc8255 100644
+--- a/security/keys/internal.h
++++ b/security/keys/internal.h
+@@ -167,6 +167,7 @@ extern unsigned key_gc_delay;
+ extern void keyring_gc(struct key *keyring, time64_t limit);
+ extern void keyring_restriction_gc(struct key *keyring,
+ 				   struct key_type *dead_type);
++void key_set_expiry(struct key *key, time64_t expiry);
+ extern void key_schedule_gc(time64_t gc_at);
+ extern void key_schedule_gc_links(void);
+ extern void key_gc_keytype(struct key_type *ktype);
+@@ -215,10 +216,18 @@ extern struct key *key_get_instantiation_authkey(key_serial_t target_id);
+  */
+ static inline bool key_is_dead(const struct key *key, time64_t limit)
+ {
++	time64_t expiry = key->expiry;
++
++	if (expiry != TIME64_MAX) {
++		if (!(key->type->flags & KEY_TYPE_INSTANT_REAP))
++			expiry += key_gc_delay;
++		if (expiry <= limit)
++			return true;
++	}
++
+ 	return
+ 		key->flags & ((1 << KEY_FLAG_DEAD) |
+ 			      (1 << KEY_FLAG_INVALIDATED)) ||
+-		(key->expiry > 0 && key->expiry <= limit) ||
+ 		key->domain_tag->removed;
+ }
+ 
+diff --git a/security/keys/key.c b/security/keys/key.c
+index 0260a1902922..5b10641debd5 100644
+--- a/security/keys/key.c
++++ b/security/keys/key.c
+@@ -294,6 +294,7 @@ struct key *key_alloc(struct key_type *type, const char *desc,
+ 	key->uid = uid;
+ 	key->gid = gid;
+ 	key->perm = perm;
++	key->expiry = TIME64_MAX;
+ 	key->restrict_link = restrict_link;
+ 	key->last_used_at = ktime_get_real_seconds();
+ 
+@@ -463,10 +464,7 @@ static int __key_instantiate_and_link(struct key *key,
+ 			if (authkey)
+ 				key_invalidate(authkey);
+ 
+-			if (prep->expiry != TIME64_MAX) {
+-				key->expiry = prep->expiry;
+-				key_schedule_gc(prep->expiry + key_gc_delay);
+-			}
++			key_set_expiry(key, prep->expiry);
+ 		}
+ 	}
+ 
+@@ -606,8 +604,7 @@ int key_reject_and_link(struct key *key,
+ 		atomic_inc(&key->user->nikeys);
+ 		mark_key_instantiated(key, -error);
+ 		notify_key(key, NOTIFY_KEY_INSTANTIATED, -error);
+-		key->expiry = ktime_get_real_seconds() + timeout;
+-		key_schedule_gc(key->expiry + key_gc_delay);
++		key_set_expiry(key, ktime_get_real_seconds() + timeout);
+ 
+ 		if (test_and_clear_bit(KEY_FLAG_USER_CONSTRUCT, &key->flags))
+ 			awaken = 1;
+@@ -723,16 +720,14 @@ struct key_type *key_type_lookup(const char *type)
+ 
+ void key_set_timeout(struct key *key, unsigned timeout)
+ {
+-	time64_t expiry = 0;
++	time64_t expiry = TIME64_MAX;
+ 
+ 	/* make the changes with the locks held to prevent races */
+ 	down_write(&key->sem);
+ 
+ 	if (timeout > 0)
+ 		expiry = ktime_get_real_seconds() + timeout;
+-
+-	key->expiry = expiry;
+-	key_schedule_gc(key->expiry + key_gc_delay);
++	key_set_expiry(key, expiry);
+ 
+ 	up_write(&key->sem);
+ }
+diff --git a/security/keys/proc.c b/security/keys/proc.c
+index d0cde6685627..4f4e2c1824f1 100644
+--- a/security/keys/proc.c
++++ b/security/keys/proc.c
+@@ -198,7 +198,7 @@ static int proc_keys_show(struct seq_file *m, void *v)
+ 
+ 	/* come up with a suitable timeout value */
+ 	expiry = READ_ONCE(key->expiry);
+-	if (expiry == 0) {
++	if (expiry == TIME64_MAX) {
+ 		memcpy(xbuf, "perm", 5);
+ 	} else if (now >= expiry) {
+ 		memcpy(xbuf, "expd", 5);
+
 
