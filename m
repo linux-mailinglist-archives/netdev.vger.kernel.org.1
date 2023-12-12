@@ -1,92 +1,75 @@
-Return-Path: <netdev+bounces-56644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F5DD80FB68
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 00:31:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03B7E80FB71
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 00:34:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CEB0B20D76
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 23:31:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A685B1F21965
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 23:34:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69FA264CE9;
-	Tue, 12 Dec 2023 23:31:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NpJl0Nne"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C6164CF0;
+	Tue, 12 Dec 2023 23:34:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 955E0B3;
-	Tue, 12 Dec 2023 15:31:11 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1d349aa5cdcso1026145ad.1;
-        Tue, 12 Dec 2023 15:31:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702423871; x=1703028671; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QsjM367fa6clENluFuDiSWHKmDiBTaLY09qdeJ4z4jE=;
-        b=NpJl0Nneim1kVJD3CcUYSEifqcV4Y8/yArIk8MsVIUimipiTRKUKD5Ozsl6XyrDy1j
-         vATgEjKScLmAUFOUjgrctEq+HG6U/AwljBkUjAx+FhFcYwbRo4fnjPqtQFREzCBqXRn2
-         aHDMRkboEBq+n0LszThU0/bf/5RWuBPsARkJRTsVm3MgsbsuJibDzaJ61K5aeP9YB1Xn
-         lYfcc6NzMeKZeOMpBPoh5dY6UO5n8BP4fYaRYXtn7YZc0HOY6bO57z7AWYVZmdvuhVPt
-         nKdp27VcW7g6TnIh3noiA+eOsmJLfvmG1vr+JBszhzVvPhwEjE/BR7DFIlVY7gJR81wq
-         pP5A==
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1FB2A0;
+	Tue, 12 Dec 2023 15:34:45 -0800 (PST)
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a1f653e3c3dso658307166b.2;
+        Tue, 12 Dec 2023 15:34:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702423871; x=1703028671;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QsjM367fa6clENluFuDiSWHKmDiBTaLY09qdeJ4z4jE=;
-        b=bOSPJi21Jexlut/gAu+lXZp062wdgppxRYKUEz7r/rFFaT3PUJkjMxJGItgSIO8b5m
-         5/RHLgIL0DQlx6sCDyKj8KwERC/UJICBCGrx7Y5Ke3XkccoI7NTL4vxctbqnL6j0X1A6
-         2yHaEqArcp4vW0Cz8xtM2ZAMQNnao2D8xDG20YVBSTaSBTcl0+nlgPusQtiac2VfBM0M
-         T6hSBygw7AtAxqHohS4n258tHI3m36N/sEvOYeG4IZuBxDLkvvAC8ErO4uQ5q+KvEF15
-         pGxto0q92jsFZ2ujxp2kcfP6cdC2xvxYB3Cdml+kgWCe8ShYo1b31twjAOBCwXlt/8o0
-         qeSw==
-X-Gm-Message-State: AOJu0Yx8fEPbJnGRDAJi6084pwNK2ZLeO8I+Sqb1I56KdoZGS4Ym7aEV
-	sehZ3ziTKrAPBz5DnbIslw0=
-X-Google-Smtp-Source: AGHT+IHv3exHvhJ4r7lyw8S7Q7oU2bNB1feAg/yOXA304/6sAgsN3mzSxHLSHO4bkKQpvpG1mKmyEA==
-X-Received: by 2002:a17:902:ea0d:b0:1d0:b693:ae30 with SMTP id s13-20020a170902ea0d00b001d0b693ae30mr13685382plg.6.1702423870831;
-        Tue, 12 Dec 2023 15:31:10 -0800 (PST)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id f10-20020a170902ce8a00b001cc8cf4ad16sm9241077plg.246.2023.12.12.15.31.10
+        d=1e100.net; s=20230601; t=1702424084; x=1703028884;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g8BCH+XloJAoL2ErcgZHUuWCOYCoHswW23v2ajF1r/M=;
+        b=IIQwjJ+fRH8gIN9VG18IAQhVzNI8V91OoLixl4/RIPQxQG9L1wMhvmZh3oFuNUHbLo
+         VFKJkzjKRZZGjEdW60lzXgEfwMZj3iPt9O0o3IjUp8Y0Bq1hHU+VXHpzbaXkqi+WK39I
+         F8alLf7rJVrl3zVcLwKuYf6JaBRPj2YAwMLdPE1n+Rh+OZ7i7kuKC/PUGcNNTGcRo0KB
+         pFwM70yVmxxqnhNVyrjrIiRFhp7Sd5o1lPRl9l4uaw5IjBZ26b8MlUjWoBL4ugzmSsWk
+         Kokq9hOpTMMADnwHqINqbaGoXtt5f1aNpTobtm/8pGLK1XOwO9jK0gTxidxMqJJopZQ2
+         sqgw==
+X-Gm-Message-State: AOJu0Yyx33GZekyIek+x7gCP7CjxgxPsF063KhZ320vSHrbP+Xvq+8ZO
+	cn5/6pur3L6Um46jUXID90k=
+X-Google-Smtp-Source: AGHT+IE+ZS50QN2cjpnHJfJ479Ioj5eP2Kok6/PKjUvIwARxSa4/9T0JV88vzgBuNRG2izHbz660TQ==
+X-Received: by 2002:a17:906:bf41:b0:a1d:86c0:7be1 with SMTP id ps1-20020a170906bf4100b00a1d86c07be1mr1932105ejb.251.1702424083966;
+        Tue, 12 Dec 2023 15:34:43 -0800 (PST)
+Received: from gmail.com (fwdproxy-cln-021.fbsv.net. [2a03:2880:31ff:15::face:b00c])
+        by smtp.gmail.com with ESMTPSA id rm6-20020a1709076b0600b00a1f6f120b33sm6409143ejc.110.2023.12.12.15.34.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 15:31:10 -0800 (PST)
-Date: Wed, 13 Dec 2023 08:31:09 +0900 (JST)
-Message-Id: <20231213.083109.2097548498951503416.fujita.tomonori@gmail.com>
-To: boqun.feng@gmail.com
-Cc: benno.lossin@proton.me, fujita.tomonori@gmail.com, alice@ryhl.io,
- netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
- tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com, wedsonaf@gmail.com,
- aliceryhl@google.com
-Subject: Re: [PATCH net-next v10 1/4] rust: core abstractions for network
- PHY drivers
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <ZXjBKEBUrisSJ7Gx@boqun-archlinux>
-References: <20231212.220216.1253919664184581703.fujita.tomonori@gmail.com>
-	<544015ec-52a4-4253-a064-8a2b370c06dc@proton.me>
-	<ZXjBKEBUrisSJ7Gx@boqun-archlinux>
+        Tue, 12 Dec 2023 15:34:43 -0800 (PST)
+Date: Tue, 12 Dec 2023 15:34:41 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>, donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v3 09/13] doc/netlink: Regenerate netlink .rst
+ files if ynl-gen-rst changes
+Message-ID: <ZXjuEUmXWRLMbj15@gmail.com>
+References: <20231212221552.3622-1-donald.hunter@gmail.com>
+ <20231212221552.3622-10-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231212221552.3622-10-donald.hunter@gmail.com>
 
-On Tue, 12 Dec 2023 12:23:04 -0800
-Boqun Feng <boqun.feng@gmail.com> wrote:
+> +$(YNL_INDEX): $(YNL_RST_FILES) $(YNL_TOOL)
+> +	$(Q)$(YNL_TOOL) -o $@ -x
 
-> So the rationale here is the callsite of mdiobus_read() is just a
-> open-code version of phy_read(), so if we meet the same requirement of
-> phy_read(), we should be safe here. Maybe:
-> 
-> 	"... open code of `phy_read()` with a valid phy_device pointer
-> 	`phydev`"
-> 
-> ?
+Isn't $(YNL_INDEX) depending to $(YNL_TOOL) indirectly since it depends
+on $(YNL_RST_FILES) ?
 
-I'll add the above comment with the similar for phy_write(), thanks!
+I mean, do you really need the line above?
+
+> +$(YNL_RST_DIR)/%.rst: $(YNL_YAML_DIR)/%.yaml $(YNL_TOOL)
+> +	$(Q)$(YNL_TOOL) -i $< -o $@
 
