@@ -1,258 +1,97 @@
-Return-Path: <netdev+bounces-56589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F61280F7FD
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 21:36:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1691280F802
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 21:39:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AEC53B20F41
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 20:36:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3C8F1F214EA
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 20:39:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BBB364129;
-	Tue, 12 Dec 2023 20:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KBJz5KRT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7291D6412E;
+	Tue, 12 Dec 2023 20:39:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64598BD
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 12:36:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702413382; x=1733949382;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ws0sqRTAwKSfM+yFT7+KFhYb9i40f8BjVoNLgKCocyk=;
-  b=KBJz5KRTKqiNI8L4oQiJU9xoi24CGjwwgvbWrZlPWT66ULDOI5h4e8q0
-   Zj99GL5zOxSiGl2TPEa9V5Hx+rbYfzyTrFjlcrBE2reciuD7YPrkkAGah
-   MdoQbfOgPMDO+UNTQva0vju+d9pip7WfAKiOufR7MWVMy27YIEbth38ba
-   +Qr/gkj0GuKDXy/GhzgU7msLHWMkaUzcILNWn1pYCQHiismHeuKGTvEyQ
-   yQ4tIXtKYhyuAbJJcCOhTcHbmDfLpmGUmpDfsXxktZmY82+8Ymp50D3pc
-   7Qj0/Uac6+EX4XKxBr+hrDTrRW50vDisu+2bzmId2uHmXapMkMLeQd98C
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="16418350"
-X-IronPort-AV: E=Sophos;i="6.04,271,1695711600"; 
-   d="scan'208";a="16418350"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 12:36:21 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="839577725"
-X-IronPort-AV: E=Sophos;i="6.04,271,1695711600"; 
-   d="scan'208";a="839577725"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmsmga008.fm.intel.com with ESMTP; 12 Dec 2023 12:36:20 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Slawomir Laba <slawomirx.laba@intel.com>,
-	anthony.l.nguyen@intel.com,
-	madhu.chittim@intel.com,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Ranganatha Rao <ranganatha.rao@intel.com>,
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net 3/3] iavf: Fix iavf_shutdown to call iavf_remove instead iavf_close
-Date: Tue, 12 Dec 2023 12:36:09 -0800
-Message-ID: <20231212203613.513423-4-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231212203613.513423-1-anthony.l.nguyen@intel.com>
-References: <20231212203613.513423-1-anthony.l.nguyen@intel.com>
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5926BC;
+	Tue, 12 Dec 2023 12:39:41 -0800 (PST)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a1f5cb80a91so665107566b.3;
+        Tue, 12 Dec 2023 12:39:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702413580; x=1703018380;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Go6fvDPmFCdEym2r9IELET0hUv2nxIIQ4R4i+BuwgG0=;
+        b=aTGu9S7ZOTASvwv1kuy2O9ExDx3sDHggfoqgi9O+vwb4s9r9M3bT/6aOONoulBUpdm
+         O5zK2G85fCE8Uqhu0hTfwgCRZrETmVnhPNHVmiofILn4rHUIQeXQ18VxYYh/Mcyg966E
+         yPUBcphMRM7OTCh0HPX6IvX2i5vLVtlkS+fnnlGO4FG459iyXoox+HPYevDjxaiLHdQE
+         vFdblyydPFTM4lwjgcZ7Oe+k3fjNlI5AKFRxII+Ewt4JJsLjt7hbn107qu9z6qnyEeZj
+         RctyVcrDKiBMvtVXRKrwmEA9mHSDyUa48uJF1hronoTfhdHr6xQu9If7CJ2oZN5A88XB
+         AtHA==
+X-Gm-Message-State: AOJu0Yz8od6EOf9gHpTN6gIiUq8AfyJekAJ28CGcFnemKeoHMs+5hHJ3
+	9vZ8913NylrPyzO0vexWQwM=
+X-Google-Smtp-Source: AGHT+IE2kJyLwALQrYrxatA2e5XPjGxAzOJyuIz/sUEcYn9PsHck8cNEBndbF6mmhjVn57sXFAPGeQ==
+X-Received: by 2002:a17:907:d15:b0:a1a:582d:f0e9 with SMTP id gn21-20020a1709070d1500b00a1a582df0e9mr2583209ejc.73.1702413580017;
+        Tue, 12 Dec 2023 12:39:40 -0800 (PST)
+Received: from gmail.com (fwdproxy-cln-025.fbsv.net. [2a03:2880:31ff:19::face:b00c])
+        by smtp.gmail.com with ESMTPSA id rf22-20020a1709076a1600b00a1d0b15f634sm6673271ejc.76.2023.12.12.12.39.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Dec 2023 12:39:39 -0800 (PST)
+Date: Tue, 12 Dec 2023 12:39:35 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>, donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v2 03/11] doc/netlink: Regenerate netlink .rst
+ files if ynl-gen-rst changes
+Message-ID: <ZXjFB90lpIQqbFtE@gmail.com>
+References: <20231211164039.83034-1-donald.hunter@gmail.com>
+ <20231211164039.83034-4-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231211164039.83034-4-donald.hunter@gmail.com>
 
-From: Slawomir Laba <slawomirx.laba@intel.com>
+On Mon, Dec 11, 2023 at 04:40:31PM +0000, Donald Hunter wrote:
+> Add ynl-gen-rst.py to the dependencies for the netlink .rst files in the
+> doc Makefile so that the docs get regenerated if the ynl-gen-rst.py
+> script is modified.
+> 
+> Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+> ---
+>  Documentation/Makefile | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/Makefile b/Documentation/Makefile
+> index 5c156fbb6cdf..9a31625ea1ff 100644
+> --- a/Documentation/Makefile
+> +++ b/Documentation/Makefile
+> @@ -105,11 +105,12 @@ YNL_TOOL:=$(srctree)/tools/net/ynl/ynl-gen-rst.py
+>  YNL_RST_FILES_TMP := $(patsubst %.yaml,%.rst,$(wildcard $(YNL_YAML_DIR)/*.yaml))
+>  YNL_RST_FILES := $(patsubst $(YNL_YAML_DIR)%,$(YNL_RST_DIR)%, $(YNL_RST_FILES_TMP))
+>  
+> -$(YNL_INDEX): $(YNL_RST_FILES)
+> +$(YNL_INDEX): $(YNL_RST_FILES) $(YNL_TOOL)
+>  	@$(YNL_TOOL) -o $@ -x
+>  
+> -$(YNL_RST_DIR)/%.rst: $(YNL_YAML_DIR)/%.yaml
+> -	@$(YNL_TOOL) -i $< -o $@
 
-Make the flow for pci shutdown be the same to the pci remove.
+> +$(YNL_RST_DIR)/%.rst: $(YNL_TOOL)
+> +$(YNL_RST_DIR)/%.rst: $(YNL_YAML_DIR)/%.yaml $(YNL_TOOL)
+> +	$(YNL_TOOL) -i $< -o $@
 
-iavf_shutdown was implementing an incomplete version
-of iavf_remove. It misses several calls to the kernel like
-iavf_free_misc_irq, iavf_reset_interrupt_capability, iounmap
-that might break the system on reboot or hibernation.
+Why do you need both lines here? Isn't the last line enough?
 
-Implement the call of iavf_remove directly in iavf_shutdown to
-close this gap.
-
-Fixes below error messages (dmesg) during shutdown stress tests -
-[685814.900917] ice 0000:88:00.0: MAC 02:d0:5f:82:43:5d does not exist for
- VF 0
-[685814.900928] ice 0000:88:00.0: MAC 33:33:00:00:00:01 does not exist for
-VF 0
-
-Reproduction:
-
-1. Create one VF interface:
-echo 1 > /sys/class/net/<interface_name>/device/sriov_numvfs
-
-2. Run live dmesg on the host:
-dmesg -wH
-
-3. On SUT, script below steps into vf_namespace_assignment.sh
-
-<#!/bin/sh> // Remove <>. Git removes # line
-if=<VF name> (edit this per VF name)
-loop=0
-
-while true; do
-
-echo test round $loop
-let loop++
-
-ip netns add ns$loop
-ip link set dev $if up
-ip link set dev $if netns ns$loop
-ip netns exec ns$loop ip link set dev $if up
-ip netns exec ns$loop ip link set dev $if netns 1
-ip netns delete ns$loop
-
-done
-
-4. Run the script for at least 1000 iterations on SUT:
-./vf_namespace_assignment.sh
-
-Expected result:
-No errors in dmesg.
-
-Fixes: 129cf89e5856 ("iavf: rename functions and structs to new name")
-Signed-off-by: Slawomir Laba <slawomirx.laba@intel.com>
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Reviewed-by: Ahmed Zaki <ahmed.zaki@intel.com>
-Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Co-developed-by: Ranganatha Rao <ranganatha.rao@intel.com>
-Signed-off-by: Ranganatha Rao <ranganatha.rao@intel.com>
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/iavf/iavf_main.c | 72 ++++++---------------
- 1 file changed, 21 insertions(+), 51 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 98116872f6bd..e8d5b889addc 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -276,27 +276,6 @@ void iavf_free_virt_mem(struct iavf_hw *hw, struct iavf_virt_mem *mem)
- 	kfree(mem->va);
- }
- 
--/**
-- * iavf_lock_timeout - try to lock mutex but give up after timeout
-- * @lock: mutex that should be locked
-- * @msecs: timeout in msecs
-- *
-- * Returns 0 on success, negative on failure
-- **/
--static int iavf_lock_timeout(struct mutex *lock, unsigned int msecs)
--{
--	unsigned int wait, delay = 10;
--
--	for (wait = 0; wait < msecs; wait += delay) {
--		if (mutex_trylock(lock))
--			return 0;
--
--		msleep(delay);
--	}
--
--	return -1;
--}
--
- /**
-  * iavf_schedule_reset - Set the flags and schedule a reset event
-  * @adapter: board private structure
-@@ -4914,34 +4893,6 @@ int iavf_process_config(struct iavf_adapter *adapter)
- 	return 0;
- }
- 
--/**
-- * iavf_shutdown - Shutdown the device in preparation for a reboot
-- * @pdev: pci device structure
-- **/
--static void iavf_shutdown(struct pci_dev *pdev)
--{
--	struct iavf_adapter *adapter = iavf_pdev_to_adapter(pdev);
--	struct net_device *netdev = adapter->netdev;
--
--	netif_device_detach(netdev);
--
--	if (netif_running(netdev))
--		iavf_close(netdev);
--
--	if (iavf_lock_timeout(&adapter->crit_lock, 5000))
--		dev_warn(&adapter->pdev->dev, "%s: failed to acquire crit_lock\n", __func__);
--	/* Prevent the watchdog from running. */
--	iavf_change_state(adapter, __IAVF_REMOVE);
--	adapter->aq_required = 0;
--	mutex_unlock(&adapter->crit_lock);
--
--#ifdef CONFIG_PM
--	pci_save_state(pdev);
--
--#endif
--	pci_disable_device(pdev);
--}
--
- /**
-  * iavf_probe - Device Initialization Routine
-  * @pdev: PCI device information struct
-@@ -5152,16 +5103,21 @@ static int __maybe_unused iavf_resume(struct device *dev_d)
-  **/
- static void iavf_remove(struct pci_dev *pdev)
- {
--	struct iavf_adapter *adapter = iavf_pdev_to_adapter(pdev);
- 	struct iavf_fdir_fltr *fdir, *fdirtmp;
- 	struct iavf_vlan_filter *vlf, *vlftmp;
- 	struct iavf_cloud_filter *cf, *cftmp;
- 	struct iavf_adv_rss *rss, *rsstmp;
- 	struct iavf_mac_filter *f, *ftmp;
-+	struct iavf_adapter *adapter;
- 	struct net_device *netdev;
- 	struct iavf_hw *hw;
- 
--	netdev = adapter->netdev;
-+	/* Don't proceed with remove if netdev is already freed */
-+	netdev = pci_get_drvdata(pdev);
-+	if (!netdev)
-+		return;
-+
-+	adapter = iavf_pdev_to_adapter(pdev);
- 	hw = &adapter->hw;
- 
- 	if (test_and_set_bit(__IAVF_IN_REMOVE_TASK, &adapter->crit_section))
-@@ -5273,11 +5229,25 @@ static void iavf_remove(struct pci_dev *pdev)
- 
- 	destroy_workqueue(adapter->wq);
- 
-+	pci_set_drvdata(pdev, NULL);
-+
- 	free_netdev(netdev);
- 
- 	pci_disable_device(pdev);
- }
- 
-+/**
-+ * iavf_shutdown - Shutdown the device in preparation for a reboot
-+ * @pdev: pci device structure
-+ **/
-+static void iavf_shutdown(struct pci_dev *pdev)
-+{
-+	iavf_remove(pdev);
-+
-+	if (system_state == SYSTEM_POWER_OFF)
-+		pci_set_power_state(pdev, PCI_D3hot);
-+}
-+
- static SIMPLE_DEV_PM_OPS(iavf_pm_ops, iavf_suspend, iavf_resume);
- 
- static struct pci_driver iavf_driver = {
--- 
-2.41.0
-
+	$(YNL_RST_DIR)/%.rst: $(YNL_YAML_DIR)/%.yaml $(YNL_TOOL)
 
