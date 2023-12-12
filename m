@@ -1,285 +1,200 @@
-Return-Path: <netdev+bounces-56267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43A8180E574
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 09:08:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73AE180E596
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 09:12:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AAC5DB20B6B
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 08:08:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4763281E57
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 08:12:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 034C818050;
-	Tue, 12 Dec 2023 08:08:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yjDyLlX+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6BD18B0B;
+	Tue, 12 Dec 2023 08:11:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1A16C7
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 00:07:56 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-50bf37fd2bbso7077227e87.0
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 00:07:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702368475; x=1702973275; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=KEK+GLviJvtTbzYzmtDV4AEm8T+lMdwOyDcx0NSd3/o=;
-        b=yjDyLlX+WKvy4KTLqbEPOCBw4F+IfDEZIpxf47iaC+QwGIVN2mrumhoyWdfOJrZ4ln
-         elyQuYvRjFjTkc6oFXoVx6liygAGXgNq2KJsItw/ovqcLu0yKy56kIVV7YzDoowB1pRi
-         ks/5kNP3Pq4YwfnuN81N/o7hZ2oHD+mjhjXXeHtoNCrudwV9wg5+35c5/sB/6TI3b9Sj
-         4RESd8RD116cSDinYlkJ2MSyEmBrXvxm3GeUBqTMhncOnEV2ldV3DjKpqwGuotby8Jlb
-         krIJQANQDL1ceXf/yKAp7b2enwvIJlKKajnuMCFKYnGeVzM3m0o7sGrSs98s6tchC2Fo
-         oaaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702368475; x=1702973275;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KEK+GLviJvtTbzYzmtDV4AEm8T+lMdwOyDcx0NSd3/o=;
-        b=jgoEIvsnDXucfIzmWm8F9CLbCVqsAYYoJM+htUcAMM3KBVbKQ0OxvRUocXxhDksKv9
-         z2HjpJYeVXBLGHv5oUK1YI3h0I6imadSWGgWMaO6rSDV5MpNYqfTcnORqLqmgOvzHvnd
-         9QuQXwrYcbKQfbYsue8nApXL8Hnx+4uLc4LMQXeXUOHDeRsiWxfDLj40RGb9csizgI2k
-         1TkaM6twy7ZMHwfTHYJ04itCmUGjsbKvAL8+lH/aORZvbbfimC7NbYXGogofvLnv4AB2
-         uSf9rL8xYtuYPqJmqd0DcjBTVSkNNaVX3xVAP0YBW1YHhvwtMf33p4PS41tKgUXZcVHa
-         umTw==
-X-Gm-Message-State: AOJu0YzXpMed/fwdzcVKlXoxuZ4XXRlQiDJt1ADZOfDDB/MN8fW9JrBK
-	l5rxdrtxzb0r+ZX13Oh8fWhUD4N5SgGoROHgwIwwlQ==
-X-Google-Smtp-Source: AGHT+IEyDnIHVqAdsBAK/Xj7zNRHMZz0/zXmDbcUqKkjG+kJeiX3tGS1DN1FlCnS9R/LXR3IKWLy3yX4hnlm0fdZnR8=
-X-Received: by 2002:a05:6512:a8c:b0:50c:6b:f164 with SMTP id
- m12-20020a0565120a8c00b0050c006bf164mr3620875lfu.27.1702368474939; Tue, 12
- Dec 2023 00:07:54 -0800 (PST)
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8FDFB8
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 00:11:44 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VyLmTHU_1702368701;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VyLmTHU_1702368701)
+          by smtp.aliyun-inc.com;
+          Tue, 12 Dec 2023 16:11:42 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux-foundation.org
+Subject: [PATCH v1] virtio_net: fix missing dma unmap for resize
+Date: Tue, 12 Dec 2023 16:11:41 +0800
+Message-Id: <20231212081141.39757-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231208005250.2910004-1-almasrymina@google.com> <20231208005250.2910004-3-almasrymina@google.com>
-In-Reply-To: <20231208005250.2910004-3-almasrymina@google.com>
-From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Date: Tue, 12 Dec 2023 10:07:18 +0200
-Message-ID: <CAC_iWjKikzwpjR0hBjYuRxgYjyqp_EYrrxoveB_2DgCxk6vWYw@mail.gmail.com>
-Subject: Re: [net-next v1 02/16] net: page_pool: create hooks for custom page providers
-To: Mina Almasry <almasrymina@google.com>
-Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeelb@google.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Git-Hash: 9b708181512b
+Content-Transfer-Encoding: 8bit
 
-Hi Mina,
+For rq, we have three cases getting buffers from virtio core:
 
-Apologies for not participating in the party earlier.
+1. virtqueue_get_buf{,_ctx}
+2. virtqueue_detach_unused_buf
+3. callback for virtqueue_resize
 
-On Fri, 8 Dec 2023 at 02:52, Mina Almasry <almasrymina@google.com> wrote:
->
-> From: Jakub Kicinski <kuba@kernel.org>
->
-> The page providers which try to reuse the same pages will
-> need to hold onto the ref, even if page gets released from
-> the pool - as in releasing the page from the pp just transfers
-> the "ownership" reference from pp to the provider, and provider
-> will wait for other references to be gone before feeding this
-> page back into the pool.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
->
-> ---
->
-> This is implemented by Jakub in his RFC:
-> https://lore.kernel.org/netdev/f8270765-a27b-6ccf-33ea-cda097168d79@redhat.com/T/
->
-> I take no credit for the idea or implementation; I only added minor
-> edits to make this workable with device memory TCP, and removed some
-> hacky test code. This is a critical dependency of device memory TCP
-> and thus I'm pulling it into this series to make it revewable and
-> mergable.
->
-> RFC v3 -> v1
-> - Removed unusued mem_provider. (Yunsheng).
-> - Replaced memory_provider & mp_priv with netdev_rx_queue (Jakub).
->
-> ---
->  include/net/page_pool/types.h | 12 ++++++++++
->  net/core/page_pool.c          | 43 +++++++++++++++++++++++++++++++----
->  2 files changed, 50 insertions(+), 5 deletions(-)
->
-> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-> index ac286ea8ce2d..0e9fa79a5ef1 100644
-> --- a/include/net/page_pool/types.h
-> +++ b/include/net/page_pool/types.h
-> @@ -51,6 +51,7 @@ struct pp_alloc_cache {
->   * @dev:       device, for DMA pre-mapping purposes
->   * @netdev:    netdev this pool will serve (leave as NULL if none or multiple)
->   * @napi:      NAPI which is the sole consumer of pages, otherwise NULL
-> + * @queue:     struct netdev_rx_queue this page_pool is being created for.
->   * @dma_dir:   DMA mapping direction
->   * @max_len:   max DMA sync memory size for PP_FLAG_DMA_SYNC_DEV
->   * @offset:    DMA sync address offset for PP_FLAG_DMA_SYNC_DEV
-> @@ -63,6 +64,7 @@ struct page_pool_params {
->                 int             nid;
->                 struct device   *dev;
->                 struct napi_struct *napi;
-> +               struct netdev_rx_queue *queue;
->                 enum dma_data_direction dma_dir;
->                 unsigned int    max_len;
->                 unsigned int    offset;
-> @@ -125,6 +127,13 @@ struct page_pool_stats {
->  };
->  #endif
->
-> +struct memory_provider_ops {
-> +       int (*init)(struct page_pool *pool);
-> +       void (*destroy)(struct page_pool *pool);
-> +       struct page *(*alloc_pages)(struct page_pool *pool, gfp_t gfp);
-> +       bool (*release_page)(struct page_pool *pool, struct page *page);
-> +};
-> +
->  struct page_pool {
->         struct page_pool_params_fast p;
->
-> @@ -174,6 +183,9 @@ struct page_pool {
->          */
->         struct ptr_ring ring;
->
-> +       void *mp_priv;
-> +       const struct memory_provider_ops *mp_ops;
-> +
->  #ifdef CONFIG_PAGE_POOL_STATS
->         /* recycle stats are per-cpu to avoid locking */
->         struct page_pool_recycle_stats __percpu *recycle_stats;
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index ca1b3b65c9b5..f5c84d2a4510 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -25,6 +25,8 @@
->
->  #include "page_pool_priv.h"
->
-> +static DEFINE_STATIC_KEY_FALSE(page_pool_mem_providers);
+But in commit 295525e29a5b("virtio_net: merge dma operations when
+filling mergeable buffers"), I missed the dma unmap for the #3 case.
 
-We could add the existing page pool mechanisms as another 'provider',
-but I assume this is coded like this for performance reasons (IOW skip
-the expensive ptr call for the default case?)
+That will leak some memory, because I did not release the pages referred
+by the unused buffers.
 
-> +
->  #define DEFER_TIME (msecs_to_jiffies(1000))
->  #define DEFER_WARN_INTERVAL (60 * HZ)
->
-> @@ -174,6 +176,7 @@ static int page_pool_init(struct page_pool *pool,
->                           const struct page_pool_params *params)
->  {
->         unsigned int ring_qsize = 1024; /* Default */
-> +       int err;
->
->         memcpy(&pool->p, &params->fast, sizeof(pool->p));
->         memcpy(&pool->slow, &params->slow, sizeof(pool->slow));
-> @@ -234,10 +237,25 @@ static int page_pool_init(struct page_pool *pool,
->         /* Driver calling page_pool_create() also call page_pool_destroy() */
->         refcount_set(&pool->user_cnt, 1);
->
-> +       if (pool->mp_ops) {
-> +               err = pool->mp_ops->init(pool);
-> +               if (err) {
-> +                       pr_warn("%s() mem-provider init failed %d\n",
-> +                               __func__, err);
-> +                       goto free_ptr_ring;
-> +               }
-> +
-> +               static_branch_inc(&page_pool_mem_providers);
-> +       }
-> +
->         if (pool->p.flags & PP_FLAG_DMA_MAP)
->                 get_device(pool->p.dev);
->
->         return 0;
-> +
-> +free_ptr_ring:
-> +       ptr_ring_cleanup(&pool->ring, NULL);
-> +       return err;
->  }
->
->  static void page_pool_uninit(struct page_pool *pool)
-> @@ -519,7 +537,10 @@ struct page *page_pool_alloc_pages(struct page_pool *pool, gfp_t gfp)
->                 return page;
->
->         /* Slow-path: cache empty, do real allocation */
-> -       page = __page_pool_alloc_pages_slow(pool, gfp);
-> +       if (static_branch_unlikely(&page_pool_mem_providers) && pool->mp_ops)
+If we do such script, we will make the system OOM.
 
-Why do we need && pool->mp_ops? On the init function, we only bump
-page_pool_mem_providers if the ops are there
+    while true
+    do
+            ethtool -G ens4 rx 128
+            ethtool -G ens4 rx 256
+            free -m
+    done
 
-> +               page = pool->mp_ops->alloc_pages(pool, gfp);
-> +       else
-> +               page = __page_pool_alloc_pages_slow(pool, gfp);
->         return page;
->  }
->  EXPORT_SYMBOL(page_pool_alloc_pages);
-> @@ -576,10 +597,13 @@ void __page_pool_release_page_dma(struct page_pool *pool, struct page *page)
->  void page_pool_return_page(struct page_pool *pool, struct page *page)
->  {
->         int count;
-> +       bool put;
->
-> -       __page_pool_release_page_dma(pool, page);
-> -
-> -       page_pool_clear_pp_info(page);
-> +       put = true;
-> +       if (static_branch_unlikely(&page_pool_mem_providers) && pool->mp_ops)
+Fixes: 295525e29a5b ("virtio_net: merge dma operations when filling mergeable buffers")
+Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+---
 
-ditto
+v1: rename to virtnet_rq_free_buf_check_dma()
 
-> +               put = pool->mp_ops->release_page(pool, page);
-> +       else
-> +               __page_pool_release_page_dma(pool, page);
->
->         /* This may be the last page returned, releasing the pool, so
->          * it is not safe to reference pool afterwards.
-> @@ -587,7 +611,10 @@ void page_pool_return_page(struct page_pool *pool, struct page *page)
->         count = atomic_inc_return_relaxed(&pool->pages_state_release_cnt);
->         trace_page_pool_state_release(pool, page, count);
->
-> -       put_page(page);
-> +       if (put) {
-> +               page_pool_clear_pp_info(page);
-> +               put_page(page);
-> +       }
->         /* An optimization would be to call __free_pages(page, pool->p.order)
->          * knowing page is not part of page-cache (thus avoiding a
->          * __page_cache_release() call).
-> @@ -857,6 +884,12 @@ static void __page_pool_destroy(struct page_pool *pool)
->
->         page_pool_unlist(pool);
->         page_pool_uninit(pool);
-> +
-> +       if (pool->mp_ops) {
+ drivers/net/virtio_net.c | 60 ++++++++++++++++++++--------------------
+ 1 file changed, 30 insertions(+), 30 deletions(-)
 
-Same here. Using a mix of pool->mp_ops and page_pool_mem_providers
-will work, but since we always check the ptr on init, can't we simply
-rely on page_pool_mem_providers for the rest of the code?
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index d16f592c2061..58ebbffeb952 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -334,7 +334,6 @@ struct virtio_net_common_hdr {
+ 	};
+ };
 
-Thanks
-/Ilias
-> +               pool->mp_ops->destroy(pool);
-> +               static_branch_dec(&page_pool_mem_providers);
-> +       }
-> +
->         kfree(pool);
->  }
->
-> --
-> 2.43.0.472.g3155946c3a-goog
->
+-static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf);
+ static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf);
+
+ static bool is_xdp_frame(void *ptr)
+@@ -408,6 +407,17 @@ static struct page *get_a_page(struct receive_queue *rq, gfp_t gfp_mask)
+ 	return p;
+ }
+
++static void virtnet_rq_free_buf(struct virtnet_info *vi,
++				struct receive_queue *rq, void *buf)
++{
++	if (vi->mergeable_rx_bufs)
++		put_page(virt_to_head_page(buf));
++	else if (vi->big_packets)
++		give_pages(rq, buf);
++	else
++		put_page(virt_to_head_page(buf));
++}
++
+ static void enable_delayed_refill(struct virtnet_info *vi)
+ {
+ 	spin_lock_bh(&vi->refill_lock);
+@@ -634,17 +644,6 @@ static void *virtnet_rq_get_buf(struct receive_queue *rq, u32 *len, void **ctx)
+ 	return buf;
+ }
+
+-static void *virtnet_rq_detach_unused_buf(struct receive_queue *rq)
+-{
+-	void *buf;
+-
+-	buf = virtqueue_detach_unused_buf(rq->vq);
+-	if (buf && rq->do_dma)
+-		virtnet_rq_unmap(rq, buf, 0);
+-
+-	return buf;
+-}
+-
+ static void virtnet_rq_init_one_sg(struct receive_queue *rq, void *buf, u32 len)
+ {
+ 	struct virtnet_rq_dma *dma;
+@@ -744,6 +743,20 @@ static void virtnet_rq_set_premapped(struct virtnet_info *vi)
+ 	}
+ }
+
++static void virtnet_rq_free_buf_check_dma(struct virtqueue *vq, void *buf)
++{
++	struct virtnet_info *vi = vq->vdev->priv;
++	struct receive_queue *rq;
++	int i = vq2rxq(vq);
++
++	rq = &vi->rq[i];
++
++	if (rq->do_dma)
++		virtnet_rq_unmap(rq, buf, 0);
++
++	virtnet_rq_free_buf(vi, rq, buf);
++}
++
+ static void free_old_xmit_skbs(struct send_queue *sq, bool in_napi)
+ {
+ 	unsigned int len;
+@@ -1764,7 +1777,7 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
+ 	if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
+ 		pr_debug("%s: short packet %i\n", dev->name, len);
+ 		DEV_STATS_INC(dev, rx_length_errors);
+-		virtnet_rq_free_unused_buf(rq->vq, buf);
++		virtnet_rq_free_buf(vi, rq, buf);
+ 		return;
+ 	}
+
+@@ -2392,7 +2405,7 @@ static int virtnet_rx_resize(struct virtnet_info *vi,
+ 	if (running)
+ 		napi_disable(&rq->napi);
+
+-	err = virtqueue_resize(rq->vq, ring_num, virtnet_rq_free_unused_buf);
++	err = virtqueue_resize(rq->vq, ring_num, virtnet_rq_free_buf_check_dma);
+ 	if (err)
+ 		netdev_err(vi->dev, "resize rx fail: rx queue index: %d err: %d\n", qindex, err);
+
+@@ -4031,19 +4044,6 @@ static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf)
+ 		xdp_return_frame(ptr_to_xdp(buf));
+ }
+
+-static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf)
+-{
+-	struct virtnet_info *vi = vq->vdev->priv;
+-	int i = vq2rxq(vq);
+-
+-	if (vi->mergeable_rx_bufs)
+-		put_page(virt_to_head_page(buf));
+-	else if (vi->big_packets)
+-		give_pages(&vi->rq[i], buf);
+-	else
+-		put_page(virt_to_head_page(buf));
+-}
+-
+ static void free_unused_bufs(struct virtnet_info *vi)
+ {
+ 	void *buf;
+@@ -4057,10 +4057,10 @@ static void free_unused_bufs(struct virtnet_info *vi)
+ 	}
+
+ 	for (i = 0; i < vi->max_queue_pairs; i++) {
+-		struct receive_queue *rq = &vi->rq[i];
++		struct virtqueue *vq = vi->rq[i].vq;
+
+-		while ((buf = virtnet_rq_detach_unused_buf(rq)) != NULL)
+-			virtnet_rq_free_unused_buf(rq->vq, buf);
++		while ((buf = virtqueue_detach_unused_buf(vq)) != NULL)
++			virtnet_rq_free_buf_check_dma(vq, buf);
+ 		cond_resched();
+ 	}
+ }
+--
+2.32.0.3.g01195cf9f
+
 
