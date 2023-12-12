@@ -1,130 +1,86 @@
-Return-Path: <netdev+bounces-56410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C9EA80EC80
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 13:50:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF74B80EC84
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 13:50:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 570D128139B
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 12:50:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DF9D1F215D0
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 12:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F8A60EC1;
-	Tue, 12 Dec 2023 12:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBF7A60EC1;
+	Tue, 12 Dec 2023 12:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VK19KfB5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PvIKTGlN"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0315E110;
-	Tue, 12 Dec 2023 04:50:07 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C0B3E2000B;
-	Tue, 12 Dec 2023 12:50:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1702385405;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GGg92Ioc3V3p1OkpBwikbksUY+03mtQ2MEb/MlWZQlU=;
-	b=VK19KfB5kxoJI9py7HhGYw3rJ7t7LIcC1Jx6E7OpWQkTbVGKrne+w34ilVX9q3rHM3rmZH
-	x/1JIsHy6SrrS1TE2HqfjEYJADvAPAW+HXCkmlDw2lDiDM0dhHpiYdPSil9SIu9sF3+aXb
-	tUDEGc3jcZzrTg4ArATw9pNozpCcKmnW3Jw5UeQ+ikeetb7CbP4vuyAT3gHKAzcieqQSkB
-	ieDImgiybOGlkX0bTNjiP36hxvJfgKJI54h0Hb4htJF7XatSAmolg6dR+JVq1kooTQQwaw
-	y/V5d9M+2SI58H5QzNUn7qHmMjshnjOYFQvuizt1nort9NlKx0j39BFRg1cIkg==
-Date: Tue, 12 Dec 2023 13:50:01 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Luo Jie <quic_luoj@quicinc.com>
-Cc: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
- <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
- <pabeni@redhat.com>, <robh+dt@kernel.org>,
- <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
- <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
- <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
- <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
-Subject: Re: [PATCH v2 1/5] net: mdio: ipq4019: move eth_ldo_rdy before MDIO
- bus register
-Message-ID: <20231212135001.6bf40e4d@device.home>
-In-Reply-To: <20231212115151.20016-2-quic_luoj@quicinc.com>
-References: <20231212115151.20016-1-quic_luoj@quicinc.com>
-	<20231212115151.20016-2-quic_luoj@quicinc.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB596A936;
+	Tue, 12 Dec 2023 12:50:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3BECEC433C9;
+	Tue, 12 Dec 2023 12:50:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702385424;
+	bh=4I/JJVdtNbprk3ZYhxaZF97ugC1eO8Heq/k9SobQVZI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PvIKTGlN3Kqb1F4Uy5vkbsYu34Uokqh3e5wDAl6sPqZZztnDaM+E+Q239UolQc1Ab
+	 pdqE2FgoStI7bMH5nVy0RcF9zxQiqm5GyBu2Xg99UE8TJqV8x9yAZA1b1k34cBd1qT
+	 c65a9KSm8BqknPVutNXttgLQ7tMweuKpIFMydMmv2lgxj/I+T9WqpVsYDSualS8LQ9
+	 7O0wxHI9HrmMtZezsE0igQEQDTNXgf6KIcdiU4RGx2BHetW48dp/FOZKGamTszerMd
+	 rn1W8pE4kKdbNQ7VOFehKw7dED9rx99dHxOfkrJfpLhl8h9buUnT3go8A8ezit3LEj
+	 sEzXUV9s0A6Eg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 20555DFC906;
+	Tue, 12 Dec 2023 12:50:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v4] net/rose: Fix Use-After-Free in rose_ioctl
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170238542412.23173.8458445650930950286.git-patchwork-notify@kernel.org>
+Date: Tue, 12 Dec 2023 12:50:24 +0000
+References: <20231209100538.GA407321@v4bel-B760M-AORUS-ELITE-AX>
+In-Reply-To: <20231209100538.GA407321@v4bel-B760M-AORUS-ELITE-AX>
+To: Hyunwoo Kim <v4bel@theori.io>
+Cc: ralf@linux-mips.org, edumazet@google.com, imv4bel@gmail.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ linux-hams@vger.kernel.org, netdev@vger.kernel.org
 
-Hello,
+Hello:
 
-On Tue, 12 Dec 2023 19:51:46 +0800
-Luo Jie <quic_luoj@quicinc.com> wrote:
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-> The ethernet LDO provides the clock for the ethernet PHY that
-> is connected with PCS, each LDO enables the clock output to
-> each PCS, after the clock output enablement, the PHY GPIO reset
-> can take effect.
+On Sat, 9 Dec 2023 05:05:38 -0500 you wrote:
+> Because rose_ioctl() accesses sk->sk_receive_queue
+> without holding a sk->sk_receive_queue.lock, it can
+> cause a race with rose_accept().
+> A use-after-free for skb occurs with the following flow.
+> ```
+> rose_ioctl() -> skb_peek()
+> rose_accept() -> skb_dequeue() -> kfree_skb()
+> ```
+> Add sk->sk_receive_queue.lock to rose_ioctl() to fix this issue.
 > 
-> For the PHY taking the MDIO bus level GPIO reset, the ethernet
-> LDO should be enabled before the MDIO bus register.
-> 
-> For example, the qca8084 PHY takes the MDIO bus level GPIO
-> reset for quad PHYs, there is another reason for qca8084 PHY
-> using MDIO bus level GPIO reset instead of PHY level GPIO
-> reset as below.
-> 
-> The work sequence of qca8084:
-> 1. enable ethernet LDO.
-> 2. GPIO reset on quad PHYs.
-> 3. register clock provider based on MDIO device of qca8084.
-> 4. PHY probe function called for initializing common clocks.
-> 5. PHY capabilities acquirement.
-> 
-> If qca8084 takes PHY level GPIO reset in the step 4, the clock
-> provider of qca8084 can't be registered correctly, since the
-> clock parent(reading the current qca8084 hardware registers in
-> step 3) of the registered clocks is deserted after GPIO reset.
-> 
-> There are two PCS(UNIPHY) supported in SOC side on ipq5332,
-> and three PCS(UNIPHY) supported on ipq9574.
-> 
-> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
-> ---
+> [...]
 
-[...]
+Here is the summary with links:
+  - [v4] net/rose: Fix Use-After-Free in rose_ioctl
+    https://git.kernel.org/netdev/net/c/810c38a369a0
 
-> @@ -252,11 +244,32 @@ static int ipq4019_mdio_probe(struct platform_device *pdev)
->  	if (IS_ERR(priv->mdio_clk))
->  		return PTR_ERR(priv->mdio_clk);
->  
-> -	/* The platform resource is provided on the chipset IPQ5018 */
-> -	/* This resource is optional */
-> -	res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
-> -	if (res)
-> -		priv->eth_ldo_rdy = devm_ioremap_resource(&pdev->dev, res);
-> +	/* These platform resources are provided on the chipset IPQ5018 or
-> +	 * IPQ5332.
-> +	 */
-> +	/* This resource are optional */
-> +	for (index = 0; index < ETH_LDO_RDY_CNT; index++) {
-> +		res = platform_get_resource(pdev, IORESOURCE_MEM, index + 1);
-> +		if (res) {
-> +			priv->eth_ldo_rdy[index] = devm_ioremap(&pdev->dev,
-> +								res->start,
-> +								resource_size(res));
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-You can simplify that sequence by using
-devm_platform_get_and_ioremap_resource(), which will do both the
-platform_get_resource and the devm_ioremap at once for you.
-
-Thanks,
-
-Maxime
 
 
