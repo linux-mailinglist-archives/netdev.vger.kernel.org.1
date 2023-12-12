@@ -1,127 +1,133 @@
-Return-Path: <netdev+bounces-56629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30AF380FA1A
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 23:17:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 376AC80FA22
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 23:18:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6224A1C20E30
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 22:17:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF6FD28230C
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 22:18:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914A26610F;
-	Tue, 12 Dec 2023 22:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2BFF660E7;
+	Tue, 12 Dec 2023 22:18:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H0EgyQbh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZgtQM8mS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87733AC;
-	Tue, 12 Dec 2023 14:16:47 -0800 (PST)
-Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-3331752d2b9so4181573f8f.3;
-        Tue, 12 Dec 2023 14:16:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702419405; x=1703024205; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IHEg6ZXv1YE3c9UTRSvzM/ei4Hb8xqiQ3kNy7PW6Q9U=;
-        b=H0EgyQbhW7QLvjby4D58y3B2tLvDocZhuuuiFr5NnAErOX3cJETtKuxK/dv4oJoQGH
-         acR+p6ZaAaWB1j0/1rSemo34HNrUq5r+UOSvxS2qD9TKJIEXai2OuNQ6EXhgEoKddejK
-         SHEVnaU7j7YTC/PJN+WY2kGPjxVfLs7t0NIQQWe2XckzopMRHCRxb7uSUP/CixkPj4Gp
-         Vwt+K1+FZuzlorXkkFeBF8buz/PyfqMdIyeQSEd36cNhehuVEwFqlkec4p82qrZfNoem
-         IBe0JKWJWf5KODGstNJ1l3sBy33xCXqfb3+HInCcVCtsh0Wfarp6HgMGbbvXLn7yWqwG
-         WVaw==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB5BCB3
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 14:18:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702419526;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=niWso/AgTSlNDKs+hLJfqSanWTgF91oEfLP5s9hKVlo=;
+	b=ZgtQM8mSySScnanpslZXhtJJ3hfJKVfFEAz7Chqirh4BAWsx0TneYgUVA6I8f7HgX8BIPs
+	/f9P0Iz/viliQb9vDlp/XvYcUTCcaWQ0B25kB20iF+vvZdQ3XKMA88TmsDCAGpGxFnTaXx
+	IZx0uEkuVfayf66KCfucdJaGWqzclVs=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-601-8e3o65mZPNK6NBJqVXLkbg-1; Tue, 12 Dec 2023 17:18:44 -0500
+X-MC-Unique: 8e3o65mZPNK6NBJqVXLkbg-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-67ee1ca3b05so21871056d6.2
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 14:18:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702419405; x=1703024205;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IHEg6ZXv1YE3c9UTRSvzM/ei4Hb8xqiQ3kNy7PW6Q9U=;
-        b=xIk0wzZ6RTZ2bqyMAhUko+JU/57/YQhSsWEe6/D6xfUsaemZSWBdvLMC22FRgdXxne
-         4IWeYllh9ZyD3aPbiVQyGLBkKJyY4Rk69/6gYDTGh0g1lt913RrXXbo/Ij2PWwd8WzGm
-         dTeL7RB2UEEO/v1TXLHXK4f/xnMglW3Hnn86JyY5adgXzjjb5xpPMXKDZ8CoAyC9u5Jl
-         Bc838xtTLBLbYyfowaDMv3NdK/HY3m82IdgJQqFKQ++BxQJZxU4EJZruTh9DjU5Gr2uY
-         xtlc84U209bo8VTZczHJzY/BWPOL7BMfD69MfQYuRORGIBdNZlpHsjpNs/1GcXLG1ciF
-         kI7g==
-X-Gm-Message-State: AOJu0YwosYY2fwqv58EnA6pfcP5/4Kp5GJuxtNBtpRsdqeUHZEMJTihP
-	v4IXmIxTr2bE5ZNHfvgnYbYM09h5xIIAHA==
-X-Google-Smtp-Source: AGHT+IFNr8oHt+6ib4hM8XNzmfqM+XQOfntzXtWBe0En6NRJIErjNHdd1yVK80dSeN/3KrqPkKWgvg==
-X-Received: by 2002:a05:6000:b83:b0:336:3467:6030 with SMTP id dl3-20020a0560000b8300b0033634676030mr1063095wrb.23.1702419405615;
-        Tue, 12 Dec 2023 14:16:45 -0800 (PST)
-Received: from imac.fritz.box ([2a02:8010:60a0:0:a1a0:2c27:44f7:b972])
-        by smtp.gmail.com with ESMTPSA id a18-20020a5d5092000000b00333415503a7sm11680482wrt.22.2023.12.12.14.16.44
+        d=1e100.net; s=20230601; t=1702419524; x=1703024324;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=niWso/AgTSlNDKs+hLJfqSanWTgF91oEfLP5s9hKVlo=;
+        b=sQ0BhF4CeR5bp7IvEJdkDQL4N4ZSfIbB+fv/eIYxEsV4Ipy6NTytDzkEmTbftFZX5D
+         KtivjWuDg8euOJ9tDanavXzSKEh5SBVBYq/narCdfsZzTUS4rpVXcGC2VgQyVCWfZHLk
+         T7shsL4TBVCwNKveeDF6Fe+j9C49qhEuWgXuLsXAC9pxAiuYedMWhpz6gA1AYiUt1HRA
+         dFSda7rkr1mCXj4fkkdqJofSS4FIz3kyP0M1lXsv0z23WJ2cQDqqDABhGn1SWUe04TMR
+         BvGLv2i/ideQn/kXkzqBhy6LE8bFoaE65dQi9KghPKW17McglC2K36LR5vp9aF5zbVel
+         Jjjw==
+X-Gm-Message-State: AOJu0YxDUGM7i//ESHIAHwLri75FDCZsHUgz9oTULNjlZA/pWuGVgz7y
+	zJvJoUuAWp1Ofu0s/JCITiFa+GdtVAAc0AEvOxmCy3utJAYWIk2n8og+GbrDQr2rSANQM/G9yhB
+	cypVfhwLsZ0KZpKlc
+X-Received: by 2002:a0c:c210:0:b0:67e:f58a:d6b0 with SMTP id l16-20020a0cc210000000b0067ef58ad6b0mr226800qvh.27.1702419524250;
+        Tue, 12 Dec 2023 14:18:44 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHXwgdCMDLzfi+fVcHm7+1qcErjuVF1ZgVVAksnjigHixsYAtg0Q68ahZCHFpj/G+kad1CZTA==
+X-Received: by 2002:a0c:c210:0:b0:67e:f58a:d6b0 with SMTP id l16-20020a0cc210000000b0067ef58ad6b0mr226790qvh.27.1702419524008;
+        Tue, 12 Dec 2023 14:18:44 -0800 (PST)
+Received: from [192.168.1.163] ([2600:1700:1ff0:d0e0::37])
+        by smtp.gmail.com with ESMTPSA id uw2-20020a05620a4d8200b0077f103c8ad6sm4050578qkn.82.2023.12.12.14.18.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 14:16:45 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Breno Leitao <leitao@debian.org>
-Cc: donald.hunter@redhat.com,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v3 13/13] tools/net/ynl-gen-rst: Remove extra indentation from generated docs
-Date: Tue, 12 Dec 2023 22:15:52 +0000
-Message-ID: <20231212221552.3622-14-donald.hunter@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231212221552.3622-1-donald.hunter@gmail.com>
-References: <20231212221552.3622-1-donald.hunter@gmail.com>
+        Tue, 12 Dec 2023 14:18:43 -0800 (PST)
+From: Andrew Halaney <ahalaney@redhat.com>
+Date: Tue, 12 Dec 2023 16:18:33 -0600
+Subject: [PATCH net v2] net: stmmac: Handle disabled MDIO busses from
+ devicetree
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20231212-b4-stmmac-handle-mdio-enodev-v2-1-600171acf79f@redhat.com>
+X-B4-Tracking: v=1; b=H4sIADjceGUC/42NQQrDIBBFrxJm3SnRBCtd9R4lC+tMGqFqUZGW4
+ N0rOUGX7z94f4fMyXGG67BD4uqyi6GDPA1gNxOejI46gxzlJKQQ+JgxF++Nxa7pxejJReQQiSt
+ qKZQmVtoqAz3xTry6z5G/Q+ACSx83l0tM3+OyikP9V68CBV4mK0c7z6smdUtMmylnGz0srbUfm
+ X3voM4AAAA=
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Serge Semin <fancer.lancer@gmail.com>, 
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ Simon Horman <horms@kernel.org>, Andrew Halaney <ahalaney@redhat.com>
+X-Mailer: b4 0.12.3
 
-The output from ynl-gen-rst.py has extra indentation that causes extra
-<blockquote> elements to be generated in the HTML output.
+Many hardware configurations have the MDIO bus disabled, and are instead
+using some other MDIO bus to talk to the MAC's phy.
 
-Reduce the indentation so that sphinx doesn't generate unnecessary
-<blockquote> elements.
+of_mdiobus_register() returns -ENODEV in this case. Let's handle it
+gracefully instead of failing to probe the MAC.
 
-Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+Fixes: 47dd7a540b8a ("net: add support for STMicroelectronics Ethernet controllers.")
+Signed-off-by: Andrew Halaney <ahalaney@redhat.com>
 ---
- tools/net/ynl/ynl-gen-rst.py | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Changes in v2:
+- Improve error handling code (Serge)
+- Fix malformed Fixes tag (Simon)
+- Link to v1: https://lore.kernel.org/r/20231211-b4-stmmac-handle-mdio-enodev-v1-1-73c20c44f8d6@redhat.com
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/tools/net/ynl/ynl-gen-rst.py b/tools/net/ynl/ynl-gen-rst.py
-index 675ae8357d5e..f7d5bf96736f 100755
---- a/tools/net/ynl/ynl-gen-rst.py
-+++ b/tools/net/ynl/ynl-gen-rst.py
-@@ -69,7 +69,7 @@ def rst_paragraph(paragraph: str, level: int = 0) -> str:
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
+index fa9e7e7040b9..0542cfd1817e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
+@@ -591,7 +591,11 @@ int stmmac_mdio_register(struct net_device *ndev)
+ 	new_bus->parent = priv->device;
  
- def rst_bullet(item: str, level: int = 0) -> str:
-     """Return a formatted a bullet"""
--    return headroom(level) + f" - {item}"
-+    return headroom(level) + f"- {item}"
- 
- 
- def rst_subsection(title: str) -> str:
-@@ -245,7 +245,7 @@ def parse_attr_sets(entries: List[Dict[str, Any]]) -> str:
-             for k in attr.keys():
-                 if k in preprocessed + ignored:
-                     continue
--                lines.append(rst_fields(k, sanitize(attr[k]), 2))
-+                lines.append(rst_fields(k, sanitize(attr[k]), 0))
-             lines.append("\n")
- 
-     return "\n".join(lines)
-@@ -263,7 +263,7 @@ def parse_sub_messages(entries: List[Dict[str, Any]]) -> str:
-             lines.append(rst_bullet(bold(value)))
-             for attr in ['fixed-header', 'attribute-set']:
-                 if attr in fmt:
--                    lines.append(rst_fields(attr, fmt[attr], 2))
-+                    lines.append(rst_fields(attr, fmt[attr], 1))
-             lines.append("\n")
- 
-     return "\n".join(lines)
+ 	err = of_mdiobus_register(new_bus, mdio_node);
+-	if (err != 0) {
++	if (err == -ENODEV) {
++		err = 0;
++		dev_info(dev, "MDIO bus is disabled\n");
++		goto bus_register_fail;
++	} else if (err) {
+ 		dev_err_probe(dev, err, "Cannot register the MDIO bus\n");
+ 		goto bus_register_fail;
+ 	}
+
+---
+base-commit: bbd220ce4e29ed55ab079007cff0b550895258eb
+change-id: 20231211-b4-stmmac-handle-mdio-enodev-82168de68c6a
+
+Best regards,
 -- 
-2.42.0
+Andrew Halaney <ahalaney@redhat.com>
 
 
