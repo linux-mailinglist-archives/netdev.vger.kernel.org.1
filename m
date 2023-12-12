@@ -1,104 +1,98 @@
-Return-Path: <netdev+bounces-56607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3766580F9C9
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 22:56:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C954280F9CD
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 22:57:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69C6A1C20D63
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 21:56:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F816B20E60
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 21:57:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 094A164CC9;
-	Tue, 12 Dec 2023 21:55:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BE7364CD0;
+	Tue, 12 Dec 2023 21:57:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F2YUche9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m8X6Dwca"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ABF3B3;
-	Tue, 12 Dec 2023 13:55:55 -0800 (PST)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-40c3f68b649so38636775e9.0;
-        Tue, 12 Dec 2023 13:55:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702418154; x=1703022954; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Zy8FfFNpNs+NX51gAcRgfZF0RZVCxGvpcLqeDklhggA=;
-        b=F2YUche9VuF+Ei4sBTmAOiQr91telRKNJyCboEP07rYmJQTSSC3YicVd9T7lNo9g4n
-         PKuYU5TgzqB6sbg0zpCUycwbnPK1QJWi7rgHgQMS6bFfY1c8jJ+0Pw2yjnCWyWn7IBqW
-         14HUQZNCn9DiETUPWmyVKvOKf8zTWhtPeecnedHwTUZGKs77TkKnqL7X6MYSRiqS329o
-         pCc6oGjol+LEgocpjjPkQLq5JBH1aFK2M1WCqN4umBZdZ31Ck/r9L2QjJ6uiZKb/J1DJ
-         Pp+hsriCB1twStEhBy8kRVCfcGYzoE8dc/ty+wR3Ga5TCh2Rs+8xF6mnjsLbOQAlgjZh
-         8Ymg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702418154; x=1703022954;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zy8FfFNpNs+NX51gAcRgfZF0RZVCxGvpcLqeDklhggA=;
-        b=aRjYVInu7DcCDaFpe8ysXoWjKBtawswnM7r6dLYGLLFhMgv/RZqrvyoL+/SOuxwIhk
-         ka66UxUhV4UXR7HW2tJODhYgL2oXUnMmEdg1uAgk9OJK/Ky1fXBSuzRHw/ZdCCjkRu12
-         FcSuP16A8XQlqvPRlY3Jp0vZSXJBQI09sXa3oeqFKsiImhEaLx7YDFX6N7FdAEXujPvc
-         ZmekZGh2c8J+FxnbxMn86/y/4mTDCgU/U14Hx+nqNVQbG9rCt2o6Zyqa5h2/uIu6WYIZ
-         asyY+UXKc6F0KcTyj87K0/l3rwz7RcqqLnJho+BdZQtj/4esy3NARsKS7qNY/X2MMy3b
-         5yjQ==
-X-Gm-Message-State: AOJu0YxIT/eVeLf9VuK5pmoxQEhyUpk9MueTOV7inLQkamqT+zK1bvNv
-	0OsSlCb7VxblO6/vGmBgmgI=
-X-Google-Smtp-Source: AGHT+IFWa9taipty31yOr6nNvJiECuCxJgZFLbRfYP89EFnIEOzxUOphJnn6CKgmt57xRKS/PY6LEw==
-X-Received: by 2002:a05:600c:3ca3:b0:40c:4dc5:b308 with SMTP id bg35-20020a05600c3ca300b0040c4dc5b308mr1028228wmb.196.1702418153566;
-        Tue, 12 Dec 2023 13:55:53 -0800 (PST)
-Received: from [192.168.0.209] (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.googlemail.com with ESMTPSA id d13-20020a05600c34cd00b0040c496c64cfsm7615484wmq.12.2023.12.12.13.55.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Dec 2023 13:55:52 -0800 (PST)
-Message-ID: <b4f22a3b-3cab-4c0d-b4b9-700c58b62826@gmail.com>
-Date: Tue, 12 Dec 2023 21:55:51 +0000
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16733B7;
+	Tue, 12 Dec 2023 13:57:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702418231; x=1733954231;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=cR/SZi/CQM7AqNyWws8Tpn6BYvRNvG5YcWdlZDDZfOg=;
+  b=m8X6DwcaQghDqX9wk61v729PfU12zm5BfAZVdHsAi/R0L6M0d6i+KKU5
+   jKjAsI8B4//F+yaa384ndf6Uq2sKw8MDzV1+jjZrInVtMrg8ZLAKRImPd
+   OzzTTgS1a21OFx43vli/sE+eGEWAVfEhzEYbbGFxMTPLYqf4EJiPMct2A
+   dCmyAUl9/nN00/0sdIPsMTFqQvWyw7LzG/JeMY8RJl6L4OdawPbXEkIZW
+   7Qv2v/WrtEIZctyM1MDsx0yM1ddWhVLIiHfEz4BlaZsx2+2gJHVw5cVCQ
+   o4ts9AUrmHNpf3rH+f+++DzgwuULG2Wjp3H705xAMF0+m21s/MlmWA+S1
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="461350451"
+X-IronPort-AV: E=Sophos;i="6.04,271,1695711600"; 
+   d="scan'208";a="461350451"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 13:57:10 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,271,1695711600"; 
+   d="scan'208";a="15177903"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orviesa002.jf.intel.com with ESMTP; 12 Dec 2023 13:57:07 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rDAkS-000Jlj-1W;
+	Tue, 12 Dec 2023 21:57:04 +0000
+Date: Wed, 13 Dec 2023 05:56:47 +0800
+From: kernel test robot <lkp@intel.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, lorenzo.bianconi@redhat.com,
+	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+	pabeni@redhat.com, bpf@vger.kernel.org, hawk@kernel.org,
+	toke@redhat.com, willemdebruijn.kernel@gmail.com,
+	jasowang@redhat.com, sdf@google.com
+Subject: Re: [PATCH v4 net-next 1/3] net: introduce page_pool pointer in
+ softnet_data percpu struct
+Message-ID: <202312130531.EIYsEYp0-lkp@intel.com>
+References: <2a267c8f331996de0e26568472c45fe78eb67e1d.1702375338.git.lorenzo@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH][next] mlx4: Fix spelling mistake: "mape" -> "map"
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-Cc: Tariq Toukan <tariqt@nvidia.com>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231209225135.4055334-1-colin.i.king@gmail.com>
- <20231212203043.GF5817@kernel.org>
-From: "Colin King (gmail)" <colin.i.king@gmail.com>
-In-Reply-To: <20231212203043.GF5817@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2a267c8f331996de0e26568472c45fe78eb67e1d.1702375338.git.lorenzo@kernel.org>
 
-On 12/12/2023 20:30, Simon Horman wrote:
-> On Sat, Dec 09, 2023 at 10:51:35PM +0000, Colin Ian King wrote:
->> There is a spelling mistake in a mlx4_err error message. Fix it.
->>
->> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
-> 
-> Hi Colin,
-> 
-> I am guessing that you are focusing on error messages and other user-facing
-> spelling errors (perhaps you told me f2f in the hallway track at Kernel
-> Recipes).  But I do wonder if you have plans to address other spelling
-> errors in this driver. codespell flags many, including 'segements' in a
-> comment in the same file.
+Hi Lorenzo,
 
-Yes, there are so many trivial spelling mistakes and typos across the 
-kernel that I'm just focusing on user facing error messages for the moment.
+kernel test robot noticed the following build errors:
 
-Colin
+[auto build test ERROR on net-next/main]
 
-> 
-> In any case,
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
+url:    https://github.com/intel-lab-lkp/linux/commits/Lorenzo-Bianconi/net-introduce-page_pool-pointer-in-softnet_data-percpu-struct/20231212-181103
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/2a267c8f331996de0e26568472c45fe78eb67e1d.1702375338.git.lorenzo%40kernel.org
+patch subject: [PATCH v4 net-next 1/3] net: introduce page_pool pointer in softnet_data percpu struct
+config: arc-defconfig (https://download.01.org/0day-ci/archive/20231213/202312130531.EIYsEYp0-lkp@intel.com/config)
+compiler: arc-elf-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231213/202312130531.EIYsEYp0-lkp@intel.com/reproduce)
 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312130531.EIYsEYp0-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   arc-elf-ld: net/core/dev.o: in function `net_dev_init':
+>> dev.c:(.init.text+0x180): undefined reference to `page_pool_create'
+>> arc-elf-ld: dev.c:(.init.text+0x180): undefined reference to `page_pool_create'
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
