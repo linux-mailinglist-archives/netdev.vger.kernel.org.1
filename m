@@ -1,310 +1,130 @@
-Return-Path: <netdev+bounces-56251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 919FE80E3E3
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 06:42:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C9DE80E3EB
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 06:43:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 198DFB216F6
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 05:42:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B694282E0D
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 05:43:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE7D14F8B;
-	Tue, 12 Dec 2023 05:42:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B562154B7;
+	Tue, 12 Dec 2023 05:43:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42C30BC
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 21:42:00 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rCvWd-000611-3w; Tue, 12 Dec 2023 06:41:47 +0100
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rCvWb-00FGUz-PC; Tue, 12 Dec 2023 06:41:45 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rCvWb-000MmR-2J;
-	Tue, 12 Dec 2023 06:41:45 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v2 2/2] net: phy: Add support for the DP83TG720S Ethernet PHY
-Date: Tue, 12 Dec 2023 06:41:44 +0100
-Message-Id: <20231212054144.87527-3-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231212054144.87527-1-o.rempel@pengutronix.de>
-References: <20231212054144.87527-1-o.rempel@pengutronix.de>
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C682FDB;
+	Mon, 11 Dec 2023 21:43:38 -0800 (PST)
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-1fb9a22b4a7so3176367fac.3;
+        Mon, 11 Dec 2023 21:43:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702359818; x=1702964618;
+        h=date:subject:message-id:references:in-reply-to:cc:to:from
+         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xlNXDh7i+xuUPez0jMtT71+3pJcqu/L3WLkyBQcQido=;
+        b=qzmHw853ph+44Xu55/l4fxNhVLAKXFTEcUGJ4ZHPn063Ec605uY7jdG2HqElHUY6ME
+         IKZl6frbwSdYD35LSaC33dF+6yTEVqFsFKgsumy6q/QJDt7l+I2m92Bw8T6UOEqIF+t3
+         j4ed0WaOI5v5M6YZVnhUdyA/GlP5+UfcGrxDpLp5AQfN4gSfCoj0FEmgPmQsYDE+OuUo
+         CembZ6JrM2OxK+m9WMZ8vUjXWV2g/flRNsGZLH3vRPtVZmxo96iojITekUIFr96pSPcp
+         5L0kPYKxxKWY+fvoRVA5GoIYgIANzNX9/GyM293x75j5W9qX9JsFNUjq4laO7RnJXydR
+         s8zg==
+X-Gm-Message-State: AOJu0YxvrBjC9x0GJYDaxCJFgWPHE3Cluv6hTeqHihwG70I4iZNbtyTX
+	MfAEzG1shei3HuuSsyMVfQ==
+X-Google-Smtp-Source: AGHT+IGoPIIkORhBOT+o92RHO+zrp9Iw9PWqvFVCTy8m9aKCvVQGCSO56hbPo+pUhcKvSm6k4S8Kgg==
+X-Received: by 2002:a05:6871:7391:b0:1fa:fc32:f081 with SMTP id na17-20020a056871739100b001fafc32f081mr6938652oac.25.1702359817776;
+        Mon, 11 Dec 2023 21:43:37 -0800 (PST)
+Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id hi7-20020a056870c98700b001faef8bb534sm2930685oab.22.2023.12.11.21.43.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Dec 2023 21:43:37 -0800 (PST)
+Received: (nullmailer pid 39728 invoked by uid 1000);
+	Tue, 12 Dec 2023 05:43:35 -0000
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+From: Rob Herring <robh@kernel.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: devicetree@vger.kernel.org, netdev@vger.kernel.org, 
+	Matthias Brugger <matthias.bgg@gmail.com>, Sean Wang <sean.wang@mediatek.com>, 
+	Conor Dooley <conor+dt@kernel.org>, Qingfang Deng <dqfext@gmail.com>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, Alexander Couzens <lynxis@fe80.eu>, Felix Fietkau <nbd@nbd.name>, 
+	SkyLake Huang <SkyLake.Huang@mediatek.com>, Eric Dumazet <edumazet@google.com>, 
+	Mark Lee <Mark-MC.Lee@mediatek.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Lunn <andrew@lunn.ch>, linux-mediatek@lists.infradead.org, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Vinod Koul <vkoul@kernel.org>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Chunfeng Yun <chunfeng.yun@mediatek.com>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Rob Herring <robh+dt@kernel.org>, John Crispin <john@phrozen.org>, linux-phy@lists.infradead.org, 
+	Kishon Vijay Abraham I <kishon@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>
+In-Reply-To: <b875f693f6d4367a610a12ef324584f3bf3a1c1c.1702352117.git.daniel@makrotopia.org>
+References: <cover.1702352117.git.daniel@makrotopia.org>
+ <b875f693f6d4367a610a12ef324584f3bf3a1c1c.1702352117.git.daniel@makrotopia.org>
+Message-Id: <170235981390.39579.3867728590010297335.robh@kernel.org>
+Subject: Re: [RFC PATCH net-next v3 1/8] dt-bindings: phy:
+ mediatek,xfi-pextp: add new bindings
+Date: Mon, 11 Dec 2023 23:43:35 -0600
 
-The DP83TG720S-Q1 device is an IEEE 802.3bp and Open Alliance compliant
-automotive Ethernet physical layer transceiver.
 
-This driver was tested with i.MX8MP EQOS (stmmac) on the MAC side and
-same TI PHY on other side.
+On Tue, 12 Dec 2023 03:46:26 +0000, Daniel Golle wrote:
+> Add bindings for the MediaTek PEXTP Ethernet SerDes PHY found in the
+> MediaTek MT7988 SoC which can operate at various interfaces modes:
+> 
+>  * USXGMII
+>  * 10GBase-R
+>  * 5GBase-R
+>  * 2500Base-X
+>  * 1000Base-X
+>  * Cisco SGMII (MAC side)
+> 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+>  .../bindings/phy/mediatek,xfi-pextp.yaml      | 80 +++++++++++++++++++
+>  1 file changed, 80 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/phy/mediatek,xfi-pextp.yaml
+> 
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- drivers/net/phy/Kconfig     |  13 +++
- drivers/net/phy/Makefile    |   1 +
- drivers/net/phy/dp83tg720.c | 188 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 202 insertions(+)
- create mode 100644 drivers/net/phy/dp83tg720.c
+My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+on your patch (DT_CHECKER_FLAGS is new in v5.13):
 
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index 25cfc5ded1da..098d17d2d3f7 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -394,6 +394,19 @@ config DP83TD510_PHY
- 	  Support for the DP83TD510 Ethernet 10Base-T1L PHY. This PHY supports
- 	  a 10M single pair Ethernet connection for up to 1000 meter cable.
- 
-+config DP83TG720_PHY
-+	tristate "Texas Instruments DP83TG720 Ethernet 1000Base-T1 PHY"
-+	help
-+	  The DP83TG720S-Q1 is an automotive Ethernet physical layer
-+	  transceiver compliant with IEEE 802.3bp and Open Alliance
-+	  standards. It supports key functions necessary for
-+	  transmitting and receiving data over both unshielded and
-+	  shielded single twisted-pair cables. This device offers
-+	  flexible xMII interface options, including support for both
-+	  RGMII and SGMII MAC interfaces. It's suitable for applications
-+	  requiring high-speed data transmission in automotive
-+	  networking environments.
-+
- config VITESSE_PHY
- 	tristate "Vitesse PHYs"
- 	help
-diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-index f65e85c91fc1..4ace41095ee2 100644
---- a/drivers/net/phy/Makefile
-+++ b/drivers/net/phy/Makefile
-@@ -57,6 +57,7 @@ obj-$(CONFIG_DP83867_PHY)	+= dp83867.o
- obj-$(CONFIG_DP83869_PHY)	+= dp83869.o
- obj-$(CONFIG_DP83TC811_PHY)	+= dp83tc811.o
- obj-$(CONFIG_DP83TD510_PHY)	+= dp83td510.o
-+obj-$(CONFIG_DP83TG720_PHY)	+= dp83tg720.o
- obj-$(CONFIG_FIXED_PHY)		+= fixed_phy.o
- obj-$(CONFIG_ICPLUS_PHY)	+= icplus.o
- obj-$(CONFIG_INTEL_XWAY_PHY)	+= intel-xway.o
-diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
-new file mode 100644
-index 000000000000..326c9770a6dc
---- /dev/null
-+++ b/drivers/net/phy/dp83tg720.c
-@@ -0,0 +1,188 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Driver for the Texas Instruments DP83TG720 PHY
-+ * Copyright (c) 2023 Pengutronix, Oleksij Rempel <kernel@pengutronix.de>
-+ */
-+#include <linux/bitfield.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/phy.h>
-+
-+#define DP83TG720S_PHY_ID			0x2000a284
-+
-+/* MDIO_MMD_VEND2 registers */
-+#define DP83TG720S_MII_REG_10			0x10
-+#define DP83TG720S_STS_MII_INT			BIT(7)
-+#define DP83TG720S_LINK_STATUS			BIT(0)
-+
-+#define DP83TG720S_PHY_RESET			0x1f
-+#define DP83TG720S_HW_RESET			BIT(15)
-+
-+#define DP83TG720S_RGMII_DELAY_CTRL		0x602
-+/* In RGMII mode, Enable or disable the internal delay for RXD */
-+#define DP83TG720S_RGMII_RX_CLK_SEL		BIT(1)
-+/* In RGMII mode, Enable or disable the internal delay for TXD */
-+#define DP83TG720S_RGMII_TX_CLK_SEL		BIT(0)
-+
-+#define DP83TG720S_SQI_REG_1			0x871
-+#define DP83TG720S_SQI_OUT_WORST		GENMASK(7, 5)
-+#define DP83TG720S_SQI_OUT			GENMASK(3, 1)
-+
-+#define DP83TG720_SQI_MAX			7
-+
-+static int dp83tg720_config_aneg(struct phy_device *phydev)
-+{
-+	/* Autoneg is not supported and this PHY supports only one speed.
-+	 * We need to care only about master/slave configuration if it was
-+	 * changed by user.
-+	 */
-+	return genphy_c45_pma_baset1_setup_master_slave(phydev);
-+}
-+
-+static int dp83tg720_read_status(struct phy_device *phydev)
-+{
-+	u16 phy_sts;
-+	int ret;
-+
-+	phydev->pause = 0;
-+	phydev->asym_pause = 0;
-+
-+	/* Most of Clause 45 registers are not present, so we can't use
-+	 * genphy_c45_read_status() here.
-+	 */
-+	phy_sts = phy_read(phydev, DP83TG720S_MII_REG_10);
-+	phydev->link = !!(phy_sts & DP83TG720S_LINK_STATUS);
-+	if (!phydev->link) {
-+		/* According to the "DP83TC81x, DP83TG72x Software
-+		 * Implementation Guide", the PHY needs to be reset after a
-+		 * link loss or if no link is created after at least 100ms.
-+		 *
-+		 * Currently we are polling with the PHY_STATE_TIME (1000ms)
-+		 * interval, which is still enough for not automotive use cases.
-+		 */
-+		ret = phy_init_hw(phydev);
-+		if (ret)
-+			return ret;
-+
-+		/* After HW reset we need to restore master/slave configuration.
-+		 */
-+		ret = dp83tg720_config_aneg(phydev);
-+		if (ret)
-+			return ret;
-+
-+		phydev->speed = SPEED_UNKNOWN;
-+		phydev->duplex = DUPLEX_UNKNOWN;
-+	} else {
-+		/* PMA/PMD control 1 register (Register 1.0) is present, but it
-+		 * doesn't contain the link speed information.
-+		 * So genphy_c45_read_pma() can't be used here.
-+		 */
-+		ret = genphy_c45_pma_baset1_read_master_slave(phydev);
-+		if (ret)
-+			return ret;
-+
-+		phydev->duplex = DUPLEX_FULL;
-+		phydev->speed = SPEED_1000;
-+	}
-+
-+	return 0;
-+}
-+
-+static int dp83tg720_get_sqi(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	if (!phydev->link)
-+		return 0;
-+
-+	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TG720S_SQI_REG_1);
-+	if (ret < 0)
-+		return ret;
-+
-+	return FIELD_GET(DP83TG720S_SQI_OUT, ret);
-+}
-+
-+static int dp83tg720_get_sqi_max(struct phy_device *phydev)
-+{
-+	return DP83TG720_SQI_MAX;
-+}
-+
-+static int dp83tg720_config_rgmii_delay(struct phy_device *phydev)
-+{
-+	u16 rgmii_delay_mask;
-+	u16 rgmii_delay = 0;
-+
-+	switch (phydev->interface) {
-+	case PHY_INTERFACE_MODE_RGMII:
-+		rgmii_delay = 0;
-+		break;
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+		rgmii_delay = DP83TG720S_RGMII_RX_CLK_SEL |
-+				DP83TG720S_RGMII_TX_CLK_SEL;
-+		break;
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+		rgmii_delay = DP83TG720S_RGMII_RX_CLK_SEL;
-+		break;
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
-+		rgmii_delay = DP83TG720S_RGMII_TX_CLK_SEL;
-+		break;
-+	default:
-+		return 0;
-+	}
-+
-+	rgmii_delay_mask = DP83TG720S_RGMII_RX_CLK_SEL |
-+		DP83TG720S_RGMII_TX_CLK_SEL;
-+
-+	return phy_modify_mmd(phydev, MDIO_MMD_VEND2,
-+			      DP83TG720S_RGMII_DELAY_CTRL, rgmii_delay_mask,
-+			      rgmii_delay);
-+}
-+
-+static int dp83tg720_config_init(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	/* Software Restart is not enough to recover from a link failure.
-+	 * Using Hardware Reset instead.
-+	 */
-+	ret = phy_write(phydev, DP83TG720S_PHY_RESET, DP83TG720S_HW_RESET);
-+	if (ret)
-+		return ret;
-+
-+	/* Wait until MDC can be used again.
-+	 * The wait value of one 1ms is documented in "DP83TG720S-Q1 1000BASE-T1
-+	 * Automotive Ethernet PHY with SGMII and RGMII" datasheet.
-+	 */
-+	usleep_range(1000, 2000);
-+
-+	if (phy_interface_is_rgmii(phydev))
-+		return dp83tg720_config_rgmii_delay(phydev);
-+
-+	return 0;
-+}
-+
-+static struct phy_driver dp83tg720_driver[] = {
-+{
-+	PHY_ID_MATCH_MODEL(DP83TG720S_PHY_ID),
-+	.name		= "TI DP83TG720S",
-+
-+	.config_aneg	= dp83tg720_config_aneg,
-+	.read_status	= dp83tg720_read_status,
-+	.get_features	= genphy_c45_pma_read_ext_abilities,
-+	.config_init	= dp83tg720_config_init,
-+	.get_sqi	= dp83tg720_get_sqi,
-+	.get_sqi_max	= dp83tg720_get_sqi_max,
-+
-+	.suspend	= genphy_suspend,
-+	.resume		= genphy_resume,
-+} };
-+module_phy_driver(dp83tg720_driver);
-+
-+static struct mdio_device_id __maybe_unused dp83tg720_tbl[] = {
-+	{ PHY_ID_MATCH_MODEL(DP83TG720S_PHY_ID) },
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(mdio, dp83tg720_tbl);
-+
-+MODULE_DESCRIPTION("Texas Instruments DP83TG720S PHY driver");
-+MODULE_AUTHOR("Oleksij Rempel <kernel@pengutronix.de>");
-+MODULE_LICENSE("GPL");
--- 
-2.39.2
+yamllint warnings/errors:
+./Documentation/devicetree/bindings/phy/mediatek,xfi-pextp.yaml:33:16: [error] string value is redundantly quoted with any quotes (quoted-strings)
+./Documentation/devicetree/bindings/phy/mediatek,xfi-pextp.yaml:34:16: [error] string value is redundantly quoted with any quotes (quoted-strings)
+
+dtschema/dtc warnings/errors:
+Documentation/devicetree/bindings/phy/mediatek,xfi-pextp.example.dts:18:18: fatal error: dt-bindings/clock/mediatek,mt7988-clk.h: No such file or directory
+   18 |         #include <dt-bindings/clock/mediatek,mt7988-clk.h>
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[2]: *** [scripts/Makefile.lib:419: Documentation/devicetree/bindings/phy/mediatek,xfi-pextp.example.dtb] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1424: dt_binding_check] Error 2
+make: *** [Makefile:234: __sub-make] Error 2
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/b875f693f6d4367a610a12ef324584f3bf3a1c1c.1702352117.git.daniel@makrotopia.org
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
 
 
