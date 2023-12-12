@@ -1,202 +1,381 @@
-Return-Path: <netdev+bounces-56171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F165280E085
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 01:53:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2E8A80E09D
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 02:01:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7EF12825A6
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:53:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56A2E2825A3
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 01:01:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38E6E63C4;
-	Tue, 12 Dec 2023 00:52:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="b/vjbFu5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1509564A;
+	Tue, 12 Dec 2023 01:01:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D41BB8
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:52:03 -0800 (PST)
-Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-425952708afso35202771cf.0
-        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:52:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1702342322; x=1702947122; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=A03aN42yKFJNYwriH9O+9ACFYNFi/+3xamR20lCO7dY=;
-        b=b/vjbFu5wnP1ORM7H95U6vzssS3jMclBBEGVHwqA6aqqc/7XDnVBEO1CMSUwBJJQdH
-         XuOCWD9yoock5ffTO9G7wR16rFsS+eFwiE888gP+LOALgxUe6AS5kATByj5lcN2mN5on
-         yyug29x/0dtlMPasKs8HYPhzpwrZj4wWwBULc=
+Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com [209.85.160.69])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07F07D1
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 17:01:32 -0800 (PST)
+Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-1fb0a385ab8so10802430fac.2
+        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 17:01:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702342322; x=1702947122;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A03aN42yKFJNYwriH9O+9ACFYNFi/+3xamR20lCO7dY=;
-        b=iw9xukUeJMDOI1mcmAP0z/UZtdcT5KQvS3CD3LDmZIpe/O31j81qnTBiJH1+lx4FZf
-         RQr7qGQtygeNzy1tUlVA10Veq7LjV1fpIsZvKvO7ri0lnK05rvBIDW2nVKCv5suWqYde
-         xI3/4c5+LphHTLNvxtrfEScHAWgu4RkuWW5SuJF8ybX1rKzVzvJCScsJmSvhYMO00DpW
-         3dUxeFjShgWCS1St1ItBIsODOc4VdAutG4LcHRcniF7VmiZCcVID1I4ItGQS987xkmwy
-         dqSHZyHQbJzPVOKfbFgim2dTyaoFKpDbhqUkD04G2rJ8d/BuBj/sbEo3vqE6TgBqnfxS
-         g9Ew==
-X-Gm-Message-State: AOJu0YynTNJvN4nI9bpYoG3OotG3CWWx3KhxEh+n0lJfORLuH6FNnE48
-	xW/g0C1TQOPgxvxrJZaKN3qC5Q==
-X-Google-Smtp-Source: AGHT+IHkpwJzBtGVoOJaX4wvS0TUxxu9z0V6oXqRg3Sb7WV311XiFGP/nAL/nQfnlESZK2cw6bGZ/g==
-X-Received: by 2002:ac8:5dce:0:b0:425:4042:f45c with SMTP id e14-20020ac85dce000000b004254042f45cmr7615400qtx.64.1702342322504;
-        Mon, 11 Dec 2023 16:52:02 -0800 (PST)
-Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id r5-20020ac87945000000b00423ea1b31b3sm3619664qtt.66.2023.12.11.16.52.01
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 11 Dec 2023 16:52:02 -0800 (PST)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	gospo@broadcom.com,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>
-Subject: [PATCH net-next 13/13] bnxt_en: Make PTP TX timestamp HWRM query silent
-Date: Mon, 11 Dec 2023 16:51:22 -0800
-Message-Id: <20231212005122.2401-14-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20231212005122.2401-1-michael.chan@broadcom.com>
-References: <20231212005122.2401-1-michael.chan@broadcom.com>
+        d=1e100.net; s=20230601; t=1702342891; x=1702947691;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+Y+IyuudeUdWEkGWtHnVfhHs+Gy/ff+4wjVS1hBzJOY=;
+        b=AtKcgBnSXPps7HF42VG3MEZYucs6vH2oyj485l6FEpS3fXsbSUVon0AFi3Ej30xS6p
+         DG5KelL//tasZOmT9k7MLrgX5UlE12Pe/NFY19Jz56LrAhkGAtPl+JidBSWoW0fF0qz+
+         HJ7thnePqd//9U1+BHXkDsmZ3UDFPdVEbOETx9M+WDuf73+ExV02BiKNIP6vWrCut2zM
+         7Xy9baF7tMnIIGqO4eo7Be5FmzMiW9T9YLol8p2YTI4FQ4hKQTLwj0pAVngtTFpziPAL
+         x2ceUeRttie0xB265mieKsNT/BmTIHU75E8+iIMQAFcAW5zpHcnCMTjaidOW8WZ2KCrC
+         k/7A==
+X-Gm-Message-State: AOJu0YyAsNr9rD2IQIkMQDoVUtuxcoIi+KPUq/ihjWTI/3F5Ao1YOMM0
+	wF72ihorg/vxRDMgkLCzb+E6iQmqgCW/fN9+BM8X7hrVSTKb
+X-Google-Smtp-Source: AGHT+IHs0ypLgrc6PpfCj9y3vldUwemZsczbLp5pAZ0lq4t+6eKxR2ty8SNiXpC3OI6BiIl4sjTuoXLYfBLWUcWAtA1Pn6iDboBP
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000703dfc060c45750a"
+X-Received: by 2002:a05:6870:648f:b0:1fb:44:aef1 with SMTP id
+ cz15-20020a056870648f00b001fb0044aef1mr5625247oab.7.1702342891316; Mon, 11
+ Dec 2023 17:01:31 -0800 (PST)
+Date: Mon, 11 Dec 2023 17:01:31 -0800
+In-Reply-To: <000000000000e7765006072e9591@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000052ab03060c459780@google.com>
+Subject: Re: [syzbot] [bpf?] [trace?] possible deadlock in task_fork_fair
+From: syzbot <syzbot+1a93ee5d329e97cfbaff@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, brauner@kernel.org, 
+	daniel@iogearbox.net, haoluo@google.com, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, martin.lau@linux.dev, 
+	mathieu.desnoyers@efficios.com, mhiramat@kernel.org, netdev@vger.kernel.org, 
+	rostedt@goodmis.org, sdf@google.com, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
---000000000000703dfc060c45750a
-Content-Transfer-Encoding: 8bit
+syzbot has found a reproducer for the following issue on:
 
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+HEAD commit:    2ebe81c81435 net, xdp: Allow metadata > 32
+git tree:       bpf-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=16687bdee80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f8715b6ede5c4b90
+dashboard link: https://syzkaller.appspot.com/bug?extid=1a93ee5d329e97cfbaff
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=148b2632e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11aae88ee80000
 
-In a busy network, especially with flow control enabled, we may
-experience timestamp query failures fairly regularly. After a while,
-dmesg may be flooded with timestamp query failure error messages.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/972e21c08639/disk-2ebe81c8.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c55f0d0739c1/vmlinux-2ebe81c8.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4aa04cd001b3/bzImage-2ebe81c8.xz
 
-Silence the error message from the low level hwrm function that
-sends the firmware message.  Change netdev_err() to netdev_WARN_ONCE()
-if this FW call ever fails.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1a93ee5d329e97cfbaff@syzkaller.appspotmail.com
 
-Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+FAULT_INJECTION: forcing a failure.
+name fail_usercopy, interval 1, probability 0, space 0, times 1
+======================================================
+WARNING: possible circular locking dependency detected
+6.7.0-rc3-syzkaller-00778-g2ebe81c81435 #0 Not tainted
+------------------------------------------------------
+syz-executor229/5088 is trying to acquire lock:
+ffffffff8ceb8da0 (console_owner){....}-{0:0}, at: console_trylock_spinning kernel/printk/printk.c:1962 [inline]
+ffffffff8ceb8da0 (console_owner){....}-{0:0}, at: vprintk_emit+0x313/0x5f0 kernel/printk/printk.c:2302
+
+but task is already holding lock:
+ffff8880b983c718 (&rq->__lock){-.-.}-{2:2}, at: raw_spin_rq_lock_nested+0x29/0x130 kernel/sched/core.c:558
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #5 (&rq->__lock){-.-.}-{2:2}:
+       _raw_spin_lock_nested+0x31/0x40 kernel/locking/spinlock.c:378
+       raw_spin_rq_lock_nested+0x29/0x130 kernel/sched/core.c:558
+       raw_spin_rq_lock kernel/sched/sched.h:1349 [inline]
+       rq_lock kernel/sched/sched.h:1663 [inline]
+       task_fork_fair+0x70/0x240 kernel/sched/fair.c:12586
+       sched_cgroup_fork+0x3cf/0x510 kernel/sched/core.c:4812
+       copy_process+0x4c86/0x73f0 kernel/fork.c:2609
+       kernel_clone+0xfd/0x930 kernel/fork.c:2907
+       user_mode_thread+0xb4/0xf0 kernel/fork.c:2985
+       rest_init+0x27/0x2b0 init/main.c:695
+       arch_call_rest_init+0x13/0x30 init/main.c:827
+       start_kernel+0x39f/0x480 init/main.c:1072
+       x86_64_start_reservations+0x18/0x30 arch/x86/kernel/head64.c:555
+       x86_64_start_kernel+0xb2/0xc0 arch/x86/kernel/head64.c:536
+       secondary_startup_64_no_verify+0x166/0x16b
+
+-> #4 (&p->pi_lock){-.-.}-{2:2}:
+       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+       _raw_spin_lock_irqsave+0x3a/0x50 kernel/locking/spinlock.c:162
+       class_raw_spinlock_irqsave_constructor include/linux/spinlock.h:518 [inline]
+       try_to_wake_up+0xb0/0x13d0 kernel/sched/core.c:4226
+       kick_pool+0x253/0x470 kernel/workqueue.c:1142
+       create_worker+0x46f/0x730 kernel/workqueue.c:2217
+       workqueue_init+0x319/0x830 kernel/workqueue.c:6698
+       kernel_init_freeable+0x332/0xc10 init/main.c:1536
+       kernel_init+0x1c/0x2a0 init/main.c:1441
+       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+       ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+
+-> #3 (&pool->lock){-.-.}-{2:2}:
+       __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+       _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+       __queue_work+0x399/0x11f0 kernel/workqueue.c:1763
+       queue_work_on+0xed/0x110 kernel/workqueue.c:1834
+       queue_work include/linux/workqueue.h:562 [inline]
+       rpm_suspend+0x121b/0x16f0 drivers/base/power/runtime.c:660
+       rpm_idle+0x578/0x6e0 drivers/base/power/runtime.c:534
+       __pm_runtime_idle+0xbe/0x160 drivers/base/power/runtime.c:1102
+       pm_runtime_put include/linux/pm_runtime.h:460 [inline]
+       __device_attach+0x382/0x4b0 drivers/base/dd.c:1048
+       bus_probe_device+0x17c/0x1c0 drivers/base/bus.c:532
+       device_add+0x117e/0x1aa0 drivers/base/core.c:3625
+       serial_base_port_add+0x353/0x4b0 drivers/tty/serial/serial_base_bus.c:178
+       serial_core_port_device_add drivers/tty/serial/serial_core.c:3316 [inline]
+       serial_core_register_port+0x137/0x1af0 drivers/tty/serial/serial_core.c:3357
+       serial8250_register_8250_port+0x140d/0x2080 drivers/tty/serial/8250/8250_core.c:1139
+       serial_pnp_probe+0x47d/0x880 drivers/tty/serial/8250/8250_pnp.c:478
+       pnp_device_probe+0x2a3/0x4c0 drivers/pnp/driver.c:111
+       call_driver_probe drivers/base/dd.c:579 [inline]
+       really_probe+0x234/0xc90 drivers/base/dd.c:658
+       __driver_probe_device+0x1de/0x4b0 drivers/base/dd.c:800
+       driver_probe_device+0x4c/0x1a0 drivers/base/dd.c:830
+       __driver_attach+0x274/0x570 drivers/base/dd.c:1216
+       bus_for_each_dev+0x13c/0x1d0 drivers/base/bus.c:368
+       bus_add_driver+0x2e9/0x630 drivers/base/bus.c:673
+       driver_register+0x15c/0x4a0 drivers/base/driver.c:246
+       serial8250_init+0xba/0x4b0 drivers/tty/serial/8250/8250_core.c:1240
+       do_one_initcall+0x11c/0x650 init/main.c:1236
+       do_initcall_level init/main.c:1298 [inline]
+       do_initcalls init/main.c:1314 [inline]
+       do_basic_setup init/main.c:1333 [inline]
+       kernel_init_freeable+0x687/0xc10 init/main.c:1551
+       kernel_init+0x1c/0x2a0 init/main.c:1441
+       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+       ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+
+-> #2 (&dev->power.lock){-...}-{2:2}:
+       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+       _raw_spin_lock_irqsave+0x3a/0x50 kernel/locking/spinlock.c:162
+       __pm_runtime_resume+0xab/0x170 drivers/base/power/runtime.c:1169
+       pm_runtime_get include/linux/pm_runtime.h:408 [inline]
+       __uart_start+0x1b2/0x470 drivers/tty/serial/serial_core.c:148
+       uart_write+0x2ff/0x5b0 drivers/tty/serial/serial_core.c:616
+       process_output_block drivers/tty/n_tty.c:574 [inline]
+       n_tty_write+0x422/0x1130 drivers/tty/n_tty.c:2379
+       iterate_tty_write drivers/tty/tty_io.c:1021 [inline]
+       file_tty_write.constprop.0+0x519/0x9b0 drivers/tty/tty_io.c:1092
+       tty_write drivers/tty/tty_io.c:1113 [inline]
+       redirected_tty_write drivers/tty/tty_io.c:1136 [inline]
+       redirected_tty_write+0xa6/0xc0 drivers/tty/tty_io.c:1116
+       call_write_iter include/linux/fs.h:2020 [inline]
+       new_sync_write fs/read_write.c:491 [inline]
+       vfs_write+0x64f/0xdf0 fs/read_write.c:584
+       ksys_write+0x12f/0x250 fs/read_write.c:637
+       do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+       do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
+       entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+-> #1 (&port_lock_key){-...}-{2:2}:
+       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+       _raw_spin_lock_irqsave+0x3a/0x50 kernel/locking/spinlock.c:162
+       uart_port_lock_irqsave include/linux/serial_core.h:616 [inline]
+       serial8250_console_write+0xa7c/0x1060 drivers/tty/serial/8250/8250_port.c:3403
+       console_emit_next_record kernel/printk/printk.c:2901 [inline]
+       console_flush_all+0x4d5/0xd60 kernel/printk/printk.c:2967
+       console_unlock+0x10c/0x260 kernel/printk/printk.c:3036
+       vprintk_emit+0x17f/0x5f0 kernel/printk/printk.c:2303
+       vprintk+0x7b/0x90 kernel/printk/printk_safe.c:45
+       _printk+0xc8/0x100 kernel/printk/printk.c:2328
+       register_console+0xa74/0x1060 kernel/printk/printk.c:3542
+       univ8250_console_init+0x35/0x50 drivers/tty/serial/8250/8250_core.c:717
+       console_init+0xba/0x5d0 kernel/printk/printk.c:3688
+       start_kernel+0x25a/0x480 init/main.c:1008
+       x86_64_start_reservations+0x18/0x30 arch/x86/kernel/head64.c:555
+       x86_64_start_kernel+0xb2/0xc0 arch/x86/kernel/head64.c:536
+       secondary_startup_64_no_verify+0x166/0x16b
+
+-> #0 (console_owner){....}-{0:0}:
+       check_prev_add kernel/locking/lockdep.c:3134 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+       validate_chain kernel/locking/lockdep.c:3869 [inline]
+       __lock_acquire+0x2433/0x3b20 kernel/locking/lockdep.c:5137
+       lock_acquire kernel/locking/lockdep.c:5754 [inline]
+       lock_acquire+0x1ae/0x520 kernel/locking/lockdep.c:5719
+       console_trylock_spinning kernel/printk/printk.c:1962 [inline]
+       vprintk_emit+0x328/0x5f0 kernel/printk/printk.c:2302
+       vprintk+0x7b/0x90 kernel/printk/printk_safe.c:45
+       _printk+0xc8/0x100 kernel/printk/printk.c:2328
+       fail_dump lib/fault-inject.c:45 [inline]
+       should_fail_ex+0x46b/0x5b0 lib/fault-inject.c:153
+       strncpy_from_user+0x38/0x300 lib/strncpy_from_user.c:118
+       strncpy_from_user_nofault+0x80/0x180 mm/maccess.c:186
+       bpf_probe_read_user_str_common kernel/trace/bpf_trace.c:213 [inline]
+       ____bpf_probe_read_user_str kernel/trace/bpf_trace.c:222 [inline]
+       bpf_probe_read_user_str+0x26/0x70 kernel/trace/bpf_trace.c:219
+       bpf_prog_6fb7ada547f278f2+0x3d/0x3f
+       bpf_dispatcher_nop_func include/linux/bpf.h:1219 [inline]
+       __bpf_prog_run include/linux/filter.h:651 [inline]
+       bpf_prog_run include/linux/filter.h:658 [inline]
+       __bpf_trace_run kernel/trace/bpf_trace.c:2378 [inline]
+       bpf_trace_run4+0x173/0x450 kernel/trace/bpf_trace.c:2419
+       __bpf_trace_sched_switch+0x13e/0x180 include/trace/events/sched.h:222
+       __traceiter_sched_switch+0x6c/0xc0 include/trace/events/sched.h:222
+       trace_sched_switch include/trace/events/sched.h:222 [inline]
+       __schedule+0x21f3/0x5af0 kernel/sched/core.c:6685
+       __schedule_loop kernel/sched/core.c:6763 [inline]
+       schedule+0xe9/0x270 kernel/sched/core.c:6778
+       ptrace_stop.part.0+0x44d/0x7a0 kernel/signal.c:2353
+       ptrace_stop kernel/signal.c:2255 [inline]
+       ptrace_do_notify+0x22f/0x2e0 kernel/signal.c:2390
+       ptrace_notify+0xc8/0x130 kernel/signal.c:2402
+       ptrace_report_syscall include/linux/ptrace.h:411 [inline]
+       ptrace_report_syscall_exit include/linux/ptrace.h:473 [inline]
+       syscall_exit_work kernel/entry/common.c:251 [inline]
+       syscall_exit_to_user_mode_prepare+0x126/0x230 kernel/entry/common.c:278
+       __syscall_exit_to_user_mode_work kernel/entry/common.c:283 [inline]
+       syscall_exit_to_user_mode+0xe/0x60 kernel/entry/common.c:296
+       do_syscall_64+0x4d/0x110 arch/x86/entry/common.c:88
+       entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+other info that might help us debug this:
+
+Chain exists of:
+  console_owner --> &p->pi_lock --> &rq->__lock
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&rq->__lock);
+                               lock(&p->pi_lock);
+                               lock(&rq->__lock);
+  lock(console_owner);
+
+ *** DEADLOCK ***
+
+2 locks held by syz-executor229/5088:
+ #0: ffff8880b983c718 (&rq->__lock){-.-.}-{2:2}, at: raw_spin_rq_lock_nested+0x29/0x130 kernel/sched/core.c:558
+ #1: ffffffff8cfabbe0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:301 [inline]
+ #1: ffffffff8cfabbe0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:747 [inline]
+ #1: ffffffff8cfabbe0 (rcu_read_lock){....}-{1:2}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2377 [inline]
+ #1: ffffffff8cfabbe0 (rcu_read_lock){....}-{1:2}, at: bpf_trace_run4+0x107/0x450 kernel/trace/bpf_trace.c:2419
+
+stack backtrace:
+CPU: 0 PID: 5088 Comm: syz-executor229 Not tainted 6.7.0-rc3-syzkaller-00778-g2ebe81c81435 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
+ check_noncircular+0x317/0x400 kernel/locking/lockdep.c:2187
+ check_prev_add kernel/locking/lockdep.c:3134 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+ validate_chain kernel/locking/lockdep.c:3869 [inline]
+ __lock_acquire+0x2433/0x3b20 kernel/locking/lockdep.c:5137
+ lock_acquire kernel/locking/lockdep.c:5754 [inline]
+ lock_acquire+0x1ae/0x520 kernel/locking/lockdep.c:5719
+ console_trylock_spinning kernel/printk/printk.c:1962 [inline]
+ vprintk_emit+0x328/0x5f0 kernel/printk/printk.c:2302
+ vprintk+0x7b/0x90 kernel/printk/printk_safe.c:45
+ _printk+0xc8/0x100 kernel/printk/printk.c:2328
+ fail_dump lib/fault-inject.c:45 [inline]
+ should_fail_ex+0x46b/0x5b0 lib/fault-inject.c:153
+ strncpy_from_user+0x38/0x300 lib/strncpy_from_user.c:118
+ strncpy_from_user_nofault+0x80/0x180 mm/maccess.c:186
+ bpf_probe_read_user_str_common kernel/trace/bpf_trace.c:213 [inline]
+ ____bpf_probe_read_user_str kernel/trace/bpf_trace.c:222 [inline]
+ bpf_probe_read_user_str+0x26/0x70 kernel/trace/bpf_trace.c:219
+ bpf_prog_6fb7ada547f278f2+0x3d/0x3f
+ bpf_dispatcher_nop_func include/linux/bpf.h:1219 [inline]
+ __bpf_prog_run include/linux/filter.h:651 [inline]
+ bpf_prog_run include/linux/filter.h:658 [inline]
+ __bpf_trace_run kernel/trace/bpf_trace.c:2378 [inline]
+ bpf_trace_run4+0x173/0x450 kernel/trace/bpf_trace.c:2419
+ __bpf_trace_sched_switch+0x13e/0x180 include/trace/events/sched.h:222
+ __traceiter_sched_switch+0x6c/0xc0 include/trace/events/sched.h:222
+ trace_sched_switch include/trace/events/sched.h:222 [inline]
+ __schedule+0x21f3/0x5af0 kernel/sched/core.c:6685
+ __schedule_loop kernel/sched/core.c:6763 [inline]
+ schedule+0xe9/0x270 kernel/sched/core.c:6778
+ ptrace_stop.part.0+0x44d/0x7a0 kernel/signal.c:2353
+ ptrace_stop kernel/signal.c:2255 [inline]
+ ptrace_do_notify+0x22f/0x2e0 kernel/signal.c:2390
+ ptrace_notify+0xc8/0x130 kernel/signal.c:2402
+ ptrace_report_syscall include/linux/ptrace.h:411 [inline]
+ ptrace_report_syscall_exit include/linux/ptrace.h:473 [inline]
+ syscall_exit_work kernel/entry/common.c:251 [inline]
+ syscall_exit_to_user_mode_prepare+0x126/0x230 kernel/entry/common.c:278
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:283 [inline]
+ syscall_exit_to_user_mode+0xe/0x60 kernel/entry/common.c:296
+ do_syscall_64+0x4d/0x110 arch/x86/entry/common.c:88
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7fc3b1ed34f9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 21 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffdaa3d0328 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: 00000000000000d8 RBX: 0000000000000000 RCX: 00007fc3b1ed34f9
+RDX: 0000000000000000 RSI: 0000000020000940 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 00007ffdaa3d00c6 R09: 00000000557624c0
+R10: 0000000000000002 R11: 0000000000000246 R12: 00000000200000d8
+R13: 00007ffdaa3d0334 R14: 0000000000000000 R15: 00007ffdaa3d0350
+ </TASK>
+CPU: 0 PID: 5088 Comm: syz-executor229 Not tainted 6.7.0-rc3-syzkaller-00778-g2ebe81c81435 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
+ fail_dump lib/fault-inject.c:52 [inline]
+ should_fail_ex+0x496/0x5b0 lib/fault-inject.c:153
+ strncpy_from_user+0x38/0x300 lib/strncpy_from_user.c:118
+ strncpy_from_user_nofault+0x80/0x180 mm/maccess.c:186
+ bpf_probe_read_user_str_common kernel/trace/bpf_trace.c:213 [inline]
+ ____bpf_probe_read_user_str kernel/trace/bpf_trace.c:222 [inline]
+ bpf_probe_read_user_str+0x26/0x70 kernel/trace/bpf_trace.c:219
+ bpf_prog_6fb7ada547f278f2+0x3d/0x3f
+ bpf_dispatcher_nop_func include/linux/bpf.h:1219 [inline]
+ __bpf_prog_run include/linux/filter.h:651 [inline]
+ bpf_prog_run include/linux/filter.h:658 [inline]
+ __bpf_trace_run kernel/trace/bpf_trace.c:2378 [inline]
+ bpf_trace_run4+0x173/0x450 kernel/trace/bpf_trace.c:2419
+ __bpf_trace_sched_switch+0x13e/0x180 include/trace/events/sched.h:222
+ __traceiter_sched_switch+0x6c/0xc0 include/trace/events/sched.h:222
+ trace_sched_switch include/trace/events/sched.h:222 [inline]
+ __schedule+0x21f3/0x5af0 kernel/sched/core.c:6685
+ __schedule_loop kernel/sched/core.c:6763 [inline]
+ schedule+0xe9/0x270 kernel/sched/core.c:6778
+ ptrace_stop.part.0+0x44d/0x7a0 kernel/signal.c:2353
+ ptrace_stop kernel/signal.c:2255 [inline]
+ ptrace_do_notify+0x22f/0x2e0 kernel/signal.c:2390
+ ptrace_notify+0xc8/0x130 kernel/signal.c:2402
+ ptrace_report_syscall include/linux/ptrace.h:411 [inline]
+ ptrace_report_syscall_exit include/linux/ptrace.h:473 [inline]
+ syscall_exit_work kernel/entry/common.c:251 [inline]
+ syscall_exit_to_user_mode_prepare+0x126/0x230 kernel/entry/common.c:278
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:283 [inline]
+ syscall_exit_to_user_mode+0xe/0x60 kernel/entry/common.c:296
+ do_syscall_64+0x4d/0x110 arch/x86/entry/common.c:88
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7fc3b1ed34f9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 21 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffdaa3d0328 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: 00000000000000d8 RBX: 0000000000000000 RCX: 00007fc3b1ed34f9
+RDX: 0000000000000000 RSI: 0000000020000940 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 00007ffdaa3d00c6 R09: 00000000557624c0
+R10: 0000000000000002 R11: 0000000000000246 R12: 00000000200000d8
+R13: 00007ffdaa3d0334 R14: 0000000000000000 R15: 00007ffdaa3d0350
+ </TASK>
+
+
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-index 3d1c36d384c2..adad188e38b8 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-@@ -129,7 +129,7 @@ static int bnxt_hwrm_port_ts_query(struct bnxt *bp, u32 flags, u64 *ts)
- 	}
- 	resp = hwrm_req_hold(bp, req);
- 
--	rc = hwrm_req_send(bp, req);
-+	rc = hwrm_req_send_silent(bp, req);
- 	if (!rc)
- 		*ts = le64_to_cpu(resp->ptp_msg_ts);
- 	hwrm_req_drop(bp, req);
-@@ -684,8 +684,8 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
- 		timestamp.hwtstamp = ns_to_ktime(ns);
- 		skb_tstamp_tx(ptp->tx_skb, &timestamp);
- 	} else {
--		netdev_err(bp->dev, "TS query for TX timer failed rc = %x\n",
--			   rc);
-+		netdev_WARN_ONCE(bp->dev,
-+				 "TS query for TX timer failed rc = %x\n", rc);
- 	}
- 
- 	dev_kfree_skb_any(ptp->tx_skb);
--- 
-2.30.1
-
-
---000000000000703dfc060c45750a
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJ3x5rt8MM1Kzil9XD2Y73DWAAEAAG1u
-VSWUm/lTY+uhMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIx
-MjAwNTIwMlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAcoYjn6Us9Lqd88mHwZN7+ZaP2W6VNduNs2zK6D2NjiEdpkobR
-cNBy2B0o6ysPz6zalm5exkVisABx/pTnGLsTa40gjEMLfNW2LNUxDyVJFALpLGNdVGBXnJ2cpsj0
-AN+/dJnJCydhQKUmwzxp3PISojH8TarToWq3NKn/eYWm1Fsytw9yONUVAMXbbDCnyrgt2gvxaosA
-Z5czI5ie/5G1Ub2ke4jt5wCjaxs6TyT6J3oon2ld9CGj5YcGrKd0Dqfvch3W1+gBUwISj4YdJztY
-UD7GJ2sj3AfMRT99EFEuJdF80wyI23Hr/2hikEeVwWznTSCjvVZrcNjNHnmdQsim
---000000000000703dfc060c45750a--
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
