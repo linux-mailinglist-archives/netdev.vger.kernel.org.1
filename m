@@ -1,86 +1,112 @@
-Return-Path: <netdev+bounces-56318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0330C80E859
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:57:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B1EB80E861
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:59:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2AD62812E5
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 09:57:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8812B20A7F
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 09:59:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E735914E;
-	Tue, 12 Dec 2023 09:57:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A20559158;
+	Tue, 12 Dec 2023 09:59:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=riseup.net header.i=@riseup.net header.b="G/fV2qeH"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Rk79/zp7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.riseup.net (mx1.riseup.net [198.252.153.129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59E49FD
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 01:57:23 -0800 (PST)
-Received: from fews01-sea.riseup.net (fews01-sea-pn.riseup.net [10.0.1.109])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx1.riseup.net (Postfix) with ESMTPS id 4SqDYL0dhDzDrRM;
-	Tue, 12 Dec 2023 09:57:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=riseup.net; s=squak;
-	t=1702375041; bh=T2p932hhf/t1ELCg3vzJT0DL6+JnVOd0apGLSkwLy2g=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=G/fV2qeH0CGR7kNB/gzf8HB8A9xjj9Ew9/U9D5F6LjF+Iaflm42OZMNFExgJVlPPB
-	 7cLYTVyMtu3WD2WlbnDH6kqBKRNoO9uv+VH0DJ270AphegvrFWvdH5EB/RAbAiGfFg
-	 iC5pc0WdFLJGx0NSsED+e0Fk01oRUKE+SvtkEyKA=
-X-Riseup-User-ID: D1B3507E71595E12C760C7F32A909C3EC4E44D597829D7D5FEBF00FC9C995999
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	 by fews01-sea.riseup.net (Postfix) with ESMTPSA id 4SqDYJ60zmzJn4h;
-	Tue, 12 Dec 2023 09:57:08 +0000 (UTC)
-Message-ID: <6715f514-f3a7-4297-8720-53872eea8056@riseup.net>
-Date: Tue, 12 Dec 2023 10:57:05 +0100
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9955A6;
+	Tue, 12 Dec 2023 01:59:18 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 89DD2FF803;
+	Tue, 12 Dec 2023 09:59:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1702375156;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q0/3Sh2eETJdeZKVLmp2oI+wYLwADP2lZuTfmz4YhfQ=;
+	b=Rk79/zp7ossMcvHhiqp98keiVcv2gf1k87JOuYi/QLilq8f6xx+Gh19mWu7nDU4GeYpq5Q
+	lRAq+xxqZKFZMqfm3v4apQZT8Eo9qLKTSvd08PZJt9pgPyMHVvNPn3vGh/gy+jkcjjZu5r
+	wCvV60IHuTJoUZ/9pXNbrDOHs/6pqvz4+6vJDPlffMiVNhwS5sKlSDDoJbM/82dbwdegCM
+	e/wzYFgh3Eyy3Q4vUTWXVi+n7g+kWD2I4tihNRFoZePsrg5xf0CTlntvsMEHd0sUIf5F+a
+	GeETxE6cLFojuL7k1GfrfDLArZPz425zbHBa/uR6Zj/b3legUK3tmLo+C1qbLA==
+Date: Tue, 12 Dec 2023 10:59:14 +0100
+From: Herve Codina <herve.codina@bootlin.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Mark Brown <broonie@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+ <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Lee Jones <lee@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH 0/5] Add support for framer infrastructure and PEF2256
+ framer
+Message-ID: <20231212105914.7eeb092b@bootlin.com>
+In-Reply-To: <CACRpkdbrH-WWVrVWx6MvReUuUW8tU_J8Mb7nW3G8fJGAoiS38g@mail.gmail.com>
+References: <20231128132534.258459-1-herve.codina@bootlin.com>
+	<17b2f126-f6a4-431c-9e72-56a9c2932a88@sirena.org.uk>
+	<CACRpkda5VMuXccwSBd-DBkM4W7A1E+UfZwBxWqtqxZzKjrqY4A@mail.gmail.com>
+	<511c83d1-d77f-4ac0-927e-91070787bc34@sirena.org.uk>
+	<CACRpkdYmN4318b1wXwUOeFjPN0S2w8M9FpXHOs3LtFa+XoTxVw@mail.gmail.com>
+	<20231128173110.0ccb8f53@kernel.org>
+	<CACRpkdbrH-WWVrVWx6MvReUuUW8tU_J8Mb7nW3G8fJGAoiS38g@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: Preferred term for netdev master / slave
-To: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org
-References: <m2plzc96m4.fsf@gmail.com>
-Content-Language: en-US
-From: "Fernando F. Mancera" <ffmancera@riseup.net>
-In-Reply-To: <m2plzc96m4.fsf@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
+Hi Linus,
 
+On Wed, 29 Nov 2023 15:00:40 +0100
+Linus Walleij <linus.walleij@linaro.org> wrote:
 
-On 11/12/2023 15:05, Donald Hunter wrote:
-> I'm working on updates to the YNL spec for RTLINK and per
-> Documentation/process/coding-style I want to avoid any new use
-> of master / slave.
+> On Wed, Nov 29, 2023 at 2:31 AM Jakub Kicinski <kuba@kernel.org> wrote:
+> > On Tue, 28 Nov 2023 15:51:01 +0100 Linus Walleij wrote:  
+> > > > > I thought this thing would be merged primarily into the networking
+> > > > > tree, and I don't know if they do signed tags, I usually create an
+> > > > > immutable branch but that should work just as fine I guess.  
+> > > >
+> > > > Right, I'd expect a signed tag on the immutable branch - it's generally
+> > > > helpful to avoid confusion about the branch actually being immutable.  
+> > >
+> > > Makes sense, best to create that in the netdev tree if possible
+> > > I guess.  
+> >
+> > I think you offered creating the branch / tag in an earlier reply,
+> > that's less work for me so yes please! :)  
 > 
-> Recommended replacements include:
+> OK I fix!
 > 
->      '{primary,main} / {secondary,replica,subordinate}'
->      '{initiator,requester} / {target,responder}'
->      '{controller,host} / {device,worker,proxy}'
+> Just waiting for some final reviews to trickle in.
 > 
-> Is there an existing preference for what to use in the context
-> of e.g. bridge master / slave?
-> 
+> Herve: nag me if it doesn't happen in time!
 
-Hi Donald,
+As you tell me, this is my reminder.
 
-In other projects like NetworkManager, rust-netlink libraries.. the 
-terms that are being used in the context of linux bridging are 
-controller / port.
+Best regards,
+Hervé
 
-> If not, then how about one of:
 > 
->      primary / secondary
->      main / subordinate
+> > FWIW I usually put the branches / tags in my personal k.org tree.
+> > I don't wanna pollute the trees for the $many people who fetch
+> > netdev with random tags.  
 > 
-> Thanks!
+> Aha yeah pin control is relatively small so I just carry misc sync
+> tags there.
 > 
-
-Thanks!
+> Yours,
+> Linus Walleij
 
