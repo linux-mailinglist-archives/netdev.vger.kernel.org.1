@@ -1,69 +1,68 @@
-Return-Path: <netdev+bounces-56560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D1D080F601
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 20:07:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4D3F80F609
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 20:08:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45D1E1F215D6
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 19:07:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F0051F216A9
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 19:08:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A13398004D;
-	Tue, 12 Dec 2023 19:07:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 460B280057;
+	Tue, 12 Dec 2023 19:08:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vMLMHfKu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Au4hC/1g"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DE3491;
-	Tue, 12 Dec 2023 11:07:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=WDyfD09PAON4LZuIakiggNErHuklPdxdPhsExRCINO0=; b=vMLMHfKuWjpOeCgqj+OLSIbKsG
-	WCGncmPzax+s7ErnI8PlwoAcxDgi7JafMKVhEz++U+ZVQ0XP+ohiULCrVXD/1dsSQSk5yjcm0zHBK
-	XJSYcF2axTnD1zNtKD5UhlW9zlwLRjW3JYr1H0mjXegUeu0pkeLE3MwLfePZ5fVAWlL23Am0I3PL5
-	NT+gIKBnCPzCh8jjkzWC4o0487W4InM+Or5UWQfd6BDMvNIV9pIIIE1jc+pWQizWWt+hHLFeDOT09
-	rdDi0N33mI6WDlJ+FmCYpG7ErF4HC1LSmRNgAAZM97w65nNqWkVz7kUwz5Y9zFE6ftvqJdadzd2vK
-	vwdMQbbQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35082)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rD85g-0007Hq-0s;
-	Tue, 12 Dec 2023 19:06:48 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rD85e-0000gA-UH; Tue, 12 Dec 2023 19:06:46 +0000
-Date: Tue, 12 Dec 2023 19:06:46 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Tomer Maimon <tmaimon77@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F1980047;
+	Tue, 12 Dec 2023 19:08:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D54B9C433C8;
+	Tue, 12 Dec 2023 19:08:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702408094;
+	bh=jhISTjjXnV6IhH0cY8Vge/0tePQdfehvyIi305w0McY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Au4hC/1gn8GAGqeNMIHMx+pf9H5e6cZx6if1YTAQ6myI1fcVcXp5E5HE2JZd7l5Ox
+	 z67YTPNEYCNjnSuydNuYjf11+fIKfzPgHgAvXDJMesthEcR7qviRft/QV/5zK2IHqc
+	 ruHQ42BTGcBdnaq77FMuM0r1fOHC9LqNVWjgGTPuAoXZTpwGA7dF5WXD028QLwM5fU
+	 83R8uUGoHmwAgKnoHD0ERZyXGTjjQTXsSeJdhkJcoe/E2jvGdjrJ/mAO3N0OzKkaja
+	 5wgu6LG6g2ra++dYX1DnvaNKyc0fxe1LJrSA1Kpyox0qvKLpHzYMqlHmzVyMur9vKu
+	 ehmZCE5A0RUew==
+Date: Tue, 12 Dec 2023 19:08:06 +0000
+From: Simon Horman <horms@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	bpf@vger.kernel.org, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	openbmc@lists.ozlabs.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 06/16] net: pcs: xpcs: Avoid creating dummy XPCS
- MDIO device
-Message-ID: <ZXivRofyIpvmfOyR@shell.armlinux.org.uk>
-References: <20231205103559.9605-1-fancer.lancer@gmail.com>
- <20231205103559.9605-7-fancer.lancer@gmail.com>
- <ZW8pxM3RvyHJTwqH@shell.armlinux.org.uk>
- <ZW85iBGAAf5RAsN1@shell.armlinux.org.uk>
- <kagwzutwnbpiyc7mmtq7ka3vhffw4fejuti5vepnla74rocruh@tryn6lxhwbjz>
+	Jonathan Corbet <corbet@lwn.net>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Shakeel Butt <shakeelb@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Subject: Re: [net-next v1 14/16] net: add SO_DEVMEM_DONTNEED setsockopt to
+ release RX frags
+Message-ID: <20231212190806.GB5817@kernel.org>
+References: <20231208005250.2910004-1-almasrymina@google.com>
+ <20231208005250.2910004-15-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,75 +71,73 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <kagwzutwnbpiyc7mmtq7ka3vhffw4fejuti5vepnla74rocruh@tryn6lxhwbjz>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20231208005250.2910004-15-almasrymina@google.com>
 
-On Tue, Dec 12, 2023 at 06:26:16PM +0300, Serge Semin wrote:
-> I would have used in the first place if it was externally visible, but
-> it's defined as static. Do you suggest to make it global or ...
-
-That would be one option - I didn't make it visible when I introduced it
-beacuse there were no users for it.
-
-> > At some point, we should implement
-> > mdiobus_get_mdiodev() which also deals with the refcount.
+On Thu, Dec 07, 2023 at 04:52:45PM -0800, Mina Almasry wrote:
+> Add an interface for the user to notify the kernel that it is done
+> reading the devmem dmabuf frags returned as cmsg. The kernel will
+> drop the reference on the frags to make them available for re-use.
 > 
-> ... create mdiobus_get_mdiodev() instead?
-> 
-> * Note in the commit message I mentioned that having a getter would be
-> * better than directly touching the mii_bus instance guts.
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
+> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
 
-What I'm thinking is:
+...
 
-/**
- * mdiobus_get_mdiodev() - get a mdiodev for the specified bus
- * @bus: mii_bus to get mdio device from
- * @addr: mdio address of mdio device
- *
- * Return the struct mdio_device attached to the MII bus @bus at MDIO
- * address @addr. On success, the refcount on the device will be
- * increased, which must be dropped using mdio_device_put(), and the
- * mdio device returned. Otherwise, returns NULL.
- */
-struct mdio_device *mdiobus_get_mdiodev(struct mii_bus *bus, int addr)
-{
-	struct mdio_device *mdiodev;
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index fef349dd72fa..521bdc4ff260 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -1051,6 +1051,41 @@ static int sock_reserve_memory(struct sock *sk, int bytes)
+>  	return 0;
+>  }
+>  
+> +static noinline_for_stack int
+> +sock_devmem_dontneed(struct sock *sk, sockptr_t optval, unsigned int optlen)
+> +{
+> +	struct dmabuf_token tokens[128];
 
-	mdiodev = mdiobus_find_device(bus, addr);
-	if (mdiodev)
-		get_device(&mdiodev->dev);
-	return mdiodev;
-}
-EXPORT_SYMBOL(mdiobus_get_mdiodev);
+Hi Mina,
 
-should do it, and will hold a reference on the mdiodev structure (which
-won't be freed) and also on the mii_bus (since this device is a child
-of the bus device, the parent can't be released until the child has
-been, so struct mii_bus should at least stay around.)
+I am guessing it is mostly due to the line above,
+but on x86 32bit builds I see:
 
-What would help the "the bus driver has been unbound" situation is if
-we took the mdio_lock on the bus, and then set the {read,write}{,_c45}
-functions to dummy stubs when the bus is being unregistered which then
-return e.g. -ENXIO. That will probably make unbinding/unloading all
-MDIO bus drivers safe from kernel oops, although phylib will spit out
-a non-useful backtrace if it tries an access. I don't think there's
-much which can be done about that - I did propose a patch to change
-that behaviour but apparently folk like having it!
+	warning: the frame size of 1048 bytes is larger than 1024 bytes [-Wframe-larger-than
 
-It isn't perfect - it's racy, but then accessing mdio_map[] is
-inherently racy due to no locking with mdiobus_.*register_device().
-At least if we have everyone using a proper getter function rather
-than directly fiddling with bus->mdio_map[]. We only have one driver
-that accesses it directly at the moment (mscc_ptp):
+> +	unsigned int num_tokens, i, j;
+> +	int ret;
+> +
+> +	if (sk->sk_type != SOCK_STREAM || sk->sk_protocol != IPPROTO_TCP)
+> +		return -EBADF;
+> +
+> +	if (optlen % sizeof(struct dmabuf_token) || optlen > sizeof(tokens))
+> +		return -EINVAL;
+> +
+> +	num_tokens = optlen / sizeof(struct dmabuf_token);
+> +	if (copy_from_sockptr(tokens, optval, optlen))
+> +		return -EFAULT;
+> +
+> +	ret = 0;
+> +	for (i = 0; i < num_tokens; i++) {
+> +		for (j = 0; j < tokens[i].token_count; j++) {
+> +			struct page *page = xa_erase(&sk->sk_user_pages,
+> +						     tokens[i].token_start + j);
+> +
+> +			if (page) {
+> +				if (WARN_ON_ONCE(!napi_pp_put_page(page,
+> +								   false)))
+> +					page_pool_page_put_many(page, 1);
+> +				ret++;
+> +			}
+> +		}
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+>  void sockopt_lock_sock(struct sock *sk)
+>  {
+>  	/* When current->bpf_ctx is set, the setsockopt is called from
 
-                dev = phydev->mdio.bus->mdio_map[vsc8531->ts_base_addr];
-                phydev = container_of(dev, struct phy_device, mdio);
-
-                return phydev->priv;
-
-and that should really be using mdiobus_get_phy().
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+...
 
