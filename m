@@ -1,102 +1,88 @@
-Return-Path: <netdev+bounces-56432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6601880ED7F
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:27:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD46B80ED94
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:30:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5FB46B20BD9
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 13:27:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9367D1F211D1
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 13:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28F7F58137;
-	Tue, 12 Dec 2023 13:27:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00D061FA7;
+	Tue, 12 Dec 2023 13:30:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k4Z8BveF"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FB3BA8;
-	Tue, 12 Dec 2023 05:26:59 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=23;SR=0;TI=SMTPD_---0VyMZ.ND_1702387614;
-Received: from 30.221.129.163(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VyMZ.ND_1702387614)
-          by smtp.aliyun-inc.com;
-          Tue, 12 Dec 2023 21:26:55 +0800
-Message-ID: <6064a6d7-8790-cf15-2d2e-eddb04e4e668@linux.alibaba.com>
-Date: Tue, 12 Dec 2023 21:26:53 +0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADAB361699
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 13:30:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0ECD4C433CA;
+	Tue, 12 Dec 2023 13:30:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702387826;
+	bh=o2ZngpIt315TyOOz+uMaM8A711SA4BcZl1S9PdBQLcE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=k4Z8BveFej3OzArqXJ1msE/6qsiPfH8yfLE0FB2IqhOXr8Q6QzmIaIWl4NDIa41Bh
+	 XPjipt5mDL8chPoXHpc0Qw0XH/p6gL2lZDr0IanVtnxAQjcZoTp1WGtO7Iq5aM4/aJ
+	 NEVK4Wd7H5DO5JKLJUrhdcInaYWSqF+8aEYZJKDnWznsqXntNC5g4O4a10CXJ8ssme
+	 ewAEbrSGxU7K1Yep3WnthQ9bxZ8qxkPlm59pcvi/j8WShnixklRO6KtKN77In5M2qs
+	 UQ3XPeTDsLQa0OjnlE+x2YuQ9fu2GgrD+y7/AyeqPeMMDfouxER0EBeGS5zTCYubX1
+	 ahy2bQt7zViuA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EA4FDDFC907;
+	Tue, 12 Dec 2023 13:30:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH v3 31/35] net: smc: optimize
- smc_wr_tx_get_free_slot_index()
-To: Yury Norov <yury.norov@gmail.com>, linux-kernel@vger.kernel.org,
- Karsten Graul <kgraul@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
- Jan Karcher <jaka@linux.ibm.com>, "D. Wythe" <alibuda@linux.alibaba.com>,
- Tony Lu <tonylu@linux.alibaba.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Jan Kara <jack@suse.cz>, Mirsad Todorovac
- <mirsad.todorovac@alu.unizg.hr>, Matthew Wilcox <willy@infradead.org>,
- Rasmus Villemoes <linux@rasmusvillemoes.dk>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
- Alexey Klimov <klimov.linux@gmail.com>, Bart Van Assche
- <bvanassche@acm.org>, Sergey Shtylyov <s.shtylyov@omp.ru>,
- Alexandra Winter <wintera@linux.ibm.com>
-References: <20231212022749.625238-1-yury.norov@gmail.com>
- <20231212022749.625238-32-yury.norov@gmail.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <20231212022749.625238-32-yury.norov@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/2] net: dsa: realtek: Two RTL8366RB fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170238782595.14412.3820310748559815932.git-patchwork-notify@kernel.org>
+Date: Tue, 12 Dec 2023 13:30:25 +0000
+References: <20231209-rtl8366rb-mtu-fix-v1-0-df863e2b2b2a@linaro.org>
+In-Reply-To: <20231209-rtl8366rb-mtu-fix-v1-0-df863e2b2b2a@linaro.org>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: alsi@bang-olufsen.dk, andrew@lunn.ch, f.fainelli@gmail.com,
+ olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org
 
+Hello:
 
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On 2023/12/12 10:27, Yury Norov wrote:
-
-> Simplify the function by using find_and_set_bit() and make it a simple
-> almost one-liner.
+On Sat, 09 Dec 2023 23:37:33 +0100 you wrote:
+> These minor fixes were found while digging into other
+> issues: a weirdly named variable and bogus MTU handling.
+> Fix it up.
 > 
-> While here, drop explicit initialization of *idx, because it's already
-> initialized by the caller in case of ENOLINK, or set properly with
-> ->wr_tx_mask, if nothing is found, in case of EBUSY.
-> 
-> CC: Tony Lu <tonylu@linux.alibaba.com>
-> Signed-off-by: Yury Norov <yury.norov@gmail.com>
-> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 > ---
->   net/smc/smc_wr.c | 10 +++-------
->   1 file changed, 3 insertions(+), 7 deletions(-)
+> Linus Walleij (2):
+>       net: dsa: realtek: Rename bogus RTL8368S variable
+>       net: dsa: realtek: Rewrite RTL8366RB MTU handling
 > 
-> diff --git a/net/smc/smc_wr.c b/net/smc/smc_wr.c
-> index 0021065a600a..b6f0cfc52788 100644
-> --- a/net/smc/smc_wr.c
-> +++ b/net/smc/smc_wr.c
-> @@ -170,15 +170,11 @@ void smc_wr_tx_cq_handler(struct ib_cq *ib_cq, void *cq_context)
->   
->   static inline int smc_wr_tx_get_free_slot_index(struct smc_link *link, u32 *idx)
->   {
-> -	*idx = link->wr_tx_cnt;
->   	if (!smc_link_sendable(link))
->   		return -ENOLINK;
-> -	for_each_clear_bit(*idx, link->wr_tx_mask, link->wr_tx_cnt) {
-> -		if (!test_and_set_bit(*idx, link->wr_tx_mask))
-> -			return 0;
-> -	}
-> -	*idx = link->wr_tx_cnt;
-> -	return -EBUSY;
-> +
-> +	*idx = find_and_set_bit(link->wr_tx_mask, link->wr_tx_cnt);
-> +	return *idx < link->wr_tx_cnt ? 0 : -EBUSY;
->   }
->   
->   /**
+> [...]
 
-Thank you! Yury.
+Here is the summary with links:
+  - [net-next,1/2] net: dsa: realtek: Rename bogus RTL8368S variable
+    https://git.kernel.org/netdev/net-next/c/389119c84218
+  - [net-next,2/2] net: dsa: realtek: Rewrite RTL8366RB MTU handling
+    https://git.kernel.org/netdev/net-next/c/d577ca429af3
 
-Reviewed-by: Wen Gu <guwen@linux.alibaba.com>
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
