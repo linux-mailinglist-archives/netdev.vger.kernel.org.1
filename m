@@ -1,191 +1,96 @@
-Return-Path: <netdev+bounces-56178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 376DF80E156
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 03:20:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2B3C80E163
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 03:25:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68B911C21674
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 02:20:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 994521F21BB4
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 02:25:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CC2A15BF;
-	Tue, 12 Dec 2023 02:20:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A8C623A5;
+	Tue, 12 Dec 2023 02:25:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bw7c8mq4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n2r34UJz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71D78B8
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 18:20:45 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-6ce9e897aeaso4440665b3a.2
-        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 18:20:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702347645; x=1702952445; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gwe4RKacTPP0IG7NhCiDvOFd1abSfQrWA3Ko3lf8lwA=;
-        b=Bw7c8mq43C88vsqSnaAX3OTr9onhncVJRl40FCB12Enndi5emg31R5G6CMKo2C1+Xh
-         AdxK12VuW4Eql4EA+WBdvE7erUX155eGr55YXDleA3if2/W6REHPf5bQ+aTeKDg06Odd
-         T0SIxzh31PUcEkKIjeeuJyaplq1r/LxGstE2+A6F1ebu/9sqNCHh7m1nfsIC1mZeOy6k
-         PHCjLLqpss7icFVawhgyPnW9gPdomUPQCCM10zVNa+6TqIyhFoPeiWw4zmhrbxLAgbLm
-         F+WZjOk7/JIPge3z8Kv2AoCmVX6WmCfQNBZM7nYyV2nXCWKMv5IcjKl5uo2/dLrlKXuU
-         OuAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702347645; x=1702952445;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gwe4RKacTPP0IG7NhCiDvOFd1abSfQrWA3Ko3lf8lwA=;
-        b=LTtwjIptdySsP4SrbALXGYThrfcwkMDaOEaYy0hLCA6427HWmhpJV4WKEJQ4NANQhz
-         kfrwZbLnOCpGqNmmmSxi/i0mrOWRJfN2JculBRwtW0jI5u4M8CLbsCcljIz/cse0fjx2
-         rc3ywCAWdvURSNzhqqWTsdT5Gw4B43yqjr72Sy3Jv5TCksYGmMnNKRV4pMlDuHIoW5Gv
-         RLzVyH1CbDfkPEK5aXlYlJjSniqPbQWWlMSjEd/zb5/icxUbyK75YcGMIYQBM+vXpqtl
-         hkPXfF/MPu9+wZhToblv69rnrtPkorcdnACDPRo9zNP6Bp/w+qXkD9Gts5G5BnZLiXSP
-         0xCw==
-X-Gm-Message-State: AOJu0YyZZSIkH/iDMEtC5gCn+Iio2LamsbbV+EiL9oEIjwvcjCkIj+JQ
-	/tpyr7KpItxH33wbAlaKGjQ=
-X-Google-Smtp-Source: AGHT+IF1egmgGQKqC+DwNi/5vDOZ0NdpIGxcTqGw8ANdm3WMU4E2YqDZuc702gd/WbQJKZXqUMuFBA==
-X-Received: by 2002:a05:6a20:5497:b0:18c:331f:3abe with SMTP id i23-20020a056a20549700b0018c331f3abemr7522841pzk.24.1702347644790;
-        Mon, 11 Dec 2023 18:20:44 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id a4-20020aa78644000000b006ce36ffb0cfsm6964733pfo.33.2023.12.11.18.20.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Dec 2023 18:20:44 -0800 (PST)
-Date: Tue, 12 Dec 2023 10:20:39 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: thinker.li@gmail.com
-Cc: netdev@vger.kernel.org, martin.lau@linux.dev, kernel-team@meta.com,
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	dsahern@kernel.org, edumazet@google.com, sinquersw@gmail.com,
-	kuifeng@meta.com
-Subject: Re: [PATCH net-next v2 2/2] selftests: fib_tests: Add tests for
- toggling between w/ and w/o expires.
-Message-ID: <ZXfDd_tzAwDbi66Q@Laptop-X1>
-References: <20231208194523.312416-1-thinker.li@gmail.com>
- <20231208194523.312416-3-thinker.li@gmail.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E5CD23A0
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 02:25:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19086C433C8;
+	Tue, 12 Dec 2023 02:25:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702347935;
+	bh=HZ0/eUetQq0IOy0d81Ka8PJJW5VGeJH77DXy6D4N6NU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=n2r34UJzz7qeYwv6YFuFrsq04aTNW1TNWSLQ14BGnA2abgndlNc+5K9+0utFKmiFu
+	 PyxUZ3jYKHvVKjpavhNsGs3tPdd858wOlEEqjdXWCh+2tv+lh8V2a4lRMWUWclpccy
+	 Raxhwt1EeLTAL0C0lIVwjwXuWVxRAvDtsmptJY9siGAvrky38uf6vLbvJK5zMuu8go
+	 5n+5WyKxj9++3+vqGgz5NB9zuVlei+4z2Ksd5NLKYWcmTSdOZYabhEYucGrgbG2fdX
+	 1W07eFKMRoifbnuOPoeEXqIcbGlN5Dy8nZYxJ+t+0kkeiG4DnFe44kS1i/VGxTWQNa
+	 8IQFt4ptd+aqg==
+Date: Mon, 11 Dec 2023 18:25:34 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ daniel@iogearbox.net, dcaratti@redhat.com, netdev@vger.kernel.org,
+ kernel@mojatatu.com
+Subject: Re: [PATCH net-next v3 2/3] net: sched: Make tc-related drop reason
+ more flexible for remaining qdiscs
+Message-ID: <20231211182534.09392034@kernel.org>
+In-Reply-To: <20231205205030.3119672-3-victor@mojatatu.com>
+References: <20231205205030.3119672-1-victor@mojatatu.com>
+	<20231205205030.3119672-3-victor@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231208194523.312416-3-thinker.li@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 08, 2023 at 11:45:23AM -0800, thinker.li@gmail.com wrote:
-> From: Kui-Feng Lee <thinker.li@gmail.com>
-> 
-> Make sure that toggling routes between w/ expires and w/o expires works
-> properly with GC list.
-> 
-> When a route with expires is replaced by a permanent route, the entry
-> should be removed from the gc list. When a permanent routes is replaced by
-> a temporary route, the new entry should be added to the gc list. The new
-> tests check if these basic operators work properly.
-> 
-> Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
-> ---
->  tools/testing/selftests/net/fib_tests.sh | 69 +++++++++++++++++++++++-
->  1 file changed, 67 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
-> index 66d0db7a2614..a8b4628fd7d2 100755
-> --- a/tools/testing/selftests/net/fib_tests.sh
-> +++ b/tools/testing/selftests/net/fib_tests.sh
-> @@ -806,10 +806,75 @@ fib6_gc_test()
->  	    ret=0
->  	fi
+On Tue,  5 Dec 2023 17:50:29 -0300 Victor Nogueira wrote:
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 4b84b72ebae8..f38c928a34aa 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -3753,6 +3753,8 @@ static inline int __dev_xmit_skb(struct sk_buff *skb, struct Qdisc *q,
 >  
-> -	set +e
-> -
->  	log_test $ret 0 "ipv6 route garbage collection"
+>  	qdisc_calculate_pkt_len(skb, q);
 >  
-> +	# Delete permanent routes
-> +	for i in $(seq 1 5000); do
-> +	    $IP -6 route del 2001:30::$i \
-> +		via 2001:10::2 dev dummy_10
-> +	done
+> +	tcf_set_drop_reason(skb, SKB_DROP_REASON_QDISC_DROP);
 > +
-> +	# Permanent routes
-> +	for i in $(seq 1 100); do
-> +	    # Expire route after $EXPIRE seconds
-> +	    $IP -6 route add 2001:20::$i \
-> +		via 2001:10::2 dev dummy_10
-> +	done
-> +	# Replace with temporary routes
-> +	for i in $(seq 1 100); do
-> +	    # Expire route after $EXPIRE seconds
-> +	    $IP -6 route replace 2001:20::$i \
-> +		via 2001:10::2 dev dummy_10 expires $EXPIRE
-> +	done
-> +	N_EXP_SLEEP=$($IP -6 route list |grep expires|wc -l)
-> +	if [ $N_EXP_SLEEP -ne 100 ]; then
-> +	    echo "FAIL: expected 100 routes with expires, got $N_EXP_SLEEP"
-
-Hi,
-
-Here the test failed, but ret is not updated.
-
-> +	fi
-> +	sleep $(($EXPIRE * 2 + 1))
-> +	N_EXP_SLEEP=$($IP -6 route list |grep expires|wc -l)
-> +	if [ $N_EXP_SLEEP -ne 0 ]; then
-> +	    echo "FAIL: expected 0 routes with expires," \
-> +		 "got $N_EXP_SLEEP"
-> +	    ret=1
-
-Here the ret is updated.
-
-> +	else
-> +	    ret=0
-> +	fi
-> +
-> +	log_test $ret 0 "ipv6 route garbage collection (replace with expires)"
-> +
-> +	PERM_BASE=$($IP -6 route list |grep -v expires|wc -l)
-> +	# Temporary routes
-> +	for i in $(seq 1 100); do
-> +	    # Expire route after $EXPIRE seconds
-> +	    $IP -6 route add 2001:20::$i \
-> +		via 2001:10::2 dev dummy_10 expires $EXPIRE
-> +	done
-> +	# Replace with permanent routes
-> +	for i in $(seq 1 100); do
-> +	    # Expire route after $EXPIRE seconds
-> +	    $IP -6 route replace 2001:20::$i \
-> +		via 2001:10::2 dev dummy_10
-> +	done
-> +	N_EXP_SLEEP=$($IP -6 route list |grep expires|wc -l)
-> +	if [ $N_EXP_SLEEP -ne 0 ]; then
-> +	    echo "FAIL: expected 0 routes with expires," \
-> +		 "got $N_EXP_SLEEP"
-
-Same here.
-
-Thanks
-Hangbin
-> +	fi
-> +	sleep $(($EXPIRE * 2 + 1))
-> +	N_EXP_PERM=$($IP -6 route list |grep -v expires|wc -l)
-> +	N_EXP_PERM=$(($N_EXP_PERM - $PERM_BASE))
-> +	if [ $N_EXP_PERM -ne 100 ]; then
-> +	    echo "FAIL: expected 100 permanent routes," \
-> +		 "got $N_EXP_PERM"
-> +	    ret=1
-> +	else
-> +	    ret=0
-> +	fi
-> +
-> +	log_test $ret 0 "ipv6 route garbage collection (replace with permanent)"
-> +
-> +	set +e
-> +
->  	cleanup &> /dev/null
->  }
+>  	if (q->flags & TCQ_F_NOLOCK) {
+>  		if (q->flags & TCQ_F_CAN_BYPASS && nolock_qdisc_is_empty(q) &&
+>  		    qdisc_run_begin(q)) {
+> @@ -3782,7 +3784,7 @@ static inline int __dev_xmit_skb(struct sk_buff *skb, struct Qdisc *q,
+>  no_lock_out:
+>  		if (unlikely(to_free))
+>  			kfree_skb_list_reason(to_free,
+> -					      SKB_DROP_REASON_QDISC_DROP);
+> +					      tcf_get_drop_reason(to_free));
+>  		return rc;
+>  	}
 >  
-> -- 
-> 2.34.1
-> 
+> @@ -3837,7 +3839,8 @@ static inline int __dev_xmit_skb(struct sk_buff *skb, struct Qdisc *q,
+>  	}
+>  	spin_unlock(root_lock);
+>  	if (unlikely(to_free))
+> -		kfree_skb_list_reason(to_free, SKB_DROP_REASON_QDISC_DROP);
+> +		kfree_skb_list_reason(to_free,
+> +				      tcf_get_drop_reason(to_free));
+
+You stuff the drop reason into every skb but then only use the one from
+the head? Herm. __qdisc_drop() only uses the next pointer can't we
+overload the prev pointer to carry the drop reason. That means only
+storing it if we already plan to drop the packet.
+
+BTW I lack TC knowledge but struct tc_skb_cb is even more clsact
+specific today than tcf_result. And reserving space for drop reason
+in a state structure seems odd. Maybe that's just me.
 
