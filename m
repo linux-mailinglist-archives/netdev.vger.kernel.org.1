@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-56310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D81F280E7AE
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:31:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB42180E7B5
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 10:32:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 945082818EB
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 09:31:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1870F1C20E13
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 09:32:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD52D584F4;
-	Tue, 12 Dec 2023 09:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C506584F6;
+	Tue, 12 Dec 2023 09:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Dm+Q7ExC"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="kbgwqknw"
 X-Original-To: netdev@vger.kernel.org
 Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6BBE107;
-	Tue, 12 Dec 2023 01:31:36 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8F69DB;
+	Tue, 12 Dec 2023 01:32:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1702373495;
-	bh=63BaG8+UnODbNllY/PE5UFPUBy6aPrVHxXNq6unqZyY=;
+	s=mail; t=1702373551;
+	bh=NAvNFGCToTcYv4i803QHyOj4P8Ba1LxYOhgrWA/utvU=;
 	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=Dm+Q7ExCKkKTJuhUnjwEyNwJM+krOm1JuYCk9nSgkwJSCWzdxuOm3EVOK3+CSPIM9
-	 qk8iCFiBNEKWBR5WNHU+85HGJ4fxI/uOUqwHmiQw2ubrzMMZU2WpyoUY19aKaxRRBR
-	 W8mV6t8z6BIb9L5eD2cjzsz1K5J7n9PLPVKkVghu/pzAPHU7CmyEi+TwLOqjM47BcV
-	 spCfjrfAor/pVbCOW5LCKdXmD9fjxmISwcwU3P+6JVG12PJLf7mhyYMrRzPJLbYYbd
-	 V0cz4CXasjsdSAAS7ErqxNmz2OtAtK9V6PRi25JCAdLASQQyfh8e1vGpmv7hvkW6kS
-	 61XB5S+uwBNoA==
+	b=kbgwqknwB0gVDzzS3fQsm9aNp3oYr8wyYJrK41E//BOVqK7eS+zj4wHzsFrMrC6mr
+	 we6AWt5FlMZNvONxG2tXp2E1bwouzQOYR4kciQDbgarjx6OLF9LsYG+lHf84c99WUb
+	 P50c6Ob9BUly4ub3j0FU7EGkmi/0oHLWKY9WKU9B+BRu29GF4dmuwS+OBBVZ3MIxCk
+	 ySkxPYkMj1Af8KDXNuwrZRIH1H/n+8AwK7q8ywOVuEDjrRJHhXx8r4cOFRVrXyw+/c
+	 wJF+lI5SDW0eN60v6QQTRg+Xf2Y1jejxUoDuQEjRhrH7dYGN0nL++d1kTRuAaUl9Va
+	 dTDsvs1lSunEg==
 Received: from [100.113.186.2] (cola.collaboradmins.com [195.201.22.229])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: kholk11)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 3B23B3781423;
-	Tue, 12 Dec 2023 09:31:34 +0000 (UTC)
-Message-ID: <1cd5446a-37fd-4fbb-8c17-e0046e58c29b@collabora.com>
-Date: Tue, 12 Dec 2023 10:31:34 +0100
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 70CA23781423;
+	Tue, 12 Dec 2023 09:32:30 +0000 (UTC)
+Message-ID: <55b785f4-a8dc-44e0-9320-9e71f0dc8853@collabora.com>
+Date: Tue, 12 Dec 2023 10:32:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -44,7 +44,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 5/5] clk: mediatek: add drivers for MT7988 SoC
+Subject: Re: [PATCH v5 3/5] dt-bindings: clock: mediatek: add clock
+ controllers of MT7988
 Content-Language: en-US
 To: Daniel Golle <daniel@makrotopia.org>, Rob Herring <robh+dt@kernel.org>,
  Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
@@ -63,26 +64,19 @@ To: Daniel Golle <daniel@makrotopia.org>, Rob Herring <robh+dt@kernel.org>,
  linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
  netdev@vger.kernel.org
 References: <152b256d253508cdc7514c0f1c5a9324bde83d46.1702350213.git.daniel@makrotopia.org>
- <14b00d8c9d1fcfdf8cd6b9b02e5a19566d970e6b.1702350213.git.daniel@makrotopia.org>
+ <ce9b1e777090724794cf9f0c52bcd8618385fd06.1702350213.git.daniel@makrotopia.org>
 From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-In-Reply-To: <14b00d8c9d1fcfdf8cd6b9b02e5a19566d970e6b.1702350213.git.daniel@makrotopia.org>
+In-Reply-To: <ce9b1e777090724794cf9f0c52bcd8618385fd06.1702350213.git.daniel@makrotopia.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Il 12/12/23 04:19, Daniel Golle ha scritto:
-> From: Sam Shih <sam.shih@mediatek.com>
+Il 12/12/23 04:18, Daniel Golle ha scritto:
+> Add various clock controllers found in the MT7988 SoC to existing
+> bindings (if applicable) and add files for the new ethwarp, mcusys
+> and xfi-pll clock controllers not previously present in any SoC.
 > 
-> Add APMIXED, ETH, INFRACFG and TOPCKGEN clock drivers which are
-> typical MediaTek designs.
-> 
-> Also add driver for XFIPLL clock generating the 156.25MHz clock for
-> the XFI SerDes. It needs an undocumented software workaround and has
-> an unknown internal design.
-> 
-> Signed-off-by: Sam Shih <sam.shih@mediatek.com>
 > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 
 Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-
 
 
