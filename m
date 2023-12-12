@@ -1,190 +1,190 @@
-Return-Path: <netdev+bounces-56440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BEF180EE1D
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:52:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C63080EE20
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 14:52:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE1131F21631
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 13:52:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53AD528140C
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 13:52:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ABB16F62C;
-	Tue, 12 Dec 2023 13:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B43BF6F62E;
+	Tue, 12 Dec 2023 13:52:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KMQO8Pg6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B3SpP+4W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25C97AD;
-	Tue, 12 Dec 2023 05:52:01 -0800 (PST)
-Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-77f68824694so9154885a.0;
-        Tue, 12 Dec 2023 05:52:01 -0800 (PST)
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 022FDB3;
+	Tue, 12 Dec 2023 05:52:21 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-50bf69afa99so7297775e87.3;
+        Tue, 12 Dec 2023 05:52:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702389120; x=1702993920; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=2DSj9HArsmUWrWsZkgJ2wfKDN+jx83el0yD5kZAUyJ0=;
-        b=KMQO8Pg6O4qnOc3UVRcHGJM/D/ulII5GJ7sw4tluES9b92iaFzoIOrwN/gyx1dn6JV
-         Gza51wuAZ80oRf1eoq6exQ05ADj8ttnucfp0RYfEqesC9r5xDniTjGxZOdEypA9Zha3K
-         eCwbYm0atvL19/UO/PYxMAy+k4K8nm+GTudNynRKac0lNa4ms38n7tAEgwFBkLyE3jb8
-         Pu3FTxE5X9FLEbXZrHbdAJ0d/bec5vWio2ENBwMXl2NtGrWwYa/7IOpr03HdFDYLl1LM
-         kXDE86Ej4gnqhqdEtkB3ggrHc5G7sLvoGrBbJB95jxAnB67mWVY3LK3T3AGy8v6YjpOl
-         eJRQ==
+        d=gmail.com; s=20230601; t=1702389140; x=1702993940; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cFnllcfa91c1zJc4Gntywu/a8dFRpUHFeO6CvIvFtu4=;
+        b=B3SpP+4WEDCrXayc3qWvV8daTzwf2cw3SF/DlDxLD1l3+uAa+1ltZRHd1QxGPWo5CY
+         7ic88L33QXDHm1+MG8lKocupTO4QytkT7ApImWXMyudMAXHzycQZ6+8y9mC7vMxdDtw+
+         2d1oJfqT4SpKd8V8RaUKwKc7rVPHijhY3UcnSWpewVrC6oaiUo6R5j2OVMmmmgTjkYuM
+         LY1BnsAyuJFc6aUiaaNh4it6hUgHXyITFRsFH41liG/ka0MIEbKBJITY50xlz0SiwGqD
+         KUFmSj8KUktZzwZAj0SpUH1jIFdeJ5ZWxccV5xWgv2xSwezwKES9tJt/sqZDCIInidvH
+         sOsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702389120; x=1702993920;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2DSj9HArsmUWrWsZkgJ2wfKDN+jx83el0yD5kZAUyJ0=;
-        b=acKP1GTOMQNkzuvG8rtKysi0XX1P9sI4RefJ2U5Q6PoUdD6NEnY3acVZKXJSMTCFtF
-         KrSTFN2HRVoNnQrHdsZC/oNmoLmXqP0y+H/P43A4OqQH1rLUyWTYLoCDsCeFBy9AtUn8
-         ABoLg9XoLvrKbQBvI1jfHDRLq5iYKPnqI8rMAquw8uznZ1hXT5tTCXuuCiH3VICjT9Ag
-         9/rSuDORGMV5ZSZCAkmhzORoSRIaZ1C6aNvACTlNRRJULVdBNGPurSTrYpK0wNwwnu97
-         Mo4wesY13BjE+R6J7Y3InnAzwrGeO95L287zCnXrB0O2MEJvw++30Df0nHPoNLJhkr3Z
-         GMuw==
-X-Gm-Message-State: AOJu0YzmPZHFxEJASWpSUqN+rg/0NomaFiSbwEkrFvkzQxDFV6QjJyBl
-	OEwIHYhrj4t19v62wgch/ODaR3XHtUdP0gqhO90=
-X-Google-Smtp-Source: AGHT+IH+J0MYsp+6RBByiQFZbj6C5PIVoIcOqafzQfoUnut0QGDo3i1II59DP55FlY3tXJSLxC4pCpZkVSo6mKMfejA=
-X-Received: by 2002:ad4:4bd0:0:b0:67a:8957:64b0 with SMTP id
- l16-20020ad44bd0000000b0067a895764b0mr11006405qvw.3.1702389119910; Tue, 12
- Dec 2023 05:51:59 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702389140; x=1702993940;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cFnllcfa91c1zJc4Gntywu/a8dFRpUHFeO6CvIvFtu4=;
+        b=Em/VQl8OdPiJY42u2OYy/BKLALeF+26O4NmFTKX7bOe+aQe/fEH+E39iDk2qTJoi2s
+         8DVywiHeEmWHI+RSTwWAj3uHAgojgmNFLdpsXWCfTVt419s+RSLD/Oh9UhfgelFTGTU7
+         6BMWaf+JRbnhIbxWlIbqJ+IsnnbnMn21+FgmOQU8EwelLWFJ+ORJZrIwgLvPyOIRDWx/
+         H6nXU7tEVtTffrT3YjLK8uAHkkf0eoxzvLUk/B7/KZjkkvNCvaB3tdDnSjQaJHKeZdva
+         2yMSJmN4oAi7tcFwaqIFOEzJh4F2+DHJ08LLNZZiiReWC387ZUeXNriUvHEa/4wSLbOV
+         DevQ==
+X-Gm-Message-State: AOJu0YzJIYspMCF0wDH1H+lavHHpl/JkZLWp9sqqS+oV/acJl8Df3lBF
+	HY/AJGb6winVyihAAEMXlu4G2o2Lw/c+cg==
+X-Google-Smtp-Source: AGHT+IHQrUXSxuBn29LhUoJX1ePcDGg56snRNXblvB5VLnQAdFUNh09t5mpngpSLdnTnZAS3jpzzfw==
+X-Received: by 2002:a05:6512:3b8d:b0:50c:c8b8:669a with SMTP id g13-20020a0565123b8d00b0050cc8b8669amr3958930lfv.92.1702389139829;
+        Tue, 12 Dec 2023 05:52:19 -0800 (PST)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id g4-20020a0565123b8400b0050bfb2a5661sm1363163lfv.103.2023.12.12.05.52.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Dec 2023 05:52:19 -0800 (PST)
+Date: Tue, 12 Dec 2023 16:52:15 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>, 
+	"Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Jose Abreu <Jose.Abreu@synopsys.com>, Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+	Tomer Maimon <tmaimon77@gmail.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, openbmc@lists.ozlabs.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 06/16] net: pcs: xpcs: Avoid creating dummy XPCS
+ MDIO device
+Message-ID: <na6krkoco7pmsl62dfuj2xlrvpsnod74ptpfyy6gv7dzwmowga@mzsiknjian2i>
+References: <20231205103559.9605-1-fancer.lancer@gmail.com>
+ <20231205103559.9605-7-fancer.lancer@gmail.com>
+ <ZW8ASzkC9IFFlxkV@shell.armlinux.org.uk>
+ <rgp33mm4spbpm5tmgxurkhy4is3lz3z62rz64rni2pygteyrit@zwflw2ejdkn7>
+ <e1806c15-757e-4af0-a8be-075aa77918c2@lunn.ch>
+ <ZW840qQMbVRto442@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231205210847.28460-1-larysa.zaremba@intel.com> <20231205210847.28460-8-larysa.zaremba@intel.com>
-In-Reply-To: <20231205210847.28460-8-larysa.zaremba@intel.com>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Tue, 12 Dec 2023 14:51:48 +0100
-Message-ID: <CAJ8uoz1dBBtR1id-9a-t3utXSFiSrihmC=S0p+usFVQ6yN2+Hg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v8 07/18] xsk: add functions to fill control buffer
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com, 
-	haoluo@google.com, jolsa@kernel.org, David Ahern <dsahern@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Anatoly Burakov <anatoly.burakov@intel.com>, 
-	Alexander Lobakin <alexandr.lobakin@intel.com>, Maryam Tahhan <mtahhan@redhat.com>, 
-	xdp-hints@xdp-project.net, netdev@vger.kernel.org, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>, Tariq Toukan <tariqt@mellanox.com>, 
-	Saeed Mahameed <saeedm@mellanox.com>, Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZW840qQMbVRto442@shell.armlinux.org.uk>
 
-On Tue, 5 Dec 2023 at 22:11, Larysa Zaremba <larysa.zaremba@intel.com> wrote:
->
-> From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
->
-> Commit 94ecc5ca4dbf ("xsk: Add cb area to struct xdp_buff_xsk") has added
-> a buffer for custom data to xdp_buff_xsk. Particularly, this memory is used
-> for data, consumed by XDP hints kfuncs. It does not always change on
-> a per-packet basis and some parts can be set for example, at the same time
-> as RX queue info.
->
-> Add functions to fill all cbs in xsk_buff_pool with the same metadata.
+Hi Andrew, Russell
 
-Thanks Larysa and Maciej.
+Sorry for the delay with response. I had to refresh my understanding
+of the series since it was created sometime ago and I already managed
+to forget some of its aspects (particularly regarding the MDIO-bus
+PHY-mask semantics).
 
-Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
+On Tue, Dec 05, 2023 at 02:50:58PM +0000, Russell King (Oracle) wrote:
+> On Tue, Dec 05, 2023 at 02:52:24PM +0100, Andrew Lunn wrote:
+> > On Tue, Dec 05, 2023 at 02:31:41PM +0300, Serge Semin wrote:
+> > > On Tue, Dec 05, 2023 at 10:49:47AM +0000, Russell King (Oracle) wrote:
+> > > > On Tue, Dec 05, 2023 at 01:35:27PM +0300, Serge Semin wrote:
+> > > > > If the DW XPCS MDIO devices are either left unmasked for being auto-probed
+> > > > > or explicitly registered in the MDIO subsystem by means of the
+> > > > > mdiobus_register_board_info() method there is no point in creating the
+> > > > > dummy MDIO device instance in order to get the DW XPCS handler since the
+> > > > > MDIO core subsystem will create the device during the MDIO bus
+> > > > > registration procedure.
+> > > > 
+> > > 
+> > > > Please reword this overly long sentence.
+> > > 
+> > > Ok.
+> > > 
+> > > > 
+> > > > If they're left unmasked, what prevents them being created as PHY
+> > > > devices?
+> > > 
+> > > Not sure I fully get what you meant. If they are left unmasked the
+> > > MDIO-device descriptor will be created by the MDIO subsystem anyway.
+> > > What the point in creating another one?
+> > 
 
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> ---
->  include/net/xdp_sock_drv.h  | 17 +++++++++++++++++
->  include/net/xsk_buff_pool.h |  2 ++
->  net/xdp/xsk_buff_pool.c     | 12 ++++++++++++
->  3 files changed, 31 insertions(+)
->
-> diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
-> index 81e02de3f453..b62bb8525a5f 100644
-> --- a/include/net/xdp_sock_drv.h
-> +++ b/include/net/xdp_sock_drv.h
-> @@ -14,6 +14,12 @@
->
->  #ifdef CONFIG_XDP_SOCKETS
->
-> +struct xsk_cb_desc {
-> +       void *src;
-> +       u8 off;
-> +       u8 bytes;
-> +};
-> +
->  void xsk_tx_completed(struct xsk_buff_pool *pool, u32 nb_entries);
->  bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc);
->  u32 xsk_tx_peek_release_desc_batch(struct xsk_buff_pool *pool, u32 max);
-> @@ -47,6 +53,12 @@ static inline void xsk_pool_set_rxq_info(struct xsk_buff_pool *pool,
->         xp_set_rxq_info(pool, rxq);
->  }
->
-> +static inline void xsk_pool_fill_cb(struct xsk_buff_pool *pool,
-> +                                   struct xsk_cb_desc *desc)
-> +{
-> +       xp_fill_cb(pool, desc);
-> +}
-> +
->  static inline unsigned int xsk_pool_get_napi_id(struct xsk_buff_pool *pool)
->  {
->  #ifdef CONFIG_NET_RX_BUSY_POLL
-> @@ -274,6 +286,11 @@ static inline void xsk_pool_set_rxq_info(struct xsk_buff_pool *pool,
->  {
->  }
->
-> +static inline void xsk_pool_fill_cb(struct xsk_buff_pool *pool,
-> +                                   struct xsk_cb_desc *desc)
-> +{
-> +}
-> +
->  static inline unsigned int xsk_pool_get_napi_id(struct xsk_buff_pool *pool)
->  {
->         return 0;
-> diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
-> index 8d48d37ab7c0..99dd7376df6a 100644
-> --- a/include/net/xsk_buff_pool.h
-> +++ b/include/net/xsk_buff_pool.h
-> @@ -12,6 +12,7 @@
->
->  struct xsk_buff_pool;
->  struct xdp_rxq_info;
-> +struct xsk_cb_desc;
->  struct xsk_queue;
->  struct xdp_desc;
->  struct xdp_umem;
-> @@ -135,6 +136,7 @@ static inline void xp_init_xskb_dma(struct xdp_buff_xsk *xskb, struct xsk_buff_p
->
->  /* AF_XDP ZC drivers, via xdp_sock_buff.h */
->  void xp_set_rxq_info(struct xsk_buff_pool *pool, struct xdp_rxq_info *rxq);
-> +void xp_fill_cb(struct xsk_buff_pool *pool, struct xsk_cb_desc *desc);
->  int xp_dma_map(struct xsk_buff_pool *pool, struct device *dev,
->                unsigned long attrs, struct page **pages, u32 nr_pages);
->  void xp_dma_unmap(struct xsk_buff_pool *pool, unsigned long attrs);
-> diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-> index 4f6f538a5462..28711cc44ced 100644
-> --- a/net/xdp/xsk_buff_pool.c
-> +++ b/net/xdp/xsk_buff_pool.c
-> @@ -125,6 +125,18 @@ void xp_set_rxq_info(struct xsk_buff_pool *pool, struct xdp_rxq_info *rxq)
->  }
->  EXPORT_SYMBOL(xp_set_rxq_info);
->
-> +void xp_fill_cb(struct xsk_buff_pool *pool, struct xsk_cb_desc *desc)
-> +{
-> +       u32 i;
-> +
-> +       for (i = 0; i < pool->heads_cnt; i++) {
-> +               struct xdp_buff_xsk *xskb = &pool->heads[i];
-> +
-> +               memcpy(xskb->cb + desc->off, desc->src, desc->bytes);
-> +       }
-> +}
-> +EXPORT_SYMBOL(xp_fill_cb);
-> +
->  static void xp_disable_drv_zc(struct xsk_buff_pool *pool)
->  {
->         struct netdev_bpf bpf;
-> --
-> 2.41.0
->
+> > Saying what Russell said, in a different way:
+> > 
+> > /*
+> >  * Return true if the child node is for a phy. It must either:
+> >  * o Compatible string of "ethernet-phy-idX.X"
+> >  * o Compatible string of "ethernet-phy-ieee802.3-c45"
+> >  * o Compatible string of "ethernet-phy-ieee802.3-c22"
+> >  * o In the white list above (and issue a warning)
+> >  * o No compatibility string
+> >  *
+> >  * A device which is not a phy is expected to have a compatible string
+> >  * indicating what sort of device it is.
+> >  */
+> > bool of_mdiobus_child_is_phy(struct device_node *child)
+> > 
+> > So when walking the bus, if a node is found which fits these criteria,
+> > its assumed to be a PHY. 
+> > 
+> > Anything on the MDIO bus which is not a PHY needs to use a compatible.
+> 
+> Right. I'd actually forgotten about the firmware-based walking, and
+> was thinking more of the non-firmware bus scanning as the commit
+> message was talking about being _unmasked_ and the only mask we have
+> is bus->phy_mask.
+
+Back then when I was working on the series and up until last week I
+had thought that having a device unmasked in mii_bus->phy_mask was a
+correct way to do for _any_ device including our DW XPCS (which BTW
+looks like a normal C45 PHY and if synthesized with a PMA attached
+could be passed to be handled by the PHY subsystem). Can't remember
+why exactly I came to that thought, but likely it was due to finding
+out examples of having mii_bus->phy_mask uninitialized in some of the
+PCS use-cases, like in drivers/net/dsa/ocelot/felix_vsc9959.c (but in
+case of DW XPCS the mask is always set indeed). Anyway obviously I was
+wrong and PHY-device is supposed to be created only if a device is
+actual PHY and handled by the PHY subsystem drivers. So the correct
+ways to create PHY MDIO-devices are:
+
+1. Call mdiobus_register() with PHY-addresses unmasked
+2. Call of_mdiobus_register() for a DT-node with sub-nodes for which
+of_mdiobus_child_is_phy() returns true.
+
+and the correct ways to create non-PHY MDIO-devices are:
+
+1. Call mdiobus_register() with non-PHY-addresses masked and have
+those non-PHY device registered by mdiobus_register_board_info()
+beforehand.
+2. Call of_mdiobus_register() with DT sub-nodes having specific
+compatible string (based on the of_mdiobus_child_is_phy() semantics).
+
+Only in case of having a non-PHY device registered it's allowed to
+use it in in non-PHY MDIO driver, like PCS, etc. Right?
+
+Please correct me if I am wrong or miss something.
+
+> 
+> It seems to me that this is yet another case of a really confusing
+> commit message making review harder than it needs to be.
+
+From the perspective described above the patch log is indeed partly
+wrong. Sorry about that. I shouldn't have mentioned the mask at all
+but instead just listed two use-cases of creating the non-PHY
+MDIO-devices. I'll fix that in v2.
+
+-Serge(y)
+
+> 
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> 
 
