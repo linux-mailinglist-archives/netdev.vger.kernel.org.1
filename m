@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-56164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1ED780E07E
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 01:52:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F420580E07F
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 01:52:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B0DBB211D5
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:52:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49465B210F4
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 00:52:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15088659;
-	Tue, 12 Dec 2023 00:51:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A09180C;
+	Tue, 12 Dec 2023 00:51:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="JSC3i7Pf"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="CaCh1NWV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EF14A6
-	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:51:53 -0800 (PST)
-Received: by mail-qk1-x72e.google.com with SMTP id af79cd13be357-77f8308616eso37643185a.2
-        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:51:53 -0800 (PST)
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8695299
+	for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:51:54 -0800 (PST)
+Received: by mail-qt1-x82e.google.com with SMTP id d75a77b69052e-425922f5b89so34917861cf.0
+        for <netdev@vger.kernel.org>; Mon, 11 Dec 2023 16:51:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1702342312; x=1702947112; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1702342313; x=1702947113; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WguqJFGGFl7e8875DmHuLLtOdnq7eY2Vkwa0CIPYSw0=;
-        b=JSC3i7Pfd3KJu9dEAmpxma/oWAzHuSpI+MXn8jb7l8ceUbu63QEJ6KzUW1qVM0SWEk
-         U+vHNcXyZlcT2NUcG1D9c5jKliMx2PeGZQmoRs6ZsOygMLVFvktZcvFHCJdOLPmC4zQt
-         J0PCKY6djSjSKk/gCunz2PyEO4P9iwDgqxVPA=
+        bh=/FQLSzIEljtj9qMhFQjt2/nf1M48P3DkoQUJaRn/gds=;
+        b=CaCh1NWV+x1gxRN8ZN9LnrBSNgTEisY8LixjAR/9k9hbpfwWTdiISGm8LDXChfOEfL
+         Au8+5JLzpdV8RkbhPoEqW/w2CCZKu1sdLixYeKfYCh8PbUnQOcLqQ4qByBBXVDD1Yulj
+         ATyzNWUVRiUfAK/IoodvZFLsJmz61AslPlYZI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702342312; x=1702947112;
+        d=1e100.net; s=20230601; t=1702342313; x=1702947113;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WguqJFGGFl7e8875DmHuLLtOdnq7eY2Vkwa0CIPYSw0=;
-        b=fY7d+I07B05DtQsU3AFkE4hYAyKcLqBAMl7NWZKrfnNrJRtNYXK6KgVHhirBvPn2Dr
-         aOS40KgM81yrMHYoqz38kMJ2Fv6r2tGm642Bf7oK7XOsvqqeBAmidUk8wYic1NlFeXZ4
-         TX7CHeCdevFeq2WurRfhD0MrmhQhIEpwJSk9uI1Z8gyeIiNFMDa2RXCeFv8LF75Hek78
-         U8nWuHxYJzYjFDbnAVcAsgdzmAh/zAUxeqhVByL7XxKKkQZptYfGq76j/yl16NZJXLVM
-         75z25HhwLGX5Sr8u7w0+pZ8DVH8B3SLZSS9TaOQmvnGEp9R6CfGxs+b/CRlpB7+7fEzQ
-         fqug==
-X-Gm-Message-State: AOJu0Yywu0YsXIXZQ26plJ43oOWV5JmzQ3JPvlwM5GxaYmFpx+49Ae6e
-	ni5d/n6ocSB37Uyhz2M6r0kC4A==
-X-Google-Smtp-Source: AGHT+IGCcVHzuu8NbMCKMPE5+Zp/cwi4JFvU1qtrzIP7uPdR+nYxOsKaRqccvq1WWQ598YO0pxgPNw==
-X-Received: by 2002:a05:622a:64a:b0:425:9d55:e9f5 with SMTP id a10-20020a05622a064a00b004259d55e9f5mr8564026qtb.75.1702342312259;
-        Mon, 11 Dec 2023 16:51:52 -0800 (PST)
+        bh=/FQLSzIEljtj9qMhFQjt2/nf1M48P3DkoQUJaRn/gds=;
+        b=EfZH44348LxaURXZwXhV4/Hx1QbK9linGLHMG44eSxM6YC1dKSbrKQTQRvPMFyTKaO
+         5XYEoaFgDxCpYC0+9e9N9zyCgHbKzq0f1fpstQ7Ip6bQrqDWiVwvkCv+AdidDdkQIE5q
+         79fFY7+m3WQ1zHrkvZlQCbmxvnkz6kNrsxZhda+gn1Fn/l0qy/JasM3+VDPs9d2Q81re
+         TYxsn+1QgYQMKgB3alvSdCOXaneTOh1xfa5P6R5kMqI5fFzSLlz822DdPmj8ZpV8xWF+
+         mNxwQFUfOj9x+IjnbBRh6i1Ea6joLfdD+Aa779mjzrrqEpk5spNLGdtP+YE7uAiOml0j
+         flnA==
+X-Gm-Message-State: AOJu0YzCJb6DpfDIOp2hLqOv7Qa2f2SCTeHbg8FBRk+6yMqwfYaNzRYM
+	2s4EoEimdyo1od43dnSuliHRqA==
+X-Google-Smtp-Source: AGHT+IF2ZB9iePLPYmeFIEQadMXffBZSqzyZJWP9CSnZOGyTlqau4Szhp9m48F6Cu8dgDKCZ14UlsA==
+X-Received: by 2002:a05:622a:30e:b0:425:9e14:3f1f with SMTP id q14-20020a05622a030e00b004259e143f1fmr7339755qtw.120.1702342313585;
+        Mon, 11 Dec 2023 16:51:53 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id r5-20020ac87945000000b00423ea1b31b3sm3619664qtt.66.2023.12.11.16.51.50
+        by smtp.gmail.com with ESMTPSA id r5-20020ac87945000000b00423ea1b31b3sm3619664qtt.66.2023.12.11.16.51.52
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 11 Dec 2023 16:51:51 -0800 (PST)
+        Mon, 11 Dec 2023 16:51:53 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -55,10 +55,10 @@ Cc: netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	gospo@broadcom.com,
-	Selvin Xavier <selvin.xavier@broadcom.com>
-Subject: [PATCH net-next 06/13] bnxt_en: Allocate extra QP backing store memory when RoCE FW reports it
-Date: Mon, 11 Dec 2023 16:51:15 -0800
-Message-Id: <20231212005122.2401-7-michael.chan@broadcom.com>
+	Somnath Kotur <somnath.kotur@broadcom.com>
+Subject: [PATCH net-next 07/13] bnxt_en: Use proper TUNNEL_DST_PORT_ALLOC* commands
+Date: Mon, 11 Dec 2023 16:51:16 -0800
+Message-Id: <20231212005122.2401-8-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231212005122.2401-1-michael.chan@broadcom.com>
 References: <20231212005122.2401-1-michael.chan@broadcom.com>
@@ -69,98 +69,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000d49863060c4574f3"
+	boundary="000000000000e87c6d060c4574d2"
 
---000000000000d49863060c4574f3
+--000000000000e87c6d060c4574d2
 Content-Transfer-Encoding: 8bit
 
-From: Selvin Xavier <selvin.xavier@broadcom.com>
+In bnxt_udp_tunnel_set_port(), use the proper ALLOC commands instead
+of the FREE commands for correctness.  The ALLOC and FREE commands
+happen to be identical so this is just a cosmetic fix for correctness.
 
-The Fast QP modify destroy RoCE feature requires additional QP entries
-in QP context backing store. FW reports the extra count to be
-allocated during backing store query. Use this value and allocate extra
-memory.  Note that this works for both the V1 and V1 backing store
-FW APIs.
-
-Signed-off-by: Selvin Xavier <selvin.xavier@broadcom.com>
+Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 72e2bd4611de..42a52ee8c1bc 100644
+index 42a52ee8c1bc..f2e8904de97f 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -7535,6 +7535,7 @@ static int bnxt_hwrm_func_backing_store_qcaps(struct bnxt *bp)
- 		ctxm->max_entries = le32_to_cpu(resp->qp_max_entries);
- 		ctxm->qp_qp1_entries = le16_to_cpu(resp->qp_min_qp1_entries);
- 		ctxm->qp_l2_entries = le16_to_cpu(resp->qp_max_l2_entries);
-+		ctxm->qp_fast_qpmd_entries = le16_to_cpu(resp->fast_qpmd_qp_num_entries);
- 		ctxm->entry_size = le16_to_cpu(resp->qp_entry_size);
- 		bnxt_init_ctx_initializer(ctxm, init_val, resp->qp_init_offset,
- 					  (init_mask & (1 << init_idx++)) != 0);
-@@ -7672,6 +7673,9 @@ static int bnxt_hwrm_func_backing_store_cfg(struct bnxt *bp, u32 enables)
- 		bnxt_hwrm_set_pg_attr(&ctx_pg->ring_mem,
- 				      &req->qpc_pg_size_qpc_lvl,
- 				      &req->qpc_page_dir);
-+
-+		if (enables & FUNC_BACKING_STORE_CFG_REQ_ENABLES_QP_FAST_QPMD)
-+			req->qp_num_fast_qpmd_entries = cpu_to_le16(ctxm->qp_fast_qpmd_entries);
- 	}
- 	if (enables & FUNC_BACKING_STORE_CFG_REQ_ENABLES_SRQ) {
- 		ctxm = &ctx->ctx_arr[BNXT_CTX_SRQ];
-@@ -8004,6 +8008,7 @@ static int bnxt_alloc_ctx_mem(struct bnxt *bp)
- 	u32 num_mr, num_ah;
- 	u32 extra_srqs = 0;
- 	u32 extra_qps = 0;
-+	u32 fast_qpmd_qps;
- 	u8 pg_lvl = 1;
- 	int i, rc;
+@@ -13673,9 +13673,9 @@ static int bnxt_udp_tunnel_set_port(struct net_device *netdev, unsigned int tabl
+ 	unsigned int cmd;
  
-@@ -8020,14 +8025,20 @@ static int bnxt_alloc_ctx_mem(struct bnxt *bp)
- 	ctxm = &ctx->ctx_arr[BNXT_CTX_QP];
- 	l2_qps = ctxm->qp_l2_entries;
- 	qp1_qps = ctxm->qp_qp1_entries;
-+	fast_qpmd_qps = ctxm->qp_fast_qpmd_entries;
- 	max_qps = ctxm->max_entries;
- 	ctxm = &ctx->ctx_arr[BNXT_CTX_SRQ];
- 	srqs = ctxm->srq_l2_entries;
- 	max_srqs = ctxm->max_entries;
-+	ena = 0;
- 	if ((bp->flags & BNXT_FLAG_ROCE_CAP) && !is_kdump_kernel()) {
- 		pg_lvl = 2;
- 		extra_qps = min_t(u32, 65536, max_qps - l2_qps - qp1_qps);
-+		/* allocate extra qps if fw supports RoCE fast qp destroy feature */
-+		extra_qps += fast_qpmd_qps;
- 		extra_srqs = min_t(u32, 8192, max_srqs - srqs);
-+		if (fast_qpmd_qps)
-+			ena |= FUNC_BACKING_STORE_CFG_REQ_ENABLES_QP_FAST_QPMD;
- 	}
+ 	if (ti->type == UDP_TUNNEL_TYPE_VXLAN)
+-		cmd = TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_VXLAN;
++		cmd = TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_VXLAN;
+ 	else
+-		cmd = TUNNEL_DST_PORT_FREE_REQ_TUNNEL_TYPE_GENEVE;
++		cmd = TUNNEL_DST_PORT_ALLOC_REQ_TUNNEL_TYPE_GENEVE;
  
- 	ctxm = &ctx->ctx_arr[BNXT_CTX_QP];
-@@ -8057,7 +8068,6 @@ static int bnxt_alloc_ctx_mem(struct bnxt *bp)
- 	if (rc)
- 		return rc;
- 
--	ena = 0;
- 	if (!(bp->flags & BNXT_FLAG_ROCE_CAP))
- 		goto skip_rdma;
- 
-@@ -8074,7 +8084,7 @@ static int bnxt_alloc_ctx_mem(struct bnxt *bp)
- 	rc = bnxt_setup_ctxm_pg_tbls(bp, ctxm, num_mr + num_ah, 2);
- 	if (rc)
- 		return rc;
--	ena = FUNC_BACKING_STORE_CFG_REQ_ENABLES_MRAV;
-+	ena |= FUNC_BACKING_STORE_CFG_REQ_ENABLES_MRAV;
- 
- 	ctxm = &ctx->ctx_arr[BNXT_CTX_TIM];
- 	rc = bnxt_setup_ctxm_pg_tbls(bp, ctxm, l2_qps + qp1_qps + extra_qps, 1);
+ 	return bnxt_hwrm_tunnel_dst_port_alloc(bp, ti->port, cmd);
+ }
 -- 
 2.30.1
 
 
---000000000000d49863060c4574f3
+--000000000000e87c6d060c4574d2
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -231,14 +175,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEICYohvKnrP8iylSR96YrgOJTS7vgisRX
-E+E/PxhWSflPMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIx
-MjAwNTE1MlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJjQ+JOlL1fjjZcHltCuw5eYxjaevOn5
+mfDOrn44y9ZPMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIx
+MjAwNTE1M1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQB+KoUqW8EpfnAxTlY05qinkOHdOpV0gY30RLieo/+Z0koB/rHu
-FM1n6fD0xmoOHOIPtSQ3HnEbzma+Co+1KxMI/bN3Z/hpNwY41mf1lwTJkNZXUqCYKGdUU16BrVUY
-Tgnh+lCLkbD9E+sBkFtmnWBUx+aLnEah4fRqUEobPIXpME/QgB8h8biO8VH4EfmgipxqzTpQ+2yQ
-ULF4AZGqTqBM5aNLgJunV36cBy2lRjKmGLsKJ1x7A8BMdHw/13adwjdFBzzqB2vOxuqXyzAHvf/6
-GlMU/YPJepsX+YLufvxkUelOStgybut9sgyiNt4XR6DuaOA1PHQfTpLEkd6ByovR
---000000000000d49863060c4574f3--
+ATANBgkqhkiG9w0BAQEFAASCAQBP28CJ6dpaSaOWIo/jQL+kJz9G/opWLOuvy+a1iPp/NqBx/xKM
+q57/rTFFyb0kf8QOX9zRnc2digxQGjf0rl2Bj99eA+Pd7SYIZEkVBSo2UVv0FvRK3hcsS11zCGhe
+F/8oGFbWFcePd+ggKIB4WkGMczcvINzx7ai/JsoEdArwKB6MQSk7Dlx7EPCkbdmCiQETkQpv4U+v
+fb6lHbvoMPdpmXAFXYlSDEJzjKio0qCKstUwMAOE2t78xpgGcpuEtHz4Y2gP2ve3m99rp3dAy2PV
+AblgDo72Yl2BT6AguobWdQQ2CeX776LCMKQU6OjtCVOlWmI9OX8NNvZdQVuZdiEn
+--000000000000e87c6d060c4574d2--
 
