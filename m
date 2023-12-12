@@ -1,61 +1,55 @@
-Return-Path: <netdev+bounces-56575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E882B80F74A
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 20:55:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6F1080F77A
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 21:06:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A412E281FFE
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 19:55:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37AE11F2124A
+	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 20:06:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D049F52745;
-	Tue, 12 Dec 2023 19:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GestSFCa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E7E152776;
+	Tue, 12 Dec 2023 20:06:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03DE38E
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 11:54:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702410894; x=1733946894;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=CA9aa2awBIDig+dNOGZp0RzanEU6A7xfFCBeXtxY+5w=;
-  b=GestSFCaMeXacomwmyeVd5J4/jDBH0mGBTLKdLfzgnNDLhyiLXe88Gku
-   JHYYar2oKgyRWOjTlR0g6YAFHvKOxen6FvTFJ2cgv5zSLQjHdq3sshBKO
-   uKGr4sLk9/Xe77pLN8VuGGB/Jk242phFtqLkpErAVEBnHnXOJF5ag3NtT
-   xWvym0fY+FsdxfrDQ0gczza0e6Dika/ZTcitXpyzrLwgp9aNhDX0oMGP0
-   Aq0PPX7UBbpq/FcqTb/Sb4h6hVQRKrmUhkcdtaFlaBa77EkTthoUiJz0+
-   FtHyTKyl++QlcslHXQ99HXFzaxm3S6rWUdmmqSTDQ5h2mO7Oq85H73ox4
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="398704157"
-X-IronPort-AV: E=Sophos;i="6.04,271,1695711600"; 
-   d="scan'208";a="398704157"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 11:54:54 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="802601537"
-X-IronPort-AV: E=Sophos;i="6.04,271,1695711600"; 
-   d="scan'208";a="802601537"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by orsmga008.jf.intel.com with ESMTP; 12 Dec 2023 11:54:51 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rD8q8-000JeR-2z;
-	Tue, 12 Dec 2023 19:54:48 +0000
-Date: Wed, 13 Dec 2023 03:54:41 +0800
-From: kernel test robot <lkp@intel.com>
-To: edward.cree@amd.com, linux-net-drivers@amd.com, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
-Cc: oe-kbuild-all@lists.linux.dev, Edward Cree <ecree.xilinx@gmail.com>,
-	netdev@vger.kernel.org, habetsm.xilinx@gmail.com,
-	Jonathan Cooper <jonathan.s.cooper@amd.com>
-Subject: Re: [PATCH net-next 2/7] sfc: debugfs for channels
-Message-ID: <202312130301.cKD8l8IO-lkp@intel.com>
-References: <df43d737fda6b6aa0cda3f2cb300916ca4b2e8f8.1702314695.git.ecree.xilinx@gmail.com>
+Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13ADCB9;
+	Tue, 12 Dec 2023 12:06:44 -0800 (PST)
+Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-5913922ab10so600965eaf.1;
+        Tue, 12 Dec 2023 12:06:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702411603; x=1703016403;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R8geil9tvbaN7HFo/6GZKxMiCtuP3jXSKj9KAGFYxaw=;
+        b=GDEsMCkYTXCUUOY+Q7ePkTSVcVWhabWHLMnrgOSrulukGizDjszR8sWFfJsKtilvnR
+         Le3Bqny8OkA7AyhNGztuJBaYdAgMpuOkYagqIrFK3g4iPzb3y9tTWQPLuNYsv6thKPmq
+         N647WoR31+XWfLS1QaFaWBoLemdWM85ZvSex1/d8HfyRrp4oYM4kzBkI1VWJzSSWVT97
+         GF8shdyJvvIubdBsWOxmFYeXQ7uC5Xfw+Ni1wckLOANZGRsaxQ7i9+8QSMmfTwk3g9YR
+         FdZggsFGm5ircDv2UBRb82eMBPWecvcb2AN2LDUNAIzbzYuhaROzqpsHh+yf57QMkx17
+         HwTQ==
+X-Gm-Message-State: AOJu0YxkfAvdaBZ3WgVyzWG7LlPN9sCkbCt8L7jrzT7f6p8MqlPpgJOc
+	TeyqOucRjZt+znBaQVFTdQ==
+X-Google-Smtp-Source: AGHT+IH7jxGi5ypSPpeOqUsvcN4v2uWH6feiDoZUUpsKHHfmeUZ9aMS03ruIyRAily1J5bH3d1LoOg==
+X-Received: by 2002:a05:6820:607:b0:590:97b9:5565 with SMTP id e7-20020a056820060700b0059097b95565mr4906684oow.12.1702411603276;
+        Tue, 12 Dec 2023 12:06:43 -0800 (PST)
+Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id o14-20020a4a384e000000b0058dc4a5de5bsm2628979oof.14.2023.12.12.12.06.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Dec 2023 12:06:42 -0800 (PST)
+Received: (nullmailer pid 2549596 invoked by uid 1000);
+	Tue, 12 Dec 2023 20:06:41 -0000
+Date: Tue, 12 Dec 2023 14:06:41 -0600
+From: Rob Herring <robh@kernel.org>
+To: Luo Jie <quic_luoj@quicinc.com>
+Cc: agross@kernel.org, andersson@kernel.org, konrad.dybcio@linaro.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk, robert.marko@sartura.hr, linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, quic_srichara@quicinc.com
+Subject: Re: [PATCH v2 5/5] dt-bindings: net: ipq4019-mdio: Document ipq5332
+ platform
+Message-ID: <20231212200641.GA2331615-robh@kernel.org>
+References: <20231212115151.20016-1-quic_luoj@quicinc.com>
+ <20231212115151.20016-6-quic_luoj@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,49 +58,181 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <df43d737fda6b6aa0cda3f2cb300916ca4b2e8f8.1702314695.git.ecree.xilinx@gmail.com>
+In-Reply-To: <20231212115151.20016-6-quic_luoj@quicinc.com>
 
-Hi,
+On Tue, Dec 12, 2023 at 07:51:50PM +0800, Luo Jie wrote:
+> Update the yaml file for the new DTS properties.
+> 
+> 1. cmn-reference-clock for the CMN PLL source clock select.
+> 2. clock-frequency for MDIO clock frequency config.
+> 3. add uniphy AHB & SYS GCC clocks.
+> 4. add reset-gpios for MDIO bus level reset.
+> 
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> ---
+>  .../bindings/net/qcom,ipq4019-mdio.yaml       | 157 +++++++++++++++++-
+>  1 file changed, 153 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml b/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
+> index 3407e909e8a7..9546a6ad7841 100644
+> --- a/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
+> +++ b/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
+> @@ -20,6 +20,8 @@ properties:
+>            - enum:
+>                - qcom,ipq6018-mdio
+>                - qcom,ipq8074-mdio
+> +              - qcom,ipq9574-mdio
+> +              - qcom,ipq5332-mdio
+>            - const: qcom,ipq4019-mdio
 
-kernel test robot noticed the following build warnings:
+A driver can function without knowing about all these new registers and 
+clocks? If not, then it can't be compatible with "qcom,ipq4019-mdio".
 
-[auto build test WARNING on net-next/main]
+>  
+>    "#address-cells":
+> @@ -30,19 +32,71 @@ properties:
+>  
+>    reg:
+>      minItems: 1
+> -    maxItems: 2
+> +    maxItems: 5
+>      description:
+> -      the first Address and length of the register set for the MDIO controller.
+> -      the second Address and length of the register for ethernet LDO, this second
+> -      address range is only required by the platform IPQ50xx.
+> +      the first Address and length of the register set for the MDIO controller,
+> +      the optional second, third and fourth address and length of the register
+> +      for ethernet LDO, these three address range are required by the platform
+> +      IPQ50xx/IPQ5332/IPQ9574, the last address and length is for the CMN clock
+> +      to select the reference clock.
+> +
+> +  reg-names:
+> +    minItems: 1
+> +    maxItems: 5
+>  
+>    clocks:
+> +    minItems: 1
+>      items:
+>        - description: MDIO clock source frequency fixed to 100MHZ
+> +      - description: UNIPHY0 AHB clock source frequency fixed to 100MHZ
+> +      - description: UNIPHY1 AHB clock source frequency fixed to 100MHZ
+> +      - description: UNIPHY0 SYS clock source frequency fixed to 24MHZ
+> +      - description: UNIPHY1 SYS clock source frequency fixed to 24MHZ
 
-url:    https://github.com/intel-lab-lkp/linux/commits/edward-cree-amd-com/sfc-initial-debugfs-implementation/20231212-013223
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/df43d737fda6b6aa0cda3f2cb300916ca4b2e8f8.1702314695.git.ecree.xilinx%40gmail.com
-patch subject: [PATCH net-next 2/7] sfc: debugfs for channels
-config: mips-ip27_defconfig (https://download.01.org/0day-ci/archive/20231213/202312130301.cKD8l8IO-lkp@intel.com/config)
-compiler: mips64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231213/202312130301.cKD8l8IO-lkp@intel.com/reproduce)
+These are all clock inputs to this h/w block and not some other clocks 
+you want to manage?
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312130301.cKD8l8IO-lkp@intel.com/
+>  
+>    clock-names:
+> +    minItems: 1
+>      items:
+>        - const: gcc_mdio_ahb_clk
+> +      - const: gcc_uniphy0_ahb_clk
+> +      - const: gcc_uniphy1_ahb_clk
+> +      - const: gcc_uniphy0_sys_clk
+> +      - const: gcc_uniphy1_sys_clk
 
-All warnings (new ones prefixed by >>):
+"gcc" is presumably the name of the clock controller in QCom chips. 
+Well, the clock source should not be part of the binding. The names 
+should be local for what they are for. So drop 'gcc_'. And '_clk' is 
+also redundant, so drop it too. Unfortunately you are stuck with the 
+name of the 1st entry.
 
-   In file included from drivers/net/ethernet/sfc/efx.c:36:
->> drivers/net/ethernet/sfc/debugfs.h:51:5: warning: no previous prototype for 'efx_init_debugfs_channel' [-Wmissing-prototypes]
-      51 | int efx_init_debugfs_channel(struct efx_channel *channel)
-         |     ^~~~~~~~~~~~~~~~~~~~~~~~
->> drivers/net/ethernet/sfc/debugfs.h:55:6: warning: no previous prototype for 'efx_fini_debugfs_channel' [-Wmissing-prototypes]
-      55 | void efx_fini_debugfs_channel(struct efx_channel *channel) {}
-         |      ^~~~~~~~~~~~~~~~~~~~~~~~
+> +
+> +  cmn-reference-clock:
+> +    oneOf:
+> +      - items:
+> +          - enum:
+> +              - 0   # CMN PLL reference internal 48MHZ
+> +              - 1   # CMN PLL reference external 25MHZ
+> +              - 2   # CMN PLL reference external 31250KHZ
+> +              - 3   # CMN PLL reference external 40MHZ
+> +              - 4   # CMN PLL reference external 48MHZ
+> +              - 5   # CMN PLL reference external 50MHZ
+> +              - 6   # CMN PLL reference internal 96MHZ
+> +
+> +  clock-frequency:
+> +    oneOf:
+> +      - items:
+> +          - enum:
+> +              - 12500000
+> +              - 6250000
+> +              - 3125000
+> +              - 1562500
+> +              - 781250
+> +              - 390625
+> +    description:
+> +      The MDIO bus clock that must be output by the MDIO bus hardware,
+> +      only the listed frequecies above can be configured, other frequency
+> +      will cause malfunction. If absent, the default hardware value is used.
+> +
+> +  reset-gpios:
+> +    maxItems: 1
+> +
+> +  reset-assert-us:
+> +    maxItems: 1
+> +
+> +  reset-deassert-us:
+> +    maxItems: 1
+>  
+>  required:
+>    - compatible
+> @@ -61,6 +115,8 @@ allOf:
+>                - qcom,ipq5018-mdio
+>                - qcom,ipq6018-mdio
+>                - qcom,ipq8074-mdio
+> +              - qcom,ipq5332-mdio
+> +              - qcom,ipq9574-mdio
+>      then:
+>        required:
+>          - clocks
+> @@ -70,6 +126,40 @@ allOf:
+>          clocks: false
+>          clock-names: false
+>  
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            enum:
+> +              - qcom,ipq5332-mdio
+> +    then:
+> +      properties:
+> +        clocks:
+> +          minItems: 5
+> +          maxItems: 5
+> +        reg-names:
+> +          items:
+> +            - const: mdio
+> +            - const: eth_ldo1
+> +            - const: eth_ldo2
+> +            - const: cmn_blk
+
+Perhaps cmn_blk should come 2nd, so all the variants have the same entry 
+indices. Then you can move this to the top level and just say 'minItems: 
+4' here.
 
 
-vim +/efx_init_debugfs_channel +51 drivers/net/ethernet/sfc/debugfs.h
+> +
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            enum:
+> +              - qcom,ipq9574-mdio
+> +    then:
+> +      properties:
+> +        reg-names:
+> +          items:
+> +            - const: mdio
+> +            - const: eth_ldo1
+> +            - const: eth_ldo2
+> +            - const: eth_ldo3
+> +            - const: cmn_blk
 
-    50	
-  > 51	int efx_init_debugfs_channel(struct efx_channel *channel)
-    52	{
-    53		return 0;
-    54	}
-  > 55	void efx_fini_debugfs_channel(struct efx_channel *channel) {}
-    56	
+And 'minItems: 5' here.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+The ipq9574 adds the CMN block, but none of the clocks? Weird.
+
+Rob
 
