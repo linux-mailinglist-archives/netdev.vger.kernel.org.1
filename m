@@ -1,109 +1,68 @@
-Return-Path: <netdev+bounces-56656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17BC180FC07
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 01:10:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0258580FC08
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 01:10:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C151B20BC3
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 00:10:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A14671F21254
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 00:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DD1E38A;
-	Wed, 13 Dec 2023 00:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 466D438B;
+	Wed, 13 Dec 2023 00:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gPo818Zb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mW95xSkT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8266410E2
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 00:10:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1B18EC43391;
-	Wed, 13 Dec 2023 00:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28BCA1C2F
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 00:10:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 247D7C433C9;
+	Wed, 13 Dec 2023 00:10:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702426229;
-	bh=tPjGEQP0O8rZwzsUkTC/JuY5zOGTheqtz2yolU+uKpA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gPo818ZbH5aly4eA08FVXIbPnd58l86jE16b0l5rxUZ4FZ87hbWAcULxOELfljJDf
-	 3zR8MT8MM8mvdKOTs3eBRWz0cW3HZOSxFdbEcC1AMbCA3lRZTXfL8XdgNjfYvtnwio
-	 fO6ogbYWZT/7vlwwY5Bm9lxYvqqw9g+AWfvfSQ/RI9YyXkSlvRM7Ubs03XFJLCjCjw
-	 4B2TjvRKUE/U70+EM2dNlmWEnkA6L8DRa4a2TJCRh7JyhhTEphEvd4l63X2hYf0WhD
-	 0UwWaxc9ZWxuHrxF68wDdRXIS0u7jol74CK02GaI5MshSpneLHsQfiJCHWtxw87xUK
-	 NIKYecUyL3aHw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 07C58DFC906;
-	Wed, 13 Dec 2023 00:10:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1702426231;
+	bh=MQxulmHpNRv6UmRfBV673M+2mklcfKpulEm24fODeAk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mW95xSkTLWdzImHwfbSbNlwL8EfiL6cKUDEovZjzIZh94Xbugiz926H7cUTZWPTws
+	 ynuM1cd44ywq76oxQtqdAnenR/765o336QfeldTg16L/cw/ylmNKRrxiMizN9JV1xA
+	 xLljND/CxoICnuOb3AdQtiOJiLC/zkZEzg6jW8BpYYqEAc6ldr84dqHbu1EQIzWnXa
+	 WATO1GK4VJXAHdN17wOn0Nwroj60VOr5kcTl+CmXikkxRHjBU+a4yVB2qp+Ry5rz+e
+	 E5gsT14lUfu8fjU383ip3EY7MDm7c8+u7/1deuVfdAQHH5Q7OfdC7W4e3lUGK8kn6s
+	 onVotf/BOpUrQ==
+Date: Tue, 12 Dec 2023 16:10:30 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shinas Rasheed <srasheed@marvell.com>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
+ <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
+ <davem@davemloft.net>, <wizhao@redhat.com>, <kheib@redhat.com>,
+ <konguyen@redhat.com>, Veerasenareddy Burru <vburru@marvell.com>, "Sathesh
+ Edara" <sedara@marvell.com>, Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next v3] octeon_ep: add PF-VF mailbox communication
+Message-ID: <20231212161030.5eb7b84e@kernel.org>
+In-Reply-To: <20231211063355.2630028-2-srasheed@marvell.com>
+References: <20231211063355.2630028-1-srasheed@marvell.com>
+	<20231211063355.2630028-2-srasheed@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/13] bnxt_en: Update for net-next
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170242622902.31821.13197564455147153846.git-patchwork-notify@kernel.org>
-Date: Wed, 13 Dec 2023 00:10:29 +0000
-References: <20231212005122.2401-1-michael.chan@broadcom.com>
-In-Reply-To: <20231212005122.2401-1-michael.chan@broadcom.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, gospo@broadcom.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Sun, 10 Dec 2023 22:33:52 -0800 Shinas Rasheed wrote:
+> Implement mailbox communication between PF and VFs.
+> PF-VF mailbox is used for all control commands from VF to PF and
+> asynchronous notification messages from PF to VF.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 11 Dec 2023 16:51:09 -0800 you wrote:
-> The first 4 patches in the series fix issues in the net-next tree
-> introduced in the last 4 weeks.  The first 3 patches fix ring accounting
-> and indexing logic.  The 4th patch fix TX timeout when the TX ring is
-> very small.
-> 
-> The next 7 patches add new features on the P7 chips, including TX
-> coalesced completions, VXLAN GPE and UDP GSO stateless offload, a
-> new rx_filter_miss counters, and more QP backing store memory for
-> RoCE.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,01/13] bnxt_en: Fix trimming of P5 RX and TX rings
-    https://git.kernel.org/netdev/net-next/c/f1e50b276d37
-  - [net-next,02/13] bnxt_en: Fix AGG ring check logic in bnxt_check_rings()
-    https://git.kernel.org/netdev/net-next/c/7fb17a0c18b6
-  - [net-next,03/13] bnxt_en: Fix TX ring indexing logic
-    https://git.kernel.org/netdev/net-next/c/18fe0a383cca
-  - [net-next,04/13] bnxt_en: Prevent TX timeout with a very small TX ring
-    https://git.kernel.org/netdev/net-next/c/f12f551b5b96
-  - [net-next,05/13] bnxt_en: Support TX coalesced completion on 5760X chips
-    https://git.kernel.org/netdev/net-next/c/6dea3ebe0d22
-  - [net-next,06/13] bnxt_en: Allocate extra QP backing store memory when RoCE FW reports it
-    https://git.kernel.org/netdev/net-next/c/297e625bf89e
-  - [net-next,07/13] bnxt_en: Use proper TUNNEL_DST_PORT_ALLOC* commands
-    https://git.kernel.org/netdev/net-next/c/e6f8a5a8ecc9
-  - [net-next,08/13] bnxt_en: Add support for VXLAN GPE
-    https://git.kernel.org/netdev/net-next/c/77b0fff55dcd
-  - [net-next,09/13] bnxt_en: Configure UDP tunnel TPA
-    https://git.kernel.org/netdev/net-next/c/960096334417
-  - [net-next,10/13] bnxt_en: add rx_filter_miss extended stats
-    https://git.kernel.org/netdev/net-next/c/6ce30622547d
-  - [net-next,11/13] bnxt_en: Add support for UDP GSO on 5760X chips
-    https://git.kernel.org/netdev/net-next/c/feeef68f6f3d
-  - [net-next,12/13] bnxt_en: Skip nic close/open when configuring tstamp filters
-    https://git.kernel.org/netdev/net-next/c/84793a499578
-  - [net-next,13/13] bnxt_en: Make PTP TX timestamp HWRM query silent
-    https://git.kernel.org/netdev/net-next/c/056bce63c469
-
-You are awesome, thank you!
+This patch was not designated as 1/4 in the subject so patchwork
+thought it's a separate posting, and the series lacks patch 1/4.
+You gotta repost so that patchwork can ingest this properly.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
