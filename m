@@ -1,71 +1,91 @@
-Return-Path: <netdev+bounces-56821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC71F810F16
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 11:58:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A12A9810F2A
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 12:00:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E22AB20BD8
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 10:58:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 418DBB20C79
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 11:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3748822EFB;
-	Wed, 13 Dec 2023 10:58:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72FF822F08;
+	Wed, 13 Dec 2023 11:00:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="u7wVbB2p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U2XwzqUz"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ED9112A;
-	Wed, 13 Dec 2023 02:58:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=mGIQDTPQtHNZfQHDhzO46ShItOaXBrTUkfxx2nG5SQY=; b=u7wVbB2pV5gntyL4PYXEwy2kdJ
-	u/EwwnGsIUcLsYSsvJRCle6GQ8iC3RZSiPxEj9f8pG+3hewpcncW/zHnPcttRW+nebLpb9zUkZ/6S
-	5sydG1e30JK1vCa+ujf9NWPiO2Wdou9AWl7gCyzTEOFIWZzawGXVS7KPBK2OrQPper4I=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rDMw4-002oEF-E9; Wed, 13 Dec 2023 11:57:52 +0100
-Date: Wed, 13 Dec 2023 11:57:52 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Justin Chen <justin.chen@broadcom.com>
-Cc: netdev@vger.kernel.org, Doug Berger <opendmb@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: mdio: mdio-bcm-unimac: Delay before first poll
-Message-ID: <c3cc7a9d-d464-48e7-beb7-b90b1abbcfc7@lunn.ch>
-References: <20231213000249.2020835-1-justin.chen@broadcom.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4209B22EF1;
+	Wed, 13 Dec 2023 11:00:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A49CDC433C9;
+	Wed, 13 Dec 2023 11:00:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702465224;
+	bh=qri/w5jLo+6ipU86Kfi+yN99WggNK8P2NJcKN4CB6ok=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=U2XwzqUzjWN0yLjzlLhJQc3xMh3Tg0fhZn8qCu9BfIRR5WocEZ1lmz4BKFgAB/VFr
+	 zg5A+VDIPe2JK5K3B6DNHg3tebxxKu4nyQ1Q9Gb/S3COrsYLwasZ4Urm66OwOCa6KI
+	 L5mT16Tf/Es6CSzqCQvIjGmIY34GGFPJASUBGsJHMYvOHC1AnobfapvffVT6X8dw2m
+	 oX4dPOwt/OwsrzbR9vyiahmZt2kOOk70Qzyou/gYYNqc7nctHqnJYJe/HSbaniCJTF
+	 P3AS9hZhDeeizkycIvTg0X5SHhfAjKjWQuV0Ds0nw14MSFbYNk0C/Xq5Rpt1U1uAbX
+	 MYTYQnc3LpREQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 89A83DD4EFD;
+	Wed, 13 Dec 2023 11:00:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231213000249.2020835-1-justin.chen@broadcom.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1 net 0/3] Some bug fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170246522455.5465.14917728271617814116.git-patchwork-notify@kernel.org>
+Date: Wed, 13 Dec 2023 11:00:24 +0000
+References: <cover.1702289232.git.siyanteng@loongson.cn>
+In-Reply-To: <cover.1702289232.git.siyanteng@loongson.cn>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, tsbogend@alpha.franken.de, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ peppe.cavallaro@st.com, alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mcoquelin.stm32@gmail.com, devicetree@vger.kernel.org,
+ linux-mips@vger.kernel.org, chenhuacai@loongson.cn, netdev@vger.kernel.org,
+ loongarch@lists.linux.dev, chris.chenfeiyang@gmail.com
 
-On Tue, Dec 12, 2023 at 04:02:49PM -0800, Justin Chen wrote:
-> With a clock interval of 400 nsec and a 64 bit transactions (32 bit
-> preamble & 16 bit control & 16 bit data), it is reasonable to assume
-> the mdio transaction will take 25.6 usec. Add a 30 usec delay before
-> the first poll to reduce the chance of a 1000-2000 usec sleep.
+Hello:
 
-#define  MDIO_C45               0
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-suggests the hardware can do C45? The timing works out different then.
-Maybe add a comment by the udelay() that is assumes C22, to give a
-clue to somebody who is adding C45 support the delay needs to be
-re-evaluated.
+On Mon, 11 Dec 2023 18:20:32 +0800 you wrote:
+> * Put Krzysztof's patch into my thread, pick Conor's Reviewed-by
+>   tag and Jiaxun's Acked-by tag.(prev version is RFC patch)
+> 
+> * I fixed an Oops related to mdio, mainly to ensure that
+>   mdio is initialized before use, because it will be used
+>   in a series of patches I am working on.
+> 
+> [...]
 
-	Andrew
+Here is the summary with links:
+  - [v1,net,1/3] stmmac: dwmac-loongson: Make sure MDIO is initialized before use
+    https://git.kernel.org/netdev/net/c/e87d3a1370ce
+  - [v1,net,2/3] stmmac: dwmac-loongson: drop useless check for compatible fallback
+    https://git.kernel.org/netdev/net/c/31fea092c6f9
+  - [v1,net,3/3] MIPS: dts: loongson: drop incorrect dwmac fallback compatible
+    https://git.kernel.org/netdev/net/c/4907a3f54b12
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
