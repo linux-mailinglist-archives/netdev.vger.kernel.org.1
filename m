@@ -1,143 +1,133 @@
-Return-Path: <netdev+bounces-56771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60905810CA9
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:43:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DAE2810CB1
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:45:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 027DFB20B3D
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 08:43:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A32FAB20BA1
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 08:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 813281EB33;
-	Wed, 13 Dec 2023 08:43:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E341EB34;
+	Wed, 13 Dec 2023 08:45:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A07qou8z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bk+05/9i"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7609CAC
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 00:43:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702457018;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9ypvU2CFpvjA4GuEgMA1XFzF02HXPcVncJHhzWckfAo=;
-	b=A07qou8zhN6INiRcZo6Jts8WashAl5Jg07IQHHatmwFCJPqJWiHlCbGsya6DH2IBb0WvGX
-	OoRfwAHiVD4WZCF+4VCQanrhJfEN8dRQmx1LJFzOcYXV4iWyTEX4eg2KZ+0ltjWEHAfcm4
-	PAHkFbg8YdslPsD7iEErztnLy+zIgbM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-668-X9ImCoEZPTql25sLoIiSeA-1; Wed, 13 Dec 2023 03:43:37 -0500
-X-MC-Unique: X9ImCoEZPTql25sLoIiSeA-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40c38ae9764so32020475e9.1
-        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 00:43:36 -0800 (PST)
+Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18042A0
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 00:45:12 -0800 (PST)
+Received: by mail-il1-x131.google.com with SMTP id e9e14a558f8ab-35d77fb7d94so27022955ab.0
+        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 00:45:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702457110; x=1703061910; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6UbrNkZFw6v2Ag5z4UUkMK3ySGfIiAe6dvzGkwUXovY=;
+        b=bk+05/9iYoZMhdFdXQ23z+vu4qADwVgRLEQk/blQGfwzAZZTlId8d/Ri9H23u9C7AT
+         FURJf0zHyRj/ONpaf4m2Jq2zLGFYDXg/sGQ4mXhKqlr+BbBtzigzykrM+m7/MMBq1Y3p
+         gEmXBnHDjLhzkie8SboLxoZMCpcJ348Zz1j/IHYBL17s+UnD5r7pu5vNnB5NMryUxhd1
+         vMBb2t9OPHO7FGkFAv2XykpHLSuUfgvAPRqXAHSj305+vXS8vexYo99fuT/x3JI72jMK
+         PB1WZNXuThI5mHnJLpt5kHPanpFgp/ZDSSk/OJ+TA10qVcGLniXwLnrSEtJQp8uItt6u
+         CtLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702457016; x=1703061816;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9ypvU2CFpvjA4GuEgMA1XFzF02HXPcVncJHhzWckfAo=;
-        b=PGl9umHiBVUBytsONgp/x3+xmKSB6htYro+vCZ1OOF+3RCrsaI0JoltdKIaEc1vWO/
-         jRCOEGYfF+2jq/ZBuPK6mu/cJXqp5rJwII3RqeIwx8HBypWSAMkkjBNOZd/F7ZbcqrN1
-         tPWYT6Ycm4AnyH/DMnm9KUkcfQYWvgIbk1s02/TyqdQQFF+u7sTyuXnR2cvymjEZgNV0
-         GapqmKi51CkirJd5KClsHhpL89TwW1eGsF5ItZstDWeBheouoZLwdPA2qKij42inYdPN
-         Xzp6MEF6miT2tJKk5xLLbmdKvdcytuoxn6aVWVTRFTQrVLwExrdDwyphTQD86/3ZgdPp
-         +Nvg==
-X-Gm-Message-State: AOJu0YwhVT3aPXLvbPTmSO9AyCEpueQKlV3HlPpQmFLDamZXZRwHIvSF
-	xo96nj59wK+UOrxW35nlvgd+BeMsxMOXz7A5YfCwCJBnBQIuUpX2YVKpXn09OY9lDMxqNMdNmYe
-	I04UEw6jsQ3ynOKrJ
-X-Received: by 2002:a05:600c:401:b0:40c:26ef:b24b with SMTP id q1-20020a05600c040100b0040c26efb24bmr3913398wmb.188.1702457015953;
-        Wed, 13 Dec 2023 00:43:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF1lQ4+EUeiLIk83v4dqAAgqvxh6iPVGvNgRE5vCofRk3mqgAvKUjUC7mCTX0q96Nl9r/GPpQ==
-X-Received: by 2002:a05:600c:401:b0:40c:26ef:b24b with SMTP id q1-20020a05600c040100b0040c26efb24bmr3913382wmb.188.1702457015584;
-        Wed, 13 Dec 2023 00:43:35 -0800 (PST)
-Received: from sgarzare-redhat ([5.179.184.12])
-        by smtp.gmail.com with ESMTPSA id j17-20020a05600c1c1100b0040b48690c49sm19575443wms.6.2023.12.13.00.43.33
+        d=1e100.net; s=20230601; t=1702457110; x=1703061910;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6UbrNkZFw6v2Ag5z4UUkMK3ySGfIiAe6dvzGkwUXovY=;
+        b=rkKWJPe6+K8qFE1vpo1iNmnW1tfhRPv64RANINVPP56VpK9yMQHiZsQqHMIgcW+3hT
+         Gg5JWZSHwu44TJeDtdcrumdGjtJ5pfNWZAeMRDpzo5RvwPVHd/wrt4kNi3/FXGigEvEH
+         R/TD91XsMyuwGMCkq//n1eC3sdMOpTiUmSxALD81JZXQ9U0vslfGhHUNmB1ehNMqwH1V
+         +1htwLFoInOeMJruCBKZDyO35+64hLth+3vaIhoSrBe0mRuFKH1BBROMI/8Wwj+vLPcA
+         p099WujmGw8JjP4/tQQg2M3d7mvQUhZhn8hSt4rcfEDxscyNtjaNQOiJb8pBcR3QvzNZ
+         eztQ==
+X-Gm-Message-State: AOJu0YxSeWezNT0jOa8l0Ys61pYI0fduUcuZNWujRXbEXFAN5Nf3XcjY
+	Z2LmzVWxu27D1ImNSZx85SbaeyvQdovpVCmBD0g=
+X-Google-Smtp-Source: AGHT+IEnaKQzZcT26KQrhmlJbsvfWvWyguGUjn17VcQVd2jU/WI1f1QoFDjd7eeQraE02SIdDKlLXQ==
+X-Received: by 2002:a05:6e02:17c8:b0:35d:a84e:f720 with SMTP id z8-20020a056e0217c800b0035da84ef720mr13327799ilu.60.1702457110665;
+        Wed, 13 Dec 2023 00:45:10 -0800 (PST)
+Received: from Laptop-X1.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id h2-20020a170902f54200b001cfc67d46efsm9897824plf.191.2023.12.13.00.45.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 00:43:35 -0800 (PST)
-Date: Wed, 13 Dec 2023 09:43:29 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v8 0/4] send credit update during setting
- SO_RCVLOWAT
-Message-ID: <ucmekzurgt3zcaezzdkk6277ukjmwaoy6kdq6tzivbtqd4d32b@izqbcsixgngk>
-References: <20231211211658.2904268-1-avkrasnov@salutedevices.com>
- <20231212105423-mutt-send-email-mst@kernel.org>
- <d27f22f0-0f1e-e1bb-5b13-a524dc6e94d7@salutedevices.com>
- <20231212111131-mutt-send-email-mst@kernel.org>
- <7b362aef-6774-0e08-81e9-0a6f7f616290@salutedevices.com>
+        Wed, 13 Dec 2023 00:45:10 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jiri Pirko <jiri@resnulli.us>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [Draft PATCH net-next 0/3] add YAML spec for team
+Date: Wed, 13 Dec 2023 16:44:59 +0800
+Message-ID: <20231213084502.4042718-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <7b362aef-6774-0e08-81e9-0a6f7f616290@salutedevices.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 12, 2023 at 08:43:07PM +0300, Arseniy Krasnov wrote:
->
->
->On 12.12.2023 19:12, Michael S. Tsirkin wrote:
->> On Tue, Dec 12, 2023 at 06:59:03PM +0300, Arseniy Krasnov wrote:
->>>
->>>
->>> On 12.12.2023 18:54, Michael S. Tsirkin wrote:
->>>> On Tue, Dec 12, 2023 at 12:16:54AM +0300, Arseniy Krasnov wrote:
->>>>> Hello,
->>>>>
->>>>>                                DESCRIPTION
->>>>>
->>>>> This patchset fixes old problem with hungup of both rx/tx sides and adds
->>>>> test for it. This happens due to non-default SO_RCVLOWAT value and
->>>>> deferred credit update in virtio/vsock. Link to previous old patchset:
->>>>> https://lore.kernel.org/netdev/39b2e9fd-601b-189d-39a9-914e5574524c@sberdevices.ru/
->>>>
->>>>
->>>> Patchset:
->>>>
->>>> Acked-by: Michael S. Tsirkin <mst@redhat.com>
->>>
->>> Thanks!
->>>
->>>>
->>>>
->>>> But I worry whether we actually need 3/8 in net not in net-next.
->>>
->>> Because of "Fixes" tag ? I think this problem is not critical and reproducible
->>> only in special cases, but i'm not familiar with netdev process so good, so I don't
->>> have strong opinion. I guess @Stefano knows better.
->>>
->>> Thanks, Arseniy
->>
->> Fixes means "if you have that other commit then you need this commit
->> too". I think as a minimum you need to rearrange patches to make the
->> fix go in first. We don't want a regression followed by a fix.
->
->I see, ok, @Stefano WDYT? I think rearrange doesn't break anything, 
->because this
->patch fixes problem that is not related with the new patches from this patchset.
+Hi Jakub,
 
-I agree, patch 3 is for sure net material (I'm fine with both 
-rearrangement or send it separately), but IMHO also patch 2 could be.
-I think with the same fixes tag, since before commit b89d882dc9fc 
-("vsock/virtio: reduce credit update messages") we sent a credit update
-for every bytes we read, so we should not have this problem, right?
+You suggested me to add yaml spec for bridge. Since I'm not familiar with
+writing the spec file, I choose to convert team as a start.
 
-So, maybe all the series could be "net".
+There are still some questions I got during convertion.
 
-Thanks,
-Stefano
+1. Is there a preference to use "-" instead of "_" for the names in spec file?
+   e.g. the attr-cnt-name in team.spec, should I use __team-attr-item-port-max
+   or --team-attr-item-port-max, or __team_attr_item_port_max?
+2. I saw ynl-gen-c.py deals with unterminated-ok. But this policy is not shown
+   in the schemas. Is it a new feature that still working on?
+3. Do we have to hard code the string max-len? Is there a way to use
+   the name in definitions? e.g.
+   name: name
+   type: string
+   checks:
+     max-len: string-max-len
+4. The doc will be generate to rst file in future, so there will not have
+   other comments in the _nl.c or _nl.h files, right?
+5. the genl_multicast_group is forced to use list. But the team use format
+   like { .name = TEAM_GENL_CHANGE_EVENT_MC_GRP_NAME, }. Should we support
+   this legacy format?
+6. The _UAPI_LINUX_IF_TEAM_H_ is rename to _UAPI_LINUX_IF_TEAM_H in uapi
+   header. Does that affects?
+7. When build, I got error modpost: missing MODULE_LICENSE() in drivers/net/team/team_nl.o.
+   Should we add the MODULE_LICENSE support in ynl-gen-c.py?
+8. When build, I also got errors like
+     ERROR: modpost: "team_nl_policy" [drivers/net/team/team.ko] undefined!
+     ERROR: modpost: "team_nl_ops" [drivers/net/team/team.ko] undefined!
+     ERROR: modpost: "team_nl_noop_doit" [drivers/net/team/team_nl.ko] undefined!
+     ERROR: modpost: "team_nl_options_set_doit" [drivers/net/team/team_nl.ko] undefined!
+     ERROR: modpost: "team_nl_options_get_doit" [drivers/net/team/team_nl.ko] undefined!
+     ERROR: modpost: "team_nl_port_list_get_doit" [drivers/net/team/team_nl.ko] undefined!
+     ERROR: modpost: "team_attr_option_nl_policy" [drivers/net/team/team.ko] undefined!
+  Do you know why include "team_nl.h" doesn't help?
+
+Thanks
+Hangbin
+
+Hangbin Liu (3):
+  Documentation: netlink: add a YAML spec for team
+  net: team: use policy generated by YAML spec
+  uapi: team: use header file generated from YAML spec
+
+ Documentation/netlink/specs/team.yaml | 205 ++++++++++++++++++++++++++
+ MAINTAINERS                           |   1 +
+ drivers/net/team/Makefile             |   2 +-
+ drivers/net/team/team.c               |  59 +-------
+ drivers/net/team/team_nl.c            |  59 ++++++++
+ drivers/net/team/team_nl.h            |  29 ++++
+ include/uapi/linux/if_team.h          | 116 ++++++---------
+ 7 files changed, 345 insertions(+), 126 deletions(-)
+ create mode 100644 Documentation/netlink/specs/team.yaml
+ create mode 100644 drivers/net/team/team_nl.c
+ create mode 100644 drivers/net/team/team_nl.h
+
+-- 
+2.43.0
 
 
