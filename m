@@ -1,108 +1,242 @@
-Return-Path: <netdev+bounces-56910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C441281146E
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 15:17:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F30C8114C2
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 15:36:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80CB6282774
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 14:17:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B56E1F21156
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 14:36:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5E752E847;
-	Wed, 13 Dec 2023 14:17:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EFFF2E857;
+	Wed, 13 Dec 2023 14:36:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z5kWkgKB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f2rmOjrx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E09139C
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 06:17:44 -0800 (PST)
-Received: by mail-oi1-x234.google.com with SMTP id 5614622812f47-3b9e7f4a0d7so4601877b6e.1
-        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 06:17:44 -0800 (PST)
+Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A108BD0;
+	Wed, 13 Dec 2023 06:35:56 -0800 (PST)
+Received: by mail-wm1-x344.google.com with SMTP id 5b1f17b1804b1-40c2c65e6aaso72109025e9.2;
+        Wed, 13 Dec 2023 06:35:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702477064; x=1703081864; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=tqc+qNcDFUuEzhB2fkHdqgjGsYz3lDNjBTl7uP60e3U=;
-        b=z5kWkgKBSg1iGHmt32CCqLV37ba7TFpJKVDhPX9nC/9LPMC97zARtf8CoXFpajR8hb
-         wkoWDWjgeZnjJSeBvpnPujhg9bUMTZXjuFHL5FrgLiqXLioA/a+4L4E2rJ9lOGAZSZ7b
-         riorA4+s41aeabJMsU+g6bOeou4mbQqVOfdkteNWFdFi9+4nC3TIdzDa1DAT2cY9jHe3
-         FgfsWHSd9LbaWd/xds3KMqALafDEr0r4MlhDZBBRmHjylrXF414a+YK7YrEa+QrZv0+l
-         BCtEQTwYCHGljqnjQn94jh46NrQFPpOqCtyCTufP1ftnM44tXH9FPn1rWkZMkDAoDXeF
-         d5SQ==
+        d=gmail.com; s=20230601; t=1702478155; x=1703082955; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:from:content-language
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nUFSFbFgIum2NtAhJnNBP5hxWvYwzYJYVb9Fw/rpe9A=;
+        b=f2rmOjrxmKRrbgQfkPYSgdaz2dxj911vkdvO9Ny+U1hkJy7ieHVUlmfucrF07LiKfX
+         xsLpuS5VuFvO0YpyaKKsvjYTCs0CVLJ2KV2EOv3Ofh6PxPww/gTqNhxCHobhuhPEhpTm
+         79yb+aVqIDcDM4tOQqQTg+INulSm6m939vOECrBMBmb7x/yD/SNKpqyL9xxYMw/e8Tek
+         AfMmMeGdgGsSpoyxINFEoHPyFlrI04OjpHpDz0cQJ0KSOy2G4WcHQPw4sIDsBfhqE4BU
+         OFbzNp4XzYujkCJKylxuqryJe281qVOC0h6mReeGhbT8tFKUNHYQXcuyrO4NLMap7q4/
+         U0Hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702477064; x=1703081864;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tqc+qNcDFUuEzhB2fkHdqgjGsYz3lDNjBTl7uP60e3U=;
-        b=EDYf8PV13C8jdHCduwhhQGxByXCcHTqlXQmRxDlh9v4xQVvB8zP3z9q2fOq25mAbEH
-         SLA0iIgizcGSg2V+cdjvYRnOSBTXA5aQ8mUDme2w92xC3S24oAk0P7KWIT6GSxYQ5kdZ
-         8LWf0skQCRKFUQaj/9ByvDipCCIE3AlK5lZMRSEodz6Xyti6tE+VWz3cQU+LKrZBoxFv
-         5dayX9N7ie+sQ2QXR9fwUpF10b4tWChyWav6dfCeznqGPj7vD83Lt0Y40N0UT2XMMMhy
-         UhLo3P2EZMQ237H7lJxLfKxXWDvdk/FD7IL28vauC7n6hTb3NeewvndszdeQvWKA5K4E
-         R0gg==
-X-Gm-Message-State: AOJu0YyDns1Y5DStTRo5qdaca8+AhA2pt/wyXrrfaplBsKnULLX8XUnn
-	J4cCAQVoSJBq+0qgC7BjyrKbaElvitYXme35W4H3K/8xDOplzZNuM24=
-X-Google-Smtp-Source: AGHT+IGrRuBBP0VXscUJrKK3DezJlHwcMBbbaSID6Hu6/oNYQJngFBsVNxknC0Ev9yzXeyl/6xEvsu74C1tnxzzOgzI=
-X-Received: by 2002:a05:6870:15ca:b0:203:c01:7d4 with SMTP id
- k10-20020a05687015ca00b002030c0107d4mr2465035oad.95.1702477064167; Wed, 13
- Dec 2023 06:17:44 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702478155; x=1703082955;
+        h=content-transfer-encoding:cc:to:subject:from:content-language
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nUFSFbFgIum2NtAhJnNBP5hxWvYwzYJYVb9Fw/rpe9A=;
+        b=LXO8Zd3Xdgh3I+FBunhfOBybW8QbyeYWLrqGN9YNJp0YXGoj/9TVne6j/rwqPH8OBc
+         4eD1scV81p/uZlIpC8ufffHdnMcwvl0ME3er3Pk9HxIjcLKKosj2vkNycAYmyW6c3kw+
+         d9agR7AZcFkDmh3WeYUIbNMcPKnXffv99V7aar3FQUJb91rGBUpCaivZ5+7qCw7ICAII
+         pcT3Q5UOFvO+StgCONZ3v6nT+PGr/wULAZpFZpKKUjlTKSx2a1g1E/qcr74tgDcLkJzA
+         sZzGzu3J1ZknidAXWT62cnnjGr91oFjI+0JACpwwwwYZy7CVKch0E0iWSsgMbhw6SIHN
+         /gag==
+X-Gm-Message-State: AOJu0Yxbl/xzVBvU/BC9RudpGYGKfKq5/RjXWHgdBGYZYRrFMcdr0gsI
+	03RqjQZtXpr4elJJFGePi1FEnUy+a4lXyMtc
+X-Google-Smtp-Source: AGHT+IHH2DLkhZJfogZupcuD9ipfyMZH25Ro9qMHMsMnFpHPnwDdvFgUHUPTzm/6osDEIjFIHpoL3Q==
+X-Received: by 2002:a05:600c:1394:b0:40c:55a7:770f with SMTP id u20-20020a05600c139400b0040c55a7770fmr1119780wmf.159.1702478154820;
+        Wed, 13 Dec 2023 06:35:54 -0800 (PST)
+Received: from [10.0.3.3] ([217.212.240.69])
+        by smtp.gmail.com with ESMTPSA id n21-20020a05600c4f9500b0040b36ad5413sm20112472wmq.46.2023.12.13.06.35.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Dec 2023 06:35:54 -0800 (PST)
+Message-ID: <ac24d9b6-bfff-4700-a301-d4bd0dbb9313@gmail.com>
+Date: Wed, 13 Dec 2023 15:33:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Wed, 13 Dec 2023 19:47:33 +0530
-Message-ID: <CA+G9fYv9j08=+-CpJdtAV1z9-8KYbYcH8YOvWjbz4TgP7pB2TA@mail.gmail.com>
-Subject: next: arm64: gcc-8-defconfig - failed - net/wireless/shipped-certs.c:92:1:
- error: expected '}' before numeric constant
-To: linux-wireless@vger.kernel.org, Netdev <netdev@vger.kernel.org>, 
-	lkft-triage@lists.linaro.org, Linux Regressions <regressions@lists.linux.dev>
-Cc: Arnd Bergmann <arnd@arndb.de>, "David S. Miller" <davem@davemloft.net>, 
-	Benjamin Berg <benjamin.berg@intel.com>, 
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>, Johannes Berg <johannes.berg@intel.com>, 
-	Dan Carpenter <dan.carpenter@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+From: Leone Fernando <leone4fernando@gmail.com>
+Subject: [PATCH net] ipmr: support IP_PKTINFO on cache report IGMP msg
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, willemdebruijn.kernel@gmail.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ leone4fernando@gmail.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Following gcc-8 builds failed on Linux next-20231213 tag.
+In order to support IP_PKTINFO on those packets, we need to call
+ipv4_pktinfo_prepare, so introduced minor changes to this
+function to support this flow.
 
-arm64: gcc-8-defconfig - failed
-arm: gcc-8-defconfig - failed
+When sending mrouted/pimd daemons a cache report IGMP msg, it is
+unnecessary to set dst on the newly created skb.
+It used to be necessary on older versions until
+commit d826eb14ecef ("ipv4: PKTINFO doesnt need dst reference") which
+changed the way IP_PKTINFO struct is been retrieved.
 
-arm64: gcc-13-defconfig - Pass
-arm: gcc-13-defconfig - pass
+Fixes: d826eb14ecef ("ipv4: PKTINFO doesnt need dst reference")
+Signed-off-by: Leone Fernando <leone4fernando@gmail.com>
+---
+ include/net/ip.h       | 10 +++++++++-
+ net/ipv4/ip_sockglue.c | 25 ++++++++++++++++---------
+ net/ipv4/ipmr.c        | 12 +++++-------
+ net/ipv4/raw.c         |  2 +-
+ net/ipv4/udp.c         |  2 +-
+ 5 files changed, 32 insertions(+), 19 deletions(-)
 
-Good: next-20231212
-Bad: next-20231213
+diff --git a/include/net/ip.h b/include/net/ip.h
+index b31be912489a..1b40b7386c56 100644
+--- a/include/net/ip.h
++++ b/include/net/ip.h
+@@ -767,7 +767,15 @@ int ip_options_rcv_srr(struct sk_buff *skb, struct net_device *dev);
+  *	Functions provided by ip_sockglue.c
+  */
+ 
+-void ipv4_pktinfo_prepare(const struct sock *sk, struct sk_buff *skb);
++void ipv4_pktinfo_prepare(const struct sock *sk, struct sk_buff *iskb,
++			struct sk_buff *oskb);
++
++
++static inline void ipv4_pktinfo_input_prepare(const struct sock *sk, struct sk_buff *skb)
++{
++	ipv4_pktinfo_prepare(sk, skb, NULL);
++}
++
+ void ip_cmsg_recv_offset(struct msghdr *msg, struct sock *sk,
+ 			 struct sk_buff *skb, int tlen, int offset);
+ int ip_cmsg_send(struct sock *sk, struct msghdr *msg,
+diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
+index d7d13940774e..fb26963e3869 100644
+--- a/net/ipv4/ip_sockglue.c
++++ b/net/ipv4/ip_sockglue.c
+@@ -1364,19 +1364,26 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
+ /**
+  * ipv4_pktinfo_prepare - transfer some info from rtable to skb
+  * @sk: socket
+- * @skb: buffer
++ * @iskb: input buffer
++ * @oskb: out buffer
+  *
+  * To support IP_CMSG_PKTINFO option, we store rt_iif and specific
+  * destination in skb->cb[] before dst drop.
+  * This way, receiver doesn't make cache line misses to read rtable.
+  */
+-void ipv4_pktinfo_prepare(const struct sock *sk, struct sk_buff *skb)
++void ipv4_pktinfo_prepare(const struct sock *sk, struct sk_buff *iskb,
++			  struct sk_buff *oskb)
+ {
+-	struct in_pktinfo *pktinfo = PKTINFO_SKB_CB(skb);
++	struct in_pktinfo *pktinfo = PKTINFO_SKB_CB(iskb);
+ 	bool prepare = inet_test_bit(PKTINFO, sk) ||
+ 		       ipv6_sk_rxinfo(sk);
+ 
+-	if (prepare && skb_rtable(skb)) {
++	if (oskb) {
++		memcpy(oskb->cb, iskb->cb, sizeof(iskb->cb));
++		pktinfo = PKTINFO_SKB_CB(oskb);
++	}
++
++	if (prepare && skb_rtable(iskb)) {
+ 		/* skb->cb is overloaded: prior to this point it is IP{6}CB
+ 		 * which has interface index (iif) as the first member of the
+ 		 * underlying inet{6}_skb_parm struct. This code then overlays
+@@ -1386,20 +1393,20 @@ void ipv4_pktinfo_prepare(const struct sock *sk, struct sk_buff *skb)
+ 		 * (e.g., process binds socket to eth0 for Tx which is
+ 		 * redirected to loopback in the rtable/dst).
+ 		 */
+-		struct rtable *rt = skb_rtable(skb);
+-		bool l3slave = ipv4_l3mdev_skb(IPCB(skb)->flags);
++		struct rtable *rt = skb_rtable(iskb);
++		bool l3slave = ipv4_l3mdev_skb(IPCB(iskb)->flags);
+ 
+ 		if (pktinfo->ipi_ifindex == LOOPBACK_IFINDEX)
+-			pktinfo->ipi_ifindex = inet_iif(skb);
++			pktinfo->ipi_ifindex = inet_iif(iskb);
+ 		else if (l3slave && rt && rt->rt_iif)
+ 			pktinfo->ipi_ifindex = rt->rt_iif;
+ 
+-		pktinfo->ipi_spec_dst.s_addr = fib_compute_spec_dst(skb);
++		pktinfo->ipi_spec_dst.s_addr = fib_compute_spec_dst(iskb);
+ 	} else {
+ 		pktinfo->ipi_ifindex = 0;
+ 		pktinfo->ipi_spec_dst.s_addr = 0;
+ 	}
+-	skb_dst_drop(skb);
++	skb_dst_drop(iskb);
+ }
+ 
+ int ip_setsockopt(struct sock *sk, int level, int optname, sockptr_t optval,
+diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
+index 9e222a57bc2b..6ed7c88743f9 100644
+--- a/net/ipv4/ipmr.c
++++ b/net/ipv4/ipmr.c
+@@ -1025,6 +1025,10 @@ static int ipmr_cache_report(const struct mr_table *mrt,
+ 	struct sk_buff *skb;
+ 	int ret;
+ 
++	mroute_sk = rcu_dereference(mrt->mroute_sk);
++	if (!mroute_sk)
++		return -EINVAL;
++
+ 	if (assert == IGMPMSG_WHOLEPKT || assert == IGMPMSG_WRVIFWHOLE)
+ 		skb = skb_realloc_headroom(pkt, sizeof(struct iphdr));
+ 	else
+@@ -1069,7 +1073,7 @@ static int ipmr_cache_report(const struct mr_table *mrt,
+ 		msg = (struct igmpmsg *)skb_network_header(skb);
+ 		msg->im_vif = vifi;
+ 		msg->im_vif_hi = vifi >> 8;
+-		skb_dst_set(skb, dst_clone(skb_dst(pkt)));
++		ipv4_pktinfo_prepare(mroute_sk, pkt, skb);
+ 		/* Add our header */
+ 		igmp = skb_put(skb, sizeof(struct igmphdr));
+ 		igmp->type = assert;
+@@ -1079,12 +1083,6 @@ static int ipmr_cache_report(const struct mr_table *mrt,
+ 		skb->transport_header = skb->network_header;
+ 	}
+ 
+-	mroute_sk = rcu_dereference(mrt->mroute_sk);
+-	if (!mroute_sk) {
+-		kfree_skb(skb);
+-		return -EINVAL;
+-	}
+-
+ 	igmpmsg_netlink_event(mrt, skb);
+ 
+ 	/* Deliver to mrouted */
+diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
+index 27da9d7294c0..cde60c8deed4 100644
+--- a/net/ipv4/raw.c
++++ b/net/ipv4/raw.c
+@@ -292,7 +292,7 @@ static int raw_rcv_skb(struct sock *sk, struct sk_buff *skb)
+ 
+ 	/* Charge it to the socket. */
+ 
+-	ipv4_pktinfo_prepare(sk, skb);
++	ipv4_pktinfo_input_prepare(sk, skb);
+ 	if (sock_queue_rcv_skb_reason(sk, skb, &reason) < 0) {
+ 		kfree_skb_reason(skb, reason);
+ 		return NET_RX_DROP;
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 89e5a806b82e..3e5a418c96c3 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -2169,7 +2169,7 @@ static int udp_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
+ 
+ 	udp_csum_pull_header(skb);
+ 
+-	ipv4_pktinfo_prepare(sk, skb);
++	ipv4_pktinfo_input_prepare(sk, skb);
+ 	return __udp_queue_rcv_skb(sk, skb);
+ 
+ csum_error:
+-- 
+2.34.1
 
-Build log:
--------------
-net/wireless/shipped-certs.c:92:1: error: expected '}' before numeric constant
- 0x30, 0x82, 0x02, 0xa4, 0x30, 0x82, 0x01, 0x8c,
- ^~~~
-net/wireless/shipped-certs.c:2:34: note: to match this '{'
- const u8 shipped_regdb_certs[] = {
-
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-
-
-Steps to reproduce:
-
-# tuxmake --runtime podman --target-arch arm64 --toolchain gcc-8
---kconfig defconfig
-                                 ^
-
-Links:
- - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20231213/testrun/21662494/suite/build/test/gcc-8-defconfig/log
- - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20231213/testrun/21662494/suite/build/test/gcc-8-defconfig/history/
- - https://storage.tuxsuite.com/public/linaro/lkft/builds/2ZTTGLGEcQd1MiMrE1GgDyvdrla/
-
-
-
---
-Linaro LKFT
-https://lkft.linaro.org
 
