@@ -1,61 +1,60 @@
-Return-Path: <netdev+bounces-56702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62A318108BF
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 04:25:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C9F08108DC
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 04:58:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 949E31C20D4D
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 03:25:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 135FE1F21AB2
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 03:58:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D106363A6;
-	Wed, 13 Dec 2023 03:25:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D649BA2E;
+	Wed, 13 Dec 2023 03:58:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="JK8gUTZX"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="aaN1nCwD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4712CB0;
-	Tue, 12 Dec 2023 19:25:31 -0800 (PST)
-Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BD2LqBh013286;
-	Tue, 12 Dec 2023 19:25:09 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	PPS06212021; bh=oHEWwWS/d+ov9oePzS5N8MzuKRMw9eiK625IUaQWN7E=; b=
-	JK8gUTZXHPvpSOmd5yh39qi5MxiksPE2stT8b+AeTFA9zI3kZRacQz+d6wt0jFtC
-	eLDYTH9SFVtCHY8jxavgvPE6rRfNIw10TC4d/Cr4VN7e6K7Xj1KZD7ftFopaFb2u
-	cyIc7eHhUFmw+BxuHgzie5L46J+0YIluMDSWq9UpwXD5tEA9aMwf9cefNKaQ7mwu
-	YNcaxPvnPtgHqC/zeGDWoaxVyyLh41jkA0/HTHLwhVrhJRv78+YGyXN/dyOijW54
-	F0n/Y4uWjAIcGJzMbMADD5FxxrsiRQ5t2AUUtuW8mzNzBCD4TPMW6wx9wkORy2AM
-	o6e5ms9XJvIc116ttNRURw==
-Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3uwyxja1f9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Tue, 12 Dec 2023 19:25:09 -0800 (PST)
-Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 12 Dec 2023 19:25:13 -0800
-Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Tue, 12 Dec 2023 19:25:10 -0800
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <lkp@intel.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <lizhi.xu@windriver.com>, <mani@kernel.org>, <netdev@vger.kernel.org>,
-        <oe-kbuild-all@lists.linux.dev>, <pabeni@redhat.com>,
-        <syzbot+006987d1be3586e13555@syzkaller.appspotmail.com>,
-        <syzkaller-bugs@googlegroups.com>
-Subject: Re: [PATCH] radix-tree: fix memory leak in radix_tree_insert
-Date: Wed, 13 Dec 2023 11:25:04 +0800
-Message-ID: <20231213032504.2133661-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <202312120651.92GGXeX4-lkp@intel.com>
-References: <202312120651.92GGXeX4-lkp@intel.com>
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D4CFCD;
+	Tue, 12 Dec 2023 19:58:26 -0800 (PST)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BD3XUD5012428;
+	Tue, 12 Dec 2023 19:58:20 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=pfpt0220; bh=sSgxyO0l
+	JDy02aWDMAq/b+ta6/FYjADN6Wj57bHu0fw=; b=aaN1nCwD4Huf0+ox/4FYdL7I
+	oM+SvuNlT73mN5TtuGoSVSPWOZPsf+Yfpl+1ozwNs7aaYR06HHtRsnsVfbu3yQdY
+	hrAQHRdnwP/kdIibb0/Bj/sAc74Wd0w1/mK+aZoIMyyZv7qpmGOvhL/xQVv56uOh
+	pkczu+8tTYoX7gfddpmGQ0n02NURSwiaRDpdgbSK1Z+Wzt9YWeLCQk/Y8Rh6Nq5Y
+	YxgI1/jed+bkUXqCkGwa3CfYYNTJr66Cflg2d0wbjKUy9HXWQ+gjhL7UG52ceMqN
+	TlLGZSkKJc6UAC+ZnIdsFJV3bulem0jFm26vmhcDkT+MIuezEVlUIrnkt9w7ew==
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3uy4tgg1xd-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Tue, 12 Dec 2023 19:58:20 -0800 (PST)
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 12 Dec
+ 2023 19:58:18 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Tue, 12 Dec 2023 19:58:18 -0800
+Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
+	by maili.marvell.com (Postfix) with ESMTP id 4F70B3F7043;
+	Tue, 12 Dec 2023 19:58:18 -0800 (PST)
+From: Shinas Rasheed <srasheed@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
+        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
+        <kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
+        <kheib@redhat.com>, <konguyen@redhat.com>,
+        Shinas Rasheed
+	<srasheed@marvell.com>
+Subject: [PATCH net-next v4 0/4] add PF-VF mailbox support
+Date: Tue, 12 Dec 2023 19:58:05 -0800
+Message-ID: <20231213035816.2656851-1-srasheed@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,30 +63,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: 9iluF6xhpeAdVt-FoAhNtKxtKrWPHrdW
-X-Proofpoint-GUID: 9iluF6xhpeAdVt-FoAhNtKxtKrWPHrdW
+X-Proofpoint-ORIG-GUID: tej4tc5MtBNQwMDUHyMx9-lG0Fn0942s
+X-Proofpoint-GUID: tej4tc5MtBNQwMDUHyMx9-lG0Fn0942s
 X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-16_25,2023-11-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 mlxscore=0 spamscore=0 phishscore=0 lowpriorityscore=0
- bulkscore=0 priorityscore=1501 mlxlogscore=789 adultscore=0 clxscore=1011
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2312130022
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
 
-On Tue, 12 Dec 2023 07:16:50 +0800, kernel test robot <lkp@intel.com> wrote:
-> kernel test robot noticed the following build warnings:
->    lib/radix-tree.c:558:24: sparse:     got struct xa_node [noderef] __rcu *parent
-> >> lib/radix-tree.c:653:28: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct xa_node *pn @@     got struct xa_node [noderef] __rcu *parent @@
->    lib/radix-tree.c:653:28: sparse:     expected struct xa_node *pn
->   651			struct radix_tree_node *pn;
->   652			while (shift < mmshift && node) {
-> > 653				pn = node->parent;
-It can be clarified here that node->parent is the type just alloced as 
-"struct radix_tree node *", so there is no need to use cast type conversion,  
-Please ignore this warning.
+This patchset aims to add PF-VF mailbox support, its related
+version support, and relevant control net support for immediate
+functionalities such as firmware notifications to VF.
 
-BR,
-Lizhi
+Changes:
+V4:
+  - Included tag [1/4] in subject of first patch of series which was
+    lost in V3
+
+V3: https://lore.kernel.org/all/20231211063355.2630028-1-srasheed@marvell.com/
+  - Corrected error cleanup logic for PF-VF mbox setup
+  - Removed double inclusion of types.h header file in octep_pfvf_mbox.c
+
+V2: https://lore.kernel.org/all/20231209081450.2613561-1-srasheed@marvell.com/
+  - Removed unused variable in PATCH 1/4
+
+V1: https://lore.kernel.org/all/20231208070352.2606192-1-srasheed@marvell.com/
+
+Shinas Rasheed (4):
+  octeon_ep: add PF-VF mailbox communication
+  octeon_ep: PF-VF mailbox version support
+  octeon_ep: control net framework to support VF offloads
+  octeon_ep: support firmware notifications for VFs
+
+ .../net/ethernet/marvell/octeon_ep/Makefile   |   2 +-
+ .../marvell/octeon_ep/octep_cn9k_pf.c         |  59 ++-
+ .../marvell/octeon_ep/octep_cnxk_pf.c         |  49 +-
+ .../marvell/octeon_ep/octep_ctrl_mbox.h       |   4 +-
+ .../marvell/octeon_ep/octep_ctrl_net.c        |   6 +
+ .../ethernet/marvell/octeon_ep/octep_main.c   |  84 +++-
+ .../ethernet/marvell/octeon_ep/octep_main.h   |  46 +-
+ .../marvell/octeon_ep/octep_pfvf_mbox.c       | 450 ++++++++++++++++++
+ .../marvell/octeon_ep/octep_pfvf_mbox.h       | 167 +++++++
+ .../marvell/octeon_ep/octep_regs_cn9k_pf.h    |   9 +
+ .../marvell/octeon_ep/octep_regs_cnxk_pf.h    |  13 +
+ .../net/ethernet/marvell/octeon_ep/octep_tx.h |  24 +-
+ 12 files changed, 864 insertions(+), 49 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h
+
+-- 
+2.25.1
 
 
