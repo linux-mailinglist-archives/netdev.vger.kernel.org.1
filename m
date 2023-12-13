@@ -1,105 +1,92 @@
-Return-Path: <netdev+bounces-57027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A45B811A2E
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 17:58:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BF48811A5B
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 18:04:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CEE31F218B2
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 16:58:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29FFC1C210FE
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 17:04:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A425A2208A;
-	Wed, 13 Dec 2023 16:58:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B143A8C4;
+	Wed, 13 Dec 2023 17:04:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="L8pCNEkL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I4oNzTx9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF195AF
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 08:57:58 -0800 (PST)
-Received: by mail-ot1-x334.google.com with SMTP id 46e09a7af769-6d7fa93afe9so5292596a34.2
-        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 08:57:58 -0800 (PST)
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84F26F7;
+	Wed, 13 Dec 2023 09:04:23 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6ceb2501f1bso6099619b3a.0;
+        Wed, 13 Dec 2023 09:04:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1702486678; x=1703091478; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4djG6mlncQ5cDDuqSKlyJ4sw+dt1BUtqB30NNGpiggY=;
-        b=L8pCNEkLH0v//dVbgUDisZejvrWw+JfT+9DYbBXwZf16tof71zQcHox2eEMzuLeOwT
-         kVCPTe0UsztGFZxsjW2kXIfru1i+6D+Qfdaznz8YdDD8lteiC1FrzAfSTdwoa6CTEV1U
-         jnXq/i063bggWlJD8LbLfYXpznGZNar98FM7tVzlNmnD/aTUn/n4FpY+qU/Fb8hYpmz0
-         48VvhDGxIDfAfDFB31XJSvFmAl6GxJgkbJDFxeoubGz7AnpbvM1UKxd7SDJfPxDFwZy8
-         jvPBcVWN4xd9T/Usvj4ZskjiFIkC8ZqtJ+Sm5/KTcW6OFGbJGqkP5xukQbV7Ym6S51IZ
-         EYPg==
+        d=gmail.com; s=20230601; t=1702487063; x=1703091863; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=7l8BED4TeYhufhQEv3oEjWqt5UjqEKMjcFSRBI7uaiQ=;
+        b=I4oNzTx9Q3q4JtLCHptQgCdXzDlghn+2/XM1DbqxiaiuxCx61dCihCSOOxTmrf5LMy
+         0HSw1jGiS7cFxurHPHnB2W2GcLtHTPX40Dh8Knc3/+RYwJ+E/0KIsxZv9CaJJZEEFjgo
+         aW7qQ/F4TZVqqk3otYbD/LBy3hI00oVJ+1GJ2sSj8xPm8o6Xi1p6MPplu+9jBDUGZOcW
+         rTSd3BkRTV5SvnH+bqweLebWI2Jzcm4tYKi+CbcaTk8Jjw1x3/fprUUpeA34jJFE0JXp
+         wtdznIvFnkFv9qF7AiRwHdlWnceFa5n1bEuxd6ZidEBugaAErdLz1sfdU/Wsbxd2QS4T
+         DALA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702486678; x=1703091478;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1702487063; x=1703091863;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=4djG6mlncQ5cDDuqSKlyJ4sw+dt1BUtqB30NNGpiggY=;
-        b=PHC8GRzWebxqQ03MRAPh98goagBCPQHN75071aetAzieCX82guOiZXPbdLFL3+WQmZ
-         SF0dfbyExmfy6SGz79z3FQxIdZloJTgiukf9zdrDjbxqhVOKjlV4iuToa5CnxtqR/zSJ
-         PVMW2GlgGpVlRQB/bLbTg4aZQbuPHHXplE5KC/MXqH+mGXj8uxpZ70k9mLloO9OxO1oB
-         t+9w5XW52CKiqRP3hIjiyF9EQwvnM/+IU24XqnXrXhQSesHobmMCZ46DAkc6PfjL59xW
-         ZVSwqLE1toWT0kZEFUBJR0oWz9s+m+iWdyhuYXmPXZIFrX6yfWPxarq9uXEI/Tw1hI4t
-         zyAg==
-X-Gm-Message-State: AOJu0Yxpr7ISEszfxSxlFCSLzUBuQKfLTbEcTZAI1hz6Ts8HFzGl0jpb
-	aA41LuvF0UkSbgTE7pmAOJyXJ6Wt2tcu8PBImKU=
-X-Google-Smtp-Source: AGHT+IGP1tHhXrWJOVtZoqWkTDENBWm7ajF4FkNfxaQD96uZGtiMd9IvgQDk8dQ2gGkmlwQwCmGGHA==
-X-Received: by 2002:a05:6830:1051:b0:6d8:74f5:dc38 with SMTP id b17-20020a056830105100b006d874f5dc38mr6900722otp.9.1702486678226;
-        Wed, 13 Dec 2023 08:57:58 -0800 (PST)
-Received: from majuu.waya ([174.91.6.24])
-        by smtp.gmail.com with ESMTPSA id qt6-20020a05620a8a0600b0077d8622ee6csm4618017qkn.81.2023.12.13.08.57.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 08:57:57 -0800 (PST)
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com
-Cc: jiri@resnulli.us,
-	xiyou.wangcong@gmail.com,
-	netdev@vger.kernel.org,
-	pctammela@mojatatu.com,
-	victor@mojatatu.com,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Coverity Scan <scan-admin@coverity.com>
-Subject: [PATCH net 1/1] net_sched: sch_fq: Fix out of range band computation
-Date: Wed, 13 Dec 2023 11:57:41 -0500
-Message-Id: <20231213165741.93528-1-jhs@mojatatu.com>
-X-Mailer: git-send-email 2.34.1
+        bh=7l8BED4TeYhufhQEv3oEjWqt5UjqEKMjcFSRBI7uaiQ=;
+        b=dInNHtCDvzWlGl+2zlIN4O6qAeUnlDbhGR2rJ50Y1oTS/SQCy2SRpRB4rPBxJ/lKWU
+         ct6O8ae2Q+idgjDiE3WqYJYcl6AIdloImF2/ZzCsznVirnZpNyf28qOiQeNh5rjG9nun
+         cEnMIXoBBXUidzpfJ9jOv/vI/7mQQbeNPflCFZjI0w3Bz0yqUUl+0AR2JY94QznuYNnI
+         76Ur2VGHU9g9StAWg7MgpYcVrRgTmOoo9kblUoAE/auZLMc4SvuCm4E+eo3YOdFY0ohz
+         E7wbpBdgBPBM6pynyZtgupdzN19TmuuJe8b6Ku//mZaQHCtWjPsURyHb5okQ/WWfogth
+         KQJA==
+X-Gm-Message-State: AOJu0YzxuBFMpqSSW4JnrnEzaNeToudrnI4AzS67Nk7VFcfN2hPDg0WP
+	ObkG8stZWh86q6Rc8VGaV+D3xPfSIP33c7DgkxU=
+X-Google-Smtp-Source: AGHT+IFp4c85uxk8quZAy+Ix4OppQhiyiE9YhkmV5BCLrKP1VGXURaAkrg9sj6R3rQXF7Tt4KhDp3XXWCfV73XiLvVw=
+X-Received: by 2002:a62:b410:0:b0:6d0:d46f:8f8f with SMTP id
+ h16-20020a62b410000000b006d0d46f8f8fmr1095648pfn.2.1702487062910; Wed, 13 Dec
+ 2023 09:04:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231212221552.3622-1-donald.hunter@gmail.com>
+ <20231212221552.3622-10-donald.hunter@gmail.com> <ZXjuEUmXWRLMbj15@gmail.com>
+ <m21qbq780z.fsf@gmail.com> <20231213083931.2235ca18@kernel.org>
+In-Reply-To: <20231213083931.2235ca18@kernel.org>
+From: Donald Hunter <donald.hunter@gmail.com>
+Date: Wed, 13 Dec 2023 17:04:11 +0000
+Message-ID: <CAD4GDZztgSHGsYQkK3jZSrwgS1FKrGmGw7AnGe7vqz40zE9JFA@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 09/13] doc/netlink: Regenerate netlink .rst
+ files if ynl-gen-rst changes
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Breno Leitao <leitao@debian.org>, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, 
+	Jacob Keller <jacob.e.keller@intel.com>, donald.hunter@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-It is possible to compute a band of 3. Doing so will overrun array
-q->band_pkt_count[0-2] boundaries.
+On Wed, 13 Dec 2023 at 16:39, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Wed, 13 Dec 2023 09:42:52 +0000 Donald Hunter wrote:
+> > Sure, the transitive dependency is sufficient. I tend to add an explicit
+> > dependency for a script that gets run in a target.
+> >
+> > Happy to remove that change and respin if you prefer?
+>
+> I can drop patch 9 when applying if that's what you mean.
+> No need to repost the sub-message support.
 
-Fixes: 29f834aa326e ("net_sched: sch_fq: add 3 bands and WRR scheduling")
-Reported-by: Coverity Scan <scan-admin@coverity.com>
-Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
----
- net/sched/sch_fq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+No, it's one line of patch 9 that needs to be dropped.
 
-diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-index 3a31c47fea9b..217c430343df 100644
---- a/net/sched/sch_fq.c
-+++ b/net/sched/sch_fq.c
-@@ -159,7 +159,7 @@ struct fq_sched_data {
- /* return the i-th 2-bit value ("crumb") */
- static u8 fq_prio2band(const u8 *prio2band, unsigned int prio)
- {
--	return (prio2band[prio / 4] >> (2 * (prio & 0x3))) & 0x3;
-+	return (prio2band[prio / 4] >> (2 * (prio & 0x3))) % 0x3;
- }
- 
- /*
--- 
-2.34.1
+> +$(YNL_INDEX): $(YNL_RST_FILES) $(YNL_TOOL)
 
+The other three lines should remain.
+
+I'll respin if you prefer.
 
