@@ -1,116 +1,287 @@
-Return-Path: <netdev+bounces-56782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB8C3810D86
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 10:40:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E910810D89
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 10:41:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB32A1F2118C
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:40:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7AA33B20BB8
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:41:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA3F200A6;
-	Wed, 13 Dec 2023 09:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="GqnpU/Q+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 981B31F95A;
+	Wed, 13 Dec 2023 09:41:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77EB9DB
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 01:40:52 -0800 (PST)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BD890E4022491;
-	Wed, 13 Dec 2023 01:40:47 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=pfpt0220; bh=3VUczU3I
-	URqTdQDmSHPuPawXedgJ2zeBgDTVT+OqdOo=; b=GqnpU/Q+8XaCl5q28ivu6vSg
-	BdbJy2MJN1/etY+Dyr4jK3UvuNWCwuwm76vpgC0f4Ssh0t2NgR0cVz0ZPCFiYKa7
-	7sO++ArzWMPYd2cAdw8+MxAHpCBzznPqChTWgYDhmHwlcYgdIo4C+aIkgGaAR7UP
-	OZdoLMj3CbwpRpbWGFqrlWjEdsXmgJ5xDfHS/MGEsSUUAbvgCeUVBxwUbPGFkv/G
-	ieHW4grD0R48j7XOg6qbQ1jADnOJFQ0ExAKfhHh0FZVOiumWRRP1Gc3c2SWCpikA
-	3n0hOpMbybH1tpjLEixa+CMcQZCxPMdnMkbbxlBKghaFOp14k6SNzHE+krnm3w==
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3uvrmjw7ah-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Wed, 13 Dec 2023 01:40:47 -0800 (PST)
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 13 Dec
- 2023 01:40:45 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Wed, 13 Dec 2023 01:40:45 -0800
-Received: from EL-LT0043.marvell.com (unknown [10.193.38.189])
-	by maili.marvell.com (Postfix) with ESMTP id 7EDCE3F70A6;
-	Wed, 13 Dec 2023 01:40:44 -0800 (PST)
-From: Igor Russkikh <irusskikh@marvell.com>
-To: <netdev@vger.kernel.org>
-CC: "David S . Miller" <davem@davemloft.net>,
-        Jakub Kicinski
-	<kuba@kernel.org>,
-        Igor Russkikh <irusskikh@marvell.com>,
-        Linus Torvalds
-	<torvalds@linux-foundation.org>
-Subject: [PATCH] net: atlantic: fix double free in ring reinit logic
-Date: Wed, 13 Dec 2023 10:40:44 +0100
-Message-ID: <20231213094044.22988-1-irusskikh@marvell.com>
-X-Mailer: git-send-email 2.25.1
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6537F2
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 01:41:25 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VyQdt2f_1702460482;
+Received: from 30.221.129.237(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VyQdt2f_1702460482)
+          by smtp.aliyun-inc.com;
+          Wed, 13 Dec 2023 17:41:23 +0800
+Message-ID: <308362d1-0dd2-2253-ced2-6defe1a7857e@linux.alibaba.com>
+Date: Wed, 13 Dec 2023 17:41:19 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [question] smc: how to enable SMC_LO feature
+To: shaozhengchao <shaozhengchao@huawei.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ yuehaibing <yuehaibing@huawei.com>, "Libin (Huawei)"
+ <huawei.libin@huawei.com>, Dust Li <dust.li@linux.alibaba.com>,
+ tonylu_linux <tonylu@linux.alibaba.com>, "D. Wythe"
+ <alibuda@linux.alibaba.com>
+References: <8ac15e20beb54acfae1a35d1603c1827@huawei.com>
+ <ad29f704-ae79-4c4b-2227-d0fa9a1ceee2@linux.alibaba.com>
+ <a6b4b010-ffca-50ea-1296-3e01eacb4f53@huawei.com>
+ <9eb58434-922e-c9e4-6a38-4c29ba0e88f6@huawei.com>
+ <2d138d78-1ebb-92b0-c6c5-9e43b5ee941b@linux.alibaba.com>
+ <488311be-5673-552c-d932-26f87e863777@huawei.com>
+ <c7b3f24e-6f25-08a5-bbe4-a32dc3d31adf@huawei.com>
+ <1fbd6b74-1080-923a-01c1-689c3d65f880@huawei.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <1fbd6b74-1080-923a-01c1-689c3d65f880@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: 7PHwqBVfAN04p36QOcB0qunobAhdzt5N
-X-Proofpoint-ORIG-GUID: 7PHwqBVfAN04p36QOcB0qunobAhdzt5N
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
 
-Driver has a logic leak in ring data allocation/free,
-where double free may happen in aq_ring_free if system is under
-stress and driver init/deinit is happening.
 
-The probability is higher to get this during suspend/resume cycle.
 
-Verification was done simulating same conditions with
+On 2023/12/13 17:00, shaozhengchao wrote:
+> 
+> 
+> On 2023/12/5 14:45, shaozhengchao wrote:
+>>
+>>
+>> On 2023/12/4 12:06, shaozhengchao wrote:
+>>>
+>>>
+>>> On 2023/12/4 11:52, Wen Gu wrote:
+>>>>
+>>>> On 2023/12/4 11:22, shaozhengchao wrote:
+>>>>>
+>>>>>
+>>>>> On 2023/11/23 14:15, shaozhengchao wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 2023/11/23 10:21, Wen Gu wrote:
+>>>>>>>
+>>>>>>>
+>>>>>>> On 2023/11/21 20:14, shaozhengchao wrote:
+>>>>>>>> Hi Wen Gu:
+>>>>>>>> Currently, I am interested in the SMC_LOOPBACK feature proposed
+>>>>>>>> by you. Therefore, I use your patchset[1] to test the SMC_LO feature on
+>>>>>>>> my x86_64 environment and kernel is based on linux-next, commit: 5ba73bec5e7b.
+>>>>>>>> The test result shows that the smc_lo feature cannot be enabled. Here's
+>>>>>>>> my analysis:
+>>>>>>>>
+>>>>>>>> 1. Run the following command to perform the test, and then capture
+>>>>>>>> packets on the lo device.
+>>>>>>>> - serv:  smc_run taskset -c <cpu> sockperf sr --tcp
+>>>>>>>> - clnt:  smc_run taskset -c <cpu> sockperf  tp --tcp --msg-size=64000 -i 127.0.0.1 -t 30
+>>>>>>>>
+>>>>>>>> 2. Use Wireshark to open packets. It is found that the VCE port replies with
+>>>>>>>> SMC-R-Deline packets.
+>>>>>>>> [cid:image001.png@01DA1CB4.F1052C30]
+>>>>>>>>
+>>>>>>>> 3. Rx
+>>>>>>>> When smc_listen_work invokes smc_listen_v2_check, the VCE port returns
+>>>>>>>> a Decline packet because eid_cnt and flag.seid in the received packet are both 0.
+>>>>>>>>
+>>>>>>>> 4. Tx
+>>>>>>>> In smc_clc_send_proposal,
+>>>>>>>> v2_ext->hdr.eid_cnt = smc_clc_eid_table.ueid_cnt;
+>>>>>>>> v2_ext->hdr.flag.seid = smc_clc_eid_table.seid_enabled;
+>>>>>>>>
+>>>>>>>> When smc_clc_init, ueid_cnt=0, and in the x86_64 environment, seid_enabled is
+>>>>>>>> always equal to 0.
+>>>>>>>>
+>>>>>>>> So, I must call smc_clc_ueid_add function to increase ueid count?
+>>>>>>>> But I don't see where operations can be added, may I missed something?
+>>>>>>>>
+>>>>>>>
+>>>>>>> Hi Zhengchao Shao,
+>>>>>>>
+>>>>>>> Yes. When using SMC-D in non-s390 architecture (like x86 here), A common
+>>>>>>> UEID should be set. It can be set by following steps:
+>>>>>>>
+>>>>>>> - Install smc-tools[1].
+>>>>>>>
+>>>>>>> - Run # smcd ueid add <ueid> in loopback test environment.
+>>>>>>>
+>>>>>>>    EID works as an ID to indicate the max communication space of SMC. When SEID is
+>>>>>>>    unavailable, an UEID is required.
+>>>>>>>
+>>>>>> Hi Wen Gu:
+>>>>>>      Thank you for your reply. This is very useful for me. And I will
+>>>>>> be happy to learn from it.
+>>>>>>
+>>>>>> Thanks
+>>>>>>
+>>>>>> Zhengchao Shao
+>>>>>>> - Then run the test.
+>>>>>>>
+>>>>>>> Hope this works for you :)
+>>>>>>>
+>>>>>>> [1] https://github.com/ibm-s390-linux/smc-tools
+>>>>>>>
+>>>>>>> Regards,
+>>>>>>> Wen Gu
+>>>>>>>
+>>>>>>>> Could you give me some advice? Thanks very much.
+>>>>>>>>
+>>>>>>>> Zhengchao Shao
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> [1]link: 
+>>>>>>>> https://patchwork.kernel.org/project/netdevbpf/cover/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
+>>>>>>>>
+>>>>>>>
+>>>>>>
+>>>>>>
+>>>>> Hi Wen Gu:
+>>>>>      I have test as following, but the performance is really
+>>>>> degraded. Now I have no idea.
+>>>>> 1. add ueid
+>>>>> run: smcd ueid add 16
+>>>>> kernel message:
+>>>>> [ 5252.009133] NET: Registered PF_SMC protocol family
+>>>>> [ 5252.009233] smc: adding smcd device smc_lo with pnetid
+>>>>> 2. start server
+>>>>> smc_run taskset -c 1 sockperf sr --tcp
+>>>>> 3. start client
+>>>>> smc_run taskset -c 3 sockperf tp  --tcp --msg-size=64000 -i 127.0.0.1 -t 30
+>>>>>
+>>>>> The test results are as follows:
+>>>>>                TCP                  SMC-lo
+>>>>> Bandwidth(MBps)         1890.56               1300.41(-31.22%)
+>>>>>
+>>>>> I didn't find a better direction when I initially positioned it. No
+>>>>> error is recorded in the kernel log, and the smcd statistics are normal.
+>>>>> [root@localhost smc-tools]# smcd stats
+>>>>> SMC-D Connections Summary
+>>>>>    Total connections handled             2
+>>>>>    SMC connections                       2
+>>>>>    Handshake errors                      0
+>>>>>    Avg requests per SMC conn       1277462.0
+>>>>>    TCP fallback                          0
+>>>>>
+>>>>> RX Stats
+>>>>>    Data transmitted (Bytes)    40907328000 (40.91G)
+>>>>>    Total requests                  1277190
+>>>>>    Buffer full                          45 (0.00%)
+>>>>>              8KB    16KB    32KB    64KB   128KB   256KB   512KB >512KB
+>>>>>    Bufs        0       0       0       2       0       0 0       0
+>>>>>    Reqs   638.0K       0       0  639.2K       0       0 0       0
+>>>>>
+>>>>> TX Stats
+>>>>>    Data transmitted (Bytes)    40907328000 (40.91G)
+>>>>>    Total requests                  1277734
+>>>>>    Buffer full                      638239 (49.95%)
+>>>>>    Buffer full (remote)                  0 (0.00%)
+>>>>>    Buffer too small                      0 (0.00%)
+>>>>>    Buffer too small (remote)             0 (0.00%)
+>>>>>              8KB    16KB    32KB    64KB   128KB   256KB   512KB >512KB
+>>>>>    Bufs        0       0       0       0       0       0 0       0
+>>>>>    Reqs        0       0       0  1.278M       0       0 0       0
+>>>>>
+>>>>> Extras
+>>>>>    Special socket calls                  1
+>>>>>
+>>>>> I captured the perf information and found that the percentage of
+>>>>> rep_movs_alternative and _raw_spin_unlock_irqrestore functions was high
+>>>>> during tx and rx.
+>>>>> 36.12%  [kernel]         [k]rep_movs_alternative
+>>>>> 14.23%  [kernel]         [k]_raw_spin_unlock_irqrestore
+>>>>>
+>>>>> I've attached the flame map. Could you help analyze it? What I missed?
+>>>>> Thanks.
+>>>>
+>>>> Hi Zhengchao Shao,
+>>>>
+>>>> Since sndbuf and RMB in SMC are pre-alloced ringbuf and won't grow dynamically
+>>>> like TCP, it is necessary to appropriately increase the default value of smc
+>>>> sk_sndbuf and sk_rcvbuf before testing throughput.
+>>>>
+>>>> Set this and try again:
+>>>>
+>>>> # sysctl -w net.smc.wmem=1048576
+>>>> # sysctl -w net.smc.rmem=1048576
+>>>>
+>>>> (The initial value of wmem and rmem are 64K)
+>>>>
+>>>> Regards,
+>>>> Wen Gu
+>>>>
+>>>>>
+>>>>> Zhengchao Shao
+>>> Hi Wen Gu:
+>>>      It solves the issue. Thank you very much.
+>>>
+>>> Zhengchao Shao
+>>>
+>> Hi Wen Gu:
+>>    I've tested all the performance test items in the patchset. The
+>> performance improvement is to be expected, except for nignx.
+>> My VM is configured with 48 cores and 32 GB memory. Therefore, run
+>> the following command:
+>> <smc_run> nignx
+>> <smc_run>./wrk -t 96 -c 1000 -d 30 http://127.0.0.1:80
+>>
+>> The test results are as follows:
+>>                          TCP                         SMC_lo
+>> Requests/s           309425.42               135547.25(-56.19%)
+>> The performance decreases by 56.19%.
+>>
+>> I capture packets and find that wrk can perform HTTP GET after each
+>> connect when smc_loopback is disabled.
+>> However, when smc_loopback is enabled, there is no HTTP GET behavior.
+>> I wonder if there is some compatibility problem with the SMC protocol when encapsulate packet? Could you give me some 
+>> advice?
+>> In the attachment, I captured some of the packets.
+>> nosmc_nginx.pcap is for SMC disabled and smc_nginx.pcap is for SMC
+>> enabled.
+>> Thank you very much.
+>>
+>> Zhengchao Shao
+>>
+>>
+>>
+> Hi Wen Gu:
+>      When the VM is configured with 8 cores and 16 GB memory, run
+> the following command:
+> <smc_run> nignx
+> <smc_run>./wrk -t 8 -c 1000 -d 30 http://127.0.0.1:80
+> the test data is as follows:
+>           TCP          SMC_lo
+> Requests/s  66056.66    94526.66(43.10%)
+> 
+> But When the VM is configured with 48 cores and 32 GB memory, run
+> the following command:
+> <smc_run> nignx
+> <smc_run>./wrk -t 96 -c 1000 -d 30 http://127.0.0.1:80
+> the test data is as follows:
+>           TCP          SMC_lo
+> Requests/s  309425.42     135547.25(-56.19%)
+> 
+> It seems that in the scenario with a large number of CPU cores,
+> performance is not optimized, but performance deteriorates. What I
+> missed?
+> Thank you.
+> 
+> Zhengchao Shao
 
-    stress -m 2000 --vm-bytes 20M --vm-hang 10 --backoff 1000
-    while true; do sudo ifconfig enp1s0 down; sudo ifconfig enp1s0 up; done
 
-Fixed by explicitly clearing pointers to NULL on deallocation
+Hi Zhengchao Shao,
 
-Fixes: 018423e90bee ("net: ethernet: aquantia: Add ring support code")
-Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
-Closes: https://lore.kernel.org/netdev/CAHk-=wiZZi7FcvqVSUirHBjx0bBUZ4dFrMDVLc3+3HCrtq0rBA@mail.gmail.com/
-Signed-off-by: Igor Russkikh <irusskikh@marvell.com>
----
- drivers/net/ethernet/aquantia/atlantic/aq_ring.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Somehow I missed your email on 12/05. I will try to reproduce this
+issue in my test environment and let you know if I find anything.
 
-diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ring.c b/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
-index 4de22eed099a..472c7c08bfed 100644
---- a/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
-+++ b/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
-@@ -932,11 +932,14 @@ void aq_ring_free(struct aq_ring_s *self)
- 		return;
- 
- 	kfree(self->buff_ring);
-+	self->buff_ring = NULL;
- 
--	if (self->dx_ring)
-+	if (self->dx_ring) {
- 		dma_free_coherent(aq_nic_get_dev(self->aq_nic),
- 				  self->size * self->dx_size, self->dx_ring,
- 				  self->dx_ring_pa);
-+		self->dx_ring = NULL;
-+	}
- }
- 
- unsigned int aq_ring_fill_stats_data(struct aq_ring_s *self, u64 *data)
--- 
-2.25.1
-
+Best Regards,
+Wen Gu
 
