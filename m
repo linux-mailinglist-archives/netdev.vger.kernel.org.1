@@ -1,214 +1,150 @@
-Return-Path: <netdev+bounces-57090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54C0981216B
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 23:28:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37AFF8121DB
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 23:43:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04B992827A9
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 22:28:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D697E1F219E5
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 22:43:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD41A81834;
-	Wed, 13 Dec 2023 22:27:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B386D81834;
+	Wed, 13 Dec 2023 22:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="CV6RDYag"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NxIZgcVb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A84491
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 14:27:56 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-28a5d0ebf1fso28238a91.0
-        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 14:27:56 -0800 (PST)
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F4F21735;
+	Wed, 13 Dec 2023 14:42:01 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-3363653e180so1822123f8f.0;
+        Wed, 13 Dec 2023 14:42:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1702506475; x=1703111275; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=iOLSB4d2eUew+8wfbH+tCKAZ+lf2yLoPsmG8Grblrxg=;
-        b=CV6RDYag9/+/zIluPP3PAWNiPLFwdreFLiI3v5DbK2UQ99YLKuhrqomdcF1SlI2MUj
-         5WmaQb3dftps707QlyKtHu40rX6wU9WbCsCJqG6TCtdnS5NCj6BxP6S8ligtdNaBmeRT
-         8Ouo8jG7kjfNrwY1wxRxFaT6mKjxybWR8eIoY=
+        d=gmail.com; s=20230601; t=1702507317; x=1703112117; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sGGuSPtvQjmJveVx9q+4NS7dvTSHaVo6X8DWdsSuIuo=;
+        b=NxIZgcVbuxZ1jGSlWweTMwDpXdfZOIrlyZcXpi1Orem2bN+nZz1A5LyULtkVrO5U4r
+         LMkpygFjRd/YiU9VxsTL8ksTtYHZtwBzQWzR8RZ94TxiRVKmzT/OWJICQIBizJ0IjTm0
+         Rsy85oYCnPWvaocT7dJEnRIeMthsb1sD1V2fhnXVgjj4LJrcuXfi5c2tBCbHhh84ZzdK
+         TUJJ340gPalHw2BnTGkKpQsDWnaD4gKYVHGgPbRjQUGUhucNbKnLrZunQKm1gJFI6zG8
+         TX0htCfFjzCMr6izaLvjF13C9dfPVwLltiamQLKNVLyYcUKTM3DPiM5LiNcDPGkNCcfx
+         wHjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702506475; x=1703111275;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iOLSB4d2eUew+8wfbH+tCKAZ+lf2yLoPsmG8Grblrxg=;
-        b=K8xXEwiMl4PQbMFAPYz6Wjg+l8mYxCkhb1bZWdIMt/CulvENN+e8150MFZ4lMRAp3j
-         /KVHx9+MCCG/ws8nuyJ8PKToPpCOPVBbinP+IvBPHNR0huJ7XGpF4pZLCXMJM2nBgLfn
-         Qe0AixhDjT0G/Z20YfpMVffoSyCJUALLqlNfvDLSFLGSwzfOPqYjjNDLVty7211qics0
-         tBdsF+BJwDXQE+Mf7yELiH55J0VlV1xFk1fI+5lqDo8ommkrdakY8JI4RsJPmwwsNZoC
-         SCWOo/PNtztlC6IegEenlcREOvITNcklxwv3uvWQON5srUW9Ga9XGyfQt7ST1Gek9mw/
-         sPew==
-X-Gm-Message-State: AOJu0YzoCkpI55vcYQoMncYMhxlZ6pk3gI5sQpIo7g63Y4WTLhhmtZ4b
-	q3gYHljDKLf6LV/GvZicn4582VGxUUCghGJb2zMEJkDqGjnnbkma4k4G3XX5xAjj/bfwLaRKzmp
-	AEakJDXeanrYlQM20HwGa+KVaD3dSa1VzF/L+0i2RysJA+dtIHX5u1Nw0xzQoi3+1TOpFA0id95
-	KHTF8xNg==
-X-Google-Smtp-Source: AGHT+IGLNz8wLTY4PXp+C23aDTr5gX7eNlU9NFOHbTBTgdL/K1IFu7wXBCAY9UVxTAEV7J5pluIacQ==
-X-Received: by 2002:a17:90a:c695:b0:28a:e68c:b268 with SMTP id n21-20020a17090ac69500b0028ae68cb268mr2058621pjt.46.1702506475331;
-        Wed, 13 Dec 2023 14:27:55 -0800 (PST)
-Received: from stbirv-lnx-1.igp.broadcom.net ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id nc4-20020a17090b37c400b00285545ac9d2sm11432515pjb.47.2023.12.13.14.27.52
+        d=1e100.net; s=20230601; t=1702507317; x=1703112117;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sGGuSPtvQjmJveVx9q+4NS7dvTSHaVo6X8DWdsSuIuo=;
+        b=GNydcbGcszldcuiLGgtKArOv8qU69+ChUYpWD87+KVJehjqNmOULU2v8PAGTBfAJMK
+         OQOL1nEL1oeJKXuoqayycEcwlHQfhNicXbighkMuY+blwYQFYp1Fw2IS+DXHM8p/ZDxo
+         3cIFGpCG6nm/lJguxBJfXg3huVU4yq9kGKhGOx4ewfmbG0YgafwAhXeaXgfT4IljTgmz
+         KggBom4nsuM6YyhF5JKGsS00eg9FJi/Q0l/YBjngt4EvET3oxNZ2qmpgSherWgkZkrTV
+         U938+X1msYlPCGwFivOMaXhZFFVt7UAqtX30evZhcwwWraKExMxHjE6jYPJU3caym+jU
+         H3eg==
+X-Gm-Message-State: AOJu0YzuezRz3xZmoA/eXD9iw0QlnajLlnce2EDh1gpJp6KfZZ84aX2e
+	klixSwnjj9yWsDPc1ZHrRzVmr+sDDsgJfA==
+X-Google-Smtp-Source: AGHT+IFH3EDPsVtChMY1I5Qt1I1seuhGUZL4LbRrbu9J0MUJuCx4+FvDWhJ9VtrZCuC7w8Cg5BmhlA==
+X-Received: by 2002:a5d:610f:0:b0:336:41da:92da with SMTP id v15-20020a5d610f000000b0033641da92damr659927wrt.40.1702507316938;
+        Wed, 13 Dec 2023 14:41:56 -0800 (PST)
+Received: from imac.fritz.box ([2a02:8010:60a0:0:7840:ddbd:bbf:1e8f])
+        by smtp.gmail.com with ESMTPSA id c12-20020a5d4f0c000000b00336442b3e80sm998562wru.78.2023.12.13.14.41.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 14:27:54 -0800 (PST)
-From: Justin Chen <justin.chen@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: opendmb@gmail.com,
-	florian.fainelli@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Justin Chen <justin.chen@broadcom.com>
-Subject: [PATCH net v2 2/2] net: mdio: mdio-bcm-unimac: Use read_poll_timeout
-Date: Wed, 13 Dec 2023 14:27:44 -0800
-Message-Id: <20231213222744.2891184-3-justin.chen@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231213222744.2891184-1-justin.chen@broadcom.com>
-References: <20231213222744.2891184-1-justin.chen@broadcom.com>
+        Wed, 13 Dec 2023 14:41:55 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Breno Leitao <leitao@debian.org>
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v4 00/13] tools/net/ynl: Add 'sub-message' support to ynl
+Date: Wed, 13 Dec 2023 22:41:33 +0000
+Message-ID: <20231213224146.94560-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000b8a61b060c6badfc"
-
---000000000000b8a61b060c6badfc
 Content-Transfer-Encoding: 8bit
 
-Simplify the code by using read_poll_timeout().
+This patchset adds a 'sub-message' attribute type to the netlink-raw
+schema and implements it in ynl. This provides support for kind-specific
+options attributes as used in rt_link and tc raw netlink families.
 
-Signed-off-by: Justin Chen <justin.chen@broadcom.com>
----
- drivers/net/mdio/mdio-bcm-unimac.c | 17 +++--------------
- 1 file changed, 3 insertions(+), 14 deletions(-)
+A description of the new 'sub-message' attribute type and the
+corresponding sub-message definitions is provided in patch 3.
 
-diff --git a/drivers/net/mdio/mdio-bcm-unimac.c b/drivers/net/mdio/mdio-bcm-unimac.c
-index 297ea4a58d79..68f8ee0ec8ba 100644
---- a/drivers/net/mdio/mdio-bcm-unimac.c
-+++ b/drivers/net/mdio/mdio-bcm-unimac.c
-@@ -73,15 +73,10 @@ static inline void unimac_mdio_start(struct unimac_mdio_priv *priv)
- 	unimac_mdio_writel(priv, reg, MDIO_CMD);
- }
- 
--static inline unsigned int unimac_mdio_busy(struct unimac_mdio_priv *priv)
--{
--	return unimac_mdio_readl(priv, MDIO_CMD) & MDIO_START_BUSY;
--}
--
- static int unimac_mdio_poll(void *wait_func_data)
- {
- 	struct unimac_mdio_priv *priv = wait_func_data;
--	unsigned int timeout = 100;
-+	u32 val;
- 
- 	/*
- 	 * C22 transactions should take ~25 usec, will need to adjust
-@@ -89,14 +84,8 @@ static int unimac_mdio_poll(void *wait_func_data)
- 	 */
- 	udelay(30);
- 
--	do {
--		if (!unimac_mdio_busy(priv))
--			return 0;
--
--		usleep_range(1000, 2000);
--	} while (--timeout);
--
--	return -ETIMEDOUT;
-+	return read_poll_timeout(unimac_mdio_readl, val, !(val & MDIO_START_BUSY),
-+				 2000, 100000, false, priv, MDIO_CMD);
- }
- 
- static int unimac_mdio_read(struct mii_bus *bus, int phy_id, int reg)
+The patchset includes updates to the rt_link spec and a new tc spec that
+make use of the new 'sub-message' attribute type.
+
+As mentioned in patch 4, encode support is not yet implemented in ynl
+and support for sub-message selectors at a different nest level from the
+key attribute is not yet supported. I plan to work on these in folloup
+patches.
+
+Patches 1 is code cleanup in ynl
+Patches 2-4 add sub-message support to the schema and ynl with
+documentation updates.
+Patch 5 adds binary and pad support to structs in netlink-raw.
+Patches 6-8 contain specs that use the sub-message attribute type.
+Patches 9-13 update ynl-gen-rst and its make target
+
+Changes since v3: (reported by Breno Leitao)
+ - Remove an unnecessary make dependency from the YNL_INDEX target.
+
+Changes since v2: (reported by Jakub Kicinski and Breno Leitao)
+ - Fixed ynl-gen-c breakage
+ - Added schema constraint for pad/binary & len
+ - Improved description text in raw schema
+ - Used | for all multi-line text in schema
+ - Updated docs with explanation of what a sub-message is
+ - Reverted change in ynl-gen-rst
+ - Added ynl-gen-rst patches and grouped them all at end of patchset
+
+Changes since v1: (reported by Jakub Kicinski, thanks!)
+ - Added cleanups for ynl and generated netlink docs
+ - Describe sub-messages in netlink docs
+ - Cleaned up unintended indent changes
+ - Cleaned up rt-link sub-message definitions
+ - Cleaned up array index expressions to follow python style
+ - Added sub-messages to generated netlink spec docs
+
+Donald Hunter (13):
+  tools/net/ynl: Use consistent array index expression formatting
+  doc/netlink: Add sub-message support to netlink-raw
+  doc/netlink: Document the sub-message format for netlink-raw
+  tools/net/ynl: Add 'sub-message' attribute decoding to ynl
+  tools/net/ynl: Add binary and pad support to structs for tc
+  doc/netlink/specs: Add sub-message type to rt_link family
+  doc/netlink/specs: use pad in structs in rt_link
+  doc/netlink/specs: Add a spec for tc
+  doc/netlink: Regenerate netlink .rst files if ynl-gen-rst changes
+  tools/net/ynl-gen-rst: Add sub-messages to generated docs
+  tools/net/ynl-gen-rst: Sort the index of generated netlink specs
+  tools/net/ynl-gen-rst: Remove bold from attribute-set headings
+  tools/net/ynl-gen-rst: Remove extra indentation from generated docs
+
+ Documentation/Makefile                        |    6 +-
+ Documentation/netlink/netlink-raw.yaml        |   65 +-
+ Documentation/netlink/specs/rt_link.yaml      |  449 +++-
+ Documentation/netlink/specs/tc.yaml           | 2037 +++++++++++++++++
+ .../userspace-api/netlink/netlink-raw.rst     |   96 +-
+ tools/net/ynl/lib/nlspec.py                   |   55 +
+ tools/net/ynl/lib/ynl.py                      |   94 +-
+ tools/net/ynl/ynl-gen-rst.py                  |   31 +-
+ 8 files changed, 2788 insertions(+), 45 deletions(-)
+ create mode 100644 Documentation/netlink/specs/tc.yaml
+
 -- 
-2.34.1
+2.42.0
 
-
---000000000000b8a61b060c6badfc
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-NhTY3E+cXCB11wty89QStajwXdhGJTYEvUgvsq1h8CwJj9w/38ldAQf5WjhPmApYeJR2ewFrBMCM
-4lHkdRJ6TDc9nXoEkypUfjJkJHe7Eal06tosh6JpAgMBAAGjggHZMIIB1TAOBgNVHQ8BAf8EBAMC
-BaAwgaMGCCsGAQUFBwEBBIGWMIGTME4GCCsGAQUFBzAChkJodHRwOi8vc2VjdXJlLmdsb2JhbHNp
-Z24uY29tL2NhY2VydC9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcnQwQQYIKwYBBQUHMAGG
-NWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwME0G
-A1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxz
-aWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEkGA1UdHwRCMEAwPqA8oDqGOGh0dHA6Ly9j
-cmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3JsMCMGA1UdEQQc
-MBqBGGp1c3Rpbi5jaGVuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSME
-GDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUIWGeYuaTsnIada5Xx8TR3cheUbgw
-DQYJKoZIhvcNAQELBQADggEBAHNQlMqQOFYPYFO71A+8t+qWMmtOdd2iGswSOvpSZ/pmGlfw8ZvY
-dRTkl27m37la84AxRkiVMes14JyOZJoMh/g7fbgPlU14eBc6WQWkIA6AmNkduFWTr1pRezkjpeo6
-xVmdBLM4VY1TFDYj7S8H2adPuypd62uHMY/MZi+BIUys4uAFA+N3NuUBNjcVZXYPplYxxKEuIFq6
-sDL+OV16G+F9CkNMN3txsym8Nnx5WAYZb6+rBUIhMGz70V05xsHQfzvo2s7f0J1tJ5BoRlPPhL0h
-VOnWA3h71u9TfSsv+PXVm3P21TfOS2uc1hbzEqyENCP4i5XQ0rv0TmPW42GZ0o4xggJtMIICaQIB
-ATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhH
-bG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwj8BKLXNpALfemdRAwDQYJ
-YIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILJmMQ07B3bynPd7Qnn4OkxSxj2o/jWtYDOZ
-tWYqvTSEMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIxMzIy
-Mjc1NVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFl
-AwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATAN
-BgkqhkiG9w0BAQEFAASCAQALDmZ3e/FOI3B64iA3vNkuR2LUGGFSgvw9JYqDRqXyDMYqeL5W2tuK
-6F+Fmtcymw91oKeDvJPytlaIjG6VyPma1sPlpJTkoKQKmQRHY5bK6cwcFy/1awm9NkcpRprLcRRj
-WkJtkuX9jj4pRwG1qIOG2636Is0oT2mMRgYQi+BrKnAqtO7jHbh6ZwBt3163AHctUIkGFO1j6joL
-YaNd2zbXEIjmik0rPA7m9cW/vjBLDBS9Le+kCaMHwK3JdeZs7f/X8bkSuhftMXnZXN3z3HPcsExb
-cK2lHY90Zp2//uFtTtlw/yzA1Dy9zu3TBFt6aq5TlYm7PiolM+jkildnIVf1
---000000000000b8a61b060c6badfc--
 
