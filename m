@@ -1,150 +1,212 @@
-Return-Path: <netdev+bounces-57070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BACE812012
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 21:34:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A590B812026
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 21:44:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37E2A1F217F4
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 20:34:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D83861C20E91
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 20:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3232254664;
-	Wed, 13 Dec 2023 20:34:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21E027E55C;
+	Wed, 13 Dec 2023 20:44:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OWh8Js1x"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jWg18e/6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50160A3;
-	Wed, 13 Dec 2023 12:34:23 -0800 (PST)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-40c2db2ee28so78496095e9.2;
-        Wed, 13 Dec 2023 12:34:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702499662; x=1703104462; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=cZt635Sksiv/B4iHuCAGDrtYdVX5NK3B45SifYW+RSU=;
-        b=OWh8Js1xctM3ckMsJHHyFs0jlPyhA8QjlMva5OrfX85eBUX82KzXpO5rNnuIe+9mNu
-         of696V1JOxPideUF6o8d65jMyn9CePllnMyewjBkqCGqMDV+dm79XBrFuKJqGkXVB8CW
-         MXamE4c4XjPYuwME7+SUYmNw3xbfoUSsYTMTHnpvlTYvo4XQsDTynnoZgHI82lKRpjbo
-         y3zzTQ7nOPVcY+AA49tOHFlv5MgOm3x/+BLaLXNnt8bZElxMH+0jROitH1OYYQBYxPSJ
-         umLhAzq34MmR1nxWUk0GiDkjMqE1yDqOXmu6G2WwyjorhNBB8W01NAbukiYcJrocucNe
-         TA/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702499662; x=1703104462;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cZt635Sksiv/B4iHuCAGDrtYdVX5NK3B45SifYW+RSU=;
-        b=rXs9uw3bwX0K5adMfRg+PBml8ujDrmwnmdezYXGDFQlmFBMP8gngPvzyYnqQPbMTiH
-         ogGmALb9aI/6B3fyyz7xCkEirWcq2w0eshhjVjuECmFo3CBzCTFgtchMHCCQJyUwVgey
-         y3qtSVLQZpovfleJ9I9oNFoQvF77a5/dFeWvbSUz7mEigRUDCA90yJMv+pNSsDg8Z7yW
-         JJkaXG7xhVDJ3gCI+p+sMCJA/p5cndYIq2iJM/0prg3b4iQiL8sl0v1nu8mwQrIrgVXj
-         ezfcFGivvFbP6Fhbl2HyDWpAXbMmcxXgI0g0kz1Vr+y24oig06HT0lZgiJc86K9jAIIj
-         ZjFQ==
-X-Gm-Message-State: AOJu0Yw7+PgoGJBQriM8B9mQ7ixZELq7jPSwMB61dvdRtcB8qXlUNg8X
-	E0Qx4oE/V6KQ9LRrQ16jYDk=
-X-Google-Smtp-Source: AGHT+IHaGfR3RX18f4847KxfzLmuAMM3GtfUiiNka5Gh/lb8lUiXGzuZv2vlnb/OD61S/h1+spe0MQ==
-X-Received: by 2002:a05:600c:3ca5:b0:40c:4b42:a1fd with SMTP id bg37-20020a05600c3ca500b0040c4b42a1fdmr2426945wmb.34.1702499661392;
-        Wed, 13 Dec 2023 12:34:21 -0800 (PST)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id jb4-20020a05600c54e400b0040c5cf930e6sm3184972wmb.19.2023.12.13.12.34.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 12:34:21 -0800 (PST)
-Message-ID: <657a154d.050a0220.c9399.b619@mx.google.com>
-X-Google-Original-Message-ID: <ZXoVSkfZ_1G_zKUg@Ansuel-xps.>
-Date: Wed, 13 Dec 2023 21:34:18 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	Kees Cook <keescook@chromium.org>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH 2/2] net: phy: leds: use new define for link
- speed modes number
-References: <20231213181554.4741-1-ansuelsmth@gmail.com>
- <20231213181554.4741-3-ansuelsmth@gmail.com>
- <ZXoRntVeW/YL/H5n@shell.armlinux.org.uk>
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [IPv6:2001:41d0:1004:224b::b2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F78FB0
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 12:44:51 -0800 (PST)
+Message-ID: <8fccb066-6d17-4fa8-ba67-287042046ea4@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1702500289;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CXEmSiijjLrpapVsdj7qXE2yuQ7usappAWQ0VpcvhiQ=;
+	b=jWg18e/6SGX979GAUUvuWZu3XH3dbs5yr6qHEEfdtAU9E08jojjrlY711hF6wytK2p9Qer
+	poIf+XOZivG44PWAvZEi4JyVHf5+z2XCDCRtSSXLO4j7pVL9cO6VabmJhoITxTSzf7sKXk
+	pI0yBqy/G0cshSfPJmLmTPfoDK4RsFw=
+Date: Wed, 13 Dec 2023 12:44:42 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZXoRntVeW/YL/H5n@shell.armlinux.org.uk>
+Subject: Re: [PATCH v5 bpf-next 6/6] selftest: bpf: Test
+ bpf_sk_assign_tcp_reqsk().
+Content-Language: en-US
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Daniel Xu <dxu@dxuuu.xyz>,
+ Eric Dumazet <edumazet@google.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>
+References: <20231211073650.90819-1-kuniyu@amazon.com>
+ <20231211073650.90819-7-kuniyu@amazon.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20231211073650.90819-7-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Dec 13, 2023 at 08:18:38PM +0000, Russell King (Oracle) wrote:
-> On Wed, Dec 13, 2023 at 07:15:54PM +0100, Christian Marangi wrote:
-> > Use new define __LINK_SPEEDS_NUM for the speeds array instead of
-> > declaring a big enough array of 50 elements to handle future link speed
-> > modes.
-> > 
-> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > ---
-> >  drivers/net/phy/phy_led_triggers.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/net/phy/phy_led_triggers.c b/drivers/net/phy/phy_led_triggers.c
-> > index f550576eb9da..40cb0fa9ace0 100644
-> > --- a/drivers/net/phy/phy_led_triggers.c
-> > +++ b/drivers/net/phy/phy_led_triggers.c
-> > @@ -84,7 +84,7 @@ static void phy_led_trigger_unregister(struct phy_led_trigger *plt)
-> >  int phy_led_triggers_register(struct phy_device *phy)
-> >  {
-> >  	int i, err;
-> > -	unsigned int speeds[50];
-> > +	unsigned int speeds[__LINK_SPEEDS_NUM];
-> >  
-> >  	phy->phy_num_led_triggers = phy_supported_speeds(phy, speeds,
-> >  							 ARRAY_SIZE(speeds));
+On 12/10/23 11:36 PM, Kuniyuki Iwashima wrote:
+> This commit adds a sample selftest to demonstrate how we can use
+> bpf_sk_assign_tcp_reqsk() as the backend of SYN Proxy.
 > 
-> Yes, I agree the original code is utterly horrid, and there should be a
-> definition for its size. However, this is about the only place it would
-> be used - if you look at the code in phy_supported_speeds() and in
-> phy_speeds() which it calls, there is nothing in there which would know
-> the speed.
+> The test creates IPv4/IPv6 x TCP/MPTCP connections and transfer
+> messages over them on lo with BPF tc prog attached.
 > 
-> The only two solution I can think would be either a new function:
+> The tc prog will process SYN and returns SYN+ACK with the following
+> ISN and TS.  In a real use case, this part will be done by other
+> hosts.
 > 
-> size_t phy_num_supported_speeds(struct phy_device *phydev);
-
-Maybe this is better to not fill the phy_speeds function with too much
-conditions.
-
+>          MSB                                   LSB
+>    ISN:  | 31 ... 8 | 7 6 |   5 |    4 | 3 2 1 0 |
+>          |   Hash_1 | MSS | ECN | SACK |  WScale |
 > 
-> or have phy_speeds() return the number of entries if "speeds" was NULL.
+>    TS:   | 31 ... 8 |          7 ... 0           |
+>          |   Random |           Hash_2           |
 > 
-> Then kmalloc_array() the speed array - but that seems a bit on the
-> side of things. The code as it stands is safe, because the passed
-> ARRAY_SIZE() limits the maximum index into speeds[] that will be
-> written, and it will result in the slower speeds not being added
-> into the array.
->
+>    WScale in SYN is reused in SYN+ACK.
+> 
+> The client returns ACK, and tc prog will recalculate ISN and TS
+> from ACK and validate SYN Cookie.
+> 
+> If it's valid, the prog calls kfunc to allocate a reqsk for skb and
+> configure the reqsk based on the argument created from SYN Cookie.
+> 
+> Later, the reqsk will be processed in cookie_v[46]_check() to create
+> a connection.
 
-The fact that the phy_speed compose an array in descending order seems
-wrong to me and not following why it was done like that in the first
-place.
+The patch set looks good.
 
-Passing for example an array of 3 elements i would expect 10 100 100
-speed to be put instead of 800 400 200. (just as an example)
+One thing I just noticed is about writing/reading bits into/from "struct 
+tcp_options_received". More on this below.
 
-Wonder if it would be sane to do this change. (invert the produced speed
-array with ascending order)
+[ ... ]
 
-A kmalloc_array might be overkill for the task but declaring a random
-array of 50 elements is equally bad...
+> +void test_tcp_custom_syncookie(void)
+> +{
+> +	struct test_tcp_custom_syncookie *skel;
+> +	int i;
+> +
+> +	if (setup_netns())
+> +		return;
+> +
+> +	skel = test_tcp_custom_syncookie__open_and_load();
+> +	if (!ASSERT_OK_PTR(skel, "open_and_load"))
+> +		return;
+> +
+> +	if (setup_tc(skel))
+> +		goto destroy_skel;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
+> +		skel->bss->handled_syn = false;
+> +		skel->bss->handled_ack = false;
+> +
+> +		test__start_subtest(test_cases[i].name);
 
-Think I will just implement kmalloc + function to return the count of
-speed modes from the settings struct.
 
--- 
-	Ansuel
+This should be tested with:
+
+	if (!test__start_subtest(test_cases[i].name))
+		continue;
+
+to skip the create_connection(). Probably do it at the beginning of the for loop.
+
+> +		create_connection(&test_cases[i]);
+> +
+> +		ASSERT_EQ(skel->bss->handled_syn, true, "SYN is not handled at tc.");
+> +		ASSERT_EQ(skel->bss->handled_ack, true, "ACK is not handled at tc");
+> +	}
+> +
+> +destroy_skel:
+> +	system("tc qdisc del dev lo clsact");
+> +
+> +	test_tcp_custom_syncookie__destroy(skel);
+> +}
+
+[ ... ]
+
+> +static int tcp_parse_option(__u32 index, struct tcp_syncookie *ctx)
+> +{
+> +	struct tcp_options_received *tcp_opt = &ctx->attr.tcp_opt;
+> +	char opcode, opsize;
+> +
+> +	if (ctx->ptr + 1 > ctx->data_end)
+> +		goto stop;
+> +
+> +	opcode = *ctx->ptr++;
+> +
+> +	if (opcode == TCPOPT_EOL)
+> +		goto stop;
+> +
+> +	if (opcode == TCPOPT_NOP)
+> +		goto next;
+> +
+> +	if (ctx->ptr + 1 > ctx->data_end)
+> +		goto stop;
+> +
+> +	opsize = *ctx->ptr++;
+> +
+> +	if (opsize < 2)
+> +		goto stop;
+> +
+> +	switch (opcode) {
+> +	case TCPOPT_MSS:
+> +		if (opsize == TCPOLEN_MSS && ctx->tcp->syn &&
+> +		    ctx->ptr + (TCPOLEN_MSS - 2) < ctx->data_end)
+> +			tcp_opt->mss_clamp = get_unaligned_be16(ctx->ptr);
+> +		break;
+> +	case TCPOPT_WINDOW:
+> +		if (opsize == TCPOLEN_WINDOW && ctx->tcp->syn &&
+> +		    ctx->ptr + (TCPOLEN_WINDOW - 2) < ctx->data_end) {
+> +			tcp_opt->wscale_ok = 1;
+> +			tcp_opt->snd_wscale = *ctx->ptr;
+
+When writing to a bitfield of "struct tcp_options_received" which is a kernel 
+struct, it needs to use the CO-RE api. The BPF_CORE_WRITE_BITFIELD has not been 
+landed yet: 
+https://lore.kernel.org/bpf/4d3dd215a4fd57d980733886f9c11a45e1a9adf3.1702325874.git.dxu@dxuuu.xyz/
+
+The same for reading bitfield but BPF_CORE_READ_BITFIELD() has already been 
+implemented in bpf_core_read.h
+
+Once the BPF_CORE_WRITE_BITFIELD is landed, this test needs to be changed to use 
+the BPF_CORE_{READ,WRITE}_BITFIELD.
+
+> +		}
+> +		break;
+> +	case TCPOPT_TIMESTAMP:
+> +		if (opsize == TCPOLEN_TIMESTAMP &&
+> +		    ctx->ptr + (TCPOLEN_TIMESTAMP - 2) < ctx->data_end) {
+> +			tcp_opt->saw_tstamp = 1;
+> +			tcp_opt->rcv_tsval = get_unaligned_be32(ctx->ptr);
+> +			tcp_opt->rcv_tsecr = get_unaligned_be32(ctx->ptr + 4);
+> +
+> +			if (ctx->tcp->syn && tcp_opt->rcv_tsecr)
+> +				tcp_opt->tstamp_ok = 0;
+> +			else
+> +				tcp_opt->tstamp_ok = 1;
+> +		}
+> +		break;
+> +	case TCPOPT_SACK_PERM:
+> +		if (opsize == TCPOLEN_SACK_PERM && ctx->tcp->syn &&
+> +		    ctx->ptr + (TCPOLEN_SACK_PERM - 2) < ctx->data_end)
+> +			tcp_opt->sack_ok = 1;
+> +		break;
+> +	}
+> +
+> +	ctx->ptr += opsize - 2;
+> +next:
+> +	return 0;
+> +stop:
+> +	return 1;
+> +}
+
+
 
