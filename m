@@ -1,591 +1,139 @@
-Return-Path: <netdev+bounces-56961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EC4381176C
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 16:39:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E0E0A81177E
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 16:40:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C29AE1F20F92
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 15:39:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 796F01F20FF8
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 15:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3657683B1D;
-	Wed, 13 Dec 2023 15:27:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33C8A33065;
+	Wed, 13 Dec 2023 15:28:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YJFWcyxK"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="cKBjNrPw"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A7C1110
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 07:27:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702481219;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WXofuzcjAytVfATApIF5KG+Rehuwn0Pqcyfgmz8Uu6Q=;
-	b=YJFWcyxKiuEkPnKmwo44E8aoEavo5rk2R7Iyd0DG0LNPvzfphtbsY7AY9HQS7aX5dMaZp9
-	kMBWhhjurC+cmxyxELAErmAq4BWqHoHiO3VwZCIU0u9IhuH1Qu4pfldeM2qXBcUyDncSuM
-	325WyUzq1ikUdnutm8n/FkkOv+a6qhA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-228-8_MjFYBWMP6LtGm0-uBNEQ-1; Wed, 13 Dec 2023 10:26:54 -0500
-X-MC-Unique: 8_MjFYBWMP6LtGm0-uBNEQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BE62A185A78E;
-	Wed, 13 Dec 2023 15:26:52 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.2])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id F1FA351E3;
-	Wed, 13 Dec 2023 15:26:48 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Jeff Layton <jlayton@kernel.org>,
-	Steve French <smfrench@gmail.com>
-Cc: David Howells <dhowells@redhat.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	Christian Brauner <christian@brauner.io>,
-	linux-cachefs@redhat.com,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>
-Subject: [PATCH v4 39/39] 9p: Use netfslib read/write_iter
-Date: Wed, 13 Dec 2023 15:23:49 +0000
-Message-ID: <20231213152350.431591-40-dhowells@redhat.com>
-In-Reply-To: <20231213152350.431591-1-dhowells@redhat.com>
-References: <20231213152350.431591-1-dhowells@redhat.com>
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2080.outbound.protection.outlook.com [40.107.105.80])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA8253257
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 07:27:32 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gUXig+xOGCw4XyWZ/bzYQohaSPk5JMh5/v45sE7xt+KsAu1fqRs2XvSv2C4U02BWhrJf2O4zcmYyc79vyjZRv+eEgmVhg+CbdOO3qqf4FPMUnWKGAKSIVWpiAlwCh6igoZzBeYjj9QxJZPHzPBJCbgLYiNfWUL8xTFZVPnKeQ2VMo/gZ3HktU2LOJ3Dbh69lCaONGlubFftomXg1BnGQv6EkmwgrYu97Y4RF7XO1jJCflkhl83j/J+5UrbT943yTGPC3RdR6ZU3AHbz4jiR0SVENIdgEOkie+RyCInjxZ3RbRrUtze2c+0nAua6F5PV5YL9g9UyfjrddO6tqcLrflg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jpEJDBDkJgtWbxeCsF212H9JJjsaE6/fKIQutYv0szo=;
+ b=hnE21omYyzbOXtOW0+FxbFY22Il8WYMs5+Cocr1wPgX2biL1qEFM7hudxFxm3UGQd8w5juv6V0ni+TGeF9hVGC/tD3JRmdBkpZFgZ/kTBk3Hb1fxNfWk4/ls7kbw6VsCgw3oByGLtvHpJwCk4dRZ7Mgrm2D9lwjjYYq91Fgd7G8vDmHMEiAJdVeCiK/dVhCfi5RIgeyV+58GkEyzhC2Wh03GPJ+8XROXXFU/8T5O6J94KF8dZt1rvZ2s+Lk8EB+2xCphgDniuxvsJJguV72TmbtABrez3ImEKanAHIuQOeolQuGPeZaTyuEGtcTjJ9NBShzQx68G7sf9egn+iwtbcg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jpEJDBDkJgtWbxeCsF212H9JJjsaE6/fKIQutYv0szo=;
+ b=cKBjNrPw8JrDgDrtZWPWS8S5zq9JMju8OwBzq7TrAji0+7HjsFWLoBPReVkoPVi/cs5Wd1a2zDfz/jWynnNsDScXfGnSFfZqk4sMzrBHCpF63lmQVu2desIeXnnDi/eI2TxvDkAlVPI/Zi9DLaW3w5RWGYiPeZ6CgQC7f6GNMI0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by DU0PR04MB9273.eurprd04.prod.outlook.com (2603:10a6:10:354::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.33; Wed, 13 Dec
+ 2023 15:27:30 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7091.022; Wed, 13 Dec 2023
+ 15:27:30 +0000
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>
+Subject: [PATCH net-next 0/2] MDIO mux cleanup
+Date: Wed, 13 Dec 2023 17:27:10 +0200
+Message-Id: <20231213152712.320842-1-vladimir.oltean@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AS4PR09CA0015.eurprd09.prod.outlook.com
+ (2603:10a6:20b:5e0::20) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DU0PR04MB9273:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7717d892-7795-494e-604b-08dbfbf004e5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	+HM1S7F0AY4ZAT4L9qR5RLEttEpQnMvgIVxx73zr95iuURZo14PP50NKqKXl7gGQxAColBniQkbd99D+m+aSPRHpGo+/ThiIztWYpwHFCah8eX1oF2lVLtH6rKP6rTGv39HDAN9PKp+JJZ5WRlxRGdhdUaepNb4CeAWy5SVdSDHjxX+WRLZRYJJHFjJb0/ddAXZiVNuoYRRSFKJ5pvaKAm/ht/iSekA11SLT7EOZEKaUPGvLzXL+FwlOKcifSbV2AicliWBJOCGRzoLTW+A9iyo71In5JdjDmPYbzsgsO8uwuMeIa49UmU+szLZx24WTsqwVI8tHyBnO3AxsATKwEJWyjRB7jhAW6dxp9fDgT80Jc/csjg9Jgd+2efiGM+kGNMfLnUykELdprw3ykwQsDgmYpSswJCilPkYlRTBt2wk0/eMVa1OMtyXAtLnvAZ95/YcmP/niS30jTDhOIndq+c/GWO8T39/7uIO09DDQkJmOtEQ/bMQ0CHyPT/YzPgCo5APrJNg682de4u4m3NZgbh59XU8JAw+VdV2mhBzU6vPX3kzbQEW0Ioj9y8CXTpRdOjWmq0Uh+xKNmCkT+RWMxuIOGBbLll9mc+q7Y0NEIGAJ5ESi7YjW+4S6nVEdjpTR
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(396003)(39860400002)(346002)(366004)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(4744005)(5660300002)(2906002)(44832011)(8936002)(4326008)(8676002)(38350700005)(36756003)(41300700001)(86362001)(1076003)(26005)(2616005)(38100700002)(83380400001)(316002)(66946007)(66476007)(66556008)(6916009)(54906003)(6506007)(52116002)(6512007)(478600001)(6486002)(6666004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?b1Y9zmAHlr+6VxIaxFRw3TFx+x7yNbw5k9SVW7VcWxRMCizdu8XCwyDEsVZd?=
+ =?us-ascii?Q?TzenA826Tst5nwYOp5SThLJUFXJ19tDXocsUcRCPUPVijWZyCEm1nbJgRna+?=
+ =?us-ascii?Q?KSjPblCs6W4HfaaUoImtZpqNr2e2gz1V1JNDKOvFdsGx1yZ6coX/5i5FAhh8?=
+ =?us-ascii?Q?XSH+/CrhG+g/DVXCnKCvB4ON6rh9nhEhnbJPV9HWHRe3jxSQhmTSPI7qVo58?=
+ =?us-ascii?Q?gbesi+0WxnVL7n0hYwz6SWRXVFcBRiDitMDpzicva3ZVKOAqbC6AOTFbw5ZC?=
+ =?us-ascii?Q?xAzkmHVO84YcU2VkyibpkJAJLAYTtdroUNnxAV2aYEFcnho2QoOpvbRGQcmI?=
+ =?us-ascii?Q?6mALiAf8o1wdnd3zlMEdYbotqf2CvnbVdTTNMWCV8jnrut+ZeGdEiAsYcF17?=
+ =?us-ascii?Q?KgOIms5mSSAzw53t/j5WQ3JdF+VMJY01F3zCvvd4/WU75yT0eXElZS+DfuMP?=
+ =?us-ascii?Q?LVJmRNTkP7LbM3/J+qG37DgEZqGyLkFatIohtQpTK/SsJKwIBuakNHweESuQ?=
+ =?us-ascii?Q?oO61BLcJpx3P4x3KKRnnOhH/K+wcFo+T+t4mMp7VHCaWtadty2VvuwsAb9Be?=
+ =?us-ascii?Q?oNBv1omEEs2MO82xNEygBlo29yxImKc/Oa2J6SAufsrAKVWJLVoArmXoVoyn?=
+ =?us-ascii?Q?zbkF0UIy+5fqaU02IFb7OI+KqFzTrnWpEuNJZBOk3bFvzhnhofv+ml88/K1N?=
+ =?us-ascii?Q?+4aZjnKPMgc7gr+z7kymNCjB6VWEkPs9fnRrtDBbK9/bmWGxZh0Wq5CagBpC?=
+ =?us-ascii?Q?HgDFKk+GpWp9u/z9S1xi8Hed5LcR03y4+4hIZUWcLD6MLCeQ1AS+rqLBuWeI?=
+ =?us-ascii?Q?WwTKwjMnigJF06le07JJ6GJRPBhacPNeaxpQa1GXzYDcg6YINao2Jhu6JBq+?=
+ =?us-ascii?Q?BH5kYR0U0Wp6PmeXSmACLbtsPBvmQRkpu4y2Uu3HobI+nTU4JT1dzfjzAUTW?=
+ =?us-ascii?Q?AAM/0GcZJr+KPtEtBOQ3UWhkHBOJoY05kzPYJ4TN+WM/7xp1m2neUtsOY1qV?=
+ =?us-ascii?Q?qLPQTK9KxnsNdUuXPmu2AhnOEHXgsqxTMjuGox/9BMxuYQTY0WbbQ+u1Fde+?=
+ =?us-ascii?Q?QSRbmf55nOtUbhHrLYjw6VSrnTzIH+BFoxKKH16AyyaWvQs1u06Vhs6wr0E+?=
+ =?us-ascii?Q?N10Edlc8WfDK/ccV3ripVLHfN5WvdxumkHf/9Fg7CKW7aLRMzFECEmgh2mVT?=
+ =?us-ascii?Q?9hbM2xjZnnMkzxbJZyOu1VXZE28KpG98058g3JizvOld1mpfKvBfX4cU/uqy?=
+ =?us-ascii?Q?zLmZFVWQT/COpZop2IUKCyIYduIQhY6ASOjuGHM4B96T5DntGy98OUcjG8Us?=
+ =?us-ascii?Q?Ax8ERbx1ChrX6XiGnTqIIPhraLSPEMVMBTv2qteQKpb9c9V0zgsy8VAEz/15?=
+ =?us-ascii?Q?UifBYJxAQNblXe+4ZlMKY1dwUTCtz4rHhUDl3Oxe2S5J3BASjqyl2NKscFSK?=
+ =?us-ascii?Q?wRMS9hoNvGoYQqH7DZa7dYQ7jp56IyY6bHMnBLkTizfJqYmNnN3YWa6pON6D?=
+ =?us-ascii?Q?qgWYZ9EcaSEEvbkY8HmRY3PYYzT6hWyBOt4iaQh24nzCV9JVsShPe5CRt3XF?=
+ =?us-ascii?Q?Ked0bHGgxapaKn544O4syIbZLYr0lD0EFcvx1AfChrGpsqJFYy19Jf9ksYsM?=
+ =?us-ascii?Q?NA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7717d892-7795-494e-604b-08dbfbf004e5
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2023 15:27:29.9298
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bWhpx2TGsa80bA4EeL7uIf7g/5pzPkUBaGZVtyvPkEfFiSoB1p8KwcjT9XSFPNh7mB7kCF+150KwrBOyny12tg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR04MB9273
 
-Use netfslib's read and write iteration helpers, allowing netfslib to take
-over the management of the page cache for 9p files and to manage local disk
-caching.  In particular, this eliminates write_begin, write_end, writepage
-and all mentions of struct page and struct folio from 9p.
+This small patch set resolves some technical debt in the MDIO mux driver
+which was discovered during the investigation for commit 1f9f2143f24e
+("net: mdio-mux: fix C45 access returning -EIO after API change").
 
-Note that netfslib now offers the possibility of write-through caching if
-that is desirable for 9p: just set the NETFS_ICTX_WRITETHROUGH flag in
-v9inode->netfs.flags in v9fs_set_netfs_context().
+The patches have been sitting for 2 months in the NXP SDK kernel and
+haven't caused issues.
 
-Note also this is untested as I can't get ganesha.nfsd to correctly parse
-the config to turn on 9p support.
+Vladimir Oltean (2):
+  net: mdio-mux: show errors on probe failure
+  net: mdio-mux: be compatible with parent buses which only support C45
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Eric Van Hensbergen <ericvh@kernel.org>
-cc: Latchesar Ionkov <lucho@ionkov.net>
-cc: Dominique Martinet <asmadeus@codewreck.org>
-cc: Christian Schoenebeck <linux_oss@crudebyte.com>
-cc: v9fs@lists.linux.dev
-cc: linux-cachefs@redhat.com
-cc: linux-fsdevel@vger.kernel.org
----
- fs/9p/vfs_addr.c  | 292 +++++++++++-----------------------------------
- fs/9p/vfs_file.c  |  89 ++------------
- fs/9p/vfs_inode.c |   2 -
- 3 files changed, 77 insertions(+), 306 deletions(-)
+ drivers/net/mdio/mdio-mux.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
-index 055b672a247d..0c7bcff05da2 100644
---- a/fs/9p/vfs_addr.c
-+++ b/fs/9p/vfs_addr.c
-@@ -19,12 +19,48 @@
- #include <linux/netfs.h>
- #include <net/9p/9p.h>
- #include <net/9p/client.h>
-+#include <trace/events/netfs.h>
- 
- #include "v9fs.h"
- #include "v9fs_vfs.h"
- #include "cache.h"
- #include "fid.h"
- 
-+static void v9fs_upload_to_server(struct netfs_io_subrequest *subreq)
-+{
-+	struct inode *inode = subreq->rreq->inode;
-+	struct v9fs_inode __maybe_unused *v9inode = V9FS_I(inode);
-+	struct p9_fid *fid = subreq->rreq->netfs_priv;
-+	int err;
-+
-+	trace_netfs_sreq(subreq, netfs_sreq_trace_submit);
-+	p9_client_write(fid, subreq->start, &subreq->io_iter, &err);
-+	netfs_write_subrequest_terminated(subreq, err < 0 ? err : subreq->len,
-+					  false);
-+}
-+
-+static void v9fs_upload_to_server_worker(struct work_struct *work)
-+{
-+	struct netfs_io_subrequest *subreq =
-+		container_of(work, struct netfs_io_subrequest, work);
-+
-+	v9fs_upload_to_server(subreq);
-+}
-+
-+/*
-+ * Set up write requests for a writeback slice.  We need to add a write request
-+ * for each write we want to make.
-+ */
-+static void v9fs_create_write_requests(struct netfs_io_request *wreq, loff_t start, size_t len)
-+{
-+	struct netfs_io_subrequest *subreq;
-+
-+	subreq = netfs_create_write_request(wreq, NETFS_UPLOAD_TO_SERVER,
-+					    start, len, v9fs_upload_to_server_worker);
-+	if (subreq)
-+		netfs_queue_write_request(subreq);
-+}
-+
- /**
-  * v9fs_issue_read - Issue a read from 9P
-  * @subreq: The read to make
-@@ -33,14 +69,10 @@ static void v9fs_issue_read(struct netfs_io_subrequest *subreq)
- {
- 	struct netfs_io_request *rreq = subreq->rreq;
- 	struct p9_fid *fid = rreq->netfs_priv;
--	struct iov_iter to;
--	loff_t pos = subreq->start + subreq->transferred;
--	size_t len = subreq->len   - subreq->transferred;
- 	int total, err;
- 
--	iov_iter_xarray(&to, ITER_DEST, &rreq->mapping->i_pages, pos, len);
--
--	total = p9_client_read(fid, pos, &to, &err);
-+	total = p9_client_read(fid, subreq->start + subreq->transferred,
-+			       &subreq->io_iter, &err);
- 
- 	/* if we just extended the file size, any portion not in
- 	 * cache won't be on server and is zeroes */
-@@ -50,23 +82,37 @@ static void v9fs_issue_read(struct netfs_io_subrequest *subreq)
- }
- 
- /**
-- * v9fs_init_request - Initialise a read request
-+ * v9fs_init_request - Initialise a request
-  * @rreq: The read request
-  * @file: The file being read from
-  */
- static int v9fs_init_request(struct netfs_io_request *rreq, struct file *file)
- {
--	struct p9_fid *fid = file->private_data;
--
--	BUG_ON(!fid);
-+	struct p9_fid *fid;
-+	bool writing = (rreq->origin == NETFS_READ_FOR_WRITE ||
-+			rreq->origin == NETFS_WRITEBACK ||
-+			rreq->origin == NETFS_WRITETHROUGH ||
-+			rreq->origin == NETFS_LAUNDER_WRITE ||
-+			rreq->origin == NETFS_UNBUFFERED_WRITE ||
-+			rreq->origin == NETFS_DIO_WRITE);
-+
-+	if (file) {
-+		fid = file->private_data;
-+		BUG_ON(!fid);
-+		p9_fid_get(fid);
-+	} else {
-+		fid = v9fs_fid_find_inode(rreq->inode, writing, INVALID_UID, true);
-+		if (!fid) {
-+			WARN_ONCE(1, "folio expected an open fid inode->i_private=%p\n",
-+				  rreq->inode->i_private);
-+			return -EINVAL;
-+		}
-+	}
- 
- 	/* we might need to read from a fid that was opened write-only
- 	 * for read-modify-write of page cache, use the writeback fid
- 	 * for that */
--	WARN_ON(rreq->origin == NETFS_READ_FOR_WRITE &&
--			!(fid->mode & P9_ORDWR));
--
--	p9_fid_get(fid);
-+	WARN_ON(writing && !(fid->mode & P9_ORDWR));
- 	rreq->netfs_priv = fid;
- 	return 0;
- }
-@@ -86,217 +132,15 @@ const struct netfs_request_ops v9fs_req_ops = {
- 	.init_request		= v9fs_init_request,
- 	.free_request		= v9fs_free_request,
- 	.issue_read		= v9fs_issue_read,
-+	.create_write_requests	= v9fs_create_write_requests,
- };
- 
--#ifdef CONFIG_9P_FSCACHE
--static void v9fs_write_to_cache_done(void *priv, ssize_t transferred_or_error,
--				     bool was_async)
--{
--	struct v9fs_inode *v9inode = priv;
--	__le32 version;
--
--	if (IS_ERR_VALUE(transferred_or_error) &&
--	    transferred_or_error != -ENOBUFS) {
--		version = cpu_to_le32(v9inode->qid.version);
--		fscache_invalidate(v9fs_inode_cookie(v9inode), &version,
--				   i_size_read(&v9inode->netfs.inode), 0);
--	}
--}
--#endif
--
--static int v9fs_vfs_write_folio_locked(struct folio *folio)
--{
--	struct inode *inode = folio_inode(folio);
--	loff_t start = folio_pos(folio);
--	loff_t i_size = i_size_read(inode);
--	struct iov_iter from;
--	size_t len = folio_size(folio);
--	struct p9_fid *writeback_fid;
--	int err;
--	struct v9fs_inode __maybe_unused *v9inode = V9FS_I(inode);
--	struct fscache_cookie __maybe_unused *cookie = v9fs_inode_cookie(v9inode);
--
--	if (start >= i_size)
--		return 0; /* Simultaneous truncation occurred */
--
--	len = min_t(loff_t, i_size - start, len);
--
--	iov_iter_xarray(&from, ITER_SOURCE, &folio_mapping(folio)->i_pages, start, len);
--
--	writeback_fid = v9fs_fid_find_inode(inode, true, INVALID_UID, true);
--	if (!writeback_fid) {
--		WARN_ONCE(1, "folio expected an open fid inode->i_private=%p\n",
--			inode->i_private);
--		return -EINVAL;
--	}
--
--	folio_wait_fscache(folio);
--	folio_start_writeback(folio);
--
--	p9_client_write(writeback_fid, start, &from, &err);
--
--#ifdef CONFIG_9P_FSCACHE
--	if (err == 0 &&
--		fscache_cookie_enabled(cookie) &&
--		test_bit(FSCACHE_COOKIE_IS_CACHING, &cookie->flags)) {
--		folio_start_fscache(folio);
--		fscache_write_to_cache(v9fs_inode_cookie(v9inode),
--					folio_mapping(folio), start, len, i_size,
--					v9fs_write_to_cache_done, v9inode,
--					true);
--	}
--#endif
--
--	folio_end_writeback(folio);
--	p9_fid_put(writeback_fid);
--
--	return err;
--}
--
--static int v9fs_vfs_writepage(struct page *page, struct writeback_control *wbc)
--{
--	struct folio *folio = page_folio(page);
--	int retval;
--
--	p9_debug(P9_DEBUG_VFS, "folio %p\n", folio);
--
--	retval = v9fs_vfs_write_folio_locked(folio);
--	if (retval < 0) {
--		if (retval == -EAGAIN) {
--			folio_redirty_for_writepage(wbc, folio);
--			retval = 0;
--		} else {
--			mapping_set_error(folio_mapping(folio), retval);
--		}
--	} else
--		retval = 0;
--
--	folio_unlock(folio);
--	return retval;
--}
--
--static int v9fs_launder_folio(struct folio *folio)
--{
--	int retval;
--
--	if (folio_clear_dirty_for_io(folio)) {
--		retval = v9fs_vfs_write_folio_locked(folio);
--		if (retval)
--			return retval;
--	}
--	folio_wait_fscache(folio);
--	return 0;
--}
--
--/**
-- * v9fs_direct_IO - 9P address space operation for direct I/O
-- * @iocb: target I/O control block
-- * @iter: The data/buffer to use
-- *
-- * The presence of v9fs_direct_IO() in the address space ops vector
-- * allowes open() O_DIRECT flags which would have failed otherwise.
-- *
-- * In the non-cached mode, we shunt off direct read and write requests before
-- * the VFS gets them, so this method should never be called.
-- *
-- * Direct IO is not 'yet' supported in the cached mode. Hence when
-- * this routine is called through generic_file_aio_read(), the read/write fails
-- * with an error.
-- *
-- */
--static ssize_t
--v9fs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
--{
--	struct file *file = iocb->ki_filp;
--	loff_t pos = iocb->ki_pos;
--	ssize_t n;
--	int err = 0;
--
--	if (iov_iter_rw(iter) == WRITE) {
--		n = p9_client_write(file->private_data, pos, iter, &err);
--		if (n) {
--			struct inode *inode = file_inode(file);
--			loff_t i_size = i_size_read(inode);
--
--			if (pos + n > i_size)
--				inode_add_bytes(inode, pos + n - i_size);
--		}
--	} else {
--		n = p9_client_read(file->private_data, pos, iter, &err);
--	}
--	return n ? n : err;
--}
--
--static int v9fs_write_begin(struct file *filp, struct address_space *mapping,
--			    loff_t pos, unsigned int len,
--			    struct page **subpagep, void **fsdata)
--{
--	int retval;
--	struct folio *folio;
--	struct v9fs_inode *v9inode = V9FS_I(mapping->host);
--
--	p9_debug(P9_DEBUG_VFS, "filp %p, mapping %p\n", filp, mapping);
--
--	/* Prefetch area to be written into the cache if we're caching this
--	 * file.  We need to do this before we get a lock on the page in case
--	 * there's more than one writer competing for the same cache block.
--	 */
--	retval = netfs_write_begin(&v9inode->netfs, filp, mapping, pos, len, &folio, fsdata);
--	if (retval < 0)
--		return retval;
--
--	*subpagep = &folio->page;
--	return retval;
--}
--
--static int v9fs_write_end(struct file *filp, struct address_space *mapping,
--			  loff_t pos, unsigned int len, unsigned int copied,
--			  struct page *subpage, void *fsdata)
--{
--	loff_t last_pos = pos + copied;
--	struct folio *folio = page_folio(subpage);
--	struct inode *inode = mapping->host;
--
--	p9_debug(P9_DEBUG_VFS, "filp %p, mapping %p\n", filp, mapping);
--
--	if (!folio_test_uptodate(folio)) {
--		if (unlikely(copied < len)) {
--			copied = 0;
--			goto out;
--		}
--
--		folio_mark_uptodate(folio);
--	}
--
--	/*
--	 * No need to use i_size_read() here, the i_size
--	 * cannot change under us because we hold the i_mutex.
--	 */
--	if (last_pos > inode->i_size) {
--		inode_add_bytes(inode, last_pos - inode->i_size);
--		i_size_write(inode, last_pos);
--#ifdef CONFIG_9P_FSCACHE
--		fscache_update_cookie(v9fs_inode_cookie(V9FS_I(inode)), NULL,
--			&last_pos);
--#endif
--	}
--	folio_mark_dirty(folio);
--out:
--	folio_unlock(folio);
--	folio_put(folio);
--
--	return copied;
--}
--
- const struct address_space_operations v9fs_addr_operations = {
--	.read_folio	= netfs_read_folio,
--	.readahead	= netfs_readahead,
--	.dirty_folio	= netfs_dirty_folio,
--	.writepage	= v9fs_vfs_writepage,
--	.write_begin	= v9fs_write_begin,
--	.write_end	= v9fs_write_end,
--	.release_folio	= netfs_release_folio,
--	.invalidate_folio = netfs_invalidate_folio,
--	.launder_folio	= v9fs_launder_folio,
--	.direct_IO	= v9fs_direct_IO,
-+	.read_folio		= netfs_read_folio,
-+	.readahead		= netfs_readahead,
-+	.dirty_folio		= netfs_dirty_folio,
-+	.release_folio		= netfs_release_folio,
-+	.invalidate_folio	= netfs_invalidate_folio,
-+	.launder_folio		= netfs_launder_folio,
-+	.direct_IO		= noop_direct_IO,
- };
-diff --git a/fs/9p/vfs_file.c b/fs/9p/vfs_file.c
-index 11cd8d23f6f2..bae330c2f0cf 100644
---- a/fs/9p/vfs_file.c
-+++ b/fs/9p/vfs_file.c
-@@ -353,25 +353,15 @@ static ssize_t
- v9fs_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
- {
- 	struct p9_fid *fid = iocb->ki_filp->private_data;
--	int ret, err = 0;
- 
- 	p9_debug(P9_DEBUG_VFS, "fid %d count %zu offset %lld\n",
- 		 fid->fid, iov_iter_count(to), iocb->ki_pos);
- 
--	if (!(fid->mode & P9L_DIRECT)) {
--		p9_debug(P9_DEBUG_VFS, "(cached)\n");
--		return generic_file_read_iter(iocb, to);
--	}
--
--	if (iocb->ki_filp->f_flags & O_NONBLOCK)
--		ret = p9_client_read_once(fid, iocb->ki_pos, to, &err);
--	else
--		ret = p9_client_read(fid, iocb->ki_pos, to, &err);
--	if (!ret)
--		return err;
-+	if (fid->mode & P9L_DIRECT)
-+		return netfs_unbuffered_read_iter(iocb, to);
- 
--	iocb->ki_pos += ret;
--	return ret;
-+	p9_debug(P9_DEBUG_VFS, "(cached)\n");
-+	return netfs_file_read_iter(iocb, to);
- }
- 
- /*
-@@ -407,46 +397,14 @@ v9fs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- {
- 	struct file *file = iocb->ki_filp;
- 	struct p9_fid *fid = file->private_data;
--	ssize_t retval;
--	loff_t origin;
--	int err = 0;
- 
- 	p9_debug(P9_DEBUG_VFS, "fid %d\n", fid->fid);
- 
--	if (!(fid->mode & (P9L_DIRECT | P9L_NOWRITECACHE))) {
--		p9_debug(P9_DEBUG_CACHE, "(cached)\n");
--		return generic_file_write_iter(iocb, from);
--	}
-+	if (fid->mode & (P9L_DIRECT | P9L_NOWRITECACHE))
-+		return netfs_unbuffered_write_iter(iocb, from);
- 
--	retval = generic_write_checks(iocb, from);
--	if (retval <= 0)
--		return retval;
--
--	origin = iocb->ki_pos;
--	retval = p9_client_write(file->private_data, iocb->ki_pos, from, &err);
--	if (retval > 0) {
--		struct inode *inode = file_inode(file);
--		loff_t i_size;
--		unsigned long pg_start, pg_end;
--
--		pg_start = origin >> PAGE_SHIFT;
--		pg_end = (origin + retval - 1) >> PAGE_SHIFT;
--		if (inode->i_mapping && inode->i_mapping->nrpages)
--			invalidate_inode_pages2_range(inode->i_mapping,
--						      pg_start, pg_end);
--		iocb->ki_pos += retval;
--		i_size = i_size_read(inode);
--		if (iocb->ki_pos > i_size) {
--			inode_add_bytes(inode, iocb->ki_pos - i_size);
--			/*
--			 * Need to serialize against i_size_write() in
--			 * v9fs_stat2inode()
--			 */
--			v9fs_i_size_write(inode, iocb->ki_pos);
--		}
--		return retval;
--	}
--	return err;
-+	p9_debug(P9_DEBUG_CACHE, "(cached)\n");
-+	return netfs_file_write_iter(iocb, from);
- }
- 
- static int v9fs_file_fsync(struct file *filp, loff_t start, loff_t end,
-@@ -519,36 +477,7 @@ v9fs_file_mmap(struct file *filp, struct vm_area_struct *vma)
- static vm_fault_t
- v9fs_vm_page_mkwrite(struct vm_fault *vmf)
- {
--	struct folio *folio = page_folio(vmf->page);
--	struct file *filp = vmf->vma->vm_file;
--	struct inode *inode = file_inode(filp);
--
--
--	p9_debug(P9_DEBUG_VFS, "folio %p fid %lx\n",
--		 folio, (unsigned long)filp->private_data);
--
--	/* Wait for the page to be written to the cache before we allow it to
--	 * be modified.  We then assume the entire page will need writing back.
--	 */
--#ifdef CONFIG_9P_FSCACHE
--	if (folio_test_fscache(folio) &&
--	    folio_wait_fscache_killable(folio) < 0)
--		return VM_FAULT_NOPAGE;
--#endif
--
--	/* Update file times before taking page lock */
--	file_update_time(filp);
--
--	if (folio_lock_killable(folio) < 0)
--		return VM_FAULT_RETRY;
--	if (folio_mapping(folio) != inode->i_mapping)
--		goto out_unlock;
--	folio_wait_stable(folio);
--
--	return VM_FAULT_LOCKED;
--out_unlock:
--	folio_unlock(folio);
--	return VM_FAULT_NOPAGE;
-+	return netfs_page_mkwrite(vmf, NULL);
- }
- 
- static void v9fs_mmap_vm_close(struct vm_area_struct *vma)
-diff --git a/fs/9p/vfs_inode.c b/fs/9p/vfs_inode.c
-index 74122540e00f..1c3f931914c0 100644
---- a/fs/9p/vfs_inode.c
-+++ b/fs/9p/vfs_inode.c
-@@ -374,10 +374,8 @@ void v9fs_evict_inode(struct inode *inode)
- 
- 	truncate_inode_pages_final(&inode->i_data);
- 
--#ifdef CONFIG_9P_FSCACHE
- 	version = cpu_to_le32(v9inode->qid.version);
- 	netfs_clear_inode_writeback(inode, &version);
--#endif
- 
- 	clear_inode(inode);
- 	filemap_fdatawrite(&inode->i_data);
+-- 
+2.34.1
 
 
