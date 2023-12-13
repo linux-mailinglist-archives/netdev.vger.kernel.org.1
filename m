@@ -1,102 +1,160 @@
-Return-Path: <netdev+bounces-56918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6780E81157B
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 16:01:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 422EE8115BF
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 16:06:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23A3C28116A
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 15:01:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E4721C21136
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 15:05:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62C1C2F849;
-	Wed, 13 Dec 2023 15:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF642FE28;
+	Wed, 13 Dec 2023 15:05:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="S1KJdxEy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V8MHk3nD"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6F19A0;
-	Wed, 13 Dec 2023 07:01:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=kIJRGB7mIa7tpVmwJASBbdkeVUIyBOjlKcbZ7uMeRys=; b=S1KJdxEy3S2wKw5HhAOIvi4LZD
-	3ZfMhG1j55QLofJe0a1KlTx/ytZ0QoqhEiCPDZKrMbFXuhy5LLAsyuVosSCkr37rNcJtciMxCYmdU
-	2ZjhuNRlXkCZ88l4XatA0AGMZHLi1QiD3/EIFZA0O/U7lYOH7mi1uRX2p5Hf2b1nbDo3E/MZ15o50
-	emD/ARxdip9ud/rVF3K4AB1pizPDNk2g1kLr/8wyrkeobVlLfKIbFM2ELQERUb3SsoDjphFv8Wik7
-	VVcJFtdsBgI8PBB/aEQEQwNPC1Qubz+pniOZBspd+XbG5VLwkApUD3xnGkcZ9qEydEZHK2ZBaw5pM
-	8fM+Cjvg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58630)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rDQjV-00005J-0l;
-	Wed, 13 Dec 2023 15:01:09 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rDQjV-0001Zs-U5; Wed, 13 Dec 2023 15:01:09 +0000
-Date: Wed, 13 Dec 2023 15:01:09 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Justin Chen <justin.chen@broadcom.com>, netdev@vger.kernel.org,
-	Doug Berger <opendmb@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2742419B6
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 07:05:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702479948;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IALMnPT1Pn+mCAgvupcIeg/euyf0UU0goFir4mrBYA0=;
+	b=V8MHk3nD6e+aFmcyUm/aJgqAKisb63RMcdtLouCU+QzSh42C3yP/7l7AJxU9iaBmUt1izU
+	/+P4xSfI6xGk0YKUIeBkuFWNBDpBM395FrUeXC9tbhOPWS9N88UA9ISX8Ob0z+6nozBEk+
+	+S34ZX131riXkaPmxwODDar7lLB+Z7I=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-269-CCUrs62IMRa1iI-I5K2ffQ-1; Wed, 13 Dec 2023 10:05:45 -0500
+X-MC-Unique: CCUrs62IMRa1iI-I5K2ffQ-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a1f8a2945b9so254208566b.1
+        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 07:05:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702479944; x=1703084744;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IALMnPT1Pn+mCAgvupcIeg/euyf0UU0goFir4mrBYA0=;
+        b=eIlAlVetdJ1USrFhLKSSUhd5l6IYXY+ew+NaEAKbQGCXpEI7iYlZKEjgax26RLnU0a
+         3HKvTrUgNoodzYMFeiMhRwnLxtaPsSLJv5hbQEZ8Fp/M160gqa78iuxGPFjTIqHmoOyL
+         kBvG06vQjGS8detuisZ27lEeDerNXijohl7mPbDY4U/T7LWkmGvuu1zO+uXoBpNpWE4h
+         QsqUSMmwIcA+T0EJvZf3FpVa2k3HKu52YUCTEppj7edX6uTL2EAAFfTCoWYcwZyaxpP3
+         xySsM1+Ekzpc1iv7oeZiO4SO4NBMhQjw/EuSJHRvd9noxjEy4mUCHXph+UkXxjBM1f6c
+         7tDQ==
+X-Gm-Message-State: AOJu0Yw3RdopoxQnj8NIRSyfukxD/Mns60NWQmlnJn6tHG9+0gEwyafG
+	CEGwDg/CwdtEkDj0k8xxSqlDYclf3w+EnK8YVLV1NzYGoMghNw6tJWYr/90vXRE+FOmK7fnB6J9
+	cXkTCiZTwYo6rOVn6
+X-Received: by 2002:a17:907:bcf:b0:a19:a19b:789f with SMTP id ez15-20020a1709070bcf00b00a19a19b789fmr3597383ejc.98.1702479944242;
+        Wed, 13 Dec 2023 07:05:44 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGZkaTVx2I2WnVbfMFnlq6Ewpkn6ejNgpIAppfp1qF9bmTmBolwTuhqkmoUq1qGvz3Weq6q9g==
+X-Received: by 2002:a17:907:bcf:b0:a19:a19b:789f with SMTP id ez15-20020a1709070bcf00b00a19a19b789fmr3597373ejc.98.1702479943907;
+        Wed, 13 Dec 2023 07:05:43 -0800 (PST)
+Received: from redhat.com ([2a02:14f:16d:d414:dc39:9ae8:919b:572d])
+        by smtp.gmail.com with ESMTPSA id cx12-20020a170907168c00b00a1caa9dd507sm7941199ejd.52.2023.12.13.07.05.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Dec 2023 07:05:42 -0800 (PST)
+Date: Wed, 13 Dec 2023 10:05:37 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: mdio: mdio-bcm-unimac: Delay before first poll
-Message-ID: <ZXnHNTreKY/F2Aqm@shell.armlinux.org.uk>
-References: <20231213000249.2020835-1-justin.chen@broadcom.com>
- <c3cc7a9d-d464-48e7-beb7-b90b1abbcfc7@lunn.ch>
+	Jason Wang <jasowang@redhat.com>,
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
+	oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v8 0/4] send credit update during setting
+ SO_RCVLOWAT
+Message-ID: <20231213100518-mutt-send-email-mst@kernel.org>
+References: <20231211211658.2904268-1-avkrasnov@salutedevices.com>
+ <20231212105423-mutt-send-email-mst@kernel.org>
+ <d27f22f0-0f1e-e1bb-5b13-a524dc6e94d7@salutedevices.com>
+ <20231212111131-mutt-send-email-mst@kernel.org>
+ <7b362aef-6774-0e08-81e9-0a6f7f616290@salutedevices.com>
+ <ucmekzurgt3zcaezzdkk6277ukjmwaoy6kdq6tzivbtqd4d32b@izqbcsixgngk>
+ <402ea723-d154-45c9-1efe-b0022d9ea95a@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <c3cc7a9d-d464-48e7-beb7-b90b1abbcfc7@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <402ea723-d154-45c9-1efe-b0022d9ea95a@salutedevices.com>
 
-On Wed, Dec 13, 2023 at 11:57:52AM +0100, Andrew Lunn wrote:
-> On Tue, Dec 12, 2023 at 04:02:49PM -0800, Justin Chen wrote:
-> > With a clock interval of 400 nsec and a 64 bit transactions (32 bit
-> > preamble & 16 bit control & 16 bit data), it is reasonable to assume
-> > the mdio transaction will take 25.6 usec. Add a 30 usec delay before
-> > the first poll to reduce the chance of a 1000-2000 usec sleep.
+On Wed, Dec 13, 2023 at 12:08:27PM +0300, Arseniy Krasnov wrote:
 > 
-> #define  MDIO_C45               0
 > 
-> suggests the hardware can do C45? The timing works out different then.
-> Maybe add a comment by the udelay() that is assumes C22, to give a
-> clue to somebody who is adding C45 support the delay needs to be
-> re-evaluated.
+> On 13.12.2023 11:43, Stefano Garzarella wrote:
+> > On Tue, Dec 12, 2023 at 08:43:07PM +0300, Arseniy Krasnov wrote:
+> >>
+> >>
+> >> On 12.12.2023 19:12, Michael S. Tsirkin wrote:
+> >>> On Tue, Dec 12, 2023 at 06:59:03PM +0300, Arseniy Krasnov wrote:
+> >>>>
+> >>>>
+> >>>> On 12.12.2023 18:54, Michael S. Tsirkin wrote:
+> >>>>> On Tue, Dec 12, 2023 at 12:16:54AM +0300, Arseniy Krasnov wrote:
+> >>>>>> Hello,
+> >>>>>>
+> >>>>>>                                DESCRIPTION
+> >>>>>>
+> >>>>>> This patchset fixes old problem with hungup of both rx/tx sides and adds
+> >>>>>> test for it. This happens due to non-default SO_RCVLOWAT value and
+> >>>>>> deferred credit update in virtio/vsock. Link to previous old patchset:
+> >>>>>> https://lore.kernel.org/netdev/39b2e9fd-601b-189d-39a9-914e5574524c@sberdevices.ru/
+> >>>>>
+> >>>>>
+> >>>>> Patchset:
+> >>>>>
+> >>>>> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> >>>>
+> >>>> Thanks!
+> >>>>
+> >>>>>
+> >>>>>
+> >>>>> But I worry whether we actually need 3/8 in net not in net-next.
+> >>>>
+> >>>> Because of "Fixes" tag ? I think this problem is not critical and reproducible
+> >>>> only in special cases, but i'm not familiar with netdev process so good, so I don't
+> >>>> have strong opinion. I guess @Stefano knows better.
+> >>>>
+> >>>> Thanks, Arseniy
+> >>>
+> >>> Fixes means "if you have that other commit then you need this commit
+> >>> too". I think as a minimum you need to rearrange patches to make the
+> >>> fix go in first. We don't want a regression followed by a fix.
+> >>
+> >> I see, ok, @Stefano WDYT? I think rearrange doesn't break anything, because this
+> >> patch fixes problem that is not related with the new patches from this patchset.
+> > 
+> > I agree, patch 3 is for sure net material (I'm fine with both rearrangement or send it separately), but IMHO also patch 2 could be.
+> > I think with the same fixes tag, since before commit b89d882dc9fc ("vsock/virtio: reduce credit update messages") we sent a credit update
+> > for every bytes we read, so we should not have this problem, right?
+> 
+> Agree for 2, so I think I can rearrange: two fixes go first, then current 0001, and then tests. And send it as V9 for 'net' only ?
+> 
+> Thanks, Arseniy
 
-Note, however, that the driver only supports C22 operations (it only
-populates the read|write functions, not the c45 variants).
 
-However, it doesn't explicitly set the MDIO_C22 bit in the configuration
-register, so what ends up being spat out on the bus would be dependent
-on the boot loader configuration.
+hmm why not net-next?
 
-However, I'm wondering why unimac_mdio_poll() isn't written as
-(based on current code):
+> > 
+> > So, maybe all the series could be "net".
+> > 
+> > Thanks,
+> > Stefano
+> > 
 
-	return read_poll_timeout(unimac_mdio_readl(priv, MDIO_CMD), val,
-				 !(val & MDIO_START_BUSY), 2000,
-				 2000000);
-
-rather than open-coding the io polling.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
