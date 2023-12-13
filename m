@@ -1,105 +1,124 @@
-Return-Path: <netdev+bounces-56890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F22118112F8
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 14:32:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BC63811316
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 14:38:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79CFFB20FD6
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:32:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBEEA28258B
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:38:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 564FF2D04B;
-	Wed, 13 Dec 2023 13:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 786D52D054;
+	Wed, 13 Dec 2023 13:38:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC817107;
-	Wed, 13 Dec 2023 05:31:57 -0800 (PST)
-Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-db538b07865so7148265276.2;
-        Wed, 13 Dec 2023 05:31:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702474316; x=1703079116;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6ByD+WhHBWOGKiqiMHh0fO3Oon6EHmqlUadQiQzx7t8=;
-        b=KNjX9y7hM9XHp0ODBk7facblQo1ZXMIZ1MjvxE9g8UWTrk+LBjk7OFoXWrs3biuvRZ
-         NeeT1+Ba5NkGpxhwmTlUzn9tiVS4hF0zc+zxsWC604/PrNcxaFMmuS9ymTms1RM9slbL
-         CGw6vjT1FmTgzfYO+Mctys2WzUMIWkTJ4AqZ/bZjagRzTxqViCRmayopEA+Dxgz6/5Qv
-         8OSzd+S6ALzcFqhOx+I62K8NyAjwIk3hS3VMb+Zp7wSADQDydKbkjNtX2lOeTkClBqwn
-         H0m5BOANHux9o2kWHuomgpZxCTxAIRo6JpVRzbkjHkEifq8wAmTvplq4NRRJdsnYDePM
-         1K0Q==
-X-Gm-Message-State: AOJu0YxdEFK32NEc0+HLn8/0ApED/QlCQn9LfC6TbShXTv1bAHUhM73D
-	P+E/yh5OpWv5aXqPhi7KhhsdG/Eb8Kkvmw==
-X-Google-Smtp-Source: AGHT+IH5Wy8HCpG0Da2bbQB8VMzjHdvSLWPqfUL2GBw1r6l1/12fv9QkqbAt56i7cc313+R5GoVVbw==
-X-Received: by 2002:a05:6902:150:b0:db7:dacf:ed8b with SMTP id p16-20020a056902015000b00db7dacfed8bmr5694588ybh.108.1702474316690;
-        Wed, 13 Dec 2023 05:31:56 -0800 (PST)
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com. [209.85.219.181])
-        by smtp.gmail.com with ESMTPSA id q3-20020a258203000000b00dbcd92f26d4sm174366ybk.20.2023.12.13.05.31.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Dec 2023 05:31:56 -0800 (PST)
-Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-dbcd28d5004so516019276.1;
-        Wed, 13 Dec 2023 05:31:56 -0800 (PST)
-X-Received: by 2002:a25:bf85:0:b0:db7:dacf:ed6f with SMTP id
- l5-20020a25bf85000000b00db7dacfed6fmr4540307ybk.80.1702474315827; Wed, 13 Dec
- 2023 05:31:55 -0800 (PST)
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E60D95;
+	Wed, 13 Dec 2023 05:38:52 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R351e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0VyRHh03_1702474728;
+Received: from 30.221.129.237(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VyRHh03_1702474728)
+          by smtp.aliyun-inc.com;
+          Wed, 13 Dec 2023 21:38:50 +0800
+Message-ID: <7cc939cf-d63f-41fc-8048-893a57ac4ab1@linux.alibaba.com>
+Date: Wed, 13 Dec 2023 21:38:48 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231207070700.4156557-1-claudiu.beznea.uj@bp.renesas.com> <20231207070700.4156557-4-claudiu.beznea.uj@bp.renesas.com>
-In-Reply-To: <20231207070700.4156557-4-claudiu.beznea.uj@bp.renesas.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 13 Dec 2023 14:31:44 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdVFsFbn94JdTFBaraUxLOQf5yJH0CUoJteOmYAb1WkCSA@mail.gmail.com>
-Message-ID: <CAMuHMdVFsFbn94JdTFBaraUxLOQf5yJH0CUoJteOmYAb1WkCSA@mail.gmail.com>
-Subject: Re: [PATCH v2 03/11] pinctrl: renesas: rzg2l: Move arg and index in
- the main function block
-To: Claudiu <claudiu.beznea@tuxon.dev>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, magnus.damm@gmail.com, 
-	mturquette@baylibre.com, sboyd@kernel.org, linus.walleij@linaro.org, 
-	prabhakar.mahadev-lad.rj@bp.renesas.com, biju.das.jz@bp.renesas.com, 
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-clk@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: SMC-R throughput drops for specific message sizes
+To: Gerd Bayer <gbayer@linux.ibm.com>,
+ "Nikolaou Alexandros (SO/PAF1-Mb)" <Alexandros.Nikolaou@de.bosch.com>,
+ "D . Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>,
+ Nils Hoppmann <niho@linux.ibm.com>
+Cc: "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+ netdev <netdev@vger.kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>,
+ Jan Karcher <jaka@linux.ibm.com>, Dust Li <dust.li@linux.alibaba.com>
+References: <PAWPR10MB72701758A24DD8DF8063BEE6C081A@PAWPR10MB7270.EURPRD10.PROD.OUTLOOK.COM>
+ <ccc03f00-02ee-4af6-8e57-b6de3bc019be@linux.ibm.com>
+ <PAWPR10MB7270731C91544AEF25E0A33CC084A@PAWPR10MB7270.EURPRD10.PROD.OUTLOOK.COM>
+ <2c460a84c6e725187dda05fc553981ce3022bb78.camel@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <2c460a84c6e725187dda05fc553981ce3022bb78.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 7, 2023 at 8:08=E2=80=AFAM Claudiu <claudiu.beznea@tuxon.dev> w=
-rote:
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->
-> Move arg and index in the main block of the function as they are used by
-> more than one case block of switch-case (3 out of 4 for arg, 2 out of 4
-> for index). In this way some lines of code are removed.
->
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> ---
->
-> Changes in v2:
-> - adapted for index variable and updated patch title and description
->   accordingly
 
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
-i.e. will queue in renesas-pinctrl-for-v6.8.
 
-Gr{oetje,eeting}s,
+On 2023/12/13 20:17, Gerd Bayer wrote:
+> Hi Nikolaou,
+> 
+> thank you for providing more details about your setup.
+> 
+> On Wed, 2023-12-06 at 15:28 +0000, Nikolaou Alexandros (SO/PAF1-Mb)
+> wrote:
+>> Dear Wenjia,
+> 
+> while Wenjia is out, I'm writing primarily to getting some more folks'
+> attention to this topic. Furthermore, I'm moving the discussion to the
+> netdev mailing list where SMC discussions usually take place.
+> 
+>> Thanks for getting back to me. Some further details on the
+>> experiments are:
+>>   
+>> - The tests had been conducted on a one-to-one connection between two
+>> Mellanox-powered (mlx5, ConnectX-5) PCs.
+>> - Attached you may find the client log of the qperf output. You may
+>> notice that for the majority of message size values, the bandwidth is
+>> around 3.2GB/s which matches the maximum throughput of the
+>> mellanox NICs.
+>> According to a periodic regular pattern though, with the first
+>> occurring at a message size of 473616 – 522192 (with a step of
+>> 12144kB), the 3.2GB/s throughput drops substantially. The
+>> corresponding commands for these drops are
+>> server: smc_run qperf
+>> client: smc_run qperf -v -uu -H worker1 -m 473616 tcp_bw
+>> - Our smc version (3E92E1460DA96BE2B2DDC2F, smc-tools-1.2.2) does not
+>> provide us with the smcr info, smc_rnics -a and smcr -d
+>> stats commands. As an alternative, you may also find attached the
+>> output of ibv_devinfo -v.
+>> - Buffer size:
+>> sudo sysctl -w net.ipv4.tcp_rmem="4096 1048576 6291456"
+>> sudo sysctl -w net.ipv4.tcp_wmem="4096 1048576 6291456"
+>> - MTU size: 9000
+>>   
+>> Should you require further information, please let me know.
+> 
+> Wenjia and I belong to a group of Linux on Z developers that maintains
+> the SMC protocol on s390 mainframe systems. Nils Hoppmann is our expert
+> for performance and might be able to shed some light on his experiences
+> with throughput drops for particular SMC message sizes. Our experience
+> is heavily biased towards IBM Z systems, though - with their distinct
+> cache and PCI root-complex hardware designs.
+> 
+> Over the last few years there's a group around D. Wythe, Wen Gu and
+> Tony Lu who adopted and extended the SMC protocol for use-cases on x86
+> architectures. I address them here explicitly, soliciting feedback on
+> their experiences.
 
-                        Geert
+Certainly. Our team will take a closer look into this matter as well.
+We intend to review the thread thoroughly and conduct an analysis within
+our environment. Updates and feedback will be provided in this thread.
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+> 
+> All in all there are several moving parts involved here, that could
+> play a role:
+> - firmware level of your Mellanox/NVidia NICs,
+> - platform specific hardware designs re. cache and root-complexes,
+> interrupt distribution, ...
+> - exact code level of the device drivers and the SMC protocol
+> 
+> This is just a heads-up, that there may be requests to try things with
+> newer code levels ;)
+> 
+> Thank you,
+> Gerd
+> 
+> --
+> Gerd Bayer
+> Linux on IBM Z Development - IBM Germany R&D
 
