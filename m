@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-56871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAB408110D8
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:16:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CB0C8110DA
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:16:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 913CE281687
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 12:16:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 628FD1C20E4D
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 12:16:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1A9028E25;
-	Wed, 13 Dec 2023 12:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C411028E0F;
+	Wed, 13 Dec 2023 12:15:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="S5OSZqyV"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="SMjoDvJa"
 X-Original-To: netdev@vger.kernel.org
 Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2061.outbound.protection.outlook.com [40.107.20.61])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B730E4
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 04:15:51 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6476CEA
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 04:15:52 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=il3azfVh5iLE0067vX6Ieaz+lSoHg7ETsthXp+JBBz3XOr/ny2Gb/rKXpM3PtQfWBRGc8R8ksCSBQDaoTuXf+hC4rBO3pUEQDeSuDapKEHSB1YYIh14jK3rWw2CvcsEbru1d/Pkxm8AbBIV420AwPaa4F9spwbGsYm89FH1JnzMYH9aprzz5pOLIRMRQZhFf9QhuJFZqcwmNIz+5m6QkcB7Birm2sPkd+ohUw2DjG1JLAguPg8jf632FIvS3sQ8kKUFpSMN3SJNZmwInNGqGCu9m55UPA2Jn095n+6Oeaz2qfQIjEfimRNtz3xfLKFpr8dfEfmiQ0txIj3ZSCvJfCA==
+ b=O4KFeOKm8NQ6CB03B2SclEwpHPvMzxTqKBTRB+BcBA2qDoDN3Ov1V4zsAyu67zHmGyZVhVbje+cUAz1FAi0wHjY6JW/WUewRFWG3CW0oy1ah2E619qQyL6OjyP05/VE/ZlfgVs8YzQ3UWHZ0pM8G2ezka2rhruIn5XYwxwZZKPPT6YP6IG1Z8z7ihvCeJJcJXCYC0UaT6hRi4siRmG0+tU+iohwX/sSHHLtEzlJCjCWIn0c2hTPCeqQGuRJZcW7hM6SaHlIx4Q0Tfg6wAk4YKKJOePCIQxCtsWDMa3rTOOA1VUxKfiIRAz5eBcIZt+Sdi1OTxz/Uac2YJTUXjb9Pyw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jIaQeGPHLwzaYEZJGYi+dVI3sJkW9Kc7OESVkhJw8ig=;
- b=YkbgUntt1YyYvA+xMB5T+gBcWRdVpKR4x2RQdEkP2wFsTOmse222aERF2nmM43u9zKAWP5hcgn8qp4iZIULiXDy8bnPbdWFWD3dEed8YqNHmyRUkxD3aFri3Fkt350tH+RnuuNne0PKX3uZgfFhgU3Bf9359fh+pjbby4lXHO1mtTV8oB0oIgx6vJO8+AJCDyyM7gDXo2aJ+7cqGm3dCX/rOwRedCHZlaYUjhdEpA62c44lwnYarvY2i6Vqseh1y9A/mmqeLKq58icZRTkBYagve2YV/EOEt0e83QAGYg8nlANZJd76/6/ykrVk8SWP+K3mUNWh21WQygbHiDU+uUg==
+ bh=Pblnng4JDMhImAMffgV4XBnZaVXqkC8eoMQLbNPb+qc=;
+ b=l9G3nTyP390u+cOcaso/wZQDhvYm2NJNybhb9EZ51t5FKyc+mGnEMUerOBYogN/11pj6MeR08q/qvXSWjTI7BPefFtkNVdxktvWVJkeDn7OGhEyIVoz3JrQnjtsMHbNpN89QVfxH17tEhjaq8AGKqWDGXW9g/kpsrSoe0QtAYFL0d6WBIOiw2Lhhii3Yk2boHQwkEhjCmIlZS3zuw1JxytVbrdgLrTN9yyKNbhrqQ+eQCtv4+MgJIBgLKoHasbSlMeIhnNPIUvX02y75YjR6k1uq2SzhMwF/QzQr2zqayWi8O/+Fdqg6Q6BpDzq63+TYkqLOJqDAN8KCsw6ODdhjWw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jIaQeGPHLwzaYEZJGYi+dVI3sJkW9Kc7OESVkhJw8ig=;
- b=S5OSZqyVsrDz3QrJ/AXzD5R2g7dlHFrERs7cq80uxU3mbpSvmlmOVTkIj4EQ1QF+69tCE9ejmuO4zpLx6IHVlSSlDaYLF6gY5eyQXwRhVFuq/UsTiLFFc2vdkWrpRB1QKBA4VUrKjsgNHJWIro0hSQ1W7HpgpbKInAEF3NgYcZ8=
+ bh=Pblnng4JDMhImAMffgV4XBnZaVXqkC8eoMQLbNPb+qc=;
+ b=SMjoDvJa1FVhpvvEMcmPzIkLPdtDcG0K/6jIYX17mpBx4AZODQG/0YhPcu2hcu2zX7s7oZBJ8nJAnFmAb/L4oOkDPCJ2C0sm3EnVXPxgCOhLgg0ILsBGvI6FPj9uZROfEn+aXdCdRgtbDp4QJ+wZOvCCvlehy4QgxuJjER2Btgo=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from GV1PR04MB9070.eurprd04.prod.outlook.com (2603:10a6:150:21::14)
  by AS8PR04MB7894.eurprd04.prod.outlook.com (2603:10a6:20b:2aa::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.26; Wed, 13 Dec
- 2023 12:15:47 +0000
+ 2023 12:15:48 +0000
 Received: from GV1PR04MB9070.eurprd04.prod.outlook.com
  ([fe80::1290:90d4:98c1:3d35]) by GV1PR04MB9070.eurprd04.prod.outlook.com
  ([fe80::1290:90d4:98c1:3d35%7]) with mapi id 15.20.7091.022; Wed, 13 Dec 2023
- 12:15:46 +0000
+ 12:15:48 +0000
 From: Ioana Ciornei <ioana.ciornei@nxp.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -50,16 +50,16 @@ To: davem@davemloft.net,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org
 Cc: Ioana Ciornei <ioana.ciornei@nxp.com>
-Subject: [PATCH net-next v2 4/8] dpaa2-switch: add ENDPOINT_CHANGED to the irq_mask
-Date: Wed, 13 Dec 2023 14:14:07 +0200
-Message-Id: <20231213121411.3091597-5-ioana.ciornei@nxp.com>
+Subject: [PATCH net-next v2 5/8] dpaa2-switch: do not clear any interrupts automatically
+Date: Wed, 13 Dec 2023 14:14:08 +0200
+Message-Id: <20231213121411.3091597-6-ioana.ciornei@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231213121411.3091597-1-ioana.ciornei@nxp.com>
 References: <20231213121411.3091597-1-ioana.ciornei@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: AS4P189CA0052.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:20b:659::21) To GV1PR04MB9070.eurprd04.prod.outlook.com
+X-ClientProxiedBy: AS4P189CA0068.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:20b:659::23) To GV1PR04MB9070.eurprd04.prod.outlook.com
  (2603:10a6:150:21::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -69,93 +69,99 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: GV1PR04MB9070:EE_|AS8PR04MB7894:EE_
-X-MS-Office365-Filtering-Correlation-Id: 089cb692-b215-404e-1325-08dbfbd53c98
+X-MS-Office365-Filtering-Correlation-Id: 2a1a69b6-f22e-493f-5346-08dbfbd53ddc
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	o3Fo6syAcs1JOiG+2ryvCXvNLsu0Hs7FYyYldiMqiTizUEEKOZ/0bNVBZFCWd5mAbVTHiHzCbFnF6PCFsI7gbuASZslBM+aXaNqXHhZk0J3ndDv7vY5KfVYLOv0/N0D45ShoBJdV8z+Cx9jsL8df5FGc9dzfX2BANkBeL07upZK+Cn18wh4IfwfZy5gZYQA6m1+tWYmc11aAd6mU+0+3e+WEnOfrNTK47f+HEnY/FQMprNRPe0v+g3J9wv7RryqyT47bkzsMvSbQsTet3gXgtJzhG9scZ+cynI04MYBaMzo5kGk4D4hhT+hyirJzln3mJg25lTccnpUj4KflJdPbotosDyZVE7KqeQJGCPQ43elPZv2xkuJXKfopQfj8MaPyfzwW1UI3NConN710BcvKQYlV6lv72ni2mxtG3AujjF/8MQK9aOsyAegBXIcir4oNqWLq/trYHcbGrnE9EynZXopwwbgyKrvXjQOgRoGoOtOP2w7JVGpja9Q5Rr4G87DiKQaSqtaIQpR6Yjag7EWx9IBV3obD/vbhdcAvXljRFvobzGMgDlRxy0hrbNCjpqib
+	vwE4l0WJkSwgh5oAuiCiMIlxNDI3uJWpEs4YUIybFkybgg5fXqa3C0yx98PUzRyhdrQ+Ro+YNCawWVzJQy2Pa7BALmzz5WFiOms/EII24v0h6SGdQN6CFzHcKFn3pp1cuy6v1kELBcWjY/hYheEOKAZn2CQxzbpkwebJaEE/0kkqSOdubyyenjUZa0PK7MAvgnxYoTcQGfI1/XkgOCcaCgoYH3dmxJt3ccoVTKeAnfSzxmYDS51c1Ei82hV3dnj+fVJPlwnuSTOLvzDyAW6IVvcsdFLG/1mHylMi6qqMFiuRV6h969H2PrhNa0De4kqIqQYVDDeLvHJNL247Cfg2o8Z4CYIlMqPIyT/Trgq2CKTKXhmVxRhVXnjftoevCC+UJY5gKqg3EQl/m3btrK2gOkoPveBJ8XCXQKINpVwRhO7Jvr+s4JB6L/sX0VDWPeKrSqPeEgMp2D+c9IaRo62G5NtRluA6Q59bJzgv5lhtZ1k7K0bAdcspd4KPjeE0PsAc3g2Vvx5x9NKyWAefZ1oLrC37h9nVRgUl2IWOulg75FUwK2/Qb5gJEBB1D+5e1a6K
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9070.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(136003)(396003)(39860400002)(346002)(366004)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(26005)(2616005)(1076003)(86362001)(83380400001)(6666004)(6506007)(6512007)(66946007)(6486002)(44832011)(478600001)(4326008)(8936002)(8676002)(36756003)(5660300002)(41300700001)(2906002)(38100700002)(66476007)(66556008)(316002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?yvzWMRTCzWFSo1qbZ6PtOCy7ZeL4iLuaLdpvM/Sa2n42P8PeQttTLeT3eFQU?=
- =?us-ascii?Q?R3Cx/fPeBmSvUwg7i1btl6qL5GbsamLVJ4afLdOq21Wja5H0xlE99dbMlFVM?=
- =?us-ascii?Q?aDmG9Es5Akn2HKru7Wj0MlTzk4CiYb577uY+GhYiQaVmAPVxt8HLSsBWFwhY?=
- =?us-ascii?Q?H9gX6Z4QaiXjn/+nly0v2MbnDySGwYWgbQtDttDxqbg0+BhoEfAP7UzxFjKr?=
- =?us-ascii?Q?6m7wfVNjalmoqjgOSOox8ddtsSOkKMD8L1WuS4Mrx766OIxlo6SFExGz/VLU?=
- =?us-ascii?Q?fn1tCpm5dsPO11TG9AMVJsj3Gv5C7NI9UThXRP3elkTlr3pkE9Uo0kNKLLA7?=
- =?us-ascii?Q?FVipFPKJsSVX4eSpucGNVap1Pefwh8aZiWGEtz1R072/jA9oHN9FHBFrYNdY?=
- =?us-ascii?Q?Ct2amAFExD5N/FVkEcKlUil60D08PbJE4BC2NzQDeGbRE/YzPr+FLfENNCNp?=
- =?us-ascii?Q?xsRSpfaPDRmTbsRB3Nzy3c25P7NqGUKxZ3mVk+D/n42ckMp8uM+avBrAkN6H?=
- =?us-ascii?Q?2g7RLtky71NcOMMMoc2z10U9npzUo+6FV+fytq/Jg2zFBH282J8dJl8OkJhE?=
- =?us-ascii?Q?Nrxrhao8ETkLzpHuwRqRGkTxA80hNzC+mVaGFLTzOhfwT6/I5FoVxHcBxiqd?=
- =?us-ascii?Q?fkpV0erhoepEjUJe4kvOnp7A90spJFB4F7eo9TViTgHJBKHZEoZjWpJDsEko?=
- =?us-ascii?Q?2oc9KXfYbsX15DMuLN6gyagGtST7Hi0wxXLd6qDetFIrhhjg8P+3JfiBkqZ+?=
- =?us-ascii?Q?6KYlXfEWTeRk8MTe/LFFIDbluYP5PY1+kA/JQ+YEdBqAjlJuwgsxjpRzmkaS?=
- =?us-ascii?Q?+T/a9IxyPCHgqbe0JDmaVhyE1/kKKwKSSdDXbE+bLIy6NbHNdFf1LEXoX900?=
- =?us-ascii?Q?rVIp7svnpZoIQdBBAml+xKOZUqDQVBzXCVAeGEJJPZ+/4UiUpfMahgNBRFJC?=
- =?us-ascii?Q?F+S5suImNbHC7wVeGdjMqi+YDRbaK5NO2rx2OMezPossdAJjIJbyKE8uzkvL?=
- =?us-ascii?Q?3y/X8WPex/MQLjBzBhz52oVzwNi61vnfhNDPWnipzOakSl6EcTYg+R0z1tYX?=
- =?us-ascii?Q?3eOqtlFt+8JhGCN+YE9anl/6nhEhcfbXxTX6fQ2wpRbQQUYQ5eh0r4GImJJ8?=
- =?us-ascii?Q?OJEBY7ajBwbZmMRar52KD0S9pGASNJESNUfttmtM1S+zZ/6bAA26VCXZHvLl?=
- =?us-ascii?Q?3KsYQY9BiRFD1EyK+b0HirF9qPcvbAg23BaLP2rrLsPP3PtBCdpb87oyahp9?=
- =?us-ascii?Q?gimgEdB/1usdSaqHrOM0j4YyrfUkGlSkmmfYDokoiFvDNybHUUGTIqk1+Poe?=
- =?us-ascii?Q?eIxIQhseKecv9Ho/uHvo5WsvIem5R9XuOqT9HWtZ1clE3GNRnKJlXYylFF/M?=
- =?us-ascii?Q?9+hA4ObyjjKHJJw3cxK3M7tcRi84J5sHDj+f+Re2V+er2kUfZaluyG6d8D1L?=
- =?us-ascii?Q?ZFZhHQu5+zLoZJdZX4fP6IUfISmCQkKlaX0tyxjtnTGFAoEGFn1Qw6F75Lib?=
- =?us-ascii?Q?8Psd8EOR0ZS1erIvFJghq+gHQX17ovk+cVxb+qKPk6FDIbEvZhqzv4XTaVWZ?=
- =?us-ascii?Q?lYWEi7L4j3sgQcctvRx3NIeBMNGp18LYsslOFZbM?=
+	=?us-ascii?Q?mEHwTfXD9aO9RNaZEmzcswGwpauDet+WZdCw0IDCTBeXD0WU3W8a8EPQWpow?=
+ =?us-ascii?Q?wdTzvFKV537N3dUHYt9CIKg0qUzh2sF9DvZ0kM5mNED12MV/buLA/1UHuymu?=
+ =?us-ascii?Q?unuKgIKGMOIHD4WZkW278ZBiiFNlI/NzxOmPyKgD3SCtwqyExv8IK0cC7+Sr?=
+ =?us-ascii?Q?07tL1WIBI/CsqUGaQdCA1pvUFVeBhANkmVY1ah6gTB622MOtgHJE1ZkBuJM4?=
+ =?us-ascii?Q?0/ud3d0i8GgHP5vcbQ6LPkMVGZn9TOOZa5Q8NUkY5rdK6aJAwTmIdiFCWKl5?=
+ =?us-ascii?Q?BigBASt9WYzrmSvt5sq0GehAm1HBeaXZ1AfYUobxhB1RizDhP6wi7nT0Lazg?=
+ =?us-ascii?Q?97KVgh9+LsOwqwEFplwopt1MgLtD5VYFZecoVb7CDdrujN0wP7eruXaJGYTm?=
+ =?us-ascii?Q?xJ5FIgR/pYyvIBnS2BdnMrPKfmjNuFICKDamW23gWZmmFA7ZY31XoQ3+0hAH?=
+ =?us-ascii?Q?q3j4rEBHrU46BQeKjFbNEfJ/eY5x5kjfPc5Kfai7NxtUyTCBTi/eY9YmXcJZ?=
+ =?us-ascii?Q?SaYfU+0XKyc5EYakJWdD8UjiJTtwF4wYlTBi457/JEL4lJOzLVNakHfhv0O7?=
+ =?us-ascii?Q?ovEjadDGu/E9O8ldf0issHSxpCQId7LxLpB2JEN6zvsc5hy/eBcPq23BiV0J?=
+ =?us-ascii?Q?XJ6geaT9KR4h0/q9sdY3myYF1sHsroGFvYDQNu2uXh6LoBfkT7V4xsMd8uqw?=
+ =?us-ascii?Q?plIluP+TqgJ0Qy8zTQ6ebU9F0fi+NFxY/UVpChifEOJJ+y8swxV+FqpxjwDZ?=
+ =?us-ascii?Q?ExpZ+YPLfvhc/QrO/EvoGZj14liRl9T8k3fjS3eK8I5NDBVhI4Rb+A/3JGxL?=
+ =?us-ascii?Q?rPqwJJXn9dc6xB2qC25WRr2HIco96KCVT+iXST7mMtRRLlXdp7DMDVRbeZ4j?=
+ =?us-ascii?Q?xbM22Ub26I+dgN5vbDFUQVbw4lBiAXrNcSVqlXFPYSEK64jmzfBdgmFncBSh?=
+ =?us-ascii?Q?4+VKIub5mWpfFB+Jd+GT4gp5Th7G9iEszcGgeBs+XrFtklFrDR/h4QAlVI+D?=
+ =?us-ascii?Q?LuVu80dGSa9Fag7gG242imXKYL9bq3CW0EK0yrcQBHj+UB0lbZd8gzi7ywi3?=
+ =?us-ascii?Q?5KRu8W2XOj7YlatBy1CxOUjvbJEZOaLvCMsRw/gRA+JXy0s1UmJdmb5YZ0+y?=
+ =?us-ascii?Q?HydOjsIVzFabt+Lgl2P/nE4RrWwY0NmT4pPMWR9tm2Klur7vNdXybNpLp7+l?=
+ =?us-ascii?Q?/FopuEdFrnbHzYhyUgaKNfwnxKHlfamIQEZ1fhjMQobeWEV9+ITjFn795lH4?=
+ =?us-ascii?Q?De4rqUoHDPbjtaFeThaUN5Ab0UgcBuPDGPnHBd5lljEZYIWqijtbANqUsAcX?=
+ =?us-ascii?Q?30in7Xu/ErZ6kN253NmxhfgnH7uDWparMeg9I7YtnYiRK9PdFtpDd7mbQ/jA?=
+ =?us-ascii?Q?UWzkr/Rc+jaTC7jjFyLaIECv+e5jcxTn2H1NTcilxnwXgyyDrjCbGzSzP/IV?=
+ =?us-ascii?Q?GSiZMiznJQylLOCy4EWIQoEwagT9wA1SydfBVzinjBJ12AshetHwgD8dNMQe?=
+ =?us-ascii?Q?Es81ErVSYcqItuHCQ86CRgWRhb9Ya4M3Wi/+02HCpbY8RWzgAe5WvAjgGv0D?=
+ =?us-ascii?Q?cNJ+utDDuGfKoIOObmPBTAL9xSFdV7lUhekQx7pv?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 089cb692-b215-404e-1325-08dbfbd53c98
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2a1a69b6-f22e-493f-5346-08dbfbd53ddc
 X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9070.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2023 12:15:46.7813
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2023 12:15:48.8657
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MSxuuVyn9IWOkyVDMSdNziqRwLpjx9L+OPIZHkJz0SVHjlCdv3nO6FxU9AZj3jMHr/OtG0ebuw9DeEx70FSl+w==
+X-MS-Exchange-CrossTenant-UserPrincipalName: +NqY+X8C8M5pUfohWM3FyrAtf2UJPkpeKWr52AIiDm4G5jQK4x0g+kcn/5zktA276yTBgeN0giaFccdiL9MyUA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7894
 
-The blamed commit added support for MAC endpoints in the dpaa2-switch
-driver but omitted to add the ENDPOINT_CHANGED irq to the list of
-interrupt sources. Fix this by extending the list of events which can
-raise an interrupt by extending the mask passed to the
-dpsw_set_irq_mask() firmware API.
+The DPSW object has multiple event sources multiplexed over the same
+IRQ. The driver has the capability to configure only some of these
+events to trigger the IRQ.
 
-There is no user visible impact even without this patch since whenever a
-switch interface is connected/disconnected from an endpoint both events
-are set (LINK_CHANGED and ENDPOINT_CHANGED) and, luckily, the
-LINK_CHANGED event could actually raise the interrupt and thus get the
-MAC/PHY SW configuration started.
+The dpsw_get_irq_status() can clear events automatically based on the
+value stored in the 'status' variable passed to it. We don't want that
+to happen because we could get into a situation when we are clearing
+more events than we actually handled.
+Just resort to manually clearing the events that we handled.
 
-Even with this, it's better to just not rely on undocumented firmware
-behavior which can change.
-
-Fixes: 84cba72956fd ("dpaa2-switch: integrate the MAC endpoint support")
 Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
 ---
 Changes in v2:
 - add a bit more info in the commit message
 
- drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-index 654dd10df307..e91ade7c7c93 100644
+index e91ade7c7c93..d9906573f71f 100644
 --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
 +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-@@ -1550,9 +1550,9 @@ static irqreturn_t dpaa2_switch_irq0_handler_thread(int irq_num, void *arg)
- 
- static int dpaa2_switch_setup_irqs(struct fsl_mc_device *sw_dev)
- {
-+	u32 mask = DPSW_IRQ_EVENT_LINK_CHANGED | DPSW_IRQ_EVENT_ENDPOINT_CHANGED;
- 	struct device *dev = &sw_dev->dev;
+@@ -1509,7 +1509,7 @@ static irqreturn_t dpaa2_switch_irq0_handler_thread(int irq_num, void *arg)
+ 	struct device *dev = (struct device *)arg;
  	struct ethsw_core *ethsw = dev_get_drvdata(dev);
--	u32 mask = DPSW_IRQ_EVENT_LINK_CHANGED;
- 	struct fsl_mc_device_irq *irq;
- 	int err;
+ 	struct ethsw_port_priv *port_priv;
+-	u32 status = ~0;
++	u32 status = 0;
+ 	int err, if_id;
+ 	bool had_mac;
+ 
+@@ -1539,12 +1539,12 @@ static irqreturn_t dpaa2_switch_irq0_handler_thread(int irq_num, void *arg)
+ 			dpaa2_switch_port_connect_mac(port_priv);
+ 	}
+ 
+-out:
+ 	err = dpsw_clear_irq_status(ethsw->mc_io, 0, ethsw->dpsw_handle,
+ 				    DPSW_IRQ_INDEX_IF, status);
+ 	if (err)
+ 		dev_err(dev, "Can't clear irq status (err %d)\n", err);
+ 
++out:
+ 	return IRQ_HANDLED;
+ }
  
 -- 
 2.34.1
