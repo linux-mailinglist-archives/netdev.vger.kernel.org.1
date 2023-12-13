@@ -1,151 +1,178 @@
-Return-Path: <netdev+bounces-56719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AAA5810951
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 06:00:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C96CF81097A
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 06:31:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E67B61F21978
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 05:00:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 103631C20979
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 05:31:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E56D7C8E7;
-	Wed, 13 Dec 2023 05:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49C4AC8C8;
+	Wed, 13 Dec 2023 05:31:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hEXyEv+M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GtWYIOu6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9094AB7;
-	Tue, 12 Dec 2023 21:00:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702443614; x=1733979614;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=E2++cigaU5epJz8MvyaCLgexIN/en3jBO7RKWMnmda8=;
-  b=hEXyEv+MaRQonEHyWV7MFR+NRwEiNjGZ/fgTwWHn6+P6o7OC+c29qq4t
-   QRHdIIXDVQGFq/rOWDIh1Gohh21ZMkAlJKmx/63PHfq7M9vu16yNRJWl7
-   YIuF5teDr2pybOWWprndqqLJ8TAdFeitA/7iYfW9dgi+75GkE3kdfHWOr
-   8yBiENT4LWSn1FbaqL2iEaNHdLI//7416ZlC6Jj1cBONRp8vnDhJqD/Zi
-   CPCeZW75VLqu6KQUWg5pBxSKE7iEIOyqcO4phj1VKnd0kA70Ee3YD+dMe
-   2FeSa2JNLOccugsJ/Dgv6zOG1UjjLKhP0/r2L2dw1vu0HNUhNhyqyp9Ar
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="8289894"
-X-IronPort-AV: E=Sophos;i="6.04,272,1695711600"; 
-   d="scan'208";a="8289894"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 21:00:13 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="1105181391"
-X-IronPort-AV: E=Sophos;i="6.04,272,1695711600"; 
-   d="scan'208";a="1105181391"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by fmsmga005.fm.intel.com with ESMTP; 12 Dec 2023 21:00:07 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rDHLp-000K5V-2Q;
-	Wed, 13 Dec 2023 05:00:05 +0000
-Date: Wed, 13 Dec 2023 12:59:59 +0800
-From: kernel test robot <lkp@intel.com>
-To: Christian Marangi <ansuelsmth@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Harini Katakam <harini.katakam@amd.com>,
-	linux-kernel@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: Re: [net-next PATCH v5 3/3] net: phy: add support for PHY package
- MMD read/write
-Message-ID: <202312131208.HLapuT6A-lkp@intel.com>
-References: <20231212123743.29829-3-ansuelsmth@gmail.com>
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B269DD5
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 21:31:01 -0800 (PST)
+Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-50bfd7be487so7359685e87.0
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 21:31:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702445460; x=1703050260; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9ob5cwessIc+6R7Ja4pmtqH2FOjFq7wHkXRHGbeTzfk=;
+        b=GtWYIOu6kzeGJ6S+nKucukgDiq8Ht2kXlGz7r4OGo7RFhp/12rYCs1l8xfbNqizYv7
+         /y24R7tGQhF5dW3/ie/0nSRxoLMh4HaKEnZaOL5EyCaU+je/H9aqpkYa0OQMu5370hDe
+         fxonqs68mEJdFmDOM70vW7k6LOBrFGWdHuJAa4ge86vAxJ8l4S0rK/2iWvAxfhRRuyfG
+         +iplvz3ugNCCfWIKU6ublbrC0IatNZbA9RvAxa/UKn/GVi4B+Nr9uyk1GumrP8bDQTyA
+         YRzPcGJchjD/t3NkiyLInvD7ufOyg8LwDx5gebRklEvOWOykZw3aDtuBxCjTmdH1kDhp
+         +Y+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702445460; x=1703050260;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9ob5cwessIc+6R7Ja4pmtqH2FOjFq7wHkXRHGbeTzfk=;
+        b=RV1D8bXKiJGwwSpNMC/amTaMY6zpyzJC71cH4Y7ewwuM2MEFuG9TQyDncCk/GK1mq1
+         oJC7s4SxrOg7I8qzRkTW7fhJqfkMW21n4hnRF7z4GKR9blxSzKTe0vp2qdAZ+gwUS+oP
+         1G3FKOkoYz125maEv6M70H2V1+CvwMWquh9rsIrzFW/dzHaDCC2iuOmYOb4XDPQYsuQ2
+         gF12pQ88MwR2sb8FyCY+20Alzf8Bf236qFyQ0EFx6thpFFEtDJ5jlrMyPYRJmb2UNSia
+         MwsiITEae2HUi2pIOE8Lm5TiQ7V48JxMx7jc4SRPrFIrcKgE2ZqN2we790EvaHqoSYqg
+         3mSg==
+X-Gm-Message-State: AOJu0YyjfVRCm4Rrob+cDwJZo6uWIAPFet15Hl7m4w+uBE8i1CePfG5q
+	A2a9tyWCrV6mVPmZMWzH5KUi4zd9zgi0FyCbv0I=
+X-Google-Smtp-Source: AGHT+IEog4gvugjvm+pgZ31h5eCVLDUDDQLmHxh/QmC/GTfi0HA2CqSPr93Gz2JsZnIarysor8fSd2MRrgmUBfJz/SM=
+X-Received: by 2002:a05:6512:481:b0:50b:eb2f:42fe with SMTP id
+ v1-20020a056512048100b0050beb2f42femr3263224lfq.74.1702445459630; Tue, 12 Dec
+ 2023 21:30:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231212123743.29829-3-ansuelsmth@gmail.com>
+References: <20231208193518.2018114-1-vladimir.oltean@nxp.com>
+ <20231208193518.2018114-4-vladimir.oltean@nxp.com> <r247bmekxv2de7owpoam6kkscel25ugnneebzwsrv3j7u3lud7@ppuwdzwl4zi5>
+ <20231211143513.n6ms3dlp6rrcqya6@skbuf>
+In-Reply-To: <20231211143513.n6ms3dlp6rrcqya6@skbuf>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Wed, 13 Dec 2023 02:30:48 -0300
+Message-ID: <CAJq09z4_dY03AaFm=e4G7PU5LwBegGXmTCTaMp9C=izh7Ycj-g@mail.gmail.com>
+Subject: Re: [PATCH net 3/4] docs: net: dsa: update user MDIO bus documentation
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <ALSI@bang-olufsen.dk>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+	Madhuri Sripada <madhuri.sripada@microchip.com>, Marcin Wojtas <mw@semihalf.com>, 
+	Linus Walleij <linus.walleij@linaro.org>, Tobias Waldekranz <tobias@waldekranz.com>, 
+	Arun Ramadoss <arun.ramadoss@microchip.com>, 
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Jonathan Corbet <corbet@lwn.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Christian,
+> > > +When using OF, the ``ds->user_mii_bus`` can be seen as a legacy feat=
+ure, rather
+> > > +than core functionality. Since 2014, the DSA OF bindings support the
+> > > +``phy-handle`` property, which is a universal mechanism to reference=
+ a PHY,
+> > > +be it internal or external.
+> > > +
+> > > +New switch drivers are encouraged to require the more universal ``ph=
+y-handle``
+> > > +property even for user ports with internal PHYs. This allows device =
+trees to
+> > > +interoperate with simpler variants of the drivers such as those from=
+ U-Boot,
+> > > +which do not have the (redundant) fallback logic for ``ds->user_mii_=
+bus``.
+> >
+> > Considering this policy, should we not emphasize that ds->user_mii_bus
+> > and ds->ops->phy_{read,write}() ought to be left unpopulated by new
+> > drivers, with the remark that if a driver wants to set up an MDIO bus,
+> > it should store the corresponding struct mii_bus pointer in its own
+> > driver private data? Just to make things crystal clear.
+> >
+> > Regardless I think this is good!
+> >
+> > Reviewed-by: Alvin =C5=A0ipraga <alsi@bang-olufsen.dk>
+>
+> I think something that makes a limited amount of sense is for DSA to
+> probe on OF, but not describe the MDIO controller in OF. Then, you'd
+> need ds->user_mii_bus. But new drivers should probably not do that
+> either; they should look into the MFD model and make the MDIO controller
+> be separate from (not a child of) the DSA switch. Then use a phy-handle
+> to it. So for new drivers, even this doesn't make too much sense, and
+> neither is it best to allocate the mii_bus from driver private code.
+>
+> What makes no sense whatsoever is commit fe7324b93222 ("net: dsa:
+> OF-ware slave_mii_bus"). Because DSA provides ds->user_mii_bus to do
+> something reasonable when the MDIO controller isn't described in OF,
+> but this change assumes that it _is_ described in OF!
+>
+> I'm not sure how and where to best put in words "let's not make DSA a
+> library for everything, just keep it for the switch". I'll think about
+> it some more.
 
-kernel test robot noticed the following build warnings:
+Hello Vladimir,
 
-[auto build test WARNING on net-next/main]
+Sorry for my lack of understanding but I still didn't get it.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Marangi/net-phy-restructure-__phy_write-read_mmd-to-helper-and-phydev-user/20231212-203921
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231212123743.29829-3-ansuelsmth%40gmail.com
-patch subject: [net-next PATCH v5 3/3] net: phy: add support for PHY package MMD read/write
-config: arm-defconfig (https://download.01.org/0day-ci/archive/20231213/202312131208.HLapuT6A-lkp@intel.com/config)
-compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project.git f28c006a5895fc0e329fe15fead81e37457cb1d1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231213/202312131208.HLapuT6A-lkp@intel.com/reproduce)
+You are telling us we should not use user_mii_bus when the user MDIO
+is described in the OF. Is it only about the "generic DSA mii" or also
+about the custom ones the current drivers have? If it is the latter, I
+don't know how to connect the dots between phy_read/write functions
+and the port.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312131208.HLapuT6A-lkp@intel.com/
+We have some drivers that define ds->user_mii_bus (not the "generic
+DSA mii") with the MDIO described in OF. Are they wrong?
 
-All warnings (new ones prefixed by >>):
+Alvin asked if we should store the mii_bus internally and not in the
+ds->user_mii_bus but I don't think you answered it. Is it about where
+we store the bus (for dropping user_mii_bus in the future)?
 
->> drivers/net/phy/phy-core.c:777: warning: expecting prototype for __phy_package_write_mmd(). Prototype was for phy_package_write_mmd() instead
+You now also mention using the MFD model (shouldn't it be cited in the
+docs too?) but I couldn't identify a DSA driver example that uses that
+model, with mdio outside the switch. Do we have one already? Would the
+OF compatible with the MDF model be something like this?
 
+my_mfd {
+    compatible "aaa";
+    switch {
+        compatible =3D "bbb";
+        ports {
+            port@0: {
+              phy-handle =3D <&ethphy0>;
+            }
+        }
+    }
+    mdio {
+         compatible =3D "ccc";
+         ethphy0: ethernet-phy@0 {
+         }
+    }
+}
 
-vim +777 drivers/net/phy/phy-core.c
+And for MDIO-connected switches, something like this?
 
-   757	
-   758	/**
-   759	 * __phy_package_write_mmd - write MMD reg relative to PHY package base addr
-   760	 * @phydev: The phy_device struct
-   761	 * @addr_offset: The offset to be added to PHY package base_addr
-   762	 * @devad: The MMD to write to
-   763	 * @regnum: The register on the MMD to write
-   764	 * @val: value to write to @regnum
-   765	 *
-   766	 * Convenience helper for writing a register of an MMD on a given PHY
-   767	 * using the PHY package base address. The base address is added to
-   768	 * the addr_offset value.
-   769	 *
-   770	 * Same calling rules as for phy_write();
-   771	 *
-   772	 * NOTE: It's assumed that the entire PHY package is either C22 or C45.
-   773	 */
-   774	int phy_package_write_mmd(struct phy_device *phydev,
-   775				  unsigned int addr_offset, int devad,
-   776				  u32 regnum, u16 val)
- > 777	{
-   778		struct phy_package_shared *shared = phydev->shared;
-   779		int addr = shared->base_addr + addr_offset;
-   780		int ret;
-   781	
-   782		if (addr >= PHY_MAX_ADDR)
-   783			return -EIO;
-   784	
-   785		if (regnum > (u16)~0 || devad > 32)
-   786			return -EINVAL;
-   787	
-   788		phy_lock_mdio_bus(phydev);
-   789		ret = mmd_phy_write(phydev->mdio.bus, addr, phydev->is_c45, devad,
-   790				    regnum, val);
-   791		phy_unlock_mdio_bus(phydev);
-   792	
-   793		return ret;
-   794	}
-   795	EXPORT_SYMBOL(phy_package_write_mmd);
-   796	
+eth0 {
+     mdio {
+         my_mfd {
+            switch{...}
+            mdio{...}
+         }
+     }
+}
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Is it only a suggestion on how to write a new driver or should we
+change the existing ones to fit both models?
+
+Regards,
+
+Luiz
 
