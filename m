@@ -1,167 +1,146 @@
-Return-Path: <netdev+bounces-56994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 121EA811841
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 16:50:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D7B4811850
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 16:51:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C992F1C21265
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 15:50:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0937DB2121B
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 15:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DD8C3306C;
-	Wed, 13 Dec 2023 15:47:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E1358534D;
+	Wed, 13 Dec 2023 15:50:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DaM9v6xu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J3VbIYLV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9BC3F2;
-	Wed, 13 Dec 2023 07:47:24 -0800 (PST)
-Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2cc259392a6so42984621fa.2;
-        Wed, 13 Dec 2023 07:47:24 -0800 (PST)
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DA38B9
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 07:50:06 -0800 (PST)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so14831a12.0
+        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 07:50:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702482443; x=1703087243; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EhvWEh807oUIcSem4VDgk6dTPM+cYeOF5hlufV89DoI=;
-        b=DaM9v6xuPKDYm4Kyb/wttByJTbgU1JRNzLNpXJMk2sLR/aDSlzQ7M8YFBOlmcUGhUX
-         amxFegOmdy1Pj++hPY6A/WeyIfNAoeSZhGZDo761/9PQcq66Sj7c5vpbTTyCqerF498O
-         S/FmcG/TqizEWAieIaogjSwVjUfp3WhlYaZ2xLD0XqtfTP0Kc9JQAZMcUZz7XspERXSp
-         kTyi4zWKOwZo6KZGfYJWj3R8VdzhY/5YHUhOBkCswmnN0THhh03v0lvQPY87zcQJvePo
-         4IoA1KdMYf62Yp/NxI5cBxynwX+VS9EHcqTMuIgDnWCk8XcyM+eyPv3pwSlT7rwg7hU5
-         dBYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702482443; x=1703087243;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1702482605; x=1703087405; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EhvWEh807oUIcSem4VDgk6dTPM+cYeOF5hlufV89DoI=;
-        b=cBkZu+/N1ea8g57MnHh+Jt2bczeENCZo2iCLx1NMEVnuNd9bUZz37R06/ZUSnYucT3
-         Ycm4Q5RFeWyseDygGiYcdNudyqraDljC9xQaSt8Vzo5pf4EXNpNDFHDe5BP3a/ns2Vl3
-         OiV5Ff9lumnh9Q24p7wP+Z7jFUAJ4VPKyF+TTYbDjAL7DizJ4LCrUA//B4eI8RbSnytS
-         G/uYo8x79cEtD7YHzeIs+oHSW4d4TaYC7xR6iL+85I1jiPdHF7Nnk7RwT+W5GUGMGn0o
-         m9ThVR8D8gyy2VnthweL+cXByhvgqGHxGKSx/DGJutJSFyRutxG13/VwAE9YeBnTpYKh
-         2Z2g==
-X-Gm-Message-State: AOJu0YyXFDRYihL8ssoF8PLXRXYCevhqWexRbl7/XvOqABl4Isv8O/5p
-	Xlr9dFBIi4fiIpyOUO1DK6M=
-X-Google-Smtp-Source: AGHT+IHfEac18zoY0gBPJcbuOObR91TUzD3b56b0y+7kI2XbIcuwhPK2c/DDUaHKl+amw8uRZizW/A==
-X-Received: by 2002:a2e:a103:0:b0:2cc:1dc8:4e96 with SMTP id s3-20020a2ea103000000b002cc1dc84e96mr4567741ljl.24.1702482442739;
-        Wed, 13 Dec 2023 07:47:22 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id p8-20020a2e8048000000b002ca026f777fsm1867436ljg.48.2023.12.13.07.47.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 07:47:22 -0800 (PST)
-Date: Wed, 13 Dec 2023 18:47:19 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Jose Abreu <Jose.Abreu@synopsys.com>, Maxime Chevallier <maxime.chevallier@bootlin.com>, 
-	Tomer Maimon <tmaimon77@gmail.com>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, openbmc@lists.ozlabs.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 06/16] net: pcs: xpcs: Avoid creating dummy XPCS
- MDIO device
-Message-ID: <eeyhdczfpgxwxbtljjc7tkjwi64avqkn2h7tehh56xq6pss3x3@7cun56p633o4>
-References: <20231205103559.9605-1-fancer.lancer@gmail.com>
- <20231205103559.9605-7-fancer.lancer@gmail.com>
- <ZW8pxM3RvyHJTwqH@shell.armlinux.org.uk>
- <ZW85iBGAAf5RAsN1@shell.armlinux.org.uk>
- <kagwzutwnbpiyc7mmtq7ka3vhffw4fejuti5vepnla74rocruh@tryn6lxhwbjz>
- <ZXivRofyIpvmfOyR@shell.armlinux.org.uk>
+        bh=aK5AiyloDMi+9ASrKpn3cQfdNDrQYEM0tYKjuMEvWyU=;
+        b=J3VbIYLVfX1bvq6hEtRbAOvX+e+tfTuy3uUkK68YSedDB3sJmMnnCy5wAU/tyXPhW5
+         Hwr1ih0gUCy6tisYhezfvNM2wmM1UwFbXTZSHChQ2r0iwDtudfEugSTCNZDbuAv4ULJK
+         ZLpykAdLZotzyj/fJ8vqWcBvxpOU7e3h6nU5x1TAz/QiSyVQo+0r5ZNGmfGkD7jeAL8d
+         5wCuacsSG+6BEjDtiVOZ01XkgJXkEIwUTJtTYyveOUSc/56NoDKjaayMwn81EjeAcCXt
+         fgur+2WWcvKbVsSksNmj5rm93Sq/dVDvi9OTmx/BTwOosKuinG8PTWdo6lQ81qQ3GUwQ
+         bP3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702482605; x=1703087405;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aK5AiyloDMi+9ASrKpn3cQfdNDrQYEM0tYKjuMEvWyU=;
+        b=KHAsWmaEtRo4ijCMArNs3B6K9zluF+yrfZBsNvqZ6/swodAJ/QqaG9f/8+KUzXfq/E
+         3Z1e4iW9SVH1mL5SmLx1JNCaiuoDmKjN3xH/HGSMgcqnLb4xnsXjSQ12+bxcPFLJKJJP
+         QK4kTSPSTjE1WHcSVMOtpnsH/WqrE2CFVIYDUzpHRAiStgASUXhmKJy1TPbA468XL4qJ
+         Rb+mnyxAd8Z2wb/My64m/RQDy9mrvbP5qIqUu0/JwVrRyIiVoknXOp3444mwYz0BA0G2
+         /sOnHCVlys4AZB5Lcue27LIYou6uTBHrjz5i0rLttq0Ef+BX7SRM8ubQj+YHXpq0Fggi
+         FMSw==
+X-Gm-Message-State: AOJu0Yw4YwS7/m+i3rfEBKckCCIjxmDW4q9xS9v92JZ4V9bdzTHZmIOt
+	QMvhH9qONVVxUGc3An7QTV5nITxNQU0rjCaFnAwUKw==
+X-Google-Smtp-Source: AGHT+IGvYZD5igLED5RS/H4soZBhMPwReNLt7D0CLY/IlYJ9se289bVdzi/qg3VCtKv4vXf6f9TyCI+No3/LlaiJEfc=
+X-Received: by 2002:a50:c082:0:b0:54c:9996:7833 with SMTP id
+ k2-20020a50c082000000b0054c99967833mr502228edf.7.1702482604482; Wed, 13 Dec
+ 2023 07:50:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZXivRofyIpvmfOyR@shell.armlinux.org.uk>
+References: <20231212145550.3872051-1-edumazet@google.com> <CADvbK_fiHwCXQZxOh7poK7gxv2t20D7KwR0Yi1wm7zWqHPN+6Q@mail.gmail.com>
+In-Reply-To: <CADvbK_fiHwCXQZxOh7poK7gxv2t20D7KwR0Yi1wm7zWqHPN+6Q@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 13 Dec 2023 16:49:50 +0100
+Message-ID: <CANn89iJdFLHVYBvOMvsw9E-N=AOMKWNi62L5dPOxqECyCpbnuQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] sctp: support MSG_ERRQUEUE flag in recvmsg()
+To: Xin Long <lucien.xin@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 12, 2023 at 07:06:46PM +0000, Russell King (Oracle) wrote:
-> On Tue, Dec 12, 2023 at 06:26:16PM +0300, Serge Semin wrote:
-> > I would have used in the first place if it was externally visible, but
-> > it's defined as static. Do you suggest to make it global or ...
-> 
-> That would be one option - I didn't make it visible when I introduced it
-> beacuse there were no users for it.
-> 
-> > > At some point, we should implement
-> > > mdiobus_get_mdiodev() which also deals with the refcount.
-> > 
-> > ... create mdiobus_get_mdiodev() instead?
-> > 
-> > * Note in the commit message I mentioned that having a getter would be
-> > * better than directly touching the mii_bus instance guts.
-> 
-> What I'm thinking is:
-> 
-> /**
->  * mdiobus_get_mdiodev() - get a mdiodev for the specified bus
->  * @bus: mii_bus to get mdio device from
->  * @addr: mdio address of mdio device
->  *
->  * Return the struct mdio_device attached to the MII bus @bus at MDIO
->  * address @addr. On success, the refcount on the device will be
->  * increased, which must be dropped using mdio_device_put(), and the
->  * mdio device returned. Otherwise, returns NULL.
->  */
-> struct mdio_device *mdiobus_get_mdiodev(struct mii_bus *bus, int addr)
-> {
-> 	struct mdio_device *mdiodev;
-> 
-> 	mdiodev = mdiobus_find_device(bus, addr);
-> 	if (mdiodev)
-> 		get_device(&mdiodev->dev);
-> 	return mdiodev;
-> }
-> EXPORT_SYMBOL(mdiobus_get_mdiodev);
-> 
-> should do it, and will hold a reference on the mdiodev structure (which
-> won't be freed) and also on the mii_bus (since this device is a child
-> of the bus device, the parent can't be released until the child has
-> been, so struct mii_bus should at least stay around.)
+On Wed, Dec 13, 2023 at 4:19=E2=80=AFPM Xin Long <lucien.xin@gmail.com> wro=
+te:
+>
+> On Tue, Dec 12, 2023 at 9:55=E2=80=AFAM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > For some reason sctp_poll() generates EPOLLERR if sk->sk_error_queue
+> > is not empty but recvmsg() can not drain the error queue yet.
+> I'm checking the code but can't see how SCTP may enqueue skbs into
+> sk->sk_error_queue. Have you ever seen it happen in any of your cases?
+>
+> >
+> > This is needed to better support timestamping.
+> I think SCTP doesn't support timestamping, there's no functions like
+> tcp_tx_timestamp()/tcp_gso_tstamp() to enable it.
+>
+> Or do you mean SO_TXTIME socket option, and then tc-etf may
+> enqueue a skb into sk->sk_error_queue if it's enabled?
+>
 
-Right. That's exactly what had in mind. Thanks for suggesting a
-ready-to-apply solution. I'll add it to the series as a separate patch
-if we decide to keep the proposed in this patch change.  See my
-question in the next message:
-https://lore.kernel.org/netdev/wnptneaxxe2tq2rf7ac6a72xtyluyggughvmtxbbg5qto64mpa@7gchl5e4qllu/
+I think this is the goal yes.
 
-> 
-> What would help the "the bus driver has been unbound" situation is if
-> we took the mdio_lock on the bus, and then set the {read,write}{,_c45}
-> functions to dummy stubs when the bus is being unregistered which then
-> return e.g. -ENXIO. That will probably make unbinding/unloading all
-> MDIO bus drivers safe from kernel oops, although phylib will spit out
-> a non-useful backtrace if it tries an access. I don't think there's
-> much which can be done about that - I did propose a patch to change
-> that behaviour but apparently folk like having it!
-> 
-> It isn't perfect - it's racy, but then accessing mdio_map[] is
-> inherently racy due to no locking with mdiobus_.*register_device().
-> At least if we have everyone using a proper getter function rather
-> than directly fiddling with bus->mdio_map[]. We only have one driver
-> that accesses it directly at the moment (mscc_ptp):
-> 
->                 dev = phydev->mdio.bus->mdio_map[vsc8531->ts_base_addr];
->                 phydev = container_of(dev, struct phy_device, mdio);
-> 
->                 return phydev->priv;
-> 
-> and that should really be using mdiobus_get_phy().
+Also this prevents developers from using MSG_ERRQUEUE and having
+the kernel read the receive queue.
 
-Regarding the driver bind/unbind. I guess the maintainers just forget
-about that problem. Do you think it's worth reminding them about it? 
+mptcp had a similar issue in the past, Paolo fixed it.
 
--Serge(y)
-
-> 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> >
+> > I had to export inet_recv_error(), since sctp
+> > can be compiled as a module.
+> >
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > Cc: Xin Long <lucien.xin@gmail.com>
+> > Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+> > Cc: Willem de Bruijn <willemb@google.com>
+> > ---
+> >  net/ipv4/af_inet.c | 1 +
+> >  net/sctp/socket.c  | 3 +++
+> >  2 files changed, 4 insertions(+)
+> >
+> > diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+> > index fbeacf04dbf3744e5888360e0b74bf6f70ff214f..835f4f9d98d25559fb8965a=
+7531c6863448a55c2 100644
+> > --- a/net/ipv4/af_inet.c
+> > +++ b/net/ipv4/af_inet.c
+> > @@ -1633,6 +1633,7 @@ int inet_recv_error(struct sock *sk, struct msghd=
+r *msg, int len, int *addr_len)
+> >  #endif
+> >         return -EINVAL;
+> >  }
+> > +EXPORT_SYMBOL(inet_recv_error);
+> >
+> >  int inet_gro_complete(struct sk_buff *skb, int nhoff)
+> >  {
+> > diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+> > index 7f89e43154c091f6f7a3c995c1ba8abb62a8e767..5fb02bbb4b349ef9ab9c279=
+0cccb30fb4c4e897c 100644
+> > --- a/net/sctp/socket.c
+> > +++ b/net/sctp/socket.c
+> > @@ -2099,6 +2099,9 @@ static int sctp_recvmsg(struct sock *sk, struct m=
+sghdr *msg, size_t len,
+> >         pr_debug("%s: sk:%p, msghdr:%p, len:%zd, flags:0x%x, addr_len:%=
+p)\n",
+> >                  __func__, sk, msg, len, flags, addr_len);
+> >
+> > +       if (unlikely(flags & MSG_ERRQUEUE))
+> > +               return inet_recv_error(sk, msg, len, addr_len);
+> > +
+> >         lock_sock(sk);
+> >
+> >         if (sctp_style(sk, TCP) && !sctp_sstate(sk, ESTABLISHED) &&
+> > --
+> > 2.43.0.472.g3155946c3a-goog
+> >
 
