@@ -1,115 +1,95 @@
-Return-Path: <netdev+bounces-56710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C0F28108FF
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 05:11:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03015810925
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 05:35:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 467BF2820F3
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 04:11:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 300331C209CD
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 04:35:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F380EBE5F;
-	Wed, 13 Dec 2023 04:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD3F4180;
+	Wed, 13 Dec 2023 04:35:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="PZDjCUAh"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nx7COMzD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-xc2d.google.com (mail-oo1-xc2d.google.com [IPv6:2607:f8b0:4864:20::c2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5BF3CE
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 20:11:02 -0800 (PST)
-Received: by mail-oo1-xc2d.google.com with SMTP id 006d021491bc7-58a7d13b00bso3783755eaf.1
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 20:11:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=theori.io; s=google; t=1702440662; x=1703045462; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=D/6OhphYEZNlLcbiJPbj6amf3Q88pF1f8rDn070eSak=;
-        b=PZDjCUAhdsui08pM1zCi2RbeiPWlL8zA+Vhc3m+dF0R4MXJXlc4IcwoD7O5bWK+d+4
-         o/8YG5o1sJ/yVV1aBV/CIceTaUDF/pVNwt/oPhSiBnETbqrz7r9U/O50HmmIqqoCgwFM
-         4reeO9FCfk2rKWB57Lusu0/Us3zd3nxcrtEl4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702440662; x=1703045462;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D/6OhphYEZNlLcbiJPbj6amf3Q88pF1f8rDn070eSak=;
-        b=Q7qOE2CqeqyTKfHAZb9rbqjOf8GpfmMg4Hxvnrm9jyk6Fq+NB+OKbNN5CFB9dFtGRW
-         B0028m2vLrX1Yls3Rx+ZFJxTE/+/XZBqh/qYDAAz8euJZZY6FVvo1igSmji8gkG58jQQ
-         z+5l314kZ6bn3MiU7mOBHvP7ApFvju9TQWXQXifI+Qofhbk5KNcjER8l0Bo1fMSlXKWL
-         q17Eq1/NPg4PiI5VkqLdxKCKyHba4SC6khBqJrrsEO5RNhcZs3lsuOLWBJIYPrUN+4Ve
-         QuWzXjKmXEygEQsoz5NqlFC3W8sxcwhL2kzvT1XNKXFRUKxSPB+mt9taVB9t8HYycz1I
-         AmMg==
-X-Gm-Message-State: AOJu0Yy675ghYlw/MZFKpDwr9vCaHepSIvpc0JxelAAoSOPM8+r8uar5
-	4hS492jDehSnc03Ti5CQf3QwsQ==
-X-Google-Smtp-Source: AGHT+IEsw8l3x+JM528+s5CUbHs8RetQqAoHV18Zv/om3v/VJ5NmzhKHTe0uBKIcqOYNFdO61zuV8Q==
-X-Received: by 2002:a05:6358:3117:b0:170:17eb:378c with SMTP id c23-20020a056358311700b0017017eb378cmr7004035rwe.52.1702440662071;
-        Tue, 12 Dec 2023 20:11:02 -0800 (PST)
-Received: from v4bel-B760M-AORUS-ELITE-AX ([211.219.71.65])
-        by smtp.gmail.com with ESMTPSA id mj21-20020a17090b369500b0028ac4d1bd72sm2082730pjb.52.2023.12.12.20.10.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 20:11:01 -0800 (PST)
-Date: Tue, 12 Dec 2023 23:10:56 -0500
-From: Hyunwoo Kim <v4bel@theori.io>
-To: pabeni@redhat.com, davem@davemloft.net, edumazet@google.com,
-	kuniyu@amazon.com
-Cc: v4bel@theori.io, imv4bel@gmail.com, kuba@kernel.org, horms@kernel.org,
-	dhowells@redhat.com, lukas.bulwahn@gmail.com, mkl@pengutronix.de,
-	netdev@vger.kernel.org
-Subject: [PATCH v3] appletalk: Fix Use-After-Free in atalk_ioctl
-Message-ID: <20231213041056.GA519680@v4bel-B760M-AORUS-ELITE-AX>
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF3A8D3
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 20:35:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=tzg5X0HaqLbD1P8hBgypQW7nl+TA9d+ifTESTRlzdZo=; b=nx7COMzDGo5OKa1J1dZa9phyaT
+	btHEhxYD5EoDSjvH3tRi+qJeUP+TDDgtFxFvpGlys1YYjn7kDtzfToBcdMT/JWF5yj2glzOSU+iew
+	lNWR75XFLuYpQdBIl22lRYcFLoTjMCcNipk+WTou+B+DK79wgw3H/bbWK3tRhBO34ymDWjIiTYOAD
+	FrxXoBWIUywrdIv2VM8o812dMy48qRUK1H0WvsLbj2NHRmJIlWKqs8sjBTMNZMtXf0jgr8vDhtPiA
+	sejYAnnsxhgXWb6hzW28nMxz/TCRmaeQfl1MToi8EXj/2+qz5dx6A+7RZ1KYzdV9+Epq49WGdcYv9
+	vppxRrYQ==;
+Received: from [50.53.46.231] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rDGxk-00DaXM-0l;
+	Wed, 13 Dec 2023 04:35:12 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: netdev@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH] net: skbuff: fix spelling errors
+Date: Tue, 12 Dec 2023 20:35:11 -0800
+Message-ID: <20231213043511.10357-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Because atalk_ioctl() accesses sk->sk_receive_queue
-without holding a sk->sk_receive_queue.lock, it can
-cause a race with atalk_recvmsg().
-A use-after-free for skb occurs with the following flow.
-```
-atalk_ioctl() -> skb_peek()
-atalk_recvmsg() -> skb_recv_datagram() -> skb_free_datagram()
-```
-Add sk->sk_receive_queue.lock to atalk_ioctl() to fix this issue.
+Correct spelling as reported by codespell.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
 ---
-v1 -> v2: Change the code style
-v2 -> v3: Delete old comments
----
- net/appletalk/ddp.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ include/linux/skbuff.h |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c
-index 9ba04a69ec2a..a852ec093fa8 100644
---- a/net/appletalk/ddp.c
-+++ b/net/appletalk/ddp.c
-@@ -1775,15 +1775,14 @@ static int atalk_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
- 		break;
- 	}
- 	case TIOCINQ: {
--		/*
--		 * These two are safe on a single CPU system as only
--		 * user tasks fiddle here
--		 */
--		struct sk_buff *skb = skb_peek(&sk->sk_receive_queue);
-+		struct sk_buff *skb;
- 		long amount = 0;
+diff -- a/include/linux/skbuff.h b/include/linux/skbuff.h
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -1069,7 +1069,7 @@ struct sk_buff {
+ 	refcount_t		users;
  
-+		spin_lock_irq(&sk->sk_receive_queue.lock);
-+		skb = skb_peek(&sk->sk_receive_queue);
- 		if (skb)
- 			amount = skb->len - sizeof(struct ddpehdr);
-+		spin_unlock_irq(&sk->sk_receive_queue.lock);
- 		rc = put_user(amount, (int __user *)argp);
- 		break;
- 	}
--- 
-2.25.1
-
+ #ifdef CONFIG_SKB_EXTENSIONS
+-	/* only useable after checking ->active_extensions != 0 */
++	/* only usable after checking ->active_extensions != 0 */
+ 	struct skb_ext		*extensions;
+ #endif
+ };
+@@ -3311,7 +3311,7 @@ static inline struct page *__dev_alloc_p
+ 					     unsigned int order)
+ {
+ 	/* This piece of code contains several assumptions.
+-	 * 1.  This is for device Rx, therefor a cold page is preferred.
++	 * 1.  This is for device Rx, therefore a cold page is preferred.
+ 	 * 2.  The expectation is the user wants a compound page.
+ 	 * 3.  If requesting a order 0 page it will not be compound
+ 	 *     due to the check to see if order has a value in prep_new_page
+@@ -4247,7 +4247,7 @@ static inline bool __skb_metadata_differ
+ {
+ 	const void *a = skb_metadata_end(skb_a);
+ 	const void *b = skb_metadata_end(skb_b);
+-	/* Using more efficient varaiant than plain call to memcmp(). */
++	/* Using more efficient variant than plain call to memcmp(). */
+ #if defined(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) && BITS_PER_LONG == 64
+ 	u64 diffs = 0;
+ 
 
