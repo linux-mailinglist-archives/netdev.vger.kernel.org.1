@@ -1,392 +1,222 @@
-Return-Path: <netdev+bounces-57021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 570058119A6
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 17:37:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB66A8119AB
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 17:37:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B96561F218BA
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 16:37:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DF471F2169E
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 16:37:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 908D1364AB;
-	Wed, 13 Dec 2023 16:37:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17DBB35F10;
+	Wed, 13 Dec 2023 16:37:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D8SqnJSP"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="WfBPPeFb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575DA1EB40;
-	Wed, 13 Dec 2023 16:37:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17E38C433C8;
-	Wed, 13 Dec 2023 16:37:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702485432;
-	bh=V32SSwQkFcdJtQ1OoYuVyd25z6w9bcMt4t9UsGwYsP4=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=D8SqnJSPhj6SbuAenL02YENotJTjraF6N0zvWRTqrkE4whmfCzWlDCdZ+087BcH1/
-	 3iEfCs0VdZZdXgE2ozF9oD1UIFVW1z+8aEK3PH3Vj6iG7g/A2oss2Kb8X76ebqD226
-	 dpUllSglbfP1OmQhnPgntX+FhwyLjaNZAch4wzTY+z46hdXlCV9nSQJ47VcD0QoUHt
-	 mbj1URgcPE6nSyewhFcam14wX9uD96jkEfLVSzybnE1v6I2caJFDXCvsoSLL2Wkm1/
-	 EgeLcAcIT8POwUa0J2yQlqEk5fAkzi3dXccsFVF/5NYO/ub919+aYf5E9HttPx93Eb
-	 fHkXzp+nOdXEw==
-Message-ID: <367107fa03540f7ddd2e8de51c751348bd7eb42c.camel@kernel.org>
-Subject: Re: [PATCH v4 12/39] netfs: Add iov_iters to (sub)requests to
- describe various buffers
-From: Jeff Layton <jlayton@kernel.org>
-To: David Howells <dhowells@redhat.com>, Steve French <smfrench@gmail.com>
-Cc: Matthew Wilcox <willy@infradead.org>, Marc Dionne
- <marc.dionne@auristor.com>,  Paulo Alcantara <pc@manguebit.com>, Shyam
- Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Dominique
- Martinet <asmadeus@codewreck.org>, Eric Van Hensbergen <ericvh@kernel.org>,
- Ilya Dryomov <idryomov@gmail.com>, Christian Brauner
- <christian@brauner.io>, linux-cachefs@redhat.com,
- linux-afs@lists.infradead.org,  linux-cifs@vger.kernel.org,
- linux-nfs@vger.kernel.org,  ceph-devel@vger.kernel.org,
- v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,  linux-mm@kvack.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Wed, 13 Dec 2023 11:37:10 -0500
-In-Reply-To: <20231213152350.431591-13-dhowells@redhat.com>
-References: <20231213152350.431591-1-dhowells@redhat.com>
-	 <20231213152350.431591-13-dhowells@redhat.com>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
-	kZWuOsJdJQdmwlWC5L5ln9xgfr/4mOY38B0U=
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.2 (3.50.2-1.fc39) 
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2DE9AC
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 08:37:45 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jtqGUboPBS4Dz09aCvmDWGAXNix6YCxYnv1V+IP2bLzhBmckN8/JOJk8ZjKvE2iCTwQXtLbCTDEar2azn9r6V7fsP66YV4X5LxBx0SknEA1kJ09Ike6hW3g22UQv2/cf5wd8Al+TsDYoGRfoV3xpvYdsWaAoQWvLh8VU1M7DJHWckctMok2v+PCbFV4mb7RdHw09UPxpa2aAWDoz7Ix1o+Ll8/Epsuyg47X9eVS3zPTzZLu54EDTDnY2En5sbUyCKwOrCXs9XZZxB6rQjC1bqjrO68VGDm1Eq4c4iU/cEC8H1yUb1NPy+1+uPYUcFTl8kLQQpRuGm+eppn8otnYM4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=E2teMCC3Qg1un9W7EwCNLtU1a3dwpVFdX2OgyvSxgB8=;
+ b=TfguBikvW88SNlKYqILAttOioF6/2rZABc0f46DbEdjbb/3s9UIpBE2EpneFqFK/WJOOYvHUynMDvR3XEtPUpjiMxVtBzQmIV/8ZfTOf7KQE7mQnvHOA/GjXzvwBiBwJOBQLkHuOmi9g7V1psAf+WdF+L0EnRuwrnuAdjSCX/ajywF/7eV8FwMwqEVWYben009NOW6MKN86CU+uuTlQN/24iiRYVEjlxce9AjoWmoFfc85Fv9LeJ8BO6AwVhlu41rtO41srENCg5gI4/A4cFmLFy+vFWEtxHxIp/J8A2vW84vjouc8tl5Yzt64ebTuj7+6BAYGqwKTiUPYwU0mMqGg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=E2teMCC3Qg1un9W7EwCNLtU1a3dwpVFdX2OgyvSxgB8=;
+ b=WfBPPeFbgx7fibtIXlJXykDyMLQsSh2JP0B2BIv+KR1N2b/mE5z6Ja8sY2Y+tu9KYemk5+w0yqk7a6grj5bCJwTNPHaiA3y5Zj+Dy7WDPekQ0SHWwse7zZH9xNjmchdgB/MiLS0yiyTdU9fXfQAFQs5Qx2JXPWMcs5JDLalCfDE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
+ by BL1PR12MB5334.namprd12.prod.outlook.com (2603:10b6:208:31d::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.26; Wed, 13 Dec
+ 2023 16:37:43 +0000
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::1d68:1eb8:d7dc:4b43]) by BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::1d68:1eb8:d7dc:4b43%6]) with mapi id 15.20.7091.022; Wed, 13 Dec 2023
+ 16:37:43 +0000
+Message-ID: <2ba8b168-627c-48f6-ac63-e83ab8056864@amd.com>
+Date: Wed, 13 Dec 2023 10:37:40 -0600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 net-next 1/3] amd-xgbe: reorganize the code of XPCS
+ access
+To: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, Shyam-sundar.S-k@amd.com
+References: <20231212053723.443772-1-Raju.Rangoju@amd.com>
+ <20231212053723.443772-2-Raju.Rangoju@amd.com>
+ <0dca661a-26d6-425c-a3c3-1b4ae94b3b47@amd.com>
+ <4d8ff5ad-b234-1c91-3119-f22b5bb32aa9@amd.com>
+Content-Language: en-US
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Autocrypt: addr=thomas.lendacky@amd.com; keydata=
+ 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
+ 1NhFSLKvfA==
+In-Reply-To: <4d8ff5ad-b234-1c91-3119-f22b5bb32aa9@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SA1P222CA0020.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:806:22c::21) To BL1PR12MB5732.namprd12.prod.outlook.com
+ (2603:10b6:208:387::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|BL1PR12MB5334:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9f504fff-b6ff-426a-0526-08dbfbf9d413
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	KB0qO//Ynx9G+VHx3MP6e+pQjhs2Lcl9XqiEEiwxFpb7JjHLyiIpq/5zMFx9AsWEW8dHxlh3o3viRR/fsf8L/YPq6XPqjzRvYq4tZ5a49bDeLdvWwHHJr8p2xgyLjN/MJ+9keWUvLRQf5XsoUSm4YOnqAS/YZDaDaOc6sJy1s242iQ+CMBSocwR0SZ0jLsXCnqPUwNV+b8e2JzhfKfW2zprzxTq592+cPJMX6PnM/Wn9x/GEmKdmNdIB/L0Q7Qr12MIQCNKOTELXKc+7eJgTlAxPz7mkSAlfojnoRrYOKH+CPshgRik7pdmOw0dX5Z2+/YzdKAJq+swLGsF6oASoCAgnjq/27HyJ60Mj/RGUDD2/HvruKt+wBRk7OlWQk+JMW+PQfmgmbq1KM2UPOrbGEcW/hmiPowwxWCxL4Xd00eVS9ygOKZOiV9WIvUUXrUHyOUk0aicQuKrMwlmvSDZ2zTb4dNwVaLrt8ccwMENf1YK1oN1BSiuObVHNbmSpbUeAvxsrNXTzAWd/4JDMAwhctenVsN80sbC/Q5chLn1Xe4Ky1qO2UzZC/3a9fF6CQAmsGyr514DQjoVblL6Sdal+5rch69IBuofA8aBbeLym+CTZ54AcQBDTCek4PGqH3vSU0btpAYkGF110pQJeS8WW1g==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(366004)(136003)(346002)(376002)(396003)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(2616005)(26005)(6506007)(6512007)(53546011)(83380400001)(5660300002)(4326008)(8676002)(8936002)(41300700001)(2906002)(6486002)(478600001)(316002)(66946007)(66556008)(66476007)(86362001)(31696002)(38100700002)(36756003)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Uk9PdThDTFdvQS9OL3N4d1dmYTBzeXpLdVV6T2JYQ0V5UXJIVjE3OE1wdExa?=
+ =?utf-8?B?OXdiQXhLU2w2ak0xS0dVTWZJUTNzbmVSWElsMUMvK05DS0VMZWhsUkl4OENG?=
+ =?utf-8?B?eUU5c3RyNkNPeVJobzNpbHEraW8rWHhCcDJURTBDV3MyUDBkUTB2U05ld3Q1?=
+ =?utf-8?B?NG9HUi9YeDJHUlhMblBxOXhjcVhSRXdlS1hDWW5paEtVL1VzTHplUWhNQUlS?=
+ =?utf-8?B?cTYzUnF2bVlrYzByZWw2ZVJpczR3NHVORmpKWkxiV0FKTEJjSTFDeGZnb3Av?=
+ =?utf-8?B?UWdhaHhTOEx0TFNHeTE5YnNnTEtUYTJlYnpUN1M2Y3hjc0k1cFdwcG93L0Vo?=
+ =?utf-8?B?RTFRK1dFdWZSSU5sZTh0dmN1MCtvRnJoUUlXeTRHTjdFY2l6UkE3cDJJajJ3?=
+ =?utf-8?B?MFh6UGJtajF3NnM0amVLQllQOGxYeTUzVC9qSll5cjdpK2d2ejFvMVZwVU10?=
+ =?utf-8?B?NTBlY0ZlaDlyYUd0b1VuRFhtWm9JTkV0Nlo1TlBRa25sL2dualFEcVdIZWZu?=
+ =?utf-8?B?WEJ3UHRlWWNKNEcxd25VNWFpNHRDTE1TMW5uWEp6Y1hJUUpSa3B4YStCY3hE?=
+ =?utf-8?B?YzhLWnk5cXlybGZySXRwbkR0dG4yNXJxcEE2TWQxb1dISDFTakdYd2NpekdK?=
+ =?utf-8?B?ZUlmWjJXOTAwd3RtOThuenFCNzRrMVZqeDRGblVvbEd5ZFlQeTZqU2ljMWg5?=
+ =?utf-8?B?YkROUVRzczZUOWh1VzlMcHROeGVMYzRzWWt2WGFXVVg4V0llTERETTdtS0hG?=
+ =?utf-8?B?cy9EU2s5a2RhQk0yUktrN2liYm5ZWkNiZU1vVHlmZjZRSVBCZVltU1NrcXAy?=
+ =?utf-8?B?T1N2d2x4Z0E0eWZJb2lOczRRWHA5RC9UZWNXcktybi9pL1BDaG5hWGNVQXZI?=
+ =?utf-8?B?Q3hEYzBOTW85Zkp4YlNSV3kzenByeTU4UlVyL1BxWXZIQ1VUb083YUVUMGpH?=
+ =?utf-8?B?VnZxV3E0UFlOK1dTaXFBMVhZVHI0U00zRkRPaEw5T2NlTnBiMExBR3Z5ZXQr?=
+ =?utf-8?B?ei9SK2JFZlk2NWFJdkl0YzRhbnBVM3J0M1RMd21UY25TY1BKdXhzSFloMytk?=
+ =?utf-8?B?WnVtVEppNXNGNXFJWlZUS3lpcVI4WnNaQlE2eitSU3Nya1Jqd0FDKzFhOUJ5?=
+ =?utf-8?B?U2IrNURtSjBwTkZHQnYydkp1QlZubTZSdEFOOS9xa240ZHMrS0htU2p4VnUr?=
+ =?utf-8?B?TFdkZlBIc2xwc1ZFcVY4QnRHem4yNkRCUlBoNlg1TWdaV2xMZVM1N2VLc0Ns?=
+ =?utf-8?B?eGg2YjBTdmJGZnVjVVhHc0l6UWJKZWVuWnJSbWhlakdWUCs2ZmlNUFRGcHFs?=
+ =?utf-8?B?cUd1b1NSM1VvOHltQTdSQ1lOK25XajdPb0p1N0k1S0dCSVZSMmtiNWdldHdT?=
+ =?utf-8?B?SWZxNGJUVVlaQnNVY2JGenNQVE9PYVFUYVpxdWpVbkdHMVVNTWllRGllRUU3?=
+ =?utf-8?B?Mk1NWVoyY3M2eVc3d0JWNVNVek9Teit1bVZFRzcweFJDaDRyTmp0Uklqejla?=
+ =?utf-8?B?ZmtRRldWcXZmMTdFYndKT0NZMUZBSWo2ak9tT0Nwb2Q5RnNGR2xXNExKbnNE?=
+ =?utf-8?B?VC9BNzd0V1ZFdU0zUHdreXFXaCtXK0RmT2pTdzhMWTdNUXNJMHBSNGR4RzN1?=
+ =?utf-8?B?QTZjYkF3U3llanBVcmdIWkJKUlJ4Q3R1U0oyTUZ2WmZENEJlSDhUaWtzT1B5?=
+ =?utf-8?B?R05CM2NjQU1qTHA3TGhBazhuekF1amlPWmd2d21wWnlVQjdXNUxpSWtla01y?=
+ =?utf-8?B?a2NQd1djWElSNEM3eW14OW9zdXNxTkFCYUQxc2p0dG1KOHgySWkzeFlueFU2?=
+ =?utf-8?B?WnEzNHZDWTR5ck52cDJBVjBFRUE5eTZKVEpPQnRpSmo1bGpGV2phNDRiWW5k?=
+ =?utf-8?B?SFBwMTZ2YkNKODA4bFBwSjI1L1Z4QW5qUFNnaWpHV3RZbGM3UHAxK3ZtMWl3?=
+ =?utf-8?B?Yjc5L1V0SmVCbkZiYVNveXpVZ2lxNjBIcDA4bzJjb3BjMDBWYVlvNjZOTEpI?=
+ =?utf-8?B?UlRrMXdLNSt4UkxCY0hrQTl2YVhxM3dQZFEwNW0xNTl6RmI2dVltSWFxS0Zp?=
+ =?utf-8?B?MkFTdEYvNUlWOWtCV0xFblFoVnphdUhKYnErY3YwZVhwUTB5NjJGcFFIY2Vj?=
+ =?utf-8?Q?LOI24Gd3aMw42QGWjjxjiTAEy?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9f504fff-b6ff-426a-0526-08dbfbf9d413
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2023 16:37:43.4825
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: G56F94HDEKX5h1967t/FFz8E+IZlOyl1LIo364yOSlP40ByVxlZP646YNYE9COrPZuyAlDlhPyFp2i3nLaxSww==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5334
 
-On Wed, 2023-12-13 at 15:23 +0000, David Howells wrote:
-> Add three iov_iter structs:
->=20
->  (1) Add an iov_iter (->iter) to the I/O request to describe the
->      unencrypted-side buffer.
->=20
->  (2) Add an iov_iter (->io_iter) to the I/O request to describe the
->      encrypted-side I/O buffer.  This may be a different size to the buff=
-er
->      in (1).
->=20
->  (3) Add an iov_iter (->io_iter) to the I/O subrequest to describe the pa=
-rt
->      of the I/O buffer for that subrequest.
->=20
-> This will allow future patches to point to a bounce buffer instead for
-> purposes of handling oversize writes, decryption (where we want to save t=
-he
-> encrypted data to the cache) and decompression.
->=20
-> These iov_iters persist for the lifetime of the (sub)request, and so can =
-be
-> accessed multiple times without worrying about them being deallocated upo=
-n
-> return to the caller.
->=20
-> The network filesystem must appropriately advance the iterator before
-> terminating the request.
->=20
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Jeff Layton <jlayton@kernel.org>
-> cc: linux-cachefs@redhat.com
-> cc: linux-fsdevel@vger.kernel.org
-> cc: linux-mm@kvack.org
-> ---
->  fs/afs/file.c            |  6 +---
->  fs/netfs/buffered_read.c | 13 ++++++++
->  fs/netfs/io.c            | 69 +++++++++++++++++++++++++++++-----------
->  include/linux/netfs.h    |  3 ++
->  4 files changed, 67 insertions(+), 24 deletions(-)
->=20
-> diff --git a/fs/afs/file.c b/fs/afs/file.c
-> index c5013ec3c1dc..aa95b4d6376c 100644
-> --- a/fs/afs/file.c
-> +++ b/fs/afs/file.c
-> @@ -320,11 +320,7 @@ static void afs_issue_read(struct netfs_io_subreques=
-t *subreq)
->  	fsreq->len	=3D subreq->len   - subreq->transferred;
->  	fsreq->key	=3D key_get(subreq->rreq->netfs_priv);
->  	fsreq->vnode	=3D vnode;
-> -	fsreq->iter	=3D &fsreq->def_iter;
-> -
-> -	iov_iter_xarray(&fsreq->def_iter, ITER_DEST,
-> -			&fsreq->vnode->netfs.inode.i_mapping->i_pages,
-> -			fsreq->pos, fsreq->len);
-> +	fsreq->iter	=3D &subreq->io_iter;
-> =20
->  	afs_fetch_data(fsreq->vnode, fsreq);
->  	afs_put_read(fsreq);
-> diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
-> index d39d0ffe75d2..751556faa70b 100644
-> --- a/fs/netfs/buffered_read.c
-> +++ b/fs/netfs/buffered_read.c
-> @@ -199,6 +199,10 @@ void netfs_readahead(struct readahead_control *ractl=
-)
-> =20
->  	netfs_rreq_expand(rreq, ractl);
-> =20
-> +	/* Set up the output buffer */
-> +	iov_iter_xarray(&rreq->iter, ITER_DEST, &ractl->mapping->i_pages,
-> +			rreq->start, rreq->len);
-> +
->  	/* Drop the refs on the folios here rather than in the cache or
->  	 * filesystem.  The locks will be dropped in netfs_rreq_unlock().
->  	 */
-> @@ -251,6 +255,11 @@ int netfs_read_folio(struct file *file, struct folio=
- *folio)
-> =20
->  	netfs_stat(&netfs_n_rh_readpage);
->  	trace_netfs_read(rreq, rreq->start, rreq->len, netfs_read_trace_readpag=
-e);
-> +
-> +	/* Set up the output buffer */
-> +	iov_iter_xarray(&rreq->iter, ITER_DEST, &mapping->i_pages,
-> +			rreq->start, rreq->len);
-> +
->  	return netfs_begin_read(rreq, true);
-> =20
->  discard:
-> @@ -408,6 +417,10 @@ int netfs_write_begin(struct netfs_inode *ctx,
->  	ractl._nr_pages =3D folio_nr_pages(folio);
->  	netfs_rreq_expand(rreq, &ractl);
-> =20
-> +	/* Set up the output buffer */
-> +	iov_iter_xarray(&rreq->iter, ITER_DEST, &mapping->i_pages,
-> +			rreq->start, rreq->len);
+On 12/13/23 09:35, Raju Rangoju wrote:
+> On 12/12/2023 8:03 PM, Tom Lendacky wrote:
+>> On 12/11/23 23:37, Raju Rangoju wrote:
+>>> The xgbe_{read/write}_mmd_regs_v* functions have common code which can
+>>> be moved to helper functions. Also, the xgbe_pci_probe() needs
+>>> reorganization.
+>>>
+>>> Add new helper functions to calculate the mmd_address for v1/v2 of xpcs
+>>> access. And, convert if/else statements in xgbe_pci_probe() to switch
+>>> case. This helps code look cleaner.
+>>>
+>>> Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+>>> ---
+>>>   drivers/net/ethernet/amd/xgbe/xgbe-dev.c | 43 ++++++++++++------------
+>>>   drivers/net/ethernet/amd/xgbe/xgbe-pci.c | 18 +++++++---
+>>>   2 files changed, 34 insertions(+), 27 deletions(-)
+>>>
 
-Should the above be ITER_SOURCE ?
+>>> @@ -274,12 +274,18 @@ static int xgbe_pci_probe(struct pci_dev *pdev, 
+>>> const struct pci_device_id *id)
+>>>       /* Set the PCS indirect addressing definition registers */
+>>>       rdev = pci_get_domain_bus_and_slot(0, 0, PCI_DEVFN(0, 0));
+>>> -    if (rdev &&
+>>> -        (rdev->vendor == PCI_VENDOR_ID_AMD) && (rdev->device == 
+>>> 0x15d0)) {
+>>> +
+>>> +    if (!(rdev && rdev->vendor == PCI_VENDOR_ID_AMD)) {
+>>> +        ret = -ENODEV;
+>>> +        goto err_pci_enable;
+>>> +    }
+>>
+>> This is different behavior compared to today. Today, everything would
+>> default to the final "else" statement. With this patch you have a
+>> possibility of failing probe now.
+> 
+> This was done to skip the cases where rdev is NULL or vendor != AMD. Not 
+> sure if I'm missing something.
 
-> +
->  	/* We hold the folio locks, so we can drop the references */
->  	folio_get(folio);
->  	while (readahead_folio(&ractl))
-> diff --git a/fs/netfs/io.c b/fs/netfs/io.c
-> index 7f753380e047..e9d408e211b8 100644
-> --- a/fs/netfs/io.c
-> +++ b/fs/netfs/io.c
-> @@ -21,12 +21,7 @@
->   */
->  static void netfs_clear_unread(struct netfs_io_subrequest *subreq)
->  {
-> -	struct iov_iter iter;
-> -
-> -	iov_iter_xarray(&iter, ITER_DEST, &subreq->rreq->mapping->i_pages,
-> -			subreq->start + subreq->transferred,
-> -			subreq->len   - subreq->transferred);
-> -	iov_iter_zero(iov_iter_count(&iter), &iter);
-> +	iov_iter_zero(iov_iter_count(&subreq->io_iter), &subreq->io_iter);
->  }
-> =20
->  static void netfs_cache_read_terminated(void *priv, ssize_t transferred_=
-or_error,
-> @@ -46,14 +41,9 @@ static void netfs_read_from_cache(struct netfs_io_requ=
-est *rreq,
->  				  enum netfs_read_from_hole read_hole)
->  {
->  	struct netfs_cache_resources *cres =3D &rreq->cache_resources;
-> -	struct iov_iter iter;
-> =20
->  	netfs_stat(&netfs_n_rh_read);
-> -	iov_iter_xarray(&iter, ITER_DEST, &rreq->mapping->i_pages,
-> -			subreq->start + subreq->transferred,
-> -			subreq->len   - subreq->transferred);
-> -
-> -	cres->ops->read(cres, subreq->start, &iter, read_hole,
-> +	cres->ops->read(cres, subreq->start, &subreq->io_iter, read_hole,
->  			netfs_cache_read_terminated, subreq);
->  }
-> =20
-> @@ -88,6 +78,11 @@ static void netfs_read_from_server(struct netfs_io_req=
-uest *rreq,
->  				   struct netfs_io_subrequest *subreq)
->  {
->  	netfs_stat(&netfs_n_rh_download);
-> +	if (iov_iter_count(&subreq->io_iter) !=3D subreq->len - subreq->transfe=
-rred)
-> +		pr_warn("R=3D%08x[%u] ITER PRE-MISMATCH %zx !=3D %zx-%zx %lx\n",
-> +			rreq->debug_id, subreq->debug_index,
-> +			iov_iter_count(&subreq->io_iter), subreq->len,
-> +			subreq->transferred, subreq->flags);
+Right, I'm just pointing out that if rdev == NULL or vendor != AMD then, 
+today, the else path is taken. With this patch you'll fail the probe with 
+-ENODEV.
 
-pr_warn is a bit alarmist, esp given the cryptic message.=A0 Maybe demote
-this to INFO or DEBUG?
+Thanks,
+Tom
 
-Does this indicate a bug in the client or that the server is sending us
-malformed frames?
-
->  	rreq->netfs_ops->issue_read(subreq);
->  }
-> =20
-> @@ -259,6 +254,30 @@ static void netfs_rreq_short_read(struct netfs_io_re=
-quest *rreq,
->  		netfs_read_from_server(rreq, subreq);
->  }
-> =20
-> +/*
-> + * Reset the subrequest iterator prior to resubmission.
-> + */
-> +static void netfs_reset_subreq_iter(struct netfs_io_request *rreq,
-> +				    struct netfs_io_subrequest *subreq)
-> +{
-> +	size_t remaining =3D subreq->len - subreq->transferred;
-> +	size_t count =3D iov_iter_count(&subreq->io_iter);
-> +
-> +	if (count =3D=3D remaining)
-> +		return;
-> +
-> +	_debug("R=3D%08x[%u] ITER RESUB-MISMATCH %zx !=3D %zx-%zx-%llx %x\n",
-> +	       rreq->debug_id, subreq->debug_index,
-> +	       iov_iter_count(&subreq->io_iter), subreq->transferred,
-> +	       subreq->len, rreq->i_size,
-> +	       subreq->io_iter.iter_type);
-> +
-> +	if (count < remaining)
-> +		iov_iter_revert(&subreq->io_iter, remaining - count);
-> +	else
-> +		iov_iter_advance(&subreq->io_iter, count - remaining);
-> +}
-> +
->  /*
->   * Resubmit any short or failed operations.  Returns true if we got the =
-rreq
->   * ref back.
-> @@ -287,6 +306,7 @@ static bool netfs_rreq_perform_resubmissions(struct n=
-etfs_io_request *rreq)
->  			trace_netfs_sreq(subreq, netfs_sreq_trace_download_instead);
->  			netfs_get_subrequest(subreq, netfs_sreq_trace_get_resubmit);
->  			atomic_inc(&rreq->nr_outstanding);
-> +			netfs_reset_subreq_iter(rreq, subreq);
->  			netfs_read_from_server(rreq, subreq);
->  		} else if (test_bit(NETFS_SREQ_SHORT_IO, &subreq->flags)) {
->  			netfs_rreq_short_read(rreq, subreq);
-> @@ -399,9 +419,9 @@ void netfs_subreq_terminated(struct netfs_io_subreque=
-st *subreq,
->  	struct netfs_io_request *rreq =3D subreq->rreq;
->  	int u;
-> =20
-> -	_enter("[%u]{%llx,%lx},%zd",
-> -	       subreq->debug_index, subreq->start, subreq->flags,
-> -	       transferred_or_error);
-> +	_enter("R=3D%x[%x]{%llx,%lx},%zd",
-> +	       rreq->debug_id, subreq->debug_index,
-> +	       subreq->start, subreq->flags, transferred_or_error);
-> =20
->  	switch (subreq->source) {
->  	case NETFS_READ_FROM_CACHE:
-> @@ -501,7 +521,8 @@ static enum netfs_io_source netfs_cache_prepare_read(=
-struct netfs_io_subrequest
->   */
->  static enum netfs_io_source
->  netfs_rreq_prepare_read(struct netfs_io_request *rreq,
-> -			struct netfs_io_subrequest *subreq)
-> +			struct netfs_io_subrequest *subreq,
-> +			struct iov_iter *io_iter)
->  {
->  	enum netfs_io_source source;
-> =20
-> @@ -528,9 +549,14 @@ netfs_rreq_prepare_read(struct netfs_io_request *rre=
-q,
->  		}
->  	}
-> =20
-> -	if (WARN_ON(subreq->len =3D=3D 0))
-> +	if (WARN_ON(subreq->len =3D=3D 0)) {
->  		source =3D NETFS_INVALID_READ;
-> +		goto out;
-> +	}
-> =20
-> +	subreq->io_iter =3D *io_iter;
-> +	iov_iter_truncate(&subreq->io_iter, subreq->len);
-> +	iov_iter_advance(io_iter, subreq->len);
->  out:
->  	subreq->source =3D source;
->  	trace_netfs_sreq(subreq, netfs_sreq_trace_prepare);
-> @@ -541,6 +567,7 @@ netfs_rreq_prepare_read(struct netfs_io_request *rreq=
-,
->   * Slice off a piece of a read request and submit an I/O request for it.
->   */
->  static bool netfs_rreq_submit_slice(struct netfs_io_request *rreq,
-> +				    struct iov_iter *io_iter,
->  				    unsigned int *_debug_index)
->  {
->  	struct netfs_io_subrequest *subreq;
-> @@ -565,7 +592,7 @@ static bool netfs_rreq_submit_slice(struct netfs_io_r=
-equest *rreq,
->  	 * (the starts must coincide), in which case, we go around the loop
->  	 * again and ask it to download the next piece.
->  	 */
-> -	source =3D netfs_rreq_prepare_read(rreq, subreq);
-> +	source =3D netfs_rreq_prepare_read(rreq, subreq, io_iter);
->  	if (source =3D=3D NETFS_INVALID_READ)
->  		goto subreq_failed;
-> =20
-> @@ -603,6 +630,7 @@ static bool netfs_rreq_submit_slice(struct netfs_io_r=
-equest *rreq,
->   */
->  int netfs_begin_read(struct netfs_io_request *rreq, bool sync)
->  {
-> +	struct iov_iter io_iter;
->  	unsigned int debug_index =3D 0;
->  	int ret;
-> =20
-> @@ -615,6 +643,8 @@ int netfs_begin_read(struct netfs_io_request *rreq, b=
-ool sync)
->  		return -EIO;
->  	}
-> =20
-> +	rreq->io_iter =3D rreq->iter;
-> +
->  	INIT_WORK(&rreq->work, netfs_rreq_work);
-> =20
->  	if (sync)
-> @@ -624,8 +654,9 @@ int netfs_begin_read(struct netfs_io_request *rreq, b=
-ool sync)
->  	 * want and submit each one.
->  	 */
->  	atomic_set(&rreq->nr_outstanding, 1);
-> +	io_iter =3D rreq->io_iter;
->  	do {
-> -		if (!netfs_rreq_submit_slice(rreq, &debug_index))
-> +		if (!netfs_rreq_submit_slice(rreq, &io_iter, &debug_index))
->  			break;
-> =20
->  	} while (rreq->submitted < rreq->len);
-> diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-> index fc6d9756a029..3da962e977f5 100644
-> --- a/include/linux/netfs.h
-> +++ b/include/linux/netfs.h
-> @@ -150,6 +150,7 @@ struct netfs_cache_resources {
->  struct netfs_io_subrequest {
->  	struct netfs_io_request *rreq;		/* Supervising I/O request */
->  	struct list_head	rreq_link;	/* Link in rreq->subrequests */
-> +	struct iov_iter		io_iter;	/* Iterator for this subrequest */
->  	loff_t			start;		/* Where to start the I/O */
->  	size_t			len;		/* Size of the I/O */
->  	size_t			transferred;	/* Amount of data transferred */
-> @@ -186,6 +187,8 @@ struct netfs_io_request {
->  	struct netfs_cache_resources cache_resources;
->  	struct list_head	proc_link;	/* Link in netfs_iorequests */
->  	struct list_head	subrequests;	/* Contributory I/O operations */
-> +	struct iov_iter		iter;		/* Unencrypted-side iterator */
-> +	struct iov_iter		io_iter;	/* I/O (Encrypted-side) iterator */
->  	void			*netfs_priv;	/* Private data for the netfs */
->  	unsigned int		debug_id;
->  	atomic_t		nr_outstanding;	/* Number of ops in progress */
->=20
-
---=20
-Jeff Layton <jlayton@kernel.org>
+> 
 
