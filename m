@@ -1,79 +1,64 @@
-Return-Path: <netdev+bounces-56864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FE478110C1
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:07:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F24748110D4
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:15:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE554B20C51
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 12:07:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 236411C20BD1
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 12:15:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B86B28DC6;
-	Wed, 13 Dec 2023 12:07:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6735428DD8;
+	Wed, 13 Dec 2023 12:15:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="sL/FEI5J"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="F9URjYNR"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2063.outbound.protection.outlook.com [40.107.104.63])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71430B0
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 04:07:02 -0800 (PST)
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2063.outbound.protection.outlook.com [40.107.20.63])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42823F3
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 04:15:42 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GFu1AzpAAQVd3XjY8oT89BCEsYCULkG3igcyN3FkE1rh9/UPbU3bnl38HZHJ9DzD2bPlkQvm5xpIZtQD3LRZLAflzArFj73IsO3PepjEgEJmjuCDDjCBMGaZWoID6Q0Z5UvfxvQs1QZPUXgLbOoNvJXuPQwJ9XHGNslLAjxiFmCu3OZAE6s8vc6qic5Xjy63p2ExKM0dUVq+B2hXWBUM1hv/mWk2Fm0a6qBqZu19WAHLws/y7u+ke0iXiYFQCfWp1z4I8CEUqKqE1SLnde0spNt29x/oO2kJDudygKMoEtRQj/WzJykF0ULykSv1ice7+7X/BU70mpUQN+vyrfYk0w==
+ b=mAs9hYqLG2jnDK5uw6wleZW02a4k/Ye62Pc9inhxKTDWpaTGG0erER1WnegFigriXGkzUa/b1FrEzWFW1MbZZmYGztXWPGNyeQo2Zb8Sb4+LeHY3VlDtRY7J/ULHuQmuyBq5SNB7s2Jby5K2vpf4cuVVr6HTT77vvKl2XyZfTsY60QnnMPhy/CYBpPC/982MLZ+Mtel96zmDe+GfVTVDAVlHmOodOOK4pE8xXbPo0kDFWbn5jLcK4aFb1+MkhGSrWqG74sg/wt2pZTaGYh6LH3oAg6CKi1trkWjeC3Gq/EJ1OQ3WuVmFSOKme2YNxzO7mbJUDt0W64QHOB/IBUvP6Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6f3WxP1HWA8hKjJFNm7bcJOd5Hi04kl8k05lnyLspn4=;
- b=Fh34nBa7K7kuwebHcHz3XByhOMsZtG5+ZeyUIdPgCLlq20DI5sH01Nu3IGGtvsh542QYREIyHnFvatMBJcuRWbxxf/JV9d3DNQ89sXIW17+yxO/DYUaRDl9995v1KLD7Cr0OY7cUbNSbx7BfF2NzTOohPxZxmHhpFX6f21dvs2HlhkJtNLjPbATHQ5SgIMJC68069T3w+Wph2xUbzdqbr96Dds7AiAshi3DbkR0/gvJBEaLC2zpwAGe9Ywb7xgKNev3w8j5i2JdLm7e7r/N4RjRdOZ1yIqZ4Sr3NPJwRWphUSELewGu2/XdqL0xX9cYXqVNHKbizdKxRiIfbtGa9Xg==
+ bh=Z2a+BKbvM2a8rDveUbGjqIcAUcgfGpl6/suDWgsL69s=;
+ b=PEIQKlgos0xhakD3mEh9skJ+PrRthEEwWRqhQKvJc/AvfP8WVA/W4dEX5xJ1OGCq0twKx3ldDL/46PNFRjbNozZKZcYwy2mO3KAk4AZ8vhRckByOc25kOTv5LxMhPHQn45b0qh6siTHsXduYjNGcHTuV/6NaeUkjbAfqVYB23z4Onl56xL2U89fZtDAEhS1NqD0pCUakUxOfHZagEDlh13PBQboapF5LXAczGkiPpZqY7qHF0MKeDmwV+rq0L4hpBV3F+w1/bNfknDoW77f8nLLsRlMp7onlghx5k6hFOG7h/BCoaD4DLRibMHflsDO9smGO5WSl0xxpwRgjTlB8pA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6f3WxP1HWA8hKjJFNm7bcJOd5Hi04kl8k05lnyLspn4=;
- b=sL/FEI5JPLH4sUjRgVqBsYlAgWSys42j/rMkKfc4hyxSn3MumDhZo2stxbeq6yMsnRGbCHFaNvG9nSgd6Nc7Hrl+SH2WEQyK7qah6+mpunF4gFGUF05vXw82dQZuUtSx6ssQDSPUl+GWwI1MYt2aqAxoG0zXR5s4lF2C8NvSfss=
+ bh=Z2a+BKbvM2a8rDveUbGjqIcAUcgfGpl6/suDWgsL69s=;
+ b=F9URjYNRm4kY5GujjXj/ma0+lMCXY9jNZfV8+jShIx8bX/6IzXRaH2qzXHSajc8CURxINnpFBa5gnRjFjSf2BG0Yhxnk337IAwie6wkrD7a+aA4HZuvCsEd6NTMSdMWGYysaLUmGqVQI5Hxe8njP+9HBmMv79lqph7tBCP9Rh5s=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by PA4PR04MB8032.eurprd04.prod.outlook.com (2603:10a6:102:ba::22) with
+Received: from GV1PR04MB9070.eurprd04.prod.outlook.com (2603:10a6:150:21::14)
+ by AS8PR04MB7894.eurprd04.prod.outlook.com (2603:10a6:20b:2aa::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.26; Wed, 13 Dec
- 2023 12:07:00 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7091.022; Wed, 13 Dec 2023
- 12:06:59 +0000
-Date: Wed, 13 Dec 2023 14:06:56 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: Alvin =?utf-8?B?4pS8w6FpcHJhZ2E=?= <ALSI@bang-olufsen.dk>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Madhuri Sripada <madhuri.sripada@microchip.com>,
-	Marcin Wojtas <mw@semihalf.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Tobias Waldekranz <tobias@waldekranz.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH net 3/4] docs: net: dsa: update user MDIO bus
- documentation
-Message-ID: <20231213120656.x46fyad6ls7sqyzv@skbuf>
-References: <20231208193518.2018114-1-vladimir.oltean@nxp.com>
- <20231208193518.2018114-4-vladimir.oltean@nxp.com>
- <r247bmekxv2de7owpoam6kkscel25ugnneebzwsrv3j7u3lud7@ppuwdzwl4zi5>
- <20231211143513.n6ms3dlp6rrcqya6@skbuf>
- <CAJq09z4_dY03AaFm=e4G7PU5LwBegGXmTCTaMp9C=izh7Ycj-g@mail.gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJq09z4_dY03AaFm=e4G7PU5LwBegGXmTCTaMp9C=izh7Ycj-g@mail.gmail.com>
-X-ClientProxiedBy: FR2P281CA0158.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:99::11) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+ 2023 12:15:39 +0000
+Received: from GV1PR04MB9070.eurprd04.prod.outlook.com
+ ([fe80::1290:90d4:98c1:3d35]) by GV1PR04MB9070.eurprd04.prod.outlook.com
+ ([fe80::1290:90d4:98c1:3d35%7]) with mapi id 15.20.7091.022; Wed, 13 Dec 2023
+ 12:15:38 +0000
+From: Ioana Ciornei <ioana.ciornei@nxp.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Cc: Ioana Ciornei <ioana.ciornei@nxp.com>
+Subject: [PATCH net-next v2 0/8] dpaa2-switch: small improvements
+Date: Wed, 13 Dec 2023 14:14:03 +0200
+Message-Id: <20231213121411.3091597-1-ioana.ciornei@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR06CA0094.eurprd06.prod.outlook.com
+ (2603:10a6:208:fa::35) To GV1PR04MB9070.eurprd04.prod.outlook.com
+ (2603:10a6:150:21::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,250 +66,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|PA4PR04MB8032:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8deb78c6-4090-43fc-5979-08dbfbd4027a
+X-MS-TrafficTypeDiagnostic: GV1PR04MB9070:EE_|AS8PR04MB7894:EE_
+X-MS-Office365-Filtering-Correlation-Id: e91fef2a-c12d-4721-d384-08dbfbd537c9
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	+21rFZ0zSXim/X0/bFSOxWyi1HwyR/UMFdrj5xvXunC7Pp1VuWVOeXeYBuZOzozVnbxd+MjHvg7/UzOV5Fvs8vQA/BcS9eq0dAXrdv12voEX3tzaepTZS56D7fRnG+5kx41cCDrDx1sJrCoOtXQzoJSrcw8d7gEPfKdDNW9BlRhX5zBaVZ7bb5d8BSxKhqv01JSyHdfN4vAMkShxI4NpLX9YJoPHXvk1pY/LN0Z/LeTY1aQO9Umrvly1fmw8XZ/JioyVoTlROo2F/W8hUMqa+moB7aBL+SWBAMuyhIxXpUGMxF9smYtvvqMojp2ildpJVu9kLEHEBsihTRpmLV0zGfMsZsgjO7wS5JUdMYVNPVV/h2Fhh1Mrwb+neXN8icSXVW0nwMgPsG+0eSRyQhNFb1KB/Mj/3hwmqA+7zDfNxYH7G9pw849Pb8mdTEZQYYy3xyIY/eBqU+X61jcmFk571Z7tozfoUWDGsv680OitiWc57KWZoiLUfDtrvHCD9IyWdkaizVVoQVqxVJXh5T1xq263PrKaccd/ymhbVAeP3D0dOVbVrCfYFUc52hBYbrrz
+	WVcJalgC5Ah90UIYRiBthyde0cRTk5KFJ7qkRKz03uCvpYIzsEPoIrLbpp4rVjKQQ+YRTN8on2RYqYm8S6hgczvnDs+83tL6ObDSSxUKo6dU4Yv24lx2fvIj/GRgXjSvgliq2nLbIMzoFUn8uD1J7SAL8l/0NDNUcdZHPZFmM0QaIXYp1Sq8vk24rnsVS1MAMsx1MGF/REo/oGS4DyWFiNZzfHUUT4vf6DAkKmbdtXgeAO+nlc3MjQc5jrj+dfCfB5jpqqn1iqgn3McVwI8yvkImv45GplMejuSizjZfQgHEQNrTSieA6210kd0Zpb6MewKdCNznrvXFLHuwSiNpWIMpSXnSqvtSGPKKOE5wtx7eg3TSXCuzEMnhXrD3gka568abgub2X89mH3ikZjuXc3mCVHqLlpl/GI/w7731Q8Lntobx1wkb/ALMtZHxH0yxZx5yCliMG31VNuYyJtijTtdgr3IVk+18VPxD4orHm5bfiad+DeTOg7E3Ay/9biXo63OIMtwW4+xZzVVrFz6f5QjtGQbKHVKEyLHgB4xh3b8u7eKxbwkKTBoC07csxDXm
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(346002)(39860400002)(376002)(366004)(136003)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(66899024)(86362001)(33716001)(41300700001)(38100700002)(44832011)(5660300002)(8676002)(4326008)(8936002)(66946007)(316002)(6916009)(66556008)(66476007)(6512007)(9686003)(26005)(54906003)(1076003)(478600001)(6486002)(6506007)(6666004)(2906002)(7416002);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9070.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(136003)(396003)(39860400002)(346002)(366004)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(26005)(2616005)(1076003)(86362001)(83380400001)(6666004)(6506007)(6512007)(66946007)(6486002)(44832011)(478600001)(4326008)(8936002)(8676002)(36756003)(5660300002)(41300700001)(4744005)(2906002)(38100700002)(66476007)(66556008)(316002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?NyiX8FB11nFn9nPnL2lMhJO98pixop4Vxj0y1M+2cGrOWIceyHeJw/JJZbRt?=
- =?us-ascii?Q?d0LNmHRtc0YGi8+aqJ+Xndmm/L/tbmqu0/6g3FAfl3AQCDSXm0H4+P6t+Vqy?=
- =?us-ascii?Q?LGbXPlS8nfOEYzqqjNvKE5xia0urSbC/fExhJ2XHoABD8ju9H8O1yl97jqk5?=
- =?us-ascii?Q?EacaZ+qaDFXIGo3HSg4pXM7TlPpr06VvO/0zQS7iFh0dcWbQP3fNkBKbfwQ5?=
- =?us-ascii?Q?kXyPN9SP8qdPYpfAejOZDdWAKbLyLDhsW5+60R31N7kLYUAcW64+2fk8mLZM?=
- =?us-ascii?Q?XgSj3oqYDMrDH3Nax8Bz0P+pOAX3FRAglHlspjHnZbihf+rk93sFX7OYATGd?=
- =?us-ascii?Q?dTWZV1UqYSzjFXuqwo6YkgAQ/6KDjQySiIXfw1vOcr5eHdP8usUrYX1PNL9e?=
- =?us-ascii?Q?Y9/459sfdBXfgljQuqpZUSRGQe9mY6E6PtK6Agq9TKmRWN6MDAIKpFMZSRDc?=
- =?us-ascii?Q?mBJKP6hdI4/0aqMpyPFyJglr9bWDkWZNfcy5h86hF6bzi0lJ+nkBTHK3Iism?=
- =?us-ascii?Q?WAeWzMxB+Md3vsDDLEZcnyyCoq7FnZYE/oBgEJPO4qjRU5p59DL1TdORxkx7?=
- =?us-ascii?Q?5pkVtQqRDlimZfEdQy5G4r5ky9o+CsxP4VivUQpJEGst01IgBKdVBlOJWylH?=
- =?us-ascii?Q?ixBXYw7N+R5jD3Vq+6B12VEzn+BjSz5ZpxBGcs7fsAiJ6nnFwG74hi1BQ4j0?=
- =?us-ascii?Q?yEITPhJb+mGDMeH1kLeqEz6lGbjCoSohp6mtZvwrOjLybjOJDvpq5qJaR+IQ?=
- =?us-ascii?Q?V1ISxadADPNywH1bX5gy3j8BpQfM5FK9V6g7BeK2ze8gjVbSrU7TvTfB6A5R?=
- =?us-ascii?Q?YFo/MT4T5kuWJiz8bhj7DGNant+VmndIc++HwN/VWRV67NspyCYx1CwLbQ65?=
- =?us-ascii?Q?aiogyFkF/Vp8GhQVYQxx8FrHKDY1uewbJO4hXi1G/Jq8ZbSmuVvhXNRJ+5Ta?=
- =?us-ascii?Q?WkO2wx1L9HMK4Zl4XotIR1OHoBCNFcSlBuhsbioqMZzXiPkjoJI+QBAHv+e6?=
- =?us-ascii?Q?VdurpSZ+kViy6AuSk4/LJIRY6Ax6u7b3BaiHyGuWOVbdre1sne3rfCG8xrPX?=
- =?us-ascii?Q?0uktRitYAh2gnaUh+Znvj0nolOU9crISZhX2U2WhszesdHiSVkFluWHj6EOq?=
- =?us-ascii?Q?mmWfyiIns7IBOrfesGYoWk9ZA9Dez35NRQTB1YXfcqMk+3xhUNk+6Zmn0NsK?=
- =?us-ascii?Q?DJzCS1JF7pVUftEoICtVnsoQ3ioMcRmZCcjPeyVt+jHbo6mGlpYPAn2ioeq4?=
- =?us-ascii?Q?l2riePZLBI1AzH8bWLhNjIk/zE5aEwM2VmvcY121GL0SvLPl35nfILCtcfex?=
- =?us-ascii?Q?GFXHErx4zy3UaLO/JeJcAs+jy2h4+g2iixUUL8S5FVZq2sdpwq5XMUgLkTFa?=
- =?us-ascii?Q?6CZn6uj0B/cRoY+O0Q8baIzU69snrgCEf+CWMjulBfIdSLuKHBAfz9yun0mq?=
- =?us-ascii?Q?8RTGc2hvGgt5vkxZ9cxKKlZbxKZ1NVRImv6wVl1jBwjsWh9i9AUC5lf9KuX3?=
- =?us-ascii?Q?Cb84nZ7IyTJk96IqDSjQ81OUDIflqTVJ2Ok0U62+iVh4mLsYBnoqD5J44d+3?=
- =?us-ascii?Q?RCT6cUdrireaVpRgi/Q6n1r8eIqVCRmkzxa94QquWSr+UsOlrHnG41Est2k+?=
- =?us-ascii?Q?wQ=3D=3D?=
+	=?us-ascii?Q?yA84UMR/Q2R8sx2atZFetWrJJlzRy/OgTNQr4hf8l9x+y4PeSualJEs1s3YA?=
+ =?us-ascii?Q?b2Zi2Mx7mPsQtL5nHiv85kiPCMa9P6ng6C6lplTIoXYDjc4PmvxLEin0dRae?=
+ =?us-ascii?Q?OyJ1H5LWM23s5oEnNkNKjhNRppb7QLz1JsgSMnvCGdH5Fh20cuJ38eQLhY28?=
+ =?us-ascii?Q?a+eE5C37V+RDOa7GBMBCtY615EVK5YREtjeaXLJR/pIsBKieTiJnAb6PCAxU?=
+ =?us-ascii?Q?Jp5CTZO1SDenjHlbTzhzeEDTlLJ8n6icJb/30Gx6R6YpS1ZWj48psZSsuHKy?=
+ =?us-ascii?Q?MfSamw9STpWUD9LjdqrAqgbGiM+LIzfppIvABVXF6so+JfIecQ035r3sRu/L?=
+ =?us-ascii?Q?LnAjwdXa/emUF51RiOvfI+igXos7WZrOVAQIZUkn68IJImOTFm4nvOU1tSpn?=
+ =?us-ascii?Q?Rue2ws5Zp99NAU7bGc4wAZ9pv4qBU3eyUFAkgFU4LD+1iLbJsEjIbRGwIhSc?=
+ =?us-ascii?Q?bhr1mUqEPIj7kBwyktpAF8puP3Yh/JibyADSAddaadsMJiWWH2wtUilKCseO?=
+ =?us-ascii?Q?zhSQxFQR+WBSi1o1Nt9JG+GGlpKcoyXrgur9WqBcZToFZINXUt70UGIYt1Kz?=
+ =?us-ascii?Q?6nx4jC1LYPLgGE3YRx8yXaR3cvPHnQheNKjPtTl2gTR61SAlsKt4rueCkg3W?=
+ =?us-ascii?Q?ICs8B8hUS6Q/f7lLF40k2F8Yn3pUc7fBRB44nAte7lvlYvOkA91KmQ87zy8W?=
+ =?us-ascii?Q?MMP3AmcgGfJwql9y72IWv1Qy+3xCQG7FOUeA+XQ2TdfIgmQSgNHw/tDwq27m?=
+ =?us-ascii?Q?ihCqbAjVfSveSObQQexTzK6Ql3SPkhg5Xh0VW01rzxlCDIy98iRnPixcyE78?=
+ =?us-ascii?Q?8wEA9MGuNbh2GtaBZLT8f6aYlWGb2LRMJ4rzlYJG32t4IQsJ9L4haN3CwSY2?=
+ =?us-ascii?Q?0srnf3iD+iatXaNt9IIdUQABH31RstRqljCpmwdp/O+YSTsLv6mpBRaguq2c?=
+ =?us-ascii?Q?0/U2K7F8wjaIMC59JALiTOptKUXwiVg393rMipBGIU99JATDAiJ4Xys98yxq?=
+ =?us-ascii?Q?kpSn6E6oMy4O/azs3Q232orb1GihCQSBQNf4HLLLPKLmEcAXkClESB/VkblI?=
+ =?us-ascii?Q?Xc+/N0/h0P03uxx9GvACy4XblcsVgfj7PJkbrhQXReIZLjpaupYNZJWtiMfM?=
+ =?us-ascii?Q?fUKodxmekFLbr7EMCNmtF/l6d7JiC18JUtoWiX8pCUQgHUJB4/mXeR04Hbfz?=
+ =?us-ascii?Q?uGc3bCzHjPCtHrDY+nAf2OSJlkgt+1YwK8AHeoJXaGjNnc90BELHFCGgItJt?=
+ =?us-ascii?Q?UbDJq/cfhnrFRNi9DX4LgfOym+yGBo6eWUxRp+8ms4MXGVkhNXfMUEcWIOm6?=
+ =?us-ascii?Q?CaNoLG3FzKNuCIB9vUoTLVAYubp0z5tvR1STBngcGYAPMyFk2t9uOwvhXb4C?=
+ =?us-ascii?Q?k7Im8GpCPbnsfLFAEZXgZ+9ZyUcWhSbqVvkYL5aQ204+QKEvGllkQrDYpupA?=
+ =?us-ascii?Q?FhTTt4E6lONorEcSk1zqqRK4om9fFlKwUejMsyq3rx1VxlcgiyefQOsmb3Q8?=
+ =?us-ascii?Q?MPzWy07VGKOe7MzZkHkxdmwgAQ4FTJfLlxe8weMBIdeblqKiR/o1/4SGN5Al?=
+ =?us-ascii?Q?DL2hyVXjziBEbcmxCu84ugjHGdfJTVgNbiOIDbiT?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8deb78c6-4090-43fc-5979-08dbfbd4027a
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e91fef2a-c12d-4721-d384-08dbfbd537c9
+X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9070.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2023 12:06:59.8399
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2023 12:15:38.6999
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: f+wcVp5WxC2CzxPQCsqvRQi/RiLqHb4ZWc/BS1jCYW+Hpb16Reigp5GU/1lmXIR/+Tx2zcP5pexLEeBlnn4zeQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB8032
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2gvvhZFjl1glOQNS/csYeIAjfAjNHyz3MKjvpPuu0PHlmNVpFo89es136BHCaLSaeqGXTVN04nNiHfa/IJy9Hg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7894
 
-On Wed, Dec 13, 2023 at 02:30:48AM -0300, Luiz Angelo Daros de Luca wrote:
-> Hello Vladimir,
-> 
-> Sorry for my lack of understanding but I still didn't get it.
-> 
-> You are telling us we should not use user_mii_bus when the user MDIO
-> is described in the OF. Is it only about the "generic DSA mii" or also
-> about the custom ones the current drivers have? If it is the latter, I
-> don't know how to connect the dots between phy_read/write functions
-> and the port.
+This patch set consists of a series of small improvements on the
+dpaa2-switch driver ranging from adding some more verbosity when
+encountering errors to reorganizing code to be easily extensible.
 
-It's about both. It has to do with the role that ds->user_mii_bus has
-(see more below), not about who allocates it.
+Changes in v2:
+- No changes to the actual diff, only rephrased some commit messages and
+  added more information.
 
-When the user_mii_bus is allocated by the driver, ds->ops->phy_read()
-and ds->ops->phy_write() are not needed. They are only needed for DSA
-to implement the ops of the generic user_mii_bus - see dsa_user_mii_bus_init().
+Ioana Ciornei (8):
+  dpaa2-switch: set interface MAC address only on endpoint change
+  dpaa2-switch: declare the netdev as IFF_LIVE_ADDR_CHANGE capable
+  dpaa2-switch: print an error when the vlan is already configured
+  dpaa2-switch: add ENDPOINT_CHANGED to the irq_mask
+  dpaa2-switch: do not clear any interrupts automatically
+  dpaa2-switch: reorganize the [pre]changeupper events
+  dpaa2-switch: move a check to the prechangeupper stage
+  dpaa2-switch: cleanup the egress flood of an unused FDB
 
-> We have some drivers that define ds->user_mii_bus (not the "generic
-> DSA mii") with the MDIO described in OF. Are they wrong?
+ .../ethernet/freescale/dpaa2/dpaa2-switch.c   | 131 +++++++++++-------
+ 1 file changed, 84 insertions(+), 47 deletions(-)
 
-This right here is the core ds->user_mii_bus functionality:
+-- 
+2.34.1
 
-	ret = phylink_of_phy_connect(dp->pl, port_dn, phy_flags);
-	if (ret == -ENODEV && ds->user_mii_bus) {
-		/* We could not connect to a designated PHY or SFP, so try to
-		 * use the switch internal MDIO bus instead
-		 */
-		ret = dsa_user_phy_connect(user_dev, dp->index, phy_flags);
-	}
-
-So, the ds->user_mii_bus is only used if we cant't do phylink_of_phy_connect(),
-which follows the "phy-handle" reference.
-
-The reasons (that I can see) why we can't do phylink_of_phy_connect() are:
-(a) port_dn is NULL (probing on platform_data and not OF)
-(b) port_dn exists, but has no phy-handle
-(c) port_dn exists and has a phy-handle to a PHY that doesn't respond
-    (wrong address, ?!)
-
-Out of those, it only makes practical sense to design for (a) and (b).
-
-If the ds->user_mii_bus has an OF node, it means that we are not in case
-(a). We are in case (b).
-
-Normally to be in case (b), it means that the device tree looks like this:
-
-	switch {
-		ports {
-			port@0 {
-				reg = <0>;
-			};
-		};
-	};
-
-aka port@0 is a user port with an internal PHY, not described in OF.
-
-But to combine case (b) with the additional constraint that ds->user_mii_bus
-has an OF node means to have this device tree:
-
-	switch {
-		ports {
-			port@0 {
-				reg = <0>;
-				// no phy-handle to <&phy0>
-			};
-		};
-
-		mdio {
-			phy0: ethernet-phy@0 {
-			};
-		};
-	};
-
-Which is simply a broken device tree which should not be like that [1].
-If the MDIO bus appears in OF, then _all_ its PHYs must appear in OF [2].
-And if all PHYs appear in OF, then you must have a phy-handle to
-reference them.
-
-[1] There exists an exception, which is the hack added by Florian in
-    commit 771089c2a485 ("net: dsa: bcm_sf2: Ensure that MDIO diversion
-    is used"). There, he starts with a valid phy-handle in the device
-    tree, but the DSA driver removes it. This makes phylink_of_phy_connect()
-    fail, and "diverts" the code to dsa_user_phy_connect(), where the
-    mii_bus read and write ops are in control of the DSA driver. Hence
-    the name "diversion to ds->user_mii_bus". It's a huge hack, make no
-    mistake about it.
-
-[2] This is because __of_mdiobus_register() does this:
-
-	/* Mask out all PHYs from auto probing.  Instead the PHYs listed in
-	 * the device tree are populated after the bus has been registered */
-	mdio->phy_mask = ~0;
-
-> Alvin asked if we should store the mii_bus internally and not in the
-> ds->user_mii_bus but I don't think you answered it. Is it about where
-> we store the bus (for dropping user_mii_bus in the future)?
-
-The ds->user_mii_bus is not just a dropbox, a pointer for random storage
-that the DSA core generously offers... It would have had a void * type
-if it was that, and DSA wouldn't have used it.
-
-When a driver populates ds->user_mii_bus, it opts into its core functionality,
-which I just described above. If you don't need it, don't use it. It's
-as simple as that. Use your own private pointer to a struct mii_bus,
-which stays out of dsa_user_phy_connect()'s business.
-
-It's very unlikely that ds->user_mii_bus will be dropped though, unless
-we resolve all other situations that need dsa_user_phy_connect() in some
-other way. One of those situations is case (b) described above, aka
-device trees with no phy-handle, which we don't want to break (for the
-old drivers where that used to work).
-
-I cannot make a blanket comment on whether all drivers that populate
-ds->user_mii_bus with an OF-aware MDIO bus "are wrong". Probably out
-of sheer ignorance, they connected and tangled together 2 logically
-isolated code paths by using ds->user_mii_bus as dumb storage.
-
-What was written carelessly now takes an expert to untangle. You now
-have as much information as I do, so you can judge for yourself whether
-the behavior given by dsa_user_phy_connect() is needed. My only ask is
-to stop proliferating this monkey-see-monkey-do. If, on top of that,
-we could eliminate the gratuitous uses of ds->user_mii_bus as plain
-storage, that would be just great.
-
-> 
-> You now also mention using the MFD model (shouldn't it be cited in the
-> docs too?) but I couldn't identify a DSA driver example that uses that
-> model, with mdio outside the switch. Do we have one already? Would the
-> OF compatible with the MDF model be something like this?
-
-I did mention it already in the docs.
-
-"But an internal microprocessor may have a very different view of the switch
-address space (which is MMIO), and may have discrete Linux drivers for each
-peripheral. In 2023, the ``ocelot_ext`` driver was added, which deviated from
-the traditional DSA driver architecture. Rather than probing on the entire
-``spi_device``, it created a multi-function device (MFD) top-level driver for
-it (associated with the SoC at large), and the switching IP is only one of the
-children of the MFD (it is a platform device with regmaps provided by its
-parent). The drivers for each peripheral in this switch SoC are the same when
-controlled over SPI and when controlled by the internal processor."
-
-> 
-> my_mfd {
->     compatible "aaa";
->     switch {
->         compatible = "bbb";
->         ports {
->             port@0: {
->               phy-handle = <&ethphy0>;
->             }
->         }
->     }
->     mdio {
->          compatible = "ccc";
->          ethphy0: ethernet-phy@0 {
->          }
->     }
-> }
-> 
-> And for MDIO-connected switches, something like this?
-> 
-> eth0 {
->      mdio {
->          my_mfd {
->             switch{...}
->             mdio{...}
->          }
->      }
-> }
-
-Follow the clue given by the "ocelot_ext" reference. Search for the "mscc,vsc7512-switch"
-compatible string, which leads you to the Documentation/devicetree/bindings/mfd/mscc,ocelot.yaml
-which is the schema for the entire SPI-connected SoC.
-
-> 
-> Is it only a suggestion on how to write a new driver or should we
-> change the existing ones to fit both models?
-
-First and foremost it is for new drivers. Read the actual patch:
-
-"Authors of new switch drivers that use DSA are encouraged to have a wider view
-of the peripherals on the chip that they are controlling, and to use the MFD
-model to separate the components whenever possible. The general direction for
-the DSA core is to focus only on the Ethernet switching IP and its ports.
-``CONFIG_NET_DSA_HWMON`` was removed in 2017. Adding new methods to ``struct
-dsa_switch_ops`` which are outside of DSA's core focus on Ethernet is strongly
-discouraged."
-
-For changing existing drivers, on one hand I would be glad to see effort
-put there, but on the other, I need to be realistic and say that I also
-tried to convert the sja1105 driver to the MFD model, and it's really,
-really hard to be compatible with both device tree formats. So I'm not
-holding my breath that I'll ever see conversion patches.
 
