@@ -1,131 +1,218 @@
-Return-Path: <netdev+bounces-56785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 042DE810D9D
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 10:47:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54F51810DAC
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 10:49:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F51AB20BF4
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:46:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07A021F2120C
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:49:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0588520B09;
-	Wed, 13 Dec 2023 09:46:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B6A421A05;
+	Wed, 13 Dec 2023 09:49:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tB5OQxh/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EYSsOQY2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6DF02030D;
-	Wed, 13 Dec 2023 09:46:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88F15C433C7;
-	Wed, 13 Dec 2023 09:46:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702460812;
-	bh=k3h+x5Vi0c4IUc2BgiJewMzJeCYyvSk8+ZHJK/SWAOw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tB5OQxh//OBSfXK0FUdFSzcfEoIJyEniRxaI6FF3p7iKPcZ+k+7oHa13+VC5BtTVW
-	 AIvVDladP54+eKEj0Gizw4euRRRU6KZCljmIlisdNUIFEIPMh59eypu8BxdaDEnvgg
-	 +J1/VytncX+iPP7xylS4qbsFfaeCyc35ucSWlT1PIR9VG8UK+IadGA4rhnRd1kZdNI
-	 /xMEdLMTt+iCLnF06HyS5MK4EQ/RO1rWc5rGrvf97MSFIVP3+KQmnXpVVESH+jjOa7
-	 Y3XgFLpzUW+W4LKrAmsIIn5S1Y6lJPRrOn80Znicol+dSEaP5p+knty92G1xUrhR47
-	 j9Ggn0ti7Ij1A==
-Date: Wed, 13 Dec 2023 09:46:44 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chunfeng Yun <chunfeng.yun@mediatek.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexander Couzens <lynxis@fe80.eu>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org
-Subject: Re: [RFC PATCH net-next v3 1/8] dt-bindings: phy:
- mediatek,xfi-pextp: add new bindings
-Message-ID: <20231213-confined-shaping-f56b1fdfb135@spud>
-References: <cover.1702352117.git.daniel@makrotopia.org>
- <b875f693f6d4367a610a12ef324584f3bf3a1c1c.1702352117.git.daniel@makrotopia.org>
- <20231212-renderer-strobe-2b46652cd6e7@spud>
- <ZXiNhSYDbowUiNvy@makrotopia.org>
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 585ACF3;
+	Wed, 13 Dec 2023 01:49:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702460967; x=1733996967;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=/BE4cI8nyAieZmYdL41ExEy2b/slFRRpAViTi2mAXFo=;
+  b=EYSsOQY2rzfytq3sjs3idNfwzENwbBtOJvGGawvx7EFi0L/L6o+mRMBs
+   tQbnKcImENJFbiHLPgz2+Izyhdo3ssUyucPLixI4I6mfr6Giak8dDT1e+
+   uqB+vwzwXELZrHLPlVjnjiKYkWjTVtludvo74wPgwmMuX4ioxhVPXP3VT
+   Cvf8+mU2W6ID7nOP78FYYr00D8yyUimDCgYP5WnKcOHg8LhmEUGKdiYMy
+   XuJwfyh9Q0e9/LUezdZYkVXr0dl1qdZgCYEJZpM0cCQNp07QkgyvKJCXW
+   rBn/Z8kvKfziEy+NLU9dOBOyp7sLHCEgwoX2GO/l3Wn7wPBWx72GPq+c9
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="1797173"
+X-IronPort-AV: E=Sophos;i="6.04,272,1695711600"; 
+   d="scan'208";a="1797173"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 01:49:27 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="750057561"
+X-IronPort-AV: E=Sophos;i="6.04,272,1695711600"; 
+   d="scan'208";a="750057561"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Dec 2023 01:49:26 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 13 Dec 2023 01:49:25 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 13 Dec 2023 01:49:25 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 13 Dec 2023 01:49:25 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.101)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 13 Dec 2023 01:49:25 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ElOvzamoSQopa0IuipPh3AHScKZ++/xc4V+AeywcTHzqyr6PTHVvZ6wxSObxL7hxKpy2xQy5kVYfST63KhOof2T14bSn4YB5KqRgawJedMvmzQ3am2nX6Z8PHCjNTsei3DUBOVQe5H6dvLjFYX7PThY3ndFeNf+UDrsUCWSh1/xlQYMns3CnzhMWzHKHTQl5bsYvsXDFyeyB41R01BaCij5a93oQnrcFo4LQHwrU3jl49OpEKQcUBvS7tu2mpr+AuApTXBDt8a6ZqhiXEWZ42JfsEbU2fxrcX7sB7+sPIZv/NSpQv9Bq1w2/HuD3pYZTVkuiL026bjpuc7u4QFt47Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TulmZyRFh/7VObXQgbbOF1Lf1ZTH1UmaohdlvRZvtLI=;
+ b=AjHhEil949C/g9wn0pPXlgUv5Tt254dZB2MvxJNBZInvw7gRtb1Et1LwY6ByYihI4iQxwlIkLXkPwu4I9Z95WuTU1YYwsyvncWQtYsMRGw5czLOj3gZfpMem7P48UQtkRwYx4V7WMqVb1G+upXPgba6PPK2AG5SAy67ReOxydXPgjjw3fTfIaSwdk9Gc/dwLH4B+eiGpB8jJDZpLXw3jX//KU04U3Rancvkd1nBJIyuUqkFUPSZtw2gjTPx0TPNpPg1n23W3nD3gySx/cG8NKJvSaFRgR6MIM+tnWFCuJNOCZA1hqFYN9T5U0rZhjeZCtO9u2v3neIKTKyrfeQYzhQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BYAPR11MB3672.namprd11.prod.outlook.com (2603:10b6:a03:fa::30)
+ by SA1PR11MB8427.namprd11.prod.outlook.com (2603:10b6:806:373::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.26; Wed, 13 Dec
+ 2023 09:49:23 +0000
+Received: from BYAPR11MB3672.namprd11.prod.outlook.com
+ ([fe80::5112:5e76:3f72:38f7]) by BYAPR11MB3672.namprd11.prod.outlook.com
+ ([fe80::5112:5e76:3f72:38f7%5]) with mapi id 15.20.7091.022; Wed, 13 Dec 2023
+ 09:49:22 +0000
+Message-ID: <1abd6bcb-6f6c-10a7-9b6f-e5e038233af8@intel.com>
+Date: Wed, 13 Dec 2023 10:49:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [PATCH v2 iwl-next] ice: Fix some null pointer dereference issues
+ in ice_ptp.c
+Content-Language: en-US
+To: Kunwu Chan <chentao@kylinos.cn>, <jesse.brandeburg@intel.com>,
+	<anthony.l.nguyen@intel.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <richardcochran@gmail.com>,
+	<jacob.e.keller@intel.com>
+CC: <karol.kolacinski@intel.com>, <michal.michalik@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Kunwu Chan <kunwu.chan@hotmail.com>
+References: <20231212024015.11595-1-chentao@kylinos.cn>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+In-Reply-To: <20231212024015.11595-1-chentao@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0177.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:b7::14) To DM6PR11MB3674.namprd11.prod.outlook.com
+ (2603:10b6:5:13d::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="TQLtrFVr4ShS8Ew7"
-Content-Disposition: inline
-In-Reply-To: <ZXiNhSYDbowUiNvy@makrotopia.org>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR11MB3672:EE_|SA1PR11MB8427:EE_
+X-MS-Office365-Filtering-Correlation-Id: 810c45cc-d015-4132-ff16-08dbfbc0c82c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: u9Zbbhlpinztdtjz8dQMeXUI504vNaAMZBvkD0UPYoimZYlcYRzKZM+X8/o6Cmnt94q/1jsRwhUTMZMnLgAyd1g2b2VhS4xT/KLzyIxSWkfVyuPpm5dh+TlCfD4CIzgai3tKhYbjzUDEOGZYXcRnUpkH1TRy852WLvzqBv947gYitkKMsTmitTfjvnLd2476bqcFOPUAkVPUgZfkhu3JAsmxCQJdGYJnR0NfvgbcLAnTUxoeTJJh+n5AgIKFCFbaqH6/xgwyhaxzOLEkT89lADDwvhSnQbE6n2HU+TTEjJ4bQ626gR7MySvnORlgVcp+BYZrkL6y8AQ2JxQib+/7aHjH7svtGtwCMiOn/d4XThggK//ZqZZgLdplI/wsaCgRxV1S9WO9EzhfHqvM4D0NrE5TzOeD2aaeHbayV7GW760jBcYiTjFoYoHOlEGYCLXYIYaIOfGbNGF4RctbhtPcI4V+jv0Hc0eTuzN1sY4zW0ByP+tc/6FdT2QN16dG3M/CMFk1+M5/9QmPaMLwIsA5D/L4oUZy1TZMneSZkTGQMDnZL4Y8XHC4czTLa8mAa8Xz8TWiuPenN7DH7up7YsWp+Aqbjusgw9Q+oJxGaM5d3BYOmoAxVRXOe57hnqP9ZTpr9ZL0Bewf5TGkjxA8G27NYA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3672.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(136003)(366004)(346002)(396003)(39860400002)(230922051799003)(451199024)(64100799003)(1800799012)(186009)(31686004)(66899024)(2616005)(26005)(6666004)(6512007)(6506007)(82960400001)(31696002)(86362001)(36756003)(38100700002)(5660300002)(45080400002)(8676002)(8936002)(7416002)(4326008)(53546011)(83380400001)(66476007)(6636002)(66556008)(66946007)(41300700001)(2906002)(316002)(6486002)(478600001)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QzRHYldiaVBwaDg0OE1VTVNGL3JvNUtjREZPN2FVZlE4S1FUdVp0dHNCT3FL?=
+ =?utf-8?B?S1IzOVFKcU1IdEJtbmU0RmhFZlN1eWpOUXFXaEJWL1hPYXowdzFqblpwS2RI?=
+ =?utf-8?B?a1JLeWVCVG1OQ2hDMk0wa3dCSXhUSW1IaFFYOThQL3F0N2FLNWRGc2NOQ240?=
+ =?utf-8?B?RHJoY3NCT2NEWjJteXduRDM4c1l1aXoxdWoxRzhKSWJvZDNqVUxUbjFYTC9p?=
+ =?utf-8?B?aVZHTzNjckV1VmxDQWQ4QzE3UlNSeWtFUUlSc1FYV1MwenpSenFnQzMzQzJT?=
+ =?utf-8?B?UHpCbEhRN3lJeDFqTk12T1BzZklnNHFlMkVWR3FjMXdPZnFlWnI0Umk5bUZz?=
+ =?utf-8?B?MnNWcGxkVGlRRnNxNGdKWUhGN01US2ZjQURzOEJHc2FldDZBWm93OCtmMDEv?=
+ =?utf-8?B?b3l1VFNZejgxN2ttekRTUGd6MU1tTkEreUZYZGJoQXpEMXNhN3hKNXRCeTVS?=
+ =?utf-8?B?d3JYb2gxUHBMUUVYYlI4WHhBeUtSeDd4QSsyWlIzdVBXN0J0UzcybTNYUWd1?=
+ =?utf-8?B?bVN3RStRS3dhc1lCa1ZhdHZnUWh1OXMzbkZWcGtDVXFhTFFrcjdhQy9lTUtl?=
+ =?utf-8?B?UC9WSlpVajQ5Qzk2VTlmekVyd1V6WXBRaDE0ZnBFMUl6aEVqVm11T25oNnhG?=
+ =?utf-8?B?U1l4ZVNybkNtOWtQa3BjWTd2VHVkeUtLY0pPbDBQR3JrRHFPTGFuYkFWbitJ?=
+ =?utf-8?B?c3hIZ0cveU5QMWwzVWllVDlOUFhLd3Z3Q05HU3JMeWdUd0pZS2VUenJWbWRJ?=
+ =?utf-8?B?alZmT2JGRmx3ak5yTWFwazJQY1lFNE5WQzdURXVxcjIwRWRsamRzYUFCdjFh?=
+ =?utf-8?B?YVVnZUdjUUhCOVB1Vm9wT2duQTVxbEJWdDNOTWp4TGtyeVFRamRMOGZFY2Fu?=
+ =?utf-8?B?VTNxU2g0b2RQcUsydHhCYVcwbWNjTmJxazBnSnRNZnNnUzZQTEpnNjRwaElE?=
+ =?utf-8?B?dXRhTHNrRmVHQ1lvbEI1aWRPREtsRTcxNnNDZUhxaFQ0WUk3TURaa1VacDg0?=
+ =?utf-8?B?VEk0emdqU0I5bmdjbExDS1JLUjBtNHBmOW9rdFBZdW1MOUpLbUprempLaTha?=
+ =?utf-8?B?QzViZGxGdFJZelluZVN1WVBOcElpcnlpZDF1NFE4N1Y4d2xJV2xJNFB1d0VY?=
+ =?utf-8?B?c0RVZmxmVnMya3gvTTZFVWY0d3VoUGZRTkZxcFJVS1hMdnozaXhseGhzMEMv?=
+ =?utf-8?B?am5JODFKdUdzVjRaaC9aa0Q0MkdUQjZlME84OWZRRk9hRjBmMnQ4RWgwM3pl?=
+ =?utf-8?B?VlhiaU54YmJTQ2VyVlo2RlFqVTg4OG1FWFFKVzVOd3d0N1JxUGU1N0IvWFd3?=
+ =?utf-8?B?REcvbEtmdEEzTVVqNnpnQjFCMFpnZnl3VXdZaHlrMHhxZFphaUJkZjNkOVhp?=
+ =?utf-8?B?ZVZldVJnd09VYmt2RWdORlg2ZWVTK1lJU3FRY0dnT0lkRCtEblJ4NTR1TzBD?=
+ =?utf-8?B?S3FKblJxVUZibFhaZkx4UjNlckJCYUNCSk9EUXJXZnQzRWx5VHY3N1NFU0lC?=
+ =?utf-8?B?Vm9nd0ZYSURtaTFPOXdjSzZLbTJVSFN2VjZzS2dHZlkyNERKOTlGU003V2tH?=
+ =?utf-8?B?cFZLWG1Rbzd4YUdDSVp4bUtySjRBTjRiNnNQMlVaNmZML0xtZ0J3TjVSWTFJ?=
+ =?utf-8?B?bHBVSisyd1Q3Q2t4TEQyZjlmT1pqUWhXb0JMSlMxQUt3WUhCenlkUFJGSWVt?=
+ =?utf-8?B?ZWtScWkyMzFDdFhUOVFmRkl5WXk0S0hDVTZvYVdlcEJWa2hoNFBpdStJMC96?=
+ =?utf-8?B?MDJ4NHhNblljY0U0NkdBUDVVeEtrOUNYZ3VvRmNuMXFCRmovWlF5UU5oeXZr?=
+ =?utf-8?B?RkNWOUtzSzJpQ0ZISGg1K1JVT2xUL1p6Zy9IQVJsTURmZWVYZ2JqREt0UDB4?=
+ =?utf-8?B?RktHMThtVGhiT1AxMXZuaUFYSGN2OHJFQkQwalF0WHJwSm13VElnSk5sSWNR?=
+ =?utf-8?B?eG9BN2VUMldEcEVCMlBiSlUrclhwTUZDelFIUHgweHdGUmppU3M4Tk1oZVZo?=
+ =?utf-8?B?dkVHWG9ZVE4wTERzVWR2cm5uUzZCYVBVanU1cGdPb1B4YkV2QW9oRjhzRTdH?=
+ =?utf-8?B?Y1NQb29kOGRrU0dMRkF3dkZNWmRQMWlKb0tSdUVYL2tpWUVnYzJDcExPbW5y?=
+ =?utf-8?B?SGZPM2cxVGNWVDJORzZUVjQ2aVY4ekJiVVRjR0d2R2ZjSi9kV0NWYllRaGU3?=
+ =?utf-8?B?ZlE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 810c45cc-d015-4132-ff16-08dbfbc0c82c
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3674.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2023 09:49:22.4571
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YCifLmbOVtz4dXXr/WNGyhWpCPOf9HI63NrMOG/ksh75lLqr0Ajwb+GUuseH5NiNHSSjzjvmL1PgWEBNbTQFKFlt+Me/+UC89jjtNojH9VM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8427
+X-OriginatorOrg: intel.com
 
+On 12/12/23 03:40, Kunwu Chan wrote:
+> devm_kasprintf() returns a pointer to dynamically allocated memory
+> which can be NULL upon failure.
+> 
+> Fixes: d938a8cca88a ("ice: Auxbus devices & driver for E822 TS")
+> Cc: Kunwu Chan <kunwu.chan@hotmail.com>
+> Suggested-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
---TQLtrFVr4ShS8Ew7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+You found the bug (or some some static analysis tool in that case);
+there is no need to add Suggested-by for every person that suggests
+something during review - the tag is for "person/s that suggested
+making such change in the repo".
 
-On Tue, Dec 12, 2023 at 04:42:45PM +0000, Daniel Golle wrote:
-> On Tue, Dec 12, 2023 at 04:21:38PM +0000, Conor Dooley wrote:
-> > On Tue, Dec 12, 2023 at 03:46:26AM +0000, Daniel Golle wrote:
-> >=20
-> > > +  mediatek,usxgmii-performance-errata:
-> > > +    $ref: /schemas/types.yaml#/definitions/flag
-> > > +    description:
-> > > +      USXGMII0 on MT7988 suffers from a performance problem in 10GBa=
-se-R
-> > > +      mode which needs a work-around in the driver. The work-around =
-is
-> > > +      enabled using this flag.
-> >=20
-> > Why do you need a property for this if you know that it is present on
-> > the MT7988?
->=20
-> Because it is only present in one of the two SerDes channels.
-> Channel 0 needs the work-around, Channel 1 doesn't.
->=20
-> See also this commit in the vendor driver for reference[1].
->=20
-> We previously discussed that[2] and it was decided that a property
-> would be the prefered way to represent this as there aren't any other
-> per-instance differences which would justify another compatible.
+Subject line would be better if less generic, eg:
+ice: avoid null deref of ptp auxbus name
 
-Please put it in the commit message so that when the next version shows
-up, Krzysztof doesn't show up and question the property for the third
-time.
+> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+> ---
+>   drivers/net/ethernet/intel/ice/ice_ptp.c | 4 ++++
+>   1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> index e9e59f4b5580..848e3e063e64 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> @@ -2743,6 +2743,8 @@ static int ice_ptp_register_auxbus_driver(struct ice_pf *pf)
+>   	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
+>   			      pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
+>   			      ice_get_ptp_src_clock_index(&pf->hw));
+> +	if (!name)
+> +		return -ENOMEM;
+>   
+>   	aux_driver->name = name;
+>   	aux_driver->shutdown = ice_ptp_auxbus_shutdown;
+> @@ -2989,6 +2991,8 @@ static int ice_ptp_create_auxbus_device(struct ice_pf *pf)
+>   	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
+>   			      pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
+>   			      ice_get_ptp_src_clock_index(&pf->hw));
+> +	if (!name)
+> +		return -ENOMEM;
+>   
+>   	aux_dev->name = name;
+>   	aux_dev->id = id;
 
-Also, on another note, this series is aimed at net-next but half the
-series is fixed for incorrect bindings. Why not net?
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
---TQLtrFVr4ShS8Ew7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZXl9hAAKCRB4tDGHoIJi
-0l51AP9AfxTVJus53lwalnfKdDDM6fu9GnfTQ1DaU51hYEgGlAD+KJiVYUIfbVyH
-NeYoGDoBXFZkUEImGzZ7OfYXmDAzTQw=
-=+6BB
------END PGP SIGNATURE-----
-
---TQLtrFVr4ShS8Ew7--
+Regarding iwl-next vs iwl-net: this bug is really unlikely to manifest,
+as we take care of both earlier and future mem allocs for ptp auxbus,
+and auxiliary_device_init() checks for null name, so no big deal,
+so: -next is fine
 
