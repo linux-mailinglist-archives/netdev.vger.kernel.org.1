@@ -1,83 +1,107 @@
-Return-Path: <netdev+bounces-57033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24E8C811AD5
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 18:22:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 643B2811AED
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 18:26:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5EC4B21185
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 17:22:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75E1E281CB3
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 17:26:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1FFA5677B;
-	Wed, 13 Dec 2023 17:22:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A0B656B7C;
+	Wed, 13 Dec 2023 17:26:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TGj7+RlF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AJS5ypMO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32D054BDF
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 17:22:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAFD6C433C7;
-	Wed, 13 Dec 2023 17:22:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702488157;
-	bh=AxLzdOwROKaBy4vKWwMVdF4dPNPs2AaXJsUH4oqw274=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=TGj7+RlFD4NS9fKb1HhoSJoU/nclrZkxpyQRv4ToOAJiI6OqZMvg4JY9lKmgSaI8A
-	 ySG0vGbWszj94XyMuw55rgqS8mK/pCxcVAWXAyZm73ha/TSc2R44Xa441IvsfDrKbB
-	 +9zklQ6JhsUIu94uwKROKjF9r5o8QW5l2XIdDj5rN32SuVhlgzRjToUyhfJh3wW47u
-	 oJCxv6Wicq7mEYFxSr8tgForsEw11NE+b7I2GXV4OgZSUCkSpz1/MpraJSi9AN5fN5
-	 kEArXuPBR7roMlr0Y165YI9Qz+ywV2QqV0I6jxThYEj6f4DEARpC0ffUQkgosxVPtC
-	 Cr5uGI787oWWw==
-Message-ID: <deb7d2b6-1314-4d39-aa6f-2930e5de8d82@kernel.org>
-Date: Wed, 13 Dec 2023 09:22:36 -0800
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CB68EA;
+	Wed, 13 Dec 2023 09:26:43 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-5522bfba795so949933a12.2;
+        Wed, 13 Dec 2023 09:26:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702488401; x=1703093201; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ld0B1jUksqKbXhxjO1khXY1xboG0f1gEIjrhs47Odww=;
+        b=AJS5ypMOACfR4rCU2mIwsYA9weMkiRJNDHDZ2agym4gKmtL7qjOOAAceCWYnSgrjWq
+         dJpl69dR5ueH4Ts/PXfAyJe1eWf1oKs3SI2zIFwPKlAvNaHoJAB07EkOOtm4kXxd15DZ
+         s7vLz3Gr3qfm9s9U+H9UOIyVUCTLzDNHFTQ/9j5NVuRR8+La5VG+BKLoAwdO3ZG0eV8B
+         BnRZHPmkWdcVcqyi2FkxgDW83XE4Znt2STctg/p7Ic+heCRECjVL7td+HOWi4keQHDIb
+         B8l+fUL2rz3suoDXEJaUsg43AOSOVmPuhfLuLnAn5ztxW/zv4ZbhBFXPF1RwoOJvKm/3
+         9DFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702488401; x=1703093201;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ld0B1jUksqKbXhxjO1khXY1xboG0f1gEIjrhs47Odww=;
+        b=MCEqX0VJXsrn0cCZeEzBMcfvmKOI+QJ8r8H8m1D8xcO/yPIGH7fFSBpf+sWlbfoj/T
+         JxUZH3ucT54MnRqEanyU2CfVeBh+BqiLZWKZWk6VPRQIhdSn2rzorMpAL5BXgTF9xDm3
+         +2Jp0JK9SH0yi1ccoCkw/F+/XghYn1zKBPybZnke8a9biXDyjcysAgtWURt+T5gb1065
+         O9RVRFXOhh1hFdeMgxbPffFZj9kv5uPcrwHL7VM9GxoHExKciv/fviKb1RvQFCIkQy82
+         1FI2w13FnQ6PBRK8c041O1h+s36RQbENDxQI7sqhf+T7kBi4NI+v6libOozCQ/exXlez
+         Eykg==
+X-Gm-Message-State: AOJu0YwgoUPP2yqBDWrJPiFnAe4zW+ydVQYxLbQfU83s+yATSlZNkVxO
+	IK6VTzZvUDOPv0WPbBT3Wuy7I2UAWMpyG4JshbA=
+X-Google-Smtp-Source: AGHT+IGq3M67HTy5rdu/IY9FndPLLuQSSg3Da+u605aRWD46UDNw8xTFi6K5KvxhiaDW/EPwyxFOBFO3ccwL+SRBrZo=
+X-Received: by 2002:a17:906:9d12:b0:9e5:2c72:9409 with SMTP id
+ fn18-20020a1709069d1200b009e52c729409mr3534316ejc.43.1702488401076; Wed, 13
+ Dec 2023 09:26:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 0/2] Fix dangling pointer at f6i->gc_link.
-Content-Language: en-US
-To: thinker.li@gmail.com, netdev@vger.kernel.org, martin.lau@linux.dev,
- kernel-team@meta.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com
-Cc: sinquersw@gmail.com, kuifeng@meta.com
-References: <20231208194523.312416-1-thinker.li@gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20231208194523.312416-1-thinker.li@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20231207222755.3920286-1-andrii@kernel.org> <20231207222755.3920286-2-andrii@kernel.org>
+ <CAADnVQK6WWcgKtPNQrGe9dM7x1iMOyL943PVrJjT6ueBDFRyQw@mail.gmail.com>
+ <CAEf4BzYHHdQsaGBFXnY8omP4hv_tUjqxHWTNoEugi3acrE5q=A@mail.gmail.com>
+ <CAADnVQLoZpugU6gexuD4ru6VCZ8iQMoLWLByjHA6hush5hUwug@mail.gmail.com> <b683d150-5fa0-4bec-af07-c709ee4781d6@linux.dev>
+In-Reply-To: <b683d150-5fa0-4bec-af07-c709ee4781d6@linux.dev>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Wed, 13 Dec 2023 09:26:28 -0800
+Message-ID: <CAEf4BzZyOCmo1CFMGQG5TRWetMqWNbwsgB0CNNpeB_6aB9jxzA@mail.gmail.com>
+Subject: Re: [PATCH RFC bpf-next 1/3] bpf: add mapper macro for bpf_cmd enum
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, Paul Moore <paul@paul-moore.com>, 
+	Christian Brauner <brauner@kernel.org>, Linux-Fsdevel <linux-fsdevel@vger.kernel.org>, 
+	LSM List <linux-security-module@vger.kernel.org>, Kees Cook <keescook@chromium.org>, 
+	Kernel Team <kernel-team@meta.com>, Sargun Dhillon <sargun@sargun.me>, 
+	Martin KaFai Lau <martin.lau@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/8/23 12:45 PM, thinker.li@gmail.com wrote:
-> From: Kui-Feng Lee <thinker.li@gmail.com>
-> 
-> According to a report [1], f6i->gc_link may point to a free block
-> causing use-after-free. According the stacktraces in the report, it is
-> very likely that a f6i was added to the GC list after being removed
-> from the tree of a fib6_table. The reason this can happen is the
-> current implementation determines if a f6i is on a tree in a wrong
-> way. It believes a f6i is on a tree if f6i->fib6_table is not NULL.
-> However, f6i->fib6_table is not reset when f6i is removed from a tree.
-> 
-> The new solution is to check if f6i->fib6_node is not NULL as well.
-> f6i->fib6_node is set/or reset when the f6i is added/or removed from
-> from a tree. It can be used to determines if a f6i is on a tree
-> reliably.
-> 
-> The other change is to determine if a f6i is on a GC list.  The
-> current implementation relies on RTF_EXPIRES on fib6_flags. It needs
-> to consider if a f6i is on a tree as well. The new solution is
-> checking hlist_unhashed() on f6i->gc_link, a clear evidence, instead.
-> 
-> [1] https://lore.kernel.org/all/20231205173250.2982846-1-edumazet@google.com/
-> 
+On Tue, Dec 12, 2023 at 5:37=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 12/11/23 8:06 PM, Alexei Starovoitov wrote:
+> > On Mon, Dec 11, 2023 at 8:01=E2=80=AFPM Andrii Nakryiko
+> > <andrii.nakryiko@gmail.com> wrote:
+> >>
+> >>
+> >>> While I can preemptively answer that in the case vmlinux BTF
+> >>> is not available it's fine not to parse names and rely on hex.
+> >>
+> >> It's fine, I can do optional BTF-based parsing, if that's what you pre=
+fer.
+> >
+> > I prefer to keep uapi/bpf.h as-is and use BTF.
+> > But I'd like to hear what Daniel's and Martin's preferences are.
+>
+> I think user will find it useful to have a more readable uapi header file=
+. It
 
-Eric: can you release the syzbot report for the backtrace listed in [1].
-I would like to make "very likely that a f6i was added to the GC list
-after being removed from the tree of a fib6_table" more certain. Thanks,
+I'd say having numeric values make it more readable, but that's a
+separate discussion. I purposefully kept full BPF_-prefixed names
+intact for readability, as opposed to what we do for enum bpf_func_id.
+
+> would be nice to keep the current uapi/bpf.h form if there is another sol=
+ution.
+
+Ok, I'll use BTF, no problem.
 
