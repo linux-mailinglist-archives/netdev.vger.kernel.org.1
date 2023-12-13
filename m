@@ -1,52 +1,47 @@
-Return-Path: <netdev+bounces-57121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC16C8122C9
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 00:25:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 316BA8122D1
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 00:29:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4DC9CB20763
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 23:25:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83922B20F87
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 23:29:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 951EF77B2F;
-	Wed, 13 Dec 2023 23:25:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72D0F77B39;
+	Wed, 13 Dec 2023 23:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TSR5MsLe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC094EA;
-	Wed, 13 Dec 2023 15:25:18 -0800 (PST)
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5910b21896eso2343275eaf.0;
-        Wed, 13 Dec 2023 15:25:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702509918; x=1703114718;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=c+ujX2KdbWl+FCDRkPG1EwpBH+yzRnhRj9laF4akgZg=;
-        b=J8AuLG1oFZynBjB+2IRB6TgTuHbv4IxN4N6LHeUVSeyMy+86xMUaJLEfqqrNvR3urT
-         Bovv2Q16Bgu4QtjKCcFlJMRV/utKHS728bgpvLJ1dlyX9kg0WkTdjzaE57SEd8MO/8Jo
-         9/+uZJFTuLe2GmnZsSukM9H4OxWOCP2mZnz5mdwQS26yrEqnlipKfDXW11ITQj58uo/v
-         qKFPbAhaHs7OkkPDzcgkwGf7b0kUQaMU3EH7arpDgD0aKjyyXefQbNWC+qoZ2FrlF6Ta
-         HJIuTTnYDCfurGeC0/C1QQXH4YmVwXdzgHW/27fZWujrPIgLpPhPr6RdmsI0V6TOTH54
-         zsCw==
-X-Gm-Message-State: AOJu0Yw2BrD8qLg+ccSaEdcFGWdqJGGMn3DFVl1PQShW/IsfE2g3zzdH
-	lfUyz3Jl4UbRaXq9Es7AGVwK/xjytg==
-X-Google-Smtp-Source: AGHT+IGghdFnEQBv2Q1gGQFkdtduPobZx6ZkqkdA1mh/zFQx4tpk5DqrUHn56S1Ix93YoI+J2tsdhQ==
-X-Received: by 2002:a4a:55ca:0:b0:590:67db:1dcb with SMTP id e193-20020a4a55ca000000b0059067db1dcbmr5555100oob.4.1702509918208;
-        Wed, 13 Dec 2023 15:25:18 -0800 (PST)
-Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id r124-20020a4a4e82000000b0058cbbf9b4e4sm3251624ooa.48.2023.12.13.15.25.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 15:25:17 -0800 (PST)
-Received: (nullmailer pid 2248461 invoked by uid 1000);
-	Wed, 13 Dec 2023 23:25:16 -0000
-From: Rob Herring <robh@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] dt-bindings: net: marvell,orion-mdio: Drop "reg" sizes schema
-Date: Wed, 13 Dec 2023 17:24:55 -0600
-Message-ID: <20231213232455.2248056-1-robh@kernel.org>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F3E77B2D
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 23:28:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A99FCC433C8;
+	Wed, 13 Dec 2023 23:28:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702510138;
+	bh=jUHyUeLnfbSzBxtN3d9CndNvmtz13tEGP80B8miWkWY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=TSR5MsLeLTV39+ncEEojg/aPltoHsEcEzA7hNHhl2fyqHVN24lQb9QohAZTMiUwtu
+	 BwDlL6GrmWZHzOMpjN/zbHx8yQcSRSZ7yYHPDHTzsIIrWsEpB5ELjqV3DKXhn7KM6F
+	 pSvQdfaoqWJY0RpjbUxI3cY4f2sjlDM2ytpAhcYQgjcvU7kRUHQ/UsfL/LA6hS0HTE
+	 Jy5SKGH/DRFtR/gbQGi01jm236HMEtaMTWbvjtfeoHcQEtklQXLyd/qXEdk7qZfxgw
+	 OX3M8G8zc8ewIujrbqgMKRy7RxDsh9AbD4dzmkFYuUb16EIxt6HuaFvbza9jpRPa0N
+	 RRK/CSpwE8Yfg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	donald.hunter@gmail.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 0/3] netlink: specs: prep legacy specs for C code gen
+Date: Wed, 13 Dec 2023 15:28:19 -0800
+Message-ID: <20231213232822.2950853-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -56,49 +51,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Defining the size of register regions is not really in scope of what
-bindings need to cover. The schema for this is also not completely correct
-as a reg entry can be variable number of cells for the address and size,
-but the schema assumes 1 cell.
+Minor adjustments to some specs to make them ready for C code gen.
 
-Signed-off-by: Rob Herring <robh@kernel.org>
----
- .../bindings/net/marvell,orion-mdio.yaml      | 22 -------------------
- 1 file changed, 22 deletions(-)
+Jakub Kicinski (3):
+  netlink: specs: ovs: remove fixed header fields from attrs
+  netlink: specs: ovs: correct enum names in specs
+  netlink: specs: mptcp: rename the MPTCP path management(?) spec
 
-diff --git a/Documentation/devicetree/bindings/net/marvell,orion-mdio.yaml b/Documentation/devicetree/bindings/net/marvell,orion-mdio.yaml
-index e35da8b01dc2..73429855d584 100644
---- a/Documentation/devicetree/bindings/net/marvell,orion-mdio.yaml
-+++ b/Documentation/devicetree/bindings/net/marvell,orion-mdio.yaml
-@@ -39,28 +39,6 @@ required:
- allOf:
-   - $ref: mdio.yaml#
- 
--  - if:
--      required:
--        - interrupts
--
--    then:
--      properties:
--        reg:
--          items:
--            - items:
--                - $ref: /schemas/types.yaml#/definitions/cell
--                - const: 0x84
--
--    else:
--      properties:
--        reg:
--          items:
--            - items:
--                - $ref: /schemas/types.yaml#/definitions/cell
--                - enum:
--                    - 0x4
--                    - 0x10
--
- unevaluatedProperties: false
- 
- examples:
+ Documentation/netlink/specs/{mptcp.yaml => mptcp_pm.yaml} | 0
+ Documentation/netlink/specs/ovs_datapath.yaml             | 3 +--
+ Documentation/netlink/specs/ovs_flow.yaml                 | 7 ++++---
+ Documentation/netlink/specs/ovs_vport.yaml                | 4 ----
+ include/uapi/linux/mptcp_pm.h                             | 2 +-
+ net/mptcp/mptcp_pm_gen.c                                  | 2 +-
+ net/mptcp/mptcp_pm_gen.h                                  | 2 +-
+ 7 files changed, 8 insertions(+), 12 deletions(-)
+ rename Documentation/netlink/specs/{mptcp.yaml => mptcp_pm.yaml} (100%)
+
 -- 
 2.43.0
 
