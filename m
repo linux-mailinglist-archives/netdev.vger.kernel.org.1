@@ -1,81 +1,51 @@
-Return-Path: <netdev+bounces-57014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16F6481194B
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 17:26:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C27681196B
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 17:29:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB6CF1F21109
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 16:26:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 515C01C2102B
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 16:29:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4721F33CC7;
-	Wed, 13 Dec 2023 16:26:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5C4434CFF;
+	Wed, 13 Dec 2023 16:29:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eWH6oA5w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KdoyBTIE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E8C8E3;
-	Wed, 13 Dec 2023 08:26:48 -0800 (PST)
-Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-336420a244dso477400f8f.0;
-        Wed, 13 Dec 2023 08:26:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702484807; x=1703089607; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=86rjT9r43JxUHVqCjIMaYs/7Gsf2BMQ04Q05TfKC+5o=;
-        b=eWH6oA5wx3EmMj5NFX8Nk+naIAzSf9xFR5k4eFZQDsvXpJAENOBWBenyltoGnX9XVM
-         +Vt1eGvp9AjJFDUidC2QmVqK+eqW8djbIHwsduYv6Wqsgk3YjjcKaxDS9H3XsEGbQJqC
-         c4OJFGzOxYKeEoaiY5IK8HGpiCGoQeBy3aOUWH0CqbY8QulSwMoNFa4ZaxhnnGWUNwra
-         euTHFQ3YarrRQRAshlhs75aH2m5t/4RnY69l3S6LeAMD8PZ3QcjFuqIG6+pPaipeQ3eQ
-         kIWiJ3X0Bm+rN0fY09hzDTnHsUmJmqMEUbDqhxTLAdszfcGi8IsJinNiJ7+oGPdbvlER
-         IY2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702484807; x=1703089607;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=86rjT9r43JxUHVqCjIMaYs/7Gsf2BMQ04Q05TfKC+5o=;
-        b=V8BewCm1TIfKpjW6iRjstY9W6oFL/39MYiPuGiNi9AufbKAZROuyqppCYR+Yct2gZZ
-         DDfkZ4w00FFvyrWtxosO0c/Hp7VIt6Usk87Fbvb56GDDLkFBlh8yZr0/I1xR+rdkFTV7
-         wHycl4wHvKve77qEauQwsETQoxm8xos62jAkp0JzFBeVMcQBYCapn0MYTATJE270vFSh
-         LupRgmcaym88cMh/3+w7t73XGTufvcEltcOeC/2lRJGTORtr4RynwP/SaTU3caMvhOvZ
-         9ACQy3FS9lSyh8UN2a2guHhYTNs/UbTKjTeKJ1gQmtgC3hvwMgIGLjNL12SVDlo+HQfD
-         Ufmg==
-X-Gm-Message-State: AOJu0YwdMOU8gqWAT8ssxAK49uoobgJ5HPnt5xfQ7qIJeRHh/w9i4odg
-	8EI17KnN9w6UykmbpY+PQjM=
-X-Google-Smtp-Source: AGHT+IG3J3ozT4pM9XLZHmjeZXoiiA+xGV9gq0CLTjcYh08vAtBidQZZbRv0vSgmwbthR08Q89v97w==
-X-Received: by 2002:a5d:63cf:0:b0:333:3a3b:8b9b with SMTP id c15-20020a5d63cf000000b003333a3b8b9bmr3811893wrw.108.1702484806570;
-        Wed, 13 Dec 2023 08:26:46 -0800 (PST)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id c13-20020a5d4ccd000000b003363823d8aesm2291005wrt.59.2023.12.13.08.26.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 08:26:46 -0800 (PST)
-Message-ID: <6579db46.5d0a0220.d624a.80b4@mx.google.com>
-X-Google-Original-Message-ID: <ZXnbQ3gpxfBxO2sK@Ansuel-xps.>
-Date: Wed, 13 Dec 2023 17:26:43 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C137D33CFF;
+	Wed, 13 Dec 2023 16:29:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26F73C433C7;
+	Wed, 13 Dec 2023 16:29:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702484969;
+	bh=LpUT5DCYHNkKp48aWpAg9uJhDqev4O8ZCeYdnemj2eY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KdoyBTIEE+hKfv7gI/p2DN7nR4x/2m/LIY00NltrDpHnaUm0DDcNYGgYiseagREz8
+	 IoM+278fjvl1p5yopg51xXJ8dfvpgGSrXHUgYvoovyGXkzh82XJkTS8FQGdnRkpsoy
+	 g05BalqdT5xe0uz+3eFDQEQ0KiAIjme1fwmRB1OA7wZUcwDJwdESCoKCipzW1rduIL
+	 dZx6rtsp/IADd0rq5dlPXlbNjcgVcEJinIzbQWEIypQ78LGm9QYFoID1PbXI5G7Pmf
+	 W4MXSc2KfprA6+AZUCUGVKI633iJuuobo/+g1tOieZ3bXZ01jGMGyzjJwz88sxx1YX
+	 F6X9OeA9p+HnQ==
+Date: Wed, 13 Dec 2023 16:29:24 +0000
+From: Simon Horman <horms@kernel.org>
+To: Ronald Wahl <rwahl@gmx.de>
+Cc: Ronald Wahl <ronald.wahl@raritan.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Harini Katakam <harini.katakam@amd.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v6 3/3] net: phy: add support for PHY package
- MMD read/write
-References: <20231213105730.1731-1-ansuelsmth@gmail.com>
- <20231213105730.1731-3-ansuelsmth@gmail.com>
- <ZXnSB4YsuWZ0vdj2@shell.armlinux.org.uk>
- <6579d3df.050a0220.41f9b.a309@mx.google.com>
- <ZXnYKLOeStCuVXY7@shell.armlinux.org.uk>
+	Ben Dooks <ben.dooks@codethink.co.uk>,
+	Tristram Ha <Tristram.Ha@microchip.com>, netdev@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net v2] net: ks8851: Fix TX stall caused by TX buffer
+ overrun
+Message-ID: <20231213162924.GH5817@kernel.org>
+References: <20231212191632.197656-1-rwahl@gmx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,44 +54,104 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZXnYKLOeStCuVXY7@shell.armlinux.org.uk>
+In-Reply-To: <20231212191632.197656-1-rwahl@gmx.de>
 
-On Wed, Dec 13, 2023 at 04:13:28PM +0000, Russell King (Oracle) wrote:
-> On Wed, Dec 13, 2023 at 04:55:08PM +0100, Christian Marangi wrote:
-> > On Wed, Dec 13, 2023 at 03:47:19PM +0000, Russell King (Oracle) wrote:
-> > > On Wed, Dec 13, 2023 at 11:57:30AM +0100, Christian Marangi wrote:
-> > > > Some PHY in PHY package may require to read/write MMD regs to correctly
-> > > > configure the PHY package.
-> > > > 
-> > > > Add support for these additional required function in both lock and no
-> > > > lock variant.
-> > > > 
-> > > > It's assumed that the entire PHY package is either C22 or C45. We use
-> > > > C22 or C45 way of writing/reading to mmd regs based on the passed phydev
-> > > > whether it's C22 or C45.
-> > > > 
-> > > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > > 
-> > > I don't recall what has been said in previous postings of this, but
-> > > introducing new helpers without an example user is normally frowned
-> > > upon. The lack of cover message for this three patch series also
-> > > doesn't help (the cover message could explain why there's no users
-> > > being proposed with this addition of helpers.)
-> > >
-> > 
-> > These are prereq for the qca803x PHY driver and the PHY package series.
-> > 
-> > I can move this single patch in those series, but it was suggested to
-> > move these simple change to a separate patch to lower the patch number
-> > since they were orthogonal to the PHY package series proposal.
+On Tue, Dec 12, 2023 at 08:16:32PM +0100, Ronald Wahl wrote:
+> From: Ronald Wahl <ronald.wahl@raritan.com>
 > 
-> ... so adding a cover message (your series in general seem to lack
-> those) would be a good idea to explain that.
->
+> There is a bug in the ks8851 Ethernet driver that more data is written
+> to the hardware TX buffer than actually available. This is caused by
+> wrong accounting of the free TX buffer space.
+> 
+> The driver maintains a tx_space variable that represents the TX buffer
+> space that is deemed to be free. The ks8851_start_xmit_spi() function
+> adds an SKB to a queue if tx_space is large enough and reduces tx_space
+> by the amount of buffer space it will later need in the TX buffer and
+> then schedules a work item. If there is not enough space then the TX
+> queue is stopped.
+> 
+> The worker function ks8851_tx_work() dequeues all the SKBs and writes
+> the data into the hardware TX buffer. The last packet will trigger an
+> interrupt after it was send. Here it is assumed that all data fits into
+> the TX buffer.
+> 
+> In the interrupt routine (which runs asynchronously because it is a
+> threaded interrupt) tx_space is updated with the current value from the
+> hardware. Also the TX queue is woken up again.
+> 
+> Now it could happen that after data was sent to the hardware and before
+> handling the TX interrupt new data is queued in ks8851_start_xmit_spi()
+> when the TX buffer space had still some space left. When the interrupt
+> is actually handled tx_space is updated from the hardware but now we
+> already have new SKBs queued that have not been written to the hardware
+> TX buffer yet. Since tx_space has been overwritten by the value from the
+> hardware the space is not accounted for.
+> 
+> Now we have more data queued then buffer space available in the hardware
+> and ks8851_tx_work() will potentially overrun the hardware TX buffer. In
+> many cases it will still work because often the buffer is written out
+> fast enough so that no overrun occurs but for example if the peer
+> throttles us via flow control then an overrun may happen.
+> 
+> This can be fixed in different ways. The most simple way would be to set
+> tx_space to 0 before writing data to the hardware TX buffer preventing
+> the queuing of more SKBs until the TX interrupt has been handled. I have
+> chosen a slightly more efficient (and still rather simple) way and
+> track the amount of data that is already queued and not yet written to
+> the hardware. When new SKBs are to be queued the already queued amount
+> of data is honoured when checking free TX buffer space.
+> 
+> I tested this with a setup of two linked KS8851 running iperf3 between
+> the two in bidirectional mode. Before the fix I got a stall after some
+> minutes. With the fix I saw now issues anymore after hours.
+> 
+> Fixes: 3ba81f3ece3c ("net: Micrel KS8851 SPI network driver")
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Ben Dooks <ben.dooks@codethink.co.uk>
+> Cc: Tristram Ha <Tristram.Ha@microchip.com>
+> Cc: netdev@vger.kernel.org
+> Cc: stable@vger.kernel.org # 5.10+
+> Signed-off-by: Ronald Wahl <ronald.wahl@raritan.com>
 
-I tend to use cover letters only for big series, sorry for not being
-very clear about this. Soo should I detach this from here or it O.K.?
+...
 
--- 
-	Ansuel
+> diff --git a/drivers/net/ethernet/micrel/ks8851_spi.c b/drivers/net/ethernet/micrel/ks8851_spi.c
+
+...
+
+> @@ -310,6 +322,8 @@ static void ks8851_tx_work(struct work_struct *work)
+>  	unsigned long flags;
+>  	struct sk_buff *txb;
+>  	bool last;
+> +	unsigned short tx_space;
+> +	unsigned int dequeued_len = 0;
+
+Hi Ronald,
+
+Please consider using reverse xmas tree - longest line to shortest -
+for local variable declarations in Networking code.
+
+> 
+>  	kss = container_of(work, struct ks8851_net_spi, tx_work);
+>  	ks = &kss->ks8851;
+> @@ -320,6 +334,7 @@ static void ks8851_tx_work(struct work_struct *work)
+>  	while (!last) {
+>  		txb = skb_dequeue(&ks->txq);
+>  		last = skb_queue_empty(&ks->txq);
+> +		dequeued_len += calc_txlen(txb->len);
+
+On the line below it is assumed that txb may be NULL.
+But on the line above it is dereferenced unconditionally.
+This seems inconsistent.
+
+Flagged by Smatch.
+
+> 
+>  		if (txb) {
+>  			ks8851_wrreg16_spi(ks, KS_RXQCR,
+
+...
 
