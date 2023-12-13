@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-56752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7687B810BF5
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:05:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CCB5D810C0E
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:10:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D4271F210E1
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 08:05:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 829951F21121
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 08:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D741C6A5;
-	Wed, 13 Dec 2023 08:05:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F403E1CF98;
+	Wed, 13 Dec 2023 08:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jjNwQL5G"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="mRM1Lsxh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92560B2;
-	Wed, 13 Dec 2023 00:05:37 -0800 (PST)
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BD7x5t5028802;
-	Wed, 13 Dec 2023 08:05:12 GMT
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAF60DC;
+	Wed, 13 Dec 2023 00:10:25 -0800 (PST)
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BD7SKZ7024094;
+	Wed, 13 Dec 2023 08:10:02 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
 	message-id:date:mime-version:subject:to:cc:references:from
 	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=krym0HY/pPafi8NwsXn9ZFmG16blrZh3WAY8SGvQUec=; b=jj
-	NwQL5GbLj4obCxjevLbfa6D1x3Wu2DOzYaV6ynnbUxWbiGRYlaoaZr/2JWPLgamC
-	nZLs14TkfTenK7DKoyDWCJJRFMIV6GJkWez2Zh8LxYrJOBsQ8sZ+CQUYKXbo2qda
-	y3r/2XfQ9V4drpkRr+l7LNMyYhsNC2i2GbjLO2NUfRc8eUoLy/ZKHLYU2IcvQGd0
-	SQssq8Kdcv387oIqEPVeK0QsENMqndZqj7IkBzLEpHZ2HqCvL+ZvUSU7Ak0okEFj
-	brUi1+Q8Vew/IrQLUxn3hyl8/FV4JWXIhBxDPX2i8a6z5wI0nheW9iLGrA9Yi1Fh
-	76GPY6oxpRh1TkbBSuQw==
+	qcppdkim1; bh=gvSnVn+LDgma7p84JhK3TqLX+SbuVfd4ulOdi+AG5ls=; b=mR
+	M1Lsxha8xoStNL56pDQdJTMm61pw5LvotZ4bfCfFOk4MjufmVlwJMRtD+8aPwsko
+	qsP3UODWYHZ6kCs3DDhWFqY46Jy59KZZM6r5jZr4VujSVcBwYGfCKgd/UtlvyIYM
+	2U5gMI2gdb5LaRjZBr2cn+tdjXQ1MHOLioUchIZkM8WbVzqSxTvYvNw2nWWSXC1t
+	rtvMA10mFBW4mLn5hXDVPn6Ta03qZCcX3lNsGx9EVX+xmYYhWtu1I3irOqLBJGaT
+	eEqcIGa9f0B7L9PwHK5t0eZszZFwSwtUUzM12B0yZ+WYo8hFFjQ5lz52lzn9BAxi
+	AHB/ZcIx+gRqK10RwkUw==
 Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uy3rprqnd-1
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uxkc833gm-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Dec 2023 08:05:12 +0000 (GMT)
+	Wed, 13 Dec 2023 08:10:02 +0000 (GMT)
 Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BD85Bju017157
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BD8A1Ml022698
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Dec 2023 08:05:11 GMT
+	Wed, 13 Dec 2023 08:10:01 GMT
 Received: from [10.253.13.71] (10.80.80.8) by nalasex01c.na.qualcomm.com
  (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 13 Dec
- 2023 00:05:06 -0800
-Message-ID: <0495f1c2-00e6-4fa5-aaae-cf01475ef2ba@quicinc.com>
-Date: Wed, 13 Dec 2023 16:05:03 +0800
+ 2023 00:09:55 -0800
+Message-ID: <b7b0ab99-7277-4618-9037-a878d7b899a9@quicinc.com>
+Date: Wed, 13 Dec 2023 16:09:53 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,8 +52,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/5] net: mdio: ipq4019: enable the SoC uniphy clocks
- for ipq5332 platform
+Subject: Re: [PATCH v2 3/5] net: mdio: ipq4019: configure CMN PLL clock for
+ ipq5332
 Content-Language: en-US
 To: Maxime Chevallier <maxime.chevallier@bootlin.com>
 CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
@@ -65,144 +65,95 @@ CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
         <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
 References: <20231212115151.20016-1-quic_luoj@quicinc.com>
- <20231212115151.20016-3-quic_luoj@quicinc.com>
- <20231212134621.0fe2583f@device.home>
+ <20231212115151.20016-4-quic_luoj@quicinc.com>
+ <20231212135417.67ece4d0@device.home>
 From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <20231212134621.0fe2583f@device.home>
+In-Reply-To: <20231212135417.67ece4d0@device.home>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
  nalasex01c.na.qualcomm.com (10.47.97.35)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: -nDUJhHxRajZkDQu6Fy_X7hz_TInw8sM
-X-Proofpoint-GUID: -nDUJhHxRajZkDQu6Fy_X7hz_TInw8sM
+X-Proofpoint-GUID: 4n-DhV8VrtmRKksbV9Qioh9e0CRFd6OV
+X-Proofpoint-ORIG-GUID: 4n-DhV8VrtmRKksbV9Qioh9e0CRFd6OV
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- mlxscore=0 suspectscore=0 impostorscore=0 adultscore=0 malwarescore=0
- mlxlogscore=999 bulkscore=0 priorityscore=1501 phishscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2312130057
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 mlxlogscore=999 suspectscore=0 bulkscore=0
+ malwarescore=0 adultscore=0 impostorscore=0 spamscore=0 mlxscore=0
+ phishscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2312130058
 
 
 
-On 12/12/2023 8:46 PM, Maxime Chevallier wrote:
+On 12/12/2023 8:54 PM, Maxime Chevallier wrote:
 > Hello,
 > 
-> On Tue, 12 Dec 2023 19:51:47 +0800
+> I have some more minor comments for yoi :)
+> 
+> On Tue, 12 Dec 2023 19:51:48 +0800
 > Luo Jie <quic_luoj@quicinc.com> wrote:
 > 
->> On the platform ipq5332, the related SoC uniphy GCC clocks need
->> to be enabled for making the MDIO slave devices accessible.
+>> The reference clock of CMN PLL block is selectable, the internal
+>> 48MHZ is used by default.
 >>
->> These UNIPHY clocks are from the SoC platform GCC clock provider,
->> which are enabled for the connected PHY devices working.
+>> The output clock of CMN PLL block is for providing the clock
+>> source of ethernet device(such as qca8084), there are 1 * 25MHZ
+>> and 3 * 50MHZ output clocks available for the ethernet devices.
 >>
 >> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+>> ---
 > 
 > [...]
 > 
->>   static int ipq4019_mdio_wait_busy(struct mii_bus *bus)
->> @@ -209,14 +230,43 @@ static int ipq4019_mdio_write_c22(struct mii_bus *bus, int mii_id, int regnum,
->>   static int ipq_mdio_reset(struct mii_bus *bus)
->>   {
->>   	struct ipq4019_mdio_data *priv = bus->priv;
->> -	int ret;
->> +	int ret, index;
->> +	unsigned long rate;
+>> +/* For the CMN PLL block, the reference clock can be configured according to
+>> + * the device tree property "cmn-reference-clock", the internal 48MHZ is used
+>> + * by default on the ipq533 platform.
+>> + *
+>> + * The output clock of CMN PLL block is provided to the ethernet devices,
+>> + * threre are 4 CMN PLL output clocks (1*25MHZ + 3*50MHZ) enabled by default.
+>> + *
+>> + * Such as the output 50M clock for the qca8084 ethernet PHY.
+>> + */
+>> +static int ipq_cmn_clock_config(struct mii_bus *bus)
+>> +{
+>> +	int ret;
+>> +	u32 reg_val, src_sel, ref_clk;
+>> +	struct ipq4019_mdio_data *priv;
 > 
-> Please remember to use reverse christmas-tree ordering, meaning longer
-> declaration lines go first :
-> 
-> 	struct ipq4019_mdio_data *priv = bus->priv;
-> 	unsigned long rate;
-> 	int ret, index;
+> Here you should also use reverse christmas-tree notation
 
-Thanks, i will update this.
+Ok, will correct this, thanks.
 
 > 
->> +
->> +	/* For the platform ipq5332, there are two SoC uniphies available
->> +	 * for connecting with ethernet PHY, the SoC uniphy gcc clock
->> +	 * should be enabled for resetting the connected device such
->> +	 * as qca8386 switch, qca8081 PHY or other PHYs effectively.
->> +	 *
->> +	 * Configure MDIO/UNIPHY clock source frequency if clock instance
->> +	 * is specified in the device tree.
->> +	 */
->> +	for (index = MDIO_CLK_MDIO_AHB; index < MDIO_CLK_CNT; index++) {
->> +		switch (index) {
->> +		case MDIO_CLK_MDIO_AHB:
->> +			rate = IPQ_MDIO_CLK_RATE;
->> +			break;
->> +		case MDIO_CLK_UNIPHY0_AHB:
->> +		case MDIO_CLK_UNIPHY1_AHB:
->> +			rate = IPQ_UNIPHY_AHB_CLK_RATE;
->> +			break;
->> +		case MDIO_CLK_UNIPHY0_SYS:
->> +		case MDIO_CLK_UNIPHY1_SYS:
->> +			rate = IPQ_UNIPHY_SYS_CLK_RATE;
->> +			break;
->> +		default:
->> +			break;
->> +		}
->>   
->> -	/* Configure MDIO clock source frequency if clock is specified in the device tree */
->> -	ret = clk_set_rate(priv->mdio_clk, IPQ_MDIO_CLK_RATE);
->> -	if (ret)
->> -		return ret;
->> +		ret = clk_set_rate(priv->clk[index], rate);
->> +		if (ret)
->> +			return ret;
->> +
->> +		ret = clk_prepare_enable(priv->clk[index]);
->> +		if (ret)
->> +			return ret;
->> +	}
->>   
->> -	ret = clk_prepare_enable(priv->mdio_clk);
->>   	if (ret == 0)
->>   		mdelay(10);
->>   
->> @@ -240,10 +290,6 @@ static int ipq4019_mdio_probe(struct platform_device *pdev)
->>   	if (IS_ERR(priv->membase))
->>   		return PTR_ERR(priv->membase);
->>   
->> -	priv->mdio_clk = devm_clk_get_optional(&pdev->dev, "gcc_mdio_ahb_clk");
->> -	if (IS_ERR(priv->mdio_clk))
->> -		return PTR_ERR(priv->mdio_clk);
->> -
->>   	/* These platform resources are provided on the chipset IPQ5018 or
->>   	 * IPQ5332.
->>   	 */
->> @@ -271,6 +317,13 @@ static int ipq4019_mdio_probe(struct platform_device *pdev)
+> [...]
+> 
+>> @@ -317,6 +441,17 @@ static int ipq4019_mdio_probe(struct platform_device *pdev)
 >>   		}
 >>   	}
 >>   
->> +	for (index = 0; index < MDIO_CLK_CNT; index++) {
->> +		priv->clk[index] = devm_clk_get_optional(&pdev->dev,
->> +							 mdio_clk_name[index]);
->> +		if (IS_ERR(priv->clk[index]))
->> +			return PTR_ERR(priv->clk[index]);
+>> +	/* The CMN block resource is for providing clock source to ethernet,
+>> +	 * which can be optionally configured on the platform ipq9574 and
+>> +	 * ipq5332.
+>> +	 */
+>> +	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "cmn_blk");
+>> +	if (res) {
+>> +		priv->cmn_membase = devm_ioremap_resource(&pdev->dev, res);
+>> +		if (IS_ERR(priv->cmn_membase))
+>> +			return PTR_ERR(priv->cmn_membase);
 >> +	}
+>> +
 > 
-> You should be able to use devm_clk_bulk_get_optional(), to avoid that
-> loop.
+> And here you can simplify a bit by using
+> devm_platform_ioremap_resource_byname()
 > 
 > Thanks,
 > 
 > Maxime
-
-Thanks Maxime for the suggestion.
-These clocks need to be configured the different clock rate, MDIO system
-clock works on 100MHZ, but UNIPHY system clock works on 24MHZ.
-
-For the clock rate set, i still need the loop to configure the different
-clock rate on the different clock instance.
-
-So i use the devm_clk_get_optional to acquire the exact clock ID here.
-
+> 
+As Russell mentioned, since this resource is optional,
+so devm_platform_ioremap_resource_byname can't be used here.
 
 
