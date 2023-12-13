@@ -1,68 +1,67 @@
-Return-Path: <netdev+bounces-57018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B87D81198D
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 17:32:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 79F2081199B
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 17:35:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D86C7282061
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 16:32:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DAAD28245B
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 16:35:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C572F35EFC;
-	Wed, 13 Dec 2023 16:32:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F60F2FC21;
+	Wed, 13 Dec 2023 16:35:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="F9FacYpA"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HhTNMn2z"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75F9E91;
-	Wed, 13 Dec 2023 08:32:48 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E6EB134;
+	Wed, 13 Dec 2023 08:34:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
 	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
 	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=N/E28jRK/viDvwysZ67eINh1B/xnv1AANrAAo+m468A=; b=F9FacYpAvC8VBP83kNMIpHTuVL
-	StsEhcooImqRL0oa7xdnDBllK6KkpkYTk4gTnuRIertAdiNTHp46DxpNDNkPXUyY+qmdUNEk+D1SA
-	Y6EeaRQWlHQl0ztEkl4ENZhDEj2QYIJeIWfrxOu0/3+b4418i6lBBlF44tHLDS/PHuAaewGCrZFZO
-	e/l1KFXkDC9rYxkwhe7qw3Vq8NOoXmrGZmZZxGEaWXG7UPAXtkBRH71zg7IecLdbT96sUJqvLbBTh
-	bSZIRZgFS8fOdfUo0i+S0ewDHQU3lMDUgcCJ3dOOtUMa5WJS93cn8lz7MuT+uBAgeA26m9zUfusQ+
-	Q5lacQ0Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59474)
+	bh=8Rz0Hd4GHebEk04ieni7Igt9GqSHOkY56E1iGl+TH3g=; b=HhTNMn2zzCcbcLo4rK6OhTBKdI
+	JRzY3ih3wjCvsBt99HBVNYjBY3pbJCCC31gHvb0hpbIPBXLa226D1sFzW0ZbvfqLNFfaQf6bGf+Pt
+	9qD5JSQGk9L5twNvMyWSlr+zyEnoYd8ZeWiVl60I7ePhCMKdCPRDw34sk8j+IEXfH4DNVqx6XmNig
+	6zVHVDD2MXDQFykTMnpVPsuaTdezA2VmbBtJ3u8o9NGbGjk1QMz4F5wicDeAfe/PW1EzD43aF73SV
+	V0px6EytF81VS1Pi2kKbj9xDDw1m9fhsXJ1IDxNvwiL77CALxqb83KCguiYjl6Rb/Vi/+oQQoqYDq
+	p/PvYgvg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55264)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1rDS9o-0000HK-1N;
-	Wed, 13 Dec 2023 16:32:24 +0000
+	id 1rDSC8-0000Hm-2E;
+	Wed, 13 Dec 2023 16:34:49 +0000
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rDS9l-0001eT-VG; Wed, 13 Dec 2023 16:32:21 +0000
-Date: Wed, 13 Dec 2023 16:32:21 +0000
+	id 1rDSCA-0001eb-I9; Wed, 13 Dec 2023 16:34:50 +0000
+Date: Wed, 13 Dec 2023 16:34:50 +0000
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Tomer Maimon <tmaimon77@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	openbmc@lists.ozlabs.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 06/16] net: pcs: xpcs: Avoid creating dummy XPCS
- MDIO device
-Message-ID: <ZXnclVEz10K2XD2+@shell.armlinux.org.uk>
-References: <20231205103559.9605-1-fancer.lancer@gmail.com>
- <20231205103559.9605-7-fancer.lancer@gmail.com>
- <ZW8pxM3RvyHJTwqH@shell.armlinux.org.uk>
- <gbkgtb4yp3cwyw7xcuhmkdl3io2wlia2gska2xmjbwjvhigpz3@w52b6tdyugqo>
+	Vladimir Oltean <olteanv@gmail.com>,
+	David Epping <david.epping@missinglinkelectronics.com>,
+	Harini Katakam <harini.katakam@amd.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH v6 1/3] net: phy: extend PHY package API to
+ support multiple global address
+Message-ID: <ZXndKlCTq12jf53y@shell.armlinux.org.uk>
+References: <20231213105730.1731-1-ansuelsmth@gmail.com>
+ <ZXnRlERUGhwxKJxi@shell.armlinux.org.uk>
+ <6579d2cc.050a0220.e6ea.d8cf@mx.google.com>
+ <ZXnX6GuooQQwu8Bs@shell.armlinux.org.uk>
+ <6579dab5.050a0220.8552a.d827@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,71 +70,74 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <gbkgtb4yp3cwyw7xcuhmkdl3io2wlia2gska2xmjbwjvhigpz3@w52b6tdyugqo>
+In-Reply-To: <6579dab5.050a0220.8552a.d827@mx.google.com>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, Dec 13, 2023 at 03:01:45AM +0300, Serge Semin wrote:
-> On Tue, Dec 05, 2023 at 01:46:44PM +0000, Russell King (Oracle) wrote:
-> > xpcs_create_mdiodev() as it originally stood creates the mdiodev from
-> > the bus/address, and then passes that to xpcs_create(). Once
-> > xpcs_create() has finished its work (irrespective of whether it was
-> > successful or not) we're done with the mdiodev in this function, so
-> > the reference is _always_ put.
+On Wed, Dec 13, 2023 at 05:24:18PM +0100, Christian Marangi wrote:
+> On Wed, Dec 13, 2023 at 04:12:24PM +0000, Russell King (Oracle) wrote:
+> > On Wed, Dec 13, 2023 at 04:50:33PM +0100, Christian Marangi wrote:
+> > > On Wed, Dec 13, 2023 at 03:45:24PM +0000, Russell King (Oracle) wrote:
+> > > > On Wed, Dec 13, 2023 at 11:57:28AM +0100, Christian Marangi wrote:
+> > > > > -static inline int phy_package_read(struct phy_device *phydev, u32 regnum)
+> > > > > +static inline int phy_package_read(struct phy_device *phydev,
+> > > > > +				   unsigned int addr_offset, u32 regnum)
+> > > > >  {
+> > > > >  	struct phy_package_shared *shared = phydev->shared;
+> > > > > +	int addr = shared->base_addr + addr_offset;
+> > > > >  
+> > > > > -	if (!shared)
+> > > > > +	if (addr >= PHY_MAX_ADDR)
+> > > > >  		return -EIO;
+> > > > 
+> > > > If we're going to check the address, I think we should check it
+> > > > properly, which means also checking whether it's become negative.
+> > > > 
+> > > > Alternatively, we could consider making "addr" and "base_addr"
+> > > > unsigned types, since they should never be negative. However,
+> > > > that probably should be done as a separate patch before this one.
+> > > >
+> > > 
+> > > Maybe I'm confused but isn't already like that?
+> > > On phy_package_join base_addr is already checked if it's negative (and
+> > > rejected)
+> > > 
+> > > addr_offset is unsigned so it can't be negative.
+> > 
+> > True, but with base_addr being an int, addr_offset being unsigned int,
+> > and addr being an int, if addr_offset is a very large number,
+> > 2-complement arithmetic will have the effect of treating it as a
+> > negative number.
+> > 
+> > So, base_addr=0, addr_offset=~0 results in addr being -1.
+> > 
+> > If "addr" were unsigned int, and as we've already established,
+> > "base_addr" can't be less than zero because of the checks already done
+> > (thus it can also be unsigned int) then we'll end up with the checks
+> > you're adding automatically doing the right thing, because...
+> > 
+> > base_addr=0, addr_offset=~0 results in addr being ~0 (a large
+> > positive unsigned number).
+> > 
 > 
-> You say that it's required to manage the refcounting twice: when we
-> get the reference from some external place and internally when the
-> reference is stored in the XPCS descriptor. What's the point in such
-> redundancy with the internal ref-counting if we know that the pointer
-> can be safely stored and utilized afterwards? Better maintainability?
-> Is it due to having the object retrieval and storing implemented in
-> different functions?
+> Oh ok... now it makes sense. So I guess I should change "addr" to
+> unsigned.
+> 
+> Considering I'm changing addr in phy_package_shared to base_addr would
+> it be ok to change that also to unsigned (doesn't make sense to have
+> that int) in this patch? Or should I create first a small patch before
+> this to change addr type?
 
-The point is that the error handling gets simpler:
-- One can see in xpcs_create_mdiodev() that the reference taken by
-  mdio_device_create() is always dropped if that function was
-  successful, irrespective of whether xpcs_create() was successful.
+What I said when I mooted the use of unsigned was:
 
-- xpcs_create() is responsible for managing the refcount on the mdiodev
-  that is passed to it - and if it's successful, it needs to increment
-  the refcount, or leave it in the same state as it was on entry if
-  failing.
+"Alternatively, we could consider making "addr" and "base_addr"
+ unsigned types, since they should never be negative. However,
+ that probably should be done as a separate patch before this
+ one."
 
-This avoids complexities in error paths, which are notorious for things
-being forgotten - since with this, each of these functions is resposible
-for managing its refcount.
+so my thoughts are that it should be a separate small patch - it's a
+single logical change.
 
-It's a different style of refcount management, one I think more people
-should adopt.
-
-> While at it if you happen to know an answer could you please also
-> clarify the next question. None of the ordinary
-> platform/PCI/USB/hwmon/etc drivers I've been working with managed
-> refcounting on storing a passed to probe() device pointer in the
-> private driver data. Is it wrong not doing that?
-
-If we wanted to do refcounting strictly, then every time a new
-pointer to a data structure is created, we should be taking a refcount
-on it, and each time that pointer is destroyed, we should be putting
-the refcount. That is what refcounting is all about.
-
-However, there are circumstances where this can be done lazily, and
-for drivers we would prefer driver authors not to end up with
-refcount errors where they've forgotten to put something.
-
-In the specific case of drivers, we have a well defined lifetime for
-a device bound to a driver. We guarantee that the struct device will
-not go away if a driver is bound to the device, until such time that
-the driver's .remove method has been called. Thus, we guarantee that
-the device driver will be notified of the struct device going away
-before it has been freed. This frees the driver author from having
-to worry about the refcount of the struct device.
-
-As soon as we start doing stuff that is outside of that model, then
-objects that are refcounted need to be dealt with, and I much prefer
-the "strict" refcounting implementation such as the one I added to
-xpcs, because IMHO it's much easier to see that the flow is obviously
-correct - even if it does need a comment to describe why we always
-do a put.
+Thanks.
 
 -- 
 RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
