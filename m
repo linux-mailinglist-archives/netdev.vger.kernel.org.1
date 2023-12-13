@@ -1,71 +1,69 @@
-Return-Path: <netdev+bounces-56884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 811EC81128D
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 14:09:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7171C8112AC
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 14:21:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B25A71C20860
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:09:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25FE01F214AD
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:21:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C67EC2C84E;
-	Wed, 13 Dec 2023 13:09:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF91A2C869;
+	Wed, 13 Dec 2023 13:21:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NSxwU5wG"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LZwEZi7q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B94BAB3;
-	Wed, 13 Dec 2023 05:09:18 -0800 (PST)
-Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2c9fdf53abcso66421891fa.1;
-        Wed, 13 Dec 2023 05:09:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702472957; x=1703077757; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2HJoRFEHz30zB0ZJf+EKks3Tvo/kzW6L5hkkeuaBBCU=;
-        b=NSxwU5wGzTjw+ytv8hERCHcgty6D8qJMkVzUlng7Z6BDH3NhWdKwFsTmvcxsYA7agw
-         kFBhmc+tcPjhMypfzioqMrps+Yjd2p+CuZLJaQdh612o57OU1fF5mFzgdGvGr680rIOq
-         kPEzE6il524kHXW0+ZtC4MmdHvkSYkCgaYHTQTl934vdhrYqGtYyVOoo6emNY4tagPRY
-         lncSs1nGyUrfgVeRuvy/0upFMaVhiGdAljNGZ+lvUXnoknT6umk1GFrVYoW8+Z5CHlR6
-         EMSMNREWrKkEcVmqz/jBevTd3QWBoO39eNRR+qNKy5ExwenB+/2z/k0VIUPaQWG6iGId
-         VNYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702472957; x=1703077757;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2HJoRFEHz30zB0ZJf+EKks3Tvo/kzW6L5hkkeuaBBCU=;
-        b=lyOcCqgAG8DDQAUvzVM8hok97ik610p08IcKMehmJK5NImwrRE66n/iF1dU4wO0Pz6
-         VOt31K6DrvYaCh7wtt2yH/QqoaMcSrK3nw/VlBlFBxvekQVLZFJKuqgt8P799lmuMWQK
-         R3472pNEXJbkaXs/M9MEGPEeh+s0tCbnRUrl/MOP/Q5NHuUpAPmu+B9Tr0ZHoA3MsjZl
-         RMdTCfmOMIoTSt/EDlb87Eq9VPQu4IUY8tIXBzAhtVN0bhqIjrjXtq30aDu/9bUnCtI1
-         YwwSF6nJWUugFFfrszA2p/GY/IMRvxc/vgN0PkHa3tCYBU3MzgqQBf187SFhYMaJdnqS
-         9itA==
-X-Gm-Message-State: AOJu0YyGxrxe0tWxTe2fobuVOmNEia7t7lN+aq/SHDb24QMgyq5eUNTi
-	Vltybq/mVYKfzwwxyqRDCRU=
-X-Google-Smtp-Source: AGHT+IEx1G2Ak0WCyDZGOhaHfa9iY3nMhLay3pfRJFLfsPi8CVj+jZd2gK+mqCcnf4++8bfHmYBixg==
-X-Received: by 2002:a2e:b742:0:b0:2c9:e940:6780 with SMTP id k2-20020a2eb742000000b002c9e9406780mr3993926ljo.22.1702472956648;
-        Wed, 13 Dec 2023 05:09:16 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id m24-20020a2e9118000000b002ca02e43f40sm1840200ljg.74.2023.12.13.05.09.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 05:09:16 -0800 (PST)
-Date: Wed, 13 Dec 2023 16:09:12 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Andrew Halaney <ahalaney@redhat.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net v2] net: stmmac: Handle disabled MDIO busses from
- devicetree
-Message-ID: <f2pf2g23ln4qcoqxidy55plysn735qtfspj6nuu6f7isqxotp2@rj6ejru5eon7>
-References: <20231212-b4-stmmac-handle-mdio-enodev-v2-1-600171acf79f@redhat.com>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1132DD;
+	Wed, 13 Dec 2023 05:21:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Cxxp9zwlmXO3GMPYFrCkmqu7xOsNc9JwZVzZO/mi2A4=; b=LZwEZi7qV7Mtl/hyhvj2u6ZW7+
+	RDy6JUTK1h/tA/7FmC9blt+9PwcxPp8uBJnkv3DRfL8H50jNqiQw+nXFekAEzei89dWKOHuBTuWvz
+	NaqI4ecySjMGiAum2YoqoLY1RwY8ZdvzS30GJ7y+xSSEg1f5Uyqztl3UgQgAdng6ja/Y=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rDPAL-002ozk-Nq; Wed, 13 Dec 2023 14:20:45 +0100
+Date: Wed, 13 Dec 2023 14:20:45 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Conor Dooley <conor@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chunfeng Yun <chunfeng.yun@mediatek.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexander Couzens <lynxis@fe80.eu>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org
+Subject: Re: [RFC PATCH net-next v3 1/8] dt-bindings: phy:
+ mediatek,xfi-pextp: add new bindings
+Message-ID: <c9605d38-e4b8-477d-84d8-de7b4dedd1f1@lunn.ch>
+References: <cover.1702352117.git.daniel@makrotopia.org>
+ <b875f693f6d4367a610a12ef324584f3bf3a1c1c.1702352117.git.daniel@makrotopia.org>
+ <20231212-renderer-strobe-2b46652cd6e7@spud>
+ <ZXiNhSYDbowUiNvy@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,56 +72,12 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231212-b4-stmmac-handle-mdio-enodev-v2-1-600171acf79f@redhat.com>
+In-Reply-To: <ZXiNhSYDbowUiNvy@makrotopia.org>
 
-On Tue, Dec 12, 2023 at 04:18:33PM -0600, Andrew Halaney wrote:
-> Many hardware configurations have the MDIO bus disabled, and are instead
-> using some other MDIO bus to talk to the MAC's phy.
-> 
-> of_mdiobus_register() returns -ENODEV in this case. Let's handle it
-> gracefully instead of failing to probe the MAC.
-> 
-> Fixes: 47dd7a540b8a ("net: add support for STMicroelectronics Ethernet controllers.")
-> Signed-off-by: Andrew Halaney <ahalaney@redhat.com>
-> ---
-> Changes in v2:
-> - Improve error handling code (Serge)
-> - Fix malformed Fixes tag (Simon)
-> - Link to v1: https://lore.kernel.org/r/20231211-b4-stmmac-handle-mdio-enodev-v1-1-73c20c44f8d6@redhat.com
+> Because it is only present in one of the two SerDes channels.
+> Channel 0 needs the work-around, Channel 1 doesn't.
 
-Looking good. Thanks!
-Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+Does the channel know its own number?
 
--Serge(y)
-
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-> index fa9e7e7040b9..0542cfd1817e 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-> @@ -591,7 +591,11 @@ int stmmac_mdio_register(struct net_device *ndev)
->  	new_bus->parent = priv->device;
->  
->  	err = of_mdiobus_register(new_bus, mdio_node);
-> -	if (err != 0) {
-> +	if (err == -ENODEV) {
-> +		err = 0;
-> +		dev_info(dev, "MDIO bus is disabled\n");
-> +		goto bus_register_fail;
-> +	} else if (err) {
->  		dev_err_probe(dev, err, "Cannot register the MDIO bus\n");
->  		goto bus_register_fail;
->  	}
-> 
-> ---
-> base-commit: bbd220ce4e29ed55ab079007cff0b550895258eb
-> change-id: 20231211-b4-stmmac-handle-mdio-enodev-82168de68c6a
-> 
-> Best regards,
-> -- 
-> Andrew Halaney <ahalaney@redhat.com>
-> 
+     Andrew
 
