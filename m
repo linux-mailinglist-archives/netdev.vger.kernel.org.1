@@ -1,213 +1,124 @@
-Return-Path: <netdev+bounces-57108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79E9D812298
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 00:06:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4A8681229E
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 00:10:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A0DD1F218D1
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 23:06:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EA98281479
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 23:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9413B81E53;
-	Wed, 13 Dec 2023 23:06:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD67F83AE0;
+	Wed, 13 Dec 2023 23:10:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kVEVIO+u"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q009b1o/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BD1DE0
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 15:06:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702508777; x=1734044777;
-  h=message-id:date:subject:from:to:cc:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Yv9H7A7AbeAnCF5YTsNxYbq1p7NvsI1KG21SeOBaQtY=;
-  b=kVEVIO+uuu9x/IJIEH3AS/YRMnaB0M73Ux2IamUYQuGZOLWjl5cEFMVc
-   goZJh8BqJ7Onjn1x2SxXOcN5dW17jnA+dXDp9OyskGvfP0aMkmjnnai3d
-   UFz2Bz8fdY7MWiAUWT0YswK9zwcr2byXKJiqT2MnDyprk17kAQckXBgTs
-   bHqajprXXtj9QO7McTEw/b4pgK7c8Vl3j0DiChvaH7viFocsaWEGVL6bD
-   BLpomffg784wNsTpPZf/y+uvXlCuHuG5dC8WioqzO/jdnBlhN+a1vZJPH
-   6J4VJTZTkuqPnzGKHCUQJ6C/PuCbLlL3LpEehAR0feLhwPY7w4gUcfkOZ
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10923"; a="397823595"
-X-IronPort-AV: E=Sophos;i="6.04,274,1695711600"; 
-   d="scan'208";a="397823595"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 15:06:17 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,274,1695711600"; 
-   d="scan'208";a="15600814"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Dec 2023 15:06:17 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 13 Dec 2023 15:06:16 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 13 Dec 2023 15:06:16 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 13 Dec 2023 15:06:15 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Z5dzL7SZqS34bh1S6LtQMLApXquwzhgtasFNBihFPCsxPgbzwoj2uK5Yymj0+k/WYd5lpeEO/N7clKIlI47Roiam/qoQon1iJGHfshQpVVIR/ub/zLPfoE96E2rBGeUdUB6iz6waaHo5ykupCv5aGD3jhEHxyVx0c/yslXyo6q4Sw4E5XMr26awTuRn4u7ABjlKRF3l0ukh5q+LCHd9ij8OI+8pz8d94pdqgaTqG2DhXDx2WQXmGJFirgjPh/aeW2HoVdjH+vv6Z+7Y7IH7wrGf9q5wzltam5lXkz2D4pjG736DsxduCw/BG705VfjPWIPVFI2Gl5I++D9CU6V2Rig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7jB5cojTPDoPMc/kkURKlFmqNTI1pWBrGdVMdGojeBU=;
- b=OG3b01utnFwLHbcCGBjaRYoJb9HuJT4LgN/JX/GdbKetUkcwcf93R/4o/U2hSspQxoy/1/7iFfTuiaXFIw2odrrjNqeT2r95Dw/NnZcJI9sbKZRRCxW3XNuNjkRWW5CUyf34GtqjxNfE/TkossYT04hqgnHEtBqeLX136KSgCkNG51gtUYwFbgoXCNYJZC+LquZ3JwOvZ/8H6ezhNJSwDjwQ68uBrDrmeZcqm9yD2WxXGFDoFdV/GVk8iFk/d3Hr5rQYig2tUNgK0dmwzp9weioLW33qEnpe7yuAHEmctJifAl3WFUjUjjWVdRvNVgnZspViMzlgpkhj54Qiwv26gg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
- by PH8PR11MB6657.namprd11.prod.outlook.com (2603:10b6:510:1c0::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.26; Wed, 13 Dec
- 2023 23:06:13 +0000
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::11e1:7392:86a5:59e3]) by BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::11e1:7392:86a5:59e3%4]) with mapi id 15.20.7068.033; Wed, 13 Dec 2023
- 23:06:13 +0000
-Message-ID: <4f2559d3-06f0-71c4-e34d-073f2bf84fe4@intel.com>
-Date: Wed, 13 Dec 2023 15:06:09 -0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] idpf: enable WB_ON_ITR
-Content-Language: en-US
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: "Kubiak, Michal" <michal.kubiak@intel.com>, Paul Menzel
-	<pmenzel@molgen.mpg.de>
-CC: "Hay, Joshua A" <joshua.a.hay@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, "Tantilov, Emil S"
-	<emil.s.tantilov@intel.com>, "Zaremba, Larysa" <larysa.zaremba@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Lobakin, Aleksander"
-	<aleksander.lobakin@intel.com>, "Brady, Alan" <alan.brady@intel.com>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
-References: <20231212145546.396273-1-michal.kubiak@intel.com>
- <78ecdb9f-25e9-4847-87ed-6e8b44a7c71d@molgen.mpg.de>
- <ZXmwR4s25afUbwz3@localhost.localdomain>
- <ZXm22Iw+vSxacpkQ@localhost.localdomain>
- <BL3PR11MB643539AEA523C7427BD255F7C68DA@BL3PR11MB6435.namprd11.prod.outlook.com>
-In-Reply-To: <BL3PR11MB643539AEA523C7427BD255F7C68DA@BL3PR11MB6435.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0288.namprd03.prod.outlook.com
- (2603:10b6:303:b5::23) To BL3PR11MB6435.namprd11.prod.outlook.com
- (2603:10b6:208:3bb::9)
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BA64E4;
+	Wed, 13 Dec 2023 15:10:48 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-40c2bb872e2so70452215e9.3;
+        Wed, 13 Dec 2023 15:10:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702509047; x=1703113847; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=27lXn/0eKgoZmqmgopJ3Fi7Q+GCy31HzcvAZfnCfdRk=;
+        b=Q009b1o/ppPGuKd9J3rm/tlBzNBBjNdEKbl1c3L8I8UUMizeN1CGtUojrpX5mpGgEq
+         TY39N2jjtp56bFNrzQAc2hnLOw34zqJw8ViZVJH3rSBSO817fvQOURcrULsMdrewajNd
+         +RmL4BjGgVrvdJuWKR+Q9gZTN9yd/6Jksf2jfOCqlSsEH3G0cxwfupWPNVboOt781LgK
+         ooNZV7/VesJhBKpJyr/tnLYKLVYM9KLP3MnPsZkfADO7EOnj3uEXpcjGI3wjKcR3Lgr0
+         DxfOLSpmMXV6lWAWyxU9IDk+c2ZtEN/9HxfhoGOfDD1x/m+NFgE8f/E9Vtd7N8QPTbhO
+         r7yQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702509047; x=1703113847;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=27lXn/0eKgoZmqmgopJ3Fi7Q+GCy31HzcvAZfnCfdRk=;
+        b=nAJ/yFEhz0CZ0SNA4TGrIu3M35qzKp1I9Xy08yqEFr3UCyI0X1xllRmbA4FyMTKocE
+         xcwR/b8BViUQgdnDXgk+6DkcEYCx7dPBvUzSQPysbfoEIHjoR9WPAjisxd25g9GKr+uY
+         pRagCCF2eqZSlN4hJYb5Fw5I9OFUGGPZyC8Pon1T5OZ3OxC1ZINLR0yweCpXa1kAAx6+
+         1AYs97sQeU98IQh6/nyOOkY/3R8Ljqm/UHoCJ3Ec5NIy+Wc2z6+pxGcXJOf4vhebgBVO
+         DHqExoOPh7SIiX1Am2tH77LLQ59xnT9acpLzdRoY83Z1HmRFKeSydJQM9rRYQMYj0Dxb
+         siPg==
+X-Gm-Message-State: AOJu0YwpMaESuS4Wc4BDNyAAler16bhHh+AosqpAq/oEtHR57MhXDK5l
+	+3k4AKzHdlqdjQKCBbVve1c=
+X-Google-Smtp-Source: AGHT+IHZVV3mGhIMNdNFGZ8VFWEtdvmavOMakWVXsv72jmuTYkwHpGivTKnraBmLNvZzfMc+vraUxQ==
+X-Received: by 2002:a05:600c:450e:b0:40b:5f03:b3c8 with SMTP id t14-20020a05600c450e00b0040b5f03b3c8mr2176250wmo.234.1702509046514;
+        Wed, 13 Dec 2023 15:10:46 -0800 (PST)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id w10-20020a05600c474a00b0040b2c195523sm24407629wmo.31.2023.12.13.15.10.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Dec 2023 15:10:46 -0800 (PST)
+Message-ID: <657a39f6.050a0220.50ffc.9232@mx.google.com>
+X-Google-Original-Message-ID: <ZXo588MHn3AuZLOm@Ansuel-xps.>
+Date: Thu, 14 Dec 2023 00:10:43 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	Kees Cook <keescook@chromium.org>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH 0/2] net: add define to describe link speed modes
+References: <20231213181554.4741-1-ansuelsmth@gmail.com>
+ <a4661402-414a-4b0d-82e8-97031fa46230@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|PH8PR11MB6657:EE_
-X-MS-Office365-Filtering-Correlation-Id: 056fbd18-03ec-49af-943c-08dbfc301a27
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: X2Fnv6iNl915LFLPtaNMb1iCPQUTQQoXzJzedyX9e4mI7l33EIgBvDdaXd2BgiqG7S7CModjxGerUMTkzby3yADIBX6afaYpkDnefbQioTJhrLm/tDD8iD98Fg4fqGR2/+3balP+a/96Zgv3jfYD9n1XNewDNwckQoeJ+3H8YQkj9XiHvmD065O19U+1Dq50xU3tCW0G5hmY/clDLav6WvFRnnYJ8CGfzLEUV1OWWZT3o54c1JVySaiQwaKh5fdq0mxwlIA6/oFXUV6hTFCgCXwMVac1NOPIK2Vy4nWAndS1NHelhdxkcbu5JUdjmZL54Uz6zUshOjEb1jvrlbljfXGm/dlFLfPZEU+ymICpPMA6JXkLRe3BKaQQQlmXmO0BmexnfTiEh66yq10CUmGTKTwJi9tOMLQ7RmRmsLYrDlPSGnEXzJJbUejRFsMfarQPZbzo0yDckutmKz3aeapCiE1DpJdClbwgjFPeCQk75CZlCy6wmknreYmXr3YIUE8U3lXWKy/GkUdKcVNBh2thSv1qoLDIxxXFiJatM1wT6pdOILtMM+tsLEpnf7wQpJo/PzvC9kkvkIBpeIGO/ag0k/XxfZcT9aguwjjF52qYB8Ye5DL82RDsDF6pWPKt6dIXO+RtGl4sEsMcHufMyi8Z8a0r2HzBsUf86cC9p9MwUzIzqHN5GFd851nLVAVjZDLh
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(346002)(366004)(136003)(376002)(230273577357003)(230922051799003)(230173577357003)(1800799012)(64100799003)(186009)(451199024)(2616005)(26005)(107886003)(6506007)(6512007)(6666004)(83380400001)(4326008)(5660300002)(8936002)(8676002)(41300700001)(2906002)(6486002)(53546011)(478600001)(316002)(66556008)(66946007)(110136005)(66476007)(54906003)(86362001)(31696002)(82960400001)(38100700002)(36756003)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SzRDTXVLc3prdlg0SmhRQU5pNUZDb3p1SFdDYnhJOGFFNytYMGo3ZS9sVEJu?=
- =?utf-8?B?SjRndllXODYwYUZOTG1DVUIrR3RMdkJOdU5SR3dPMUJaNG5kNjRVQ3FJYnJz?=
- =?utf-8?B?QlJ3MlFVOFZTZ1RsSE5DVmp2S3g0eXI5Mlc5VFBxRFRCVFErWWZmUitOd295?=
- =?utf-8?B?Wk1jRXdXdEYzQ1lrSnhQTjc0UElIT1JQZlhPTHhUQzhMUzZ0YnM5MFVSRUpM?=
- =?utf-8?B?Nkt4S3Vrd1JtS2RmTnI0OFl0QTBrdEpBdFJGZlQvcll4UU1kVVVOd1duMzZ0?=
- =?utf-8?B?dkl3cm9Mei8zQXZCRHBzdVoxTlRvTlRYSXByMk1WNEMyRzdmV3FXcFFGY2VG?=
- =?utf-8?B?UVdIQVpsWmU0b2xEVmxlKzYraU1OOUoyTGhLZjdBR2wyUk1zWHpVM2dSUzFL?=
- =?utf-8?B?cXMwdDZPTkYwZzlQNDEvajVtWkl5b1hUcU9ucDZSTjNNOVFCOUd4T1pKb1JQ?=
- =?utf-8?B?Mk5GSkkrN3c1R3BtekMvV1h5TXdUc2g2VXVaQkhNNlRRVzltQjB1Ym1HMG5S?=
- =?utf-8?B?M2VIcWNrbGhQNEdQWWJYWFFOQVpTOGxEcG9ucjNzcVFHeWNaUTdvd0JwVHUw?=
- =?utf-8?B?bVE1V3hIS1RlUzFHQXk3MW50MmJ2TEJlR2V6by81RTRadExSaG0wcHk5bUw0?=
- =?utf-8?B?SnNXdmFxVlA3WlVjUmdSTFlpMjVtaDRYNjJpVktiQjI5WEk1R2h4TjFCdXdQ?=
- =?utf-8?B?RWJITWVXbE83b2tibzVPc0VJUFJpV2RwWE9QOVppLzZHUEQ4a21GWUZUeTBN?=
- =?utf-8?B?bFlTZDRmQ0MzZmxsdTVKUG12UEExcVpFSHFZYndaNEdCSW1ROGpmcEwvcHJO?=
- =?utf-8?B?VDkzVURwOWJqcmVFQ0gxckl2MzR3NktZcWt0VzlPNHEwSTd4aGorMmRXbC8w?=
- =?utf-8?B?UUlhWGpCcHJDZkxEbURKTmZyOVk5ZXB6T2VPbnZ3VWhGb200M01rZHRDRWJD?=
- =?utf-8?B?TG9pNHVvNnM3c0tzMXNFNnByZGptdTNPOERHNjNXbENGRHdld3Vnc1VqdXBq?=
- =?utf-8?B?MXFpOGFZeDVhM3Q2djFES0R5eTI5S2IyVUR4cFY0alhZZGpLZVNlV3NZakFF?=
- =?utf-8?B?RC9la1d4Qzl5QVRPM2JVMU1UeXZlRFlpVnM5MGRpNXdqOFh3bEE0MUNYRFor?=
- =?utf-8?B?Yk1NWVBpbHMwWUtXTDdyM1lWTzY0dHlkQVBtakV0Yjd1c1l1N01RRXNqZDBW?=
- =?utf-8?B?aE5pNURGMHNKemlZNnJ0dWR4OWNWTXhQSXpIbHU0dW5HTitMb3dwTWkwWktY?=
- =?utf-8?B?ZWhxYm1TaC9HRE13MEVjTW41NEsySU9aUWM2N2wrOFRYdXNYVUs2YkdRTEkr?=
- =?utf-8?B?Tm5xUVdmWkxyQ1dyTUtnclZUN08xbEo0TWVtK0ovZWFjUlJlRnFwL3VmUld2?=
- =?utf-8?B?bVJ4QTJRUjNBNzJPN2doSkE2dmFxUGg5MkNmRU1KM3VWYkxjRmh6SE16MnZh?=
- =?utf-8?B?aXk0eHpaLzZnMWxadm56TXN3cVVTekozMzI4TGFaSFRUMXFwTkgxeU9NRG5R?=
- =?utf-8?B?S1ZzRVlMYlNoTnBMWVluZWtiMEw4OWN1bk5pUUhwSlVTVnJFUGs5T1Z3WWpV?=
- =?utf-8?B?NTFmb25NUzZlYzlBVUN4Ykt5V3F1RDBMcXVwWitLK0NPNkVPTHhVcDRFRjhn?=
- =?utf-8?B?MjBFaUNxZS9qQ0ZBdlhUQmlUTmNMNi92ZXUxcEdxcElvZ1N0bnNEcmcxUWY3?=
- =?utf-8?B?aEdkOHB6czZWUzRJbjlHSk1VelNWK3JrYVJ0ZUNTU1lHVW9XMjlmL0ZZMkpC?=
- =?utf-8?B?TllHNy9WY0diQzQzVnBzT0dtOVNRYklQb2RGY1NGZ1cydVJsT2FieWlOYUtD?=
- =?utf-8?B?V0hCdFJjLzZiYWhVZ1JCMFdDalk0VWlhK0pRdEZJSmFkOVJXTlE0RjQ2R3Zi?=
- =?utf-8?B?NCswdmRyUnNUYVNvczlDeGZicy9EMlEzb2NGdzkwMldyVG42OGMzK0VCNEpC?=
- =?utf-8?B?bzF5OHBTcVFLKzA5MUNBV1JZbkR2Q2EzZ1J1U0Y3T1kwNzRYV1BtRWNjRHpN?=
- =?utf-8?B?Q1dTK1E0ZW10OUJOWDNKU0dad1JDWHN6bjZzMDJrYmxKWXFZWExUUnJYY0ZV?=
- =?utf-8?B?MmZTVUhnbGt2Um1vUVR3SFh3VStlczFiaFFhV2pRbHA4VzhOVGdWYkJzc1dv?=
- =?utf-8?B?R3ZtOXJ5VVdHMUd0VlN4eGpERGdYdzlXRklQL0hGTy9aa0xOdXYyR1dkQmJX?=
- =?utf-8?B?Nmc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 056fbd18-03ec-49af-943c-08dbfc301a27
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2023 23:06:13.2791
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HaNx62qKJcwm9LjtlkUOP2M8ifYJ+YHgvmtVrBPKoHHy5X/GHslr8MpKJtY1kbbcCUMnpKOZ4/8UwOof6xbpAjwKdmUSxeDgyJYqjuMfnIg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6657
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a4661402-414a-4b0d-82e8-97031fa46230@lunn.ch>
 
-
-
-On 12/13/2023 2:22 PM, Nguyen, Anthony L wrote:
+On Thu, Dec 14, 2023 at 12:05:52AM +0100, Andrew Lunn wrote:
+> On Wed, Dec 13, 2023 at 07:15:52PM +0100, Christian Marangi wrote:
+> > This is a simple series to add define to describe link speed modes.
+> > 
+> > Hope the proposed way is acceptable with the enum and define.
+> > 
+> > This is also needed in the upcoming changes in the netdev trigger for LEDs
+> > where phy_speeds functions is used to declare a more compact array instead
+> > of using a "big enough" approach.
 > 
+> I'm trying to figure out the 'big picture' here.
 > 
->> -----Original Message-----
->> From: Kubiak, Michal <michal.kubiak@intel.com>
->> Sent: Wednesday, December 13, 2023 5:51 AM
->>
->> On Wed, Dec 13, 2023 at 02:23:19PM +0100, Michal Kubiak wrote:
->>> On Tue, Dec 12, 2023 at 05:50:55PM +0100, Paul Menzel wrote:
->>>> Dear Michal, dear Joshua,
->>>>
->>>>
->>>> Thank you for your patch.
->>>>
->>>> On 12/12/23 15:55, Michal Kubiak wrote:
->>>>> From: Joshua Hay <joshua.a.hay@intel.com>
->>>>>
->>>>> Tell hardware to writeback completed descriptors even when
->>>>> interrupts
->>>>
->>>> Should you resend, the verb is spelled with a space: write back.
->>>
->>> Sure, I will fix it.
->>
->> Hi Tony,
->>
->> Could you please add a space ("writeback" -> "write back") when taking the
->> patch to your tree?
+> The LED trigger will call ksetting_get to get a list of supported link
+> modes. You can then use the table struct phy_setting settings[] in
+> phy-core.c to translate the link mode to a speed. You are likely to
+> get a lot of duplicate speeds, but you can remove them. For each speed
+> you need to create a sysfs file. Why not just create a linked list,
+> rather than an array? Or just walk the table and find out how many
+> different speeds there are and allocate an array of that size. Its
+> currently 15, which is not that big. And then just use the is_visible
+> method to hide the ones which are not relevant.
 > 
-> Yep, I can do that.
+> I don't see any need for new enums or tables here, just a function to
+> look up a link mode in that table and return the speed.
+>
 
-Actually, looks like you missed updating kdocs
+The big picture was to have an handy define and statically allocate the
+array with the max amount of link modes possible without having to
+allocate kernel memory at runtime.
 
-drivers/net/ethernet/intel/idpf/idpf_txrx.h:508: warning: Function 
-parameter or member 'dyn_ctl_intena_msk_m' not described in 'idpf_intr_reg'
-drivers/net/ethernet/intel/idpf/idpf_txrx.h:508: warning: Function 
-parameter or member 'dyn_ctl_wb_on_itr_m' not described in 'idpf_intr_reg'
-drivers/net/ethernet/intel/idpf/idpf_txrx.h:561: warning: Function 
-parameter or member 'wb_on_itr' not described in 'idpf_q_vector'
+With the current way of allocating only the needed space, I have to
+parse the settings table 2 times (one to get the number and the second
+time to compose the actual array)
 
-> Thanks,
-> Tony
-> 
+Not a problem since these are called only on LED register or when the
+device name is called... Just extra code and the fact that kmalloc can
+fail with ENOMEM. (but that is almost imposible and would be in an OOM
+condition)
+
+-- 
+	Ansuel
 
