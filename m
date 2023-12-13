@@ -1,119 +1,105 @@
-Return-Path: <netdev+bounces-56865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C26A68110D0
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:15:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A32B8110D1
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:15:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E0951F212A3
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 12:15:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA5FE2818A1
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 12:15:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7121728DD6;
-	Wed, 13 Dec 2023 12:15:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AED428E08;
+	Wed, 13 Dec 2023 12:15:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="ZuDFQn9F"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fEovZsJy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-40134.protonmail.ch (mail-40134.protonmail.ch [185.70.40.134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67E03B0
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 04:15:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1702469699; x=1702728899;
-	bh=Zqk2zoyfaGGXrvLxTBqarsBmK9ljpHypJub7CA1ot9E=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=ZuDFQn9FjAUjVQaQ90wlvl5ZYDvoOOI1qM9FJbCRqFULjn0/4QcfqJOV8k/7mFi+F
-	 3dvkxiObcUymDvHC1hKOFJamygdHe0WpwJlqNIN2ZM9AEhoVVBPP4lVUqWJeAq10i3
-	 aGYuTX8MotQlkP1Vt2bnjHQzObwqhbjljNnoMQq3oU/a2+VvhrnR1fHLh1rQUhOCLt
-	 WS2k64P5aJzofVgT2Oh/fzKApkv3joYyxepPNT6027Kc/a64y9tEXEgWLa3gzwmNri
-	 i0DwEa5ehcTK8AVBdvlFE9SdRTe+X9s3kBtn80sLw12sAqrwxTLSoC7NRxlH6dgpft
-	 xfPZoke45ajvQ==
-Date: Wed, 13 Dec 2023 12:14:55 +0000
-To: Andrew Lunn <andrew@lunn.ch>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, boqun.feng@gmail.com, alice@ryhl.io, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com, wedsonaf@gmail.com, aliceryhl@google.com
-Subject: Re: [PATCH net-next v10 1/4] rust: core abstractions for network PHY drivers
-Message-ID: <3d6e1af3-9d86-4058-914f-ea3d7115e0db@proton.me>
-In-Reply-To: <79abc99b-a0f2-48c6-ba68-b72dcf5f7254@lunn.ch>
-References: <ZXfFzKYMxBt7OhrM@boqun-archlinux> <20231212.130410.1213689699686195367.fujita.tomonori@gmail.com> <ZXf5g5srNnCtgcL5@Boquns-Mac-mini.home> <20231212.220216.1253919664184581703.fujita.tomonori@gmail.com> <544015ec-52a4-4253-a064-8a2b370c06dc@proton.me> <79abc99b-a0f2-48c6-ba68-b72dcf5f7254@lunn.ch>
-Feedback-ID: 71780778:user:proton
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84ACA9A
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 04:15:08 -0800 (PST)
+Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-50bfd8d5c77so7853651e87.1
+        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 04:15:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702469706; x=1703074506; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xGmpHYTW9S3vl3puS381PDZTb3jivoBGyatqfVxW4Mc=;
+        b=fEovZsJy4QZm4kW7AQae9oQf2OaonAgfalJAcPJLlK4qdVpARWMnDtDwnQWkMDTxpn
+         8cewKjFWzSeA0stYR1vgiNshStcpW82yPeaU6c4H0GlKywUD1Wv3Yuwilr+hryounf8a
+         cYAhneyWQiNLh4MCZ1IYJfG6ZswU3K5lq1uDgw3UIGwLoKtoG98rUW4ucXrtRZ5RC8m4
+         pvmHYk6LdvjZd9KviZmbp0WaNRQ3prWVrA1nds9egv2PYdnyYXbLhVzUlJHumSkvujE1
+         3G3wAdd4P4MxNF/lF1R4t5yrYOk9rkejbPbH8HiMxKr1HoQ8ylF9dB9Qc1A0llnvlkOv
+         s76A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702469706; x=1703074506;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xGmpHYTW9S3vl3puS381PDZTb3jivoBGyatqfVxW4Mc=;
+        b=BuyD5pRNF68lZlwoJ8HdwOCxhG6QkAj5skCoibjNlqHS64IODq2/X3w5o7Q/yXfQgH
+         Vog05I0QpFeZ7q5XjSbZNOXDu7iiy7bXdrJBEZD8pf55ezbUE3+YRKw8qTww+THN6UY7
+         KZkoZP4h4+MDudb8oX7vIrdaHtmy6+wIFbnE1WGu1hdL/p7i19tVCqLlpXun4yA3PZWO
+         YPrNpJn+vYu0MgqjeVh5tK8pyPC69TepvJHg7rBeegooWBQfVk6/F7vre6lDgwfs0gNk
+         TEP3qDbNX5Z91lziPjabA5gQ948uN+eS4msaMxHkXgi7rB7nZzX+zeF9QK0isoV4iyNn
+         33DA==
+X-Gm-Message-State: AOJu0Yxd8HcxUnHt7JBqP6i5vAID9LF8Cj6QIyQHdNWsDAnrRivrqdMT
+	zhSLlFX3fReTS6I3vliTEHA=
+X-Google-Smtp-Source: AGHT+IG3GE07twPttHXOMYZDALIJK351fh/PQyty/OmV/BSuldWib4FBG6OiMoPn9G+Y7Dq8qiabWQ==
+X-Received: by 2002:ac2:592b:0:b0:50b:f90a:717c with SMTP id v11-20020ac2592b000000b0050bf90a717cmr1567380lfi.83.1702469706176;
+        Wed, 13 Dec 2023 04:15:06 -0800 (PST)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id v13-20020ac2592d000000b0050c001ce064sm1591215lfi.80.2023.12.13.04.15.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Dec 2023 04:15:05 -0800 (PST)
+Subject: Re: [PATCH net-next 7/7] sfc: add debugfs node for filter table
+ contents
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, edward.cree@amd.com,
+ linux-net-drivers@amd.com, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, habetsm.xilinx@gmail.com,
+ Jonathan Cooper <jonathan.s.cooper@amd.com>
+References: <cover.1702314694.git.ecree.xilinx@gmail.com>
+ <0cf27cb7a42cc81c8d360b5812690e636a100244.1702314695.git.ecree.xilinx@gmail.com>
+ <20231211191734.GQ5817@kernel.org>
+ <38eabc7c-e84b-77af-1ec4-f487154eb408@gmail.com>
+ <b9456284-432d-2254-0af2-1dedeca0183d@gmail.com>
+ <20231212081944.2480f57b@kernel.org>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <6258c258-b1c2-0856-aff7-cca33be15bf6@gmail.com>
+Date: Wed, 13 Dec 2023 12:15:04 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <20231212081944.2480f57b@kernel.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-On 12/13/23 11:28, Andrew Lunn wrote:
->> I still think you need to justify why `mdio.bus` is a pointer that you
->> can give to `midobus_read`.
->=20
-> Maybe a dumb question. Why are you limiting this to just a few members
-> of struct phy_device? It has ~50 members, any of which can be used by
-> the C side when Rust calls into C.
+On 12/12/2023 16:19, Jakub Kicinski wrote:
+> On Tue, 12 Dec 2023 15:14:17 +0000 Edward Cree wrote:
+>> I will update the commit message to call out and explain this; I
+>>  believe the code is actually fine.
+> 
+> Fair point, second time in a ~month we see this sort of false positive.
+> I'll throw [^\\]$ at the end of the regex to try to avoid matching stuff
+> that's most likely a macro.
 
-I limited it to those few members, because the Rust side only uses
-those.
-Theoretically one could specify all invariants for all members, but that
-seems like a *lot* of work.
+Sounds good, thanks.
 
-In Rust everything [1] has to be initialized with a valid value.
-Contrast this with C where everything is potentially uninitialized. As
-an example, let's look at the first few fields of `PhyDevice`:
+> This one looks legit tho:
+> 
+> +void efx_debugfs_print_filter(char *s, size_t l, struct efx_filter_spec *spec) {}
 
-    struct PhyDevice {
-        mdio: MdioDevice,
-        drv: Box<PhyDriver>,
-        devlink: Box<DeviceLink>,
-        phy_id: u32,
-        c45_ids: PhyC45DeviceIds,
-        // ...
-    }
+Yep, that one's real, will be fixed in v2.
+And this time I'll actually build-test with CONFIG_DEBUG_FS=n,
+ which I forgot to do with v1 (sorry).
 
-Note that in Rust we now do not need to write down any invariants, since
-they are all implicitly encoded. For example the `drv` field is of type
-`Box<PhyDriver>`, it *always* is a pointer to an allocation that
-contains a valid `PhyDriver`. So while on the C side you would have to
-state this, on the Rust side we get it for free.
-
-Rust function also make use of the "everything is in a valid state"
-rule, they know that the fields are valid and thus the Rust equivalent
-of `phy_read` could be safe and without any comments:
-
-    impl PhyDevice {
-        fn phy_read(&self, regnum: u32) -> i32 {
-            self.mdio.bus.mdiobus_read(self.mdio.addr, regnum)
-        }
-    }
-
-All of this only applies to safe code, `unsafe` code is allowed to
-violate all of these things temporarily. However, when it gives a value
-back to safe code [2], that value needs to be valid.
-
-I think that specifying all of these implicit invariants in C will be
-extremely laborious. Especially since the usual way of doing things in C
-is not considering these invariants (at least not consciously), but
-rather "just do the thing".
-
-The way we do the interoperability is to just fully trust the C side to
-produce valid values that we can feed back to the C side. Of course
-there are caveats, so e.g. one needs to initialize a `struct mutex`
-before it can be used, but that is what we need to capture with the
-safety comments.
-
-[1]: There are exceptions for this, but for the purposes of this
-     discussion, they can be ignored. If you want to know more, you can
-     read this article in the nomicon:
-     https://doc.rust-lang.org/nomicon/unchecked-uninit.html
-
-[2]: There are also exceptions, but I will omit them here.
-
---=20
-Cheers,
-Benno
-
+-ed
 
