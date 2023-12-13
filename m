@@ -1,67 +1,70 @@
-Return-Path: <netdev+bounces-56772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DAE2810CB1
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:45:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EC21810CB2
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:45:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A32FAB20BA1
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 08:45:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4744B20C9C
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 08:45:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E341EB34;
-	Wed, 13 Dec 2023 08:45:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39A7A1EB43;
+	Wed, 13 Dec 2023 08:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bk+05/9i"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a3SlKFaH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18042A0
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 00:45:12 -0800 (PST)
-Received: by mail-il1-x131.google.com with SMTP id e9e14a558f8ab-35d77fb7d94so27022955ab.0
-        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 00:45:12 -0800 (PST)
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31334F3
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 00:45:14 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1d0b2752dc6so58832185ad.3
+        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 00:45:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702457110; x=1703061910; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6UbrNkZFw6v2Ag5z4UUkMK3ySGfIiAe6dvzGkwUXovY=;
-        b=bk+05/9iYoZMhdFdXQ23z+vu4qADwVgRLEQk/blQGfwzAZZTlId8d/Ri9H23u9C7AT
-         FURJf0zHyRj/ONpaf4m2Jq2zLGFYDXg/sGQ4mXhKqlr+BbBtzigzykrM+m7/MMBq1Y3p
-         gEmXBnHDjLhzkie8SboLxoZMCpcJ348Zz1j/IHYBL17s+UnD5r7pu5vNnB5NMryUxhd1
-         vMBb2t9OPHO7FGkFAv2XykpHLSuUfgvAPRqXAHSj305+vXS8vexYo99fuT/x3JI72jMK
-         PB1WZNXuThI5mHnJLpt5kHPanpFgp/ZDSSk/OJ+TA10qVcGLniXwLnrSEtJQp8uItt6u
-         CtLg==
+        d=gmail.com; s=20230601; t=1702457113; x=1703061913; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GtT/ElbQqdJwX418PMIMGHlJ/bgVex4PuuJXGBHr+A8=;
+        b=a3SlKFaHC6M0eGdCs3tc8FhrxrlwYIE7DvL8UzBwN1y2cSAI6zs77OVUkJlsphlXF8
+         +vzVnbWspZzwY8bnbZQ+4vpxzpzlXyNc1QEsVsYLCQ7ljH296TmttiKtEp3dKbOt/JHB
+         poK3v+rfl8TnvfUnkC2kkGt8yadudQWFGC1qZ7wmKxxeyZUQdQfAWxCmQUvlxFpu71kV
+         PGFnd5dT8uw3TvdmUYMBEM04Foez8CoDcyvCy4L+2aB2eXsgsPPiI8PJ7HClXNdCgPx+
+         +JkLOVB6Nglu3/l3kmvzkVwCHrgF0uuk3izNUEOb9kWbP4jyKXRiy2tU0vmt7IQK4A/8
+         KAqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702457110; x=1703061910;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6UbrNkZFw6v2Ag5z4UUkMK3ySGfIiAe6dvzGkwUXovY=;
-        b=rkKWJPe6+K8qFE1vpo1iNmnW1tfhRPv64RANINVPP56VpK9yMQHiZsQqHMIgcW+3hT
-         Gg5JWZSHwu44TJeDtdcrumdGjtJ5pfNWZAeMRDpzo5RvwPVHd/wrt4kNi3/FXGigEvEH
-         R/TD91XsMyuwGMCkq//n1eC3sdMOpTiUmSxALD81JZXQ9U0vslfGhHUNmB1ehNMqwH1V
-         +1htwLFoInOeMJruCBKZDyO35+64hLth+3vaIhoSrBe0mRuFKH1BBROMI/8Wwj+vLPcA
-         p099WujmGw8JjP4/tQQg2M3d7mvQUhZhn8hSt4rcfEDxscyNtjaNQOiJb8pBcR3QvzNZ
-         eztQ==
-X-Gm-Message-State: AOJu0YxSeWezNT0jOa8l0Ys61pYI0fduUcuZNWujRXbEXFAN5Nf3XcjY
-	Z2LmzVWxu27D1ImNSZx85SbaeyvQdovpVCmBD0g=
-X-Google-Smtp-Source: AGHT+IEnaKQzZcT26KQrhmlJbsvfWvWyguGUjn17VcQVd2jU/WI1f1QoFDjd7eeQraE02SIdDKlLXQ==
-X-Received: by 2002:a05:6e02:17c8:b0:35d:a84e:f720 with SMTP id z8-20020a056e0217c800b0035da84ef720mr13327799ilu.60.1702457110665;
-        Wed, 13 Dec 2023 00:45:10 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702457113; x=1703061913;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GtT/ElbQqdJwX418PMIMGHlJ/bgVex4PuuJXGBHr+A8=;
+        b=ufFKPMDiR0TLIR3MtHwupHL1FdF8/Xf1DJXXm8/85BX91ng7Ae/xhwy7xfpf8l+qgn
+         WX2w6bhKxEV/ahcc4lSNuVbwvsHe3p5xv9fuFogweU/YRKLlHBoxTfSd+TkewX11xmTU
+         U8/KjMqdQKWb+Uf0zBHg9r0u4cDPWLoYPPkPufm2Wo4b+rwXot1OHvdPO0YYwewzIJN7
+         DipFqb8uGo5RGPkUjGQ8A96dws15Kudte4OZMYDLuRy7fiiOR6eznT7U8JFw6cF09EyR
+         tG1vwbwqQLjTRDISNQzsQ6Bxdj7yRMdi/ioOR2sKEbD497gN9Oyuznnw6ZUQaquJ7QuS
+         oN6g==
+X-Gm-Message-State: AOJu0YyAK6S1Qn2lf+idoBBQ4vz6RLJYl6+/FdmdHp2DCOHzb1eOPM8U
+	yhK+Bwfwitl1I0lB9SFTywc+EPjYPcVQ6v9TWh0=
+X-Google-Smtp-Source: AGHT+IHKrzsBaA7lIeLCAVJ4Cuh8VMQ9vvphlogR263YMnrGwpYP3EgpMRgBj2ZhxAddaNNgYcMkuw==
+X-Received: by 2002:a17:902:f546:b0:1d0:c37a:9d05 with SMTP id h6-20020a170902f54600b001d0c37a9d05mr10013464plf.75.1702457112893;
+        Wed, 13 Dec 2023 00:45:12 -0800 (PST)
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id h2-20020a170902f54200b001cfc67d46efsm9897824plf.191.2023.12.13.00.45.08
+        by smtp.gmail.com with ESMTPSA id h2-20020a170902f54200b001cfc67d46efsm9897824plf.191.2023.12.13.00.45.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 00:45:10 -0800 (PST)
+        Wed, 13 Dec 2023 00:45:12 -0800 (PST)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Jiri Pirko <jiri@resnulli.us>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [Draft PATCH net-next 0/3] add YAML spec for team
-Date: Wed, 13 Dec 2023 16:44:59 +0800
-Message-ID: <20231213084502.4042718-1-liuhangbin@gmail.com>
+Subject: [Draft PATCH net-next 1/3] Documentation: netlink: add a YAML spec for team
+Date: Wed, 13 Dec 2023 16:45:00 +0800
+Message-ID: <20231213084502.4042718-2-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20231213084502.4042718-1-liuhangbin@gmail.com>
+References: <20231213084502.4042718-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,63 +73,238 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi Jakub,
+Add a YAML specification for team.
 
-You suggested me to add yaml spec for bridge. Since I'm not familiar with
-writing the spec file, I choose to convert team as a start.
-
-There are still some questions I got during convertion.
-
-1. Is there a preference to use "-" instead of "_" for the names in spec file?
-   e.g. the attr-cnt-name in team.spec, should I use __team-attr-item-port-max
-   or --team-attr-item-port-max, or __team_attr_item_port_max?
-2. I saw ynl-gen-c.py deals with unterminated-ok. But this policy is not shown
-   in the schemas. Is it a new feature that still working on?
-3. Do we have to hard code the string max-len? Is there a way to use
-   the name in definitions? e.g.
-   name: name
-   type: string
-   checks:
-     max-len: string-max-len
-4. The doc will be generate to rst file in future, so there will not have
-   other comments in the _nl.c or _nl.h files, right?
-5. the genl_multicast_group is forced to use list. But the team use format
-   like { .name = TEAM_GENL_CHANGE_EVENT_MC_GRP_NAME, }. Should we support
-   this legacy format?
-6. The _UAPI_LINUX_IF_TEAM_H_ is rename to _UAPI_LINUX_IF_TEAM_H in uapi
-   header. Does that affects?
-7. When build, I got error modpost: missing MODULE_LICENSE() in drivers/net/team/team_nl.o.
-   Should we add the MODULE_LICENSE support in ynl-gen-c.py?
-8. When build, I also got errors like
-     ERROR: modpost: "team_nl_policy" [drivers/net/team/team.ko] undefined!
-     ERROR: modpost: "team_nl_ops" [drivers/net/team/team.ko] undefined!
-     ERROR: modpost: "team_nl_noop_doit" [drivers/net/team/team_nl.ko] undefined!
-     ERROR: modpost: "team_nl_options_set_doit" [drivers/net/team/team_nl.ko] undefined!
-     ERROR: modpost: "team_nl_options_get_doit" [drivers/net/team/team_nl.ko] undefined!
-     ERROR: modpost: "team_nl_port_list_get_doit" [drivers/net/team/team_nl.ko] undefined!
-     ERROR: modpost: "team_attr_option_nl_policy" [drivers/net/team/team.ko] undefined!
-  Do you know why include "team_nl.h" doesn't help?
-
-Thanks
-Hangbin
-
-Hangbin Liu (3):
-  Documentation: netlink: add a YAML spec for team
-  net: team: use policy generated by YAML spec
-  uapi: team: use header file generated from YAML spec
-
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
  Documentation/netlink/specs/team.yaml | 205 ++++++++++++++++++++++++++
  MAINTAINERS                           |   1 +
- drivers/net/team/Makefile             |   2 +-
- drivers/net/team/team.c               |  59 +-------
- drivers/net/team/team_nl.c            |  59 ++++++++
- drivers/net/team/team_nl.h            |  29 ++++
- include/uapi/linux/if_team.h          | 116 ++++++---------
- 7 files changed, 345 insertions(+), 126 deletions(-)
+ 2 files changed, 206 insertions(+)
  create mode 100644 Documentation/netlink/specs/team.yaml
- create mode 100644 drivers/net/team/team_nl.c
- create mode 100644 drivers/net/team/team_nl.h
 
+diff --git a/Documentation/netlink/specs/team.yaml b/Documentation/netlink/specs/team.yaml
+new file mode 100644
+index 000000000000..5647068bf521
+--- /dev/null
++++ b/Documentation/netlink/specs/team.yaml
+@@ -0,0 +1,205 @@
++# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
++
++name: team
++
++protocol: genetlink-legacy
++
++doc: |
++  Network team device driver.
++
++c-family-name: team-genl-name
++c-version-name: team-genl-version
++kernel-policy: global
++uapi-header: linux/if_team.h
++
++definitions:
++  -
++    name: string-max-len
++    type: const
++    value: 32
++  -
++    name: genl-change-event-mc-grp-name
++    type: const
++    value: change_event
++
++attribute-sets:
++  -
++    name: team
++    doc:
++      The team nested layout of get/set msg looks like
++          [TEAM_ATTR_LIST_OPTION]
++              [TEAM_ATTR_ITEM_OPTION]
++                  [TEAM_ATTR_OPTION_*], ...
++              [TEAM_ATTR_ITEM_OPTION]
++                  [TEAM_ATTR_OPTION_*], ...
++              ...
++          [TEAM_ATTR_LIST_PORT]
++              [TEAM_ATTR_ITEM_PORT]
++                  [TEAM_ATTR_PORT_*], ...
++              [TEAM_ATTR_ITEM_PORT]
++                  [TEAM_ATTR_PORT_*], ...
++              ...
++    name-prefix: team-attr-
++    attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
++      -
++        name: team-ifindex
++        type: u32
++      -
++        name: list-option
++        type: nest
++        nested-attributes: item-option
++      -
++        name: list-port
++        type: nest
++        nested-attributes: item-port
++  -
++    name: item-option
++    name-prefix: team-attr-item-
++    attr-cnt-name: __team-attr-item-option-max
++    attr-max-name: team-attr-item-option-max
++    attributes:
++      -
++        name: option-unspec
++        type: unused
++        value: 0
++      -
++        name: option
++        type: nest
++        nested-attributes: attr-option
++  -
++    name: attr-option
++    name-prefix: team-attr-option-
++    attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
++      -
++        name: name
++        type: string
++        checks:
++          # no unterminated-ok defination?
++          # do we have to hard code this?
++          max-len: 32
++      -
++        name: changed
++        type: flag
++      -
++        name: type
++        type: u8
++      -
++        name: data
++        type: binary
++      -
++        name: removed
++        type: flag
++      -
++        name: port-ifindex
++        type: u32
++        doc: for per-port options
++      -
++        name: array-index
++        type: u32
++        doc: for for array options
++  -
++    name: item-port
++    name-prefix: team-attr-item-
++    attr-cnt-name: __team-attr-item-port-max
++    attr-max-name: team-attr-item-port-max
++    attributes:
++      -
++        name: port-unspec
++        type: unused
++        value: 0
++      -
++        name: port
++        type: nest
++        nested-attributes: attr-port
++  -
++    name: attr-port
++    name-prefix: team-attr-port-
++    attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
++      -
++        name: ifindex
++        type: u32
++      -
++        name: changed
++        type: flag
++      -
++        name: linkup
++        type: flag
++      -
++        name: speed
++        type: u32
++      -
++        name: duplex
++        type: u8
++      -
++        name: removed
++        type: flag
++
++operations:
++  list:
++    -
++      name: noop
++      doc: No operation
++      value: 0
++      attribute-set: team
++      dont-validate: [ strict, dump ]
++
++      do:
++        # Actually it only reply the team netlink family
++        reply:
++          attributes:
++            - team-ifindex
++
++    -
++      name: options-set
++      doc: Set team options
++      attribute-set: team
++      dont-validate: [ strict, dump ]
++      flags: [ admin-perm ]
++
++      do:
++        request:
++          attributes:
++            - team-ifindex
++            - list-option
++
++    -
++      name: options-get
++      doc: Get team options info
++      attribute-set: team
++      dont-validate: [ strict, dump ]
++      flags: [ admin-perm ]
++
++      do:
++        request:
++          attributes:
++            - team-ifindex
++        reply:
++          attributes:
++            - list-option
++
++    -
++      name: port-list-get
++      doc: Get team ports info
++      attribute-set: team
++      dont-validate: [ strict, dump ]
++      flags: [ admin-perm ]
++
++      do:
++        request:
++          attributes:
++            - team-ifindex
++        reply:
++          attributes:
++            - list-port
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 7fb66210069b..b64e449f47f9 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -21301,6 +21301,7 @@ F:	drivers/net/team/
+ F:	include/linux/if_team.h
+ F:	include/uapi/linux/if_team.h
+ F:	tools/testing/selftests/drivers/net/team/
++F:	Documentation/netlink/specs/team.yaml
+ 
+ TECHNICAL ADVISORY BOARD PROCESS DOCS
+ M:	"Theodore Ts'o" <tytso@mit.edu>
 -- 
 2.43.0
 
