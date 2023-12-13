@@ -1,47 +1,50 @@
-Return-Path: <netdev+bounces-57106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65EF781220B
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 23:49:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98D46812297
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 00:06:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 960661C210E8
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 22:49:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 437471F216C4
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 23:06:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A421681854;
-	Wed, 13 Dec 2023 22:49:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 866868185F;
+	Wed, 13 Dec 2023 23:06:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ymmFUvjZ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dEpAotxw"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3395DCF
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 14:49:45 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6504DD5;
+	Wed, 13 Dec 2023 15:06:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=EUgE5DLNIHiHDAd1jHooBex6WZ+a+tKC674WRCyoFi4=; b=ymmFUvjZa1sYWhsfk17B+hTTkN
-	77Ycdcfq4HX3jY+8UuIJmncXDXhGMJ7bn7xBZMb8w2pi4p6QsbBYlRKcPkvzBB4PJNTwGZMrSXkBb
-	eMjEFts5f5ITlHJpc16k4Dseg6Vvz92wzr3s4OT9N31+7//O3m7Djlc0r/GL/cqwaDSc=;
+	bh=iLIaYmnFeaSAt+oehqvXb0rJqmTP/GxPnscvrauls0A=; b=dEpAotxwRFL6VfcTsV3BjfNlLf
+	R0HwFimi0CGQoG+T+QMCJqeMVxxum72Y7ayvcMqp9wFztVnBEbraZ7CX4pZKtGafV+S1CpHPTjRab
+	2Iy36dvYn+qgBEsQnwwKZnuJT+oN3GqHHblTCVuqkVLL+HiC4AvY0RGP5nRGrb8jcz38=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rDY2x-002rlq-FE; Wed, 13 Dec 2023 23:49:43 +0100
-Date: Wed, 13 Dec 2023 23:49:43 +0100
+	id 1rDYIa-002rrh-MX; Thu, 14 Dec 2023 00:05:52 +0100
+Date: Thu, 14 Dec 2023 00:05:52 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>
-Subject: Re: [PATCH net-next 2/2] net: mdio-mux: be compatible with parent
- buses which only support C45
-Message-ID: <28eac550-e48c-401d-a111-05c6b4c9e4c0@lunn.ch>
-References: <20231213152712.320842-1-vladimir.oltean@nxp.com>
- <20231213152712.320842-3-vladimir.oltean@nxp.com>
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	Kees Cook <keescook@chromium.org>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH 0/2] net: add define to describe link speed modes
+Message-ID: <a4661402-414a-4b0d-82e8-97031fa46230@lunn.ch>
+References: <20231213181554.4741-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,20 +53,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231213152712.320842-3-vladimir.oltean@nxp.com>
+In-Reply-To: <20231213181554.4741-1-ansuelsmth@gmail.com>
 
-On Wed, Dec 13, 2023 at 05:27:12PM +0200, Vladimir Oltean wrote:
-> After the mii_bus API conversion to a split read() / read_c45(), there
-> might be MDIO parent buses which only populate the read_c45() and
-> write_c45() function pointers but not the C22 variants.
+On Wed, Dec 13, 2023 at 07:15:52PM +0100, Christian Marangi wrote:
+> This is a simple series to add define to describe link speed modes.
 > 
-> We haven't seen these in the wild paired with MDIO multiplexers, but
-> Andrew points out we should treat the corner case.
+> Hope the proposed way is acceptable with the enum and define.
 > 
-> Link: https://lore.kernel.org/netdev/4ccd7dc9-b611-48aa-865f-68d3a1327ce8@lunn.ch/
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> This is also needed in the upcoming changes in the netdev trigger for LEDs
+> where phy_speeds functions is used to declare a more compact array instead
+> of using a "big enough" approach.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+I'm trying to figure out the 'big picture' here.
 
-    Andrew
+The LED trigger will call ksetting_get to get a list of supported link
+modes. You can then use the table struct phy_setting settings[] in
+phy-core.c to translate the link mode to a speed. You are likely to
+get a lot of duplicate speeds, but you can remove them. For each speed
+you need to create a sysfs file. Why not just create a linked list,
+rather than an array? Or just walk the table and find out how many
+different speeds there are and allocate an array of that size. Its
+currently 15, which is not that big. And then just use the is_visible
+method to hide the ones which are not relevant.
+
+I don't see any need for new enums or tables here, just a function to
+look up a link mode in that table and return the speed.
+
+       Andrew
 
