@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-57088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B150812169
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 23:27:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB51281216A
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 23:28:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28F981F21230
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 22:27:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A6B628282A
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 22:28:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3FC681829;
-	Wed, 13 Dec 2023 22:27:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18CA581835;
+	Wed, 13 Dec 2023 22:27:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hEcUpV2d"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RWf9SEF8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-xc35.google.com (mail-oo1-xc35.google.com [IPv6:2607:f8b0:4864:20::c35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31076BD
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 14:27:50 -0800 (PST)
-Received: by mail-oo1-xc35.google.com with SMTP id 006d021491bc7-590bb31ccf5so3286312eaf.3
-        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 14:27:50 -0800 (PST)
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D729491
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 14:27:52 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-5be30d543c4so4405929a12.2
+        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 14:27:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1702506469; x=1703111269; darn=vger.kernel.org;
-        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=YMM1hSqTpM+vk2MUmDHPLX5apsTR0ducsOnhoUfDRqw=;
-        b=hEcUpV2dcxrpPyAJ18YAVlR7yhasOPe1r+5skV6SSbz6bU6u9lmw7XzaAgAo48N9WZ
-         N/J1NiQVtA82Zdum2uzFCmoCgkb904dIXiNDuaiZVH3DgXrqbe1sqnm6ekMVlMu6LA6v
-         /0/m/Bb1EcElmS53VTG/r0kkuQtd7kIK8J4rE=
+        d=broadcom.com; s=google; t=1702506472; x=1703111272; darn=vger.kernel.org;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YOXy1nGoiM3p8tlLmXhiPMpxrpOe0ylsigY0njjI5rI=;
+        b=RWf9SEF82RxTXLM4TcoX8O6uBuFt1x/ufDUGCmu3eOhzUpkMPltW283JE8aSYulLkG
+         WUOWIadLR3FfWRg2XPRtD/PV5Blek7DJwCRTon+6hUmCzFfJzoRDM8WtZQamwFgDL2ch
+         VxJ8UCd19SadJjrM72wgtyNKzmapEWWaSIa68=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702506469; x=1703111269;
-        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YMM1hSqTpM+vk2MUmDHPLX5apsTR0ducsOnhoUfDRqw=;
-        b=MfDxLicyY+YQ0GF79hVxJum8a1Gf1hhXnR+R2Yd9aYGQALUP1y6R5jg9W+jCi8ITq0
-         E7993qERLNpz4qRp27NDnZQ9wOHl8qM2vpDHRSyqybBeuh9RDlZ4biFnIcp2yooU5CPu
-         JeM+Bzg2Z2q0FgIAlE5JDIzRNV5JVkz1paurmj+EkDlrg+liskZWpfVKypxFSSykG/xs
-         e4fvBMqKTSZeWZ8uJsq+Jz11jdLlCyq3lAwe4CT/hH5iPpf/Ya1cPjbItERewSXq/mlZ
-         ykyud3TjSOG0DkBqy7nHNV2Nekeqf+mu7RB+QRzMw0k6T7nkdqt1nPQr67BgaUpA/XIH
-         mgjA==
-X-Gm-Message-State: AOJu0YyS3oDmEnOxdrQipRGk6HHWe1s1mEXnfwDh9XjGkmv9K/+KZdlS
-	247Kd/1veFw8HSNhbrKL5mKSyBDvI3fvqAcMfwHlqWlkT5+mIhD0EiEdeh+I9SKXCAyrIOPCj4j
-	oZPFlMkjakpavTp/iQl3e6YuQQQM4gtMdYnFodqQQVfcDbTrrXvk0ZEhVl7/SuZp3OrDzIdhvcP
-	p4NlsrWg==
-X-Google-Smtp-Source: AGHT+IEUDzhQzGigx5RPg3X8ZAibk/XLTMJdWchWG7K8+9LtQVModiSI+Ok6tDXtOJUatIDKmuFvcA==
-X-Received: by 2002:a05:6358:f18:b0:170:17eb:9c48 with SMTP id b24-20020a0563580f1800b0017017eb9c48mr8160567rwj.41.1702506469071;
-        Wed, 13 Dec 2023 14:27:49 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702506472; x=1703111272;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YOXy1nGoiM3p8tlLmXhiPMpxrpOe0ylsigY0njjI5rI=;
+        b=r76vGrw/qHBZpKSx7bDQqhfIppdcveVwxshPKS+kNShRG9+3RUO57/m7HZtarP7S2A
+         Ltp8lXUAYXErF/8W/ONkgPr0CzPMzEcoZRCA6mYTp1y3O/k6diNo7oKW9kJzTO61mqYb
+         LHxi5nOIN4t7/Xpsb/5BNJW5QLlBwdq0V6WJqFolTfFIs3YktqptFnd293O08xCp+stV
+         1wNfu9OueNxvEqJgacX4seg5h21l5xhJyF56BepvnN7z5QeSk9ykejh+lyVJcBlx8Hw3
+         oRnlwz3cDTl1qZfAhpRBg6qMRqYdhY0nwcTBU0A+pfX22Fk6eKt43l8Q/x581h+vVOJE
+         iXMw==
+X-Gm-Message-State: AOJu0YyEbq6POeXKzIa9+t+0hOgtYZgYQmdiyQcAs/qGeT4w4ymMWJhl
+	b6k6d2WUuK26p6AB13JgKIZaSZPvwg7FHnj9xhM7REYitQAi+MBsgtH/LnynMVJ6cfDONdz5BTa
+	687jOtNHNi+BpFFl09XP3qOKPoG4ZC0ZtmxLZHU+gyyImWKEj4HQ/Di+kgB/H3eCtim1iJoKRhj
+	kIYcc7Mw==
+X-Google-Smtp-Source: AGHT+IHBtWPH4jelDj6Y0Ec63Hqsod/0jXI3J7WAtxlFn+fwMlk9XiDtflvDQU5evXGP0LiMDHgQkw==
+X-Received: by 2002:a05:6a21:6da1:b0:18f:c6ac:807f with SMTP id wl33-20020a056a216da100b0018fc6ac807fmr5367400pzb.51.1702506471898;
+        Wed, 13 Dec 2023 14:27:51 -0800 (PST)
 Received: from stbirv-lnx-1.igp.broadcom.net ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id nc4-20020a17090b37c400b00285545ac9d2sm11432515pjb.47.2023.12.13.14.27.46
+        by smtp.gmail.com with ESMTPSA id nc4-20020a17090b37c400b00285545ac9d2sm11432515pjb.47.2023.12.13.14.27.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 14:27:47 -0800 (PST)
+        Wed, 13 Dec 2023 14:27:51 -0800 (PST)
 From: Justin Chen <justin.chen@broadcom.com>
 To: netdev@vger.kernel.org
 Cc: opendmb@gmail.com,
@@ -63,10 +63,12 @@ Cc: opendmb@gmail.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	Justin Chen <justin.chen@broadcom.com>
-Subject: [PATCH net v2 0/2] net: mdio: mdio-bcm-unimac: optimizations and clean up
-Date: Wed, 13 Dec 2023 14:27:42 -0800
-Message-Id: <20231213222744.2891184-1-justin.chen@broadcom.com>
+Subject: [PATCH net v2 1/2] net: mdio: mdio-bcm-unimac: Delay before first poll
+Date: Wed, 13 Dec 2023 14:27:43 -0800
+Message-Id: <20231213222744.2891184-2-justin.chen@broadcom.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231213222744.2891184-1-justin.chen@broadcom.com>
+References: <20231213222744.2891184-1-justin.chen@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,26 +76,52 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000057c725060c6bad9a"
+	boundary="0000000000008466de060c6badd2"
 
---00000000000057c725060c6bad9a
+--0000000000008466de060c6badd2
 Content-Transfer-Encoding: 8bit
 
-Clean up mdio poll to use read_poll_timeout() and reduce the potential
-poll time.
+With a clock interval of 400 nsec and a 64 bit transactions (32 bit
+preamble & 16 bit control & 16 bit data), it is reasonable to assume
+the mdio transaction will take 25.6 usec. Add a 30 usec delay before
+the first poll to reduce the chance of a 1000-2000 usec sleep.
 
-Justin Chen (2):
-  net: mdio: mdio-bcm-unimac: Delay before first poll
-  net: mdio: mdio-bcm-unimac: Use read_poll_timeout
+Reduce the timeout from 1000ms to 100ms as it is unlikely for the bus
+to take this long.
 
- drivers/net/mdio/mdio-bcm-unimac.c | 21 ++++++++-------------
- 1 file changed, 8 insertions(+), 13 deletions(-)
+Signed-off-by: Justin Chen <justin.chen@broadcom.com>
+Acked-by: Florian Fainelli <florian.fainelli@broadcom.com>
+---
+v2
+	- Add comment to address absense of C45 support
 
+ drivers/net/mdio/mdio-bcm-unimac.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/mdio/mdio-bcm-unimac.c b/drivers/net/mdio/mdio-bcm-unimac.c
+index e8cd8eef319b..297ea4a58d79 100644
+--- a/drivers/net/mdio/mdio-bcm-unimac.c
++++ b/drivers/net/mdio/mdio-bcm-unimac.c
+@@ -81,7 +81,13 @@ static inline unsigned int unimac_mdio_busy(struct unimac_mdio_priv *priv)
+ static int unimac_mdio_poll(void *wait_func_data)
+ {
+ 	struct unimac_mdio_priv *priv = wait_func_data;
+-	unsigned int timeout = 1000;
++	unsigned int timeout = 100;
++
++	/*
++	 * C22 transactions should take ~25 usec, will need to adjust
++	 * if C45 support is added.
++	 */
++	udelay(30);
+ 
+ 	do {
+ 		if (!unimac_mdio_busy(priv))
 -- 
 2.34.1
 
 
---00000000000057c725060c6bad9a
+--0000000000008466de060c6badd2
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -164,14 +192,14 @@ sDL+OV16G+F9CkNMN3txsym8Nnx5WAYZb6+rBUIhMGz70V05xsHQfzvo2s7f0J1tJ5BoRlPPhL0h
 VOnWA3h71u9TfSsv+PXVm3P21TfOS2uc1hbzEqyENCP4i5XQ0rv0TmPW42GZ0o4xggJtMIICaQIB
 ATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhH
 bG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwj8BKLXNpALfemdRAwDQYJ
-YIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIC+uZhH7YJ+TdrzPuI7doAw2VufN8ZWrKalh
-LXhaGm2IMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIxMzIy
-Mjc0OVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFl
+YIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIIE5ssVhBuIOEgdK5T8DyzF00Gedq6OR4J8x
+RwVsiHyjMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIxMzIy
+Mjc1MlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFl
 AwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATAN
-BgkqhkiG9w0BAQEFAASCAQBBoAt3RDw41IREnoTiNWlRqrVpITGgRl46iYlCnVTQJqxXyXkjp+UZ
-bilyqsffemsZYBvEVJe61/papSi2/ZWt4pIeWOGhtjDwTPsECWyFJ7uXUJd/436Qv62BGdwGxw98
-fCgPPLx8sM0Gynp6ax8WVCj8uHeM7+9YGcbNALT4Z3PrG2LTRGumpErkzBkDdvBGAeTTuHc5XoPy
-023Lzmvu6lySRkBcbEjJcVsAozoKXOzHgzK5DRqA5whv8wKYm6SxDbKwzdYICLrCVbEyE8SaorWp
-WrpJNUGWWl3tBKmPoJ+rNSp5eJWJB2VO0qKhNCGA5st8RjlvSFZ9S8YBX3ic
---00000000000057c725060c6bad9a--
+BgkqhkiG9w0BAQEFAASCAQB3tujW+kT8nR5rWiHlygCv8U6k1ON5xZzEJFTrGVx5iYEvU+7fpCJ3
+vx4Ufx8Frgdx+vHXQ3if8wVOifaDaW9dcFNbq9Zh9CDeXjnteDjMShCOqVGeK2RlqmPe5ZJBsdYj
+6I5C54qRvXP4NjG9C4q1HsrtQxsHotaIzsWfYlZ/dFi25DggLoTSpKKi2iZGMfC4gZmYnX7iid5V
+I2TR+RKg5//I280U4Z33K042EEGPCDJ3y9QzVp4TpIApvuWvIX2c4tMMTkzYN6ZZI7wFiWYVjZOP
+SQdUYLkxCy56lFgMwkMJV+gHm7bmQQ5zy5EKcampx3wvaMk8xPLS5g1zp+Tw
+--0000000000008466de060c6badd2--
 
