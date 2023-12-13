@@ -1,240 +1,151 @@
-Return-Path: <netdev+bounces-56718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1AC5810945
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 05:56:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AAA5810951
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 06:00:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B5751F21179
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 04:56:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E67B61F21978
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 05:00:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A837C15B;
-	Wed, 13 Dec 2023 04:55:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E56D7C8E7;
+	Wed, 13 Dec 2023 05:00:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hEXyEv+M"
 X-Original-To: netdev@vger.kernel.org
-Received: from anchovy3.45ru.net.au (anchovy3.45ru.net.au [203.30.46.155])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E247CF
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 20:55:52 -0800 (PST)
-Received: (qmail 11945 invoked by uid 5089); 13 Dec 2023 04:55:48 -0000
-Received: by simscan 1.2.0 ppid: 11867, pid: 11868, t: 0.5432s
-         scanners: regex: 1.2.0 attach: 1.2.0 clamav: 0.88.3/m:40/d:1950 spam: 3.1.4
-X-Spam-Level: 
-Received: from unknown (HELO ?192.168.1.24?) (rtresidd@electromag.com.au@202.90.244.20)
-  by anchovy2.45ru.net.au with ESMTPA; 13 Dec 2023 04:55:47 -0000
-Message-ID: <62f5452a-7ce9-46e0-a8fd-0056920fef19@electromag.com.au>
-Date: Wed, 13 Dec 2023 12:55:26 +0800
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9094AB7;
+	Tue, 12 Dec 2023 21:00:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702443614; x=1733979614;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=E2++cigaU5epJz8MvyaCLgexIN/en3jBO7RKWMnmda8=;
+  b=hEXyEv+MaRQonEHyWV7MFR+NRwEiNjGZ/fgTwWHn6+P6o7OC+c29qq4t
+   QRHdIIXDVQGFq/rOWDIh1Gohh21ZMkAlJKmx/63PHfq7M9vu16yNRJWl7
+   YIuF5teDr2pybOWWprndqqLJ8TAdFeitA/7iYfW9dgi+75GkE3kdfHWOr
+   8yBiENT4LWSn1FbaqL2iEaNHdLI//7416ZlC6Jj1cBONRp8vnDhJqD/Zi
+   CPCeZW75VLqu6KQUWg5pBxSKE7iEIOyqcO4phj1VKnd0kA70Ee3YD+dMe
+   2FeSa2JNLOccugsJ/Dgv6zOG1UjjLKhP0/r2L2dw1vu0HNUhNhyqyp9Ar
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="8289894"
+X-IronPort-AV: E=Sophos;i="6.04,272,1695711600"; 
+   d="scan'208";a="8289894"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 21:00:13 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="1105181391"
+X-IronPort-AV: E=Sophos;i="6.04,272,1695711600"; 
+   d="scan'208";a="1105181391"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by fmsmga005.fm.intel.com with ESMTP; 12 Dec 2023 21:00:07 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rDHLp-000K5V-2Q;
+	Wed, 13 Dec 2023 05:00:05 +0000
+Date: Wed, 13 Dec 2023 12:59:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: Christian Marangi <ansuelsmth@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	David Epping <david.epping@missinglinkelectronics.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Harini Katakam <harini.katakam@amd.com>,
+	linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: Re: [net-next PATCH v5 3/3] net: phy: add support for PHY package
+ MMD read/write
+Message-ID: <202312131208.HLapuT6A-lkp@intel.com>
+References: <20231212123743.29829-3-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: STMMAC Ethernet Driver support
-Content-Language: en-US
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
-  vinschen@redhat.com, netdev@vger.kernel.org
-References: <e5c6c75f-2dfa-4e50-a1fb-6bf4cdb617c2@electromag.com.au>
- <20231208101216.3fca85b1@kernel.org>
- <8a0850d8-a2e4-4eb0-81e1-d067f18c2263@electromag.com.au>
- <41903b8b-d145-4fdf-a942-79d7f88f9068@electromag.com.au>
- <f47b0230-1513-4a81-9d78-3f092b979c48@electromag.com.au>
- <2139624b-e098-457a-bda4-0387d576b53a@lunn.ch>
- <8ba4d31f-9436-43ad-afd7-997a4d3a4bf2@electromag.com.au>
- <rfg3fj2rhjxsnpula4tqhvdmmzdszlyebgaf2qxa4ncwb3gczo@wxf5graxwmib>
-From: Richard Tresidder <rtresidd@electromag.com.au>
-In-Reply-To: <rfg3fj2rhjxsnpula4tqhvdmmzdszlyebgaf2qxa4ncwb3gczo@wxf5graxwmib>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231212123743.29829-3-ansuelsmth@gmail.com>
 
-On 12/12/2023 5:27 pm, Serge Semin wrote:
-> On Tue, Dec 12, 2023 at 11:57:22AM +0800, Richard Tresidder wrote:
->> <font face="monospace">Richard Tresidder</font>
->>
->>
->> On 12/12/2023 12:16 am, Andrew Lunn wrote:
->>>> We use the SOC's internal  STMMAC interface to connect to a Marvel switch IC
->>>> and expose each port individually using vlan, I'd forgot that part.
->>>> It's an  88E6352-xx-TFJ2I000  device utilising the 'marvell,mv88e6085'
->>>> compatible driver  in drivers\net\dsa\mv88e6xxx
->>> Its odd you need VLANs. Each port should already be exposed to the
->>> host as netdev interfaces. That is what DSA does.
->>>
->>>        Andrew
->> Hi Andrew
->>     I'll read further on that one as this is the first time I've had to dig
->> into this side of the system.
->> It had always "just worked".
->> The ports show up in an 'ip l' list in the same style as a vlan with an @
->> symbol, naming isn't quite vlan style though.
->> That in concert with the fact this 'vlan_feature' line broke things has
->> possibly distorted my view of how they're propagated.
->> It's a rather trimmed down busybox image, so I'm missing some tools I'd
->> usually use to examine stuff.
->>
->> This is the config in the dts
->> **************************************
->> //------------------------------------------------------------------------------
->> // connected to dsa network switch
->> &gmac1 {
->>    clock-names = "stmmaceth", "clk_ptp_ref";
-> Just a side note irrelevant to the topic. You might be interested to
-> know STMMAC driver expects to have the PTP reference clock source
-> passed with the "ptp_ref" name, not "clk_ptp_ref".
->
-> -Serge(y)
-Cheers for that Surge
-The dts for this device hasn't been updated in a while!
-It was based on a 4.7 series kernel
-I vaguely remember coming across this change on clock naming a while 
-back when dealing with a pll device driver but looks like we missed this 
-one!
-Good catch
+Hi Christian,
 
-  Cheers Richard
->>    clocks = <&emac1_clk &hps_eosc1>;
->>    f2h_ptp_ref_clk;
->>    fixed-link {
->>      speed = <1000>;
->>      full-duplex;
->>    };
->> };
->>
->> //------------------------------------------------------------------------------
->> &mdio1 {
->>    #address-cells = <1>;
->>    #size-cells = <0>;
->>
->>    switch0: switch0@0 {
->>      compatible = "marvell,mv88e6085";
->>      #address-cells = <1>;
->>      reg = <0>;
->>      //reset-gpios = <&pio_a0 2 GPIO_ACTIVE_LOW>;
->>
->>      dsa,member = <0 0>;
->>
->>      ports {
->>        #address-cells = <1>;
->>        #size-cells = <0>;
->>
->>        port@2 {
->>          reg = <2>;
->>          label = "lan1";
->>          phy-handle = <&switch1phy2>;
->>        };
->>
->>        port@3 {
->>          reg = <3>;
->>          label = "lan2";
->>          phy-handle = <&switch1phy3>;
->>        };
->>
->>        port@4 {
->>          reg = <4>;
->>          label = "lan3";
->>          phy-handle = <&switch1phy4>;
->>        };
->>
->>        port@5 {
->>          reg = <5>;
->>          label = "wifi";
->>          fixed-link {
->>            speed = <100>;
->>            full-duplex;
->>          };
->>        };
->>
->>        port@6 {
->>          reg = <6>;
->>          label = "cpu";
->>          ethernet = <&gmac1>;
->>          fixed-link {
->>            speed = <1000>;
->>            full-duplex;
->>          };
->>        };
->>
->>      };
->>
->>      mdio {
->>        #address-cells = <1>;
->>        #size-cells = <0>;
->>        switch1phy2: switch1phy2@2 {
->>          reg = <2>;
->>          marvell,reg-init = <0 0x10 0 0x0200>; // Sense only on Rx Energy
->> Detect, no FLPs sents
->>        };
->>        switch1phy3: switch1phy3@3 {
->>          reg = <3>;
->>          marvell,reg-init = <0 0x10 0 0x0200>; // Sense only on Rx Energy
->> Detect, no FLPs sents
->>        };
->>        switch1phy4: switch1phy4@4 {
->>          reg = <4>;
->>          marvell,reg-init = <0 0x10 0 0x0200>; // Sense only on Rx Energy
->> Detect, no FLPs sents
->>        };
->>      };
->>
->>      };
->> };
->> *************************************************
->>
->> This is how they appear using 'ip l'
->> The @ symbol got me as I've usually associated this with vlan's in my day to
->> day networking.
->> But the config files don't configure them as vlans.
->> *************************************************
->> 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
->>      link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
->> 2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1508 qdisc mq qlen 1000
->>      link/ether 04:91:62:cf:4f:06 brd ff:ff:ff:ff:ff:ff
->> 3: sit0@NONE: <NOARP> mtu 1480 qdisc noop qlen 1000
->>      link/sit 0.0.0.0 brd 0.0.0.0
->> 4: lan1@eth0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue
->> qlen 1000
->>      link/ether 04:91:62:cf:4f:06 brd ff:ff:ff:ff:ff:ff
->> 5: lan2@eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue qlen
->> 1000
->>      link/ether 04:91:62:cf:4f:06 brd ff:ff:ff:ff:ff:ff
->> 6: lan3@eth0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue
->> qlen 1000
->>      link/ether 04:91:62:cf:4f:06 brd ff:ff:ff:ff:ff:ff
->> 7: wifi@eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue qlen
->> 1000
->>      link/ether 04:91:62:cf:4f:06 brd ff:ff:ff:ff:ff:ff
->>
->> *************************************************
->>
->> And these are the systemd config files
->> No vlan mentioned in there..
->> *************************************************
->> /etc/systemd/network/eth0.network
->> [Match]
->> Name=eth0
->>
->> [Network]
->>
->> /etc/systemd/network/lan.network
->> [Match]
->> Name=lan*
->>
->> [Network]
->> DHCP=yes
->> BindCarrier=eth0
->> LinkLocalAddressing=yes
->>
->> [DHCP]
->> UseDomains=yes
->> ClientIdentifier=mac
->>
->> *************************************************
->>
->> Cheers
->>     Richard
->>
->
+kernel test robot noticed the following build warnings:
 
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Marangi/net-phy-restructure-__phy_write-read_mmd-to-helper-and-phydev-user/20231212-203921
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231212123743.29829-3-ansuelsmth%40gmail.com
+patch subject: [net-next PATCH v5 3/3] net: phy: add support for PHY package MMD read/write
+config: arm-defconfig (https://download.01.org/0day-ci/archive/20231213/202312131208.HLapuT6A-lkp@intel.com/config)
+compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project.git f28c006a5895fc0e329fe15fead81e37457cb1d1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231213/202312131208.HLapuT6A-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312131208.HLapuT6A-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/phy/phy-core.c:777: warning: expecting prototype for __phy_package_write_mmd(). Prototype was for phy_package_write_mmd() instead
+
+
+vim +777 drivers/net/phy/phy-core.c
+
+   757	
+   758	/**
+   759	 * __phy_package_write_mmd - write MMD reg relative to PHY package base addr
+   760	 * @phydev: The phy_device struct
+   761	 * @addr_offset: The offset to be added to PHY package base_addr
+   762	 * @devad: The MMD to write to
+   763	 * @regnum: The register on the MMD to write
+   764	 * @val: value to write to @regnum
+   765	 *
+   766	 * Convenience helper for writing a register of an MMD on a given PHY
+   767	 * using the PHY package base address. The base address is added to
+   768	 * the addr_offset value.
+   769	 *
+   770	 * Same calling rules as for phy_write();
+   771	 *
+   772	 * NOTE: It's assumed that the entire PHY package is either C22 or C45.
+   773	 */
+   774	int phy_package_write_mmd(struct phy_device *phydev,
+   775				  unsigned int addr_offset, int devad,
+   776				  u32 regnum, u16 val)
+ > 777	{
+   778		struct phy_package_shared *shared = phydev->shared;
+   779		int addr = shared->base_addr + addr_offset;
+   780		int ret;
+   781	
+   782		if (addr >= PHY_MAX_ADDR)
+   783			return -EIO;
+   784	
+   785		if (regnum > (u16)~0 || devad > 32)
+   786			return -EINVAL;
+   787	
+   788		phy_lock_mdio_bus(phydev);
+   789		ret = mmd_phy_write(phydev->mdio.bus, addr, phydev->is_c45, devad,
+   790				    regnum, val);
+   791		phy_unlock_mdio_bus(phydev);
+   792	
+   793		return ret;
+   794	}
+   795	EXPORT_SYMBOL(phy_package_write_mmd);
+   796	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
