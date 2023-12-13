@@ -1,315 +1,208 @@
-Return-Path: <netdev+bounces-56751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C07F2810BE3
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 08:53:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7687B810BF5
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:05:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B9A3B20A4E
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 07:52:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D4271F210E1
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 08:05:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 806F51B298;
-	Wed, 13 Dec 2023 07:52:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D741C6A5;
+	Wed, 13 Dec 2023 08:05:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sp6Pj7hK"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jjNwQL5G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D084BF2
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 23:52:50 -0800 (PST)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-40c25973988so67856785e9.2
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 23:52:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702453969; x=1703058769; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M39btmxp5CMOvqAic+iM2gRDFVus/hb+Dtb73l5YcRQ=;
-        b=sp6Pj7hKu+lK93QwTGNytyOkZEVL5VJgYXC/Te9Dly9QURdrnkTE7T8YZ6bsdqAmQJ
-         YNuMF9yHWUEu2W3LBADG6YUzvWsZGt39sDhQuKWWVG4sc1USFv24IPAGOaSz/SLgFQb5
-         PqtSfIq8je9pE68QSc5Coq2hulrEIpM2Iqd70uE4xjLzGnO0022NwWhazV67NqZXgmt7
-         AZsOKcCA5SE+4R2ujHMyc+3DSpK2MKGXNOaov+lJR2UGDf4q1SU1t9PPlRWKLELweOWP
-         O5N+2azhs26gSyE9CpsxsXo7NHxabfaEr4pxhoGvHMJKcE+9fEaS3Ybhq64n7P99YUb0
-         /Kpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702453969; x=1703058769;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M39btmxp5CMOvqAic+iM2gRDFVus/hb+Dtb73l5YcRQ=;
-        b=GR12mmwF437ROdsbd0kuh1iYbS9tttqYEc3OnOTGwwH0NSeawvhf6ZYTPzvos0TTSP
-         4GwMg4XQDoiI1Rp1YRuXfdLqa5ugNwbWGqDBdoWvq+H/BIWGv8E5H1gVfAYd6MkN+4UP
-         tGw8QWETWsk9cuTqlRx3VxVrK2BAR7vM9Yd8+19+WeEGaKya2ClkMxSSbkV5mcyWRD+H
-         IrHe4ablHq9t8SGmZF30RH505H1svzgzvwSuU/SY/ukEaA+oD28e7dkwmVcjov4GrVGk
-         GtfG2HrsHii9SGlwLlj6J9o4aDhynT3U4Nkx6mK3oTp13Fp/keg4fEe9KNbvepX2tw+6
-         BRRw==
-X-Gm-Message-State: AOJu0YyUHlOb+oUHua4coNvKcLUU+yp9MKm7dX1kL+C1HwrihxGgMGNw
-	2Thz60x5uTpSZtj0PRX5DDSqZqqWexEiwap4gmIASw==
-X-Google-Smtp-Source: AGHT+IF8GsUa/W3RJdThooSHp8WYWcUSc4eP6rXO8ssH3BcKraug5UQYXMvk50EClsQDU3QAMz82hldzzEvDsMEPiCw=
-X-Received: by 2002:a05:600c:11ce:b0:40c:377c:4b62 with SMTP id
- b14-20020a05600c11ce00b0040c377c4b62mr3749772wmi.50.1702453969020; Tue, 12
- Dec 2023 23:52:49 -0800 (PST)
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92560B2;
+	Wed, 13 Dec 2023 00:05:37 -0800 (PST)
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BD7x5t5028802;
+	Wed, 13 Dec 2023 08:05:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=krym0HY/pPafi8NwsXn9ZFmG16blrZh3WAY8SGvQUec=; b=jj
+	NwQL5GbLj4obCxjevLbfa6D1x3Wu2DOzYaV6ynnbUxWbiGRYlaoaZr/2JWPLgamC
+	nZLs14TkfTenK7DKoyDWCJJRFMIV6GJkWez2Zh8LxYrJOBsQ8sZ+CQUYKXbo2qda
+	y3r/2XfQ9V4drpkRr+l7LNMyYhsNC2i2GbjLO2NUfRc8eUoLy/ZKHLYU2IcvQGd0
+	SQssq8Kdcv387oIqEPVeK0QsENMqndZqj7IkBzLEpHZ2HqCvL+ZvUSU7Ak0okEFj
+	brUi1+Q8Vew/IrQLUxn3hyl8/FV4JWXIhBxDPX2i8a6z5wI0nheW9iLGrA9Yi1Fh
+	76GPY6oxpRh1TkbBSuQw==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uy3rprqnd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Dec 2023 08:05:12 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BD85Bju017157
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Dec 2023 08:05:11 GMT
+Received: from [10.253.13.71] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 13 Dec
+ 2023 00:05:06 -0800
+Message-ID: <0495f1c2-00e6-4fa5-aaae-cf01475ef2ba@quicinc.com>
+Date: Wed, 13 Dec 2023 16:05:03 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231208005250.2910004-1-almasrymina@google.com>
- <20231208005250.2910004-10-almasrymina@google.com> <32211cbf-3a4e-8a86-6214-4304ddb18a98@huawei.com>
- <CAHS8izOQcuLPwvDff96fuNB7r6EU9OWt3ShueQp=u7wat3L5LA@mail.gmail.com>
- <92e30bd9-6df4-b72f-7bcd-f4fe5670eba2@huawei.com> <CAHS8izPEFsqw50qgM+sPot6XVvOExpd+DrwrmPSR3zsWGLysRw@mail.gmail.com>
- <CAHS8izN6Cbjy0FCYhJyNsP396XfgJ_nTFXWuHb5QWNct=PifAg@mail.gmail.com>
-In-Reply-To: <CAHS8izN6Cbjy0FCYhJyNsP396XfgJ_nTFXWuHb5QWNct=PifAg@mail.gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 12 Dec 2023 23:52:34 -0800
-Message-ID: <CAHS8izODNXtmhBoPk6z=wuj8tvbndcHHHxcZmH64hY57znT-Mg@mail.gmail.com>
-Subject: Re: [net-next v1 09/16] page_pool: device memory support
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
-	David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeelb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/5] net: mdio: ipq4019: enable the SoC uniphy clocks
+ for ipq5332 platform
+Content-Language: en-US
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+        <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
+References: <20231212115151.20016-1-quic_luoj@quicinc.com>
+ <20231212115151.20016-3-quic_luoj@quicinc.com>
+ <20231212134621.0fe2583f@device.home>
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <20231212134621.0fe2583f@device.home>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: -nDUJhHxRajZkDQu6Fy_X7hz_TInw8sM
+X-Proofpoint-GUID: -nDUJhHxRajZkDQu6Fy_X7hz_TInw8sM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
+ mlxscore=0 suspectscore=0 impostorscore=0 adultscore=0 malwarescore=0
+ mlxlogscore=999 bulkscore=0 priorityscore=1501 phishscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2312130057
 
-On Sun, Dec 10, 2023 at 8:04=E2=80=AFPM Mina Almasry <almasrymina@google.co=
-m> wrote:
->
-> On Sun, Dec 10, 2023 at 6:26=E2=80=AFPM Mina Almasry <almasrymina@google.=
-com> wrote:
-> >
-> > On Sun, Dec 10, 2023 at 6:04=E2=80=AFPM Yunsheng Lin <linyunsheng@huawe=
-i.com> wrote:
-> > >
-> > > On 2023/12/9 0:05, Mina Almasry wrote:
-> > > > On Fri, Dec 8, 2023 at 1:30=E2=80=AFAM Yunsheng Lin <linyunsheng@hu=
-awei.com> wrote:
-> > > >>
-> > > >>
-> > > >> As mentioned before, it seems we need to have the above checking e=
-very
-> > > >> time we need to do some per-page handling in page_pool core, is th=
-ere
-> > > >> a plan in your mind how to remove those kind of checking in the fu=
-ture?
-> > > >>
-> > > >
-> > > > I see 2 ways to remove the checking, both infeasible:
-> > > >
-> > > > 1. Allocate a wrapper struct that pulls out all the fields the page=
- pool needs:
-> > > >
-> > > > struct netmem {
-> > > >         /* common fields */
-> > > >         refcount_t refcount;
-> > > >         bool is_pfmemalloc;
-> > > >         int nid;
-> > > >         ...
-> > > >         union {
-> > > >                 struct dmabuf_genpool_chunk_owner *owner;
-> > > >                 struct page * page;
-> > > >         };
-> > > > };
-> > > >
-> > > > The page pool can then not care if the underlying memory is iov or
-> > > > page. However this introduces significant memory bloat as this stru=
-ct
-> > > > needs to be allocated for each page or ppiov, which I imagine is no=
-t
-> > > > acceptable for the upside of removing a few static_branch'd if
-> > > > statements with no performance cost.
-> > > >
-> > > > 2. Create a unified struct for page and dmabuf memory, which the mm
-> > > > folks have repeatedly nacked, and I imagine will repeatedly nack in
-> > > > the future.
-> > > >
-> > > > So I imagine the special handling of ppiov in some form is critical
-> > > > and the checking may not be removable.
-> > >
-> > > If the above is true, perhaps devmem is not really supposed to be int=
-ergated
-> > > into page_pool.
-> > >
-> > > Adding a checking for every per-page handling in page_pool core is ju=
-st too
-> > > hacky to be really considerred a longterm solution.
-> > >
-> >
-> > The only other option is to implement another page_pool for ppiov and
-> > have the driver create page_pool or ppiov_pool depending on the state
-> > of the netdev_rx_queue (or some helper in the net stack to do that for
-> > the driver). This introduces some code duplication. The ppiov_pool &
-> > page_pool would look similar in implementation.
-> >
-> > But this was all discussed in detail in RFC v2 and the last response I
-> > heard from Jesper was in favor if this approach, if I understand
-> > correctly:
-> >
-> > https://lore.kernel.org/netdev/7aedc5d5-0daf-63be-21bc-3b724cc1cab9@red=
-hat.com/
-> >
-> > Would love to have the maintainer weigh in here.
-> >
->
-> I should note we may be able to remove some of the checking, but maybe no=
-t all.
->
-> - Checks that disable page fragging for ppiov can be removed once
-> ppiov has frag support (in this series or follow up).
->
-> - If we use page->pp_frag_count (or page->pp_ref_count) for
-> refcounting ppiov, we can remove the if checking in the refcounting.
->
-> - We may be able to store the dma_addr of the ppiov in page->dma_addr,
-> but I'm unsure if that actually works, because the dma_buf dmaddr is
-> dma_addr_t (u32 or u64), but page->dma_addr is unsigned long (4 bytes
-> I think). But if it works for pages I may be able to make it work for
-> ppiov as well.
->
-> - Checks that obtain the page->pp can work with ppiov if we align the
-> offset of page->pp and ppiov->pp.
->
-> - Checks around page->pp_magic can be removed if we also have offset
-> aligned ppiov->pp_magic.
->
-> Sadly I don't see us removing the checking for these other cases:
->
-> - page_is_pfmemalloc(): I'm not allowed to pass a non-struct page into
-> that helper.
->
-> - page_to_nid(): I'm not allowed to pass a non-struct page into that help=
-er.
->
-> - page_pool_free_va(): ppiov have no va.
->
-> - page_pool_sync_for_dev/page_pool_dma_map: ppiov backed by dma-buf
-> fundamentally can't get mapped again.
->
-> Are the removal (or future removal) of these checks enough to resolve thi=
-s?
->
 
-I took a deeper look here, and with some effort I'm able to remove
-almost all the custom checks for ppiov. The only remaining checks for
-devmem are the checks around these mm calls:
 
-page_is_pfmemalloc()
-page_to_nid()
-page_ref_count()
-compound_head()
+On 12/12/2023 8:46 PM, Maxime Chevallier wrote:
+> Hello,
+> 
+> On Tue, 12 Dec 2023 19:51:47 +0800
+> Luo Jie <quic_luoj@quicinc.com> wrote:
+> 
+>> On the platform ipq5332, the related SoC uniphy GCC clocks need
+>> to be enabled for making the MDIO slave devices accessible.
+>>
+>> These UNIPHY clocks are from the SoC platform GCC clock provider,
+>> which are enabled for the connected PHY devices working.
+>>
+>> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> 
+> [...]
+> 
+>>   static int ipq4019_mdio_wait_busy(struct mii_bus *bus)
+>> @@ -209,14 +230,43 @@ static int ipq4019_mdio_write_c22(struct mii_bus *bus, int mii_id, int regnum,
+>>   static int ipq_mdio_reset(struct mii_bus *bus)
+>>   {
+>>   	struct ipq4019_mdio_data *priv = bus->priv;
+>> -	int ret;
+>> +	int ret, index;
+>> +	unsigned long rate;
+> 
+> Please remember to use reverse christmas-tree ordering, meaning longer
+> declaration lines go first :
+> 
+> 	struct ipq4019_mdio_data *priv = bus->priv;
+> 	unsigned long rate;
+> 	int ret, index;
 
-page_is_pfmemalloc() checks can be removed by using a bit
-page->pp_magic potentially to indicate pfmemalloc().
+Thanks, i will update this.
 
-The other 3, I'm not sure I can remove. They rely on the page flags or
-other fields not specific to page_pool pages. The next version should
-come with the most minimal amount of devmem checks for the page_pool.
-
-> > > It is somewhat ironical that devmem is using static_branch to allivia=
-te the
-> > > performance impact for normal memory at the possible cost of performa=
-nce
-> > > degradation for devmem, does it not defeat some purpose of intergatin=
-g devmem
-> > > to page_pool?
-> > >
-> >
-> > I don't see the issue. The static branch sets the non-ppiov path as
-> > default if no memory providers are in use, and flips it when they are,
-> > making the default branch prediction ideal in both cases.
-> >
-> > > >
-> > > >> Even though a static_branch check is added in page_is_page_pool_io=
-v(), it
-> > > >> does not make much sense that a core has tow different 'struct' fo=
-r its
-> > > >> most basic data.
-> > > >>
-> > > >> IMHO, the ppiov for dmabuf is forced fitting into page_pool withou=
-t much
-> > > >> design consideration at this point.
-> > > >>
-> > > > ...
-> > > >>
-> > > >> For now, the above may work for the the rx part as it seems that y=
-ou are
-> > > >> only enabling rx for dmabuf for now.
-> > > >>
-> > > >> What is the plan to enable tx for dmabuf? If it is also intergrate=
-d into
-> > > >> page_pool? There was a attempt to enable page_pool for tx, Eric se=
-emed to
-> > > >> have some comment about this:
-> > > >> https://lkml.kernel.org/netdev/2cf4b672-d7dc-db3d-ce90-15b4e91c400=
-5@huawei.com/T/#mb6ab62dc22f38ec621d516259c56dd66353e24a2
-> > > >>
-> > > >> If tx is not intergrated into page_pool, do we need to create a ne=
-w layer for
-> > > >> the tx dmabuf?
-> > > >>
-> > > >
-> > > > I imagine the TX path will reuse page_pool_iov, page_pool_iov_*()
-> > > > helpers, and page_pool_page_*() helpers, but will not need any core
-> > > > page_pool changes. This is because the TX path will have to piggyba=
-ck
-> > >
-> > > We may need another bit/flags checking to demux between page_pool own=
-ed
-> > > devmem and non-page_pool owned devmem.
-> > >
-> >
-> > The way I'm imagining the support, I don't see the need for such
-> > flags. We'd be re-using generic helpers like
-> > page_pool_iov_get_dma_address() and what not that don't need that
-> > checking.
-> >
-> > > Also calling page_pool_*() on non-page_pool owned devmem is confusing
-> > > enough that we may need a thin layer handling non-page_pool owned dev=
-mem
-> > > in the end.
-> > >
-> >
-> > The page_pool_page* & page_pool_iov* functions can be renamed if
-> > confusing. I would think that's no issue (note that the page_pool_*
-> > functions need not be called for TX path).
-> >
-> > > > on MSG_ZEROCOPY (devmem is not copyable), so no memory allocation f=
-rom
-> > > > the page_pool (or otherwise) is needed or possible. RFCv1 had a TX
-> > > > implementation based on dmabuf pages without page_pool involvement,=
- I
-> > > > imagine I'll do something similar.
-> > > It would be good to have a tx implementation for the next version, so
-> > > that we can have a whole picture of devmem.
-> > >
-> > > >
-> >
-> >
-> >
-> > --
-> > Thanks,
-> > Mina
->
->
->
-> --
+> 
+>> +
+>> +	/* For the platform ipq5332, there are two SoC uniphies available
+>> +	 * for connecting with ethernet PHY, the SoC uniphy gcc clock
+>> +	 * should be enabled for resetting the connected device such
+>> +	 * as qca8386 switch, qca8081 PHY or other PHYs effectively.
+>> +	 *
+>> +	 * Configure MDIO/UNIPHY clock source frequency if clock instance
+>> +	 * is specified in the device tree.
+>> +	 */
+>> +	for (index = MDIO_CLK_MDIO_AHB; index < MDIO_CLK_CNT; index++) {
+>> +		switch (index) {
+>> +		case MDIO_CLK_MDIO_AHB:
+>> +			rate = IPQ_MDIO_CLK_RATE;
+>> +			break;
+>> +		case MDIO_CLK_UNIPHY0_AHB:
+>> +		case MDIO_CLK_UNIPHY1_AHB:
+>> +			rate = IPQ_UNIPHY_AHB_CLK_RATE;
+>> +			break;
+>> +		case MDIO_CLK_UNIPHY0_SYS:
+>> +		case MDIO_CLK_UNIPHY1_SYS:
+>> +			rate = IPQ_UNIPHY_SYS_CLK_RATE;
+>> +			break;
+>> +		default:
+>> +			break;
+>> +		}
+>>   
+>> -	/* Configure MDIO clock source frequency if clock is specified in the device tree */
+>> -	ret = clk_set_rate(priv->mdio_clk, IPQ_MDIO_CLK_RATE);
+>> -	if (ret)
+>> -		return ret;
+>> +		ret = clk_set_rate(priv->clk[index], rate);
+>> +		if (ret)
+>> +			return ret;
+>> +
+>> +		ret = clk_prepare_enable(priv->clk[index]);
+>> +		if (ret)
+>> +			return ret;
+>> +	}
+>>   
+>> -	ret = clk_prepare_enable(priv->mdio_clk);
+>>   	if (ret == 0)
+>>   		mdelay(10);
+>>   
+>> @@ -240,10 +290,6 @@ static int ipq4019_mdio_probe(struct platform_device *pdev)
+>>   	if (IS_ERR(priv->membase))
+>>   		return PTR_ERR(priv->membase);
+>>   
+>> -	priv->mdio_clk = devm_clk_get_optional(&pdev->dev, "gcc_mdio_ahb_clk");
+>> -	if (IS_ERR(priv->mdio_clk))
+>> -		return PTR_ERR(priv->mdio_clk);
+>> -
+>>   	/* These platform resources are provided on the chipset IPQ5018 or
+>>   	 * IPQ5332.
+>>   	 */
+>> @@ -271,6 +317,13 @@ static int ipq4019_mdio_probe(struct platform_device *pdev)
+>>   		}
+>>   	}
+>>   
+>> +	for (index = 0; index < MDIO_CLK_CNT; index++) {
+>> +		priv->clk[index] = devm_clk_get_optional(&pdev->dev,
+>> +							 mdio_clk_name[index]);
+>> +		if (IS_ERR(priv->clk[index]))
+>> +			return PTR_ERR(priv->clk[index]);
+>> +	}
+> 
+> You should be able to use devm_clk_bulk_get_optional(), to avoid that
+> loop.
+> 
 > Thanks,
-> Mina
+> 
+> Maxime
+
+Thanks Maxime for the suggestion.
+These clocks need to be configured the different clock rate, MDIO system
+clock works on 100MHZ, but UNIPHY system clock works on 24MHZ.
+
+For the clock rate set, i still need the loop to configure the different
+clock rate on the different clock instance.
+
+So i use the devm_clk_get_optional to acquire the exact clock ID here.
 
 
-
---=20
-Thanks,
-Mina
 
