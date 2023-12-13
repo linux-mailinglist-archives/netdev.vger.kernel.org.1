@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-56873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13FF78110DB
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:16:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E0098110DC
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:16:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83CFA1F212ED
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 12:16:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DD7D1C20EC6
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 12:16:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD28C28E26;
-	Wed, 13 Dec 2023 12:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CBAA29406;
+	Wed, 13 Dec 2023 12:15:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="oIdJ25qZ"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="iRioFqiv"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2084.outbound.protection.outlook.com [40.107.20.84])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3A7ACF
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 04:15:54 -0800 (PST)
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2057.outbound.protection.outlook.com [40.107.6.57])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 768A0E4
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 04:15:55 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AA934ggZjf7PCplBiuAWh+OJBMgs+plMANYBd/HiMC6iDRPPq0qHm74Of6kcJ1nQPFEffqiRGF34HCf5PfGSo1Bn6/7Z6VlYgJ8vGR1UVFt6qNPOU65Y70/e66h5eAYIa9LMOtngv0AW0eq+HTfOD8hU8YWwpUg1D6izJsk9JMPTsUlFfnyHzVWVjx4UyMDgZBkZXLbqEcUkpROpEFiRBkfCtzwgCvnx/pf+YehAoDnbUhh9v+Wvqx11FFpa1Oew8r7dNuunYhCh0fYE84/iHPjdMQNqJUQkXZi3ybj8EVE6LelWDVx3LgpwinLKZ49F1Yw7m2QprUg5ddiSB9xwqw==
+ b=kSxPzQjIhGZx3da1duwfZeBhw23hHoDp69QTDcEd2yFuaZERD62l/1zsKAmRd4VYLtR2FOX9Dj5HDujNO+ctkMS9RHgOQ2dren4aQOOiyeoxC+Hit90LFgBai7Dju2gudZ3dR/108YUGTUv1IK/nky94pJepPkWtqQn9e52DUPYeUk8U2ICKs2Ei6lewyTAwp9kR+vA7G0dpUs0I1cwk5ClwJMztB6roUCo6RcSuqKqzDn6CWyigCEpLGQlgWmqI7bf5ER55nlAJ9N11Fwyah/D9FPtc4SqwwJnRK4AHvsDSnIrxXfx2IwbMnZfsKk8Yzjk82wlIPdtgvsQbZzaXaA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xdltuH3SZgiHn+mCN7QDEGebCcb4fWERK38PuZULMHs=;
- b=NqWm6MI6QD5zPwddA9DhrY9QQujN8sCRiDeGDJJxTeD6dGUaPLTucdqFF8W4ONj2E98h6BOcaYEMxBWxBoeq7gytS5t39pCrtt+EOsbIVKPfE59A1yz/BF32jmv/idzAwrmcvrXaam05dR/tJ+WK/9OuYZmPIKRWaOZnmiU+HQ6wkTKWKXQZTEGF/H3wlUoTuqv+sceD+GgXPLtK1pZehiEX3Q5Qqhbo0Z6jAfoi8wG4kTHQgSRlT/zTWnhFAAf59SBeED+uRHZopA5iCmDjY3KjW9fkFc0suu6AebtfcYYax5S3jZtmFYdlxs/opmBsDmG4p0S11hgP0caXJ1eiqQ==
+ bh=MINwNap2inbO1AOWDShHCzH8T/m/ImIfhK/QZcjGEIs=;
+ b=d8DAsBUL9qhKyql916tFaSZeKC+qhsk5KRTyekwllqMB5bapmJEJXMo+hnkk/MHhXJZACXENINwdRSa7+kj3Zfp6sg5OSLFytKigV2csy3gWMwMV+QDrkflbZmb8le2xlW3cIFoVEVOg8AHxaNsCX5k0asuHryVP+1aJjC7OeiJgYDMp4rjKcw4+zK1U0PydyAxE234zgo9t1fy8aFcs2VK7F/W4dF6zM/TFvCL6Ybu0BTxUbv9uV90NnakcBao4bQ6RyCto5RkDNO6HQQgzHAuBC0HUpIqvE+tL8ZyPj23LBuQfeJ1lroOwk5WaA02/2+/k7E76Ui6/ZE5x/WLXtA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xdltuH3SZgiHn+mCN7QDEGebCcb4fWERK38PuZULMHs=;
- b=oIdJ25qZzB9bu8c4dErmTT/6xLzbdVS2Kcrtha+JlV+eHARFo8v86EWWSlOHrkSxbCPMlajLEtEMcIgIVuEJ9rX3RcPui4ObortVJpTFLfhc6NApzOeB5anxJ7Tm5sM5poHS0nEYf4AEJUvUCWsxiwbdRrg5Qu1lKGZ5dsVGZXM=
+ bh=MINwNap2inbO1AOWDShHCzH8T/m/ImIfhK/QZcjGEIs=;
+ b=iRioFqivzSUIds3eDrYkTzGx+Zl5Oso8NFENeqTaxecCkevuNnfTm++Okihvx4SKXbJuNTVeBfIwwVk82GvL5DwzyDmsACm/CeEIxlzSabCOwrtOJsPAbldvK6JA7yUxudu1PodTObuVz7OrBaH5nfwJyuITk5oXXGOIY9p2vNo=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from GV1PR04MB9070.eurprd04.prod.outlook.com (2603:10a6:150:21::14)
- by AS8PR04MB7894.eurprd04.prod.outlook.com (2603:10a6:20b:2aa::18) with
+ by AM9PR04MB8455.eurprd04.prod.outlook.com (2603:10a6:20b:414::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.26; Wed, 13 Dec
- 2023 12:15:50 +0000
+ 2023 12:15:52 +0000
 Received: from GV1PR04MB9070.eurprd04.prod.outlook.com
  ([fe80::1290:90d4:98c1:3d35]) by GV1PR04MB9070.eurprd04.prod.outlook.com
  ([fe80::1290:90d4:98c1:3d35%7]) with mapi id 15.20.7091.022; Wed, 13 Dec 2023
- 12:15:50 +0000
+ 12:15:52 +0000
 From: Ioana Ciornei <ioana.ciornei@nxp.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -50,16 +50,16 @@ To: davem@davemloft.net,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org
 Cc: Ioana Ciornei <ioana.ciornei@nxp.com>
-Subject: [PATCH net-next v2 6/8] dpaa2-switch: reorganize the [pre]changeupper events
-Date: Wed, 13 Dec 2023 14:14:09 +0200
-Message-Id: <20231213121411.3091597-7-ioana.ciornei@nxp.com>
+Subject: [PATCH net-next v2 7/8] dpaa2-switch: move a check to the prechangeupper stage
+Date: Wed, 13 Dec 2023 14:14:10 +0200
+Message-Id: <20231213121411.3091597-8-ioana.ciornei@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231213121411.3091597-1-ioana.ciornei@nxp.com>
 References: <20231213121411.3091597-1-ioana.ciornei@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: AS4P189CA0059.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:20b:659::29) To GV1PR04MB9070.eurprd04.prod.outlook.com
+X-ClientProxiedBy: AS4P189CA0068.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:20b:659::23) To GV1PR04MB9070.eurprd04.prod.outlook.com
  (2603:10a6:150:21::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -68,179 +68,128 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: GV1PR04MB9070:EE_|AS8PR04MB7894:EE_
-X-MS-Office365-Filtering-Correlation-Id: be251c65-a4c5-4b99-e30e-08dbfbd53f0f
+X-MS-TrafficTypeDiagnostic: GV1PR04MB9070:EE_|AM9PR04MB8455:EE_
+X-MS-Office365-Filtering-Correlation-Id: 17c7b519-45f4-4d4a-6014-08dbfbd54030
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	bWBxA0gCCmWSPPKo7EUaQWieIa6ZCPbQs3v1HLeBFiaed9eGghBegvBSD1UuY9fnt8mGhm3JT4smADKql9h8yrCveY8mByN/jtVmzoBi3X4oFuaC1oR4Vj1RbABRbqFSquQpeRHn7sqBSRWK6WXIZz1O5L1TyBlSBuIZWWtMx063z1u4R0JbWr9fBq/DiSdcAQA4uyMgkcXK08nvQdlc+wnjX2tWY3wJn3yrI3vF9MughJjovEVdQo+ty3jRfE/mlIqxgWrDsYC36AI/VMP1Wm4bWT5jWJ4C/btKsdAy5gSwunIogVLT7ciJn5F/o7WcJAWoye+GWPAGX2zndULoAElGqbkAe7KfVL0Y7NsGRAkJUoZd6avLoQsLaNHaU/jyMpEIHqLpTqa0Iv3xEiVnLxIEkTgAqn+L5HkJlN3rRgjQ9P1gHiyXSVFxhiciZrEFA/KXYJq+Rk43FchRsOYDd/oAZwzdyrCvOw3MyCfJcrmICr5UMFms8eqAw0xEz7PsRDTTi+USVrDaGCt0olAIZ3ksBhTIgVd7iTFSyFBADYvl0T/r0RDKx+NXzmJJj/LB
+	BwshD3AououszJhTgVL6GKquUMTl+EBox7IWGyZtrS40mvoPy65RnpFFrXBgVUzmZJNxwyCrxVCSYDhztC7LqVq29u/NPGgwsy58ZesToVkbtRehcAnw7u98yT3XlvJdfo57diY+3T4a9odDaEU49rTv/u0hffAC9ab1XCeKHz8I3yVtlefDuUZv4+dMO7Xr8/gZTXy8D5BbOnYO+DJ4z2BiV0HhbbGwWxPdyq7d0GQdfVZYGa6Y+EKiO3eDUZjy3z03S8qQTYeYycB4LaPv3XDJGqXMe14yaTlBCxbqaOx12HdYs664WtIktvED8AmFZx/WEJ2R71Uj1ab0b5Rdt3jfRWOX6fvyqg6fXmhMr3Yt/36cMqeYf85spe0zo8VQJYdC68UD85L5D+VilxEB820J+FzY1fHI2wLRZDQK4yGEl8cezgOqvoGpnPbozjmSuw4odgJlzAw7M1kDq7kY8M6MoAxQYfqjiG4b5wXcHjpQJHJKzilNnz+jTM9+uSyMCvQesZ7no2RbUV6BVDXfiuOX28mg7xm6uZ++Hl+BQBCuK1eVz+nFA4/W2K5JMzGx
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9070.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(136003)(396003)(39860400002)(346002)(366004)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(26005)(2616005)(1076003)(86362001)(83380400001)(6666004)(6506007)(6512007)(66946007)(6486002)(44832011)(478600001)(4326008)(8936002)(8676002)(36756003)(5660300002)(41300700001)(2906002)(38100700002)(66476007)(66556008)(316002);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9070.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(136003)(396003)(366004)(39860400002)(230922051799003)(186009)(451199024)(1800799012)(64100799003)(83380400001)(38100700002)(26005)(5660300002)(44832011)(8936002)(316002)(8676002)(2906002)(4326008)(478600001)(66476007)(41300700001)(6512007)(6666004)(6506007)(6486002)(66556008)(66946007)(2616005)(1076003)(36756003)(86362001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?cipKXvk+yWVi+zDLddx6/Dc7gsKKBtkI4HmB0NMCVO0om/JVPrj5aXHji60J?=
- =?us-ascii?Q?NwKLfx3bGdGEdHJdHVWU9bGyY2f3RzX3QLEHBOnmwh+IbDZZuaQzgBXeYlkf?=
- =?us-ascii?Q?ZTQtujtwKqgXwop6s69tAOh2QByu4h+dNQf4OfsmNYvMQkYjPRVrtFenZ1HE?=
- =?us-ascii?Q?f5svY3BOZptA035o8vVjILsvGLhK2ivdgqQ7oU+U9nABNaf++JqVQPvxubsY?=
- =?us-ascii?Q?3p98UUnVv2jQviW1KqZga+Gp7hB63FJUO5iu1B8V+sEwH2Ex63xOf0F4MMUp?=
- =?us-ascii?Q?BhrwvHDbBYX4h3Lsvg87mWbwGuivwbLj5Q1jFk0Q7pxlddYesbpv1Q1gdhBF?=
- =?us-ascii?Q?IMThbjArVHkT3NmGcjl5csagy0piNH3hcO263zI0/NP8vXXiEiyjArt3CQnj?=
- =?us-ascii?Q?tIyzLz0LMXt+MBjib0j2punTJLh1ilSFXixTYbhFCdVAPqwRDXp+MgpQJmuy?=
- =?us-ascii?Q?84RKgw7l9Sq+Xoh6V6pH7U/iql7a4cjVjNko4mFzb3TZUsZzdEvObuDlTKSA?=
- =?us-ascii?Q?Vp5Sa76TJdn7KGt/I26uwZGyZ+iyW0qoTkXlSgKX44Su4hnmpg6Iv7UPjh3/?=
- =?us-ascii?Q?vJRH+QHh0tJBrqNSZl9zGgce8n2CE6y6ZIlzjcEheaKljmCU4rdt19DmDExs?=
- =?us-ascii?Q?Bu5jsd7NqkXjHGJEj1oIr26IFdONw6WKyLuWL8T4Gk6J5kCD3jpB0FVLnyz+?=
- =?us-ascii?Q?iExxrmKxbbtbExrOTh7mJeyxgZ79T5tQvChj11XT55Hgw14U0x+UnfsehIAc?=
- =?us-ascii?Q?y+OG2wd4zI8sdxZKRZO84TdG6ObIkEGMmU4bV4IM68zoo94Gib1ImLD3hGzP?=
- =?us-ascii?Q?Q3mRSAJnjYfss8k5/TfDOxmTR+omQuDsAoJZCXPY/y9RGByRjUHPK4C4pVLi?=
- =?us-ascii?Q?KjQLbRAq4JfM5PKnIW+gS+YWgexPfShq4Myk2b/OqNWPih8C+R2S0JYERjmv?=
- =?us-ascii?Q?TjPUkQCDXaBsepzc+Jah8l7sf0I9/c+mX3LBNjZ5TaIfHL48jYnQTDKCh4Cd?=
- =?us-ascii?Q?1INRGkyBGwqwB5h7QX5FP0hGikcp/XqXj33ejFgcxo2+EU7R5srHxZKqcFeK?=
- =?us-ascii?Q?bVqaEHEPKByyO3sKgK5nHjlf+cC3ZXghTvOOr8EkMkpX7Up9FWzHTT+OYJep?=
- =?us-ascii?Q?+I4MU4luA/av+Yn6HxALQi8Y2fM9a5vgk+RaDIdwNw5dUlYWzFw4XmhR8P2T?=
- =?us-ascii?Q?rDOhNsDoEeBtEgn7lO04HF9fGFE+pjXtpOyqSrY4KM/Cp1VQsQuMjn1OymIK?=
- =?us-ascii?Q?5pDEDo/vuvGCqFbjwgKMaKdzP6gVLOPID93mI2mqFdI8sn88Us/V2ixEBJ+k?=
- =?us-ascii?Q?KynLBbvJacmigUHyyf/WGA9+Ie9LqrF87H9nM84jgoZ8XREZZlJL586G5nbL?=
- =?us-ascii?Q?ZFltrVv9E2mdSovLEKxtwqC403C6AIW9BgFvGeDWosaH+JXQ10rPH328UQd0?=
- =?us-ascii?Q?cKxh8FZrcwK3WxgYizsoeYRuf4r4f/0IMfjwjcyg5ZyaWk37A5oXYl9a1vbB?=
- =?us-ascii?Q?VkUzW8CSu+WSiv2qkY61myFb4dmo7qrdOAP0ndMj5phgKomj6hEI+Gvm4ZUD?=
- =?us-ascii?Q?HLw5YH7hw5bTOOfG0HPv74X5kiHzZxNBc7znrTy8?=
+	=?us-ascii?Q?IsZSeF1Jw2O7NcVRK5RdStTXApR1+eWnl6sRYA3kD25XXJgkGQrbyhqD3tep?=
+ =?us-ascii?Q?RG5cfESbLitlRTG/1Q8Zc9wcm1QtCi4QXVTE3dFOPXws2Fg20yaaGbbTw2Yo?=
+ =?us-ascii?Q?XVuehgQRsFceiK8vbR108EIX4kWHCu7AD2dvtNK8UJmj9DBUDM9SckbtGhcq?=
+ =?us-ascii?Q?IAo4VHRb70rdr95Agw+ClTASD64k7sX5h2LrSaZWVBlKKQFSmSUw168EvJiw?=
+ =?us-ascii?Q?9RUtNwwD5YMpVZoGSwkGZEazZJtley3L3+NpHEczuR+R5JWO4zlhhjyiXgb6?=
+ =?us-ascii?Q?/NKoR0oDwNYg9zF+yLwF5iqUtALke1ODlwYQTrTed2jzUOd4hOt81sDxcgxm?=
+ =?us-ascii?Q?5kl0FxoLRmBGGoCQbOiDCzC4tXk9G6Sj13Yl+ot/JO9VwxWiPvCYVjR1wxqJ?=
+ =?us-ascii?Q?ikFFGmH70MRu4YWUEGjFty5CmbanA9HHda2xpS5SDN3Y0nf/mimrTkAGhrjT?=
+ =?us-ascii?Q?m15WEgVeyBmqXCSQRzogPXqPa/Utm6WtDJuL5Eyai28qy4NgY6puzoOYmCEq?=
+ =?us-ascii?Q?3rXQGx/N/GGC7YEM7+LydYw6Ez6hn8mCe2vOFnwFBL9Fl2lCVieDgYmVT4Ii?=
+ =?us-ascii?Q?u4XdWbl5Intf9SS/tSW6Xo8bVrOpkXSTiToyjFm5+auaodg9uYtERzQdzvkP?=
+ =?us-ascii?Q?VTFIy6nzZpkqpnE4F7Gv92c5h/dwg/1+u3FovYh5B408JWVjvjAgfxlge4fA?=
+ =?us-ascii?Q?Dkf/Z7avTXwkM/cN0JSTgmmo1RY3T12nQrmeK5//5pVEjcLjaNVHzNGuKCai?=
+ =?us-ascii?Q?OD9uT+BZu9eiay2kOTMd/ZXlg5oqkY5Pmn9a9RjtJ/loGwY59XOVOYGfeEF3?=
+ =?us-ascii?Q?ueuaWOSnsgbWZNEibIcazfAPzJUqD15qKeGIrPcdWAOPqwudhWj1wBPjSmq8?=
+ =?us-ascii?Q?fFGseWlb8EZ9DmajpsvK/9P0wjDg8B0DizJhIWu4klTi/XqV1gEP7M2252u7?=
+ =?us-ascii?Q?x3rJWiAJzDuhITSNiuyhmcZefEGyzuvMowwcFi6Qf33T2LCDhDgdNJkhKOlZ?=
+ =?us-ascii?Q?E/gfSNTXtzIpbjUd2vLX7oTlx0rBTLBpLyFjtezjnl400PGhPcWAS5+qOJ97?=
+ =?us-ascii?Q?ObdP1eBqGASOU84aRo8zHLE3bFF849ZqQQyY7MXvX/NhhI4D1cLtDOpnnXz/?=
+ =?us-ascii?Q?NU8x5qCka2rhxdanlbf5a93jMXPnBjX7rkMUfz307BnwwRCypD/wsbaWaCa0?=
+ =?us-ascii?Q?oYtoN/wwAw+rEQAJqq00wwwrgN+ZIRjqhWU1fV7oZeSFLVEB8SnBwR94Qkb0?=
+ =?us-ascii?Q?TqkC7JYvnrMXReHUqZwH/a45BUqb700YRRMqKs4xBOBHgpax/TdA7PLcpeJE?=
+ =?us-ascii?Q?ziEYMyoQYEWbHmTg447jrCsf8Dxpx/nmCLimTAshZkOWoXLopz8Ftg0C6UXY?=
+ =?us-ascii?Q?bIoKGTx/CspICnjiQ4Ad7WJTaxlVBbD1CIWTYztMW+LRuPPHG6FM0aWxHn8A?=
+ =?us-ascii?Q?9hmxSOtNEf/6U/EHWSJDCnKYhWN/3/7+smPUFuu1uWUPqaPH7RT/paWkDW2u?=
+ =?us-ascii?Q?4iEPcMvXl+ldy/MFECiUf4EZm7NwuuBVD/T+J0mlNqzltJlnuCcYSxpcIUkO?=
+ =?us-ascii?Q?BK4qMabl64g+TQkprZ1DMt+Po1bdc9P9PFDFGJfu?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: be251c65-a4c5-4b99-e30e-08dbfbd53f0f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 17c7b519-45f4-4d4a-6014-08dbfbd54030
 X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9070.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2023 12:15:50.8692
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2023 12:15:52.7698
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: t9ovMtD6+eG1TEPn7eVG+bvIYEljhLIe3iFjXzYCnanq62boJiCfa0/kh3l/iej85lewrHOJIU1rzmxGidAvSg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7894
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4/rMenSYSCsxUOpHzvmK7ORn3yGKdI0OEE1UV/suffqD7m3gh1pqqNBCw6yZADKDYwLvxce61gj9uGCjfZpNlg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8455
 
-Create separate functions, dpaa2_switch_port_prechangeupper and
-dpaa2_switch_port_changeupper, to be called directly when a DPSW port
-changes its upper device.
-
-This way we are not open-coding everything in the main event callback
-and we can easily extent when necessary.
+Two different DPAA2 switch ports from two different DPSW instances
+cannot be under the same bridge. Instead of checking for this
+unsupported configuration in the CHANGEUPPER event, check it as early as
+possible in the PRECHANGEUPPER one.
 
 Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
 ---
 Changes in v2:
 - none
 
- .../ethernet/freescale/dpaa2/dpaa2-switch.c   | 76 +++++++++++++------
- 1 file changed, 52 insertions(+), 24 deletions(-)
+ .../ethernet/freescale/dpaa2/dpaa2-switch.c   | 31 ++++++++++---------
+ 1 file changed, 16 insertions(+), 15 deletions(-)
 
 diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-index d9906573f71f..58c0baee2d61 100644
+index 58c0baee2d61..dd878e87eef1 100644
 --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
 +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-@@ -2180,51 +2180,79 @@ dpaa2_switch_prechangeupper_sanity_checks(struct net_device *netdev,
+@@ -2008,24 +2008,9 @@ static int dpaa2_switch_port_bridge_join(struct net_device *netdev,
+ {
+ 	struct ethsw_port_priv *port_priv = netdev_priv(netdev);
+ 	struct ethsw_core *ethsw = port_priv->ethsw_data;
+-	struct ethsw_port_priv *other_port_priv;
+-	struct net_device *other_dev;
+-	struct list_head *iter;
+ 	bool learn_ena;
+ 	int err;
+ 
+-	netdev_for_each_lower_dev(upper_dev, other_dev, iter) {
+-		if (!dpaa2_switch_port_dev_check(other_dev))
+-			continue;
+-
+-		other_port_priv = netdev_priv(other_dev);
+-		if (other_port_priv->ethsw_data != port_priv->ethsw_data) {
+-			NL_SET_ERR_MSG_MOD(extack,
+-					   "Interface from a different DPSW is in the bridge already");
+-			return -EINVAL;
+-		}
+-	}
+-
+ 	/* Delete the previously manually installed VLAN 1 */
+ 	err = dpaa2_switch_port_del_vlan(port_priv, 1);
+ 	if (err)
+@@ -2163,6 +2148,10 @@ dpaa2_switch_prechangeupper_sanity_checks(struct net_device *netdev,
+ 					  struct net_device *upper_dev,
+ 					  struct netlink_ext_ack *extack)
+ {
++	struct ethsw_port_priv *port_priv = netdev_priv(netdev);
++	struct ethsw_port_priv *other_port_priv;
++	struct net_device *other_dev;
++	struct list_head *iter;
+ 	int err;
+ 
+ 	if (!br_vlan_enabled(upper_dev)) {
+@@ -2177,6 +2166,18 @@ dpaa2_switch_prechangeupper_sanity_checks(struct net_device *netdev,
+ 		return 0;
+ 	}
+ 
++	netdev_for_each_lower_dev(upper_dev, other_dev, iter) {
++		if (!dpaa2_switch_port_dev_check(other_dev))
++			continue;
++
++		other_port_priv = netdev_priv(other_dev);
++		if (other_port_priv->ethsw_data != port_priv->ethsw_data) {
++			NL_SET_ERR_MSG_MOD(extack,
++					   "Interface from a different DPSW is in the bridge already");
++			return -EINVAL;
++		}
++	}
++
  	return 0;
  }
  
--static int dpaa2_switch_port_netdevice_event(struct notifier_block *nb,
--					     unsigned long event, void *ptr)
-+static int dpaa2_switch_port_prechangeupper(struct net_device *netdev,
-+					    struct netdev_notifier_changeupper_info *info)
- {
--	struct net_device *netdev = netdev_notifier_info_to_dev(ptr);
--	struct netdev_notifier_changeupper_info *info = ptr;
- 	struct netlink_ext_ack *extack;
- 	struct net_device *upper_dev;
- 	int err = 0;
- 
- 	if (!dpaa2_switch_port_dev_check(netdev))
--		return NOTIFY_DONE;
-+		return 0;
- 
- 	extack = netdev_notifier_info_to_extack(&info->info);
--
--	switch (event) {
--	case NETDEV_PRECHANGEUPPER:
--		upper_dev = info->upper_dev;
--		if (!netif_is_bridge_master(upper_dev))
--			break;
--
-+	upper_dev = info->upper_dev;
-+	if (netif_is_bridge_master(upper_dev)) {
- 		err = dpaa2_switch_prechangeupper_sanity_checks(netdev,
- 								upper_dev,
- 								extack);
- 		if (err)
--			goto out;
-+			return err;
- 
- 		if (!info->linking)
- 			dpaa2_switch_port_pre_bridge_leave(netdev);
-+	}
-+
-+	return 0;
-+}
-+
-+static int dpaa2_switch_port_changeupper(struct net_device *netdev,
-+					 struct netdev_notifier_changeupper_info *info)
-+{
-+	struct netlink_ext_ack *extack;
-+	struct net_device *upper_dev;
-+	int err = 0;
-+
-+	if (!dpaa2_switch_port_dev_check(netdev))
-+		return 0;
-+
-+	extack = netdev_notifier_info_to_extack(&info->info);
-+
-+	upper_dev = info->upper_dev;
-+	if (netif_is_bridge_master(upper_dev)) {
-+		if (info->linking)
-+			return dpaa2_switch_port_bridge_join(netdev,
-+							     upper_dev,
-+							     extack);
-+		else
-+			return dpaa2_switch_port_bridge_leave(netdev);
-+	}
-+
-+	return err;
-+}
-+
-+static int dpaa2_switch_port_netdevice_event(struct notifier_block *nb,
-+					     unsigned long event, void *ptr)
-+{
-+	struct net_device *netdev = netdev_notifier_info_to_dev(ptr);
-+	int err = 0;
-+
-+	switch (event) {
-+	case NETDEV_PRECHANGEUPPER:
-+		err = dpaa2_switch_port_prechangeupper(netdev, ptr);
-+		if (err)
-+			return notifier_from_errno(err);
- 
- 		break;
- 	case NETDEV_CHANGEUPPER:
--		upper_dev = info->upper_dev;
--		if (netif_is_bridge_master(upper_dev)) {
--			if (info->linking)
--				err = dpaa2_switch_port_bridge_join(netdev,
--								    upper_dev,
--								    extack);
--			else
--				err = dpaa2_switch_port_bridge_leave(netdev);
--		}
-+		err = dpaa2_switch_port_changeupper(netdev, ptr);
-+		if (err)
-+			return notifier_from_errno(err);
-+
- 		break;
- 	}
- 
--out:
--	return notifier_from_errno(err);
-+	return NOTIFY_DONE;
- }
- 
- struct ethsw_switchdev_event_work {
 -- 
 2.34.1
 
