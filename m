@@ -1,92 +1,65 @@
-Return-Path: <netdev+bounces-57059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB381811DBE
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 19:59:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3177C811DCD
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 20:00:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29445B21270
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 18:59:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4528F1F21D97
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 19:00:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 771076168F;
-	Wed, 13 Dec 2023 18:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30B996168F;
+	Wed, 13 Dec 2023 19:00:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kMXRGRws"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85598D5;
-	Wed, 13 Dec 2023 10:59:32 -0800 (PST)
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6d9e756cf32so4798964a34.2;
-        Wed, 13 Dec 2023 10:59:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702493972; x=1703098772;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HeK0cW3CYjJ4+DfiuKUFos/Az6mhlvyWdViJpwMXZc8=;
-        b=T3IaK71925yG97S8veP7f09+NxVq3MtNvm8lA3x52KRmE+PxrlWwmzasBUPM1JU3U0
-         Bs2F5Yd/LlWf+xsDIzVrYQrjD7nusWLEIzPKIcZiVZjnGcqEBx//cHQwZQsCKb/8SEim
-         rSPvm2qGnd1Y+UZ6scAozAHefS5VJ8Uk+k/8yOCzoFJpGpm40OEW0XfsAYq0xPx6R/7P
-         TS5JAyeF54KP8v/WmgXfVl0dbq2d7zqPXnWbcTpK+MIanDjpwwzKz8F0FlerXicw7tRN
-         lwxGXWm/6v+HLdg15tBweIeFUZCjXP86zEkH3a8JGpJYWd2F19UdMIDUc6ETIq4pv4NM
-         u/UA==
-X-Gm-Message-State: AOJu0YxWA9xmIImfuiewPMFrIjZBEHk6fh1GC+CdAkcYIq83h/ZdaKvv
-	thWNcNTBzUhZbR5/mziqfw==
-X-Google-Smtp-Source: AGHT+IG0Cq8wvVnID/6qOI5cs3vksMULR/gsiDuT8TlocRTc5hlZ5/6MWbi6jQSItp2CJI63aNiItQ==
-X-Received: by 2002:a05:6830:1e4a:b0:6d8:74e2:a3e2 with SMTP id e10-20020a0568301e4a00b006d874e2a3e2mr7477380otj.62.1702493971838;
-        Wed, 13 Dec 2023 10:59:31 -0800 (PST)
-Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id g19-20020a9d6a13000000b006d99e0667e4sm2901837otn.28.2023.12.13.10.59.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 10:59:31 -0800 (PST)
-Received: (nullmailer pid 1720212 invoked by uid 1000);
-	Wed, 13 Dec 2023 18:59:30 -0000
-Date: Wed, 13 Dec 2023 12:59:30 -0600
-From: Rob Herring <robh@kernel.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, van Spriel <arend@broadcom.com>, linux-wireless@vger.kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] dt-bindings: net: wireless: brcm,bcm4329-fmac:
- allow local-mac-address
-Message-ID: <20231213185930.GA1713843-robh@kernel.org>
-References: <20231209160505.237843-1-krzysztof.kozlowski@linaro.org>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13BA65FEF7
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 19:00:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28985C433C8;
+	Wed, 13 Dec 2023 19:00:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702494009;
+	bh=sLLLyT07B7/hiZsTdkiXCcmYldYAzuh+nFhvappGfSE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kMXRGRwsaDARO3j2Gh2ztQRMbyq2ZscQ//5YfVGAU/kIcJvpb9vvwihTEXIw1kVKC
+	 ndEQnCHlU9ca29RpaQgTJkrDUV8RJiyl11kte81UFt6g5Aucsy1svF4s601qmXy9bv
+	 97CNLELWxcRrpzDe4kNSkhw0Boqx68ICmh5wT8Bv8WSNDVefSqA0+4RH7hOd19ETYL
+	 oSnnxPiLukIdeqbHFmAB2kU+OYBeSmhdV4ZsTeuq8YYycd3HSvrgaVEoGe6gPcDv5R
+	 j+s8mEvWKOQ5gnwTj+A15s2MsaG3IKX0BYRZhZ2dutdE3MUKX8gWnszkoLDXNYw+Xq
+	 M1pqDKNjpDNhg==
+Date: Wed, 13 Dec 2023 11:00:08 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Salvatore Dipietro
+ <dipiets@amazon.com>, davem@davemloft.net, dsahern@kernel.org,
+ netdev@vger.kernel.org, blakgeof@amazon.com, alisaidi@amazon.com,
+ benh@amazon.com, dipietro.salvatore@gmail.com
+Subject: Re: [PATCH] tcp: disable tcp_autocorking for socket when
+ TCP_NODELAY flag is set
+Message-ID: <20231213110008.2e723723@kernel.org>
+In-Reply-To: <CANn89i+98ifRj9SJQbK+QJrCde2UJvWr1h31gAZSuxt4i_U=iw@mail.gmail.com>
+References: <20231208182049.33775-1-dipiets@amazon.com>
+	<0d30d5a41d3ac990573016308aaeacb40a9dc79f.camel@redhat.com>
+	<CANn89i+98ifRj9SJQbK+QJrCde2UJvWr1h31gAZSuxt4i_U=iw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231209160505.237843-1-krzysztof.kozlowski@linaro.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sat, Dec 09, 2023 at 05:05:05PM +0100, Krzysztof Kozlowski wrote:
-> Some boards come with local-mac-address property.  Allow it, and
-> mac-address as well, to fix dtbs_check warnings like:
+On Wed, 13 Dec 2023 15:10:00 +0100 Eric Dumazet wrote:
+> > It looks like the above disables autocorking even after the userspace
+> > sets TCP_CORK. Am I reading it correctly?Sal Is that expected?
 > 
->   apple/t8103-j456.dtb: network@0,0: Unevaluated properties are not allowed ('local-mac-address' was unexpected)
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> ---
->  .../devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml  | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml b/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
-> index 4aa521f1be8c..4c8a7950c83e 100644
-> --- a/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
-> @@ -67,6 +67,9 @@ properties:
->      description: Name for the OOB IRQ, this must be set to "host-wake".
->      const: host-wake
->  
-> +  local-mac-address: true
-> +  mac-address: true
+> Yes, it seems the patch went too far.
 
-This doesn't work because the schema for these properties are never 
-applied. There was some work to split them out from 
-ethernet-controller.yaml to a network device schema[1]. Perhaps you can 
-revive that.
-
-Rob
-
-[1] https://lore.kernel.org/all/20230203-dt-bindings-network-class-v2-0-499686795073@jannau.net/#t
+Reverted to avoid it getting to Linus in the meantime, FWIW.
 
