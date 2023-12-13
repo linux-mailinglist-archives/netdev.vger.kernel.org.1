@@ -1,103 +1,159 @@
-Return-Path: <netdev+bounces-56818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2E6B810ECB
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 11:48:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36AE0810F0F
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 11:57:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EDB61F211C2
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 10:48:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B09DEB20E8F
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 10:57:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4972F225AE;
-	Wed, 13 Dec 2023 10:48:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uYfJXcpR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FE7A22EFA;
+	Wed, 13 Dec 2023 10:57:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9730999;
-	Wed, 13 Dec 2023 02:48:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5wwbEC8DhP4/P3mp66T2IELploh6DQuZBdmSstEh2WY=; b=uYfJXcpRp4fNICWR+8my+Gv207
-	MygnsXk7j+HBu/SGQaM8QMTZnNfY7RtLxMWAto0y7eUAnnaeMEBVw09Y0vixEF3H1X3r8fF9nxfFg
-	HjkcK9dfnHqRxpkEkBWeQ5S4kmUAHauyxgPyNm4chP3NIrU+bSCDwUa0x97BhvEsBaHg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rDMmM-002oAs-UN; Wed, 13 Dec 2023 11:47:50 +0100
-Date: Wed, 13 Dec 2023 11:47:50 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Daniel Golle <daniel@makrotopia.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: phy: skip LED triggers on PHYs on SFP modules
-Message-ID: <ac88a858-67fe-4932-a224-550d38454420@lunn.ch>
-References: <102a9dce38bdf00215735d04cd4704458273ad9c.1702339354.git.daniel@makrotopia.org>
- <20231212153512.67a7a35b@device.home>
- <ec909d14-e571-4a50-926d-fbef4f4f9e0a@lunn.ch>
- <20231213110622.29f53391@device.home>
+X-Greylist: delayed 468 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 13 Dec 2023 02:57:45 PST
+Received: from mail-m49225.qiye.163.com (mail-m49225.qiye.163.com [45.254.49.225])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F88E9C;
+	Wed, 13 Dec 2023 02:57:44 -0800 (PST)
+Received: from localhost.localdomain (unknown [IPV6:240e:3b7:3270:b440:d83b:6c2e:b6f:d27e])
+	by mail-m12741.qiye.163.com (Hmail) with ESMTPA id 66C609E05CD;
+	Wed, 13 Dec 2023 18:49:29 +0800 (CST)
+From: Ke Xiao <xiaoke@sangfor.com.cn>
+To: jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: dinghui@sangfor.com.cn,
+	zhudi2@huawei.com,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ke Xiao <xiaoke@sangfor.com.cn>
+Subject: [net PATCH] i40e: fix use-after-free in i40e_aqc_add_filters()
+Date: Wed, 13 Dec 2023 18:49:11 +0800
+Message-Id: <20231213104912.16153-1-xiaoke@sangfor.com.cn>
+X-Mailer: git-send-email 2.17.1
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkZGh4ZVklOQhlMGE5JGhlCSFUTARMWGhIXJBQOD1
+	lXWRgSC1lBWUlPSx5BSBlMQUhJTEtBGU9PS0EfQ0gZQU0YSR5BGU0dQR9JTB5ZV1kWGg8SFR0UWU
+	FZT0tIVUpNT0lMTlVKS0tVSkJLS1kG
+X-HM-Tid: 0a8c62cbc175b214kuuu66c609e05cd
+X-HM-MType: 1
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6N006ERw5GDw3Sj1DDgwjDR9N
+	EzowCyNVSlVKTEtJT01PTkxLT0lLVTMWGhIXVQMSGhQQHjsIGhUcHRQJVRgUFlUYFUVZV1kSC1lB
+	WUlPSx5BSBlMQUhJTEtBGU9PS0EfQ0gZQU0YSR5BGU0dQR9JTB5ZV1kIAVlBT05PTjcG
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231213110622.29f53391@device.home>
 
-> > SFP LEDs are very unlikely to be on the front panel, since there is no
-> > such pins on the SFP cage.
-> > 
-> > Russell, in your collection of SFPs do you have any with LEDs?
-> 
-> I mean, aren't the led triggers generic so that it can trigger any
-> other LED to blink, and it's up to the user to decide ?
+Commit 3116f59c12bd ("i40e: fix use-after-free in
+i40e_sync_filters_subtask()") avoided use-after-free issues,
+by increasing refcount during update the VSI filter list to
+the HW. However, it missed the unicast situation.
 
-Correct. However, generic LEDs won't be registered via this code path,
-so the deadlock is not an issue. Only LED controllers in a PHY within
-an SFP, inside an SFP cage are the issue here. I don't have any Copper
-SFP modules, so i've no idea if they are physically big enough to have
-LEDs?
+When deleting an unicast FDB entry, the i40e driver will release
+the mac_filter, and i40e_service_task will concurrently request
+firmware to add the mac_filter, which will lead to the following
+use-after-free issue.
 
-> I do however see one good thing with this patch is that it makes the
-> behaviour coherent regarding triggers regardless if we have a
-> media-converter or not.
-> 
-> If we have a SFP bus with phylink as its upstream (SFP bus directly
-> connected to the MAC), then the phy is going to be attached through
-> phy_attach_direct(), and before this patch, led triggers will be
-> registered.
-> 
-> If we have an intermediate PHY acting as a media-converter and
-> connected to the SFP bus, then the phy isn't attached to the net_device,
-> and the triggers aren't registered.
-> 
-> So if in the end it doesn't make sense to register led triggers for
-> PHY in modules, it might be more coherent not registering them at all
-> as this patch does. What do you think ?
+Fix again for both netdev->uc and netdev->mc.
 
-I think it is all messy. Say the media converter has its LEDs
-connected to the front panel. You then get indications of activity on
-the front panel. I've never seen a fibre SFP with LEDs, and its an
-open question if Copper SFPs have LEDs. So you are limited to the MAC
-LEDs or the media converter LEDs. Another scenario could be a PHY
-which acts as a media switch, it can have an RJ-45 or an SFP cage,
-first to get link wins. In such a situation, i would put the LEDs on
-the front panel, since it would look odd for an empty RJ-45 socket
-LEDs to blink for SFP activity.
+BUG: KASAN: use-after-free in i40e_aqc_add_filters+0x55c/0x5b0 [i40e]
+Read of size 2 at addr ffff888eb3452d60 by task kworker/8:7/6379
 
-So i think we should have the ability to describe all the LEDs in DT
-and let it decided what gets registered.
+CPU: 8 PID: 6379 Comm: kworker/8:7 Kdump: loaded Tainted: G
+Workqueue: i40e i40e_service_task [i40e]
+Call Trace:
+ dump_stack+0x71/0xab
+ print_address_description+0x6b/0x290
+ kasan_report+0x14a/0x2b0
+ i40e_aqc_add_filters+0x55c/0x5b0 [i40e]
+ i40e_sync_vsi_filters+0x1676/0x39c0 [i40e]
+ i40e_service_task+0x1397/0x2bb0 [i40e]
+ process_one_work+0x56a/0x11f0
+ worker_thread+0x8f/0xf40
+ kthread+0x2a0/0x390
+ ret_from_fork+0x1f/0x40
 
-	Andrew
+Allocated by task 21948:
+ kasan_kmalloc+0xa6/0xd0
+ kmem_cache_alloc_trace+0xdb/0x1c0
+ i40e_add_filter+0x11e/0x520 [i40e]
+ i40e_addr_sync+0x37/0x60 [i40e]
+ __hw_addr_sync_dev+0x1f5/0x2f0
+ i40e_set_rx_mode+0x61/0x1e0 [i40e]
+ dev_uc_add_excl+0x137/0x190
+ i40e_ndo_fdb_add+0x161/0x260 [i40e]
+ rtnl_fdb_add+0x567/0x950
+ rtnetlink_rcv_msg+0x5db/0x880
+ netlink_rcv_skb+0x254/0x380
+ netlink_unicast+0x454/0x610
+ netlink_sendmsg+0x747/0xb00
+ sock_sendmsg+0xe2/0x120
+ __sys_sendto+0x1ae/0x290
+ __x64_sys_sendto+0xdd/0x1b0
+ do_syscall_64+0xa0/0x370
+ entry_SYSCALL_64_after_hwframe+0x65/0xca
+
+Freed by task 21948:
+ __kasan_slab_free+0x137/0x190
+ kfree+0x8b/0x1b0
+ __i40e_del_filter+0x116/0x1e0 [i40e]
+ i40e_del_mac_filter+0x16c/0x300 [i40e]
+ i40e_addr_unsync+0x134/0x1b0 [i40e]
+ __hw_addr_sync_dev+0xff/0x2f0
+ i40e_set_rx_mode+0x61/0x1e0 [i40e]
+ dev_uc_del+0x77/0x90
+ rtnl_fdb_del+0x6a5/0x860
+ rtnetlink_rcv_msg+0x5db/0x880
+ netlink_rcv_skb+0x254/0x380
+ netlink_unicast+0x454/0x610
+ netlink_sendmsg+0x747/0xb00
+ sock_sendmsg+0xe2/0x120
+ __sys_sendto+0x1ae/0x290
+ __x64_sys_sendto+0xdd/0x1b0
+ do_syscall_64+0xa0/0x370
+ entry_SYSCALL_64_after_hwframe+0x65/0xca
+
+Fixes: 3116f59c12bd ("i40e: fix use-after-free in i40e_sync_filters_subtask()")
+Fixes: 41c445ff0f48 ("i40e: main driver core")
+Signed-off-by: Ke Xiao <xiaoke@sangfor.com.cn>
+Signed-off-by: Ding Hui <dinghui@sangfor.com.cn>
+Cc: Di Zhu <zhudi2@huawei.com>
+---
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index 1ab8dbe2d880..16b574d69843 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -108,11 +108,17 @@ static void netdev_hw_addr_refcnt(struct i40e_mac_filter *f,
+ 				  struct net_device *netdev, int delta)
+ {
+ 	struct netdev_hw_addr *ha;
++	struct netdev_hw_addr_list *ha_list;
+ 
+ 	if (!f || !netdev)
+ 		return;
+ 
+-	netdev_for_each_mc_addr(ha, netdev) {
++	if (is_unicast_ether_addr(f->macaddr) || is_link_local_ether_addr(f->macaddr))
++		ha_list = &netdev->uc;
++	else
++		ha_list = &netdev->mc;
++
++	netdev_hw_addr_list_for_each(ha, ha_list) {
+ 		if (ether_addr_equal(ha->addr, f->macaddr)) {
+ 			ha->refcount += delta;
+ 			if (ha->refcount <= 0)
+-- 
+2.17.1
+
 
