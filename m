@@ -1,112 +1,164 @@
-Return-Path: <netdev+bounces-56912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 971518114C8
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 15:37:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D901B811532
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 15:48:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 203311F21683
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 14:37:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A47C1F21569
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 14:48:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44DE52E85B;
-	Wed, 13 Dec 2023 14:37:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B81A52EB07;
+	Wed, 13 Dec 2023 14:47:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TP8muHC8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5361EE3
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 06:37:04 -0800 (PST)
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABDAE99
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 06:47:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702478874;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0jKzahdW3Z8DiMF4k91DJLvHn4lH9K58mF9LO/614r8=;
+	b=TP8muHC81kX6Q2ehx9md1hzw2b5sZ8zDdc5XfupTYJJg0PS7d4Hnns9x329JgF9xmpmz/+
+	EEoxIor4Y6s2YTEVVSBHkj2qF4gPuBsgqCiI4H4w5TyWEBhUwdYj7X/9QW4R0wZc4Myis2
+	LF2607Mei0RMMIntZQxuY1EZCO/OhJk=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-593-RnP9YVc7OQGSpF9V5jKgeg-1; Wed, 13 Dec 2023 09:36:58 -0500
-X-MC-Unique: RnP9YVc7OQGSpF9V5jKgeg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 409C183B870;
-	Wed, 13 Dec 2023 14:36:57 +0000 (UTC)
-Received: from hog (unknown [10.39.192.229])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id DD7CC51E3;
-	Wed, 13 Dec 2023 14:36:55 +0000 (UTC)
-Date: Wed, 13 Dec 2023 15:36:54 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Cc: netdev@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
-	Saeed Mahameed <saeed@kernel.org>, Gal Pressman <gal@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH RFC net-next v1 2/3] macsec: Detect if Rx skb is
- macsec-related for offloading devices that update md_dst
-Message-ID: <ZXnBhouKZPf39Hkb@hog>
-References: <20231116182900.46052-1-rrameshbabu@nvidia.com>
- <20231116182900.46052-3-rrameshbabu@nvidia.com>
- <ZV9jzHCQy1DZvyfk@hog>
- <87wmu36mhw.fsf@nvidia.com>
+ us-mta-472-IL2U2bcqPUabnpY8zv4RYA-1; Wed, 13 Dec 2023 09:47:53 -0500
+X-MC-Unique: IL2U2bcqPUabnpY8zv4RYA-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a1d38492da7so425581666b.0
+        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 06:47:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702478872; x=1703083672;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0jKzahdW3Z8DiMF4k91DJLvHn4lH9K58mF9LO/614r8=;
+        b=cj9iBDhPhyEPYEMM9RFSXTLvkUGK6rBXWh4Noh3E5s2TWOl+oEmUeeNF+IrT23Ab8P
+         s9BlxradUu1VetsW+2iWfyec22fVVWXH2f2OJdMdoi7MQyPUoGJupLij1dk2qSwbNwvH
+         ODz+7GYVw+pl7iquH5kUxFhwr2VhJZALww+XZKfnddPo7qPKxxEFxMYkfT2Iy2ji1SRz
+         Cw3Hicch1XEkWutIyVFlSTbgQBHUKtzzlzfOJ+3D9sJwjrI0Qb1g45YQw52RaOd6YIlV
+         BQvaUi9+GNOUmcF4SvkGgShovkb+aHTBC8Xm/Awd+8q/zcRqhVaw4U/B8wmgqU8AWFjr
+         G0WQ==
+X-Gm-Message-State: AOJu0YxLkhxCVmN9slI/N4LEEK8bYTjfNfxXnZxWMqAiijOjdNr3Wu4T
+	ScPaDc5UDVtQ/4f476MqAC0H32KecowzZ9MWpMzbhIRrTY43PpxagZiRjXkrfVIzCbFNb8vS8Bx
+	W64HYPdt5is2tM8AO
+X-Received: by 2002:a17:907:72cb:b0:a1d:9d7b:f2cf with SMTP id du11-20020a17090772cb00b00a1d9d7bf2cfmr2746757ejc.15.1702478872432;
+        Wed, 13 Dec 2023 06:47:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHH225M+fWShUJGXunG1g7mFoAwsjGf+FIVoxeFbFwopVnE+cUOXBfhM3binQy7H2O/ZZGcAw==
+X-Received: by 2002:a17:907:72cb:b0:a1d:9d7b:f2cf with SMTP id du11-20020a17090772cb00b00a1d9d7bf2cfmr2746745ejc.15.1702478872109;
+        Wed, 13 Dec 2023 06:47:52 -0800 (PST)
+Received: from redhat.com ([2a02:14f:16d:d414:dc39:9ae8:919b:572d])
+        by smtp.gmail.com with ESMTPSA id tb19-20020a1709078b9300b00a1cd30d06d1sm8049662ejc.14.2023.12.13.06.47.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Dec 2023 06:47:51 -0800 (PST)
+Date: Wed, 13 Dec 2023 09:47:47 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Tobias Huschle <huschle@linux.ibm.com>
+Cc: Jason Wang <jasowang@redhat.com>, Abel Wu <wuyun.abel@bytedance.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	Mike Christie <michael.christie@oracle.com>
+Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
+ sched/fair: Add lag based placement)
+Message-ID: <20231213093627-mutt-send-email-mst@kernel.org>
+References: <20231208052150-mutt-send-email-mst@kernel.org>
+ <53044.123120806415900549@us-mta-342.us.mimecast.lan>
+ <20231209053443-mutt-send-email-mst@kernel.org>
+ <CACGkMEuSGT-e-i-8U7hum-N_xEnsEKL+_07Mipf6gMLFFhj2Aw@mail.gmail.com>
+ <20231211115329-mutt-send-email-mst@kernel.org>
+ <CACGkMEudZnF7hUajgt0wtNPCxH8j6A3L1DgJj2ayJWhv9Bh1WA@mail.gmail.com>
+ <20231212111433-mutt-send-email-mst@kernel.org>
+ <42870.123121305373200110@us-mta-641.us.mimecast.lan>
+ <20231213061719-mutt-send-email-mst@kernel.org>
+ <25485.123121307454100283@us-mta-18.us.mimecast.lan>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <87wmu36mhw.fsf@nvidia.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <25485.123121307454100283@us-mta-18.us.mimecast.lan>
 
-2023-11-27, 11:10:19 -0800, Rahul Rameshbabu wrote:
-> On Thu, 23 Nov, 2023 15:38:04 +0100 Sabrina Dubroca <sd@queasysnail.net> =
-wrote:
-> > If the device provided md_dst, either we find the corresponding rx_sc,
-> > then we receive on this macsec device only, or we don't and try the
-> > other macsec devices.
-> >
-> > Something like this (completely untested):
-> >
-> > =09if (macsec_is_offloaded(macsec) && netif_running(ndev)) {
-> > =09=09struct macsec_rx_sc *rx_sc =3D NULL;
-> > =09=09bool exact =3D false;
-> >
-> > =09=09if (macsec->offload_md_dst && !is_macsec_md_dst)
-> > =09=09=09continue;
-> >
-> > =09=09if (is_macsec_md_dst) {
-> > =09=09=09DEBUG_NET_WARN_ON_ONCE(!macsec->offload_md_dst);
-> > =09=09=09rx_sc =3D find_rx_sc(&macsec->secy, md_dst->u.macsec_info.sci)=
-;
-> > =09=09=09if (!rx_sc)
-> > =09=09=09=09continue;
-> > =09=09=09exact =3D true;
-> > =09=09}
-> >
-> > =09=09if (exact ||
-> > =09=09    ether_addr_equal_64bits(hdr->h_dest, ndev->dev_addr)) {
-> > =09=09=09/* exact match, divert skb to this port */
-> > =09[keep the existing code after this]
-> >
-> >
-> > Am I missing something?
->=20
-> I just have one question with regards to this (will be testing this out
-> too). For the exact match case, if the receiving traffic was macsec
-> encrypted multicast, would the pkt_type be PACKET_HOST or
-> PACKET_BROADCAST/PACKET_MULTICAST? My intuition is screaming to me that
-> '[keep the existing code after this]' is not 100% true because we would
-> want to update the skb pkt_type to PACKET_BROADCAST/PACKET_MULTICAST
-> even if we are able to identify the incoming multicast frame was macsec
-> encrypted and specifically intended for this device. Does that sound
-> right?
+On Wed, Dec 13, 2023 at 01:45:35PM +0100, Tobias Huschle wrote:
+> On Wed, Dec 13, 2023 at 07:00:53AM -0500, Michael S. Tsirkin wrote:
+> > On Wed, Dec 13, 2023 at 11:37:23AM +0100, Tobias Huschle wrote:
+> > > On Tue, Dec 12, 2023 at 11:15:01AM -0500, Michael S. Tsirkin wrote:
+> > > > On Tue, Dec 12, 2023 at 11:00:12AM +0800, Jason Wang wrote:
+> > > > > On Tue, Dec 12, 2023 at 12:54 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+> 
+> [...]
+> > 
+> > Apparently schedule is already called?
+> > 
+> 
+> What about this: 
+> 
+> static int vhost_task_fn(void *data)
+> {
+> 	<...>
+> 	did_work = vtsk->fn(vtsk->data);  --> this calls vhost_worker if I'm not mistaken
+> 	if (!did_work)
+> 		schedule();
+> 	<...>
+> }
+> 
+> static bool vhost_worker(void *data)
+> {
+> 	struct vhost_worker *worker = data;
+> 	struct vhost_work *work, *work_next;
+> 	struct llist_node *node;
+> 
+> 	node = llist_del_all(&worker->work_list);
+> 	if (node) {
+> 		<...>
+> 		llist_for_each_entry_safe(work, work_next, node, node) {
+> 			<...>
+> 		}
+> 	}
+> 
+> 	return !!node;
+> }
+> 
+> The llist_for_each_entry_safe does not actually change the node value, doesn't it?
+> 
+> If it does not change it, !!node would return 1.
+> Thereby skipping the schedule.
+> 
+> This was changed recently with:
+> f9010dbdce91 fork, vhost: Use CLONE_THREAD to fix freezer/ps regression
+> 
+> It returned a hardcoded 0 before. The commit message explicitly mentions this
+> change to make vhost_worker return 1 if it did something.
+> 
+> Seems indeed like a nasty little side effect caused by EEVDF not scheduling
+> the woken up kworker right away.
 
-Yes, I guess. SW decrypt path calls eth_type_trans, but that does a
-lot more than we need here.
+Indeed, but previously vhost_worker was looping itself.
+And it did:
+-               node = llist_del_all(&worker->work_list);
+-               if (!node)
+-                       schedule();
 
---=20
-Sabrina
+so I don't think this was changed at all.
+
+
+
+
+
+
+-- 
+MST
 
 
