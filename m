@@ -1,47 +1,62 @@
-Return-Path: <netdev+bounces-57069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB3C5811FE1
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 21:24:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BACE812012
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 21:34:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B64DA1C210D0
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 20:24:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37E2A1F217F4
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 20:34:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 711417E566;
-	Wed, 13 Dec 2023 20:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3232254664;
+	Wed, 13 Dec 2023 20:34:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="fY4+FmOH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OWh8Js1x"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 333369C;
-	Wed, 13 Dec 2023 12:24:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=REov+oFNlg6yYMIR/95rdfAyE9Q9tktH/CA0m6KaQUI=; b=fY4+FmOH5yJykXdclne/eOJ4sx
-	o1yZxkvltFI5nvWbGcly5/o5zItlScMmj/IcU95tEWUFjEBs3rZVCOhU96oM/Eam5xi0zaduDzvw0
-	zOLAqklAejhQ6Sl7dgEWVA9q6UVERPw90kw+UtTMZUmBnhpO2/S8GZ0qE7FkDRUZtDYRuXcqkCIyW
-	bdrhW7eK8YRAnbBVYVS5Zqzsnv5YvgEfy/FevlSZtSZOXHR0TbweFpYxhOfdTT7jb9RPqjp5FJccp
-	TKt1Rgeby6E8CeGl/Si8sCcIFnIfQrWG1uZiMF/8LYxVpEudA8ZSxwFI0h2N8g+2z5ixkLBpyt7Bt
-	j6idMUsw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56454)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rDVlr-0000Yk-2D;
-	Wed, 13 Dec 2023 20:23:55 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rDVlt-0001p4-Gq; Wed, 13 Dec 2023 20:23:57 +0000
-Date: Wed, 13 Dec 2023 20:23:57 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Christian Marangi <ansuelsmth@gmail.com>
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50160A3;
+	Wed, 13 Dec 2023 12:34:23 -0800 (PST)
+Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-40c2db2ee28so78496095e9.2;
+        Wed, 13 Dec 2023 12:34:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702499662; x=1703104462; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=cZt635Sksiv/B4iHuCAGDrtYdVX5NK3B45SifYW+RSU=;
+        b=OWh8Js1xctM3ckMsJHHyFs0jlPyhA8QjlMva5OrfX85eBUX82KzXpO5rNnuIe+9mNu
+         of696V1JOxPideUF6o8d65jMyn9CePllnMyewjBkqCGqMDV+dm79XBrFuKJqGkXVB8CW
+         MXamE4c4XjPYuwME7+SUYmNw3xbfoUSsYTMTHnpvlTYvo4XQsDTynnoZgHI82lKRpjbo
+         y3zzTQ7nOPVcY+AA49tOHFlv5MgOm3x/+BLaLXNnt8bZElxMH+0jROitH1OYYQBYxPSJ
+         umLhAzq34MmR1nxWUk0GiDkjMqE1yDqOXmu6G2WwyjorhNBB8W01NAbukiYcJrocucNe
+         TA/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702499662; x=1703104462;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cZt635Sksiv/B4iHuCAGDrtYdVX5NK3B45SifYW+RSU=;
+        b=rXs9uw3bwX0K5adMfRg+PBml8ujDrmwnmdezYXGDFQlmFBMP8gngPvzyYnqQPbMTiH
+         ogGmALb9aI/6B3fyyz7xCkEirWcq2w0eshhjVjuECmFo3CBzCTFgtchMHCCQJyUwVgey
+         y3qtSVLQZpovfleJ9I9oNFoQvF77a5/dFeWvbSUz7mEigRUDCA90yJMv+pNSsDg8Z7yW
+         JJkaXG7xhVDJ3gCI+p+sMCJA/p5cndYIq2iJM/0prg3b4iQiL8sl0v1nu8mwQrIrgVXj
+         ezfcFGivvFbP6Fhbl2HyDWpAXbMmcxXgI0g0kz1Vr+y24oig06HT0lZgiJc86K9jAIIj
+         ZjFQ==
+X-Gm-Message-State: AOJu0Yw7+PgoGJBQriM8B9mQ7ixZELq7jPSwMB61dvdRtcB8qXlUNg8X
+	E0Qx4oE/V6KQ9LRrQ16jYDk=
+X-Google-Smtp-Source: AGHT+IHaGfR3RX18f4847KxfzLmuAMM3GtfUiiNka5Gh/lb8lUiXGzuZv2vlnb/OD61S/h1+spe0MQ==
+X-Received: by 2002:a05:600c:3ca5:b0:40c:4b42:a1fd with SMTP id bg37-20020a05600c3ca500b0040c4b42a1fdmr2426945wmb.34.1702499661392;
+        Wed, 13 Dec 2023 12:34:21 -0800 (PST)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id jb4-20020a05600c54e400b0040c5cf930e6sm3184972wmb.19.2023.12.13.12.34.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Dec 2023 12:34:21 -0800 (PST)
+Message-ID: <657a154d.050a0220.c9399.b619@mx.google.com>
+X-Google-Original-Message-ID: <ZXoVSkfZ_1G_zKUg@Ansuel-xps.>
+Date: Wed, 13 Dec 2023 21:34:18 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
 Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -51,13 +66,11 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Kees Cook <keescook@chromium.org>,
 	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH 1/2] net: ethtool: add define for link speed
- mode number
-Message-ID: <ZXoS3faDCUuZaLuN@shell.armlinux.org.uk>
+Subject: Re: [net-next PATCH 2/2] net: phy: leds: use new define for link
+ speed modes number
 References: <20231213181554.4741-1-ansuelsmth@gmail.com>
- <20231213181554.4741-2-ansuelsmth@gmail.com>
- <ZXoPwmDsy7geZe6N@shell.armlinux.org.uk>
- <657a10e1.050a0220.22d18.b3cb@mx.google.com>
+ <20231213181554.4741-3-ansuelsmth@gmail.com>
+ <ZXoRntVeW/YL/H5n@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,52 +79,72 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <657a10e1.050a0220.22d18.b3cb@mx.google.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <ZXoRntVeW/YL/H5n@shell.armlinux.org.uk>
 
-On Wed, Dec 13, 2023 at 09:15:27PM +0100, Christian Marangi wrote:
-> On Wed, Dec 13, 2023 at 08:10:42PM +0000, Russell King (Oracle) wrote:
-> > NAK.
+On Wed, Dec 13, 2023 at 08:18:38PM +0000, Russell King (Oracle) wrote:
+> On Wed, Dec 13, 2023 at 07:15:54PM +0100, Christian Marangi wrote:
+> > Use new define __LINK_SPEEDS_NUM for the speeds array instead of
+> > declaring a big enough array of 50 elements to handle future link speed
+> > modes.
 > > 
-> > You *clearly* didn't look before you leaped.
+> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > ---
+> >  drivers/net/phy/phy_led_triggers.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
 > > 
-> > On Wed, Dec 13, 2023 at 07:15:53PM +0100, Christian Marangi wrote:
-> > > +enum ethtool_link_speeds {
-> > > +	SPEED_10 = 0,
-> > > +	SPEED_100,
-> > > +	SPEED_1000,
-> > ...
-> > 
-> > and from the context immediately below, included in your patch:
-> > >  #define SPEED_10		10
-> >            ^^^^^^^^
-> > >  #define SPEED_100		100
-> >            ^^^^^^^^^
-> > >  #define SPEED_1000		1000
-> >            ^^^^^^^^^^
-> > 
-> > Your enumerated values will be overridden by the preprocessor
-> > definitions.
-> > 
-> > Moreover, SPEED_xxx is an already taken namespace and part of the UAPI,
-> > and thus can _not_ be changed. Convention is that SPEED_x will be
-> > defined as the numeric speed.
-> >
+> > diff --git a/drivers/net/phy/phy_led_triggers.c b/drivers/net/phy/phy_led_triggers.c
+> > index f550576eb9da..40cb0fa9ace0 100644
+> > --- a/drivers/net/phy/phy_led_triggers.c
+> > +++ b/drivers/net/phy/phy_led_triggers.c
+> > @@ -84,7 +84,7 @@ static void phy_led_trigger_unregister(struct phy_led_trigger *plt)
+> >  int phy_led_triggers_register(struct phy_device *phy)
+> >  {
+> >  	int i, err;
+> > -	unsigned int speeds[50];
+> > +	unsigned int speeds[__LINK_SPEEDS_NUM];
+> >  
+> >  	phy->phy_num_led_triggers = phy_supported_speeds(phy, speeds,
+> >  							 ARRAY_SIZE(speeds));
 > 
-> Well yes that is the idea of having the enum to count them and then redefining
-> them to the correct value. (wasn't trying to introduce new define for
-> the speed and trying to assign incremental values)
+> Yes, I agree the original code is utterly horrid, and there should be a
+> definition for its size. However, this is about the only place it would
+> be used - if you look at the code in phy_supported_speeds() and in
+> phy_speeds() which it calls, there is nothing in there which would know
+> the speed.
 > 
-> Any idea how to handle this without the enum - redefine thing?
+> The only two solution I can think would be either a new function:
 > 
-> Was trying to find a more automated way than defining the raw number of
-> the current modes. (but maybe this is not that bad? since on adding more
-> modes, other values has to be changed so it would be just another value
-> to document in the comment)
+> size_t phy_num_supported_speeds(struct phy_device *phydev);
 
-I think my comment on patch 2 gives some ideas! :D
+Maybe this is better to not fill the phy_speeds function with too much
+conditions.
+
+> 
+> or have phy_speeds() return the number of entries if "speeds" was NULL.
+> 
+> Then kmalloc_array() the speed array - but that seems a bit on the
+> side of things. The code as it stands is safe, because the passed
+> ARRAY_SIZE() limits the maximum index into speeds[] that will be
+> written, and it will result in the slower speeds not being added
+> into the array.
+>
+
+The fact that the phy_speed compose an array in descending order seems
+wrong to me and not following why it was done like that in the first
+place.
+
+Passing for example an array of 3 elements i would expect 10 100 100
+speed to be put instead of 800 400 200. (just as an example)
+
+Wonder if it would be sane to do this change. (invert the produced speed
+array with ascending order)
+
+A kmalloc_array might be overkill for the task but declaring a random
+array of 50 elements is equally bad...
+
+Think I will just implement kmalloc + function to return the count of
+speed modes from the settings struct.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+	Ansuel
 
