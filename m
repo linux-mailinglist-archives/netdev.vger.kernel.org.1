@@ -1,109 +1,214 @@
-Return-Path: <netdev+bounces-56862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EE2B811080
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 12:49:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 42CC68110AD
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:01:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF4CB1F212FB
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 11:49:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E19E21F21203
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 12:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB328288D8;
-	Wed, 13 Dec 2023 11:49:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C86828DC0;
+	Wed, 13 Dec 2023 12:01:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CQQLAnqQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88659AF;
-	Wed, 13 Dec 2023 03:48:59 -0800 (PST)
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4SqtyY5ySQz29g0y;
-	Wed, 13 Dec 2023 19:47:49 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5ECA31400DA;
-	Wed, 13 Dec 2023 19:48:57 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 13 Dec
- 2023 19:48:57 +0800
-Subject: Re: [net-next v1 09/16] page_pool: device memory support
-To: Mina Almasry <almasrymina@google.com>
-CC: Shailend Chand <shailend@google.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-arch@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<bpf@vger.kernel.org>, <linux-media@vger.kernel.org>,
-	<dri-devel@lists.freedesktop.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst
-	<jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
-	<ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, David Ahern
-	<dsahern@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
-	=?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>, Harshitha
- Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeelb@google.com>
-References: <20231208005250.2910004-1-almasrymina@google.com>
- <20231208005250.2910004-10-almasrymina@google.com>
- <32211cbf-3a4e-8a86-6214-4304ddb18a98@huawei.com>
- <CAHS8izOQcuLPwvDff96fuNB7r6EU9OWt3ShueQp=u7wat3L5LA@mail.gmail.com>
- <92e30bd9-6df4-b72f-7bcd-f4fe5670eba2@huawei.com>
- <CAHS8izPEFsqw50qgM+sPot6XVvOExpd+DrwrmPSR3zsWGLysRw@mail.gmail.com>
- <CAHS8izN6Cbjy0FCYhJyNsP396XfgJ_nTFXWuHb5QWNct=PifAg@mail.gmail.com>
- <59e07233-24cb-7fb2-1aee-e1cf7eb72fa9@huawei.com>
- <CAHS8izMdpo0D7GYzMkOtg1ueCODAVNxtwSP_qPseSYXNMhPGCw@mail.gmail.com>
- <2cdf173c-95e4-2141-56f7-0761705cd737@huawei.com>
- <CAHS8izOTdqqbS6ajAo+c646UwXkK-aB8ET9uJRS6Auszfi0nfA@mail.gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <17adf1c0-e4ad-4baf-4d01-32d6544cc13e@huawei.com>
-Date: Wed, 13 Dec 2023 19:48:56 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82126D5
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 04:01:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702468860;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nTPYpZwAOhjAyPYYnK4hzvfKTahVi5tJRBmZC1f6ZW8=;
+	b=CQQLAnqQbHtNxnvHZKenqqaLoMBpGtsGjUdN5n8Vuij2pIw8JWexDOZkm0zu1xCG2MGzds
+	XghIj5cVWodhXCZ+KW3XjK+19BycSenweQVduJz3AWEm3mhmI3iBw8QP0XwnSbktNuyXQB
+	PwdmXL6EsZgTxqr2W80t/eSnVbkO+i8=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-516-xvFIagcYN6yzyrouDuN06g-1; Wed, 13 Dec 2023 07:00:58 -0500
+X-MC-Unique: xvFIagcYN6yzyrouDuN06g-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-551e1e9d331so587980a12.2
+        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 04:00:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702468858; x=1703073658;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nTPYpZwAOhjAyPYYnK4hzvfKTahVi5tJRBmZC1f6ZW8=;
+        b=sZDCqJ8/J7s4CNukfP9nJAmh94wpsPCz7VMYp85gMj2GY2iohtW2U+sul4wRyq19JS
+         C/x21/WoXccl+daZgBruR0eRbEHHtVrUtz6o7FkRH0U75FxyjBLZH8yjyir4QptKlhpA
+         zIi4FqjCJQzQ4Em5DQruTSCaDHgv41fFEWZQB4N0DO3/lcQI/ar+EO9+IinJEycgLIjE
+         uksbAjZ1a90L2Rm/YgnDn+ZR1gLU0/QtRxzrkkjfCZlmA4WYtcwMBeecNQNAB7Whnylr
+         M2nPKz+EtBLGthgY+L8GDVs4r29i8LPg8KZFTstRXz3b72FvTLmqww1+9fgoRza98FTJ
+         5JZw==
+X-Gm-Message-State: AOJu0Yyl8BptyfcfuzFPJ9HHgCwKKvN576AXeCOFmNyutHO23xKi4FPd
+	tEzT5rIRmCiytZ5TSSNBkNyYRz4HLlzAhtEbO/01caYrg9gJvY9ZMsxS2Fd8NUn2dQE6sWz5eNL
+	V54D2g0LPAGOXTnkN
+X-Received: by 2002:a50:858d:0:b0:551:1775:207 with SMTP id a13-20020a50858d000000b0055117750207mr2984145edh.17.1702468857819;
+        Wed, 13 Dec 2023 04:00:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF0c9/lpfdtIRoYWRQu0pmj/b0D4R6L9UEAHj8W7P/aMFmYE+jvnwxBab8G5vMGQjvYkS/yKg==
+X-Received: by 2002:a50:858d:0:b0:551:1775:207 with SMTP id a13-20020a50858d000000b0055117750207mr2984133edh.17.1702468857417;
+        Wed, 13 Dec 2023 04:00:57 -0800 (PST)
+Received: from redhat.com ([2a02:14f:16d:d414:dc39:9ae8:919b:572d])
+        by smtp.gmail.com with ESMTPSA id c63-20020a509fc5000000b0054c738b6c31sm5913003edf.55.2023.12.13.04.00.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Dec 2023 04:00:56 -0800 (PST)
+Date: Wed, 13 Dec 2023 07:00:53 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Tobias Huschle <huschle@linux.ibm.com>
+Cc: Jason Wang <jasowang@redhat.com>, Abel Wu <wuyun.abel@bytedance.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
+ sched/fair: Add lag based placement)
+Message-ID: <20231213061719-mutt-send-email-mst@kernel.org>
+References: <20231207014626-mutt-send-email-mst@kernel.org>
+ <56082.123120804242300177@us-mta-137.us.mimecast.lan>
+ <20231208052150-mutt-send-email-mst@kernel.org>
+ <53044.123120806415900549@us-mta-342.us.mimecast.lan>
+ <20231209053443-mutt-send-email-mst@kernel.org>
+ <CACGkMEuSGT-e-i-8U7hum-N_xEnsEKL+_07Mipf6gMLFFhj2Aw@mail.gmail.com>
+ <20231211115329-mutt-send-email-mst@kernel.org>
+ <CACGkMEudZnF7hUajgt0wtNPCxH8j6A3L1DgJj2ayJWhv9Bh1WA@mail.gmail.com>
+ <20231212111433-mutt-send-email-mst@kernel.org>
+ <42870.123121305373200110@us-mta-641.us.mimecast.lan>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHS8izOTdqqbS6ajAo+c646UwXkK-aB8ET9uJRS6Auszfi0nfA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <42870.123121305373200110@us-mta-641.us.mimecast.lan>
 
-On 2023/12/12 22:28, Mina Almasry wrote:
-
-...
-
->>
->> the page_ref_*() API may be avoided using the below patch:
->> https://patchwork.kernel.org/project/netdevbpf/patch/20231113130041.58124-7-linyunsheng@huawei.com/
->>
+On Wed, Dec 13, 2023 at 11:37:23AM +0100, Tobias Huschle wrote:
+> On Tue, Dec 12, 2023 at 11:15:01AM -0500, Michael S. Tsirkin wrote:
+> > On Tue, Dec 12, 2023 at 11:00:12AM +0800, Jason Wang wrote:
+> > > On Tue, Dec 12, 2023 at 12:54 AM Michael S. Tsirkin <mst@redhat.com> wrote:
 > 
-> Even after the patch above, you're still calling page_ref_count() in
-> the page_pool to check for recycling, so after that patch you're still
-> using page->_refcount.
-
-Yes, we still need page_ref_count(), which seems be a similar problem
-like the one for page_is_pfmemalloc(), can we deal with it like most
-of other fields?
-
+> We played around with the suggestions and some other ideas.
+> I would like to share some initial results.
 > 
->> But I am not sure how to do that for tx part if devmem for tx is not
->> intergating into page_pool, that is why I suggest having a tx implementation
->> for the next version, so that we can have a whole picture of devmem.
->>
+> We tried the following:
 > 
-> I strongly prefer to keep the TX implementation in a separate series.
-> This series is complicated to implement and review as it is, and is
-> hitting the 15 patch limit anyway.
-
-I am not sure how complicated the TX implementation for devmem will be
-for the latest version, but from the RFCv1, it seems it is simple enough
-to keep it in one patchset.
-
-Anyway, it would be good to sort out the basic idea what is the tx API
-for devmem when designing/implementing the rx API for devmem.
-
+> 1. Call uncondtional schedule in the vhost_worker function
+> 2. Change the HZ value from 100 to 1000
+> 3. Reverting 05bfb338fa8d vhost: Fix livepatch timeouts in vhost_worker()
+> 4. Adding a cond_resched to translate_desc
+> 5. Reducing VHOST_NET_WEIGHT to 25% of its original value
 > 
+> Please find the diffs below.
+> 
+> Summary:
+> 
+> Option 1 is very very hacky but resolved the regression.
+> Option 2 reduces the regression by ~20%.
+> Options 3-5 do not help unfortunately.
+> 
+> Potential explanation:
+> 
+> While the vhost is executing, the need_resched flag is not set (observable
+> in the traces). Therefore cond_resched and alike will do nothing. vhost
+> will continue executing until the need_resched flag is set by an external
+> party, e.g. by a request to migrate the vhost.
+> 
+> Calling schedule unconditionally forces the scheduler to re-evaluate all 
+> tasks and their vruntime/deadline/vlag values. The scheduler comes to the
+> correct conclusion, that the kworker should be executed and from there it
+> is smooth sailing. I will have to verify that sequence by collecting more
+> traces, but this seems rather plausible.
+> This hack might of course introduce all kinds of side effects but might
+> provide an indicator that this is the actual problem.
+> The big question would be how to solve this conceptually, and, first
+> things first, whether you think this is a viable hypothesis.
+> 
+> Increasing the HZ value helps most likely because the other CPUs take 
+> scheduling/load balancing decisions more often as well and therefore
+> trigger the migration faster.
+> 
+> Bringing down VHOST_NET_WEIGHT even more might also help to shorten the
+> vhost loop. But I have no intuition how low we can/should go here.
+> 
+> 
+> We also changed vq_err to print error messages, but did not encounter any.
+> 
+> Diffs:
+> --------------------------------------------------------------------------
+> 
+> 1. Call uncondtional schedule in the vhost_worker function
+> 
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index e0c181ad17e3..16d73fd28831 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -414,6 +414,7 @@ static bool vhost_worker(void *data)
+>                 }
+>         }
+>  
+> +       schedule();
+>         return !!node;
+>  }
+
+
+So, this helps.
+But this is very surprising!
+
+
+static int vhost_task_fn(void *data)
+{
+        struct vhost_task *vtsk = data;
+        bool dead = false;
+
+        for (;;) {
+                bool did_work;
+
+                if (!dead && signal_pending(current)) {
+                        struct ksignal ksig;
+                        /*
+                         * Calling get_signal will block in SIGSTOP,
+                         * or clear fatal_signal_pending, but remember
+                         * what was set.
+                         *
+                         * This thread won't actually exit until all
+                         * of the file descriptors are closed, and
+                         * the release function is called.
+                         */
+                        dead = get_signal(&ksig);
+                        if (dead)
+                                clear_thread_flag(TIF_SIGPENDING);
+                }
+
+                /* mb paired w/ vhost_task_stop */
+                set_current_state(TASK_INTERRUPTIBLE);
+
+                if (test_bit(VHOST_TASK_FLAGS_STOP, &vtsk->flags)) {
+                        __set_current_state(TASK_RUNNING);
+                        break;
+                }
+
+                did_work = vtsk->fn(vtsk->data);
+                if (!did_work)
+                        schedule();
+        }
+
+        complete(&vtsk->exited);
+        do_exit(0);
+
+}
+
+Apparently schedule is already called?
+
+
+-- 
+MST
+
 
