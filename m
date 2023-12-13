@@ -1,289 +1,131 @@
-Return-Path: <netdev+bounces-56880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47825811230
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:59:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B42081125F
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 14:03:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7C7C1F212CB
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 12:59:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 173E5B20CAE
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:03:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D382D2C1B0;
-	Wed, 13 Dec 2023 12:59:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EB4B2C1BF;
+	Wed, 13 Dec 2023 13:02:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pOAZ793f"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76A9FB3
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 04:59:46 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R921e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VyR8QLj_1702472383;
-Received: from 30.221.129.237(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VyR8QLj_1702472383)
-          by smtp.aliyun-inc.com;
-          Wed, 13 Dec 2023 20:59:44 +0800
-Message-ID: <699c9271-9c6d-0884-048d-6a9b83fb8619@linux.alibaba.com>
-Date: Wed, 13 Dec 2023 20:59:43 +0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3244E2C842;
+	Wed, 13 Dec 2023 13:02:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B73FFC433C8;
+	Wed, 13 Dec 2023 13:02:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702472575;
+	bh=SYhlR91tO42bA8AfGZXjJpENUJXvfJwI9ZrVd2yDl7o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pOAZ793fHzKh/HYPbFWxrP57xdIvDGz7zJAPafMIdiXo/gdClWfHHvXyABgyiaI3d
+	 IzjD7flCvOmUtRPQK/nwxFG4P+/wjewBRhds66wynKr/e/B9HcmsYwbGWOiDfrcGgF
+	 Mad+vti/3CHqhV9Mc8DmDCiHi5Llrhj8bBvRK8yG2/BfMYB5kldfx6AoNVi3LS5Yed
+	 voYZzMviyN03AtFIwzndO9A1hh6wyeIOadgNlhvE3YVLQFoRmcz/zTpvLmVk2qGecJ
+	 c2p65kbrZ/i6niLm0i+F8ERk9GXSfIiwFL6+xEZru50pieVHqYJCoculVkT2y+ID+D
+	 uMM7/fLCxbELQ==
+Date: Wed, 13 Dec 2023 13:02:49 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: linux-riscv@lists.infradead.org,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Daire McNamara <daire.mcnamara@microchip.com>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org
+Subject: Re: [PATCH RESEND v1 2/7] dt-bindings: can: mpfs: add missing
+ required clock
+Message-ID: <20231213-waffle-grueling-3a5c3879395b@spud>
+References: <20231208-reenter-ajar-b6223e5134b3@spud>
+ <20231208-palpitate-passable-c79bacf2036c@spud>
+ <20231212-unreeling-depose-8b6b2e032555-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [question] smc: how to enable SMC_LO feature
-To: shaozhengchao <shaozhengchao@huawei.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- yuehaibing <yuehaibing@huawei.com>, "Libin (Huawei)"
- <huawei.libin@huawei.com>, Dust Li <dust.li@linux.alibaba.com>,
- tonylu_linux <tonylu@linux.alibaba.com>, "D. Wythe"
- <alibuda@linux.alibaba.com>
-References: <8ac15e20beb54acfae1a35d1603c1827@huawei.com>
- <ad29f704-ae79-4c4b-2227-d0fa9a1ceee2@linux.alibaba.com>
- <a6b4b010-ffca-50ea-1296-3e01eacb4f53@huawei.com>
- <9eb58434-922e-c9e4-6a38-4c29ba0e88f6@huawei.com>
- <2d138d78-1ebb-92b0-c6c5-9e43b5ee941b@linux.alibaba.com>
- <488311be-5673-552c-d932-26f87e863777@huawei.com>
- <c7b3f24e-6f25-08a5-bbe4-a32dc3d31adf@huawei.com>
- <1fbd6b74-1080-923a-01c1-689c3d65f880@huawei.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <1fbd6b74-1080-923a-01c1-689c3d65f880@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="AuzXFLC6CIKr68l9"
+Content-Disposition: inline
+In-Reply-To: <20231212-unreeling-depose-8b6b2e032555-mkl@pengutronix.de>
 
-On 2023/12/13 17:00, shaozhengchao wrote:
-> 
-> 
-> On 2023/12/5 14:45, shaozhengchao wrote:
->>
->>
->> On 2023/12/4 12:06, shaozhengchao wrote:
->>>
->>>
->>> On 2023/12/4 11:52, Wen Gu wrote:
->>>>
->>>> On 2023/12/4 11:22, shaozhengchao wrote:
->>>>>
->>>>>
->>>>> On 2023/11/23 14:15, shaozhengchao wrote:
->>>>>>
->>>>>>
->>>>>> On 2023/11/23 10:21, Wen Gu wrote:
->>>>>>>
->>>>>>>
->>>>>>> On 2023/11/21 20:14, shaozhengchao wrote:
->>>>>>>> Hi Wen Gu:
->>>>>>>> Currently, I am interested in the SMC_LOOPBACK feature proposed
->>>>>>>> by you. Therefore, I use your patchset[1] to test the SMC_LO feature on
->>>>>>>> my x86_64 environment and kernel is based on linux-next, commit: 5ba73bec5e7b.
->>>>>>>> The test result shows that the smc_lo feature cannot be enabled. Here's
->>>>>>>> my analysis:
->>>>>>>>
->>>>>>>> 1. Run the following command to perform the test, and then capture
->>>>>>>> packets on the lo device.
->>>>>>>> - serv:  smc_run taskset -c <cpu> sockperf sr --tcp
->>>>>>>> - clnt:  smc_run taskset -c <cpu> sockperf  tp --tcp --msg-size=64000 -i 127.0.0.1 -t 30
->>>>>>>>
->>>>>>>> 2. Use Wireshark to open packets. It is found that the VCE port replies with
->>>>>>>> SMC-R-Deline packets.
->>>>>>>> [cid:image001.png@01DA1CB4.F1052C30]
->>>>>>>>
->>>>>>>> 3. Rx
->>>>>>>> When smc_listen_work invokes smc_listen_v2_check, the VCE port returns
->>>>>>>> a Decline packet because eid_cnt and flag.seid in the received packet are both 0.
->>>>>>>>
->>>>>>>> 4. Tx
->>>>>>>> In smc_clc_send_proposal,
->>>>>>>> v2_ext->hdr.eid_cnt = smc_clc_eid_table.ueid_cnt;
->>>>>>>> v2_ext->hdr.flag.seid = smc_clc_eid_table.seid_enabled;
->>>>>>>>
->>>>>>>> When smc_clc_init, ueid_cnt=0, and in the x86_64 environment, seid_enabled is
->>>>>>>> always equal to 0.
->>>>>>>>
->>>>>>>> So, I must call smc_clc_ueid_add function to increase ueid count?
->>>>>>>> But I don't see where operations can be added, may I missed something?
->>>>>>>>
->>>>>>>
->>>>>>> Hi Zhengchao Shao,
->>>>>>>
->>>>>>> Yes. When using SMC-D in non-s390 architecture (like x86 here), A common
->>>>>>> UEID should be set. It can be set by following steps:
->>>>>>>
->>>>>>> - Install smc-tools[1].
->>>>>>>
->>>>>>> - Run # smcd ueid add <ueid> in loopback test environment.
->>>>>>>
->>>>>>>    EID works as an ID to indicate the max communication space of SMC. When SEID is
->>>>>>>    unavailable, an UEID is required.
->>>>>>>
->>>>>> Hi Wen Gu:
->>>>>>      Thank you for your reply. This is very useful for me. And I will
->>>>>> be happy to learn from it.
->>>>>>
->>>>>> Thanks
->>>>>>
->>>>>> Zhengchao Shao
->>>>>>> - Then run the test.
->>>>>>>
->>>>>>> Hope this works for you :)
->>>>>>>
->>>>>>> [1] https://github.com/ibm-s390-linux/smc-tools
->>>>>>>
->>>>>>> Regards,
->>>>>>> Wen Gu
->>>>>>>
->>>>>>>> Could you give me some advice? Thanks very much.
->>>>>>>>
->>>>>>>> Zhengchao Shao
->>>>>>>>
->>>>>>>>
->>>>>>>> [1]link: 
->>>>>>>> https://patchwork.kernel.org/project/netdevbpf/cover/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
->>>>>>>>
->>>>>>>
->>>>>>
->>>>>>
->>>>> Hi Wen Gu:
->>>>>      I have test as following, but the performance is really
->>>>> degraded. Now I have no idea.
->>>>> 1. add ueid
->>>>> run: smcd ueid add 16
->>>>> kernel message:
->>>>> [ 5252.009133] NET: Registered PF_SMC protocol family
->>>>> [ 5252.009233] smc: adding smcd device smc_lo with pnetid
->>>>> 2. start server
->>>>> smc_run taskset -c 1 sockperf sr --tcp
->>>>> 3. start client
->>>>> smc_run taskset -c 3 sockperf tp  --tcp --msg-size=64000 -i 127.0.0.1 -t 30
->>>>>
->>>>> The test results are as follows:
->>>>>                TCP                  SMC-lo
->>>>> Bandwidth(MBps)         1890.56               1300.41(-31.22%)
->>>>>
->>>>> I didn't find a better direction when I initially positioned it. No
->>>>> error is recorded in the kernel log, and the smcd statistics are normal.
->>>>> [root@localhost smc-tools]# smcd stats
->>>>> SMC-D Connections Summary
->>>>>    Total connections handled             2
->>>>>    SMC connections                       2
->>>>>    Handshake errors                      0
->>>>>    Avg requests per SMC conn       1277462.0
->>>>>    TCP fallback                          0
->>>>>
->>>>> RX Stats
->>>>>    Data transmitted (Bytes)    40907328000 (40.91G)
->>>>>    Total requests                  1277190
->>>>>    Buffer full                          45 (0.00%)
->>>>>              8KB    16KB    32KB    64KB   128KB   256KB   512KB >512KB
->>>>>    Bufs        0       0       0       2       0       0 0       0
->>>>>    Reqs   638.0K       0       0  639.2K       0       0 0       0
->>>>>
->>>>> TX Stats
->>>>>    Data transmitted (Bytes)    40907328000 (40.91G)
->>>>>    Total requests                  1277734
->>>>>    Buffer full                      638239 (49.95%)
->>>>>    Buffer full (remote)                  0 (0.00%)
->>>>>    Buffer too small                      0 (0.00%)
->>>>>    Buffer too small (remote)             0 (0.00%)
->>>>>              8KB    16KB    32KB    64KB   128KB   256KB   512KB >512KB
->>>>>    Bufs        0       0       0       0       0       0 0       0
->>>>>    Reqs        0       0       0  1.278M       0       0 0       0
->>>>>
->>>>> Extras
->>>>>    Special socket calls                  1
->>>>>
->>>>> I captured the perf information and found that the percentage of
->>>>> rep_movs_alternative and _raw_spin_unlock_irqrestore functions was high
->>>>> during tx and rx.
->>>>> 36.12%  [kernel]         [k]rep_movs_alternative
->>>>> 14.23%  [kernel]         [k]_raw_spin_unlock_irqrestore
->>>>>
->>>>> I've attached the flame map. Could you help analyze it? What I missed?
->>>>> Thanks.
->>>>
->>>> Hi Zhengchao Shao,
->>>>
->>>> Since sndbuf and RMB in SMC are pre-alloced ringbuf and won't grow dynamically
->>>> like TCP, it is necessary to appropriately increase the default value of smc
->>>> sk_sndbuf and sk_rcvbuf before testing throughput.
->>>>
->>>> Set this and try again:
->>>>
->>>> # sysctl -w net.smc.wmem=1048576
->>>> # sysctl -w net.smc.rmem=1048576
->>>>
->>>> (The initial value of wmem and rmem are 64K)
->>>>
->>>> Regards,
->>>> Wen Gu
->>>>
->>>>>
->>>>> Zhengchao Shao
->>> Hi Wen Gu:
->>>      It solves the issue. Thank you very much.
->>>
->>> Zhengchao Shao
->>>
->> Hi Wen Gu:
->>    I've tested all the performance test items in the patchset. The
->> performance improvement is to be expected, except for nignx.
->> My VM is configured with 48 cores and 32 GB memory. Therefore, run
->> the following command:
->> <smc_run> nignx
->> <smc_run>./wrk -t 96 -c 1000 -d 30 http://127.0.0.1:80
->>
->> The test results are as follows:
->>                          TCP                         SMC_lo
->> Requests/s           309425.42               135547.25(-56.19%)
->> The performance decreases by 56.19%.
->>
->> I capture packets and find that wrk can perform HTTP GET after each
->> connect when smc_loopback is disabled.
->> However, when smc_loopback is enabled, there is no HTTP GET behavior.
->> I wonder if there is some compatibility problem with the SMC protocol when encapsulate packet? Could you give me some 
->> advice?
->> In the attachment, I captured some of the packets.
->> nosmc_nginx.pcap is for SMC disabled and smc_nginx.pcap is for SMC
->> enabled.
->> Thank you very much.
->>
->> Zhengchao Shao
->>
->>
->>
-> Hi Wen Gu:
->      When the VM is configured with 8 cores and 16 GB memory, run
-> the following command:
-> <smc_run> nignx
-> <smc_run>./wrk -t 8 -c 1000 -d 30 http://127.0.0.1:80
-> the test data is as follows:
->           TCP          SMC_lo
-> Requests/s  66056.66    94526.66(43.10%)
-> 
-> But When the VM is configured with 48 cores and 32 GB memory, run
-> the following command:
-> <smc_run> nignx
-> <smc_run>./wrk -t 96 -c 1000 -d 30 http://127.0.0.1:80
-> the test data is as follows:
->           TCP          SMC_lo
-> Requests/s  309425.42     135547.25(-56.19%)
-> 
-> It seems that in the scenario with a large number of CPU cores,
-> performance is not optimized, but performance deteriorates. What I
-> missed?
-> Thank you.
-> 
-> Zhengchao Shao
 
-Hi Zhengchao,
+--AuzXFLC6CIKr68l9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I failed to reproduce this large regression. Could you please share some
-information about your test environment?
+On Tue, Dec 12, 2023 at 09:49:41PM +0100, Marc Kleine-Budde wrote:
+> On 08.12.2023 17:12:24, Conor Dooley wrote:
+> > From: Conor Dooley <conor.dooley@microchip.com>
+> >=20
+> > The CAN controller on PolarFire SoC has an AHB peripheral clock _and_ a
+> > CAN bus clock. The bus clock was omitted when the binding was written,
+> > but is required for operation. Make up for lost time and add it.
+> >=20
+> > Cautionary tale in adding bindings without having implemented a real
+> > user for them perhaps.
+> >=20
+> > Fixes: c878d518d7b6 ("dt-bindings: can: mpfs: document the mpfs CAN con=
+troller")
+> > Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
+> > ---
+> >  .../devicetree/bindings/net/can/microchip,mpfs-can.yaml    | 7 +++++--
+> >  1 file changed, 5 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/Documentation/devicetree/bindings/net/can/microchip,mpfs-c=
+an.yaml b/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.yaml
+> > index 45aa3de7cf01..05f680f15b17 100644
+> > --- a/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.yaml
+> > +++ b/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.yaml
+> > @@ -24,7 +24,10 @@ properties:
+> >      maxItems: 1
+> > =20
+> >    clocks:
+> > -    maxItems: 1
+> > +    maxItems: 2
+> > +    items:
+> > +      - description: AHB peripheral clock
+> > +      - description: CAN bus clock
+>=20
+> Do we we want to have a "clock-names" property, as we need the clock
+> rate of the CAN bus clock.
 
-- The nginx configure.
-- The guest(VM) cpu topology.
-- The host(physical machine) cpu topology.
-- The mapping relationship between vcpu of guest(VM) and physical cpu of host.
-- The cpu usage (top) when regression happens.
+We should not need the clock-names property to be able to get both of
+the clocks. clk_bulk_get_all() for example should be usable here.
 
-Thank you.
+Cheers,
+Conor.
+
+--AuzXFLC6CIKr68l9
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZXmreQAKCRB4tDGHoIJi
+0pybAQCaXK2xUCp5W6797bY/KOydLDfzz6/zpgo3/ym1K/7tCgEAs+ZQmqrTvSuQ
+t2sr42Cf8RWYaRCGrwl6zg97g0jV0As=
+=jW/W
+-----END PGP SIGNATURE-----
+
+--AuzXFLC6CIKr68l9--
 
