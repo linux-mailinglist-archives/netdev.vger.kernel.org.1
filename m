@@ -1,105 +1,175 @@
-Return-Path: <netdev+bounces-56866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A32B8110D1
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:15:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 715938110E0
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:18:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA5FE2818A1
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 12:15:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 760EB1C20EC8
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 12:18:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AED428E08;
-	Wed, 13 Dec 2023 12:15:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD6CD28DDB;
+	Wed, 13 Dec 2023 12:17:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fEovZsJy"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="owP7qQuS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84ACA9A
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 04:15:08 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-50bfd8d5c77so7853651e87.1
-        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 04:15:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702469706; x=1703074506; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xGmpHYTW9S3vl3puS381PDZTb3jivoBGyatqfVxW4Mc=;
-        b=fEovZsJy4QZm4kW7AQae9oQf2OaonAgfalJAcPJLlK4qdVpARWMnDtDwnQWkMDTxpn
-         8cewKjFWzSeA0stYR1vgiNshStcpW82yPeaU6c4H0GlKywUD1Wv3Yuwilr+hryounf8a
-         cYAhneyWQiNLh4MCZ1IYJfG6ZswU3K5lq1uDgw3UIGwLoKtoG98rUW4ucXrtRZ5RC8m4
-         pvmHYk6LdvjZd9KviZmbp0WaNRQ3prWVrA1nds9egv2PYdnyYXbLhVzUlJHumSkvujE1
-         3G3wAdd4P4MxNF/lF1R4t5yrYOk9rkejbPbH8HiMxKr1HoQ8ylF9dB9Qc1A0llnvlkOv
-         s76A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702469706; x=1703074506;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xGmpHYTW9S3vl3puS381PDZTb3jivoBGyatqfVxW4Mc=;
-        b=BuyD5pRNF68lZlwoJ8HdwOCxhG6QkAj5skCoibjNlqHS64IODq2/X3w5o7Q/yXfQgH
-         Vog05I0QpFeZ7q5XjSbZNOXDu7iiy7bXdrJBEZD8pf55ezbUE3+YRKw8qTww+THN6UY7
-         KZkoZP4h4+MDudb8oX7vIrdaHtmy6+wIFbnE1WGu1hdL/p7i19tVCqLlpXun4yA3PZWO
-         YPrNpJn+vYu0MgqjeVh5tK8pyPC69TepvJHg7rBeegooWBQfVk6/F7vre6lDgwfs0gNk
-         TEP3qDbNX5Z91lziPjabA5gQ948uN+eS4msaMxHkXgi7rB7nZzX+zeF9QK0isoV4iyNn
-         33DA==
-X-Gm-Message-State: AOJu0Yxd8HcxUnHt7JBqP6i5vAID9LF8Cj6QIyQHdNWsDAnrRivrqdMT
-	zhSLlFX3fReTS6I3vliTEHA=
-X-Google-Smtp-Source: AGHT+IG3GE07twPttHXOMYZDALIJK351fh/PQyty/OmV/BSuldWib4FBG6OiMoPn9G+Y7Dq8qiabWQ==
-X-Received: by 2002:ac2:592b:0:b0:50b:f90a:717c with SMTP id v11-20020ac2592b000000b0050bf90a717cmr1567380lfi.83.1702469706176;
-        Wed, 13 Dec 2023 04:15:06 -0800 (PST)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id v13-20020ac2592d000000b0050c001ce064sm1591215lfi.80.2023.12.13.04.15.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Dec 2023 04:15:05 -0800 (PST)
-Subject: Re: [PATCH net-next 7/7] sfc: add debugfs node for filter table
- contents
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, edward.cree@amd.com,
- linux-net-drivers@amd.com, davem@davemloft.net, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, habetsm.xilinx@gmail.com,
- Jonathan Cooper <jonathan.s.cooper@amd.com>
-References: <cover.1702314694.git.ecree.xilinx@gmail.com>
- <0cf27cb7a42cc81c8d360b5812690e636a100244.1702314695.git.ecree.xilinx@gmail.com>
- <20231211191734.GQ5817@kernel.org>
- <38eabc7c-e84b-77af-1ec4-f487154eb408@gmail.com>
- <b9456284-432d-2254-0af2-1dedeca0183d@gmail.com>
- <20231212081944.2480f57b@kernel.org>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <6258c258-b1c2-0856-aff7-cca33be15bf6@gmail.com>
-Date: Wed, 13 Dec 2023 12:15:04 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 794249A;
+	Wed, 13 Dec 2023 04:17:55 -0800 (PST)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BDBq4nw026207;
+	Wed, 13 Dec 2023 12:17:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=2LO+KZOc1A6iY+w5EuG6nKQ43T54kE83JDUPE8JPgPs=;
+ b=owP7qQuS6C3ZQ9Op3YDzPTHUPWDFok2QrxFkyATpCL8bJfLRCzxNK9+qIMB4yhzzXu6b
+ WfWuTDpoOqFDKXRO2aq+L7j4yTv1hZRtZ2GO7zo0U084XduncbnB5WKqhypRb9NKCvgG
+ q5OBvARW85wtcUIiKnaHHXVnljbSENniGftfyO1W7a3vowTOF8JaEgA0QMpm3Q2MWD3i
+ XGO90qOFrjqkBJ7NPuH0bjmllUOSP8Nxw8my4gC5/j6IqaROfC2Ny5ewFJykdTJV6yED
+ aWiku1XvPYpS1rFfc4J68zz3iHOHqFOEpHCN3djXCD9o0YjKU/r14yk025ZbU0cJlA7O xA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uyc450sav-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Dec 2023 12:17:52 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BDCBglT025077;
+	Wed, 13 Dec 2023 12:17:52 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uyc450saf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Dec 2023 12:17:52 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BDAcktX004101;
+	Wed, 13 Dec 2023 12:17:51 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3uw4skg8u4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Dec 2023 12:17:51 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BDCHmrt12321508
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 13 Dec 2023 12:17:48 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4578B20043;
+	Wed, 13 Dec 2023 12:17:48 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 00F0F20040;
+	Wed, 13 Dec 2023 12:17:48 +0000 (GMT)
+Received: from [9.152.224.39] (unknown [9.152.224.39])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 13 Dec 2023 12:17:47 +0000 (GMT)
+Message-ID: <2c460a84c6e725187dda05fc553981ce3022bb78.camel@linux.ibm.com>
+Subject: Re: SMC-R throughput drops for specific message sizes
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: "Nikolaou Alexandros (SO/PAF1-Mb)" <Alexandros.Nikolaou@de.bosch.com>,
+        "D . Wythe" <alibuda@linux.alibaba.com>,
+        Wen Gu <guwen@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>,
+        Nils Hoppmann <niho@linux.ibm.com>
+Cc: "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        netdev
+	 <netdev@vger.kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>,
+        Jan Karcher
+	 <jaka@linux.ibm.com>
+Date: Wed, 13 Dec 2023 13:17:47 +0100
+In-Reply-To: <PAWPR10MB7270731C91544AEF25E0A33CC084A@PAWPR10MB7270.EURPRD10.PROD.OUTLOOK.COM>
+References: 
+	  <PAWPR10MB72701758A24DD8DF8063BEE6C081A@PAWPR10MB7270.EURPRD10.PROD.OUTLOOK.COM>
+	 <ccc03f00-02ee-4af6-8e57-b6de3bc019be@linux.ibm.com>
+	 <PAWPR10MB7270731C91544AEF25E0A33CC084A@PAWPR10MB7270.EURPRD10.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.module_f38+17164+63eeee4a) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231212081944.2480f57b@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 3qJCnWvMKx-zjMUMBWbfO7VTeUTOmrRr
+X-Proofpoint-GUID: IULt2Ub6WF76JU1Zjf2vBZPIIpuOjyT0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-13_05,2023-12-13_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
+ bulkscore=0 adultscore=0 mlxlogscore=999 mlxscore=0 lowpriorityscore=0
+ clxscore=1011 phishscore=0 malwarescore=0 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2312130089
 
-On 12/12/2023 16:19, Jakub Kicinski wrote:
-> On Tue, 12 Dec 2023 15:14:17 +0000 Edward Cree wrote:
->> I will update the commit message to call out and explain this; I
->>  believe the code is actually fine.
-> 
-> Fair point, second time in a ~month we see this sort of false positive.
-> I'll throw [^\\]$ at the end of the regex to try to avoid matching stuff
-> that's most likely a macro.
+Hi Nikolaou,
 
-Sounds good, thanks.
+thank you for providing more details about your setup.
 
-> This one looks legit tho:
-> 
-> +void efx_debugfs_print_filter(char *s, size_t l, struct efx_filter_spec *spec) {}
+On Wed, 2023-12-06 at 15:28 +0000, Nikolaou Alexandros (SO/PAF1-Mb)
+wrote:
+> Dear Wenjia,=C2=A0
 
-Yep, that one's real, will be fixed in v2.
-And this time I'll actually build-test with CONFIG_DEBUG_FS=n,
- which I forgot to do with v1 (sorry).
+while Wenjia is out, I'm writing primarily to getting some more folks'
+attention to this topic. Furthermore, I'm moving the discussion to the
+netdev mailing list where SMC discussions usually take place.
 
--ed
+> Thanks for getting back to me. Some further details on the
+> experiments are:=C2=A0
+> =C2=A0
+> - The tests had been conducted on a one-to-one connection between two
+> Mellanox-powered (mlx5, ConnectX-5) PCs.
+> - Attached you may find the client log of the qperf=C2=A0output. You may
+> notice that for the majority of=C2=A0message size values, the bandwidth i=
+s
+> around 3.2GB/s=C2=A0which matches the maximum throughput of the
+> mellanox=C2=A0NICs.=20
+> According to a periodic regular pattern though, with the first=20
+> occurring=C2=A0at a message size of 473616 =E2=80=93 522192 (with a step =
+of
+> 12144kB),=C2=A0the 3.2GB/s throughput drops substantially. The
+> corresponding commands for these drops are =C2=A0
+> server: smc_run=C2=A0qperf=C2=A0=C2=A0
+> client:=C2=A0smc_run=C2=A0qperf=C2=A0-v -uu=C2=A0-H worker1 -m 473616 tcp=
+_bw=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
+> - Our smc=C2=A0version (3E92E1460DA96BE2B2DDC2F, smc-tools-1.2.2) does no=
+t
+> provide us with the smcr=C2=A0info, smc_rnics=C2=A0-a=C2=A0and smcr=C2=A0=
+-d
+> stats=C2=A0commands. As an alternative, you may also find attached the
+> output of ibv_devinfo=C2=A0-v.=C2=A0
+> - Buffer size:=C2=A0
+> sudo=C2=A0sysctl=C2=A0-w net.ipv4.tcp_rmem=3D"4096 1048576 6291456" =C2=
+=A0
+> sudo=C2=A0sysctl=C2=A0-w net.ipv4.tcp_wmem=3D"4096 1048576 6291456"=C2=A0
+> - MTU size: 9000=C2=A0
+> =C2=A0
+> Should you require further information, please let me know.=C2=A0
+
+Wenjia and I belong to a group of Linux on Z developers that maintains
+the SMC protocol on s390 mainframe systems. Nils Hoppmann is our expert
+for performance and might be able to shed some light on his experiences
+with throughput drops for particular SMC message sizes. Our experience
+is heavily biased towards IBM Z systems, though - with their distinct
+cache and PCI root-complex hardware designs.
+
+Over the last few years there's a group around D. Wythe, Wen Gu and
+Tony Lu who adopted and extended the SMC protocol for use-cases on x86
+architectures. I address them here explicitly, soliciting feedback on
+their experiences.
+
+All in all there are several moving parts involved here, that could
+play a role:
+- firmware level of your Mellanox/NVidia NICs,
+- platform specific hardware designs re. cache and root-complexes,
+interrupt distribution, ...
+- exact code level of the device drivers and the SMC protocol
+
+This is just a heads-up, that there may be requests to try things with
+newer code levels ;)
+
+Thank you,
+Gerd
+
+--
+Gerd Bayer
+Linux on IBM Z Development - IBM Germany R&D
 
