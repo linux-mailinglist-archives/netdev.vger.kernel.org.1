@@ -1,114 +1,121 @@
-Return-Path: <netdev+bounces-56907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C024B811448
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 15:09:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8068881144D
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 15:10:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7ECA92828C2
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 14:09:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23476B20A5A
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 14:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94F172E832;
-	Wed, 13 Dec 2023 14:09:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="raDR3LMQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D98672E82E;
+	Wed, 13 Dec 2023 14:10:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98A4310C
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 06:09:02 -0800 (PST)
-Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-3363e9240b4so341266f8f.0
-        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 06:09:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702476541; x=1703081341; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aKQmsgK550fGD+FPkX8U9qIfMTPKfTZB/dYSgLKLhHI=;
-        b=raDR3LMQD2Yc+pWuvi6DVStJgdBYhKRHCQ0uii1O7MQSKC8Pm5qjpupa0X1KOIHl2B
-         dT1mIqsvJJ3CKmX7J59jjDSV6W7xIPmX2RoM7J6cOJ8Prs1jh+R3tNwAX1P3GI3O74tL
-         phAKfYogQbwiZ/UmxP3DRj+90EOnpgGlHjDfX70KFQWXtBiVUVnGZBzZHYjeGSL978NZ
-         AtiTI3HTN1S3PKz1yvUHkEwWeT2yc7H+qzgkq1ndk2r37KxY7WGt+BgOWl9NKfM2mF9M
-         xFy+d98N5vMuZ8ZgL3lLDFVbJQTs3nQ8U7VbaIvIsgS3AXR/1g5xlYkpoNaOwNOE5YME
-         hSqw==
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B73929C;
+	Wed, 13 Dec 2023 06:10:09 -0800 (PST)
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-5d8a772157fso61503027b3.3;
+        Wed, 13 Dec 2023 06:10:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702476541; x=1703081341;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aKQmsgK550fGD+FPkX8U9qIfMTPKfTZB/dYSgLKLhHI=;
-        b=KAOqxlxB2dnRlKyAk80JgCUdGscJFKOIqgiyuZ/AjsbzX7U47mx5d/J049pIro2eLP
-         9nzLem6o3+wQ26SV26ZvITDtMGoAY1vUj+9jKW0DtBGl4SjYYPdJi6bWHZnkJjw9+TG5
-         xkPFtCwY4P4Bch5oPcp3MQxoeb8lrXZpYiY8DRYtISx9kayYkDnZCOgOV3foNoYDwu4k
-         5S/2V+1KQceO2gU3pwaxqmbqFrf5JgG2cEEidXvFnSbFuCqAg7NnaXrwvpoVmssGi/aA
-         p8pGp/1VU9C4cwSs+cc4U5vcRsiuCex7NYImA6wID7jR1Dencde1B72E9qoBq1ZpxFI1
-         3Bzw==
-X-Gm-Message-State: AOJu0Ywk6ihUMhYjeGvMd271ziXY4g2vyFaCErp11h1kLLPYum8VsT4H
-	uycx2tHQIS8fiViHPdqsquPsGw==
-X-Google-Smtp-Source: AGHT+IHjUazdmDWYtmZHjBl/MNYaHkCncmuiI4Qik4o/6nTaZ1Cz/zKroUpSSvwn0aRFyAT+imvrQg==
-X-Received: by 2002:a5d:6d4a:0:b0:336:1d85:a87 with SMTP id k10-20020a5d6d4a000000b003361d850a87mr2669412wri.12.1702476541132;
-        Wed, 13 Dec 2023 06:09:01 -0800 (PST)
-Received: from localhost ([102.140.209.237])
-        by smtp.gmail.com with ESMTPSA id b18-20020adfe652000000b003333f5f5fd7sm13472171wrn.31.2023.12.13.06.09.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 06:09:00 -0800 (PST)
-Date: Wed, 13 Dec 2023 17:08:57 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Chris Mi <cmi@nvidia.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Moshe Shemesh <moshe@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-	Shay Drory <shayd@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH net 2/2] net/mlx5e: Fix error codes in alloc_branch_attr()
-Message-ID: <3504e359-aed9-421b-b2f1-e0f7b4769132@moroto.mountain>
+        d=1e100.net; s=20230601; t=1702476608; x=1703081408;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lctB7HRIwcjgOPSYwLKN7AvXZwasrHyg/ppK58pb6FQ=;
+        b=rgAthnrB6ry20TwHvow877fohFwKW75PmFBDsAnV4g4DeSxKtDtQPv9wFQpPJ0EmN6
+         fRDwiQfysGWH4AnyNbnTlN3QDAnH3uAc32SaLwKd5kmyLuyzMXiKVX/OtSpk5I9ovLk5
+         aKHkY6sOKm3kCLyS8j1qOlZ7j2av4idIAlueo/P3VXElM1uqRCNnYkoSO+r4uBBwH3LE
+         WOw8/F6OLKwYbpkrsYZ9iPXFzF6ndMiFT4inhwQheLhmgutm1jDlBDOVDhKFe5BnPJnW
+         brVTcsDGX0qX2v3hIgZpAasy6lbRY5POZdlyr/hVRAWSoz/5ZL+1kUlQv5ZwAFJIaQh2
+         XBzA==
+X-Gm-Message-State: AOJu0YyS6dugah+M+RaGUBwTHXeZ+kgYN7dLrc+59iST9cfrrCGeCdLy
+	3H3TvzppGSLvdIUIUdkMeEcIC9xe6buQKg==
+X-Google-Smtp-Source: AGHT+IEod+B+NCcMD5ZPfsOWfS7gVSwpF/VNt02LFpFTCsItur++77J5mCfNM43w39sxyHR7vcHILg==
+X-Received: by 2002:a25:ab23:0:b0:dbc:d22a:9135 with SMTP id u32-20020a25ab23000000b00dbcd22a9135mr446757ybi.105.1702476608583;
+        Wed, 13 Dec 2023 06:10:08 -0800 (PST)
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com. [209.85.128.169])
+        by smtp.gmail.com with ESMTPSA id u4-20020a258f84000000b00dafa5f86dc2sm3967368ybl.16.2023.12.13.06.10.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Dec 2023 06:10:07 -0800 (PST)
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-5d8a772157fso61502697b3.3;
+        Wed, 13 Dec 2023 06:10:07 -0800 (PST)
+X-Received: by 2002:a81:6582:0:b0:5d3:f36c:4aa3 with SMTP id
+ z124-20020a816582000000b005d3f36c4aa3mr6180811ywb.15.1702476607543; Wed, 13
+ Dec 2023 06:10:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <133f4081-6f34-4e3b-b4b5-bacd76961376@moroto.mountain>
-X-Mailer: git-send-email haha only kidding
+References: <20231207070700.4156557-1-claudiu.beznea.uj@bp.renesas.com> <20231207070700.4156557-12-claudiu.beznea.uj@bp.renesas.com>
+In-Reply-To: <20231207070700.4156557-12-claudiu.beznea.uj@bp.renesas.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 13 Dec 2023 15:09:56 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdW5PdFc6AE-G6u3hiRn8g45AYfyqytBvzWPB_Maj2x45Q@mail.gmail.com>
+Message-ID: <CAMuHMdW5PdFc6AE-G6u3hiRn8g45AYfyqytBvzWPB_Maj2x45Q@mail.gmail.com>
+Subject: Re: [PATCH v2 11/11] arm64: dts: renesas: rzg3s-smarc-som: Enable the
+ Ethernet interfaces
+To: Claudiu <claudiu.beznea@tuxon.dev>
+Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, magnus.damm@gmail.com, 
+	mturquette@baylibre.com, sboyd@kernel.org, linus.walleij@linaro.org, 
+	prabhakar.mahadev-lad.rj@bp.renesas.com, biju.das.jz@bp.renesas.com, 
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-clk@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Set the error code if set_branch_dest_ft() fails.
+On Thu, Dec 7, 2023 at 8:08=E2=80=AFAM Claudiu <claudiu.beznea@tuxon.dev> w=
+rote:
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>
+> The RZ/G3S Smarc Module has Ethernet PHYs (KSZ9131) connected to each
+> Ethernet IP. For this, add proper DT bindings to enable the Ethernet
+> communication through these PHYs.
+>
+> The interface b/w PHYs and MACs is RGMII. The skew settings were set to
+> zero as based on phy-mode (rgmii-id) the KSZ9131 driver enables internal
+> DLL, which adds a 2ns delay b/w clocks (TX/RX) and data signals.
+>
+> Different pin settings were applied to TXC and TX_CTL compared with the
+> rest of the RGMII pins to comply with requirements for these pins imposed
+> by HW manual of RZ/G3S (see chapters "Ether Ch0 Voltage Mode Control
+> Register (ETH0_POC)", "Ether Ch1 Voltage Mode Control Register (ETH1_POC)=
+",
+> for power source selection, "Ether MII/RGMII Mode Control Register
+> (ETH_MODE)" for output-enable and "Input Enable Control Register (IEN_m)"
+> for input-enable configurations).
+>
+> Commit also enables the Ethernet interfaces by selecting
+> SW_CONFIG3 =3D SW_ON.
+>
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> ---
+>
+> Changes in v2:
+> - removed #address-cells, #size-cells
+> - adapted patch description to reflect the usage of SW_CONFIG
 
-Fixes: ccbe33003b10 ("net/mlx5e: TC, Don't offload post action rule if not supported")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+i.e. will queue in renesas-devel for v6.8.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-index 85cdba226eac..5775699e1d3e 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-@@ -3778,7 +3778,8 @@ alloc_branch_attr(struct mlx5e_tc_flow *flow,
- 		break;
- 	case FLOW_ACTION_ACCEPT:
- 	case FLOW_ACTION_PIPE:
--		if (set_branch_dest_ft(flow->priv, attr))
-+		err = set_branch_dest_ft(flow->priv, attr);
-+		if (err)
- 			goto out_err;
- 		break;
- 	case FLOW_ACTION_JUMP:
-@@ -3788,7 +3789,8 @@ alloc_branch_attr(struct mlx5e_tc_flow *flow,
- 			goto out_err;
- 		}
- 		*jump_count = cond->extval;
--		if (set_branch_dest_ft(flow->priv, attr))
-+		err = set_branch_dest_ft(flow->priv, attr);
-+		if (err)
- 			goto out_err;
- 		break;
- 	default:
--- 
-2.42.0
+Gr{oetje,eeting}s,
 
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
