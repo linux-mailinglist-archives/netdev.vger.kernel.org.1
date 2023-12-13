@@ -1,78 +1,90 @@
-Return-Path: <netdev+bounces-56684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E7E08107B9
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 02:38:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B6FA8107D2
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 02:49:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F01C1F212B6
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 01:38:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58B9A1C20E28
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 01:49:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F63AA5E;
-	Wed, 13 Dec 2023 01:38:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="E032alIf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C079DECE;
+	Wed, 13 Dec 2023 01:48:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [IPv6:2001:41d0:1004:224b::bd])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37A0DB7
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 17:37:58 -0800 (PST)
-Message-ID: <b683d150-5fa0-4bec-af07-c709ee4781d6@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1702431476;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QR2VSsFCexoYoHMfOMQBYvflj8tNx0RG9xJyXqIMWgg=;
-	b=E032alIfX9+oqA1vQ8NPUQP8BXQQdd4z0effO2ed7bpJU4KR6h1Dx+vF0XiNgeJUw+F0Au
-	4rHGpNUz8ct/ep1PdVyRqCFl8WZ0jZHxHFhqCGit52bEPaixmZGbpz6zzQTVAaCL62FMeI
-	qjw1ZHb0Vek67tpczRcmr59hXttBQvo=
-Date: Tue, 12 Dec 2023 17:37:47 -0800
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B984CAD;
+	Tue, 12 Dec 2023 17:48:53 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=tonylu@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VyO3miM_1702432130;
+Received: from localhost(mailfrom:tonylu@linux.alibaba.com fp:SMTPD_---0VyO3miM_1702432130)
+          by smtp.aliyun-inc.com;
+          Wed, 13 Dec 2023 09:48:51 +0800
+Date: Wed, 13 Dec 2023 09:48:47 +0800
+From: Tony Lu <tonylu@linux.alibaba.com>
+To: Ahelenia =?us-ascii?Q?Ziemia'nska?= <nabijaczleweli@nabijaczleweli.xyz>
+Cc: Karsten Graul <kgraul@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RESEND 06/11] net/smc: smc_splice_read: always request
+ MSG_DONTWAIT
+Message-ID: <ZXkNf9vvtzR7oqoE@TONYMAC-ALIBABA.local>
+Reply-To: Tony Lu <tonylu@linux.alibaba.com>
+References: <cover.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
+ <145da5ab094bcc7d3331385e8813074922c2a13c6.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH RFC bpf-next 1/3] bpf: add mapper macro for bpf_cmd enum
-Content-Language: en-US
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
- Andrii Nakryiko <andrii.nakryiko@gmail.com>,
- Daniel Borkmann <daniel@iogearbox.net>
-Cc: Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>,
- Network Development <netdev@vger.kernel.org>,
- Paul Moore <paul@paul-moore.com>, Christian Brauner <brauner@kernel.org>,
- Linux-Fsdevel <linux-fsdevel@vger.kernel.org>,
- LSM List <linux-security-module@vger.kernel.org>,
- Kees Cook <keescook@chromium.org>, Kernel Team <kernel-team@meta.com>,
- Sargun Dhillon <sargun@sargun.me>, Martin KaFai Lau <martin.lau@kernel.org>
-References: <20231207222755.3920286-1-andrii@kernel.org>
- <20231207222755.3920286-2-andrii@kernel.org>
- <CAADnVQK6WWcgKtPNQrGe9dM7x1iMOyL943PVrJjT6ueBDFRyQw@mail.gmail.com>
- <CAEf4BzYHHdQsaGBFXnY8omP4hv_tUjqxHWTNoEugi3acrE5q=A@mail.gmail.com>
- <CAADnVQLoZpugU6gexuD4ru6VCZ8iQMoLWLByjHA6hush5hUwug@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAADnVQLoZpugU6gexuD4ru6VCZ8iQMoLWLByjHA6hush5hUwug@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <145da5ab094bcc7d3331385e8813074922c2a13c6.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
 
-On 12/11/23 8:06 PM, Alexei Starovoitov wrote:
-> On Mon, Dec 11, 2023 at 8:01 PM Andrii Nakryiko
-> <andrii.nakryiko@gmail.com> wrote:
->>
->>
->>> While I can preemptively answer that in the case vmlinux BTF
->>> is not available it's fine not to parse names and rely on hex.
->>
->> It's fine, I can do optional BTF-based parsing, if that's what you prefer.
+Please add correct tag, for this patch, IIUC, it should be a fix, and
+you need add [PATCH net].
+
+On Tue, Dec 12, 2023 at 11:12:47AM +0100, Ahelenia Ziemia'nska wrote:
+> Otherwise we risk sleeping with the pipe locked for indeterminate
+> lengths of time.
 > 
-> I prefer to keep uapi/bpf.h as-is and use BTF.
-> But I'd like to hear what Daniel's and Martin's preferences are.
+> Link: https://lore.kernel.org/linux-fsdevel/qk6hjuam54khlaikf2ssom6custxf5is2ekkaequf4hvode3ls@zgf7j5j4ubvw/t/#u
 
-I think user will find it useful to have a more readable uapi header file. It 
-would be nice to keep the current uapi/bpf.h form if there is another solution.
+Fixes line is needed.
+
+> Signed-off-by: Ahelenia Ziemia'nska <nabijaczleweli@nabijaczleweli.xyz>
+> ---
+>  net/smc/af_smc.c | 6 +-----
+>  1 file changed, 1 insertion(+), 5 deletions(-)
+> 
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> index bacdd971615e..89473305f629 100644
+> --- a/net/smc/af_smc.c
+> +++ b/net/smc/af_smc.c
+> @@ -3243,12 +3243,8 @@ static ssize_t smc_splice_read(struct socket *sock, loff_t *ppos,
+>  			rc = -ESPIPE;
+>  			goto out;
+>  		}
+> -		if (flags & SPLICE_F_NONBLOCK)
+> -			flags = MSG_DONTWAIT;
+> -		else
+> -			flags = 0;
+>  		SMC_STAT_INC(smc, splice_cnt);
+> -		rc = smc_rx_recvmsg(smc, NULL, pipe, len, flags);
+> +		rc = smc_rx_recvmsg(smc, NULL, pipe, len, MSG_DONTWAIT);
+>  	}
+>  out:
+>  	release_sock(sk);
+> -- 
+> 2.39.2
+
+
 
