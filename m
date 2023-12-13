@@ -1,59 +1,75 @@
-Return-Path: <netdev+bounces-57046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8D4B811C00
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 19:11:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83D60811C1F
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 19:16:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25D4F1C2093C
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 18:11:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1852C2812ED
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 18:16:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D0259B7C;
-	Wed, 13 Dec 2023 18:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CAB157893;
+	Wed, 13 Dec 2023 18:16:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="YiSd5hZC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DQm3jOX0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7820DAF;
-	Wed, 13 Dec 2023 10:11:05 -0800 (PST)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BDBPTkC007464;
-	Wed, 13 Dec 2023 10:10:53 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=pfpt0220; bh=9Hj0KLnB
-	Ueycwyof1iA+0mLw8fTdl+oosoVSFW+ctGw=; b=YiSd5hZC0q3ooM0Me1HLmyAk
-	rirR/TQIaDNsdEgmu+3kAY4uAl7dseWWMIzd5xBFE31X8Fw/1MtVFpvu+BgoTaei
-	DeZQh0KfKhc3DrkW1cp6YhlGmmkwIrFjJo8tM50ktSBfgwRRBisc5sAKI0VBS6fy
-	3Kg8WcDz3+AvLEbVJ0LEggNXDwHnLPxsDOvnGUh8BSBlAQJS/t91SvDsBTfl0MN5
-	oc3BRAB5YMWCw8DgI0mSpunKn7ToYXMeH/VNnNm5FxbDaALSVjt8Ge2jeGtXmyfp
-	NKVdmKyoKRiqI3xMhLvFLOsk5JnokyzRtYsItCj9WSG80aCwVrJ6EvbycxhXHw==
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3uybqmhtb4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Wed, 13 Dec 2023 10:10:53 -0800 (PST)
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 13 Dec
- 2023 10:10:51 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Wed, 13 Dec 2023 10:10:51 -0800
-Received: from localhost.localdomain (unknown [10.28.36.166])
-	by maili.marvell.com (Postfix) with ESMTP id A62733F708C;
-	Wed, 13 Dec 2023 10:10:47 -0800 (PST)
-From: Suman Ghosh <sumang@marvell.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <sgoutham@marvell.com>, <sbhatta@marvell.com>,
-        <jerinj@marvell.com>, <gakula@marvell.com>, <hkelam@marvell.com>,
-        <lcherian@marvell.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: Suman Ghosh <sumang@marvell.com>
-Subject: [net PATCH] octeontx2-pf: Fix graceful exit during PFC configuration failure
-Date: Wed, 13 Dec 2023 23:40:44 +0530
-Message-ID: <20231213181044.103943-1-sumang@marvell.com>
-X-Mailer: git-send-email 2.25.1
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79FB0A7;
+	Wed, 13 Dec 2023 10:16:01 -0800 (PST)
+Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-3360ae1b937so3694103f8f.0;
+        Wed, 13 Dec 2023 10:16:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702491360; x=1703096160; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nGFsEcnLWfQskkH/HBBeriUIEXqAgKL8+Y/z39zis/U=;
+        b=DQm3jOX0GiWYveROu/pugi10THtutEEKijcAPXCm/kHQbFecwsOAigGNC/A2apCgrH
+         c1YCdR67c1XK6L9FR8Nvi63hSf0OzNV9rU2Tvf1mAoN59FaRzZc+1ksInJ83geLH1S6T
+         XxHFGGuLGQDzysh5PwTtpxOEIAUHbroBPa3H+vSw+GKyzRa1Huwiw+OWeaOS3qGsC863
+         bHIZTjHmB6ILAIgmwEUjzWsNgz+0yFtsdRO9iU6XzN/xwU51GbkRbVoNuqoJuhTerAIP
+         EjIWqiPFQ8Ic7XAeHyC97fSXcGKFWHoMNF7TpDG0pRYIyfKMcdvRP3ZHyjLNcxfBR8UW
+         SLWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702491360; x=1703096160;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nGFsEcnLWfQskkH/HBBeriUIEXqAgKL8+Y/z39zis/U=;
+        b=iEKoYW2j/EdYgOQ2HDfNUcd2XyOuhwuvgcFs2Rv0xmey2oqLvkjiOU9OR7sjiX3w2W
+         695v1xynill2XsLhhqA919m49EOkw53vh/oT51BSP829cq+XrS6c+vlSvVXz13sAWq//
+         3EoMTyIB4BEz/8FPZl/Wz6p1gvO1IJJjbmBMO203v+p3wdb+mLL6ASHKF7xpySywtSrI
+         8abk0JTSQUFHnjpvnxn0xrPz/YV+nNh72qJPcFyTuEoYKtZhg9bOBqL4wi5itG/M+MQU
+         USHMFpsxznJfIzYgWPAOck8hJARc+LWI8S7S1UL/lzh/Gn96a3ZKj2GhlwN2VvJJj3Wg
+         FowQ==
+X-Gm-Message-State: AOJu0YzsHIJqAT90rjeI28dOGItfsgmNhk7pfozFbjy/x6SpJTgTQNBO
+	XE2GuhvpqXX6OmoiWXCsp7c=
+X-Google-Smtp-Source: AGHT+IE9cHR0Goae7Zt7vuXUDTwV1Mv8t2gUcOTNuEiQVHOb16d0OW3R1laCb9C5gwG+u98v6nzOxA==
+X-Received: by 2002:a5d:6611:0:b0:333:179:d8df with SMTP id n17-20020a5d6611000000b003330179d8dfmr4457400wru.26.1702491359661;
+        Wed, 13 Dec 2023 10:15:59 -0800 (PST)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id e33-20020a5d5961000000b0033346fe9b9bsm13947762wri.83.2023.12.13.10.15.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Dec 2023 10:15:59 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	Kees Cook <keescook@chromium.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [net-next PATCH 0/2] net: add define to describe link speed modes
+Date: Wed, 13 Dec 2023 19:15:52 +0100
+Message-Id: <20231213181554.4741-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,72 +77,24 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: VdTMhOCCxuJki73Q6snNOiZI0IHMJ3KY
-X-Proofpoint-ORIG-GUID: VdTMhOCCxuJki73Q6snNOiZI0IHMJ3KY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
 
-During PFC configuration failure the code was not handling a graceful
-exit. This patch fixes the same and add proper code for a graceful exit.
+This is a simple series to add define to describe link speed modes.
 
-Fixes: 99c969a83d82 ("octeontx2-pf: Add egress PFC support")
-Signed-off-by: Suman Ghosh <sumang@marvell.com>
----
- .../ethernet/marvell/octeontx2/nic/otx2_dcbnl.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+Hope the proposed way is acceptable with the enum and define.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
-index bfddbff7bcdf..28fb643d2917 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
-@@ -399,9 +399,10 @@ static int otx2_dcbnl_ieee_getpfc(struct net_device *dev, struct ieee_pfc *pfc)
- static int otx2_dcbnl_ieee_setpfc(struct net_device *dev, struct ieee_pfc *pfc)
- {
- 	struct otx2_nic *pfvf = netdev_priv(dev);
-+	u8 old_pfc_en;
- 	int err;
- 
--	/* Save PFC configuration to interface */
-+	old_pfc_en = pfvf->pfc_en;
- 	pfvf->pfc_en = pfc->pfc_en;
- 
- 	if (pfvf->hw.tx_queues >= NIX_PF_PFC_PRIO_MAX)
-@@ -411,13 +412,17 @@ static int otx2_dcbnl_ieee_setpfc(struct net_device *dev, struct ieee_pfc *pfc)
- 	 * supported by the tx queue configuration
- 	 */
- 	err = otx2_check_pfc_config(pfvf);
--	if (err)
-+	if (err) {
-+		pfvf->pfc_en = old_pfc_en;
- 		return err;
-+	}
- 
- process_pfc:
- 	err = otx2_config_priority_flow_ctrl(pfvf);
--	if (err)
-+	if (err) {
-+		pfvf->pfc_en = old_pfc_en;
- 		return err;
-+	}
- 
- 	/* Request Per channel Bpids */
- 	if (pfc->pfc_en)
-@@ -425,6 +430,12 @@ static int otx2_dcbnl_ieee_setpfc(struct net_device *dev, struct ieee_pfc *pfc)
- 
- 	err = otx2_pfc_txschq_update(pfvf);
- 	if (err) {
-+		if (pfc->pfc_en)
-+			otx2_nix_config_bp(pfvf, false);
-+
-+		otx2_pfc_txschq_stop(pfvf);
-+		pfvf->pfc_en = old_pfc_en;
-+		otx2_config_priority_flow_ctrl(pfvf);
- 		dev_err(pfvf->dev, "%s failed to update TX schedulers\n", __func__);
- 		return err;
- 	}
+This is also needed in the upcoming changes in the netdev trigger for LEDs
+where phy_speeds functions is used to declare a more compact array instead
+of using a "big enough" approach.
+
+Christian Marangi (2):
+  net: ethtool: add define for link speed mode number
+  net: phy: leds: use new define for link speed modes number
+
+ drivers/net/phy/phy_led_triggers.c |  2 +-
+ include/uapi/linux/ethtool.h       | 22 ++++++++++++++++++++++
+ 2 files changed, 23 insertions(+), 1 deletion(-)
+
 -- 
-2.25.1
+2.40.1
 
 
