@@ -1,242 +1,112 @@
-Return-Path: <netdev+bounces-56911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F30C8114C2
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 15:36:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 971518114C8
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 15:37:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B56E1F21156
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 14:36:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 203311F21683
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 14:37:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EFFF2E857;
-	Wed, 13 Dec 2023 14:36:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f2rmOjrx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44DE52E85B;
+	Wed, 13 Dec 2023 14:37:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A108BD0;
-	Wed, 13 Dec 2023 06:35:56 -0800 (PST)
-Received: by mail-wm1-x344.google.com with SMTP id 5b1f17b1804b1-40c2c65e6aaso72109025e9.2;
-        Wed, 13 Dec 2023 06:35:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702478155; x=1703082955; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:from:content-language
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nUFSFbFgIum2NtAhJnNBP5hxWvYwzYJYVb9Fw/rpe9A=;
-        b=f2rmOjrxmKRrbgQfkPYSgdaz2dxj911vkdvO9Ny+U1hkJy7ieHVUlmfucrF07LiKfX
-         xsLpuS5VuFvO0YpyaKKsvjYTCs0CVLJ2KV2EOv3Ofh6PxPww/gTqNhxCHobhuhPEhpTm
-         79yb+aVqIDcDM4tOQqQTg+INulSm6m939vOECrBMBmb7x/yD/SNKpqyL9xxYMw/e8Tek
-         AfMmMeGdgGsSpoyxINFEoHPyFlrI04OjpHpDz0cQJ0KSOy2G4WcHQPw4sIDsBfhqE4BU
-         OFbzNp4XzYujkCJKylxuqryJe281qVOC0h6mReeGhbT8tFKUNHYQXcuyrO4NLMap7q4/
-         U0Hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702478155; x=1703082955;
-        h=content-transfer-encoding:cc:to:subject:from:content-language
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=nUFSFbFgIum2NtAhJnNBP5hxWvYwzYJYVb9Fw/rpe9A=;
-        b=LXO8Zd3Xdgh3I+FBunhfOBybW8QbyeYWLrqGN9YNJp0YXGoj/9TVne6j/rwqPH8OBc
-         4eD1scV81p/uZlIpC8ufffHdnMcwvl0ME3er3Pk9HxIjcLKKosj2vkNycAYmyW6c3kw+
-         d9agR7AZcFkDmh3WeYUIbNMcPKnXffv99V7aar3FQUJb91rGBUpCaivZ5+7qCw7ICAII
-         pcT3Q5UOFvO+StgCONZ3v6nT+PGr/wULAZpFZpKKUjlTKSx2a1g1E/qcr74tgDcLkJzA
-         sZzGzu3J1ZknidAXWT62cnnjGr91oFjI+0JACpwwwwYZy7CVKch0E0iWSsgMbhw6SIHN
-         /gag==
-X-Gm-Message-State: AOJu0Yxbl/xzVBvU/BC9RudpGYGKfKq5/RjXWHgdBGYZYRrFMcdr0gsI
-	03RqjQZtXpr4elJJFGePi1FEnUy+a4lXyMtc
-X-Google-Smtp-Source: AGHT+IHH2DLkhZJfogZupcuD9ipfyMZH25Ro9qMHMsMnFpHPnwDdvFgUHUPTzm/6osDEIjFIHpoL3Q==
-X-Received: by 2002:a05:600c:1394:b0:40c:55a7:770f with SMTP id u20-20020a05600c139400b0040c55a7770fmr1119780wmf.159.1702478154820;
-        Wed, 13 Dec 2023 06:35:54 -0800 (PST)
-Received: from [10.0.3.3] ([217.212.240.69])
-        by smtp.gmail.com with ESMTPSA id n21-20020a05600c4f9500b0040b36ad5413sm20112472wmq.46.2023.12.13.06.35.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Dec 2023 06:35:54 -0800 (PST)
-Message-ID: <ac24d9b6-bfff-4700-a301-d4bd0dbb9313@gmail.com>
-Date: Wed, 13 Dec 2023 15:33:19 +0100
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5361EE3
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 06:37:04 -0800 (PST)
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-593-RnP9YVc7OQGSpF9V5jKgeg-1; Wed, 13 Dec 2023 09:36:58 -0500
+X-MC-Unique: RnP9YVc7OQGSpF9V5jKgeg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 409C183B870;
+	Wed, 13 Dec 2023 14:36:57 +0000 (UTC)
+Received: from hog (unknown [10.39.192.229])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id DD7CC51E3;
+	Wed, 13 Dec 2023 14:36:55 +0000 (UTC)
+Date: Wed, 13 Dec 2023 15:36:54 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Cc: netdev@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
+	Saeed Mahameed <saeed@kernel.org>, Gal Pressman <gal@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH RFC net-next v1 2/3] macsec: Detect if Rx skb is
+ macsec-related for offloading devices that update md_dst
+Message-ID: <ZXnBhouKZPf39Hkb@hog>
+References: <20231116182900.46052-1-rrameshbabu@nvidia.com>
+ <20231116182900.46052-3-rrameshbabu@nvidia.com>
+ <ZV9jzHCQy1DZvyfk@hog>
+ <87wmu36mhw.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Language: en-US
-From: Leone Fernando <leone4fernando@gmail.com>
-Subject: [PATCH net] ipmr: support IP_PKTINFO on cache report IGMP msg
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, willemdebruijn.kernel@gmail.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- leone4fernando@gmail.com
+In-Reply-To: <87wmu36mhw.fsf@nvidia.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-In order to support IP_PKTINFO on those packets, we need to call
-ipv4_pktinfo_prepare, so introduced minor changes to this
-function to support this flow.
+2023-11-27, 11:10:19 -0800, Rahul Rameshbabu wrote:
+> On Thu, 23 Nov, 2023 15:38:04 +0100 Sabrina Dubroca <sd@queasysnail.net> =
+wrote:
+> > If the device provided md_dst, either we find the corresponding rx_sc,
+> > then we receive on this macsec device only, or we don't and try the
+> > other macsec devices.
+> >
+> > Something like this (completely untested):
+> >
+> > =09if (macsec_is_offloaded(macsec) && netif_running(ndev)) {
+> > =09=09struct macsec_rx_sc *rx_sc =3D NULL;
+> > =09=09bool exact =3D false;
+> >
+> > =09=09if (macsec->offload_md_dst && !is_macsec_md_dst)
+> > =09=09=09continue;
+> >
+> > =09=09if (is_macsec_md_dst) {
+> > =09=09=09DEBUG_NET_WARN_ON_ONCE(!macsec->offload_md_dst);
+> > =09=09=09rx_sc =3D find_rx_sc(&macsec->secy, md_dst->u.macsec_info.sci)=
+;
+> > =09=09=09if (!rx_sc)
+> > =09=09=09=09continue;
+> > =09=09=09exact =3D true;
+> > =09=09}
+> >
+> > =09=09if (exact ||
+> > =09=09    ether_addr_equal_64bits(hdr->h_dest, ndev->dev_addr)) {
+> > =09=09=09/* exact match, divert skb to this port */
+> > =09[keep the existing code after this]
+> >
+> >
+> > Am I missing something?
+>=20
+> I just have one question with regards to this (will be testing this out
+> too). For the exact match case, if the receiving traffic was macsec
+> encrypted multicast, would the pkt_type be PACKET_HOST or
+> PACKET_BROADCAST/PACKET_MULTICAST? My intuition is screaming to me that
+> '[keep the existing code after this]' is not 100% true because we would
+> want to update the skb pkt_type to PACKET_BROADCAST/PACKET_MULTICAST
+> even if we are able to identify the incoming multicast frame was macsec
+> encrypted and specifically intended for this device. Does that sound
+> right?
 
-When sending mrouted/pimd daemons a cache report IGMP msg, it is
-unnecessary to set dst on the newly created skb.
-It used to be necessary on older versions until
-commit d826eb14ecef ("ipv4: PKTINFO doesnt need dst reference") which
-changed the way IP_PKTINFO struct is been retrieved.
+Yes, I guess. SW decrypt path calls eth_type_trans, but that does a
+lot more than we need here.
 
-Fixes: d826eb14ecef ("ipv4: PKTINFO doesnt need dst reference")
-Signed-off-by: Leone Fernando <leone4fernando@gmail.com>
----
- include/net/ip.h       | 10 +++++++++-
- net/ipv4/ip_sockglue.c | 25 ++++++++++++++++---------
- net/ipv4/ipmr.c        | 12 +++++-------
- net/ipv4/raw.c         |  2 +-
- net/ipv4/udp.c         |  2 +-
- 5 files changed, 32 insertions(+), 19 deletions(-)
-
-diff --git a/include/net/ip.h b/include/net/ip.h
-index b31be912489a..1b40b7386c56 100644
---- a/include/net/ip.h
-+++ b/include/net/ip.h
-@@ -767,7 +767,15 @@ int ip_options_rcv_srr(struct sk_buff *skb, struct net_device *dev);
-  *	Functions provided by ip_sockglue.c
-  */
- 
--void ipv4_pktinfo_prepare(const struct sock *sk, struct sk_buff *skb);
-+void ipv4_pktinfo_prepare(const struct sock *sk, struct sk_buff *iskb,
-+			struct sk_buff *oskb);
-+
-+
-+static inline void ipv4_pktinfo_input_prepare(const struct sock *sk, struct sk_buff *skb)
-+{
-+	ipv4_pktinfo_prepare(sk, skb, NULL);
-+}
-+
- void ip_cmsg_recv_offset(struct msghdr *msg, struct sock *sk,
- 			 struct sk_buff *skb, int tlen, int offset);
- int ip_cmsg_send(struct sock *sk, struct msghdr *msg,
-diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index d7d13940774e..fb26963e3869 100644
---- a/net/ipv4/ip_sockglue.c
-+++ b/net/ipv4/ip_sockglue.c
-@@ -1364,19 +1364,26 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
- /**
-  * ipv4_pktinfo_prepare - transfer some info from rtable to skb
-  * @sk: socket
-- * @skb: buffer
-+ * @iskb: input buffer
-+ * @oskb: out buffer
-  *
-  * To support IP_CMSG_PKTINFO option, we store rt_iif and specific
-  * destination in skb->cb[] before dst drop.
-  * This way, receiver doesn't make cache line misses to read rtable.
-  */
--void ipv4_pktinfo_prepare(const struct sock *sk, struct sk_buff *skb)
-+void ipv4_pktinfo_prepare(const struct sock *sk, struct sk_buff *iskb,
-+			  struct sk_buff *oskb)
- {
--	struct in_pktinfo *pktinfo = PKTINFO_SKB_CB(skb);
-+	struct in_pktinfo *pktinfo = PKTINFO_SKB_CB(iskb);
- 	bool prepare = inet_test_bit(PKTINFO, sk) ||
- 		       ipv6_sk_rxinfo(sk);
- 
--	if (prepare && skb_rtable(skb)) {
-+	if (oskb) {
-+		memcpy(oskb->cb, iskb->cb, sizeof(iskb->cb));
-+		pktinfo = PKTINFO_SKB_CB(oskb);
-+	}
-+
-+	if (prepare && skb_rtable(iskb)) {
- 		/* skb->cb is overloaded: prior to this point it is IP{6}CB
- 		 * which has interface index (iif) as the first member of the
- 		 * underlying inet{6}_skb_parm struct. This code then overlays
-@@ -1386,20 +1393,20 @@ void ipv4_pktinfo_prepare(const struct sock *sk, struct sk_buff *skb)
- 		 * (e.g., process binds socket to eth0 for Tx which is
- 		 * redirected to loopback in the rtable/dst).
- 		 */
--		struct rtable *rt = skb_rtable(skb);
--		bool l3slave = ipv4_l3mdev_skb(IPCB(skb)->flags);
-+		struct rtable *rt = skb_rtable(iskb);
-+		bool l3slave = ipv4_l3mdev_skb(IPCB(iskb)->flags);
- 
- 		if (pktinfo->ipi_ifindex == LOOPBACK_IFINDEX)
--			pktinfo->ipi_ifindex = inet_iif(skb);
-+			pktinfo->ipi_ifindex = inet_iif(iskb);
- 		else if (l3slave && rt && rt->rt_iif)
- 			pktinfo->ipi_ifindex = rt->rt_iif;
- 
--		pktinfo->ipi_spec_dst.s_addr = fib_compute_spec_dst(skb);
-+		pktinfo->ipi_spec_dst.s_addr = fib_compute_spec_dst(iskb);
- 	} else {
- 		pktinfo->ipi_ifindex = 0;
- 		pktinfo->ipi_spec_dst.s_addr = 0;
- 	}
--	skb_dst_drop(skb);
-+	skb_dst_drop(iskb);
- }
- 
- int ip_setsockopt(struct sock *sk, int level, int optname, sockptr_t optval,
-diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index 9e222a57bc2b..6ed7c88743f9 100644
---- a/net/ipv4/ipmr.c
-+++ b/net/ipv4/ipmr.c
-@@ -1025,6 +1025,10 @@ static int ipmr_cache_report(const struct mr_table *mrt,
- 	struct sk_buff *skb;
- 	int ret;
- 
-+	mroute_sk = rcu_dereference(mrt->mroute_sk);
-+	if (!mroute_sk)
-+		return -EINVAL;
-+
- 	if (assert == IGMPMSG_WHOLEPKT || assert == IGMPMSG_WRVIFWHOLE)
- 		skb = skb_realloc_headroom(pkt, sizeof(struct iphdr));
- 	else
-@@ -1069,7 +1073,7 @@ static int ipmr_cache_report(const struct mr_table *mrt,
- 		msg = (struct igmpmsg *)skb_network_header(skb);
- 		msg->im_vif = vifi;
- 		msg->im_vif_hi = vifi >> 8;
--		skb_dst_set(skb, dst_clone(skb_dst(pkt)));
-+		ipv4_pktinfo_prepare(mroute_sk, pkt, skb);
- 		/* Add our header */
- 		igmp = skb_put(skb, sizeof(struct igmphdr));
- 		igmp->type = assert;
-@@ -1079,12 +1083,6 @@ static int ipmr_cache_report(const struct mr_table *mrt,
- 		skb->transport_header = skb->network_header;
- 	}
- 
--	mroute_sk = rcu_dereference(mrt->mroute_sk);
--	if (!mroute_sk) {
--		kfree_skb(skb);
--		return -EINVAL;
--	}
--
- 	igmpmsg_netlink_event(mrt, skb);
- 
- 	/* Deliver to mrouted */
-diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
-index 27da9d7294c0..cde60c8deed4 100644
---- a/net/ipv4/raw.c
-+++ b/net/ipv4/raw.c
-@@ -292,7 +292,7 @@ static int raw_rcv_skb(struct sock *sk, struct sk_buff *skb)
- 
- 	/* Charge it to the socket. */
- 
--	ipv4_pktinfo_prepare(sk, skb);
-+	ipv4_pktinfo_input_prepare(sk, skb);
- 	if (sock_queue_rcv_skb_reason(sk, skb, &reason) < 0) {
- 		kfree_skb_reason(skb, reason);
- 		return NET_RX_DROP;
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 89e5a806b82e..3e5a418c96c3 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -2169,7 +2169,7 @@ static int udp_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
- 
- 	udp_csum_pull_header(skb);
- 
--	ipv4_pktinfo_prepare(sk, skb);
-+	ipv4_pktinfo_input_prepare(sk, skb);
- 	return __udp_queue_rcv_skb(sk, skb);
- 
- csum_error:
--- 
-2.34.1
+--=20
+Sabrina
 
 
