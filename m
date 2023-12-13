@@ -1,50 +1,39 @@
-Return-Path: <netdev+bounces-56767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00DC3810C66
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:27:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A03C1810C95
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:39:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 307521C20A9A
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 08:27:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 55BA61F211A2
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 08:39:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C7AE1DDEC;
-	Wed, 13 Dec 2023 08:27:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB18C1DDD7;
+	Wed, 13 Dec 2023 08:39:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="YlsTbeja"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vO3EpuSM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41F5091;
-	Wed, 13 Dec 2023 00:27:19 -0800 (PST)
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BD7UFmv007336;
-	Wed, 13 Dec 2023 08:27:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=3lO73/urnQDm+kr+1VeDVOz2JVDHAIwLqDv0H1bD5Iw=; b=Yl
-	sTbejaClQy+tJ8J+U+DkXgP4bSDdsy1txWlLvJdoqOEG+7n8LuDChqdbPY/B0zks
-	yP0wV4zT78EvblM5Zt+DDMonsU/cqTzx5gH9DWKzMLoQKNCGI/dRjZiqGLOIFtGA
-	JJ0mSjOOhOET00dcpo/K7d72EO95pInk8lmy5T7aJ3udTYXYOCD82W3xHk74Tp24
-	msQX0YiTZjqsQB9per3qb3f4oiM5xtgIRUYbJfCzlQETfR59l8wDsnAHdM7cmRpC
-	RUyq2QgbXIM28wEBaSZbdTucJ8kmdBhyEeEpoTv7jbKLF/3yHcsQ/9yrMPCGeLxw
-	Ng+Tpn2nsdhnMftTmu3w==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uy3rprs48-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Dec 2023 08:27:05 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BD8R4Dp012447
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Dec 2023 08:27:04 GMT
-Received: from [10.253.13.71] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 13 Dec
- 2023 00:26:59 -0800
-Message-ID: <11ffc985-3f2b-46b9-ae0b-911f7abe98d1@quicinc.com>
-Date: Wed, 13 Dec 2023 16:26:56 +0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54FB2F44;
+	Wed, 13 Dec 2023 08:39:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96B13C433C7;
+	Wed, 13 Dec 2023 08:39:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702456752;
+	bh=rqWbtF/NxYXvBPFQFOh7+fSc22EYlFtkkZ1q8+1HHpg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=vO3EpuSMPUKdH6YSXnpdHQY1/OD9Sz13+qESRvlFfyKShrJEzhy9vLcbZXJW25X9Y
+	 ANHpdO0bL7jiRUR1oxUXpHZrjQelCzLZ/A8wOCkOY64dR41I+4zLNUnNIuajnYt+JN
+	 CE3161OLG2rEUZODsfHcv3JOKzHFsxcc66PZuUy9R+gSotbaJtC+83ygUTfWyslraZ
+	 lTZvLg3/5ZsVFGv1PUUqHxDR41U+WEoB9j9ZQ4zWx2xtw7b7womJ4Xcjx9OPDdH4ww
+	 CdMTIk9R4jrphLTiYJP2Vr7mJ1cLZ+WmGcepVDXxDrDAnt1g0Bh5z6L4mWIOpBjD2H
+	 V4gCglzWoYYGw==
+Message-ID: <78c0072a-c084-4588-b973-ad4f80047914@kernel.org>
+Date: Wed, 13 Dec 2023 09:39:08 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,156 +41,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 5/5] dt-bindings: net: ipq4019-mdio: Document ipq5332
- platform
+Subject: Re: [PATCH] net, xdp: correct grammar
 Content-Language: en-US
-To: Conor Dooley <conor@kernel.org>
-CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
-References: <20231212115151.20016-1-quic_luoj@quicinc.com>
- <20231212115151.20016-6-quic_luoj@quicinc.com>
- <20231212-caution-improvise-ed3cc6a1d305@spud>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <20231212-caution-improvise-ed3cc6a1d305@spud>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+To: Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, bpf@vger.kernel.org
+References: <20231213043735.30208-1-rdunlap@infradead.org>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20231213043735.30208-1-rdunlap@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: IhyU1Oqb6UTIJDWGvhhHChFCzN1KcSsK
-X-Proofpoint-GUID: IhyU1Oqb6UTIJDWGvhhHChFCzN1KcSsK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- mlxscore=0 suspectscore=0 impostorscore=0 adultscore=0 malwarescore=0
- mlxlogscore=999 bulkscore=0 priorityscore=1501 phishscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2312130059
 
 
 
-On 12/13/2023 12:06 AM, Conor Dooley wrote:
-> On Tue, Dec 12, 2023 at 07:51:50PM +0800, Luo Jie wrote:
->> Update the yaml file for the new DTS properties.
->>
->> 1. cmn-reference-clock for the CMN PLL source clock select.
->> 2. clock-frequency for MDIO clock frequency config.
->> 3. add uniphy AHB & SYS GCC clocks.
->> 4. add reset-gpios for MDIO bus level reset.
->>
->> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
->> ---
->>   .../bindings/net/qcom,ipq4019-mdio.yaml       | 157 +++++++++++++++++-
->>   1 file changed, 153 insertions(+), 4 deletions(-)
->>
->> diff --git a/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml b/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
->> index 3407e909e8a7..9546a6ad7841 100644
->> --- a/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
->> +++ b/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
->> @@ -20,6 +20,8 @@ properties:
->>             - enum:
->>                 - qcom,ipq6018-mdio
->>                 - qcom,ipq8074-mdio
->> +              - qcom,ipq9574-mdio
->> +              - qcom,ipq5332-mdio
->>             - const: qcom,ipq4019-mdio
->>   
->>     "#address-cells":
->> @@ -30,19 +32,71 @@ properties:
->>   
->>     reg:
->>       minItems: 1
->> -    maxItems: 2
->> +    maxItems: 5
->>       description:
->> -      the first Address and length of the register set for the MDIO controller.
->> -      the second Address and length of the register for ethernet LDO, this second
->> -      address range is only required by the platform IPQ50xx.
->> +      the first Address and length of the register set for the MDIO controller,
->> +      the optional second, third and fourth address and length of the register
->> +      for ethernet LDO, these three address range are required by the platform
->> +      IPQ50xx/IPQ5332/IPQ9574, the last address and length is for the CMN clock
->> +      to select the reference clock.
->> +
->> +  reg-names:
->> +    minItems: 1
->> +    maxItems: 5
->>   
->>     clocks:
->> +    minItems: 1
->>       items:
->>         - description: MDIO clock source frequency fixed to 100MHZ
->> +      - description: UNIPHY0 AHB clock source frequency fixed to 100MHZ
->> +      - description: UNIPHY1 AHB clock source frequency fixed to 100MHZ
->> +      - description: UNIPHY0 SYS clock source frequency fixed to 24MHZ
->> +      - description: UNIPHY1 SYS clock source frequency fixed to 24MHZ
->>   
->>     clock-names:
->> +    minItems: 1
->>       items:
->>         - const: gcc_mdio_ahb_clk
->> +      - const: gcc_uniphy0_ahb_clk
->> +      - const: gcc_uniphy1_ahb_clk
->> +      - const: gcc_uniphy0_sys_clk
->> +      - const: gcc_uniphy1_sys_clk
+On 13/12/2023 05.37, Randy Dunlap wrote:
+> Use the correct verb form in 2 places.
 > 
->> +  cmn-reference-clock:
->> +    oneOf:
->> +      - items:
->> +          - enum:
->> +              - 0   # CMN PLL reference internal 48MHZ
->> +              - 1   # CMN PLL reference external 25MHZ
->> +              - 2   # CMN PLL reference external 31250KHZ
->> +              - 3   # CMN PLL reference external 40MHZ
->> +              - 4   # CMN PLL reference external 48MHZ
->> +              - 5   # CMN PLL reference external 50MHZ
->> +              - 6   # CMN PLL reference internal 96MHZ
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Alexei Starovoitov <ast@kernel.org>
+> Cc: Daniel Borkmann <daniel@iogearbox.net>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Jesper Dangaard Brouer <hawk@kernel.org>
+> Cc: John Fastabend <john.fastabend@gmail.com>
+> Cc: bpf@vger.kernel.org
+> ---
+>   include/net/xdp.h |    4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> Why is this not represented by an element of the clocks property?
 
-This property is for the reference clock source selection of CMN PLL,
-CMN PLL generates the different clock rates for the different Ethernet
-blocks, this CMN PLL configuration is not located in the GCC, so the
-clock framework can't be used, which is the general hardware register
-instead of RCG register for GCC.
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
-> 
->> +  clock-frequency:
->> +    oneOf:
->> +      - items:
->> +          - enum:
->> +              - 12500000
->> +              - 6250000
->> +              - 3125000
->> +              - 1562500
->> +              - 781250
->> +              - 390625
->> +    description:
->> +      The MDIO bus clock that must be output by the MDIO bus hardware,
->> +      only the listed frequecies above can be configured, other frequency
->> +      will cause malfunction. If absent, the default hardware value is used.
-> 
-> Likewise.
-> 
-> Your commit message contains a bullet point list of what you are doing,
-> but there's no explanation here for why custom properties are required
-> to provide clock information.
-> 
-> Thanks,
-> Conor.
-
-Hi Conor,
-This property clock-frequency is optional to configure the MDIO working
-clock rate, and this is the MDIO general DT property, since the hardware
-default clock rate is 390625HZ, there is requirement for higher clock 
-rate in the normal working case, i will update this information in the
-next patch set.
+> diff -- a/include/net/xdp.h b/include/net/xdp.h
+> --- a/include/net/xdp.h
+> +++ b/include/net/xdp.h
+> @@ -16,7 +16,7 @@
+>    *
+>    * The XDP RX-queue info (xdp_rxq_info) is associated with the driver
+>    * level RX-ring queues.  It is information that is specific to how
+> - * the driver have configured a given RX-ring queue.
+> + * the driver has configured a given RX-ring queue.
+>    *
+>    * Each xdp_buff frame received in the driver carries a (pointer)
+>    * reference to this xdp_rxq_info structure.  This provides the XDP
+> @@ -32,7 +32,7 @@
+>    * The struct is not directly tied to the XDP prog.  A new XDP prog
+>    * can be attached as long as it doesn't change the underlying
+>    * RX-ring.  If the RX-ring does change significantly, the NIC driver
+> - * naturally need to stop the RX-ring before purging and reallocating
+> + * naturally needs to stop the RX-ring before purging and reallocating
+>    * memory.  In that process the driver MUST call unregister (which
+>    * also applies for driver shutdown and unload).  The register API is
+>    * also mandatory during RX-ring setup.
 
