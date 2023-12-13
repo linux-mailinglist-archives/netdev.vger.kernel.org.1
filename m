@@ -1,159 +1,128 @@
-Return-Path: <netdev+bounces-56753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCB5D810C0E
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:10:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CB39810C43
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:21:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 829951F21121
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 08:10:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AE9328175F
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 08:21:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F403E1CF98;
-	Wed, 13 Dec 2023 08:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E30A41D68F;
+	Wed, 13 Dec 2023 08:21:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="mRM1Lsxh"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="vqyYBO2F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAF60DC;
-	Wed, 13 Dec 2023 00:10:25 -0800 (PST)
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BD7SKZ7024094;
-	Wed, 13 Dec 2023 08:10:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=gvSnVn+LDgma7p84JhK3TqLX+SbuVfd4ulOdi+AG5ls=; b=mR
-	M1Lsxha8xoStNL56pDQdJTMm61pw5LvotZ4bfCfFOk4MjufmVlwJMRtD+8aPwsko
-	qsP3UODWYHZ6kCs3DDhWFqY46Jy59KZZM6r5jZr4VujSVcBwYGfCKgd/UtlvyIYM
-	2U5gMI2gdb5LaRjZBr2cn+tdjXQ1MHOLioUchIZkM8WbVzqSxTvYvNw2nWWSXC1t
-	rtvMA10mFBW4mLn5hXDVPn6Ta03qZCcX3lNsGx9EVX+xmYYhWtu1I3irOqLBJGaT
-	eEqcIGa9f0B7L9PwHK5t0eZszZFwSwtUUzM12B0yZ+WYo8hFFjQ5lz52lzn9BAxi
-	AHB/ZcIx+gRqK10RwkUw==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uxkc833gm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Dec 2023 08:10:02 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BD8A1Ml022698
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Dec 2023 08:10:01 GMT
-Received: from [10.253.13.71] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 13 Dec
- 2023 00:09:55 -0800
-Message-ID: <b7b0ab99-7277-4618-9037-a878d7b899a9@quicinc.com>
-Date: Wed, 13 Dec 2023 16:09:53 +0800
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 921FA8E
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 00:21:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1702455667; x=1733991667;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Z+bdvlN5X4PbezfjoUMWJEWoW3rVWUjBwmtiLXMAEf0=;
+  b=vqyYBO2FFzVe4opapacKJh7wMprakbutm3L082JDIvJbpd43fLQQR46T
+   G6Jyve/9llhCPWRpgG5CKk8DfeNNHJoZLcv9rKjSiaxyv02z4czhDwrSx
+   itlLIKH59FttDs4T3pzgL0Qx7PhNzkZXhl26hotw/ZHKe6wt7776i2AVw
+   E=;
+X-IronPort-AV: E=Sophos;i="6.04,272,1695686400"; 
+   d="scan'208";a="382594616"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-8c5b1df3.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 08:21:00 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
+	by email-inbound-relay-pdx-2c-m6i4x-8c5b1df3.us-west-2.amazon.com (Postfix) with ESMTPS id C5F4C40D67;
+	Wed, 13 Dec 2023 08:20:59 +0000 (UTC)
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:6877]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.2.31:2525] with esmtp (Farcaster)
+ id c2f4996c-2a63-40ee-8cfd-8e0c3e815d67; Wed, 13 Dec 2023 08:20:59 +0000 (UTC)
+X-Farcaster-Flow-ID: c2f4996c-2a63-40ee-8cfd-8e0c3e815d67
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Wed, 13 Dec 2023 08:20:46 +0000
+Received: from 88665a182662.ant.amazon.com (10.119.5.2) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Wed, 13 Dec 2023 08:20:42 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v2 net-next 00/12] tcp: Refactor bhash2 and remove sk_bind2_node.
+Date: Wed, 13 Dec 2023 17:20:17 +0900
+Message-ID: <20231213082029.35149-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/5] net: mdio: ipq4019: configure CMN PLL clock for
- ipq5332
-Content-Language: en-US
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
-References: <20231212115151.20016-1-quic_luoj@quicinc.com>
- <20231212115151.20016-4-quic_luoj@quicinc.com>
- <20231212135417.67ece4d0@device.home>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <20231212135417.67ece4d0@device.home>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 4n-DhV8VrtmRKksbV9Qioh9e0CRFd6OV
-X-Proofpoint-ORIG-GUID: 4n-DhV8VrtmRKksbV9Qioh9e0CRFd6OV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 mlxlogscore=999 suspectscore=0 bulkscore=0
- malwarescore=0 adultscore=0 impostorscore=0 spamscore=0 mlxscore=0
- phishscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2312130058
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWB003.ant.amazon.com (10.13.139.135) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+
+This series refactors code around bhash2 and remove some bhash2-specific
+fields; sock.sk_bind2_node, and inet_timewait_sock.tw_bind2_node.
+
+  patch 1      : optimise bind() for non-wildcard v4-mapped-v6 address
+  patch 2 -  4 : optimise bind() conflict tests
+  patch 5 - 12 : Link bhash2 to bhash and unlink sk from bhash2 to
+                 remove sk_bind2_node
+
+The patch 8 will trigger a false-positive error by checkpatch.
+
+After this series, bhash is a wrapper of bhash2:
+
+  tb
+  `-> tb2 -> tb2 -> ...
+      `-> sk -> sk -> sk ....
 
 
+Changes:
+  v2:
+    * Rebase on latest net-next
+    * Patch 11
+      * Add change in inet_diag_dump_icsk() for recent bhash dump patch
 
-On 12/12/2023 8:54 PM, Maxime Chevallier wrote:
-> Hello,
-> 
-> I have some more minor comments for yoi :)
-> 
-> On Tue, 12 Dec 2023 19:51:48 +0800
-> Luo Jie <quic_luoj@quicinc.com> wrote:
-> 
->> The reference clock of CMN PLL block is selectable, the internal
->> 48MHZ is used by default.
->>
->> The output clock of CMN PLL block is for providing the clock
->> source of ethernet device(such as qca8084), there are 1 * 25MHZ
->> and 3 * 50MHZ output clocks available for the ethernet devices.
->>
->> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
->> ---
-> 
-> [...]
-> 
->> +/* For the CMN PLL block, the reference clock can be configured according to
->> + * the device tree property "cmn-reference-clock", the internal 48MHZ is used
->> + * by default on the ipq533 platform.
->> + *
->> + * The output clock of CMN PLL block is provided to the ethernet devices,
->> + * threre are 4 CMN PLL output clocks (1*25MHZ + 3*50MHZ) enabled by default.
->> + *
->> + * Such as the output 50M clock for the qca8084 ethernet PHY.
->> + */
->> +static int ipq_cmn_clock_config(struct mii_bus *bus)
->> +{
->> +	int ret;
->> +	u32 reg_val, src_sel, ref_clk;
->> +	struct ipq4019_mdio_data *priv;
-> 
-> Here you should also use reverse christmas-tree notation
+  v1: https://lore.kernel.org/netdev/20231023190255.39190-1-kuniyu@amazon.com/
 
-Ok, will correct this, thanks.
 
-> 
-> [...]
-> 
->> @@ -317,6 +441,17 @@ static int ipq4019_mdio_probe(struct platform_device *pdev)
->>   		}
->>   	}
->>   
->> +	/* The CMN block resource is for providing clock source to ethernet,
->> +	 * which can be optionally configured on the platform ipq9574 and
->> +	 * ipq5332.
->> +	 */
->> +	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "cmn_blk");
->> +	if (res) {
->> +		priv->cmn_membase = devm_ioremap_resource(&pdev->dev, res);
->> +		if (IS_ERR(priv->cmn_membase))
->> +			return PTR_ERR(priv->cmn_membase);
->> +	}
->> +
-> 
-> And here you can simplify a bit by using
-> devm_platform_ioremap_resource_byname()
-> 
-> Thanks,
-> 
-> Maxime
-> 
-As Russell mentioned, since this resource is optional,
-so devm_platform_ioremap_resource_byname can't be used here.
+Kuniyuki Iwashima (12):
+  tcp: Use bhash2 for v4-mapped-v6 non-wildcard address.
+  tcp: Rearrange tests in
+    inet_bind2_bucket_(addr_match|match_addr_any)().
+  tcp: Save v4 address as v4-mapped-v6 in
+    inet_bind2_bucket.v6_rcv_saddr.
+  tcp: Save address type in inet_bind2_bucket.
+  tcp: Rename tb in inet_bind2_bucket_(init|create)().
+  tcp: Link bhash2 to bhash.
+  tcp: Rearrange tests in inet_csk_bind_conflict().
+  tcp: Iterate tb->bhash2 in inet_csk_bind_conflict().
+  tcp: Check hlist_empty(&tb->bhash2) instead of
+    hlist_empty(&tb->owners).
+  tcp: Unlink sk from bhash.
+  tcp: Link sk and twsk to tb2->owners using skc_bind_node.
+  tcp: Remove dead code and fields for bhash2.
+
+ include/net/inet_hashtables.h    | 21 +++----
+ include/net/inet_timewait_sock.h |  4 --
+ include/net/ipv6.h               |  5 --
+ include/net/sock.h               | 14 -----
+ net/ipv4/inet_connection_sock.c  | 73 +++++++++++-------------
+ net/ipv4/inet_diag.c             |  2 +-
+ net/ipv4/inet_hashtables.c       | 98 +++++++++++++++-----------------
+ net/ipv4/inet_timewait_sock.c    | 21 +------
+ 8 files changed, 92 insertions(+), 146 deletions(-)
+
+-- 
+2.30.2
 
 
