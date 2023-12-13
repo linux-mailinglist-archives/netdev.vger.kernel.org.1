@@ -1,143 +1,147 @@
-Return-Path: <netdev+bounces-56796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAB32810DEC
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 11:09:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEF42810DF5
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 11:12:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C759E1C203A2
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 10:09:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06DEB1C209BD
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 10:12:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7700F224C6;
-	Wed, 13 Dec 2023 10:09:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="o1TvX1J7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16FB3224F8;
+	Wed, 13 Dec 2023 10:12:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C581783;
-	Wed, 13 Dec 2023 02:08:57 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id EC77EC0007;
-	Wed, 13 Dec 2023 10:08:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1702462136;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BkEPmwBo76rZMnhAQd2TljBiXO6wxAjKUlmXUkfuePY=;
-	b=o1TvX1J7P4zG7d64wUmm6horPq6/QP0Cau8umau4GIgzX90kjj/oBPz/oTiCVDKMgmkSMB
-	SSNUEJM7Odk6FBTt3Atpq/m6U9/t2dhz3l3jax8NSgEGulOn/LQE9axsGEsQXEdvTCEGSq
-	4x+cpLUEOCJp1t76t8kIZYaEBrTzxf2QUL9yBF6iKWWlcobzecfU6pzGwsgBonAWdL6S7R
-	XOAJMLZpcRdRXoEEQj5vwcvT63cCHmIgVZBls5I5Y3daiSD7uQ0jJSNY+3sHCrDLzatAzn
-	Wy2GsboVFaPc5dyMuuvbp8ywgg32TwvsxbVrNEIFh6vmqsa2fgKPrxoVwOKMlg==
-Date: Wed, 13 Dec 2023 11:08:53 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Jie Luo <quic_luoj@quicinc.com>
-Cc: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
- <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
- <pabeni@redhat.com>, <robh+dt@kernel.org>,
- <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
- <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
- <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
- <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
-Subject: Re: [PATCH v2 3/5] net: mdio: ipq4019: configure CMN PLL clock for
- ipq5332
-Message-ID: <20231213110853.07f2be7d@device.home>
-In-Reply-To: <b7b0ab99-7277-4618-9037-a878d7b899a9@quicinc.com>
-References: <20231212115151.20016-1-quic_luoj@quicinc.com>
-	<20231212115151.20016-4-quic_luoj@quicinc.com>
-	<20231212135417.67ece4d0@device.home>
-	<b7b0ab99-7277-4618-9037-a878d7b899a9@quicinc.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5708E83
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 02:12:41 -0800 (PST)
+Received: from loongson.cn (unknown [112.20.109.254])
+	by gateway (Coremail) with SMTP id _____8DxS+mXg3llFaEAAA--.3895S3;
+	Wed, 13 Dec 2023 18:12:39 +0800 (CST)
+Received: from localhost.localdomain (unknown [112.20.109.254])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxguOPg3llXjMCAA--.15020S2;
+	Wed, 13 Dec 2023 18:12:32 +0800 (CST)
+From: Yanteng Si <siyanteng@loongson.cn>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com
+Cc: Yanteng Si <siyanteng@loongson.cn>,
+	fancer.lancer@gmail.com,
+	Jose.Abreu@synopsys.com,
+	chenhuacai@loongson.cn,
+	linux@armlinux.org.uk,
+	guyinggang@loongson.cn,
+	netdev@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	chris.chenfeiyang@gmail.com
+Subject: [PATCH v6 0/9] stmmac: Add Loongson platform support
+Date: Wed, 13 Dec 2023 18:12:22 +0800
+Message-Id: <cover.1702458672.git.siyanteng@loongson.cn>
+X-Mailer: git-send-email 2.31.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8CxguOPg3llXjMCAA--.15020S2
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxCF45Wr45Wr47CFWDJr1UArc_yoW5CF18pF
+	W7Aa4YgrZ7tr1xA3Z5Jw1DXFy5Wayayr47Wa1Iqw1Ska9rKryjqrya9FWYvFy7ArZ8uFy2
+	qr1UCr1DCF1qk3cCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUB2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7V
+	AKI48JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY
+	6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
+	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
+	jxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw2
+	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
+	67AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcbAwUUUUU
 
-On Wed, 13 Dec 2023 16:09:53 +0800
-Jie Luo <quic_luoj@quicinc.com> wrote:
+v6:
 
-> On 12/12/2023 8:54 PM, Maxime Chevallier wrote:
-> > Hello,
-> > 
-> > I have some more minor comments for yoi :)
-> > 
-> > On Tue, 12 Dec 2023 19:51:48 +0800
-> > Luo Jie <quic_luoj@quicinc.com> wrote:
-> >   
-> >> The reference clock of CMN PLL block is selectable, the internal
-> >> 48MHZ is used by default.
-> >>
-> >> The output clock of CMN PLL block is for providing the clock
-> >> source of ethernet device(such as qca8084), there are 1 * 25MHZ
-> >> and 3 * 50MHZ output clocks available for the ethernet devices.
-> >>
-> >> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
-> >> ---  
-> > 
-> > [...]
-> >   
-> >> +/* For the CMN PLL block, the reference clock can be configured according to
-> >> + * the device tree property "cmn-reference-clock", the internal 48MHZ is used
-> >> + * by default on the ipq533 platform.
-> >> + *
-> >> + * The output clock of CMN PLL block is provided to the ethernet devices,
-> >> + * threre are 4 CMN PLL output clocks (1*25MHZ + 3*50MHZ) enabled by default.
-> >> + *
-> >> + * Such as the output 50M clock for the qca8084 ethernet PHY.
-> >> + */
-> >> +static int ipq_cmn_clock_config(struct mii_bus *bus)
-> >> +{
-> >> +	int ret;
-> >> +	u32 reg_val, src_sel, ref_clk;
-> >> +	struct ipq4019_mdio_data *priv;  
-> > 
-> > Here you should also use reverse christmas-tree notation  
-> 
-> Ok, will correct this, thanks.
-> 
-> > 
-> > [...]
-> >   
-> >> @@ -317,6 +441,17 @@ static int ipq4019_mdio_probe(struct platform_device *pdev)
-> >>   		}
-> >>   	}
-> >>   
-> >> +	/* The CMN block resource is for providing clock source to ethernet,
-> >> +	 * which can be optionally configured on the platform ipq9574 and
-> >> +	 * ipq5332.
-> >> +	 */
-> >> +	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "cmn_blk");
-> >> +	if (res) {
-> >> +		priv->cmn_membase = devm_ioremap_resource(&pdev->dev, res);
-> >> +		if (IS_ERR(priv->cmn_membase))
-> >> +			return PTR_ERR(priv->cmn_membase);
-> >> +	}
-> >> +  
-> > 
-> > And here you can simplify a bit by using
-> > devm_platform_ioremap_resource_byname()
-> > 
-> > Thanks,
-> > 
-> > Maxime
-> >   
-> As Russell mentioned, since this resource is optional,
-> so devm_platform_ioremap_resource_byname can't be used here.
-> 
+* Refer to Serge's suggestion:
+  - Add new platform feature flag:
+    include/linux/stmmac.h:
+    +#define STMMAC_FLAG_HAS_LGMAC			BIT(13)
 
-Indeed, my bad I missed that point. Sorry for the noise :/
+  - Add the IRQs macros specific to the Loongson Multi-channels GMAC:
+     drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h:
+     +#define DMA_INTR_ENA_NIE_LOONGSON 0x00060000	/* Normal Loongson Tx/Rx Summary */
+     #define DMA_INTR_ENA_NIE 0x00010000	/* Normal Summary */
+     ...
 
-Thanks,
+  - Drop all of redundant changes that don't require the
+    prototypes being converted to accepting the stmmac_priv
+    pointer.
 
-Maxime
+* Refer to andrew's suggestion:
+  - Drop white space changes.
+  - break patch up into lots of smaller parts.
+     Some small patches have been put into another series as a preparation
+     see <https://lore.kernel.org/loongarch/cover.1702289232.git.siyanteng@loongson.cn/T/#t>
+     
+     *note* : This series of patches relies on the three small patches above.
+* others
+  - Drop irq_flags changes.
+  - Changed patch order.
+
+
+
+v4 -> v5:
+
+* Remove an ugly and useless patch (fix channel number).
+* Remove the non-standard dma64 driver code, and also remove
+  the HWIF entries, since the associated custom callbacks no
+  longer exist.
+* Refer to Serge's suggestion: Update the dwmac1000_dma.c to
+  support the multi-DMA-channels controller setup.
+
+See:
+v4: <https://lore.kernel.org/loongarch/cover.1692696115.git.chenfeiyang@loongson.cn/>
+v3: <https://lore.kernel.org/loongarch/cover.1691047285.git.chenfeiyang@loongson.cn/>
+v2: <https://lore.kernel.org/loongarch/cover.1690439335.git.chenfeiyang@loongson.cn/>
+v1: <https://lore.kernel.org/loongarch/cover.1689215889.git.chenfeiyang@loongson.cn/>
+
+Yanteng Si (9):
+  net: stmmac: Pass stmmac_priv and chan in some callbacks
+  net: stmmac: dwmac-loongson: Refactor code for loongson_dwmac_probe()
+  net: stmmac: dwmac-loongson: Add full PCI support
+  net: stmmac: Add multi-channel supports
+  net: stmmac: Add Loongson-specific register definitions
+  net: stmmac: dwmac-loongson: Add MSI support
+  net: stmmac: dwmac-loongson: Add GNET support
+  net: stmmac: dwmac-loongson: Disable flow control for GMAC
+  net: stmmac: Disable coe for some Loongson GNET
+
+ drivers/net/ethernet/stmicro/stmmac/common.h  |   1 +
+ .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 296 ++++++++++++++----
+ .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |   2 +-
+ .../ethernet/stmicro/stmmac/dwmac1000_dma.c   |  61 +++-
+ .../ethernet/stmicro/stmmac/dwmac100_dma.c    |   2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  |   2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac_dma.h   |  47 ++-
+ .../net/ethernet/stmicro/stmmac/dwmac_lib.c   |  65 ++--
+ .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    |   8 +-
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |  11 +-
+ .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |   6 +
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |  13 +-
+ include/linux/stmmac.h                        |   4 +
+ 14 files changed, 413 insertions(+), 107 deletions(-)
+
+-- 
+2.31.4
+
 
