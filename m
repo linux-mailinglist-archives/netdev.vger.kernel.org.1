@@ -1,212 +1,158 @@
-Return-Path: <netdev+bounces-57071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A590B812026
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 21:44:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E503812058
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 22:04:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D83861C20E91
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 20:44:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E83F01F2158E
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 21:04:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21E027E55C;
-	Wed, 13 Dec 2023 20:44:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E085F7E573;
+	Wed, 13 Dec 2023 21:04:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jWg18e/6"
+	dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b="CLzu1xAX"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [IPv6:2001:41d0:1004:224b::b2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F78FB0
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 12:44:51 -0800 (PST)
-Message-ID: <8fccb066-6d17-4fa8-ba67-287042046ea4@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1702500289;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CXEmSiijjLrpapVsdj7qXE2yuQ7usappAWQ0VpcvhiQ=;
-	b=jWg18e/6SGX979GAUUvuWZu3XH3dbs5yr6qHEEfdtAU9E08jojjrlY711hF6wytK2p9Qer
-	poIf+XOZivG44PWAvZEi4JyVHf5+z2XCDCRtSSXLO4j7pVL9cO6VabmJhoITxTSzf7sKXk
-	pI0yBqy/G0cshSfPJmLmTPfoDK4RsFw=
-Date: Wed, 13 Dec 2023 12:44:42 -0800
+Received: from JPN01-TYC-obe.outbound.protection.outlook.com (mail-tycjpn01on2128.outbound.protection.outlook.com [40.107.114.128])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 751FBA7;
+	Wed, 13 Dec 2023 13:04:14 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ddVuEpyRO4jZdY92gKp0cqaQOchkDl+ov4FPOtzcxQh6zKFHZcSmKPO/0I3BlfTz/h6APEPbvNVwtO1pRjC7vGuyCwWzo0tmiD/vzfy+oEP6aWKqVfuUbme7a3uzpNiob+O0/QzhOsVjRIR9PHsckHSlgXIJi04cXx7I3hN9CEUQQKZTtwe2nIYek6qT2F38fUSfyZP00nbvLuDkl+n/MxM6Wcyp7Xjhd2YnO4qUjjMag2dhSPSj/jnnyBpeH+4vHdEDMvPOUqXddCsXHHrcr+/rGCNV8PLotd9PS8+nPbuoeeAytR7PIXeGjzfPe2KxGkOOOfbvMHsoNX6n8VExsA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qnduVvoISTHjcZMqhuBa4VFkWWfSHk10Axqy7oHHyJ0=;
+ b=kpbE9PdyS1c0tyXjpd5NrRzYA+A03qHGQZJh2aZzv6JD4vTGQUQdgWHSKv1oCzO0/iGVUBdG6eSt6TkDzJW9rfSI2uN/E+0gWZ3KEO7OPnjd5OW9sU8lvXJ96V33l/g6yEtM+IE10tO4Ff5CNAv6Kf1qB45sSsGRC6X69ch/8WYsQgOulFlqQz9OszKoxAC0owoo9IU8Zu7APo5Q6cg4WzN4X4NqqKXgl6kk5CJcjV7KYJYse5TmYWm4LCeq46a80H7gJaf6tGZHY03dQ7/L38PKaK5Qk8vAYYiSdBFgzZstWTuzLnneqeET1hXISsBE7P4raDIbgQxlJQQz1rknOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
+ dkim=pass header.d=renesas.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qnduVvoISTHjcZMqhuBa4VFkWWfSHk10Axqy7oHHyJ0=;
+ b=CLzu1xAX3CtE3PS4bMrct4TkHL1z0cZcj2BSUkgVZaqJRJtiiHMMBoAGBvxMYEZerLLpmPNww1riqVQ6EJBWljbFIK4aKt1LqSbbZBLXbO6gDsPKBrOxV2ePk94mQV3K6t1P2Tkae2FGlJ2zCXdely57DAu84fF8+4Liwg55fg4=
+Received: from OS3PR01MB6593.jpnprd01.prod.outlook.com (2603:1096:604:101::7)
+ by OS3PR01MB7851.jpnprd01.prod.outlook.com (2603:1096:604:160::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.8; Wed, 13 Dec
+ 2023 21:04:11 +0000
+Received: from OS3PR01MB6593.jpnprd01.prod.outlook.com
+ ([fe80::15f6:e7cb:d89d:7926]) by OS3PR01MB6593.jpnprd01.prod.outlook.com
+ ([fe80::15f6:e7cb:d89d:7926%4]) with mapi id 15.20.7113.008; Wed, 13 Dec 2023
+ 21:04:07 +0000
+From: Min Li <min.li.xe@renesas.com>
+To: Simon Horman <horms@kernel.org>
+CC: Paolo Abeni <pabeni@redhat.com>, Min Li <lnimi@hotmail.com>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>, "lee@kernel.org"
+	<lee@kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: RE: [PATCH net-next v6 1/6] ptp: clockmatrix: support 32-bit address
+ space
+Thread-Topic: [PATCH net-next v6 1/6] ptp: clockmatrix: support 32-bit address
+ space
+Thread-Index: AQHaI72WxBSXocJ/XESZT6513Vz+TbCacjaAgAABPgCAAgSWEIABPJKAgAoTE5A=
+Date: Wed, 13 Dec 2023 21:04:07 +0000
+Message-ID:
+ <OS3PR01MB65932B78E4262609241101F2BA8DA@OS3PR01MB6593.jpnprd01.prod.outlook.com>
+References:
+ <PH7PR03MB70644CE21E835B48799F3EB3A082A@PH7PR03MB7064.namprd03.prod.outlook.com>
+ <20231205092429.GS50400@kernel.org>
+ <d657f059d384419fe4df02580a4af9cf69e0e9c2.camel@redhat.com>
+ <OS3PR01MB6593B50F4C5BF3687EE3FA97BA84A@OS3PR01MB6593.jpnprd01.prod.outlook.com>
+ <20231207111055.GF50400@kernel.org>
+In-Reply-To: <20231207111055.GF50400@kernel.org>
+Accept-Language: en-CA, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=renesas.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: OS3PR01MB6593:EE_|OS3PR01MB7851:EE_
+x-ms-office365-filtering-correlation-id: 055c265f-df41-474b-4b00-08dbfc1f0be8
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ PICbBMEA9dCca8KGsCe8vS5ZevdstWMSgCOZZHE8kMeUdUEYwcz4MihR7HFiYObLtL+hAozeUYqRDJglUFaBJX0/3iHCbKaDksu8rUM4KcyF4vmw3dbfQmvGi/Eh02iblbLx/ZjGW7f/aenOXcg6YNmo7qFGjcmxF/pFQUrY5D+/TmW/lVEdJD67TNpyJz3huRB5k8+Qjdf9SWf2ZEzyFFmj9tXJgFOigHR4p3dExUDwm+/tHynSMml/w9z5JGRNFmm00p6Zrzgs1DREMLHu8oJf4nN/fK6hyhVGrw7MNxKU3w8nZ/iPgKc2WbvIzHqtn4L1F764BeVke0Pa1LUWg5fYZWGkxCcC79oNur8JShw5J95rgLIGi8IgdJbgNMRj1/FEsP+2wSDM6k2RtJ0DvwkUfX/f4QgmJ3dhMfX5RD4uNMUyOHm7T4zDOwIe0bQIG7BVqIdGoa4WwDtM8DMJr0WOaFJ59xhSGJ3k6FEGsuuRVBuzfRiCeqd83E8cuzkgTVP6ngZ6WYaml5y8ynJ/MwbXjKJLiCgyqn8UOmQuzwKa/V7f8bIIzFXb2JaUH3wVdtpK93T5qZQnXbVzF1fZ21ZObTOGcVH1NG9JNiOK9+gth9798IQ1DMMeh/yBBdAy
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:OS3PR01MB6593.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(136003)(376002)(346002)(39860400002)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(55016003)(26005)(7696005)(6506007)(33656002)(38070700009)(86362001)(38100700002)(122000001)(5660300002)(4326008)(52536014)(55236004)(71200400001)(9686003)(76116006)(66946007)(6916009)(316002)(8676002)(8936002)(64756008)(54906003)(66556008)(66476007)(66446008)(2906002)(4744005)(41300700001)(478600001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?i/w7MjxcHPKlBuZbpPAvfwQ/yGfm4WX40kxEQhY7+FbK+1y0mddUXGV3HzVC?=
+ =?us-ascii?Q?Qm4+02Bi3XkU56uPP9U2OeHhw7Hctw1fT8ydy8mxfk1ajXqw8cZ/sc8NIgPg?=
+ =?us-ascii?Q?NFzQPmPttdQCzlY0JwswlF7rz9gA/BHxnpTed3xiiw2VER1e8wwb+1dfkjSj?=
+ =?us-ascii?Q?ZC5fGdMbJmJylOMlDzDnevTSW8I4XwfV15NOA1gjB1NNk+RqApAE91aPkjsO?=
+ =?us-ascii?Q?uJ+Jx8LNeoyp7A2EgudOV9bJFiFLEP1O1Zll/P4MqQsFWpyPiJFGuFiZptnK?=
+ =?us-ascii?Q?istYnXMR/jNogoUP0LS01TlxLOpMfDAY76+7gpAAtuirMey1wcJ962Clar3K?=
+ =?us-ascii?Q?vYa0FnOqjLW+kV8Hc6dkh55hdUhSWxA+TFvpnQFEPohx6QmHZl0dyp218rec?=
+ =?us-ascii?Q?ig8jK3aOVXtSn5I9Jnpt4G+KAuzSMyqnIW1UyGGFRaDKerxHGqIkAl1XTzHw?=
+ =?us-ascii?Q?CGpNRl0Kh4yLWS2Iu2LiX51xUIiZh+PVLBGIoXgIi32Umi38OeNIUn6wi88T?=
+ =?us-ascii?Q?SqHnHZ0pfYr1K3F1R0ldn1GoBei4J0Bo25RkRkJMY8uRa5UcNH9kWqP96gIo?=
+ =?us-ascii?Q?9ioP6xpj+OJud6HcFvGgmBbhcebSn1NZie/i/TyDfDXbzAvi2pQ4NZpcWpjx?=
+ =?us-ascii?Q?HjcJ3d62ltuo2RB5YPPGOXGtCzPF1rinh5FtOuHv1VcSblPrWauJRKxgHsMR?=
+ =?us-ascii?Q?+MDRLvGWsTsSMYWgxuL/5c8vqcu6y3qeN9bmCn1F7+aLmvF4x0uvR9/9sh3f?=
+ =?us-ascii?Q?bKRrUn6+StTR0DooE198FD7jxiEJhs784st/ipBZIkbLX7+r+enbpKgNtV1E?=
+ =?us-ascii?Q?LaMcaBy/Bn5VvWL+XF7uN806vCFGYl/SpFSlY1+sFJtoW4RTJLd6RNOP2u76?=
+ =?us-ascii?Q?3ocOdQ+e1oMa5lBE1rlWOE+xruai8gI4FXT+PZlFgA/yzpLLvl9a/Z5ciHtB?=
+ =?us-ascii?Q?hJ+PWQfWi0UAfhEnEgpIlc8AUN44fiBVh2ZmOBxT6AkW67ti9ItBgwjPqyuY?=
+ =?us-ascii?Q?bEYKJL527uPQ+JJqCgHUvYeRfbVhg9/CRHi9Y6ecYTQ6ld3yBJSaGEGsu3WI?=
+ =?us-ascii?Q?2pDF7UnGrK1cNtGCq4dNh2bljdS5zXoLZx1HhSX1/Mkca8Agy95dVPuoaMZH?=
+ =?us-ascii?Q?c0SSlALDnUVQf7DNVupgAZOBGmnu35Q8/hkMNZTSQFIJlfzT7v5+vFvMm7rY?=
+ =?us-ascii?Q?Eu9XLPZVk0KUIx4YpnFXezwpiUxYF1S56JDhEVTJTAGVNVFPlNX9hKGXP65V?=
+ =?us-ascii?Q?xYu/GVNeAGcCDSCPXI4LmhrGvqO05UmSIvMGVflCe30lE7BUnGUVupo8v/PG?=
+ =?us-ascii?Q?iMJmfFsFnpXfdJN7knTb4Xb1Rkp9WwTfWMFQPNqavfYwn5alpuAL1app40iA?=
+ =?us-ascii?Q?M3WF7VddW8e5dlHqLLyX+CKzXNuVfw5+ETgsjBkRU0Td9HloXBTgybe++zXm?=
+ =?us-ascii?Q?/PsC0b6oEqVEd5ZzpVAQnsD3kh0WEYED+L0U0wL1Bqa05ZzrVpw0S/Krvoxz?=
+ =?us-ascii?Q?U8NMXXN+ZxCqQFALH/NvvqlyDqcSeqqg7Ef0seQjN0m7RLC9fvWhj2NgoJgF?=
+ =?us-ascii?Q?W0Tp4ZRyWEjVq2E5YYARU5AXl0cewJsu0AC9EYwT?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v5 bpf-next 6/6] selftest: bpf: Test
- bpf_sk_assign_tcp_reqsk().
-Content-Language: en-US
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, Daniel Xu <dxu@dxuuu.xyz>,
- Eric Dumazet <edumazet@google.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>
-References: <20231211073650.90819-1-kuniyu@amazon.com>
- <20231211073650.90819-7-kuniyu@amazon.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20231211073650.90819-7-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-OriginatorOrg: renesas.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: OS3PR01MB6593.jpnprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 055c265f-df41-474b-4b00-08dbfc1f0be8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Dec 2023 21:04:07.6564
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 0Pq9SsLPaZRhMCElK7SmURCikwblmk0sCBk9iU93eNvoOWMCtpdDlhLN80lIXX5uDqCUudUtZenCd21jZDn7EQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OS3PR01MB7851
 
-On 12/10/23 11:36 PM, Kuniyuki Iwashima wrote:
-> This commit adds a sample selftest to demonstrate how we can use
-> bpf_sk_assign_tcp_reqsk() as the backend of SYN Proxy.
-> 
-> The test creates IPv4/IPv6 x TCP/MPTCP connections and transfer
-> messages over them on lo with BPF tc prog attached.
-> 
-> The tc prog will process SYN and returns SYN+ACK with the following
-> ISN and TS.  In a real use case, this part will be done by other
-> hosts.
-> 
->          MSB                                   LSB
->    ISN:  | 31 ... 8 | 7 6 |   5 |    4 | 3 2 1 0 |
->          |   Hash_1 | MSS | ECN | SACK |  WScale |
-> 
->    TS:   | 31 ... 8 |          7 ... 0           |
->          |   Random |           Hash_2           |
-> 
->    WScale in SYN is reused in SYN+ACK.
-> 
-> The client returns ACK, and tc prog will recalculate ISN and TS
-> from ACK and validate SYN Cookie.
-> 
-> If it's valid, the prog calls kfunc to allocate a reqsk for skb and
-> configure the reqsk based on the argument created from SYN Cookie.
-> 
-> Later, the reqsk will be processed in cookie_v[46]_check() to create
-> a connection.
+=20
+> My reading is that this patch reverses the usage of module and regaddr.
+> F.e. the following hunk:
+>=20
+> @@ -553,11 +554,11 @@ static int _sync_pll_output(struct idtcm *idtcm,
+> 	val =3D SYNCTRL1_MASTER_SYNC_RST;
+>=20
+> 	/* Place master sync in reset */
+> 	err =3D idtcm_write(idtcm, 0, sync_ctrl1, &val, sizeof(val));
+> 	err =3D idtcm_write(idtcm, sync_ctrl1, 0, &val, sizeof(val));
+> 	if (err)
+> 		return err;
+>=20
+> 	err =3D idtcm_write(idtcm, 0, sync_ctrl0, &sync_src, sizeof(sync_src));
+> 	err =3D idtcm_write(idtcm, sync_ctrl0, 0, &sync_src, sizeof(sync_src));
+> 	if (err)
+> 		return err;
+>=20
+> If that is really intended I think it needs to be explained, or possibly =
+a
+> separate patch.
 
-The patch set looks good.
+Hi Simon
 
-One thing I just noticed is about writing/reading bits into/from "struct 
-tcp_options_received". More on this below.
-
-[ ... ]
-
-> +void test_tcp_custom_syncookie(void)
-> +{
-> +	struct test_tcp_custom_syncookie *skel;
-> +	int i;
-> +
-> +	if (setup_netns())
-> +		return;
-> +
-> +	skel = test_tcp_custom_syncookie__open_and_load();
-> +	if (!ASSERT_OK_PTR(skel, "open_and_load"))
-> +		return;
-> +
-> +	if (setup_tc(skel))
-> +		goto destroy_skel;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
-> +		skel->bss->handled_syn = false;
-> +		skel->bss->handled_ack = false;
-> +
-> +		test__start_subtest(test_cases[i].name);
-
-
-This should be tested with:
-
-	if (!test__start_subtest(test_cases[i].name))
-		continue;
-
-to skip the create_connection(). Probably do it at the beginning of the for loop.
-
-> +		create_connection(&test_cases[i]);
-> +
-> +		ASSERT_EQ(skel->bss->handled_syn, true, "SYN is not handled at tc.");
-> +		ASSERT_EQ(skel->bss->handled_ack, true, "ACK is not handled at tc");
-> +	}
-> +
-> +destroy_skel:
-> +	system("tc qdisc del dev lo clsact");
-> +
-> +	test_tcp_custom_syncookie__destroy(skel);
-> +}
-
-[ ... ]
-
-> +static int tcp_parse_option(__u32 index, struct tcp_syncookie *ctx)
-> +{
-> +	struct tcp_options_received *tcp_opt = &ctx->attr.tcp_opt;
-> +	char opcode, opsize;
-> +
-> +	if (ctx->ptr + 1 > ctx->data_end)
-> +		goto stop;
-> +
-> +	opcode = *ctx->ptr++;
-> +
-> +	if (opcode == TCPOPT_EOL)
-> +		goto stop;
-> +
-> +	if (opcode == TCPOPT_NOP)
-> +		goto next;
-> +
-> +	if (ctx->ptr + 1 > ctx->data_end)
-> +		goto stop;
-> +
-> +	opsize = *ctx->ptr++;
-> +
-> +	if (opsize < 2)
-> +		goto stop;
-> +
-> +	switch (opcode) {
-> +	case TCPOPT_MSS:
-> +		if (opsize == TCPOLEN_MSS && ctx->tcp->syn &&
-> +		    ctx->ptr + (TCPOLEN_MSS - 2) < ctx->data_end)
-> +			tcp_opt->mss_clamp = get_unaligned_be16(ctx->ptr);
-> +		break;
-> +	case TCPOPT_WINDOW:
-> +		if (opsize == TCPOLEN_WINDOW && ctx->tcp->syn &&
-> +		    ctx->ptr + (TCPOLEN_WINDOW - 2) < ctx->data_end) {
-> +			tcp_opt->wscale_ok = 1;
-> +			tcp_opt->snd_wscale = *ctx->ptr;
-
-When writing to a bitfield of "struct tcp_options_received" which is a kernel 
-struct, it needs to use the CO-RE api. The BPF_CORE_WRITE_BITFIELD has not been 
-landed yet: 
-https://lore.kernel.org/bpf/4d3dd215a4fd57d980733886f9c11a45e1a9adf3.1702325874.git.dxu@dxuuu.xyz/
-
-The same for reading bitfield but BPF_CORE_READ_BITFIELD() has already been 
-implemented in bpf_core_read.h
-
-Once the BPF_CORE_WRITE_BITFIELD is landed, this test needs to be changed to use 
-the BPF_CORE_{READ,WRITE}_BITFIELD.
-
-> +		}
-> +		break;
-> +	case TCPOPT_TIMESTAMP:
-> +		if (opsize == TCPOLEN_TIMESTAMP &&
-> +		    ctx->ptr + (TCPOLEN_TIMESTAMP - 2) < ctx->data_end) {
-> +			tcp_opt->saw_tstamp = 1;
-> +			tcp_opt->rcv_tsval = get_unaligned_be32(ctx->ptr);
-> +			tcp_opt->rcv_tsecr = get_unaligned_be32(ctx->ptr + 4);
-> +
-> +			if (ctx->tcp->syn && tcp_opt->rcv_tsecr)
-> +				tcp_opt->tstamp_ok = 0;
-> +			else
-> +				tcp_opt->tstamp_ok = 1;
-> +		}
-> +		break;
-> +	case TCPOPT_SACK_PERM:
-> +		if (opsize == TCPOLEN_SACK_PERM && ctx->tcp->syn &&
-> +		    ctx->ptr + (TCPOLEN_SACK_PERM - 2) < ctx->data_end)
-> +			tcp_opt->sack_ok = 1;
-> +		break;
-> +	}
-> +
-> +	ctx->ptr += opsize - 2;
-> +next:
-> +	return 0;
-> +stop:
-> +	return 1;
-> +}
-
-
+sync_ctrl0/1 was meant to be a module and it was in a wrong place. And this=
+ patch is just correcting it.
 
