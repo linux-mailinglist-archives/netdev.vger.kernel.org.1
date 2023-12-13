@@ -1,112 +1,303 @@
-Return-Path: <netdev+bounces-56776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0581A810CC4
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:50:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4BE4810D26
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 10:16:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F43BB20B53
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 08:50:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61FB72814E6
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:16:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4361B1EB3C;
-	Wed, 13 Dec 2023 08:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="K5dSWxgA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E381EB58;
+	Wed, 13 Dec 2023 09:16:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FB51AD
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 00:50:46 -0800 (PST)
-Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-a1915034144so868004366b.0
-        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 00:50:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702457445; x=1703062245; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rzZ0wHOCKxKt46yMwc5YoqqAju6eznko5SbWpJoTnT0=;
-        b=K5dSWxgAHfAlDFQAtjwi1QXnKLsqwcI8uwV0DH9KdZ8BAD3fQnrswfBy/9sJyDzBjs
-         bIZl/8155xXXtWnrvuMGVrviU1fu1V9dpMSNwT0co9bD7YbYB0NpojYVcIgEib+/9ucM
-         NnI5HJfg1bWF9HG9M9j0nM1aAxA6C6kqYD5lP4ye/FeFVj2AitQ8hpFFct9fLfZEoapY
-         iEyJzcz7zL2Wm+LTGpzS9/Ed0eCNtsWMJNshMRINnqP5ixW4qAD6FCUQXwxsIDskhOCm
-         U3CJ6H/eXa0AZyp/5UKODpRLtZjLDK0FmzS5RWeidfn8aicMoz7rpNjIsKk61qqHGjoy
-         RF/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702457445; x=1703062245;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rzZ0wHOCKxKt46yMwc5YoqqAju6eznko5SbWpJoTnT0=;
-        b=rUzW1FpV8EZsam8KcvdXoW29cpwQ1YceUN8rAgKw8J96U90jgC04RZFOz2ji7/dNHL
-         GUei1XFYw3tmPAUHIJSwInD4fWbFh6yTxo1bz7iSLt2qBi1PR9rORImpPIOWz1iSCVVh
-         JaOxpuItRrlmfHvEvcu7Zeeu35Qfq3hvwHbGrztdmSsXlLwHA4jGoIKR7qZV8F0qULEZ
-         3rZEHsc/b1OQsx2EwrJpENNcB7qN7mkiOrCJC9MEVT1KTuf+ptNlVMohea20wvzuRAvY
-         B1HFQzmMPX6d3LW+3tamcZcLBSe//MwyXc2S+khx8DMXpGPl/Ogwr11sYjYCAyne8Vm/
-         Is4A==
-X-Gm-Message-State: AOJu0YwI8abZuw6k3IhE5f9kqoqxl+psRbE+5dSWVQPwD4idD5+FNCSZ
-	Dn7nPy42Xh12N1FmQonWlIbmfQ==
-X-Google-Smtp-Source: AGHT+IFAzNPzEOzVBDYRyNptP5VHVJvjvP3Y0K/S5C602offreD3t+NuHOjcJhCK2rEmjAgYarwTaw==
-X-Received: by 2002:a17:906:2207:b0:a1f:b467:9b93 with SMTP id s7-20020a170906220700b00a1fb4679b93mr1884164ejs.78.1702457444903;
-        Wed, 13 Dec 2023 00:50:44 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id th18-20020a1709078e1200b00a1f8df4e2d5sm5166485ejc.178.2023.12.13.00.50.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 00:50:44 -0800 (PST)
-Date: Wed, 13 Dec 2023 09:50:43 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, jacob.e.keller@intel.com, jhs@mojatatu.com,
-	johannes@sipsolutions.net, andriy.shevchenko@linux.intel.com,
-	amritha.nambiar@intel.com, sdf@google.com, horms@kernel.org,
-	przemyslaw.kitszel@intel.com
-Subject: Re: [patch net-next v6 5/9] genetlink: introduce per-sock family
- private storage
-Message-ID: <ZXlwY5NxMCEzT/MM@nanopsycho>
-References: <20231212101736.1112671-1-jiri@resnulli.us>
- <20231212101736.1112671-6-jiri@resnulli.us>
- <20231212154938.6e68fc1d@kernel.org>
+X-Greylist: delayed 921 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 13 Dec 2023 01:16:01 PST
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8114C112
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 01:16:01 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4SqqDL3yBXz1Q6MS;
+	Wed, 13 Dec 2023 16:59:30 +0800 (CST)
+Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
+	by mail.maildlp.com (Postfix) with ESMTPS id 51EA71A0192;
+	Wed, 13 Dec 2023 17:00:38 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 13 Dec 2023 17:00:37 +0800
+Message-ID: <1fbd6b74-1080-923a-01c1-689c3d65f880@huawei.com>
+Date: Wed, 13 Dec 2023 17:00:37 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231212154938.6e68fc1d@kernel.org>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [question] smc: how to enable SMC_LO feature
+From: shaozhengchao <shaozhengchao@huawei.com>
+To: Wen Gu <guwen@linux.alibaba.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, yuehaibing
+	<yuehaibing@huawei.com>, "Libin (Huawei)" <huawei.libin@huawei.com>, Dust Li
+	<dust.li@linux.alibaba.com>, tonylu_linux <tonylu@linux.alibaba.com>, "D.
+ Wythe" <alibuda@linux.alibaba.com>
+References: <8ac15e20beb54acfae1a35d1603c1827@huawei.com>
+ <ad29f704-ae79-4c4b-2227-d0fa9a1ceee2@linux.alibaba.com>
+ <a6b4b010-ffca-50ea-1296-3e01eacb4f53@huawei.com>
+ <9eb58434-922e-c9e4-6a38-4c29ba0e88f6@huawei.com>
+ <2d138d78-1ebb-92b0-c6c5-9e43b5ee941b@linux.alibaba.com>
+ <488311be-5673-552c-d932-26f87e863777@huawei.com>
+ <c7b3f24e-6f25-08a5-bbe4-a32dc3d31adf@huawei.com>
+In-Reply-To: <c7b3f24e-6f25-08a5-bbe4-a32dc3d31adf@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
 
-Wed, Dec 13, 2023 at 12:49:38AM CET, kuba@kernel.org wrote:
->On Tue, 12 Dec 2023 11:17:32 +0100 Jiri Pirko wrote:
->> +static void genl_sk_priv_free(struct genl_sk_priv *priv)
->> +{
->> +	spin_lock(&priv->family->sock_priv_list->lock);
->> +	list_del(&priv->list);
->> +	spin_unlock(&priv->family->sock_priv_list->lock);
->> +	if (priv->destructor)
->> +		priv->destructor(priv->priv);
->> +	kfree(priv);
->
->> +static void genl_sk_priv_list_free(const struct genl_family *family)
->> +{
->> +	struct genl_sk_priv *priv, *tmp;
->> +
->> +	if (!family->sock_priv_size)
->> +		return;
->> +
->> +	list_for_each_entry_safe(priv, tmp, &family->sock_priv_list->list, list)
->> +		genl_sk_priv_free(priv);
->> +	kfree(family->sock_priv_list);
->
->Is this not racy for socket close vs family unregister?
->Once family starts to unregister no new privs can be installed
->(on the basis that such family's callbacks can no longer be called).
->But a socket may get closed in the meantime, and we'll end up entering
->genl_sk_priv_free() both from genl_release() and genl_sk_priv_list_free().
->
->Also I'm afraid there is a race still between removing the entry from
->the list and calling destroy.
 
-Moreover, priv is not erased from gsk->family_privs xarray. Sigh, this
-is pain.
+
+On 2023/12/5 14:45, shaozhengchao wrote:
+> 
+> 
+> On 2023/12/4 12:06, shaozhengchao wrote:
+>>
+>>
+>> On 2023/12/4 11:52, Wen Gu wrote:
+>>>
+>>> On 2023/12/4 11:22, shaozhengchao wrote:
+>>>>
+>>>>
+>>>> On 2023/11/23 14:15, shaozhengchao wrote:
+>>>>>
+>>>>>
+>>>>> On 2023/11/23 10:21, Wen Gu wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 2023/11/21 20:14, shaozhengchao wrote:
+>>>>>>> Hi Wen Gu:
+>>>>>>> Currently, I am interested in the SMC_LOOPBACK feature proposed
+>>>>>>> by you. Therefore, I use your patchset[1] to test the SMC_LO 
+>>>>>>> feature on
+>>>>>>> my x86_64 environment and kernel is based on linux-next, commit: 
+>>>>>>> 5ba73bec5e7b.
+>>>>>>> The test result shows that the smc_lo feature cannot be enabled. 
+>>>>>>> Here's
+>>>>>>> my analysis:
+>>>>>>>
+>>>>>>> 1. Run the following command to perform the test, and then capture
+>>>>>>> packets on the lo device.
+>>>>>>> - serv:  smc_run taskset -c <cpu> sockperf sr --tcp
+>>>>>>> - clnt:  smc_run taskset -c <cpu> sockperf  tp --tcp 
+>>>>>>> --msg-size=64000 -i 127.0.0.1 -t 30
+>>>>>>>
+>>>>>>> 2. Use Wireshark to open packets. It is found that the VCE port 
+>>>>>>> replies with
+>>>>>>> SMC-R-Deline packets.
+>>>>>>> [cid:image001.png@01DA1CB4.F1052C30]
+>>>>>>>
+>>>>>>> 3. Rx
+>>>>>>> When smc_listen_work invokes smc_listen_v2_check, the VCE port 
+>>>>>>> returns
+>>>>>>> a Decline packet because eid_cnt and flag.seid in the received 
+>>>>>>> packet are both 0.
+>>>>>>>
+>>>>>>> 4. Tx
+>>>>>>> In smc_clc_send_proposal,
+>>>>>>> v2_ext->hdr.eid_cnt = smc_clc_eid_table.ueid_cnt;
+>>>>>>> v2_ext->hdr.flag.seid = smc_clc_eid_table.seid_enabled;
+>>>>>>>
+>>>>>>> When smc_clc_init, ueid_cnt=0, and in the x86_64 environment, 
+>>>>>>> seid_enabled is
+>>>>>>> always equal to 0.
+>>>>>>>
+>>>>>>> So, I must call smc_clc_ueid_add function to increase ueid count?
+>>>>>>> But I don't see where operations can be added, may I missed 
+>>>>>>> something?
+>>>>>>>
+>>>>>>
+>>>>>> Hi Zhengchao Shao,
+>>>>>>
+>>>>>> Yes. When using SMC-D in non-s390 architecture (like x86 here), A 
+>>>>>> common
+>>>>>> UEID should be set. It can be set by following steps:
+>>>>>>
+>>>>>> - Install smc-tools[1].
+>>>>>>
+>>>>>> - Run # smcd ueid add <ueid> in loopback test environment.
+>>>>>>
+>>>>>>    EID works as an ID to indicate the max communication space of 
+>>>>>> SMC. When SEID is
+>>>>>>    unavailable, an UEID is required.
+>>>>>>
+>>>>> Hi Wen Gu:
+>>>>>      Thank you for your reply. This is very useful for me. And I will
+>>>>> be happy to learn from it.
+>>>>>
+>>>>> Thanks
+>>>>>
+>>>>> Zhengchao Shao
+>>>>>> - Then run the test.
+>>>>>>
+>>>>>> Hope this works for you :)
+>>>>>>
+>>>>>> [1] https://github.com/ibm-s390-linux/smc-tools
+>>>>>>
+>>>>>> Regards,
+>>>>>> Wen Gu
+>>>>>>
+>>>>>>> Could you give me some advice? Thanks very much.
+>>>>>>>
+>>>>>>> Zhengchao Shao
+>>>>>>>
+>>>>>>>
+>>>>>>> [1]link: 
+>>>>>>> https://patchwork.kernel.org/project/netdevbpf/cover/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
+>>>>>>>
+>>>>>>
+>>>>>
+>>>>>
+>>>> Hi Wen Gu:
+>>>>      I have test as following, but the performance is really
+>>>> degraded. Now I have no idea.
+>>>> 1. add ueid
+>>>> run: smcd ueid add 16
+>>>> kernel message:
+>>>> [ 5252.009133] NET: Registered PF_SMC protocol family
+>>>> [ 5252.009233] smc: adding smcd device smc_lo with pnetid
+>>>> 2. start server
+>>>> smc_run taskset -c 1 sockperf sr --tcp
+>>>> 3. start client
+>>>> smc_run taskset -c 3 sockperf tp  --tcp --msg-size=64000 -i 
+>>>> 127.0.0.1 -t 30
+>>>>
+>>>> The test results are as follows:
+>>>>                TCP                  SMC-lo
+>>>> Bandwidth(MBps)         1890.56               1300.41(-31.22%)
+>>>>
+>>>> I didn't find a better direction when I initially positioned it. No
+>>>> error is recorded in the kernel log, and the smcd statistics are 
+>>>> normal.
+>>>> [root@localhost smc-tools]# smcd stats
+>>>> SMC-D Connections Summary
+>>>>    Total connections handled             2
+>>>>    SMC connections                       2
+>>>>    Handshake errors                      0
+>>>>    Avg requests per SMC conn       1277462.0
+>>>>    TCP fallback                          0
+>>>>
+>>>> RX Stats
+>>>>    Data transmitted (Bytes)    40907328000 (40.91G)
+>>>>    Total requests                  1277190
+>>>>    Buffer full                          45 (0.00%)
+>>>>              8KB    16KB    32KB    64KB   128KB   256KB   512KB  
+>>>> >512KB
+>>>>    Bufs        0       0       0       2       0       0       
+>>>> 0       0
+>>>>    Reqs   638.0K       0       0  639.2K       0       0       
+>>>> 0       0
+>>>>
+>>>> TX Stats
+>>>>    Data transmitted (Bytes)    40907328000 (40.91G)
+>>>>    Total requests                  1277734
+>>>>    Buffer full                      638239 (49.95%)
+>>>>    Buffer full (remote)                  0 (0.00%)
+>>>>    Buffer too small                      0 (0.00%)
+>>>>    Buffer too small (remote)             0 (0.00%)
+>>>>              8KB    16KB    32KB    64KB   128KB   256KB   512KB  
+>>>> >512KB
+>>>>    Bufs        0       0       0       0       0       0       
+>>>> 0       0
+>>>>    Reqs        0       0       0  1.278M       0       0       
+>>>> 0       0
+>>>>
+>>>> Extras
+>>>>    Special socket calls                  1
+>>>>
+>>>> I captured the perf information and found that the percentage of
+>>>> rep_movs_alternative and _raw_spin_unlock_irqrestore functions was high
+>>>> during tx and rx.
+>>>> 36.12%  [kernel]         [k]rep_movs_alternative
+>>>> 14.23%  [kernel]         [k]_raw_spin_unlock_irqrestore
+>>>>
+>>>> I've attached the flame map. Could you help analyze it? What I missed?
+>>>> Thanks.
+>>>
+>>> Hi Zhengchao Shao,
+>>>
+>>> Since sndbuf and RMB in SMC are pre-alloced ringbuf and won't grow 
+>>> dynamically
+>>> like TCP, it is necessary to appropriately increase the default value 
+>>> of smc
+>>> sk_sndbuf and sk_rcvbuf before testing throughput.
+>>>
+>>> Set this and try again:
+>>>
+>>> # sysctl -w net.smc.wmem=1048576
+>>> # sysctl -w net.smc.rmem=1048576
+>>>
+>>> (The initial value of wmem and rmem are 64K)
+>>>
+>>> Regards,
+>>> Wen Gu
+>>>
+>>>>
+>>>> Zhengchao Shao
+>> Hi Wen Gu:
+>>      It solves the issue. Thank you very much.
+>>
+>> Zhengchao Shao
+>>
+> Hi Wen Gu:
+>    I've tested all the performance test items in the patchset. The
+> performance improvement is to be expected, except for nignx.
+> My VM is configured with 48 cores and 32 GB memory. Therefore, run
+> the following command:
+> <smc_run> nignx
+> <smc_run>./wrk -t 96 -c 1000 -d 30 http://127.0.0.1:80
+> 
+> The test results are as follows:
+>                          TCP                         SMC_lo
+> Requests/s           309425.42               135547.25(-56.19%)
+> The performance decreases by 56.19%.
+> 
+> I capture packets and find that wrk can perform HTTP GET after each
+> connect when smc_loopback is disabled.
+> However, when smc_loopback is enabled, there is no HTTP GET behavior.
+> I wonder if there is some compatibility problem with the SMC protocol 
+> when encapsulate packet? Could you give me some advice?
+> In the attachment, I captured some of the packets.
+> nosmc_nginx.pcap is for SMC disabled and smc_nginx.pcap is for SMC
+> enabled.
+> Thank you very much.
+> 
+> Zhengchao Shao
+> 
+> 
+> 
+Hi Wen Gu:
+	When the VM is configured with 8 cores and 16 GB memory, run
+the following command:
+<smc_run> nignx
+<smc_run>./wrk -t 8 -c 1000 -d 30 http://127.0.0.1:80
+the test data is as follows:
+	     TCP          SMC_lo
+Requests/s  66056.66    94526.66(43.10%)
+
+But When the VM is configured with 48 cores and 32 GB memory, run
+the following command:
+<smc_run> nignx
+<smc_run>./wrk -t 96 -c 1000 -d 30 http://127.0.0.1:80
+the test data is as follows:
+	     TCP          SMC_lo
+Requests/s  309425.42     135547.25(-56.19%)
+
+It seems that in the scenario with a large number of CPU cores,
+performance is not optimized, but performance deteriorates. What I
+missed?
+Thank you.
+
+Zhengchao Shao
 
