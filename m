@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-56765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E1E6810C5E
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:25:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49C3B810C5F
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 09:26:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0567B1F2116B
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 08:25:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CBA91C209DD
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 08:26:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D47D01DDDC;
-	Wed, 13 Dec 2023 08:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59A3A1DFC3;
+	Wed, 13 Dec 2023 08:26:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="FJfK6cQA"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Cq5F851b"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED4E193
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 00:25:46 -0800 (PST)
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD1FEDC
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 00:26:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1702455948; x=1733991948;
+  t=1702455971; x=1733991971;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=CAR5bGtYHiLYsd58D0LlZ4eNldfSEgu0pG8NSmLjyKA=;
-  b=FJfK6cQA/h/O/Qr5vk3J9mGR6YZ3VbNyrAdrOYh5NaEL+mbQe2RCwvKC
-   Oj25CBdmTReZRpYNdtou3OPJ5Yd/k55t+DIs6SlW9rDhir9P57sNBomNW
-   wMVLaD/fd5RgEdx6d/2PjanJSZVBFmS/KSHytq11srbPuMqQt1SkKOpef
-   k=;
+  bh=mB/0BdIk9aG+uEy8MftPRICImQUU3atwG2v8CIJ7owU=;
+  b=Cq5F851beTkBa6rW6uJcEVu1sHOUl21ROSrx+k9wYuKxZFakAdfU1eUW
+   gLSu9KhaLR9iShdFbpU6oZhTHDgqdYuhdtRcIieHLlVlkDlt8ZkD5UMDI
+   GCUWSUzP75hhKVwYUtyf7ZGhoTyuoz6f2TR0Hf5lKX2Be1EBvicz3fto2
+   w=;
 X-IronPort-AV: E=Sophos;i="6.04,272,1695686400"; 
-   d="scan'208";a="600300657"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-b538c141.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 08:25:41 +0000
+   d="scan'208";a="259363162"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-0aba4706.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2023 08:26:08 +0000
 Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
-	by email-inbound-relay-iad-1e-m6i4x-b538c141.us-east-1.amazon.com (Postfix) with ESMTPS id 3742EA0BD8;
-	Wed, 13 Dec 2023 08:25:38 +0000 (UTC)
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:63826]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.54.233:2525] with esmtp (Farcaster)
- id 0d3bddd0-9f22-445d-9eb5-55a71bce8996; Wed, 13 Dec 2023 08:25:38 +0000 (UTC)
-X-Farcaster-Flow-ID: 0d3bddd0-9f22-445d-9eb5-55a71bce8996
+	by email-inbound-relay-iad-1e-m6i4x-0aba4706.us-east-1.amazon.com (Postfix) with ESMTPS id 742BAA26DA;
+	Wed, 13 Dec 2023 08:26:05 +0000 (UTC)
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:20919]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.11.243:2525] with esmtp (Farcaster)
+ id 5a3c2553-41eb-449b-ad04-5fe7eec5c1dc; Wed, 13 Dec 2023 08:26:04 +0000 (UTC)
+X-Farcaster-Flow-ID: 5a3c2553-41eb-449b-ad04-5fe7eec5c1dc
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Wed, 13 Dec 2023 08:25:37 +0000
+ 15.2.1118.40; Wed, 13 Dec 2023 08:26:04 +0000
 Received: from 88665a182662.ant.amazon.com (10.119.5.2) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
- Wed, 13 Dec 2023 08:25:34 +0000
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Wed, 13 Dec 2023 08:26:00 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 net-next 11/12] tcp: Link sk and twsk to tb2->owners using skc_bind_node.
-Date: Wed, 13 Dec 2023 17:20:28 +0900
-Message-ID: <20231213082029.35149-12-kuniyu@amazon.com>
+Subject: [PATCH v2 net-next 12/12] tcp: Remove dead code and fields for bhash2.
+Date: Wed, 13 Dec 2023 17:20:29 +0900
+Message-ID: <20231213082029.35149-13-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20231213082029.35149-1-kuniyu@amazon.com>
 References: <20231213082029.35149-1-kuniyu@amazon.com>
@@ -67,159 +67,161 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWA002.ant.amazon.com (10.13.139.12) To
+X-ClientProxiedBy: EX19D032UWA002.ant.amazon.com (10.13.139.81) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 Precedence: Bulk
 
-Now we can use sk_bind_node/tw_bind_node for bhash2, which means
-we need not link TIME_WAIT sockets separately.
+Now all sockets including TIME_WAIT are linked to bhash2 using
+sock_common.skc_bind_node.
 
-The dead code and sk_bind2_node will be removed in the next patch.
+We no longer use inet_bind2_bucket.deathrow, sock.sk_bind2_node,
+and inet_timewait_sock.tw_bind2_node.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- include/net/sock.h              | 10 ----------
- net/ipv4/inet_connection_sock.c |  4 ++--
- net/ipv4/inet_diag.c            |  2 +-
- net/ipv4/inet_hashtables.c      |  8 ++++----
- net/ipv4/inet_timewait_sock.c   | 11 ++---------
- 5 files changed, 9 insertions(+), 26 deletions(-)
+ include/net/inet_hashtables.h    |  4 ----
+ include/net/inet_timewait_sock.h |  4 ----
+ include/net/sock.h               |  4 ----
+ net/ipv4/inet_connection_sock.c  | 21 ---------------------
+ net/ipv4/inet_hashtables.c       |  3 +--
+ 5 files changed, 1 insertion(+), 35 deletions(-)
 
+diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
+index 98ba728aec08..7f1b38458743 100644
+--- a/include/net/inet_hashtables.h
++++ b/include/net/inet_hashtables.h
+@@ -107,10 +107,6 @@ struct inet_bind2_bucket {
+ 	struct hlist_node	bhash_node;
+ 	/* List of sockets hashed to this bucket */
+ 	struct hlist_head	owners;
+-	/* bhash has twsk in owners, but bhash2 has twsk in
+-	 * deathrow not to add a member in struct sock_common.
+-	 */
+-	struct hlist_head	deathrow;
+ };
+ 
+ static inline struct net *ib_net(const struct inet_bind_bucket *ib)
+diff --git a/include/net/inet_timewait_sock.h b/include/net/inet_timewait_sock.h
+index b14999ff55db..f28da08a37b4 100644
+--- a/include/net/inet_timewait_sock.h
++++ b/include/net/inet_timewait_sock.h
+@@ -75,13 +75,9 @@ struct inet_timewait_sock {
+ 	struct timer_list	tw_timer;
+ 	struct inet_bind_bucket	*tw_tb;
+ 	struct inet_bind2_bucket	*tw_tb2;
+-	struct hlist_node		tw_bind2_node;
+ };
+ #define tw_tclass tw_tos
+ 
+-#define twsk_for_each_bound_bhash2(__tw, list) \
+-	hlist_for_each_entry(__tw, list, tw_bind2_node)
+-
+ static inline struct inet_timewait_sock *inet_twsk(const struct sock *sk)
+ {
+ 	return (struct inet_timewait_sock *)sk;
 diff --git a/include/net/sock.h b/include/net/sock.h
-index 1d6931caf0c3..e0de49533361 100644
+index e0de49533361..dbc01ce74ef2 100644
 --- a/include/net/sock.h
 +++ b/include/net/sock.h
-@@ -873,16 +873,6 @@ static inline void sk_add_bind_node(struct sock *sk,
- 	hlist_add_head(&sk->sk_bind_node, list);
- }
+@@ -352,7 +352,6 @@ struct sk_filter;
+   *	@sk_txtime_report_errors: set report errors mode for SO_TXTIME
+   *	@sk_txtime_unused: unused txtime flags
+   *	@ns_tracker: tracker for netns reference
+-  *	@sk_bind2_node: bind node in the bhash2 table
+   */
+ struct sock {
+ 	/*
+@@ -544,7 +543,6 @@ struct sock {
+ #endif
+ 	struct rcu_head		sk_rcu;
+ 	netns_tracker		ns_tracker;
+-	struct hlist_node	sk_bind2_node;
+ };
  
--static inline void __sk_del_bind2_node(struct sock *sk)
--{
--	__hlist_del(&sk->sk_bind2_node);
--}
--
--static inline void sk_add_bind2_node(struct sock *sk, struct hlist_head *list)
--{
--	hlist_add_head(&sk->sk_bind2_node, list);
--}
--
- #define sk_for_each(__sk, list) \
- 	hlist_for_each_entry(__sk, list, sk_node)
- #define sk_for_each_rcu(__sk, list) \
+ enum sk_pacing {
+@@ -890,8 +888,6 @@ static inline void sk_add_bind_node(struct sock *sk,
+ 	hlist_for_each_entry_safe(__sk, tmp, list, sk_node)
+ #define sk_for_each_bound(__sk, list) \
+ 	hlist_for_each_entry(__sk, list, sk_bind_node)
+-#define sk_for_each_bound_bhash2(__sk, list) \
+-	hlist_for_each_entry(__sk, list, sk_bind2_node)
+ 
+ /**
+  * sk_for_each_entry_offset_rcu - iterate over a list at a given struct offset
 diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-index 5f641e5dff55..35ce1decc47a 100644
+index 35ce1decc47a..1a7f08719de9 100644
 --- a/net/ipv4/inet_connection_sock.c
 +++ b/net/ipv4/inet_connection_sock.c
-@@ -208,7 +208,7 @@ static bool inet_bhash2_conflict(const struct sock *sk,
- 	struct inet_timewait_sock *tw2;
+@@ -205,7 +205,6 @@ static bool inet_bhash2_conflict(const struct sock *sk,
+ 				 bool relax, bool reuseport_cb_ok,
+ 				 bool reuseport_ok)
+ {
+-	struct inet_timewait_sock *tw2;
  	struct sock *sk2;
  
--	sk_for_each_bound_bhash2(sk2, &tb2->owners) {
-+	sk_for_each_bound(sk2, &tb2->owners) {
- 		if (__inet_bhash2_conflict(sk, sk2, sk_uid, relax,
- 					   reuseport_cb_ok, reuseport_ok))
+ 	sk_for_each_bound(sk2, &tb2->owners) {
+@@ -214,14 +213,6 @@ static bool inet_bhash2_conflict(const struct sock *sk,
  			return true;
-@@ -227,7 +227,7 @@ static bool inet_bhash2_conflict(const struct sock *sk,
+ 	}
  
- #define sk_for_each_bound_bhash(__sk, __tb2, __tb)			\
+-	twsk_for_each_bound_bhash2(tw2, &tb2->deathrow) {
+-		sk2 = (struct sock *)tw2;
+-
+-		if (__inet_bhash2_conflict(sk, sk2, sk_uid, relax,
+-					   reuseport_cb_ok, reuseport_ok))
+-			return true;
+-	}
+-
+ 	return false;
+ }
+ 
+@@ -229,10 +220,6 @@ static bool inet_bhash2_conflict(const struct sock *sk,
  	hlist_for_each_entry(__tb2, &(__tb)->bhash2, bhash_node)	\
--		sk_for_each_bound_bhash2(sk2, &(__tb2)->owners)
-+		sk_for_each_bound(sk2, &(__tb2)->owners)
+ 		sk_for_each_bound(sk2, &(__tb2)->owners)
  
- #define twsk_for_each_bound_bhash(__sk, __tb2, __tb)			\
- 	hlist_for_each_entry(__tb2, &(__tb)->bhash2, bhash_node)	\
-diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
-index 46b13962ad02..8e6b6aa0579e 100644
---- a/net/ipv4/inet_diag.c
-+++ b/net/ipv4/inet_diag.c
-@@ -1104,7 +1104,7 @@ void inet_diag_dump_icsk(struct inet_hashinfo *hashinfo, struct sk_buff *skb,
- 				if (!net_eq(ib2_net(tb2), net))
- 					continue;
+-#define twsk_for_each_bound_bhash(__sk, __tb2, __tb)			\
+-	hlist_for_each_entry(__tb2, &(__tb)->bhash2, bhash_node)	\
+-		sk_for_each_bound_bhash2(sk2, &(__tb2)->deathrow)
+-
+ /* This should be called only when the tb and tb2 hashbuckets' locks are held */
+ static int inet_csk_bind_conflict(const struct sock *sk,
+ 				  const struct inet_bind_bucket *tb,
+@@ -272,14 +259,6 @@ static int inet_csk_bind_conflict(const struct sock *sk,
+ 			return true;
+ 	}
  
--				sk_for_each_bound_bhash2(sk, &tb2->owners) {
-+				sk_for_each_bound(sk, &tb2->owners) {
- 					struct inet_sock *inet = inet_sk(sk);
+-	twsk_for_each_bound_bhash(sk2, tb2, tb) {
+-		if (!inet_bind_conflict(sk, sk2, uid, relax, reuseport_cb_ok, reuseport_ok))
+-			continue;
+-
+-		if (inet_rcv_saddr_equal(sk, sk2, true))
+-			return true;
+-	}
+-
+ 	return false;
+ }
  
- 					if (num < s_num)
 diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index 7a78b8691365..a6652104b70e 100644
+index a6652104b70e..a5038351388a 100644
 --- a/net/ipv4/inet_hashtables.c
 +++ b/net/ipv4/inet_hashtables.c
-@@ -169,8 +169,8 @@ void inet_bind_hash(struct sock *sk, struct inet_bind_bucket *tb,
+@@ -122,7 +122,6 @@ static void inet_bind2_bucket_init(struct inet_bind2_bucket *tb2,
+ 	tb2->rcv_saddr = sk->sk_rcv_saddr;
+ #endif
+ 	INIT_HLIST_HEAD(&tb2->owners);
+-	INIT_HLIST_HEAD(&tb2->deathrow);
+ 	hlist_add_head(&tb2->node, &head->chain);
+ 	hlist_add_head(&tb2->bhash_node, &tb->bhash2);
+ }
+@@ -144,7 +143,7 @@ struct inet_bind2_bucket *inet_bind2_bucket_create(struct kmem_cache *cachep,
+ /* Caller must hold hashbucket lock for this tb with local BH disabled */
+ void inet_bind2_bucket_destroy(struct kmem_cache *cachep, struct inet_bind2_bucket *tb)
  {
- 	inet_sk(sk)->inet_num = port;
- 	inet_csk(sk)->icsk_bind_hash = tb;
--	sk_add_bind2_node(sk, &tb2->owners);
- 	inet_csk(sk)->icsk_bind2_hash = tb2;
-+	sk_add_bind_node(sk, &tb2->owners);
- }
- 
- /*
-@@ -197,7 +197,7 @@ static void __inet_put_port(struct sock *sk)
- 	if (inet_csk(sk)->icsk_bind2_hash) {
- 		struct inet_bind2_bucket *tb2 = inet_csk(sk)->icsk_bind2_hash;
- 
--		__sk_del_bind2_node(sk);
-+		__sk_del_bind_node(sk);
- 		inet_csk(sk)->icsk_bind2_hash = NULL;
- 		inet_bind2_bucket_destroy(hashinfo->bind2_bucket_cachep, tb2);
- 	}
-@@ -937,7 +937,7 @@ static int __inet_bhash2_update_saddr(struct sock *sk, void *saddr, int family,
- 	spin_lock_bh(&head->lock);
- 
- 	spin_lock(&head2->lock);
--	__sk_del_bind2_node(sk);
-+	__sk_del_bind_node(sk);
- 	inet_bind2_bucket_destroy(hinfo->bind2_bucket_cachep, inet_csk(sk)->icsk_bind2_hash);
- 	spin_unlock(&head2->lock);
- 
-@@ -954,8 +954,8 @@ static int __inet_bhash2_update_saddr(struct sock *sk, void *saddr, int family,
- 		tb2 = new_tb2;
- 		inet_bind2_bucket_init(tb2, net, head2, inet_csk(sk)->icsk_bind_hash, sk);
- 	}
--	sk_add_bind2_node(sk, &tb2->owners);
- 	inet_csk(sk)->icsk_bind2_hash = tb2;
-+	sk_add_bind_node(sk, &tb2->owners);
- 	spin_unlock(&head2->lock);
- 
- 	spin_unlock_bh(&head->lock);
-diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
-index 547583a87bd3..5befa4de5b24 100644
---- a/net/ipv4/inet_timewait_sock.c
-+++ b/net/ipv4/inet_timewait_sock.c
-@@ -35,9 +35,8 @@ void inet_twsk_bind_unhash(struct inet_timewait_sock *tw,
- 	if (!tb)
- 		return;
- 
-+	__sk_del_bind_node((struct sock *)tw);
- 	tw->tw_tb = NULL;
--
--	__hlist_del(&tw->tw_bind2_node);
- 	tw->tw_tb2 = NULL;
- 	inet_bind2_bucket_destroy(hashinfo->bind2_bucket_cachep, tb2);
- 	inet_bind_bucket_destroy(hashinfo->bind_bucket_cachep, tb);
-@@ -93,12 +92,6 @@ static void inet_twsk_add_node_rcu(struct inet_timewait_sock *tw,
- 	hlist_nulls_add_head_rcu(&tw->tw_node, list);
- }
- 
--static void inet_twsk_add_bind2_node(struct inet_timewait_sock *tw,
--				     struct hlist_head *list)
--{
--	hlist_add_head(&tw->tw_bind2_node, list);
--}
--
- /*
-  * Enter the time wait state. This is called with locally disabled BH.
-  * Essentially we whip up a timewait bucket, copy the relevant info into it
-@@ -129,7 +122,7 @@ void inet_twsk_hashdance(struct inet_timewait_sock *tw, struct sock *sk,
- 
- 	tw->tw_tb2 = icsk->icsk_bind2_hash;
- 	WARN_ON(!icsk->icsk_bind2_hash);
--	inet_twsk_add_bind2_node(tw, &tw->tw_tb2->deathrow);
-+	sk_add_bind_node((struct sock *)tw, &tw->tw_tb2->owners);
- 
- 	spin_unlock(&bhead2->lock);
- 	spin_unlock(&bhead->lock);
+-	if (hlist_empty(&tb->owners) && hlist_empty(&tb->deathrow)) {
++	if (hlist_empty(&tb->owners)) {
+ 		__hlist_del(&tb->node);
+ 		__hlist_del(&tb->bhash_node);
+ 		kmem_cache_free(cachep, tb);
 -- 
 2.30.2
 
