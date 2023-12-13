@@ -1,47 +1,62 @@
-Return-Path: <netdev+bounces-57065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9777811FB9
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 21:11:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B62E6811FC3
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 21:15:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6D6A28165C
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 20:11:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D738281E02
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 20:15:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D05027E54E;
-	Wed, 13 Dec 2023 20:11:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 340187E55B;
+	Wed, 13 Dec 2023 20:15:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="oqrxxd8t"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PCDS5xsT"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 576CCDD;
-	Wed, 13 Dec 2023 12:10:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=PwOVL8mVKeFXsW0HcBL1U5ZeoAlOHIL4hxG+Ermm0Do=; b=oqrxxd8tZUp4TaF8Qx7f1USJ1+
-	Fk0puhRMdQ1N94CmXAtd/ycvks7V8GFGMVLbTXDeapF7YvARte1MdPW22s1nZDz7RCHKik8n90hdx
-	uYcTPoyaEfrgERS6cPOT22a506hCaeXtC6RCIGWKVKaQEfP6Rk+tAgC105YHDKHUmgB3PpTmG38R0
-	ImWfo63KfDElgqlIqBaX4Lcl7T0EJBt6JS6dFQ/vrK4KVcoIqwSspzpNNQKE0X3qAoN/1ilToPqCH
-	et2Bq1Locx3qPSg6Ak7iyYklE0KYJB+wjbyPo2Mh+VgY3TtZU3U/UFJhH7bNaXawD2H09mmkYIb7A
-	/Cku/XiQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36782)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rDVZ6-0000XV-0W;
-	Wed, 13 Dec 2023 20:10:44 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rDVZ4-0001oW-BG; Wed, 13 Dec 2023 20:10:42 +0000
-Date: Wed, 13 Dec 2023 20:10:42 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Christian Marangi <ansuelsmth@gmail.com>
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2D389C;
+	Wed, 13 Dec 2023 12:15:31 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-40c317723a8so64072355e9.3;
+        Wed, 13 Dec 2023 12:15:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702498530; x=1703103330; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vb5B6Yi9sghxkDMCL6Vt09IrQB+8r0DuYMikKdRw/lc=;
+        b=PCDS5xsTMRP1UYxJG/5a1yKY6dKnAyHRqCMvt8XW3lvhMXGpeqqmqOE93QguPxDIcl
+         3rE6UgdBtJjp7/esPc7CTkjoDlYRg01+0gfeCg0OlugBY4g5yoEV7hLzxXiWByTNyBt8
+         I0Wz3GW0WV/Z404rv0J+omFyL+j2tCNz87wSSLfoSRH8FBuiXS1nFZzjWiBhK4FCzwpI
+         S4vR7SXFEgePdy4p2HckmBD1hCmGIU1DEGI0KHqTUTm6Cmrf3ID9ZYi/j0S7CjxMRnZx
+         xDC2oqmd95eHZu6Kw1xIzdP0hDdb64RyplZEqQEkZMxYD6bAO6riI/+euOkaZd/tYX6V
+         uHGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702498530; x=1703103330;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vb5B6Yi9sghxkDMCL6Vt09IrQB+8r0DuYMikKdRw/lc=;
+        b=guCsNrE9X32jd9XJK/ZjOK5ZAmbNl6noE+i95SMT0Wc8aO71g2KMJegt3deDsuR+5c
+         YCEueWp2gLb9X7r4iQfHEcx6vbx/P8jCGc2gSxdvghvIky3jBEEEJMSz80DMjD7E8NZN
+         c8gyjMJRjwF86GcXmpHq1/yBQXpx/8oIigXiCu0oBJYULTS+vrKEKsCucZUcc5S8+lqH
+         17LZBWuKWw9kO9vBBcBw+ErFX6jj7xWGtGrNrJ1+gNoxYcLrg+wuzVI3eH913E8/cnJc
+         cAbYmDwzrjMJA3NOZxT6Eu6qW291WgmUJfNC0JGT9rNeVnVz/qJTZ+N1aWuuuDKEEiJ7
+         0c9A==
+X-Gm-Message-State: AOJu0Yy1n7ilZ+mg+pOXZcpQff+CMXqhy/xSGg+ADAoNrnM92q9WQWO8
+	9j/bQ39mbP+TxOS72lr+hdg=
+X-Google-Smtp-Source: AGHT+IGt77bq+tJdZfS3kvtLEs7hLVZ3XtfobDRpKoGENDqN+bvJEfNqHY62OfsG1FJFgLUqwJdA1w==
+X-Received: by 2002:a05:600c:2a41:b0:40b:5e21:d344 with SMTP id x1-20020a05600c2a4100b0040b5e21d344mr4754263wme.77.1702498530206;
+        Wed, 13 Dec 2023 12:15:30 -0800 (PST)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id az27-20020a05600c601b00b0040c34e763ecsm20923276wmb.44.2023.12.13.12.15.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Dec 2023 12:15:29 -0800 (PST)
+Message-ID: <657a10e1.050a0220.22d18.b3cb@mx.google.com>
+X-Google-Original-Message-ID: <ZXoQ3wofRFV3XVfc@Ansuel-xps.>
+Date: Wed, 13 Dec 2023 21:15:27 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
 Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -53,9 +68,9 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [net-next PATCH 1/2] net: ethtool: add define for link speed
  mode number
-Message-ID: <ZXoPwmDsy7geZe6N@shell.armlinux.org.uk>
 References: <20231213181554.4741-1-ansuelsmth@gmail.com>
  <20231213181554.4741-2-ansuelsmth@gmail.com>
+ <ZXoPwmDsy7geZe6N@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,36 +79,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231213181554.4741-2-ansuelsmth@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <ZXoPwmDsy7geZe6N@shell.armlinux.org.uk>
 
-NAK.
+On Wed, Dec 13, 2023 at 08:10:42PM +0000, Russell King (Oracle) wrote:
+> NAK.
+> 
+> You *clearly* didn't look before you leaped.
+> 
+> On Wed, Dec 13, 2023 at 07:15:53PM +0100, Christian Marangi wrote:
+> > +enum ethtool_link_speeds {
+> > +	SPEED_10 = 0,
+> > +	SPEED_100,
+> > +	SPEED_1000,
+> ...
+> 
+> and from the context immediately below, included in your patch:
+> >  #define SPEED_10		10
+>            ^^^^^^^^
+> >  #define SPEED_100		100
+>            ^^^^^^^^^
+> >  #define SPEED_1000		1000
+>            ^^^^^^^^^^
+> 
+> Your enumerated values will be overridden by the preprocessor
+> definitions.
+> 
+> Moreover, SPEED_xxx is an already taken namespace and part of the UAPI,
+> and thus can _not_ be changed. Convention is that SPEED_x will be
+> defined as the numeric speed.
+>
 
-You *clearly* didn't look before you leaped.
+Well yes that is the idea of having the enum to count them and then redefining
+them to the correct value. (wasn't trying to introduce new define for
+the speed and trying to assign incremental values)
 
-On Wed, Dec 13, 2023 at 07:15:53PM +0100, Christian Marangi wrote:
-> +enum ethtool_link_speeds {
-> +	SPEED_10 = 0,
-> +	SPEED_100,
-> +	SPEED_1000,
-...
+Any idea how to handle this without the enum - redefine thing?
 
-and from the context immediately below, included in your patch:
->  #define SPEED_10		10
-           ^^^^^^^^
->  #define SPEED_100		100
-           ^^^^^^^^^
->  #define SPEED_1000		1000
-           ^^^^^^^^^^
-
-Your enumerated values will be overridden by the preprocessor
-definitions.
-
-Moreover, SPEED_xxx is an already taken namespace and part of the UAPI,
-and thus can _not_ be changed. Convention is that SPEED_x will be
-defined as the numeric speed.
+Was trying to find a more automated way than defining the raw number of
+the current modes. (but maybe this is not that bad? since on adding more
+modes, other values has to be changed so it would be just another value
+to document in the comment)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+	Ansuel
 
