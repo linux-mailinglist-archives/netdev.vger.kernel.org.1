@@ -1,140 +1,105 @@
-Return-Path: <netdev+bounces-57120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4D838122C2
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 00:23:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC16C8122C9
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 00:25:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F54028244A
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 23:23:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4DC9CB20763
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 23:25:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03B2777B2F;
-	Wed, 13 Dec 2023 23:23:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="THhd50kO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 951EF77B2F;
+	Wed, 13 Dec 2023 23:25:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFB48AD
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 15:23:23 -0800 (PST)
-Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-5e309941f46so8913087b3.3
-        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 15:23:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1702509803; x=1703114603; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uVkNB32hd1iHEzvkeQh9LlJbSIwrHIrN9UnZLaDlQKA=;
-        b=THhd50kOnuvF+iBDetJfls019ZrA98VLgqPxtWHRzVve2Fz7hX9nDPWSQjWJNbE6i4
-         jrzmVd7ZLqVVF6KXeqK6bwjrxbWoCD7BO0pyMkyoK3WMok0d+O9mvscVNLNOwM2KjWIj
-         Oj8Ts9Y9W3NjyIEzCqqpEbwamANtjxOS5oSOwxliDL1N8BVT9SS/a2Hk2U0hlklJo+BG
-         PMkHTa7LpXDaEytVde9Es7wOmC5jptmjXQfK7b3YraCtjc5qXyThf4OtBRY9hfIt8zTw
-         Cf6W4Nr58CocfLSudYsoereYDfL3fEnF+4iEYBY0a51UxF2OaGYylSj5LKE0eZ0w2QDq
-         RAyg==
+Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC094EA;
+	Wed, 13 Dec 2023 15:25:18 -0800 (PST)
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5910b21896eso2343275eaf.0;
+        Wed, 13 Dec 2023 15:25:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702509803; x=1703114603;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uVkNB32hd1iHEzvkeQh9LlJbSIwrHIrN9UnZLaDlQKA=;
-        b=MHiZEKBzbVbqyIHsGikLqmxhuDm5SLRiOKY37AQtjhR8q7U80HkeFpBMmXSUxz4mQz
-         h8DB1cZ5OtCEcjViYDaQEaIT1PJZgLvSGlQXCuM/k4uUKJWzXF0QOIxcXc0cbnvip5n3
-         f5q8kZ5Ghq7lyWH6Y7dMXYyMZD4uRztuIYJEPizzpuJc0XNnY3CflnHlE15iWK5HrZPE
-         lztr5ZCoBRmjgzunxQcVKjxyaW4u3b2YONtnNMsVywHXwLD6xZGIpSAvdQ8k0zF8awg+
-         UwEcPsNmlgCjqKddTl4vhSoatdCx1p1JXoZXULeTP+AefsZ7qANUOgMuZzLRXw24jzFr
-         ncew==
-X-Gm-Message-State: AOJu0YwJ/Wh0z4UCrKc30ByUsVzMIpC4FMUMEqK7B6dNxzfJ02Fu1B6l
-	JbLSDeDUO1K/MQYNjqvdwnvbTUQk1NQAU41K2VxqRw==
-X-Google-Smtp-Source: AGHT+IHvksdDnxVQ/nYmkyCZ2hwd6b/7WpssRswsT5373vF36zQmClzFML6nBey+PcRwhJLGnLEOWrYopsDgnlNhtGA=
-X-Received: by 2002:a81:6c84:0:b0:5e2:9a9c:a18e with SMTP id
- h126-20020a816c84000000b005e29a9ca18emr1956958ywc.23.1702509803090; Wed, 13
- Dec 2023 15:23:23 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702509918; x=1703114718;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=c+ujX2KdbWl+FCDRkPG1EwpBH+yzRnhRj9laF4akgZg=;
+        b=J8AuLG1oFZynBjB+2IRB6TgTuHbv4IxN4N6LHeUVSeyMy+86xMUaJLEfqqrNvR3urT
+         Bovv2Q16Bgu4QtjKCcFlJMRV/utKHS728bgpvLJ1dlyX9kg0WkTdjzaE57SEd8MO/8Jo
+         9/+uZJFTuLe2GmnZsSukM9H4OxWOCP2mZnz5mdwQS26yrEqnlipKfDXW11ITQj58uo/v
+         qKFPbAhaHs7OkkPDzcgkwGf7b0kUQaMU3EH7arpDgD0aKjyyXefQbNWC+qoZ2FrlF6Ta
+         HJIuTTnYDCfurGeC0/C1QQXH4YmVwXdzgHW/27fZWujrPIgLpPhPr6RdmsI0V6TOTH54
+         zsCw==
+X-Gm-Message-State: AOJu0Yw2BrD8qLg+ccSaEdcFGWdqJGGMn3DFVl1PQShW/IsfE2g3zzdH
+	lfUyz3Jl4UbRaXq9Es7AGVwK/xjytg==
+X-Google-Smtp-Source: AGHT+IGghdFnEQBv2Q1gGQFkdtduPobZx6ZkqkdA1mh/zFQx4tpk5DqrUHn56S1Ix93YoI+J2tsdhQ==
+X-Received: by 2002:a4a:55ca:0:b0:590:67db:1dcb with SMTP id e193-20020a4a55ca000000b0059067db1dcbmr5555100oob.4.1702509918208;
+        Wed, 13 Dec 2023 15:25:18 -0800 (PST)
+Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id r124-20020a4a4e82000000b0058cbbf9b4e4sm3251624ooa.48.2023.12.13.15.25.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Dec 2023 15:25:17 -0800 (PST)
+Received: (nullmailer pid 2248461 invoked by uid 1000);
+	Wed, 13 Dec 2023 23:25:16 -0000
+From: Rob Herring <robh@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] dt-bindings: net: marvell,orion-mdio: Drop "reg" sizes schema
+Date: Wed, 13 Dec 2023 17:24:55 -0600
+Message-ID: <20231213232455.2248056-1-robh@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231201180139.328529-2-john.fastabend@gmail.com>
- <20231201211453.27432-1-kuniyu@amazon.com> <656e4758675b9_1bd6e2086f@john.notmuch>
- <ZXKZa4RRmK2M6iHT@pop-os.localdomain> <5c20a29a-ac9f-da0a-01dc-2278d7ae386a@iogearbox.net>
-In-Reply-To: <5c20a29a-ac9f-da0a-01dc-2278d7ae386a@iogearbox.net>
-From: Amery Hung <amery.hung@bytedance.com>
-Date: Wed, 13 Dec 2023 15:23:12 -0800
-Message-ID: <CAONe227zBRfcadH22X1A=qRRqNszXFXT0N5Oqt692rcGbsrs9w@mail.gmail.com>
-Subject: Re: [External] Re: [PATCH bpf v2 1/2] bpf: syzkaller found null ptr
- deref in unix_bpf proto add
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, John Fastabend <john.fastabend@gmail.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, bpf@vger.kernel.org, edumazet@google.com, 
-	jakub@cloudflare.com, martin.lau@kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Dec 11, 2023 at 6:56=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.n=
-et> wrote:
->
-> On 12/8/23 5:19 AM, Cong Wang wrote:
-> > On Mon, Dec 04, 2023 at 01:40:40PM -0800, John Fastabend wrote:
-> >> Kuniyuki Iwashima wrote:
-> >>> From: John Fastabend <john.fastabend@gmail.com>
-> >>> Date: Fri,  1 Dec 2023 10:01:38 -0800
-> >>>> I added logic to track the sock pair for stream_unix sockets so that=
- we
-> >>>> ensure lifetime of the sock matches the time a sockmap could referen=
-ce
-> >>>> the sock (see fixes tag). I forgot though that we allow af_unix unco=
-nnected
-> >>>> sockets into a sock{map|hash} map.
-> >>>>
-> >>>> This is problematic because previous fixed expected sk_pair() to exi=
-st
-> >>>> and did not NULL check it. Because unconnected sockets have a NULL
-> >>>> sk_pair this resulted in the NULL ptr dereference found by syzkaller=
-.
-> >>>>
-> >>>> BUG: KASAN: null-ptr-deref in unix_stream_bpf_update_proto+0x72/0x43=
-0 net/unix/unix_bpf.c:171
-> >>>> Write of size 4 at addr 0000000000000080 by task syz-executor360/507=
-3
-> >>>> Call Trace:
-> >>>>   <TASK>
-> >>>>   ...
-> >>>>   sock_hold include/net/sock.h:777 [inline]
-> >>>>   unix_stream_bpf_update_proto+0x72/0x430 net/unix/unix_bpf.c:171
-> >>>>   sock_map_init_proto net/core/sock_map.c:190 [inline]
-> >>>>   sock_map_link+0xb87/0x1100 net/core/sock_map.c:294
-> >>>>   sock_map_update_common+0xf6/0x870 net/core/sock_map.c:483
-> >>>>   sock_map_update_elem_sys+0x5b6/0x640 net/core/sock_map.c:577
-> >>>>   bpf_map_update_value+0x3af/0x820 kernel/bpf/syscall.c:167
-> >>>>
-> >>>> We considered just checking for the null ptr and skipping taking a r=
-ef
-> >>>> on the NULL peer sock. But, if the socket is then connected() after
-> >>>> being added to the sockmap we can cause the original issue again. So
-> >>>> instead this patch blocks adding af_unix sockets that are not in the
-> >>>> ESTABLISHED state.
-> >>>
-> >>> I'm not sure if someone has the unconnected stream socket use case
-> >>> though, can't we call additional sock_hold() in connect() by checking
-> >>> sk_prot under sk_callback_lock ?
-> >>
-> >> Could be done I guess yes. I'm not sure the utility of it though. I
-> >> thought above patch was the simplest solution and didn't require touch=
-ing
-> >> main af_unix code. I don't actually use the sockmap with af_unix
-> >> sockets anywhere so maybe someone who is using this can comment if
-> >> unconnected is needed?
-> >
-> > Our use case is also connected unix stream socket, as demonstrated in
-> > the selftest unix_redir_to_connected().
->
-> Great, is everyone good to move this fix forward then? Would be great if
-> this receives at least one ack if the latter is indeed the case.
->
-> Thanks,
-> Daniel
+Defining the size of register regions is not really in scope of what
+bindings need to cover. The schema for this is also not completely correct
+as a reg entry can be variable number of cells for the address and size,
+but the schema assumes 1 cell.
 
-I just want to ack that we are not inserting unconnected UDS to sockmap.
+Signed-off-by: Rob Herring <robh@kernel.org>
+---
+ .../bindings/net/marvell,orion-mdio.yaml      | 22 -------------------
+ 1 file changed, 22 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/net/marvell,orion-mdio.yaml b/Documentation/devicetree/bindings/net/marvell,orion-mdio.yaml
+index e35da8b01dc2..73429855d584 100644
+--- a/Documentation/devicetree/bindings/net/marvell,orion-mdio.yaml
++++ b/Documentation/devicetree/bindings/net/marvell,orion-mdio.yaml
+@@ -39,28 +39,6 @@ required:
+ allOf:
+   - $ref: mdio.yaml#
+ 
+-  - if:
+-      required:
+-        - interrupts
+-
+-    then:
+-      properties:
+-        reg:
+-          items:
+-            - items:
+-                - $ref: /schemas/types.yaml#/definitions/cell
+-                - const: 0x84
+-
+-    else:
+-      properties:
+-        reg:
+-          items:
+-            - items:
+-                - $ref: /schemas/types.yaml#/definitions/cell
+-                - enum:
+-                    - 0x4
+-                    - 0x10
+-
+ unevaluatedProperties: false
+ 
+ examples:
+-- 
+2.43.0
+
 
