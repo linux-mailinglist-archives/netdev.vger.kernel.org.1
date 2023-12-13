@@ -1,124 +1,126 @@
-Return-Path: <netdev+bounces-56891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BC63811316
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 14:38:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B56A9811331
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 14:43:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBEEA28258B
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:38:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFF151C21003
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:43:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 786D52D054;
-	Wed, 13 Dec 2023 13:38:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3EDF2D629;
+	Wed, 13 Dec 2023 13:43:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E60D95;
-	Wed, 13 Dec 2023 05:38:52 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R351e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0VyRHh03_1702474728;
-Received: from 30.221.129.237(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VyRHh03_1702474728)
-          by smtp.aliyun-inc.com;
-          Wed, 13 Dec 2023 21:38:50 +0800
-Message-ID: <7cc939cf-d63f-41fc-8048-893a57ac4ab1@linux.alibaba.com>
-Date: Wed, 13 Dec 2023 21:38:48 +0800
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A8D0101;
+	Wed, 13 Dec 2023 05:43:29 -0800 (PST)
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-5d8d2b5d1b5so47787747b3.0;
+        Wed, 13 Dec 2023 05:43:29 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702475008; x=1703079808;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NF7SpEIkXNopAQR1vCI++5qhTFUAvECcT+HygO/vLhU=;
+        b=JD1VxZOh6SIUVrvK50pRgXh4RAvOgWz9QXAv/Te3s126jIX1efV9D/ukTtpH6D8iaz
+         ecUr/Wl9qsxTnKqaaIB4TrsSKbJMV/DEO3yePYrEI+KGod10OokTvFfT5Xd79i4Vnxhd
+         H1V4Z9WHoA7xj4jEwo4dAfItM6q4tsu5zGJtGEGqfth5MMEskV0vOiBBIPNPsiNBGsec
+         4aOoKwYrHfub3uzYKov6+BqKW3UB1ijmjwr/XlAC/r97yRsCr9YIHB2qt6XH/H0BLxsA
+         njM8kC7LWEPKK22Z+Gq/i1qYkG38QXC9VPJO1TKDoI+qQM8bLlOljts4SctRvb+68IjD
+         kIig==
+X-Gm-Message-State: AOJu0YxScikeU1wS3fZAlllLvWXX1pmaEk3mpuJrRa9wbw8T4TMOk/Wl
+	+kaKJAghncGgTRFv1XJUYP5ME+Vhe9rOUg==
+X-Google-Smtp-Source: AGHT+IE3Qofo6Slm+LGXbe9MAwM4KRx4Xp2ppEPSh1/PglB9KFGZ3aCdFTiCfdzIc3R/FypOQWGU9g==
+X-Received: by 2002:a0d:c345:0:b0:5d7:1940:8dea with SMTP id f66-20020a0dc345000000b005d719408deamr3983419ywd.81.1702475008425;
+        Wed, 13 Dec 2023 05:43:28 -0800 (PST)
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com. [209.85.219.181])
+        by smtp.gmail.com with ESMTPSA id f68-20020a0ddc47000000b005d16b6edfffsm4659889ywe.120.2023.12.13.05.43.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Dec 2023 05:43:27 -0800 (PST)
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-d9b9adaf291so5001821276.1;
+        Wed, 13 Dec 2023 05:43:27 -0800 (PST)
+X-Received: by 2002:a05:6902:1a45:b0:da0:3b6c:fc22 with SMTP id
+ cy5-20020a0569021a4500b00da03b6cfc22mr3918042ybb.31.1702475006909; Wed, 13
+ Dec 2023 05:43:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: SMC-R throughput drops for specific message sizes
-To: Gerd Bayer <gbayer@linux.ibm.com>,
- "Nikolaou Alexandros (SO/PAF1-Mb)" <Alexandros.Nikolaou@de.bosch.com>,
- "D . Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>,
- Nils Hoppmann <niho@linux.ibm.com>
-Cc: "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
- netdev <netdev@vger.kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>,
- Jan Karcher <jaka@linux.ibm.com>, Dust Li <dust.li@linux.alibaba.com>
-References: <PAWPR10MB72701758A24DD8DF8063BEE6C081A@PAWPR10MB7270.EURPRD10.PROD.OUTLOOK.COM>
- <ccc03f00-02ee-4af6-8e57-b6de3bc019be@linux.ibm.com>
- <PAWPR10MB7270731C91544AEF25E0A33CC084A@PAWPR10MB7270.EURPRD10.PROD.OUTLOOK.COM>
- <2c460a84c6e725187dda05fc553981ce3022bb78.camel@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <2c460a84c6e725187dda05fc553981ce3022bb78.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20231207070700.4156557-1-claudiu.beznea.uj@bp.renesas.com> <20231207070700.4156557-5-claudiu.beznea.uj@bp.renesas.com>
+In-Reply-To: <20231207070700.4156557-5-claudiu.beznea.uj@bp.renesas.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 13 Dec 2023 14:43:16 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdV15T+c2idSEeWX7_kdLXs0tLURxDs0_f86DE8MLE+6ng@mail.gmail.com>
+Message-ID: <CAMuHMdV15T+c2idSEeWX7_kdLXs0tLURxDs0_f86DE8MLE+6ng@mail.gmail.com>
+Subject: Re: [PATCH v2 04/11] pinctrl: renesas: rzg2l: Add pin configuration
+ support for pinmux groups
+To: Claudiu <claudiu.beznea@tuxon.dev>
+Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, magnus.damm@gmail.com, 
+	mturquette@baylibre.com, sboyd@kernel.org, linus.walleij@linaro.org, 
+	prabhakar.mahadev-lad.rj@bp.renesas.com, biju.das.jz@bp.renesas.com, 
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-clk@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Hi Claudiu,
 
+On Thu, Dec 7, 2023 at 8:08=E2=80=AFAM Claudiu <claudiu.beznea@tuxon.dev> w=
+rote:
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>
+> On RZ/G3S different Ethernet pins need to be configured with different
+> settings (e.g., power-source needs to be set, RGMII TXC and TX_CTL pins
+> need output-enable). Commit adjust driver to allow specifying pin
+> configuration for pinmux groups. With this, DT settings like the followin=
+g
+> are taken into account by driver:
+>
+> eth0_pins: eth0 {
+>         tx_ctl {
+>                 pinmux =3D <RZG2L_PORT_PINMUX(1, 1, 1)>;  /* ET0_TX_CTL *=
+/
+>                 power-source =3D <1800>;
+>                 output-enable;
+>                 drive-strength-microamp =3D <5200>;
+>         };
+> };
+>
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> ---
+>
+> Changes in v2:
 
-On 2023/12/13 20:17, Gerd Bayer wrote:
-> Hi Nikolaou,
-> 
-> thank you for providing more details about your setup.
-> 
-> On Wed, 2023-12-06 at 15:28 +0000, Nikolaou Alexandros (SO/PAF1-Mb)
-> wrote:
->> Dear Wenjia,
-> 
-> while Wenjia is out, I'm writing primarily to getting some more folks'
-> attention to this topic. Furthermore, I'm moving the discussion to the
-> netdev mailing list where SMC discussions usually take place.
-> 
->> Thanks for getting back to me. Some further details on the
->> experiments are:
->>   
->> - The tests had been conducted on a one-to-one connection between two
->> Mellanox-powered (mlx5, ConnectX-5) PCs.
->> - Attached you may find the client log of the qperf output. You may
->> notice that for the majority of message size values, the bandwidth is
->> around 3.2GB/s which matches the maximum throughput of the
->> mellanox NICs.
->> According to a periodic regular pattern though, with the first
->> occurring at a message size of 473616 – 522192 (with a step of
->> 12144kB), the 3.2GB/s throughput drops substantially. The
->> corresponding commands for these drops are
->> server: smc_run qperf
->> client: smc_run qperf -v -uu -H worker1 -m 473616 tcp_bw
->> - Our smc version (3E92E1460DA96BE2B2DDC2F, smc-tools-1.2.2) does not
->> provide us with the smcr info, smc_rnics -a and smcr -d
->> stats commands. As an alternative, you may also find attached the
->> output of ibv_devinfo -v.
->> - Buffer size:
->> sudo sysctl -w net.ipv4.tcp_rmem="4096 1048576 6291456"
->> sudo sysctl -w net.ipv4.tcp_wmem="4096 1048576 6291456"
->> - MTU size: 9000
->>   
->> Should you require further information, please let me know.
-> 
-> Wenjia and I belong to a group of Linux on Z developers that maintains
-> the SMC protocol on s390 mainframe systems. Nils Hoppmann is our expert
-> for performance and might be able to shed some light on his experiences
-> with throughput drops for particular SMC message sizes. Our experience
-> is heavily biased towards IBM Z systems, though - with their distinct
-> cache and PCI root-complex hardware designs.
-> 
-> Over the last few years there's a group around D. Wythe, Wen Gu and
-> Tony Lu who adopted and extended the SMC protocol for use-cases on x86
-> architectures. I address them here explicitly, soliciting feedback on
-> their experiences.
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+i.e. will queue in renesas-pinctrl-for-v6.8.
 
-Certainly. Our team will take a closer look into this matter as well.
-We intend to review the thread thoroughly and conduct an analysis within
-our environment. Updates and feedback will be provided in this thread.
+> - moved num_configs check under num_pinmux check as suggested
 
-> 
-> All in all there are several moving parts involved here, that could
-> play a role:
-> - firmware level of your Mellanox/NVidia NICs,
-> - platform specific hardware designs re. cache and root-complexes,
-> interrupt distribution, ...
-> - exact code level of the device drivers and the SMC protocol
-> 
-> This is just a heads-up, that there may be requests to try things with
-> newer code levels ;)
-> 
-> Thank you,
-> Gerd
-> 
-> --
-> Gerd Bayer
-> Linux on IBM Z Development - IBM Germany R&D
+Actually my comment was wrong, as I had misunderstood the code flow
+("goto done") in case num_pins is non-zero.
+
+I will revert to v1 while queuing in renesas-pinctrl-for-v6.8.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
