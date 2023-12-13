@@ -1,307 +1,180 @@
-Return-Path: <netdev+bounces-56682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85E3D8106E8
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 01:46:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A7CD8106DD
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 01:43:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E08E282350
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 00:46:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B8C31F2152F
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 00:43:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FA43A31;
-	Wed, 13 Dec 2023 00:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3819319C;
+	Wed, 13 Dec 2023 00:43:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iNgzd6UT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZH+6Thax"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E25E99;
-	Tue, 12 Dec 2023 16:45:38 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-28ae1de660bso51642a91.1;
-        Tue, 12 Dec 2023 16:45:38 -0800 (PST)
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A43A99;
+	Tue, 12 Dec 2023 16:43:15 -0800 (PST)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-a1c7d8f89a5so839812466b.2;
+        Tue, 12 Dec 2023 16:43:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702428337; x=1703033137; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nhuPJkKCpT/mx/ACBlpgaGAD4YyXeKLrX/gcd/CAqRM=;
-        b=iNgzd6UTbH0gWg1XOEBByT4E18oWR2MOTMd8otqBRNOLeRL6EvXJaLHWTR1H3Kc3u6
-         rYE9G5E1hnaiwXMZajRToCJuovQAMXPbO5XLkAiD7Wh7MgpmmKCF6LkoI7CUjK06pCju
-         RbQSv5pkcYu3dmZx8cbO+a2p0aLx6xYtz+Tdj6VuXae34Iq8baiBcI1QvYFXA5VE8asq
-         FfTtHxzvCRzIWsbcztlumynGMu7RwFEy/exQ0Ap3J4cLCSvGUBksskH91KMGeJ5cpmUu
-         2hr4iG6riSWMV/aR2A4FYDImVkMMpQS+e/AS4UhHxn7VfYPLOrePAFhC7Vt8JvCl7ECV
-         2wyA==
+        d=gmail.com; s=20230601; t=1702428194; x=1703032994; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZKL5eU2NB9nJqOzdxObiNjRSKS27RY2ubeT3N5kNB70=;
+        b=ZH+6ThaxOfWNxCGmlrFolGuj+hexuFJ+HhMCDsHzH/T79Ausjx9roHL8/dyfDzjhhW
+         5HXvvbirWfjLxcy9ED3+YxJsR46Sp/dhIXrYK4MoWjdCKw5oifrUsh0IXGCq2GzSpv5S
+         An/WTuz8SUPBYMKRMH6SIOsgKZsbccXO7SKyXe3+AU5vA4dYiCxSqkFMnbMxukRA4iND
+         dEDhyPOYyAmQsl/E9Mkzs6+E/3Efh3U8/bkqPC0bCx+qRYKVXrORZYiyd7uaLraaIqZe
+         +cMlcMEBmq+BMz41MS0F2Kyu5s+R6Q919cH37r8IXEdxGxXKR723hCkL4sLmZE3hs9MM
+         eH5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702428337; x=1703033137;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nhuPJkKCpT/mx/ACBlpgaGAD4YyXeKLrX/gcd/CAqRM=;
-        b=fEK3mys7dRMacrPu0QYtConPOD8DGsbIZ+CUK5mKQCVr0HEvRi9Vou5UYyCkrEvceM
-         tWUQ+H/JqH+B4HVyWzvn19gUJ79vTFL+yB5R4D/8JnIGRfdpAn04919P0A4hr/kD/MaO
-         v+1AwM7treEjeBfS0GeuDMVktfux9b4ALi30fiqumL6QRjxdyLofS5RPfC024GOs2OqB
-         7NmQBD7txw8hHRwHmXT/VSoWNL3lY+0PjSHSdNxOIFGh+zx2CzkJ+N3AuQU9qU88XUJU
-         mUwx1sUZ/7bNd7c3uUAvufhXnVfWE2GQjHyowoC6HzcqY7H15F/+wV/QydUyqVaD1Rga
-         VQ3g==
-X-Gm-Message-State: AOJu0YyHkYGRfkXHfaeos3T424R2oWrfGoPL4473WT6w2HuSITVR5wJP
-	jjkKhaLHSq7RipXG9gTKvdUAG8U2sxM2oHWT
-X-Google-Smtp-Source: AGHT+IHhIDhr2il3M0d+GCBp25KV4B+vxt42usd7ljRZsJ6PkpldQ5ZA0xjywbshktOLQVu7njjLVA==
-X-Received: by 2002:a17:90a:4e06:b0:28a:cdc0:7413 with SMTP id n6-20020a17090a4e0600b0028acdc07413mr2353356pjh.1.1702428337550;
-        Tue, 12 Dec 2023 16:45:37 -0800 (PST)
-Received: from ip-172-30-47-114.us-west-2.compute.internal (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id gn21-20020a17090ac79500b0028ac1112124sm2031130pjb.30.2023.12.12.16.45.36
+        d=1e100.net; s=20230601; t=1702428194; x=1703032994;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZKL5eU2NB9nJqOzdxObiNjRSKS27RY2ubeT3N5kNB70=;
+        b=d0vAQtPABdcX6m2h88TQFpBUZd3Na/EckKiR/VCRcZt7cLsrxgzUTQ8yjqnK33Gb1x
+         aDHFidL95hY74HSgguje3kSeHmQJeSi1kAB7x7wK3+9ohQYcyZNjRCzkk3OT1WL3FN2U
+         YVhn7DLQJ8rUzZ/H6nSPkV+Df17IBIb6/Z0anWrOvjH93Q7Lkgr/biKvZvF92IGRYkvA
+         51i96rO555pRDUxqbemZbDcuBTTV5/QobqoP/+JvPhBC9CZkwJNPetwymQQGRuQvUnRP
+         4MuUtF73fyDT5+nNl5qCqv5WwER9nikPs9TG1tlcMjVfBXaNSiJwyGP1G6j0xf30w1Yq
+         mteg==
+X-Gm-Message-State: AOJu0YzLMFDUKbwRBiSlqAPkYeX2+DVbQAYJIkHz5ORBJbuni7UyNtgI
+	Kk++AZ6goUSTDQhKltogd/isbveMtS3NP7m1
+X-Google-Smtp-Source: AGHT+IE1ckr/Y+WwdH+1D99jBFmc9XRkamDadSJaJHL2vvr9zcPVxjWSaHcDF9Lfh65WvRBKX2UHFg==
+X-Received: by 2002:a17:907:962a:b0:a1d:53d8:427e with SMTP id gb42-20020a170907962a00b00a1d53d8427emr4227324ejc.119.1702428193557;
+        Tue, 12 Dec 2023 16:43:13 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id vq2-20020a170907a4c200b00a22faee6649sm119305ejc.117.2023.12.12.16.43.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 16:45:37 -0800 (PST)
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-To: netdev@vger.kernel.org
-Cc: rust-for-linux@vger.kernel.org,
-	andrew@lunn.ch,
-	tmgross@umich.edu,
-	miguel.ojeda.sandonis@gmail.com,
-	benno.lossin@proton.me,
-	wedsonaf@gmail.com,
-	aliceryhl@google.com,
-	boqun.feng@gmail.com
-Subject: [PATCH net-next v11 4/4] net: phy: add Rust Asix PHY driver
-Date: Wed, 13 Dec 2023 09:42:11 +0900
-Message-Id: <20231213004211.1625780-5-fujita.tomonori@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231213004211.1625780-1-fujita.tomonori@gmail.com>
-References: <20231213004211.1625780-1-fujita.tomonori@gmail.com>
+        Tue, 12 Dec 2023 16:43:13 -0800 (PST)
+Date: Wed, 13 Dec 2023 02:43:11 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Jianheng Zhang <Jianheng.Zhang@synopsys.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	James Li <James.Li1@synopsys.com>,
+	Martin McKenny <Martin.McKenny@synopsys.com>,
+	"open list:STMMAC ETHERNET DRIVER" <netdev@vger.kernel.org>,
+	"moderated list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>,
+	"moderated list:ARM/STM32 ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 net-next] net: stmmac: xgmac3+: add FPE handshaking
+ support
+Message-ID: <20231213004311.nptkcubaxuiineec@skbuf>
+References: <CY5PR12MB63727C24923AE855CFF0D425BF8EA@CY5PR12MB6372.namprd12.prod.outlook.com>
+ <20231212152347.167007f3@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231212152347.167007f3@kernel.org>
 
-This is the Rust implementation of drivers/net/phy/ax88796b.c. The
-features are equivalent. You can choose C or Rust version kernel
-configuration.
+On Tue, Dec 12, 2023 at 03:23:47PM -0800, Jakub Kicinski wrote:
+> On Tue, 12 Dec 2023 14:05:02 +0000 Jianheng Zhang wrote:
+> > Adds the HW specific support for Frame Preemption handshaking on XGMAC3+
+> > cores.
+> > 
+> > Signed-off-by: Jianheng Zhang <Jianheng.Zhang@synopsys.com>
+> 
+> I defer to Vladimir on whether to trust that the follow up with
+> the ethtool API support will come later (and not require rewrite
+> of existing code); or we should request that it's part of the same
+> series.
+> -- 
+> pw-bot: needs-ack
+> 
 
-Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Reviewed-by: Trevor Gross <tmgross@umich.edu>
-Reviewed-by: Benno Lossin <benno.lossin@proton.me>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
----
- MAINTAINERS                      |   8 ++
- drivers/net/phy/Kconfig          |   8 ++
- drivers/net/phy/Makefile         |   6 +-
- drivers/net/phy/ax88796b_rust.rs | 135 +++++++++++++++++++++++++++++++
- rust/uapi/uapi_helper.h          |   2 +
- 5 files changed, 158 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/phy/ax88796b_rust.rs
+Here's the thing - my understanding of what Synopsys is doing is that
+they use TC_TAPRIO_CMD_SET_AND_HOLD and TC_TAPRIO_CMD_SET_AND_RELEASE
+as implicit hints to the stmmac driver that FPE should be enabled.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 089394a0af2e..bbc6db6bebf4 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3083,6 +3083,14 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/net/asix,ax88796c.yaml
- F:	drivers/net/ethernet/asix/ax88796c_*
- 
-+ASIX PHY DRIVER [RUST]
-+M:	FUJITA Tomonori <fujita.tomonori@gmail.com>
-+R:	Trevor Gross <tmgross@umich.edu>
-+L:	netdev@vger.kernel.org
-+L:	rust-for-linux@vger.kernel.org
-+S:	Maintained
-+F:	drivers/net/phy/ax88796b_rust.rs
-+
- ASPEED CRYPTO DRIVER
- M:	Neal Liu <neal_liu@aspeedtech.com>
- L:	linux-aspeed@lists.ozlabs.org (moderated for non-subscribers)
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index 8d00cece5e23..0f483c3dfed9 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -112,6 +112,14 @@ config AX88796B_PHY
- 	  Currently supports the Asix Electronics PHY found in the X-Surf 100
- 	  AX88796B package.
- 
-+config AX88796B_RUST_PHY
-+	bool "Rust reference driver for Asix PHYs"
-+	depends on RUST_PHYLIB_ABSTRACTIONS && AX88796B_PHY
-+	help
-+	  Uses the Rust reference driver for Asix PHYs (ax88796b_rust.ko).
-+	  The features are equivalent. It supports the Asix Electronics PHY
-+	  found in the X-Surf 100 AX88796B package.
-+
- config BROADCOM_PHY
- 	tristate "Broadcom 54XX PHYs"
- 	select BCM_NET_PHYLIB
-diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-index f65e85c91fc1..ab450a46b855 100644
---- a/drivers/net/phy/Makefile
-+++ b/drivers/net/phy/Makefile
-@@ -37,7 +37,11 @@ obj-$(CONFIG_ADIN1100_PHY)	+= adin1100.o
- obj-$(CONFIG_AMD_PHY)		+= amd.o
- obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia/
- obj-$(CONFIG_AT803X_PHY)	+= at803x.o
--obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
-+ifdef CONFIG_AX88796B_RUST_PHY
-+  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b_rust.o
-+else
-+  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
-+endif
- obj-$(CONFIG_BCM54140_PHY)	+= bcm54140.o
- obj-$(CONFIG_BCM63XX_PHY)	+= bcm63xx.o
- obj-$(CONFIG_BCM7XXX_PHY)	+= bcm7xxx.o
-diff --git a/drivers/net/phy/ax88796b_rust.rs b/drivers/net/phy/ax88796b_rust.rs
-new file mode 100644
-index 000000000000..5c92572962dc
---- /dev/null
-+++ b/drivers/net/phy/ax88796b_rust.rs
-@@ -0,0 +1,135 @@
-+// SPDX-License-Identifier: GPL-2.0
-+// Copyright (C) 2023 FUJITA Tomonori <fujita.tomonori@gmail.com>
-+
-+//! Rust Asix PHYs driver
-+//!
-+//! C version of this driver: [`drivers/net/phy/ax88796b.c`](./ax88796b.c)
-+use kernel::{
-+    c_str,
-+    net::phy::{self, DeviceId, Driver},
-+    prelude::*,
-+    uapi,
-+};
-+
-+kernel::module_phy_driver! {
-+    drivers: [PhyAX88772A, PhyAX88772C, PhyAX88796B],
-+    device_table: [
-+        DeviceId::new_with_driver::<PhyAX88772A>(),
-+        DeviceId::new_with_driver::<PhyAX88772C>(),
-+        DeviceId::new_with_driver::<PhyAX88796B>()
-+    ],
-+    name: "rust_asix_phy",
-+    author: "FUJITA Tomonori <fujita.tomonori@gmail.com>",
-+    description: "Rust Asix PHYs driver",
-+    license: "GPL",
-+}
-+
-+const MII_BMCR: u16 = uapi::MII_BMCR as u16;
-+const BMCR_SPEED100: u16 = uapi::BMCR_SPEED100 as u16;
-+const BMCR_FULLDPLX: u16 = uapi::BMCR_FULLDPLX as u16;
-+
-+// Performs a software PHY reset using the standard
-+// BMCR_RESET bit and poll for the reset bit to be cleared.
-+// Toggle BMCR_RESET bit off to accommodate broken AX8796B PHY implementation
-+// such as used on the Individual Computers' X-Surf 100 Zorro card.
-+fn asix_soft_reset(dev: &mut phy::Device) -> Result {
-+    dev.write(uapi::MII_BMCR as u16, 0)?;
-+    dev.genphy_soft_reset()
-+}
-+
-+struct PhyAX88772A;
-+
-+#[vtable]
-+impl Driver for PhyAX88772A {
-+    const FLAGS: u32 = phy::flags::IS_INTERNAL;
-+    const NAME: &'static CStr = c_str!("Asix Electronics AX88772A");
-+    const PHY_DEVICE_ID: DeviceId = DeviceId::new_with_exact_mask(0x003b1861);
-+
-+    // AX88772A is not working properly with some old switches (NETGEAR EN 108TP):
-+    // after autoneg is done and the link status is reported as active, the MII_LPA
-+    // register is 0. This issue is not reproducible on AX88772C.
-+    fn read_status(dev: &mut phy::Device) -> Result<u16> {
-+        dev.genphy_update_link()?;
-+        if !dev.is_link_up() {
-+            return Ok(0);
-+        }
-+        // If MII_LPA is 0, phy_resolve_aneg_linkmode() will fail to resolve
-+        // linkmode so use MII_BMCR as default values.
-+        let ret = dev.read(MII_BMCR)?;
-+
-+        if ret & BMCR_SPEED100 != 0 {
-+            dev.set_speed(uapi::SPEED_100);
-+        } else {
-+            dev.set_speed(uapi::SPEED_10);
-+        }
-+
-+        let duplex = if ret & BMCR_FULLDPLX != 0 {
-+            phy::DuplexMode::Full
-+        } else {
-+            phy::DuplexMode::Half
-+        };
-+        dev.set_duplex(duplex);
-+
-+        dev.genphy_read_lpa()?;
-+
-+        if dev.is_autoneg_enabled() && dev.is_autoneg_completed() {
-+            dev.resolve_aneg_linkmode();
-+        }
-+
-+        Ok(0)
-+    }
-+
-+    fn suspend(dev: &mut phy::Device) -> Result {
-+        dev.genphy_suspend()
-+    }
-+
-+    fn resume(dev: &mut phy::Device) -> Result {
-+        dev.genphy_resume()
-+    }
-+
-+    fn soft_reset(dev: &mut phy::Device) -> Result {
-+        asix_soft_reset(dev)
-+    }
-+
-+    fn link_change_notify(dev: &mut phy::Device) {
-+        // Reset PHY, otherwise MII_LPA will provide outdated information.
-+        // This issue is reproducible only with some link partner PHYs.
-+        if dev.state() == phy::DeviceState::NoLink {
-+            let _ = dev.init_hw();
-+            let _ = dev.start_aneg();
-+        }
-+    }
-+}
-+
-+struct PhyAX88772C;
-+
-+#[vtable]
-+impl Driver for PhyAX88772C {
-+    const FLAGS: u32 = phy::flags::IS_INTERNAL;
-+    const NAME: &'static CStr = c_str!("Asix Electronics AX88772C");
-+    const PHY_DEVICE_ID: DeviceId = DeviceId::new_with_exact_mask(0x003b1881);
-+
-+    fn suspend(dev: &mut phy::Device) -> Result {
-+        dev.genphy_suspend()
-+    }
-+
-+    fn resume(dev: &mut phy::Device) -> Result {
-+        dev.genphy_resume()
-+    }
-+
-+    fn soft_reset(dev: &mut phy::Device) -> Result {
-+        asix_soft_reset(dev)
-+    }
-+}
-+
-+struct PhyAX88796B;
-+
-+#[vtable]
-+impl Driver for PhyAX88796B {
-+    const NAME: &'static CStr = c_str!("Asix Electronics AX88796B");
-+    const PHY_DEVICE_ID: DeviceId = DeviceId::new_with_model_mask(0x003b1841);
-+
-+    fn soft_reset(dev: &mut phy::Device) -> Result {
-+        asix_soft_reset(dev)
-+    }
-+}
-diff --git a/rust/uapi/uapi_helper.h b/rust/uapi/uapi_helper.h
-index 301f5207f023..08f5e9334c9e 100644
---- a/rust/uapi/uapi_helper.h
-+++ b/rust/uapi/uapi_helper.h
-@@ -7,3 +7,5 @@
-  */
- 
- #include <uapi/asm-generic/ioctl.h>
-+#include <uapi/linux/mii.h>
-+#include <uapi/linux/ethtool.h>
--- 
-2.34.1
+Hold/Release is merely one use case for frame preemption. The "fp"
+argument in the tc framework gives you access to the rest: preemption
+without scheduling, preemption with scheduling but without hold/release.
 
+And the ethtool-mm framework gives you compatibility with LLDP, so you
+can adjust the minimum fragment sizes according to the link partner.
+Roger Quadros is adding am65-cpsw support for FPE using the generic
+framework, and the TI device has an erratum that the minimum fragment
+size that can be received cannot be lower than 124 bytes. LLDP allows
+link partners to discover that and still interoperate - which is very
+important, because if first-gen TSN hardware, with all its pre-standard
+quirks, does not deliver, there may not be a second-gen.
+
+By using LLDP, you can also enable the FPE handshake based on user space
+input - when the LLDP daemon gets an LLDPDU with an Additional Ethernet
+Capabilities TLV, rather than during each and every stmmac_mac_link_up(),
+and hoping for someone to respond. Depending on your hardware design,
+this can even lead to power savings, because you can power on your pMAC
+only when LLDP says the link partner is also capable, and it will be required.
+
+Ethtool also gives you the ability to report standardized stats per eMAC
+and per pMAC, and standardized stats for the MAC Merge layer itself.
+
+Also, the FPE state machine from the stmmac driver is so chatty and
+spams the kernel log so bad, because it has nowhere else to report its
+current (fragile) state. The ethtool MAC Merge layer gives the driver
+a way to report its verification state ("FPE Handshake" as Synopsys
+calls it) in a standardized enum.
+
+A small note that the mainline iproute2 does not even expose the
+TC_TAPRIO_CMD_SET_AND_HOLD and TC_TAPRIO_CMD_SET_AND_RELEASE netlink
+attribute values. To quote from the manpage (which is not out of date
+with the code; I checked - again): 'The only supported <command> is "S",
+which means "SetGateStates"'.
+
+So I can only guess that Synopsys and anyone else who wants to turn on
+FPE on stmmac has to patch their iproute2. A Github code search made me
+land here:
+https://github.com/altera-opensource/meta-intel-fpga-refdes/blob/7b050ca9968f5ff71598e86bb3a10bb8e011439c/recipes-connectivity/iproute2/iproute2/0003-taprio-Add-support-for-the-SetAndHold-and-SetAndRele.patch
+
+In principle there's nothing wrong with not sharing patches on community
+software with the rest of the world. But I cannot help but get the
+impression that stmmac support for FPE is abandonware / extremely low
+priority / code written to tick the boxes. It's not in the best state
+even in the "good" case where the XGMAC3+ support gets accepted.
+Jianheng, please contradict me by showing what testing is currently
+conducted with this implementation. If none or close to that, let's get
+it to a more "observable" state, where at least others' tests could be
+reused.
+
+Even this very patch is slightly strange - it is not brand new hardware
+support, but it fills in some more FPE ops in dwxlgmac2_ops - when
+dwxgmac3_fpe_configure() was already there. So this suggests the
+existing support was incomplete. How complete is it now? No way to tell.
+There is a selftest to tell, but we can't run it because the driver
+doesn't integrate with those kernel APIs.
+
+There are long periods of radio silence from Synopsys engineers in upstream,
+and as maintainers we simply don't know what stmmac's FPE implementation
+does and what it doesn't do. If a future user gets into trouble, having
+a "known good" bisection point, by means of a selftest that passes, is
+going to allow even non-expert maintainers like us provide some help,
+even if Synopsys engineers go radio silent again.
+
+It may be that Jianheng just needs a little nudge to help the management
+prioritize, by getting a NACK. It's a simple "help us help you" situation:
+the framework is there and it is a gateway for better Linux user space
+support for your platform, you just need to use it. And what better time
+to integrate with new API than with new hardware... :) Because it's not
+as if FPE on XGMAC3+ ever worked in mainline given my reading of the code.
+So why would users not start learning to use it with what is becoming
+the common tool set for everybody else.
+
+Allow me to change the "needs-ack" into:
+
+pw-bot: cr
 
