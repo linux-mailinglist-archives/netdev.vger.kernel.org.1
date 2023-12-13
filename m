@@ -1,203 +1,259 @@
-Return-Path: <netdev+bounces-57078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15B0B8120D5
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 22:38:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26A6C8120D7
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 22:41:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C3D71F219B9
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 21:38:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A5BF2826B5
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 21:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41FEA7FBA1;
-	Wed, 13 Dec 2023 21:38:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC3477FBA4;
+	Wed, 13 Dec 2023 21:41:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OqCXTAVS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DLNp9H+e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBD8DCF
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 13:37:56 -0800 (PST)
-Received: by mail-ot1-x332.google.com with SMTP id 46e09a7af769-6d9e993d94dso4632306a34.0
-        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 13:37:56 -0800 (PST)
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E04FDB
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 13:41:03 -0800 (PST)
+Received: by mail-qt1-x830.google.com with SMTP id d75a77b69052e-4258423e133so53436891cf.3
+        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 13:41:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702503475; x=1703108275; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X3x1URCksmhBkrK5U60qDbBJnVveS2ETEubCGJBlhtQ=;
-        b=OqCXTAVSaX5pFrTriu9Q5j0jZgswjIxrsiuNJjGdBf0FA6GL0piYFqmJFhOkw2KPo1
-         Xhib2meA89HWsVIX7TuTc4SoF1DAB0K6eEXsOIUvmAItGNYZ/pb8S1UjwHf+yesRHNhi
-         xgPzrjIBX5FVkXrqYECQt/+uFCuCjk7lTqcTYjh77mSVnagebR1Fq4t3bgvv5ISRg09V
-         dZ+ypooCFhaK58sC2Rzc9yHEY9sPWjUWGmjg8BhWT2tZBkgJsNF4FIbFYHgg3VG62kgl
-         tJaaV1kgzeEDaXd7fJEp4+keQhu7YY4/vJhbHymF3xlyD6utWAjADcDEdlLozq7htpne
-         2xDg==
+        d=gmail.com; s=20230601; t=1702503662; x=1703108462; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3ENsPs54kjRIcSGHvpPRlMUMeU51Igm+ASIsv1zG5SA=;
+        b=DLNp9H+ecdWCYwKMRlAjzg7rPQG/NirkaW1gVg7naqc16S/4cqMs1bT5TEH1E96vQQ
+         SrHJJovb9Oeb2ZlxYMiIqpxdHE9eCMkc06mH8fchFrgdl1xEPm1O9qZAIbaYJ0UIl8IV
+         wIJJmYY2kqFjJlrC1aF0RuigNNtpSWANeSkG9XkhIkFUvkvyqqBZ+DhhEIyB8l9jaqy9
+         PrkuSUacCEni+mHpK/9D/SwCTZqTrBHlWc+bmIkuFrivg68OleqbQfhFm8UgOESop7MQ
+         8MVnpmZJIeNCQO5B4S2pzED17ygY6rDkrrAVJxcnp7xE9nAVXfN0fTxUsh7VjkgMwE+h
+         iJFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702503475; x=1703108275;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X3x1URCksmhBkrK5U60qDbBJnVveS2ETEubCGJBlhtQ=;
-        b=BmDQBljQOZpYteXAjocSt67eExFFCCXk3fWALWikIvLeZ/yFn+sTm0Y6cyabnSHoiS
-         7RxKHFyxlta7x9yDORYrMGzKiQk4SuamAkvTNJjUUlGAvLBLpb7HWNeeMOfJsNfKf/Wm
-         vSWRacje8tsUGQjZtp1HZJpF6H4R4ACRJxZcINx1YuIre3AdEHBIOz44FhIpngOBE+QL
-         RXYdyGj0H+lQkzKggVZ42lK8nCjsSLsk0jJY3DyYaIwJNwOV7NgjIFYevSdz6dOXLlKJ
-         E5CopTplxynmID+LXthumFbVhZ+L+vf82pD0b+6xUz6F7u8ggL8em630RIe9nISsXI35
-         Jkqg==
-X-Gm-Message-State: AOJu0YzyOxptIF7Y2Z2IXzB9ynX4Bjb5MGI/9Kp9ZyDG0vMbkei6TvRT
-	al1VDCNRSklXvPpeFnyV3ZkxDNVWDYr/GA==
-X-Google-Smtp-Source: AGHT+IEYx9lBY2N8ZfXy17XuALIZ5Ul4OcFXwXSPjg7MKUew1FbpkLJrerX1pMDPdGuWZdPNGcTJxw==
-X-Received: by 2002:a05:6830:1d7c:b0:6d9:d59d:6559 with SMTP id l28-20020a0568301d7c00b006d9d59d6559mr7651712oti.7.1702503475477;
-        Wed, 13 Dec 2023 13:37:55 -0800 (PST)
-Received: from kickker.attlocal.net ([2600:1700:6cf8:1240:180e:8c9:1628:87e1])
-        by smtp.gmail.com with ESMTPSA id t190-20020a0deac7000000b005e3175fc655sm496799ywe.55.2023.12.13.13.37.54
+        d=1e100.net; s=20230601; t=1702503662; x=1703108462;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3ENsPs54kjRIcSGHvpPRlMUMeU51Igm+ASIsv1zG5SA=;
+        b=AopKrxXkf+1mT5hRMZeosFtbkyUY8cZOojHcOrXbxXsc40eUYbvCyVZ52C1KtAdIgL
+         Px9jjVRfyj4EcCZe8Q+yGQ3ls/smEsavateqvHXyhpgW6cTzZeGI154UawoeUrexWplJ
+         6S3y+HulKVZ4s0815MglU0z5OEG4Y7Y3My5kGkqaTZGB0ulrKKTlegpVxhQrFiFqq0aa
+         B/4HCc+KbmPvj/cra3cyVqMCBlYsSge6shuAury5DUbV0Z6Z2AIMrHgzU6vOVup6jqZ+
+         7vyRIatXUma2eC1m0dZFtBP1wCeDX4Os0C+84z1I0E7S9vEkbQ0QSf9gD5DgT6/vw4Cr
+         qCfw==
+X-Gm-Message-State: AOJu0YxRP8hYJk4ElUQnYnUPPofacjBtf/6NPBbZoj/kYro7LLP579Se
+	8hK8ga7nrM+zjTSVkkRhGH4=
+X-Google-Smtp-Source: AGHT+IH044XEFl/mUwRa5bGbk3kvBKAnPqR19W8D+sx6e0/F61LcdZiSixAU6yKtjYnAZ5Yuuj+S/A==
+X-Received: by 2002:a05:622a:144e:b0:425:aa00:cdd9 with SMTP id v14-20020a05622a144e00b00425aa00cdd9mr11872185qtx.16.1702503662488;
+        Wed, 13 Dec 2023 13:41:02 -0800 (PST)
+Received: from localhost ([69.156.66.74])
+        by smtp.gmail.com with ESMTPSA id e7-20020ac845c7000000b00418122186ccsm5198285qto.12.2023.12.13.13.41.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 13:37:55 -0800 (PST)
-From: thinker.li@gmail.com
-To: netdev@vger.kernel.org,
-	martin.lau@linux.dev,
-	kernel-team@meta.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	edumazet@google.com
-Cc: sinquersw@gmail.com,
-	kuifeng@meta.com,
-	Kui-Feng Lee <thinker.li@gmail.com>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH net-next v3 2/2] selftests: fib_tests: Add tests for toggling between w/ and w/o expires.
-Date: Wed, 13 Dec 2023 13:37:35 -0800
-Message-Id: <20231213213735.434249-3-thinker.li@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231213213735.434249-1-thinker.li@gmail.com>
-References: <20231213213735.434249-1-thinker.li@gmail.com>
+        Wed, 13 Dec 2023 13:41:02 -0800 (PST)
+Date: Wed, 13 Dec 2023 16:40:53 -0500
+From: Benjamin Poirier <benjamin.poirier@gmail.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: Petr Machata <petrm@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
+	mlxsw@nvidia.com, Jay Vosburgh <j.vosburgh@gmail.com>
+Subject: Re: [PATCH net-next] selftests: forwarding: Import top-level lib.sh
+ through $lib_dir
+Message-ID: <ZXok5cRZDKdjX1nj@d3>
+References: <a1c56680a5041ae337a6a44a7091bd8f781c1970.1702295081.git.petrm@nvidia.com>
+ <ZXcERjbKl2JFClEz@Laptop-X1>
+ <87fs07mi0w.fsf@nvidia.com>
+ <ZXi_veDs_NMDsFrD@d3>
+ <ZXlIew7PbTglpUmV@Laptop-X1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZXlIew7PbTglpUmV@Laptop-X1>
 
-From: Kui-Feng Lee <thinker.li@gmail.com>
+On 2023-12-13 14:00 +0800, Hangbin Liu wrote:
+> On Tue, Dec 12, 2023 at 03:17:01PM -0500, Benjamin Poirier wrote:
+> > On 2023-12-12 18:22 +0100, Petr Machata wrote:
+[...]
+> > There is also another related issue which is that generating a test
+> > archive using gen_tar for the tests under drivers/net/bonding does not
+> > include the new lib.sh. This is similar to the issue reported here:
+> > https://lore.kernel.org/netdev/40f04ded-0c86-8669-24b1-9a313ca21076@redhat.com/
+> > 
+> > /tmp/x# ./run_kselftest.sh
+> > TAP version 13
+> > [...]
+> > # timeout set to 120
+> > # selftests: drivers/net/bonding: dev_addr_lists.sh
+> > # ./net_forwarding_lib.sh: line 41: ../lib.sh: No such file or directory
+> > # TEST: bonding cleanup mode active-backup                            [ OK ]
+> > # TEST: bonding cleanup mode 802.3ad                                  [ OK ]
+> > # TEST: bonding LACPDU multicast address to slave (from bond down)    [ OK ]
+> > # TEST: bonding LACPDU multicast address to slave (from bond up)      [ OK ]
+> > ok 4 selftests: drivers/net/bonding: dev_addr_lists.sh
+> > [...]
+> 
+> Hmm.. Is it possible to write a rule in the Makefile to create the net/
+> and net/forwarding folder so we can source the relative path directly. e.g.
+> 
+> ]# tree
+> .
+> ├── drivers
+> │   └── net
+> │       └── bonding
+> │           ├── bond-arp-interval-causes-panic.sh
+> │           ├── ...
+> │           └── settings
+> ├── kselftest
+> │   ├── module.sh
+> │   ├── prefix.pl
+> │   └── runner.sh
+> ├── kselftest-list.txt
+> ├── net
+> │   ├── forwarding
+> │   │   └── lib.sh
+> │   └── lib.sh
+> └── run_kselftest.sh
 
-Make sure that toggling routes between w/ expires and w/o expires works
-properly with GC list.
+That sounds like a good idea. I started to work on that approach but I'm
+missing recursive inclusion. For instance
 
-When a route with expires is replaced by a permanent route, the entry
-should be removed from the gc list. When a permanent routes is replaced by
-a temporary route, the new entry should be added to the gc list. The new
-tests check if these basic operators work properly.
+cd tools/testing/selftests
+make install TARGETS="drivers/net/bonding"
+./kselftest_install/run_kselftest.sh -t drivers/net/bonding:dev_addr_lists.sh
 
-Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
-Cc: Hangbin Liu <liuhangbin@gmail.com>
+includes net/forwarding/lib.sh but is missing net/lib.sh. I feel that my
+'make' skills are rusty but I guess that with enough make code, it could
+be done. A workaround is simply to manually list the transitive
+dependencies in TEST_SH_LIBS:
+ TEST_SH_LIBS := \
+-	net/forwarding/lib.sh
++	net/forwarding/lib.sh \
++	net/lib.sh
+
+I only converted a few files to validate that the approach is viable. I
+used the following tests:
+drivers/net/bonding/dev_addr_lists.sh
+net/test_vxlan_vnifiltering.sh
+net/forwarding/pedit_ip.sh
+
+Let me know what you think.
+
 ---
- tools/testing/selftests/net/fib_tests.sh | 82 +++++++++++++++++++++++-
- 1 file changed, 80 insertions(+), 2 deletions(-)
+ tools/testing/selftests/Makefile                            | 5 ++++-
+ tools/testing/selftests/drivers/net/bonding/Makefile        | 6 ++++--
+ .../testing/selftests/drivers/net/bonding/dev_addr_lists.sh | 2 +-
+ .../selftests/drivers/net/bonding/net_forwarding_lib.sh     | 1 -
+ tools/testing/selftests/lib.mk                              | 3 +++
+ tools/testing/selftests/net/forwarding/Makefile             | 3 +++
+ tools/testing/selftests/net/forwarding/lib.sh               | 3 ++-
+ 7 files changed, 17 insertions(+), 6 deletions(-)
+ delete mode 120000 tools/testing/selftests/drivers/net/bonding/net_forwarding_lib.sh
 
-diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
-index 66d0db7a2614..337d0febd796 100755
---- a/tools/testing/selftests/net/fib_tests.sh
-+++ b/tools/testing/selftests/net/fib_tests.sh
-@@ -785,6 +785,8 @@ fib6_gc_test()
- 	    ret=0
- 	fi
+diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
+index 3b2061d1c1a5..0aaa7efa3015 100644
+--- a/tools/testing/selftests/Makefile
++++ b/tools/testing/selftests/Makefile
+@@ -256,7 +256,10 @@ ifdef INSTALL_PATH
+ 	@ret=1;	\
+ 	for TARGET in $(TARGETS); do \
+ 		BUILD_TARGET=$$BUILD/$$TARGET;	\
+-		$(MAKE) OUTPUT=$$BUILD_TARGET -C $$TARGET INSTALL_PATH=$(INSTALL_PATH)/$$TARGET install \
++		$(MAKE) install OUTPUT=$$BUILD_TARGET -C $$TARGET \
++				INSTALL_PATH=$(INSTALL_PATH)/$$TARGET \
++				SH_LIBS_PATH=$(INSTALL_PATH) \
++				BASE_PATH=$(shell pwd) \
+ 				O=$(abs_objtree)		\
+ 				$(if $(FORCE_TARGETS),|| exit);	\
+ 		ret=$$((ret * $$?));		\
+diff --git a/tools/testing/selftests/drivers/net/bonding/Makefile b/tools/testing/selftests/drivers/net/bonding/Makefile
+index 8a72bb7de70f..6682f8c1fe79 100644
+--- a/tools/testing/selftests/drivers/net/bonding/Makefile
++++ b/tools/testing/selftests/drivers/net/bonding/Makefile
+@@ -15,7 +15,9 @@ TEST_PROGS := \
+ TEST_FILES := \
+ 	lag_lib.sh \
+ 	bond_topo_2d1c.sh \
+-	bond_topo_3d1c.sh \
+-	net_forwarding_lib.sh
++	bond_topo_3d1c.sh
++
++TEST_SH_LIBS := \
++	net/forwarding/lib.sh
  
-+	log_test $ret 0 "ipv6 route garbage collection"
-+
- 	# Permanent routes
- 	for i in $(seq 1 5000); do
- 	    $IP -6 route add 2001:30::$i \
-@@ -806,9 +808,85 @@ fib6_gc_test()
- 	    ret=0
- 	fi
+ include ../../../lib.mk
+diff --git a/tools/testing/selftests/drivers/net/bonding/dev_addr_lists.sh b/tools/testing/selftests/drivers/net/bonding/dev_addr_lists.sh
+index 5cfe7d8ebc25..e6fa24eded5b 100755
+--- a/tools/testing/selftests/drivers/net/bonding/dev_addr_lists.sh
++++ b/tools/testing/selftests/drivers/net/bonding/dev_addr_lists.sh
+@@ -14,7 +14,7 @@ ALL_TESTS="
+ REQUIRE_MZ=no
+ NUM_NETIFS=0
+ lib_dir=$(dirname "$0")
+-source "$lib_dir"/net_forwarding_lib.sh
++source "$lib_dir"/../../../net/forwarding/lib.sh
  
--	set +e
-+	log_test $ret 0 "ipv6 route garbage collection (with permanent routes)"
+ source "$lib_dir"/lag_lib.sh
  
--	log_test $ret 0 "ipv6 route garbage collection"
-+	# Delete permanent routes
-+	for i in $(seq 1 5000); do
-+	    $IP -6 route del 2001:30::$i \
-+		via 2001:10::2 dev dummy_10
-+	done
-+
-+	# Permanent routes
-+	for i in $(seq 1 100); do
-+	    # Expire route after $EXPIRE seconds
-+	    $IP -6 route add 2001:20::$i \
-+		via 2001:10::2 dev dummy_10
-+	done
-+	# Replace with temporary routes
-+	for i in $(seq 1 100); do
-+	    # Expire route after $EXPIRE seconds
-+	    $IP -6 route replace 2001:20::$i \
-+		via 2001:10::2 dev dummy_10 expires $EXPIRE
-+	done
-+	N_EXP_SLEEP=$($IP -6 route list |grep expires|wc -l)
-+	if [ $N_EXP_SLEEP -ne 100 ]; then
-+	    echo "FAIL: expected 100 routes with expires, got $N_EXP_SLEEP"
-+	    ret=1
-+	else
-+	    ret=0
-+	fi
-+
-+	if [ $ret -eq 0 ]; then
-+	    sleep $(($EXPIRE * 2 + 1))
-+	    N_EXP_SLEEP=$($IP -6 route list |grep expires|wc -l)
-+	    if [ $N_EXP_SLEEP -ne 0 ]; then
-+		echo "FAIL: expected 0 routes with expires," \
-+		     "got $N_EXP_SLEEP"
-+		ret=1
-+	    else
-+		ret=0
-+	    fi
-+	fi
-+
-+	if [ $ret -eq 0 ]; then
-+	    PERM_BASE=$($IP -6 route list |grep -v expires|wc -l)
-+	    # Temporary routes
-+	    for i in $(seq 1 100); do
-+		# Expire route after $EXPIRE seconds
-+		$IP -6 route add 2001:20::$i \
-+		    via 2001:10::2 dev dummy_10 expires $EXPIRE
-+	    done
-+	    # Replace with permanent routes
-+	    for i in $(seq 1 100); do
-+		# Expire route after $EXPIRE seconds
-+		$IP -6 route replace 2001:20::$i \
-+		    via 2001:10::2 dev dummy_10
-+	    done
-+	    N_EXP_SLEEP=$($IP -6 route list |grep expires|wc -l)
-+	    if [ $N_EXP_SLEEP -ne 0 ]; then
-+		echo "FAIL: expected 0 routes with expires," \
-+		 "got $N_EXP_SLEEP"
-+		ret=1
-+	    else
-+		ret=0
-+	    fi
-+	fi
-+	if [ $ret -eq 0 ]; then
-+	    sleep $(($EXPIRE * 2 + 1))
-+	    N_EXP_PERM=$($IP -6 route list |grep -v expires|wc -l)
-+	    N_EXP_PERM=$(($N_EXP_PERM - $PERM_BASE))
-+	    if [ $N_EXP_PERM -ne 100 ]; then
-+		echo "FAIL: expected 100 permanent routes," \
-+		     "got $N_EXP_PERM"
-+		ret=1
-+	    else
-+		ret=0
-+	    fi
-+	fi
-+
-+	log_test $ret 0 "ipv6 route garbage collection (replace with permanent)"
-+
-+	set +e
+diff --git a/tools/testing/selftests/drivers/net/bonding/net_forwarding_lib.sh b/tools/testing/selftests/drivers/net/bonding/net_forwarding_lib.sh
+deleted file mode 120000
+index 39c96828c5ef..000000000000
+--- a/tools/testing/selftests/drivers/net/bonding/net_forwarding_lib.sh
++++ /dev/null
+@@ -1 +0,0 @@
+-../../../net/forwarding/lib.sh
+\ No newline at end of file
+diff --git a/tools/testing/selftests/lib.mk b/tools/testing/selftests/lib.mk
+index 118e0964bda9..94b7af7d6610 100644
+--- a/tools/testing/selftests/lib.mk
++++ b/tools/testing/selftests/lib.mk
+@@ -137,6 +137,9 @@ endef
+ install: all
+ ifdef INSTALL_PATH
+ 	$(INSTALL_RULE)
++	$(if $(TEST_SH_LIBS), \
++		cd $(BASE_PATH) && rsync -aR $(TEST_SH_LIBS) $(SH_LIBS_PATH)/ \
++	)
+ else
+ 	$(error Error: set INSTALL_PATH to use install)
+ endif
+diff --git a/tools/testing/selftests/net/forwarding/Makefile b/tools/testing/selftests/net/forwarding/Makefile
+index df593b7b3e6b..4f6921638bae 100644
+--- a/tools/testing/selftests/net/forwarding/Makefile
++++ b/tools/testing/selftests/net/forwarding/Makefile
+@@ -128,4 +128,7 @@ TEST_PROGS_EXTENDED := devlink_lib.sh \
+ 	sch_tbf_etsprio.sh \
+ 	tc_common.sh
  
- 	cleanup &> /dev/null
- }
++TEST_SH_LIBS := \
++	net/lib.sh
++
+ include ../../lib.mk
+diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+index 8f6ca458af9a..b99fae42e3c0 100755
+--- a/tools/testing/selftests/net/forwarding/lib.sh
++++ b/tools/testing/selftests/net/forwarding/lib.sh
+@@ -38,7 +38,8 @@ if [[ -f $relative_path/forwarding.config ]]; then
+ 	source "$relative_path/forwarding.config"
+ fi
+ 
+-source ../lib.sh
++libdir=$(dirname "$(readlink -f "$BASH_SOURCE")")
++source "$libdir"/../lib.sh
+ ##############################################################################
+ # Sanity checks
+ 
 -- 
-2.34.1
+2.43.0
 
 
