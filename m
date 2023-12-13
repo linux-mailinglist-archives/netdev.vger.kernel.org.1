@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-56675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 374BB8106AC
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 01:37:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 05D218106C8
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 01:38:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 673901C20A1E
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 00:37:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 369C31C20D64
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 00:38:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3FF0394;
-	Wed, 13 Dec 2023 00:37:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C243A41;
+	Wed, 13 Dec 2023 00:38:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="Zd0qF6nd"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="n4q5FErS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA88992
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 16:37:19 -0800 (PST)
-Received: by mail-ot1-x329.google.com with SMTP id 46e09a7af769-6d9d209c9bbso5044470a34.0
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 16:37:19 -0800 (PST)
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96AAA99
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 16:38:47 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-6d099d316a8so2369754b3a.0
+        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 16:38:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1702427839; x=1703032639; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1702427927; x=1703032727; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=28YVeWUZWxL+EysOhXyOQaCyUsZJlXdHXys5QdhUXEw=;
-        b=Zd0qF6ndBzT30uJ2ZZfD8GyBDTEptPJyyfB4uE4G3AAmkGbPxjjFRRDd94IlScUqIM
-         J6CP4oF/PCOMz0raRZR9tEPl+RZ+EbthPLCwUX7qPk07cpk9+k8/J8hKZ9lBJgmdo6m8
-         h7+E+fxX0Sdw5RnByETFhBk2u6ydC9xNReYeWcH7pgj3183xhdya82PF8//pmt/KajBL
-         bmtTZaNYphZ9XgJtXrDR6b6IshqiFm05rT5pdW/u0xmNvjJknD9y8+oT2tYlYN1EgAAk
-         eYi/aPEs5Bll24O1K9X5Oi5o9T4U8V6yaGbUqcwiOCQmf919SXQRQ9U6sPf2JQfiB5h2
-         SD4w==
+        bh=X2LgjgyFZCsJsJMuI4smk3aaCnyMQmBBIXOcsAVX1mk=;
+        b=n4q5FErS2/oBe03xMBk2Dqc3r3Qejl5xENIwnKo18Ugz3gvaDTPk+vaKhCi3fOXQ7Q
+         9dqcqUv9w656Jd03gGX58mUr6898CSvSvg5PE3Gt/RSmPV9XytTWJnlIhV42Gq06HjSf
+         W0nvMpLUK+x1bCZ2pqWnabJfw0TiqHnSZjmkfKZwijrWHAB7w0Ut1uyDVJ4ZdKUZtBu/
+         UGSslb7BHFuynYdNxyCgZS+a49YIGMPFfEYsoRAhAkvmL21F8w9lEin6fMpuu6/PflVx
+         KA+OHXJFh/CGSUa+47BoqYjLBgm6JCcZuToxrqP+nlW57YWPIANHZKao3/4wn0jJv0He
+         zt9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702427839; x=1703032639;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1702427927; x=1703032727;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=28YVeWUZWxL+EysOhXyOQaCyUsZJlXdHXys5QdhUXEw=;
-        b=tK9rBoNtt+DAr7U6gbCp74whgbSYBHIVyZltGcUVQALhmlSlEaAiBBGLZxpn3GYvI2
-         SsshceFgLy/w9eowBAgLPld/XRfIYRKp1tz6MTAGOByiUZ2uzISRwKT3dgATOc/S7DhR
-         Vs8BXu0R1KxR4zWBCa6TOKMS5+Yvqx+0NuB+UlUe3a3AS09kmGsDvvKyS1e1+kCmIuBd
-         9C6e3C4fmwrqdqgWtvDQIFM0V9FU1ZUg0yoegIksgEst5GyAclA+m/HbOxmu9B5W8v6n
-         g24EBwh4EsD4VB2R+DJDOg907fdVzeex31RrlfAJfHhv3F5WCJbyGzkG9bR4i51mGRuj
-         vR9w==
-X-Gm-Message-State: AOJu0YzqZoMD/S4xfEkLpoZ2pBFdD2DZGGrQzZKlsHkbKJmjHQotj6o/
-	ulu4tU+XgGKP2ZvRZ372dSAAE5+w8Y824XrXQR5B0g==
-X-Google-Smtp-Source: AGHT+IFK4z7dnqtBzSqo55NWH07p7nRZ3xYyzNsTCHZmhCcAUit9um7GtTDhLh4ckaZ5gR4Fz4aSdQ==
-X-Received: by 2002:a05:6830:1a:b0:6d7:f363:eb0 with SMTP id c26-20020a056830001a00b006d7f3630eb0mr7212719otp.35.1702427839085;
-        Tue, 12 Dec 2023 16:37:19 -0800 (PST)
+        bh=X2LgjgyFZCsJsJMuI4smk3aaCnyMQmBBIXOcsAVX1mk=;
+        b=ig878qvDVcpRFDy1lOxtbDayi4sWYvk6cwMr2WzEUgPPBwbYr5RLU9Nw9LgIoWyyO8
+         OoWsqbbkcARJB9qsFtlz6o7EVe4bphIhSt0xYpDQqAX09LabE4FgPacB/LHW81Q5uQbk
+         BtMVndZsvwEjqwajd6fYjDfawnI54rFdVI5bP9gm2Ry5A/0M4rIY9K3924sWa3rzIPF9
+         vkv+GnIJ10w50SbMttH8wUlaQrNo+QtprbqZhFFBBEnJJ7I3fwhYl94/JNfQzHnSA/I4
+         swF+QHQZQ+3vqOWjHvmPQu2Pu+YZbZ9AboYhQqaXIulzfytiiVASNe7LQBctupIcA4Dd
+         BAEw==
+X-Gm-Message-State: AOJu0Yx3rbgau/EbWnVcWlCVQNqoZeHgz5phlOjmQBEOb5l7whwc+0W7
+	FwzJdcjsqZOiwbEYVbvhMMER8w==
+X-Google-Smtp-Source: AGHT+IExcDonwQf+ccAGx4vwD0y2pxUKlcjlCsfyBz7AL/XsMo48WKP1HdirrhBZPx4zwN7whfUh2A==
+X-Received: by 2002:a05:6a00:10d3:b0:68f:d1a7:1a3a with SMTP id d19-20020a056a0010d300b0068fd1a71a3amr7934857pfu.8.1702427927013;
+        Tue, 12 Dec 2023 16:38:47 -0800 (PST)
 Received: from ?IPV6:2a03:83e0:1151:15:40a:5eb5:8916:33a4? ([2620:10d:c090:500::7:721])
-        by smtp.gmail.com with ESMTPSA id c7-20020a056a00008700b006ce458995f8sm8789340pfj.173.2023.12.12.16.37.17
+        by smtp.gmail.com with ESMTPSA id c7-20020a056a00008700b006ce458995f8sm8789340pfj.173.2023.12.12.16.38.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Dec 2023 16:37:18 -0800 (PST)
-Message-ID: <12f55a91-1f93-48a0-96b9-63f0c1ea36cb@davidwei.uk>
-Date: Tue, 12 Dec 2023 16:37:16 -0800
+        Tue, 12 Dec 2023 16:38:46 -0800 (PST)
+Message-ID: <a318c61c-81ce-4eb8-9737-0ea1c0ed57a0@davidwei.uk>
+Date: Tue, 12 Dec 2023 16:38:45 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,101 +62,146 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/3] netdevsim: allow two netdevsim ports to
- be connected
+Subject: Re: [PATCH net-next v2 3/3] netdevsim: add selftest for forwarding
+ skb between connected ports
+Content-Language: en-GB
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: Jiri Pirko <jiri@resnulli.us>, Sabrina Dubroca <sd@queasysnail.net>,
  netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
 References: <20231210010448.816126-1-dw@davidwei.uk>
- <20231210010448.816126-2-dw@davidwei.uk> <20231212122441.7c936a28@kernel.org>
-Content-Language: en-GB
+ <20231210010448.816126-4-dw@davidwei.uk> <20231212122935.4e23dd08@kernel.org>
 From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20231212122441.7c936a28@kernel.org>
+In-Reply-To: <20231212122935.4e23dd08@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 2023-12-12 12:24, Jakub Kicinski wrote:
-> On Sat,  9 Dec 2023 17:04:46 -0800 David Wei wrote:
->> diff --git a/drivers/net/netdevsim/bus.c b/drivers/net/netdevsim/bus.c
->> index bcbc1e19edde..3e4378e9dbee 100644
->> --- a/drivers/net/netdevsim/bus.c
->> +++ b/drivers/net/netdevsim/bus.c
->> @@ -364,3 +364,13 @@ void nsim_bus_exit(void)
->>  	driver_unregister(&nsim_driver);
->>  	bus_unregister(&nsim_bus);
->>  }
->> +
->> +struct nsim_bus_dev *nsim_bus_dev_get(unsigned int id)
+On 2023-12-12 12:29, Jakub Kicinski wrote:
+> On Sat,  9 Dec 2023 17:04:48 -0800 David Wei wrote:
+>> From: David Wei <davidhwei@meta.com>
+>>
+>> Connect two netdevsim ports in different namespaces together, then send
+>> packets between them using socat.
+>>
+>> Signed-off-by: David Wei <dw@davidwei.uk>
+>> ---
+>>  .../selftests/drivers/net/netdevsim/peer.sh   | 111 ++++++++++++++++++
+>>  1 file changed, 111 insertions(+)
+>>  create mode 100755 tools/testing/selftests/drivers/net/netdevsim/peer.sh
 > 
-> nit: s/get/find/ get sometimes implied taking a reference 
+> You need to include this script in the Makefile so it gets run
+
+Thanks, will address.
+
+> 
+>> diff --git a/tools/testing/selftests/drivers/net/netdevsim/peer.sh b/tools/testing/selftests/drivers/net/netdevsim/peer.sh
+>> new file mode 100755
+>> index 000000000000..d1d59a932174
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/drivers/net/netdevsim/peer.sh
+>> @@ -0,0 +1,111 @@
+>> +#!/bin/bash
+>> +# SPDX-License-Identifier: GPL-2.0-only
+>> +
+>> +NSIM_DEV_SYS=/sys/bus/netdevsim
+>> +NSIM_DEV_DFS=/sys/kernel/debug/netdevsim/netdevsim
+>> +
+>> +socat_check()
+>> +{
+>> +	if [ ! -x "$(command -v socat)" ]; then
+>> +		echo "socat command not found. Skipping test"
+>> +		return 1
+>> +	fi
+>> +
+>> +	return 0
+>> +}
+>> +
+>> +setup_ns()
+>> +{
+>> +	set -e
+>> +	ip netns add nssv
+>> +	ip netns add nscl
+>> +
+>> +	ip link set eni1np1 netns nssv
+>> +	ip link set eni2np1 netns nscl
+> 
+> This assumes you have systemd renaming interfaces.
+> I can find out what the netdev is called from sysfs.
+> After you create the nsim device in its sysfs dir
+> there will be a dir "net" and in it you'll have
+> a subdir with the same name as the netdev.
+
+Thanks, will fix.
+
+> 
+>> +	ip netns exec nssv ip addr add '192.168.1.1/24' dev eni1np1
+>> +	ip netns exec nscl ip addr add '192.168.1.2/24' dev eni2np1
+>> +
+>> +	ip netns exec nssv ip link set dev eni1np1 up
+>> +	ip netns exec nscl ip link set dev eni2np1 up
+>> +	set +e
+>> +}
+>> +
+>> +cleanup_ns()
+>> +{
+>> +	ip netns del nscl
+>> +	ip netns del nssv
+>> +}
+>> +
+>> +###
+>> +### Code start
+>> +###
+>> +
+>> +modprobe netdevsim
+>> +
+>> +# linking
+>> +
+>> +echo 1 > ${NSIM_DEV_SYS}/new_device
+> 
+> Use $RANDOM to generate a random device ID.
 
 Will do.
 
 > 
->> +{
->> +	struct nsim_bus_dev *nsim_bus_dev;
-> 
-> new line here, please checkpatch --strict
-
-Sorry, will remember to do this next time.
-
-> 
->> +	list_for_each_entry(nsim_bus_dev, &nsim_bus_dev_list, list) {
->> +		if (nsim_bus_dev->dev.id == id)
->> +			return nsim_bus_dev;
-> 
-> You must assume some lock is being held so that you can walk the list
-> and return a meaningful value? :) Please figure out what caller has to
-> hold and add an appropriate lockdep assert here.
-
-Will address.
-
-> 
->> +	}
->> +	return NULL;
->> +}
-> 
->> +static ssize_t nsim_dev_peer_read(struct file *file, char __user *data,
->> +				  size_t count, loff_t *ppos)
->> +{
->> +	struct nsim_dev_port *nsim_dev_port;
->> +	struct netdevsim *peer;
->> +	unsigned int id, port;
->> +	char buf[23];
->> +	ssize_t len;
+>> +echo "2 0" > ${NSIM_DEV_DFS}1/ports/0/peer 2>/dev/null
+>> +if [ $? -eq 0 ]; then
+>> +	echo "linking with non-existent netdevsim should fail"
+>> +	exit 1
+>> +fi
 >> +
->> +	nsim_dev_port = file->private_data;
->> +	rcu_read_lock();
->> +	peer = rcu_dereference(nsim_dev_port->ns->peer);
->> +	if (!peer) {
->> +		len = scnprintf(buf, sizeof(buf), "\n");
-> 
-> Why not return 0?
-
-No reason, wasn't sure what the norm is.
-
-> 
->> +		goto out;
->> +	}
+>> +echo 2 > /sys/bus/netdevsim/new_device
 >> +
->> +	id = peer->nsim_bus_dev->dev.id;
->> +	port = peer->nsim_dev_port->port_index;
->> +	len = scnprintf(buf, sizeof(buf), "%u %u\n", id, port);
+>> +echo "2 0" > ${NSIM_DEV_DFS}1/ports/0/peer
+>> +if [ $? -ne 0 ]; then
+>> +	echo "linking netdevsim1 port0 with netdevsim2 port0 should succeed"
+>> +	exit 1
+>> +fi
 >> +
->> +out:
->> +	rcu_read_unlock();
->> +	return simple_read_from_buffer(data, count, ppos, buf, len);
->> +}
-> 
->> @@ -417,3 +418,5 @@ struct nsim_bus_dev {
->>  
->>  int nsim_bus_init(void);
->>  void nsim_bus_exit(void);
+>> +# argument error checking
 >> +
->> +struct nsim_bus_dev *nsim_bus_dev_get(unsigned int id);
+>> +echo "2 1" > ${NSIM_DEV_DFS}1/ports/0/peer 2>/dev/null
+>> +if [ $? -eq 0 ]; then
+>> +	echo "linking with non-existent port in a netdevsim should fail"
+>> +	exit 1
+>> +fi
+>> +
+>> +echo "1 0" > ${NSIM_DEV_DFS}1/ports/0/peer 2>/dev/null
+>> +if [ $? -eq 0 ]; then
+>> +	echo "linking with self should fail"
+>> +	exit 1
+>> +fi
+>> +
+>> +echo "2 a" > ${NSIM_DEV_DFS}1/ports/0/peer 2>/dev/null
+>> +if [ $? -eq 0 ]; then
+>> +	echo "invalid arg should fail"
+>> +	exit 1
+>> +fi
+>> +
+>> +# send/recv packets
+>> +
+>> +socat_check || exit 1
 > 
-> nit: let this go before the module init/exit funcs, 3 lines up
+> There's a magic return value for skipping kselftests, 1 means fail.
 
-Will address.
+Thanks, will fix.
 
