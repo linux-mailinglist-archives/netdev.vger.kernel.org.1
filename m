@@ -1,208 +1,255 @@
-Return-Path: <netdev+bounces-56882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1088981126E
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 14:04:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 766E6811283
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 14:07:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2021281462
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:04:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32CB128172F
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:07:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B90B22C845;
-	Wed, 13 Dec 2023 13:04:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OSLXg6g+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41582C849;
+	Wed, 13 Dec 2023 13:07:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6705AF2
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 05:04:24 -0800 (PST)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-a1ceae92ab6so917497866b.0
-        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 05:04:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702472663; x=1703077463; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3fi0Pv8OBwBSKa4VbO77xNSYbdM01eCCTvzKo/l6XyY=;
-        b=OSLXg6g+oweP74a+OYcFfoZW2qzcH1vUC02S5TInb8hsOK8l+r84Bjrdz1Tupcmge+
-         s80NWUuaMphM7OKd9uUbvqNEIp4TmhgHtLXKwb7Aqw3G1dmOPI0Z+GmPda0kREXbbvl3
-         AFJr1PDXrjtGPm89/dh+aSUD+NM9B29WOJa0C1eDxA8xnHGGMidIcFt8tYhCl2jLMGoc
-         CrhcBkVKaZ7YuZqYq+dX0GbIu6VmpRCpadujBH56L9Jo4diDhC7V/ca0U0tuwPWxpG8T
-         zHa+oM7NkTQgdKx4ozHyHHNt1ZUeoZw5iIeAmuAYN1tHhACslV+8AoOUhEuNrjVG9FcX
-         Tjxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702472663; x=1703077463;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3fi0Pv8OBwBSKa4VbO77xNSYbdM01eCCTvzKo/l6XyY=;
-        b=RS6luJxeyndqSE/953kerOPyJ1hP/o0DsqL6P93MXxHIWbgAy78L2fhthTuUgMATZ5
-         gnxqC5em1/miDDmTl2RiYtVC4EpSVgRI5P1rFhBsCHT3050/1mZr9H6C/gTpGyerZEQG
-         3CzjKwwxycGp8bMyaIrEwDgRebqMydPrNmBJYuyuRNafVGkHL6d6ROKWl7OcqetyiU3J
-         4Db3LCc1puSvY5ExhBVZL89B3Wr3TRLlnASV3d7LQoKE3s9qOAyE4vVCgZFIniuBwWO7
-         237sALDff128dcykJh9idL2Gh8y24vmpmRi/3K5aOSXL+Nn3V5IYWcivcoGDR/1pKviE
-         6ZMw==
-X-Gm-Message-State: AOJu0YxU2GLpVD73alHWG2kRGxd5ph/d6aMv+4zPLhLiZbhpzeHiTbl+
-	vaYapjIQx68X8Y051mnJG0c=
-X-Google-Smtp-Source: AGHT+IF5KdbjcUR+Che/jiu0dzhLwwWqlK09EwEMVmw5pg4iCdkcbsn7cyBPtvElLx64gX1oQVWAnQ==
-X-Received: by 2002:a17:907:1c91:b0:a1d:310f:13f0 with SMTP id nb17-20020a1709071c9100b00a1d310f13f0mr5104919ejc.127.1702472662508;
-        Wed, 13 Dec 2023 05:04:22 -0800 (PST)
-Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id vx4-20020a170907a78400b00a0a2553ec99sm7741833ejc.65.2023.12.13.05.04.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 05:04:22 -0800 (PST)
-Date: Wed, 13 Dec 2023 15:04:19 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: Alvin =?utf-8?Q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linus.walleij@linaro.org" <linus.walleij@linaro.org>,
-	"andrew@lunn.ch" <andrew@lunn.ch>,
-	"f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"arinc.unal@arinc9.com" <arinc.unal@arinc9.com>
-Subject: Re: [PATCH net-next 2/7] net: dsa: realtek: put of node after MDIO
- registration
-Message-ID: <20231213130419.flgob4mhi6hrxgn2@skbuf>
-References: <20231208045054.27966-1-luizluca@gmail.com>
- <20231208045054.27966-3-luizluca@gmail.com>
- <CAJq09z7yykDsh2--ZahDX=Pto9SF+EQUo5hBnrLiWNALeVY_Bw@mail.gmail.com>
- <i3qp6sjkgqw2mgkbkrpgwxlbcdblwfp6vpohpfnb7tnq77mrpc@hrr3iv2flvqh>
- <CAJq09z45WQv-F9dw-y13E_6DXAfmpxH20JnRoO10za3cuS2kZw@mail.gmail.com>
- <20231211171143.yrvtw7l6wihkbeur@skbuf>
- <CAJq09z6G+yyQ9NLmfTLYRKnNzoP_=AUC5TibQCNPysb6GsBjqA@mail.gmail.com>
- <20231212215801.ey74tgywufywa3ip@skbuf>
- <CAJq09z6veGUNymR6hxabBPercR6+7gFC-FhwiVM+wScm5xDREA@mail.gmail.com>
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEEF6A4
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 05:06:57 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VyRBkqV_1702472814;
+Received: from 30.221.129.237(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VyRBkqV_1702472814)
+          by smtp.aliyun-inc.com;
+          Wed, 13 Dec 2023 21:06:55 +0800
+Message-ID: <39f00e1b-bd8f-81e5-9c1f-f97e7b8efd88@linux.alibaba.com>
+Date: Wed, 13 Dec 2023 21:06:53 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJq09z6veGUNymR6hxabBPercR6+7gFC-FhwiVM+wScm5xDREA@mail.gmail.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [question] smc: how to enable SMC_LO feature
+To: shaozhengchao <shaozhengchao@huawei.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ yuehaibing <yuehaibing@huawei.com>, "Libin (Huawei)"
+ <huawei.libin@huawei.com>, Dust Li <dust.li@linux.alibaba.com>,
+ tonylu_linux <tonylu@linux.alibaba.com>, "D. Wythe"
+ <alibuda@linux.alibaba.com>
+References: <8ac15e20beb54acfae1a35d1603c1827@huawei.com>
+ <ad29f704-ae79-4c4b-2227-d0fa9a1ceee2@linux.alibaba.com>
+ <a6b4b010-ffca-50ea-1296-3e01eacb4f53@huawei.com>
+ <9eb58434-922e-c9e4-6a38-4c29ba0e88f6@huawei.com>
+ <2d138d78-1ebb-92b0-c6c5-9e43b5ee941b@linux.alibaba.com>
+ <488311be-5673-552c-d932-26f87e863777@huawei.com>
+ <c7b3f24e-6f25-08a5-bbe4-a32dc3d31adf@huawei.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <c7b3f24e-6f25-08a5-bbe4-a32dc3d31adf@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 13, 2023 at 01:37:27AM -0300, Luiz Angelo Daros de Luca wrote:
-> The answer "just read (all the multiple level and different) code
-> (paths)" is fated to fail. The put after registration in DSA core code
-> is just an example of how it did not work.
 
-If you try to think critically about the changes you make, you'll get
-better at it with time. Reading code is what we all do, really, and
-making educated guesses about what we saw. It's error prone for everyone
-involved, which is why we use review to confront what we all understand.
 
-This is not only an encouragement, but also a subtle hint that you will
-endlessly frustrate those who have to read more than you did, in order
-to review your proposals, only for you to complain that you have to read
-too much when making changes.
-
-Anyway.
-
-> > I don't mean to be rude, but I don't have the time to dig into this any
-> > further, sorry. If you are truly committed to better the phylib API,
-> > please bring it up with the phylib people instead. I literally only
-> > care about the thing that Alvin pointed out, which is that you made
-> > unjustified changes to a DSA driver.
+On 2023/12/5 14:45, shaozhengchao wrote:
 > 
-> Sure, phylib is still for netdev, right?
-
-ETHERNET PHY LIBRARY
-M:	Andrew Lunn <andrew@lunn.ch>
-M:	Heiner Kallweit <hkallweit1@gmail.com>
-R:	Russell King <linux@armlinux.org.uk>
-L:	netdev@vger.kernel.org
-S:	Maintained
-F:	Documentation/ABI/testing/sysfs-class-net-phydev
-F:	Documentation/devicetree/bindings/net/ethernet-phy.yaml
-F:	Documentation/devicetree/bindings/net/mdio*
-F:	Documentation/devicetree/bindings/net/qca,ar803x.yaml
-F:	Documentation/networking/phy.rst
-F:	drivers/net/mdio/
-F:	drivers/net/mdio/acpi_mdio.c
-F:	drivers/net/mdio/fwnode_mdio.c
-F:	drivers/net/mdio/of_mdio.c
-F:	drivers/net/pcs/
-F:	drivers/net/phy/
-F:	include/dt-bindings/net/qca-ar803x.h
-F:	include/linux/*mdio*.h
-F:	include/linux/linkmode.h
-F:	include/linux/mdio/*.h
-F:	include/linux/mii.h
-F:	include/linux/of_net.h
-F:	include/linux/phy.h
-F:	include/linux/phy_fixed.h
-F:	include/linux/phylib_stubs.h
-F:	include/linux/platform_data/mdio-bcm-unimac.h
-F:	include/linux/platform_data/mdio-gpio.h
-F:	include/trace/events/mdio.h
-F:	include/uapi/linux/mdio.h
-F:	include/uapi/linux/mii.h
-F:	net/core/of_net.c
-
-> > Oh, couldn't we straight-up revert that instead? :) The user_mii_bus
-> > is created by DSA for compatibility with non-OF. I cannot understand
-> > why you insist to attach an OF node to it.
 > 
-> Please, not before this patch series gets merged or you'll break
-> MDIO-connected Realtek DSA switches, at least the IRQ handling.
-> I'll send the revert myself afterwards.
+> On 2023/12/4 12:06, shaozhengchao wrote:
+>>
+>>
+>> On 2023/12/4 11:52, Wen Gu wrote:
+>>>
+>>> On 2023/12/4 11:22, shaozhengchao wrote:
+>>>>
+>>>>
+>>>> On 2023/11/23 14:15, shaozhengchao wrote:
+>>>>>
+>>>>>
+>>>>> On 2023/11/23 10:21, Wen Gu wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 2023/11/21 20:14, shaozhengchao wrote:
+>>>>>>> Hi Wen Gu:
+>>>>>>> Currently, I am interested in the SMC_LOOPBACK feature proposed
+>>>>>>> by you. Therefore, I use your patchset[1] to test the SMC_LO feature on
+>>>>>>> my x86_64 environment and kernel is based on linux-next, commit: 5ba73bec5e7b.
+>>>>>>> The test result shows that the smc_lo feature cannot be enabled. Here's
+>>>>>>> my analysis:
+>>>>>>>
+>>>>>>> 1. Run the following command to perform the test, and then capture
+>>>>>>> packets on the lo device.
+>>>>>>> - serv:  smc_run taskset -c <cpu> sockperf sr --tcp
+>>>>>>> - clnt:  smc_run taskset -c <cpu> sockperf  tp --tcp --msg-size=64000 -i 127.0.0.1 -t 30
+>>>>>>>
+>>>>>>> 2. Use Wireshark to open packets. It is found that the VCE port replies with
+>>>>>>> SMC-R-Deline packets.
+>>>>>>> [cid:image001.png@01DA1CB4.F1052C30]
+>>>>>>>
+>>>>>>> 3. Rx
+>>>>>>> When smc_listen_work invokes smc_listen_v2_check, the VCE port returns
+>>>>>>> a Decline packet because eid_cnt and flag.seid in the received packet are both 0.
+>>>>>>>
+>>>>>>> 4. Tx
+>>>>>>> In smc_clc_send_proposal,
+>>>>>>> v2_ext->hdr.eid_cnt = smc_clc_eid_table.ueid_cnt;
+>>>>>>> v2_ext->hdr.flag.seid = smc_clc_eid_table.seid_enabled;
+>>>>>>>
+>>>>>>> When smc_clc_init, ueid_cnt=0, and in the x86_64 environment, seid_enabled is
+>>>>>>> always equal to 0.
+>>>>>>>
+>>>>>>> So, I must call smc_clc_ueid_add function to increase ueid count?
+>>>>>>> But I don't see where operations can be added, may I missed something?
+>>>>>>>
+>>>>>>
+>>>>>> Hi Zhengchao Shao,
+>>>>>>
+>>>>>> Yes. When using SMC-D in non-s390 architecture (like x86 here), A common
+>>>>>> UEID should be set. It can be set by following steps:
+>>>>>>
+>>>>>> - Install smc-tools[1].
+>>>>>>
+>>>>>> - Run # smcd ueid add <ueid> in loopback test environment.
+>>>>>>
+>>>>>>    EID works as an ID to indicate the max communication space of SMC. When SEID is
+>>>>>>    unavailable, an UEID is required.
+>>>>>>
+>>>>> Hi Wen Gu:
+>>>>>      Thank you for your reply. This is very useful for me. And I will
+>>>>> be happy to learn from it.
+>>>>>
+>>>>> Thanks
+>>>>>
+>>>>> Zhengchao Shao
+>>>>>> - Then run the test.
+>>>>>>
+>>>>>> Hope this works for you :)
+>>>>>>
+>>>>>> [1] https://github.com/ibm-s390-linux/smc-tools
+>>>>>>
+>>>>>> Regards,
+>>>>>> Wen Gu
+>>>>>>
+>>>>>>> Could you give me some advice? Thanks very much.
+>>>>>>>
+>>>>>>> Zhengchao Shao
+>>>>>>>
+>>>>>>>
+>>>>>>> [1]link: 
+>>>>>>> https://patchwork.kernel.org/project/netdevbpf/cover/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
+>>>>>>>
+>>>>>>
+>>>>>
+>>>>>
+>>>> Hi Wen Gu:
+>>>>      I have test as following, but the performance is really
+>>>> degraded. Now I have no idea.
+>>>> 1. add ueid
+>>>> run: smcd ueid add 16
+>>>> kernel message:
+>>>> [ 5252.009133] NET: Registered PF_SMC protocol family
+>>>> [ 5252.009233] smc: adding smcd device smc_lo with pnetid
+>>>> 2. start server
+>>>> smc_run taskset -c 1 sockperf sr --tcp
+>>>> 3. start client
+>>>> smc_run taskset -c 3 sockperf tp  --tcp --msg-size=64000 -i 127.0.0.1 -t 30
+>>>>
+>>>> The test results are as follows:
+>>>>                TCP                  SMC-lo
+>>>> Bandwidth(MBps)         1890.56               1300.41(-31.22%)
+>>>>
+>>>> I didn't find a better direction when I initially positioned it. No
+>>>> error is recorded in the kernel log, and the smcd statistics are normal.
+>>>> [root@localhost smc-tools]# smcd stats
+>>>> SMC-D Connections Summary
+>>>>    Total connections handled             2
+>>>>    SMC connections                       2
+>>>>    Handshake errors                      0
+>>>>    Avg requests per SMC conn       1277462.0
+>>>>    TCP fallback                          0
+>>>>
+>>>> RX Stats
+>>>>    Data transmitted (Bytes)    40907328000 (40.91G)
+>>>>    Total requests                  1277190
+>>>>    Buffer full                          45 (0.00%)
+>>>>              8KB    16KB    32KB    64KB   128KB   256KB   512KB  >512KB
+>>>>    Bufs        0       0       0       2       0       0       0       0
+>>>>    Reqs   638.0K       0       0  639.2K       0       0       0       0
+>>>>
+>>>> TX Stats
+>>>>    Data transmitted (Bytes)    40907328000 (40.91G)
+>>>>    Total requests                  1277734
+>>>>    Buffer full                      638239 (49.95%)
+>>>>    Buffer full (remote)                  0 (0.00%)
+>>>>    Buffer too small                      0 (0.00%)
+>>>>    Buffer too small (remote)             0 (0.00%)
+>>>>              8KB    16KB    32KB    64KB   128KB   256KB   512KB  >512KB
+>>>>    Bufs        0       0       0       0       0       0       0       0
+>>>>    Reqs        0       0       0  1.278M       0       0       0       0
+>>>>
+>>>> Extras
+>>>>    Special socket calls                  1
+>>>>
+>>>> I captured the perf information and found that the percentage of
+>>>> rep_movs_alternative and _raw_spin_unlock_irqrestore functions was high
+>>>> during tx and rx.
+>>>> 36.12%  [kernel]         [k]rep_movs_alternative
+>>>> 14.23%  [kernel]         [k]_raw_spin_unlock_irqrestore
+>>>>
+>>>> I've attached the flame map. Could you help analyze it? What I missed?
+>>>> Thanks.
+>>>
+>>> Hi Zhengchao Shao,
+>>>
+>>> Since sndbuf and RMB in SMC are pre-alloced ringbuf and won't grow dynamically
+>>> like TCP, it is necessary to appropriately increase the default value of smc
+>>> sk_sndbuf and sk_rcvbuf before testing throughput.
+>>>
+>>> Set this and try again:
+>>>
+>>> # sysctl -w net.smc.wmem=1048576
+>>> # sysctl -w net.smc.rmem=1048576
+>>>
+>>> (The initial value of wmem and rmem are 64K)
+>>>
+>>> Regards,
+>>> Wen Gu
+>>>
+>>>>
+>>>> Zhengchao Shao
+>> Hi Wen Gu:
+>>      It solves the issue. Thank you very much.
+>>
+>> Zhengchao Shao
+>>
+> Hi Wen Gu:
+>    I've tested all the performance test items in the patchset. The
+> performance improvement is to be expected, except for nignx.
+> My VM is configured with 48 cores and 32 GB memory. Therefore, run
+> the following command:
+> <smc_run> nignx
+> <smc_run>./wrk -t 96 -c 1000 -d 30 http://127.0.0.1:80
 > 
-> > But otherwise, yes, it is the same situation: of_node_put(), called
-> > before unregistering an MDIO bus registered with of_mdiobus_register(),
-> > means that the full OF API on this MDIO bus may not work correctly.
-> > I don't know the exact conditions though. It might be marginal or even
-> > a bug that's impossible to trigger. I haven't tested anything.
+> The test results are as follows:
+>                          TCP                         SMC_lo
+> Requests/s           309425.42               135547.25(-56.19%)
+> The performance decreases by 56.19%.
 > 
-> OK. I'll not try to fix that but revert it as soon as possible without
-> breaking existing code.
+> I capture packets and find that wrk can perform HTTP GET after each
+> connect when smc_loopback is disabled.
+> However, when smc_loopback is enabled, there is no HTTP GET behavior.
 
-Ok, I'm not saying "revert it NOW". But it would be good if you could
-revert it as part of the realtek-common series, as a last patch
-(provided that you've done your homework and nobody else relies on it).
-Or at least not forget about it.
+The HTTP GET is transfered by SMC stack through shared memory. So they
+can't be captured by tcpdump.
 
-> > I understand why a driver may want a ds->user_mii_bus. And I understand
-> > why a driver may want an MDIO bus with an of_node. What I don't understand
-> > is who might want both at the same time, and why.
+> I wonder if there is some compatibility problem with the SMC protocol when encapsulate packet? Could you give me some 
+> advice?
+> In the attachment, I captured some of the packets.
+> nosmc_nginx.pcap is for SMC disabled and smc_nginx.pcap is for SMC
+> enabled.
+> Thank you very much.
 > 
-> That one I might be novice enough to answer :).
+> Zhengchao Shao
 > 
-> When you start to write a new driver, you read the docs to get a
-> general idea. However, as code moves faster than docs, you mainly rely
-> on code. So, you just choose a driver (or a couple of them) to inspire
-> you. You normally prefer a small driver because it is less code to
-> read and it might be just enough to get started. As long as it is
-> mainline, nothing indicates it should not be used as a reference.
-
-And when you consider that DSA has better documentation than most
-subsystems out there....
-
-Would it blow your mind away if I told you that the documentation is
-written based on the code? The same code from which you draw a lazy
-conclusion.
-
-You have perfectly laid out why the code is not the problem, and why the
-documentation is not the solution. The problem is the unwillingness to
-spend time to understand, but to want to push your changes nonetheless.
-The problem is on your end. I'm sorry, it has to be said.
-
-> I wasn't the one that wrote most of the Realtek DSA driver but I see
-> the same OF + user_mii_bus pattern in more than one driver. If you
-> want to stop spreading, as rewriting all affected drivers might not be
-> an option, a nice /* TODO: convert to user YXZ */ comment might do the
-> trick. An updated doc suggesting a driver to be used as an example
-> would also be nice.
-
-I don't have time, Luiz. I spent 1 and a half hours today replying
-to just your emails, and one and a half hours yesterday. I have a job.
-
-You've made me see that I'm wasting my time writing documentation for
-people who want instant gratification instead. I don't know how to get
-to them. I'll think about it some more.
+> 
+> 
 
