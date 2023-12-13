@@ -1,306 +1,194 @@
-Return-Path: <netdev+bounces-56693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECDA6810866
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 03:50:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62F0781086A
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 03:57:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1122F1C20D7E
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 02:50:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D5471C20CC0
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 02:57:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B582665C;
-	Wed, 13 Dec 2023 02:49:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37815186C;
+	Wed, 13 Dec 2023 02:57:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nRvmgQIW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jZ7wSey2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0D5D98
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 18:49:53 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-54f5469c211so6377283a12.0
-        for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 18:49:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702435792; x=1703040592; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hx3MGS0vh0t0JSEKl4JpxxRT2HR4aiOSN7E9sUnPJsU=;
-        b=nRvmgQIWjas9b95worPEqPwauyXIwD+2FaHh37nnecQ6RGIjP9cX9uikwTuXVg0Uat
-         PyehvK8Li7LYwGt6pwD4/Dt/TiaW+kebwWwf6HMH0BdTKGarOsLOgFWpKBDiwGYNey4s
-         /daxDmytTOw0Oh9pWRqA3cINaSJaPBY1ORmHYN32PZEuBnc8IuZJqEgmQg1UKuR/fRSI
-         uTlt9IE8XXUjmGCq+5dUvcWHYaF3UYwA4CUUQeZALNsuvjDRpKmIqfcsW2+irYz8X9+9
-         ywf+icC5zmlbqC+mEikAi5qQJTd1CycyJCRt7dm1wWY4EEqsH5kfjC3npl0z8WoNCq2d
-         mOBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702435792; x=1703040592;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Hx3MGS0vh0t0JSEKl4JpxxRT2HR4aiOSN7E9sUnPJsU=;
-        b=PDyYXd8YHRfWm45e/Cfyvd5tx7hFctzMb8UxnF8oL3y6gVTxTXQ29hCsHthUWqboH3
-         CSl78I7I7x3cbwt2tSqSGfwGQ6+q5oDj+3d9FRnPwJRsY4UFM2nN9v9vs0NIM3hj3KiI
-         Z/vPAV29HHB5W8SkJBYPLLhJgAG9D5UJI4NiKf1AuMCkEKo+XeogOtq3ZG2M5UzvO0HP
-         6Nv2WrTxulftZnB81e2M1jkxrXIe2/G4f9rOSLYwsLN/Q1GTdRNysmMx0mLg7UJSqpel
-         jAeM6AKhOa4eXIe6v6WRtxsCdzLboB+BkCNB2GyfUizTciKAcmDHTPvrkEGtjcXRYJPj
-         WXwQ==
-X-Gm-Message-State: AOJu0YwhLcWCSPotIzczWOrtCnaTqRJB3zhblFxuyDRbTeCxSvnASr+m
-	6SXBg6tT8QcwxR/HP3bunmVSqv1hnYJTxtcRNxiSPg==
-X-Google-Smtp-Source: AGHT+IGe3jEGYSGhaaFpyZ5DbH0V4pQ4kWfFiVOeEr6q2XFMv4n1SIL+/2Go2YLnoKl5LEaDe5iEkB9Kkdwf84tvtPg=
-X-Received: by 2002:a17:906:ceda:b0:a1d:ddfc:1cda with SMTP id
- si26-20020a170906ceda00b00a1dddfc1cdamr3643955ejb.93.1702435792229; Tue, 12
- Dec 2023 18:49:52 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FFD1B3
+	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 18:57:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702436264; x=1733972264;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=qDzeVMkg1TQ/CYzl7xKcLGz0OF1oj//FFk7QaTgWMBo=;
+  b=jZ7wSey2rIcPIx6gJRHuxA/MNNJOE65iANPJhbqKr6h44/rbz3dB4jiU
+   bGf8rbqRI+mETEemI00ec6fmNminrSnUeEvRIykNIZrD5hDL17cNObpKo
+   xH3ec4ZuvBIcEKmeQqrTmEFQKgRQUS64r/SZQyQtOWyeHLDsDKpxyLRU4
+   irJpOgVtKbwJIidck+CnFfI6D2YIbGkXf7sDbleg/8uzB5w9Sm5TH2nQf
+   XlehgZm+Z4CvW3eTmfF1DjgonXJi8l5+vrj2v8USbJWwoihqmZA6XUExt
+   CtIfI4WmDQ3yL4l1XQm6LEMeKp0j7XQiP0VzRsoXbJOWmEAZaLiG6bubl
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="8266635"
+X-IronPort-AV: E=Sophos;i="6.04,271,1695711600"; 
+   d="scan'208";a="8266635"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 18:57:43 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10922"; a="767052966"
+X-IronPort-AV: E=Sophos;i="6.04,271,1695711600"; 
+   d="scan'208";a="767052966"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Dec 2023 18:57:42 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 12 Dec 2023 18:57:42 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 12 Dec 2023 18:57:41 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 12 Dec 2023 18:57:41 -0800
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 12 Dec 2023 18:57:41 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LdIanVeshWD0Rd+Cd7jnIVHPWYDnT3nBEcjtXUuiyZy0tNhzIeJjBDQxQKUo8URDoaIJwweUAGcBk+ra2rrGmsc3sl6gLGK/rtrKpA/rmU8lFPrwxpG0wf7g2OIz9K4ykHAEp9opURGHujbjo2bRhqCKXboP2LA5+kZdkkXHqPzdJbVAzr+UvVRoEo4gP82HGJNaP9Jrpw0i8Zf2pZTd+nKb3HvbHEovt2B4k0R55fqcoaik+arX8pPvotDjCbdBix+nch98x5zx8h1cK1QtxtbeNw5jwzAI10Fr/WPK9GlIXaAF1SBfW0KcvMZjywEEw6BfdV/3uKniiqTYNOya3g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ky9MAW8TIPekylhZ+odRIlSYI0CYpRWARKydjzlphN4=;
+ b=gDAVP8fsnK1BijfEXoWP2yRS1tdsqNZaeXM260aS31Se++AqDaTMMMFsUIqWS7hkyNj0TnqALOfQftj8d+XSrvBM6sOo4v+glhpu3fnyVlH4KbKzJ+fD6j1tDdYh/mwJU38qZX9GwOX9sfh/38WygsuTF8QVh0vxsKErNxuBEyaCtMbJ6dMgl5PS+U5XO4rCgVtGmWgUiyqvh8G1g/vnfaFkw5B/GSKFDkUXnReq70HvfTucdpvaHXCD9QfVWPEXh7tTmkNK9jhBobqcHXfrfbsLKvM7tAsfWYxDccbhg+fpG7YGQw2XrXv+7pnlexZk24nLiUi/4x4aB/xI7SJ+tQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com (2603:10b6:208:75::32)
+ by SJ2PR11MB8451.namprd11.prod.outlook.com (2603:10b6:a03:56e::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.26; Wed, 13 Dec
+ 2023 02:57:37 +0000
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::954:6050:f988:740f]) by BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::954:6050:f988:740f%4]) with mapi id 15.20.7068.031; Wed, 13 Dec 2023
+ 02:57:37 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Brandeburg, Jesse"
+	<jesse.brandeburg@intel.com>, "Lobakin, Aleksander"
+	<aleksander.lobakin@intel.com>, "marcin.szycik@linux.intel.com"
+	<marcin.szycik@linux.intel.com>, "horms@kernel.org" <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v2 14/15] ice: cleanup
+ inconsistent code
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v2 14/15] ice: cleanup
+ inconsistent code
+Thread-Index: AQHaJ+AEV8dcbDXwqkqvmOjt/XzUsrCmj/BA
+Date: Wed, 13 Dec 2023 02:57:36 +0000
+Message-ID: <BL0PR11MB3122F3BB68CD48195603A54DBD8DA@BL0PR11MB3122.namprd11.prod.outlook.com>
+References: <20231206010114.2259388-1-jesse.brandeburg@intel.com>
+ <20231206010114.2259388-15-jesse.brandeburg@intel.com>
+In-Reply-To: <20231206010114.2259388-15-jesse.brandeburg@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL0PR11MB3122:EE_|SJ2PR11MB8451:EE_
+x-ms-office365-filtering-correlation-id: a8e16649-66b1-4232-6bad-08dbfb874331
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: CKXa8dvQ2MDVr1nLCgD73gwXqr0s7TGVyT5ZE1Au7x+3yg7lTTcTQBM2O9iOsRb271nWoethdzSg+4QldQ8rJZnyIswCaWShu1YRJv+3MiTY6v58wjQYYZ0nvikD9LjuTFE/ZCPVmBdlRTdu6Q1Cz+dtn5trkkXzLqwNSSATT0Dz1B16L9Jq9IzSsj4FwKxHCj8mnVzC394ysy8/zlq69XTIZY28+3NPkOHicDJUFjb0QIIRzqkjFqylXcNmdSTTkAit8RFFOQOF405gujWvzgeR6iTQgpITtay66CuZvhKrpiyk0YLm8NC1uxLWWW2YXzB8WnoACjAoQu0DkrnherHBRAqZqr9cdzNjb5qG8JKWVlXR9aWlVWEK42DsBCgj3fzfBiRjbW9KRkeRZln/hEzt6AVEMgOJIJ+a1ZgIaZyrYnz/wvVafFIsTDzl32V9aOzxtbHM5pfuWX3gGo+MhOApY20ZYyoHk21GG6F8EW5XvRjiJObr6zL5vKVAqEJ5aw6QLc+xZRC/wwA3RxBY8RJ8y26ZMC9Zwd1t7qRn54LhRZmw1n8e1t4fQ4OCNwQKXJCFyhAg+PtpNQAJE/EDy6lm3SV05yzeM5SALIKOQw0x0Ta785ZwL9xCSz/7s9zf
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3122.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(366004)(376002)(396003)(346002)(136003)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(8676002)(8936002)(2906002)(4326008)(52536014)(316002)(5660300002)(55016003)(66476007)(76116006)(66556008)(110136005)(66946007)(64756008)(66446008)(54906003)(478600001)(38070700009)(26005)(6506007)(7696005)(53546011)(41300700001)(9686003)(71200400001)(82960400001)(83380400001)(33656002)(86362001)(122000001)(38100700002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?pMG7gK6KS85SWn7VMjUNhQW8fHzaNdL19BvsqpdggHnbUjnvNFRdK0/+r7bt?=
+ =?us-ascii?Q?AycgGhQygTOJq6KG38gtOKraXyubA4gOI7pBhUihylv7QaMbBX3H8P2BkWEd?=
+ =?us-ascii?Q?Aq+MeKQTrluAmjFkR1rpDHXsNq5siiAuKorGWviuaI0oM6hL0n20SxXGk4IQ?=
+ =?us-ascii?Q?acmXaq35IKgTo02EKXuxMfqTHX0r1frVzAM5TqZt2BLwsylCz3ZCPsVO5rO+?=
+ =?us-ascii?Q?nAN2OSYarW2BPcDHMIrjyfUYyFbP/yGtko5n//mkf5OHAF54x7+Xmjhw1QQ6?=
+ =?us-ascii?Q?MgcJm76IojuC0T+YGCfyp81skwpbVTnSohjsTSKExDTcKpea8zN9N8DVU3b7?=
+ =?us-ascii?Q?dwzOne3eqSxpRophr3qjvHaewalNBOK9cT7ihw8GsIwVgf0ZM3dz/7901Rfm?=
+ =?us-ascii?Q?zvT7jGvNcuytx4BhnOFtfuLn7BbmQ5nC3AxOBoR4NAruCn3Y08LNM5vcJP0D?=
+ =?us-ascii?Q?Z07JFJDVw/0qmVwAYZlkc3FxOppwyEibERv14CIHxuwtqe0S8MvthMU6MvR2?=
+ =?us-ascii?Q?eYy3ixg9Y7RLgZPuHq/CLzxXKk0MN2qeFHmY4KEMGN1kwR9M/n1d4PA3GvMf?=
+ =?us-ascii?Q?hv8KbGM4O0uOgvumNfOUPGbJZhXblL5m/rdPx3XxmXvZxKzSI2tkJDulF5Da?=
+ =?us-ascii?Q?VUmJVLallEmWpsp7lKA1JLJJzU+okMAzqkwRjrF19e+9xtOK35j03I8syD5t?=
+ =?us-ascii?Q?uErmWSIAQfqN5NhZjZBGOIY5M24/Q41MCGCHp0ZuNyCEABn3kufNVm1ibW38?=
+ =?us-ascii?Q?+ZnKvN2YHabQj6SYiqDtopQ7afPga9t/A0kXLqdy+vqGFtN9Uc5jjC9ZSIqL?=
+ =?us-ascii?Q?MdCpmYR1Q8iUPaZuVVgYP704PCeLW1p0HdUJr2+0EDrzdF4bGKpy2nFYN45I?=
+ =?us-ascii?Q?dDKosz0O0UHy9DPgz9ILCvBUAb23OGJVM/rhUiIuQpL+kKcSf1SIu9jf1UsJ?=
+ =?us-ascii?Q?i0xOQRREjfVzg2pSXO4SVtCmgHB+15ZXae9qxe5HSQQjk7WWo6HKYwbMwyzB?=
+ =?us-ascii?Q?kt/VzDIczDBEzLfZsD3lDJ8z/jbiSxaxp+yuVrkdex89i05L9gp2d2bVxeEn?=
+ =?us-ascii?Q?Gsq+cuIxG7NTkRv9uHpejR+w1rZqluItF12bKbdmftYUxCN+lEeQy3Gb6/G4?=
+ =?us-ascii?Q?50GybwebBjZzOxjyTS8eUV8Uxkd7MENus9jNwCRaDPNS0+03Da40X/tmBOnB?=
+ =?us-ascii?Q?LwmSA2+l/AYB9suSubVy9uQ6lolQviEyciWdBYAEFoLXSZH+w7eJt77r0wXW?=
+ =?us-ascii?Q?5YcwuZOExw9nYJXWsmWwrfwgWmhP4SqzcVAA/BVvSAnJmKOxJnOcupRXbe7t?=
+ =?us-ascii?Q?QWLK7t0m10sy7Q9oO+cby7XM6CmeedcVE5lznLTEcjuKSgEPiybWptGwkAkK?=
+ =?us-ascii?Q?tioMKk3/1fU3tuSUxrXHr+4FemtiZut2sEFXD8FcU34djtVVaDYL6FVohxs5?=
+ =?us-ascii?Q?fF3Htf2wMck4kh7UjDB+ttJ/OJcmG5LMM3kKvCgz84b3Akd76/pW5xMGEJ4v?=
+ =?us-ascii?Q?1PfdXns9O3LDrBicPJFKuQP5rLs8C+WhnaRZY/mo05ft9Sc3Txo4SHf29QFP?=
+ =?us-ascii?Q?o5X8pYFVY93IjPc3he0l/jmJnO0uT5qXmFxwZWpy5rvqYeZjFPMpcbTQk2uS?=
+ =?us-ascii?Q?Iw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231212044614.42733-1-liangchen.linux@gmail.com>
- <20231212044614.42733-5-liangchen.linux@gmail.com> <CAHS8izPW8dugsbUmXbt8WOFaOLvAaNtW2SwxizVtk4tNm-hFJw@mail.gmail.com>
- <CAKhg4tKRQrvAUSz0jHi82TreO9EmxJPttxO-39CBz=7RwhC0Mw@mail.gmail.com>
-In-Reply-To: <CAKhg4tKRQrvAUSz0jHi82TreO9EmxJPttxO-39CBz=7RwhC0Mw@mail.gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 12 Dec 2023 18:49:40 -0800
-Message-ID: <CAHS8izNFhZ4ZSR+UhTG99Y43LzmxkvkdOvRnYuGtxt0jehwHCA@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 4/4] skbuff: Optimization of SKB coalescing
- for page pool
-To: Liang Chen <liangchen.linux@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, hawk@kernel.org, ilias.apalodimas@linaro.org, 
-	linyunsheng@huawei.com, netdev@vger.kernel.org, linux-mm@kvack.org, 
-	jasowang@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3122.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a8e16649-66b1-4232-6bad-08dbfb874331
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Dec 2023 02:57:36.8973
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: oAgZClqcIVy+k7KtX1p2SvQCJq5lxcCL/ugVg3iUJwpP8IsOvDHpNt8lulAyMGBVkdN534SNVroOtUBrUFyUFfY+Vc5JLFlvPPHXWucq4lHg/9Bo9+k9e1YfbIWdYcl5
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8451
+X-OriginatorOrg: intel.com
 
-On Tue, Dec 12, 2023 at 6:37=E2=80=AFPM Liang Chen <liangchen.linux@gmail.c=
-om> wrote:
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of J=
+esse Brandeburg
+> Sent: Wednesday, December 6, 2023 6:31 AM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; Brandeburg, Jesse=
+ <jesse.brandeburg@intel.com>; Lobakin, Aleksander <aleksander.lobakin@inte=
+l.com>; marcin.szycik@linux.intel.com; horms@kernel.org; netdev@vger.kernel=
+.org
+> Subject: [Intel-wired-lan] [PATCH iwl-next v2 14/15] ice: cleanup inconsi=
+stent code
 >
-> On Wed, Dec 13, 2023 at 9:49=E2=80=AFAM Mina Almasry <almasrymina@google.=
-com> wrote:
-> >
-> > On Mon, Dec 11, 2023 at 8:47=E2=80=AFPM Liang Chen <liangchen.linux@gma=
-il.com> wrote:
-> > >
-> > > In order to address the issues encountered with commit 1effe8ca4e34
-> > > ("skbuff: fix coalescing for page_pool fragment recycling"), the
-> > > combination of the following condition was excluded from skb coalesci=
-ng:
-> > >
-> > > from->pp_recycle =3D 1
-> > > from->cloned =3D 1
-> > > to->pp_recycle =3D 1
-> > >
-> > > However, with page pool environments, the aforementioned combination =
-can
-> > > be quite common(ex. NetworkMananger may lead to the additional
-> > > packet_type being registered, thus the cloning). In scenarios with a
-> > > higher number of small packets, it can significantly affect the succe=
-ss
-> > > rate of coalescing. For example, considering packets of 256 bytes siz=
-e,
-> > > our comparison of coalescing success rate is as follows:
-> > >
-> > > Without page pool: 70%
-> > > With page pool: 13%
-> > >
-> > > Consequently, this has an impact on performance:
-> > >
-> > > Without page pool: 2.57 Gbits/sec
-> > > With page pool: 2.26 Gbits/sec
-> > >
-> > > Therefore, it seems worthwhile to optimize this scenario and enable
-> > > coalescing of this particular combination. To achieve this, we need t=
-o
-> > > ensure the correct increment of the "from" SKB page's page pool
-> > > reference count (pp_ref_count).
-> > >
-> > > Following this optimization, the success rate of coalescing measured =
-in
-> > > our environment has improved as follows:
-> > >
-> > > With page pool: 60%
-> > >
-> > > This success rate is approaching the rate achieved without using page
-> > > pool, and the performance has also been improved:
-> > >
-> > > With page pool: 2.52 Gbits/sec
-> > >
-> > > Below is the performance comparison for small packets before and afte=
-r
-> > > this optimization. We observe no impact to packets larger than 4K.
-> > >
-> > > packet size     before      after       improved
-> > > (bytes)         (Gbits/sec) (Gbits/sec)
-> > > 128             1.19        1.27        7.13%
-> > > 256             2.26        2.52        11.75%
-> > > 512             4.13        4.81        16.50%
-> > > 1024            6.17        6.73        9.05%
-> > > 2048            14.54       15.47       6.45%
-> > > 4096            25.44       27.87       9.52%
-> > >
-> > > Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
-> > > Reviewed-by: Yunsheng Lin <linyunsheng@huawei.com>
-> > > Suggested-by: Jason Wang <jasowang@redhat.com>
-> > > ---
-> > >  include/net/page_pool/helpers.h |  5 ++++
-> > >  net/core/skbuff.c               | 43 ++++++++++++++++++++++++-------=
---
-> > >  2 files changed, 36 insertions(+), 12 deletions(-)
-> > >
-> > > diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/=
-helpers.h
-> > > index d0c5e7e6857a..0dc8fab43bef 100644
-> > > --- a/include/net/page_pool/helpers.h
-> > > +++ b/include/net/page_pool/helpers.h
-> > > @@ -281,6 +281,11 @@ static inline long page_pool_unref_page(struct p=
-age *page, long nr)
-> > >         return ret;
-> > >  }
-> > >
-> > > +static inline void page_pool_ref_page(struct page *page)
-> > > +{
-> > > +       atomic_long_inc(&page->pp_ref_count);
-> > > +}
-> > > +
-> > >  static inline bool page_pool_is_last_ref(struct page *page)
-> > >  {
-> > >         /* If page_pool_unref_page() returns 0, we were the last user=
- */
-> > > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > > index 7e26b56cda38..783a04733109 100644
-> > > --- a/net/core/skbuff.c
-> > > +++ b/net/core/skbuff.c
-> > > @@ -947,6 +947,26 @@ static bool skb_pp_recycle(struct sk_buff *skb, =
-void *data, bool napi_safe)
-> > >         return napi_pp_put_page(virt_to_page(data), napi_safe);
-> > >  }
-> > >
-> > > +/**
-> > > + * skb_pp_frag_ref() - Increase fragment reference count of a page
-> > > + * @page:      page of the fragment on which to increase a reference
-> > > + *
-> > > + * Increase the fragment reference count (pp_ref_count) of a page. T=
-his is
-> > > + * intended to gain a fragment reference only for page pool aware sk=
-bs,
-> > > + * i.e. when skb->pp_recycle is true, and not for fragments in a
-> > > + * non-pp-recycling skb. It has a fallback to increase a reference o=
-n a
-> > > + * normal page, as page pool aware skbs may also have normal page fr=
-agments.
-> > > + */
-> > > +static void skb_pp_frag_ref(struct page *page)
-> > > +{
-> > > +       struct page *head_page =3D compound_head(page);
-> > > +
-> >
-> > Feel free to not delay this patch series further based on this
-> > comment/question, but...
-> >
-> > I'm a bit confused about the need for compound_head() here, but
-> > skb_frag_ref() doesn't first obtain the compound_head(). Is there a
-> > page_pool specific reason why skb_frag_ref() can get_page() directly
-> > but this helper needs to grab the compound_head() first?
-> >
+> It was found while doing further testing of the previous commit
+> fbf32a9bab91 ("ice: field get conversion") that one of the FIELD_GET
+> conversions should really be a FIELD_PREP. The previous code was styled
+> as a match to the FIELD_GET conversion, which always worked because the
+> shift value was 0.  The code makes way more sense as a FIELD_PREP and
+> was in fact the only FIELD_GET with two constant arguments in this
+> series.
 >
-> get_page includes the call to compound_head, so skb_frag_ref
-> indirectly calls compound_head as well.
+> Didn't squash this patch to make it easier to call out the
+> (non-impactful) bug.
 >
-> > > +       if (likely(is_pp_page(head_page)))
-> > > +               page_pool_ref_page(head_page);
-> > > +       else
-> > > +               page_ref_inc(head_page);
-> >
-> > Any reason why not get_page() here?
-> >
->
-> head_page is a head page because of the compound_head call above. This
-> was actually a comment received from a previous iteration:)
+> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_dcb.c | 2 +-
+>  drivers/net/ethernet/intel/ice/ice_lib.c | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 >
 
-I see, thanks.
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
-
-Noob question: do we actually support someone passing a compound_page
-to skb_frag_fill_page_desc()? Anyone know of any driver that does
-this? I kinda like the direction this patch was going instead:
-
-https://patchwork.kernel.org/project/netdevbpf/patch/20231113130041.58124-5=
--linyunsheng@huawei.com/
-
-Where we explicitly exclude compound pages from skbs... This is for
-convenience for devmem TCP, where I don't support compound pages, but
-that is more my problem than yours. This patch is fine.
-
-> > > +}
-> > > +
-> > >  static void skb_kfree_head(void *head, unsigned int end_offset)
-> > >  {
-> > >         if (end_offset =3D=3D SKB_SMALL_HEAD_HEADROOM)
-> > > @@ -5769,17 +5789,12 @@ bool skb_try_coalesce(struct sk_buff *to, str=
-uct sk_buff *from,
-> > >                 return false;
-> > >
-> > >         /* In general, avoid mixing page_pool and non-page_pool alloc=
-ated
-> > > -        * pages within the same SKB. Additionally avoid dealing with=
- clones
-> > > -        * with page_pool pages, in case the SKB is using page_pool f=
-ragment
-> > > -        * references (page_pool_alloc_frag()). Since we only take fu=
-ll page
-> > > -        * references for cloned SKBs at the moment that would result=
- in
-> > > -        * inconsistent reference counts.
-> > > -        * In theory we could take full references if @from is cloned=
- and
-> > > -        * !@to->pp_recycle but its tricky (due to potential race wit=
-h
-> > > -        * the clone disappearing) and rare, so not worth dealing wit=
-h.
-> > > +        * pages within the same SKB. In theory we could take full
-> > > +        * references if @from is cloned and !@to->pp_recycle but its
-> > > +        * tricky (due to potential race with the clone disappearing)=
- and
-> > > +        * rare, so not worth dealing with.
-> > >          */
-> > > -       if (to->pp_recycle !=3D from->pp_recycle ||
-> > > -           (from->pp_recycle && skb_cloned(from)))
-> > > +       if (to->pp_recycle !=3D from->pp_recycle)
-> > >                 return false;
-> > >
-> > >         if (len <=3D skb_tailroom(to)) {
-> > > @@ -5836,8 +5851,12 @@ bool skb_try_coalesce(struct sk_buff *to, stru=
-ct sk_buff *from,
-> > >         /* if the skb is not cloned this does nothing
-> > >          * since we set nr_frags to 0.
-> > >          */
-> > > -       for (i =3D 0; i < from_shinfo->nr_frags; i++)
-> > > -               __skb_frag_ref(&from_shinfo->frags[i]);
-> > > +       if (from->pp_recycle)
-> > > +               for (i =3D 0; i < from_shinfo->nr_frags; i++)
-> > > +                       skb_pp_frag_ref(skb_frag_page(&from_shinfo->f=
-rags[i]));
-> > > +       else
-> > > +               for (i =3D 0; i < from_shinfo->nr_frags; i++)
-> > > +                       __skb_frag_ref(&from_shinfo->frags[i]);
-> > >
-> > >         to->truesize +=3D delta;
-> > >         to->len +=3D len;
-> > > --
-> > > 2.31.1
-> > >
-> >
-> >
-> > --
-> > Thanks,
-> > Mina
-
-
-
---=20
-Thanks,
-Mina
 
