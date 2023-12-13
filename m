@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-57097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0DFF8121E9
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 23:43:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EB308121DF
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 23:43:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C2D91F21673
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 22:43:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B30DB28276C
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 22:43:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E3168184E;
-	Wed, 13 Dec 2023 22:43:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 736EC81840;
+	Wed, 13 Dec 2023 22:43:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PtJ6y0Xj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N3DQmMhN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 861A2D46;
-	Wed, 13 Dec 2023 14:42:23 -0800 (PST)
-Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-336417c565eso825342f8f.3;
-        Wed, 13 Dec 2023 14:42:23 -0800 (PST)
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96885D56;
+	Wed, 13 Dec 2023 14:42:24 -0800 (PST)
+Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-3363ebb277bso770150f8f.2;
+        Wed, 13 Dec 2023 14:42:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702507336; x=1703112136; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1702507337; x=1703112137; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uj94wzE87RLEym7VefjYamBPKqN2ktHl1CeOxhfULeA=;
-        b=PtJ6y0XjA99fFGsP8c3sqcqlQoO7vgVqLSne2f5XoUPlbSHCWThlUOaduyU65Tlxtd
-         KFHXp7xF2LHfl/IQ0yHpbWMFClvFPH6zb1lKLMLDiaFV7ZBgjW/yg1rkL85G/x3FEfCL
-         /ul+eCc5kd7aRzTlGstv51vnnkpXcZ/eZ3sS5l0vArAbvThgh5HTehxtgg8vL1grOYoE
-         6IKiVXoliXXYKp/gZ7Tn41zkXKk8i2/oeC1CQMlrVjGI7YyFS5Qsf4W05zR4Qkb6irko
-         0uaS1zuf1vKEXgTvCu8YCrtr6mpijHRKwcJDf2qyjY+MfxICK5uyeAKUK23yVA6gOnmJ
-         790Q==
+        bh=v1Cw3Yu6aGvXs5Wx/DiJERo5X0a59a10/3prA+sLwwY=;
+        b=N3DQmMhN7DBdil13H9In7xS0S2I0rKO47Ny3RLnTgGvjYA9cvhqeC5ym89GQKW/7QN
+         nCcjWuwcTMRYSldTA7tY15nKnveXV8yP/4/OeEnvQUpCSrNifBDd0PJNANXsPKvH0DuQ
+         s0RtZTQuZtqeSJlFzbANkvv7z+o1IVo8gbj5JyRDJeqCAMn9RMdnyoXcWWagK9Awgte/
+         n3sVZfzzSeAzBo1cettoTder+kMri8ZhOocZrgd3QtlmXSzknBR0MDjYUQD9OxP5R3mD
+         nADT5QctBVyLCQTrsh2IBfBrfE6hjdvtbipUkVvtYxwmhWi2haHl0/YU5vRAAzo16v+4
+         n31Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702507336; x=1703112136;
+        d=1e100.net; s=20230601; t=1702507337; x=1703112137;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uj94wzE87RLEym7VefjYamBPKqN2ktHl1CeOxhfULeA=;
-        b=HH6xuX/ifVkZdmq74iDT2itUpkL3dX3wTKrojGtx6nQwfg9iSLwDvySHJQmFELjIfR
-         iI2PfquwgGFq+0Z1SLn7gVp4j4TYIGdqmKqZKeO3NSSV5Eq9M1rWJeD5u2TX7Yke4Zo9
-         oZd6DLy1itr7gC6mwO9pNa6nsn6in0R1OGq7H+aS0t08VnXAQ2ct57FBZv3E0pCl7+b8
-         qsuAwwKr2h8l1g3L7G9Xb3TlJ2BG7/QnHvvuzkQhRQSZvxpvcPKeGR0lPsO1CJj6U1fW
-         7ActbehfdFYkOLbRKLD/pls9rIF7Cno6aipxx4L4de0SqvReg7G7d88Um1FoWal5Cty5
-         F0Kg==
-X-Gm-Message-State: AOJu0YyxsKTvbtzc5Fd0NhtbDSYURGCV900Mb1OOFlT5JlY96uUl0Rv2
-	FNg2jFDWoEkML+jghxaNwiS9xZz+XgfgBw==
-X-Google-Smtp-Source: AGHT+IFKAWeGIvpyQ01t5wZdlrjaHPGt+VQIM92P6srZCK0gKoTeZzZDpaFTyKFUS/kNqSgKhyBQ/A==
-X-Received: by 2002:adf:ff8d:0:b0:336:462a:dc16 with SMTP id j13-20020adfff8d000000b00336462adc16mr74936wrr.166.1702507335913;
-        Wed, 13 Dec 2023 14:42:15 -0800 (PST)
+        bh=v1Cw3Yu6aGvXs5Wx/DiJERo5X0a59a10/3prA+sLwwY=;
+        b=mbAwTK2HGOaymA2xwae13NGsTjjGdge0yfP/c3LX14Nz3V/3fHu3boo9pq+yHvDK33
+         ez1hIUFZTfyHI8aBrWR4lxlKyeKHfcKqMSvEUyr1Pf+Gs7pbYdSH5JCsF/lEqeGXifSR
+         qqrhO8oVq8T6vCWOcYsfCYr+eTmpRVje22elDgbOhNnPVAVK9kfi5uieHmV0RCuHpHPR
+         EZnR5L3yYif/fkEVsfKO1nvUlPKCPch/XiuejomYCUzAza5guoYIHy8hCntW5T6bJinT
+         Vrgn6WAatObPRx62Ul9oQqQyTKZ+bnGvdVemoXzI6Uox+pG/X+xRju1QQiJnOBBC5vCO
+         qmvQ==
+X-Gm-Message-State: AOJu0YybEjzOTTSAvMec+b4EhnZYaF89DM0ED+qDz22+wYjaAagCJerv
+	ZMu1HB/5xJZvBv1vVybSVbi67GAMM+7aHg==
+X-Google-Smtp-Source: AGHT+IGtD5sKA1ffZFl9OEdPFfBz1HeouPmCI0fY4okQtoN3SlcC/c9tgFRH5eWIySS6OCHsAW04Ow==
+X-Received: by 2002:adf:a4d2:0:b0:333:3e32:8201 with SMTP id h18-20020adfa4d2000000b003333e328201mr3449999wrb.123.1702507337322;
+        Wed, 13 Dec 2023 14:42:17 -0800 (PST)
 Received: from imac.fritz.box ([2a02:8010:60a0:0:7840:ddbd:bbf:1e8f])
-        by smtp.gmail.com with ESMTPSA id c12-20020a5d4f0c000000b00336442b3e80sm998562wru.78.2023.12.13.14.42.14
+        by smtp.gmail.com with ESMTPSA id c12-20020a5d4f0c000000b00336442b3e80sm998562wru.78.2023.12.13.14.42.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 14:42:14 -0800 (PST)
+        Wed, 13 Dec 2023 14:42:16 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -65,9 +65,9 @@ To: netdev@vger.kernel.org,
 	Breno Leitao <leitao@debian.org>
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v4 11/13] tools/net/ynl-gen-rst: Sort the index of generated netlink specs
-Date: Wed, 13 Dec 2023 22:41:44 +0000
-Message-ID: <20231213224146.94560-12-donald.hunter@gmail.com>
+Subject: [PATCH net-next v4 12/13] tools/net/ynl-gen-rst: Remove bold from attribute-set headings
+Date: Wed, 13 Dec 2023 22:41:45 +0000
+Message-ID: <20231213224146.94560-13-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231213224146.94560-1-donald.hunter@gmail.com>
 References: <20231213224146.94560-1-donald.hunter@gmail.com>
@@ -79,29 +79,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The index of netlink specs was being generated unsorted. Sort the output
-before generating the index entries.
+The generated .rst for attribute-sets currently uses a sub-sub-heading
+for each attribute, with the attribute name in bold. This makes
+attributes stand out more than the attribute-set sub-headings they are
+part of.
+
+Remove the bold markup from attribute sub-sub-headings.
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
-Reviewed-by: Breno Leitao <leitao@debian.org>
 ---
  tools/net/ynl/ynl-gen-rst.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tools/net/ynl/ynl-gen-rst.py b/tools/net/ynl/ynl-gen-rst.py
-index 19e5b34554a1..6b7afaa56e22 100755
+index 6b7afaa56e22..675ae8357d5e 100755
 --- a/tools/net/ynl/ynl-gen-rst.py
 +++ b/tools/net/ynl/ynl-gen-rst.py
-@@ -377,7 +377,7 @@ def generate_main_index_rst(output: str) -> None:
- 
-     index_dir = os.path.dirname(output)
-     logging.debug("Looking for .rst files in %s", index_dir)
--    for filename in os.listdir(index_dir):
-+    for filename in sorted(os.listdir(index_dir)):
-         if not filename.endswith(".rst") or filename == "index.rst":
-             continue
-         lines.append(f"   {filename.replace('.rst', '')}\n")
+@@ -235,7 +235,7 @@ def parse_attr_sets(entries: List[Dict[str, Any]]) -> str:
+         lines.append(rst_section(entry["name"]))
+         for attr in entry["attributes"]:
+             type_ = attr.get("type")
+-            attr_line = bold(attr["name"])
++            attr_line = attr["name"]
+             if type_:
+                 # Add the attribute type in the same line
+                 attr_line += f" ({inline(type_)})"
 -- 
 2.42.0
 
