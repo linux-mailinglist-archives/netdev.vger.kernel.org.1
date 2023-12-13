@@ -1,175 +1,103 @@
-Return-Path: <netdev+bounces-56876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 715938110E0
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:18:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA964811136
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 13:40:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 760EB1C20EC8
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 12:18:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9688C281979
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 12:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD6CD28DDB;
-	Wed, 13 Dec 2023 12:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56C4C28E1D;
+	Wed, 13 Dec 2023 12:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="owP7qQuS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mce/beJh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 794249A;
-	Wed, 13 Dec 2023 04:17:55 -0800 (PST)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BDBq4nw026207;
-	Wed, 13 Dec 2023 12:17:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=2LO+KZOc1A6iY+w5EuG6nKQ43T54kE83JDUPE8JPgPs=;
- b=owP7qQuS6C3ZQ9Op3YDzPTHUPWDFok2QrxFkyATpCL8bJfLRCzxNK9+qIMB4yhzzXu6b
- WfWuTDpoOqFDKXRO2aq+L7j4yTv1hZRtZ2GO7zo0U084XduncbnB5WKqhypRb9NKCvgG
- q5OBvARW85wtcUIiKnaHHXVnljbSENniGftfyO1W7a3vowTOF8JaEgA0QMpm3Q2MWD3i
- XGO90qOFrjqkBJ7NPuH0bjmllUOSP8Nxw8my4gC5/j6IqaROfC2Ny5ewFJykdTJV6yED
- aWiku1XvPYpS1rFfc4J68zz3iHOHqFOEpHCN3djXCD9o0YjKU/r14yk025ZbU0cJlA7O xA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uyc450sav-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Dec 2023 12:17:52 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BDCBglT025077;
-	Wed, 13 Dec 2023 12:17:52 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uyc450saf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Dec 2023 12:17:52 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BDAcktX004101;
-	Wed, 13 Dec 2023 12:17:51 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3uw4skg8u4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Dec 2023 12:17:51 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BDCHmrt12321508
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 13 Dec 2023 12:17:48 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4578B20043;
-	Wed, 13 Dec 2023 12:17:48 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 00F0F20040;
-	Wed, 13 Dec 2023 12:17:48 +0000 (GMT)
-Received: from [9.152.224.39] (unknown [9.152.224.39])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 13 Dec 2023 12:17:47 +0000 (GMT)
-Message-ID: <2c460a84c6e725187dda05fc553981ce3022bb78.camel@linux.ibm.com>
-Subject: Re: SMC-R throughput drops for specific message sizes
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: "Nikolaou Alexandros (SO/PAF1-Mb)" <Alexandros.Nikolaou@de.bosch.com>,
-        "D . Wythe" <alibuda@linux.alibaba.com>,
-        Wen Gu <guwen@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>,
-        Nils Hoppmann <niho@linux.ibm.com>
-Cc: "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        netdev
-	 <netdev@vger.kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>,
-        Jan Karcher
-	 <jaka@linux.ibm.com>
-Date: Wed, 13 Dec 2023 13:17:47 +0100
-In-Reply-To: <PAWPR10MB7270731C91544AEF25E0A33CC084A@PAWPR10MB7270.EURPRD10.PROD.OUTLOOK.COM>
-References: 
-	  <PAWPR10MB72701758A24DD8DF8063BEE6C081A@PAWPR10MB7270.EURPRD10.PROD.OUTLOOK.COM>
-	 <ccc03f00-02ee-4af6-8e57-b6de3bc019be@linux.ibm.com>
-	 <PAWPR10MB7270731C91544AEF25E0A33CC084A@PAWPR10MB7270.EURPRD10.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.module_f38+17164+63eeee4a) 
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 396A31798F
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 12:40:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 97E6DC433C9;
+	Wed, 13 Dec 2023 12:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702471225;
+	bh=LWZlRMBHe0H98SVKK8tqTAevoocsLbabA7oaIVKPvFQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Mce/beJhXjvJ387GmREl9pBsNR4MzX26fjEjWQWz7L2r+ZHx4UeWtakVVhRYoU9s/
+	 +nOiQb21mfMJktzHsrIm8nhQDw2XPQB/U7yk+2Mb8cdeTFukhptpsjlVPsUxJchw3a
+	 jEoSV7Fg8kTYzCCsYq40y7/FzhzfCeFgu7dfwEKigU360DsQ5IzjCqEwLqIT4SqIHs
+	 zRwEY1O6LPmOgWVNyNYO6iZUMbSMjGNHhc3P0Kce5l/NMVQDavKx6REbWvlMOvfMIo
+	 d/5N+tZd7+jMGRV77s0bX7a4DQAonrXFMZb1rbX8eIwVx0uJLBjs59jR9yhhbGIowX
+	 EvBzkdTaur1VQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 809ADC4314C;
+	Wed, 13 Dec 2023 12:40:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 3qJCnWvMKx-zjMUMBWbfO7VTeUTOmrRr
-X-Proofpoint-GUID: IULt2Ub6WF76JU1Zjf2vBZPIIpuOjyT0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-13_05,2023-12-13_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
- bulkscore=0 adultscore=0 mlxlogscore=999 mlxscore=0 lowpriorityscore=0
- clxscore=1011 phishscore=0 malwarescore=0 suspectscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2312130089
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/8] ionic: updates to PCI error handling
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170247122552.30596.16162818098614293135.git-patchwork-notify@kernel.org>
+Date: Wed, 13 Dec 2023 12:40:25 +0000
+References: <20231211185804.18668-1-shannon.nelson@amd.com>
+In-Reply-To: <20231211185804.18668-1-shannon.nelson@amd.com>
+To: Shannon Nelson <shannon.nelson@amd.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, brett.creeley@amd.com,
+ drivers@pensando.io
 
-Hi Nikolaou,
+Hello:
 
-thank you for providing more details about your setup.
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-On Wed, 2023-12-06 at 15:28 +0000, Nikolaou Alexandros (SO/PAF1-Mb)
-wrote:
-> Dear Wenjia,=C2=A0
+On Mon, 11 Dec 2023 10:57:56 -0800 you wrote:
+> These are improvements to our PCI error handling, including FLR and
+> AER events.
+> 
+> Shannon Nelson (8):
+>   ionic: pass opcode to devcmd_wait
+>   ionic: keep filters across FLR
+>   ionic: bypass firmware cmds when stuck in reset
+>   ionic: prevent pci disable of already disabled device
+>   ionic: no fw read when PCI reset failed
+>   ionic: use timer_shutdown_sync
+>   ionic: lif debugfs refresh on reset
+>   ionic: fill out pci error handlers
+> 
+> [...]
 
-while Wenjia is out, I'm writing primarily to getting some more folks'
-attention to this topic. Furthermore, I'm moving the discussion to the
-netdev mailing list where SMC discussions usually take place.
+Here is the summary with links:
+  - [net-next,1/8] ionic: pass opcode to devcmd_wait
+    https://git.kernel.org/netdev/net-next/c/24f110240c03
+  - [net-next,2/8] ionic: keep filters across FLR
+    https://git.kernel.org/netdev/net-next/c/45b84188a0a4
+  - [net-next,3/8] ionic: bypass firmware cmds when stuck in reset
+    https://git.kernel.org/netdev/net-next/c/ca5fdf9a7c5b
+  - [net-next,4/8] ionic: prevent pci disable of already disabled device
+    https://git.kernel.org/netdev/net-next/c/13943d6c8273
+  - [net-next,5/8] ionic: no fw read when PCI reset failed
+    https://git.kernel.org/netdev/net-next/c/219e183272b4
+  - [net-next,6/8] ionic: use timer_shutdown_sync
+    https://git.kernel.org/netdev/net-next/c/b0dbe358fbb4
+  - [net-next,7/8] ionic: lif debugfs refresh on reset
+    https://git.kernel.org/netdev/net-next/c/ce66172d3393
+  - [net-next,8/8] ionic: fill out pci error handlers
+    https://git.kernel.org/netdev/net-next/c/c3a910e1c47a
 
-> Thanks for getting back to me. Some further details on the
-> experiments are:=C2=A0
-> =C2=A0
-> - The tests had been conducted on a one-to-one connection between two
-> Mellanox-powered (mlx5, ConnectX-5) PCs.
-> - Attached you may find the client log of the qperf=C2=A0output. You may
-> notice that for the majority of=C2=A0message size values, the bandwidth i=
-s
-> around 3.2GB/s=C2=A0which matches the maximum throughput of the
-> mellanox=C2=A0NICs.=20
-> According to a periodic regular pattern though, with the first=20
-> occurring=C2=A0at a message size of 473616 =E2=80=93 522192 (with a step =
-of
-> 12144kB),=C2=A0the 3.2GB/s throughput drops substantially. The
-> corresponding commands for these drops are =C2=A0
-> server: smc_run=C2=A0qperf=C2=A0=C2=A0
-> client:=C2=A0smc_run=C2=A0qperf=C2=A0-v -uu=C2=A0-H worker1 -m 473616 tcp=
-_bw=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
-> - Our smc=C2=A0version (3E92E1460DA96BE2B2DDC2F, smc-tools-1.2.2) does no=
-t
-> provide us with the smcr=C2=A0info, smc_rnics=C2=A0-a=C2=A0and smcr=C2=A0=
--d
-> stats=C2=A0commands. As an alternative, you may also find attached the
-> output of ibv_devinfo=C2=A0-v.=C2=A0
-> - Buffer size:=C2=A0
-> sudo=C2=A0sysctl=C2=A0-w net.ipv4.tcp_rmem=3D"4096 1048576 6291456" =C2=
-=A0
-> sudo=C2=A0sysctl=C2=A0-w net.ipv4.tcp_wmem=3D"4096 1048576 6291456"=C2=A0
-> - MTU size: 9000=C2=A0
-> =C2=A0
-> Should you require further information, please let me know.=C2=A0
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Wenjia and I belong to a group of Linux on Z developers that maintains
-the SMC protocol on s390 mainframe systems. Nils Hoppmann is our expert
-for performance and might be able to shed some light on his experiences
-with throughput drops for particular SMC message sizes. Our experience
-is heavily biased towards IBM Z systems, though - with their distinct
-cache and PCI root-complex hardware designs.
 
-Over the last few years there's a group around D. Wythe, Wen Gu and
-Tony Lu who adopted and extended the SMC protocol for use-cases on x86
-architectures. I address them here explicitly, soliciting feedback on
-their experiences.
-
-All in all there are several moving parts involved here, that could
-play a role:
-- firmware level of your Mellanox/NVidia NICs,
-- platform specific hardware designs re. cache and root-complexes,
-interrupt distribution, ...
-- exact code level of the device drivers and the SMC protocol
-
-This is just a heads-up, that there may be requests to try things with
-newer code levels ;)
-
-Thank you,
-Gerd
-
---
-Gerd Bayer
-Linux on IBM Z Development - IBM Germany R&D
 
