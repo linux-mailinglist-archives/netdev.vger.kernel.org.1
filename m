@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-57104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34A848121FD
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 23:44:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCCFE8121E2
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 23:43:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD781B21084
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 22:44:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79C3B282852
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 22:43:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 500C081859;
-	Wed, 13 Dec 2023 22:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06CD381E34;
+	Wed, 13 Dec 2023 22:43:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c4u1tjSv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FvovFUr8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7E8818A;
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C04052100;
 	Wed, 13 Dec 2023 14:42:21 -0800 (PST)
-Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-33638e7f71aso12592f8f.1;
+Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-336447f240cso280482f8f.3;
         Wed, 13 Dec 2023 14:42:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702507332; x=1703112132; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1702507334; x=1703112134; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VLA+yZoLDjFMN/O1juANGCrbT+QdJr4gSE0ytCTmmgg=;
-        b=c4u1tjSvxiVgT/Q6VzPGaTXFxfehipPkK1FS1FGq5QcXkrPDcpW6mtHhxb9bf5E85a
-         DR4+sdXHaRLMsk3YvR9PJSs0ZYBACdP2elvxKXGTuSCK0QD8x0yA4hRBQtGe/8IxfIoy
-         ruj4WhXe/jgXgJZPVE5BR8c3enHnNgTO6ljQtcdlk5rD2dZN/g5Y9qu8pl6yVKVrisE6
-         CbzF6tEwP9VyzNg5aam58bmj9qLfRJ15IPXcHBb0QXfJGrlf56SPE6pGo+swmwpYEkVw
-         Fq1j7DpP5O/xwzZ2kHrKBdIM6m2wZxny4avMqFcLoRptwkUh7YnyirU/oaExzex1X3DW
-         BuRg==
+        bh=kHxjA/PI+QAMG6yG9cC6vwGS4SQuFy0Xe9c6W4xTqrU=;
+        b=FvovFUr8+5Aw/FRG+Xl69tY1wVwyKCG71oIyTyzNi4jisGlkJSdt65HPOwMbQdB5Pu
+         KT0Y9/c1h/neQTmdtyG3mhI2tAseJzcxx7+W3a71WxcLAY98zPcgb2Cc312WbFDs8uZo
+         FRByVFB1o3D3867HXmTTlUy5yUY8Oot8K6YVGogtEYqqiMOcdhQMwSiNbKSKn6xmoQSe
+         wwn90XeAeLIX+7IST/GnqOzyMfipAND479C4yjAYHp7SnSqVd9Fp6UeRRjXTqaPrHtOi
+         nbxIm1nVKad3Fs3KFQgpYfu2glfikBxlB2QUrWPrxXiSJvvvWdvb3uwRsNIYBwThl0Uu
+         4DGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702507332; x=1703112132;
+        d=1e100.net; s=20230601; t=1702507334; x=1703112134;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VLA+yZoLDjFMN/O1juANGCrbT+QdJr4gSE0ytCTmmgg=;
-        b=K+WloECAXWodkmsUmm4MsyIC4LfqgRHHPj1/eIaNe2mM9cIenLFDbPgSlYFQWZbNsZ
-         xbiGN7ttTYFyK/OAUwkKl+d7Dzpnbj5ePNlVFuisw5mJhRZLryurgm6y3HkguN5mUi14
-         Aa56wKw7QD4ymB2/IxjKnJQj+vYcrMqdGHmxDLwHkHzU6AjnYFVpOgquvALLbBze2gGn
-         1n5QohI0f/bNj5py5qDZBDEHnK+B3Ah1O4SaV2m5TyXZMsXWpUG4Xwma8hYkGfAq7YTP
-         yEeTh4ueDgKWmDgf9yKkTnveKGbhI8tVzY5Pn4M8Ne+YQrzyXPsO8yVHN5XWbBhppKnx
-         ebIQ==
-X-Gm-Message-State: AOJu0Yw2Q1k+noBT1oTxuAnhb6sX6TXc7uX9DDQXU/uZQtGCrp5d7lnN
-	sEzUptxT5DSS7zhtrKQzZECa141NQa+2pQ==
-X-Google-Smtp-Source: AGHT+IHwwRdiOM6SzNxTg3j+mxfZCkh/ui5oZxQYO7Sxu6FeJbfuyRxNTm9STeKXI+YfvUkXXIFcsw==
-X-Received: by 2002:a05:6000:8c:b0:333:2fd7:95fd with SMTP id m12-20020a056000008c00b003332fd795fdmr4797055wrx.56.1702507332471;
-        Wed, 13 Dec 2023 14:42:12 -0800 (PST)
+        bh=kHxjA/PI+QAMG6yG9cC6vwGS4SQuFy0Xe9c6W4xTqrU=;
+        b=lxoXEh83rnxvtbhOYV+P6kyxbUnQNF1JTHF9DeTU7aBvs1rtQdzB6s49/Ll65mMVzj
+         5WiaHgENK9Rt9vupa1QsJqpmuhNu0+ol/2UZTJlJwYyNeJO8sqvU8pPbZAsE5jlVahh0
+         hCVIzH/IWHGESLFs5UpyhK+x2ITn7/hGRIYikxjzL5oKqaP2xnYeo0ir41/Ya/iO+07S
+         OQTAGgsLltufPN9Yz1mhH7x4SpKI6pcrOQ9v2VLZfL7trTu2TDFySmQBkEggYAWT+DhQ
+         N2H9F2x4kuWLY+Y4J01mGnWDQAHqflsOLA3gmbfOJqTLRXGwuhZzyN6AyXZHx0pbYqgD
+         v5+w==
+X-Gm-Message-State: AOJu0Ywq4FVjrwZ8aXB08gUM+R1Z3glBKB+QASk799LLTKsl0dKqh681
+	7KE6QjafhjicMvDgMVyzFA3pqnbGXkKyqw==
+X-Google-Smtp-Source: AGHT+IEg0WtTu4qjzMSrMijZ6fI204HwGzosDV0CpG8WD+3/4kZpxrJ+LzBdVQOSrYPBzdxdTlAFiA==
+X-Received: by 2002:a5d:58c9:0:b0:336:363e:fa7f with SMTP id o9-20020a5d58c9000000b00336363efa7fmr1496907wrf.140.1702507334118;
+        Wed, 13 Dec 2023 14:42:14 -0800 (PST)
 Received: from imac.fritz.box ([2a02:8010:60a0:0:7840:ddbd:bbf:1e8f])
-        by smtp.gmail.com with ESMTPSA id c12-20020a5d4f0c000000b00336442b3e80sm998562wru.78.2023.12.13.14.42.10
+        by smtp.gmail.com with ESMTPSA id c12-20020a5d4f0c000000b00336442b3e80sm998562wru.78.2023.12.13.14.42.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 14:42:11 -0800 (PST)
+        Wed, 13 Dec 2023 14:42:13 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -65,9 +65,9 @@ To: netdev@vger.kernel.org,
 	Breno Leitao <leitao@debian.org>
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v4 09/13] doc/netlink: Regenerate netlink .rst files if ynl-gen-rst changes
-Date: Wed, 13 Dec 2023 22:41:42 +0000
-Message-ID: <20231213224146.94560-10-donald.hunter@gmail.com>
+Subject: [PATCH net-next v4 10/13] tools/net/ynl-gen-rst: Add sub-messages to generated docs
+Date: Wed, 13 Dec 2023 22:41:43 +0000
+Message-ID: <20231213224146.94560-11-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231213224146.94560-1-donald.hunter@gmail.com>
 References: <20231213224146.94560-1-donald.hunter@gmail.com>
@@ -79,36 +79,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add ynl-gen-rst.py to the dependencies for the netlink .rst files in the
-doc Makefile so that the docs get regenerated if the ynl-gen-rst.py
-script is modified. Use $(Q) to honour V=1 in the rules that run
-ynl-gen-rst.py
+Add a section for sub-messages to the generated .rst files.
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 Reviewed-by: Breno Leitao <leitao@debian.org>
 ---
- Documentation/Makefile | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ tools/net/ynl/ynl-gen-rst.py | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/Documentation/Makefile b/Documentation/Makefile
-index 5c156fbb6cdf..3885bbe260eb 100644
---- a/Documentation/Makefile
-+++ b/Documentation/Makefile
-@@ -106,10 +106,10 @@ YNL_RST_FILES_TMP := $(patsubst %.yaml,%.rst,$(wildcard $(YNL_YAML_DIR)/*.yaml))
- YNL_RST_FILES := $(patsubst $(YNL_YAML_DIR)%,$(YNL_RST_DIR)%, $(YNL_RST_FILES_TMP))
+diff --git a/tools/net/ynl/ynl-gen-rst.py b/tools/net/ynl/ynl-gen-rst.py
+index b6292109e236..19e5b34554a1 100755
+--- a/tools/net/ynl/ynl-gen-rst.py
++++ b/tools/net/ynl/ynl-gen-rst.py
+@@ -251,6 +251,24 @@ def parse_attr_sets(entries: List[Dict[str, Any]]) -> str:
+     return "\n".join(lines)
  
- $(YNL_INDEX): $(YNL_RST_FILES)
--	@$(YNL_TOOL) -o $@ -x
-+	$(Q)$(YNL_TOOL) -o $@ -x
  
--$(YNL_RST_DIR)/%.rst: $(YNL_YAML_DIR)/%.yaml
--	@$(YNL_TOOL) -i $< -o $@
-+$(YNL_RST_DIR)/%.rst: $(YNL_YAML_DIR)/%.yaml $(YNL_TOOL)
-+	$(Q)$(YNL_TOOL) -i $< -o $@
++def parse_sub_messages(entries: List[Dict[str, Any]]) -> str:
++    """Parse sub-message definitions"""
++    lines = []
++
++    for entry in entries:
++        lines.append(rst_section(entry["name"]))
++        for fmt in entry["formats"]:
++            value = fmt["value"]
++
++            lines.append(rst_bullet(bold(value)))
++            for attr in ['fixed-header', 'attribute-set']:
++                if attr in fmt:
++                    lines.append(rst_fields(attr, fmt[attr], 2))
++            lines.append("\n")
++
++    return "\n".join(lines)
++
++
+ def parse_yaml(obj: Dict[str, Any]) -> str:
+     """Format the whole YAML into a RST string"""
+     lines = []
+@@ -287,6 +305,11 @@ def parse_yaml(obj: Dict[str, Any]) -> str:
+         lines.append(rst_subtitle("Attribute sets"))
+         lines.append(parse_attr_sets(obj["attribute-sets"]))
  
- htmldocs: $(YNL_INDEX)
- 	@$(srctree)/scripts/sphinx-pre-install --version-check
++    # Sub-messages
++    if "sub-messages" in obj:
++        lines.append(rst_subtitle("Sub-messages"))
++        lines.append(parse_sub_messages(obj["sub-messages"]))
++
+     return "\n".join(lines)
+ 
+ 
 -- 
 2.42.0
 
