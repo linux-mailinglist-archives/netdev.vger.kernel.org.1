@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-57123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93A6F8122D0
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 00:29:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3387F8122D2
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 00:29:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D9862826D5
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 23:29:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D29E01F21A19
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 23:29:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8101777B3B;
-	Wed, 13 Dec 2023 23:28:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0B077B47;
+	Wed, 13 Dec 2023 23:29:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nl9eBYnI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="myb/9fRu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C8977B34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B0E677B42
 	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 23:28:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AE29C433C7;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5ADC0C433CC;
 	Wed, 13 Dec 2023 23:28:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1702510139;
-	bh=4gKidT0yhMom5LZFkC+V9sWURd/W6+Efd8VGEETESnM=;
+	bh=tfTPS9f9KB5Y44fWE4ssGBkaJxzzO/CyKnWmpPQxmLQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Nl9eBYnIIqPUoY10qXWQ2oii2454652b5sPYirYZd2/P8gLT+Off8wdu0uODQwbWs
-	 jkMoROuORiNa2wv1rN26unk6upb3O3Rniwsd8bhtxkMrlBYDbG0fAI+01oZX/OTEaS
-	 SWShTIzUBZEO2WAcUs40s2Fq1xVsKFFpQiWzjgtmIhII4Y3hvRaofIcxhACPQGTHXA
-	 9FM1+00B+8NLHgbuPl5JbBxZcKzveJvN6guNm7N9Ij7yIZ+OTMpLBTiAcEtDxHq4An
-	 m323ehQLaOXPYIJgqmZ6Fo1+7bFhzRKWdWwaM26Os8CLXt1a6FcrMc/f80gdcz/xCS
-	 MHsiE2nyYsgmA==
+	b=myb/9fRuHMJ4DTKAIChLXNlOdZyYRHMpPygfBse5EM9CrRNhk1APuanbIczaXNXzd
+	 NC/iXfh2OcOGd/VVXDNJHg3irBIkyw8LyCfpG29EGTLsECXMXdG/Q47iu3ETE7oJPX
+	 TQ0/m2/r0SEJh2FPr3s6H4Y+WuoEz5Z1nH0ty/SW8lZ6Dj/FV+EFYA1efwEIcUmHap
+	 r5IxyK5MSYq5gjY8epG/DBJXGeaR+8tFUwj8cZwZzYRPyqwY7gc9qyE+hux5KmCZLs
+	 VqN8F7GgIc1go3SWTCBKVsqRwiE2Twxs1/rJ2ZE8PIBChD9A7HXruqCtw4mHa3SbQJ
+	 Uh72zV0770K7Q==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -39,9 +39,9 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	donald.hunter@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 1/3] netlink: specs: ovs: remove fixed header fields from attrs
-Date: Wed, 13 Dec 2023 15:28:20 -0800
-Message-ID: <20231213232822.2950853-2-kuba@kernel.org>
+Subject: [PATCH net-next 2/3] netlink: specs: ovs: correct enum names in specs
+Date: Wed, 13 Dec 2023 15:28:21 -0800
+Message-ID: <20231213232822.2950853-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231213232822.2950853-1-kuba@kernel.org>
 References: <20231213232822.2950853-1-kuba@kernel.org>
@@ -53,104 +53,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Op's "attributes" list is a workaround for families with a single
-attr set. We don't want to render a single huge request structure,
-the same for each op since we know that most ops accept only a small
-set of attributes. "Attributes" list lets us narrow down the attributes
-to what op acctually pays attention to.
-
-It doesn't make sense to put names of fixed headers in there.
-They are not "attributes" and we can't really narrow down the struct
-members.
-
-Remove the fixed header fields from attrs for ovs families
-in preparation for C codegen support.
+Align the enum-names of OVS with what's actually in the uAPI.
+Either correct the names, or mark the enum as empty because
+the values are in fact #defines.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/netlink/specs/ovs_datapath.yaml | 2 --
- Documentation/netlink/specs/ovs_flow.yaml     | 3 ---
- Documentation/netlink/specs/ovs_vport.yaml    | 4 ----
- 3 files changed, 9 deletions(-)
+ Documentation/netlink/specs/ovs_datapath.yaml | 1 +
+ Documentation/netlink/specs/ovs_flow.yaml     | 4 ++++
+ 2 files changed, 5 insertions(+)
 
 diff --git a/Documentation/netlink/specs/ovs_datapath.yaml b/Documentation/netlink/specs/ovs_datapath.yaml
-index f709c26c3e92..067c54a52d7a 100644
+index 067c54a52d7a..edc8c95ca6f5 100644
 --- a/Documentation/netlink/specs/ovs_datapath.yaml
 +++ b/Documentation/netlink/specs/ovs_datapath.yaml
-@@ -142,7 +142,6 @@ uapi-header: linux/openvswitch.h
-       do:
-         request:
-           attributes:
--            - dp-ifindex
-             - name
-             - upcall-pid
-             - user-features
-@@ -154,7 +153,6 @@ uapi-header: linux/openvswitch.h
-       do:
-         request:
-           attributes:
--            - dp-ifindex
-             - name
- 
- mcast-groups:
+@@ -20,6 +20,7 @@ uapi-header: linux/openvswitch.h
+     name: user-features
+     type: flags
+     name-prefix: ovs-dp-f-
++    enum-name:
+     entries:
+       -
+         name: unaligned
 diff --git a/Documentation/netlink/specs/ovs_flow.yaml b/Documentation/netlink/specs/ovs_flow.yaml
-index 109ca1f57b6c..29315f3538fd 100644
+index 29315f3538fd..4fdfc6b5cae9 100644
 --- a/Documentation/netlink/specs/ovs_flow.yaml
 +++ b/Documentation/netlink/specs/ovs_flow.yaml
-@@ -947,13 +947,11 @@ uapi-header: linux/openvswitch.h
-       do: &flow-get-op
-         request:
-           attributes:
--            - dp-ifindex
-             - key
-             - ufid
-             - ufid-flags
-         reply:
-           attributes:
--            - dp-ifindex
-             - key
-             - ufid
-             - mask
-@@ -968,7 +966,6 @@ uapi-header: linux/openvswitch.h
-       do:
-         request:
-           attributes:
--            - dp-ifindex
-             - key
-             - ufid
-             - mask
-diff --git a/Documentation/netlink/specs/ovs_vport.yaml b/Documentation/netlink/specs/ovs_vport.yaml
-index f65ce62cd60d..86ba9ac2a521 100644
---- a/Documentation/netlink/specs/ovs_vport.yaml
-+++ b/Documentation/netlink/specs/ovs_vport.yaml
-@@ -135,7 +135,6 @@ uapi-header: linux/openvswitch.h
-             - name
-             - type
-             - upcall-pid
--            - dp-ifindex
-             - ifindex
-             - options
-     -
-@@ -146,7 +145,6 @@ uapi-header: linux/openvswitch.h
-       do:
-         request:
-           attributes:
--            - dp-ifindex
-             - port-no
-             - type
-             - name
-@@ -158,11 +156,9 @@ uapi-header: linux/openvswitch.h
-       do: &vport-get-op
-         request:
-           attributes:
--            - dp-ifindex
-             - name
-         reply: &dev-all
-           attributes:
--            - dp-ifindex
-             - port-no
-             - type
-             - name
+@@ -124,6 +124,7 @@ uapi-header: linux/openvswitch.h
+   -
+     name: ovs-frag-type
+     name-prefix: ovs-frag-type-
++    enum-name: ovs-frag-type
+     type: enum
+     entries:
+       -
+@@ -269,6 +270,7 @@ uapi-header: linux/openvswitch.h
+   -
+     name: ovs-ufid-flags
+     name-prefix: ovs-ufid-f-
++    enum-name:
+     type: flags
+     entries:
+       - omit-key
+@@ -288,6 +290,7 @@ uapi-header: linux/openvswitch.h
+         doc: Basis used for computing hash.
+   -
+     name: ovs-hash-alg
++    enum-name: ovs-hash-alg
+     type: enum
+     doc: |
+       Data path hash algorithm for computing Datapath hash. The algorithm type only specifies
+@@ -339,6 +342,7 @@ uapi-header: linux/openvswitch.h
+           MPLS tunnel attributes.
+   -
+     name: ct-state-flags
++    enum-name:
+     type: flags
+     name-prefix: ovs-cs-f-
+     entries:
 -- 
 2.43.0
 
