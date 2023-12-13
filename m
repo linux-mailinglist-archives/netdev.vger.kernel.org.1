@@ -1,133 +1,132 @@
-Return-Path: <netdev+bounces-57045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34F6C811BEA
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 19:05:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8D4B811C00
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 19:11:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 739CA1C20D30
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 18:05:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25D4F1C2093C
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 18:11:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FC463A8EA;
-	Wed, 13 Dec 2023 18:05:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D0259B7C;
+	Wed, 13 Dec 2023 18:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MloHbArP"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="YiSd5hZC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6581810E
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 10:04:56 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-54c77d011acso531a12.1
-        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 10:04:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702490695; x=1703095495; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=21jXasXtmRzkqxKFo4eGWsmHlpxdFbQH+B0lhXK71P4=;
-        b=MloHbArPCGy4UH5vKI6xDmEliPPlzqx/k9DUZmUzdQkSorQv0HIEFxXAraXbpUaW8T
-         Y3t8aDwWC3h/gKz/oWjnagGkt8cmAWbgZvI5FqNoM0jYDr5scRs5/VA4SlZNk6D1PQku
-         7BEJ+Khlwwp2KHuOSJR2GUM8pdz0C2ZQrVmlqAtVmPwN321cXzV/ZxOtZmqI01RLPJsL
-         5E60pw7XD32cPDF1PwqKopY9ppcR+0GRn8flADXgoBaGQJ1JrQd99Ydjjr8cLFY6wvFo
-         9JbseIqA3hwhh//FBGfvnr6BTc4VQFCzbhuk0fciFBauC9/wsr2fgPrsXg97zQRMR0Fm
-         l4Fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702490695; x=1703095495;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=21jXasXtmRzkqxKFo4eGWsmHlpxdFbQH+B0lhXK71P4=;
-        b=mcSriEXVrxzb+bTy+6vdxcw1NLU3xuvdPLE2j6yJYpW/C+bpbaP/clupF5xCnzlmFL
-         YEZVWIqHA58QFT4UBx9kslp4ZYcUDV0iJoq4lrX1uRE/4yECy0h78MlYNHBk0ZqgHovg
-         Sgz4OefJE5hacmyeTlsM1t0gXKWJMtXibElKvuy7OxBiwaizUjr5vlvlaFDaU7UeYBGc
-         O7RQ2d79+dv7Dg2wUTBqCYeb+Hyn/zP47WHySRilW04HfUTZbY4oBYjsAVXwy57BXa+D
-         jFxQ/M8lYN+LAM50vf/QFyum66zo7zdXIhy0/Nf07uPS0NNLTfNmsyCd2BJMzBDbRHVV
-         rLng==
-X-Gm-Message-State: AOJu0YySBLA2pbFzAyemzZUjOdeEj8cNoUi/h5m2BKjOWOukSvuiBWSJ
-	Y0hOyFmEduOXTK/sIVX/en1W27ew13wPPkoNuxakwQ==
-X-Google-Smtp-Source: AGHT+IFZ0QnhCZ83tmXoK6mhFHyBdcvp5mCRnCffsk1ck7VZ9hKplAHt87E6Nft++7qp0ZDZ9mDDVfILHJcQSQ2GlaQ=
-X-Received: by 2002:a50:c092:0:b0:543:fb17:1a8 with SMTP id
- k18-20020a50c092000000b00543fb1701a8mr511384edf.3.1702490694642; Wed, 13 Dec
- 2023 10:04:54 -0800 (PST)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7820DAF;
+	Wed, 13 Dec 2023 10:11:05 -0800 (PST)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BDBPTkC007464;
+	Wed, 13 Dec 2023 10:10:53 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=pfpt0220; bh=9Hj0KLnB
+	Ueycwyof1iA+0mLw8fTdl+oosoVSFW+ctGw=; b=YiSd5hZC0q3ooM0Me1HLmyAk
+	rirR/TQIaDNsdEgmu+3kAY4uAl7dseWWMIzd5xBFE31X8Fw/1MtVFpvu+BgoTaei
+	DeZQh0KfKhc3DrkW1cp6YhlGmmkwIrFjJo8tM50ktSBfgwRRBisc5sAKI0VBS6fy
+	3Kg8WcDz3+AvLEbVJ0LEggNXDwHnLPxsDOvnGUh8BSBlAQJS/t91SvDsBTfl0MN5
+	oc3BRAB5YMWCw8DgI0mSpunKn7ToYXMeH/VNnNm5FxbDaALSVjt8Ge2jeGtXmyfp
+	NKVdmKyoKRiqI3xMhLvFLOsk5JnokyzRtYsItCj9WSG80aCwVrJ6EvbycxhXHw==
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3uybqmhtb4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Wed, 13 Dec 2023 10:10:53 -0800 (PST)
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 13 Dec
+ 2023 10:10:51 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Wed, 13 Dec 2023 10:10:51 -0800
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id A62733F708C;
+	Wed, 13 Dec 2023 10:10:47 -0800 (PST)
+From: Suman Ghosh <sumang@marvell.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <sgoutham@marvell.com>, <sbhatta@marvell.com>,
+        <jerinj@marvell.com>, <gakula@marvell.com>, <hkelam@marvell.com>,
+        <lcherian@marvell.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: Suman Ghosh <sumang@marvell.com>
+Subject: [net PATCH] octeontx2-pf: Fix graceful exit during PFC configuration failure
+Date: Wed, 13 Dec 2023 23:40:44 +0530
+Message-ID: <20231213181044.103943-1-sumang@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231213165741.93528-1-jhs@mojatatu.com> <CANn89iK+4p7i_+NaLQq5S7yQ+JB=ZEUJEsxvFkzamttzm21u8A@mail.gmail.com>
- <CANn89iK-4==X-bELpZwLVJCBNOoDYfZEQkCOtNeSRqc=CT-PEw@mail.gmail.com> <CAM0EoMm8sRhONAJj6OhJ_+9BmzzSV71F=LuCWze_0Mc1h9V+kQ@mail.gmail.com>
-In-Reply-To: <CAM0EoMm8sRhONAJj6OhJ_+9BmzzSV71F=LuCWze_0Mc1h9V+kQ@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 13 Dec 2023 19:04:42 +0100
-Message-ID: <CANn89iKB3u6i36Bjqz87jn9b0GQMkUswQMUL+F57B-KYQZwGhQ@mail.gmail.com>
-Subject: Re: [PATCH net 1/1] net_sched: sch_fq: Fix out of range band computation
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Willem de Bruijn <willemb@google.com>, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, jiri@resnulli.us, xiyou.wangcong@gmail.com, 
-	netdev@vger.kernel.org, pctammela@mojatatu.com, victor@mojatatu.com, 
-	Coverity Scan <scan-admin@coverity.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: VdTMhOCCxuJki73Q6snNOiZI0IHMJ3KY
+X-Proofpoint-ORIG-GUID: VdTMhOCCxuJki73Q6snNOiZI0IHMJ3KY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
 
-On Wed, Dec 13, 2023 at 6:53=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
->
-> On Wed, Dec 13, 2023 at 12:42=E2=80=AFPM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> >
-> > On Wed, Dec 13, 2023 at 6:29=E2=80=AFPM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > >
-> > > On Wed, Dec 13, 2023 at 5:57=E2=80=AFPM Jamal Hadi Salim <jhs@mojatat=
-u.com> wrote:
-> > > >
-> > > > It is possible to compute a band of 3. Doing so will overrun array
-> > > > q->band_pkt_count[0-2] boundaries.
-> > > >
-> > > > Fixes: 29f834aa326e ("net_sched: sch_fq: add 3 bands and WRR schedu=
-ling")
-> > > > Reported-by: Coverity Scan <scan-admin@coverity.com>
-> > > > Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> > > > ---
-> > > >  net/sched/sch_fq.c | 2 +-
-> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-> > > > index 3a31c47fea9b..217c430343df 100644
-> > > > --- a/net/sched/sch_fq.c
-> > > > +++ b/net/sched/sch_fq.c
-> > > > @@ -159,7 +159,7 @@ struct fq_sched_data {
-> > > >  /* return the i-th 2-bit value ("crumb") */
-> > > >  static u8 fq_prio2band(const u8 *prio2band, unsigned int prio)
-> > > >  {
-> > > > -       return (prio2band[prio / 4] >> (2 * (prio & 0x3))) & 0x3;
-> > > > +       return (prio2band[prio / 4] >> (2 * (prio & 0x3))) % 0x3;
-> > > >  }
-> > > >
-> > >
-> > > Are you sure this is needed ?
-> > >
-> > > fq_load_priomap() makes sure this can not happen...
-> >
-> > Yeah, I am pretty sure this patch is incorrect, we need to mask to get
-> > only two bits.
->
-> The check in fq_load_priomap() is what makes it moot. Masking with
-> b'11 could result in b'11. Definitely the modulo will guarantee
-> whatever results can only be in the range 0..2. But it is not needed.
->
->
+During PFC configuration failure the code was not handling a graceful
+exit. This patch fixes the same and add proper code for a graceful exit.
 
+Fixes: 99c969a83d82 ("octeontx2-pf: Add egress PFC support")
+Signed-off-by: Suman Ghosh <sumang@marvell.com>
+---
+ .../ethernet/marvell/octeontx2/nic/otx2_dcbnl.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-Modulo would be incorrect, since it would use high order bits.
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
+index bfddbff7bcdf..28fb643d2917 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
+@@ -399,9 +399,10 @@ static int otx2_dcbnl_ieee_getpfc(struct net_device *dev, struct ieee_pfc *pfc)
+ static int otx2_dcbnl_ieee_setpfc(struct net_device *dev, struct ieee_pfc *pfc)
+ {
+ 	struct otx2_nic *pfvf = netdev_priv(dev);
++	u8 old_pfc_en;
+ 	int err;
+ 
+-	/* Save PFC configuration to interface */
++	old_pfc_en = pfvf->pfc_en;
+ 	pfvf->pfc_en = pfc->pfc_en;
+ 
+ 	if (pfvf->hw.tx_queues >= NIX_PF_PFC_PRIO_MAX)
+@@ -411,13 +412,17 @@ static int otx2_dcbnl_ieee_setpfc(struct net_device *dev, struct ieee_pfc *pfc)
+ 	 * supported by the tx queue configuration
+ 	 */
+ 	err = otx2_check_pfc_config(pfvf);
+-	if (err)
++	if (err) {
++		pfvf->pfc_en = old_pfc_en;
+ 		return err;
++	}
+ 
+ process_pfc:
+ 	err = otx2_config_priority_flow_ctrl(pfvf);
+-	if (err)
++	if (err) {
++		pfvf->pfc_en = old_pfc_en;
+ 		return err;
++	}
+ 
+ 	/* Request Per channel Bpids */
+ 	if (pfc->pfc_en)
+@@ -425,6 +430,12 @@ static int otx2_dcbnl_ieee_setpfc(struct net_device *dev, struct ieee_pfc *pfc)
+ 
+ 	err = otx2_pfc_txschq_update(pfvf);
+ 	if (err) {
++		if (pfc->pfc_en)
++			otx2_nix_config_bp(pfvf, false);
++
++		otx2_pfc_txschq_stop(pfvf);
++		pfvf->pfc_en = old_pfc_en;
++		otx2_config_priority_flow_ctrl(pfvf);
+ 		dev_err(pfvf->dev, "%s failed to update TX schedulers\n", __func__);
+ 		return err;
+ 	}
+-- 
+2.25.1
 
-(0x22 % 3) is different than (0x22 & 3)
-
-Had you written:
-
-return ((prio2band[prio / 4] >> (2 * (prio & 0x3))) & 0x3) % 3)
-
-Then yes, the last % 3 would be "not needed"
 
