@@ -1,51 +1,56 @@
-Return-Path: <netdev+bounces-56647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43A7080FB91
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 00:49:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04A3580FBA9
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 01:00:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2D752822CB
-	for <lists+netdev@lfdr.de>; Tue, 12 Dec 2023 23:49:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1A96B20DA2
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 00:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65AD27319B;
-	Tue, 12 Dec 2023 23:49:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA93D28FD;
+	Wed, 13 Dec 2023 00:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gLF/GZks"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rr+8sXVa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A581173C
-	for <netdev@vger.kernel.org>; Tue, 12 Dec 2023 23:49:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53DE3C433C7;
-	Tue, 12 Dec 2023 23:49:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D0828F7;
+	Wed, 13 Dec 2023 00:00:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C07BC433C8;
+	Wed, 13 Dec 2023 00:00:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702424979;
-	bh=z4PMRW3bLDOubA4hfT5LIRe1J2zSDJmQ3e8ZI5XcVIY=;
+	s=k20201202; t=1702425643;
+	bh=P4ZmKF2m1aszLr/cpUggGxXzp94xFrO2iZjJ8pMqg+E=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gLF/GZksTEXvRKeUoAtBQK0E/zr0nUIklRatkB/m1LbN8nSZL8D2eMuaPeRGKMpIL
-	 Wlg005v0H7pAbg9NNZWHgQVJdIXOSuiLd5ViIbARTo0TVEPRDJZxCgIcuOqPXv09FK
-	 FF13ecAtvRBajQzX4obiuKEfToYuRM0owsC9XReay5c9Jhdci4y3+VF7mtcWpUqmHJ
-	 WD6rmpYr1o7weFVGdBL2DleILvvGbqD7FkxRHCRHAdeMQIHNzM82JgT+5Hj8bwCvMQ
-	 e1eSiJLPeVY+ZIlXW+1+bLYS6l7aP2WdDeEWMZ3ySEMp2g+lMzSnheLn5nYT/DhhCy
-	 sLSz2eJ3HXtAw==
-Date: Tue, 12 Dec 2023 15:49:38 -0800
+	b=rr+8sXVaCR0cZJfv25f5QiVFngRPZpU9NmLl4uCO7WxxK3BPCXWN1Wh+LmpLBBu2a
+	 ClLlVD7V0O5cpv+vf6COEK3i6JxOcNQyV0Dnixbb7Xb5cWW5u4fY0ICqclW2zB1DGN
+	 3e/DE0Mkib942xdPVP+h0rZ/bkRQiBfy17+afZz67kdJDPRhEt/JIPT0lQQCgn0dQO
+	 q7oc2gvw17TkeossVqF6P4nUL0UyfHPd0Z6cn5zvBMS8S3Bo7VTmIjQTSF3oIbjV7h
+	 vwGtq/DqUKlSMsfBSA4VS0yTlCtaKUYrk/yN0YD6rzwi0hZhROXhX9nFATIMhKDzAp
+	 S1J94Ehdjyoxw==
+Date: Tue, 12 Dec 2023 16:00:41 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, jacob.e.keller@intel.com, jhs@mojatatu.com,
- johannes@sipsolutions.net, andriy.shevchenko@linux.intel.com,
- amritha.nambiar@intel.com, sdf@google.com, horms@kernel.org,
- przemyslaw.kitszel@intel.com
-Subject: Re: [patch net-next v6 5/9] genetlink: introduce per-sock family
- private storage
-Message-ID: <20231212154938.6e68fc1d@kernel.org>
-In-Reply-To: <20231212101736.1112671-6-jiri@resnulli.us>
-References: <20231212101736.1112671-1-jiri@resnulli.us>
-	<20231212101736.1112671-6-jiri@resnulli.us>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Herve Codina <herve.codina@bootlin.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Rob Herring
+ <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Lee Jones <lee@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, Mark Brown
+ <broonie@kernel.org>, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH 0/5] Add support for framer infrastructure and PEF2256
+ framer
+Message-ID: <20231212160041.59c93d8a@kernel.org>
+In-Reply-To: <CACRpkdYT1J7noFUhObFgfA60XQAfL4rb=knEmWS__TKKtCMh7Q@mail.gmail.com>
+References: <20231128132534.258459-1-herve.codina@bootlin.com>
+	<CACRpkdYT1J7noFUhObFgfA60XQAfL4rb=knEmWS__TKKtCMh7Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,33 +60,10 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 12 Dec 2023 11:17:32 +0100 Jiri Pirko wrote:
-> +static void genl_sk_priv_free(struct genl_sk_priv *priv)
-> +{
-> +	spin_lock(&priv->family->sock_priv_list->lock);
-> +	list_del(&priv->list);
-> +	spin_unlock(&priv->family->sock_priv_list->lock);
-> +	if (priv->destructor)
-> +		priv->destructor(priv->priv);
-> +	kfree(priv);
+On Tue, 12 Dec 2023 23:15:38 +0100 Linus Walleij wrote:
+> here is an immutable tag for the PEF2256 framer, as promised.
+> 
+> I have already merged it into the pinctrl tree for starters.
 
-> +static void genl_sk_priv_list_free(const struct genl_family *family)
-> +{
-> +	struct genl_sk_priv *priv, *tmp;
-> +
-> +	if (!family->sock_priv_size)
-> +		return;
-> +
-> +	list_for_each_entry_safe(priv, tmp, &family->sock_priv_list->list, list)
-> +		genl_sk_priv_free(priv);
-> +	kfree(family->sock_priv_list);
-
-Is this not racy for socket close vs family unregister?
-Once family starts to unregister no new privs can be installed
-(on the basis that such family's callbacks can no longer be called).
-But a socket may get closed in the meantime, and we'll end up entering
-genl_sk_priv_free() both from genl_release() and genl_sk_priv_list_free().
-
-Also I'm afraid there is a race still between removing the entry from
-the list and calling destroy.
+Pulled to net-next as well, thank you!
 
