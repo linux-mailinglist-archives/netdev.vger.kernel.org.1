@@ -1,90 +1,82 @@
-Return-Path: <netdev+bounces-56976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8853D8117BF
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 16:43:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D24B8117C2
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 16:43:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D7B5B20C7A
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 15:43:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB61F286115
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 15:43:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6025A85344;
-	Wed, 13 Dec 2023 15:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF908534D;
+	Wed, 13 Dec 2023 15:41:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Xadg9aAo"
+	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="mREbFX7l"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D4AE12F;
-	Wed, 13 Dec 2023 07:39:47 -0800 (PST)
+Received: from kylie.crudebyte.com (kylie.crudebyte.com [5.189.157.229])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99ED1B2;
+	Wed, 13 Dec 2023 07:40:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=fgEk9LMNVUaeThSQwdJHU30F2t0A2/iyhxXKmlomGTg=; b=Xadg9aAo392pv0nFRr7P22NzJS
-	8TdXarqBjOfZFOmuoat7VbKd67RnUu3iPITSdHzi6BoQm39R4zSeGbV7MFilubdW/ARgY0e8H1fh6
-	UrtoQ00+pACWnjevBMCEej6O2mC6VI7lqjKjr2UxeKNf8vx2t5dGpPdOpp9UgfGeyLtbYq5UGu2ik
-	udZ+d4OACU+rRdY0Rk5cKlALXhcXYC9z27v25bBkViHxQGABM3uqCHDSo0KqYbbxJ04887Kbwpfti
-	0Gp3yGn2hQMtxrs/LsUJF1Og9wOBbd+ngreQ61cShlleOPudfqHrZDjBvzoae3X0BaBg/whlHQs0C
-	ki8BItsQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43346)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rDRKi-0000AY-38;
-	Wed, 13 Dec 2023 15:39:37 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rDRKk-0001cO-PC; Wed, 13 Dec 2023 15:39:38 +0000
-Date: Wed, 13 Dec 2023 15:39:38 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Harini Katakam <harini.katakam@amd.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v6 2/3] net: phy: restructure
- __phy_write/read_mmd to helper and phydev user
-Message-ID: <ZXnQOqcEvjsqK8IC@shell.armlinux.org.uk>
-References: <20231213105730.1731-1-ansuelsmth@gmail.com>
- <20231213105730.1731-2-ansuelsmth@gmail.com>
+	d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+	Content-ID:Content-Description;
+	bh=7//ZdDSj+QqrNUi/Q5v5UfWHhwMOn9RO8A+kW7pJWZQ=; b=mREbFX7lEogiXaaRoZFSpgjtu4
+	U2kQQSMGEIdblZxPKwD9cRXFhIxlM3PuImXIBkKgc3rSQr+G3fGLW5bDqTRmQgrcyrjaXM9DbVHxP
+	88/e6AhC50j/6S0VHchBBxbzoO0OvkCptkHWsT86VZ1poIfwRi2/XqbH4jhQXEKlnTUefh9K0tZ+4
+	zCh2KVyTjAFhw0Y0MHa8bA7ZFGWcbpf/+7jNYTHG0ENXa7IV3keFu2ApRDOAzXCNGr4Q1yFWndahW
+	rBC8hinUHvTkMz+mcSreDQH0rpgbV1GGrpkLiKCMT8NjBYOtXY1iTk69JU4K4pWRSTCGtVW6TdMT1
+	a2UIsAykP8NsCkVNzYnyKoSUWwNv4ft9or7ZIBjDQGFWYYiH/1kLHBQRzkDNmJYWzfWMgxmpTlVUI
+	ePj/QII0KBGj42bsJLngP8YuA/P5i3BTF7q1f8/lKfivAycXf7SoR/LxQqh5ghWGGKNf7jtW/EirZ
+	Uo5gEb5Jrlc07sOFDpGn9jIUNEqOv+diInVfAzlFEAd+C7CPOduxkhfokH6IyEozwa3voZ152z8Ry
+	BlqMDUHL3OdAcOGmk4zT4Mx6CtZdMh3d4aheBcTdcfkh5d1kMTSJ7NEC0JkUyJIQ188GoYJ+aYml5
+	4fTneTZgDYIsW3C8FGbVlAXu47ughRBAS2T0PTGZ8=;
+From: Christian Schoenebeck <linux_oss@crudebyte.com>
+To: Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>,
+ David Howells <dhowells@redhat.com>
+Cc: David Howells <dhowells@redhat.com>, Matthew Wilcox <willy@infradead.org>,
+ Marc Dionne <marc.dionne@auristor.com>, Paulo Alcantara <pc@manguebit.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+ Dominique Martinet <asmadeus@codewreck.org>,
+ Eric Van Hensbergen <ericvh@kernel.org>, Ilya Dryomov <idryomov@gmail.com>,
+ Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
+ linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+ linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Latchesar Ionkov <lucho@ionkov.net>
+Subject: Re: [PATCH v4 39/39] 9p: Use netfslib read/write_iter
+Date: Wed, 13 Dec 2023 16:39:54 +0100
+Message-ID: <189166113.2PRW8NTP99@silver>
+In-Reply-To: <20231213152350.431591-40-dhowells@redhat.com>
+References:
+ <20231213152350.431591-1-dhowells@redhat.com>
+ <20231213152350.431591-40-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231213105730.1731-2-ansuelsmth@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Dec 13, 2023 at 11:57:29AM +0100, Christian Marangi wrote:
-> Restructure phy_write_mmd and phy_read_mmd to implement generic helper
-> for direct mdiobus access for mmd and use these helper for phydev user.
+On Wednesday, December 13, 2023 4:23:49 PM CET David Howells wrote:
+> Use netfslib's read and write iteration helpers, allowing netfslib to take
+> over the management of the page cache for 9p files and to manage local disk
+> caching.  In particular, this eliminates write_begin, write_end, writepage
+> and all mentions of struct page and struct folio from 9p.
 > 
-> This is needed in preparation of PHY package API that requires generic
-> access to the mdiobus and are deatched from phydev struct but instead
-> access them based on PHY package base_addr and offsets.
+> Note that netfslib now offers the possibility of write-through caching if
+> that is desirable for 9p: just set the NETFS_ICTX_WRITETHROUGH flag in
+> v9inode->netfs.flags in v9fs_set_netfs_context().
 > 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> Note also this is untested as I can't get ganesha.nfsd to correctly parse
+> the config to turn on 9p support.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Do you have a chance to test this 9p patch with QEMU instead maybe?
 
-Thanks!
+/Christian
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
 
