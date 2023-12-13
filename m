@@ -1,324 +1,127 @@
-Return-Path: <netdev+bounces-56791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-56795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52778810DCD
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 11:02:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EB1A810DEA
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 11:08:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88F40B20C2D
-	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 10:02:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 087721F2109C
+	for <lists+netdev@lfdr.de>; Wed, 13 Dec 2023 10:08:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3252209F;
-	Wed, 13 Dec 2023 10:01:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93BF22231F;
+	Wed, 13 Dec 2023 10:08:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="BEIll5Vo"
+	dkim=pass (2048-bit key) header.d=pmachata.org header.i=@pmachata.org header.b="Yjijo1rU"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id B1B3E83;
-	Wed, 13 Dec 2023 02:01:54 -0800 (PST)
-Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
-	by linux.microsoft.com (Postfix) with ESMTPSA id D9FAC20B74C0;
-	Wed, 13 Dec 2023 02:01:53 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D9FAC20B74C0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1702461713;
-	bh=W76rnqlsU93altV/2qDWt6+X+GwQAHiWQz5/saK9YpA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=BEIll5Vo3uXoX3e04Vuj3HajXdbhmOkMB/PmrDnLfOK5t3VQbVawsSsp0xoJ//UvQ
-	 qtSxCc3FMfwaXE3qOD6NiJhmwsxq+E+kOIvulaCUV2qY509ZEGGQKsDMlUFdFcMW/V
-	 IPwH7SI3iR3BqrIJQuN4cexjtEGvKFGVbiyykiQE=
-From: Konstantin Taranov <kotaranov@linux.microsoft.com>
-To: kotaranov@microsoft.com,
-	kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	kuba@kernel.org,
-	leon@kernel.org,
-	decui@microsoft.com,
-	edumazet@google.com,
-	cai.huoqing@linux.dev,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	longli@microsoft.com
-Cc: linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH for-next v2] net: mana: add msix index sharing between EQs
-Date: Wed, 13 Dec 2023 02:01:47 -0800
-Message-Id: <1702461707-2692-1-git-send-email-kotaranov@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28E72D5
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 02:08:03 -0800 (PST)
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4SqrlK06hsz9sps;
+	Wed, 13 Dec 2023 11:07:57 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pmachata.org;
+	s=MBO0001; t=1702462077;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tsQLLRpnDsVMTVYA/DDMG6+HfwCM1AaQi256XlTClvE=;
+	b=Yjijo1rUyGlx6McYjDVdAhqExki4aGo0QRnIBaOlx6+HCEqNnTYA7txe7XbDIb1mRxK+YX
+	Dp8hA02G4W9cFvASklgp/WgEYuaSV3Q4sG6JcxAoj45NNrDs+Y8k0P2WjsvoM/kiXnaA6g
+	30UM6V6+KZZUN/OMUjxNzyKGR2TBkzB5ctPaLbRFJeJV174ksDnYKqJ972+ykhHLVAHqGl
+	6V8QZW/globGLxtLnVibhy7imNFKfzsoz5HhSUAFHLlOiUoabGxK2Rdnq/sx/puu5A4j7g
+	4Lo9ZJznpSXQ1uLlbryk03L3EVPLJyzanmsUOUj+APDNcFd6XR89ZRVKUQaMSw==
+References: <a1c56680a5041ae337a6a44a7091bd8f781c1970.1702295081.git.petrm@nvidia.com>
+ <ZXcERjbKl2JFClEz@Laptop-X1> <87fs07mi0w.fsf@nvidia.com>
+ <ZXi_veDs_NMDsFrD@d3>
+From: Petr Machata <me@pmachata.org>
+To: Benjamin Poirier <benjamin.poirier@gmail.com>
+Cc: Petr Machata <petrm@nvidia.com>, Hangbin Liu <liuhangbin@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, Shuah Khan
+ <shuah@kernel.org>, mlxsw@nvidia.com, Jonathan Toppins
+ <jtoppins@redhat.com>
+Subject: Re: [PATCH net-next] selftests: forwarding: Import top-level lib.sh
+ through $lib_dir
+Date: Wed, 13 Dec 2023 11:03:06 +0100
+In-reply-to: <ZXi_veDs_NMDsFrD@d3>
+Message-ID: <877climn45.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain
 
-From: Konstantin Taranov <kotaranov@microsoft.com>
 
-This patch allows to assign and poll more than one EQ on the same
-msix index.
-It is achieved by introducing a list of attached EQs in each IRQ context.
-It also removes the existing msix_index map that tried to ensure that there
-is only one EQ at each msix_index.
-This patch exports symbols for creating EQs from other MANA kernel modules.
+Benjamin Poirier <benjamin.poirier@gmail.com> writes:
 
-Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
----
-V1 -> V2: removed msix_index map and improved thread-safety of rcu lists
----
- .../net/ethernet/microsoft/mana/gdma_main.c   | 76 +++++++++----------
- .../net/ethernet/microsoft/mana/hw_channel.c  |  1 +
- drivers/net/ethernet/microsoft/mana/mana_en.c |  1 +
- include/net/mana/gdma.h                       |  7 +-
- 4 files changed, 43 insertions(+), 42 deletions(-)
+> On 2023-12-12 18:22 +0100, Petr Machata wrote:
+>> 
+>> Hangbin Liu <liuhangbin@gmail.com> writes:
+>> 
+>> > On Mon, Dec 11, 2023 at 01:01:06PM +0100, Petr Machata wrote:
+>> >
+>> >> @@ -38,7 +38,7 @@ if [[ -f $relative_path/forwarding.config ]]; then
+>> >>  	source "$relative_path/forwarding.config"
+>> >>  fi
+>> >>  
+>> >> -source ../lib.sh
+>> >> +source ${lib_dir-.}/../lib.sh
+>> >>  ##############################################################################
+>> >>  # Sanity checks
+>> >
+>> > Hi Petr,
+>> >
+>> > Thanks for the report. However, this doesn't fix the soft link scenario. e.g.
+>> > The bonding tests tools/testing/selftests/drivers/net/bonding add a soft link
+>> > net_forwarding_lib.sh and source it directly in dev_addr_lists.sh.
+>> 
+>> I see, I didn't realize those exist.
+>> 
+>> > So how about something like:
+>> >
+>> > diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+>> > index 8f6ca458af9a..7f90248e05d6 100755
+>> > --- a/tools/testing/selftests/net/forwarding/lib.sh
+>> > +++ b/tools/testing/selftests/net/forwarding/lib.sh
+>> > @@ -38,7 +38,8 @@ if [[ -f $relative_path/forwarding.config ]]; then
+>> >         source "$relative_path/forwarding.config"
+>> >  fi
+>> >
+>> > -source ../lib.sh
+>> > +forwarding_dir=$(dirname $(readlink -f $BASH_SOURCE))
+>> > +source ${forwarding_dir}/../lib.sh
+>> 
+>> Yep, that's gonna work.
+>> I'll pass through our tests and send later this week.
+>
+> There is also another related issue which is that generating a test
+> archive using gen_tar for the tests under drivers/net/bonding does not
+> include the new lib.sh. This is similar to the issue reported here:
+> https://lore.kernel.org/netdev/40f04ded-0c86-8669-24b1-9a313ca21076@redhat.com/
+>
+> /tmp/x# ./run_kselftest.sh
+> TAP version 13
+> [...]
+> # timeout set to 120
+> # selftests: drivers/net/bonding: dev_addr_lists.sh
+> # ./net_forwarding_lib.sh: line 41: ../lib.sh: No such file or directory
+> # TEST: bonding cleanup mode active-backup                            [ OK ]
+> # TEST: bonding cleanup mode 802.3ad                                  [ OK ]
+> # TEST: bonding LACPDU multicast address to slave (from bond down)    [ OK ]
+> # TEST: bonding LACPDU multicast address to slave (from bond up)      [ OK ]
+> ok 4 selftests: drivers/net/bonding: dev_addr_lists.sh
+> [...]
 
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 6367de0..a686301 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -414,8 +414,12 @@ static void mana_gd_process_eq_events(void *arg)
- 
- 		old_bits = (eq->head / num_eqe - 1) & GDMA_EQE_OWNER_MASK;
- 		/* No more entries */
--		if (owner_bits == old_bits)
-+		if (owner_bits == old_bits) {
-+			/* return here without ringing the doorbell */
-+			if (i == 0)
-+				return;
- 			break;
-+		}
- 
- 		new_bits = (eq->head / num_eqe) & GDMA_EQE_OWNER_MASK;
- 		if (owner_bits != new_bits) {
-@@ -445,42 +449,29 @@ static int mana_gd_register_irq(struct gdma_queue *queue,
- 	struct gdma_dev *gd = queue->gdma_dev;
- 	struct gdma_irq_context *gic;
- 	struct gdma_context *gc;
--	struct gdma_resource *r;
- 	unsigned int msi_index;
- 	unsigned long flags;
- 	struct device *dev;
- 	int err = 0;
- 
- 	gc = gd->gdma_context;
--	r = &gc->msix_resource;
- 	dev = gc->dev;
-+	msi_index = spec->eq.msix_index;
- 
--	spin_lock_irqsave(&r->lock, flags);
--
--	msi_index = find_first_zero_bit(r->map, r->size);
--	if (msi_index >= r->size || msi_index >= gc->num_msix_usable) {
-+	if (msi_index >= gc->num_msix_usable) {
- 		err = -ENOSPC;
--	} else {
--		bitmap_set(r->map, msi_index, 1);
--		queue->eq.msix_index = msi_index;
--	}
--
--	spin_unlock_irqrestore(&r->lock, flags);
--
--	if (err) {
--		dev_err(dev, "Register IRQ err:%d, msi:%u rsize:%u, nMSI:%u",
--			err, msi_index, r->size, gc->num_msix_usable);
-+		dev_err(dev, "Register IRQ err:%d, msi:%u nMSI:%u",
-+			err, msi_index, gc->num_msix_usable);
- 
- 		return err;
- 	}
- 
-+	queue->eq.msix_index = msi_index;
- 	gic = &gc->irq_contexts[msi_index];
- 
--	WARN_ON(gic->handler || gic->arg);
--
--	gic->arg = queue;
--
--	gic->handler = mana_gd_process_eq_events;
-+	spin_lock_irqsave(&gic->lock, flags);
-+	list_add_rcu(&queue->entry, &gic->eq_list);
-+	spin_unlock_irqrestore(&gic->lock, flags);
- 
- 	return 0;
- }
-@@ -490,12 +481,11 @@ static void mana_gd_deregiser_irq(struct gdma_queue *queue)
- 	struct gdma_dev *gd = queue->gdma_dev;
- 	struct gdma_irq_context *gic;
- 	struct gdma_context *gc;
--	struct gdma_resource *r;
- 	unsigned int msix_index;
- 	unsigned long flags;
-+	struct gdma_queue *eq;
- 
- 	gc = gd->gdma_context;
--	r = &gc->msix_resource;
- 
- 	/* At most num_online_cpus() + 1 interrupts are used. */
- 	msix_index = queue->eq.msix_index;
-@@ -503,14 +493,17 @@ static void mana_gd_deregiser_irq(struct gdma_queue *queue)
- 		return;
- 
- 	gic = &gc->irq_contexts[msix_index];
--	gic->handler = NULL;
--	gic->arg = NULL;
--
--	spin_lock_irqsave(&r->lock, flags);
--	bitmap_clear(r->map, msix_index, 1);
--	spin_unlock_irqrestore(&r->lock, flags);
-+	spin_lock_irqsave(&gic->lock, flags);
-+	list_for_each_entry_rcu(eq, &gic->eq_list, entry) {
-+		if (queue == eq) {
-+			list_del_rcu(&eq->entry);
-+			break;
-+		}
-+	}
-+	spin_unlock_irqrestore(&gic->lock, flags);
- 
- 	queue->eq.msix_index = INVALID_PCI_MSIX_INDEX;
-+	synchronize_rcu();
- }
- 
- int mana_gd_test_eq(struct gdma_context *gc, struct gdma_queue *eq)
-@@ -588,6 +581,7 @@ static int mana_gd_create_eq(struct gdma_dev *gd,
- 	int err;
- 
- 	queue->eq.msix_index = INVALID_PCI_MSIX_INDEX;
-+	queue->id = INVALID_QUEUE_ID;
- 
- 	log2_num_entries = ilog2(queue->queue_size / GDMA_EQE_SIZE);
- 
-@@ -819,6 +813,7 @@ free_q:
- 	kfree(queue);
- 	return err;
- }
-+EXPORT_SYMBOL_NS(mana_gd_create_mana_eq, NET_MANA);
- 
- int mana_gd_create_mana_wq_cq(struct gdma_dev *gd,
- 			      const struct gdma_queue_spec *spec,
-@@ -895,6 +890,7 @@ void mana_gd_destroy_queue(struct gdma_context *gc, struct gdma_queue *queue)
- 	mana_gd_free_memory(gmi);
- 	kfree(queue);
- }
-+EXPORT_SYMBOL_NS(mana_gd_destroy_queue, NET_MANA);
- 
- int mana_gd_verify_vf_version(struct pci_dev *pdev)
- {
-@@ -1217,9 +1213,14 @@ int mana_gd_poll_cq(struct gdma_queue *cq, struct gdma_comp *comp, int num_cqe)
- static irqreturn_t mana_gd_intr(int irq, void *arg)
- {
- 	struct gdma_irq_context *gic = arg;
-+	struct list_head *eq_list = &gic->eq_list;
-+	struct gdma_queue *eq;
- 
--	if (gic->handler)
--		gic->handler(gic->arg);
-+	rcu_read_lock();
-+	list_for_each_entry_rcu(eq, eq_list, entry) {
-+		gic->handler(eq);
-+	}
-+	rcu_read_unlock();
- 
- 	return IRQ_HANDLED;
- }
-@@ -1271,8 +1272,9 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
- 
- 	for (i = 0; i < nvec; i++) {
- 		gic = &gc->irq_contexts[i];
--		gic->handler = NULL;
--		gic->arg = NULL;
-+		gic->handler = mana_gd_process_eq_events;
-+		INIT_LIST_HEAD(&gic->eq_list);
-+		spin_lock_init(&gic->lock);
- 
- 		if (!i)
- 			snprintf(gic->name, MANA_IRQ_NAME_SZ, "mana_hwc@pci:%s",
-@@ -1295,10 +1297,6 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
- 		irq_set_affinity_and_hint(irq, cpumask_of(cpu));
- 	}
- 
--	err = mana_gd_alloc_res_map(nvec, &gc->msix_resource);
--	if (err)
--		goto free_irq;
--
- 	gc->max_num_msix = nvec;
- 	gc->num_msix_usable = nvec;
- 
-@@ -1329,8 +1327,6 @@ static void mana_gd_remove_irqs(struct pci_dev *pdev)
- 	if (gc->max_num_msix < 1)
- 		return;
- 
--	mana_gd_free_res_map(&gc->msix_resource);
--
- 	for (i = 0; i < gc->max_num_msix; i++) {
- 		irq = pci_irq_vector(pdev, i);
- 		if (irq < 0)
-diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-index 9d1cd3b..2729a2c 100644
---- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
-+++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-@@ -300,6 +300,7 @@ static int mana_hwc_create_gdma_eq(struct hw_channel_context *hwc,
- 	spec.eq.context = ctx;
- 	spec.eq.callback = cb;
- 	spec.eq.log2_throttle_limit = DEFAULT_LOG2_THROTTLING_FOR_ERROR_EQ;
-+	spec.eq.msix_index = 0;
- 
- 	return mana_gd_create_hwc_queue(hwc->gdma_dev, &spec, queue);
- }
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index fc3d290..2c04bdb 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -1244,6 +1244,7 @@ static int mana_create_eq(struct mana_context *ac)
- 	spec.eq.log2_throttle_limit = LOG2_EQ_THROTTLE;
- 
- 	for (i = 0; i < gc->max_num_queues; i++) {
-+		spec.eq.msix_index = (i + 1) % gc->num_msix_usable;
- 		err = mana_gd_create_mana_eq(gd, &spec, &ac->eqs[i].eq);
- 		if (err)
- 			goto out;
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index 88b6ef7..76f2fd2 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -293,6 +293,7 @@ struct gdma_queue {
- 
- 	u32 head;
- 	u32 tail;
-+	struct list_head entry;
- 
- 	/* Extra fields specific to EQ/CQ. */
- 	union {
-@@ -328,6 +329,7 @@ struct gdma_queue_spec {
- 			void *context;
- 
- 			unsigned long log2_throttle_limit;
-+			unsigned int msix_index;
- 		} eq;
- 
- 		struct {
-@@ -344,7 +346,9 @@ struct gdma_queue_spec {
- 
- struct gdma_irq_context {
- 	void (*handler)(void *arg);
--	void *arg;
-+	/* Protect the eq_list */
-+	spinlock_t lock;
-+	struct list_head eq_list;
- 	char name[MANA_IRQ_NAME_SZ];
- };
- 
-@@ -355,7 +359,6 @@ struct gdma_context {
- 	unsigned int		max_num_queues;
- 	unsigned int		max_num_msix;
- 	unsigned int		num_msix_usable;
--	struct gdma_resource	msix_resource;
- 	struct gdma_irq_context	*irq_contexts;
- 
- 	/* L2 MTU */
--- 
-2.43.0
-
+The issue is that the symlink becomes a text file during install, and
+readlink on that file then becomes a nop. Maybe the bonding tests should
+include net/forwarding/lib.sh through a relative path like other tests
+in drivers/, instead of this symlink business?
 
