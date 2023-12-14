@@ -1,107 +1,87 @@
-Return-Path: <netdev+bounces-57318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C839812DFE
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:01:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B36E1812E7A
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:25:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FA4E1C21550
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:01:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68EEA1F2151F
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:25:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE91F3E475;
-	Thu, 14 Dec 2023 11:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BB803FB24;
+	Thu, 14 Dec 2023 11:25:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sgeHfjBH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d2kFqja5"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 396971A3;
-	Thu, 14 Dec 2023 03:01:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Popi+890fZ1lHbXbLEHSlXolpjJo3sDNBxoaukvvxzM=; b=sgeHfjBHWSa4Ai8ohwsLkr9bLX
-	exGWirdgfG0oHmhTbF3/gok3kfORbPiMrVHzOqnkjt7M4Ix3XQTMImnSyqz4idtzHLbs+Ydb+yLyd
-	Y4ECRzgfFoX7137PTSav157ABqjC3u3JaqNHd3GCIaPUaRN/LOYEOujiIYlpnUJlve4c=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rDjT4-002ul8-GY; Thu, 14 Dec 2023 12:01:26 +0100
-Date: Thu, 14 Dec 2023 12:01:26 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Luo Jie <quic_luoj@quicinc.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	hkallweit1@gmail.com, linux@armlinux.org.uk, corbet@lwn.net,
-	p.zabel@pengutronix.de, f.fainelli@gmail.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v7 03/14] net: phy: at803x: add QCA8084 ethernet phy
- support
-Message-ID: <c05e4756-0b33-4c97-ba88-1e14f459bbe3@lunn.ch>
-References: <20231214094813.24690-1-quic_luoj@quicinc.com>
- <20231214094813.24690-4-quic_luoj@quicinc.com>
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFEC3BD
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 03:25:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702553104; x=1734089104;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=qWNU/qKUCy72Z2wZf+28srtB/TxNz/lfvuv54u997mQ=;
+  b=d2kFqja5/RiiyqBrm/Pmmg0ea7IWV4KZR3GcitANazU4FaAHE8TWSvCY
+   /im13/T96hUViPLGoAE1/SEnn2lVuYD67cQd0jg899KRpH3ccQQUD5DPr
+   lcNC5XKMRTavvnfuMAsJ12xE5P+tSYBP72mMP3nRSj0Y0CeKHZPqnfdBs
+   skXuVqaTrdmCBApWIy4c/wn7wIu/dOAKmVkYV308/YsmSmjby5eg1gPgC
+   04pmedXbmOiJ7guF7fq2OkB0t/z3mZdV4lKOcrABwFjlsnV/nea3772Us
+   FZblM6R3iSFVCxddI+x/QxKzCU6meGArqAZEEKMkHCB5NFrypJfFX7y9v
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10923"; a="393977386"
+X-IronPort-AV: E=Sophos;i="6.04,275,1695711600"; 
+   d="scan'208";a="393977386"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 03:25:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10923"; a="750503271"
+X-IronPort-AV: E=Sophos;i="6.04,275,1695711600"; 
+   d="scan'208";a="750503271"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orsmga006.jf.intel.com with ESMTP; 14 Dec 2023 03:25:02 -0800
+Received: from lplachno-mobl.ger.corp.intel.com (lplachno-mobl.ger.corp.intel.com [10.249.145.51])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 2D0313A3C8;
+	Thu, 14 Dec 2023 11:25:01 +0000 (GMT)
+From: Lukasz Plachno <lukasz.plachno@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Lukasz Plachno <lukasz.plachno@intel.com>
+Subject: [PATCH iwl-next v3 0/2] ice: Support flow director ether type filters
+Date: Thu, 14 Dec 2023 05:34:47 +0100
+Message-Id: <20231214043449.15835-1-lukasz.plachno@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231214094813.24690-4-quic_luoj@quicinc.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 14, 2023 at 05:48:02PM +0800, Luo Jie wrote:
-> Add qca8084 PHY support, which is four-port PHY with maximum
-> link capability 2.5G, the features of each port is almost same
-> as QCA8081 and slave seed config is not needed.
-> 
-> Three kind of interface modes supported by qca8084.
-> PHY_INTERFACE_MODE_10G_QXGMII, PHY_INTERFACE_MODE_2500BASEX and
-> PHY_INTERFACE_MODE_SGMII.
-> 
-> The PCS(serdes) and clock are also needed to be configured to
-> bringup qca8084 PHY, which will be added in the pcs driver.
-> 
-> The additional CDT configurations used for qca8084.
-> 
-> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
-> ---
->  drivers/net/phy/at803x.c | 49 ++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 49 insertions(+)
-> 
-> diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
-> index 37fb033e1c29..8dfdf2ff56a5 100644
-> --- a/drivers/net/phy/at803x.c
-> +++ b/drivers/net/phy/at803x.c
-> @@ -176,6 +176,7 @@
->  #define AT8030_PHY_ID_MASK			0xffffffef
->  
->  #define QCA8081_PHY_ID				0x004dd101
-> +#define QCA8084_PHY_ID				0x004dd180
->  
->  #define QCA8327_A_PHY_ID			0x004dd033
->  #define QCA8327_B_PHY_ID			0x004dd034
-> @@ -1760,6 +1761,9 @@ static bool qca808x_is_prefer_master(struct phy_device *phydev)
->  
->  static bool qca808x_has_fast_retrain_or_slave_seed(struct phy_device *phydev)
->  {
-> +	if (phydev_id_compare(phydev, QCA8084_PHY_ID))
-> +		return false;
-> +
->  	return linkmode_test_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, phydev->supported);
->  }
+Ethtool allows creating rules with type=ether, add support for such
+filters in ice driver.
+Patch 1 allows extending ice_fdir_comp_rules() with handling additional
+type of filters.
 
+v3: fixed possible use of uninitialized variable "perfect_filter"
+v2: fixed compilation warning by moving default: case between commits
 
-It looks like these patches need rebasing on net-next/main. It appears
-you are missing Christians patches.
+Jakub Buchocki (1):
+  ice: Implement 'flow-type ether' rules
 
+Lukasz Plachno (1):
+  ice: Remove unnecessary argument from ice_fdir_comp_rules()
 
-    Andrew
+ .../net/ethernet/intel/ice/ice_ethtool_fdir.c | 128 +++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_fdir.c     | 112 ++++++++-------
+ drivers/net/ethernet/intel/ice/ice_fdir.h     |  11 ++
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ 4 files changed, 205 insertions(+), 47 deletions(-)
 
----
-pw-bot: cr
+-- 
+2.34.1
+
 
