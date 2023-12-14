@@ -1,173 +1,196 @@
-Return-Path: <netdev+bounces-57452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D2398131A0
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:31:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C5A28131B4
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:37:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85A40B20E8D
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:31:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4E8C1F221F2
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:37:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B80E56473;
-	Thu, 14 Dec 2023 13:31:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2943C56B61;
+	Thu, 14 Dec 2023 13:37:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dXPQ9RFD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YsCoIcZl"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF0C0114
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 05:31:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702560673;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FhDJJg4/pl3h7/mBVAHcUZIMYz0zIwkzbR3me6ootLo=;
-	b=dXPQ9RFDqbgpm1kNlzP9im8G7Gf57ftxu3UvhfUTqyp/12gE36fr7e7m7dWPYmaNaLVduI
-	xhc6pejFO5574VymcdNI2AIYAttfwJIa19CPw28SV1862dgJRRZSld/g0GzznTYQ+VYzgZ
-	I27AX/YCfuz6A/42lmo51xlIek61hQQ=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-688--oHIsoBzO1WpfYQt12tRBw-1; Thu, 14 Dec 2023 08:31:11 -0500
-X-MC-Unique: -oHIsoBzO1WpfYQt12tRBw-1
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1d379a01995so1219075ad.2
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 05:31:11 -0800 (PST)
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A033111;
+	Thu, 14 Dec 2023 05:36:56 -0800 (PST)
+Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-32f8441dfb5so7373326f8f.0;
+        Thu, 14 Dec 2023 05:36:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702561015; x=1703165815; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6S2+AU1W7+DGowTp+6xRDiKLzpMDOMD4cB5epYgiBJA=;
+        b=YsCoIcZlpgEbD91G0hPIliOu/4DFbJ7khNODY6WSu8F3WrryH7s8P+i3ymxUqcHRmb
+         RSSH1EWk6YY5GrdIIXe8umLG/vLRAi81ZX2ydfkF2X/G+Bap3+5IxOQTMwNkl+6p1y2g
+         M3Uyp2YHgX9MDDJHi08SnXW6lQu+9ONnVQeXrdoIklYda/yWZNaUSqk1zjRcHiUsQN09
+         ypyfluRsRw0XQHNgzUfJpFEeMryYB1q1DeKznTjGpJ0HEMlDotSPu7HBcuHJgXLNL5hR
+         dadnI/Hbsj1GRBILAyKjTeXIKJ7BaXlcH2lOCcaZ8mJ2KV8+w9R8jW9+GrfjYtZB48r8
+         jQiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702560671; x=1703165471;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=FhDJJg4/pl3h7/mBVAHcUZIMYz0zIwkzbR3me6ootLo=;
-        b=mY+K6cJdGl8yHJgaRCFfDg5zPRy84pog+GAblbZMM3Rw3lZ/eX9q6QgsIsR50hU9sZ
-         pKeTM/exnGMLxoR/WAw4z4Xjg0/BBrhiWycB6D8BP9PHgjdXI7w5GPruNqjv0EFNlHh6
-         LjHm9uWwz6+57chj+e+mJVs2oO41UMVSSjnH5v7rJ59DIzBZT8rxwxlV6wR0LTtjOuLj
-         ugDwvnYUEj+dInZQN6Nw8Oa7xikuMFvsvxOBgAiJZHDcrN/eMR/tQebZ9zpIa34mhlo3
-         GfQe6yywIP60Kib1L99TyS2foEvbtXnQggvXMxMfJZ1BaXz0l5CuIaxa86KznUMsCz6n
-         XYlw==
-X-Gm-Message-State: AOJu0YyhSBsTx6bnZ9INN7tJwfpbzANeybvKIBM0/ZSVJs50Hfi3HWOD
-	RN8tocLlOgIO2bJyP59WwQGE9vfxLECoi6G3K6duz1kXsozPyIPMpz7H3bU2oWe0vRGVS57ba+q
-	+hSXD0Y3EffXHsDXD
-X-Received: by 2002:a17:902:704c:b0:1d0:ba40:b0e1 with SMTP id h12-20020a170902704c00b001d0ba40b0e1mr9807091plt.124.1702560670769;
-        Thu, 14 Dec 2023 05:31:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGvzQXchsfgSrtil39BRsvRrN20J5DTpVZDJweM/m8itxlUXPPJj5M/aYG+sgscJd5tcBM09Q==
-X-Received: by 2002:a17:902:704c:b0:1d0:ba40:b0e1 with SMTP id h12-20020a170902704c00b001d0ba40b0e1mr9807081plt.124.1702560670453;
-        Thu, 14 Dec 2023 05:31:10 -0800 (PST)
-Received: from localhost ([240d:1a:c0d:9f00:3342:3fe3:7275:954])
-        by smtp.gmail.com with ESMTPSA id w13-20020a170902e88d00b001d087f68ef8sm1365993plg.37.2023.12.14.05.31.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 05:31:09 -0800 (PST)
-Date: Thu, 14 Dec 2023 22:31:06 +0900 (JST)
-Message-Id: <20231214.223106.2284573595890480656.syoshida@redhat.com>
-To: kuniyu@amazon.com
-Cc: davem@davemloft.net, kuba@kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com,
- syzbot+c71bc336c5061153b502@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] net: Return error from sk_stream_wait_connect() if
- sk_wait_event() fails
-From: Shigeru Yoshida <syoshida@redhat.com>
-In-Reply-To: <20231214084622.15054-1-kuniyu@amazon.com>
-References: <20231214050922.3480023-1-syoshida@redhat.com>
-	<20231214084622.15054-1-kuniyu@amazon.com>
-X-Mailer: Mew version 6.9 on Emacs 29.1
+        d=1e100.net; s=20230601; t=1702561015; x=1703165815;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6S2+AU1W7+DGowTp+6xRDiKLzpMDOMD4cB5epYgiBJA=;
+        b=aLdGaFmw67zngrbDolOUPZ2dbGmUcjZMgh0fWUnxBF6U+65ErKlYitbaHWzWQH3sI4
+         dR6BAnghe1jWI9Jnoe7YjQCL+6JNa6MKOWRtL0rkTunDeIdeby7kP/0tlU0VlVipUQD7
+         4GbMOO2akMgur378BtzAB5H1Olz5I9dlb0MXOnlddsIhyB5cpnTXBW3I//RpIRI/98lh
+         6iOxKi0wwFV5QmsYDUze9z0ron5ENiwP+w9XauxHXXQnSKc4sUvbKyMGsmkIL+X+33Kn
+         mJLoBvYe3wAp2yvo4/ZRGeKTjylyb/tIHQK5eMD6CoF1yd7kOnHn31+8hZGid5yuZant
+         b1zg==
+X-Gm-Message-State: AOJu0YyDJ6Lt8M4+WEHxYnj/13XSCfzpU6BnLqrHSebtPI3Zwa1Otujm
+	ygQxLo4TUBLEZ86fbj0mIsavz0QeK//bN+GKfaE=
+X-Google-Smtp-Source: AGHT+IHoAnSXH6VL2+jFHotZlpX2frkhvp7d85GQIlKqay5gsslFEaKZdbkSq7mjO1ppywoG3BXsuLxJ9SOYsZJ0l1c=
+X-Received: by 2002:adf:f412:0:b0:336:3434:7a6e with SMTP id
+ g18-20020adff412000000b0033634347a6emr2237437wro.131.1702561014531; Thu, 14
+ Dec 2023 05:36:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20231214130007.33281-1-tushar.vyavahare@intel.com> <ZXsBx31uOqyrfDvD@boxer>
+In-Reply-To: <ZXsBx31uOqyrfDvD@boxer>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Thu, 14 Dec 2023 05:36:42 -0800
+Message-ID: <CAADnVQLEXLO-5CHcY3mVPjtLq7TCgkyYXpqm73aakBCdr3Kg4w@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2] selftests/xsk: fix for SEND_RECEIVE_UNALIGNED test
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Tushar Vyavahare <tushar.vyavahare@intel.com>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	"Karlsson, Magnus" <magnus.karlsson@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	"Sarkar, Tirthendu" <tirthendu.sarkar@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Dec 14, 2023 at 5:23=E2=80=AFAM Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> On Thu, Dec 14, 2023 at 01:00:07PM +0000, Tushar Vyavahare wrote:
+>
+> I think target tree should be bpf, not bpf-next
 
-On Thu, 14 Dec 2023 17:46:22 +0900, Kuniyuki Iwashima wrote:
-> From: Shigeru Yoshida <syoshida@redhat.com>
-> Date: Thu, 14 Dec 2023 14:09:22 +0900
->> The following NULL pointer dereference issue occurred:
->> 
->> BUG: kernel NULL pointer dereference, address: 0000000000000000
->> <...>
->> RIP: 0010:ccid_hc_tx_send_packet net/dccp/ccid.h:166 [inline]
->> RIP: 0010:dccp_write_xmit+0x49/0x140 net/dccp/output.c:356
->> <...>
->> Call Trace:
->>  <TASK>
->>  dccp_sendmsg+0x642/0x7e0 net/dccp/proto.c:801
->>  inet_sendmsg+0x63/0x90 net/ipv4/af_inet.c:846
->>  sock_sendmsg_nosec net/socket.c:730 [inline]
->>  __sock_sendmsg+0x83/0xe0 net/socket.c:745
->>  ____sys_sendmsg+0x443/0x510 net/socket.c:2558
->>  ___sys_sendmsg+0xe5/0x150 net/socket.c:2612
->>  __sys_sendmsg+0xa6/0x120 net/socket.c:2641
->>  __do_sys_sendmsg net/socket.c:2650 [inline]
->>  __se_sys_sendmsg net/socket.c:2648 [inline]
->>  __x64_sys_sendmsg+0x45/0x50 net/socket.c:2648
->>  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
->>  do_syscall_64+0x43/0x110 arch/x86/entry/common.c:82
->>  entry_SYSCALL_64_after_hwframe+0x63/0x6b
->> 
->> sk_wait_event() returns an error (-EPIPE) if disconnect() is called on the
->> socket waiting for the event. However, sk_stream_wait_connect() returns
->> success, i.e. zero, even if sk_wait_event() returns -EPIPE, so a function
->> that waits for a connection with sk_stream_wait_connect() may misbehave.
->> 
->> In the case of the above DCCP issue, dccp_sendmsg() is waiting for the
->> connection. If disconnect() is called in concurrently, the above issue
->> occurs.
->> 
->> This patch fixes the issue by returning error from sk_stream_wait_connect()
->> if sk_wait_event() fails.
->> 
->> Fixes: 419ce133ab92 ("tcp: allow again tcp_disconnect() when threads are waiting")
->> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
-> 
-> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> 
-> I guess you picked this issue from syzbot's report.
-> https://lore.kernel.org/netdev/0000000000009e122006088a2b8d@google.com/
-> 
-> If so, let's give a proper credit to syzbot and its authors:
-> 
-> Reported-by: syzbot+c71bc336c5061153b502@syzkaller.appspotmail.com
+no. selftests/bpf are fine with bpf-next 99% of the time.
 
-Hi Kuniyuki-san,
-
-Thank you very much for your review. I didn't notice the syzbot's
-report. Actually, I found this issue by running syzkaller on my
-machine.
-
-Now, I tested this patch with syzbot, and it looks good.
-
-Reported-and-tested-by: syzbot+c71bc336c5061153b502@syzkaller.appspotmail.com
-
-Thanks,
-Shigeru
-
-> 
-> Thanks!
-> 
->> ---
->>  net/core/stream.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->> 
->> diff --git a/net/core/stream.c b/net/core/stream.c
->> index 96fbcb9bbb30..b16dfa568a2d 100644
->> --- a/net/core/stream.c
->> +++ b/net/core/stream.c
->> @@ -79,7 +79,7 @@ int sk_stream_wait_connect(struct sock *sk, long *timeo_p)
->>  		remove_wait_queue(sk_sleep(sk), &wait);
->>  		sk->sk_write_pending--;
->>  	} while (!done);
->> -	return 0;
->> +	return done < 0 ? done : 0;
->>  }
->>  EXPORT_SYMBOL(sk_stream_wait_connect);
->>  
->> -- 
->> 2.41.0
->> 
-> 
-
+> > Fix test broken by shared umem test and framework enhancement commit.
+> >
+> > Correct the current implementation of pkt_stream_replace_half() by
+> > ensuring that nb_valid_entries are not set to half, as this is not true
+> > for all the tests. Ensure that the expected value for valid_entries for
+> > the SEND_RECEIVE_UNALIGNED test equals the total number of packets sent=
+,
+> > which is 4096.
+> >
+> > Create a new function called pkt_stream_pkt_set() that allows for packe=
+t
+> > modification to meet specific requirements while ensuring the accurate
+> > maintenance of the valid packet count to prevent inconsistencies in pac=
+ket
+> > tracking.
+> >
+> > Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
+> > Fixes: 6d198a89c004 ("selftests/xsk: Add a test for shared umem feature=
+")
+> > Reported-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> > Signed-off-by: Tushar Vyavahare <tushar.vyavahare@intel.com>
+>
+> besides subject fix,
+>
+> Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+>
+> >
+> > ---
+> > v1->v2
+> > - Updated git commit message for better clarity as suggested in the
+> >   review. [Maciej]
+> > - Renamed pkt_valid() to set_pkt_valid() for better clarity. [Maciej]
+> > - Fixed double space issue. [Maciej]
+> > - Included Magnus's acknowledgement.
+> > - Remove the redundant part from the set_pkt_valid() if condition.
+> >   [Maciej]
+> > - remove pkt_modify().
+> > - added pkt_stream_pkt_set(). [Magnus]
+> > - renamed mod_valid to prev_pkt_valid. [Tirtha]
+> > ---
+> >  tools/testing/selftests/bpf/xskxceiver.c | 25 +++++++++++++++---------
+> >  1 file changed, 16 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/s=
+elftests/bpf/xskxceiver.c
+> > index b604c570309a..b1102ee13faa 100644
+> > --- a/tools/testing/selftests/bpf/xskxceiver.c
+> > +++ b/tools/testing/selftests/bpf/xskxceiver.c
+> > @@ -634,16 +634,24 @@ static u32 pkt_nb_frags(u32 frame_size, struct pk=
+t_stream *pkt_stream, struct pk
+> >       return nb_frags;
+> >  }
+> >
+> > +static bool set_pkt_valid(int offset, u32 len)
+> > +{
+> > +     return len <=3D MAX_ETH_JUMBO_SIZE;
+> > +}
+> > +
+> >  static void pkt_set(struct pkt_stream *pkt_stream, struct pkt *pkt, in=
+t offset, u32 len)
+> >  {
+> >       pkt->offset =3D offset;
+> >       pkt->len =3D len;
+> > -     if (len > MAX_ETH_JUMBO_SIZE) {
+> > -             pkt->valid =3D false;
+> > -     } else {
+> > -             pkt->valid =3D true;
+> > -             pkt_stream->nb_valid_entries++;
+> > -     }
+> > +     pkt->valid =3D set_pkt_valid(offset, len);
+> > +}
+> > +
+> > +static void pkt_stream_pkt_set(struct pkt_stream *pkt_stream, struct p=
+kt *pkt, int offset, u32 len)
+> > +{
+> > +     bool prev_pkt_valid =3D pkt->valid;
+> > +
+> > +     pkt_set(pkt_stream, pkt, offset, len);
+> > +     pkt_stream->nb_valid_entries +=3D pkt->valid - prev_pkt_valid;
+> >  }
+> >
+> >  static u32 pkt_get_buffer_len(struct xsk_umem_info *umem, u32 len)
+> > @@ -665,7 +673,7 @@ static struct pkt_stream *__pkt_stream_generate(u32=
+ nb_pkts, u32 pkt_len, u32 nb
+> >       for (i =3D 0; i < nb_pkts; i++) {
+> >               struct pkt *pkt =3D &pkt_stream->pkts[i];
+> >
+> > -             pkt_set(pkt_stream, pkt, 0, pkt_len);
+> > +             pkt_stream_pkt_set(pkt_stream, pkt, 0, pkt_len);
+> >               pkt->pkt_nb =3D nb_start + i * nb_off;
+> >       }
+> >
+> > @@ -700,10 +708,9 @@ static void __pkt_stream_replace_half(struct ifobj=
+ect *ifobj, u32 pkt_len,
+> >
+> >       pkt_stream =3D pkt_stream_clone(ifobj->xsk->pkt_stream);
+> >       for (i =3D 1; i < ifobj->xsk->pkt_stream->nb_pkts; i +=3D 2)
+> > -             pkt_set(pkt_stream, &pkt_stream->pkts[i], offset, pkt_len=
+);
+> > +             pkt_stream_pkt_set(pkt_stream, &pkt_stream->pkts[i], offs=
+et, pkt_len);
+> >
+> >       ifobj->xsk->pkt_stream =3D pkt_stream;
+> > -     pkt_stream->nb_valid_entries /=3D 2;
+> >  }
+> >
+> >  static void pkt_stream_replace_half(struct test_spec *test, u32 pkt_le=
+n, int offset)
+> > --
+> > 2.34.1
+> >
+>
 
