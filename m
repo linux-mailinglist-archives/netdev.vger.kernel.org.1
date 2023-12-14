@@ -1,132 +1,83 @@
-Return-Path: <netdev+bounces-57520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D638813430
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:11:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD31B81342D
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:11:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2156E280CA7
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:11:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A5ED280EEA
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:11:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7714D5D904;
-	Thu, 14 Dec 2023 15:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2E625C08F;
+	Thu, 14 Dec 2023 15:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="GHuBBxfF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U+RJZv5r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D886112E;
-	Thu, 14 Dec 2023 07:10:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-	s=s31663417; t=1702566605; x=1703171405; i=wahrenst@gmx.net;
-	bh=+V6TWgFQD0QXBTOYOaUZSTtj4sBFwWacPDZFwSXHg/I=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:
-	 References;
-	b=GHuBBxfFaB6ZyTNo4lRdXOHi63HVIWERahhiNG0k3XpfiM+wWW4kqixq9tV6jI0z
-	 yFgDbRHZ0YD0p46ASx8PU6dVNiJRw2KwUF8Yp6qxOkvlW0VnMnKG85ax25QVUDyXz
-	 ajz67alULldzIzm32kZ19HpdgE51dDYA74muR+SvVMI2cnvWg0nqp56Feg50XcYD3
-	 iVyVI9jIVCnY3vZ6Zc79xspwUI/huzLrzYvAWggNwylt8Yu1J5RLfSktWd9NUVYBP
-	 LDyzDJxI5rgOxSx1l4/sK8IAVYZL4HKq4gFggK9tudv/A+8iWebaPo7jxg/ehUGy+
-	 97ughMfdCJHC9OTIXQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from stefanw-SCHENKER ([37.4.248.43]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MIwz4-1qtVJ912YE-00KQe2; Thu, 14
- Dec 2023 16:10:05 +0100
-From: Stefan Wahren <wahrenst@gmx.net>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Stefan Wahren <stefan.wahren@i2se.com>,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: [PATCH 12/12 net-next] qca_7k: Replace old mail address
-Date: Thu, 14 Dec 2023 16:09:44 +0100
-Message-Id: <20231214150944.55808-13-wahrenst@gmx.net>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231214150944.55808-1-wahrenst@gmx.net>
-References: <20231214150944.55808-1-wahrenst@gmx.net>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD0F15D8EA
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 15:10:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 00082C433CA;
+	Thu, 14 Dec 2023 15:10:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702566625;
+	bh=zdcPAZnAA+fnlDDoOYRTGowddn9N6RX9Wu2qUUDSKFw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=U+RJZv5r0gLIx1b3cdJt/uFDST4E6gp7GYxQJeBvkUc2GzO+4DjPNLFelmqSpuwWn
+	 Z0b1KPzxRPu7M4knGDGvD+M3hfJ3mxnvw/LPHA+Rn+J5ayq6MHVO3w7mjFgAU9xqut
+	 wx6ziqUtWJ2fGWpgUoqcZ6tyekdhUTOpygbSA/pfBBLlr+erR+L/8U2lq7hfNOSUT7
+	 ebgCoiHesHIsOvd1F6fDdEevhBF4xvdPuQs7QH2ur0Y1aqcZ5QvtwPchHQDSoVDs0q
+	 KZa3yvx8QSqHHxT6bgjVGbc3jLx+jsn91tktRCTIKouLnDSv6z0QXB9qQpYiTrNO6i
+	 aI+jcgLBnOcdA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D9BBCDD4EFB;
+	Thu, 14 Dec 2023 15:10:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:uCDwzQ3sQIrP/AtvuPo1Sz9yf6dROMs+l0kalkMuagerhgEeg0s
- emuIf+WS8z8St0CycyIRf5Y4qeLrKvYSBZiIXzoAyFLYsqijKMtwfvzAkBT/OWLBPlqzOvs
- gFnWj/U/wxkKAdmmr0AjenvWlxDm2hS7AuuQxzaS/tw5iUkdGAAYX72bBlBNVFfKOPEKGLc
- LGHKud9KeY6BZmQ8eLvEg==
-UI-OutboundReport: notjunk:1;M01:P0:6C6IfB+febI=;Upp/2WWO5+IRrWVvZgzBHRipSDv
- LyO+7rrTcY9lgg1YBiwTV/2Rn5ZDgtgEP9LUVeWSCqjKo7ptjF3FwQgF1kUqeI11TJHrytanE
- 0QZ8uc9jBS0ybJ75xEfpbulO1tTk+d1D8FHPxKMR5lX9R2qAPMtW2yCc0t4yzF3h3/pYzP+KR
- 2vD58kryHN0xQk99ZQlZoRlOebeRZfirsmq6hIBQlcO8PAvLbT3hHs6FesgsvfIYJDMNkX+Eg
- BcVJGEQIz3fMGSChrrwyNBHGcifiezIcXa7/RLxsdKHdFoB9J43MJTEPokb4mFfCOR7FgYFR7
- YXLipVb6DLzyneA52QNMIMDKmtQPzwobct8yLmp9lUCjEQzgUcU0wpUA3bi3w1Mm9c7pwnM6e
- KgIu1DJdG8Eerm/oQMWCDYOlZ6Q9VT5JW5NSr1DRPCIOR/yNLO7rXhi2hMfli6N9BvorTtItA
- ksoNy7A4ip97yEbNDkO+KTiDHM77GYb6fXAlAQQwsqNvLRVFRurMmWFo46AD2dLxwBinCSgd7
- Jp8Ltq11KGtL1/wQSI5BFlSfI8TTfVKyCts2SCaZOEiipjlX5jlT4cokBhVYlYT758TFiFOrr
- j8kOhGTF0N5sYrolaD/Q7BBEnB03+4tifcOJd9QkHQOpBc+SMXJaqK91r2PrjOHW9ioXpLwoL
- y1+vQhUTZS62tVCfL2sVykelyIgEFO4GvdFtcHLPsrY7VXoEtZ5fj8smyzddPsgnfPueimFgo
- IC9JJ/DqxzcSYVyvoXME8mskX0Bu0R1qakElTa3ye+TyoK6fQuGGiMknXxjAhhjMlhsk8SKQV
- FFw9MxqRSwE7MaYf8SkB0SgOUPk6RYiUb47klDaKE1s8ZqwV+s0agAyCJ+PsRQNjOu703PeQb
- gcuX4a0aAOVsl5CJ7mJJ7rdr7uj9EQgskNZdPqn9ZTfiUYBl8wWj2LuiO7I1+0Q57tGQTNffo
- UByQ3A==
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2] net: mvpp2: add support for mii
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170256662488.26207.4155748684872594821.git-patchwork-notify@kernel.org>
+Date: Thu, 14 Dec 2023 15:10:24 +0000
+References: <20231212141200.62579-1-eichest@gmail.com>
+In-Reply-To: <20231212141200.62579-1-eichest@gmail.com>
+To: Stefan Eichenberger <eichest@gmail.com>
+Cc: maxime.chevallier@bootlin.com, mw@semihalf.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-From: Stefan Wahren <stefan.wahren@i2se.com>
+Hello:
 
-The company I2SE has been acquired a long time ago. Switch to
-my private mail address before the I2SE account is deactivated.
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
-Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
-=2D--
- drivers/net/ethernet/qualcomm/qca_7k_common.c | 2 +-
- drivers/net/ethernet/qualcomm/qca_spi.c       | 2 +-
- drivers/net/ethernet/qualcomm/qca_uart.c      | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+On Tue, 12 Dec 2023 15:12:00 +0100 you wrote:
+> Currently, mvpp2 only supports RGMII. This commit adds support for MII.
+> The description in Marvell's functional specification seems to be wrong.
+> To enable MII, we need to set GENCONF_CTRL0_PORT3_RGMII, while for RGMII
+> we need to clear it. This is also how U-Boot handles it.
+> 
+> Signed-off-by: Stefan Eichenberger <eichest@gmail.com>
+> 
+> [...]
 
-diff --git a/drivers/net/ethernet/qualcomm/qca_7k_common.c b/drivers/net/e=
-thernet/qualcomm/qca_7k_common.c
-index be2f754efd21..5302da587620 100644
-=2D-- a/drivers/net/ethernet/qualcomm/qca_7k_common.c
-+++ b/drivers/net/ethernet/qualcomm/qca_7k_common.c
-@@ -149,5 +149,5 @@ EXPORT_SYMBOL_GPL(qcafrm_fsm_decode);
+Here is the summary with links:
+  - [net-next,v2] net: mvpp2: add support for mii
+    https://git.kernel.org/netdev/net-next/c/1b666016d0ad
 
- MODULE_DESCRIPTION("Qualcomm Atheros QCA7000 common");
- MODULE_AUTHOR("Qualcomm Atheros Communications");
--MODULE_AUTHOR("Stefan Wahren <stefan.wahren@i2se.com>");
-+MODULE_AUTHOR("Stefan Wahren <wahrenst@gmx.net>");
- MODULE_LICENSE("Dual BSD/GPL");
-diff --git a/drivers/net/ethernet/qualcomm/qca_spi.c b/drivers/net/etherne=
-t/qualcomm/qca_spi.c
-index a075193f3787..ccf9a9d7ecb0 100644
-=2D-- a/drivers/net/ethernet/qualcomm/qca_spi.c
-+++ b/drivers/net/ethernet/qualcomm/qca_spi.c
-@@ -1024,6 +1024,6 @@ module_spi_driver(qca_spi_driver);
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
- MODULE_DESCRIPTION("Qualcomm Atheros QCA7000 SPI Driver");
- MODULE_AUTHOR("Qualcomm Atheros Communications");
--MODULE_AUTHOR("Stefan Wahren <stefan.wahren@i2se.com>");
-+MODULE_AUTHOR("Stefan Wahren <wahrenst@gmx.net>");
- MODULE_LICENSE("Dual BSD/GPL");
- MODULE_VERSION(QCASPI_DRV_VERSION);
-diff --git a/drivers/net/ethernet/qualcomm/qca_uart.c b/drivers/net/ethern=
-et/qualcomm/qca_uart.c
-index f911effccfe0..fb53a0c32898 100644
-=2D-- a/drivers/net/ethernet/qualcomm/qca_uart.c
-+++ b/drivers/net/ethernet/qualcomm/qca_uart.c
-@@ -398,6 +398,6 @@ module_serdev_device_driver(qca_uart_driver);
-
- MODULE_DESCRIPTION("Qualcomm Atheros QCA7000 UART Driver");
- MODULE_AUTHOR("Qualcomm Atheros Communications");
--MODULE_AUTHOR("Stefan Wahren <stefan.wahren@i2se.com>");
-+MODULE_AUTHOR("Stefan Wahren <wahrenst@gmx.net>");
- MODULE_LICENSE("Dual BSD/GPL");
- MODULE_VERSION(QCAUART_DRV_VERSION);
-=2D-
-2.34.1
 
 
