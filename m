@@ -1,65 +1,66 @@
-Return-Path: <netdev+bounces-57171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FFC18124EA
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 03:05:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE21D8124ED
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 03:05:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE1B5B21140
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:05:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E6631F218E4
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:05:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0EF8803;
-	Thu, 14 Dec 2023 02:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A46D7F9;
+	Thu, 14 Dec 2023 02:05:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d55syZjm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DkHmqonU"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AE8CE8
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 18:05:35 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-db53919e062so8568473276.0
-        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 18:05:35 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6389CD5
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 18:05:37 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-dbcc50d7dd3so2123850276.2
+        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 18:05:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702519534; x=1703124334; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZEZvumk7MgtmWweazFTl3ViX2nGxgFVZEAs/ufpHI5M=;
-        b=d55syZjmKh0jF715C/7aNAUldvVb4oI3+siNfsLgqn7bws5HsgU+UiAHKN634KvyF4
-         W3VR8VIGXuPFBdIaTTNYMpr7RBterFVYL8hosCuW3uIYoY7rjdxNH3Hu6ZzALqSvS4P+
-         BJIwcFjUcroUrR1wfANH+C3YhWqlTJ+dlm8GarSBouvX0GJqxtCErzjsVbAFMo96uzdQ
-         BL3UHOQR1OpeCn1+ABTDBX/P8e6XE2qajt/y7uITeRs5HNF1f5sKjURU6rRvwpYNusek
-         TUNyjMBfhmXshbPsWKo6Z7/QG+S+kktHiS1638ewUbT++3d4Xw+M9+vBkaJtuVYymJU9
-         M4yw==
+        d=google.com; s=20230601; t=1702519536; x=1703124336; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+ronbOySVVJCeCFXE+E452YTaKGaTM58JCsYafTPHk4=;
+        b=DkHmqonUytnYF2oN/aGhCb13hqOLBVcsnUgMBwRHn3risdLIOysKUH+t8sDqud79zu
+         K6rRA7CpcP1LSQUqdJ5N58ZLzTC3GsgLdi82mftGk8ZD9TkJ13Mao81gr5Wun5Y9o3v7
+         SLnl9pzl+5+Qk0dEqwfQXxz0WntaFts4guHWfXp5Ng1gzNsnZa1w/jSEJagKb+Z50LMc
+         PvTrtmqu/cHBXlVoRRHTu47w1DAX4ek3nUfTCmaj197cQtx+AD/0QptT1bsIokQki8C7
+         e7B47lCJ3HjRTzTwy6HxdFljYpvKmrKqDWPqLoL2HH/SwWUD5hqKq2ohojVabEn6cChB
+         ilIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702519534; x=1703124334;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZEZvumk7MgtmWweazFTl3ViX2nGxgFVZEAs/ufpHI5M=;
-        b=AC0IfMsHVogooCJSK5EDqqVD91Em/SOZUZZx8k9KekHjx4TyQ9SzUEdR1JyxBzjJ+P
-         daUXKlZflf3GosqFcPQpf3+9d5YfaduPPe+WYg5Xw9RA38ndH///AcyFlDfwa2f6dUej
-         oBfeaDAFQDB9ZFqEU59Q1wFhgyNIAtUKqKcH3L6BE1pd03kCXjwkzYgBEj3i8vGq1fQk
-         HFDjeybgGrH5t0kYHoKCon5qt7D4kfmpTJNM2W2/6COw34ceJAaL6dKLCaVaOwYBmD2C
-         1hAdqictjXiwU/oDmy/HVg9HF0IKRpWnKStv3oozdKkT3OEcNq0ZR3C3w/XfwgJsFtlB
-         UYzg==
-X-Gm-Message-State: AOJu0YxZLfLLepdwpwAXH+kNFmcWcZz2MVHe+2nltcFkVTqjVCrlLAhz
-	Ef5+twp7h+kRbmXe/BcFZxSBctMyzcrkJUhBgA==
-X-Google-Smtp-Source: AGHT+IEeQgDesKe3i+QDS/rezaXpGa7RoKAiDBO9Ys/1XaviI6mis9BGhANKrNA1DQEcY996FnoLnUQecY6J10j8wA==
+        d=1e100.net; s=20230601; t=1702519536; x=1703124336;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+ronbOySVVJCeCFXE+E452YTaKGaTM58JCsYafTPHk4=;
+        b=vFLY26Wljn/KxQmvGK5U1ej5k1IeLGKDE4ocG9f10PZQKaFL6QDmtzBypfJ3XNeaOm
+         1DamEul0Tztmp68t38Mm4ip5udFZE02s3J4W9RSI32XP7yDcl7Qo4yVSKSHXKktYNgOg
+         SKXE7vA4yYq/l55SZ0gjBSAucJMXkJZCajFc0eVnsE/Nq/uYA4rDy2AsoytNMoxlB/h0
+         cpOPictvlslpCjpymfnElAIIwhQfqk0d1S8QdL13LNEjaK3UUHBN81w2I+O50Atlg6nw
+         IM9MWIsv0AjzckCR5DT5YUnMwVxCE0mWr28bq7jgoAMcr1O2kHX0vR0LDbYwaYF+ZIA0
+         VPIQ==
+X-Gm-Message-State: AOJu0YxNbYwrPNi99mh30AZZZrTsomgrQ7yVhVPko/m+C5iItdrVwmnL
+	kWXAZj4NAap7SAfVaCTLJ3HqSdQ3wsAtu6qYFg==
+X-Google-Smtp-Source: AGHT+IGncV41fwbhz/mCy6hSR3EOohDoL5eRhnTHrk4bhzSdLjyeCnLJseqiKf/w0iEIyiWoDGOSz2aVqCYno2zrog==
 X-Received: from almasrymina.svl.corp.google.com ([2620:15c:2c4:200:d31b:c1a:fb6a:2488])
- (user=almasrymina job=sendgmr) by 2002:a5b:783:0:b0:db5:4766:e363 with SMTP
- id b3-20020a5b0783000000b00db54766e363mr77867ybq.6.1702519534471; Wed, 13 Dec
- 2023 18:05:34 -0800 (PST)
-Date: Wed, 13 Dec 2023 18:05:23 -0800
+ (user=almasrymina job=sendgmr) by 2002:a05:6902:545:b0:dbc:e64a:ccd6 with
+ SMTP id z5-20020a056902054500b00dbce64accd6mr1821ybs.9.1702519536540; Wed, 13
+ Dec 2023 18:05:36 -0800 (PST)
+Date: Wed, 13 Dec 2023 18:05:24 -0800
+In-Reply-To: <20231214020530.2267499-1-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20231214020530.2267499-1-almasrymina@google.com>
 X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20231214020530.2267499-1-almasrymina@google.com>
-Subject: [RFC PATCH net-next v1 0/4] Abstract page from net stack
+Message-ID: <20231214020530.2267499-2-almasrymina@google.com>
+Subject: [RFC PATCH net-next v1 1/4] vsock/virtio: use skb_frag_page() helper
 From: Mina Almasry <almasrymina@google.com>
 To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
 Cc: Mina Almasry <almasrymina@google.com>, Thomas Gleixner <tglx@linutronix.de>, 
@@ -108,84 +109,32 @@ Cc: Mina Almasry <almasrymina@google.com>, Thomas Gleixner <tglx@linutronix.de>,
 	Shakeel Butt <shakeelb@google.com>, Yunsheng Lin <linyunsheng@huawei.com>, 
 	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Currently these components in the net stack use the struct page
-directly:
+Minor fix for virtio: code wanting to access the page inside
+the skb should use skb_frag_page() helper, instead of accessing
+bv_page directly. This allows for extensions where the underlying
+memory is not a page.
 
-1. Drivers.
-2. Page pool.
-3. skb_frag_t.
+Signed-off-by: Mina Almasry <almasrymina@google.com>
 
-To add support for new (non struct page) memory types to the net stack, we
-must first abstract the current memory type.
+---
+ net/vmw_vsock/virtio_transport.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Originally the plan was to reuse struct page* for the new memory types,
-and to set the LSB on the page* to indicate it's not really a page.
-However, for safe compiler type checking we need to introduce a new type.
-
-struct netmem is introduced to abstract the underlying memory type.
-Currently it's a no-op abstraction that is always a struct page underneath.
-In parallel there is an undergoing effort to add support for devmem to the
-net stack:
-
-https://lore.kernel.org/netdev/20231208005250.2910004-1-almasrymina@google.=
-com/
-
-Cc: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Christian K=C3=B6nig <christian.koenig@amd.com>
-Cc: Shakeel Butt <shakeelb@google.com>
-Cc: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-
-Mina Almasry (4):
-  vsock/virtio: use skb_frag_page() helper
-  net: introduce abstraction for network memory
-  net: add netmem_t to skb_frag_t
-  net: page_pool: use netmem_t instead of struct page in API
-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 15 ++--
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  8 ++-
- drivers/net/ethernet/engleder/tsnep_main.c    | 22 +++---
- drivers/net/ethernet/freescale/fec_main.c     | 33 ++++++---
- .../net/ethernet/hisilicon/hns3/hns3_enet.c   | 14 ++--
- drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  2 +-
- drivers/net/ethernet/intel/idpf/idpf_txrx.h   | 15 ++--
- drivers/net/ethernet/marvell/mvneta.c         | 24 ++++---
- .../net/ethernet/marvell/mvpp2/mvpp2_main.c   | 18 +++--
- .../marvell/octeontx2/nic/otx2_common.c       |  8 ++-
- drivers/net/ethernet/mediatek/mtk_eth_soc.c   | 22 +++---
- .../net/ethernet/mellanox/mlx5/core/en/xdp.c  | 27 ++++---
- .../net/ethernet/mellanox/mlx5/core/en_rx.c   | 28 ++++----
- .../ethernet/microchip/lan966x/lan966x_fdma.c | 16 +++--
- drivers/net/ethernet/microsoft/mana/mana_en.c | 10 +--
- drivers/net/ethernet/socionext/netsec.c       | 25 ++++---
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 48 ++++++++-----
- drivers/net/ethernet/ti/cpsw.c                | 11 +--
- drivers/net/ethernet/ti/cpsw_new.c            | 11 +--
- drivers/net/ethernet/ti/cpsw_priv.c           | 12 ++--
- drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 18 +++--
- drivers/net/veth.c                            |  5 +-
- drivers/net/vmxnet3/vmxnet3_drv.c             |  7 +-
- drivers/net/vmxnet3/vmxnet3_xdp.c             | 20 +++---
- drivers/net/wireless/mediatek/mt76/dma.c      |  4 +-
- drivers/net/wireless/mediatek/mt76/mt76.h     |  5 +-
- .../net/wireless/mediatek/mt76/mt7915/mmio.c  |  4 +-
- drivers/net/xen-netfront.c                    |  4 +-
- include/linux/skbuff.h                        | 11 ++-
- include/net/netmem.h                          | 35 +++++++++
- include/net/page_pool/helpers.h               | 72 ++++++++++---------
- include/net/page_pool/types.h                 |  9 +--
- net/bpf/test_run.c                            |  2 +-
- net/core/page_pool.c                          | 39 +++++-----
- net/core/skbuff.c                             |  2 +-
- net/core/xdp.c                                |  3 +-
- net/kcm/kcmsock.c                             |  9 ++-
- net/vmw_vsock/virtio_transport.c              |  2 +-
- 38 files changed, 381 insertions(+), 239 deletions(-)
- create mode 100644 include/net/netmem.h
-
---=20
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index af5bab1acee1..bd0b413dfa3f 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -153,7 +153,7 @@ virtio_transport_send_pkt_work(struct work_struct *work)
+ 				 * 'virt_to_phys()' later to fill the buffer descriptor.
+ 				 * We don't touch memory at "virtual" address of this page.
+ 				 */
+-				va = page_to_virt(skb_frag->bv_page);
++				va = page_to_virt(skb_frag_page(skb_frag));
+ 				sg_init_one(sgs[out_sg],
+ 					    va + skb_frag->bv_offset,
+ 					    skb_frag->bv_len);
+-- 
 2.43.0.472.g3155946c3a-goog
 
 
