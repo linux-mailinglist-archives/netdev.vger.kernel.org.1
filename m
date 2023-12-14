@@ -1,190 +1,159 @@
-Return-Path: <netdev+bounces-57492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FA448132C7
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:17:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6F918132D9
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:19:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB995281A0D
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:17:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59C101F215B6
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:19:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46EE759E2E;
-	Thu, 14 Dec 2023 14:17:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4351F59E39;
+	Thu, 14 Dec 2023 14:19:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="D8uGsd/B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k4AZMB4q"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2089.outbound.protection.outlook.com [40.107.105.89])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3407F129;
-	Thu, 14 Dec 2023 06:16:58 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AfK+lhMZJc/YEv7DHZieG/T8xjm/Ir3HR3MP98T7OALTNFPdjegLty1saP/rEAwLiifMVJ+xF3rJH4wpGtVFls/fNdAtDFBI39dIu/uT7FIjN9OWdTv3lHsh2ylrAa2toFTeVE8SM9Y1XZjT8CFWshj7ob5dYN/Hf1yz101rmQ/d64xKdS+PAMYYbS69N0YUkfFYCEJbGmKvRuL9Lx9aIEVmsBK2+/8ApmNkNMNBu6FlxGkY/nDpZEIizZQROujgWguiU5Q3i7p1/TKohXtqhNn+wLOsmhh4ZkHhe2H/ozOgNr6mfTh3QzMapKqJHd/LDWwePNcILHFc5u/igeE8OA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=opf1HphXX+pLIhUaZUsxGo3e7rbzCC5liWJYZNQAR1E=;
- b=ZKtXn8V3eDO14Llb4JQEGukcsyh2HuvOCmEmT+atmwC/W9iT0wifbne84JYYyupXpJvFC08QyfJ8RUQVva9TZ/Wu30j9qsqvf+4JAp26bjFrYaVvKWc1zBzeM0ovcWwaY0oEe31Oq333Au4cDtkjZBKaKjx9L//ayqFPyvR11aCIrS+xR1JoUUDYZ2gZ+mP8eeyTZNR81AR+BGuuM8ICcpkSqNp4FEB53oB7uM4gMVb3EAlBHsOtC38nIyfZlpR0Y1VtYtWRL2WriDS/M3HLA/XcVCjLEFIj0Z7CYqDKzsl65mEJADoCgzP5udm2WGfiCZF5xTZzVhWiOyrc+uAWTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=opf1HphXX+pLIhUaZUsxGo3e7rbzCC5liWJYZNQAR1E=;
- b=D8uGsd/BE3OWlEWMNznijbDKtPKxe84TN0XtWUdNtgZWkfSWLdm6F8xcpkti+3irpPHxv3mWkqqj9DpU5KjVzoNY/Yrkw23rq0GvYWTjXX71EDtj5M4JqKbQ11IxAm4SN/M8ErkGW8CYX9r2CbqC8ZwQMDVcqJauGyCloxJZh0A=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by DUZPR04MB9746.eurprd04.prod.outlook.com (2603:10a6:10:4b1::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.33; Thu, 14 Dec
- 2023 14:16:52 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7091.028; Thu, 14 Dec 2023
- 14:16:52 +0000
-Date: Thu, 14 Dec 2023 16:16:46 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, shuah@kernel.org, s-vadapalli@ti.com,
-	r-gunasekaran@ti.com, vigneshr@ti.com, srk@ti.com, horms@kernel.org,
-	p-varis@ti.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 net-next 02/11] selftests: forwarding: ethtool_mm:
- fall back to aggregate if device does not report pMAC stats
-Message-ID: <20231214141646.kdf5rnldpyglwvdd@skbuf>
-References: <20231213110721.69154-1-rogerq@kernel.org>
- <20231213110721.69154-3-rogerq@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231213110721.69154-3-rogerq@kernel.org>
-X-ClientProxiedBy: AS4P250CA0007.EURP250.PROD.OUTLOOK.COM
- (2603:10a6:20b:5df::11) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEF45136;
+	Thu, 14 Dec 2023 06:19:10 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-50dfac6c0beso6342807e87.2;
+        Thu, 14 Dec 2023 06:19:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702563549; x=1703168349; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CQ3bwMUk8X1J9J3ypOy0/pA2DHF8fbOaltjbT7mP9XQ=;
+        b=k4AZMB4qqs2QvtVei5TV64L4E5JV6cNBfZFPHH3XotPoyBzdvtopDjqd1IDiX5C01v
+         bp9MvuyAZda9AKHUj2dFPBLlpCCWjolTCKUxp6sjPQjzTIcLbnhYPmxxC4qElNRuRY0/
+         Z34PfTl421la5OUPKn4eMt/dxGV+P0KIBSFo1FBBkxsi9jIXAiwGxx2XQtGqrUFzgUlk
+         oj2PBHdCZcj7wkqRPBaN+nisL3Z2iGYdqfLCGHhFNOeclb4LbG0LIHvHoYrYs2JFk+0m
+         3MGcsEckiian6QrxfrLnNN6jmaYDi3znouaq5lTC8FeALsQTGSBGJaqL5qciQQzwrQGg
+         X1Ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702563549; x=1703168349;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CQ3bwMUk8X1J9J3ypOy0/pA2DHF8fbOaltjbT7mP9XQ=;
+        b=a9Ih1576xLOsVm/hKMoIq6R625GFTvkde7MMPYa6V1ObFsMbfgWuw0PYEQc2zx6Lzy
+         /ircoEqnPNYFmfCvnUAw0WtsNjQMvha/AQ9u3HLNXSG5q9sLUyma/UOxdxISO6MCpfim
+         Jdsxr1Vg1a0yUEMI9/XeMG+O6jotfxFrRLw1wkSTIKfbAvqGlE7Nma+siSW8Xh7qnAOb
+         FdCS8DTGcF7umItToTO5vUW9TZSe5dA4etn1YFvC1g1t+dcmHGwrcJklb/HRFqHRF2dK
+         K3JaDBjKpMb67Fni6uYxV3NNhDpQiB/wWzY5lQTwruHtPvBxq1/cwTVToZyIP4+OxKKN
+         dwXg==
+X-Gm-Message-State: AOJu0YwMC83y6FcZ0XuUj9Nj5ZvshFgBceVRP/JQQZPjAK2c3G3ZNziN
+	3suq6oSl8+1VAJFQOG83JMs=
+X-Google-Smtp-Source: AGHT+IHqRqPM9xCrb8bY2qjbc5gXG+mnTP3vPzOVFwnQVHJHqCdJgI9kYABRRuwhHG1WUCcWt/wOqg==
+X-Received: by 2002:a19:f70b:0:b0:50c:1f:7e00 with SMTP id z11-20020a19f70b000000b0050c001f7e00mr4932096lfe.21.1702563548694;
+        Thu, 14 Dec 2023 06:19:08 -0800 (PST)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id d6-20020ac24c86000000b0050bed336e0csm1881825lfl.162.2023.12.14.06.19.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Dec 2023 06:19:08 -0800 (PST)
+Date: Thu, 14 Dec 2023 17:19:04 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Jose Abreu <Jose.Abreu@synopsys.com>, Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+	Tomer Maimon <tmaimon77@gmail.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, openbmc@lists.ozlabs.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 06/16] net: pcs: xpcs: Avoid creating dummy XPCS
+ MDIO device
+Message-ID: <n44fxxqr6q3fs7z6uhooecn55tvyapdroizsowtmfgrn7vnhlw@dt25gi2dybc4>
+References: <20231205103559.9605-1-fancer.lancer@gmail.com>
+ <20231205103559.9605-7-fancer.lancer@gmail.com>
+ <ZW8pxM3RvyHJTwqH@shell.armlinux.org.uk>
+ <gbkgtb4yp3cwyw7xcuhmkdl3io2wlia2gska2xmjbwjvhigpz3@w52b6tdyugqo>
+ <ZXnclVEz10K2XD2+@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DUZPR04MB9746:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7da1d5e4-4023-47dc-2de1-08dbfcaf518c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	IJKydCwlmGpBavkO45GKj3kLoNTwOrpT8rqAZzLK6aOfCQbnzPTYPubQhmnFmnOgWCd+Zqtmmx/3M73T6U093JFxfHrDMnEx7flb4FkiHYmZieI89f6xQQSaZmuL9Cqqp1HBydWN5f/LXA7S31GIKYh2PkuZvUyjRk8ffqqd0yK3RB7LZq2ZNdUA1e+pBf7OHFJmmLceWBTI5xLCKtoqgy10fIFpOtwtWY6xbmJND+aA79TV6YyUeBFTZSV+CrDHappktb6Rvj8Rf17tdge8fnGZ7cxTfaWgvhXhQs65Ww4w02y1/KR6iwI7X0RE3YQrY4+gSLVSIjedzxySZscbFNr5g1xbryIZMDZr+9BGGTQ0w5hYX4CWXRZuLAVLEgcoGQ5wFYvrDtWf4p5wO1P2a1jNWNbIKAucc4F3lSwMA5Gofccvl64U6/YnXnPoc+70jkE/jlMW8zE0JiJom8dMXmslcw624m1I8/mvvkTRTWJ8b1AGw0GzI/cuewo12StotrrICOX1ieVQGEUKT5hvAnlwFUXpPKphUPU53jaQdWA=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(136003)(366004)(346002)(376002)(396003)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(6506007)(1076003)(26005)(66946007)(8676002)(6486002)(44832011)(9686003)(83380400001)(7416002)(6512007)(5660300002)(2906002)(33716001)(8936002)(4326008)(478600001)(966005)(66476007)(6666004)(41300700001)(6916009)(66556008)(316002)(86362001)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?HAmd+PK14BYdgYUN3+SUv5V074PVz4j7Gu9s/UeB0w6LxJcSaCG+WSe1LJzu?=
- =?us-ascii?Q?mma6ayGgqPcjiJqgyy0jW5PkJbCbNVxkxZZzDzZDG7KeBiWVKvRMQ60C91gU?=
- =?us-ascii?Q?6RHzNDr3SV4HYak+eUMYXhrcAZ/4CQ+osnLqz12Q4M4O+FBDDnYdGqe3W/Ov?=
- =?us-ascii?Q?gn3xDbF78/EWJCQkI6Iwv13repELRzO7Uxtfo41AFPe5uVJFpx+yNviIkqJL?=
- =?us-ascii?Q?GxWZtu56YZfD8nEHaJ+FkaGX2VLb7SD8w5ti3U80HfRxlXpI5mWv2v4sd2bJ?=
- =?us-ascii?Q?GUWfYx75EFrLiZPw3c5xPiK7J5iWuFUNr/5jWPksdO8aQxnLms5dNBx24Csn?=
- =?us-ascii?Q?WxN4qayat7d0JDVVMSa+M6IHu0RERUcRuCGGsQW+JqRXRLfIiSCDEYxBrdz1?=
- =?us-ascii?Q?1T2Etc0Ffz9qmLRQ/AVL5bTMN+gv5J78ns9Ayz9PreADgbtStJMumz70SCSS?=
- =?us-ascii?Q?QFB1ssVjZrT7nMgMcCc/+deTRmQqBxHLsLxNcFLifA/msfx2ZkscYZrapYap?=
- =?us-ascii?Q?4i68qpqs+8ttsthFlVGbb2PHaXyIsBVsi42cAvU58cG4NqgMM6yi3Yq1S3zi?=
- =?us-ascii?Q?pdWWSKojqxNrte0eehApPK1Dbk+j2tvSyDK1jnz1CHzvbHuI8BA3aU2+3rrr?=
- =?us-ascii?Q?bcq+AIcl4nKRY3wNvjAYbzXilG2fWKXM+u4y0L3PmWthL2pucL4kiNBCSr6o?=
- =?us-ascii?Q?Z/WzcR3eyeroq05A6GbuhpAIdVy4ua7jVgsosoIh2KMPMrUVv7/Bt36g+dAT?=
- =?us-ascii?Q?nnHdm306h7+JzXKuHxZfAohyBLcJpvN/DlD0rljs0jaTMwAL+DxKiZa90DR9?=
- =?us-ascii?Q?gTN3a3y1twDODQj4D2Dl7g23htExvcmaPzdXxdi6VKWWob096H3RH2qnvWcO?=
- =?us-ascii?Q?hnjvmnXBH5fUXGYfNHb0lmxUa5NsPzF9ngB7/w96v/V30jSRkhjmr/muGlT8?=
- =?us-ascii?Q?k1eAAZv+/7nJWU8tnufOTO6qGP7ZTrwlZVPFEbPCsFVZALFtX+9Ws2t2VDyB?=
- =?us-ascii?Q?0RmWXaRf7PKuhdP3uPzscuNyJ6cgZMBiERIK5NXBvMBu5NDW5W/9aLP4oS0q?=
- =?us-ascii?Q?dq8wwHPzPCRCcW+Etr3Nb0WzJ9as2ucLKwWq2PC57BF+mANAZJXU71WY3z75?=
- =?us-ascii?Q?JiW4kiww0Kp3rQLMECo+cUg6uxI7mi2ukUvqoUhCgz1YNO2Trye9Cln5GK+g?=
- =?us-ascii?Q?7e94kpILoXRCLF3zXwAsG2YxUHYfbJF0UkYrqqjNFgdQk8OYypxfiJWGU8+3?=
- =?us-ascii?Q?SnLdB53QXLGWJ7XAkidJIH21s5rMWwRvnKTOU//tQjSbRF5J2kmaDr9CN/zp?=
- =?us-ascii?Q?dVpcx4h8REYHj8G1zHKSfqR7Akemcq/D7Nb6t8fT+qMVbj2iCkO873ZtLmlG?=
- =?us-ascii?Q?HxTdoGKINHtbwQlf5yWtTnLSpuuB9EBoVSztL37+R972j6aeeNu1OSuX8GrN?=
- =?us-ascii?Q?tdOnUJlkW26EMdOGkG+3Mu7IXwJMNYzsPm33/zzUWROdjIpbPZ5v1/Q9GMyC?=
- =?us-ascii?Q?7bGIsCXviNprl/NK0NRJ+XCF1zbHxCTgOlRINDyMcFu0WvWhShy+RSJYmT6m?=
- =?us-ascii?Q?Ud+3D0LdovxjtFyg1IzNLsuaZKcTg83BPf7l+GCyKW3Rgpg3MVJ0O7d0ch3c?=
- =?us-ascii?Q?Vg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7da1d5e4-4023-47dc-2de1-08dbfcaf518c
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2023 14:16:52.7204
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4A2O0LDNohC45zvckV+B6eKyixCImKA1iHXD0fShprKleYQwWsovITxsFC2pyIrZeXlLohIJr+xaKPK1EHFXyw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DUZPR04MB9746
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZXnclVEz10K2XD2+@shell.armlinux.org.uk>
 
-On Wed, Dec 13, 2023 at 01:07:12PM +0200, Roger Quadros wrote:
-> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-> index 8f6ca458af9a..763c262a3453 100755
-> --- a/tools/testing/selftests/net/forwarding/lib.sh
-> +++ b/tools/testing/selftests/net/forwarding/lib.sh
-> @@ -146,6 +146,15 @@ check_ethtool_mm_support()
->  	fi
->  }
->  
-> +check_ethtool_pmac_std_stats_support()
-> +{
-> +	local dev=$1; shift
-> +	local grp=$1; shift
-> +
-> +	[ 0 -ne $(ethtool --json -S $dev --all-groups --src pmac 2>/dev/null \
-> +		| jq '.[]."$grp" | length') ]
-> +}
-> +
->  check_locked_port_support()
->  {
->  	if ! bridge -d link show | grep -q " locked"; then
+On Wed, Dec 13, 2023 at 04:32:21PM +0000, Russell King (Oracle) wrote:
+> On Wed, Dec 13, 2023 at 03:01:45AM +0300, Serge Semin wrote:
+> > On Tue, Dec 05, 2023 at 01:46:44PM +0000, Russell King (Oracle) wrote:
+> > > xpcs_create_mdiodev() as it originally stood creates the mdiodev from
+> > > the bus/address, and then passes that to xpcs_create(). Once
+> > > xpcs_create() has finished its work (irrespective of whether it was
+> > > successful or not) we're done with the mdiodev in this function, so
+> > > the reference is _always_ put.
+> > 
+> > You say that it's required to manage the refcounting twice: when we
+> > get the reference from some external place and internally when the
+> > reference is stored in the XPCS descriptor. What's the point in such
+> > redundancy with the internal ref-counting if we know that the pointer
+> > can be safely stored and utilized afterwards? Better maintainability?
+> > Is it due to having the object retrieval and storing implemented in
+> > different functions?
+> 
+> The point is that the error handling gets simpler:
+> - One can see in xpcs_create_mdiodev() that the reference taken by
+>   mdio_device_create() is always dropped if that function was
+>   successful, irrespective of whether xpcs_create() was successful.
+> 
+> - xpcs_create() is responsible for managing the refcount on the mdiodev
+>   that is passed to it - and if it's successful, it needs to increment
+>   the refcount, or leave it in the same state as it was on entry if
+>   failing.
+> 
+> This avoids complexities in error paths, which are notorious for things
+> being forgotten - since with this, each of these functions is resposible
+> for managing its refcount.
+> 
+> It's a different style of refcount management, one I think more people
+> should adopt.
+> 
+> > While at it if you happen to know an answer could you please also
+> > clarify the next question. None of the ordinary
+> > platform/PCI/USB/hwmon/etc drivers I've been working with managed
+> > refcounting on storing a passed to probe() device pointer in the
+> > private driver data. Is it wrong not doing that?
+> 
+> If we wanted to do refcounting strictly, then every time a new
+> pointer to a data structure is created, we should be taking a refcount
+> on it, and each time that pointer is destroyed, we should be putting
+> the refcount. That is what refcounting is all about.
+> 
+> However, there are circumstances where this can be done lazily, and
+> for drivers we would prefer driver authors not to end up with
+> refcount errors where they've forgotten to put something.
+> 
+> In the specific case of drivers, we have a well defined lifetime for
+> a device bound to a driver. We guarantee that the struct device will
+> not go away if a driver is bound to the device, until such time that
+> the driver's .remove method has been called. Thus, we guarantee that
+> the device driver will be notified of the struct device going away
+> before it has been freed. This frees the driver author from having
+> to worry about the refcount of the struct device.
+> 
+> As soon as we start doing stuff that is outside of that model, then
+> objects that are refcounted need to be dealt with, and I much prefer
+> the "strict" refcounting implementation such as the one I added to
+> xpcs, because IMHO it's much easier to see that the flow is obviously
+> correct - even if it does need a comment to describe why we always
+> do a put.
+
+Ok. I fully get your point now: lazy refcounting for the drivers
+following standard model and the 'strict' one for others. It sounds
+reasonable. I'll get that adopted in my future developments. Thank you
+very much for the detailed explanation and for all your comments.
+
+-Serge(y)
+
+> 
 > -- 
-> 2.34.1
->
-
-FYI, there's another submitted patch that touches the exact same spot,
-and it looks like it has a good chance of getting merged.
-https://patchwork.kernel.org/project/netdevbpf/patch/20231214135029.383595-9-tobias@waldekranz.com/
-
-You need to pay attention to merge conflicts, so you don't waste a patch
-iteration just because of that one thing.
-
-I guess you might be able to wing it, because the other patch does this:
-
-diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-index 8f6ca458af9a..e3740163c384 100755
---- a/tools/testing/selftests/net/forwarding/lib.sh
-+++ b/tools/testing/selftests/net/forwarding/lib.sh
-@@ -146,6 +146,15 @@  check_ethtool_mm_support()
- 	fi
- }
- 
-+check_ethtool_counter_group_support()
-+{
-+	ethtool --help 2>&1| grep -- '--all-groups' &> /dev/null
-+	if [[ $? -ne 0 ]]; then
-+		echo "SKIP: ethtool too old; it is missing standard counter group support"
-+		exit $ksft_skip
-+	fi
-+}
-+
- check_locked_port_support()
- {
- 	if ! bridge -d link show | grep -q " locked"; then
-
-which quite coincidentally does not change what your patch sees in its
-upper context, aka 3 lines like this:
-
-----
- 	fi
- }
- 
-----
-
-You can check if your patch set applies on top of Tobias', by formatting
-it as patch files on top of net-next/main, resetting HEAD to net-next,
-applying Tobias' series and then your patches.
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
