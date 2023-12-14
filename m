@@ -1,409 +1,210 @@
-Return-Path: <netdev+bounces-57298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CE97812C3A
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 10:56:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D246812C3C
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 10:56:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF8F51F210D4
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 09:56:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E8D71C209E2
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 09:56:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E27E35EF1;
-	Thu, 14 Dec 2023 09:55:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B55735F0A;
+	Thu, 14 Dec 2023 09:56:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ugwNfNBE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yagx8o6O"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E70C129424
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 09:55:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64FF5C433C8;
-	Thu, 14 Dec 2023 09:55:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702547757;
-	bh=fr556/1bjaRw8tu8bD+o5ZS/ydF4Zz/SePK+fQc/gz0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ugwNfNBE0Q878ZLdF3wDnPH1exUMg3HPbmC4o/CzhYAyXMjMF10M8XmTyDPfigkFa
-	 2DXt19BVS3/PVBChOPk7SVRzvqUEB/WXRI5ykUp8PSkbnPzyPvuTPs2mTHSV22sUOY
-	 xr9gfuAOnw/e+xlpySTeRGiXPb/Im2cR7gNciFlSPxS+vy+mro2zniQleA6la1BDt2
-	 uYLPgGQCcGzPsUpbB5L4ks2NtmR21iLu7atOeB6WfzCaaxVWKWY31B17p2n1nxvf/T
-	 SFijaC+VgEPl9ADknsZdmCJG9Qtn/OfzSdKbLElGyIaE21s9XXQpmlTicZq1vtb4qN
-	 1bz24qJutqyyQ==
-Date: Thu, 14 Dec 2023 09:55:53 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH iwl-next v4 1/2] ixgbe: Refactor overtemp event handling
-Message-ID: <20231214095553.GJ5817@kernel.org>
-References: <20231212104642.316887-1-jedrzej.jagielski@intel.com>
- <20231212104642.316887-2-jedrzej.jagielski@intel.com>
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71755F5
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 01:56:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702547774;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/tkL8YLXBdtuh1lhYs0W2zJGNUrEl73DXiA9GWiR3Xc=;
+	b=Yagx8o6OikMINwIq3qxQBSoNrcZlY+uGSN99PVI/cWREyimdBK/GIaCh5YS+dm08g81MJn
+	+qmzCNDedgP/9k2brURSCi2M79e0iW5CjYud5HfB5DRLt3RHawv6MPSNUrZ6A8eqJom0ug
+	SQOfEtJdb55+qrh1uYtKx9i72v8ARTQ=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-609-8S--qr9MPbefoV7YtUWE2g-1; Thu, 14 Dec 2023 04:56:12 -0500
+X-MC-Unique: 8S--qr9MPbefoV7YtUWE2g-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-333405020f3so5947569f8f.1
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 01:56:12 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702547771; x=1703152571;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/tkL8YLXBdtuh1lhYs0W2zJGNUrEl73DXiA9GWiR3Xc=;
+        b=PkqF+xpupze/iHlkWXkBiT8q6flsAEGF/696nWiILAngEP8HljLxNBUp8oaX8VmLwI
+         t8qJ+5MGDV1mAQnk2lRS0vm+D1ZNO7RMLu8EW0Ce4UyiiHQePaQxrdjf7TwR9HGapmHy
+         ZK6jiRBVanVS351ZDdhYykbDdxk9Tsu4qZa0TSAX7ZW/bfKqkBiOYVsFUh99AdBGCCvB
+         vcSOjnKXeonrUzIWbF6JdRqW79RxyhhXkXc4Jk1A5GZWseIdq+BKCW7hFOLoLw2c7PSl
+         0MhoSCpykjuWPtb2m+bNDACaZ7/0ml3mSn0LPIVdFdqSLp4SkVwZCzet46xRsRJ3mXvw
+         pc8g==
+X-Gm-Message-State: AOJu0YyfOrPXwqvhNrjt6La6IrdPlIQ7MIWX6Z0s29zNbcTWVz+P4i9Q
+	g6ZNyI1eC+iwEflx4mz+dZThZghYL+u1bZ1mMNoOmRlVklrHybD6/Qq07kFIIVG1hC2Xb/ovM4C
+	CDxlggekeseGmA4Z/
+X-Received: by 2002:a5d:614a:0:b0:336:9f9:6df with SMTP id y10-20020a5d614a000000b0033609f906dfmr5151061wrt.5.1702547771643;
+        Thu, 14 Dec 2023 01:56:11 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEiakjz1ILbcnOG+FrF8iuBB/YhiQdiiOV88jj7k12GPoMjsxf1aAqx1tuBwIkVtWxpFGD4+Q==
+X-Received: by 2002:a5d:614a:0:b0:336:9f9:6df with SMTP id y10-20020a5d614a000000b0033609f906dfmr5151053wrt.5.1702547771279;
+        Thu, 14 Dec 2023 01:56:11 -0800 (PST)
+Received: from sgarzare-redhat ([5.11.101.217])
+        by smtp.gmail.com with ESMTPSA id c15-20020adfe74f000000b0033335644478sm15617053wrn.114.2023.12.14.01.56.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Dec 2023 01:56:10 -0800 (PST)
+Date: Thu, 14 Dec 2023 10:56:04 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v9 0/4] send credit update during setting
+ SO_RCVLOWAT
+Message-ID: <4qaygyv6sw4qip6gnu2dirw7d7r3f3cmmh3qctnznda3rslzug@r2cyub6rjw6h>
+References: <20231214091947.395892-1-avkrasnov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20231212104642.316887-2-jedrzej.jagielski@intel.com>
+In-Reply-To: <20231214091947.395892-1-avkrasnov@salutedevices.com>
 
-On Tue, Dec 12, 2023 at 11:46:41AM +0100, Jedrzej Jagielski wrote:
-> Currently ixgbe driver is notified of overheating events
-> via internal IXGBE_ERR_OVERTEMP error code.
-> 
-> Change the approach for handle_lasi() to use freshly introduced
-> is_overtemp function parameter which set when such event occurs.
-> Change check_overtemp() to bool and return true if overtemp
-> event occurs.
-> 
-> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> ---
-> v2: change aproach to use additional function parameter to notify when overheat
-> v4: change check_overtemp to bool
-> 
-> https://lore.kernel.org/netdev/20231208090055.303507-1-jedrzej.jagielski@intel.com/T/
-> ---
+On Thu, Dec 14, 2023 at 12:19:43PM +0300, Arseniy Krasnov wrote:
+>Hello,
+>
+>                               DESCRIPTION
+>
+>This patchset fixes old problem with hungup of both rx/tx sides and adds
+>test for it. This happens due to non-default SO_RCVLOWAT value and
+>deferred credit update in virtio/vsock. Link to previous old patchset:
+>https://lore.kernel.org/netdev/39b2e9fd-601b-189d-39a9-914e5574524c@sberdevices.ru/
+>
+>Here is what happens step by step:
+>
+>                                  TEST
+>
+>                            INITIAL CONDITIONS
+>
+>1) Vsock buffer size is 128KB.
+>2) Maximum packet size is also 64KB as defined in header (yes it is
+>   hardcoded, just to remind about that value).
+>3) SO_RCVLOWAT is default, e.g. 1 byte.
+>
+>
+>                                 STEPS
+>
+>            SENDER                              RECEIVER
+>1) sends 128KB + 1 byte in a
+>   single buffer. 128KB will
+>   be sent, but for 1 byte
+>   sender will wait for free
+>   space at peer. Sender goes
+>   to sleep.
+>
+>
+>2)                                     reads 64KB, credit update not sent
+>3)                                     sets SO_RCVLOWAT to 64KB + 1
+>4)                                     poll() -> wait forever, there is
+>                                       only 64KB available to read.
+>
+>So in step 4) receiver also goes to sleep, waiting for enough data or
+>connection shutdown message from the sender. Idea to fix it is that rx
+>kicks tx side to continue transmission (and may be close connection)
+>when rx changes number of bytes to be woken up (e.g. SO_RCVLOWAT) and
+>this value is bigger than number of available bytes to read.
+>
+>I've added small test for this, but not sure as it uses hardcoded value
+>for maximum packet length, this value is defined in kernel header and
+>used to control deferred credit update. And as this is not available to
+>userspace, I can't control test parameters correctly (if one day this
+>define will be changed - test may become useless).
+>
+>Head for this patchset is:
+>https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=9bab51bd662be4c3ebb18a28879981d69f3ef15a
+>
+>Link to v1:
+>https://lore.kernel.org/netdev/20231108072004.1045669-1-avkrasnov@salutedevices.com/
+>Link to v2:
+>https://lore.kernel.org/netdev/20231119204922.2251912-1-avkrasnov@salutedevices.com/
+>Link to v3:
+>https://lore.kernel.org/netdev/20231122180510.2297075-1-avkrasnov@salutedevices.com/
+>Link to v4:
+>https://lore.kernel.org/netdev/20231129212519.2938875-1-avkrasnov@salutedevices.com/
+>Link to v5:
+>https://lore.kernel.org/netdev/20231130130840.253733-1-avkrasnov@salutedevices.com/
+>Link to v6:
+>https://lore.kernel.org/netdev/20231205064806.2851305-1-avkrasnov@salutedevices.com/
+>Link to v7:
+>https://lore.kernel.org/netdev/20231206211849.2707151-1-avkrasnov@salutedevices.com/
+>Link to v8:
+>https://lore.kernel.org/netdev/20231211211658.2904268-1-avkrasnov@salutedevices.com/
+>
+>Changelog:
+>v1 -> v2:
+> * Patchset rebased and tested on new HEAD of net-next (see hash above).
+> * New patch is added as 0001 - it removes return from SO_RCVLOWAT set
+>   callback in 'af_vsock.c' when transport callback is set - with that
+>   we can set 'sk_rcvlowat' only once in 'af_vsock.c' and in future do
+>   not copy-paste it to every transport. It was discussed in v1.
+> * See per-patch changelog after ---.
+>v2 -> v3:
+> * See changelog after --- in 0003 only (0001 and 0002 still same).
+>v3 -> v4:
+> * Patchset rebased and tested on new HEAD of net-next (see hash above).
+> * See per-patch changelog after ---.
+>v4 -> v5:
+> * Change patchset tag 'RFC' -> 'net-next'.
+> * See per-patch changelog after ---.
+>v5 -> v6:
+> * New patch 0003 which sends credit update during reading bytes from
+>   socket.
+> * See per-patch changelog after ---.
+>v6 -> v7:
+> * Patchset rebased and tested on new HEAD of net-next (see hash above).
+> * See per-patch changelog after ---.
+>v7 -> v8:
+> * See per-patch changelog after ---.
+>v8 -> v9:
+> * Patchset rebased and tested on new HEAD of net-next (see hash above).
+> * Add 'Fixes' tag for the current 0002.
+> * Reorder patches by moving two fixes first.
+>
+>Arseniy Krasnov (4):
+>  virtio/vsock: fix logic which reduces credit update messages
+>  virtio/vsock: send credit update during setting SO_RCVLOWAT
+>  vsock: update SO_RCVLOWAT setting callback
+>  vsock/test: two tests to check credit update logic
 
-Hi Jedrzej,
+This order will break the bisectability, since now patch 2 will not
+build if patch 3 is not applied.
 
-I like where this patch-set is going.
-Please find some feedback from my side inline.
+So you need to implement in patch 2 `set_rcvlowat` and in patch 3
+updated it to `notify_set_rcvlowat`, otherwise we always need to
+backport patch 3 in stable branches, that should be applied before
+patch 2.
 
->  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 19 ++++----
->  drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c  | 26 ++++++-----
->  drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h  |  2 +-
->  drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |  4 +-
->  drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c | 45 +++++++++++--------
->  5 files changed, 54 insertions(+), 42 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> index 227415d61efc..9bff614788a2 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> @@ -2756,7 +2756,7 @@ static void ixgbe_check_overtemp_subtask(struct ixgbe_adapter *adapter)
->  {
->  	struct ixgbe_hw *hw = &adapter->hw;
->  	u32 eicr = adapter->interrupt_event;
-> -	s32 rc;
-> +	bool overtemp;
->  
->  	if (test_bit(__IXGBE_DOWN, &adapter->state))
->  		return;
-> @@ -2790,14 +2790,15 @@ static void ixgbe_check_overtemp_subtask(struct ixgbe_adapter *adapter)
->  		}
->  
->  		/* Check if this is not due to overtemp */
-> -		if (hw->phy.ops.check_overtemp(hw) != IXGBE_ERR_OVERTEMP)
-> +		overtemp = hw->phy.ops.check_overtemp(hw);
-> +		if (!overtemp)
->  			return;
+You have 2 options:
+a. move patch 3 before patch 2 without changing the code
+b. change patch 2 to use `set_rcvlowat` and updated that code in patch 3
 
-I like the readability of the above, but FWIIW, I think it could
-also be slightly more compactly written as (completely untested!):
+I don't have a strong opinion, but I slightly prefer option a. BTW that
+forces us to backport more patches on stable branches, so I'm fine with
+option b as well.
 
-		if (!hw->phy.ops.check_overtemp(hw))
-			return;
+That said:
+Nacked-by: Stefano Garzarella <sgarzare@redhat.com>
 
->  
->  		break;
->  	case IXGBE_DEV_ID_X550EM_A_1G_T:
->  	case IXGBE_DEV_ID_X550EM_A_1G_T_L:
-> -		rc = hw->phy.ops.check_overtemp(hw);
-> -		if (rc != IXGBE_ERR_OVERTEMP)
-> +		overtemp = hw->phy.ops.check_overtemp(hw);
-> +		if (!overtemp)
->  			return;
->  		break;
->  	default:
-> @@ -7938,7 +7939,7 @@ static void ixgbe_service_timer(struct timer_list *t)
->  static void ixgbe_phy_interrupt_subtask(struct ixgbe_adapter *adapter)
->  {
->  	struct ixgbe_hw *hw = &adapter->hw;
-> -	u32 status;
-> +	bool overtemp;
->  
->  	if (!(adapter->flags2 & IXGBE_FLAG2_PHY_INTERRUPT))
->  		return;
-> @@ -7948,11 +7949,9 @@ static void ixgbe_phy_interrupt_subtask(struct ixgbe_adapter *adapter)
->  	if (!hw->phy.ops.handle_lasi)
->  		return;
->  
-> -	status = hw->phy.ops.handle_lasi(&adapter->hw);
-> -	if (status != IXGBE_ERR_OVERTEMP)
-> -		return;
-> -
-> -	e_crit(drv, "%s\n", ixgbe_overheat_msg);
-> +	hw->phy.ops.handle_lasi(&adapter->hw, &overtemp);
-
-Unless I am mistaken, the above can return an error. Should it be checked?
-
-Or alternatively, as this seems to be the only call-site,
-could handle_lasi() return overtemp as a bool?
-
-> +	if (overtemp)
-> +		e_crit(drv, "%s\n", ixgbe_overheat_msg);
->  }
->  
->  static void ixgbe_reset_subtask(struct ixgbe_adapter *adapter)
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
-> index ca31638c6fb8..343c3ca9b1c9 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
-> @@ -396,9 +396,10 @@ static enum ixgbe_phy_type ixgbe_get_phy_type_from_id(u32 phy_id)
->   **/
->  s32 ixgbe_reset_phy_generic(struct ixgbe_hw *hw)
->  {
-> -	u32 i;
-> -	u16 ctrl = 0;
->  	s32 status = 0;
-> +	bool overtemp;
-> +	u16 ctrl = 0;
-> +	u32 i;
->  
->  	if (hw->phy.type == ixgbe_phy_unknown)
->  		status = ixgbe_identify_phy_generic(hw);
-> @@ -407,8 +408,8 @@ s32 ixgbe_reset_phy_generic(struct ixgbe_hw *hw)
->  		return status;
->  
->  	/* Don't reset PHY if it's shut down due to overtemp. */
-> -	if (!hw->phy.reset_if_overtemp &&
-> -	    (IXGBE_ERR_OVERTEMP == hw->phy.ops.check_overtemp(hw)))
-> +	overtemp = hw->phy.ops.check_overtemp(hw);
-> +	if (!hw->phy.reset_if_overtemp && overtemp)
->  		return 0;
-
-Previously check_overtemp() would only be called if reset_if_overtemp was
-false. Now it is called unconditionally. I'm not sure if it matters, but
-the check for reset_if_overtemp may have avoided some logic, including a
-call to hw->phy.ops.read_reg() in some cases.
-
-I wonder if it would be nicer to go back to the previous logic.
-(completely untested!)
-
-	if (!hw->phy.reset_if_overtemp && hw->phy.ops.check_overtemp(hw))
-		return 0;
-
->  
->  	/* Blocked by MNG FW so bail */
-> @@ -2747,21 +2748,24 @@ static void ixgbe_i2c_bus_clear(struct ixgbe_hw *hw)
->   *
->   *  Checks if the LASI temp alarm status was triggered due to overtemp
->   **/
-> -s32 ixgbe_tn_check_overtemp(struct ixgbe_hw *hw)
-> +bool ixgbe_tn_check_overtemp(struct ixgbe_hw *hw)
->  {
->  	u16 phy_data = 0;
-> +	u32 status;
->  
->  	if (hw->device_id != IXGBE_DEV_ID_82599_T3_LOM)
-> -		return 0;
-> +		return false;
->  
->  	/* Check that the LASI temp alarm status was triggered */
-> -	hw->phy.ops.read_reg(hw, IXGBE_TN_LASI_STATUS_REG,
-> -			     MDIO_MMD_PMAPMD, &phy_data);
-> +	status = hw->phy.ops.read_reg(hw, IXGBE_TN_LASI_STATUS_REG,
-> +				      MDIO_MMD_PMAPMD, &phy_data);
-> +	if (status)
-> +		return false;
->  
-> -	if (!(phy_data & IXGBE_TN_LASI_STATUS_TEMP_ALARM))
-> -		return 0;
-> +	if (phy_data & IXGBE_TN_LASI_STATUS_TEMP_ALARM)
-> +		return true;
->  
-> -	return IXGBE_ERR_OVERTEMP;
-> +	return false;
-
-Maybe (completely untested!):
-
-	return !!(phy_data & IXGBE_TN_LASI_STATUS_TEMP_ALARM)
-
->  }
->  
->  /** ixgbe_set_copper_phy_power - Control power for copper phy
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
-> index 6544c4539c0d..ef72729d7c93 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
-> @@ -155,7 +155,7 @@ s32 ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw);
->  s32 ixgbe_get_sfp_init_sequence_offsets(struct ixgbe_hw *hw,
->  					u16 *list_offset,
->  					u16 *data_offset);
-> -s32 ixgbe_tn_check_overtemp(struct ixgbe_hw *hw);
-> +bool ixgbe_tn_check_overtemp(struct ixgbe_hw *hw);
->  s32 ixgbe_read_i2c_byte_generic(struct ixgbe_hw *hw, u8 byte_offset,
->  				u8 dev_addr, u8 *data);
->  s32 ixgbe_read_i2c_byte_generic_unlocked(struct ixgbe_hw *hw, u8 byte_offset,
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-> index 2b00db92b08f..91c9ecca4cb5 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-> @@ -3509,10 +3509,10 @@ struct ixgbe_phy_operations {
->  	s32 (*read_i2c_sff8472)(struct ixgbe_hw *, u8 , u8 *);
->  	s32 (*read_i2c_eeprom)(struct ixgbe_hw *, u8 , u8 *);
->  	s32 (*write_i2c_eeprom)(struct ixgbe_hw *, u8, u8);
-> -	s32 (*check_overtemp)(struct ixgbe_hw *);
-> +	bool (*check_overtemp)(struct ixgbe_hw *);
->  	s32 (*set_phy_power)(struct ixgbe_hw *, bool on);
->  	s32 (*enter_lplu)(struct ixgbe_hw *);
-> -	s32 (*handle_lasi)(struct ixgbe_hw *hw);
-> +	s32 (*handle_lasi)(struct ixgbe_hw *hw, bool *);
-
-I'm not sure of the history of this, or the nature of the other callbacks,
-but I think that usually int is used as the return type when standard error
-numbers are returned. I realise that is not strictly related to this patch,
-maybe it could be addressed at some point?
-
->  	s32 (*read_i2c_byte_unlocked)(struct ixgbe_hw *, u8 offset, u8 addr,
->  				      u8 *value);
->  	s32 (*write_i2c_byte_unlocked)(struct ixgbe_hw *, u8 offset, u8 addr,
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-> index b3509b617a4e..59dd38dd8248 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-> @@ -600,8 +600,10 @@ static s32 ixgbe_setup_fw_link(struct ixgbe_hw *hw)
->  	rc = ixgbe_fw_phy_activity(hw, FW_PHY_ACT_SETUP_LINK, &setup);
->  	if (rc)
->  		return rc;
-> +
->  	if (setup[0] == FW_PHY_ACT_SETUP_LINK_RSP_DOWN)
-> -		return IXGBE_ERR_OVERTEMP;
-> +		return -EIO;
-> +
->  	return 0;
->  }
->  
-> @@ -2367,18 +2369,21 @@ static s32 ixgbe_get_link_capabilities_X550em(struct ixgbe_hw *hw,
->   * @hw: pointer to hardware structure
->   * @lsc: pointer to boolean flag which indicates whether external Base T
->   *	 PHY interrupt is lsc
-> + * @is_overtemp: indicate whether an overtemp event encountered
->   *
->   * Determime if external Base T PHY interrupt cause is high temperature
->   * failure alarm or link status change.
-> - *
-> - * Return IXGBE_ERR_OVERTEMP if interrupt is high temperature
-> - * failure alarm, else return PHY access status.
->   **/
-> -static s32 ixgbe_get_lasi_ext_t_x550em(struct ixgbe_hw *hw, bool *lsc)
-> +static s32 ixgbe_get_lasi_ext_t_x550em(struct ixgbe_hw *hw, bool *lsc,
-> +				       bool *is_overtemp)
->  {
->  	u32 status;
->  	u16 reg;
->  
-> +	if (!hw || !lsc || !is_overtemp)
-> +		return -EINVAL;
-
-I don't think this kind of defensive programming is appropriate
-in a kernel driver.
-
-And unless I am mistaken, caller's don't check the return value of this
-function (or propagate to a caller which doesn't check it).
-
-> +
-> +	*is_overtemp = false;
->  	*lsc = false;
->  
->  	/* Vendor alarm triggered */
-> @@ -2410,7 +2415,8 @@ static s32 ixgbe_get_lasi_ext_t_x550em(struct ixgbe_hw *hw, bool *lsc)
->  	if (reg & IXGBE_MDIO_GLOBAL_ALM_1_HI_TMP_FAIL) {
->  		/* power down the PHY in case the PHY FW didn't already */
->  		ixgbe_set_copper_phy_power(hw, false);
-> -		return IXGBE_ERR_OVERTEMP;
-> +		*is_overtemp = true;
-> +		return -EIO;
->  	}
->  	if (reg & IXGBE_MDIO_GLOBAL_ALM_1_DEV_FAULT) {
->  		/*  device fault alarm triggered */
-> @@ -2424,7 +2430,8 @@ static s32 ixgbe_get_lasi_ext_t_x550em(struct ixgbe_hw *hw, bool *lsc)
->  		if (reg == IXGBE_MDIO_GLOBAL_FAULT_MSG_HI_TMP) {
->  			/* power down the PHY in case the PHY FW didn't */
->  			ixgbe_set_copper_phy_power(hw, false);
-> -			return IXGBE_ERR_OVERTEMP;
-> +			*is_overtemp = true;
-> +			return -EIO;
->  		}
->  	}
->  
-> @@ -2460,12 +2467,12 @@ static s32 ixgbe_get_lasi_ext_t_x550em(struct ixgbe_hw *hw, bool *lsc)
->   **/
->  static s32 ixgbe_enable_lasi_ext_t_x550em(struct ixgbe_hw *hw)
->  {
-> +	bool lsc, overtemp;
->  	u32 status;
->  	u16 reg;
-> -	bool lsc;
->  
->  	/* Clear interrupt flags */
-> -	status = ixgbe_get_lasi_ext_t_x550em(hw, &lsc);
-> +	status = ixgbe_get_lasi_ext_t_x550em(hw, &lsc, &overtemp);
->  
->  	/* Enable link status change alarm */
->  
-> @@ -2544,21 +2551,23 @@ static s32 ixgbe_enable_lasi_ext_t_x550em(struct ixgbe_hw *hw)
->  /**
->   * ixgbe_handle_lasi_ext_t_x550em - Handle external Base T PHY interrupt
->   * @hw: pointer to hardware structure
-> + * @is_overtemp: indicate whether an overtemp event encountered
->   *
->   * Handle external Base T PHY interrupt. If high temperature
->   * failure alarm then return error, else if link status change
->   * then setup internal/external PHY link
-> - *
-> - * Return IXGBE_ERR_OVERTEMP if interrupt is high temperature
-> - * failure alarm, else return PHY access status.
->   **/
-> -static s32 ixgbe_handle_lasi_ext_t_x550em(struct ixgbe_hw *hw)
-> +static s32 ixgbe_handle_lasi_ext_t_x550em(struct ixgbe_hw *hw,
-> +					  bool *is_overtemp)
->  {
->  	struct ixgbe_phy_info *phy = &hw->phy;
->  	bool lsc;
->  	u32 status;
->  
-> -	status = ixgbe_get_lasi_ext_t_x550em(hw, &lsc);
-> +	if (!hw || !is_overtemp)
-> +		return -EINVAL;
-
-Ditto.
-
-> +
-> +	status = ixgbe_get_lasi_ext_t_x550em(hw, &lsc, is_overtemp);
->  	if (status)
->  		return status;
->  
-> @@ -3186,20 +3195,20 @@ static s32 ixgbe_reset_phy_fw(struct ixgbe_hw *hw)
->   * ixgbe_check_overtemp_fw - Check firmware-controlled PHYs for overtemp
->   * @hw: pointer to hardware structure
->   */
-> -static s32 ixgbe_check_overtemp_fw(struct ixgbe_hw *hw)
-> +static bool ixgbe_check_overtemp_fw(struct ixgbe_hw *hw)
->  {
->  	u32 store[FW_PHY_ACT_DATA_COUNT] = { 0 };
->  	s32 rc;
->  
->  	rc = ixgbe_fw_phy_activity(hw, FW_PHY_ACT_GET_LINK_INFO, &store);
->  	if (rc)
-> -		return rc;
-> +		return false;
->  
->  	if (store[0] & FW_PHY_ACT_GET_LINK_INFO_TEMP) {
->  		ixgbe_shutdown_fw_phy(hw);
-> -		return IXGBE_ERR_OVERTEMP;
-> +		return true;
->  	}
-> -	return 0;
-> +	return false;
->  }
->  
->  /**
-> -- 
-> 2.31.1
-> 
 
