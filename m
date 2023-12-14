@@ -1,87 +1,120 @@
-Return-Path: <netdev+bounces-57335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21811812E4B
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:13:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D3B6812E57
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:15:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1636282570
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:13:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17FAE1F218B9
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:15:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DED14120D;
-	Thu, 14 Dec 2023 11:12:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCF343F8EC;
+	Thu, 14 Dec 2023 11:15:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hpRUkU+v"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="DFC8+J8a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68360118
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 03:12:49 -0800 (PST)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-50bfd8d5c77so9223923e87.1
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 03:12:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702552367; x=1703157167; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yV+H1iUcW23IJbiepd3475zmIxfPgIm3FP/Cq0IRb3k=;
-        b=hpRUkU+v+AJekPum5viWv7gdwRp5WK/KLi4geu9gclY8OlP7fZW5nwR9dzZkeAKr1b
-         DFxkjF+PT0OEGfjT3skQUBgqQAmKArg4mgMuT3byinmXvllos5GhTFvGtvAAubVEnQy/
-         sLj7vC3DEvwYMEXpeGoFnw5r++aTcxbpEUJvwbqN4G7bUtVBDdIvB0NVMUL8DVSGHvUn
-         kYWvzTyNMs8pfQB3VLqaHF1/PtrWgRz2hW5zn014XZILdclRcNjVbpjkSMyy4bUAbfx9
-         BM1QIw2jgRLRRVoc3kwyn2j/j3U/isE7p+eNHJnh9zX/auiUnSU6BdcbIdnoSeeystLV
-         B57w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702552367; x=1703157167;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yV+H1iUcW23IJbiepd3475zmIxfPgIm3FP/Cq0IRb3k=;
-        b=FM5kNIVmnOJkm+0Sl7WmBUCUm69/5w4pOmRPxQhdyxpPAAat3Nzh07N0jxvttsuBwV
-         Bq7j772HJBwuQqpJHAMbZRF6E3GWpjHPq0qlOxv+vVEtQCpJjjhSiu6XhVrK4UEyOOYV
-         1etnXDh+EarSUjR5FabM9MHL1jO6XNLnXx+KE5NDGZ1k3C1T68QBy2Vhb4TAQIoi1/Li
-         5CZm7KQhN4hinkxfHCdbMpJZC+FarYi9w0zXHYH1omEaVJnI65YFY01hcNVOTtoPS94B
-         e+rrC6tv4PBUCWBI68K78TMgs1vkSYuSYcDL4/mbEBGcJyFpdflcwPLwpIg0ufHAydra
-         NlLA==
-X-Gm-Message-State: AOJu0YzX4JxrMAfWQ1PBIIUXzIQ6JihOrm71iE3Opnw43BbpEA7RrJFu
-	vf4R1B02HcTv0KQyXxeB9Ck=
-X-Google-Smtp-Source: AGHT+IFgF+YJIpl3xRRUoR9ZZ7+I00SSKdiPAWYEMCmqMkNHvxPPE33sfVokuZw8DJ3QzxO1toxHCw==
-X-Received: by 2002:a05:6512:750:b0:50e:1680:83ed with SMTP id c16-20020a056512075000b0050e168083edmr243852lfs.84.1702552367433;
-        Thu, 14 Dec 2023 03:12:47 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:7840:ddbd:bbf:1e8f])
-        by smtp.gmail.com with ESMTPSA id d9-20020adfef89000000b0033342978c93sm15743138wro.30.2023.12.14.03.12.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 03:12:46 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  nicolas.dichtel@6wind.com,  jiri@resnulli.us
-Subject: Re: [PATCH net-next 6/8] tools: ynl-gen: re-sort ignoring recursive
- nests
-In-Reply-To: <20231213231432.2944749-7-kuba@kernel.org> (Jakub Kicinski's
-	message of "Wed, 13 Dec 2023 15:14:30 -0800")
-Date: Thu, 14 Dec 2023 11:12:13 +0000
-Message-ID: <m2le9x3unm.fsf@gmail.com>
-References: <20231213231432.2944749-1-kuba@kernel.org>
-	<20231213231432.2944749-7-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 667948E;
+	Thu, 14 Dec 2023 03:15:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=HpQxZhm8d6LKtqLRDNiB4jTiJNh2mIFp64Hs6+a2K2A=; t=1702552521; x=1703762121; 
+	b=DFC8+J8aGm8X2v/5PF25U4O11YsqcCTCwrpJwOBfxXZhIOWPPJQ2WuHs4qrsdDpYAuUvfBU4qOR
+	K5t6n0Q+76mWhesB7QIQ60LiyWyynoGuwHuqZ0VV1AnPJ8/k8nVlQTRCjyYGMcrx9XQo9OtRkQQO0
+	Ru1tAzHStl2L/epiKrOtBceER0Eu1ucbOuzq7fAe/x84ZBctPy9Bqo8iqQt83pIX+7Inyfl9QdvI5
+	epwC3FMVoaxRc/vVLnE0Sdah6bR04FbbHxU3DqzGUCFAFNJSU77PZtBO+i9kxXyQ04zJkFHtw5D6Z
+	Sg8GJhtDlp1gGB2FgIXSvakITrPtXvX8AtXQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1rDjgU-0000000Amjs-2rid;
+	Thu, 14 Dec 2023 12:15:18 +0100
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: pull-request: wireless-2023-12-14
+Date: Thu, 14 Dec 2023 12:13:56 +0100
+Message-ID: <20231214111515.60626-3-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Jakub Kicinski <kuba@kernel.org> writes:
+Hi,
 
-> We try to keep the structures and helpers "topologically sorted",
-> to avoid forward declarations. When recursive nests are at play
-> we need to sort twice, because structs which end up being marked
-> as recursive will get a full set of forward declarations, so we
-> should ignore them for the purpose of sorting.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+So more stragglers than I'd like, perhaps, but here we are.
+A bunch of these escaped Intel's vault late though, and we're
+now rewriting our tooling so should get better at that...
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+Please pull and let us know if there's any problem.
+
+Thanks,
+johannes
+
+
+
+The following changes since commit 91fdb30ddfdb651509914d3ed0a0302712540fed:
+
+  net: libwx: fix memory leak on msix entry (2023-11-29 20:13:03 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2023-12-14
+
+for you to fetch changes up to 3c2a8ebe3fe66a5f77d4c164a0bea8e2ff37b455:
+
+  wifi: cfg80211: fix certs build to not depend on file order (2023-12-14 09:11:51 +0100)
+
+----------------------------------------------------------------
+ * add (and fix) certificate for regdb handover to Chen-Yu Tsai
+ * fix rfkill GPIO handling
+ * a few driver (iwlwifi, mt76) crash fixes
+ * logic fixes in the stack
+
+----------------------------------------------------------------
+Avraham Stern (1):
+      wifi: iwlwifi: pcie: avoid a NULL pointer dereference
+
+Chen-Yu Tsai (1):
+      wifi: cfg80211: Add my certificate
+
+Edward Adam Davis (1):
+      wifi: mac80211: check if the existing link config remains unchanged
+
+Felix Fietkau (1):
+      wifi: mt76: fix crash with WED rx support enabled
+
+Johannes Berg (7):
+      wifi: ieee80211: don't require protected vendor action frames
+      wifi: iwlwifi: pcie: add another missing bh-disable for rxq->lock
+      wifi: mac80211: don't re-add debugfs during reconfig
+      wifi: mac80211: check defragmentation succeeded
+      wifi: mac80211: mesh: check element parsing succeeded
+      wifi: mac80211: mesh_plink: fix matches_local logic
+      wifi: cfg80211: fix certs build to not depend on file order
+
+Rouven Czerwinski (1):
+      net: rfkill: gpio: set GPIO direction
+
+ drivers/net/wireless/intel/iwlwifi/pcie/rx.c    |  2 +-
+ drivers/net/wireless/intel/iwlwifi/pcie/trans.c |  4 +-
+ drivers/net/wireless/mediatek/mt76/dma.c        | 10 +--
+ include/linux/ieee80211.h                       |  3 +-
+ net/mac80211/cfg.c                              |  4 +-
+ net/mac80211/driver-ops.c                       |  6 +-
+ net/mac80211/mesh_plink.c                       | 16 +++--
+ net/mac80211/mlme.c                             |  4 +-
+ net/rfkill/rfkill-gpio.c                        |  8 +++
+ net/wireless/certs/wens.hex                     | 87 +++++++++++++++++++++++++
+ 10 files changed, 125 insertions(+), 19 deletions(-)
+ create mode 100644 net/wireless/certs/wens.hex
 
