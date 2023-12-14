@@ -1,87 +1,163 @@
-Return-Path: <netdev+bounces-57332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97C28812E48
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:13:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 941F5812E10
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:05:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C803C1C21494
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:13:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F7432828BB
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:05:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F2E3F8F9;
-	Thu, 14 Dec 2023 11:12:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E57B53E487;
+	Thu, 14 Dec 2023 11:04:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ScxSLKsR"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="kLXr8E0N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30997B7
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 03:12:44 -0800 (PST)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-40c2308faedso82091855e9.1
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 03:12:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702552362; x=1703157162; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WY6V/EuYOgr05Aa2pH43QYAE0TQDIKxakfFLhSs3zSQ=;
-        b=ScxSLKsRgjY4ibxgsXiA23MtSPWAPp2I5aTIjovr8+S3mHfIcCuMy+g3XsV0arZAjg
-         c8g8A+D45rczvTMYb5g7f+ylSnfBIdm0jaoV47y7KLAzjnnxRUakDY0CzBUKHywiOhcM
-         JqsaaoCqnRgowwLslqxZeT/P7NYp02mM4vtSpYxZKtawebihRoo/RkgansMSUJYUirAc
-         Ju8bhA1EHWQGvquk7B2h3ujwf26xfIuti7nCtGyTG5VIy+zlv7EgThXVdhn5bCG/oc9M
-         aqqKQahRzJ8mkWshQiV7AVGL2Ii/cAL0jUsPlgTriJlOyuD6aLMywBJQ2/QSMxXptXAz
-         ZjKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702552362; x=1703157162;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WY6V/EuYOgr05Aa2pH43QYAE0TQDIKxakfFLhSs3zSQ=;
-        b=LXTVs1E0ouFJxY9la3pQgaf9sKebXhXoOf8UTsglc73KB20J0V0ubVeOGWNCDPsB2b
-         sxWwKsa/IYAdKkK0OSOjrhs7itNZQXmXTciODC+1SiE9uZuRoMprCt1vb1qq5V6VbQSp
-         wj/x7ZPBcm7kd4suY7jowKgAnLS7XxfNqYFdcyPt6JdCcEFC1TRgJWOW05vwMX7uhsG9
-         eDCH1cIpImjWelLp/oCuNhQ0N5F4s9klTufwirlHsz8GenWox41V6KUc3zt4BuNNB7ZO
-         ec3Dj19mo7ENxShyqc+0KhdtU3P95cCtzhbofUKbq4c4yJP4VK5lbHcYAzYXhJJJtLHM
-         +Ltg==
-X-Gm-Message-State: AOJu0Yxv0vV1N8nkmpmZFDjB4E+0vsLecjLrrebhfvCNooEnHwq/onYJ
-	rNtrvoTH+hWTzM9Puh3KDCPH5CYhIH1kug==
-X-Google-Smtp-Source: AGHT+IGk4uUR4mYDDEa6wBGX9mitupl8WNjEcqlxmRfM6ghr/zWN13rkTZjK9m1XMzjBUXO+Y1e1dw==
-X-Received: by 2002:a7b:c4ca:0:b0:40c:386b:9356 with SMTP id g10-20020a7bc4ca000000b0040c386b9356mr4621186wmk.72.1702552362592;
-        Thu, 14 Dec 2023 03:12:42 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:7840:ddbd:bbf:1e8f])
-        by smtp.gmail.com with ESMTPSA id n19-20020a05600c3b9300b0040b4b66110csm24345566wms.22.2023.12.14.03.12.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 03:12:42 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  nicolas.dichtel@6wind.com,  jiri@resnulli.us
-Subject: Re: [PATCH net-next 5/8] tools: ynl-gen: record information about
- recursive nests
-In-Reply-To: <20231213231432.2944749-6-kuba@kernel.org> (Jakub Kicinski's
-	message of "Wed, 13 Dec 2023 15:14:29 -0800")
-Date: Thu, 14 Dec 2023 11:02:16 +0000
-Message-ID: <m2y1dx3v47.fsf@gmail.com>
-References: <20231213231432.2944749-1-kuba@kernel.org>
-	<20231213231432.2944749-6-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2060.outbound.protection.outlook.com [40.107.21.60])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63BBE197;
+	Thu, 14 Dec 2023 03:04:55 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YsEvlg60p0zZ5TReJnExPWcY2ijrxDReB9OW4AC48p8CfdPHgm/OaUxBtS2FGn07FqB8SeIJDxwEhogZ0l4s5BneT+DzRoIRLrQ0ySxUCNT3yD5txtn9gehwmuVnQjMY4VG4hq3Vz4rV1Y0wpISqCOgQEEKIlAegQBR7dBuTz/Zvs9IkIv8eJLqLKOa8Psq8UZyaiRL604i8Rqxt3OGt2HEZjU74ERv19XEwyYVzvd/Tx9/t6kImhTECzyDHS54pWJVk9rOySL/cucjUCy+vzTqB8EXn/NhgpRzLK9i/EoBDXAa5P2H2Uq67vXENljjrtq36zq26tkLIYJOzMlViFA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pflpDcyv989TQf//x+qYNrITgMfQkkHbT14dyc+OIys=;
+ b=Ns6sSOF2BZm2XGBJdLfYhbVHITNCnf96qucg8AYrYnstFhcSgOVY5wiADtS9LWQBIJasQhUkmO/gMsFDk+Fmif7Qsj4tnjN0l2v8a4O8BeNJ/NHLr9bO2H1Gr4Pnm6dXhtYBGfZDwABfkccbmy8OpGI8WGT1yyNhG1/tD582RsHiboc4tNmUTJ1X5vnKCXKmmkoLkFGHHhSzbGaQ770MWmRUXT2LgGZpAx/zviXPChiAiZBQswNH/wcFBx9dfwOqhcCLMyn6kwHF7tYlrGO8Otwcbbuf5ZQaiQRiW2pssQpcTHi0VHO8Ub8WcResXV0M6t8CMHEoSYs1HoxGRwUAqw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pflpDcyv989TQf//x+qYNrITgMfQkkHbT14dyc+OIys=;
+ b=kLXr8E0N6upNbxGLfmXFJanxGE1s1iuqXodupnL894ZZPxJEn7Rgb00ktko1l/gL+v2JzxYj4B00AXq0rN1oSwYx5xMJji05I5N5ty+vZ/QHuX8rmaw602xqlCg7Iln0MtCkj/RarVs+FIrlozOh9E9Q2eEzG0PdWMOs3U8lDI8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by GV1PR04MB9070.eurprd04.prod.outlook.com (2603:10a6:150:21::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.28; Thu, 14 Dec
+ 2023 11:04:52 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7091.028; Thu, 14 Dec 2023
+ 11:04:52 +0000
+Date: Thu, 14 Dec 2023 13:04:48 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, shuah@kernel.org, s-vadapalli@ti.com,
+	r-gunasekaran@ti.com, vigneshr@ti.com, srk@ti.com, horms@kernel.org,
+	p-varis@ti.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 net-next 09/11] net: ethernet: ti: am65-cpsw-qos: Add
+ Frame Preemption MAC Merge support
+Message-ID: <20231214110448.lycg7yusrusbd7w2@skbuf>
+References: <20231213110721.69154-1-rogerq@kernel.org>
+ <20231213110721.69154-10-rogerq@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231213110721.69154-10-rogerq@kernel.org>
+X-ClientProxiedBy: VI1PR0902CA0043.eurprd09.prod.outlook.com
+ (2603:10a6:802:1::32) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|GV1PR04MB9070:EE_
+X-MS-Office365-Filtering-Correlation-Id: 61a80626-6485-4645-e6a5-08dbfc947eec
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	xsyvzvJ06ljXOUvyouBP5pZb2rGlTKx819B8uqXQ+hPWbJiAJOzNcK4bUE4GV0CgZx9/FkWHiRpha4E/YWdoH22piUHqUojyTwsTU7V/bsxNsp4cGoFZVM60GNzYqgUeoc7PU1Ri8mT0NqaJSMOoiWy00pYySCbV+P5dpZVswRghof/FcLMAUsKWQ5+YdStIXv7Ral0syb1VaW12qq+rAeriT24MVdRu6UKhnjJFXvv/9pYIQX7GtzRfJgEAXhh+ccTIRV3S90RMu3g+Xo9GxbVqS2zNC6L+PrX7j0Tx45A4GzWGTiHL2PKjMs+7cd2j7IF4rlKAXlYD89qd81yNjewouW7GBa0RYQ14RGv3vTYsQ59Qn2hmRVOluiIPCFvzFmhNQyn5l2XXyqloE3ia1lDj4+c+4fOw+0UhufvVpUw1sdgglE3eQMncQMOnbF9z/NGh+yjxx9ZF5XZcGxn86lsJFKufM0KfFC3+chiiYvzNcUROOpz8+ihguAl5Y6zde9+F7UvTVs19ro6E8IMq6sy3VETm3zVE5mZp53cjqVrC5DxCkLSwHy6wh0748E0O
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(376002)(396003)(39860400002)(136003)(346002)(230922051799003)(186009)(1800799012)(451199024)(64100799003)(6666004)(478600001)(6486002)(38100700002)(83380400001)(26005)(1076003)(6506007)(6512007)(9686003)(2906002)(8676002)(41300700001)(8936002)(5660300002)(4326008)(7416002)(86362001)(44832011)(6916009)(316002)(66556008)(66946007)(66476007)(33716001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?ORDOpEgJwyFYqhcgNiChs/mOm5QKZy+eD1LKJQ3N4/VT70cEWlwH2FnKDaZ+?=
+ =?us-ascii?Q?Z5X/ifcdHR5wQ+ifgOlDMABmQkqshBqbVtO54Pfznw3woL6kqZ5shE9sDwnj?=
+ =?us-ascii?Q?/v1ffsj9e055ONId54bzyLXQTjIhyM4HkeAIYHp6zyhMkTyc6re/lJRWDJud?=
+ =?us-ascii?Q?qVgQFd0/T1SpKksiMpHYXAdmoqSBSPcAm0m3W5hYWolydzPjb5Q4ONT/iPgK?=
+ =?us-ascii?Q?bFG/7TedzKYDTli9ZT5pvbec3JpmJA3GBXp5vD9BNHLMxzMgwaTMgSrlYJhR?=
+ =?us-ascii?Q?MeSDxMDfIOOsePTy8f5qeIv1yi1FeRM4A4ZiljUVPDjoL7K6jyx3eFvEjxK3?=
+ =?us-ascii?Q?C4m2mNQJrhKoY+5QVKnrMUyKp8WagLmY0c5ms17E5o07sSbC0DN9q3KPnG9t?=
+ =?us-ascii?Q?TkEgtLamgCvPupHMrPof4hEUF9TY5xF+Sxx3diqd+47jFy5Gell9geOHNUUO?=
+ =?us-ascii?Q?bXnLxNba/4m4G0xRtfDYhKCVVGfNpZOqcHzfQRtm1FAQuvEhhFHsKVtbFDU1?=
+ =?us-ascii?Q?jvR56vrQnqOSmHZg1Z+AxsY2j0F/JLNrFfvLSCfIWPGwTSnGlGn6wH370V33?=
+ =?us-ascii?Q?k0eZNMTJtaFMP3x+ttnqHexvCI9kLkElcvzpzuyVHLIaiE4O9j4oO/9GErYj?=
+ =?us-ascii?Q?VvJnOJ8v2bJAwpHLfwmhq2/YkzjD1NQ4+Z8l1XKs0GqiFoGUDm3zo2wcb5YO?=
+ =?us-ascii?Q?SEaG7pFMY4lsq/h9wtWG87GQSZd3ebkCPCIpBUf8FSt5PmzIigVboiI1l0Bd?=
+ =?us-ascii?Q?vcopRSmASzirpNGgVSOPHXsXv9uuvC2QgEqvcCFvtnz6S449vjRlXi8UgoJ8?=
+ =?us-ascii?Q?CypgD1AbGUDpYoXy8dB5XXb1PQ3PdH9Yoyb7uIqvOGm42RmSA+KBEFojKUay?=
+ =?us-ascii?Q?WlY+OvSISbIMXVsoGUS0YWLslGijXKO18HkoKf+Za9BQELSt6SXwA/Riklr3?=
+ =?us-ascii?Q?UZ+Jp6EaLe/ZygMDkfy6oxpoO/y4ECIEmoNgSaL7Y2w5o4SCCTDIxfdsrs01?=
+ =?us-ascii?Q?k+2/cNE3V/JbcbFVv/HVG3LVaI4cMLQ4xGgWKGbGDVJ+/dxry+x1R3xksadQ?=
+ =?us-ascii?Q?SSPNEJ0O7rdDKKtTyHwQTDPmioVyD9Y9TEnePva4FZpUiGDR19AJh9iJnVdV?=
+ =?us-ascii?Q?wIptx1OQYJuMAabq5xqGRGquVS4pjhaUSu7MYcv+5P0AOdSJ70ktUCHHdYI9?=
+ =?us-ascii?Q?4Bj+3xgkZa2Kg7DvO+GzqimjP/+9Be+WDFDNBPSAlxSIwi0RW0Nc1rX71CSd?=
+ =?us-ascii?Q?E4DErZ6+s+HaIszOkVghQr5+Xk5QDhk8rwBzGJu6pz7xxWOckm6Fol8w9/d8?=
+ =?us-ascii?Q?W3QIZ9Y8DxthvwBDz+4hJilYMSxumq8VWecuS6szyOffP7iWfxR74pzTElLs?=
+ =?us-ascii?Q?WT3wnMMJwTlDWQDHiuv5RPL3vPRP5ZDMiwXI6Tr0f534xVnlcMcFj35N9cLI?=
+ =?us-ascii?Q?d//rYXZ9B+Q8PJ13NUs1jczCU7b7aB88vN+TSa5kKto6uMrkgBhnGRHBcYpv?=
+ =?us-ascii?Q?5/b2mFYo+MiJh3z3L0nwqHqGFUYigTJ1Mhf+zPhCexO/EI4+7cu3O2dHulfC?=
+ =?us-ascii?Q?SqY8/TR1TLaVcQxe4WMLfOVsra+H2rp54zfZhl2ySGrOO6oMkdSmRQvNYRi9?=
+ =?us-ascii?Q?DQ=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 61a80626-6485-4645-e6a5-08dbfc947eec
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2023 11:04:51.9968
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: whyv5tF1krCMDf1Ryk45ty0bEWGGs5ceYep1Aq35z0rl8tOLZ7d9EMRJzEgZVzpL2dhOkFrsWWM07kAJNzuptA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR04MB9070
 
-Jakub Kicinski <kuba@kernel.org> writes:
+On Wed, Dec 13, 2023 at 01:07:19PM +0200, Roger Quadros wrote:
+> - Fix am65_cpsw_iet_get_verify_timeout_ms() to default to timeout for
+>   1G link if link is inactive.
+> +
+> +static int am65_cpsw_set_mm(struct net_device *ndev, struct ethtool_mm_cfg *cfg,
+> +			    struct netlink_ext_ack *extack)
+> +{
+> +	val = readl(port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
+> +	if (cfg->verify_enabled) {
+> +		val &= ~AM65_CPSW_PN_IET_MAC_DISABLEVERIFY;
+> +		/* Reset Verify state machine. Verification won't start here.
+> +		 * Verification will be done once link-up.
+> +		 */
+> +		val |= AM65_CPSW_PN_IET_MAC_LINKFAIL;
+> +	} else {
+> +		val |= AM65_CPSW_PN_IET_MAC_DISABLEVERIFY;
+> +		/* Clear LINKFAIL to allow verify/response packets */
+> +		val &= ~AM65_CPSW_PN_IET_MAC_LINKFAIL;
+> +	}
+> +
+> +	val &= ~AM65_CPSW_PN_IET_MAC_MAC_ADDFRAGSIZE_MASK;
+> +	val |= AM65_CPSW_PN_IET_MAC_SET_ADDFRAGSIZE(add_frag_size);
+> +	writel(val, port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
+> +
+> +	/* verify_timeout_count can only be set at valid link */
+> +	if (cfg->verify_time > 0)
+> +		port->qos.iet.verify_time_ms = cfg->verify_time;
+> +	else
+> +		port->qos.iet.verify_time_ms = 10;
 
-> Track which nests are recursive. Non-recursive nesting gets
-> rendered in C as directly nested structs. For recursive
-> ones we need to put a pointer in, rather than full struct.
->
-> Track this information, no change to generated code, yet.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+I don't think I understand what the check is for? The netlink policy for
+ETHTOOL_A_MM_VERIFY_TIME limits the range between 1 ms and 128 ms.
+How can it be 0?
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+> +
+> +	/* enable/disable preemption based on link status */
+> +	am65_cpsw_iet_commit_preemptible_tcs(port);
+> +
+> +	return 0;
+> +}
 
