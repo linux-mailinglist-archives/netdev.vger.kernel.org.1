@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-57156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8C9C81248B
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:25:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E922281248C
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:25:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1EA91C213FB
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 01:25:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED489B21238
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 01:25:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 687E37ED;
-	Thu, 14 Dec 2023 01:25:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0E17F9;
+	Thu, 14 Dec 2023 01:25:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MFI9Es2o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TGvmP0G5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484E13D7C
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 01:25:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D953C433CB;
-	Thu, 14 Dec 2023 01:25:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A140946A2
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 01:25:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14A72C433C9;
+	Thu, 14 Dec 2023 01:25:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702517116;
-	bh=5h8PjeKPgBikqIMJWdj/lwMwuYTz1KaOOIwl94MC+3A=;
+	s=k20201202; t=1702517117;
+	bh=Mu9Xn91286+2wllO7EGzHSJcvlQwhXUD9IjgPOUs7yM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MFI9Es2osyzcVf3lzEhluEHZH0LXXSbLUMO1WCaGCohWHSNQbLuedub/sBcdh46Da
-	 R8Nu4ap+8nlRgNLH86IZpOnWW+3YBAW32EQP8S43/R4CRZuzG5un4wTktHBAlZ36v6
-	 XcqtRmHACa96N8o0bZERg6vAZXpQ4md041EMpMaBz5Z8vUGK9QcvKyy/PZEWkPtYl+
-	 niJvCLt/DMqbCOjgialpjIoKjfhIQSeSlVBJsYYrGNANo0FJvXh0z4wpUtZq143TK8
-	 t20Fu/OQ2UHjNyrkt9gtPfM9QYLEYTyxWhw8P8rX+QqvGXXfLt2TQ29LKpp1udB5E8
-	 MYmIkGbsNPPtQ==
+	b=TGvmP0G5WvGzGVALEiRizfgnxOt4WOVjzEyM44dJ3TxOYRKajqGtzQ3r4zMwicArS
+	 R47eRrNn+Lq65rYLZsl7qRP4XBGMIn1ZbFoEulaVkQ+csQbb9ZGGGJvMa14b48Ddt1
+	 IZQER3Vy4L/TM8WeOeFgBGUU0m66e0VjfOOmtFoWIlqttx6ABJJvqa3lbqdb5imNwC
+	 MEg0Ful57l1Gd4rUxUD7lLfFF1RUxkMM2kQ/GpulrPnc9duanZYTo9I5K5waPcujpv
+	 GenY0h+0OeklgSlzYF3V3VaIRhU0gxGy3Xrq799zREReoBmlGp2r3RQJmyxvlJK57Z
+	 XRdZZ+L4okYkQ==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,11 +40,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Jianbo Liu <jianbol@nvidia.com>,
-	Roi Dayan <roid@nvidia.com>
-Subject: [net 07/15] net/mlx5e: Fix overrun reported by coverity
-Date: Wed, 13 Dec 2023 17:24:57 -0800
-Message-ID: <20231214012505.42666-8-saeed@kernel.org>
+	Chris Mi <cmi@nvidia.com>,
+	Jianbo Liu <jianbol@nvidia.com>
+Subject: [net 08/15] net/mlx5e: Decrease num_block_tc when unblock tc offload
+Date: Wed, 13 Dec 2023 17:24:58 -0800
+Message-ID: <20231214012505.42666-9-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231214012505.42666-1-saeed@kernel.org>
 References: <20231214012505.42666-1-saeed@kernel.org>
@@ -56,57 +56,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jianbo Liu <jianbol@nvidia.com>
+From: Chris Mi <cmi@nvidia.com>
 
-Coverity Scan reports the following issue. But it's impossible that
-mlx5_get_dev_index returns 7 for PF, even if the index is calculated
-from PCI FUNC ID. So add the checking to make coverity slience.
+The cited commit increases num_block_tc when unblock tc offload.
+Actually should decrease it.
 
-CID 610894 (#2 of 2): Out-of-bounds write (OVERRUN)
-Overrunning array esw->fdb_table.offloads.peer_miss_rules of 4 8-byte
-elements at element index 7 (byte offset 63) using index
-mlx5_get_dev_index(peer_dev) (which evaluates to 7).
-
-Fixes: 9bee385a6e39 ("net/mlx5: E-switch, refactor FDB miss rule add/remove")
-Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-Reviewed-by: Roi Dayan <roid@nvidia.com>
+Fixes: c8e350e62fc5 ("net/mlx5e: Make TC and IPsec offloads mutually exclusive on a netdev")
+Signed-off-by: Chris Mi <cmi@nvidia.com>
+Reviewed-by: Jianbo Liu <jianbol@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../ethernet/mellanox/mlx5/core/eswitch_offloads.c   | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-index bb8bcb448ae9..9bd5609cf659 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-@@ -1177,9 +1177,9 @@ static int esw_add_fdb_peer_miss_rules(struct mlx5_eswitch *esw,
- 	struct mlx5_flow_handle *flow;
- 	struct mlx5_flow_spec *spec;
- 	struct mlx5_vport *vport;
-+	int err, pfindex;
- 	unsigned long i;
- 	void *misc;
--	int err;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c
+index c1e89dc77db9..41a2543a52cd 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c
+@@ -2142,7 +2142,7 @@ static int mlx5e_ipsec_block_tc_offload(struct mlx5_core_dev *mdev)
  
- 	if (!MLX5_VPORT_MANAGER(esw->dev) && !mlx5_core_is_ecpf_esw_manager(esw->dev))
- 		return 0;
-@@ -1255,7 +1255,15 @@ static int esw_add_fdb_peer_miss_rules(struct mlx5_eswitch *esw,
- 			flows[vport->index] = flow;
- 		}
- 	}
--	esw->fdb_table.offloads.peer_miss_rules[mlx5_get_dev_index(peer_dev)] = flows;
-+
-+	pfindex = mlx5_get_dev_index(peer_dev);
-+	if (pfindex >= MLX5_MAX_PORTS) {
-+		esw_warn(esw->dev, "Peer dev index(%d) is over the max num defined(%d)\n",
-+			 pfindex, MLX5_MAX_PORTS);
-+		err = -EINVAL;
-+		goto add_ec_vf_flow_err;
-+	}
-+	esw->fdb_table.offloads.peer_miss_rules[pfindex] = flows;
+ static void mlx5e_ipsec_unblock_tc_offload(struct mlx5_core_dev *mdev)
+ {
+-	mdev->num_block_tc++;
++	mdev->num_block_tc--;
+ }
  
- 	kvfree(spec);
- 	return 0;
+ int mlx5e_accel_ipsec_fs_add_rule(struct mlx5e_ipsec_sa_entry *sa_entry)
 -- 
 2.43.0
 
