@@ -1,68 +1,66 @@
-Return-Path: <netdev+bounces-57223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95A5481261C
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 04:53:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6D65812650
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 05:15:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FA4BB21076
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 03:53:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70B282815BF
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 04:15:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 494D81871;
-	Thu, 14 Dec 2023 03:52:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A87B317E4;
+	Thu, 14 Dec 2023 04:15:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T6aE/Xp6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Br9llnfa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCB0910B
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 19:52:54 -0800 (PST)
-Received: by mail-oi1-x234.google.com with SMTP id 5614622812f47-3b9e2a014e8so5471599b6e.2
-        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 19:52:54 -0800 (PST)
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44103CF
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 20:15:12 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id 98e67ed59e1d1-286b45c5a8dso8064735a91.1
+        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 20:15:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702525974; x=1703130774; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1702527312; x=1703132112; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yiqdwdOZ0FAsGmIOr/WB6FnKYdGFXUJx+JPX+VsFl9E=;
-        b=T6aE/Xp6WQ1exMX5gFiOvde7/RUYvsNt0m1q8n6F3XN8L/BOw5MyGwsgT5NUqBMxA+
-         5qAO+z/1lDctpW0naJm7BgaUCkyGnayKMeuM9or8Gw8qlWHP0Fwn1SbG5HLYnLENhqmN
-         vNKr5GO42KCJRe/IRAnTuAsKg+DAPk2Zsbb14qhkDO0iSaehO4BqL5HPIo74e83XWbgw
-         xg7IQwXEfEEsUVS4oIOWu0775nw5zPIYolpJXL1PEzYBB9JkBIVNfGYgbhHap7DWHog5
-         fTnCgZx39vbStxFThJs5ZCWX08PagGYAzzZB2domAPVPUjYxDQhNTFYY86E3uAIuA1h+
-         mBfQ==
+        bh=iM7zWVa0XHAy6wGlOZW+2wt/022FKMl4RKM94PMESHs=;
+        b=Br9llnfaKjlvN2uewWMiuaBMaxLSeGpKw0wnQxqUer33KhGsII9GmKSApQp/fYygCV
+         7fIe07735zT4tAHhwfPV9Lt03/+ixbYPI3d/d1A/+qmf7zuPlQxqYlAWJ9V9WKT32UhN
+         nYJwXd9K4K7qC+yCv8k3MrB9p8VFsiqPfMEbHAKDeZ/IrD8muqaq7JrVFHLd/SL8WxFH
+         YIMCCAJd9QzS1nZDSNEWXQAT7ju0F3x6i/i+vwAOWN9aEEr7lPDErW5qKMNoEOTvZfxZ
+         1WnkKnnykMqSJccOSqd+XPJQBz1w8yUl0aV5x899F5re25ND6p4flKHFsM+S0GupHFV+
+         Is+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702525974; x=1703130774;
+        d=1e100.net; s=20230601; t=1702527312; x=1703132112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yiqdwdOZ0FAsGmIOr/WB6FnKYdGFXUJx+JPX+VsFl9E=;
-        b=SoJqv+DwWoh4RstHAUuqFWFdHuM5JmLb+Oiv/zxwASaDZrJFHN2WoC5hXxfC9V8yo5
-         1LxMMue7GLKihGhXo35tKr82vGev5NH0/Lul+UlsmlRG5zdn6JULWtllqwKAqWKKkhQW
-         anxnII8O6HuxotAM1WFr+LsdE3dxhp5kvbEDg5Rmz7ypFJoJDlj5cBWZCdY5DO/FtTe5
-         UWZZyeWQsoDop2O3hHrgDQDwX1CcUujBxwPoO00PEnin0Otmx99cLfUOdA/Mb87N0SMd
-         ATVVd59Xx6sAcC01piZJ01uhpcQF+y2lWQQ/q9BDhJBytOK8PjAn+EbAzH4j+gmmP3V7
-         NYwg==
-X-Gm-Message-State: AOJu0YxRDCjhW/ZLnWZ6JzPqFacm5pAJE6CWHfCsSgtcd+7lkdHJGBB/
-	b6estQWh4cT4NBzrobw4FgfPPPvHOc8VnS31eEg=
-X-Google-Smtp-Source: AGHT+IEOTvBaw6ErxbNel/wNMSnV/KGYcQ1gzAgILOmEw60806ffMpZTSSz35rWXl84Ln73qCRnkTg==
-X-Received: by 2002:a05:6808:3023:b0:3b8:b063:6ba6 with SMTP id ay35-20020a056808302300b003b8b0636ba6mr10990845oib.85.1702525974051;
-        Wed, 13 Dec 2023 19:52:54 -0800 (PST)
+        bh=iM7zWVa0XHAy6wGlOZW+2wt/022FKMl4RKM94PMESHs=;
+        b=bsRwAVOyMiUJdLRzQoLgb/fQSGMLdkYtPCxBfsmnCQXxrGcrktP8F0vBSI7idNs8yW
+         dsvhuvVjD3TT/+4sCuqpikzsGNqVYbA/pcA3XTjPQjr2neASDNG3jwFAu+f3tCpSw4sy
+         yM5jjucqPhzh19iBnOdfZIagnWXg358dzfkA380dfuShU5thAwlSaGt/bM5OLt4offBK
+         8cPCQ4KZBnUmmMf1JIqUm2iZekbyiKl0kjxGHR8tUwUg3xyB+Nj10Z61ySJCoOfBz54V
+         Gk/V/KstJClZSB6MLpAn1JUp5+aIyo65F52aTJgBYdtza7WYRbvW4sQG7NRayW/l1HV9
+         eC9A==
+X-Gm-Message-State: AOJu0YxhCQJWgcDZBBfM07D3Lp5l30nmi8sl9oqw307rqLE1Jz2Mj2/B
+	u+Qx3/trYRxIQzlTmlTpF+M=
+X-Google-Smtp-Source: AGHT+IHJ6/7WUENXF5cNYE8RlUnI8re5akNYE5zdoKPs7BdD5qN6ZJ+PsLMtTEKEzbRHJhJSJAg4ig==
+X-Received: by 2002:a17:902:e789:b0:1d0:6ffe:9f5 with SMTP id cp9-20020a170902e78900b001d06ffe09f5mr10592514plb.83.1702527311568;
+        Wed, 13 Dec 2023 20:15:11 -0800 (PST)
 Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id oa13-20020a17090b1bcd00b0028ae3061475sm2258750pjb.19.2023.12.13.19.52.52
+        by smtp.gmail.com with ESMTPSA id t13-20020a1709027fcd00b001d051725d09sm2371500plb.241.2023.12.13.20.15.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 19:52:53 -0800 (PST)
-Date: Thu, 14 Dec 2023 11:52:50 +0800
+        Wed, 13 Dec 2023 20:15:11 -0800 (PST)
+Date: Thu, 14 Dec 2023 12:15:07 +0800
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [Draft PATCH net-next 1/3] Documentation: netlink: add a YAML
- spec for team
-Message-ID: <ZXp8Elbqfxuum01g@Laptop-X1>
+Subject: Re: [Draft PATCH net-next 0/3] add YAML spec for team
+Message-ID: <ZXqBSyBt7xiv7YyA@Laptop-X1>
 References: <20231213084502.4042718-1-liuhangbin@gmail.com>
- <20231213084502.4042718-2-liuhangbin@gmail.com>
- <20231213081818.4e885817@kernel.org>
+ <20231213083642.1872702f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,32 +69,113 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231213081818.4e885817@kernel.org>
+In-Reply-To: <20231213083642.1872702f@kernel.org>
 
-On Wed, Dec 13, 2023 at 08:18:18AM -0800, Jakub Kicinski wrote:
-> On Wed, 13 Dec 2023 16:45:00 +0800 Hangbin Liu wrote:
-> > +    -
-> > +      name: noop
-> > +      doc: No operation
-> > +      value: 0
-> > +      attribute-set: team
-> > +      dont-validate: [ strict, dump ]
-> > +
-> > +      do:
-> > +        # Actually it only reply the team netlink family
-> > +        reply:
-> > +          attributes:
-> > +            - team-ifindex
+Hi Jakub,
+On Wed, Dec 13, 2023 at 08:36:42AM -0800, Jakub Kicinski wrote:
+> > There are still some questions I got during convertion.
+> > 
+> > 1. Is there a preference to use "-" instead of "_" for the names in spec file?
+> >    e.g. the attr-cnt-name in team.spec, should I use __team-attr-item-port-max
+> >    or --team-attr-item-port-max, or __team_attr_item_port_max?
 > 
-> Oh my. Does it actually take team-ifindex or its an op with no input
-> and no output?
+> Minor preference for using -, but it mostly matters for things which
+> will be visible outside of C. For instance in attr names when they are
+> used in python: 
+>   msg['port-index']
+> looks nicer to me than
+>   msg['port_index']
+> and is marginally easier to type. But cnt-name is a C thing, so up to
+> you. If I was writing it myself I'd probably go with
+> --team-attr-item-port-max, that's what MPTCP did.
 
-No, it doesn't take team-ifindex. It's an option with no input
-and just reply the team_nl_family.
+Thanks, I will do as what else do
 
-I added this reply attribute just to make sure the TEAM_CMD_NOOP show in the
-cmd enum to not break uAPI.
+> 
+> > 2. I saw ynl-gen-c.py deals with unterminated-ok. But this policy is not shown
+> >    in the schemas. Is it a new feature that still working on?
+> 
+> I must have added it to the code gen when experimenting with a family 
+> I didn't end up supporting. I'm not actively working on that one, feel
+> free to take a stab at finishing it or LMK if you need help.
 
-Thanks
+OK, I will do it.
+
+> 
+> > 3. Do we have to hard code the string max-len? Is there a way to use
+> >    the name in definitions? e.g.
+> >    name: name
+> >    type: string
+> >    checks:
+> >      max-len: string-max-len
+> 
+> Yes, that's the intention, if codegen doesn't support that today it
+> should be improved.
+
+I can try improve this. But may a little late (should go next year).
+If you have time you can improve this directly.
+
+> 
+> > 4. The doc will be generate to rst file in future, so there will not have
+> >    other comments in the _nl.c or _nl.h files, right?
+> 
+> It already generates ReST:
+> https://docs.kernel.org/next/networking/netlink_spec/
+> We do still generate kdoc in the uAPI header, tho.
+
+How to generate the doc in uAPI header?
+
+> 
+> > 5. the genl_multicast_group is forced to use list. But the team use format
+> >    like { .name = TEAM_GENL_CHANGE_EVENT_MC_GRP_NAME, }. Should we support
+> >    this legacy format?
+> 
+> Do you mean that we generate:
+> 
+> 	[ID] = { "name", }
+> 
+> rather than:
+> 
+> 	[ID] = { .name = "name", }
+> 
+> ? I think the struct had only one member at the time, so I didn't
+> bother adding the .name, but you can change the code-gen.
+
+No, the current team just do like
+
+static const struct genl_multicast_group team_nl_mcgrps[] = {
+        { .name = TEAM_GENL_CHANGE_EVENT_MC_GRP_NAME, },
+};
+
+So there is new ID was defined. Looks the group id is not a must.
+
+> > 7. When build, I got error modpost: missing MODULE_LICENSE() in drivers/net/team/team_nl.o.
+> >    Should we add the MODULE_LICENSE support in ynl-gen-c.py?
+> 
+> Not sure if we can, the generated code should be linked with 
+> the implementation to form a full module. The manually written
+> part of the implementation should define the license. YAML specs
+> have a fairly odd / broadly open license because they are uAPI.
+> We don't want to start getting into licensing business.
+> 
+> > 8. When build, I also got errors like
+> >      ERROR: modpost: "team_nl_policy" [drivers/net/team/team.ko] undefined!
+> >      ERROR: modpost: "team_nl_ops" [drivers/net/team/team.ko] undefined!
+> >      ERROR: modpost: "team_nl_noop_doit" [drivers/net/team/team_nl.ko] undefined!
+> >      ERROR: modpost: "team_nl_options_set_doit" [drivers/net/team/team_nl.ko] undefined!
+> >      ERROR: modpost: "team_nl_options_get_doit" [drivers/net/team/team_nl.ko] undefined!
+> >      ERROR: modpost: "team_nl_port_list_get_doit" [drivers/net/team/team_nl.ko] undefined!
+> >      ERROR: modpost: "team_attr_option_nl_policy" [drivers/net/team/team.ko] undefined!
+> >   Do you know why include "team_nl.h" doesn't help?
+> 
+> Same reason as the reason you're getting the LICENSE warning.
+> kbuild is probably trying to build team_nl and team as separate modules.
+> 
+> I think you'll have to rename team.c, take a look at what I did around
+> commit 08d323234d10. I don't know a better way...
+
+Thanks, this works for me.
+
+Cheers
 Hangbin
 
