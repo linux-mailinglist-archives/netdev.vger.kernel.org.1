@@ -1,109 +1,118 @@
-Return-Path: <netdev+bounces-57562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CDEB813669
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 17:37:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CC068136AA
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 17:46:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABD381F216F3
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:37:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01B971F22114
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:46:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE3D760B8F;
-	Thu, 14 Dec 2023 16:37:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01E6961FB3;
+	Thu, 14 Dec 2023 16:46:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cPpxvJtd"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="KhRjo32K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E296711A
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 08:37:19 -0800 (PST)
-Received: by mail-vs1-xe33.google.com with SMTP id ada2fe7eead31-464a3b84ef7so483994137.1
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 08:37:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702571839; x=1703176639; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=njevfSV6ipnODY+aF4lC9wLV+jiEMCdKQ1y9AcFdFmg=;
-        b=cPpxvJtdZqordDxyVxHTXrseUGxQhSFN2nRcxKwBtdZlQFBdSX7Gi1kVHE3TzjlYtz
-         aOStKDcnLryJIuPkvSdqUZEVsMvtC+ZYDxPXzi0pQqvrdpO4Sp9B0z+rCDCOGU5rjklQ
-         kKByg87vvGMLQSHPLeP3L5B0K1o4ol5F4igAqQ6NT3TLdjAajCZKm8dF9cODE0wYE76U
-         xyXlgRHNlLW454YcKYXPzf3rHM0iTA7ZupatLXYkIX37mQgY769t+lvWnccmzQMekVcz
-         N4/JahRWZi17Tn2YR0E5k/IaIV/YKZU9VQXzoCGs1Q1l6jIf5luKx57nBL6z5HX/QMQO
-         JhDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702571839; x=1703176639;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=njevfSV6ipnODY+aF4lC9wLV+jiEMCdKQ1y9AcFdFmg=;
-        b=rON6npDC6CAL6FE2YeZzXpm/v5EKQuMft1HZoDTDsVrfiSAnfTuuMx7CT+XNDcLNVO
-         OGMAYQTc1bHoNScWm+fjinPHhSli2LZ3UYJPi/tdj0KYqsSxn3mELGFY3o0bxacGiAub
-         GnFI4D9pUM47UkB51QVPgYCrefohkc4B07rnFDPc9KVyxZxUMGcL4AXbKJAP4BS4tUbi
-         U6b4/fOX5g25IPm2ekxvGQSqKeNbdO63dYxm7XKlruSR1FDXLb/Gcfg0apHebwEvXJyZ
-         H7GHc4FjAfFY5g5MnCUQL1V5QRfuwqKKax6ckOKUMwI2c6wLzrtz40NGimN+6neUFRbI
-         5+1g==
-X-Gm-Message-State: AOJu0Yzfc6EL0UTJ9zsnIwFe8Veo2i1rowggIPN85l1aLi4owaLR43ZJ
-	eyk0XeiV2409V7qSjkgUZ2JaDrUVd0Abx50KvApvGw==
-X-Google-Smtp-Source: AGHT+IHv4nWpsJEesS1GOpNZJJwbyChop0SI5TUvt1nAOftw0Qz/CFqJjUGsSW4LQi+8LKUYijgWaC/DWDOOaEOEhFc=
-X-Received: by 2002:a67:ef46:0:b0:465:f6c3:c3c2 with SMTP id
- k6-20020a67ef46000000b00465f6c3c3c2mr9132897vsr.18.1702571838902; Thu, 14 Dec
- 2023 08:37:18 -0800 (PST)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86D2E114;
+	Thu, 14 Dec 2023 08:46:17 -0800 (PST)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BE9LXoN016663;
+	Thu, 14 Dec 2023 08:45:50 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=pfpt0220; bh=1b9Ucpj9
+	gnfZxgBpgNijv5lFY+zJaKovhnq+EmMW+dk=; b=KhRjo32KOxR9CLtYlibXPhJ+
+	7ryV1lY3N9fP3JQDWT26XDpq68LXWLMUimVG5FKCDJuqEmf6L7qLfP8dxnT4yVTC
+	nDzqFQaWgHN3piYnvEQBH8ChLh+6s+QUUc/CoWON7RQFLj4T8EL51G8iME3O4qjp
+	IxYVueGVusJ+c+pNXvQJx/vfuzA+qHWQy6R2flXxUfAGYxtstbFvyj1o3oW+LOXV
+	meArh/aou+tdnX4bzCfnZPj19NdwFHG6MYC57Qxw6h8QlxhC8zOTmJrmTvuHlL5k
+	bpuxY+JxIN2RJMWj7+jdhjbI9YU/bUsO873rxYvD7Fq+/4+GUkWxpHd3SQW+Qw==
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3uyy0nsjga-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Thu, 14 Dec 2023 08:45:50 -0800 (PST)
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 14 Dec
+ 2023 08:45:48 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Thu, 14 Dec 2023 08:45:48 -0800
+Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
+	by maili.marvell.com (Postfix) with ESMTP id 59A953F7088;
+	Thu, 14 Dec 2023 08:45:48 -0800 (PST)
+From: Shinas Rasheed <srasheed@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
+        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
+        <kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
+        <kheib@redhat.com>, <konguyen@redhat.com>, <shenijian15@huawei.com>,
+        "Shinas
+ Rasheed" <srasheed@marvell.com>
+Subject: [PATCH net-next v5 0/4] add PF-VF mailbox support
+Date: Thu, 14 Dec 2023 08:45:32 -0800
+Message-ID: <20231214164536.2670006-1-srasheed@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231214104901.1318423-1-edumazet@google.com> <20231214104901.1318423-3-edumazet@google.com>
- <657b09de9f6a6_14c73d294da@willemb.c.googlers.com.notmuch>
-In-Reply-To: <657b09de9f6a6_14c73d294da@willemb.c.googlers.com.notmuch>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Thu, 14 Dec 2023 11:37:02 -0500
-Message-ID: <CADVnQynZE3XG0adXdehs_2z24MALgc_uGLMKNz7_-vDS7fAf1A@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/3] net: Namespace-ify sysctl_optmem_max
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Mina Almasry <almasrymina@google.com>, Chao Wu <wwchao@google.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: X-AYg-st7lJQJ5x8eyT0HODGc-j6SVO3
+X-Proofpoint-GUID: X-AYg-st7lJQJ5x8eyT0HODGc-j6SVO3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
 
-On Thu, Dec 14, 2023 at 8:57=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Eric Dumazet wrote:
-> > optmem_max being used in tx zerocopy,
-> > we want to be able to control it on a netns basis.
-> >
-> > Following patch changes two tests.
-> >
-> > Tested:
-> >
-> > oqq130:~# cat /proc/sys/net/core/optmem_max
-> > 131072
-> > oqq130:~# echo 1000000 >/proc/sys/net/core/optmem_max
-> > oqq130:~# cat /proc/sys/net/core/optmem_max
-> > 1000000
-> > oqq130:~# unshare -n
-> > oqq130:~# cat /proc/sys/net/core/optmem_max
-> > 131072
-> > oqq130:~# exit
-> > logout
-> > oqq130:~# cat /proc/sys/net/core/optmem_max
-> > 1000000
-> >
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
->
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
+This patchset aims to add PF-VF mailbox support, its related
+version support, and relevant control net support for immediate
+functionalities such as firmware notifications to VF.
 
-Acked-by: Neal Cardwell <ncardwell@google.com>
-                                            client_loop: send
-disconnect: Broken pipe
+Changes:
+V5:
+  - Refactored patches to cut out redundant changes in 1/4 patch.
 
-Thanks, Eric!
+V4: https://lore.kernel.org/all/20231213035816.2656851-1-srasheed@marvell.com/
+  - Included tag [1/4] in subject of first patch of series which was
+    lost in V3
 
-neal
+V3: https://lore.kernel.org/all/20231211063355.2630028-1-srasheed@marvell.com/
+  - Corrected error cleanup logic for PF-VF mbox setup
+  - Removed double inclusion of types.h header file in octep_pfvf_mbox.c
+
+V2: https://lore.kernel.org/all/20231209081450.2613561-1-srasheed@marvell.com/
+  - Removed unused variable in PATCH 1/4
+
+V1: https://lore.kernel.org/all/20231208070352.2606192-1-srasheed@marvell.com/
+
+Shinas Rasheed (4):
+  octeon_ep: add PF-VF mailbox communication
+  octeon_ep: PF-VF mailbox version support
+  octeon_ep: control net framework to support VF offloads
+  octeon_ep: support firmware notifications for VFs
+
+ .../net/ethernet/marvell/octeon_ep/Makefile   |   2 +-
+ .../marvell/octeon_ep/octep_cn9k_pf.c         |  59 ++-
+ .../marvell/octeon_ep/octep_cnxk_pf.c         |  49 +-
+ .../marvell/octeon_ep/octep_ctrl_mbox.h       |   4 +-
+ .../marvell/octeon_ep/octep_ctrl_net.c        |   6 +
+ .../ethernet/marvell/octeon_ep/octep_main.c   |  84 +++-
+ .../ethernet/marvell/octeon_ep/octep_main.h   |  46 +-
+ .../marvell/octeon_ep/octep_pfvf_mbox.c       | 450 ++++++++++++++++++
+ .../marvell/octeon_ep/octep_pfvf_mbox.h       | 167 +++++++
+ .../marvell/octeon_ep/octep_regs_cn9k_pf.h    |   9 +
+ .../marvell/octeon_ep/octep_regs_cnxk_pf.h    |  13 +
+ .../net/ethernet/marvell/octeon_ep/octep_tx.h |  24 +-
+ 12 files changed, 864 insertions(+), 49 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h
+
+-- 
+2.25.1
+
 
