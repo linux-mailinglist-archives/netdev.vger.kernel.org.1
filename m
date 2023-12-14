@@ -1,118 +1,190 @@
-Return-Path: <netdev+bounces-57568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12D2D8136B4
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 17:49:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEEFA8136F6
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 17:53:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 959192811BA
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:49:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85D491F211C3
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:53:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C264460BB2;
-	Thu, 14 Dec 2023 16:49:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9002461FB3;
+	Thu, 14 Dec 2023 16:53:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ykNWUMcT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dOic3fXy"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DA5F8E;
-	Thu, 14 Dec 2023 08:49:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=jpEgcy8NN3HTStEB0Wx38X+kWFgy54/SSxE7weirF/E=; b=ykNWUMcT36CU8ETNnUBdAfU5Di
-	DdbbhgKydxhHANMjCciNJr98L8meROJk0TARR4eSpvc0QjNauXChKS9k/5RgLtTgmReaGbOzh/gQs
-	UB+HHTwT2uI5MnX919RNy3rtpS0rtfqnAU1OWGoy4D+JdqYWp4AFF+7z3jiTAXaCa8/IkY2WaZ5Kv
-	9a/3mNXm+y5GwXuFJVgTJvqJmi/S+p9PB0YwIa2mPnjLD5rdHkQB9TLOJAeT5d9m5Vqzk6aLmANKh
-	ANoL90HggfZf6QWBokdy6F/zsFD5mNiv6PdbmO9yG96k/zN3kwqFVaMdCwIvB5vFjK2kGNmGWOoEY
-	Ew0OAhsA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49794)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rDotX-0001hF-1F;
-	Thu, 14 Dec 2023 16:49:07 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rDotX-0002h8-FN; Thu, 14 Dec 2023 16:49:07 +0000
-Date: Thu, 14 Dec 2023 16:49:07 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Wei Fang <wei.fang@nxp.com>,
-	Marek Vasut <marex@denx.de>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-clk@vger.kernel.org,
-	Stephen Boyd <sboyd@kernel.org>,
-	Michael Turquette <mturquette@baylibre.com>
-Subject: Re: [PATCH] net: phy: at803x: Improve hibernation support on start up
-Message-ID: <ZXsyA+2USrmIaF3u@shell.armlinux.org.uk>
-References: <20230804175842.209537-1-marex@denx.de>
- <AM5PR04MB3139793206F9101A552FADA0880DA@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <45b1ee70-8330-0b18-2de1-c94ddd35d817@denx.de>
- <AM5PR04MB31392C770BA3101BDFBA80318812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <20230809043626.GG5736@pengutronix.de>
- <AM5PR04MB3139D8C0EBC9D2DFB0C778348812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <20230809060836.GA13300@pengutronix.de>
- <ZNNRxY4z7HroDurv@shell.armlinux.org.uk>
- <ZNS8LEiuwsv660EC@shell.armlinux.org.uk>
- <7aabc198-9df5-5bce-2968-90d4cda3c244@bootlin.com>
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC91A10D4
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 08:53:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702572791; x=1734108791;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=GDQKT2agmerywj9jWojH1O8+CRnBro6qh0/zwFtt6sA=;
+  b=dOic3fXyE73i5ZCNCp7e8Dnmmt45gQagpLwyLNmZ326k1b9sCwnxofhg
+   uWfJOTHRk6y3qQ6FdsVw3lNDCc52k5F3+LScPrEnVYcjlAAyDPDYU9T4j
+   zhWYebXugoKoZ3bbL5aGTSmuqz3UB1QcQzTJ/2/c8HLJYO6ouh7EYo/0q
+   W16mbRML8E+juh5KuyCaIJNfcYX83lb8jR0++yTvh4izU30H+1YSXQwf2
+   wsNil+GDDGMmAfO3N6DwP+dBz0xIKHc02KSch9pdWHO+HT6ofPDHCJmM+
+   tdGJER8dZ0j3WN5TQMD+esqzKHdEM8Ibg8r8rVFcQB+2YV3AaaqHbbMbn
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="375303854"
+X-IronPort-AV: E=Sophos;i="6.04,276,1695711600"; 
+   d="scan'208";a="375303854"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 08:53:11 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="844780191"
+X-IronPort-AV: E=Sophos;i="6.04,276,1695711600"; 
+   d="scan'208";a="844780191"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Dec 2023 08:53:11 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 14 Dec 2023 08:53:10 -0800
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 14 Dec 2023 08:53:09 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 14 Dec 2023 08:53:09 -0800
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.40) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 14 Dec 2023 08:53:08 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Gk9cLFsuKtqd+bx283XRftG5G62axhMIxLxWheKfi1iEbGJkR+fpnwvnkuygVCx47hmhWRIPaHs0P1BNeymsX0wAYX4qA3GamUs31Hz/sQowMmroGnOJM9+nYvNg3x0nM+tUc/0zuWF1okG1P+LXEp1hpN/W+G6ILFFxGbop2Uqf2LZSpgAmYkWZ36fuUH+7FRoifehdJjc93ssQOVoq9+rbhIn7A0gxQlOZlB8YLJHFkWhiDK5PfEqf13RERgzq4jHtYwvyrhEofJwA/DF5i4E0i7pCcIwYno49Ru/En6gtpIWepBAwFwQJmL3Q/dUfHULDiU1WgmK07BBuoT40hg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=j/o47soJqTH0+7JCTljAnFcGwwy/2bjyFyQu5E4B4Fw=;
+ b=W2LPdLbD2P5hZtOe8n6RfTxEsJlyXWWCWCjEaUYih8gGtZClvSY1sptz1dlPVnzBBXOO2KR9g7p5pgqgeWAS+a3TLN8evABvUafxEQYydNRtdUf0VxDRglMD43WHxFV9va+UhQ0bg34OoUZf9OQqS4nckZ83hmjTBZRS2fc/98HETUg2E3lHg1si0u+HFzPvKpQm21gi7+1zz0a3OaeJpoLwK08nCkfnoa0ZIwKosc6fecCB2SaIBcSb/ROqGemCopwmj1PIDa2xta3IlUZli0HOp1zYuefyLCZQuUWvkfL+yzwlQ95ZE86Qqd3+5ET2aklhKok0eUQ+Xlt1GfphjQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH7PR11MB6748.namprd11.prod.outlook.com (2603:10b6:510:1b6::8)
+ by PH7PR11MB6007.namprd11.prod.outlook.com (2603:10b6:510:1e2::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.28; Thu, 14 Dec
+ 2023 16:53:02 +0000
+Received: from PH7PR11MB6748.namprd11.prod.outlook.com
+ ([fe80::7c0f:4cd6:d4e0:307a]) by PH7PR11MB6748.namprd11.prod.outlook.com
+ ([fe80::7c0f:4cd6:d4e0:307a%7]) with mapi id 15.20.7091.028; Thu, 14 Dec 2023
+ 16:53:02 +0000
+Date: Thu, 14 Dec 2023 17:51:08 +0100
+From: Pawel Chmielewski <pawel.chmielewski@intel.com>
+To: Michal Schmidt <mschmidt@redhat.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<pmenzel@molgen.mpg.de>, <lukasz.czapnik@intel.com>, Liang-Min Wang
+	<liang-min.wang@intel.com>, Michal Swiatkowski
+	<michal.swiatkowski@linux.intel.com>
+Subject: Re: [PATCH iwl-next v2] ice: Reset VF on Tx MDD event
+Message-ID: <ZXsyfFHcFnaqeWe+@baltimore>
+References: <20231102155149.2574209-1-pawel.chmielewski@intel.com>
+ <CADEbmW03axMX30oiEG0iNLLiGYaTi6pqx9qdrLsR7DSC-x-fyw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADEbmW03axMX30oiEG0iNLLiGYaTi6pqx9qdrLsR7DSC-x-fyw@mail.gmail.com>
+X-ClientProxiedBy: WA2P291CA0014.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1e::25) To PH7PR11MB6748.namprd11.prod.outlook.com
+ (2603:10b6:510:1b6::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7aabc198-9df5-5bce-2968-90d4cda3c244@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR11MB6748:EE_|PH7PR11MB6007:EE_
+X-MS-Office365-Filtering-Correlation-Id: cfa670e7-d24f-4218-c444-08dbfcc52274
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: O3Ctb5gbhNoKnoI2s8o0Et6s9EsT+2YEPnktKBHhWpAq10kaqOv3PHolAAAcFgaQyfqvFs1GB79o8qM2Zma/sINCQGM/37YzxYaBQTzTAo8T3/yBBJOm+sgzgfXoRkHdXQQxJkM5M9ay8V++J7AdDPhWY1Z6fV2i6fqY/kQFmWH7styyoVWZpJkIaf082/4PHyXUuaAqyxqLtwgEps7YwWcmRMZg/Sjdzz9Q6rWBFVJwSC3XtqyffBff6pGLxparbp9owE98YprpMzywhPkA6iLJU8kBMBO6RDuYdPcqNN9fpx7Mqx8osfiJmKuqKyVpdFUyXN9F90pnVLFtl2xZFR4aJcoYlAqhw5eq9oDWzd1NlvzEQqsaPy1Ge38l0cO4VXWyvHfpkG1XNiL6Niy4SSIQbm1q9FF8+Jez720R8nU029VXa8RmZ5u1hxkxhvydAqelXYrthEuD0cxRFK2mTuQ2VJ9y84+K/f0F2tBlyuswGPiLsh9uFQKmzoK1lg+zq9QAPX2SayNahv2gnPWdr9Yw9OGVRTYrI1ygoJptOiMk1hZgO0YZA2UTLV9XArPW
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB6748.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(376002)(346002)(136003)(366004)(396003)(39860400002)(230922051799003)(186009)(1800799012)(451199024)(64100799003)(38100700002)(4326008)(8936002)(2906002)(316002)(83380400001)(33716001)(82960400001)(8676002)(5660300002)(44832011)(26005)(41300700001)(9686003)(6512007)(478600001)(6486002)(54906003)(6506007)(6916009)(53546011)(66556008)(66476007)(66946007)(86362001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZkhnczNaaWxEMkhGTVk5dEJid3l2WGRtZE5jZzBLUW54ZGcyOWtob2RleHA3?=
+ =?utf-8?B?U1E4aktVVGVPSlZYSzE2V0lkNmowd3BkUE95clFWa2RyUHBTcnlqRDdiK3Zo?=
+ =?utf-8?B?c2FVVldnYWRkQTBhV2ZrTSt0TnRsZTlpQmpXVnlkOVY2T0k1MG8zc1hUZ1Uz?=
+ =?utf-8?B?Z0lYUFpIQWpvN2JST1MrVFR6Tlo3U3kraEdpNzBXVUdoZUhqSUp2R3Z2UXdT?=
+ =?utf-8?B?ZnZUTy9WM2wxdUNiVEhzck5GeEg3NGR4MWxBTS9ORUY2ZVV3dHFlSnJyS0RN?=
+ =?utf-8?B?ci9PZjVCbXFMMkVXZTNCcVBVTVprYlVhYmN3bGZqOGM0THB6VU5VR0YwRXVu?=
+ =?utf-8?B?T3pYMjJCSVlDc3d0STZMbWs0RUN1SUMxNVVidWtCWXFjUngvQ08xN3g5WjFU?=
+ =?utf-8?B?V2VZeS8rVGJ5eWJFa0JXM2NIa1BTMUV5dG04ZlBHTXVHM2Y2YkUvZWxKL29O?=
+ =?utf-8?B?M3hOdmhRUmVseEo3d2l1dEd2V3BhUlhpWUlQTXhCQkZHRjFQcjVhRTlKYmc0?=
+ =?utf-8?B?eExaRUhtNkppU1R6VGVaalhibkxZdXpiYmJKd1ZRVFZxQS9yUllWYWdPbDl4?=
+ =?utf-8?B?VkcwdWhXcnZGaFowRzgrQ1IzYXJEU1cxQmhrYVh0M2hrdXlTVWRwSjAvMXBi?=
+ =?utf-8?B?OEh2QzA4WHc4ekFGV3ZyLzRQdDFheERVSytORk93eEdYWkhOS3FYVHo0RzZn?=
+ =?utf-8?B?QVUxbEdOMjcvek9mRTJHREp1RjZSaXhjOVg4Z2tjNXlCamRHSjBZYVFPZFNu?=
+ =?utf-8?B?WEFJTTdiRGVJWEtWSEpnUHdHNkZXOGVqbXRyNFROWFFselJTb2tETENxanl3?=
+ =?utf-8?B?emUzbnpObXhYSGk3VDJUL01JWGxxU1lpcko3K0taSThEK0lVTkFxVXBuV3B3?=
+ =?utf-8?B?OHViQ2pIM1ZQcng5aGpldmFTOW9jMGx1akNXK2FiRHpSVTJxR3JULy8vSGov?=
+ =?utf-8?B?ZDZZU3VrWjRlMEJ5akpvM21neUdFMkUxcUx1TVd2WHVsVGFRNlhiWDYyMDVp?=
+ =?utf-8?B?TCt1NG5jOTBrRk5LR29KZ1RZdzF1NXo1V1R1VE5DVHl6aWNPd0dhR3BlZ3BN?=
+ =?utf-8?B?ZHJ3ZjdHRXZkendwYi9manJmbmE0TVJIWWZha2FHVEdWN3VvMnFEWEJDdWdy?=
+ =?utf-8?B?TThZWG82cGlieHM1VlBhOE9jalJRSy9JYlE4SVgreUJNVGRkOVBwbFh4V2lv?=
+ =?utf-8?B?SzRYQlpSczc4a3IyMm5TS0J4NGJpa0xEY3NLcWZHNG9hMDBMZ3hyY0c3SFJG?=
+ =?utf-8?B?NnhGTE8wM2FHcXZtc2Yycy9DWWZzb1gxVWl2SUFEVysvMGw5cWtSY0FacnZh?=
+ =?utf-8?B?K2pOVUt5aU1mMmpDV3VMSmVHL2dHVW5ad1BHMEhpTnd6SzFLcXZKRTZESkJh?=
+ =?utf-8?B?VnFRQVQ2VmI0RlhvWXRXMWE0cnI1MGhvNHltdGQ3bjNld2pHNDFsS1F6SDZJ?=
+ =?utf-8?B?TGs4c1ZjSFNXWktOcVAzazVMT1JmdmVKejNpSXhXRnNEd2hBZXBkQUdHQlRC?=
+ =?utf-8?B?WmdJS1Nvck9oYllRYTIyY2MxcXJqVWR2NGlqZFV0a2thQU1HWlF5Sno4cWsr?=
+ =?utf-8?B?VDdUQTZTL3dHd1k2R0JnVWI1LzNYbVBsajlPMFpBQVQ5WS85VHlxanB5aG1G?=
+ =?utf-8?B?aHJNdFBDVjZZWm44b1ZvL3BZZzBhWVo0RVdEQlFtY01sUVh1OVpxQ2xackZa?=
+ =?utf-8?B?T20ya3o0SDA1MlNDZW55U05GRFR3c1hGMzNYQmkrUjN1NXB4Sk1RUjRGbEI1?=
+ =?utf-8?B?NGJGOXlUSk1ZdzBOLzgrQXZJOXFHUm5nVGdWRzJyZ0pLcFNySkk3clBVQ0Fn?=
+ =?utf-8?B?aEdvamVxa1VZUUFveE1LQUJzcldlcHdJOVEveWlJUnpTcnJzbFUxNEVVU3U1?=
+ =?utf-8?B?bitVRWtxYWdEdG1ac0s2VEgxYVdBeC9Lby9iKzF6RzFTTVRwajJMWlUyUFoy?=
+ =?utf-8?B?T1hwNFJLREUzelNreXZraEZsVFhsODdPTU1iLzNPeWo3L0tNZDVDZDJHUm9N?=
+ =?utf-8?B?UTZDdUdCWTh1MVk1cDhJT1ZDdGp4dno1a2FsMEFCejB3dHU3dHZuRyttOEla?=
+ =?utf-8?B?aGRXR1dVUGpMRkY1MnNLSlQyY2Q1cHJJaDVjbTJFdmR0L3BsNGdNN21oQXMx?=
+ =?utf-8?B?VjlWRDdSa1BWbFp6VDNJdUkwSGNiSGIxRkZ1SjJHQWh1MGRDQThLWWNieks5?=
+ =?utf-8?B?VEE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: cfa670e7-d24f-4218-c444-08dbfcc52274
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB6748.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2023 16:53:02.5118
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DY9ZvmqsKc8z8J5k8ZF/f/BxbxPkKGKUj+/GxgK/Q6GFdCxyPVSF1nBaQV4dR7XhUBZtiDOLOL/LujWb58faFxOzchc84A1N/cO6BBOR0yc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6007
+X-OriginatorOrg: intel.com
 
-On Thu, Dec 14, 2023 at 09:13:58AM +0100, Romain Gantois wrote:
-> Hello Russell,
+On Thu, Dec 14, 2023 at 09:37:32AM +0100, Michal Schmidt wrote:
+> On Thu, Nov 2, 2023 at 4:56 PM Pawel Chmielewski
+> <pawel.chmielewski@intel.com> wrote:
+> > From: Liang-Min Wang <liang-min.wang@intel.com>
+> >
+> > In cases when VF sends malformed packets that are classified as malicious,
+> > sometimes it causes Tx queue to freeze. This frozen queue can be stuck
+> > for several minutes being unusable. This behavior can be reproduced with
+> > DPDK application, testpmd.
+> >
+> > When Malicious Driver Detection event occurs, perform graceful VF reset
+> > to quickly bring VF back to operational state. Add a log message to
+> > notify about the cause of the reset.
 > 
-> I've implemented and tested the general-case solution you proposed to this 
-> receive clock issue with stmmac drivers. The core of your suggestion is pretty 
-> much unchanged, I just added a phylink_pcs flag for standalone PCS drivers that 
-> also need to provide the receive clock.
-
-So this affects the ability of PCS to operate correctly as well as MACs?
-Would you enlighten which PCS are affected, and what PCS <--> PHY link
-modes this is required for?
-
-> I'd like to send a series for this upstream, which would allow solving this 
-> issue for both the DWMAC RZN1 case and the AT803x PHY suspend/hibernate case 
-> (and also potentially other cases with a similar bug).
+> Sorry for bringing this up so late, but I have just now realized this:
+> Wasn't freezing of the queue originally the intended behavior, as a
+> penalty for being malicious?
+> Shouldn't these resets at least be guarded by ICE_FLAG_MDD_AUTO_RESET_VF?
 > 
-> I wanted to ask you how you would prefer to be credited in my patch series. I 
-> was considering putting you as author and first signer of the initial patch 
-> adding the phy_dev flag. Would that be okay or would you prefer something else?
+> Michal
 
-It depends how big the changes are from my patches. If more than 50% of
-the patch remains my work, please retain my authorship. If you wish to
-also indicate your authorship, then there is a mechanism to do that -
-Co-developed-by: from submitting-patches.rst:
-
-Co-developed-by: states that the patch was co-created by multiple
-developers; it is used to give attribution to co-authors (in addition
-to the author attributed by the From: tag) when several people work on
-a single patch. Since Co-developed-by: denotes authorship, every
-Co-developed-by: must be immediately followed by a Signed-off-by: of
-the associated co-author.
-
-See submitting-patches.rst for examples of the ordering of the
-attributations.
-
-Thanks for asking.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+In some cases, the MDD can be caused also by a regular software error
+(like the one mentioned in commit message), and not the actual malicious
+action. There was decision to change the default behavior to avoid denial
+of service. 
 
