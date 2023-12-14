@@ -1,58 +1,76 @@
-Return-Path: <netdev+bounces-57246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D1F28128A4
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 07:59:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB51E8128B9
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 08:07:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E9C62816A0
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 06:59:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07316B210A0
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 07:07:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BAF1D52E;
-	Thu, 14 Dec 2023 06:59:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C65E2D52C;
+	Thu, 14 Dec 2023 07:06:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CViAJ6fS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jHkUWt3x"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4333CB9;
-	Wed, 13 Dec 2023 22:59:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=sCcjsVfvGrL10f8KrjBhxlZMbVCOfy10t/MAoJlx8KE=; b=CViAJ6fS5ELM4EZ55saHCscxb6
-	55bQzcdnMTPt49sOOjGICOW9sPzDsc5RmzyJGX/og7owMIZ+TRHC0++ZFHXPlJlf1tcdncRsUlvJK
-	TAweBcvzHZVOgsyZCmbK0A1jUya1ddqZVcX2MjtmUAwxkZyrBaAgtcRmbkek24gKkPfj4yED8QIdT
-	vUHm/3dV8GlRjnfqJb6mhk7pvEd5YUcliFV+vGD8cKQ/CtVu5acx5WDqNJC1ig4oJrvqBLmjrZYlZ
-	ZgMF+L2vR2xIm9IlUrvthVJeokCDIcovGuRsHoVzQ6xYOdvKJpAI7AhtZVLLCHf+zKPXp22UUBrnZ
-	8d6Ah8RA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1rDfgs-00H2ux-0b;
-	Thu, 14 Dec 2023 06:59:26 +0000
-Date: Wed, 13 Dec 2023 22:59:26 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	patchwork-bot+netdevbpf@kernel.org, shailend@google.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, corbet@lwn.net, jeroendb@google.com,
-	pkaligineedi@google.com, hawk@kernel.org,
-	ilias.apalodimas@linaro.org, arnd@arndb.de, dsahern@kernel.org,
-	willemdebruijn.kernel@gmail.com, shuah@kernel.org,
-	sumit.semwal@linaro.org, christian.koenig@amd.com,
-	linyunsheng@huawei.com, hramamurthy@google.com, shakeelb@google.com
-Subject: Re: [net-next v1 00/16] Device Memory TCP
-Message-ID: <ZXqnzuYxcqlapcpa@infradead.org>
-References: <20231208005250.2910004-1-almasrymina@google.com>
- <170253482786.28524.10625748175644260187.git-patchwork-notify@kernel.org>
- <ZXqlWT2JYg0sa7IF@infradead.org>
- <CAHS8izNCvxuTsKV73oTu3xS7ZVr0riBdYGbKnsHptVe_e-t5MQ@mail.gmail.com>
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A61FBD
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 23:06:54 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-6ce7c1b07e1so6932323b3a.2
+        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 23:06:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702537614; x=1703142414; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=nV9io2uZNuWIe6Es1+OwTSTABNTqgnyb2vdsEw09Ve4=;
+        b=jHkUWt3x0ZVH30hMV+ruoLzKmDkYR3LqKF066BvPcx64NuAY2MUL06NcK/7BEioaDQ
+         z1Pil2yIfEBmhWpBc/lQBy1L9p24XvZ0XLRGYSGkhEk3xwDRF3+MiMX9k1JMT9iis8w6
+         D4zT+psxD32AR6IWiyvB0Wd46/kMNvJgRWMaXDyWTlaeKc2yl9Oi09Zc570ICIcDIX27
+         PnNoQje/FgEKOWTT3le5vctKw9a0tfJlJAyGV1Fj8SIJnyZ/SfvVCWvLNHDLfXr4lmeq
+         BXCf7IHSFAK7GgYfEUW2NGeEXLOneXj8bqucQQ8fvwzpxIp6LZYJzYf0GzX1iS+jkOGO
+         6Pdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702537614; x=1703142414;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nV9io2uZNuWIe6Es1+OwTSTABNTqgnyb2vdsEw09Ve4=;
+        b=Qdf21ZuO20AOPkS9cXAnFnaTqrW1ndGOQlh9PTxp01TxpFDefogWAwttka65JGusJT
+         Sb6hTky2e0cK6CNS9Yy7FlIMvo4ECeRVS3+HTYEcoaXOsaTArr441v99YNyt/dVBRjpc
+         lzf6XU5YlXaC91hLL0wdlmjhEDEm8FA1WERG3RluFHfPGKRlzID1TZMonKq+uXG8Ik1l
+         a0/SL99ombOdtCAC+QijZiva2cEtBXm7NnTiMozjAmojLrAs4q2TtXMd6XqZaG3cTqIK
+         oKXXrDVyylSYf0t7bJZpqnYO8QLvaK+gf9lyZ/75jy7feE1/USxW0b7T2whqlzlyscRH
+         ejJg==
+X-Gm-Message-State: AOJu0Yz17HeRG0vXMDV0upSGKA2RA7lFzUeyQObktOGUI0wGJTo/hgvM
+	V6KWV/RTmkjYwYyY8HYPZ2s=
+X-Google-Smtp-Source: AGHT+IE9G8hOFTGkHGfBBx6kSGkrNp9DHSQE6heKaYLV75LHcuQQKCUwxL0SojpiFJduzAZbRpMvCg==
+X-Received: by 2002:a05:6a00:27a1:b0:6ce:79b3:b28a with SMTP id bd33-20020a056a0027a100b006ce79b3b28amr9824479pfb.60.1702537613832;
+        Wed, 13 Dec 2023 23:06:53 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id o73-20020a62cd4c000000b006c875abecbcsm11500114pfg.121.2023.12.13.23.06.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Dec 2023 23:06:53 -0800 (PST)
+Date: Thu, 14 Dec 2023 15:06:49 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Benjamin Poirier <benjamin.poirier@gmail.com>
+Cc: Petr Machata <petrm@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
+	mlxsw@nvidia.com, Jay Vosburgh <j.vosburgh@gmail.com>
+Subject: Re: [PATCH net-next] selftests: forwarding: Import top-level lib.sh
+ through $lib_dir
+Message-ID: <ZXqpieBoynMk0U-Z@Laptop-X1>
+References: <a1c56680a5041ae337a6a44a7091bd8f781c1970.1702295081.git.petrm@nvidia.com>
+ <ZXcERjbKl2JFClEz@Laptop-X1>
+ <87fs07mi0w.fsf@nvidia.com>
+ <ZXi_veDs_NMDsFrD@d3>
+ <ZXlIew7PbTglpUmV@Laptop-X1>
+ <ZXok5cRZDKdjX1nj@d3>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,27 +80,63 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izNCvxuTsKV73oTu3xS7ZVr0riBdYGbKnsHptVe_e-t5MQ@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <ZXok5cRZDKdjX1nj@d3>
 
-On Wed, Dec 13, 2023 at 10:51:25PM -0800, Mina Almasry wrote:
-> On Wed, Dec 13, 2023 at 10:49 PM Christoph Hellwig <hch@infradead.org> wrote:
-> >
-> > On Thu, Dec 14, 2023 at 06:20:27AM +0000, patchwork-bot+netdevbpf@kernel.org wrote:
-> > > Hello:
-> > >
-> > > This series was applied to netdev/net-next.git (main)
-> > > by Jakub Kicinski <kuba@kernel.org>:
-> >
-> > Umm, this is still very broken in intraction with other subsystems.
-> > Please don't push ahead so quickly.
-> >
-> 
-> The bot is just a bit optimistic. Only this first patch was applied.
-> It does not interact with other subsystems.
-> 
->   - [net-next,v1,01/16] net: page_pool: factor out releasing DMA from
-> releasing the page
+Hi Benjamin,
 
-Ah, that makes sense.  Thanks for the update!
+On Wed, Dec 13, 2023 at 04:40:53PM -0500, Benjamin Poirier wrote:
+> > Hmm.. Is it possible to write a rule in the Makefile to create the net/
+> > and net/forwarding folder so we can source the relative path directly. e.g.
+> > 
+> > ]# tree
+> > .
+> > ├── drivers
+> > │   └── net
+> > │       └── bonding
+> > │           ├── bond-arp-interval-causes-panic.sh
+> > │           ├── ...
+> > │           └── settings
+> > ├── kselftest
+> > │   ├── module.sh
+> > │   ├── prefix.pl
+> > │   └── runner.sh
+> > ├── kselftest-list.txt
+> > ├── net
+> > │   ├── forwarding
+> > │   │   └── lib.sh
+> > │   └── lib.sh
+> > └── run_kselftest.sh
+> 
+> That sounds like a good idea. I started to work on that approach but I'm
+> missing recursive inclusion. For instance
+> 
+> cd tools/testing/selftests
+> make install TARGETS="drivers/net/bonding"
+> ./kselftest_install/run_kselftest.sh -t drivers/net/bonding:dev_addr_lists.sh
+> 
+> includes net/forwarding/lib.sh but is missing net/lib.sh. I feel that my
+> 'make' skills are rusty but I guess that with enough make code, it could
+> be done. A workaround is simply to manually list the transitive
+> dependencies in TEST_SH_LIBS:
+>  TEST_SH_LIBS := \
+> -	net/forwarding/lib.sh
+> +	net/forwarding/lib.sh \
+> +	net/lib.sh
+
+Yes, this makes the user need to make sure all the recursive inclusions listed
+here. A little inconvenient. But I "make" skill is worse than you...
+
+> 
+> I only converted a few files to validate that the approach is viable. I
+> used the following tests:
+> drivers/net/bonding/dev_addr_lists.sh
+> net/test_vxlan_vnifiltering.sh
+> net/forwarding/pedit_ip.sh
+> 
+> Let me know what you think.
+
+Thanks! This works for me.
+
+Cheers
+Hangbin
 
