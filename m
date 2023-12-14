@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-57515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DE5381342A
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:11:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E981081341D
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:10:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 073412833E5
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:11:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26E331C21A56
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20ED25D4B6;
-	Thu, 14 Dec 2023 15:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C21105C08E;
+	Thu, 14 Dec 2023 15:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="Te9nOUmS"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="MhTXXGtg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64908125;
-	Thu, 14 Dec 2023 07:10:16 -0800 (PST)
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBA09111;
+	Thu, 14 Dec 2023 07:10:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
 	s=s31663417; t=1702566603; x=1703171403; i=wahrenst@gmx.net;
-	bh=uRDT1P17rUMa94Pjny3C2uqVoUmM42vy9zD9t/wTjGk=;
+	bh=dtL88b189EQfj8kkwIRgqqLj6oW21NIG/L8Xt1uiUiw=;
 	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:
 	 References;
-	b=Te9nOUmS5DV+lamdchh7tlTxpnIZ9N8RWzsLNeWdv29/2iYR+AJoF2oi6iF5FGV+
-	 P7cAsQCofAZA9H5IBFsmwiWCbG5VIH2P6i5R6zp9OiHTdlh+8I8TAA2+M6/bgonD+
-	 nXfAONcBfn5hLzNBq5eDArRNx4a63s+FAOf/41/dSAN81EGwStCq9xz8cNGC1qJYJ
-	 RvVJBXfH0Fbc9YuuDy/ZrW90fNEVJzNMZcYtlj1fUzRrFU7wKiPu88GLpSiNisFi6
-	 o9zHZW05Dax/xiZshLF4gKYR8VZro9EPAL6y+o1IP16dNAq1O3NMCsbGz7OMhuD88
-	 a0DoLGXBLotJ2ccSJA==
+	b=MhTXXGtgf+zKs+Kl9kzT95qnLDEsaUfx2rq5EgQo3hreaRzhBzt9uWcYHOLPGrfo
+	 YWoSwD3f3z4aKlN23XHnK9ivajKIDACDfmQY/+es0xtbaeAbRJVznvOA7qkH/NQ8G
+	 lSLJWYpRweOmsEzsw5RVSv0KUNSN+V3J5RwCA3ATs6V7oxa0SoHkSbERs8I1AZWnO
+	 7lMgh3TDd1vb+71C9hgSTxGi7U3QkjuV6/DhGDgcsTG7/6exTGJbyuZOkArv4rT53
+	 6LJLZZ62FH3R89ti6JNssIm2eq/hPASJzjXy4ORQjRlKGacSCTztd7OwJ9BrYmNUW
+	 88N7e8pCgU9RYQrryg==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
 Received: from stefanw-SCHENKER ([37.4.248.43]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MV63q-1qo3Gn0xEM-00S9ry; Thu, 14
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1M59C8-1rEtoN2HBc-0016Xc; Thu, 14
  Dec 2023 16:10:03 +0100
 From: Stefan Wahren <wahrenst@gmx.net>
 To: "David S. Miller" <davem@davemloft.net>,
@@ -41,9 +41,9 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Stefan Wahren <wahrenst@gmx.net>
-Subject: [PATCH 06/12 net-next] qca_spi: Add QCASPI prefix to ring defines
-Date: Thu, 14 Dec 2023 16:09:38 +0100
-Message-Id: <20231214150944.55808-7-wahrenst@gmx.net>
+Subject: [PATCH 07/12 net-next] qca_spi: Introduce QCASPI_RX_MAX_FRAMES
+Date: Thu, 14 Dec 2023 16:09:39 +0100
+Message-Id: <20231214150944.55808-8-wahrenst@gmx.net>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231214150944.55808-1-wahrenst@gmx.net>
 References: <20231214150944.55808-1-wahrenst@gmx.net>
@@ -54,112 +54,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:gt2WAqBmQtUV9umX0eQ4VehFvnkIU8kxOa/49+geh7iqOIfK9wu
- 4jBKJtteiFHuAlxWBrwPGc7XWnNwv5tWVTUaU2WMl+nlgGrGTGIDHIGYCHFi+k0YMi2CD2I
- avAP8hdiQL4P9XFRnZ7o/n5ZleMIZYhq2L/bkSjkY1GYsdHl1q5DLkbY0ZjJS+YR5QrY+rW
- PKvEepFpymKGoEnIag5Ow==
-UI-OutboundReport: notjunk:1;M01:P0:EpkKNXJVzz0=;RTI8JM35GT/KQRK4nQ5xbnkBLZg
- yuzqPqL4JDFLkIQwLPb26jAuWAkhwowlffzQBhfot5HF/9B9B3MhMMMy1TKRaOHGUVtDwI3f8
- 9HbXWtGlIBrxq1M36atL55+IfOfChO7UBnekGK4K6SeDhckqdFyq3kyCpCcd2yn960DQmn5sr
- KwU1b/eC7X885wKLm1GMAu4zj+TvRvxsPdioQeiXHSMDtdkNhwD9fXr6cFLeAfgVkfLvHL683
- yOMcMi0XvGTK2mytPZ9wgbHSKmwhWONYtdLOQb41mm/KU74szwXSRGOB+HH+yrNmxw5okqCR1
- QbA+psPbJjy6gLlzLVuNy8CEu9lYPJbSsEjIL5/t80U1qbcAvPBBpQVWjoNsD8TP/yV0uoNVS
- gi+zna9r9lU5KIU4w8AIbOu5/n5ua5whuqeAf2gFwsryviWKZYtbsICC+ed+4SUImMSZzZyxC
- SVw3agNhyI+jQhUzs5uySejr6n5QSa6wzBTZFiHWDDTAMIcobEKQUm2jgzVoGkc3GmS6HslH0
- Z+VLNCQpEHF/JCjmBZyy5RTf0qe1XmBesx5l2SLjG6yQwtTpvq3meO0xAVfUm4bPlHfFFsQHy
- npB3Lhb5FXHqcN2cNxT97Wgi2qcP0CKLMZpcpxkJhIOLn1YZw3TNWspa/PD1ciFzYM8AqaP5A
- LYFuTqt945v6YRkbFTdOeaYT3PtxYNSc2blOiUpy4VHXxzzPK5QG1yGyeDCgXCPdqPOI7ER0X
- txeB4Trx2fUjm/ku9G1xBQjnPwrBo0C4lbRTurcBPqplwdFjIkAuwi6uIR7KfwW5u4Ffr90Bg
- QJzFVEQiCOyhEWdEEYGZrYgVdx1I0k5GTQ/kiQ4cikGyjZCXKIA6Vmi+9fPq2CcQUDAYtP71V
- 0TB8PvVVrFfu1xXsRUp1uYKguKYo1NZyVRqiE3C9jLosD0zE4bcfKpuNpIZlEITQxKwba2/Ma
- 0uEXlg==
+X-Provags-ID: V03:K1:6/yhf7vZclKY2EkVrwsHMX69cZt80n0/2WhMFI8fNap/UNpkHnu
+ vaNtrm+jLxn+OC7snc2AVK+WGiBTq4zAh8hSEfo6QNuTs36AOxaUoJm8m+z1sbvPuUONAIp
+ u0L11ZmCorR9Hh8C5LFse1ZJVAB5W0JBIKoJU442OI0BJ10DsMW5Z7nNnU5r1uMhbC7C2Nz
+ +5xQ6nd3aFyfyGozv5bpA==
+UI-OutboundReport: notjunk:1;M01:P0:lSdcSXuP3DM=;ywW1B1ZxhsMnKLkaFgGueDpaBzW
+ XqjtFpUpxGS4C5szE0/g/HUJB3+/2tGQFnEgxtijFR0eS6VESQwoypgCRM5sOsx4yDnh+Zxvl
+ qzYDRfz4HJE/Qg9ymS7tUvpaihk+vcBCafhz8dN6h4NSh28J71rj3ICqPqbphFAc0XGU/shLa
+ F6J1fI+XSrFCFc/6p2N8eODpN408Wr/0/A5CDLfTMaJIyXiAP6IHQT3gOaGoVMIn951RudLpV
+ c/zJRj9Qf5QdSa/HZU4mCBxu+efEATxwtPRN1fV8hGzx1gI3YKnwBTjyr5/t4ngB43ObKMlq9
+ hgiiHdVBHvALqAt6azPP84vshNvmawHPfa5FbVvULZKlXeAVzRD/kKpnU85Mqc/asoZqutmg1
+ Id4H6s5LHG6rvBQkK4LelmRLm3teLKrbTq3PNMojYYIZgZrPna88Vn1II5eAn/x6JdXh3PbNZ
+ Rg63SCwJWOF/gTPxcq5vJjGdUVlglcFnEI6n2nGrWW121Il2FaQD6hncJLsiYvA0nC1kLxnTk
+ A5CBR6KFY8zY5et1tZb9aT0urDod0NV0Q/4TpmuQq3NQMkYgElPLyOBpcIQeIG5mODGYA69UG
+ YpGIKyva8M280pp3miAX9ucYJDBpba0gK4EcHr3JiohNYXjy+SaCjGhd5nxmbkTTHAT7u6UZx
+ u3pKn87ytdJ0Sl71OTL4jWwLAX2xVeUhRG0z/PVS7zpNIACWKw+DHoDd2XX9llrwhTMJiS/Ur
+ Yi8vZOeQQQsMVv//eGPIVMxYGECDOhoC1dZBfxEKA4lWKGPkfkTwL5Iu91pcA73Tduj++Bekv
+ xkb/SlpVSQ2o3G/QzPjNc7jEe/oYZAQ6+zyVLmq6eKZZzFC19lnax9GnurTpcAh6Rc+G3y4pY
+ ObzJ/j5NH/luhac1L/Tpf0elG/zXfzj5HHedjiJMWCXyiIOhS2NTAxpFeNYRK9HhCsDFL4s2a
+ m2xXkA==
 
-All defines in qca_spi.h except of the two ring limit defines have
-a QCASPI prefix. Since the name is quite generic add the QCASPI prefix
-to avoid possible name conflicts.
+Currently qca_spi reserves enough space for 4 complete Ethernet over SPI
+frames in the receive buffer. Unfortunately this is hidden under a magic
+number. So replace it with a more self explaining define.
 
 Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
 =2D--
- drivers/net/ethernet/qualcomm/qca_debug.c | 6 +++---
- drivers/net/ethernet/qualcomm/qca_spi.c   | 4 ++--
- drivers/net/ethernet/qualcomm/qca_spi.h   | 6 +++---
- 3 files changed, 8 insertions(+), 8 deletions(-)
+ drivers/net/ethernet/qualcomm/qca_spi.c | 2 +-
+ drivers/net/ethernet/qualcomm/qca_spi.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/qualcomm/qca_debug.c b/drivers/net/ether=
-net/qualcomm/qca_debug.c
-index 6f2fa2a42770..12d68fdaad8e 100644
-=2D-- a/drivers/net/ethernet/qualcomm/qca_debug.c
-+++ b/drivers/net/ethernet/qualcomm/qca_debug.c
-@@ -253,7 +253,7 @@ qcaspi_get_ringparam(struct net_device *dev, struct et=
-htool_ringparam *ring,
- 	struct qcaspi *qca =3D netdev_priv(dev);
-
- 	ring->rx_max_pending =3D 4;
--	ring->tx_max_pending =3D TX_RING_MAX_LEN;
-+	ring->tx_max_pending =3D QCASPI_TX_RING_MAX_LEN;
- 	ring->rx_pending =3D 4;
- 	ring->tx_pending =3D qca->txr.count;
- }
-@@ -274,8 +274,8 @@ qcaspi_set_ringparam(struct net_device *dev, struct et=
-htool_ringparam *ring,
- 	if (netif_running(dev))
- 		ops->ndo_stop(dev);
-
--	qca->txr.count =3D max_t(u32, ring->tx_pending, TX_RING_MIN_LEN);
--	qca->txr.count =3D min_t(u16, qca->txr.count, TX_RING_MAX_LEN);
-+	qca->txr.count =3D max_t(u32, ring->tx_pending, QCASPI_TX_RING_MIN_LEN);
-+	qca->txr.count =3D min_t(u16, qca->txr.count, QCASPI_TX_RING_MAX_LEN);
-
- 	if (netif_running(dev))
- 		ops->ndo_open(dev);
 diff --git a/drivers/net/ethernet/qualcomm/qca_spi.c b/drivers/net/etherne=
 t/qualcomm/qca_spi.c
-index f0c99ac8d73d..31ed7a527092 100644
+index 31ed7a527092..450c3d254075 100644
 =2D-- a/drivers/net/ethernet/qualcomm/qca_spi.c
 +++ b/drivers/net/ethernet/qualcomm/qca_spi.c
-@@ -476,7 +476,7 @@ qcaspi_flush_tx_ring(struct qcaspi *qca)
- 	 * has been replaced by netif_tx_lock_bh() and so on.
- 	 */
- 	netif_tx_lock_bh(qca->net_dev);
--	for (i =3D 0; i < TX_RING_MAX_LEN; i++) {
-+	for (i =3D 0; i < QCASPI_TX_RING_MAX_LEN; i++) {
- 		if (qca->txr.skb[i]) {
- 			dev_kfree_skb(qca->txr.skb[i]);
- 			qca->txr.skb[i] =3D NULL;
-@@ -871,7 +871,7 @@ qcaspi_netdev_setup(struct net_device *dev)
- 	memset(qca, 0, sizeof(struct qcaspi));
+@@ -796,7 +796,7 @@ qcaspi_netdev_init(struct net_device *dev)
+ 	qca->burst_len =3D qcaspi_burst_len;
+ 	qca->spi_thread =3D NULL;
+ 	qca->buffer_size =3D (dev->mtu + VLAN_ETH_HLEN + QCAFRM_HEADER_LEN +
+-		QCAFRM_FOOTER_LEN + 4) * 4;
++		QCAFRM_FOOTER_LEN + 4) * QCASPI_RX_MAX_FRAMES;
 
- 	memset(&qca->txr, 0, sizeof(qca->txr));
--	qca->txr.count =3D TX_RING_MAX_LEN;
-+	qca->txr.count =3D QCASPI_TX_RING_MAX_LEN;
- }
+ 	memset(&qca->stats, 0, sizeof(struct qcaspi_stats));
 
- static const struct of_device_id qca_spi_of_match[] =3D {
 diff --git a/drivers/net/ethernet/qualcomm/qca_spi.h b/drivers/net/etherne=
 t/qualcomm/qca_spi.h
-index 3067356106f0..dcecb072b8eb 100644
+index dcecb072b8eb..f735ad77402f 100644
 =2D-- a/drivers/net/ethernet/qualcomm/qca_spi.h
 +++ b/drivers/net/ethernet/qualcomm/qca_spi.h
-@@ -39,8 +39,8 @@
+@@ -41,6 +41,7 @@
 
- #define QCASPI_GOOD_SIGNATURE 0xAA55
-
--#define TX_RING_MAX_LEN 10
--#define TX_RING_MIN_LEN 2
-+#define QCASPI_TX_RING_MAX_LEN 10
-+#define QCASPI_TX_RING_MIN_LEN 2
+ #define QCASPI_TX_RING_MAX_LEN 10
+ #define QCASPI_TX_RING_MIN_LEN 2
++#define QCASPI_RX_MAX_FRAMES 4
 
  /* sync related constants */
  #define QCASPI_SYNC_UNKNOWN 0
-@@ -54,7 +54,7 @@
- #define QCASPI_EVENT_CPUON  1
-
- struct tx_ring {
--	struct sk_buff *skb[TX_RING_MAX_LEN];
-+	struct sk_buff *skb[QCASPI_TX_RING_MAX_LEN];
- 	u16 head;
- 	u16 tail;
- 	u16 size;
 =2D-
 2.34.1
 
