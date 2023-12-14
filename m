@@ -1,62 +1,80 @@
-Return-Path: <netdev+bounces-57640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8743813AEB
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 20:42:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 43521813AEF
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 20:45:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75760282FA2
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 19:42:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F07E2282F16
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 19:45:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3EE2697A3;
-	Thu, 14 Dec 2023 19:42:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7384B68E83;
+	Thu, 14 Dec 2023 19:45:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pCwS1Eid"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cfUXXzrP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E1769794
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 19:42:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 819BBC433C7;
-	Thu, 14 Dec 2023 19:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5262B697AF;
+	Thu, 14 Dec 2023 19:45:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D9F9C433C8;
+	Thu, 14 Dec 2023 19:45:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702582930;
-	bh=PX0ecoAXEz9Cl0MWSXtDnwlLpv7C/aIBTFzfnHmjRio=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pCwS1EidBkgB2zDM1zZavKwnTHCdbEciauXLQT+KEHt8qw+vdg+5xFSGjXx4gowX4
-	 rUtbDoc5NEN/qocvhiDZxd3N16GlksXxflm/hHlDosxiR5RPpuOY6ZZH7gFrqRfalt
-	 RAprABB1RBc3jOzBEXXLz5NyrrZ/vuc5Tn68kfCQySwNS+zn16cHi+u6wSP7lbDR5F
-	 Bh4P6+cmhsaI0ug7j14E2IsSANzisAdXqsuhJpmFix6i51+rIPnsxTLyCY0ed2lTJf
-	 9J/w3oqZPYiGWmHpzKH1TBpxevtepO6y78XTPQxVldUAnCKmJWc/xqvZ4J4t23N7ET
-	 6RladxgZXjHbQ==
-Date: Thu, 14 Dec 2023 11:42:07 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Justin Chen <justin.chen@broadcom.com>
-Cc: netdev@vger.kernel.org, opendmb@gmail.com,
- florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
- andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com
-Subject: Re: [PATCH net v2 0/2] net: mdio: mdio-bcm-unimac: optimizations
- and clean up
-Message-ID: <20231214114207.54606a5a@kernel.org>
-In-Reply-To: <20231213222744.2891184-1-justin.chen@broadcom.com>
-References: <20231213222744.2891184-1-justin.chen@broadcom.com>
+	s=k20201202; t=1702583129;
+	bh=lYNWxD8VhKRxBVZogY1MoqzSA2del0XNZc5v4TOfhCU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cfUXXzrP8XyHmFUWDcYjKEcMHEUHBERJX61bkW9aGMuHv1oLnEMc1Fj9hQkcqvfaY
+	 PmQBuWLg6aXd/jw3FAtkDub7NjGiH9v0BvMSJpFeE6kXrfxAHZHmT6aWAEf8WhSG+E
+	 16M3WNr9OwXidM/4QubN2ewgpAqQW7dmkKH3FkP2ALkSjozXyMKwuO9oVsCAoKPQ6N
+	 hABCJRvZJ4aepBbtaej76Vd7Y0ubhVlx15KW3ner8Dvp6a5umTojVy7OKh3SuPkjDX
+	 XpgBHTTD5oBsVGs9cj55ncmJ8ek3ogH4efuskHTPEl8b1WGcFDb6BW7R+ofIx3I2xA
+	 5c1QRFNeoVW7w==
+Date: Thu, 14 Dec 2023 19:45:24 +0000
+From: Simon Horman <horms@kernel.org>
+To: Suman Ghosh <sumang@marvell.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, sgoutham@marvell.com, sbhatta@marvell.com,
+	jerinj@marvell.com, gakula@marvell.com, hkelam@marvell.com,
+	lcherian@marvell.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, wojciech.drewek@intel.com
+Subject: Re: [net-next PATCH v2] octeontx2-af: Fix multicast/mirror group
+ lock/unlock issue
+Message-ID: <20231214194524.GT5817@kernel.org>
+References: <20231213095349.69895-1-sumang@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231213095349.69895-1-sumang@marvell.com>
 
-On Wed, 13 Dec 2023 14:27:42 -0800 Justin Chen wrote:
-> Clean up mdio poll to use read_poll_timeout() and reduce the potential
-> poll time.
+On Wed, Dec 13, 2023 at 03:23:49PM +0530, Suman Ghosh wrote:
+> As per the existing implementation, there exists a race between finding
+> a multicast/mirror group entry and deleting that entry. The group lock
+> was taken and released independently by rvu_nix_mcast_find_grp_elem()
+> function. Which is incorrect and group lock should be taken during the
+> entire operation of group updation/deletion. This patch fixes the same.
+> 
+> Fixes: 51b2804c19cd ("octeontx2-af: Add new mbox to support multicast/mirror offload")
+> Signed-off-by: Suman Ghosh <sumang@marvell.com>
+> ---
+> Note: This is a follow up of
+> 
+> https://urldefense.proofpoint.com/v2/url?u=https-3A__git.kernel.org_netdev_net-2Dnext_c_51b2804c19cd&d=DwIDaQ&c=nKjWec2b6R0mOyPaz7xtfQ&r=7si3Xn9Ly-Se1a655kvEPIYU0nQ9HPeN280sEUv5ROU&m=NjKPoTkYVlL5Dh4aSr3-dVo-AukiIperlvB0S4_Mqzkyl_VcYAAKrWhkGZE5Cx-p&s=AkBf0454Xm-0adqV0Os7ZE8peaCXtYyuNbCS5kit6Jk&e=
+> 
+> v2 changes:
+> - Addresed review comments from Simon about a missed unlock and re-org the code
+>   with some goto labels.
 
-This is supposed to go to net-next, it's not a fix?
-No need to repost.
+Thanks Suman,
+
+this one looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
