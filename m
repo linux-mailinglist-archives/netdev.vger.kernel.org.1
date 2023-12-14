@@ -1,70 +1,69 @@
-Return-Path: <netdev+bounces-57326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2FB1812E40
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:12:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA74D812E41
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:12:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A871B1F218B9
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:12:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E4B8281C91
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:12:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0980C3F8C2;
-	Thu, 14 Dec 2023 11:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA80B3FB13;
+	Thu, 14 Dec 2023 11:12:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="liQXxm2m"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ABNE1//M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44BEEB7
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 03:12:34 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-40c2a444311so77122745e9.2
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 03:12:34 -0800 (PST)
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35415CF
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 03:12:36 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-40c2308faedso82090255e9.1
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 03:12:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702552353; x=1703157153; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1702552354; x=1703157154; darn=vger.kernel.org;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DGDHADo7C3NaDRc+ZRm9nq6QxuOQpyaoDXW27f7Yvxg=;
-        b=liQXxm2mcqkC+yalyEpXo+Y4+ftqIqJGmiQDyZLuQKa4rJGBdhDIJBXpAPj40rtlsm
-         gnWWE2K5JC+Y4KKwPT6dq9YGznrOJJyv5dWnxcYqteBeEdZOO3cno0umoA3fZD4muYOp
-         8ukbYu/LtVRvTEhHoqvdTYHRloIYVKQ6kae+38LXp3sAbQtH5SmDPFkl4z9rlpWXBz8R
-         DZR78QNAa5wiL1Z/cjjw7iyF10eqUSnw8Lyhn1TUQu6lolb6Cv6+3cwSe4HK0hwEQBGO
-         DxE9u29nlkbo0F3eTvxf2Imwual0IdYkM2assKwD6FfaHt0UUgWB4fPljP6/9IrVv5cg
-         qx/w==
+        bh=HFLk90YJRJTdLAWuuobbT0hT4wL3qXQh3mzV6rk9Sig=;
+        b=ABNE1//MS7iQFiwTSWvcOqnzpiaJ7dJAnklvLSn3iyVVwo+jAF7DX7mnpxY92oFa6c
+         Vp5LCET1hQmjm6KBuN+d+IT+K5H6cy5aNy4vE/S4ZLWjTgKYUItr4ubNCAm/2lcCwIZt
+         X3esJXoQJp00l1V5gFc2UXzOat0l/oRtHP3yJPZFx3BQPU+X7KMHxtEaBuki8/MRfBPa
+         LbPgmZJv1Ppf2Lvo9t5BZqLfOUs2rJ6BGMj6Ys0s2R+t+2/2rx1Uobbds6kmXbnA7AYS
+         EPH8Fyb42RUszGVLHGR+1rV4LzZOjRTYQLcmx1pFs3kphE/nCPoTOscQC0Pe1A0NTNeK
+         Ba7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702552353; x=1703157153;
+        d=1e100.net; s=20230601; t=1702552354; x=1703157154;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DGDHADo7C3NaDRc+ZRm9nq6QxuOQpyaoDXW27f7Yvxg=;
-        b=IQLBIQP3RxqG+BF9eL/+PtSZqgz+ALSkEfs41pXHyPNa1fHhRkCbY0yuVzVDmEtNrj
-         6f3MJSlJLj3UvYV+eTASwjwXH06XH5BL3CeMn9t6RbGRP3Mq3N0Gos10+Xsbx6QbJo1t
-         gtVXDxmEaQ8OTlRs3bGzVzmflN5gpvntP7G6DdVuoYMo8+SPLeYzC6nLX/rWxe4WJAQ1
-         nQbm6RnLZ2x78/ZOkfsVZ9DiP/iU95yrvyxdHtzXVukBSO80mEpbMoKKdJ+8UY2VsTFR
-         VTmiyJR3ngrdi2GsYPSXwjuLjesI0BnQ7tiFuttRpLSaKxOIMEZMQd7t9Mqr6XyTNDrO
-         1xxw==
-X-Gm-Message-State: AOJu0Yzfg9ou9yz9GZ///XaNlvVXQJg3H4lk+2gh2D9A7JqZOtHoV/oo
-	ajB/URt59ybAQEmZooSCeVc=
-X-Google-Smtp-Source: AGHT+IHQq2H06/ajaLzf9ecb2zQvKQDlKeASRQe+NPs3P0RofX1vL7E9lJ60bUJ0sWpUFLobinZ3yA==
-X-Received: by 2002:a05:600c:4fd6:b0:40c:38e2:8e51 with SMTP id o22-20020a05600c4fd600b0040c38e28e51mr2872515wmq.13.1702552352652;
-        Thu, 14 Dec 2023 03:12:32 -0800 (PST)
+        bh=HFLk90YJRJTdLAWuuobbT0hT4wL3qXQh3mzV6rk9Sig=;
+        b=B2XeRO5/RUlQHMeVMa2hP3tFPSWx/S5nZzDek/gYtPmTyw7t3IaoguH3ZhAgJaO7cb
+         euN9h46suiVnP1lC87Qzw753SO80PpNNOv6cE6MmoffQyeNEIJrVcEWdWBrJAPSO3elj
+         ffxctic+LdtHGL49v0GicI03/Pw/P/0om4d6WPlN7w/TAUU0OIg3NDgnXqHM7wCJe859
+         60pshZozFm/FWn1rl3KaUfNULd0GfuCvYJo2dY+l6funeYENCZmBS/C66t/k7nXindUm
+         Cn+9psyP22JMbVhxXMK5R0Lif9uAR0ohhCvNGl9xIg+vF0fFhzrtl+sgKz6YqXzty+2p
+         sFiA==
+X-Gm-Message-State: AOJu0YzPqO08LRirc8wVtep53vHw0K+sUFgSgy2SGX1K7hAm+nVEpAZ1
+	gKgjbNdOXfZQu/uBeFS9xS9YID2+aSqZKA==
+X-Google-Smtp-Source: AGHT+IGYRIYnNJtsVqAZYaOj1lGnpUltn2JmwHx3MpEfMzcuCBD1dZaFY5YUPIwR6E3vfHzuGSXD7A==
+X-Received: by 2002:a05:600c:1705:b0:40c:2a42:d7ec with SMTP id c5-20020a05600c170500b0040c2a42d7ecmr4390677wmn.57.1702552354309;
+        Thu, 14 Dec 2023 03:12:34 -0800 (PST)
 Received: from imac ([2a02:8010:60a0:0:7840:ddbd:bbf:1e8f])
-        by smtp.gmail.com with ESMTPSA id q14-20020a05600c46ce00b0040c4c9c52a3sm12581213wmo.12.2023.12.14.03.12.31
+        by smtp.gmail.com with ESMTPSA id r5-20020a05600c35c500b004080f0376a0sm24018828wmq.42.2023.12.14.03.12.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 03:12:31 -0800 (PST)
+        Thu, 14 Dec 2023 03:12:33 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  matttbe@kernel.org,  martineau@kernel.org,
-  dcaratti@redhat.com,  mptcp@lists.linux.dev
-Subject: Re: [PATCH net-next 3/3] netlink: specs: mptcp: rename the MPTCP
- path management(?) spec
-In-Reply-To: <20231213232822.2950853-4-kuba@kernel.org> (Jakub Kicinski's
-	message of "Wed, 13 Dec 2023 15:28:22 -0800")
-Date: Thu, 14 Dec 2023 08:42:48 +0000
-Message-ID: <m2o7et5g53.fsf@gmail.com>
+  pabeni@redhat.com
+Subject: Re: [PATCH net-next 2/3] netlink: specs: ovs: correct enum names in
+ specs
+In-Reply-To: <20231213232822.2950853-3-kuba@kernel.org> (Jakub Kicinski's
+	message of "Wed, 13 Dec 2023 15:28:21 -0800")
+Date: Thu, 14 Dec 2023 08:45:36 +0000
+Message-ID: <m2jzph5g0f.fsf@gmail.com>
 References: <20231213232822.2950853-1-kuba@kernel.org>
-	<20231213232822.2950853-4-kuba@kernel.org>
+	<20231213232822.2950853-3-kuba@kernel.org>
 User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,10 +75,9 @@ Content-Type: text/plain
 
 Jakub Kicinski <kuba@kernel.org> writes:
 
-> We assume in handful of places that the name of the spec is
-> the same as the name of the family. We could fix that but
-> it seems like a fair assumption to make. Rename the MPTCP
-> spec instead.
+> Align the enum-names of OVS with what's actually in the uAPI.
+> Either correct the names, or mark the enum as empty because
+> the values are in fact #defines.
 >
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
