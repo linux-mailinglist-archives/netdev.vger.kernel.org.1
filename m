@@ -1,78 +1,57 @@
-Return-Path: <netdev+bounces-57485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4186481329E
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:10:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 151FF81329A
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:10:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 320601C219C8
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:10:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ABCA5B2112B
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:10:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB01E59E28;
-	Thu, 14 Dec 2023 14:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA0B59B4F;
+	Thu, 14 Dec 2023 14:10:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="IosEXvha"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GHfjHAQ1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B18411A
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 06:10:25 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-28b011857f0so749718a91.2
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 06:10:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1702563025; x=1703167825; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4/0a4wTusCtzkiTYwcqjWoIqKIZJJnty4VarpRqEhR4=;
-        b=IosEXvhav6pt7Xjyk4TykGYR4i8FeitnVbsDRCo3x66YgOsElh42zx6gm1U6ILwCr5
-         BPfV6+filwLTV4G9kuaB6xmRO8xkdvtkC2JcVW6N2eYDRKV7aEbhG5UD765mZlX7cZdq
-         MNhJRZO8o9vCt1THzg6yH+n8V/DoupHzUunMXdlLK+ManpOoDlnsFYSbedL0C8rFJsz0
-         eoQFX2/GkPXYK3lZL+GsJh4JMtKMENqA/Sfznqsof+kRkYr5N5+SlV4naGRETTLkHMKM
-         zffii7seKaG6rMGqxNM8kAYFOzcgVY2wK705O7kGI6FJIscWCY1e0GgCAGaeLC+I9HGv
-         oWoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702563025; x=1703167825;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4/0a4wTusCtzkiTYwcqjWoIqKIZJJnty4VarpRqEhR4=;
-        b=VTgTB8dJkqi5IGYCyIJIvY60Sk9SoZoelW+mYr9jvMee0dJ+0aqa5k9pLb2djW/TXH
-         232O9tC87hWhaSUF8dKQ4B6fPqHaVNYRc+bzJFCX9t7CGqLVim62Ba2ySUxoFiZ93iCB
-         0cXvku0koCzL3lOVMq+FRZwXHvj7RC/kft0cRdyGRaK4suiaNp1QLyCTphK8SRkNc/BL
-         s+sOGAr//bElxW2lsVdnwdKFZ6nnu7Mb90QOZIb0Zo7afHSpArRVmj9iKYL0mTqqMKGO
-         eSM2LA+oeqD2g8bcuvpX1tdumnhmYtjDUsGm/TyeLu4AavIk4fz0HdCi3cWTrTBzrGvz
-         K0pA==
-X-Gm-Message-State: AOJu0YxORmk3xR/Cszjqe/nlJyznoTCEY+zB4t/yTJMydg5lvGmSGF07
-	SuOZnC85zaAeSnCyfq7Pvz6jnQ==
-X-Google-Smtp-Source: AGHT+IEUcmn6iOaUIpwJPyuyW4RVcdgk3cPKXE5t+MwUmTuMVvy2P4Rl41F5CZIke7olnW1MCCnoGg==
-X-Received: by 2002:a17:90a:8815:b0:28a:9b35:8fe with SMTP id s21-20020a17090a881500b0028a9b3508femr2882807pjn.53.1702563024030;
-        Thu, 14 Dec 2023 06:10:24 -0800 (PST)
-Received: from localhost.localdomain ([2804:7f1:e2c0:60e3:4c1:486f:7eda:5fb5])
-        by smtp.gmail.com with ESMTPSA id q2-20020a17090a430200b0028a4c85a55csm11028698pjg.27.2023.12.14.06.10.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 06:10:23 -0800 (PST)
-From: Victor Nogueira <victor@mojatatu.com>
-To: jhs@mojatatu.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us
-Cc: mleitner@redhat.com,
-	vladbu@nvidia.com,
-	paulb@nvidia.com,
-	pctammela@mojatatu.com,
-	netdev@vger.kernel.org,
-	kernel@mojatatu.com
-Subject: [PATCH net-next v6 3/3] net/sched: act_mirred: Allow mirred to block
-Date: Thu, 14 Dec 2023 11:10:06 -0300
-Message-ID: <20231214141006.3578080-4-victor@mojatatu.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231214141006.3578080-1-victor@mojatatu.com>
-References: <20231214141006.3578080-1-victor@mojatatu.com>
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CD65118
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 06:10:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702563015; x=1734099015;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=P5+juMLHJnwyDiBpl3S0dM5Nn3q6D4TIwTTHAV2aD7E=;
+  b=GHfjHAQ1wc8ZDtbSwBZ3hl8nfmiVSvKqKDKTV/M4vjwB1rKKi63iAG45
+   xjl/DOb1JeSHztV8qPlflhY3acdwcUB0Ek6QCUN5e6pB8ySK7U/YTTDdT
+   EYXYnPYm5KSE0CBbzRnoSzCd4FBXs5Mid58iRsObqbElPNqqFpjOJSIgO
+   NVSHNKR3u3sviQ3L5gF/CaCwri0WVf3+67mQ9yKYpglOTocYLm7B5vr8C
+   W7v/Lg90dJ2PZ61DhrGldFrAQcsl9EtLSs0MklSbP6OapOfEJspsEQYs0
+   /SCKWVI8ZvlPo3V9I17h282+RNb8D3ls2p01SC1SUqAVgUCZbKyOu5Vyb
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="1942365"
+X-IronPort-AV: E=Sophos;i="6.04,275,1695711600"; 
+   d="scan'208";a="1942365"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 06:10:14 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="918071248"
+X-IronPort-AV: E=Sophos;i="6.04,275,1695711600"; 
+   d="scan'208";a="918071248"
+Received: from unknown (HELO amlin-019-225.igk.intel.com) ([10.102.19.225])
+  by fmsmga001.fm.intel.com with ESMTP; 14 Dec 2023 06:10:13 -0800
+From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-next] i40e: add trace events related to SFP module IOCTLs
+Date: Thu, 14 Dec 2023 15:10:12 +0100
+Message-Id: <20231214141012.224894-1-aleksandr.loktionov@intel.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,460 +60,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-So far the mirred action has dealt with syntax that handles mirror/redirection for netdev.
-A matching packet is redirected or mirrored to a target netdev.
+Add trace events related to SFP module IOCTLs for troubleshooting.
 
-In this patch we enable mirred to mirror to a tc block as well.
-IOW, the new syntax looks as follows:
-... mirred <ingress | egress> <mirror | redirect> [index INDEX] < <blockid BLOCKID> | <dev <devname>> >
-
-Examples of mirroring or redirecting to a tc block:
-$ tc filter add block 22 protocol ip pref 25 \
-  flower dst_ip 192.168.0.0/16 action mirred egress mirror blockid 22
-
-$ tc filter add block 22 protocol ip pref 25 \
-  flower dst_ip 10.10.10.10/32 action mirred egress redirect blockid 22
-
-Co-developed-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
-Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+Riewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
- include/net/tc_act/tc_mirred.h        |   1 +
- include/uapi/linux/tc_act/tc_mirred.h |   1 +
- net/sched/act_mirred.c                | 280 +++++++++++++++++++-------
- 3 files changed, 208 insertions(+), 74 deletions(-)
+ src/CORE/i40e_ethtool.c |  5 +++++
+ src/CORE/i40e_trace.h   | 18 ++++++++++++++++++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/include/net/tc_act/tc_mirred.h b/include/net/tc_act/tc_mirred.h
-index 32ce8ea36950..75722d967bf2 100644
---- a/include/net/tc_act/tc_mirred.h
-+++ b/include/net/tc_act/tc_mirred.h
-@@ -8,6 +8,7 @@
- struct tcf_mirred {
- 	struct tc_action	common;
- 	int			tcfm_eaction;
-+	u32                     tcfm_blockid;
- 	bool			tcfm_mac_header_xmit;
- 	struct net_device __rcu	*tcfm_dev;
- 	netdevice_tracker	tcfm_dev_tracker;
-diff --git a/include/uapi/linux/tc_act/tc_mirred.h b/include/uapi/linux/tc_act/tc_mirred.h
-index 2500a0005d05..54df06658bc8 100644
---- a/include/uapi/linux/tc_act/tc_mirred.h
-+++ b/include/uapi/linux/tc_act/tc_mirred.h
-@@ -20,6 +20,7 @@ enum {
- 	TCA_MIRRED_UNSPEC,
- 	TCA_MIRRED_TM,
- 	TCA_MIRRED_PARMS,
-+	TCA_MIRRED_BLOCKID,
- 	TCA_MIRRED_PAD,
- 	__TCA_MIRRED_MAX
- };
-diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
-index 0a711c184c29..3bdf6a9764e8 100644
---- a/net/sched/act_mirred.c
-+++ b/net/sched/act_mirred.c
-@@ -85,10 +85,20 @@ static void tcf_mirred_release(struct tc_action *a)
+diff --git a/src/CORE/i40e_ethtool.c b/src/CORE/i40e_ethtool.c
+index 0838566..e9d9d4b 100644
+--- a/src/CORE/i40e_ethtool.c
++++ b/src/CORE/i40e_ethtool.c
+@@ -1057,6 +1057,7 @@ static int i40e_get_link_ksettings(struct net_device *netdev,
+ 	ethtool_link_ksettings_zero_link_mode(ks, supported);
+ 	ethtool_link_ksettings_zero_link_mode(ks, advertising);
  
- static const struct nla_policy mirred_policy[TCA_MIRRED_MAX + 1] = {
- 	[TCA_MIRRED_PARMS]	= { .len = sizeof(struct tc_mirred) },
-+	[TCA_MIRRED_BLOCKID]	= { .type = NLA_U32 },
- };
- 
- static struct tc_action_ops act_mirred_ops;
- 
-+static void tcf_mirred_replace_dev(struct tcf_mirred *m, struct net_device *ndev)
-+{
-+	struct net_device *odev;
-+
-+	odev = rcu_replace_pointer(m->tcfm_dev, ndev,
-+				   lockdep_is_held(&m->tcf_lock));
-+	netdev_put(odev, &m->tcfm_dev_tracker);
-+}
-+
- static int tcf_mirred_init(struct net *net, struct nlattr *nla,
- 			   struct nlattr *est, struct tc_action **a,
- 			   struct tcf_proto *tp,
-@@ -126,6 +136,13 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
- 	if (exists && bind)
- 		return 0;
- 
-+	if (tb[TCA_MIRRED_BLOCKID] && parm->ifindex) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Mustn't specify Block ID and dev simultaneously");
-+		err = -EINVAL;
-+		goto release_idr;
-+	}
-+
- 	switch (parm->eaction) {
- 	case TCA_EGRESS_MIRROR:
- 	case TCA_EGRESS_REDIR:
-@@ -142,9 +159,9 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
- 	}
- 
- 	if (!exists) {
--		if (!parm->ifindex) {
-+		if (!parm->ifindex && !tb[TCA_MIRRED_BLOCKID]) {
- 			tcf_idr_cleanup(tn, index);
--			NL_SET_ERR_MSG_MOD(extack, "Specified device does not exist");
-+			NL_SET_ERR_MSG_MOD(extack, "Must specify device or block");
- 			return -EINVAL;
- 		}
- 		ret = tcf_idr_create_from_flags(tn, index, est, a,
-@@ -170,7 +187,7 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
- 	spin_lock_bh(&m->tcf_lock);
- 
- 	if (parm->ifindex) {
--		struct net_device *odev, *ndev;
-+		struct net_device *ndev;
- 
- 		ndev = dev_get_by_index(net, parm->ifindex);
- 		if (!ndev) {
-@@ -179,11 +196,14 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
- 			goto put_chain;
- 		}
- 		mac_header_xmit = dev_is_mac_header_xmit(ndev);
--		odev = rcu_replace_pointer(m->tcfm_dev, ndev,
--					  lockdep_is_held(&m->tcf_lock));
--		netdev_put(odev, &m->tcfm_dev_tracker);
-+		tcf_mirred_replace_dev(m, ndev);
- 		netdev_tracker_alloc(ndev, &m->tcfm_dev_tracker, GFP_ATOMIC);
- 		m->tcfm_mac_header_xmit = mac_header_xmit;
-+		m->tcfm_blockid = 0;
-+	} else if (tb[TCA_MIRRED_BLOCKID]) {
-+		tcf_mirred_replace_dev(m, NULL);
-+		m->tcfm_mac_header_xmit = false;
-+		m->tcfm_blockid = nla_get_u32(tb[TCA_MIRRED_BLOCKID]);
- 	}
- 	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
- 	m->tcfm_eaction = parm->eaction;
-@@ -211,13 +231,14 @@ static bool is_mirred_nested(void)
- 	return unlikely(__this_cpu_read(mirred_nest_level) > 1);
- }
- 
--static int tcf_mirred_forward(bool want_ingress, struct sk_buff *skb)
-+static int tcf_mirred_forward(bool want_ingress, bool nested_call,
-+			      struct sk_buff *skb)
- {
- 	int err;
- 
- 	if (!want_ingress)
- 		err = tcf_dev_queue_xmit(skb, dev_queue_xmit);
--	else if (is_mirred_nested())
-+	else if (nested_call)
- 		err = netif_rx(skb);
++	i40e_trace(ioctl_get_link_ksettings, pf, hw_link_info->link_info);
+ 	if (link_up)
+ 		i40e_get_settings_link_up(hw, ks, netdev, pf);
  	else
- 		err = netif_receive_skb(skb);
-@@ -225,110 +246,215 @@ static int tcf_mirred_forward(bool want_ingress, struct sk_buff *skb)
- 	return err;
+@@ -7219,9 +7220,12 @@ static int i40e_get_module_info(struct net_device *netdev,
+ 		modinfo->eeprom_len = I40E_MODULE_QSFP_MAX_LEN;
+ 		break;
+ 	default:
++		i40e_trace(ioctl_get_module_info, pf, ~0UL);
+ 		netdev_dbg(vsi->netdev, "SFP module type unrecognized or no SFP connector used.\n");
+ 		return -EOPNOTSUPP;
+ 	}
++	i40e_trace(ioctl_get_module_info, pf, (((u64)modinfo->type) << 32) |
++		   modinfo->eeprom_len);
+ 	return 0;
  }
  
--TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *skb,
--				     const struct tc_action *a,
--				     struct tcf_result *res)
-+static int tcf_redirect_act(struct sk_buff *skb, bool want_ingress)
- {
--	struct tcf_mirred *m = to_mirred(a);
--	struct sk_buff *skb2 = skb;
--	bool m_mac_header_xmit;
--	struct net_device *dev;
--	unsigned int nest_level;
--	int retval, err = 0;
--	bool use_reinsert;
-+	skb_set_redirected(skb, skb->tc_at_ingress);
-+
-+	return tcf_mirred_forward(want_ingress, is_mirred_nested(), skb);
-+}
-+
-+static int tcf_mirror_act(struct sk_buff *skb, bool want_ingress)
-+{
-+	return tcf_mirred_forward(want_ingress, is_mirred_nested(), skb);
-+}
-+
-+static int tcf_mirred_to_dev(struct sk_buff *skb, struct tcf_mirred *m,
-+			     struct net_device *dev,
-+			     const bool m_mac_header_xmit, int m_eaction,
-+			     int retval)
-+{
-+	struct sk_buff *skb_to_send = skb;
- 	bool want_ingress;
- 	bool is_redirect;
--	bool expects_nh;
- 	bool at_ingress;
--	int m_eaction;
-+	bool dont_clone;
-+	bool expects_nh;
- 	int mac_len;
- 	bool at_nh;
-+	int err;
+@@ -7244,6 +7248,7 @@ static int i40e_get_module_eeprom(struct net_device *netdev,
+ 	u32 value = 0;
+ 	int i;
  
--	nest_level = __this_cpu_inc_return(mirred_nest_level);
--	if (unlikely(nest_level > MIRRED_NEST_LIMIT)) {
--		net_warn_ratelimited("Packet exceeded mirred recursion limit on dev %s\n",
--				     netdev_name(skb->dev));
--		__this_cpu_dec(mirred_nest_level);
--		return TC_ACT_SHOT;
--	}
--
--	tcf_lastuse_update(&m->tcf_tm);
--	tcf_action_update_bstats(&m->common, skb);
-+	is_redirect = tcf_mirred_is_act_redirect(m_eaction);
-+	want_ingress = tcf_mirred_act_wants_ingress(m_eaction);
-+	expects_nh = want_ingress || !m_mac_header_xmit;
++	i40e_trace(ioctl_get_module_eeprom, pf, ee ? ee->len : 0U);
+ 	if (!ee || !ee->len || !data)
+ 		return -EINVAL;
  
--	m_mac_header_xmit = READ_ONCE(m->tcfm_mac_header_xmit);
--	m_eaction = READ_ONCE(m->tcfm_eaction);
--	retval = READ_ONCE(m->tcf_action);
--	dev = rcu_dereference_bh(m->tcfm_dev);
--	if (unlikely(!dev)) {
--		pr_notice_once("tc mirred: target device is gone\n");
--		goto out;
--	}
-+	/* we could easily avoid the clone only if called by ingress and clsact;
-+	 * since we can't easily detect the clsact caller, skip clone only for
-+	 * ingress - that covers the TC S/W datapath.
-+	 */
-+	dont_clone = skb_at_tc_ingress(skb) && is_redirect &&
-+		     tcf_mirred_can_reinsert(retval);
+diff --git a/src/CORE/i40e_trace.h b/src/CORE/i40e_trace.h
+index cac0f7c..f54fc36 100644
+--- a/src/CORE/i40e_trace.h
++++ b/src/CORE/i40e_trace.h
+@@ -428,6 +428,24 @@ DEFINE_EVENT(
  
--	if (unlikely(!(dev->flags & IFF_UP)) || !netif_carrier_ok(dev)) {
-+	if (unlikely(!(dev->flags & IFF_UP)) ||
-+	    !netif_carrier_ok(dev)) {
- 		net_notice_ratelimited("tc mirred to Houston: device %s is down\n",
- 				       dev->name);
-+		err = -ENODEV;
- 		goto out;
- 	}
+ 	TP_ARGS(pf, val));
  
--	/* we could easily avoid the clone only if called by ingress and clsact;
--	 * since we can't easily detect the clsact caller, skip clone only for
--	 * ingress - that covers the TC S/W datapath.
--	 */
--	is_redirect = tcf_mirred_is_act_redirect(m_eaction);
--	at_ingress = skb_at_tc_ingress(skb);
--	use_reinsert = at_ingress && is_redirect &&
--		       tcf_mirred_can_reinsert(retval);
--	if (!use_reinsert) {
--		skb2 = skb_clone(skb, GFP_ATOMIC);
--		if (!skb2)
-+	if (!dont_clone) {
-+		skb_to_send = skb_clone(skb, GFP_ATOMIC);
-+		if (!skb_to_send) {
-+			err =  -ENOMEM;
- 			goto out;
-+		}
- 	}
++DEFINE_EVENT(
++	i40e_ioctl_template, i40e_ioctl_get_module_info,
++	TP_PROTO(struct i40e_pf *pf, u64 val),
++
++	TP_ARGS(pf, val));
++
++DEFINE_EVENT(
++	i40e_ioctl_template, i40e_ioctl_get_module_eeprom,
++	TP_PROTO(struct i40e_pf *pf, u64 val),
++
++	TP_ARGS(pf, val));
++
++DEFINE_EVENT(
++	i40e_ioctl_template, i40e_ioctl_get_link_ksettings,
++	TP_PROTO(struct i40e_pf *pf, u64 val),
++
++	TP_ARGS(pf, val));
++
+ DECLARE_EVENT_CLASS(
+ 	i40e_nvmupd_template,
  
--	want_ingress = tcf_mirred_act_wants_ingress(m_eaction);
-+	at_ingress = skb_at_tc_ingress(skb);
- 
- 	/* All mirred/redirected skbs should clear previous ct info */
--	nf_reset_ct(skb2);
-+	nf_reset_ct(skb_to_send);
- 	if (want_ingress && !at_ingress) /* drop dst for egress -> ingress */
--		skb_dst_drop(skb2);
-+		skb_dst_drop(skb_to_send);
- 
--	expects_nh = want_ingress || !m_mac_header_xmit;
- 	at_nh = skb->data == skb_network_header(skb);
- 	if (at_nh != expects_nh) {
--		mac_len = skb_at_tc_ingress(skb) ? skb->mac_len :
-+		mac_len = at_ingress ? skb->mac_len :
- 			  skb_network_offset(skb);
- 		if (expects_nh) {
- 			/* target device/action expect data at nh */
--			skb_pull_rcsum(skb2, mac_len);
-+			skb_pull_rcsum(skb_to_send, mac_len);
- 		} else {
- 			/* target device/action expect data at mac */
--			skb_push_rcsum(skb2, mac_len);
-+			skb_push_rcsum(skb_to_send, mac_len);
- 		}
- 	}
- 
--	skb2->skb_iif = skb->dev->ifindex;
--	skb2->dev = dev;
-+	skb_to_send->skb_iif = skb->dev->ifindex;
-+	skb_to_send->dev = dev;
- 
--	/* mirror is always swallowed */
- 	if (is_redirect) {
--		skb_set_redirected(skb2, skb2->tc_at_ingress);
--
--		/* let's the caller reinsert the packet, if possible */
--		if (use_reinsert) {
--			err = tcf_mirred_forward(want_ingress, skb);
--			if (err)
--				tcf_action_inc_overlimit_qstats(&m->common);
--			__this_cpu_dec(mirred_nest_level);
--			return TC_ACT_CONSUMED;
--		}
-+		if (skb == skb_to_send)
-+			retval = TC_ACT_CONSUMED;
-+
-+		err = tcf_redirect_act(skb_to_send, want_ingress);
-+	} else {
-+		err = tcf_mirror_act(skb_to_send, want_ingress);
- 	}
- 
--	err = tcf_mirred_forward(want_ingress, skb2);
--	if (err) {
- out:
-+	if (err)
- 		tcf_action_inc_overlimit_qstats(&m->common);
--		if (tcf_mirred_is_act_redirect(m_eaction))
--			retval = TC_ACT_SHOT;
-+
-+	return retval;
-+}
-+
-+static int tcf_mirred_blockcast_redir(struct sk_buff *skb, struct tcf_mirred *m,
-+				      struct tcf_block *block, int m_eaction,
-+				      const u32 exception_ifindex, int retval)
-+{
-+	struct net_device *dev_prev = NULL;
-+	struct net_device *dev = NULL;
-+	unsigned long index;
-+	int mirred_eaction;
-+
-+	mirred_eaction = tcf_mirred_act_wants_ingress(m_eaction) ?
-+		TCA_INGRESS_MIRROR : TCA_EGRESS_MIRROR;
-+
-+	xa_for_each(&block->ports, index, dev) {
-+		if (index == exception_ifindex)
-+			continue;
-+
-+		if (dev_prev == NULL)
-+			goto assign_prev;
-+
-+		tcf_mirred_to_dev(skb, m, dev_prev,
-+				  dev_is_mac_header_xmit(dev),
-+				  mirred_eaction, retval);
-+assign_prev:
-+		dev_prev = dev;
-+	}
-+
-+	if (dev_prev)
-+		return tcf_mirred_to_dev(skb, m, dev_prev,
-+					 dev_is_mac_header_xmit(dev_prev),
-+					 m_eaction, retval);
-+
-+	return retval;
-+}
-+
-+static int tcf_mirred_blockcast(struct sk_buff *skb, struct tcf_mirred *m,
-+				const u32 blockid, struct tcf_result *res,
-+				int retval)
-+{
-+	const u32 exception_ifindex = skb->dev->ifindex;
-+	struct net_device *dev = NULL;
-+	struct tcf_block *block;
-+	unsigned long index;
-+	bool is_redirect;
-+	int m_eaction;
-+
-+	m_eaction = READ_ONCE(m->tcfm_eaction);
-+	is_redirect = tcf_mirred_is_act_redirect(m_eaction);
-+
-+	/* we are already under rcu protection, so can call block lookup directly */
-+	block = tcf_block_lookup(dev_net(skb->dev), blockid);
-+	if (!block || xa_empty(&block->ports)) {
-+		tcf_action_inc_overlimit_qstats(&m->common);
-+		return retval;
-+	}
-+
-+	if (is_redirect)
-+		return tcf_mirred_blockcast_redir(skb, m, block, m_eaction,
-+						  exception_ifindex, retval);
-+
-+	xa_for_each(&block->ports, index, dev) {
-+		if (index == exception_ifindex)
-+			continue;
-+
-+		tcf_mirred_to_dev(skb, m, dev,
-+				  dev_is_mac_header_xmit(dev),
-+				  m_eaction, retval);
-+	}
-+
-+	return retval;
-+}
-+
-+TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *skb,
-+				     const struct tc_action *a,
-+				     struct tcf_result *res)
-+{
-+	struct tcf_mirred *m = to_mirred(a);
-+	int retval = READ_ONCE(m->tcf_action);
-+	unsigned int nest_level;
-+	bool m_mac_header_xmit;
-+	struct net_device *dev;
-+	int m_eaction;
-+	u32 blockid;
-+	int err = 0;
-+
-+	nest_level = __this_cpu_inc_return(mirred_nest_level);
-+	if (unlikely(nest_level > MIRRED_NEST_LIMIT)) {
-+		net_warn_ratelimited("Packet exceeded mirred recursion limit on dev %s\n",
-+				     netdev_name(skb->dev));
-+		retval = TC_ACT_SHOT;
-+		goto dec_nest_level;
-+	}
-+
-+	tcf_lastuse_update(&m->tcf_tm);
-+	tcf_action_update_bstats(&m->common, skb);
-+
-+	blockid = READ_ONCE(m->tcfm_blockid);
-+	if (blockid) {
-+		retval = tcf_mirred_blockcast(skb, m, blockid, res, retval);
-+		goto dec_nest_level;
-+	}
-+
-+	dev = rcu_dereference_bh(m->tcfm_dev);
-+	if (unlikely(!dev)) {
-+		pr_notice_once("tc mirred: target device is gone\n");
-+		err = -ENODEV;
-+		tcf_action_inc_overlimit_qstats(&m->common);
-+		goto dec_nest_level;
- 	}
-+
-+	m_mac_header_xmit = READ_ONCE(m->tcfm_mac_header_xmit);
-+	m_eaction = READ_ONCE(m->tcfm_eaction);
-+
-+	retval = tcf_mirred_to_dev(skb, m, dev, m_mac_header_xmit, m_eaction,
-+				   retval);
-+
-+dec_nest_level:
- 	__this_cpu_dec(mirred_nest_level);
- 
- 	return retval;
-@@ -349,6 +475,7 @@ static int tcf_mirred_dump(struct sk_buff *skb, struct tc_action *a, int bind,
- {
- 	unsigned char *b = skb_tail_pointer(skb);
- 	struct tcf_mirred *m = to_mirred(a);
-+	const u32 blockid = m->tcfm_blockid;
- 	struct tc_mirred opt = {
- 		.index   = m->tcf_index,
- 		.refcnt  = refcount_read(&m->tcf_refcnt) - ref,
-@@ -367,6 +494,9 @@ static int tcf_mirred_dump(struct sk_buff *skb, struct tc_action *a, int bind,
- 	if (nla_put(skb, TCA_MIRRED_PARMS, sizeof(opt), &opt))
- 		goto nla_put_failure;
- 
-+	if (blockid && nla_put_u32(skb, TCA_MIRRED_BLOCKID, m->tcfm_blockid))
-+		goto nla_put_failure;
-+
- 	tcf_tm_dump(&t, &m->tcf_tm);
- 	if (nla_put_64bit(skb, TCA_MIRRED_TM, sizeof(t), &t, TCA_MIRRED_PAD))
- 		goto nla_put_failure;
-@@ -397,6 +527,8 @@ static int mirred_device_event(struct notifier_block *unused,
- 				 * net_device are already rcu protected.
- 				 */
- 				RCU_INIT_POINTER(m->tcfm_dev, NULL);
-+			} else if (m->tcfm_blockid) {
-+				m->tcfm_blockid = 0;
- 			}
- 			spin_unlock_bh(&m->tcf_lock);
- 		}
 -- 
-2.25.1
+2.31.1
 
 
