@@ -1,68 +1,125 @@
-Return-Path: <netdev+bounces-57263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CB6E812AD9
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 09:57:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 194B2812AFB
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 10:03:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5F7A1F211D2
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 08:57:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C11531F218AC
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 09:03:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D762A2575D;
-	Thu, 14 Dec 2023 08:57:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57A922576E;
+	Thu, 14 Dec 2023 09:03:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="fFM3xcmN"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 118B510A;
-	Thu, 14 Dec 2023 00:57:04 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VyTuMXi_1702544220;
-Received: from 30.221.148.227(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VyTuMXi_1702544220)
-          by smtp.aliyun-inc.com;
-          Thu, 14 Dec 2023 16:57:02 +0800
-Message-ID: <e6d9b59f-9c98-53a1-4947-720095e0c37e@linux.alibaba.com>
-Date: Thu, 14 Dec 2023 16:56:59 +0800
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3734113;
+	Thu, 14 Dec 2023 01:03:45 -0800 (PST)
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BE8pA3k007659;
+	Thu, 14 Dec 2023 09:03:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=qcppdkim1; bh=CEmD2Io
+	8I30NU9IsgDTAgfw6x3bBuAFuwff3Y2iUpWs=; b=fFM3xcmN9p0FMX+cBO7VIWd
+	aHICKqkaBvrUogzjOriukPB4AdhJ0Cs7RavBDKo8QK3Bihbp1o43AKBPOzZbadao
+	4chbsXoXNrpiYJ5uizOc/7bzQd1bah1XNuV2+RUSqmmrHLnIoDRpsfXjW+6LbFd6
+	pfvRJMhSd0KwXlkSomkT5iz6Uxv3JQT41Pfqo4pKfkJR1FlpvONeeo/WGSsbLSZH
+	cad+aA4IRF37VysdR/QkTzPXFS7fqPkisT0tMsPtsDwjuHHiVCteNhJwCOBO30+O
+	Z7Vw0MESVWt1FK6mnyc3wis1tC5gCIqSm4inN5iWHzVIdXDwG8VoPhvsLcNFM1A=
+	=
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uynvy90yh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Dec 2023 09:03:25 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BE93O6t019890
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Dec 2023 09:03:24 GMT
+Received: from akronite-sh-dev02.qualcomm.com (10.80.80.8) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Thu, 14 Dec 2023 01:03:19 -0800
+From: Luo Jie <quic_luoj@quicinc.com>
+To: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+        <robert.marko@sartura.hr>
+CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <quic_srichara@quicinc.com>
+Subject: [PATCH v3 0/5] support ipq5332 platform
+Date: Thu, 14 Dec 2023 17:02:59 +0800
+Message-ID: <20231214090304.16884-1-quic_luoj@quicinc.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [RFC nf-next 1/2] netfilter: bpf: support prog update
-Content-Language: en-US
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>, bpf <bpf@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>,
- Network Development <netdev@vger.kernel.org>, coreteam@netfilter.org,
- netfilter-devel <netfilter-devel@vger.kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>
-References: <1702467945-38866-1-git-send-email-alibuda@linux.alibaba.com>
- <1702467945-38866-2-git-send-email-alibuda@linux.alibaba.com>
- <20231213222415.GA13818@breakpoint.cc>
- <0e94149a-05f1-3f98-3f75-ca74f364a45b@linux.alibaba.com>
- <CAADnVQJx7j_kB6PVJN7cwGn5ETjcSs2Y0SuBS0+9qJRFpMNv-w@mail.gmail.com>
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <CAADnVQJx7j_kB6PVJN7cwGn5ETjcSs2Y0SuBS0+9qJRFpMNv-w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: HoUA1_qfyPvjIpdjHqM530fb9N7xuvvV
+X-Proofpoint-ORIG-GUID: HoUA1_qfyPvjIpdjHqM530fb9N7xuvvV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
+ adultscore=0 phishscore=0 priorityscore=1501 spamscore=0 suspectscore=0
+ mlxscore=0 malwarescore=0 mlxlogscore=999 lowpriorityscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2312140059
+
+For IPQ5332 platform, there are two MAC PCSs, and qca8084 is
+connected with one of them.
+
+1. The Ethernet LDO needs to be enabled to make the PHY GPIO
+   reset taking effect, which uses the MDIO bus level reset.
+
+2. The SoC GCC uniphy AHB and SYS clocks need to be enabled
+   to make the ethernet PHY device accessible.
+
+3. To provide the clock to the ethernet, the CMN clock needs
+   to be initialized for selecting reference clock and enabling
+   the output clock.
+
+4. Support optional MDIO clock frequency config.
+
+5. Update dt-bindings doc for the new added properties.
+
+Changes in v2:
+	* remove the PHY related features such as PHY address
+	  program and clock initialization.
+	* leverage the MDIO level GPIO reset for qca8084 PHY.
+
+Changes in v3:
+	* fix the christmas-tree format issue.
+	* improve the dt-binding changes.
+
+Luo Jie (5):
+  net: mdio: ipq4019: move eth_ldo_rdy before MDIO bus register
+  net: mdio: ipq4019: enable the SoC uniphy clocks for ipq5332 platform
+  net: mdio: ipq4019: configure CMN PLL clock for ipq5332
+  net: mdio: ipq4019: support MDIO clock frequency divider
+  dt-bindings: net: ipq4019-mdio: Document ipq5332 platform
+
+ .../bindings/net/qcom,ipq4019-mdio.yaml       | 143 ++++++++-
+ drivers/net/mdio/mdio-ipq4019.c               | 296 ++++++++++++++++--
+ 2 files changed, 410 insertions(+), 29 deletions(-)
 
 
+base-commit: 11651f8cb2e88372d4ed523d909514dc9a613ea3
+-- 
+2.42.0
 
-On 12/14/23 1:50 PM, Alexei Starovoitov wrote:
-> On Wed, Dec 13, 2023 at 9:31 PM D. Wythe <alibuda@linux.alibaba.com> wrote:
->> I will address those issues you mentioned in the next version.
-> Don't. There is no need for the next version.
-> None of these changes are necessary.
-
-Can I know the reason ?  Updating prog for active link is kind of 
-important feature
-for real application..
-
-Best wishes,
-D. Wythe
 
