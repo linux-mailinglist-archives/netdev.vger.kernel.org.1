@@ -1,221 +1,66 @@
-Return-Path: <netdev+bounces-57196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9940B812552
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 03:34:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 246B0812551
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 03:34:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0FEFBB21252
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:34:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 376C81C2117C
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:34:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59C29180;
-	Thu, 14 Dec 2023 02:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60302180;
+	Thu, 14 Dec 2023 02:34:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kP8+AqMI"
 X-Original-To: netdev@vger.kernel.org
-Received: from bg5.exmail.qq.com (bg5.exmail.qq.com [43.154.197.177])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A44BE4
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 18:34:23 -0800 (PST)
-X-QQ-mid: bizesmtp81t1702521222tr1q6biz
-Received: from dsp-duanqiangwen.trustnetic.com ( [183.129.236.74])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 14 Dec 2023 10:33:40 +0800 (CST)
-X-QQ-SSF: 01400000000000D0E000000A0000000
-X-QQ-FEAT: Q4gfBD3K7t+QmzF3JJSNcFSW77A6VwX9yy+lk3ErH3P0Tk64fF+epjwvF27zQ
-	reaXFyDSx9illMCCAKC9W8F1WtF1v7xG08OT7nJH4Su8jxLICWnyC9twTkqjSfsQ4bSmzYc
-	At08+e5URwv9GEHOaYuKBpOaBYs6o38SS38srj9g5RTiwWS+U/6iACDwqYtHvizl9j6EwG4
-	TzToLjNMuvwATY0/SfNJEMYr4b0pssIi1lOQDiDEgFbe4rp57PXMpYEw4W4CTu88zoLy/Ca
-	JGAY2ZCh0+/rvJbEMFl7nqzqza5k/aLUyAunBDzEFqBkMNz/W7YEHW03QJl3z3z1+rBoJ1a
-	hnq31Qoc+lKovuLvF4/2u6/JTCK3sZT9IwxaiWiH1lz3/L1erYiDxhvFw0/p7L54QisL4Nb
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 1649953417430970998
-From: duanqiangwen <duanqiangwen@net-swift.com>
-To: netdev@vger.kernel.org,
-	kuba@kernel.org,
-	jiawenwu@trustnetic.com,
-	mengyuanlou@net-swift.com,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	yang.lee@linux.alibaba.com,
-	shaozhengchao@huawei.com,
-	horms@kernel.org,
-	stable@kernel.org
-Cc: duanqiangwen <duanqiangwen@net-swift.com>
-Subject: [PATCH net v4] net: libwx: fix memory leak on free page
-Date: Thu, 14 Dec 2023 10:33:37 +0800
-Message-Id: <20231214023337.15392-1-duanqiangwen@net-swift.com>
-X-Mailer: git-send-email 2.12.2.windows.1
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrsz:qybglogicsvrsz3a-1
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E1BEA3
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 02:34:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 474C6C433C8;
+	Thu, 14 Dec 2023 02:34:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702521261;
+	bh=RXN5/rSyacpvWraHY2GbXeOvhIwFH3pgd7QurRxyHQI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kP8+AqMIPfRctFhHwHYSCGxsFErGeRZ3MuaH7Heyus3XnoefEyKn1kMHWt5Oo9Wsx
+	 tw0MqMDAQ36d4b+FO0b2zpgIXEHhrkAaOtQs5rOknNmZdWATP1Zmk/C9NGdoB0oZDm
+	 ybJNrMNvyMcVL9OBIdPom7IUlnjR/1yqlGOIz2jX842NKZS7QdEet9nnKM8s6jjfa+
+	 nPvnroYdg0KsOxKvxdjEasyDNxeZJu0YZfD93vdV62A5eXesxP/q4FDvRFZNAz0Fda
+	 BVoNsPzBWtDE3JFxHOd4tbemY7UqUmcRyWkW03WTndF4vb4+mRozjT10PwNwAmfWmj
+	 vIqKywch0gmTA==
+Date: Wed, 13 Dec 2023 18:34:20 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Liang Chen <liangchen.linux@gmail.com>
+Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, hawk@kernel.org,
+ linyunsheng@huawei.com, netdev@vger.kernel.org, linux-mm@kvack.org,
+ jasowang@redhat.com, almasrymina@google.com
+Subject: Re: [PATCH net-next v8 4/4] skbuff: Optimization of SKB coalescing
+ for page pool
+Message-ID: <20231213183420.78b3be68@kernel.org>
+In-Reply-To: <CAKhg4tJDgaVeMp437q1BHuE3aZo2NU4JnOhaQEXepJuQhPnTZQ@mail.gmail.com>
+References: <20231211035243.15774-1-liangchen.linux@gmail.com>
+	<20231211035243.15774-5-liangchen.linux@gmail.com>
+	<CAC_iWjJX3ixPevJAVpszx7nVMb99EtmEeeQcoqxd0GWocK0zkw@mail.gmail.com>
+	<20231211121409.5cfaebd5@kernel.org>
+	<CAC_iWjK=Frw_4kp-X+c4bN7e19ygqsg78aiiV2qJc59o7Gx8jA@mail.gmail.com>
+	<CAKhg4tJDgaVeMp437q1BHuE3aZo2NU4JnOhaQEXepJuQhPnTZQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-ifconfig ethx up, will set page->refcount larger than 1,
-and then ifconfig ethx down, calling __page_frag_cache_drain()
-to free pages, it is not compatible with page pool.
-So deleting codes which changing page->refcount.
+On Thu, 14 Dec 2023 10:26:47 +0800 Liang Chen wrote:
+> If there is no objection, it will be included in v10.
 
-Fixes: 3c47e8ae113a ("net: libwx: Support to receive packets in NAPI")
-Signed-off-by: duanqiangwen <duanqiangwen@net-swift.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_lib.c  | 82 ++--------------------------
- drivers/net/ethernet/wangxun/libwx/wx_type.h |  1 -
- 2 files changed, 6 insertions(+), 77 deletions(-)
-
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index a5a50b5a8816..347d3cec02a3 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -160,60 +160,6 @@ static __le32 wx_test_staterr(union wx_rx_desc *rx_desc,
- 	return rx_desc->wb.upper.status_error & cpu_to_le32(stat_err_bits);
- }
- 
--static bool wx_can_reuse_rx_page(struct wx_rx_buffer *rx_buffer,
--				 int rx_buffer_pgcnt)
--{
--	unsigned int pagecnt_bias = rx_buffer->pagecnt_bias;
--	struct page *page = rx_buffer->page;
--
--	/* avoid re-using remote and pfmemalloc pages */
--	if (!dev_page_is_reusable(page))
--		return false;
--
--#if (PAGE_SIZE < 8192)
--	/* if we are only owner of page we can reuse it */
--	if (unlikely((rx_buffer_pgcnt - pagecnt_bias) > 1))
--		return false;
--#endif
--
--	/* If we have drained the page fragment pool we need to update
--	 * the pagecnt_bias and page count so that we fully restock the
--	 * number of references the driver holds.
--	 */
--	if (unlikely(pagecnt_bias == 1)) {
--		page_ref_add(page, USHRT_MAX - 1);
--		rx_buffer->pagecnt_bias = USHRT_MAX;
--	}
--
--	return true;
--}
--
--/**
-- * wx_reuse_rx_page - page flip buffer and store it back on the ring
-- * @rx_ring: rx descriptor ring to store buffers on
-- * @old_buff: donor buffer to have page reused
-- *
-- * Synchronizes page for reuse by the adapter
-- **/
--static void wx_reuse_rx_page(struct wx_ring *rx_ring,
--			     struct wx_rx_buffer *old_buff)
--{
--	u16 nta = rx_ring->next_to_alloc;
--	struct wx_rx_buffer *new_buff;
--
--	new_buff = &rx_ring->rx_buffer_info[nta];
--
--	/* update, and store next to alloc */
--	nta++;
--	rx_ring->next_to_alloc = (nta < rx_ring->count) ? nta : 0;
--
--	/* transfer page from old buffer to new buffer */
--	new_buff->page = old_buff->page;
--	new_buff->page_dma = old_buff->page_dma;
--	new_buff->page_offset = old_buff->page_offset;
--	new_buff->pagecnt_bias	= old_buff->pagecnt_bias;
--}
--
- static void wx_dma_sync_frag(struct wx_ring *rx_ring,
- 			     struct wx_rx_buffer *rx_buffer)
- {
-@@ -270,8 +216,6 @@ static struct wx_rx_buffer *wx_get_rx_buffer(struct wx_ring *rx_ring,
- 				      size,
- 				      DMA_FROM_DEVICE);
- skip_sync:
--	rx_buffer->pagecnt_bias--;
--
- 	return rx_buffer;
- }
- 
-@@ -280,19 +224,9 @@ static void wx_put_rx_buffer(struct wx_ring *rx_ring,
- 			     struct sk_buff *skb,
- 			     int rx_buffer_pgcnt)
- {
--	if (wx_can_reuse_rx_page(rx_buffer, rx_buffer_pgcnt)) {
--		/* hand second half of page back to the ring */
--		wx_reuse_rx_page(rx_ring, rx_buffer);
--	} else {
--		if (!IS_ERR(skb) && WX_CB(skb)->dma == rx_buffer->dma)
--			/* the page has been released from the ring */
--			WX_CB(skb)->page_released = true;
--		else
--			page_pool_put_full_page(rx_ring->page_pool, rx_buffer->page, false);
--
--		__page_frag_cache_drain(rx_buffer->page,
--					rx_buffer->pagecnt_bias);
--	}
-+	if (!IS_ERR(skb) && WX_CB(skb)->dma == rx_buffer->dma)
-+		/* the page has been released from the ring */
-+		WX_CB(skb)->page_released = true;
- 
- 	/* clear contents of rx_buffer */
- 	rx_buffer->page = NULL;
-@@ -335,11 +269,12 @@ static struct sk_buff *wx_build_skb(struct wx_ring *rx_ring,
- 		if (size <= WX_RXBUFFER_256) {
- 			memcpy(__skb_put(skb, size), page_addr,
- 			       ALIGN(size, sizeof(long)));
--			rx_buffer->pagecnt_bias++;
--
-+			page_pool_put_full_page(rx_ring->page_pool, rx_buffer->page, true);
- 			return skb;
- 		}
- 
-+		skb_mark_for_recycle(skb);
-+
- 		if (!wx_test_staterr(rx_desc, WX_RXD_STAT_EOP))
- 			WX_CB(skb)->dma = rx_buffer->dma;
- 
-@@ -382,8 +317,6 @@ static bool wx_alloc_mapped_page(struct wx_ring *rx_ring,
- 	bi->page_dma = dma;
- 	bi->page = page;
- 	bi->page_offset = 0;
--	page_ref_add(page, USHRT_MAX - 1);
--	bi->pagecnt_bias = USHRT_MAX;
- 
- 	return true;
- }
-@@ -723,7 +656,6 @@ static int wx_clean_rx_irq(struct wx_q_vector *q_vector,
- 		/* exit if we failed to retrieve a buffer */
- 		if (!skb) {
- 			rx_ring->rx_stats.alloc_rx_buff_failed++;
--			rx_buffer->pagecnt_bias++;
- 			break;
- 		}
- 
-@@ -2248,8 +2180,6 @@ static void wx_clean_rx_ring(struct wx_ring *rx_ring)
- 
- 		/* free resources associated with mapping */
- 		page_pool_put_full_page(rx_ring->page_pool, rx_buffer->page, false);
--		__page_frag_cache_drain(rx_buffer->page,
--					rx_buffer->pagecnt_bias);
- 
- 		i++;
- 		rx_buffer++;
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index 165e82de772e..83f9bb7b3c22 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -787,7 +787,6 @@ struct wx_rx_buffer {
- 	dma_addr_t page_dma;
- 	struct page *page;
- 	unsigned int page_offset;
--	u16 pagecnt_bias;
- };
- 
- struct wx_queue_stats {
--- 
-2.12.2.windows.1
-
+If I manage to reach you before you post - please hold off for another
+30min with posting, I'm going to apply patch 1.
 
