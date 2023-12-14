@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-57632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F353B813AC2
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 20:30:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0901E813AC3
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 20:30:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BD291C20C2A
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 19:30:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B33C1C20DAB
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 19:30:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948E86A01A;
-	Thu, 14 Dec 2023 19:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8C3F6979C;
+	Thu, 14 Dec 2023 19:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LQ4MNGHh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u4XfMv6C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 812066A011
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 19:29:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE81A6979E
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 19:29:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-db4004a8aa9so8846072276.1
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 11:29:44 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-db4004a8aa9so8846100276.1
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 11:29:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702582183; x=1703186983; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1702582185; x=1703186985; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3uYFT4xSOByVORG/Hz/4E8k1uuLRLJt+VLsAUmJri2Q=;
-        b=LQ4MNGHhGSFH3gAjoBThKDP4TzuYN3aNrtVRQezxT6vVxtDy2CyBlignKy2z9kePlq
-         nG8tJnP/SSiHM6ysAOC9gyHNbjMFn/dcmtOAjDk0O0Dy6fD6ZK8YKVGfRFu8Iz1QmNNQ
-         zGEbcoOVYdWtQ8feREkm2iMyVUo6wT6VpY0yce2v0OVYSfB5EB9bLpqEUSVZ7+IcV09b
-         qxMTHNHjFe7rKuOXcOikWBcKzGecffWwPUPDA6be+v2uNxY4y28O5I0lD+XYLfp2bbsR
-         LDb1uUTOVTwjTnH/2lorAz3e1PPt+yaSRUuX8lrDZNeLHgfr5o4E/YPMHtkDRjopn/+P
-         FXdQ==
+        bh=QjHMfEabd+3Xlbiimy+s63yAHcYhAs+GhPJrBDH3K8o=;
+        b=u4XfMv6CLPQ1e3SmInLx99++3XdwOJNnqAaJHh+32JAQiuty9dzz5REAQ7yXEPsspS
+         s6p6Ae4PqUg8Zhqzch6rOmSxEYCbnc9z9foBnK+kKrkCUmsm7dLlC7lqFilkT1WwKkCx
+         +IuLijOwWURah/fNUZsLfWcO0gByIlAL9cTYPTpdZJyjSfTlaPAfX/PUYNjWFTTNJxPd
+         DyRK880jxScklS7ZmQbwOModmfK6+CbQGX5z3/nzDYqyjufavEr4Vit7jM33GB86gcKZ
+         IwtepwCOWH/nUtK9rHtnzKu/53MrR8T/nirA5YN14a9HrexXlkSm5xNvONzuQVco/Jt0
+         A3xA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702582183; x=1703186983;
+        d=1e100.net; s=20230601; t=1702582185; x=1703186985;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3uYFT4xSOByVORG/Hz/4E8k1uuLRLJt+VLsAUmJri2Q=;
-        b=JF06w9JGdAXVQWkqT/1el9CNi/tRT42cTHP5lqXJToguE21T9kO3BqDjR5vmjUeIOa
-         j8EhkKflJh23H2YIbhfzhDaoZq1pP04GaPpRaAf/K7YFfFSS0EQPTdDPJc3EHh9mpnBp
-         IqAwU0eQOO+nZhG9q2J4yugKnAZEKobynF8yaFZ4Lynv8Cz8rLBgB6DrUCWnmollpMOb
-         BTUPDgTlgHyYp6Qrb1Sa5WQQV5iP4ADIfW/oWuakQAETD5N7b3quwg2dgZzIFFkAz4k2
-         g66tuGadSlwkhuXzjloI3MF2L5B94WYX9uB91kVrF79tUywtI2OA40HVErk0lslfFtLZ
-         w1jw==
-X-Gm-Message-State: AOJu0Yzb+WN5qGIKDakL7cwYV98N/CtDjIvgru8pbh0uSmuyI9tFZFBb
-	d1wnGEX4d9j/zwsgvTNHRAUIUpdwy0KMHg==
-X-Google-Smtp-Source: AGHT+IG1uHwl0S/hjQNqh2Cz0bAUMJ6m9Jh9QGp2ynMiir63sH4vONPaMepj1h0JU7iJcubQQAQOMQ5CtUiIKA==
+        bh=QjHMfEabd+3Xlbiimy+s63yAHcYhAs+GhPJrBDH3K8o=;
+        b=baiUDcZM6/1lQ0uFlSibfc5JvoBjexqSzirnNRFZRJLyO3mK5w63FxrP+vN4Ds3bok
+         85O9XBuzlFBQRMlh0cpR5DCLWG7VVysNLOBFgubTslS+uXinZn3icaLAy7oN/t8k7H51
+         0bwSnBolSl7Fokv3wmGCdyAyTxn36pBtIeGEecZbQ2ZEP1LpkEZi9EfupSo7aADthXk/
+         qPmg077YpfY3U9G9BS4odAXkAh+xPR3fYJuaKQbPSHKOwbhVxPeFfY1L6CXodqdIeVEd
+         cSHas8yG4wTTGcvBLfD4bOFo3BoY/eltHDJxPx72QhpgVcaTY0/lxLgAZaX6RkJs7EhE
+         geSw==
+X-Gm-Message-State: AOJu0YxjGakWmPY4q1M/t98x2dW8vI29a+zHQzsJoimUsop6Qd30RmWc
+	gES7YmkixcERV38VJ0qHcbCFRfrLKvfbpQ==
+X-Google-Smtp-Source: AGHT+IEH6RGFY2wIIJvrpObT4+2Jzgo1EerYetJEjiWRDb8XWRQk5warZI49awWStLg25d2Z0AnxeJXhjPSEEA==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a5b:787:0:b0:d9a:efcc:42af with SMTP id
- b7-20020a5b0787000000b00d9aefcc42afmr124942ybq.2.1702582183308; Thu, 14 Dec
- 2023 11:29:43 -0800 (PST)
-Date: Thu, 14 Dec 2023 19:29:38 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:52f:b0:db5:48c5:302e with SMTP
+ id y15-20020a056902052f00b00db548c5302emr102313ybs.4.1702582184937; Thu, 14
+ Dec 2023 11:29:44 -0800 (PST)
+Date: Thu, 14 Dec 2023 19:29:39 +0000
 In-Reply-To: <20231214192939.1962891-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -63,8 +63,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20231214192939.1962891-1-edumazet@google.com>
 X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20231214192939.1962891-2-edumazet@google.com>
-Subject: [PATCH net-next 1/2] inet: returns a bool from inet_sk_get_local_port_range()
+Message-ID: <20231214192939.1962891-3-edumazet@google.com>
+Subject: [PATCH net-next 2/2] tcp/dccp: change source port selection at
+ connect() time
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -72,79 +73,105 @@ Cc: Jakub Sitnicki <jakub@cloudflare.com>, netdev@vger.kernel.org, eric.dumazet@
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Change inet_sk_get_local_port_range() to return a boolean,
-telling the callers if the port range was provided by
-IP_LOCAL_PORT_RANGE socket option.
+In commit 1580ab63fc9a ("tcp/dccp: better use of ephemeral ports in connect()")
+we added an heuristic to select even ports for connect() and odd ports for bind().
 
-Adds documentation while we are at it.
+This was nice because no applications changes were needed.
+
+But it added more costs when all even ports are in use,
+when there are few listeners and many active connections.
+
+Since then, IP_LOCAL_PORT_RANGE has been added to permit an application
+to partition ephemeral port range at will.
+
+This patch extends the idea so that if IP_LOCAL_PORT_RANGE is set on
+a socket before accept(), port selection no longer favors even ports.
+
+This means that connect() can find a suitable source port faster,
+and applications can use a different split between connect() and bind()
+users.
+
+This should give more entropy to Toeplitz hash used in RSS: Using even
+ports was wasting one bit from the 16bit sport.
+
+A similar change can be done in inet_csk_find_open_port() if needed.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Sitnicki <jakub@cloudflare.com>
 ---
- include/net/ip.h                |  2 +-
- net/ipv4/inet_connection_sock.c | 21 ++++++++++++++++-----
- 2 files changed, 17 insertions(+), 6 deletions(-)
+ net/ipv4/inet_hashtables.c | 27 ++++++++++++++++-----------
+ 1 file changed, 16 insertions(+), 11 deletions(-)
 
-diff --git a/include/net/ip.h b/include/net/ip.h
-index b31be912489af8b01cc0393a27ffc80b086feaa0..de0c69c57e3cb7485e3d8473bc0b109e4280d2f6 100644
---- a/include/net/ip.h
-+++ b/include/net/ip.h
-@@ -356,7 +356,7 @@ static inline void inet_get_local_port_range(const struct net *net, int *low, in
- 	*low = range & 0xffff;
- 	*high = range >> 16;
- }
--void inet_sk_get_local_port_range(const struct sock *sk, int *low, int *high);
-+bool inet_sk_get_local_port_range(const struct sock *sk, int *low, int *high);
+diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+index a532f749e47781cc951f2003f621cec4387a2384..9ff201bc4e6d2da04735e8c160d446602e0adde1 100644
+--- a/net/ipv4/inet_hashtables.c
++++ b/net/ipv4/inet_hashtables.c
+@@ -1012,7 +1012,8 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 	bool tb_created = false;
+ 	u32 remaining, offset;
+ 	int ret, i, low, high;
+-	int l3mdev;
++	bool local_ports;
++	int step, l3mdev;
+ 	u32 index;
  
- #ifdef CONFIG_SYSCTL
- static inline bool inet_is_local_reserved_port(struct net *net, unsigned short port)
-diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-index 70be0f6fe879ea671bf6686b04edf32bf5e0d4b6..bd325b029dd12c9fad754ded266ae232ee7ec260 100644
---- a/net/ipv4/inet_connection_sock.c
-+++ b/net/ipv4/inet_connection_sock.c
-@@ -117,16 +117,25 @@ bool inet_rcv_saddr_any(const struct sock *sk)
- 	return !sk->sk_rcv_saddr;
- }
+ 	if (port) {
+@@ -1024,10 +1025,12 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
  
--void inet_sk_get_local_port_range(const struct sock *sk, int *low, int *high)
-+/**
-+ *	inet_sk_get_local_port_range - fetch ephemeral ports range
-+ *	@sk: socket
-+ *	@low: pointer to low port
-+ *	@high: pointer to high port
-+ *
-+ *	Fetch netns port range (/proc/sys/net/ipv4/ip_local_port_range)
-+ *	Range can be overridden if socket got IP_LOCAL_PORT_RANGE option.
-+ *	Returns true if IP_LOCAL_PORT_RANGE was set on this socket.
-+ */
-+bool inet_sk_get_local_port_range(const struct sock *sk, int *low, int *high)
- {
--	const struct inet_sock *inet = inet_sk(sk);
--	const struct net *net = sock_net(sk);
- 	int lo, hi, sk_lo, sk_hi;
-+	bool local_range = false;
- 	u32 sk_range;
+ 	l3mdev = inet_sk_bound_l3mdev(sk);
  
--	inet_get_local_port_range(net, &lo, &hi);
-+	inet_get_local_port_range(sock_net(sk), &lo, &hi);
+-	inet_sk_get_local_port_range(sk, &low, &high);
++	local_ports = inet_sk_get_local_port_range(sk, &low, &high);
++	step = local_ports ? 1 : 2;
++
+ 	high++; /* [32768, 60999] -> [32768, 61000[ */
+ 	remaining = high - low;
+-	if (likely(remaining > 1))
++	if (!local_ports && remaining > 1)
+ 		remaining &= ~1U;
  
--	sk_range = READ_ONCE(inet->local_port_range);
-+	sk_range = READ_ONCE(inet_sk(sk)->local_port_range);
- 	if (unlikely(sk_range)) {
- 		sk_lo = sk_range & 0xffff;
- 		sk_hi = sk_range >> 16;
-@@ -135,10 +144,12 @@ void inet_sk_get_local_port_range(const struct sock *sk, int *low, int *high)
- 			lo = sk_lo;
- 		if (lo <= sk_hi && sk_hi <= hi)
- 			hi = sk_hi;
-+		local_range = true;
+ 	get_random_sleepable_once(table_perturb,
+@@ -1040,10 +1043,11 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 	/* In first pass we try ports of @low parity.
+ 	 * inet_csk_get_port() does the opposite choice.
+ 	 */
+-	offset &= ~1U;
++	if (!local_ports)
++		offset &= ~1U;
+ other_parity_scan:
+ 	port = low + offset;
+-	for (i = 0; i < remaining; i += 2, port += 2) {
++	for (i = 0; i < remaining; i += step, port += step) {
+ 		if (unlikely(port >= high))
+ 			port -= remaining;
+ 		if (inet_is_local_reserved_port(net, port))
+@@ -1083,10 +1087,11 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 		cond_resched();
  	}
  
- 	*low = lo;
- 	*high = hi;
-+	return local_range;
- }
- EXPORT_SYMBOL(inet_sk_get_local_port_range);
+-	offset++;
+-	if ((offset & 1) && remaining > 1)
+-		goto other_parity_scan;
+-
++	if (!local_ports) {
++		offset++;
++		if ((offset & 1) && remaining > 1)
++			goto other_parity_scan;
++	}
+ 	return -EADDRNOTAVAIL;
  
+ ok:
+@@ -1109,8 +1114,8 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 	 * on low contention the randomness is maximal and on high contention
+ 	 * it may be inexistent.
+ 	 */
+-	i = max_t(int, i, get_random_u32_below(8) * 2);
+-	WRITE_ONCE(table_perturb[index], READ_ONCE(table_perturb[index]) + i + 2);
++	i = max_t(int, i, get_random_u32_below(8) * step);
++	WRITE_ONCE(table_perturb[index], READ_ONCE(table_perturb[index]) + i + step);
+ 
+ 	/* Head lock still held and bh's disabled */
+ 	inet_bind_hash(sk, tb, tb2, port);
 -- 
 2.43.0.472.g3155946c3a-goog
 
