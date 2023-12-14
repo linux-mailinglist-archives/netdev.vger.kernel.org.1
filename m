@@ -1,75 +1,76 @@
-Return-Path: <netdev+bounces-57587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2992081386A
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 18:24:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16F3D81387A
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 18:27:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD70CB215AC
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 17:24:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47B431C20D27
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 17:27:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61AF665EC2;
-	Thu, 14 Dec 2023 17:24:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0DA565ED1;
+	Thu, 14 Dec 2023 17:27:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bndVW96a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cv7K2wj5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 468F565EB3
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 17:24:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 654E1C433C7;
-	Thu, 14 Dec 2023 17:24:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6ED65ECA;
+	Thu, 14 Dec 2023 17:27:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D9D9C433C7;
+	Thu, 14 Dec 2023 17:27:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702574652;
-	bh=Lo++xlxLZ+5osBQRnqfeNnIUwruOjg2HtfW4cEdp9TU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bndVW96a5dPw/EEN9DFKm+FmNgfhGjXzX4JEA53PfvnIr/6fDD9jZCQCUY23OHDWx
-	 guW75UOqAw7zpVGgQpfIaoAeVkaBI/aHT7oKbUhVL1Kuwq6hG5Xruv1hfNvJf23tnV
-	 tP0gpoSw90lxSoA9wgaKZWwfD6Za0kzIELtVZUE0KekIai01mfKTXH7jodr0516CGD
-	 WfT7/G9j8yxnzNUpyzfcuD6kKkB1UM0+robF39A8VnHsrr8brFHVHQoDQ3mG8IMScP
-	 K3bvyH9CAPIdutDduQXm/G9ohUwimh8f1DPDA3ma+03Ye1CJ1yzdaGLireQfyz6Y+X
-	 u8yZSm8o0hBPA==
-Date: Thu, 14 Dec 2023 09:24:11 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: JustinLai0215 <justinlai0215@realtek.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
- <edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "andrew@lunn.ch"
- <andrew@lunn.ch>, Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu
- <larry.chiu@realtek.com>
-Subject: Re: [PATCH net-next v14 06/13] rtase: Implement .ndo_start_xmit
- function
-Message-ID: <20231214092411.62661528@kernel.org>
-In-Reply-To: <ce315d58376c40d4abf82d80bf203c81@realtek.com>
-References: <20231208094733.1671296-1-justinlai0215@realtek.com>
-	<20231208094733.1671296-7-justinlai0215@realtek.com>
-	<20231212113212.1cfb9e19@kernel.org>
-	<ce315d58376c40d4abf82d80bf203c81@realtek.com>
+	s=k20201202; t=1702574825;
+	bh=bnqr0jl6e352eT1WhkqIxmaAirnqjoRIEQIzKS9Ksyk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cv7K2wj5B6XKoMMeOYXhWlg6Fc2p5mkE8Qp1PNEzKYtuAhR/LHBjWbEe/PEWcuUKK
+	 Mx47lPGg1mot0RBTNrUok3hr4X5M4J1l3j7t0maMesRQ6kN+fymLKz/RIoKBL7xRiZ
+	 guEjPKsEBVCU2diFPL2SIYKTDgted3MmSCBhJFOO9NDi6Pd90eJLlKN+Ib7j3BU0iL
+	 3QNo9RRzt/zo+09R2DwsCLgdESL4nDK3AoqT3gcn9OpOOuFX2SHHJak7nxmoP43RrR
+	 UmaDY2Us25cgNwdMKZL0581k/HYIEOGUpKkNbxcDC2cOQHSshEdsXr93zvQHx7I1hr
+	 CfnDksaqtVutA==
+Date: Thu, 14 Dec 2023 17:27:00 +0000
+From: Simon Horman <horms@kernel.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: netdev@vger.kernel.org, Johannes Berg <johannes@sipsolutions.net>,
+	linux-wireless@vger.kernel.org, Kalle Valo <kvalo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH] wifi: cfg80211: fix spelling & punctutation
+Message-ID: <20231214172700.GO5817@kernel.org>
+References: <20231213043558.10409-1-rdunlap@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231213043558.10409-1-rdunlap@infradead.org>
 
-On Thu, 14 Dec 2023 13:00:29 +0000 JustinLai0215 wrote:
-> > I don't see how this is called, the way you split the submission makes it a bit
-> > hard to review, oh well. Anyway - if you pass the NAPI budget here - that's not
-> > right, it may be 0, and you'd loop forever.
-> > For Tx - you should try to reap some fixed number of packets, say 128, the
-> > budget is for Rx, not for Tx.  
+On Tue, Dec 12, 2023 at 08:35:58PM -0800, Randy Dunlap wrote:
+> Correct spelling and run-on sentences.
 > 
-> Even if the budget is 0, this function will not loop forever, it will just run all tx_left.
-> Or what changes would you like us to make?
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Johannes Berg <johannes@sipsolutions.net>
+> Cc: linux-wireless@vger.kernel.org
+> Cc: Kalle Valo <kvalo@kernel.org>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
 
-Ah, good point. It does seem a little accidental to me :S
-In that case perhaps always consume all completed packets?
-@budget should not constrain Tx completions directly, see:
-https://www.kernel.org/doc/html/next/networking/napi.html
+Thanks Randy,
+
+These changes look correct to me.
+
+FWIIW, codespell does not flag any non-false-positive spelling errors
+both with and without this patch.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
