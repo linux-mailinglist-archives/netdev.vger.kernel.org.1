@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-57287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82E63812C04
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 10:49:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B38D4812C0E
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 10:49:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B594F1C214B8
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 09:49:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D89D2828CA
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 09:49:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F8B339FDD;
-	Thu, 14 Dec 2023 09:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4605A364A1;
+	Thu, 14 Dec 2023 09:49:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Q+6Kucqe"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="lKQWqLP5"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DDAA118;
-	Thu, 14 Dec 2023 01:49:04 -0800 (PST)
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BE8k2hR017630;
-	Thu, 14 Dec 2023 09:48:50 GMT
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD0D0186;
+	Thu, 14 Dec 2023 01:49:08 -0800 (PST)
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BE6F5uM020469;
+	Thu, 14 Dec 2023 09:48:55 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
 	from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding:content-type; s=
-	qcppdkim1; bh=g1/PSi7VGkjdeLX+7/20eelyP/TKgqeOerVb/AB4m5E=; b=Q+
-	6Kucqe6Hyr1jN9o+GdfITFsebJQfe4JJcWN/rbWE930l+NT+nsBWplPb6pljGKHW
-	bS1Aw3AZKsfxkg6y1yFucFRLNMDOLlfXENFeN7mAa8FTt1ZlTN30lYKVofCYAMVc
-	O8Yb+4czgyFpEk9/KptwgLOuA19NM8W5ndqTjnFCEQj2Qg/BP5+B4pYmqwd0ky12
-	z/xxplvMLZr+0Fli5lPXC3HMwwNPtmmzkVArdnxmNdR+ku1rptOYhz8dQ2iKlVSL
-	t2vUzhMjadeCajCwlUJQed+E9pUc6f3oSOtjuhCQhii+WZTID1Vf3fHbqa+Vxr9O
-	W1Q6XiEmixoNxhzoOWGA==
+	qcppdkim1; bh=y0D0iHXYA2UwA5V/ss5IJKv+axl//qAJpDzVbQOftAs=; b=lK
+	QWqLP5DkWjGLtg7TE6eN4Eqk3w5YjE559rz+3mOhnrhVUrAk+qIdYL49KtCPNtss
+	H+/CtO/7lB54QsClBR+SpKWriZAbhbONAVwh+fkPxo12M2biixljcoRVBk3fW7Jq
+	w/wW5IFB63H6IXLTzIXpuK1yDEBQ/zH7u3uFdS4T74k5Mspx1uTwsACNBKa9Lj4e
+	wz/rRlK7ySl6wajTNAYXbJW0+BJIJkfzeMN+x6vjtQGZYy7RfssDZ0gA0/DKIiYA
+	HhQDCAcGl3V2Ekw0CsIV+t2SP1dXwaiXXuve+motCBczXl+//FigH7JtL6jNVc1V
+	rGQfdoENvQMLSMY0mUYA==
 Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uytn68jwu-1
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uyqgt0x6v-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Dec 2023 09:48:50 +0000 (GMT)
+	Thu, 14 Dec 2023 09:48:55 +0000 (GMT)
 Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BE9mn8e016536
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BE9msk8016564
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Dec 2023 09:48:49 GMT
+	Thu, 14 Dec 2023 09:48:54 GMT
 Received: from akronite-sh-dev02.qualcomm.com (10.80.80.8) by
  nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 14 Dec 2023 01:48:45 -0800
+ 15.2.1118.40; Thu, 14 Dec 2023 01:48:49 -0800
 From: Luo Jie <quic_luoj@quicinc.com>
 To: <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
         <kuba@kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
@@ -51,9 +51,9 @@ To: <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
         <p.zabel@pengutronix.de>, <f.fainelli@gmail.com>
 CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
-Subject: [PATCH v7 05/14] net: phy: at803x: Add qca8084_config_init function
-Date: Thu, 14 Dec 2023 17:48:04 +0800
-Message-ID: <20231214094813.24690-6-quic_luoj@quicinc.com>
+Subject: [PATCH v7 06/14] net: phy: at803x: add qca8084_link_change_notify
+Date: Thu, 14 Dec 2023 17:48:05 +0800
+Message-ID: <20231214094813.24690-7-quic_luoj@quicinc.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231214094813.24690-1-quic_luoj@quicinc.com>
 References: <20231214094813.24690-1-quic_luoj@quicinc.com>
@@ -69,76 +69,88 @@ X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
  nalasex01c.na.qualcomm.com (10.47.97.35)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: QRAe3tA68AcDDTlUQBoC24ioP5h0tAK_
-X-Proofpoint-ORIG-GUID: QRAe3tA68AcDDTlUQBoC24ioP5h0tAK_
+X-Proofpoint-GUID: JS8OlbMNkJnE_wXl87Cfi-nGgSakcntL
+X-Proofpoint-ORIG-GUID: JS8OlbMNkJnE_wXl87Cfi-nGgSakcntL
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
- phishscore=0 mlxlogscore=999 mlxscore=0 priorityscore=1501
- lowpriorityscore=0 suspectscore=0 bulkscore=0 impostorscore=0 adultscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
+ impostorscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0 clxscore=1015
+ spamscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2311290000 definitions=main-2312140065
 
-Configure MSE detect threshold and ADC clock edge invert.
+When the link is changed, qca8084 needs to do the fifo reset and
+adjust the IPG level for the qusgmii link speed 1000M.
 
 Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
 ---
- drivers/net/phy/at803x.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ drivers/net/phy/at803x.c | 41 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
 diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
-index 143f0d2e36a6..ba5d069ad351 100644
+index ba5d069ad351..b6b41b1a4352 100644
 --- a/drivers/net/phy/at803x.c
 +++ b/drivers/net/phy/at803x.c
-@@ -280,6 +280,15 @@
- #define QCA8081_PHY_SERDES_MMD1_FIFO_CTRL	0x9072
- #define QCA8081_PHY_FIFO_RSTN			BIT(11)
+@@ -289,6 +289,13 @@
+ #define QCA8084_MSE_THRESHOLD			0x800a
+ #define QCA8084_MSE_THRESHOLD_2P5G_VAL		0x51c6
  
-+/* QCA8084 ADC clock edge */
-+#define QCA8084_ADC_CLK_SEL			0x8b80
-+#define QCA8084_ADC_CLK_SEL_ACLK		GENMASK(7, 4)
-+#define QCA8084_ADC_CLK_SEL_ACLK_FALL		0xf
-+#define QCA8084_ADC_CLK_SEL_ACLK_RISE		0x0
++#define QCA8084_FIFO_CONTROL			0x19
++#define QCA8084_FIFO_MAC_2_PHY			BIT(1)
++#define QCA8084_FIFO_PHY_2_MAC			BIT(0)
 +
-+#define QCA8084_MSE_THRESHOLD			0x800a
-+#define QCA8084_MSE_THRESHOLD_2P5G_VAL		0x51c6
++#define QCA8084_MMD7_IPG_OP			0x901d
++#define QCA8084_IPG_10_TO_11_EN			BIT(0)
 +
  MODULE_DESCRIPTION("Qualcomm Atheros AR803x and QCA808X PHY driver");
  MODULE_AUTHOR("Matus Ujhelyi");
  MODULE_LICENSE("GPL");
-@@ -2085,6 +2094,26 @@ static void qca808x_link_change_notify(struct phy_device *phydev)
- 			QCA8081_PHY_FIFO_RSTN, phydev->link ? QCA8081_PHY_FIFO_RSTN : 0);
+@@ -2114,6 +2121,39 @@ static int qca8084_config_init(struct phy_device *phydev)
+ 			     QCA8084_MSE_THRESHOLD_2P5G_VAL);
  }
  
-+static int qca8084_config_init(struct phy_device *phydev)
++static void qca8084_link_change_notify(struct phy_device *phydev)
 +{
 +	int ret;
 +
-+	/* Invert ADC clock edge */
-+	ret = at803x_debug_reg_mask(phydev, QCA8084_ADC_CLK_SEL,
-+				    QCA8084_ADC_CLK_SEL_ACLK,
-+				    FIELD_PREP(QCA8084_ADC_CLK_SEL_ACLK,
-+					       QCA8084_ADC_CLK_SEL_ACLK_FALL));
-+	if (ret < 0)
-+		return ret;
++	ret = phy_modify(phydev, QCA8084_FIFO_CONTROL,
++			 QCA8084_FIFO_MAC_2_PHY | QCA8084_FIFO_PHY_2_MAC,
++			 0);
++	if (ret)
++		return;
 +
-+	/* Adjust MSE threshold value to avoid link issue with
-+	 * some link partner.
++	/* If the PHY works on PHY_INTERFACE_MODE_10G_QXGMII mode, the fifo
++	 * needs to be kept as reset state in link down status.
 +	 */
-+	return phy_write_mmd(phydev, MDIO_MMD_PMAPMD,
-+			     QCA8084_MSE_THRESHOLD,
-+			     QCA8084_MSE_THRESHOLD_2P5G_VAL);
++	if (phydev->interface != PHY_INTERFACE_MODE_10G_QXGMII ||
++	    phydev->link) {
++		msleep(50);
++		ret = phy_modify(phydev, QCA8084_FIFO_CONTROL,
++				 QCA8084_FIFO_MAC_2_PHY |
++				 QCA8084_FIFO_PHY_2_MAC,
++				 QCA8084_FIFO_MAC_2_PHY |
++				 QCA8084_FIFO_PHY_2_MAC);
++		if (ret)
++			return;
++	}
++
++	/* Enable IPG 10 to 11 tuning on link speed 1000M of QUSGMII mode. */
++	if (phydev->interface == PHY_INTERFACE_MODE_10G_QXGMII)
++		phy_modify_mmd(phydev, MDIO_MMD_AN, QCA8084_MMD7_IPG_OP,
++			       QCA8084_IPG_10_TO_11_EN,
++			       phydev->speed == SPEED_1000 ?
++			       QCA8084_IPG_10_TO_11_EN : 0);
 +}
 +
  static struct phy_driver at803x_driver[] = {
  {
  	/* Qualcomm Atheros AR8035 */
-@@ -2281,6 +2310,7 @@ static struct phy_driver at803x_driver[] = {
- 	.soft_reset		= qca808x_soft_reset,
+@@ -2311,6 +2351,7 @@ static struct phy_driver at803x_driver[] = {
  	.cable_test_start	= qca808x_cable_test_start,
  	.cable_test_get_status	= qca808x_cable_test_get_status,
-+	.config_init		= qca8084_config_init,
+ 	.config_init		= qca8084_config_init,
++	.link_change_notify	= qca8084_link_change_notify,
  }, };
  
  module_phy_driver(at803x_driver);
