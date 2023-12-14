@@ -1,101 +1,134 @@
-Return-Path: <netdev+bounces-57237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D659A8127D9
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 07:20:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 491738127EC
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 07:27:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 145B31C21511
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 06:20:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 179C9B21078
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 06:27:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F09CA79;
-	Thu, 14 Dec 2023 06:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B7AD260;
+	Thu, 14 Dec 2023 06:27:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uaLBXFBx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OLfCLKMV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F22DD261;
-	Thu, 14 Dec 2023 06:20:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DA8AFC433C9;
-	Thu, 14 Dec 2023 06:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AD4A610B;
+	Thu, 14 Dec 2023 06:27:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 262DDC433C8;
+	Thu, 14 Dec 2023 06:27:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702534827;
-	bh=gVzW956pE4WZPiafeYeaFLar70TRxqJHBI/nEbsghSk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uaLBXFBxTz4OYPv+IVw11RKr/ii1rs4cpxVdpItKOF0JGJtsBspzhnMX3ku7O9MXZ
-	 xoezExqyTBP2b1AFiOmLlDr3kqt1PR9VK84jmyTeSNIPY53Q6uHkwq3Jmwp+SeGDzU
-	 qWL4Hy9KWWXCOH9XrwV8XDZA1mxlrYwKTQVK+TGi5eJqERcwyxuVVhijRZwobSJ2fW
-	 kZhWLxWc94R/WdDJAqXygSetBYKa2QzrsR3Ka34QbPeF4elE9ATrN02GrPGBM0MVVa
-	 P6SsRVaJmzRauBaBC+t/bqtqPSKvmVLgqVhL+v+F8ksH+/ZtPn+P+AhWig6bMLV9JF
-	 abWEG2kZgaNHw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C1115DD4EF9;
-	Thu, 14 Dec 2023 06:20:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1702535264;
+	bh=jCIF91qtDA+ZEemkBo11x9McQ7w6uFe00P7r8p+aNPc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=OLfCLKMVmfm4FvlW6f9rzDdFrIJXc9NVwo8lyjxEmGPCLKMB+q5s5r8p04kk5BMJM
+	 N5inpFK7IRJjGnWpMJx5ekByzFuldxl12CU/nxmV3pDAzTKssl7WNNNp9+kJ4YDXNt
+	 zi7UWJW6klo9/1YSSrL31LbUcOqA46d7whIOxM0PvDpa5WH5162jXd9OFTDCe4GNJD
+	 1aaYbKJjaUVKgc2oP4/Uw9s9+5BLEKn4p1ODIv2MweI08wA5yzyLPMJI734I8L1QrQ
+	 +4YBCzIRwhns3lqdHyWUK26IabO7QJ0Rglu4Vj1ppOyVL8X8iPcdNvdNAn6Avzc2GK
+	 DCd4l/otJcPnw==
+Message-ID: <ecf4ec04-4ed6-483c-8ffe-1fc319ee6aa4@kernel.org>
+Date: Wed, 13 Dec 2023 22:27:40 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v9 0/8] Support symmetric-xor RSS hash
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170253482778.28524.4770397031071631009.git-patchwork-notify@kernel.org>
-Date: Thu, 14 Dec 2023 06:20:27 +0000
-References: <20231213003321.605376-1-ahmed.zaki@intel.com>
-In-Reply-To: <20231213003321.605376-1-ahmed.zaki@intel.com>
-To: Ahmed Zaki <ahmed.zaki@intel.com>
-Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org, corbet@lwn.net,
- jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- vladimir.oltean@nxp.com, andrew@lunn.ch, horms@kernel.org, mkubecek@suse.cz,
- willemdebruijn.kernel@gmail.com, gal@nvidia.com, alexander.duyck@gmail.com,
- ecree.xilinx@gmail.com, linux-doc@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next v1 1/4] vsock/virtio: use skb_frag_page()
+ helper
+Content-Language: en-US
+To: Mina Almasry <almasrymina@google.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Michael Chan <michael.chan@broadcom.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Wei Fang <wei.fang@nxp.com>,
+ Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+ NXP Linux Team <linux-imx@nxp.com>, Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Shailend Chand <shailend@google.com>, Yisen Zhuang
+ <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ Marcin Wojtas <mw@semihalf.com>, Russell King <linux@armlinux.org.uk>,
+ Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>,
+ Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>,
+ Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
+ Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, Jassi Brar <jaswinder.singh@linaro.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Siddharth Vadapalli <s-vadapalli@ti.com>,
+ Ravi Gunasekaran <r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>,
+ Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou
+ <mengyuanlou@net-swift.com>, Ronak Doshi <doshir@vmware.com>,
+ VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+ Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>,
+ Kalle Valo <kvalo@kernel.org>, Juergen Gross <jgross@suse.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
+ <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ Jason Gunthorpe <jgg@nvidia.com>, Shakeel Butt <shakeelb@google.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+References: <20231214020530.2267499-1-almasrymina@google.com>
+ <20231214020530.2267499-2-almasrymina@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20231214020530.2267499-2-almasrymina@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On 12/13/23 7:05 PM, Mina Almasry wrote:
+> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> index af5bab1acee1..bd0b413dfa3f 100644
+> --- a/net/vmw_vsock/virtio_transport.c
+> +++ b/net/vmw_vsock/virtio_transport.c
+> @@ -153,7 +153,7 @@ virtio_transport_send_pkt_work(struct work_struct *work)
+>  				 * 'virt_to_phys()' later to fill the buffer descriptor.
+>  				 * We don't touch memory at "virtual" address of this page.
+>  				 */
+> -				va = page_to_virt(skb_frag->bv_page);
+> +				va = page_to_virt(skb_frag_page(skb_frag));
+>  				sg_init_one(sgs[out_sg],
+>  					    va + skb_frag->bv_offset,
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+offset should not be open coded either.
 
-On Tue, 12 Dec 2023 17:33:13 -0700 you wrote:
-> Patches 1 and 2 modify the get/set_rxh ethtool API to take a pointer to
-> struct of parameters instead of individual params. This will allow future
-> changes to the uAPI-shared struct ethtool_rxfh without changing the
-> drivers' API.
-> 
-> Patch 3 adds the support at the Kernel level, allowing the user to set a
-> symmetric-xor RSS hash for a netdevice via:
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v9,1/8] net: ethtool: pass a pointer to parameters to get/set_rxfh ethtool ops
-    https://git.kernel.org/netdev/net-next/c/fb6e30a72539
-  - [net-next,v9,2/8] net: ethtool: get rid of get/set_rxfh_context functions
-    https://git.kernel.org/netdev/net-next/c/dcd8dbf9e734
-  - [net-next,v9,3/8] net: ethtool: add support for symmetric-xor RSS hash
-    https://git.kernel.org/netdev/net-next/c/13e59344fb9d
-  - [net-next,v9,4/8] ice: fix ICE_AQ_VSI_Q_OPT_RSS_* register values
-    https://git.kernel.org/netdev/net-next/c/20f73b60bb5c
-  - [net-next,v9,5/8] ice: refactor RSS configuration
-    https://git.kernel.org/netdev/net-next/c/dc6e44c9d6d6
-  - [net-next,v9,6/8] ice: refactor the FD and RSS flow ID generation
-    https://git.kernel.org/netdev/net-next/c/b1f5921a99ac
-  - [net-next,v9,7/8] ice: enable symmetric-xor RSS for Toeplitz hash function
-    https://git.kernel.org/netdev/net-next/c/352e9bf23813
-  - [net-next,v9,8/8] iavf: enable symmetric-xor RSS for Toeplitz hash function
-    https://git.kernel.org/netdev/net-next/c/4a3de3fb0eb6
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+>  					    skb_frag->bv_len);
 
 
