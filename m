@@ -1,164 +1,151 @@
-Return-Path: <netdev+bounces-57622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2597813A4E
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 19:46:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B78B813A57
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 19:52:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08D741C20CD6
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 18:46:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0709281F45
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 18:52:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D77CA68E95;
-	Thu, 14 Dec 2023 18:45:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5AD68B97;
+	Thu, 14 Dec 2023 18:52:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nabijaczleweli.xyz header.i=@nabijaczleweli.xyz header.b="PH1S8/Df"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lvv2wQM2"
 X-Original-To: netdev@vger.kernel.org
-Received: from tarta.nabijaczleweli.xyz (tarta.nabijaczleweli.xyz [139.28.40.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8C68D6D;
-	Thu, 14 Dec 2023 10:45:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
-	s=202305; t=1702579514;
-	bh=+jS1MLjilnhxRPOp0kqbSSFP9DLnqgTL1iwYC7/xSp8=;
-	h=Date:From:Cc:Subject:References:In-Reply-To:From;
-	b=PH1S8/DfkxO1QyDe0AqWW8FTVsk0Kh+JAcJjokfuWmIJ1XIXS4j3UdhaddJCcs3Ns
-	 XzQHOBgPOsF+JTRHOv6L4hkqJrJOnM6jtbRPn/8maHf1xjn8eHwqY3vurChFIUx8ll
-	 FtTdKk96NeN/4TE84wdjzanPXyIUkzUsp+DAFoJtn1AGNqEhxw0WbTKZuI9EN/iUfZ
-	 W5NljOKMiCWg8N4LE1+BZewiYPut6wykWkqZuZK5nUalpzFR+9RZsSxpIAv66cCS9R
-	 EZ8uilAs9BmK1jMUUYzyC3QEsNQK3fFjGp4nIWiX+U2AVDn2Fh8NAlH9XXh4ywMKAL
-	 wJTOwaCVPXV8g==
-Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
-	by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id 52B9A13798;
-	Thu, 14 Dec 2023 19:45:14 +0100 (CET)
-Date: Thu, 14 Dec 2023 19:45:14 +0100
-From: 
-	Ahelenia =?utf-8?Q?Ziemia=C5=84ska?= <nabijaczleweli@nabijaczleweli.xyz>
-Cc: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, linux-fsdevel@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH RERESEND 09/11] net/tcp: tcp_splice_read: always do
- non-blocking reads
-Message-ID: <2d44f2f64c18151d103ee045d1e3ce7a7d5534273.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
-User-Agent: NeoMutt/20231103
-References: <2cover.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4CCBA0
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 10:52:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702579928; x=1734115928;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=BDOejxndfLReb0cci5NYlZsRU6fGJSDduqwshAciC6Q=;
+  b=lvv2wQM2b+85YMuUxBuY0mV3BdLScSeubA1Cvf77cQWFEBDi3qOzLf4i
+   US/OcVomQu31K+4ul6BwOD/PbD+Rkb2XTgT7bm8ftTnDtmG2cpsWABTsg
+   wQmatquuP3Tp71ltGz1/38IivpGWsXe7WEyV8ZzVGnufngDK8KJTJ51sd
+   7d1FLo6E2Pq8ARekptlAEDi4Kya3f8jQTtn7xR5/76R7fdY4bsRasI/UF
+   dTL2tW2nXJ/LjuzLrqBX9HZ88yLafU0B/N/O+lCWJFWctEAuqqeuNTJll
+   y/jg7cv71x7OCS1uRFJ79s6RIUOA5Wbmxu9U5R6BI9RWizqrWoE07Uhbx
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="399004490"
+X-IronPort-AV: E=Sophos;i="6.04,276,1695711600"; 
+   d="scan'208";a="399004490"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 10:52:08 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,276,1695711600"; 
+   d="scan'208";a="15963533"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orviesa002.jf.intel.com with ESMTP; 14 Dec 2023 10:52:04 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rDqoU-000MV2-1b;
+	Thu, 14 Dec 2023 18:52:02 +0000
+Date: Fri, 15 Dec 2023 02:51:11 +0800
+From: kernel test robot <lkp@intel.com>
+To: Eyal Birger <eyal.birger@gmail.com>, davem@davemloft.net,
+	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au, pablo@netfilter.org, paul@nohats.ca,
+	nharold@google.com
+Cc: oe-kbuild-all@lists.linux.dev, devel@linux-ipsec.org,
+	netdev@vger.kernel.org, Eyal Birger <eyal.birger@gmail.com>
+Subject: Re: [PATCH ipsec-next,v2] xfrm: support sending NAT keepalives in
+ ESP in UDP states
+Message-ID: <202312150227.iYQMDIJT-lkp@intel.com>
+References: <20231210180116.1737411-1-eyal.birger@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="6sgdahaz72uicyvq"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2cover.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
+In-Reply-To: <20231210180116.1737411-1-eyal.birger@gmail.com>
+
+Hi Eyal,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on netfilter-nf/main]
+[also build test ERROR on linus/master v6.7-rc5 next-20231214]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Eyal-Birger/xfrm-support-sending-NAT-keepalives-in-ESP-in-UDP-states/20231211-020238
+base:   git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git main
+patch link:    https://lore.kernel.org/r/20231210180116.1737411-1-eyal.birger%40gmail.com
+patch subject: [PATCH ipsec-next,v2] xfrm: support sending NAT keepalives in ESP in UDP states
+config: x86_64-rhel-8.3-ltp (https://download.01.org/0day-ci/archive/20231215/202312150227.iYQMDIJT-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231215/202312150227.iYQMDIJT-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312150227.iYQMDIJT-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   net/xfrm/xfrm_nat_keepalive.c: In function 'nat_keepalive_send_ipv6':
+>> net/xfrm/xfrm_nat_keepalive.c:78:21: error: implicit declaration of function 'csum_ipv6_magic'; did you mean 'csum_tcpudp_magic'? [-Werror=implicit-function-declaration]
+      78 |         uh->check = csum_ipv6_magic(&ka->saddr.in6, &ka->daddr.in6,
+         |                     ^~~~~~~~~~~~~~~
+         |                     csum_tcpudp_magic
+   cc1: some warnings being treated as errors
 
 
---6sgdahaz72uicyvq
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+vim +78 net/xfrm/xfrm_nat_keepalive.c
 
-Otherwise we risk sleeping with the pipe locked for indeterminate
-lengths of time.
+    64	
+    65	#if IS_ENABLED(CONFIG_IPV6)
+    66	static int nat_keepalive_send_ipv6(struct sk_buff *skb,
+    67					   struct nat_keepalive *ka,
+    68					   struct udphdr *uh)
+    69	{
+    70		struct net *net = ka->net;
+    71		struct dst_entry *dst;
+    72		struct flowi6 fl6;
+    73		struct sock *sk;
+    74		__wsum csum;
+    75		int err;
+    76	
+    77		csum = skb_checksum(skb, 0, skb->len, 0);
+  > 78		uh->check = csum_ipv6_magic(&ka->saddr.in6, &ka->daddr.in6,
+    79					    skb->len, IPPROTO_UDP, csum);
+    80		if (uh->check == 0)
+    81			uh->check = CSUM_MANGLED_0;
+    82	
+    83		memset(&fl6, 0, sizeof(fl6));
+    84		fl6.flowi6_mark = skb->mark;
+    85		fl6.saddr = ka->saddr.in6;
+    86		fl6.daddr = ka->daddr.in6;
+    87		fl6.flowi6_proto = IPPROTO_UDP;
+    88		fl6.fl6_sport = ka->encap_sport;
+    89		fl6.fl6_dport = ka->encap_dport;
+    90	
+    91		sk = *this_cpu_ptr(&nat_keepalive_sk_ipv6);
+    92		sock_net_set(sk, net);
+    93		dst = ipv6_stub->ipv6_dst_lookup_flow(net, sk, &fl6, NULL);
+    94		if (IS_ERR(dst))
+    95			return PTR_ERR(dst);
+    96	
+    97		skb_dst_set(skb, dst);
+    98		err = ipv6_stub->ip6_xmit(sk, skb, &fl6, skb->mark, NULL, 0, 0);
+    99		sock_net_set(sk, &init_net);
+   100		return err;
+   101	}
+   102	#endif
+   103	
 
-sock_rcvtimeo() returns 0 if the second argument is true, so the
-explicit re-try loop for empty read conditions can be removed
-entirely.
-
-Link: https://lore.kernel.org/linux-fsdevel/qk6hjuam54khlaikf2ssom6custxf5i=
-s2ekkaequf4hvode3ls@zgf7j5j4ubvw/t/#u
-Signed-off-by: Ahelenia Ziemia=C5=84ska <nabijaczleweli@nabijaczleweli.xyz>
----
- net/ipv4/tcp.c | 30 +++---------------------------
- 1 file changed, 3 insertions(+), 27 deletions(-)
-
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 3f66cdeef7de..09b562e2c1bf 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -782,7 +782,6 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *pp=
-os,
- 		.len =3D len,
- 		.flags =3D flags,
- 	};
--	long timeo;
- 	ssize_t spliced;
- 	int ret;
-=20
-@@ -797,7 +796,6 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *pp=
-os,
-=20
- 	lock_sock(sk);
-=20
--	timeo =3D sock_rcvtimeo(sk, sock->file->f_flags & O_NONBLOCK);
- 	while (tss.len) {
- 		ret =3D __tcp_splice_read(sk, &tss);
- 		if (ret < 0)
-@@ -821,35 +819,13 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *=
-ppos,
- 				ret =3D -ENOTCONN;
- 				break;
- 			}
--			if (!timeo) {
--				ret =3D -EAGAIN;
--				break;
--			}
--			/* if __tcp_splice_read() got nothing while we have
--			 * an skb in receive queue, we do not want to loop.
--			 * This might happen with URG data.
--			 */
--			if (!skb_queue_empty(&sk->sk_receive_queue))
--				break;
--			sk_wait_data(sk, &timeo, NULL);
--			if (signal_pending(current)) {
--				ret =3D sock_intr_errno(timeo);
--				break;
--			}
--			continue;
-+			ret =3D -EAGAIN;
-+			break;
- 		}
- 		tss.len -=3D ret;
- 		spliced +=3D ret;
-=20
--		if (!tss.len || !timeo)
--			break;
--		release_sock(sk);
--		lock_sock(sk);
--
--		if (sk->sk_err || sk->sk_state =3D=3D TCP_CLOSE ||
--		    (sk->sk_shutdown & RCV_SHUTDOWN) ||
--		    signal_pending(current))
--			break;
-+		break;
- 	}
-=20
- 	release_sock(sk);
---=20
-2.39.2
-
---6sgdahaz72uicyvq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmV7TTkACgkQvP0LAY0m
-WPGANw/8D1YCIrVZ4bS0K0ryXlK1B+D+T4y2m/WOWKAApdw0Noli4oDhvaFjRX5x
-p2NKG/bJNc2gk4H9HPvkhO3AOFKFDAPv9nMRbfaIvXgRBLI9EarZGZolTNBdYipJ
-+Q7fHHBlqhKrrtIGWnpppqqElD4N/xD5QwCRDB+UnTcuyj4Pj1yJG0ZIcSgkg3th
-OGqO5gyXZs4kxWHaVBhgCsfWt67WEhqZpmxi1Oyid8Ka06kkbU1KS1IeNujp8DKr
-VIAchxFge51ljmYKZK6PSw/iassC2QPnMcasNZZYAVnTU5IZpMZMq+6662rIeH3W
-1edAJZw8R4NHzmlfERNl8s7yaZ3y6fV+OJC9OoFdu/sQIaCimeOzKsZvBspJd69G
-OG2AcfcKwDuKnjPiUM2m9hsWmLQ7vQhXIxDXs+U80WDvMuKqzKKwXM4uUWNjQjaf
-27ftOG8zkI4c09WJe+Kj6e8OwKujNLXUmvyRSssFJLUvSmo18A1DeICqXXk8gTng
-ugtQw3vq+89SM78KfiblW8ck2llVgOlRkrUbynw03eQ1SKF9N7Up3sN5DOgD21BJ
-WuHgES2Ushzrp75tudATCZrSffsdw6uzuDmQRgeRNWHdcoWU8yHengVRgBLdqKBB
-cQ2S1H1SexjjqJanjO7TLIZ5tPEKvcBgJGWXaaXj2rBntkyJc4k=
-=XfJ5
------END PGP SIGNATURE-----
-
---6sgdahaz72uicyvq--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
