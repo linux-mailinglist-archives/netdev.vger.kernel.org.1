@@ -1,114 +1,111 @@
-Return-Path: <netdev+bounces-57694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F824813E6C
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 00:54:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1EFF813E6F
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 00:57:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09ED9B21917
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 23:54:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7621A1F22B36
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 23:57:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2ED2DB63;
-	Thu, 14 Dec 2023 23:54:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 682532DB67;
+	Thu, 14 Dec 2023 23:57:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Cql5vmFx"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="XYU7jVEx"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E196C6F1;
-	Thu, 14 Dec 2023 23:54:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=AGhWCo3kebEsFhbGunIR4r1yUG3IKZL5BCf/J4dBVOQ=; b=Cql5vmFxeviq3QAIJKNd8I3mxr
-	NrqSPnVL6vLMh91+DwSjADq0qrXQhRM2LLdgcPEnlQQ0fIUbcrpauHxf2yELgwE89CjqyrvFkAGA5
-	8dtazzKrPvBCPtowDPdgoieulYKJeO4lsxY82qYOzYAKXKP+iL4gpyFAaZBRVDWNnrzoe3vl44lqz
-	UaHO0O2kThTU01YlF3j4MxV8z3CYqVmf9urD6g1hMJcFGyqPGpJtfJMRJaUrVBidsPMEKy8locyid
-	XxLjaK+o0yvAwqIMBAEWo/MuJ/boMvjc97shseIqZF+qpgH6XoRgVgY5zaaqZiowbr4sZS/wTsaQg
-	hZGbL4Dw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50276)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rDvX8-00022X-2X;
-	Thu, 14 Dec 2023 23:54:26 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rDvX8-0002zR-2g; Thu, 14 Dec 2023 23:54:26 +0000
-Date: Thu, 14 Dec 2023 23:54:26 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Harini Katakam <harini.katakam@amd.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v7 2/4] net: phy: extend PHY package API to
- support multiple global address
-Message-ID: <ZXuVsotg1DV596lV@shell.armlinux.org.uk>
-References: <20231214121026.4340-1-ansuelsmth@gmail.com>
- <20231214121026.4340-3-ansuelsmth@gmail.com>
- <ZXs14wrGKGtTfiui@shell.armlinux.org.uk>
- <657b921d.5d0a0220.7815b.87dd@mx.google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821712DB63;
+	Thu, 14 Dec 2023 23:56:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1702598212;
+	bh=kdaqb+qL+sKQKweMgh3BTaVI6c3ywDEdnrXH5XQmY9Q=;
+	h=Date:From:To:Cc:Subject:From;
+	b=XYU7jVExQdM6oeWGiq1bI3oV+raixNUkyDKqnsD+dkXsy2Wrv3DLPyx9dB/fu1zp5
+	 vbUqs22wcBs/ewf0Yd0g2cfrVa2P4l230BGzp69VDHNQZv8ycQi7GJ12vC4sSK9SMi
+	 RQAMmZqVpk+laso5ybeWpSjM48pCAF8chq/1hzapRXFE6uYUyzH4oKQlaNBqcxi2eg
+	 Cs0HylxUAQH63/BPVjxEddEiW3bXsQNUZNIrwIo46AJ7q14BE4Kq/7BCu98YvzJYT/
+	 b2M7sWJb0VHUBdNrbSaLQF5RydEyAKlUFAtvZhUVxH2RrdAMyMCS6noB2gzJQqFlwy
+	 OKzuybFZz73+A==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Srq5J0W8jz4wcJ;
+	Fri, 15 Dec 2023 10:56:51 +1100 (AEDT)
+Date: Fri, 15 Dec 2023 10:56:50 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, David Miller
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>
+Cc: bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Larysa
+ Zaremba <larysa.zaremba@intel.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the bpf-next tree with the net-next
+ tree
+Message-ID: <20231215105650.5eb8d2a4@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <657b921d.5d0a0220.7815b.87dd@mx.google.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: multipart/signed; boundary="Sig_/CLPTXkepDjGLf88u5G7zcrp";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Thu, Dec 14, 2023 at 05:54:51PM +0100, Christian Marangi wrote:
-> What I don't like is the wrap check.
-> 
-> But I wonder... Isn't it easier to have 
-> 
-> unsigned int addr = shared->base_addr + addr_offset;
-> 
-> and check if >= PHY_MAC_ADDR?
-> 
-> Everything is unsigned (so no negative case) and wrap is not possible as
-> nothing is downcasted.
+--Sig_/CLPTXkepDjGLf88u5G7zcrp
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I'm afraid that I LOL'd at "wrap is not possible" ! Of course it's
-possible. Here's an example:
+Hi all,
 
-	shared->base_addr is 20
-	addr_offset is ~0 (or -1 casted to an unsigned int)
-	addr becomes 19
+Today's linux-next merge of the bpf-next tree got a conflict in:
 
-How about:
+  tools/net/ynl/generated/netdev-user.c
 
-	if (addr_offset >= PHY_MAX_ADDR)
-		return -EIO;
+between commit:
 
-	addr = shared->base_addr + addr_offset;
-	if (addr >= PHY_MAX_ADDR)
-		return -EIO;
+  f7c0e362a25f ("tools: ynl: remove generated user space code from git")
 
-and then we could keep 'addr' as u8.
+from the net-next tree and commit:
 
-Honestly, I have wondered why the mdio bus address is a signed int, but
-never decided to do anything about it.
+  e6795330f88b ("xdp: Add VLAN tag hint")
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+from the bpf-next tree.
+
+I fixed it up (I just removed the file) and can carry the fix as
+necessary. This is now fixed as far as linux-next is concerned, but any
+non trivial conflicts should be mentioned to your upstream maintainer
+when your tree is submitted for merging.  You may also want to consider
+cooperating with the maintainer of the conflicting tree to minimise any
+particularly complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/CLPTXkepDjGLf88u5G7zcrp
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmV7lkIACgkQAVBC80lX
+0Gyv/QgAmdgxoieVX+RuS74JGn0oucUyO+YZNdN1+Q/Wx0quGXyfCus34AZzy8Wc
+/ng370Ky6puQEAPtv7p4ZdocU4kK7rBWyyqYzgDz6JcQ2rWaOXng4ClQ0cS1S8KU
+aOSTUcVnDWqCtoX04qw8qOGbKnD69T97Bc2UnBjrLpDrNdimXmBTQKbUjj9P6YuU
+hYDlCTK7KCwP+ZgpBKRZNLHBq62hjpTq1kh41+WCJmTPMt2NxXcYeeJlFi5y4ZSg
+CbZdaL5caMrU5UZ1qYDcP+KhhuUjIfWW/h1vD9rtE29EeJChd3Rt8hsrhftdIzkO
+M5qzya5888mLzxyOhw3ZABGcCHxFtQ==
+=QuYy
+-----END PGP SIGNATURE-----
+
+--Sig_/CLPTXkepDjGLf88u5G7zcrp--
 
