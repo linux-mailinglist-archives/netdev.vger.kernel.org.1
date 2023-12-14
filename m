@@ -1,173 +1,234 @@
-Return-Path: <netdev+bounces-57537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1C1781354B
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:53:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 16252813553
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:55:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A49071F21858
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:53:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97BB11F21BE9
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:54:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0BF5D90F;
-	Thu, 14 Dec 2023 15:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E575D917;
+	Thu, 14 Dec 2023 15:54:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="JDwFefI3"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="vWKzeF6a"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38C67E8
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 07:52:56 -0800 (PST)
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D520E8;
+	Thu, 14 Dec 2023 07:54:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1702569176; x=1734105176;
-  h=date:from:to:cc:in-reply-to:message-id:references:
-   mime-version:subject;
-  bh=cdf8DTGn0madXkupaFpmveiXLIUFsPGFH1v3+vgl57o=;
-  b=JDwFefI3CtDffgzoC5oP9TpWz9Ilwn29FcvLP0ZZOkxkonLCze6KukVN
-   BeccxHmNVcx7+B4t+04aOYhOCPyvez5PBGEwxYdjgxhHsPmq0gEuU0twm
-   xdmi3XVIBSywu54hrUby0RsiojpOwzL9P3sjn74Qt6PPR6AZmAMuH8zIl
-   o=;
+  t=1702569291; x=1734105291;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=I5jhm5cy2oaJAdCnM0BrbT9/Gr+ONF1EVY3nTyJ7IbE=;
+  b=vWKzeF6aVqO/xJO34Cnffmd8MmmbXOJE1Num3QGy0kJfAPawQ9TG4/qb
+   dVwcL3NlLXp4HgLNqx9U/VHosL4MJV1MTA4Y0H66vGDy3jS7XepMDhxYy
+   7RWTBm0mb2nuLKQD8kjpYq4vhLuw9RYpVJULzkhyv1D8K6qC2KTgkpA7Y
+   Q=;
 X-IronPort-AV: E=Sophos;i="6.04,275,1695686400"; 
-   d="scan'208";a="259755918"
-Subject: RE: [PATCH] tcp: disable tcp_autocorking for socket when TCP_NODELAY flag is
- set
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-21d8d9f4.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 15:52:56 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
-	by email-inbound-relay-pdx-2a-m6i4x-21d8d9f4.us-west-2.amazon.com (Postfix) with ESMTPS id 65719895AA;
-	Thu, 14 Dec 2023 15:52:55 +0000 (UTC)
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:65105]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.19.109:2525] with esmtp (Farcaster)
- id cb21cb25-0d9e-40aa-a1cd-d980d5a785b9; Thu, 14 Dec 2023 15:52:54 +0000 (UTC)
-X-Farcaster-Flow-ID: cb21cb25-0d9e-40aa-a1cd-d980d5a785b9
-Received: from EX19D003UWC001.ant.amazon.com (10.13.138.144) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+   d="scan'208";a="259098496"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-f7c754c9.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 15:54:49 +0000
+Received: from smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
+	by email-inbound-relay-pdx-2c-m6i4x-f7c754c9.us-west-2.amazon.com (Postfix) with ESMTPS id 91AEC40DAD;
+	Thu, 14 Dec 2023 15:54:47 +0000 (UTC)
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:13558]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.43.236:2525] with esmtp (Farcaster)
+ id 5c140d4b-8ed2-4673-ad51-e60ad6eefaf2; Thu, 14 Dec 2023 15:54:46 +0000 (UTC)
+X-Farcaster-Flow-ID: 5c140d4b-8ed2-4673-ad51-e60ad6eefaf2
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 14 Dec 2023 15:52:46 +0000
-Received: from edge-bw-112.e-lhr50.amazon.com (10.106.178.9) by
- EX19D003UWC001.ant.amazon.com (10.13.138.144) with Microsoft SMTP Server
+ 15.2.1118.40; Thu, 14 Dec 2023 15:54:41 +0000
+Received: from 88665a182662.ant.amazon.com (10.143.92.5) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 14 Dec 2023 15:52:45 +0000
-Date: Thu, 14 Dec 2023 09:52:21 -0600
-From: Geoff Blake <blakgeof@amazon.com>
-To: Eric Dumazet <edumazet@google.com>
-CC: Salvatore Dipietro <dipiets@amazon.com>, <alisaidi@amazon.com>,
-	<benh@amazon.com>, <davem@davemloft.net>, <dipietro.salvatore@gmail.com>,
-	<dsahern@kernel.org>, <kuba@kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>
-In-Reply-To: <CANn89i+xtQe9d6YJH7useqY+v31kpHkeg-MxCqtWD90nLrYNXQ@mail.gmail.com>
-Message-ID: <3baf5407-34b1-d616-9552-19696933e0c2@amazon.com>
-References: <CANn89i+98ifRj9SJQbK+QJrCde2UJvWr1h31gAZSuxt4i_U=iw@mail.gmail.com> <20231213213006.89142-1-dipiets@amazon.com> <CANn89i+xtQe9d6YJH7useqY+v31kpHkeg-MxCqtWD90nLrYNXQ@mail.gmail.com>
+ 15.2.1118.40; Thu, 14 Dec 2023 15:54:37 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: Eric Dumazet <edumazet@google.com>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <bpf@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: [PATCH v6 bpf-next 0/6] bpf: tcp: Support arbitrary SYN Cookie at TC.
+Date: Fri, 15 Dec 2023 00:54:18 +0900
+Message-ID: <20231214155424.67136-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="0-940578139-1702569166=:82855"
-X-ClientProxiedBy: EX19D044UWB002.ant.amazon.com (10.13.139.188) To
- EX19D003UWC001.ant.amazon.com (10.13.138.144)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D033UWC002.ant.amazon.com (10.13.139.196) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 Precedence: Bulk
 
---0-940578139-1702569166=:82855
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+Under SYN Flood, the TCP stack generates SYN Cookie to remain stateless
+for the connection request until a valid ACK is responded to the SYN+ACK.
 
-Thanks for helping dig in here Eric, but what is supposed to happen on TX 
-completion? We're unfamiliar with TCP small queues beside finding your old 
-LKML listing that states a tasklet is supposed to run if there is pending 
-data.  So need a bit more guidance if you could.
+The cookie contains two kinds of host-specific bits, a timestamp and
+secrets, so only can it be validated by the generator.  It means SYN
+Cookie consumes network resources between the client and the server;
+intermediate nodes must remember which nodes to route ACK for the cookie.
 
-I think its supposed to call tcp_free() when the skb is destructed and 
-that invokes the tasklet?  There is also sock_wfree(), it does not appear 
-to have the linkage to the tasklet by design.
+SYN Proxy reduces such unwanted resource allocation by handling 3WHS at
+the edge network.  After SYN Proxy completes 3WHS, it forwards SYN to the
+backend server and completes another 3WHS.  However, since the server's
+ISN differs from the cookie, the proxy must manage the ISN mappings and
+fix up SEQ/ACK numbers in every packet for each connection.  If a proxy
+node goes down, all the connections through it are terminated.  Keeping
+a state at proxy is painful from that perspective.
 
-We did attach probes at one point to look at whether there was a chance an 
-interrupt went missing (but don't have them on-hand anymore), but we 
-always saw the TX completion happen. When the 40ms latency happened 
-we'd see that the completion had happened just after the other packet decided to 
-be corked.  But it certainly doesn't hurt to double check.  
+At AWS, we use a dirty hack to build truly stateless SYN Proxy at scale.
+Our SYN Proxy consists of the front proxy layer and the backend kernel
+module.  (See slides of LPC2023 [0], p37 - p48)
 
-- Geoff Blake
+The cookie that SYN Proxy generates differs from the kernel's cookie in
+that it contains a secret (called rolling salt) (i) shared by all the proxy
+nodes so that any node can validate ACK and (ii) updated periodically so
+that old cookies cannot be validated and we need not encode a timestamp for
+the cookie.  Also, ISN contains WScale, SACK, and ECN, not in TS val.  This
+is not to sacrifice any connection quality, where some customers turn off
+TCP timestamps option due to retro CVE.
 
-On Thu, 14 Dec 2023, Eric Dumazet wrote:
+After 3WHS, the proxy restores SYN, encapsulates ACK into SYN, and forward
+the TCP-in-TCP packet to the backend server.  Our kernel module works at
+Netfilter input/output hooks and first feeds SYN to the TCP stack to
+initiate 3WHS.  When the module is triggered for SYN+ACK, it looks up the
+corresponding request socket and overwrites tcp_rsk(req)->snt_isn with the
+proxy's cookie.  Then, the module can complete 3WHS with the original ACK
+as is.
 
-> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
-> 
-> 
-> 
-> On Wed, Dec 13, 2023 at 10:30 PM Salvatore Dipietro <dipiets@amazon.com> wrote:
-> >
-> > > It looks like the above disables autocorking even after the userspace
-> > > sets TCP_CORK. Am I reading it correctly? Is that expected?
-> >
-> > I have tested a new version of the patch which can target only TCP_NODELAY.
-> > Results using previous benchmark are identical. I will submit it in a new
-> > patch version.
-> >
-> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > --- a/net/ipv4/tcp.c
-> > +++ b/net/ipv4/tcp.c
-> > @@ -716,7 +716,8 @@
-> >
-> >         tcp_mark_urg(tp, flags);
-> >
-> > -       if (tcp_should_autocork(sk, skb, size_goal)) {
-> > +       if (!(nonagle & TCP_NAGLE_OFF) &&
-> > +           tcp_should_autocork(sk, skb, size_goal)) {
-> >
-> >                 /* avoid atomic op if TSQ_THROTTLED bit is already set */
-> >                 if (!test_bit(TSQ_THROTTLED, &sk->sk_tsq_flags)) {
-> >
-> >
-> >
-> > > Also I wonder about these 40ms delays, TCP small queue handler should
-> > > kick when the prior skb is TX completed.
-> > >
-> > > It seems the issue is on the driver side ?
-> > >
-> > > Salvatore, which driver are you using ?
-> >
-> > I am using ENA driver.
-> >
-> > Eric can you please clarify where do you think the problem is?
-> >
-> 
-> Following bpftrace program could double check if ena driver is
-> possibly holding TCP skbs too long:
-> 
-> bpftrace -e 'k:dev_hard_start_xmit {
->  $skb = (struct sk_buff *)arg0;
->  if ($skb->fclone == 2) {
->   @start[$skb] = nsecs;
->  }
-> }
-> k:__kfree_skb {
->  $skb = (struct sk_buff *)arg0;
->  if ($skb->fclone == 2 && @start[$skb]) {
->   @tx_compl_usecs = hist((nsecs - @start[$skb])/1000);
->   delete(@start[$skb]);
-> }
-> } END { clear(@start); }'
-> 
-> iroa21:/home/edumazet# ./trace-tx-completion.sh
-> Attaching 3 probes...
-> ^C
-> 
-> 
-> @tx_compl_usecs:
-> [2, 4)                13 |                                                    |
-> [4, 8)               182 |                                                    |
-> [8, 16)          2379007 |@@@@@@@@@@@@@@@                                     |
-> [16, 32)         7865369 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-> [32, 64)         6040939 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@             |
-> [64, 128)         199255 |@                                                   |
-> [128, 256)          9235 |                                                    |
-> [256, 512)            89 |                                                    |
-> [512, 1K)             37 |                                                    |
-> [1K, 2K)              19 |                                                    |
-> [2K, 4K)              56 |                                                    |
-> 
---0-940578139-1702569166=:82855--
+This way, our SYN Proxy does not manage the ISN mappings nor wait for
+SYN+ACK from the backend thus can remain stateless.  It's working very
+well for high-bandwidth services like multiple Tbps, but we are looking
+for a way to drop the dirty hack and further optimise the sequences.
+
+If we could validate an arbitrary SYN Cookie on the backend server with
+BPF, the proxy would need not restore SYN nor pass it.  After validating
+ACK, the proxy node just needs to forward it, and then the server can do
+the lightweight validation (e.g. check if ACK came from proxy nodes, etc)
+and create a connection from the ACK.
+
+This series allows us to create a full sk from an arbitrary SYN Cookie,
+which is done in 3 steps.
+
+  1) At tc, BPF prog calls a new kfunc to create a reqsk and configure
+     it based on the argument populated from SYN Cookie.  The reqsk has
+     its listener as req->rsk_listener and is passed to the TCP stack as
+     skb->sk.
+
+  2) During TCP socket lookup for the skb, skb_steal_sock() returns a
+     listener in the reuseport group that inet_reqsk(skb->sk)->rsk_listener
+     belongs to.
+
+  3) In cookie_v[46]_check(), the reqsk (skb->sk) is fully initialised and
+     a full sk is created.
+
+The kfunc usage is as follows:
+
+    struct bpf_tcp_req_attrs attrs = {
+        .mss = mss,
+        .wscale_ok = wscale_ok,
+        .rcv_wscale = rcv_wscale, /* Server's WScale < 15 */
+        .snd_wscale = snd_wscale, /* Client's WScale < 15 */
+        .tstamp_ok = tstamp_ok,
+        .rcv_tsval = tsval,
+        .rcv_tsecr = tsecr, /* Server's Initial TSval */
+        .usec_ts_ok = usec_ts_ok,
+        .sack_ok = sack_ok,
+        .ecn_ok = ecn_ok,
+    }
+
+    skc = bpf_skc_lookup_tcp(...);
+    sk = (struct sock *)bpf_skc_to_tcp_sock(skc);
+    bpf_sk_assign_tcp_reqsk(skb, sk, attrs, sizeof(attrs));
+    bpf_sk_release(skc);
+
+[0]: https://lpc.events/event/17/contributions/1645/attachments/1350/2701/SYN_Proxy_at_Scale_with_BPF.pdf
+
+
+Changes:
+  v6:
+    * Patch 5 & 6
+      * /struct /s/tcp_cookie_attributes/bpf_tcp_req_attrs/
+      * Don't reuse struct tcp_options_received and use u8 for each attrs
+    * Patch 6
+      * Check retval of test__start_subtest()
+
+  v5: https://lore.kernel.org/netdev/20231211073650.90819-1-kuniyu@amazon.com/
+    * Split patch 1-3
+    * Patch 3
+      * Clear req->rsk_listener in skb_steal_sock()
+    * Patch 4 & 5
+      * Move sysctl validation and tsoff init from cookie_bpf_check() to kfunc
+    * Patch 5
+      * Do not increment LINUX_MIB_SYNCOOKIES(RECV|FAILED)
+    * Patch 6
+      * Remove __always_inline
+      * Test if tcp_handle_{syn,ack}() is executed
+      * Move some definition to bpf_tracing_net.h
+      * s/BPF_F_CURRENT_NETNS/-1/
+
+  v4: https://lore.kernel.org/bpf/20231205013420.88067-1-kuniyu@amazon.com/
+    * Patch 1 & 2
+      * s/CONFIG_SYN_COOKIE/CONFIG_SYN_COOKIES/
+    * Patch 1
+      * Don't set rcv_wscale for BPF SYN Cookie case.
+    * Patch 2
+      * Add test for tcp_opt.{unused,rcv_wscale} in kfunc
+      * Modify skb_steal_sock() to avoid resetting skb-sk
+      * Support SO_REUSEPORT lookup
+    * Patch 3
+      * Add CONFIG_SYN_COOKIES to Kconfig for CI
+      * Define BPF_F_CURRENT_NETNS
+
+  v3: https://lore.kernel.org/netdev/20231121184245.69569-1-kuniyu@amazon.com/
+    * Guard kfunc and req->syncookie part in inet6?_steal_sock() with
+      CONFIG_SYN_COOKIE
+
+  v2: https://lore.kernel.org/netdev/20231120222341.54776-1-kuniyu@amazon.com/
+    * Drop SOCK_OPS and move SYN Cookie validation logic to TC with kfunc.
+    * Add cleanup patches to reduce discrepancy between cookie_v[46]_check()
+
+  v1: https://lore.kernel.org/bpf/20231013220433.70792-1-kuniyu@amazon.com/
+
+
+Kuniyuki Iwashima (6):
+  tcp: Move tcp_ns_to_ts() to tcp.h
+  tcp: Move skb_steal_sock() to request_sock.h
+  bpf: tcp: Handle BPF SYN Cookie in skb_steal_sock().
+  bpf: tcp: Handle BPF SYN Cookie in cookie_v[46]_check().
+  bpf: tcp: Support arbitrary SYN Cookie.
+  selftest: bpf: Test bpf_sk_assign_tcp_reqsk().
+
+ include/net/request_sock.h                    |  39 ++
+ include/net/sock.h                            |  25 -
+ include/net/tcp.h                             |  42 ++
+ net/core/filter.c                             | 116 +++-
+ net/core/sock.c                               |  14 +-
+ net/ipv4/syncookies.c                         |  40 +-
+ net/ipv6/syncookies.c                         |  13 +-
+ tools/testing/selftests/bpf/bpf_kfuncs.h      |  10 +
+ tools/testing/selftests/bpf/config            |   1 +
+ .../bpf/prog_tests/tcp_custom_syncookie.c     | 171 ++++++
+ .../selftests/bpf/progs/bpf_tracing_net.h     |  17 +
+ .../selftests/bpf/progs/test_siphash.h        |  64 ++
+ .../bpf/progs/test_tcp_custom_syncookie.c     | 572 ++++++++++++++++++
+ .../bpf/progs/test_tcp_custom_syncookie.h     | 140 +++++
+ 14 files changed, 1218 insertions(+), 46 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_siphash.h
+ create mode 100644 tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.h
+
+-- 
+2.30.2
+
 
