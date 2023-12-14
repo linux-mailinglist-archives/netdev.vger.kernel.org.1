@@ -1,90 +1,80 @@
-Return-Path: <netdev+bounces-57201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C0CC81255B
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 03:40:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86E9D812565
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 03:45:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A9A028297A
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:40:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27C731F21A2D
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:45:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8CBA111D;
-	Thu, 14 Dec 2023 02:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vCaIOPh3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B167B180;
+	Thu, 14 Dec 2023 02:44:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3247ED9;
-	Thu, 14 Dec 2023 02:40:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F1CF0C43397;
-	Thu, 14 Dec 2023 02:40:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702521626;
-	bh=oNpKOec2ST05tlPJgQy+n4kAfENZeKy96q0lzZpGODU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=vCaIOPh3ZWESPnYdDezpTfrpwmDdcNZRZFpH0eHXcS5EhhXCO7sAi+tWSBPYoSEL3
-	 gY84e4pXgkQQG8jS+dkxmmjRfH1tgRSReIDYLj11u04PDM+a4qibNFZfJQKHVV4uEK
-	 3bgcL5Ah3BUX8Qn0OpMjUWz2objK5ramqrWajjxmPvsuHSBqZonWrz3ZuS6M/Lp6na
-	 wBuE0PThM09itqeOuBJDFyUXhgy4oRQtszmwRoQwCr8lyounilEvc0mZhvlKNWO/LI
-	 jQDQNAcqcWpYdiDZmwfHDJy6FQ7LsM4SzVft0co/2LdWUL9sqBk2Zi/hPiMHQKbOR4
-	 Qc1CG7uw7DRrQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D4B08DD4F15;
-	Thu, 14 Dec 2023 02:40:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8BC1BD;
+	Wed, 13 Dec 2023 18:44:51 -0800 (PST)
+X-UUID: 5c39719a134f4eef9e0ffa98abcdc5f6-20231214
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.33,REQID:6d9f5f62-07da-4d5b-a2a1-77fc2a26c4b6,IP:5,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:-10
+X-CID-INFO: VERSION:1.1.33,REQID:6d9f5f62-07da-4d5b-a2a1-77fc2a26c4b6,IP:5,URL
+	:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:-10
+X-CID-META: VersionHash:364b77b,CLOUDID:91082d61-c89d-4129-91cb-8ebfae4653fc,B
+	ulkID:231214104438TKVN4X1A,BulkQuantity:0,Recheck:0,SF:17|19|44|64|66|24|1
+	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
+	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS
+X-UUID: 5c39719a134f4eef9e0ffa98abcdc5f6-20231214
+X-User: chentao@kylinos.cn
+Received: from [172.20.15.254] [(116.128.244.169)] by mailgw
+	(envelope-from <chentao@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 238258755; Thu, 14 Dec 2023 10:44:37 +0800
+Message-ID: <9250b0e9-360d-447d-b4bf-30e4bc4f697c@kylinos.cn>
+Date: Thu, 14 Dec 2023 10:44:35 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] amd-xgbe: Avoid potential string truncation in name
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170252162586.2494.9298983108679557532.git-patchwork-notify@kernel.org>
-Date: Thu, 14 Dec 2023 02:40:25 +0000
-References: <20231212221312.work.830-kees@kernel.org>
-In-Reply-To: <20231212221312.work.830-kees@kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Shyam-sundar.S-k@amd.com, lkp@intel.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] igb: Add null pointer check to igb_set_fw_version
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ jacob.e.keller@intel.com, przemyslaw.kitszel@intel.com,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Kunwu Chan <kunwu.chan@hotmail.com>
+References: <20231211031336.235634-1-chentao@kylinos.cn>
+ <20231212132637.1b0fb8aa@kernel.org>
+Content-Language: en-US
+From: Kunwu Chan <chentao@kylinos.cn>
+In-Reply-To: <20231212132637.1b0fb8aa@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
+Thanks for your reply.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+I'll try to use snprintf in v2 patch.
 
-On Tue, 12 Dec 2023 14:13:12 -0800 you wrote:
-> Build with W=1 were warning about a potential string truncation:
+
+On 2023/12/13 05:26, Jakub Kicinski wrote:
+> On Mon, 11 Dec 2023 11:13:36 +0800 Kunwu Chan wrote:
+>> kasprintf() returns a pointer to dynamically allocated memory
+>> which can be NULL upon failure.
+>>
+>> Fixes: 1978d3ead82c ("intel: fix string truncation warnings")
+>> Cc: Kunwu Chan <kunwu.chan@hotmail.com>
+>> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
 > 
-> drivers/net/ethernet/amd/xgbe/xgbe-drv.c: In function 'xgbe_alloc_channels':
-> drivers/net/ethernet/amd/xgbe/xgbe-drv.c:211:73: warning: '%u' directive output may be truncated writing between 1 and 10 bytes into a region of size 8 [-Wformat-truncation=]
->   211 |                 snprintf(channel->name, sizeof(channel->name), "channel-%u", i);
->       |                                                                         ^~
-> drivers/net/ethernet/amd/xgbe/xgbe-drv.c:211:64: note: directive argument in the range [0, 4294967294]
->   211 |                 snprintf(channel->name, sizeof(channel->name), "channel-%u", i);
->       |                                                                ^~~~~~~~~~~~
-> drivers/net/ethernet/amd/xgbe/xgbe-drv.c:211:17: note: 'snprintf' output between 10 and 19 bytes into a destination of size 16
->   211 |                 snprintf(channel->name, sizeof(channel->name), "channel-%u", i);
->       |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> [...]
-
-Here is the summary with links:
-  - amd-xgbe: Avoid potential string truncation in name
-    https://git.kernel.org/netdev/net-next/c/84cc99199a34
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> The allocation is rather pointless here.
+> Can you convert this code to use snprintf() instead?
 
