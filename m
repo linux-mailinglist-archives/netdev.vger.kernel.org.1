@@ -1,51 +1,41 @@
-Return-Path: <netdev+bounces-57211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C37F8125B1
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 04:02:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87FC18125AA
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 04:00:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB9D8B213DA
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 03:02:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D13A1C2084B
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 03:00:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F313138F;
-	Thu, 14 Dec 2023 03:01:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC15EA52;
+	Thu, 14 Dec 2023 03:00:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j1WOdV/5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB111D0
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 19:01:39 -0800 (PST)
-X-QQ-mid: bizesmtp68t1702522822tonjdmjl
-Received: from wxdbg.localdomain.com ( [183.129.236.74])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 14 Dec 2023 11:00:21 +0800 (CST)
-X-QQ-SSF: 01400000000000L0Z000000A0000000
-X-QQ-FEAT: 7YFKcddXaghKykJRvhmj5bYNzFJiXOJYx/571afAXBOPTP8gTLAu4ONeIjcBu
-	HfuWi3sTVn7XDQUvHU2SZK+RtEWmS3xIgl3bRqekA0q3nUmG6qR/EQz8Q4uqbYZbTvuiehN
-	8ao6OTwk2fgANGtaPPbPTpi0By4WWOkgqhNtuCP471Sppfc8BMOLBtcbOpdlCBNVtvAdk4J
-	PltNWVD6kNAPIRRHSUzfUtAms6WYrUO1d+O0yfMgNQjcVfV1mABOLIcCsCetN9h4g2Ke4h2
-	CdUX8bgIHHWKVnPUBMghEbE1b9qd4+4LsnLF5rVuHj52qY6zibGFssEhhixfuK4HexbbwQq
-	6sBryExLmvMThCoOnZMImfIpn2T7QFDqklFfTaksOEFSt9PNFrerbufvhHu1snxt3257XxT
-	qtqF0Sgre10=
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 9371315004211221537
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	andrew@lunn.ch,
-	netdev@vger.kernel.org
-Cc: mengyuanlou@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v5 8/8] net: wangxun: add ethtool_ops for msglevel
-Date: Thu, 14 Dec 2023 10:54:56 +0800
-Message-Id: <20231214025456.1387175-9-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20231214025456.1387175-1-jiawenwu@trustnetic.com>
-References: <20231214025456.1387175-1-jiawenwu@trustnetic.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFEA814
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 03:00:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DA93EC433C7;
+	Thu, 14 Dec 2023 03:00:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702522825;
+	bh=sfFFIOxWrh8aCBYWrka9XFG3m0E28R6vbTMjn9ChSaY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=j1WOdV/5eyYbR4vnFQdU2guY+Bh21vaifn/Wuc6KTLUu/lMnsg6MuebHGddbuLb4w
+	 bdoktTaHpRfvxam2eZFYS+QIzbohUdabe62O2krkYoBZPw8M6UC29WSLDd+9N3nr/l
+	 Ix7QoGN/K6GrZLuvVqV7DBULYNElGWSLVp8ZNdsAjJ6Jcww6b06NSvl2Gsu3LZSaL1
+	 crJF9qVM6CP/HZKCfW99rjzhsJygWKU7/KbPJ9KdAODg/atpPrXS/q1VN4sshNEBfs
+	 Mt5ojREQkQcMEnRDIV1x0RYLUrtF655ArH4Cg7F7JKRScEEVTJUvqWdbpvStAkKL2z
+	 q8lj/N9Jhta4Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C2045DD4EFE;
+	Thu, 14 Dec 2023 03:00:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,104 +43,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
+Subject: Re: [PATCH net v2 0/2] dpaa2-switch: various fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170252282578.11535.15284744936202542226.git-patchwork-notify@kernel.org>
+Date: Thu, 14 Dec 2023 03:00:25 +0000
+References: <20231212164326.2753457-1-ioana.ciornei@nxp.com>
+In-Reply-To: <20231212164326.2753457-1-ioana.ciornei@nxp.com>
+To: Ioana Ciornei <ioana.ciornei@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, vladimir.oltean@nxp.com
 
-Add support to get and set msglevel for driver txgbe and ngbe.
+Hello:
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
- .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 24 ++++++++++++-------
- .../net/ethernet/wangxun/libwx/wx_ethtool.h   |  2 ++
- .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  |  2 ++
- .../ethernet/wangxun/txgbe/txgbe_ethtool.c    |  2 ++
- 4 files changed, 22 insertions(+), 8 deletions(-)
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-index 31d189e8536b..518278ae41ac 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-@@ -383,10 +383,6 @@ void wx_get_channels(struct net_device *dev,
- 
- 	/* record RSS queues */
- 	ch->combined_count = wx->ring_feature[RING_F_RSS].indices;
--
--	/* nothing else to report if RSS is disabled */
--	if (ch->combined_count == 1)
--		return;
- }
- EXPORT_SYMBOL(wx_get_channels);
- 
-@@ -396,10 +392,6 @@ int wx_set_channels(struct net_device *dev,
- 	unsigned int count = ch->combined_count;
- 	struct wx *wx = netdev_priv(dev);
- 
--	/* verify they are not requesting separate vectors */
--	if (!count || ch->rx_count || ch->tx_count)
--		return -EOPNOTSUPP;
--
- 	/* verify other_count has not changed */
- 	if (ch->other_count != 1)
- 		return -EINVAL;
-@@ -413,3 +405,19 @@ int wx_set_channels(struct net_device *dev,
- 	return 0;
- }
- EXPORT_SYMBOL(wx_set_channels);
-+
-+u32 wx_get_msglevel(struct net_device *netdev)
-+{
-+	struct wx *wx = netdev_priv(netdev);
-+
-+	return wx->msg_enable;
-+}
-+EXPORT_SYMBOL(wx_get_msglevel);
-+
-+void wx_set_msglevel(struct net_device *netdev, u32 data)
-+{
-+	struct wx *wx = netdev_priv(netdev);
-+
-+	wx->msg_enable = data;
-+}
-+EXPORT_SYMBOL(wx_set_msglevel);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-index ec4ad84c03b9..600c3b597d1a 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-@@ -38,4 +38,6 @@ void wx_get_channels(struct net_device *dev,
- 		     struct ethtool_channels *ch);
- int wx_set_channels(struct net_device *dev,
- 		    struct ethtool_channels *ch);
-+u32 wx_get_msglevel(struct net_device *netdev);
-+void wx_set_msglevel(struct net_device *netdev, u32 data);
- #endif /* _WX_ETHTOOL_H_ */
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-index 6d16150f0bbd..ee49bd3ce51a 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-@@ -131,6 +131,8 @@ static const struct ethtool_ops ngbe_ethtool_ops = {
- 	.set_coalesce		= wx_set_coalesce,
- 	.get_channels		= wx_get_channels,
- 	.set_channels		= ngbe_set_channels,
-+	.get_msglevel		= wx_get_msglevel,
-+	.set_msglevel		= wx_set_msglevel,
- };
- 
- void ngbe_set_ethtool_ops(struct net_device *netdev)
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-index 7148ff8333db..5d16e5712d77 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-@@ -95,6 +95,8 @@ static const struct ethtool_ops txgbe_ethtool_ops = {
- 	.set_coalesce		= wx_set_coalesce,
- 	.get_channels		= wx_get_channels,
- 	.set_channels		= txgbe_set_channels,
-+	.get_msglevel		= wx_get_msglevel,
-+	.set_msglevel		= wx_set_msglevel,
- };
- 
- void txgbe_set_ethtool_ops(struct net_device *netdev)
+On Tue, 12 Dec 2023 18:43:24 +0200 you wrote:
+> The first patch fixes the size passed to two dma_unmap_single() calls
+> which was wrongly put as the size of the pointer.
+> 
+> The second patch is new to this series and reverts the behavior of the
+> dpaa2-switch driver to not ask for object replay upon offloading so that
+> we avoid the errors encountered when a VLAN is installed multiple times
+> on the same port.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2,1/2] dpaa2-switch: fix size of the dma_unmap
+    https://git.kernel.org/netdev/net/c/2aad7d4189a9
+  - [net,v2,2/2] dpaa2-switch: do not ask for MDB, VLAN and FDB replay
+    https://git.kernel.org/netdev/net/c/f24a49a375f6
+
+You are awesome, thank you!
 -- 
-2.27.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
