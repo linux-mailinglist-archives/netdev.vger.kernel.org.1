@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-57180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D54B3812503
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 03:09:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D763B812504
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 03:09:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93E9E1C214AC
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:09:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77E14B2112B
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:09:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C9F6A59;
-	Thu, 14 Dec 2023 02:08:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 222661368;
+	Thu, 14 Dec 2023 02:08:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iISJOdFF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jF7Gov9H"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319A115BD
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 02:08:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1FC0C433C9;
-	Thu, 14 Dec 2023 02:08:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B4B184E
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 02:08:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4AC0C433C8;
+	Thu, 14 Dec 2023 02:08:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1702519724;
-	bh=XJjSNIE8eYywN6Xedqg4WEz9LYb3JsMFeHQHGZSnWQo=;
+	bh=9GLGJpeOE3NzuK1dnnT1fcd5mix5534yE3LtBtVUq88=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iISJOdFFfkVoScgpWF+Rh2Tq5hZhUKvHS6xlOGXkL3grPt2PmdXkrPCHt9NdRyB4z
-	 Y52QM6N+httKOILJeC7CAVWhvpjHN4gfr4HoA7471gM/F6O7eDoHitY6rIe284Y4zW
-	 /JEduDE+TuYxdaMyeBMlgMU3I50mp7QcI7vKktBUd5CX0C+f3//qI1zkSKMw98P4el
-	 /ARUhhdMhg77S7ZlFkjJdlovDqYgWiEAjYQ3xujH80Ra6sf0Y7MoqpXpyWI3Af3U+J
-	 lp/SDOYxNi9VzZ7vVOOoumZMdsz89CQmFLlk/YPbHHmpUWVX30gvRUM9Cf+8BMEcRz
-	 vKAZzF+lsvWgg==
+	b=jF7Gov9HiEKHiMKdt5wEuXVg7EVeaa49g68sRiqP26+HBgkGG7mehGQIqHx8bJo2N
+	 bZ+vw58dFXKk/Aosn6l+duNYnBIWV2jBOcpbEQrgD4HI+NSxGFrxI8KgKZ0k1IpJTr
+	 8EDulCvgyGctnuwqA4UjpJVsbGpOg74584pSjD9uMf5hbyTvCipXzNFsMYzgrobLVL
+	 WB3kZ7oRecL78rjsZ5o0YRXFie4MTzYvMiQ03HVH8hynRTy+HMitFdwzoMT1ONnPfw
+	 tHpUVq5pKg39c8PnrZ872BNCoIUwxQfPXHVBpZF1Cuxir+fMhKISG3/ttZkZb5iMq8
+	 Wv/qGlRhxG8Lw==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -41,9 +41,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>
-Subject: [net-next 04/11] net/mlx5: fs, Command to control TX flow table root
-Date: Wed, 13 Dec 2023 18:08:25 -0800
-Message-ID: <20231214020832.50703-5-saeed@kernel.org>
+Subject: [net-next 05/11] net/mlx5e: Remove TLS-specific logic in generic create TIS API
+Date: Wed, 13 Dec 2023 18:08:26 -0800
+Message-ID: <20231214020832.50703-6-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231214020832.50703-1-saeed@kernel.org>
 References: <20231214020832.50703-1-saeed@kernel.org>
@@ -57,54 +57,30 @@ Content-Transfer-Encoding: 8bit
 
 From: Tariq Toukan <tariqt@nvidia.com>
 
-Introduce an API to set/unset the TX flow table root for a device.
+TLS TISes are created using their own dedicated functions,
+don't honor their specific logic here.
 
 Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 Reviewed-by: Gal Pressman <gal@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/fs_cmd.c  | 20 +++++++++++++++++++
- .../net/ethernet/mellanox/mlx5/core/fs_cmd.h  |  1 +
- 2 files changed, 21 insertions(+)
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-index 8438ecabff84..1616a6144f7b 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-@@ -1158,3 +1158,23 @@ int mlx5_fs_cmd_set_l2table_entry_silent(struct mlx5_core_dev *dev, u8 silent_mo
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 26a98cfb0a59..b49b7c28863c 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -3357,9 +3357,6 @@ int mlx5e_create_tis(struct mlx5_core_dev *mdev, void *in, u32 *tisn)
  
- 	return mlx5_cmd_exec_in(dev, set_l2_table_entry, in);
- }
-+
-+int mlx5_fs_cmd_set_tx_flow_table_root(struct mlx5_core_dev *dev, u32 ft_id, bool disconnect)
-+{
-+	u32 out[MLX5_ST_SZ_DW(set_flow_table_root_out)] = {};
-+	u32 in[MLX5_ST_SZ_DW(set_flow_table_root_in)] = {};
-+
-+	if (disconnect && MLX5_CAP_FLOWTABLE_NIC_TX(dev, reset_root_to_default))
-+		return -EOPNOTSUPP;
-+
-+	MLX5_SET(set_flow_table_root_in, in, opcode,
-+		 MLX5_CMD_OP_SET_FLOW_TABLE_ROOT);
-+	MLX5_SET(set_flow_table_root_in, in, table_type,
-+		 FS_FT_NIC_TX);
-+	if (disconnect)
-+		MLX5_SET(set_flow_table_root_in, in, op_mod, 1);
-+	else
-+		MLX5_SET(set_flow_table_root_in, in, table_id, ft_id);
-+
-+	return mlx5_cmd_exec(dev, in, sizeof(in), out, sizeof(out));
-+}
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.h b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.h
-index f553719a02a0..53e0e5137d3f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.h
-@@ -123,4 +123,5 @@ const struct mlx5_flow_cmds *mlx5_fs_cmd_get_default(enum fs_flow_table_type typ
- const struct mlx5_flow_cmds *mlx5_fs_cmd_get_fw_cmds(void);
+ 	MLX5_SET(tisc, tisc, transport_domain, mdev->mlx5e_res.hw_objs.td.tdn);
  
- int mlx5_fs_cmd_set_l2table_entry_silent(struct mlx5_core_dev *dev, u8 silent_mode);
-+int mlx5_fs_cmd_set_tx_flow_table_root(struct mlx5_core_dev *dev, u32 ft_id, bool disconnect);
- #endif
+-	if (MLX5_GET(tisc, tisc, tls_en))
+-		MLX5_SET(tisc, tisc, pd, mdev->mlx5e_res.hw_objs.pdn);
+-
+ 	if (mlx5_lag_is_lacp_owner(mdev))
+ 		MLX5_SET(tisc, tisc, strict_lag_tx_port_affinity, 1);
+ 
 -- 
 2.43.0
 
