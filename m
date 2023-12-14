@@ -1,90 +1,85 @@
-Return-Path: <netdev+bounces-57323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2D50812E35
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:10:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08DAD812E49
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:13:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 738B0282206
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:10:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8467CB2129C
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:13:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0EDD3E49D;
-	Thu, 14 Dec 2023 11:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C9F3FE5B;
+	Thu, 14 Dec 2023 11:12:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r7iKIUNY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SEN7TBOP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C693D978
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 11:10:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4C2AFC433C9;
-	Thu, 14 Dec 2023 11:10:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702552225;
-	bh=xwq0ikO0DH4IjRaxfWn3ELJXTbtrWoZcQar3Cp9coY4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=r7iKIUNYJL2tt8CpKsqUnySzPVGJvGxjxP68NsPV/cpO8VBRIdi8XmoWkjr7vQjI+
-	 itYWFGeyBhW+C8DetPiCsgp84810L/bev5rfLIxP/xpDn6CG+OK0v/mVvrIzie1Iw+
-	 6Kjr/tejTbTQvRPWj7Nnf9Zc5k11UuHdC0FEcXswEfjdA3GHQifqyBA2NuCT2A9+CX
-	 VGUv3N5aYiNDDOhR5cVtkqCKyGBLH4eNwJFkccc8OuUSh1AOYBmAhAUi5E98dXPP+q
-	 0uBkckcSO8gOIz1LmjA+xSJpkdMjBxqb4R0A+EEYNzXx4urQT6P5gBiBiPWsZfNG0k
-	 ilK/DgPLeLvXA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 30E03DD4EFD;
-	Thu, 14 Dec 2023 11:10:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E20E78E
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 03:12:45 -0800 (PST)
+Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-40c31f18274so76659505e9.0
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 03:12:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702552364; x=1703157164; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+awbDbYRppxhyiKn67j5nTOqvsR+tFdedweDtgr3TQs=;
+        b=SEN7TBOPgoL/wKcb+G7Rkpes9hIMx1/bOUfAT23Lu7NmAglpJHH+nH1EKkYPFZvMmA
+         AMxu7xFvTQIwp39dla3BtqnPrUeptNBeUylfhSXO2LZt7nH/FAsQ1ZN6rEgx2P2kiNwB
+         ueXvOtv6uZp72VdY1szwtpxU1EUB5yG/vX5Pa35uGdPEGn/98whEIefegsuKrAxkvTl1
+         A1KQGrZy23tWVq52YxwpcXmY2I8MowGKBG+J6no6xMZt7VE6nWlac6J4Q5Z1GL8PBBV6
+         8KwiNJopPUyqAfUY6+MzbI6kQH0YuIgiwX//XYYhfcSikvq2vq1W9SUDm5ISQzg/D2QI
+         OuTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702552364; x=1703157164;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+awbDbYRppxhyiKn67j5nTOqvsR+tFdedweDtgr3TQs=;
+        b=WN1/A021qpUQCIt2Xj/Jt2+R/0wdpRUzvg2dVhwxSeHerhJEZvlMYitRVYX8xjVe6Y
+         MgNNu7WaWpDwycI9qKYmVPzsnReWIaLAAP4076dkDaBfbZaRaJ4KsbSHp1/rjUfl3qee
+         Ofl6cBIvG9iTrhaMfsRZnwhTCZOBJtVW5FB88Y2FnZ1SwTT3SmrhZtPiuJGVc93kIw0w
+         f8fAGHV1hwT9QP0Y1+JZOExaEp7AZUtUv0pqWPNs5j0PBnXR0Y0wzcMNN9SD8s2zLWoS
+         Xbr6YhoguZd9GXBpwzYJ/Wzl3hJjM45xkwdR0WekTQrgfKkOT/VGjBffhEoGWdztqn4k
+         Q4EA==
+X-Gm-Message-State: AOJu0Ywur/Q5N1a50pxKdudOcZvzfVnCmUYvmpdUPScLSnjfcdcBFZDQ
+	9HNXqZH5+ee4084HvYB0/Yw=
+X-Google-Smtp-Source: AGHT+IHXZYjNvWHK/DCPgWxzFh6UFGPQBA8ZYNK7ynHh8tr4j7yUtxliHhcZfYCrn3cXJedCyEpABQ==
+X-Received: by 2002:a05:600c:1ca9:b0:40c:325b:6360 with SMTP id k41-20020a05600c1ca900b0040c325b6360mr4324085wms.130.1702552364187;
+        Thu, 14 Dec 2023 03:12:44 -0800 (PST)
+Received: from imac ([2a02:8010:60a0:0:7840:ddbd:bbf:1e8f])
+        by smtp.gmail.com with ESMTPSA id h5-20020a05600c314500b0040b56f2cce3sm26333748wmo.23.2023.12.14.03.12.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Dec 2023 03:12:43 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  nicolas.dichtel@6wind.com,  jiri@resnulli.us
+Subject: Re: [PATCH net-next 8/8] tools: ynl-gen: print prototypes for
+ recursive stuff
+In-Reply-To: <20231213231432.2944749-9-kuba@kernel.org> (Jakub Kicinski's
+	message of "Wed, 13 Dec 2023 15:14:32 -0800")
+Date: Thu, 14 Dec 2023 11:11:40 +0000
+Message-ID: <m2ttol3uoj.fsf@gmail.com>
+References: <20231213231432.2944749-1-kuba@kernel.org>
+	<20231213231432.2944749-9-kuba@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: stmmac: Handle disabled MDIO busses from
- devicetree
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170255222519.10804.11119972355205402863.git-patchwork-notify@kernel.org>
-Date: Thu, 14 Dec 2023 11:10:25 +0000
-References: <20231212-b4-stmmac-handle-mdio-enodev-v2-1-600171acf79f@redhat.com>
-In-Reply-To: <20231212-b4-stmmac-handle-mdio-enodev-v2-1-600171acf79f@redhat.com>
-To: Andrew Halaney <ahalaney@redhat.com>
-Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com, peppe.cavallaro@st.com, andrew@lunn.ch,
- fancer.lancer@gmail.com, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- horms@kernel.org
+Content-Type: text/plain
 
-Hello:
+Jakub Kicinski <kuba@kernel.org> writes:
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+> We avoid printing forward declarations and prototypes for most
+> types by sorting things topologically. But if structs nest we
+> do need the forward declarations, there's no other way.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-On Tue, 12 Dec 2023 16:18:33 -0600 you wrote:
-> Many hardware configurations have the MDIO bus disabled, and are instead
-> using some other MDIO bus to talk to the MAC's phy.
-> 
-> of_mdiobus_register() returns -ENODEV in this case. Let's handle it
-> gracefully instead of failing to probe the MAC.
-> 
-> Fixes: 47dd7a540b8a ("net: add support for STMicroelectronics Ethernet controllers.")
-> Signed-off-by: Andrew Halaney <ahalaney@redhat.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v2] net: stmmac: Handle disabled MDIO busses from devicetree
-    https://git.kernel.org/netdev/net/c/e23c0d21ce92
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
