@@ -1,92 +1,95 @@
-Return-Path: <netdev+bounces-57142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9067281240E
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 01:45:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31B48812420
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 01:50:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B25B91C21489
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 00:45:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FAFC282152
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 00:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E1180D;
-	Thu, 14 Dec 2023 00:45:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35DD939C;
+	Thu, 14 Dec 2023 00:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OjUWqod/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kSxKEnzZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90648A3
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 16:45:41 -0800 (PST)
-Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-a1c7d8f89a5so1000722766b.2
-        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 16:45:41 -0800 (PST)
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59D8EAC
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 16:50:13 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-6cebbf51742so86726b3a.1
+        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 16:50:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702514740; x=1703119540; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HsCpSdJ+cezQKITwB2sRH/SoiYOVwlKBRMvbzUnjpZc=;
-        b=OjUWqod/+4ex60ObIykSoq4anSmBgDd7ntDDjhWPg/obpus8dF8uyi+M8RIB/AOZ8a
-         Szm0qQFmzYe1C0kK1Q74BYT8+S2E3tgIzUF4TUM9928HlfO057KKl9GKi2pjE7y6dn4Z
-         gFaJ+q5dA0bFMAI47F6RAbSPN1uBMc9gA7WNNZbXJQguIsTYjxpDujZkSQc9LJgKDwm5
-         tiTkdNJHr+m/828UiTvOBfAJx7LCeDwCbxBHgLBg5fLLlvuR8wYnNaeOBn6YXozsDC3a
-         NNgzL2RdFwPhvUKEtNf8fKf+nWBHprL/hiWKMNJeYBqlfhSIPFTK6CPZebDlgSHPe9hy
-         D+0Q==
+        d=gmail.com; s=20230601; t=1702515013; x=1703119813; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KGtSFv/k26mU91Xy5EV6ZunGPt9CESueDuplVzh3gMA=;
+        b=kSxKEnzZfL4Cj6d0GRaJ4I6Pe3eW8DVF+rI27YLLEdBAJAe1T522XUGpV2bDLIODvN
+         8OQLHCMVbIbdePUEWQ3c+XUl3OWY+7VQq104Hz1VA/La24fCSCXKKqd/7pxdEAngwJNo
+         bQu6T5xgWlLdSW/R1NPoTzmuCwp/oWKmPDYPGrrQmB6jiXmv3YckeSn5Rxwdo014xGY5
+         4vmOy5pHgABfD+NTOw/gegBUGPLwTrHOM6CQNn7248Lh30x0I8fAWUe54lDjVmc7YEW4
+         rfvs3uV2bDOxb6uKmedALIphFwcscRwclRis56nEy1mD+GXo4bUHUnwMAcskN4QFjkoN
+         gc9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702514740; x=1703119540;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HsCpSdJ+cezQKITwB2sRH/SoiYOVwlKBRMvbzUnjpZc=;
-        b=upDXSTf12TrTy6LrbTRo6Ecv01dvGN3UsHHvrwvCVqSMbtJpm7n0PmAbYjgsrLZuxm
-         /dcrQCJj7sTtlyp9srb/3TPz8SROYjm1cZMzoGNzovB/F03YdI/9IcK6Mo3NYibhkPN5
-         UBtnEAdW+D3C1nmXMdUB/0Mq8E5KYY8rurxqzKKfD5inPvTChmM6oeOE5pp1cTslXack
-         +6AFIGLMqjpb+ZTsekOz6D4tJdSEHyA0Ivh/7fZIjG5M0BrG8Wt0mzRe38Ufb0Tt0kvk
-         vmYvnJAQSv/XBZB1CvIRuBq2tpMvEsdAPM6Ux1eJsXJ1JmcKV2CVcEhJMQtli42Z+Ip/
-         fvRg==
-X-Gm-Message-State: AOJu0Yz1Y9F4spx7A27DCmh/Cnd2aiG13BUI4Y4rEgzbfprUF0YO8yxS
-	UeA4EMn7t/nTcgzdwg9WVz0=
-X-Google-Smtp-Source: AGHT+IHvrD7uXi/2BT8jhjvHBPyoHMCKtNXoveaF0F2Aw/2hQ0XlPTc8WcQeeojFuf80dMclCPXpfA==
-X-Received: by 2002:a17:907:7f10:b0:a04:e6f8:3d6c with SMTP id qf16-20020a1709077f1000b00a04e6f83d6cmr6043111ejc.48.1702514739593;
-        Wed, 13 Dec 2023 16:45:39 -0800 (PST)
-Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id z9-20020a170906d00900b009c5c5c2c5a4sm8567676ejy.219.2023.12.13.16.45.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 16:45:39 -0800 (PST)
-Date: Thu, 14 Dec 2023 02:45:37 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
-	f.fainelli@gmail.com, netdev@vger.kernel.org,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH v3 net-next 2/8] net: dsa: mv88e6xxx: Create API to read
- a single stat counter
-Message-ID: <20231214004537.wx7wexdug7syekgz@skbuf>
-References: <20231211223346.2497157-1-tobias@waldekranz.com>
- <20231211223346.2497157-3-tobias@waldekranz.com>
+        d=1e100.net; s=20230601; t=1702515013; x=1703119813;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KGtSFv/k26mU91Xy5EV6ZunGPt9CESueDuplVzh3gMA=;
+        b=CV9m78WyghoWfr0/1ZUUKZ1IEvoAeNB7d9MLgpUb4eP0O/Pkd+i3StPWiqrUrJW1yF
+         dfEN7/1J6Ik1zjhadDhAUwiYSjA0qp7YOumdOxI54D0laCp7RcfGuXymv1fJSe6qnEQP
+         zOJ8f9oqiviggB2AoiPvZSXAV1DNVNUSC67N9ZJdHDb7ap4l3dhc8Ae4ASluzRPrzIla
+         l8JbAC5WsO2xNq3BhObKcWQpX4gQOqQuvzacJK/R6H2vYX3o6jJVtBkvzZ4EsqFf007u
+         SrItWzjoAsIgwcIDdh7DXtu8l69idiFoW7uHdrxi2Qyzq1rXWXlaEBMfrk7lnFujy+Vh
+         L8Dg==
+X-Gm-Message-State: AOJu0YyrGaFbk4rfhifD1CaIzp1gR3Q+INx8aadPjpQ92VINt4aNp4QZ
+	oDfRMEUVooaTRRsIqtR8pPk=
+X-Google-Smtp-Source: AGHT+IGaxq0i70w9kaiqTb9P+2lqBOmd9IUB/5vnxnz/h7z3QsonI6aDHhESiQ+9oMVx9b5/d9B35A==
+X-Received: by 2002:a05:6a00:cd2:b0:6ce:54dc:2d0b with SMTP id b18-20020a056a000cd200b006ce54dc2d0bmr12895020pfv.1.1702515012566;
+        Wed, 13 Dec 2023 16:50:12 -0800 (PST)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id v15-20020aa7850f000000b006ce467a2475sm1762771pfn.181.2023.12.13.16.50.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Dec 2023 16:50:11 -0800 (PST)
+Message-ID: <4a6aa3dc-2de7-45f8-8274-7f3f686df309@gmail.com>
+Date: Wed, 13 Dec 2023 16:50:07 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231211223346.2497157-3-tobias@waldekranz.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] net: mscc: ocelot: fix eMAC TX RMON stats for
+ bucket 256-511 and above
+Content-Language: en-US
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Claudiu Manoil <claudiu.manoil@nxp.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>
+References: <20231214000902.545625-1-vladimir.oltean@nxp.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20231214000902.545625-1-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 11, 2023 at 11:33:40PM +0100, Tobias Waldekranz wrote:
-> This change contains no functional change. We simply push the hardware
-> specific stats logic to a function reading a single counter, rather
-> than the whole set.
+On 12/13/23 16:09, Vladimir Oltean wrote:
+> There is a typo in the driver due to which we report incorrect TX RMON
+> counters for the 256-511 octet bucket and all the other buckets larger
+> than that.
 > 
-> This is a preparatory change for the upcoming standard ethtool
-> statistics support (i.e. "eth-mac", "eth-ctrl" etc.).
+> Bug found with the selftest at
+> https://patchwork.kernel.org/project/netdevbpf/patch/20231211223346.2497157-9-tobias@waldekranz.com/
 > 
-> Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
-> ---
+> Fixes: e32036e1ae7b ("net: mscc: ocelot: add support for all sorts of standardized counters present in DSA")
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-You left this function prototype as returning int rather than size_t.
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
 
-static int mv88e6xxx_stats_get_stats(struct mv88e6xxx_chip *chip, int port,
-				     uint64_t *data)
 
