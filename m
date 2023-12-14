@@ -1,91 +1,173 @@
-Return-Path: <netdev+bounces-57420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FD28813120
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:17:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A037E8131B2
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:36:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 458A41C214E3
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:17:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 536A41F221C4
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:36:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0719A53E3F;
-	Thu, 14 Dec 2023 13:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jeNqshmt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 615CA56B62;
+	Thu, 14 Dec 2023 13:36:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D104116
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 05:16:55 -0800 (PST)
-Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso9210a12.1
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 05:16:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702559814; x=1703164614; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JOwx/mzdDKXszuaQLdYZ1msi9ylZyxJ8mX7DjwOPBEw=;
-        b=jeNqshmtzVItlAWzSzV8k3NGNGlSbaJlo0wClasTi5q3siJPbUBufJyjHQ+7JeFSy9
-         GcJ7QdYz8voqHQg5JilAaqYRRAPjrp72jeijcdb0VCd6dNfkZjswZXP+QZrq9ohW0Wu4
-         oL2hRRRnrX/Hkd4BvxJyvs9pu1MS9T2Q3pgCDMyCksC4saUAka80RB595tjaSHoBzXi3
-         2C8Ha3xWvaJ6h3PnWV+NZMbqpBRlr3gd8EalTjTd7Mj5w5vUnVCnGtNHE+DO7JHFTVLc
-         LGl1p8fwasGipoTYWuiN7fnz1SJk35CEP74tZOIxfbQ6OF9DwmLaa4b1BF6I+/u+OSWH
-         0Eww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702559814; x=1703164614;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JOwx/mzdDKXszuaQLdYZ1msi9ylZyxJ8mX7DjwOPBEw=;
-        b=p8pf9RsU9kcnFAJYhyblcun0lmVJd+3CxAWA5/50MWLqU0lct2MuQthDdaslArKID5
-         QFW1Jzvf2GrUyTAHCfXBfABcLWK8UPMFMVV7ZrTORWus+/EcK2VIroBkWRyl2UdBCeZ1
-         ywOOON+UTjA5Cb0wXLaZzATWWBks/Opk+DXKWAn088AdaDbrQolK17WcOU9WrCGYOMXB
-         N1bFD/w0/SUwlfo4oS8XTBuv0jMLGHHI+f9pQjBJ2HsT7gBxQ6W0LuPemaxkNQh1u0SZ
-         HKkOTbq0a7a1rokiSAMsZBBBVWFfgWYF1w6Yan/5GxtIVi3bes3w6zUKJslSYAW3Qn0i
-         Fhkw==
-X-Gm-Message-State: AOJu0YxCLVSINkBLmMmOqUtBMzAq6v++LTyh+6Y3Jr+xLosHCJ/3UW7S
-	vgMXkWoGW2AjrI+57GsZb886hIytHHEAq+lOn33ghA==
-X-Google-Smtp-Source: AGHT+IGPDxq0uza/+XgXG2IMOVmp4USK/BgaYfsY2x/YbZF38+w2YUrljG49XX3YUQ0U6joCplt/Sk0pleh5niEVIrM=
-X-Received: by 2002:a50:bacf:0:b0:54d:6a88:507e with SMTP id
- x73-20020a50bacf000000b0054d6a88507emr682903ede.4.1702559813499; Thu, 14 Dec
- 2023 05:16:53 -0800 (PST)
+X-Greylist: delayed 1154 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 14 Dec 2023 05:36:02 PST
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A0C1118;
+	Thu, 14 Dec 2023 05:36:02 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4SrXsN4LxQz1Q6P2;
+	Thu, 14 Dec 2023 21:15:36 +0800 (CST)
+Received: from dggpeml500022.china.huawei.com (unknown [7.185.36.66])
+	by mail.maildlp.com (Postfix) with ESMTPS id 67D761400CB;
+	Thu, 14 Dec 2023 21:16:45 +0800 (CST)
+Received: from [10.67.120.135] (10.67.120.135) by
+ dggpeml500022.china.huawei.com (7.185.36.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 14 Dec 2023 21:16:45 +0800
+Subject: Re: [PATCH net-next v4 2/4] octeon_ep: PF-VF mailbox version support
+To: Shinas Rasheed <srasheed@marvell.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
+	<mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
+	<kheib@redhat.com>, <konguyen@redhat.com>, Veerasenareddy Burru
+	<vburru@marvell.com>, Sathesh Edara <sedara@marvell.com>, Eric Dumazet
+	<edumazet@google.com>
+References: <20231213035816.2656851-1-srasheed@marvell.com>
+ <20231213035816.2656851-3-srasheed@marvell.com>
+From: "shenjian (K)" <shenjian15@huawei.com>
+Message-ID: <59426716-2f97-2f08-1d9f-84ce6483cfa9@huawei.com>
+Date: Thu, 14 Dec 2023 21:16:44 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.5.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <63bd69c0-8729-4237-82e6-53af12a60bf9@gmail.com>
-In-Reply-To: <63bd69c0-8729-4237-82e6-53af12a60bf9@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 14 Dec 2023 14:16:38 +0100
-Message-ID: <CANn89iLcXjzWQSs9VW-=c0d0YL0Ksc4B54cTYZawUUnBkSLRNg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] ipmr: support IP_PKTINFO on cache report IGMP msg
-To: Leone Fernando <leone4fernando@gmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20231213035816.2656851-3-srasheed@marvell.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpeml500022.china.huawei.com (7.185.36.66)
 
-On Wed, Dec 13, 2023 at 5:28=E2=80=AFPM Leone Fernando <leone4fernando@gmai=
-l.com> wrote:
->
-> In order to support IP_PKTINFO on those packets, we need to call
-> ipv4_pktinfo_prepare.
->
-> When sending mrouted/pimd daemons a cache report IGMP msg, it is
-> unnecessary to set dst on the newly created skb.
-> It used to be necessary on older versions until
-> commit d826eb14ecef ("ipv4: PKTINFO doesnt need dst reference") which
-> changed the way IP_PKTINFO struct is been retrieved.
->
-> Changes from v1:
-> 1. Undo changes in ipv4_pktinfo_prepare function. use it directly
->    and copy the control block.
->
-> Fixes: d826eb14ecef ("ipv4: PKTINFO doesnt need dst reference")
-> Signed-off-by: Leone Fernando <leone4fernando@gmail.com>
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+
+在 2023/12/13 11:58, Shinas Rasheed 写道:
+> Add PF-VF mailbox initial version support
+>
+> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
+> ---
+> V4:
+>    - No changes
+>
+> V3: https://lore.kernel.org/all/20231211063355.2630028-3-srasheed@marvell.com/
+>    - No changes
+>
+> V2: https://lore.kernel.org/all/20231209081450.2613561-3-srasheed@marvell.com/
+>    - No changes
+>
+> V1: https://lore.kernel.org/all/20231208070352.2606192-3-srasheed@marvell.com/
+>
+>   .../net/ethernet/marvell/octeon_ep/octep_main.h   |  1 +
+>   .../ethernet/marvell/octeon_ep/octep_pfvf_mbox.c  | 15 ++++++++++++---
+>   .../ethernet/marvell/octeon_ep/octep_pfvf_mbox.h  |  7 +++++--
+>   3 files changed, 18 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.h b/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
+> index 3223bb6f95ea..fee59e0e0138 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
+> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
+> @@ -220,6 +220,7 @@ struct octep_iface_link_info {
+>   /* The Octeon VF device specific info data structure.*/
+>   struct octep_pfvf_info {
+>   	u8 mac_addr[ETH_ALEN];
+> +	u32 mbox_version;
+>   };
+>   
+>   /* The Octeon device specific private data structure.
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
+> index 43b40e91f7bf..baffe298a2a0 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
+> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
+> @@ -28,10 +28,18 @@ static void octep_pfvf_validate_version(struct octep_device *oct,  u32 vf_id,
+>   {
+>   	u32 vf_version = (u32)cmd.s_version.version;
+>   
+> -	if (vf_version <= OCTEP_PFVF_MBOX_VERSION_V1)
+> -		rsp->s_version.type = OCTEP_PFVF_MBOX_TYPE_RSP_ACK;
+> +	dev_dbg(&oct->pdev->dev, "VF id:%d VF version:%d PF version:%d\n",
+> +		vf_id, vf_version, OCTEP_PFVF_MBOX_VERSION_CURRENT);
+> +	if (vf_version < OCTEP_PFVF_MBOX_VERSION_CURRENT)
+> +		rsp->s_version.version = vf_version;
+>   	else
+> -		rsp->s_version.type = OCTEP_PFVF_MBOX_TYPE_RSP_NACK;
+> +		rsp->s_version.version = OCTEP_PFVF_MBOX_VERSION_CURRENT;
+> +
+> +	oct->vf_info[vf_id].mbox_version = rsp->s_version.version;
+> +	dev_dbg(&oct->pdev->dev, "VF id:%d negotiated VF version:%d\n",
+> +		vf_id, oct->vf_info[vf_id].mbox_version);
+> +
+> +	rsp->s_version.type = OCTEP_PFVF_MBOX_TYPE_RSP_ACK;
+>   }
+>   
+>   static void octep_pfvf_get_link_status(struct octep_device *oct, u32 vf_id,
+> @@ -167,6 +175,7 @@ int octep_setup_pfvf_mbox(struct octep_device *oct)
+>   			goto free_mbox;
+>   
+>   		memset(oct->mbox[ring], 0, sizeof(struct octep_mbox));
+> +		memset(&oct->vf_info[i], 0, sizeof(struct octep_pfvf_info));
+>   		mutex_init(&oct->mbox[ring]->lock);
+>   		INIT_WORK(&oct->mbox[ring]->wk.work, octep_pfvf_mbox_work);
+>   		oct->mbox[ring]->wk.ctxptr = oct->mbox[ring];
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h
+> index 34feeb559b0d..af4dcf5ef7f1 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h
+> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h
+> @@ -13,11 +13,15 @@
+>   #define OCTEON_SDP_16K_HW_FRS  16380UL
+>   #define OCTEON_SDP_64K_HW_FRS  65531UL
+>   
+> +/* When a new command is implemented,PF Mbox version should be bumped.
+> + */
+>   enum octep_pfvf_mbox_version {
+>   	OCTEP_PFVF_MBOX_VERSION_V0,
+>   	OCTEP_PFVF_MBOX_VERSION_V1,
+>   };
+>   
+> +#define OCTEP_PFVF_MBOX_VERSION_CURRENT	OCTEP_PFVF_MBOX_VERSION_V1
+> +
+>   enum octep_pfvf_mbox_opcode {
+>   	OCTEP_PFVF_MBOX_CMD_VERSION,
+>   	OCTEP_PFVF_MBOX_CMD_SET_MTU,
+> @@ -30,7 +34,7 @@ enum octep_pfvf_mbox_opcode {
+>   	OCTEP_PFVF_MBOX_CMD_GET_LINK_STATUS,
+>   	OCTEP_PFVF_MBOX_CMD_GET_MTU,
+>   	OCTEP_PFVF_MBOX_CMD_DEV_REMOVE,
+> -	OCTEP_PFVF_MBOX_CMD_LAST,
+> +	OCTEP_PFVF_MBOX_CMD_MAX,
+>   };
+This change is unrelative with
+this enum is introduced in the first patch, why not directly rename it 
+in the first one?
+
+>   
+>   enum octep_pfvf_mbox_word_type {
+> @@ -79,7 +83,6 @@ enum octep_pfvf_link_autoneg {
+>   
+>   #define OCTEP_PFVF_MBOX_TIMEOUT_MS     500
+>   #define OCTEP_PFVF_MBOX_MAX_RETRIES    2
+> -#define OCTEP_PFVF_MBOX_VERSION        0
+Similar here,  you introduce it in first patch, and no place used, then 
+remove it int the second one.
+Maybe you can reorganize this patchset ?
+
+>   #define OCTEP_PFVF_MBOX_MAX_DATA_SIZE  6
+>   #define OCTEP_PFVF_MBOX_MORE_FRAG_FLAG 1
+>   #define OCTEP_PFVF_MBOX_WRITE_WAIT_TIME msecs_to_jiffies(1)
+
 
