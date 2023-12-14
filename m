@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-57239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 491738127EC
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 07:27:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B57CD812839
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 07:34:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 179C9B21078
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 06:27:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72D392825F0
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 06:34:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B7AD260;
-	Thu, 14 Dec 2023 06:27:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC6DD274;
+	Thu, 14 Dec 2023 06:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OLfCLKMV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VlJb41ft"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AD4A610B;
-	Thu, 14 Dec 2023 06:27:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 262DDC433C8;
-	Thu, 14 Dec 2023 06:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B316A21;
+	Thu, 14 Dec 2023 06:34:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C84CCC433C8;
+	Thu, 14 Dec 2023 06:34:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702535264;
-	bh=jCIF91qtDA+ZEemkBo11x9McQ7w6uFe00P7r8p+aNPc=;
+	s=k20201202; t=1702535686;
+	bh=1KvqRRdnwqEvmlU+FTtgALcCS9FN2+H6/ZpytPxQYp8=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=OLfCLKMVmfm4FvlW6f9rzDdFrIJXc9NVwo8lyjxEmGPCLKMB+q5s5r8p04kk5BMJM
-	 N5inpFK7IRJjGnWpMJx5ekByzFuldxl12CU/nxmV3pDAzTKssl7WNNNp9+kJ4YDXNt
-	 zi7UWJW6klo9/1YSSrL31LbUcOqA46d7whIOxM0PvDpa5WH5162jXd9OFTDCe4GNJD
-	 1aaYbKJjaUVKgc2oP4/Uw9s9+5BLEKn4p1ODIv2MweI08wA5yzyLPMJI734I8L1QrQ
-	 +4YBCzIRwhns3lqdHyWUK26IabO7QJ0Rglu4Vj1ppOyVL8X8iPcdNvdNAn6Avzc2GK
-	 DCd4l/otJcPnw==
-Message-ID: <ecf4ec04-4ed6-483c-8ffe-1fc319ee6aa4@kernel.org>
-Date: Wed, 13 Dec 2023 22:27:40 -0800
+	b=VlJb41ftGhuFO+GxwcbjBxwGRGB2zf1smUTBpPP4JBA21Ox58C2c4TJJyLD2oij5K
+	 mhW89hPQm8fkU3MEjAcZ53HkyHmCdWYJQhc/LAI1IGQAIuilBVJ6gO00dm42gKkRK9
+	 T7P/gPUcj7Y3pkkaSoG3q/lhkVoLzh1sDJjSvR7LrXNUBxF8Ep4GagCnjp4YRTCjIl
+	 f5haY1z8EdeGAaTNu6Xej1GiLHDG9EFd/kM3doSgDZS1KbY6yxPLrJSkvhiuYkdYYK
+	 /q7BhYSEXQSWZIKGts3JsXifLENy7qPEzo+qd1/2oy0Lu4OzsIrqNxAnpvL2KkQUpK
+	 iDg8FMq/DWfPw==
+Message-ID: <80e14311-61ba-4dda-93bb-991ad4b779df@kernel.org>
+Date: Wed, 13 Dec 2023 22:34:43 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,8 +41,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v1 1/4] vsock/virtio: use skb_frag_page()
- helper
+Subject: Re: [RFC PATCH net-next v1 2/4] net: introduce abstraction for
+ network memory
 Content-Language: en-US
 To: Mina Almasry <almasrymina@google.com>, linux-kernel@vger.kernel.org,
  netdev@vger.kernel.org, bpf@vger.kernel.org
@@ -107,28 +107,57 @@ Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
  Yunsheng Lin <linyunsheng@huawei.com>,
  Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 References: <20231214020530.2267499-1-almasrymina@google.com>
- <20231214020530.2267499-2-almasrymina@google.com>
+ <20231214020530.2267499-3-almasrymina@google.com>
 From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20231214020530.2267499-2-almasrymina@google.com>
+In-Reply-To: <20231214020530.2267499-3-almasrymina@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 12/13/23 7:05 PM, Mina Almasry wrote:
-> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> index af5bab1acee1..bd0b413dfa3f 100644
-> --- a/net/vmw_vsock/virtio_transport.c
-> +++ b/net/vmw_vsock/virtio_transport.c
-> @@ -153,7 +153,7 @@ virtio_transport_send_pkt_work(struct work_struct *work)
->  				 * 'virt_to_phys()' later to fill the buffer descriptor.
->  				 * We don't touch memory at "virtual" address of this page.
->  				 */
-> -				va = page_to_virt(skb_frag->bv_page);
-> +				va = page_to_virt(skb_frag_page(skb_frag));
->  				sg_init_one(sgs[out_sg],
->  					    va + skb_frag->bv_offset,
+> diff --git a/include/net/netmem.h b/include/net/netmem.h
+> new file mode 100644
+> index 000000000000..e4309242d8be
+> --- /dev/null
+> +++ b/include/net/netmem.h
+> @@ -0,0 +1,35 @@
+> +/* SPDX-License-Identifier: GPL-2.0
+> + *
+> + * netmem.h
+> + *	Author:	Mina Almasry <almasrymina@google.com>
+> + *	Copyright (C) 2023 Google LLC
+> + */
+> +
+> +#ifndef _NET_NETMEM_H
+> +#define _NET_NETMEM_H
+> +
+> +struct netmem {
+> +	union {
+> +		struct page page;
+> +
+> +		/* Stub to prevent compiler implicitly converting from page*
+> +		 * to netmem_t* and vice versa.
+> +		 *
+> +		 * Other memory type(s) net stack would like to support
+> +		 * can be added to this union.
+> +		 */
+> +		void *addr;
+> +	};
+> +};
+> +
+> +static inline struct page *netmem_to_page(struct netmem *netmem)
+> +{
+> +	return &netmem->page;
+> +}
+> +
+> +static inline struct netmem *page_to_netmem(struct page *page)
+> +{
+> +	return (struct netmem *)page;
 
-offset should not be open coded either.
+container_of; no typecasts.
 
->  					    skb_frag->bv_len);
+
+> +}
+> +
+> +#endif /* _NET_NETMEM_H */
 
 
