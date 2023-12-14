@@ -1,233 +1,118 @@
-Return-Path: <netdev+bounces-57564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07FA08136A5
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 17:46:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12D2D8136B4
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 17:49:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B48F1F22133
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:46:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 959192811BA
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:49:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCDAA60BB9;
-	Thu, 14 Dec 2023 16:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C264460BB2;
+	Thu, 14 Dec 2023 16:49:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="b1PZSONA"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ykNWUMcT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0536112;
-	Thu, 14 Dec 2023 08:46:14 -0800 (PST)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BEFFfMN028410;
-	Thu, 14 Dec 2023 08:46:00 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	pfpt0220; bh=77RVZ2pQEuJiIgnQ10J5215bqYx8vDdSeXsSEqsaZQs=; b=b1P
-	ZSONAnIYeCjr/FOQQD6zvXhsOtVgiCh3oWkjbMK+QnGDOC/EikvWI0qyF42smPMo
-	xshspRw+eNcc7m7hrRPhfo3Ipp1xfdwucqVbj0aGoz9L5ISFhEd1AhiCglrwlxwp
-	5z75XCcF0/40PLPaGdmVwZK+U2GFBIX6ozhloKT3BCBvjs7hOsAN5PHWr6irRIq8
-	ejokvRtEVH5Uz0CjMesw/sHnGrtHQxT/wZd79BMbW76Ge3AOGWS/8/nWyD+nif3u
-	7RW1UWc+vjvlcWRNX96RTyBB/kww3fmaq/JPtiGKD7jWyuzlCl2Y2Ebz281Jz1pA
-	cXAez5OGmsbW7RJffHw==
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3uyy0m9fy9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Thu, 14 Dec 2023 08:46:00 -0800 (PST)
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 14 Dec
- 2023 08:45:58 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Thu, 14 Dec 2023 08:45:58 -0800
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id 6E4623F708A;
-	Thu, 14 Dec 2023 08:45:58 -0800 (PST)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
-        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
-        <kheib@redhat.com>, <konguyen@redhat.com>, <shenijian15@huawei.com>,
-        "Shinas
- Rasheed" <srasheed@marvell.com>,
-        Veerasenareddy Burru <vburru@marvell.com>,
-        Sathesh Edara <sedara@marvell.com>, Eric Dumazet <edumazet@google.com>
-Subject: [PATCH net-next v5 4/4] octeon_ep: support firmware notifications for VFs
-Date: Thu, 14 Dec 2023 08:45:36 -0800
-Message-ID: <20231214164536.2670006-5-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231214164536.2670006-1-srasheed@marvell.com>
-References: <20231214164536.2670006-1-srasheed@marvell.com>
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DA5F8E;
+	Thu, 14 Dec 2023 08:49:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=jpEgcy8NN3HTStEB0Wx38X+kWFgy54/SSxE7weirF/E=; b=ykNWUMcT36CU8ETNnUBdAfU5Di
+	DdbbhgKydxhHANMjCciNJr98L8meROJk0TARR4eSpvc0QjNauXChKS9k/5RgLtTgmReaGbOzh/gQs
+	UB+HHTwT2uI5MnX919RNy3rtpS0rtfqnAU1OWGoy4D+JdqYWp4AFF+7z3jiTAXaCa8/IkY2WaZ5Kv
+	9a/3mNXm+y5GwXuFJVgTJvqJmi/S+p9PB0YwIa2mPnjLD5rdHkQB9TLOJAeT5d9m5Vqzk6aLmANKh
+	ANoL90HggfZf6QWBokdy6F/zsFD5mNiv6PdbmO9yG96k/zN3kwqFVaMdCwIvB5vFjK2kGNmGWOoEY
+	Ew0OAhsA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49794)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rDotX-0001hF-1F;
+	Thu, 14 Dec 2023 16:49:07 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rDotX-0002h8-FN; Thu, 14 Dec 2023 16:49:07 +0000
+Date: Thu, 14 Dec 2023 16:49:07 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Wei Fang <wei.fang@nxp.com>,
+	Marek Vasut <marex@denx.de>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	kernel@pengutronix.de, linux-clk@vger.kernel.org,
+	Stephen Boyd <sboyd@kernel.org>,
+	Michael Turquette <mturquette@baylibre.com>
+Subject: Re: [PATCH] net: phy: at803x: Improve hibernation support on start up
+Message-ID: <ZXsyA+2USrmIaF3u@shell.armlinux.org.uk>
+References: <20230804175842.209537-1-marex@denx.de>
+ <AM5PR04MB3139793206F9101A552FADA0880DA@AM5PR04MB3139.eurprd04.prod.outlook.com>
+ <45b1ee70-8330-0b18-2de1-c94ddd35d817@denx.de>
+ <AM5PR04MB31392C770BA3101BDFBA80318812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+ <20230809043626.GG5736@pengutronix.de>
+ <AM5PR04MB3139D8C0EBC9D2DFB0C778348812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+ <20230809060836.GA13300@pengutronix.de>
+ <ZNNRxY4z7HroDurv@shell.armlinux.org.uk>
+ <ZNS8LEiuwsv660EC@shell.armlinux.org.uk>
+ <7aabc198-9df5-5bce-2968-90d4cda3c244@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: UW04w0R5lqrvggGlezbjiPrERPl8r7eK
-X-Proofpoint-ORIG-GUID: UW04w0R5lqrvggGlezbjiPrERPl8r7eK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7aabc198-9df5-5bce-2968-90d4cda3c244@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Notifications from firmware to vf has to pass through PF
-control mbox and via PF-VF mailboxes. The notifications have to
-be parsed out from the control mbox and passed to the
-PF-VF mailbox in order to reach the corresponding VF.
-Version compatibility should also be checked before messages
-are passed to the mailboxes.
+On Thu, Dec 14, 2023 at 09:13:58AM +0100, Romain Gantois wrote:
+> Hello Russell,
+> 
+> I've implemented and tested the general-case solution you proposed to this 
+> receive clock issue with stmmac drivers. The core of your suggestion is pretty 
+> much unchanged, I just added a phylink_pcs flag for standalone PCS drivers that 
+> also need to provide the receive clock.
 
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
-V5:
-  - No changes
+So this affects the ability of PCS to operate correctly as well as MACs?
+Would you enlighten which PCS are affected, and what PCS <--> PHY link
+modes this is required for?
 
-V4: https://lore.kernel.org/all/20231213035816.2656851-5-srasheed@marvell.com/
-  - No changes
+> I'd like to send a series for this upstream, which would allow solving this 
+> issue for both the DWMAC RZN1 case and the AT803x PHY suspend/hibernate case 
+> (and also potentially other cases with a similar bug).
+> 
+> I wanted to ask you how you would prefer to be credited in my patch series. I 
+> was considering putting you as author and first signer of the initial patch 
+> adding the phy_dev flag. Would that be okay or would you prefer something else?
 
-V3: https://lore.kernel.org/all/20231211063355.2630028-5-srasheed@marvell.com/
-  - No changes
+It depends how big the changes are from my patches. If more than 50% of
+the patch remains my work, please retain my authorship. If you wish to
+also indicate your authorship, then there is a mechanism to do that -
+Co-developed-by: from submitting-patches.rst:
 
-V2: https://lore.kernel.org/all/20231209081450.2613561-5-srasheed@marvell.com/
-  - No changes
+Co-developed-by: states that the patch was co-created by multiple
+developers; it is used to give attribution to co-authors (in addition
+to the author attributed by the From: tag) when several people work on
+a single patch. Since Co-developed-by: denotes authorship, every
+Co-developed-by: must be immediately followed by a Signed-off-by: of
+the associated co-author.
 
-V1: https://lore.kernel.org/all/20231208070352.2606192-5-srasheed@marvell.com/
+See submitting-patches.rst for examples of the ordering of the
+attributations.
 
- .../marvell/octeon_ep/octep_ctrl_net.c        |  6 ++
- .../marvell/octeon_ep/octep_pfvf_mbox.c       | 58 +++++++++++++++++++
- .../marvell/octeon_ep/octep_pfvf_mbox.h       |  2 +
- 3 files changed, 66 insertions(+)
+Thanks for asking.
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-index 9dff2166dbb7..01b7be154c38 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-@@ -13,6 +13,7 @@
- #include "octep_config.h"
- #include "octep_main.h"
- #include "octep_ctrl_net.h"
-+#include "octep_pfvf_mbox.h"
- 
- /* Control plane version */
- #define OCTEP_CP_VERSION_CURRENT	OCTEP_CP_VERSION(1, 0, 0)
-@@ -329,6 +330,11 @@ static int process_mbox_notify(struct octep_device *oct,
- 	    octep_ctrl_net_f2h_cmd_versions[cmd] < OCTEP_CP_VERSION_CURRENT)
- 		return -EOPNOTSUPP;
- 
-+	if (msg->hdr.s.is_vf) {
-+		octep_pfvf_notify(oct, msg);
-+		return 0;
-+	}
-+
- 	switch (cmd) {
- 	case OCTEP_CTRL_NET_F2H_CMD_LINK_STATUS:
- 		if (netif_running(netdev)) {
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
-index dbb5b8f4ef30..2e2c3be8a0b4 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
-@@ -21,6 +21,15 @@
- #include "octep_pfvf_mbox.h"
- #include "octep_ctrl_net.h"
- 
-+/* When a new command is implemented, the below table should be updated
-+ * with new command and it's version info.
-+ */
-+static u32 pfvf_cmd_versions[OCTEP_PFVF_MBOX_CMD_MAX] = {
-+	[0 ... OCTEP_PFVF_MBOX_CMD_DEV_REMOVE] = OCTEP_PFVF_MBOX_VERSION_V1,
-+	[OCTEP_PFVF_MBOX_CMD_GET_FW_INFO ... OCTEP_PFVF_MBOX_NOTIF_LINK_STATUS] =
-+		OCTEP_PFVF_MBOX_VERSION_V2
-+};
-+
- static void octep_pfvf_validate_version(struct octep_device *oct,  u32 vf_id,
- 					union octep_pfvf_mbox_word cmd,
- 					union octep_pfvf_mbox_word *rsp)
-@@ -87,6 +96,34 @@ static void octep_pfvf_set_rx_state(struct octep_device *oct, u32 vf_id,
- 	rsp->s_link_state.type = OCTEP_PFVF_MBOX_TYPE_RSP_ACK;
- }
- 
-+static int octep_send_notification(struct octep_device *oct, u32 vf_id,
-+				   union octep_pfvf_mbox_word cmd)
-+{
-+	u32 max_rings_per_vf, vf_mbox_queue;
-+	struct octep_mbox *mbox;
-+
-+	/* check if VF PF Mailbox is compatible for this notification */
-+	if (pfvf_cmd_versions[cmd.s.opcode] > oct->vf_info[vf_id].mbox_version) {
-+		dev_dbg(&oct->pdev->dev, "VF Mbox doesn't support Notification:%d on VF ver:%d\n",
-+			cmd.s.opcode, oct->vf_info[vf_id].mbox_version);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	max_rings_per_vf = CFG_GET_MAX_RPVF(oct->conf);
-+	vf_mbox_queue = vf_id * max_rings_per_vf;
-+	if (!oct->mbox[vf_mbox_queue]) {
-+		dev_err(&oct->pdev->dev, "Notif obtained for bad mbox vf %d\n", vf_id);
-+		return -EINVAL;
-+	}
-+	mbox = oct->mbox[vf_mbox_queue];
-+
-+	mutex_lock(&mbox->lock);
-+	writeq(cmd.u64, mbox->pf_vf_data_reg);
-+	mutex_unlock(&mbox->lock);
-+
-+	return 0;
-+}
-+
- static void octep_pfvf_set_mtu(struct octep_device *oct, u32 vf_id,
- 			       union octep_pfvf_mbox_word cmd,
- 			       union octep_pfvf_mbox_word *rsp)
-@@ -326,6 +363,27 @@ static void octep_pfvf_pf_get_data(struct octep_device *oct,
- 	}
- }
- 
-+void octep_pfvf_notify(struct octep_device *oct, struct octep_ctrl_mbox_msg *msg)
-+{
-+	union octep_pfvf_mbox_word notif = { 0 };
-+	struct octep_ctrl_net_f2h_req *req;
-+
-+	req = (struct octep_ctrl_net_f2h_req *)msg->sg_list[0].msg;
-+	switch (req->hdr.s.cmd) {
-+	case OCTEP_CTRL_NET_F2H_CMD_LINK_STATUS:
-+		notif.s_link_status.opcode = OCTEP_PFVF_MBOX_NOTIF_LINK_STATUS;
-+		notif.s_link_status.status = req->link.state;
-+		break;
-+	default:
-+		pr_info("Unknown mbox notif for vf: %u\n",
-+			req->hdr.s.cmd);
-+		return;
-+	}
-+
-+	notif.s.type = OCTEP_PFVF_MBOX_TYPE_CMD;
-+	octep_send_notification(oct, msg->hdr.s.vf_idx, notif);
-+}
-+
- void octep_pfvf_mbox_work(struct work_struct *work)
- {
- 	struct octep_pfvf_mbox_wk *wk = container_of(work, struct octep_pfvf_mbox_wk, work);
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h
-index c18a9f26fc31..0dc6eead292a 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h
-@@ -37,6 +37,7 @@ enum octep_pfvf_mbox_opcode {
- 	OCTEP_PFVF_MBOX_CMD_DEV_REMOVE,
- 	OCTEP_PFVF_MBOX_CMD_GET_FW_INFO,
- 	OCTEP_PFVF_MBOX_CMD_SET_OFFLOADS,
-+	OCTEP_PFVF_MBOX_NOTIF_LINK_STATUS,
- 	OCTEP_PFVF_MBOX_CMD_MAX,
- };
- 
-@@ -162,4 +163,5 @@ union octep_pfvf_mbox_word {
- void octep_pfvf_mbox_work(struct work_struct *work);
- int octep_setup_pfvf_mbox(struct octep_device *oct);
- void octep_delete_pfvf_mbox(struct octep_device *oct);
-+void octep_pfvf_notify(struct octep_device *oct, struct octep_ctrl_mbox_msg *msg);
- #endif
 -- 
-2.25.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
