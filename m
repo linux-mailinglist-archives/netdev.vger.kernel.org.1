@@ -1,162 +1,172 @@
-Return-Path: <netdev+bounces-57279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FB65812BC2
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 10:33:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFB20812BC9
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 10:37:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19A811F214A1
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 09:33:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00ED1282205
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 09:37:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 084DF2E85C;
-	Thu, 14 Dec 2023 09:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264A62E85C;
+	Thu, 14 Dec 2023 09:37:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b="bp1tL1Kw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XdqOKmAL"
 X-Original-To: netdev@vger.kernel.org
-Received: from JPN01-TYC-obe.outbound.protection.outlook.com (mail-tycjpn01on2091.outbound.protection.outlook.com [40.107.114.91])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3BC098;
-	Thu, 14 Dec 2023 01:33:41 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VUbJV8EKnRIPHGR80r84Wtz/rto0pGGB1Kf+eWLv96Gs/YXDL3JLOasJV1AaLBl7rMfvf9tHYeXzD10XDtgvGIZbC3oYBKSQdi8/fhWyNnqFGqA1Tn1393RtDdm1pBWpbrWC4olfXftnbjJ7CG9XfHqWZThljr7oV3y9+AeWB6LU4YDHpYfyrY/CKBLPhk6TNnnNoTtAOXyGz0VZCzs5WjjzzWwniz/b8KiD9uOEhlqYywlYTjphSICrKgaTL68AnAOaiMZelJ5wroi57LHnnRWmwXaBZoodM0eYGCaY0DmLasQTsLXoNqN4O44uUZQVgJOGpOGkKWtfaIMlicH+Ww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=byGBdeTi2glpjPTgW22aB/fldZO23VcBG0KzXN9F4qY=;
- b=OQ4QMoWGGpCphrlixhumF63LxyCAVsUQuhFIr0/svZRCGvzk3KCH2m9nxJEKOzmUUWhbyLfDHuI6PbTv8azIL+82JE+ss+iaCsoTN0hMFdeN7t5Dcx/WE3zP1QwfUK8B5QpZxGTA1yFRD6hsAK/Y2mvS9U0ZR0I6nM+kvflCyIFTIIbsTZ6R7/kX3RcHCxlyYAHp247Seu0IUZxEx6+9iqHtcvWe7jHdEOVXZ667Ptx5Li4xsXmvrl+wZiUxsFDA2WHgX5/RdspyuEK1FRpS92A/YqeAecbimWUshfZzPTHONdsSUmfLAESUA1CpQ01NI5PeB4q2J7AeJpoYo9qsyg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bp.renesas.com; dmarc=pass action=none
- header.from=bp.renesas.com; dkim=pass header.d=bp.renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bp.renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=byGBdeTi2glpjPTgW22aB/fldZO23VcBG0KzXN9F4qY=;
- b=bp1tL1Kwk1DSMDQB5/d3idOnUH/5gFi+FPt9O835io9snoJyyJ8oPoT35k7Q+0TKJepjD1YxOJMsCGjcIaPuTbDZj1DtPB697pWNHChxEnToZ9a3L9GqB4g/ausOLubkX1SR70xqi56x8Wp3i54KiDPu7TxQG8WvgAlSuba1S5M=
-Received: from TYCPR01MB11269.jpnprd01.prod.outlook.com
- (2603:1096:400:3c0::10) by TYWPR01MB9869.jpnprd01.prod.outlook.com
- (2603:1096:400:235::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.8; Thu, 14 Dec
- 2023 09:33:38 +0000
-Received: from TYCPR01MB11269.jpnprd01.prod.outlook.com
- ([fe80::f216:24ab:3668:3a48]) by TYCPR01MB11269.jpnprd01.prod.outlook.com
- ([fe80::f216:24ab:3668:3a48%4]) with mapi id 15.20.7113.008; Thu, 14 Dec 2023
- 09:33:38 +0000
-From: Biju Das <biju.das.jz@bp.renesas.com>
-To: "Berg, Johannes" <johannes.berg@intel.com>, "naresh.kamboju@linaro.org"
-	<naresh.kamboju@linaro.org>, "linux-wireless@vger.kernel.org"
-	<linux-wireless@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>
-CC: "arnd@arndb.de" <arnd@arndb.de>, "Berg, Benjamin"
-	<benjamin.berg@intel.com>, "dan.carpenter@linaro.org"
-	<dan.carpenter@linaro.org>, "davem@davemloft.net" <davem@davemloft.net>,
-	"lkft-triage@lists.linaro.org" <lkft-triage@lists.linaro.org>, "Korenblit,
- Miriam Rachel" <miriam.rachel.korenblit@intel.com>,
-	"regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: Re: next: arm64: gcc-8-defconfig - failed -
- net/wireless/shipped-certs.c:92:1: error: expected '}' before numeric
- constant
-Thread-Topic: Re: next: arm64: gcc-8-defconfig - failed -
- net/wireless/shipped-certs.c:92:1: error: expected '}' before numeric
- constant
-Thread-Index: Adot078PtDDEl6shQJysZ7bF7F4DCQAm7U9AAAAwzQAAABMMkA==
-Date: Thu, 14 Dec 2023 09:33:38 +0000
-Message-ID:
- <TYCPR01MB112699830AA2FC0A8348D9818868CA@TYCPR01MB11269.jpnprd01.prod.outlook.com>
-References:
- <TYCPR01MB11269DD29E89EF09A4B053C1C868DA@TYCPR01MB11269.jpnprd01.prod.outlook.com>
- <TYCPR01MB11269A0200358724E126E7ECD868CA@TYCPR01MB11269.jpnprd01.prod.outlook.com>
- <DM4PR11MB53594DB860C5FA1539FDC570E98CA@DM4PR11MB5359.namprd11.prod.outlook.com>
-In-Reply-To:
- <DM4PR11MB53594DB860C5FA1539FDC570E98CA@DM4PR11MB5359.namprd11.prod.outlook.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=bp.renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TYCPR01MB11269:EE_|TYWPR01MB9869:EE_
-x-ms-office365-filtering-correlation-id: eb007071-c51d-49f9-bf93-08dbfc87c0b9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- qAftoWTJ9RM6/O8BhCEtF5u+oPu0jz+ygO3Rf4XfHdxcyYb2RaB0z97xMBvg6Xl78y1j52Aez6Ak745ryilYGfehxfI3jxYgX+iPYcEquL0acJekgSmTPcFaT/YzFImninF7rxCt1TWT/oPdLJ2V6xocx4IHqX8QOWcKnOJbB/98wHOLXNLYv7tFR09Ak3NNBYw2JZ9qYcXANFlrkXHT54HzK7OhqWq6JKn/wryjPFxwYXGDYFliRgBv0pMNYNgPtx6qTwnpzpNSF3su7GKARgVkUOf+fQzyRsuWDm14bv3taWXmDGlPCRE3jtuBBv5HUzEXqIwOP0RyzktEufJdc/dRoHcQrJ1AYr4vJ5Y0tB8y8kQpTzE3rKTL+RfQkhZI4kLVn5MpzGr+73XVUnQpH3ZUeavDvZw2EhQVmKpIxa7lZ59RNrfq55UyQBWpKJm7hOjVi9JkAZDcPqTBwytVvmoT6akCuBjtZ/zcznjPQqIx97OXz5HDsulZ+af0QmgeDqbPZQj0vwgJxATNNQHZ/LHBr/1XAdR2T5x6cMo9gNYdkhYjjOMxLoaZg3ZIpfEUD1UHPJUvUxYdlS8pwSgH8tDZE4mRmZeEQYh4yYLZj1IiBobAbOAwSiAOs7GHckMe
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYCPR01MB11269.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(39860400002)(366004)(346002)(376002)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(38070700009)(41300700001)(122000001)(4744005)(7416002)(5660300002)(33656002)(2906002)(53546011)(6506007)(83380400001)(71200400001)(7696005)(9686003)(478600001)(66476007)(26005)(8936002)(8676002)(4326008)(110136005)(316002)(64756008)(76116006)(54906003)(55016003)(66946007)(66446008)(66556008)(86362001)(52536014)(38100700002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?SUVaNDhObEg5TjkwQ3l2MURub3J2SmI1dzFvb2FWUUc4MkFBS3NrYzA2K0JY?=
- =?utf-8?B?VjZJa1ppanZXRHg3WVR0eTA0S2lCazBQUzBaclhRUW01c0VxcnNVZ1V6QW1i?=
- =?utf-8?B?SU5idC9ERllBZjZDTFJZL1ZWbHMrQTFBK1M3SEowWkIzRGtkWTI5WDFySDNu?=
- =?utf-8?B?MlNra0krREdNUjZzV0txMUk3cVhQdTNtbFdzckRwWk9GM2I4TDFBRFJRa2do?=
- =?utf-8?B?bDNEazB2cWdHM290cU5vTFB0UE9rMXpJR2UweFFWVmVNcDkzMGlFdGR2bEcv?=
- =?utf-8?B?YS9ESWVyTzZBUm8zbDFzZ2ZreU8zS0pOb3djVGRDYzRFR0tCYnVQRjJ6NS94?=
- =?utf-8?B?SnpZMG5waWtSc2xpK2E0Vk5TWFd5SENoZGRtRDMzODZYQ0FNelVVc3NTNHJF?=
- =?utf-8?B?T1NwZlNZdUZpNlE1Zzk4YTh5azgvb2todVNxcXA2d1k4NHgwc21wVW5GUUhL?=
- =?utf-8?B?MHlMdHlZTjIwdFNabFdXUnNPTGFlS0hIVk12cFhDZDh1S2d6SEg5b0NHVEZ4?=
- =?utf-8?B?MzZ2L1NwRlRpM0hGZWJ6QkN4OUxzc3IvYklEQWppaTBzbDl0dUxMYkVVL01J?=
- =?utf-8?B?ZDVBTjgvMGcvbFhwcGJ4dEsyZ1A0bWtGalI4Mm5sQzlKZ0kyTkkxcjN2VUFZ?=
- =?utf-8?B?YkN1TXRwK1Z2a1c2V09ZY1JHWXZuaU5qWFE5ZEFmM1dZNlpscDRweWVJOUVi?=
- =?utf-8?B?MlhhRTlob1puOGF1RDcxRi91enFyRDhVQndQcDEzWWNUT1J1QldmWG1BOENK?=
- =?utf-8?B?MW15WWgxT3RkYU9aK3VCTWt5ZGRJb3lQM1hrb296N2Yyd2lFRElHb0tHRkow?=
- =?utf-8?B?K25yL0s3eUVNaW5YMmVEN0phTEsxMUhSSEU1M1M3YTMrSVo1Z1haYlZTSXFa?=
- =?utf-8?B?MlBCOFJVUFlROFpOVFdGTEg5VjRya3dCTVhMTEdWd3FzNUVIc3owYW1IVE9T?=
- =?utf-8?B?d041bk5UcXdEOGp0ZUhpWHdXSllGazVNdjVITDZsODJPb1hHUzdPMVkrbm13?=
- =?utf-8?B?ZFJnWlppbXhvRG9sc2lhTnIvUE1XSjhsY256Q29lMnFmZGd5QTIzb29Zejkz?=
- =?utf-8?B?QUZnclRuYzEzdkxRR3kyWkdtMXNGSlhmeEJtZjBuQ2N3MG5EdlJJeWxST1ow?=
- =?utf-8?B?RGZ2TEUrTzhvYjlrVXBMdjNNaXB4MmlqMTZyT0N6YzkwUEdiUWoyL1Boa0JT?=
- =?utf-8?B?cEpLL28zaU0xQkx1bEJrWC9PK093YW10OExVelJjeGpvaFRsSnpqS2V2MWUx?=
- =?utf-8?B?d3ArbUY0ZlI5R3pGb3c5WTlXVmpKSWNaOENuM1NwaWNGejVVeVQrNUJ6R2dZ?=
- =?utf-8?B?U0tIUlhjaXFBbWR4OU9GYzNUMGtLREJKeGZ2aUZLZS9zdEM1T092eDAvNCt3?=
- =?utf-8?B?T2g2SFUySlp6dDJYT3dlZ3M5RWQyb1lmSW9PQ2gxRWxDaVNiV1Z6NHpkZy9p?=
- =?utf-8?B?ZWxESkY4cmVRenJnOWRwS295K2txcHczbGIyZVIyRDRlSnNVQnZFeWxZUmQz?=
- =?utf-8?B?Z2RWV0syOXRMSnk4eTFFY0pJckwyQllFN1AySW5FV2dqNUFaRGNveisrUVpU?=
- =?utf-8?B?UHZZdFUwSnpTZ2hudU5LL3QvbEVtcUdWTHhacjFHekUvaythUkxwUjB2cjFC?=
- =?utf-8?B?L2JQVTJESGlrWnpubGkyZXVSTzJWZ2xXdXUrQ0VLYkRYOTBRaXVnWkZkZzBn?=
- =?utf-8?B?VndxOHB4ZlJ5R0dZcUlrUHRmeDdpY2JkQk9Ga3JkVjN1OHNyODUxRkJLNUJS?=
- =?utf-8?B?ODhhVFBEU1Z6bUNDR2dJTkxhM3lhNVdZOVNTRCt3SGxQd1VnVUtoSXVwSFBN?=
- =?utf-8?B?NWM4M1hVMEozL1pXdC9NVTByVWhGV29hWTllemlPd1VCb3lSeDNmcVhJNFZq?=
- =?utf-8?B?dTN5Y0xjc0x6OWh4YThPcUc1K3RFeTRDZVVMY2Z0Q0d6YnN0OVcxbkVFeTNi?=
- =?utf-8?B?T0ZQYWhmTlhPMlJZSUpJM1d4eHkvTDdFL25nTXR1QThMeEFDNGQzV3NRRXFt?=
- =?utf-8?B?U1lHZzFXeVgva201cUgwTng3Q2FUaERrSlVZck5MdlhOZ3dxY2VRMW9qY0JS?=
- =?utf-8?B?LzAwVTAxb0R5VldIVGZQaGNlRml3b1Z1Z1hyM212ekI1NkthL04wMlo0a1U0?=
- =?utf-8?B?NGVkekR2MG1aZU9UclIrY2ZpWkg1RU0rL2ZDSnllMWQwckcvV1FnZVlnbmdO?=
- =?utf-8?B?Rmc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDA1CE0
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 01:37:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702546627;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=f1H0kKT3jccLGmQFqwXGxIScaEIaGvkzHt/VCZv3TM0=;
+	b=XdqOKmALHQtLQT+cH4zHXrMZhrIrz/V60n5s+drzZhEplpyHMmNg3bD1F+95dM67aQYspU
+	QiTj0t5hTvjOZB0N5zW7vMvV+b2cE6SxJgfI4AA9KMmQZMtdiydUMNehqKBSs/HGr214lJ
+	N7qU2Mebqj4/H6okSfDZXOivb7fV6K0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-492-k-dQEwXlNS-wPcIygEYWjQ-1; Thu, 14 Dec 2023 04:37:05 -0500
+X-MC-Unique: k-dQEwXlNS-wPcIygEYWjQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40c5cf93e09so3595315e9.0
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 01:37:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702546624; x=1703151424;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=f1H0kKT3jccLGmQFqwXGxIScaEIaGvkzHt/VCZv3TM0=;
+        b=Kc6nsQFLH0MmoIBMH9ZZuxKAdNE6liFuZv8KT+3iGi002G2SF/8KwnZfZj3H8CuZGA
+         pagKpJefUT0RkLEokeCTTnXUN8X7HUJMNhwdMF+rBq0PC7cJxSsPxfoRwNokrJcdrapg
+         clsB4tbwdupeLNLzbWF+vaxicUIzia0nS83a7XbyBEdi2AHYoAFvm5ACmH5/EE9D6pEq
+         MsVHmYJqgP1XdlIP08T5ZajLcHsoMYYVwUIBZbZO2xgzLBlmAPSrJlvvSgP4aepaA9Bf
+         9bIq5pNsVC20WKMet8wToUs//JMAmUjIpFHdsArBRboHQKfKTNhHRB7U9GdTSOO6PtI5
+         BP7g==
+X-Gm-Message-State: AOJu0YywMPpe3Us59G/zGr7q+t0rOJ7lbZ6jObWv6orfogn9Hws1iC8Z
+	yWxpAmDl7ldgWP3V1sREOqOlxzjhybtwit/cEzFV7zNZHaL/juFAm4K3EKxR7W/M2YU+mobDBUB
+	LFrF35zzmipfCE7cP
+X-Received: by 2002:a5d:4991:0:b0:336:433e:2d38 with SMTP id r17-20020a5d4991000000b00336433e2d38mr1460228wrq.0.1702546623938;
+        Thu, 14 Dec 2023 01:37:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHzyUbq7Bs08VK6v9WSJtUEjarcwjd/7U9eu/zKNhixM3p+8B3mMJuIb308x6YGN29q0w+MlQ==
+X-Received: by 2002:a5d:4991:0:b0:336:433e:2d38 with SMTP id r17-20020a5d4991000000b00336433e2d38mr1460212wrq.0.1702546623588;
+        Thu, 14 Dec 2023 01:37:03 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-252-36.dyn.eolo.it. [146.241.252.36])
+        by smtp.gmail.com with ESMTPSA id c4-20020adffb44000000b003362d0eefd3sm6117475wrs.20.2023.12.14.01.37.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Dec 2023 01:37:03 -0800 (PST)
+Message-ID: <ebf480701cd22da00c89c5b1b00d31be95ff8e4d.camel@redhat.com>
+Subject: Re: [PATCH] net: sysctl: fix edge case wrt. sysctl write access
+From: Paolo Abeni <pabeni@redhat.com>
+To: Maciej =?UTF-8?Q?=C5=BBenczykowski?= <maze@google.com>, Maciej
+	=?UTF-8?Q?=C5=BBenczykowski?=
+	 <zenczykowski@gmail.com>
+Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>,  "David
+ S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Flavio Crisciani <fcrisciani@google.com>,
+ "Theodore Y. Ts'o" <tytso@google.com>, "Eric W. Biederman"
+ <ebiederm@xmission.com>, Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Date: Thu, 14 Dec 2023 10:37:01 +0100
+In-Reply-To: <20231210111033.1823491-1-maze@google.com>
+References: <20231210111033.1823491-1-maze@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: bp.renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TYCPR01MB11269.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eb007071-c51d-49f9-bf93-08dbfc87c0b9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Dec 2023 09:33:38.7164
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: xMA/dCaejbJYXAnBERtEd1eBI0EeOx1PFHRc1HT83EKOYoQV+R9xqCWfS59NtC4PcUyyx6dB+EUnTXGknH7ZLxasn6ubexr++OAG24fW6pA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYWPR01MB9869
 
-SGkgSm9oYW5uZXMsDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQmVy
-ZywgSm9oYW5uZXMgPGpvaGFubmVzLmJlcmdAaW50ZWwuY29tPg0KPiBTZW50OiBUaHVyc2RheSwg
-RGVjZW1iZXIgMTQsIDIwMjMgOTozMiBBTQ0KPiBTdWJqZWN0OiBSRTogUmU6IG5leHQ6IGFybTY0
-OiBnY2MtOC1kZWZjb25maWcgLSBmYWlsZWQgLQ0KPiBuZXQvd2lyZWxlc3Mvc2hpcHBlZC1jZXJ0
-cy5jOjkyOjE6IGVycm9yOiBleHBlY3RlZCAnfScgYmVmb3JlIG51bWVyaWMNCj4gY29uc3RhbnQN
-Cj4gDQo+ID4NCj4gPiBGWUksIFRoaXMgaXNzdWUgaXMgc2VlbiBvbiB0b2RheSBuZXh0IGFzIHdl
-bGwsIHRoZSBnZW5lcmF0ZWQgY29kZVsyXQ0KPiA+IGlzIG1pc3NpbmcgYSBjb21tYSBsZWFkaW5n
-IHRvIEJ1aWxkIGZhaWx1cmUuIElzIGl0IGEgcmVxdWlyZW1lbnQgdG8NCj4gPiB1c2UgbGF0ZXN0
-IHRvb2xjaGFpbiBmb3IgbGludXgtbmV4dD8NCj4gDQo+IFdlbGwsIG5vIHN1cnByaXNlIHNpbmNl
-IEkgd2FzIG91dCB5ZXN0ZXJkYXnwn5iJDQo+IA0KPiBUaGUgaXNzdWUgaXNuJ3QgdGhlIHRvb2xj
-aGFpbiBvciBhbnl0aGluZyAtIGl0J3MgcmVsYXRlZCB0byB0aGUgb3JkZXJpbmcNCj4gaW4gd2hp
-Y2ggdGhlIHR3byBmaWxlcyBhcmUgcmV0dXJuZWQgd2hlbiBtYWtlIGNoZWNrcyBmb3IgdGhlbS4u
-LiBJJ3ZlDQo+IHB1c2hlZCBhIGZpeC4NCg0KQ29vbC4gVGhhbmtzIGZvciB0aGUgcHVzaGZpeC4N
-Cg0KQ2hlZXJzLA0KQmlqdQ0K
+On Sun, 2023-12-10 at 03:10 -0800, Maciej =C5=BBenczykowski wrote:
+> The clear intent of net_ctl_permissions() is that having CAP_NET_ADMIN
+> grants write access to networking sysctls.
+>=20
+> However, it turns out there is an edge case where this is insufficient:
+> inode_permission() has an additional check on HAS_UNMAPPED_ID(inode)
+> which can return -EACCES and thus block *all* write access.
+>=20
+> Note: AFAICT this check is wrt. the uid/gid mapping that was
+> active at the time the filesystem (ie. proc) was mounted.
+>=20
+> In order for this check to not fail, we need net_ctl_set_ownership()
+> to set valid uid/gid.  It is not immediately clear what value
+> to use, nor what values are guaranteed to work.
+> It does make sense that /proc/sys/net appear to be owned by root
+> from within the netns owning userns.  As such we only modify
+> what happens if the code fails to map uid/gid 0.
+> Currently the code just fails to do anything, which in practice
+> results in using the zeroes of freshly allocated memory,
+> and we thus end up with global root.
+> With this change we instead use the uid/gid of the owning userns.
+> While it is probably (?) theoretically possible for this to *also*
+> be unmapped from the /proc filesystem's point of view, this seems
+> much less likely to happen in practice.
+>=20
+> The old code is observed to fail in a relatively complex setup,
+> within a global root created user namespace with selectively
+> mapped uid/gids (not including global root) and /proc mounted
+> afterwards (so this /proc mount does not have global root mapped).
+> Within this user namespace another non privileged task creates
+> a new user namespace, maps it's own uid/gid (but not uid/gid 0),
+> and then creates a network namespace.  It cannot write to networking
+> sysctls even though it does have CAP_NET_ADMIN.
+
+I'm wondering if this specific scenario should be considered a setup=20
+issue, and should be solved with a different configuration? I would
+love to hear others opinions!
+
+> This is because net_ctl_set_ownership fails to map uid/gid 0
+> (because uid/gid 0 are *not* mapped in the owning 2nd level user_ns),
+> and falls back to global root.
+> But global root is not mapped in the 1st level user_ns,
+> which was inherited by the /proc mount, and thus fails...
+>=20
+> Note: the uid/gid of networking sysctls is of purely superficial
+> importance, outside of this UNMAPPED check, it does not actually
+> affect access, and only affects display.
+>=20
+> Access is always based on whether you are *global* root uid
+> (or have CAP_NET_ADMIN over the netns) for user write access bits
+> (or are in *global* root gid for group write access bits).
+>=20
+> Cc: Flavio Crisciani <fcrisciani@google.com>
+> Cc: "Theodore Y. Ts'o" <tytso@google.com>
+> Cc: "Eric W. Biederman" <ebiederm@xmission.com>
+> Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+> Fixes: e79c6a4fc923 ("net: make net namespace sysctls belong to container=
+'s owner")
+> Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
+> ---
+>  net/sysctl_net.c | 13 ++++---------
+>  1 file changed, 4 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/net/sysctl_net.c b/net/sysctl_net.c
+> index 051ed5f6fc93..ded399f380d9 100644
+> --- a/net/sysctl_net.c
+> +++ b/net/sysctl_net.c
+> @@ -58,16 +58,11 @@ static void net_ctl_set_ownership(struct ctl_table_he=
+ader *head,
+>  				  kuid_t *uid, kgid_t *gid)
+>  {
+>  	struct net *net =3D container_of(head->set, struct net, sysctls);
+> -	kuid_t ns_root_uid;
+> -	kgid_t ns_root_gid;
+> +	kuid_t ns_root_uid =3D make_kuid(net->user_ns, 0);
+> +	kgid_t ns_root_gid =3D make_kgid(net->user_ns, 0);
+> =20
+> -	ns_root_uid =3D make_kuid(net->user_ns, 0);
+
+As a fix I would prefer you would keep it minimal. e.g. just replace
+the if with the ternary operator or just add an 'else' branch.
+
+Cheers,
+
+Paolo
+
 
