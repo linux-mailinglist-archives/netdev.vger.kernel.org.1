@@ -1,230 +1,183 @@
-Return-Path: <netdev+bounces-57581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E61F8137CE
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 18:13:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0E5C813839
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 18:16:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A195E1C20F4F
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 17:13:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E2C51C20F25
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 17:16:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2949B65EAB;
-	Thu, 14 Dec 2023 17:12:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AAC665EB5;
+	Thu, 14 Dec 2023 17:16:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n9sZrVGq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="INrZDHVb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0166D65EA7;
-	Thu, 14 Dec 2023 17:12:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8716C433C8;
-	Thu, 14 Dec 2023 17:12:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702573977;
-	bh=BAELR7PAtgbHJ26Por16QtKzX2s0QDtbvfohshpvT7k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n9sZrVGqgBfPqr4iuqNawJmRCH6DZnjo9xEv9sc8Jb8tUM5X0p2lHGToKbQ71HmoH
-	 44fCZG2jogO+9MP9i+gwLpTOOeyiyU8jAzQ1KbHVHCCGg37M6IvFcsH49fsWo4Bj9r
-	 9YCpvO79dr6domzMwMFfmpRS9yzXx9Pzq5ie9+Pp33xnWN/ahxK5Y3byWThrLVIRzL
-	 lQbkm57hE1G71W7o7ddnMWQuxFYqhvBVWMz1Y9yTRr89wMBuQ0tvGE9pbIGLfT80zN
-	 VwNv612w0mqTSyIyJzwwQEthaIO3/MOA2kJ/6s8cYTWUsqwlbnGiZx4yeCY6098KxZ
-	 sCIYaCsJeKvOA==
-Date: Thu, 14 Dec 2023 17:12:51 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Jie Luo <quic_luoj@quicinc.com>
-Cc: agross@kernel.org, andersson@kernel.org, konrad.dybcio@linaro.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	robert.marko@sartura.hr, linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, quic_srichara@quicinc.com
-Subject: Re: [PATCH v2 5/5] dt-bindings: net: ipq4019-mdio: Document ipq5332
- platform
-Message-ID: <20231214-outshine-shush-8a11c68607cd@spud>
-References: <20231212115151.20016-1-quic_luoj@quicinc.com>
- <20231212115151.20016-6-quic_luoj@quicinc.com>
- <20231212-caution-improvise-ed3cc6a1d305@spud>
- <11ffc985-3f2b-46b9-ae0b-911f7abe98d1@quicinc.com>
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18DBA121
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 09:16:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702574186;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MhL95NMRHTomnhtExuXArq1k4RIba5maai0PYgVgIYA=;
+	b=INrZDHVb/vFTznQaUg8iot/EsN49icIhQUsujXEQ4OepzXM5iDBdK7ptZ172jVyePiYrcC
+	rQXqrBFK3B2WH0Ms9ziYBhg4X4vZwujkTPAIMyLaKvOtNOdnLMeukLF1w3Hrfuuc3pDqMk
+	QOWIhU5HmdR7lrRmEPu6SCzOpmQ2LbY=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-690-nqJMzeNnPGGoe4W9PE9eKw-1; Thu, 14 Dec 2023 12:16:25 -0500
+X-MC-Unique: nqJMzeNnPGGoe4W9PE9eKw-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a1f72871acdso136939766b.0
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 09:16:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702574184; x=1703178984;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MhL95NMRHTomnhtExuXArq1k4RIba5maai0PYgVgIYA=;
+        b=hsd5euN1vHo2I1/MKGxSC4Zl/LhcwkD0kvwJnCKjSyfYR2Z/VMX3XI3sel3lfJYgUO
+         qjkMj5NmZGqb1FNMv2DzBGSIUPQ+wqlcI8OVu7vyvSXSIbHYrf1y+18e/r5Z1m7FQPwD
+         BDY4KU8KLMYXfz0iO1YwRwiPMndjCNSW/FAmjEczpEyWoYUhNERx6Tq4+4zQMYFhwIre
+         hvhjTWeUUybifBAFmUGWT/t+WGU0ZxVePp3oHUYjObZ2GhBrWzRAyyQPURLf4Jd7PfO+
+         jeL5L7lj9CPwdDS1JvDwZKKdxFKzHeakfnkY2lGa28J1RRwuQ6b4+x9Ah6EYPywtlbMj
+         YpVw==
+X-Gm-Message-State: AOJu0YwD1y4FZFwGhjIYOzcHRZhmEdhR3oGCNbZpxZ1iysPueKsxhBg3
+	3thTdmo5n/zK+6TVLMJRTZvNoSYcoh7VqkFmyFPWBhxXriwsA6jC0zk1x8iA9tB7zSJIvcWDwdE
+	DCdKLhDXYPnj4K8KA
+X-Received: by 2002:a17:907:a805:b0:9e6:69d:46b4 with SMTP id vo5-20020a170907a80500b009e6069d46b4mr10620276ejc.6.1702574184214;
+        Thu, 14 Dec 2023 09:16:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEVqkdBJEInRFs8Fc6fxyvFlPTB8j7gXya13sBdlD+i6t8imuoKWNDb+z/wWLTwu2nRZqWGkw==
+X-Received: by 2002:a17:907:a805:b0:9e6:69d:46b4 with SMTP id vo5-20020a170907a80500b009e6069d46b4mr10620262ejc.6.1702574183862;
+        Thu, 14 Dec 2023 09:16:23 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-252-36.dyn.eolo.it. [146.241.252.36])
+        by smtp.gmail.com with ESMTPSA id vk5-20020a170907cbc500b00a1ce56f7b16sm9680706ejc.71.2023.12.14.09.16.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Dec 2023 09:16:23 -0800 (PST)
+Message-ID: <8e2475cba51a078e0e12c219d81ae8f14e2196b3.camel@redhat.com>
+Subject: Re: [PATCH] net: sysctl: fix edge case wrt. sysctl write access
+From: Paolo Abeni <pabeni@redhat.com>
+To: Maciej =?UTF-8?Q?=C5=BBenczykowski?= <maze@google.com>
+Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>,  "David
+ S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Flavio Crisciani <fcrisciani@google.com>,
+ "Theodore Y. Ts'o" <tytso@google.com>, "Eric W. Biederman"
+ <ebiederm@xmission.com>, Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Date: Thu, 14 Dec 2023 18:16:21 +0100
+In-Reply-To: <CANP3RGfk6PqR2P8HnGX92ODnf6V5iKb+_zjonOsTDOB-3odM5g@mail.gmail.com>
+References: <20231210111033.1823491-1-maze@google.com>
+	 <ebf480701cd22da00c89c5b1b00d31be95ff8e4d.camel@redhat.com>
+	 <CANP3RGfk6PqR2P8HnGX92ODnf6V5iKb+_zjonOsTDOB-3odM5g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="LYJ0ceWwoY8jlvlx"
-Content-Disposition: inline
-In-Reply-To: <11ffc985-3f2b-46b9-ae0b-911f7abe98d1@quicinc.com>
 
-
---LYJ0ceWwoY8jlvlx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Dec 13, 2023 at 04:26:56PM +0800, Jie Luo wrote:
->=20
->=20
-> On 12/13/2023 12:06 AM, Conor Dooley wrote:
-> > On Tue, Dec 12, 2023 at 07:51:50PM +0800, Luo Jie wrote:
-> > > Update the yaml file for the new DTS properties.
+On Thu, 2023-12-14 at 14:17 +0100, Maciej =C5=BBenczykowski wrote:
+> On Thu, Dec 14, 2023 at 10:37=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> =
+wrote:
+> >=20
+> > On Sun, 2023-12-10 at 03:10 -0800, Maciej =C5=BBenczykowski wrote:
+> > > The clear intent of net_ctl_permissions() is that having CAP_NET_ADMI=
+N
+> > > grants write access to networking sysctls.
 > > >=20
-> > > 1. cmn-reference-clock for the CMN PLL source clock select.
-> > > 2. clock-frequency for MDIO clock frequency config.
-> > > 3. add uniphy AHB & SYS GCC clocks.
-> > > 4. add reset-gpios for MDIO bus level reset.
+> > > However, it turns out there is an edge case where this is insufficien=
+t:
+> > > inode_permission() has an additional check on HAS_UNMAPPED_ID(inode)
+> > > which can return -EACCES and thus block *all* write access.
 > > >=20
-> > > Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
-> > > ---
-> > >   .../bindings/net/qcom,ipq4019-mdio.yaml       | 157 +++++++++++++++=
-++-
-> > >   1 file changed, 153 insertions(+), 4 deletions(-)
+> > > Note: AFAICT this check is wrt. the uid/gid mapping that was
+> > > active at the time the filesystem (ie. proc) was mounted.
 > > >=20
-> > > diff --git a/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.=
-yaml b/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
-> > > index 3407e909e8a7..9546a6ad7841 100644
-> > > --- a/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
-> > > +++ b/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
-> > > @@ -20,6 +20,8 @@ properties:
-> > >             - enum:
-> > >                 - qcom,ipq6018-mdio
-> > >                 - qcom,ipq8074-mdio
-> > > +              - qcom,ipq9574-mdio
-> > > +              - qcom,ipq5332-mdio
-> > >             - const: qcom,ipq4019-mdio
-> > >     "#address-cells":
-> > > @@ -30,19 +32,71 @@ properties:
-> > >     reg:
-> > >       minItems: 1
-> > > -    maxItems: 2
-> > > +    maxItems: 5
-> > >       description:
-> > > -      the first Address and length of the register set for the MDIO =
-controller.
-> > > -      the second Address and length of the register for ethernet LDO=
-, this second
-> > > -      address range is only required by the platform IPQ50xx.
-> > > +      the first Address and length of the register set for the MDIO =
-controller,
-> > > +      the optional second, third and fourth address and length of th=
-e register
-> > > +      for ethernet LDO, these three address range are required by th=
-e platform
-> > > +      IPQ50xx/IPQ5332/IPQ9574, the last address and length is for th=
-e CMN clock
-> > > +      to select the reference clock.
-> > > +
-> > > +  reg-names:
-> > > +    minItems: 1
-> > > +    maxItems: 5
-> > >     clocks:
-> > > +    minItems: 1
-> > >       items:
-> > >         - description: MDIO clock source frequency fixed to 100MHZ
-> > > +      - description: UNIPHY0 AHB clock source frequency fixed to 100=
-MHZ
-> > > +      - description: UNIPHY1 AHB clock source frequency fixed to 100=
-MHZ
-> > > +      - description: UNIPHY0 SYS clock source frequency fixed to 24M=
-HZ
-> > > +      - description: UNIPHY1 SYS clock source frequency fixed to 24M=
-HZ
-> > >     clock-names:
-> > > +    minItems: 1
-> > >       items:
-> > >         - const: gcc_mdio_ahb_clk
-> > > +      - const: gcc_uniphy0_ahb_clk
-> > > +      - const: gcc_uniphy1_ahb_clk
-> > > +      - const: gcc_uniphy0_sys_clk
-> > > +      - const: gcc_uniphy1_sys_clk
+> > > In order for this check to not fail, we need net_ctl_set_ownership()
+> > > to set valid uid/gid.  It is not immediately clear what value
+> > > to use, nor what values are guaranteed to work.
+> > > It does make sense that /proc/sys/net appear to be owned by root
+> > > from within the netns owning userns.  As such we only modify
+> > > what happens if the code fails to map uid/gid 0.
+> > > Currently the code just fails to do anything, which in practice
+> > > results in using the zeroes of freshly allocated memory,
+> > > and we thus end up with global root.
+> > > With this change we instead use the uid/gid of the owning userns.
+> > > While it is probably (?) theoretically possible for this to *also*
+> > > be unmapped from the /proc filesystem's point of view, this seems
+> > > much less likely to happen in practice.
+> > >=20
+> > > The old code is observed to fail in a relatively complex setup,
+> > > within a global root created user namespace with selectively
+> > > mapped uid/gids (not including global root) and /proc mounted
+> > > afterwards (so this /proc mount does not have global root mapped).
+> > > Within this user namespace another non privileged task creates
+> > > a new user namespace, maps it's own uid/gid (but not uid/gid 0),
+> > > and then creates a network namespace.  It cannot write to networking
+> > > sysctls even though it does have CAP_NET_ADMIN.
 > >=20
-> > > +  cmn-reference-clock:
-> > > +    oneOf:
-> > > +      - items:
-> > > +          - enum:
-> > > +              - 0   # CMN PLL reference internal 48MHZ
-> > > +              - 1   # CMN PLL reference external 25MHZ
-> > > +              - 2   # CMN PLL reference external 31250KHZ
-> > > +              - 3   # CMN PLL reference external 40MHZ
-> > > +              - 4   # CMN PLL reference external 48MHZ
-> > > +              - 5   # CMN PLL reference external 50MHZ
-> > > +              - 6   # CMN PLL reference internal 96MHZ
-> >=20
-> > Why is this not represented by an element of the clocks property?
+> > I'm wondering if this specific scenario should be considered a setup
+> > issue, and should be solved with a different configuration? I would
+> > love to hear others opinions!
 >=20
-> This property is for the reference clock source selection of CMN PLL,
-> CMN PLL generates the different clock rates for the different Ethernet
-> blocks, this CMN PLL configuration is not located in the GCC, so the
-> clock framework can't be used, which is the general hardware register
-> instead of RCG register for GCC.
+> While it could be fixed in userspace.  I don't think it should:
+>=20
+> The global root uid/gid are very intentionally not mapped in (as a
+> security feature).
+> So that part isn't changeable (it's also a system daemon and not under
+> user control).
+>=20
+> The user namespace very intentionally maps uid->uid and not 0->uid.
+> Here there's theoretically more leeway... because it is at least under
+> user control.
+> However here this is done for good reason as well.
+> There's plenty of code that special cases uid=3D0, both in the kernel
+> (for example capability handling across exec) and in various userspace
+> libraries.  It's unrealistic to fix them all.
+> Additionally it's nice to have semi-transparent user namespaces,
+> which are security barriers but don't remap uids - remapping causes confu=
+sion.
+> (ie. the uid is either mapped or not, but if it is mapped it's a 1:1 mapp=
+ing)
+>=20
+> As for why?  Because uids as visible to userspace may leak across user
+> namespace boundaries,
+> either when talking to other system daemons or when talking across machin=
+es.
+> It's pretty easy (and common) to have uids that are globally unique
+> and meaningful in a cluster of machines.
+> Again, this is *theoretically* fixable in userspace, but not actually
+> a realistic expectation.
+>=20
+> btw. even outside of clusters of machines, I also run some
+> user/uts/net namespace using
+> code on my personal desktop (this does require some minor hacks to
+> unshare/mount binaries),
+> and again I intentionally map uid->uid and 0->uid, because this makes
+> my username show up as 'maze' and not 'root'.
 
-I don't see how the clock being provided by the "GCC" (whatever that is)
-or by some other clock controller or fixed clock makes a difference.
-Why can't the other clock provider be represented in the devicetree?
+I see, thanks for all the details.
 
-> > > +  clock-frequency:
-> > > +    oneOf:
-> > > +      - items:
-> > > +          - enum:
-> > > +              - 12500000
-> > > +              - 6250000
-> > > +              - 3125000
-> > > +              - 1562500
-> > > +              - 781250
-> > > +              - 390625
-> > > +    description:
-> > > +      The MDIO bus clock that must be output by the MDIO bus hardwar=
-e,
-> > > +      only the listed frequecies above can be configured, other freq=
-uency
-> > > +      will cause malfunction. If absent, the default hardware value =
-is used.
-> >=20
-> > Likewise.
-> >=20
-> > Your commit message contains a bullet point list of what you are doing,
-> > but there's no explanation here for why custom properties are required
-> > to provide clock information.
+> This is *clearly* a kernel bug that this doesn't just work.
+> (side note: there's a very similar issue in proc_net.c which I haven't
+> gotten around to fixing yet, because it looks to be more complex to
+> convince oneself it's safe to do)
 
-> This property clock-frequency is optional to configure the MDIO working
-> clock rate, and this is the MDIO general DT property, since the hardware
-> default clock rate is 390625HZ, there is requirement for higher clock rate
-> in the normal working case, i will update this information in the
-> next patch set.
+Indeed the potential security related issue is the root cause of my
+concerns here. I could not identify any such problem, but I must admit
+the uid mapping is not the kernel I know better.
 
-I'm just realising that this particular one is not a custom property,
-the unusual `oneOf: - items: - enum:` structure here threw me. This can
-just be
-  clock-frequency:
-    enum:
-      - 12500000
-      - 6250000
-      - 3125000
-      - 1562500
-      - 781250
-      - 390625
+I definitely could use another pair of eyeballs here ;)
 
-but you're missing a default, given your commit about the last element
-in that list being one.
+Cheers,
 
-Thanks,
-Conor.
+Paolo
 
---LYJ0ceWwoY8jlvlx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZXs3kwAKCRB4tDGHoIJi
-0vu7APsHtU2RskKEI44XxHTB9wAjvT2zciB0zeCci/YTbg5d6gEAqM9G7uRaWzhA
-33QIM6/PicVe6pC2JOVaFUlBDKnW0gM=
-=Cypi
------END PGP SIGNATURE-----
-
---LYJ0ceWwoY8jlvlx--
 
