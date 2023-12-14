@@ -1,137 +1,226 @@
-Return-Path: <netdev+bounces-57302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A2C5812C6E
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:04:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EB5B812CDB
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:25:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02C621F21920
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 10:04:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 859381F21CC0
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 10:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F8E439FCC;
-	Thu, 14 Dec 2023 10:04:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07D973C08A;
+	Thu, 14 Dec 2023 10:24:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UMtkVzAn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ijj2xQtW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FAA27724
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 10:04:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93319C433C8;
-	Thu, 14 Dec 2023 10:04:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702548281;
-	bh=5xiTNTnoHneS2djHnlvMPZzDBmc5bGUzo0jg6374Fxo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=UMtkVzAnKFo0CO1904K8hr7NxZXtrJi+X8XnY6B+vZE62FHOEYWxv8V2H24vnQCOe
-	 rFy6JR8GCg7l2se6T/H1n3FPkDFg2viYa4z2OyC7XASwD4dd/xGsDwxdx4ZYYk3X5D
-	 B53+Rl3NJtRgvTA4d+J0TeZiDD9y0KVVN+9tnAdCz8AmjnoZxK1ntwtGYu+x0us3ji
-	 kDc0H4Aru5E/5RtE/oe4fplpjXV6fRpMp84kwrgxcVuEgfWA1gfYoNSsDUDj6VOlj9
-	 8K5RrV+VU8S1S+lhhdYFrjzYIPX/XxKOVDMJunnaz6UNFvJDwSHIwqkClz5CXoQG/Y
-	 iecA+OqKv/B8g==
-Message-ID: <e637fe93-692d-48b1-9cb9-11719f8c90c3@kernel.org>
-Date: Thu, 14 Dec 2023 12:04:35 +0200
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28588BD
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 02:24:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702549488;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DSSH8LtzM2s/nHi8p5P1p50CtgKbNQDA/Xelk2DiA14=;
+	b=ijj2xQtW7klWiHpC6Jyf3UNxDJ4Sy1cUiY+fyHG/gVFPdD7IpKRUvHCxuGc4vjgOKKvd99
+	Ed9n0xcKPFzygb67uhIPjZYWXbmZ+GtPpJtccw1kpt5Vs8XDW054J9InhOqUp5oIb6nX64
+	PmgWevn2VnePlFQtGGEhTDF8aoqCA9s=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-97-X9Bn1Y6qOsq_lid81setCQ-1; Thu, 14 Dec 2023 05:24:46 -0500
+X-MC-Unique: X9Bn1Y6qOsq_lid81setCQ-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a1f8a2945b9so301258766b.1
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 02:24:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702549485; x=1703154285;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DSSH8LtzM2s/nHi8p5P1p50CtgKbNQDA/Xelk2DiA14=;
+        b=i4dHiREhGAk2FFEhnJrtuJmwIku3XysY17x9rws91d7qFGaNbqxmkJX4L+HrCyRgBz
+         OPZnDPp3HlyCDOaB90tZYVbl+bfUHaYJocUcBWJOQUmF6nmhfz5xzXYYT0C20SQKLMPN
+         AkhAAWXldMlCiR3sbBDB2vM4kmK/BB7F3waVfAmZ4NqYl3//Jf1eHsVl2avs5/JGl94z
+         H7TAfhL3Iy7h0hAn1i4pujLU5xvZUzc8xo7iUPgjZlcNevdQigWDLb++Q0IQlM7sVoff
+         Y+Q3Hdkr468NP1RJegW4qcIOPIgETIY88FRjcAFABH1pyXoOGyin98gncvw4hD12i+lO
+         eAKA==
+X-Gm-Message-State: AOJu0YxBzx0cpv4NDr5uZrtMbkd/BOeMyGMGpYBL1u8B6jQ68XbVB8rd
+	8FwqOzU3OLvwlVSblTc9t5KC7s57nPoVbybEhYYX2rc9VujiiA8cN2WajOj+LjDbvAhYRTYss5V
+	Mh5PtDctxe1VCAZfy
+X-Received: by 2002:a17:907:3a97:b0:a1f:7352:3c0 with SMTP id fh23-20020a1709073a9700b00a1f735203c0mr4111126ejc.59.1702549485721;
+        Thu, 14 Dec 2023 02:24:45 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFJ4mtbeRMe02kWwF6Hh+xBcu1mR/wHuPokTQ+4Rni40u2pBzA16VxW6ly8OowEf1SbmDDVig==
+X-Received: by 2002:a17:907:3a97:b0:a1f:7352:3c0 with SMTP id fh23-20020a1709073a9700b00a1f735203c0mr4111122ejc.59.1702549485320;
+        Thu, 14 Dec 2023 02:24:45 -0800 (PST)
+Received: from redhat.com ([2.52.132.243])
+        by smtp.gmail.com with ESMTPSA id vv6-20020a170907a68600b00a1dff479037sm9103575ejc.127.2023.12.14.02.24.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Dec 2023 02:24:44 -0800 (PST)
+Date: Thu, 14 Dec 2023 05:24:40 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
+	oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v9 2/4] virtio/vsock: send credit update during
+ setting SO_RCVLOWAT
+Message-ID: <20231214052234-mutt-send-email-mst@kernel.org>
+References: <20231214091947.395892-1-avkrasnov@salutedevices.com>
+ <20231214091947.395892-3-avkrasnov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 net-next 11/11] net: ethernet: ti: am65-cpsw: Fix
- get_eth_mac_stats
-Content-Language: en-US
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shuah@kernel.org, s-vadapalli@ti.com,
- r-gunasekaran@ti.com, vigneshr@ti.com, srk@ti.com, horms@kernel.org,
- p-varis@ti.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231213110721.69154-1-rogerq@kernel.org>
- <20231213110721.69154-12-rogerq@kernel.org>
- <20231213135435.czao6wjighpskcvz@skbuf>
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20231213135435.czao6wjighpskcvz@skbuf>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231214091947.395892-3-avkrasnov@salutedevices.com>
+
+On Thu, Dec 14, 2023 at 12:19:45PM +0300, Arseniy Krasnov wrote:
+> Send credit update message when SO_RCVLOWAT is updated and it is bigger
+> than number of bytes in rx queue. It is needed, because 'poll()' will
+> wait until number of bytes in rx queue will be not smaller than
+> SO_RCVLOWAT, so kick sender to send more data. Otherwise mutual hungup
+> for tx/rx is possible: sender waits for free space and receiver is
+> waiting data in 'poll()'.
+> 
+> Fixes: b89d882dc9fc ("vsock/virtio: reduce credit update messages")
+> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  Changelog:
+>  v1 -> v2:
+>   * Update commit message by removing 'This patch adds XXX' manner.
+>   * Do not initialize 'send_update' variable - set it directly during
+>     first usage.
+>  v3 -> v4:
+>   * Fit comment in 'virtio_transport_notify_set_rcvlowat()' to 80 chars.
+>  v4 -> v5:
+>   * Do not change callbacks order in transport structures.
+>  v5 -> v6:
+>   * Reorder callbacks in transport structures.
+>   * Do to send credit update when 'fwd_cnt' == 'last_fwd_cnt'.
+>  v8 -> v9:
+>   * Add 'Fixes' tag.
+> 
+>  drivers/vhost/vsock.c                   |  1 +
+>  include/linux/virtio_vsock.h            |  1 +
+>  net/vmw_vsock/virtio_transport.c        |  1 +
+>  net/vmw_vsock/virtio_transport_common.c | 30 +++++++++++++++++++++++++
+>  net/vmw_vsock/vsock_loopback.c          |  1 +
+>  5 files changed, 34 insertions(+)
+> 
+> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> index f75731396b7e..ec20ecff85c7 100644
+> --- a/drivers/vhost/vsock.c
+> +++ b/drivers/vhost/vsock.c
+> @@ -449,6 +449,7 @@ static struct virtio_transport vhost_transport = {
+>  		.notify_send_pre_enqueue  = virtio_transport_notify_send_pre_enqueue,
+>  		.notify_send_post_enqueue = virtio_transport_notify_send_post_enqueue,
+>  		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+> +		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+>  
+
+This needs to be set_rcvlowat.
+
+>  		.read_skb = virtio_transport_read_skb,
+>  	},
+> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+> index ebb3ce63d64d..c82089dee0c8 100644
+> --- a/include/linux/virtio_vsock.h
+> +++ b/include/linux/virtio_vsock.h
+> @@ -256,4 +256,5 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit);
+>  void virtio_transport_deliver_tap_pkt(struct sk_buff *skb);
+>  int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *list);
+>  int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t read_actor);
+> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk, int val);
+>  #endif /* _LINUX_VIRTIO_VSOCK_H */
+> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> index af5bab1acee1..f495b9e5186b 100644
+> --- a/net/vmw_vsock/virtio_transport.c
+> +++ b/net/vmw_vsock/virtio_transport.c
+> @@ -537,6 +537,7 @@ static struct virtio_transport virtio_transport = {
+>  		.notify_send_pre_enqueue  = virtio_transport_notify_send_pre_enqueue,
+>  		.notify_send_post_enqueue = virtio_transport_notify_send_post_enqueue,
+>  		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+> +		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+>  
+>  		.read_skb = virtio_transport_read_skb,
+>  	},
 
 
+This, too.
 
-On 13/12/2023 15:54, Vladimir Oltean wrote:
-> On Wed, Dec 13, 2023 at 01:07:21PM +0200, Roger Quadros wrote:
->> We do not support individual stats for PMAC and EMAC so
->> report only aggregate stats.
->>
->> Fixes: 67372d7a85fc ("net: ethernet: am65-cpsw: Add standard Ethernet MAC stats to ethtool")
->> Signed-off-by: Roger Quadros <rogerq@kernel.org>
->> ---
->>  drivers/net/ethernet/ti/am65-cpsw-ethtool.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> Changelog:
->>
->> v8: initial commit
->>
->> diff --git a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
->> index d2baffb05d55..35e318458b0c 100644
->> --- a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
->> +++ b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
->> @@ -671,6 +671,9 @@ static void am65_cpsw_get_eth_mac_stats(struct net_device *ndev,
->>  
->>  	stats = port->stat_base;
->>  
->> +	if (s->src != ETHTOOL_MAC_STATS_SRC_AGGREGATE)
->> +		return;
->> +
->>  	s->FramesTransmittedOK = readl_relaxed(&stats->tx_good_frames);
->>  	s->SingleCollisionFrames = readl_relaxed(&stats->tx_single_coll_frames);
->>  	s->MultipleCollisionFrames = readl_relaxed(&stats->tx_mult_coll_frames);
->> -- 
->> 2.34.1
->>
-> 
-> Fixes are only fixes if they address a visible issue. And the blamed
-> commit is the one that made the issue visible - the same one that
-> "git bisect" would lead to - not necessarily the commit that introduced
-> the code being changed.
-> 
-> If you look at net/ethtool/stats.c, it will only accept ETHTOOL_MAC_STATS_SRC_AGGREGATE
-> for drivers that don't support the MAC Merge layer.
-> 
-> 	if ((src == ETHTOOL_MAC_STATS_SRC_EMAC ||
-> 	     src == ETHTOOL_MAC_STATS_SRC_PMAC) &&
-> 	    !__ethtool_dev_mm_supported(dev)) {
-> 		NL_SET_ERR_MSG_MOD(info->extack,
-> 				   "Device does not support MAC merge layer");
-> 		ethnl_ops_complete(dev);
-> 		return -EOPNOTSUPP;
-> 	}
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index 7eabe5219ef7..9d2305fdc65c 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -1690,6 +1690,36 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
+>  }
+>  EXPORT_SYMBOL_GPL(virtio_transport_read_skb);
+>  
+> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk, int val)
+> +{
+> +	struct virtio_vsock_sock *vvs = vsk->trans;
+> +	bool send_update;
+> +
+> +	spin_lock_bh(&vvs->rx_lock);
+> +
+> +	/* If number of available bytes is less than new SO_RCVLOWAT value,
+> +	 * kick sender to send more data, because sender may sleep in its
+> +	 * 'send()' syscall waiting for enough space at our side. Also
+> +	 * don't send credit update when peer already knows actual value -
+> +	 * such transmission will be useless.
+> +	 */
+> +	send_update = (vvs->rx_bytes < val) &&
+> +		      (vvs->fwd_cnt != vvs->last_fwd_cnt);
+> +
+> +	spin_unlock_bh(&vvs->rx_lock);
+> +
+> +	if (send_update) {
+> +		int err;
+> +
+> +		err = virtio_transport_send_credit_update(vsk);
+> +		if (err < 0)
+> +			return err;
+> +	}
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(virtio_transport_notify_set_rcvlowat);
+> +
+>  MODULE_LICENSE("GPL v2");
+>  MODULE_AUTHOR("Asias He");
+>  MODULE_DESCRIPTION("common code for virtio vsock");
 
-Got it.
+I think you need to set sk->sk_rcvlowat here, no?
+Follow up patch will move it to transport independent code.
 
-> 
-> So, there was nothing broken in commit 67372d7a85fc ("net: ethernet:
-> am65-cpsw: Add standard Ethernet MAC stats to ethtool").
-> 
-> The first broken commit is when you add support for get_mm(), such that
-> __ethtool_dev_mm_supported() returns true.
-> 
-> And because you don't add bugs in the code just to fix them later in the
-> series, you need to order the patches such that all the dependencies for
-> get_mm() are in place before the get_mm() support is added.
-> 
-> Translated to your case, this patch must not be 11/11, and it must have
-> the Fixes: tag dropped, and it must explain in the commit message that
-> it is preparatory work.
 
-OK. I take care of this in next spin. Thanks.
-> 
-> --
-> pw-bot: changes-requested
+> diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+> index 048640167411..6dea6119f5b2 100644
+> --- a/net/vmw_vsock/vsock_loopback.c
+> +++ b/net/vmw_vsock/vsock_loopback.c
+> @@ -96,6 +96,7 @@ static struct virtio_transport loopback_transport = {
+>  		.notify_send_pre_enqueue  = virtio_transport_notify_send_pre_enqueue,
+>  		.notify_send_post_enqueue = virtio_transport_notify_send_post_enqueue,
+>  		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+> +		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+>  
+>  		.read_skb = virtio_transport_read_skb,
+>  	},
+> -- 
+> 2.25.1
 
--- 
-cheers,
--roger
 
