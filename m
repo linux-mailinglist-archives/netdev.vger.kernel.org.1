@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-57604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EF278139B0
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 19:16:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 961BC8139B1
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 19:16:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1976C281689
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 18:16:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 504EF28310E
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 18:16:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4B6167E95;
-	Thu, 14 Dec 2023 18:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60FE367E9F;
+	Thu, 14 Dec 2023 18:15:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="kq1EwSkJ"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="OI9eWQMI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF3AB116
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 10:15:52 -0800 (PST)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-40c39e936b4so59843425e9.1
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 10:15:52 -0800 (PST)
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF311A6
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 10:15:54 -0800 (PST)
+Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-50c0f6b1015so9874301e87.3
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 10:15:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702577751; x=1703182551; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=haTWuvvb3wg9rSHuJ/USxttW24h6lX+MTFJZTs+fzZM=;
-        b=kq1EwSkJI1GtlN0KIXhEmpzfQk9MBBo1NziDNNkmLOrLq1SW1NGzUK1fbJJ+opOf/e
-         RZyJCuc3kzPvdrQ6rlvzkyIubaPY1/Sc+03Ba+YiUrAzLpjNmr2cbGXO+4ZyXOX+ByGI
-         gwJi82edTYYl0gDR/8YuA4PUBkIy7W93lmrsK2MhnwHBwYl70Y3Cx7ouXbzQeQd2sGNc
-         /vaSmhTlj1dW3ZxK8OgZMRcsxS5WjfCHBpHjNb5YGo933keNtckJmUyUjSd2OuWF8Ysl
-         KcFMdXhZBXutcMAWtAZGIjbDQahQpLdeWlLhgA/CJmf4wiMY2+IRugHxGnMx7J4B5Qn3
-         bxuQ==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702577753; x=1703182553; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=33J8BP2HLxzySsghbviJPGk4M7islA6m5mnPAfoHhcc=;
+        b=OI9eWQMI2wlQDaR7JVumqW6miG90baGvdMM1N5cR8FLFcezPDX9JWwNVD79xzZv74i
+         pl7RnkE+FHTpOuBcuxIJt/l2vThAdcCCC4a97T4usOZ4s236gVv/lyaG2A8RuhV7Y2NU
+         Y0Ndvlt0/mFTBjIwo+2O7dmk9SpLkETwOj+h6w5WW3Vv/+LK7uy/A1JbA0vz8UB1mW52
+         hi/T5LngNRNF/7I7i8bjx+tF4o10YUg2hfKc8DHQJVCKBUnDTqQLA/xp7UKl1nB3i7id
+         Jb3xFRIFQLD7aqBQbCOMUSkF4OgQM5mj/cRZBYiG8MQZfBadmc1U22Eiqdsw/sft+BnA
+         rx0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702577751; x=1703182551;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=haTWuvvb3wg9rSHuJ/USxttW24h6lX+MTFJZTs+fzZM=;
-        b=OtQyGWgb1KgANLUt8tPpc3qYDcDYEn+4wfaKQKjIHASZM/420ke3mz1akbs1B8muUN
-         TBCY0ZyCMX2whz7vNru0v8xC7+LTH/UkyLaUYJMUa1M+g+9dWir9yOmqbS/6WQKxOYkD
-         9kgCIfIwdMkM/BxpEg2XFnvVIWaaT6Epo7sI4ObqK1KmPTJFMgtLJjoTdeNOe+YOrMFg
-         3e0lhAgjSgubt8x5zMxBCfafSRmOcfZwJ/2S7VM/TSx5DHsOsGGnmpnfLtR3gUBBoRVs
-         vaaA8195EKsB6h3RApD9sug9mRkIouVKVlX79/fdVmV/aiyFShal175tR2ZzDmRC39gY
-         PGjQ==
-X-Gm-Message-State: AOJu0Yz8T6LLv9omgKIzJ+5Vt5n5+qabMJktt/4eqBLp9H/l21TBd3b3
-	EGwjY4M1mp1Xk7ty6i7JLUyc9gwCBoXPfswM0Uk=
-X-Google-Smtp-Source: AGHT+IF5y6tvmXuhyd4Iy7d+lJcmRgtTV1kcGSICuKUicJFUyNAC43+BfqDfRbukH3AT8z6vtXIq4A==
-X-Received: by 2002:a05:600c:3c9d:b0:40c:4a4d:b534 with SMTP id bg29-20020a05600c3c9d00b0040c4a4db534mr1557303wmb.354.1702577751006;
-        Thu, 14 Dec 2023 10:15:51 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702577753; x=1703182553;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=33J8BP2HLxzySsghbviJPGk4M7islA6m5mnPAfoHhcc=;
+        b=LeJRElKE9yDDopYPb2gXEvgP+yV/LUPkoZYUawkSRBjv0ovnCUXFQS0Ry83zl0q4kz
+         rxh6IfZDzi/wFGpgfFLOuG60lyTzay1VtQYloE4HkKhe2GLSUsF7lK10zGSO3RoBWvQn
+         1UGNw1SirMYiAijCQLPgESQidObSKjZWYYqkbfqe2Kt2evE0nQ/IkrsTGuDTy+O3hSqF
+         AvZ7f98vHPOGL0kpfohMu7gFxL/sNWKS3JFZAB09LcQeciz+RgVJrwx0kLD3xIue2xK5
+         mVGNyaqM1rMJimNz+KivhnTAENUuch1FXbqMK1QC28p5x+LcrFSANQvTVtH8ZvtWv1s8
+         WbgQ==
+X-Gm-Message-State: AOJu0YxPKWSakL2biiPS9pBDWcZp2gylb7yLG7wqhEv5WyomUSL5XRYS
+	Db4nAC6R0wgAcMAymUE3vCR8PQbLyY4W8J5P9wo=
+X-Google-Smtp-Source: AGHT+IFNx1T4f34HGhXAEYUxQPrqkFA83hCi0NV3HboJqLY0/aM0Jii66h8eTiY40Wr8XnPxdlDJXA==
+X-Received: by 2002:ac2:455c:0:b0:50b:f486:88b8 with SMTP id j28-20020ac2455c000000b0050bf48688b8mr4400690lfm.76.1702577752879;
+        Thu, 14 Dec 2023 10:15:52 -0800 (PST)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id ld4-20020a1709079c0400b00a1df88cc7c0sm9618505ejc.182.2023.12.14.10.15.49
+        by smtp.gmail.com with ESMTPSA id t16-20020a056402241000b00552743342c8sm864392eda.59.2023.12.14.10.15.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 10:15:50 -0800 (PST)
+        Thu, 14 Dec 2023 10:15:52 -0800 (PST)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -66,10 +67,12 @@ Cc: kuba@kernel.org,
 	sdf@google.com,
 	horms@kernel.org,
 	przemyslaw.kitszel@intel.com
-Subject: [patch net-next v7 0/9] devlink: introduce notifications filtering
-Date: Thu, 14 Dec 2023 19:15:40 +0100
-Message-ID: <20231214181549.1270696-1-jiri@resnulli.us>
+Subject: [patch net-next v7 1/9] devlink: use devl_is_registered() helper instead xa_get_mark()
+Date: Thu, 14 Dec 2023 19:15:41 +0100
+Message-ID: <20231214181549.1270696-2-jiri@resnulli.us>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20231214181549.1270696-1-jiri@resnulli.us>
+References: <20231214181549.1270696-1-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,120 +83,87 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Currently the user listening on a socket for devlink notifications
-gets always all messages for all existing devlink instances and objects,
-even if he is interested only in one of those. That may cause
-unnecessary overhead on setups with thousands of instances present.
+Instead of checking the xarray mark directly using xa_get_mark() helper
+use devl_is_registered() helper which wraps it up. Note that there are
+couple more users of xa_get_mark() left which are going to be handled
+by the next patch.
 
-User is currently able to narrow down the devlink objects replies
-to dump commands by specifying select attributes.
-
-Allow similar approach for notifications providing user a new
-notify-filter-set command to select attributes with values
-the notification message has to match. In that case, it is delivered
-to the socket.
-
-Note that the filtering is done per-socket, so multiple users may
-specify different selection of attributes with values.
-
-This patchset initially introduces support for following attributes:
-DEVLINK_ATTR_BUS_NAME
-DEVLINK_ATTR_DEV_NAME
-DEVLINK_ATTR_PORT_INDEX
-
-Patches #1 - #4 are preparations in devlink code, patch #3 is
-                an optimization done on the way.
-Patches #5 - #7 are preparations in netlink and generic netlink code.
-Patch #8 is the main one in this set implementing of
-         the notify-filter-set command and the actual
-         per-socket filtering.
-Patch #9 extends the infrastructure allowing to filter according
-         to a port index.
-
-Example:
-$ devlink mon port pci/0000:08:00.0/32768
-[port,new] pci/0000:08:00.0/32768: type notset flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
-  function:
-    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
-[port,new] pci/0000:08:00.0/32768: type eth flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
-  function:
-    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
-[port,new] pci/0000:08:00.0/32768: type eth netdev eth3 flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
-  function:
-    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
-[port,new] pci/0000:08:00.0/32768: type eth netdev eth3 flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
-  function:
-    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
-[port,new] pci/0000:08:00.0/32768: type eth flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
-  function:
-    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
-[port,new] pci/0000:08:00.0/32768: type notset flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
-  function:
-    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
-[port,del] pci/0000:08:00.0/32768: type notset flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
-  function:
-    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
-
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
-v6->v7:
-- bigger changes in patch #5, moves the tracking to the family xarray
-  with sock as index, makes all lot more nicer and fixes the race
-  conditions
-v5->v6:
-- in patch #5 added family removal handling of privs destruction,
-  couple other things, see the patch changelog for details
-v4->v5:
-- converted priv pointer in netlink_sock to genl_sock container,
-  containing xarray pointer
-- introduced per-family init/destroy callbacks and priv_size to allocate
-  per-sock private, converted devlink to that
-- see patches #5 and #8 for more details
-v3->v4:
-- converted from sk_user_data pointer use to nlk(sk)->priv pointer and
-  allow priv to be stored for multiple generic netlink families, see
-  patch #5 for more details
-v2->v3:
-- small cosmetical fixes in patch #6
-v1->v2:
-- added patch #6, fixed generated docs
-- see individual patches for details
+ net/devlink/dev.c  | 4 ++--
+ net/devlink/rate.c | 2 +-
+ net/devlink/trap.c | 9 ++++++---
+ 3 files changed, 9 insertions(+), 6 deletions(-)
 
-Jiri Pirko (9):
-  devlink: use devl_is_registered() helper instead xa_get_mark()
-  devlink: introduce __devl_is_registered() helper and use it instead of
-    xa_get_mark()
-  devlink: send notifications only if there are listeners
-  devlink: introduce a helper for netlink multicast send
-  genetlink: introduce per-sock family private storage
-  netlink: introduce typedef for filter function
-  genetlink: introduce helpers to do filtered multicast
-  devlink: add a command to set notification filter and use it for
-    multicasts
-  devlink: extend multicast filtering by port index
-
- Documentation/netlink/specs/devlink.yaml |  11 ++
- drivers/connector/connector.c            |   5 +-
- include/linux/connector.h                |   3 +-
- include/linux/netlink.h                  |   6 +-
- include/net/genetlink.h                  |  46 +++++++-
- include/net/netlink.h                    |  31 ++++-
- include/uapi/linux/devlink.h             |   2 +
- net/devlink/dev.c                        |  13 ++-
- net/devlink/devl_internal.h              |  59 +++++++++-
- net/devlink/health.c                     |  10 +-
- net/devlink/linecard.c                   |   5 +-
- net/devlink/netlink.c                    | 116 ++++++++++++++++++
- net/devlink/netlink_gen.c                |  16 ++-
- net/devlink/netlink_gen.h                |   4 +-
- net/devlink/param.c                      |   5 +-
- net/devlink/port.c                       |   8 +-
- net/devlink/rate.c                       |   5 +-
- net/devlink/region.c                     |   6 +-
- net/devlink/trap.c                       |  18 +--
- net/netlink/af_netlink.c                 |   3 +-
- net/netlink/genetlink.c                  | 143 ++++++++++++++++++++++-
- 21 files changed, 462 insertions(+), 53 deletions(-)
-
+diff --git a/net/devlink/dev.c b/net/devlink/dev.c
+index 918a0395b03e..3fe93c8a9fe2 100644
+--- a/net/devlink/dev.c
++++ b/net/devlink/dev.c
+@@ -202,7 +202,7 @@ static void devlink_notify(struct devlink *devlink, enum devlink_command cmd)
+ 	int err;
+ 
+ 	WARN_ON(cmd != DEVLINK_CMD_NEW && cmd != DEVLINK_CMD_DEL);
+-	WARN_ON(!xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED));
++	WARN_ON(!devl_is_registered(devlink));
+ 
+ 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+ 	if (!msg)
+@@ -999,7 +999,7 @@ static void __devlink_flash_update_notify(struct devlink *devlink,
+ 		cmd != DEVLINK_CMD_FLASH_UPDATE_END &&
+ 		cmd != DEVLINK_CMD_FLASH_UPDATE_STATUS);
+ 
+-	if (!xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED))
++	if (!devl_is_registered(devlink))
+ 		return;
+ 
+ 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+diff --git a/net/devlink/rate.c b/net/devlink/rate.c
+index 94b289b93ff2..e2190cf22beb 100644
+--- a/net/devlink/rate.c
++++ b/net/devlink/rate.c
+@@ -146,7 +146,7 @@ static void devlink_rate_notify(struct devlink_rate *devlink_rate,
+ 
+ 	WARN_ON(cmd != DEVLINK_CMD_RATE_NEW && cmd != DEVLINK_CMD_RATE_DEL);
+ 
+-	if (!xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED))
++	if (!devl_is_registered(devlink))
+ 		return;
+ 
+ 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+diff --git a/net/devlink/trap.c b/net/devlink/trap.c
+index c26313e7ca08..908085e2c990 100644
+--- a/net/devlink/trap.c
++++ b/net/devlink/trap.c
+@@ -1173,7 +1173,8 @@ devlink_trap_group_notify(struct devlink *devlink,
+ 
+ 	WARN_ON_ONCE(cmd != DEVLINK_CMD_TRAP_GROUP_NEW &&
+ 		     cmd != DEVLINK_CMD_TRAP_GROUP_DEL);
+-	if (!xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED))
++
++	if (!devl_is_registered(devlink))
+ 		return;
+ 
+ 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+@@ -1234,7 +1235,8 @@ static void devlink_trap_notify(struct devlink *devlink,
+ 
+ 	WARN_ON_ONCE(cmd != DEVLINK_CMD_TRAP_NEW &&
+ 		     cmd != DEVLINK_CMD_TRAP_DEL);
+-	if (!xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED))
++
++	if (!devl_is_registered(devlink))
+ 		return;
+ 
+ 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+@@ -1710,7 +1712,8 @@ devlink_trap_policer_notify(struct devlink *devlink,
+ 
+ 	WARN_ON_ONCE(cmd != DEVLINK_CMD_TRAP_POLICER_NEW &&
+ 		     cmd != DEVLINK_CMD_TRAP_POLICER_DEL);
+-	if (!xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED))
++
++	if (!devl_is_registered(devlink))
+ 		return;
+ 
+ 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
 -- 
 2.43.0
 
