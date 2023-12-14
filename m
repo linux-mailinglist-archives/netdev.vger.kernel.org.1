@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-57184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7722D812508
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 03:09:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7929D812509
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 03:09:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 172871F21B0F
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:09:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89ADD1C214EE
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:09:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A096546A2;
-	Thu, 14 Dec 2023 02:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84F1B7F9;
+	Thu, 14 Dec 2023 02:08:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O5eHGBRB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uKhct0Et"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83E434437
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 02:08:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C4B8C433C8;
-	Thu, 14 Dec 2023 02:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C004C6B
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 02:08:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E939C433CB;
+	Thu, 14 Dec 2023 02:08:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702519727;
-	bh=IWANXQlKp4SDbvu4rGn4Rl1LnxYA2ZQMLuhFjoEqVXc=;
+	s=k20201202; t=1702519728;
+	bh=ENt9hjx5AtKsZCPv2IVV2uYMb7hbNbQrSDmwrCj5ob8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=O5eHGBRB45LLYVbvLvdv86dPSnBCgUgtGFsQc/VmucI7SsiX0VnA+cVU46g9rpjJA
-	 OefP3F92lqQVEdjvtsYYhk/TzVXZxh8lhLfTjot4gI09efbe82M8OmBnTixxzu/i+R
-	 4LE28Sdcn0q7+RuNZmlNR48JTyC8jvDlgZAlwHmiIUPBbvx8B5MIbobd3hi1Lys6C4
-	 wMHQQCdRze1VoEOlxxKfiOIbNU6svU7TCUtbyfpVMAdPIWXBuWl7R51WasRhQolqw2
-	 PC2dyKrgBelmVWT9H7JuZgZCM5BYgPmCm8sTInMnkkg5ki3DcW+h73WJ5gMq9tDNrs
-	 ppd/cj91m6Htw==
+	b=uKhct0EtfkHDa+6exbpPpnNNd59jftLPBivzr6V95JG9ZIUeWH1pIQQnSVk5s7Tb+
+	 Rspf9H/7F56xMDp34SMzNNT3BIGBnzeI+l9imwNLxtZGpxTV2HIW86ip7lolrC7YtE
+	 S/Wv6E/p8GawyzHFDeuy0H+rYCSdum/OOU6ciGQJJPzFlk78ppRBQSHq2Ang1FU5jM
+	 YfvhRxH7qnuf+wiHCVTBw05qWkMSz/HmRzaPWRw0XyyE/woJf5ZpNjylwqbm1Iqs1R
+	 neYTxCs/YgV5x/hkH41lalLY14CBHfnbiS0ZRmEU7xNH8h5YQf/e0kAWdRM+RppMHN
+	 nhm0LByA8Nn4Q==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -41,9 +41,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>
-Subject: [net-next 08/11] net/mlx5e: Add wrapping for auxiliary_driver ops and remove unused args
-Date: Wed, 13 Dec 2023 18:08:29 -0800
-Message-ID: <20231214020832.50703-9-saeed@kernel.org>
+Subject: [net-next 09/11] net/mlx5e: Decouple CQ from priv
+Date: Wed, 13 Dec 2023 18:08:30 -0800
+Message-ID: <20231214020832.50703-10-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231214020832.50703-1-saeed@kernel.org>
 References: <20231214020832.50703-1-saeed@kernel.org>
@@ -57,84 +57,314 @@ Content-Transfer-Encoding: 8bit
 
 From: Tariq Toukan <tariqt@nvidia.com>
 
-Turn some of the struct auxiliary_driver ops into wrappers to stop
-having dummy local vars passed as unused arguments.
+Make CQ struct and methods independent of "priv", use more basic
+arguments instead.
+This will ease the transition to netdev with multiple mdevs.
 
 Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 Reviewed-by: Gal Pressman <gal@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/en_main.c | 22 +++++++++++++------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  |  6 ++--
+ .../ethernet/mellanox/mlx5/core/en/params.c   |  2 ++
+ .../net/ethernet/mellanox/mlx5/core/en/ptp.c  | 10 ++++--
+ .../net/ethernet/mellanox/mlx5/core/en/qos.c  |  2 +-
+ .../net/ethernet/mellanox/mlx5/core/en/trap.c |  4 ++-
+ .../mellanox/mlx5/core/en/xsk/setup.c         |  4 +--
+ .../net/ethernet/mellanox/mlx5/core/en_main.c | 32 +++++++++----------
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  2 +-
+ .../net/ethernet/mellanox/mlx5/core/en_tx.c   |  2 +-
+ 9 files changed, 37 insertions(+), 27 deletions(-)
 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+index 6808e0d82944..efacad46a24e 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+@@ -363,7 +363,7 @@ struct mlx5e_cq {
+ 	/* control */
+ 	struct net_device         *netdev;
+ 	struct mlx5_core_dev      *mdev;
+-	struct mlx5e_priv         *priv;
++	struct workqueue_struct   *workqueue;
+ 	struct mlx5_wq_ctrl        wq_ctrl;
+ } ____cacheline_aligned_in_smp;
+ 
+@@ -1043,6 +1043,8 @@ int mlx5e_open_xdpsq(struct mlx5e_channel *c, struct mlx5e_params *params,
+ void mlx5e_close_xdpsq(struct mlx5e_xdpsq *sq);
+ 
+ struct mlx5e_create_cq_param {
++	struct net_device *netdev;
++	struct workqueue_struct *wq;
+ 	struct napi_struct *napi;
+ 	struct mlx5e_ch_stats *ch_stats;
+ 	int node;
+@@ -1050,7 +1052,7 @@ struct mlx5e_create_cq_param {
+ };
+ 
+ struct mlx5e_cq_param;
+-int mlx5e_open_cq(struct mlx5e_priv *priv, struct dim_cq_moder moder,
++int mlx5e_open_cq(struct mlx5_core_dev *mdev, struct dim_cq_moder moder,
+ 		  struct mlx5e_cq_param *param, struct mlx5e_create_cq_param *ccp,
+ 		  struct mlx5e_cq *cq);
+ void mlx5e_close_cq(struct mlx5e_cq *cq);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
+index e097f336e1c4..284253b79266 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
+@@ -669,6 +669,8 @@ void mlx5e_build_rq_params(struct mlx5_core_dev *mdev,
+ void mlx5e_build_create_cq_param(struct mlx5e_create_cq_param *ccp, struct mlx5e_channel *c)
+ {
+ 	*ccp = (struct mlx5e_create_cq_param) {
++		.netdev = c->netdev,
++		.wq = c->priv->wq,
+ 		.napi = &c->napi,
+ 		.ch_stats = c->stats,
+ 		.node = cpu_to_node(c->cpu),
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
+index 04cec76c1ac4..c206cc0a8483 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
+@@ -557,6 +557,8 @@ static int mlx5e_ptp_open_tx_cqs(struct mlx5e_ptp *c,
+ 
+ 	num_tc = mlx5e_get_dcb_num_tc(params);
+ 
++	ccp.netdev   = c->netdev;
++	ccp.wq       = c->priv->wq;
+ 	ccp.node     = dev_to_node(mlx5_core_dma_dev(c->mdev));
+ 	ccp.ch_stats = c->stats;
+ 	ccp.napi     = &c->napi;
+@@ -567,7 +569,7 @@ static int mlx5e_ptp_open_tx_cqs(struct mlx5e_ptp *c,
+ 	for (tc = 0; tc < num_tc; tc++) {
+ 		struct mlx5e_cq *cq = &c->ptpsq[tc].txqsq.cq;
+ 
+-		err = mlx5e_open_cq(c->priv, ptp_moder, cq_param, &ccp, cq);
++		err = mlx5e_open_cq(c->mdev, ptp_moder, cq_param, &ccp, cq);
+ 		if (err)
+ 			goto out_err_txqsq_cq;
+ 	}
+@@ -576,7 +578,7 @@ static int mlx5e_ptp_open_tx_cqs(struct mlx5e_ptp *c,
+ 		struct mlx5e_cq *cq = &c->ptpsq[tc].ts_cq;
+ 		struct mlx5e_ptpsq *ptpsq = &c->ptpsq[tc];
+ 
+-		err = mlx5e_open_cq(c->priv, ptp_moder, cq_param, &ccp, cq);
++		err = mlx5e_open_cq(c->mdev, ptp_moder, cq_param, &ccp, cq);
+ 		if (err)
+ 			goto out_err_ts_cq;
+ 
+@@ -604,6 +606,8 @@ static int mlx5e_ptp_open_rx_cq(struct mlx5e_ptp *c,
+ 	struct mlx5e_cq_param *cq_param;
+ 	struct mlx5e_cq *cq = &c->rq.cq;
+ 
++	ccp.netdev   = c->netdev;
++	ccp.wq       = c->priv->wq;
+ 	ccp.node     = dev_to_node(mlx5_core_dma_dev(c->mdev));
+ 	ccp.ch_stats = c->stats;
+ 	ccp.napi     = &c->napi;
+@@ -611,7 +615,7 @@ static int mlx5e_ptp_open_rx_cq(struct mlx5e_ptp *c,
+ 
+ 	cq_param = &cparams->rq_param.cqp;
+ 
+-	return mlx5e_open_cq(c->priv, ptp_moder, cq_param, &ccp, cq);
++	return mlx5e_open_cq(c->mdev, ptp_moder, cq_param, &ccp, cq);
+ }
+ 
+ static void mlx5e_ptp_close_tx_cqs(struct mlx5e_ptp *c)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/qos.c b/drivers/net/ethernet/mellanox/mlx5/core/en/qos.c
+index 9e2211f0c3a4..34adf8c3f81a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/qos.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/qos.c
+@@ -124,7 +124,7 @@ int mlx5e_open_qos_sq(struct mlx5e_priv *priv, struct mlx5e_channels *chs,
+ 	memset(&param_cq, 0, sizeof(param_cq));
+ 	mlx5e_build_sq_param(priv->mdev, params, &param_sq);
+ 	mlx5e_build_tx_cq_param(priv->mdev, params, &param_cq);
+-	err = mlx5e_open_cq(priv, params->tx_cq_moderation, &param_cq, &ccp, &sq->cq);
++	err = mlx5e_open_cq(c->mdev, params->tx_cq_moderation, &param_cq, &ccp, &sq->cq);
+ 	if (err)
+ 		goto err_free_sq;
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/trap.c b/drivers/net/ethernet/mellanox/mlx5/core/en/trap.c
+index 5620d9f97518..ac458a8d10e0 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/trap.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/trap.c
+@@ -68,11 +68,13 @@ static int mlx5e_open_trap_rq(struct mlx5e_priv *priv, struct mlx5e_trap *t)
+ 
+ 	node = dev_to_node(mdev->device);
+ 
++	ccp.netdev   = priv->netdev;
++	ccp.wq       = priv->wq;
+ 	ccp.node     = node;
+ 	ccp.ch_stats = t->stats;
+ 	ccp.napi     = &t->napi;
+ 	ccp.ix       = 0;
+-	err = mlx5e_open_cq(priv, trap_moder, &rq_param->cqp, &ccp, &rq->cq);
++	err = mlx5e_open_cq(priv->mdev, trap_moder, &rq_param->cqp, &ccp, &rq->cq);
+ 	if (err)
+ 		return err;
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/setup.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/setup.c
+index 36826b582484..82e6abbc1734 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/setup.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/setup.c
+@@ -127,7 +127,7 @@ int mlx5e_open_xsk(struct mlx5e_priv *priv, struct mlx5e_params *params,
+ 
+ 	mlx5e_build_xsk_cparam(priv->mdev, params, xsk, priv->q_counter, cparam);
+ 
+-	err = mlx5e_open_cq(c->priv, params->rx_cq_moderation, &cparam->rq.cqp, &ccp,
++	err = mlx5e_open_cq(c->mdev, params->rx_cq_moderation, &cparam->rq.cqp, &ccp,
+ 			    &c->xskrq.cq);
+ 	if (unlikely(err))
+ 		goto err_free_cparam;
+@@ -136,7 +136,7 @@ int mlx5e_open_xsk(struct mlx5e_priv *priv, struct mlx5e_params *params,
+ 	if (unlikely(err))
+ 		goto err_close_rx_cq;
+ 
+-	err = mlx5e_open_cq(c->priv, params->tx_cq_moderation, &cparam->xdp_sq.cqp, &ccp,
++	err = mlx5e_open_cq(c->mdev, params->tx_cq_moderation, &cparam->xdp_sq.cqp, &ccp,
+ 			    &c->xsksq.cq);
+ 	if (unlikely(err))
+ 		goto err_close_rq;
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index ecb40950ec8d..78794268abe7 100644
+index 78794268abe7..8e09f9740d27 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -5984,7 +5984,7 @@ static int mlx5e_resume(struct auxiliary_device *adev)
+@@ -1994,11 +1994,12 @@ void mlx5e_close_xdpsq(struct mlx5e_xdpsq *sq)
+ 	mlx5e_free_xdpsq(sq);
+ }
+ 
+-static int mlx5e_alloc_cq_common(struct mlx5e_priv *priv,
++static int mlx5e_alloc_cq_common(struct mlx5_core_dev *mdev,
++				 struct net_device *netdev,
++				 struct workqueue_struct *workqueue,
+ 				 struct mlx5e_cq_param *param,
+ 				 struct mlx5e_cq *cq)
+ {
+-	struct mlx5_core_dev *mdev = priv->mdev;
+ 	struct mlx5_core_cq *mcq = &cq->mcq;
+ 	int err;
+ 	u32 i;
+@@ -2025,13 +2026,13 @@ static int mlx5e_alloc_cq_common(struct mlx5e_priv *priv,
+ 	}
+ 
+ 	cq->mdev = mdev;
+-	cq->netdev = priv->netdev;
+-	cq->priv = priv;
++	cq->netdev = netdev;
++	cq->workqueue = workqueue;
+ 
  	return 0;
  }
  
--static int mlx5e_suspend(struct auxiliary_device *adev, pm_message_t state)
-+static int _mlx5e_suspend(struct auxiliary_device *adev)
- {
- 	struct mlx5e_dev *mlx5e_dev = auxiliary_get_drvdata(adev);
- 	struct mlx5e_priv *priv = mlx5e_dev->priv;
-@@ -6002,15 +6002,18 @@ static int mlx5e_suspend(struct auxiliary_device *adev, pm_message_t state)
- 	return 0;
+-static int mlx5e_alloc_cq(struct mlx5e_priv *priv,
++static int mlx5e_alloc_cq(struct mlx5_core_dev *mdev,
+ 			  struct mlx5e_cq_param *param,
+ 			  struct mlx5e_create_cq_param *ccp,
+ 			  struct mlx5e_cq *cq)
+@@ -2042,7 +2043,7 @@ static int mlx5e_alloc_cq(struct mlx5e_priv *priv,
+ 	param->wq.db_numa_node  = ccp->node;
+ 	param->eq_ix            = ccp->ix;
+ 
+-	err = mlx5e_alloc_cq_common(priv, param, cq);
++	err = mlx5e_alloc_cq_common(mdev, ccp->netdev, ccp->wq, param, cq);
+ 
+ 	cq->napi     = ccp->napi;
+ 	cq->ch_stats = ccp->ch_stats;
+@@ -2108,14 +2109,13 @@ static void mlx5e_destroy_cq(struct mlx5e_cq *cq)
+ 	mlx5_core_destroy_cq(cq->mdev, &cq->mcq);
  }
  
--static int mlx5e_probe(struct auxiliary_device *adev,
--		       const struct auxiliary_device_id *id)
-+static int mlx5e_suspend(struct auxiliary_device *adev, pm_message_t state)
-+{
-+	return _mlx5e_suspend(adev);
-+}
-+
-+static int _mlx5e_probe(struct auxiliary_device *adev)
+-int mlx5e_open_cq(struct mlx5e_priv *priv, struct dim_cq_moder moder,
++int mlx5e_open_cq(struct mlx5_core_dev *mdev, struct dim_cq_moder moder,
+ 		  struct mlx5e_cq_param *param, struct mlx5e_create_cq_param *ccp,
+ 		  struct mlx5e_cq *cq)
  {
- 	struct mlx5_adev *edev = container_of(adev, struct mlx5_adev, adev);
- 	const struct mlx5e_profile *profile = &mlx5e_nic_profile;
- 	struct mlx5_core_dev *mdev = edev->mdev;
- 	struct mlx5e_dev *mlx5e_dev;
- 	struct net_device *netdev;
--	pm_message_t state = {};
- 	struct mlx5e_priv *priv;
+-	struct mlx5_core_dev *mdev = priv->mdev;
  	int err;
  
-@@ -6065,7 +6068,7 @@ static int mlx5e_probe(struct auxiliary_device *adev,
- 	return 0;
+-	err = mlx5e_alloc_cq(priv, param, ccp, cq);
++	err = mlx5e_alloc_cq(mdev, param, ccp, cq);
+ 	if (err)
+ 		return err;
  
- err_resume:
--	mlx5e_suspend(adev, state);
-+	_mlx5e_suspend(adev);
- err_profile_cleanup:
- 	profile->cleanup(priv);
- err_destroy_netdev:
-@@ -6077,16 +6080,21 @@ static int mlx5e_probe(struct auxiliary_device *adev,
- 	return err;
+@@ -2148,7 +2148,7 @@ static int mlx5e_open_tx_cqs(struct mlx5e_channel *c,
+ 	int tc;
+ 
+ 	for (tc = 0; tc < c->num_tc; tc++) {
+-		err = mlx5e_open_cq(c->priv, params->tx_cq_moderation, &cparam->txq_sq.cqp,
++		err = mlx5e_open_cq(c->mdev, params->tx_cq_moderation, &cparam->txq_sq.cqp,
+ 				    ccp, &c->sq[tc].cq);
+ 		if (err)
+ 			goto err_close_tx_cqs;
+@@ -2352,12 +2352,12 @@ static int mlx5e_open_queues(struct mlx5e_channel *c,
+ 
+ 	mlx5e_build_create_cq_param(&ccp, c);
+ 
+-	err = mlx5e_open_cq(c->priv, icocq_moder, &cparam->async_icosq.cqp, &ccp,
++	err = mlx5e_open_cq(c->mdev, icocq_moder, &cparam->async_icosq.cqp, &ccp,
+ 			    &c->async_icosq.cq);
+ 	if (err)
+ 		return err;
+ 
+-	err = mlx5e_open_cq(c->priv, icocq_moder, &cparam->icosq.cqp, &ccp,
++	err = mlx5e_open_cq(c->mdev, icocq_moder, &cparam->icosq.cqp, &ccp,
+ 			    &c->icosq.cq);
+ 	if (err)
+ 		goto err_close_async_icosq_cq;
+@@ -2366,17 +2366,17 @@ static int mlx5e_open_queues(struct mlx5e_channel *c,
+ 	if (err)
+ 		goto err_close_icosq_cq;
+ 
+-	err = mlx5e_open_cq(c->priv, params->tx_cq_moderation, &cparam->xdp_sq.cqp, &ccp,
++	err = mlx5e_open_cq(c->mdev, params->tx_cq_moderation, &cparam->xdp_sq.cqp, &ccp,
+ 			    &c->xdpsq.cq);
+ 	if (err)
+ 		goto err_close_tx_cqs;
+ 
+-	err = mlx5e_open_cq(c->priv, params->rx_cq_moderation, &cparam->rq.cqp, &ccp,
++	err = mlx5e_open_cq(c->mdev, params->rx_cq_moderation, &cparam->rq.cqp, &ccp,
+ 			    &c->rq.cq);
+ 	if (err)
+ 		goto err_close_xdp_tx_cqs;
+ 
+-	err = c->xdp ? mlx5e_open_cq(c->priv, params->tx_cq_moderation, &cparam->xdp_sq.cqp,
++	err = c->xdp ? mlx5e_open_cq(c->mdev, params->tx_cq_moderation, &cparam->xdp_sq.cqp,
+ 				     &ccp, &c->rq_xdpsq.cq) : 0;
+ 	if (err)
+ 		goto err_close_rx_cq;
+@@ -3310,7 +3310,7 @@ static int mlx5e_alloc_drop_cq(struct mlx5e_priv *priv,
+ 	param->wq.buf_numa_node = dev_to_node(mlx5_core_dma_dev(mdev));
+ 	param->wq.db_numa_node  = dev_to_node(mlx5_core_dma_dev(mdev));
+ 
+-	return mlx5e_alloc_cq_common(priv, param, cq);
++	return mlx5e_alloc_cq_common(priv->mdev, priv->netdev, priv->wq, param, cq);
  }
  
-+static int mlx5e_probe(struct auxiliary_device *adev,
-+		       const struct auxiliary_device_id *id)
-+{
-+	return _mlx5e_probe(adev);
-+}
-+
- static void mlx5e_remove(struct auxiliary_device *adev)
- {
- 	struct mlx5e_dev *mlx5e_dev = auxiliary_get_drvdata(adev);
- 	struct mlx5e_priv *priv = mlx5e_dev->priv;
--	pm_message_t state = {};
+ int mlx5e_open_drop_rq(struct mlx5e_priv *priv,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+index 8d9743a5e42c..a493c3716a99 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+@@ -1039,7 +1039,7 @@ int mlx5e_poll_ico_cq(struct mlx5e_cq *cq)
+ 						     (struct mlx5_err_cqe *)cqe);
+ 				mlx5_wq_cyc_wqe_dump(&sq->wq, ci, wi->num_wqebbs);
+ 				if (!test_and_set_bit(MLX5E_SQ_STATE_RECOVERING, &sq->state))
+-					queue_work(cq->priv->wq, &sq->recover_work);
++					queue_work(cq->workqueue, &sq->recover_work);
+ 				break;
+ 			}
  
- 	mlx5_core_uplink_netdev_set(priv->mdev, NULL);
- 	mlx5e_dcbnl_delete_app(priv);
- 	unregister_netdev(priv->netdev);
--	mlx5e_suspend(adev, state);
-+	_mlx5e_suspend(adev);
- 	priv->profile->cleanup(priv);
- 	mlx5e_destroy_netdev(priv);
- 	mlx5e_devlink_port_unregister(mlx5e_dev);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
+index f0b506e562df..5c166d9d2dca 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
+@@ -861,7 +861,7 @@ bool mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget)
+ 				mlx5e_dump_error_cqe(&sq->cq, sq->sqn,
+ 						     (struct mlx5_err_cqe *)cqe);
+ 				mlx5_wq_cyc_wqe_dump(&sq->wq, ci, wi->num_wqebbs);
+-				queue_work(cq->priv->wq, &sq->recover_work);
++				queue_work(cq->workqueue, &sq->recover_work);
+ 			}
+ 			stats->cqe_err++;
+ 		}
 -- 
 2.43.0
 
