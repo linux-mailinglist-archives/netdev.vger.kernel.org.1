@@ -1,180 +1,146 @@
-Return-Path: <netdev+bounces-57648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7FE0813B63
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 21:15:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C466D813B6F
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 21:22:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5AFC2B210FC
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 20:15:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BCB21F215D5
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 20:22:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5118E6A021;
-	Thu, 14 Dec 2023 20:15:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="3T5YzupG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D22E96A328;
+	Thu, 14 Dec 2023 20:22:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E016C6A33B
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 20:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-50e18689828so1093562e87.2
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 12:15:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1702584906; x=1703189706; darn=vger.kernel.org;
-        h=content-transfer-encoding:organization:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+yM7zmNbZ3NMKlj22szdncYUAuggJTnUNqcTouIT5Qs=;
-        b=3T5YzupGDwDsFAtlSa/rbnO769F100DajDkQIjejKwUW6QsJqWwK8rHITDMU8knofk
-         aibr1B0+x/7fcNGPutuXoNs4ZZtO9W/U9suZUJ7n2sHcOMohjaxhS1w8CZ0Zo95COd8H
-         mgpZvuYpNHjhDfA1YY4W52BycvZnIRUK69XgbQL3MSFKAPJjDrdne4iQ032cTobr8OIi
-         UgUJZsO2IvYfb9q3q2ifus128VSxa0Kl7xem5wTYqCFxO4EAaDdeGfQ9UAGllccqK1SD
-         Zc2PYOQoMjdRtiTL5GRACMwdJO3nSqC4IZX+mcUPdv/cOTlNfMXupNDeR27fpHQr3OoE
-         EzhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702584906; x=1703189706;
-        h=content-transfer-encoding:organization:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+yM7zmNbZ3NMKlj22szdncYUAuggJTnUNqcTouIT5Qs=;
-        b=TV42/ycpanFCf+/4MnkON/Unj61OLohTgn2k4oMMVcE7YJY/fJXpNxdiKmUwO+dd8w
-         yl+rfchKYd0lJcqu2mjLwjIGJxZBhQXjFyjqRgYLkm64RxssSLMhLPZ1VZkMIiQoYHQz
-         DXghoS4Fpw5dMsXezXuu4T6WW/9Cy/nHNelNcdY0sE+EhIHzSJtiZl2hv6c7iCXzTecx
-         A4Mkxej7jMBH5Y221+eSSkbTSphOTXAJrwxs8gYg/iHzgqGcFVgdTmVfIuFkWyPmqcl2
-         IziNFPdTn5YTunNC/ywF29MWkauIbDWdYMfHnPJzz11W79PSC0geMQ0paYzwDJgpJ4gf
-         wjyQ==
-X-Gm-Message-State: AOJu0Yx0AL9lFGpo/yY6w6fX/9wR3zDavL2XhhUwjxSwzw2qTYKIcv0O
-	9S9f7MHv87xndEjd+mtsHWbPHw==
-X-Google-Smtp-Source: AGHT+IGlxWLTei4ZhkkCQO5kN+blstnu3fm/QzjY3Gm3mbAab7sIaqeIXNBqxpx6zULCUy0YYjdlPw==
-X-Received: by 2002:a05:6512:31d2:b0:50e:154e:d7ad with SMTP id j18-20020a05651231d200b0050e154ed7admr1325381lfe.79.1702584905748;
-        Thu, 14 Dec 2023 12:15:05 -0800 (PST)
-Received: from wkz-x13.addiva.ad (h-158-174-187-194.NA.cust.bahnhof.se. [158.174.187.194])
-        by smtp.gmail.com with ESMTPSA id dw11-20020a0565122c8b00b0050e140f84besm369519lfb.164.2023.12.14.12.15.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 12:15:04 -0800 (PST)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux@armlinux.org.uk,
-	kabel@kernel.org,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: [PATCH net-next 4/4] dt-bindings: net: marvell10g: Document LED polarity
-Date: Thu, 14 Dec 2023 21:14:42 +0100
-Message-Id: <20231214201442.660447-5-tobias@waldekranz.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231214201442.660447-1-tobias@waldekranz.com>
-References: <20231214201442.660447-1-tobias@waldekranz.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306446AB81;
+	Thu, 14 Dec 2023 20:22:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (178.176.74.138) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 14 Dec
+ 2023 23:22:15 +0300
+Subject: Re: [PATCH net 2/2] net: ravb: Check that GTI loading request is done
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<claudiu.beznea.uj@bp.renesas.com>, <yoshihiro.shimoda.uh@renesas.com>,
+	<wsa+renesas@sang-engineering.com>, <niklas.soderlund+renesas@ragnatech.se>,
+	<biju.das.jz@bp.renesas.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	<mitsuhiro.kimura.kc@renesas.com>, <geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20231214113137.2450292-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214113137.2450292-3-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <884a4c36-25e4-1049-8410-cc5df9bcc4d1@omp.ru>
+Date: Thu, 14 Dec 2023 23:22:15 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Addiva Elektronik
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231214113137.2450292-3-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/14/2023 20:07:00
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182128 [Dec 14 2023]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.74.138 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.74.138 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.74.138
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 12/14/2023 20:12:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 12/14/2023 7:08:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Hardware supports multiple ways of driving attached LEDs, but this is
-not configurable via any sample-at-reset pins - rather it must be set
-via software.
+On 12/14/23 2:31 PM, Claudiu wrote:
 
-Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
----
- .../bindings/net/marvell,marvell10g.yaml      | 60 +++++++++++++++++++
- MAINTAINERS                                   |  1 +
- 2 files changed, 61 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/marvell,marvell10g.yaml
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> Hardware manual specifies the following for GCCR.LTI bit:
+> 0: Setting completed
+> 1: When written: Issue a configuration request.
+> When read: Completion of settings is pending
+> 
+> Thus, check the completion status when setting 1 to GCCR.LTI.
 
-diff --git a/Documentation/devicetree/bindings/net/marvell,marvell10g.yaml b/Documentation/devicetree/bindings/net/marvell,marvell10g.yaml
-new file mode 100644
-index 000000000000..37ff7fdfdd3d
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/marvell,marvell10g.yaml
-@@ -0,0 +1,60 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/marvell,marvell10g.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Marvell Alaska X 10G Ethernet PHY
-+
-+maintainers:
-+  - Tobias Waldekranz <tobias@waldekranz.com>
-+
-+description: |
-+  Bindings for Marvell Alaska X 10G Ethernet PHYs
-+
-+allOf:
-+  - $ref: ethernet-phy.yaml#
-+
-+properties:
-+  leds:
-+    type: object
-+
-+    properties:
-+      '#address-cells':
-+        const: 1
-+
-+      '#size-cells':
-+        const: 0
-+
-+    patternProperties:
-+      '^led@[a-f0-9]+$':
-+        $ref: /schemas/leds/common.yaml#
-+
-+        properties:
-+          marvell,polarity:
-+            description: |
-+              Electrical polarity and drive type for this LED. In the
-+              active state, hardware may drive the pin either low or
-+              high. In the inactive state, the pin can either be
-+              driven to the opposite logic level, or be tristated.
-+            $ref: /schemas/types.yaml#/definitions/string
-+            enum:
-+              - active-low
-+              - active-high
-+              - active-low-tristate
-+              - active-high-tristate
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    mdio {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        ethernet-phy@0 {
-+            reg = <0>;
-+
-+            marvell,polarity = "active-low-tristate";
-+        };
-+    };
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a151988646fe..2def66789f9d 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -12849,6 +12849,7 @@ M:	Russell King <linux@armlinux.org.uk>
- M:	Marek Behún <kabel@kernel.org>
- L:	netdev@vger.kernel.org
- S:	Maintained
-+F:	Documentation/devicetree/bindings/net/marvell,marvell10g.yaml
- F:	drivers/net/phy/marvell10g.c
- 
- MARVELL MVEBU THERMAL DRIVER
--- 
-2.34.1
+   But do we really need to? Seems quite dubious... currently we
+just let it the loading complete asynchronously...
 
+> Fixes: 7e09a052dc4e ("ravb: Exclude gPTP feature support for RZ/G2L")
+> Fixes: 568b3ce7a8ef ("ravb: factor out register bit twiddling code")
+> Fixes: 0184165b2f42 ("ravb: add sleep PM suspend/resume support")
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> ---
+>  drivers/net/ethernet/renesas/ravb_main.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index ce95eb5af354..1c253403a297 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -2819,6 +2819,10 @@ static int ravb_probe(struct platform_device *pdev)
+>  
+>  		/* Request GTI loading */
+>  		ravb_modify(ndev, GCCR, GCCR_LTI, GCCR_LTI);
+> +		/* Check completion status. */
+> +		error = ravb_wait(ndev, GCCR, GCCR_LTI, 0);
+> +		if (error)
+> +			goto out_disable_refclk;
+>  	}
+>  
+>  	if (info->internal_delay) {
+> @@ -3041,6 +3045,10 @@ static int __maybe_unused ravb_resume(struct device *dev)
+>  
+>  		/* Request GTI loading */
+>  		ravb_modify(ndev, GCCR, GCCR_LTI, GCCR_LTI);
+> +		/* Check completion status. */
+> +		ret = ravb_wait(ndev, GCCR, GCCR_LTI, 0);
+> +		if (ret)
+> +			return ret;
+>  	}
+>  
+>  	if (info->internal_delay)
+> 
+
+   BTW, seems worth factoring out into a separate function...
+
+MBR, Sergey
 
