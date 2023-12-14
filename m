@@ -1,91 +1,94 @@
-Return-Path: <netdev+bounces-57588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3A9B813870
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 18:25:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 440C5813874
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 18:25:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F31241C20CC3
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 17:25:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AAD44B20DDD
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 17:25:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3C665EC2;
-	Thu, 14 Dec 2023 17:25:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBA3565ED6;
+	Thu, 14 Dec 2023 17:25:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siddh.me header.i=code@siddh.me header.b="etSC+Grb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="On1rQijo"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender-of-o51.zoho.in (sender-of-o51.zoho.in [103.117.158.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A18499;
-	Thu, 14 Dec 2023 09:25:12 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1702574669; cv=none; 
-	d=zohomail.in; s=zohoarc; 
-	b=IsS9jqdNboH+DokAUmHWqUdAxp2O47MBBHJTb7Dh8wac4DUOZx6ULC2KgjpbCybyXSew3T3QjTNtSSSviySJT2YlYw3WIDIDIK3w+78z2iokrFcqLBobXwVL1ZfGJzb6c8kE1T8RR7SqZZofNhHN5WLHrCVFLUbiYX0kMFBYyqs=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
-	t=1702574669; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=wt/4epX/ikd630E8H32vudYEFiqhHNATnHTpC4Gl3Zw=; 
-	b=ZyHXlsU/0eZB83l9Agr4vd5hcci3vL+DaRyfcEEynFd+JkKBbXJyjibopQHAdHthgTBAzu8JQnTVM7JdNnOd4aD7SmUXrFPfI2QC98jEwbHlFavo0k6+5GOY88UCHh9z2V8dVYbGc3ABiiarecKmNL58NKJHEs/cH7QMfdcWNFI=
-ARC-Authentication-Results: i=1; mx.zohomail.in;
-	dkim=pass  header.i=siddh.me;
-	spf=pass  smtp.mailfrom=code@siddh.me;
-	dmarc=pass header.from=<code@siddh.me>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1702574669;
-	s=zmail; d=siddh.me; i=code@siddh.me;
-	h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=wt/4epX/ikd630E8H32vudYEFiqhHNATnHTpC4Gl3Zw=;
-	b=etSC+GrbFdDpLBWHJIudygbqtoqUN7XpxfaMwsjjYlbPfUMzayWDO1fyy3AVXh1C
-	R9R7xOxYRVhe55/ALgDAvIVatCgtQ/5JTbl0Wqi6J8P36Ucre+efHrFt6NHxNHY0yBx
-	0ah92EK14DJOFL1Gxunv4Gis3uvVeg5zdm2mHn/U=
-Received: from mail.zoho.in by mx.zoho.in
-	with SMTP id 1702574638401587.2154477246745; Thu, 14 Dec 2023 22:53:58 +0530 (IST)
-Date: Thu, 14 Dec 2023 22:53:58 +0530
-From: Siddh Raman Pant <code@siddh.me>
-To: "Krzysztof Kozlowski" <krzysztof.kozlowski@linaro.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	"Eric Dumazet" <edumazet@google.com>,
-	"Jakub Kicinski" <kuba@kernel.org>,
-	"Paolo Abeni" <pabeni@redhat.com>,
-	"Suman Ghosh" <sumang@marvell.com>,
-	"netdev" <netdev@vger.kernel.org>,
-	"linux-kernel" <linux-kernel@vger.kernel.org>,
-	"syzbot+bbe84a4010eeea00982d"
- <syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com>
-Message-ID: <18c695b4512.5afde007311004.1718468931473736202@siddh.me>
-In-Reply-To: <1813902b-6afc-4539-96b2-050df6fc75c1@linaro.org>
-References: <cover.1702404519.git.code@siddh.me>
- <6a26e3b65817bb31cb11c8dde5b1b420071d944e.1702404519.git.code@siddh.me> <1813902b-6afc-4539-96b2-050df6fc75c1@linaro.org>
-Subject: Re: [PATCH net-next v5 1/2] nfc: llcp_core: Hold a ref to
- llcp_local->dev when holding a ref to llcp_local
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10468A7
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 09:25:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702574738; x=1734110738;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jMw7RRpHVs9kaxegVgNIhrUhV/V/APavpUBnfUCm8/0=;
+  b=On1rQijo+NhTEjRmCrfROI26ehRH07MKW5hWx8atNsPoLFuzMttNJeqm
+   7zeGKXSOSKvLt18zhxnGQB5DHdObJX+2r52Pan39tCh/bn/tdnCD0HREq
+   266Ol7Vxoh7nW2wg+LS1Y4Ea+MZPA3OQkfQ589N2s+DmjZjvPnZni53jo
+   tZ7SqRz7A7fc+expfpyL92sL7jES/BY9z+H+XXT95X1/KO9yugbAUDrGK
+   q8EUydyvp/7UFk9gHcNJ26Q6FXImrSkUD+0dxoavAZofmCUkZtP3bkMZd
+   NVFmKMtmXUVeDR+qcyWwq/iNptp+UR7brLQOphUJ4tgPgt2QHsOUgpoRU
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="481345178"
+X-IronPort-AV: E=Sophos;i="6.04,276,1695711600"; 
+   d="scan'208";a="481345178"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 09:25:37 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="803361479"
+X-IronPort-AV: E=Sophos;i="6.04,276,1695711600"; 
+   d="scan'208";a="803361479"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga008.jf.intel.com with ESMTP; 14 Dec 2023 09:25:34 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rDpSg-000MOA-1z;
+	Thu, 14 Dec 2023 17:25:31 +0000
+Date: Fri, 15 Dec 2023 01:24:00 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	edumazet@google.com, pabeni@redhat.com, donald.hunter@gmail.com,
+	Jakub Kicinski <kuba@kernel.org>, matttbe@kernel.org,
+	martineau@kernel.org, dcaratti@redhat.com, mptcp@lists.linux.dev
+Subject: Re: [PATCH net-next 3/3] netlink: specs: mptcp: rename the MPTCP
+ path management(?) spec
+Message-ID: <202312150140.ST22T64E-lkp@intel.com>
+References: <20231213232822.2950853-4-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Importance: Medium
-User-Agent: Zoho Mail
-X-Mailer: Zoho Mail
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231213232822.2950853-4-kuba@kernel.org>
 
-On Wed, 13 Dec 2023 13:10:16 +0530, Krzysztof Kozlowski wrote:
-> > -	if (sk_acceptq_is_full(parent)) {
-> > -		reason = LLCP_DM_REJ;
-> > -		release_sock(&sock->sk);
-> > -		sock_put(&sock->sk);
-> > -		goto fail;
-> > -	}
-> > +	if (sk_acceptq_is_full(parent))
-> > +		goto fail_put_sock;
-> 
-> I would argue that you reshuffle here more code than needed for the fix.
-> 
-> This should fix only missing dev reference, not reshuffle code. It's a
-> bugfix, not cleanup.
+Hi Jakub,
 
-So this should not be done? I did it because you told to extend the
-cleanup label in v3 discussion.
+kernel test robot noticed the following build warnings:
 
-Thanks,
-Siddh
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Jakub-Kicinski/netlink-specs-ovs-remove-fixed-header-fields-from-attrs/20231214-073118
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231213232822.2950853-4-kuba%40kernel.org
+patch subject: [PATCH net-next 3/3] netlink: specs: mptcp: rename the MPTCP path management(?) spec
+reproduce: (https://download.01.org/0day-ci/archive/20231215/202312150140.ST22T64E-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312150140.ST22T64E-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> Warning: MAINTAINERS references a file that doesn't exist: Documentation/netlink/specs/mptcp.yaml
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
