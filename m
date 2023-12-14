@@ -1,159 +1,107 @@
-Return-Path: <netdev+bounces-57524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4328F81346C
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:15:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A947C81347A
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:18:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F38F72820FA
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:15:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B105B20B1D
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:18:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E53F25C8F5;
-	Thu, 14 Dec 2023 15:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32CD35C903;
+	Thu, 14 Dec 2023 15:18:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DMgpQ8mc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L0Au00VY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-x35.google.com (mail-oa1-x35.google.com [IPv6:2001:4860:4864:20::35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4FE9199
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 07:15:35 -0800 (PST)
-Received: by mail-oa1-x35.google.com with SMTP id 586e51a60fabf-1efabc436e4so5787969fac.1
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 07:15:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702566935; x=1703171735; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wb1/c99fDx2vxrOG/BjC5kU3A8NpbcUe6YaEnqoVq+s=;
-        b=DMgpQ8mcnZ5qsHjxyevwPDp6E6KSgkIahmJq/AhxramV6ZU3V4b8o/cuzH2iCAsF7F
-         mYER8s5vOnxDn4To3qV0RAcl0523P/OJayq4DrUCY+OZI8ZvfmAAdOC8UIRjeuUutiHF
-         GtJl0uFtUxEWSt2Rv0rikcn503QoRw2OcW6NT+uIuigj7oQVoUbGSe3mNgCt+RkUz+/K
-         WOiq4sh56uz/7dAB3xYh5Dqihpo/graE3J9DdXQ92cxAPe5uFv41qYe7WzgD02hYMnqy
-         TbYsWkpUPfr5V/EsvMF4cKTY3AJyRLpGC1MReT0NsZccxOcm993eJSwA8WOgyQ3eggIk
-         V/Eg==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49EB811D
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 07:18:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702567112;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uouXIP/mY6V89mn8ffGDizGjbA5gvdMVTlnAPaRcEZY=;
+	b=L0Au00VYVHL1qUBKfIqAOayJ4ho7ubYcR/YUHiwEJ8gP9SIiqOiyVISMyIAhDoX9AEKF7s
+	OAdBfmTD1GztbwlzMoAiWsYC7bNGlZtWQ075lpnuNwYCp+yW1LnFK0Sv3bApdWOFl4dMrO
+	rxt2mwPnR1UlLJMpIeaGGyQK4PXKOBU=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-465-hev4HcwHM9KOJL_ucyAnqw-1; Thu, 14 Dec 2023 10:18:31 -0500
+X-MC-Unique: hev4HcwHM9KOJL_ucyAnqw-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a1fae8cca5bso90120666b.1
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 07:18:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702566935; x=1703171735;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wb1/c99fDx2vxrOG/BjC5kU3A8NpbcUe6YaEnqoVq+s=;
-        b=PHlYv7zWdGrDRD15Wi1O01k5mATmIDuL6PvIQtBpgJ8LWjBRw+MWXb8cYpjMrT0vAs
-         W/l8uFS5se2rwErGqNkTny8fo0Bnt+WBdunmibwT0Hhtw7I7+Ef1g4AZFr8xvplKF7pC
-         jaL3P9ue590aMgOVCiUHDv8omI+o23UefQSc/WHXKdNCXajfXYf6lT4woxFI6Oklicxk
-         5AkMqXjeEOaElTiSzjHCxCiy/CVAB94wo2w2bwVmyEQbf6rnAA23IwMhesar6FcBDP6H
-         pFq0OSostk3Ydc/+6lpBYSbe9rRMFUbBiubzk7eVqqC8WAU/LtPqYAebKXlCLt0CGrvE
-         CGxw==
-X-Gm-Message-State: AOJu0YwtJNA+ew9QO5xgsVcNxLFl2hhVHZEhLhMR4tu4sd9XXXUH+Crz
-	AhrV22n06JLjKSkpYO82oetrvIHVv7S7MQ==
-X-Google-Smtp-Source: AGHT+IEPfMadRV3cTITiKW5mlEGOHNGhNvsrfOl026TFEUVp+domMSgFVqmzh2kXUESW9AXEtzPilA==
-X-Received: by 2002:a05:6870:a693:b0:203:506a:326e with SMTP id i19-20020a056870a69300b00203506a326emr715873oam.79.1702566934908;
-        Thu, 14 Dec 2023 07:15:34 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id d24-20020a67fb18000000b004665bd1453asm160375vsr.30.2023.12.14.07.15.32
+        d=1e100.net; s=20230601; t=1702567110; x=1703171910;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=uouXIP/mY6V89mn8ffGDizGjbA5gvdMVTlnAPaRcEZY=;
+        b=NXEF89Xf6KZLkQFk2JliiE62lspnGxPyBi9PPAO8+bqujLSLmvYoDIL7PjvXUR2hg5
+         f+3LSfFTxL1FZBrOIGmFk9UkH2JZe/neGweHvdRlwucbk5SPIO50GD+AgsCvXAWlE8Qs
+         qJmmPsE2b1i27tAk8kThi76OD00uMcgWbzztWUcS9F+FliGyynLPkQa3VOBdKC0Ux0W8
+         Ex/+czLZ54v1JBhkdxcVF2024EzMbVFi9PF/pdUe5dWgKVSkfCWeXpaCt7+bpZiPljuE
+         n6MtdMk55kG9dwhFN4sI2rS/UyPbMzW2gXhAqBuHd4XF+u7M0UatDU1scZiiVfVLcWCz
+         X2HQ==
+X-Gm-Message-State: AOJu0YzWp3/Q1nRxvtJszafgLjw731Vu1SfiTZeRxX9LeaSe/v9/YxWA
+	waDj2Ai/xtgv/sCjnt2XpExtFofsiJlFpNjG9sZFS2bquF7A4RWn3EwQr+DO+JIWYUxYB6fJEe7
+	722aei5zlTq+rXjeB
+X-Received: by 2002:a17:907:d384:b0:a1b:1daf:8270 with SMTP id vh4-20020a170907d38400b00a1b1daf8270mr11509613ejc.5.1702567110036;
+        Thu, 14 Dec 2023 07:18:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHbLh6Ckh+2C7wi9l0Q+FDN5slGlIEm9FPCvaL/O8/HwM1PTKqTgUfLgM/T/AGEUxS/XBLhng==
+X-Received: by 2002:a17:907:d384:b0:a1b:1daf:8270 with SMTP id vh4-20020a170907d38400b00a1b1daf8270mr11509595ejc.5.1702567109820;
+        Thu, 14 Dec 2023 07:18:29 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-252-36.dyn.eolo.it. [146.241.252.36])
+        by smtp.gmail.com with ESMTPSA id sn24-20020a170906629800b00a2310f34d0asm725097ejc.196.2023.12.14.07.18.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 07:15:34 -0800 (PST)
-Date: Thu, 14 Dec 2023 18:15:30 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, loongarch@lists.linux.dev, chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH v6 0/9] stmmac: Add Loongson platform support
-Message-ID: <pwdr6mampxe33jpqdf6o5xczgd4qkdttqj4tvionxl7qbry2ek@hpadl7wi4zni>
-References: <cover.1702458672.git.siyanteng@loongson.cn>
+        Thu, 14 Dec 2023 07:18:29 -0800 (PST)
+Message-ID: <4837d1401e1610764eeea7446280de87d51912f6.camel@redhat.com>
+Subject: Re: [syzbot] [mptcp?] WARNING in mptcp_check_listen_stop
+From: Paolo Abeni <pabeni@redhat.com>
+To: syzbot <syzbot+5a01c3a666e726bc8752@syzkaller.appspotmail.com>, 
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+ linux-kernel@vger.kernel.org, martineau@kernel.org, matttbe@kernel.org, 
+ mptcp@lists.linux.dev, netdev@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com
+Date: Thu, 14 Dec 2023 16:18:27 +0100
+In-Reply-To: <000000000000703582060c68aeab@google.com>
+References: <000000000000703582060c68aeab@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1702458672.git.siyanteng@loongson.cn>
 
-Hi Yanteng
+On Wed, 2023-12-13 at 10:53 -0800, syzbot wrote:
+> syzbot has found a reproducer for the following issue on:
+>=20
+> HEAD commit:    2513974cc3e1 Merge branch 'stmmac-bug-fixes'
+> git tree:       net
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=3D116337fae8000=
+0
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Db50bd31249191=
+be8
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3D5a01c3a666e726b=
+c8752
+> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for D=
+ebian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D1119061ee80=
+000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D110ca006e8000=
+0
 
-On Wed, Dec 13, 2023 at 06:12:22PM +0800, Yanteng Si wrote:
-> v6:
-> 
-> * Refer to Serge's suggestion:
->   - Add new platform feature flag:
->     include/linux/stmmac.h:
->     +#define STMMAC_FLAG_HAS_LGMAC			BIT(13)
-> 
->   - Add the IRQs macros specific to the Loongson Multi-channels GMAC:
->      drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h:
->      +#define DMA_INTR_ENA_NIE_LOONGSON 0x00060000	/* Normal Loongson Tx/Rx Summary */
->      #define DMA_INTR_ENA_NIE 0x00010000	/* Normal Summary */
->      ...
-> 
->   - Drop all of redundant changes that don't require the
->     prototypes being converted to accepting the stmmac_priv
->     pointer.
-> 
-> * Refer to andrew's suggestion:
->   - Drop white space changes.
->   - break patch up into lots of smaller parts.
->      Some small patches have been put into another series as a preparation
->      see <https://lore.kernel.org/loongarch/cover.1702289232.git.siyanteng@loongson.cn/T/#t>
->      
->      *note* : This series of patches relies on the three small patches above.
-> * others
->   - Drop irq_flags changes.
->   - Changed patch order.
+It looks like tcp_diag_destroy is closing the listener subflow, while
+the mptcp stack is not expecting anyone to touch it while in listener
+status. I guess we can relax the mptcp_check_listen_stop checks.
 
-Thanks for submitting the updated series. I'll have a closer look at
-it on the next week.
+/P=20
 
--Serge(y)
-
-> 
-> 
-> 
-> v4 -> v5:
-> 
-> * Remove an ugly and useless patch (fix channel number).
-> * Remove the non-standard dma64 driver code, and also remove
->   the HWIF entries, since the associated custom callbacks no
->   longer exist.
-> * Refer to Serge's suggestion: Update the dwmac1000_dma.c to
->   support the multi-DMA-channels controller setup.
-> 
-> See:
-> v4: <https://lore.kernel.org/loongarch/cover.1692696115.git.chenfeiyang@loongson.cn/>
-> v3: <https://lore.kernel.org/loongarch/cover.1691047285.git.chenfeiyang@loongson.cn/>
-> v2: <https://lore.kernel.org/loongarch/cover.1690439335.git.chenfeiyang@loongson.cn/>
-> v1: <https://lore.kernel.org/loongarch/cover.1689215889.git.chenfeiyang@loongson.cn/>
-> 
-> Yanteng Si (9):
->   net: stmmac: Pass stmmac_priv and chan in some callbacks
->   net: stmmac: dwmac-loongson: Refactor code for loongson_dwmac_probe()
->   net: stmmac: dwmac-loongson: Add full PCI support
->   net: stmmac: Add multi-channel supports
->   net: stmmac: Add Loongson-specific register definitions
->   net: stmmac: dwmac-loongson: Add MSI support
->   net: stmmac: dwmac-loongson: Add GNET support
->   net: stmmac: dwmac-loongson: Disable flow control for GMAC
->   net: stmmac: Disable coe for some Loongson GNET
-> 
->  drivers/net/ethernet/stmicro/stmmac/common.h  |   1 +
->  .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 296 ++++++++++++++----
->  .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |   2 +-
->  .../ethernet/stmicro/stmmac/dwmac1000_dma.c   |  61 +++-
->  .../ethernet/stmicro/stmmac/dwmac100_dma.c    |   2 +-
->  .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  |   2 +-
->  .../net/ethernet/stmicro/stmmac/dwmac_dma.h   |  47 ++-
->  .../net/ethernet/stmicro/stmmac/dwmac_lib.c   |  65 ++--
->  .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |   2 +-
->  drivers/net/ethernet/stmicro/stmmac/hwif.c    |   8 +-
->  drivers/net/ethernet/stmicro/stmmac/hwif.h    |  11 +-
->  .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |   6 +
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c |  13 +-
->  include/linux/stmmac.h                        |   4 +
->  14 files changed, 413 insertions(+), 107 deletions(-)
-> 
-> -- 
-> 2.31.4
-> 
 
