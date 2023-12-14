@@ -1,95 +1,102 @@
-Return-Path: <netdev+bounces-57552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1B8A813600
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 17:16:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 418B3813607
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 17:17:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96B391F2213A
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:16:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBBFF1F21E07
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:17:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF6865F1DF;
-	Thu, 14 Dec 2023 16:16:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E15945F1E7;
+	Thu, 14 Dec 2023 16:17:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SwVM9ldH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S2zoVI0T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0FAF12A
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 08:16:28 -0800 (PST)
-Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-1fb9a22b4a7so4942074fac.3
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 08:16:28 -0800 (PST)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3322411A
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 08:17:23 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-54c77d011acso12081a12.1
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 08:17:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702570588; x=1703175388; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1702570641; x=1703175441; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+PbRjTBgX8BFxA9/J0vk+pjURu8qRhIKqhgUQ/E0mRY=;
-        b=SwVM9ldHg21P9+cJX0gFq4nPXsRu9minEGm0UeA/+y/8IvCQSwIkvL9WfZA/1p4DX+
-         UEVZM2zeJ8N/RTi2E+p00nbMjwnXgV6QT7MoqoZQaMlVnHbqzg2AuR89to9C03GTZc0s
-         gxSMaChFqnA6SY0d5gd2wtInrCwNkFcFMQ+1Vcp4soDiqTqe4T6w+xKKSrYPlXpSWiZl
-         3svAhhC0E4WURCx/BnKEubKE5i7r5LaGq69DManMw49Gk8GS+81FoPI0F7DIlKRjxkU7
-         lGZokWSoKRv8+2WAWvC1+Nhx01LdOXR+Jyy/H4FiIaAFmAiDmbUyqpcC4m+aSw+62y1L
-         JV8Q==
+        bh=L7+F/AIQ+R4dXwbyX988J6IJeOe2kasVZsJeJ+ksKts=;
+        b=S2zoVI0TXAmPBhx1RaWDBpgfI670+0Alh+SgRn0H4bz8VZqVDBeptmv6V2MfahuFVD
+         ytCKWz992WjsDaEuBgGEakRwmOjQIHhJVbWd8CVDxiD/Jhb7iJePFoW2jwYTd+wmX08U
+         /6LjVXWA9E8C0/ucmDdnLJwUE0qbsER6UGssMuK7v6QZ3nN7lA9WXnsR4h3Nip7Q7tlF
+         Z7c8ChhNuEntPcVHscUohdUR4qkhRFYnLyxGKgchsdW/k7djsLzwytQbjvZORJJZg1lT
+         sEGhT5KFB+EivMZYfjP/NiGKW6Sopg3I/eI81hUGxHjKfx32RZyAzz7/RHU1KeKUMF7i
+         9Snw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702570588; x=1703175388;
+        d=1e100.net; s=20230601; t=1702570641; x=1703175441;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+PbRjTBgX8BFxA9/J0vk+pjURu8qRhIKqhgUQ/E0mRY=;
-        b=HtJf2dWs0HoLMDSY6PeWcyql1/McT+E4rdK3jflJmqJKCNw9SfkgWDyZ3fUFJtNYcU
-         NByzO1/IBVY6/678PGeSL5tGZkrg3TeSYc5Uy6b12sxTEkIBY8wnvHDc1XH3Q+SV4+0N
-         +Wf4/fa7zsa296w71u3TdWxHiQZlZJAQa2NIXe1noiPjhxqoCIUKq6Ni0Qrn+yx9rv5z
-         uISdWo9gM60TDAfG2P4NXa1IqYKDR4ylczHep1ZM1EWxHvImSCUQ420r5taIwHT4kdKo
-         KKUOISvNlfgfRPXxBjyF6DpP/BLd0SDSVECZrStkLGfHJ+6AKDwVs2gO8U4heynSsXrX
-         6Lfw==
-X-Gm-Message-State: AOJu0Yz0DwWdDcrYCZlwjjg9JfVeBoEirBa/gtyM3jW6z5Sj1EpcSEIY
-	3jjd+dq/5fIsSoLMS0e+xapoVK9ku2eICuvVCBXkOQ==
-X-Google-Smtp-Source: AGHT+IEcAC1aBVy2eIZ27/CHhn1kikfWBJVB4hiR/CtJKw2SKRD7W/8k6ojVqoRK6/jkhs5FG54sdSfmaw/qWQguXK8=
-X-Received: by 2002:a05:6870:f10d:b0:203:5e76:1d7 with SMTP id
- k13-20020a056870f10d00b002035e7601d7mr65521oac.3.1702570588126; Thu, 14 Dec
- 2023 08:16:28 -0800 (PST)
+        bh=L7+F/AIQ+R4dXwbyX988J6IJeOe2kasVZsJeJ+ksKts=;
+        b=jY7nM1i2Qkbg6BBxAm9uB1ifDHGjZOzGfkqBLCLkP0ziuP++D5K/T0ixlMNRHzRK4A
+         aLdJZ8Y+E/uojGgKzZshq/4AfB6BYjm+VzNV1vJaj/G3eTUPAuOdmAZqLlEvJc1nQc59
+         2Zonv82tdYkqyVTZipuXx5777pQMildH9ELZP6x3mGFFqMEH7zFfmoEOXa+0uIOnUnsV
+         Hsa3wyX+XKpZYvvOcJZlssArBqEYmknQdFbrg4LE9reWOxpiizlt89TIxtT01H6atRk8
+         Fub5Um7bv3v9JYf25sMJWFsb2Hiw7C+RiV8TRsozRzGbkgI3GYWjnVmJW59dmJpcm3X7
+         8lJA==
+X-Gm-Message-State: AOJu0YzYS1ntd7D5mP3XSdLl6tKVLTTbph5g8V21C5tkvWu8/37L4O5/
+	sL72hov1O62JUYLFO6rejianlbNi+il5x0KMhfwWsQ==
+X-Google-Smtp-Source: AGHT+IEGnuwqOSea+Mf1eP3VPlAGE0YQ+aLikfhX/prmeqXDuUPdkQrWtfK2RMweuitBluRbnpgt3lmL8at/6n228CQ=
+X-Received: by 2002:a50:c192:0:b0:54c:f4fd:3427 with SMTP id
+ m18-20020a50c192000000b0054cf4fd3427mr663327edf.7.1702570641361; Thu, 14 Dec
+ 2023 08:17:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231214104901.1318423-1-edumazet@google.com> <20231214104901.1318423-2-edumazet@google.com>
- <657b09ab4f6ef_14c73d294b9@willemb.c.googlers.com.notmuch>
-In-Reply-To: <657b09ab4f6ef_14c73d294b9@willemb.c.googlers.com.notmuch>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Thu, 14 Dec 2023 11:16:11 -0500
-Message-ID: <CADVnQyk4vV_Tqy6YBON6ic15x+SjHgMmrHm6eC4xry1qy1vrmQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/3] net: increase optmem_max default value
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Mina Almasry <almasrymina@google.com>, Chao Wu <wwchao@google.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20231214155424.67136-1-kuniyu@amazon.com> <20231214155424.67136-2-kuniyu@amazon.com>
+In-Reply-To: <20231214155424.67136-2-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 14 Dec 2023 17:17:10 +0100
+Message-ID: <CANn89iJS+rGAWaDCsOXmyrXF0d_xSXqrFXpknAnPMZAQ5mi43g@mail.gmail.com>
+Subject: Re: [PATCH v6 bpf-next 1/6] tcp: Move tcp_ns_to_ts() to tcp.h
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 14, 2023 at 8:57=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
+On Thu, Dec 14, 2023 at 4:55=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
 >
-> Eric Dumazet wrote:
-> > For many years, /proc/sys/net/core/optmem_max default value
-> > on a 64bit kernel has been 20 KB.
-> >
-> > Regular usage of TCP tx zerocopy needs a bit more.
-> >
-> > Google has used 128KB as the default value for 7 years without
-> > any problem.
-> >
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> We will support arbitrary SYN Cookie with BPF.
 >
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> When BPF prog validates ACK and kfunc allocates a reqsk, we need
+> to call tcp_ns_to_ts() to calculate an offset of TSval for later
+> use:
+>
+>   time
+>   t0 : Send SYN+ACK
+>        -> tsval =3D Initial TSval (Random Number)
+>
+>   t1 : Recv ACK of 3WHS
+>        -> tsoff =3D TSecr - tcp_ns_to_ts(usec_ts_ok, tcp_clock_ns())
+>                 =3D Initial TSval - t1
+>
+>   t2 : Send ACK
+>        -> tsval =3D t2 + tsoff
+>                 =3D Initial TSval + (t2 - t1)
+>                 =3D Initial TSval + Time Delta (x)
+>
+>   (x) Note that the time delta does not include the initial RTT
+>       from t0 to t1.
+>
+> Let's move tcp_ns_to_ts() to tcp.h.
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Acked-by: Neal Cardwell <ncardwell@google.com>
-
-Thanks, Eric!
-
-neal
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
