@@ -1,145 +1,135 @@
-Return-Path: <netdev+bounces-57679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EF1F813D63
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 23:39:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8B86813C44
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 22:04:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1A4C1F22423
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 22:39:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D7AA281ABC
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 21:04:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5510A6DD09;
-	Thu, 14 Dec 2023 22:38:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gaM6CsDX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4407254275;
+	Thu, 14 Dec 2023 21:04:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08DDE6A34D;
-	Thu, 14 Dec 2023 22:38:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-40c38de1ee4so720065e9.0;
-        Thu, 14 Dec 2023 14:38:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702593516; x=1703198316; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tI12aCWJQCHdnL9tpy1TZqFUoLiTbzcedlrkIrXRyzo=;
-        b=gaM6CsDXN9QTmZ+6tuMHtvQBtsZyL+6jo0kQtDGBFUdLQsHYspNnvIucVWR2cYaX9q
-         9BMSfEKtMMhg+cBnjZBzJ/vnLiiaXoIEYOGLQVYqFo0FcWbZphwQlvnih5TjuoYFf/ZF
-         suyMFPhZHnTwYxft20sAb2hSkEebwkhHEKW0lBdKFcoVPyw/CSCdAzwoS64KvOqESTYR
-         8S1Lt9AvRaUvMbNHxWfVupBFDYBKCuQT21RW6D1K3c188LSe7vr6e2STNY8DNsFRsQOS
-         uL06OXcXIH/30wN5WXFsh6nupeBNUgraWgX+HW/4RjbALScpIJPMAEvghrYCh1s2lmgk
-         lzcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702593516; x=1703198316;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tI12aCWJQCHdnL9tpy1TZqFUoLiTbzcedlrkIrXRyzo=;
-        b=jYCSJ5BmWj831aV+KylsBg6YH96KpPalN12AdU8BRbszXyGQuW4m/1SBUVz7IKulN4
-         C6wWxe4avsVJigSyaNbasgcPFhBJrrVk9G/FXVRfOboFLwb9bBPT9KqHXfTy20yEwF6J
-         /hb5qQH400W3JVCliDFnWYke7x3sdVu/M0vTGAbJ0Gsrs5h9qfJl/JzTOfLP1lXA66zN
-         4NCkhYemF3GwfjSUr2u9SyQlNlVioOSXv7b8u6LAZfyQuOx/QfiS7mvpXXk2VF4QvQa8
-         lRUHS7+eays/zpagMfFZTcnd7i/2wG+mpxAx9YbcLv/Zc7ZK+t+udolOeC4o70dBm6bd
-         Jb3g==
-X-Gm-Message-State: AOJu0YyEch4sL7Z7Ynd2rEm5tagj16eKR3L+VlIpY7vBmmd8Qq7IYTZ6
-	JxMhGMpVaPa8snRhcTzgxD4MTFlbGOE=
-X-Google-Smtp-Source: AGHT+IFdoARMWmZNzhKw0rwFY0f1WPM6SFtGq0GrsXkXpKS4ch37Yu7Qx+DrPnfxw4CUT6SR/0KkkQ==
-X-Received: by 2002:a05:600c:1f1a:b0:40c:31f1:145c with SMTP id bd26-20020a05600c1f1a00b0040c31f1145cmr5011868wmb.169.1702593515923;
-        Thu, 14 Dec 2023 14:38:35 -0800 (PST)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id n41-20020a05600c3ba900b0040c61ee0816sm54746wms.0.2023.12.14.14.38.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 14:38:35 -0800 (PST)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Christian Marangi <ansuelsmth@gmail.com>
-Subject: [net-next PATCH v2 3/3] net: phy: led: dynamically allocate speed modes array
-Date: Thu, 14 Dec 2023 16:49:06 +0100
-Message-Id: <20231214154906.29436-4-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231214154906.29436-1-ansuelsmth@gmail.com>
-References: <20231214154906.29436-1-ansuelsmth@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80578282E8;
+	Thu, 14 Dec 2023 21:04:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (178.176.74.138) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 15 Dec
+ 2023 00:03:59 +0300
+Subject: Re: [PATCH net-next v2 11/21] net: ravb: Move DBAT configuration to
+ the driver's ndo_open API
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>,
+	<geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214114600.2451162-12-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <a93c0673-2876-5bb2-29aa-0d0208b97b10@omp.ru>
+Date: Fri, 15 Dec 2023 00:03:59 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231214114600.2451162-12-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/14/2023 20:46:37
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182128 [Dec 14 2023]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.74.138 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.74.138 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.74.138
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 12/14/2023 20:51:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 12/14/2023 7:08:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Instead of defining a big enough array for speed modes use the newly
-introduced API to get the actual number of supported speed modes and
-dynamically allocate them.
+On 12/14/23 2:45 PM, Claudiu wrote:
 
-Allocated space is freed at the end of the LED register loop.
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> DBAT setup was done in the driver's probe API. As some IP variants switch
+> to reset mode (and thus registers' content is lost) when setting clocks
+> (due to module standby functionality) to be able to implement runtime PM
+> move the DBAT configuration in the driver's ndo_open API.
+> 
+> This commit prepares the code for the addition of runtime PM.
+> 
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- drivers/net/phy/phy_led_triggers.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-diff --git a/drivers/net/phy/phy_led_triggers.c b/drivers/net/phy/phy_led_triggers.c
-index f550576eb9da..2e41d10e323c 100644
---- a/drivers/net/phy/phy_led_triggers.c
-+++ b/drivers/net/phy/phy_led_triggers.c
-@@ -83,14 +83,21 @@ static void phy_led_trigger_unregister(struct phy_led_trigger *plt)
- 
- int phy_led_triggers_register(struct phy_device *phy)
- {
-+	unsigned int *speeds;
- 	int i, err;
--	unsigned int speeds[50];
- 
--	phy->phy_num_led_triggers = phy_supported_speeds(phy, speeds,
--							 ARRAY_SIZE(speeds));
-+	phy->phy_num_led_triggers = phy_supported_speeds_num(phy);
- 	if (!phy->phy_num_led_triggers)
- 		return 0;
- 
-+	speeds = kmalloc_array(phy->phy_num_led_triggers, sizeof(*speeds),
-+			       GFP_KERNEL);
-+	if (!speeds)
-+		return -ENOMEM;
-+
-+	/* Presence of speed modes already checked up */
-+	phy_supported_speeds(phy, speeds, phy->phy_num_led_triggers);
-+
- 	phy->led_link_trigger = devm_kzalloc(&phy->mdio.dev,
- 					     sizeof(*phy->led_link_trigger),
- 					     GFP_KERNEL);
-@@ -123,6 +130,8 @@ int phy_led_triggers_register(struct phy_device *phy)
- 	phy->last_triggered = NULL;
- 	phy_led_trigger_change_speed(phy);
- 
-+	free(speeds);
-+
- 	return 0;
- out_unreg:
- 	while (i--)
-@@ -134,6 +143,7 @@ int phy_led_triggers_register(struct phy_device *phy)
- 	devm_kfree(&phy->mdio.dev, phy->led_link_trigger);
- 	phy->led_link_trigger = NULL;
- out_clear:
-+	free(speeds);
- 	phy->phy_num_led_triggers = 0;
- 	return err;
- }
--- 
-2.40.1
+[...]
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index 04eaa1967651..6b8ca08be35e 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -1822,6 +1822,7 @@ static int ravb_open(struct net_device *ndev)
+>  		napi_enable(&priv->napi[RAVB_NC]);
+>  
+>  	ravb_set_delay_mode(ndev);
+> +	ravb_write(ndev, priv->desc_bat_dma, DBAT);
+>  
+>  	/* Device init */
+>  	error = ravb_dmac_init(ndev);
+> @@ -2841,7 +2842,6 @@ static int ravb_probe(struct platform_device *pdev)
+>  	}
+>  	for (q = RAVB_BE; q < DBAT_ENTRY_NUM; q++)
+>  		priv->desc_bat[q].die_dt = DT_EOS;
+> -	ravb_write(ndev, priv->desc_bat_dma, DBAT);
+>  
+>  	/* Initialise HW timestamp list */
+>  	INIT_LIST_HEAD(&priv->ts_skb_list);
+> 
 
+  How about also removing the DBAT write from ravb_resume()?
+
+MBR, Sergey
 
