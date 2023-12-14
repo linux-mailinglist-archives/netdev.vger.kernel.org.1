@@ -1,137 +1,202 @@
-Return-Path: <netdev+bounces-57229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86DC98126C8
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 06:09:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC9078126ED
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 06:31:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A70601C211B6
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 05:09:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F4552814F1
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 05:31:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC97C610B;
-	Thu, 14 Dec 2023 05:09:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iOf0Wlw6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1967063C1;
+	Thu, 14 Dec 2023 05:31:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00781D0
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 21:09:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702530570;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=xO88RRkOEho8UJ2yjNCpaLd/VuL7Hge2PfB6GXsL1SM=;
-	b=iOf0Wlw6GjtSZqBVGPJF8CgBzIwvNxDfYi12g5/4hD5j/6/yHjhrHWM2ULuXOKCxcJQNQC
-	s4/amR/iBLp+gcrQZiJzzgkLJgsZizaguZx0qgkQCVgxAZYQoQVE71b5cp93+mGwgftXJE
-	qXbR+zaeRnsNo3xDEJQZcD1rSfBdsjk=
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-433-_O833TrAPga4AvVu-2wkIw-1; Thu, 14 Dec 2023 00:09:29 -0500
-X-MC-Unique: _O833TrAPga4AvVu-2wkIw-1
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1d35dc29b73so9058615ad.3
-        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 21:09:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702530568; x=1703135368;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xO88RRkOEho8UJ2yjNCpaLd/VuL7Hge2PfB6GXsL1SM=;
-        b=Jal6/qSQoaUFhsM5+Bh1mkEa0sveaBKoM2glEISO+6LUk8vWMTBzNUFhXdFycp5Pmx
-         00yguWd9xKXOWTXrquYHE3lC3lGm9Qk892AdUEOHKjQYu2vXSSqyb77OaYZiYO2LAK5K
-         fhGAXLr4axqgVk19PS2d5cMbvLoHq6xdL57QQCEiw8lwZwJUXBtBZRWPeQK6P6UbCMNP
-         nKGR23T5ttjrB0xN3rv00HrjSF3Mj35H0JgSsPzgZg64yR1u5MRA2NS/7aSQ5Fo8gscw
-         smeumSyEVMM/3qgIS8/FpMg0V46t/6emd1tq0MPToNrJtK90F/RvppkxBakZfUr+/+r+
-         J68w==
-X-Gm-Message-State: AOJu0Yy8ltQURMVcWmZLb7wQ0xAbVFo7jBvArB3lvM6egb9A9/UInzVb
-	v6lQEsyNn7lAvANpNkij2sBzErVVtSRZ24t/aQfGrLyRVkcr9LchF16WcwE2EkfxOxYBtF1hD8G
-	U9E76vZt7gFrTlFrg
-X-Received: by 2002:a17:902:dacf:b0:1d3:5084:e9f3 with SMTP id q15-20020a170902dacf00b001d35084e9f3mr1318161plx.57.1702530568279;
-        Wed, 13 Dec 2023 21:09:28 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHMxc/J25XfrysCEgFd0ZBPUbjJL5FfnrcIXQwa/DjXelYmb771MD7ewSwlMUHHTX0ORVI0ag==
-X-Received: by 2002:a17:902:dacf:b0:1d3:5084:e9f3 with SMTP id q15-20020a170902dacf00b001d35084e9f3mr1318152plx.57.1702530567949;
-        Wed, 13 Dec 2023 21:09:27 -0800 (PST)
-Received: from kernel-devel.local ([240d:1a:c0d:9f00:245e:16ff:fe87:c960])
-        by smtp.gmail.com with ESMTPSA id r7-20020a170902be0700b001d0c641d220sm11485771pls.257.2023.12.13.21.09.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 21:09:27 -0800 (PST)
-From: Shigeru Yoshida <syoshida@redhat.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Shigeru Yoshida <syoshida@redhat.com>
-Subject: [PATCH net] net: Return error from sk_stream_wait_connect() if sk_wait_event() fails
-Date: Thu, 14 Dec 2023 14:09:22 +0900
-Message-ID: <20231214050922.3480023-1-syoshida@redhat.com>
-X-Mailer: git-send-email 2.41.0
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12009BD;
+	Wed, 13 Dec 2023 21:31:26 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R701e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VyTFUF0_1702531882;
+Received: from 30.221.148.227(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VyTFUF0_1702531882)
+          by smtp.aliyun-inc.com;
+          Thu, 14 Dec 2023 13:31:24 +0800
+Message-ID: <0e94149a-05f1-3f98-3f75-ca74f364a45b@linux.alibaba.com>
+Date: Thu, 14 Dec 2023 13:31:22 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [RFC nf-next 1/2] netfilter: bpf: support prog update
+Content-Language: en-US
+To: Florian Westphal <fw@strlen.de>
+Cc: pablo@netfilter.org, kadlec@netfilter.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ coreteam@netfilter.org, netfilter-devel@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, ast@kernel.org
+References: <1702467945-38866-1-git-send-email-alibuda@linux.alibaba.com>
+ <1702467945-38866-2-git-send-email-alibuda@linux.alibaba.com>
+ <20231213222415.GA13818@breakpoint.cc>
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <20231213222415.GA13818@breakpoint.cc>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The following NULL pointer dereference issue occurred:
 
-BUG: kernel NULL pointer dereference, address: 0000000000000000
-<...>
-RIP: 0010:ccid_hc_tx_send_packet net/dccp/ccid.h:166 [inline]
-RIP: 0010:dccp_write_xmit+0x49/0x140 net/dccp/output.c:356
-<...>
-Call Trace:
- <TASK>
- dccp_sendmsg+0x642/0x7e0 net/dccp/proto.c:801
- inet_sendmsg+0x63/0x90 net/ipv4/af_inet.c:846
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x83/0xe0 net/socket.c:745
- ____sys_sendmsg+0x443/0x510 net/socket.c:2558
- ___sys_sendmsg+0xe5/0x150 net/socket.c:2612
- __sys_sendmsg+0xa6/0x120 net/socket.c:2641
- __do_sys_sendmsg net/socket.c:2650 [inline]
- __se_sys_sendmsg net/socket.c:2648 [inline]
- __x64_sys_sendmsg+0x45/0x50 net/socket.c:2648
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x43/0x110 arch/x86/entry/common.c:82
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-sk_wait_event() returns an error (-EPIPE) if disconnect() is called on the
-socket waiting for the event. However, sk_stream_wait_connect() returns
-success, i.e. zero, even if sk_wait_event() returns -EPIPE, so a function
-that waits for a connection with sk_stream_wait_connect() may misbehave.
+On 12/14/23 6:24 AM, Florian Westphal wrote:
+> D. Wythe <alibuda@linux.alibaba.com> wrote:
+>> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>>
+>> To support the prog update, we need to ensure that the prog seen
+>> within the hook is always valid. Considering that hooks are always
+>> protected by rcu_read_lock(), which provide us the ability to use a
+>> new RCU-protected context to access the prog.
+>>
+>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+>> ---
+>>   net/netfilter/nf_bpf_link.c | 124 +++++++++++++++++++++++++++++++++++++++-----
+>>   1 file changed, 111 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/net/netfilter/nf_bpf_link.c b/net/netfilter/nf_bpf_link.c
+>> index e502ec0..918c470 100644
+>> --- a/net/netfilter/nf_bpf_link.c
+>> +++ b/net/netfilter/nf_bpf_link.c
+>> @@ -8,17 +8,11 @@
+>>   #include <net/netfilter/nf_bpf_link.h>
+>>   #include <uapi/linux/netfilter_ipv4.h>
+>>   
+>> -static unsigned int nf_hook_run_bpf(void *bpf_prog, struct sk_buff *skb,
+>> -				    const struct nf_hook_state *s)
+>> +struct bpf_nf_hook_ctx
+>>   {
+>> -	const struct bpf_prog *prog = bpf_prog;
+>> -	struct bpf_nf_ctx ctx = {
+>> -		.state = s,
+>> -		.skb = skb,
+>> -	};
+>> -
+>> -	return bpf_prog_run(prog, &ctx);
+>> -}
+>> +	struct bpf_prog *prog;
+>> +	struct rcu_head rcu;
+>> +};
+> I don't understand the need for this structure.  AFAICS bpf_prog_put()
+> will always release the program via call_rcu()?
+>
+> If it doesn't, we are probably already in trouble as-is without this
+> patch, I don't think anything that prevents us from ending up calling already
+> released bpf prog, or releasing it while another cpu is still running it
+> if bpf_prog_put releases the actual underlying prog instantly.
+>
+> A BPF expert could confirm bpf-prog-put-is-call-rcu.
 
-In the case of the above DCCP issue, dccp_sendmsg() is waiting for the
-connection. If disconnect() is called in concurrently, the above issue
-occurs.
+Hi Florian,
 
-This patch fixes the issue by returning error from sk_stream_wait_connect()
-if sk_wait_event() fails.
+I must admit that I did not realize that bpf_prog is released
+under RCU ...
 
-Fixes: 419ce133ab92 ("tcp: allow again tcp_disconnect() when threads are waiting")
-Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
----
- net/core/stream.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>>   struct bpf_nf_link {
+>>   	struct bpf_link link;
+>> @@ -26,8 +20,59 @@ struct bpf_nf_link {
+>>   	struct net *net;
+>>   	u32 dead;
+>>   	const struct nf_defrag_hook *defrag_hook;
+>> +	/* protect link update in parallel */
+>> +	struct mutex update_lock;
+>> +	struct bpf_nf_hook_ctx __rcu *hook_ctx;
+> What kind of replacements-per-second rate are you aiming for?
+> I think
+>
+> static DEFINE_MUTEX(bpf_nf_mutex);
+>
+> is enough.
 
-diff --git a/net/core/stream.c b/net/core/stream.c
-index 96fbcb9bbb30..b16dfa568a2d 100644
---- a/net/core/stream.c
-+++ b/net/core/stream.c
-@@ -79,7 +79,7 @@ int sk_stream_wait_connect(struct sock *sk, long *timeo_p)
- 		remove_wait_queue(sk_sleep(sk), &wait);
- 		sk->sk_write_pending--;
- 	} while (!done);
--	return 0;
-+	return done < 0 ? done : 0;
- }
- EXPORT_SYMBOL(sk_stream_wait_connect);
- 
--- 
-2.41.0
+I'm okay with that.
+
+>
+> Then bpf_nf_link gains
+>
+> 	struct bpf_prog __rcu *prog
+>
+> and possibly a trailing struct rcu_head, see below.
+
+Yes, that's what we need.
+
+>> +static void bpf_nf_hook_ctx_free_rcu(struct bpf_nf_hook_ctx *hook_ctx)
+>> +{
+>> +	call_rcu(&hook_ctx->rcu, __bpf_nf_hook_ctx_free_rcu);
+>> +}
+> Don't understand the need for call_rcu either, see below.
+>
+>> +static unsigned int nf_hook_run_bpf(void *bpf_link, struct sk_buff *skb,
+>> +				    const struct nf_hook_state *s)
+>> +{
+>> +	const struct bpf_nf_link *link = bpf_link;
+>> +	struct bpf_nf_hook_ctx *hook_ctx;
+>> +	struct bpf_nf_ctx ctx = {
+>> +		.state = s,
+>> +		.skb = skb,
+>> +	};
+>> +
+>> +	hook_ctx = rcu_dereference(link->hook_ctx);
+> This could then just rcu_deref link->prog.
+>
+>> +	return bpf_prog_run(hook_ctx->prog, &ctx);
+>> +}
+>> +
+>>   #if IS_ENABLED(CONFIG_NF_DEFRAG_IPV4) || IS_ENABLED(CONFIG_NF_DEFRAG_IPV6)
+>>   static const struct nf_defrag_hook *
+>>   get_proto_defrag_hook(struct bpf_nf_link *link,
+>> @@ -120,6 +165,10 @@ static void bpf_nf_link_release(struct bpf_link *link)
+>>   	if (!cmpxchg(&nf_link->dead, 0, 1)) {
+>>   		nf_unregister_net_hook(nf_link->net, &nf_link->hook_ops);
+>>   		bpf_nf_disable_defrag(nf_link);
+>> +		/* Wait for outstanding hook to complete before the
+>> +		 * link gets released.
+>> +		 */
+>> +		synchronize_rcu();
+>>   	}
+> Could you convert bpf_nf_link_dealloc to release via kfree_rcu instead?
+>
+Got it.
+>> @@ -162,7 +212,42 @@ static int bpf_nf_link_fill_link_info(const struct bpf_link *link,
+>>   static int bpf_nf_link_update(struct bpf_link *link, struct bpf_prog *new_prog,
+>>   			      struct bpf_prog *old_prog)
+>>   {
+>> -	return -EOPNOTSUPP;
+>> +	struct bpf_nf_link *nf_link = container_of(link, struct bpf_nf_link, link);
+>> +	struct bpf_nf_hook_ctx *hook_ctx;
+>> +	int err = 0;
+>> +
+>> +	mutex_lock(&nf_link->update_lock);
+>> +
+> I think you need to check link->dead here too.
+
+Got that.
+>
+>> +	/* bpf_nf_link_release() ensures that after its execution, there will be
+>> +	 * no ongoing or upcoming execution of nf_hook_run_bpf() within any context.
+>> +	 * Therefore, within nf_hook_run_bpf(), the link remains valid at all times."
+>> +	 */
+>> +	link->hook_ops.priv = link;
+> ATM we only need to make sure the bpf prog itself stays alive until after
+> all concurrent rcu critical sections have completed.
+>
+> After this change, struct bpf_link gets passed instead, so we need to
+> keep that alive too.
+>
+> Which works with synchronize_rcu, sure, but that seems a bit overkill here.
+
+Got it! Thank you very much for your suggestion.
+I will address those issues you mentioned in the next version.
+
+
+Best wishes,
+D. Wythe
 
 
