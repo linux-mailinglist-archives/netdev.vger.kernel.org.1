@@ -1,252 +1,175 @@
-Return-Path: <netdev+bounces-57685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99C94813D93
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 23:52:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFDE9813E5C
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 00:39:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 500AF28349E
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 22:52:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E31991C21FB0
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 23:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F797E574;
-	Thu, 14 Dec 2023 22:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E456C6F1;
+	Thu, 14 Dec 2023 23:39:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="qJcqpxiN";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lLtW2KZJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DDdTi3GF"
 X-Original-To: netdev@vger.kernel.org
-Received: from wnew1-smtp.messagingengine.com (wnew1-smtp.messagingengine.com [64.147.123.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E0C6F614;
-	Thu, 14 Dec 2023 22:49:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailnew.west.internal (Postfix) with ESMTP id 2E4A02B007A7;
-	Thu, 14 Dec 2023 17:49:40 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute2.internal (MEProxy); Thu, 14 Dec 2023 17:49:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1702594179; x=
-	1702601379; bh=Qq1ouEN+3ihu7U9MznAZUpbzC1IONhC/7bAWyzeIku8=; b=q
-	JcqpxiNiyYr34sDS9EKQhYc9wxX9mzCZAiw2nNy8MGVlU9u/UrVfYDlxO7xCo/M/
-	fcHAaBB8226PPFcKcqpzqC8kd+coRqvhwk1qR7Vb863V/h5cpm+8NkrKouhFCJhA
-	LbMv5F3gwDhl47+nELFf+9Yl8W6fubXsAHcg9uXMwOdOg73aTvaaNxYpU+eEB1fk
-	8PsKwVEPLZFg4MbRHC1S0G+9KhJ3q/3WhP9Xpt6SSmX8vY23ZEZzAbgXxgDGU+2c
-	Y0B5f++E6Tz8CwvPUp+Bp1ysOZl88rLwuajd0x/QFtExiRARlMj5dJSCQ0gPdEaV
-	z05wGSFLHSYYRdzcBSelw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1702594179; x=
-	1702601379; bh=Qq1ouEN+3ihu7U9MznAZUpbzC1IONhC/7bAWyzeIku8=; b=l
-	LtW2KZJKAnxlWzW+V1TnKa5jsRIQbzY0dPE8TSPeJmqmXls62QxG2CKzTjrhCPfx
-	vzngzOavGTmbcrUYSqLtji8wH7BE3UV8sbMEESH6r2OtPdiMZFTEwTI1a0JSJSRY
-	BdR8YfE64HJyBhZUH+7HHXBDH2Cz6vJuXJeEu6/3hyqLYbtrNBgmXma7PHyTqpCx
-	Y1EUXWHOQ/7TXiRXK78eB2j7VdPv8QXx1EQpFKZ1i0ChawyiTiaSlMLlIbTUNz5p
-	ZnnS23EM/XrfryVXUNC8jDp26ai3Uzzjsrrz7augnUV9tf5xPH244F75uv2vYJln
-	46swzWSB55SfqQEXCVAEw==
-X-ME-Sender: <xms:g4Z7ZSVkKSmA8kC7EHMs2MXbMZCX-U7D1jQdOY7xevBloFz996MiNQ>
-    <xme:g4Z7Zen9qmZjyRSiIlLouCuzjtiGn1fIVTprtn3BGxFRa4MpzaCKZ2DySnNsIDjGD
-    tp75vWIMJFnjeIh0Q>
-X-ME-Received: <xmr:g4Z7ZWbKGW_56mnOO5ab2ebHEvdEqRdH3LKIXIPodoiNc79rSzmAsI3wTrsUcOlCr131m41CzSXOSkm_yFNMnYdve225-oXBD_S8T8nxI19ArA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvddttddgtddvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucgfrhhlucfvnfffucdlfeehmdenucfjughrpefhvf
-    evufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeffrghnihgvlhcuighuuceo
-    ugiguhesugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepgfefgfegjefhudeike
-    dvueetffelieefuedvhfehjeeljeejkefgffeghfdttdetnecuvehluhhsthgvrhfuihii
-    vgeptdenucfrrghrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihii
-X-ME-Proxy: <xmx:g4Z7ZZU9vsi2hEZ0carLE8gXdaYloNd1fUqZcT6ob0yB79T9d3sPJg>
-    <xmx:g4Z7Zcna85sYFkYAw6Rspoe_L5RpDxtgX8KPIStGl8LQb3jn_cb5rQ>
-    <xmx:g4Z7ZedZl_3GCb52LOAwE8fOKXop5qoR9U4bTNzRTunLB88KTsfdbg>
-    <xmx:g4Z7ZY3XIyR44KBmdrDbZG9WFFWyeARcCbAWMYoSKIpuoF1DDiZPcImAnfw>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 14 Dec 2023 17:49:37 -0500 (EST)
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: davem@davemloft.net,
-	hawk@kernel.org,
-	shuah@kernel.org,
-	kuba@kernel.org,
-	john.fastabend@gmail.com,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	ast@kernel.org,
-	steffen.klassert@secunet.com,
-	antony.antony@secunet.com,
-	alexei.starovoitov@gmail.com,
-	yonghong.song@linux.dev,
-	eddyz87@gmail.com,
-	eyal.birger@gmail.com
-Cc: martin.lau@linux.dev,
-	song@kernel.org,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	mykolal@fb.com,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devel@linux-ipsec.org
-Subject: [PATCH bpf-next v6 5/5] bpf: xfrm: Add selftest for bpf_xdp_get_xfrm_state()
-Date: Thu, 14 Dec 2023 15:49:06 -0700
-Message-ID: <e704e9a4332e3eac7b458e4bfdec8fcc6984cdb6.1702593901.git.dxu@dxuuu.xyz>
-X-Mailer: git-send-email 2.42.1
-In-Reply-To: <cover.1702593901.git.dxu@dxuuu.xyz>
-References: <cover.1702593901.git.dxu@dxuuu.xyz>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E162DB79;
+	Thu, 14 Dec 2023 23:39:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3363aa2bbfbso62960f8f.0;
+        Thu, 14 Dec 2023 15:39:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702597150; x=1703201950; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=KaAHlm+HSdz5rpNR+CgBxGChQ0hnWO14UQuggvpy/cw=;
+        b=DDdTi3GFLTIRxOxfvxUp8lHYi9q55zRIIBRl/ttOAFjWEO+QyAYnnXG3MtrHhT8JLj
+         vEo4fYhSmWkKfXT9w4DXC67uQGKJdeV4Qq0rg2ptXmDlszBjxSRWBr5ZATPbhfYkrzbZ
+         8pFI4pT9Y50t+m9VdzGYx5ByErhOoJ3K3ewqY4wLrtHkeslx9a/r+KPy+0UJczFyz+kH
+         zih+L/TxeqAZ8vItaQFFAVOEAF/lfwY3zMSwquA8v7wpzQu+SsJ8wxKXh7/r13Wk9X9v
+         7EdnjkecdBaBm4N7EBRvmzq5bpT5/ph1FJ9HCUL47MTaNwK3IZ9vcIENTSdXWMqebLNi
+         3amA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702597150; x=1703201950;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KaAHlm+HSdz5rpNR+CgBxGChQ0hnWO14UQuggvpy/cw=;
+        b=FP9rN9vuR5p8FjBnfmcWHUpclEsAYiPu9Fqqmbr521EiIoHl31PPfGn5EhRj06dYES
+         3UPnLPSVCWAVsOvDVe/W4qfmtA142t9KwftD90J6Fr4Wzo6PCGqU1sucIxegR4Mc2KTw
+         QWdM0n2KgmP7IIJLcVvpZ0KidY3uWPfWinokRsdEFTWsTFl+UPFktd6FX/rYqhUdeTeB
+         YurAMuFlKeLD0WXNt/OaXQQFY4kht+SLvUSk6bWfENc8Dy1yTsBX/2pgqGhB+KzSqi5r
+         Mqln3ucssok76Dp1mWWJSBSIvPrKcq6JmnAE3N5dbe/95D5vKzTpCa70DNFZBzLmrqk3
+         0VSQ==
+X-Gm-Message-State: AOJu0YyX2uk3lpVxyd+CvcQJouSa0l7pbK/wvcwXhOEem3Hf7f2P2y0l
+	ot7kJhSNmxqgegM7yrk/f4Q=
+X-Google-Smtp-Source: AGHT+IFlVZ4kyRnZpnjhiVd15iyzFe0K21ph94UW7wfDB4R38x5Ef3UrzFd4ZyiaLe3RdDgHauUYDw==
+X-Received: by 2002:adf:e309:0:b0:336:984:6b2c with SMTP id b9-20020adfe309000000b0033609846b2cmr4969197wrj.8.1702597149727;
+        Thu, 14 Dec 2023 15:39:09 -0800 (PST)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id g10-20020a5d46ca000000b003364a398398sm2337615wrs.9.2023.12.14.15.39.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Dec 2023 15:39:09 -0800 (PST)
+Message-ID: <657b921d.5d0a0220.7815b.87dd@mx.google.com>
+X-Google-Original-Message-ID: <ZXszWxEuzGBadp6Z@Ansuel-xps.>
+Date: Thu, 14 Dec 2023 17:54:51 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	David Epping <david.epping@missinglinkelectronics.com>,
+	Harini Katakam <harini.katakam@amd.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH v7 2/4] net: phy: extend PHY package API to
+ support multiple global address
+References: <20231214121026.4340-1-ansuelsmth@gmail.com>
+ <20231214121026.4340-3-ansuelsmth@gmail.com>
+ <ZXs14wrGKGtTfiui@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZXs14wrGKGtTfiui@shell.armlinux.org.uk>
 
-This commit extends test_tunnel selftest to test the new XDP xfrm state
-lookup kfunc.
+On Thu, Dec 14, 2023 at 05:05:39PM +0000, Russell King (Oracle) wrote:
+> On Thu, Dec 14, 2023 at 01:10:24PM +0100, Christian Marangi wrote:
+> > @@ -1998,46 +1999,54 @@ int __phy_hwtstamp_set(struct phy_device *phydev,
+> >  		       struct kernel_hwtstamp_config *config,
+> >  		       struct netlink_ext_ack *extack);
+> >  
+> > -static inline int phy_package_read(struct phy_device *phydev, u32 regnum)
+> > +static inline int phy_package_read(struct phy_device *phydev,
+> > +				   unsigned int addr_offset, u32 regnum)
+> >  {
+> >  	struct phy_package_shared *shared = phydev->shared;
+> > +	u8 addr = shared->base_addr + addr_offset;
+> >  
+> > -	if (!shared)
+> > +	if (addr >= PHY_MAX_ADDR)
+> >  		return -EIO;
+> 
+> I did notice that you're using u8 in patch 1 as well - and while it's
+> fine in patch 1 (because we validate the range of the value we will
+> assign to that variable) that is not the case here.
+> 
+> Yes, shared->base_addr is a u8, but addr_offset is an unsigned int,
+> and this is implicitly cast-down to a u8 in the calculation of addr,
+> chopping off the bits above bit 7.
+> 
+> How about this approach:
+> 
+> static int phy_package_address(struct phy_device *phydev,
+> 			       unsigned int addr_offset)
+> {
+> 	struct phy_package_shared *shared = phydev->shared;
+> 	unsigned int addr = shared->addr + addr_offset;
+> 
+> 	/* detect wrap */
+> 	if (addr < addr_offset)
+> 		return -EIO;
+> 
+> 	/* detect invalid address */
+> 	if (addr >= PHY_ADDR_MAX)
+> 		return -EIO;
+> 
+> 	/* we know that addr will be in the range 0..31 and thus the
+> 	 * implicit cast to a signed int is not a problem.
+> 	 */
+> 	return addr;
+> }
+> 
+> and then these functions all become:
+> 
+> 	int addr = phy_package_address(phydev, addr_offset);
+> 
+> 	if (addr < 0)
+> 		return addr;
+> 
+> I'll give you that this is belt and braces, but it avoids problems
+> should a negative errno value be passed in as addr_offset (which will
+> be cast to a very large positive integer.)
 
-Co-developed-by: Antony Antony <antony.antony@secunet.com>
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
-Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
----
- .../selftests/bpf/prog_tests/test_tunnel.c    | 16 +++++-
- .../selftests/bpf/progs/test_tunnel_kern.c    | 51 +++++++++++++++++++
- 2 files changed, 65 insertions(+), 2 deletions(-)
+I also feel an helper is needed (since as you pointed out in the mmd
+function we would have duplicated logic)
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_tunnel.c b/tools/testing/selftests/bpf/prog_tests/test_tunnel.c
-index 2d7f8fa82ebd..2b3c6dd66259 100644
---- a/tools/testing/selftests/bpf/prog_tests/test_tunnel.c
-+++ b/tools/testing/selftests/bpf/prog_tests/test_tunnel.c
-@@ -278,7 +278,7 @@ static int add_xfrm_tunnel(void)
- 	SYS(fail,
- 	    "ip netns exec at_ns0 "
- 		"ip xfrm state add src %s dst %s proto esp "
--			"spi %d reqid 1 mode tunnel "
-+			"spi %d reqid 1 mode tunnel replay-window 42 "
- 			"auth-trunc 'hmac(sha1)' %s 96 enc 'cbc(aes)' %s",
- 	    IP4_ADDR_VETH0, IP4_ADDR1_VETH1, XFRM_SPI_IN_TO_OUT, XFRM_AUTH, XFRM_ENC);
- 	SYS(fail,
-@@ -313,7 +313,7 @@ static int add_xfrm_tunnel(void)
- 	 */
- 	SYS(fail,
- 	    "ip xfrm state add src %s dst %s proto esp "
--		    "spi %d reqid 1 mode tunnel "
-+		    "spi %d reqid 1 mode tunnel replay-window 42 "
- 		    "auth-trunc 'hmac(sha1)' %s 96  enc 'cbc(aes)' %s",
- 	    IP4_ADDR_VETH0, IP4_ADDR1_VETH1, XFRM_SPI_IN_TO_OUT, XFRM_AUTH, XFRM_ENC);
- 	SYS(fail,
-@@ -628,8 +628,10 @@ static void test_xfrm_tunnel(void)
- {
- 	DECLARE_LIBBPF_OPTS(bpf_tc_hook, tc_hook,
- 			    .attach_point = BPF_TC_INGRESS);
-+	LIBBPF_OPTS(bpf_xdp_attach_opts, opts);
- 	struct test_tunnel_kern *skel = NULL;
- 	struct nstoken *nstoken;
-+	int xdp_prog_fd;
- 	int tc_prog_fd;
- 	int ifindex;
- 	int err;
-@@ -654,6 +656,14 @@ static void test_xfrm_tunnel(void)
- 	if (attach_tc_prog(&tc_hook, tc_prog_fd, -1))
- 		goto done;
- 
-+	/* attach xdp prog to tunnel dev */
-+	xdp_prog_fd = bpf_program__fd(skel->progs.xfrm_get_state_xdp);
-+	if (!ASSERT_GE(xdp_prog_fd, 0, "bpf_program__fd"))
-+		goto done;
-+	err = bpf_xdp_attach(ifindex, xdp_prog_fd, XDP_FLAGS_REPLACE, &opts);
-+	if (!ASSERT_OK(err, "bpf_xdp_attach"))
-+		goto done;
-+
- 	/* ping from at_ns0 namespace test */
- 	nstoken = open_netns("at_ns0");
- 	err = test_ping(AF_INET, IP4_ADDR_TUNL_DEV1);
-@@ -667,6 +677,8 @@ static void test_xfrm_tunnel(void)
- 		goto done;
- 	if (!ASSERT_EQ(skel->bss->xfrm_remote_ip, 0xac100164, "remote_ip"))
- 		goto done;
-+	if (!ASSERT_EQ(skel->bss->xfrm_replay_window, 42, "replay_window"))
-+		goto done;
- 
- done:
- 	delete_xfrm_tunnel();
-diff --git a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-index 3a59eb9c34de..3e436e6f7312 100644
---- a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-+++ b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-@@ -30,6 +30,10 @@ int bpf_skb_set_fou_encap(struct __sk_buff *skb_ctx,
- 			  struct bpf_fou_encap *encap, int type) __ksym;
- int bpf_skb_get_fou_encap(struct __sk_buff *skb_ctx,
- 			  struct bpf_fou_encap *encap) __ksym;
-+struct xfrm_state *
-+bpf_xdp_get_xfrm_state(struct xdp_md *ctx, struct bpf_xfrm_state_opts *opts,
-+		       u32 opts__sz) __ksym;
-+void bpf_xdp_xfrm_state_release(struct xfrm_state *x) __ksym;
- 
- struct {
- 	__uint(type, BPF_MAP_TYPE_ARRAY);
-@@ -950,4 +954,51 @@ int xfrm_get_state(struct __sk_buff *skb)
- 	return TC_ACT_OK;
- }
- 
-+volatile int xfrm_replay_window = 0;
-+
-+SEC("xdp")
-+int xfrm_get_state_xdp(struct xdp_md *xdp)
-+{
-+	struct bpf_xfrm_state_opts opts = {};
-+	struct xfrm_state *x = NULL;
-+	struct ip_esp_hdr *esph;
-+	struct bpf_dynptr ptr;
-+	u8 esph_buf[8] = {};
-+	u8 iph_buf[20] = {};
-+	struct iphdr *iph;
-+	u32 off;
-+
-+	if (bpf_dynptr_from_xdp(xdp, 0, &ptr))
-+		goto out;
-+
-+	off = sizeof(struct ethhdr);
-+	iph = bpf_dynptr_slice(&ptr, off, iph_buf, sizeof(iph_buf));
-+	if (!iph || iph->protocol != IPPROTO_ESP)
-+		goto out;
-+
-+	off += sizeof(struct iphdr);
-+	esph = bpf_dynptr_slice(&ptr, off, esph_buf, sizeof(esph_buf));
-+	if (!esph)
-+		goto out;
-+
-+	opts.netns_id = BPF_F_CURRENT_NETNS;
-+	opts.daddr.a4 = iph->daddr;
-+	opts.spi = esph->spi;
-+	opts.proto = IPPROTO_ESP;
-+	opts.family = AF_INET;
-+
-+	x = bpf_xdp_get_xfrm_state(xdp, &opts, sizeof(opts));
-+	if (!x)
-+		goto out;
-+
-+	if (!x->replay_esn)
-+		goto out;
-+
-+	xfrm_replay_window = x->replay_esn->replay_window;
-+out:
-+	if (x)
-+		bpf_xdp_xfrm_state_release(x);
-+	return XDP_PASS;
-+}
-+
- char _license[] SEC("license") = "GPL";
+What I don't like is the wrap check.
+
+But I wonder... Isn't it easier to have 
+
+unsigned int addr = shared->base_addr + addr_offset;
+
+and check if >= PHY_MAC_ADDR?
+
+Everything is unsigned (so no negative case) and wrap is not possible as
+nothing is downcasted.
+
+After the check value is O.K. and can be trated as an int in
+mdiobus_read (as we are sure it's in the limits and positive)
+
+If this is correct, and the thing is a simple condition I think the
+helper is not needed (or should we use it anyway for consistency in each
+function?)
+
+> 
+> Andrew, any opinions on how far this should be taken?
+> 
+
 -- 
-2.42.1
-
+	Ansuel
 
