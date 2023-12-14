@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-57200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9480081255A
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 03:40:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E934812557
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 03:40:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C02AE282923
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:40:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3138B209AD
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8515ECB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 559DB814;
 	Thu, 14 Dec 2023 02:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EPdGwY0E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MO7sH6WI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842D5A59
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38740180
 	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 02:40:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C30F5C433C7;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DDBD0C433CA;
 	Thu, 14 Dec 2023 02:40:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1702521625;
-	bh=RkWa2Vxp48FvhWUEDd4UAUVq0uHmwOqAASOVffoictA=;
+	bh=u52HoA/r064z5Cj70vQADEgDIM05KePhooGZRdVJ7Mk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EPdGwY0Ea+enh+Og3ixNEC6JafTwyIRlyh5MeZWpXddI8G+rXhH/A8j0nx1UAUGxQ
-	 aVQtVj+0naW/8J9yOrt9+fj03e1LhjGcoLlDIiMm/o+eWQnEme+KPk0jiwTsZBttB/
-	 WNSUNXy36Rg+MCrk0tCNdZUQ1RyE31NQhiLCo/TRcO3GVRmKo7U8CEs+fB4Sx7v7Uu
-	 dNV4UEB/xAeB7PCLyDwr5U1Tp8LJpoO3XqfcpE2uTkywvSKtiXW1Kr9W8Cl+WCWPf6
-	 mc+qFupyP8IJXKG5+h4B+jhBgxLWKJD8Yw5FPyqyG++ddSY1+Q7+DzcyQ5L4MgR8ty
-	 mI1SpzuTSnH/Q==
+	b=MO7sH6WIO6gVLA/n1oq6Dt+yuegnSqlTZt/v91OkTr0w20E6AC+32R7FJTiv/sM7r
+	 J1CB3yUOTM/Rl3XxI3grwWMw1LP+a8UxrLLIsskIq6iYkQgn0GRQR+OhsdaiyjwEK+
+	 FZNj/HoRd+Fq87yLclvPRCJod3xgbdROp3Hxw9khop/Ta8c0jBaAMJRMPX5tFdSfni
+	 N+77uBmryt/WKjqfX/OmtrN6X6Tlp0/vc5maQjfgarQtST/0q3VyH+VyZcoUNKMx02
+	 wfic0ZyFWIkEx75rNm2ksDnowIY2QGjtUu0ok+QQSQ8FZqg3DSwZO8U0GIZ4yGbEaO
+	 SCAiGV9jQlj2A==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A5104DD4EFE;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BDD65DD4F13;
 	Thu, 14 Dec 2023 02:40:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,45 +43,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] idpf: add get/set for Ethtool's header split
- ringparam
+Subject: Re: [patch net-next] dpll: allocate pin ids in cycle
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170252162566.2494.10156204711336606229.git-patchwork-notify@kernel.org>
+ <170252162577.2494.3673019032132073803.git-patchwork-notify@kernel.org>
 Date: Thu, 14 Dec 2023 02:40:25 +0000
-References: <20231212142752.935000-1-aleksander.lobakin@intel.com>
-In-Reply-To: <20231212142752.935000-1-aleksander.lobakin@intel.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, michal.kubiak@intel.com, przemyslaw.kitszel@intel.com,
- vladimir.oltean@nxp.com, andrew@lunn.ch, mkubecek@suse.cz, jiri@resnulli.us,
- paul.greenwalt@intel.com, anthony.l.nguyen@intel.com,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+References: <20231212150605.1141261-1-jiri@resnulli.us>
+In-Reply-To: <20231212150605.1141261-1-jiri@resnulli.us>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ davem@davemloft.net, edumazet@google.com, vadim.fedorenko@linux.dev,
+ arkadiusz.kubalewski@intel.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 12 Dec 2023 15:27:50 +0100 you wrote:
-> Currently, the header split feature (putting headers in one smaller
-> buffer and then the data in a separate bigger one) is always enabled
-> in idpf when supported.
-> One may want to not have fragmented frames per each packet, for example,
-> to avoid XDP frags. To better optimize setups for particular workloads,
-> add ability to switch the header split state on and off via Ethtool's
-> ringparams, as well as to query the current status.
-> There's currently only GET in the Ethtool Netlink interface for now,
-> so add SET first. I suspect idpf is not the only one supporting this.
+On Tue, 12 Dec 2023 16:06:05 +0100 you wrote:
+> From: Jiri Pirko <jiri@nvidia.com>
+> 
+> Pin ID is just a number. Nobody should rely on a certain value, instead,
+> user should use either pin-id-get op or RTNetlink to get it.
+> 
+> Unify the pin ID allocation behavior with what there is already
+> implemented for dpll devices.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/2] ethtool: add SET for TCP_DATA_SPLIT ringparam
-    https://git.kernel.org/netdev/net-next/c/50d73710715d
-  - [net-next,2/2] idpf: add get/set for Ethtool's header split ringparam
-    https://git.kernel.org/netdev/net-next/c/9b1aa3ef2328
+  - [net-next] dpll: allocate pin ids in cycle
+    https://git.kernel.org/netdev/net-next/c/97f265ef7f5b
 
 You are awesome, thank you!
 -- 
