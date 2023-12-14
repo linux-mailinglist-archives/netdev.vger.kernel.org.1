@@ -1,112 +1,105 @@
-Return-Path: <netdev+bounces-57507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF8228133C1
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:00:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0017813420
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:10:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3D161F21ED7
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:00:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D7041C21B0B
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE0605B5B0;
-	Thu, 14 Dec 2023 15:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AE585C8F7;
+	Thu, 14 Dec 2023 15:10:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ht1YdQaV"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="allC7b3s"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46757115
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 07:00:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702566021;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YWD8flG08948c+kk5diZhSkaE4l4o5OrXgP93+sWFH8=;
-	b=Ht1YdQaVbXHF99NaROTAKw+pyFxElWBPcLYpngdUbPwckJOxmYwlAu7U8w50QAjGLotW3+
-	8J1zaoLpgHb7Ay7LzAGismGdfsKJxijQUrFWUYCj7wq0JkiwmMSP8uCkO1zK4GnJICNHHn
-	YjaxMZTmjjguNZ6SLUPvsfJHq8vKG5s=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-475-kQxS5o81PxWcUwByp5wUTQ-1; Thu, 14 Dec 2023 10:00:19 -0500
-X-MC-Unique: kQxS5o81PxWcUwByp5wUTQ-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a1f72871acdso134183166b.0
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 07:00:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702566018; x=1703170818;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YWD8flG08948c+kk5diZhSkaE4l4o5OrXgP93+sWFH8=;
-        b=pBu4nhh9wQeO/1WqUsb7UR/kYYIL6OLYLGFkilYm9tq7nf2AqY6qEDJy+KvVQUv+/F
-         ToARqbL+N6ROtLlfT4aha3M1gYWfxz6aECQj3HbHn6L/mLErHOzWC5PPqtODa7Ild8P4
-         f4DnWmPUIXMyCQj3ef55BQkRPaI8fRI2zmYhffdN7Nl92asxsInHjT/8hFyYunEwdGmT
-         F+9UWb7305aOwVj7Gi1M3qebxhvFy3S3SsvH/C1dkqHMcMmUgunaqdEzK6tjOQUtlTEr
-         P0cXhIhaSIzq07sdBtmqZSooru/HOE5iaSt67WlqAlv/RJHlr6SGCUySo0NJPLaAMESl
-         3q7Q==
-X-Gm-Message-State: AOJu0YwJKTlydRD4Tb/OKU/qbScOQ0USftEvu706UvqR7mNrMQu7iffT
-	Do3SwQPcC1iCkEbgN+RHMcPLUSD5Dmmdo851u0KJKBi8w5zLf3AR1mqOvcdysMK1AhI+d0R4cR+
-	9uGCOsROEIFmQ643+
-X-Received: by 2002:a50:c349:0:b0:552:8299:65fc with SMTP id q9-20020a50c349000000b00552829965fcmr853879edb.4.1702566018700;
-        Thu, 14 Dec 2023 07:00:18 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEObJZISOhVTutkg5qzmkvSZBjnemH0WpgDmhPCj1LJegEvnc1zWHUUA1QXUujGyd6isycDyg==
-X-Received: by 2002:a50:c349:0:b0:552:8299:65fc with SMTP id q9-20020a50c349000000b00552829965fcmr853840edb.4.1702566018356;
-        Thu, 14 Dec 2023 07:00:18 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-252-36.dyn.eolo.it. [146.241.252.36])
-        by smtp.gmail.com with ESMTPSA id cn10-20020a0564020caa00b0054ca2619c1bsm6867552edb.9.2023.12.14.07.00.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 07:00:17 -0800 (PST)
-Message-ID: <fa171d50e1a20019b4b2bf302043278909b9072f.camel@redhat.com>
-Subject: Re: [PATCH net-next v6 3/3] net: stmmac: Add driver support for
- DWMAC5 common safety IRQ
-From: Paolo Abeni <pabeni@redhat.com>
-To: Suraj Jaiswal <quic_jsuraj@quicinc.com>, Vinod Koul <vkoul@kernel.org>, 
- Bhupesh Sharma <bhupesh.sharma@linaro.org>, Andy Gross <agross@kernel.org>,
- Bjorn Andersson <andersson@kernel.org>,  Konrad Dybcio
- <konrad.dybcio@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Rob
- Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>,  Conor Dooley <conor+dt@kernel.org>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
- <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, Prasad Sodagudi
- <psodagud@quicinc.com>,  Andrew Halaney <ahalaney@redhat.com>, Rob Herring
- <robh@kernel.org>
-Cc: kernel@quicinc.com
-Date: Thu, 14 Dec 2023 16:00:15 +0100
-In-Reply-To: <20231212115841.3800241-4-quic_jsuraj@quicinc.com>
-References: <20231212115841.3800241-1-quic_jsuraj@quicinc.com>
-	 <20231212115841.3800241-4-quic_jsuraj@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27726120;
+	Thu, 14 Dec 2023 07:10:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+	s=s31663417; t=1702566601; x=1703171401; i=wahrenst@gmx.net;
+	bh=aUZN9Ijekl/DgdJ1Nx0Xjkr/d4rjzMLWEFZI+tiOk58=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
+	b=allC7b3smS9jqnp3tsB6109ja6LuV3e7M+2GS+mcg9C5JQq6LHxynDQPNKwpHh4V
+	 tzt5Ag3sSjMN3v1765B8lt2uKNUb67m68cGUOLgiaJSx1DTQN+A+uyhOIUFuLU4Qs
+	 6HXwtVxHTIUafIuqoLvjT/JMPzmWV27MApxUBth3HHWhxX6Qvld6uhLzc+il7P7Gb
+	 MZgy1dpEFD2f78LQkvXjx1hLv4wMdeFxemzE2lBsEYIRvZJ4GypmU4A0MyuAnQl6s
+	 u+24Ioxbm9kGwAlbpRlHNDbZVMcPeJCNmfMr5rQo5mWi17LrWA8Am/DfVJ++/iELU
+	 EgSpyJHu8z8UGzQPxg==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from stefanw-SCHENKER ([37.4.248.43]) by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1M5wPb-1r6LMg0iQV-007S3v; Thu, 14
+ Dec 2023 16:10:01 +0100
+From: Stefan Wahren <wahrenst@gmx.net>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Stefan Wahren <wahrenst@gmx.net>
+Subject: [PATCH 00/12 net-next] qca_spi: collection of improvements
+Date: Thu, 14 Dec 2023 16:09:32 +0100
+Message-Id: <20231214150944.55808-1-wahrenst@gmx.net>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:vpvI5oqNtjLr/ORfeHZV8Fno96ycQesm/UeTNY8EvTrg6FdbSRb
+ vPscjvrUVVu+tJ+uwhJpYedUrMahS5s5gZ9UAecWBDU/glenTWAMx+9Db/4q38QovgvwJl3
+ ITu3a4zGIV09a4UhODa6L1SmYovQXxRl6PojnMfo7Adk86BmWqVkZwkNEvhrjXleYeEGo+9
+ QQo21BmyrIg8aCQWRzvEg==
+UI-OutboundReport: notjunk:1;M01:P0:VQAWmS7UqfM=;WS1sChCUdFo0AQtAI5AB8Euurq3
+ /qNbOq5dSCG44zJegCdJiSMEpHFZv/ippX65uf13qCYkNhC1xph5mCS53c+8Q7khHJoS6kM/8
+ 9U8tMghYMj4yIovfM2eVR2wfpc/KqctnHJLBN2DMMAuIYbzeh2oY9Azd+16OqOJRYg8J2z4pT
+ gSem+3/lbH7tHjSfGoJ3WX7NIaqfIaw9kjFUORvhSaZLAE0zdviI7464/w1Ey/zPAzHbuwhKx
+ 9Ty2pk0Ggn5RArRokgAty9IusMm3/c8WCyvdElkdxrormkTbR1zfQJ5wpGiaCpUAVAiGM+GEb
+ OrdebS1iCw5nymX5C0TH+zV/uo+pndRq54J5jBai62BcgRjxAX4PFp9OiDAbc9UaKalYAuYb7
+ 8w9gJP7TbsbAfXM8RNfotCQGIQWUvPRKFe8vvurW3dztmoPHFqNg0b+qV18gB3Rbopad8bqBi
+ XJbm8INjssqwSUMtEgm24ctjj3X14uuBs68e37pFD9N/VOvqTNSFbTy0YwSpKV/oH1jdXnL1A
+ I82G5UYTGEhyeSOUWGTqbVG5o4Ie9me2MxImOQvC88+yq1RNvYHXbBo6n7IBx92lOHV0SjlAv
+ vf3y6Xa59+Aslbvw+yyLhBqL6DA1h7ynTZL4LA6hI5v2H0aRREJmKhtEKrCOcw/2khI/QoMVK
+ DV3yWOhjRjcdGXFuZva9FqFr3+ZLrC/1L0q+Gj/nL7iy9VoQI3j4hki6VK8h1q24X9+KRGGgo
+ QnyF+ueTWbkpgXDA5HrWwG+kvA0uI0wPrMlMSHJZYnKhq3kZj0fLFy4hPGg7FLp6Eth8S2IS2
+ lg4NBfV01MWdiDB3xbDIVDnQAEXcbrkoZDASiOejramVPvqFHbYbYnb7UjX0N1Yrj4nklOppW
+ 884OEImM6wRx3kKdxktnCXKGucqObAng7j4CrOny9cYdvGKr8U+w4oMVifYUlgNp9wlDxp6lN
+ uDrRzA==
 
-On Tue, 2023-12-12 at 17:28 +0530, Suraj Jaiswal wrote:
-> @@ -3759,6 +3763,7 @@ static int stmmac_request_irq_single(struct net_dev=
-ice *dev)
->  	struct stmmac_priv *priv =3D netdev_priv(dev);
->  	enum request_irq_err irq_err;
->  	int ret;
-> +	char *int_name;
+This series contains a wild collection of improvements for the
+qca_spi driver. This is a follow-up series to the recent bugfixes.
 
-I'm sorry to nit-pick, but please respect the reverse x-mas tree above,
+Stefan Wahren (12):
+  qca_spi: Improve SPI thread creation
+  qca_spi: Improve SPI IRQ handling
+  qca_spi: Avoid skb_copy_expand in TX path
+  qca_7k_common: Drop unnecessary function description
+  qca_7k_common: Drop unused len from qcafrm_handle
+  qca_spi: Add QCASPI prefix to ring defines
+  qca_spi: Introduce QCASPI_RX_MAX_FRAMES
+  qca_spi: Improve calculation of RX buffer size
+  qca_spi: Log expected signature in error case
+  qca_spi: Adjust log of SPI_REG_RDBUF_BYTE_AVA
+  qca_7k: Replace BSD boilerplate with SPDX
+  qca_7k: Replace old mail address
 
-Otherwise LGTM!
+ drivers/net/ethernet/qualcomm/qca_7k.c        | 17 +---
+ drivers/net/ethernet/qualcomm/qca_7k.h        | 16 +---
+ drivers/net/ethernet/qualcomm/qca_7k_common.c | 17 +---
+ drivers/net/ethernet/qualcomm/qca_7k_common.h | 29 +------
+ drivers/net/ethernet/qualcomm/qca_debug.c     | 21 +----
+ drivers/net/ethernet/qualcomm/qca_debug.h     | 15 +---
+ drivers/net/ethernet/qualcomm/qca_spi.c       | 86 +++++++++----------
+ drivers/net/ethernet/qualcomm/qca_spi.h       | 22 ++---
+ drivers/net/ethernet/qualcomm/qca_uart.c      | 17 +---
+ 9 files changed, 57 insertions(+), 183 deletions(-)
 
-Cheers,
-
-Paolo
-
+=2D-
+2.34.1
 
 
