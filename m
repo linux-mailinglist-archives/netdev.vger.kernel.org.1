@@ -1,84 +1,89 @@
-Return-Path: <netdev+bounces-57165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69C8F8124A5
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:40:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1A118124BC
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:51:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CCE01C20E41
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 01:40:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D7A9281D96
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 01:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C9DA65B;
-	Thu, 14 Dec 2023 01:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C07DA7EE;
+	Thu, 14 Dec 2023 01:51:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bw3ATMqC"
+	dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b="n7TkciNW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F378563D;
-	Thu, 14 Dec 2023 01:40:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5E170C433C9;
-	Thu, 14 Dec 2023 01:40:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702518025;
-	bh=Rpw99G+Bd16Fbf4PTlRaG5ns6MLevepNoS8vLtGnQMg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Bw3ATMqCzEIccVPAcn8dAhMbY6yI4i9uSj4UDx0PuiTjuw15u8KDPqMn27vdqsRM5
-	 rTe/2HeVHyR0oh62kMfjrMfyM7uLGwjIyxvcFZTUVsKz3Rk6chQkC3B/9GSGRpOnsq
-	 sOiM32kbnPRibisw+W0UZ47IXiDqbda47OxyusrH2bBQJV7t+X0uWiBXeI6PfPd8Vz
-	 LzuHyu9Ynd7jTu1oRKzUc/fEF3MDWvOJYEnlJWOErQOP5r9fRVThmCjjxy+lcfNcaz
-	 VunhgjqbhXuKxTfVaZjaU6+lw2YUQqx8TsX2i5t2R9VunEucYkAw/fiiyY4PQg3toT
-	 4AG0osduzto6w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 43CB2DD4EF0;
-	Thu, 14 Dec 2023 01:40:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 13B77D5;
+	Wed, 13 Dec 2023 17:51:51 -0800 (PST)
+Received: by linux.microsoft.com (Postfix, from userid 1004)
+	id 90B5920B74C0; Wed, 13 Dec 2023 17:51:50 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 90B5920B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
+	s=default; t=1702518710;
+	bh=sJRm8CuoV+klJB/nMf1AahuNujNBwErNguiFQXCE6Bk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=n7TkciNWX6eoTwHaf9TGTd8gnrfuK7Sj1EEM0tJZiJjY+cfvQoi7EMwr7Cibn6NX7
+	 ZS5/GgrqeHhzC3IWGI4WHtfP4FHZp115kKdrI/P2A8BThIs2SH4JF2W9/f2cM3bVPW
+	 eTGBqn6d8hPX7vUPsCd9MOfaGyXcLhOcf925kbQU=
+From: longli@linuxonhyperv.com
+To: Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	Dexuan Cui <decui@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-rdma@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Long Li <longli@microsoft.com>
+Subject: [Patch v2 0/3] Register with RDMA SOC interface and support for CQ
+Date: Wed, 13 Dec 2023 17:51:41 -0800
+Message-Id: <1702518704-15886-1-git-send-email-longli@linuxonhyperv.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf v2 0/2]  bpf fix for unconnect af_unix socket
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170251802527.4404.9577873656919386450.git-patchwork-notify@kernel.org>
-Date: Thu, 14 Dec 2023 01:40:25 +0000
-References: <20231201180139.328529-1-john.fastabend@gmail.com>
-In-Reply-To: <20231201180139.328529-1-john.fastabend@gmail.com>
-To: John Fastabend <john.fastabend@gmail.com>
-Cc: martin.lau@kernel.org, edumazet@google.com, jakub@cloudflare.com,
- bpf@vger.kernel.org, netdev@vger.kernel.org
 
-Hello:
+From: Long Li <longli@microsoft.com>
 
-This series was applied to bpf/bpf.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
+This patchset add support for registering a RDMA device with SoC for
+support of querying device capabilities, upcoming RC queue pairs and
+CQ interrupts.
 
-On Fri,  1 Dec 2023 10:01:37 -0800 you wrote:
-> Eric reported a syzbot splat from a null ptr deref from recent fix to
-> resolve a use-after-free with af-unix stream sockets and BPF sockmap
-> usage.
-> 
-> The issue is I missed is we allow unconnected af_unix STREAM sockets to
-> be added to the sockmap. Fix this by blocking unconnected sockets.
-> 
-> [...]
+This patchset is partially based on Ajay Sharma's work:
+https://lore.kernel.org/netdev/1697494322-26814-1-git-send-email-sharmaajay@linuxonhyperv.com
 
-Here is the summary with links:
-  - [bpf,v2,1/2] bpf: syzkaller found null ptr deref in unix_bpf proto add
-    https://git.kernel.org/bpf/bpf/c/8d6650646ce4
-  - [bpf,v2,2/2] bpf: sockmap, test for unconnected af_unix sock
-    https://git.kernel.org/bpf/bpf/c/50d96f05af67
+Changes in v2:
+Dropped the patches to create EQs for RC QP. They will be implemented with
+RC patches.
 
-You are awesome, thank you!
+
+Long Li (3):
+  RDMA/mana_ib: register RDMA device with GDMA
+  RDMA/mana_ib: query device capabilities
+  RDMA/mana_ib: Add CQ interrupt support for RAW QP
+
+ drivers/infiniband/hw/mana/cq.c               | 34 ++++++-
+ drivers/infiniband/hw/mana/device.c           | 31 +++++--
+ drivers/infiniband/hw/mana/main.c             | 69 ++++++++++----
+ drivers/infiniband/hw/mana/mana_ib.h          | 53 +++++++++++
+ drivers/infiniband/hw/mana/qp.c               | 90 ++++++++++++++++---
+ .../net/ethernet/microsoft/mana/gdma_main.c   |  5 ++
+ include/net/mana/gdma.h                       |  5 ++
+ 7 files changed, 252 insertions(+), 35 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
