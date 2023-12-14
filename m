@@ -1,133 +1,230 @@
-Return-Path: <netdev+bounces-57559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3D2281364C
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 17:31:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57E16813661
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 17:36:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 773241F21F22
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:31:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DD6E281885
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:36:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1FC45F1E3;
-	Thu, 14 Dec 2023 16:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0BE15FEF1;
+	Thu, 14 Dec 2023 16:36:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xl8xhJDR"
+	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="YCBg7cdF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E210F112
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 08:31:27 -0800 (PST)
-Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso12276a12.1
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 08:31:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702571486; x=1703176286; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RFzsDH4W6g+dzf0ZJqoJe94xr3ifV/aPAfhQwt3xHno=;
-        b=Xl8xhJDRkbpU+w537X81m+/fWHUjMBZ8LTZ/5NPz9RuTBl7YSLmOe/IyOQnlwYGDw6
-         IHQtzIqThBAUL4e1FD3/2vf95GQ/GQrx8WITBLft7w7MIEjfIKN0JjvVbHg9sty6OjlC
-         xffYaqtoqP+OMFeXt3IEvKqtHiiRgrINRu6KSYE418CHj/DpWkR3FZ6UyJghJPLuqRca
-         d+9KBzxfQ9veUYld/tQrvD+LSQZdXn+P4eTx8fsdJ9SheypdOrlo7XiH2v4cQyCYJ92l
-         z6++uwc69LwZowW0l8uFt8r517+Blo1KyN8LCClBg3m8DAEHTsMuFFxxASYhM6jnb3Ts
-         AEcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702571486; x=1703176286;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RFzsDH4W6g+dzf0ZJqoJe94xr3ifV/aPAfhQwt3xHno=;
-        b=HWJvRGRZcaiEWrAjClyRvcPG99jV3+78tpGLaQQCjdZKqUTcHgXqGPbuM4bbfRG+xO
-         +htHWMz1eLHw9iE0xL5OTevDqRQHHe5iKOlmRA6G1P3v0B53Ffn64uYDF1jO6zs8B7Bq
-         jbqUELKT5Qm6Yj2y6e0FkrBu8mDdUg1yL3nW4wAQWRcGhkP21YTiVDDlXZ2MtID7qB9b
-         58ofLGUMgbtK+dp5s/WM8e5sDe9IFoInmTohWUhpXXvbAmlNltD/BQFZa8HTJ3bQAp4N
-         JXyECGET8CHIk1bwSYHaltShNAOWLEYJL1h54htDnfmYZ5Gbexbp5vofxNY6DR04gOd4
-         ZLbg==
-X-Gm-Message-State: AOJu0YznmR7xzEUgZapUC0rLXNCNSRBpzegTB1DC3QaTA/7/ULxL4vQ/
-	OYSpfpDz9HHC/uYQrpw+wYkO0M6LTanvdNddlTKNq+UuyU1N2ENyN3Y=
-X-Google-Smtp-Source: AGHT+IENyyBj8zWcjlR/kWt8zVAzEqsFR9jWrSUwj3CKNn/MeXWePl7Lnr7JJnj9/sGRuxmXWKvhVt/sBBK7oER6hYQ=
-X-Received: by 2002:a50:bb26:0:b0:552:365c:6962 with SMTP id
- y35-20020a50bb26000000b00552365c6962mr186983ede.2.1702571486139; Thu, 14 Dec
- 2023 08:31:26 -0800 (PST)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11olkn2010.outbound.protection.outlook.com [40.92.20.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EB3010F;
+	Thu, 14 Dec 2023 08:36:40 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hyxg+4IwPwngjW9hScSdtWGJuq4GIEhb03rTjdSyew4Bacxvspu7OS8Nc6vi6QDZwFShJxU2nh/+fNysHffgh/ONsP5UY2JKv+gQYLfya9wJycNYmf9/ut9qqjEOji0SN6x39tFulhOmB0oWB/rV2MdRFrW/7yV9HxI534ue7XNpX/QUoeUAYgZl3DvhNumtZefXH16423sye7s+A2E6LW9eK78tKqjjM/j3EBXnNBh7Ta8vjdl2ixtLRrgANol2UwZKetUJszhpLlqFxgxek8/b7bp1nCz/iE+GsABzeu6jM7QfcMURhCekRLivrBn89Ky0OKCVQxF85g3ToAjneQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=b9AjcKM/+IwWquA3N1E6VrYur+iXx9b0VAeSNKjoNoY=;
+ b=lrmYXIv4WctQHaPFlwIMdYIqSQlsXyyZY37WfdzK9eJWlBRt8XltimVNSh8ir6lA/4nWZWirCH+6WTRHS8vRC1ERrX37dLNsI68a/5dH9IcmF095emZI9UMNTsiBezx4rcffCalEMytsfB1YLSNjlgXmlsZINB4z4UE2crrq0sNyQ9K7KYrVZGHsTYQVoDd5rMEf2hFVESvDZZ/u+d5EkMU0BQl0f9T+chsLTJLTEHgpf9tEM+1j57oOGKZxv3CwnRVt5dVBP2MTDJjk6Qebo5T/0pDxy+UQuDL+3D29YJXme/b1Nb2whZgG+9HOVUuOznC20DTObIpR7c0rhulZuw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=b9AjcKM/+IwWquA3N1E6VrYur+iXx9b0VAeSNKjoNoY=;
+ b=YCBg7cdFGInE8fh/DtyOHmY6c72nbNDRLjoHF+N5Nj501HaroxJMaE+POsEB+QsbcuDHTfDGowSVfAepnSEnuy++XDwrE2PUQQJulcH5gSG3eIwIzKn/PKLqfHm98q1IARfyLNlWaXFPkAQxwr5DBicOWzItu66geccvFm7b0VBJdgE8rHBZ7Wzs6OARYBRqSiqH617ToV/ckrIBgBhG7Ja9Z3zkIVZXTeK9kKGyUNq7pDDpgn12LDR2Q+sxyU9BBAFAdklnkWoFk8jX0L8505lvDgdxXcY5Qz1y6ct+Xfh5X8UjuZSMEnqSduPSnv+ThuVW2rVlqes7syKQQH8uwg==
+Received: from PH7PR03MB7064.namprd03.prod.outlook.com (2603:10b6:510:2a5::8)
+ by PH0PR03MB6770.namprd03.prod.outlook.com (2603:10b6:510:121::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.28; Thu, 14 Dec
+ 2023 16:36:38 +0000
+Received: from PH7PR03MB7064.namprd03.prod.outlook.com
+ ([fe80::9ca4:4c22:a89:9a8]) by PH7PR03MB7064.namprd03.prod.outlook.com
+ ([fe80::9ca4:4c22:a89:9a8%7]) with mapi id 15.20.7091.028; Thu, 14 Dec 2023
+ 16:36:38 +0000
+From: Min Li <lnimi@hotmail.com>
+To: richardcochran@gmail.com,
+	lee@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Min Li <min.li.xe@renesas.com>
+Subject: [PATCH net-next v3 1/2] ptp: introduce PTP_CLOCK_EXTOFF event for the measured external offset
+Date: Thu, 14 Dec 2023 11:36:24 -0500
+Message-ID:
+ <PH7PR03MB706431C1C25954AD76134FD8A08CA@PH7PR03MB7064.namprd03.prod.outlook.com>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [o3CvydYN5YRJpPgRJpH1l3l9faZiXgu+jQ+7vbX3tfI=]
+X-ClientProxiedBy: BL1PR13CA0314.namprd13.prod.outlook.com
+ (2603:10b6:208:2c1::19) To PH7PR03MB7064.namprd03.prod.outlook.com
+ (2603:10b6:510:2a5::8)
+X-Microsoft-Original-Message-ID: <20231214163625.17939-1-lnimi@hotmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231214155424.67136-1-kuniyu@amazon.com> <20231214155424.67136-4-kuniyu@amazon.com>
-In-Reply-To: <20231214155424.67136-4-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 14 Dec 2023 17:31:15 +0100
-Message-ID: <CANn89i+8e8VJ8cJX6vwLFhtj=BmT233nNr=F9H3nFs8BZgTbsQ@mail.gmail.com>
-Subject: Re: [PATCH v6 bpf-next 3/6] bpf: tcp: Handle BPF SYN Cookie in skb_steal_sock().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR03MB7064:EE_|PH0PR03MB6770:EE_
+X-MS-Office365-Filtering-Correlation-Id: 702ee067-4ad0-458e-2ead-08dbfcc2d80f
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	2drGr+chtIOo5ukyMztkWi/mHmRnL36C6GX1leTWQTwOZGucLergehaRPcvRMGuHT/7DqyRumRSuinWtIKZyGq7t3wmvlqQp30T6t2XpcU2QeQoQdLAxfIlGyv1mFztuVVthDpIL666V2BusJC9HXCbFxG/9lLoZPpN9Xd9HU7KfqwMCWajlC2mIC+jm/gU1MDXxJhwINxC2P2tijZzZyG13kupiqxYjTnXpzUYzvTlnsvaO4A+OhQ23AUjD1s49lsB335ZaAOtZFm/aHohUu5sEfFXpMxjMRYS98pZhzVv8KtjwTHI48ogoJv6Ksy96F85uUbZsqX7VHVqW5OVMh0qcf9R91xfO5tigyPRYRXxfabuuck6gPnpI5+i1UviJv5gD7d05Z1pwUysBCsdbfoUg767kEPIXU8IxKkyHzJ2BeXufJfeFRuCvhIBUsuw7Zkgsg59ViLmF60Wk4wRtFkm9Bz1H2dYuo7+yea5OLL2a3dTbR0PbS6PJidO7ZXUEFaAB/Ffq35D+jwA25j4pYKy5lFDDiRFNeq7whNwG4kMDNngbPR5chjsfGh4KHE7l
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?LnRyBuBP0w3fnqLlP74Gs22H07t70Okhln+3evmjigmmI4OCliFEr2JA6yQu?=
+ =?us-ascii?Q?T80G+fNbW5BKeKquwZ8f0E1FDk+cV1OCS0Lq/ZWi5XjzubfUobasSHcGbqJ4?=
+ =?us-ascii?Q?yZCrx/kwLlDU//g3HJUsBN1/oQPF7tuRjzEs/FN1acUBC1wk5l0l33Cn8scP?=
+ =?us-ascii?Q?1Uc5G1hbeo9leGwIXbvrFZANoq6I9h1Ztyw18F5K1z8zYjINZZbqD7GJbB//?=
+ =?us-ascii?Q?WV23RzHfi2G+cI5AlV4pUWZFT+rQWbYv0WZs4sZqq/aNX6CrbNerDZoVuASt?=
+ =?us-ascii?Q?weGY7nfTAJaaOxvM2cTXvzdsxU6a/r61CCEi0FPeMDAIDUTvjAWqDa/eaFNq?=
+ =?us-ascii?Q?NA2/WCmu9zSOXtl2tYG8KeOpX/4LyMQVm6UYEjy109bunJ0tUnnLIQXItIxM?=
+ =?us-ascii?Q?vi3BbsJ8p1HogQJAkYVszIbbBoHuieDFIALehehfszemX5/GFy9V7YSuwn3v?=
+ =?us-ascii?Q?rpRJZyJ9HAVP4hCIoFf+FJ1sJgmWICjVZCnpT2j3zxRpZ66WOPmo+FrC+SZA?=
+ =?us-ascii?Q?rMfDoPgo74a2Tc6b7QnsN3oPI7OEMNvCrCEohB6V4qsUkQqA4DTO3FuS/qF0?=
+ =?us-ascii?Q?atAKN+uPC+4HR6ViDwUWZaPbmvA9KaiHXInSYhBU9VZXzksPJxz2eA380kBU?=
+ =?us-ascii?Q?vTJet/sVxySDrghUE2vM22kZ53fFGSpHv5ElDcN+ghJSajMIJnx80C0dYcjC?=
+ =?us-ascii?Q?sOW+Tgk74u8MePuuNuwFwm9uS09FAjagWVkLX1FTwlFqFPyKm78lIEtH2vNN?=
+ =?us-ascii?Q?7+bgNUAVx4oI5lP49wQPukpfuH08lSdegRgNxkAGje8cbxB1dIOSJKr7a+jr?=
+ =?us-ascii?Q?BmVbE3KhWdfGKAi8l3qMdke+SqSdsnlBlxBQHGtomx5YD6DJRrLzR6zjJ679?=
+ =?us-ascii?Q?/w2RUf/ZyN8dk57fYs7MtWP18ydlQZHwi5AC4DqHBWNYtgwJ2YySHM2cCgTB?=
+ =?us-ascii?Q?FLUVAiN57hK2TAE5DiODrbj+FjrNTDiqSJIatmPJqgtp/x4HLJ0Zyyv0u6Nh?=
+ =?us-ascii?Q?ZzXKD7KQrzBT745kygZz+BkflBc2KqJVRrfB6ChKSv+2xEH05TKM3kNES0uG?=
+ =?us-ascii?Q?XkoRPXyw2F5Et8p7bB4xXaJ3M2Zou3x3DpYdG1/foyoLxdb/xjEh+AeTtv3R?=
+ =?us-ascii?Q?PNNjXUM+Nx/71jWteXrtcIOtii5AaNueK0WetFaAUZGBzb/nhKy5kZ0bd7UF?=
+ =?us-ascii?Q?MgZAb5sIROrGIH5+6JRhJyydu6WQCQdibPSczw=3D=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-839f4.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 702ee067-4ad0-458e-2ead-08dbfcc2d80f
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR03MB7064.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2023 16:36:38.8014
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR03MB6770
 
-On Thu, Dec 14, 2023 at 4:56=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> We will support arbitrary SYN Cookie with BPF.
->
-> If BPF prog validates ACK and kfunc allocates a reqsk, it will
-> be carried to TCP stack as skb->sk with req->syncookie 1.  Also,
-> the reqsk has its listener as req->rsk_listener with no refcnt
-> taken.
->
-> When the TCP stack looks up a socket from the skb, we steal
-> inet_reqsk(skb->sk)->rsk_listener in skb_steal_sock() so that
-> the skb will be processed in cookie_v[46]_check() with the
-> listener.
->
-> Note that we do not clear skb->sk and skb->destructor so that we
-> can carry the reqsk to cookie_v[46]_check().
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
->  include/net/request_sock.h | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
->
-> diff --git a/include/net/request_sock.h b/include/net/request_sock.h
-> index 26c630c40abb..8839133d6f6b 100644
-> --- a/include/net/request_sock.h
-> +++ b/include/net/request_sock.h
-> @@ -101,10 +101,21 @@ static inline struct sock *skb_steal_sock(struct sk=
-_buff *skb,
->         }
->
->         *prefetched =3D skb_sk_is_prefetched(skb);
-> -       if (*prefetched)
-> +       if (*prefetched) {
-> +#if IS_ENABLED(CONFIG_SYN_COOKIES)
-> +               if (sk->sk_state =3D=3D TCP_NEW_SYN_RECV && inet_reqsk(sk=
-)->syncookie) {
-> +                       struct request_sock *req =3D inet_reqsk(sk);
-> +
-> +                       *refcounted =3D false;
-> +                       sk =3D req->rsk_listener;
-> +                       req->rsk_listener =3D NULL;
+From: Min Li <min.li.xe@renesas.com>
 
-I am not sure about interactions with MPTCP.
+This change is for the PHC devices that can measure the phase offset
+between PHC signal and the external signal, such as the 1PPS signal of
+GNSS. Reporting PTP_CLOCK_EXTOFF to user space will be piggy-backed to
+the existing ptp_extts_event so that application such as ts2phc can
+poll the external offset the same way as extts. Hence, ts2phc can use
+the offset to achieve the alignment between PHC and the external signal
+by the help of either SW or HW filters.
 
-I would be nice to have their feedback.
+Signed-off-by: Min Li <min.li.xe@renesas.com>
+---
+-Rebase to net-next tree
+-Fix the typo and ns2counters suggested by Simon
 
-> +                       return sk;
-> +               }
-> +#endif
->                 *refcounted =3D sk_is_refcounted(sk);
-> -       else
-> +       } else {
->                 *refcounted =3D true;
-> +       }
->
->         skb->destructor =3D NULL;
->         skb->sk =3D NULL;
-> --
-> 2.30.2
->
+ drivers/ptp/ptp_clock.c          | 12 +++++++++---
+ include/linux/ptp_clock_kernel.h |  3 +++
+ include/uapi/linux/ptp_clock.h   |  9 +++++++--
+ 3 files changed, 19 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 15b804ba4..01b55c1e2 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -48,14 +48,19 @@ static void enqueue_external_timestamp(struct timestamp_event_queue *queue,
+ 	s64 seconds;
+ 	u32 remainder;
+ 
+-	seconds = div_u64_rem(src->timestamp, 1000000000, &remainder);
++	if (src->type != PTP_CLOCK_EXTOFF)
++		seconds = div_u64_rem(src->timestamp, 1000000000, &remainder);
+ 
+ 	spin_lock_irqsave(&queue->lock, flags);
+ 
+ 	dst = &queue->buf[queue->tail];
+ 	dst->index = src->index;
+-	dst->t.sec = seconds;
+-	dst->t.nsec = remainder;
++	if (src->type != PTP_CLOCK_EXTOFF) {
++		dst->t.sec = seconds;
++		dst->t.nsec = remainder;
++	} else {
++		dst->offset_ns = src->offset;
++	}
+ 
+ 	/* Both WRITE_ONCE() are paired with READ_ONCE() in queue_cnt() */
+ 	if (!queue_free(queue))
+@@ -417,6 +422,7 @@ void ptp_clock_event(struct ptp_clock *ptp, struct ptp_clock_event *event)
+ 		break;
+ 
+ 	case PTP_CLOCK_EXTTS:
++	case PTP_CLOCK_EXTOFF:
+ 		/* Enqueue timestamp on selected queues */
+ 		spin_lock_irqsave(&ptp->tsevqs_lock, flags);
+ 		list_for_each_entry(tsevq, &ptp->tsevqs, qlist) {
+diff --git a/include/linux/ptp_clock_kernel.h b/include/linux/ptp_clock_kernel.h
+index 1ef4e0f9b..6e4b8206c 100644
+--- a/include/linux/ptp_clock_kernel.h
++++ b/include/linux/ptp_clock_kernel.h
+@@ -200,6 +200,7 @@ struct ptp_clock;
+ enum ptp_clock_events {
+ 	PTP_CLOCK_ALARM,
+ 	PTP_CLOCK_EXTTS,
++	PTP_CLOCK_EXTOFF,
+ 	PTP_CLOCK_PPS,
+ 	PTP_CLOCK_PPSUSR,
+ };
+@@ -210,6 +211,7 @@ enum ptp_clock_events {
+  * @type:  One of the ptp_clock_events enumeration values.
+  * @index: Identifies the source of the event.
+  * @timestamp: When the event occurred (%PTP_CLOCK_EXTTS only).
++ * @offset:    When the event occurred (%PTP_CLOCK_EXTOFF only).
+  * @pps_times: When the event occurred (%PTP_CLOCK_PPSUSR only).
+  */
+ 
+@@ -218,6 +220,7 @@ struct ptp_clock_event {
+ 	int index;
+ 	union {
+ 		u64 timestamp;
++		s64 offset;
+ 		struct pps_event_time pps_times;
+ 	};
+ };
+diff --git a/include/uapi/linux/ptp_clock.h b/include/uapi/linux/ptp_clock.h
+index da700999c..66f4dd73a 100644
+--- a/include/uapi/linux/ptp_clock.h
++++ b/include/uapi/linux/ptp_clock.h
+@@ -32,6 +32,7 @@
+ #define PTP_RISING_EDGE    (1<<1)
+ #define PTP_FALLING_EDGE   (1<<2)
+ #define PTP_STRICT_FLAGS   (1<<3)
++#define PTP_EXT_OFFSET     (1<<4)
+ #define PTP_EXTTS_EDGES    (PTP_RISING_EDGE | PTP_FALLING_EDGE)
+ 
+ /*
+@@ -40,7 +41,8 @@
+ #define PTP_EXTTS_VALID_FLAGS	(PTP_ENABLE_FEATURE |	\
+ 				 PTP_RISING_EDGE |	\
+ 				 PTP_FALLING_EDGE |	\
+-				 PTP_STRICT_FLAGS)
++				 PTP_STRICT_FLAGS |	\
++				 PTP_EXT_OFFSET)
+ 
+ /*
+  * flag fields valid for the original PTP_EXTTS_REQUEST ioctl.
+@@ -228,7 +230,10 @@ struct ptp_pin_desc {
+ #define PTP_MASK_EN_SINGLE  _IOW(PTP_CLK_MAGIC, 20, unsigned int)
+ 
+ struct ptp_extts_event {
+-	struct ptp_clock_time t; /* Time event occured. */
++	union {
++		struct ptp_clock_time t; /* Time event occurred. */
++		__s64 offset_ns;         /* Offset event occurred. */
++	};
+ 	unsigned int index;      /* Which channel produced the event. */
+ 	unsigned int flags;      /* Reserved for future use. */
+ 	unsigned int rsv[2];     /* Reserved for future use. */
+-- 
+2.39.2
+
 
