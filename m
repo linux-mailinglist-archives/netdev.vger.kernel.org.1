@@ -1,144 +1,209 @@
-Return-Path: <netdev+bounces-57421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 190DC813127
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:17:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D731681312B
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:18:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CB7A28315D
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:17:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 668401F20FFA
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:18:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5C755775;
-	Thu, 14 Dec 2023 13:17:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B34FC54BC8;
+	Thu, 14 Dec 2023 13:18:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cs7sirs9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z88tR6GF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B9CE4F1E1;
-	Thu, 14 Dec 2023 13:17:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2EFFC433C8;
-	Thu, 14 Dec 2023 13:16:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702559821;
-	bh=JHyomd0Q9NPn9A6jdZewEr+8uII5CmAyP0V6PrfA4bA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cs7sirs9h0XVwnqWYZLR/SKUFu2N9cpp0Yiz0d+uM6Gx48N7jql/U1q1F0Baw8AK0
-	 KAsMhLeqa+jA25Lv7z282d9rx/9Bx3RtE/7rtOpsLo2hAMJVn/cb8uNlOCUh9G1tRa
-	 Q4BlAFF9y8gqm4V1uwSrFjju+NkuQAPifpstroy8LPfPit/KVjSN39cF+u1fdTDuFr
-	 wxH9zOBWW1Jj+JAaA2/6ttNAWNB3DcevrU39jZyxIV3queyCIejv1lioZzsj2CMqI5
-	 YpAEj54TSUVWnVHEfGb4FtOIqjOnmePv+hf2aM31ld4yumAISfJy8yxIVIZjHqK8C8
-	 P5OilGkQLL67g==
-Date: Thu, 14 Dec 2023 13:16:55 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: linux-riscv@lists.infradead.org,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Daire McNamara <daire.mcnamara@microchip.com>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org
-Subject: Re: [PATCH RESEND v1 2/7] dt-bindings: can: mpfs: add missing
- required clock
-Message-ID: <20231214-tinderbox-paver-d1ff0fc5c428@spud>
-References: <20231208-reenter-ajar-b6223e5134b3@spud>
- <20231208-palpitate-passable-c79bacf2036c@spud>
- <20231212-unreeling-depose-8b6b2e032555-mkl@pengutronix.de>
- <20231213-waffle-grueling-3a5c3879395b@spud>
- <20231214-tinderbox-glitzy-60d1936ab85f-mkl@pengutronix.de>
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45BE710E
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 05:17:58 -0800 (PST)
+Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-5526993db9fso9737a12.0
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 05:17:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702559877; x=1703164677; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/Nzz009bCK5F2i7STK4T3mKQ2BTIc8hB5IsTWQ0ncsg=;
+        b=z88tR6GF8aiR3bhtWIBNrYtNhSX/cQv6OO+/jUrB7iRTsgV9fTdI7mAwcXm5cuez6+
+         2QVYyFKDlf9m7PGJzhZQI8VfKTpBAcRjkJ0JVw3fc4E9TCAYALW4CONQ8JBOi9rp5RNd
+         mTEq53XjX/7RJXOpYKrt9KYyR9OFeIIH/JzBAxEsFLzOV3dn+cqRdMjo2VbNnHqzGZgZ
+         HDTXdFn3eKkeL5SguWu4YzMWWZv1TADIIFllFoHm1XFDzHuS0c4b7dQH3n3tHd2Bf6cI
+         d2ZMu0QALYWXr0aZA9BSlaHsSiuPw5XP2E68vgaA7wIq5ywEwDf541U8SEg156CfkY+w
+         xFcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702559877; x=1703164677;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/Nzz009bCK5F2i7STK4T3mKQ2BTIc8hB5IsTWQ0ncsg=;
+        b=ZSEVDtZshhuC/58OR7E0oWo2fJBZvHmuQ1G5mXpOECyQf1zqbmdQQEWvFBpd2/uE0Y
+         AT+freh9MJ2t10zDor7+q3hsGNDY+V3shpekFMBuHFcwrY4H2fnYWDO29w+UTnqWX3FC
+         nhwSF9MQlp1R7tyHFAahbfHTt0KY4ssLJghdeWIzSfA3U4BeE6aFV9W+j2lVpWq9aa1X
+         V0xWJ26QNyBV93MFaCdqRRfaJXriBVBwPMJr0PWRuLnmDFnPrEkQGK1suuKCGCSmG8v8
+         p13RdcvCVlKWZ7lJC6+InaEIL70PjATHZbCs5h/18wMDXn+HY61cL1B2OA5V2/oeyIgB
+         a2Xw==
+X-Gm-Message-State: AOJu0YxIN/FSGJ4S7mbUDxn+zB7coyxE4spshZTqBjTrx3nfIj7ra6am
+	cYGB57mmhsTCGyAHCDCuNrun0Q/7tIG/86PFPwx1uQ==
+X-Google-Smtp-Source: AGHT+IHmopDQbJwS5mno7KGH25ei4JUtKSc6D3yADawqMJyR9i5N3wMeEvFVOjLyf9nJN7oXuj7wZ/3bLPYej3tYQ4Q=
+X-Received: by 2002:a50:bacf:0:b0:545:279:d075 with SMTP id
+ x73-20020a50bacf000000b005450279d075mr624515ede.1.1702559876549; Thu, 14 Dec
+ 2023 05:17:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="8sbtDukOq8t99rKn"
-Content-Disposition: inline
-In-Reply-To: <20231214-tinderbox-glitzy-60d1936ab85f-mkl@pengutronix.de>
-
-
---8sbtDukOq8t99rKn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20231210111033.1823491-1-maze@google.com> <ebf480701cd22da00c89c5b1b00d31be95ff8e4d.camel@redhat.com>
+In-Reply-To: <ebf480701cd22da00c89c5b1b00d31be95ff8e4d.camel@redhat.com>
+From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
+Date: Thu, 14 Dec 2023 14:17:44 +0100
+Message-ID: <CANP3RGfk6PqR2P8HnGX92ODnf6V5iKb+_zjonOsTDOB-3odM5g@mail.gmail.com>
+Subject: Re: [PATCH] net: sysctl: fix edge case wrt. sysctl write access
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Flavio Crisciani <fcrisciani@google.com>, "Theodore Y. Ts'o" <tytso@google.com>, 
+	"Eric W. Biederman" <ebiederm@xmission.com>, Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 14, 2023 at 12:31:04PM +0100, Marc Kleine-Budde wrote:
-> On 13.12.2023 13:02:49, Conor Dooley wrote:
-> > On Tue, Dec 12, 2023 at 09:49:41PM +0100, Marc Kleine-Budde wrote:
-> > > On 08.12.2023 17:12:24, Conor Dooley wrote:
-> > > > From: Conor Dooley <conor.dooley@microchip.com>
-> > > >=20
-> > > > The CAN controller on PolarFire SoC has an AHB peripheral clock _an=
-d_ a
-> > > > CAN bus clock. The bus clock was omitted when the binding was writt=
-en,
-> > > > but is required for operation. Make up for lost time and add it.
-> > > >=20
-> > > > Cautionary tale in adding bindings without having implemented a real
-> > > > user for them perhaps.
-> > > >=20
-> > > > Fixes: c878d518d7b6 ("dt-bindings: can: mpfs: document the mpfs CAN=
- controller")
-> > > > Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
-> > > > ---
-> > > >  .../devicetree/bindings/net/can/microchip,mpfs-can.yaml    | 7 +++=
-++--
-> > > >  1 file changed, 5 insertions(+), 2 deletions(-)
-> > > >=20
-> > > > diff --git a/Documentation/devicetree/bindings/net/can/microchip,mp=
-fs-can.yaml b/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.=
-yaml
-> > > > index 45aa3de7cf01..05f680f15b17 100644
-> > > > --- a/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.=
-yaml
-> > > > +++ b/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.=
-yaml
-> > > > @@ -24,7 +24,10 @@ properties:
-> > > >      maxItems: 1
-> > > > =20
-> > > >    clocks:
-> > > > -    maxItems: 1
-> > > > +    maxItems: 2
-> > > > +    items:
-> > > > +      - description: AHB peripheral clock
-> > > > +      - description: CAN bus clock
-> > >=20
-> > > Do we we want to have a "clock-names" property, as we need the clock
-> > > rate of the CAN bus clock.
-> >=20
-> > We should not need the clock-names property to be able to get both of
-> > the clocks. clk_bulk_get_all() for example should be usable here.
->=20
-> ACK, but we need the clock rate of CAN clock. Does this binding check
-> that the CAN clock rate is the 2nd one?
+On Thu, Dec 14, 2023 at 10:37=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> On Sun, 2023-12-10 at 03:10 -0800, Maciej =C5=BBenczykowski wrote:
+> > The clear intent of net_ctl_permissions() is that having CAP_NET_ADMIN
+> > grants write access to networking sysctls.
+> >
+> > However, it turns out there is an edge case where this is insufficient:
+> > inode_permission() has an additional check on HAS_UNMAPPED_ID(inode)
+> > which can return -EACCES and thus block *all* write access.
+> >
+> > Note: AFAICT this check is wrt. the uid/gid mapping that was
+> > active at the time the filesystem (ie. proc) was mounted.
+> >
+> > In order for this check to not fail, we need net_ctl_set_ownership()
+> > to set valid uid/gid.  It is not immediately clear what value
+> > to use, nor what values are guaranteed to work.
+> > It does make sense that /proc/sys/net appear to be owned by root
+> > from within the netns owning userns.  As such we only modify
+> > what happens if the code fails to map uid/gid 0.
+> > Currently the code just fails to do anything, which in practice
+> > results in using the zeroes of freshly allocated memory,
+> > and we thus end up with global root.
+> > With this change we instead use the uid/gid of the owning userns.
+> > While it is probably (?) theoretically possible for this to *also*
+> > be unmapped from the /proc filesystem's point of view, this seems
+> > much less likely to happen in practice.
+> >
+> > The old code is observed to fail in a relatively complex setup,
+> > within a global root created user namespace with selectively
+> > mapped uid/gids (not including global root) and /proc mounted
+> > afterwards (so this /proc mount does not have global root mapped).
+> > Within this user namespace another non privileged task creates
+> > a new user namespace, maps it's own uid/gid (but not uid/gid 0),
+> > and then creates a network namespace.  It cannot write to networking
+> > sysctls even though it does have CAP_NET_ADMIN.
+>
+> I'm wondering if this specific scenario should be considered a setup
+> issue, and should be solved with a different configuration? I would
+> love to hear others opinions!
 
-The items list requires that the can clock be the second one, so drivers
-etc can rely on that ordering.
+While it could be fixed in userspace.  I don't think it should:
 
---8sbtDukOq8t99rKn
-Content-Type: application/pgp-signature; name="signature.asc"
+The global root uid/gid are very intentionally not mapped in (as a
+security feature).
+So that part isn't changeable (it's also a system daemon and not under
+user control).
 
------BEGIN PGP SIGNATURE-----
+The user namespace very intentionally maps uid->uid and not 0->uid.
+Here there's theoretically more leeway... because it is at least under
+user control.
+However here this is done for good reason as well.
+There's plenty of code that special cases uid=3D0, both in the kernel
+(for example capability handling across exec) and in various userspace
+libraries.  It's unrealistic to fix them all.
+Additionally it's nice to have semi-transparent user namespaces,
+which are security barriers but don't remap uids - remapping causes confusi=
+on.
+(ie. the uid is either mapped or not, but if it is mapped it's a 1:1 mappin=
+g)
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZXsARwAKCRB4tDGHoIJi
-0h9wAP903owgON0b07MdLtwGROU5QzSNFLxoBOqorLvQyAIqpAD+NUlz2g5CmXeF
-4jrpFftFyQNgWbQ8mC2atxX5XKUNvA4=
-=LB6e
------END PGP SIGNATURE-----
+As for why?  Because uids as visible to userspace may leak across user
+namespace boundaries,
+either when talking to other system daemons or when talking across machines=
+.
+It's pretty easy (and common) to have uids that are globally unique
+and meaningful in a cluster of machines.
+Again, this is *theoretically* fixable in userspace, but not actually
+a realistic expectation.
 
---8sbtDukOq8t99rKn--
+btw. even outside of clusters of machines, I also run some
+user/uts/net namespace using
+code on my personal desktop (this does require some minor hacks to
+unshare/mount binaries),
+and again I intentionally map uid->uid and 0->uid, because this makes
+my username show up as 'maze' and not 'root'.
+
+This is *clearly* a kernel bug that this doesn't just work.
+(side note: there's a very similar issue in proc_net.c which I haven't
+gotten around to fixing yet, because it looks to be more complex to
+convince oneself it's safe to do)
+
+> > This is because net_ctl_set_ownership fails to map uid/gid 0
+> > (because uid/gid 0 are *not* mapped in the owning 2nd level user_ns),
+> > and falls back to global root.
+> > But global root is not mapped in the 1st level user_ns,
+> > which was inherited by the /proc mount, and thus fails...
+> >
+> > Note: the uid/gid of networking sysctls is of purely superficial
+> > importance, outside of this UNMAPPED check, it does not actually
+> > affect access, and only affects display.
+> >
+> > Access is always based on whether you are *global* root uid
+> > (or have CAP_NET_ADMIN over the netns) for user write access bits
+> > (or are in *global* root gid for group write access bits).
+> >
+> > Cc: Flavio Crisciani <fcrisciani@google.com>
+> > Cc: "Theodore Y. Ts'o" <tytso@google.com>
+> > Cc: "Eric W. Biederman" <ebiederm@xmission.com>
+> > Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+> > Fixes: e79c6a4fc923 ("net: make net namespace sysctls belong to contain=
+er's owner")
+> > Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
+> > ---
+> >  net/sysctl_net.c | 13 ++++---------
+> >  1 file changed, 4 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/net/sysctl_net.c b/net/sysctl_net.c
+> > index 051ed5f6fc93..ded399f380d9 100644
+> > --- a/net/sysctl_net.c
+> > +++ b/net/sysctl_net.c
+> > @@ -58,16 +58,11 @@ static void net_ctl_set_ownership(struct ctl_table_=
+header *head,
+> >                                 kuid_t *uid, kgid_t *gid)
+> >  {
+> >       struct net *net =3D container_of(head->set, struct net, sysctls);
+> > -     kuid_t ns_root_uid;
+> > -     kgid_t ns_root_gid;
+> > +     kuid_t ns_root_uid =3D make_kuid(net->user_ns, 0);
+> > +     kgid_t ns_root_gid =3D make_kgid(net->user_ns, 0);
+> >
+> > -     ns_root_uid =3D make_kuid(net->user_ns, 0);
+>
+> As a fix I would prefer you would keep it minimal. e.g. just replace
+> the if with the ternary operator or just add an 'else' branch.
+
+If you think that's better, I'll resend a v2.
+
+>
+> Cheers,
+>
+> Paolo
+>
+
+--
+Maciej =C5=BBenczykowski, Kernel Networking Developer @ Google
 
