@@ -1,49 +1,50 @@
-Return-Path: <netdev+bounces-57618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 284EA813A39
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 19:45:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4838E813A43
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 19:45:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D10471F21EB5
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 18:45:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11CD2B21609
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 18:45:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89CDC68B85;
-	Thu, 14 Dec 2023 18:45:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED8B68E85;
+	Thu, 14 Dec 2023 18:45:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nabijaczleweli.xyz header.i=@nabijaczleweli.xyz header.b="jHdrVrI5"
+	dkim=pass (2048-bit key) header.d=nabijaczleweli.xyz header.i=@nabijaczleweli.xyz header.b="oyywvtgX"
 X-Original-To: netdev@vger.kernel.org
 Received: from tarta.nabijaczleweli.xyz (tarta.nabijaczleweli.xyz [139.28.40.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A816FB;
-	Thu, 14 Dec 2023 10:44:57 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A0DF191;
+	Thu, 14 Dec 2023 10:45:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
-	s=202305; t=1702579495;
-	bh=HdTsxawUqvYBqho9F8qfYgYlmOiA88qfknRMSXgij6E=;
+	s=202305; t=1702579507;
+	bh=PXy1R2vwiW8A+KWASBw8dr5/DmcBJ0IEf3dFC85mQcY=;
 	h=Date:From:Cc:Subject:References:In-Reply-To:From;
-	b=jHdrVrI5NZyeYt+K+FSO9zKM0tTA499Q1cB+K1dvZbIIKwM7zi+hpj7wvgNZmr04/
-	 Sk2dELl2jUoSWvLp7A//4WuKVr9z4rEy6PqFY+LNOv2V8M5X85ffyZVWN220/NIS0b
-	 sA8JDl5dpah4bnW1EfP+RGorBMlQS7cqtym4B0dJf0P3xjtQIlVQLYwOFz+kA2jCaO
-	 YTKGUs70Ox8ei/67BnYdwOvclbIkAw4uDSy+RI29C7qaj/1jsUepUUC9PjUCrYqque
-	 /mQgTIETwDiVnv6YFez8wCuWMviss9E/QVpmxhF1DraMXfnLgMoVhj1quE7+9OMfAo
-	 itv8Acm2JtGWg==
+	b=oyywvtgX6oB4Loxdmd/EoU++8RV/IElw8VF3Jy+1ZdFZhJ6d573To1kXtbm6XaZrf
+	 6+GeDpcK8oRxScDdXUiFqwABUMekRu4SnvSlM4J9scZMnPHJeDSf+S6UmrU0HKMzww
+	 +d2AD00EGLyCdS4STW5c0WrmXDNzL7mHOCc0eKrJaPBa3ZNvDfsKWDdnmjh7zZXetJ
+	 +Kz6W/D0UGJvTBfTggfxoe81Rl8kyANYCb5d6vfWDRrPbj1K/hVt9TV6SVphxL2HrS
+	 60byyjT0YCbKti0kKIM+PYPHZEd6z3dlwZphS8HxraVIv+y3ADdJ1DK2IjpKHUXs8G
+	 bZ24ZQirTcmEg==
 Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
-	by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id DAF0B13272;
-	Thu, 14 Dec 2023 19:44:55 +0100 (CET)
-Date: Thu, 14 Dec 2023 19:44:55 +0100
+	by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id 902331398C;
+	Thu, 14 Dec 2023 19:45:07 +0100 (CET)
+Date: Thu, 14 Dec 2023 19:45:07 +0100
 From: 
 	Ahelenia =?utf-8?Q?Ziemia=C5=84ska?= <nabijaczleweli@nabijaczleweli.xyz>
 Cc: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>, 
 	Alexander Viro <viro@zeniv.linux.org.uk>, linux-fsdevel@vger.kernel.org, 
+	Karsten Graul <kgraul@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
+	Jan Karcher <jaka@linux.ibm.com>, "D. Wythe" <alibuda@linux.alibaba.com>, 
+	Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, David Howells <dhowells@redhat.com>, 
-	Alexander Mikhalitsyn <alexander@mihalicyn.com>, Kirill Tkhai <tkhai@ya.ru>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: [PATCH RERESEND 02/11] af_unix: unix_stream_splice_read: always
- request MSG_DONTWAIT
-Message-ID: <28db45d00902da22ae25aa16a0c28bb41002fc039.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-s390@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH RERESEND 06/11] net/smc: smc_splice_read: always request
+ MSG_DONTWAIT
+Message-ID: <245da5ab094bcc7d3331385e8813074922c2a13c6.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
 User-Agent: NeoMutt/20231103
 References: <2cover.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
 Precedence: bulk
@@ -53,12 +54,12 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ye7hyns4bd3ezngs"
+	protocol="application/pgp-signature"; boundary="l4z4w7hyrnleo4rd"
 Content-Disposition: inline
 In-Reply-To: <2cover.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
 
 
---ye7hyns4bd3ezngs
+--l4z4w7hyrnleo4rd
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
@@ -70,53 +71,50 @@ Link: https://lore.kernel.org/linux-fsdevel/qk6hjuam54khlaikf2ssom6custxf5i=
 s2ekkaequf4hvode3ls@zgf7j5j4ubvw/t/#u
 Signed-off-by: Ahelenia Ziemia=C5=84ska <nabijaczleweli@nabijaczleweli.xyz>
 ---
- net/unix/af_unix.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ net/smc/af_smc.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 3e8a04a13668..9489b9bda753 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -2889,15 +2889,12 @@ static ssize_t unix_stream_splice_read(struct socke=
-t *sock,  loff_t *ppos,
- 		.pipe =3D pipe,
- 		.size =3D size,
- 		.splice_flags =3D flags,
-+		.flags =3D MSG_DONTWAIT,
- 	};
-=20
- 	if (unlikely(*ppos))
- 		return -ESPIPE;
-=20
--	if (sock->file->f_flags & O_NONBLOCK ||
--	    flags & SPLICE_F_NONBLOCK)
--		state.flags =3D MSG_DONTWAIT;
--
- 	return unix_stream_read_generic(&state, false);
- }
-=20
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index bacdd971615e..89473305f629 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -3243,12 +3243,8 @@ static ssize_t smc_splice_read(struct socket *sock, =
+loff_t *ppos,
+ 			rc =3D -ESPIPE;
+ 			goto out;
+ 		}
+-		if (flags & SPLICE_F_NONBLOCK)
+-			flags =3D MSG_DONTWAIT;
+-		else
+-			flags =3D 0;
+ 		SMC_STAT_INC(smc, splice_cnt);
+-		rc =3D smc_rx_recvmsg(smc, NULL, pipe, len, flags);
++		rc =3D smc_rx_recvmsg(smc, NULL, pipe, len, MSG_DONTWAIT);
+ 	}
+ out:
+ 	release_sock(sk);
 --=20
 2.39.2
 
---ye7hyns4bd3ezngs
+--l4z4w7hyrnleo4rd
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmV7TScACgkQvP0LAY0m
-WPGi6xAAnOF1XsITYUFaL7TgbYsG5Cc848T8lIyQ52KabsYFv6bNp74g60c2vPo+
-JhktQE8Iur9cvutWppKMZsLoQMRZxFD5oD9Bmbx19Gx3UQVejdrYQEAtqaMLHMZU
-tlao88CDisdmKBQ0mTKrxFzpgxVxClvO88NNAj3AYLitDTZs47D3OewrsuJPYCl2
-N24xmsdG3x2L4b7EvXrIs8ZOgHAcf+i5Ue00ZujtQXVAB6G5LSk44L+Bgl3M6nRu
-A6FltV5RieigL1ahQjPA8peQ8PU6YkaeeCMhIbQhWeZD2MywVaoR8n3moOpXRt9G
-tR6qVoZsu9exzPyMAxz6qYYXv0BozBZLzdhcOVhkIV7hYt4TiRrepufM/e639Zuh
-N+q/4BTTyyJ7d57t059sFyNKu5cvyAi8lP5zd4Z2vxnArF5LGAdZLefve9RT0Z7Y
-RG6QCXMUTGdyemR5SSycouPySpZtWozJPdblqg7vKNP4JcE1Vzv3E0BRGKdnE29O
-7uZiZWb+/FXtmqRnrXWCJVPeFES+71NMIVe2mrbYBQGWfiK5re3Dm41L60a8UC8N
-ilUpVKft7YURQQEXuNsP/IL0gjanyNRq/qD2Y5FsnT1j1aNgBAm7AIGTgRrstLWu
-ddtWF1lQak5HHxX1j2u1Z2zzNlq2GT5QY415ZS8oL2PZiR7AcKY=
-=j3Oi
+iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmV7TTMACgkQvP0LAY0m
+WPForQ//WzHhUmkfyAAcw6XAu0st2Tx/S0T4A8l24yTjKu6/h2phrrquWFN0C79n
+nDa7MaFQEA8qXMAsROApZoHayZpSq+w3jee6D+3MRwnsPp8wEMWs+KGTlX09D978
+4qbgCq1shAJSsms4U1EbSINfu499AwyDUREI5wY+49WCdZMADG/C7imntuw4xspd
+scXnF8CXKfEezTx6VJPTYhJHswgbwkKbh6GtuiZmppqaFZAdXolj/9Vpb8+Rlm38
+jiPL7XX7zBoI+yZdsxprh4xNU7rvOpIGnnVlGswDlJ7Y36wryXhOIhQOF3hzhKLE
+2GsdPt6YkjVmXiGPSIx+5UZ8+GIOhSoI+M/pLwep29PVG+HST7UCJfdO+TGgiKWd
+sPRImk1GFZJvC0XK4xAn5XLGubk17JcrDNkaXX8BxK0nD7uZkqxpDXsQKkEJhXEh
+xfXb/PV2Pl140PJ3D72sak8KKoR+MLjnxKnGX2I+08OVJBE1+k/SKn0HolRUTupW
+lkFwG/qehZppWnoBjVrSnknp9EppSS0cxCprhYo4VsowmDduVE1AbyMGad2olq1h
+K6opPf1wfCnR8EzaFHsAopFlRi1NHVE5xZ4Hu77zAVnxficxxEL86rijUiUAM5uY
+ClM5h5nv8LDF04ZN70QS6uytYomwSnnlLiWHYX/JkOtxXvDm7QA=
+=hazA
 -----END PGP SIGNATURE-----
 
---ye7hyns4bd3ezngs--
+--l4z4w7hyrnleo4rd--
 
