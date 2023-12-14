@@ -1,57 +1,43 @@
-Return-Path: <netdev+bounces-57481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 151FF81329A
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:10:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 953C18132C0
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:16:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ABCA5B2112B
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:10:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00F56B215C8
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:16:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA0B59B4F;
-	Thu, 14 Dec 2023 14:10:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GHfjHAQ1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB91D59E31;
+	Thu, 14 Dec 2023 14:16:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CD65118
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 06:10:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702563015; x=1734099015;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=P5+juMLHJnwyDiBpl3S0dM5Nn3q6D4TIwTTHAV2aD7E=;
-  b=GHfjHAQ1wc8ZDtbSwBZ3hl8nfmiVSvKqKDKTV/M4vjwB1rKKi63iAG45
-   xjl/DOb1JeSHztV8qPlflhY3acdwcUB0Ek6QCUN5e6pB8ySK7U/YTTDdT
-   EYXYnPYm5KSE0CBbzRnoSzCd4FBXs5Mid58iRsObqbElPNqqFpjOJSIgO
-   NVSHNKR3u3sviQ3L5gF/CaCwri0WVf3+67mQ9yKYpglOTocYLm7B5vr8C
-   W7v/Lg90dJ2PZ61DhrGldFrAQcsl9EtLSs0MklSbP6OapOfEJspsEQYs0
-   /SCKWVI8ZvlPo3V9I17h282+RNb8D3ls2p01SC1SUqAVgUCZbKyOu5Vyb
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="1942365"
-X-IronPort-AV: E=Sophos;i="6.04,275,1695711600"; 
-   d="scan'208";a="1942365"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 06:10:14 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="918071248"
-X-IronPort-AV: E=Sophos;i="6.04,275,1695711600"; 
-   d="scan'208";a="918071248"
-Received: from unknown (HELO amlin-019-225.igk.intel.com) ([10.102.19.225])
-  by fmsmga001.fm.intel.com with ESMTP; 14 Dec 2023 06:10:13 -0800
-From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com,
-	aleksandr.loktionov@intel.com
-Cc: netdev@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-next] i40e: add trace events related to SFP module IOCTLs
-Date: Thu, 14 Dec 2023 15:10:12 +0100
-Message-Id: <20231214141012.224894-1-aleksandr.loktionov@intel.com>
-X-Mailer: git-send-email 2.25.1
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 831B7A7;
+	Thu, 14 Dec 2023 06:16:08 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4SrZ9s5x3kz29g0N;
+	Thu, 14 Dec 2023 22:14:57 +0800 (CST)
+Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
+	by mail.maildlp.com (Postfix) with ESMTPS id 51C0A1A0190;
+	Thu, 14 Dec 2023 22:16:06 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.2) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 14 Dec 2023 22:16:05 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
+	<liuyonglong@huawei.com>, <lanhao@huawei.com>, <wangpeiyang1@huawei.com>,
+	<shaojijie@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH V2 net-next 0/3] There are some features for the HNS3 ethernet driver
+Date: Thu, 14 Dec 2023 22:11:32 +0800
+Message-ID: <20231214141135.613485-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,79 +45,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
 
-Add trace events related to SFP module IOCTLs for troubleshooting.
+There are some features for the HNS3 ethernet driver
 
-Riewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
- src/CORE/i40e_ethtool.c |  5 +++++
- src/CORE/i40e_trace.h   | 18 ++++++++++++++++++
- 2 files changed, 23 insertions(+)
+changeLog:
+v1 -> v2:
+  - Delete a patch for ethtool -S to dump page pool statistics, suggested by Jakub Kicinski
+  - Delete two patches about CMIS transceiver modules because
+    ethtool get_module_eeprom_by_page op is not implemented, suggested by Jakub Kicinski
+  v1: https://lore.kernel.org/all/20231211020816.69434-1-shaojijie@huawei.com/
+---
 
-diff --git a/src/CORE/i40e_ethtool.c b/src/CORE/i40e_ethtool.c
-index 0838566..e9d9d4b 100644
---- a/src/CORE/i40e_ethtool.c
-+++ b/src/CORE/i40e_ethtool.c
-@@ -1057,6 +1057,7 @@ static int i40e_get_link_ksettings(struct net_device *netdev,
- 	ethtool_link_ksettings_zero_link_mode(ks, supported);
- 	ethtool_link_ksettings_zero_link_mode(ks, advertising);
- 
-+	i40e_trace(ioctl_get_link_ksettings, pf, hw_link_info->link_info);
- 	if (link_up)
- 		i40e_get_settings_link_up(hw, ks, netdev, pf);
- 	else
-@@ -7219,9 +7220,12 @@ static int i40e_get_module_info(struct net_device *netdev,
- 		modinfo->eeprom_len = I40E_MODULE_QSFP_MAX_LEN;
- 		break;
- 	default:
-+		i40e_trace(ioctl_get_module_info, pf, ~0UL);
- 		netdev_dbg(vsi->netdev, "SFP module type unrecognized or no SFP connector used.\n");
- 		return -EOPNOTSUPP;
- 	}
-+	i40e_trace(ioctl_get_module_info, pf, (((u64)modinfo->type) << 32) |
-+		   modinfo->eeprom_len);
- 	return 0;
- }
- 
-@@ -7244,6 +7248,7 @@ static int i40e_get_module_eeprom(struct net_device *netdev,
- 	u32 value = 0;
- 	int i;
- 
-+	i40e_trace(ioctl_get_module_eeprom, pf, ee ? ee->len : 0U);
- 	if (!ee || !ee->len || !data)
- 		return -EINVAL;
- 
-diff --git a/src/CORE/i40e_trace.h b/src/CORE/i40e_trace.h
-index cac0f7c..f54fc36 100644
---- a/src/CORE/i40e_trace.h
-+++ b/src/CORE/i40e_trace.h
-@@ -428,6 +428,24 @@ DEFINE_EVENT(
- 
- 	TP_ARGS(pf, val));
- 
-+DEFINE_EVENT(
-+	i40e_ioctl_template, i40e_ioctl_get_module_info,
-+	TP_PROTO(struct i40e_pf *pf, u64 val),
-+
-+	TP_ARGS(pf, val));
-+
-+DEFINE_EVENT(
-+	i40e_ioctl_template, i40e_ioctl_get_module_eeprom,
-+	TP_PROTO(struct i40e_pf *pf, u64 val),
-+
-+	TP_ARGS(pf, val));
-+
-+DEFINE_EVENT(
-+	i40e_ioctl_template, i40e_ioctl_get_link_ksettings,
-+	TP_PROTO(struct i40e_pf *pf, u64 val),
-+
-+	TP_ARGS(pf, val));
-+
- DECLARE_EVENT_CLASS(
- 	i40e_nvmupd_template,
- 
+Hao Lan (1):
+  net: hns3: add command queue trace for hns3
+
+Jijie Shao (1):
+  net: hns3: support dump pfc frame statistics in tx timeout log
+
+Peiyang Wang (1):
+  net: hns3: dump more reg info based on ras mod
+
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h   |   6 +
+ .../hns3/hns3_common/hclge_comm_cmd.c         |  19 +
+ .../hns3/hns3_common/hclge_comm_cmd.h         |  16 +-
+ .../net/ethernet/hisilicon/hns3/hns3_enet.c   |   6 +-
+ .../hisilicon/hns3/hns3pf/hclge_debugfs.c     |   6 +-
+ .../hisilicon/hns3/hns3pf/hclge_debugfs.h     |   3 +
+ .../hisilicon/hns3/hns3pf/hclge_err.c         | 434 +++++++++++++++++-
+ .../hisilicon/hns3/hns3pf/hclge_err.h         |  36 ++
+ .../hisilicon/hns3/hns3pf/hclge_main.c        |  47 ++
+ .../hisilicon/hns3/hns3pf/hclge_trace.h       |  94 ++++
+ .../hisilicon/hns3/hns3vf/hclgevf_main.c      |  40 ++
+ .../hisilicon/hns3/hns3vf/hclgevf_trace.h     |  50 ++
+ 12 files changed, 746 insertions(+), 11 deletions(-)
+
 -- 
-2.31.1
+2.30.0
 
 
