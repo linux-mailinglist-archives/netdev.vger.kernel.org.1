@@ -1,147 +1,141 @@
-Return-Path: <netdev+bounces-57381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16866812FA6
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:05:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 594D2812FA9
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:06:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA9531F2217B
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:05:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD5AD1F220F9
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:06:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D5841224;
-	Thu, 14 Dec 2023 12:05:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A4F43FE53;
+	Thu, 14 Dec 2023 12:06:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="OOxQcW8Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9306BD;
-	Thu, 14 Dec 2023 04:05:39 -0800 (PST)
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SrWHj4l4yzvS9D;
-	Thu, 14 Dec 2023 20:04:49 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id A0C3F1400CD;
-	Thu, 14 Dec 2023 20:05:37 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 14 Dec
- 2023 20:05:37 +0800
-Subject: Re: [RFC PATCH net-next v1 4/4] net: page_pool: use netmem_t instead
- of struct page in API
-To: Mina Almasry <almasrymina@google.com>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <bpf@vger.kernel.org>
-CC: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
-	<x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, Greg Kroah-Hartman
-	<gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Sumit
- Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=c3=b6nig?=
-	<christian.koenig@amd.com>, Michael Chan <michael.chan@broadcom.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper
- Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
-	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, Jeroen de Borst
-	<jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
-	Shailend Chand <shailend@google.com>, Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>, Jesse Brandeburg
-	<jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Marcin Wojtas
-	<mw@semihalf.com>, Russell King <linux@armlinux.org.uk>, Sunil Goutham
-	<sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Subbaraya
- Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, Felix Fietkau
-	<nbd@nbd.name>, John Crispin <john@phrozen.org>, Sean Wang
-	<sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Saeed
- Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Horatiu
- Vultur <horatiu.vultur@microchip.com>, <UNGLinuxDriver@microchip.com>, "K. Y.
- Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei
- Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Jassi Brar
-	<jaswinder.singh@linaro.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
-	<joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>, Ravi Gunasekaran
-	<r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>, Jiawen Wu
-	<jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, Ronak
- Doshi <doshir@vmware.com>, VMware PV-Drivers Reviewers
-	<pv-drivers@vmware.com>, Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen
-	<shayne.chen@mediatek.com>, Kalle Valo <kvalo@kernel.org>, Juergen Gross
-	<jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Oleksandr
- Tyshchenko <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko
-	<andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
-	<song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh
-	<kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
-	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Stefan Hajnoczi
-	<stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan
-	<shuah@kernel.org>, =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>,
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
-	<ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
-	<justinstitt@google.com>, Jason Gunthorpe <jgg@nvidia.com>, Shakeel Butt
-	<shakeelb@google.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-References: <20231214020530.2267499-1-almasrymina@google.com>
- <20231214020530.2267499-5-almasrymina@google.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <ddffff98-f3de-6a5d-eb26-636dacefe9aa@huawei.com>
-Date: Thu, 14 Dec 2023 20:05:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+Received: from EUR01-DB5-obe.outbound.protection.outlook.com (mail-db5eur01on2048.outbound.protection.outlook.com [40.107.15.48])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15715B9
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 04:06:34 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VUZ/ke2OzOTIO52TrjN3cmJQ1OP/qCSdLTffiJ8oxSjDfAYarvd1SXO+0GMfKdfrt0hMX77XRkyGt8CToQjO9AevlfG8ZLgmljggndoRnp3IrnMcP8w1FUpT2+vz6oCgE0cnu6ml66/2qk67aIBGGnZ3N+QAROsy39+/DJGpMTM9X63zaK33Kn27gxrTPnPoQhR/p0u0hXwcWnb7AsLk5rOUF2+Y/VZEiTJT0Hd3zqKMe0bb0381r2/Hpd0r8QlpZJBkawPedYvSgpfv45u/CtqIx0CwK/wqfkLhf8+szBKEVN8Hru0XikaqF7j2Ws6mKUzigvyX6vWrPLOxwwDkqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LbYoDfDyEZfs2fPSPHrCLNmMvp7f8utsA2RI/R+tLP4=;
+ b=dkeDhL4ncYulKpvMg1M/NIwVVo6AHMmP34Vt7FgdF0oa27b0bYOdctIWdof3o3VpNm3+zS8sLpIKpO+IMk4HzU0iGKB/6xrwWndKWjVrk24R8m8wMMoDTG6GeDpwH3ogd7ePANF6CYf8IQgu3Llv9Oo9BdhHOH/Nsg8SOMRNqsDrRJQXsQgJl4/Om3TjlPvqBdw+uKnnfsRkQqlZJZyTgzH7zgYoEjI2+jwQ7EbaaKoyr3mfOa77rQW2utLI0nmQ7KwK10R0p2NfjGcIFWBqwl5pr5cL+nmH+W1pLbHxMs8JRntRm5ddaDfl8PXvzHIEn9FRE9fCERujkSHnEBVMNA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LbYoDfDyEZfs2fPSPHrCLNmMvp7f8utsA2RI/R+tLP4=;
+ b=OOxQcW8YGCPkgzTHm78zwBlL6iCkKDNwDTuxD7VqxTnbdCFnN7k3smJG91SE1fynag32rYVuv1SWocDqLMh8wLGYkN8YEcq4nzE1Hpu9H+KAQ6BIPKamYVVDY8lrp1T5/IC/R70mpSz2ygeC4lohhoHj8ZOhVyJfnCKriEOGXeY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by DB9PR04MB8092.eurprd04.prod.outlook.com (2603:10a6:10:24f::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.28; Thu, 14 Dec
+ 2023 12:06:31 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7091.028; Thu, 14 Dec 2023
+ 12:06:31 +0000
+Date: Thu, 14 Dec 2023 14:06:27 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Tobias Waldekranz <tobias@waldekranz.com>
+Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
+	f.fainelli@gmail.com, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 net-next 6/8] net: dsa: mv88e6xxx: Limit histogram
+ counters to ingress traffic
+Message-ID: <20231214120627.7iw37bumqddtqyon@skbuf>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231211223346.2497157-7-tobias@waldekranz.com>
+ <20231211223346.2497157-7-tobias@waldekranz.com>
+X-ClientProxiedBy: VI1PR06CA0121.eurprd06.prod.outlook.com
+ (2603:10a6:803:a0::14) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231214020530.2267499-5-almasrymina@google.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DB9PR04MB8092:EE_
+X-MS-Office365-Filtering-Correlation-Id: 144d1ceb-6cac-4cdb-391d-08dbfc9d1bd1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	a/IbSahal0KsmJyOAf77Y9FH45XXKR6Nkr3AeXlR6BT6ff34TzAe5OCKo6UHkkf/XsyaT0D1o1tS8COF/FmXLRPfCN9IfVQjUT59Rn/KfgM4Qi5rtIoU0KBoBO9Xo8CzAHENHGeE1oWFncD0+GiM6w/sMABQvXikK6WSCUcicvIN9VX/yA8xBbhVW3OfDKrQ7sqrlOEpCileGo1RYocywVBxy5TKtzZrrx2LgYK4yQ2+li57tJuZyhjZssXophMYBzpd+rLOfm9X3365q838pWooxHDkMpwKTuS2kd4Xz6TAE/BnZEZtQDcZ8P2M6V1nGV1SRnxei8bJFOK8rOC42ra0GqdL2i+1THYVy2CiJ4jz+ITHpUGoHghSBUOn0yjbdqaBIoHs9W2iMR2qVJCDyl/f6cxhWSsSnWOrMMTTCpgkaNZ1uOZljhApLJL+bxRiwbHbRZvefnvXDIC6xkHi0z22VnSWNTNfuiF3Qju5Z6oxIqy78CV8ikSH/Cwac8031Px+9NOZhWlGFzx6/KKsIzdf6oG571dmYh9NWE5Ix7KDsdh2eT0r5NmI0N+SaPU4
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(346002)(376002)(366004)(39860400002)(396003)(230922051799003)(1800799012)(186009)(451199024)(64100799003)(1076003)(6512007)(6506007)(9686003)(83380400001)(26005)(33716001)(4744005)(8676002)(44832011)(8936002)(41300700001)(4326008)(2906002)(86362001)(5660300002)(316002)(6916009)(66556008)(66476007)(66946007)(6666004)(478600001)(6486002)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?1VmhWJ2I9vDG4mxWlcoVU+OlDEu1wVAQyjeB5YZkQ7PoyMfXevtdvpgtGlIK?=
+ =?us-ascii?Q?oL4+2oUhWDAm63QYIX7lLS1NXtpYSxaZR0QkoGEj7inaLFeNT8dCEm731S8d?=
+ =?us-ascii?Q?psXlJ/fy0f9ZAv5k4YpOfL+Q6UsEmGlnD3O2+FCR6jjaVxjQHx1SDFc+Z9Jm?=
+ =?us-ascii?Q?jdzdhMURLDmhB72c+ANK8IzMqhyuNWcV3c4iqyINcKTS4LnO6cMi5Qnr5qcr?=
+ =?us-ascii?Q?MazPT+H88xYBfFRU9bxG6XgIfp6fcixOjJVp83hPnrz/BqzIOjCOOAqfr+M0?=
+ =?us-ascii?Q?fOCFA+EwY73s1a+9JUDY1JJWaK4hhNTKtEBCp83YPpzkKNKEXpLIdN+XKkDb?=
+ =?us-ascii?Q?b6Dklmzh3wIqLY74JAcnYDurt5pG7WbKS5DunpMlaN98Julo5KnmF+7RDh8s?=
+ =?us-ascii?Q?KNFRVT75XpUPyAPAOG78uK2s4Yxs+8dKDJbEwEeWMtSvH3rFz7CWWOZMfrvu?=
+ =?us-ascii?Q?yeWDcbpuCkuu+uboSnvVfGLhHCC4ctMG+PxDwjPko4FvZBO/nEHyfznVbHob?=
+ =?us-ascii?Q?+lSt24mrJsg7StPQM0UMi33rz4yzoTtcSTU22kgKTBsr4bxvgKTcQLu1T9bb?=
+ =?us-ascii?Q?Q3DatdORXLHMQd2hChySvVQYuXsb0sMcVqvBpE6qujToRxKcl6g08cYI/v6c?=
+ =?us-ascii?Q?gGA4ADfup7KI7fwFB9ahofQX11H86d9q8t8Da1IcgjV5r7Il8/KFQEKJ2CPn?=
+ =?us-ascii?Q?aFh3NvuZhBbzadkcHlPWV4xlinyJxJVUP7+qOFeb+t3Ap8J8uinLEcwIYz3o?=
+ =?us-ascii?Q?deKCbFtiTv0/eboPqYpA3PKIcOX87iVfjuVgYjxRdKCc02VjfLTAnzaBJxKd?=
+ =?us-ascii?Q?JwzkZG81XmzmclqSs0Rq4lNzkGaIFb0iircfdSJWB412D0dgxHO+d64fNOZY?=
+ =?us-ascii?Q?fXrzCc/HF7Iu9NfhmMXXH8L8L7HX/52m/DntxdKyS620Hwn6lEikjjvmZBF5?=
+ =?us-ascii?Q?e5wQytjKPVoSzu0b+p8xqewNuDL2rMxkpULPXCiXaHcwjCzA178kCHUnZ7wO?=
+ =?us-ascii?Q?II4X4hI/He5SxPdQWusLIkC2Ww9broM9SOmHj6mQ4Y7BkBjU0diQCoFX53TS?=
+ =?us-ascii?Q?MFKU1yYt7+A+wKdMRvxtg6K81GBSQ4F0IC1SeV7+nveGX9i1Loyd5vc+n5mJ?=
+ =?us-ascii?Q?6pVRJjriVtLhw6zQ+e/a7O66UYB8FLzo9Q0uvk6KGttEAkJ2vPJaubAvIxyB?=
+ =?us-ascii?Q?9taav0lWHqioEvL+fF72n1o2AH8yZiKqLzPv3wLPoSwNkLXZWZhCW2Hzgigv?=
+ =?us-ascii?Q?etZCrGiifXePLAWGz3deoEhJG2G1W2wrVoqH00/Cud+2uNhUppYkF2/oqfSu?=
+ =?us-ascii?Q?7ZiS3z0n9M+JdeT2kWNiWRpEskq7NNnTL7Xpzc/LP2bXF3IWRGmBBiwEqaca?=
+ =?us-ascii?Q?31fNysImg2p8+zod91O+dDt18qPrYE8rADiI5GG+EeRAfj0heptbGaf6m7Ld?=
+ =?us-ascii?Q?YD3lCtJFVWov3NY6xvVCvGCvg4rObigi1cWObDUnmUet8prKVmmSGOWt84Pd?=
+ =?us-ascii?Q?5Cd+gzIH5b5LGWIxIK0zDL2oTvAITWQNARcvsx0+OPFq80KJxZtBFggyTooa?=
+ =?us-ascii?Q?tbk1lL2Xf35i55WltK13n3Doai1eMIGbruuBLxRxcjk/3AKOOL6a68RmuRSc?=
+ =?us-ascii?Q?SA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 144d1ceb-6cac-4cdb-391d-08dbfc9d1bd1
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2023 12:06:31.7609
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LumgvUKuavkXX+6qQTrYEWYPMZ8H6YOQHE3B2kHEMbz9uGPQl58Xdg88BIxPhQhL/8+8zZ0jazlCgWx8KztOPA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB8092
 
-On 2023/12/14 10:05, Mina Almasry wrote:
+On Mon, Dec 11, 2023 at 11:33:44PM +0100, Tobias Waldekranz wrote:
+> Chips in this family only has one set of histogram counters, which can
+> be used to count ingressing and/or egressing traffic. mv88e6xxx has,
+> up until this point, kept the hardware default of counting both
+> directions.
+> 
+> In the mean time, standard counter group support has been added to
+> ethtool. Via that interface, drivers may report ingress-only and
+> egress-only histograms separately - but not combined.
+> 
+> In order for mv88e6xxx to maximalize amount of diagnostic information
+> that can be exported via standard interfaces, we opt to limit the
+> histogram counters to ingress traffic only. Which will allow us to
+> export them via the standard "rmon" group in an upcoming commit.
+> 
+> The reason for choosing ingress-only over egress-only, is to be
+> compatible with RFC2819 (RMON MIB).
+> 
+> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
+> ---
 
-...
-
-> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-> index ac286ea8ce2d..0faa5207a394 100644
-> --- a/include/net/page_pool/types.h
-> +++ b/include/net/page_pool/types.h
-> @@ -6,6 +6,7 @@
->  #include <linux/dma-direction.h>
->  #include <linux/ptr_ring.h>
->  #include <linux/types.h>
-> +#include <net/netmem.h>
->  
->  #define PP_FLAG_DMA_MAP		BIT(0) /* Should page_pool do the DMA
->  					* map/unmap
-> @@ -199,9 +200,9 @@ struct page_pool {
->  	} user;
->  };
->  
-> -struct page *page_pool_alloc_pages(struct page_pool *pool, gfp_t gfp);
-> -struct page *page_pool_alloc_frag(struct page_pool *pool, unsigned int *offset,
-> -				  unsigned int size, gfp_t gfp);
-> +struct netmem *page_pool_alloc_pages(struct page_pool *pool, gfp_t gfp);
-> +struct netmem *page_pool_alloc_frag(struct page_pool *pool, unsigned int *offset,
-> +			       unsigned int size, gfp_t gfp);
-
-Is it possible that we add a thin layer caller on top of the page_pool API?
-So that the existing users can still use the old API, the new user supporting
-the devmem can use the new API, something like below:
-
-struct netmem *netmem_pool_alloc(struct netmem_pool *pool, gfp_t gfp)
-or
-struct devmem *devmem_pool_alloc(struct devmem_pool *pool, gfp_t gfp)
-
-I perfer the second one personally, as devmem means that it is not
-readable from cpu.
-Perhaps netmem can be used in the networking core in the future to
-indicate the generic type for all types of memory supported by networking
-core.
-
-As the main concern from Jason seems to be about safe type protection for
-large driver facing API surface. And touching a lot of existing users does
-not seem to bring a lot of benefit when we have not a clear idea how to
-proceed yet.
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
