@@ -1,89 +1,166 @@
-Return-Path: <netdev+bounces-57242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B27E812869
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 07:46:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1F6E812867
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 07:46:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9566282646
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 06:46:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 170FF1C210B1
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 06:46:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3019D505;
-	Thu, 14 Dec 2023 06:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DDAAD28E;
+	Thu, 14 Dec 2023 06:46:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qfA9ztx8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 280C3E8;
-	Wed, 13 Dec 2023 22:46:19 -0800 (PST)
-X-UUID: a8a7e8588f3945dca372922d586ad599-20231214
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.33,REQID:3e35a9ac-60c8-4a01-8c7d-96e47a71c586,IP:5,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:-10
-X-CID-INFO: VERSION:1.1.33,REQID:3e35a9ac-60c8-4a01-8c7d-96e47a71c586,IP:5,URL
-	:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:-10
-X-CID-META: VersionHash:364b77b,CLOUDID:308d2f61-c89d-4129-91cb-8ebfae4653fc,B
-	ulkID:231214144607IFAQKYW0,BulkQuantity:0,Recheck:0,SF:19|44|64|66|24|17|1
-	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
-	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
-X-UUID: a8a7e8588f3945dca372922d586ad599-20231214
-X-User: chentao@kylinos.cn
-Received: from [172.20.15.254] [(116.128.244.169)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 1396760837; Thu, 14 Dec 2023 14:46:07 +0800
-Message-ID: <ae686e04-b65c-4a4d-b208-076136bae070@kylinos.cn>
-Date: Thu, 14 Dec 2023 14:46:06 +0800
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FDACB9;
+	Wed, 13 Dec 2023 22:46:21 -0800 (PST)
+Message-ID: <3186bf18-a8fd-4b30-a080-61beb13f19f7@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1702536379;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7V8e+jyiil5rWZA6frN0TI83nM5JUOA/KWZ7I2m1ICg=;
+	b=qfA9ztx8p+wG4cjDb6Gl8erqRuFZDdRdoJUDXNLI4YMY45H6Gnx1ka71f2JORCf+R7UDIM
+	gkRfqtejJ967bwekYjiByattWoxf1IEd0dhET3o4bpodxn5Bc2YBjh6LcMXLtIKLbdMZ7y
+	49YGOUbxNORlqG8USZQbCSp08wZht9g=
+Date: Wed, 13 Dec 2023 22:46:11 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] iavf: Fix null pointer dereference in
- iavf_print_link_message
+Subject: Re: [PATCH v5 bpf-next 6/6] selftest: bpf: Test
+ bpf_sk_assign_tcp_reqsk().
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- jacob.e.keller@intel.com, przemyslaw.kitszel@intel.com,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Kunwu Chan <kunwu.chan@hotmail.com>
-References: <20231211025927.233449-1-chentao@kylinos.cn>
- <20231212132851.59054654@kernel.org>
-From: Kunwu Chan <chentao@kylinos.cn>
-In-Reply-To: <20231212132851.59054654@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, dxu@dxuuu.xyz, edumazet@google.com,
+ kuni1840@gmail.com, netdev@vger.kernel.org,
+ Yonghong Song <yonghong.song@linux.dev>
+References: <8fccb066-6d17-4fa8-ba67-287042046ea4@linux.dev>
+ <20231214031819.83105-1-kuniyu@amazon.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20231214031819.83105-1-kuniyu@amazon.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Thanks for your reply.
-Sure, the only thing 'iavf_print_link_message' do is to print a msg by 
-netdev_info.
-
-The 'iavf_virtchnl_completion' assume that no errors will be returned.
-Whether we could just execute 'netdev_info(netdev, "NIC Link is Up Speed 
-is %s Full Duplex\n", speed? speed :"");' when 'speed' is null.
-
-
-Before commit '1978d3ead82c8', the buffer size is '#define 
-IAVF_MAX_SPEED_STRLEN  13', whether we could use a bigger buffer
-size to avoid a null pointer.
-
-Such as '#define IAVF_MAX_SPEED_STRLEN 48'.
-
-
-On 2023/12/13 05:28, Jakub Kicinski wrote:
-> On Mon, 11 Dec 2023 10:59:27 +0800 Kunwu Chan wrote:
->> kasprintf() returns a pointer to dynamically allocated memory
->> which can be NULL upon failure.
+On 12/13/23 7:18 PM, Kuniyuki Iwashima wrote:
+>>> +static int tcp_parse_option(__u32 index, struct tcp_syncookie *ctx)
+>>> +{
+>>> +	struct tcp_options_received *tcp_opt = &ctx->attr.tcp_opt;
+>>> +	char opcode, opsize;
+>>> +
+>>> +	if (ctx->ptr + 1 > ctx->data_end)
+>>> +		goto stop;
+>>> +
+>>> +	opcode = *ctx->ptr++;
+>>> +
+>>> +	if (opcode == TCPOPT_EOL)
+>>> +		goto stop;
+>>> +
+>>> +	if (opcode == TCPOPT_NOP)
+>>> +		goto next;
+>>> +
+>>> +	if (ctx->ptr + 1 > ctx->data_end)
+>>> +		goto stop;
+>>> +
+>>> +	opsize = *ctx->ptr++;
+>>> +
+>>> +	if (opsize < 2)
+>>> +		goto stop;
+>>> +
+>>> +	switch (opcode) {
+>>> +	case TCPOPT_MSS:
+>>> +		if (opsize == TCPOLEN_MSS && ctx->tcp->syn &&
+>>> +		    ctx->ptr + (TCPOLEN_MSS - 2) < ctx->data_end)
+>>> +			tcp_opt->mss_clamp = get_unaligned_be16(ctx->ptr);
+>>> +		break;
+>>> +	case TCPOPT_WINDOW:
+>>> +		if (opsize == TCPOLEN_WINDOW && ctx->tcp->syn &&
+>>> +		    ctx->ptr + (TCPOLEN_WINDOW - 2) < ctx->data_end) {
+>>> +			tcp_opt->wscale_ok = 1;
+>>> +			tcp_opt->snd_wscale = *ctx->ptr;
+>> When writing to a bitfield of "struct tcp_options_received" which is a kernel
+>> struct, it needs to use the CO-RE api. The BPF_CORE_WRITE_BITFIELD has not been
+>> landed yet:
+>> https://lore.kernel.org/bpf/4d3dd215a4fd57d980733886f9c11a45e1a9adf3.1702325874.git.dxu@dxuuu.xyz/
 >>
->> Fixes: 1978d3ead82c ("intel: fix string truncation warnings")
+>> The same for reading bitfield but BPF_CORE_READ_BITFIELD() has already been
+>> implemented in bpf_core_read.h
+>>
+>> Once the BPF_CORE_WRITE_BITFIELD is landed, this test needs to be changed to use
+>> the BPF_CORE_{READ,WRITE}_BITFIELD.
+> IIUC, the CO-RE api assumes that the offset of bitfields could be changed.
 > 
-> No need for the allocation here, print to a buffer on the stack.
+> If the size of struct tcp_cookie_attributes is changed, kfunc will not work
+> in this test.  So, BPF_CORE_WRITE_BITFIELD() works only when the size of
+> tcp_cookie_attributes is unchanged but fields in tcp_options_received are
+> rearranged or expanded to use the unused@ bits ?
+
+Right, CO-RE helps to figure out the offset of a member in the running kernel.
+
+> 
+> Also, do we need to use BPF_CORE_READ() for other non-bitfields in
+> strcut tcp_options_received (and ecn_ok in struct tcp_cookie_attributes
+> just in case other fields are added to tcp_cookie_attributes and ecn_ok
+> is rearranged) ?
+
+BPF_CORE_READ is a CO-RE friendly macro for using bpf_probe_read_kernel(). 
+bpf_probe_read_kernel() is mostly for the tracing use case where the ptr is not 
+safe to read directly.
+
+It is not the case for the tcp_options_received ptr in this tc-bpf use case or 
+other stack allocated objects. In general, no need to use BPF_CORE_READ. The 
+relocation will be done by the libbpf for tcp_opt->mss_clamp (e.g.).
+
+Going back to bitfield, it needs BPF_CORE_*_BITFIELD because the offset may not 
+be right after __attribute__((preserve_access_index)), cc: Yonghong and Andrii 
+who know more details than I do.
+
+A verifier error has been reported: 
+https://lore.kernel.org/bpf/391d524c496acc97a8801d8bea80976f58485810.1700676682.git.dxu@dxuuu.xyz/.
+
+I also hit an error earlier in 
+https://lore.kernel.org/all/20220817061847.4182339-1-kafai@fb.com/ when not 
+using BPF_CORE_READ_BITFIELD. I don't exactly remember how the instruction looks 
+like but it was reading a wrong value instead of verifier error.
+
+================
+
+Going back to this patch set here.
+
+After sleeping on it longer, I am thinking it is better not to reuse 'struct 
+tcp_options_received' (meaning no bitfield) in the bpf_sk_assign_tcp_reqsk() 
+kfunc API.
+
+There is not much benefit in reusing 'tcp_options_received'. When new tcp option 
+was ever added to tcp_options_received, it is not like bpf_sk_assign_tcp_reqsk 
+will support it automatically. It needs to relay this new option back to the 
+allocated req. Unlike tcp_sock or req which may have a lot of them such that it 
+is useful to have a compact tcp_options_received, the tc-bpf use case here is to 
+allocate it once in the stack. Also, not all the members in tcp_options_received 
+is useful, e.g. num_sacks, ts_recent_stamp, and user_mss are not used. Leaving 
+it there being ignored by bpf_sk_assign_tcp_reqsk is confusing.
+
+How about using a full u8 for each necessary member and directly add them to 
+struct tcp_cookie_attributes instead of nesting them into another struct. After 
+taking out the unnecessary members, the size may not end up to be much bigger.
+
+The bpf prog can then directly access attr->tstamp_ok more naturally. The 
+changes to patch 5 and 6 should be mostly mechanical changes.
+
+I would also rename s/tcp_cookie_attributes/bpf_tcp_req_attrs/.
+
+wdyt?
+
+
 
