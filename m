@@ -1,89 +1,72 @@
-Return-Path: <netdev+bounces-57311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46C5F812D59
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:50:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4B68812D5E
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:50:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA5052820DF
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 10:50:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 572CC1F21A1E
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 10:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57CF03C489;
-	Thu, 14 Dec 2023 10:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D963C684;
+	Thu, 14 Dec 2023 10:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PMs44FOK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cjW7wdE0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3776D2576E;
-	Thu, 14 Dec 2023 10:50:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0A038C433C9;
-	Thu, 14 Dec 2023 10:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778643C494;
+	Thu, 14 Dec 2023 10:50:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13C00C433C8;
+	Thu, 14 Dec 2023 10:50:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702551027;
-	bh=SXb2V+uKEU2n7t6G6weVcddYl7DHNgyGn9EjuAISZ7Q=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PMs44FOKJKKcMWG467I+UZQgz3KFimsU98HZCl35q+mJO5LR67yFuO82gv1ydWkez
-	 De5Nc9B950jcxgWtUGAbw4AXWLCRYDmTg3cckGFSKJV84PbaaFJrl85B+OZ4FYR2gW
-	 fJYj3gg9/cmcYZtmKOfI11348XmFmE4VL6Pv4sfBDbKw8eNWiEfrW/e7BbizKNsYTw
-	 7lrotZL3Lp/6ciGzPs/O/+wGHtX7D+mwyBdSNJ6mymn9I/bs+rYUy92kYSlcmD2tH8
-	 qKsGvLpap5Vo9be4H8AA1VYxT2t3bW0oOtF0oxLiClwGX/W1etEdfoLuPyEHYQeY22
-	 nQe5z3zxtHx0Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E93C1DD4EFA;
-	Thu, 14 Dec 2023 10:50:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1702551052;
+	bh=B3Uzhdrf3xm+8hmipnGveC7xOj8Hsd8r5ig/mSxdums=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cjW7wdE0wJKpOB85/uTrRUZDMYAzvL5sJeBifjJFoP9i7NGE5Oi7a+4FO7v2ai+l4
+	 nVbRAw9ZKZd5dfjc2HHHRBrOLhKc+W2RUxZ4nkoftoeW/uaTBN4SDGKYEV1zvjHXBL
+	 vdM9RbsYQqhNyz+LHodwpS4E7AsD7curbtBCxaF6IrSytdaPiViHD+B+tuyNslANj6
+	 TMEXUovKVZxIZF0dnS+NXydDH/xos7XtdhqYb+NOMcJcVui3XOw9SHU7I0wbxG1AQx
+	 Nom7GRyNXKt/X6L98kcxe2/PAfWM98PoFAJW4gkP3+9ecSqwycW81aSFJb0dYjmvS5
+	 3/1ugywDFRH4Q==
+Date: Thu, 14 Dec 2023 11:50:45 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Tony Lu <tonylu@linux.alibaba.com>,
+	Ahelenia Ziemia'nska <nabijaczleweli@nabijaczleweli.xyz>,
+	Karsten Graul <kgraul@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH RESEND 06/11] net/smc: smc_splice_read: always request
+ MSG_DONTWAIT
+Message-ID: <20231214-glimmen-abspielen-12b68e7cb3a7@brauner>
+References: <cover.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
+ <145da5ab094bcc7d3331385e8813074922c2a13c6.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
+ <ZXkNf9vvtzR7oqoE@TONYMAC-ALIBABA.local>
+ <20231213162854.4acfbd9f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v4] net: stmmac: dwmac-qcom-ethqos: Fix drops in 10M SGMII
- RX
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170255102695.29358.13778143091773009121.git-patchwork-notify@kernel.org>
-Date: Thu, 14 Dec 2023 10:50:26 +0000
-References: <20231212092208.22393-1-quic_snehshah@quicinc.com>
-In-Reply-To: <20231212092208.22393-1-quic_snehshah@quicinc.com>
-To: Sneh Shah <quic_snehshah@quicinc.com>
-Cc: vkoul@kernel.org, bhupesh.sharma@linaro.org, alexandre.torgue@foss.st.com,
- joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
- netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kernel@quicinc.com, ahalaney@redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231213162854.4acfbd9f@kernel.org>
 
-Hello:
+> Let's figure that out before we get another repost.
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue, 12 Dec 2023 14:52:08 +0530 you wrote:
-> In 10M SGMII mode all the packets are being dropped due to wrong Rx clock.
-> SGMII 10MBPS mode needs RX clock divider programmed to avoid drops in Rx.
-> Update configure SGMII function with Rx clk divider programming.
-> 
-> Fixes: 463120c31c58 ("net: stmmac: dwmac-qcom-ethqos: add support for SGMII")
-> Tested-by: Andrew Halaney <ahalaney@redhat.com>
-> Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v4] net: stmmac: dwmac-qcom-ethqos: Fix drops in 10M SGMII RX
-    https://git.kernel.org/netdev/net/c/981d947bcd38
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I'm just waiting for Jens to review it as he had comments on this
+before.
 
