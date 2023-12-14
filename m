@@ -1,183 +1,180 @@
-Return-Path: <netdev+bounces-57304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90C09812CE6
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:29:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54443812D2A
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:38:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91EE81C2135D
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 10:29:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B748E281A95
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 10:38:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E57283BB48;
-	Thu, 14 Dec 2023 10:29:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0993C070;
+	Thu, 14 Dec 2023 10:38:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bo7FbkhB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kNjxxrEr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04ABB114
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 02:29:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702549788;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mNaidnArOatG5DPMZgGUNeTPrppTOu1ght+u2+9nPgo=;
-	b=Bo7FbkhBee1ZsvFqeKV7xlwzV5nF0IJGhAJx6U2JV8Z+ctcFplytgVYwjJX4sN88q9f9sZ
-	cC4huT7To850WW0hMa+JESjiJSw+r4Pb9KOIHxEMIZmDf2vmrTQrqZfhd8tGsX69bUN0rz
-	wS0wp8XDJQ+CwYqVBd6rbncnzCrFeao=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-529-7bz1eGnxOVeQ96VVYI-N2Q-1; Thu, 14 Dec 2023 05:29:46 -0500
-X-MC-Unique: 7bz1eGnxOVeQ96VVYI-N2Q-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2cc2ddf70a1so26476921fa.1
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 02:29:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702549785; x=1703154585;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mNaidnArOatG5DPMZgGUNeTPrppTOu1ght+u2+9nPgo=;
-        b=EPuzrsgafavy0Q8Jorz7hMxvJwd9vwjZYo9QZDBdq2n1BbCwmYAHiyLVTYxOAvn5Ya
-         xvVyPjyJrcwtHdVG4qyT2eKl3mnugN4CKiUffMZOqcpmT8fSuAMiHJFcLmE+iAHAvOF7
-         pwwXVoO8N6aJzcpcKDPGktEvyoYrnmsQlsK1EP0nKLgyYgkH9w4t3JcIxGBUeaYr18qm
-         YRfqsLEDiD5QcFaxBorXjHW+3l1D3yc/qVUFa8tGjobKngvDLZTEG7MveXacrW6G4UCC
-         nZrHminSys+10cO5pR3P09IU3JhKaqC8g9neaHT/ns8rAe5EtmBSV8bxXVYpE0+D9YoB
-         0Bmw==
-X-Gm-Message-State: AOJu0YxA9BOrA9V0+mHjQpJJ5Q3ILyMmXPU+Tj104goq5uSR4Ag+tal7
-	EfviAv6u4c0LKp42NbnM8DvVYUA20ZKwsr24YWcUw0dKjQCNqaiFbiFpJL1VQLpYdgQ6ZMjIDHy
-	rITQX4GQiFOruV2VL
-X-Received: by 2002:a2e:b88a:0:b0:2cc:1c21:f729 with SMTP id r10-20020a2eb88a000000b002cc1c21f729mr3199481ljp.60.1702549785338;
-        Thu, 14 Dec 2023 02:29:45 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEjkT5w/kdScbgQ5jnlJ/iNq1v76LhwoQiz85pVMwCHKmLvFjAg9HfOnqm6pisPjZpcYg0XYw==
-X-Received: by 2002:a2e:b88a:0:b0:2cc:1c21:f729 with SMTP id r10-20020a2eb88a000000b002cc1c21f729mr3199467ljp.60.1702549784912;
-        Thu, 14 Dec 2023 02:29:44 -0800 (PST)
-Received: from redhat.com ([2.52.132.243])
-        by smtp.gmail.com with ESMTPSA id v21-20020a2e9615000000b002c9f1316121sm2098658ljh.36.2023.12.14.02.29.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 02:29:43 -0800 (PST)
-Date: Thu, 14 Dec 2023 05:29:38 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel@sberdevices.ru,
-	oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v9 3/4] vsock: update SO_RCVLOWAT setting
- callback
-Message-ID: <20231214052502-mutt-send-email-mst@kernel.org>
-References: <20231214091947.395892-1-avkrasnov@salutedevices.com>
- <20231214091947.395892-4-avkrasnov@salutedevices.com>
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A2CDBD;
+	Thu, 14 Dec 2023 02:38:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702550304; x=1734086304;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=7c5HRQ7p7rUQq5773tY1I2FoClyIopr+txUkw392o24=;
+  b=kNjxxrErRmVPqiJKpWPZozw21h5oA0VqbLPK++eBaB7sY/RIuDnuwYth
+   3Z9buktEfx+q4p148nXCQnVaMTDrPyVllxfkxz28T1LXhrg5FLdQHH+sH
+   LshPxJ1izdeLwl4ptCjikBOwgns/fhDUOxg38j8pLADKX+5WtQRYy1m7C
+   I/jnGoxBvx7a2izno69fced9gQ824EgTuFPZifzYz3morW+/DhvORk4sj
+   D1doCYo3y/7M1xfSu3qr/09rhsjieKyYSdtAUzPGmUDoVnH12sgb/djzY
+   Eo4STbFcc2tUiajdpuV/JbKcAAt1fd6bzWMOMZNzZ16P57n1kmkDeqzyk
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10923"; a="1920361"
+X-IronPort-AV: E=Sophos;i="6.04,275,1695711600"; 
+   d="scan'208";a="1920361"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 02:38:13 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10923"; a="844659550"
+X-IronPort-AV: E=Sophos;i="6.04,275,1695711600"; 
+   d="scan'208";a="844659550"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Dec 2023 02:38:11 -0800
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 14 Dec 2023 02:38:11 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 14 Dec 2023 02:38:11 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 14 Dec 2023 02:38:11 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eJewVmpGQMUFocBNp+TXWDK+1uv5t95iZ8D8tGFVMI+B8rmvD+/C0uEoQtkO3pITDkG9A3jqBCy1AkiLb1c5Y5oUz7sdjwSxFbSU99095XnTr2dy+rZ9Awl9F9XYu0P0rwWRsaX5Iklb/P1cI/zAyrVZfxcMJ1O4DSI5fZhBh8LOOvwYcTsRzZPJ83E/SQYnc04hacSZ2bh54AXztvxsJEsEAQFPcnaAkHVBAwBiHgynSlCzcf/5z9JmnKysNYOPvC0oaXxTX/aQyeK+cAyB+lTXhHyknoonEge5wEcEBYVPxnMTYyqsA8Q+5sI9DzXRnphSIdF4qwh7J0d3S2N6mg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7c5HRQ7p7rUQq5773tY1I2FoClyIopr+txUkw392o24=;
+ b=DjseNiJgc/VXPDWPMMgvSCWloo2ca9bwX40u+pM8qlSGEzwT8nSInYEwSJT2AtRu9TRZ875SNwQTKewIpuCKOK1o7CbO4TUHSGExiPm6av7lCuWIOBYVS5OHS5VUZpuMwB4mXHv9mCuQAoN78MssbPu3ipbjnKRdRO4o75xnnuBblea8bfPOypvKjdM63EP5L12EfuSFQGXtjVreU+0w14AttbRpiMk5xhSRJI9rbvYadpqSNiZQJisSpjsdMeKVmiFsMjYexM8UgR76/uuKT64iM2cfAcAwZHzhDKE7AoZNhLfk5YZk4dAWJxFFq0NRFbG+sNtL0XUZNko9T5KmgA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ by CO1PR11MB4850.namprd11.prod.outlook.com (2603:10b6:303:9c::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.29; Thu, 14 Dec
+ 2023 10:38:04 +0000
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::4ef8:c112:a0b4:90f2]) by DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::4ef8:c112:a0b4:90f2%4]) with mapi id 15.20.7091.028; Thu, 14 Dec 2023
+ 10:38:03 +0000
+Message-ID: <2cd811ab-30ac-4f68-b519-00743b64d343@intel.com>
+Date: Thu, 14 Dec 2023 11:36:24 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 00/12] net: intel: start The Great Code Dedup
+ + Page Pool for iavf
+Content-Language: en-US
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Michal Kubiak
+	<michal.kubiak@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>,
+	Alexander Duyck <alexanderduyck@fb.com>, Yunsheng Lin
+	<linyunsheng@huawei.com>, David Christensen <drc@linux.vnet.ibm.com>, "Jesper
+ Dangaard Brouer" <hawk@kernel.org>, Ilias Apalodimas
+	<ilias.apalodimas@linaro.org>, Paul Menzel <pmenzel@molgen.mpg.de>,
+	<netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20231213112835.2262651-1-aleksander.lobakin@intel.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <20231213112835.2262651-1-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR3P281CA0197.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a5::7) To DM6PR11MB3625.namprd11.prod.outlook.com
+ (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231214091947.395892-4-avkrasnov@salutedevices.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|CO1PR11MB4850:EE_
+X-MS-Office365-Filtering-Correlation-Id: 85f15596-16ae-4ce5-93ed-08dbfc90c034
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bCm9hCv+tK30ndForeiCf1PJMbSDlqY/nd4Xw2VmzJJY6DG5MuzJqkVcFWFC4yZ84XtQorIm/AdewR8UQkTccMnSqnDe9OrQ0EktAcjnBJpfDY3ZA5ee9rRt2l512JNkNEWXxoYs40YOM/Vz8ktUI8goZ0SqdQ39P0BaA49Fy0WONAuXc0aYsOqtpIOXJiITCZUakEAVEXa82VZLPTo2dm01W0np/nqv07IFyBxmryytpKzvyVX5eR+ZAkC1Z6/d4QCdGgSl9vq38eP0H7RvtIjKNir4E6L84z8F7Tc3wmUUzhpKxJMc+IGib+WVvjg+I0v5DAUsyv9hXecP2MFKF9WuoMrNWwAuNV5ITAvFaG4RdtQm/DJT+QfFWs7NbCtY3zliFpOzTffWzad2c0kZoAQTOJzwf+Rt77CaTM9nkvATZQ1afvYlGKxkzZeU4SqPxVa+ZszM0dZTOIvw6ueBS9YZgV2kHp9EJdD4XxJB9ZzZG947H5n+coA/7AQE5DUwg2R+xdNATplixFNY1EXbluY/EDnFZHxlu2NqZoe1HzHhDN4zftDPx60GLTQ5FCZd1p5YQpEBaexepF5bpJ0t0r3iDpcr9KEOIyv6zOxWkDi11SbMIHR6ypv21lFHkyc6xu++2XEFbK3Bl5rqsmMK4g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(366004)(136003)(346002)(376002)(396003)(230922051799003)(64100799003)(186009)(1800799012)(451199024)(31686004)(2616005)(26005)(6666004)(6512007)(6506007)(82960400001)(86362001)(36756003)(31696002)(38100700002)(5660300002)(8936002)(8676002)(7416002)(4326008)(83380400001)(66476007)(54906003)(66556008)(110136005)(66946007)(41300700001)(4744005)(2906002)(316002)(6486002)(478600001)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?M2F3bExHbjFjSVpmSk9Xc1U3RjZEV1kvZ3RacWZFTGxBYkZsK2Zha2NVeVdq?=
+ =?utf-8?B?ZkZ2SlppeWdnL1FFTFpGWVlhUzVoTm1lK1R4YUp0ZGMzRG5oUkZEeG1QQWQ2?=
+ =?utf-8?B?VUsreE5yc0Uxd3JVeU9LYjJkL2QvazVCZjZ2Qlo1Nk93TFhBR0tLemNlMFVu?=
+ =?utf-8?B?dEZ6SGhLT1dBcmdMT2lFMVYvbFQvVmU3azY4Qnpxa2FsLzUwR1g5SStsN3Fu?=
+ =?utf-8?B?b0sraUZoenpXZFd0dThUSW1UQ1YrRWd1ZUFzK2tIYldKSzFobWp1cTdYQWtQ?=
+ =?utf-8?B?ZUV6OU5YdG9kaFhHUzlYd3MxWngxQ1lJZjNPWE1nbDk1aVR0U09TSGMrekNG?=
+ =?utf-8?B?RFhhMkEycnA3M1BuNVgxbjRNeDliMmlDNzhuK1E2TUFHSDhvWDBDaTh5SENT?=
+ =?utf-8?B?OWJVKzVmOGxkcG93MVFVQXV6RGU0TmdZaHBrc0xQM092STdWTEt6Ulkvd1RP?=
+ =?utf-8?B?YVdkcFZWRHVRVUhVYW5rdW9kWnBhanpKUXBDcUljOXFyeFVOMWxJQlM1OTBR?=
+ =?utf-8?B?VW94Lzdja3d0TGZRQ0ZYOEF5Q1FkbXk0cEZQaEZ3dHROL3RrL1gvbXpGbk5L?=
+ =?utf-8?B?N0RaS3NnYjladis5WDZOK0RYWHVvVUhqazJmOXdKeTZxV1FtSWdWMVdBNjNJ?=
+ =?utf-8?B?NGtsU2RsVzBidmVpOG5ReXNLbTAwTmdSeEI1WTdqVThRcFJFQk9lTGlXOUhr?=
+ =?utf-8?B?UUxZV1p5SXZsUnpEZ1pNa1VXRURnUlZ6SGpvV1RPaHZSU21Pc0JaVFJkMXIv?=
+ =?utf-8?B?RTZYZ2ZHQXhncURndnV0S1hzSjlvbFAyL2FIZFNCOUtJdGEyRGVaQU9Pemlm?=
+ =?utf-8?B?S3VXdDA1RWpOS0laam0rb1c4c1plKzdNMHpMaisxK244NE1ucjZHcWw2ZVVw?=
+ =?utf-8?B?aW5yZXhqK1gvVTVqMUtoQ1Z6QWRyM1R1V3JHMFZMQm9wbDFNN2pxNU5wMDNC?=
+ =?utf-8?B?K1RGVC9FVFY4SDVDNnUraVlrSHJjc1Z2NDNmTExzRERFSUdES0d2RkI0VU1O?=
+ =?utf-8?B?bVFVNmVMRGVHV08xY1VHK1NDdVFlU1hkYk0vL1dzdjhGVnlMUGJDbG9VTkhD?=
+ =?utf-8?B?Qzl2MTVKZ2pCemxpWWd2ek9zQkVxNEROSmc1eTREdFpzaG9RSWlUcEdJZUky?=
+ =?utf-8?B?aHI2aDRtZ1Q3YnJzOUVjQ1dMc1IzZDc2b1J2QS9JaTFGR3FuN25taFpkaG9H?=
+ =?utf-8?B?N21JR2ZEbXQ2Q01uVUVyM0g5cDUvYmd1NDB6OTN2WTNyQjRwa1MxQ012ZURw?=
+ =?utf-8?B?dUhKdUNNbWU5YlhFZDlrUVNGVS9UZUtUbC9GU3pTaU5NcFRkVXRwSlZFM3Jn?=
+ =?utf-8?B?VnJwbDBoWjkxY0hmU21xNitqUk9FMGkwQW1mRXJCS3hwMmZGWm9SRXFybXZu?=
+ =?utf-8?B?UWU1UzlzQmJsZWRQWmZ6bzVxMW9GN0ZTVVl0WXMzRGhnSzVUVS9Wc0JydVRx?=
+ =?utf-8?B?L3VWVVZoY25mSHJVNDkybW0xYUdOSHNVMkdMck9KYVJ4NU5rbnM4aVJNUm9u?=
+ =?utf-8?B?dlFhSGd0SG9nSnR5UkNGYUhKV0RWVzhGckRCdmZnck5jdXhKSlZCY1NBOE8z?=
+ =?utf-8?B?SmxPS3pBQWR3M2N5TGMzNm56bkYzenl2dnpweUFvSGFKZ0Q5aFU4THA4VFZJ?=
+ =?utf-8?B?YlJBdmpZYjhoWDREaXN1RHZCVXFLdlBQNjUyMGhmRk9pSlZYZWZJZVZqNnY0?=
+ =?utf-8?B?Yks3bTF0UThSVjE5M3VaS1MxSnNFYWRXeVhWZkw1M2U5Tk11cU1QYVBpTStt?=
+ =?utf-8?B?cEtuU1huZVVuVnhSZWlhekl0cFhoUlA1SmNaemFFTkZUazV6cC9OZ1VaTmxv?=
+ =?utf-8?B?NGt4SFB1QVlkSURGeTdHSmRjNDVnaU9OMnJaVVNDQ01VL04wTlU1UG56K3R3?=
+ =?utf-8?B?eFpPTTQ2dUIyNFp4bVdaR2JGdmNjbGphaHBvcnhyM2FLRVdCdHI3VENBM0xE?=
+ =?utf-8?B?MkhnNFlWcm9oc0tVYzZDdXlxZ0dkMjVzSWVYRzBXQVRFaC9qTG84TGFiYWMz?=
+ =?utf-8?B?c2V0YUh5cUdGVHQ2czNGSjd6bTVGK2NwaENZOGFlZDdmTWQ1QnhVb2YxdmhK?=
+ =?utf-8?B?WHE2M2Y0VzBCWWlRRTV2U1E5Ymo1YlRiYXhmREdkSUFFcFdxTVZ5cG1uZ09Q?=
+ =?utf-8?B?Q0ZuWmlXc3lvWXpNODM4ck1mdDg0UDFmNXJaZ1hVNWNNQU1YR0hQMDVhVElW?=
+ =?utf-8?B?Q2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 85f15596-16ae-4ce5-93ed-08dbfc90c034
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2023 10:38:03.5864
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MNjQCChiY8g/m8nO9zCiDgMZyoHV4H1gdOI7KZpPmbyVqouKUZoP18Or03lmgeX/wIt1RJ5DvKahf9YeN9mOIYI0Tpllmk0HN273RuS6SkY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4850
+X-OriginatorOrg: intel.com
 
-On Thu, Dec 14, 2023 at 12:19:46PM +0300, Arseniy Krasnov wrote:
-> Do not return if transport callback for SO_RCVLOWAT is set (only in
-> error case). In this case we don't need to set 'sk_rcvlowat' field in
-> each transport - only in 'vsock_set_rcvlowat()'. Also, if 'sk_rcvlowat'
-> is now set only in af_vsock.c, change callback name from 'set_rcvlowat'
-> to 'notify_set_rcvlowat'.
-> 
-> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Date: Wed, 13 Dec 2023 12:28:23 +0100
 
-Maybe squash this with patch 2/4?
+> Here's a two-shot: introduce Intel Ethernet common library (libie) and
+> switch iavf to Page Pool. Details are in the commit messages; here's
+> a summary:
+Now conflicts with bpf-next =\
 
-> ---
->  Changelog:
->  v3 -> v4:
->   * Rename 'set_rcvlowat' to 'notify_set_rcvlowat'.
->   * Commit message updated.
-> 
->  include/net/af_vsock.h           | 2 +-
->  net/vmw_vsock/af_vsock.c         | 9 +++++++--
->  net/vmw_vsock/hyperv_transport.c | 4 ++--
->  3 files changed, 10 insertions(+), 5 deletions(-)
-> 
-> diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-> index e302c0e804d0..535701efc1e5 100644
-> --- a/include/net/af_vsock.h
-> +++ b/include/net/af_vsock.h
-> @@ -137,7 +137,6 @@ struct vsock_transport {
->  	u64 (*stream_rcvhiwat)(struct vsock_sock *);
->  	bool (*stream_is_active)(struct vsock_sock *);
->  	bool (*stream_allow)(u32 cid, u32 port);
-> -	int (*set_rcvlowat)(struct vsock_sock *vsk, int val);
->  
->  	/* SEQ_PACKET. */
->  	ssize_t (*seqpacket_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
-> @@ -168,6 +167,7 @@ struct vsock_transport {
->  		struct vsock_transport_send_notify_data *);
->  	/* sk_lock held by the caller */
->  	void (*notify_buffer_size)(struct vsock_sock *, u64 *);
-> +	int (*notify_set_rcvlowat)(struct vsock_sock *vsk, int val);
->  
->  	/* Shutdown. */
->  	int (*shutdown)(struct vsock_sock *, int);
-> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> index 816725af281f..54ba7316f808 100644
-> --- a/net/vmw_vsock/af_vsock.c
-> +++ b/net/vmw_vsock/af_vsock.c
-> @@ -2264,8 +2264,13 @@ static int vsock_set_rcvlowat(struct sock *sk, int val)
->  
->  	transport = vsk->transport;
->  
-> -	if (transport && transport->set_rcvlowat)
-> -		return transport->set_rcvlowat(vsk, val);
-> +	if (transport && transport->notify_set_rcvlowat) {
-> +		int err;
-> +
-> +		err = transport->notify_set_rcvlowat(vsk, val);
-> +		if (err)
-> +			return err;
-> +	}
->  
->  	WRITE_ONCE(sk->sk_rcvlowat, val ? : 1);
->  	return 0;
+I'll send a new one soon, hopefully bpf-next will be pulled to net-next
+meantime?
 
-
-
-I would s
-
-> diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
-> index 7cb1a9d2cdb4..e2157e387217 100644
-> --- a/net/vmw_vsock/hyperv_transport.c
-> +++ b/net/vmw_vsock/hyperv_transport.c
-> @@ -816,7 +816,7 @@ int hvs_notify_send_post_enqueue(struct vsock_sock *vsk, ssize_t written,
->  }
->  
->  static
-> -int hvs_set_rcvlowat(struct vsock_sock *vsk, int val)
-> +int hvs_notify_set_rcvlowat(struct vsock_sock *vsk, int val)
->  {
->  	return -EOPNOTSUPP;
->  }
-> @@ -856,7 +856,7 @@ static struct vsock_transport hvs_transport = {
->  	.notify_send_pre_enqueue  = hvs_notify_send_pre_enqueue,
->  	.notify_send_post_enqueue = hvs_notify_send_post_enqueue,
->  
-> -	.set_rcvlowat             = hvs_set_rcvlowat
-> +	.notify_set_rcvlowat      = hvs_notify_set_rcvlowat
->  };
->  
->  static bool hvs_check_transport(struct vsock_sock *vsk)
-> -- 
-> 2.25.1
-
+Thanks,
+Olek
 
