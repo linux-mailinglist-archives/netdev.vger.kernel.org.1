@@ -1,67 +1,49 @@
-Return-Path: <netdev+bounces-57313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBD5E812DC4
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:54:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D515812DCB
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:55:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECAD01C2148E
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 10:54:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC64C1F21A5A
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 10:55:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD4863D39F;
-	Thu, 14 Dec 2023 10:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D41C3D978;
+	Thu, 14 Dec 2023 10:55:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eAwDqErh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0PaMKcTU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58D19D7F
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 02:53:33 -0800 (PST)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-a1f653e3c3dso878365266b.2
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 02:53:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702551211; x=1703156011; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=b4xdDLVag0ZgO6prT+qC+tDi0V8J2q58AzNyrvL+9nM=;
-        b=eAwDqErhcMS3YLiEJQ41MrquVrzKu9NlOue+N8L6r6qYSB6X0SMzp2zaMzH/Y3+cES
-         wPK4jWVKzUrCw5+n8NwrH+Y53OAUeNXCidW+YZc4oVHhFOKCiZO4JcPbjx3Qxdbirkhy
-         g40GPpJTrV4U7bS3xey3jEHADthGTWluHoOOEZn50r+P8m4T//kVakJMjAbKcB9KPeYF
-         M8Sa38JSguK4wlC+EiHAMHt+y0TN/0wqHTI2HEmA/m+scS9nvp1+g/HRnqCNusQ/28Ju
-         pklyykc3LOq2ra762QtLzW3q7TKVyHaw5unDpCp6fQqDCE3ZwUpRDQccL2ZhGGx960bw
-         lKYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702551211; x=1703156011;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b4xdDLVag0ZgO6prT+qC+tDi0V8J2q58AzNyrvL+9nM=;
-        b=Dk5iUOIRNC1FLc3eb6d3ovl739TQCKTG4WUVpPNcETtqAg/6ZX6daLroYa1H62UxP2
-         0v+XaRHa0mpEFAkMuO/gCr9541YGYRrBplf4bm65N4y32JaJFArPCK9dLjSUjzzl+J/C
-         XQeM/SJoS5VXgZ2WI29E3anEzbgQFJLypV4Vm6grhaWgDL7dqJjAWm+ry9iqNBo6Dvk1
-         GjcmBgVdQZkxR+VaimiVxgzFPBjcbj4a/jUCLW4Aw4DaKNeADOEul+Q6FXnsFADG3hVb
-         yvB8hyV0euadP4KHMQ/JZMymi8Vq+BYQgiR2xucog6k7PN0dPXWGTAQSGwcsD5HPyHxZ
-         Oasw==
-X-Gm-Message-State: AOJu0YzLCzFJmLoGV/3AaM0S3XTGAAFtTZfkQcOmCwvSCs3Qdydnro4x
-	UCJLQqPQP5u4NqPeMDY1Zew=
-X-Google-Smtp-Source: AGHT+IFjC/vDlxjG/hSVGd+GGbomzsGjxRagqq+iyYKtkpL3C8L8uMijLVxkdE/C76QUEyS2qM/FFQ==
-X-Received: by 2002:a17:907:720d:b0:a19:d40a:d222 with SMTP id dr13-20020a170907720d00b00a19d40ad222mr3248569ejc.238.1702551211321;
-        Thu, 14 Dec 2023 02:53:31 -0800 (PST)
-Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id tg3-20020a1709078dc300b00a22fdd1722asm2285425ejc.122.2023.12.14.02.53.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 02:53:30 -0800 (PST)
-Date: Thu, 14 Dec 2023 12:53:28 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: andrew@lunn.ch, Tobias Waldekranz <tobias@waldekranz.com>
-Cc: davem@davemloft.net, kuba@kernel.org, f.fainelli@gmail.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v3 net-next 6/8] net: dsa: mv88e6xxx: Limit histogram
- counters to ingress traffic
-Message-ID: <20231214105328.3kftoisqieodqlnr@skbuf>
-References: <20231211223346.2497157-1-tobias@waldekranz.com>
- <20231211223346.2497157-7-tobias@waldekranz.com>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8A3F171F;
+	Thu, 14 Dec 2023 02:54:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=i5KEO/4V33LYgutwXb3TRWuNCSS9bJhDrQTPBSGXBKA=; b=0PaMKcTUlPtGE2YpI/zI+HQGYl
+	zUUTm7Np6XGNb0bQ5G4kbazHgJR29LuXV1mRIXb6qWT1KvSDtcd2+RtOsPUvBpAgY2nR3XFRNj+B5
+	19z89pK/uRQ6MvsDJwjQdu+gVArlZ+FaxkEB63WUHEGbTNHZVjZ5AiS1PzWF8JF49434=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rDjM1-002uhO-LT; Thu, 14 Dec 2023 11:54:09 +0100
+Date: Thu, 14 Dec 2023 11:54:09 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Luo Jie <quic_luoj@quicinc.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	hkallweit1@gmail.com, linux@armlinux.org.uk, corbet@lwn.net,
+	p.zabel@pengutronix.de, f.fainelli@gmail.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v7 01/14] net: phy: introduce core support for phy-mode =
+ "10g-qxgmii"
+Message-ID: <9df4335a-5190-4091-8e14-ed9f5d12d50e@lunn.ch>
+References: <20231214094813.24690-1-quic_luoj@quicinc.com>
+ <20231214094813.24690-2-quic_luoj@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,28 +52,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231211223346.2497157-7-tobias@waldekranz.com>
+In-Reply-To: <20231214094813.24690-2-quic_luoj@quicinc.com>
 
-On Mon, Dec 11, 2023 at 11:33:44PM +0100, Tobias Waldekranz wrote:
-> Chips in this family only has one set of histogram counters, which can
-> be used to count ingressing and/or egressing traffic. mv88e6xxx has,
-> up until this point, kept the hardware default of counting both
-> directions.
+On Thu, Dec 14, 2023 at 05:48:00PM +0800, Luo Jie wrote:
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
 > 
-> In the mean time, standard counter group support has been added to
-> ethtool. Via that interface, drivers may report ingress-only and
-> egress-only histograms separately - but not combined.
+> 10G-QXGMII is a MAC-to-PHY interface defined by the USXGMII multiport
+> specification. It uses the same signaling as USXGMII, but it multiplexes
+> 4 ports over the link, resulting in a maximum speed of 2.5G per port.
 > 
-> In order for mv88e6xxx to maximalize amount of diagnostic information
-> that can be exported via standard interfaces, we opt to limit the
-> histogram counters to ingress traffic only. Which will allow us to
-> export them via the standard "rmon" group in an upcoming commit.
+> Some in-tree SoCs like the NXP LS1028A use "usxgmii" when they mean
+> either the single-port USXGMII or the quad-port 10G-QXGMII variant, and
+> they could get away just fine with that thus far. But there is a need to
+> distinguish between the 2 as far as SerDes drivers are concerned.
 > 
-> The reason for choosing ingress-only over egress-only, is to be
-> compatible with RFC2819 (RMON MIB).
-> 
-> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
-> ---
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
 
-I guess this needs an ack from Andrew.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
