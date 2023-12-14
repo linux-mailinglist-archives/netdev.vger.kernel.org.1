@@ -1,109 +1,187 @@
-Return-Path: <netdev+bounces-57476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2461D81324E
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:58:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D469681324F
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:58:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65FFEB2196B
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:57:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D23B1F21279
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:58:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1C45789C;
-	Thu, 14 Dec 2023 13:57:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59A005789E;
+	Thu, 14 Dec 2023 13:58:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W53XMcyw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="chRmS2GI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EB76111
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 05:57:52 -0800 (PST)
-Received: by mail-qv1-xf32.google.com with SMTP id 6a1803df08f44-67a91751ba8so48170336d6.3
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 05:57:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702562271; x=1703167071; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y4GG92dKTxNaTk9lUtZlAp+jFvDJQa6YTMq7X1xQGdo=;
-        b=W53XMcyw0lUvCkNP3Cm1o6U78q/b+Z2KTeqY4ns6EwTfESY8dtzryp9le+0ftVAnUQ
-         R/NW109J7SGjq1yLjp5CK6XW1wfWaB8//I1/SZZ7vWcEGfx04d6l+8OWPD1x97vPPwVj
-         mwQZHwCQhAr231HRTkHl7sdtoPC9sdlwEKh+J82VvBXcVN9sRyBsjrI4GbhMIuE17IZ8
-         kp7MimPb+Gn38IbPMscPJUMaKUQ1np1jq2InQx8Ask9Rt/YSLEqvVZpX36RJYVRewgDp
-         2jrrTcDxMxleXwzf3SHMnaaRZfXRW6PvZBMz0kYuMuMiUJQZPS35WjmMeqaK53LBcX3i
-         6QRg==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E686A7
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 05:58:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702562298;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IJb/JZ5DIeJAEZiRa30hG/dhyz0C7/rbH/xtFkoJWDc=;
+	b=chRmS2GItxois/SqUXyTneXL5c8kZfuOp0lkbaDGVtmminEdUZzcYqWanCO7NkAgJSZTwv
+	rAb8Eo9US2NJnF54DyOIGNyDX4evFVoE+RjDZ+T57Yp2xHyn5EqayD8OfhX9Pa6vuOOJIi
+	cFKiispO7WJJ5WyOBEKSMvSwgsaRSEI=
+Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
+ [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-562-N5VKs-CWOFOW6d-BXFYRaw-1; Thu, 14 Dec 2023 08:58:17 -0500
+X-MC-Unique: N5VKs-CWOFOW6d-BXFYRaw-1
+Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-5e3a77ad1a6so5677847b3.3
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 05:58:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702562271; x=1703167071;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Y4GG92dKTxNaTk9lUtZlAp+jFvDJQa6YTMq7X1xQGdo=;
-        b=oJjXxjTP/5PnXpNtlCiE11TH5eZ92EL2hDsVvBZmsJ0hGjX+/hcwE2YAvKiXiqB2Qu
-         DkK5LUmPXiqMmpYM7d4rwg8XxrgHFC5iMwz1P9lT1Us7CE4eP05+RXvwlFAtm5EcF+7Q
-         DN0wSCLNhz0n76PgG4UK995IE2+matAcfHmXXV6pNlM1F2SsfxijbhcoXOzU6EbBgfum
-         KvhG8KANvUoegPhS+2ORzDZ+ukYy62avgpiZC3E79QLA3g5TCNuOrTvAZqUmJYPg7Qwq
-         UFRN8FkC/MgiC66MonlDja/3+mJH5sE1VwerPpITYhpSQeNZaL4kgfiAn2Ii+M23J1H5
-         Jm6Q==
-X-Gm-Message-State: AOJu0YzUfPDcX9UI/m4/UrjJLmGuTdMwZrpnbH/qMVNRlxYtbg1QbGbC
-	xRX4VNQe9DvcdMs0jfbsTxg=
-X-Google-Smtp-Source: AGHT+IEWXDHDHWD1wgDzVN/30yyUm6h2n9+lx1jwSR0X69nD365aI3YRO/rdJJFzvu7diUrYahGQvw==
-X-Received: by 2002:ad4:574c:0:b0:67f:fa0:94ed with SMTP id q12-20020ad4574c000000b0067f0fa094edmr529607qvx.99.1702562271117;
-        Thu, 14 Dec 2023 05:57:51 -0800 (PST)
-Received: from localhost (114.66.194.35.bc.googleusercontent.com. [35.194.66.114])
-        by smtp.gmail.com with ESMTPSA id t18-20020a0cf992000000b0067aab230ed9sm5909265qvn.21.2023.12.14.05.57.50
+        d=1e100.net; s=20230601; t=1702562297; x=1703167097;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IJb/JZ5DIeJAEZiRa30hG/dhyz0C7/rbH/xtFkoJWDc=;
+        b=p610++W0KRySjEbyXA/1yk2G4nYx5xDkoaAiwt/x0bR3yIXHLGFqIXIfbEshHYZwVQ
+         hC3dEV8w4UfbXzsyZ0ZTtuBcdLNnjeShg0ae4pXPJ9bNfMTl7Ijgpwq1MQ8+7dZi6vyq
+         NkVD97t9x55xxZGcdlW46jXJxFYk/kDyPLlAd8Kwd211BWPzUjQhN7G9MX0bOz8+JE4s
+         5W0cnNsXPJjAn7XAcwRZnDgqHiPo4V3S/HerV/UV2rLKBR4LdspTv1bkgHVs5CCKkd18
+         lFI1RSPnmplIWF4u9aolA13nNXWhduqheYZjeNWnQi/M4reAu0PYFzSRaMEJmaAXQ4dt
+         lrKA==
+X-Gm-Message-State: AOJu0Yy7UXieGPTKCS0mYdufhXATX5IktmsVFEQsprc75iAAMR9I1DUH
+	ZsACwrMR7lpW4KgPekX3ThkQ4jHPIDB+Fus41YNULmsNSLcZCWpr3fs3DVzP5szR0MEfGCuq9gK
+	ek0tAL1ib1KhHv1tN
+X-Received: by 2002:a0d:d845:0:b0:5e3:ca00:9967 with SMTP id a66-20020a0dd845000000b005e3ca009967mr446795ywe.51.1702562297074;
+        Thu, 14 Dec 2023 05:58:17 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHS7kdvyTqXPlUr1rZsJgktdjWBr/8U3nDefOdKeX0+UOYgJ1x+/oj6T1jy3NVpQiwvjdBVdQ==
+X-Received: by 2002:a0d:d845:0:b0:5e3:ca00:9967 with SMTP id a66-20020a0dd845000000b005e3ca009967mr446787ywe.51.1702562296787;
+        Thu, 14 Dec 2023 05:58:16 -0800 (PST)
+Received: from localhost ([240d:1a:c0d:9f00:3342:3fe3:7275:954])
+        by smtp.gmail.com with ESMTPSA id w3-20020a0cf703000000b0067f11d1829asm99352qvn.20.2023.12.14.05.58.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 05:57:50 -0800 (PST)
-Date: Thu, 14 Dec 2023 08:57:50 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Neal Cardwell <ncardwell@google.com>, 
- Willem de Bruijn <willemb@google.com>, 
- Mina Almasry <almasrymina@google.com>, 
- Chao Wu <wwchao@google.com>, 
- Pavel Begunkov <asml.silence@gmail.com>, 
- netdev@vger.kernel.org, 
- eric.dumazet@gmail.com, 
- Eric Dumazet <edumazet@google.com>
-Message-ID: <657b09de9f6a6_14c73d294da@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20231214104901.1318423-3-edumazet@google.com>
-References: <20231214104901.1318423-1-edumazet@google.com>
- <20231214104901.1318423-3-edumazet@google.com>
-Subject: Re: [PATCH net-next 2/3] net: Namespace-ify sysctl_optmem_max
+        Thu, 14 Dec 2023 05:58:16 -0800 (PST)
+Date: Thu, 14 Dec 2023 22:58:12 +0900 (JST)
+Message-Id: <20231214.225812.609786828308701015.syoshida@redhat.com>
+To: kuniyu@amazon.com
+Cc: davem@davemloft.net, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com,
+ syzbot+c71bc336c5061153b502@syzkaller.appspotmail.com, nogikh@google.com,
+ syzkaller@googlegroups.com
+Subject: Re: [PATCH net] net: Return error from sk_stream_wait_connect() if
+ sk_wait_event() fails
+From: Shigeru Yoshida <syoshida@redhat.com>
+In-Reply-To: <20231214134615.55389-1-kuniyu@amazon.com>
+References: <20231214.223106.2284573595890480656.syoshida@redhat.com>
+	<20231214134615.55389-1-kuniyu@amazon.com>
+X-Mailer: Mew version 6.9 on Emacs 29.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 
-Eric Dumazet wrote:
-> optmem_max being used in tx zerocopy,
-> we want to be able to control it on a netns basis.
+On Thu, 14 Dec 2023 22:46:14 +0900, Kuniyuki Iwashima wrote:
+> From: Shigeru Yoshida <syoshida@redhat.com>
+> Date: Thu, 14 Dec 2023 22:31:06 +0900 (JST)
+>> On Thu, 14 Dec 2023 17:46:22 +0900, Kuniyuki Iwashima wrote:
+>> > From: Shigeru Yoshida <syoshida@redhat.com>
+>> > Date: Thu, 14 Dec 2023 14:09:22 +0900
+>> >> The following NULL pointer dereference issue occurred:
+>> >> 
+>> >> BUG: kernel NULL pointer dereference, address: 0000000000000000
+>> >> <...>
+>> >> RIP: 0010:ccid_hc_tx_send_packet net/dccp/ccid.h:166 [inline]
+>> >> RIP: 0010:dccp_write_xmit+0x49/0x140 net/dccp/output.c:356
+>> >> <...>
+>> >> Call Trace:
+>> >>  <TASK>
+>> >>  dccp_sendmsg+0x642/0x7e0 net/dccp/proto.c:801
+>> >>  inet_sendmsg+0x63/0x90 net/ipv4/af_inet.c:846
+>> >>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>> >>  __sock_sendmsg+0x83/0xe0 net/socket.c:745
+>> >>  ____sys_sendmsg+0x443/0x510 net/socket.c:2558
+>> >>  ___sys_sendmsg+0xe5/0x150 net/socket.c:2612
+>> >>  __sys_sendmsg+0xa6/0x120 net/socket.c:2641
+>> >>  __do_sys_sendmsg net/socket.c:2650 [inline]
+>> >>  __se_sys_sendmsg net/socket.c:2648 [inline]
+>> >>  __x64_sys_sendmsg+0x45/0x50 net/socket.c:2648
+>> >>  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+>> >>  do_syscall_64+0x43/0x110 arch/x86/entry/common.c:82
+>> >>  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+>> >> 
+>> >> sk_wait_event() returns an error (-EPIPE) if disconnect() is called on the
+>> >> socket waiting for the event. However, sk_stream_wait_connect() returns
+>> >> success, i.e. zero, even if sk_wait_event() returns -EPIPE, so a function
+>> >> that waits for a connection with sk_stream_wait_connect() may misbehave.
+>> >> 
+>> >> In the case of the above DCCP issue, dccp_sendmsg() is waiting for the
+>> >> connection. If disconnect() is called in concurrently, the above issue
+>> >> occurs.
+>> >> 
+>> >> This patch fixes the issue by returning error from sk_stream_wait_connect()
+>> >> if sk_wait_event() fails.
+>> >> 
+>> >> Fixes: 419ce133ab92 ("tcp: allow again tcp_disconnect() when threads are waiting")
+>> >> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+>> > 
+>> > Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+>> > 
+>> > I guess you picked this issue from syzbot's report.
+>> > https://lore.kernel.org/netdev/0000000000009e122006088a2b8d@google.com/
+>> > 
+>> > If so, let's give a proper credit to syzbot and its authors:
+>> > 
+>> > Reported-by: syzbot+c71bc336c5061153b502@syzkaller.appspotmail.com
+>> 
+>> Hi Kuniyuki-san,
+>> 
+>> Thank you very much for your review. I didn't notice the syzbot's
+>> report. Actually, I found this issue by running syzkaller on my
+>> machine.
 > 
-> Following patch changes two tests.
+> Thanks for clarifying.
 > 
-> Tested:
+> I'm also running syzkaller locally and used to add
 > 
-> oqq130:~# cat /proc/sys/net/core/optmem_max
-> 131072
-> oqq130:~# echo 1000000 >/proc/sys/net/core/optmem_max
-> oqq130:~# cat /proc/sys/net/core/optmem_max
-> 1000000
-> oqq130:~# unshare -n
-> oqq130:~# cat /proc/sys/net/core/optmem_max
-> 131072
-> oqq130:~# exit
-> logout
-> oqq130:~# cat /proc/sys/net/core/optmem_max
-> 1000000
+>   Reported-by: syzbot <syzkaller@googlegroups.com>
 > 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> But, it was confusing for syzbot's owners, and I got a mail from one of
+> the authors, Aleksandr Nogikh.  Since then, if syzkaller found an issue
+> that was not on the syzbot dashboard, I have used
+> 
+>   Reported-by: syzkaller <syzkaller@googlegroups.com>
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Thanks for your information. This tag looks great, so I will use this
+next time I send a fix found by local syzkaller :)
+
+Thanks,
+Shigeru
+
+> 
+> .  FWIW, here's Aleksandr's words from the mail.
+> 
+> ---8<---
+> Maybe it would be just a little more clear if instead of
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> you'd write
+> Reported-by: syzkaller <syzkaller@googlegroups.com>
+> if the bug was found only by a local syzkaller instance, because
+> otherwise it implies that the bug was found by syzbot, which is not
+> really the case here :)
+> ---8<---
+> 
+> 
+>> 
+>> Now, I tested this patch with syzbot, and it looks good.
+>> 
+>> Reported-and-tested-by: syzbot+c71bc336c5061153b502@syzkaller.appspotmail.com
+> 
+> This time, this tag is best.
+> 
+> Thanks!
+> 
+> 
+
 
