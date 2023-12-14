@@ -1,180 +1,132 @@
-Return-Path: <netdev+bounces-57644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D88AD813B34
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 21:03:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39CB9813B3C
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 21:07:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62C491F2250C
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 20:03:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E36931F2234F
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 20:07:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C546A036;
-	Thu, 14 Dec 2023 20:03:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D1606A015;
+	Thu, 14 Dec 2023 20:07:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DcctqYnl"
+	dkim=pass (2048-bit key) header.d=threespeedlogic-com.20230601.gappssmtp.com header.i=@threespeedlogic-com.20230601.gappssmtp.com header.b="oeuDLz4v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00516A014
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 20:03:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40c41b43e1eso61758155e9.1
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 12:03:28 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7920968B99
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 20:07:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=threespeedlogic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=threespeedlogic.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6ceb2501f1bso7555100b3a.0
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 12:07:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702584207; x=1703189007; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=threespeedlogic-com.20230601.gappssmtp.com; s=20230601; t=1702584443; x=1703189243; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3t3FbK18GrHFwKE4zIkpGcLL7FiHaNow8xNq3R4/QdI=;
-        b=DcctqYnloBXyzr6/icFJ5nrbeI/fwc45lTK7zT/zDqs/kq2mNANjqfq2WI1CPbOIkl
-         3zpygJURz7qkPfte+tjx80A6gdM+O1FTYI2VvL7SuLYcjzd7H6DpQfdwmDLV9+nXMrPb
-         7dTw0mVB00N20UiuwNWRNzFDHCuBoP+J6TIeAJfZc3sS1MAXMzL9Z0GoRoatm7TLOu8j
-         8ZZNvlX+vs9HJuG2Y82vknoMM3anREwfsFsat4CTGetqMhnBOOAiPMlJfT5NqSfpdkqn
-         3Qd8clBnVZm39r28lU0UGMK8yIuIf8HPnzkmKCt9BujWkP4WutaWkmQdw0Vrw4Oq2nII
-         J76Q==
+        bh=d/Y+Q0nov9zir8e4K6AmuAGHpEWYG8k6pX7YmsKWyGc=;
+        b=oeuDLz4v1VISMuFIi+P0yyOXqpnab7FF4kxUG1H0JM204TF1Tt6Q0/8LE+/Q7YUgw2
+         LNDwa8wDGVKKFNTKtKD/mVtu8aX7vaP0lDH5vDYTW25Rq2t531Vk/XF6iBo3Qcdm2SYU
+         FXox53w93klV0/bcxW2l4tOd6Vw82PnxY78XXVI+o/Mzj3OAUD24Wq3KUA+t8krVIdNE
+         0oIGF3OzoaRO/aAGGvuOa0Hy8f1TcnJCLHqqVy3sYhDmU0RqvGqRklRN1qIxanKDdk/y
+         iZ+K1fQRuAX33cn6n8xncU1CSEIcEJpy1lZdUEQ9nfsAJgQFlvMCR0kZLRQVmrP98VtG
+         OQxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702584207; x=1703189007;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3t3FbK18GrHFwKE4zIkpGcLL7FiHaNow8xNq3R4/QdI=;
-        b=HHLZm8pQLfEvGXOBii/jVDdG63oJTU14KMdJPlk6SrTWmWRpOGcQosjguZ5gK4NU4b
-         wyU6jTnuVFuymUBejPiXxa3bglDTn3yEHPHm4pMn04x/PxFXX4kEwT2Ivf9hukxpfjEv
-         WtVWv2H2hGipuP7R8edMCnO6tt4gUUF742b8nqEWqwX1MRIS1AYG37oumHHrjx2FEOKa
-         kd2nwUXY6ejulixsUyS7EUt+QBXVD1zeOulAbKd17AK+cH6HxalTI6b6EHS843MMkDq/
-         v2KPyMhDF7J8AKNdzy5KtIXUl0zIkkYOjWTSQnB/u+nR8Q7HocPP4UidKwTiAZT6pMf8
-         SaHg==
-X-Gm-Message-State: AOJu0Yw2FvsP3JEi+7uwWv9dTH6RhWXvVzuob8KPT7e4PYNzNqxuAlrv
-	rf1y0G7JpYp5ZK01Xe1njR9Z0mzMgsMPzZYeGwsz9w==
-X-Google-Smtp-Source: AGHT+IFJxGuMnKvxp55N7GC1tz5/h738b4XoM+FeA8fRtBht8xQJ/kBDFL2qAi3ZYkZt7idruFgudyPvdRKWDedOoVg=
-X-Received: by 2002:a05:600c:2313:b0:40c:3e43:4183 with SMTP id
- 19-20020a05600c231300b0040c3e434183mr4682976wmo.5.1702584207011; Thu, 14 Dec
- 2023 12:03:27 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702584443; x=1703189243;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=d/Y+Q0nov9zir8e4K6AmuAGHpEWYG8k6pX7YmsKWyGc=;
+        b=Mil2p7gdCntoQjbSADTdIAPOnetjFNNAZZQgZDj5hNgKPfgPQMfIJgzpBRhwSWcIYH
+         sKKmND6AUczGprAeNBu5PhYmpPTmaTF8JsLx1s80lbdMGNZSEJRTTkmlZg0W0z6dQu5M
+         FGQ1pjwxjhVs2E70t+XkbBIJVNkRo3BltwiJPLWaykhYBRGOaVNBt1wVdb+K0/bNSL9Q
+         M3MNP5dzplH9mnt85FG7z1mJXGHshMke9n0TFlH4rtgUlWc2liDB+EHm1+/N2BYNlbC1
+         4+aGpK9kERIyglPVU5u1Qosak5kZrz40YH31xX60b7UJV3+EgLehna/lBJtUrngBeoj4
+         wGew==
+X-Gm-Message-State: AOJu0YweG6/dpgfLDQ57hue3NM16FHMmDEZGftTbAsiGEuZ+Desgpigq
+	phL/FNa5KGcs5+DbiDuayzyhUw==
+X-Google-Smtp-Source: AGHT+IHlfBbHiX1mxafk1T/SJFyjAXHhNBi+Sg1CMpNGJMV+q+F+YHfAt3NAY/3pI8jvMWglO+G0QQ==
+X-Received: by 2002:a05:6a20:1445:b0:18c:aa14:ad4 with SMTP id a5-20020a056a20144500b0018caa140ad4mr13390918pzi.30.1702584442704;
+        Thu, 14 Dec 2023 12:07:22 -0800 (PST)
+Received: from [192.168.0.164] (d172-218-135-26.bchsia.telus.net. [172.218.135.26])
+        by smtp.gmail.com with ESMTPSA id r15-20020aa78b8f000000b006cdd82337bcsm12208496pfd.207.2023.12.14.12.07.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Dec 2023 12:07:22 -0800 (PST)
+Message-ID: <f532722f-d1ea-d8fb-cf56-da55f3d2eb59@threespeedlogic.com>
+Date: Thu, 14 Dec 2023 12:07:21 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231208005250.2910004-1-almasrymina@google.com>
- <20231208005250.2910004-9-almasrymina@google.com> <b07a4eca-0c3d-4620-9f97-b1d2c76642c2@gmail.com>
- <CAHS8izNVFx6oHoo7y86P8Di9VCVe8A_n_9UZFkg5Wnt=A=YcNQ@mail.gmail.com>
- <b1aea7bc-9627-499a-9bee-d2cc07856978@gmail.com> <CAHS8izPry13h49v+PqrmWSREZKZjYpPesxUTyPQy7AGyFwzo4g@mail.gmail.com>
- <661c1bae-d7d3-457e-b545-5f67b9ef4197@gmail.com>
-In-Reply-To: <661c1bae-d7d3-457e-b545-5f67b9ef4197@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 14 Dec 2023 12:03:15 -0800
-Message-ID: <CAHS8izOY9xm=LBEN8sYwEa3aFB4GWDvJVacom3o4mHZPdHzTUg@mail.gmail.com>
-Subject: Re: [net-next v1 08/16] memory-provider: dmabuf devmem memory provider
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
-	David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeelb@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Content-Language: en-US
+To: davem@davemloft.net, dsahern@kernel.org
+Cc: netdev@vger.kernel.org, claudiu.beznea@tuxon.dev,
+ nicolas.ferre@microchip.com, mdf@kernel.org
+From: Graeme Smecher <gsmecher@threespeedlogic.com>
+Subject: net: ipconfig: dev_set_mtu call is incompatible with a number of
+ Ethernet drivers
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 11, 2023 at 12:37=E2=80=AFPM Pavel Begunkov <asml.silence@gmail=
-.com> wrote:
-...
-> >> If you remove the branch, let it fall into ->release and rely
-> >> on refcounting there, then the callback could also fix up
-> >> release_cnt or ask pp to do it, like in the patch I linked above
-> >>
-> >
-> > Sadly I don't think this is possible due to the reasons I mention in
-> > the commit message of that patch. Prematurely releasing ppiov and not
-> > having them be candidates for recycling shows me a 4-5x degradation in
-> > performance.
->
-> I don't think I follow. The concept is to only recycle a buffer (i.e.
-> make it available for allocation) when its refs drop to zero, which is
-> IMHO the only way it can work, and IIUC what this patchset is doing.
->
-> That's also I suggest to do, but through a slightly different path.
-> Let's say at some moment there are 2 refs (e.g. 1 for an skb and
-> 1 for userspace/xarray).
->
-> Say it first puts the skb:
->
-> napi_pp_put_page()
->    -> page_pool_return_page()
->      -> mp_ops->release_page()
->         -> need_to_free =3D put_buf()
->            // not last ref, need_to_free=3D=3Dfalse,
->            // don't recycle, don't increase release_cnt
->
-> Then you put the last ref:
->
-> page_pool_iov_put_many()
->    -> page_pool_return_page()
->      -> mp_ops->release_page()
->         -> need_to_free =3D put_buf()
->            // last ref, need_to_free=3D=3Dtrue,
->            // recycle and release_cnt++
->
-> And that last put can even be recycled right into the
-> pp / ptr_ring, in which case it doesn't need to touch
-> release_cnt. Does it make sense? I don't see where
-> 4-5x degradation would come from
->
->
+Hi all,
 
-Sorry for the late reply, I have been working on this locally.
+In a number of ethernet drivers, the MTU can't be changed on a running device. Here's one example (from drivers/net/ethernet/cadence/macb_main.c):
 
-What you're saying makes sense, and I'm no longer sure why I was
-seeing a perf degradation without '[net-next v1 10/16] page_pool:
-don't release iov on elevanted refcount'. However, even though what
-you're saying is technically correct, AFAIU it's actually semantically
-wrong. When a page is released by the page_pool, we should call
-page_pool_clear_pp_info() and completely disconnect the page from the
-pool. If we call release_page() on a page and then the page pool sees
-it again in page_pool_return_page(), I think that is considered a bug.
-In fact I think what you're proposing is as a result of a bug because
-we don't call a page_pool_clear_pp_info() equivalent on releasing
-ppiov.
+static int macb_change_mtu(struct net_device *dev, int new_mtu)
+{
+	if (netif_running(dev))
+		return -EBUSY;
+		dev->mtu = new_mtu;
+		return 0;
+}
 
-However, I'm reasonably confident I figured out the right thing to do
-here. The page_pool uses page->pp_frag_count for its refcounting.
-pp_frag_count is a misnomer, it's being renamed to pp_ref_count in
-Liang's series[1]). In this series I used a get_page/put_page
-equivalent for refcounting. Once I transitioned to using
-pp_[frag|ref]_count for refcounting inside the page_pool, the issue
-went away, and I no longer need the patch 'page_pool: don't release
-iov on elevanted refcount'.
+This code is present in a number of other drivers:
 
-There is an additional upside, since pages and ppiovs are both being
-refcounted using pp_[frag|ref]_count, we get some unified handling for
-ppiov and we reduce the checks around ppiov. This should be fixed
-properly in the next series.
+- drivers/net/ethernet/renesas/sh_eth.c
+- drivers/net/ethernet/cadence/macb_main.c
+- drivers/net/ethernet/ni/nixge.c
+- drivers/net/ethernet/dlink/sundance.c
 
-I still need to do some work (~1 week) before I upload the next
-version as there is a new requirement from MM that we transition to a
-new type and not re-use page*, but I uploaded my changes github with
-the refcounting issues resolved in case they're useful to you. Sorry
-for the churn:
+In all but nixge, the reasoning is straightforward: device buffers are allocated with a size that depends on MTU, so the device has to be brought down and these buffers re-allocated when the MTU changes. However, the ipconfig code is incompatible with this:
 
-https://github.com/mina/linux/commits/tcpdevmem-v1.5/
+	/* Handle the case where we need non-standard MTU on the boot link (a network
+	 * using jumbo frames, for instance).  If we can't set the mtu, don't error
+	 * out, we'll try to muddle along.
+	 */
+	if (ic_dev_mtu != 0) {
+		rtnl_lock();
+		if ((err = dev_set_mtu(ic_dev->dev, ic_dev_mtu)) < 0)
+			pr_err("IP-Config: Unable to set interface mtu to %d (%d)\n",
+			       ic_dev_mtu, err);
+		rtnl_unlock();
+	}
 
-[1] https://patchwork.kernel.org/project/netdevbpf/list/?series=3D809049&st=
-ate=3D*
+The device is not brought down prior to dev_set_mtu, so we always trigger an -EBUSY with these drivers. The boot log looks like this:
 
---=20
-Thanks,
-Mina
+[    6.988410] Sending DHCP requests ., OK
+[    8.016248] IP-Config: Got DHCP answer from 192.168.1.1, my address is 192.168.1.217
+[    8.023994] IP-Config: Complete:
+[    8.027215]      device=eth0, hwaddr=46:b5:da:0d:99:20, ipaddr=192.168.1.217, mask=255.255.255.0, gw=255.255.255.255
+[    8.037729]      host=192.168.1.217, domain=threespeedlogic.com, nis-domain=(none)
+[    8.045288]      bootserver=192.168.1.1, rootserver=192.168.1.1, rootpath=, mtu=9000
+[    8.045296]      nameserver0=192.168.1.1
+[    8.057015] IP-Config: Unable to set interface mtu to 9000 (-16)
+
+So - what to do? I can see three defensible arguments:
+
+- The network drivers should allow MTU changes on-the-fly (many do), or
+- The ipconfig code could bring the adapter down and up again, or
+- This is out-of-scope, and I should be reconfiguring the interface in userspace anyways.
+
+thanks,
+Graeme
 
