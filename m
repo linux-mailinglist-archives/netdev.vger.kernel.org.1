@@ -1,255 +1,155 @@
-Return-Path: <netdev+bounces-57429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B7F4813153
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:23:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76B0F81315C
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:25:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27A4E2831EB
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:23:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14E4C1F220F2
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:25:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1946055C04;
-	Thu, 14 Dec 2023 13:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4025F55C04;
+	Thu, 14 Dec 2023 13:25:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kazLAdeG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d2fQwETM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 581FCB9;
-	Thu, 14 Dec 2023 05:23:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702560208; x=1734096208;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=KrO46T/FJChGQLq6w+uu7BIdmYdx65+PzqJzW9LgLQo=;
-  b=kazLAdeGPDFej3PnzKUTjkeSdrFCQqTGY7XcV8TaV1OwR5S1CCET6NSp
-   /LoyyZwaczsIOZgoBvetxc9l9fiawrnhC22QIc6TwwUDrAw0zRffmPGvF
-   Azmko2vVFsBrWyWjt3mHtNNp1UtHmaU1YqrpQmKISA1MWv0YnTQWwvwqk
-   B3M+2a02sCqfrCYtfIhylUUMRt5lKjoKd6BEaMNnmPqm7EtxK9R0Ln1zt
-   c/2yEZcHw7vqdLHDWmJ7+0J6rRsSo32LLDYFgifN/UJ0yflBM5owwJ5um
-   GR/YOkERVwaJo48oBX2X7ZDjusVfsdsvTaAOKOzAuAMjRo/NX4DPTZDyg
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10923"; a="394863670"
-X-IronPort-AV: E=Sophos;i="6.04,275,1695711600"; 
-   d="scan'208";a="394863670"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 05:23:27 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10923"; a="774365160"
-X-IronPort-AV: E=Sophos;i="6.04,275,1695711600"; 
-   d="scan'208";a="774365160"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Dec 2023 05:23:27 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 14 Dec 2023 05:23:26 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 14 Dec 2023 05:23:26 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 14 Dec 2023 05:23:26 -0800
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.169)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 14 Dec 2023 05:23:26 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UrnGwcZU+7O5YR3vMDsiene7smmkLu561o5Xtt5oEaIcELTkSuQeE9jRUZ8RiEYY6KNZfnWiQF2MUJytHTV5RVtwOuK5ltIIhUYZ7pfbDRcmuKVX8YNwgdCR/Vi5PKiwHBmRRf09qEcsmJpHx7NUrFaxcIA/ushkI7NO7t7gW2KUbj+eZHfbq+X8e9QsnIMRAZpxGrx3HaHrd8gWxzuvMVCtUX+hdkywl5H23xohzCKQp/o29ys2sr8D6BOC6sxlOSAYaRsFexUPKLFJTdYm334b37KDiDNb5Rh6SAP5v318lVMK1RKmY2WtQEtQ81WD+Gt5JqbGxR0ux7C8v3wOkQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IZq5LgB9LMVZ0YsXwiPk3nkGt82azpksbJe3fTGx9NY=;
- b=k4w46U27ID10K4PUf0kqRY8z5Qgm9LVAF+PDyE+Qea4Dom0e8l55dJ44peoGVe5Ge4Ti7gKoBbEmaeZc6LBXGdQ6yPrkebGz8WUUzQTG9yRcV5hfsPwxPrym3wXEf6CA+xUGVdzBG7lIT0+jl9tcGxUdk82gH6UzFlw7xHWQ1oCoIh2yFcZ6W4PhS0QSRyOn95JeVhDnEvTL5WeP9OeQxslupGnkGx6u3AY5XQcOQi4YuukPNNgMCda3S7+VHSR8ko6fRbhobKewF4NXTwv8cqEPS4CevUukfmVTLoTPhBDCLM7Fv3A/TaN0+RmeSm477mwdQPBD4GAiNNIFbl4kLg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- IA1PR11MB8200.namprd11.prod.outlook.com (2603:10b6:208:454::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7091.28; Thu, 14 Dec 2023 13:23:24 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::ee54:9452:634e:8c53]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::ee54:9452:634e:8c53%7]) with mapi id 15.20.7091.028; Thu, 14 Dec 2023
- 13:23:24 +0000
-Date: Thu, 14 Dec 2023 14:23:19 +0100
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Tushar Vyavahare <tushar.vyavahare@intel.com>
-CC: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>, <bjorn@kernel.org>,
-	<magnus.karlsson@intel.com>, <jonathan.lemon@gmail.com>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<ast@kernel.org>, <daniel@iogearbox.net>, <tirthendu.sarkar@intel.com>
-Subject: Re: [PATCH bpf-next v2] selftests/xsk: fix for
- SEND_RECEIVE_UNALIGNED test
-Message-ID: <ZXsBx31uOqyrfDvD@boxer>
-References: <20231214130007.33281-1-tushar.vyavahare@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20231214130007.33281-1-tushar.vyavahare@intel.com>
-X-ClientProxiedBy: WA1P291CA0009.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:19::20) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE54010F
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 05:25:27 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5e2eccf79f8so19133237b3.1
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 05:25:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702560327; x=1703165127; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:mime-version
+         :message-id:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9mhP4t0btZKR0/TW9pUz2FL4rewCv2oadSpMb4oTgd8=;
+        b=d2fQwETMICZ/OO5gbMBqNB2HyQSa8MmnkYpKQt0JXKETwoyJ/h7ro0bVZh3PB0W9MM
+         2biR2BgEYwHebfiN5TJN40sxyCTjakhHLSxvWrTfBXLmttR5Ox7IblRPAoau8xG0cS9S
+         r1MNeTms6jyTf5IqYZl4OG7c71yo6hPu5KdQ8YOEWbgsdziSekTvNUzV40HCAOsGVvsf
+         8EWAzcEQcy944jIe9U+0JjE+M2A4uahP686WOyYSU5Pi1lm/3jSZnF+xqLnUwb42PM6z
+         Ksi8R+Dl+UaW20rwSDcTGVYiW4angGIrKV/bMnLcE9oVeVyQm83T/7FzuP9fdIvn0JOe
+         8MHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702560327; x=1703165127;
+        h=content-transfer-encoding:cc:to:from:subject:mime-version
+         :message-id:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9mhP4t0btZKR0/TW9pUz2FL4rewCv2oadSpMb4oTgd8=;
+        b=dRXLTtJFRk7laBN+PLj4DORrR88mb0GWh4+1kKfVhGZREyCYPA6EtoTUdf6h12LA+7
+         i586ca7snFAHX5NoE2O9EeweOYIdm2tD0IuhoMVAQfMjag81a/roOz1adbq/6DZFB8d3
+         xjiSMEUuuHR59kxMjNy2g+921lMnBYnZ6PIT/ZAzS2JaTf3zqyqCn9JiwaPwnx0Dm+9S
+         +CBrnMcEgfqtSX9bJ2TgWfEMNC+co+qIVvyD8oAHqH0Js2myiwbUwvrNY/+3xM4vkcYK
+         759qS4R2oYxuqHIrLK2o1bl4qN0Q7+AfUVR1lOw3Q4bdleViFXpvjB3qQChrtpgNV6Ml
+         j2tQ==
+X-Gm-Message-State: AOJu0Yx/R2gaXmX097BK2P2c2Odq383bm3YLsRPYtcDWArS048sN6lDf
+	abjPt8jMktOs5YDmafphgaKMtf0W
+X-Google-Smtp-Source: AGHT+IE8bIn8SV2li013BZXV2KePtXGoWBnVD0ACCTjAoXNBMrH8qXd67lYod3qpT9jha14b2R7EL9Tl
+X-Received: from athina.mtv.corp.google.com ([2620:15c:211:200:c062:ed85:e322:32af])
+ (user=maze job=sendgmr) by 2002:a05:690c:3747:b0:5d5:5183:ebd7 with SMTP id
+ fw7-20020a05690c374700b005d55183ebd7mr108247ywb.7.1702560326886; Thu, 14 Dec
+ 2023 05:25:26 -0800 (PST)
+Date: Thu, 14 Dec 2023 05:25:23 -0800
+Message-Id: <20231214132523.929567-1-maze@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|IA1PR11MB8200:EE_
-X-MS-Office365-Filtering-Correlation-Id: da6f1d38-c49c-483c-3b5c-08dbfca7d9c2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 9k0hu2xxEtt4FL3tVVB8ZAVHSZBzFBgPk5eBfXtjimkDZUY2IJkj/FmfZZQyv67yaj1faUO2ZMvu6kMXg40XuQEqL5G2Lmr967PUU5JiFJhxcbFyxu2z2mRyr9lUcZTosdjMO9E0XChzJ4blEeLif+JHhu+w7e5460uuizA5oOQiPUbtzZ3qc88GEOyhu4QE63oI/I74mmSGqXEZPKCOserOzXPyImxAVyPITT5tSixkWAT9gPKESwMojZczTOphAIWdwGu20HW+6dpawGuznXip8ABvYFPNZcvCnruVGAW5QBNc0OdWK7FiRESOgOCdbqXvWXFf/4zYou7+5R8w4Yz8nQQaVPTF0T9EjC4MUWmkqnBIHBGzDU+PAhmKN9R9BH6qXwpQ024dMFZwk2HN+bds4tBOPNsENmcKqDvAC8V8a8oS50386o0gTaMJ5Ss6k+ohnYsY2qJ1sVxBIBtpbhHWF9B5XPGm4Jjy3Vo9ifZytRRWi2AhaScBK3a2Ztvkd3qqr85Y7orw20MmZ+l2I/cbPXNpfavAvn2no+x2KhdMTsVu7yY8ftPxjElrtssg
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(39860400002)(136003)(376002)(346002)(366004)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(5660300002)(26005)(107886003)(83380400001)(44832011)(6486002)(2906002)(478600001)(316002)(6636002)(41300700001)(66946007)(66476007)(66556008)(6862004)(4326008)(8676002)(33716001)(9686003)(6506007)(6512007)(6666004)(8936002)(38100700002)(82960400001)(86362001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?MB/IFtnE18LxucSG8/ogG3uug0hUl+cD7VbIHl7Zdp8RAjysXd/f1PWX2vLE?=
- =?us-ascii?Q?MhQpaynRD1A1Ao+jWxILF2cJ3soooVkVCSQnzErCzvnRl5naGnuB5hfoI+wD?=
- =?us-ascii?Q?KVdaFcAKmlILgLBw0QSUkYvj7yuED0BohFPUT+PFshOmXw6RwwKo+Wkhtjt1?=
- =?us-ascii?Q?I8u2T0OOjqlMv7E7bICdsvbFPPaVQbTr/jyHM1euJnLWrhXx6jBAuRUKu2lg?=
- =?us-ascii?Q?xOEcZRBcK4dkWoODSZwbNxLHVoh58fmGWF5tYyONB+XCl/A62rvrjsfPJ/XY?=
- =?us-ascii?Q?0JNlEFcx3RiyTV9acDl1lGO6qUxNbblP9Y5Da/y0krvLdq10VxEfviHqH/5d?=
- =?us-ascii?Q?HeR4MECNrGYkm6WP37gAJVZYm3Myr2jl4vteT3C1NxIC6vAGYJssfzJX6/Am?=
- =?us-ascii?Q?Z+OV0Y23/qtBffzWT74N/zykHKWIraQ1DQgrdiTawNASu7HHzOqyk589aQ7X?=
- =?us-ascii?Q?zg3IfLah2uk9B/DTjkXYU9tEXLsusBmMPhbhKf2UUlCGD0zxLufHgjmeax7c?=
- =?us-ascii?Q?HudCrlIOv4Zrt+CrJt+9LzS55jsxyUHJOMj0hy3Cv4PCbeX60KoJ5r9Co8qE?=
- =?us-ascii?Q?3Kv3lAA2FeUwszx4yNHAJlrG2c4ohVpU4AdNAuurFv3TGxBRaZcxK15uUB33?=
- =?us-ascii?Q?YDrU0IUYXBwFkOcXkoZRsZFQ39AbLNT5WERoxqQ4I+WZzvu2th+NGWf8IG1t?=
- =?us-ascii?Q?kviRhSSPetcBTRWEI6nNzvbFwmww7MRLnAYiPdAq9MMDC43WyzTrNVXo+5NO?=
- =?us-ascii?Q?ekYc4zPI+Zl2ARTixWhfpNrOWagzFREthQTR51RFz1PEExbCXPBHIRMP3/Sr?=
- =?us-ascii?Q?9nK44hJKpWbVWrOPaHchjn83G4ZoCv9YMfFmx9AbeuUwieyX941UvLoXapQ1?=
- =?us-ascii?Q?McwDPdddn/cXRamQrELArsXl/ISo8RcViYu1VuXEG8CNA/h5wnDPUBtYPzVP?=
- =?us-ascii?Q?WPhfKaYZrbiL0ol1p0yIgQbYL4nMRsNgMHim9UW2EoEA+KAVV8jVgUb/bQcX?=
- =?us-ascii?Q?nA0/sgZEXPm/O6V/aakqqlat2GbaU4FI+5vmGjP9hIoVDRXxvqIxL29H74Vp?=
- =?us-ascii?Q?voD8pgKJ3+qDbl6XFYAcl++sA7ICrBCZ4k9uhHWed5ex3EOVyH8/CEpxqeuZ?=
- =?us-ascii?Q?Yie+jYrmkbBsqcqmkB5WDMoIk5AZKQj8JUSilJTueIt6aSlc5hV7DklmSf8x?=
- =?us-ascii?Q?kpIV07COSJq+R6SdS/GVtMtKgnfNakr211YEXLrGp7ZHZcznLI8nwRe87prA?=
- =?us-ascii?Q?yM82s5EoT15aVCmCA7u9XvmXg+htYdzlQRRrxWlyO9Uy8/+RHPlB1T9Qr0wH?=
- =?us-ascii?Q?KWZ3EaHC6wILwHoLsQbHvtUbUjQBoBzpmM/2rtp1/Ayy4YAV7WGD++Qzo1+S?=
- =?us-ascii?Q?FPH/ERzHs7sESaNm4M0fOEtRXnLnv5zKJwkqFTmVPmYVjF8L2SJHPOeiK9uC?=
- =?us-ascii?Q?zbsAoYESmRrYv2xFQkN7zc1VuFEpC0qVqmMPEznrBDLXDRAS+tzqeq8+xal0?=
- =?us-ascii?Q?Ho3KK2mlOazXYLAhspczrWFtUKe4pKyFLlxkHDZKehbo9sBZC96GeXUbetPf?=
- =?us-ascii?Q?EB5ZV5Lk6iI0OJjqwgc1rIMsJ/ivd5A+/qX/ygpF/cd+MLDbXrl8m3HT2SxJ?=
- =?us-ascii?Q?WA=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: da6f1d38-c49c-483c-3b5c-08dbfca7d9c2
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2023 13:23:24.7405
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: h4zKt2ln9cP6Ii7G2LGcOLSYHL26ha+tB0lvEsb2h/VTUG0ZNAQdAT4wmUGcmuHqNZcedBBls5Blh0VPYcp9Ex9g6eUJu+S6QWKuXEQYjjg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB8200
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Subject: [PATCH net v2] net: sysctl: fix edge case wrt. sysctl write access
+From: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>
+To: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <zenczykowski@gmail.com>
+Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Flavio Crisciani <fcrisciani@google.com>, 
+	"Theodore Y. Ts'o" <tytso@google.com>, "Eric W. Biederman" <ebiederm@xmission.com>, 
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 14, 2023 at 01:00:07PM +0000, Tushar Vyavahare wrote:
+The clear intent of net_ctl_permissions() is that having CAP_NET_ADMIN
+grants write access to networking sysctls.
 
-I think target tree should be bpf, not bpf-next
+However, it turns out there is an edge case where this is insufficient:
+inode_permission() has an additional check on HAS_UNMAPPED_ID(inode)
+which can return -EACCES and thus block *all* write access.
 
-> Fix test broken by shared umem test and framework enhancement commit.
-> 
-> Correct the current implementation of pkt_stream_replace_half() by
-> ensuring that nb_valid_entries are not set to half, as this is not true
-> for all the tests. Ensure that the expected value for valid_entries for
-> the SEND_RECEIVE_UNALIGNED test equals the total number of packets sent,
-> which is 4096.
-> 
-> Create a new function called pkt_stream_pkt_set() that allows for packet
-> modification to meet specific requirements while ensuring the accurate
-> maintenance of the valid packet count to prevent inconsistencies in packet
-> tracking.
-> 
-> Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
-> Fixes: 6d198a89c004 ("selftests/xsk: Add a test for shared umem feature")
-> Reported-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> Signed-off-by: Tushar Vyavahare <tushar.vyavahare@intel.com>
+Note: AFAICT this check is wrt. the uid/gid mapping that was
+active at the time the filesystem (ie. proc) was mounted.
 
-besides subject fix,
+In order for this check to not fail, we need net_ctl_set_ownership()
+to set valid uid/gid.  It is not immediately clear what value
+to use, nor what values are guaranteed to work.
+It does make sense that /proc/sys/net appear to be owned by root
+from within the netns owning userns.  As such we only modify
+what happens if the code fails to map uid/gid 0.
+Currently the code just fails to do anything, which in practice
+results in using the zeroes of freshly allocated memory,
+and we thus end up with global root.
+With this change we instead use the uid/gid of the owning userns.
+While it is probably (?) theoretically possible for this to *also*
+be unmapped from the /proc filesystem's point of view, this seems
+much less likely to happen in practice.
 
-Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+The old code is observed to fail in a relatively complex setup,
+within a global root created user namespace with selectively
+mapped uid/gids (not including global root) and /proc mounted
+afterwards (so this /proc mount does not have global root mapped).
+Within this user namespace another non privileged task creates
+a new user namespace, maps it's own uid/gid (but not uid/gid 0),
+and then creates a network namespace.  It cannot write to networking
+sysctls even though it does have CAP_NET_ADMIN.
 
-> 
-> ---
-> v1->v2
-> - Updated git commit message for better clarity as suggested in the
->   review. [Maciej]
-> - Renamed pkt_valid() to set_pkt_valid() for better clarity. [Maciej]
-> - Fixed double space issue. [Maciej]
-> - Included Magnus's acknowledgement.
-> - Remove the redundant part from the set_pkt_valid() if condition.
->   [Maciej]
-> - remove pkt_modify().
-> - added pkt_stream_pkt_set(). [Magnus]
-> - renamed mod_valid to prev_pkt_valid. [Tirtha]
-> ---
->  tools/testing/selftests/bpf/xskxceiver.c | 25 +++++++++++++++---------
->  1 file changed, 16 insertions(+), 9 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
-> index b604c570309a..b1102ee13faa 100644
-> --- a/tools/testing/selftests/bpf/xskxceiver.c
-> +++ b/tools/testing/selftests/bpf/xskxceiver.c
-> @@ -634,16 +634,24 @@ static u32 pkt_nb_frags(u32 frame_size, struct pkt_stream *pkt_stream, struct pk
->  	return nb_frags;
->  }
->  
-> +static bool set_pkt_valid(int offset, u32 len)
-> +{
-> +	return len <= MAX_ETH_JUMBO_SIZE;
-> +}
-> +
->  static void pkt_set(struct pkt_stream *pkt_stream, struct pkt *pkt, int offset, u32 len)
->  {
->  	pkt->offset = offset;
->  	pkt->len = len;
-> -	if (len > MAX_ETH_JUMBO_SIZE) {
-> -		pkt->valid = false;
-> -	} else {
-> -		pkt->valid = true;
-> -		pkt_stream->nb_valid_entries++;
-> -	}
-> +	pkt->valid = set_pkt_valid(offset, len);
-> +}
-> +
-> +static void pkt_stream_pkt_set(struct pkt_stream *pkt_stream, struct pkt *pkt, int offset, u32 len)
-> +{
-> +	bool prev_pkt_valid = pkt->valid;
-> +
-> +	pkt_set(pkt_stream, pkt, offset, len);
-> +	pkt_stream->nb_valid_entries += pkt->valid - prev_pkt_valid;
->  }
->  
->  static u32 pkt_get_buffer_len(struct xsk_umem_info *umem, u32 len)
-> @@ -665,7 +673,7 @@ static struct pkt_stream *__pkt_stream_generate(u32 nb_pkts, u32 pkt_len, u32 nb
->  	for (i = 0; i < nb_pkts; i++) {
->  		struct pkt *pkt = &pkt_stream->pkts[i];
->  
-> -		pkt_set(pkt_stream, pkt, 0, pkt_len);
-> +		pkt_stream_pkt_set(pkt_stream, pkt, 0, pkt_len);
->  		pkt->pkt_nb = nb_start + i * nb_off;
->  	}
->  
-> @@ -700,10 +708,9 @@ static void __pkt_stream_replace_half(struct ifobject *ifobj, u32 pkt_len,
->  
->  	pkt_stream = pkt_stream_clone(ifobj->xsk->pkt_stream);
->  	for (i = 1; i < ifobj->xsk->pkt_stream->nb_pkts; i += 2)
-> -		pkt_set(pkt_stream, &pkt_stream->pkts[i], offset, pkt_len);
-> +		pkt_stream_pkt_set(pkt_stream, &pkt_stream->pkts[i], offset, pkt_len);
->  
->  	ifobj->xsk->pkt_stream = pkt_stream;
-> -	pkt_stream->nb_valid_entries /= 2;
->  }
->  
->  static void pkt_stream_replace_half(struct test_spec *test, u32 pkt_len, int offset)
-> -- 
-> 2.34.1
-> 
+This is because net_ctl_set_ownership fails to map uid/gid 0
+(because uid/gid 0 are *not* mapped in the owning 2nd level user_ns),
+and falls back to global root.
+But global root is not mapped in the 1st level user_ns,
+which was inherited by the /proc mount, and thus fails...
+
+Note: the uid/gid of networking sysctls is of purely superficial
+importance, outside of this UNMAPPED check, it does not actually
+affect access, and only affects display.
+
+Access is always based on whether you are *global* root uid
+(or have CAP_NET_ADMIN over the netns) for user write access bits
+(or are in *global* root gid for group write access bits).
+
+Cc: Flavio Crisciani <fcrisciani@google.com>
+Cc: "Theodore Y. Ts'o" <tytso@google.com>
+Cc: "Eric W. Biederman" <ebiederm@xmission.com>
+Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Fixes: e79c6a4fc923 ("net: make net namespace sysctls belong to container's=
+ owner")
+Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
+---
+ net/sysctl_net.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/net/sysctl_net.c b/net/sysctl_net.c
+index 051ed5f6fc93..2cdda78308be 100644
+--- a/net/sysctl_net.c
++++ b/net/sysctl_net.c
+@@ -62,12 +62,10 @@ static void net_ctl_set_ownership(struct ctl_table_head=
+er *head,
+ 	kgid_t ns_root_gid;
+=20
+ 	ns_root_uid =3D make_kuid(net->user_ns, 0);
+-	if (uid_valid(ns_root_uid))
+-		*uid =3D ns_root_uid;
++	*uid =3D uid_valid(ns_root_uid) ? ns_root_uid : net->user_ns->owner;
+=20
+ 	ns_root_gid =3D make_kgid(net->user_ns, 0);
+-	if (gid_valid(ns_root_gid))
+-		*gid =3D ns_root_gid;
++	*gid =3D gid_valid(ns_root_gid) ? ns_root_gid : net->user_ns->group;
+ }
+=20
+ static struct ctl_table_root net_sysctl_root =3D {
+--=20
+2.43.0.472.g3155946c3a-goog
+
 
