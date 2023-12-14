@@ -1,113 +1,114 @@
-Return-Path: <netdev+bounces-57660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3113C813C12
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 21:54:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCCEE813C2D
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 21:58:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B846FB20A82
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 20:54:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98FF5283738
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 20:58:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F58D54279;
-	Thu, 14 Dec 2023 20:54:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A0ZL9rv/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18FBE273FD;
+	Thu, 14 Dec 2023 20:58:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42CDB1110;
-	Thu, 14 Dec 2023 20:53:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3360ae1b937so4539170f8f.0;
-        Thu, 14 Dec 2023 12:53:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702587220; x=1703192020; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EGYPk6/2LK4WB05DzAsE7gyIm4PhBFTb2r9q70jSsZY=;
-        b=A0ZL9rv/TCR847tKdOwWmNhARHOfMMpq6rGJzc6Ztg6Rbz35D4sWCVgBdJZpELCNS0
-         ObsEoLYfuR4D/VreB3pQzAdWGJMzilMYobk5dUmfSGZy43hIPCjhy6eb472CHUqwXt+o
-         BvmfxfUUq7Hy2Sw05fYnF+ZD/7p7D9M+Z1BYupOEAtcOiKS5OivyJPTpkrcnOELQCoZJ
-         +XZPrOq04IlWOskedEzJ+BP+zXd5WfM7yOgYNEhEIRZNvtItWo/SpYMy90o9fJ0a0rHY
-         VPs8hPY1MVm2u1Np3wLYL5ZbAhlumXm8fvXpxChL2iI17iHcsfg5f4L8+uCnC8H+f+9M
-         lEqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702587220; x=1703192020;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EGYPk6/2LK4WB05DzAsE7gyIm4PhBFTb2r9q70jSsZY=;
-        b=uj1rcEeJtCrFyRPgBjg6+wH2r1fOrR0UFkMhqXCSC5vzy2IvlTQfF5AOkl9D111gWz
-         zgaduFGjIvQnM1seP6pNkw7c92fop/ULnHXM//vDDog8UYnTvLRVvD1eC0Nz05sucPFz
-         3M4XQp2C0AEFajMQHjuElWKWF7yZbnJpOK/iS+YQpKODWOkesZ0CKSKQtP5v195UE8CU
-         DnWIAP/J5pon3GI1UmyMpEwoGVVuFtPBeexWTqp4HX5Hy8wQdWR/VEY606trVaBBLgin
-         wEHfIDXUzPYsQtQODPZ69V6Z6fB9I+K5gt87JeIorCW5d70mgVSjhP8+395wqxEYbnJG
-         3wcQ==
-X-Gm-Message-State: AOJu0YwJ4hZH9Csspx3FlckuvZ/SLNI4W0zjYWzcdNx9JFSRcX2odYVF
-	PiFSVtLcNxVB5rXbJXKmxqEcskCCIyS1Puqlyrv1SRU5
-X-Google-Smtp-Source: AGHT+IEn60KUK3G6CTwadCd0k9MiIqAGQ3rzBMDGyIiYKbZcEWgSu3gx0rWCz07xT2LLzY3YFYQ/rng7NW2Pl4nIbV8=
-X-Received: by 2002:a5d:54cd:0:b0:336:495c:8b39 with SMTP id
- x13-20020a5d54cd000000b00336495c8b39mr817426wrv.137.1702587220078; Thu, 14
- Dec 2023 12:53:40 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688146A001;
+	Thu, 14 Dec 2023 20:58:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (178.176.74.138) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 14 Dec
+ 2023 23:58:06 +0300
+Subject: Re: [PATCH net-next v2 06/21] net: ravb: Assert/de-assert reset on
+ suspend/resume
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>,
+	<geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214114600.2451162-7-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <223486bc-a03c-8d86-780c-38c3e14e055e@omp.ru>
+Date: Thu, 14 Dec 2023 23:58:05 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <qiv464c4y43mo5rih5k6lgzkbpnj6wsrl52hrhgbxeqj45atun@szmqlmnccm52>
- <CAHsH6Gujycb9RBuRk7QHorLe0Q=Np_tb3uboQfp9KmJnegVXvw@mail.gmail.com>
- <fwadmdjjogp4ybfxfpwovnmnn36jigffopijsuqt4ly4vxqghm@ysqhd25mzylp>
- <fecc7tpmbnqxuxqqolm44ggyeomcr3piabsjkv3pgyzlhyonq6@iiaxf34erjzq>
- <CAP01T770poh_63vBC+Heb9ASJ9pDZd1wTDWAgm5KCYHK9GtE1g@mail.gmail.com>
- <yshbkwaiong7qq2rsgkpvvyvzefnwud5uywbea6ocfxxenzv6s@dn45gdaygaso>
- <CAHsH6Gu_c29Nc+cH-s3EeztwScL=A42wi_SuJD=WeYV0mtVxbA@mail.gmail.com>
- <CAP01T76ZtehyRidmnV5A0p3LCyjw6Q4sjRH6ZhczgGn1ap-x_g@mail.gmail.com>
- <CAP01T74dKxYKM1GfTUJZ+G4+CKbRU=JLGoNcG6b8PMYcqUyEzQ@mail.gmail.com>
- <idbmj3y65mi7isezhlq4lip54bbngoouv5hbai2xd7bqtv7dxy@qjcmln2ovmz2> <i6kxylvo5hcttmjmhpjrmwdaxe4bi6cggk32js72ivr7qelknc@qnjkmr3df3b5>
-In-Reply-To: <i6kxylvo5hcttmjmhpjrmwdaxe4bi6cggk32js72ivr7qelknc@qnjkmr3df3b5>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 14 Dec 2023 12:53:28 -0800
-Message-ID: <CAADnVQL_=Hot71RV9dQ7FN6bm8TY3aMiouhAnQHUg3tmKtWStQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v5 9/9] bpf: xfrm: Add selftest for bpf_xdp_get_xfrm_state()
-To: Daniel Xu <dxu@dxuuu.xyz>
-Cc: Kumar Kartikeya Dwivedi <memxor@gmail.com>, Eyal Birger <eyal.birger@gmail.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
-	Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Steffen Klassert <steffen.klassert@secunet.com>, antony.antony@secunet.com, 
-	Yonghong Song <yonghong.song@linux.dev>, Eddy Z <eddyz87@gmail.com>, 
-	Mykola Lysenko <mykolal@fb.com>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, devel@linux-ipsec.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20231214114600.2451162-7-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/14/2023 20:40:34
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182128 [Dec 14 2023]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.74.138 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.74.138 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.74.138
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 12/14/2023 20:46:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 12/14/2023 7:08:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Thu, Dec 14, 2023 at 12:24=E2=80=AFPM Daniel Xu <dxu@dxuuu.xyz> wrote:
->
->
-> Looks like only x86 supports exceptions (looking at
-> bpf_jit_supports_exceptions()).
->
-> This causes selftests in this patchset to fail on !x86, which is
-> unfortunate. We probably want to be running these tests on all the major
-> archs, so I will drop the assertion patches from this patchset.
->
-> But since they're generally useful and I've already written the
-> selftests for it, I could put them up in another patchset? Or maybe not
-> cuz you're gonna fix it later anyways. WDYT?
+On 12/14/23 2:45 PM, Claudiu wrote:
 
-Yeah. don't use bpf_assert in generic tests yet.
-Only tests that test bpf_assert should use it.
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> RZ/G3S can go to deep sleep states where power to most of the SoC parts is
+> off. When resuming from such a state, the Ethernet controller needs to be
+> reinitialized. De-asserting the reset signal for it should also be done.
+> Thus, add reset assert/de-assert on suspend/resume functions.
+> 
+> On the resume function, the de-assert was not reverted in case of failures
+> to give the user a chance to restore the interface (e.g., bringing down/up
+> the interface) in case suspend/resume failed.
+> 
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-Pls send the ones you wrote separately, so they stay in email archives
-and we can pick them up later.
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+
+[...]
+
+MBR, Sergey
 
