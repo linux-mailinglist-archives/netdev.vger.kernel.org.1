@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-57154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD0D9812489
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:25:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66D6381248A
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:25:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E7F81F21A2D
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 01:25:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08CD11F21A32
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 01:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 690861376;
-	Thu, 14 Dec 2023 01:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68D0D656;
+	Thu, 14 Dec 2023 01:25:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rj2Giybh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cPKhm4R6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9091866
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 01:25:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C892C433C9;
-	Thu, 14 Dec 2023 01:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9F120FD
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 01:25:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D646C433C8;
+	Thu, 14 Dec 2023 01:25:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702517114;
-	bh=Z6s/3GJ4F5CkLRPFrj01Gx0cyEtd/sR4MMFuEoQX5LE=;
+	s=k20201202; t=1702517115;
+	bh=9T9QHaoh6mWfJN3/UJbdkADFOKI/+NYHb6NSMgMVk28=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rj2GiybhomB9Mvgik0EFvjWlmNUixCZ8CVUWAafgwy/DqXrGjoIrpGcMipH+JrvAc
-	 8WZOUhOq24zozA2F9FsS6q8THOsUZQpxDeAxSAbCsM8mQ9CQPNgCVVAVJlTLVnje33
-	 aj4657C2FbsQNeVSGgHYuVDThtZ55wlOl7wjuiEYsI+skhVORN5MU+RQY5s32l2ZWP
-	 KSapU+6lO/JNrLIsaEFBX3Bo668GdEbctaTZrm2U6ua360KCknB0Q8t2ZN8VrkIi8h
-	 2e1IZDvJvTCQyjoN253Lz2A5vuc4iawqO36s23EdqZld9E1rqor+dY5vhCGjUhUzq2
-	 xebPXEDmBjBlg==
+	b=cPKhm4R64Kms5NKlMPY2lcCqiV3QGaLORfooCIU7LVb0UkJjHaJHYiJWXUlDv3fvi
+	 qADCGqUowMPeG39Cv22AqMqTLe+SnQofKQlnpumTZvIlTtzJ2im5SJNp516xMTb+XI
+	 FvD1HZV6FKYPPMn+vWx7TlBUmazqpswfAzmqlBjTUaij+qNw23SdZ+252V02AOFQPg
+	 PCdvUOS+SaJ4SkC75AWoUIxBQOGkNZVDaU/KFJodjZGHQ9zjAMBTJxHRJ/VC2lquhc
+	 ZkEGPMqTMbnAAPhAjyCDR03M/dOByorNokDnTcP0F+OY61YyXlGX7L5H7iqjiSSKu/
+	 9okXTs19HuJJw==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,11 +40,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Shifeng Li <lishifeng@sangfor.com.cn>,
-	Moshe Shemesh <moshe@nvidia.com>
-Subject: [net 05/15] net/mlx5e: Fix a race in command alloc flow
-Date: Wed, 13 Dec 2023 17:24:55 -0800
-Message-ID: <20231214012505.42666-6-saeed@kernel.org>
+	Dinghao Liu <dinghao.liu@zju.edu.cn>,
+	Simon Horman <horms@kernel.org>
+Subject: [net 06/15] net/mlx5e: fix a potential double-free in fs_udp_create_groups
+Date: Wed, 13 Dec 2023 17:24:56 -0800
+Message-ID: <20231214012505.42666-7-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231214012505.42666-1-saeed@kernel.org>
 References: <20231214012505.42666-1-saeed@kernel.org>
@@ -56,121 +56,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Shifeng Li <lishifeng@sangfor.com.cn>
+From: Dinghao Liu <dinghao.liu@zju.edu.cn>
 
-Fix a cmd->ent use after free due to a race on command entry.
-Such race occurs when one of the commands releases its last refcount and
-frees its index and entry while another process running command flush
-flow takes refcount to this command entry. The process which handles
-commands flush may see this command as needed to be flushed if the other
-process allocated a ent->idx but didn't set ent to cmd->ent_arr in
-cmd_work_handler(). Fix it by moving the assignment of cmd->ent_arr into
-the spin lock.
+When kcalloc() for ft->g succeeds but kvzalloc() for in fails,
+fs_udp_create_groups() will free ft->g. However, its caller
+fs_udp_create_table() will free ft->g again through calling
+mlx5e_destroy_flow_table(), which will lead to a double-free.
+Fix this by setting ft->g to NULL in fs_udp_create_groups().
 
-[70013.081955] BUG: KASAN: use-after-free in mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
-[70013.081967] Write of size 4 at addr ffff88880b1510b4 by task kworker/26:1/1433361
-[70013.081968]
-[70013.082028] Workqueue: events aer_isr
-[70013.082053] Call Trace:
-[70013.082067]  dump_stack+0x8b/0xbb
-[70013.082086]  print_address_description+0x6a/0x270
-[70013.082102]  kasan_report+0x179/0x2c0
-[70013.082173]  mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
-[70013.082267]  mlx5_cmd_flush+0x80/0x180 [mlx5_core]
-[70013.082304]  mlx5_enter_error_state+0x106/0x1d0 [mlx5_core]
-[70013.082338]  mlx5_try_fast_unload+0x2ea/0x4d0 [mlx5_core]
-[70013.082377]  remove_one+0x200/0x2b0 [mlx5_core]
-[70013.082409]  pci_device_remove+0xf3/0x280
-[70013.082439]  device_release_driver_internal+0x1c3/0x470
-[70013.082453]  pci_stop_bus_device+0x109/0x160
-[70013.082468]  pci_stop_and_remove_bus_device+0xe/0x20
-[70013.082485]  pcie_do_fatal_recovery+0x167/0x550
-[70013.082493]  aer_isr+0x7d2/0x960
-[70013.082543]  process_one_work+0x65f/0x12d0
-[70013.082556]  worker_thread+0x87/0xb50
-[70013.082571]  kthread+0x2e9/0x3a0
-[70013.082592]  ret_from_fork+0x1f/0x40
-
-The logical relationship of this error is as follows:
-
-             aer_recover_work              |          ent->work
--------------------------------------------+------------------------------
-aer_recover_work_func                      |
-|- pcie_do_recovery                        |
-  |- report_error_detected                 |
-    |- mlx5_pci_err_detected               |cmd_work_handler
-      |- mlx5_enter_error_state            |  |- cmd_alloc_index
-        |- enter_error_state               |    |- lock cmd->alloc_lock
-          |- mlx5_cmd_flush                |    |- clear_bit
-            |- mlx5_cmd_trigger_completions|    |- unlock cmd->alloc_lock
-              |- lock cmd->alloc_lock      |
-              |- vector = ~dev->cmd.vars.bitmask
-              |- for_each_set_bit          |
-                |- cmd_ent_get(cmd->ent_arr[i]) (UAF)
-              |- unlock cmd->alloc_lock    |  |- cmd->ent_arr[ent->idx]=ent
-
-The cmd->ent_arr[ent->idx] assignment and the bit clearing are not
-protected by the cmd->alloc_lock in cmd_work_handler().
-
-Fixes: 50b2412b7e78 ("net/mlx5: Avoid possible free of command entry while timeout comp handler")
-Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
-Signed-off-by: Shifeng Li <lishifeng@sangfor.com.cn>
+Fixes: 1c80bd684388 ("net/mlx5e: Introduce Flow Steering UDP API")
+Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-index f8f0a712c943..a7b1f9686c09 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-@@ -156,15 +156,18 @@ static u8 alloc_token(struct mlx5_cmd *cmd)
- 	return token;
- }
- 
--static int cmd_alloc_index(struct mlx5_cmd *cmd)
-+static int cmd_alloc_index(struct mlx5_cmd *cmd, struct mlx5_cmd_work_ent *ent)
- {
- 	unsigned long flags;
- 	int ret;
- 
- 	spin_lock_irqsave(&cmd->alloc_lock, flags);
- 	ret = find_first_bit(&cmd->vars.bitmask, cmd->vars.max_reg_cmds);
--	if (ret < cmd->vars.max_reg_cmds)
-+	if (ret < cmd->vars.max_reg_cmds) {
- 		clear_bit(ret, &cmd->vars.bitmask);
-+		ent->idx = ret;
-+		cmd->ent_arr[ent->idx] = ent;
-+	}
- 	spin_unlock_irqrestore(&cmd->alloc_lock, flags);
- 
- 	return ret < cmd->vars.max_reg_cmds ? ret : -ENOMEM;
-@@ -979,7 +982,7 @@ static void cmd_work_handler(struct work_struct *work)
- 	sem = ent->page_queue ? &cmd->vars.pages_sem : &cmd->vars.sem;
- 	down(sem);
- 	if (!ent->page_queue) {
--		alloc_ret = cmd_alloc_index(cmd);
-+		alloc_ret = cmd_alloc_index(cmd, ent);
- 		if (alloc_ret < 0) {
- 			mlx5_core_err_rl(dev, "failed to allocate command entry\n");
- 			if (ent->callback) {
-@@ -994,15 +997,14 @@ static void cmd_work_handler(struct work_struct *work)
- 			up(sem);
- 			return;
- 		}
--		ent->idx = alloc_ret;
- 	} else {
- 		ent->idx = cmd->vars.max_reg_cmds;
- 		spin_lock_irqsave(&cmd->alloc_lock, flags);
- 		clear_bit(ent->idx, &cmd->vars.bitmask);
-+		cmd->ent_arr[ent->idx] = ent;
- 		spin_unlock_irqrestore(&cmd->alloc_lock, flags);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c b/drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c
+index be83ad9db82a..e1283531e0b8 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c
+@@ -154,6 +154,7 @@ static int fs_udp_create_groups(struct mlx5e_flow_table *ft, enum fs_udp_type ty
+ 	in = kvzalloc(inlen, GFP_KERNEL);
+ 	if  (!in || !ft->g) {
+ 		kfree(ft->g);
++		ft->g = NULL;
+ 		kvfree(in);
+ 		return -ENOMEM;
  	}
- 
--	cmd->ent_arr[ent->idx] = ent;
- 	lay = get_inst(cmd, ent->idx);
- 	ent->lay = lay;
- 	memset(lay, 0, sizeof(*lay));
 -- 
 2.43.0
 
