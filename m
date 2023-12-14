@@ -1,59 +1,47 @@
-Return-Path: <netdev+bounces-57188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D2B1812516
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 03:13:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24A3C812529
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 03:21:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CCCAFB2119B
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:13:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1555C282262
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:21:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 628327F9;
-	Thu, 14 Dec 2023 02:13:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EF677F9;
+	Thu, 14 Dec 2023 02:21:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RlmDPF4H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i0Nt4gWA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455517EE
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 02:13:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A6F8C433C8;
-	Thu, 14 Dec 2023 02:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D99642
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 02:21:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04A1BC433C7;
+	Thu, 14 Dec 2023 02:21:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702519984;
-	bh=dl6bXVaGaetNPS9qavZlOhXzgfopeDUt7Z61/X4VyoI=;
+	s=k20201202; t=1702520472;
+	bh=E+nTFsxPhhLeQMpDCEQGk2uiEZkW2LcAQEEFfBZAtG4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RlmDPF4HcFSOaulqr9YRAlXmJOHOUkkswDfB69BFAsHj1mvKwWsexJCcqxVnTGnRX
-	 VyBaPY4qI1b43x63UTY365dISncZ5khk26S1E3hp7j5tSfBOddKT1QcyI47GQWimYW
-	 4zB6NpZd0mSLuXJ4C2d0wObLVAyHZ+Bsc5DNIOMa+e5uqXeyi9394zmtYnY/MV9//j
-	 /MkBKi+r5Dj+TDVxjnH8g9SUjiv7WmakCvCWT1ms3fQgDwj8Ji3fN4/m77S9SPsPag
-	 Pvkv8dmW9MMkXybAS9LeYMsFaoeExSRA96aslaxgfvUzMEORj6Pk7XFOv0vEOqyClT
-	 TgqWUUWLk3ulA==
-Date: Wed, 13 Dec 2023 18:13:03 -0800
+	b=i0Nt4gWAGZ0loOUiz3/ecoZACsJrcTxv3P0A3aLSPYDX7Ha7JW854C/nDDgJZPkeV
+	 uTGo7DeG00edeKD/n1LvuiKCLOUPA3HyqmdBrEA4pQKNkKTYV/wEnCr9Clma/6NeWU
+	 utlfaVdB13m/Y6BWnjzPSpn5kYuIR6jq5Jo4QgHvI7HVOlgPCigMp1bDKyZA0IOeQy
+	 g2VHWgHzdb9sqE2OcPoHsRLOYoHTxsMJrZ9wjtAaaDfLjxhoB8lk4SmenGr/SX3y6o
+	 5GP05crTcpWYall8bnQkNS3X9Ug72EC1vFXdJ/wtTs+idHPD96FM3DGNaYp1wmCKmK
+	 2lsEnDOTk1RwQ==
+Date: Wed, 13 Dec 2023 18:21:10 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>, David Epping
- <david.epping@missinglinkelectronics.com>, Harini Katakam
- <harini.katakam@amd.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v6 3/3] net: phy: add support for PHY package
- MMD read/write
-Message-ID: <20231213181303.34833b32@kernel.org>
-In-Reply-To: <6579db46.5d0a0220.d624a.80b4@mx.google.com>
-References: <20231213105730.1731-1-ansuelsmth@gmail.com>
-	<20231213105730.1731-3-ansuelsmth@gmail.com>
-	<ZXnSB4YsuWZ0vdj2@shell.armlinux.org.uk>
-	<6579d3df.050a0220.41f9b.a309@mx.google.com>
-	<ZXnYKLOeStCuVXY7@shell.armlinux.org.uk>
-	<6579db46.5d0a0220.d624a.80b4@mx.google.com>
+To: duanqiangwen <duanqiangwen@net-swift.com>
+Cc: netdev@vger.kernel.org, jiawenwu@trustnetic.com,
+ mengyuanlou@net-swift.com, davem@davemloft.net, pabeni@redhat.com,
+ yang.lee@linux.alibaba.com, shaozhengchao@huawei.com, horms@kernel.org
+Subject: Re: [PATCH net v3] net: libwx: fix memory leak on free page
+Message-ID: <20231213182110.38052c7b@kernel.org>
+In-Reply-To: <20231212032902.23180-1-duanqiangwen@net-swift.com>
+References: <20231212032902.23180-1-duanqiangwen@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,13 +51,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 13 Dec 2023 17:26:43 +0100 Christian Marangi wrote:
-> I tend to use cover letters only for big series, sorry for not being
-> very clear about this.
+On Tue, 12 Dec 2023 11:29:02 +0800 duanqiangwen wrote:
+> -		__page_frag_cache_drain(rx_buffer->page,
+> -					rx_buffer->pagecnt_bias);
+> +
+>  
 
-FWIW in netdev the rule of thumb is "if there's more than 2 patches,
-there's probably extra context". Even the 2 patch exception for cover
-letters is mostly for when people post code + test, as two separate
-patches. Cover letter stating that you have a series for xyz
-pending, which will need this, seems like a straightforward ask..
+sorry for the late nit pick, there's a double new line here
+checkpatch seems to miss this :S
+
+>  		i++;
 
