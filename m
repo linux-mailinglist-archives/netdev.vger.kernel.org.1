@@ -1,93 +1,77 @@
-Return-Path: <netdev+bounces-57146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63270812421
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 01:50:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED59F81245B
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 02:15:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95D7A1C213B8
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 00:50:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A62C81F21A45
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 01:15:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EA1538E;
-	Thu, 14 Dec 2023 00:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3734656;
+	Thu, 14 Dec 2023 01:15:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SEZLLBjo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ot/Mr1P8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAD73E0
-	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 16:50:26 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-28b05a2490bso381000a91.1
-        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 16:50:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702515026; x=1703119826; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jcs652nAzIbSYKddMAMjdgD7OlZTEhEQLejf1Fi5XQw=;
-        b=SEZLLBjog8gskhNzoxrxY/rnSMuE0umA422LxPihYFxCedvwPNrkk4T7VRDDm/p7gF
-         I1pvsA1+DBfZ4ZDqF5xvHv5zoBhOhHlPF/SdoZ7T2dbPf9fm7pVYu35HBF98dzJtqlT6
-         HU5bChUuHNsAtNVrlqSCcgo7gBsPnV2pBU0fHbgJRxP0N89dQ0XpVl0HtP62LAT7DWxi
-         LF99V1jVKNUeWY/OapovXrkZnbdyHL4ozLrA/P8rm8UJ9A8q8zu0NP7GyRQ7hhLLwJEj
-         xYQTllRFd6TJ03XGFlUG8sUE59lh6Oy0pTlMPLND+q6kyO5vjO/0WX9SJRISWIrrsNjL
-         2S2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702515026; x=1703119826;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jcs652nAzIbSYKddMAMjdgD7OlZTEhEQLejf1Fi5XQw=;
-        b=QytMovcstmHoTka8Pg6G6e7QzN5W85y1leGttTJqS+5UIyTlj5NVUbYghVaLk4e+9r
-         OcPa2V6LUqRPxXrSGdkBOfoeKF7k2p6Oa0/WV+PWM6cl1pE70Fz/2+5gSPMUzamSKOL9
-         9yCxcITA3wNZ9iyTnxzgLFVmh8fCYaAw5DlLI8wieSkKekccMwcmAknouEMGlOIRhRA+
-         umwHBHTfJLASLNq1fv46bHxhrDdgJ1wlsrbT34wLOriCnlRIwwqKzmV4ZFS9IJg936YR
-         cHKC0AY02nOkFNOSMudCsvVyoCGLdnGS2wJa3NktEUnyfavsc6bfh3IFpJ4npBWqMNMy
-         h3Kg==
-X-Gm-Message-State: AOJu0Yy7meYg22s4Lw5PE7xEoCMclz4ZhU0GoKLTHBkL1QmdBYzHzSC6
-	KiFmNL8+hPxRdedyM7b8yQE=
-X-Google-Smtp-Source: AGHT+IGiGUThx07BkUZfBUl5aA3OoZsFMyxSeMvDWpHKgIw4GllABQQskbPO0zG5OLHnYzhPCaWg8Q==
-X-Received: by 2002:a05:6a20:3942:b0:18f:97c:6163 with SMTP id r2-20020a056a20394200b0018f097c6163mr12701967pzg.96.1702515026216;
-        Wed, 13 Dec 2023 16:50:26 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id v15-20020aa7850f000000b006ce467a2475sm1762771pfn.181.2023.12.13.16.50.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Dec 2023 16:50:25 -0800 (PST)
-Message-ID: <e5a35e28-9442-42c7-8d51-301bdbcc20c7@gmail.com>
-Date: Wed, 13 Dec 2023 16:50:22 -0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9B7EA3;
+	Thu, 14 Dec 2023 01:15:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26BC1C433C7;
+	Thu, 14 Dec 2023 01:15:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702516540;
+	bh=t0rU34tq8DhzkLBkFxn7ambC0hASa1O0GjSgzQkryC8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ot/Mr1P8szCrNFm0hJ5f4gZjqkAYiPwfrzCNxDCw9eE3Tj8W7JjdlpUDBDsgugHu/
+	 byFf0jmPC0QT6DYooDZBa7TFhilvS5PqbAxbeveAlzb6IskUdxsdU0qbnALISkxT3E
+	 8LaENIaxborpvBH4Xq6FmVOJ2TqiIIiXx2b45387wfpu6oDF+1d0YaVbkAQ4V9YnY8
+	 JbXgZWzOAf/iAWSoUZw7b6BOBgUV1h4M7EHkiteQthq74DtjeXUr9DjH5DA8Kd8vgN
+	 3hk5WYLKXg9U3ZPPHHf8m2W4H1ZGik9cIDED+aV//wHrF2u7hBFmTsUASIc9VgVjBj
+	 l540ij+i/09FA==
+Date: Wed, 13 Dec 2023 17:15:38 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ bpf@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>, Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd
+ Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, Willem de
+ Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>, "Christian =?UTF-8?B?S8O2bmln?="
+ <christian.koenig@amd.com>, Yunsheng Lin <linyunsheng@huawei.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt
+ <shakeelb@google.com>
+Subject: Re: [net-next v1 03/16] queue_api: define queue api
+Message-ID: <20231213171538.04847459@kernel.org>
+In-Reply-To: <20231208005250.2910004-4-almasrymina@google.com>
+References: <20231208005250.2910004-1-almasrymina@google.com>
+	<20231208005250.2910004-4-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/2] net: mscc: ocelot: fix pMAC TX RMON stats for
- bucket 256-511 and above
-Content-Language: en-US
-To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Claudiu Manoil <claudiu.manoil@nxp.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>
-References: <20231214000902.545625-1-vladimir.oltean@nxp.com>
- <20231214000902.545625-2-vladimir.oltean@nxp.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20231214000902.545625-2-vladimir.oltean@nxp.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 12/13/23 16:09, Vladimir Oltean wrote:
-> The typo from ocelot_port_rmon_stats_cb() was also carried over to
-> ocelot_port_pmac_rmon_stats_cb() as well, leading to incorrect TX RMON
-> stats for the pMAC too.
-> 
-> Fixes: ab3f97a9610a ("net: mscc: ocelot: export ethtool MAC Merge stats for Felix VSC9959")
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+On Thu,  7 Dec 2023 16:52:34 -0800 Mina Almasry wrote:
+> This API enables the net stack to reset the queues used for devmem.
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
-
+Nice, thanks for moving this forward. FWIW when I started hacking on it
+the API looked more like:
+https://github.com/kuba-moo/linux/commit/7af8abfa4fdff248e21fc76aecc334004a0f322f
+which passes the config objects to the queue callbacks as an argument.
+Storing in struct netdev_rx_queue makes implementing prepare / swap
+harder. But that's just FYI, we can refactor later. The queue config
+rabbit hole is pretty deep.
 
