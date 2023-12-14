@@ -1,244 +1,156 @@
-Return-Path: <netdev+bounces-57639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7129B813AE9
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 20:42:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55334813B22
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 20:57:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28B05282F8E
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 19:42:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A0A11F22196
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 19:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A41276A320;
-	Thu, 14 Dec 2023 19:41:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QCmMDKsp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0CE7697BC;
+	Thu, 14 Dec 2023 19:57:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1A36A011;
-	Thu, 14 Dec 2023 19:41:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702582900; x=1734118900;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=JeJEGG5sFogcxVYcE4xCnsdCdmkxF2xsMcIKN/Q4UTw=;
-  b=QCmMDKspDcbAuPeQERIfCMG2hqmqkpPg7vdeqAhsjWoHax743ZQI4SOm
-   TWuVVGRAzfFKmFDljJVV0+T9yWPDD2+p6zcDJlcycH7LwtAjFx30e6hCQ
-   uGJc7U00L7NsDJMPWT0TvyueM1N6a8DOdrKAHA4THnN+UNsg64Z942OzQ
-   YiE0EAInQpmgS6fYtplLfFvnM2R7vzHx8knOOA7yMWoTcwM3Ai+AiRoMC
-   bhe1CgD4vUzFGYEFFsu32SCa+U3fiDIZzmAeB3qL9wiRAZo490uoGYVJO
-   9du9bGxUIbMfifcOCB1PtY/GBur5sKno/7M5lpOvu84OWP/GU6IirX8g0
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="399013871"
-X-IronPort-AV: E=Sophos;i="6.04,276,1695711600"; 
-   d="scan'208";a="399013871"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 11:41:34 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="750666558"
-X-IronPort-AV: E=Sophos;i="6.04,276,1695711600"; 
-   d="scan'208";a="750666558"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orsmga006.jf.intel.com with ESMTP; 14 Dec 2023 11:41:32 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>,
-	anthony.l.nguyen@intel.com,
-	jacob.e.keller@intel.com,
-	vaishnavi.tipireddy@intel.com,
-	horms@kernel.org,
-	leon@kernel.org,
-	corbet@lwn.net,
-	linux-doc@vger.kernel.org,
-	rdunlap@infradead.org
-Subject: [PATCH net-next v6 5/5] ice: add documentation for FW logging
-Date: Thu, 14 Dec 2023 11:40:40 -0800
-Message-ID: <20231214194042.2141361-6-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231214194042.2141361-1-anthony.l.nguyen@intel.com>
-References: <20231214194042.2141361-1-anthony.l.nguyen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5CCA6A33E;
+	Thu, 14 Dec 2023 19:57:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (178.176.74.138) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 14 Dec
+ 2023 22:41:53 +0300
+Subject: Re: [PATCH net 1/2] net: ravb: Wait for operation mode to be applied
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<claudiu.beznea.uj@bp.renesas.com>, <yoshihiro.shimoda.uh@renesas.com>,
+	<wsa+renesas@sang-engineering.com>, <niklas.soderlund+renesas@ragnatech.se>,
+	<biju.das.jz@bp.renesas.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	<mitsuhiro.kimura.kc@renesas.com>, <geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20231214113137.2450292-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214113137.2450292-2-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <d08dbbd4-2e63-c436-6935-df68c291bf75@omp.ru>
+Date: Thu, 14 Dec 2023 22:41:53 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231214113137.2450292-2-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/14/2023 19:30:19
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182128 [Dec 14 2023]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.74.138 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.74.138 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.74.138
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 12/14/2023 19:36:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 12/14/2023 4:35:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-From: Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>
+resetOn 12/14/23 2:31 PM, Claudiu wrote:
 
-Add documentation for FW logging in
-Documentation/networking/device_drivers/ethernet/intel/ice.rst
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> CSR.OPS bits specify the current operating mode and (according to
+> documentation) they are updated when the operating mode change request
+> is processed. Thus, check CSR.OPS before proceeding.
 
-Signed-off-by: Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- .../device_drivers/ethernet/intel/ice.rst     | 141 ++++++++++++++++++
- 1 file changed, 141 insertions(+)
+   The manuals I have indeed say we need to check CSR.OPS... But we only
+need to wait iff we transfer from the operation mode to the config mode...
 
-diff --git a/Documentation/networking/device_drivers/ethernet/intel/ice.rst b/Documentation/networking/device_drivers/ethernet/intel/ice.rst
-index e4d065c55ea8..5038e54586af 100644
---- a/Documentation/networking/device_drivers/ethernet/intel/ice.rst
-+++ b/Documentation/networking/device_drivers/ethernet/intel/ice.rst
-@@ -895,6 +895,147 @@ driver writes raw bytes by the GNSS object to the receiver through i2c. Please
- refer to the hardware GNSS module documentation for configuration details.
- 
- 
-+Firmware (FW) logging
-+---------------------
-+The driver supports FW logging via the debugfs interface on PF 0 only. The FW
-+running on the NIC must support FW logging; if the FW doesn't support FW logging
-+the 'fwlog' file will not get created in the ice debugfs directory.
-+
-+Module configuration
-+~~~~~~~~~~~~~~~~~~~~
-+Firmware logging is configured on a per module basis. Each module can be set to
-+a value independent of the other modules (unless the module 'all' is specified).
-+The modules will be instantiated under the 'fwlog/modules' directory.
-+
-+The user can set the log level for a module by writing to the module file like
-+this::
-+
-+  # echo <log_level> > /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/modules/<module>
-+
-+where
-+
-+* log_level is a name as described below. Each level includes the
-+  messages from the previous/lower level
-+
-+      *	none
-+      *	error
-+      *	warning
-+      *	normal
-+      *	verbose
-+
-+* module is a name that represents the module to receive events for. The
-+  module names are
-+
-+      *	general
-+      *	ctrl
-+      *	link
-+      *	link_topo
-+      *	dnl
-+      *	i2c
-+      *	sdp
-+      *	mdio
-+      *	adminq
-+      *	hdma
-+      *	lldp
-+      *	dcbx
-+      *	dcb
-+      *	xlr
-+      *	nvm
-+      *	auth
-+      *	vpd
-+      *	iosf
-+      *	parser
-+      *	sw
-+      *	scheduler
-+      *	txq
-+      *	rsvd
-+      *	post
-+      *	watchdog
-+      *	task_dispatch
-+      *	mng
-+      *	synce
-+      *	health
-+      *	tsdrv
-+      *	pfreg
-+      *	mdlver
-+      *	all
-+
-+The name 'all' is special and allows the user to set all of the modules to the
-+specified log_level or to read the log_level of all of the modules.
-+
-+Example usage to configure the modules
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+To set a single module to 'verbose'::
-+
-+  # echo verbose > /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/modules/link
-+
-+To set multiple modules then issue the command multiple times::
-+
-+  # echo verbose > /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/modules/link
-+  # echo warning > /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/modules/ctrl
-+  # echo none > /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/modules/dcb
-+
-+To set all the modules to the same value::
-+
-+  # echo normal > /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/modules/all
-+
-+To read the log_level of a specific module (e.g. module 'general')::
-+
-+  # cat /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/modules/general
-+
-+To read the log_level of all the modules::
-+
-+  # cat /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/modules/all
-+
-+Enabling FW log
-+~~~~~~~~~~~~~~~
-+Configuring the modules indicates to the FW that the configured modules should
-+generate events that the driver is interested in, but it **does not** send the
-+events to the driver until the enable message is sent to the FW. To do this
-+the user can write a 1 (enable) or 0 (disable) to 'fwlog/enable'. An example
-+is::
-+
-+  # echo 1 > /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/enable
-+
-+Retrieving FW log data
-+~~~~~~~~~~~~~~~~~~~~~~
-+The FW log data can be retrieved by reading from 'fwlog/data'. The user can
-+write any value to 'fwlog/data' to clear the data. The data can only be cleared
-+when FW logging is disabled. The FW log data is a binary file that is sent to
-+Intel and used to help debug user issues.
-+
-+An example to read the data is::
-+
-+  # cat /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/data > fwlog.bin
-+
-+An example to clear the data is::
-+
-+  # echo 0 > /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/data
-+
-+Changing how often the log events are sent to the driver
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+The driver receives FW log data from the Admin Receive Queue (ARQ). The
-+frequency that the FW sends the ARQ events can be configured by writing to
-+'fwlog/nr_messages'. The range is 1-128 (1 means push every log message, 128
-+means push only when the max AQ command buffer is full). The suggested value is
-+10. The user can see what the value is configured to by reading
-+'fwlog/nr_messages'. An example to set the value is::
-+
-+  # echo 50 > /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/nr_messages
-+
-+Configuring the amount of memory used to store FW log data
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+The driver stores FW log data within the driver. The default size of the memory
-+used to store the data is 1MB. Some use cases may require more or less data so
-+the user can change the amount of memory that is allocated for FW log data.
-+To change the amount of memory then write to 'fwlog/log_size'. The value must be
-+one of: 128K, 256K, 512K, 1M, or 2M. FW logging must be disabled to change the
-+value. An example of changing the value is::
-+
-+  # echo 128K > /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/log_size
-+
-+
- Performance Optimization
- ========================
- Driver defaults are meant to fit a wide variety of workloads, but if further
--- 
-2.41.0
+> Fixes: 568b3ce7a8ef ("ravb: factor out register bit twiddling code")
+> Fixes: 0184165b2f42 ("ravb: add sleep PM suspend/resume support")
+> Fixes: 7e09a052dc4e ("ravb: Exclude gPTP feature support for RZ/G2L")
+> Fixes: 3e3d647715d4 ("ravb: add wake-on-lan support via magic packet")
+> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
 
+   Hm, that long list does look weird...
+
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> ---
+>  drivers/net/ethernet/renesas/ravb_main.c | 47 ++++++++++++++++++++----
+>  1 file changed, 39 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index 9178f6d60e74..ce95eb5af354 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -683,8 +683,11 @@ static int ravb_dmac_init(struct net_device *ndev)
+>  
+>  	/* Setting the control will start the AVB-DMAC process. */
+>  	ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_OPERATION);
+> +	error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_OPERATION);
+> +	if (error)
+> +		netdev_err(ndev, "failed to switch device to operation mode\n");
+
+   It doesn't look like ravb_wait() is needed here...
+   And besides, this pattern seems repetitive and worth factoring out into
+a single function.
+
+[...]
+> @@ -1744,6 +1747,18 @@ static inline int ravb_hook_irq(unsigned int irq, irq_handler_t handler,
+>  	return error;
+>  }
+>  
+> +static int ravb_set_reset_mode(struct net_device *ndev)
+> +{
+> +	int error;
+> +
+> +	ravb_write(ndev, CCC_OPC_RESET, CCC);
+> +	error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_RESET);
+> +	if (error)
+> +		netdev_err(ndev, "failed to switch device to reset mode\n");
+> +
+> +	return error;
+> +}
+> +
+
+   Again, ravb_wait() call doesn't seem necessary here...
+
+[...]
+
+MBR, Sergey
 
