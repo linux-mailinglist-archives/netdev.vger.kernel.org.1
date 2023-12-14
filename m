@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-57238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC5268127DF
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 07:20:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D659A8127D9
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 07:20:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA25D1C2157E
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 06:20:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 145B31C21511
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 06:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFF95D28A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F09CA79;
 	Thu, 14 Dec 2023 06:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XCwoc/9W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uaLBXFBx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720B7CA57;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F22DD261;
 	Thu, 14 Dec 2023 06:20:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F0B1EC433CC;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DA8AFC433C9;
 	Thu, 14 Dec 2023 06:20:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702534828;
-	bh=+vkxHeCGMNypV4HTfFOZ2Yy/60cFLbQw3F9hivio95U=;
+	s=k20201202; t=1702534827;
+	bh=gVzW956pE4WZPiafeYeaFLar70TRxqJHBI/nEbsghSk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XCwoc/9WTOKFFdAICIMqPHMjv6oeO4Pp+v7+7n/BcwEpfIUwCaQGC1TyO90tc3s+F
-	 4iMuFSonb7td1SNtF1ARcta6HO3szQxo/eTWA3PWgh1n9ndKRu3EGh+nxdxwJCDwEF
-	 C5wbcDdHDR9kDvws7qfFo2ZK3IFMZukwcHNhYfnGRauUxTzKDGsAZUwkEJjVzYYniB
-	 rd8UTiTCDeYkElN+6hTQ17XC95nHuKkDorHWKjNxvgot4aPi0xBRyLLQeDnMf+uifL
-	 xSTQdlfLVS9vWPcdZDdUGFtsUGZzqb7Z5spstpB1oT9YsbKWHGPQUAatOOPdI3jqXx
-	 PsahGbgOBc0ag==
+	b=uaLBXFBxTz4OYPv+IVw11RKr/ii1rs4cpxVdpItKOF0JGJtsBspzhnMX3ku7O9MXZ
+	 xoezExqyTBP2b1AFiOmLlDr3kqt1PR9VK84jmyTeSNIPY53Q6uHkwq3Jmwp+SeGDzU
+	 qWL4Hy9KWWXCOH9XrwV8XDZA1mxlrYwKTQVK+TGi5eJqERcwyxuVVhijRZwobSJ2fW
+	 kZhWLxWc94R/WdDJAqXygSetBYKa2QzrsR3Ka34QbPeF4elE9ATrN02GrPGBM0MVVa
+	 P6SsRVaJmzRauBaBC+t/bqtqPSKvmVLgqVhL+v+F8ksH+/ZtPn+P+AhWig6bMLV9JF
+	 abWEG2kZgaNHw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D40E9DD4EFB;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C1115DD4EF9;
 	Thu, 14 Dec 2023 06:20:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,74 +43,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next v1 00/16] Device Memory TCP
+Subject: Re: [PATCH net-next v9 0/8] Support symmetric-xor RSS hash
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170253482786.28524.10625748175644260187.git-patchwork-notify@kernel.org>
+ <170253482778.28524.4770397031071631009.git-patchwork-notify@kernel.org>
 Date: Thu, 14 Dec 2023 06:20:27 +0000
-References: <20231208005250.2910004-1-almasrymina@google.com>
-In-Reply-To: <20231208005250.2910004-1-almasrymina@google.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: shailend@google.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- corbet@lwn.net, jeroendb@google.com, pkaligineedi@google.com,
- hawk@kernel.org, ilias.apalodimas@linaro.org, arnd@arndb.de,
- dsahern@kernel.org, willemdebruijn.kernel@gmail.com, shuah@kernel.org,
- sumit.semwal@linaro.org, christian.koenig@amd.com, linyunsheng@huawei.com,
- hramamurthy@google.com, shakeelb@google.com
+References: <20231213003321.605376-1-ahmed.zaki@intel.com>
+In-Reply-To: <20231213003321.605376-1-ahmed.zaki@intel.com>
+To: Ahmed Zaki <ahmed.zaki@intel.com>
+Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org, corbet@lwn.net,
+ jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ vladimir.oltean@nxp.com, andrew@lunn.ch, horms@kernel.org, mkubecek@suse.cz,
+ willemdebruijn.kernel@gmail.com, gal@nvidia.com, alexander.duyck@gmail.com,
+ ecree.xilinx@gmail.com, linux-doc@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu,  7 Dec 2023 16:52:31 -0800 you wrote:
-> Major changes in v1:
-> --------------
+On Tue, 12 Dec 2023 17:33:13 -0700 you wrote:
+> Patches 1 and 2 modify the get/set_rxh ethtool API to take a pointer to
+> struct of parameters instead of individual params. This will allow future
+> changes to the uAPI-shared struct ethtool_rxfh without changing the
+> drivers' API.
 > 
-> 1. Implemented MVP queue API ndos to remove the userspace-visible
->    driver reset.
-> 
-> 2. Fixed issues in the napi_pp_put_page() devmem frag unref path.
+> Patch 3 adds the support at the Kernel level, allowing the user to set a
+> symmetric-xor RSS hash for a netdevice via:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v1,01/16] net: page_pool: factor out releasing DMA from releasing the page
-    https://git.kernel.org/netdev/net-next/c/c3f687d8dfeb
-  - [net-next,v1,02/16] net: page_pool: create hooks for custom page providers
-    (no matching commit)
-  - [net-next,v1,03/16] queue_api: define queue api
-    (no matching commit)
-  - [net-next,v1,04/16] gve: implement queue api
-    (no matching commit)
-  - [net-next,v1,05/16] net: netdev netlink api to bind dma-buf to a net device
-    (no matching commit)
-  - [net-next,v1,06/16] netdev: support binding dma-buf to netdevice
-    (no matching commit)
-  - [net-next,v1,07/16] netdev: netdevice devmem allocator
-    (no matching commit)
-  - [net-next,v1,08/16] memory-provider: dmabuf devmem memory provider
-    (no matching commit)
-  - [net-next,v1,09/16] page_pool: device memory support
-    (no matching commit)
-  - [net-next,v1,10/16] page_pool: don't release iov on elevanted refcount
-    (no matching commit)
-  - [net-next,v1,11/16] net: support non paged skb frags
-    (no matching commit)
-  - [net-next,v1,12/16] net: add support for skbs with unreadable frags
-    (no matching commit)
-  - [net-next,v1,13/16] tcp: RX path for devmem TCP
-    (no matching commit)
-  - [net-next,v1,14/16] net: add SO_DEVMEM_DONTNEED setsockopt to release RX frags
-    (no matching commit)
-  - [net-next,v1,15/16] net: add devmem TCP documentation
-    (no matching commit)
-  - [net-next,v1,16/16] selftests: add ncdevmem, netcat for devmem TCP
-    (no matching commit)
+  - [net-next,v9,1/8] net: ethtool: pass a pointer to parameters to get/set_rxfh ethtool ops
+    https://git.kernel.org/netdev/net-next/c/fb6e30a72539
+  - [net-next,v9,2/8] net: ethtool: get rid of get/set_rxfh_context functions
+    https://git.kernel.org/netdev/net-next/c/dcd8dbf9e734
+  - [net-next,v9,3/8] net: ethtool: add support for symmetric-xor RSS hash
+    https://git.kernel.org/netdev/net-next/c/13e59344fb9d
+  - [net-next,v9,4/8] ice: fix ICE_AQ_VSI_Q_OPT_RSS_* register values
+    https://git.kernel.org/netdev/net-next/c/20f73b60bb5c
+  - [net-next,v9,5/8] ice: refactor RSS configuration
+    https://git.kernel.org/netdev/net-next/c/dc6e44c9d6d6
+  - [net-next,v9,6/8] ice: refactor the FD and RSS flow ID generation
+    https://git.kernel.org/netdev/net-next/c/b1f5921a99ac
+  - [net-next,v9,7/8] ice: enable symmetric-xor RSS for Toeplitz hash function
+    https://git.kernel.org/netdev/net-next/c/352e9bf23813
+  - [net-next,v9,8/8] iavf: enable symmetric-xor RSS for Toeplitz hash function
+    https://git.kernel.org/netdev/net-next/c/4a3de3fb0eb6
 
 You are awesome, thank you!
 -- 
