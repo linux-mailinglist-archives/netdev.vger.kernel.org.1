@@ -1,337 +1,236 @@
-Return-Path: <netdev+bounces-57532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A7E08134AF
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:25:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C11C8134BA
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:28:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 211B228343B
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:25:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E20CF1F21787
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:27:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBFDA5CD2F;
-	Thu, 14 Dec 2023 15:24:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0A35CD0F;
+	Thu, 14 Dec 2023 15:27:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="dcJl2BC5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D9ohm7YP"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12olkn2074.outbound.protection.outlook.com [40.92.21.74])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21F241A4;
-	Thu, 14 Dec 2023 07:24:43 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IHIBH9fhMpI6o6WB3b04prcWGr4Jhvjfw3e0n6DtQCKZLkDcNe8saaqXicN9QGj1TE6DspcSBNxEfRqMrAv31+LdXb0zbgeeJs9YPnFeSw/1GonkoR55hX+O/BQsqJWCYk5GcoiNfQG2TVmcaOage4WJkcIIX0OgYvSD8XmSadwQoZmPi2LJJZnyj2BSc3qfITUiPe0y41cQT3Sw4Z/e2f715Xr3ABcBLzS++5wQfse1OL9Tx/sKJoFTmadIt36T8wxiD6MZGssdMKop2LZxGQ0ZeXueGKWXElBUwOUJgoQjaVJBsEnFCjFvC8Fu5UCbIRJgstVLQZkemNoU+iiUpA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Jg7b6p+xqD2UoF2S3eJvncZGfTYlOgCJeL446xehAFE=;
- b=ZkIABnOHNHKMLaFvU0oY9pTekcyo/nUlNa6JmLoyJhw4Ykiwy2XwXKuswvmlorvtDC/MWJvvCgNJ/UXHFYUDiBa8jks2IcIfvVc6QzWLIrpnbpOBxdij30eroX+M7WxMeaTEbatIy6JGssYB3B4L07B2et1XFE/qxHIBUONh8kuZlispSMBtycDBbmzqpEwUWa7QiFT3ysPlX6h1RwoqGbjfHE2OjCzKBm9lyYfZrGzKfhOZZNCM0tU4/l+3WUEIONU4ITpSk6JHeAqDjtzZP1b5Dwtvt/GKvaw8cjpab6rgpYtRBl+YFSd8GmMgNlv5qiN2V8GkMdrgLxgYIi02WQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Jg7b6p+xqD2UoF2S3eJvncZGfTYlOgCJeL446xehAFE=;
- b=dcJl2BC5uQkW1ErJwikbvOVeAwFOsomysuE2A6qY+e0Ond+r5tKfaEzIO1jx84SbPLManCkuar0366sqz54Q9gLhSFExAQ074qkbfBpYv7zXq/wk3Qp8JIkH+9gatguTedwihHds3USbIJUVlBAbf9aJ2KlePZ6KmXjwRoqBCR0KblJpDhjWjJTwdfUQnI5F6hbmRZAB1g03WBtSeOWXT1PhhKEv56vZMOuMOuPQ7Kjf1QOIJDgeEVo0YJ0z1gStirYI/TbR45hDj95ZKztnG+fFCUObzcGBFRSByXC+R5Zkn1t4r753UG8P2ZdWwSJizbQHpf/aTeFfi91uHdqPnw==
-Received: from PH7PR03MB7064.namprd03.prod.outlook.com (2603:10b6:510:2a5::8)
- by PH0PR03MB6252.namprd03.prod.outlook.com (2603:10b6:510:e6::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.28; Thu, 14 Dec
- 2023 15:24:41 +0000
-Received: from PH7PR03MB7064.namprd03.prod.outlook.com
- ([fe80::9ca4:4c22:a89:9a8]) by PH7PR03MB7064.namprd03.prod.outlook.com
- ([fe80::9ca4:4c22:a89:9a8%7]) with mapi id 15.20.7091.028; Thu, 14 Dec 2023
- 15:24:41 +0000
-From: Min Li <lnimi@hotmail.com>
-To: richardcochran@gmail.com,
-	lee@kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Min Li <min.li.xe@renesas.com>
-Subject: [PATCH net-next v7 5/5] ptp: clockmatrix: move register and firmware related definition to idt8a340_reg.h
-Date: Thu, 14 Dec 2023 10:24:15 -0500
-Message-ID:
- <PH7PR03MB70642FA60659FF2A519E9E48A08CA@PH7PR03MB7064.namprd03.prod.outlook.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231214152415.14785-1-lnimi@hotmail.com>
-References: <20231214152415.14785-1-lnimi@hotmail.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [fr9c9r7i8ZnQzcPuuAmCeUT2/59DKXe6YWXweL8VdGk=]
-X-ClientProxiedBy: YQBPR01CA0054.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:c01:2::26) To PH7PR03MB7064.namprd03.prod.outlook.com
- (2603:10b6:510:2a5::8)
-X-Microsoft-Original-Message-ID: <20231214152415.14785-5-lnimi@hotmail.com>
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBF0A120
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 07:27:52 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-dbcbd789ddcso1487768276.0
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 07:27:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702567671; x=1703172471; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=f0fM/yof0ktgb2xlCUt8GtfUJFXxVj8VTC3AQz4PSF0=;
+        b=D9ohm7YPHWW+WENRC7NWugGae8KJ7r0QoPLmfFI8ycqxdov2qyUda+Hy9O3Hee17YE
+         cjPhh1l9GpBLNOuhjBzTtoy9Pl52QTMm5PnrcfaBeyHjbuUs7+JB51EIy64tklkDOzQp
+         kzUhEBdicPh/YW8uuoH0PkrID2TZbMUxF2bIIDBO+6w6K+dECm39lMo5ahcS9fRXVeXY
+         HNQtfllUOF6wJBRssermUDKjLLL3lbc8OZ9TnnQgeNTwS2b/ofpiqPGDlm+n5VavJIaC
+         kyao+m6qK6bq/vxhtOXt6xgKn/ISlUcMOUEpzu7suwwIvGmIkYJ/Ch+OGzrfZvUM63+e
+         ZnUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702567671; x=1703172471;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=f0fM/yof0ktgb2xlCUt8GtfUJFXxVj8VTC3AQz4PSF0=;
+        b=Bc97z6+Ptl/4p6RneNJjGmoJolxOcd+tM+9L6xDIk9DXVGoq65apl41pyhQ2XoAA71
+         GR2ICWcfe7fiXYPlO0gD9nvc60E8xIN6dFuY9t7AdPsQDLsWXjUS9DJrU8iYwn/9ZZC4
+         aTcOdWli/PKUeTKcoied2LttDLXYKp8JjQsADdoIoXuGYjOXTv6DB/WL8JWwvcLjc4lz
+         XGbKDems9D1mQsMVlysx7do1X2egqCWIZXpxddwv1tVu3R7h9NwQTCfFRqmNeFnptA38
+         cQ+1fMuf0+jTKiLiTGLYYhvhuSa+2RcKrulxdHDuwjFGbJkM+gHDUGAemTxpVJuLw1Bo
+         A3PQ==
+X-Gm-Message-State: AOJu0Yyrl6M6s6m8mkVy2Lz12OnGg42KJNWeexVMEnOVnyy+iCgtZkZT
+	ODszmdXJWlFRyehkqXvqTYVwMi/Bgpbxxw==
+X-Google-Smtp-Source: AGHT+IEj4LwVzQWTnGaHVjWb93Pwao48LBJ9LIpWsEZMcw5jk7pVFFprEE6omy6lAV2kPA87A//57jYtAllgxg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1812:b0:dbc:cc25:8ab with SMTP
+ id cf18-20020a056902181200b00dbccc2508abmr43578ybb.4.1702567671569; Thu, 14
+ Dec 2023 07:27:51 -0800 (PST)
+Date: Thu, 14 Dec 2023 15:27:47 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR03MB7064:EE_|PH0PR03MB6252:EE_
-X-MS-Office365-Filtering-Correlation-Id: 39d98b89-fe08-42f3-a15d-08dbfcb8ca5d
-X-MS-Exchange-SLBlob-MailProps:
-	Cq7lScuPrnrf5XTkHvzLuPL047Guub83ie5xQtlga+49LNCSAf9VFoHU+cQ6YFyN3zRkGfeuhEHDPhUl+OviL5mP8wIIF2cVaZBbQGF7x4RJ9AQW2L8rmt4P91jL2wwI23lTi1JttwmjCE6vTIkfCg/Gvp5b6eFGN30tUSANIBq7pDeJ0EzhzhIocOFqBQcb8C56dhbud6m3S9gqG6E8iy/+Hh2KHCxkyP7Uo8ynZtkRFuPwpzIfondfOk3+xod0oFxlGrdTOaKCvJViQlNT7b28VCW/J53cWxFBmAoMMT1R8EhniSozsLMD+1hK+YGCSPGcPdF5Tht6dHDQopoou96VBgYpYYiYb4yzwc0xtfMwLfVQupPo+R8m7M0KYJvnV9PWLbrVSi0MzjIekMpXZ4jOKzgIGwZd/dpvj0w8bGlYo1xVm52bIfqGW+IkYWJHEaIE0AWmwnyxV0uv35g4emeb/1PYCAMUaPpAwQfE/iyQlbHpDPsalBMd9A9KQPXAaYPVs/71gcph1MY8FkSO3FyyyIutQKbmLBrNuq/SfUACHwUCuiKMsnDhpWVztC7h97sSA5zs1J7AjsN/PDOuMcwpI2k7eJeSDVeLpziESkem9goANp1a/eahsKf7nlTvSGWn019WTJJ6H7TdNhMTEv2wF1ol6z/qapf/XotrgqEyyMNKZbzvortUlHuzzLE7wUwbinKHPfLKWhznTtRhTO9HG0+JbcQZh8Go9En/h4YlerNNnzIvjWJIK1bzXhwWYxiEc8zvOXw=
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	6uFstCzvZ32t5oiOuYB3BPauo+1yXJWCEcqLtXnQ2Jop7P1lH7BwCoe5l4+fk9J7nqGB0LsbIYt/Atku3tUJLwsMzJyQVi1fO5dpkvwnwtdXonmbLC2pbdtzRd2pkbjN8jQwsLa2VAWVkFjuPNBrkiBm6vRP7iZn22jE0pXGe0FlTr2fD631RHfsVI0M2irynsK8AZuBTkuiv9oRM9sSkLdKpSyx4c736nuG0HBNP/ZklNDDULg/kX/vspPllNCjSrJJi4hdPf5fENvFBc49gCYHSK7jW7GKDDcAcSL0OxXEyQlZ6/QDdzgh5oBc5e2HOb840gWYCacCCbDVbqus+gGwO7HX8Zbi4mAgGMzYcc5tJc5NK8molVz4gWfp2Pul88lPHVJpbD6VfQOAGTZJ4bDcvwoNPkVJJhmYZwun8ry+gZPKISWC10/uIWkv7iw79v55iSZDtyy7k9uAoFCoxXL8U05h+P/q+zTKKnCyZW4tOeB/NnGDivw+8kSeED7LdNoa8pHdCsHP/McRCDmAl4QVLHE/3ll879SFvyXvClW0FJx3jZ9NsCDZkWpxc1ix
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?RQ/wRofxUxicsAaZ/rBPuinAkvuTYFa5fNlHG1mPs0m47bVqI1L0Y7Z/Us/n?=
- =?us-ascii?Q?zOOpjxrz0MQj/eaEb763khEDeha+o/g4Xe0i++h4q5BNKAUW3BvypcvpKkZM?=
- =?us-ascii?Q?yKMv+q27q1+pJlMvWfBETPCIv5BkHUwt4sdtg0A5kj/8Q/TXLwLt5hehVVVU?=
- =?us-ascii?Q?Du9o1ObDHOLWdCQsrK63um2t5ciz3rfRdCN2YdTpGsHfqoC0J5dENukWpuZW?=
- =?us-ascii?Q?ncCPGDR9TDOIY7BbJiD3AkylUf1oUH4dLdOW5BvFUySgpkE/4a4vf/II9hI2?=
- =?us-ascii?Q?LNvGhlUAxavRrJfx9Z/48J23MMBibjODfRb/UdZn17sZd9LniTTnyTqoR1S1?=
- =?us-ascii?Q?loUqS/+Q4yDug++oun3ual+QyMhL4KPa4Byl8xxcu4c4ckJv2IsoMxVxV7Dv?=
- =?us-ascii?Q?5p++CxWMqT0eq/fgoSpEz0ScO2ot7Vv5wCw3fGau8e6mX0uZ6X9pDXiQTTAj?=
- =?us-ascii?Q?EW+KQ9K/rFFNJSsfZPVVTN6Ct1i8f2deavzx7HIWrdO8PnTI+c22DpjGx+S0?=
- =?us-ascii?Q?vHSHVOj3svzy7hCDaFRc2twtWf1+NEQ9FQhxAyCARxuiK7YpE4CCAVIQhlwD?=
- =?us-ascii?Q?S2RJeqzI8UJsY3V/LBACytzHBD4ew9i+viwxCBzOefu9db66uYeB05L/nUlY?=
- =?us-ascii?Q?xNAztpozLZ6vts5lwUTK7pD66q0Ac8rxFAHrjjTDzlKEudTtYhkSGzbG2HBy?=
- =?us-ascii?Q?fuYRN+vy8VhvveAOf/Lmk6IdyOo81IoYhbpkZ0zT5sSlL1ToWgF1haI/I/OQ?=
- =?us-ascii?Q?TfGFnKcaydPbU/wYVWZ9dUZpTRwh+MAQtrUBzTpU1pWepo0ITIEtsvdS9N5+?=
- =?us-ascii?Q?2SRtPAHlENEQXh0HdCIkqzH4EXAj5YkyMskkDTbG8alhPPciS1gVgTVdeiEb?=
- =?us-ascii?Q?Sh0cVp8Zc51CD1dtzRD/gCqpwLJNixLKVwmqb5xbYqEpBN0ccDVcWbvTvfGF?=
- =?us-ascii?Q?R1nFmpebWPSmKN9pvdqsVneO3lfD5A5B2T9lsVgV6LtOQUEbkmm9mrVA/YFS?=
- =?us-ascii?Q?CfOAoGjZFJt58nE4X97xt0SIBTInzKcsIWmSlG2xDEX7iqFT+qpnpDDcvoyp?=
- =?us-ascii?Q?9B5/sLnKKwjjVugGVbhYprQhmZ+Dqpqejpq7RkDutvDUmjRuUBA57Gvfj+Mx?=
- =?us-ascii?Q?Dd4rl2wD7NKz7CX8qyeGCDAV5lP81FZMKM6wdYfZ6PWTnkSNjtRYGbcBlR6/?=
- =?us-ascii?Q?8jVt7gGAtP04ZO1Aqz+7eOFzta/yaokXEFmeRw=3D=3D?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-839f4.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 39d98b89-fe08-42f3-a15d-08dbfcb8ca5d
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR03MB7064.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2023 15:24:40.9175
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR03MB6252
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Message-ID: <20231214152747.1700980-1-edumazet@google.com>
+Subject: [PATCH net] net/rose: fix races in rose_kill_by_device()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
+	Bernard Pidoux <f6bvp@free.fr>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Min Li <min.li.xe@renesas.com>
+syzbot found an interesting netdev refcounting issue in
+net/rose/af_rose.c, thanks to CONFIG_NET_DEV_REFCNT_TRACKER=y [1]
 
-This change is needed by rsmu driver, which will be submitted separately
-from mfd tree.
+Problem is that rose_kill_by_device() can change rose->device
+while other threads do not expect the pointer to be changed.
 
-Signed-off-by: Min Li <min.li.xe@renesas.com>
+We have to first collect sockets in a temporary array,
+then perform the changes while holding the socket
+lock and rose_list_lock spinlock (in this order)
+
+Change rose_release() to also acquire rose_list_lock
+before releasing the netdev refcount.
+
+[1]
+
+[ 1185.055088][ T7889] ref_tracker: reference already released.
+[ 1185.061476][ T7889] ref_tracker: allocated in:
+[ 1185.066081][ T7889]  rose_bind+0x4ab/0xd10
+[ 1185.070446][ T7889]  __sys_bind+0x1ec/0x220
+[ 1185.074818][ T7889]  __x64_sys_bind+0x72/0xb0
+[ 1185.079356][ T7889]  do_syscall_64+0x40/0x110
+[ 1185.083897][ T7889]  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+[ 1185.089835][ T7889] ref_tracker: freed in:
+[ 1185.094088][ T7889]  rose_release+0x2f5/0x570
+[ 1185.098629][ T7889]  __sock_release+0xae/0x260
+[ 1185.103262][ T7889]  sock_close+0x1c/0x20
+[ 1185.107453][ T7889]  __fput+0x270/0xbb0
+[ 1185.111467][ T7889]  task_work_run+0x14d/0x240
+[ 1185.116085][ T7889]  get_signal+0x106f/0x2790
+[ 1185.120622][ T7889]  arch_do_signal_or_restart+0x90/0x7f0
+[ 1185.126205][ T7889]  exit_to_user_mode_prepare+0x121/0x240
+[ 1185.131846][ T7889]  syscall_exit_to_user_mode+0x1e/0x60
+[ 1185.137293][ T7889]  do_syscall_64+0x4d/0x110
+[ 1185.141783][ T7889]  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+[ 1185.148085][ T7889] ------------[ cut here ]------------
+
+WARNING: CPU: 1 PID: 7889 at lib/ref_tracker.c:255 ref_tracker_free+0x61a/0x810 lib/ref_tracker.c:255
+Modules linked in:
+CPU: 1 PID: 7889 Comm: syz-executor.2 Not tainted 6.7.0-rc4-syzkaller-00162-g65c95f78917e #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
+RIP: 0010:ref_tracker_free+0x61a/0x810 lib/ref_tracker.c:255
+Code: 00 44 8b 6b 18 31 ff 44 89 ee e8 21 62 f5 fc 45 85 ed 0f 85 a6 00 00 00 e8 a3 66 f5 fc 48 8b 34 24 48 89 ef e8 27 5f f1 05 90 <0f> 0b 90 bb ea ff ff ff e9 52 fd ff ff e8 84 66 f5 fc 4c 8d 6d 44
+RSP: 0018:ffffc90004917850 EFLAGS: 00010202
+RAX: 0000000000000201 RBX: ffff88802618f4c0 RCX: 0000000000000000
+RDX: 0000000000000202 RSI: ffffffff8accb920 RDI: 0000000000000001
+RBP: ffff8880269ea5b8 R08: 0000000000000001 R09: fffffbfff23e35f6
+R10: ffffffff91f1afb7 R11: 0000000000000001 R12: 1ffff92000922f0c
+R13: 0000000005a2039b R14: ffff88802618f4d8 R15: 00000000ffffffff
+FS: 00007f0a720ef6c0(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f43a819d988 CR3: 0000000076c64000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+<TASK>
+netdev_tracker_free include/linux/netdevice.h:4127 [inline]
+netdev_put include/linux/netdevice.h:4144 [inline]
+netdev_put include/linux/netdevice.h:4140 [inline]
+rose_kill_by_device net/rose/af_rose.c:195 [inline]
+rose_device_event+0x25d/0x330 net/rose/af_rose.c:218
+notifier_call_chain+0xb6/0x3b0 kernel/notifier.c:93
+call_netdevice_notifiers_info+0xbe/0x130 net/core/dev.c:1967
+call_netdevice_notifiers_extack net/core/dev.c:2005 [inline]
+call_netdevice_notifiers net/core/dev.c:2019 [inline]
+__dev_notify_flags+0x1f5/0x2e0 net/core/dev.c:8646
+dev_change_flags+0x122/0x170 net/core/dev.c:8682
+dev_ifsioc+0x9ad/0x1090 net/core/dev_ioctl.c:529
+dev_ioctl+0x224/0x1090 net/core/dev_ioctl.c:786
+sock_do_ioctl+0x198/0x270 net/socket.c:1234
+sock_ioctl+0x22e/0x6b0 net/socket.c:1339
+vfs_ioctl fs/ioctl.c:51 [inline]
+__do_sys_ioctl fs/ioctl.c:871 [inline]
+__se_sys_ioctl fs/ioctl.c:857 [inline]
+__x64_sys_ioctl+0x18f/0x210 fs/ioctl.c:857
+do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
+entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7f0a7147cba9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f0a720ef0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f0a7159bf80 RCX: 00007f0a7147cba9
+RDX: 0000000020000040 RSI: 0000000000008914 RDI: 0000000000000004
+RBP: 00007f0a714c847a R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007f0a7159bf80 R15: 00007ffc8bb3a5f8
+</TASK>
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Bernard Pidoux <f6bvp@free.fr>
 ---
- drivers/ptp/ptp_clockmatrix.h    |  33 ---------
- include/linux/mfd/idt8a340_reg.h | 121 +++++++++++++++++++++++++++++--
- 2 files changed, 113 insertions(+), 41 deletions(-)
+ net/rose/af_rose.c | 39 ++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 34 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/ptp/ptp_clockmatrix.h b/drivers/ptp/ptp_clockmatrix.h
-index 31d90b1bf025..f041c7999ddc 100644
---- a/drivers/ptp/ptp_clockmatrix.h
-+++ b/drivers/ptp/ptp_clockmatrix.h
-@@ -21,32 +21,6 @@
- #define MAX_ABS_WRITE_PHASE_NANOSECONDS (107374182L)
- #define MAX_FFO_PPB (244000)
- 
--#define TOD_MASK_ADDR		(0xFFA5)
--#define DEFAULT_TOD_MASK	(0x04)
--
--#define SET_U16_LSB(orig, val8) (orig = (0xff00 & (orig)) | (val8))
--#define SET_U16_MSB(orig, val8) (orig = (0x00ff & (orig)) | (val8 << 8))
--
--#define TOD0_PTP_PLL_ADDR		(0xFFA8)
--#define TOD1_PTP_PLL_ADDR		(0xFFA9)
--#define TOD2_PTP_PLL_ADDR		(0xFFAA)
--#define TOD3_PTP_PLL_ADDR		(0xFFAB)
--
--#define TOD0_OUT_ALIGN_MASK_ADDR	(0xFFB0)
--#define TOD1_OUT_ALIGN_MASK_ADDR	(0xFFB2)
--#define TOD2_OUT_ALIGN_MASK_ADDR	(0xFFB4)
--#define TOD3_OUT_ALIGN_MASK_ADDR	(0xFFB6)
--
--#define DEFAULT_OUTPUT_MASK_PLL0	(0x003)
--#define DEFAULT_OUTPUT_MASK_PLL1	(0x00c)
--#define DEFAULT_OUTPUT_MASK_PLL2	(0x030)
--#define DEFAULT_OUTPUT_MASK_PLL3	(0x0c0)
--
--#define DEFAULT_TOD0_PTP_PLL		(0)
--#define DEFAULT_TOD1_PTP_PLL		(1)
--#define DEFAULT_TOD2_PTP_PLL		(2)
--#define DEFAULT_TOD3_PTP_PLL		(3)
--
- #define PHASE_PULL_IN_THRESHOLD_NS_DEPRECATED	(150000)
- #define PHASE_PULL_IN_THRESHOLD_NS		(15000)
- #define TOD_WRITE_OVERHEAD_COUNT_MAX		(2)
-@@ -121,11 +95,4 @@ struct idtcm {
- 	ktime_t			start_time;
- };
- 
--struct idtcm_fwrc {
--	u8 hiaddr;
--	u8 loaddr;
--	u8 value;
--	u8 reserved;
--} __packed;
--
- #endif /* PTP_IDTCLOCKMATRIX_H */
-diff --git a/include/linux/mfd/idt8a340_reg.h b/include/linux/mfd/idt8a340_reg.h
-index 13b36f4858b3..5aeb0820f876 100644
---- a/include/linux/mfd/idt8a340_reg.h
-+++ b/include/linux/mfd/idt8a340_reg.h
-@@ -116,16 +116,41 @@
- #define OTP_SCSR_CONFIG_SELECT            0x0022
- 
- #define STATUS                            0x2010c03c
--#define DPLL0_STATUS			  0x0018
--#define DPLL1_STATUS			  0x0019
--#define DPLL2_STATUS			  0x001a
--#define DPLL3_STATUS			  0x001b
--#define DPLL4_STATUS			  0x001c
--#define DPLL5_STATUS			  0x001d
--#define DPLL6_STATUS			  0x001e
--#define DPLL7_STATUS			  0x001f
-+#define IN0_MON_STATUS                    0x0008
-+#define IN1_MON_STATUS                    0x0009
-+#define IN2_MON_STATUS                    0x000a
-+#define IN3_MON_STATUS                    0x000b
-+#define IN4_MON_STATUS                    0x000c
-+#define IN5_MON_STATUS                    0x000d
-+#define IN6_MON_STATUS                    0x000e
-+#define IN7_MON_STATUS                    0x000f
-+#define IN8_MON_STATUS                    0x0010
-+#define IN9_MON_STATUS                    0x0011
-+#define IN10_MON_STATUS                   0x0012
-+#define IN11_MON_STATUS                   0x0013
-+#define IN12_MON_STATUS                   0x0014
-+#define IN13_MON_STATUS                   0x0015
-+#define IN14_MON_STATUS                   0x0016
-+#define IN15_MON_STATUS                   0x0017
-+#define DPLL0_STATUS                      0x0018
-+#define DPLL1_STATUS                      0x0019
-+#define DPLL2_STATUS                      0x001a
-+#define DPLL3_STATUS                      0x001b
-+#define DPLL4_STATUS                      0x001c
-+#define DPLL5_STATUS                      0x001d
-+#define DPLL6_STATUS                      0x001e
-+#define DPLL7_STATUS                      0x001f
- #define DPLL_SYS_STATUS                   0x0020
- #define DPLL_SYS_APLL_STATUS              0x0021
-+#define DPLL0_REF_STATUS                  0x0022
-+#define DPLL1_REF_STATUS                  0x0023
-+#define DPLL2_REF_STATUS                  0x0024
-+#define DPLL3_REF_STATUS                  0x0025
-+#define DPLL4_REF_STATUS                  0x0026
-+#define DPLL5_REF_STATUS                  0x0027
-+#define DPLL6_REF_STATUS                  0x0028
-+#define DPLL7_REF_STATUS                  0x0029
-+#define DPLL_SYS_REF_STATUS               0x002a
- #define DPLL0_FILTER_STATUS               0x0044
- #define DPLL1_FILTER_STATUS               0x004c
- #define DPLL2_FILTER_STATUS               0x0054
-@@ -192,6 +217,25 @@
- #define DPLL_CTRL_REG_0                   0x0002
- #define DPLL_CTRL_REG_1                   0x0003
- #define DPLL_CTRL_REG_2                   0x0004
-+#define DPLL_REF_PRIORITY_0               0x000f
-+#define DPLL_REF_PRIORITY_1               0x0010
-+#define DPLL_REF_PRIORITY_2               0x0011
-+#define DPLL_REF_PRIORITY_3               0x0012
-+#define DPLL_REF_PRIORITY_4               0x0013
-+#define DPLL_REF_PRIORITY_5               0x0014
-+#define DPLL_REF_PRIORITY_6               0x0015
-+#define DPLL_REF_PRIORITY_7               0x0016
-+#define DPLL_REF_PRIORITY_8               0x0017
-+#define DPLL_REF_PRIORITY_9               0x0018
-+#define DPLL_REF_PRIORITY_10              0x0019
-+#define DPLL_REF_PRIORITY_11              0x001a
-+#define DPLL_REF_PRIORITY_12              0x001b
-+#define DPLL_REF_PRIORITY_13              0x001c
-+#define DPLL_REF_PRIORITY_14              0x001d
-+#define DPLL_REF_PRIORITY_15              0x001e
-+#define DPLL_REF_PRIORITY_16              0x001f
-+#define DPLL_REF_PRIORITY_17              0x0020
-+#define DPLL_REF_PRIORITY_18              0x0021
- #define DPLL_MAX_FREQ_OFFSET              0x0025
- #define DPLL_WF_TIMER                     0x002c
- #define DPLL_WP_TIMER                     0x002e
-@@ -450,6 +494,10 @@
- #define OUTPUT_TDC_1                      0x2010cd08
- #define OUTPUT_TDC_2                      0x2010cd10
- #define OUTPUT_TDC_3                      0x2010cd18
-+
-+#define OUTPUT_TDC_CTRL_4                 0x0006
-+#define OUTPUT_TDC_CTRL_4_V520            0x0007
-+
- #define INPUT_TDC                         0x2010cd20
- 
- #define SCRATCH                           0x2010cf50
-@@ -668,6 +716,28 @@
- #define DPLL_STATE_MASK                   (0xf)
- #define DPLL_STATE_SHIFT                  (0x0)
- 
-+/* Bit definitions for the DPLL0_REF_STAT register */
-+#define DPLL_REF_STATUS_MASK              (0x1f)
-+
-+/* Bit definitions for the DPLL register */
-+#define DPLL_REF_PRIORITY_ENABLE_SHIFT       (0)
-+#define DPLL_REF_PRIORITY_REF_SHIFT          (1)
-+#define DPLL_REF_PRIORITY_GROUP_NUMBER_SHIFT (6)
-+
-+/* Bit definitions for the IN0_MON_STATUS register */
-+#define IN_MON_STATUS_LOS_SHIFT       (0)
-+#define IN_MON_STATUS_NO_ACT_SHIFT    (1)
-+#define IN_MON_STATUS_FFO_LIMIT_SHIFT (2)
-+
-+#define DEFAULT_PRIORITY_GROUP (0)
-+#define MAX_PRIORITY_GROUP     (3)
-+
-+#define MAX_REF_PRIORITIES (19)
-+
-+#define MAX_ELECTRICAL_REFERENCES (16)
-+
-+#define NO_REFERENCE (0x1f)
-+
- /*
-  * Return register address based on passed in firmware version
+diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
+index ecb91ad4ce639e7f8f3d2a9698e005cf696b123f..ef81d019b20f48d80a81d6eeab60808299f813a0 100644
+--- a/net/rose/af_rose.c
++++ b/net/rose/af_rose.c
+@@ -182,21 +182,47 @@ void rose_kill_by_neigh(struct rose_neigh *neigh)
   */
-@@ -778,4 +848,39 @@ enum scsr_tod_write_type_sel {
- 	SCSR_TOD_WR_TYPE_SEL_DELTA_MINUS = 2,
- 	SCSR_TOD_WR_TYPE_SEL_MAX = SCSR_TOD_WR_TYPE_SEL_DELTA_MINUS,
- };
-+
-+/* firmware interface */
-+struct idtcm_fwrc {
-+	u8 hiaddr;
-+	u8 loaddr;
-+	u8 value;
-+	u8 reserved;
-+} __packed;
-+
-+#define SET_U16_LSB(orig, val8) (orig = (0xff00 & (orig)) | (val8))
-+#define SET_U16_MSB(orig, val8) (orig = (0x00ff & (orig)) | (val8 << 8))
-+
-+#define TOD_MASK_ADDR		(0xFFA5)
-+#define DEFAULT_TOD_MASK	(0x04)
-+
-+#define TOD0_PTP_PLL_ADDR		(0xFFA8)
-+#define TOD1_PTP_PLL_ADDR		(0xFFA9)
-+#define TOD2_PTP_PLL_ADDR		(0xFFAA)
-+#define TOD3_PTP_PLL_ADDR		(0xFFAB)
-+
-+#define TOD0_OUT_ALIGN_MASK_ADDR	(0xFFB0)
-+#define TOD1_OUT_ALIGN_MASK_ADDR	(0xFFB2)
-+#define TOD2_OUT_ALIGN_MASK_ADDR	(0xFFB4)
-+#define TOD3_OUT_ALIGN_MASK_ADDR	(0xFFB6)
-+
-+#define DEFAULT_OUTPUT_MASK_PLL0	(0x003)
-+#define DEFAULT_OUTPUT_MASK_PLL1	(0x00c)
-+#define DEFAULT_OUTPUT_MASK_PLL2	(0x030)
-+#define DEFAULT_OUTPUT_MASK_PLL3	(0x0c0)
-+
-+#define DEFAULT_TOD0_PTP_PLL		(0)
-+#define DEFAULT_TOD1_PTP_PLL		(1)
-+#define DEFAULT_TOD2_PTP_PLL		(2)
-+#define DEFAULT_TOD3_PTP_PLL		(3)
-+
- #endif
+ static void rose_kill_by_device(struct net_device *dev)
+ {
+-	struct sock *s;
++	struct sock *sk, *array[16];
++	struct rose_sock *rose;
++	bool rescan;
++	int i, cnt;
+ 
++start:
++	rescan = false;
++	cnt = 0;
+ 	spin_lock_bh(&rose_list_lock);
+-	sk_for_each(s, &rose_list) {
+-		struct rose_sock *rose = rose_sk(s);
++	sk_for_each(sk, &rose_list) {
++		rose = rose_sk(sk);
++		if (rose->device == dev) {
++			if (cnt == ARRAY_SIZE(array)) {
++				rescan = true;
++				break;
++			}
++			sock_hold(sk);
++			array[cnt++] = sk;
++		}
++	}
++	spin_unlock_bh(&rose_list_lock);
+ 
++	for (i = 0; i < cnt; i++) {
++		sk = array[cnt];
++		rose = rose_sk(sk);
++		lock_sock(sk);
++		spin_lock_bh(&rose_list_lock);
+ 		if (rose->device == dev) {
+-			rose_disconnect(s, ENETUNREACH, ROSE_OUT_OF_ORDER, 0);
++			rose_disconnect(sk, ENETUNREACH, ROSE_OUT_OF_ORDER, 0);
+ 			if (rose->neighbour)
+ 				rose->neighbour->use--;
+ 			netdev_put(rose->device, &rose->dev_tracker);
+ 			rose->device = NULL;
+ 		}
++		spin_unlock_bh(&rose_list_lock);
++		release_sock(sk);
++		sock_put(sk);
++		cond_resched();
+ 	}
+-	spin_unlock_bh(&rose_list_lock);
++	if (rescan)
++		goto start;
+ }
+ 
+ /*
+@@ -656,7 +682,10 @@ static int rose_release(struct socket *sock)
+ 		break;
+ 	}
+ 
++	spin_lock_bh(&rose_list_lock);
+ 	netdev_put(rose->device, &rose->dev_tracker);
++	rose->device = NULL;
++	spin_unlock_bh(&rose_list_lock);
+ 	sock->sk = NULL;
+ 	release_sock(sk);
+ 	sock_put(sk);
 -- 
-2.39.2
+2.43.0.472.g3155946c3a-goog
 
 
