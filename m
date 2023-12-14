@@ -1,162 +1,117 @@
-Return-Path: <netdev+bounces-57379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF4D6812F83
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:57:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA76F812F95
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:00:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68C001F2200F
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:57:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46530283155
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A27EA4120E;
-	Thu, 14 Dec 2023 11:56:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14114121C;
+	Thu, 14 Dec 2023 12:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="m4wzcdz4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VMHOBKTG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A41F6113
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 03:56:56 -0800 (PST)
-Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-a22f2a28c16so317540166b.0
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 03:56:56 -0800 (PST)
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16B62B7;
+	Thu, 14 Dec 2023 04:00:21 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-5522ba3f94aso1877336a12.1;
+        Thu, 14 Dec 2023 04:00:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1702555015; x=1703159815; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XAk80z6Wt05yIdKe/JUV2jKGr0/LddtdEgIiGSIGHB0=;
-        b=m4wzcdz4b86y/KQi5sBprpr6ZaGEUwim/LYRl2aNAeSzTvt0BmD3c+bRMLDRY+jS2g
-         rsm85cvbLE0zI4z62rXvlHHbY3zA25wMvxe7bdvEaHT6PHG36ERtOKBFmV1GyvOuzGlQ
-         9W2LSp0fysWgaVcGUKfsuUIgIwP2hC7T3/gYZTgpIkvq9DAkRcBsfraAB4hvsLBq/KGh
-         zrtPLyvZtiL6cVqJMjhjb/YdRm+hCzpzfpWW+zYZ18BujsAF1kMcur4GbohgTHWXrkJW
-         Z5HoKfvYmUCQ2hZNwFhydKwq4rY52XLbcer3lazgx3cSixxcuEIUTFTYZOEQ5APx2Lc0
-         T+DQ==
+        d=gmail.com; s=20230601; t=1702555219; x=1703160019; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uAVjKqO7t1SHEAhnbN0gUIgoq1UKlAq8GC08s1NGUV8=;
+        b=VMHOBKTGX2nJ/vb/pYuzizI7gNB8bCnxFUsbE+v/oFgtYDZBzFLVfs5rLuTLaZoc2h
+         rqTFeUrxFXZgzxZ1A5R3nTXCq+UJmtXZOW/4jbUDaTcwL2wZrRW6izkm81JmgvYS53aT
+         onlSgdVZfWMWNfrxX9BhnxLSz3m8nu/TKczDC0pIYIHynEtckssQhZSxE5zcUAi/O55W
+         xaqE5yCFQW2kth6rILEkbCetazM5v6xG4jzWYa/Gy1XRuUVgUn5n1+MAIF6TNMKQ7oFw
+         88jEkoRRSmG50MXAH+ng0rElcHm0dGRPPybLDd8EbD5yhxOmjkKUFgO6Ew3y8ljl7Kmu
+         nlRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702555015; x=1703159815;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XAk80z6Wt05yIdKe/JUV2jKGr0/LddtdEgIiGSIGHB0=;
-        b=LqcA0AaqSZbZ2TAZIMgyDx9FlnThjubORWLHbqHavhb+Fwoo5TvS0VPYhCOCWKJAvu
-         pY+DPcFGVmvu7NbwWUeFxKmf/IKIEcE5qa2shs8mOCB7pEsWiJgGby0Q+zaclajTA89a
-         icHKfN5n2fIopqrrEGnjz2l+9Yxs2NMs9YLAAOSzZ7th7uSSdt7FVj+dldiv0J7X+4F4
-         MOmAYgQu8T+winjtbSvxJQso5r7R8IB5WPZkQY2eODn8CF8P+1R0YZo8e14otVoYZc5m
-         m3K9o2puV6XS2XvaI8sCyBUxAPlCnlTRtP3oWRzmg0l6QEje9n7jtZRBIjq+PZtM7CX/
-         ViOA==
-X-Gm-Message-State: AOJu0YyYWfRCBtH67hWprV1PS9X62PVVeSACTENQQ+CQhFVtJRArwsTt
-	68tuPBdpuao+L76FMAhfBiBo2A==
-X-Google-Smtp-Source: AGHT+IG04raSt18SerEL5MEH+ZXjlehHlJvrIcana0QxzLp5r3cYEDmugmu8Xxf6a73Kvv8JqmsWHQ==
-X-Received: by 2002:a17:906:11d7:b0:a1f:5dd9:2177 with SMTP id o23-20020a17090611d700b00a1f5dd92177mr2751162eja.149.1702555015139;
-        Thu, 14 Dec 2023 03:56:55 -0800 (PST)
-Received: from [192.168.50.4] ([82.78.167.103])
-        by smtp.gmail.com with ESMTPSA id qo4-20020a170907874400b00a1933a57960sm9111324ejc.22.2023.12.14.03.56.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Dec 2023 03:56:54 -0800 (PST)
-Message-ID: <35e310fc-24ef-4af6-9d8d-52bb80914cec@tuxon.dev>
-Date: Thu, 14 Dec 2023 13:56:52 +0200
+        d=1e100.net; s=20230601; t=1702555219; x=1703160019;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uAVjKqO7t1SHEAhnbN0gUIgoq1UKlAq8GC08s1NGUV8=;
+        b=Vx0jNyu7MVDllNyo8ioCn9gZXHyAkDj9CSUuJVo9COOy/l6x1N8519THgRdaelxY7W
+         ZNYlpgZL35plBqfbdm0g17MBC7SzopQKM8w0UGiAwAmQq/lUxRXm/Y2TMS7Y+2eA91r3
+         5LotGMrCuXxfYZx2fWKsQ5h3Q5bXgqEge9j3hmwTd+NCJUkk1ZP25iwXO9EqhdzVH2Bx
+         ArfY6y67oCbmYJzwa/hlzL4P5rBbljOYBF6M3pTMcE3P+WVYgcMac3aI04scaRYatWHy
+         h9l8MPzdx8HmoQUV2TOc+ANmtxnIkLm2nfVrimC8ltPcuoSebyv79S0MI8lg4vjQn8vF
+         hR4Q==
+X-Gm-Message-State: AOJu0YzMP4Wp05uf9u+erUHhRN3m/rxyMhl8iwKGTJVjOP7PW0XoDXnB
+	Xk5eI8W3+Bfwq3nZuQGlmpjZA5dTBMCvBg==
+X-Google-Smtp-Source: AGHT+IFkAF8xyyVRvjbkhV0Imar1p4RnoaCvAzq2XlE+nsr9Wcq6xdWObgKdx8piQfIZ52SF7bMauQ==
+X-Received: by 2002:a17:906:74d6:b0:a23:fb2:e6c4 with SMTP id z22-20020a17090674d600b00a230fb2e6c4mr186158ejl.233.1702555219291;
+        Thu, 14 Dec 2023 04:00:19 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id ss27-20020a170907c01b00b00a1d9afe42f0sm9248350ejc.35.2023.12.14.04.00.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Dec 2023 04:00:19 -0800 (PST)
+Date: Thu, 14 Dec 2023 14:00:16 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Tomer Maimon <tmaimon77@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	openbmc@lists.ozlabs.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 10/16] net: pcs: xpcs: Add generic DW XPCS
+ MDIO-device support
+Message-ID: <20231214120016.wgeip3mdro5ihnxe@skbuf>
+References: <20231205103559.9605-1-fancer.lancer@gmail.com>
+ <20231205103559.9605-11-fancer.lancer@gmail.com>
+ <20231205111351.xjjuwpbf7kwg3vuh@skbuf>
+ <uivunnjv5vi3w3fkc5w2f4lem5bingrgajgjfsu2ih7fuhz6hd@3naeubr5spak>
+ <20231205122316.ihhpklv222f5giz3@skbuf>
+ <nflj4ajgx3byqhwna2eslldwulbbafmcwba4dwgxo65o5c7pmj@zbgqt2zje4ix>
+ <20231208163343.5s74bmirfna3o7yw@skbuf>
+ <xhj7jchcv63y2bmnedxqffnmh3fvdxirccdugnnljruemuiurz@ceafs7mivbqp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 00/21] net: ravb: Add suspend to RAM and
- runtime PM support for RZ/G3S
-Content-Language: en-US
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
-To: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
- p.zabel@pengutronix.de, yoshihiro.shimoda.uh@renesas.com,
- wsa+renesas@sang-engineering.com, geert+renesas@glider.be
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
-In-Reply-To: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <xhj7jchcv63y2bmnedxqffnmh3fvdxirccdugnnljruemuiurz@ceafs7mivbqp>
 
+On Thu, Dec 14, 2023 at 02:54:00PM +0300, Serge Semin wrote:
+> > > > The pcs-rzn1-miic.c driver puts a device_link to the MAC to at least
+> > > > tear down the whole thing when the PCS is unbound, which is saner than
+> > > > crashing the kernel. I don't see the equivalent protection mechanism here?
+> > > 
+> > > You are right. I don't have any equivalent protection here. Thanks for
+> > > suggesting a solution.
+> > 
+> > I think that a device link between the "ethernet" device and the "mdio"
+> > device (controller, parent of the PHY or PCS), if the Ethernet is not a
+> > parent of the MDIO controller, could also solve that. But it would also
+> > require ACK from PHY maintainers, who may have grander plans to address
+> > this snag.
+> 
+> Ok. I'll add it in v2. Let's see what the maintainers think about
+> that.
 
+Are you not following the parallel discussion on the topic of PCS
+devices having bound drivers?
+https://lore.kernel.org/netdev/ZXnV%2FPk1PYxAm%2FjS@shell.armlinux.org.uk/
 
-On 14.12.2023 13:45, Claudiu wrote:
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> 
-> Hi,
-> 
-> This series adds suspend to RAM and runtime PM support for Ethernet
-> IP available on the RZ/G3S (R9A08G045) SoC.
-> 
-> As there are IP versions that switch to module standby when disabling
-> the clocks, and because of module standby IP switches to reset and
-> the register content is lost, to be able to have runtime PM supported
-> for all IP variants, the configuration operations were moved all to
-> ravb_open()/ravb_close() letting the ravb_probe() and ravb_remove()
-> to deal with resource parsing and allocation/free.
-> 
-> The ethtool and IOCTL APIs that could have been run asyncronously
-> were adapted to return if the interface is down. As explained in
-> each individual commits description, this should be harmless.
-> 
-> Along with it, the series contains preparatory cleanups.
-> 
-> The series has been tested on the boards with the following device trees:
-> - r8a7742-iwg21d-q7.dts
-> - r8a774a1-hihope-rzg2m-ex.dts 
-> - r9a07g043u11-smarc-rzg2ul.dts
-> - r9a07g054l2-smarc-rzv2l.dts
-> - r9a07g044l2-smarc-rzg2l.dts
-
-And also (I forgot to mention):
-- r9a08g045s33-smarc.dts (RZ/G3S).
-
-> 
-> Patches are based on series at [1].
-> 
-> Thank you,
-> Claudiu Beznea
-> 
-> Changes in v2:
-> - rework the driver (mainly, ravb_open() contains now only resource
->   allocation and parsing leaving the settings to ravb_open(); ravb_remove()
->   has been adapted accordingly) to be able to use runtime PM for all
->   IP variants; due to this number of patches increased
-> - adjust previous series to review comments
-> - collected tags
-> - populated driver's own runtime PM ops with enable/disable of reference
->   clock
-> 
-> [1] https://lore.kernel.org/all/20231214113137.2450292-1-claudiu.beznea.uj@bp.renesas.com/
-> 
-> Claudiu Beznea (21):
->   net: ravb: Let IP-specific receive function to interrogate descriptors
->   net: ravb: Rely on PM domain to enable gptp_clk
->   net: ravb: Make reset controller support mandatory
->   net: ravb: Switch to SYSTEM_SLEEP_PM_OPS()/RUNTIME_PM_OPS() and
->     pm_ptr()
->   net: ravb: Use tabs instead of spaces
->   net: ravb: Assert/de-assert reset on suspend/resume
->   net: ravb: Move reference clock enable/disable on runtime PM APIs
->   net: ravb: Move the IRQs get and request in the probe function
->   net: ravb: Split GTI computation and set operations
->   net: ravb: Move delay mode set in the driver's ndo_open API
->   net: ravb: Move DBAT configuration to the driver's ndo_open API
->   net: ravb: Move ptp initialization in the driver's ndo_open API for
->     ccc_gac platorms
->   net: ravb: Set config mode in ndo_open and reset mode in ndo_close
->   net: ravb: Simplify ravb_suspend()
->   net: ravb: Simplify ravb_resume()
->   net: ravb: Keep the reverse order of operations in ravb_close()
->   net: ravb: Keep clock request operations grouped together
->   net: ravb: Return cached statistics if the interface is down
->   net: ravb: Do not set promiscuous mode if the interface is down
->   net: ravb: Do not apply RX CSUM settings to hardware if the interface
->     is down
->   net: ravb: Add runtime PM support
-> 
->  drivers/net/ethernet/renesas/ravb.h      |   2 +
->  drivers/net/ethernet/renesas/ravb_main.c | 783 ++++++++++++-----------
->  2 files changed, 417 insertions(+), 368 deletions(-)
-> 
+Sadly I don't have much spare time to join that discussion, but it looks
+like you could.
 
