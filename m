@@ -1,172 +1,160 @@
-Return-Path: <netdev+bounces-57280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFB20812BC9
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 10:37:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D6C3812BF8
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 10:49:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00ED1282205
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 09:37:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D36561F218E9
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 09:48:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264A62E85C;
-	Thu, 14 Dec 2023 09:37:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B4A33CF1;
+	Thu, 14 Dec 2023 09:48:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XdqOKmAL"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="GhDRMXiO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDA1CE0
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 01:37:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702546627;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=f1H0kKT3jccLGmQFqwXGxIScaEIaGvkzHt/VCZv3TM0=;
-	b=XdqOKmALHQtLQT+cH4zHXrMZhrIrz/V60n5s+drzZhEplpyHMmNg3bD1F+95dM67aQYspU
-	QiTj0t5hTvjOZB0N5zW7vMvV+b2cE6SxJgfI4AA9KMmQZMtdiydUMNehqKBSs/HGr214lJ
-	N7qU2Mebqj4/H6okSfDZXOivb7fV6K0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-492-k-dQEwXlNS-wPcIygEYWjQ-1; Thu, 14 Dec 2023 04:37:05 -0500
-X-MC-Unique: k-dQEwXlNS-wPcIygEYWjQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40c5cf93e09so3595315e9.0
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 01:37:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702546624; x=1703151424;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=f1H0kKT3jccLGmQFqwXGxIScaEIaGvkzHt/VCZv3TM0=;
-        b=Kc6nsQFLH0MmoIBMH9ZZuxKAdNE6liFuZv8KT+3iGi002G2SF/8KwnZfZj3H8CuZGA
-         pagKpJefUT0RkLEokeCTTnXUN8X7HUJMNhwdMF+rBq0PC7cJxSsPxfoRwNokrJcdrapg
-         clsB4tbwdupeLNLzbWF+vaxicUIzia0nS83a7XbyBEdi2AHYoAFvm5ACmH5/EE9D6pEq
-         MsVHmYJqgP1XdlIP08T5ZajLcHsoMYYVwUIBZbZO2xgzLBlmAPSrJlvvSgP4aepaA9Bf
-         9bIq5pNsVC20WKMet8wToUs//JMAmUjIpFHdsArBRboHQKfKTNhHRB7U9GdTSOO6PtI5
-         BP7g==
-X-Gm-Message-State: AOJu0YywMPpe3Us59G/zGr7q+t0rOJ7lbZ6jObWv6orfogn9Hws1iC8Z
-	yWxpAmDl7ldgWP3V1sREOqOlxzjhybtwit/cEzFV7zNZHaL/juFAm4K3EKxR7W/M2YU+mobDBUB
-	LFrF35zzmipfCE7cP
-X-Received: by 2002:a5d:4991:0:b0:336:433e:2d38 with SMTP id r17-20020a5d4991000000b00336433e2d38mr1460228wrq.0.1702546623938;
-        Thu, 14 Dec 2023 01:37:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHzyUbq7Bs08VK6v9WSJtUEjarcwjd/7U9eu/zKNhixM3p+8B3mMJuIb308x6YGN29q0w+MlQ==
-X-Received: by 2002:a5d:4991:0:b0:336:433e:2d38 with SMTP id r17-20020a5d4991000000b00336433e2d38mr1460212wrq.0.1702546623588;
-        Thu, 14 Dec 2023 01:37:03 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-252-36.dyn.eolo.it. [146.241.252.36])
-        by smtp.gmail.com with ESMTPSA id c4-20020adffb44000000b003362d0eefd3sm6117475wrs.20.2023.12.14.01.37.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 01:37:03 -0800 (PST)
-Message-ID: <ebf480701cd22da00c89c5b1b00d31be95ff8e4d.camel@redhat.com>
-Subject: Re: [PATCH] net: sysctl: fix edge case wrt. sysctl write access
-From: Paolo Abeni <pabeni@redhat.com>
-To: Maciej =?UTF-8?Q?=C5=BBenczykowski?= <maze@google.com>, Maciej
-	=?UTF-8?Q?=C5=BBenczykowski?=
-	 <zenczykowski@gmail.com>
-Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>,  "David
- S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Flavio Crisciani <fcrisciani@google.com>,
- "Theodore Y. Ts'o" <tytso@google.com>, "Eric W. Biederman"
- <ebiederm@xmission.com>, Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Date: Thu, 14 Dec 2023 10:37:01 +0100
-In-Reply-To: <20231210111033.1823491-1-maze@google.com>
-References: <20231210111033.1823491-1-maze@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 830D6E0;
+	Thu, 14 Dec 2023 01:48:48 -0800 (PST)
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BE4Qpbg001177;
+	Thu, 14 Dec 2023 09:48:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=qcppdkim1; bh=5gAIgXH
+	XeRin2mY+3nShzO93vkScwEPkafSycd779B0=; b=GhDRMXiOI2oQt1NUXTi/fVK
+	zYR8P+l3guWUMrjWhvf05gfaNQMqucmb167oXUWLx2W+3LlAjPWftDnS7c1SDjAa
+	fLRl9/fH3dmLfI8bNlmQWSvKN+zE680aj2soYCOBbyRnx6iBtfjedXYx3UradpeZ
+	D50PtrRq2DMlNjHf134ZZaC3tzyVOV/U3jH/QYsjmvkDdoUdSOTmvqbSinyMKrJh
+	7TNEM7JjcUeMnP4kKLdtStdP8k8D9HMkbI9zz3HZeRXrzsOBNcLF2ej+GKKXxsJD
+	qkhrbolMlHSmYGik3KO/TPqPqhDzY27mfxRLvgsL4SJ3q0rt6EslndSdATHHzmw=
+	=
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uynja94p0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Dec 2023 09:48:28 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BE9mRlT000717
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Dec 2023 09:48:27 GMT
+Received: from akronite-sh-dev02.qualcomm.com (10.80.80.8) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Thu, 14 Dec 2023 01:48:22 -0800
+From: Luo Jie <quic_luoj@quicinc.com>
+To: <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <corbet@lwn.net>,
+        <p.zabel@pengutronix.de>, <f.fainelli@gmail.com>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
+Subject: [PATCH v7 00/14] add qca8084 ethernet phy driver
+Date: Thu, 14 Dec 2023 17:47:59 +0800
+Message-ID: <20231214094813.24690-1-quic_luoj@quicinc.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: XHYkJ8TAGLrIFIgXHOeOiDABrmoi6RgO
+X-Proofpoint-ORIG-GUID: XHYkJ8TAGLrIFIgXHOeOiDABrmoi6RgO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
+ impostorscore=0 spamscore=0 priorityscore=1501 mlxlogscore=905 mlxscore=0
+ clxscore=1011 lowpriorityscore=0 bulkscore=0 suspectscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2311290000
+ definitions=main-2312140065
 
-On Sun, 2023-12-10 at 03:10 -0800, Maciej =C5=BBenczykowski wrote:
-> The clear intent of net_ctl_permissions() is that having CAP_NET_ADMIN
-> grants write access to networking sysctls.
->=20
-> However, it turns out there is an edge case where this is insufficient:
-> inode_permission() has an additional check on HAS_UNMAPPED_ID(inode)
-> which can return -EACCES and thus block *all* write access.
->=20
-> Note: AFAICT this check is wrt. the uid/gid mapping that was
-> active at the time the filesystem (ie. proc) was mounted.
->=20
-> In order for this check to not fail, we need net_ctl_set_ownership()
-> to set valid uid/gid.  It is not immediately clear what value
-> to use, nor what values are guaranteed to work.
-> It does make sense that /proc/sys/net appear to be owned by root
-> from within the netns owning userns.  As such we only modify
-> what happens if the code fails to map uid/gid 0.
-> Currently the code just fails to do anything, which in practice
-> results in using the zeroes of freshly allocated memory,
-> and we thus end up with global root.
-> With this change we instead use the uid/gid of the owning userns.
-> While it is probably (?) theoretically possible for this to *also*
-> be unmapped from the /proc filesystem's point of view, this seems
-> much less likely to happen in practice.
->=20
-> The old code is observed to fail in a relatively complex setup,
-> within a global root created user namespace with selectively
-> mapped uid/gids (not including global root) and /proc mounted
-> afterwards (so this /proc mount does not have global root mapped).
-> Within this user namespace another non privileged task creates
-> a new user namespace, maps it's own uid/gid (but not uid/gid 0),
-> and then creates a network namespace.  It cannot write to networking
-> sysctls even though it does have CAP_NET_ADMIN.
+QCA8084 is four-port PHY with maximum link capability 2.5G,
+which supports the interface mode qusgmii and sgmii mode,
+there are two PCSs available to connected with ethernet port.
 
-I'm wondering if this specific scenario should be considered a setup=20
-issue, and should be solved with a different configuration? I would
-love to hear others opinions!
+QCA8084 can work in switch mode or PHY mode.
+For switch mode, both PCS0 and PCS1 work on sgmii mode.
+For PHY mode, PCS1 works on qusgmii mode.
+The fourth PHY connected with PCS0 works on sgmii mode.
 
-> This is because net_ctl_set_ownership fails to map uid/gid 0
-> (because uid/gid 0 are *not* mapped in the owning 2nd level user_ns),
-> and falls back to global root.
-> But global root is not mapped in the 1st level user_ns,
-> which was inherited by the /proc mount, and thus fails...
->=20
-> Note: the uid/gid of networking sysctls is of purely superficial
-> importance, outside of this UNMAPPED check, it does not actually
-> affect access, and only affects display.
->=20
-> Access is always based on whether you are *global* root uid
-> (or have CAP_NET_ADMIN over the netns) for user write access bits
-> (or are in *global* root gid for group write access bits).
->=20
-> Cc: Flavio Crisciani <fcrisciani@google.com>
-> Cc: "Theodore Y. Ts'o" <tytso@google.com>
-> Cc: "Eric W. Biederman" <ebiederm@xmission.com>
-> Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-> Fixes: e79c6a4fc923 ("net: make net namespace sysctls belong to container=
-'s owner")
-> Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
-> ---
->  net/sysctl_net.c | 13 ++++---------
->  1 file changed, 4 insertions(+), 9 deletions(-)
->=20
-> diff --git a/net/sysctl_net.c b/net/sysctl_net.c
-> index 051ed5f6fc93..ded399f380d9 100644
-> --- a/net/sysctl_net.c
-> +++ b/net/sysctl_net.c
-> @@ -58,16 +58,11 @@ static void net_ctl_set_ownership(struct ctl_table_he=
-ader *head,
->  				  kuid_t *uid, kgid_t *gid)
->  {
->  	struct net *net =3D container_of(head->set, struct net, sysctls);
-> -	kuid_t ns_root_uid;
-> -	kgid_t ns_root_gid;
-> +	kuid_t ns_root_uid =3D make_kuid(net->user_ns, 0);
-> +	kgid_t ns_root_gid =3D make_kgid(net->user_ns, 0);
-> =20
-> -	ns_root_uid =3D make_kuid(net->user_ns, 0);
+Besides this PHY driver patches, the PCS driver is also needed
+to bring up the qca8084 device, which mainly configurs PCS
+and clocks.
 
-As a fix I would prefer you would keep it minimal. e.g. just replace
-the if with the ternary operator or just add an 'else' branch.
+The qca8084 PHY driver depends on the following clock controller
+patchset, the initial clocks and resets are provided by the clock
+controller driver below.
+https://lore.kernel.org/lkml/20231104034858.9159-2-quic_luoj@quicinc.com/T/
 
-Cheers,
+Changes in v3:
+	* pick the two patches to introduce the interface mode
+	  10g-qxgmii from Vladimir Oltean(olteanv@gmail.com).
+	* add the function phydev_id_is_qca808x to identify the
+	  PHY qca8081 and qca8084.
+	* update the interface mode name PHY_INTERFACE_MODE_QUSGMII
+	  to PHY_INTERFACE_MODE_10G_QXGMII.
 
-Paolo
+Changes in v4:
+	* remove the following patch:
+	  <net: phylink: move phylink_pcs_neg_mode() to phylink.c>.
+	* split out 10g_qxgmii change of ethernet-controller.yaml.
+
+Changes in v5:
+	* update the author of the patch below.
+	  <introduce core support for phy-mode = "10g-qxgmii">.
+
+Changes in v6:
+	* drop the "inline" keyword.
+	* apply the patches with "--max-line-length=80".
+
+Changes in v7:
+	* add possible interfaces of phydev
+	* customize phy address
+	* add initialized clock & reset config
+	* add the work mode config
+	* update qca,ar803x.yaml for the new added properties
+
+Luo Jie (12):
+  net: phy: at803x: add QCA8084 ethernet phy support
+  net: phy: at803x: add the function phydev_id_is_qca808x
+  net: phy: at803x: Add qca8084_config_init function
+  net: phy: at803x: add qca8084_link_change_notify
+  net: phy: at803x: add the possible_interfaces
+  net: phy: at803x: add qca8084 switch registe access
+  net: phy: at803x: set MDIO address of qca8084 PHY
+  net: phy: at803x: parse qca8084 clocks and resets
+  net: phy: at803x: add qca808x initial config sequence
+  net: phy: at803x: configure qca8084 common clocks
+  net: phy: at803x: configure qca8084 work mode
+  dt-bindings: net: ar803x: add qca8084 PHY propetry
+
+Vladimir Oltean (2):
+  net: phy: introduce core support for phy-mode = "10g-qxgmii"
+  dt-bindings: net: ethernet-controller: add 10g-qxgmii mode
+
+ .../bindings/net/ethernet-controller.yaml     |   1 +
+ .../devicetree/bindings/net/qca,ar803x.yaml   | 158 ++++-
+ Documentation/networking/phy.rst              |   6 +
+ drivers/net/phy/at803x.c                      | 586 +++++++++++++++++-
+ drivers/net/phy/phy-core.c                    |   1 +
+ drivers/net/phy/phylink.c                     |  11 +-
+ include/linux/phy.h                           |   4 +
+ include/linux/phylink.h                       |   2 +
+ 8 files changed, 758 insertions(+), 11 deletions(-)
+
+
+base-commit: 48e8992e33abf054bcc0bb2e77b2d43bb899212e
+-- 
+2.42.0
 
 
