@@ -1,176 +1,92 @@
-Return-Path: <netdev+bounces-57144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C848812411
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 01:46:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9067281240E
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 01:45:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0287D1F21A5E
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 00:46:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B25B91C21489
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 00:45:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 242C939C;
-	Thu, 14 Dec 2023 00:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E1180D;
+	Thu, 14 Dec 2023 00:45:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m0wABbGf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OjUWqod/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5514DD;
-	Wed, 13 Dec 2023 16:45:42 -0800 (PST)
-Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-336471815c4so89450f8f.1;
-        Wed, 13 Dec 2023 16:45:42 -0800 (PST)
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90648A3
+	for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 16:45:41 -0800 (PST)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-a1c7d8f89a5so1000722766b.2
+        for <netdev@vger.kernel.org>; Wed, 13 Dec 2023 16:45:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702514741; x=1703119541; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HOR5ojDqgOZh8TgFAYUGsLmhZvWja5pYQDWlBF86PYQ=;
-        b=m0wABbGfB7NF7pB2ZGMnu5G7+8FPshKQJwZEWEFhfjJL85q7RBD3EeklsvqAQFGHTP
-         J7vA/y9hgObZE1Pr151r5BvwX0aVfU2SweQNGHX14us7SOsRB4GIUjU/do5Rx3K1jQs4
-         kLoeHa1V2dpzFQpuVfuKurtk7TfXXFJmImkro9QLO2KknsL8fJ+JjwrJ+IgDm5WBFR5F
-         NxPZLs+n3tEezvsKflSWjYqDFrCpxF1S1Qwq424vivwfm0I+D+Ad0+3jEJc+QF6GSyhS
-         hkkqZVbf2G3CH5jy0huNHHKBzcQ537CY4Dm5oJMZJWUEjqI4W/SQEbENiRdA+qpoq8Eg
-         g3eg==
+        d=gmail.com; s=20230601; t=1702514740; x=1703119540; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HsCpSdJ+cezQKITwB2sRH/SoiYOVwlKBRMvbzUnjpZc=;
+        b=OjUWqod/+4ex60ObIykSoq4anSmBgDd7ntDDjhWPg/obpus8dF8uyi+M8RIB/AOZ8a
+         Szm0qQFmzYe1C0kK1Q74BYT8+S2E3tgIzUF4TUM9928HlfO057KKl9GKi2pjE7y6dn4Z
+         gFaJ+q5dA0bFMAI47F6RAbSPN1uBMc9gA7WNNZbXJQguIsTYjxpDujZkSQc9LJgKDwm5
+         tiTkdNJHr+m/828UiTvOBfAJx7LCeDwCbxBHgLBg5fLLlvuR8wYnNaeOBn6YXozsDC3a
+         NNgzL2RdFwPhvUKEtNf8fKf+nWBHprL/hiWKMNJeYBqlfhSIPFTK6CPZebDlgSHPe9hy
+         D+0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702514741; x=1703119541;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HOR5ojDqgOZh8TgFAYUGsLmhZvWja5pYQDWlBF86PYQ=;
-        b=TDh5qDS7MeoaVDGn5SJTQJJvyiFbGPLbepsI2HuHiK3CLri6PQ0HY2B3jloysGWwUN
-         bb+q/FwN3ExsHkuxhZ0rBK66cAy/3biau16XrbKWZl+HQml/+c9jp92mFnVBWNzOFVmr
-         pVbU7H/tmSM7svJaV6MvcyEdanTmVuzJCjnAFaL4YSiIr3eAclj+q5pr3cLCoeZ7ZuVB
-         TL3CaXgiqwSJ7TThDadUtyriADgSXpxUhy+PAXAf3daeiPqoo/gvYVi3RYeWUAE0TTkC
-         Z3prHXiZozTt/IGri54/J4Js7crGAIQw5Mgh+tMRTQATqBaeAzH0STv0FTPxheNJ4tnF
-         wTYg==
-X-Gm-Message-State: AOJu0Yxc37fDNLqEE9xibndVpQ0CSIfJXE/GwGRhT0jnTzp1AoxGwAS2
-	ZfQrf92BtD/mNFcQRNxY6ZU=
-X-Google-Smtp-Source: AGHT+IFCXWjWwJ3vBywzuLDdrdaXytVJz4dNq5U4zGfR6T5loW3mh13IJAKkcoWZ2dCZ7WXXUx8YZA==
-X-Received: by 2002:a5d:4342:0:b0:333:591c:6507 with SMTP id u2-20020a5d4342000000b00333591c6507mr2365594wrr.248.1702514741066;
-        Wed, 13 Dec 2023 16:45:41 -0800 (PST)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id g15-20020adfe40f000000b003364470f30bsm959013wrm.52.2023.12.13.16.45.40
+        d=1e100.net; s=20230601; t=1702514740; x=1703119540;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HsCpSdJ+cezQKITwB2sRH/SoiYOVwlKBRMvbzUnjpZc=;
+        b=upDXSTf12TrTy6LrbTRo6Ecv01dvGN3UsHHvrwvCVqSMbtJpm7n0PmAbYjgsrLZuxm
+         /dcrQCJj7sTtlyp9srb/3TPz8SROYjm1cZMzoGNzovB/F03YdI/9IcK6Mo3NYibhkPN5
+         UBtnEAdW+D3C1nmXMdUB/0Mq8E5KYY8rurxqzKKfD5inPvTChmM6oeOE5pp1cTslXack
+         +6AFIGLMqjpb+ZTsekOz6D4tJdSEHyA0Ivh/7fZIjG5M0BrG8Wt0mzRe38Ufb0Tt0kvk
+         vmYvnJAQSv/XBZB1CvIRuBq2tpMvEsdAPM6Ux1eJsXJ1JmcKV2CVcEhJMQtli42Z+Ip/
+         fvRg==
+X-Gm-Message-State: AOJu0Yz1Y9F4spx7A27DCmh/Cnd2aiG13BUI4Y4rEgzbfprUF0YO8yxS
+	UeA4EMn7t/nTcgzdwg9WVz0=
+X-Google-Smtp-Source: AGHT+IHvrD7uXi/2BT8jhjvHBPyoHMCKtNXoveaF0F2Aw/2hQ0XlPTc8WcQeeojFuf80dMclCPXpfA==
+X-Received: by 2002:a17:907:7f10:b0:a04:e6f8:3d6c with SMTP id qf16-20020a1709077f1000b00a04e6f83d6cmr6043111ejc.48.1702514739593;
+        Wed, 13 Dec 2023 16:45:39 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id z9-20020a170906d00900b009c5c5c2c5a4sm8567676ejy.219.2023.12.13.16.45.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 16:45:40 -0800 (PST)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Christian Marangi <ansuelsmth@gmail.com>
-Subject: [net-next PATCH 2/2] net: phy: at803x: make read specific status function more generic
-Date: Thu, 14 Dec 2023 01:44:32 +0100
-Message-Id: <20231214004432.16702-3-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231214004432.16702-1-ansuelsmth@gmail.com>
-References: <20231214004432.16702-1-ansuelsmth@gmail.com>
+        Wed, 13 Dec 2023 16:45:39 -0800 (PST)
+Date: Thu, 14 Dec 2023 02:45:37 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Tobias Waldekranz <tobias@waldekranz.com>
+Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
+	f.fainelli@gmail.com, netdev@vger.kernel.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH v3 net-next 2/8] net: dsa: mv88e6xxx: Create API to read
+ a single stat counter
+Message-ID: <20231214004537.wx7wexdug7syekgz@skbuf>
+References: <20231211223346.2497157-1-tobias@waldekranz.com>
+ <20231211223346.2497157-3-tobias@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231211223346.2497157-3-tobias@waldekranz.com>
 
-Rework read specific status function to be more generic. The function
-apply different speed mask based on the PHY ID. Make it more generic by
-adding an additional arg to pass the specific speed (ss) mask and use
-the provided mask to parse the speed value.
+On Mon, Dec 11, 2023 at 11:33:40PM +0100, Tobias Waldekranz wrote:
+> This change contains no functional change. We simply push the hardware
+> specific stats logic to a function reading a single counter, rather
+> than the whole set.
+> 
+> This is a preparatory change for the upcoming standard ethtool
+> statistics support (i.e. "eth-mac", "eth-ctrl" etc.).
+> 
+> Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
+> ---
 
-This is needed to permit an easier deatch of qca808x code from the
-at803x driver.
+You left this function prototype as returning int rather than size_t.
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- drivers/net/phy/at803x.c | 26 ++++++++++++++++++--------
- 1 file changed, 18 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
-index 03f945cc7626..a7d28848ee93 100644
---- a/drivers/net/phy/at803x.c
-+++ b/drivers/net/phy/at803x.c
-@@ -301,6 +301,11 @@ static struct at803x_hw_stat qca83xx_hw_stats[] = {
- 	{ "eee_wake_errors", 0x16, GENMASK(15, 0), MMD},
- };
- 
-+struct at803x_ss_mask {
-+	u16 speed_mask;
-+	u8 speed_shift;
-+};
-+
- struct at803x_priv {
- 	int flags;
- 	u16 clk_25m_reg;
-@@ -921,7 +926,8 @@ static void at803x_link_change_notify(struct phy_device *phydev)
- 	}
- }
- 
--static int at803x_read_specific_status(struct phy_device *phydev)
-+static int at803x_read_specific_status(struct phy_device *phydev,
-+				       struct at803x_ss_mask ss_mask)
- {
- 	int ss;
- 
-@@ -940,11 +946,8 @@ static int at803x_read_specific_status(struct phy_device *phydev)
- 		if (sfc < 0)
- 			return sfc;
- 
--		/* qca8081 takes the different bits for speed value from at803x */
--		if (phydev->drv->phy_id == QCA8081_PHY_ID)
--			speed = FIELD_GET(QCA808X_SS_SPEED_MASK, ss);
--		else
--			speed = FIELD_GET(AT803X_SS_SPEED_MASK, ss);
-+		speed = ss & ss_mask.speed_mask;
-+		speed >>= ss_mask.speed_shift;
- 
- 		switch (speed) {
- 		case AT803X_SS_SPEED_10:
-@@ -989,6 +992,7 @@ static int at803x_read_specific_status(struct phy_device *phydev)
- static int at803x_read_status(struct phy_device *phydev)
- {
- 	struct at803x_priv *priv = phydev->priv;
-+	struct at803x_ss_mask ss_mask = { 0 };
- 	int err, old_link = phydev->link;
- 
- 	if (priv->is_1000basex)
-@@ -1012,7 +1016,9 @@ static int at803x_read_status(struct phy_device *phydev)
- 	if (err < 0)
- 		return err;
- 
--	err = at803x_read_specific_status(phydev);
-+	ss_mask.speed_mask = AT803X_SS_SPEED_MASK;
-+	ss_mask.speed_shift = __bf_shf(AT803X_SS_SPEED_MASK);
-+	err = at803x_read_specific_status(phydev, ss_mask);
- 	if (err < 0)
- 		return err;
- 
-@@ -1869,6 +1875,7 @@ static int qca808x_config_init(struct phy_device *phydev)
- 
- static int qca808x_read_status(struct phy_device *phydev)
- {
-+	struct at803x_ss_mask ss_mask = { 0 };
- 	int ret;
- 
- 	ret = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_AN_10GBT_STAT);
-@@ -1882,7 +1889,10 @@ static int qca808x_read_status(struct phy_device *phydev)
- 	if (ret)
- 		return ret;
- 
--	ret = at803x_read_specific_status(phydev);
-+	/* qca8081 takes the different bits for speed value from at803x */
-+	ss_mask.speed_mask = QCA808X_SS_SPEED_MASK;
-+	ss_mask.speed_shift = __bf_shf(QCA808X_SS_SPEED_MASK);
-+	ret = at803x_read_specific_status(phydev, ss_mask);
- 	if (ret < 0)
- 		return ret;
- 
--- 
-2.40.1
-
+static int mv88e6xxx_stats_get_stats(struct mv88e6xxx_chip *chip, int port,
+				     uint64_t *data)
 
