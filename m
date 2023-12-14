@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-57331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C49A7812E47
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:13:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97C28812E48
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:13:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C49281C215AF
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:13:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C803C1C21494
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 11:13:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07CBA3FE5A;
-	Thu, 14 Dec 2023 11:12:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F2E3F8F9;
+	Thu, 14 Dec 2023 11:12:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H5v3xfU3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ScxSLKsR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4AB28E
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 03:12:42 -0800 (PST)
-Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-3333a3a599fso269420f8f.0
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 03:12:42 -0800 (PST)
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30997B7
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 03:12:44 -0800 (PST)
+Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-40c2308faedso82091855e9.1
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 03:12:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702552361; x=1703157161; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1702552362; x=1703157162; darn=vger.kernel.org;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rMV8u/r154wiParO3LDm2hiATatvloB0iOB9pv6UZXk=;
-        b=H5v3xfU3+xKNiCWja3Fze+dtVm1xIknb/cN0mzBS8yiRsHLj7ggYuSMwjQGMkRs3YR
-         c4JZS/DyFAbBf0kirKYqfP59mOb4iqEST8fjOOVjDqLy7aNEEHr9ehrcCVbKMmJYw5cw
-         kEIvbxjlisF1B4BzMGKqQrGd0T0BJZ4ujK/P+kYdIRcVSwd3Y+4669r7R0dmCd6zwkTe
-         vSbgUDPmss1YIZXYbL8xhpRMaEBKsna08X3NlX8/8Fy8Q5l6iCHvbo4HX33yR7oBs5kg
-         Qhp+Ty7Wkr5la2VG2qur+7x/M+mSEqIVTN5UCVamyiOZMxm4Y8pYNZjtG/UPB1xjiJPM
-         9VvQ==
+        bh=WY6V/EuYOgr05Aa2pH43QYAE0TQDIKxakfFLhSs3zSQ=;
+        b=ScxSLKsRgjY4ibxgsXiA23MtSPWAPp2I5aTIjovr8+S3mHfIcCuMy+g3XsV0arZAjg
+         c8g8A+D45rczvTMYb5g7f+ylSnfBIdm0jaoV47y7KLAzjnnxRUakDY0CzBUKHywiOhcM
+         JqsaaoCqnRgowwLslqxZeT/P7NYp02mM4vtSpYxZKtawebihRoo/RkgansMSUJYUirAc
+         Ju8bhA1EHWQGvquk7B2h3ujwf26xfIuti7nCtGyTG5VIy+zlv7EgThXVdhn5bCG/oc9M
+         aqqKQahRzJ8mkWshQiV7AVGL2Ii/cAL0jUsPlgTriJlOyuD6aLMywBJQ2/QSMxXptXAz
+         ZjKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702552361; x=1703157161;
+        d=1e100.net; s=20230601; t=1702552362; x=1703157162;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rMV8u/r154wiParO3LDm2hiATatvloB0iOB9pv6UZXk=;
-        b=Il3F9cizir3ofMhWzDpbr/VvFaAh6goHn2FRQeQfzfwbvXwR6h71T/Qhlx5KHuV7vr
-         tIgPdMnvD+PIv9UZFfThk19djYHnDP03UWyd3yTRKynpKmgWBVKy4ZdjGVAuwPIZPHH9
-         EDtNGUCJEFFg6MmdCS8AhZ2PEyTEtrOx5AtzcIDHzN0YlgZxbDHc2lqBWnLzz+0CZx2C
-         FjIWdTzDIbJS/VR5C6eM29x36iU2MK9sYiApCqMt+4rSf4cpVYyavTrKxtA8i+CzBXql
-         qNVvXQGKWuA8gGie9OwZL5MEohYFXvXb/EgFx9Cji2wzNzTVb69IKrsisvVwh5crgefJ
-         Fpqg==
-X-Gm-Message-State: AOJu0YyjFg7GpEYOwbqNohkIru3yuzpSTLmIuPk+Iwf3x2j1Yn17kFBv
-	UV/IZoJ2y/ZKCNAOFa0tQe4=
-X-Google-Smtp-Source: AGHT+IFX14QJVureQZqjMM85VQ8cpgAUskldP/7KbDUUjxshDawdEUrwk4UCPZWfjvetiWHR27cPMQ==
-X-Received: by 2002:adf:fe01:0:b0:333:4169:2ada with SMTP id n1-20020adffe01000000b0033341692adamr5127198wrr.44.1702552361095;
-        Thu, 14 Dec 2023 03:12:41 -0800 (PST)
+        bh=WY6V/EuYOgr05Aa2pH43QYAE0TQDIKxakfFLhSs3zSQ=;
+        b=LXTVs1E0ouFJxY9la3pQgaf9sKebXhXoOf8UTsglc73KB20J0V0ubVeOGWNCDPsB2b
+         sxWwKsa/IYAdKkK0OSOjrhs7itNZQXmXTciODC+1SiE9uZuRoMprCt1vb1qq5V6VbQSp
+         wj/x7ZPBcm7kd4suY7jowKgAnLS7XxfNqYFdcyPt6JdCcEFC1TRgJWOW05vwMX7uhsG9
+         eDCH1cIpImjWelLp/oCuNhQ0N5F4s9klTufwirlHsz8GenWox41V6KUc3zt4BuNNB7ZO
+         ec3Dj19mo7ENxShyqc+0KhdtU3P95cCtzhbofUKbq4c4yJP4VK5lbHcYAzYXhJJJtLHM
+         +Ltg==
+X-Gm-Message-State: AOJu0Yxv0vV1N8nkmpmZFDjB4E+0vsLecjLrrebhfvCNooEnHwq/onYJ
+	rNtrvoTH+hWTzM9Puh3KDCPH5CYhIH1kug==
+X-Google-Smtp-Source: AGHT+IGk4uUR4mYDDEa6wBGX9mitupl8WNjEcqlxmRfM6ghr/zWN13rkTZjK9m1XMzjBUXO+Y1e1dw==
+X-Received: by 2002:a7b:c4ca:0:b0:40c:386b:9356 with SMTP id g10-20020a7bc4ca000000b0040c386b9356mr4621186wmk.72.1702552362592;
+        Thu, 14 Dec 2023 03:12:42 -0800 (PST)
 Received: from imac ([2a02:8010:60a0:0:7840:ddbd:bbf:1e8f])
-        by smtp.gmail.com with ESMTPSA id d9-20020adfef89000000b0033342978c93sm15742896wro.30.2023.12.14.03.12.40
+        by smtp.gmail.com with ESMTPSA id n19-20020a05600c3b9300b0040b4b66110csm24345566wms.22.2023.12.14.03.12.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 03:12:40 -0800 (PST)
+        Thu, 14 Dec 2023 03:12:42 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
   pabeni@redhat.com,  nicolas.dichtel@6wind.com,  jiri@resnulli.us
-Subject: Re: [PATCH net-next 4/8] tools: ynl-gen: fill in implementations
- for TypeUnused
-In-Reply-To: <20231213231432.2944749-5-kuba@kernel.org> (Jakub Kicinski's
-	message of "Wed, 13 Dec 2023 15:14:28 -0800")
-Date: Thu, 14 Dec 2023 10:58:48 +0000
-Message-ID: <m234w559uf.fsf@gmail.com>
+Subject: Re: [PATCH net-next 5/8] tools: ynl-gen: record information about
+ recursive nests
+In-Reply-To: <20231213231432.2944749-6-kuba@kernel.org> (Jakub Kicinski's
+	message of "Wed, 13 Dec 2023 15:14:29 -0800")
+Date: Thu, 14 Dec 2023 11:02:16 +0000
+Message-ID: <m2y1dx3v47.fsf@gmail.com>
 References: <20231213231432.2944749-1-kuba@kernel.org>
-	<20231213231432.2944749-5-kuba@kernel.org>
+	<20231213231432.2944749-6-kuba@kernel.org>
 User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -75,9 +75,11 @@ Content-Type: text/plain
 
 Jakub Kicinski <kuba@kernel.org> writes:
 
-> Fill in more empty handlers for TypeUnused. When 'unused'
-> attr gets specified in a nested set we have to cleanly
-> skip it during code generation.
+> Track which nests are recursive. Non-recursive nesting gets
+> rendered in C as directly nested structs. For recursive
+> ones we need to put a pointer in, rather than full struct.
+>
+> Track this information, no change to generated code, yet.
 >
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
