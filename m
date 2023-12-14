@@ -1,232 +1,119 @@
-Return-Path: <netdev+bounces-57392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC4D8813000
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:27:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3A1A81301A
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:29:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3EB431F221DD
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:27:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 875701F221FD
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:29:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73674879B;
-	Thu, 14 Dec 2023 12:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81894AF7D;
+	Thu, 14 Dec 2023 12:29:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bRp0f9R2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PtNUZRyz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3964F123;
-	Thu, 14 Dec 2023 04:27:08 -0800 (PST)
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C984116;
+	Thu, 14 Dec 2023 04:29:10 -0800 (PST)
+Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2ca0c36f5beso105467981fa.1;
+        Thu, 14 Dec 2023 04:29:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1702556829; x=1734092829;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=WBZnqQidIdU+FmCjEo33kMaf6+8W5Ekd+I/lPMZWmqc=;
-  b=bRp0f9R2xTDpgBN85gY5QWPD9KFATrFRY8zKmm0HEeUxzmMkw1CLsHXA
-   sovUmNUYFjSs40g1jMgZqhTZa1Nce/pfq8r3d5AnaymZlRvqAAjQ4fKau
-   sewnGbca6XnRbYp+YMwe/a2zvIdRDZfINcH32QfbM6YFu0cVWT8btRWB1
-   M=;
-X-IronPort-AV: E=Sophos;i="6.04,275,1695686400"; 
-   d="scan'208";a="259705551"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-47cc8a4c.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 12:27:05 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
-	by email-inbound-relay-iad-1a-m6i4x-47cc8a4c.us-east-1.amazon.com (Postfix) with ESMTPS id 60A55161FC7;
-	Thu, 14 Dec 2023 12:27:01 +0000 (UTC)
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:41161]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.18.147:2525] with esmtp (Farcaster)
- id 5c963059-1839-4f7a-9376-02ee4d0c0e69; Thu, 14 Dec 2023 12:27:00 +0000 (UTC)
-X-Farcaster-Flow-ID: 5c963059-1839-4f7a-9376-02ee4d0c0e69
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 14 Dec 2023 12:26:59 +0000
-Received: from 88665a182662.ant.amazon.com (10.143.92.5) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
- Thu, 14 Dec 2023 12:26:54 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuniyu@amazon.com>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-	<daniel@iogearbox.net>, <dxu@dxuuu.xyz>, <edumazet@google.com>,
-	<kuni1840@gmail.com>, <martin.lau@linux.dev>, <netdev@vger.kernel.org>,
-	<yonghong.song@linux.dev>
-Subject: Re: [PATCH v5 bpf-next 6/6] selftest: bpf: Test bpf_sk_assign_tcp_reqsk().
-Date: Thu, 14 Dec 2023 21:26:39 +0900
-Message-ID: <20231214122639.47782-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20231214074955.10720-1-kuniyu@amazon.com>
-References: <20231214074955.10720-1-kuniyu@amazon.com>
+        d=gmail.com; s=20230601; t=1702556948; x=1703161748; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hKkOlqtXnQi1CXioJeNrKbuA1zxevHtK9i/pmWXuhPs=;
+        b=PtNUZRyzxvOmLBaakV61+fMGgP483Uod+LvSsurLxiUd8Qj78BlRcuhGw0lxhTyq8/
+         L0+r6mQcuhFmW00OmQXO+y7Uk9doVvmGqbfQowRFaUIbx0HvS8G0R1z7uA6idgMZn1l0
+         VrInPGM0Bj3kuAMLwGLf4GTi8v3ZqfXgiB0iLqRpHV83ISEdDnUl2OOwVbCiqV1V8xKi
+         Lisanbp15YxIcXA/PO532c5J5NtokuTVS4jWjMO+KjPMIDWELW7rtLS/+xxBBQTp30cQ
+         tLeDG5Y59193YtD0WcuXArGWCr068RJWac6J5WHCWi98TR/DPZYZDcV+oazdSgTbESxj
+         w3oA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702556948; x=1703161748;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hKkOlqtXnQi1CXioJeNrKbuA1zxevHtK9i/pmWXuhPs=;
+        b=TFKRfE7u21pWbKpIAy0DlHL9Z7FwFSpggDyqWucP1grr9a9ipi5OyyKmvCBj/K7m+c
+         MaVHoZ9XCigTQdKGmeorzHeFAesfa/dRhGa8SgcOgQPfXO+aHWKgtFB8gxsM1S4wD3Li
+         LAKQUwPiq0vZvzFnOAQSi6oxljMDk8W0lkSBxbUNYkRQ8KoO9ugOjUyN/yxuMTXHF6hX
+         rmHQgM3/2zPgmm6WWffueEk5AfOp6ufVvrxEwt1PCaYT9/21ypygBonc3OxuXtahDp8O
+         HBvq/e3FvrRw3hLe868sWdAFG8jOrcK1BTuAQJppvdtckXAvU7AYNrjPrnE8puax1kk0
+         hzEg==
+X-Gm-Message-State: AOJu0YxxAJ94kAfv0HVz1tmLK870/Q94xK+J/sK/HgKRyeoAaf4YF+XV
+	vJvbu9nQ8QK0lYQ75P6y8OI=
+X-Google-Smtp-Source: AGHT+IHT6Syfor5yq9T7eo4jSSMy2o+vRuqPr7cfTtYXt59vOt5802fiJ9vq9yDDRmVoosxtqQtXEg==
+X-Received: by 2002:a05:651c:2221:b0:2cc:2012:7509 with SMTP id y33-20020a05651c222100b002cc20127509mr3762737ljq.98.1702556948246;
+        Thu, 14 Dec 2023 04:29:08 -0800 (PST)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id j1-20020a2e8241000000b002c9f70a0419sm2040940ljh.140.2023.12.14.04.29.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Dec 2023 04:29:03 -0800 (PST)
+Date: Thu, 14 Dec 2023 15:28:57 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Jose Abreu <Jose.Abreu@synopsys.com>, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, Tomer Maimon <tmaimon77@gmail.com>, 
+	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+	Conor Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, openbmc@lists.ozlabs.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 10/16] net: pcs: xpcs: Add generic DW XPCS
+ MDIO-device support
+Message-ID: <wz7h5lvxnhw2rav6s54dhv2xbxsks6tlpx3hvywjn3afmkf2av@tbiigyupuga7>
+References: <20231205103559.9605-1-fancer.lancer@gmail.com>
+ <20231205103559.9605-11-fancer.lancer@gmail.com>
+ <20231205111351.xjjuwpbf7kwg3vuh@skbuf>
+ <uivunnjv5vi3w3fkc5w2f4lem5bingrgajgjfsu2ih7fuhz6hd@3naeubr5spak>
+ <20231205122316.ihhpklv222f5giz3@skbuf>
+ <nflj4ajgx3byqhwna2eslldwulbbafmcwba4dwgxo65o5c7pmj@zbgqt2zje4ix>
+ <20231208163343.5s74bmirfna3o7yw@skbuf>
+ <xhj7jchcv63y2bmnedxqffnmh3fvdxirccdugnnljruemuiurz@ceafs7mivbqp>
+ <20231214120016.wgeip3mdro5ihnxe@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWB004.ant.amazon.com (10.13.139.170) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231214120016.wgeip3mdro5ihnxe@skbuf>
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date: Thu, 14 Dec 2023 16:49:55 +0900
-> From: Martin KaFai Lau <martin.lau@linux.dev>
-> Date: Wed, 13 Dec 2023 22:46:11 -0800
-> > On 12/13/23 7:18 PM, Kuniyuki Iwashima wrote:
-> > >>> +static int tcp_parse_option(__u32 index, struct tcp_syncookie *ctx)
-> > >>> +{
-> > >>> +	struct tcp_options_received *tcp_opt = &ctx->attr.tcp_opt;
-> > >>> +	char opcode, opsize;
-> > >>> +
-> > >>> +	if (ctx->ptr + 1 > ctx->data_end)
-> > >>> +		goto stop;
-> > >>> +
-> > >>> +	opcode = *ctx->ptr++;
-> > >>> +
-> > >>> +	if (opcode == TCPOPT_EOL)
-> > >>> +		goto stop;
-> > >>> +
-> > >>> +	if (opcode == TCPOPT_NOP)
-> > >>> +		goto next;
-> > >>> +
-> > >>> +	if (ctx->ptr + 1 > ctx->data_end)
-> > >>> +		goto stop;
-> > >>> +
-> > >>> +	opsize = *ctx->ptr++;
-> > >>> +
-> > >>> +	if (opsize < 2)
-> > >>> +		goto stop;
-> > >>> +
-> > >>> +	switch (opcode) {
-> > >>> +	case TCPOPT_MSS:
-> > >>> +		if (opsize == TCPOLEN_MSS && ctx->tcp->syn &&
-> > >>> +		    ctx->ptr + (TCPOLEN_MSS - 2) < ctx->data_end)
-> > >>> +			tcp_opt->mss_clamp = get_unaligned_be16(ctx->ptr);
-> > >>> +		break;
-> > >>> +	case TCPOPT_WINDOW:
-> > >>> +		if (opsize == TCPOLEN_WINDOW && ctx->tcp->syn &&
-> > >>> +		    ctx->ptr + (TCPOLEN_WINDOW - 2) < ctx->data_end) {
-> > >>> +			tcp_opt->wscale_ok = 1;
-> > >>> +			tcp_opt->snd_wscale = *ctx->ptr;
-> > >> When writing to a bitfield of "struct tcp_options_received" which is a kernel
-> > >> struct, it needs to use the CO-RE api. The BPF_CORE_WRITE_BITFIELD has not been
-> > >> landed yet:
-> > >> https://lore.kernel.org/bpf/4d3dd215a4fd57d980733886f9c11a45e1a9adf3.1702325874.git.dxu@dxuuu.xyz/
-> > >>
-> > >> The same for reading bitfield but BPF_CORE_READ_BITFIELD() has already been
-> > >> implemented in bpf_core_read.h
-> > >>
-> > >> Once the BPF_CORE_WRITE_BITFIELD is landed, this test needs to be changed to use
-> > >> the BPF_CORE_{READ,WRITE}_BITFIELD.
-> > > IIUC, the CO-RE api assumes that the offset of bitfields could be changed.
+On Thu, Dec 14, 2023 at 02:00:16PM +0200, Vladimir Oltean wrote:
+> On Thu, Dec 14, 2023 at 02:54:00PM +0300, Serge Semin wrote:
+> > > > > The pcs-rzn1-miic.c driver puts a device_link to the MAC to at least
+> > > > > tear down the whole thing when the PCS is unbound, which is saner than
+> > > > > crashing the kernel. I don't see the equivalent protection mechanism here?
+> > > > 
+> > > > You are right. I don't have any equivalent protection here. Thanks for
+> > > > suggesting a solution.
 > > > 
-> > > If the size of struct tcp_cookie_attributes is changed, kfunc will not work
-> > > in this test.  So, BPF_CORE_WRITE_BITFIELD() works only when the size of
-> > > tcp_cookie_attributes is unchanged but fields in tcp_options_received are
-> > > rearranged or expanded to use the unused@ bits ?
+> > > I think that a device link between the "ethernet" device and the "mdio"
+> > > device (controller, parent of the PHY or PCS), if the Ethernet is not a
+> > > parent of the MDIO controller, could also solve that. But it would also
+> > > require ACK from PHY maintainers, who may have grander plans to address
+> > > this snag.
 > > 
-> > Right, CO-RE helps to figure out the offset of a member in the running kernel.
-> > 
-> > > 
-> > > Also, do we need to use BPF_CORE_READ() for other non-bitfields in
-> > > strcut tcp_options_received (and ecn_ok in struct tcp_cookie_attributes
-> > > just in case other fields are added to tcp_cookie_attributes and ecn_ok
-> > > is rearranged) ?
-> > 
-> > BPF_CORE_READ is a CO-RE friendly macro for using bpf_probe_read_kernel(). 
-> > bpf_probe_read_kernel() is mostly for the tracing use case where the ptr is not 
-> > safe to read directly.
-> > 
-> > It is not the case for the tcp_options_received ptr in this tc-bpf use case or 
-> > other stack allocated objects. In general, no need to use BPF_CORE_READ. The 
-> > relocation will be done by the libbpf for tcp_opt->mss_clamp (e.g.).
-> > 
-> > Going back to bitfield, it needs BPF_CORE_*_BITFIELD because the offset may not 
-> > be right after __attribute__((preserve_access_index)), cc: Yonghong and Andrii 
-> > who know more details than I do.
-> > 
-> > A verifier error has been reported: 
-> > https://lore.kernel.org/bpf/391d524c496acc97a8801d8bea80976f58485810.1700676682.git.dxu@dxuuu.xyz/.
-> > 
-> > I also hit an error earlier in 
-> > https://lore.kernel.org/all/20220817061847.4182339-1-kafai@fb.com/ when not 
-> > using BPF_CORE_READ_BITFIELD. I don't exactly remember how the instruction looks 
-> > like but it was reading a wrong value instead of verifier error.
+> > Ok. I'll add it in v2. Let's see what the maintainers think about
+> > that.
 > 
-> Thank you so much for detailed explanation!
+> Are you not following the parallel discussion on the topic of PCS
+> devices having bound drivers?
+> https://lore.kernel.org/netdev/ZXnV%2FPk1PYxAm%2FjS@shell.armlinux.org.uk/
 > 
-> 
-> > 
-> > ================
-> > 
-> > Going back to this patch set here.
-> > 
-> > After sleeping on it longer, I am thinking it is better not to reuse 'struct 
-> > tcp_options_received' (meaning no bitfield) in the bpf_sk_assign_tcp_reqsk() 
-> > kfunc API.
-> > 
-> > There is not much benefit in reusing 'tcp_options_received'. When new tcp option 
-> > was ever added to tcp_options_received, it is not like bpf_sk_assign_tcp_reqsk 
-> > will support it automatically. It needs to relay this new option back to the 
-> > allocated req. Unlike tcp_sock or req which may have a lot of them such that it 
-> > is useful to have a compact tcp_options_received, the tc-bpf use case here is to 
-> > allocate it once in the stack. Also, not all the members in tcp_options_received 
-> > is useful, e.g. num_sacks, ts_recent_stamp, and user_mss are not used. Leaving 
-> > it there being ignored by bpf_sk_assign_tcp_reqsk is confusing.
-> > 
-> > How about using a full u8 for each necessary member and directly add them to 
-> > struct tcp_cookie_attributes instead of nesting them into another struct. After 
-> > taking out the unnecessary members, the size may not end up to be much bigger.
-> > 
-> > The bpf prog can then directly access attr->tstamp_ok more naturally. The 
-> > changes to patch 5 and 6 should be mostly mechanical changes.
-> > 
-> > I would also rename s/tcp_cookie_attributes/bpf_tcp_req_attrs/.
-> > 
-> > wdyt?
-> 
-> Totally agree.  I reused struct tcp_options_received but had a similar
-> thought like unused fields, confusing fields (saw_tstamp vs tstamp_ok,
-> user_mss vs clamp_mss), etc.
-> 
-> And I like bpf_tcp_req_attrs, tcp_cookie_attributes was bit wordy :)
-> 
-> So probably bpf_tcp_req_attrs would look like this ?
-> 
-> struct bpf_tcp_req_attrs {
-> 	u32 rcv_tsval;
-> 	u32 rcv_tsecr;
-> 	u16 mss;
-> 	u8 rcv_scale;
-> 	u8 snd_scale;
-> 	bool ecn_ok;
-> 	bool wscale_ok;
-> 	bool sack_ok;
-> 	bool tstamp_ok;
-> 	bool usec_ts;
-> } __packed;
-> 
-> or you prefer u8 over bool and __packed ?
+> Sadly I don't have much spare time to join that discussion, but it looks
+> like you could.
 
-Ah, bool and __packed will require BPF_CORE_(READ|WRITE)_BITFIELD().
-I'll use the following struct.
+Ok. Thanks for sharing the link. At least I'll follow up the
+discussion in order to pick up/wait for a solution they'll come up
+with.
 
-Thank you!
-
-> 
-> struct bpf_tcp_req_attrs {
-> 	u32 rcv_tsval;
-> 	u32 rcv_tsecr;
-> 	u16 mss;
-> 	u8 rcv_scale;
-> 	u8 snd_scale;
-> 	u8 ecn_ok;
-> 	u8 wscale_ok;
-> 	u8 sack_ok;
-> 	u8 tstamp_ok;
-> 	u8 usec_ts;
-> }
+-Serge(y)
 
