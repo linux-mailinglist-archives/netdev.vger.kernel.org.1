@@ -1,82 +1,262 @@
-Return-Path: <netdev+bounces-57390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F345812FD1
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:12:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABE0F812FF8
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:26:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4043281A5E
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:12:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 188871F21CA1
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:26:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3956941768;
-	Thu, 14 Dec 2023 12:12:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7BE41776;
+	Thu, 14 Dec 2023 12:26:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="wLTKgOzC"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="DCij6W3v"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 058D5BD;
-	Thu, 14 Dec 2023 04:11:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=i3BQLavQ7q8dzK5mqTZacIcgB0K8M4R6u9OZ0gzDytE=;
-	t=1702555918; x=1703765518; b=wLTKgOzC9uf3RmlJWJd1QzQHFYtW3Pns8Hg2YKc95rxkmDs
-	HptNPdO3Oak4XCWprU9c9VHFo0IjJUie+iTNGM8aAj0BaSuTwlJuuUHwhdmmbpofvvtPxJqk3eM08
-	KxwU41+ZJS1i+ivjKulB3EknTtcWcQT8dy/x0g/0PBQBxvK8QDpwgaNCyWuQS/Nm80GwL48n9BAZ3
-	EaXwCphp2jj6lO0QpCiREQ5IFI6n5OUsVxuCb+PRlGMZg12cMvmMvdmHn60P9ZuGz75YrMsd3eOYS
-	pEXOQGaUNmX23MAFXojCk0aZpvXgJehfhK/x/0yQ+qdxttIJEJfr31d+RI0DdZhw==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rDkZI-0000000AoWX-06kI;
-	Thu, 14 Dec 2023 13:11:56 +0100
-Message-ID: <d8667c83111b70144b40a3b7c457c7a2dd440e09.camel@sipsolutions.net>
-Subject: Re: pull-request: wireless-2023-12-14
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Date: Thu, 14 Dec 2023 13:11:55 +0100
-In-Reply-To: <ddb0d6217b333c3f025760b5b704342a989f2094.camel@redhat.com>
-References: <20231214111515.60626-3-johannes@sipsolutions.net>
-	 <ddb0d6217b333c3f025760b5b704342a989f2094.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.2 (3.50.2-1.fc39) 
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7BA7BD
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 04:26:05 -0800 (PST)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-50bf898c43cso7826119e87.1
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 04:26:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1702556764; x=1703161564; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wuwUSmV/kVrAbENuuZFkPgGMGjiOEuNoJMZtwfSZm0w=;
+        b=DCij6W3vK1/6bSttEFccHSjhZLu+YuhzfcsGKX13h5egtLe1/MvKqPhIXVdm9Ampjd
+         LzTZEmhGDOGI40IfwEFVeX3RYcnDEqviSZJN/cs8BU9p7xatKEQAWnHZS6nmL7eyz9E/
+         QdsZ8LEmpxFWV2pZwPHOoq960Ilyw0wswyX1MdCZEbJLWQsT4zK7ZzkIOSo2luHertc0
+         J0PnWtaSjtAtcDn8OTH05BymVqFSQlZI9FgfLK6krtGVWZT/FXu2GGjqdjRkaVt4SKuf
+         Lp3MYMbDea5ySuP7DyMzdgjfwdPPwTwCRck5SAeLSRMs5vPYTKyDpyLB96YD6+le+xW2
+         WZSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702556764; x=1703161564;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wuwUSmV/kVrAbENuuZFkPgGMGjiOEuNoJMZtwfSZm0w=;
+        b=Z9twBqsQ1A78FGe0Pg2RxN9svl6SRTpkXuplF7YLiDj223gFSZRobIhNn49HF4vqRG
+         9R5WJ+DxGjajwfpyJCSmp+3fsHvdoom+iIVOklxwXV3P0Ltrd+ovRuVkOAcVOpRM0z+h
+         Ns6mLD8QUyW2nPfDG0jlcnz0kMKQ/wLZrNvMMrMLsljv/KnTwxNojrLom/wFrk6Ur9t/
+         iHtom4TdljMIzpwS4wLz5tRGW1gAIguU5DUxx5Hs+eWdPqADb+6sL40W4AziQsHNd9c4
+         65DNIv2wXHWn7fG7IJTpGHTUSqKwgj6Jfo8plx3ObWr5838EQzXIw7UyKsknRqXNaXb1
+         TcdA==
+X-Gm-Message-State: AOJu0YwNJNHcAmXVziAMii7E9NkF0XkdkstVsvs2oVY4s+8CwMu/jwKi
+	2dFaJx/7T8NStdZVFK9hkF0lnw==
+X-Google-Smtp-Source: AGHT+IGlUqLsuH+kw3wJpuXR2PGCNVzPATeb3/5HChBlXycaDNyuH09w8Y7apf9yILfeCdGXornVbg==
+X-Received: by 2002:ac2:47eb:0:b0:50e:1b5d:4dda with SMTP id b11-20020ac247eb000000b0050e1b5d4ddamr99465lfp.166.1702556763878;
+        Thu, 14 Dec 2023 04:26:03 -0800 (PST)
+Received: from [192.168.50.4] ([82.78.167.103])
+        by smtp.gmail.com with ESMTPSA id mm20-20020a1709077a9400b00a1a53e9f401sm9327866ejc.132.2023.12.14.04.26.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Dec 2023 04:26:03 -0800 (PST)
+Message-ID: <7f514abe-7f18-44c8-9a0e-d2f4772713f7@tuxon.dev>
+Date: Thu, 14 Dec 2023 14:25:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] net: ravb: Wait for operation mode to be applied
+Content-Language: en-US
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, claudiu.beznea.uj@bp.renesas.com,
+ yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com,
+ biju.das.jz@bp.renesas.com, prabhakar.mahadev-lad.rj@bp.renesas.com,
+ mitsuhiro.kimura.kc@renesas.com, geert+renesas@glider.be,
+ netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231214113137.2450292-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214113137.2450292-2-claudiu.beznea.uj@bp.renesas.com>
+ <20231214121109.GK1863068@ragnatech.se>
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <20231214121109.GK1863068@ragnatech.se>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, 2023-12-14 at 13:08 +0100, Paolo Abeni wrote:
-> On Thu, 2023-12-14 at 12:13 +0100, Johannes Berg wrote:
-> > So more stragglers than I'd like, perhaps, but here we are.
-> > A bunch of these escaped Intel's vault late though, and we're
-> > now rewriting our tooling so should get better at that...
-> >=20
-> > Please pull and let us know if there's any problem.
->=20
-> whoops, this will not enter today's PR, as I'm finalizing it right now.
+Hi, Niklas,
 
-Yeah I kind of expected that.
+On 14.12.2023 14:11, Niklas Söderlund wrote:
+> Hi Claudiu,
+> 
+> Thanks for your patch.
+> 
+> On 2023-12-14 13:31:36 +0200, Claudiu wrote:
+>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>
+>> CSR.OPS bits specify the current operating mode and (according to
+>> documentation) they are updated when the operating mode change request
+>> is processed. Thus, check CSR.OPS before proceeding.
+>>
+>> Fixes: 568b3ce7a8ef ("ravb: factor out register bit twiddling code")
+>> Fixes: 0184165b2f42 ("ravb: add sleep PM suspend/resume support")
+>> Fixes: 7e09a052dc4e ("ravb: Exclude gPTP feature support for RZ/G2L")
+>> Fixes: 3e3d647715d4 ("ravb: add wake-on-lan support via magic packet")
+>> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+> 
+> I think the list of fixes tags can be reduced. The last item in the list 
+> is the patch which adds the RAVB driver so what's the point of listing 
+> the rest?
 
-> Unless you scream very hard, very soon, for good reasons, and I'll
-> restart my work from scratch ;) (well not really all the PR work, but
-> some ...)
->=20
-> Please let me know!
+In commit c156633f1353 ("Renesas Ethernet AVB driver proper") different
+features that were touched by the rest of commits in the fixes list might
+not be present. So, it might be possible that this patch to not be
+back-portable to c156633f1353 ("Renesas Ethernet AVB driver proper") but to
+other commits in the list.
 
-There'll be another chance next week, hopefully?
+> 
+>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>> ---
+>>  drivers/net/ethernet/renesas/ravb_main.c | 47 ++++++++++++++++++++----
+>>  1 file changed, 39 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>> index 9178f6d60e74..ce95eb5af354 100644
+>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>> @@ -683,8 +683,11 @@ static int ravb_dmac_init(struct net_device *ndev)
+>>  
+>>  	/* Setting the control will start the AVB-DMAC process. */
+>>  	ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_OPERATION);
+>> +	error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_OPERATION);
+>> +	if (error)
+>> +		netdev_err(ndev, "failed to switch device to operation mode\n");
+> 
+> As you add ravb_set_reset_mode() to compliment the existing 
+> ravb_set_config_mode(), would it not be coherent to also add a 
+> ravb_set_operation_mode() instead of open coding it here?
 
-Anyway, I don't see anything super critical and likely to affect
-everyone badly. Even if it doesn't make it at all, that wouldn't be a
-huge problem, we'd just have to do some creative merging on our end (or
-reset the tree) :)
+CSR_OPS_OPERATION is set only in this place. Reset is done in more than one
+place. Due to this I've added a function for it.
 
-johannes
+> 
+>>  
+>> -	return 0;
+>> +	return error;
+>>  }
+>>  
+>>  static void ravb_get_tx_tstamp(struct net_device *ndev)
+>> @@ -1744,6 +1747,18 @@ static inline int ravb_hook_irq(unsigned int irq, irq_handler_t handler,
+>>  	return error;
+>>  }
+>>  
+>> +static int ravb_set_reset_mode(struct net_device *ndev)
+> 
+> nit: Maybe move this to be close to ravb_set_config_mode() to co-locate 
+> all mode changing logic?
+
+I've did this but not in this patch. It could be found on the final version
+of the driver proposed by
+https://lore.kernel.org/all/20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com/
+
+Thank you for your review,
+Claudiu Beznea
+
+> 
+>> +{
+>> +	int error;
+>> +
+>> +	ravb_write(ndev, CCC_OPC_RESET, CCC);
+>> +	error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_RESET);
+>> +	if (error)
+>> +		netdev_err(ndev, "failed to switch device to reset mode\n");
+>> +
+>> +	return error;
+>> +}
+>> +
+>>  /* Network device open function for Ethernet AVB */
+>>  static int ravb_open(struct net_device *ndev)
+>>  {
+>> @@ -2551,10 +2566,11 @@ static int ravb_set_gti(struct net_device *ndev)
+>>  	return 0;
+>>  }
+>>  
+>> -static void ravb_set_config_mode(struct net_device *ndev)
+>> +static int ravb_set_config_mode(struct net_device *ndev)
+>>  {
+>>  	struct ravb_private *priv = netdev_priv(ndev);
+>>  	const struct ravb_hw_info *info = priv->info;
+>> +	int error;
+>>  
+>>  	if (info->gptp) {
+>>  		ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG);
+>> @@ -2566,6 +2582,12 @@ static void ravb_set_config_mode(struct net_device *ndev)
+>>  	} else {
+>>  		ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG);
+>>  	}
+>> +
+>> +	error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_CONFIG);
+>> +	if (error)
+>> +		netdev_err(ndev, "failed to switch device to config mode\n");
+>> +
+>> +	return error;
+>>  }
+>>  
+>>  /* Set tx and rx clock internal delay modes */
+>> @@ -2785,7 +2807,9 @@ static int ravb_probe(struct platform_device *pdev)
+>>  	ndev->ethtool_ops = &ravb_ethtool_ops;
+>>  
+>>  	/* Set AVB config mode */
+>> -	ravb_set_config_mode(ndev);
+>> +	error = ravb_set_config_mode(ndev);
+>> +	if (error)
+>> +		goto out_disable_refclk;
+>>  
+>>  	if (info->gptp || info->ccc_gac) {
+>>  		/* Set GTI value */
+>> @@ -2893,6 +2917,7 @@ static void ravb_remove(struct platform_device *pdev)
+>>  	struct net_device *ndev = platform_get_drvdata(pdev);
+>>  	struct ravb_private *priv = netdev_priv(ndev);
+>>  	const struct ravb_hw_info *info = priv->info;
+>> +	int error;
+>>  
+>>  	unregister_netdev(ndev);
+>>  	if (info->nc_queues)
+>> @@ -2908,8 +2933,9 @@ static void ravb_remove(struct platform_device *pdev)
+>>  	dma_free_coherent(ndev->dev.parent, priv->desc_bat_size, priv->desc_bat,
+>>  			  priv->desc_bat_dma);
+>>  
+>> -	/* Set reset mode */
+>> -	ravb_write(ndev, CCC_OPC_RESET, CCC);
+>> +	error = ravb_set_reset_mode(ndev);
+>> +	if (error)
+>> +		netdev_err(ndev, "Failed to reset ndev\n");
+>>  
+>>  	clk_disable_unprepare(priv->gptp_clk);
+>>  	clk_disable_unprepare(priv->refclk);
+>> @@ -2991,8 +3017,11 @@ static int __maybe_unused ravb_resume(struct device *dev)
+>>  	int ret = 0;
+>>  
+>>  	/* If WoL is enabled set reset mode to rearm the WoL logic */
+>> -	if (priv->wol_enabled)
+>> -		ravb_write(ndev, CCC_OPC_RESET, CCC);
+>> +	if (priv->wol_enabled) {
+>> +		ret = ravb_set_reset_mode(ndev);
+>> +		if (ret)
+>> +			return ret;
+>> +	}
+>>  
+>>  	/* All register have been reset to default values.
+>>  	 * Restore all registers which where setup at probe time and
+>> @@ -3000,7 +3029,9 @@ static int __maybe_unused ravb_resume(struct device *dev)
+>>  	 */
+>>  
+>>  	/* Set AVB config mode */
+>> -	ravb_set_config_mode(ndev);
+>> +	ret = ravb_set_config_mode(ndev);
+>> +	if (ret)
+>> +		return ret;
+>>  
+>>  	if (info->gptp || info->ccc_gac) {
+>>  		/* Set GTI value */
+>> -- 
+>> 2.39.2
+>>
+> 
 
