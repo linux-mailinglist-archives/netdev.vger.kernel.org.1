@@ -1,114 +1,73 @@
-Return-Path: <netdev+bounces-57136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71E678123D3
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 01:21:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A6378123DF
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 01:29:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01BAD1F2199E
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 00:21:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D364BB211F4
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 00:29:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B917A381;
-	Thu, 14 Dec 2023 00:20:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD39384;
+	Thu, 14 Dec 2023 00:28:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="F4z/6gY1";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="1HSeLWX0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BOrmA2DE"
 X-Original-To: netdev@vger.kernel.org
-Received: from wnew2-smtp.messagingengine.com (wnew2-smtp.messagingengine.com [64.147.123.27])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DD37C9;
-	Wed, 13 Dec 2023 16:20:54 -0800 (PST)
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-	by mailnew.west.internal (Postfix) with ESMTP id 432AF2B002DA;
-	Wed, 13 Dec 2023 19:20:51 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Wed, 13 Dec 2023 19:20:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm3; t=1702513250; x=1702520450; bh=A2PcotebGi
-	6VLDzZX2wIz+tqypyvwDgsO7u1srRyogw=; b=F4z/6gY1J9/DjQJZ7WzBgfQnIA
-	3MxGdMgA616hpbu0+SvnCeTWya4Zz4ABDxjPuGA348CeMWn3tizJeMP0g2YT4E8U
-	IG9eSOIv64q1G2/5J+NPhJ2An8U6JkBmyY7jEQ24t8DMUgifv+0Bm8eshDY8DnK5
-	+FCq1KE0REluiG66OMb+r1BwQw33/mUIgH7Ub54SnOmFft2mbgROQPJedS/A6JDP
-	jl6B0e2Cgxlek37mhPyOLaojcR/n78w4hH5ZyvcFqCROYDXnTsCP2w7n1jQjsHAf
-	88ACr0HEQ/uNFeBIEidk60dg5hY51b7+YBEFvtZZBKRmVYxGHy95fLym0hVA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm1; t=1702513250; x=1702520450; bh=A2PcotebGi6VLDzZX2wIz+tqypyv
-	wDgsO7u1srRyogw=; b=1HSeLWX04KCZqIHUNG/EtE3SvGqz5naqjcSTia60LrpB
-	Cw1pLt2We4hWHq2zVCLiFQ15gEj78aA+A6xgo70QxmOxQzh693g5ww2c6cT3eNST
-	FRgUpr/iSi2zVeuQSIheqknxIcKf8sXmJy3XBwqmLsFaH8AlW0Z6WrltTNgNGq1Q
-	LLGya9K1mhYsVe7NcTsyB4NGJRL/ZbK+M4XfQoEzIjNNbyGeMD+174xmoV81vCt3
-	rO2u0OmK0qu6yWw0wiwQJYuwqCcjIQ0EGOH/PhUH63YtIK1q6+LmRVpxtD1oshVY
-	ov2FyVnMomU7Z/HuSrKUpj6pVYqMRyff8BIhHFvYlA==
-X-ME-Sender: <xms:Ykp6ZabkOkPkyq-ckjqIqVkuHIUdLMQAWG8qVxRRBiQZ3fenNBOy2w>
-    <xme:Ykp6Zdaafo5szGuzYflYYFhUZXokE_EmECJOSXfWSewhWijmwXQAxCTp6KkgF_O-j
-    YB1sWGqhqq8Ll6FmA>
-X-ME-Received: <xmr:Ykp6ZU-JrLPO2pGTunjSWbCxphBNoQtzh63iBa51YfeFpG6lrZ8csIIeMiM1U51d3hxNmCn0aRBtVwRO0ASQB74Vegx9gn8buWwF>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudelkedgvdduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    gfrhhlucfvnfffucdlfeehmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdfstddt
-    tddvnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesugiguhhuuhdrgiihiieqne
-    cuggftrfgrthhtvghrnhepgfelteeuteekgeeikeehtefhffelteekieeigfeuffehvdev
-    ieetheekffegudevnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvg
-    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdig
-    hiii
-X-ME-Proxy: <xmx:Ykp6Zcrcit-uNyfYtl8VniKKaDk_5H1JP-tJhdxfUiv4ON1f3Ivdkw>
-    <xmx:Ykp6ZVpC-eITjFHKVxLTuvxMKk9dv4VVcF-yGp1WkUmTbCMk1EyhOw>
-    <xmx:Ykp6ZaS4nE2_OIhtOZkhp7Bu0_N3m1hM4loh4S3_blq_wX83ILwnjA>
-    <xmx:Ykp6Zc6tx-p830khytyhDdSWCcgbQo-KjUrAnuH7aT276yb0q72vDxLJdOM>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 13 Dec 2023 19:20:48 -0500 (EST)
-Date: Wed, 13 Dec 2023 17:20:47 -0700
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: mykolal@fb.com, song@kernel.org, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	devel@linux-ipsec.org, netdev@vger.kernel.org, ast@kernel.org, andrii@kernel.org, 
-	shuah@kernel.org, daniel@iogearbox.net, steffen.klassert@secunet.com, 
-	antony.antony@secunet.com, alexei.starovoitov@gmail.com, yonghong.song@linux.dev, 
-	eddyz87@gmail.com, eyal.birger@gmail.com, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>
-Subject: Re: [PATCH bpf-next v5 5/9] bpf: selftests: Add verifier tests for
- CO-RE bitfield writes
-Message-ID: <qydvklkwevtrqhz5vyy2gwvdxc55hupvgan4l7nzoteo3cfudm@cr52rpydfzm4>
-References: <cover.1702325874.git.dxu@dxuuu.xyz>
- <72698a1080fa565f541d5654705255984ea2a029.1702325874.git.dxu@dxuuu.xyz>
- <85bb2e79-5b1a-41c1-972f-9f7f185fac88@linux.dev>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E63218F;
+	Thu, 14 Dec 2023 00:28:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92049C433C8;
+	Thu, 14 Dec 2023 00:28:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702513736;
+	bh=tQFwrDCOk2a2q/qZ8qSubMnw90hcJ8c+fZRXDcJTQnQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BOrmA2DETPhEo6BqgDyhgelgOXer2LOk5wlznPX5fq2pKPtg/rOzY95+ywP/lofbD
+	 XA/fl4wEoI/vI18t9RiZ7FRG/OtxjrN1ao+WEEeTWUt7gA9R7FUxk//dHeQrs9vqWX
+	 0TmIgQQq1fYZU0vW17gfI9r42EKYlRMWhTe1QLxzAJcaR4bzGCJRhx5glQlEPA+sc9
+	 bbXrxMSWfOa6Fjq103NsnxU8AfxU01wHfjyDWoILJPYd63Z0BpYkSeddJhVBpk0FXq
+	 iVLtzKf2GQwP1p2dNLFwTP/uMhym2lgb4zFlucctpjIHHPhRxXf8AqK1fUB3zaI8q5
+	 8JrCl/zH62+og==
+Date: Wed, 13 Dec 2023 16:28:54 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tony Lu <tonylu@linux.alibaba.com>, Christian Brauner
+ <brauner@kernel.org>
+Cc: Ahelenia Ziemia'nska <nabijaczleweli@nabijaczleweli.xyz>, Karsten Graul
+ <kgraul@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher
+ <jaka@linux.ibm.com>, "D. Wythe" <alibuda@linux.alibaba.com>, Wen Gu
+ <guwen@linux.alibaba.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, Alexander Viro
+ <viro@zeniv.linux.org.uk>
+Subject: Re: [PATCH RESEND 06/11] net/smc: smc_splice_read: always request
+ MSG_DONTWAIT
+Message-ID: <20231213162854.4acfbd9f@kernel.org>
+In-Reply-To: <ZXkNf9vvtzR7oqoE@TONYMAC-ALIBABA.local>
+References: <cover.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
+	<145da5ab094bcc7d3331385e8813074922c2a13c6.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
+	<ZXkNf9vvtzR7oqoE@TONYMAC-ALIBABA.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <85bb2e79-5b1a-41c1-972f-9f7f185fac88@linux.dev>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Dec 13, 2023 at 03:58:39PM -0800, Martin KaFai Lau wrote:
-> On 12/11/23 12:20 PM, Daniel Xu wrote:
-> > Add some tests that exercise BPF_CORE_WRITE_BITFIELD() macro. Since some
-> > non-trivial bit fiddling is going on, make sure various edge cases (such
-> > as adjacent bitfields and bitfields at the edge of structs) are
-> > exercised.
-> 
-> Hi DanielXu, I have pushed the libbpf changes (adding
-> BPF_CORE_WRITE_BITFIELD) and verifier test in patch 3-5 which is useful by
-> itself. e.g. Another patchset can start using it also:
-> https://lore.kernel.org/bpf/8fccb066-6d17-4fa8-ba67-287042046ea4@linux.dev/
-> 
-> Thanks.
+On Wed, 13 Dec 2023 09:48:47 +0800 Tony Lu wrote:
+> Please add correct tag, for this patch, IIUC, it should be a fix, and
+> you need add [PATCH net].
 
-Sounds good. I'll rebase my patchset on top of bpf-next.
+I was wondering who's expected to take this. We (netdev/net maintainers)
+didn't even get CCed on all the patches in the series.
+My sense is that this is more of a VFS change, so Al / Christian may be
+better suited to take this?
 
-Thanks,
-Daniel
+Let's figure that out before we get another repost.
 
