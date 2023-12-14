@@ -1,196 +1,230 @@
-Return-Path: <netdev+bounces-57580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0370813753
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 18:07:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E61F8137CE
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 18:13:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8535B1F20ED2
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 17:07:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A195E1C20F4F
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 17:13:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C016D63DD7;
-	Thu, 14 Dec 2023 17:07:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2949B65EAB;
+	Thu, 14 Dec 2023 17:12:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="P7dCe7Xp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n9sZrVGq"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2074.outbound.protection.outlook.com [40.107.13.74])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ABDE118
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 09:07:17 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=f3SC4JvzF5CNUOvK5qtxfljYKx4Z7B4sp2p0MWRBtJskPiVB2gBIrOgvbeNgcqRZtaIslUOr9sMYEKUJT42jVCfqvEcL8iuBRzxORJr+vu+btDWttW2YVytnMQoJy7AMP/9q5cfqpnD+6bC2bMQ9cqz4koV+rhMhfd3HiFIhLrZ913ZvK3J9rA9OzT08lbnKPmKPdrnv6LEnRfA/wyHTpBCGBjnzpsUs0Kyq0arOb/B1wH5Klc1taSQYE8e2nK0O32bx9u4kIlK9iIfxRpslPykgYKde+fHpQUw/mB93J1+Fyx5h8glrW4wsc8iCCYu1uBKApeOjuIb2pBqo9mkppA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IROtaDdFQk4TIqx9QOaqxvyhBqKmA9XGiMbkT4UaE6g=;
- b=UZRvckVjxfa5dgSqK+eYeRMEKRlqYSR1Ojg9K0SGrGuri2UoVJE2bVk1ZeiAtVfpSI9E4d8y8+rzCDocGd3SJdf8K43Q7KrdTwSrmPDp0RxfUM03XrRErrOG6O7saxU28fbRKQwaPPoKlLCBnWzankqA6fjv3dUXQyP6X5HWwqC3revou4UefTsLvFr4RppOp6drMfoLwYIkjXkQZ+hOXuzAWIhZEPQF6WKMzOPN9JM+3ff2R9qvjLMlVkjLhHQT55WogP9RSe2KVPwd2BRnvrUc7GFXduhQYOxUA8g1zH++jID/7Jn0xqM8qO/ly165UcXbuZ6k83AC0XG+ndDtDQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IROtaDdFQk4TIqx9QOaqxvyhBqKmA9XGiMbkT4UaE6g=;
- b=P7dCe7XpRq3zolXCnSKJxzB7/UC/IABP7FQnhf4GTWUh7lZ8rwhwB5NjbQHaiRGAmXo9aG34N+sjXyOiRxjgaid66Zt8eJglmNrXKkjY1RKaTJpRHSfW7iflosameIRRIsRCmRP4vpCRkIRwpd8hX9fyHrsStgxXMuXdfJDkL7o=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by DBBPR04MB7547.eurprd04.prod.outlook.com (2603:10a6:10:208::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.28; Thu, 14 Dec
- 2023 17:07:13 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7091.028; Thu, 14 Dec 2023
- 17:07:12 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>
-Subject: [PATCH net-next] net: phylink: avoid one unnecessary phylink_validate() call during phylink_create()
-Date: Thu, 14 Dec 2023 19:06:59 +0200
-Message-Id: <20231214170659.868759-1-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM8P251CA0018.EURP251.PROD.OUTLOOK.COM
- (2603:10a6:20b:21b::23) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0166D65EA7;
+	Thu, 14 Dec 2023 17:12:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8716C433C8;
+	Thu, 14 Dec 2023 17:12:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702573977;
+	bh=BAELR7PAtgbHJ26Por16QtKzX2s0QDtbvfohshpvT7k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=n9sZrVGqgBfPqr4iuqNawJmRCH6DZnjo9xEv9sc8Jb8tUM5X0p2lHGToKbQ71HmoH
+	 44fCZG2jogO+9MP9i+gwLpTOOeyiyU8jAzQ1KbHVHCCGg37M6IvFcsH49fsWo4Bj9r
+	 9YCpvO79dr6domzMwMFfmpRS9yzXx9Pzq5ie9+Pp33xnWN/ahxK5Y3byWThrLVIRzL
+	 lQbkm57hE1G71W7o7ddnMWQuxFYqhvBVWMz1Y9yTRr89wMBuQ0tvGE9pbIGLfT80zN
+	 VwNv612w0mqTSyIyJzwwQEthaIO3/MOA2kJ/6s8cYTWUsqwlbnGiZx4yeCY6098KxZ
+	 sCIYaCsJeKvOA==
+Date: Thu, 14 Dec 2023 17:12:51 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Jie Luo <quic_luoj@quicinc.com>
+Cc: agross@kernel.org, andersson@kernel.org, konrad.dybcio@linaro.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	robert.marko@sartura.hr, linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, quic_srichara@quicinc.com
+Subject: Re: [PATCH v2 5/5] dt-bindings: net: ipq4019-mdio: Document ipq5332
+ platform
+Message-ID: <20231214-outshine-shush-8a11c68607cd@spud>
+References: <20231212115151.20016-1-quic_luoj@quicinc.com>
+ <20231212115151.20016-6-quic_luoj@quicinc.com>
+ <20231212-caution-improvise-ed3cc6a1d305@spud>
+ <11ffc985-3f2b-46b9-ae0b-911f7abe98d1@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DBBPR04MB7547:EE_
-X-MS-Office365-Filtering-Correlation-Id: 36c55574-9de7-45c4-d4ea-08dbfcc71d7d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	9V1DjLBuAaRsiCIFi1q1xf5j5DH087swisGX2ivMlveNfsiyDZGJdQda7kb+wzPcXixwS7E5V8H5DZ5lelZcYcc6P3Ouqy3O0tpwAWf77zzEfEEJIsBBQzHTLNBYeDwbQfZS4flgeKUlRP7fMZ2jFw/w1fvueHq1ZaezUkLAkBX+ljBQK3KyA8Qff71trapuYaI2yElWmkiehZxtCldbrh4WoiYZ6Iww/0RfFpY5HT66A2xCbQ9HQlyjdUcO71IlDSodQkMfzdAuYhCPFYgbbgLCkYISwnxBwqEMp/G/hXHgh/8iU7NHlmMY7HkUbwNQXM/xSyT8HytwnZhpnYKRfWLR+I8PSHNiqdkbbkIysHyCaQlhdAm+xvYUHDRCqdn94rGIIYlkEy42OUxHBHVrWf5ESmSBZtWr/iGscmeCsVAIRF4I+iKT+EiZNRNWxPym8Dh59lXXfW4VzOCZX7AQxrSD8mXJZXhZhNf6Jk5SmYDOge/9ninObVvvnN9NO9dqf05VLaIJbo/UENiSK+4c1HzhHo6aAF7JqzbSsfGxxK7JDfxx1rOLmRJU5LpZEAAC7xSC7NjkBwMsAIis4yVsWJ8uUpQFDjRpmt4bYfj1fvo=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(376002)(346002)(136003)(366004)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(1076003)(26005)(2616005)(6506007)(6512007)(6666004)(83380400001)(52116002)(66476007)(5660300002)(4326008)(8676002)(8936002)(44832011)(41300700001)(2906002)(966005)(6486002)(478600001)(316002)(6916009)(66556008)(66946007)(54906003)(36756003)(86362001)(38100700002)(38350700005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?KuWugl7V9ujLyphFdRxchQ8v2Cq9vIGVKovswerUeiuUO4aX1QACsYYowuy9?=
- =?us-ascii?Q?5KHSeNJBvby1S+orGGRDR3c19A6yZuLK++lI1S+85zyi7afwKYiUjlR5pRvj?=
- =?us-ascii?Q?0lvmc2pPEBhc0CQnRxK9hS+SiC2qVceFafjEOTT24ItAZzxYaCsA35bLqBn3?=
- =?us-ascii?Q?gsv/SAn1VP9wJbHl3h50sF/e+Q8sFLN8Zqz702pvg4buEo/ivRBZRsg0LHIA?=
- =?us-ascii?Q?3M34Z1cBaibg7R0NAcY/2wcZMfx1lvlVWofDOxCa7WzyF2ZELZCMoTBzzOY8?=
- =?us-ascii?Q?dfrWuOlsOZE8u+PDLSJoCR/z2kzO+gvV7FFDIJvX+Z6EWD8AMmM2eH1dxgfM?=
- =?us-ascii?Q?a4txQtsQNykFsq+jjHJbhrTsHx4WOGyj9f4URbSEzrg1Wl/P6IApT1X+M+U6?=
- =?us-ascii?Q?jxzwo7IX+Em0eDccqEaOFvA19h+1bbye0PPkHxxzX5MHZQ64DkSy67tg+zKf?=
- =?us-ascii?Q?aTFW/hocVIXaEchYvctuojTa/Sa4QZaIkB98EuRutYhi+yqblnV6CI+8qYcR?=
- =?us-ascii?Q?aJryrBYhJzoA6FY/Fqb47uwj54785+LA0in7B7Z14Bm4S48dcA2gg2zLtEv+?=
- =?us-ascii?Q?a+q0uYfuKlisVqcpUtOqPUAlN3L35pMDpTew6km+QjW0aiTTLBEJyMMvivc2?=
- =?us-ascii?Q?TVlCZgUTb0tNj5ZF7fzJN3TkKZvgtANH1Elq0NV1/96UFjoJ1E79QX/Kx2gk?=
- =?us-ascii?Q?slPGeXGpnEBSU8D2XqMRdJL4un08wcvvKKZteYsE3lW3uQeuvANT26jS3OtW?=
- =?us-ascii?Q?4AhrqZ32aM1ll7RQBGVSicnTzstzRPrIHnOTHjR01+pgjq2V56RY9bFtFQgZ?=
- =?us-ascii?Q?2nEqQwohlpZESOPvUrXGhHASU4KTC4YXP1TTEBgNEjAFy8vtwIIWWEmfsO3v?=
- =?us-ascii?Q?31cs6E8BdjbSc0WvWFAwb5zrkqAJqpAKNBlPM/Ka4l0RHEjyblWi1pNbuKL2?=
- =?us-ascii?Q?SaKbhCM/6Flgxaw2zC8VMjXZpeHwC+vAybxNbDVWacP/T5RV4K+vMnR5CsZI?=
- =?us-ascii?Q?/sECNKwn6tH4bux9EhpVPEWwWVNMCvS2R+hNskByF2w/226rTt5rknwzNV65?=
- =?us-ascii?Q?fsbAf6zaeDBMt/aTI50z9C5nsa+8Z1MkxCTNoaevk3Jg4NbOP7MXSNMLvvls?=
- =?us-ascii?Q?YzaSd0Lw2eEjn+yas8UqM+b0jskgZqfYMk0u6g+/YjJ5/FUFrcVjqy9CO1pd?=
- =?us-ascii?Q?WCui12bgVSex062Rd9YORLPhkoaBpcs7u+ns5pgcrCbmCKogORcEW1/8HdQs?=
- =?us-ascii?Q?oPsBRmqYqD6P0EQ09feo+lpszRsY7ppOFdMu3CouT/a8xYwR7SOikcIIAG0j?=
- =?us-ascii?Q?XRt+KTc/KlhkYft1Wh/VK4nfa1RXCgCMmtJwcgVVsdIozWgH4gTvA5wyDtBM?=
- =?us-ascii?Q?cABGaxaq4elR9S5xBrtSd7oeSMavp0AfTyaoIac/HqlhJNKp3YdaCiEPGwz7?=
- =?us-ascii?Q?ts5rfXIm6hTUJOC0uG2pmhIvepBlibbU40KDKP2jZ640Ny81U7TYx94E+2lZ?=
- =?us-ascii?Q?/l+5qfSC1/1p56UUwZmzEvkMM8LJz/fc9XeVGGTMOE3HCvg8jmAHJ+EOTX80?=
- =?us-ascii?Q?uI4iQwz1vFafD1fEF5rw1fcUObtTq8s6lLfIlcx3RnLtwY4I+SHbIr6dYDDY?=
- =?us-ascii?Q?qg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 36c55574-9de7-45c4-d4ea-08dbfcc71d7d
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2023 17:07:12.8676
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PXg5/2Eh7qYwLDbkPQbjl022EX3jJzo/1CDGYy/lJ+Dsv+w1enkWm69lnzLrC7j2Yh1jMkjAAXRb6SMu7RA57w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB7547
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="LYJ0ceWwoY8jlvlx"
+Content-Disposition: inline
+In-Reply-To: <11ffc985-3f2b-46b9-ae0b-911f7abe98d1@quicinc.com>
 
-The direct phylink_validate() call from phylink_create() is partly
-redundant, since there will be subsequent calls to phylink_validate()
-issued by phylink_parse_mode() for MLO_AN_INBAND, and by
-phylink_parse_fixedlink() for MLO_AN_FIXED. These will overwrite what
-the initial phylink_validate() call already did.
 
-The only exception is MLO_AN_PHY, for which phylink_validate() might be
-called with a slight delay (the timing of the phylink_bringup_phy() call
-is not under phylink's control). User space could issue
-phylink_ethtool_ksettings_get() calls before phylink_bringup_phy(), and
-could thus see an empty pl->supported, which this early phylink_validate()
-call prevents.
+--LYJ0ceWwoY8jlvlx
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-So we can delay the direct phylink_create() -> phylink_validate() call
-until after phylink_parse_mode() and phylink_parse_fixedlink(), and execute
-it only for the mode where it makes any difference at all - MLO_AN_PHY.
+On Wed, Dec 13, 2023 at 04:26:56PM +0800, Jie Luo wrote:
+>=20
+>=20
+> On 12/13/2023 12:06 AM, Conor Dooley wrote:
+> > On Tue, Dec 12, 2023 at 07:51:50PM +0800, Luo Jie wrote:
+> > > Update the yaml file for the new DTS properties.
+> > >=20
+> > > 1. cmn-reference-clock for the CMN PLL source clock select.
+> > > 2. clock-frequency for MDIO clock frequency config.
+> > > 3. add uniphy AHB & SYS GCC clocks.
+> > > 4. add reset-gpios for MDIO bus level reset.
+> > >=20
+> > > Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> > > ---
+> > >   .../bindings/net/qcom,ipq4019-mdio.yaml       | 157 +++++++++++++++=
+++-
+> > >   1 file changed, 153 insertions(+), 4 deletions(-)
+> > >=20
+> > > diff --git a/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.=
+yaml b/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
+> > > index 3407e909e8a7..9546a6ad7841 100644
+> > > --- a/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
+> > > +++ b/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
+> > > @@ -20,6 +20,8 @@ properties:
+> > >             - enum:
+> > >                 - qcom,ipq6018-mdio
+> > >                 - qcom,ipq8074-mdio
+> > > +              - qcom,ipq9574-mdio
+> > > +              - qcom,ipq5332-mdio
+> > >             - const: qcom,ipq4019-mdio
+> > >     "#address-cells":
+> > > @@ -30,19 +32,71 @@ properties:
+> > >     reg:
+> > >       minItems: 1
+> > > -    maxItems: 2
+> > > +    maxItems: 5
+> > >       description:
+> > > -      the first Address and length of the register set for the MDIO =
+controller.
+> > > -      the second Address and length of the register for ethernet LDO=
+, this second
+> > > -      address range is only required by the platform IPQ50xx.
+> > > +      the first Address and length of the register set for the MDIO =
+controller,
+> > > +      the optional second, third and fourth address and length of th=
+e register
+> > > +      for ethernet LDO, these three address range are required by th=
+e platform
+> > > +      IPQ50xx/IPQ5332/IPQ9574, the last address and length is for th=
+e CMN clock
+> > > +      to select the reference clock.
+> > > +
+> > > +  reg-names:
+> > > +    minItems: 1
+> > > +    maxItems: 5
+> > >     clocks:
+> > > +    minItems: 1
+> > >       items:
+> > >         - description: MDIO clock source frequency fixed to 100MHZ
+> > > +      - description: UNIPHY0 AHB clock source frequency fixed to 100=
+MHZ
+> > > +      - description: UNIPHY1 AHB clock source frequency fixed to 100=
+MHZ
+> > > +      - description: UNIPHY0 SYS clock source frequency fixed to 24M=
+HZ
+> > > +      - description: UNIPHY1 SYS clock source frequency fixed to 24M=
+HZ
+> > >     clock-names:
+> > > +    minItems: 1
+> > >       items:
+> > >         - const: gcc_mdio_ahb_clk
+> > > +      - const: gcc_uniphy0_ahb_clk
+> > > +      - const: gcc_uniphy1_ahb_clk
+> > > +      - const: gcc_uniphy0_sys_clk
+> > > +      - const: gcc_uniphy1_sys_clk
+> >=20
+> > > +  cmn-reference-clock:
+> > > +    oneOf:
+> > > +      - items:
+> > > +          - enum:
+> > > +              - 0   # CMN PLL reference internal 48MHZ
+> > > +              - 1   # CMN PLL reference external 25MHZ
+> > > +              - 2   # CMN PLL reference external 31250KHZ
+> > > +              - 3   # CMN PLL reference external 40MHZ
+> > > +              - 4   # CMN PLL reference external 48MHZ
+> > > +              - 5   # CMN PLL reference external 50MHZ
+> > > +              - 6   # CMN PLL reference internal 96MHZ
+> >=20
+> > Why is this not represented by an element of the clocks property?
+>=20
+> This property is for the reference clock source selection of CMN PLL,
+> CMN PLL generates the different clock rates for the different Ethernet
+> blocks, this CMN PLL configuration is not located in the GCC, so the
+> clock framework can't be used, which is the general hardware register
+> instead of RCG register for GCC.
 
-This has the benefit that we issue one phylink_validate() call less, for
-some deployments. The visible output remains unchanged in all cases.
+I don't see how the clock being provided by the "GCC" (whatever that is)
+or by some other clock controller or fixed clock makes a difference.
+Why can't the other clock provider be represented in the devicetree?
 
-Link: https://lore.kernel.org/netdev/20231004222523.p5t2cqaot6irstwq@skbuf/
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
-The other, non-immediate benefit has to do with potential future API
-extensions. With this change, pl->cfg_link_an_mode is now parsed and
-available to phylink every time phylink_validate() is called. So it is
-possible to pass it to pcs_validate(), if that ever becomes necessary,
-for example with the introduction of a separate MLO_AN_* mode for clause
-73 auto-negotiation (i.e. in-band selection of state->interface).
+> > > +  clock-frequency:
+> > > +    oneOf:
+> > > +      - items:
+> > > +          - enum:
+> > > +              - 12500000
+> > > +              - 6250000
+> > > +              - 3125000
+> > > +              - 1562500
+> > > +              - 781250
+> > > +              - 390625
+> > > +    description:
+> > > +      The MDIO bus clock that must be output by the MDIO bus hardwar=
+e,
+> > > +      only the listed frequecies above can be configured, other freq=
+uency
+> > > +      will cause malfunction. If absent, the default hardware value =
+is used.
+> >=20
+> > Likewise.
+> >=20
+> > Your commit message contains a bullet point list of what you are doing,
+> > but there's no explanation here for why custom properties are required
+> > to provide clock information.
 
-I don't think this extra information should go into the commit message,
-since these plans may or may not materialize. They are just extra
-information to give reviewers context. The change is useful even if the
-plans do not materialize.
+> This property clock-frequency is optional to configure the MDIO working
+> clock rate, and this is the MDIO general DT property, since the hardware
+> default clock rate is 390625HZ, there is requirement for higher clock rate
+> in the normal working case, i will update this information in the
+> next patch set.
 
- drivers/net/phy/phylink.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+I'm just realising that this particular one is not a custom property,
+the unusual `oneOf: - items: - enum:` structure here threw me. This can
+just be
+  clock-frequency:
+    enum:
+      - 12500000
+      - 6250000
+      - 3125000
+      - 1562500
+      - 781250
+      - 390625
 
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 4adf8ff3ac31..65bff93b1bd8 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -1620,10 +1620,6 @@ struct phylink *phylink_create(struct phylink_config *config,
- 	__set_bit(PHYLINK_DISABLE_STOPPED, &pl->phylink_disable_state);
- 	timer_setup(&pl->link_poll, phylink_fixed_poll, 0);
- 
--	linkmode_fill(pl->supported);
--	linkmode_copy(pl->link_config.advertising, pl->supported);
--	phylink_validate(pl, pl->supported, &pl->link_config);
--
- 	ret = phylink_parse_mode(pl, fwnode);
- 	if (ret < 0) {
- 		kfree(pl);
-@@ -1636,6 +1632,17 @@ struct phylink *phylink_create(struct phylink_config *config,
- 			kfree(pl);
- 			return ERR_PTR(ret);
- 		}
-+	} else if (pl->cfg_link_an_mode == MLO_AN_PHY) {
-+		/* phylink_bringup_phy() will recalculate pl->supported with
-+		 * information from the PHY, but it may take a while until it
-+		 * is called, and we should report something to user space
-+		 * until then rather than nothing at all, to avoid issues.
-+		 * Just report all link modes supportable by the current
-+		 * phy_interface_t and the MAC capabilities.
-+		 */
-+		linkmode_fill(pl->supported);
-+		linkmode_copy(pl->link_config.advertising, pl->supported);
-+		phylink_validate(pl, pl->supported, &pl->link_config);
- 	}
- 
- 	pl->cur_link_an_mode = pl->cfg_link_an_mode;
--- 
-2.34.1
+but you're missing a default, given your commit about the last element
+in that list being one.
 
+Thanks,
+Conor.
+
+--LYJ0ceWwoY8jlvlx
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZXs3kwAKCRB4tDGHoIJi
+0vu7APsHtU2RskKEI44XxHTB9wAjvT2zciB0zeCci/YTbg5d6gEAqM9G7uRaWzhA
+33QIM6/PicVe6pC2JOVaFUlBDKnW0gM=
+=Cypi
+-----END PGP SIGNATURE-----
+
+--LYJ0ceWwoY8jlvlx--
 
