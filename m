@@ -1,176 +1,190 @@
-Return-Path: <netdev+bounces-57487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DA268132AF
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:12:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FA448132C7
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:17:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29A93282533
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:12:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB995281A0D
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:17:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B232959B71;
-	Thu, 14 Dec 2023 14:12:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46EE759E2E;
+	Thu, 14 Dec 2023 14:17:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DriDc4zi"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="D8uGsd/B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85EF9CF
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 06:12:22 -0800 (PST)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-a1d2f89ddabso985310566b.1
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 06:12:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702563141; x=1703167941; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3TzeL0ZSjS0zpiE00HiTA+MkKO8bVUznzXu5wftU6rg=;
-        b=DriDc4ziW3U39eUomzW1MGfSlCPLrPq385D+V/Byb3jgeCLfOXQwOOdAS6BFcHAOIt
-         FR/K+WCNdOuay6TzXy+/kRuFS0khk71CEljcDX/AEtEPgOBE9m5yHg+ZA9zANdfhGdsW
-         ki9uhGz3NGBUqXs+fuz2j3q2EMKeJmw5/V+nN9s6d5T5XJP6W7+0sdJgnpqrgGRvVFnW
-         uYRCMDsHQBfg36u2QK6GWeo0b0UqyPK7u/0aYNdYtLjqCvEmofgsZ7vEpk3WNqvdupKo
-         u5b7dHsrDglJc7Yq+X+0kIPcvOFLYFAO92Mj/4RMcY1YC9C14Fn3oxmvDNp9ziJxpToz
-         mrbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702563141; x=1703167941;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3TzeL0ZSjS0zpiE00HiTA+MkKO8bVUznzXu5wftU6rg=;
-        b=xC7cnij2DsP8ZyE1nFcv+oxlNeKfRiKVinYdPbG7zYXf4N1QcrDsxIpLAVUgrD55zb
-         8mf6e3+RsDzikKrdlVfjPLIGA4pRaTW8Qz3A+j5QH8RVoaNovTsDwT0trh4TzUk9u6D+
-         2k/U6reADqxPEpc6qhfmmY8uL66Hle9qVyKgzU+ZRtGhujlJONPe8LaQI/aRkbA9NWb4
-         m5YqeqI3DMF9TUZAtNh7wscs00RugTST4orXREYcaTU/u5j9hayPtCSsws9YNLbNooqE
-         ScQN9tDwH9FmyZd20k+t9oMbHvvoR2nBujB+uul0+nhB9fRvHj7FmKCej50APC0FFPnA
-         2k4w==
-X-Gm-Message-State: AOJu0YxSm23CZ+GDCq1WzXu5uz6nb+2a1JPNEv6ufpiW0jMEcatD6cLy
-	vhte3edJs1PJMHtWWub8PDV3ubm58NTXfw==
-X-Google-Smtp-Source: AGHT+IHKKvBNMKD30/N57NGCUtvTd2A62FWQKsk/ACuW3rSLBbiP5LqzOnxBo7wtb2FmUchzqssAXQ==
-X-Received: by 2002:a17:906:5a49:b0:9e0:4910:166a with SMTP id my9-20020a1709065a4900b009e04910166amr5776870ejc.32.1702563140709;
-        Thu, 14 Dec 2023 06:12:20 -0800 (PST)
-Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id kt17-20020a1709079d1100b00a015eac52dcsm9398713ejc.108.2023.12.14.06.12.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 06:12:20 -0800 (PST)
-Date: Thu, 14 Dec 2023 16:12:18 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
-	f.fainelli@gmail.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v4 net-next 8/8] selftests: forwarding: ethtool_rmon: Add
- histogram counter test
-Message-ID: <20231214141218.2qz7onhdp72itxam@skbuf>
-References: <20231214135029.383595-1-tobias@waldekranz.com>
- <20231214135029.383595-1-tobias@waldekranz.com>
- <20231214135029.383595-9-tobias@waldekranz.com>
- <20231214135029.383595-9-tobias@waldekranz.com>
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2089.outbound.protection.outlook.com [40.107.105.89])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3407F129;
+	Thu, 14 Dec 2023 06:16:58 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AfK+lhMZJc/YEv7DHZieG/T8xjm/Ir3HR3MP98T7OALTNFPdjegLty1saP/rEAwLiifMVJ+xF3rJH4wpGtVFls/fNdAtDFBI39dIu/uT7FIjN9OWdTv3lHsh2ylrAa2toFTeVE8SM9Y1XZjT8CFWshj7ob5dYN/Hf1yz101rmQ/d64xKdS+PAMYYbS69N0YUkfFYCEJbGmKvRuL9Lx9aIEVmsBK2+/8ApmNkNMNBu6FlxGkY/nDpZEIizZQROujgWguiU5Q3i7p1/TKohXtqhNn+wLOsmhh4ZkHhe2H/ozOgNr6mfTh3QzMapKqJHd/LDWwePNcILHFc5u/igeE8OA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=opf1HphXX+pLIhUaZUsxGo3e7rbzCC5liWJYZNQAR1E=;
+ b=ZKtXn8V3eDO14Llb4JQEGukcsyh2HuvOCmEmT+atmwC/W9iT0wifbne84JYYyupXpJvFC08QyfJ8RUQVva9TZ/Wu30j9qsqvf+4JAp26bjFrYaVvKWc1zBzeM0ovcWwaY0oEe31Oq333Au4cDtkjZBKaKjx9L//ayqFPyvR11aCIrS+xR1JoUUDYZ2gZ+mP8eeyTZNR81AR+BGuuM8ICcpkSqNp4FEB53oB7uM4gMVb3EAlBHsOtC38nIyfZlpR0Y1VtYtWRL2WriDS/M3HLA/XcVCjLEFIj0Z7CYqDKzsl65mEJADoCgzP5udm2WGfiCZF5xTZzVhWiOyrc+uAWTQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=opf1HphXX+pLIhUaZUsxGo3e7rbzCC5liWJYZNQAR1E=;
+ b=D8uGsd/BE3OWlEWMNznijbDKtPKxe84TN0XtWUdNtgZWkfSWLdm6F8xcpkti+3irpPHxv3mWkqqj9DpU5KjVzoNY/Yrkw23rq0GvYWTjXX71EDtj5M4JqKbQ11IxAm4SN/M8ErkGW8CYX9r2CbqC8ZwQMDVcqJauGyCloxJZh0A=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by DUZPR04MB9746.eurprd04.prod.outlook.com (2603:10a6:10:4b1::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.33; Thu, 14 Dec
+ 2023 14:16:52 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7091.028; Thu, 14 Dec 2023
+ 14:16:52 +0000
+Date: Thu, 14 Dec 2023 16:16:46 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, shuah@kernel.org, s-vadapalli@ti.com,
+	r-gunasekaran@ti.com, vigneshr@ti.com, srk@ti.com, horms@kernel.org,
+	p-varis@ti.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 net-next 02/11] selftests: forwarding: ethtool_mm:
+ fall back to aggregate if device does not report pMAC stats
+Message-ID: <20231214141646.kdf5rnldpyglwvdd@skbuf>
+References: <20231213110721.69154-1-rogerq@kernel.org>
+ <20231213110721.69154-3-rogerq@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231213110721.69154-3-rogerq@kernel.org>
+X-ClientProxiedBy: AS4P250CA0007.EURP250.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5df::11) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231214135029.383595-9-tobias@waldekranz.com>
- <20231214135029.383595-9-tobias@waldekranz.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DUZPR04MB9746:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7da1d5e4-4023-47dc-2de1-08dbfcaf518c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	IJKydCwlmGpBavkO45GKj3kLoNTwOrpT8rqAZzLK6aOfCQbnzPTYPubQhmnFmnOgWCd+Zqtmmx/3M73T6U093JFxfHrDMnEx7flb4FkiHYmZieI89f6xQQSaZmuL9Cqqp1HBydWN5f/LXA7S31GIKYh2PkuZvUyjRk8ffqqd0yK3RB7LZq2ZNdUA1e+pBf7OHFJmmLceWBTI5xLCKtoqgy10fIFpOtwtWY6xbmJND+aA79TV6YyUeBFTZSV+CrDHappktb6Rvj8Rf17tdge8fnGZ7cxTfaWgvhXhQs65Ww4w02y1/KR6iwI7X0RE3YQrY4+gSLVSIjedzxySZscbFNr5g1xbryIZMDZr+9BGGTQ0w5hYX4CWXRZuLAVLEgcoGQ5wFYvrDtWf4p5wO1P2a1jNWNbIKAucc4F3lSwMA5Gofccvl64U6/YnXnPoc+70jkE/jlMW8zE0JiJom8dMXmslcw624m1I8/mvvkTRTWJ8b1AGw0GzI/cuewo12StotrrICOX1ieVQGEUKT5hvAnlwFUXpPKphUPU53jaQdWA=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(136003)(366004)(346002)(376002)(396003)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(6506007)(1076003)(26005)(66946007)(8676002)(6486002)(44832011)(9686003)(83380400001)(7416002)(6512007)(5660300002)(2906002)(33716001)(8936002)(4326008)(478600001)(966005)(66476007)(6666004)(41300700001)(6916009)(66556008)(316002)(86362001)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?HAmd+PK14BYdgYUN3+SUv5V074PVz4j7Gu9s/UeB0w6LxJcSaCG+WSe1LJzu?=
+ =?us-ascii?Q?mma6ayGgqPcjiJqgyy0jW5PkJbCbNVxkxZZzDzZDG7KeBiWVKvRMQ60C91gU?=
+ =?us-ascii?Q?6RHzNDr3SV4HYak+eUMYXhrcAZ/4CQ+osnLqz12Q4M4O+FBDDnYdGqe3W/Ov?=
+ =?us-ascii?Q?gn3xDbF78/EWJCQkI6Iwv13repELRzO7Uxtfo41AFPe5uVJFpx+yNviIkqJL?=
+ =?us-ascii?Q?GxWZtu56YZfD8nEHaJ+FkaGX2VLb7SD8w5ti3U80HfRxlXpI5mWv2v4sd2bJ?=
+ =?us-ascii?Q?GUWfYx75EFrLiZPw3c5xPiK7J5iWuFUNr/5jWPksdO8aQxnLms5dNBx24Csn?=
+ =?us-ascii?Q?WxN4qayat7d0JDVVMSa+M6IHu0RERUcRuCGGsQW+JqRXRLfIiSCDEYxBrdz1?=
+ =?us-ascii?Q?1T2Etc0Ffz9qmLRQ/AVL5bTMN+gv5J78ns9Ayz9PreADgbtStJMumz70SCSS?=
+ =?us-ascii?Q?QFB1ssVjZrT7nMgMcCc/+deTRmQqBxHLsLxNcFLifA/msfx2ZkscYZrapYap?=
+ =?us-ascii?Q?4i68qpqs+8ttsthFlVGbb2PHaXyIsBVsi42cAvU58cG4NqgMM6yi3Yq1S3zi?=
+ =?us-ascii?Q?pdWWSKojqxNrte0eehApPK1Dbk+j2tvSyDK1jnz1CHzvbHuI8BA3aU2+3rrr?=
+ =?us-ascii?Q?bcq+AIcl4nKRY3wNvjAYbzXilG2fWKXM+u4y0L3PmWthL2pucL4kiNBCSr6o?=
+ =?us-ascii?Q?Z/WzcR3eyeroq05A6GbuhpAIdVy4ua7jVgsosoIh2KMPMrUVv7/Bt36g+dAT?=
+ =?us-ascii?Q?nnHdm306h7+JzXKuHxZfAohyBLcJpvN/DlD0rljs0jaTMwAL+DxKiZa90DR9?=
+ =?us-ascii?Q?gTN3a3y1twDODQj4D2Dl7g23htExvcmaPzdXxdi6VKWWob096H3RH2qnvWcO?=
+ =?us-ascii?Q?hnjvmnXBH5fUXGYfNHb0lmxUa5NsPzF9ngB7/w96v/V30jSRkhjmr/muGlT8?=
+ =?us-ascii?Q?k1eAAZv+/7nJWU8tnufOTO6qGP7ZTrwlZVPFEbPCsFVZALFtX+9Ws2t2VDyB?=
+ =?us-ascii?Q?0RmWXaRf7PKuhdP3uPzscuNyJ6cgZMBiERIK5NXBvMBu5NDW5W/9aLP4oS0q?=
+ =?us-ascii?Q?dq8wwHPzPCRCcW+Etr3Nb0WzJ9as2ucLKwWq2PC57BF+mANAZJXU71WY3z75?=
+ =?us-ascii?Q?JiW4kiww0Kp3rQLMECo+cUg6uxI7mi2ukUvqoUhCgz1YNO2Trye9Cln5GK+g?=
+ =?us-ascii?Q?7e94kpILoXRCLF3zXwAsG2YxUHYfbJF0UkYrqqjNFgdQk8OYypxfiJWGU8+3?=
+ =?us-ascii?Q?SnLdB53QXLGWJ7XAkidJIH21s5rMWwRvnKTOU//tQjSbRF5J2kmaDr9CN/zp?=
+ =?us-ascii?Q?dVpcx4h8REYHj8G1zHKSfqR7Akemcq/D7Nb6t8fT+qMVbj2iCkO873ZtLmlG?=
+ =?us-ascii?Q?HxTdoGKINHtbwQlf5yWtTnLSpuuB9EBoVSztL37+R972j6aeeNu1OSuX8GrN?=
+ =?us-ascii?Q?tdOnUJlkW26EMdOGkG+3Mu7IXwJMNYzsPm33/zzUWROdjIpbPZ5v1/Q9GMyC?=
+ =?us-ascii?Q?7bGIsCXviNprl/NK0NRJ+XCF1zbHxCTgOlRINDyMcFu0WvWhShy+RSJYmT6m?=
+ =?us-ascii?Q?Ud+3D0LdovxjtFyg1IzNLsuaZKcTg83BPf7l+GCyKW3Rgpg3MVJ0O7d0ch3c?=
+ =?us-ascii?Q?Vg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7da1d5e4-4023-47dc-2de1-08dbfcaf518c
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2023 14:16:52.7204
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4A2O0LDNohC45zvckV+B6eKyixCImKA1iHXD0fShprKleYQwWsovITxsFC2pyIrZeXlLohIJr+xaKPK1EHFXyw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DUZPR04MB9746
 
-On Thu, Dec 14, 2023 at 02:50:29PM +0100, Tobias Waldekranz wrote:
-> Validate the operation of rx and tx histogram counters, if supported
-> by the interface, by sending batches of packets targeted for each
-> bucket.
-> 
-> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
-> ---
-
-Tested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-
-# enetc + ocelot
-./ethtool_rmon.sh eno0 swp0
-TEST: rx-pkts64to64 on eno0                                         [ OK ]
-TEST: rx-pkts65to127 on eno0                                        [ OK ]
-TEST: rx-pkts128to255 on eno0                                       [ OK ]
-TEST: rx-pkts256to511 on eno0                                       [ OK ]
-TEST: rx-pkts512to1023 on eno0                                      [ OK ]
-TEST: rx-pkts1024to1522 on eno0                                     [ OK ]
-TEST: rx-pkts1523to9600 on eno0                                     [ OK ]
-TEST: rx-pkts64to64 on swp0                                         [ OK ]
-TEST: rx-pkts65to127 on swp0                                        [ OK ]
-TEST: rx-pkts128to255 on swp0                                       [ OK ]
-TEST: rx-pkts256to511 on swp0                                       [ OK ]
-TEST: rx-pkts512to1023 on swp0                                      [ OK ]
-TEST: rx-pkts1024to1526 on swp0                                     [ OK ]
-TEST: rx-pkts1527to65535 on swp0                                    [ OK ]
-TEST: tx-pkts64to64 on eno0                                         [ OK ]
-TEST: tx-pkts65to127 on eno0                                        [ OK ]
-TEST: tx-pkts128to255 on eno0                                       [ OK ]
-TEST: tx-pkts256to511 on eno0                                       [ OK ]
-TEST: tx-pkts512to1023 on eno0                                      [ OK ]
-TEST: tx-pkts1024to1522 on eno0                                     [ OK ]
-TEST: tx-pkts1523to9600 on eno0                                     [ OK ]
-TEST: tx-pkts64to64 on swp0                                         [ OK ]
-TEST: tx-pkts65to127 on swp0                                        [ OK ]
-TEST: tx-pkts128to255 on swp0                                       [ OK ]
-TEST: tx-pkts256to511 on swp0                                       [ OK ]
-TEST: tx-pkts512to1023 on swp0                                      [ OK ]
-TEST: tx-pkts1024to1526 on swp0                                     [ OK ]
-TEST: tx-pkts1527to65535 on swp0                                    [ OK ]
-
-# mv88e6xxx
-./ethtool_rmon.sh lan1 lan2
-TEST: rx-pkts64to64 on lan1                                         [ OK ]
-TEST: rx-pkts65to127 on lan1                                        [ OK ]
-TEST: rx-pkts128to255 on lan1                                       [ OK ]
-TEST: rx-pkts256to511 on lan1                                       [ OK ]
-TEST: rx-pkts512to1023 on lan1                                      [ OK ]
-TEST: rx-pkts1024to65535 on lan1                                    [ OK ]
-TEST: rx-pkts64to64 on lan2                                         [ OK ]
-TEST: rx-pkts65to127 on lan2                                        [ OK ]
-TEST: rx-pkts128to255 on lan2                                       [ OK ]
-TEST: rx-pkts256to511 on lan2                                       [ OK ]
-TEST: rx-pkts512to1023 on lan2                                      [ OK ]
-TEST: rx-pkts1024to65535 on lan2                                    [ OK ]
-TEST: lan1 does not support tx histogram counters                   [SKIP]
-TEST: lan2 does not support tx histogram counters                   [SKIP]
-
-This is just lovely, thanks for the work, Tobias.
-
-Just one nitpick below.
-
-> +rmon_histogram()
+On Wed, Dec 13, 2023 at 01:07:12PM +0200, Roger Quadros wrote:
+> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+> index 8f6ca458af9a..763c262a3453 100755
+> --- a/tools/testing/selftests/net/forwarding/lib.sh
+> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+> @@ -146,6 +146,15 @@ check_ethtool_mm_support()
+>  	fi
+>  }
+>  
+> +check_ethtool_pmac_std_stats_support()
 > +{
-> +	local iface=$1; shift
-> +	local neigh=$1; shift
-> +	local set=$1; shift
-> +	local nbuckets=0
-> +	local step=
+> +	local dev=$1; shift
+> +	local grp=$1; shift
 > +
-> +	RET=0
+> +	[ 0 -ne $(ethtool --json -S $dev --all-groups --src pmac 2>/dev/null \
+> +		| jq '.[]."$grp" | length') ]
+> +}
 > +
-> +	while read -r -a bucket; do
-> +		step="$set-pkts${bucket[0]}to${bucket[1]} on $iface"
-> +
-> +		for if in $iface $neigh; do
+>  check_locked_port_support()
+>  {
+>  	if ! bridge -d link show | grep -q " locked"; then
+> -- 
+> 2.34.1
+>
 
-My syntax highlighting in vim gets confused by the fact that you name a
-variable "if". I guess something like "netif" would do the trick. But
-bash doesn't seem to be confused. I can send a patch renaming this after
-it gets merged. There's no reason to resend - it's not a functional
-change.
+FYI, there's another submitted patch that touches the exact same spot,
+and it looks like it has a good chance of getting merged.
+https://patchwork.kernel.org/project/netdevbpf/patch/20231214135029.383595-9-tobias@waldekranz.com/
 
-> +			if ! ensure_mtu $if ${bucket[0]}; then
-> +				log_test_skip "$if does not support the required MTU for $step"
-> +				return
-> +			fi
-> +		done
-> +
-> +		if ! bucket_test $iface $neigh $set $nbuckets ${bucket[0]}; then
-> +			check_err 1 "$step failed"
-> +			return 1
-> +		fi
-> +		log_test "$step"
-> +		nbuckets=$((nbuckets + 1))
-> +	done < <(ethtool --json -S $iface --groups rmon | \
-> +		jq -r ".[0].rmon[\"${set}-pktsNtoM\"][]|[.low, .high]|@tsv" 2>/dev/null)
+You need to pay attention to merge conflicts, so you don't waste a patch
+iteration just because of that one thing.
+
+I guess you might be able to wing it, because the other patch does this:
+
+diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+index 8f6ca458af9a..e3740163c384 100755
+--- a/tools/testing/selftests/net/forwarding/lib.sh
++++ b/tools/testing/selftests/net/forwarding/lib.sh
+@@ -146,6 +146,15 @@  check_ethtool_mm_support()
+ 	fi
+ }
+ 
++check_ethtool_counter_group_support()
++{
++	ethtool --help 2>&1| grep -- '--all-groups' &> /dev/null
++	if [[ $? -ne 0 ]]; then
++		echo "SKIP: ethtool too old; it is missing standard counter group support"
++		exit $ksft_skip
++	fi
++}
++
+ check_locked_port_support()
+ {
+ 	if ! bridge -d link show | grep -q " locked"; then
+
+which quite coincidentally does not change what your patch sees in its
+upper context, aka 3 lines like this:
+
+----
+ 	fi
+ }
+ 
+----
+
+You can check if your patch set applies on top of Tobias', by formatting
+it as patch files on top of net-next/main, resetting HEAD to net-next,
+applying Tobias' series and then your patches.
 
