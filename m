@@ -1,209 +1,388 @@
-Return-Path: <netdev+bounces-57422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D731681312B
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:18:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CE0E81312E
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:18:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 668401F20FFA
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:18:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C2641C21567
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:18:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B34FC54BC8;
-	Thu, 14 Dec 2023 13:18:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z88tR6GF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3004554BD4;
+	Thu, 14 Dec 2023 13:18:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45BE710E
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 05:17:58 -0800 (PST)
-Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-5526993db9fso9737a12.0
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 05:17:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702559877; x=1703164677; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/Nzz009bCK5F2i7STK4T3mKQ2BTIc8hB5IsTWQ0ncsg=;
-        b=z88tR6GF8aiR3bhtWIBNrYtNhSX/cQv6OO+/jUrB7iRTsgV9fTdI7mAwcXm5cuez6+
-         2QVYyFKDlf9m7PGJzhZQI8VfKTpBAcRjkJ0JVw3fc4E9TCAYALW4CONQ8JBOi9rp5RNd
-         mTEq53XjX/7RJXOpYKrt9KYyR9OFeIIH/JzBAxEsFLzOV3dn+cqRdMjo2VbNnHqzGZgZ
-         HDTXdFn3eKkeL5SguWu4YzMWWZv1TADIIFllFoHm1XFDzHuS0c4b7dQH3n3tHd2Bf6cI
-         d2ZMu0QALYWXr0aZA9BSlaHsSiuPw5XP2E68vgaA7wIq5ywEwDf541U8SEg156CfkY+w
-         xFcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702559877; x=1703164677;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/Nzz009bCK5F2i7STK4T3mKQ2BTIc8hB5IsTWQ0ncsg=;
-        b=ZSEVDtZshhuC/58OR7E0oWo2fJBZvHmuQ1G5mXpOECyQf1zqbmdQQEWvFBpd2/uE0Y
-         AT+freh9MJ2t10zDor7+q3hsGNDY+V3shpekFMBuHFcwrY4H2fnYWDO29w+UTnqWX3FC
-         nhwSF9MQlp1R7tyHFAahbfHTt0KY4ssLJghdeWIzSfA3U4BeE6aFV9W+j2lVpWq9aa1X
-         V0xWJ26QNyBV93MFaCdqRRfaJXriBVBwPMJr0PWRuLnmDFnPrEkQGK1suuKCGCSmG8v8
-         p13RdcvCVlKWZ7lJC6+InaEIL70PjATHZbCs5h/18wMDXn+HY61cL1B2OA5V2/oeyIgB
-         a2Xw==
-X-Gm-Message-State: AOJu0YxIN/FSGJ4S7mbUDxn+zB7coyxE4spshZTqBjTrx3nfIj7ra6am
-	cYGB57mmhsTCGyAHCDCuNrun0Q/7tIG/86PFPwx1uQ==
-X-Google-Smtp-Source: AGHT+IHmopDQbJwS5mno7KGH25ei4JUtKSc6D3yADawqMJyR9i5N3wMeEvFVOjLyf9nJN7oXuj7wZ/3bLPYej3tYQ4Q=
-X-Received: by 2002:a50:bacf:0:b0:545:279:d075 with SMTP id
- x73-20020a50bacf000000b005450279d075mr624515ede.1.1702559876549; Thu, 14 Dec
- 2023 05:17:56 -0800 (PST)
+X-Greylist: delayed 100 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 14 Dec 2023 05:18:27 PST
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CE7510E;
+	Thu, 14 Dec 2023 05:18:27 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4SrXvK03FYz29g2T;
+	Thu, 14 Dec 2023 21:17:17 +0800 (CST)
+Received: from dggpeml500022.china.huawei.com (unknown [7.185.36.66])
+	by mail.maildlp.com (Postfix) with ESMTPS id 77FC31A0190;
+	Thu, 14 Dec 2023 21:18:25 +0800 (CST)
+Received: from [10.67.120.135] (10.67.120.135) by
+ dggpeml500022.china.huawei.com (7.185.36.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 14 Dec 2023 21:18:25 +0800
+Subject: Re: [PATCH net-next v4 1/4] octeon_ep: add PF-VF mailbox
+ communication
+To: Shinas Rasheed <srasheed@marvell.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
+	<mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
+	<kheib@redhat.com>, <konguyen@redhat.com>, Veerasenareddy Burru
+	<vburru@marvell.com>, Sathesh Edara <sedara@marvell.com>, Eric Dumazet
+	<edumazet@google.com>
+References: <20231213035816.2656851-1-srasheed@marvell.com>
+ <20231213035816.2656851-2-srasheed@marvell.com>
+From: "shenjian (K)" <shenjian15@huawei.com>
+Message-ID: <cf45647c-f161-809f-e1c5-5fd82524ede4@huawei.com>
+Date: Thu, 14 Dec 2023 21:18:24 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.5.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231210111033.1823491-1-maze@google.com> <ebf480701cd22da00c89c5b1b00d31be95ff8e4d.camel@redhat.com>
-In-Reply-To: <ebf480701cd22da00c89c5b1b00d31be95ff8e4d.camel@redhat.com>
-From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
-Date: Thu, 14 Dec 2023 14:17:44 +0100
-Message-ID: <CANP3RGfk6PqR2P8HnGX92ODnf6V5iKb+_zjonOsTDOB-3odM5g@mail.gmail.com>
-Subject: Re: [PATCH] net: sysctl: fix edge case wrt. sysctl write access
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Flavio Crisciani <fcrisciani@google.com>, "Theodore Y. Ts'o" <tytso@google.com>, 
-	"Eric W. Biederman" <ebiederm@xmission.com>, Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20231213035816.2656851-2-srasheed@marvell.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpeml500022.china.huawei.com (7.185.36.66)
 
-On Thu, Dec 14, 2023 at 10:37=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
+A few nit comments
+
+
+在 2023/12/13 11:58, Shinas Rasheed 写道:
+> Implement mailbox communication between PF and VFs.
+> PF-VF mailbox is used for all control commands from VF to PF and
+> asynchronous notification messages from PF to VF.
 >
-> On Sun, 2023-12-10 at 03:10 -0800, Maciej =C5=BBenczykowski wrote:
-> > The clear intent of net_ctl_permissions() is that having CAP_NET_ADMIN
-> > grants write access to networking sysctls.
-> >
-> > However, it turns out there is an edge case where this is insufficient:
-> > inode_permission() has an additional check on HAS_UNMAPPED_ID(inode)
-> > which can return -EACCES and thus block *all* write access.
-> >
-> > Note: AFAICT this check is wrt. the uid/gid mapping that was
-> > active at the time the filesystem (ie. proc) was mounted.
-> >
-> > In order for this check to not fail, we need net_ctl_set_ownership()
-> > to set valid uid/gid.  It is not immediately clear what value
-> > to use, nor what values are guaranteed to work.
-> > It does make sense that /proc/sys/net appear to be owned by root
-> > from within the netns owning userns.  As such we only modify
-> > what happens if the code fails to map uid/gid 0.
-> > Currently the code just fails to do anything, which in practice
-> > results in using the zeroes of freshly allocated memory,
-> > and we thus end up with global root.
-> > With this change we instead use the uid/gid of the owning userns.
-> > While it is probably (?) theoretically possible for this to *also*
-> > be unmapped from the /proc filesystem's point of view, this seems
-> > much less likely to happen in practice.
-> >
-> > The old code is observed to fail in a relatively complex setup,
-> > within a global root created user namespace with selectively
-> > mapped uid/gids (not including global root) and /proc mounted
-> > afterwards (so this /proc mount does not have global root mapped).
-> > Within this user namespace another non privileged task creates
-> > a new user namespace, maps it's own uid/gid (but not uid/gid 0),
-> > and then creates a network namespace.  It cannot write to networking
-> > sysctls even though it does have CAP_NET_ADMIN.
+> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
+> ---
+> V4:
+>    - Include [1/4] in the subject for this patch, which was lost in V3
 >
-> I'm wondering if this specific scenario should be considered a setup
-> issue, and should be solved with a different configuration? I would
-> love to hear others opinions!
-
-While it could be fixed in userspace.  I don't think it should:
-
-The global root uid/gid are very intentionally not mapped in (as a
-security feature).
-So that part isn't changeable (it's also a system daemon and not under
-user control).
-
-The user namespace very intentionally maps uid->uid and not 0->uid.
-Here there's theoretically more leeway... because it is at least under
-user control.
-However here this is done for good reason as well.
-There's plenty of code that special cases uid=3D0, both in the kernel
-(for example capability handling across exec) and in various userspace
-libraries.  It's unrealistic to fix them all.
-Additionally it's nice to have semi-transparent user namespaces,
-which are security barriers but don't remap uids - remapping causes confusi=
-on.
-(ie. the uid is either mapped or not, but if it is mapped it's a 1:1 mappin=
-g)
-
-As for why?  Because uids as visible to userspace may leak across user
-namespace boundaries,
-either when talking to other system daemons or when talking across machines=
-.
-It's pretty easy (and common) to have uids that are globally unique
-and meaningful in a cluster of machines.
-Again, this is *theoretically* fixable in userspace, but not actually
-a realistic expectation.
-
-btw. even outside of clusters of machines, I also run some
-user/uts/net namespace using
-code on my personal desktop (this does require some minor hacks to
-unshare/mount binaries),
-and again I intentionally map uid->uid and 0->uid, because this makes
-my username show up as 'maze' and not 'root'.
-
-This is *clearly* a kernel bug that this doesn't just work.
-(side note: there's a very similar issue in proc_net.c which I haven't
-gotten around to fixing yet, because it looks to be more complex to
-convince oneself it's safe to do)
-
-> > This is because net_ctl_set_ownership fails to map uid/gid 0
-> > (because uid/gid 0 are *not* mapped in the owning 2nd level user_ns),
-> > and falls back to global root.
-> > But global root is not mapped in the 1st level user_ns,
-> > which was inherited by the /proc mount, and thus fails...
-> >
-> > Note: the uid/gid of networking sysctls is of purely superficial
-> > importance, outside of this UNMAPPED check, it does not actually
-> > affect access, and only affects display.
-> >
-> > Access is always based on whether you are *global* root uid
-> > (or have CAP_NET_ADMIN over the netns) for user write access bits
-> > (or are in *global* root gid for group write access bits).
-> >
-> > Cc: Flavio Crisciani <fcrisciani@google.com>
-> > Cc: "Theodore Y. Ts'o" <tytso@google.com>
-> > Cc: "Eric W. Biederman" <ebiederm@xmission.com>
-> > Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-> > Fixes: e79c6a4fc923 ("net: make net namespace sysctls belong to contain=
-er's owner")
-> > Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
-> > ---
-> >  net/sysctl_net.c | 13 ++++---------
-> >  1 file changed, 4 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/net/sysctl_net.c b/net/sysctl_net.c
-> > index 051ed5f6fc93..ded399f380d9 100644
-> > --- a/net/sysctl_net.c
-> > +++ b/net/sysctl_net.c
-> > @@ -58,16 +58,11 @@ static void net_ctl_set_ownership(struct ctl_table_=
-header *head,
-> >                                 kuid_t *uid, kgid_t *gid)
-> >  {
-> >       struct net *net =3D container_of(head->set, struct net, sysctls);
-> > -     kuid_t ns_root_uid;
-> > -     kgid_t ns_root_gid;
-> > +     kuid_t ns_root_uid =3D make_kuid(net->user_ns, 0);
-> > +     kgid_t ns_root_gid =3D make_kgid(net->user_ns, 0);
-> >
-> > -     ns_root_uid =3D make_kuid(net->user_ns, 0);
+> V3: https://lore.kernel.org/all/20231211063355.2630028-2-srasheed@marvell.com/
+>    - Corrected error cleanup logic for PF-VF mbox setup
+>    - Removed double inclusion of types.h header file in octep_pfvf_mbox.c
 >
-> As a fix I would prefer you would keep it minimal. e.g. just replace
-> the if with the ternary operator or just add an 'else' branch.
-
-If you think that's better, I'll resend a v2.
-
+> V2: https://lore.kernel.org/all/20231209081450.2613561-2-srasheed@marvell.com/
+>    - Remove unused variable
 >
-> Cheers,
+> V1: https://lore.kernel.org/all/20231208070352.2606192-2-srasheed@marvell.com/
 >
-> Paolo
+>   .../net/ethernet/marvell/octeon_ep/Makefile   |   2 +-
+>   .../marvell/octeon_ep/octep_cn9k_pf.c         |  59 ++-
+>   .../marvell/octeon_ep/octep_cnxk_pf.c         |  46 ++-
+>   .../marvell/octeon_ep/octep_ctrl_mbox.h       |   4 +-
+>   .../ethernet/marvell/octeon_ep/octep_main.c   |  83 ++++-
+>   .../ethernet/marvell/octeon_ep/octep_main.h   |  45 ++-
+>   .../marvell/octeon_ep/octep_pfvf_mbox.c       | 335 ++++++++++++++++++
+>   .../marvell/octeon_ep/octep_pfvf_mbox.h       | 143 ++++++++
+>   .../marvell/octeon_ep/octep_regs_cn9k_pf.h    |   9 +
+>   .../marvell/octeon_ep/octep_regs_cnxk_pf.h    |  13 +
+>   .../net/ethernet/marvell/octeon_ep/octep_tx.h |  24 +-
+>   11 files changed, 714 insertions(+), 49 deletions(-)
+>   create mode 100644 drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
+>   create mode 100644 drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h
 >
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/Makefile b/drivers/net/ethernet/marvell/octeon_ep/Makefile
+> index 02a4a21bc298..62162ed63f34 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep/Makefile
+> +++ b/drivers/net/ethernet/marvell/octeon_ep/Makefile
+> @@ -7,4 +7,4 @@ obj-$(CONFIG_OCTEON_EP) += octeon_ep.o
+>   
+>   octeon_ep-y := octep_main.o octep_cn9k_pf.o octep_tx.o octep_rx.o \
+>   	       octep_ethtool.o octep_ctrl_mbox.o octep_ctrl_net.o \
+> -	       octep_cnxk_pf.o
+> +	       octep_pfvf_mbox.o octep_cnxk_pf.o
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c b/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c
+> index 9209f1ec1b52..b5805969404f 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c
+> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c
+> @@ -362,16 +362,55 @@ static void octep_setup_mbox_regs_cn93_pf(struct octep_device *oct, int q_no)
+>   {
+>   	struct octep_mbox *mbox = oct->mbox[q_no];
+>   
+> -	mbox->q_no = q_no;
+> -
+> -	/* PF mbox interrupt reg */
+> -	mbox->mbox_int_reg = oct->mmio[0].hw_addr + CN93_SDP_EPF_MBOX_RINT(0);
+> -
+>   	/* PF to VF DATA reg. PF writes into this reg */
+> -	mbox->mbox_write_reg = oct->mmio[0].hw_addr + CN93_SDP_R_MBOX_PF_VF_DATA(q_no);
+> +	mbox->pf_vf_data_reg = oct->mmio[0].hw_addr + CN93_SDP_MBOX_PF_VF_DATA(q_no);
+>   
+>   	/* VF to PF DATA reg. PF reads from this reg */
+> -	mbox->mbox_read_reg = oct->mmio[0].hw_addr + CN93_SDP_R_MBOX_VF_PF_DATA(q_no);
+> +	mbox->vf_pf_data_reg = oct->mmio[0].hw_addr + CN93_SDP_MBOX_VF_PF_DATA(q_no);
+> +}
+> +
+> +/* Poll for mailbox messages from VF */
+> +static void octep_poll_pfvf_mailbox(struct octep_device *oct)
+> +{
+> +	u32 vf, active_vfs, active_rings_per_vf, vf_mbox_queue;
+> +	u64 reg0, reg1;
+> +
+> +	reg0 = octep_read_csr64(oct, CN93_SDP_EPF_MBOX_RINT(0));
+> +	reg1 = octep_read_csr64(oct, CN93_SDP_EPF_MBOX_RINT(1));
+> +	if (reg0 || reg1) {
+> +		active_vfs = CFG_GET_ACTIVE_VFS(oct->conf);
+> +		active_rings_per_vf = CFG_GET_ACTIVE_RPVF(oct->conf);
+> +		for (vf = 0; vf < active_vfs; vf++) {
+> +			vf_mbox_queue = vf * active_rings_per_vf;
+> +
+> +			if (vf_mbox_queue < 64) {
+> +				if (!(reg0 & (0x1UL << vf_mbox_queue)))
+> +					continue;
+> +			} else {
+> +				if (!(reg1 & (0x1UL << (vf_mbox_queue - 64))))
+> +					continue;
+> +			}
+> +
+> +			if (!oct->mbox[vf_mbox_queue]) {
+> +				dev_err(&oct->pdev->dev, "bad mbox vf %d\n", vf);
+> +				continue;
+> +			}
+> +			schedule_work(&oct->mbox[vf_mbox_queue]->wk.work);
+> +		}
+> +		if (reg0)
+> +			octep_write_csr64(oct, CN93_SDP_EPF_MBOX_RINT(0), reg0);
+> +		if (reg1)
+> +			octep_write_csr64(oct, CN93_SDP_EPF_MBOX_RINT(1), reg1);
+> +	}
+> +}
+> +
+> +/* PF-VF mailbox interrupt handler */
+> +static irqreturn_t octep_pfvf_mbox_intr_handler_cn93_pf(void *dev)
+> +{
+> +	struct octep_device *oct = (struct octep_device *)dev;
+> +
+> +	octep_poll_pfvf_mailbox(oct);
+> +	return IRQ_HANDLED;
+>   }
+>   
+>   /* Poll OEI events like heartbeat */
+> @@ -403,6 +442,7 @@ static irqreturn_t octep_oei_intr_handler_cn93_pf(void *dev)
+>    */
+>   static void octep_poll_non_ioq_interrupts_cn93_pf(struct octep_device *oct)
+>   {
+> +	octep_poll_pfvf_mailbox(oct);
+>   	octep_poll_oei_cn93_pf(oct);
+>   }
+>   
+> @@ -646,6 +686,8 @@ static void octep_enable_interrupts_cn93_pf(struct octep_device *oct)
+>   
+>   	octep_write_csr64(oct, CN93_SDP_EPF_MISC_RINT_ENA_W1S, intr_mask);
+>   	octep_write_csr64(oct, CN93_SDP_EPF_DMA_RINT_ENA_W1S, intr_mask);
+> +	octep_write_csr64(oct, CN93_SDP_EPF_MBOX_RINT_ENA_W1S(0), -1ULL);
+> +	octep_write_csr64(oct, CN93_SDP_EPF_MBOX_RINT_ENA_W1S(1), -1ULL);
+>   
+>   	octep_write_csr64(oct, CN93_SDP_EPF_DMA_VF_RINT_ENA_W1S(0), -1ULL);
+>   	octep_write_csr64(oct, CN93_SDP_EPF_PP_VF_RINT_ENA_W1S(0), -1ULL);
+> @@ -672,6 +714,8 @@ static void octep_disable_interrupts_cn93_pf(struct octep_device *oct)
+>   
+>   	octep_write_csr64(oct, CN93_SDP_EPF_MISC_RINT_ENA_W1C, intr_mask);
+>   	octep_write_csr64(oct, CN93_SDP_EPF_DMA_RINT_ENA_W1C, intr_mask);
+> +	octep_write_csr64(oct, CN93_SDP_EPF_MBOX_RINT_ENA_W1C(0), -1ULL);
+> +	octep_write_csr64(oct, CN93_SDP_EPF_MBOX_RINT_ENA_W1C(1), -1ULL);
+>   
+>   	octep_write_csr64(oct, CN93_SDP_EPF_DMA_VF_RINT_ENA_W1C(0), -1ULL);
+>   	octep_write_csr64(oct, CN93_SDP_EPF_PP_VF_RINT_ENA_W1C(0), -1ULL);
+> @@ -807,6 +851,7 @@ void octep_device_setup_cn93_pf(struct octep_device *oct)
+>   	oct->hw_ops.setup_oq_regs = octep_setup_oq_regs_cn93_pf;
+>   	oct->hw_ops.setup_mbox_regs = octep_setup_mbox_regs_cn93_pf;
+>   
+> +	oct->hw_ops.mbox_intr_handler = octep_pfvf_mbox_intr_handler_cn93_pf;
+>   	oct->hw_ops.oei_intr_handler = octep_oei_intr_handler_cn93_pf;
+>   	oct->hw_ops.ire_intr_handler = octep_ire_intr_handler_cn93_pf;
+>   	oct->hw_ops.ore_intr_handler = octep_ore_intr_handler_cn93_pf;
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_cnxk_pf.c b/drivers/net/ethernet/marvell/octeon_ep/octep_cnxk_pf.c
+> index 098a0c5c4d1c..5de0b5ecbc5f 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_cnxk_pf.c
+> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_cnxk_pf.c
+> @@ -392,16 +392,44 @@ static void octep_setup_mbox_regs_cnxk_pf(struct octep_device *oct, int q_no)
+>   {
+>   	struct octep_mbox *mbox = oct->mbox[q_no];
+>   
+> -	mbox->q_no = q_no;
+> -
+> -	/* PF mbox interrupt reg */
+> -	mbox->mbox_int_reg = oct->mmio[0].hw_addr + CNXK_SDP_EPF_MBOX_RINT(0);
+> -
+>   	/* PF to VF DATA reg. PF writes into this reg */
+> -	mbox->mbox_write_reg = oct->mmio[0].hw_addr + CNXK_SDP_R_MBOX_PF_VF_DATA(q_no);
+> +	mbox->pf_vf_data_reg = oct->mmio[0].hw_addr + CNXK_SDP_MBOX_PF_VF_DATA(q_no);
+>   
+>   	/* VF to PF DATA reg. PF reads from this reg */
+> -	mbox->mbox_read_reg = oct->mmio[0].hw_addr + CNXK_SDP_R_MBOX_VF_PF_DATA(q_no);
+> +	mbox->vf_pf_data_reg = oct->mmio[0].hw_addr + CNXK_SDP_MBOX_VF_PF_DATA(q_no);
+> +}
+> +
+> +static void octep_poll_pfvf_mailbox_cnxk_pf(struct octep_device *oct)
+> +{
+> +	u32 vf, active_vfs, active_rings_per_vf, vf_mbox_queue;
+> +	u64 reg0;
+> +
+> +	reg0 = octep_read_csr64(oct, CNXK_SDP_EPF_MBOX_RINT(0));
+> +	if (reg0) {
+> +		active_vfs = CFG_GET_ACTIVE_VFS(oct->conf);
+> +		active_rings_per_vf = CFG_GET_ACTIVE_RPVF(oct->conf);
+> +		for (vf = 0; vf < active_vfs; vf++) {
+> +			vf_mbox_queue = vf * active_rings_per_vf;
+> +			if (!(reg0 & (0x1UL << vf_mbox_queue)))
+> +				continue;
+> +
+> +			if (!oct->mbox[vf_mbox_queue]) {
+> +				dev_err(&oct->pdev->dev, "bad mbox vf %d\n", vf);
+> +				continue;
+> +			}
+> +			schedule_work(&oct->mbox[vf_mbox_queue]->wk.work);
+> +		}
+> +		if (reg0)
+the checking of reg0 here seems unnecessary.
 
---
-Maciej =C5=BBenczykowski, Kernel Networking Developer @ Google
+> +			octep_write_csr64(oct, CNXK_SDP_EPF_MBOX_RINT(0), reg0);
+> +	}
+> +}
+> +
+> +static irqreturn_t octep_pfvf_mbox_intr_handler_cnxk_pf(void *dev)
+> +{
+> +	struct octep_device *oct = (struct octep_device *)dev;
+> +
+> +	octep_poll_pfvf_mailbox_cnxk_pf(oct);
+> +	return IRQ_HANDLED;
+>   }
+
+...
+
+> +#include <linux/types.h>
+> +#include <linux/errno.h>
+> +#include <linux/string.h>
+> +#include <linux/mutex.h>
+> +#include <linux/jiffies.h>
+> +#include <linux/sched.h>
+> +#include <linux/sched/signal.h>
+> +#include <linux/io.h>
+> +#include <linux/pci.h>
+> +#include <linux/etherdevice.h>
+> +
+> +#include "octep_config.h"
+> +#include "octep_main.h"
+> +#include "octep_pfvf_mbox.h"
+> +#include "octep_ctrl_net.h"
+> +
+> +static void octep_pfvf_validate_version(struct octep_device *oct,  u32 vf_id,
+redundant space before "u32 vf_id"
+
+> +					union octep_pfvf_mbox_word cmd,
+> +					union octep_pfvf_mbox_word *rsp)
+> +{
+> +	u32 vf_version = (u32)cmd.s_version.version;
+> +
+> +	if (vf_version <= OCTEP_PFVF_MBOX_VERSION_V1)
+> +		rsp->s_version.type = OCTEP_PFVF_MBOX_TYPE_RSP_ACK;
+> +	else
+> +		rsp->s_version.type = OCTEP_PFVF_MBOX_TYPE_RSP_NACK;
+> +}
+
+...
+> +static void octep_pfvf_dev_remove(struct octep_device *oct,  u32 vf_id,
+> +				  union octep_pfvf_mbox_word cmd,
+> +				  union octep_pfvf_mbox_word *rsp)
+> +{
+> +	int err;
+> +
+> +	err = octep_ctrl_net_dev_remove(oct, vf_id);
+> +	if (err) {
+> +		rsp->s.type = OCTEP_PFVF_MBOX_TYPE_RSP_NACK;
+> +		dev_err(&oct->pdev->dev, "Failed to acknowledge fw of vf %d removal\n",
+> +			vf_id);
+> +		return;
+> +	}
+> +	rsp->s.type = OCTEP_PFVF_MBOX_TYPE_RSP_ACK;
+> +}
+> +
+> +int octep_setup_pfvf_mbox(struct octep_device *oct)
+> +{
+> +	int i = 0, num_vfs = 0, rings_per_vf = 0;
+looks unnecessary initialiazation here.
+
+> +	int ring = 0;
+> +
+> +	num_vfs = oct->conf->sriov_cfg.active_vfs;
+> +	rings_per_vf = oct->conf->sriov_cfg.max_rings_per_vf;
+> +
+> +	for (i = 0; i < num_vfs; i++) {
+> +		ring  = rings_per_vf * i;
+redundant space after 'ring'? also exist at other places.
+> +		oct->mbox[ring] = vzalloc(sizeof(*oct->mbox[ring]));
+> +
+> +		if (!oct->mbox[ring])
+> +			goto free_mbox;
+> +
+> +		memset(oct->mbox[ring], 0, sizeof(struct octep_mbox));
+> +		mutex_init(&oct->mbox[ring]->lock);
+> +		INIT_WORK(&oct->mbox[ring]->wk.work, octep_pfvf_mbox_work);
+> +		oct->mbox[ring]->wk.ctxptr = oct->mbox[ring];
+> +		oct->mbox[ring]->oct = oct;
+> +		oct->mbox[ring]->vf_id = i;
+> +		oct->hw_ops.setup_mbox_regs(oct, ring);
+> +	}
+> +	return 0;
+> +
+> +free_mbox:
+> +	while (i) {
+> +		i--;
+> +		ring  = rings_per_vf * i;
+> +		cancel_work_sync(&oct->mbox[ring]->wk.work);
+> +		mutex_destroy(&oct->mbox[ring]->lock);
+> +		vfree(oct->mbox[ring]);
+> +		oct->mbox[ring] = NULL;
+> +	}
+> +	return -ENOMEM;
+> +}
+> +
+> +void octep_delete_pfvf_mbox(struct octep_device *oct)
+> +{
+> +	int rings_per_vf = oct->conf->sriov_cfg.max_rings_per_vf;
+> +	int num_vfs = oct->conf->sriov_cfg.active_vfs;
+> +	int i = 0, ring = 0, vf_srn = 0;
+> +
+> +	for (i = 0; i < num_vfs; i++) {
+> +		ring  = vf_srn + rings_per_vf * i;
+> +		if (!oct->mbox[ring])
+> +			continue;
+> +
+> +		if (work_pending(&oct->mbox[ring]->wk.work))
+> +			cancel_work_sync(&oct->mbox[ring]->wk.work);
+> +
+> +		mutex_destroy(&oct->mbox[ring]->lock);
+> +		vfree(oct->mbox[ring]);
+> +		oct->mbox[ring] = NULL;
+> +	}
+> +}
+> +
+> +static void octep_pfvf_pf_get_data(struct octep_device *oct,
+> +				   struct octep_mbox *mbox, int vf_id,
+> +				   union octep_pfvf_mbox_word cmd,
+> +				   union octep_pfvf_mbox_word *rsp)
+> +{
+> +	int length = 0;
+> +	int i = 0;
+> +	int err;
+> +	struct octep_iface_link_info link_info;
+> +	struct octep_iface_rx_stats rx_stats;
+> +	struct octep_iface_tx_stats tx_stats;
+Variables should be placed with Revert-Chris Tree  sequency
+
+
+...
 
