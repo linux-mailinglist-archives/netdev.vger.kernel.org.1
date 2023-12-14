@@ -1,39 +1,44 @@
-Return-Path: <netdev+bounces-57240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B57CD812839
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 07:34:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B27E812869
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 07:46:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72D392825F0
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 06:34:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9566282646
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 06:46:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC6DD274;
-	Thu, 14 Dec 2023 06:34:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VlJb41ft"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3019D505;
+	Thu, 14 Dec 2023 06:46:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B316A21;
-	Thu, 14 Dec 2023 06:34:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C84CCC433C8;
-	Thu, 14 Dec 2023 06:34:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702535686;
-	bh=1KvqRRdnwqEvmlU+FTtgALcCS9FN2+H6/ZpytPxQYp8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=VlJb41ftGhuFO+GxwcbjBxwGRGB2zf1smUTBpPP4JBA21Ox58C2c4TJJyLD2oij5K
-	 mhW89hPQm8fkU3MEjAcZ53HkyHmCdWYJQhc/LAI1IGQAIuilBVJ6gO00dm42gKkRK9
-	 T7P/gPUcj7Y3pkkaSoG3q/lhkVoLzh1sDJjSvR7LrXNUBxF8Ep4GagCnjp4YRTCjIl
-	 f5haY1z8EdeGAaTNu6Xej1GiLHDG9EFd/kM3doSgDZS1KbY6yxPLrJSkvhiuYkdYYK
-	 /q7BhYSEXQSWZIKGts3JsXifLENy7qPEzo+qd1/2oy0Lu4OzsIrqNxAnpvL2KkQUpK
-	 iDg8FMq/DWfPw==
-Message-ID: <80e14311-61ba-4dda-93bb-991ad4b779df@kernel.org>
-Date: Wed, 13 Dec 2023 22:34:43 -0800
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 280C3E8;
+	Wed, 13 Dec 2023 22:46:19 -0800 (PST)
+X-UUID: a8a7e8588f3945dca372922d586ad599-20231214
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.33,REQID:3e35a9ac-60c8-4a01-8c7d-96e47a71c586,IP:5,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:-10
+X-CID-INFO: VERSION:1.1.33,REQID:3e35a9ac-60c8-4a01-8c7d-96e47a71c586,IP:5,URL
+	:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:-10
+X-CID-META: VersionHash:364b77b,CLOUDID:308d2f61-c89d-4129-91cb-8ebfae4653fc,B
+	ulkID:231214144607IFAQKYW0,BulkQuantity:0,Recheck:0,SF:19|44|64|66|24|17|1
+	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
+	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
+X-UUID: a8a7e8588f3945dca372922d586ad599-20231214
+X-User: chentao@kylinos.cn
+Received: from [172.20.15.254] [(116.128.244.169)] by mailgw
+	(envelope-from <chentao@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1396760837; Thu, 14 Dec 2023 14:46:07 +0800
+Message-ID: <ae686e04-b65c-4a4d-b208-076136bae070@kylinos.cn>
+Date: Thu, 14 Dec 2023 14:46:06 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,123 +46,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v1 2/4] net: introduce abstraction for
- network memory
+Subject: Re: [PATCH] iavf: Fix null pointer dereference in
+ iavf_print_link_message
 Content-Language: en-US
-To: Mina Almasry <almasrymina@google.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Michael Chan <michael.chan@broadcom.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Wei Fang <wei.fang@nxp.com>,
- Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
- NXP Linux Team <linux-imx@nxp.com>, Jeroen de Borst <jeroendb@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Shailend Chand <shailend@google.com>, Yisen Zhuang
- <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Marcin Wojtas <mw@semihalf.com>, Russell King <linux@armlinux.org.uk>,
- Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>,
- Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>,
- Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
- Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com,
- "K. Y. Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, Jassi Brar <jaswinder.singh@linaro.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Siddharth Vadapalli <s-vadapalli@ti.com>,
- Ravi Gunasekaran <r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>,
- Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou
- <mengyuanlou@net-swift.com>, Ronak Doshi <doshir@vmware.com>,
- VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
- Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>,
- Kalle Valo <kvalo@kernel.org>, Juergen Gross <jgross@suse.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
- =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
- Nathan Chancellor <nathan@kernel.org>,
- Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
- <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- Jason Gunthorpe <jgg@nvidia.com>, Shakeel Butt <shakeelb@google.com>,
- Yunsheng Lin <linyunsheng@huawei.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-References: <20231214020530.2267499-1-almasrymina@google.com>
- <20231214020530.2267499-3-almasrymina@google.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20231214020530.2267499-3-almasrymina@google.com>
-Content-Type: text/plain; charset=UTF-8
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ jacob.e.keller@intel.com, przemyslaw.kitszel@intel.com,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Kunwu Chan <kunwu.chan@hotmail.com>
+References: <20231211025927.233449-1-chentao@kylinos.cn>
+ <20231212132851.59054654@kernel.org>
+From: Kunwu Chan <chentao@kylinos.cn>
+In-Reply-To: <20231212132851.59054654@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/13/23 7:05 PM, Mina Almasry wrote:
-> diff --git a/include/net/netmem.h b/include/net/netmem.h
-> new file mode 100644
-> index 000000000000..e4309242d8be
-> --- /dev/null
-> +++ b/include/net/netmem.h
-> @@ -0,0 +1,35 @@
-> +/* SPDX-License-Identifier: GPL-2.0
-> + *
-> + * netmem.h
-> + *	Author:	Mina Almasry <almasrymina@google.com>
-> + *	Copyright (C) 2023 Google LLC
-> + */
-> +
-> +#ifndef _NET_NETMEM_H
-> +#define _NET_NETMEM_H
-> +
-> +struct netmem {
-> +	union {
-> +		struct page page;
-> +
-> +		/* Stub to prevent compiler implicitly converting from page*
-> +		 * to netmem_t* and vice versa.
-> +		 *
-> +		 * Other memory type(s) net stack would like to support
-> +		 * can be added to this union.
-> +		 */
-> +		void *addr;
-> +	};
-> +};
-> +
-> +static inline struct page *netmem_to_page(struct netmem *netmem)
-> +{
-> +	return &netmem->page;
-> +}
-> +
-> +static inline struct netmem *page_to_netmem(struct page *page)
-> +{
-> +	return (struct netmem *)page;
+Thanks for your reply.
+Sure, the only thing 'iavf_print_link_message' do is to print a msg by 
+netdev_info.
 
-container_of; no typecasts.
+The 'iavf_virtchnl_completion' assume that no errors will be returned.
+Whether we could just execute 'netdev_info(netdev, "NIC Link is Up Speed 
+is %s Full Duplex\n", speed? speed :"");' when 'speed' is null.
 
 
-> +}
-> +
-> +#endif /* _NET_NETMEM_H */
+Before commit '1978d3ead82c8', the buffer size is '#define 
+IAVF_MAX_SPEED_STRLEN  13', whether we could use a bigger buffer
+size to avoid a null pointer.
 
+Such as '#define IAVF_MAX_SPEED_STRLEN 48'.
+
+
+On 2023/12/13 05:28, Jakub Kicinski wrote:
+> On Mon, 11 Dec 2023 10:59:27 +0800 Kunwu Chan wrote:
+>> kasprintf() returns a pointer to dynamically allocated memory
+>> which can be NULL upon failure.
+>>
+>> Fixes: 1978d3ead82c ("intel: fix string truncation warnings")
+> 
+> No need for the allocation here, print to a buffer on the stack.
 
