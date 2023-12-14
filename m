@@ -1,236 +1,127 @@
-Return-Path: <netdev+bounces-57533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C11C8134BA
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:28:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0709B8134D1
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 16:31:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E20CF1F21787
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:27:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7EAF4B20CBA
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 15:31:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0A35CD0F;
-	Thu, 14 Dec 2023 15:27:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F39455C8FD;
+	Thu, 14 Dec 2023 15:31:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D9ohm7YP"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="sAu6lj2/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBF0A120
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 07:27:52 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-dbcbd789ddcso1487768276.0
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 07:27:52 -0800 (PST)
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01F638E
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 07:31:37 -0800 (PST)
+Received: by mail-ot1-x32c.google.com with SMTP id 46e09a7af769-6da3a585c29so1232833a34.1
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 07:31:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702567671; x=1703172471; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=f0fM/yof0ktgb2xlCUt8GtfUJFXxVj8VTC3AQz4PSF0=;
-        b=D9ohm7YPHWW+WENRC7NWugGae8KJ7r0QoPLmfFI8ycqxdov2qyUda+Hy9O3Hee17YE
-         cjPhh1l9GpBLNOuhjBzTtoy9Pl52QTMm5PnrcfaBeyHjbuUs7+JB51EIy64tklkDOzQp
-         kzUhEBdicPh/YW8uuoH0PkrID2TZbMUxF2bIIDBO+6w6K+dECm39lMo5ahcS9fRXVeXY
-         HNQtfllUOF6wJBRssermUDKjLLL3lbc8OZ9TnnQgeNTwS2b/ofpiqPGDlm+n5VavJIaC
-         kyao+m6qK6bq/vxhtOXt6xgKn/ISlUcMOUEpzu7suwwIvGmIkYJ/Ch+OGzrfZvUM63+e
-         ZnUQ==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1702567896; x=1703172696; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yO4kIoFu7m42w9yDigXpykpNwdT7OWkJmrUXnTRqkgQ=;
+        b=sAu6lj2/UnObxhiSZ2ZfhwKd0Kl4S4NN8MW12NEM9Rvgu3telVzkZPRD+VpRVp9TcM
+         /VG7B32K4xODG/RAJa/5jjsAvbYi5gVzH9FMEeCq/jLsK3+oU1lZehdmn02yMoIfWtnx
+         1QwGwWmsSKEWNQgouauEhP1LievM8E0fN0uTIJUocZTGVJK4rXefNreA7B1g+liMoVCD
+         B1wISBDaFIz0+m/1yPRPdm/uWIqsZwDbmyMShW7fYyRu27MdEl+6F7au41cYOnUjnR6l
+         2msgtNE83RUJY7FxmkHXN+c1HKhts4CYe3DogL6RQhLyvwewjUA6yyHLDOTXoK70O9HW
+         CnSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702567671; x=1703172471;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=f0fM/yof0ktgb2xlCUt8GtfUJFXxVj8VTC3AQz4PSF0=;
-        b=Bc97z6+Ptl/4p6RneNJjGmoJolxOcd+tM+9L6xDIk9DXVGoq65apl41pyhQ2XoAA71
-         GR2ICWcfe7fiXYPlO0gD9nvc60E8xIN6dFuY9t7AdPsQDLsWXjUS9DJrU8iYwn/9ZZC4
-         aTcOdWli/PKUeTKcoied2LttDLXYKp8JjQsADdoIoXuGYjOXTv6DB/WL8JWwvcLjc4lz
-         XGbKDems9D1mQsMVlysx7do1X2egqCWIZXpxddwv1tVu3R7h9NwQTCfFRqmNeFnptA38
-         cQ+1fMuf0+jTKiLiTGLYYhvhuSa+2RcKrulxdHDuwjFGbJkM+gHDUGAemTxpVJuLw1Bo
-         A3PQ==
-X-Gm-Message-State: AOJu0Yyrl6M6s6m8mkVy2Lz12OnGg42KJNWeexVMEnOVnyy+iCgtZkZT
-	ODszmdXJWlFRyehkqXvqTYVwMi/Bgpbxxw==
-X-Google-Smtp-Source: AGHT+IEj4LwVzQWTnGaHVjWb93Pwao48LBJ9LIpWsEZMcw5jk7pVFFprEE6omy6lAV2kPA87A//57jYtAllgxg==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1812:b0:dbc:cc25:8ab with SMTP
- id cf18-20020a056902181200b00dbccc2508abmr43578ybb.4.1702567671569; Thu, 14
- Dec 2023 07:27:51 -0800 (PST)
-Date: Thu, 14 Dec 2023 15:27:47 +0000
+        d=1e100.net; s=20230601; t=1702567896; x=1703172696;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yO4kIoFu7m42w9yDigXpykpNwdT7OWkJmrUXnTRqkgQ=;
+        b=uCKqdyDQ+/incWVCZnR4UL5ZlzFQ3GJTaAH/YKBC6sRy1Fp98tpO8rJRuoFMeIHt3A
+         TXKgERIS4KS1cYDnIxt6zPGXma3FPn62WgbfCLDgKda4QLGj7UvkRWMToIrmFh96HVT2
+         pSNgs2/uOW7BJIFCT0SazG1yg1gkFXAcJIuQcEqv6MXk6cDLNA74cOfCb+SaFq59ROzB
+         3GLYoEut9Hl2DtMf1Izk36XTChxSGYYNpyFXmG9sYYD4IvR8JZlLDxxOG5/AWBSK/j6/
+         QpQNinFEhrVZchCJJypB+WlSkEDcly/PXthRuW84tT+QU/Td9kMixFYYm0bDx1YkO6Fm
+         SIPw==
+X-Gm-Message-State: AOJu0YzfPAB2IG9R40ZS1lta2DtGa7dWco5wgC0vi9FEpd2l+eFAZyEs
+	/26S3R+5Iu6rqga57HYi4U+P/bWG8AyupkcFXZ62nA==
+X-Google-Smtp-Source: AGHT+IHa7CFhkPQf7/HLv4UBRu46RyqZ5iCU6cnnVvuqgcqf+8Era4Wre4XVrWXvPIenlblA9thcMLA89jU38lK1PCE=
+X-Received: by 2002:a05:6830:1084:b0:6d9:e192:56a4 with SMTP id
+ y4-20020a056830108400b006d9e19256a4mr9214346oto.17.1702567896301; Thu, 14 Dec
+ 2023 07:31:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20231214152747.1700980-1-edumazet@google.com>
-Subject: [PATCH net] net/rose: fix races in rose_kill_by_device()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
-	Bernard Pidoux <f6bvp@free.fr>
+MIME-Version: 1.0
+References: <20231205205030.3119672-1-victor@mojatatu.com> <20231205205030.3119672-3-victor@mojatatu.com>
+ <20231211182534.09392034@kernel.org> <CAM0EoMkYq+qqO6pwMy_G58_+PCT6A6EGtpPJXPkvQ1=aVvY=Sw@mail.gmail.com>
+ <CANn89i+-G0gTF=Vmr5NprYizdqXqpoQC5OvnXbc-7dA47tcdyQ@mail.gmail.com>
+ <CAAFAkD8X-EXt4K+9Jp4P_f607zd=HxB6WCEF_4BGcCm_hSbv_A@mail.gmail.com>
+ <CAM0EoMk9cA0qCGNa181QkGjRHr=4oZhvfMGEWoTRS-kHXFWt7g@mail.gmail.com> <20231213130807.503e1332@kernel.org>
+In-Reply-To: <20231213130807.503e1332@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 14 Dec 2023 10:31:24 -0500
+Message-ID: <CAM0EoM=+zoLNc2JihS4Xyz77YciKCywXdtr8N3cDuwYRxc8TcQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/3] net: sched: Make tc-related drop reason
+ more flexible for remaining qdiscs
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jamal Hadi Salim <hadi@mojatatu.com>, Eric Dumazet <edumazet@google.com>, 
+	Victor Nogueira <victor@mojatatu.com>, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	davem@davemloft.net, pabeni@redhat.com, daniel@iogearbox.net, 
+	dcaratti@redhat.com, netdev@vger.kernel.org, kernel@mojatatu.com, 
+	Taehee Yoo <ap420073@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot found an interesting netdev refcounting issue in
-net/rose/af_rose.c, thanks to CONFIG_NET_DEV_REFCNT_TRACKER=y [1]
+On Wed, Dec 13, 2023 at 4:08=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Wed, 13 Dec 2023 13:36:31 -0500 Jamal Hadi Salim wrote:
+> > Putting this to rest:
+> > Other than fq codel, the others that deal with multiple skbs due to
+> > gso segments. So the conclusion is:  if we have a bunch in the list
+> > then they all suffer the same fate. So a single reason for the list is
+> > sufficient.
+>
+> Alright.
+>
+> I'm still a bit confused about the cb, tho.
+>
+> struct qdisc_skb_cb is the state struct.
 
-Problem is that rose_kill_by_device() can change rose->device
-while other threads do not expect the pointer to be changed.
+Per packet state within tc though, no? Once it leaves tc whatever sits
+in that space cant be trusted to be valid.
+To answer your earlier question tcf_result is not available at the
+qdisc level (when we call free_skb_list() but cb is and thats why we
+used it)
 
-We have to first collect sockets in a temporary array,
-then perform the changes while holding the socket
-lock and rose_list_lock spinlock (in this order)
+> But we put the drop reason in struct tc_skb_cb.
+> How does that work. Qdiscs will assume they own all of
+> qdisc_skb_cb::data ?
+>
 
-Change rose_release() to also acquire rose_list_lock
-before releasing the netdev refcount.
+Short answer, yes. Anyone can scribble over that. And multiple
+consumers have a food fight going on - but it is expected behavior:
+ebpf's skb->cb, cake, fq_codel etc - all use qdisc_skb_cb::data.
+Out of the 48B in skb->cb qdisc_skb_cb redefined the first 28B and
+left in qdisc_skb_cb::data as free-for-all space. I think,
+unfortunately, that is now cast in stone.
+Which still leaves us 20 bytes which is now being squatered by
+tc_skb_cb where the drop reason was placed. Shit, i just noticed this
+is not exclusive - seems like
+drivers/net/amt.c is using this space - not sure why it is even using
+tc space. I am wondering if we can make it use the 20B scratch pad.
++Cc author Taehee Yoo - it doesnt seem to conflict but strange that it
+is considering qdisc_skb_cb
 
-[1]
+> Maybe some documentation about the lifetimes of these things
+> would clarify things?
 
-[ 1185.055088][ T7889] ref_tracker: reference already released.
-[ 1185.061476][ T7889] ref_tracker: allocated in:
-[ 1185.066081][ T7889]  rose_bind+0x4ab/0xd10
-[ 1185.070446][ T7889]  __sys_bind+0x1ec/0x220
-[ 1185.074818][ T7889]  __x64_sys_bind+0x72/0xb0
-[ 1185.079356][ T7889]  do_syscall_64+0x40/0x110
-[ 1185.083897][ T7889]  entry_SYSCALL_64_after_hwframe+0x63/0x6b
-[ 1185.089835][ T7889] ref_tracker: freed in:
-[ 1185.094088][ T7889]  rose_release+0x2f5/0x570
-[ 1185.098629][ T7889]  __sock_release+0xae/0x260
-[ 1185.103262][ T7889]  sock_close+0x1c/0x20
-[ 1185.107453][ T7889]  __fput+0x270/0xbb0
-[ 1185.111467][ T7889]  task_work_run+0x14d/0x240
-[ 1185.116085][ T7889]  get_signal+0x106f/0x2790
-[ 1185.120622][ T7889]  arch_do_signal_or_restart+0x90/0x7f0
-[ 1185.126205][ T7889]  exit_to_user_mode_prepare+0x121/0x240
-[ 1185.131846][ T7889]  syscall_exit_to_user_mode+0x1e/0x60
-[ 1185.137293][ T7889]  do_syscall_64+0x4d/0x110
-[ 1185.141783][ T7889]  entry_SYSCALL_64_after_hwframe+0x63/0x6b
-[ 1185.148085][ T7889] ------------[ cut here ]------------
+What text do you think makes sense and where should it go?
 
-WARNING: CPU: 1 PID: 7889 at lib/ref_tracker.c:255 ref_tracker_free+0x61a/0x810 lib/ref_tracker.c:255
-Modules linked in:
-CPU: 1 PID: 7889 Comm: syz-executor.2 Not tainted 6.7.0-rc4-syzkaller-00162-g65c95f78917e #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
-RIP: 0010:ref_tracker_free+0x61a/0x810 lib/ref_tracker.c:255
-Code: 00 44 8b 6b 18 31 ff 44 89 ee e8 21 62 f5 fc 45 85 ed 0f 85 a6 00 00 00 e8 a3 66 f5 fc 48 8b 34 24 48 89 ef e8 27 5f f1 05 90 <0f> 0b 90 bb ea ff ff ff e9 52 fd ff ff e8 84 66 f5 fc 4c 8d 6d 44
-RSP: 0018:ffffc90004917850 EFLAGS: 00010202
-RAX: 0000000000000201 RBX: ffff88802618f4c0 RCX: 0000000000000000
-RDX: 0000000000000202 RSI: ffffffff8accb920 RDI: 0000000000000001
-RBP: ffff8880269ea5b8 R08: 0000000000000001 R09: fffffbfff23e35f6
-R10: ffffffff91f1afb7 R11: 0000000000000001 R12: 1ffff92000922f0c
-R13: 0000000005a2039b R14: ffff88802618f4d8 R15: 00000000ffffffff
-FS: 00007f0a720ef6c0(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f43a819d988 CR3: 0000000076c64000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
-<TASK>
-netdev_tracker_free include/linux/netdevice.h:4127 [inline]
-netdev_put include/linux/netdevice.h:4144 [inline]
-netdev_put include/linux/netdevice.h:4140 [inline]
-rose_kill_by_device net/rose/af_rose.c:195 [inline]
-rose_device_event+0x25d/0x330 net/rose/af_rose.c:218
-notifier_call_chain+0xb6/0x3b0 kernel/notifier.c:93
-call_netdevice_notifiers_info+0xbe/0x130 net/core/dev.c:1967
-call_netdevice_notifiers_extack net/core/dev.c:2005 [inline]
-call_netdevice_notifiers net/core/dev.c:2019 [inline]
-__dev_notify_flags+0x1f5/0x2e0 net/core/dev.c:8646
-dev_change_flags+0x122/0x170 net/core/dev.c:8682
-dev_ifsioc+0x9ad/0x1090 net/core/dev_ioctl.c:529
-dev_ioctl+0x224/0x1090 net/core/dev_ioctl.c:786
-sock_do_ioctl+0x198/0x270 net/socket.c:1234
-sock_ioctl+0x22e/0x6b0 net/socket.c:1339
-vfs_ioctl fs/ioctl.c:51 [inline]
-__do_sys_ioctl fs/ioctl.c:871 [inline]
-__se_sys_ioctl fs/ioctl.c:857 [inline]
-__x64_sys_ioctl+0x18f/0x210 fs/ioctl.c:857
-do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
-entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7f0a7147cba9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f0a720ef0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f0a7159bf80 RCX: 00007f0a7147cba9
-RDX: 0000000020000040 RSI: 0000000000008914 RDI: 0000000000000004
-RBP: 00007f0a714c847a R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f0a7159bf80 R15: 00007ffc8bb3a5f8
-</TASK>
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Bernard Pidoux <f6bvp@free.fr>
----
- net/rose/af_rose.c | 39 ++++++++++++++++++++++++++++++++++-----
- 1 file changed, 34 insertions(+), 5 deletions(-)
-
-diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
-index ecb91ad4ce639e7f8f3d2a9698e005cf696b123f..ef81d019b20f48d80a81d6eeab60808299f813a0 100644
---- a/net/rose/af_rose.c
-+++ b/net/rose/af_rose.c
-@@ -182,21 +182,47 @@ void rose_kill_by_neigh(struct rose_neigh *neigh)
-  */
- static void rose_kill_by_device(struct net_device *dev)
- {
--	struct sock *s;
-+	struct sock *sk, *array[16];
-+	struct rose_sock *rose;
-+	bool rescan;
-+	int i, cnt;
- 
-+start:
-+	rescan = false;
-+	cnt = 0;
- 	spin_lock_bh(&rose_list_lock);
--	sk_for_each(s, &rose_list) {
--		struct rose_sock *rose = rose_sk(s);
-+	sk_for_each(sk, &rose_list) {
-+		rose = rose_sk(sk);
-+		if (rose->device == dev) {
-+			if (cnt == ARRAY_SIZE(array)) {
-+				rescan = true;
-+				break;
-+			}
-+			sock_hold(sk);
-+			array[cnt++] = sk;
-+		}
-+	}
-+	spin_unlock_bh(&rose_list_lock);
- 
-+	for (i = 0; i < cnt; i++) {
-+		sk = array[cnt];
-+		rose = rose_sk(sk);
-+		lock_sock(sk);
-+		spin_lock_bh(&rose_list_lock);
- 		if (rose->device == dev) {
--			rose_disconnect(s, ENETUNREACH, ROSE_OUT_OF_ORDER, 0);
-+			rose_disconnect(sk, ENETUNREACH, ROSE_OUT_OF_ORDER, 0);
- 			if (rose->neighbour)
- 				rose->neighbour->use--;
- 			netdev_put(rose->device, &rose->dev_tracker);
- 			rose->device = NULL;
- 		}
-+		spin_unlock_bh(&rose_list_lock);
-+		release_sock(sk);
-+		sock_put(sk);
-+		cond_resched();
- 	}
--	spin_unlock_bh(&rose_list_lock);
-+	if (rescan)
-+		goto start;
- }
- 
- /*
-@@ -656,7 +682,10 @@ static int rose_release(struct socket *sock)
- 		break;
- 	}
- 
-+	spin_lock_bh(&rose_list_lock);
- 	netdev_put(rose->device, &rose->dev_tracker);
-+	rose->device = NULL;
-+	spin_unlock_bh(&rose_list_lock);
- 	sock->sk = NULL;
- 	release_sock(sk);
- 	sock_put(sk);
--- 
-2.43.0.472.g3155946c3a-goog
-
+cheers,
+jamal
 
