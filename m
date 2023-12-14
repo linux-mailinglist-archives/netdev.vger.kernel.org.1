@@ -1,87 +1,97 @@
-Return-Path: <netdev+bounces-57473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E201181323D
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:54:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCACC813246
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 14:56:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 831AAB21973
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:54:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A47B1C20AC3
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:56:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5555F5786B;
-	Thu, 14 Dec 2023 13:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0915257882;
+	Thu, 14 Dec 2023 13:56:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="If1izdon"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NInP5snR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AB6A57866
-	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 13:54:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9875C433C7;
-	Thu, 14 Dec 2023 13:53:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702562040;
-	bh=hpFFXTmdXfzanXnsdALphQX0Ep1vz2YY4i+cRKKFp8w=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=If1izdonII/GWHYWsyA6KwnvJHTklxXM1V9F5kzkZ8ovqBrxTZn1/1g1FVBrZMuis
-	 UExbC7QuscqXwxTU0LPbUGyOeBwhp5z/LTUA0EhXC3xBfjxGWeulEOLJCLO09RYZd8
-	 TOP6S+TZZd32o14Y2J5lwrwKl62vUZKH/0mZQk/uQrEUOBzI42KDUFtZ2LITdsai6g
-	 VV9Fk99I9mHlwfThDaQ6Ein0ofJylcLnqoYJPgBlntNs8vpsAzP6GopqZ9ny+dZkbN
-	 2508wRg93+N0MgCvfz/rASnku5kmzLrxePUW/BSc+0J8PyP6Ta1Ga9lekBFfczwFXc
-	 lJn4bOZ16qT0w==
-Message-ID: <4b20b60a-c72d-4283-a8af-ff82bc5d1b19@kernel.org>
-Date: Thu, 14 Dec 2023 15:53:57 +0200
+Received: from mail-vk1-xa31.google.com (mail-vk1-xa31.google.com [IPv6:2607:f8b0:4864:20::a31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3C4B11D
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 05:56:11 -0800 (PST)
+Received: by mail-vk1-xa31.google.com with SMTP id 71dfb90a1353d-4b2d08747e7so2153726e0c.1
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 05:56:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702562171; x=1703166971; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A2yKAEncwRm3uBvSmdHVhBg2GFoJmldNAoOXza5tMHY=;
+        b=NInP5snRlp6oc/H/Eyyi2JkKvvEBS7VhUYVKCnojCU7LpPCnhCJuN1SaD2NEuJJ8F8
+         S9BhNtWVyP74RU55fcAws1isix9iMmIzKPwOFO5/l83FN92gDA1chHq28XGwtTW6gnT5
+         YD6GAxT8mxRikD4gjPyVaBfNvDi9CI1ZrCD0hxCmIXM8pJ8IKuVpOF27AAvdNkRaTlvO
+         z6HQWq+POsR/Teg5O3LVsdTHgDGbJJUvDQUacnOO7t7mcWawRXq3HZLVEuhtAVMmj4/I
+         Wf7fXSPRYx0Tz8Ry5fWyApBmfkn2n//+XIswVOp4lmCLRDEIynYfgNEWVa/dOUvsN7SG
+         KUSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702562171; x=1703166971;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=A2yKAEncwRm3uBvSmdHVhBg2GFoJmldNAoOXza5tMHY=;
+        b=ngyXIOXFx6W6o9Ns6fNzNaLGL+9ckJZQggxbdrYjGIERLyjiAtBqinkwCFvkuJ+l15
+         WkZy0NbtqckJWGi8n/V7IwLNiG3AjFi+Le5rtVfLuwOB1UJFp/GsUw5QWdXIY3NUfwOb
+         QiKkxkjOFviJlbzG6rNZj7fRPZ0VKU8oomiY1JwyuuOWdG5jZh6MtyGLvXzZolJdv1jU
+         LzoL6f0+8JTVsc4BCu6RXk8eubpx9/y7XKk8YGuXn4LKkMR/7zj8LFf+EBDHAzsUUnHC
+         rOnq++d/84UyxTUE1IsBZJIC7b3TsQwSL77rW8NGuVxhevgnPY8LqIPgq86VfSF9MDI4
+         MK8w==
+X-Gm-Message-State: AOJu0Yx5f3KEVZwpxvU7ybtvaZ1FhQipqsmLP1SMXCsELy0IjGGWpZ1u
+	Yv1jJYzcmae6kOZ1vi2d/Ns=
+X-Google-Smtp-Source: AGHT+IEIkQ+rCDqLW5UOPkQ3DUdIKh8+TYJ54MRwQQXazFK6k7i+QrF8C8YAuc12EW6lb1o2n1fKDA==
+X-Received: by 2002:a05:6122:200c:b0:4b2:caf7:cc72 with SMTP id l12-20020a056122200c00b004b2caf7cc72mr7687380vkd.29.1702562170962;
+        Thu, 14 Dec 2023 05:56:10 -0800 (PST)
+Received: from localhost (114.66.194.35.bc.googleusercontent.com. [35.194.66.114])
+        by smtp.gmail.com with ESMTPSA id g6-20020ac84806000000b004255638e8b9sm5772991qtq.79.2023.12.14.05.56.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Dec 2023 05:56:10 -0800 (PST)
+Date: Thu, 14 Dec 2023 08:56:10 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Neal Cardwell <ncardwell@google.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Mina Almasry <almasrymina@google.com>, 
+ Chao Wu <wwchao@google.com>, 
+ Pavel Begunkov <asml.silence@gmail.com>, 
+ netdev@vger.kernel.org, 
+ eric.dumazet@gmail.com, 
+ Eric Dumazet <edumazet@google.com>
+Message-ID: <657b097a526a9_14c73d29495@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20231214104901.1318423-2-edumazet@google.com>
+References: <20231214104901.1318423-1-edumazet@google.com>
+ <20231214104901.1318423-2-edumazet@google.com>
+Subject: Re: [PATCH net-next 1/3] net: increase optmem_max default value
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 net-next 09/11] net: ethernet: ti: am65-cpsw-qos: Add
- Frame Preemption MAC Merge support
-Content-Language: en-US
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shuah@kernel.org, s-vadapalli@ti.com,
- r-gunasekaran@ti.com, vigneshr@ti.com, srk@ti.com, horms@kernel.org,
- p-varis@ti.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231213110721.69154-1-rogerq@kernel.org>
- <20231213110721.69154-10-rogerq@kernel.org>
- <20231214110448.lycg7yusrusbd7w2@skbuf>
- <c08814cb-86b6-44bb-8682-00a5b6a0c0bc@kernel.org>
- <20231214135039.6lcixyy7z6u56zgv@skbuf>
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20231214135039.6lcixyy7z6u56zgv@skbuf>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-
-
-On 14/12/2023 15:50, Vladimir Oltean wrote:
-> On Thu, Dec 14, 2023 at 03:44:03PM +0200, Roger Quadros wrote:
->> On 14/12/2023 13:04, Vladimir Oltean wrote:
->>>> +	/* verify_timeout_count can only be set at valid link */
->>>> +	if (cfg->verify_time > 0)
->>>> +		port->qos.iet.verify_time_ms = cfg->verify_time;
->>>> +	else
->>>> +		port->qos.iet.verify_time_ms = 10;
->>>
->>> I don't think I understand what the check is for? The netlink policy for
->>> ETHTOOL_A_MM_VERIFY_TIME limits the range between 1 ms and 128 ms.
->>> How can it be 0?
->>
->> I didn't check ETHTOOL_A_MM_VERIFY_TIME before.
+Eric Dumazet wrote:
+> For many years, /proc/sys/net/core/optmem_max default value
+> on a 64bit kernel has been 20 KB.
 > 
-> Not even when the exact same policy was rejecting the verify-time set by
-> LLDP in v6, for being larger than the upper limit of 128 ms? :-/
+> Regular usage of TCP tx zerocopy needs a bit more.
+> 
+> Google has used 128KB as the default value for 7 years without
+> any problem.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Sorry. I did check it before but overlooked it here. My memory seems to be failing me. :(
-
--- 
-cheers,
--roger
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
