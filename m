@@ -1,303 +1,242 @@
-Return-Path: <netdev+bounces-57388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67D63812FCB
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:11:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 429DA812FCD
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 13:11:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59D901C2155A
-	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:11:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53BFF1C216BE
+	for <lists+netdev@lfdr.de>; Thu, 14 Dec 2023 12:11:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 535054B5AF;
-	Thu, 14 Dec 2023 12:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F6784176F;
+	Thu, 14 Dec 2023 12:11:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jo07xeup"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="mK3Lc8Mk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68E0610A;
-	Thu, 14 Dec 2023 04:10:53 -0800 (PST)
-Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-33642ab735dso1080596f8f.0;
-        Thu, 14 Dec 2023 04:10:53 -0800 (PST)
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E976312C
+	for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 04:11:12 -0800 (PST)
+Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-50e0d1f9fe6so2884061e87.1
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 04:11:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702555852; x=1703160652; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sXxUg8r4wEYQBuQ5G/+HpnGYG3sKQPUKb6HI5iMSDJc=;
-        b=Jo07xeupV5d4bzAdJChklfSQbDIwg87WdGLEOJbEmXZkDHLvbM+pGn/yh5SUItN8FB
-         uAuhPkhBZamjvHhZTiDfd0aou/bOIWC61QHQna+NKz9cpYpXRi3eKwZLtD7ZO2DE7bp5
-         PPrANUi+wDmUXS9BMsmBq4q+alvbsdvwbpr73ptrRhwqZ9Ej3OPtjcr+nNT9nXCtMyv9
-         1LHQunIdAxasQ2FfYhaRhZXKLqdH3QwTA0YCumEhhY7IZDqes6Zt38xu29wk1WrcHqsh
-         iJq6DTw3OI+0O5Tyjw6igoFCE8QrG+dZFAM//R0hdBak2zL5qjtHPJtfNmHXB+V5Ufcw
-         XoCw==
+        d=ragnatech.se; s=google; t=1702555871; x=1703160671; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xgrqFdV6UcxdxSO2fJT9XQI291SapSFGO4zYlzTTifY=;
+        b=mK3Lc8MkuBCR3+0JWrGqjz/9WEFJoi1Xg8R2uqXA+/eUgsQVpGriScFxMxsAKELZdD
+         TjM1Ss81xoMKIaYKPwiP9wwLd/MbBFnqXR1feJOsIm5WtvvFlB3vGRXPdhUrKjB43eqT
+         nGW7GpqRsaGN4ZjPxvyBY6LlS1ZT+yrvJnaYC7C2UvNssjvR/SKqHRSEr/csUpLjLNNb
+         PjYo9nbzK6rp29f0IT8fyVVh+/oOaQlFtRcT9AmOz3oL6++KNxjXqCdQJcqj8Af4Eep1
+         pxNz55SqDGjaYdPHhqIiE8d7fDvWQi/zpp5kalDExVR+ugsXwEEE6X/Cd/6eJ5ksa3zZ
+         CiOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702555852; x=1703160652;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sXxUg8r4wEYQBuQ5G/+HpnGYG3sKQPUKb6HI5iMSDJc=;
-        b=qu5+v6djOGn1v0qLr5FFdgg7a2pJnEftAefA/PUGY/0bz2qrUpaGREP16XXEbY7V4a
-         pJNY1SCEahFJRAVlFh89k+RtT+9EFvO3SgeTlstmAF8s8129wZMMJa1695lB5XnviWiB
-         ZDTZKzKsy3RPm6obAA/5pOmh7wqhIajo7b5YcfJsdqG223tVpXBuU9RJBZHUNzyARPij
-         vBmIBxxsrEum51BUA1oYbyNxNCnu+CJ32yh1fKLMNRvYejU0r40+KOD0jA300dKQT+KO
-         81cis0ZqoBo8nTrXZVFuwCMe/J+3TfIu8UXpDTl/ucsWsDjFyeh6k2+/0qcoxIglD5oM
-         W/cg==
-X-Gm-Message-State: AOJu0YxSHeNl4WRvDTSmqGzCLkZaPx3GF4s/idohq7+E34E5b/sYhRii
-	5K9p9YkOm0sjJL0q7+b21j0=
-X-Google-Smtp-Source: AGHT+IGAPfmdbJo+KNqPInaKDDNRWQhXLSTAUJ5ef6vRRwyV7NAE157Vl+YHxqoJjX8t5P4mrz+oOA==
-X-Received: by 2002:adf:f60f:0:b0:332:dfeb:76ab with SMTP id t15-20020adff60f000000b00332dfeb76abmr2449946wrp.60.1702555851704;
-        Thu, 14 Dec 2023 04:10:51 -0800 (PST)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id d12-20020adfa40c000000b003333fa3d043sm16026765wra.12.2023.12.14.04.10.50
+        d=1e100.net; s=20230601; t=1702555871; x=1703160671;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xgrqFdV6UcxdxSO2fJT9XQI291SapSFGO4zYlzTTifY=;
+        b=C0wu4WZiCYBzwi1hzbMX9PSk4VjRhMUlti9ZzrOSOFtiaDHt9D/cAuYSSyXhc92yXg
+         1b/1fWE6OGyh2nVIZb4UKHNkFKtBjk5PF4OCQD+I0QVPLTwfNl5bM2PER2tpPWu5NnJp
+         AADaDJpmvrK9sYyY6LuRhyJYBZ5dc/kQa0R/2VZNZNtDnWRdqNKK0xefhnhMA6PoQprd
+         hxjxqwfzzUbrcN09dQtkP0CLsTK15jOHAxcPW0Gi7jm1uA9KdWtJJvy1ZBdcU3u9uYyT
+         05Cpx2kuz6TY2U5VeFjRrBWxU5XCg+xw5b2KLCdnsOr3XhFZVg/U/aZFel43h27NadAb
+         mIcw==
+X-Gm-Message-State: AOJu0YwH8Z4k9o2pt4u/xOE7wOmVn1Ar4yTSB1oZ8WWxW3qT+aXfDVh7
+	EwdCCrzo0xqpwEWzhqqA/5GAmw==
+X-Google-Smtp-Source: AGHT+IGnSjm5Hi+DAMqiJjbw0iT/RsGej7lC+5bYSSPg4CNP/j779F4eCE1ROr58TW0N7XE7G56SRg==
+X-Received: by 2002:a05:6512:3ba8:b0:50e:d6e:67d6 with SMTP id g40-20020a0565123ba800b0050e0d6e67d6mr1943973lfv.14.1702555870935;
+        Thu, 14 Dec 2023 04:11:10 -0800 (PST)
+Received: from localhost (h-46-59-36-206.A463.priv.bahnhof.se. [46.59.36.206])
+        by smtp.gmail.com with ESMTPSA id j13-20020ac2550d000000b0050bf4803234sm1876416lfk.194.2023.12.14.04.11.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 04:10:51 -0800 (PST)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Harini Katakam <harini.katakam@amd.com>,
-	netdev@vger.kernel.org,
+        Thu, 14 Dec 2023 04:11:10 -0800 (PST)
+Date: Thu, 14 Dec 2023 13:11:09 +0100
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Claudiu <claudiu.beznea@tuxon.dev>
+Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com,
+	claudiu.beznea.uj@bp.renesas.com, yoshihiro.shimoda.uh@renesas.com,
+	wsa+renesas@sang-engineering.com, biju.das.jz@bp.renesas.com,
+	prabhakar.mahadev-lad.rj@bp.renesas.com,
+	mitsuhiro.kimura.kc@renesas.com, geert+renesas@glider.be,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [net-next PATCH v7 4/4] net: phy: add support for PHY package MMD read/write
-Date: Thu, 14 Dec 2023 13:10:26 +0100
-Message-Id: <20231214121026.4340-5-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231214121026.4340-1-ansuelsmth@gmail.com>
-References: <20231214121026.4340-1-ansuelsmth@gmail.com>
+Subject: Re: [PATCH net 1/2] net: ravb: Wait for operation mode to be applied
+Message-ID: <20231214121109.GK1863068@ragnatech.se>
+References: <20231214113137.2450292-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214113137.2450292-2-claudiu.beznea.uj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231214113137.2450292-2-claudiu.beznea.uj@bp.renesas.com>
 
-Some PHY in PHY package may require to read/write MMD regs to correctly
-configure the PHY package.
+Hi Claudiu,
 
-Add support for these additional required function in both lock and no
-lock variant.
+Thanks for your patch.
 
-It's assumed that the entire PHY package is either C22 or C45. We use
-C22 or C45 way of writing/reading to mmd regs based on the passed phydev
-whether it's C22 or C45.
+On 2023-12-14 13:31:36 +0200, Claudiu wrote:
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> CSR.OPS bits specify the current operating mode and (according to
+> documentation) they are updated when the operating mode change request
+> is processed. Thus, check CSR.OPS before proceeding.
+> 
+> Fixes: 568b3ce7a8ef ("ravb: factor out register bit twiddling code")
+> Fixes: 0184165b2f42 ("ravb: add sleep PM suspend/resume support")
+> Fixes: 7e09a052dc4e ("ravb: Exclude gPTP feature support for RZ/G2L")
+> Fixes: 3e3d647715d4 ("ravb: add wake-on-lan support via magic packet")
+> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
-Changes v7:
-- Change addr to u8
-Changes v6:
-- Fix copy paste error for kdoc
-Changes v5:
-- Improve function description
-Changes v4:
-- Drop function comments in header file
-Changes v3:
-- Move in phy-core.c from phy.h
-- Base c45 from phydev
-Changes v2:
-- Rework to use newly introduced helper
-- Add common check for regnum and devad
+I think the list of fixes tags can be reduced. The last item in the list 
+is the patch which adds the RAVB driver so what's the point of listing 
+the rest?
 
- drivers/net/phy/phy-core.c | 144 +++++++++++++++++++++++++++++++++++++
- include/linux/phy.h        |  16 +++++
- 2 files changed, 160 insertions(+)
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> ---
+>  drivers/net/ethernet/renesas/ravb_main.c | 47 ++++++++++++++++++++----
+>  1 file changed, 39 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index 9178f6d60e74..ce95eb5af354 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -683,8 +683,11 @@ static int ravb_dmac_init(struct net_device *ndev)
+>  
+>  	/* Setting the control will start the AVB-DMAC process. */
+>  	ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_OPERATION);
+> +	error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_OPERATION);
+> +	if (error)
+> +		netdev_err(ndev, "failed to switch device to operation mode\n");
 
-diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
-index b729ac8b2640..7af935c6abe5 100644
---- a/drivers/net/phy/phy-core.c
-+++ b/drivers/net/phy/phy-core.c
-@@ -650,6 +650,150 @@ int phy_write_mmd(struct phy_device *phydev, int devad, u32 regnum, u16 val)
- }
- EXPORT_SYMBOL(phy_write_mmd);
- 
-+/**
-+ * __phy_package_read_mmd - read MMD reg relative to PHY package base addr
-+ * @phydev: The phy_device struct
-+ * @addr_offset: The offset to be added to PHY package base_addr
-+ * @devad: The MMD to read from
-+ * @regnum: The register on the MMD to read
-+ *
-+ * Convenience helper for reading a register of an MMD on a given PHY
-+ * using the PHY package base address. The base address is added to
-+ * the addr_offset value.
-+ *
-+ * Same calling rules as for __phy_read();
-+ *
-+ * NOTE: It's assumed that the entire PHY package is either C22 or C45.
-+ */
-+int __phy_package_read_mmd(struct phy_device *phydev,
-+			   unsigned int addr_offset, int devad,
-+			   u32 regnum)
-+{
-+	struct phy_package_shared *shared = phydev->shared;
-+	u8 addr = shared->base_addr + addr_offset;
-+
-+	if (addr >= PHY_MAX_ADDR)
-+		return -EIO;
-+
-+	if (regnum > (u16)~0 || devad > 32)
-+		return -EINVAL;
-+
-+	return mmd_phy_read(phydev->mdio.bus, addr, phydev->is_c45, devad,
-+			    regnum);
-+}
-+EXPORT_SYMBOL(__phy_package_read_mmd);
-+
-+/**
-+ * phy_package_read_mmd - read MMD reg relative to PHY package base addr
-+ * @phydev: The phy_device struct
-+ * @addr_offset: The offset to be added to PHY package base_addr
-+ * @devad: The MMD to read from
-+ * @regnum: The register on the MMD to read
-+ *
-+ * Convenience helper for reading a register of an MMD on a given PHY
-+ * using the PHY package base address. The base address is added to
-+ * the addr_offset value.
-+ *
-+ * Same calling rules as for phy_read();
-+ *
-+ * NOTE: It's assumed that the entire PHY package is either C22 or C45.
-+ */
-+int phy_package_read_mmd(struct phy_device *phydev,
-+			 unsigned int addr_offset, int devad,
-+			 u32 regnum)
-+{
-+	struct phy_package_shared *shared = phydev->shared;
-+	u8 addr = shared->base_addr + addr_offset;
-+	int val;
-+
-+	if (addr >= PHY_MAX_ADDR)
-+		return -EIO;
-+
-+	if (regnum > (u16)~0 || devad > 32)
-+		return -EINVAL;
-+
-+	phy_lock_mdio_bus(phydev);
-+	val = mmd_phy_read(phydev->mdio.bus, addr, phydev->is_c45, devad,
-+			   regnum);
-+	phy_unlock_mdio_bus(phydev);
-+
-+	return val;
-+}
-+EXPORT_SYMBOL(phy_package_read_mmd);
-+
-+/**
-+ * __phy_package_write_mmd - write MMD reg relative to PHY package base addr
-+ * @phydev: The phy_device struct
-+ * @addr_offset: The offset to be added to PHY package base_addr
-+ * @devad: The MMD to write to
-+ * @regnum: The register on the MMD to write
-+ * @val: value to write to @regnum
-+ *
-+ * Convenience helper for writing a register of an MMD on a given PHY
-+ * using the PHY package base address. The base address is added to
-+ * the addr_offset value.
-+ *
-+ * Same calling rules as for __phy_write();
-+ *
-+ * NOTE: It's assumed that the entire PHY package is either C22 or C45.
-+ */
-+int __phy_package_write_mmd(struct phy_device *phydev,
-+			    unsigned int addr_offset, int devad,
-+			    u32 regnum, u16 val)
-+{
-+	struct phy_package_shared *shared = phydev->shared;
-+	u8 addr = shared->base_addr + addr_offset;
-+
-+	if (addr >= PHY_MAX_ADDR)
-+		return -EIO;
-+
-+	if (regnum > (u16)~0 || devad > 32)
-+		return -EINVAL;
-+
-+	return mmd_phy_write(phydev->mdio.bus, addr, phydev->is_c45, devad,
-+			     regnum, val);
-+}
-+EXPORT_SYMBOL(__phy_package_write_mmd);
-+
-+/**
-+ * phy_package_write_mmd - write MMD reg relative to PHY package base addr
-+ * @phydev: The phy_device struct
-+ * @addr_offset: The offset to be added to PHY package base_addr
-+ * @devad: The MMD to write to
-+ * @regnum: The register on the MMD to write
-+ * @val: value to write to @regnum
-+ *
-+ * Convenience helper for writing a register of an MMD on a given PHY
-+ * using the PHY package base address. The base address is added to
-+ * the addr_offset value.
-+ *
-+ * Same calling rules as for phy_write();
-+ *
-+ * NOTE: It's assumed that the entire PHY package is either C22 or C45.
-+ */
-+int phy_package_write_mmd(struct phy_device *phydev,
-+			  unsigned int addr_offset, int devad,
-+			  u32 regnum, u16 val)
-+{
-+	struct phy_package_shared *shared = phydev->shared;
-+	u8 addr = shared->base_addr + addr_offset;
-+	int ret;
-+
-+	if (addr >= PHY_MAX_ADDR)
-+		return -EIO;
-+
-+	if (regnum > (u16)~0 || devad > 32)
-+		return -EINVAL;
-+
-+	phy_lock_mdio_bus(phydev);
-+	ret = mmd_phy_write(phydev->mdio.bus, addr, phydev->is_c45, devad,
-+			    regnum, val);
-+	phy_unlock_mdio_bus(phydev);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL(phy_package_write_mmd);
-+
- /**
-  * phy_modify_changed - Function for modifying a PHY register
-  * @phydev: the phy_device struct
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index aaec34389f48..78daac729385 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -2049,6 +2049,22 @@ static inline int __phy_package_write(struct phy_device *phydev,
- 	return __mdiobus_write(phydev->mdio.bus, addr, regnum, val);
- }
- 
-+int __phy_package_read_mmd(struct phy_device *phydev,
-+			   unsigned int addr_offset, int devad,
-+			   u32 regnum);
-+
-+int phy_package_read_mmd(struct phy_device *phydev,
-+			 unsigned int addr_offset, int devad,
-+			 u32 regnum);
-+
-+int __phy_package_write_mmd(struct phy_device *phydev,
-+			    unsigned int addr_offset, int devad,
-+			    u32 regnum, u16 val);
-+
-+int phy_package_write_mmd(struct phy_device *phydev,
-+			  unsigned int addr_offset, int devad,
-+			  u32 regnum, u16 val);
-+
- static inline bool __phy_package_set_once(struct phy_device *phydev,
- 					  unsigned int b)
- {
+As you add ravb_set_reset_mode() to compliment the existing 
+ravb_set_config_mode(), would it not be coherent to also add a 
+ravb_set_operation_mode() instead of open coding it here?
+
+>  
+> -	return 0;
+> +	return error;
+>  }
+>  
+>  static void ravb_get_tx_tstamp(struct net_device *ndev)
+> @@ -1744,6 +1747,18 @@ static inline int ravb_hook_irq(unsigned int irq, irq_handler_t handler,
+>  	return error;
+>  }
+>  
+> +static int ravb_set_reset_mode(struct net_device *ndev)
+
+nit: Maybe move this to be close to ravb_set_config_mode() to co-locate 
+all mode changing logic?
+
+> +{
+> +	int error;
+> +
+> +	ravb_write(ndev, CCC_OPC_RESET, CCC);
+> +	error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_RESET);
+> +	if (error)
+> +		netdev_err(ndev, "failed to switch device to reset mode\n");
+> +
+> +	return error;
+> +}
+> +
+>  /* Network device open function for Ethernet AVB */
+>  static int ravb_open(struct net_device *ndev)
+>  {
+> @@ -2551,10 +2566,11 @@ static int ravb_set_gti(struct net_device *ndev)
+>  	return 0;
+>  }
+>  
+> -static void ravb_set_config_mode(struct net_device *ndev)
+> +static int ravb_set_config_mode(struct net_device *ndev)
+>  {
+>  	struct ravb_private *priv = netdev_priv(ndev);
+>  	const struct ravb_hw_info *info = priv->info;
+> +	int error;
+>  
+>  	if (info->gptp) {
+>  		ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG);
+> @@ -2566,6 +2582,12 @@ static void ravb_set_config_mode(struct net_device *ndev)
+>  	} else {
+>  		ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG);
+>  	}
+> +
+> +	error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_CONFIG);
+> +	if (error)
+> +		netdev_err(ndev, "failed to switch device to config mode\n");
+> +
+> +	return error;
+>  }
+>  
+>  /* Set tx and rx clock internal delay modes */
+> @@ -2785,7 +2807,9 @@ static int ravb_probe(struct platform_device *pdev)
+>  	ndev->ethtool_ops = &ravb_ethtool_ops;
+>  
+>  	/* Set AVB config mode */
+> -	ravb_set_config_mode(ndev);
+> +	error = ravb_set_config_mode(ndev);
+> +	if (error)
+> +		goto out_disable_refclk;
+>  
+>  	if (info->gptp || info->ccc_gac) {
+>  		/* Set GTI value */
+> @@ -2893,6 +2917,7 @@ static void ravb_remove(struct platform_device *pdev)
+>  	struct net_device *ndev = platform_get_drvdata(pdev);
+>  	struct ravb_private *priv = netdev_priv(ndev);
+>  	const struct ravb_hw_info *info = priv->info;
+> +	int error;
+>  
+>  	unregister_netdev(ndev);
+>  	if (info->nc_queues)
+> @@ -2908,8 +2933,9 @@ static void ravb_remove(struct platform_device *pdev)
+>  	dma_free_coherent(ndev->dev.parent, priv->desc_bat_size, priv->desc_bat,
+>  			  priv->desc_bat_dma);
+>  
+> -	/* Set reset mode */
+> -	ravb_write(ndev, CCC_OPC_RESET, CCC);
+> +	error = ravb_set_reset_mode(ndev);
+> +	if (error)
+> +		netdev_err(ndev, "Failed to reset ndev\n");
+>  
+>  	clk_disable_unprepare(priv->gptp_clk);
+>  	clk_disable_unprepare(priv->refclk);
+> @@ -2991,8 +3017,11 @@ static int __maybe_unused ravb_resume(struct device *dev)
+>  	int ret = 0;
+>  
+>  	/* If WoL is enabled set reset mode to rearm the WoL logic */
+> -	if (priv->wol_enabled)
+> -		ravb_write(ndev, CCC_OPC_RESET, CCC);
+> +	if (priv->wol_enabled) {
+> +		ret = ravb_set_reset_mode(ndev);
+> +		if (ret)
+> +			return ret;
+> +	}
+>  
+>  	/* All register have been reset to default values.
+>  	 * Restore all registers which where setup at probe time and
+> @@ -3000,7 +3029,9 @@ static int __maybe_unused ravb_resume(struct device *dev)
+>  	 */
+>  
+>  	/* Set AVB config mode */
+> -	ravb_set_config_mode(ndev);
+> +	ret = ravb_set_config_mode(ndev);
+> +	if (ret)
+> +		return ret;
+>  
+>  	if (info->gptp || info->ccc_gac) {
+>  		/* Set GTI value */
+> -- 
+> 2.39.2
+> 
+
 -- 
-2.40.1
-
+Kind Regards,
+Niklas Söderlund
 
