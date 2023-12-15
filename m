@@ -1,174 +1,94 @@
-Return-Path: <netdev+bounces-57971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EDDB8149E2
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 15:02:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 364F5814A0D
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 15:08:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1D441C20E6C
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:02:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DF6D1C23612
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:08:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9137A2EB0C;
-	Fri, 15 Dec 2023 13:59:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56542EB13;
+	Fri, 15 Dec 2023 14:03:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Eq1pTRQp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E45D734559;
-	Fri, 15 Dec 2023 13:59:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dolcini.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
-Received: from francesco-nb.int.toradex.com (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
-	by mail11.truemail.it (Postfix) with ESMTPA id 402FB212A0;
-	Fri, 15 Dec 2023 14:59:37 +0100 (CET)
-Date: Fri, 15 Dec 2023 14:59:35 +0100
-From: Francesco Dolcini <francesco@dolcini.it>
-To: Johan Hovold <johan@kernel.org>
-Cc: Francesco Dolcini <francesco@dolcini.it>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jirislaby@kernel.org>, linux-bluetooth@vger.kernel.org,
-	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, greybus-dev@lists.linaro.org,
-	linux-iio@vger.kernel.org, netdev@vger.kernel.org,
-	chrome-platform@lists.linux.dev,
-	platform-driver-x86@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-sound@vger.kernel.org,
-	Francesco Dolcini <francesco.dolcini@toradex.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Alex Elder <elder@kernel.org>, Jonathan Cameron <jic23@kernel.org>,
-	Lee Jones <lee@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Benson Leung <bleung@chromium.org>,
-	Tzung-Bi Shih <tzungbi@kernel.org>, Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v1] treewide, serdev: change receive_buf() return type to
- size_t
-Message-ID: <ZXxbx+laQk35W56U@francesco-nb.int.toradex.com>
-References: <20231214170146.641783-1-francesco@dolcini.it>
- <ZXxZzd1iBOCmnczH@hovoldconsulting.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389C93715D
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 14:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so12646a12.0
+        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 06:03:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702649026; x=1703253826; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Re7EmG4dUkFMkt4ueBg1VbsxnFksGTpUK+oP1mdXSsY=;
+        b=Eq1pTRQp6STrjSolGA+EHlOtSg4Q0mWub65jkZGdjuZhjn9yJljhKNqFPBUwB3SePy
+         YYNANVSGR+MascuSrEt4ZBbAVUxlco4VVhOwb3dXZYmqYGosRbA03JOz7Vg0aZszmFV9
+         ss9wPAHRc2qSkbbs9OrE9kWTXKnKgP6ebVQNR9yUpDiwmlyz2lcvLpyQojn7OgPa6i7D
+         mv9tlPcrpjCe90ppkNuq8ajuL7NzpQ2KbL24rv0EHO9Olzzfb2xLuXghMvIIPTmm/ny/
+         LQx/SRgapnFj1OyD8U4uE2/7uHL+Fdkc3mFEJG06UzPj43sQ99VHmSF+5h6kimRpw8XF
+         hRzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702649026; x=1703253826;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Re7EmG4dUkFMkt4ueBg1VbsxnFksGTpUK+oP1mdXSsY=;
+        b=PplLHmtBu1feE22KVX7U6LZotsyQWlqChCTIMn8wv57uGfaolbN54jM6XH+JMG/+QB
+         4TaT6UfDAXWC/+juQSFKpIPHPOGPTX6W5e5/b+jBmfR0VlWa66MT7TdaLrijKT5PEJsa
+         0PP5EuEjf2sL1yfVLqQfTPw0lTQ7S0ShGkig/DHe5raViJIRk1D71XbnH1wd+WPQIZB7
+         Aj8X9UioTRMcbqb0mbR489CfdBvk2myfvhpFs/oYywfyf4CEndV5Hv0LyRnxr3Brk6jm
+         8FXMlD4bAnAe6W1jmScO0X0mVclH1s/qBBJoclSqsuyjo6dyAwnQ+tGhKM4xXlo2TAqK
+         VyEg==
+X-Gm-Message-State: AOJu0YxWIWos8XpWj604P0ibwzeMkJbx23I0b56/BLeHZCfhaUiBSqH5
+	6zl2r0rsGnuuOOPqgFbl12Ixh23StZQut6fYHspCcA==
+X-Google-Smtp-Source: AGHT+IGgVEEsykRVGcS2ed7Lh5mNdaC99FmXoavQzMoeW70SohuB9gUVAGbYBy3ncmOHKz2UxKMHpAYnpGpBRzAKfEY=
+X-Received: by 2002:a50:c249:0:b0:544:e2b8:ba6a with SMTP id
+ t9-20020a50c249000000b00544e2b8ba6amr811234edf.3.1702649026232; Fri, 15 Dec
+ 2023 06:03:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZXxZzd1iBOCmnczH@hovoldconsulting.com>
+References: <20231213082029.35149-1-kuniyu@amazon.com> <20231213082029.35149-2-kuniyu@amazon.com>
+In-Reply-To: <20231213082029.35149-2-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 15 Dec 2023 15:03:31 +0100
+Message-ID: <CANn89i+cYcR51VHU0MsVyinWV4xNEHWdHt16sJTKmGRGMiK30Q@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 01/12] tcp: Use bhash2 for v4-mapped-v6
+ non-wildcard address.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 15, 2023 at 02:51:09PM +0100, Johan Hovold wrote:
-> On Thu, Dec 14, 2023 at 06:01:46PM +0100, Francesco Dolcini wrote:
-> > From: Francesco Dolcini <francesco.dolcini@toradex.com>
-> > 
-> > receive_buf() is called from ttyport_receive_buf() that expects values
-> > ">= 0" from serdev_controller_receive_buf(), change its return type from
-> > ssize_t to size_t.
-> > 
-> > Suggested-by: Jiri Slaby <jirislaby@kernel.org>
-> > Link: https://lore.kernel.org/all/087be419-ec6b-47ad-851a-5e1e3ea5cfcc@kernel.org/
-> > Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
-> > ---
-> > hello,
-> > patch is based on current linux next.
-> > 
-> > It has an obvious problem, it touches files from multiple subsystem in a single
-> > patch that is complicated to review and eventually merge, just splitting this
-> > would however not work, it will break bisectability and the build.
-> > 
-> > I am looking for advise on the best way to move forward.
-> > 
-> > I see the following options:
-> >  - keep it as it is
-> >  - break it down with a patch with each subsystem, and squash before applying
-> >    from a single (tty?) subsystem
-> >  - go for a multi stage approach, defining a new callback, move to it and in
-> >    the end remove the original one, likewise it was done for i2c lately
-> > 
-> > ---
-> >  drivers/bluetooth/btmtkuart.c              |  4 ++--
-> >  drivers/bluetooth/btnxpuart.c              |  4 ++--
-> 
-> > diff --git a/drivers/bluetooth/btmtkuart.c b/drivers/bluetooth/btmtkuart.c
-> > index 3c84fcbda01a..e6bc4a73c9fc 100644
-> > --- a/drivers/bluetooth/btmtkuart.c
-> > +++ b/drivers/bluetooth/btmtkuart.c
-> > @@ -383,8 +383,8 @@ static void btmtkuart_recv(struct hci_dev *hdev, const u8 *data, size_t count)
-> >  	}
-> >  }
-> >  
-> > -static ssize_t btmtkuart_receive_buf(struct serdev_device *serdev,
-> > -				     const u8 *data, size_t count)
-> > +static size_t btmtkuart_receive_buf(struct serdev_device *serdev,
-> > +				    const u8 *data, size_t count)
-> >  {
-> >  	struct btmtkuart_dev *bdev = serdev_device_get_drvdata(serdev);
-> >  
-> > diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-> > index 1d592ac413d1..056bef5b2919 100644
-> > --- a/drivers/bluetooth/btnxpuart.c
-> > +++ b/drivers/bluetooth/btnxpuart.c
-> > @@ -1264,8 +1264,8 @@ static const struct h4_recv_pkt nxp_recv_pkts[] = {
-> >  	{ NXP_RECV_FW_REQ_V3,   .recv = nxp_recv_fw_req_v3 },
-> >  };
-> >  
-> > -static ssize_t btnxpuart_receive_buf(struct serdev_device *serdev,
-> > -				     const u8 *data, size_t count)
-> > +static size_t btnxpuart_receive_buf(struct serdev_device *serdev,
-> > +				    const u8 *data, size_t count)
-> >  {
-> >  	struct btnxpuart_dev *nxpdev = serdev_device_get_drvdata(serdev);
-> 
-> A quick check of just the first two functions here shows that they can
-> return negative values.
+On Wed, Dec 13, 2023 at 9:21=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> While checking port availability in bind() or listen(), we used only
+> bhash for all v4-mapped-v6 addresses.  But there is no good reason not
+> to use bhash2 for v4-mapped-v6 non-wildcard addresses.
+>
+> Let's do it by returning true in inet_use_bhash2_on_bind().  Then, we
+> also need to add a test in inet_bind2_bucket_match_addr_any() so that
+> ::ffff:X.X.X.X will match with 0.0.0.0.
+>
+> Note that sk->sk_rcv_saddr is initialised for v4-mapped-v6 sk in
+> __inet6_bind().
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-This is already fixed. Patches are in next.
-
-There were 3 buggy user of this API.
- - 1 patch was merged a few days ago in mainline
- - 2 patches are in next, the maintainer decided to wait for the next merge window
-
-commit 687d2de93b11 ("Bluetooth: btmtkuart: fix recv_buf() return value")
-commit 7954bbcdd7ea ("Bluetooth: btnxpuart: fix recv_buf() return value")
-commit c8820c92caf0 ("platform/surface: aggregator: fix recv_buf() return value")
-
-
-> 
-> > diff --git a/drivers/tty/serdev/serdev-ttyport.c b/drivers/tty/serdev/serdev-ttyport.c
-> > index e94e090cf0a1..3d7ae7fa5018 100644
-> > --- a/drivers/tty/serdev/serdev-ttyport.c
-> > +++ b/drivers/tty/serdev/serdev-ttyport.c
-> > @@ -27,19 +27,17 @@ static size_t ttyport_receive_buf(struct tty_port *port, const u8 *cp,
-> >  {
-> >  	struct serdev_controller *ctrl = port->client_data;
-> >  	struct serport *serport = serdev_controller_get_drvdata(ctrl);
-> > -	int ret;
-> > +	size_t ret;
-> >  
-> >  	if (!test_bit(SERPORT_ACTIVE, &serport->flags))
-> >  		return 0;
-> >  
-> >  	ret = serdev_controller_receive_buf(ctrl, cp, count);
-> >  
-> > -	dev_WARN_ONCE(&ctrl->dev, ret < 0 || ret > count,
-> > -				"receive_buf returns %d (count = %zu)\n",
-> > +	dev_WARN_ONCE(&ctrl->dev, ret > count,
-> > +				"receive_buf returns %zu (count = %zu)\n",
-> >  				ret, count);
-> > -	if (ret < 0)
-> > -		return 0;
-> > -	else if (ret > count)
-> > +	if (ret > count)
-> >  		return count;
-> >  
-> >  	return ret;
-> 
-> So please do not apply this patch until the various implementations have
-> been fixed.
-> 
-> Johan
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
