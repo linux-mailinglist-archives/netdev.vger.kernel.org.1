@@ -1,43 +1,39 @@
-Return-Path: <netdev+bounces-58072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B22B5814F39
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 18:52:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC1AC814F38
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 18:52:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 678F21F21616
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 17:52:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F42EB2242F
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 17:51:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4631430133;
-	Fri, 15 Dec 2023 17:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6179A82EE3;
+	Fri, 15 Dec 2023 17:49:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ao5vRLe7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a7ij1vE/"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E97A41864;
-	Fri, 15 Dec 2023 17:49:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Cc:Content-ID:Content-Description;
-	bh=6doYMLm7Bax3yqK0joGshFZ7OI7/1Sir/DmkIlByeKY=; b=ao5vRLe79QhpcwBxgopft/HAge
-	KzIWxjDoA+XrNGKYjtfUaFJBcDImKQnVnKt60JE3FinQosQCII3wJ6g4+qmW3keci7+Q+njUzGawJ
-	MELFBtZ1kRfwNerHZWzocXQ48kJ5u0a/aHw7fbNqdqCm42m+7pj9pqLIoYgij23xqDdZU+UX+pDK+
-	heHl9uYhdf1uvAMNX5bVFo27kKquTWm2MZDSRdS1D3gB9X+79vJ71FV4upSGGigBcs0z+dak58f7k
-	ISMWy/hUsBSYBVJ/U61C+SV4AXv1/izjrNVrYf6G0qxHutvpIqzCJi4aXKlHjtQWgH8OvwqTjuUOo
-	w/MfAFmw==;
-Received: from [50.53.46.231] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1rECJh-0049Rm-1H;
-	Fri, 15 Dec 2023 17:49:41 +0000
-Message-ID: <2bde540c-b637-49f6-a8fd-03b5b95f752c@infradead.org>
-Date: Fri, 15 Dec 2023 09:49:40 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4788F4184E
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 17:49:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AB1FC433C7;
+	Fri, 15 Dec 2023 17:49:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702662586;
+	bh=d6HjQ90ZtNX1IkZrZUhDnF2CqbAfowKH+HF2mcG8qLc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=a7ij1vE/5+BQ0iN2l9sJBQprmghqCzk3Wm42Psu+H/Ewtwji6pGnt5rcg/bmj18Lh
+	 3PLh9aIICal1FGN/tAb4ezqhjuQCYuaaDpF/XLcKyzgm7XSbgnddkbQk0M9mm69p4g
+	 ENgFgHhwNnfoyo3c3VRZG2VxQ4zd5X7VzpE3CuWWBq7J9gEqfhZfOogjY3SA8nf7J2
+	 QoFoLNbrc/XCa5RGCEo6c2sMkmC4mTG7E0PNHq0exK19Ayd/nbfQ6svtP8ANMoxB76
+	 6fQ55yPU4inql6GrC3/ue7txV872pRKguBUvBFwg1RQZaqe2dsd9JORMz17VrNFCKA
+	 Y/+cO5+5doMHQ==
+Message-ID: <58519bfa-260c-4745-a145-fdca89b4e9d1@kernel.org>
+Date: Fri, 15 Dec 2023 09:49:45 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,83 +41,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH v3 2/3] net: phy: add simple helper to return
- count of supported speeds
+Subject: Re: net: ipconfig: dev_set_mtu call is incompatible with a number of
+ Ethernet drivers
 Content-Language: en-US
-To: Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20231215132921.16808-1-ansuelsmth@gmail.com>
- <20231215132921.16808-3-ansuelsmth@gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20231215132921.16808-3-ansuelsmth@gmail.com>
+To: Graeme Smecher <gsmecher@threespeedlogic.com>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, claudiu.beznea@tuxon.dev,
+ nicolas.ferre@microchip.com, mdf@kernel.org
+References: <f532722f-d1ea-d8fb-cf56-da55f3d2eb59@threespeedlogic.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <f532722f-d1ea-d8fb-cf56-da55f3d2eb59@threespeedlogic.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-
-
-On 12/15/23 05:29, Christian Marangi wrote:
-> Add simple helper to return count of supported speeds for the passed PHY
-> device.
+On 12/14/23 12:07 PM, Graeme Smecher wrote:
+> Hi all,
 > 
-> This can be useful to know the number of speed modes to dynamically
-> allocate a speed array for it.
+> In a number of ethernet drivers, the MTU can't be changed on a running
+> device. Here's one example (from drivers/net/ethernet/cadence/macb_main.c):
 > 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
->  drivers/net/phy/phy.c | 12 ++++++++++++
->  include/linux/phy.h   |  2 ++
->  2 files changed, 14 insertions(+)
+
+...
+
 > 
-> diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-> index a5fa077650e8..311560e72126 100644
-> --- a/drivers/net/phy/phy.c
-> +++ b/drivers/net/phy/phy.c
-> @@ -229,6 +229,18 @@ phy_find_valid(int speed, int duplex, unsigned long *supported)
->  	return phy_lookup_setting(speed, duplex, supported, false);
->  }
->  
-> +/**
-> + * phy_supported_speeds_num - return the number of all speeds currently
-> + *			      supported by a phy device
-> + * @phy: The phy device to return supported speeds of.
-> + *
-> + * Description: Returns the number of supported speeds.
+> So - what to do? I can see three defensible arguments:
+> 
+> - The network drivers should allow MTU changes on-the-fly (many do), or
+> - The ipconfig code could bring the adapter down and up again, or
 
-For kernel-doc, better to have that line as:
+looking at the ordering, bringing down the selected device to change the
+MTU seems the more reasonable solution.
 
- * Returns: the number of supported speeds.
+> - This is out-of-scope, and I should be reconfiguring the interface in
+> userspace anyways.
+> 
 
-
-
-> + */
-> +unsigned int phy_supported_speeds_num(struct phy_device *phy)
-> +{
-> +	return phy_speeds(NULL, 0, phy->supported);
-> +}
-> +
->  /**
->   * phy_supported_speeds - return all speeds currently supported by a phy device
->   * @phy: The phy device to return supported speeds of.
-> diff --git a/include/linux/phy.h b/include/linux/phy.h
-> index 3cc52826f18e..52aa415fab0f 100644
-> --- a/include/linux/phy.h
-> +++ b/include/linux/phy.h
-> @@ -202,6 +202,8 @@ static inline void phy_interface_set_rgmii(unsigned long *intf)
->  	__set_bit(PHY_INTERFACE_MODE_RGMII_TXID, intf);
->  }
->  
-> +unsigned int phy_supported_speeds_num(struct phy_device *phy);
-> +
->  /*
->   * phy_supported_speeds - return all speeds currently supported by a PHY device
->   */
-
--- 
-#Randy
-https://people.kernel.org/tglx/notes-about-netiquette
-https://subspace.kernel.org/etiquette.html
 
