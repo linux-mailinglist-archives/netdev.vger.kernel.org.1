@@ -1,184 +1,121 @@
-Return-Path: <netdev+bounces-57711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EE34813F85
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 02:58:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E457813F87
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 02:59:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 909A0B220C8
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 01:58:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18B461F22ACA
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 01:59:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90E9650;
-	Fri, 15 Dec 2023 01:58:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 107427FC;
+	Fri, 15 Dec 2023 01:59:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="qj3u1NTW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jlYgpdFF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6212C7E4
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 01:58:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A977E4;
+	Fri, 15 Dec 2023 01:59:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-333536432e0so108055f8f.3;
+        Thu, 14 Dec 2023 17:59:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1702605513; x=1734141513;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=gI/AeCQBvYfpqBer5ls1z6A8dVfxi1wQc7z5OFU5sCA=;
-  b=qj3u1NTWcQdWCDEMVqaKca8+llFs6v2XW7a+UrebVxmtO/5mumiNGtwC
-   YiKtC1RgRMAipyw8DedjAtxTrAnKxTYsqwaHd0BVMmd/1E3EHfuOtt2w0
-   Wdi8vOx+EOmI5a8Eoyy5z5r4dbignHcg3D4T9HsZCgyIzY+x1Iu+58c7z
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.04,277,1695686400"; 
-   d="scan'208";a="259895260"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-f7c754c9.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2023 01:58:30 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
-	by email-inbound-relay-pdx-2c-m6i4x-f7c754c9.us-west-2.amazon.com (Postfix) with ESMTPS id AEF9540D68;
-	Fri, 15 Dec 2023 01:58:29 +0000 (UTC)
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:49142]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.27.95:2525] with esmtp (Farcaster)
- id 43150f7e-b22f-4983-9746-87ea14b71030; Fri, 15 Dec 2023 01:58:29 +0000 (UTC)
-X-Farcaster-Flow-ID: 43150f7e-b22f-4983-9746-87ea14b71030
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 15 Dec 2023 01:58:28 +0000
-Received: from 88665a182662.ant.amazon.com (10.37.244.8) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 15 Dec 2023 01:58:24 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <jakub@cloudflare.com>,
-	<kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>, "Kuniyuki
- Iwashima" <kuniyu@amazon.com>
-Subject: [PATCH net-next 2/2] tcp/dccp: change source port selection at connect() time
-Date: Fri, 15 Dec 2023 10:58:07 +0900
-Message-ID: <20231215015807.39107-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20231214192939.1962891-3-edumazet@google.com>
-References: <20231214192939.1962891-3-edumazet@google.com>
+        d=gmail.com; s=20230601; t=1702605588; x=1703210388; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0BPXHZiXrCumILWBdbm2jyfqq1EYY5OqKA7tVcfSWPY=;
+        b=jlYgpdFFYhZAWqAHB5IBqWBGkbZUw7y/UkQSyY2plDrFQ8ZPpin4wqUgn96mlzwruW
+         YCgEGYZiOsEJBuU0qf4ZZA4mUuaOvuyohXkOflRfaPX1epN49tLx+TCYap33a6OkMDCj
+         5tPnSTTYz5nx5wHzmdpj/weIbZS2CWIXtOq8DnVQDd77vOq1ut+SwfxTPavMfrjCa/Ir
+         Pf+483Yd2UsT3abY3doi7UCHfzKXU9yh8UmC4axdak7aqnT+fDyZWn0ibxFP8LhGcK54
+         xLMT1QZ+t6cGE6/VXOV2q+fTFnjkZojpels6S0UyXXyD55a3UD2mYWbjrD7T8oi7uyCL
+         0Z5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702605588; x=1703210388;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0BPXHZiXrCumILWBdbm2jyfqq1EYY5OqKA7tVcfSWPY=;
+        b=reks1Z1jWYhSlxqUYrOOiotypmCWT3oLavbdqUWbgHws9TM5M0ZB11AOJx+DOxh7nM
+         TyP/t1ZyUJ7nUM+Bi0oNTvyNo4oqc6Apam4roqOunmqiM9AfWkwhnGAKgiCwyM8DO2tq
+         z0p+ceITuPUTZ/zKMgljuScZSfBjSXrrO021MLAm/dXlSsVoqBnIcGFQxumirpZHyIOt
+         /KtXKpArNm908KRrMxn6mwVhV91DjE28yBY9fwL3EugfRfmZtfsDn5tzz9frjdFLe7Ih
+         PR0ITo7/tM/6t9sCNUzBRfvE4o8XdfhZiE9jr1FL4iqoMn6KMmKVEVidmdaaGV8dELmk
+         SZnQ==
+X-Gm-Message-State: AOJu0Yxty8J42RbwK/TszEicZBQKTfE6ZMoxQZgbJwKi9BQRIErDbRjZ
+	EAk4u4WpU258/MvFp/AN/vI73hf4dE9wIHEdy8A=
+X-Google-Smtp-Source: AGHT+IEQ9/UVkiTTf2mynkBFhgR6IeL+g82WMufDcGhjlUpuHcP0aPoLuAa4ko36Eu3GeZlCWMCgLkRy74ioo1IewCY=
+X-Received: by 2002:a05:6000:1183:b0:336:4736:e695 with SMTP id
+ g3-20020a056000118300b003364736e695mr908420wrx.52.1702605587460; Thu, 14 Dec
+ 2023 17:59:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D032UWB002.ant.amazon.com (10.13.139.190) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+References: <CAADnVQ+dPML0DW=Miuq=n7nC8m4gcPj7Dk_nhedzs9zTE30arw@mail.gmail.com>
+ <20231214204629.1b380b82@gandalf.local.home>
+In-Reply-To: <20231214204629.1b380b82@gandalf.local.home>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Thu, 14 Dec 2023 17:59:36 -0800
+Message-ID: <CAADnVQJSvFeqRT+x3y5AWOC396nOdZQ4Zf66Es-71PxBtpj_GA@mail.gmail.com>
+Subject: Re: [bug] splat at boot
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
+	Stephen Rothwell <sfr@canb.auug.org.au>, Alexander Potapenko <glider@google.com>, 
+	Andrey Konovalov <andreyknvl@gmail.com>, Peter Zijlstra <peterz@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 14 Dec 2023 19:29:39 +0000
-> In commit 1580ab63fc9a ("tcp/dccp: better use of ephemeral ports in connect()")
-> we added an heuristic to select even ports for connect() and odd ports for bind().
-> 
-> This was nice because no applications changes were needed.
-> 
-> But it added more costs when all even ports are in use,
-> when there are few listeners and many active connections.
-> 
-> Since then, IP_LOCAL_PORT_RANGE has been added to permit an application
-> to partition ephemeral port range at will.
-> 
-> This patch extends the idea so that if IP_LOCAL_PORT_RANGE is set on
-> a socket before accept(), port selection no longer favors even ports.
-> 
-> This means that connect() can find a suitable source port faster,
-> and applications can use a different split between connect() and bind()
-> users.
-> 
-> This should give more entropy to Toeplitz hash used in RSS: Using even
-> ports was wasting one bit from the 16bit sport.
-> 
-> A similar change can be done in inet_csk_find_open_port() if needed.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+On Thu, Dec 14, 2023 at 5:45=E2=80=AFPM Steven Rostedt <rostedt@goodmis.org=
+> wrote:
+>
+> On Thu, 14 Dec 2023 17:25:46 -0800
+> Alexei Starovoitov <alexei.starovoitov@gmail.com> wrote:
+>
+> > Hi All,
+> >
+> > just noticed a boot splat that probably was there for lone time:
+> >
+> > [    1.118691] ftrace: allocating 50546 entries in 198 pages
+> > [    1.129690] ftrace: allocated 198 pages with 4 groups
+> > [    1.130156]
+> > [    1.130158] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > [    1.130159] [ BUG: Invalid wait context ]
+> > [    1.130161] 6.7.0-rc3-00837-g403f3e8fda60 #5272 Not tainted
+> > [    1.130163] -----------------------------
+> > [    1.130165] swapper/0 is trying to lock:
+> > [    1.130166] ffff88823fffb1d8 (&zone->lock){....}-{3:3}, at:
+> > __rmqueue_pcplist+0xe80/0x1100
+> > [    1.130181] other info that might help us debug this:
+> > [    1.130182] context-{5:5}
+>
+> Can you trigger this with CONFIG_PROVE_RAW_LOCK_NESTING disabled?
+>
+> If not, then I wouldn't worry about it for now, but this will need to be
+> addressed when PREEMPT_RT is included.
+>
+> Basically, a spin_lock() in PREEMPT_RT is converted into a mutex, and mos=
+t
+> interrupt handlers and all softirqs are turned into threads. But there's
+> still cases where spin_lock() can not be used. One is for interrupt
+> handlers that will not turn into a thread (like the timer interrupt), and
+> for when a raw_spin_lock is held. You can't have:
+>
+>   raw_spin_lock(rawlock);
+>   spin_lock(spinlock);
+>
+> order.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-
-
-> Cc: Jakub Sitnicki <jakub@cloudflare.com>
-> ---
->  net/ipv4/inet_hashtables.c | 27 ++++++++++++++++-----------
->  1 file changed, 16 insertions(+), 11 deletions(-)
-> 
-> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-> index a532f749e47781cc951f2003f621cec4387a2384..9ff201bc4e6d2da04735e8c160d446602e0adde1 100644
-> --- a/net/ipv4/inet_hashtables.c
-> +++ b/net/ipv4/inet_hashtables.c
-> @@ -1012,7 +1012,8 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
->  	bool tb_created = false;
->  	u32 remaining, offset;
->  	int ret, i, low, high;
-> -	int l3mdev;
-> +	bool local_ports;
-> +	int step, l3mdev;
->  	u32 index;
->  
->  	if (port) {
-> @@ -1024,10 +1025,12 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
->  
->  	l3mdev = inet_sk_bound_l3mdev(sk);
->  
-> -	inet_sk_get_local_port_range(sk, &low, &high);
-> +	local_ports = inet_sk_get_local_port_range(sk, &low, &high);
-> +	step = local_ports ? 1 : 2;
-> +
->  	high++; /* [32768, 60999] -> [32768, 61000[ */
->  	remaining = high - low;
-> -	if (likely(remaining > 1))
-> +	if (!local_ports && remaining > 1)
->  		remaining &= ~1U;
->  
->  	get_random_sleepable_once(table_perturb,
-> @@ -1040,10 +1043,11 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
->  	/* In first pass we try ports of @low parity.
->  	 * inet_csk_get_port() does the opposite choice.
->  	 */
-> -	offset &= ~1U;
-> +	if (!local_ports)
-> +		offset &= ~1U;
->  other_parity_scan:
->  	port = low + offset;
-> -	for (i = 0; i < remaining; i += 2, port += 2) {
-> +	for (i = 0; i < remaining; i += step, port += step) {
->  		if (unlikely(port >= high))
->  			port -= remaining;
->  		if (inet_is_local_reserved_port(net, port))
-> @@ -1083,10 +1087,11 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
->  		cond_resched();
->  	}
->  
-> -	offset++;
-> -	if ((offset & 1) && remaining > 1)
-> -		goto other_parity_scan;
-> -
-> +	if (!local_ports) {
-> +		offset++;
-> +		if ((offset & 1) && remaining > 1)
-> +			goto other_parity_scan;
-> +	}
->  	return -EADDRNOTAVAIL;
->  
->  ok:
-> @@ -1109,8 +1114,8 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
->  	 * on low contention the randomness is maximal and on high contention
->  	 * it may be inexistent.
->  	 */
-> -	i = max_t(int, i, get_random_u32_below(8) * 2);
-> -	WRITE_ONCE(table_perturb[index], READ_ONCE(table_perturb[index]) + i + 2);
-> +	i = max_t(int, i, get_random_u32_below(8) * step);
-> +	WRITE_ONCE(table_perturb[index], READ_ONCE(table_perturb[index]) + i + step);
->  
->  	/* Head lock still held and bh's disabled */
->  	inet_bind_hash(sk, tb, tb2, port);
-> -- 
-> 2.43.0.472.g3155946c3a-goog
+Thanks for explaining.
+It's fine without PROVE_RAW_LOCK_NESTING.
 
