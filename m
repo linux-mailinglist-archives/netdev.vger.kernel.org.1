@@ -1,136 +1,172 @@
-Return-Path: <netdev+bounces-57848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B13B814512
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:03:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7055D814521
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:05:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C62BC1F22E86
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 10:03:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A21CC1C22D0D
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 10:05:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D3CE18B0E;
-	Fri, 15 Dec 2023 10:03:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67F9B18E28;
+	Fri, 15 Dec 2023 10:04:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="d5ffZ9qV"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="b058VRax"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B8D19454
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 10:03:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-550dd0e3304so564301a12.1
-        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 02:03:42 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1933918C11
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 10:04:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-40c25973988so5152095e9.2
+        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 02:04:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702634621; x=1703239421; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=56mVcOurV+ZpI4KiJDKVHnndwqaB73yRAHtAX8Z6DO8=;
-        b=d5ffZ9qV9EMOyLJgkG4b/aQwtnQ5HiuydgMFHE6iR4Qkla7Z6qm8rMf8JZRtnKeOjM
-         3SCLiyNMtbPMa/PPDoVKs9mlZ6Yinw0dmlL/MAc0D2g3uEh2oupdVaaTBqQhF9I3Yfbc
-         PMdevjgNdHAGdZrD2XBe6hXLjwc8XGi0wbz4PXT7ST5m0wQ+bF1yOtZ9eTk6oq35qEMV
-         Wb1qr01Z9FkWsP5f+NlNeYQ+j623yArCJ1ZYLGEeGv0RykKQcUzuSgJ+70dgTRwG+1e0
-         VoiENUtTobIYCtvboHD4kMeK8FmnbZSEjLTgjC8CggeT3hCGKY1WJ1RaYUYHvXmdZfNJ
-         27iA==
+        d=tuxon.dev; s=google; t=1702634693; x=1703239493; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TzGSueYgjKpbem4qFtdP7rmchtFZgQq3JUglNkOvT3w=;
+        b=b058VRaxYdMSQpRbtrh0q3q5oZ4tKhQbn71OdKk9BWgTNVB9gguNmKiRj9g04VCP//
+         nj7tdGpe/yLGFfpODe0oGU4BSKPIpt5fFehHo7o6FxcwcygZEtkMukZSh9e6n51e1v43
+         AAtJ+JllomTSvQ9gO1d3/GiiDMeGDr5CIe3XsOR/IJTk/NIdQhZNxw0Nt9FbSWjOXEcT
+         Z3TMpT3iJxIkWFtCSVNmc7e44GH0SuDotCE8v5CV7KjA6A6E8x7jXWhxdkLQxVU74TCE
+         pxakNl+tMPl+GGa2c75uJ9Yqus6bzmRiCPW5VwC+oKi2/olmYAI/jQgmBnTWarFX4/A7
+         XwQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702634621; x=1703239421;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=56mVcOurV+ZpI4KiJDKVHnndwqaB73yRAHtAX8Z6DO8=;
-        b=cvrLcTFkoM2RmaX+iPue2fTr+hYMUI6OjJNiFpTZR5QhB9MLpDrAozA7SbaRIE4Emr
-         vxGGrzLo2m0iD5RJqS1A8VJ37b+idQnZtD1+n69uRypmc7nZyIXbpHQD4i/Dtr5EFnWI
-         MaxE9e6uytfBoNjIDuoUqG/giiCDmlsV0GHoeoj1goY+4X/8v4Msj822VsOKj13aKgx2
-         78KwrtCa2bEJroJtJpHODtbaJqK1wwLg/5wnGuDipL+kgeP/AQyoDm8OT0PjUJl5ocJg
-         jDPy4E4SMq5uK2Bdji0qziBLeb9Y8GDgAfUZOTTOkxNNDF278rPPdjIo0/rnikHonKa8
-         CQcw==
-X-Gm-Message-State: AOJu0YxJKFWrwsYKkaMJX5zeA+j/d1JBd6TlLOdM1Elmimg2Phj1M8Mw
-	TsTr2rG2AHGKUc5ImE78OWtWSA==
-X-Google-Smtp-Source: AGHT+IFakk7HKd1/w8eY7FbamYh2nhmDM6EiZxY4UHt3ysPT6LjF98hN7F7qLS1EFjn3+x7lPOFj3g==
-X-Received: by 2002:a50:8d8a:0:b0:54c:e28c:2086 with SMTP id r10-20020a508d8a000000b0054ce28c2086mr6312806edh.38.1702634621057;
-        Fri, 15 Dec 2023 02:03:41 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id dg12-20020a0564021d0c00b0054c9635b24esm7616141edb.21.2023.12.15.02.03.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Dec 2023 02:03:40 -0800 (PST)
-Date: Fri, 15 Dec 2023 11:03:39 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, jacob.e.keller@intel.com, jhs@mojatatu.com,
-	johannes@sipsolutions.net, andriy.shevchenko@linux.intel.com,
-	amritha.nambiar@intel.com, sdf@google.com, horms@kernel.org,
-	przemyslaw.kitszel@intel.com
-Subject: Re: [patch net-next v7 5/9] genetlink: introduce per-sock family
- private storage
-Message-ID: <ZXwkezPrcHlFdiS9@nanopsycho>
-References: <20231214181549.1270696-1-jiri@resnulli.us>
- <20231214181549.1270696-6-jiri@resnulli.us>
- <20231214192358.1b150fda@kernel.org>
+        d=1e100.net; s=20230601; t=1702634693; x=1703239493;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TzGSueYgjKpbem4qFtdP7rmchtFZgQq3JUglNkOvT3w=;
+        b=LWT1SVCfoy9QPdPOfhW+WtoDMrLXOFYvZJ0Xnt3Kf3Yq/6q4pjEqWOsnZGIvlSnlqC
+         7mwadiFDWeA7NJscC7e8vEdBFXjunN1Xlx0D/DXtqR/3I9uij6Z4n9EfrZTAIGJu9LgE
+         SMkHgdSGSWYCoXOw3Ta5BXOZL+Ma4sVu+gtECnRqCPzRNiKJWfQUQMhEtDw64m8w8SkD
+         5UyL5IBqa59rnkxnZbib9k73d4uhi5pD5piv/uTzLA9ptEw8zHWrRKKRoSj816UUxTWr
+         mlRlw/hPc4MPnZToZyC9EXqIqxR1VX/HsTXBQ3GBf7npv6ukXflpZjDIPonJSPSifLN4
+         WZQQ==
+X-Gm-Message-State: AOJu0YxjLJCLQi6vIyHNvpo1ZrSwfU2qa2B8tzDtOjDDrJh4i7zwT3Ny
+	GI230El2MgrqHDs3TzVgnAwxSg==
+X-Google-Smtp-Source: AGHT+IG23H+vbNwlWVjRO6JupU3b8UJgJiD5gNauO7Z+S0ticxIdE6x+9ZzaZ14GJJx4kxaE5DNpug==
+X-Received: by 2002:a7b:cd11:0:b0:40c:909:4402 with SMTP id f17-20020a7bcd11000000b0040c09094402mr5528160wmj.133.1702634693136;
+        Fri, 15 Dec 2023 02:04:53 -0800 (PST)
+Received: from [192.168.50.4] ([82.78.167.103])
+        by smtp.gmail.com with ESMTPSA id i1-20020a05600c354100b0040c411da99csm22891968wmq.48.2023.12.15.02.04.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Dec 2023 02:04:52 -0800 (PST)
+Message-ID: <0b807496-f387-4aef-8650-a43a9249468f@tuxon.dev>
+Date: Fri, 15 Dec 2023 12:04:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231214192358.1b150fda@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] net: ravb: Wait for operation mode to be applied
+Content-Language: en-US
+To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ claudiu.beznea.uj@bp.renesas.com, yoshihiro.shimoda.uh@renesas.com,
+ wsa+renesas@sang-engineering.com, niklas.soderlund+renesas@ragnatech.se,
+ biju.das.jz@bp.renesas.com, prabhakar.mahadev-lad.rj@bp.renesas.com,
+ mitsuhiro.kimura.kc@renesas.com, geert+renesas@glider.be
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231214113137.2450292-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214113137.2450292-2-claudiu.beznea.uj@bp.renesas.com>
+ <d08dbbd4-2e63-c436-6935-df68c291bf75@omp.ru>
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <d08dbbd4-2e63-c436-6935-df68c291bf75@omp.ru>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Fri, Dec 15, 2023 at 04:23:58AM CET, kuba@kernel.org wrote:
->On Thu, 14 Dec 2023 19:15:45 +0100 Jiri Pirko wrote:
->> - converted family->sock_priv_list to family->sock_privs xarray
->>   and use it to store the per-socket privs, use sock pointer as
->>   an xarrar index. This made the code much simpler
->
->Nice! 
->
->FWIW I think I remember Willy saying that storing pointers in xarray is
->comparatively inefficient / slow, but we can cross that bridge later.
-
-I see an alternative in using rhashtable with sk pointer as a key. Not
-sure if it is more efficient. Any other ideas?
-
-But as you say, this can be addressed as a follow-up.
 
 
->
->> +void *__genl_sk_priv_get(struct genl_family *family, struct sock *sk)
+On 14.12.2023 21:41, Sergey Shtylyov wrote:
+> resetOn 12/14/23 2:31 PM, Claudiu wrote:
+> 
+>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>
+>> CSR.OPS bits specify the current operating mode and (according to
+>> documentation) they are updated when the operating mode change request
+>> is processed. Thus, check CSR.OPS before proceeding.
+> 
+>    The manuals I have indeed say we need to check CSR.OPS... But we only
+> need to wait iff we transfer from the operation mode to the config mode...
+
+RZ/G3S manual say about CSR.OPS "These bits are updated when an operating
+mode changes is processed". From this I get we need to check it for any mode.
+
+Also, on configuration procedure (of RZ/G3S) it say CSR.OPS need to be
+checked when switching from reset -> config.
+
+> 
+>> Fixes: 568b3ce7a8ef ("ravb: factor out register bit twiddling code")
+>> Fixes: 0184165b2f42 ("ravb: add sleep PM suspend/resume support")
+>> Fixes: 7e09a052dc4e ("ravb: Exclude gPTP feature support for RZ/G2L")
+>> Fixes: 3e3d647715d4 ("ravb: add wake-on-lan support via magic packet")
+>> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+> 
+>    Hm, that long list does look weird...
+
+OK, then I'll limit it to only c156633f1353 ("Renesas Ethernet AVB driver
+proper"). Niklas also suggested this.
+
+> 
+>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>> ---
+>>  drivers/net/ethernet/renesas/ravb_main.c | 47 ++++++++++++++++++++----
+>>  1 file changed, 39 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>> index 9178f6d60e74..ce95eb5af354 100644
+>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>> @@ -683,8 +683,11 @@ static int ravb_dmac_init(struct net_device *ndev)
+>>  
+>>  	/* Setting the control will start the AVB-DMAC process. */
+>>  	ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_OPERATION);
+>> +	error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_OPERATION);
+>> +	if (error)
+>> +		netdev_err(ndev, "failed to switch device to operation mode\n");
+> 
+>    It doesn't look like ravb_wait() is needed here...
+>    And besides, this pattern seems repetitive and worth factoring out into
+> a single function.
+
+In the final version of the driver proposed by RPM series it is gone. I
+tried to keep the fixes simple. I'll update it as Niklas also suggested this.
+
+> 
+> [...]
+>> @@ -1744,6 +1747,18 @@ static inline int ravb_hook_irq(unsigned int irq, irq_handler_t handler,
+>>  	return error;
+>>  }
+>>  
+>> +static int ravb_set_reset_mode(struct net_device *ndev)
 >> +{
->> +	if (WARN_ON_ONCE(!family->sock_privs))
->> +		return NULL;
->> +	return xa_load(family->sock_privs, (unsigned long) sk);
+>> +	int error;
+>> +
+>> +	ravb_write(ndev, CCC_OPC_RESET, CCC);
+>> +	error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_RESET);
+>> +	if (error)
+>> +		netdev_err(ndev, "failed to switch device to reset mode\n");
+>> +
+>> +	return error;
 >> +}
 >> +
->> +/**
->> + * genl_sk_priv_get - Get family private pointer for socket
->> + *
->> + * @family: family
->> + * @sk: socket
->> + *
->> + * Lookup a private memory for a Generic netlink family and specified socket.
->> + * Allocate the private memory in case it was not already done.
->> + *
->> + * Return: valid pointer on success, otherwise negative error value
->> + * encoded by ERR_PTR().
->
->nit: probably better if __genl_sk_priv_get() returned an error pointer
->     if family is broken, save ourselves the bot-generated "fixes"..
+> 
+>    Again, ravb_wait() call doesn't seem necessary here...
 
-Okay, will fix and send v8 (hopefully the last one, uff).
+Ok. I followed the guideline from the description of CSR.OPS. Let me know
+if you want to keep it or not. I think I haven't saw any issues w/o this.
 
-
->
->> + */
->> +void *genl_sk_priv_get(struct genl_family *family, struct sock *sk)
->> +{
->> +	void *priv, *old_priv;
->> +
->> +	priv = __genl_sk_priv_get(family, sk);
->> +	if (priv)
->> +		return priv;
->
+> 
+> [...]
+> 
+> MBR, Sergey
 
