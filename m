@@ -1,247 +1,439 @@
-Return-Path: <netdev+bounces-58060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00E2F814E93
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 18:27:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 72F79814E98
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 18:28:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80C921F2570F
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 17:27:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 004E51F258AA
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 17:28:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A348256387;
-	Fri, 15 Dec 2023 17:16:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F043FB1A;
+	Fri, 15 Dec 2023 17:17:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0Aq+x8UP"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="LDn81EmW"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2072.outbound.protection.outlook.com [40.107.237.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6076D4B5B3;
-	Fri, 15 Dec 2023 17:16:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LRpN/4fdTJZrGx38IUGnB6rtHiDIIa0FOtewoswAXqMfNzOja9ZyYPAIzaSgLx865kPTcEdGwmWguoN6jV8e47jIjNw5PJeGeKEs8Cv/Jny2k841zR4HujhQJK6FiYQt5hKUslR/mjQDl9IT2GWrp4a80wzkqGkKg/9RUdZJvTtUj+j6g8Mt8fb+H4U0azxIgVp0wSP11pg8LjoIjpWrddAiZ8TD9R5+m9HzKE2+5V0fOTgvaAvwy1+LS/2vEcSkG5IckrI0ULVLQR1F+p4DGOMBm2vSylt3nzqbwixlo3RhOQR8nVX+g7z2XBpItmpo4RfOvqmuJAYH1Tsy5X231w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xDaGjddj6oREkN7REYbXEAYwjbiEXIo82iY1xLNoyfw=;
- b=U+VsHGrjU/gILLI/QMmJvrl4QLhScUUDtpM36cXm73cqiikIRHtkMWCYIlTfI9lPxsXoivm1xtxkiWVVkoL2d4ZULmpSvP0xX0OBc5KsYnTPu3vEr3G6eeWDFI1HmM5GDatWBBbLKe1PPTM2Y5N7ZAAzNCNSfW5b2Ig+fUSuiboUatG85E38SkFHxFy6tT7t+0B2lyw8A1wdcPg7xgIIW7bVAhIPdGuur25UiKihWRFFgEjbFYen8u1NKTqo2+7gOWnVIcNidG3h+PFVv0t2FlZD7Hf5W0GbpZelqDxv+MkxlSXXuYAgHVUSYFVhvmDGIA6zNhiW6C3El4G3z0sZQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xDaGjddj6oREkN7REYbXEAYwjbiEXIo82iY1xLNoyfw=;
- b=0Aq+x8UPu+kbkDDOj2o6KOXSAQ8P/gNUIWlTWWhq9BdwDONy4MoTdPHQmlW8cbFSW6cEx7Pz9zjGlAzhrNQjx93mC38go/QAoJhW+Dr93FNcoUEHuSfbTGgX3tukkaPBIOU+IlMoVahYK3GhjU6aABUDUoC78luoIRT+d6r6pFw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
- by DM4PR12MB5890.namprd12.prod.outlook.com (2603:10b6:8:66::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.32; Fri, 15 Dec
- 2023 17:16:07 +0000
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::bec4:77b3:e1d1:5615]) by PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::bec4:77b3:e1d1:5615%5]) with mapi id 15.20.7091.028; Fri, 15 Dec 2023
- 17:16:04 +0000
-Message-ID: <0edc953a-0357-d054-d9a2-e9a86e90233d@amd.com>
-Date: Fri, 15 Dec 2023 09:16:00 -0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [net PATCH] i40e: fix use-after-free in i40e_aqc_add_filters()
-Content-Language: en-US
-To: Ke Xiao <xiaoke@sangfor.com.cn>, jesse.brandeburg@intel.com,
- anthony.l.nguyen@intel.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: dinghui@sangfor.com.cn, zhudi2@huawei.com,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20231213104912.16153-1-xiaoke@sangfor.com.cn>
-From: Brett Creeley <bcreeley@amd.com>
-In-Reply-To: <20231213104912.16153-1-xiaoke@sangfor.com.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0056.namprd03.prod.outlook.com
- (2603:10b6:a03:33e::31) To PH0PR12MB7982.namprd12.prod.outlook.com
- (2603:10b6:510:28d::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6FE166AAD
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 17:17:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-5cd68a0de49so529675a12.2
+        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 09:17:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1702660658; x=1703265458; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NCAm1Ni6Cdha4u9AHDohjRb25yQoEQRDw8Af8dU+fNU=;
+        b=LDn81EmWtsB3Rxl0MUub2m22kCAbrus9IgXMoeeDNQaBZ5WTcTWdYkYAgiDygF7FCl
+         d8iXR/R57AyREqdvG2Gwr4DY5UEYUkFfelekx1N5w8Jxs5JXOfIBXP6Ou8NjBV/4Ckvo
+         giGm1VtRVCgHU5PjZZyXp4ntluWlb6rX1sOigukfGL4qCJEE2TT4zzAce+IFij6XmA5h
+         y2NCagM3w3zfnu7tTYmsZvRY0WAv5xE9twTOueN2lNhrUokpau5813bWAXqApqBNCH4P
+         rCdtHbULst7XLmMYEYPfDujynxgiEn/qtDlugfRb6c+nBPjxus1aEMBkhbg2vPvoro+F
+         va4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702660658; x=1703265458;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NCAm1Ni6Cdha4u9AHDohjRb25yQoEQRDw8Af8dU+fNU=;
+        b=oVJPWfCZBDU/FycoEtuC207CF5beKsUr2eq53+EbTkzaPI/o2p89bBLdBjSKve0ZJe
+         uucCNrGl2qAoqxFNrxsJ3jJhh5wOTdIVc2/1m25I1j7Jp77tkaFI5Pr1Eg/rbjYwpbrO
+         bqnelQaI5f5Gs++kWlbPdTtXr5eFjkwd2vyhnw5rRiUgRQD0WCak2EDVfs9M5QPbDWK+
+         HOHvZU/1Fjjg3AmVmO7ma3VuI1WTA+UERN4BHtDZ1zosqEejbpYX6QG/z9JjwQhXsSTy
+         a8lzlAE0M7/PQ6UzGhXADJAouqn9EQ1tTsROHZMobKKxnW8s29KCkaSRCoC9JEeuxnZ+
+         dHvA==
+X-Gm-Message-State: AOJu0Yw48bh7dPyweZsuN3Tm/TYAxGg5gFYnURDgAqcu4Wx3M4OIQU5I
+	9XCoOAYJpH4Om9sv5dK75K8fYHvc3iYEzf7d75XjUg==
+X-Google-Smtp-Source: AGHT+IEnLVTzIIkRGgMybKz3yIvwEg2RoK549jkWmzqKgfCwMWQcdbSI2U5tumVpADsfLGNa/um6rmokDA2QXIv4Bp4=
+X-Received: by 2002:a17:90a:77c1:b0:285:8673:450d with SMTP id
+ e1-20020a17090a77c100b002858673450dmr9155706pjs.40.1702660657969; Fri, 15 Dec
+ 2023 09:17:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|DM4PR12MB5890:EE_
-X-MS-Office365-Filtering-Correlation-Id: 25c215b7-4eec-418b-10d4-08dbfd9184c1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	eqIKzStThsvZj3v7wMjT0NKbp3qkkqbTvut1L+1+R7Y7XIQHUuXtR/ThxOlHEmdhh0qOUnBcAY1wLhziFGwUAXoe+R3ayTjGLXx5oTNa7aMb8B/7kfya2+bz9wc4C952OgqCFm1yxrDcK+s2v/EVArvDFiuc6A8TZMoJP7sM+BtlWqCe9cVb/gh2wtMjGZeSh3P5YADfepInvr30rmOOp0vAaISw64V1vNQgvZpPdxjf6z+uSXawt6GQHKZgSni6XNfw3a9VS8+QWOv0C3JvI9N3eCr8P3Kw5rKTAIUrftWjCQqwPL2zEIQsFCH1yWS/qk5i5O+UV/BsD0k0ctwSFZngZFlyeDmhZOtUEPzyinLY9YQ8trS+QrUMAMG3adkT/8RswETqjVY1SxUEBBcmXSp20hPH6YdeqXyRzacQFNIRED9Hxj2yymismipBcwth4pCbUxPYPHTrlsiqA2iIdufs3kHMKSvs1+usCOvHGVIHf1zWH8dKqN3wmDh9e+SZVGpYQdUprCA+DvSOGJzNPAFIaHS5ErAx1wZcBtBJwg5qWeFEmV4r4H2c4oPRub0LeTy3cvxKfNr9OatBr95OGQsEEu+o8lXQS2jf2xv+Ce/0dus7SSaFR2VCTZHjCcV4iyDNx+XGD1Lb8ZWJ+DD3KF7GfMnyvblCr+cJVO95kv+PR+F/GKjPKbtICi3me4Ns
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(366004)(376002)(346002)(136003)(230273577357003)(230173577357003)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(31686004)(26005)(2616005)(53546011)(6666004)(6512007)(6506007)(38100700002)(31696002)(36756003)(41300700001)(8676002)(8936002)(4326008)(478600001)(5660300002)(7416002)(2906002)(83380400001)(6486002)(66946007)(66556008)(66476007)(316002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?YVhBUk8vSUJzbUFnSlpIaWRZazZQYWo5bko0dVA4Vll0MkwrVTc2RFYxZUpU?=
- =?utf-8?B?aGRxRFcybzBzbnV3OC9DQUljd3hHNTl1bGF1RGh5MEkwWmIwQ3pBY084NG5H?=
- =?utf-8?B?Qzg4L2ZWMDVuc3R4elAyMCs4R09sWVF5UDZLR3JKNnQ0dENFWS9NVVZoMzI1?=
- =?utf-8?B?U0ROamRDRWdQOXNkYXdNeklVRHFOMVd0bmFtTkw3ejA4K2E3U3h2S3ZEbHVP?=
- =?utf-8?B?U09uQXlieHBOOW12RDhHRTNxY056UVZYbW1yVWZzL0VDdTRCK0dKaGtXQUUz?=
- =?utf-8?B?b005M0pWWlJaMXRtNzVoSVJDY0hzY2VoQnJZMmdJdTZJeUJlYkRMNm1HZk0r?=
- =?utf-8?B?M2VZSGNFLzRTeXB2Ly9hQi9HeURiNzV1d0NqaFFNTHN3am1iRU1sbGVTL3Vq?=
- =?utf-8?B?ODZ3d1cyMWozbTZQdUlISUczaHBYdUlYU0s0cVpVNHdnU255L1l6c0pFMnBx?=
- =?utf-8?B?YTJucVpFeDR3bTNJMmd1Uy9VYVNhUHRkOTB3MlljbnpSdk1LN0JKNjcwbStQ?=
- =?utf-8?B?QzlBbjkvSFMvZ3VETDluMEtaNnhxdm1EbmtVNmtjWlMzQU5jM1hQV1FTaHpV?=
- =?utf-8?B?WjJmQnpna0tyMTUxQW5IclJOZGpCSDBqdWd0cTJKb0YwejNiRkRMREU2VktM?=
- =?utf-8?B?TU0yWnNCWm52UmFkaGp6eWVDbms1ZjJlSTQ0azJFVUVnRlZkdXdORDlpWjVE?=
- =?utf-8?B?R1ozUFhaRUkyN0YraXcyZi9CdStOeXgvRTVTU096ZFIwWTNoYnFzYlY1VDBi?=
- =?utf-8?B?RTBGaHpNaTJsWlZPbzF4eVZTaFRLeStad3ZrNUtWZ1FUWkNYR0p2dmQrUzh2?=
- =?utf-8?B?R0FwcmI3STg2Q3liZ2Q0M3FIL0dNV3FXMzFYK1NoQUxIdGFUYVgxS2ZFSjdX?=
- =?utf-8?B?enQ5TEEybUF4alhvbnhLM1ROOXpFWmpaVmMybStmVEV3VXVsMzA2YTF3ZmVl?=
- =?utf-8?B?SHBVeGhibHI3c3VLTWFHYXVDOXY0L0xhVHh2YnV1b1ZpUXNjYXhqdk9iZXl0?=
- =?utf-8?B?N2VnUkhSSHFRK2syVGRBZTRNSjJNZi9NeDFVWm1HR1RIaDZJNTFyaW4wQnVu?=
- =?utf-8?B?YTdnSUdvbXZvcmpIdUw5WTBVTWo2em43MFhKekpEcmtoYnkxUkR2WjBtYmlT?=
- =?utf-8?B?SURaSGYyN1hQRnFRdVhYaXQwK0xSeU1DTndweVpFamE2ZkVLUzZFWnVzRmpI?=
- =?utf-8?B?QnRoalBPNEZKc2lBeVdPN1VhTHlCQmRyTHBNYzRvaHE4RkNsNnJhQjF0eEdT?=
- =?utf-8?B?ZEtKaDA5TGxDbWFISytKc2ZUQmlsL3oybFZvNGlVWFNhWCtaSHNVZ0VHa3FX?=
- =?utf-8?B?UGRKQklvOXdKdkg4Ty9EY3dkUFg5ZnNyVzZRRGYrQjNvZEErR2dvbnM2K2Yv?=
- =?utf-8?B?TTE3WDgwQm9Jcm0rSTFWZTU2ZUdramh2clVGb0ZhUThhbXFDOFY3WDE5bm05?=
- =?utf-8?B?ckdGeUhtc2lWMnFqOExwWTB3WHloLzZTK05CNEZjNVhadFRHM0ZDdENDQmlz?=
- =?utf-8?B?ODNUeHF0eWcycW54UytHeFJ5UEVHOUhraHQ1Y3NpNkhwK0JDaE8wTHpncS9k?=
- =?utf-8?B?VGhNQnkwMkV0a3ZhWk4zSlFrVVEvcGxwdEhxVk1GeXJmSHlKZDFhTDV4UkR5?=
- =?utf-8?B?UXdMV0JoS2RubDZPVlhCRlZTU01KQmVoN3V4UXBoL1NqSzdINjk4VTRPOW84?=
- =?utf-8?B?Q0xGLzFxU0U1ZHlSa1RuK2hMNUQ2YUI1UWFyR2RrWTV0czVpclNZRnZFaDlS?=
- =?utf-8?B?Y1duaWhibWk0WnBQWktmTVJHUTErRzJvM0dLcU9vNmFLY3hVdytjUElobnBz?=
- =?utf-8?B?UXlPdU1HelVZVUVNa01FV3ZmYjRrMlU1b2JTMGJkK1d1alQraVZJRTBlQ0xn?=
- =?utf-8?B?WVFrendySk9hN1VtTVQyRmxYZ3o2TUJReHlISzlILzluc1pXOWIxMktlOEJY?=
- =?utf-8?B?cFh5Q21EQWJJUFA0Z0s2cEUrVjVvekJLYXN0RDlTNXRxa0hZc2xWcDVodDhP?=
- =?utf-8?B?QmRNdW5PVjQxa1Q2VjY0RnorWTBiWDRRcGlheU5NWWpFZ0YxMG9QQXhDdFZ5?=
- =?utf-8?B?SVlrajgvUnlNeUNYWXVjY29RMEFFUGMvaEVadXRhUDBySGllMDRwS09xZ1dv?=
- =?utf-8?Q?zs8T0PHBl2oz/GIK7Cj3ux2rl?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 25c215b7-4eec-418b-10d4-08dbfd9184c1
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2023 17:16:04.3742
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: at3akw0b+sOtpedpT54+r4mL0F+wLWOOXFgizA3roLphIQpPYv4xFbkhgZij87+C+DFFhW99/EKGR9n5rHaXfQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5890
+References: <20231215111050.3624740-1-victor@mojatatu.com> <20231215111050.3624740-2-victor@mojatatu.com>
+ <ZXxVQ0E-kd-ab3XD@nanopsycho> <CAAFAkD8Tx9TALNdHrwH19dKzRNaWNKKeQ-Tvd1DrwgT0MfxdJA@mail.gmail.com>
+ <ZXx2Ml5m4I4v4J33@nanopsycho>
+In-Reply-To: <ZXx2Ml5m4I4v4J33@nanopsycho>
+From: Jamal Hadi Salim <hadi@mojatatu.com>
+Date: Fri, 15 Dec 2023 12:17:27 -0500
+Message-ID: <CAAFAkD9t-b_gs8AWOCHOF_8Qr5NTrWJVLJJhqcE1uv+XVs_7Bw@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 1/3] net/sched: Introduce tc block netdev
+ tracking infra
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Victor Nogueira <victor@mojatatu.com>, jhs@mojatatu.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	xiyou.wangcong@gmail.com, mleitner@redhat.com, vladbu@nvidia.com, 
+	paulb@nvidia.com, pctammela@mojatatu.com, netdev@vger.kernel.org, 
+	kernel@mojatatu.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/13/2023 2:49 AM, Ke Xiao wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
-> 
-> 
-> Commit 3116f59c12bd ("i40e: fix use-after-free in
-> i40e_sync_filters_subtask()") avoided use-after-free issues,
-> by increasing refcount during update the VSI filter list to
-> the HW. However, it missed the unicast situation.
-> 
-> When deleting an unicast FDB entry, the i40e driver will release
-> the mac_filter, and i40e_service_task will concurrently request
-> firmware to add the mac_filter, which will lead to the following
-> use-after-free issue.
-> 
-> Fix again for both netdev->uc and netdev->mc.
-> 
-> BUG: KASAN: use-after-free in i40e_aqc_add_filters+0x55c/0x5b0 [i40e]
-> Read of size 2 at addr ffff888eb3452d60 by task kworker/8:7/6379
-> 
-> CPU: 8 PID: 6379 Comm: kworker/8:7 Kdump: loaded Tainted: G
-> Workqueue: i40e i40e_service_task [i40e]
-> Call Trace:
->   dump_stack+0x71/0xab
->   print_address_description+0x6b/0x290
->   kasan_report+0x14a/0x2b0
->   i40e_aqc_add_filters+0x55c/0x5b0 [i40e]
->   i40e_sync_vsi_filters+0x1676/0x39c0 [i40e]
->   i40e_service_task+0x1397/0x2bb0 [i40e]
->   process_one_work+0x56a/0x11f0
->   worker_thread+0x8f/0xf40
->   kthread+0x2a0/0x390
->   ret_from_fork+0x1f/0x40
-> 
-> Allocated by task 21948:
->   kasan_kmalloc+0xa6/0xd0
->   kmem_cache_alloc_trace+0xdb/0x1c0
->   i40e_add_filter+0x11e/0x520 [i40e]
->   i40e_addr_sync+0x37/0x60 [i40e]
->   __hw_addr_sync_dev+0x1f5/0x2f0
->   i40e_set_rx_mode+0x61/0x1e0 [i40e]
->   dev_uc_add_excl+0x137/0x190
->   i40e_ndo_fdb_add+0x161/0x260 [i40e]
->   rtnl_fdb_add+0x567/0x950
->   rtnetlink_rcv_msg+0x5db/0x880
->   netlink_rcv_skb+0x254/0x380
->   netlink_unicast+0x454/0x610
->   netlink_sendmsg+0x747/0xb00
->   sock_sendmsg+0xe2/0x120
->   __sys_sendto+0x1ae/0x290
->   __x64_sys_sendto+0xdd/0x1b0
->   do_syscall_64+0xa0/0x370
->   entry_SYSCALL_64_after_hwframe+0x65/0xca
-> 
-> Freed by task 21948:
->   __kasan_slab_free+0x137/0x190
->   kfree+0x8b/0x1b0
->   __i40e_del_filter+0x116/0x1e0 [i40e]
->   i40e_del_mac_filter+0x16c/0x300 [i40e]
->   i40e_addr_unsync+0x134/0x1b0 [i40e]
->   __hw_addr_sync_dev+0xff/0x2f0
->   i40e_set_rx_mode+0x61/0x1e0 [i40e]
->   dev_uc_del+0x77/0x90
->   rtnl_fdb_del+0x6a5/0x860
->   rtnetlink_rcv_msg+0x5db/0x880
->   netlink_rcv_skb+0x254/0x380
->   netlink_unicast+0x454/0x610
->   netlink_sendmsg+0x747/0xb00
->   sock_sendmsg+0xe2/0x120
->   __sys_sendto+0x1ae/0x290
->   __x64_sys_sendto+0xdd/0x1b0
->   do_syscall_64+0xa0/0x370
->   entry_SYSCALL_64_after_hwframe+0x65/0xca
-> 
-> Fixes: 3116f59c12bd ("i40e: fix use-after-free in i40e_sync_filters_subtask()")
-> Fixes: 41c445ff0f48 ("i40e: main driver core")
-> Signed-off-by: Ke Xiao <xiaoke@sangfor.com.cn>
-> Signed-off-by: Ding Hui <dinghui@sangfor.com.cn>
-> Cc: Di Zhu <zhudi2@huawei.com>
-> ---
->   drivers/net/ethernet/intel/i40e/i40e_main.c | 8 +++++++-
->   1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> index 1ab8dbe2d880..16b574d69843 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> @@ -108,11 +108,17 @@ static void netdev_hw_addr_refcnt(struct i40e_mac_filter *f,
->                                    struct net_device *netdev, int delta)
->   {
->          struct netdev_hw_addr *ha;
-> +       struct netdev_hw_addr_list *ha_list;
+On Fri, Dec 15, 2023 at 10:52=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrot=
+e:
+>
+> Fri, Dec 15, 2023 at 03:35:01PM CET, hadi@mojatatu.com wrote:
+> >On Fri, Dec 15, 2023 at 8:31=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wr=
+ote:
+> >>
+> >> Fri, Dec 15, 2023 at 12:10:48PM CET, victor@mojatatu.com wrote:
+> >> >This commit makes tc blocks track which ports have been added to them=
+.
+> >> >And, with that, we'll be able to use this new information to send
+> >> >packets to the block's ports. Which will be done in the patch #3 of t=
+his
+> >> >series.
+> >> >
+> >> >Suggested-by: Jiri Pirko <jiri@nvidia.com>
+> >> >Co-developed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> >> >Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> >> >Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
+> >> >Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+> >> >Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+> >> >---
+> >> > include/net/sch_generic.h |  4 +++
+> >> > net/sched/cls_api.c       |  2 ++
+> >> > net/sched/sch_api.c       | 55 +++++++++++++++++++++++++++++++++++++=
+++
+> >> > net/sched/sch_generic.c   | 31 ++++++++++++++++++++--
+> >> > 4 files changed, 90 insertions(+), 2 deletions(-)
+> >> >
+> >> >diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+> >> >index dcb9160e6467..cefca55dd4f9 100644
+> >> >--- a/include/net/sch_generic.h
+> >> >+++ b/include/net/sch_generic.h
+> >> >@@ -19,6 +19,7 @@
+> >> > #include <net/gen_stats.h>
+> >> > #include <net/rtnetlink.h>
+> >> > #include <net/flow_offload.h>
+> >> >+#include <linux/xarray.h>
+> >> >
+> >> > struct Qdisc_ops;
+> >> > struct qdisc_walker;
+> >> >@@ -126,6 +127,8 @@ struct Qdisc {
+> >> >
+> >> >       struct rcu_head         rcu;
+> >> >       netdevice_tracker       dev_tracker;
+> >> >+      netdevice_tracker       in_block_tracker;
+> >> >+      netdevice_tracker       eg_block_tracker;
+> >> >       /* private data */
+> >> >       long privdata[] ____cacheline_aligned;
+> >> > };
+> >> >@@ -457,6 +460,7 @@ struct tcf_chain {
+> >> > };
+> >> >
+> >> > struct tcf_block {
+> >> >+      struct xarray ports; /* datapath accessible */
+> >> >       /* Lock protects tcf_block and lifetime-management data of cha=
+ins
+> >> >        * attached to the block (refcnt, action_refcnt, explicitly_cr=
+eated).
+> >> >        */
+> >> >diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+> >> >index dc1c19a25882..6020a32ecff2 100644
+> >> >--- a/net/sched/cls_api.c
+> >> >+++ b/net/sched/cls_api.c
+> >> >@@ -531,6 +531,7 @@ static void tcf_block_destroy(struct tcf_block *b=
+lock)
+> >> > {
+> >> >       mutex_destroy(&block->lock);
+> >> >       mutex_destroy(&block->proto_destroy_lock);
+> >> >+      xa_destroy(&block->ports);
+> >> >       kfree_rcu(block, rcu);
+> >> > }
+> >> >
+> >> >@@ -1002,6 +1003,7 @@ static struct tcf_block *tcf_block_create(struc=
+t net *net, struct Qdisc *q,
+> >> >       refcount_set(&block->refcnt, 1);
+> >> >       block->net =3D net;
+> >> >       block->index =3D block_index;
+> >> >+      xa_init(&block->ports);
+> >> >
+> >> >       /* Don't store q pointer for blocks which are shared */
+> >> >       if (!tcf_block_shared(block))
+> >> >diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+> >> >index e9eaf637220e..09ec64f2f463 100644
+> >> >--- a/net/sched/sch_api.c
+> >> >+++ b/net/sched/sch_api.c
+> >> >@@ -1180,6 +1180,57 @@ static int qdisc_graft(struct net_device *dev,=
+ struct Qdisc *parent,
+> >> >       return 0;
+> >> > }
+> >> >
+> >> >+static int qdisc_block_add_dev(struct Qdisc *sch, struct net_device =
+*dev,
+> >> >+                             struct nlattr **tca,
+> >> >+                             struct netlink_ext_ack *extack)
+> >> >+{
+> >> >+      const struct Qdisc_class_ops *cl_ops =3D sch->ops->cl_ops;
+> >> >+      struct tcf_block *in_block =3D NULL;
+> >> >+      struct tcf_block *eg_block =3D NULL;
+> >>
+> >> No need to null.
+> >>
+> >> Can't you just have:
+> >>         struct tcf_block *block;
+> >>
+> >>         And use it in both ifs? You can easily obtain the block again =
+on
+> >>         the error path.
+> >>
+> >
+> >It's just easier to read.
+>
+> Hmm.
+>
+> >
+> >> >+      int err;
+> >> >+
+> >> >+      if (tca[TCA_INGRESS_BLOCK]) {
+> >> >+              /* works for both ingress and clsact */
+> >> >+              in_block =3D cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, =
+NULL);
+> >> >+              if (!in_block) {
+> >>
+> >> I don't see how this could happen. In fact, why exactly do you check
+> >> tca[TCA_INGRESS_BLOCK]?
+> >>
+> >
+> >It's lazy but what is wrong with doing that?
+>
+> It's not needed, that's wrong.
+>
 
-Nit, needs to be in Reverse Christmas Tree (RCT) order.
-> 
->          if (!f || !netdev)
->                  return;
-> 
-> -       netdev_for_each_mc_addr(ha, netdev) {
-> +       if (is_unicast_ether_addr(f->macaddr) || is_link_local_ether_addr(f->macaddr))
-> +               ha_list = &netdev->uc;
-> +       else
-> +               ha_list = &netdev->mc;
-> +
-> +       netdev_hw_addr_list_for_each(ha, ha_list) {
->                  if (ether_addr_equal(ha->addr, f->macaddr)) {
->                          ha->refcount += delta;
->                          if (ha->refcount <= 0)
-> --
-> 2.17.1
-> 
-> 
+Are you ok with the proposal i made?
+
+>
+> >
+> >> At this time, the clsact/ingress init() function was already called, y=
+ou
+> >> can just do:
+> >>
+> >>         block =3D cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+> >>         if (block) {
+> >>                 err =3D xa_insert(&block->ports, dev->ifindex, dev, GF=
+P_KERNEL);
+> >>                 if (err) {
+> >>                         NL_SET_ERR_MSG(extack, "Ingress block dev inse=
+rt failed");
+> >>                         return err;
+> >>                 }
+> >>                 netdev_hold(dev, &sch->in_block_tracker, GFP_KERNEL);
+> >>         }
+> >>         block =3D cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
+> >>         if (block) {
+> >>                 err =3D xa_insert(&block->ports, dev->ifindex, dev, GF=
+P_KERNEL);
+> >>                 if (err) {
+> >>                         NL_SET_ERR_MSG(extack, "Egress block dev inser=
+t failed");
+> >>                         goto err_out;
+> >>                 }
+> >>                 netdev_hold(dev, &sch->eg_block_tracker, GFP_KERNEL);
+> >>         }
+> >>         return 0;
+> >>
+> >> err_out:
+> >>         block =3D cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+> >>         if (block) {
+> >>                 xa_erase(&block->ports, dev->ifindex);
+> >>                 netdev_put(dev, &sch->in_block_tracker);
+> >>         }
+> >>         return err;
+> >>
+> >> >+                      NL_SET_ERR_MSG(extack, "Shared ingress block m=
+issing");
+> >> >+                      return -EINVAL;
+> >> >+              }
+> >> >+
+> >> >+              err =3D xa_insert(&in_block->ports, dev->ifindex, dev,=
+ GFP_KERNEL);
+> >> >+              if (err) {
+> >> >+                      NL_SET_ERR_MSG(extack, "Ingress block dev inse=
+rt failed");
+> >> >+                      return err;
+> >> >+              }
+> >> >+
+> >
+> >How about a middle ground:
+> >        in_block =3D cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+> >        if (in_block) {
+> >                err =3D xa_insert(&in_block->ports, dev->ifindex, dev,
+> >GFP_KERNEL);
+> >                if (err) {
+> >                        NL_SET_ERR_MSG(extack, "ingress block dev
+> >insert failed");
+> >                        return err;
+> >                }
+> >                netdev_hold(dev, &sch->in_block_tracker, GFP_KERNEL)
+> >      }
+> >       eg_block =3D cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
+> >        if (eg_block) {
+> >                err =3D xa_insert(&eg_block->ports, dev->ifindex, dev,
+> >GFP_KERNEL);
+> >                if (err) {
+> >                        netdev_put(dev, &sch->eg_block_tracker);
+> >                        NL_SET_ERR_MSG(extack, "Egress block dev
+> >insert failed");
+> >                        xa_erase(&in_block->ports, dev->ifindex);
+> >                        netdev_put(dev, &sch->in_block_tracker);
+> >                        return err;
+> >                }
+> >                netdev_hold(dev, &sch->eg_block_tracker, GFP_KERNEL);
+> >        }
+> >        return 0;
+> >
+> >> >+              netdev_hold(dev, &sch->in_block_tracker, GFP_KERNEL);
+> >>
+> >> Why exactly do you need an extra reference of netdev? Qdisc is already
+> >> having one.
+> >
+> >More fine grained tracking.
+>
+> Again, good for what exactly?
+
+We do xa_insert(&eg_block->ports, dev->ifindex, dev,...) which calls
+for a hold on the dev.
+Then we need to track that for debugging; so, instead of incrementing
+the same qdisc tracker again for each of those inserts we keep a
+separate tracker.
+
+cheers,
+jamal
+
+>
+> >
+> >>
+> >> >+      }
+> >> >+
+> >> >+      if (tca[TCA_EGRESS_BLOCK]) {
+> >> >+              eg_block =3D cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, N=
+ULL);
+> >> >+              if (!eg_block) {
+> >> >+                      NL_SET_ERR_MSG(extack, "Shared egress block mi=
+ssing");
+> >> >+                      err =3D -EINVAL;
+> >> >+                      goto err_out;
+> >> >+              }
+> >> >+
+> >> >+              err =3D xa_insert(&eg_block->ports, dev->ifindex, dev,=
+ GFP_KERNEL);
+> >> >+              if (err) {
+> >> >+                      NL_SET_ERR_MSG(extack, "Egress block dev inser=
+t failed");
+> >> >+                      goto err_out;
+> >> >+              }
+> >> >+              netdev_hold(dev, &sch->eg_block_tracker, GFP_KERNEL);
+> >> >+      }
+> >> >+
+> >> >+      return 0;
+> >> >+err_out:
+> >> >+      if (in_block) {
+> >> >+              xa_erase(&in_block->ports, dev->ifindex);
+> >> >+              netdev_put(dev, &sch->in_block_tracker);
+> >> >+      }
+> >> >+      return err;
+> >> >+}
+> >> >+
+> >> > static int qdisc_block_indexes_set(struct Qdisc *sch, struct nlattr =
+**tca,
+> >> >                                  struct netlink_ext_ack *extack)
+> >> > {
+> >> >@@ -1350,6 +1401,10 @@ static struct Qdisc *qdisc_create(struct net_d=
+evice *dev,
+> >> >       qdisc_hash_add(sch, false);
+> >> >       trace_qdisc_create(ops, dev, parent);
+> >> >
+> >> >+      err =3D qdisc_block_add_dev(sch, dev, tca, extack);
+> >> >+      if (err)
+> >> >+              goto err_out4;
+> >> >+
+> >> >       return sch;
+> >> >
+> >> > err_out4:
+> >> >diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+> >> >index 8dd0e5925342..32bed60dea9f 100644
+> >> >--- a/net/sched/sch_generic.c
+> >> >+++ b/net/sched/sch_generic.c
+> >> >@@ -1050,7 +1050,11 @@ static void qdisc_free_cb(struct rcu_head *hea=
+d)
+> >> >
+> >> > static void __qdisc_destroy(struct Qdisc *qdisc)
+> >> > {
+> >> >-      const struct Qdisc_ops  *ops =3D qdisc->ops;
+> >> >+      struct net_device *dev =3D qdisc_dev(qdisc);
+> >> >+      const struct Qdisc_ops *ops =3D qdisc->ops;
+> >> >+      const struct Qdisc_class_ops *cops;
+> >> >+      struct tcf_block *block;
+> >> >+      u32 block_index;
+> >> >
+> >> > #ifdef CONFIG_NET_SCHED
+> >> >       qdisc_hash_del(qdisc);
+> >> >@@ -1061,11 +1065,34 @@ static void __qdisc_destroy(struct Qdisc *qdi=
+sc)
+> >> >
+> >> >       qdisc_reset(qdisc);
+> >> >
+> >> >+      cops =3D ops->cl_ops;
+> >> >+      if (ops->ingress_block_get) {
+> >> >+              block_index =3D ops->ingress_block_get(qdisc);
+> >> >+              if (block_index) {
+> >>
+> >> I don't follow. What you need block_index for? Why can't you just call=
+:
+> >>         block =3D cops->tcf_block(qdisc, TC_H_MIN_INGRESS, NULL);
+> >> right away?
+> >
+> >Good point.
+> >
+> >cheers,
+> >jamal
+> >
+> >>
+> >> >+                      block =3D cops->tcf_block(qdisc, TC_H_MIN_INGR=
+ESS, NULL);
+> >> >+                      if (block) {
+> >> >+                              if (xa_erase(&block->ports, dev->ifind=
+ex))
+> >> >+                                      netdev_put(dev, &qdisc->in_blo=
+ck_tracker);
+> >> >+                      }
+> >> >+              }
+> >> >+      }
+> >> >+
+> >> >+      if (ops->egress_block_get) {
+> >> >+              block_index =3D ops->egress_block_get(qdisc);
+> >> >+              if (block_index) {
+> >> >+                      block =3D cops->tcf_block(qdisc, TC_H_MIN_EGRE=
+SS, NULL);
+> >> >+                      if (block) {
+> >> >+                              if (xa_erase(&block->ports, dev->ifind=
+ex))
+> >> >+                                      netdev_put(dev, &qdisc->eg_blo=
+ck_tracker);
+> >> >+                      }
+> >> >+              }
+> >> >+      }
+> >> >+
+> >> >       if (ops->destroy)
+> >> >               ops->destroy(qdisc);
+> >> >
+> >> >       module_put(ops->owner);
+> >> >-      netdev_put(qdisc_dev(qdisc), &qdisc->dev_tracker);
+> >> >+      netdev_put(dev, &qdisc->dev_tracker);
+> >> >
+> >> >       trace_qdisc_destroy(qdisc);
+> >> >
+> >> >--
+> >> >2.25.1
+> >> >
 
