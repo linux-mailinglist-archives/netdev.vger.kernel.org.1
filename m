@@ -1,162 +1,263 @@
-Return-Path: <netdev+bounces-57981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE8A6814A9A
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 15:35:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96B3D814A9F
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 15:37:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CABA285BCB
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:35:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E1731F21AA4
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:37:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD12F111C;
-	Fri, 15 Dec 2023 14:35:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8236330640;
+	Fri, 15 Dec 2023 14:36:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="MU/bIdo2"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="LX1zBuZG"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2079.outbound.protection.outlook.com [40.107.93.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B2453AF
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 14:35:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cpzNEUOMSwh4DQHQA8TlTOuwy8/+TX9Djy9SfaCOjvimF/xR6tJdQzMcsXdN80roXQRTrrxo4YXB+cg5pKMPFkGbHURDaiXeApKXUt0nnfn1qyTIx+kuAYk0v/sPWNDeHgpjYTuqZEkbqR72rifpii86GhAd6Y+3MI4+pqrpPljap5CbqT+5pwlpoNek3S5C1Jq30q1Tq3u75iA0Q0oJzMgDU+aOB0qqAE3GX0nRepej9A2g13u0PiAV0RB9z6/N/FeHnlJIsIe649jb1FDJ79u2mgTjCaJQKdjc8/tHn0k4cKTAwAxlGubLQrEZmeoziZ7M754oS/w3Nr3B6gx3/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xWJM7Tze3SrPFYYAypBouQSk5/rcsJ5YgzoP7mHjs+A=;
- b=PN8bGniQk6G1t6Q12yQc8tLsLqUoRUvPj86GFEVmmtp0k6Lw/ieTOQCYnWgPpVkeu6X7TC/iiGxzxnUB1dBcxGs8M2+X33r9oT67DXIRTJ9/DFJqqnAhsXUiusZmEM32gyzBA7hpGER1skd+HGkXIygu6hXPkFQQTQtj5td4OzTBkbsg4IJy1nCMSk1nFvru0rTEXGfCPqS6/NMPGK1gaznoeSsbv99Ria2l1CCWO8RXMfjOoNeAOyilThWbKs2CzElFu1dQV5tK6H13sQi0/i+pe1Xni/k8/R542KFSurm0SFlt2a1Hx1JVL0BG6iiYYnVs00oocOYfO4C4HJp/hA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xWJM7Tze3SrPFYYAypBouQSk5/rcsJ5YgzoP7mHjs+A=;
- b=MU/bIdo29/B6lmKe4pXmO7VI+URBa5661SfdFpt8fNXVJCXcirm5EgXaA99Pdim/cbJ7fSqZJDm/R966dgPcPbvuP8IiHYDSaRwB9fspQoaAIipPMprSD3IT/BwlFl35N4OBXD2M61LjLq1k7woV2/T3PQZWfVmnqkTgTc4PXns=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
- by CO6PR12MB5394.namprd12.prod.outlook.com (2603:10b6:5:35f::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.28; Fri, 15 Dec
- 2023 14:35:51 +0000
-Received: from BL1PR12MB5732.namprd12.prod.outlook.com
- ([fe80::1d68:1eb8:d7dc:4b43]) by BL1PR12MB5732.namprd12.prod.outlook.com
- ([fe80::1d68:1eb8:d7dc:4b43%6]) with mapi id 15.20.7091.030; Fri, 15 Dec 2023
- 14:35:50 +0000
-Message-ID: <72d8ab78-4e61-ba13-2abe-dfe988dd511f@amd.com>
-Date: Fri, 15 Dec 2023 08:35:47 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v3 net-next 3/3] amd-xgbe: use smn functions to avoid race
-Content-Language: en-US
-To: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, Shyam-sundar.S-k@amd.com
-References: <20231212053723.443772-1-Raju.Rangoju@amd.com>
- <20231212053723.443772-4-Raju.Rangoju@amd.com>
- <68c52e74-dd8d-4211-bdb9-9541b41c6900@amd.com>
- <82f60707-a24d-b745-ab25-7909b24c629e@amd.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <82f60707-a24d-b745-ab25-7909b24c629e@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN4PR0501CA0069.namprd05.prod.outlook.com
- (2603:10b6:803:41::46) To BL1PR12MB5732.namprd12.prod.outlook.com
- (2603:10b6:208:387::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06ACD1E535
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 14:36:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-5cd68a0de49so368612a12.2
+        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 06:36:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1702651008; x=1703255808; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=n5oh/bxjXnaE54gtLmR46/UIyG68SRaD4v9mr3JpiXI=;
+        b=LX1zBuZGtAdt0kYoo9Rkru/igGe5R2Fc8JfrQXqOLCw3HdcW9b9IJOsm9zvlzl4pka
+         WTitCGk9XpNbh++2aZgIW/I0d8j7Om0FVln3MLBRdk8kGgdWxhszT4EGwDmDvQN+Ek7H
+         QTZ6cdSG8S/0nFYCr74ixa/+lkKKGSSnap+hVdF4Tn+wbLe9dQi+MADKXY1OOnuhF7mw
+         3EjUH/beWG97hJ7Rg3QVHSrTvx52eQkZxIDnaJr1rIN0hZqna6AWzfCZl8zjY7PNeGpB
+         InmFb64ZHGR1H3I8E74TXFzK/dTs6QGJSqIeL/8zq3TdTUmWgM1me80jZ4L6tuQDMUfb
+         a5gQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702651008; x=1703255808;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=n5oh/bxjXnaE54gtLmR46/UIyG68SRaD4v9mr3JpiXI=;
+        b=nJ5K5dXQk25NQ2ngsZBsMt/P47jLF1ZFU/2W5nQoG+c1Vp2fWF87eELp+PRqIa3FeL
+         sWAfHWZ5UNXt/wEJRhD/gF8KNFra6yA1EwrUO1pVwWwoiE+tKoXzOvuwuBba5vEiVtGn
+         L2lQ9PhFJO2hHTQ3XIWsRw7FnSQso56ZsvDsc/SUMOjOQnHTbgRhfSXkmgRS/3IyOaFw
+         xVaMBv0hyos38ItLaTmMZQ/NBnlp/G1A0vq6E3vmsikxSGfHaMBwZYemuA7EwddWSMxE
+         QrT85lKP7VQ6dpi1d6s367+GVpOT9JomfrNQdxpre3Vtox1hL6ig3N6IygtMfngzcNPk
+         9PpQ==
+X-Gm-Message-State: AOJu0YxwY64Z0XmEdE6loIs5FhDqZTcyq83lLWCKROInT5OS2OsS8kWe
+	Vsu6zCopxm56h7q6Io5Z+BvKztnyFQfnIaeeIGZDJA==
+X-Google-Smtp-Source: AGHT+IFmIkpXpCRnU6WSqeXH7SxQKmDW2IGXTTMtrFVEYTzgyRjKpgGLb6ij50S0HtbEZNCxFWFIPXJ1gyrtg5vhEq0=
+X-Received: by 2002:a17:90a:d16:b0:28b:2c7d:7552 with SMTP id
+ t22-20020a17090a0d1600b0028b2c7d7552mr629862pja.42.1702651008276; Fri, 15 Dec
+ 2023 06:36:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|CO6PR12MB5394:EE_
-X-MS-Office365-Filtering-Correlation-Id: b09cdb91-83be-4256-937d-08dbfd7b229f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	DWUdzBZm56g4qNV0DZtD8seQEFv1BPUbyXqwgL0l8ZAnmmP6Gkb5B8KO5A3CdRn+GVirAZQtK+7zZ+QTJcVYpfeLDXIr59anvgZnVD4Ozc+oEphXYZbg/f+2tx+nhbnh/8y8xPuzch3cPdIIeeGd6G6GTa85sRhHTmuwvETBOpJ26Yo/3K6t7iGnLiq47/DohB1T/1FPPWLjFgw/NEfIxCe5NVfoPkZjjHi7Elu8EbrpRZUBAQrcQHbQY2+m82rM2Oumb6YLOYA5+5WAG3UA0h/xPuGWFAnYnxagw8DzFdZ0dBSiMln2A2UqdIFNLPTUvR35AT7FaWzLBj3B/wi09/WP8xFY3lbw5l1aUB0XGqBKmaq2Fsrq7AYMBtX1aWMNHdcO9qYP6J3922lyPcYls4thSiKla/l0z+FRKBKAk5GgfAKwgh25dFaOuaMGGDW7aOb6IFb0zSbm15RSCvBNAbTH0+we0SdpYETdWNcLYdl6gnKhNAlqcSWy0MQPyijBOM1gt43DB/4gX94ry8IJBWC2L4Am/IG3MxXrVNMVVmT/jeYiFxVOGWge1wwR9NA9Pajo2PbQTQ0Iyq0ww7bG4GcNkwRRphSwr5CR/ekLowieUgLf6B9nFIXAeuWPTx1Ni8Ps+yc7aa//7jBcl5vYgQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(346002)(39860400002)(366004)(376002)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(86362001)(36756003)(38100700002)(316002)(66476007)(2616005)(66946007)(66556008)(26005)(83380400001)(5660300002)(4326008)(8676002)(53546011)(8936002)(6666004)(6512007)(6506007)(478600001)(6486002)(41300700001)(4744005)(31696002)(2906002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cXZhYjZzV1lHQUdOYkVlQjIxTlBNMnhSdGQrZFdVMjBVT25hcW9aTmF6b1JT?=
- =?utf-8?B?SHJVbXdHWFVscC9WNUxSbmdYVWx3amU1Q2tkM2tYalJ1YmZuZ3ZoVHhpTytP?=
- =?utf-8?B?VWg5aUJncjNtV3FMZTArUFFYbnM0ZW93RHczNHFSQkVGeWtWMDBqTzJxdGM3?=
- =?utf-8?B?YWlKbytzQW5EU0dsVnhOMVk1ZllKc1M0OWlITlZQaWFpYWpKQ1dmaEErRmRE?=
- =?utf-8?B?UXFEY0hVS2Zqem9iaHRFSEZ2RHpKNGtJSnduYU0waHhUS1ZwMVJSK21jekY2?=
- =?utf-8?B?YjFWTWdMSEJwYXYwTmRsc3FhcEtvdGVObHpEM3pzaUltVmV5alJOaWx6Zml3?=
- =?utf-8?B?bUtLRWJSL21mR1l3VnVXL2RBdXkweDJ5NTd1aHFzK241eHpCRnAwMU9EM0dQ?=
- =?utf-8?B?a0JWVnFvR3RBYjhwNWJzZjcwL3RLR3JCZTRCYkwzS3lSUzl2YTVrbWdNRVp0?=
- =?utf-8?B?bnNEdFdUOVRJeHRyS0ZLRUFWc1ViM2J2KysrYUxHZzhTcHVkVVdjR29YVXcw?=
- =?utf-8?B?bzgvSUlEKzdXMldjdUZHNlJmbFpWd3dzaUZ3NmZQWEdMa0FJQ1FCK2pUYjZB?=
- =?utf-8?B?aGFUd3UxU0dZbEFyZ1Y5VU5hNGxwQnNaN1MzMG5GaGFMcFc4WDhsekc3QzVl?=
- =?utf-8?B?WDlCS3dMRFd0TFhhN1dzTE9KVFlWUjJhOWVaYjR4TXZjVWREQ3F0Y0p0Skh4?=
- =?utf-8?B?NSthdnpTMmpIVnJ5bUlGazdUbTNUcjJyOXRYRHJvOTllRHdYVTV5QzZHVnhD?=
- =?utf-8?B?QVZUK1ZrVmtmTlhQWTBrWXRvNjRISWdkeHdJSDg3a2xnRWsrMWF5ZktXK1ZR?=
- =?utf-8?B?UXFmQytRLzNHakttOHNPMzErdGZ6d2E4NmtWUC9rU1lyUkRBRHZHK2F4a1BW?=
- =?utf-8?B?MGUzWmdiZmYzSU1Cb2hLdk93YktkMzYyeHJPOElUbGpsQ1BpUFhxRy9vTGdT?=
- =?utf-8?B?UDNiMTMrVG9IV1dEQmNwVUE4RCtqaDd2NGhxSmVFY2NIZ3dGQ0FVL3BVYUx3?=
- =?utf-8?B?SFhCVy9teVhFWm03bXdOdktCdDJnQ2YrTnpMRG9HeFhDMG44MDNDbkdiZkIy?=
- =?utf-8?B?YnhWbURES3dHdEVmd2ZJQk9kaVhmZWJ6OUw1clNBTTBDNVRnT0pubDB6Wi9i?=
- =?utf-8?B?Q2FKQllZS050YmVZekJka05zUGJCTEhvaG82TmRRbncvNTloZkVGcUoxeGtE?=
- =?utf-8?B?V0xzc2w4QXVxMitoN2hXMDBOeEQ0TkdkMmh5cUE5NW1EMVlFYWFNQTZ4QzAr?=
- =?utf-8?B?bTFyKzRLMmJTQTFJcXpWdk1PbDFIMUcyWXpZZVdtd3BIOHE2TURnbjB3dkpN?=
- =?utf-8?B?WEp6bkFtOFI3WndpaUpWSlYwNnBtbm5wKzlicGNOM3NhNkREKytYOTIwTUhn?=
- =?utf-8?B?R25TbU5UV2ZudnRKeFViTW8vOGNqaE5jVEVLckh3Y0dpOHRnYjZjbk9zckFD?=
- =?utf-8?B?RlFJQmI4dEtrOGd5Z21uZzJ3Vm9ucTA1L09LVlM2aXJOT3BlejJ4NHAxemZ4?=
- =?utf-8?B?bTlQNkx0QW83VEt0aURQYXoyU3o2OWgwdUVVRWxCWlB4TzNhWjhVUENVeDFY?=
- =?utf-8?B?ak8xQlI4Uno5R2tybUgxUkV6KzVzRlNoaVNUb1doa1lleTFnQUhxL05YL1cr?=
- =?utf-8?B?QlR4Z0IzYS9sdGo4RjZPV1p5TlpTNVRHbWtvL2ErdWVWYVYyck9lWEhrQ3hV?=
- =?utf-8?B?SmVGK0V4S2xGK2tudEZ4ZVZPUVdDSWwxVVNZaSsrVWFSaVhMendjWGtzWHYv?=
- =?utf-8?B?YmZ5b29WZEpld2dGZUlqV21xU2t0UHZSQmlHYjJtUXZSN0ZGcndJMEVZd0Uv?=
- =?utf-8?B?VWRiVExlSXRUajJCQ3U3R0FvUFdQN05OdjE2ZnR3UWRXTGNnZjNTakZEcmsy?=
- =?utf-8?B?WUs5bEZqUHZLQTVZT3JxbkRqc3lOaGJkQXJEMTFPbDhvdVB0Vm5JMk1pWGlC?=
- =?utf-8?B?dnJQMGJ2dWkxQ1NuMmhTTkF1Y21WcjZmR2ltUUlkbzVwci9BT2VCWkhIZkhZ?=
- =?utf-8?B?eUsrK2NFdjZqeVJ1NVUzQmtEbk5rc1cwYml5ZDNoQkhVcnNIRlBJRHprS0xx?=
- =?utf-8?B?K1NvNHJuSCtma3VBYXpXR2hDWWNkWk9wRzBVeC9vRkRMS0NUU0czc2xMZWhs?=
- =?utf-8?Q?YEga/zQN5RblOfCq2rJDMWA+d?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b09cdb91-83be-4256-937d-08dbfd7b229f
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2023 14:35:50.8326
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dxhxglkdlcfEIKZHmDaVUqkzsErtPAT0IMtgZQ/yovl7qZs3puba2RJhN5CNAg2OuM4/xdT9UYriBn4bPoys+w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR12MB5394
+References: <20231215111050.3624740-1-victor@mojatatu.com> <20231215111050.3624740-4-victor@mojatatu.com>
+ <ZXxPZoaIQoa7jlJv@nanopsycho> <1d08f20e-a363-4405-ad97-1107cd34628a@mojatatu.com>
+ <ZXxgUHVzFp4BVZl3@nanopsycho>
+In-Reply-To: <ZXxgUHVzFp4BVZl3@nanopsycho>
+From: Jamal Hadi Salim <hadi@mojatatu.com>
+Date: Fri, 15 Dec 2023 09:36:37 -0500
+Message-ID: <CAAFAkD8KeMi3z-AArAsp8G8qAYPTv=go0qRvvTguWxAou+fzxw@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 3/3] net/sched: act_mirred: Allow mirred to block
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Victor Nogueira <victor@mojatatu.com>, jhs@mojatatu.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	xiyou.wangcong@gmail.com, mleitner@redhat.com, vladbu@nvidia.com, 
+	paulb@nvidia.com, pctammela@mojatatu.com, netdev@vger.kernel.org, 
+	kernel@mojatatu.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/14/23 22:35, Raju Rangoju wrote:
-> 
-> 
-> On 12/12/2023 9:08 PM, Tom Lendacky wrote:
->> On 12/11/23 23:37, Raju Rangoju wrote:
->>> Some of the ethernet add-in-cards have dual PHY but share a single MDIO
->>> line (between the ports). In such cases, link inconsistencies are
->>> noticed during the heavy traffic and during reboot stress tests.
->>>
->>> So, use the SMN calls to avoid the race conditions.
->>
->> So this patch replaces all the PCI accesses you added in patch #2, so 
->> why not just do this from the start?
-> 
-> Yes, that is correct. It was done to maintain the history and that will be 
-> reference as to why SMN is used over regular PCI accesses in this case.
+On Fri, Dec 15, 2023 at 9:19=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote=
+:
+>
+> Fri, Dec 15, 2023 at 02:56:48PM CET, victor@mojatatu.com wrote:
+> >On 15/12/2023 10:06, Jiri Pirko wrote:
+> >> Fri, Dec 15, 2023 at 12:10:50PM CET, victor@mojatatu.com wrote:
+> >> > So far the mirred action has dealt with syntax that handles mirror/r=
+edirection for netdev.
+> >> > A matching packet is redirected or mirrored to a target netdev.
+> >> >
+> >> > In this patch we enable mirred to mirror to a tc block as well.
+> >> > IOW, the new syntax looks as follows:
+> >> > ... mirred <ingress | egress> <mirror | redirect> [index INDEX] < <b=
+lockid BLOCKID> | <dev <devname>> >
+> >> >
+> >> > Examples of mirroring or redirecting to a tc block:
+> >> > $ tc filter add block 22 protocol ip pref 25 \
+> >> >   flower dst_ip 192.168.0.0/16 action mirred egress mirror blockid 2=
+2
+> >> >
+> >> > $ tc filter add block 22 protocol ip pref 25 \
+> >> >   flower dst_ip 10.10.10.10/32 action mirred egress redirect blockid=
+ 22
+> >> >
+> >> > Co-developed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> >> > Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> >> > Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
+> >> > Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+> >> > Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+> >> > ---
+> >> > include/net/tc_act/tc_mirred.h        |   1 +
+> >> > include/uapi/linux/tc_act/tc_mirred.h |   1 +
+> >> > net/sched/act_mirred.c                | 278 +++++++++++++++++++-----=
+--
+> >> > 3 files changed, 206 insertions(+), 74 deletions(-)
+> >> >
+> >> > diff --git a/include/net/tc_act/tc_mirred.h b/include/net/tc_act/tc_=
+mirred.h
+> >> > index 32ce8ea36950..75722d967bf2 100644
+> >> > --- a/include/net/tc_act/tc_mirred.h
+> >> > +++ b/include/net/tc_act/tc_mirred.h
+> >> > @@ -8,6 +8,7 @@
+> >> > struct tcf_mirred {
+> >> >    struct tc_action        common;
+> >> >    int                     tcfm_eaction;
+> >> > +  u32                     tcfm_blockid;
+> >> >    bool                    tcfm_mac_header_xmit;
+> >> >    struct net_device __rcu *tcfm_dev;
+> >> >    netdevice_tracker       tcfm_dev_tracker;
+> >> > diff --git a/include/uapi/linux/tc_act/tc_mirred.h b/include/uapi/li=
+nux/tc_act/tc_mirred.h
+> >> > index 2500a0005d05..54df06658bc8 100644
+> >> > --- a/include/uapi/linux/tc_act/tc_mirred.h
+> >> > +++ b/include/uapi/linux/tc_act/tc_mirred.h
+> >> > @@ -20,6 +20,7 @@ enum {
+> >> >    TCA_MIRRED_UNSPEC,
+> >> >    TCA_MIRRED_TM,
+> >> >    TCA_MIRRED_PARMS,
+> >> > +  TCA_MIRRED_BLOCKID,
+> >>
+> >> You just broke uapi. Make sure to add new attributes to the end.
+> >
+> >My bad, don't know how we missed this one.
+> >Will fix in v8.
+> >
+> >>
+> >> >    TCA_MIRRED_PAD,
+> >> >    __TCA_MIRRED_MAX
+> >> > };
+> >> > diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+> >> > index 0a711c184c29..8b6d04d26c5a 100644
+> >> > --- a/net/sched/act_mirred.c
+> >> > +++ b/net/sched/act_mirred.c
+> >> > @@ -85,10 +85,20 @@ static void tcf_mirred_release(struct tc_action =
+*a)
+> >> >
+> >> > static const struct nla_policy mirred_policy[TCA_MIRRED_MAX + 1] =3D=
+ {
+> >> >    [TCA_MIRRED_PARMS]      =3D { .len =3D sizeof(struct tc_mirred) }=
+,
+> >> > +  [TCA_MIRRED_BLOCKID]    =3D { .type =3D NLA_U32 },
+> >> > };
+> >> >
+> >> > static struct tc_action_ops act_mirred_ops;
+> >> >
+> >> > +static void tcf_mirred_replace_dev(struct tcf_mirred *m, struct net=
+_device *ndev)
+> >> > +{
+> >> > +  struct net_device *odev;
+> >> > +
+> >> > +  odev =3D rcu_replace_pointer(m->tcfm_dev, ndev,
+> >> > +                             lockdep_is_held(&m->tcf_lock));
+> >> > +  netdev_put(odev, &m->tcfm_dev_tracker);
+> >> > +}
+> >> > +
+> >> > static int tcf_mirred_init(struct net *net, struct nlattr *nla,
+> >> >                       struct nlattr *est, struct tc_action **a,
+> >> >                       struct tcf_proto *tp,
+> >> > @@ -126,6 +136,13 @@ static int tcf_mirred_init(struct net *net, str=
+uct nlattr *nla,
+> >> >    if (exists && bind)
+> >> >            return 0;
+> >> >
+> >> > +  if (tb[TCA_MIRRED_BLOCKID] && parm->ifindex) {
+> >> > +          NL_SET_ERR_MSG_MOD(extack,
+> >> > +                             "Mustn't specify Block ID and dev simu=
+ltaneously");
+> >> > +          err =3D -EINVAL;
+> >> > +          goto release_idr;
+> >> > +  }
+> >> > +
+> >> >    switch (parm->eaction) {
+> >> >    case TCA_EGRESS_MIRROR:
+> >> >    case TCA_EGRESS_REDIR:
+> >> > @@ -142,9 +159,9 @@ static int tcf_mirred_init(struct net *net, stru=
+ct nlattr *nla,
+> >> >    }
+> >> >
+> >> >    if (!exists) {
+> >> > -          if (!parm->ifindex) {
+> >> > +          if (!parm->ifindex && !tb[TCA_MIRRED_BLOCKID]) {
+> >> >                    tcf_idr_cleanup(tn, index);
+> >> > -                  NL_SET_ERR_MSG_MOD(extack, "Specified device does=
+ not exist");
+> >> > +                  NL_SET_ERR_MSG_MOD(extack, "Must specify device o=
+r block");
+> >> >                    return -EINVAL;
+> >> >            }
+> >> >            ret =3D tcf_idr_create_from_flags(tn, index, est, a,
+> >> > @@ -170,7 +187,7 @@ static int tcf_mirred_init(struct net *net, stru=
+ct nlattr *nla,
+> >> >    spin_lock_bh(&m->tcf_lock);
+> >> >
+> >> >    if (parm->ifindex) {
+> >> > -          struct net_device *odev, *ndev;
+> >> > +          struct net_device *ndev;
+> >> >
+> >> >            ndev =3D dev_get_by_index(net, parm->ifindex);
+> >> >            if (!ndev) {
+> >> > @@ -179,11 +196,14 @@ static int tcf_mirred_init(struct net *net, st=
+ruct nlattr *nla,
+> >> >                    goto put_chain;
+> >> >            }
+> >> >            mac_header_xmit =3D dev_is_mac_header_xmit(ndev);
+> >> > -          odev =3D rcu_replace_pointer(m->tcfm_dev, ndev,
+> >> > -                                    lockdep_is_held(&m->tcf_lock));
+> >> > -          netdev_put(odev, &m->tcfm_dev_tracker);
+> >> > +          tcf_mirred_replace_dev(m, ndev);
+> >>
+> >> This could be a separate patch, for better readability of the patches.
+> >>
+> >> Skimming thought the rest of the patch, this is hard to follow (-ETOOB=
+IG).
+> >> What would help is to cut this patch into multiple ones. Do preparatio=
+ns
+> >> first, then you finally add TCA_MIRRED_BLOCKID processin and blockid
+> >> forwarding. Could you?
+> >
+> >Will transform this one into two separate patches.
+>
+> More please.
 
-Seems unnecessary to me. Adding a comment in the commit log and the code 
-that states why SMN is used instead of PCI and how it fixes the race 
-condition would be enough. Your call... but since patch #2 enables the 
-device, this could cause a bisect issue.
+I see the first one as preparation and the second as usage. Can you
+make suggestion as to what more/better split is?
 
-Thanks,
-Tom
+cheers,
+jamal
 
-> 
+> >
+> >>
+> >> >            netdev_tracker_alloc(ndev, &m->tcfm_dev_tracker, GFP_ATOM=
+IC);
+> >> >            m->tcfm_mac_header_xmit =3D mac_header_xmit;
+> >> > +          m->tcfm_blockid =3D 0;
+> >> > +  } else if (tb[TCA_MIRRED_BLOCKID]) {
+> >> > +          tcf_mirred_replace_dev(m, NULL);
+> >> > +          m->tcfm_mac_header_xmit =3D false;
+> >> > +          m->tcfm_blockid =3D nla_get_u32(tb[TCA_MIRRED_BLOCKID]);
+> >> >    }
+> >> >    goto_ch =3D tcf_action_set_ctrlact(*a, parm->action, goto_ch);
+> >> >    m->tcfm_eaction =3D parm->eaction;
+> >>
+> >> [...]
 
