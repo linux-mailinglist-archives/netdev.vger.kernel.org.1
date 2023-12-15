@@ -1,163 +1,99 @@
-Return-Path: <netdev+bounces-57870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 637778145E0
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:45:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A99E8145FA
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:50:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F193285631
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 10:45:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8ED2A28582B
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 10:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E37111A717;
-	Fri, 15 Dec 2023 10:45:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFD611BDD4;
+	Fri, 15 Dec 2023 10:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="UkonQnDN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PVjcf02p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B313F1A711
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 10:45:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a22fb5f71d9so87733766b.0
-        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 02:45:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702637136; x=1703241936; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AwPe/iahY7ApTLD8fcE62eFuVvnVpyt0sw9R5Im/rZI=;
-        b=UkonQnDNZ5JHZQKZKUt2Btk7K6CeKSAbNirJgpmwKxIH3HEpavQf/RGOlxhP5djcNt
-         o1IpSRk8yxN7bDnctdUZYmFM24EOHOkznZaXDdDPgOrnQ2jU5xGaKE9jtrUoBpYk6Os7
-         DEVXL6A5dpDvgKpQUjCmaUb7yd/XK2iE4KQjjl1b8hsg4PhkCRv+Ja1KPUfNcCtq8AD3
-         IejqXkPA8l63h5/DlqV2OB8z1MyFRg1xESVf4okhkz7KDe/kN7Ccgoj5nYvKfcES+pVm
-         upW+FWJuRdEMlLk4FV3F6a2zcQ8Vka/UDH5e5JoXT/u6pug0jUS9N+uz06o0grY21r+r
-         PxWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702637136; x=1703241936;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AwPe/iahY7ApTLD8fcE62eFuVvnVpyt0sw9R5Im/rZI=;
-        b=jSr398OSYYTALkFjoCbdd7dGaDKn+pyI7QS1p8IFqlVZtQDZQGvQYWIWuI1Kxsas6O
-         nwrxHEq364dpVVZftFwNXrweE9Yr1zbxMP8uwfgbUnlst2DN5M6q7C8CPRZJz9O6sgoQ
-         i04TVSmfBHJbxn5D/xWhL9zpweEaJlYwW4q7RY2SJVJs9AKaq55y2dOwFUhWD7LDOf8T
-         CK8G9ag7evhq1Te79Dzv0g9V+u4U8o2VTMl//FBSeCyE6hnLH6Xsa3zlsm237KjxtMhY
-         Ick661H+Cm2rkJqcuL7BLm7WAXAnU7ugMfXWHN+8Zihcy/eV5fOePPFpweVM6C4usFgR
-         +Juw==
-X-Gm-Message-State: AOJu0YyCgF5Q4EH1iF7zP9MqxRJ4mnNltDxr3XGsn15ss0N1ggjd0xGz
-	KkcC3QHffsLoZPjj3FAFg1DZnQ==
-X-Google-Smtp-Source: AGHT+IHPRy1q7dpI9+aFcDwJC+Abbwxcg+uD3eIXFRjn+AHoKXuthX4Ks277S2xvTlrVBTPoPmEEAQ==
-X-Received: by 2002:a17:906:ef8b:b0:a1b:619e:53f7 with SMTP id ze11-20020a170906ef8b00b00a1b619e53f7mr11429745ejb.27.1702637135853;
-        Fri, 15 Dec 2023 02:45:35 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id ty6-20020a170907c70600b00a1d71c57cb1sm10649563ejc.68.2023.12.15.02.45.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Dec 2023 02:45:35 -0800 (PST)
-Date: Fri, 15 Dec 2023 11:45:33 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: David Wei <dw@davidwei.uk>
-Cc: Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v3 2/4] netdevsim: forward skbs from one
- connected port to another
-Message-ID: <ZXwuTRFSbDn_ON_E@nanopsycho>
-References: <20231214212443.3638210-1-dw@davidwei.uk>
- <20231214212443.3638210-3-dw@davidwei.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E2AB1A71C;
+	Fri, 15 Dec 2023 10:50:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2577AC433C9;
+	Fri, 15 Dec 2023 10:50:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702637424;
+	bh=gos3Phm3LB4MOicLuSXStryachdArg/Id/Ku2MRLSmY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PVjcf02plSfFuguW/1OujenYqHq4KR6sO1p8lDrbs3D5vkm0fT6BJl5oidHgfSXFf
+	 d5rJV/UUSY4gLKTXPrLxOIzFEl/sOgPu5aPuDYA5IwMweXGRl/sDltbiOWkMdIF9tS
+	 YtXet1e93weu4nijohG75pp3ZKKxK411At17CqTFN2/GuxrNopzJNg290zAJlXXi33
+	 RTXK/aETZfk2YHUQENBrirjNmbbwJ035GwrBcH/ee4H2xJASVFJRax66P7DhauhVFH
+	 1Q0c0ybOC+BQ9aEX9vCWAsRzRW216vEpV+wMpRO+zb31P8krMmrZJMcKNIidEIH5xX
+	 QPCd2vWMtLV6g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 10A4EC4314C;
+	Fri, 15 Dec 2023 10:50:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231214212443.3638210-3-dw@davidwei.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: Return error from sk_stream_wait_connect() if
+ sk_wait_event() fails
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170263742406.9428.15969365069894994554.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Dec 2023 10:50:24 +0000
+References: <20231214050922.3480023-1-syoshida@redhat.com>
+In-Reply-To: <20231214050922.3480023-1-syoshida@redhat.com>
+To: Shigeru Yoshida <syoshida@redhat.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Thu, Dec 14, 2023 at 10:24:41PM CET, dw@davidwei.uk wrote:
->Forward skbs sent from one netdevsim port to its connected netdevsim
->port using dev_forward_skb, in a spirit similar to veth.
+Hello:
 
-Perhaps better to write "dev_forward_skb()" to make obvious you talk
-about function.
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-
->
->Signed-off-by: David Wei <dw@davidwei.uk>
->---
-> drivers/net/netdevsim/netdev.c | 23 ++++++++++++++++++-----
-> 1 file changed, 18 insertions(+), 5 deletions(-)
->
->diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
->index e290c54b0e70..c5f53b1dbdcc 100644
->--- a/drivers/net/netdevsim/netdev.c
->+++ b/drivers/net/netdevsim/netdev.c
->@@ -29,19 +29,33 @@
-> static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
-> {
-> 	struct netdevsim *ns = netdev_priv(dev);
->+	struct netdevsim *peer_ns;
->+	int ret = NETDEV_TX_OK;
+On Thu, 14 Dec 2023 14:09:22 +0900 you wrote:
+> The following NULL pointer dereference issue occurred:
 > 
->+	rcu_read_lock();
-
-Why do you need to be in rcu read locked section here?
-
-
-> 	if (!nsim_ipsec_tx(ns, skb))
->-		goto out;
->+		goto err;
-
-Not sure why you need to rename the label. Why "out" is not okay?
-
+> BUG: kernel NULL pointer dereference, address: 0000000000000000
+> <...>
+> RIP: 0010:ccid_hc_tx_send_packet net/dccp/ccid.h:166 [inline]
+> RIP: 0010:dccp_write_xmit+0x49/0x140 net/dccp/output.c:356
+> <...>
+> Call Trace:
+>  <TASK>
+>  dccp_sendmsg+0x642/0x7e0 net/dccp/proto.c:801
+>  inet_sendmsg+0x63/0x90 net/ipv4/af_inet.c:846
+>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>  __sock_sendmsg+0x83/0xe0 net/socket.c:745
+>  ____sys_sendmsg+0x443/0x510 net/socket.c:2558
+>  ___sys_sendmsg+0xe5/0x150 net/socket.c:2612
+>  __sys_sendmsg+0xa6/0x120 net/socket.c:2641
+>  __do_sys_sendmsg net/socket.c:2650 [inline]
+>  __se_sys_sendmsg net/socket.c:2648 [inline]
+>  __x64_sys_sendmsg+0x45/0x50 net/socket.c:2648
+>  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+>  do_syscall_64+0x43/0x110 arch/x86/entry/common.c:82
+>  entry_SYSCALL_64_after_hwframe+0x63/0x6b
 > 
-> 	u64_stats_update_begin(&ns->syncp);
-> 	ns->tx_packets++;
-> 	ns->tx_bytes += skb->len;
-> 	u64_stats_update_end(&ns->syncp);
-> 
->-out:
->-	dev_kfree_skb(skb);
->+	peer_ns = rcu_dereference(ns->peer);
->+	if (!peer_ns)
->+		goto err;
+> [...]
 
-This is definitelly not an error path, "err" label name is misleading.
+Here is the summary with links:
+  - [net] net: Return error from sk_stream_wait_connect() if sk_wait_event() fails
+    https://git.kernel.org/netdev/net/c/cac23b7d7627
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
->+
->+	skb_tx_timestamp(skb);
->+	if (unlikely(dev_forward_skb(peer_ns->netdev, skb) == NET_RX_DROP))
->+		ret = NET_XMIT_DROP;
-
-Hmm, can't you track dropped packets in ns->tx_dropped and expose in
-nsim_get_stats64() ?
-
-
-> 
->-	return NETDEV_TX_OK;
->+	rcu_read_unlock();
->+	return ret;
->+
->+err:
->+	rcu_read_unlock();
->+	dev_kfree_skb(skb);
->+	return ret;
-> }
-> 
-> static void nsim_set_rx_mode(struct net_device *dev)
->@@ -302,7 +316,6 @@ static void nsim_setup(struct net_device *dev)
-> 	eth_hw_addr_random(dev);
-> 
-> 	dev->tx_queue_len = 0;
->-	dev->flags |= IFF_NOARP;
-> 	dev->flags &= ~IFF_MULTICAST;
-> 	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE |
-> 			   IFF_NO_QUEUE;
->-- 
->2.39.3
->
 
