@@ -1,125 +1,171 @@
-Return-Path: <netdev+bounces-57993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E38EB814C04
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 16:45:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 370EA814C13
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 16:48:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EE7E2840DD
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 15:45:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5D061F236F0
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 15:48:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 440F6374C4;
-	Fri, 15 Dec 2023 15:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08C72381B2;
+	Fri, 15 Dec 2023 15:48:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wI3ZB31k"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WjKqstUq"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A51232DF67;
-	Fri, 15 Dec 2023 15:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=WTZEU8lgYKwjH1B8Xlk6CEYwtbKUxcW+W9XW4pXoCsk=; b=wI3ZB31khOI2xk2bLZFZ3+oqnf
-	Po+GYnQ+11zp+6J1yLgxtOGj0r7VkDjBnsKzCn4J3t6Oel1WdFN+0AaetIPS/unKPhUPauTtkycAT
-	NEPAaO8oWxPqDMs7z15nfUlWwJ7PmjSr4qKdRAq7DFGMkhoDPczDRA0Li7WJT3rAo2WgrCw1+Vtpr
-	h3TPFUVyVA9nmfIVtyBlDhROyPX68lEfHElgVsOVvCBmpVZw7D/xJD1g4UEwOlz/8MUd+GsAIAjbt
-	4UomB0LJ/23I1wpxXjdLjQU78d4EOoHeIZCeZa3a+Ju5TvG5SoWMMYi+cwqy6A5y3X6KyxEyCfDfo
-	0S0BJ+vw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53300)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rEAMx-0002rP-2F;
-	Fri, 15 Dec 2023 15:44:55 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rEAMz-0003jY-7y; Fri, 15 Dec 2023 15:44:57 +0000
-Date: Fri, 15 Dec 2023 15:44:57 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: davem@davemloft.net, kuba@kernel.org, kabel@kernel.org, andrew@lunn.ch,
-	hkallweit1@gmail.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 2/4] net: phy: marvell10g: Fix power-up when
- strapped to start powered down
-Message-ID: <ZXx0eVzJ3I1PwOa0@shell.armlinux.org.uk>
-References: <20231214201442.660447-1-tobias@waldekranz.com>
- <20231214201442.660447-3-tobias@waldekranz.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E20E374F2
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 15:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a1d93da3eb7so94642666b.0
+        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 07:48:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1702655317; x=1703260117; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6V+t0K1oct9Wudj2H/d2gc++61U+do5HqF41fn098Q8=;
+        b=WjKqstUqCGsJkSUiM4TwZnmDbk/KW/cCrAMl/Gzf+jCl9uQGHs8wRfQiRc0GfkNcuj
+         386IpgD8zz/oA+ZY5H1arLL1/lEb6W8+FGyUqHmaRMQlSvlkOAtKGGHz/YJJmbFJvHIN
+         f+iWd6VFFmZwFcPk3IELYyqJ0T5Ywgu8Y39FCWzQlZ0BYOUh6GDa5aY0xL9VXG4RjgsW
+         lcvHtL+75kqvkgtuMXfUJ5U3fiAlsC2rLaESZHOe8ubaUwZ4aSHX0P4d+7bqoF8vXQ4Z
+         e0nYGvQbvGC84iHbnBr4WP7P1d32JCQSVejaX5N26oLvgj9Kbgpg4Y8BcwlvD0cFN9K7
+         yYKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702655317; x=1703260117;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6V+t0K1oct9Wudj2H/d2gc++61U+do5HqF41fn098Q8=;
+        b=FguGATrvx1Vuv1ew0cp1yI8806XPNAJo30MwtBYgcBgJzfmSXvjCVOByp+6hKuplbk
+         Tm8n7keWmLB6u88YIydAHfHIbRp+xEj+XNQlLvhRkvsS1PqhBT6lfpLaTWOtNrwjZE9d
+         eMMyUgr1rRpd093qhXbBlYZXGGSRru/fxCqOnPHVOCvLp4wfNUwrl/AFSKCpvwdD6E47
+         C/9NU4rLKUIIDlIg2Rqg4RpZI5QUUXGaVsRLhVrPqyDC0CVawctB8oE/7stVeqUJrej8
+         +E70kzeq5tZNEbskoUAl5+KtjUqLGKmc/MUJo0PNYYmTUyh35kd4uy8EF4xRLarod/1S
+         6XLw==
+X-Gm-Message-State: AOJu0YyzXSq0TAnFDeTzMvhv+l3rxurp22+ZowZY9BljQCVdus+GcVVm
+	VSNjSZs1uH+3sg4/u/1c97bVkA==
+X-Google-Smtp-Source: AGHT+IGByvw04w73VsKBlxa7B7G/1sxNz8ygLYCarskgry1OFwGj4M8JCxuwxPewDmOZidbZO7nxaQ==
+X-Received: by 2002:a17:907:868d:b0:a19:a1ba:8ccb with SMTP id qa13-20020a170907868d00b00a19a1ba8ccbmr6541639ejc.105.1702655317599;
+        Fri, 15 Dec 2023 07:48:37 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.218.27])
+        by smtp.gmail.com with ESMTPSA id mm15-20020a1709077a8f00b00a1b6ec7a88asm10887144ejc.113.2023.12.15.07.48.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Dec 2023 07:48:37 -0800 (PST)
+Message-ID: <d63e8b6a-c0fc-4d99-b399-86f66f369176@linaro.org>
+Date: Fri, 15 Dec 2023 16:48:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231214201442.660447-3-tobias@waldekranz.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH v3 1/4] dt-bindings: net: phy: Document new LEDs
+ active-low property
+Content-Language: en-US
+To: Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, tobias Waldekranz <tobias@waldekranz.com>
+References: <20231213111322.6152-1-ansuelsmth@gmail.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20231213111322.6152-1-ansuelsmth@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 14, 2023 at 09:14:40PM +0100, Tobias Waldekranz wrote:
-> On devices which are hardware strapped to start powered down (PDSTATE
-> == 1), make sure that we clear the power-down bit on all units
-> affected by this setting.
+On 13/12/2023 12:13, Christian Marangi wrote:
+> Document new LEDs active-low property to define if the LED require to be
+> set low to be turned on.
 > 
-> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
+> active-low can be defined in the leds node for PHY that apply the LED
+> polarity globally for each attached LED or in the specific led node for
+> PHY that supports setting the LED polarity per LED.
+> 
+> Declaring both way is not supported and will result in the schema
+> getting rejected.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 > ---
->  drivers/net/phy/marvell10g.c | 17 ++++++++++++++---
->  1 file changed, 14 insertions(+), 3 deletions(-)
+> Changes v3:
+> - Out of RFC
+> Changes v2:
+> - Add this patch
 > 
-> diff --git a/drivers/net/phy/marvell10g.c b/drivers/net/phy/marvell10g.c
-> index 83233b30d7b0..1c1333d867fb 100644
-> --- a/drivers/net/phy/marvell10g.c
-> +++ b/drivers/net/phy/marvell10g.c
-> @@ -344,11 +344,22 @@ static int mv3310_power_down(struct phy_device *phydev)
+>  .../devicetree/bindings/net/ethernet-phy.yaml | 20 +++++++++++++++++++
+>  1 file changed, 20 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+> index 8fb2a6ee7e5b..9cb3981fed2a 100644
+> --- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+> +++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+> @@ -213,6 +213,11 @@ properties:
+>        '#size-cells':
+>          const: 0
 >  
->  static int mv3310_power_up(struct phy_device *phydev)
->  {
-> +	static const u16 resets[][2] = {
-> +		{ MDIO_MMD_PCS,    MV_PCS_BASE_R    + MDIO_CTRL1 },
-> +		{ MDIO_MMD_PCS,    MV_PCS_1000BASEX + MDIO_CTRL1 },
+> +      'active-low':
 
-This is not necessary. The documentation states that the power down
-bit found at each of these is the same physical bit appearing in two
-different locations. So only one is necessary.
+Drop quotes, no need for them.
 
-> +		{ MDIO_MMD_PCS,    MV_PCS_BASE_T    + MDIO_CTRL1 },
-> +		{ MDIO_MMD_PMAPMD, MDIO_CTRL1 },
-> +		{ MDIO_MMD_VEND2,  MV_V2_PORT_CTRL },
-> +	};
->  	struct mv3310_priv *priv = dev_get_drvdata(&phydev->mdio.dev);
-> -	int ret;
-> +	int i, ret;
->  
-> -	ret = phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2, MV_V2_PORT_CTRL,
-> -				 MV_V2_PORT_CTRL_PWRDOWN);
-> +	for (i = 0; i < ARRAY_SIZE(resets); i++) {
-> +		ret = phy_clear_bits_mmd(phydev, resets[i][0], resets[i][1],
-> +					 MV_V2_PORT_CTRL_PWRDOWN);
+As pointed out in other patchset, bool might not be enough.
+https://lore.kernel.org/all/74cb1d1c-64b8-4fb0-9e6d-c2fad8417232@lunn.ch/
+Anyway, both cases probably needs to be considered here.
 
-While MV_V2_PORT_CTRL_PWRDOWN may correspond with the correct bit for
-the MDIO CTRL1 register, we have MDIO_CTRL1_LPOWER which describes
-this bit. Probably the simplest solution would be to leave the
-existing phy_clear_bits_mmd(), remove the vendor 2 entry from the
-table, and run through that table first.
+Best regards,
+Krzysztof
 
-Lastly, how does this impact a device which has firmware, and the
-firmware manages the power-down state (the manual states that unused
-blocks will be powered down - I assume by the firmware.) If this
-causes blocks which had been powered down by the firmware because
-they're not being used to then be powered up, that is a regression.
-Please check that this is not the case.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
