@@ -1,182 +1,156 @@
-Return-Path: <netdev+bounces-58014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEAA7814D6C
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 17:46:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29123814D75
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 17:48:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2DCFCB21DAD
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 16:46:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 962131F24D1A
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 16:48:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A39F3DBBF;
-	Fri, 15 Dec 2023 16:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABFE93DBB7;
+	Fri, 15 Dec 2023 16:48:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Pu1eDoGc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bXSXDzSB"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3333DBAE;
-	Fri, 15 Dec 2023 16:45:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=GkrSkZ4cg3Fb4+AcZws22YYhtObtizpPpGeGf6TSkHs=; b=Pu1eDoGcEGpANRPpsmLpyEamso
-	s2uEZTH6ZIA87YxFlXP3/1hlKbfaQOK86OvbLxv7RDvhVP+QOYOw9tMQTNGnG6voSYUtxaxKp+J+P
-	EPV/OAu3BGRAMWubs9CqHtRZoWKJH01DCLeaSWSJHOqpg9H81If8KAbDOtu5DSsFVJke73HSJ1Ghn
-	1EMRriiQ0N1bd4DGY4ZaXSn0H5fVuxLd7S6q357jOq0fiaNItRgSI4sIh8JOzXwmmOjqTiEDto/qC
-	retP5mgATikU6kuY7wrVEtxmm8sQRDOqxTG7k+XW1H8gcFegYVbqW5ApPufxLGuGgNKsWhwbNvkAX
-	Nd/NqNlw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46006)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rEBJ9-0002v6-1N;
-	Fri, 15 Dec 2023 16:45:03 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rEBJ7-0003mZ-3R; Fri, 15 Dec 2023 16:45:01 +0000
-Date: Fri, 15 Dec 2023 16:45:01 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: phy: skip LED triggers on PHYs on SFP modules
-Message-ID: <ZXyCjfW79jPqd1G6@shell.armlinux.org.uk>
-References: <102a9dce38bdf00215735d04cd4704458273ad9c.1702339354.git.daniel@makrotopia.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 702C13DBAD
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 16:47:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1d0b40bb704so196035ad.0
+        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 08:47:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702658879; x=1703263679; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pFF1dta+xlyg8MLdIwibfZN3TDA+ceWGZnTEl/bvSYQ=;
+        b=bXSXDzSBSErBYcDeSf04Oo/6R6KqHXIJ+J+UecNGsyyGc36MaoAYOxn8eNe4iyKOQF
+         wxqNrO3f/8yyOsPdjso8UbmhlJwHZFDy9N8ICOxKoPX/9W04NuTzJInOW7r9Z69ZTjX7
+         FbdVV80pAEbOx0wOznxquDjqLGoER5vNn6NFHuM2hmUvXlU/XA/gC6SniHJXjvJmURes
+         FhWjTvknjXByoEo7eWAzor1aGBToDmpanONBT3eCSkN6YHhRgRUKrMMDzkAuW+fZljUV
+         74P+kNT9M6eLqYz5PUmqEJRQUBHxiLyyNoG0lMRi4CRiz0x1NKtYB6fasW83xPFyMK+V
+         +xNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702658879; x=1703263679;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pFF1dta+xlyg8MLdIwibfZN3TDA+ceWGZnTEl/bvSYQ=;
+        b=Iq26g16p53QKApOz5+SviEScBqhWEsgealwnNIUtjtUYwhOPmbwCq5CrlugoXOokA4
+         Q9JiQXKP+8B/di5eiDHzg+IlS/kDgEFOQ1IzrzyUkRwAbQ3mjyCKAb9BE1YnKAnykZGc
+         2j8zR4th7qcJ1/xo9NpmDMKo1T+op1bIf+t8ocnTuYutwPUgeG87oK/hScwD6RFO2jxI
+         3rsavn4GhB6OR9n0Qb+o6h03FzjUqs19RPog5X4+bLh/X/TWHyxd8y3ng9tyBc+4lN0C
+         +PbKm4TRqn6M3OpDS5eXxZ162PCw4ZjMa5TFm9M01Kk3FolUPiSECvTgkILzaiXgydcn
+         vkKA==
+X-Gm-Message-State: AOJu0YwNtGXijmV4720LhkwG9jXr5Ahqbt7dVPvtct9BpRr36TrBI0TT
+	4MxzpS6Jv5k0Qouj4RfVjcKzlIeJcmDgD4nvLPL0Bw==
+X-Google-Smtp-Source: AGHT+IEbjeJsIZp5rRAzjQJeOjn/ytdkm89roAe2N65CsvRTZlJkSLxF/eDtmABy6dq4nOdoTRoClIhD5j52IYQ8NPc=
+X-Received: by 2002:a17:903:1108:b0:1d3:40ea:bf5b with SMTP id
+ n8-20020a170903110800b001d340eabf5bmr1147864plh.21.1702658878388; Fri, 15 Dec
+ 2023 08:47:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <102a9dce38bdf00215735d04cd4704458273ad9c.1702339354.git.daniel@makrotopia.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20231214020530.2267499-1-almasrymina@google.com>
+ <20231214020530.2267499-5-almasrymina@google.com> <ddffff98-f3de-6a5d-eb26-636dacefe9aa@huawei.com>
+ <CAHS8izO2nDHuxKau8iLcAmnho-1TYkzW09MBZ80+JzOo9YyVFA@mail.gmail.com>
+ <20231215021114.ipvdx2bwtxckrfdg@google.com> <793eb1bd-29bd-3c66-4ed2-9297879dbaa0@huawei.com>
+In-Reply-To: <793eb1bd-29bd-3c66-4ed2-9297879dbaa0@huawei.com>
+From: Shakeel Butt <shakeelb@google.com>
+Date: Fri, 15 Dec 2023 08:47:46 -0800
+Message-ID: <CALvZod7-WsxLj8gdhu=FMfdunEDgBV+DwfOB2316NfXvf_K41g@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v1 4/4] net: page_pool: use netmem_t instead
+ of struct page in API
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: Mina Almasry <almasrymina@google.com>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Michael Chan <michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Wei Fang <wei.fang@nxp.com>, 
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	NXP Linux Team <linux-imx@nxp.com>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
+	Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, 
+	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Marcin Wojtas <mw@semihalf.com>, 
+	Russell King <linux@armlinux.org.uk>, Sunil Goutham <sgoutham@marvell.com>, 
+	Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, 
+	hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, 
+	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, Jassi Brar <jaswinder.singh@linaro.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
+	Ravi Gunasekaran <r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>, 
+	Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, 
+	Ronak Doshi <doshir@vmware.com>, VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, 
+	Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>, 
+	Kalle Valo <kvalo@kernel.org>, Juergen Gross <jgross@suse.com>, 
+	Stefano Stabellini <sstabellini@kernel.org>, 
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+	Jason Gunthorpe <jgg@nvidia.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 12, 2023 at 12:05:35AM +0000, Daniel Golle wrote:
-> -> #3 (&sfp->sm_mutex){+.+.}-{3:3}:
->        __mutex_lock+0x88/0x7a0
->        mutex_lock_nested+0x20/0x28
->        cleanup_module+0x2ae0/0x3120 [sfp]
->        sfp_register_bus+0x5c/0x9c
->        sfp_register_socket+0x48/0xd4
->        cleanup_module+0x271c/0x3120 [sfp]
->        platform_probe+0x64/0xb8
->        really_probe+0x17c/0x3c0
->        __driver_probe_device+0x78/0x164
->        driver_probe_device+0x3c/0xd4
->        __driver_attach+0xec/0x1f0
->        bus_for_each_dev+0x60/0xa0
->        driver_attach+0x20/0x28
->        bus_add_driver+0x108/0x208
->        driver_register+0x5c/0x118
->        __platform_driver_register+0x24/0x2c
->        init_module+0x28/0xa7c [sfp]
->        do_one_initcall+0x70/0x2ec
->        do_init_module+0x54/0x1e4
->        load_module+0x1b78/0x1c8c
->        __do_sys_init_module+0x1bc/0x2cc
->        __arm64_sys_init_module+0x18/0x20
->        invoke_syscall.constprop.0+0x4c/0xdc
->        do_el0_svc+0x3c/0xbc
->        el0_svc+0x34/0x80
->        el0t_64_sync_handler+0xf8/0x124
->        el0t_64_sync+0x150/0x154
+On Fri, Dec 15, 2023 at 3:04=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
+>
+> On 2023/12/15 10:11, Shakeel Butt wrote:
+> > On Thu, Dec 14, 2023 at 08:27:55AM -0800, Mina Almasry wrote:
+> >> On Thu, Dec 14, 2023 at 4:05=E2=80=AFAM Yunsheng Lin <linyunsheng@huaw=
+ei.com> wrote:
+> >>>
+> > [...]
+> >>> I perfer the second one personally, as devmem means that it is not
+> >>> readable from cpu.
+> >>
+> >> From my POV it has to be the first one. We want to abstract the memory
+> >> type from the drivers as much as possible, not introduce N new memory
+> >> types and ask the driver to implement new code for each of them
+> >> separately.
+>
+> That was my initial thinking too:
+> https://www.spinics.net/lists/netdev/msg949376.html
+>
+> But after discussion, it may make more sense to have two sets of API from=
+ the
+> driver's piont of view if we want a complete safe type protection, so tha=
+t
+> compiler can check everything statically and devmem driver API have a cle=
+ar
+> semantic:
+> 1. devmem is not allowed to be called into mm subsystem.
+> 2. it will not provide a API like page_address().
+>
 
-I suspect these backtraces aren't all that reliable, and look like they
-are generated by walking through the stack and logging anything that
-seems to be pointing into the text segment, which is rubbish for ARM32
-and probably ARM64 as well.
-
-We can see that this backtrace is a pile of lies because there is _no_
-_way_ that sfp's cleanup_module() could ever be called while its
-init_module() function is running.
-
-In any case, I think this path is irrelevant.
-
-> -> #2 (rtnl_mutex){+.+.}-{3:3}:
->        __mutex_lock+0x88/0x7a0
->        mutex_lock_nested+0x20/0x28
->        rtnl_lock+0x18/0x20
->        set_device_name+0x30/0x130
->        netdev_trig_activate+0x13c/0x1ac
->        led_trigger_set+0x118/0x234
->        led_trigger_write+0x104/0x17c
->        sysfs_kf_bin_write+0x64/0x80
->        kernfs_fop_write_iter+0x128/0x1b4
->        vfs_write+0x178/0x2a4
->        ksys_write+0x58/0xd4
->        __arm64_sys_write+0x18/0x20
->        invoke_syscall.constprop.0+0x4c/0xdc
->        do_el0_svc+0x3c/0xbc
->        el0_svc+0x34/0x80
->        el0t_64_sync_handler+0xf8/0x124
->        el0t_64_sync+0x150/0x154
-
-This is one of the paths that matters. A userspace write is occuring
-to the netdev trigger module. This path takes the following locks
-(most recent first):
-
-	rtnl_lock()
-	trigger_lock (write)
-	triggers_list_lock (read)
-
-> -> #0 (triggers_list_lock){++++}-{3:3}:
->        __lock_acquire+0x12a0/0x2014
->        lock_acquire+0x100/0x2ac
->        down_write+0x4c/0x13c
->        led_trigger_register+0x4c/0x1a8
->        phy_led_triggers_register+0x9c/0x214
->        phy_attach_direct+0x154/0x36c
->        phylink_attach_phy+0x30/0x60
->        phylink_sfp_connect_phy+0x140/0x510
->        sfp_add_phy+0x34/0x50
->        init_module+0x15c/0xa7c [sfp]
->        cleanup_module+0x1d94/0x3120 [sfp]
->        cleanup_module+0x2bb4/0x3120 [sfp]
->        process_one_work+0x1f8/0x4ec
->        worker_thread+0x1e8/0x3d8
->        kthread+0x104/0x110
->        ret_from_fork+0x10/0x20
-
-This path I suspect (but hard to see, we've got that cleanup_module
-and init_module crud there again which is utter trash, sfp_add_phy
-is not called from any of the functions previously listed)...
-Manually going through the code instead, the locking order will be:
-
-	triggers_list_lock (write)
-	sm_mutex
-	rtnl
-
-I'm not sure that the lockdep report is accurate, as it seems to be
-blaming the deadlock via three locks (triggers_list_lock --> rtnl_mutex
---> &sfp->sm_mutex) but I can't find a path where sm_mutex would be
-involved (except the immediate above.)
-
-It looks to me like the problem is in part caused by calling
-phy_led_triggers_register() while holding the rtnl lock. Holding the
-rtnl lock is fundamental to being able to safely remove and add PHY
-devices to netdevs while they are up and running.
-
-The other part that causes the problem is a write to a netdev trigger
-that causes it to activate takes the rtnl and triggers_list_lock in
-the opposite order.
-
-I don't currently see a solution to this.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+I think all of us are on the same page that there will be two sets of
+APIs here but Mina's point was let's aim to not make that N set of
+APIs.
 
