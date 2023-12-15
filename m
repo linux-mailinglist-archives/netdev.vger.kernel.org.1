@@ -1,85 +1,83 @@
-Return-Path: <netdev+bounces-57861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96BF1814589
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:30:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B31A7814595
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:31:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F310B1F23E00
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 10:30:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 697131F2133F
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 10:31:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A271A702;
-	Fri, 15 Dec 2023 10:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE7E19469;
+	Fri, 15 Dec 2023 10:31:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dlDKy0Qx"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yI+I7qeQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59DB208A0;
-	Fri, 15 Dec 2023 10:30:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 49D8FC433C9;
-	Fri, 15 Dec 2023 10:30:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702636224;
-	bh=03F3Xbn+qBzY9EYDhrw3WRnqK6/tNhnCJJHn+Zgaprs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dlDKy0QxHrho1xQ73unyksu7JhKeAw4a4UnvfP4afjyeiiGAoT4H6sItvm1s/ULOc
-	 Gj2m9tqPAITy+h8jpjWDLaHPqBEKye1hzJ2TrWsSZ85sp1UKtR2ocMpx+aTlyajYuF
-	 /r/j43TKyzT/sERM5t1/Q0KjN+OEynI0GKxvSP5sE3MjggE2GHpfN9xHhrZVFd5QEV
-	 fo2DxkG4PSiRWXguxyFBxcDTF3H9bwceaA6hKCjkrySAjHiznwAvHWzvdw8ZAkx0/H
-	 o62OigqNs+h1Hp/8ZrOVkr3bJOLX2YjgDta9mlvkIIN8lzOx4Rxm4hJf73eD+rjE2g
-	 6FSGQ2Xq2jElQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 35901DD4EF5;
-	Fri, 15 Dec 2023 10:30:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4ED71A716
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 10:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=cHsnSmtS9kGZZZeYF9SJWbAva9OD5wy7J68KbPwQFGE=; b=yI+I7qeQoN0vicSDQ5gqD9MWxV
+	8xPcNzR3rM4P/TqPHFujlXgUISNeeqcF/hGByIPo7NJqekRyBp/rSwXWZKgFfUKIhNustc9FyTEyA
+	M2pSNAkRKHPixU6PrY+IYGSt+Dz3nk9t4PhSB54vcEjnC4aUUaOnM5DVUUTmWbnbdshY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rE5Sx-0030da-H4; Fri, 15 Dec 2023 11:30:47 +0100
+Date: Fri, 15 Dec 2023 11:30:47 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Linus Walleij <linus.walleij@linaro.org>
+Subject: Re: DSA tags seem to break checksum offloading on DWMAC100
+Message-ID: <e431c74f-5f83-4fb8-8246-a0f447a24596@lunn.ch>
+References: <c57283ed-6b9b-b0e6-ee12-5655c1c54495@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net PATCH] octeontx2-pf: Fix graceful exit during PFC configuration
- failure
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170263622421.29656.18263550245322394466.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Dec 2023 10:30:24 +0000
-References: <20231213181044.103943-1-sumang@marvell.com>
-In-Reply-To: <20231213181044.103943-1-sumang@marvell.com>
-To: Suman Ghosh <sumang@marvell.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, sgoutham@marvell.com, sbhatta@marvell.com,
- jerinj@marvell.com, gakula@marvell.com, hkelam@marvell.com,
- lcherian@marvell.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c57283ed-6b9b-b0e6-ee12-5655c1c54495@bootlin.com>
 
-Hello:
+> So it seems like a solution is needed to prevent checksum offloading by Ethernet
+> drivers when DSA tags are in used. I'm not sure how this would be done, since
+> DSA is purposefully kept quite separate from CPU port drivers. What are your
+> thoughts on this?
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+It is not as simple as that, because some Ethernet drivers do know how
+to correctly calculate checksums when there is a DSA
+header. e.g. Marvell and Broadcom devices can do this, when combined
+with Marvell/Broadcom switches. I don't know how the Broadcom driver
+does this, but on the Marvell Ethernet drivers, there is a value you
+set in the transmit descriptor to indicate how big the headers are
+before the IP header. Its normally used to skip over the VLAN tag, but
+it can also be used to skip over the DSA header.
 
-On Wed, 13 Dec 2023 23:40:44 +0530 you wrote:
-> During PFC configuration failure the code was not handling a graceful
-> exit. This patch fixes the same and add proper code for a graceful exit.
-> 
-> Fixes: 99c969a83d82 ("octeontx2-pf: Add egress PFC support")
-> Signed-off-by: Suman Ghosh <sumang@marvell.com>
-> ---
->  .../ethernet/marvell/octeontx2/nic/otx2_dcbnl.c | 17 ++++++++++++++---
->  1 file changed, 14 insertions(+), 3 deletions(-)
+So i would suggest you look at the data sheet and see if there is
+anything similar, a way to tell the hardware where the IP header
+actually is in the frame. If you can do that, you can then actually
+make use of the hardware checksum, rather than disable it.
 
-Here is the summary with links:
-  - [net] octeontx2-pf: Fix graceful exit during PFC configuration failure
-    https://git.kernel.org/netdev/net/c/8c97ab5448f2
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+     Andrew
 
