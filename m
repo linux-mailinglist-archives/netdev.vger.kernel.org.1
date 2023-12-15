@@ -1,77 +1,89 @@
-Return-Path: <netdev+bounces-57752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D98AE81406F
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 04:09:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 243C1814073
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 04:10:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DAAC1F2153F
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 03:09:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C30771F21487
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 03:10:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1BB6110F;
-	Fri, 15 Dec 2023 03:09:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 626905697;
+	Fri, 15 Dec 2023 03:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oYFn85wS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lutge+8G"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87EB9D515
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 03:09:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F02EC433C7;
-	Fri, 15 Dec 2023 03:09:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488D05692
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 03:10:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B1574C433AD;
+	Fri, 15 Dec 2023 03:10:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702609761;
-	bh=FPibQYImoSC0PSFDPY26IWcYwFfbNKrkyGey9LhHyJk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oYFn85wSZP08XSbliexEvVTZjKjnRN2m34HIr2ZoOrnGj2pDbKo18JKtbn3uOXuvC
-	 YsxXMP70as0ZJ2hrS62JhkIFV4Qz1xeTRRLvPWOEHWZ6803MlV2O6MJDYLGw60XkKA
-	 0bPY8ieZqgv7/Uqmyz9EGWLrgNlS8AyMS1yrKudLynZcEiJhyKolS49icFH7VUYHAK
-	 dkiqoucc31JQShVCD8KRcwpXTB45oEQW+W0WRfP99XPRlUUzRu/Aj8knSMypa1TQJn
-	 WMcz03utZkd8blfJJ26Ue0XjBofz35R8mivB9hGlL1h49t/pLmMIFsomhzhtQKs4x5
-	 GPC+6xMzzv+Kg==
-Date: Thu, 14 Dec 2023 19:09:19 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: jhs@mojatatu.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- mleitner@redhat.com, vladbu@nvidia.com, paulb@nvidia.com,
- pctammela@mojatatu.com, netdev@vger.kernel.org, kernel@mojatatu.com
-Subject: Re: [PATCH net-next v6 3/3] net/sched: act_mirred: Allow mirred to
- block
-Message-ID: <20231214190919.2b446e31@kernel.org>
-In-Reply-To: <20231214141006.3578080-4-victor@mojatatu.com>
-References: <20231214141006.3578080-1-victor@mojatatu.com>
-	<20231214141006.3578080-4-victor@mojatatu.com>
+	s=k20201202; t=1702609826;
+	bh=PDCn8BYQR0pViH7jcx385sd+37qFHXo5GCKz34WeP7g=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Lutge+8Gx0maQcbBIuyIxY/NqcOpaNsDiiniCt5yWBNEdVAQiC8NpeQJT1gajZPw7
+	 ltpxxoUBJ5r6Atgp5Z3NjaYZaFa0DnCZ8aPa623ON8Nzt8Jg3GTjHw9FMah+VDF5sz
+	 hv6G7DGkR63xLqFMHIf8JJv9QAzTmw+olmoz4bVy7RhHY7ncN/ihPZBS0MPosIATNl
+	 0pYyvKSld4Dn3YBmVfeXEm9w/ReS37J/YvB6ss/2EFe675a/LcY+mYvWQAHGZ3X8Bp
+	 pk+A1MKcEenQw8mzBldaeOIUZOcjftVqcJls4VekrebVyUxEFH2/0cQIJShp+bWXcp
+	 /fo6SRjHJqvzg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 998D7DD4EFF;
+	Fri, 15 Dec 2023 03:10:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2][pull request] Intel Wired LAN Driver Updates
+ 2023-12-13 (ice, i40e)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170260982662.2748.5524035806868477202.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Dec 2023 03:10:26 +0000
+References: <20231213220827.1311772-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20231213220827.1311772-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org
 
-On Thu, 14 Dec 2023 11:10:06 -0300 Victor Nogueira wrote:
-> So far the mirred action has dealt with syntax that handles mirror/redirection for netdev.
-> A matching packet is redirected or mirrored to a target netdev.
-> 
-> In this patch we enable mirred to mirror to a tc block as well.
-> IOW, the new syntax looks as follows:
-> ... mirred <ingress | egress> <mirror | redirect> [index INDEX] < <blockid BLOCKID> | <dev <devname>> >
-> 
-> Examples of mirroring or redirecting to a tc block:
-> $ tc filter add block 22 protocol ip pref 25 \
->   flower dst_ip 192.168.0.0/16 action mirred egress mirror blockid 22
-> 
-> $ tc filter add block 22 protocol ip pref 25 \
->   flower dst_ip 10.10.10.10/32 action mirred egress redirect blockid 22
+Hello:
 
-net/sched/act_mirred.c:424:6: warning: variable 'err' set but not used [-Wunused-but-set-variable]
-  424 |         int err = 0;
-      |             ^
+This series was applied to netdev/net.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
+
+On Wed, 13 Dec 2023 14:08:24 -0800 you wrote:
+> This series contains updates to ice and i40e drivers.
+> 
+> Michal Schmidt prevents possible out-of-bounds access for ice.
+> 
+> Ivan Vecera corrects value for MDIO clause 45 on i40e.
+> 
+> The following are changes since commit 810c38a369a0a0ce625b5c12169abce1dd9ccd53:
+>   net/rose: Fix Use-After-Free in rose_ioctl
+> and are available in the git repository at:
+>   git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 100GbE
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/2] ice: fix theoretical out-of-bounds access in ethtool link modes
+    https://git.kernel.org/netdev/net/c/91f9181c7381
+  - [net,2/2] i40e: Fix ST code value for Clause 45
+    https://git.kernel.org/netdev/net/c/9b3daf2b0443
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
