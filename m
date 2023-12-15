@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-57839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B846E8144C0
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 10:40:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F9988144BF
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 10:40:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EADD11C209ED
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 09:40:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFE261C20E71
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 09:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 223641805D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 222B018029;
 	Fri, 15 Dec 2023 09:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D7KH7koc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rxKiSKZ9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0045D18AE8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0047C18AEE;
 	Fri, 15 Dec 2023 09:40:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 84DBDC433C9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 916ACC433C8;
 	Fri, 15 Dec 2023 09:40:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1702633224;
-	bh=DBz9wtE7RjeSYiKG1ce4EE+S157hUpSa+u6pWZ6ST9w=;
+	bh=4WLPzR0ImxTYD0Q0FMSX4ET9eASvLOs7mKeotYiEWMs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=D7KH7kocevc6DNtXPXsqTrqaqIPQZG0XEAEJdLmRHeHPG8UrfNtCIp5biNlppKVhh
-	 D6LPndpdR3AS1jtcYRQaBFosA52s+I6Wqjt2SkTMA9xnfko6UVztfFmNBe9GW+feP/
-	 BwmSdm3NSIxelKGMsiF6/+EPggfu7q+ruTcBVsvQ33iXqWNlkLNcsJNv5Fo6W4aIq9
-	 vKGWVGzhWqrHoPH6T4Zv4cFzs1432HZktTlbNM0EUe+cW9RtehaxUYkvjEYJ94F7VZ
-	 ljpYZZXB3s3gLyA6OkWZ+guGhWPOe518rYSC8zAIlpK7NaHAR8UENKBe+A+MARfLhr
-	 zdNCufzR+PoFA==
+	b=rxKiSKZ9Xsrq8fs6VVI827bmCS4bJU9EH9VujlT8U99F6OS9Ps06rZGVCLfVEYfAJ
+	 7eKt4dUbcYanYZDLa9x38maqJ4t2DlOULtYObj99b7G4YEioN/UoKgKcWHDUAJ0Z0U
+	 1M54qNioUGzM/ZhFEIz6S7BO1CtxjaNWsVcO4E8L06pRp+S/8cuxGHRlmvnvXjHyGy
+	 JXAxuiXN+bwxRDSIripmR1yGR5qeDGgBnb5dcDxUCALOFbJ8cgg3e9nbNmiYO/NuGM
+	 Gz8xECij3oAYLpHXFPsDBsvFHw3PUWKBN27StNebhZ7/zXUPt62vgu/J4D4dKOUezI
+	 b+ARurfUxO4lQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6E4A7DD4EFD;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 779C0DD4EF5;
 	Fri, 15 Dec 2023 09:40:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,42 +43,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v11 0/4] Rust abstractions for network PHY drivers
+Subject: Re: [PATCH net-next v4] net: stmmac: don't create a MDIO bus if
+ unnecessary
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170263322444.1975.17234929609368010648.git-patchwork-notify@kernel.org>
+ <170263322448.1975.8565502940787597440.git-patchwork-notify@kernel.org>
 Date: Fri, 15 Dec 2023 09:40:24 +0000
-References: <20231213004211.1625780-1-fujita.tomonori@gmail.com>
-In-Reply-To: <20231213004211.1625780-1-fujita.tomonori@gmail.com>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
- tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me,
- wedsonaf@gmail.com, aliceryhl@google.com, boqun.feng@gmail.com
+References: <20231212-stmmac-no-mdio-node-v4-1-c121068ccd17@redhat.com>
+In-Reply-To: <20231212-stmmac-no-mdio-node-v4-1-c121068ccd17@redhat.com>
+To: Andrew Halaney <ahalaney@redhat.com>
+Cc: fancer.lancer@gmail.com, andrew@lunn.ch, alexandre.torgue@foss.st.com,
+ joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ bartosz.golaszewski@linaro.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Wed, 13 Dec 2023 09:42:07 +0900 you wrote:
-> No functional change since v10; only comment and commit log updates.
+On Tue, 12 Dec 2023 16:07:36 -0600 you wrote:
+> Currently a MDIO bus is created if the devicetree description is either:
 > 
-> This patchset adds Rust abstractions for phylib. It doesn't fully
-> cover the C APIs yet but I think that it's already useful. I implement
-> two PHY drivers (Asix AX88772A PHYs and Realtek Generic FE-GE). Seems
-> they work well with real hardware.
+>     1. Not fixed-link
+>     2. fixed-link but contains a MDIO bus as well
+> 
+> The "1" case above isn't always accurate. If there's a phy-handle,
+> it could be referencing a phy on another MDIO controller's bus[1]. In
+> this case, where the MDIO bus is not described at all, currently
+> stmmac will make a MDIO bus and scan its address space to discover
+> phys (of which there are none). This process takes time scanning a bus
+> that is known to be empty, delaying time to complete probe.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v11,1/4] rust: core abstractions for network PHY drivers
-    https://git.kernel.org/netdev/net-next/c/f20fd5449ada
-  - [net-next,v11,2/4] rust: net::phy add module_phy_driver macro
-    https://git.kernel.org/netdev/net-next/c/2fe11d5ab35d
-  - [net-next,v11,3/4] MAINTAINERS: add Rust PHY abstractions for ETHERNET PHY LIBRARY
-    https://git.kernel.org/netdev/net-next/c/cbaa28f970a1
-  - [net-next,v11,4/4] net: phy: add Rust Asix PHY driver
-    https://git.kernel.org/netdev/net-next/c/cbe0e4150896
+  - [net-next,v4] net: stmmac: don't create a MDIO bus if unnecessary
+    https://git.kernel.org/netdev/net-next/c/f3c2caacee82
 
 You are awesome, thank you!
 -- 
