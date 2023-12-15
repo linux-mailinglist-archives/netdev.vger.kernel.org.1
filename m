@@ -1,138 +1,88 @@
-Return-Path: <netdev+bounces-57716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49AFD813F99
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 03:11:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34CA8813F9C
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 03:11:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9CDB283F35
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 02:11:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E100B1F21076
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 02:11:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D1F7FC;
-	Fri, 15 Dec 2023 02:11:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00EA87FC;
+	Fri, 15 Dec 2023 02:11:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S4ihFpEG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zzr7Tp2D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D25010F3
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 02:11:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--shakeelb.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1d3622ab522so13947015ad.1
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 18:11:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702606276; x=1703211076; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Hn2u3ohnyQZ77hNqSlm/EvFnLZDsF+Ox+1yQ+iYOeGU=;
-        b=S4ihFpEGaGASqDXTKfIcJabS3ty2QxSafop+BYrFlYS3RFOOEXc4/eKAaKZjzU4WWh
-         DRXxnvX7n3k/XvfTLWvDbDI7EuR8uo9fqmsBj1c8yy9c253JKQ6y5iHHgfx2WBSiVhqA
-         2KaQxhu0iAwy+KIml+CkrMRTA2GIVTgZvPP7BdOXDTLu9HND3PfxIVB0/V1suO6spBxu
-         w+ugljbilT8Xyj+wPr5aH1wcv+/1s6U3TWDxYLvRPl9zk0ug9BodKQROgmm6vOHwTIcs
-         r8iMGrzQdnS2SkDKDnKlkoTa1Io+H5bE4s67IUAtJ3FgiB0G2oYsfA9jZ4ClQJbAipA7
-         /6tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702606276; x=1703211076;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Hn2u3ohnyQZ77hNqSlm/EvFnLZDsF+Ox+1yQ+iYOeGU=;
-        b=nAsJ4lTDgBv8iXHXoWEtPRhZX3TLNmJ5ONlht7Q/v9QrKGIJMZkSX0C4FPknO7aXIp
-         q+9Uffu5fmg98EJXkhLZCJ5JgRbyn/h6AHmTn7teTpId6RZFRwwlyBA0bLR7itsLXTJQ
-         sbZE8fQBHwMc/VChnMYcih1CLHKpWcrHxchZz0k8YqKZ7/2Q20RDDTtbBFalCsK5x83u
-         sNDzlHsIm7lA6sYOBYzCdQ7d8Wbxposb32YUtkvCFDYNl6uouIN215+OlVVJh4tj+R36
-         g3fLSofByBUdtiflnvM/C0BtIDcHtynhZtmUBCCcKb4+EtfZOSzyC3+cDlPZpvQ5Ta5W
-         Nw+Q==
-X-Gm-Message-State: AOJu0YwNz4dQjRWTQHyDRhev6yt4jbw5HSO/3G+Fa1ErBOJBhbCheoUO
-	e4WnvRoaP/d6zCnysIWMdbDW49uLp5A62w==
-X-Google-Smtp-Source: AGHT+IFer5ptuGEEfLFmjy3FBazRTAHYraFtWH6cjZkWuSL5hJETliQbOEPas4rAqb9tpBNPAqzbmDmViSQbnQ==
-X-Received: from shakeelb.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:262e])
- (user=shakeelb job=sendgmr) by 2002:a17:902:f690:b0:1d0:8be8:bb7c with SMTP
- id l16-20020a170902f69000b001d08be8bb7cmr1969874plg.4.1702606275789; Thu, 14
- Dec 2023 18:11:15 -0800 (PST)
-Date: Fri, 15 Dec 2023 02:11:14 +0000
-In-Reply-To: <CAHS8izO2nDHuxKau8iLcAmnho-1TYkzW09MBZ80+JzOo9YyVFA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB87E7EA
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 02:11:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DC35C433C8;
+	Fri, 15 Dec 2023 02:11:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702606290;
+	bh=gSlmGvXM7l3usEJEqGEgLaxe+8FR8knxzpms6VTa6JY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Zzr7Tp2D62n7lK7uX67SV+L29ZquMUZ1OddGbCy1WuAGxQzL9QCSnNgmbGvvIteez
+	 4dmf6mfuAQO20ug44VL6IKvqgue4V8GZIlqnf9ip5wr0LODls4WiMX7+6tTRuYgBdp
+	 J3DaSkvYzxJcjO2cDFmHlkIDlD0JNV07/RFD72Z18dlrZkVNSqSilhR4saSA1Bfzjw
+	 oaJBdZ0KCzTgzweiAyMyuaxTtI9wgMjd+CNQ4SirBrOOBxtQBX254bQ/I/KM7mCp5H
+	 dcvIkulWD7tcsttNuZL9/Xe490kP978uKPhy17M2Ex3EEforbfA/jXQ0eLWS+RzoPq
+	 9WzR83k5H3mBQ==
+Date: Thu, 14 Dec 2023 18:11:28 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Aurelien Aptel <aaptel@nvidia.com>
+Cc: linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
+ sagi@grimberg.me, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
+ chaitanyak@nvidia.com, davem@davemloft.net, aurelien.aptel@gmail.com,
+ smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
+ yorayz@nvidia.com, borisp@nvidia.com, galshalom@nvidia.com,
+ mgurtovoy@nvidia.com, edumazet@google.com, pabeni@redhat.com,
+ john.fastabend@gmail.com, daniel@iogearbox.net
+Subject: Re: [PATCH v21 04/20] net/tls,core: export get_netdev_for_sock
+Message-ID: <20231214181128.63793cdc@kernel.org>
+In-Reply-To: <20231214132623.119227-5-aaptel@nvidia.com>
+References: <20231214132623.119227-1-aaptel@nvidia.com>
+	<20231214132623.119227-5-aaptel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231214020530.2267499-1-almasrymina@google.com>
- <20231214020530.2267499-5-almasrymina@google.com> <ddffff98-f3de-6a5d-eb26-636dacefe9aa@huawei.com>
- <CAHS8izO2nDHuxKau8iLcAmnho-1TYkzW09MBZ80+JzOo9YyVFA@mail.gmail.com>
-Message-ID: <20231215021114.ipvdx2bwtxckrfdg@google.com>
-Subject: Re: [RFC PATCH net-next v1 4/4] net: page_pool: use netmem_t instead
- of struct page in API
-From: Shakeel Butt <shakeelb@google.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Yunsheng Lin <linyunsheng@huawei.com>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	"Christian =?utf-8?B?S8O2bmln?=" <christian.koenig@amd.com>, Michael Chan <michael.chan@broadcom.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Wei Fang <wei.fang@nxp.com>, 
-	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
-	NXP Linux Team <linux-imx@nxp.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
-	Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, 
-	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Marcin Wojtas <mw@semihalf.com>, 
-	Russell King <linux@armlinux.org.uk>, Sunil Goutham <sgoutham@marvell.com>, 
-	Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, 
-	hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, 
-	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Jassi Brar <jaswinder.singh@linaro.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
-	Ravi Gunasekaran <r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>, 
-	Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, 
-	Ronak Doshi <doshir@vmware.com>, VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, 
-	Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>, 
-	Kalle Valo <kvalo@kernel.org>, Juergen Gross <jgross@suse.com>, 
-	Stefano Stabellini <sstabellini@kernel.org>, 
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Jason Gunthorpe <jgg@nvidia.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 14, 2023 at 08:27:55AM -0800, Mina Almasry wrote:
-> On Thu, Dec 14, 2023 at 4:05=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.=
-com> wrote:
-> >
-[...]
-> > I perfer the second one personally, as devmem means that it is not
-> > readable from cpu.
->=20
-> From my POV it has to be the first one. We want to abstract the memory
-> type from the drivers as much as possible, not introduce N new memory
-> types and ask the driver to implement new code for each of them
-> separately.
->=20
+On Thu, 14 Dec 2023 13:26:07 +0000 Aurelien Aptel wrote:
+> -struct net_device *netdev_sk_get_lowest_dev(struct net_device *dev,
+> -					    struct sock *sk)
+> +struct net_device *get_netdev_for_sock(struct sock *sk)
+>  {
+> -	struct net_device *lower;
+> +	struct dst_entry *dst = sk_dst_get(sk);
+> +	struct net_device *dev, *lower;
+>  
+> -	lower = netdev_sk_get_lower_dev(dev, sk);
+> -	while (lower) {
+> +	if (unlikely(!dst))
+> +		return NULL;
+> +	dev = dst->dev;
+> +	while ((lower = netdev_sk_get_lower_dev(dev, sk)))
+>  		dev = lower;
+> -		lower = netdev_sk_get_lower_dev(dev, sk);
+> -	}
+> -
+> +	dev_hold(dev);
+> +	dst_release(dst);
+>  	return dev;
+>  }
+> -EXPORT_SYMBOL(netdev_sk_get_lowest_dev);
+> +EXPORT_SYMBOL_GPL(get_netdev_for_sock);
 
-Agree with Mina's point. Let's aim to decouple memory types from
-drivers.
+Since the use of this helper is now spreading we should
+switch it to netdev_hold and have the caller pass in a
+netdevice_tracker.
 
