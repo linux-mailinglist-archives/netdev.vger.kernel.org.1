@@ -1,438 +1,270 @@
-Return-Path: <netdev+bounces-58120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A61438151F3
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 22:37:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DBAF815206
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 22:45:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 209CE1F24F12
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 21:37:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33DB5281BBD
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 21:45:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8898147F7D;
-	Fri, 15 Dec 2023 21:37:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD7B7482E1;
+	Fri, 15 Dec 2023 21:45:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BoQKQ+G5"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="MoWzIPNn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2081.outbound.protection.outlook.com [40.107.7.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69CFE82ED1;
-	Fri, 15 Dec 2023 21:37:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702676230; x=1734212230;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version:content-transfer-encoding;
-  bh=u0rSifhJstSojm/lW2TxHwOkR1V3aPcA8iXgMDwGwIA=;
-  b=BoQKQ+G5FB7RyUu1osBSQNygK5FuV5fNe2TBfL8evQT/RUF1S/YIzeZk
-   FwRPObO6jXffboRWROHdvuTpnEhbLh1xt9OIlShpsj6clWX9swLLB7MJZ
-   M7Y8nyKnmwJy3R/RjljQJHNc7Tk8NaVbCQCBbPx73Zb34GcdIQzgRXTmd
-   XdJJ1tBJIb2I67mTaOVrGhOa6ucXE2peAv5sZ8J6myqafTYBs0Tf1Ur/L
-   pzG4fC78yap3a4RmgeIXDce1Ug9HJFlBU6axDDALGdEaxsxSulX94ZHTZ
-   cR9LrtizCXO6ekfuAWlEwiiWfQ34AG2r+BglwNloDfSD4e2DP3rROZ66M
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10925"; a="2418076"
-X-IronPort-AV: E=Sophos;i="6.04,279,1695711600"; 
-   d="scan'208";a="2418076"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2023 13:37:09 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10925"; a="1022067096"
-X-IronPort-AV: E=Sophos;i="6.04,279,1695711600"; 
-   d="scan'208";a="1022067096"
-Received: from kpowell-mobl.amr.corp.intel.com (HELO vcostago-mobl3) ([10.209.17.106])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2023 13:37:08 -0800
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Eric Dumazet <edumazet@google.com>, syzbot
- <syzbot+45b67ef6e09a39a2cbcd@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, jhs@mojatatu.com,
- jiri@resnulli.us, kuba@kernel.org, lenb@kernel.org,
- linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, rjw@rjwysocki.net,
- syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
-Subject: Re: [syzbot] [net?] INFO: rcu detected stall in ip_list_rcv (6)
-In-Reply-To: <CANn89i+nERqd=gPkSxvGA1tE3x2RNJif-ANZnCSTAZMYTj4CyA@mail.gmail.com>
-References: <0000000000005c8e95060babfa0e@google.com>
- <CANn89i+nERqd=gPkSxvGA1tE3x2RNJif-ANZnCSTAZMYTj4CyA@mail.gmail.com>
-Date: Fri, 15 Dec 2023 13:37:07 -0800
-Message-ID: <87cyv7p2po.fsf@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52404358B0;
+	Fri, 15 Dec 2023 21:45:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hmrxNDOL9ik2SY4x9SlWtGwwjZjhNqOSqz8uX3VKeTDg/av/vBXuU/RlvGL1zzbhM+fUqQLs/YjM1d9XrPT9kwX2/eULYr+w4wFojmOIJjZ6ET6Lt+4vsfbnTbjjx8FcycbrkERLUKPpEaNVLbxtue70E3Vsanq5LM28A8e+xatrTZOytK4nabnZ4WpB7Tfm5BgFy4k7BUTdAI8dVTj59RvR7jvZ9kEhB6hTYyNNrC4qcVMMe27rgdezpL7Bb5X1CHVd+vbsoCcAwTlr0EtcvZpAARxGv/dz6T5Kg02uTTP7JoePEWdMdmpKLQv1KOu8L4394mFsBEpS0V+kdoluRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=f06pJ8dPs7Tni5hIzB5LrTXTg8HTsmftsVMug+ylt0w=;
+ b=FjfVdVca3vsjY3fMa9CTK9rhhRRhpYtlWDNw/9gIkTU7OltYqDpBGxg1eO4b+LtHYsqCbmpw0Cix2s2N1uE+ippY6XUBgtU+LbcjRcFa9Ft1yl9K31k+yYV5FMJbFFZij3vWsRTPr1WDVK0/hkh5SPN+ehyCQR7hhIp3tQSGZL/+zpzahhZmyakz2BySS01tMcldSvugD84uXUxotcGvpusNTYivtzMl2nPo797ruYllQ817IIt1jCB7NNCBzXejPOwTxcB92k4rmSqnBo09Llt4ah+GeAlLXkqON0eXSeglue/K/j6gTQMR/3hiM4TK9eCD/wnyZ6V55Z2i7ZCfRg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=f06pJ8dPs7Tni5hIzB5LrTXTg8HTsmftsVMug+ylt0w=;
+ b=MoWzIPNnhVz4+3Dykoi1MS+24Rhlg8pF/FVwJkTN7K6JA+ADxT+9GIG9MZkZP5iqIApPsnjjjITiykq8lClWxRzjGb/4CJTUUNsmlVZZKSqd5vesmjrt57Yqo1WuiOX49FL27ZaezabQ4hFhQjCpz5lQ7aHLgNLzdHGT0yQsJng=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by DU2PR04MB8823.eurprd04.prod.outlook.com (2603:10a6:10:2e2::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.31; Fri, 15 Dec
+ 2023 21:45:27 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7091.030; Fri, 15 Dec 2023
+ 21:45:27 +0000
+Date: Fri, 15 Dec 2023 23:45:23 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	=?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?utf-8?Q?Nicol=C3=B2?= Veronese <nicveronese@gmail.com>
+Subject: Re: [PATCH net-next v4 01/13] net: phy: Introduce ethernet link
+ topology representation
+Message-ID: <20231215214523.ntk5kec32mb5vqjs@skbuf>
+References: <20231215171237.1152563-1-maxime.chevallier@bootlin.com>
+ <20231215171237.1152563-1-maxime.chevallier@bootlin.com>
+ <20231215171237.1152563-2-maxime.chevallier@bootlin.com>
+ <20231215171237.1152563-2-maxime.chevallier@bootlin.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231215171237.1152563-2-maxime.chevallier@bootlin.com>
+ <20231215171237.1152563-2-maxime.chevallier@bootlin.com>
+X-ClientProxiedBy: VI1PR0102CA0078.eurprd01.prod.exchangelabs.com
+ (2603:10a6:803:15::19) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DU2PR04MB8823:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1bfc1dfc-ec51-499e-a7f8-08dbfdb72689
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	zhgkncRdcLUlLSDLXlRjanNV0H0htOKWFMBgSA49wz61BuQxNivlY2RFNrx1T4RLhVVFQCDi151Q5DCEpVAhrBFdqoaZP+P2sgig5trSDbgPvl1zS4GAb2NRRK0ZhsOwOimBcU0lritLjtyxsWJMfcv9u0ojjRpghmo8lgE0kNtkjaqCL0Gqf3HDXJ0/fAgVO9qAu8vjC3pqyQYEugWxr2bPl0ApPCcJFtOqfi3kZdL115HE+/7pPvlBwwMCqgHkLXMgTbQdvFDvGVumHDOyMeYG5dO4mAaPBTVO6nygvkdenR6pgL3b8KTwQsA9q5qD/e1aF9ZLcGKT0yDsQxQbgG4D/Q5uwJeNg1QPJpTz87fhaitZjvXjSGempZudysL91VsREXiWyrE+rmgJK0G90fZYPW1omA/eiB/3R2LSXqePpL59L+sojR4MJ1iYVhjEMMcbNztj+N96Pdqg+EufVobxLNpDitZnHE81TRyadkSd2vFKXTZKb/zKGq+4OEv3ibmSBO1QhgGRjJeA79hyrqzezwb/fY4OR1fzm3w2+l6HHS+5FgcToPhWXkvtZQhJA0AyDkgLpx41CTTxbhAj7obpNdFBxPaw76hpmMKGZdwdTmqG2MWXSBQ2lqSgM0O9
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(396003)(39860400002)(136003)(346002)(376002)(230922051799003)(230173577357003)(230273577357003)(451199024)(1800799012)(186009)(64100799003)(26005)(6506007)(1076003)(86362001)(38100700002)(83380400001)(4326008)(5660300002)(44832011)(7416002)(6512007)(9686003)(6666004)(6916009)(316002)(66946007)(8676002)(6486002)(8936002)(54906003)(66556008)(66476007)(2906002)(41300700001)(33716001)(478600001)(45080400002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?6Xs1Xq13eGdp3xcpNSB3Yyk55AEXo95fDwrue4g6hBWrbQT2TkvZlO/Jn5fV?=
+ =?us-ascii?Q?n912z9dQy2HfuGobofhixCRptQ8vkUARg/6b3AUKYSic1YuBW87GEb6MMUip?=
+ =?us-ascii?Q?9VWBkllUzzXq7UxewCFA61+OEIo4936k3PyU9yLLGJuJMiBB8Spe6UXVDL4P?=
+ =?us-ascii?Q?IniUQMfWYxoKElVs8xh087iTsqG1BnVJqfMdRurC4oSllEe45NSf7ga8Yk5e?=
+ =?us-ascii?Q?PEBvdT89KgX/rwxCICeTI25k51Q/jQlCVk0JBk/Op6lREQNVD2zJzsDzxlrX?=
+ =?us-ascii?Q?FrKwOA1oOZ07LMywYT/E9Ey9cW/wX1anYbxyqGs+fEfxQhaaWtVPbOqkPJ5O?=
+ =?us-ascii?Q?moyzqoFLQnBo4QjRkeTkqMS0oQbcuLnNrE08wVPmLItAMJYGi5Z+BUw6sgll?=
+ =?us-ascii?Q?fqnTbgYlXMmQHKy5/HwbdGTpD57RPXmemr8YwWdWl/v8IA7Q7lseiNNKkbGR?=
+ =?us-ascii?Q?9EElTcQ8CyJvsNjpUMtfx9aNjwe806E/X5m8ZJ5AoCFtsR2FAriJJ43rIdY0?=
+ =?us-ascii?Q?d/DOeemFz1Ic5EhLThnI+oZg6lP9oh9Hnm9ohqJGJ9PxAtO6p4ZpIwiitD2Z?=
+ =?us-ascii?Q?+kOTkz+axkYGgg98QkqKRY7PRBpB6MJjP8S2ZqQrIaQXxmpPTeZbKTYRskCm?=
+ =?us-ascii?Q?fp/RlhlMkC+eUV19v4U45OMmm1oBLYqgBc65rlLE/6l/Blom6qtrPQa/XKoj?=
+ =?us-ascii?Q?kwytYKWU1lVaP9U+ZRjkyFHJeazf2cH7zsyOUfFTBX55jRicxCukKg0b+RHP?=
+ =?us-ascii?Q?u3cogWNx2rJOFLRrAOcx9mzA4X57M4Nk/tgtjKVEckNLgiY/H+uUEtvZPKvi?=
+ =?us-ascii?Q?+Ow9jX2w7DxR3qMarU57YSRZcoKQTX187ar4jPM7RQGxGJuqfMJNYsZOhRoI?=
+ =?us-ascii?Q?nkxQIOgibID9FrjfUN/gx9p8oa6LXw1qXTyCAeZAvQRFXWwEJNbcOofz3Mgc?=
+ =?us-ascii?Q?KIw6Ngq9pkE9r6AGq8y9aRhj8KpaTBQvK6jlXdV5mLnbZlDxKNCK83yQqzDl?=
+ =?us-ascii?Q?H0r6uy4Jkspm56JkN5q4mXtGeC65WLxQYrCKuZcYQiKM+8+ro+wmJHxc9iIE?=
+ =?us-ascii?Q?83sk1hFk14lPH1jfYDpwzrlpT4GW1rTb94R2WUqznMLpd7fpjVjygLlaKNp3?=
+ =?us-ascii?Q?/XLS+sEXEeYfvbw0XprUvp3jmw/mof9T5xscvLt54gA/5abGEszLKT+fTSDb?=
+ =?us-ascii?Q?gDbX4gLqxMK1yCb+Pc4SZ7tElgnZTr+DlqPlYJ7vOm/mQ4Ex4Zrzk3tEV9rZ?=
+ =?us-ascii?Q?rJLMsK7nEXgOPZZcgtGJs9kvwmBIiCcqkzoi8zNb3d4ll6aZqGvktfWc/+Zs?=
+ =?us-ascii?Q?YDXvO5jFlkLlBw7eoHIh4+CJcpDUTmG+kDtrA3tqWhPga0+6VaTspFBsitBN?=
+ =?us-ascii?Q?EyOkUivqHOUYSTSiCLTxLmrfes3JaPNKR9mcqqL/Ra5IcEMIHlE/ro8sl+86?=
+ =?us-ascii?Q?f0Ti+8Qine3sVel2TmLhHuzKmgfQ03VlfWWd/aZZ/FJN8zV5UPyt6n0waeFE?=
+ =?us-ascii?Q?zxttb4sPjoCSUK9Yn8hmw2ZNmWpwXaqWYaSMUL1qXhgHN6Qs4cBL4FmSGm6u?=
+ =?us-ascii?Q?/BNQcu8VSnx0NqISM3t0PzNs7F3cbPvTO3XRwaF1euKUeDwKGuv0OgGXQUj/?=
+ =?us-ascii?Q?Lg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1bfc1dfc-ec51-499e-a7f8-08dbfdb72689
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2023 21:45:27.2991
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5ccs/ewb2ZZ134BcVDPn4SvIC0V5ANB5exj9my/Ju2x7FK9riueFxqidMCIS+dewwdyjWWfOTFyZsIIm1nFB5A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB8823
 
-Eric Dumazet <edumazet@google.com> writes:
+On Fri, Dec 15, 2023 at 06:12:23PM +0100, Maxime Chevallier wrote:
+> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+> index d8e9335d415c..89daaccc9276 100644
+> --- a/drivers/net/phy/phy_device.c
+> +++ b/drivers/net/phy/phy_device.c
+> @@ -1491,6 +1500,11 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
+>  
+>  		if (phydev->sfp_bus_attached)
+>  			dev->sfp_bus = phydev->sfp_bus;
+> +
+> +		err = phy_link_topo_add_phy(&dev->link_topo, phydev,
+> +					    PHY_UPSTREAM_MAC, dev);
+> +		if (err)
+> +			goto error;
+>  	}
+>  
+>  	/* Some Ethernet drivers try to connect to a PHY device before
+> @@ -1816,6 +1830,7 @@ void phy_detach(struct phy_device *phydev)
+>  	if (dev) {
+>  		phydev->attached_dev->phydev = NULL;
+>  		phydev->attached_dev = NULL;
+> +		phy_link_topo_del_phy(&dev->link_topo, phydev);
+>  	}
+>  	phydev->phylink = NULL;
+>  
+> diff --git a/drivers/net/phy/phy_link_topology.c b/drivers/net/phy/phy_link_topology.c
+> new file mode 100644
+> index 000000000000..22f6372d002c
+> --- /dev/null
+> +++ b/drivers/net/phy/phy_link_topology.c
+> +int phy_link_topo_add_phy(struct phy_link_topology *topo,
+> +			  struct phy_device *phy,
+> +			  enum phy_upstream upt, void *upstream)
+> +{
+> +	struct phy_device_node *pdn;
+> +	int ret;
+> +
+> +	/* Protects phy and upstream */
+> +	ASSERT_RTNL();
 
-> On Mon, Dec 4, 2023 at 10:45=E2=80=AFAM syzbot
-> <syzbot+45b67ef6e09a39a2cbcd@syzkaller.appspotmail.com> wrote:
->>
->> Hello,
->>
->> syzbot found the following issue on:
->>
->> HEAD commit:    753c8608f3e5 Merge tag 'for-netdev' of https://git.kerne=
-l...
->> git tree:       net-next
->> console output: https://syzkaller.appspot.com/x/log.txt?x=3D1381f352e800=
-00
->> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Df8715b6ede5c=
-4b90
->> dashboard link: https://syzkaller.appspot.com/bug?extid=3D45b67ef6e09a39=
-a2cbcd
->> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for =
-Debian) 2.40
->> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D15abc0e2e8=
-0000
->> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D10b0c7c2e800=
-00
->>
->> Downloadable assets:
->> disk image: https://storage.googleapis.com/syzbot-assets/17dd61ceadb9/di=
-sk-753c8608.raw.xz
->> vmlinux: https://storage.googleapis.com/syzbot-assets/fed6ba43d9bd/vmlin=
-ux-753c8608.xz
->> kernel image: https://storage.googleapis.com/syzbot-assets/3e68e49966d3/=
-bzImage-753c8608.xz
->>
->> The issue was bisected to:
->>
->> commit b5b73b26b3ca34574124ed7ae9c5ba8391a7f176
->> Author: Vinicius Costa Gomes <vinicius.gomes@intel.com>
->> Date:   Thu Sep 10 00:03:11 2020 +0000
->>
->>     taprio: Fix allowing too small intervals
->>
->> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D13b90672e=
-80000
->> final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D10790672e=
-80000
->> console output: https://syzkaller.appspot.com/x/log.txt?x=3D17b90672e800=
-00
->>
->> IMPORTANT: if you fix the issue, please add the following tag to the com=
-mit:
->> Reported-by: syzbot+45b67ef6e09a39a2cbcd@syzkaller.appspotmail.com
->> Fixes: b5b73b26b3ca ("taprio: Fix allowing too small intervals")
->>
->> rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
->> rcu:    0-...!: (2 GPs behind) idle=3D9444/0/0x3 softirq=3D6168/6168 fqs=
-=3D0
->> rcu:    (detected by 1, t=3D10504 jiffies, g=3D7341, q=3D186 ncpus=3D2)
->> Sending NMI from CPU 1 to CPUs 0:
->> NMI backtrace for cpu 0
->> CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.7.0-rc3-syzkaller-00666-g753=
-c8608f3e5 #0
->> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS =
-Google 11/10/2023
->> RIP: 0010:rcu_is_watching+0x7c/0xb0 kernel/rcu/tree.c:701
->> Code: 89 da 48 c1 ea 03 0f b6 14 02 48 89 d8 83 e0 07 83 c0 03 38 d0 7c =
-04 84 d2 75 1c 8b 03 c1 e8 02 83 e0 01 65 ff 0d fc d9 93 7e <74> 03 5b 5d c=
-3 e8 fa 9d 90 ff 5b 5d c3 48 89 df e8 bf 90 6e 00 eb
->> RSP: 0000:ffffc90000006b90 EFLAGS: 00000006
->> RAX: 0000000000000001 RBX: ffff8880b9836de8 RCX: ffffffff81680cf5
->> RDX: 0000000000000000 RSI: ffffffff8b2f1340 RDI: ffffffff8ca6ea60
->> RBP: 0000000000000000 R08: 0000000000000000 R09: fffffbfff1e31dea
->> R10: ffffffff8f18ef57 R11: 0000000000000004 R12: ffff8880b982b958
->> R13: 179cc057f149e962 R14: ffff88807627b340 R15: ffffffff88a26e60
->> FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:000000000000=
-0000
->> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> CR2: 00007f3bc135f410 CR3: 000000001ab22000 CR4: 00000000003506f0
->> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->> Call Trace:
->>  <NMI>
->>  </NMI>
->>  <IRQ>
->>  trace_lock_release include/trace/events/lock.h:69 [inline]
->>  lock_release+0x4bf/0x690 kernel/locking/lockdep.c:5765
->>  __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:149 [inli=
-ne]
->>  _raw_spin_unlock_irqrestore+0x1a/0x70 kernel/locking/spinlock.c:194
->>  __run_hrtimer kernel/time/hrtimer.c:1684 [inline]
->>  __hrtimer_run_queues+0x58b/0xc20 kernel/time/hrtimer.c:1752
->>  hrtimer_interrupt+0x31b/0x800 kernel/time/hrtimer.c:1814
->>  local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1065 [inline]
->>  __sysvec_apic_timer_interrupt+0x105/0x400 arch/x86/kernel/apic/apic.c:1=
-082
->>  sysvec_apic_timer_interrupt+0x43/0xb0 arch/x86/kernel/apic/apic.c:1076
->>  asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry=
-.h:645
->> RIP: 0010:unwind_get_return_address+0xa1/0xe0 arch/x86/kernel/unwind_orc=
-.c:369
->> Code: 00 31 ff 89 c5 89 c6 e8 8d 9d 4d 00 85 ed 74 b9 e8 14 a2 4d 00 4c =
-89 e2 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 80 3c 02 00 <75> 28 48 8b 5=
-b 48 e8 f4 a1 4d 00 48 89 d8 5b 5d 41 5c c3 48 89 df
->> RSP: 0000:ffffc90000006f08 EFLAGS: 00000246
->> RAX: dffffc0000000000 RBX: ffffc90000006f30 RCX: ffffffff8139f033
->> RDX: 1ffff92000000def RSI: ffffffff8139f03c RDI: 0000000000000005
->> RBP: 0000000000000001 R08: 0000000000000005 R09: 0000000000000000
->> R10: 0000000000000001 R11: 0000000000000003 R12: ffffc90000006f78
->> R13: ffffffff8174f4a0 R14: ffffc90000006ff0 R15: ffffffff8cc95900
->>  arch_stack_walk+0xbe/0x170 arch/x86/kernel/stacktrace.c:26
->>  stack_trace_save+0x96/0xd0 kernel/stacktrace.c:122
->>  kasan_save_stack+0x33/0x50 mm/kasan/common.c:45
->>  kasan_set_track+0x25/0x30 mm/kasan/common.c:52
->>  kasan_save_free_info+0x2b/0x40 mm/kasan/generic.c:522
->>  ____kasan_slab_free mm/kasan/common.c:236 [inline]
->>  ____kasan_slab_free+0x15b/0x1b0 mm/kasan/common.c:200
->>  kasan_slab_free include/linux/kasan.h:164 [inline]
->>  slab_free_hook mm/slub.c:1800 [inline]
->>  slab_free_freelist_hook+0x114/0x1e0 mm/slub.c:1826
->>  slab_free mm/slub.c:3809 [inline]
->>  kmem_cache_free+0xf8/0x350 mm/slub.c:3831
->>  kfree_skbmem+0xef/0x1b0 net/core/skbuff.c:1015
->>  tcp_rcv_established+0xd5f/0x20e0 net/ipv4/tcp_input.c:6065
->>  tcp_v4_do_rcv+0x68c/0xa10 net/ipv4/tcp_ipv4.c:1912
->>  tcp_v4_rcv+0x3892/0x3b40 net/ipv4/tcp_ipv4.c:2335
->>  ip_protocol_deliver_rcu+0x9f/0x480 net/ipv4/ip_input.c:205
->>  ip_local_deliver_finish+0x2e4/0x510 net/ipv4/ip_input.c:233
->>  NF_HOOK include/linux/netfilter.h:314 [inline]
->>  NF_HOOK include/linux/netfilter.h:308 [inline]
->>  ip_local_deliver+0x18e/0x1f0 net/ipv4/ip_input.c:254
->>  dst_input include/net/dst.h:461 [inline]
->>  ip_sublist_rcv_finish+0x99/0x2e0 net/ipv4/ip_input.c:580
->>  ip_list_rcv_finish.constprop.0+0x560/0x720 net/ipv4/ip_input.c:631
->>  ip_sublist_rcv net/ipv4/ip_input.c:639 [inline]
->>  ip_list_rcv+0x339/0x440 net/ipv4/ip_input.c:674
->>  __netif_receive_skb_list_ptype net/core/dev.c:5572 [inline]
->>  __netif_receive_skb_list_core+0x52c/0x8a0 net/core/dev.c:5620
->>  __netif_receive_skb_list net/core/dev.c:5672 [inline]
->>  netif_receive_skb_list_internal+0x769/0xe00 net/core/dev.c:5763
->>  gro_normal_list include/net/gro.h:439 [inline]
->>  gro_normal_list include/net/gro.h:435 [inline]
->>  napi_complete_done+0x23f/0x990 net/core/dev.c:6103
->>  virtqueue_napi_complete drivers/net/virtio_net.c:440 [inline]
->>  virtnet_poll+0xf4a/0x15d0 drivers/net/virtio_net.c:2158
->>  __napi_poll.constprop.0+0xb4/0x540 net/core/dev.c:6533
->>  napi_poll net/core/dev.c:6602 [inline]
->>  net_rx_action+0x956/0xe90 net/core/dev.c:6735
->>  __do_softirq+0x21a/0x8de kernel/softirq.c:553
->>  invoke_softirq kernel/softirq.c:427 [inline]
->>  __irq_exit_rcu kernel/softirq.c:632 [inline]
->>  irq_exit_rcu+0xb7/0x120 kernel/softirq.c:644
->>  common_interrupt+0xb0/0xd0 arch/x86/kernel/irq.c:247
->>  </IRQ>
->>  <TASK>
->>  asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:636
->> RIP: 0010:native_irq_disable arch/x86/include/asm/irqflags.h:37 [inline]
->> RIP: 0010:arch_local_irq_disable arch/x86/include/asm/irqflags.h:72 [inl=
-ine]
->> RIP: 0010:acpi_safe_halt+0x1b/0x20 drivers/acpi/processor_idle.c:113
->> Code: ed c3 66 66 2e 0f 1f 84 00 00 00 00 00 66 90 65 48 8b 04 25 c0 bc =
-03 00 48 8b 00 a8 08 75 0c 66 90 0f 00 2d b7 7b ba 00 fb f4 <fa> c3 0f 1f 0=
-0 0f b6 47 08 3c 01 74 0b 3c 02 74 05 8b 7f 04 eb 9f
->> RSP: 0000:ffffffff8cc07d68 EFLAGS: 00000246
->> RAX: 0000000000004000 RBX: 0000000000000001 RCX: ffffffff8a7fa837
->> RDX: 0000000000000001 RSI: ffff888014ebd800 RDI: ffff888014ebd864
->> RBP: ffff888014ebd864 R08: 0000000000000001 R09: ffffed1017306dbd
->> R10: ffff8880b9836deb R11: 0000000000000000 R12: ffff8881412c4000
->> R13: ffffffff8db1cf20 R14: 0000000000000000 R15: 0000000000000000
->>  acpi_idle_enter+0xc5/0x160 drivers/acpi/processor_idle.c:707
->>  cpuidle_enter_state+0x83/0x500 drivers/cpuidle/cpuidle.c:267
->>  cpuidle_enter+0x4e/0xa0 drivers/cpuidle/cpuidle.c:388
->>  cpuidle_idle_call kernel/sched/idle.c:215 [inline]
->>  do_idle+0x319/0x400 kernel/sched/idle.c:282
->>  cpu_startup_entry+0x50/0x60 kernel/sched/idle.c:380
->>  rest_init+0x16f/0x2b0 init/main.c:730
->>  arch_call_rest_init+0x13/0x30 init/main.c:827
->>  start_kernel+0x39f/0x480 init/main.c:1072
->>  x86_64_start_reservations+0x18/0x30 arch/x86/kernel/head64.c:555
->>  x86_64_start_kernel+0xb2/0xc0 arch/x86/kernel/head64.c:536
->>  secondary_startup_64_no_verify+0x166/0x16b
->>  </TASK>
->> INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 5.00=
-4 msecs
->> rcu: rcu_preempt kthread starved for 10504 jiffies! g7341 f0x0 RCU_GP_WA=
-IT_FQS(5) ->state=3D0x0 ->cpu=3D1
->> rcu:    Unless rcu_preempt kthread gets sufficient CPU time, OOM is now =
-expected behavior.
->> rcu: RCU grace-period kthread stack dump:
->> task:rcu_preempt     state:R  running task     stack:28752 pid:17    tgi=
-d:17    ppid:2      flags:0x00004000
->> Call Trace:
->>  <TASK>
->>  context_switch kernel/sched/core.c:5376 [inline]
->>  __schedule+0xedb/0x5af0 kernel/sched/core.c:6688
->>  __schedule_loop kernel/sched/core.c:6763 [inline]
->>  schedule+0xe9/0x270 kernel/sched/core.c:6778
->>  schedule_timeout+0x137/0x290 kernel/time/timer.c:2167
->>  rcu_gp_fqs_loop+0x1ec/0xb10 kernel/rcu/tree.c:1631
->>  rcu_gp_kthread+0x24b/0x380 kernel/rcu/tree.c:1830
->>  kthread+0x2c6/0x3a0 kernel/kthread.c:388
->>  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
->>  ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
->>  </TASK>
->> rcu: Stack dump where RCU GP kthread last ran:
->> CPU: 1 PID: 5093 Comm: syz-executor163 Not tainted 6.7.0-rc3-syzkaller-0=
-0666-g753c8608f3e5 #0
->> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS =
-Google 11/10/2023
->> RIP: 0010:kvm_wait+0x146/0x180 arch/x86/kernel/kvm.c:1062
->> Code: 5b 5d 41 5c 41 5d e9 c9 34 4e 00 e8 c4 34 4e 00 e8 8f ed 54 00 66 =
-90 e8 b8 34 4e 00 0f 00 2d 41 5a 90 09 e8 ac 34 4e 00 fb f4 <5b> 5d 41 5c 4=
-1 5d e9 9f 34 4e 00 e8 9a 34 4e 00 e8 d5 ed 54 00 e9
->> RSP: 0018:ffffc900001f0ae0 EFLAGS: 00000246
->> RAX: 0000000000000000 RBX: 0000000000000003 RCX: 1ffffffff23ec48c
->> RDX: ffff888076299dc0 RSI: ffffffff81395da4 RDI: ffffffff8b2f13c0
->> RBP: ffff88807e768098 R08: 0000000000000001 R09: fffffbfff23e29e7
->> R10: ffffffff91f14f3f R11: 0000000000000002 R12: 0000000000000003
->> R13: 0000000000000003 R14: 0000000000000000 R15: ffffed100fced013
->> FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:000000000000=
-0000
->> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> CR2: 00007f3bc14032d0 CR3: 000000007af32000 CR4: 00000000003506f0
->> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->> Call Trace:
->>  <IRQ>
->>  pv_wait arch/x86/include/asm/paravirt.h:598 [inline]
->>  pv_wait_head_or_lock kernel/locking/qspinlock_paravirt.h:470 [inline]
->>  __pv_queued_spin_lock_slowpath+0x959/0xc70 kernel/locking/qspinlock.c:5=
-11
->>  pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:586 [inlin=
-e]
->>  queued_spin_lock_slowpath arch/x86/include/asm/qspinlock.h:51 [inline]
->>  queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
->>  do_raw_spin_lock+0x20e/0x2b0 kernel/locking/spinlock_debug.c:115
->>  spin_lock include/linux/spinlock.h:351 [inline]
->>  tcp_write_timer+0x2a/0x2b0 net/ipv4/tcp_timer.c:708
->>  call_timer_fn+0x193/0x590 kernel/time/timer.c:1700
->>  expire_timers kernel/time/timer.c:1751 [inline]
->>  __run_timers+0x764/0xb20 kernel/time/timer.c:2022
->>  run_timer_softirq+0x58/0xd0 kernel/time/timer.c:2035
->>  __do_softirq+0x21a/0x8de kernel/softirq.c:553
->>  invoke_softirq kernel/softirq.c:427 [inline]
->>  __irq_exit_rcu kernel/softirq.c:632 [inline]
->>  irq_exit_rcu+0xb7/0x120 kernel/softirq.c:644
->>  sysvec_apic_timer_interrupt+0x95/0xb0 arch/x86/kernel/apic/apic.c:1076
->>  </IRQ>
->>  <TASK>
->>  asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry=
-.h:645
->> RIP: 0010:csd_lock_wait kernel/smp.c:311 [inline]
->> RIP: 0010:smp_call_function_many_cond+0x4e4/0x1550 kernel/smp.c:855
->> Code: 0b 00 85 ed 74 4d 48 b8 00 00 00 00 00 fc ff df 4d 89 f4 4c 89 f5 =
-49 c1 ec 03 83 e5 07 49 01 c4 83 c5 03 e8 8e c0 0b 00 f3 90 <41> 0f b6 04 2=
-4 40 38 c5 7c 08 84 c0 0f 85 24 0e 00 00 8b 43 08 31
->> RSP: 0018:ffffc90003bffa48 EFLAGS: 00000293
->> RAX: 0000000000000000 RBX: ffff8880b98441a0 RCX: ffffffff817bd1e8
->> RDX: ffff888076299dc0 RSI: ffffffff817bd1c2 RDI: 0000000000000005
->> RBP: 0000000000000003 R08: 0000000000000005 R09: 0000000000000000
->> R10: 0000000000000001 R11: 0000000000000001 R12: ffffed1017308835
->> R13: 0000000000000001 R14: ffff8880b98441a8 R15: ffff8880b993d8c0
->>  on_each_cpu_cond_mask+0x40/0x90 kernel/smp.c:1023
->>  __flush_tlb_multi arch/x86/include/asm/paravirt.h:87 [inline]
->>  flush_tlb_multi arch/x86/mm/tlb.c:944 [inline]
->>  flush_tlb_mm_range+0x28f/0x320 arch/x86/mm/tlb.c:1030
->>  tlb_flush arch/x86/include/asm/tlb.h:20 [inline]
->>  tlb_flush_mmu_tlbonly include/asm-generic/tlb.h:458 [inline]
->>  tlb_flush_mmu_tlbonly include/asm-generic/tlb.h:448 [inline]
->>  tlb_flush_mmu mm/mmu_gather.c:299 [inline]
->>  tlb_finish_mmu+0x335/0x6f0 mm/mmu_gather.c:392
->>  exit_mmap+0x38b/0xa70 mm/mmap.c:3321
->>  __mmput+0x12a/0x4d0 kernel/fork.c:1349
->>  mmput+0x62/0x70 kernel/fork.c:1371
->>  exit_mm kernel/exit.c:567 [inline]
->>  do_exit+0x9ad/0x2ae0 kernel/exit.c:858
->>  do_group_exit+0xd4/0x2a0 kernel/exit.c:1021
->>  __do_sys_exit_group kernel/exit.c:1032 [inline]
->>  __se_sys_exit_group kernel/exit.c:1030 [inline]
->>  __x64_sys_exit_group+0x3e/0x50 kernel/exit.c:1030
->>  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
->>  do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
->>  entry_SYSCALL_64_after_hwframe+0x63/0x6b
->> RIP: 0033:0x7f3bc13802e9
->> Code: Unable to access opcode bytes at 0x7f3bc13802bf.
->> RSP: 002b:00007ffde3662848 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
->> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f3bc13802e9
->> RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000000
->> RBP: 00007f3bc1400390 R08: ffffffffffffffb8 R09: 0000000100000000
->> R10: 0000000000000000 R11: 0000000000000246 R12: 00007f3bc1400390
->> R13: 0000000000000000 R14: 00007f3bc1402ec0 R15: 00007f3bc13507c0
->>  </TASK>
->>
->>
->> ---
->> This report is generated by a bot. It may contain errors.
->> See https://goo.gl/tpsmEJ for more information about syzbot.
->> syzbot engineers can be reached at syzkaller@googlegroups.com.
->>
->> syzbot will keep track of this issue. See:
->> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->> For information about bisection process see: https://goo.gl/tpsmEJ#bisec=
-tion
->>
->> If the report is already addressed, let syzbot know by replying with:
->> #syz fix: exact-commit-title
->>
->> If you want syzbot to run the reproducer, reply with:
->> #syz test: git://repo/address.git branch-or-commit-hash
->> If you attach or paste a git patch, syzbot will apply it before testing.
->>
->> If you want to overwrite report's subsystems, reply with:
->> #syz set subsystems: new-subsystem
->> (See the list of subsystem names on the web dashboard)
->>
->> If the report is a duplicate of another one, reply with:
->> #syz dup: exact-subject-of-another-report
->>
->> If you want to undo deduplication, reply with:
->> #syz undup
->
-> FYI : Many other syzbot reports are pointing to taprio these days.
->
+Something to think for the PHY library maintainers. This is probably
+the first time when the rtnl_lock() requirement is asserted at
+phy_attach_direct() time.
 
-I know, it's bothering me a lot, really.
+I haven't done too much with the patch set yet, so I don't understand
+exactly from the comment what this is protecting. But I get the
+following assertion failure with DSA:
 
-I'll investigate this one a bit better, and see if I can come up with
-a fix for the short term.
+[    4.157160] ------------[ cut here ]------------
+[    4.161805] RTNL: assertion failed at drivers/net/phy/phy_link_topology.c (35)
+[    4.169124] WARNING: CPU: 0 PID: 26 at drivers/net/phy/phy_link_topology.c:35 phy_link_topo_add_phy+0x128/0x130
+[    4.179263] Modules linked in:
+[    4.209232] pc : phy_link_topo_add_phy+0x128/0x130
+[    4.214040] lr : phy_link_topo_add_phy+0x128/0x130
+[    4.293822] Call trace:
+[    4.296271]  phy_link_topo_add_phy+0x128/0x130
+[    4.300730]  phy_attach_direct+0xbc/0x3c4
+[    4.304752]  phylink_fwnode_phy_connect+0xa8/0xf8
+[    4.309473]  phylink_of_phy_connect+0x1c/0x28
+[    4.313844]  dsa_user_create+0x318/0x5ac
+[    4.317778]  dsa_port_setup+0x100/0x144
+[    4.321626]  dsa_register_switch+0xe90/0x11f8
+[    4.325997]  sja1105_probe+0x2bc/0x2e4
+[    4.329759]  spi_probe+0xa4/0xc4
+[    4.332995]  really_probe+0x16c/0x3fc
+[    4.336669]  __driver_probe_device+0xa4/0x168
+[    4.341041]  driver_probe_device+0x3c/0x220
+[    4.345238]  __device_attach_driver+0x128/0x1cc
+[    4.349784]  bus_for_each_drv+0xf4/0x14c
+[    4.353719]  __device_attach+0xfc/0x1bc
+[    4.357567]  device_initial_probe+0x14/0x20
+[    4.361764]  bus_probe_device+0x94/0x100
+[    4.385371] ---[ end trace 0000000000000000 ]---
 
-For the long term, I am thinking that the solution is to re-write the
-taprio software mode "engine" to not be 'hrtimer' dependent. And it will
-have the advantage that I would be able to unify some of the code for
-"txtime-assisted mode" and software mode, i.e. the "get the schedule
-entry for a particular time" function will be the used for both.
+Someone please correct me if I'm wrong, but at least up until now, calling
+this unlocked has been quite harmless, because we call dsa_user_phy_setup()
+before register_netdevice(), and thus, the net_device is pretty much
+inaccessible to the world when we attach it to the PHY.
 
-> In a3d43c0d56f1b94e74963a2fbadfb70126d92213 ("taprio: Add support
-> adding an admin schedule"),
-> advance_sched() was changed to call switch_schedules(q, &admin, &oper);
->
-> This is done while qdisc spinlock is not held, I fail to see how this
-> can work safely ?
->
+And, while having the phydev->attached_dev pointer populated technically
+makes the net_device now accessible from the PHY, this is a moot point,
+because no user space command targets the PHY directly. They all target
+the netdev, and through that, netdev->phydev. The netdev is still
+unregistered, so it's ok to not have rtnl_lock().
 
-I took a look at the code at a3d43c0d56f1b94e74963a2fbadfb70126d92213
-point, there are two calls to switch_schedules() and both calls to
-switch_schedules() (both in advance_sched()) are done with the lock held
-(q->current_entry_lock). Am I missing anything?
+It is rather going to be something that concerns those drivers which call
+phy_attach_direct() after registering, for example from ndo_open().
 
-But the situation in the current code is definitely worse, I admit,
-there are two additional calls to switch_schedules(), one in
-get_packet_txtime() and one in taprio_offload_config_changed(), these
-are done without the lock, but in these modes the hrtimer isn't running.
+Interestingly, phylink_disconnect_phy() has an ASSERT_RTNL() in it
+even though the phylink_attach_phy() derivatives do not. I'm unable
+to ascertain whether a previous unregister_netdevice() call makes this
+requirement redundant or not.
 
-I will send a patch fixing this, adding locking for those two extra
-cases as well.
-
-> Which lock is supposed to protect q->oper_sched and q->admin_sched ?
->
-> This can not be q->current_entry_lock in some cases, and qdisc lock in ot=
-hers.
->
-
-It should have been q->current_entry_lock.
-
-
-Cheers,
---=20
-Vinicius
+> +
+> +	pdn = kzalloc(sizeof(*pdn), GFP_KERNEL);
+> +	if (!pdn)
+> +		return -ENOMEM;
+> +
+> +	pdn->phy = phy;
+> +	switch (upt) {
+> +	case PHY_UPSTREAM_MAC:
+> +		pdn->upstream.netdev = (struct net_device *)upstream;
+> +		if (phy_on_sfp(phy))
+> +			pdn->parent_sfp_bus = pdn->upstream.netdev->sfp_bus;
+> +		break;
+> +	case PHY_UPSTREAM_PHY:
+> +		pdn->upstream.phydev = (struct phy_device *)upstream;
+> +		if (phy_on_sfp(phy))
+> +			pdn->parent_sfp_bus = pdn->upstream.phydev->sfp_bus;
+> +		break;
+> +	default:
+> +		ret = -EINVAL;
+> +		goto err;
+> +	}
+> +	pdn->upstream_type = upt;
+> +
+> +	ret = xa_alloc_cyclic(&topo->phys, &phy->phyindex, pdn, xa_limit_32b,
+> +			      &topo->next_phy_index, GFP_KERNEL);
+> +	if (ret)
+> +		goto err;
+> +
+> +	return 0;
+> +
+> +err:
+> +	kfree(pdn);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(phy_link_topo_add_phy);
 
