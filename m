@@ -1,87 +1,104 @@
-Return-Path: <netdev+bounces-57845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02D488144E9
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 10:55:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 38D90814500
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 10:59:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 959371F24201
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 09:55:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CED351F227AE
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 09:59:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5517618AF4;
-	Fri, 15 Dec 2023 09:55:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74C4618B04;
+	Fri, 15 Dec 2023 09:59:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="anZH1k01"
 X-Original-To: netdev@vger.kernel.org
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5939C18AEE;
-	Fri, 15 Dec 2023 09:55:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1rE4uM-0002VP-Tt; Fri, 15 Dec 2023 10:55:03 +0100
-Message-ID: <cdf72778-a314-467d-8ac8-163d2007fd70@leemhuis.info>
-Date: Fri, 15 Dec 2023 10:55:05 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0044518AF9;
+	Fri, 15 Dec 2023 09:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 06B82240004;
+	Fri, 15 Dec 2023 09:59:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1702634372;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yExJ2o/kc8OLXIlEOTC2J4B49akJNkoaJGJOI+Bu0FI=;
+	b=anZH1k01slCSYKb4V1xZMlexTsV75XZ5Aka0I6oA6yhuAq38LsOora95YD8h0Stu6dgxxN
+	1hHFB1NUUAkctIBJ1r7ufRMIfsnAVMoJcUIMTNw4QQN5bVSTamR+BZH+rNsZY7hDmVsbfo
+	cPTnLkRcJQS0LeeYKDDU3UH+6gS6dDGIItYCJGd8greNpvep2cUyI3LxSNM+yR7dDqHpnO
+	I06jXnrzEmr5Rum39s6+z1V02ZU1J0vapuAtnwFASq4IcbVCPz5qufSgWoqWho24aPM3Of
+	l0CH0XnFfo8awZNH9fTI6c8KTSjsjqEX5he9TMpKELzNdTlbQ3lg0k/5OtQ4hw==
+Date: Fri, 15 Dec 2023 10:59:28 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Paolo Abeni
+ <pabeni@redhat.com>, Daniel Golle <daniel@makrotopia.org>, Heiner Kallweit
+ <hkallweit1@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: phy: skip LED triggers on PHYs on SFP modules
+Message-ID: <20231215105928.74608001@device-28.home>
+In-Reply-To: <37a66b85-3980-4553-8447-d040404bbc11@lunn.ch>
+References: <102a9dce38bdf00215735d04cd4704458273ad9c.1702339354.git.daniel@makrotopia.org>
+	<20231212153512.67a7a35b@device.home>
+	<ec909d14-e571-4a50-926d-fbef4f4f9e0a@lunn.ch>
+	<ZXnNYJer0JrJxOsl@shell.armlinux.org.uk>
+	<ZXn_id6-XWYr2Seo@makrotopia.org>
+	<6dd8d8b62d6db979d6c2197a4091ebc768e6610a.camel@redhat.com>
+	<ZXsyt+msigtNiLN9@shell.armlinux.org.uk>
+	<37a66b85-3980-4553-8447-d040404bbc11@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Subject: Re: Bug report connect to VM with Vagrant
-Content-Language: en-US, de-DE
-To: Eric Dumazet <edumazet@google.com>, Shachar Kagan <skagan@nvidia.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "kuba@kernel.org" <kuba@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
- Yishai Hadas <yishaih@nvidia.com>, Ido Kalir <idok@nvidia.com>,
- Topaz Uliel <topazu@nvidia.com>, Shirly Ohnona <shirlyo@nvidia.com>,
- Ziyad Atiyyeh <ziyadat@nvidia.com>
-References: <MN2PR12MB44863139E562A59329E89DBEB982A@MN2PR12MB4486.namprd12.prod.outlook.com>
- <CANn89iKvG5cTNROyBF32958BzATfXysh4zLk5nRR6fgi08vumA@mail.gmail.com>
- <MN2PR12MB4486457FC77205D246FC834AB98BA@MN2PR12MB4486.namprd12.prod.outlook.com>
- <CANn89i+e2TcvSU1EgrVZRUoEmZ5NDauXd3=kEkjpsGjmaypHOw@mail.gmail.com>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-In-Reply-To: <CANn89i+e2TcvSU1EgrVZRUoEmZ5NDauXd3=kEkjpsGjmaypHOw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1702634106;f996b060;
-X-HE-SMSGID: 1rE4uM-0002VP-Tt
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On 08.12.23 11:49, Eric Dumazet wrote:
-> On Thu, Dec 7, 2023 at 2:03 PM Shachar Kagan <skagan@nvidia.com> wrote:
->>>> On Thu, Nov 30, 2023 at 2:55 PM Shachar Kagan <skagan@nvidia.com> wrote:
->>>>
->>>> I have an issue that bisection pointed at this patch:
->>>> commit 0a8de364ff7a14558e9676f424283148110384d6
->>>> tcp: no longer abort SYN_SENT when receiving some ICMP
->>>
->>> Please provide tcpdump/pcap captures.
->>>
->>>  It is hard to say what is going on just by looking at some application logs.
->>
->> I managed to capture the tcpdump of ‘Vagrant up’ step over old kernel and new kernel where this step fails. Both captures are attached.
->> The tcpdump is filtered by given IP of the nested VM.
+Hi Andrew,
+
+On Fri, 15 Dec 2023 10:46:18 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
+
+> > I disagree with that - analysing the locking and coming up with a fix
+> > is likely going to be a lengthy affair, meanwhile the mainline kernel
+> > will deadlock on this. This patch prevents that deadlock at the
+> > expense of removing the LED triggers for the PHY-on-SFP which I don't
+> > think is a big deal considering the age of the PHY-based LED triggers.
+> > 
+> > So I personally would prefer this patch to be merged while a
+> > different solution (that we have little idea at this point what it
+> > would look like) is sought.  
+
+I would agree, I feel bad about delaying it , although as Daniel
+mentioned it's indeed the trigger registration that gets skipped.
+ 
+> So, if i'm reading this patch correctly, it only affects PHYs within
+> SFPs.
 > 
-> I do not see any ICMP messages in these files, can you get them ?
-> 
-> Feel free to continue this exchange privately, no need to send MB
-> email to various lists.
+> The discussion went off on a tangent and also talked about media
+> converter PHYs, but from my reading of this patch, they are unaffected
+> by this patch. Do they however also suffer from this deadlock? Anybody
+> tested that?
 
-Here this thread died, so I assume this turned out to be not a
-regression at all or something like that? If not please speak up!
+I can give it a try today (in a few hours probably, I'm experiencing
+a power outage right now...) and make sure the issue doesn't occur with
+media converter PHYs.
 
-#regzbot inconclusive: radio silence
+Maxime
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-If I did something stupid, please tell me, as explained on that page.
+>      Andrew
+
 
