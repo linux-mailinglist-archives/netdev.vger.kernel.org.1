@@ -1,130 +1,216 @@
-Return-Path: <netdev+bounces-57901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A74B81473F
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 12:47:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93115814742
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 12:49:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF012B20E8E
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:47:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C52771C22E84
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:49:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69076250F3;
-	Fri, 15 Dec 2023 11:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 625C0250F3;
+	Fri, 15 Dec 2023 11:49:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OCsZhha1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oPD02VnO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B572724B57
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 11:47:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702640846;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PV5PO6XaRHGl6j8FZmI00SMb/OM7VurjhwlFY4KX9Mw=;
-	b=OCsZhha1gWDGBjMZcvdZEw5OZC5ZyDUjF0dDV6yjq78s2zjW0xpXa0frPsdFnRODieWMos
-	zdrSXaLNaZ49U/8v2fRlz/6dSH6lOakc/K6JfCEDp1A76UepyWOMl4CwBphPXEYjrQth6o
-	0QVSpo9OVAPJnnNh8pDEJlnmmrifdhc=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-43-Fy9xKDx0PsaPJBo8inMI2g-1; Fri, 15 Dec 2023 06:47:25 -0500
-X-MC-Unique: Fy9xKDx0PsaPJBo8inMI2g-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a1ef5c7f80cso12076666b.1
-        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 03:47:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702640844; x=1703245644;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PV5PO6XaRHGl6j8FZmI00SMb/OM7VurjhwlFY4KX9Mw=;
-        b=wpcKlWMWCAu8gmQmK6l5GMRmpVym240oDFAzOogV6v6ludCb1km1z/mq9S8jRSYykR
-         Mfd6Xo1bMPjyd1TdTkpY/qAFpHFJWlNuBbFLpLKLlC1sz9oBWUgeDfuRmgddZEmhJXiP
-         4Y8TJXvraSKrUtvkGLZ2eMS36px5TlhoQdPnxfCPKNBplxOd/YrW1eQ87QSzJnlm6IRk
-         Mopzn6imvuFroGWEfn7v/W7JpUXaUzIhB0CDVEswLcNJnMkJ8RTMR+vW2/fTWIKW1bJ1
-         lPR5GGMj0NYLeUpJoQqGTL3ytmV3VAB/sJgR9hQjoFk6IjEbRAVZfhKAGEg46m0QeDct
-         Aiqg==
-X-Gm-Message-State: AOJu0Yz8V4PMfMWuGqEKkzrvRTK8doOmb78UZaH7ycg4kBruVKL221Ha
-	11MB/xjEAwCOXYqwpx7WygduKoEpxKKWcs6JfgUZ1foKFWtov+M0ojyr+Hz3TdbKDgY92HjnYy5
-	ZLflEW8uFDrmi4mFe
-X-Received: by 2002:a17:907:c003:b0:a1d:6d:1392 with SMTP id ss3-20020a170907c00300b00a1d006d1392mr13164558ejc.1.1702640843996;
-        Fri, 15 Dec 2023 03:47:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFPygyxbOj1lWrl7m8EK2d8BmH++5xkgLBF6oVmiERRiUftAoRmP26PffAgucb8v5DeVeZkxw==
-X-Received: by 2002:a17:907:c003:b0:a1d:6d:1392 with SMTP id ss3-20020a170907c00300b00a1d006d1392mr13164546ejc.1.1702640843656;
-        Fri, 15 Dec 2023 03:47:23 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-255-162.dyn.eolo.it. [146.241.255.162])
-        by smtp.gmail.com with ESMTPSA id so7-20020a170907390700b00a1f747f762asm9976547ejc.112.2023.12.15.03.47.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Dec 2023 03:47:23 -0800 (PST)
-Message-ID: <340b7306b5adbdba468c1cf719c912cbeeb12df6.camel@redhat.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 0/5] iavf: Add devlink and
- devlink rate support'
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, anthony.l.nguyen@intel.com, 
- intel-wired-lan@lists.osuosl.org, qi.z.zhang@intel.com, Wenjun Wu
- <wenjun1.wu@intel.com>, maxtram95@gmail.com, "Chittim, Madhu"
- <madhu.chittim@intel.com>, "Samudrala, Sridhar"
- <sridhar.samudrala@intel.com>,  Simon Horman <simon.horman@redhat.com>
-Date: Fri, 15 Dec 2023 12:47:21 +0100
-In-Reply-To: <7b0c2e0132b71b131fc9a5407abd27bc0be700ee.camel@redhat.com>
-References: <20230727021021.961119-1-wenjun1.wu@intel.com>
-	 <20230822034003.31628-1-wenjun1.wu@intel.com> <ZORRzEBcUDEjMniz@nanopsycho>
-	 <20230822081255.7a36fa4d@kernel.org> <ZOTVkXWCLY88YfjV@nanopsycho>
-	 <0893327b-1c84-7c25-d10c-1cc93595825a@intel.com>
-	 <ZOcBEt59zHW9qHhT@nanopsycho>
-	 <5aed9b87-28f8-f0b0-67c4-346e1d8f762c@intel.com>
-	 <bdb0137a-b735-41d9-9fea-38b238db0305@intel.com>
-	 <20231118084843.70c344d9@kernel.org>
-	 <3d60fabf-7edf-47a2-9b95-29b0d9b9e236@intel.com>
-	 <20231122192201.245a0797@kernel.org>
-	 <e662dca5-84e4-4f7b-bfa3-50bce30c697c@intel.com>
-	 <20231127174329.6dffea07@kernel.org>
-	 <55e51b97c29894ebe61184ab94f7e3d8486e083a.camel@redhat.com>
-	 <20231214174604.1ca4c30d@kernel.org>
-	 <7b0c2e0132b71b131fc9a5407abd27bc0be700ee.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4865024B52
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 11:49:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64740C433C7;
+	Fri, 15 Dec 2023 11:49:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702640983;
+	bh=9ZZ9pO+YZPFZrj/cpV6/L1X+dL6XlkD9xAXgSvhyXQ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oPD02VnO8hnpYa1PMeVsniaCeEa0jwPJsyQTGfjzn1/Pw+QpycytRq091fnSwkEnz
+	 cdQz1qcPE+/V6UhP7u+bHGKP0QDTkq0O/EzqHSBs6/CpJDED6tRng8PeRKYSYKiGTA
+	 1czKWvU9LlrADqvsF2EGdq7JHh972EJOpZeUYQpgaXQCYFyKDKAMPz8NW4z+diIBBE
+	 KR8byVJgG0LBktmAb+5LkIr8Y1f80oHCk0tBaq8y3ASGEY2nTMoBu2yukQnPlHEVix
+	 q22kAeKVCIUt2frsZaUQcCTufWNCJSpWTzik7qutqCJSQa4A52zOQFhkpAWtQrfsAa
+	 zMIlTjrBl+8tw==
+Date: Fri, 15 Dec 2023 11:49:39 +0000
+From: Simon Horman <horms@kernel.org>
+To: Ioana Ciornei <ioana.ciornei@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 6/8] dpaa2-switch: reorganize the
+ [pre]changeupper events
+Message-ID: <20231215114939.GB6288@kernel.org>
+References: <20231213121411.3091597-1-ioana.ciornei@nxp.com>
+ <20231213121411.3091597-7-ioana.ciornei@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231213121411.3091597-7-ioana.ciornei@nxp.com>
 
-On Fri, 2023-12-15 at 12:06 +0100, Paolo Abeni wrote:
-> 1) AFAICS devlink (and/or devlink_port) does not have fine grained, per
-> queue representation and intel want to be able to configure shaping on
-> per queue basis. I think/hope we don't want to bring the discussion to
-> extending the devlink interface with queue support, I fear that will
-> block us for a long time. Perhaps I=E2=80=99m missing or misunderstanding
-> something here. Otherwise in retrospect this looks like a reasonable
-> point to completely avoid devlink here.
+On Wed, Dec 13, 2023 at 02:14:09PM +0200, Ioana Ciornei wrote:
+> Create separate functions, dpaa2_switch_port_prechangeupper and
+> dpaa2_switch_port_changeupper, to be called directly when a DPSW port
+> changes its upper device.
+> 
+> This way we are not open-coding everything in the main event callback
+> and we can easily extent when necessary.
+> 
+> Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
+> ---
+> Changes in v2:
+> - none
+> 
+>  .../ethernet/freescale/dpaa2/dpaa2-switch.c   | 76 +++++++++++++------
+>  1 file changed, 52 insertions(+), 24 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+> index d9906573f71f..58c0baee2d61 100644
+> --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+> +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+> @@ -2180,51 +2180,79 @@ dpaa2_switch_prechangeupper_sanity_checks(struct net_device *netdev,
+>  	return 0;
+>  }
+>  
+> -static int dpaa2_switch_port_netdevice_event(struct notifier_block *nb,
+> -					     unsigned long event, void *ptr)
+> +static int dpaa2_switch_port_prechangeupper(struct net_device *netdev,
+> +					    struct netdev_notifier_changeupper_info *info)
+>  {
+> -	struct net_device *netdev = netdev_notifier_info_to_dev(ptr);
+> -	struct netdev_notifier_changeupper_info *info = ptr;
+>  	struct netlink_ext_ack *extack;
+>  	struct net_device *upper_dev;
+>  	int err = 0;
 
-Note to self: never send a message to the ML before my 3rd morning
-coffee.
+nit: I don't think that err needs to be initialised here.
 
-This thread started with Intel trying to using devlink rate for their
-use-case, apparently slamming my doubt above.
+>  
+>  	if (!dpaa2_switch_port_dev_check(netdev))
+> -		return NOTIFY_DONE;
+> +		return 0;
+>  
+>  	extack = netdev_notifier_info_to_extack(&info->info);
+> -
+> -	switch (event) {
+> -	case NETDEV_PRECHANGEUPPER:
+> -		upper_dev = info->upper_dev;
+> -		if (!netif_is_bridge_master(upper_dev))
+> -			break;
+> -
+> +	upper_dev = info->upper_dev;
+> +	if (netif_is_bridge_master(upper_dev)) {
+>  		err = dpaa2_switch_prechangeupper_sanity_checks(netdev,
+>  								upper_dev,
+>  								extack);
+>  		if (err)
+> -			goto out;
+> +			return err;
+>  
+>  		if (!info->linking)
+>  			dpaa2_switch_port_pre_bridge_leave(netdev);
+> +	}
 
-My understanding is that in the patches the queue devlink <> queue
-relationship was kept inside the driver and not exposed to the devlink
-level.
+FWIIW, I think that a more idomatic flow would be to return if
+netif_is_bridge_master() is false. Something like this (completely untested!):
 
-If we want to use the devlink rate api to replace e.g.
-ndo_set_tx_maxrate, we would need a devlink queue(id) or the like,
-hence this point.
+	if (!netif_is_bridge_master(upper_dev))
+		return 0;
 
-Cheer,
+	err = dpaa2_switch_prechangeupper_sanity_checks(netdev, upper_dev,
+							extack);
+	if (err)
+		return err;
 
-Paolo
+	if (!info->linking)
+		dpaa2_switch_port_pre_bridge_leave(netdev);
 
+> +
+> +	return 0;
+> +}
+> +
+> +static int dpaa2_switch_port_changeupper(struct net_device *netdev,
+> +					 struct netdev_notifier_changeupper_info *info)
+> +{
+> +	struct netlink_ext_ack *extack;
+> +	struct net_device *upper_dev;
+> +	int err = 0;
+
+nit: I don't think err is needed in this function it's value never changes.
+
+> +
+> +	if (!dpaa2_switch_port_dev_check(netdev))
+> +		return 0;
+> +
+> +	extack = netdev_notifier_info_to_extack(&info->info);
+> +
+> +	upper_dev = info->upper_dev;
+> +	if (netif_is_bridge_master(upper_dev)) {
+> +		if (info->linking)
+> +			return dpaa2_switch_port_bridge_join(netdev,
+> +							     upper_dev,
+> +							     extack);
+> +		else
+> +			return dpaa2_switch_port_bridge_leave(netdev);
+> +	}
+> +
+> +	return err;
+> +}
+
+In a similar vein to my comment above, FWIIW, I would have
+gone for something more like this (completely untested!).
+
+	if (!netif_is_bridge_master(upper_dev))
+		return 0;
+
+	if (info->linking)
+		return dpaa2_switch_port_bridge_join(netdev, upper_dev,
+						     extack);
+
+	return dpaa2_switch_port_bridge_leave(netdev);
+
+> +
+> +static int dpaa2_switch_port_netdevice_event(struct notifier_block *nb,
+> +					     unsigned long event, void *ptr)
+> +{
+> +	struct net_device *netdev = netdev_notifier_info_to_dev(ptr);
+> +	int err = 0;
+> +
+> +	switch (event) {
+> +	case NETDEV_PRECHANGEUPPER:
+> +		err = dpaa2_switch_port_prechangeupper(netdev, ptr);
+> +		if (err)
+> +			return notifier_from_errno(err);
+>  
+>  		break;
+>  	case NETDEV_CHANGEUPPER:
+> -		upper_dev = info->upper_dev;
+> -		if (netif_is_bridge_master(upper_dev)) {
+> -			if (info->linking)
+> -				err = dpaa2_switch_port_bridge_join(netdev,
+> -								    upper_dev,
+> -								    extack);
+> -			else
+> -				err = dpaa2_switch_port_bridge_leave(netdev);
+> -		}
+> +		err = dpaa2_switch_port_changeupper(netdev, ptr);
+> +		if (err)
+> +			return notifier_from_errno(err);
+> +
+>  		break;
+>  	}
+>  
+> -out:
+> -	return notifier_from_errno(err);
+> +	return NOTIFY_DONE;
+>  }
+>  
+>  struct ethsw_switchdev_event_work {
+> -- 
+> 2.34.1
+> 
 
