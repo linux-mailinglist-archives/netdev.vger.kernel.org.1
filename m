@@ -1,224 +1,113 @@
-Return-Path: <netdev+bounces-57933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 147438148B9
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:06:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BEA48148DB
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:15:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37A581C22A63
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 13:06:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C37DC1F249D5
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 13:15:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E9B72D033;
-	Fri, 15 Dec 2023 13:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5715F2D052;
+	Fri, 15 Dec 2023 13:15:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="FJYDXopw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NFyw2OgK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FE9C2DB67
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 13:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-40c38de1ee4so6223815e9.0
-        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 05:06:50 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C425A347B8;
+	Fri, 15 Dec 2023 13:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-40c3ca9472dso7049185e9.2;
+        Fri, 15 Dec 2023 05:15:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702645608; x=1703250408; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=R1xNFHHezv1CLJEnvAaLL47nUlvUbiqoNX5LXzMdimw=;
-        b=FJYDXopwuO8vhfphZGbuHCFTkHyH6D2D2wGFJRCN/A+TV91jbpYpyiip+QuYypIdUf
-         D7G9ntY6/Y4DMV+HpZkU0w/bhQWzilrPcYrGEgO0zc7AOnFecYpGAOS9RO3rQ/7syRGJ
-         q9LVwnZirtvHncFbbgrK4SJaIg/W7lF8XEVeO4pxESxoMlmdTbulGQkJh+/uOgl5HJLF
-         X7Bde76n+s78Ye0p6CPcDu4cLDn4v7PVi6o1YLfr+LUvukZWEJWOSFQF4wUzAqxwDD2C
-         tqZ6vtDexO7nDUj8DtMOMHvxvzSFoOZ88yFFNcpxr3Q+05XAvkKopK7kGqDwv2xxvtQb
-         xHgw==
+        d=gmail.com; s=20230601; t=1702646140; x=1703250940; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rkdT4x7u+h8nhlT6vy5UnmJ8k4AsKgQANvq11Zb9QZM=;
+        b=NFyw2OgKOBJZlf8rorXfjPxp65W42Ba6sJbzy6/eJ0DvYIihrLnP4re+X126OJhgDu
+         d4PcMPKXVmuF2G88j59t8tfhNYsScmHcOjGuEbxPaDSjL5p/fWQ3W7Z5TGE4bMc3x2Tg
+         hYOaAVjHBrFusGoyTJLf3MihlQ+6uI6NVdpMS2NQCx5kiEWTrHTsgYwu7os5ShWH2i25
+         3c4tUgRmMKr2JhA+kc0d0gO40biqMOuJ0drL6VIfis1QtZ+P9eft5MktKf/8iwngCHE1
+         68APCGcJlo5sVqWq0bsdW1S8w/JunWhUFEfdqkvXeLZQk96RKoDvR4HUyqyXKgcKnIr2
+         IzlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702645608; x=1703250408;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R1xNFHHezv1CLJEnvAaLL47nUlvUbiqoNX5LXzMdimw=;
-        b=sUerNaoX8ecEbA7Bbibj7A4sC9vzWDZ9Bix5CGyWEzEabkIJdATSfeTlfDPdriOKz4
-         zh3uGStXMxddKqzpwbiGAa4yiRWP0ofIQvgcaUDfwFtlTR+80c2tht3mK7+0Ro8gn9JQ
-         ITQlbVOcntXo7DrjbGCUIaVEG+IkVoWi9zMGGG2CgEyNL2IV8dXTtwYb2U47eSHxbXnE
-         5RLeVxKO4vkyrNtWdeflmuXgcRun0Yyl4QCEPsCj2sMS3pucQBjJhD77lJf9gv0BeHOa
-         a5A2g6oTpMRfyfPvfD4fiuiZS0rsZ/LUXrOOKDznxM1eW9nxCz8uYcx9u2WUJ31CTtqT
-         NSNw==
-X-Gm-Message-State: AOJu0YzYInRztriUXCraFUU/c7mCRRI6i7tdgVVSGOKC3gqTFn5sNBOF
-	4KZSANadJHbcpQXSYnFE3MARKg==
-X-Google-Smtp-Source: AGHT+IFKm6J1Xmbkr5u96R36lxKXtp3bL0a9jORurz6Mn47NDIi/MtSGxZIeHXltkIG9YcHGGT1roQ==
-X-Received: by 2002:a05:600c:4fc7:b0:40c:3984:49a7 with SMTP id o7-20020a05600c4fc700b0040c398449a7mr6022909wmq.103.1702645608502;
-        Fri, 15 Dec 2023 05:06:48 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id j18-20020a05600c191200b0040c6b667dccsm2164862wmq.25.2023.12.15.05.06.47
+        d=1e100.net; s=20230601; t=1702646140; x=1703250940;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rkdT4x7u+h8nhlT6vy5UnmJ8k4AsKgQANvq11Zb9QZM=;
+        b=l7wqWeGAgSczbA2djJlRmAG2PTBp8LevnoAr0jsJYLGvHniFayfF75WdauGWOehT+H
+         XtQ+o2G5b4DWFPn87UbYVgOjljdNpLcSjEUKv0e7ZyZCjX1NqvgnumcMYeIh4zVg2rwC
+         NEOqSbRaLmbK3fa2s96H3bZ8QdZtZhXNRcb8lADBDWYoTrDOcf45rNVjJohI9qju3oPT
+         LOmwKHoboin2ZTcxQouPu8oFoCgB10IeuhJHVNr0v0r+7SpnUeVZ7qSwinLGXzICtUUt
+         BJ/l1fzbVVkj5RBYFmI6CS+XhQ8l1TCE6C8Ik9e9aOz8p/8klc97ULwp9z3byl8l/uxl
+         K+Jw==
+X-Gm-Message-State: AOJu0YxTMcBzZe+sWclYaxntIN79wyYbPV6DOh5MNgpmcJ5UC/2JuAx8
+	fX/tkLtmvDdDVJNT/4hphf8=
+X-Google-Smtp-Source: AGHT+IF+AgEnmZ3p4PV2OjqFiRTJTeCASxbOj7bj5N3yrEyRogHvFDMvqSAzDQa6nUGTdk95oMa+MA==
+X-Received: by 2002:a05:600c:378d:b0:40b:3f72:de79 with SMTP id o13-20020a05600c378d00b0040b3f72de79mr4256731wmr.5.1702646139739;
+        Fri, 15 Dec 2023 05:15:39 -0800 (PST)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id fc7-20020a05600c524700b0040c44cb251dsm21618324wmb.46.2023.12.15.05.15.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Dec 2023 05:06:47 -0800 (PST)
-Date: Fri, 15 Dec 2023 14:06:46 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: jhs@mojatatu.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com,
-	mleitner@redhat.com, vladbu@nvidia.com, paulb@nvidia.com,
-	pctammela@mojatatu.com, netdev@vger.kernel.org, kernel@mojatatu.com
-Subject: Re: [PATCH net-next v7 3/3] net/sched: act_mirred: Allow mirred to
- block
-Message-ID: <ZXxPZoaIQoa7jlJv@nanopsycho>
-References: <20231215111050.3624740-1-victor@mojatatu.com>
- <20231215111050.3624740-4-victor@mojatatu.com>
+        Fri, 15 Dec 2023 05:15:38 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	David Epping <david.epping@missinglinkelectronics.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Harini Katakam <harini.katakam@amd.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [net-next PATCH v8 0/4] net: phy: add PHY package base addr + mmd APIs
+Date: Fri, 15 Dec 2023 14:15:30 +0100
+Message-Id: <20231215131534.7188-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231215111050.3624740-4-victor@mojatatu.com>
+Content-Transfer-Encoding: 8bit
 
-Fri, Dec 15, 2023 at 12:10:50PM CET, victor@mojatatu.com wrote:
->So far the mirred action has dealt with syntax that handles mirror/redirection for netdev.
->A matching packet is redirected or mirrored to a target netdev.
->
->In this patch we enable mirred to mirror to a tc block as well.
->IOW, the new syntax looks as follows:
->... mirred <ingress | egress> <mirror | redirect> [index INDEX] < <blockid BLOCKID> | <dev <devname>> >
->
->Examples of mirroring or redirecting to a tc block:
->$ tc filter add block 22 protocol ip pref 25 \
->  flower dst_ip 192.168.0.0/16 action mirred egress mirror blockid 22
->
->$ tc filter add block 22 protocol ip pref 25 \
->  flower dst_ip 10.10.10.10/32 action mirred egress redirect blockid 22
->
->Co-developed-by: Jamal Hadi Salim <jhs@mojatatu.com>
->Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
->Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
->Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
->Signed-off-by: Victor Nogueira <victor@mojatatu.com>
->---
-> include/net/tc_act/tc_mirred.h        |   1 +
-> include/uapi/linux/tc_act/tc_mirred.h |   1 +
-> net/sched/act_mirred.c                | 278 +++++++++++++++++++-------
-> 3 files changed, 206 insertions(+), 74 deletions(-)
->
->diff --git a/include/net/tc_act/tc_mirred.h b/include/net/tc_act/tc_mirred.h
->index 32ce8ea36950..75722d967bf2 100644
->--- a/include/net/tc_act/tc_mirred.h
->+++ b/include/net/tc_act/tc_mirred.h
->@@ -8,6 +8,7 @@
-> struct tcf_mirred {
-> 	struct tc_action	common;
-> 	int			tcfm_eaction;
->+	u32                     tcfm_blockid;
-> 	bool			tcfm_mac_header_xmit;
-> 	struct net_device __rcu	*tcfm_dev;
-> 	netdevice_tracker	tcfm_dev_tracker;
->diff --git a/include/uapi/linux/tc_act/tc_mirred.h b/include/uapi/linux/tc_act/tc_mirred.h
->index 2500a0005d05..54df06658bc8 100644
->--- a/include/uapi/linux/tc_act/tc_mirred.h
->+++ b/include/uapi/linux/tc_act/tc_mirred.h
->@@ -20,6 +20,7 @@ enum {
-> 	TCA_MIRRED_UNSPEC,
-> 	TCA_MIRRED_TM,
-> 	TCA_MIRRED_PARMS,
->+	TCA_MIRRED_BLOCKID,
+This small series is required for the upcoming qca807x PHY that
+will make use of PHY package mmd API and the new implementation
+with read/write based on base addr.
 
-You just broke uapi. Make sure to add new attributes to the end.
+The MMD PHY package patch currently has no use but it will be
+used in the upcoming patch and it does complete what a PHY package
+may require in addition to basic read/write to setup global PHY address.
 
+(Changelog for all the revision is present in the single patch)
 
-> 	TCA_MIRRED_PAD,
-> 	__TCA_MIRRED_MAX
-> };
->diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
->index 0a711c184c29..8b6d04d26c5a 100644
->--- a/net/sched/act_mirred.c
->+++ b/net/sched/act_mirred.c
->@@ -85,10 +85,20 @@ static void tcf_mirred_release(struct tc_action *a)
-> 
-> static const struct nla_policy mirred_policy[TCA_MIRRED_MAX + 1] = {
-> 	[TCA_MIRRED_PARMS]	= { .len = sizeof(struct tc_mirred) },
->+	[TCA_MIRRED_BLOCKID]	= { .type = NLA_U32 },
-> };
-> 
-> static struct tc_action_ops act_mirred_ops;
-> 
->+static void tcf_mirred_replace_dev(struct tcf_mirred *m, struct net_device *ndev)
->+{
->+	struct net_device *odev;
->+
->+	odev = rcu_replace_pointer(m->tcfm_dev, ndev,
->+				   lockdep_is_held(&m->tcf_lock));
->+	netdev_put(odev, &m->tcfm_dev_tracker);
->+}
->+
-> static int tcf_mirred_init(struct net *net, struct nlattr *nla,
-> 			   struct nlattr *est, struct tc_action **a,
-> 			   struct tcf_proto *tp,
->@@ -126,6 +136,13 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
-> 	if (exists && bind)
-> 		return 0;
-> 
->+	if (tb[TCA_MIRRED_BLOCKID] && parm->ifindex) {
->+		NL_SET_ERR_MSG_MOD(extack,
->+				   "Mustn't specify Block ID and dev simultaneously");
->+		err = -EINVAL;
->+		goto release_idr;
->+	}
->+
-> 	switch (parm->eaction) {
-> 	case TCA_EGRESS_MIRROR:
-> 	case TCA_EGRESS_REDIR:
->@@ -142,9 +159,9 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
-> 	}
-> 
-> 	if (!exists) {
->-		if (!parm->ifindex) {
->+		if (!parm->ifindex && !tb[TCA_MIRRED_BLOCKID]) {
-> 			tcf_idr_cleanup(tn, index);
->-			NL_SET_ERR_MSG_MOD(extack, "Specified device does not exist");
->+			NL_SET_ERR_MSG_MOD(extack, "Must specify device or block");
-> 			return -EINVAL;
-> 		}
-> 		ret = tcf_idr_create_from_flags(tn, index, est, a,
->@@ -170,7 +187,7 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
-> 	spin_lock_bh(&m->tcf_lock);
-> 
-> 	if (parm->ifindex) {
->-		struct net_device *odev, *ndev;
->+		struct net_device *ndev;
-> 
-> 		ndev = dev_get_by_index(net, parm->ifindex);
-> 		if (!ndev) {
->@@ -179,11 +196,14 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
-> 			goto put_chain;
-> 		}
-> 		mac_header_xmit = dev_is_mac_header_xmit(ndev);
->-		odev = rcu_replace_pointer(m->tcfm_dev, ndev,
->-					  lockdep_is_held(&m->tcf_lock));
->-		netdev_put(odev, &m->tcfm_dev_tracker);
->+		tcf_mirred_replace_dev(m, ndev);
+Christian Marangi (4):
+  net: phy: make addr type u8 in phy_package_shared struct
+  net: phy: extend PHY package API to support multiple global address
+  net: phy: restructure __phy_write/read_mmd to helper and phydev user
+  net: phy: add support for PHY package MMD read/write
 
-This could be a separate patch, for better readability of the patches.
+ drivers/net/phy/bcm54140.c       |  16 ++-
+ drivers/net/phy/mscc/mscc.h      |   5 +
+ drivers/net/phy/mscc/mscc_main.c |   4 +-
+ drivers/net/phy/phy-core.c       | 204 +++++++++++++++++++++++++------
+ drivers/net/phy/phy_device.c     |  35 +++---
+ include/linux/phy.h              |  80 ++++++++----
+ 6 files changed, 266 insertions(+), 78 deletions(-)
 
-Skimming thought the rest of the patch, this is hard to follow (-ETOOBIG).
-What would help is to cut this patch into multiple ones. Do preparations
-first, then you finally add TCA_MIRRED_BLOCKID processin and blockid
-forwarding. Could you?
+-- 
+2.40.1
 
-
-> 		netdev_tracker_alloc(ndev, &m->tcfm_dev_tracker, GFP_ATOMIC);
-> 		m->tcfm_mac_header_xmit = mac_header_xmit;
->+		m->tcfm_blockid = 0;
->+	} else if (tb[TCA_MIRRED_BLOCKID]) {
->+		tcf_mirred_replace_dev(m, NULL);
->+		m->tcfm_mac_header_xmit = false;
->+		m->tcfm_blockid = nla_get_u32(tb[TCA_MIRRED_BLOCKID]);
-> 	}
-> 	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
-> 	m->tcfm_eaction = parm->eaction;
-
-[...]
 
