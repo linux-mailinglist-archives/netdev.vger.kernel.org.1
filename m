@@ -1,105 +1,137 @@
-Return-Path: <netdev+bounces-57713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FE9C813F8A
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 03:01:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74CA5813F8F
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 03:05:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40E941C20A72
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 02:01:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6FCD6B220AB
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 02:05:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA7B3650;
-	Fri, 15 Dec 2023 02:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4869804;
+	Fri, 15 Dec 2023 02:05:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LYG2xC5+"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="whOm1R/6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5D15382
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 02:01:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 54C9BC433C9;
-	Fri, 15 Dec 2023 02:01:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702605678;
-	bh=Or/ZKP96HsPKi+i7G/pvUgsIB6RuzIH+Rn2FXg+BpKw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LYG2xC5+u3J2CS7PxrfUzqcVDyvb3tVu7Skg0F3dxnI9897xXbcNVPulA1pLdpMt4
-	 uPng7nshaz5wl+g1CbmCN13a0u4r9XfC1+EqtbhoLp4pyHHH6ZcjcEVkh9H4vKVKpL
-	 kd4kCjoMj2vVS6pb1MauJULWgvOZlYxHBWTUWsyVaz6Ak0mV+8I2bF6mdYSYPdeibV
-	 t71YpFImjhIA2AJ46CE0ntDY/vc+z8zEps5xJFSQ4ktDOk+j033nO09vdA+EsrMNW1
-	 v5duvaLJTujGAsq2q7FhI9Qhs0A1/WYKZjseup8blNNoeViCJSplZ7eXpdQWHr9mjF
-	 7eH8FFQ6uy7zg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 37211DD4EF9;
-	Fri, 15 Dec 2023 02:01:18 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8547FC
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 02:05:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <b80b0dc5-ebd3-4d6e-8ba8-9fe4d2dbf9d0@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1702605905;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UpVC96IbxxexOpg4mRHS7vO4h6BT+0ZVXeCwbJqJRJc=;
+	b=whOm1R/6vDWhm+MxBIIpxsX4WpIXsepJ6X8+z2JazUPU59mua/RNhwlTLyYfNmwynQHuDA
+	EwOqkPZ5QaGum2A5MMd1ao5PhAnJfdBN0ZQk322OsfWUWCVggJsntod23KoKN8egKheaJW
+	bhKMO0bMa0BBEUtYz/PikzRlUxDCqeE=
+Date: Thu, 14 Dec 2023 18:05:01 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/8] tools: ynl-gen: fill in the gaps in support of
- legacy families
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170260567822.29932.4186848634489676352.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Dec 2023 02:01:18 +0000
-References: <20231213231432.2944749-1-kuba@kernel.org>
-In-Reply-To: <20231213231432.2944749-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, nicolas.dichtel@6wind.com, jiri@resnulli.us,
- donald.hunter@gmail.com
+Subject: Re: [PATCH bpf-next v13 03/14] bpf, net: introduce
+ bpf_struct_ops_desc.
+Content-Language: en-US
+To: thinker.li@gmail.com
+Cc: sinquersw@gmail.com, kuifeng@meta.com, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, ast@kernel.org, song@kernel.org, kernel-team@meta.com,
+ andrii@kernel.org, drosen@google.com
+References: <20231209002709.535966-1-thinker.li@gmail.com>
+ <20231209002709.535966-4-thinker.li@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20231209002709.535966-4-thinker.li@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
+On 12/8/23 4:26 PM, thinker.li@gmail.com wrote:
+> diff --git a/net/bpf/bpf_dummy_struct_ops.c b/net/bpf/bpf_dummy_struct_ops.c
+> index 2748f9d77b18..bd753dbccaf6 100644
+> --- a/net/bpf/bpf_dummy_struct_ops.c
+> +++ b/net/bpf/bpf_dummy_struct_ops.c
+> @@ -17,6 +17,8 @@ struct bpf_dummy_ops_test_args {
+>   	struct bpf_dummy_ops_state state;
+>   };
+>   
+> +static struct btf *bpf_dummy_ops_btf;
+> +
+>   static struct bpf_dummy_ops_test_args *
+>   dummy_ops_init_args(const union bpf_attr *kattr, unsigned int nr)
+>   {
+> @@ -85,9 +87,13 @@ int bpf_struct_ops_test_run(struct bpf_prog *prog, const union bpf_attr *kattr,
+>   	void *image = NULL;
+>   	unsigned int op_idx;
+>   	int prog_ret;
+> +	u32 type_id;
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+	s32 type_id;
 
-On Wed, 13 Dec 2023 15:14:24 -0800 you wrote:
-> Fill in the gaps in YNL C code gen so that we can generate user
-> space code for all genetlink families for which we have specs.
-> 
-> The two major changes we need are support for fixed headers and
-> support for recursive nests.
-> 
-> For fixed header support - place the struct for the fixed header
-> directly in the request struct (and don't bother generating access
-> helpers). The member of a fixed header can't be too complex, and
-> also are by definition not optional so the user has to fill them in.
-> The YNL core needs a bit of a tweak to understand that the attrs
-> may now start at a fixed offset, which is not necessarily equal
-> to sizeof(struct genlmsghdr).
-> 
-> [...]
+>   	int err;
+>   
+> -	if (prog->aux->attach_btf_id != st_ops->type_id)
+> +	type_id = btf_find_by_name_kind(bpf_dummy_ops_btf,
+> +					bpf_bpf_dummy_ops.name,
+> +					BTF_KIND_STRUCT);
 
-Here is the summary with links:
-  - [net-next,1/8] tools: ynl-gen: add missing request free helpers for dumps
-    https://git.kernel.org/netdev/net-next/c/4dc27587dcba
-  - [net-next,2/8] tools: ynl-gen: use enum user type for members and args
-    https://git.kernel.org/netdev/net-next/c/139c163b5b0b
-  - [net-next,3/8] tools: ynl-gen: support fixed headers in genetlink
-    https://git.kernel.org/netdev/net-next/c/f6805072c2aa
-  - [net-next,4/8] tools: ynl-gen: fill in implementations for TypeUnused
-    https://git.kernel.org/netdev/net-next/c/f967a498fce8
-  - [net-next,5/8] tools: ynl-gen: record information about recursive nests
-    https://git.kernel.org/netdev/net-next/c/38329fcfb757
-  - [net-next,6/8] tools: ynl-gen: re-sort ignoring recursive nests
-    https://git.kernel.org/netdev/net-next/c/aa75783b95a1
-  - [net-next,7/8] tools: ynl-gen: store recursive nests by a pointer
-    https://git.kernel.org/netdev/net-next/c/461f25a2e433
-  - [net-next,8/8] tools: ynl-gen: print prototypes for recursive stuff
-    https://git.kernel.org/netdev/net-next/c/7b5fe80ebc63
+	if (type_id < 0)
+		return -EINVAL;
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+> +	if (prog->aux->attach_btf_id != type_id)
+>   		return -EOPNOTSUPP;
+>   
+>   	func_proto = prog->aux->attach_func_proto;
+> @@ -142,6 +148,7 @@ int bpf_struct_ops_test_run(struct bpf_prog *prog, const union bpf_attr *kattr,
+>   
+>   static int bpf_dummy_init(struct btf *btf)
+>   {
+> +	bpf_dummy_ops_btf = btf;
+>   	return 0;
+>   }
+>   
+> diff --git a/net/ipv4/bpf_tcp_ca.c b/net/ipv4/bpf_tcp_ca.c
+> index c7bbd8f3c708..5bb56c9ad4e5 100644
+> --- a/net/ipv4/bpf_tcp_ca.c
+> +++ b/net/ipv4/bpf_tcp_ca.c
+> @@ -20,6 +20,7 @@ static u32 unsupported_ops[] = {
+>   
+>   static const struct btf_type *tcp_sock_type;
+>   static u32 tcp_sock_id, sock_id;
+> +static const struct btf_type *tcp_congestion_ops_type;
+>   
+>   static int bpf_tcp_ca_init(struct btf *btf)
+>   {
+> @@ -36,6 +37,11 @@ static int bpf_tcp_ca_init(struct btf *btf)
+>   	tcp_sock_id = type_id;
+>   	tcp_sock_type = btf_type_by_id(btf, tcp_sock_id);
+>   
+> +	type_id = btf_find_by_name_kind(btf, "tcp_congestion_ops", BTF_KIND_STRUCT);
+> +	if (type_id < 0)
+> +		return -EINVAL;
+> +	tcp_congestion_ops_type = btf_type_by_id(btf, type_id);
+> +
+>   	return 0;
+>   }
+>   
+> @@ -149,7 +155,7 @@ static u32 prog_ops_moff(const struct bpf_prog *prog)
+>   	u32 midx;
+>   
+>   	midx = prog->expected_attach_type;
+> -	t = bpf_tcp_congestion_ops.type;
+> +	t = tcp_congestion_ops_type;
+>   	m = &btf_type_member(t)[midx];
+>   
+>   	return __btf_member_bit_offset(t, m) / 8;
 
 
