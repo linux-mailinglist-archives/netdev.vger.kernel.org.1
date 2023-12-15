@@ -1,65 +1,64 @@
-Return-Path: <netdev+bounces-57783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53D96814248
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 08:22:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFC00814255
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 08:27:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 029BD283CD9
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 07:22:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 100A01C21A94
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 07:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1DC6CA68;
-	Fri, 15 Dec 2023 07:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89B27D2EA;
+	Fri, 15 Dec 2023 07:27:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cocvtpnW"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Uj+t1/7y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161AD10783
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 07:22:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB097D2E2
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 07:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-54c5ed26cf6so340385a12.3
-        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 23:22:46 -0800 (PST)
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-67ad5b37147so2957506d6.2
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 23:27:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702624965; x=1703229765; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=z1N/IqnPuUTMF0bMvQG1DYelgzWvnk5JJ2yMI964gjE=;
-        b=cocvtpnWDsShq++VOm79oPeBqGkYRijLzAvRYvcriKlVBzLftjTn/mvdFJ04y4qpJW
-         9DNpXjmm/SiNTrMxOPCTHZ5ORpj+L1Lwiepfm/97t52upua32Uf+FCY+b7dUqfXgvhu2
-         igLzN5nsHmKph3VOOvDC0BeNv5n1bmLfwVorusljBJkxOWD7yx4F/FSmo7IGWIxPX0hZ
-         DBUfM2/X9BnXLuCcAEav0HNovaVHWrpFGQQOD9ZzkBBMdeLU5c4i5+vWhPJbm+2R7zwa
-         c0kR8GP6ms3LTqxRGGtAA2/8LjkE/EsVSaqvFTlaqFZbtKpvtYZhbEJqb9PrpU3VttyW
-         P1CQ==
+        d=linaro.org; s=google; t=1702625231; x=1703230031; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=a18momHU0cA7dq8ixWwr9NxFTC1XlwJBWi3s0wx38Ck=;
+        b=Uj+t1/7yB9WgP+SPm22ywNDkiKDukxByfXGFTWk7GgFMXrWKpqY7Zz9HthUuGc6K5C
+         fHouF40ZADER0VWV8DDZSw7m3TL9Ivx5RL9WWhShVoSF/fZEUWDl0Za29/Htep92CeN8
+         jlnT8TUyMSXm+wXIKVt9ZPkPvRwMvh/ja/g7iWt94cFjRpsok3xfZ84BDbbLJlXuzOe9
+         YXNu5uxBtCBCWzmNaayxL0wKOciVVjYMsLyPpGa6oMUcbIqTluKu+myo/SHzB9sfI7To
+         HfH8hi+gwrXHhlGVRLFXHJCCGrRecrdiefETjLcBZh8JFlBDMjCHwJ9lHo7Qpdso9XHw
+         wn1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702624965; x=1703229765;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z1N/IqnPuUTMF0bMvQG1DYelgzWvnk5JJ2yMI964gjE=;
-        b=O+Cr+nUGzM704dsKfXpLXPbHz13ZJkeUGH0MYkIMn48Z9jt3HkqKPpakgT6pgLDy0L
-         wLo8EB/XOrEKFZfuKornnUEL8LeE16i6WW52LqNftWw+sWQv8j6TsPIlCdZikOVVEYT1
-         9UqVGpMn4WrOGQZ/s0DaFRcKTL3Hz2nCPlQPD0sUtB6aUt6uMXcI2Jr9s5Vt5qf11DEz
-         3z8IDcRISf4hZ1lN74sR4fcg+1VIg5G66aPFh/h3Ctp+1CzYBKbQDfPsUTPKZR4yLyaM
-         w1WVErufK6z7Gjhq6dfBkl372IThMoWo9Tu1l14kpPdQOM08rD5l8XQDyTr+hi6oc005
-         V/Bg==
-X-Gm-Message-State: AOJu0Ywe7KfzdMx9tx2aBb6+wUzLYy+fZAr87WYlPxKS+niEB5rKJCt1
-	YOXsPJ8CCbAsAgi+SCakOeY0Nw==
-X-Google-Smtp-Source: AGHT+IHjQCJzPMaljEx66j5jK8Y/TjVx4csCkgGE49TpsRVgAlf0luivMkJCYj8hGiMkQKAsCiL94g==
-X-Received: by 2002:a17:906:7398:b0:a19:a19b:55de with SMTP id f24-20020a170906739800b00a19a19b55demr4954226ejl.110.1702624965226;
-        Thu, 14 Dec 2023 23:22:45 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702625231; x=1703230031;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=a18momHU0cA7dq8ixWwr9NxFTC1XlwJBWi3s0wx38Ck=;
+        b=YuRyYakcplK5kU2LVPThQSjbuO6IH+/UMkGVdFrsE2mIR32+AH+Ll0KqK4TuUU9nSP
+         ntsUuBLCSz5QSxRfTigWdTOs7APnV1t48emebSQBgzw29xT0IeUi137MN8UE7CRjY3O7
+         uqBazbSCj+uPPL98rNkt/WlRCLTom2KDaDsUmUdZkkIDMkVch28MehM3BPtabAeRsMVL
+         OkA3Ph6zAQ6H6UbqswGmZFi0rw2nBC3vb4pI93TnicPf5JwJwnr+gGE6S8c6Y0wyCDzf
+         nJJmJYj3d++1jiRTKLJhFE4yLCRaTYG8phkqoO+8IaFFpLUFuHKLYcvdilj82sod+0lk
+         EsIw==
+X-Gm-Message-State: AOJu0Yw6R3MXff3N8sGRz4EUafTe289IfXTv8vkFLN6goHto67FqQEGQ
+	kolbgZQMJyGX2prU3SGpeBTiIw==
+X-Google-Smtp-Source: AGHT+IFs1bJuKEwshcNjmdQYsyD+A+QhCMvOhqCCwOxNKejvnYpaG8Ht7MhZ3Ozi0Ff/AupocUpccA==
+X-Received: by 2002:a05:6214:cc6:b0:67f:4c0:4f1a with SMTP id 6-20020a0562140cc600b0067f04c04f1amr5223444qvx.1.1702625230842;
+        Thu, 14 Dec 2023 23:27:10 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.218.27])
-        by smtp.gmail.com with ESMTPSA id vk2-20020a170907cbc200b00a1d3e9e888bsm10423928ejc.55.2023.12.14.23.22.43
+        by smtp.gmail.com with ESMTPSA id es12-20020a056214192c00b0067f1359da7bsm663879qvb.83.2023.12.14.23.27.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Dec 2023 23:22:44 -0800 (PST)
-Message-ID: <3b7072c5-8b38-418f-b960-3c5401e8b18f@linaro.org>
-Date: Fri, 15 Dec 2023 08:22:42 +0100
+        Thu, 14 Dec 2023 23:27:10 -0800 (PST)
+Message-ID: <1e4c55c8-8ed6-4f2e-8328-8a173f09b62f@linaro.org>
+Date: Fri, 15 Dec 2023 08:27:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,21 +66,19 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 1/2] nfc: llcp_core: Hold a ref to
- llcp_local->dev when holding a ref to llcp_local
-To: Siddh Raman Pant <code@siddh.me>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Suman Ghosh <sumang@marvell.com>,
- netdev <netdev@vger.kernel.org>, linux-kernel
- <linux-kernel@vger.kernel.org>,
- syzbot+bbe84a4010eeea00982d
- <syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com>
-References: <cover.1702404519.git.code@siddh.me>
- <6a26e3b65817bb31cb11c8dde5b1b420071d944e.1702404519.git.code@siddh.me>
- <1813902b-6afc-4539-96b2-050df6fc75c1@linaro.org>
- <18c695b4512.5afde007311004.1718468931473736202@siddh.me>
+Subject: Re: [PATCH v3 5/5] dt-bindings: net: ipq4019-mdio: Document ipq5332
+ platform
 Content-Language: en-US
+To: Luo Jie <quic_luoj@quicinc.com>, agross@kernel.org, andersson@kernel.org,
+ konrad.dybcio@linaro.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, robert.marko@sartura.hr
+Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ quic_srichara@quicinc.com
+References: <20231214090304.16884-1-quic_luoj@quicinc.com>
+ <20231214090304.16884-6-quic_luoj@quicinc.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -127,31 +124,192 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <18c695b4512.5afde007311004.1718468931473736202@siddh.me>
+In-Reply-To: <20231214090304.16884-6-quic_luoj@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 14/12/2023 18:23, Siddh Raman Pant wrote:
-> On Wed, 13 Dec 2023 13:10:16 +0530, Krzysztof Kozlowski wrote:
->>> -	if (sk_acceptq_is_full(parent)) {
->>> -		reason = LLCP_DM_REJ;
->>> -		release_sock(&sock->sk);
->>> -		sock_put(&sock->sk);
->>> -		goto fail;
->>> -	}
->>> +	if (sk_acceptq_is_full(parent))
->>> +		goto fail_put_sock;
->>
->> I would argue that you reshuffle here more code than needed for the fix.
->>
->> This should fix only missing dev reference, not reshuffle code. It's a
->> bugfix, not cleanup.
+On 14/12/2023 10:03, Luo Jie wrote:
+> Update the yaml file for the new DTS properties.
 > 
-> So this should not be done? I did it because you told to extend the
-> cleanup label in v3 discussion.
+> 1. cmn-reference-clock for the CMN PLL source clock select.
+> 2. clock-frequency for MDIO clock frequency config.
+> 3. add uniphy AHB & SYS GCC clocks.
+> 4. add reset-gpios for MDIO bus level reset.
+> 
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> ---
+>  .../bindings/net/qcom,ipq4019-mdio.yaml       | 143 +++++++++++++++++-
+>  1 file changed, 139 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml b/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
+> index 3407e909e8a7..79f8513739e7 100644
+> --- a/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
+> +++ b/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
+> @@ -20,6 +20,8 @@ properties:
+>            - enum:
+>                - qcom,ipq6018-mdio
+>                - qcom,ipq8074-mdio
+> +              - qcom,ipq9574-mdio
+> +              - qcom,ipq5332-mdio
+>            - const: qcom,ipq4019-mdio
+>  
+>    "#address-cells":
+> @@ -30,19 +32,77 @@ properties:
+>  
+>    reg:
+>      minItems: 1
+> -    maxItems: 2
+> +    maxItems: 5
+>      description:
+> -      the first Address and length of the register set for the MDIO controller.
+> -      the second Address and length of the register for ethernet LDO, this second
+> -      address range is only required by the platform IPQ50xx.
+> +      the first Address and length of the register set for the MDIO controller,
+> +      the optional second, third and fourth address and length of the register
+> +      for ethernet LDO, these three address range are required by the platform
+> +      IPQ50xx/IPQ5332, the last address and length is for the CMN clock to
+> +      select the reference clock.
+> +
+> +  reg-names:
+> +    minItems: 1
+> +    maxItems: 5
+>  
+>    clocks:
+> +    minItems: 1
+>      items:
+>        - description: MDIO clock source frequency fixed to 100MHZ
+> +      - description: UNIPHY0 AHB clock source frequency fixed to 100MHZ
+> +      - description: UNIPHY1 AHB clock source frequency fixed to 100MHZ
+> +      - description: UNIPHY0 SYS clock source frequency fixed to 24MHZ
+> +      - description: UNIPHY1 SYS clock source frequency fixed to 24MHZ
+>  
+>    clock-names:
+> +    minItems: 1
+>      items:
+>        - const: gcc_mdio_ahb_clk
+> +      - const: uniphy0_ahb
+> +      - const: uniphy1_ahb
+> +      - const: uniphy0_sys
+> +      - const: uniphy1_sys
+> +
+> +  cmn-reference-clock:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
 
-It can be done but not in the same commit. You must not combine fixes
-with other changes. Also, each commit is one logical change.
+Nothing improved here
+
+> +    oneOf:
+> +      - items:
+
+So it is enum or not?
+
+> +          - enum:
+> +              - 0   # CMN PLL reference internal 48MHZ
+> +              - 1   # CMN PLL reference external 25MHZ
+> +              - 2   # CMN PLL reference external 31250KHZ
+> +              - 3   # CMN PLL reference external 40MHZ
+> +              - 4   # CMN PLL reference external 48MHZ
+> +              - 5   # CMN PLL reference external 50MHZ
+> +              - 6   # CMN PLL reference internal 96MHZ
+> +
+> +  clock-frequency:
+> +    oneOf:
+> +      - items:
+
+Same questions
+
+> +          - enum:
+> +              - 12500000
+> +              - 6250000
+> +              - 3125000
+> +              - 1562500
+> +              - 781250
+> +              - 390625
+> +    description:
+> +      The MDIO bus clock that must be output by the MDIO bus hardware,
+> +      only the listed frequencies above can be supported, other frequency
+> +      will cause malfunction. If absent, the default hardware value 0xff
+> +      is used, which means the default MDIO clock frequency 390625HZ, The
+> +      MDIO clock frequency is MDIO_SYS_CLK/(MDIO_CLK_DIV + 1), the SoC
+> +      MDIO_SYS_CLK is fixed to 100MHZ, the MDIO_CLK_DIV is from MDIO control
+> +      register, there is higher clock frequency requirement on the normal
+> +      working case where the MDIO slave devices support high clock frequency.
+> +
+> +  reset-gpios:
+> +    maxItems: 1
+> +
+> +  reset-assert-us:
+> +    maxItems: 1
+
+This does not look related to ipq5332.
+
+> +
+> +  reset-deassert-us:
+> +    maxItems: 1
+
+Neither this.
+
+>  
+>  required:
+>    - compatible
+> @@ -61,6 +121,8 @@ allOf:
+>                - qcom,ipq5018-mdio
+>                - qcom,ipq6018-mdio
+>                - qcom,ipq8074-mdio
+> +              - qcom,ipq5332-mdio
+> +              - qcom,ipq9574-mdio
+>      then:
+>        required:
+>          - clocks
+> @@ -70,6 +132,20 @@ allOf:
+>          clocks: false
+>          clock-names: false
+>  
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            enum:
+> +              - qcom,ipq5332-mdio
+> +    then:
+> +      properties:
+> +        clocks:
+> +          minItems: 5
+> +          maxItems: 5
+> +        reg-names:
+> +          minItems: 4
+> +
+>  unevaluatedProperties: false
+>  
+>  examples:
+> @@ -100,3 +176,62 @@ examples:
+>          reg = <4>;
+>        };
+>      };
+> +
+> +  - |
+> +    #include <dt-bindings/clock/qcom,ipq5332-gcc.h>
+> +    #include <dt-bindings/gpio/gpio.h>
+> +
+> +    mdio@90000 {
+> +      #address-cells = <1>;
+> +      #size-cells = <0>;
+> +      compatible = "qcom,ipq5332-mdio",
+> +                   "qcom,ipq4019-mdio";
+> +      cmn-reference-clock = <0>;
+> +      clock-frequency = <6250000>;
+> +
+> +      reset-gpios = <&tlmm 51 GPIO_ACTIVE_LOW>;
+> +      reset-assert-us = <100000>;
+> +      reset-deassert-us = <100000>;
+> +
+> +      reg = <0x90000 0x64>,
+> +            <0x9B000 0x800>,
+> +            <0x7A00610 0x4>,
+> +            <0x7A10610 0x4>;
+
+Lowercase hex, wrong order of properties. Align it with coding style.
+
+
 
 Best regards,
 Krzysztof
