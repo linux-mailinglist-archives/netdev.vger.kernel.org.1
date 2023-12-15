@@ -1,145 +1,115 @@
-Return-Path: <netdev+bounces-57954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C7E6814943
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:31:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05F86814946
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:31:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04D2DB22949
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 13:30:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39A741C23A73
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 13:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBA492DB91;
-	Fri, 15 Dec 2023 13:29:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68EA22DB81;
+	Fri, 15 Dec 2023 13:30:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mhix1SNK"
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="ZOF0Y6Oz";
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="L+tc9AV7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from nautica.notk.org (nautica.notk.org [91.121.71.147])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F55530321;
-	Fri, 15 Dec 2023 13:29:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40c38e292c8so3513915e9.0;
-        Fri, 15 Dec 2023 05:29:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702646981; x=1703251781; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v8KycpmoEY28RLHnfyVEt7HZvLA/Co1CVDklFA2THj0=;
-        b=Mhix1SNKzn25mpmaQJA/pZ7i75Y8TA9Q54sj3hZE+lCzV587iu5W4fwvNyq3kOvNhU
-         bH5dvQDGMrQTx/fa/0kaIQqlLrH2m9ILUSTQlcUu/sQSGOE0Rlivj94r2CTGZmlTxoNp
-         f+/cUzIRGXFNR4h13PjNVUINhYeRBx2SYs8tOF5UiewfQyosrWvwiVhPYglxHDAxLcP2
-         iavOVx+SOr5jiuamrUrfrZ8AOrSTlrwbsrgveafixUG98mJldQml6/PGSWxlHA9g3bUj
-         8rho2uZ6RojnpppcOaZ1MFeejOElKBuISSkfk11kkcmSsTVr7fPX/oKkgE5SbCfsRSRj
-         ke5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702646981; x=1703251781;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v8KycpmoEY28RLHnfyVEt7HZvLA/Co1CVDklFA2THj0=;
-        b=wz5BdHf4G6FLU49Wvz3HVbqwvD3lmCf3oex13kj+XyGqq56eI0weCkTy/HoumxACni
-         LxAigQF3TeKSLcVNZPbDfG9jXKcWKfdbmeYz0S9r8rRCKQ5ysz7SYddO9urE1h/mBBqg
-         Tom97nMqI5MIE3LhqPHdMEoNRSx4WV2s2ts+LMU5UlcRLxyXtLU827sUw4uZcFWOnnL5
-         hcFQMfAFcJlIr9uXg57z3N71z2VVzRsqaSEG8CkeR2Q3dj8CoDeLnoTDmgPi+Y40Wvcz
-         aU0HPBfPDYUsgAHvnbZ/bnB2CvtXbbmxJlUBeFllAmjjGWoOgXUDAI0S7MpasJwZR0ll
-         KA6A==
-X-Gm-Message-State: AOJu0YwafsAroLj6iqnesHQlrsv5MGwNfsxbPUvETEZAKBYbSuLX/pGM
-	u32gpRdt1T2m2e57rNZPxma6mfzNjpM=
-X-Google-Smtp-Source: AGHT+IGCuZef8REAlKzw59ZBBJ+UeH4/0eh5MO6e1D0CdDAZHUQXjtNFnkntk8XvYKs5aijPV2d94A==
-X-Received: by 2002:a05:600c:808e:b0:40b:47d0:cff with SMTP id ew14-20020a05600c808e00b0040b47d00cffmr6101245wmb.10.1702646981425;
-        Fri, 15 Dec 2023 05:29:41 -0800 (PST)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id o3-20020a05600c4fc300b004042dbb8925sm31434543wmq.38.2023.12.15.05.29.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Dec 2023 05:29:41 -0800 (PST)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E5231A68;
+	Fri, 15 Dec 2023 13:30:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
+Received: by nautica.notk.org (Postfix, from userid 108)
+	id 05FD3C023; Fri, 15 Dec 2023 14:30:09 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
+	t=1702647009; bh=b20vpyg00WVKyH6ybuqsHsgOXZgJ2nb71oRe/G0ycJk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZOF0Y6OzwY77P+4OK/bRx/LrA92E+Ewqg7UEcUTXhlBz8WRRzkOsyWJsKm9lxRTtw
+	 xtoPSv6O9oxvJpuYguK9xY1uPTJXr5NOHCCZ3kbcQEzGdY/Kq9KpKIuO3NDqlKgGud
+	 Aa/7f/fAGOuveFvNH08lFTZqK6znaj71tk3Wbc3Wt90uEINykdavQ7zyd9dEfOnuOn
+	 Z1PlzvWTFz9HUtDsPMNqv0OC7r1zw6rrA0ZvUKg6sP5xpVeJNHQtNc82xrdQxMSQ4D
+	 Q69/KGCAz9V7u1p8dyz2oTi4YMj8SYbIX/256qZJEKxGq6iQXgGtwx5tJrh+QtXvPb
+	 dDAehFNnM+a7w==
+X-Spam-Level: 
+Received: from gaia (localhost [127.0.0.1])
+	by nautica.notk.org (Postfix) with ESMTPS id 4FAF9C009;
+	Fri, 15 Dec 2023 14:30:02 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
+	t=1702647008; bh=b20vpyg00WVKyH6ybuqsHsgOXZgJ2nb71oRe/G0ycJk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=L+tc9AV77ZtJkbnBcyJo/SQdJxBCl8J00AjfEfjPJmuB3W7CjYkI69XJqbf38qbVT
+	 iN+BVGUZw1IYvZhn1OkWsRzzuwmEc7GnlsnkX4mCFTRmV6WY6RBx7G5X6Vfhpk3XWX
+	 wBNxZF1klac/LiiNCkqMeYfLQsZz1fiAjDDp+YL/ln7seybyTXVhRQdhKNBhbPDqtD
+	 kQrnngf4YY5S7T1KSuB565s8Mj6l7wUDoBCP9f/DxD8OojN/sRJRPVDJTiNwnqRgAP
+	 XW+EhZXAuxEGyJR4xoprwR5o8PgJeUaAxnDl+jDKDdW2/e0t2NfYEWTLP2bGT8gWku
+	 LoIkI9axCVNMA==
+Received: from localhost (gaia [local])
+	by gaia (OpenSMTPD) with ESMTPA id 6ce99df9;
+	Fri, 15 Dec 2023 13:29:58 +0000 (UTC)
+Date: Fri, 15 Dec 2023 22:29:43 +0900
+From: Dominique Martinet <asmadeus@codewreck.org>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>,
+	David Howells <dhowells@redhat.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Cc: Christian Marangi <ansuelsmth@gmail.com>
-Subject: [net-next PATCH v3 3/3] net: phy: led: dynamically allocate speed modes array
-Date: Fri, 15 Dec 2023 14:29:21 +0100
-Message-Id: <20231215132921.16808-4-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231215132921.16808-1-ansuelsmth@gmail.com>
-References: <20231215132921.16808-1-ansuelsmth@gmail.com>
+Subject: Re: [PATCH v4 00/39] netfs, afs, 9p: Delegate high-level I/O to
+ netfslib
+Message-ID: <ZXxUx_nh4HNTaDJx@codewreck.org>
+References: <20231213152350.431591-1-dhowells@redhat.com>
+ <20231215-einziehen-landen-94a63dd17637@brauner>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231215-einziehen-landen-94a63dd17637@brauner>
 
-Instead of defining a big enough array for speed modes use the newly
-introduced API to get the actual number of supported speed modes and
-dynamically allocate them.
+Christian Brauner wrote on Fri, Dec 15, 2023 at 01:03:14PM +0100:
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+> branch: vfs.netfs
 
-Allocated space is freed at the end of the LED register loop.
+This doesn't seem to build:
+-------
+  CC [M]  fs/netfs/buffered_write.o
+fs/netfs/buffered_write.c: In function ‘netfs_kill_pages’:
+fs/netfs/buffered_write.c:569:17: error: implicit declaration of function ‘generic_error_remove_folio’; did you mean ‘generic_error_remove_page’? [-Werror=implicit-function-declaration]
+  569 |                 generic_error_remove_folio(mapping, folio);
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                 generic_error_remove_page
+cc1: some warnings being treated as errors
+-------
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- drivers/net/phy/phy_led_triggers.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+This helper is present in -next as commit af7628d6ec19 ("fs: convert
+error_remove_page to error_remove_folio") (as of now's next), apparently
+from akpm's mm-stable:
+git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm mm-stable
 
-diff --git a/drivers/net/phy/phy_led_triggers.c b/drivers/net/phy/phy_led_triggers.c
-index f550576eb9da..3b962ec13d90 100644
---- a/drivers/net/phy/phy_led_triggers.c
-+++ b/drivers/net/phy/phy_led_triggers.c
-@@ -83,14 +83,21 @@ static void phy_led_trigger_unregister(struct phy_led_trigger *plt)
- 
- int phy_led_triggers_register(struct phy_device *phy)
- {
-+	unsigned int *speeds;
- 	int i, err;
--	unsigned int speeds[50];
- 
--	phy->phy_num_led_triggers = phy_supported_speeds(phy, speeds,
--							 ARRAY_SIZE(speeds));
-+	phy->phy_num_led_triggers = phy_supported_speeds_num(phy);
- 	if (!phy->phy_num_led_triggers)
- 		return 0;
- 
-+	speeds = kmalloc_array(phy->phy_num_led_triggers, sizeof(*speeds),
-+			       GFP_KERNEL);
-+	if (!speeds)
-+		return -ENOMEM;
-+
-+	/* Presence of speed modes already checked up */
-+	phy_supported_speeds(phy, speeds, phy->phy_num_led_triggers);
-+
- 	phy->led_link_trigger = devm_kzalloc(&phy->mdio.dev,
- 					     sizeof(*phy->led_link_trigger),
- 					     GFP_KERNEL);
-@@ -123,6 +130,8 @@ int phy_led_triggers_register(struct phy_device *phy)
- 	phy->last_triggered = NULL;
- 	phy_led_trigger_change_speed(phy);
- 
-+	kfree(speeds);
-+
- 	return 0;
- out_unreg:
- 	while (i--)
-@@ -134,6 +143,7 @@ int phy_led_triggers_register(struct phy_device *phy)
- 	devm_kfree(&phy->mdio.dev, phy->led_link_trigger);
- 	phy->led_link_trigger = NULL;
- out_clear:
-+	kfree(speeds);
- 	phy->phy_num_led_triggers = 0;
- 	return err;
- }
+(which obviously have some conflict in afs when trying to merge...)
+
+
+I'll go back to dhowell's tree to finally test 9p a bit,
+sorry for lack of involvement just low on time all around.
+
+
+Good luck (?),
 -- 
-2.40.1
-
+Dominique Martinet | Asmadeus
 
