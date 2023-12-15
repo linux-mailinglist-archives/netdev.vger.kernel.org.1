@@ -1,147 +1,107 @@
-Return-Path: <netdev+bounces-57855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46ED0814542
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:17:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30A7F81454B
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:18:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD95F1F23FB9
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 10:17:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E99822852A5
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 10:18:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8016F18C3A;
-	Fri, 15 Dec 2023 10:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D6B818E3A;
+	Fri, 15 Dec 2023 10:18:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="1HvOOUN5"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NJjjmzbB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D7919BA8
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 10:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a1e7971db2aso53219766b.3
-        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 02:17:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702635436; x=1703240236; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3sdYjfrh0XIiJda1rBtqGHUSXAcGhSpafwfegt0TWAE=;
-        b=1HvOOUN5uTR9RnrUYWd0aEapBeE7qGMLdpe0WyRh+oRnNrBjE96PR9SiOmeHZDKuQ3
-         34wFfY3hj8WlX7vzHKBFFkwGs3dC0gDfAVtQNreIfAv5R86gAhBIRq16lxn/TdrIkSBA
-         QIfb5h3HORKeJ65Cn6e7q1RzRgzs4L8MbyI9pSgwT1Qk+LGmhLucGgXh54xOaF2N/INw
-         8PC+P65FM+ZF2qyiupsJ83ZjFf80c14AIZCvZJ/FXsKfIwTDNcy/sAx2ylE4Yi2uBnBx
-         k0HjOK0X25QFGG5MVn0G0Yi4ArPKMJHtJdSkgLKjdJqNe4X3yqRDE8gkNuExlRPKd+A8
-         zxvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702635436; x=1703240236;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3sdYjfrh0XIiJda1rBtqGHUSXAcGhSpafwfegt0TWAE=;
-        b=Xy1kQ27qkiD7IfOXgUXwdznOEBct5bzJ3vA2p/s59io1YKSPElyLBObHBIL+OeP8wE
-         NSAhoQdz/3Ng4sh6RIa25Fv8CQC2OWr7bGvQKOx0WEqQga7sCFB7LE+8sLpF/VFYXba/
-         5U3xIYStyEcLBWTKb8s6NdbGdf8Tu02RhVECLXZ8uDgMiE2no+2lHGL1CtrIp4X7dS6c
-         hM22OPTOWjwmWXFayVq79SaRM1rPGnGa+/t5CG630VIouwTBi/1c2D3UUXcptkuu5bS6
-         InchFuCb1yI0h1FUuP3ZLloTwvyjCdNwL3kDEY27H3JZ7fllOjnREGi6kfqQKgOAPLVG
-         +okQ==
-X-Gm-Message-State: AOJu0Yw9PjwMgOo7sX0lHdXDE8YblJRzygtx8oemJIupWb+lscsD9ASZ
-	M48S5vFxDamBYc66sFJDdkg64Q==
-X-Google-Smtp-Source: AGHT+IHibCH18swjfa/WQt80LZHdwmECUFEd4gr/XzUvkWY0+61WBlnitLsVCSNuRyHScuIIr/4N8g==
-X-Received: by 2002:a17:907:2596:b0:a0e:d93a:3202 with SMTP id ad22-20020a170907259600b00a0ed93a3202mr4817885ejc.4.1702635436344;
-        Fri, 15 Dec 2023 02:17:16 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id mt39-20020a17090761a700b00a0ad10b3f68sm10502879ejc.205.2023.12.15.02.17.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Dec 2023 02:17:15 -0800 (PST)
-Date: Fri, 15 Dec 2023 11:17:14 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, jacob.e.keller@intel.com, jhs@mojatatu.com,
-	johannes@sipsolutions.net, andriy.shevchenko@linux.intel.com,
-	amritha.nambiar@intel.com, sdf@google.com, horms@kernel.org,
-	przemyslaw.kitszel@intel.com
-Subject: Re: [patch net-next v7 5/9] genetlink: introduce per-sock family
- private storage
-Message-ID: <ZXwnqqsFPDhRUNBy@nanopsycho>
-References: <20231214181549.1270696-1-jiri@resnulli.us>
- <20231214181549.1270696-6-jiri@resnulli.us>
- <20231214192358.1b150fda@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33F01A596;
+	Fri, 15 Dec 2023 10:18:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=NaKT5qoM+qCmvzKX65nbLG/srH1WrOorsHKdumObti8=; b=NJ
+	jjmzbBpViyMWjd/BWRY6PLwWucmKJSCdLtRqTA97Yfa4MiQnXnMYihg47mshv2m3yCUN7ljv5z3g3
+	ZO4cgeDx1T9i27CTcOfLNiwoqbmCkND1P/IBljgq0vA3euiwFY9gfzIbPOBJwDL1k8YH7MC4r2baQ
+	tuLD2BL8k9cUB2c=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rE5Gw-0030Yc-Ry; Fri, 15 Dec 2023 11:18:22 +0100
+Date: Fri, 15 Dec 2023 11:18:22 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Rob Herring <robh@kernel.org>
+Cc: Conor Dooley <conor@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] dt-bindings: net: marvell,orion-mdio: Drop
+ "reg" sizes schema
+Message-ID: <e59ff8c2-caa1-4072-b86f-0446120ac49b@lunn.ch>
+References: <20231213232455.2248056-1-robh@kernel.org>
+ <20231214-buzz-playlist-2f75095ef2b0@spud>
+ <CAL_JsqKaGFfQNwR3HqRnVs3K7SUtevpoG6tEDntM0SNfyyp6AQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231214192358.1b150fda@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL_JsqKaGFfQNwR3HqRnVs3K7SUtevpoG6tEDntM0SNfyyp6AQ@mail.gmail.com>
 
-Fri, Dec 15, 2023 at 04:23:58AM CET, kuba@kernel.org wrote:
->On Thu, 14 Dec 2023 19:15:45 +0100 Jiri Pirko wrote:
->> - converted family->sock_priv_list to family->sock_privs xarray
->>   and use it to store the per-socket privs, use sock pointer as
->>   an xarrar index. This made the code much simpler
->
->Nice! 
->
->FWIW I think I remember Willy saying that storing pointers in xarray is
->comparatively inefficient / slow, but we can cross that bridge later.
->
->> +void *__genl_sk_priv_get(struct genl_family *family, struct sock *sk)
->> +{
->> +	if (WARN_ON_ONCE(!family->sock_privs))
->> +		return NULL;
->> +	return xa_load(family->sock_privs, (unsigned long) sk);
->> +}
->> +
->> +/**
->> + * genl_sk_priv_get - Get family private pointer for socket
->> + *
->> + * @family: family
->> + * @sk: socket
->> + *
->> + * Lookup a private memory for a Generic netlink family and specified socket.
->> + * Allocate the private memory in case it was not already done.
->> + *
->> + * Return: valid pointer on success, otherwise negative error value
->> + * encoded by ERR_PTR().
->
->nit: probably better if __genl_sk_priv_get() returned an error pointer
->     if family is broken, save ourselves the bot-generated "fixes"..
+On Thu, Dec 14, 2023 at 12:12:42PM -0600, Rob Herring wrote:
+> On Thu, Dec 14, 2023 at 10:23 AM Conor Dooley <conor@kernel.org> wrote:
+> >
+> > On Wed, Dec 13, 2023 at 05:24:55PM -0600, Rob Herring wrote:
+> > > Defining the size of register regions is not really in scope of what
+> > > bindings need to cover. The schema for this is also not completely correct
+> > > as a reg entry can be variable number of cells for the address and size,
+> > > but the schema assumes 1 cell.
+> > >
+> > > Signed-off-by: Rob Herring <robh@kernel.org>
+> >
+> > Does this not also remove restrictions on what the number in the reg
+> > entry is actually allowed to be?
+> 
+> Yes, that's what I mean with the first sentence. We don't do this
+> anywhere else with the exception of some I2C devices with fixed
+> addresses. Keying off of the interrupt property also seems
+> questionable. If the register size is different, that should be a
+> different compatible.
 
-Wait, let me make your suggestion clear. Do you suggest to remove the
-WARN_ON_ONCE from __genl_sk_priv_get() as well?
+Reading the code, it appears the hardware always supported interrupts,
+however the first version of the driver never used them. It seems like
+some DT blobs had the register space cover just the needed registers
+for polling, and excluded the interrupt control register. When
+interrupt support was added, all in-tree DT files were updated with
+the extended register space, but to allow backwards compatibility, the
+driver checks the length of the register space and will not enable
+interrupts if its too small.
 
-To put it in code:
-void *__genl_sk_priv_get(struct genl_family *family, struct sock *sk)
-{
-	if (WARN_ON_ONCE(!family->sock_privs))
-		return ERR_PTR(-EINVAL);
-	return xa_load(family->sock_privs, (unsigned long) sk);
-}
-OR:
-void *__genl_sk_priv_get(struct genl_family *family, struct sock *sk)
-{
-	if (!family->sock_privs)
-		return ERR_PTR(-EINVAL);
-	return xa_load(family->sock_privs, (unsigned long) sk);
-}
-?
+I'm guessing that since the hardware did not change, a new compatible
+was not used when adding interrupt support. And the yaml is there to
+help when old out of tree .dts files are merged into the tree and have
+the old register space.
 
-Thanks!
+This is and old driver, and its usage of DT is from long before many
+of the current best practices where determined, or yaml was even an
+idea. So i'm not surprised it has a few odd quirks.
 
->
->> + */
->> +void *genl_sk_priv_get(struct genl_family *family, struct sock *sk)
->> +{
->> +	void *priv, *old_priv;
->> +
->> +	priv = __genl_sk_priv_get(family, sk);
->> +	if (priv)
->> +		return priv;
->
+I don't see a reason not to remove these constraints, as i said, the
+driver should do the right thing if the register space it too small
+and YAML does not warn about it.
+
+      Andrew
 
