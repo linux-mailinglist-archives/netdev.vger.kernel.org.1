@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-58116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1871681517C
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 22:00:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5582981518E
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 22:03:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A625A286187
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 21:00:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82E901C22F3D
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 21:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C096A47766;
-	Fri, 15 Dec 2023 21:00:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83F974778B;
+	Fri, 15 Dec 2023 21:03:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="STVO7dLP"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Fs/HaoOn"
 X-Original-To: netdev@vger.kernel.org
 Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4842630120;
-	Fri, 15 Dec 2023 21:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 039FB30132;
+	Fri, 15 Dec 2023 21:03:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1702674002;
-	bh=XmjdsnypmM0sVMOODNg7bU4x4gIm/6EultPACYo535g=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=STVO7dLPIsVi6rpyepTxq9ZaRTHmDDoUxqtPx0GKDDsoI6kKYuT5kVY9Ej1rdZ31z
-	 7skxZyTGnWDhXRx3ivcTrWcTn9pS4jn15bf5IuuHF7TKOhf7CjaCQAsFLUqgG+OQw3
-	 TmbB7SYbpCKErLSC8pj0EX7CX9QLnILzsRBE/ohiUJbIFE1IMg/cjGBGPtPajrXG4f
-	 sNECYsMCQOlfv1P7YiowMjwE7S+4WEgZ3Ta/BBENvi3lzY5/pUGpbmzJcRRt17LLTu
-	 pvJjE5GpakAoU7lTRzhh1ydC3vC2/ToA4s4IC0aoo60dOSNzUN2jT4plhHgrw2rMwr
-	 McF7U6Ymc8nDQ==
+	s=mail; t=1702674207;
+	bh=fWUcyTSvl9HkzhbEm2R9p6yElA555rA8toz5mjYvtR8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Fs/HaoOn6SjZTGGcdUHfgvof1ag/gLuno1cJmOXOX8v2Mr/oGxLTYh8xd4Ju11DlS
+	 07D2Y6ZaCj9MasIAmOM5lRGp7y1k1osx5lCBzcihDN0lI0oD6WYloE6Ah132R2CDwN
+	 ExwWYzVW6REs3ogTVC7ys8oxbR+B8Wq5LhBmWRqHVdkU29ZkHwm6U1JwIkIwZEFiDB
+	 0mHdZeUJsAv5xtXJO89pm1Xu3lRCb8332T86FidfU/XlTkDU/jcVul2g9PScZVabG8
+	 xL3yhH+JzwcZOxVKRCi+CDz1pkSzJxElChYxhgcaPDo4hO/LLydHjz0sPzX3gEc7mk
+	 P4XKIW1PNHMlQ==
 Received: from [100.115.223.179] (cola.collaboradmins.com [195.201.22.229])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: cristicc)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 6EFBA3781FD5;
-	Fri, 15 Dec 2023 21:00:00 +0000 (UTC)
-Message-ID: <a9a3a7c5-7ee9-4b28-9abb-f1194054dfef@collabora.com>
-Date: Fri, 15 Dec 2023 23:00:00 +0200
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 354E83781FD5;
+	Fri, 15 Dec 2023 21:03:25 +0000 (UTC)
+Message-ID: <6c62e3b2-acde-4580-9b67-56683289e45e@collabora.com>
+Date: Fri, 15 Dec 2023 23:03:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,8 +51,8 @@ User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v3 2/9] dt-bindings: net: starfive,jh7110-dwmac: Add
  JH7100 SoC compatible
 Content-Language: en-US
-From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-To: Jessica Clarke <jrtc27@jrtc27.com>
+To: Samuel Holland <samuel.holland@sifive.com>,
+ Jessica Clarke <jrtc27@jrtc27.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
  Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
@@ -76,13 +76,14 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 References: <20231215204050.2296404-1-cristian.ciocaltea@collabora.com>
  <20231215204050.2296404-3-cristian.ciocaltea@collabora.com>
  <A7C96942-07CB-40FD-AAAA-4A8947DEE7CA@jrtc27.com>
- <491f1a89-aabd-4c38-b33a-a298add1bdb3@collabora.com>
-In-Reply-To: <491f1a89-aabd-4c38-b33a-a298add1bdb3@collabora.com>
+ <65fd52f1-6861-42b0-9148-266766d054b1@sifive.com>
+From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+In-Reply-To: <65fd52f1-6861-42b0-9148-266766d054b1@sifive.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 12/15/23 22:56, Cristian Ciocaltea wrote:
-> On 12/15/23 22:47, Jessica Clarke wrote:
+On 12/15/23 22:59, Samuel Holland wrote:
+> On 2023-12-15 2:47 PM, Jessica Clarke wrote:
 >> On 15 Dec 2023, at 20:40, Cristian Ciocaltea <cristian.ciocaltea@collabora.com> wrote:
 >>>
 >>> The Synopsys DesignWare MAC found on StarFive JH7100 SoC is mostly
@@ -131,21 +132,18 @@ On 12/15/23 22:56, Cristian Ciocaltea wrote:
 >> I’m not so well-versed in the YAML bindings, but would this not allow
 >> reset-names = "ahb", "ahb"?
 > 
-> Yes, as I already pointed out in [1], I wasn't able to come up with a
-> proper solution to avoid that.
-
-Sorry, I've sent the previous email too early..
-
-[1]: https://lore.kernel.org/lkml/564503dd-b779-4e9f-851d-f34d9ea5fa65@collabora.com/
-
-> Thanks,
-> Cristian
+> Yes, it would. You need something like:
 > 
->> Jess
->>
+> reset-names:
+>   oneOf:
+>     - enum: [stmmaceth, ahb]
+>     - items:
+>         - const: stmmaceth
+>         - const: ahb
+
+Oh yes, I always forget about the "oneOf" thing. Thanks!
+
+> Regards,
+> Samuel
 > 
-> _______________________________________________
-> linux-riscv mailing list
-> linux-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-riscv
 
