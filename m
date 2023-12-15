@@ -1,172 +1,188 @@
-Return-Path: <netdev+bounces-57927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45740814843
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 13:40:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5DCF81486F
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 13:51:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABE171F2343A
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 12:40:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24CE71C230F4
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 12:51:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B0B2C684;
-	Fri, 15 Dec 2023 12:40:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEA5B2D021;
+	Fri, 15 Dec 2023 12:51:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="VvkRb+4Y"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O7MWuzwW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E3E2574B;
-	Fri, 15 Dec 2023 12:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BFBWoLl021140;
-	Fri, 15 Dec 2023 12:40:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=B61GhZHnhYwWb3C8z/OV06tvezyEbwYLqKpoXeDZ8aU=; b=Vv
-	kRb+4Y961NdXByE/RcephGFIXmgX96yZIk9ztafCYz7oYCT59jIdAnhjH5gt74UQ
-	GMARy4b2ciwbyGig3YR8gyCII3YqqJjTuiflF8hPV77So3xdnAMg1yVSVzSGWOA3
-	u1btTcdTs1zmVcLweHvITCeqUzVRNsbjVwCbGEMlwmJYUeza4hiTtRbloiwflj15
-	l1RVMHrmq32EQRQNWRDAP4ntLc9Yjz28/xYQvnIElEIM6tIX1DNXphyZIEtm75L4
-	ctZs2NeJlVQM05vqGqerJtF6tPVeE7fG/7WxXvYSE+yn/fiL5D9WXbKk/nQhQjsr
-	al5QniDsCv2v49w0pwRw==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3v0p1003sc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Dec 2023 12:40:30 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BFCeS6e023276
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Dec 2023 12:40:29 GMT
-Received: from [10.253.13.71] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 15 Dec
- 2023 04:40:23 -0800
-Message-ID: <f656d1c7-ea86-405a-9165-9eb079ea6f2a@quicinc.com>
-Date: Fri, 15 Dec 2023 20:40:20 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642412C6B1;
+	Fri, 15 Dec 2023 12:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702644687; x=1734180687;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=fzPxfKu5qBe6tZ/jrEy3J9qTN7QyGjhXfJqX+tBLEc8=;
+  b=O7MWuzwW8RkyZ7JuPJVlJgfOYDkTuHaEI+IkmzNP/yP/TTu6CXR9G2fd
+   +9JXDpOEUQrlbYhEKSjrV/i/zJaY2xa9P3josBR4ibYi62n4RyiVtXi10
+   KboDbKrl51c/YwS6AcjZaFVtsz8zxuqrzclUFBZT1vKHjtGFpnlZXUnPa
+   P8Lpf8KScSr5UdkVzrfcups9S8hW1O5ohJ8puV7BKfcD7VI9e5guiqGBg
+   e9orlYpul3dpPVNdyXh7V4vTwCbSiPSDSpApuq1FU0li5t0KLu/odvPci
+   uD/wuL6FHQSd0rdV0wx67wq6UCirZNnhXTMuksZ611mJ3KfO8vORhfjJ7
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="380266716"
+X-IronPort-AV: E=Sophos;i="6.04,278,1695711600"; 
+   d="scan'208";a="380266716"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2023 04:51:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="898128673"
+X-IronPort-AV: E=Sophos;i="6.04,278,1695711600"; 
+   d="scan'208";a="898128673"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga004.jf.intel.com with ESMTP; 15 Dec 2023 04:51:23 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rE7ey-0000DW-37;
+	Fri, 15 Dec 2023 12:51:20 +0000
+Date: Fri, 15 Dec 2023 20:50:28 +0800
+From: kernel test robot <lkp@intel.com>
+To: Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Christian Marangi <ansuelsmth@gmail.com>
+Subject: Re: [net-next PATCH v2 3/3] net: phy: led: dynamically allocate
+ speed modes array
+Message-ID: <202312152038.v9NZyBxd-lkp@intel.com>
+References: <20231214154906.29436-4-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 5/5] dt-bindings: net: ipq4019-mdio: Document ipq5332
- platform
-Content-Language: en-US
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Conor Dooley
-	<conor@kernel.org>
-CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
-References: <20231212115151.20016-1-quic_luoj@quicinc.com>
- <20231212115151.20016-6-quic_luoj@quicinc.com>
- <20231212-caution-improvise-ed3cc6a1d305@spud>
- <11ffc985-3f2b-46b9-ae0b-911f7abe98d1@quicinc.com>
- <20231214-outshine-shush-8a11c68607cd@spud>
- <c5123ce7-6fdc-43c7-ac07-251c39196e66@quicinc.com>
- <a1e5ffec-a20d-4389-83f9-ee09bd9d733d@linaro.org>
- <a84a36af-69f8-46af-967e-b06d028597a3@quicinc.com>
- <26c8b0b1-5ea9-45cc-adf3-0d0b03a1284d@linaro.org>
- <4b9c56b8-3b29-4861-a3d5-2da26fbc14b4@quicinc.com>
- <2e77e3b1-00b6-46b9-bfed-7cae3ffa15e9@linaro.org>
- <7bae46fd-63fd-4b86-9a56-73052cf0ea95@quicinc.com>
- <5a8095e6-b6a6-4d11-b006-31519e8d8622@linaro.org>
- <7466b655-2b7e-44f2-a510-6e0cc1b95248@quicinc.com>
- <602759ce-c93d-4111-9272-1dce7e4a170a@linaro.org>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <602759ce-c93d-4111-9272-1dce7e4a170a@linaro.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: pJglisA-8S8KnxCJTj_EzLPIVPxPRnDQ
-X-Proofpoint-ORIG-GUID: pJglisA-8S8KnxCJTj_EzLPIVPxPRnDQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
- spamscore=0 bulkscore=0 mlxlogscore=845 lowpriorityscore=0
- priorityscore=1501 phishscore=0 malwarescore=0 impostorscore=0
- clxscore=1015 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2312150084
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231214154906.29436-4-ansuelsmth@gmail.com>
+
+Hi Christian,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Marangi/net-phy-refactor-and-better-document-phy_speeds-function/20231215-064112
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231214154906.29436-4-ansuelsmth%40gmail.com
+patch subject: [net-next PATCH v2 3/3] net: phy: led: dynamically allocate speed modes array
+config: arm-randconfig-002-20231215 (https://download.01.org/0day-ci/archive/20231215/202312152038.v9NZyBxd-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231215/202312152038.v9NZyBxd-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312152038.v9NZyBxd-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> drivers/net/phy/phy_led_triggers.c:89:30: error: call to undeclared function 'phy_supported_speeds_num'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+      89 |         phy->phy_num_led_triggers = phy_supported_speeds_num(phy);
+         |                                     ^
+   drivers/net/phy/phy_led_triggers.c:89:30: note: did you mean 'phy_supported_speeds'?
+   include/linux/phy.h:208:14: note: 'phy_supported_speeds' declared here
+     208 | unsigned int phy_supported_speeds(struct phy_device *phy,
+         |              ^
+>> drivers/net/phy/phy_led_triggers.c:133:2: error: call to undeclared library function 'free' with type 'void (void *)'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     133 |         free(speeds);
+         |         ^
+   drivers/net/phy/phy_led_triggers.c:133:2: note: include the header <stdlib.h> or explicitly provide a declaration for 'free'
+   2 errors generated.
 
 
+vim +/phy_supported_speeds_num +89 drivers/net/phy/phy_led_triggers.c
 
-On 12/15/2023 8:19 PM, Krzysztof Kozlowski wrote:
-> On 15/12/2023 12:42, Jie Luo wrote:
->>>>>>>>> Which clocks are these mentioned in the property? From where do they come?
->>>>>>>>>
->>>>>>>>> Anyway, property is in existing form is not correct - this is not a
->>>>>>>>> generic property.
->>>>>>>>>
->>>>>>>>
->>>>>>>> This property cmn-reference-clock is just the hardware register
->>>>>>>> configuration, since the different IPQ platform needs to select
->>>>>>>> the different reference clock source for the CMN PLL block that
->>>>>>>> provides the various clock outputs to the all kinds of Ethernet
->>>>>>>> devices, which is not from GCC provider.
->>>>>>>
->>>>>>> AGAIN: where do the clocks come from? Which device generates them?
->>>>>>
->>>>>> Oh, OK, the reference clock is from wifi that provides 48MHZ to
->>>>>> Ethernet block.
->>>>>
->>>>> Then WiFi should be providing you the clock and this device should be
->>>>> clock consumer, right?
->>>>
->>>> Yes, wifi provides 48MHz clock to CMM PLL block, there is no GCC
->>>> for this 48MHZ clock output, it is the hardware PIN connection.
->>>
->>> All clocks are some hardware pin connections.
->>>
->>> Best regards,
->>> Krzysztof
->>>
->>
->> Yes, all reference clocks here are from hardware pin connection.
-> 
-> You keep answering with short sentences without touching the root of the
-> problem. I don't know exactly why, but I feel this discussion leads
-> nowhere. After long discussion you finally admitted that clocks came
-> from another device - Wifi. It took us like 6 emails?
-> 
-> So last statement: if you have clock provider and clock consumer, you
-> must represent it in the bindings or provide rationale why it should not
-> or must not be represented in the bindings. So far I do not see any of
-> such arguments.
-> 
-> If you use arguments like:
-> "My driver....": sorry, bindings are not about drivers
-> "I don't have clock driver for WiFi": sorry, it does not matter if you
-> can write one, right?
-> 
-> Please reach internally your colleagues to solve these problems and make
-> review process smoother.
-> 
-> Best regards,
-> Krzysztof
-> 
-> 
+    83	
+    84	int phy_led_triggers_register(struct phy_device *phy)
+    85	{
+    86		unsigned int *speeds;
+    87		int i, err;
+    88	
+  > 89		phy->phy_num_led_triggers = phy_supported_speeds_num(phy);
+    90		if (!phy->phy_num_led_triggers)
+    91			return 0;
+    92	
+    93		speeds = kmalloc_array(phy->phy_num_led_triggers, sizeof(*speeds),
+    94				       GFP_KERNEL);
+    95		if (!speeds)
+    96			return -ENOMEM;
+    97	
+    98		/* Presence of speed modes already checked up */
+    99		phy_supported_speeds(phy, speeds, phy->phy_num_led_triggers);
+   100	
+   101		phy->led_link_trigger = devm_kzalloc(&phy->mdio.dev,
+   102						     sizeof(*phy->led_link_trigger),
+   103						     GFP_KERNEL);
+   104		if (!phy->led_link_trigger) {
+   105			err = -ENOMEM;
+   106			goto out_clear;
+   107		}
+   108	
+   109		err = phy_led_trigger_register(phy, phy->led_link_trigger, 0, "link");
+   110		if (err)
+   111			goto out_free_link;
+   112	
+   113		phy->phy_led_triggers = devm_kcalloc(&phy->mdio.dev,
+   114						    phy->phy_num_led_triggers,
+   115						    sizeof(struct phy_led_trigger),
+   116						    GFP_KERNEL);
+   117		if (!phy->phy_led_triggers) {
+   118			err = -ENOMEM;
+   119			goto out_unreg_link;
+   120		}
+   121	
+   122		for (i = 0; i < phy->phy_num_led_triggers; i++) {
+   123			err = phy_led_trigger_register(phy, &phy->phy_led_triggers[i],
+   124						       speeds[i],
+   125						       phy_speed_to_str(speeds[i]));
+   126			if (err)
+   127				goto out_unreg;
+   128		}
+   129	
+   130		phy->last_triggered = NULL;
+   131		phy_led_trigger_change_speed(phy);
+   132	
+ > 133		free(speeds);
+   134	
+   135		return 0;
+   136	out_unreg:
+   137		while (i--)
+   138			phy_led_trigger_unregister(&phy->phy_led_triggers[i]);
+   139		devm_kfree(&phy->mdio.dev, phy->phy_led_triggers);
+   140	out_unreg_link:
+   141		phy_led_trigger_unregister(phy->led_link_trigger);
+   142	out_free_link:
+   143		devm_kfree(&phy->mdio.dev, phy->led_link_trigger);
+   144		phy->led_link_trigger = NULL;
+   145	out_clear:
+   146		free(speeds);
+   147		phy->phy_num_led_triggers = 0;
+   148		return err;
+   149	}
+   150	EXPORT_SYMBOL_GPL(phy_led_triggers_register);
+   151	
 
-These reference clocks source do not need the hardware configuration,
-that is the reason why the clock provider is not needed, some reference
-clock source are even from external crystal.
-
-There is also no enable control for the reference clocks since it is
-inputted by the hardware PIN connection, i will update these description
-in the DT to make it more clear.
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
