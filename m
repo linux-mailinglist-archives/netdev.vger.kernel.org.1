@@ -1,195 +1,393 @@
-Return-Path: <netdev+bounces-58091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25624814FF6
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 20:06:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 185C1815005
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 20:12:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE8911F24F2C
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 19:06:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BF5F1C20C07
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 19:12:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83FD13EA78;
-	Fri, 15 Dec 2023 19:06:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED31B3EA71;
+	Fri, 15 Dec 2023 19:12:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="naWoOykE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XHhyiItO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 967784184C
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 19:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702667159; x=1734203159;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=MCn3NqISnLaU/oZvg2jfnSko6LT/EgpqKTP6n3l0EUI=;
-  b=naWoOykE/Ki45z5v35kcrfvNIHZQyigioQzF0CHivJFmf8HJGh6wmXVU
-   fCn5FHeBkEO0VzETWHD6ZEazpzdPg9takuob19Q+jR3cyK9Qot9V+ETuZ
-   Oz6APtkCvO8j78xkO2YLMz7h+unVFStgR+M/Ngm39CXrtnzAe09PND6tP
-   2XFVblEchqctRy0Fw0L9z3naHELJ/5dbYs6yV6uHcImDy81yUj4nLFqIQ
-   zmZdpkon7hIUzqtA/p8jtp6QM6S7Hcmo61rsZ2HN1d2jMVtaxPFDXkb8E
-   k5Gro7fMAkqPsMzRCb/unbO8qXugG/xkVdXXhh5Kx2Df3R8FBbPnzS3cM
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10925"; a="461776022"
-X-IronPort-AV: E=Sophos;i="6.04,279,1695711600"; 
-   d="scan'208";a="461776022"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2023 11:05:57 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10925"; a="1106216589"
-X-IronPort-AV: E=Sophos;i="6.04,279,1695711600"; 
-   d="scan'208";a="1106216589"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 15 Dec 2023 11:05:56 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 15 Dec 2023 11:05:56 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 15 Dec 2023 11:05:56 -0800
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.40) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 15 Dec 2023 11:05:04 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B42dUPUbYN92QhhrI+W7HjnDPykHdj9BVkZPo2VjHdXkeRVaQIZoy8jgD6sEaBNeOhXuPZXRbgK3f2j3s28du6JBxbhyEezFWhqdQOzAw48IrFjUztXhDyskJ7YO4ov+gkE69s2klaqDHxn1Izy2lcz15d4zAe0lENosISZ9PZJmXulCZ2LpjFF8y/XCe54rDYoGtVDhXzJ2aUGh3LbTTobEcKTox8mByxroanyBHL2pJCMx7NsYUObxQ/7R0dHvbqbtr8SN+1apqPRDMJgh2WGfEbkjnC8/w7N7TjUd8ZV9S+3gwJPlxSrcBB54Qo8WwnMVSbCNsr0RU5sHqHTzSg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xPCd2Cu+/MUcIJF1xSihfAt29uFfxtwMx+Uxx+/sDMM=;
- b=HVUQNF5rhXlumhb9/ugSKdukMYUDq619ing/lDeX0g2AJ4bVH9bsIzx/cN5E4AhWYG9VIi8oPiBI3RbU9x8NwgRgxwdGzHToAhf1zvbflkF9xXWmhacF8HnKIeE6GARV7eR1iV3wo++g70sxKx1P8sj3B4wPJCG5l/tiRwL/VZum/BsjR6IA7B6EGzzc7q/3uLoNxckc57zSoDNf6HiPW/9frjBnO+UOtq/x+6NJWyktS+DfvfzMCGn9OgQBkCp8BGsHawv9kO99cNi8oQ595pFvTgCqVqs5BfkUEaYl9zyowNuSJoQ/qMg/auEC976prX5XT6hmNgHuJjbUZbTm0A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB5782.namprd11.prod.outlook.com (2603:10b6:510:147::11)
- by PH7PR11MB7122.namprd11.prod.outlook.com (2603:10b6:510:20d::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.31; Fri, 15 Dec
- 2023 19:04:57 +0000
-Received: from PH0PR11MB5782.namprd11.prod.outlook.com
- ([fe80::dfa4:95a8:ac5:bc37]) by PH0PR11MB5782.namprd11.prod.outlook.com
- ([fe80::dfa4:95a8:ac5:bc37%5]) with mapi id 15.20.7091.032; Fri, 15 Dec 2023
- 19:04:57 +0000
-Date: Fri, 15 Dec 2023 20:04:52 +0100
-From: Michal Kubiak <michal.kubiak@intel.com>
-To: Brett Creeley <bcreeley@amd.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <aleksander.lobakin@intel.com>,
-	<larysa.zaremba@intel.com>, <alan.brady@intel.com>, <joshua.a.hay@intel.com>,
-	<emil.s.tantilov@intel.com>, <maciej.fijalkowski@intel.com>,
-	<netdev@vger.kernel.org>, Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH iwl-net] idpf: enable WB_ON_ITR
-Message-ID: <ZXyjVCdi03p29jcc@localhost.localdomain>
-References: <20231212145546.396273-1-michal.kubiak@intel.com>
- <9ea0484d-a2a4-308c-95fd-c9accdcdc424@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <9ea0484d-a2a4-308c-95fd-c9accdcdc424@amd.com>
-X-ClientProxiedBy: DU7PR01CA0043.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:50e::21) To PH0PR11MB5782.namprd11.prod.outlook.com
- (2603:10b6:510:147::11)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3923C41843
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 19:12:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-db3fa47c2f7so835813276.0
+        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 11:12:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702667556; x=1703272356; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=g/7MzHYLzqZQheJqMfLkZzeOiy0VpB3DOKLySBs2Akg=;
+        b=XHhyiItOgQT3AV3nk1DKCvzkKOt02iAQQu0+7TrGKZiV3nQb6oqQJ3Yw9hTIIdbahV
+         slKm+OnEu/1M/zYZMBPYUx7DONvDdjFz9+VDuZIV1knh/AzmB04UnXeF858/bW6WRUSK
+         nHIwaJasbbMDdCudZnku+K99eaFIPG7E/N2g75EHeJB1oFYCx7OYbE9Tu/67IGmomV7z
+         lYHkNnC3dSr4aw4URwkheUu1Rau1QWngticOTc/600MrlpMT4Kk/31hDWeuYPgIxE/BJ
+         zHyOXGy9Gl2RdWoM6ARejKKANTPyBxpJPcQ3qWDVsOBCLv/pqZiDemxPw+rcaa3QWjrv
+         NPRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702667556; x=1703272356;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=g/7MzHYLzqZQheJqMfLkZzeOiy0VpB3DOKLySBs2Akg=;
+        b=X7YYLK05sRTfhIO52r4aN3AURgD1iVkhI+87xpvwrrDQQrJ0xTsZK3f3K77QSWGNfQ
+         L+o8fQL+bSSmSaDIzcSRZIpaLUCPNIy2/B4sxs8pHVTRMpo/L+Vx2JrqMHcXsypNzqZH
+         iTR0Ujf4jBpQT76f0aeGRLY6edZqYU/qntqlIkrpzDWRrgkkOqS9eAG3TYNTRjCwkDaW
+         x0RMxHobRsjmJ9ewWmYp6PsYEqiWgKtc/u9eWRS0iPYk6Q0DAIpk7UJvSIsMoKCSxHY/
+         /TCal8/N6+RDliNEEUtrxRYXJXdfj08+eZb9QucNjAQ5EysK5p4tC5SPqce7AtiBR8Xl
+         jhbg==
+X-Gm-Message-State: AOJu0YxOElRQZ+YW2/uFRevd4i7okOn5Xzss+VvhsETrMgKQvhA+eAv3
+	tyu7enF8RNAoRBO79qeZBX0=
+X-Google-Smtp-Source: AGHT+IEPDmPqsW/Fae8JRM7QKRAcGCa5W5/Wr2x9CIll8lf39S9KqIGvW/xWuVZo3vyV6dng/bZKWA==
+X-Received: by 2002:a25:b12:0:b0:dbc:ceab:3a2b with SMTP id 18-20020a250b12000000b00dbcceab3a2bmr3600559ybl.32.1702667555917;
+        Fri, 15 Dec 2023 11:12:35 -0800 (PST)
+Received: from ?IPV6:2600:1700:6cf8:1240:cff8:4904:6a61:98b6? ([2600:1700:6cf8:1240:cff8:4904:6a61:98b6])
+        by smtp.gmail.com with ESMTPSA id 18-20020a250b12000000b00dbccef3a8fcsm2173069ybl.28.2023.12.15.11.12.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Dec 2023 11:12:35 -0800 (PST)
+Message-ID: <185a3177-3281-4ead-838e-6d621151ea36@gmail.com>
+Date: Fri, 15 Dec 2023 11:12:33 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB5782:EE_|PH7PR11MB7122:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4e2da750-1daa-4a28-d5c1-08dbfda0bab7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tA6AWQbue6TFc4ZZlUzhQW0tg8aqpM3VVaAA2czDapyXDfzaz3u+As2Ce+APiV+NYzlmsdVizX4PInnC2TjSotBshGs7f+6VNtNjVdG9J06ATSRQXJN1FYlHQzUlXnNu3brmO45z+qd+0pV0xthst7kEEM9xvD7x+33R+shfgwShFDL3Dn1nUTmscdBDBUpmsv8xGUQ19dTlH3WUNpKreCV36x0VyEx2GfnfmkgA/lnc4XW8KdsZVGcOh0vncfcVb4wp3XKQ4KVEJC1pplsnZU9fsUmV3n0lwZpRhd+W5FJQMbMNzJnKl0F+gXPwe/8QjAwXz+wNTuXxNXCcRjb6bgeLDkzfh0lJfa0nxuVg8x0PjGc9TS0+12Uw4kIEBjr8TIOPuLMmw2JDnJbjVGoa1IRqI2T2pCXpGvasq9lF8fR07F+ue26Jk9mB2qcrgmxgw0iBCIW5bp/SwAdCtsMyi7uHshss1admiJerR7mTZFY0c1ykf3/8Ap9UOkdu5nAWho5ladckRz1gedSa7IMNNhcMpH2zvCUB9otJC4qLau48o36lDJCJzvP1PHzaAjyh
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5782.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(376002)(136003)(346002)(39860400002)(230922051799003)(451199024)(64100799003)(1800799012)(186009)(26005)(6506007)(107886003)(82960400001)(86362001)(38100700002)(83380400001)(5660300002)(4326008)(44832011)(9686003)(6512007)(6666004)(6916009)(316002)(66946007)(8676002)(6486002)(8936002)(66556008)(66476007)(2906002)(41300700001)(478600001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?8xbDmmZuZk1cAzUYS+afzCK0yLyQkSI2fyB5AsgIGUIJQ3c6yTEDZIrq7ZSF?=
- =?us-ascii?Q?sBd1cfShV+E3Wc1NSeth0A4aFSQmaA1mGUJgslfQWlZDVI+y0QcuZBT3kU8h?=
- =?us-ascii?Q?8D/vX6j65XZeDNFvEe4cfr8wDZyibO+jFA8X5BpNC1aSgO+f6MGzoYfBJK2t?=
- =?us-ascii?Q?Bvhbo3RiHTKrTsikjbFhUVL9VWGEnZvHQO9bHfrWSJ9yUa/z8BxwJyxKGukq?=
- =?us-ascii?Q?0Qf3BO+frxngS1bvydJ4CgSKBiuqyJuA0sb01PQM3/zMzzCh5SNZAGuDj+kO?=
- =?us-ascii?Q?5pXwrx2uQOGILxetU2prjoruE+SUpXU2RUjKXbmLmtUmx+YlBNtJryu+scbw?=
- =?us-ascii?Q?XFrDob9P2xxcJJwhVfRiMcYLP1jluCoLKcmDlhqnbYrxiftnaPJmAFYkWtmy?=
- =?us-ascii?Q?4ocXSJmGVPtwTsxraqPNAVfm7DYg/JM01obQoCAR7Sgej2wn9OQj/Rwb6SHB?=
- =?us-ascii?Q?EUqq5PQjgev3ZJAv1CX3O6ZNmcC8GtDESvdyAUBKshcF8X7yssudz3OzcP5q?=
- =?us-ascii?Q?ezJCjzmCcI2uOPvmSAIsMqt4zWCNyPnRPSW3y79JNd1AMmTWky3DW7SGsx3N?=
- =?us-ascii?Q?PUqcOpvRPFLSMSMyA0hvM035RC0UzZt36WMLH1rHA6yG4r9BJgb1/JqoMxFl?=
- =?us-ascii?Q?tvA9JyTlmYxKrgogdXWjcsU/qHiD9l4LuO1LiUxPoXG5HvpPCppzYfpdZCSy?=
- =?us-ascii?Q?2uHThpjwi1h3TpWcQx1Vs3pBZX9GL9wKAgNVwZ3RsJxnPdOwPJi7014BJ05H?=
- =?us-ascii?Q?awGNCdB7TqrGDLwe1kK8GeXa1cFATGVS6246YixuhvN080bFkVa9AI8zfKvy?=
- =?us-ascii?Q?UQ6UrjRRTPMWFaSLtW2WYQ79F770lU8kydGslUKs8PDlFjI6oXN3VJjOiW0l?=
- =?us-ascii?Q?dMZY3og8SFim0Jq2yefBFRyjpEFsMMmm0yiD2USYSkSmp9Ko1WQNtsffVzZy?=
- =?us-ascii?Q?IT0/zrvWg7nL3UTimH3jY5JtFoq1sp3IvFJwo1DoAPfD6PwGzdgwwgrdqGAD?=
- =?us-ascii?Q?d7cvAfNuhzPO65NLrhrRz/aafXnT3tmKfc8KXS4iztlAJCy6Lk53h8uGjVDe?=
- =?us-ascii?Q?YfTxn6pHVCqAHnXOoBBt7liQLv1AnKroO/Jb9gwEfgiK9LPPTZRpunKGJOrS?=
- =?us-ascii?Q?ZVyaYxrcKwUPkQAHaPfXQVThYMNdjW0iVBnlSqsDxcLTLwQObb3bc8KYdN50?=
- =?us-ascii?Q?ftWqYsoASrOc2XpN5zwr8V8jHE1tAMgCxpSc2mzzWEj7U0xV3q/JjXrlFv0l?=
- =?us-ascii?Q?2fXbq3rF1v7nXumDh18nW09COsMZJFJU6cvh8uJE4s8PxlCT94QN3uVy+GP1?=
- =?us-ascii?Q?okVGBMFt+7K+hW59f6bpBb6P33GLBXuvhiUVe3Pgwjw7OiOCi3hS/mko17Db?=
- =?us-ascii?Q?sm3QWhcdExrQEh8HQbQbH4FAejwykIfjOybeFu2R9gQP4pGP0zWNeFEZoVO5?=
- =?us-ascii?Q?I2WNDhc4pqRYDpf3bNTwpS0SMYYaJ/xM/HybMmUadZ+p+wGFlzR4yYOx3Eo9?=
- =?us-ascii?Q?7GFpa0q1PcWzOXBMZV86e3kSpfz1jFxdHZaYRZdcOIjwUTIkb7Gji5zWEP15?=
- =?us-ascii?Q?gdf1SGNP1Nrb8BzaNy5MzugO+8NTNdSIBCyYQ4R7uHre8ck23jaHtq+tkBkM?=
- =?us-ascii?Q?ZQ=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4e2da750-1daa-4a28-d5c1-08dbfda0bab7
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5782.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2023 19:04:57.3719
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GcZ8I8V4h97mi8VGlMoA3l8zsHBozLXwOjVxBG/6pouWbg2Iezw2AkWVFgPrIamhcWCm8pY+P0eegJQmYuYH4w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7122
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/2] net/ipv6: insert a f6i to a GC list only
+ if the f6i is in a fib6_table tree.
+Content-Language: en-US
+To: David Ahern <dsahern@kernel.org>, thinker.li@gmail.com,
+ netdev@vger.kernel.org, martin.lau@linux.dev, kernel-team@meta.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+Cc: kuifeng@meta.com, syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com
+References: <20231213213735.434249-1-thinker.li@gmail.com>
+ <20231213213735.434249-2-thinker.li@gmail.com>
+ <28f016bc-3514-444f-82df-719aeb2d013a@kernel.org>
+From: Kui-Feng Lee <sinquersw@gmail.com>
+In-Reply-To: <28f016bc-3514-444f-82df-719aeb2d013a@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 15, 2023 at 10:01:36AM -0800, Brett Creeley wrote:
+
+
+On 12/13/23 22:11, David Ahern wrote:
+> On 12/13/23 2:37 PM, thinker.li@gmail.com wrote:
+>> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+>> index b132feae3393..dcaeb88d73aa 100644
+>> --- a/net/ipv6/route.c
+>> +++ b/net/ipv6/route.c
+>> @@ -3763,10 +3763,10 @@ static struct fib6_info *ip6_route_info_create(struct fib6_config *cfg,
+>>   		rt->dst_nocount = true;
+>>   
+>>   	if (cfg->fc_flags & RTF_EXPIRES)
+>> -		fib6_set_expires_locked(rt, jiffies +
+>> -					clock_t_to_jiffies(cfg->fc_expires));
+>> +		__fib6_set_expires(rt, jiffies +
+>> +				   clock_t_to_jiffies(cfg->fc_expires));
+>>   	else
+>> -		fib6_clean_expires_locked(rt);
+>> +		__fib6_clean_expires(rt);
 > 
-
-[...]
-
+> as Eric noted in a past comment, the clean is not needed in this
+> function since memory is initialized to 0 (expires is never set).
 > 
-> > 
-> > diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-> > index df76493faa75..50761c2d9f3b 100644
-> > --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-> > +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-> > @@ -495,9 +495,11 @@ struct idpf_vec_regs {
-> >   struct idpf_intr_reg {
-> >          void __iomem *dyn_ctl;
-> >          u32 dyn_ctl_intena_m;
-> > +       u32 dyn_ctl_intena_msk_m;
-> >          u32 dyn_ctl_itridx_s;
-> >          u32 dyn_ctl_itridx_m;
-> >          u32 dyn_ctl_intrvl_s;
-> > +       u32 dyn_ctl_wb_on_itr_m;
-> >          void __iomem *rx_itr;
-> >          void __iomem *tx_itr;
-> >          void __iomem *icr_ena;
-> > @@ -534,6 +536,7 @@ struct idpf_q_vector {
-> >          struct napi_struct napi;
-> >          u16 v_idx;
-> >          struct idpf_intr_reg intr_reg;
-> > +       bool wb_on_itr;
+> Also, this patch set does not fundamentally change the logic, so it
+> cannot fix the bug reported in
 > 
-> Not sure if this was considered, but it might be best to put this before
-> intr_reg so it's on the same cacheline as intr_reg.
+> https://lore.kernel.org/all/20231205173250.2982846-1-edumazet@google.com/
 > 
+> please hold off future versions of this set until the problem in that
+> stack traced is fixed. I have tried a few things using RA's, but have
+> not been able to recreate UAF.
 
-Good point! It wasn't considered before.
-I have just confirmed with pahole that it is worth putting that flag
-before the register structure in terms of cacheline.
+I tried to reproduce the issue yesterday, according to the hypothesis
+behind the patch of this thread. The following is the instructions
+to reproduce the UAF issue. However, this instruction doesn't create
+a crash at the place since the memory is still available even it has
+been free. But, the log shows a UAF.
 
-Thank you for your suggestion. I will reorder this.
+The patch at the end of this message is required to reproduce and
+show UAF. The most critical change in the patch is to insert
+a 'mdelay(3000)' to sleep 3s in rt6_route_rcv(). That gives us
+a chance to manipulate the kernel to reproduce the UAF.
 
-Thanks,
-Michal
+Here is my conclusion. There is no protection between finding
+a route and changing the route in rt6_route_rcv(), including inserting
+the entry to the gc list. It is possible to insert an entry that will be
+free later to the gc list, causing a UAF. There is more explanations
+along with the following logs.
+
+Instructions:
+      - Preparation
+        - install ipv6toolkit on the host.
+        - run qemu with a patched kernel as a guest through
+          with the host through qemubr0 a bridge.
+        - On the guest
+          - stop systemd-networkd.service & systemd-networkd.socket if 
+there are.
+          - sysctl -w net.ipv6.conf.enp0s3.accept_ra=2
+          - sysctl -w net.ipv6.conf.enp0s3.accept_ra_rt_info_max_plen=127
+        - Assume the address of qemubr0 in the host is
+          fe80::4ce9:92ff:fe27:75df.
+      - Test
+        - ra6 -i qemubr0 -d ff02::1 -R 'fe82::/64#1#300' -t 300 # On the 
+host
+        - sleep 2; ip -6 route del fe82::/64                    # On the 
+guest
+        - ra6 -i qemubr0 -d ff02::1 -R 'fe82::/64#1#300' -t 300 # On the 
+host
+        - ra6 -i qemubr0 -d ff02::1 -R 'fe81::/64#1#300' -t 0   # On the 
+host
+      - The step 3 should start immediately after step 2 since we have
+        a gap of merely 3 seconds in the kernel.
+
+
+The log generated by the test:
+
+# this is the log triggered by step 1
+
+qemu login: [    4.673867] __ip6_ins_rt fe80::5054:ff:fe12:3456/128
+[   82.138139] rt = 0000000000000000
+[   82.138731] fib6_info_alloc: ffff888103950200
+[   82.139088] __ip6_ins_rt ::/0
+[   82.139993] fib6_add: add ffff888103950200 to gc list 
+ffff888103950238 pprev ffff888102878200 next 0000000000000000
+[   82.141719] rt = ffff888103950200
+[   82.141748] rt6_route_rcv
+[   82.141748] fib6_info_alloc: ffff88810093be00
+[   82.141748] __ip6_ins_rt fe82::/64
+[   82.141748] rt6_route_rcv: route info ffff88810093be00, sleep 3s
+[   85.121803] fib6_set_expires_locked: add ffff88810093be00 to gc list 
+ffff88810093be38 pprev ffff888102878200 next ffff888103950238
+[   85.146497] rt6_route_rcv: route info ffff88810093be00, after release
+
+
+# This is the log triggered by step 2 & 3.
+#
+# The line containing fib6_clean_expires_locked is specifically
+# triggered by step 2. Step 2 removes the entry from the tree and
+# gc list. Step 3 free the entry by calling
+# fib6_info_release() at the very end of rt6_route_rcv() since it is
+# the last owner of that entry. fib6_info_destroy_rcu proves that.
+#
+# However, even the entry will be free later, rt6_route_rcv() still add
+# the entry back to the gc list before freeing the entry. In other
+# words, it create an entry (ffff88810093be38) that is free in
+# a gc list.
+#
+# Keep an eye on ffff88810093be38 and ffff88810093be00. ffff88810093be00
+# is the address of a fib6_info and ffff88810093be38 is the address of
+# its gc_link.
+#
+# This log also complies with the log in
+#
+#  https://lore.kernel.org/all/20231205173250.2982846-1-edumazet@google.com/
+#
+# The entry is free by the call of fib6_info_release() in
+# rt6_route_rcv().
+
+[  105.158140] rt = ffff888103950200
+[  105.158590] rt6_route_rcv
+[  105.158924] rt6_route_rcv: route info ffff88810093be00, sleep 3s
+[  106.368875] fib6_clean_expires_locked: del ffff88810093be00 from gc 
+list pprev ffff888102878200 next ffff888103950238
+[  107.201815] fib6_set_expires_locked: add ffff88810093be00 to gc list 
+ffff88810093be38 pprev ffff888102878200 next ffff888103950238
+[  108.159815] rt6_route_rcv: route info ffff88810093be00, after release
+[  108.168807] fib6_info_destroy_rcu ffff88810093be00
+
+
+# This is the log triggered by step 4.
+# The line containing fib6_clean_expires_locked shows the free entry
+# mentioned in the previous part is still in the gc list. (pprev
+# ffff88810093be38)
+# Since fib6_clean_expires_locked() calls hlist_del_init() to remove
+# an entry from the gc list, it will change the value of *pprev
+# (ffff88810093be38). It causes an UAF case.
+
+[  131.882130] rt = ffff888103950200
+[  131.882567] __ip6_del_rt ::/0
+[  131.882932] fib6_clean_expires_locked: del ffff888103950200 from gc 
+list pprev ffff88810093be38 next 0000000000000000
+[  131.883296] rt6_route_rcv
+[  131.883296] fib6_info_alloc: ffff88810093be00
+[  131.884517] __ip6_ins_rt fe81::/64
+[  131.884517] rt6_route_rcv: route info ffff88810093be00, sleep 3s
+[  134.305866] fib6_set_expires_locked: add ffff88810093be00 to gc list 
+ffff88810093be38 pprev ffff888102878200 next ffff88810093be38
+[  134.537866] rt6_route_rcv: route info ffff88810093be00, after release
+[  134.896801] fib6_info_destroy_rcu ffff888103950200
+
+
+# The following log is the kernel errors that printed after 10s seconds.
+
+[  168.321812] watchdog: BUG: soft lockup - CPU#3 stuck for 26s! 
+[swapper/3:0]
+[  196.289823] watchdog: BUG: soft lockup - CPU#3 stuck for 52s! 
+[swapper/3:0]
+[  214.244784] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+[  214.245723] rcu:     3-....: (7 ticks this GP) idle=198c/0/0x1 
+softirq=2002/2003 fqs=12309
+[  214.245774] rcu:     (detected by 2, t=60002 jiffies, g=1213, q=282 
+ncpus=4)
+[  240.321823] watchdog: BUG: soft lockup - CPU#3 stuck for 93s! 
+[swapper/3:0]
+[  268.353804] watchdog: BUG: soft lockup - CPU#3 stuck for 119s! 
+[swapper/3:0]
+[  296.388805] watchdog: BUG: soft lockup - CPU#3 stuck for 146s! 
+[swapper/3:0]
+
+
+
+
+
+diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
+index 1ba9f4ddf2f6..6e059ba3d2d0 100644
+--- a/include/net/ip6_fib.h
++++ b/include/net/ip6_fib.h
+@@ -510,8 +510,11 @@ static inline void fib6_set_expires_locked(struct 
+fib6_info *f6i,
+
+  	tb6 = f6i->fib6_table;
+  	f6i->expires = expires;
+-	if (tb6 && !fib6_has_expires(f6i))
++	if (tb6 && !fib6_has_expires(f6i)) {
+  		hlist_add_head(&f6i->gc_link, &tb6->tb6_gc_hlist);
++		printk(KERN_CRIT "fib6_set_expires_locked: add %px to gc list %px 
+pprev %px next %px\n",
++		       f6i, &f6i->gc_link, f6i->gc_link.pprev, f6i->gc_link.next);
++	}
+  	f6i->fib6_flags |= RTF_EXPIRES;
+  }
+
+@@ -529,8 +532,11 @@ static inline void fib6_set_expires(struct 
+fib6_info *f6i,
+
+  static inline void fib6_clean_expires_locked(struct fib6_info *f6i)
+  {
+-	if (fib6_has_expires(f6i))
++	if (fib6_has_expires(f6i)) {
++		printk(KERN_CRIT "fib6_clean_expires_locked: del %px from gc list 
+pprev %px next %px\n",
++		       f6i, f6i->gc_link.pprev, f6i->gc_link.next);
+  		hlist_del_init(&f6i->gc_link);
++	}
+  	f6i->fib6_flags &= ~RTF_EXPIRES;
+  	f6i->expires = 0;
+  }
+diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+index 28b01a068412..b275b9798b5e 100644
+--- a/net/ipv6/ip6_fib.c
++++ b/net/ipv6/ip6_fib.c
+@@ -162,6 +162,8 @@ struct fib6_info *fib6_info_alloc(gfp_t gfp_flags, 
+bool with_fib6_nh)
+
+  	INIT_HLIST_NODE(&f6i->gc_link);
+
++	printk(KERN_CRIT "fib6_info_alloc: %px\n", f6i);
++
+  	return f6i;
+  }
+
+@@ -178,6 +180,7 @@ void fib6_info_destroy_rcu(struct rcu_head *head)
+
+  	ip_fib_metrics_put(f6i->fib6_metrics);
+  	kfree(f6i);
++	printk(KERN_CRIT "fib6_info_destroy_rcu %px\n", f6i);
+  }
+  EXPORT_SYMBOL_GPL(fib6_info_destroy_rcu);
+
+@@ -1486,8 +1489,10 @@ int fib6_add(struct fib6_node *root, struct 
+fib6_info *rt,
+  			list_add(&rt->nh_list, &rt->nh->f6i_list);
+  		__fib6_update_sernum_upto_root(rt, fib6_new_sernum(info->nl_net));
+
+-		if (fib6_has_expires(rt))
++		if (fib6_has_expires(rt)) {
+  			hlist_add_head(&rt->gc_link, &table->tb6_gc_hlist);
++			printk(KERN_CRIT "fib6_add: add %px to gc list %px pprev %px next 
+%px\n", rt, &rt->gc_link, rt->gc_link.pprev, rt->gc_link.next);
++		}
+
+  		fib6_start_gc(info->nl_net, rt);
+  	}
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index b132feae3393..52283a80f79e 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -935,6 +935,8 @@ int rt6_route_rcv(struct net_device *dev, u8 *opt, 
+int len,
+  	unsigned long lifetime;
+  	struct fib6_info *rt;
+
++	printk(KERN_CRIT "rt6_route_rcv\n");
++
+  	if (len < sizeof(struct route_info)) {
+  		return -EINVAL;
+  	}
+@@ -989,12 +991,15 @@ int rt6_route_rcv(struct net_device *dev, u8 *opt, 
+int len,
+  				 (rt->fib6_flags & ~RTF_PREF_MASK) | RTF_PREF(pref);
+
+  	if (rt) {
++		printk(KERN_CRIT "rt6_route_rcv: route info %px, sleep 3s\n", rt);
++		mdelay(3000);
+  		if (!addrconf_finite_timeout(lifetime))
+  			fib6_clean_expires(rt);
+  		else
+  			fib6_set_expires(rt, jiffies + HZ * lifetime);
+
+  		fib6_info_release(rt);
++		printk(KERN_CRIT "rt6_route_rcv: route info %px, after release\n", rt);
+  	}
+  	return 0;
+  }
+@@ -1297,6 +1302,9 @@ static int __ip6_ins_rt(struct fib6_info *rt, 
+struct nl_info *info,
+  {
+  	int err;
+  	struct fib6_table *table;
++	if (rt)
++		printk(KERN_CRIT "__ip6_ins_rt %pI6c/%d\n",
++		       &rt->fib6_dst.addr, rt->fib6_dst.plen);
+
+  	table = rt->fib6_table;
+  	spin_lock_bh(&table->tb6_lock);
+@@ -3855,6 +3863,9 @@ static int __ip6_del_rt(struct fib6_info *rt, 
+struct nl_info *info)
+  	struct net *net = info->nl_net;
+  	struct fib6_table *table;
+  	int err;
++	if (rt)
++		printk(KERN_CRIT "__ip6_del_rt %pI6c/%d\n",
++		       &rt->fib6_dst.addr, rt->fib6_dst.plen);
+
+  	if (rt == net->ipv6.fib6_null_entry) {
+  		err = -ENOENT;
+@@ -4345,8 +4356,10 @@ struct fib6_info *rt6_get_dflt_router(struct net 
+*net,
+  		    ipv6_addr_equal(&nh->fib_nh_gw6, addr))
+  			break;
+  	}
+-	if (rt && !fib6_info_hold_safe(rt))
++	if (rt && !fib6_info_hold_safe(rt)) {
+  		rt = NULL;
++	}
++	printk(KERN_CRIT "rt = %px\n", rt);
+  	rcu_read_unlock();
+  	return rt;
+  }
 
