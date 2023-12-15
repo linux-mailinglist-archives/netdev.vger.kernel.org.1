@@ -1,120 +1,85 @@
-Return-Path: <netdev+bounces-57963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8EA4814986
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:43:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E47481498E
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:45:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF9FBB21A25
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 13:43:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90E101C232B6
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 13:45:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6562DF67;
-	Fri, 15 Dec 2023 13:42:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lG7viCNz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EB3B2DB9A;
+	Fri, 15 Dec 2023 13:45:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.216.63.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808ED30321;
-	Fri, 15 Dec 2023 13:42:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=pv0AaHgjkAy6u95Pj8OOH2/guQb3Aq8ffCZaWiu1IRg=; b=lG7viCNzqAjzgDF7gJwFPmDEJ4
-	LjsCYZjzFLR2bZTBYmuCcgLYwjT2eW9VGwCO+J8AgkzFFivO5Y7jx6u5khrCR4Kkl4tlxWeuARR2b
-	zMIyXm8Iw1VWdmpe0o5eNSF6ZWnuBYXaG/cztXM6PEZZy1ymzgxCUOZO8jZncwaeoMOr4oanxJXn0
-	ll8PMs9VoKw1NBUkvId0gijqpyLdeSttPDx6Hl4oRPmhTqnfP67dt0/H46tVkz+qs4X+J+xnZk4Bs
-	4Ai6ePEieplGWO8h2S/Ebeqd8RRMMEukMDHCztZcjftHBa+R5107awrpcm5Sl6NPywXQdXVA6PY8f
-	/E2uAr8g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51368)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rE8Sd-0002hd-1H;
-	Fri, 15 Dec 2023 13:42:39 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rE8Sc-0003em-Gu; Fri, 15 Dec 2023 13:42:38 +0000
-Date: Fri, 15 Dec 2023 13:42:38 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jie Luo <quic_luoj@quicinc.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	hkallweit1@gmail.com, corbet@lwn.net, p.zabel@pengutronix.de,
-	f.fainelli@gmail.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH v8 14/14] dt-bindings: net: ar803x: add qca8084 PHY
- properties
-Message-ID: <ZXxXzm8hP68KrXYs@shell.armlinux.org.uk>
-References: <20231215074005.26976-1-quic_luoj@quicinc.com>
- <20231215074005.26976-15-quic_luoj@quicinc.com>
- <bdfba8a7-9197-4aae-a7f9-6075a375f60b@linaro.org>
- <c3391e33-e770-4c61-855e-d90e82b95f75@quicinc.com>
- <4cb2bd57-f3d3-49f9-9c02-a922fd270572@lunn.ch>
- <ed0dd288-be8a-4161-a19f-2d4d2d17b3ec@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B522C852;
+	Fri, 15 Dec 2023 13:45:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4Ss9TS4Pr5z8XrRL;
+	Fri, 15 Dec 2023 21:45:32 +0800 (CST)
+Received: from xaxapp02.zte.com.cn ([10.88.97.241])
+	by mse-fl1.zte.com.cn with SMTP id 3BFDjRWh071963;
+	Fri, 15 Dec 2023 21:45:27 +0800 (+08)
+	(envelope-from yang.guang5@zte.com.cn)
+Received: from mapi (xaxapp02[null])
+	by mapi (Zmail) with MAPI id mid31;
+	Fri, 15 Dec 2023 21:45:31 +0800 (CST)
+Date: Fri, 15 Dec 2023 21:45:31 +0800 (CST)
+X-Zmail-TransId: 2afa657c587b3a7-53fc0
+X-Mailer: Zmail v1.0
+Message-ID: <202312152145312776210@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ed0dd288-be8a-4161-a19f-2d4d2d17b3ec@quicinc.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Mime-Version: 1.0
+From: <yang.guang5@zte.com.cn>
+To: <davem@davemloft.net>
+Cc: <jiang.xuexin@zte.com.cn>, <chen.haonan2@zte.com.cn>, <cgel.zte@gmail.com>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <sd@queasysnail.net>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: =?UTF-8?B?W1BBVENIIGxpbnV4LW5leHRdIG1seHN3OiBzcGVjdHJ1bTogdXNlIG5ldGlmX2lzX21hY3NlYygpIGluc3RlYWQgb2Ygb3BlbiBjb2Rl?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl1.zte.com.cn 3BFDjRWh071963
+X-Fangmail-Gw-Spam-Type: 0
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 657C587C.001/4Ss9TS4Pr5z8XrRL
 
-On Fri, Dec 15, 2023 at 08:16:53PM +0800, Jie Luo wrote:
-> On 12/15/2023 7:25 PM, Andrew Lunn wrote:
-> > > The "maxItems: 1" of the property resets is defined in ethernet-phy.yaml
-> > > that is referenced by qca,ar803x.yaml, but i have 11 reset instances
-> > > used for qca8084 PHY
-> > 
-> > 11!?!?? Really? Why?
-> > 
-> > I assume the order and timer matters, otherwise why would you need
-> > 11? So the PHY driver needs to handle this, not phylib framework. So
-> > you will be adding vendor properties to describe all 11 of them. So
-> > ethernet-phy.yaml does not matter.
-> > 
-> > 	Andrew
-> 
-> Since these resets need to be configured in the special sequence, and
-> these clocks need to be configured with different clock rate.
-> 
-> But the clock instance get, the property name is fixed to "clock-names"
-> according to the function of_parse_clkspec, and the reset property name
-> is also fixed to "reset-names" from function __of_reset_control_get.
+From: Yang Guang <yang.guang5@zte.com.cn>
 
-I think you need to give more details about this.
+Open code which is dev->priv_flags & IFF_MACSEC has already defined as
+netif_is_macsec(). So use netif_is_macsec() instead of open code.
+No functional changed.
 
-Where are these 11 resets located? What is the sequence? Why does the
-PHY driver need to deal with each individual reset?
+Signed-off-by: Chen Haonan <chen.haonan2@zte.com.cn>
+---
+ include/linux/netdevice.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-IMHO, a PHY driver should _not_ be dealing with the resets outside of
-the PHY device itself, and I find it hard to imagine that qca8084
-would have 11 external resets.
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 1b935ee341b4..1f2b23d854c9 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -5103,7 +5103,7 @@ void netif_inherit_tso_max(struct net_device *to,
 
-If these are 11 internal resets (to qca8084) then why are you using the
-reset subsystem, and why do you need to describe them in DT? Surely if
-they are internal to the PHY, that can be encapsulated within the PHY
-driver?
+ static inline bool netif_is_macsec(const struct net_device *dev)
+ {
+-	return dev->priv_flags & IFF_MACSEC;
++	return netif_is_macsec(dev);
+ }
 
-This is an example of why it is useful to have an _example_ of the use
-of this binding, because it would answer some of the above questions.
-
+ static inline bool netif_is_macvlan(const struct net_device *dev)
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.25.1
 
