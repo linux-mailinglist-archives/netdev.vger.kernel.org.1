@@ -1,154 +1,113 @@
-Return-Path: <netdev+bounces-57730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9D35813FF3
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 03:39:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EF2C81401F
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 03:44:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D42141C221C6
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 02:39:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8823A1C21C37
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 02:44:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3454C468C;
-	Fri, 15 Dec 2023 02:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36FB3D27E;
+	Fri, 15 Dec 2023 02:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="RrBX8bqu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eKajEIRU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596D96ADB;
-	Fri, 15 Dec 2023 02:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1702607852; x=1734143852;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=BMuquihvkV7y6qBpruCNT7zj5pk94gUeJwQRZWzrrNo=;
-  b=RrBX8bquTm8s8WihJqq70Y0QhJXZjVXj2VlGXM7/D63oPiAIZLZ+IWfO
-   7O912lVFWCOMlO1N4p23GjmNrLDeFu9ZyBKDAMP3oFm9CpzweboHvWHHb
-   MljjBC2kCu8R/vXPXBRMklMYxXWqdiL9yUfZh0iZgr8vo4zMBYjHUoD6G
-   o=;
-X-IronPort-AV: E=Sophos;i="6.04,277,1695686400"; 
-   d="scan'208";a="691284391"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2023 02:37:25 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
-	by email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com (Postfix) with ESMTPS id 15757A3096;
-	Fri, 15 Dec 2023 02:37:21 +0000 (UTC)
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:5142]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.18.147:2525] with esmtp (Farcaster)
- id 34600c7c-afc1-48b6-b40a-836b38bf7abd; Fri, 15 Dec 2023 02:37:21 +0000 (UTC)
-X-Farcaster-Flow-ID: 34600c7c-afc1-48b6-b40a-836b38bf7abd
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 15 Dec 2023 02:37:20 +0000
-Received: from 88665a182662.ant.amazon.com (10.37.244.8) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 15 Dec 2023 02:37:16 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: Matthieu Baerts <matttbe@kernel.org>, Mat Martineau
-	<martineau@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: <edumazet@google.com>, <andrii@kernel.org>, <ast@kernel.org>,
-	<bpf@vger.kernel.org>, <daniel@iogearbox.net>, <kuni1840@gmail.com>,
-	<kuniyu@amazon.com>, <martin.lau@linux.dev>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH v6 bpf-next 3/6] bpf: tcp: Handle BPF SYN Cookie in skb_steal_sock().
-Date: Fri, 15 Dec 2023 11:37:07 +0900
-Message-ID: <20231215023707.41864-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <CANn89i+8e8VJ8cJX6vwLFhtj=BmT233nNr=F9H3nFs8BZgTbsQ@mail.gmail.com>
-References: <CANn89i+8e8VJ8cJX6vwLFhtj=BmT233nNr=F9H3nFs8BZgTbsQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1616E10797;
+	Fri, 15 Dec 2023 02:40:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 81BDDC433C9;
+	Fri, 15 Dec 2023 02:40:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702608027;
+	bh=CuDA9y2CRS+wMsawD52ockrNDkEjR7Iar2UzEeNZzHs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eKajEIRUuIIxtU4Ng0xKzOWgCoRAH1jI2HvHFv2YkHFLP6DPmxUXjncmM3Jd+wXO8
+	 ssVo91I4mwNhkyj2ICBPC/16Utf1XYkXTAmn8lcSdoULW/boFHHfmbzgvpgaT1yVN3
+	 G08G8NJp2A2j/BDV8YK/u4pynvhMbgIa7bBOeVMpcFFcMbt/2DLylFIRrWglmtY83c
+	 Etz3rlQHkCQoUUL8XOFYjJsPPVpijBj1PatvDFt8cK328e07eLh1kQwTFd7xtLVmyx
+	 5q3QMtjBY938xUUXuG0RfugHtl2dqT0+6MK1/8pyXaIDcSvqEmIKNRYJR8DjBaGEyv
+	 KzFREKUyhlzdg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6B1B4DD4EF9;
+	Fri, 15 Dec 2023 02:40:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D038UWB002.ant.amazon.com (10.13.139.185) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+Subject: Re: [PATCHv2 net-next 00/13] Convert net selftests to run in unique
+ namespace (Part 3)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170260802743.18795.8297377482881203534.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Dec 2023 02:40:27 +0000
+References: <20231213060856.4030084-1-liuhangbin@gmail.com>
+In-Reply-To: <20231213060856.4030084-1-liuhangbin@gmail.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, shuah@kernel.org, dsahern@kernel.org,
+ linux-kselftest@vger.kernel.org, po-hsu.lin@canonical.com,
+ andrea.mayer@uniroma2.it, amcohen@nvidia.com, nicolas.dichtel@6wind.com,
+ roopa@nvidia.com, idosch@nvidia.com
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 14 Dec 2023 17:31:15 +0100
-> On Thu, Dec 14, 2023 at 4:56 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> >
-> > We will support arbitrary SYN Cookie with BPF.
-> >
-> > If BPF prog validates ACK and kfunc allocates a reqsk, it will
-> > be carried to TCP stack as skb->sk with req->syncookie 1.  Also,
-> > the reqsk has its listener as req->rsk_listener with no refcnt
-> > taken.
-> >
-> > When the TCP stack looks up a socket from the skb, we steal
-> > inet_reqsk(skb->sk)->rsk_listener in skb_steal_sock() so that
-> > the skb will be processed in cookie_v[46]_check() with the
-> > listener.
-> >
-> > Note that we do not clear skb->sk and skb->destructor so that we
-> > can carry the reqsk to cookie_v[46]_check().
-> >
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > ---
-> >  include/net/request_sock.h | 15 +++++++++++++--
-> >  1 file changed, 13 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/include/net/request_sock.h b/include/net/request_sock.h
-> > index 26c630c40abb..8839133d6f6b 100644
-> > --- a/include/net/request_sock.h
-> > +++ b/include/net/request_sock.h
-> > @@ -101,10 +101,21 @@ static inline struct sock *skb_steal_sock(struct sk_buff *skb,
-> >         }
-> >
-> >         *prefetched = skb_sk_is_prefetched(skb);
-> > -       if (*prefetched)
-> > +       if (*prefetched) {
-> > +#if IS_ENABLED(CONFIG_SYN_COOKIES)
-> > +               if (sk->sk_state == TCP_NEW_SYN_RECV && inet_reqsk(sk)->syncookie) {
-> > +                       struct request_sock *req = inet_reqsk(sk);
-> > +
-> > +                       *refcounted = false;
-> > +                       sk = req->rsk_listener;
-> > +                       req->rsk_listener = NULL;
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 13 Dec 2023 14:08:43 +0800 you wrote:
+> Here is the 3rd part of converting net selftests to run in unique namespace.
+> This part converts all srv6 and fib tests.
 > 
-> I am not sure about interactions with MPTCP.
+> Note that patch 06 is a fix for testing fib_nexthop_multiprefix.
 > 
-> I would be nice to have their feedback.
-
-Matthieu, Mat, Paolo, could you double check if the change
-above is sane ?
-https://lore.kernel.org/bpf/20231214155424.67136-4-kuniyu@amazon.com/
-
-
-Short sumamry:
-
-With this series, tc could allocate reqsk to skb->sk and set a
-listener to reqsk->rsk_listener, then __inet_lookup_skb() returns
-a listener in the same reuseport group, and skb is processed in the
-listener function flow, especially cookie_v[46]_check().
-
-The only difference here is that skb->sk has reqsk, which does not
-have rsk_listener.
-
-
+> Here is the part 1 link:
+> https://lore.kernel.org/netdev/20231202020110.362433-1-liuhangbin@gmail.com
+> And part 2 link:
+> https://lore.kernel.org/netdev/20231206070801.1691247-1-liuhangbin@gmail.com
 > 
-> > +                       return sk;
-> > +               }
-> > +#endif
-> >                 *refcounted = sk_is_refcounted(sk);
-> > -       else
-> > +       } else {
-> >                 *refcounted = true;
-> > +       }
-> >
-> >         skb->destructor = NULL;
-> >         skb->sk = NULL;
-> > --
-> > 2.30.2
+> [...]
+
+Here is the summary with links:
+  - [PATCHv2,net-next,01/13] selftests/net: add variable NS_LIST for lib.sh
+    https://git.kernel.org/netdev/net-next/c/b6925b4ed57c
+  - [PATCHv2,net-next,02/13] selftests/net: convert srv6_end_dt46_l3vpn_test.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/59cac2efd378
+  - [PATCHv2,net-next,03/13] selftests/net: convert srv6_end_dt4_l3vpn_test.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/7b2d941c81bc
+  - [PATCHv2,net-next,04/13] selftests/net: convert srv6_end_dt6_l3vpn_test.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/792cd1dbc8a2
+  - [PATCHv2,net-next,05/13] selftests/net: convert fcnal-test.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/779283b7770f
+  - [PATCHv2,net-next,06/13] selftests/net: fix grep checking for fib_nexthop_multiprefix
+    https://git.kernel.org/netdev/net-next/c/a33e9da34704
+  - [PATCHv2,net-next,07/13] selftests/net: convert fib_nexthop_multiprefix to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/5ae89fe43a4e
+  - [PATCHv2,net-next,08/13] selftests/net: convert fib_nexthop_nongw.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/d2168ea79234
+  - [PATCHv2,net-next,09/13] selftests/net: convert fib_nexthops.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/39333e31672c
+  - [PATCHv2,net-next,10/13] selftests/net: convert fib-onlink-tests.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/3a06833b2adc
+  - [PATCHv2,net-next,11/13] selftests/net: convert fib_rule_tests.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/6c0ee7b4d69d
+  - [PATCHv2,net-next,12/13] selftests/net: convert fib_tests.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/f6fc5b949911
+  - [PATCHv2,net-next,13/13] selftests/net: convert fdb_flush.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/b795db185e32
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
