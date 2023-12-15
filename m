@@ -1,144 +1,122 @@
-Return-Path: <netdev+bounces-57926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 852D2814822
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 13:33:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 560A1814877
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 13:52:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5000B22E0B
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 12:33:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11F21285ED3
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 12:52:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 668FB199D7;
-	Fri, 15 Dec 2023 12:33:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="kwsZ2WCX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 826432C6AB;
+	Fri, 15 Dec 2023 12:52:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 002CE2C868;
-	Fri, 15 Dec 2023 12:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BFCQm8U022578;
-	Fri, 15 Dec 2023 12:33:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=Zem9zj92wvAtdEA8Fe7XFOaOhnvk2FMTdxZ40u2vP6E=; b=kw
-	sZ2WCXvxb0OwWIfAnMVfsBIQieYVruY+aVBoVPYq3oJx9ActuEazE1r+RSSZz0wS
-	54/n8hprq03E5GRFRVHLn4yQuK+TzO3rjI3rGRFoajo/pphnH9TygThVInqtuh1h
-	nnOe84/XQr4rGrCDPJ2qEl4Etzz8TdpFkpakuBdtmmzwCfd8NZLOqyOu4BJsrqO5
-	U3UMEsJJxpiBrINxSwyoPyNizRB4q7omoQG1SUIkzAX5nrh+Hr6nG1k5M5AyiB2e
-	8nUNlGSrouptfkKEZXvjEZtLkucVntkhGaG5AtGrkWlHtt8yPCgzBaj02qiN2YO/
-	2PxKCivnBt8OxxwwFj6A==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3v0k90rkax-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Dec 2023 12:33:08 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BFCX7EN013389
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Dec 2023 12:33:07 GMT
-Received: from [10.253.13.71] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 15 Dec
- 2023 04:33:03 -0800
-Message-ID: <a65ad12d-b990-4439-b196-903f4a5f096a@quicinc.com>
-Date: Fri, 15 Dec 2023 20:33:00 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7952D2F842;
+	Fri, 15 Dec 2023 12:52:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Ss7tx5HrKz2mGxD;
+	Fri, 15 Dec 2023 20:34:01 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 944321A0190;
+	Fri, 15 Dec 2023 20:34:06 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 15 Dec
+ 2023 20:34:06 +0800
+Subject: Re: [PATCH net-next] page_pool: Rename frag_users to frag_cnt
+To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+CC: <netdev@vger.kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<linux-kernel@vger.kernel.org>
+References: <20231215073119.543560-1-ilias.apalodimas@linaro.org>
+ <6fddeb22-0906-e04c-3a84-7836bef9ffa2@huawei.com>
+ <CAC_iWjLiOdUqLmRHjZmwv9QBsBvYNV=zn30JrRbJa05qMyDBmw@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <fb0f33d8-d09a-57fc-83b0-ccf152277355@huawei.com>
+Date: Fri, 15 Dec 2023 20:34:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 14/14] dt-bindings: net: ar803x: add qca8084 PHY
- properties
+In-Reply-To: <CAC_iWjLiOdUqLmRHjZmwv9QBsBvYNV=zn30JrRbJa05qMyDBmw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <corbet@lwn.net>,
-        <p.zabel@pengutronix.de>, <f.fainelli@gmail.com>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
-References: <20231215074005.26976-1-quic_luoj@quicinc.com>
- <20231215074005.26976-15-quic_luoj@quicinc.com>
- <60b9081c-76fa-4122-b7ae-5c3dcf7229f9@lunn.ch>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <60b9081c-76fa-4122-b7ae-5c3dcf7229f9@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 4Uz7d0EgknsiF0Y5kIan2k8PGtrPqcmd
-X-Proofpoint-GUID: 4Uz7d0EgknsiF0Y5kIan2k8PGtrPqcmd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- impostorscore=0 priorityscore=1501 malwarescore=0 clxscore=1015
- mlxlogscore=990 adultscore=0 suspectscore=0 bulkscore=0 spamscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2312150084
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
+On 2023/12/15 19:58, Ilias Apalodimas wrote:
+> Hi Yunsheng,
+> 
+> On Fri, 15 Dec 2023 at 13:10, Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>
+>> On 2023/12/15 15:31, Ilias Apalodimas wrote:
+>>> Since [0] got merged, it's clear that 'pp_ref_count' is used to track
+>>> the number of users for each page. On struct_page though we have
+>>> a member called 'frag_users'. Despite of what the name suggests this is
+>>> not the number of users. It instead represents the number of fragments of
+>>> the current page. When we have a single page this is set to one. When we
+>>> split the page this is set to the actual number of frags and later used
+>>> in page_pool_drain_frag() to infer the real number of users.
+>>>
+>>> So let's rename it to something that matches the description above
+>>>
+>>> [0]
+>>> Link: https://lore.kernel.org/netdev/20231212044614.42733-2-liangchen.linux@gmail.com/
+>>> Signed-off-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+>>> ---
+>>>  include/net/page_pool.h | 2 +-
+>>>  net/core/page_pool.c    | 8 ++++----
+>>>  2 files changed, 5 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/include/net/page_pool.h b/include/net/page_pool.h
+>>> index 813c93499f20..957cd84bb3f4 100644
+>>> --- a/include/net/page_pool.h
+>>> +++ b/include/net/page_pool.h
+>>> @@ -158,7 +158,7 @@ struct page_pool {
+>>>       u32 pages_state_hold_cnt;
+>>>       unsigned int frag_offset;
+>>>       struct page *frag_page;
+>>> -     long frag_users;
+>>> +     long frag_cnt;
+>>
+>> I would rename it to something like refcnt_bais to mirror the pagecnt_bias
+>> in struct page_frag_cache.
+> 
+> Sure
+> 
+>>
+>>>
+>>>  #ifdef CONFIG_PAGE_POOL_STATS
+>>>       /* these stats are incremented while in softirq context */
+>>> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+>>> index 9b203d8660e4..19a56a52ac8f 100644
+>>> --- a/net/core/page_pool.c
+>>> +++ b/net/core/page_pool.c
+>>> @@ -659,7 +659,7 @@ EXPORT_SYMBOL(page_pool_put_page_bulk);
+>>>  static struct page *page_pool_drain_frag(struct page_pool *pool,
+>>>                                        struct page *page)
+>>>  {
+>>> -     long drain_count = BIAS_MAX - pool->frag_users;
+>>> +     long drain_count = BIAS_MAX - pool->frag_cnt;
+>>
+>> drain_count = pool->refcnt_bais;
+> 
+> I think this is a typo right? This still remains
 
+It would be better to invert logic too, as it is mirroring:
 
-On 12/15/2023 8:12 PM, Andrew Lunn wrote:
->> +  clocks:
->> +    items:
->> +      - description: APB bridge clock
->> +      - description: AHB clock
->> +      - description: Security control clock
->> +      - description: TLMM clock
->> +      - description: TLMM AHB clock
->> +      - description: CNOC AHB clock
->> +      - description: MDIO AHB clock
->> +      - description: MDIO master AHB clock
->> +      - description: PCS0 system clock
->> +      - description: PCS1 system clock
->> +      - description: EPHY0 system clock
->> +      - description: EPHY1 system clock
->> +      - description: EPHY2 system clock
->> +      - description: EPHY3 system clock
-> 
-> What exactly are you describing here? A PHY, or a PHY package?
-> 
-> The ethernet-phy.yaml describes a PHY. So does each of your 4 PHYs
-> have 14 clocks? The PHY package as a whole has 14*4 clocks?
-> 
-> This seems unlikely. You have some clocks used by the package as a
-> whole, and you have some clocks used by one specific PHY within the
-> package. So you need a hierarchical description of the hardware in DT,
-> to match the actual hierarchical of the hardware.
-> 
-> This is exactly what Christian has been working on, and you have
-> persistently ignored what he is doing. You need to work with him.
-> Nothing is going to be merged until you and Christian have one
-> consistent design for the two PHYs you are working on.
-> 
-> 
->      Andrew
-> 
-> ---
-> pw-bot: cr
-
-Hi Andrew,
-These clocks are for the whole PHY package including quad PHYs, since
-these clocks & resets need to be initialized at one point, i put it
-the previous MDIO driver code, these clocks & resets are configured
-after GPIO hardware reset, after these clocks and resets sequences
-configured, each PHY capabilities can be acquired correctly in the PHY
-probe function.
-
-Sorry for missing Christian's patches, i will look his patches and
-update qca8084 PHY driver correspondingly.
-
+https://elixir.bootlin.com/linux/v6.7-rc5/source/mm/page_alloc.c#L4745
 
