@@ -1,102 +1,155 @@
-Return-Path: <netdev+bounces-57868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BD978145D7
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:42:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9B7C8145DA
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:43:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 026B72852EE
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 10:42:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5726B1F23504
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 10:43:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8D9E1A711;
-	Fri, 15 Dec 2023 10:42:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66751A711;
+	Fri, 15 Dec 2023 10:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="asfeppbA"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jeZtRIDv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA801A704;
-	Fri, 15 Dec 2023 10:42:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54598C433C8;
-	Fri, 15 Dec 2023 10:42:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702636953;
-	bh=cbq/for1fT1/aMAwkkiVODRQoqfzFgJjEOjBZSRK4lg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=asfeppbABUhdnqqjlY+HjF1MwY8p9z4KmnXK8DDjIFnkUA+sFd82ZXkMBpFACeS/0
-	 tyWhZAA3t1IgZMZkv6sbGEzqEVocnZQKR9pHLVvqndlnkzcDWwHd04WUhFw3BAaVb8
-	 zOXFAcB2B9mRxPYMR2pZWJZ4in8wq6gNqZYKZo31c9ktPvxkQIzhIJ9AhPJ8mXdWHw
-	 7goo65zdQJr3ho79/bVMFw7rlv0bQ9v2PNoGtUdJYjzIcZ4wFytrq8wyLxAp+uvimD
-	 SRHgw2idAcuJSnK1CF5IuLrYMtD9kQ7mLKvhacsqqAvNmk/aE9eyBseJ4+0LXgmeXM
-	 0Zt+1E+TZxB3w==
-Date: Fri, 15 Dec 2023 10:42:27 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Jie Luo <quic_luoj@quicinc.com>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, agross@kernel.org,
-	andersson@kernel.org, konrad.dybcio@linaro.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, robert.marko@sartura.hr,
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	quic_srichara@quicinc.com
-Subject: Re: [PATCH v2 5/5] dt-bindings: net: ipq4019-mdio: Document ipq5332
- platform
-Message-ID: <20231215-junkyard-primate-64d32bbde12c@spud>
-References: <20231212115151.20016-1-quic_luoj@quicinc.com>
- <20231212115151.20016-6-quic_luoj@quicinc.com>
- <20231212-caution-improvise-ed3cc6a1d305@spud>
- <11ffc985-3f2b-46b9-ae0b-911f7abe98d1@quicinc.com>
- <20231214-outshine-shush-8a11c68607cd@spud>
- <c5123ce7-6fdc-43c7-ac07-251c39196e66@quicinc.com>
- <a1e5ffec-a20d-4389-83f9-ee09bd9d733d@linaro.org>
- <a84a36af-69f8-46af-967e-b06d028597a3@quicinc.com>
- <26c8b0b1-5ea9-45cc-adf3-0d0b03a1284d@linaro.org>
- <4b9c56b8-3b29-4861-a3d5-2da26fbc14b4@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D8D41A70D;
+	Fri, 15 Dec 2023 10:42:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from relay2-d.mail.gandi.net (unknown [217.70.183.194])
+	by mslow1.mail.gandi.net (Postfix) with ESMTP id EB37AC27B4;
+	Fri, 15 Dec 2023 10:42:48 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 35B144000D;
+	Fri, 15 Dec 2023 10:42:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1702636961;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VOegI2nr02yHx10+fDKDl/CpKdi0c6rrkPE4G6vRvZ0=;
+	b=jeZtRIDvrO1VWYjZSKXBE3rcGoOx8UYoqKR8JszgLkNWmaKsyf7mQsP5eb1CpzJXsz/GNu
+	d1et2dv9bmsEq0w8CKjx/D7RVPgekB7fek2nJeHKA4+AcBLPC8abwqukrPFAYXwdzNj8Eo
+	XHzj+zRkfFDaKKpoNF6XDRJ9gr4SJ2e4T2OY/nZIIKoR3zFNAbIK70stTrzciTds5Nk9n0
+	inMOSq77PaKeBneZfow1m1sFBUs5d5uXhOCvckttKrfePfaCLUvs1dPNcT+UF8E/1+3LKZ
+	KfLRP222gH5m/lUSf7CWIUk6Wi07gEvjDw3LMGH62pJldYxsB1k/F5w/D0f81w==
+Date: Fri, 15 Dec 2023 11:42:28 +0100
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Alexander Aring <aahringo@redhat.com>
+Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
+ <stefan@datenfreihafen.org>, linux-wpan@vger.kernel.org, David Girault
+ <david.girault@qorvo.com>, Romuald Despres <romuald.despres@qorvo.com>,
+ Frederic Blain <frederic.blain@qorvo.com>, Nicolas Schodet
+ <nico@ni.fr.eu.org>, Guilhem Imberton <guilhem.imberton@qorvo.com>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH wpan-next 2/5] mac802154: Use the PAN coordinator
+ parameter when stamping packets
+Message-ID: <20231215114228.35e3a408@xps-13>
+In-Reply-To: <CAK-6q+jpmhhARPcjkbfFVR7tRFQqYwXAdngebyUt+BzpFcgUGw@mail.gmail.com>
+References: <20231128111655.507479-1-miquel.raynal@bootlin.com>
+	<20231128111655.507479-3-miquel.raynal@bootlin.com>
+	<CAK-6q+jpmhhARPcjkbfFVR7tRFQqYwXAdngebyUt+BzpFcgUGw@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="lPsoRtMa/4Vasazk"
-Content-Disposition: inline
-In-Reply-To: <4b9c56b8-3b29-4861-a3d5-2da26fbc14b4@quicinc.com>
-
-
---lPsoRtMa/4Vasazk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 
-> > > This is indeed not a generic property, which is the Ethernet
-> > > function configs same as clock-frequency.
-> >=20
-> >=20
-> > Then it should not be made as a generic property...
+Hi Alexander,
+
+aahringo@redhat.com wrote on Thu, 14 Dec 2023 21:46:06 -0500:
+
+> Hi,
 >=20
-> sure, i saw your another comments, will prefix qcom_ on this property.
+> On Tue, Nov 28, 2023 at 6:17=E2=80=AFAM Miquel Raynal <miquel.raynal@boot=
+lin.com> wrote:
+> >
+> > ACKs come with the source and destination address empty, this has been
+> > clarified already. But there is something else: if the destination
+> > address is empty but the source address is valid, it may be a way to
+> > reach the PAN coordinator. Either the device receiving this frame is the
+> > PAN coordinator itself and should process what it just received
+> > (PACKET_HOST) or it is not and may, if supported, relay the packet as it
+> > is targeted to another device in the network.
+> >
+> > Right now we do not support relaying so the packet should be dropped in
+> > the first place, but the stamping looks more accurate this way.
+> >
+> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> > ---
+> >  net/mac802154/rx.c | 11 +++++++----
+> >  1 file changed, 7 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+> > index 0024341ef9c5..e40a988d6c80 100644
+> > --- a/net/mac802154/rx.c
+> > +++ b/net/mac802154/rx.c
+> > @@ -156,12 +156,15 @@ ieee802154_subif_frame(struct ieee802154_sub_if_d=
+ata *sdata,
+> >
+> >         switch (mac_cb(skb)->dest.mode) {
+> >         case IEEE802154_ADDR_NONE:
+> > -               if (hdr->source.mode !=3D IEEE802154_ADDR_NONE)
+> > -                       /* FIXME: check if we are PAN coordinator */
+> > -                       skb->pkt_type =3D PACKET_OTHERHOST;
+> > -               else
+> > +               if (hdr->source.mode =3D=3D IEEE802154_ADDR_NONE)
+> >                         /* ACK comes with both addresses empty */
+> >                         skb->pkt_type =3D PACKET_HOST;
+> > +               else if (!wpan_dev->parent)
+> > +                       /* No dest means PAN coordinator is the recipie=
+nt */
+> > +                       skb->pkt_type =3D PACKET_HOST;
+> > +               else
+> > +                       /* We are not the PAN coordinator, just relayin=
+g */
+> > +                       skb->pkt_type =3D PACKET_OTHERHOST;
+> >                 break;
+> >         case IEEE802154_ADDR_LONG:
+> >                 if (mac_cb(skb)->dest.pan_id !=3D span && =20
+>=20
+> So if I understand it correctly, the "wpan_dev->parent" check acts
+> like a "forwarding" setting on an IP capable interface here? The
 
-iff the property stays, that would be a prefix of "qcom," not "qcom_".
+Kind of, yes, in this case having a parent means we are not the top
+level PAN coordinator.
 
-Cheers,
-Conor.
+> "forwarding" setting changes the interface to act as a router, which
+> is fine...=20
 
---lPsoRtMa/4Vasazk
-Content-Type: application/pgp-signature; name="signature.asc"
+I think there is no true "router" role but depending on the frame
+construction (dest field) we might sometimes act as a router. This is
+not supported in Linux, just a feature of the spec.
 
------BEGIN PGP SIGNATURE-----
+> but we have a difference here with the actual hardware and
+> the address filtering setting which we don't have in e.g. ethernet. My
+> concern is here that this code is probably interface type specific,
+> e.g. node vs coordinator type and currently we handle both in one
+> receive part.
+>=20
+> I am fine with that and probably it is just a thing to change in future...
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZXwtkgAKCRB4tDGHoIJi
-0omZAP9JSfFHjp1++gshgNWcCEiTlr90TUqSvd1rzXSVelfeqwD+Lra2OcWNoJ1x
-iEoXqTpeaWcyqzifYrBHXenZ8sb17gg=
-=Ozgz
------END PGP SIGNATURE-----
+That is true and probably will need adaptations if/when we come to this
+feature. What we do here however is just stamping the packet, in a
+manner that is more accurate. So in practice all type of interfaces may
+want to do that. However the handling of the packet later in the
+stack will be interface specific, I agree.
 
---lPsoRtMa/4Vasazk--
+Thanks,
+Miqu=C3=A8l
 
