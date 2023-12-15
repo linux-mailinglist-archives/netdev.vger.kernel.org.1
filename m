@@ -1,280 +1,155 @@
-Return-Path: <netdev+bounces-57802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21BCD8142E2
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 08:47:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D20D8142EB
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 08:49:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90A17B2361C
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 07:47:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EE8E1C224C6
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 07:49:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F234618B04;
-	Fri, 15 Dec 2023 07:41:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B445E10A0E;
+	Fri, 15 Dec 2023 07:43:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="htNYVwBU"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AokBiNJi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC1430331;
-	Fri, 15 Dec 2023 07:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BF6HWWf022899;
-	Fri, 15 Dec 2023 07:41:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	qcppdkim1; bh=AhES8Y7x+ZpiqbfFpeHU+5rxqGlvKWJu/Mp3zVbaca0=; b=ht
-	NYVwBUG0MhcA8iKOg1xpcqrFYN6/1YfR1xwe8qABPDcfFb4yXmPn+ysVsWwwrnR0
-	nuKeW0cM6q4GQuGy7ATn1uyOgNvGeDUZHvw9cIdsviuSNBEfJgvsH/254mKykPvD
-	JXG/tOAvrY6HUaOf03lUQ7oB3dYsZr3k3AD2qDcOlYGCQYwd/qiavUlSRV4Gcfp4
-	jjR9kgtZCgSDEUXJ7Njro+gaVHS5ktzpCGsvp8bubUT0rP4WD3ugBzR3J9sXv9p6
-	MSwn/MpBo/HRq/SNNW+ed/pa91lbsmJ39xTa7BqpqNDkMQzVDapGkl7UCZrjFP1B
-	jB6R2gS6XC+Z6MV6kJmg==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3v0741jcym-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Dec 2023 07:41:28 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BF7fRMf022408
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Dec 2023 07:41:27 GMT
-Received: from akronite-sh-dev02.qualcomm.com (10.80.80.8) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 14 Dec 2023 23:41:23 -0800
-From: Luo Jie <quic_luoj@quicinc.com>
-To: <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <corbet@lwn.net>,
-        <p.zabel@pengutronix.de>, <f.fainelli@gmail.com>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
-Subject: [PATCH v8 14/14] dt-bindings: net: ar803x: add qca8084 PHY properties
-Date: Fri, 15 Dec 2023 15:40:04 +0800
-Message-ID: <20231215074005.26976-15-quic_luoj@quicinc.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231215074005.26976-1-quic_luoj@quicinc.com>
-References: <20231215074005.26976-1-quic_luoj@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C79F19446
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 07:43:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2cc3facf0c0so3225871fa.0
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 23:43:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1702626219; x=1703231019; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=6CU2aBIsn4uLVHIUeTfbp05eiVPkokyoGdlPhM/bWCM=;
+        b=AokBiNJiyPvZZYHu7gH7tre8199C/1US8hWkzYuCbcx4fAbYv0VZxOq2M1OjYuNeLi
+         H0vSL4zhtRF0zqMLOqHLZer2sCd7ZqL+M+aMjkoWiu5AWXbkbgJpWjUYEKu/4ZEM3L2d
+         sKRV4ThQjdp77oBgZp4K7ahkDnMl3kWhZLxOzECO4sVu54+ImnZcgeXSxubscHVnK1bR
+         AG0KTxMQCsLRxlkUEd2Ud1USRpotb+KSLvdmq0bxsnzzN9xbXsxkc7zvdwbE4V65K74J
+         SVtR6lPnEQaap7T6XPzcBnWyytssM5RBEtSlHuQhS9RCr4DXczqrbXR7IsLZpwIx56Fx
+         a7Jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702626219; x=1703231019;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6CU2aBIsn4uLVHIUeTfbp05eiVPkokyoGdlPhM/bWCM=;
+        b=nOqCutN/x3mxrdsvoi+r78GFpy8HjJrTMszsHb4BMG7Ez93uRz/N92iB88Ye5Z0fE0
+         UjUxRRDXu9hkjK3+jWXxIiVNOnnkM88pGf9GxNVkhVOzZ82n/4G2gfkIfwFH5zIW+xMY
+         rr78/IC9JhRPf4xJ0oEv7rfiCzAnwkpx7S1fNSa5rMIxl5hKc2DmOfFEYJmIsRk2vN4f
+         MN/VM9Rqc5cLIXAuSW25btUO2NXSSr4ULwYCCGU+3bdNHjpmWwbjC1t17NWhmrhjtLBp
+         5WR+TdERg/orbTgEuf2J41fZ8OAw6Whml72kM/2rN11vArmRm+6m6nvfhvPp5F78GANr
+         vCdg==
+X-Gm-Message-State: AOJu0YyX/UGrw/wb6vwUJghywSuotZoX/tJhp1+5vZ3NN8FnXxJMCA/K
+	NHnpG1wOTEPHM8k7cdKjjCs+ENy9iyA8S5zmTfL90h1mM4lsC7+YWMo=
+X-Google-Smtp-Source: AGHT+IFoL7u9z0Lc9WuuCSh08T4stA/DbiwJaOgeTvrpfjkv4Y6ZwzQiD4LmdYl97Ol9//U110N44Oh2EJg3Pu7/U2U=
+X-Received: by 2002:a05:651c:20a:b0:2cc:4bb5:6b12 with SMTP id
+ y10-20020a05651c020a00b002cc4bb56b12mr371694ljn.20.1702626219157; Thu, 14 Dec
+ 2023 23:43:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: yx8mAsx_35qSXdlQGbbb70N0gxc5x5Qj
-X-Proofpoint-GUID: yx8mAsx_35qSXdlQGbbb70N0gxc5x5Qj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- clxscore=1015 suspectscore=0 bulkscore=0 priorityscore=1501 malwarescore=0
- spamscore=0 phishscore=0 lowpriorityscore=0 adultscore=0 mlxlogscore=728
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2311290000
- definitions=main-2312150047
+References: <20231215073119.543560-1-ilias.apalodimas@linaro.org>
+In-Reply-To: <20231215073119.543560-1-ilias.apalodimas@linaro.org>
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Date: Fri, 15 Dec 2023 09:43:03 +0200
+Message-ID: <CAC_iWjLYu7En7-2sVAxFtNwhvqhrRPqJmbPR_C-YL5wD2Cfe6w@mail.gmail.com>
+Subject: Re: [PATCH net-next] page_pool: Rename frag_users to frag_cnt
+To: netdev@vger.kernel.org
+Cc: linyunsheng@huawei.com, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-The following properties are added for qca8084 PHY.
+On Fri, 15 Dec 2023 at 09:31, Ilias Apalodimas
+<ilias.apalodimas@linaro.org> wrote:
+>
+> Since [0] got merged, it's clear that 'pp_ref_count' is used to track
+> the number of users for each page. On struct_page though we have
+> a member called 'frag_users'. Despite of what the name suggests this is
+> not the number of users. It instead represents the number of fragments of
+> the current page. When we have a single page this is set to one.
 
-1. add the compatible string "ethernet-phy-id004d.d180" since
-   the PHY device is not accessible during MDIO bus register.
-2. add property "qcom,phy-addr-fixup" for customizing MDIO address.
-3. add property "qcom,phy-work-mode" for specifying qca8084 PHY
-   work mode.
-4. add the initial clocks and resets.
+Replying to myself here, but this is a typo. On single pages, we set
+pp_ref_count to one, not this.
 
-Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
----
- .../devicetree/bindings/net/qca,ar803x.yaml   | 158 +++++++++++++++++-
- 1 file changed, 155 insertions(+), 3 deletions(-)
-
-diff --git a/Documentation/devicetree/bindings/net/qca,ar803x.yaml b/Documentation/devicetree/bindings/net/qca,ar803x.yaml
-index 3acd09f0da86..febff039a44f 100644
---- a/Documentation/devicetree/bindings/net/qca,ar803x.yaml
-+++ b/Documentation/devicetree/bindings/net/qca,ar803x.yaml
-@@ -14,9 +14,6 @@ maintainers:
- description: |
-   Bindings for Qualcomm Atheros AR803x PHYs
- 
--allOf:
--  - $ref: ethernet-phy.yaml#
--
- properties:
-   qca,clk-out-frequency:
-     description: Clock output frequency in Hertz.
-@@ -85,6 +82,161 @@ properties:
-     $ref: /schemas/regulator/regulator.yaml
-     unevaluatedProperties: false
- 
-+  qcom,phy-addr-fixup:
-+    $ref: /schemas/types.yaml#/definitions/uint32-array
-+    description:
-+      MDIO address for 4 PHY devices and 3 PCS devices
-+
-+  qcom,phy-work-mode:
-+    description: PHY device work mode.
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    enum: [0, 1, 2, 3]
-+
-+  clocks:
-+    items:
-+      - description: APB bridge clock
-+      - description: AHB clock
-+      - description: Security control clock
-+      - description: TLMM clock
-+      - description: TLMM AHB clock
-+      - description: CNOC AHB clock
-+      - description: MDIO AHB clock
-+      - description: MDIO master AHB clock
-+      - description: PCS0 system clock
-+      - description: PCS1 system clock
-+      - description: EPHY0 system clock
-+      - description: EPHY1 system clock
-+      - description: EPHY2 system clock
-+      - description: EPHY3 system clock
-+    description: PHY initial common clock configs
-+
-+  clock-names:
-+    items:
-+      - const: apb_bridge
-+      - const: ahb
-+      - const: sec_ctrl_ahb
-+      - const: tlmm
-+      - const: tlmm_ahb
-+      - const: cnoc_ahb
-+      - const: mdio_ahb
-+      - const: mdio_master_ahb
-+      - const: srds0_sys
-+      - const: srds1_sys
-+      - const: gephy0_sys
-+      - const: gephy1_sys
-+      - const: gephy2_sys
-+      - const: gephy3_sys
-+
-+  resets:
-+    items:
-+      - description: PCS0 system reset
-+      - description: PCS1 system reset
-+      - description: EPHY0 system reset
-+      - description: EPHY1 system reset
-+      - description: EPHY2 system reset
-+      - description: EPHY3 system reset
-+      - description: EPHY0 software reset
-+      - description: EPHY1 software reset
-+      - description: EPHY2 software reset
-+      - description: EPHY3 software reset
-+      - description: Ethernet DSP reset
-+    description: PHY initial common reset configs
-+
-+  reset-names:
-+    items:
-+      - const: srds0_sys
-+      - const: srds1_sys
-+      - const: gephy0_sys
-+      - const: gephy1_sys
-+      - const: gephy2_sys
-+      - const: gephy3_sys
-+      - const: gephy0_soft
-+      - const: gephy1_soft
-+      - const: gephy2_soft
-+      - const: gephy3_soft
-+      - const: gephy_dsp
-+
-+allOf:
-+  - $ref: ethernet-phy.yaml#
-+
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            enum:
-+              - ethernet-phy-id004d.d180
-+    then:
-+      properties:
-+        clocks:
-+          items:
-+            - description: APB bridge clock
-+            - description: AHB clock
-+            - description: Security control clock
-+            - description: TLMM clock
-+            - description: TLMM AHB clock
-+            - description: CNOC AHB clock
-+            - description: MDIO AHB clock
-+            - description: MDIO master AHB clock
-+            - description: PCS0 system clock
-+            - description: PCS1 system clock
-+            - description: EPHY0 system clock
-+            - description: EPHY1 system clock
-+            - description: EPHY2 system clock
-+            - description: EPHY3 system clock
-+        clock-names:
-+          items:
-+            - const: apb_bridge
-+            - const: ahb
-+            - const: sec_ctrl_ahb
-+            - const: tlmm
-+            - const: tlmm_ahb
-+            - const: cnoc_ahb
-+            - const: mdio_ahb
-+            - const: mdio_master_ahb
-+            - const: srds0_sys
-+            - const: srds1_sys
-+            - const: gephy0_sys
-+            - const: gephy1_sys
-+            - const: gephy2_sys
-+            - const: gephy3_sys
-+        resets:
-+          items:
-+            - description: PCS0 system reset
-+            - description: PCS1 system reset
-+            - description: EPHY0 system reset
-+            - description: EPHY1 system reset
-+            - description: EPHY2 system reset
-+            - description: EPHY3 system reset
-+            - description: EPHY0 software reset
-+            - description: EPHY1 software reset
-+            - description: EPHY2 software reset
-+            - description: EPHY3 software reset
-+            - description: Ethernet DSP reset
-+        reset-names:
-+          items:
-+            - const: srds0_sys
-+            - const: srds1_sys
-+            - const: gephy0_sys
-+            - const: gephy1_sys
-+            - const: gephy2_sys
-+            - const: gephy3_sys
-+            - const: gephy0_soft
-+            - const: gephy1_soft
-+            - const: gephy2_soft
-+            - const: gephy3_soft
-+            - const: gephy_dsp
-+      required:
-+        - qcom,phy-addr-fixup
-+        - qcom,phy-work-mode
-+        - clocks
-+        - clock-names
-+        - resets
-+        - reset-names
-+    else:
-+      properties:
-+        qcom,phy-addr-fixup: false
-+        qcom,phy-work-mode: false
-+
- unevaluatedProperties: false
- 
- examples:
--- 
-2.42.0
-
+>  When we
+> split the page this is set to the actual number of frags and later used
+> in page_pool_drain_frag() to infer the real number of users.
+>
+> So let's rename it to something that matches the description above
+>
+> [0]
+> Link: https://lore.kernel.org/netdev/20231212044614.42733-2-liangchen.linux@gmail.com/
+> Signed-off-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+> ---
+>  include/net/page_pool.h | 2 +-
+>  net/core/page_pool.c    | 8 ++++----
+>  2 files changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/include/net/page_pool.h b/include/net/page_pool.h
+> index 813c93499f20..957cd84bb3f4 100644
+> --- a/include/net/page_pool.h
+> +++ b/include/net/page_pool.h
+> @@ -158,7 +158,7 @@ struct page_pool {
+>         u32 pages_state_hold_cnt;
+>         unsigned int frag_offset;
+>         struct page *frag_page;
+> -       long frag_users;
+> +       long frag_cnt;
+>
+>  #ifdef CONFIG_PAGE_POOL_STATS
+>         /* these stats are incremented while in softirq context */
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 9b203d8660e4..19a56a52ac8f 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -659,7 +659,7 @@ EXPORT_SYMBOL(page_pool_put_page_bulk);
+>  static struct page *page_pool_drain_frag(struct page_pool *pool,
+>                                          struct page *page)
+>  {
+> -       long drain_count = BIAS_MAX - pool->frag_users;
+> +       long drain_count = BIAS_MAX - pool->frag_cnt;
+>
+>         /* Some user is still using the page frag */
+>         if (likely(page_pool_defrag_page(page, drain_count)))
+> @@ -678,7 +678,7 @@ static struct page *page_pool_drain_frag(struct page_pool *pool,
+>
+>  static void page_pool_free_frag(struct page_pool *pool)
+>  {
+> -       long drain_count = BIAS_MAX - pool->frag_users;
+> +       long drain_count = BIAS_MAX - pool->frag_cnt;
+>         struct page *page = pool->frag_page;
+>
+>         pool->frag_page = NULL;
+> @@ -721,14 +721,14 @@ struct page *page_pool_alloc_frag(struct page_pool *pool,
+>                 pool->frag_page = page;
+>
+>  frag_reset:
+> -               pool->frag_users = 1;
+> +               pool->frag_cnt = 1;
+>                 *offset = 0;
+>                 pool->frag_offset = size;
+>                 page_pool_fragment_page(page, BIAS_MAX);
+>                 return page;
+>         }
+>
+> -       pool->frag_users++;
+> +       pool->frag_cnt++;
+>         pool->frag_offset = *offset + size;
+>         alloc_stat_inc(pool, fast);
+>         return page;
+> --
+> 2.37.2
+>
 
