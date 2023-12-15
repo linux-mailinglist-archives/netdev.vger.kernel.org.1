@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-57762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA03B814094
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 04:20:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAE68814097
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 04:20:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C744283942
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 03:20:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19AA91C2207E
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 03:20:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBCA71FD2;
-	Fri, 15 Dec 2023 03:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8100A53A0;
+	Fri, 15 Dec 2023 03:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WIdHTHTd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jJmhegX9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A47A63B8;
-	Fri, 15 Dec 2023 03:20:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 54737C433C9;
-	Fri, 15 Dec 2023 03:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6208A7492;
+	Fri, 15 Dec 2023 03:20:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8E0CBC433CC;
+	Fri, 15 Dec 2023 03:20:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702610424;
-	bh=tmWdNB9hZsZGW4LzMyDRaX1WA5hh8PQ2ljdQx4iYZkg=;
+	s=k20201202; t=1702610425;
+	bh=A0SmXHAcm8gwLAGCl29PtarxvKADCdCHoxik2JrtxaE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WIdHTHTdc6va3NW41pfmybuglFuuBA5cvOHGOyRnopCk5xK718xQFFssfdvYPs8x4
-	 jnW6j2KornMb68CaldEVmODfAJeVlR7Zs/Rnoqxiiva77qMsAJiR3aYDISsIrfMhor
-	 Dqv+FcQQNMVFEePAHbUfpkiVLN1iAadjyeVH2VUNwoZi0yyMVQdMN4yEsFnp2uy2S8
-	 Fiw4Vh6sgxpLN4KEuZ0LF93dQUcKOaDWAqzVOHVHGPAF2My1nQlWQMRLdbt+LF11mH
-	 hqRUPB5lK5ic1fy/1YFrdVtatkkxi3ORQy4mkagzec7tpjJvZZRXlC7jssg5tyNxTH
-	 0H2Rh4H6Fy5Dw==
+	b=jJmhegX9dQGKBMrrhbQBRparADTcrOjaZjsrM3W/+CdzjuupuihTH3++0imDNXX1Y
+	 NFDdk8lOAVs8DPAvwWK72SP2aeTiSPJiaYHkqoMCk793DcWY3ChQoz/8CBmyC4YLqv
+	 0Lxn6Ui6GN5zad5shEMAXbQwzn+DmstiyDIwhrE3hGftGAFyxFqzugAKErLK7L+eHb
+	 x1FcEg18EqU5DrSCkWxviRtYsQ2AsrSxg+26IFBQp+dMJ+AmvCeeyJnxETKH79TfYJ
+	 l2OZRMCutBAIlXDYSxyMyOaB7RqIhbUE89QESQzmNua3QVpz7T0sijEh2crR4a1HYJ
+	 K6iJV0ZDqm/nw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3B2A3DD4EFC;
-	Fri, 15 Dec 2023 03:20:24 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7CA24DD4EF9;
+	Fri, 15 Dec 2023 03:20:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -43,40 +43,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next 0/3] Various BPF exception improvements
+Subject: Re: pull-request: wireless-2023-12-14
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170261042423.8096.11497491721460220225.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Dec 2023 03:20:24 +0000
-References: <cover.1702594357.git.dxu@dxuuu.xyz>
-In-Reply-To: <cover.1702594357.git.dxu@dxuuu.xyz>
-To: Daniel Xu <dxu@dxuuu.xyz>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, memxor@gmail.com
+ <170261042550.8096.16344665402526181503.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Dec 2023 03:20:25 +0000
+References: <20231214111515.60626-3-johannes@sipsolutions.net>
+In-Reply-To: <20231214111515.60626-3-johannes@sipsolutions.net>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
 
 Hello:
 
-This series was applied to bpf/bpf-next.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 14 Dec 2023 15:56:24 -0700 you wrote:
-> Two small improves to BPF exceptions in this patchset:
+On Thu, 14 Dec 2023 12:13:56 +0100 you wrote:
+> Hi,
 > 
-> 1. Allow throwing exceptions in XDP progs
-> 2. Add some macros to help release references before throwing exceptions
+> So more stragglers than I'd like, perhaps, but here we are.
+> A bunch of these escaped Intel's vault late though, and we're
+> now rewriting our tooling so should get better at that...
 > 
-> Note the macros are intended to be temporary, at least until BPF
-> exception infra is able to automatically release acquired resources.
+> Please pull and let us know if there's any problem.
 > 
 > [...]
 
 Here is the summary with links:
-  - [bpf-next,1/3] bpf: xdp: Register generic_kfunc_set with XDP programs
-    https://git.kernel.org/bpf/bpf-next/c/7489723c2e26
-  - [bpf-next,2/3] bpf: selftests: Add bpf_assert_if() and bpf_assert_with_if() macros
-    (no matching commit)
-  - [bpf-next,3/3] bpf: selftests: Test bpf_assert_if() and bpf_assert_with_if()
-    (no matching commit)
+  - pull-request: wireless-2023-12-14
+    https://git.kernel.org/netdev/net/c/0225191a7695
 
 You are awesome, thank you!
 -- 
