@@ -1,179 +1,163 @@
-Return-Path: <netdev+bounces-58111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A18A881515C
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 21:45:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C757D815162
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 21:48:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5D671C20FB1
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 20:45:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B46C1F22DB9
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 20:48:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D56A4642B;
-	Fri, 15 Dec 2023 20:45:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72A847763;
+	Fri, 15 Dec 2023 20:48:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="NntLXKX/"
+	dkim=pass (2048-bit key) header.d=jrtc27.com header.i=@jrtc27.com header.b="Y10e4GVl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B7E36B03
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 20:45:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-552d4e2f344so1100780a12.0
-        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 12:45:42 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E0746531
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 20:48:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrtc27.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jrtc27.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-40c6736d10fso13220195e9.1
+        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 12:48:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1702673141; x=1703277941; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=v3ILTk5OrzzCbiThrfcfRtAh0MO6nINrsuw+RsWLRlQ=;
-        b=NntLXKX/7jifWNUHBhZnVKBFlC9TVR+UukA7i5t2Gt59FE5K6XCX0zOzFBaeWRBSSz
-         sXnz3LISA6GljR1Vt0fRp77UQp7OtmTU19OsiEfsa2vSlanq2TgFyYzfSISNFeJIwiCz
-         YoB+Kbu1xB3JxCsz7/WwI+bLCyKrCyGfbKl1U=
+        d=jrtc27.com; s=gmail.jrtc27.user; t=1702673290; x=1703278090; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XkbA3FPlNo1r+U6O6Ao4SqV6N3qGQHbqxTmiKmAK7ww=;
+        b=Y10e4GVl5p3c7s5ut1pfDNzZZjIb5zWf7PaoHS89DSdvpe3YC9ndnXZCqvpGo1mghB
+         FwxSotXHXgw9yTiQ50CdGFzQ3MABscjqZdDfQn4Ibyf6Apq5999Eytsz+PzzIEJkj7Nw
+         b+KBqA1Ng7c2lgZirrs9P1pIWOIQEO2rwh/DPz1E4vcDs17RuHedQZvHgVsuj9MbIiCr
+         UUQCXwOPKaHZ79J/7vORmH08rcJcYqQFQgprJb6fev9FGZpxtTcEHWKwdaS5b1AuS8gI
+         mKIMfoMEtqSDKuEOvl4m4gwzQUz9r4Fzfx7VPmUN70tRGrv7wexc6YwMiXg4UQEqDM5T
+         7/fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702673141; x=1703277941;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=v3ILTk5OrzzCbiThrfcfRtAh0MO6nINrsuw+RsWLRlQ=;
-        b=uvQYvVCF4drt5qehGnSX/am+x0IqHanvARDyERkymuZolYp2p+d0QD4vLTV5Qb8vP6
-         Umn5/lq0+MbtOT42U56VRNtcJ0YG+5QUth31Lyi8RmtjoETZRrvLZYpXWM6slVoFkYBn
-         4WaaY/JYji1jb7BYwghuAsf+obJA8/HhcZGCDZDjD3zqkfudJv2BlXglCCmdHp2lCi4V
-         RTq2Jyce0tJ91tmKnMmS44hyflQuHYp7AkEf/rJ8J6CsO3T0vvGfj6GMAXv59EG8WiU+
-         bBzlHLxNKkDlWlAWNSxA8gq83bFmmzTGSlfQScwbUvirDkl0vs3Zm+qJMyxoT8OHUDsy
-         KtmA==
-X-Gm-Message-State: AOJu0Yy7vEqJIoYsKvca7P4Utvmv7Zvj2iJSpZlvcDGp8/1gw0QuBWFM
-	ACkYLvkXoCc7VWExb/DcRZuU8TrhcSvs8dkqvCHCre1SDKTEn0JRtJ0=
-X-Google-Smtp-Source: AGHT+IGy7flyjLN3vYV71Xaj2okVYLzsCeJAsrUCtuQ3lXDk+XxLSP/iBERK1cv+oJ2cpjYari9aaSrttBM46+9j0Ek=
-X-Received: by 2002:a50:99da:0:b0:552:e7bf:d3da with SMTP id
- n26-20020a5099da000000b00552e7bfd3damr267826edb.77.1702673140487; Fri, 15 Dec
- 2023 12:45:40 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702673290; x=1703278090;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XkbA3FPlNo1r+U6O6Ao4SqV6N3qGQHbqxTmiKmAK7ww=;
+        b=TI0RBNAlUmU/7LBRrWlLmy3i/+KFdDVYBHP8HzicbkYfxr17clvaVT7fxedFy8F9lE
+         TYgm3VfsEoJgq1K3qNibKUn5kEvI1CdY5+X3nE+5+deGsfxeQBIMBggFeQowg31xebPn
+         jqBJhbhJ8r2TvSliINcS8NB8sjZzsxD77Imw9svj7S8ml0kTrRIhFEL7sww9tThE7jP2
+         QseabU015Th4PeSbQ0M0cSBY72eN3HhAlRn+mWIAv0wHkY97bag9v2H9+Or7irNlYWjm
+         Tg51e5Xr8RKCSwcmcJA3mkj8gm1Y44MAWC+izih6HzkK7I2dfbrdEOfSJrz99ujknUJL
+         Zrcg==
+X-Gm-Message-State: AOJu0YzCsTyT0VCCe7soXUaHsMrvtUySAxsrJdL8R38Two18fi4WSyr7
+	0qZYdkBP2iHW7m+dBhIgZke7Xg==
+X-Google-Smtp-Source: AGHT+IHmyxYXA7TlsEHSBZ2x2Q3ZtE6ks/hZmTMZ9YZV6t1R+oDgMn/QNCqxM1cqDO/CM4Y9PqXh7w==
+X-Received: by 2002:a05:600c:808b:b0:40b:5e21:dd24 with SMTP id ew11-20020a05600c808b00b0040b5e21dd24mr6411929wmb.82.1702673290406;
+        Fri, 15 Dec 2023 12:48:10 -0800 (PST)
+Received: from smtpclient.apple ([131.111.5.246])
+        by smtp.gmail.com with ESMTPSA id p8-20020a05600c358800b0040b40468c98sm31891322wmq.10.2023.12.15.12.48.09
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 15 Dec 2023 12:48:09 -0800 (PST)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231214213138.98095-1-michael.chan@broadcom.com>
- <20231215083759.0702559d@kernel.org> <ZXyFW0lIGluM8ipj@C02YVCJELVCG.dhcp.broadcom.net>
- <20231215092112.3f0fee3d@kernel.org>
-In-Reply-To: <20231215092112.3f0fee3d@kernel.org>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Fri, 15 Dec 2023 12:45:27 -0800
-Message-ID: <CACKFLi=MGnF3Tp=5_c6jjXzRbnzWL7ec8ecUYNGh-QZ1b4K9_A@mail.gmail.com>
-Subject: Re: [PATCH net] bnxt_en: do not map packet buffers twice
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andy Gospodarek <andrew.gospodarek@broadcom.com>, davem@davemloft.net, 
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com, 
-	bpf@vger.kernel.org, hawk@kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	john.fastabend@gmail.com, Somnath Kotur <somnath.kotur@broadcom.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000bd09bb060c927bc8"
-
---000000000000bd09bb060c927bc8
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.200.91.1.1\))
+Subject: Re: [PATCH v3 2/9] dt-bindings: net: starfive,jh7110-dwmac: Add
+ JH7100 SoC compatible
+From: Jessica Clarke <jrtc27@jrtc27.com>
+In-Reply-To: <20231215204050.2296404-3-cristian.ciocaltea@collabora.com>
+Date: Fri, 15 Dec 2023 20:47:58 +0000
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Emil Renner Berthing <kernel@esmil.dk>,
+ Samin Guo <samin.guo@starfivetech.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>,
+ Hal Feng <hal.feng@starfivetech.com>,
+ Michael Turquette <mturquette@baylibre.com>,
+ Stephen Boyd <sboyd@kernel.org>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ netdev@vger.kernel.org,
+ "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>,
+ linux-riscv <linux-riscv@lists.infradead.org>,
+ linux-clk@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org,
+ kernel@collabora.com
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <A7C96942-07CB-40FD-AAAA-4A8947DEE7CA@jrtc27.com>
+References: <20231215204050.2296404-1-cristian.ciocaltea@collabora.com>
+ <20231215204050.2296404-3-cristian.ciocaltea@collabora.com>
+To: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+X-Mailer: Apple Mail (2.3774.200.91.1.1)
 
-On Fri, Dec 15, 2023 at 9:21=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> Are the XDP_REDIRECT (target) and XDP_TX going to the same rings?
-> The locking seems to be missing, and bnxt_tx_int_xdp() does not
-> seem to be able to handle the optimization you described if
-> a ring contains a mix of XDP_REDIRECT and XDP_TX.
+On 15 Dec 2023, at 20:40, Cristian Ciocaltea =
+<cristian.ciocaltea@collabora.com> wrote:
+>=20
+> The Synopsys DesignWare MAC found on StarFive JH7100 SoC is mostly
+> similar to the newer JH7110, but it requires only two interrupts and a
+> single reset line, which is 'ahb' instead of the commonly used
+> 'stmmaceth'.
+>=20
+> Since the common binding 'snps,dwmac' allows selecting 'ahb' only in
+> conjunction with 'stmmaceth', extend the logic to also permit =
+exclusive
+> usage of the 'ahb' reset name.  This ensures the following use cases =
+are
+> supported:
+>=20
+>  JH7110: reset-names =3D "stmmaceth", "ahb";
+>  JH7100: reset-names =3D "ahb";
+>  other:  reset-names =3D "stmmaceth";
+>=20
+> Also note the need to use a different dwmac fallback, as v5.20 applies
+> to JH7110 only, while JH7100 relies on v3.7x.
+>=20
+> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+> ---
+> .../devicetree/bindings/net/snps,dwmac.yaml   |  3 +-
+> .../bindings/net/starfive,jh7110-dwmac.yaml   | 74 +++++++++++++------
+> 2 files changed, 55 insertions(+), 22 deletions(-)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml =
+b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> index 5c2769dc689a..c1380ff1c054 100644
+> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> @@ -95,6 +95,7 @@ properties:
+>         - snps,dwmac-5.20
+>         - snps,dwxgmac
+>         - snps,dwxgmac-2.10
+> +        - starfive,jh7100-dwmac
+>         - starfive,jh7110-dwmac
+>=20
+>   reg:
+> @@ -146,7 +147,7 @@ properties:
+>   reset-names:
+>     minItems: 1
+>     items:
+> -      - const: stmmaceth
+> +      - enum: [stmmaceth, ahb]
+>       - const: ahb
 
-XDP_REDIRECT mixed with XDP_TX won't work well currently.  It was
-briefly mentioned on the list a few months ago:
+I=E2=80=99m not so well-versed in the YAML bindings, but would this not =
+allow
+reset-names =3D "ahb", "ahb"?
 
-https://lore.kernel.org/netdev/CACKFLin+1whPs0qeM5xBb1yXx8FkFS_vGrW6PaGy41_=
-XVH=3DSGg@mail.gmail.com/
+Jess
 
-Yes, they share the same set of TX rings in the current code.  My plan
-is to have a set of dedicated TX rings for XDP_REDIRECT.  Adding
-locking to properly support XDP_REDIRECT and XDP_TX seems not ideal
-for performance.
-
---000000000000bd09bb060c927bc8
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIEQ+YkMETBXCAHqlOMZ+38ufM1ZJS7Yt
-nH3K1DkN1ISBMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIx
-NTIwNDU0MVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCYHKQQNozH6g+teTxFQV/CQJ3flbE/Vo6Kt7AwZsa45sR2YzIW
-sPxB2dFrdiKZl7uG2VFfsmlQODSLoeoy6vuP/JUoajI8Sq8K4/9IoffzPYzapSGt7d9J05agvL3w
-81sMdYplWicppNGZmUgkeW7+vH5+Zum4DjJ9JEV7F0yu2foLhdDhN7Hl/HryyqZjRG6ID7d9CwZp
-4Xeglit4evPNumFvD7r/kOk45p19Tn5auMi5Rv9RhGm8Zhv6PNYOAz1qXgjh41TPAxb81PUFSFtN
-NF1ABYk26taPYYSxKVI1Iws3wbFSApsZiAYupKpUMY0LrzvfCj3W+Z98AytWwFVn
---000000000000bd09bb060c927bc8--
 
