@@ -1,199 +1,321 @@
-Return-Path: <netdev+bounces-58043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40BA1814E49
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 18:18:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0CB2814E67
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 18:21:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC8D71F2162F
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 17:18:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49FF51F258B6
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 17:21:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 280046DD0F;
-	Fri, 15 Dec 2023 17:10:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AE0C47763;
+	Fri, 15 Dec 2023 17:12:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="SRSorbBE";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="bKkDOU1m"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GsxhrFTr"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F2816AB83;
-	Fri, 15 Dec 2023 17:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1702660243;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF05446DA;
+	Fri, 15 Dec 2023 17:12:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DF2B9C0002;
+	Fri, 15 Dec 2023 17:12:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1702660360;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wD16ISNyde986dSZRGGV32udEpTGLhg+lI5u4jYKrqw=;
-	b=SRSorbBEjdXTPPsLCYBR3BfHZUztde0viH5AXb6BnrVRO+dRpLMHGwt39krhGG0dIGg2gc
-	U/GPYQC8QIJryAvWdpneFKRQPe6h9ZTqEWdzui8QpFNXWEeO85TAeVO/cv65RLccd4/YRK
-	WzlvjMKRk5knp71bJzfOBYegir5nHiJNyJqFAqoY8QhtCasD/8/viDwUyU06Aoa/DCR6yt
-	/Bo5pe68KaOdpzj5Ej1RmwGXZF6GFCUwJ4j6BVvHO/0/fuqfNBRqPARUavf+TmVV9muEYn
-	DgRMLZwgTHliPnTc22SgXQvtzytCGCuEBcYzPMfFPZaWDtx9BK4682g+Lzyb7w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1702660243;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wD16ISNyde986dSZRGGV32udEpTGLhg+lI5u4jYKrqw=;
-	b=bKkDOU1m4UEsf1ODMNSff2+rozRNCsjhcGgYFGGAkJKSnk1VerHLACuMKMr3ry8mJ6DtKt
-	6a997HCgOHDcT6Dw==
-To: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=xekBtYrzEfeddVkt5T9IKlymKf8ZyjRogSe1ZvmnuGg=;
+	b=GsxhrFTr6YBTjpyd1T4DAoYvUrXV4W5tPMgSU8RxDu9GUqiZnVL2PQSK1M5kVSXZfO2kAK
+	6CqorskmU7E95I+JWTl+tb6m70n3LL5/CSKQgu+JEsg7z0gDTib4NJRhysJnXB+i6DOXk0
+	qz+hBN6q0Buv2G4MwnoaIJQvZhREFQYu5SrIlwp1sykoI2uDyjCLLb1YwQBLnUgetv1u6y
+	rTe2bOxpjQiciTorImkMZCZjxUA5MLj7wEJbbUjIigZyKqk4urj5d+YL7uHFS6jVobZVD9
+	Tx0UN5DjQfPEp3DvqZIFVfvpq5vCG4dHle7gABWOPZWwDPJ3OBguZi/C62laAQ==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Hao Luo <haoluo@google.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	bpf@vger.kernel.org
-Subject: [PATCH net-next 24/24] net: bpf: Add lockdep assert for the redirect process.
-Date: Fri, 15 Dec 2023 18:07:43 +0100
-Message-ID: <20231215171020.687342-25-bigeasy@linutronix.de>
-In-Reply-To: <20231215171020.687342-1-bigeasy@linutronix.de>
-References: <20231215171020.687342-1-bigeasy@linutronix.de>
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>
+Subject: [PATCH net-next v4 00/13] Introduce PHY listing and link_topology tracking
+Date: Fri, 15 Dec 2023 18:12:22 +0100
+Message-ID: <20231215171237.1152563-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-The users of bpf_redirect_info should lock the access by acquiring the
-nested BH-lock bpf_run_lock.redirect_lock. This lock should be acquired
-before the first usage (bpf_prog_run_xdp()) and dropped after the last
-user in the context (xdp_do_redirect()).
+Hello everyone,
 
-Current user in tree have been audited and updated.
+Here's a V4 of the multi-PHY support series. This is mostly bugfixes to
+allow building without phylib, but I also removed the RFC flag.
 
-Add lockdep annonation to ensure new user acquire the lock.
+The blurb bellow is a full description of the series, however I realised
+that I failed to mentionned why this is called "phy_link_topology". The
+end-goal of this struct is not only to track the phy_devices but also
+the different front-facing ports across the topology. I'm picking a
+pretty generic name to convey the fact that this should be strictly
+related to PHYs.
 
-Cc: Alexei Starovoitov <ast@kernel.org>
-Cc: Andrii Nakryiko <andrii@kernel.org>
-Cc: Hao Luo <haoluo@google.com>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Jiri Olsa <jolsa@kernel.org>
-Cc: John Fastabend <john.fastabend@gmail.com>
-Cc: KP Singh <kpsingh@kernel.org>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Song Liu <song@kernel.org>
-Cc: Stanislav Fomichev <sdf@google.com>
-Cc: Yonghong Song <yonghong.song@linux.dev>
-Cc: bpf@vger.kernel.org
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- include/net/xdp.h |  1 +
- net/core/filter.c | 11 +++++++++++
- 2 files changed, 12 insertions(+)
+As a remainder, this ongoing work aims ultimately at supporting complex
+link topologies that involve multiplexing multiple PHYs/SFPs on a single
+netdevice. As a first step, it's required that we are able to enumerate the
+PHYs on a given ethernet interface.
 
-diff --git a/include/net/xdp.h b/include/net/xdp.h
-index 349c36fb5fd8f..cdeab175abf18 100644
---- a/include/net/xdp.h
-+++ b/include/net/xdp.h
-@@ -493,6 +493,7 @@ static inline void xdp_clear_features_flag(struct net_d=
-evice *dev)
- static __always_inline u32 bpf_prog_run_xdp(const struct bpf_prog *prog,
- 					    struct xdp_buff *xdp)
- {
-+	lockdep_assert_held(this_cpu_ptr(&bpf_run_lock.redirect_lock));
- 	/* Driver XDP hooks are invoked within a single NAPI poll cycle and thus
- 	 * under local_bh_disable(), which provides the needed RCU protection
- 	 * for accessing map entries.
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 72a7812f933a1..a2f97503ed578 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -2495,6 +2495,7 @@ int skb_do_redirect(struct sk_buff *skb)
- 	struct net_device *dev;
- 	u32 flags =3D ri->flags;
-=20
-+	lockdep_assert_held(this_cpu_ptr(&bpf_run_lock.redirect_lock));
- 	dev =3D dev_get_by_index_rcu(net, ri->tgt_index);
- 	ri->tgt_index =3D 0;
- 	ri->flags =3D 0;
-@@ -2525,6 +2526,8 @@ BPF_CALL_2(bpf_redirect, u32, ifindex, u64, flags)
- {
- 	struct bpf_redirect_info *ri =3D this_cpu_ptr(&bpf_redirect_info);
-=20
-+	lockdep_assert_held(this_cpu_ptr(&bpf_run_lock.redirect_lock));
-+
- 	if (unlikely(flags & (~(BPF_F_INGRESS) | BPF_F_REDIRECT_INTERNAL)))
- 		return TC_ACT_SHOT;
-=20
-@@ -2546,6 +2549,8 @@ BPF_CALL_2(bpf_redirect_peer, u32, ifindex, u64, flag=
-s)
- {
- 	struct bpf_redirect_info *ri =3D this_cpu_ptr(&bpf_redirect_info);
-=20
-+	lockdep_assert_held(this_cpu_ptr(&bpf_run_lock.redirect_lock));
-+
- 	if (unlikely(flags))
- 		return TC_ACT_SHOT;
-=20
-@@ -2568,6 +2573,8 @@ BPF_CALL_4(bpf_redirect_neigh, u32, ifindex, struct b=
-pf_redir_neigh *, params,
- {
- 	struct bpf_redirect_info *ri =3D this_cpu_ptr(&bpf_redirect_info);
-=20
-+	lockdep_assert_held(this_cpu_ptr(&bpf_run_lock.redirect_lock));
-+
- 	if (unlikely((plen && plen < sizeof(*params)) || flags))
- 		return TC_ACT_SHOT;
-=20
-@@ -4287,6 +4294,8 @@ u32 xdp_master_redirect(struct xdp_buff *xdp)
- 	struct net_device *master, *slave;
- 	struct bpf_redirect_info *ri =3D this_cpu_ptr(&bpf_redirect_info);
-=20
-+	lockdep_assert_held(this_cpu_ptr(&bpf_run_lock.redirect_lock));
-+
- 	master =3D netdev_master_upper_dev_get_rcu(xdp->rxq->dev);
- 	slave =3D master->netdev_ops->ndo_xdp_get_xmit_slave(master, xdp);
- 	if (slave && slave !=3D xdp->rxq->dev) {
-@@ -4394,6 +4403,7 @@ int xdp_do_redirect(struct net_device *dev, struct xd=
-p_buff *xdp,
- 	struct bpf_redirect_info *ri =3D this_cpu_ptr(&bpf_redirect_info);
- 	enum bpf_map_type map_type =3D ri->map_type;
-=20
-+	lockdep_assert_held(this_cpu_ptr(&bpf_run_lock.redirect_lock));
- 	if (map_type =3D=3D BPF_MAP_TYPE_XSKMAP)
- 		return __xdp_do_redirect_xsk(ri, dev, xdp, xdp_prog);
-=20
-@@ -4408,6 +4418,7 @@ int xdp_do_redirect_frame(struct net_device *dev, str=
-uct xdp_buff *xdp,
- 	struct bpf_redirect_info *ri =3D this_cpu_ptr(&bpf_redirect_info);
- 	enum bpf_map_type map_type =3D ri->map_type;
-=20
-+	lockdep_assert_held(this_cpu_ptr(&bpf_run_lock.redirect_lock));
- 	if (map_type =3D=3D BPF_MAP_TYPE_XSKMAP)
- 		return __xdp_do_redirect_xsk(ri, dev, xdp, xdp_prog);
-=20
---=20
+By just doing so, we also improve already-existing use-cases, namely the
+copper SFP modules support when a media-converter is used (as we have 2
+PHYs on the link, but only one is referenced by net_device.phydev, which
+is used on a variety of netlink commands).
+
+The series is architectured as follows :
+
+- The first patch adds the notion of phy_link_topology, which tracks
+all PHYs attached to a netdevice.
+
+- Patches 2, 3 and 4 adds some plumbing into SFP and phylib to be able
+  to connect the dots when building the topology tree, to know which PHY
+  is connected to which SFP bus, trying not to be too invasive on phylib.
+
+- Patch 5 allows passing a PHY_INDEX to ethnl commands. I'm uncertain about
+  this, as there are at least 4 netlink commands ( 5 with the one introduced
+  in patch 7 ) that targets PHYs directly or indirectly, which to me makes
+  it worth-it to have a generic way to pass a PHY index to commands, however
+  the approach taken may be too generic.
+
+- Patch 6 is the netlink spec update + ethtool-user.c|h autogenerated code
+update (the autogenerated code triggers checkpatch warning though)
+
+- Patch 7 introduces a new netlink command set to list PHYs on a netdevice.
+It implements a custom DUMP and GET operation to allow filtered dumps,
+that lists all PHYs on a given netdevice. I couldn't use most of ethnl's
+plumbing though.
+
+- Patch 8 is the netlink spec update + ethtool-user.c|h update for that
+new command
+
+- Patch 8,9,10 and 11 updates the PLCA, strset, cable-test and pse netlink
+commands to use the user-provided PHY instead of net_device.phydev.
+
+- Finally patch 12 adds some documentation for this whole work.
+
+Examples
+========
+
+Here's a short overview of the kind of operations you can have regarding
+the PHY topology. These tests were performed on a MacchiatoBin, which
+has 3 interfaces :
+
+eth0 and eth1 have the following layout:
+
+MAC - PHY - SFP
+
+eth2 has this more classic topology :
+
+MAC - PHY - RJ45
+
+finally eth3 has the following topology :
+
+MAC - SFP
+
+When performing a dump with all interfaces down, we don't get any
+result, as no PHY has been attached to their respective net_device :
+
+# ./cli.py --spec specs/ethtool.yaml --schema genetlink-legacy.yaml --dump phy-get
+None
+
+The following output is with eth0, eth2 and eth3 up, but no SFP module
+inserted in none of the interfaces :
+
+# ./cli.py --spec specs/ethtool.yaml --schema genetlink-legacy.yaml --dump phy-get
+[{'downstream-sfp-name': 'sfp-eth0',
+  'drvname': 'mv88x3310',
+  'header': {'dev-index': 2, 'dev-name': 'eth0'},
+  'id': 0,
+  'index': 1,
+  'name': 'f212a600.mdio-mii:00',
+  'upstream-type': 'mac'},
+ {'drvname': 'Marvell 88E1510',
+  'header': {'dev-index': 4, 'dev-name': 'eth2'},
+  'id': 21040593,
+  'index': 1,
+  'name': 'f212a200.mdio-mii:00',
+  'upstream-type': 'mac'}]
+
+
+And now is a dump operation with a copper SFP in the eth0 port :
+
+# ./cli.py --spec specs/ethtool.yaml --schema genetlink-legacy.yaml --dump phy-get
+[{'downstream-sfp-name': 'sfp-eth0',
+  'drvname': 'mv88x3310',
+  'header': {'dev-index': 2, 'dev-name': 'eth0'},
+  'id': 0,
+  'index': 1,
+  'name': 'f212a600.mdio-mii:00',
+  'upstream-type': 'mac'},
+ {'drvname': 'Marvell 88E1111',
+  'header': {'dev-index': 2, 'dev-name': 'eth0'},
+  'id': 21040322,
+  'index': 2,
+  'name': 'i2c:sfp-eth0:16',
+  'upstream': {'index': 1, 'sfp-name': 'sfp-eth0'},
+  'upstream-type': 'phy'},
+ {'drvname': 'Marvell 88E1510',
+  'header': {'dev-index': 4, 'dev-name': 'eth2'},
+  'id': 21040593,
+  'index': 1,
+  'name': 'f212a200.mdio-mii:00',
+  'upstream-type': 'mac'}]
+
+ -- Note that this shouldn't actually work as the 88x3310 PHY doesn't allow
+a 1G SFP to be connected to its SFP interface, and I don't have a 10G copper SFP,
+so for the sake of the demo I applied the following modification, which
+of courses gives a non-functionnal link, but the PHY attach still works,
+which is what I want to demonstrate :
+
+@@ -488,7 +488,7 @@ static int mv3310_sfp_insert(void *upstream, const struct sfp_eeprom_id *id)
+
+        if (iface != PHY_INTERFACE_MODE_10GBASER) {
+                dev_err(&phydev->mdio.dev, "incompatible SFP module inserted\n");
+-               return -EINVAL;
++               //return -EINVAL;
+        }
+        return 0;
+ }
+
+Finally an example of the filtered DUMP operation that Jakub suggested
+in V1 :
+
+# ./cli.py --spec specs/ethtool.yaml --schema genetlink-legacy.yaml \
+# --dump phy-get --json '{"header" : {"dev-name" : "eth0"}}'
+
+[{'downstream-sfp-name': 'sfp-eth0',
+  'drvname': 'mv88x3310',
+  'header': {'dev-index': 2, 'dev-name': 'eth0'},
+  'id': 0,
+  'index': 1,
+  'name': 'f212a600.mdio-mii:00',
+  'upstream-type': 'mac'},
+ {'drvname': 'Marvell 88E1111',
+  'header': {'dev-index': 2, 'dev-name': 'eth0'},
+  'id': 21040322,
+  'index': 2,
+  'name': 'i2c:sfp-eth0:16',
+  'upstream': {'index': 1, 'sfp-name': 'sfp-eth0'},
+  'upstream-type': 'phy'}]
+
+And a classic GET operation allows querying a single PHY's info :
+
+# ./cli.py --spec specs/ethtool.yaml --schema genetlink-legacy.yaml \
+# --do phy-get --json '{"header" : {"dev-name" : "eth0", "phy-index" : 2}}'
+
+{'drvname': 'Marvell 88E1111',
+ 'header': {'dev-index': 2, 'dev-name': 'eth0'},
+ 'id': 21040322,
+ 'index': 2,
+ 'name': 'i2c:sfp-eth0:16',
+ 'upstream': {'index': 1, 'sfp-name': 'sfp-eth0'},
+ 'upstream-type': 'phy'}
+
+Changes in V4:
+- Dropped the RFC flag
+- Made the net_device integration independent to having phylib enabled
+- Removed the autogenerated ethtool-user code for the YNL specs
+
+Changes in V3:
+- Added RTNL assertions where needed
+- Fixed issues in the DUMP code for PHY_GET, which crashed when running it
+  twice in a row
+- Added the documentation, and moved in-source docs around
+- renamed link_topology to phy_link_topology
+
+Changes in V2:
+- Added the DUMP operation
+- Added much more information in the reported data, to be able to reconstruct
+  precisely the topology tree
+- renamed phy_list to link_topology
+
+
+
+Maxime Chevallier (13):
+  net: phy: Introduce ethernet link topology representation
+  net: sfp: pass the phy_device when disconnecting an sfp module's PHY
+  net: phy: add helpers to handle sfp phy connect/disconnect
+  net: sfp: Add helper to return the SFP bus name
+  net: ethtool: Allow passing a phy index for some commands
+  netlink: specs: add phy-index as a header parameter
+  net: ethtool: Introduce a command to list PHYs on an interface
+  netlink: specs: add ethnl PHY_GET command set
+  net: ethtool: plca: Target the command to the requested PHY
+  net: ethtool: pse-pd: Target the command to the requested PHY
+  net: ethtool: cable-test: Target the command to the requested PHY
+  net: ethtool: strset: Allow querying phy stats by index
+  Documentation: networking: document phy_link_topology
+
+ Documentation/netlink/specs/ethtool.yaml      |  68 ++++
+ Documentation/networking/ethtool-netlink.rst  |  51 +++
+ Documentation/networking/index.rst            |   1 +
+ .../networking/phy-link-topology.rst          | 121 +++++++
+ MAINTAINERS                                   |   2 +
+ drivers/net/phy/Makefile                      |   2 +-
+ drivers/net/phy/at803x.c                      |   2 +
+ drivers/net/phy/marvell-88x2222.c             |   2 +
+ drivers/net/phy/marvell.c                     |   2 +
+ drivers/net/phy/marvell10g.c                  |   2 +
+ drivers/net/phy/phy_device.c                  |  55 ++++
+ drivers/net/phy/phy_link_topology.c           |  79 +++++
+ drivers/net/phy/phylink.c                     |   3 +-
+ drivers/net/phy/sfp-bus.c                     |  15 +-
+ include/linux/netdevice.h                     |   4 +-
+ include/linux/phy.h                           |   6 +
+ include/linux/phy_link_topology.h             |  64 ++++
+ include/linux/phy_link_topology_core.h        |  19 ++
+ include/linux/sfp.h                           |   8 +-
+ include/uapi/linux/ethtool.h                  |  16 +
+ include/uapi/linux/ethtool_netlink.h          |  30 ++
+ net/core/dev.c                                |   3 +
+ net/ethtool/Makefile                          |   2 +-
+ net/ethtool/cabletest.c                       |  12 +-
+ net/ethtool/netlink.c                         |  33 ++
+ net/ethtool/netlink.h                         |  12 +-
+ net/ethtool/phy.c                             | 306 ++++++++++++++++++
+ net/ethtool/plca.c                            |  13 +-
+ net/ethtool/pse-pd.c                          |  14 +-
+ net/ethtool/strset.c                          |  15 +-
+ 30 files changed, 922 insertions(+), 40 deletions(-)
+ create mode 100644 Documentation/networking/phy-link-topology.rst
+ create mode 100644 drivers/net/phy/phy_link_topology.c
+ create mode 100644 include/linux/phy_link_topology.h
+ create mode 100644 include/linux/phy_link_topology_core.h
+ create mode 100644 net/ethtool/phy.c
+
+-- 
 2.43.0
 
 
