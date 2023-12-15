@@ -1,154 +1,100 @@
-Return-Path: <netdev+bounces-57894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60E898146D9
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 12:27:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C40D81466D
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 12:10:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 923901C208F5
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:27:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18E0A283DAC
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 910A524A15;
-	Fri, 15 Dec 2023 11:27:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F891CF95;
+	Fri, 15 Dec 2023 11:10:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AEWtrFNz"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 174EE14F87;
-	Fri, 15 Dec 2023 11:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Ss61m2ykFz1Q6dq;
-	Fri, 15 Dec 2023 19:09:48 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id C05F718006C;
-	Fri, 15 Dec 2023 19:09:58 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 15 Dec
- 2023 19:09:58 +0800
-Subject: Re: [PATCH net-next] page_pool: Rename frag_users to frag_cnt
-To: Ilias Apalodimas <ilias.apalodimas@linaro.org>, <netdev@vger.kernel.org>
-CC: Jesper Dangaard Brouer <hawk@kernel.org>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<linux-kernel@vger.kernel.org>
-References: <20231215073119.543560-1-ilias.apalodimas@linaro.org>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <6fddeb22-0906-e04c-3a84-7836bef9ffa2@huawei.com>
-Date: Fri, 15 Dec 2023 19:09:58 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E113D1C2BD
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 11:10:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 534DBC433CB;
+	Fri, 15 Dec 2023 11:10:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702638633;
+	bh=ZeanRKAlfinpnCC8LF7reMt1A542iCyBgUV4PbcvM8Y=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AEWtrFNzYYTFfW55uyCwp2G0rnUduVLuzZPmbdF0iFloDBfucEbkXCL8Y6wnymty4
+	 CJsheTdEfmDEMksV/lYuGxnHdvh4jYmPKiEJrpbuqCZRhr3CNmGmI0DXFfU1qVEUl7
+	 Zey0+08S6TJzv+LcatYv8uu6b8DUEXYbn+ejLoyhqBJFwID83DB1+H5Uo3rczOBru0
+	 ldVXPLIShjD3grFOtzHimtph/dMkUfziwHR1X6B6yLmCoWeIwu2g0rSkQn4GEqVHXm
+	 bnWL1ga3EXeMwB4bO/ydL5FWwu6DSGGSh5GE7ULoRxHb/NarG1/Q3mNV2JZdltQJcp
+	 7GAQTHxSLGf2w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3A93EDD4EF5;
+	Fri, 15 Dec 2023 11:10:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231215073119.543560-1-ilias.apalodimas@linaro.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v4 net-next 0/8] net: dsa: mv88e6xxx: Add "eth-mac" and "rmon"
+ counter group support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170263863323.21335.9582784901328470443.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Dec 2023 11:10:33 +0000
+References: <20231214135029.383595-1-tobias@waldekranz.com>
+In-Reply-To: <20231214135029.383595-1-tobias@waldekranz.com>
+To: Tobias Waldekranz <tobias@waldekranz.com>
+Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
+ f.fainelli@gmail.com, olteanv@gmail.com, netdev@vger.kernel.org
 
-On 2023/12/15 15:31, Ilias Apalodimas wrote:
-> Since [0] got merged, it's clear that 'pp_ref_count' is used to track
-> the number of users for each page. On struct_page though we have
-> a member called 'frag_users'. Despite of what the name suggests this is
-> not the number of users. It instead represents the number of fragments of
-> the current page. When we have a single page this is set to one. When we
-> split the page this is set to the actual number of frags and later used
-> in page_pool_drain_frag() to infer the real number of users.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Thu, 14 Dec 2023 14:50:21 +0100 you wrote:
+> The majority of the changes (2/8) are about refactoring the existing
+> ethtool statistics support to make it possible to read individual
+> counters, rather than the whole set.
 > 
-> So let's rename it to something that matches the description above
+> 4/8 tries to collect all information about a stat in a single place
+> using a mapper macro, which is then used to generate the original list
+> of stats, along with a matching enum. checkpatch is less than amused
+> with this construct, but prior art exists (__BPF_FUNC_MAPPER in
+> include/uapi/linux/bpf.h, for example).
 > 
-> [0]
-> Link: https://lore.kernel.org/netdev/20231212044614.42733-2-liangchen.linux@gmail.com/
-> Signed-off-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-> ---
->  include/net/page_pool.h | 2 +-
->  net/core/page_pool.c    | 8 ++++----
->  2 files changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/include/net/page_pool.h b/include/net/page_pool.h
-> index 813c93499f20..957cd84bb3f4 100644
-> --- a/include/net/page_pool.h
-> +++ b/include/net/page_pool.h
-> @@ -158,7 +158,7 @@ struct page_pool {
->  	u32 pages_state_hold_cnt;
->  	unsigned int frag_offset;
->  	struct page *frag_page;
-> -	long frag_users;
-> +	long frag_cnt;
+> [...]
 
-I would rename it to something like refcnt_bais to mirror the pagecnt_bias
-in struct page_frag_cache.
+Here is the summary with links:
+  - [v4,net-next,1/8] net: dsa: mv88e6xxx: Push locking into stats snapshotting
+    https://git.kernel.org/netdev/net-next/c/d624afaf4c79
+  - [v4,net-next,2/8] net: dsa: mv88e6xxx: Create API to read a single stat counter
+    https://git.kernel.org/netdev/net-next/c/3def80e52db3
+  - [v4,net-next,3/8] net: dsa: mv88e6xxx: Fix mv88e6352_serdes_get_stats error path
+    https://git.kernel.org/netdev/net-next/c/fc82a08ae795
+  - [v4,net-next,4/8] net: dsa: mv88e6xxx: Give each hw stat an ID
+    https://git.kernel.org/netdev/net-next/c/5780acbd2499
+  - [v4,net-next,5/8] net: dsa: mv88e6xxx: Add "eth-mac" counter group support
+    https://git.kernel.org/netdev/net-next/c/0e047cec7796
+  - [v4,net-next,6/8] net: dsa: mv88e6xxx: Limit histogram counters to ingress traffic
+    https://git.kernel.org/netdev/net-next/c/ceea48efa358
+  - [v4,net-next,7/8] net: dsa: mv88e6xxx: Add "rmon" counter group support
+    https://git.kernel.org/netdev/net-next/c/394518e3c119
+  - [v4,net-next,8/8] selftests: forwarding: ethtool_rmon: Add histogram counter test
+    https://git.kernel.org/netdev/net-next/c/00e7f29d9b89
 
-> 
->  #ifdef CONFIG_PAGE_POOL_STATS
->  	/* these stats are incremented while in softirq context */
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 9b203d8660e4..19a56a52ac8f 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -659,7 +659,7 @@ EXPORT_SYMBOL(page_pool_put_page_bulk);
->  static struct page *page_pool_drain_frag(struct page_pool *pool,
->  					 struct page *page)
->  {
-> -	long drain_count = BIAS_MAX - pool->frag_users;
-> +	long drain_count = BIAS_MAX - pool->frag_cnt;
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-drain_count = pool->refcnt_bais;
 
-or
-
-remove it and use pool->refcnt_bais directly.
-
-> 
->  	/* Some user is still using the page frag */
->  	if (likely(page_pool_defrag_page(page, drain_count)))
-> @@ -678,7 +678,7 @@ static struct page *page_pool_drain_frag(struct page_pool *pool,
-> 
->  static void page_pool_free_frag(struct page_pool *pool)
->  {
-> -	long drain_count = BIAS_MAX - pool->frag_users;
-> +	long drain_count = BIAS_MAX - pool->frag_cnt;
-
-Same here.
-
->  	struct page *page = pool->frag_page;
-> 
->  	pool->frag_page = NULL;
-> @@ -721,14 +721,14 @@ struct page *page_pool_alloc_frag(struct page_pool *pool,
->  		pool->frag_page = page;
-> 
->  frag_reset:
-> -		pool->frag_users = 1;
-> +		pool->frag_cnt = 1;
-
-pool->refcnt_bais = BIAS_MAX - 1;
-
->  		*offset = 0;
->  		pool->frag_offset = size;
->  		page_pool_fragment_page(page, BIAS_MAX);
->  		return page;
->  	}
-> 
-> -	pool->frag_users++;
-> +	pool->frag_cnt++;
-
-pool->refcnt_bais--;
-
->  	pool->frag_offset = *offset + size;
->  	alloc_stat_inc(pool, fast);
->  	return page;
-> --
-> 2.37.2
-> 
-> .
-> 
 
