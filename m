@@ -1,78 +1,127 @@
-Return-Path: <netdev+bounces-58070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AC27814F37
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 18:51:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B22B5814F39
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 18:52:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF8841F231E4
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 17:51:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 678F21F21616
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 17:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8707A3FE2F;
-	Fri, 15 Dec 2023 17:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4631430133;
+	Fri, 15 Dec 2023 17:49:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ao5vRLe7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.merlins.org (magic.merlins.org [209.81.13.136])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C6BD3FB28
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 17:49:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=merlins.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=merlins.org
-Received: from c-76-132-34-178.hsd1.ca.comcast.net ([76.132.34.178]:53094 helo=sauron.svh.merlins.org)
-	by mail1.merlins.org with esmtpsa 
-	(Cipher TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim 4.94.2 #2)
-	id 1rECJI-0007yx-G3 by authid <merlins.org> with srv_auth_plain; Fri, 15 Dec 2023 09:49:16 -0800
-Received: from merlin by sauron.svh.merlins.org with local (Exim 4.92)
-	(envelope-from <marc@merlins.org>)
-	id 1rECGg-000UUd-Az; Fri, 15 Dec 2023 09:46:34 -0800
-Date: Fri, 15 Dec 2023 09:46:34 -0800
-From: Marc MERLIN <marc@merlins.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-Subject: Re: [PATCH net v3] net: ethtool: do runtime PM outside RTNL
-Message-ID: <20231215174634.GA10053@merlins.org>
-References: <20231206113934.8d7819857574.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
- <20231206084448.53b48c49@kernel.org>
- <e6f227ee701e1ee37e8f568b1310d240a2b8935a.camel@sipsolutions.net>
- <a44865f5-3a07-d60a-c333-59c012bfa2fb@intel.com>
- <20231207094021.1419b5d0@kernel.org>
- <20231211045200.GC24475@merlins.org>
- <83dc80d3-1c26-405d-a08d-2db4bc318ac8@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E97A41864;
+	Fri, 15 Dec 2023 17:49:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Cc:Content-ID:Content-Description;
+	bh=6doYMLm7Bax3yqK0joGshFZ7OI7/1Sir/DmkIlByeKY=; b=ao5vRLe79QhpcwBxgopft/HAge
+	KzIWxjDoA+XrNGKYjtfUaFJBcDImKQnVnKt60JE3FinQosQCII3wJ6g4+qmW3keci7+Q+njUzGawJ
+	MELFBtZ1kRfwNerHZWzocXQ48kJ5u0a/aHw7fbNqdqCm42m+7pj9pqLIoYgij23xqDdZU+UX+pDK+
+	heHl9uYhdf1uvAMNX5bVFo27kKquTWm2MZDSRdS1D3gB9X+79vJ71FV4upSGGigBcs0z+dak58f7k
+	ISMWy/hUsBSYBVJ/U61C+SV4AXv1/izjrNVrYf6G0qxHutvpIqzCJi4aXKlHjtQWgH8OvwqTjuUOo
+	w/MfAFmw==;
+Received: from [50.53.46.231] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rECJh-0049Rm-1H;
+	Fri, 15 Dec 2023 17:49:41 +0000
+Message-ID: <2bde540c-b637-49f6-a8fd-03b5b95f752c@infradead.org>
+Date: Fri, 15 Dec 2023 09:49:40 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <83dc80d3-1c26-405d-a08d-2db4bc318ac8@gmail.com>
-X-Sysadmin: BOFH
-X-URL: http://marc.merlins.org/
-X-SA-Exim-Connect-IP: 76.132.34.178
-X-SA-Exim-Mail-From: marc@merlins.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH v3 2/3] net: phy: add simple helper to return
+ count of supported speeds
+Content-Language: en-US
+To: Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231215132921.16808-1-ansuelsmth@gmail.com>
+ <20231215132921.16808-3-ansuelsmth@gmail.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20231215132921.16808-3-ansuelsmth@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 15, 2023 at 02:42:01PM +0100, Heiner Kallweit wrote:
-> Why don't you simply disable runtime pm for the affected device as a
-> workaround? This can be done via sysfs.
 
-1) because I didn't know what the exact bug was and how to work around it :)
-2) without power management, the battery use is not good, but yes not
-good is better than laptop crashing :)
 
-That said, if it's only affecting wired ethernet, I can also unload the
-igc module until I actually need wired ethernet, which is sometimes but
-not often.
+On 12/15/23 05:29, Christian Marangi wrote:
+> Add simple helper to return count of supported speeds for the passed PHY
+> device.
+> 
+> This can be useful to know the number of speed modes to dynamically
+> allocate a speed array for it.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+>  drivers/net/phy/phy.c | 12 ++++++++++++
+>  include/linux/phy.h   |  2 ++
+>  2 files changed, 14 insertions(+)
+> 
+> diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+> index a5fa077650e8..311560e72126 100644
+> --- a/drivers/net/phy/phy.c
+> +++ b/drivers/net/phy/phy.c
+> @@ -229,6 +229,18 @@ phy_find_valid(int speed, int duplex, unsigned long *supported)
+>  	return phy_lookup_setting(speed, duplex, supported, false);
+>  }
+>  
+> +/**
+> + * phy_supported_speeds_num - return the number of all speeds currently
+> + *			      supported by a phy device
+> + * @phy: The phy device to return supported speeds of.
+> + *
+> + * Description: Returns the number of supported speeds.
 
-Thanks for your suggestion
-Marc
+For kernel-doc, better to have that line as:
+
+ * Returns: the number of supported speeds.
+
+
+
+> + */
+> +unsigned int phy_supported_speeds_num(struct phy_device *phy)
+> +{
+> +	return phy_speeds(NULL, 0, phy->supported);
+> +}
+> +
+>  /**
+>   * phy_supported_speeds - return all speeds currently supported by a phy device
+>   * @phy: The phy device to return supported speeds of.
+> diff --git a/include/linux/phy.h b/include/linux/phy.h
+> index 3cc52826f18e..52aa415fab0f 100644
+> --- a/include/linux/phy.h
+> +++ b/include/linux/phy.h
+> @@ -202,6 +202,8 @@ static inline void phy_interface_set_rgmii(unsigned long *intf)
+>  	__set_bit(PHY_INTERFACE_MODE_RGMII_TXID, intf);
+>  }
+>  
+> +unsigned int phy_supported_speeds_num(struct phy_device *phy);
+> +
+>  /*
+>   * phy_supported_speeds - return all speeds currently supported by a PHY device
+>   */
+
 -- 
-"A mouse is a device used to point at the xterm you want to type in" - A.S.R.
- 
-Home page: http://marc.merlins.org/                       | PGP 7F55D5F27AAF9D08
+#Randy
+https://people.kernel.org/tglx/notes-about-netiquette
+https://subspace.kernel.org/etiquette.html
 
