@@ -1,133 +1,160 @@
-Return-Path: <netdev+bounces-58089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE8C9814FC7
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 19:32:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB1A3814FD0
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 19:39:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71C001F238E7
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 18:32:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08B921C23E06
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 18:39:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADABB1CF8D;
-	Fri, 15 Dec 2023 18:32:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F03A34CF6;
+	Fri, 15 Dec 2023 18:39:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hQCnieUb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SiGP8hoH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7A13C46B;
-	Fri, 15 Dec 2023 18:32:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-5e4dc41ab59so3938287b3.3;
-        Fri, 15 Dec 2023 10:32:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702665137; x=1703269937; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YRjwpVZkDiYveLBU3alcmnlTla2B39gK/IQD+D9ndaI=;
-        b=hQCnieUb6IgP3+chWdZPxqkMlTAAbGO+fFTtx9WkEWdwCoisg4vhmgPZIE23BfEyj7
-         Ch/RolZqCgvYptPyQr8QWanJcryjwcCkS/SlaW+5+6Ph8SKly6HPLd2kvPtUEA4mM9lU
-         CJ/mJOtQzV3jk9g4nNfkWVz68aRyFtgVtWIky8jM1QwYvmW953wpzpUAuMMBz5dDCJZS
-         8lZPAjdnbLS6ScgoXMMYxkXba11eP2ULsH91pxKpQhJMbWVjt+lHNcReXYtdOGirtNCW
-         oQ7oPjicbPNsSq7QeIkqwZElJ2XOxPcaSXdQJo4QTdpX1ja+ka+xOI1UyEsV51wxvJ2a
-         NRSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702665137; x=1703269937;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YRjwpVZkDiYveLBU3alcmnlTla2B39gK/IQD+D9ndaI=;
-        b=WDWEfXorKm5RmonUWSbNAZaHdILQhVt02UmfGuhsnaHSAuGw9bXa3sgd8WRKPVcMTc
-         rgcL5IDKwpc2rC3LhemH9X/ffS66YciTwHA+vU6A+0cstxmxstBq/m8NB0410DffkqfE
-         Ygig3n6SAIswZfqW4axT42vUqKrRKrLDM+ubzV7B+/cUPou34gWtpPHnWDvYabzz1dA3
-         Ia2dcnaPzHBiZxBkWVptyWtbghDzpQVSFmEHF/AB6tLuHdbwhe3RvxMjOxneR+wGYayf
-         J1IvuweJvYmiLzljp4QePayCBCXiMTzk9/vSgcshxXvHmSmXoLeO7bbyKDSkmrZMB7iw
-         dEMA==
-X-Gm-Message-State: AOJu0YyhpgIYa8BVWDjK6LB62NJpst49h8VUIOTgmNOvnfJtpQLVBGkg
-	EZvQ9lLKcYdcMc4veeuVaQOQZ1fJJCc=
-X-Google-Smtp-Source: AGHT+IHKUjhYfgy4WnqxJaIjG+2dOjbeva/k+mBe1XbCy0N0JxHX6kCxrLP2lRVVudzA5DUZbBHSlQ==
-X-Received: by 2002:a81:84c8:0:b0:5d3:9f4d:dae0 with SMTP id u191-20020a8184c8000000b005d39f4ddae0mr9421226ywf.24.1702665137249;
-        Fri, 15 Dec 2023 10:32:17 -0800 (PST)
-Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id h4-20020a816c04000000b005e2dff985d5sm2206289ywc.33.2023.12.15.10.32.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Dec 2023 10:32:16 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull-request: bluetooth 2023-12-15
-Date: Fri, 15 Dec 2023 13:32:13 -0500
-Message-ID: <20231215183214.1563754-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6052C6A3;
+	Fri, 15 Dec 2023 18:39:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702665563; x=1734201563;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=2KVrdVaDIOg+oxMRP1IVWmS8Xuon9rKpLe+/fBHVOiE=;
+  b=SiGP8hoH8aWgQEh995Bi/f5Y/Gv45UnRVN5OBGV4Y6UkLax7TeJrzRFt
+   Q/zqkUwEwv5arUmNxZdP+ccwObIkaU4Xb9fLnLtSO8RiGVF2JAZuD0bK8
+   JLvn5VTA4GOoyHBTb4N5sTs9RREyJk9WTie8jHgrgjp9vWtZYqgG1lcJQ
+   8WB7iXJHEfEB14hOl+tLjpLkssW+tdaiATBplFxK67oxfITLH6MMgd9M7
+   DvkdBwGPugapkUT8ipGeyMAWmkAaMejVM/M5UuADhpKMG1DFtcWQw2Hcc
+   fX5R5S1OQtFvdaWHWg2JRewFeeKt0wj4PFjEWd7tHIt8xXDyg+eX9eUSy
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10925"; a="395053537"
+X-IronPort-AV: E=Sophos;i="6.04,279,1695711600"; 
+   d="scan'208";a="395053537"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2023 10:39:22 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10925"; a="840760872"
+X-IronPort-AV: E=Sophos;i="6.04,279,1695711600"; 
+   d="scan'208";a="840760872"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by fmsmga008.fm.intel.com with ESMTP; 15 Dec 2023 10:39:17 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rED5e-0000cG-2T;
+	Fri, 15 Dec 2023 18:39:14 +0000
+Date: Sat, 16 Dec 2023 02:39:00 +0800
+From: kernel test robot <lkp@intel.com>
+To: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Luka Perkov <luka.perkov@sartura.hr>,
+	Robert Marko <robert.marko@sartura.hr>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@somainline.org>
+Subject: Re: [PATCH net-next v3 5/8] net: qualcomm: ipqess: add bridge
+ offloading features to the IPQESS driver
+Message-ID: <202312160211.TqddYea8-lkp@intel.com>
+References: <20231114105600.1012056-6-romain.gantois@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231114105600.1012056-6-romain.gantois@bootlin.com>
 
-The following changes since commit 64b8bc7d5f1434c636a40bdcfcd42b278d1714be:
+Hi Romain,
 
-  net/rose: fix races in rose_kill_by_device() (2023-12-15 11:59:53 +0000)
+kernel test robot noticed the following build warnings:
 
-are available in the Git repository at:
+[auto build test WARNING on net-next/main]
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2023-12-15
+url:    https://github.com/intel-lab-lkp/linux/commits/Romain-Gantois/dt-bindings-net-Introduce-the-Qualcomm-IPQESS-Ethernet-switch/20231114-185953
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231114105600.1012056-6-romain.gantois%40bootlin.com
+patch subject: [PATCH net-next v3 5/8] net: qualcomm: ipqess: add bridge offloading features to the IPQESS driver
+config: arc-randconfig-r112-20231116 (https://download.01.org/0day-ci/archive/20231216/202312160211.TqddYea8-lkp@intel.com/config)
+compiler: arc-elf-gcc (GCC) 13.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20231216/202312160211.TqddYea8-lkp@intel.com/reproduce)
 
-for you to fetch changes up to 2e07e8348ea454615e268222ae3fc240421be768:
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312160211.TqddYea8-lkp@intel.com/
 
-  Bluetooth: af_bluetooth: Fix Use-After-Free in bt_sock_recvmsg (2023-12-15 11:54:18 -0500)
+sparse warnings: (new ones prefixed by >>)
+>> drivers/net/dsa/qca/qca8k-8xxx.c:1982:5: sparse: sparse: symbol 'qca8k_dsa_port_fdb_dump' was not declared. Should it be static?
+>> drivers/net/dsa/qca/qca8k-8xxx.c:1988:6: sparse: sparse: symbol 'qca8k_dsa_port_stp_state_set' was not declared. Should it be static?
+>> drivers/net/dsa/qca/qca8k-8xxx.c:1995:6: sparse: sparse: symbol 'qca8k_dsa_port_fast_age' was not declared. Should it be static?
+>> drivers/net/dsa/qca/qca8k-8xxx.c:2000:5: sparse: sparse: symbol 'qca8k_dsa_set_ageing_time' was not declared. Should it be static?
+>> drivers/net/dsa/qca/qca8k-8xxx.c:2005:5: sparse: sparse: symbol 'qca8k_dsa_port_vlan_filtering' was not declared. Should it be static?
+>> drivers/net/dsa/qca/qca8k-8xxx.c:2012:5: sparse: sparse: symbol 'qca8k_dsa_vlan_add' was not declared. Should it be static?
 
-----------------------------------------------------------------
-bluetooth pull request for net:
+vim +/qca8k_dsa_port_fdb_dump +1982 drivers/net/dsa/qca/qca8k-8xxx.c
 
- - Add encryption key size check when acting as peripheral
- - Shut up false-positive build warning
- - Send reject if L2CAP command request is corrupted
- - Fix Use-After-Free in bt_sock_recvmsg
- - Fix not notifying when connection encryption changes
- - Fix not checking if HCI_OP_INQUIRY has been sent
- - Fix address type send over to the MGMT interface
- - Fix deadlock in vhci_send_frame
+  1981	
+> 1982	int qca8k_dsa_port_fdb_dump(struct dsa_switch *ds, int port,
+  1983				    dsa_fdb_dump_cb_t *cb, void *data)
+  1984	{
+  1985		return qca8k_port_fdb_dump(ds->priv, port, cb, data);
+  1986	}
+  1987	
+> 1988	void qca8k_dsa_port_stp_state_set(struct dsa_switch *ds, int port,
+  1989					  u8 state)
+  1990	{
+  1991		qca8k_port_stp_state_set(ds->priv, port, state,
+  1992					 dsa_to_port(ds, port)->learning, true);
+  1993	}
+  1994	
+> 1995	void qca8k_dsa_port_fast_age(struct dsa_switch *ds, int port)
+  1996	{
+  1997		qca8k_port_fast_age(ds->priv, port);
+  1998	}
+  1999	
+> 2000	int qca8k_dsa_set_ageing_time(struct dsa_switch *ds, unsigned int msecs)
+  2001	{
+  2002		return qca8k_set_ageing_time(ds->priv, msecs);
+  2003	}
+  2004	
+> 2005	int qca8k_dsa_port_vlan_filtering(struct dsa_switch *ds, int port,
+  2006					  bool vlan_filtering,
+  2007					  struct netlink_ext_ack *extack)
+  2008	{
+  2009		return qca8k_port_vlan_filtering(ds->priv, port, vlan_filtering);
+  2010	}
+  2011	
+> 2012	int qca8k_dsa_vlan_add(struct dsa_switch *ds, int port,
+  2013			       const struct switchdev_obj_port_vlan *vlan,
+  2014			       struct netlink_ext_ack *extack)
+  2015	{
+  2016		return qca8k_port_vlan_add(ds->priv, port, vlan, extack);
+  2017	}
+  2018	
 
-----------------------------------------------------------------
-Alex Lu (1):
-      Bluetooth: Add more enc key size check
-
-Arnd Bergmann (1):
-      Bluetooth: hci_event: shut up a false-positive warning
-
-Frédéric Danis (1):
-      Bluetooth: L2CAP: Send reject on command corrupted request
-
-Hyunwoo Kim (1):
-      Bluetooth: af_bluetooth: Fix Use-After-Free in bt_sock_recvmsg
-
-Luiz Augusto von Dentz (3):
-      Bluetooth: Fix not notifying when connection encryption changes
-      Bluetooth: hci_event: Fix not checking if HCI_OP_INQUIRY has been sent
-      Bluetooth: hci_core: Fix hci_conn_hash_lookup_cis
-
-Xiao Yao (1):
-      Bluetooth: MGMT/SMP: Fix address type when using SMP over BREDR/LE
-
-Ying Hsu (1):
-      Bluetooth: Fix deadlock in vhci_send_frame
-
- drivers/bluetooth/hci_vhci.c     | 10 ++++++----
- include/net/bluetooth/hci_core.h |  9 +++++++--
- net/bluetooth/af_bluetooth.c     |  7 ++++++-
- net/bluetooth/hci_event.c        | 30 +++++++++++++++++++++---------
- net/bluetooth/l2cap_core.c       | 21 +++++++++++++++------
- net/bluetooth/mgmt.c             | 25 ++++++++++++++++++-------
- net/bluetooth/smp.c              |  7 +++++++
- 7 files changed, 80 insertions(+), 29 deletions(-)
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
