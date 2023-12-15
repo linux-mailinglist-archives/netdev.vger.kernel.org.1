@@ -1,98 +1,97 @@
-Return-Path: <netdev+bounces-57976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8F5A814A7D
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 15:28:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FAFA814A82
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 15:30:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 070191C20E96
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:28:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 470351C22C80
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AE2C3172A;
-	Fri, 15 Dec 2023 14:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1CC631747;
+	Fri, 15 Dec 2023 14:30:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eaROFdjA"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DYOxdjhR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D857F31A60
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 14:28:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-da077db5145so546438276.0
-        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 06:28:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702650527; x=1703255327; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VJwV8Ak+gq9x2mtfc2tfaMyEbAkvp48o/I9bnD8rRwQ=;
-        b=eaROFdjA+5VlVdBGC7h3AlxjGmcEv+n6ijbngFnNH+IvuUOsQY3Gx3o11hAlTQRUQ6
-         RqkDSeeckqtWF5HpguuJLgkexvDhKWY9ySD/Ez+cCv1/Bccy070erAPrQaUqNZsg5Lxu
-         D17zerquJ83YWdjdBuOFhBse3lIUC0mg/kmM/WIRm56aUkNcIRWWXpXFy7QsP/OBZZj1
-         9delQk7jbOgRZyc9824KT6XBx8s1TewF0tLPQ+sw4C+8YXJiW2m1z8HQcHn5UcpqJRl8
-         26/FqSvd4o7MBJe9GUOeSQ8PZiiw+KuBI9HzEA6cS4Mtnv1veR6v+23a8Xhkv3/hkL1T
-         ZTxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702650527; x=1703255327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VJwV8Ak+gq9x2mtfc2tfaMyEbAkvp48o/I9bnD8rRwQ=;
-        b=hJZQUYadgvbkkvWfIU9IX+osvfTAzJqecIW32lBIJj147kfniC+DMCpZgmHKaol+94
-         Ei1MA5sEvcVQT+6ex7E1KpQvtSglTHNoW7VFpWD2z9D+VLIgoxKmDJDt2Le8nTy8ixx8
-         Jsuth/rBVNovdC0b+dShkByd6oGCL8NvKTipLlbquNagvgiIrIpPpdLR7sBCSagcsC/g
-         pMVb/2bADBkEhqWnEpgWU9m2+yPJwJv1HMmkxxElXVaUV92eQG/K+NJZAYDrNq0lNK4L
-         zwPBEaJnkVMRw5RQR2d72XXe/0CFheHRbcJoirgoUMGXVCRFoKoKU1Yo3D7eTt2xua+4
-         c9SA==
-X-Gm-Message-State: AOJu0Yz2ogl6usZPMjY5F6xYPzPlGddRg9yQb09fm2kw+EfuRAnpZ6eU
-	1rZlirPAnU+7p+CPLCed1sZ94NFUiXrhfYUHFTv+dg==
-X-Google-Smtp-Source: AGHT+IEAHufcCh6qxzHgMry8x0eJ0jCtrXsP+MRKmnGoQciFCK55wEG/ZdTo9kN7MCJ54mD75JIn3nJdH654J5EstwI=
-X-Received: by 2002:a25:abe1:0:b0:dbc:ec97:d7dd with SMTP id
- v88-20020a25abe1000000b00dbcec97d7ddmr1502293ybi.97.1702650526815; Fri, 15
- Dec 2023 06:28:46 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C4C31A60;
+	Fri, 15 Dec 2023 14:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=P3iLHttbrgUIWYcVkIFf5jAva/J51DmOVnlpZQQDo+k=; b=DYOxdjhRrUI6Emgjy6KKYO0u2G
+	83r8usrhOHjsEw53n/T5X7ttj9KFKKNdK8V/nM96s5gW/GRjs3VA/eQNtphY0p5rPXewmTam5jmRH
+	vJUA9wBTuDGyYsxtZCtGaamJCXnkP7yQOKkBnjYCCd6mKYSvRD0cJ95Hhtoso8dvh5ws=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rE9Cb-00323Q-Ao; Fri, 15 Dec 2023 15:30:09 +0100
+Date: Fri, 15 Dec 2023 15:30:09 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tobias Waldekranz <tobias@waldekranz.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux@armlinux.org.uk,
+	kabel@kernel.org, hkallweit1@gmail.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 1/4] net: phy: marvell10g: Support firmware
+ loading on 88X3310
+Message-ID: <627fbf7d-5992-4c4b-9e32-b34e363db928@lunn.ch>
+References: <20231214201442.660447-1-tobias@waldekranz.com>
+ <20231214201442.660447-2-tobias@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231215-new-gemini-ethernet-regression-v1-0-93033544be23@linaro.org>
- <20231215-new-gemini-ethernet-regression-v1-1-93033544be23@linaro.org> <CANn89iJo8ER1kZYB7La1jx5p00FrHxzSLnSsWcMNdj8-iG9_Rw@mail.gmail.com>
-In-Reply-To: <CANn89iJo8ER1kZYB7La1jx5p00FrHxzSLnSsWcMNdj8-iG9_Rw@mail.gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Fri, 15 Dec 2023 15:28:35 +0100
-Message-ID: <CACRpkdbu_MjJCiC0bCx4EVA7krY=iTvqKyu0ym8n3QuzoPvOhA@mail.gmail.com>
-Subject: Re: [PATCH net 1/2] net: ethernet: cortina: Drop software checksumming
-To: Eric Dumazet <edumazet@google.com>
-Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231214201442.660447-2-tobias@waldekranz.com>
 
-On Fri, Dec 15, 2023 at 10:32=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
+On Thu, Dec 14, 2023 at 09:14:39PM +0100, Tobias Waldekranz wrote:
+> When probing, if a device is waiting for firmware to be loaded into
+> its RAM, ask userspace for the binary and load it over XMDIO.
 
-> Depending on packet being gso or not, you would have to check skb->len
-> or shinfo->gso_size
->
-> The ndo_features_check could then take a more appropriate action
-> (forcing GSO, and/or forcing software checksumming)
+Does a device without firmware have valid ID registers? Is the driver
+going to probe via bus enumeration, or is it necessary to use a
+compatible with ID values?
 
-We had something like that before but it looked weird because
-it was just looking at the MTU.
+> +	for (sect = fw->data; (sect + sizeof(hdr)) < (fw->data + fw->size);) {
 
-> This driver claims to support TSO, but I do not see it using
-> shinfo->gso_size, something must be very wrong...
->
-> I would simply remove this TSO part, before the driver really supports
-> TSO properly.
+This validates that the firmware is big enough to hold the header...
 
-I added a hunk dropping the TSO flags for v2. Sending out tomorrow!
+> +		memcpy(&hdr, sect, sizeof(hdr));
+> +		hdr.data.size = cpu_to_le32(hdr.data.size);
+> +		hdr.data.addr = cpu_to_le32(hdr.data.addr);
+> +		hdr.data.csum = cpu_to_le16(hdr.data.csum);
+> +		hdr.next_hdr = cpu_to_le32(hdr.next_hdr);
 
-Yours,
-Linus Walleij
+I'm surprised sparse is not complaining about this. You have the same
+source and destination, and sparse probably wants the destination to
+be marked as little endian.
+
+> +		hdr.csum = cpu_to_le16(hdr.csum);
+> +
+> +		for (i = 0, csum = 0; i < offsetof(struct mv3310_fw_hdr, csum); i++)
+> +			csum += sect[i];
+> +
+> +		if ((u16)~csum != hdr.csum) {
+> +			dev_err(&phydev->mdio.dev, "Corrupt section header\n");
+> +			err = -EINVAL;
+> +			break;
+> +		}
+> +
+> +		err = mv3310_load_fw_sect(phydev, &hdr, sect + sizeof(hdr));
+
+What i don't see is any validation that the firmware left at sect +
+sizeof(hdr) big enough to contain hdr.data.size bytes.
+
+	    Andrew
 
