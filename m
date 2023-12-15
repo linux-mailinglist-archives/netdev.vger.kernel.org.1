@@ -1,61 +1,41 @@
-Return-Path: <netdev+bounces-57973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47BC7814A1E
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 15:12:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4CF5814A44
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 15:17:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 068832817BD
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:12:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E12151C253C7
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:17:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58CCA2F87A;
-	Fri, 15 Dec 2023 14:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="H6hwq92X"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6154C2FE3A;
+	Fri, 15 Dec 2023 14:17:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02ECC30641;
-	Fri, 15 Dec 2023 14:11:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A407C433C7;
-	Fri, 15 Dec 2023 14:11:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1702649515;
-	bh=xcqVasPR7/6/BGkmp20d/mwFZY/qYeQV954kXhulne0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=H6hwq92XJhZCx8YzkUspQ2BH8/Bmyvmss0bwdDEeI685r5m21J29uMKmzEeKRlHGf
-	 gFtB8lAkg2zQd+t/qN4A5hvSsaF9WE8iyeEfKkXx0TQFMfFJwajt9rs2jMLAA5UQ2Q
-	 ttSYSzrZbXILZ1muKg4Fnpy5jIEyvmZtvtb8oCHY=
-Date: Fri, 15 Dec 2023 15:11:53 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Johan Hovold <johan@kernel.org>
-Cc: Francesco Dolcini <francesco@dolcini.it>,
-	Jiri Slaby <jirislaby@kernel.org>, linux-bluetooth@vger.kernel.org,
-	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, greybus-dev@lists.linaro.org,
-	linux-iio@vger.kernel.org, netdev@vger.kernel.org,
-	chrome-platform@lists.linux.dev,
-	platform-driver-x86@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-sound@vger.kernel.org,
-	Francesco Dolcini <francesco.dolcini@toradex.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Alex Elder <elder@kernel.org>, Jonathan Cameron <jic23@kernel.org>,
-	Lee Jones <lee@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Benson Leung <bleung@chromium.org>,
-	Tzung-Bi Shih <tzungbi@kernel.org>, Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v1] treewide, serdev: change receive_buf() return type to
- size_t
-Message-ID: <2023121544-hastiness-unhinge-b8d3@gregkh>
-References: <20231214170146.641783-1-francesco@dolcini.it>
- <ZXxWX-Fw1InID2ax@hovoldconsulting.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC88730CE1;
+	Fri, 15 Dec 2023 14:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1rE904-0005oD-7W; Fri, 15 Dec 2023 15:17:12 +0100
+Date: Fri, 15 Dec 2023 15:17:12 +0100
+From: Florian Westphal <fw@strlen.de>
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de,
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, coreteam@netfilter.org,
+	netfilter-devel@vger.kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	ast@kernel.org
+Subject: Re: [RFC nf-next v1 1/2] netfilter: bpf: support prog update
+Message-ID: <20231215141712.GA17065@breakpoint.cc>
+References: <1702609653-45835-1-git-send-email-alibuda@linux.alibaba.com>
+ <1702609653-45835-2-git-send-email-alibuda@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,47 +44,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZXxWX-Fw1InID2ax@hovoldconsulting.com>
+In-Reply-To: <1702609653-45835-2-git-send-email-alibuda@linux.alibaba.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Fri, Dec 15, 2023 at 02:36:31PM +0100, Johan Hovold wrote:
-> On Thu, Dec 14, 2023 at 06:01:46PM +0100, Francesco Dolcini wrote:
-> > From: Francesco Dolcini <francesco.dolcini@toradex.com>
-> > 
-> > receive_buf() is called from ttyport_receive_buf() that expects values
-> > ">= 0" from serdev_controller_receive_buf(), change its return type from
-> > ssize_t to size_t.
-> > 
-> > Suggested-by: Jiri Slaby <jirislaby@kernel.org>
-> > Link: https://lore.kernel.org/all/087be419-ec6b-47ad-851a-5e1e3ea5cfcc@kernel.org/
-> > Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
-> > ---
-> >  drivers/gnss/core.c                        |  6 +++---
-> >  drivers/gnss/serial.c                      |  4 ++--
-> >  drivers/gnss/sirf.c                        |  6 +++---
-> 
-> > diff --git a/drivers/gnss/core.c b/drivers/gnss/core.c
-> > index 48f2ee0f78c4..9b8a0605ec76 100644
-> > --- a/drivers/gnss/core.c
-> > +++ b/drivers/gnss/core.c
-> > @@ -317,10 +317,10 @@ EXPORT_SYMBOL_GPL(gnss_deregister_device);
-> >   *
-> >   * Must not be called for a closed device.
-> >   */
-> > -int gnss_insert_raw(struct gnss_device *gdev, const unsigned char *buf,
-> > -				size_t count)
-> > +size_t gnss_insert_raw(struct gnss_device *gdev, const unsigned char *buf,
-> > +		       size_t count)
-> >  {
-> > -	int ret;
-> > +	size_t ret;
-> >  
-> >  	ret = kfifo_in(&gdev->read_fifo, buf, count);
-> >  
-> 
-> Why are you changing this function? This is part of the GNSS interface
-> and has nothing to do with the rest of this patch.
-> 
-> Greg, please drop this one again until this has been resolved.
+D. Wythe <alibuda@linux.alibaba.com> wrote:
+>  	const struct nf_defrag_hook *defrag_hook;
+> +	const struct bpf_prog __rcu *nf_prog;
 
-Now dropped, thanks.
+Hmm, why do we need this pointer?
+Can't you just re-use bpf_nf_link->link.prog?
+
+> +	rcu_assign_pointer(nf_link->nf_prog, new_prog);
+> +	old_prog = xchg(&link->prog, new_prog);
+
+This looks redundant, I think you can remove the nf_prog
+pointer again.
+
+Rest LGTM.
 
