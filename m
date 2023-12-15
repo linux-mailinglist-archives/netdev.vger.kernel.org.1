@@ -1,156 +1,76 @@
-Return-Path: <netdev+bounces-58015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29123814D75
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 17:48:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C55CA814D7B
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 17:49:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 962131F24D1A
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 16:48:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 112B9B20DE4
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 16:49:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABFE93DBB7;
-	Fri, 15 Dec 2023 16:48:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0F803DB90;
+	Fri, 15 Dec 2023 16:49:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bXSXDzSB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pQkDdn87"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 702C13DBAD
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 16:47:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1d0b40bb704so196035ad.0
-        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 08:47:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702658879; x=1703263679; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pFF1dta+xlyg8MLdIwibfZN3TDA+ceWGZnTEl/bvSYQ=;
-        b=bXSXDzSBSErBYcDeSf04Oo/6R6KqHXIJ+J+UecNGsyyGc36MaoAYOxn8eNe4iyKOQF
-         wxqNrO3f/8yyOsPdjso8UbmhlJwHZFDy9N8ICOxKoPX/9W04NuTzJInOW7r9Z69ZTjX7
-         FbdVV80pAEbOx0wOznxquDjqLGoER5vNn6NFHuM2hmUvXlU/XA/gC6SniHJXjvJmURes
-         FhWjTvknjXByoEo7eWAzor1aGBToDmpanONBT3eCSkN6YHhRgRUKrMMDzkAuW+fZljUV
-         74P+kNT9M6eLqYz5PUmqEJRQUBHxiLyyNoG0lMRi4CRiz0x1NKtYB6fasW83xPFyMK+V
-         +xNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702658879; x=1703263679;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pFF1dta+xlyg8MLdIwibfZN3TDA+ceWGZnTEl/bvSYQ=;
-        b=Iq26g16p53QKApOz5+SviEScBqhWEsgealwnNIUtjtUYwhOPmbwCq5CrlugoXOokA4
-         Q9JiQXKP+8B/di5eiDHzg+IlS/kDgEFOQ1IzrzyUkRwAbQ3mjyCKAb9BE1YnKAnykZGc
-         2j8zR4th7qcJ1/xo9NpmDMKo1T+op1bIf+t8ocnTuYutwPUgeG87oK/hScwD6RFO2jxI
-         3rsavn4GhB6OR9n0Qb+o6h03FzjUqs19RPog5X4+bLh/X/TWHyxd8y3ng9tyBc+4lN0C
-         +PbKm4TRqn6M3OpDS5eXxZ162PCw4ZjMa5TFm9M01Kk3FolUPiSECvTgkILzaiXgydcn
-         vkKA==
-X-Gm-Message-State: AOJu0YwNtGXijmV4720LhkwG9jXr5Ahqbt7dVPvtct9BpRr36TrBI0TT
-	4MxzpS6Jv5k0Qouj4RfVjcKzlIeJcmDgD4nvLPL0Bw==
-X-Google-Smtp-Source: AGHT+IEbjeJsIZp5rRAzjQJeOjn/ytdkm89roAe2N65CsvRTZlJkSLxF/eDtmABy6dq4nOdoTRoClIhD5j52IYQ8NPc=
-X-Received: by 2002:a17:903:1108:b0:1d3:40ea:bf5b with SMTP id
- n8-20020a170903110800b001d340eabf5bmr1147864plh.21.1702658878388; Fri, 15 Dec
- 2023 08:47:58 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F763C48A
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 16:49:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0517C433C7;
+	Fri, 15 Dec 2023 16:49:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702658966;
+	bh=5PHuAaFaCYATOtsy7iWNG+199rmb+dNu49WRu/iAdQE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=pQkDdn87YTPWYCQ/njtT2ma80iQYV9Id5HGXdWE7+Cqn+zQ+/qB//f1TRNgOIsvFt
+	 pfz7zwFPoRwSzc6QH1wOJWw8Z1Znl2ZXCrVKCGE0hbyx1MRtjqFa38BJMxt8uW0Bm/
+	 3Va4Sb9724teO9KOEibnh/+P15a3cpREvF0c4R+66liJoK/SnuEdzVE1D8F0HR8/OV
+	 /GYILjEV8V/ioVVWhk2vIPgzyID6OwfIFWO8dJXwkIUCMW6OMcgYgYsBXaYBrwDOTY
+	 y7qkKsuhfQHJBSH21o75JYRHzkv2uqiWwA1KBUa/Ga+F40oS+hJ/6eOp13jp+b2B8H
+	 QgRDF6QCoa8Ag==
+Date: Fri, 15 Dec 2023 08:49:24 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ <pabeni@redhat.com>, Marcin Szycik <marcin.szycik@linux.intel.com>, Tony
+ Nguyen <anthony.l.nguyen@intel.com>, <michal.swiatkowski@linux.intel.com>,
+ <wojciech.drewek@intel.com>, <idosch@nvidia.com>,
+ <jesse.brandeburg@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+ <netdev@vger.kernel.org>, <jiri@resnulli.us>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 0/7] Add PFCP filter
+ support
+Message-ID: <20231215084924.40b47a7e@kernel.org>
+In-Reply-To: <67e287f5-b126-4049-9f3b-f05bf216c8b9@intel.com>
+References: <20231207164911.14330-1-marcin.szycik@linux.intel.com>
+	<b3e5ec09-d01b-0cea-69ea-c7406ea3f8b5@intel.com>
+	<13f7d3b4-214c-4987-9adc-1c14ae686946@intel.com>
+	<aeb76f91-ab1d-b951-f895-d618622b137b@intel.com>
+	<539ae7a3-c769-4cf6-b82f-74e05b01f619@linux.intel.com>
+	<67e287f5-b126-4049-9f3b-f05bf216c8b9@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231214020530.2267499-1-almasrymina@google.com>
- <20231214020530.2267499-5-almasrymina@google.com> <ddffff98-f3de-6a5d-eb26-636dacefe9aa@huawei.com>
- <CAHS8izO2nDHuxKau8iLcAmnho-1TYkzW09MBZ80+JzOo9YyVFA@mail.gmail.com>
- <20231215021114.ipvdx2bwtxckrfdg@google.com> <793eb1bd-29bd-3c66-4ed2-9297879dbaa0@huawei.com>
-In-Reply-To: <793eb1bd-29bd-3c66-4ed2-9297879dbaa0@huawei.com>
-From: Shakeel Butt <shakeelb@google.com>
-Date: Fri, 15 Dec 2023 08:47:46 -0800
-Message-ID: <CALvZod7-WsxLj8gdhu=FMfdunEDgBV+DwfOB2316NfXvf_K41g@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v1 4/4] net: page_pool: use netmem_t instead
- of struct page in API
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Mina Almasry <almasrymina@google.com>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Michael Chan <michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Wei Fang <wei.fang@nxp.com>, 
-	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
-	NXP Linux Team <linux-imx@nxp.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
-	Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, 
-	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Marcin Wojtas <mw@semihalf.com>, 
-	Russell King <linux@armlinux.org.uk>, Sunil Goutham <sgoutham@marvell.com>, 
-	Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, 
-	hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, 
-	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Jassi Brar <jaswinder.singh@linaro.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
-	Ravi Gunasekaran <r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>, 
-	Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, 
-	Ronak Doshi <doshir@vmware.com>, VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, 
-	Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>, 
-	Kalle Valo <kvalo@kernel.org>, Juergen Gross <jgross@suse.com>, 
-	Stefano Stabellini <sstabellini@kernel.org>, 
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
-	Jason Gunthorpe <jgg@nvidia.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 15, 2023 at 3:04=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
->
-> On 2023/12/15 10:11, Shakeel Butt wrote:
-> > On Thu, Dec 14, 2023 at 08:27:55AM -0800, Mina Almasry wrote:
-> >> On Thu, Dec 14, 2023 at 4:05=E2=80=AFAM Yunsheng Lin <linyunsheng@huaw=
-ei.com> wrote:
-> >>>
-> > [...]
-> >>> I perfer the second one personally, as devmem means that it is not
-> >>> readable from cpu.
-> >>
-> >> From my POV it has to be the first one. We want to abstract the memory
-> >> type from the drivers as much as possible, not introduce N new memory
-> >> types and ask the driver to implement new code for each of them
-> >> separately.
->
-> That was my initial thinking too:
-> https://www.spinics.net/lists/netdev/msg949376.html
->
-> But after discussion, it may make more sense to have two sets of API from=
- the
-> driver's piont of view if we want a complete safe type protection, so tha=
-t
-> compiler can check everything statically and devmem driver API have a cle=
-ar
-> semantic:
-> 1. devmem is not allowed to be called into mm subsystem.
-> 2. it will not provide a API like page_address().
->
+On Fri, 15 Dec 2023 11:11:23 +0100 Alexander Lobakin wrote:
+> Ping? :s
+> Or should we resubmit?
 
-I think all of us are on the same page that there will be two sets of
-APIs here but Mina's point was let's aim to not make that N set of
-APIs.
+Can you wait for next merge window instead?
+We're getting flooded with patches as everyone seemingly tries to get
+their own (i.e. the most important!) work merged before the end of 
+the year. The set of PRs from the bitmap tree which Linus decided
+not to pull is not empty. So we'd have to go figure out what's exactly
+is in that branch we're supposed to pull, and whether it's fine.
+It probably is, but you see, this is a problem which can be solved by
+waiting, and letting Linus pull it himself. While the 150 patches we're
+getting a day now have to be looked at.
 
