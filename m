@@ -1,121 +1,105 @@
-Return-Path: <netdev+bounces-57712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E457813F87
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 02:59:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FE9C813F8A
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 03:01:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18B461F22ACA
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 01:59:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40E941C20A72
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 02:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 107427FC;
-	Fri, 15 Dec 2023 01:59:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA7B3650;
+	Fri, 15 Dec 2023 02:01:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jlYgpdFF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LYG2xC5+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A977E4;
-	Fri, 15 Dec 2023 01:59:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-333536432e0so108055f8f.3;
-        Thu, 14 Dec 2023 17:59:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702605588; x=1703210388; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0BPXHZiXrCumILWBdbm2jyfqq1EYY5OqKA7tVcfSWPY=;
-        b=jlYgpdFFYhZAWqAHB5IBqWBGkbZUw7y/UkQSyY2plDrFQ8ZPpin4wqUgn96mlzwruW
-         YCgEGYZiOsEJBuU0qf4ZZA4mUuaOvuyohXkOflRfaPX1epN49tLx+TCYap33a6OkMDCj
-         5tPnSTTYz5nx5wHzmdpj/weIbZS2CWIXtOq8DnVQDd77vOq1ut+SwfxTPavMfrjCa/Ir
-         Pf+483Yd2UsT3abY3doi7UCHfzKXU9yh8UmC4axdak7aqnT+fDyZWn0ibxFP8LhGcK54
-         xLMT1QZ+t6cGE6/VXOV2q+fTFnjkZojpels6S0UyXXyD55a3UD2mYWbjrD7T8oi7uyCL
-         0Z5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702605588; x=1703210388;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0BPXHZiXrCumILWBdbm2jyfqq1EYY5OqKA7tVcfSWPY=;
-        b=reks1Z1jWYhSlxqUYrOOiotypmCWT3oLavbdqUWbgHws9TM5M0ZB11AOJx+DOxh7nM
-         TyP/t1ZyUJ7nUM+Bi0oNTvyNo4oqc6Apam4roqOunmqiM9AfWkwhnGAKgiCwyM8DO2tq
-         z0p+ceITuPUTZ/zKMgljuScZSfBjSXrrO021MLAm/dXlSsVoqBnIcGFQxumirpZHyIOt
-         /KtXKpArNm908KRrMxn6mwVhV91DjE28yBY9fwL3EugfRfmZtfsDn5tzz9frjdFLe7Ih
-         PR0ITo7/tM/6t9sCNUzBRfvE4o8XdfhZiE9jr1FL4iqoMn6KMmKVEVidmdaaGV8dELmk
-         SZnQ==
-X-Gm-Message-State: AOJu0Yxty8J42RbwK/TszEicZBQKTfE6ZMoxQZgbJwKi9BQRIErDbRjZ
-	EAk4u4WpU258/MvFp/AN/vI73hf4dE9wIHEdy8A=
-X-Google-Smtp-Source: AGHT+IEQ9/UVkiTTf2mynkBFhgR6IeL+g82WMufDcGhjlUpuHcP0aPoLuAa4ko36Eu3GeZlCWMCgLkRy74ioo1IewCY=
-X-Received: by 2002:a05:6000:1183:b0:336:4736:e695 with SMTP id
- g3-20020a056000118300b003364736e695mr908420wrx.52.1702605587460; Thu, 14 Dec
- 2023 17:59:47 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5D15382
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 02:01:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 54C9BC433C9;
+	Fri, 15 Dec 2023 02:01:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702605678;
+	bh=Or/ZKP96HsPKi+i7G/pvUgsIB6RuzIH+Rn2FXg+BpKw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LYG2xC5+u3J2CS7PxrfUzqcVDyvb3tVu7Skg0F3dxnI9897xXbcNVPulA1pLdpMt4
+	 uPng7nshaz5wl+g1CbmCN13a0u4r9XfC1+EqtbhoLp4pyHHH6ZcjcEVkh9H4vKVKpL
+	 kd4kCjoMj2vVS6pb1MauJULWgvOZlYxHBWTUWsyVaz6Ak0mV+8I2bF6mdYSYPdeibV
+	 t71YpFImjhIA2AJ46CE0ntDY/vc+z8zEps5xJFSQ4ktDOk+j033nO09vdA+EsrMNW1
+	 v5duvaLJTujGAsq2q7FhI9Qhs0A1/WYKZjseup8blNNoeViCJSplZ7eXpdQWHr9mjF
+	 7eH8FFQ6uy7zg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 37211DD4EF9;
+	Fri, 15 Dec 2023 02:01:18 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAADnVQ+dPML0DW=Miuq=n7nC8m4gcPj7Dk_nhedzs9zTE30arw@mail.gmail.com>
- <20231214204629.1b380b82@gandalf.local.home>
-In-Reply-To: <20231214204629.1b380b82@gandalf.local.home>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 14 Dec 2023 17:59:36 -0800
-Message-ID: <CAADnVQJSvFeqRT+x3y5AWOC396nOdZQ4Zf66Es-71PxBtpj_GA@mail.gmail.com>
-Subject: Re: [bug] splat at boot
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Stephen Rothwell <sfr@canb.auug.org.au>, Alexander Potapenko <glider@google.com>, 
-	Andrey Konovalov <andreyknvl@gmail.com>, Peter Zijlstra <peterz@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/8] tools: ynl-gen: fill in the gaps in support of
+ legacy families
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170260567822.29932.4186848634489676352.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Dec 2023 02:01:18 +0000
+References: <20231213231432.2944749-1-kuba@kernel.org>
+In-Reply-To: <20231213231432.2944749-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, nicolas.dichtel@6wind.com, jiri@resnulli.us,
+ donald.hunter@gmail.com
 
-On Thu, Dec 14, 2023 at 5:45=E2=80=AFPM Steven Rostedt <rostedt@goodmis.org=
-> wrote:
->
-> On Thu, 14 Dec 2023 17:25:46 -0800
-> Alexei Starovoitov <alexei.starovoitov@gmail.com> wrote:
->
-> > Hi All,
-> >
-> > just noticed a boot splat that probably was there for lone time:
-> >
-> > [    1.118691] ftrace: allocating 50546 entries in 198 pages
-> > [    1.129690] ftrace: allocated 198 pages with 4 groups
-> > [    1.130156]
-> > [    1.130158] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > [    1.130159] [ BUG: Invalid wait context ]
-> > [    1.130161] 6.7.0-rc3-00837-g403f3e8fda60 #5272 Not tainted
-> > [    1.130163] -----------------------------
-> > [    1.130165] swapper/0 is trying to lock:
-> > [    1.130166] ffff88823fffb1d8 (&zone->lock){....}-{3:3}, at:
-> > __rmqueue_pcplist+0xe80/0x1100
-> > [    1.130181] other info that might help us debug this:
-> > [    1.130182] context-{5:5}
->
-> Can you trigger this with CONFIG_PROVE_RAW_LOCK_NESTING disabled?
->
-> If not, then I wouldn't worry about it for now, but this will need to be
-> addressed when PREEMPT_RT is included.
->
-> Basically, a spin_lock() in PREEMPT_RT is converted into a mutex, and mos=
-t
-> interrupt handlers and all softirqs are turned into threads. But there's
-> still cases where spin_lock() can not be used. One is for interrupt
-> handlers that will not turn into a thread (like the timer interrupt), and
-> for when a raw_spin_lock is held. You can't have:
->
->   raw_spin_lock(rawlock);
->   spin_lock(spinlock);
->
-> order.
+Hello:
 
-Thanks for explaining.
-It's fine without PROVE_RAW_LOCK_NESTING.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 13 Dec 2023 15:14:24 -0800 you wrote:
+> Fill in the gaps in YNL C code gen so that we can generate user
+> space code for all genetlink families for which we have specs.
+> 
+> The two major changes we need are support for fixed headers and
+> support for recursive nests.
+> 
+> For fixed header support - place the struct for the fixed header
+> directly in the request struct (and don't bother generating access
+> helpers). The member of a fixed header can't be too complex, and
+> also are by definition not optional so the user has to fill them in.
+> The YNL core needs a bit of a tweak to understand that the attrs
+> may now start at a fixed offset, which is not necessarily equal
+> to sizeof(struct genlmsghdr).
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,1/8] tools: ynl-gen: add missing request free helpers for dumps
+    https://git.kernel.org/netdev/net-next/c/4dc27587dcba
+  - [net-next,2/8] tools: ynl-gen: use enum user type for members and args
+    https://git.kernel.org/netdev/net-next/c/139c163b5b0b
+  - [net-next,3/8] tools: ynl-gen: support fixed headers in genetlink
+    https://git.kernel.org/netdev/net-next/c/f6805072c2aa
+  - [net-next,4/8] tools: ynl-gen: fill in implementations for TypeUnused
+    https://git.kernel.org/netdev/net-next/c/f967a498fce8
+  - [net-next,5/8] tools: ynl-gen: record information about recursive nests
+    https://git.kernel.org/netdev/net-next/c/38329fcfb757
+  - [net-next,6/8] tools: ynl-gen: re-sort ignoring recursive nests
+    https://git.kernel.org/netdev/net-next/c/aa75783b95a1
+  - [net-next,7/8] tools: ynl-gen: store recursive nests by a pointer
+    https://git.kernel.org/netdev/net-next/c/461f25a2e433
+  - [net-next,8/8] tools: ynl-gen: print prototypes for recursive stuff
+    https://git.kernel.org/netdev/net-next/c/7b5fe80ebc63
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
