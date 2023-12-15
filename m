@@ -1,402 +1,162 @@
-Return-Path: <netdev+bounces-57980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74E69814A97
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 15:35:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE8A6814A9A
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 15:35:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDC001F2406C
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:35:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CABA285BCB
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:35:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DE891117;
-	Fri, 15 Dec 2023 14:35:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD12F111C;
+	Fri, 15 Dec 2023 14:35:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="vcd0R/JE"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="MU/bIdo2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2079.outbound.protection.outlook.com [40.107.93.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DCD23589F
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 14:35:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-5c66418decaso277077a12.3
-        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 06:35:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1702650912; x=1703255712; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KnlS7puGnykzLk4EJuyG8myrm7i6tXcW0GlnSLaTedw=;
-        b=vcd0R/JEzoneDTjotNfypaQBI0IuAtrr1J472i28T4B2KinKVNwFDg8aRETlZW5heg
-         mCPZ9FLHN/jskbDyQbHp3ZCVZLwZlDMBb9jMzrpC2jZvzuWr9RGDpY9kcSZk34s6FbFF
-         878Pd2BxhYZ6FNz+n7WKUI3vKloSnCvys4rClndYjcpdR51M1XixzcOKFfz2146MMIkd
-         pKn8MMkP+B6rIJijjpFMc6OkmXar4YAHOBP9OQIUYJPDNp+vYrHfvkiJGSjZ2O3ckaC1
-         DvwLaeC3/bfV0mg5OT5DPetY5KcP+9jXJdGD1AMASOk/qlVfi+mkWt7G2OO112ebgsZg
-         MVKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702650912; x=1703255712;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KnlS7puGnykzLk4EJuyG8myrm7i6tXcW0GlnSLaTedw=;
-        b=lD4hI2J0HWUpSCjjKbgEgwx0Mh7ywotap3X4uqHyrji+P9+vQv0KTn0qhdzwHTN43R
-         b5FJIm2henyV60KDJr2NurVLnIuguBDdiThU8SEnwhRSKY2tqwnYkElzI1XpSsMdcHSM
-         n8cm/zEoqMN5OGHBzOxG7pk4QMPaFKCST+fo3frv1FwbzXH9U8N77W7HMyrzA3loUR+j
-         /a7FVVU2TCp4RSCuqREFKXrqAY6JdbfjgX3j0DIJLlDxF007IPTT7rkOa/oPbeRZ8pyY
-         hdv3/N1QSiOLU8s3KRTSqyPbkopzUx4xcpYfUmHxUpvM3UvTWjhNBuJx8/hAu7mroYpc
-         GV0w==
-X-Gm-Message-State: AOJu0YzYPkgh+sumT3i0Aa5LheC+odn5Ww6fv+z8nZX9/XsQfgCjiV+O
-	CRN7LLYxAf9w3gOlFOdqGjcwenM+Yty4la5HfGfLZw==
-X-Google-Smtp-Source: AGHT+IG+FaK0KzPoLKfz9HbGTqGhnLFGiSQKE3/ha0idn7e9xwdqtwQmdFdUIbjG9ztooY/exWq7FlWQjBMKh94csk0=
-X-Received: by 2002:a05:6a20:6a10:b0:191:b226:f927 with SMTP id
- p16-20020a056a206a1000b00191b226f927mr2994174pzk.87.1702650912284; Fri, 15
- Dec 2023 06:35:12 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B2453AF
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 14:35:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cpzNEUOMSwh4DQHQA8TlTOuwy8/+TX9Djy9SfaCOjvimF/xR6tJdQzMcsXdN80roXQRTrrxo4YXB+cg5pKMPFkGbHURDaiXeApKXUt0nnfn1qyTIx+kuAYk0v/sPWNDeHgpjYTuqZEkbqR72rifpii86GhAd6Y+3MI4+pqrpPljap5CbqT+5pwlpoNek3S5C1Jq30q1Tq3u75iA0Q0oJzMgDU+aOB0qqAE3GX0nRepej9A2g13u0PiAV0RB9z6/N/FeHnlJIsIe649jb1FDJ79u2mgTjCaJQKdjc8/tHn0k4cKTAwAxlGubLQrEZmeoziZ7M754oS/w3Nr3B6gx3/A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xWJM7Tze3SrPFYYAypBouQSk5/rcsJ5YgzoP7mHjs+A=;
+ b=PN8bGniQk6G1t6Q12yQc8tLsLqUoRUvPj86GFEVmmtp0k6Lw/ieTOQCYnWgPpVkeu6X7TC/iiGxzxnUB1dBcxGs8M2+X33r9oT67DXIRTJ9/DFJqqnAhsXUiusZmEM32gyzBA7hpGER1skd+HGkXIygu6hXPkFQQTQtj5td4OzTBkbsg4IJy1nCMSk1nFvru0rTEXGfCPqS6/NMPGK1gaznoeSsbv99Ria2l1CCWO8RXMfjOoNeAOyilThWbKs2CzElFu1dQV5tK6H13sQi0/i+pe1Xni/k8/R542KFSurm0SFlt2a1Hx1JVL0BG6iiYYnVs00oocOYfO4C4HJp/hA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xWJM7Tze3SrPFYYAypBouQSk5/rcsJ5YgzoP7mHjs+A=;
+ b=MU/bIdo29/B6lmKe4pXmO7VI+URBa5661SfdFpt8fNXVJCXcirm5EgXaA99Pdim/cbJ7fSqZJDm/R966dgPcPbvuP8IiHYDSaRwB9fspQoaAIipPMprSD3IT/BwlFl35N4OBXD2M61LjLq1k7woV2/T3PQZWfVmnqkTgTc4PXns=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
+ by CO6PR12MB5394.namprd12.prod.outlook.com (2603:10b6:5:35f::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.28; Fri, 15 Dec
+ 2023 14:35:51 +0000
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::1d68:1eb8:d7dc:4b43]) by BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::1d68:1eb8:d7dc:4b43%6]) with mapi id 15.20.7091.030; Fri, 15 Dec 2023
+ 14:35:50 +0000
+Message-ID: <72d8ab78-4e61-ba13-2abe-dfe988dd511f@amd.com>
+Date: Fri, 15 Dec 2023 08:35:47 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v3 net-next 3/3] amd-xgbe: use smn functions to avoid race
+Content-Language: en-US
+To: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, Shyam-sundar.S-k@amd.com
+References: <20231212053723.443772-1-Raju.Rangoju@amd.com>
+ <20231212053723.443772-4-Raju.Rangoju@amd.com>
+ <68c52e74-dd8d-4211-bdb9-9541b41c6900@amd.com>
+ <82f60707-a24d-b745-ab25-7909b24c629e@amd.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <82f60707-a24d-b745-ab25-7909b24c629e@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0501CA0069.namprd05.prod.outlook.com
+ (2603:10b6:803:41::46) To BL1PR12MB5732.namprd12.prod.outlook.com
+ (2603:10b6:208:387::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231215111050.3624740-1-victor@mojatatu.com> <20231215111050.3624740-2-victor@mojatatu.com>
- <ZXxVQ0E-kd-ab3XD@nanopsycho>
-In-Reply-To: <ZXxVQ0E-kd-ab3XD@nanopsycho>
-From: Jamal Hadi Salim <hadi@mojatatu.com>
-Date: Fri, 15 Dec 2023 09:35:01 -0500
-Message-ID: <CAAFAkD8Tx9TALNdHrwH19dKzRNaWNKKeQ-Tvd1DrwgT0MfxdJA@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 1/3] net/sched: Introduce tc block netdev
- tracking infra
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Victor Nogueira <victor@mojatatu.com>, jhs@mojatatu.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	xiyou.wangcong@gmail.com, mleitner@redhat.com, vladbu@nvidia.com, 
-	paulb@nvidia.com, pctammela@mojatatu.com, netdev@vger.kernel.org, 
-	kernel@mojatatu.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|CO6PR12MB5394:EE_
+X-MS-Office365-Filtering-Correlation-Id: b09cdb91-83be-4256-937d-08dbfd7b229f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	DWUdzBZm56g4qNV0DZtD8seQEFv1BPUbyXqwgL0l8ZAnmmP6Gkb5B8KO5A3CdRn+GVirAZQtK+7zZ+QTJcVYpfeLDXIr59anvgZnVD4Ozc+oEphXYZbg/f+2tx+nhbnh/8y8xPuzch3cPdIIeeGd6G6GTa85sRhHTmuwvETBOpJ26Yo/3K6t7iGnLiq47/DohB1T/1FPPWLjFgw/NEfIxCe5NVfoPkZjjHi7Elu8EbrpRZUBAQrcQHbQY2+m82rM2Oumb6YLOYA5+5WAG3UA0h/xPuGWFAnYnxagw8DzFdZ0dBSiMln2A2UqdIFNLPTUvR35AT7FaWzLBj3B/wi09/WP8xFY3lbw5l1aUB0XGqBKmaq2Fsrq7AYMBtX1aWMNHdcO9qYP6J3922lyPcYls4thSiKla/l0z+FRKBKAk5GgfAKwgh25dFaOuaMGGDW7aOb6IFb0zSbm15RSCvBNAbTH0+we0SdpYETdWNcLYdl6gnKhNAlqcSWy0MQPyijBOM1gt43DB/4gX94ry8IJBWC2L4Am/IG3MxXrVNMVVmT/jeYiFxVOGWge1wwR9NA9Pajo2PbQTQ0Iyq0ww7bG4GcNkwRRphSwr5CR/ekLowieUgLf6B9nFIXAeuWPTx1Ni8Ps+yc7aa//7jBcl5vYgQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(346002)(39860400002)(366004)(376002)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(86362001)(36756003)(38100700002)(316002)(66476007)(2616005)(66946007)(66556008)(26005)(83380400001)(5660300002)(4326008)(8676002)(53546011)(8936002)(6666004)(6512007)(6506007)(478600001)(6486002)(41300700001)(4744005)(31696002)(2906002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cXZhYjZzV1lHQUdOYkVlQjIxTlBNMnhSdGQrZFdVMjBVT25hcW9aTmF6b1JT?=
+ =?utf-8?B?SHJVbXdHWFVscC9WNUxSbmdYVWx3amU1Q2tkM2tYalJ1YmZuZ3ZoVHhpTytP?=
+ =?utf-8?B?VWg5aUJncjNtV3FMZTArUFFYbnM0ZW93RHczNHFSQkVGeWtWMDBqTzJxdGM3?=
+ =?utf-8?B?YWlKbytzQW5EU0dsVnhOMVk1ZllKc1M0OWlITlZQaWFpYWpKQ1dmaEErRmRE?=
+ =?utf-8?B?UXFEY0hVS2Zqem9iaHRFSEZ2RHpKNGtJSnduYU0waHhUS1ZwMVJSK21jekY2?=
+ =?utf-8?B?YjFWTWdMSEJwYXYwTmRsc3FhcEtvdGVObHpEM3pzaUltVmV5alJOaWx6Zml3?=
+ =?utf-8?B?bUtLRWJSL21mR1l3VnVXL2RBdXkweDJ5NTd1aHFzK241eHpCRnAwMU9EM0dQ?=
+ =?utf-8?B?a0JWVnFvR3RBYjhwNWJzZjcwL3RLR3JCZTRCYkwzS3lSUzl2YTVrbWdNRVp0?=
+ =?utf-8?B?bnNEdFdUOVRJeHRyS0ZLRUFWc1ViM2J2KysrYUxHZzhTcHVkVVdjR29YVXcw?=
+ =?utf-8?B?bzgvSUlEKzdXMldjdUZHNlJmbFpWd3dzaUZ3NmZQWEdMa0FJQ1FCK2pUYjZB?=
+ =?utf-8?B?aGFUd3UxU0dZbEFyZ1Y5VU5hNGxwQnNaN1MzMG5GaGFMcFc4WDhsekc3QzVl?=
+ =?utf-8?B?WDlCS3dMRFd0TFhhN1dzTE9KVFlWUjJhOWVaYjR4TXZjVWREQ3F0Y0p0Skh4?=
+ =?utf-8?B?NSthdnpTMmpIVnJ5bUlGazdUbTNUcjJyOXRYRHJvOTllRHdYVTV5QzZHVnhD?=
+ =?utf-8?B?QVZUK1ZrVmtmTlhQWTBrWXRvNjRISWdkeHdJSDg3a2xnRWsrMWF5ZktXK1ZR?=
+ =?utf-8?B?UXFmQytRLzNHakttOHNPMzErdGZ6d2E4NmtWUC9rU1lyUkRBRHZHK2F4a1BW?=
+ =?utf-8?B?MGUzWmdiZmYzSU1Cb2hLdk93YktkMzYyeHJPOElUbGpsQ1BpUFhxRy9vTGdT?=
+ =?utf-8?B?UDNiMTMrVG9IV1dEQmNwVUE4RCtqaDd2NGhxSmVFY2NIZ3dGQ0FVL3BVYUx3?=
+ =?utf-8?B?SFhCVy9teVhFWm03bXdOdktCdDJnQ2YrTnpMRG9HeFhDMG44MDNDbkdiZkIy?=
+ =?utf-8?B?YnhWbURES3dHdEVmd2ZJQk9kaVhmZWJ6OUw1clNBTTBDNVRnT0pubDB6Wi9i?=
+ =?utf-8?B?Q2FKQllZS050YmVZekJka05zUGJCTEhvaG82TmRRbncvNTloZkVGcUoxeGtE?=
+ =?utf-8?B?V0xzc2w4QXVxMitoN2hXMDBOeEQ0TkdkMmh5cUE5NW1EMVlFYWFNQTZ4QzAr?=
+ =?utf-8?B?bTFyKzRLMmJTQTFJcXpWdk1PbDFIMUcyWXpZZVdtd3BIOHE2TURnbjB3dkpN?=
+ =?utf-8?B?WEp6bkFtOFI3WndpaUpWSlYwNnBtbm5wKzlicGNOM3NhNkREKytYOTIwTUhn?=
+ =?utf-8?B?R25TbU5UV2ZudnRKeFViTW8vOGNqaE5jVEVLckh3Y0dpOHRnYjZjbk9zckFD?=
+ =?utf-8?B?RlFJQmI4dEtrOGd5Z21uZzJ3Vm9ucTA1L09LVlM2aXJOT3BlejJ4NHAxemZ4?=
+ =?utf-8?B?bTlQNkx0QW83VEt0aURQYXoyU3o2OWgwdUVVRWxCWlB4TzNhWjhVUENVeDFY?=
+ =?utf-8?B?ak8xQlI4Uno5R2tybUgxUkV6KzVzRlNoaVNUb1doa1lleTFnQUhxL05YL1cr?=
+ =?utf-8?B?QlR4Z0IzYS9sdGo4RjZPV1p5TlpTNVRHbWtvL2ErdWVWYVYyck9lWEhrQ3hV?=
+ =?utf-8?B?SmVGK0V4S2xGK2tudEZ4ZVZPUVdDSWwxVVNZaSsrVWFSaVhMendjWGtzWHYv?=
+ =?utf-8?B?YmZ5b29WZEpld2dGZUlqV21xU2t0UHZSQmlHYjJtUXZSN0ZGcndJMEVZd0Uv?=
+ =?utf-8?B?VWRiVExlSXRUajJCQ3U3R0FvUFdQN05OdjE2ZnR3UWRXTGNnZjNTakZEcmsy?=
+ =?utf-8?B?WUs5bEZqUHZLQTVZT3JxbkRqc3lOaGJkQXJEMTFPbDhvdVB0Vm5JMk1pWGlC?=
+ =?utf-8?B?dnJQMGJ2dWkxQ1NuMmhTTkF1Y21WcjZmR2ltUUlkbzVwci9BT2VCWkhIZkhZ?=
+ =?utf-8?B?eUsrK2NFdjZqeVJ1NVUzQmtEbk5rc1cwYml5ZDNoQkhVcnNIRlBJRHprS0xx?=
+ =?utf-8?B?K1NvNHJuSCtma3VBYXpXR2hDWWNkWk9wRzBVeC9vRkRMS0NUU0czc2xMZWhs?=
+ =?utf-8?Q?YEga/zQN5RblOfCq2rJDMWA+d?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b09cdb91-83be-4256-937d-08dbfd7b229f
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2023 14:35:50.8326
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dxhxglkdlcfEIKZHmDaVUqkzsErtPAT0IMtgZQ/yovl7qZs3puba2RJhN5CNAg2OuM4/xdT9UYriBn4bPoys+w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR12MB5394
 
-On Fri, Dec 15, 2023 at 8:31=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote=
-:
->
-> Fri, Dec 15, 2023 at 12:10:48PM CET, victor@mojatatu.com wrote:
-> >This commit makes tc blocks track which ports have been added to them.
-> >And, with that, we'll be able to use this new information to send
-> >packets to the block's ports. Which will be done in the patch #3 of this
-> >series.
-> >
-> >Suggested-by: Jiri Pirko <jiri@nvidia.com>
-> >Co-developed-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> >Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> >Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
-> >Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-> >Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-> >---
-> > include/net/sch_generic.h |  4 +++
-> > net/sched/cls_api.c       |  2 ++
-> > net/sched/sch_api.c       | 55 +++++++++++++++++++++++++++++++++++++++
-> > net/sched/sch_generic.c   | 31 ++++++++++++++++++++--
-> > 4 files changed, 90 insertions(+), 2 deletions(-)
-> >
-> >diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-> >index dcb9160e6467..cefca55dd4f9 100644
-> >--- a/include/net/sch_generic.h
-> >+++ b/include/net/sch_generic.h
-> >@@ -19,6 +19,7 @@
-> > #include <net/gen_stats.h>
-> > #include <net/rtnetlink.h>
-> > #include <net/flow_offload.h>
-> >+#include <linux/xarray.h>
-> >
-> > struct Qdisc_ops;
-> > struct qdisc_walker;
-> >@@ -126,6 +127,8 @@ struct Qdisc {
-> >
-> >       struct rcu_head         rcu;
-> >       netdevice_tracker       dev_tracker;
-> >+      netdevice_tracker       in_block_tracker;
-> >+      netdevice_tracker       eg_block_tracker;
-> >       /* private data */
-> >       long privdata[] ____cacheline_aligned;
-> > };
-> >@@ -457,6 +460,7 @@ struct tcf_chain {
-> > };
-> >
-> > struct tcf_block {
-> >+      struct xarray ports; /* datapath accessible */
-> >       /* Lock protects tcf_block and lifetime-management data of chains
-> >        * attached to the block (refcnt, action_refcnt, explicitly_creat=
-ed).
-> >        */
-> >diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-> >index dc1c19a25882..6020a32ecff2 100644
-> >--- a/net/sched/cls_api.c
-> >+++ b/net/sched/cls_api.c
-> >@@ -531,6 +531,7 @@ static void tcf_block_destroy(struct tcf_block *bloc=
-k)
-> > {
-> >       mutex_destroy(&block->lock);
-> >       mutex_destroy(&block->proto_destroy_lock);
-> >+      xa_destroy(&block->ports);
-> >       kfree_rcu(block, rcu);
-> > }
-> >
-> >@@ -1002,6 +1003,7 @@ static struct tcf_block *tcf_block_create(struct n=
-et *net, struct Qdisc *q,
-> >       refcount_set(&block->refcnt, 1);
-> >       block->net =3D net;
-> >       block->index =3D block_index;
-> >+      xa_init(&block->ports);
-> >
-> >       /* Don't store q pointer for blocks which are shared */
-> >       if (!tcf_block_shared(block))
-> >diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-> >index e9eaf637220e..09ec64f2f463 100644
-> >--- a/net/sched/sch_api.c
-> >+++ b/net/sched/sch_api.c
-> >@@ -1180,6 +1180,57 @@ static int qdisc_graft(struct net_device *dev, st=
-ruct Qdisc *parent,
-> >       return 0;
-> > }
-> >
-> >+static int qdisc_block_add_dev(struct Qdisc *sch, struct net_device *de=
-v,
-> >+                             struct nlattr **tca,
-> >+                             struct netlink_ext_ack *extack)
-> >+{
-> >+      const struct Qdisc_class_ops *cl_ops =3D sch->ops->cl_ops;
-> >+      struct tcf_block *in_block =3D NULL;
-> >+      struct tcf_block *eg_block =3D NULL;
->
-> No need to null.
->
-> Can't you just have:
->         struct tcf_block *block;
->
->         And use it in both ifs? You can easily obtain the block again on
->         the error path.
->
+On 12/14/23 22:35, Raju Rangoju wrote:
+> 
+> 
+> On 12/12/2023 9:08 PM, Tom Lendacky wrote:
+>> On 12/11/23 23:37, Raju Rangoju wrote:
+>>> Some of the ethernet add-in-cards have dual PHY but share a single MDIO
+>>> line (between the ports). In such cases, link inconsistencies are
+>>> noticed during the heavy traffic and during reboot stress tests.
+>>>
+>>> So, use the SMN calls to avoid the race conditions.
+>>
+>> So this patch replaces all the PCI accesses you added in patch #2, so 
+>> why not just do this from the start?
+> 
+> Yes, that is correct. It was done to maintain the history and that will be 
+> reference as to why SMN is used over regular PCI accesses in this case.
 
-It's just easier to read.
+Seems unnecessary to me. Adding a comment in the commit log and the code 
+that states why SMN is used instead of PCI and how it fixes the race 
+condition would be enough. Your call... but since patch #2 enables the 
+device, this could cause a bisect issue.
 
-> >+      int err;
-> >+
-> >+      if (tca[TCA_INGRESS_BLOCK]) {
-> >+              /* works for both ingress and clsact */
-> >+              in_block =3D cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NUL=
-L);
-> >+              if (!in_block) {
->
-> I don't see how this could happen. In fact, why exactly do you check
-> tca[TCA_INGRESS_BLOCK]?
->
+Thanks,
+Tom
 
-It's lazy but what is wrong with doing that?
-
-> At this time, the clsact/ingress init() function was already called, you
-> can just do:
->
->         block =3D cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
->         if (block) {
->                 err =3D xa_insert(&block->ports, dev->ifindex, dev, GFP_K=
-ERNEL);
->                 if (err) {
->                         NL_SET_ERR_MSG(extack, "Ingress block dev insert =
-failed");
->                         return err;
->                 }
->                 netdev_hold(dev, &sch->in_block_tracker, GFP_KERNEL);
->         }
->         block =3D cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
->         if (block) {
->                 err =3D xa_insert(&block->ports, dev->ifindex, dev, GFP_K=
-ERNEL);
->                 if (err) {
->                         NL_SET_ERR_MSG(extack, "Egress block dev insert f=
-ailed");
->                         goto err_out;
->                 }
->                 netdev_hold(dev, &sch->eg_block_tracker, GFP_KERNEL);
->         }
->         return 0;
->
-> err_out:
->         block =3D cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
->         if (block) {
->                 xa_erase(&block->ports, dev->ifindex);
->                 netdev_put(dev, &sch->in_block_tracker);
->         }
->         return err;
->
-> >+                      NL_SET_ERR_MSG(extack, "Shared ingress block miss=
-ing");
-> >+                      return -EINVAL;
-> >+              }
-> >+
-> >+              err =3D xa_insert(&in_block->ports, dev->ifindex, dev, GF=
-P_KERNEL);
-> >+              if (err) {
-> >+                      NL_SET_ERR_MSG(extack, "Ingress block dev insert =
-failed");
-> >+                      return err;
-> >+              }
-> >+
-
-How about a middle ground:
-        in_block =3D cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
-        if (in_block) {
-                err =3D xa_insert(&in_block->ports, dev->ifindex, dev,
-GFP_KERNEL);
-                if (err) {
-                        NL_SET_ERR_MSG(extack, "ingress block dev
-insert failed");
-                        return err;
-                }
-                netdev_hold(dev, &sch->in_block_tracker, GFP_KERNEL)
-      }
-       eg_block =3D cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
-        if (eg_block) {
-                err =3D xa_insert(&eg_block->ports, dev->ifindex, dev,
-GFP_KERNEL);
-                if (err) {
-                        netdev_put(dev, &sch->eg_block_tracker);
-                        NL_SET_ERR_MSG(extack, "Egress block dev
-insert failed");
-                        xa_erase(&in_block->ports, dev->ifindex);
-                        netdev_put(dev, &sch->in_block_tracker);
-                        return err;
-                }
-                netdev_hold(dev, &sch->eg_block_tracker, GFP_KERNEL);
-        }
-        return 0;
-
-> >+              netdev_hold(dev, &sch->in_block_tracker, GFP_KERNEL);
->
-> Why exactly do you need an extra reference of netdev? Qdisc is already
-> having one.
-
-More fine grained tracking.
-
->
-> >+      }
-> >+
-> >+      if (tca[TCA_EGRESS_BLOCK]) {
-> >+              eg_block =3D cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL=
-);
-> >+              if (!eg_block) {
-> >+                      NL_SET_ERR_MSG(extack, "Shared egress block missi=
-ng");
-> >+                      err =3D -EINVAL;
-> >+                      goto err_out;
-> >+              }
-> >+
-> >+              err =3D xa_insert(&eg_block->ports, dev->ifindex, dev, GF=
-P_KERNEL);
-> >+              if (err) {
-> >+                      NL_SET_ERR_MSG(extack, "Egress block dev insert f=
-ailed");
-> >+                      goto err_out;
-> >+              }
-> >+              netdev_hold(dev, &sch->eg_block_tracker, GFP_KERNEL);
-> >+      }
-> >+
-> >+      return 0;
-> >+err_out:
-> >+      if (in_block) {
-> >+              xa_erase(&in_block->ports, dev->ifindex);
-> >+              netdev_put(dev, &sch->in_block_tracker);
-> >+      }
-> >+      return err;
-> >+}
-> >+
-> > static int qdisc_block_indexes_set(struct Qdisc *sch, struct nlattr **t=
-ca,
-> >                                  struct netlink_ext_ack *extack)
-> > {
-> >@@ -1350,6 +1401,10 @@ static struct Qdisc *qdisc_create(struct net_devi=
-ce *dev,
-> >       qdisc_hash_add(sch, false);
-> >       trace_qdisc_create(ops, dev, parent);
-> >
-> >+      err =3D qdisc_block_add_dev(sch, dev, tca, extack);
-> >+      if (err)
-> >+              goto err_out4;
-> >+
-> >       return sch;
-> >
-> > err_out4:
-> >diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-> >index 8dd0e5925342..32bed60dea9f 100644
-> >--- a/net/sched/sch_generic.c
-> >+++ b/net/sched/sch_generic.c
-> >@@ -1050,7 +1050,11 @@ static void qdisc_free_cb(struct rcu_head *head)
-> >
-> > static void __qdisc_destroy(struct Qdisc *qdisc)
-> > {
-> >-      const struct Qdisc_ops  *ops =3D qdisc->ops;
-> >+      struct net_device *dev =3D qdisc_dev(qdisc);
-> >+      const struct Qdisc_ops *ops =3D qdisc->ops;
-> >+      const struct Qdisc_class_ops *cops;
-> >+      struct tcf_block *block;
-> >+      u32 block_index;
-> >
-> > #ifdef CONFIG_NET_SCHED
-> >       qdisc_hash_del(qdisc);
-> >@@ -1061,11 +1065,34 @@ static void __qdisc_destroy(struct Qdisc *qdisc)
-> >
-> >       qdisc_reset(qdisc);
-> >
-> >+      cops =3D ops->cl_ops;
-> >+      if (ops->ingress_block_get) {
-> >+              block_index =3D ops->ingress_block_get(qdisc);
-> >+              if (block_index) {
->
-> I don't follow. What you need block_index for? Why can't you just call:
->         block =3D cops->tcf_block(qdisc, TC_H_MIN_INGRESS, NULL);
-> right away?
-
-Good point.
-
-cheers,
-jamal
-
->
-> >+                      block =3D cops->tcf_block(qdisc, TC_H_MIN_INGRESS=
-, NULL);
-> >+                      if (block) {
-> >+                              if (xa_erase(&block->ports, dev->ifindex)=
-)
-> >+                                      netdev_put(dev, &qdisc->in_block_=
-tracker);
-> >+                      }
-> >+              }
-> >+      }
-> >+
-> >+      if (ops->egress_block_get) {
-> >+              block_index =3D ops->egress_block_get(qdisc);
-> >+              if (block_index) {
-> >+                      block =3D cops->tcf_block(qdisc, TC_H_MIN_EGRESS,=
- NULL);
-> >+                      if (block) {
-> >+                              if (xa_erase(&block->ports, dev->ifindex)=
-)
-> >+                                      netdev_put(dev, &qdisc->eg_block_=
-tracker);
-> >+                      }
-> >+              }
-> >+      }
-> >+
-> >       if (ops->destroy)
-> >               ops->destroy(qdisc);
-> >
-> >       module_put(ops->owner);
-> >-      netdev_put(qdisc_dev(qdisc), &qdisc->dev_tracker);
-> >+      netdev_put(dev, &qdisc->dev_tracker);
-> >
-> >       trace_qdisc_destroy(qdisc);
-> >
-> >--
-> >2.25.1
-> >
+> 
 
