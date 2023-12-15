@@ -1,236 +1,180 @@
-Return-Path: <netdev+bounces-58058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BA4D814E83
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 18:25:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DE13814E8E
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 18:26:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 093931F2557C
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 17:25:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05D12286F9C
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 17:26:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D719580DEB;
-	Fri, 15 Dec 2023 17:13:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC32C495FA;
+	Fri, 15 Dec 2023 17:16:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oVsbcofg"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="eHCO6StW"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2042.outbound.protection.outlook.com [40.107.7.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995893011A;
-	Fri, 15 Dec 2023 17:13:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 87698C000D;
-	Fri, 15 Dec 2023 17:12:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1702660378;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LfIk6jrsbwO3TLKZXiaKaSazRpes+uS9mpSSHSKb1MY=;
-	b=oVsbcofgcjHMs9jJ1JyR+cxJ1jRk5kvr+suHLsjfEqtSsvuiJ4++YLg1CLMEqIUBa/8BV2
-	OFuQOn/kgBAaumbxBaUCK6zUlfXFNfH4EXUTTMFiXriu/Njs0CwtRnlhjLwUzrOX182Ett
-	vDd8adYQhrYOoaNEeZlKc5Juh+x/RcDoC2H+KH1sKCNb64JHTdnkWBTzZ23zHrUWS9CIrw
-	yZzUXWI8C+Gd/bkmIrIjne9jsPmaErIoTghpnuZOt9qZuvWphhxpAhL7MJ0tsARNJgPo9t
-	CafG4a8pybrQy8zswaXy7BFw74V6nali01GIUnS2f4gaMgkuf0jqiotWgnc/WQ==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>
-Subject: [PATCH net-next v4 13/13] Documentation: networking: document phy_link_topology
-Date: Fri, 15 Dec 2023 18:12:35 +0100
-Message-ID: <20231215171237.1152563-14-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231215171237.1152563-1-maxime.chevallier@bootlin.com>
-References: <20231215171237.1152563-1-maxime.chevallier@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134383FB12;
+	Fri, 15 Dec 2023 17:16:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iCI4crTvzcUzKarpvL+r3yGAAbD5QOwoCQxqkGSsQphK1caKaM6fPbBBYUc2Q/hTT81aHDQ0rrRl6enERqW7lGSu4idSVHmUHbuvzb6AA/Qd04DNh8OlLTGGu81C4Wpk2/EG/CkGYS40FDifIUuQlIccoymT0W3T/6Njlfo9g81/3++ofAlmtO9jTf30UiWP47GyRxRDxu2pdSECohUolTrIcrGYTseDNluyEujVg9YIUecsTsmNlgm2zaKopEo8lFY0shbxvST6JiiY+J40KNC+adzQUHjyldkEOWEm7r25sFwQuHz44MWwNRf0vmb12rARNGS97fisVkQI+QaB1w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+y9Y9QKiIBUPbhw2CUh1eKHMo808IskqA4ajiraBjBk=;
+ b=Xp062KDYweF6cJpej2NWemRNl0wCs2DcqytXycvrS1Z3rXnUbNh0J11Lo7rIdhvUtmwMGV4LQovU/WRaidnGzHi0qRmoM+AeRtRPeHONUk+llyILXfDZiqNFfuilFUFnKzPYbBHDMv4w6hqhvYcrUYos8dchmwOZHFN2mLSAxgTvvRJC5KowNPUCD6aMPgfsJ84aJN4Mu8lMoEmcbEyN4YPxPFXVd9iXvFvqBTkjC9OtV6zhyMJD1Az0i/i8fLZvwAAuUwdGGjgbSLZaSiiYVkdUaFeIwoxpYFXLACZqKY+aZV+j4t4doEFIkSzs3se45xBQ9Yt1nPRP1T1J5hIsqA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+y9Y9QKiIBUPbhw2CUh1eKHMo808IskqA4ajiraBjBk=;
+ b=eHCO6StWTp/RarzdhtphDHMJU4wm7JOpqIJYdl9yEruvk38mhLSUhuc/RAVA9CyAinNt/hwWT1joam/hFRYXYY27TJFzXlv8tj1lNG2wL1F/qfyjN5ZJp7kZxxosBODxPDTkKcXyWdU87da5lMFaNrqtGEq+Sus9C9mUJmqmecQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by AS8PR04MB8658.eurprd04.prod.outlook.com (2603:10a6:20b:429::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.31; Fri, 15 Dec
+ 2023 17:16:02 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7091.030; Fri, 15 Dec 2023
+ 17:16:00 +0000
+Date: Fri, 15 Dec 2023 19:15:55 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, shuah@kernel.org, s-vadapalli@ti.com,
+	r-gunasekaran@ti.com, vigneshr@ti.com, srk@ti.com, horms@kernel.org,
+	p-varis@ti.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v9 08/10] net: ethernet: ti: am65-cpsw: add
+ mqprio qdisc offload in channel mode
+Message-ID: <20231215171555.4emy5fn77ej6oti6@skbuf>
+References: <20231215132048.43727-1-rogerq@kernel.org>
+ <20231215132048.43727-1-rogerq@kernel.org>
+ <20231215132048.43727-9-rogerq@kernel.org>
+ <20231215132048.43727-9-rogerq@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231215132048.43727-9-rogerq@kernel.org>
+ <20231215132048.43727-9-rogerq@kernel.org>
+X-ClientProxiedBy: FR4P281CA0246.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:f5::15) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AS8PR04MB8658:EE_
+X-MS-Office365-Filtering-Correlation-Id: 98d3835e-0191-4442-32e9-08dbfd9181c1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	wE8YlDbu6I/CtnZz1uTtZHxL22yrsKcyI3rBYViDrvgIU1DarNzFctIObL9B3ql/Q0Qwt5Y6riSDgcY9SL/8wx69bHByUuWNO1cyKFahxNUT7uw4aE7f25PMzhM28xR7pkHdipQLvOx+6tNIc2qChrCf5a2auCAhggmpLk2JX2vFoShKLJDzzELzczlmi1LGIhnvSBC/Ye5vzVeJrD8MTLMT5/GK4Zyx2nqZWKY7Wd1pk6yjjzyCWIzV+tYs4mpWmzNlQnJrt4tz6Xvh+6uu09R+ynaGYLqmWZG4/2iE7aSpFkooTFczmeC4/57NneO6Ml40CaNkSjb3nj5otuVoKsGaK5xhmAw6YkdSXmWljeC3AvWb5ndubM0jUaL0xUPred+DCxZMFpFuAvMTSEjPL/Q8AtyMsNOIVQIQSauDeuQUW2pQ1rjyZOIFHfGO//8dkEEFObzy9rWm5pUH03A3nwuvhz0ZPbDFTVdUIVdwcurYBZeDC2OTnuO2NfRySZ8LRZ6RR3LM/0zaz3BiWWLAfkaz5K+BGGbzip/fP3WL+pEtzFRsMRagQmKJL9O6bdXcrTUDOAbL3Gbf3wQcvYkGpG3zkcL23KAcQ3D+g8qIDlg5ZCfkG/q3+4QW+o8fCFRf
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(39860400002)(396003)(346002)(366004)(376002)(230922051799003)(230273577357003)(230173577357003)(186009)(451199024)(1800799012)(64100799003)(83380400001)(6486002)(478600001)(6666004)(6506007)(9686003)(1076003)(6512007)(26005)(66556008)(66946007)(6916009)(66476007)(316002)(38100700002)(86362001)(8676002)(4326008)(44832011)(8936002)(5660300002)(7416002)(2906002)(33716001)(41300700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?q6S0W0sjsvUQ5Z5aac2M53BuMVXGEsq07aO2Z7kQn+0PGItc5sO/NeoMHu0r?=
+ =?us-ascii?Q?YyD1QdsVXmXrW8SpyYJftWPEZ+3nqwfNT5JPDmjmS32fSta7vnpX2zVXVdhK?=
+ =?us-ascii?Q?Qh600Tia5Iw029C7TpnVeAhj3jw/AICduhEKo2rHjGFZdjUN5cyTsRbVPHeD?=
+ =?us-ascii?Q?ybWLdkzChSDBVq1IEoIg/NkMsgZXvhGXwiDEhYqz3K6rBD9YZ44xx6eM6JRS?=
+ =?us-ascii?Q?/zZPyhqYKqCCxD1HTXHdzaMo7fSDEli9+Lva7pvv6/Su6MWBt/McPkF84dBD?=
+ =?us-ascii?Q?Mj66fgQrUFVjoxIYo53cXO9ZxsdAd6Gzf8hz8n+ZFAh+tta36+bldXdtVkIm?=
+ =?us-ascii?Q?JKy5bJtmFz2ayyXKcuzKIXzmsfKiT787B3RDXzZrmn3UH4Ij7LnsoZJYoH+x?=
+ =?us-ascii?Q?/mQhc4jEbLusbwcUmb28ZHoqV4McmQyCy7SL3V9IrLS+XjYAwVoDeoBsbN2s?=
+ =?us-ascii?Q?pM33LfIS+3AeYzr2WQ4zJJqQDbV5Qo1SS0Gm+FScacS3r8yBEeGUFBWNRgzf?=
+ =?us-ascii?Q?j5Wt2jvG4WCwpQRdnYFYDugrJbETlSZN5vzcpSNlKYd5tjVw6TGYbK5CAzns?=
+ =?us-ascii?Q?xBmmRjdrAQkHNq5maU2IAAupc5Z12wSt+fAjXlvjDe9yOTA6eP45QcmkxCcV?=
+ =?us-ascii?Q?bpLkBgjHiaGx8AyEwoJEsI9R+6tpp8BfrfhNIhoDW74Y45ROOZHcevTNYH9g?=
+ =?us-ascii?Q?9z6ppAeS3spBmfZNzwk9oja8ktYehGduJyenTgTJ3pGZR1MtUs0MIaI4L2DV?=
+ =?us-ascii?Q?9jq90ERjDzT2vGDFng8djdzRsI8wWI4o8tJi5wHN//70E8IxgHuKg8SP8LcO?=
+ =?us-ascii?Q?OE6aiUzlGeiTvl64dERGKqB2XPCrtsJidgNT4zKieTgB3gGsQpqndrCLsuc4?=
+ =?us-ascii?Q?VfH+BuuICtxa4h7mV+E1Cw4WWXMoWq1X8goGzokpIr1PWqta4jzoV7WUnzkr?=
+ =?us-ascii?Q?6It1JxAnc3mX1CQMBBsHB2A0G4Jciwzxl77JhSUuKw6i6qAxnfDd6At506zW?=
+ =?us-ascii?Q?zIyMm61qM8t+/rdocCPmc9M48dp0chXdevM24ceCMu9JjkUXkCXwoOsbhstF?=
+ =?us-ascii?Q?GWG5ABsgmetOYI8gEzZFfJCdfCL0LC1TZvefPweHDYSREt2qtQVidiQPhEEp?=
+ =?us-ascii?Q?4n6rZqHAJtYJoP1aAMTa2Nf7xUJ5ZmQA7jYDPtCcX2cfrRW2SazzfQekn9Z8?=
+ =?us-ascii?Q?dVV0BjPGGVYTDjNdi2mmREx5LTHcmQB9GVj4XiLiBgmoa8I39IgaFCbvBork?=
+ =?us-ascii?Q?Ao1JHZQiBRMi76iODVzQ+tRnpm4M3Wk2x3MIvFGB7PL8N6gpWyhgC9xtm34p?=
+ =?us-ascii?Q?TbtOfxCjwLoXZ1KepNWT5H40XI81Mtx88sR9kDFJaxGAaCtXp44fGOho4D8X?=
+ =?us-ascii?Q?7OPN439qlHpvhRfT7ZeJIeroYb9Nm9R/yPtnrfSAa7b0y9kdPnuaz0U0rfmL?=
+ =?us-ascii?Q?OxmhX4MouESGvwHHVIVvhny60JDTcNakpdFj+8q1Xd8EyjlsuwNLoSNqnoU9?=
+ =?us-ascii?Q?2nM8pl+jyUKpV8ScayuyQQ57vAbh14eIT4YR2oC667DO/0xFSGvGUM58J+Vt?=
+ =?us-ascii?Q?+O5ANtLkd9J6yF9uq953roXU43skbUYvPdetRB91h6FxJOU0J/1yLWePbRGN?=
+ =?us-ascii?Q?DA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 98d3835e-0191-4442-32e9-08dbfd9181c1
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2023 17:15:59.3813
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 40/UQzZbWaEebX0jJIDrJi13K6DcWNys4CLbSMaa75PXM6p5SzxUo14fXTGwDtpfNx8zJryYKeUwbbOOx0Rf4Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8658
 
-The newly introduced phy_link_topology tracks all ethernet PHYs that are
-attached to a netdevice. Document the base principle, internal and
-external APIs. As the phy_link_topology is expected to be extended, this
-documentation will hold any further improvements and additions made
-relative to topology handling.
+On Fri, Dec 15, 2023 at 03:20:46PM +0200, Roger Quadros wrote:
+> From: Grygorii Strashko <grygorii.strashko@ti.com>
+> 
+> This patch adds MQPRIO Qdisc offload in full 'channel' mode which allows
+> not only setting up pri:tc mapping, but also configuring TX shapers
+> (rate-limiting) on external port FIFOs.
+> 
+> The MQPRIO Qdisc offload is expected to work with or without VLAN/priority
+> tagged packets.
+> 
+> The CPSW external Port FIFO has 8 Priority queues. The rate-limit can be
+> set for each of these priority queues. Which Priority queue a packet is
+> assigned to depends on PN_REG_TX_PRI_MAP register which maps header
+> priority to switch priority.
+> 
+> The header priority of a packet is assigned via the RX_PRI_MAP_REG which
+> maps packet priority to header priority.
+> 
+> The packet priority is either the VLAN priority (for VLAN tagged packets)
+> or the thread/channel offset.
+> 
+> For simplicity, we assign the same priority queue to all queues of a
+> Traffic Class so it can be rate-limited correctly.
+> 
+> Configuration example:
+>  ethtool -L eth1 tx 5
+>  ethtool --set-priv-flags eth1 p0-rx-ptype-rrobin off
+> 
+>  tc qdisc add dev eth1 parent root handle 100: mqprio num_tc 3 \
+>  map 0 0 1 2 0 0 0 0 0 0 0 0 0 0 0 0 \
+>  queues 1@0 1@1 1@2 hw 1 mode channel \
+>  shaper bw_rlimit min_rate 0 100mbit 200mbit max_rate 0 101mbit 202mbit
+> 
+>  tc qdisc replace dev eth2 handle 100: parent root mqprio num_tc 1 \
+>  map 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 queues 1@0 hw 1
+> 
+>  ip link add link eth1 name eth1.100 type vlan id 100
+>  ip link set eth1.100 type vlan egress 0:0 1:1 2:2 3:3 4:4 5:5 6:6 7:7
+> 
+> In the above example two ports share the same TX CPPI queue 0 for low
+> priority traffic. 3 traffic classes are defined for eth1 and mapped to:
+> TC0 - low priority, TX CPPI queue 0 -> ext Port 1 fifo0, no rate limit
+> TC1 - prio 2, TX CPPI queue 1 -> ext Port 1 fifo1, CIR=100Mbit/s, EIR=1Mbit/s
+> TC2 - prio 3, TX CPPI queue 2 -> ext Port 1 fifo2, CIR=200Mbit/s, EIR=2Mbit/s
+> 
+> Signed-off-by: Grygorii Strashko <grygorii.strashko@ti.com>
+> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+> ---
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
-V4: No changes
-V3: New patch
-
- Documentation/networking/index.rst            |   1 +
- .../networking/phy-link-topology.rst          | 121 ++++++++++++++++++
- 2 files changed, 122 insertions(+)
- create mode 100644 Documentation/networking/phy-link-topology.rst
-
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index 69f3d6dcd9fd..a2c45a75a4a6 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -88,6 +88,7 @@ Contents:
-    operstates
-    packet_mmap
-    phonet
-+   phy-link-topology
-    pktgen
-    plip
-    ppp_generic
-diff --git a/Documentation/networking/phy-link-topology.rst b/Documentation/networking/phy-link-topology.rst
-new file mode 100644
-index 000000000000..d66ee9711ac1
---- /dev/null
-+++ b/Documentation/networking/phy-link-topology.rst
-@@ -0,0 +1,121 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=================
-+PHY link topology
-+=================
-+
-+Overview
-+========
-+
-+The PHY link topology representation in the networking stack aims at representing
-+the hardware layout for any given Ethernet link.
-+
-+An Ethernet Interface from userspace's poing of view is nothing but a
-+:c:type:`struct net_device <net_device>`, which exposes configuration options
-+trough the legacy ioctls and the ethool netlink commands. The base assumption
-+when designing these configuration channels were that the link looked
-+something like this ::
-+
-+  +-----------------------+        +----------+      +--------------+
-+  | Ethernet Controller / |        | Ethernet |      | Connector /  |
-+  |       MAC             | ------ |   PHY    | ---- |    Port      | ---... to LP
-+  +-----------------------+        +----------+      +--------------+
-+  struct net_device               struct phy_device
-+
-+Commands that needs to configure the PHY will go through the net_device.phydev
-+field to reach the PHY and perform the relevant configuration.
-+
-+This assumption falls appart in more complex topologies that can arise when,
-+for example, using SFP transceivers (although that's not the only specific case).
-+
-+Here, we have 2 basic scenarios. Either the MAC is able to output a serialized
-+interface, that can directly be fed to an SFP cage, such as SGMII, 1000BaseX,
-+10GBaseR, etc.
-+
-+The link topology then looks like this (when an SFP module is inserted) ::
-+
-+  +-----+  SGMII  +------------+
-+  | MAC | ------- | SFP Module |
-+  +-----+         +------------+
-+
-+Knowing that some modules embed a PHY, the actual link is more like ::
-+
-+  +-----+  SGMII   +--------------+
-+  | MAC | -------- | PHY (on SFP) |
-+  +-----+          +--------------+
-+
-+In this case, the SFP PHY is handled by phylib, and registered by phylink through
-+its SFP upstream ops.
-+
-+Now some Ethernet controllers aren't able to output a serialized interface, so
-+we can't directly connect them to an SFP cage. However, some PHYs can be used
-+as media-converters, to translate the non-serialized MAC MII interface to a
-+serialized MII interface fed to the SFP ::
-+
-+  +-----+  RGMII  +-----------------------+  SGMII  +--------------+
-+  | MAC | ------- | PHY (media converter) | ------- | PHY (on SFP) |
-+  +-----+         +-----------------------+         +--------------+
-+
-+This is where the model of having a single net_device.phydev pointer shows its
-+limitations, as we now have 2 PHYs on the link.
-+
-+The phy_link topology framework aims at providing a way to keep track of every
-+PHY on the link, for use by both kernel drivers and subsystems, but also to
-+report the topology to userspace, allowing to target individual PHYs in configuration
-+commands.
-+
-+API
-+===
-+
-+The :c:type:`struct phy_link_topology <phy_link_topology>` is a per-netdevice
-+resource, that gets initialized at netdevice creation. Once it's initialized,
-+it is then possible to register PHYs to the topology through :
-+
-+:c:func:`phy_link_topo_add_phy`
-+
-+Besides registering the PHY to the topology, this call will also assign a unique
-+index to the PHY, which can then be reported to userspace to refer to this PHY
-+(akin to the ifindex). This index is a u32, ranging from 1 to U32_MAX. The value
-+0 is reserved to indicate the PHY doesn't belong to any topology yet.
-+
-+The PHY can then be removed from the topology through
-+
-+:c:func:`phy_link_topo_del_phy`
-+
-+These function are already hooked into the phylib subsystem, so all PHYs that
-+are linked to a net_device through :c:func:`phy_attach_direct` will automatically
-+join the netdev's topology.
-+
-+PHYs that are on a SFP module will also be automatically registered IF the SFP
-+upstream is phylink (so, no media-converter).
-+
-+PHY drivers that can be used as SFP upstream need to call :c:func:`phy_sfp_attach_phy`
-+and :c:func:`phy_sfp_detach_phy`, which can be used as a
-+.attach_phy / .detach_phy implementation for the
-+:c:type:`struct sfp_upstream_ops <sfp_upstream_ops>`.
-+
-+UAPI
-+====
-+
-+There exist a set of netlink commands to query the link topology from userspace,
-+see ``Documentation/networking/ethtool-netlink.rst``.
-+
-+The whole point of having a topology representation is to assign the phyindex
-+field in :c:type:`struct phy_device <phy_device>`. This index is reported to
-+userspace using the ``ETHTOOL_MSG_PHY_GET`` ethtnl command. Performing a DUMP operation
-+will result in all PHYs from all net_device being listed. The DUMP command
-+accepts either a ``ETHTOOL_A_HEADER_DEV_INDEX`` or ``ETHTOOL_A_HEADER_DEV_NAME``
-+to be passed in the request to filter the DUMP to a single net_device.
-+
-+The retrieved index can then be passed as a request parameter using the
-+``ETHTOOL_A_HEADER_PHY_INDEX`` field in the following ethnl commands :
-+
-+* ``ETHTOOL_MSG_STRSET_GET`` to get the stats strig set from a given PHY
-+* ``ETHTOOL_MSG_CABLE_TEST_ACT`` and ``ETHTOOL_MSG_CABLE_TEST_ACT``, to perform
-+  cable testing on a given PHY on the link (most likely the outermost PHY)
-+* ``ETHTOOL_MSG_PSE_SET`` and ``ETHTOOL_MSG_PSE_GET`` for PHY-controlled PoE and PSE settings
-+* ``ETHTOOL_MSG_PLCA_GET_CFG``, ``ETHTOOL_MSG_PLCA_SET_CFG`` and ``ETHTOOL_MSG_PLCA_GET_STATUS``
-+  to set the PLCA (Physical Layer Collision Avoidance) parameters
-+
-+Note that the PHY index can be passed to other requests, which will silently
-+ignore it if present and irrelevant.
--- 
-2.43.0
-
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
