@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-58092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 185C1815005
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 20:12:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D09C781500B
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 20:13:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BF5F1C20C07
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 19:12:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C79D1F24C0C
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 19:13:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED31B3EA71;
-	Fri, 15 Dec 2023 19:12:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EB6D3FB30;
+	Fri, 15 Dec 2023 19:13:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XHhyiItO"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="Zjx8vriQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3923C41843
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 19:12:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-db3fa47c2f7so835813276.0
-        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 11:12:36 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9834F3FE2C
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 19:13:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5913b73b53eso736578eaf.0
+        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 11:13:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702667556; x=1703272356; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1702667627; x=1703272427; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=g/7MzHYLzqZQheJqMfLkZzeOiy0VpB3DOKLySBs2Akg=;
-        b=XHhyiItOgQT3AV3nk1DKCvzkKOt02iAQQu0+7TrGKZiV3nQb6oqQJ3Yw9hTIIdbahV
-         slKm+OnEu/1M/zYZMBPYUx7DONvDdjFz9+VDuZIV1knh/AzmB04UnXeF858/bW6WRUSK
-         nHIwaJasbbMDdCudZnku+K99eaFIPG7E/N2g75EHeJB1oFYCx7OYbE9Tu/67IGmomV7z
-         lYHkNnC3dSr4aw4URwkheUu1Rau1QWngticOTc/600MrlpMT4Kk/31hDWeuYPgIxE/BJ
-         zHyOXGy9Gl2RdWoM6ARejKKANTPyBxpJPcQ3qWDVsOBCLv/pqZiDemxPw+rcaa3QWjrv
-         NPRA==
+        bh=F4jZOOTED3fISjUmCLVaEsjs7SardkFmYTmlGlijSa0=;
+        b=Zjx8vriQsi16IhzwHM5Wr+JrkA6R1sY6gpaQuvPsCAI8EMowL/R3DgSVSYOpJwKRio
+         a1DO+frLNEBkLWSUrPZTEB1qO/eRaG6A47IDtHb73g0zDSWARwIgGvFPM9CfdqjOVydJ
+         s71sPITxikatTKhFF+EVm98QM55fBTeM7nYAXWfZKYcwq1zzaogFdVMeDRFr8SPtz0eU
+         S76VzJ8YK99SNFFqhvrXddI7WScLnn9ehr/OJzKJS+wMbBNRe0HmXhJnK/HBCjvSZlQU
+         ZXiux42prfn+pM9K+pb2JWISdtoYbr2iQrCH2p+I+TVFy7NV3R5Y5PU6c2ZzSBOP1Suh
+         KLrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702667556; x=1703272356;
+        d=1e100.net; s=20230601; t=1702667627; x=1703272427;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g/7MzHYLzqZQheJqMfLkZzeOiy0VpB3DOKLySBs2Akg=;
-        b=X7YYLK05sRTfhIO52r4aN3AURgD1iVkhI+87xpvwrrDQQrJ0xTsZK3f3K77QSWGNfQ
-         L+o8fQL+bSSmSaDIzcSRZIpaLUCPNIy2/B4sxs8pHVTRMpo/L+Vx2JrqMHcXsypNzqZH
-         iTR0Ujf4jBpQT76f0aeGRLY6edZqYU/qntqlIkrpzDWRrgkkOqS9eAG3TYNTRjCwkDaW
-         x0RMxHobRsjmJ9ewWmYp6PsYEqiWgKtc/u9eWRS0iPYk6Q0DAIpk7UJvSIsMoKCSxHY/
-         /TCal8/N6+RDliNEEUtrxRYXJXdfj08+eZb9QucNjAQ5EysK5p4tC5SPqce7AtiBR8Xl
-         jhbg==
-X-Gm-Message-State: AOJu0YxOElRQZ+YW2/uFRevd4i7okOn5Xzss+VvhsETrMgKQvhA+eAv3
-	tyu7enF8RNAoRBO79qeZBX0=
-X-Google-Smtp-Source: AGHT+IEPDmPqsW/Fae8JRM7QKRAcGCa5W5/Wr2x9CIll8lf39S9KqIGvW/xWuVZo3vyV6dng/bZKWA==
-X-Received: by 2002:a25:b12:0:b0:dbc:ceab:3a2b with SMTP id 18-20020a250b12000000b00dbcceab3a2bmr3600559ybl.32.1702667555917;
-        Fri, 15 Dec 2023 11:12:35 -0800 (PST)
-Received: from ?IPV6:2600:1700:6cf8:1240:cff8:4904:6a61:98b6? ([2600:1700:6cf8:1240:cff8:4904:6a61:98b6])
-        by smtp.gmail.com with ESMTPSA id 18-20020a250b12000000b00dbccef3a8fcsm2173069ybl.28.2023.12.15.11.12.34
+        bh=F4jZOOTED3fISjUmCLVaEsjs7SardkFmYTmlGlijSa0=;
+        b=dZkz4Bdn8JhUaDKn/IMToV9lz4H2kxITf93jUUgeQ2jtGOah/uv7+R+5m5dIIyKYRA
+         WJiKVlwCEzCqLHalQA/i5MIq3zNiy8U5KGEq7IYnv0z72o4McWnEzmfOepZyKAnLazbn
+         IY2gXE5P36vxCL1rGVBWhUWPxqGb6/wgvqxhgay4tRQ9JwB1OwGH6Vsy4v+cmVili4nu
+         9GqfuP9pF9quXXd/Dv60SxB2A/vwplIvNq/wurzXm6JCOikA0y88RDCPu4+zRq9i60p9
+         awU0wDGKkSBEC/I/r1f6joniQcs3EqBYHMcmeB3iYV1CwjtVHIALHnWDLBDcfGyqg7k4
+         c5Og==
+X-Gm-Message-State: AOJu0Yy7leEiHSiVYsAF8XmXq+LyDVW9WrEsj76yYyou82rk09gegIJ4
+	iUH1IAoQ/KOSXgiGMYVL4pmTdyksne0aZn+1hfUs9RUm
+X-Google-Smtp-Source: AGHT+IFwtLz69CSqHdIxrqxrSe9O9BZk7/jWfnP8QwAk3c1yRXyDz4pDTI38mgq0cf1WeiS0u0BMcA==
+X-Received: by 2002:a05:6358:2c93:b0:170:c41c:8107 with SMTP id l19-20020a0563582c9300b00170c41c8107mr13205580rwm.6.1702667627528;
+        Fri, 15 Dec 2023 11:13:47 -0800 (PST)
+Received: from ?IPV6:2a03:83e0:1256:2:c51:2090:e106:83fa? ([2620:10d:c090:500::5:b356])
+        by smtp.gmail.com with ESMTPSA id du6-20020a056a002b4600b006cde7dd80cbsm13868657pfb.191.2023.12.15.11.13.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Dec 2023 11:12:35 -0800 (PST)
-Message-ID: <185a3177-3281-4ead-838e-6d621151ea36@gmail.com>
-Date: Fri, 15 Dec 2023 11:12:33 -0800
+        Fri, 15 Dec 2023 11:13:47 -0800 (PST)
+Message-ID: <1cbbc046-3b41-4518-95f3-9a4d2315ff92@davidwei.uk>
+Date: Fri, 15 Dec 2023 11:13:45 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,328 +66,271 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 1/2] net/ipv6: insert a f6i to a GC list only
- if the f6i is in a fib6_table tree.
-Content-Language: en-US
-To: David Ahern <dsahern@kernel.org>, thinker.li@gmail.com,
- netdev@vger.kernel.org, martin.lau@linux.dev, kernel-team@meta.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
-Cc: kuifeng@meta.com, syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com
-References: <20231213213735.434249-1-thinker.li@gmail.com>
- <20231213213735.434249-2-thinker.li@gmail.com>
- <28f016bc-3514-444f-82df-719aeb2d013a@kernel.org>
-From: Kui-Feng Lee <sinquersw@gmail.com>
-In-Reply-To: <28f016bc-3514-444f-82df-719aeb2d013a@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH net-next v3 1/4] netdevsim: allow two netdevsim ports to
+ be connected
+Content-Language: en-GB
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+References: <20231214212443.3638210-1-dw@davidwei.uk>
+ <20231214212443.3638210-2-dw@davidwei.uk> <ZXw0dWbPKs1e_2eJ@nanopsycho>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <ZXw0dWbPKs1e_2eJ@nanopsycho>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-
-
-On 12/13/23 22:11, David Ahern wrote:
-> On 12/13/23 2:37 PM, thinker.li@gmail.com wrote:
->> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
->> index b132feae3393..dcaeb88d73aa 100644
->> --- a/net/ipv6/route.c
->> +++ b/net/ipv6/route.c
->> @@ -3763,10 +3763,10 @@ static struct fib6_info *ip6_route_info_create(struct fib6_config *cfg,
->>   		rt->dst_nocount = true;
->>   
->>   	if (cfg->fc_flags & RTF_EXPIRES)
->> -		fib6_set_expires_locked(rt, jiffies +
->> -					clock_t_to_jiffies(cfg->fc_expires));
->> +		__fib6_set_expires(rt, jiffies +
->> +				   clock_t_to_jiffies(cfg->fc_expires));
->>   	else
->> -		fib6_clean_expires_locked(rt);
->> +		__fib6_clean_expires(rt);
+On 2023-12-15 03:11, Jiri Pirko wrote:
+> Thu, Dec 14, 2023 at 10:24:40PM CET, dw@davidwei.uk wrote:
+>> Add a debugfs file in
+>> /sys/kernel/debug/netdevsim/netdevsimN/ports/A/peer
+>>
+>> Writing "M B" to this file will link port A of netdevsim N with port B of
+>> netdevsim M.
+>>
+>> Reading this file will return the linked netdevsim id and port, if any.
+>>
+>> Signed-off-by: David Wei <dw@davidwei.uk>
+>> ---
+>> drivers/net/netdevsim/bus.c       | 17 ++++++
+>> drivers/net/netdevsim/dev.c       | 88 +++++++++++++++++++++++++++++++
+>> drivers/net/netdevsim/netdev.c    |  6 +++
+>> drivers/net/netdevsim/netdevsim.h |  3 ++
+>> 4 files changed, 114 insertions(+)
+>>
+>> diff --git a/drivers/net/netdevsim/bus.c b/drivers/net/netdevsim/bus.c
+>> index bcbc1e19edde..1ef95661a3f5 100644
+>> --- a/drivers/net/netdevsim/bus.c
+>> +++ b/drivers/net/netdevsim/bus.c
+>> @@ -323,6 +323,23 @@ static struct device_driver nsim_driver = {
+>> 	.owner		= THIS_MODULE,
+>> };
+>>
+>> +struct nsim_bus_dev *nsim_bus_dev_get(unsigned int id)
 > 
-> as Eric noted in a past comment, the clean is not needed in this
-> function since memory is initialized to 0 (expires is never set).
+> This sounds definitelly incorrect. You should not need to touch bus.c
+> code. It arranges the bus and devices on it. The fact that a device is
+> probed or not is parallel to this.
 > 
-> Also, this patch set does not fundamentally change the logic, so it
-> cannot fix the bug reported in
+> I think you need to maintain a separate list/xarray of netdevsim devices
+> probed by nsim_drv_probe()
+
+There is a 1:1 relationship between bus devices (nsim_bus_dev) and nsim devices
+(nsim_dev). Adding a separate list for nsim devices seemed redundant to me when
+there is already a list for bus devices.
+
 > 
-> https://lore.kernel.org/all/20231205173250.2982846-1-edumazet@google.com/
 > 
-> please hold off future versions of this set until the problem in that
-> stack traced is fixed. I have tried a few things using RA's, but have
-> not been able to recreate UAF.
+>> +{
+>> +	struct nsim_bus_dev *nsim_bus_dev;
+>> +
+>> +	mutex_lock(&nsim_bus_dev_list_lock);
+>> +	list_for_each_entry(nsim_bus_dev, &nsim_bus_dev_list, list) {
+>> +		if (nsim_bus_dev->dev.id == id) {
+>> +			get_device(&nsim_bus_dev->dev);
+>> +			mutex_unlock(&nsim_bus_dev_list_lock);
+>> +			return nsim_bus_dev;
+>> +		}
+>> +	}
+>> +	mutex_unlock(&nsim_bus_dev_list_lock);
+>> +
+>> +	return NULL;
+>> +}
+>> +
+>> int nsim_bus_init(void)
+>> {
+>> 	int err;
+>> diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
+>> index b4d3b9cde8bd..034145ba1861 100644
+>> --- a/drivers/net/netdevsim/dev.c
+>> +++ b/drivers/net/netdevsim/dev.c
+>> @@ -388,6 +388,91 @@ static const struct file_operations nsim_dev_rate_parent_fops = {
+>> 	.owner = THIS_MODULE,
+>> };
+>>
+>> +static ssize_t nsim_dev_peer_read(struct file *file, char __user *data,
+>> +				  size_t count, loff_t *ppos)
+>> +{
+>> +	struct nsim_dev_port *nsim_dev_port;
+>> +	struct netdevsim *peer;
+>> +	unsigned int id, port;
+>> +	char buf[23];
+>> +	ssize_t len;
+>> +
+>> +	nsim_dev_port = file->private_data;
+>> +	rcu_read_lock();
+>> +	peer = rcu_dereference(nsim_dev_port->ns->peer);
+>> +	if (!peer) {
+>> +		rcu_read_unlock();
+>> +		return 0;
+>> +	}
+>> +
+>> +	id = peer->nsim_bus_dev->dev.id;
+>> +	port = peer->nsim_dev_port->port_index;
+>> +	len = scnprintf(buf, sizeof(buf), "%u %u\n", id, port);
+>> +
+>> +	rcu_read_unlock();
+>> +	return simple_read_from_buffer(data, count, ppos, buf, len);
+>> +}
+>> +
+>> +static ssize_t nsim_dev_peer_write(struct file *file,
+>> +				   const char __user *data,
+>> +				   size_t count, loff_t *ppos)
+>> +{
+>> +	struct nsim_dev_port *nsim_dev_port, *peer_dev_port;
+>> +	struct nsim_bus_dev *peer_bus_dev;
+>> +	struct nsim_dev *peer_dev;
+>> +	unsigned int id, port;
+>> +	char buf[22];
+>> +	ssize_t ret;
+>> +
+>> +	if (count >= sizeof(buf))
+>> +		return -ENOSPC;
+>> +
+>> +	ret = copy_from_user(buf, data, count);
+>> +	if (ret)
+>> +		return -EFAULT;
+>> +	buf[count] = '\0';
+>> +
+>> +	ret = sscanf(buf, "%u %u", &id, &port);
+>> +	if (ret != 2) {
+>> +		pr_err("Format for adding a peer is \"id port\" (uint uint)");
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	/* invalid netdevsim id */
+>> +	peer_bus_dev = nsim_bus_dev_get(id);
+>> +	if (!peer_bus_dev)
+>> +		return -EINVAL;
+>> +
+>> +	ret = -EINVAL;
+>> +	/* cannot link to self */
+>> +	nsim_dev_port = file->private_data;
+>> +	if (nsim_dev_port->ns->nsim_bus_dev == peer_bus_dev &&
+>> +	    nsim_dev_port->port_index == port)
+>> +		goto out;
+>> +
+>> +	peer_dev = dev_get_drvdata(&peer_bus_dev->dev);
+> 
+> Again, no bus touching should be needed. (btw, this could be null is dev
+> is not probed)
 
-I tried to reproduce the issue yesterday, according to the hypothesis
-behind the patch of this thread. The following is the instructions
-to reproduce the UAF issue. However, this instruction doesn't create
-a crash at the place since the memory is still available even it has
-been free. But, the log shows a UAF.
+That's fair, I can do a null check.
 
-The patch at the end of this message is required to reproduce and
-show UAF. The most critical change in the patch is to insert
-a 'mdelay(3000)' to sleep 3s in rt6_route_rcv(). That gives us
-a chance to manipulate the kernel to reproduce the UAF.
+> 
+> 
+>> +	list_for_each_entry(peer_dev_port, &peer_dev->port_list, list) {
+>> +		if (peer_dev_port->port_index != port)
+>> +			continue;
+>> +		rcu_assign_pointer(nsim_dev_port->ns->peer, peer_dev_port->ns);
+>> +		rcu_assign_pointer(peer_dev_port->ns->peer, nsim_dev_port->ns);
+> 
+> What is stopping another cpu from setting different peer for the same
+> port here, making a mess?
 
-Here is my conclusion. There is no protection between finding
-a route and changing the route in rt6_route_rcv(), including inserting
-the entry to the gc list. It is possible to insert an entry that will be
-free later to the gc list, causing a UAF. There is more explanations
-along with the following logs.
+Looking into RCU a bit more, you're right that it does not protect from
+multiple writers. Would adding a lock (spinlock?) to nsim_dev and taking that
+be sufficient here?
 
-Instructions:
-      - Preparation
-        - install ipv6toolkit on the host.
-        - run qemu with a patched kernel as a guest through
-          with the host through qemubr0 a bridge.
-        - On the guest
-          - stop systemd-networkd.service & systemd-networkd.socket if 
-there are.
-          - sysctl -w net.ipv6.conf.enp0s3.accept_ra=2
-          - sysctl -w net.ipv6.conf.enp0s3.accept_ra_rt_info_max_plen=127
-        - Assume the address of qemubr0 in the host is
-          fe80::4ce9:92ff:fe27:75df.
-      - Test
-        - ra6 -i qemubr0 -d ff02::1 -R 'fe82::/64#1#300' -t 300 # On the 
-host
-        - sleep 2; ip -6 route del fe82::/64                    # On the 
-guest
-        - ra6 -i qemubr0 -d ff02::1 -R 'fe82::/64#1#300' -t 300 # On the 
-host
-        - ra6 -i qemubr0 -d ff02::1 -R 'fe81::/64#1#300' -t 0   # On the 
-host
-      - The step 3 should start immediately after step 2 since we have
-        a gap of merely 3 seconds in the kernel.
+Or what if I took rtnl_lock()?
 
+> 
+> 
+>> +		ret = count;
+>> +		goto out;
+>> +	}
+>> +
+>> +out:
+>> +	put_device(&peer_bus_dev->dev);
+>> +	return ret;
+>> +}
+>> +
+>> +static const struct file_operations nsim_dev_peer_fops = {
+>> +	.open = simple_open,
+>> +	.read = nsim_dev_peer_read,
+>> +	.write = nsim_dev_peer_write,
+>> +	.llseek = generic_file_llseek,
+>> +	.owner = THIS_MODULE,
+>> +};
+>> +
+>> static int nsim_dev_port_debugfs_init(struct nsim_dev *nsim_dev,
+>> 				      struct nsim_dev_port *nsim_dev_port)
+>> {
+>> @@ -418,6 +503,9 @@ static int nsim_dev_port_debugfs_init(struct nsim_dev *nsim_dev,
+>> 	}
+>> 	debugfs_create_symlink("dev", nsim_dev_port->ddir, dev_link_name);
+>>
+>> +	debugfs_create_file("peer", 0600, nsim_dev_port->ddir,
+>> +			    nsim_dev_port, &nsim_dev_peer_fops);
+>> +
+>> 	return 0;
+>> }
+>>
+>> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+>> index aecaf5f44374..e290c54b0e70 100644
+>> --- a/drivers/net/netdevsim/netdev.c
+>> +++ b/drivers/net/netdevsim/netdev.c
+>> @@ -388,6 +388,7 @@ nsim_create(struct nsim_dev *nsim_dev, struct nsim_dev_port *nsim_dev_port)
+>> 	ns->nsim_dev = nsim_dev;
+>> 	ns->nsim_dev_port = nsim_dev_port;
+>> 	ns->nsim_bus_dev = nsim_dev->nsim_bus_dev;
+>> +	RCU_INIT_POINTER(ns->peer, NULL);
+>> 	SET_NETDEV_DEV(dev, &ns->nsim_bus_dev->dev);
+>> 	SET_NETDEV_DEVLINK_PORT(dev, &nsim_dev_port->devlink_port);
+>> 	nsim_ethtool_init(ns);
+>> @@ -407,9 +408,14 @@ nsim_create(struct nsim_dev *nsim_dev, struct nsim_dev_port *nsim_dev_port)
+>> void nsim_destroy(struct netdevsim *ns)
+>> {
+>> 	struct net_device *dev = ns->netdev;
+>> +	struct netdevsim *peer;
+>>
+>> 	rtnl_lock();
+>> +	peer = rtnl_dereference(ns->peer);
+>> +	RCU_INIT_POINTER(ns->peer, NULL);
+>> 	unregister_netdevice(dev);
+>> +	if (peer)
+>> +		RCU_INIT_POINTER(peer->peer, NULL);
+> 
+> What is stopping the another CPU from setting this back to this "ns"?
+> Or what is stopping another netdevsim port from setting this ns while
+> going away?
+> 
+> Do you rely on RTNL_LOCK in any way (other then synchronize_net() in
+> unlock())? If yes, looks wrong.
+> 
+> This ns->peer update locking looks very broken to me :/
 
-The log generated by the test:
+As above, would a spinlock on nsim_dev or taking rtnl_lock() in
+nsim_dev_peer_write() resolve this?
 
-# this is the log triggered by step 1
-
-qemu login: [    4.673867] __ip6_ins_rt fe80::5054:ff:fe12:3456/128
-[   82.138139] rt = 0000000000000000
-[   82.138731] fib6_info_alloc: ffff888103950200
-[   82.139088] __ip6_ins_rt ::/0
-[   82.139993] fib6_add: add ffff888103950200 to gc list 
-ffff888103950238 pprev ffff888102878200 next 0000000000000000
-[   82.141719] rt = ffff888103950200
-[   82.141748] rt6_route_rcv
-[   82.141748] fib6_info_alloc: ffff88810093be00
-[   82.141748] __ip6_ins_rt fe82::/64
-[   82.141748] rt6_route_rcv: route info ffff88810093be00, sleep 3s
-[   85.121803] fib6_set_expires_locked: add ffff88810093be00 to gc list 
-ffff88810093be38 pprev ffff888102878200 next ffff888103950238
-[   85.146497] rt6_route_rcv: route info ffff88810093be00, after release
-
-
-# This is the log triggered by step 2 & 3.
-#
-# The line containing fib6_clean_expires_locked is specifically
-# triggered by step 2. Step 2 removes the entry from the tree and
-# gc list. Step 3 free the entry by calling
-# fib6_info_release() at the very end of rt6_route_rcv() since it is
-# the last owner of that entry. fib6_info_destroy_rcu proves that.
-#
-# However, even the entry will be free later, rt6_route_rcv() still add
-# the entry back to the gc list before freeing the entry. In other
-# words, it create an entry (ffff88810093be38) that is free in
-# a gc list.
-#
-# Keep an eye on ffff88810093be38 and ffff88810093be00. ffff88810093be00
-# is the address of a fib6_info and ffff88810093be38 is the address of
-# its gc_link.
-#
-# This log also complies with the log in
-#
-#  https://lore.kernel.org/all/20231205173250.2982846-1-edumazet@google.com/
-#
-# The entry is free by the call of fib6_info_release() in
-# rt6_route_rcv().
-
-[  105.158140] rt = ffff888103950200
-[  105.158590] rt6_route_rcv
-[  105.158924] rt6_route_rcv: route info ffff88810093be00, sleep 3s
-[  106.368875] fib6_clean_expires_locked: del ffff88810093be00 from gc 
-list pprev ffff888102878200 next ffff888103950238
-[  107.201815] fib6_set_expires_locked: add ffff88810093be00 to gc list 
-ffff88810093be38 pprev ffff888102878200 next ffff888103950238
-[  108.159815] rt6_route_rcv: route info ffff88810093be00, after release
-[  108.168807] fib6_info_destroy_rcu ffff88810093be00
-
-
-# This is the log triggered by step 4.
-# The line containing fib6_clean_expires_locked shows the free entry
-# mentioned in the previous part is still in the gc list. (pprev
-# ffff88810093be38)
-# Since fib6_clean_expires_locked() calls hlist_del_init() to remove
-# an entry from the gc list, it will change the value of *pprev
-# (ffff88810093be38). It causes an UAF case.
-
-[  131.882130] rt = ffff888103950200
-[  131.882567] __ip6_del_rt ::/0
-[  131.882932] fib6_clean_expires_locked: del ffff888103950200 from gc 
-list pprev ffff88810093be38 next 0000000000000000
-[  131.883296] rt6_route_rcv
-[  131.883296] fib6_info_alloc: ffff88810093be00
-[  131.884517] __ip6_ins_rt fe81::/64
-[  131.884517] rt6_route_rcv: route info ffff88810093be00, sleep 3s
-[  134.305866] fib6_set_expires_locked: add ffff88810093be00 to gc list 
-ffff88810093be38 pprev ffff888102878200 next ffff88810093be38
-[  134.537866] rt6_route_rcv: route info ffff88810093be00, after release
-[  134.896801] fib6_info_destroy_rcu ffff888103950200
-
-
-# The following log is the kernel errors that printed after 10s seconds.
-
-[  168.321812] watchdog: BUG: soft lockup - CPU#3 stuck for 26s! 
-[swapper/3:0]
-[  196.289823] watchdog: BUG: soft lockup - CPU#3 stuck for 52s! 
-[swapper/3:0]
-[  214.244784] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-[  214.245723] rcu:     3-....: (7 ticks this GP) idle=198c/0/0x1 
-softirq=2002/2003 fqs=12309
-[  214.245774] rcu:     (detected by 2, t=60002 jiffies, g=1213, q=282 
-ncpus=4)
-[  240.321823] watchdog: BUG: soft lockup - CPU#3 stuck for 93s! 
-[swapper/3:0]
-[  268.353804] watchdog: BUG: soft lockup - CPU#3 stuck for 119s! 
-[swapper/3:0]
-[  296.388805] watchdog: BUG: soft lockup - CPU#3 stuck for 146s! 
-[swapper/3:0]
-
-
-
-
-
-diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
-index 1ba9f4ddf2f6..6e059ba3d2d0 100644
---- a/include/net/ip6_fib.h
-+++ b/include/net/ip6_fib.h
-@@ -510,8 +510,11 @@ static inline void fib6_set_expires_locked(struct 
-fib6_info *f6i,
-
-  	tb6 = f6i->fib6_table;
-  	f6i->expires = expires;
--	if (tb6 && !fib6_has_expires(f6i))
-+	if (tb6 && !fib6_has_expires(f6i)) {
-  		hlist_add_head(&f6i->gc_link, &tb6->tb6_gc_hlist);
-+		printk(KERN_CRIT "fib6_set_expires_locked: add %px to gc list %px 
-pprev %px next %px\n",
-+		       f6i, &f6i->gc_link, f6i->gc_link.pprev, f6i->gc_link.next);
-+	}
-  	f6i->fib6_flags |= RTF_EXPIRES;
-  }
-
-@@ -529,8 +532,11 @@ static inline void fib6_set_expires(struct 
-fib6_info *f6i,
-
-  static inline void fib6_clean_expires_locked(struct fib6_info *f6i)
-  {
--	if (fib6_has_expires(f6i))
-+	if (fib6_has_expires(f6i)) {
-+		printk(KERN_CRIT "fib6_clean_expires_locked: del %px from gc list 
-pprev %px next %px\n",
-+		       f6i, f6i->gc_link.pprev, f6i->gc_link.next);
-  		hlist_del_init(&f6i->gc_link);
-+	}
-  	f6i->fib6_flags &= ~RTF_EXPIRES;
-  	f6i->expires = 0;
-  }
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index 28b01a068412..b275b9798b5e 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -162,6 +162,8 @@ struct fib6_info *fib6_info_alloc(gfp_t gfp_flags, 
-bool with_fib6_nh)
-
-  	INIT_HLIST_NODE(&f6i->gc_link);
-
-+	printk(KERN_CRIT "fib6_info_alloc: %px\n", f6i);
-+
-  	return f6i;
-  }
-
-@@ -178,6 +180,7 @@ void fib6_info_destroy_rcu(struct rcu_head *head)
-
-  	ip_fib_metrics_put(f6i->fib6_metrics);
-  	kfree(f6i);
-+	printk(KERN_CRIT "fib6_info_destroy_rcu %px\n", f6i);
-  }
-  EXPORT_SYMBOL_GPL(fib6_info_destroy_rcu);
-
-@@ -1486,8 +1489,10 @@ int fib6_add(struct fib6_node *root, struct 
-fib6_info *rt,
-  			list_add(&rt->nh_list, &rt->nh->f6i_list);
-  		__fib6_update_sernum_upto_root(rt, fib6_new_sernum(info->nl_net));
-
--		if (fib6_has_expires(rt))
-+		if (fib6_has_expires(rt)) {
-  			hlist_add_head(&rt->gc_link, &table->tb6_gc_hlist);
-+			printk(KERN_CRIT "fib6_add: add %px to gc list %px pprev %px next 
-%px\n", rt, &rt->gc_link, rt->gc_link.pprev, rt->gc_link.next);
-+		}
-
-  		fib6_start_gc(info->nl_net, rt);
-  	}
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index b132feae3393..52283a80f79e 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -935,6 +935,8 @@ int rt6_route_rcv(struct net_device *dev, u8 *opt, 
-int len,
-  	unsigned long lifetime;
-  	struct fib6_info *rt;
-
-+	printk(KERN_CRIT "rt6_route_rcv\n");
-+
-  	if (len < sizeof(struct route_info)) {
-  		return -EINVAL;
-  	}
-@@ -989,12 +991,15 @@ int rt6_route_rcv(struct net_device *dev, u8 *opt, 
-int len,
-  				 (rt->fib6_flags & ~RTF_PREF_MASK) | RTF_PREF(pref);
-
-  	if (rt) {
-+		printk(KERN_CRIT "rt6_route_rcv: route info %px, sleep 3s\n", rt);
-+		mdelay(3000);
-  		if (!addrconf_finite_timeout(lifetime))
-  			fib6_clean_expires(rt);
-  		else
-  			fib6_set_expires(rt, jiffies + HZ * lifetime);
-
-  		fib6_info_release(rt);
-+		printk(KERN_CRIT "rt6_route_rcv: route info %px, after release\n", rt);
-  	}
-  	return 0;
-  }
-@@ -1297,6 +1302,9 @@ static int __ip6_ins_rt(struct fib6_info *rt, 
-struct nl_info *info,
-  {
-  	int err;
-  	struct fib6_table *table;
-+	if (rt)
-+		printk(KERN_CRIT "__ip6_ins_rt %pI6c/%d\n",
-+		       &rt->fib6_dst.addr, rt->fib6_dst.plen);
-
-  	table = rt->fib6_table;
-  	spin_lock_bh(&table->tb6_lock);
-@@ -3855,6 +3863,9 @@ static int __ip6_del_rt(struct fib6_info *rt, 
-struct nl_info *info)
-  	struct net *net = info->nl_net;
-  	struct fib6_table *table;
-  	int err;
-+	if (rt)
-+		printk(KERN_CRIT "__ip6_del_rt %pI6c/%d\n",
-+		       &rt->fib6_dst.addr, rt->fib6_dst.plen);
-
-  	if (rt == net->ipv6.fib6_null_entry) {
-  		err = -ENOENT;
-@@ -4345,8 +4356,10 @@ struct fib6_info *rt6_get_dflt_router(struct net 
-*net,
-  		    ipv6_addr_equal(&nh->fib_nh_gw6, addr))
-  			break;
-  	}
--	if (rt && !fib6_info_hold_safe(rt))
-+	if (rt && !fib6_info_hold_safe(rt)) {
-  		rt = NULL;
-+	}
-+	printk(KERN_CRIT "rt = %px\n", rt);
-  	rcu_read_unlock();
-  	return rt;
-  }
+> 
+> 
+> 
+> 
+>> 	if (nsim_dev_port_is_pf(ns->nsim_dev_port)) {
+>> 		nsim_macsec_teardown(ns);
+>> 		nsim_ipsec_teardown(ns);
+>> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+>> index 028c825b86db..61ac3a80cf9a 100644
+>> --- a/drivers/net/netdevsim/netdevsim.h
+>> +++ b/drivers/net/netdevsim/netdevsim.h
+>> @@ -125,6 +125,7 @@ struct netdevsim {
+>> 	} udp_ports;
+>>
+>> 	struct nsim_ethtool ethtool;
+>> +	struct netdevsim __rcu *peer;
+>> };
+>>
+>> struct netdevsim *
+>> @@ -415,5 +416,7 @@ struct nsim_bus_dev {
+>> 	bool init;
+>> };
+>>
+>> +struct nsim_bus_dev *nsim_bus_dev_get(unsigned int id);
+>> +
+>> int nsim_bus_init(void);
+>> void nsim_bus_exit(void);
+>> -- 
+>> 2.39.3
+>>
 
