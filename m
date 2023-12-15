@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-57881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C40D81466D
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 12:10:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83E6D81466E
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 12:10:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18E0A283DAC
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:10:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FCAE2841C2
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:10:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F891CF95;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06FC81F61E;
 	Fri, 15 Dec 2023 11:10:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AEWtrFNz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OB5nUvOc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E113D1C2BD
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E110E1C2A8
 	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 11:10:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 534DBC433CB;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6D8A9C433C9;
 	Fri, 15 Dec 2023 11:10:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1702638633;
-	bh=ZeanRKAlfinpnCC8LF7reMt1A542iCyBgUV4PbcvM8Y=;
+	bh=uwWZxjzciMiG/CWr8h6enu8Us9pxlvmGkYzop+va1is=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AEWtrFNzYYTFfW55uyCwp2G0rnUduVLuzZPmbdF0iFloDBfucEbkXCL8Y6wnymty4
-	 CJsheTdEfmDEMksV/lYuGxnHdvh4jYmPKiEJrpbuqCZRhr3CNmGmI0DXFfU1qVEUl7
-	 Zey0+08S6TJzv+LcatYv8uu6b8DUEXYbn+ejLoyhqBJFwID83DB1+H5Uo3rczOBru0
-	 ldVXPLIShjD3grFOtzHimtph/dMkUfziwHR1X6B6yLmCoWeIwu2g0rSkQn4GEqVHXm
-	 bnWL1ga3EXeMwB4bO/ydL5FWwu6DSGGSh5GE7ULoRxHb/NarG1/Q3mNV2JZdltQJcp
-	 7GAQTHxSLGf2w==
+	b=OB5nUvOcp5AGgQuhe9UBZKrkauGyvwKzef3M7u1/ylxtqX+uftUA2YAboiqp0ZWUl
+	 Gkta3Ibv7d7QrJIBF7MZ6/Y1sNBXNqxfxj6mp7IP8xJ4w4AVsgxJKQjdYanOs/7KwI
+	 pgqGEx3+Iajl6W1N9mx8nz8dCPoFsc+xGWcI7xFsBB5kRUbt1TPiNC9kt/ST652fh4
+	 qYhgkc4+hJKLuWr+oaJk1igi94QsV1Z7KxWMNn7yyWDs3q5samiYJw+Tire2pc3cWX
+	 mK96XJF/qBMMDGEgRDsHPLQyHP6Q+VSYkyit1A+8lDl4ESigCsHqRzh70bEGYrnO5W
+	 U0adhZhn5DiLg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3A93EDD4EF5;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 53EC3DD4EFD;
 	Fri, 15 Dec 2023 11:10:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,53 +43,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 net-next 0/8] net: dsa: mv88e6xxx: Add "eth-mac" and "rmon"
- counter group support
+Subject: Re: [PATCH net-next 0/3] net: optmem_max changes
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170263863323.21335.9582784901328470443.git-patchwork-notify@kernel.org>
+ <170263863333.21335.15984199287730287738.git-patchwork-notify@kernel.org>
 Date: Fri, 15 Dec 2023 11:10:33 +0000
-References: <20231214135029.383595-1-tobias@waldekranz.com>
-In-Reply-To: <20231214135029.383595-1-tobias@waldekranz.com>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
- f.fainelli@gmail.com, olteanv@gmail.com, netdev@vger.kernel.org
+References: <20231214104901.1318423-1-edumazet@google.com>
+In-Reply-To: <20231214104901.1318423-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ ncardwell@google.com, willemb@google.com, almasrymina@google.com,
+ wwchao@google.com, asml.silence@gmail.com, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu, 14 Dec 2023 14:50:21 +0100 you wrote:
-> The majority of the changes (2/8) are about refactoring the existing
-> ethtool statistics support to make it possible to read individual
-> counters, rather than the whole set.
+On Thu, 14 Dec 2023 10:48:58 +0000 you wrote:
+> optmem_max default value is too small for tx zerocopy workloads.
 > 
-> 4/8 tries to collect all information about a stat in a single place
-> using a mapper macro, which is then used to generate the original list
-> of stats, along with a matching enum. checkpatch is less than amused
-> with this construct, but prior art exists (__BPF_FUNC_MAPPER in
-> include/uapi/linux/bpf.h, for example).
+> First patch increases default from 20KB to 128 KB,
+> which is the value we have used for seven years.
+> 
+> Second patch makes optmem_max sysctl per netns.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v4,net-next,1/8] net: dsa: mv88e6xxx: Push locking into stats snapshotting
-    https://git.kernel.org/netdev/net-next/c/d624afaf4c79
-  - [v4,net-next,2/8] net: dsa: mv88e6xxx: Create API to read a single stat counter
-    https://git.kernel.org/netdev/net-next/c/3def80e52db3
-  - [v4,net-next,3/8] net: dsa: mv88e6xxx: Fix mv88e6352_serdes_get_stats error path
-    https://git.kernel.org/netdev/net-next/c/fc82a08ae795
-  - [v4,net-next,4/8] net: dsa: mv88e6xxx: Give each hw stat an ID
-    https://git.kernel.org/netdev/net-next/c/5780acbd2499
-  - [v4,net-next,5/8] net: dsa: mv88e6xxx: Add "eth-mac" counter group support
-    https://git.kernel.org/netdev/net-next/c/0e047cec7796
-  - [v4,net-next,6/8] net: dsa: mv88e6xxx: Limit histogram counters to ingress traffic
-    https://git.kernel.org/netdev/net-next/c/ceea48efa358
-  - [v4,net-next,7/8] net: dsa: mv88e6xxx: Add "rmon" counter group support
-    https://git.kernel.org/netdev/net-next/c/394518e3c119
-  - [v4,net-next,8/8] selftests: forwarding: ethtool_rmon: Add histogram counter test
-    https://git.kernel.org/netdev/net-next/c/00e7f29d9b89
+  - [net-next,1/3] net: increase optmem_max default value
+    https://git.kernel.org/netdev/net-next/c/4944566706b2
+  - [net-next,2/3] net: Namespace-ify sysctl_optmem_max
+    https://git.kernel.org/netdev/net-next/c/f5769faeec36
+  - [net-next,3/3] selftests/net: optmem_max became per netns
+    https://git.kernel.org/netdev/net-next/c/18872ba8cd24
 
 You are awesome, thank you!
 -- 
