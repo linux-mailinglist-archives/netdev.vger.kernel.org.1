@@ -1,139 +1,171 @@
-Return-Path: <netdev+bounces-57891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2A1F8146BE
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 12:22:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F995814630
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 12:07:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10D1E1C23032
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:22:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CF351C2257A
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:07:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D36D250E4;
-	Fri, 15 Dec 2023 11:22:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFCB31C2BD;
+	Fri, 15 Dec 2023 11:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d9l314U9"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427D2249F2;
-	Fri, 15 Dec 2023 11:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Ss5tj611Rz1fyXw;
-	Fri, 15 Dec 2023 19:03:41 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id DB759140113;
-	Fri, 15 Dec 2023 19:04:50 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 15 Dec
- 2023 19:04:49 +0800
-Subject: Re: [RFC PATCH net-next v1 4/4] net: page_pool: use netmem_t instead
- of struct page in API
-To: Shakeel Butt <shakeelb@google.com>, Mina Almasry <almasrymina@google.com>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<bpf@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
-	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, "H. Peter Anvin"
-	<hpa@zytor.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J.
- Wysocki" <rafael@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
-	=?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>, Michael Chan
-	<michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, Wei Fang <wei.fang@nxp.com>, Shenwei
- Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, NXP Linux
- Team <linux-imx@nxp.com>, Jeroen de Borst <jeroendb@google.com>, Praveen
- Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>,
-	Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, Thomas Petazzoni
-	<thomas.petazzoni@bootlin.com>, Marcin Wojtas <mw@semihalf.com>, Russell King
-	<linux@armlinux.org.uk>, Sunil Goutham <sgoutham@marvell.com>, Geetha
- sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
-	hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, John Crispin
-	<john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>, Mark Lee
-	<Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Matthias
- Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
-	<angelogioacchino.delregno@collabora.com>, Saeed Mahameed
-	<saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>, <UNGLinuxDriver@microchip.com>, "K. Y.
- Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei
- Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Jassi Brar
-	<jaswinder.singh@linaro.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
-	<joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>, Ravi Gunasekaran
-	<r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>, Jiawen Wu
-	<jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, Ronak
- Doshi <doshir@vmware.com>, VMware PV-Drivers Reviewers
-	<pv-drivers@vmware.com>, Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen
-	<shayne.chen@mediatek.com>, Kalle Valo <kvalo@kernel.org>, Juergen Gross
-	<jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Oleksandr
- Tyshchenko <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko
-	<andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
-	<song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh
-	<kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
-	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Stefan Hajnoczi
-	<stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan
-	<shuah@kernel.org>, =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>,
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
-	<ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
-	<justinstitt@google.com>, Jason Gunthorpe <jgg@nvidia.com>, Willem de Bruijn
-	<willemdebruijn.kernel@gmail.com>
-References: <20231214020530.2267499-1-almasrymina@google.com>
- <20231214020530.2267499-5-almasrymina@google.com>
- <ddffff98-f3de-6a5d-eb26-636dacefe9aa@huawei.com>
- <CAHS8izO2nDHuxKau8iLcAmnho-1TYkzW09MBZ80+JzOo9YyVFA@mail.gmail.com>
- <20231215021114.ipvdx2bwtxckrfdg@google.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <793eb1bd-29bd-3c66-4ed2-9297879dbaa0@huawei.com>
-Date: Fri, 15 Dec 2023 19:04:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248AB1C28F
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 11:07:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702638421;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+SBrpdDFNUNV9rPT9NLwnq0LGAxyDiW4IAOIo/k6GdI=;
+	b=d9l314U9R3CIClmwWSBpsbeIW3OA6+YWunDiJLeiHn/n2AR59D7080W+d50KyrK4yYRkSw
+	scKBOmz6l5LB9QzWTofH4G7xTECnBTX0Twc4TYCW0Zdk6rPqGi5Hcfk1oNlrDbhDiyX8/b
+	vf1aBbpYe7l1F0oD8+kTUtMbTAK17do=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-537-2qIOFF6xNhCoSsapn7XPLg-1; Fri, 15 Dec 2023 06:06:58 -0500
+X-MC-Unique: 2qIOFF6xNhCoSsapn7XPLg-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a1d3a7dbb81so12430266b.0
+        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 03:06:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702638417; x=1703243217;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+SBrpdDFNUNV9rPT9NLwnq0LGAxyDiW4IAOIo/k6GdI=;
+        b=FS8Zn2SbrbE8mDvDtgWSAj/fwija7a37zuBVc3hdoJchOHQX/yjcBLBWIMtBTaVuq4
+         id1hfn0Vq/v/CsiOJmQ8hIBsmDcvr/Y53NpHRxxleZsDOGFhjpstzvKPKHIFMliFg072
+         9sQVRDIMRz96ZUGNm23mOL9vuQq5ZEBuL47vWEjhLvwqyRoJY7L/qaHIt5cLHliJHdbk
+         8oIihXPc8T+D5Zz8s8dMPJGF2fuWbpzt65trp32E4GVay6vOMWHsJG3kivxH3GbXJupN
+         qWbbTlErAE0K0KfIQj2kgM7sj2QSnQ6k9Z+dpn10549IpoVowY0W1IPNzY+SnZzIZAlf
+         9rLw==
+X-Gm-Message-State: AOJu0Yykkhky/2GJ5/h29EjUlOPz5qz6NGyr/xYXN9AI2BW/8a5YFjsH
+	fr64Cyy8s7mGHcKa2yZg3DBLUkDkoAh5ZOgNk5B24YjJWL7I/aN76zFO7/xVZazMnPqZo3qwbSo
+	QE9YNLegtuCBGHcEW
+X-Received: by 2002:a17:907:c312:b0:a01:ae7b:d19b with SMTP id tl18-20020a170907c31200b00a01ae7bd19bmr13400113ejc.7.1702638416821;
+        Fri, 15 Dec 2023 03:06:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGqpkcw+CXAIe9OcjU9a+jALwDiPC7w1Lq9B7//FnjoXl2yypFOCqn4E0ZWOM64gx9WBsXmQw==
+X-Received: by 2002:a17:907:c312:b0:a01:ae7b:d19b with SMTP id tl18-20020a170907c31200b00a01ae7bd19bmr13400093ejc.7.1702638416441;
+        Fri, 15 Dec 2023 03:06:56 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-255-162.dyn.eolo.it. [146.241.255.162])
+        by smtp.gmail.com with ESMTPSA id st10-20020a170907c08a00b00a1cd0794696sm10590739ejc.53.2023.12.15.03.06.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Dec 2023 03:06:55 -0800 (PST)
+Message-ID: <7b0c2e0132b71b131fc9a5407abd27bc0be700ee.camel@redhat.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 0/5] iavf: Add devlink and
+ devlink rate support'
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, anthony.l.nguyen@intel.com, 
+ intel-wired-lan@lists.osuosl.org, qi.z.zhang@intel.com, Wenjun Wu
+ <wenjun1.wu@intel.com>, maxtram95@gmail.com, "Chittim, Madhu"
+ <madhu.chittim@intel.com>, "Samudrala, Sridhar"
+ <sridhar.samudrala@intel.com>,  Simon Horman <simon.horman@redhat.com>
+Date: Fri, 15 Dec 2023 12:06:52 +0100
+In-Reply-To: <20231214174604.1ca4c30d@kernel.org>
+References: <20230727021021.961119-1-wenjun1.wu@intel.com>
+	 <20230822034003.31628-1-wenjun1.wu@intel.com> <ZORRzEBcUDEjMniz@nanopsycho>
+	 <20230822081255.7a36fa4d@kernel.org> <ZOTVkXWCLY88YfjV@nanopsycho>
+	 <0893327b-1c84-7c25-d10c-1cc93595825a@intel.com>
+	 <ZOcBEt59zHW9qHhT@nanopsycho>
+	 <5aed9b87-28f8-f0b0-67c4-346e1d8f762c@intel.com>
+	 <bdb0137a-b735-41d9-9fea-38b238db0305@intel.com>
+	 <20231118084843.70c344d9@kernel.org>
+	 <3d60fabf-7edf-47a2-9b95-29b0d9b9e236@intel.com>
+	 <20231122192201.245a0797@kernel.org>
+	 <e662dca5-84e4-4f7b-bfa3-50bce30c697c@intel.com>
+	 <20231127174329.6dffea07@kernel.org>
+	 <55e51b97c29894ebe61184ab94f7e3d8486e083a.camel@redhat.com>
+	 <20231214174604.1ca4c30d@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231215021114.ipvdx2bwtxckrfdg@google.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemm500005.china.huawei.com (7.185.36.74)
 
-On 2023/12/15 10:11, Shakeel Butt wrote:
-> On Thu, Dec 14, 2023 at 08:27:55AM -0800, Mina Almasry wrote:
->> On Thu, Dec 14, 2023 at 4:05 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
->>>
-> [...]
->>> I perfer the second one personally, as devmem means that it is not
->>> readable from cpu.
->>
->> From my POV it has to be the first one. We want to abstract the memory
->> type from the drivers as much as possible, not introduce N new memory
->> types and ask the driver to implement new code for each of them
->> separately.
+On Thu, 2023-12-14 at 17:46 -0800, Jakub Kicinski wrote:
+> On Thu, 14 Dec 2023 21:29:51 +0100 Paolo Abeni wrote:
+> > Together with Simon, I spent some time on the above. We think the
+> > ndo_setup_tc(TC_SETUP_QDISC_TBF) hook could be used as common basis for
+> > this offloads, with some small extensions (adding a 'max_rate' param,
+> > too).
+>=20
+> uAPI aside, why would we use ndo_setup_tc(TC_SETUP_QDISC_TBF)
+> to implement common basis?
+>=20
+> Is it not cleaner to have a separate driver API, with its ops
+> and capabilities?
 
-That was my initial thinking too:
-https://www.spinics.net/lists/netdev/msg949376.html
+We understand one of the end goal is consolidating the existing rate-
+related in kernel interfaces.  Adding a new one does not feel a good
+starting to reach that goal, see [1] & [2] ;). ndo_setup_tc() feels
+like the natural choice for H/W offload and TBF is the existing
+interface IMHO nearest to the requirements here.
 
-But after discussion, it may make more sense to have two sets of API from the
-driver's piont of view if we want a complete safe type protection, so that
-compiler can check everything statically and devmem driver API have a clear
-semantic:
-1. devmem is not allowed to be called into mm subsystem.
-2. it will not provide a API like page_address().
+The devlink rate API could be a possible alternative...
 
->>
-> 
-> Agree with Mina's point. Let's aim to decouple memory types from
-> drivers.
-> .
-> 
+> > The idea would be:
+> > - 'fixing' sch_btf so that the s/w path became a no-op when h/w offload
+> > is enabled
+> > - extend sch_btf to support max rate
+> > - do the relevant ice implementation
+> > - ndo_set_tx_maxrate could be replaced with the mentioned ndo call (the
+> > latter interface is a strict super-set of former)
+> > - ndo_set_vf_rate could also be replaced with the mentioned ndo call
+> > (with another small extension to the offload data)
+> >=20
+> > I think mqprio deserves it's own separate offload interface, as it
+> > covers multiple tasks other than shaping (grouping queues and mapping
+> > priority to classes)
+> >=20
+> > In the long run we could have a generic implementation of the
+> > ndo_setup_tc(TC_SETUP_QDISC_TBF) in term of devlink rate adding a
+> > generic way to fetch the devlink_port instance corresponding to the
+> > given netdev and mapping the TBF features to the devlink_rate API.
+> >=20
+> > Not starting this due to what Jiri mentioned [1].
+>=20
+> Jiri, AFAIU, is against using devlink rate *uAPI* to configure network
+> rate limiting. That's separate from the internal representation.
+
+... with a couples of caveats:
+
+1) AFAICS devlink (and/or devlink_port) does not have fine grained, per
+queue representation and intel want to be able to configure shaping on
+per queue basis. I think/hope we don't want to bring the discussion to
+extending the devlink interface with queue support, I fear that will
+block us for a long time. Perhaps I=E2=80=99m missing or misunderstanding
+something here. Otherwise in retrospect this looks like a reasonable
+point to completely avoid devlink here.
+
+2) My understanding of Jiri statement was more restrictive. @Jiri it
+would great if could share your genuine interpretation: are you ok with
+using the devlink_port rate API as a basis to replace
+ndo_set_tx_maxrate() (via dev->devlink_port->devlink->) and possibly
+ndo_set_vf_rate(). Note the given the previous point, this option would
+still feel problematic.
+
+Cheers,
+
+Paolo
+
+[1] https://xkcd.com/927/
+[2] https://www.youtube.com/watch?v=3Df8kO_L-pDwo
+
 
