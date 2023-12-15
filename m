@@ -1,67 +1,63 @@
-Return-Path: <netdev+bounces-57959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB04C81496D
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:36:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 780FB814975
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:39:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7AB92B21C7E
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 13:36:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A24EB2181D
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 13:39:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8AA92DB9C;
-	Fri, 15 Dec 2023 13:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BD122DB9C;
+	Fri, 15 Dec 2023 13:39:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tud6o92I"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wFh8KTDa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889CB2DB85;
-	Fri, 15 Dec 2023 13:36:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04C1FC433C8;
-	Fri, 15 Dec 2023 13:36:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702647397;
-	bh=subHRTKMwmMr0u+Qf2RNzCSmCaDcHEzfdzarxtD8z/U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Tud6o92I0jvVdrQ08FGKjdwhC80aUmMEmOH08YZYA7JMT2nqm5k4KKn6vBcUbxJjP
-	 VmpYMMCDc/VLLrETSfv2FpWhSRRti1nAMypE+MNbCK/UR8mamGdHErStfqAZXkgaKC
-	 qBv5XaksNxAOX6jipIaq1IbmkhKayDCxE6KAcyXAv3QSDdh51sfDh1IcgQiy2tAttY
-	 WXgcpMVNiCj3RxJHmQEXR/hTQbtqjFGwwlG5b3BHtjTFBOyuVjwGH1S6sM6UqultwY
-	 zXpxq3Nw1vqu3UFHQsvlUnunnipIRRlxvKbgttSUVa1ufg21iJkPpOgtx6sbhdvg9A
-	 kjq2BdKV10YQg==
-Received: from johan by xi.lan with local (Exim 4.96.2)
-	(envelope-from <johan@kernel.org>)
-	id 1rE8Mh-0008LA-2Z;
-	Fri, 15 Dec 2023 14:36:31 +0100
-Date: Fri, 15 Dec 2023 14:36:31 +0100
-From: Johan Hovold <johan@kernel.org>
-To: Francesco Dolcini <francesco@dolcini.it>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Jiri Slaby <jirislaby@kernel.org>, linux-bluetooth@vger.kernel.org,
-	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, greybus-dev@lists.linaro.org,
-	linux-iio@vger.kernel.org, netdev@vger.kernel.org,
-	chrome-platform@lists.linux.dev,
-	platform-driver-x86@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-sound@vger.kernel.org,
-	Francesco Dolcini <francesco.dolcini@toradex.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Alex Elder <elder@kernel.org>, Jonathan Cameron <jic23@kernel.org>,
-	Lee Jones <lee@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
-	Benson Leung <bleung@chromium.org>,
-	Tzung-Bi Shih <tzungbi@kernel.org>, Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v1] treewide, serdev: change receive_buf() return type to
- size_t
-Message-ID: <ZXxWX-Fw1InID2ax@hovoldconsulting.com>
-References: <20231214170146.641783-1-francesco@dolcini.it>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0230818C2F;
+	Fri, 15 Dec 2023 13:39:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=wtwSbmM7l1ab40jpBtWJLq9UlQFmWrKdHhgxv86nFSE=; b=wFh8KTDajmYxCZQ+++PVkwX39F
+	BAZJl6fIM/4Ff6l4Nlmxirf6s+mhZ1nETZCaQrz/KkUhhmcf0sMyrlR13ZbN7LWJoX5UD+TyrqYx0
+	u1Kf7VCqiDUKEdF3CYjSPy3ZIcmg08xaI+D/5saClC+cR8sCtpM3B2Amw3hU9TEwPGp4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rE8Pe-0031iW-Sy; Fri, 15 Dec 2023 14:39:34 +0100
+Date: Fri, 15 Dec 2023 14:39:34 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jie Luo <quic_luoj@quicinc.com>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Conor Dooley <conor@kernel.org>, agross@kernel.org,
+	andersson@kernel.org, konrad.dybcio@linaro.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	robert.marko@sartura.hr, linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, quic_srichara@quicinc.com
+Subject: Re: [PATCH v2 5/5] dt-bindings: net: ipq4019-mdio: Document ipq5332
+ platform
+Message-ID: <3d89a725-ce81-4d13-b5e3-75198c408f78@lunn.ch>
+References: <a1e5ffec-a20d-4389-83f9-ee09bd9d733d@linaro.org>
+ <a84a36af-69f8-46af-967e-b06d028597a3@quicinc.com>
+ <26c8b0b1-5ea9-45cc-adf3-0d0b03a1284d@linaro.org>
+ <4b9c56b8-3b29-4861-a3d5-2da26fbc14b4@quicinc.com>
+ <2e77e3b1-00b6-46b9-bfed-7cae3ffa15e9@linaro.org>
+ <7bae46fd-63fd-4b86-9a56-73052cf0ea95@quicinc.com>
+ <5a8095e6-b6a6-4d11-b006-31519e8d8622@linaro.org>
+ <7466b655-2b7e-44f2-a510-6e0cc1b95248@quicinc.com>
+ <602759ce-c93d-4111-9272-1dce7e4a170a@linaro.org>
+ <f656d1c7-ea86-405a-9165-9eb079ea6f2a@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,46 +66,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231214170146.641783-1-francesco@dolcini.it>
+In-Reply-To: <f656d1c7-ea86-405a-9165-9eb079ea6f2a@quicinc.com>
 
-On Thu, Dec 14, 2023 at 06:01:46PM +0100, Francesco Dolcini wrote:
-> From: Francesco Dolcini <francesco.dolcini@toradex.com>
-> 
-> receive_buf() is called from ttyport_receive_buf() that expects values
-> ">= 0" from serdev_controller_receive_buf(), change its return type from
-> ssize_t to size_t.
-> 
-> Suggested-by: Jiri Slaby <jirislaby@kernel.org>
-> Link: https://lore.kernel.org/all/087be419-ec6b-47ad-851a-5e1e3ea5cfcc@kernel.org/
-> Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
-> ---
->  drivers/gnss/core.c                        |  6 +++---
->  drivers/gnss/serial.c                      |  4 ++--
->  drivers/gnss/sirf.c                        |  6 +++---
+> > You keep answering with short sentences without touching the root of the
+> > problem. I don't know exactly why, but I feel this discussion leads
+> > nowhere. After long discussion you finally admitted that clocks came
+> > from another device - Wifi. It took us like 6 emails?
+> > 
+> > So last statement: if you have clock provider and clock consumer, you
+> > must represent it in the bindings or provide rationale why it should not
+> > or must not be represented in the bindings. So far I do not see any of
+> > such arguments.
+> > 
+> > If you use arguments like:
+> > "My driver....": sorry, bindings are not about drivers
+> > "I don't have clock driver for WiFi": sorry, it does not matter if you
+> > can write one, right?
+> > 
+> > Please reach internally your colleagues to solve these problems and make
+> > review process smoother.
 
-> diff --git a/drivers/gnss/core.c b/drivers/gnss/core.c
-> index 48f2ee0f78c4..9b8a0605ec76 100644
-> --- a/drivers/gnss/core.c
-> +++ b/drivers/gnss/core.c
-> @@ -317,10 +317,10 @@ EXPORT_SYMBOL_GPL(gnss_deregister_device);
->   *
->   * Must not be called for a closed device.
->   */
-> -int gnss_insert_raw(struct gnss_device *gdev, const unsigned char *buf,
-> -				size_t count)
-> +size_t gnss_insert_raw(struct gnss_device *gdev, const unsigned char *buf,
-> +		       size_t count)
->  {
-> -	int ret;
-> +	size_t ret;
->  
->  	ret = kfifo_in(&gdev->read_fifo, buf, count);
->  
+Yes, i strongly agree with this. Its not our job as maintainers to
+educate big companies like Qualcomm how to write Linux drivers. There
+are more experienced driver writer within Qualcomm, you need to make
+contact with them, and get them to help you. Or you need to outsource
+the driver development to one of the companies which write mainline
+Linux drivers.
 
-Why are you changing this function? This is part of the GNSS interface
-and has nothing to do with the rest of this patch.
-
-Greg, please drop this one again until this has been resolved.
-
-Johan
+	Andrew
 
