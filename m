@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-58117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5582981518E
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 22:03:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 567098151B7
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 22:13:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82E901C22F3D
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 21:03:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11B5D2868EB
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 21:13:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83F974778B;
-	Fri, 15 Dec 2023 21:03:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CBD747F5F;
+	Fri, 15 Dec 2023 21:13:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Fs/HaoOn"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="aQQW59io"
 X-Original-To: netdev@vger.kernel.org
 Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 039FB30132;
-	Fri, 15 Dec 2023 21:03:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1040F3E49F;
+	Fri, 15 Dec 2023 21:13:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1702674207;
-	bh=fWUcyTSvl9HkzhbEm2R9p6yElA555rA8toz5mjYvtR8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Fs/HaoOn6SjZTGGcdUHfgvof1ag/gLuno1cJmOXOX8v2Mr/oGxLTYh8xd4Ju11DlS
-	 07D2Y6ZaCj9MasIAmOM5lRGp7y1k1osx5lCBzcihDN0lI0oD6WYloE6Ah132R2CDwN
-	 ExwWYzVW6REs3ogTVC7ys8oxbR+B8Wq5LhBmWRqHVdkU29ZkHwm6U1JwIkIwZEFiDB
-	 0mHdZeUJsAv5xtXJO89pm1Xu3lRCb8332T86FidfU/XlTkDU/jcVul2g9PScZVabG8
-	 xL3yhH+JzwcZOxVKRCi+CDz1pkSzJxElChYxhgcaPDo4hO/LLydHjz0sPzX3gEc7mk
-	 P4XKIW1PNHMlQ==
+	s=mail; t=1702674794;
+	bh=4Z0A8i3BQDX4XSWXqY1AsxNZ2UXBxVUatce/rv4lcqQ=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=aQQW59ioaNIQdMzt2vbe1pPJEASAIpZfAf6FHXhPw68vkAGU+ykS3yUhdCPVM1NSb
+	 9wwk6IO6HDR5/myECbvSXLfKm5Tu1Iabzgg5CNmFx4rW+jmjwj80FBF83uWeDme4E6
+	 1tGMZeRLjHm0LxPxHWvry3YxYPwwEWoHSeQ6LPFtKaDgt7FqT1Ls1jV3RGzxpIXezZ
+	 vDrQdzgzA2tZNIFtHVeEXRklDATFU6vLymVPKRTOAIMhrGbCxZsXxCzX8B/wwE5wnL
+	 SjuVBwV09aKtYTSaLrHp/5ZV+wzmPZtj2vSaXlJ30rCvmJRVYltyXoTaZsyioLFSMq
+	 jNgqz9s408vhw==
 Received: from [100.115.223.179] (cola.collaboradmins.com [195.201.22.229])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: cristicc)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 354E83781FD5;
-	Fri, 15 Dec 2023 21:03:25 +0000 (UTC)
-Message-ID: <6c62e3b2-acde-4580-9b67-56683289e45e@collabora.com>
-Date: Fri, 15 Dec 2023 23:03:24 +0200
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 66C133781489;
+	Fri, 15 Dec 2023 21:13:13 +0000 (UTC)
+Message-ID: <698fbb5d-0750-4f2a-857f-5429e5f589f9@collabora.com>
+Date: Fri, 15 Dec 2023 23:13:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,102 +48,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/9] dt-bindings: net: starfive,jh7110-dwmac: Add
- JH7100 SoC compatible
+Subject: Re: [PATCH v2 12/12] [UNTESTED] riscv: dts: starfive:
+ beaglev-starlight: Enable gmac
 Content-Language: en-US
-To: Samuel Holland <samuel.holland@sifive.com>,
- Jessica Clarke <jrtc27@jrtc27.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+To: Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
  Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
  Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
  Samin Guo <samin.guo@starfivetech.com>,
  Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
  <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Hal Feng <hal.feng@starfivetech.com>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
  Jose Abreu <joabreu@synopsys.com>,
  Maxime Coquelin <mcoquelin.stm32@gmail.com>,
  Richard Cochran <richardcochran@gmail.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
- "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
- <devicetree@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
- linux-riscv <linux-riscv@lists.infradead.org>, linux-clk@vger.kernel.org,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
  linux-stm32@st-md-mailman.stormreply.com,
  linux-arm-kernel@lists.infradead.org, kernel@collabora.com
-References: <20231215204050.2296404-1-cristian.ciocaltea@collabora.com>
- <20231215204050.2296404-3-cristian.ciocaltea@collabora.com>
- <A7C96942-07CB-40FD-AAAA-4A8947DEE7CA@jrtc27.com>
- <65fd52f1-6861-42b0-9148-266766d054b1@sifive.com>
-From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-In-Reply-To: <65fd52f1-6861-42b0-9148-266766d054b1@sifive.com>
+References: <20231029042712.520010-1-cristian.ciocaltea@collabora.com>
+ <20231029042712.520010-13-cristian.ciocaltea@collabora.com>
+ <CAJM55Z9e=vjGKNnmURN15mvXo2bVd3igBA-3puF9q7eh5hiP+A@mail.gmail.com>
+ <2f06ce36-0dc1-495e-b6a6-318951a53e8d@collabora.com>
+In-Reply-To: <2f06ce36-0dc1-495e-b6a6-318951a53e8d@collabora.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 12/15/23 22:59, Samuel Holland wrote:
-> On 2023-12-15 2:47 PM, Jessica Clarke wrote:
->> On 15 Dec 2023, at 20:40, Cristian Ciocaltea <cristian.ciocaltea@collabora.com> wrote:
+On 11/28/23 02:40, Cristian Ciocaltea wrote:
+> On 11/26/23 23:10, Emil Renner Berthing wrote:
+>> Cristian Ciocaltea wrote:
+>>> The BeagleV Starlight SBC uses a Microchip KSZ9031RNXCA PHY supporting
+>>> RGMII-ID.
 >>>
->>> The Synopsys DesignWare MAC found on StarFive JH7100 SoC is mostly
->>> similar to the newer JH7110, but it requires only two interrupts and a
->>> single reset line, which is 'ahb' instead of the commonly used
->>> 'stmmaceth'.
->>>
->>> Since the common binding 'snps,dwmac' allows selecting 'ahb' only in
->>> conjunction with 'stmmaceth', extend the logic to also permit exclusive
->>> usage of the 'ahb' reset name.  This ensures the following use cases are
->>> supported:
->>>
->>>  JH7110: reset-names = "stmmaceth", "ahb";
->>>  JH7100: reset-names = "ahb";
->>>  other:  reset-names = "stmmaceth";
->>>
->>> Also note the need to use a different dwmac fallback, as v5.20 applies
->>> to JH7110 only, while JH7100 relies on v3.7x.
->>>
->>> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
->>> ---
->>> .../devicetree/bindings/net/snps,dwmac.yaml   |  3 +-
->>> .../bindings/net/starfive,jh7110-dwmac.yaml   | 74 +++++++++++++------
->>> 2 files changed, 55 insertions(+), 22 deletions(-)
->>>
->>> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
->>> index 5c2769dc689a..c1380ff1c054 100644
->>> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
->>> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
->>> @@ -95,6 +95,7 @@ properties:
->>>         - snps,dwmac-5.20
->>>         - snps,dwxgmac
->>>         - snps,dwxgmac-2.10
->>> +        - starfive,jh7100-dwmac
->>>         - starfive,jh7110-dwmac
->>>
->>>   reg:
->>> @@ -146,7 +147,7 @@ properties:
->>>   reset-names:
->>>     minItems: 1
->>>     items:
->>> -      - const: stmmaceth
->>> +      - enum: [stmmaceth, ahb]
->>>       - const: ahb
+
+[...]
+ 
+>> You've alse removed the phy reset gpio on the Starlight board:
 >>
->> I’m not so well-versed in the YAML bindings, but would this not allow
->> reset-names = "ahb", "ahb"?
+>>   snps,reset-gpios = <&gpio 63 GPIO_ACTIVE_LOW>
+>>
+>> Why?
 > 
-> Yes, it would. You need something like:
-> 
-> reset-names:
->   oneOf:
->     - enum: [stmmaceth, ahb]
->     - items:
->         - const: stmmaceth
->         - const: ahb
+> I missed this in v1 as the gmac handling was done exclusively in
+> jh7100-common. Thanks for noticing!
 
-Oh yes, I always forget about the "oneOf" thing. Thanks!
+Hi Emil,
 
-> Regards,
-> Samuel
-> 
+I think the reset doesn't actually trigger because "snps,reset-gpios" is
+not a valid property, it should have been "snps,reset-gpio" (without the
+trailing "s").
+
+However, this seems to be deprecated now, and the recommended approach
+would be to define the reset gpio in the phy node, which I did in [1].
+
+Hopefully this won't cause any unexpected behaviour. Otherwise we should
+probably simply drop it.
+
+[1]: https://lore.kernel.org/lkml/20231215204050.2296404-8-cristian.ciocaltea@collabora.com/ 
 
