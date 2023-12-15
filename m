@@ -1,55 +1,73 @@
-Return-Path: <netdev+bounces-57956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06EF481494E
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:32:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F701814952
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:32:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 203611C239DB
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 13:32:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72B941C23249
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 13:32:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D90B2DB78;
-	Fri, 15 Dec 2023 13:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C7E62DB99;
+	Fri, 15 Dec 2023 13:31:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xbHp58+g"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="DU58M7eH"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205CB2DB7E;
-	Fri, 15 Dec 2023 13:31:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=zcGhs/MR386LURyyPrPAXA8pXRQ9HDSgaEfMslprAcM=; b=xbHp58+graqC9tBpU0Op9Qo4iO
-	tccIY15VinrpgENUDgmioCuVXP+RDvoX/PZ2z4Aq5hpGdb4CGgZQFcsZA2bYg8+ZvMaWGu0BCHbJm
-	mV6xl79t+iVlPSfNX40rJk1Mhf+g6H8fevB7Xt+h7/hkQZg4ApOa6okdiBkx7URoPCmI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rE8HZ-0031fG-0t; Fri, 15 Dec 2023 14:31:13 +0100
-Date: Fri, 15 Dec 2023 14:31:13 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jie Luo <quic_luoj@quicinc.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	hkallweit1@gmail.com, linux@armlinux.org.uk, corbet@lwn.net,
-	p.zabel@pengutronix.de, f.fainelli@gmail.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v8 14/14] dt-bindings: net: ar803x: add qca8084 PHY
- properties
-Message-ID: <f5c5cbce-c36e-498a-97e2-35f06d927d74@lunn.ch>
-References: <20231215074005.26976-1-quic_luoj@quicinc.com>
- <20231215074005.26976-15-quic_luoj@quicinc.com>
- <60b9081c-76fa-4122-b7ae-5c3dcf7229f9@lunn.ch>
- <a65ad12d-b990-4439-b196-903f4a5f096a@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19FB52DB91
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 13:31:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-40c69403b3eso6219445e9.3
+        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 05:31:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702647109; x=1703251909; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fknnBHAUDHqih7lWjNaXjjlEh6BAM5q393HmPyhGQWc=;
+        b=DU58M7eHUrOS1d+IyQAKCBt05cum7RPCksA6TnE1xk4zybu5s6egZPsvLO9m3gNBiH
+         bVjxr0b1iDAg/ncHyX16+4JCa+t8i4utiVZ8x47z06V7dQkKIR353wMv5Bzokst2ia4J
+         5fy4K5f9XxKGhNjuFdoXwwbQR023g5pGGbCCBXWwVB/spKOqk05YbE7huimAZ+ladM3g
+         cIZUvvQOjUS4zwx/bUAj2TGQ5eTNpHHAGeqJPXQuxnC+ZECjPDN9439q1FCzjO88Gg4m
+         Ya4dbLpV6Q/uCv5NMbSvjufpuHjyLr2ikLxTs1Tq5e9s+Vjty9z/F3JdU/cnl8GVfpei
+         RNlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702647109; x=1703251909;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fknnBHAUDHqih7lWjNaXjjlEh6BAM5q393HmPyhGQWc=;
+        b=g9pUvsfizftrHEQmBg/Im5Bz8BM0uHEqVQGOGutzVjvqCxu+LB7JWqbCc74XWx90d9
+         c+5CPgBPpqjlNQAsM/liy3EEBSxfz7MnFgiy3CTciIfxIN38D0dEUjJYAXIfplAhAQtO
+         OdIqwWQaLRCm7/p1ea1Cq5NcBZeAEduklx5e6v4BYRgF4AicgFIwcSyP0KnhjmLIm9jo
+         /WOfYFjvrSw1wMSToX2jB/kI6wn+NhxsQV7lE1Hz6JT8fDTpcZxn9EGZhoZVwpjQvG1z
+         qCVBGqDs8JDrvJIV93Q0lunw1pGtYR0p5wxcr6dzDxrIebCaxZ2Ain5BGfV34S+4Cc0A
+         DvDQ==
+X-Gm-Message-State: AOJu0YxBTkT5MoK/mPNVq5VKqjqW/UtMZp3u4FA6Z3FAporih6t06kuG
+	nHpXxm/AAdfDv/fYO0J1A/3t6w==
+X-Google-Smtp-Source: AGHT+IGwZyifJQf8bQosNR3q61b+4xdyqw6UPZCfp50CKYOfTeE0U4hoJmZtpILEI8WIg7kxN2LMTQ==
+X-Received: by 2002:a05:600c:4c8a:b0:40c:377c:4b66 with SMTP id g10-20020a05600c4c8a00b0040c377c4b66mr6495671wmp.76.1702647109038;
+        Fri, 15 Dec 2023 05:31:49 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id r20-20020a05600c459400b0040b349c91acsm31218203wmo.16.2023.12.15.05.31.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Dec 2023 05:31:48 -0800 (PST)
+Date: Fri, 15 Dec 2023 14:31:47 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: jhs@mojatatu.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com,
+	mleitner@redhat.com, vladbu@nvidia.com, paulb@nvidia.com,
+	pctammela@mojatatu.com, netdev@vger.kernel.org, kernel@mojatatu.com
+Subject: Re: [PATCH net-next v7 1/3] net/sched: Introduce tc block netdev
+ tracking infra
+Message-ID: <ZXxVQ0E-kd-ab3XD@nanopsycho>
+References: <20231215111050.3624740-1-victor@mojatatu.com>
+ <20231215111050.3624740-2-victor@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,55 +76,258 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a65ad12d-b990-4439-b196-903f4a5f096a@quicinc.com>
+In-Reply-To: <20231215111050.3624740-2-victor@mojatatu.com>
 
-On Fri, Dec 15, 2023 at 08:33:00PM +0800, Jie Luo wrote:
+Fri, Dec 15, 2023 at 12:10:48PM CET, victor@mojatatu.com wrote:
+>This commit makes tc blocks track which ports have been added to them.
+>And, with that, we'll be able to use this new information to send
+>packets to the block's ports. Which will be done in the patch #3 of this
+>series.
+>
+>Suggested-by: Jiri Pirko <jiri@nvidia.com>
+>Co-developed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+>Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+>Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
+>Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+>Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+>---
+> include/net/sch_generic.h |  4 +++
+> net/sched/cls_api.c       |  2 ++
+> net/sched/sch_api.c       | 55 +++++++++++++++++++++++++++++++++++++++
+> net/sched/sch_generic.c   | 31 ++++++++++++++++++++--
+> 4 files changed, 90 insertions(+), 2 deletions(-)
+>
+>diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+>index dcb9160e6467..cefca55dd4f9 100644
+>--- a/include/net/sch_generic.h
+>+++ b/include/net/sch_generic.h
+>@@ -19,6 +19,7 @@
+> #include <net/gen_stats.h>
+> #include <net/rtnetlink.h>
+> #include <net/flow_offload.h>
+>+#include <linux/xarray.h>
 > 
+> struct Qdisc_ops;
+> struct qdisc_walker;
+>@@ -126,6 +127,8 @@ struct Qdisc {
 > 
-> On 12/15/2023 8:12 PM, Andrew Lunn wrote:
-> > > +  clocks:
-> > > +    items:
-> > > +      - description: APB bridge clock
-> > > +      - description: AHB clock
-> > > +      - description: Security control clock
-> > > +      - description: TLMM clock
-> > > +      - description: TLMM AHB clock
-> > > +      - description: CNOC AHB clock
-> > > +      - description: MDIO AHB clock
-> > > +      - description: MDIO master AHB clock
-> > > +      - description: PCS0 system clock
-> > > +      - description: PCS1 system clock
-> > > +      - description: EPHY0 system clock
-> > > +      - description: EPHY1 system clock
-> > > +      - description: EPHY2 system clock
-> > > +      - description: EPHY3 system clock
+> 	struct rcu_head		rcu;
+> 	netdevice_tracker	dev_tracker;
+>+	netdevice_tracker	in_block_tracker;
+>+	netdevice_tracker	eg_block_tracker;
+> 	/* private data */
+> 	long privdata[] ____cacheline_aligned;
+> };
+>@@ -457,6 +460,7 @@ struct tcf_chain {
+> };
+> 
+> struct tcf_block {
+>+	struct xarray ports; /* datapath accessible */
+> 	/* Lock protects tcf_block and lifetime-management data of chains
+> 	 * attached to the block (refcnt, action_refcnt, explicitly_created).
+> 	 */
+>diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+>index dc1c19a25882..6020a32ecff2 100644
+>--- a/net/sched/cls_api.c
+>+++ b/net/sched/cls_api.c
+>@@ -531,6 +531,7 @@ static void tcf_block_destroy(struct tcf_block *block)
+> {
+> 	mutex_destroy(&block->lock);
+> 	mutex_destroy(&block->proto_destroy_lock);
+>+	xa_destroy(&block->ports);
+> 	kfree_rcu(block, rcu);
+> }
+> 
+>@@ -1002,6 +1003,7 @@ static struct tcf_block *tcf_block_create(struct net *net, struct Qdisc *q,
+> 	refcount_set(&block->refcnt, 1);
+> 	block->net = net;
+> 	block->index = block_index;
+>+	xa_init(&block->ports);
+> 
+> 	/* Don't store q pointer for blocks which are shared */
+> 	if (!tcf_block_shared(block))
+>diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+>index e9eaf637220e..09ec64f2f463 100644
+>--- a/net/sched/sch_api.c
+>+++ b/net/sched/sch_api.c
+>@@ -1180,6 +1180,57 @@ static int qdisc_graft(struct net_device *dev, struct Qdisc *parent,
+> 	return 0;
+> }
+> 
+>+static int qdisc_block_add_dev(struct Qdisc *sch, struct net_device *dev,
+>+			       struct nlattr **tca,
+>+			       struct netlink_ext_ack *extack)
+>+{
+>+	const struct Qdisc_class_ops *cl_ops = sch->ops->cl_ops;
+>+	struct tcf_block *in_block = NULL;
+>+	struct tcf_block *eg_block = NULL;
 
-> Hi Andrew,
-> These clocks are for the whole PHY package including quad PHYs, since
-> these clocks & resets need to be initialized at one point, i put it
-> the previous MDIO driver code, these clocks & resets are configured
-> after GPIO hardware reset, after these clocks and resets sequences
-> configured, each PHY capabilities can be acquired correctly in the PHY
-> probe function.
+No need to null.
 
-I really expect the hardware is hierarchical. Its unlikely that EPHY0
-is connected to all four PHYs in the package. Its specific to one
-PHY. So it should be in the DT properties for that one specific PHY. I
-expect the resets are the same. It seems there is a soft and hard
-reset per PHY, so i would expect these to be in the node for one PHY.
+Can't you just have:
+	struct tcf_block *block;
 
-Do the two PCS instances take up two MDIO address? They can be
-considered devices on the bus, so could have a DT node, and hence you
-can place the PCS clocks on that node?
+	And use it in both ifs? You can easily obtain the block again on
+	the error path.
 
-What exactly do the two MDIO clocks do? I assume these are not for the
-MDIO bus master, but the MDIO slave block within the PHY package?
-There is one MDIO slave block shared by the four PHYs. So these are
-package properties and should be in the package node in DT.
+>+	int err;
+>+
+>+	if (tca[TCA_INGRESS_BLOCK]) {
+>+		/* works for both ingress and clsact */
+>+		in_block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+>+		if (!in_block) {
 
-Look at all the other clocks and decide, are they package clocks, or
-specific to one block on the MDIO bus? Do the properties go in the
-package node, or the per PHY node?
+I don't see how this could happen. In fact, why exactly do you check
+tca[TCA_INGRESS_BLOCK]?
 
-	Andrew
+At this time, the clsact/ingress init() function was already called, you
+can just do:
+
+	block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+	if (block) {
+		err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
+		if (err) {
+			NL_SET_ERR_MSG(extack, "Ingress block dev insert failed");
+			return err;
+		}
+		netdev_hold(dev, &sch->in_block_tracker, GFP_KERNEL);
+	}
+	block = cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
+	if (block) {
+		err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
+		if (err) {
+			NL_SET_ERR_MSG(extack, "Egress block dev insert failed");
+			goto err_out;
+		}
+		netdev_hold(dev, &sch->eg_block_tracker, GFP_KERNEL);
+	}
+	return 0;
+
+err_out:
+	block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+	if (block) {
+		xa_erase(&block->ports, dev->ifindex);
+		netdev_put(dev, &sch->in_block_tracker);
+	}
+	return err;
+
+>+			NL_SET_ERR_MSG(extack, "Shared ingress block missing");
+>+			return -EINVAL;
+>+		}
+>+
+>+		err = xa_insert(&in_block->ports, dev->ifindex, dev, GFP_KERNEL);
+>+		if (err) {
+>+			NL_SET_ERR_MSG(extack, "Ingress block dev insert failed");
+>+			return err;
+>+		}
+>+
+>+		netdev_hold(dev, &sch->in_block_tracker, GFP_KERNEL);
+
+Why exactly do you need an extra reference of netdev? Qdisc is already
+having one.
+
+
+>+	}
+>+
+>+	if (tca[TCA_EGRESS_BLOCK]) {
+>+		eg_block = cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
+>+		if (!eg_block) {
+>+			NL_SET_ERR_MSG(extack, "Shared egress block missing");
+>+			err = -EINVAL;
+>+			goto err_out;
+>+		}
+>+
+>+		err = xa_insert(&eg_block->ports, dev->ifindex, dev, GFP_KERNEL);
+>+		if (err) {
+>+			NL_SET_ERR_MSG(extack, "Egress block dev insert failed");
+>+			goto err_out;
+>+		}
+>+		netdev_hold(dev, &sch->eg_block_tracker, GFP_KERNEL);
+>+	}
+>+
+>+	return 0;
+>+err_out:
+>+	if (in_block) {
+>+		xa_erase(&in_block->ports, dev->ifindex);
+>+		netdev_put(dev, &sch->in_block_tracker);
+>+	}
+>+	return err;
+>+}
+>+
+> static int qdisc_block_indexes_set(struct Qdisc *sch, struct nlattr **tca,
+> 				   struct netlink_ext_ack *extack)
+> {
+>@@ -1350,6 +1401,10 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
+> 	qdisc_hash_add(sch, false);
+> 	trace_qdisc_create(ops, dev, parent);
+> 
+>+	err = qdisc_block_add_dev(sch, dev, tca, extack);
+>+	if (err)
+>+		goto err_out4;
+>+
+> 	return sch;
+> 
+> err_out4:
+>diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+>index 8dd0e5925342..32bed60dea9f 100644
+>--- a/net/sched/sch_generic.c
+>+++ b/net/sched/sch_generic.c
+>@@ -1050,7 +1050,11 @@ static void qdisc_free_cb(struct rcu_head *head)
+> 
+> static void __qdisc_destroy(struct Qdisc *qdisc)
+> {
+>-	const struct Qdisc_ops  *ops = qdisc->ops;
+>+	struct net_device *dev = qdisc_dev(qdisc);
+>+	const struct Qdisc_ops *ops = qdisc->ops;
+>+	const struct Qdisc_class_ops *cops;
+>+	struct tcf_block *block;
+>+	u32 block_index;
+> 
+> #ifdef CONFIG_NET_SCHED
+> 	qdisc_hash_del(qdisc);
+>@@ -1061,11 +1065,34 @@ static void __qdisc_destroy(struct Qdisc *qdisc)
+> 
+> 	qdisc_reset(qdisc);
+> 
+>+	cops = ops->cl_ops;
+>+	if (ops->ingress_block_get) {
+>+		block_index = ops->ingress_block_get(qdisc);
+>+		if (block_index) {
+
+I don't follow. What you need block_index for? Why can't you just call:
+	block = cops->tcf_block(qdisc, TC_H_MIN_INGRESS, NULL);
+right away?
+
+
+>+			block = cops->tcf_block(qdisc, TC_H_MIN_INGRESS, NULL);
+>+			if (block) {
+>+				if (xa_erase(&block->ports, dev->ifindex))
+>+					netdev_put(dev, &qdisc->in_block_tracker);
+>+			}
+>+		}
+>+	}
+>+
+>+	if (ops->egress_block_get) {
+>+		block_index = ops->egress_block_get(qdisc);
+>+		if (block_index) {
+>+			block = cops->tcf_block(qdisc, TC_H_MIN_EGRESS, NULL);
+>+			if (block) {
+>+				if (xa_erase(&block->ports, dev->ifindex))
+>+					netdev_put(dev, &qdisc->eg_block_tracker);
+>+			}
+>+		}
+>+	}
+>+
+> 	if (ops->destroy)
+> 		ops->destroy(qdisc);
+> 
+> 	module_put(ops->owner);
+>-	netdev_put(qdisc_dev(qdisc), &qdisc->dev_tracker);
+>+	netdev_put(dev, &qdisc->dev_tracker);
+> 
+> 	trace_qdisc_destroy(qdisc);
+> 
+>-- 
+>2.25.1
+>
 
