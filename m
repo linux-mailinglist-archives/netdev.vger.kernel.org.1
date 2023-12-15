@@ -1,93 +1,107 @@
-Return-Path: <netdev+bounces-57703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 016D8813F31
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 02:30:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC58F813F61
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 02:46:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F712B21E55
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 01:30:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 094391C22058
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 01:46:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EC157E4;
-	Fri, 15 Dec 2023 01:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CFCE624;
+	Fri, 15 Dec 2023 01:46:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kUx7byr3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="htFd+MzO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3235E36F;
-	Fri, 15 Dec 2023 01:30:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 96382C433C9;
-	Fri, 15 Dec 2023 01:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 734DF804
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 01:46:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAF35C433C8;
+	Fri, 15 Dec 2023 01:46:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702603825;
-	bh=jtcofboF/4WRkBgEMaFOO3hoqYqlP2cYDQy7vfXOtb8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kUx7byr3SsEs7Wq7NG9IdkE4P24QeqVM8UaxMNJ3Um/2ZdvgPDRJTkVijgaFP+6Cf
-	 CWbnMgzaPZLVUn/zXczIfIG6JSBab/BbR2NVbjev1y/KUAZSeZyqX8rJafM2mQxTCR
-	 ojn7f08mMdE3/Kw3gi0OIGY4mE9umTwFxFGaRjja2iIeSwT4EpePMm4nin19j6HQtc
-	 +sjAO54gLZaEwLENIhc14PMXWwK5QrMtEl4AmKSb8eW7sK/TTRxg0blO3/dWKgT+ZA
-	 IVLOQvPZGcXRPgyDoU+GRCFXJ4Wi7gyXHw5OYU0WTapy9u0sqreDyxPzC3qlLZ807d
-	 sg5TT3ADD3XoQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 78E95DD4EFA;
-	Fri, 15 Dec 2023 01:30:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1702604766;
+	bh=pOA9iQ3oiHnXchJg588/G4CIPWlxrqFDcw3s8wXyqws=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=htFd+MzOhXJsdFv6KasWkyach/PjprBnMtSP606w6G/RDDnABjSV+NMIW/ydkfk0M
+	 soS6InwL7Em5khpnGz190BuAXMhfHeYBcA2JJTdJcA65v+0c6jkUtcPmeHFVpUkyPS
+	 3yGRDvGg5sUlQHl7SXENDnoZkGnfNpLDLBURHGW2qaJ98wnu5MYyZ85Hfybtu6x8VT
+	 joFttvBlP1eB16lvaomSmeUjGr9NniZ17C3VD8jo891VaMCbV6C2kBOVOIxB+2aPWV
+	 FjQdnBlYtXftrmRlTb4wXSr0F1F/yFLwyv9yINRX59D8pUnm2+VHRfdNmauI0souxZ
+	 tvMfCrBw5SKtw==
+Date: Thu, 14 Dec 2023 17:46:04 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+ anthony.l.nguyen@intel.com, intel-wired-lan@lists.osuosl.org,
+ qi.z.zhang@intel.com, Wenjun Wu <wenjun1.wu@intel.com>,
+ maxtram95@gmail.com, "Chittim, Madhu" <madhu.chittim@intel.com>,
+ "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Simon Horman
+ <simon.horman@redhat.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 0/5] iavf: Add devlink and
+ devlink rate support'
+Message-ID: <20231214174604.1ca4c30d@kernel.org>
+In-Reply-To: <55e51b97c29894ebe61184ab94f7e3d8486e083a.camel@redhat.com>
+References: <20230727021021.961119-1-wenjun1.wu@intel.com>
+	<20230822034003.31628-1-wenjun1.wu@intel.com>
+	<ZORRzEBcUDEjMniz@nanopsycho>
+	<20230822081255.7a36fa4d@kernel.org>
+	<ZOTVkXWCLY88YfjV@nanopsycho>
+	<0893327b-1c84-7c25-d10c-1cc93595825a@intel.com>
+	<ZOcBEt59zHW9qHhT@nanopsycho>
+	<5aed9b87-28f8-f0b0-67c4-346e1d8f762c@intel.com>
+	<bdb0137a-b735-41d9-9fea-38b238db0305@intel.com>
+	<20231118084843.70c344d9@kernel.org>
+	<3d60fabf-7edf-47a2-9b95-29b0d9b9e236@intel.com>
+	<20231122192201.245a0797@kernel.org>
+	<e662dca5-84e4-4f7b-bfa3-50bce30c697c@intel.com>
+	<20231127174329.6dffea07@kernel.org>
+	<55e51b97c29894ebe61184ab94f7e3d8486e083a.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v6 0/5] Add bpf_xdp_get_xfrm_state() kfunc
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170260382549.15017.6886623501178455100.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Dec 2023 01:30:25 +0000
-References: <cover.1702593901.git.dxu@dxuuu.xyz>
-In-Reply-To: <cover.1702593901.git.dxu@dxuuu.xyz>
-To: Daniel Xu <dxu@dxuuu.xyz>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- steffen.klassert@secunet.com, antony.antony@secunet.com,
- alexei.starovoitov@gmail.com, yonghong.song@linux.dev, eddyz87@gmail.com,
- eyal.birger@gmail.com, devel@linux-ipsec.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 14 Dec 2023 21:29:51 +0100 Paolo Abeni wrote:
+> Together with Simon, I spent some time on the above. We think the
+> ndo_setup_tc(TC_SETUP_QDISC_TBF) hook could be used as common basis for
+> this offloads, with some small extensions (adding a 'max_rate' param,
+> too).
 
-This series was applied to bpf/bpf-next.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
+uAPI aside, why would we use ndo_setup_tc(TC_SETUP_QDISC_TBF)
+to implement common basis?
 
-On Thu, 14 Dec 2023 15:49:01 -0700 you wrote:
-> This patchset adds two kfunc helpers, bpf_xdp_get_xfrm_state() and
-> bpf_xdp_xfrm_state_release() that wrap xfrm_state_lookup() and
-> xfrm_state_put(). The intent is to support software RSS (via XDP) for
-> the ongoing/upcoming ipsec pcpu work [0]. Recent experiments performed
-> on (hopefully) reproducible AWS testbeds indicate that single tunnel
-> pcpu ipsec can reach line rate on 100G ENA nics.
+Is it not cleaner to have a separate driver API, with its ops
+and capabilities?
+
+> The idea would be:
+> - 'fixing' sch_btf so that the s/w path became a no-op when h/w offload
+> is enabled
+> - extend sch_btf to support max rate
+> - do the relevant ice implementation
+> - ndo_set_tx_maxrate could be replaced with the mentioned ndo call (the
+> latter interface is a strict super-set of former)
+> - ndo_set_vf_rate could also be replaced with the mentioned ndo call
+> (with another small extension to the offload data)
 > 
-> [...]
+> I think mqprio deserves it's own separate offload interface, as it
+> covers multiple tasks other than shaping (grouping queues and mapping
+> priority to classes)
+> 
+> In the long run we could have a generic implementation of the
+> ndo_setup_tc(TC_SETUP_QDISC_TBF) in term of devlink rate adding a
+> generic way to fetch the devlink_port instance corresponding to the
+> given netdev and mapping the TBF features to the devlink_rate API.
+> 
+> Not starting this due to what Jiri mentioned [1].
 
-Here is the summary with links:
-  - [bpf-next,v6,1/5] bpf: xfrm: Add bpf_xdp_get_xfrm_state() kfunc
-    https://git.kernel.org/bpf/bpf-next/c/8f0ec8c68175
-  - [bpf-next,v6,2/5] bpf: selftests: test_tunnel: Setup fresh topology for each subtest
-    https://git.kernel.org/bpf/bpf-next/c/77a7a8220f0d
-  - [bpf-next,v6,3/5] bpf: selftests: test_tunnel: Use vmlinux.h declarations
-    https://git.kernel.org/bpf/bpf-next/c/02b4e126e6a5
-  - [bpf-next,v6,4/5] bpf: selftests: Move xfrm tunnel test to test_progs
-    https://git.kernel.org/bpf/bpf-next/c/e7adc8291a9e
-  - [bpf-next,v6,5/5] bpf: xfrm: Add selftest for bpf_xdp_get_xfrm_state()
-    https://git.kernel.org/bpf/bpf-next/c/2cd07b0eb08c
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Jiri, AFAIU, is against using devlink rate *uAPI* to configure network
+rate limiting. That's separate from the internal representation.
 
