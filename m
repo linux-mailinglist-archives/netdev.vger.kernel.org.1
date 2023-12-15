@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-57804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A13E481431F
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 09:01:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF79E814331
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 09:03:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CD35282665
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 08:01:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D53C1C20BA9
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 08:03:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 535B4107B8;
-	Fri, 15 Dec 2023 08:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C0601094D;
+	Fri, 15 Dec 2023 08:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T1tvHWAg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JKVp61II"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C4212B99;
-	Fri, 15 Dec 2023 08:01:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 146A9C43397;
-	Fri, 15 Dec 2023 08:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EE4012E40;
+	Fri, 15 Dec 2023 08:03:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34F3DC433C7;
+	Fri, 15 Dec 2023 08:03:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702627271;
-	bh=fjWhoQ1988wnd5acXghZMLzc04rxWPNRdW0Fgl7C1wU=;
+	s=k20201202; t=1702627425;
+	bh=p9x1fXgVjeCici0BVx/zhFbZXBS2ONfRfVclygpC/1g=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=T1tvHWAgCX4gNdWFBOY1cAOwWTD9WGgvZlMsHGjWwU4XzKcOkULSz6LTpoho3klBa
-	 O1dmWMvtGVqByOEMit3ysgy78WzN2rbbR8HQp9fb1Mk+uIt2z1CEhfwq+89d0HkRWQ
-	 H0VdN5q4gz7RdoDbyAh5FOSgWOxdgvf4mUX4ZkONuH9HlLok6cq3UFiM8VR1a0+4G/
-	 /QXlph0oH1nSLjM2NW5Hz40wcl+H9Y9sqPeM71AcSveQ5RMH1afEfTQ7CAbSbAh6V3
-	 RPUIOSZ34QYEiSInI7kcWJ0ymhamsJlxCCFktIfFc2Wna7VSzN67vzPVTeEQUTJx6l
-	 2V9dZRF9cyiog==
-Date: Fri, 15 Dec 2023 08:01:04 +0000
+	b=JKVp61IIC+9onKloh5tAwcWq/WXWqCw/PsDYjyi953raW7v0lsSP8zGwnYt3q+0IR
+	 rptS/NCci7c/SCk4RWJQelYO75hLFGuoJG6YejmX8u+ReEdjLR5xzjZ9VEP9SiBJrl
+	 gkE7QBKFcOytBSjv4/IOdIEIFjjO4CZrMPLa00IFlCRmHu2frzXL22iq+3L7UxAV+K
+	 skC3/T7XmzCjvzlPalUxO34YxTZQqivLsEF2BrpxEGDSg5z6bdg4TpAcJR0FL+5Xpe
+	 TYKPjO/6OlQDrgTi1fkZ1/QTcQt1sN03VYWQv8Z4G1fSyEZtIo4Sm9BGskWuI7q2c3
+	 xh2S55gywsqdQ==
+Date: Fri, 15 Dec 2023 08:03:40 +0000
 From: Simon Horman <horms@kernel.org>
 To: Jijie Shao <shaojijie@huawei.com>
 Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
@@ -40,11 +40,11 @@ Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
 	shenjian15@huawei.com, wangjie125@huawei.com,
 	liuyonglong@huawei.com, lanhao@huawei.com, wangpeiyang1@huawei.com,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2 net-next 2/3] net: hns3: dump more reg info based on
- ras mod
-Message-ID: <20231215080104.GV5817@kernel.org>
+Subject: Re: [PATCH V2 net-next 3/3] net: hns3: support dump pfc frame
+ statistics in tx timeout log
+Message-ID: <20231215080340.GW5817@kernel.org>
 References: <20231214141135.613485-1-shaojijie@huawei.com>
- <20231214141135.613485-3-shaojijie@huawei.com>
+ <20231214141135.613485-4-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,45 +53,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231214141135.613485-3-shaojijie@huawei.com>
+In-Reply-To: <20231214141135.613485-4-shaojijie@huawei.com>
 
-On Thu, Dec 14, 2023 at 10:11:34PM +0800, Jijie Shao wrote:
-> From: Peiyang Wang <wangpeiyang1@huawei.com>
+On Thu, Dec 14, 2023 at 10:11:35PM +0800, Jijie Shao wrote:
+> Continuous pfc frames may cause tx timeout.
+> Therefore, pfc frame statistics are added to logs.
 > 
-> Dump more reg info base on ras mod before reset, which is useful to
-> analyze the ras error.
-> 
-> Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
 > Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 
-...
+Thanks,
 
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.h
-> index 68b738affa66..45a783a50643 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.h
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.h
-> @@ -5,6 +5,7 @@
->  #define __HCLGE_ERR_H
->  
->  #include "hclge_main.h"
-> +#include "hclge_debugfs.h"
+I agree it is good to include this information, which may relate to a
+timeout, in the existing log message for timeouts.
 
-Hi Jijie Shao and Peiyang Wang,
-
-hclge_debugfs.h defines a number of constants, such as hclge_dbg_tqp_reg.
-
-With the above include added, these constants are now also defined
-in files that include hclge_err.h. Which leads to them
-being defined but unused in hclge_main.c.
-
-At a glance, it seems that these constants are only used in hclge_debugfs.c.
-Perhaps they could simply be moved there?
-
-Flagged by gcc-13 W=1 allmodconfig builds.
-
->  #include "hnae3.h"
->  
->  #define HCLGE_MPF_RAS_INT_MIN_BD_NUM	10
-
-...
+Reviewed-by: Simon Horman <horms@kernel.org>
 
