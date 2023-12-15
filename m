@@ -1,119 +1,96 @@
-Return-Path: <netdev+bounces-57991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AAF5814BF8
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 16:41:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BC0F814BFF
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 16:43:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9690F1C2085A
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 15:41:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 109431F21D1C
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 15:43:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B53A13717F;
-	Fri, 15 Dec 2023 15:41:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26D3937169;
+	Fri, 15 Dec 2023 15:43:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XWAeZwBw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SUCNOhRg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B7B37169;
-	Fri, 15 Dec 2023 15:41:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CB16C433C8;
-	Fri, 15 Dec 2023 15:41:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702654890;
-	bh=9eb/YXAxsUcPYKS4pAEAtfBhfAIyQkqe9AYM+SecHT4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=XWAeZwBw01RQ5p8XwwCktMHqn1dhx41Rd+aTliosRr6XB6IzVjzhEl//DzG7rggci
-	 Xc6elGVBXYp6B0eJjqzM7hYwKyyVDxCs6YR6+0Tu8S7HXqbdwkEl1AncckNACpnZhV
-	 vF3oNXUwXww5/E1874zeWbU6XF20SoqqHyk+fGyQ84ibYQUlIn8zcJx9KUPSi//uEO
-	 0omLe0NazHtTyf8tqcCtqVhu0rBtLmo979JfU55vJIklehbJHA8Kev87w1BBkJ+8ot
-	 3ST7Anyrn+i/bU/lqXD/OuiDaYDc3xDO+YXouJ4j4ky0l2EzSpW7EUkQ0co46J8LuU
-	 1+8LcChbddzOA==
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-50be9e6427dso822168e87.1;
-        Fri, 15 Dec 2023 07:41:29 -0800 (PST)
-X-Gm-Message-State: AOJu0Yy2skKqnvIqCC2XKsVbknYgYlzIFgJlRO7Io+dLKA0BdOpeCW0H
-	ZJ0Eq6BLDeSGxCv+b1htmp/qjUU8UMx3vw5Xew==
-X-Google-Smtp-Source: AGHT+IGnAJfnE/sQ4Y8/oGYmAjDUUeKmL8J99ab6q70z2JbHalypEIVNYp+q9/np/aq6YGsP/Vl1mwpFXcp2/gLTWg4=
-X-Received: by 2002:ac2:5b50:0:b0:50b:eca9:fa18 with SMTP id
- i16-20020ac25b50000000b0050beca9fa18mr5216683lfp.118.1702654888249; Fri, 15
- Dec 2023 07:41:28 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2A137163
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 15:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-552eaf800abso899a12.0
+        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 07:43:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702655020; x=1703259820; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Fx3/YsZ+IWUjkas264EbDNziHfU5P+VY8sq6LNXKLsI=;
+        b=SUCNOhRgC0iI28PJsvyFBAs+4ip5Lj60Pw4YsSz6Yq/k+dhZ1kIohk67yO5gIGMuXk
+         PF2X1cn/BDeU1TFlyIXPYdSZIdM73E0tomjqrS0IKXb0sGsHcYrwO2B1pQl4zhGDYYPW
+         khyB0ZSlII+zjBfWzVfp7bsNTaRGytLx1BqkNZ4Y+b5WzipMNRo/zp8lBuE3ASPb2ARg
+         W//nMaCyQTkZWb2zyKUnXn4uOMrqFLrIUYKQTJ+e9bSzy12yzHHr0rXGIZwxvrGWzASD
+         lo32QiGLKLO/fD1h4HqVAZ12li6Q7PP3uAGS6RnsfkrLtPdbwVcqr65xsHVAA498mGXm
+         RRGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702655020; x=1703259820;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Fx3/YsZ+IWUjkas264EbDNziHfU5P+VY8sq6LNXKLsI=;
+        b=EgRLyygQhA00KjlJjGcf7fHGi0NCDZYtnGSY2GgHW/a8qRkPufPh4a4U6cva9nDhQe
+         3c60ibb5EGydm3scR2HWrLX43Qo9vJ7Gpp2i12JAyHuG+GMxW4M8YI5/fEnqhW/31f+W
+         FJAyYeKRvzSlIm95NibKTdhy7njAdhqweu9qmrnMuIfVb1UqzXHT4oeDoDwY4ifX3cAu
+         TOPRsIkgWdItjL/S4okZac8w4cBic73KOyYFBpc/MHLjx/9HsKZFoUrMBDuQILm+LQ6w
+         SwEazl+tw2NSVz2TLpiJz05iNB3Yx+MW+KQo8oJ5Iksb1YAzvDMekcuCV901I/1oTFi0
+         oVFw==
+X-Gm-Message-State: AOJu0YyK+ajsFkM2o0y44WYR7xOAmSjST189Z5Mjq8NJt7PgtIaAGnBE
+	ZEhT0BiFWsjhhfd+XwxKESKMZWoyC9oPVhYlgprL8A==
+X-Google-Smtp-Source: AGHT+IHr36DvHEz2+85x5LNLKCHnUoyFV1x/uPPYlL7w1fGwOWTD05+e+bHbErJVkFvTLK5jfDs20ZiXmHIMBKJeHX8=
+X-Received: by 2002:a50:d097:0:b0:552:e6a0:cddb with SMTP id
+ v23-20020a50d097000000b00552e6a0cddbmr20296edd.2.1702655019497; Fri, 15 Dec
+ 2023 07:43:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231213232455.2248056-1-robh@kernel.org> <20231214-buzz-playlist-2f75095ef2b0@spud>
- <CAL_JsqKaGFfQNwR3HqRnVs3K7SUtevpoG6tEDntM0SNfyyp6AQ@mail.gmail.com> <e59ff8c2-caa1-4072-b86f-0446120ac49b@lunn.ch>
-In-Reply-To: <e59ff8c2-caa1-4072-b86f-0446120ac49b@lunn.ch>
-From: Rob Herring <robh@kernel.org>
-Date: Fri, 15 Dec 2023 09:41:15 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqJwqQTCJmAfNpM7z+0BjusB33OwUgr7_7AxOpnQ-GwaLQ@mail.gmail.com>
-Message-ID: <CAL_JsqJwqQTCJmAfNpM7z+0BjusB33OwUgr7_7AxOpnQ-GwaLQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] dt-bindings: net: marvell,orion-mdio: Drop "reg"
- sizes schema
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Conor Dooley <conor@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <20231213082029.35149-1-kuniyu@amazon.com> <20231213082029.35149-4-kuniyu@amazon.com>
+In-Reply-To: <20231213082029.35149-4-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 15 Dec 2023 16:43:25 +0100
+Message-ID: <CANn89iLz+D6NTnNcX0WdXkMx5=c2yr9q6AP3gS7XYzYKYqrCnQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 03/12] tcp: Save v4 address as v4-mapped-v6 in inet_bind2_bucket.v6_rcv_saddr.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 15, 2023 at 4:18=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+On Wed, Dec 13, 2023 at 9:22=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
 >
-> On Thu, Dec 14, 2023 at 12:12:42PM -0600, Rob Herring wrote:
-> > On Thu, Dec 14, 2023 at 10:23=E2=80=AFAM Conor Dooley <conor@kernel.org=
-> wrote:
-> > >
-> > > On Wed, Dec 13, 2023 at 05:24:55PM -0600, Rob Herring wrote:
-> > > > Defining the size of register regions is not really in scope of wha=
-t
-> > > > bindings need to cover. The schema for this is also not completely =
-correct
-> > > > as a reg entry can be variable number of cells for the address and =
-size,
-> > > > but the schema assumes 1 cell.
-> > > >
-> > > > Signed-off-by: Rob Herring <robh@kernel.org>
-> > >
-> > > Does this not also remove restrictions on what the number in the reg
-> > > entry is actually allowed to be?
-> >
-> > Yes, that's what I mean with the first sentence. We don't do this
-> > anywhere else with the exception of some I2C devices with fixed
-> > addresses. Keying off of the interrupt property also seems
-> > questionable. If the register size is different, that should be a
-> > different compatible.
+> In bhash2, IPv4/IPv6 addresses are saved in two union members,
+> which complicate address checks in inet_bind2_bucket_addr_match()
+> and inet_bind2_bucket_match_addr_any() considering uninitialised
+> memory and v4-mapped-v6 conflicts.
 >
-> Reading the code, it appears the hardware always supported interrupts,
-> however the first version of the driver never used them. It seems like
-> some DT blobs had the register space cover just the needed registers
-> for polling, and excluded the interrupt control register. When
-> interrupt support was added, all in-tree DT files were updated with
-> the extended register space, but to allow backwards compatibility, the
-> driver checks the length of the register space and will not enable
-> interrupts if its too small.
+> Let's simplify that by saving IPv4 address as v4-mapped-v6 address
+> and defining tb2.rcv_saddr as tb2.v6_rcv_saddr.s6_addr32[3].
 >
-> I'm guessing that since the hardware did not change, a new compatible
-> was not used when adding interrupt support. And the yaml is there to
-> help when old out of tree .dts files are merged into the tree and have
-> the old register space.
+> Then, we can compare v6 address as is, and after checking v4-mapped-v6,
+> we can compare v4 address easily.  Also, we can remove tb2->family.
 >
-> This is and old driver, and its usage of DT is from long before many
-> of the current best practices where determined, or yaml was even an
-> idea. So i'm not surprised it has a few odd quirks.
+> Note these functions will be further refactored in the next patch.
 >
-> I don't see a reason not to remove these constraints, as i said, the
-> driver should do the right thing if the register space it too small
-> and YAML does not warn about it.
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Is that an Ack? I almost read your double negative as a Nak and that's
-what the maintainers read because it is now "Rejected" in PW.
 
-Rob
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
