@@ -1,175 +1,160 @@
-Return-Path: <netdev+bounces-57961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0A93814980
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:41:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2118814983
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:42:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EFD0286AC1
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 13:41:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E7231F23689
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 13:42:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C612E3FB;
-	Fri, 15 Dec 2023 13:41:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F8F52DF98;
+	Fri, 15 Dec 2023 13:42:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BAbLq0a4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hPQlok4w"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0439C2DF97;
-	Fri, 15 Dec 2023 13:41:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B574C433C8;
-	Fri, 15 Dec 2023 13:41:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702647704;
-	bh=ofCPvhE3rPFrA60eGlM3ABSTLtZ1mI9JLqdMqmvW9mY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BAbLq0a4k8KxFFquNN34idVISj8/qphcRB/0zIg2gLy223GHS4OSCkrm2M0x/+q0x
-	 7b8r9THOzs0M6mzYX3LHbNsrL9TJn3+BxVqyCopjz6pe/nAgDh7aiPAWgoHfvHN3OE
-	 q6A3anYQ+c/1CytuIyuCOQVuDnxXK/Tegkc1PVAHXMsTsngIos6IIWdDgRNPoZ1ntE
-	 mDVje97TaV5JHyLx5oyh04CqXYGGWFz5WH1hPQsGg1UcwZSZdZNy5SbrwnPLiRfJKl
-	 UcCeyjO9BppBSPOgOmwex+qNQbSnGyeb61bvgINSCj1+EbNafYodkOBjrE7dIMiE7c
-	 Eem1jJWp4fRZg==
-Date: Fri, 15 Dec 2023 13:41:38 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Jie Luo <quic_luoj@quicinc.com>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, agross@kernel.org,
-	andersson@kernel.org, konrad.dybcio@linaro.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, robert.marko@sartura.hr,
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	quic_srichara@quicinc.com
-Subject: Re: [PATCH v2 5/5] dt-bindings: net: ipq4019-mdio: Document ipq5332
- platform
-Message-ID: <20231215-gauze-sprinkled-172729f22b6c@spud>
-References: <a1e5ffec-a20d-4389-83f9-ee09bd9d733d@linaro.org>
- <a84a36af-69f8-46af-967e-b06d028597a3@quicinc.com>
- <26c8b0b1-5ea9-45cc-adf3-0d0b03a1284d@linaro.org>
- <4b9c56b8-3b29-4861-a3d5-2da26fbc14b4@quicinc.com>
- <2e77e3b1-00b6-46b9-bfed-7cae3ffa15e9@linaro.org>
- <7bae46fd-63fd-4b86-9a56-73052cf0ea95@quicinc.com>
- <5a8095e6-b6a6-4d11-b006-31519e8d8622@linaro.org>
- <7466b655-2b7e-44f2-a510-6e0cc1b95248@quicinc.com>
- <602759ce-c93d-4111-9272-1dce7e4a170a@linaro.org>
- <f656d1c7-ea86-405a-9165-9eb079ea6f2a@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09CF82DF68
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 13:42:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-54dcfca54e0so914904a12.1
+        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 05:42:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702647723; x=1703252523; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JWyY+1ZRwB7JSCluGmdigCtNxrtlYQpVrbJS1gPGz5w=;
+        b=hPQlok4wox0ztFwbg3KjtCPhaieD9PRio3Rh8OeuTgCqswhwC/48FBKWwGz2Q3+4C+
+         pmt3L1DO+gP66p6X2lpx+B8vXW2v2wf+2R0kFdgDRJfDV8j4z74tSxWH9yOfNW5S5UnP
+         7FMxZGeOmgdtcW59/TB56uza38Q+21xcw9AmJuYXOwAltLAAAp2dqqLkQQrCtLo1hpL1
+         hHjJlV++eGDLWyLKftDoSR7MjBcgorPnZwtXcrBV4IFI9uNkVDIcJ62OkPsti+ifsUXL
+         UcPl3G4vLsvah3mIVVWW+4LS0qCaU8SbIcVXYn3dal4+n8X+ar3IPYzpWkXVZzcu3Qqa
+         rsvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702647723; x=1703252523;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JWyY+1ZRwB7JSCluGmdigCtNxrtlYQpVrbJS1gPGz5w=;
+        b=KGEU09lq0ODOa5EZ8KbyOkDp4RUA1odmyM3iMmhDOV+4zlCu8vCMZKmtu8Fmvc0dAH
+         nvDYY3z4crjR1QbZx2Q97DP+JeLarz/BVZ3W4fu5LQ+sOD087FEo3SZOhvnrDCtVpmcp
+         EPbaZiiVxItr/P/0T48wB+IC+VtLmibyN85aAFYiwubB4uIKng6ojxHvTtV9gGHqqNY1
+         i0MVajZXwh3hk5F3ncJ1f0KUYmT9Pz9qd6+SNnlCfkGgBbLOxXpfaRxwCufujdB9X/vD
+         9xR+7/syELD/zEHo84oheJKdCY29ocw38PYAZso9fpLi7Li6W2OfZ/Fy6y8Qr+6h0ohK
+         GD5Q==
+X-Gm-Message-State: AOJu0Yxe9GnetiAkCUU9L1pBTb55E/0wgQOKj1K0awU7MXoDeCRJVMXj
+	t1DKzegtnt+6ltlIfu4PVq8=
+X-Google-Smtp-Source: AGHT+IF25RzXmMk4vfMp7QaNzOQ98zw63IElqtHzdXCgyMKhef498DDQK2jhu9O5AH8nenEjjEm11w==
+X-Received: by 2002:a17:907:7d8c:b0:a1d:58ff:df2b with SMTP id oz12-20020a1709077d8c00b00a1d58ffdf2bmr7117987ejc.17.1702647722883;
+        Fri, 15 Dec 2023 05:42:02 -0800 (PST)
+Received: from ?IPV6:2a01:c23:c4af:da00:753e:3071:8b26:92a4? (dynamic-2a01-0c23-c4af-da00-753e-3071-8b26-92a4.c23.pool.telefonica.de. [2a01:c23:c4af:da00:753e:3071:8b26:92a4])
+        by smtp.googlemail.com with ESMTPSA id cw15-20020a170907160f00b00a1937153bddsm10673996ejd.20.2023.12.15.05.42.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Dec 2023 05:42:02 -0800 (PST)
+Message-ID: <83dc80d3-1c26-405d-a08d-2db4bc318ac8@gmail.com>
+Date: Fri, 15 Dec 2023 14:42:01 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="TU1olG04/N/WRNt5"
-Content-Disposition: inline
-In-Reply-To: <f656d1c7-ea86-405a-9165-9eb079ea6f2a@quicinc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] net: ethtool: do runtime PM outside RTNL
+Content-Language: en-US
+To: Marc MERLIN <marc@merlins.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+References: <20231206113934.8d7819857574.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
+ <20231206084448.53b48c49@kernel.org>
+ <e6f227ee701e1ee37e8f568b1310d240a2b8935a.camel@sipsolutions.net>
+ <a44865f5-3a07-d60a-c333-59c012bfa2fb@intel.com>
+ <20231207094021.1419b5d0@kernel.org> <20231211045200.GC24475@merlins.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20231211045200.GC24475@merlins.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 11.12.2023 05:52, Marc MERLIN wrote:
+> On Thu, Dec 07, 2023 at 09:40:21AM -0800, Jakub Kicinski wrote:
+>> On Thu, 7 Dec 2023 11:16:10 +0100 Przemek Kitszel wrote:
+>>> I have let know our igc TL, architect, and anybody that could be
+>>> interested via cc: IWL. And I'm happy that this could be done at
+>>> relaxed pace thanks to Johannes
+>>
+>> I think you may be expecting us to take Johannes's patch.
+>> It's still on the table, but to make things clear -
+>> upstream we prefer to wait for the "real fix", so if we agree
+>> that fixing igb/igc is a better way (as Heiner pointed out on previous
+>> version PM functions are called by the stack under rtnl elsewhere too,
+>> just not while device is open) - we'll wait for that. Especially
+>> that I'm 80% I complained about the PM in those drivers in
+>> the past and nobody seemed to care. It's a constant source of rtnl
+>> deadlocks.
+> 
+> For whatever it's worth, I want to be clear that all stock kernels
+> are 100% unusable on lenovo P17gen2 because of this deadlock and that
+> without the temporary patch, my laptop would be usuable.
+> It was also a risk of data loss due to repeated deadlocks and unclean
+> shutdowns.
+> 
+Why don't you simply disable runtime pm for the affected device as a
+workaround? This can be done via sysfs.
 
---TU1olG04/N/WRNt5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> I cannot say what the correct fix is, but I am definitely hoping you
+> will accept some solution for the next stable kernel.
+> 
+> Thank you
+> Marc
 
-On Fri, Dec 15, 2023 at 08:40:20PM +0800, Jie Luo wrote:
->=20
->=20
-> On 12/15/2023 8:19 PM, Krzysztof Kozlowski wrote:
-> > On 15/12/2023 12:42, Jie Luo wrote:
-> > > > > > > > > > Which clocks are these mentioned in the property? From =
-where do they come?
-> > > > > > > > > >=20
-> > > > > > > > > > Anyway, property is in existing form is not correct - t=
-his is not a
-> > > > > > > > > > generic property.
-> > > > > > > > > >=20
-> > > > > > > > >=20
-> > > > > > > > > This property cmn-reference-clock is just the hardware re=
-gister
-> > > > > > > > > configuration, since the different IPQ platform needs to =
-select
-> > > > > > > > > the different reference clock source for the CMN PLL bloc=
-k that
-> > > > > > > > > provides the various clock outputs to the all kinds of Et=
-hernet
-> > > > > > > > > devices, which is not from GCC provider.
-> > > > > > > >=20
-> > > > > > > > AGAIN: where do the clocks come from? Which device generate=
-s them?
-> > > > > > >=20
-> > > > > > > Oh, OK, the reference clock is from wifi that provides 48MHZ =
-to
-> > > > > > > Ethernet block.
-> > > > > >=20
-> > > > > > Then WiFi should be providing you the clock and this device sho=
-uld be
-> > > > > > clock consumer, right?
-> > > > >=20
-> > > > > Yes, wifi provides 48MHz clock to CMM PLL block, there is no GCC
-> > > > > for this 48MHZ clock output, it is the hardware PIN connection.
-> > > >=20
-> > > > All clocks are some hardware pin connections.
-> > > >=20
-> > > > Best regards,
-> > > > Krzysztof
-> > > >=20
-> > >=20
-> > > Yes, all reference clocks here are from hardware pin connection.
-> >=20
-> > You keep answering with short sentences without touching the root of the
-> > problem. I don't know exactly why, but I feel this discussion leads
-> > nowhere. After long discussion you finally admitted that clocks came
-> > from another device - Wifi. It took us like 6 emails?
-> >=20
-> > So last statement: if you have clock provider and clock consumer, you
-> > must represent it in the bindings or provide rationale why it should not
-> > or must not be represented in the bindings. So far I do not see any of
-> > such arguments.
-> >=20
-> > If you use arguments like:
-> > "My driver....": sorry, bindings are not about drivers
-> > "I don't have clock driver for WiFi": sorry, it does not matter if you
-> > can write one, right?
-> >=20
-> > Please reach internally your colleagues to solve these problems and make
-> > review process smoother.
-
-> These reference clocks source do not need the hardware configuration,
-> that is the reason why the clock provider is not needed, some reference
-> clock source are even from external crystal.
-
-I fail to understand how that makes this clock different to the clocks
-on any other platform. Clocks from external crystals are present in many
-many systems. See for example fixed-clock.yaml.
-
-> There is also no enable control for the reference clocks since it is
-> inputted by the hardware PIN connection, i will update these description
-> in the DT to make it more clear.
-
-Again, this does not justify having custom properties for this clock,
-as it is no different to other platforms. As far as I can tell, the only
-thing that a standard "clocks" property cannot convey here is the
-internal reference. I would suggest that since there is only one
-internal clock frequency, the absence of this particular clock in the
-"clocks" property can be used to determine that the reference is the
-internal one.
-
-Thanks,
-Conor.
-
---TU1olG04/N/WRNt5
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZXxXjgAKCRB4tDGHoIJi
-0ktnAQDXBBwhZHLj4sCIUSdyx4+oOH09y7pvBGaGOqmUTOcvqAEAzJuNBZWAf+Y6
-Z4suZfbVe+CoDxDWfXUAiedmYQY7kgA=
-=tykB
------END PGP SIGNATURE-----
-
---TU1olG04/N/WRNt5--
 
