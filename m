@@ -1,39 +1,43 @@
-Return-Path: <netdev+bounces-58071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC1AC814F38
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 18:52:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B051A814F42
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 18:53:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F42EB2242F
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 17:51:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 420BA28276F
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 17:53:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6179A82EE3;
-	Fri, 15 Dec 2023 17:49:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C7BE3011D;
+	Fri, 15 Dec 2023 17:51:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a7ij1vE/"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jay9ougN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4788F4184E
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 17:49:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AB1FC433C7;
-	Fri, 15 Dec 2023 17:49:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702662586;
-	bh=d6HjQ90ZtNX1IkZrZUhDnF2CqbAfowKH+HF2mcG8qLc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=a7ij1vE/5+BQ0iN2l9sJBQprmghqCzk3Wm42Psu+H/Ewtwji6pGnt5rcg/bmj18Lh
-	 3PLh9aIICal1FGN/tAb4ezqhjuQCYuaaDpF/XLcKyzgm7XSbgnddkbQk0M9mm69p4g
-	 ENgFgHhwNnfoyo3c3VRZG2VxQ4zd5X7VzpE3CuWWBq7J9gEqfhZfOogjY3SA8nf7J2
-	 QoFoLNbrc/XCa5RGCEo6c2sMkmC4mTG7E0PNHq0exK19Ayd/nbfQ6svtP8ANMoxB76
-	 6fQ55yPU4inql6GrC3/ue7txV872pRKguBUvBFwg1RQZaqe2dsd9JORMz17VrNFCKA
-	 Y/+cO5+5doMHQ==
-Message-ID: <58519bfa-260c-4745-a145-fdca89b4e9d1@kernel.org>
-Date: Fri, 15 Dec 2023 09:49:45 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D34CA45C16;
+	Fri, 15 Dec 2023 17:51:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Cc:Content-ID:Content-Description;
+	bh=+iPdiJNdZVJJftJlmJirKXP1ftutRoMmfkmL/gnsteY=; b=jay9ougNBK8TghytFpUhx1y5b9
+	mytxfXrEWaqLun8HqrByCIQ1KJ0tS9xj2hr6FQv+cYgraTC2H9B7+sgUyeQyhIkW8k9xY3UK6Ru9e
+	4rvkSX87wxIV3VUZ9rwz/hyqc1dUXh5k2kUFk/CUKrZ3WAYsCk5QKrIAyKBc2NVcdEnZN++aoP+M6
+	OHzIUAu/iE/b3akYMpojMKjJhfZTdLsfQxaJ9WnqemAlQxehX5MSBrair0xLWki721i04sG2QIV1V
+	mjLODjZXsvIMQ01s0//xlPLmgdoRhFsQqNY2kx/vE7ou5/j9GOik77l6hJpuiyuMHHiBkfpT7S7R9
+	chetLpkQ==;
+Received: from [50.53.46.231] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rECLg-0049yM-39;
+	Fri, 15 Dec 2023 17:51:45 +0000
+Message-ID: <387c75f9-e2f3-499a-bfb3-17b18398866a@infradead.org>
+Date: Fri, 15 Dec 2023 09:51:44 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,38 +45,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: net: ipconfig: dev_set_mtu call is incompatible with a number of
- Ethernet drivers
+Subject: Re: [net-next PATCH v3 1/3] net: phy: refactor and better document
+ phy_speeds function
 Content-Language: en-US
-To: Graeme Smecher <gsmecher@threespeedlogic.com>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, claudiu.beznea@tuxon.dev,
- nicolas.ferre@microchip.com, mdf@kernel.org
-References: <f532722f-d1ea-d8fb-cf56-da55f3d2eb59@threespeedlogic.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <f532722f-d1ea-d8fb-cf56-da55f3d2eb59@threespeedlogic.com>
+To: Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231215132921.16808-1-ansuelsmth@gmail.com>
+ <20231215132921.16808-2-ansuelsmth@gmail.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20231215132921.16808-2-ansuelsmth@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 12/14/23 12:07 PM, Graeme Smecher wrote:
-> Hi all,
-> 
-> In a number of ethernet drivers, the MTU can't be changed on a running
-> device. Here's one example (from drivers/net/ethernet/cadence/macb_main.c):
-> 
+Hi--
 
-...
-
+On 12/15/23 05:29, Christian Marangi wrote:
+> Refactor the phy_speeds function to be more readable and understandable
+> and add some documentation on it.
 > 
-> So - what to do? I can see three defensible arguments:
+> While on it extend it to take NULL speeds values to make it return only
+> the count of speed modes in the passed mask.
 > 
-> - The network drivers should allow MTU changes on-the-fly (many do), or
-> - The ipconfig code could bring the adapter down and up again, or
-
-looking at the ordering, bringing down the selected device to change the
-MTU seems the more reasonable solution.
-
-> - This is out-of-scope, and I should be reconfiguring the interface in
-> userspace anyways.
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+>  drivers/net/phy/phy-core.c | 50 ++++++++++++++++++++++++++++++++++----
+>  1 file changed, 45 insertions(+), 5 deletions(-)
 > 
+> diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
+> index 966c93cbe616..9618d89458d1 100644
+> --- a/drivers/net/phy/phy-core.c
+> +++ b/drivers/net/phy/phy-core.c
+> @@ -317,17 +317,57 @@ phy_lookup_setting(int speed, int duplex, const unsigned long *mask, bool exact)
+>  }
+>  EXPORT_SYMBOL_GPL(phy_lookup_setting);
+>  
+> +/**
+> + * phy_speeds - return all speeds in mask
+> + * @speeds: pointer to array where to put the speed modes
+> + * @size: size of array where to put the speed modes
+> + * @mask: mask of speed modes to compare with
+> + *
+> + * Take mask, test bit in mask with the settings table and compose the
+> + * speeds array based on that as many as size permits.
+> + *
+> + * With speeds NULL, only the number of detected modes is returned and
+> + * no array is composed. (size value is ignored)
+> + *
+> + * Return the number of detected modes in mask.
 
+    * Return: the number of detected modes in mask.
+
+
+> + */
+
+
+-- 
+#Randy
+https://people.kernel.org/tglx/notes-about-netiquette
+https://subspace.kernel.org/etiquette.html
 
