@@ -1,108 +1,121 @@
-Return-Path: <netdev+bounces-58141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86F3D8154A3
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 00:50:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C77EE8154A8
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 00:53:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 812181C24051
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 23:50:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BBC0286BCC
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 23:53:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A6D1DDC5;
-	Fri, 15 Dec 2023 23:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF2043013E;
+	Fri, 15 Dec 2023 23:53:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Pk/1nUH4"
+	dkim=pass (2048-bit key) header.d=nabijaczleweli.xyz header.i=@nabijaczleweli.xyz header.b="ALLplDil"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+Received: from tarta.nabijaczleweli.xyz (tarta.nabijaczleweli.xyz [139.28.40.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87D118EDA
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 23:50:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702684226; x=1734220226;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=jeuw+gV3HerAJEKsYkEcIEaLL5vpGvorWy07Lc9qDCo=;
-  b=Pk/1nUH4diQ4y+7smlGif8HUoNC4Nsk95+1Nh4U23g7LTUS0sGvVYrhZ
-   PyKrrHnVsuAPckwRhoaOmtkecnULxtLRcm35sLHWgDHYGGv4tAL1gid1e
-   IMnPUubslVgSEXL+7nOt2Ix2R1PZfETsEvwDLZdXWeyCeA7QoiamJq576
-   gXmGWyFSLofD8gOkfh4RFIFBJEx4mZ2ZSQ4gcMpRg7ikefZaMSnR0Pg5C
-   zKYjoS43vZWLp2IJgkPBET285reuJIPgYM8Ezngg+P/eSawArJYG/UP5Y
-   Y38E+VI26cZreI12nEnytMvdEydYOVyCz07VB0urshe7CrU0wlm7dvQDw
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10925"; a="398128496"
-X-IronPort-AV: E=Sophos;i="6.04,280,1695711600"; 
-   d="scan'208";a="398128496"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2023 15:50:26 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10925"; a="845280881"
-X-IronPort-AV: E=Sophos;i="6.04,280,1695711600"; 
-   d="scan'208";a="845280881"
-Received: from unknown (HELO lo0-100.bstnma-vfttp-361.verizon-gni.com) ([10.166.80.24])
-  by fmsmga004.fm.intel.com with ESMTP; 15 Dec 2023 15:50:25 -0800
-From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	larysa.zaremba@intel.com,
-	przemyslaw.kitszel@intel.com,
-	aleksander.lobakin@intel.com,
-	Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-Subject: [PATCH iwl-net] idpf: avoid compiler introduced padding in virtchnl2_rss_key struct
-Date: Fri, 15 Dec 2023 15:48:07 -0800
-Message-Id: <20231215234807.1094344-1-pavan.kumar.linga@intel.com>
-X-Mailer: git-send-email 2.38.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF6249F61;
+	Fri, 15 Dec 2023 23:53:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nabijaczleweli.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabijaczleweli.xyz
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
+	s=202305; t=1702684425;
+	bh=Rp8yaDPkB4QdC5rV4rYLgAqrcv6iNuhHVPicafTNPjA=;
+	h=Date:From:Cc:Subject:From;
+	b=ALLplDilttu5v8rqxLa6CwJtIrwuJP315MxWVHc7kAmGUMtCESeRMxJJKx//uddqP
+	 YcCPENjMBMXJxfHq0jP8o+iUCLyH3eEAFrqTRwXk2l6ce658bdaGBGsnTAwEKA3e35
+	 M1qGj+ioDQOY/FF6TwSy8BACJc46tKJQQGTXETuJYb42Q66j12hIWj/5HbySwik3Rq
+	 1RAE5JsMOXMxZ70/mYf33JVw1C8rek5tApnMlnXPcz0C2nl7G3CHZ+Qay2cHiY4Km2
+	 OuLbW5mgmoXiW+TgjgI2ZnYcCH3NDCgtAc3Tfd8g6AhgSLjdN+S2sEy7gawLVbOJJS
+	 zUIJ1Nc3AdEGA==
+Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
+	by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id E14E3131E6;
+	Sat, 16 Dec 2023 00:53:45 +0100 (CET)
+Date: Sat, 16 Dec 2023 00:53:45 +0100
+From: 
+	Ahelenia =?utf-8?Q?Ziemia=C5=84ska?= <nabijaczleweli@nabijaczleweli.xyz>
+Cc: Trond Myklebust <trond.myklebust@hammerspace.com>, 
+	Anna Schumaker <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, 
+	Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, 
+	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-nfs@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] net: sunrpc: sizeof('\0') is 4, not 1
+Message-ID: <4zlmy3qwneijnrsbygfr2wbsnvdvcgvjyvudqnuxq5zvwmyaof@tarta.nabijaczleweli.xyz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="pluqraly4f3xucjm"
+Content-Disposition: inline
+User-Agent: NeoMutt/20231103-116-3b855e-dirty
 
-Size of the virtchnl2_rss_key struct should be 7 bytes but the
-compiler introduces a padding byte for the structure alignment.
-This results in idpf sending an additional byte of memory to the device
-control plane than the expected buffer size. As the control plane
-enforces virtchnl message size checks to validate the message,
-set RSS key message fails resulting in the driver load failure.
 
-Remove implicit compiler padding by using "__packed" structure
-attribute for the virtchnl2_rss_key struct.
+--pluqraly4f3xucjm
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Also there is no need to use __DECLARE_FLEX_ARRAY macro for the
-'key_flex' struct field. So drop it.
+To make it self-documenting, the referenced commit added the space
+for the null terminator as sizeof('\0'). The message elaborates on
+why only one byte is needed, so this is clearly a mistake.
+Spell it as 1 /* NUL */ instead.
 
-Fixes: 0d7502a9b4a7 ("virtchnl: add virtchnl version 2 ops")
-Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
-Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+This is the only result for git grep "sizeof.'" in the tree.
+
+Fixes: commit 1e360a60b24a ("SUNRPC: Address  buffer overrun in
+ rpc_uaddr2sockaddr()")
+Signed-off-by: Ahelenia Ziemia=C5=84ska <nabijaczleweli@nabijaczleweli.xyz>
 ---
- drivers/net/ethernet/intel/idpf/virtchnl2.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ net/sunrpc/addr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/virtchnl2.h b/drivers/net/ethernet/intel/idpf/virtchnl2.h
-index 07e72c72d15..8dc83788972 100644
---- a/drivers/net/ethernet/intel/idpf/virtchnl2.h
-+++ b/drivers/net/ethernet/intel/idpf/virtchnl2.h
-@@ -1104,9 +1104,9 @@ struct virtchnl2_rss_key {
- 	__le32 vport_id;
- 	__le16 key_len;
- 	u8 pad;
--	__DECLARE_FLEX_ARRAY(u8, key_flex);
--};
--VIRTCHNL2_CHECK_STRUCT_LEN(8, virtchnl2_rss_key);
-+	u8 key_flex[];
-+} __packed;
-+VIRTCHNL2_CHECK_STRUCT_LEN(7, virtchnl2_rss_key);
- 
- /**
-  * struct virtchnl2_queue_chunk - chunk of contiguous queues
--- 
-2.38.1
+diff --git a/net/sunrpc/addr.c b/net/sunrpc/addr.c
+index d435bffc6199..c4ba342f6866 100644
+--- a/net/sunrpc/addr.c
++++ b/net/sunrpc/addr.c
+@@ -311,7 +311,7 @@ size_t rpc_uaddr2sockaddr(struct net *net, const char *=
+uaddr,
+ 			  const size_t uaddr_len, struct sockaddr *sap,
+ 			  const size_t salen)
+ {
+-	char *c, buf[RPCBIND_MAXUADDRLEN + sizeof('\0')];
++	char *c, buf[RPCBIND_MAXUADDRLEN + 1 /* NUL */];
+ 	u8 portlo, porthi;
+ 	unsigned short port;
+=20
 
+base-commit: 26aff849438cebcd05f1a647390c4aa700d5c0f1
+--=20
+2.39.2
+
+--pluqraly4f3xucjm
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmV85wkACgkQvP0LAY0m
+WPE6lQ/+NHjguNV1PqOjyvFWculazWD9CBMypIE2ibK1lYsJl5ekrN1odp5UGdUI
+fmFemQFGcWnzmxKU/P1iBJwn7TRmuoPKiUnq+MFmGVEtBserGOGbwIxJnPlGIMhW
+nSA/7lyUJHR3xYc57YLSmnRPtpfiuNPpyCASKuuRh1TLJ6NMMS0qCg68thTGvQ0+
+K8mT7tRhplYx83TTKJmp0B39sKtEy/tY1nYGGoKEtNEYs0W9AVHBX23qHGcgJ5y+
+UMxsiJjVYtw1IOR1/hZ6JVUKxre/kewUUrdr4/F5J0SAu7j/a+ygjXZKlGDv19Ik
+eEetfCwBEknB3M0WhldRBnqo9LsJSJM55B06L0yCeUByqIp/PUN88IXNDIBK79yO
+k54V72jJAU4E5ylYJ1CADP2KwW6aUQIFHpIX8eEip89VOMMZIw9I5OB5dvICKdDO
+TQ14LcGiJuuB0mnEJmaYIzuo1jdr1rXXqlejxr+K3Rn7ZjlwRNRQXZ6RXQPvTilO
+gtW7MH2XJHEzmZHHALwnX5wk8jukengejSDN2fJodbCnMumR6mqj/VvWyxdmPOg+
+WlAKqq5pH7nIVumoD3NGC0S3qysJ2EnmzzmjoPmtBX9GxwIVzidRaXdbOVrD31tE
+LZhdmnzdXIS6T69P5LNUJq5gc+EIvU5QikLgweAx3SSgbp4MegM=
+=civI
+-----END PGP SIGNATURE-----
+
+--pluqraly4f3xucjm--
 
