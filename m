@@ -1,176 +1,158 @@
-Return-Path: <netdev+bounces-57704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83792813F5E
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 02:45:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80444813F76
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 02:51:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23305B21F01
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 01:45:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08CCFB21CED
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 01:51:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2068D650;
-	Fri, 15 Dec 2023 01:45:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80A82624;
+	Fri, 15 Dec 2023 01:51:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="tMJqbphW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 085EC2574;
-	Fri, 15 Dec 2023 01:45:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F892C433C7;
-	Fri, 15 Dec 2023 01:45:41 +0000 (UTC)
-Date: Thu, 14 Dec 2023 20:46:29 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>, "Paul E. McKenney"
- <paulmck@kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Alexander
- Potapenko <glider@google.com>, Andrey Konovalov <andreyknvl@gmail.com>,
- Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [bug] splat at boot
-Message-ID: <20231214204629.1b380b82@gandalf.local.home>
-In-Reply-To: <CAADnVQ+dPML0DW=Miuq=n7nC8m4gcPj7Dk_nhedzs9zTE30arw@mail.gmail.com>
-References: <CAADnVQ+dPML0DW=Miuq=n7nC8m4gcPj7Dk_nhedzs9zTE30arw@mail.gmail.com>
-X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF08B10F3
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 01:51:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1702605085; x=1734141085;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=VVRqC07AyHT2rQC8j4OSNYBMB8IKQGcyHhijztHrBuM=;
+  b=tMJqbphWp/JiElQ2PyorXrPyDkuMs+pycUbesZrm1HSuSNr9PM9FTrgt
+   ns9Wpqnf1uj4SXxOcQaGrUsGyZNpyX///F/P6kI6J9rtmdv2hh5Kqb9WL
+   KcVQTWylFuksfmQXFclImO8k8YO9AWrY1srHbdsi8VDEsmVk93Mvfi46w
+   I=;
+X-IronPort-AV: E=Sophos;i="6.04,277,1695686400"; 
+   d="scan'208";a="600739375"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-af372327.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2023 01:51:18 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
+	by email-inbound-relay-pdx-2a-m6i4x-af372327.us-west-2.amazon.com (Postfix) with ESMTPS id 1600460CA1;
+	Fri, 15 Dec 2023 01:51:17 +0000 (UTC)
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:1663]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.2.31:2525] with esmtp (Farcaster)
+ id 5bd78f9a-7d22-44cd-aa05-4a2fbc703fde; Fri, 15 Dec 2023 01:51:16 +0000 (UTC)
+X-Farcaster-Flow-ID: 5bd78f9a-7d22-44cd-aa05-4a2fbc703fde
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 15 Dec 2023 01:51:16 +0000
+Received: from 88665a182662.ant.amazon.com (10.37.244.8) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 15 Dec 2023 01:51:12 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <jakub@cloudflare.com>,
+	<kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<kuniyu@amazon.com>
+Subject: Re: [PATCH net-next 1/2] inet: returns a bool from inet_sk_get_local_port_range()
+Date: Fri, 15 Dec 2023 10:50:58 +0900
+Message-ID: <20231215015058.38150-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20231214192939.1962891-2-edumazet@google.com>
+References: <20231214192939.1962891-2-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D033UWC001.ant.amazon.com (10.13.139.218) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-On Thu, 14 Dec 2023 17:25:46 -0800
-Alexei Starovoitov <alexei.starovoitov@gmail.com> wrote:
-
-> Hi All,
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 14 Dec 2023 19:29:38 +0000
+> Change inet_sk_get_local_port_range() to return a boolean,
+> telling the callers if the port range was provided by
+> IP_LOCAL_PORT_RANGE socket option.
 > 
-> just noticed a boot splat that probably was there for lone time:
+> Adds documentation while we are at it.
 > 
-> [    1.118691] ftrace: allocating 50546 entries in 198 pages
-> [    1.129690] ftrace: allocated 198 pages with 4 groups
-> [    1.130156]
-> [    1.130158] =============================
-> [    1.130159] [ BUG: Invalid wait context ]
-> [    1.130161] 6.7.0-rc3-00837-g403f3e8fda60 #5272 Not tainted
-> [    1.130163] -----------------------------
-> [    1.130165] swapper/0 is trying to lock:
-> [    1.130166] ffff88823fffb1d8 (&zone->lock){....}-{3:3}, at:
-> __rmqueue_pcplist+0xe80/0x1100
-> [    1.130181] other info that might help us debug this:
-> [    1.130182] context-{5:5}
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Can you trigger this with CONFIG_PROVE_RAW_LOCK_NESTING disabled?
-
-If not, then I wouldn't worry about it for now, but this will need to be
-addressed when PREEMPT_RT is included.
-
-Basically, a spin_lock() in PREEMPT_RT is converted into a mutex, and most
-interrupt handlers and all softirqs are turned into threads. But there's
-still cases where spin_lock() can not be used. One is for interrupt
-handlers that will not turn into a thread (like the timer interrupt), and
-for when a raw_spin_lock is held. You can't have:
-
-  raw_spin_lock(rawlock);
-  spin_lock(spinlock);
-
-order.
-
-But if you can trigger it without the PROVE_RAW_LOCK_NESTING, then it's
-something that needs to be addressed today.
-
--- Steve
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
 
-> [    1.130184] 3 locks held by swapper/0:
-> [    1.130185]  #0: ffffffff84334888 (slab_mutex){....}-{4:4}, at:
-> kmem_cache_create_usercopy+0x47/0x270
-> [    1.130197]  #1: ffffffff8437aad8 (kmemleak_lock){....}-{2:2}, at:
-> __create_object+0x36/0xa0
-> [    1.130207]  #2: ffff8881f6c37c18 (&pcp->lock){....}-{3:3}, at:
-> get_page_from_freelist+0x8be/0x2250
-> [    1.130215] stack backtrace:
-> [    1.130217] CPU: 0 PID: 0 Comm: swapper Not tainted
-> 6.7.0-rc3-00837-g403f3e8fda60 #5272
-> [    1.130221] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-> BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
-> [    1.130224] Call Trace:
-> [    1.130225]  <TASK>
-> [    1.130228]  dump_stack_lvl+0x4a/0x80
-> [    1.130234]  __lock_acquire+0xd5d/0x34e0
-> [    1.130244]  ? lockdep_hardirqs_on_prepare+0x220/0x220
-> [    1.130248]  ? __lock_acquire+0x906/0x34e0
-> [    1.130254]  lock_acquire+0x155/0x3b0
-> [    1.130258]  ? __rmqueue_pcplist+0xe80/0x1100
-> [    1.130263]  ? lock_sync+0x100/0x100
-> [    1.130268]  ? secondary_startup_64_no_verify+0x166/0x16b
-> [    1.130274]  ? lockdep_hardirqs_on_prepare+0x220/0x220
-> [    1.130279]  _raw_spin_lock_irqsave+0x3f/0x60
-> [    1.130284]  ? __rmqueue_pcplist+0xe80/0x1100
-> [    1.130288]  __rmqueue_pcplist+0xe80/0x1100
-> [    1.130293]  ? lock_acquire+0x165/0x3b0
-> [    1.130300]  ? find_suitable_fallback+0xe0/0xe0
-> [    1.130306]  get_page_from_freelist+0x91c/0x2250
-> [    1.130314]  ? lock_release+0x219/0x3a0
-> [    1.130317]  ? __stack_depot_save+0x223/0x450
-> [    1.130322]  ? reacquire_held_locks+0x270/0x270
-> [    1.130328]  ? __zone_watermark_ok+0x290/0x290
-> [    1.130332]  ? prepare_alloc_pages.constprop.0+0x173/0x220
-> [    1.130337]  __alloc_pages+0x188/0x390
-> [    1.130342]  ? __alloc_pages_slowpath.constprop.0+0x1380/0x1380
-> [    1.130347]  ? unwind_next_frame+0x1ee/0xe10
-> [    1.130354]  ? secondary_startup_64_no_verify+0x166/0x16b
-> [    1.130358]  ? secondary_startup_64_no_verify+0x166/0x16b
-> [    1.130362]  ? write_profile+0x220/0x220
-> [    1.130366]  ? policy_nodemask+0x28/0x190
-> [    1.130371]  alloc_pages_mpol+0xf0/0x2c0
-> [    1.130376]  ? mempolicy_in_oom_domain+0x90/0x90
-> [    1.130381]  ? secondary_startup_64_no_verify+0x166/0x16b
-> [    1.130387]  __stack_depot_save+0x36f/0x450
-> [    1.130393]  set_track_prepare+0x79/0xa0
-> [    1.130396]  ? get_object+0x50/0x50
-> [    1.130400]  ? kmem_cache_alloc_node+0x222/0x3b0
-> [    1.130404]  ? __kmem_cache_create+0x167/0x5e0
-> [    1.130408]  ? kmem_cache_create_usercopy+0x17c/0x270
-> [    1.130412]  ? kmem_cache_create+0x16/0x20
-> [    1.130415]  ? sched_init+0xf8/0x780
-> [    1.130420]  ? start_kernel+0x13c/0x390
-> [    1.130425]  ? x86_64_start_reservations+0x18/0x30
-> [    1.130428]  ? x86_64_start_kernel+0xb2/0xc0
-> [    1.130431]  ? secondary_startup_64_no_verify+0x166/0x16b
-> [    1.130436]  ? strncpy+0x33/0x60
-> [    1.130441]  __link_object+0x21c/0x4c0
-> [    1.130447]  __create_object+0x4e/0xa0
-> [    1.130452]  kmem_cache_alloc_node+0x222/0x3b0
-> [    1.130457]  ? calculate_sizes+0x2eb/0x320
-> [    1.130462]  __kmem_cache_create+0x167/0x5e0
-> [    1.130467]  kmem_cache_create_usercopy+0x17c/0x270
-> [    1.130471]  ? cpupri_init+0xe6/0x100
-> [    1.130478]  kmem_cache_create+0x16/0x20
-> [    1.130482]  sched_init+0xf8/0x780
-> [    1.130486]  start_kernel+0x13c/0x390
-> [    1.130491]  x86_64_start_reservations+0x18/0x30
-> [    1.130494]  x86_64_start_kernel+0xb2/0xc0
-> [    1.130498]  secondary_startup_64_no_verify+0x166/0x16b
-> [    1.130506]  </TASK>
-> [    1.133575] Running RCU self tests
+> ---
+>  include/net/ip.h                |  2 +-
+>  net/ipv4/inet_connection_sock.c | 21 ++++++++++++++++-----
+>  2 files changed, 17 insertions(+), 6 deletions(-)
 > 
-> Looks to be stackdepot related?
-> 
-> I haven't debugged it yet.
-> Wondering, is this a known issue?
-> 
-> CONFIG_KASAN=y
-> CONFIG_KASAN_GENERIC=y
-> CONFIG_KASAN_OUTLINE=y
-> # CONFIG_KASAN_INLINE is not set
-> CONFIG_KASAN_STACK=y
-> CONFIG_KASAN_VMALLOC=y
-> # CONFIG_KASAN_MODULE_TEST is not set
-> CONFIG_HAVE_ARCH_KFENCE=y
-> CONFIG_KFENCE=y
-> CONFIG_DEBUG_ATOMIC_SLEEP=y
-
+> diff --git a/include/net/ip.h b/include/net/ip.h
+> index b31be912489af8b01cc0393a27ffc80b086feaa0..de0c69c57e3cb7485e3d8473bc0b109e4280d2f6 100644
+> --- a/include/net/ip.h
+> +++ b/include/net/ip.h
+> @@ -356,7 +356,7 @@ static inline void inet_get_local_port_range(const struct net *net, int *low, in
+>  	*low = range & 0xffff;
+>  	*high = range >> 16;
+>  }
+> -void inet_sk_get_local_port_range(const struct sock *sk, int *low, int *high);
+> +bool inet_sk_get_local_port_range(const struct sock *sk, int *low, int *high);
+>  
+>  #ifdef CONFIG_SYSCTL
+>  static inline bool inet_is_local_reserved_port(struct net *net, unsigned short port)
+> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+> index 70be0f6fe879ea671bf6686b04edf32bf5e0d4b6..bd325b029dd12c9fad754ded266ae232ee7ec260 100644
+> --- a/net/ipv4/inet_connection_sock.c
+> +++ b/net/ipv4/inet_connection_sock.c
+> @@ -117,16 +117,25 @@ bool inet_rcv_saddr_any(const struct sock *sk)
+>  	return !sk->sk_rcv_saddr;
+>  }
+>  
+> -void inet_sk_get_local_port_range(const struct sock *sk, int *low, int *high)
+> +/**
+> + *	inet_sk_get_local_port_range - fetch ephemeral ports range
+> + *	@sk: socket
+> + *	@low: pointer to low port
+> + *	@high: pointer to high port
+> + *
+> + *	Fetch netns port range (/proc/sys/net/ipv4/ip_local_port_range)
+> + *	Range can be overridden if socket got IP_LOCAL_PORT_RANGE option.
+> + *	Returns true if IP_LOCAL_PORT_RANGE was set on this socket.
+> + */
+> +bool inet_sk_get_local_port_range(const struct sock *sk, int *low, int *high)
+>  {
+> -	const struct inet_sock *inet = inet_sk(sk);
+> -	const struct net *net = sock_net(sk);
+>  	int lo, hi, sk_lo, sk_hi;
+> +	bool local_range = false;
+>  	u32 sk_range;
+>  
+> -	inet_get_local_port_range(net, &lo, &hi);
+> +	inet_get_local_port_range(sock_net(sk), &lo, &hi);
+>  
+> -	sk_range = READ_ONCE(inet->local_port_range);
+> +	sk_range = READ_ONCE(inet_sk(sk)->local_port_range);
+>  	if (unlikely(sk_range)) {
+>  		sk_lo = sk_range & 0xffff;
+>  		sk_hi = sk_range >> 16;
+> @@ -135,10 +144,12 @@ void inet_sk_get_local_port_range(const struct sock *sk, int *low, int *high)
+>  			lo = sk_lo;
+>  		if (lo <= sk_hi && sk_hi <= hi)
+>  			hi = sk_hi;
+> +		local_range = true;
+>  	}
+>  
+>  	*low = lo;
+>  	*high = hi;
+> +	return local_range;
+>  }
+>  EXPORT_SYMBOL(inet_sk_get_local_port_range);
+>  
+> -- 
+> 2.43.0.472.g3155946c3a-goog
 
