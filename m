@@ -1,73 +1,58 @@
-Return-Path: <netdev+bounces-57986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24806814AEA
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 15:46:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95521814AF2
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 15:49:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5A8F2841DA
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:46:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F5351F23892
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:49:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 393BE2F854;
-	Fri, 15 Dec 2023 14:46:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d8pdryL7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4646B34540;
+	Fri, 15 Dec 2023 14:49:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBC435882;
-	Fri, 15 Dec 2023 14:46:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E6831734;
+	Fri, 15 Dec 2023 14:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d346f4a043so1501645ad.0;
-        Fri, 15 Dec 2023 06:46:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702651587; x=1703256387; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wJpx8lDh+zgSZj5Gc1ilBxsX86teXNLADKg4dm6Oaq8=;
-        b=d8pdryL7UmwSQcJdyTKKF0h4h0DfK9utT1MoC17bv1vuJE8i5wn9AHmEeQwzlLxf7m
-         mcWUo8vKhtQfSkA4+XR9Kd5VsnNcRD78ZVhRi9Dq8bdGx+6jfiHXlx1KSnrHQE8d1fEv
-         RZ+0ReGpHhK/fjUCIJvx/RUCg3zbBWKcEdMWwmW+qW8/7FMvCFGQ3Ngz2gBvsSOmd+Yu
-         YOt+HZRV2qH8NtByl9Af89ys7XJqgN/5dNAPJ2ikN972B6YP+22GNDHdeQAYa84uIm09
-         cM+ppIbbG2cKqzuAqUltfTkEA31Z9xwl0lpG8fE8mtkxOjV0H4NsI1UF8ECrKEUAM5Kq
-         k3mw==
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-6da45aa5549so548834a34.0;
+        Fri, 15 Dec 2023 06:49:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702651587; x=1703256387;
+        d=1e100.net; s=20230601; t=1702651755; x=1703256555;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wJpx8lDh+zgSZj5Gc1ilBxsX86teXNLADKg4dm6Oaq8=;
-        b=AjsNPbUYssgldJ57ZvjneO8ij8OMI3CGjyM0R4rasLhdxPCogKkA6q+ACsPGfqd2oy
-         aw+80NCUjl0Slp85xOjMnLhZhGI9OJfWLfZ93lfI/F3TCduyH9WD2/qELPXWJya5qOtG
-         SJTYH0V7ERp3TuQ22CJ0SAqOqAT+5re9SOUUsugDLlaNs9Fls0YrqU/6VuCHqsz2pKZl
-         ws3ypeT2fhyt6cUhmtd2cdmw/ixowZeAVPCalFQzLkSgb6IZCHMSl6xsRF/GVqNdhl+h
-         PbHWJvrXZ9nWGfI/a0y+4+8SpKOIoctRi5Gd2Cyu4FBDiqt89Go8U0FwCW8Wk6w1P+16
-         nHXg==
-X-Gm-Message-State: AOJu0YwIImfvXpNZOSnsoPS2Lqe34A8FpuuLAjLb15/spDos73jiO2Rq
-	uoAzu/aJrsVVFW1jGYrmUcA=
-X-Google-Smtp-Source: AGHT+IHny81eaLMXZ5yyjDTCB6oMOBj6vglrdTY0sAk1mwbs3U0uy8NXK4+C8NeCNhynkXdOpdMpzw==
-X-Received: by 2002:a17:903:18e:b0:1d0:a146:f85f with SMTP id z14-20020a170903018e00b001d0a146f85fmr23491918plg.2.1702651586354;
-        Fri, 15 Dec 2023 06:46:26 -0800 (PST)
-Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id n6-20020a170902e54600b001d1cd7e4ad2sm14248945plf.125.2023.12.15.06.46.24
+        bh=DTcdU8JgUNSEfxeT9Xh4yUJhv++1bY3Z7SLC7fDL6mU=;
+        b=XRtSamtylUouKMRcV5JKLz702YPtdBAdgH8Vp2ehMud32l6VnevJ5pKXYOoNNA0l7L
+         FDwCMSENJ18EP55Iwowuoos6GDv/FDEQBZgDiZrbsJfMenoQ/WUVuo4J8W6TRG4ehHJl
+         N1DwsCRf6BiD/BpV9cH5xFvQEUEyoaL+xXV37JlD1d1LkncaX6oxanodTYOYhM6PJgIe
+         3Yr/iUnC4aRD3f5fG0gUPRS0ZOO2GSc+SUEm+whLLL9SkXfoO0PjQROYAsBEpRsa+TSs
+         m4OzPTmmTqK5aoCaUn7lKvqFI7RNTjaghIe1l9EGsAIovbm48Jlw7LQ1T5KQuMFLvI5k
+         Xo6g==
+X-Gm-Message-State: AOJu0YyndQM3uqRI0BlHKNx7W66k/rP+oUQcEyoHSlYAZY5gmhanhjQz
+	3CVzDrgKIUqCNTRsG9a/Qg==
+X-Google-Smtp-Source: AGHT+IFYl+saY+Skc5Ug+LewydgV1ECe1agDOExPez3oAwH4Ly9DtXGJzK9hqq07oPCPo7UfUrcG+g==
+X-Received: by 2002:a05:6830:3486:b0:6d8:74e2:c097 with SMTP id c6-20020a056830348600b006d874e2c097mr14209575otu.73.1702651755009;
+        Fri, 15 Dec 2023 06:49:15 -0800 (PST)
+Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id h16-20020a9d7990000000b006d9d8abcdeesm3687410otm.40.2023.12.15.06.49.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Dec 2023 06:46:25 -0800 (PST)
-Date: Fri, 15 Dec 2023 06:46:22 -0800
-From: Richard Cochran <richardcochran@gmail.com>
-To: Min Li <min.li.xe@renesas.com>
-Cc: Min Li <lnimi@hotmail.com>, "lee@kernel.org" <lee@kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 1/2] ptp: introduce PTP_CLOCK_EXTOFF event
- for the measured external offset
-Message-ID: <ZXxmvsqfMFIF0OWQ@hoboy.vegasvil.org>
-References: <PH7PR03MB706431C1C25954AD76134FD8A08CA@PH7PR03MB7064.namprd03.prod.outlook.com>
- <ZXtLvOfS0uYxESQm@hoboy.vegasvil.org>
- <OS3PR01MB65938570774AF540C6BFD8F5BA8CA@OS3PR01MB6593.jpnprd01.prod.outlook.com>
+        Fri, 15 Dec 2023 06:49:14 -0800 (PST)
+Received: (nullmailer pid 3787422 invoked by uid 1000);
+	Fri, 15 Dec 2023 14:49:13 -0000
+Date: Fri, 15 Dec 2023 08:49:13 -0600
+From: Rob Herring <robh@kernel.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Eric Dumazet <edumazet@google.com>, Heiner Kallweit <hkallweit1@gmail.com>, linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>, Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, devicetree@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, Conor Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, Florian Fainelli <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [net-next PATCH v3 3/4] dt-bindings: net: Document QCA808x PHYs
+Message-ID: <170265175286.3787360.12287688657217382801.robh@kernel.org>
+References: <20231213111322.6152-1-ansuelsmth@gmail.com>
+ <20231213111322.6152-3-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,37 +61,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <OS3PR01MB65938570774AF540C6BFD8F5BA8CA@OS3PR01MB6593.jpnprd01.prod.outlook.com>
+In-Reply-To: <20231213111322.6152-3-ansuelsmth@gmail.com>
 
-On Thu, Dec 14, 2023 at 09:59:32PM +0000, Min Li wrote:
 
-> Would it be Ok if I use the flags to differentiate extts events from extoff?
+On Wed, 13 Dec 2023 12:13:21 +0100, Christian Marangi wrote:
+> Add Documentation for QCA808x PHYs for the additional LED configuration
+> for this PHY.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+> For Rob, I used enum instead of const as I assume more PHY will
+> come in the future for the qca808x family. Currently only qca8081
+> has seen around.
+> 
+> Changes v3:
+> - Use compatible instead of select
+> - Out of RFC
+> Changes v2:
+> - Fix License warning from checkpatch
+> - Drop redundant Description phrase
+> - Improve commit tile
+> - Drop special property (generalized)
+> 
+>  .../devicetree/bindings/net/qca,qca808x.yaml  | 54 +++++++++++++++++++
+>  1 file changed, 54 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/qca,qca808x.yaml
+> 
 
-That makes sense to me.  We can return the relevant
-ptp_extts_request.flags.  Something like:
+Reviewed-by: Rob Herring <robh@kernel.org>
 
-#define PTP_EXTTS_FLAGS_VALID	PTP_ENABLE_FEATURE
-
-Then you can return
-
-	ptp_extts_event.flags = PTP_EXTTS_FLAGS_VALID | PTP_EXT_OFFSET;
-
-Later on, other drivers can indicate PTP_[RISING|FALLING]_EDGE, if
-they can tell which one happened.
-
->  struct ptp_extts_event {
-> -       struct ptp_clock_time t; /* Time event occured. */
-> +       union {
-> +               struct ptp_clock_time t; /* Time event occurred. */
-> +               __s64 offset_ns;         /* Offset event occurred. */
-
-BTW, please don't make a union here.  Instead just add text to the
-comment of `struct ptp_clock_time t`.
-
-The `struct ptp_clock_time t` can be a postive or a negative value
-(see comment at the top of the file), and so you can put an offset in
-there as well.
-
-Thanks,
-Richard
 
