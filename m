@@ -1,64 +1,54 @@
-Return-Path: <netdev+bounces-57854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D00B814539
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:13:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6723D814545
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:17:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59D511C22D60
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 10:13:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8086E1C22B58
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 10:17:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29C2C18E33;
-	Fri, 15 Dec 2023 10:13:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D636318E14;
+	Fri, 15 Dec 2023 10:17:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="aAuhIVol"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="mTIRw6YX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DCA61A705
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 10:13:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-40c19f5f822so2244615e9.1
-        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 02:13:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1702635191; x=1703239991; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=H2CdcCJKkO0jEWGPVev2OgSogYyxT5fxlwX+UtYJ6qE=;
-        b=aAuhIVolzUnQF/Yzce6EwM9sOKvXRmW23g+FVRVn5guO6lxIt1UoHmY8zheGQELuGK
-         5s/EX347tQx1vf/xpI83LbBKe5LBBaOx6lhCO2Z8ywtc11QiOx8Dv/3TiYRmKFDOf722
-         8uClnVw4hJ1bvr1GecdR+gscIJbuP+DHBhtT+CpGXRP4OqkVrMv/cAvb/Rm74EgUs+4C
-         Gsd1E0VKjtP9S2AafH14Up89eOtvpP+kNZbLpuuNxZKhdhYx8n+c1HIWHBvsc7jAh40E
-         lefB902pD6pzrSES7npw0NrmkmkSpjiayaWSZ6EVUPon5EDTb8NMQWxmH9MS8VifcGJ/
-         IFrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702635191; x=1703239991;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H2CdcCJKkO0jEWGPVev2OgSogYyxT5fxlwX+UtYJ6qE=;
-        b=UerTrXRZHKKI3O6pODBg2OVbsqwmtMqZMHWNsBqGrsCPgdBJkcJ0GIUoGc/jn0dPxT
-         2Bc0p8+7tSxFDzqzdTudOA5n5dU+1hBAyUOtZHs3V4/ZR3xvqff2CWHtK27VpfkHmI8Q
-         q25p/l4sz2YpMI45q4PSKWU9hqh29AdCHAtURy8dKp6cNK8oa5bHA8/E84gnbHPPdwPv
-         xSepvAg6sTrvGWO2VLL6NvdpG3Fl68Rn943x2tGeowFR/lQV7CuwchpliaNc8iJ6+St6
-         s7s+dahP0tjDq7dzvGMr/ERYfPoeoRIMcar3yLcViLfc1WyZXtOS0q4nP//qSO2o9Z0B
-         iJfg==
-X-Gm-Message-State: AOJu0Yxzs4Z0uSADz/VyIp1cegnc3xpYKVWXTphXj3EXysA/kDLJE6gw
-	7+lcFICtWmDuf02+t2nadDVi9w==
-X-Google-Smtp-Source: AGHT+IHF/8+NAtYGoen5YwfftG+M9vepRTL+8NgDRqY9CvPc4G5Bkva4Tei8OUDpUGhORYM1Jz0iGA==
-X-Received: by 2002:a7b:c4ca:0:b0:40c:2341:10a7 with SMTP id g10-20020a7bc4ca000000b0040c234110a7mr5646135wmk.128.1702635191446;
-        Fri, 15 Dec 2023 02:13:11 -0800 (PST)
-Received: from [192.168.50.4] ([82.78.167.103])
-        by smtp.gmail.com with ESMTPSA id d13-20020a05600c34cd00b0040c496c64cfsm18393794wmq.12.2023.12.15.02.13.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Dec 2023 02:13:11 -0800 (PST)
-Message-ID: <9c5f9c23-d28f-4400-a113-1bafc8f349b8@tuxon.dev>
-Date: Fri, 15 Dec 2023 12:13:08 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A8124B42;
+	Fri, 15 Dec 2023 10:17:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BF9Mqgk032346;
+	Fri, 15 Dec 2023 10:17:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=Tun7DRNtaaSLQZm0TAzmr2NH9jDXt4w0fbSSJYXmQkY=; b=mT
+	IRw6YXWH74HMQuu+Gz87bBRaA0ugHj3LKQm5JFUwFjJ5OlJZtQmzw6WnBvARAuzr
+	VObYybK4bBBD9U8RyFegpnzJiX4mM1Yq4kPY0Tu8Lv8V2PfvMjm4lptFqqQYNNzG
+	uu6E8PerIWq0TOYaq6MFRMUSIqoVLd1KciD+7ltjUYMoxVFTlpA1yuHHqKou0QgL
+	DKBREb+mUMFmxOMlSk68bFSkxEltJbAaxic+wWl97OFSsaNqLLOEFZszVjM3p5de
+	iO7tjbTRGTFIAFAtQIxtsGlj/LZn3fJQwojBDY1cVljQtUNolbr111wu6uaSbgOK
+	VDFiqoDP2kdNv7uMTbwA==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3v0m46g4gq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 15 Dec 2023 10:17:10 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BFAGirw014118
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 15 Dec 2023 10:16:44 GMT
+Received: from [10.253.13.71] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 15 Dec
+ 2023 02:16:40 -0800
+Message-ID: <c3391e33-e770-4c61-855e-d90e82b95f75@quicinc.com>
+Date: Fri, 15 Dec 2023 18:16:37 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,82 +56,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/2] net: ravb: Check that GTI loading request is done
+Subject: Re: [PATCH v8 14/14] dt-bindings: net: ar803x: add qca8084 PHY
+ properties
 Content-Language: en-US
-To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- claudiu.beznea.uj@bp.renesas.com, yoshihiro.shimoda.uh@renesas.com,
- wsa+renesas@sang-engineering.com, niklas.soderlund+renesas@ragnatech.se,
- biju.das.jz@bp.renesas.com, prabhakar.mahadev-lad.rj@bp.renesas.com,
- mitsuhiro.kimura.kc@renesas.com, geert+renesas@glider.be
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20231214113137.2450292-1-claudiu.beznea.uj@bp.renesas.com>
- <20231214113137.2450292-3-claudiu.beznea.uj@bp.renesas.com>
- <884a4c36-25e4-1049-8410-cc5df9bcc4d1@omp.ru>
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
-In-Reply-To: <884a4c36-25e4-1049-8410-cc5df9bcc4d1@omp.ru>
-Content-Type: text/plain; charset=UTF-8
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, <andrew@lunn.ch>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <corbet@lwn.net>,
+        <p.zabel@pengutronix.de>, <f.fainelli@gmail.com>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
+References: <20231215074005.26976-1-quic_luoj@quicinc.com>
+ <20231215074005.26976-15-quic_luoj@quicinc.com>
+ <bdfba8a7-9197-4aae-a7f9-6075a375f60b@linaro.org>
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <bdfba8a7-9197-4aae-a7f9-6075a375f60b@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 6BPPAA1eXPd8CZFoyaMl93amoket_0Rb
+X-Proofpoint-ORIG-GUID: 6BPPAA1eXPd8CZFoyaMl93amoket_0Rb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 adultscore=0 phishscore=0 mlxscore=0 clxscore=1015
+ mlxlogscore=955 impostorscore=0 malwarescore=0 bulkscore=0 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2312150069
 
 
 
-On 14.12.2023 22:22, Sergey Shtylyov wrote:
-> On 12/14/23 2:31 PM, Claudiu wrote:
-> 
->> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+On 12/15/2023 4:22 PM, Krzysztof Kozlowski wrote:
+> On 15/12/2023 08:40, Luo Jie wrote:
+>> The following properties are added for qca8084 PHY.
 >>
->> Hardware manual specifies the following for GCCR.LTI bit:
->> 0: Setting completed
->> 1: When written: Issue a configuration request.
->> When read: Completion of settings is pending
->>
->> Thus, check the completion status when setting 1 to GCCR.LTI.
+>> 1. add the compatible string "ethernet-phy-id004d.d180" since
+>>     the PHY device is not accessible during MDIO bus register.
+>> 2. add property "qcom,phy-addr-fixup" for customizing MDIO address.
+>> 3. add property "qcom,phy-work-mode" for specifying qca8084 PHY
+>>     work mode.
+>> 4. add the initial clocks and resets.
 > 
->    But do we really need to? Seems quite dubious... currently we
-> just let it the loading complete asynchronously...
+> All my previous comments (sent one minute before this patchset :) )
+> apply. Please respond to them or implement them in v5 (not earlier than
+> after 24h).
+> 
+> 
+> Best regards,
+> Krzysztof
+> 
 
-Now, thinking again at it... we should be safe w/o it (even though I said
-we need it in a previous thread, I think I was wrong).
+Sure, will update the new version after the discussion completed.
+actually i have query about the dt-bindings doc.
 
-> 
->> Fixes: 7e09a052dc4e ("ravb: Exclude gPTP feature support for RZ/G2L")
->> Fixes: 568b3ce7a8ef ("ravb: factor out register bit twiddling code")
->> Fixes: 0184165b2f42 ("ravb: add sleep PM suspend/resume support")
->> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->> ---
->>  drivers/net/ethernet/renesas/ravb_main.c | 8 ++++++++
->>  1 file changed, 8 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->> index ce95eb5af354..1c253403a297 100644
->> --- a/drivers/net/ethernet/renesas/ravb_main.c
->> +++ b/drivers/net/ethernet/renesas/ravb_main.c
->> @@ -2819,6 +2819,10 @@ static int ravb_probe(struct platform_device *pdev)
->>  
->>  		/* Request GTI loading */
->>  		ravb_modify(ndev, GCCR, GCCR_LTI, GCCR_LTI);
->> +		/* Check completion status. */
->> +		error = ravb_wait(ndev, GCCR, GCCR_LTI, 0);
->> +		if (error)
->> +			goto out_disable_refclk;
->>  	}
->>  
->>  	if (info->internal_delay) {
->> @@ -3041,6 +3045,10 @@ static int __maybe_unused ravb_resume(struct device *dev)
->>  
->>  		/* Request GTI loading */
->>  		ravb_modify(ndev, GCCR, GCCR_LTI, GCCR_LTI);
->> +		/* Check completion status. */
->> +		ret = ravb_wait(ndev, GCCR, GCCR_LTI, 0);
->> +		if (ret)
->> +			return ret;
->>  	}
->>  
->>  	if (info->internal_delay)
->>
-> 
->    BTW, seems worth factoring out into a separate function...
-> 
-> MBR, Sergey
+The "maxItems: 1" of the property resets is defined in ethernet-phy.yaml
+that is referenced by qca,ar803x.yaml, but i have 11 reset instances
+used for qca8084 PHY, it seems i can't overwrite maxItems of reset
+property to 11 from 1 in qca,ar803x.yaml.
+
+is there any method to overwrite the maxItems value?
+
+Thanks,
+Jie
 
