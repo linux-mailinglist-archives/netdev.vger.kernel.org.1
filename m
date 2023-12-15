@@ -1,425 +1,213 @@
-Return-Path: <netdev+bounces-57699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3751813E88
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 01:06:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2862813EB7
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 01:27:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D6FA1F21312
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 00:06:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBE8B1C21EFB
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 00:27:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C296170;
-	Fri, 15 Dec 2023 00:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95CD5360;
+	Fri, 15 Dec 2023 00:27:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="oGGDL0sn"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="O+Owv06Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2052.outbound.protection.outlook.com [40.107.93.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D2CC624
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 00:05:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=geR2qmCCiXnuyPlLkDwzm2yHyqkrmX/lqrnZ6W8OhPQCJzURVZf/+6Qp31nEM+HBX/by6w+86R7ghWG8iwD0K0Xy4stLaKwQPjUo4RlW8rXW1bcApn/nk9tXSON2QsDf3BfERz0quMer5dEL37qm5ApopUSx4Qi/LPngE11iSzLmRaNnmFCtEpdMlZZJaFKYAaxJk+V+xBhTksZ9SwNFxux2Yhi/WprF23o2inNB4bDAdJRPxje+UARQ/2r1rwYcCi7quJa8lxYSuUpGCIhe8IH3nY+jCGLThOFt0A79rI1byQSYNNb4n+PCvvU5CzaYubvK7YVTMUI+GK6PFpUksA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TCM9B6THdJ0n1/sjvvP7TXWuMIcgrt9orhew8vkoBAs=;
- b=lTV2bN28VB9mpBEEDT59wUsNdUfy7kwoeT9EHvvoWaFE5KqLk7GRJChsRB2A50nextBZaFqUlTQ3Fecb+W2lsDOOheOrUxAB+A4g94CRpS/n0jm6ekEA7V4f30hi6xJsR4S3kqp0cJTF3PwfoZasN+g7+JzR0TIv/ceBDKhy6Q8FfDzO/8D2pl4lSXQbCZG8qlIN1Ls1JlpRSH74sQBUlOhWyEDJZRdez5wLka/iDHcBucpgjLmQjW2qxFOaLl+3MuyhedpBjqlBQlW84K6SvyRIw0WXEhUGN76MglJHeB2+xS6Uoqu/X1pRttrQtcPm/svkUFIEYgzc0L46vFjTrg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TCM9B6THdJ0n1/sjvvP7TXWuMIcgrt9orhew8vkoBAs=;
- b=oGGDL0snx6aJyFbumn+i4rCSuj8lYg2z5H31XIEYUNLnMydfDNXlbrHlvlVW2M6s22QSOqmWlDENuJ+V4exoAoCoSWsmoBSELIxGCik8nd7S481/ZAZdLRcSQJGHKpm0NC50x1Yqbki1F6gLR6oDeEO3F4BpVkVtL02ix0LPnEc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- PH7PR12MB5903.namprd12.prod.outlook.com (2603:10b6:510:1d7::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.28; Fri, 15 Dec
- 2023 00:05:52 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::3d14:1fe0:fcb0:958c]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::3d14:1fe0:fcb0:958c%2]) with mapi id 15.20.7091.028; Fri, 15 Dec 2023
- 00:05:51 +0000
-Message-ID: <71eded85-49bf-4f9d-a604-7b8129aa19ba@amd.com>
-Date: Thu, 14 Dec 2023 16:05:50 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 7/7] sfc: add debugfs node for filter table
- contents
-Content-Language: en-US
-To: edward.cree@amd.com, linux-net-drivers@amd.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
-Cc: Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org,
- habetsm.xilinx@gmail.com, Jonathan Cooper <jonathan.s.cooper@amd.com>
-References: <cover.1702314694.git.ecree.xilinx@gmail.com>
- <0cf27cb7a42cc81c8d360b5812690e636a100244.1702314695.git.ecree.xilinx@gmail.com>
-From: "Nelson, Shannon" <shannon.nelson@amd.com>
-In-Reply-To: <0cf27cb7a42cc81c8d360b5812690e636a100244.1702314695.git.ecree.xilinx@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW2PR2101CA0024.namprd21.prod.outlook.com
- (2603:10b6:302:1::37) To DS0PR12MB6583.namprd12.prod.outlook.com
- (2603:10b6:8:d1::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1F8170
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 00:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3363aa1b7d2so82692f8f.0
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 16:27:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1702600057; x=1703204857; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4iAlXz4iswBM7aYvToOXuITzMN/MFncKa6XHsaj8gZk=;
+        b=O+Owv06Z+2QLkn7RBdwxFRg3x9K6KSRJcfhzvlgmbefV/435PFqiyCyRa4yxdUe7HY
+         8fpHFa2O2VEF2LuUtr69750BrhU4fnhNped7ajxyr2MBKTLclwYSPnW18PqA7KTTPsOw
+         tIOS68Qdyb7B8B39ReWtkB626uFMMDCNQNCic=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702600057; x=1703204857;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4iAlXz4iswBM7aYvToOXuITzMN/MFncKa6XHsaj8gZk=;
+        b=h24kHGikujwIY5tM2pr3X7JFbEJJbzRQOZlfBATYsUbhRdGWFlqFflh6UbL9sDGrhe
+         BOkJn70POs4v8MARbPvLcFoYxGd3QAODuR1dvpaAa/GxeDmeNLnQnrqOKLOLPRjfY9Gk
+         v1Hu32IRO4dTbyyirrH7Ca9c3TylcPktYYuEIbVQpXrrnju405zTSlkD+PAh84domnU7
+         RzPxABxXAtudKxNLkpYA7Y1SOrc8WLIkejYfs3kP/MnIScPB7sdSEMHjcHw6TLZYCqJn
+         Tt6nYP4LaP605ivStrSCd8sI6ZzTi+YwOhcW+ov7jQQw4LbupmEUd7vIRElgFNIIeqPS
+         vejA==
+X-Gm-Message-State: AOJu0Yy/FSiNZMQIk3ClFBh819W+wd/5yh41Pl5cv2pjW+5dpDbgwOql
+	dzZxAYd3jdLJsU8tMvSBSZq0T1tDC2W2KK2aLL3QoQ==
+X-Google-Smtp-Source: AGHT+IE0FlF+Rb3ATL6GKEapsx+56xF3nAqs9ipCC0LBs6KDQMV/bOI4NkK5VAQ0Y8ZvXuvHYoWTyJZTJ+62cnllZp4=
+X-Received: by 2002:adf:f202:0:b0:336:42cf:3de8 with SMTP id
+ p2-20020adff202000000b0033642cf3de8mr1019758wro.211.1702600056852; Thu, 14
+ Dec 2023 16:27:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|PH7PR12MB5903:EE_
-X-MS-Office365-Filtering-Correlation-Id: d117400d-af91-4304-f6fa-08dbfd0199a5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	JLf91c/FitVvNtBnIQCKVKKrGYe6TpmwMr7s6BHkYyJk5sZB32saS7IJN+IViFv1d+9l5XFswc0AzdFTpYmTzoEh7O+TjxdYUuMH2LtckvcipUG/9lTg6X1/zsDFOuX6qVYrFY03LLUay8I5DfvpOC7ufB28AoWdYgn0tdlvr9BEMlF6aZSOnregmU5Bigv99n6O1CEu+sbUuc3VovL8o0RIf7i/YjX+2qnUj7kZ8hgZFQkrQFkcbyFjS4qYATKUgOlEq9rJywBTvzD3OpI+/0QIZpjEGxdUBnXJnaewB/mytyV1+f7PKlv5rGZ/9Wiw/E8h61c5G9ZlqpwQGQySeCsurm/22IRSbfI1YLFqbHsfHyXeaoZyF3GLO2Nk2gQWeUo35lnDYbsR3mxNWCUe4iKdI0E5i1b5rIrs6rnw4GIh0lIud4Il+XgUsnP9ZtdbqxTKua8Gcq4v2vAwnUorQyKmhqukjthWHgN5UDlk5rr2GSDcyifzj9MZ3xQrxcy9sOOl9pBfr0Te5iLKSu0QOVK2iy5bko8hf9HBx6g3MSCnVyeu19XqxMDpEExhVlngb+oe1CdN4WIdP0odGK43XgG0t5VfuP7McTKOAVDczU6uSn1xaBIAe7LJhDOEyTbYKuOejzcM6YHw5083Ou5eFg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(136003)(39860400002)(396003)(366004)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(2616005)(8936002)(8676002)(26005)(4326008)(5660300002)(83380400001)(86362001)(6506007)(53546011)(2906002)(6486002)(38100700002)(31696002)(36756003)(478600001)(41300700001)(31686004)(66946007)(66556008)(66476007)(54906003)(6512007)(316002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RlBYRlRwcGZYTjdVcUFDRWVmVlVUN2pRa3drU0JkR2d0cjJGcGhtNWdSelQz?=
- =?utf-8?B?MnNOcHo3dmk3KzVjNW1FTlZTd3NaRDJZQWNodHlDdkxEV2ZYYXZuRG0vdlhs?=
- =?utf-8?B?VVZkejVEaFF4N2NxakNBV0VTcE1OR0JUYngwSC9vQjU4V1VKNDF5c0xqa2Z1?=
- =?utf-8?B?ajJLT3JlTXRPRmpUNEF1OFRTaytkSU5GNnBMeEZiQWpiWUtqcGdTSHpZVkNa?=
- =?utf-8?B?Z0srT08zVWN4WnZ3bUprbTVyaWxBZ3pqSmtBdGR3LzlvNG5kUEx2WWViQUV4?=
- =?utf-8?B?dVQ3L1ZoUmdtWUNjOXRTSGxkaFl6Y0xmbkdLbzVFUkNmQVRsSW53blRmazNY?=
- =?utf-8?B?bnVwaXJVMEdRQjJLMHd6L1BUVzNhcGhnMFNCU3Q1UlVTQmt5VWZKeHRRKzR0?=
- =?utf-8?B?RmJFUDdzUzRtR2FFbHFHeFJPQ0l0ZXRFcjZGNnh1RlFOYnZxbzVnZ0hmeHRQ?=
- =?utf-8?B?Vy9yNldwVHJabmFtbnpXcUVZMFhPeGJ2QWl4ZnhhVVNVTVRIa0VkRHpwSmdj?=
- =?utf-8?B?dUh0MlRndDFjOEZYZ0xCeVRmZmNaOGd1TnRGTDJEU1BHQWc4WVNqbHR6UFRD?=
- =?utf-8?B?WnY4T1ZiVnlaa1owOUZKbVBEWTBmMHNjTkVlQzhvVzUvUWs4QnUrYU81dGNi?=
- =?utf-8?B?SnV2RDJDS0RvOS9PZy9vNmdYZXJzVThvTEg0TzNQNFZHS1lWbUFvRWN5a0Vh?=
- =?utf-8?B?U3A0NGwvOFZZbmN3clJSdm5pWmRsTzVuOWd2cVdaL2NRV0x3YWtldjB0UW5K?=
- =?utf-8?B?Q2E3OFdwem5HMTU2Q21GSXZuRWpGQ1VkRW01Q0FVMWtrclVlUGkwellPVDJm?=
- =?utf-8?B?SU1iZlJ1M3I1TEdaVUMySUhaaHJ0RGEzUjhBMERGWUZPc0c5bUJqaXJSSkd5?=
- =?utf-8?B?QVE2OGtNRDNlMHQwcUlPbHFKYjNYRk5ZN3U0YjBTeGQ3d21vam9QL1d6RTc1?=
- =?utf-8?B?a29Yb3F2QzhXU1I2UmZ1NllGVWZTL3NqMlR5RGM0blEwa3JrS0JtRmtBZUVl?=
- =?utf-8?B?NWhqb1JxZUdha2V4eUhFL2diRjN2MHNYdnJWd2gwUE5veWdxcmlGL0pwUnZ3?=
- =?utf-8?B?dm00TWwyTzJ3YXBjcUlnOVY4eEpTUzVnK09TWkFWOXUxVWEwNFZrN094QmlR?=
- =?utf-8?B?S1Z3SEtLRlBTa3AwZllRblJDUHFRcmZtZ1pYYTZtRDhIZ1BkSHdWV2VRVmdX?=
- =?utf-8?B?alFQaU1uM2xRaEYzdHpENzJmMzlpNXBpQnZpRFpMQ3NTSEVJYndZK29RYi82?=
- =?utf-8?B?QXFvR01yOHpqMmU0UDcreG9ucGlkQ1JwNkFyekRlbVVYL3Q3djBSb1d1L1VH?=
- =?utf-8?B?b0lVclJ5cFNBUVJib01VS3dQUUhrSGpUTTJiaXJ0QmxJK0FrWkxnQVJXS2J2?=
- =?utf-8?B?bTNTcjlTeVo5K0dGbDVvclFWUEUwYm4rQVRTWUJDOXpFUjFYd0R4dUVyWkpW?=
- =?utf-8?B?SFlHUzhPNW10eGFXejhzelkrYXdCVDFISDg2eWRLRGFjQXpPS1V0QVI2ZnRZ?=
- =?utf-8?B?eHpKMzNoaWcxUEpqMmtGejB6MlV4VE9JTnU3bTdFR1ptbkdkUzBOL1RLZUI2?=
- =?utf-8?B?K2hEYmhQa0FBT0tTa2FROVJvS3hiV3g1VjJpR1VVbm05T29QbzYxcVE5ZGZ6?=
- =?utf-8?B?eHdwaGxqOEVVYzN0TkZxWjBHOWI5ZkIzZkpOZnZrK0h5KzBPUmp2RVNGVXRn?=
- =?utf-8?B?bmxMVjlXQk5hVlR1UDJLa2p1VXExSVNNSU5CZkpLT2NoSWpMVU0rdFFnMENB?=
- =?utf-8?B?ZHZ3bXpWSnoyVFQvQ1FSQUc3TFptL21hd2Y0VlUwRHIyWHVscFR0K3BkUmND?=
- =?utf-8?B?a05NbHl1dHhEUDUxQ0xNM0kwK08xcFVPbCtNOWcxNWdtTmM1aFNCSERtRnBY?=
- =?utf-8?B?dG1QRmhITmhCMldEaUQrdFVhUEhnTFovQUczRERTWmFEc3hOZmV4eHRkM016?=
- =?utf-8?B?d1JBRU9tQU9VRGJDcVJpTlYxNzRzY3ZWWm1yVndzbmI2ZVVRMVBNcXFRMEtz?=
- =?utf-8?B?MDlnWlZHSkNFYUZkRWR1a2NLakl2c0xXYnhTNTE2ZXpybGE3Rk9TQXNCSmVX?=
- =?utf-8?B?UVZTRzJSS1lhZEJwMFZSNlA3TzBYTG9CYnZtUXUyNXpYZWZVOFM0RTZHdDlF?=
- =?utf-8?Q?ESAHKxGydy0o6Y6KnNYeZFS5i?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d117400d-af91-4304-f6fa-08dbfd0199a5
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2023 00:05:51.8899
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zHxqBLM4cvgJpyuyZjoWftSeAUM1drpbfaEJTDRbu/7wtZp4EEim/8u6nxMVRHcQh/ZYRHnjffjPeiqDDuiQcw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5903
+References: <20231214213138.98095-1-michael.chan@broadcom.com> <2dcfb90d-2cac-4297-aaec-173c559369f3@davidwei.uk>
+In-Reply-To: <2dcfb90d-2cac-4297-aaec-173c559369f3@davidwei.uk>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Thu, 14 Dec 2023 16:27:25 -0800
+Message-ID: <CACKFLinEXJmvZv=qAHd4UkwMTEcPYc+9td+MePcU+VgYLLq6jA@mail.gmail.com>
+Subject: Re: [PATCH net] bnxt_en: do not map packet buffers twice
+To: David Wei <dw@davidwei.uk>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, bpf@vger.kernel.org, hawk@kernel.org, 
+	ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>, Somnath Kotur <somnath.kotur@broadcom.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000009ce51b060c8177bc"
 
-On 12/11/2023 9:18 AM, edward.cree@amd.com wrote:
-> 
-> From: Edward Cree <ecree.xilinx@gmail.com>
-> 
-> Expose the filter table entries.
-> 
-> Reviewed-by: Jonathan Cooper <jonathan.s.cooper@amd.com>
-> Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
-> ---
->   drivers/net/ethernet/sfc/debugfs.c      | 117 +++++++++++++++++++++++-
->   drivers/net/ethernet/sfc/debugfs.h      |  45 +++++++++
->   drivers/net/ethernet/sfc/mcdi_filters.c |  39 ++++++++
->   3 files changed, 197 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/sfc/debugfs.c b/drivers/net/ethernet/sfc/debugfs.c
-> index 549ff1ee273e..e67b0fc927fe 100644
-> --- a/drivers/net/ethernet/sfc/debugfs.c
-> +++ b/drivers/net/ethernet/sfc/debugfs.c
-> @@ -9,10 +9,6 @@
->    */
-> 
->   #include "debugfs.h"
-> -#include <linux/module.h>
-> -#include <linux/debugfs.h>
-> -#include <linux/dcache.h>
-> -#include <linux/seq_file.h>
+--0000000000009ce51b060c8177bc
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Can you leave these out of the original patch and not have to remove 
-them here?
+On Thu, Dec 14, 2023 at 3:18=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
+>
+> On 2023-12-14 13:31, Michael Chan wrote:
+> > From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+> >
+> > Remove double-mapping of DMA buffers as it can prevent page pool entrie=
+s
+> > from being freed.  Mapping is managed by page pool infrastructure and
+> > was previously managed by the driver in __bnxt_alloc_rx_page before
+> > allowing the page pool infrastructure to manage it.
+> >
+> > Fixes: 578fcfd26e2a ("bnxt_en: Let the page pool manage the DMA mapping=
+")
+> > Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+> > Signed-off-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+> > Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> > ---
+> >  drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c | 11 ++---------
+> >  1 file changed, 2 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/ne=
+t/ethernet/broadcom/bnxt/bnxt_xdp.c
+> > index 96f5ca778c67..8cb9a99154aa 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+> > @@ -59,7 +59,6 @@ struct bnxt_sw_tx_bd *bnxt_xmit_bd(struct bnxt *bp,
+> >       for (i =3D 0; i < num_frags ; i++) {
+> >               skb_frag_t *frag =3D &sinfo->frags[i];
+> >               struct bnxt_sw_tx_bd *frag_tx_buf;
+> > -             struct pci_dev *pdev =3D bp->pdev;
+> >               dma_addr_t frag_mapping;
+> >               int frag_len;
+> >
+> > @@ -73,16 +72,10 @@ struct bnxt_sw_tx_bd *bnxt_xmit_bd(struct bnxt *bp,
+> >               txbd =3D &txr->tx_desc_ring[TX_RING(prod)][TX_IDX(prod)];
+> >
+> >               frag_len =3D skb_frag_size(frag);
+> > -             frag_mapping =3D skb_frag_dma_map(&pdev->dev, frag, 0,
+> > -                                             frag_len, DMA_TO_DEVICE);
+> > -
+> > -             if (unlikely(dma_mapping_error(&pdev->dev, frag_mapping))=
+)
+> > -                     return NULL;
+> > -
+> > -             dma_unmap_addr_set(frag_tx_buf, mapping, frag_mapping);
+>
+> If this is no longer set, what would happen to dma_unmap_single() in
+> bnxt_tx_int_xdp() that is then reading `mapping` via dma_unmap_addr()?
 
-> 
->   /* Maximum length for a name component or symlink target */
->   #define EFX_DEBUGFS_NAME_LEN 32
-> @@ -428,3 +424,116 @@ void efx_fini_debugfs(void)
->          efx_debug_cards = NULL;
->          efx_debug_root = NULL;
->   }
-> +
-> +/**
-> + * efx_debugfs_print_filter - format a filter spec for display
-> + * @s: buffer to write result into
-> + * @l: length of buffer @s
-> + * @spec: filter specification
-> + */
-> +void efx_debugfs_print_filter(char *s, size_t l, struct efx_filter_spec *spec)
-> +{
-> +       u32 ip[4];
-> +       int p = snprintf(s, l, "match=%#x,pri=%d,flags=%#x,q=%d",
-> +                        spec->match_flags, spec->priority, spec->flags,
-> +                        spec->dmaq_id);
-> +
-> +       if (spec->vport_id)
-> +               p += snprintf(s + p, l - p, ",vport=%#x", spec->vport_id);
-> +
-> +       if (spec->flags & EFX_FILTER_FLAG_RX_RSS)
-> +               p += snprintf(s + p, l - p, ",rss=%#x", spec->rss_context);
-> +
-> +       if (spec->match_flags & EFX_FILTER_MATCH_OUTER_VID)
-> +               p += snprintf(s + p, l - p,
-> +                             ",ovid=%d", ntohs(spec->outer_vid));
-> +       if (spec->match_flags & EFX_FILTER_MATCH_INNER_VID)
-> +               p += snprintf(s + p, l - p,
-> +                             ",ivid=%d", ntohs(spec->inner_vid));
-> +       if (spec->match_flags & EFX_FILTER_MATCH_ENCAP_TYPE)
-> +               p += snprintf(s + p, l - p,
-> +                             ",encap=%d", spec->encap_type);
-> +       if (spec->match_flags & EFX_FILTER_MATCH_LOC_MAC)
-> +               p += snprintf(s + p, l - p,
-> +                             ",lmac=%02x:%02x:%02x:%02x:%02x:%02x",
-> +                             spec->loc_mac[0], spec->loc_mac[1],
-> +                             spec->loc_mac[2], spec->loc_mac[3],
-> +                             spec->loc_mac[4], spec->loc_mac[5]);
-> +       if (spec->match_flags & EFX_FILTER_MATCH_REM_MAC)
-> +               p += snprintf(s + p, l - p,
-> +                             ",rmac=%02x:%02x:%02x:%02x:%02x:%02x",
-> +                             spec->rem_mac[0], spec->rem_mac[1],
-> +                             spec->rem_mac[2], spec->rem_mac[3],
-> +                             spec->rem_mac[4], spec->rem_mac[5]);
-> +       if (spec->match_flags & EFX_FILTER_MATCH_ETHER_TYPE)
-> +               p += snprintf(s + p, l - p,
-> +                             ",ether=%#x", ntohs(spec->ether_type));
-> +       if (spec->match_flags & EFX_FILTER_MATCH_IP_PROTO)
-> +               p += snprintf(s + p, l - p,
-> +                             ",ippr=%#x", spec->ip_proto);
-> +       if (spec->match_flags & EFX_FILTER_MATCH_LOC_HOST) {
-> +               if (ntohs(spec->ether_type) == ETH_P_IP) {
-> +                       ip[0] = (__force u32) spec->loc_host[0];
-> +                       p += snprintf(s + p, l - p,
-> +                                     ",lip=%d.%d.%d.%d",
-> +                                     ip[0] & 0xff,
-> +                                     (ip[0] >> 8) & 0xff,
-> +                                     (ip[0] >> 16) & 0xff,
-> +                                     (ip[0] >> 24) & 0xff);
-> +               } else if (ntohs(spec->ether_type) == ETH_P_IPV6) {
-> +                       ip[0] = (__force u32) spec->loc_host[0];
-> +                       ip[1] = (__force u32) spec->loc_host[1];
-> +                       ip[2] = (__force u32) spec->loc_host[2];
-> +                       ip[3] = (__force u32) spec->loc_host[3];
-> +                       p += snprintf(s + p, l - p,
-> +                                     ",lip=%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x",
-> +                                     ip[0] & 0xffff,
-> +                                     (ip[0] >> 16) & 0xffff,
-> +                                     ip[1] & 0xffff,
-> +                                     (ip[1] >> 16) & 0xffff,
-> +                                     ip[2] & 0xffff,
-> +                                     (ip[2] >> 16) & 0xffff,
-> +                                     ip[3] & 0xffff,
-> +                                     (ip[3] >> 16) & 0xffff);
-> +               } else {
-> +                       p += snprintf(s + p, l - p, ",lip=?");
-> +               }
-> +       }
-> +       if (spec->match_flags & EFX_FILTER_MATCH_REM_HOST) {
-> +               if (ntohs(spec->ether_type) == ETH_P_IP) {
-> +                       ip[0] = (__force u32) spec->rem_host[0];
-> +                       p += snprintf(s + p, l - p,
-> +                                     ",rip=%d.%d.%d.%d",
-> +                                     ip[0] & 0xff,
-> +                                     (ip[0] >> 8) & 0xff,
-> +                                     (ip[0] >> 16) & 0xff,
-> +                                     (ip[0] >> 24) & 0xff);
-> +               } else if (ntohs(spec->ether_type) == ETH_P_IPV6) {
-> +                       ip[0] = (__force u32) spec->rem_host[0];
-> +                       ip[1] = (__force u32) spec->rem_host[1];
-> +                       ip[2] = (__force u32) spec->rem_host[2];
-> +                       ip[3] = (__force u32) spec->rem_host[3];
-> +                       p += snprintf(s + p, l - p,
-> +                                     ",rip=%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x",
-> +                                     ip[0] & 0xffff,
-> +                                     (ip[0] >> 16) & 0xffff,
-> +                                     ip[1] & 0xffff,
-> +                                     (ip[1] >> 16) & 0xffff,
-> +                                     ip[2] & 0xffff,
-> +                                     (ip[2] >> 16) & 0xffff,
-> +                                     ip[3] & 0xffff,
-> +                                     (ip[3] >> 16) & 0xffff);
-> +               } else {
-> +                       p += snprintf(s + p, l - p, ",rip=?");
-> +               }
+The dma_unmap_addr() call in bnxt_tx_int_xdp() is for XDP_REDIRECT
+packets only.  Our current XDP_REDIRECT implementation supports only a
+single buffer per packet.  Here, this code path is for XDP_TX
+multi-buffers.  The DMA mapping for the frag pages is always handled
+by the page pool.  Thanks.
 
-Since you have this code more than once, it might be a candidate for a 
-utility function, if one doesn't already exist somewhere in the kernel 
-already.
+--0000000000009ce51b060c8177bc
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-> +       }
-> +       if (spec->match_flags & EFX_FILTER_MATCH_LOC_PORT)
-> +               p += snprintf(s + p, l - p,
-> +                             ",lport=%d", ntohs(spec->loc_port));
-> +       if (spec->match_flags & EFX_FILTER_MATCH_REM_PORT)
-> +               p += snprintf(s + p, l - p,
-> +                             ",rport=%d", ntohs(spec->rem_port));
-> +       if (spec->match_flags & EFX_FILTER_MATCH_LOC_MAC_IG)
-> +               p += snprintf(s + p, l - p, ",%s",
-> +                             spec->loc_mac[0] ? "mc" : "uc");
-> +}
-> diff --git a/drivers/net/ethernet/sfc/debugfs.h b/drivers/net/ethernet/sfc/debugfs.h
-> index 7a96f3798cbd..f50b4bf33a6b 100644
-> --- a/drivers/net/ethernet/sfc/debugfs.h
-> +++ b/drivers/net/ethernet/sfc/debugfs.h
-> @@ -10,6 +10,10 @@
-> 
->   #ifndef EFX_DEBUGFS_H
->   #define EFX_DEBUGFS_H
-> +#include <linux/module.h>
-> +#include <linux/debugfs.h>
-> +#include <linux/dcache.h>
-> +#include <linux/seq_file.h>
->   #include "net_driver.h"
-> 
->   #ifdef CONFIG_DEBUG_FS
-> @@ -63,6 +67,45 @@ void efx_fini_debugfs_nic(struct efx_nic *efx);
->   int efx_init_debugfs(void);
->   void efx_fini_debugfs(void);
-> 
-> +void efx_debugfs_print_filter(char *s, size_t l, struct efx_filter_spec *spec);
-> +
-> +/* Generate operations for a debugfs node with a custom reader function.
-> + * The reader should have signature int (*)(struct seq_file *s, void *data)
-> + * where data is the pointer passed to EFX_DEBUGFS_CREATE_RAW.
-> + */
-> +#define EFX_DEBUGFS_RAW_PARAMETER(_reader)                                    \
-> +                                                                              \
-> +static int efx_debugfs_##_reader##_read(struct seq_file *s, void *d)          \
-> +{                                                                             \
-> +       return _reader(s, s->private);                                         \
-> +}                                                                             \
-> +                                                                              \
-> +static int efx_debugfs_##_reader##_open(struct inode *inode, struct file *f)   \
-> +{                                                                             \
-> +       return single_open(f, efx_debugfs_##_reader##_read, inode->i_private); \
-> +}                                                                             \
-> +                                                                              \
-> +static const struct file_operations efx_debugfs_##_reader##_ops = {           \
-> +       .owner = THIS_MODULE,                                                  \
-> +       .open = efx_debugfs_##_reader##_open,                                  \
-> +       .release = single_release,                                             \
-> +       .read = seq_read,                                                      \
-> +       .llseek = seq_lseek,                                                   \
-> +};                                                                            \
-> +                                                                              \
-> +static void efx_debugfs_create_##_reader(const char *name, umode_t mode,       \
-> +                                        struct dentry *parent, void *data)    \
-> +{                                                                             \
-> +       debugfs_create_file(name, mode, parent, data,                          \
-> +                           &efx_debugfs_##_reader##_ops);                     \
-> +}
-> +
-> +/* Instantiate a debugfs node with a custom reader function.  The operations
-> + * must have been generated with EFX_DEBUGFS_RAW_PARAMETER(_reader).
-> + */
-> +#define EFX_DEBUGFS_CREATE_RAW(_name, _mode, _parent, _data, _reader)         \
-> +               efx_debugfs_create_##_reader(_name, _mode, _parent, _data)
-> +
->   #else /* CONFIG_DEBUG_FS */
-> 
->   static inline void efx_fini_debugfs_netdev(struct net_device *net_dev) {}
-> @@ -99,6 +142,8 @@ static inline int efx_init_debugfs(void)
->   }
->   static inline void efx_fini_debugfs(void) {}
-> 
-> +void efx_debugfs_print_filter(char *s, size_t l, struct efx_filter_spec *spec) {}
-> +
->   #endif /* CONFIG_DEBUG_FS */
-> 
->   #endif /* EFX_DEBUGFS_H */
-> diff --git a/drivers/net/ethernet/sfc/mcdi_filters.c b/drivers/net/ethernet/sfc/mcdi_filters.c
-> index a4ab45082c8f..465226c3e8c7 100644
-> --- a/drivers/net/ethernet/sfc/mcdi_filters.c
-> +++ b/drivers/net/ethernet/sfc/mcdi_filters.c
-> @@ -13,6 +13,7 @@
->   #include "mcdi.h"
->   #include "nic.h"
->   #include "rx_common.h"
-> +#include "debugfs.h"
-> 
->   /* The maximum size of a shared RSS context */
->   /* TODO: this should really be from the mcdi protocol export */
-> @@ -1173,6 +1174,42 @@ s32 efx_mcdi_filter_get_rx_ids(struct efx_nic *efx,
->          return count;
->   }
-> 
-> +static int efx_debugfs_read_filter_list(struct seq_file *file, void *data)
-> +{
-> +       struct efx_mcdi_filter_table *table;
-> +       struct efx_nic *efx = data;
-> +       int i;
-> +
-> +       down_read(&efx->filter_sem);
-> +       table = efx->filter_state;
-> +       if (!table || !table->entry) {
-> +               up_read(&efx->filter_sem);
-> +               return -ENETDOWN;
-> +       }
-> +
-> +       /* deliberately don't lock the table->lock, so that we can
-> +        * still dump the table even if we hang mid-operation.
-> +        */
-> +       for (i = 0; i < EFX_MCDI_FILTER_TBL_ROWS; ++i) {
-> +               struct efx_filter_spec *spec =
-> +                       efx_mcdi_filter_entry_spec(table, i);
-> +               char filter[256];
-> +
-> +               if (spec) {
-> +                       efx_debugfs_print_filter(filter, sizeof(filter), spec);
-> +
-> +                       seq_printf(file, "%d[%#04llx],%#x = %s\n",
-> +                                  i, table->entry[i].handle & 0xffff,
-> +                                  efx_mcdi_filter_entry_flags(table, i),
-> +                                  filter);
-> +               }
-> +       }
-> +
-> +       up_read(&efx->filter_sem);
-> +       return 0;
-> +}
-> +EFX_DEBUGFS_RAW_PARAMETER(efx_debugfs_read_filter_list);
-> +
->   static int efx_mcdi_filter_match_flags_from_mcdi(bool encap, u32 mcdi_flags)
->   {
->          int match_flags = 0;
-> @@ -1360,6 +1397,8 @@ int efx_mcdi_filter_table_probe(struct efx_nic *efx, bool multicast_chaining)
->                              &table->mc_overflow);
->          debugfs_create_bool("mc_chaining", 0444, table->debug_dir,
->                              &table->mc_chaining);
-> +       EFX_DEBUGFS_CREATE_RAW("entries", 0444, table->debug_dir, efx,
-> +                              efx_debugfs_read_filter_list);
->   #endif
-> 
->          efx->filter_state = table;
-> 
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIFHKvy0HoEfLGI6nr4zNDUzmczJfq1kP
+CoiHqODTDlCbMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIx
+NTAwMjczN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQCnwc0Fi8twolNRtHkVyteMdoMSxYFNui3/TAsSuiazijiFbIhi
+rKpQ1f1T3oKJwvGbdWQizVckpGlMMWjYWXNkbGPwS1qckSYs2XPdAO3q31Q1scB8qyHiammIRT4Q
+IB5G1Vnrn4dzk7dqmZvBWfGFTFEwkY8WmsTX+leu6LtUoL8V367uX2alns462+OvVlq4fwWHV0Qe
+X5gs2HNkrH7nV6WeTlp0YrxwZk34KcSTiWyXZWuaDELjUhMSFH6g+kasj7tVshY41bdoIARLYZVB
+8GeeW2D9fdEUAySPlRTk09b6Zru68QkZBR++nK4RBlJpGWA5KaSIGgL5/Xd7AMsQ
+--0000000000009ce51b060c8177bc--
 
