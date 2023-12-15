@@ -1,65 +1,66 @@
-Return-Path: <netdev+bounces-57697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35FF1813E86
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 01:05:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3CC8813E87
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 01:05:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 273EB1C21FC0
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 00:05:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5297B283D48
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 00:05:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A8A2804;
-	Fri, 15 Dec 2023 00:05:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04CC7A4D;
+	Fri, 15 Dec 2023 00:05:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="KFqzvKLF"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="vAczPK5f"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2054.outbound.protection.outlook.com [40.107.93.54])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2082.outbound.protection.outlook.com [40.107.93.82])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19AFD650
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 00:05:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C71BA4C
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 00:05:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ATLJhT9E36XAiy+uor6fJwqXKuLfMim1k4h8UjP5OHhi0tF9+xubwkXrWyxigJJWp2DJpOTye0X8COmaZ+FvfC7nbUFTh+zLOv72CIkNCrwoEyK5jdH4KwhkrbIZjZCxebk77G5lI2YMnUGjzuVEbQWzKBUsZxeIq5agqS0Nhsa1RAstxzqTIJutAfElKxlbzH9/OYy/b+l74GBQmLVGUjkCJU/ui9fe16WyPWyl8YJsFD5PQctjZJYQSWfJlD5inDWc6ejn9wd8Gpe9EEZnOS2Qa4ukDzQBoWW4jTGYccpdt4jrrZTKx+VNrvH7xKanbo7Bj2DrbAha8MB9AEFnYw==
+ b=W+2rFPGd+7X+mFrHuGDu1waSpN4splm20YMBBNpzoFtOpFUOFU7h0jKdDrZJK0fZpdq5294hBx4MoBO/XogO3owNiObg9tOomlma5SPqY7sC64Viz/jQevJl423UTjT/vbnrc3Gad1W+aJscgb4HUwlp/hDy8lajQ7ld+hDDnEIXFGD6zjsEW5kmTNlKVgX7pe+9PzANOH5u5XKf7TxkLNK5gizcdo6rLQYBwbb4k9ijnJ7maebXf4u1UuyTMrETWHgocIphZKmW4gpjtDvPynk5WU72J5xh3lka+cyRr9QBcVs5Djq9WQDYh60sGMzYg10c8jIURgpfhVof1myXyQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Msb1E8wqlZgKqwLO4wARlPdZESXv7XA0yBxCMhJC14k=;
- b=MbH2v0SbKP+GorLY4f/mmJjwNxGNWxQJA7y3LdVkJZNZ0SCE8t6PJzes/pCMMeR+Af8YkOTlkmswVaQdS2hwL0OdSibUCxkK+BxIrkPzz/kpEfiOLy9jSkuIDZW4Hy86v2iAKIWpP2kDsfHPKwCLRGD3xI7MENaLmDqhIniBsXarYL8xrvdBSRZd9jJSgBainvbWwLMX/1+MELtpKPbW13XTay8RV6ySpCnTV5qlvapfQ8Mb1cg6WXAX9iH/0ruFDdZue05nIeip81JkkWOIVsMLo5rBu6hz8fXvLDgr6e6hMDTwfd5sYY3ehGHcV9mSK1pmlOKRif4HShsIoFRtDQ==
+ bh=l967id/EkKhM0om4/5W6m/zxJcRbLqU9LbkCastmtGg=;
+ b=k/Q45THoUtzjeEmlhXY6SGVFDrNA60V2rZbab5ZqsAn5lYT+ULfzrsIae0a4J62C5/EP+ZC40JgroKid/NTLC8F9VP7wcaQz0WnkhTQaEMAqayMFu0HaeoV/OPDI+9MJRjdDxBxy/SPNMf+8LGz27sN190hZ6d6ePl9pKfp6u6wsA8t3J58weYJJKWepA/RFAiYk3H4ueHVNt5nZHMFysbBsfPF1qbkIWIi/3Yj+Bzxjj1u/pd36UAQveq5An2LEs0zm2QNGxtj+zu5HltPUO2Cps8LfHK0d5voDIai4EZAaVk/+mm5o0OcAM3DYBf4oS8xVdLuva8VmeG7Mnv9EQA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Msb1E8wqlZgKqwLO4wARlPdZESXv7XA0yBxCMhJC14k=;
- b=KFqzvKLFYZkUJX44SNzw2goL7HsdyYCjSNzFJvSEhiIVO/HgpSN6aSBK4piXWqvGw7UBZyNQTYN0zOKWgLTCTdH3PbnAXKrZ2PyM0i/A4fucmOxlrTSBE5hG7tr8qxVDV7oZbCqCyIUagXSNAICekoLhEkLbSr2wsxA9+Tb/6tc=
+ bh=l967id/EkKhM0om4/5W6m/zxJcRbLqU9LbkCastmtGg=;
+ b=vAczPK5f4URyy48dVMqYhC6uReDwfxncw3oHecDPtOISzCj+D6xTVGZvt3hWrQJMa8L82Xh4NraqG0OWf4bMGFEF/NS/llfrG4UE92jHvw8tlaBgzX4gLshKXkdf7FcYMQ1hW/eLS85xPYgZrNuu2Km5PgOvR/lF0PGHcyuu5gA=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
  PH7PR12MB5903.namprd12.prod.outlook.com (2603:10b6:510:1d7::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.28; Fri, 15 Dec
- 2023 00:05:39 +0000
+ 2023 00:05:46 +0000
 Received: from DS0PR12MB6583.namprd12.prod.outlook.com
  ([fe80::3d14:1fe0:fcb0:958c]) by DS0PR12MB6583.namprd12.prod.outlook.com
  ([fe80::3d14:1fe0:fcb0:958c%2]) with mapi id 15.20.7091.028; Fri, 15 Dec 2023
- 00:05:39 +0000
-Message-ID: <0d1d3002-ff8b-4601-84d5-ee26733af54e@amd.com>
-Date: Thu, 14 Dec 2023 16:05:37 -0800
+ 00:05:46 +0000
+Message-ID: <ed7a2ffa-bfc9-4276-8776-89cafa546ef8@amd.com>
+Date: Thu, 14 Dec 2023 16:05:45 -0800
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/7] sfc: debugfs for (nic) RX queues
+Subject: Re: [PATCH net-next 6/7] sfc: add debugfs entries for filter table
+ status
 Content-Language: en-US
 To: edward.cree@amd.com, linux-net-drivers@amd.com, davem@davemloft.net,
  kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
 Cc: Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org,
  habetsm.xilinx@gmail.com, Jonathan Cooper <jonathan.s.cooper@amd.com>
 References: <cover.1702314694.git.ecree.xilinx@gmail.com>
- <a5c5491d3d0b58b8f8dff65cb53f892d7b13c32a.1702314695.git.ecree.xilinx@gmail.com>
+ <fc28d967fbffd53f61a1d42332ee7bc64435df7c.1702314695.git.ecree.xilinx@gmail.com>
 From: "Nelson, Shannon" <shannon.nelson@amd.com>
-In-Reply-To: <a5c5491d3d0b58b8f8dff65cb53f892d7b13c32a.1702314695.git.ecree.xilinx@gmail.com>
+In-Reply-To: <fc28d967fbffd53f61a1d42332ee7bc64435df7c.1702314695.git.ecree.xilinx@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: MW2PR2101CA0024.namprd21.prod.outlook.com
@@ -73,272 +74,154 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|PH7PR12MB5903:EE_
-X-MS-Office365-Filtering-Correlation-Id: 20ec3d17-d019-4c69-7408-08dbfd0191ed
+X-MS-Office365-Filtering-Correlation-Id: 72987124-f509-4e02-692f-08dbfd01966f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	8IHdavO7ryXZfnjcL1za63QsUxv36mj2qa+vrOjGzrRUHdyDAanbPCBoZ+EyyWiYB5l89W3kw/LNj2XJsk3x9gmZJvTabfgzvSwX3t7z7VJcHMJ+AUJzCxOL1tldTPUQuzTvEfPzN4UJalpLmjmcRQJTLTgTWaxUl3rGdGKWnXbO5er+vEauvoImdSUSiIk8vD6fjnm+DEzs1AXRKZEsrRDKilVCL6Zd0QQOakVwbFZ2ts48TQa2v7M/2ArUkXAEhTTw0cuyTTBu/yiLVWmwV4nyjXRN+KtzQP0J56RXtXG8PB782A8aedh0IMGTqLeyo+QufRW+6pvWBownP66aZyB8LTwyLtSiImcFFchwAjnf3mg9bCSTc2NlT7c7TNBBLACwOfJgIIGjvyFU4wB5g8fyajGy5V1rsHnNx+++l+cHHYjYxGb0BgP5GRDQlTu+AlKQQ61PCt8y90ot8ufjqSPAojYtZE1Ut8c/fAcnVfj7Bd1k5IlnrXqXYiDKJ/Nf2GYRa6/CCtQfD97qLRWfKRP3E2FRxl0Xyz94+iq/rrYoP2DXkhT0PQ1v9sFuvS7R6o0nX222avuryAheZxvvLazy8Yl9y6Sbkw1wWEwjWyP6ZO7kXf7i0ET0PZgRtJCF7tBnoY6gf9H5C4Pbi7Lufg==
+	8iL7q2B0FyH+5wEcby4JkIzHn1qGTDEKJfrtNkYrJ2Uc1zDAYhdiKIA6SAIkfnKo+5BSJpm6HJX58UDKfoG6/c0zxCztIkYcrarFLM7pMcuQRV1DnO7k89KRXkwZerAEV7kqZZ11eM/NYtyDDIFuSt21OhLXFAh2NzfHZuhkQvgLIDYAIrfUZVhd/Txq2xoYxIAscY7jYuBMJ+SEoPqzfLgW+h3i+Aw2jn7wmueDTrPi6nMlrxmlyQ6Al0NJtORTUCG/if+gPJ/fdQ1Mkyl8X0pOpq2MU7LFX3xgm7D52dv/iOeME7UvhCQcSIw/GaRpfXZtVs8NNPyQjqmYP9QJg1psYr/dx87niSQ1h3kayTGkKeVkhR8ehOEUjHu+MD1S9fzuECyN+AxkYcp73a5ARGnBLkqtWOhn2Ld2oBiOrB77DwUKSN9Y8K3gj5yXaq1vjqqx8zHppjfNjf5hXzUc7PFyNXY1CBpqiajB1qOcNFAme+IcfDMLqx93ipr6/pYBZ6cBySniueRVG8HlUUHtjz6C48wM1PndFwQPkwFwYn1cgAvCC0dD5sq80wn7quZo1nX3nmtND/ZELPUWfBqX/WYpIczK0Cm8CzZLOEGB4NZM9ObBJjc1j+bIhLl2GxsXu6n/nEyiYhHKWEvukIykQQ==
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(136003)(39860400002)(396003)(366004)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(2616005)(8936002)(8676002)(26005)(4326008)(5660300002)(83380400001)(86362001)(6506007)(53546011)(2906002)(6486002)(38100700002)(31696002)(36756003)(478600001)(41300700001)(31686004)(66946007)(66556008)(66476007)(54906003)(6512007)(316002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Y0NoUE1td2p5UmZQTmtkV2xZTU5scENxVU43ZzhFZWJRUUcxMno4UkczU2Nu?=
- =?utf-8?B?bHBKckhVWU9TQ2RjcU9XWTdtb3E5bEExTFoveWg4UmQvNEhIWlRkYWZBK2lo?=
- =?utf-8?B?YXVEZm9yQVFvdzJtYUh6VFludGJPZk93Q0ZwOXNudFFaRVVuMzFVOXV2d3V0?=
- =?utf-8?B?Tzk4VVNUM09pTm1tc0NrMFBzY0RhVDNvQWxmY1BiWmRaeGd0WEJ1N0ZjZUow?=
- =?utf-8?B?WlRQVHFkY294TGs4Ky9IcVU3VWtyb2VNQ3JYajU3SE5YUXlIQUovWEozQzZY?=
- =?utf-8?B?U0ZaS0ZGU0pkSUl3OEdVYU1hcGZoVE5VVGFRbGxLRCtFaSt3R1dQY3BaNU00?=
- =?utf-8?B?cE1QczBDbjk2MG5jb2xja3R5dzJiSktrZ2dkWkNhWENrZW45bzE1NEFQa0pB?=
- =?utf-8?B?ZW9EbnpKZ2JOdmJ5TEkvTDBHUjRJUVR6VkhucWw4M3RxdjE0QmZRU2dTR2Vs?=
- =?utf-8?B?VUtrT3dlNmgwdXduSTJiQ0FTd0xwT3UzWTlOMlFzRllscFVUVUtCb1JlYmw5?=
- =?utf-8?B?NHA5WVNoQ1NibTJSRVVTd3VjQTVGUUpiMExOS3pUakFQdG9jMkJFcG0xMmc1?=
- =?utf-8?B?NlhuZ0ZjVlVuOXJaZG56a2pRYlRXR1BwQllLVzJzQkVEOUNLVElJM2hzazB0?=
- =?utf-8?B?RmkySnhVUUYvUng3Qk5yQWV1d3g0VTVRT2ZhNEUrbzdMRm5oaXBtZ0Y3c2Fj?=
- =?utf-8?B?UUs1RTk1K1JZbmRCT28vaGxadlQrWlprKzZJOEZLU1B4WHQyUHI5bVVQbXFk?=
- =?utf-8?B?NFBDUjU3QzB4VmQwZVkyLzRDYzg3T1lwWERmV2FLclJoWmpqbDVEejhxMk9S?=
- =?utf-8?B?SlgvTkJCUldOQWhDVUVjWmdhTTI3VVEyTHJpc3gxRUorWXR6dVh3aTJVRFd4?=
- =?utf-8?B?RXRCd2xYU2s5OUVZL0JicHk3TEgyRUZ4eXNXaEJLWUxoU1g0T2NzZ0Z2MEJ4?=
- =?utf-8?B?d0o5bVBDeUNWZ2FVdDI0WWJNaFRMSjc1OGhqZDdpNmlNWG40a0tUR29mN3lM?=
- =?utf-8?B?cC9Mb3pvcHNoMmFRREV2bzUyYTRWdzhrQmNZYzR3bE5aa3lPdjFzWllSK09N?=
- =?utf-8?B?blJnQmJ2NTYrL01PMTBqSGZEYmFQVCsxczl1TTFkYWlMMmtvSzJtaWpYdTNK?=
- =?utf-8?B?MkFVeVBrWGU2eUNONVNsc2w3YlhmWWFlZlE2T3h0VTRvTXk3V3E3VFNLN3gz?=
- =?utf-8?B?M0ZyeDUyTkFSMzhrWWUyV0NkRDdBcWUvKy9RZ1pCVEFta25Wd3EvRDlkaGpP?=
- =?utf-8?B?WE1XM2szMWN0ZnFHNHZNcnlWZE11djZlOFBMMG9qNzIwTGY2MnoxNGc2N2Rq?=
- =?utf-8?B?U3NVdDZHb20vMkdUTVhhZ2ZsQ0pQS0dyS2ptb3FYUFRiRkU5eDdObTVkcFpT?=
- =?utf-8?B?b1BURG9LdHhMVVRZT3d1WS9zN1d3bm1TWlFhYUJERGhxbDAzb1J0Q2N0V2hr?=
- =?utf-8?B?NXBiRXp0YVpHQWpoVEZGWE1iVXlNM0lDYW5QL09aOE5MMktldUdVWmFuejdu?=
- =?utf-8?B?djhlWDQrdGZxaUdlNGY1b0k3bUk5YWFqZW1aR2did1hGQkpYL2x4cjZwS0Nk?=
- =?utf-8?B?VVEyN2N3bVF4a2NnclM1dE1sNEZWTkhET0dCWm8yY2VxUTBjSXRRVkg4V2pJ?=
- =?utf-8?B?QXRIQ3RQSG9jM0gzN3NYVXYwUGZMK0c1OTJUOElmWlhYbmFGK0FLSVZWakFH?=
- =?utf-8?B?N25oR2srdGJXT3FPUVIzWUpjbTYybUN4MVpXOVZMYUJ6YW1qaWEvMGR3S2RE?=
- =?utf-8?B?TTN3L1JHSVBIVkg0bTlVdE5SYyt3bXVPdUFZUkE0Tm9LbkhlSFgzV3JxRmZI?=
- =?utf-8?B?c0dJQUI0UVVuV0pRTVFMRTVOU0wwd1FDbE92dFdiL0hvWnYyQWh0RTd3V2kw?=
- =?utf-8?B?dzJCa21NOU43T1dRcW9aZUhUTG10TzhRYmVqM0ZSQmRrM0tScHhwR01tbmc3?=
- =?utf-8?B?R2EzaE44TXV1VTlxOVJJUC9kbk5JRk1PM05DYW1XNTVhYlFBVFV3UndSVGR6?=
- =?utf-8?B?ay9PNE05MEtBQU5aSDFDSHZmSGtqcjhoUjFJZzBIUmJBai92Z0Z2ZUljd3pE?=
- =?utf-8?B?cFFLUmdKUzlvQll2eGxZc0c2Y0hmMHp0dzZFSnZzWHM5Uk5jMmZDRkM0c29l?=
- =?utf-8?Q?hd+hLUPmt4Dvjw8XZzQ9dr7Mw?=
+	=?utf-8?B?ZDdYNUYrcFVENUh5UmVLYkhjeDhNalBrZmRlWUlsL3l3QjN0SW80SkYwOHRx?=
+ =?utf-8?B?WWVhZmc1VzFHa1AzV3R2Q1pGL241NHBwalFCQjV4MEt4RkFxUzVBZERWbzhG?=
+ =?utf-8?B?R3IxZk9GVzEvZ3lHZ0tTNGgvcXlhOE51MjZoa0NhdlV4UUtYMWg3Tm9ydEEy?=
+ =?utf-8?B?eklJU25BVEVVL0tPTW1PTzExcWcya2RRdGpHbEpqNElYQStUdmZLOXZPQkZI?=
+ =?utf-8?B?cmRJa080eFNEOGlNSURjU1hKVDlvM09zcktCT1oyWDhUNkNTSmlwbWF3MCts?=
+ =?utf-8?B?RW1JVUF1NDVPekU4VzVZaStGOHZCS0g2bzM5TktreWhFRW5WMFpzSG4vbjhi?=
+ =?utf-8?B?aFhNWUtwMFVMZy9xM2RrYjBlcURLbGhhVnFXVFFNYVdmcHJFazlianVTS0Vs?=
+ =?utf-8?B?NnBZYmVZMmlkMW5ab0l5SVJCeTNjVSswMitkaHY4TmY2bEE3THUvTktzSjZ4?=
+ =?utf-8?B?N2lhQWR6RWE2bEVPT1oxSE4rZUhOc2xiVFN2aDN6bHRkUytUc0c3NEFsQ1RG?=
+ =?utf-8?B?M2pGSG1ocm4yczFiZFpGQ2hqUnpRWmYrNDhmNzlXZ0F4Z3huZGMzRVNSMFBz?=
+ =?utf-8?B?UGFsNUNqSmtRMGlRVm1Zc0puZDRrVGxpdW1rMXNZMzdnTElWa2VveUs2anIx?=
+ =?utf-8?B?QU9NY0wzM1RONHIyTHVlOUdxdnVBSUthVVpXdGlCYlJxOWlWTXZ0aXhadXRG?=
+ =?utf-8?B?UHJMVjVHTzR5aktmV21QVE9CMjdNWGs1UjZxajBnbllQdXd2UXg5d3hkaVpu?=
+ =?utf-8?B?WkJTaGNpWk9Kdk00VE93RFdkYStUYmFSRGVaVFNOcG1CeUxhdHRuLzVGaG5E?=
+ =?utf-8?B?ODVNSkpNb2hZd04yTzlxNHlDd3NtUitiZ1RRNDRJUGlpZFE1TDdVSmxuMXRN?=
+ =?utf-8?B?K29WUzB5WGU1YmZkbjZWM0JlZlByaWN4eFJOcjNjdHNvcXp4QzgyamtPWnVB?=
+ =?utf-8?B?Q1QrTFRYYU5sWjBtT1hObDkyQlZMaCt2a3N6d0ZibVFFeVpUcWpnSmNyRjBE?=
+ =?utf-8?B?TG5ndHVsSFd3cGs1eXRUdlQyQUZDVUNlenVuWjgwTVFZZXpCbEtxWVFvYm9M?=
+ =?utf-8?B?clVvcjJqSGVocEpnVUM3NHhwU2NENjdxcXZDYXJQakJDZmZaMGt4aXlmT1g5?=
+ =?utf-8?B?OXFFT3lrK0N4WDJZQlRGT3FJTXFPZU5uTlJZTkUyZXdVclVCdHgrdjdFL2xT?=
+ =?utf-8?B?Y2grODQrTFFJcXZydnlYcmthcThaMUZHSThIMSsxTHlWZGhndVRYOEJOb1ph?=
+ =?utf-8?B?S1Z5VVYvNlhFWm1uTU1aUjM3SUtKUnczTWlwSUJ0VkxiTkR5bHFYY2hnUWNP?=
+ =?utf-8?B?VGZaRU5aKzBtUjE3Sktja1hmWjJQWUptdWh6TjI2cHZmNE1zWXFmY0R1MEVN?=
+ =?utf-8?B?R0l6dUVUbUxrZU9GbHppQTB6cUlDME5vMWJqOWlYbVVMVjlqdUQ5VGtaUWh3?=
+ =?utf-8?B?TGtIYVRDb0UrUzBiS0Y1Qk5wNldUdFY3WU9ILzlUWFlhN0RUNGxIbkN2YWxs?=
+ =?utf-8?B?cUZwamI1RllSQ3dLUnIzbjUxbS9Gb2JKREEvMFlsSE8wOE02MnB5R2FsM2ZF?=
+ =?utf-8?B?K0VRTFZ2SFhJMUZYR2lVRkhUWmVpRlo5Z1VEWlhHaUdtRmhOOWthM0xGVkQr?=
+ =?utf-8?B?NWFoS2dDVFRKYTIvSzQwSFkwWG9qdCtwZWF4UkhSL0k3U210Zm9Ka0UxOTB6?=
+ =?utf-8?B?bitXbnZmMmFRM3NzTTExekl5bllFbzhMV1hXSEIrSmJrRWw1ZW5QNjl6eWts?=
+ =?utf-8?B?cUg3UGRpRG84MVlXQWFBVmlvN1IxQnh0NzcyaStWb1ZFS0ZhNXdZSEpGOHlN?=
+ =?utf-8?B?OE56emxkdlNPaFhHL0xSanhybUdMQVdBOEhRa0xseDBRcXk5QXI5Mlo5WlBq?=
+ =?utf-8?B?d0JNaE5aczRRVUJxRU1BaDdQMTdhQ2xCeDhyOXZwVG85R3BXZ1FkS3JERDli?=
+ =?utf-8?B?Z0NqcTFuK0paaUgwdE9aMzBHbmtyQmQ3RTh1UXUvS0hKS0hsZUQ4Y0M2ZCtJ?=
+ =?utf-8?B?TnVIK29ITU0yOU1WbW5LM1NpVTN4cmhPQ05NVmlJOGJtbzZPL2ZDZzVtRGMr?=
+ =?utf-8?B?TmRKb1hmUWFSN09xL3lOdGlzMTk2OG1qUmVKNWs4dXE5cnFxMVFWQlVpY2NC?=
+ =?utf-8?Q?gBS8AmjRE5yAAS8mkSko8Nkfk?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 20ec3d17-d019-4c69-7408-08dbfd0191ed
+X-MS-Exchange-CrossTenant-Network-Message-Id: 72987124-f509-4e02-692f-08dbfd01966f
 X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2023 00:05:38.9643
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2023 00:05:46.5219
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: q/EEmz6+R7sElX4reo9d9kzZt+L6e2jWlX0VhO4YcwPXolRWCRfSa8zOFOoFKFUn+0/v6h5x1Y1PHw0B9e6JQg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: HsM5+zuqr65DWRzOBxJj0fnp+fYTtRIDixb/rnUs1P5RZCu1QBwq3TtOQIO/VtUXN7bNcmnKjqtWUt+rffDTMQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5903
 
 On 12/11/2023 9:18 AM, edward.cree@amd.com wrote:
 > 
 > From: Edward Cree <ecree.xilinx@gmail.com>
 > 
-> Expose each RX queue's core RXQ association, and the read/write/etc
->   pointers for the descriptor ring.
-> Each RXQ dir also symlinks to its owning channel.
+> Filter table management is complicated by the possibility of overflow
+>   kicking us into a promiscuous fallback for either unicast or multicast.
+>   Expose the internal flags that drive this.
+> Since the table state (efx->filter_state) has a separate, shorter
+>   lifetime than struct efx_nic, put its debugfs nodes in a subdirectory
+>   (efx->filter_state->debug_dir) so that they can be cleaned up easily
+>   before the filter_state is freed.
 > 
 > Reviewed-by: Jonathan Cooper <jonathan.s.cooper@amd.com>
 > Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
 > ---
->   drivers/net/ethernet/sfc/debugfs.c    | 69 ++++++++++++++++++++++++++-
->   drivers/net/ethernet/sfc/debugfs.h    | 15 ++++++
->   drivers/net/ethernet/sfc/net_driver.h |  6 +++
->   drivers/net/ethernet/sfc/rx_common.c  |  9 ++++
->   4 files changed, 98 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/sfc/debugfs.c b/drivers/net/ethernet/sfc/debugfs.c
-> index b46339249794..43b1d06a985e 100644
-> --- a/drivers/net/ethernet/sfc/debugfs.c
-> +++ b/drivers/net/ethernet/sfc/debugfs.c
-> @@ -78,6 +78,72 @@ void efx_update_debugfs_netdev(struct efx_nic *efx)
->          mutex_unlock(&efx->debugfs_symlink_mutex);
->   }
-> 
-> +#define EFX_DEBUGFS_RXQ(_type, _name)  \
-> +       debugfs_create_##_type(#_name, 0444, rx_queue->debug_dir, &rx_queue->_name)
-> +
-> +/* Create basic debugfs parameter files for an Efx RXQ */
-> +static void efx_init_debugfs_rx_queue_files(struct efx_rx_queue *rx_queue)
-> +{
-> +       EFX_DEBUGFS_RXQ(u32, core_index); /* actually an int */
-> +       /* descriptor ring indices */
-> +       EFX_DEBUGFS_RXQ(u32, added_count);
-> +       EFX_DEBUGFS_RXQ(u32, notified_count);
-> +       EFX_DEBUGFS_RXQ(u32, granted_count);
-> +       EFX_DEBUGFS_RXQ(u32, removed_count);
-> +}
-> +
-> +/**
-> + * efx_init_debugfs_rx_queue - create debugfs directory for RX queue
-> + * @rx_queue:          Efx RX queue
-> + *
-> + * Create a debugfs directory containing parameter-files for @rx_queue.
-> + * The directory must be cleaned up using efx_fini_debugfs_rx_queue(),
-> + * even if this function returns an error.
-> + *
-> + * Return: a negative error code or 0 on success.
-> + */
-> +int efx_init_debugfs_rx_queue(struct efx_rx_queue *rx_queue)
-> +{
-> +       struct efx_channel *channel = efx_rx_queue_channel(rx_queue);
-> +       char target[EFX_DEBUGFS_NAME_LEN];
-> +       char name[EFX_DEBUGFS_NAME_LEN];
-> +
-> +       if (!rx_queue->efx->debug_queues_dir)
-> +               return -ENODEV;
-> +       /* Create directory */
-> +       if (snprintf(name, sizeof(name), "rx-%d", efx_rx_queue_index(rx_queue))
-
-Adding leading 0's here can be helpful for directory entry sorting
-
-> +           >= sizeof(name))
-> +               return -ENAMETOOLONG;
-> +       rx_queue->debug_dir = debugfs_create_dir(name,
-> +                                                rx_queue->efx->debug_queues_dir);
-> +       if (!rx_queue->debug_dir)
-> +               return -ENOMEM;
-> +
-> +       /* Create files */
-> +       efx_init_debugfs_rx_queue_files(rx_queue);
-> +
-> +       /* Create symlink to channel */
-> +       if (snprintf(target, sizeof(target), "../../channels/%d",
-> +                    channel->channel) >= sizeof(target))
-> +               return -ENAMETOOLONG;
-> +       if (!debugfs_create_symlink("channel", rx_queue->debug_dir, target))
-> +               return -ENOMEM;
-
-If these fail, should you clean up the earlier create_dir()?
-
-
-> +
-> +       return 0;
-> +}
-> +
-> +/**
-> + * efx_fini_debugfs_rx_queue - remove debugfs directory for RX queue
-> + * @rx_queue:          Efx RX queue
-> + *
-> + * Remove directory created for @rx_queue by efx_init_debugfs_rx_queue().
-> + */
-> +void efx_fini_debugfs_rx_queue(struct efx_rx_queue *rx_queue)
-> +{
-> +       debugfs_remove_recursive(rx_queue->debug_dir);
-> +       rx_queue->debug_dir = NULL;
-> +}
-> +
->   #define EFX_DEBUGFS_CHANNEL(_type, _name)      \
->          debugfs_create_##_type(#_name, 0444, channel->debug_dir, &channel->_name)
-> 
-> @@ -208,9 +274,10 @@ int efx_init_debugfs_nic(struct efx_nic *efx)
->          if (!efx->debug_dir)
->                  return -ENOMEM;
->          efx_init_debugfs_nic_files(efx);
-> -       /* Create channels subdirectory */
-> +       /* Create subdirectories */
->          efx->debug_channels_dir = debugfs_create_dir("channels",
->                                                       efx->debug_dir);
-> +       efx->debug_queues_dir = debugfs_create_dir("queues", efx->debug_dir);
->          return 0;
->   }
+>   drivers/net/ethernet/sfc/debugfs.h      |  4 ++++
+>   drivers/net/ethernet/sfc/mcdi_filters.c | 18 ++++++++++++++++++
+>   drivers/net/ethernet/sfc/mcdi_filters.h |  4 ++++
+>   3 files changed, 26 insertions(+)
 > 
 > diff --git a/drivers/net/ethernet/sfc/debugfs.h b/drivers/net/ethernet/sfc/debugfs.h
-> index 4af4a03d1b97..53c98a2fb4c9 100644
+> index 3e8d2e2b5bad..7a96f3798cbd 100644
 > --- a/drivers/net/ethernet/sfc/debugfs.h
 > +++ b/drivers/net/ethernet/sfc/debugfs.h
-> @@ -28,11 +28,20 @@
->    * * "channels/" (&efx_nic.debug_channels_dir).  For each channel, this will
->    *   contain a directory (&efx_channel.debug_dir), whose name is the channel
->    *   index (in decimal).
-> + * * "queues/" (&efx_nic.debug_queues_dir).
+> @@ -39,6 +39,10 @@
+>    *     index.  (This may differ from both the kernel core TX queue index and
+>    *     the hardware queue label of the TXQ.)
+>    *     The directory will contain a symlink to the owning channel.
 > + *
-> + *   * For each NIC RX queue, this will contain a directory
-> + *     (&efx_rx_queue.debug_dir), whose name is "rx-N" where N is the RX queue
-> + *     index.  (This may not be the same as the kernel core RX queue index.)
-> + *     The directory will contain a symlink to the owning channel.
+> + * * "filters/" (&efx_mcdi_filter_table.debug_dir).
+> + *   This contains parameter files for the NIC receive filter table
+> + *   (@efx->filter_state).
 >    */
 > 
 >   void efx_fini_debugfs_netdev(struct net_device *net_dev);
->   void efx_update_debugfs_netdev(struct efx_nic *efx);
+> diff --git a/drivers/net/ethernet/sfc/mcdi_filters.c b/drivers/net/ethernet/sfc/mcdi_filters.c
+> index 4ff6586116ee..a4ab45082c8f 100644
+> --- a/drivers/net/ethernet/sfc/mcdi_filters.c
+> +++ b/drivers/net/ethernet/sfc/mcdi_filters.c
+> @@ -1348,6 +1348,20 @@ int efx_mcdi_filter_table_probe(struct efx_nic *efx, bool multicast_chaining)
+>          INIT_LIST_HEAD(&table->vlan_list);
+>          init_rwsem(&table->lock);
 > 
-> +int efx_init_debugfs_rx_queue(struct efx_rx_queue *rx_queue);
-> +void efx_fini_debugfs_rx_queue(struct efx_rx_queue *rx_queue);
-> +
->   int efx_init_debugfs_channel(struct efx_channel *channel);
->   void efx_fini_debugfs_channel(struct efx_channel *channel);
-> 
-> @@ -48,6 +57,12 @@ static inline void efx_fini_debugfs_netdev(struct net_device *net_dev) {}
-> 
->   static inline void efx_update_debugfs_netdev(struct efx_nic *efx) {}
-> 
-> +int efx_init_debugfs_rx_queue(struct efx_rx_queue *rx_queue)
-> +{
-> +       return 0;
-> +}
-> +void efx_fini_debugfs_rx_queue(struct efx_rx_queue *rx_queue) {}
-> +
->   int efx_init_debugfs_channel(struct efx_channel *channel)
->   {
->          return 0;
-> diff --git a/drivers/net/ethernet/sfc/net_driver.h b/drivers/net/ethernet/sfc/net_driver.h
-> index 2b92c5461fe3..63eb32670826 100644
-> --- a/drivers/net/ethernet/sfc/net_driver.h
-> +++ b/drivers/net/ethernet/sfc/net_driver.h
-> @@ -424,6 +424,10 @@ struct efx_rx_queue {
->          struct work_struct grant_work;
->          /* Statistics to supplement MAC stats */
->          unsigned long rx_packets;
 > +#ifdef CONFIG_DEBUG_FS
-> +       /** @debug_dir: Queue debugfs directory (under @efx->debug_queues_dir) */
+> +       table->debug_dir = debugfs_create_dir("filters", efx->debug_dir);
+> +       debugfs_create_bool("uc_promisc", 0444, table->debug_dir,
+> +                           &table->uc_promisc);
+> +       debugfs_create_bool("mc_promisc", 0444, table->debug_dir,
+> +                           &table->mc_promisc);
+> +       debugfs_create_bool("mc_promisc_last", 0444, table->debug_dir,
+> +                           &table->mc_promisc_last);
+> +       debugfs_create_bool("mc_overflow", 0444, table->debug_dir,
+> +                           &table->mc_overflow);
+> +       debugfs_create_bool("mc_chaining", 0444, table->debug_dir,
+> +                           &table->mc_chaining);
+> +#endif
+
+It would be good to continue the practice of using the debugfs_* 
+primitives in your debugfs.c and just make a single call here that 
+doesn't need the ifdef
+
+> +
+>          efx->filter_state = table;
+> 
+>          return 0;
+> @@ -1518,6 +1532,10 @@ void efx_mcdi_filter_table_remove(struct efx_nic *efx)
+>                  return;
+> 
+>          vfree(table->entry);
+> +#ifdef CONFIG_DEBUG_FS
+> +       /* Remove debugfs entries pointing into @table */
+> +       debugfs_remove_recursive(table->debug_dir);
+> +#endif
+>          kfree(table);
+>   }
+> 
+> diff --git a/drivers/net/ethernet/sfc/mcdi_filters.h b/drivers/net/ethernet/sfc/mcdi_filters.h
+> index c0d6558b9fd2..897843ade3ec 100644
+> --- a/drivers/net/ethernet/sfc/mcdi_filters.h
+> +++ b/drivers/net/ethernet/sfc/mcdi_filters.h
+> @@ -91,6 +91,10 @@ struct efx_mcdi_filter_table {
+>          bool vlan_filter;
+>          /* Entries on the vlan_list are added/removed under filter_sem */
+>          struct list_head vlan_list;
+> +#ifdef CONFIG_DEBUG_FS
+> +       /* filter table debugfs directory */
 > +       struct dentry *debug_dir;
 > +#endif
->          struct xdp_rxq_info xdp_rxq_info;
->          bool xdp_rxq_info_valid;
 >   };
-> @@ -1150,6 +1154,8 @@ struct efx_nic {
->          struct dentry *debug_dir;
->          /** @debug_channels_dir: contains channel debugfs dirs.  Under @debug_dir */
->          struct dentry *debug_channels_dir;
-> +       /** @debug_queues_dir: contains RX/TX queue debugfs dirs.  Under @debug_dir */
-> +       struct dentry *debug_queues_dir;
->          /** @debug_symlink: NIC debugfs symlink (``nic_eth%d``) */
->          struct dentry *debug_symlink;
->          /** @debug_interrupt_mode: debugfs details for printing @interrupt_mode */
-> diff --git a/drivers/net/ethernet/sfc/rx_common.c b/drivers/net/ethernet/sfc/rx_common.c
-> index d2f35ee15eff..7f63f70f082d 100644
-> --- a/drivers/net/ethernet/sfc/rx_common.c
-> +++ b/drivers/net/ethernet/sfc/rx_common.c
-> @@ -14,6 +14,7 @@
->   #include "efx.h"
->   #include "nic.h"
->   #include "rx_common.h"
-> +#include "debugfs.h"
 > 
->   /* This is the percentage fill level below which new RX descriptors
->    * will be added to the RX descriptor ring.
-> @@ -208,6 +209,12 @@ int efx_probe_rx_queue(struct efx_rx_queue *rx_queue)
->          if (!rx_queue->buffer)
->                  return -ENOMEM;
-> 
-> +       rc = efx_init_debugfs_rx_queue(rx_queue);
-> +       if (rc) /* not fatal */
-> +               netif_err(efx, drv, efx->net_dev,
-> +                         "Failed to create debugfs for RXQ %d, rc=%d\n",
-> +                         efx_rx_queue_index(rx_queue), rc);
-> +
->          rc = efx_nic_probe_rx(rx_queue);
->          if (rc) {
->                  kfree(rx_queue->buffer);
-> @@ -311,6 +318,8 @@ void efx_remove_rx_queue(struct efx_rx_queue *rx_queue)
-> 
->          efx_nic_remove_rx(rx_queue);
-> 
-> +       efx_fini_debugfs_rx_queue(rx_queue);
-> +
->          kfree(rx_queue->buffer);
->          rx_queue->buffer = NULL;
->   }
+>   int efx_mcdi_filter_table_probe(struct efx_nic *efx, bool multicast_chaining);
 > 
 
