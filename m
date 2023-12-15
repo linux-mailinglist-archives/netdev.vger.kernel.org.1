@@ -1,112 +1,245 @@
-Return-Path: <netdev+bounces-57888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0A5E81467B
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 12:12:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42A188146A8
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 12:19:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 618171F23A01
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:12:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A535BB23B8E
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:19:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A00200A8;
-	Fri, 15 Dec 2023 11:12:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03FFC208BD;
+	Fri, 15 Dec 2023 11:18:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="kK1CQUWA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qP5QN/fE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF85E249EF
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 11:12:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6ceba6c4b8dso428690b3a.1
-        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 03:12:05 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEB55250E8
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 11:18:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-552d1a24ce7so3879a12.0
+        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 03:18:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1702638725; x=1703243525; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dXP6s66q9ntTfbLUAFz49osaIwyE5w6Ya+xKP7fpd10=;
-        b=kK1CQUWAIrhWz3SYA1OlMOJXORUhqYGo+VMPxPe1B6hhilsEiL1L4jdmCslpwydOKu
-         fKZBBxNGM2KDMbicjb37IhBzpbUuOpZ32yquskmqecXrj/Q1NzPvini5UuTCt5hBWyo2
-         IuNCJu2eXRVUTvHcT4eTRf376DvMH1UB6uNR6Cj9G6WXK0lVDzzhLHY48hGROKhuk5hQ
-         70i39VrVsg8vg5VMwYTX4ZNOAy/EfaS9nhFe/2Vs9bUk+SxRJMIgEGhGkl96aItd/ONW
-         YI+bzWtkR8HI4VeYdFUQKtjfSAw87lO2X0ia6/AsoU4yVJHJQW2Ul+YCm4bQs24qjiLW
-         AH3w==
+        d=google.com; s=20230601; t=1702639091; x=1703243891; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X5JzWASf9jMPLO1Q1A977u9mQNMOjvxdwjqETtYKs/I=;
+        b=qP5QN/fE9jxpjYNCjGGJ5hAyLrFbcb8dRSLTM1gHLtzKzu+mzKIgN/jOOR8p/LzZhX
+         PM6iusuF9X7ymtkzO+UaNij72PvOAnLfff2Qt3qWmrDd+TnwBHR4/PI2uF4yJGOX4iqC
+         +bNt5OQAudEohoD5+Ng//Gp+5N/YVDZyRB2LTjQGmF+3+NazybK+xJfy+2hxno7oazOy
+         xpgxrtrnSPJockUWskOl3RZOn2qzZa+nwUSDq+slUgFHWgvUAvVLAl3bq2IRgjdVyauu
+         G2jD80aSKe5ThpOf0WAy4G20/sBsT7K4FAsLiXD+Wj2/ZDNJtLOvcJl6JgK38AP+sK8H
+         wbmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702638725; x=1703243525;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dXP6s66q9ntTfbLUAFz49osaIwyE5w6Ya+xKP7fpd10=;
-        b=kr3kjy0QdBCRwjHbQUQuMSxdWeCgWBbzQc28NcBSVyrKgTJ0haKp8y5eXP/lVRhlic
-         tFIOTusbnaH2yDOzZ2yKfQSPro9p6lKq9/8nsaomfgiYEdTPoWC2sGrJ7+jrjxzxQhBx
-         L1Nkr+y7/KgEGWyZSlm16Vr2382wq3rGPJPEWyGd4883ow1Vw8ETdyj5tKkM4Ig/b12/
-         sEQ0EoNlGFxUmjkAVCK2V2AY41HoX0P9cPpK97IzEok1jy8VNvcsf8vDsU3z4k6cuiD2
-         OikyKEqS0hbJtshm/5daSemIceWXgj9KhLwLjPynjouPU+U1l1QLeu4tnyIGZEnWCOlV
-         tQcA==
-X-Gm-Message-State: AOJu0YwSo1OO4yT9wGv7JiigFfyy2TCES1Z1aYO8K01n7e9lqcN1c/8N
-	3LajR365m/gQL+uomMaDA/xLNg==
-X-Google-Smtp-Source: AGHT+IEXkw6jspAvr3Xj+cY9qC6Lf80UWcR3sDS+5fUNBsa5Bx2Y7Qm2kp1iFPT6jKWwlroUcfRyug==
-X-Received: by 2002:a05:6a20:ba7:b0:18b:5a66:3f70 with SMTP id i39-20020a056a200ba700b0018b5a663f70mr12153042pzh.2.1702638725121;
-        Fri, 15 Dec 2023 03:12:05 -0800 (PST)
-Received: from ?IPV6:2804:7f1:e2c0:60e3:4c1:486f:7eda:5fb5? ([2804:7f1:e2c0:60e3:4c1:486f:7eda:5fb5])
-        by smtp.gmail.com with ESMTPSA id n8-20020a654508000000b005c65fcca22csm11324422pgq.85.2023.12.15.03.12.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Dec 2023 03:12:04 -0800 (PST)
-Message-ID: <a478ab7c-0fa1-4233-95ac-61ebbd7ba0f1@mojatatu.com>
-Date: Fri, 15 Dec 2023 08:12:00 -0300
+        d=1e100.net; s=20230601; t=1702639091; x=1703243891;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X5JzWASf9jMPLO1Q1A977u9mQNMOjvxdwjqETtYKs/I=;
+        b=fWloEXIt9Wh5JP5l8RoGDezTp6kbkZyHmRsVKZrXCroJRDFcPXjCAZY5W60DDJMnQz
+         lVZDtNrB5FgdeV71x5yEs+0uQWSgORC5HNv3Xf1G58G8IV6p3ThC9f9trBW5iNAAKhrZ
+         Xgrq1oNZZf5QPtg4dGplLoLQ/fo55fMLR4eemYn39EgWomkBMDryziDf7owvC2ZmBWty
+         h+Ca4lp4TG/VFSmC5aTmb3Sx+SZGPrMUCwitRwIIThtQ5B63ab+H3JIZalTI0bAZB5nX
+         tQSVwuuZa7I6/OU2XmZyPZTP6oGtrxwCqsX6DdlpOUGWyYph5X4+1yF5plzsEpS1w5h8
+         o45A==
+X-Gm-Message-State: AOJu0YwXa9tCP4yN+JKIafLzNG+U/VyJd+qpf744Bi6C4Tw3WIDoq9eF
+	t0G+qLCzImaBhI287nOlLdE0vW+CflekccXJM6FHGuGa50bWU243gW4=
+X-Google-Smtp-Source: AGHT+IHHasFIcofykcXZNC3k8hP4LOgW+AsG+H1e7XkVB6vk0e0BfwVn9L//6/qEmTAiSTFYsFy6QYTlCSze9MtmBsE=
+X-Received: by 2002:a50:c192:0:b0:54c:f4fd:3427 with SMTP id
+ m18-20020a50c192000000b0054cf4fd3427mr772015edf.7.1702639090701; Fri, 15 Dec
+ 2023 03:18:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 3/3] net/sched: act_mirred: Allow mirred to
- block
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: jhs@mojatatu.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- mleitner@redhat.com, vladbu@nvidia.com, paulb@nvidia.com,
- pctammela@mojatatu.com, netdev@vger.kernel.org, kernel@mojatatu.com
-References: <20231214141006.3578080-1-victor@mojatatu.com>
- <20231214141006.3578080-4-victor@mojatatu.com>
- <20231214190919.2b446e31@kernel.org>
-From: Victor Nogueira <victor@mojatatu.com>
-In-Reply-To: <20231214190919.2b446e31@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20231215-new-gemini-ethernet-regression-v1-0-93033544be23@linaro.org>
+ <20231215-new-gemini-ethernet-regression-v1-1-93033544be23@linaro.org> <CANn89iJo8ER1kZYB7La1jx5p00FrHxzSLnSsWcMNdj8-iG9_Rw@mail.gmail.com>
+In-Reply-To: <CANn89iJo8ER1kZYB7La1jx5p00FrHxzSLnSsWcMNdj8-iG9_Rw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 15 Dec 2023 12:17:57 +0100
+Message-ID: <CANn89iJLfxng1sYL5Zk0mknXpyYQPCp83m3KgD2KJ2_hKCpEUg@mail.gmail.com>
+Subject: Re: [PATCH net 1/2] net: ethernet: cortina: Drop software checksumming
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Dec 15, 2023 at 10:32=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> On Fri, Dec 15, 2023 at 9:49=E2=80=AFAM Linus Walleij <linus.walleij@lina=
+ro.org> wrote:
+> >
+> > The recent change to allow large frames without hardware checksumming
+> > slotted in software checksumming in the driver if hardware could not
+> > do it.
+> >
+> > This will however upset TSO (TCP Segment Offloading). Typical
+> > error dumps includes this:
+> >
+> > skb len=3D2961 headroom=3D222 headlen=3D66 tailroom=3D0
+> > (...)
+> > WARNING: CPU: 0 PID: 956 at net/core/dev.c:3259 skb_warn_bad_offload+0x=
+7c/0x108
+> > gemini-ethernet-port: caps=3D(0x0000010000154813, 0x00002007ffdd7889)
+> >
+> > And the packets do not go through.
+> >
+> > After investigating I drilled it down to the introduction of the
+> > software checksumming in the driver.
+> >
+> > Since the segmenting of packets will be done by the hardware this
+> > makes a bit of sense since in that case the hardware also needs to
+> > be keeping track of the checksumming.
+> >
+> > That begs the question why large TCP or UDP packets also have to
+> > bypass the checksumming (like e.g. ICMP does). If the hardware is
+> > splitting it into smaller packets per-MTU setting, and checksumming
+> > them, why is this happening then? I don't know. I know it is needed,
+> > from tests: the OpenWrt webserver uhttpd starts sending big skb:s (up
+> > to 2047 bytes, the max MTU) and above 1514 bytes it starts to fail
+> > and hang unless the bypass bit is set: the frames are not getting
+> > through.
+> >
+> > Keeping the size check but removing the software checksum makes things
+> > work again. This was probably dubious to introduce in the first place.
+> >
+> > Fixes: d4d0c5b4d279 ("net: ethernet: cortina: Handle large frames")
+> > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> > ---
+> >  drivers/net/ethernet/cortina/gemini.c | 8 --------
+> >  1 file changed, 8 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethern=
+et/cortina/gemini.c
+> > index 78287cfcbf63..255fcffc1579 100644
+> > --- a/drivers/net/ethernet/cortina/gemini.c
+> > +++ b/drivers/net/ethernet/cortina/gemini.c
+> > @@ -1145,7 +1145,6 @@ static int gmac_map_tx_bufs(struct net_device *ne=
+tdev, struct sk_buff *skb,
+> >         dma_addr_t mapping;
+> >         unsigned short mtu;
+> >         void *buffer;
+> > -       int ret;
+> >
+> >         mtu  =3D ETH_HLEN;
+> >         mtu +=3D netdev->mtu;
+> > @@ -1166,14 +1165,7 @@ static int gmac_map_tx_bufs(struct net_device *n=
+etdev, struct sk_buff *skb,
+> >                  * checksum buffer is only 1518 bytes, so when the fram=
+es get
+> >                  * bigger they get truncated, or the last few bytes get
+> >                  * overwritten by the FCS.
+> > -                *
+> > -                * Just use software checksumming and bypass on bigger =
+frames.
+> >                  */
+> > -               if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL) {
+> > -                       ret =3D skb_checksum_help(skb);
+> > -                       if (ret)
+> > -                               return ret;
+> > -               }
+>
+> If the hardware does not support checksumming for frames bigger than
+> ETH_FRAME_LEN,
+> then an appropriate mitigation would be to have an ndo_features_check() ?
+>
+> Depending on packet being gso or not, you would have to check skb->len
+> or shinfo->gso_size
+>
+> The ndo_features_check could then take a more appropriate action
+> (forcing GSO, and/or forcing software checksumming)
+>
+> This driver claims to support TSO, but I do not see it using
+> shinfo->gso_size, something must be very wrong...
+>
+> I would simply remove this TSO part, before the driver really supports
+> TSO properly.
+>
+> diff --git a/drivers/net/ethernet/cortina/gemini.c
+> b/drivers/net/ethernet/cortina/gemini.c
+> index 78287cfcbf6388f01bfab417c264f41f3a1a16f2..829cb69982fe1caf99b56363e=
+9e0565fbaecc82e
+> 100644
+> --- a/drivers/net/ethernet/cortina/gemini.c
+> +++ b/drivers/net/ethernet/cortina/gemini.c
+> @@ -79,8 +79,7 @@ MODULE_PARM_DESC(debug, "Debug level (0=3Dnone,...,16=
+=3Dall)");
+>  #define GMAC0_IRQ4_8 (GMAC0_MIB_INT_BIT | GMAC0_RX_OVERRUN_INT_BIT)
+>
+>  #define GMAC_OFFLOAD_FEATURES (NETIF_F_SG | NETIF_F_IP_CSUM | \
+> -               NETIF_F_IPV6_CSUM | NETIF_F_RXCSUM | \
+> -               NETIF_F_TSO | NETIF_F_TSO_ECN | NETIF_F_TSO6)
+> +               NETIF_F_IPV6_CSUM | NETIF_F_RXCSUM )
+>
+>  /**
+>   * struct gmac_queue_page - page buffer per-page info
 
 
+I do not have the datasheet for this NIC, but my naive attempt would
+be something like:
 
-On 15/12/2023 00:09, Jakub Kicinski wrote:
-> On Thu, 14 Dec 2023 11:10:06 -0300 Victor Nogueira wrote:
->> So far the mirred action has dealt with syntax that handles mirror/redirection for netdev.
->> A matching packet is redirected or mirrored to a target netdev.
->>
->> In this patch we enable mirred to mirror to a tc block as well.
->> IOW, the new syntax looks as follows:
->> ... mirred <ingress | egress> <mirror | redirect> [index INDEX] < <blockid BLOCKID> | <dev <devname>> >
->>
->> Examples of mirroring or redirecting to a tc block:
->> $ tc filter add block 22 protocol ip pref 25 \
->>    flower dst_ip 192.168.0.0/16 action mirred egress mirror blockid 22
->>
->> $ tc filter add block 22 protocol ip pref 25 \
->>    flower dst_ip 10.10.10.10/32 action mirred egress redirect blockid 22
-> 
-> net/sched/act_mirred.c:424:6: warning: variable 'err' set but not used [-Wunused-but-set-variable]
->    424 |         int err = 0;
->        |             ^
+diff --git a/drivers/net/ethernet/cortina/gemini.c
+b/drivers/net/ethernet/cortina/gemini.c
+index 78287cfcbf6388f01bfab417c264f41f3a1a16f2..3c902dac16f7d539349178ebc4a=
+49c7e48edced5
+100644
+--- a/drivers/net/ethernet/cortina/gemini.c
++++ b/drivers/net/ethernet/cortina/gemini.c
+@@ -1143,39 +1143,18 @@ static int gmac_map_tx_bufs(struct net_device
+*netdev, struct sk_buff *skb,
+        struct gmac_txdesc *txd;
+        skb_frag_t *skb_frag;
+        dma_addr_t mapping;
+-       unsigned short mtu;
+        void *buffer;
+        int ret;
 
-Thank you for the catch.
-Sent a v7 fixing it.
+-       mtu  =3D ETH_HLEN;
+-       mtu +=3D netdev->mtu;
+-       if (skb->protocol =3D=3D htons(ETH_P_8021Q))
+-               mtu +=3D VLAN_HLEN;
+-
+        word1 =3D skb->len;
+        word3 =3D SOF_BIT;
 
-cheers,
-Victor
+-       if (word1 > mtu) {
++       if (skb_is_gso(skb)) {
+                word1 |=3D TSS_MTU_ENABLE_BIT;
+-               word3 |=3D mtu;
++               word3 |=3D skb_shinfo(skb)->gso_size;
+        }
+
+-       if (skb->len >=3D ETH_FRAME_LEN) {
+-               /* Hardware offloaded checksumming isn't working on frames
+-                * bigger than 1514 bytes. A hypothesis about this is that =
+the
+-                * checksum buffer is only 1518 bytes, so when the frames g=
+et
+-                * bigger they get truncated, or the last few bytes get
+-                * overwritten by the FCS.
+-                *
+-                * Just use software checksumming and bypass on bigger fram=
+es.
+-                */
+-               if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL) {
+-                       ret =3D skb_checksum_help(skb);
+-                       if (ret)
+-                               return ret;
+-               }
+-               word1 |=3D TSS_BYPASS_BIT;
+-       } else if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL) {
++       if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL) {
+                int tcp =3D 0;
+
+                /* We do not switch off the checksumming on non TCP/UDP
 
