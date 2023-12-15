@@ -1,110 +1,110 @@
-Return-Path: <netdev+bounces-58073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B051A814F42
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 18:53:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83D18814F61
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 19:00:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 420BA28276F
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 17:53:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B44DB2464B
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 18:00:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C7BE3011D;
-	Fri, 15 Dec 2023 17:51:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D5DD3FB1D;
+	Fri, 15 Dec 2023 17:57:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jay9ougN"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="EYaLE286"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D34CA45C16;
-	Fri, 15 Dec 2023 17:51:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Cc:Content-ID:Content-Description;
-	bh=+iPdiJNdZVJJftJlmJirKXP1ftutRoMmfkmL/gnsteY=; b=jay9ougNBK8TghytFpUhx1y5b9
-	mytxfXrEWaqLun8HqrByCIQ1KJ0tS9xj2hr6FQv+cYgraTC2H9B7+sgUyeQyhIkW8k9xY3UK6Ru9e
-	4rvkSX87wxIV3VUZ9rwz/hyqc1dUXh5k2kUFk/CUKrZ3WAYsCk5QKrIAyKBc2NVcdEnZN++aoP+M6
-	OHzIUAu/iE/b3akYMpojMKjJhfZTdLsfQxaJ9WnqemAlQxehX5MSBrair0xLWki721i04sG2QIV1V
-	mjLODjZXsvIMQ01s0//xlPLmgdoRhFsQqNY2kx/vE7ou5/j9GOik77l6hJpuiyuMHHiBkfpT7S7R9
-	chetLpkQ==;
-Received: from [50.53.46.231] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1rECLg-0049yM-39;
-	Fri, 15 Dec 2023 17:51:45 +0000
-Message-ID: <387c75f9-e2f3-499a-bfb3-17b18398866a@infradead.org>
-Date: Fri, 15 Dec 2023 09:51:44 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6B447767
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 17:57:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-5c664652339so628215a12.1
+        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 09:57:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1702663060; x=1703267860; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/cC3qIY7fgUlPmVk5BBf4sPopoT6JSZSLBmCXtEI2go=;
+        b=EYaLE2860Wm8qtcuGQgiIAjBoVFLhwyuQ5fW/ffogRZVmODnr0JqWucXNK/B1wTJ8U
+         VgHQdXEDkedKwHv01Ir5UdnaOAvfyLzcRNHf2XGidTa6H5CY/qdpntFz+fuqN/7bt1lx
+         xalJmHHgF1M91EWZIeMjZCHfkCrkcAJ3wh1b68avfFAzJnvQtfsK4CGRqDaIhSp5JvIp
+         KzP3f+aVh6jYTHcsRvEnc4DR6Y1RB7KVyIdk8PTEa0NAlDd4Kc0v8Hn2B5bHPtzOV79z
+         ZmWJD3mrPuvFOZmsCl4HD3pfz48JQKMmdjdjcraeqcJC3SR4QwX0NMSNsKfJUeJJx/Mk
+         oeig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702663060; x=1703267860;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/cC3qIY7fgUlPmVk5BBf4sPopoT6JSZSLBmCXtEI2go=;
+        b=d7nt0wchT9OhHlRo8otNPyQ67OoUeOXSwpHkNoUepK94E/7AJqq/KHNoHbp9hG760H
+         V11QEFFD/yHHkDAwSdbke5tAfe245S6PSvFE2dCUWyYErFTtpseITWbRLuNJl/n8nk5p
+         e3BeSCouuz101bBN16UjGkTL7HhG0HQdshInMihLrxq5zEI7GH10T2bl+5M45rMhMM1s
+         t2u8WGOydbWu9bOLVzB2a9GZ7Us6PbsllifE1sqTrOWGBoYSS6diTsAm2+l/fm9h26ka
+         Zgs6Y2pQBjkQyRBxDSlJLdQ9es+NG3RKDBS0zlegnwb0Mm0nFxuUQ1qQ3Ax9A1+RZsNJ
+         v9PQ==
+X-Gm-Message-State: AOJu0YyPGE/Zo4SuUsPIsAfyeaLyB/vLJro6M2kEXXFZ0z5z6jXaoTQS
+	pNMpkWjcvbBteszdXMEr9Q4ecQtbWATqbUXCuh8=
+X-Google-Smtp-Source: AGHT+IFUTVRqee3UhuMf7btg6ZfWEwlsUz9HEYdzAVjIdsGRKwYtJ3echGo/VGnwDhPGc+vk9iP28w==
+X-Received: by 2002:a05:6a20:1047:b0:187:1015:bf9c with SMTP id gt7-20020a056a20104700b001871015bf9cmr6750596pzc.10.1702663060432;
+        Fri, 15 Dec 2023 09:57:40 -0800 (PST)
+Received: from rogue-one.tail33bf8.ts.net ([201.17.86.134])
+        by smtp.gmail.com with ESMTPSA id sm9-20020a17090b2e4900b0028b0848f0edsm711799pjb.9.2023.12.15.09.57.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Dec 2023 09:57:40 -0800 (PST)
+From: Pedro Tammela <pctammela@mojatatu.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	jiri@resnulli.us,
+	jhs@mojatatu.com,
+	victor@mojatatu.com,
+	martin@strongswan.org,
+	idosch@nvidia.com,
+	razor@blackwall.org,
+	lucien.xin@gmail.com,
+	edwin.peer@broadcom.com,
+	amcohen@nvidia.com,
+	Pedro Tammela <pctammela@mojatatu.com>
+Subject: [PATCH net-next 0/2] net: rtnl: introduce rcu_replace_pointer_rtnl
+Date: Fri, 15 Dec 2023 14:57:09 -0300
+Message-Id: <20231215175711.323784-1-pctammela@mojatatu.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH v3 1/3] net: phy: refactor and better document
- phy_speeds function
-Content-Language: en-US
-To: Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20231215132921.16808-1-ansuelsmth@gmail.com>
- <20231215132921.16808-2-ansuelsmth@gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20231215132921.16808-2-ansuelsmth@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi--
+Introduce the rcu_replace_pointer_rtnl helper to lockdep check rtnl lock
+rcu replacements, alongside the already existing helpers.
 
-On 12/15/23 05:29, Christian Marangi wrote:
-> Refactor the phy_speeds function to be more readable and understandable
-> and add some documentation on it.
-> 
-> While on it extend it to take NULL speeds values to make it return only
-> the count of speed modes in the passed mask.
-> 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
->  drivers/net/phy/phy-core.c | 50 ++++++++++++++++++++++++++++++++++----
->  1 file changed, 45 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
-> index 966c93cbe616..9618d89458d1 100644
-> --- a/drivers/net/phy/phy-core.c
-> +++ b/drivers/net/phy/phy-core.c
-> @@ -317,17 +317,57 @@ phy_lookup_setting(int speed, int duplex, const unsigned long *mask, bool exact)
->  }
->  EXPORT_SYMBOL_GPL(phy_lookup_setting);
->  
-> +/**
-> + * phy_speeds - return all speeds in mask
-> + * @speeds: pointer to array where to put the speed modes
-> + * @size: size of array where to put the speed modes
-> + * @mask: mask of speed modes to compare with
-> + *
-> + * Take mask, test bit in mask with the settings table and compose the
-> + * speeds array based on that as many as size permits.
-> + *
-> + * With speeds NULL, only the number of detected modes is returned and
-> + * no array is composed. (size value is ignored)
-> + *
-> + * Return the number of detected modes in mask.
+Patch 2 uses the new helper in the rtnl_unregister_* functions.
 
-    * Return: the number of detected modes in mask.
+Originally this change was part of the P4TC series, as it's a recurrent
+pattern there, but since it has a use case in mainline we are pushing it
+separately.
 
+Jamal Hadi Salim (1):
+  net: rtnl: introduce rcu_replace_pointer_rtnl
 
-> + */
+Pedro Tammela (1):
+  net: rtnl: use rcu_replace_pointer_rtnl in rtnl_unregister_*
 
+ include/linux/rtnetlink.h | 12 ++++++++++++
+ net/core/rtnetlink.c      | 12 +++---------
+ 2 files changed, 15 insertions(+), 9 deletions(-)
 
 -- 
-#Randy
-https://people.kernel.org/tglx/notes-about-netiquette
-https://subspace.kernel.org/etiquette.html
+2.40.1
+
 
