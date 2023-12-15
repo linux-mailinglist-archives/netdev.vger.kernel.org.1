@@ -1,228 +1,136 @@
-Return-Path: <netdev+bounces-57849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81D8F814516
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:04:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B13B814512
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 11:03:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36251281DE0
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 10:04:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C62BC1F22E86
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 10:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C9D18C14;
-	Fri, 15 Dec 2023 10:04:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D3CE18B0E;
+	Fri, 15 Dec 2023 10:03:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="EqtSz8d0"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="d5ffZ9qV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889F918C09;
-	Fri, 15 Dec 2023 10:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BF5F27t015003;
-	Fri, 15 Dec 2023 10:03:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=BRxgl//zknMrW5V/U7mkOhKeb9Q7bg36q8gBhzKKTVk=; b=Eq
-	tSz8d0JLOSAvfnZvIn5IINNlLksNUqgx+FmGfCtUHyG8gDuya26IjO2OqTVzuC8Z
-	V+tvnRSJ0/6tUxwzLwtWH7OOW94K9pWLznCriJRTRZGKVbNO6/9vW2ykGZ0vD9iq
-	28c9c9QD565f8IJROnmm5RDyx8xWIj6TUm60dX03n16qy08RRBb59op336D019or
-	U82/kJxhTUQYjElXb7+sCa3rCYfbZJXVxLyKMP9bYvuF14hcFkmZarv57ZUyhPq8
-	x1UunfxTsQNjmFGYxIKZrS8Y48Dq+AbM7+tRvsSJLaqMj9WnYQuqEMJ9PVR/AZAk
-	uyWGjXG4huYDYBh7p23g==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3v05jqj068-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Dec 2023 10:03:42 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BFA3fHc013778
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Dec 2023 10:03:41 GMT
-Received: from [10.253.13.71] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 15 Dec
- 2023 02:03:36 -0800
-Message-ID: <3de98516-9a28-4f58-8951-2a7752621fee@quicinc.com>
-Date: Fri, 15 Dec 2023 18:03:33 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B8D19454
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 10:03:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-550dd0e3304so564301a12.1
+        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 02:03:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1702634621; x=1703239421; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=56mVcOurV+ZpI4KiJDKVHnndwqaB73yRAHtAX8Z6DO8=;
+        b=d5ffZ9qV9EMOyLJgkG4b/aQwtnQ5HiuydgMFHE6iR4Qkla7Z6qm8rMf8JZRtnKeOjM
+         3SCLiyNMtbPMa/PPDoVKs9mlZ6Yinw0dmlL/MAc0D2g3uEh2oupdVaaTBqQhF9I3Yfbc
+         PMdevjgNdHAGdZrD2XBe6hXLjwc8XGi0wbz4PXT7ST5m0wQ+bF1yOtZ9eTk6oq35qEMV
+         Wb1qr01Z9FkWsP5f+NlNeYQ+j623yArCJ1ZYLGEeGv0RykKQcUzuSgJ+70dgTRwG+1e0
+         VoiENUtTobIYCtvboHD4kMeK8FmnbZSEjLTgjC8CggeT3hCGKY1WJ1RaYUYHvXmdZfNJ
+         27iA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702634621; x=1703239421;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=56mVcOurV+ZpI4KiJDKVHnndwqaB73yRAHtAX8Z6DO8=;
+        b=cvrLcTFkoM2RmaX+iPue2fTr+hYMUI6OjJNiFpTZR5QhB9MLpDrAozA7SbaRIE4Emr
+         vxGGrzLo2m0iD5RJqS1A8VJ37b+idQnZtD1+n69uRypmc7nZyIXbpHQD4i/Dtr5EFnWI
+         MaxE9e6uytfBoNjIDuoUqG/giiCDmlsV0GHoeoj1goY+4X/8v4Msj822VsOKj13aKgx2
+         78KwrtCa2bEJroJtJpHODtbaJqK1wwLg/5wnGuDipL+kgeP/AQyoDm8OT0PjUJl5ocJg
+         jDPy4E4SMq5uK2Bdji0qziBLeb9Y8GDgAfUZOTTOkxNNDF278rPPdjIo0/rnikHonKa8
+         CQcw==
+X-Gm-Message-State: AOJu0YxJKFWrwsYKkaMJX5zeA+j/d1JBd6TlLOdM1Elmimg2Phj1M8Mw
+	TsTr2rG2AHGKUc5ImE78OWtWSA==
+X-Google-Smtp-Source: AGHT+IFakk7HKd1/w8eY7FbamYh2nhmDM6EiZxY4UHt3ysPT6LjF98hN7F7qLS1EFjn3+x7lPOFj3g==
+X-Received: by 2002:a50:8d8a:0:b0:54c:e28c:2086 with SMTP id r10-20020a508d8a000000b0054ce28c2086mr6312806edh.38.1702634621057;
+        Fri, 15 Dec 2023 02:03:41 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id dg12-20020a0564021d0c00b0054c9635b24esm7616141edb.21.2023.12.15.02.03.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Dec 2023 02:03:40 -0800 (PST)
+Date: Fri, 15 Dec 2023 11:03:39 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, jacob.e.keller@intel.com, jhs@mojatatu.com,
+	johannes@sipsolutions.net, andriy.shevchenko@linux.intel.com,
+	amritha.nambiar@intel.com, sdf@google.com, horms@kernel.org,
+	przemyslaw.kitszel@intel.com
+Subject: Re: [patch net-next v7 5/9] genetlink: introduce per-sock family
+ private storage
+Message-ID: <ZXwkezPrcHlFdiS9@nanopsycho>
+References: <20231214181549.1270696-1-jiri@resnulli.us>
+ <20231214181549.1270696-6-jiri@resnulli.us>
+ <20231214192358.1b150fda@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 5/5] dt-bindings: net: ipq4019-mdio: Document ipq5332
- platform
-Content-Language: en-US
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, <agross@kernel.org>,
-        <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <robert.marko@sartura.hr>
-CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <quic_srichara@quicinc.com>
-References: <20231214090304.16884-1-quic_luoj@quicinc.com>
- <20231214090304.16884-6-quic_luoj@quicinc.com>
- <1e4c55c8-8ed6-4f2e-8328-8a173f09b62f@linaro.org>
- <3c8e33b4-6ebc-476f-a00f-15cc8a1ad9e4@quicinc.com>
- <b89abf8c-57f8-46a6-a071-b1591340fbdf@linaro.org>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <b89abf8c-57f8-46a6-a071-b1591340fbdf@linaro.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: bxKaZEW4wPbab5whn79-T1BjlytsHqbD
-X-Proofpoint-GUID: bxKaZEW4wPbab5whn79-T1BjlytsHqbD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- mlxlogscore=999 lowpriorityscore=0 adultscore=0 suspectscore=0 spamscore=0
- mlxscore=0 clxscore=1015 impostorscore=0 phishscore=0 malwarescore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2312150067
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231214192358.1b150fda@kernel.org>
+
+Fri, Dec 15, 2023 at 04:23:58AM CET, kuba@kernel.org wrote:
+>On Thu, 14 Dec 2023 19:15:45 +0100 Jiri Pirko wrote:
+>> - converted family->sock_priv_list to family->sock_privs xarray
+>>   and use it to store the per-socket privs, use sock pointer as
+>>   an xarrar index. This made the code much simpler
+>
+>Nice! 
+>
+>FWIW I think I remember Willy saying that storing pointers in xarray is
+>comparatively inefficient / slow, but we can cross that bridge later.
+
+I see an alternative in using rhashtable with sk pointer as a key. Not
+sure if it is more efficient. Any other ideas?
+
+But as you say, this can be addressed as a follow-up.
 
 
+>
+>> +void *__genl_sk_priv_get(struct genl_family *family, struct sock *sk)
+>> +{
+>> +	if (WARN_ON_ONCE(!family->sock_privs))
+>> +		return NULL;
+>> +	return xa_load(family->sock_privs, (unsigned long) sk);
+>> +}
+>> +
+>> +/**
+>> + * genl_sk_priv_get - Get family private pointer for socket
+>> + *
+>> + * @family: family
+>> + * @sk: socket
+>> + *
+>> + * Lookup a private memory for a Generic netlink family and specified socket.
+>> + * Allocate the private memory in case it was not already done.
+>> + *
+>> + * Return: valid pointer on success, otherwise negative error value
+>> + * encoded by ERR_PTR().
+>
+>nit: probably better if __genl_sk_priv_get() returned an error pointer
+>     if family is broken, save ourselves the bot-generated "fixes"..
 
-On 12/15/2023 4:39 PM, Krzysztof Kozlowski wrote:
-> On 15/12/2023 09:28, Jie Luo wrote:
->>
->>
->> On 12/15/2023 3:27 PM, Krzysztof Kozlowski wrote:
->>> On 14/12/2023 10:03, Luo Jie wrote:
->>>> Update the yaml file for the new DTS properties.
->>>>
->>>> 1. cmn-reference-clock for the CMN PLL source clock select.
->>>> 2. clock-frequency for MDIO clock frequency config.
->>>> 3. add uniphy AHB & SYS GCC clocks.
->>>> 4. add reset-gpios for MDIO bus level reset.
->>>>
->>>> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
->>>> ---
->>>>    .../bindings/net/qcom,ipq4019-mdio.yaml       | 143 +++++++++++++++++-
->>>>    1 file changed, 139 insertions(+), 4 deletions(-)
->>>>
->>>> diff --git a/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml b/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
->>>> index 3407e909e8a7..79f8513739e7 100644
->>>> --- a/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
->>>> +++ b/Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
->>>> @@ -20,6 +20,8 @@ properties:
->>>>              - enum:
->>>>                  - qcom,ipq6018-mdio
->>>>                  - qcom,ipq8074-mdio
->>>> +              - qcom,ipq9574-mdio
->>>> +              - qcom,ipq5332-mdio
-> 
-> Why do you add entries to the end of the list? In reversed order?
-
-Thanks for pointing it out, i will move "- qcom,ipq5332-mdio" before
-"- qcom,ipq6018-mdio".
-
-> 
->>>>              - const: qcom,ipq4019-mdio
->>>>    
->>>>      "#address-cells":
->>>> @@ -30,19 +32,77 @@ properties:
->>>>    
->>>>      reg:
->>>>        minItems: 1
->>>> -    maxItems: 2
->>>> +    maxItems: 5
->>>>        description:
->>>> -      the first Address and length of the register set for the MDIO controller.
->>>> -      the second Address and length of the register for ethernet LDO, this second
->>>> -      address range is only required by the platform IPQ50xx.
->>>> +      the first Address and length of the register set for the MDIO controller,
->>>> +      the optional second, third and fourth address and length of the register
->>>> +      for ethernet LDO, these three address range are required by the platform
->>>> +      IPQ50xx/IPQ5332, the last address and length is for the CMN clock to
->>>> +      select the reference clock.
->>>> +
->>>> +  reg-names:
->>>> +    minItems: 1
->>>> +    maxItems: 5
->>>>    
->>>>      clocks:
->>>> +    minItems: 1
->>>>        items:
->>>>          - description: MDIO clock source frequency fixed to 100MHZ
->>>> +      - description: UNIPHY0 AHB clock source frequency fixed to 100MHZ
->>>> +      - description: UNIPHY1 AHB clock source frequency fixed to 100MHZ
->>>> +      - description: UNIPHY0 SYS clock source frequency fixed to 24MHZ
->>>> +      - description: UNIPHY1 SYS clock source frequency fixed to 24MHZ
->>>>    
->>>>      clock-names:
->>>> +    minItems: 1
->>>>        items:
->>>>          - const: gcc_mdio_ahb_clk
->>>> +      - const: uniphy0_ahb
->>>> +      - const: uniphy1_ahb
->>>> +      - const: uniphy0_sys
->>>> +      - const: uniphy1_sys
->>>> +
->>>> +  cmn-reference-clock:
->>>> +    $ref: /schemas/types.yaml#/definitions/uint32
->>>
->>> Nothing improved here
->>
->> With this change, the warning is not reported when i run
->> dt_binding_check, looks the new added property needs
->> the type ref to avoid the warning reported.
-> 
-> Nothing improved in the property name, nor its style, nor in the actual
-> contents/values.
-
-This property is for CMN PLL block reference clock configuration,
-so i use this property name.
-
-it will be appreciated if you can suggest a suitable name, thanks.
-
-> 
-> ...
-> 
->>>> +  reset-gpios:
->>>> +    maxItems: 1
->>>> +
->>>> +  reset-assert-us:
->>>> +    maxItems: 1
->>>
->>> This does not look related to ipq5332.
->>
->> The reset gpio properties are needed on ipq5332, since qca8084 phy is
->> connected, which uses the MDIO bus level gpio reset.
-> 
-> I am talking about this property, not these properties.
-
-ok.
-
-> 
->>
->> Without declaring these gpio properties, the warning will be reported
->> by dt_binding_check.
-> 
-> How is it even possible to have warnings if there is no such node in
-> DTS? We do not care about warnings in your downstream code.
-> 
-> 
-> Best regards,
-> Krzysztof
-> 
-
-If i do not declare the property "reset-assert-us" and 
-"reset-deassert-us", the warning will be reported by "make 
-dt_binding_check" since i
-add a example in this file.
+Okay, will fix and send v8 (hopefully the last one, uff).
 
 
+>
+>> + */
+>> +void *genl_sk_priv_get(struct genl_family *family, struct sock *sk)
+>> +{
+>> +	void *priv, *old_priv;
+>> +
+>> +	priv = __genl_sk_priv_get(family, sk);
+>> +	if (priv)
+>> +		return priv;
+>
 
