@@ -1,136 +1,154 @@
-Return-Path: <netdev+bounces-57724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEEBA813FE3
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 03:36:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D9D35813FF3
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 03:39:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51C321C220F8
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 02:36:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D42141C221C6
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 02:39:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA3BA18F;
-	Fri, 15 Dec 2023 02:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3454C468C;
+	Fri, 15 Dec 2023 02:37:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PHBH74Cy"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="RrBX8bqu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB47D279
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 02:36:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F814C433C7;
-	Fri, 15 Dec 2023 02:36:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702607793;
-	bh=yJ9XVJuk48nQyEOei9rfBwmUC5/fn1VYqNUprXm0HyA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PHBH74CyDUohWPR2gQNzwWAQCdFRvq3PKRNzn1afL2rlWu7X7wvc4YqDGQJrplWpP
-	 qWpu5CEDLREs/lXvJnQkWbZJ5kP9mhXkjCdWZ8HgG1HRXoGnjAyqaYp04G1kmk3/j/
-	 +3/CtJSgj7UVbQtttodiMLQ5VqF75gDHm0OLSj8qhzN2qY6Ap/aB8W2987ZafSaqh3
-	 ywQvcC96o+vvLadIi3zHOTbUgKDntxDyCZ/NY8LmvnSjD8Mj4emDqAtbbphdTwaNuu
-	 /fyddHzdzmM7KHQ2AAfrZPqwP9cxRevnj24MJ/Y0zRIEzgsPqldouMI+iWS9GlYVSa
-	 1mhNx2RCPc31A==
-Date: Thu, 14 Dec 2023 18:36:31 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Liu Jian <liujian56@huawei.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <jiri@resnulli.us>, <vladimir.oltean@nxp.com>, <andrew@lunn.ch>,
- <d-tatianin@yandex-team.ru>, <justin.chen@broadcom.com>,
- <rkannoth@marvell.com>, <idosch@nvidia.com>, <jdamato@fastly.com>,
- <netdev@vger.kernel.org>
-Subject: Re: [PATCH net v2] net: check vlan filter feature in
- vlan_vids_add_by_dev() and vlan_vids_del_by_dev()
-Message-ID: <20231214183631.578f374b@kernel.org>
-In-Reply-To: <20231213040641.2653812-1-liujian56@huawei.com>
-References: <20231213040641.2653812-1-liujian56@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596D96ADB;
+	Fri, 15 Dec 2023 02:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1702607852; x=1734143852;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=BMuquihvkV7y6qBpruCNT7zj5pk94gUeJwQRZWzrrNo=;
+  b=RrBX8bquTm8s8WihJqq70Y0QhJXZjVXj2VlGXM7/D63oPiAIZLZ+IWfO
+   7O912lVFWCOMlO1N4p23GjmNrLDeFu9ZyBKDAMP3oFm9CpzweboHvWHHb
+   MljjBC2kCu8R/vXPXBRMklMYxXWqdiL9yUfZh0iZgr8vo4zMBYjHUoD6G
+   o=;
+X-IronPort-AV: E=Sophos;i="6.04,277,1695686400"; 
+   d="scan'208";a="691284391"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2023 02:37:25 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
+	by email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com (Postfix) with ESMTPS id 15757A3096;
+	Fri, 15 Dec 2023 02:37:21 +0000 (UTC)
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:5142]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.18.147:2525] with esmtp (Farcaster)
+ id 34600c7c-afc1-48b6-b40a-836b38bf7abd; Fri, 15 Dec 2023 02:37:21 +0000 (UTC)
+X-Farcaster-Flow-ID: 34600c7c-afc1-48b6-b40a-836b38bf7abd
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 15 Dec 2023 02:37:20 +0000
+Received: from 88665a182662.ant.amazon.com (10.37.244.8) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 15 Dec 2023 02:37:16 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: Matthieu Baerts <matttbe@kernel.org>, Mat Martineau
+	<martineau@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: <edumazet@google.com>, <andrii@kernel.org>, <ast@kernel.org>,
+	<bpf@vger.kernel.org>, <daniel@iogearbox.net>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <martin.lau@linux.dev>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH v6 bpf-next 3/6] bpf: tcp: Handle BPF SYN Cookie in skb_steal_sock().
+Date: Fri, 15 Dec 2023 11:37:07 +0900
+Message-ID: <20231215023707.41864-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CANn89i+8e8VJ8cJX6vwLFhtj=BmT233nNr=F9H3nFs8BZgTbsQ@mail.gmail.com>
+References: <CANn89i+8e8VJ8cJX6vwLFhtj=BmT233nNr=F9H3nFs8BZgTbsQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D038UWB002.ant.amazon.com (10.13.139.185) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-On Wed, 13 Dec 2023 12:06:41 +0800 Liu Jian wrote:
-> I got the bleow warning trace:
-
-s/bleow/below/
-
-> WARNING: CPU: 4 PID: 4056 at net/core/dev.c:11066 unregister_netdevice_many_notify
-> CPU: 4 PID: 4056 Comm: ip Not tainted 6.7.0-rc4+ #15
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
-> RIP: 0010:unregister_netdevice_many_notify+0x9a4/0x9b0
-> Call Trace:
->  rtnl_dellink
->  rtnetlink_rcv_msg
->  netlink_rcv_skb
->  netlink_unicast
->  netlink_sendmsg
->  __sock_sendmsg
->  ____sys_sendmsg
->  ___sys_sendmsg
->  __sys_sendmsg
->  do_syscall_64
->  entry_SYSCALL_64_after_hwframe
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 14 Dec 2023 17:31:15 +0100
+> On Thu, Dec 14, 2023 at 4:56 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+> >
+> > We will support arbitrary SYN Cookie with BPF.
+> >
+> > If BPF prog validates ACK and kfunc allocates a reqsk, it will
+> > be carried to TCP stack as skb->sk with req->syncookie 1.  Also,
+> > the reqsk has its listener as req->rsk_listener with no refcnt
+> > taken.
+> >
+> > When the TCP stack looks up a socket from the skb, we steal
+> > inet_reqsk(skb->sk)->rsk_listener in skb_steal_sock() so that
+> > the skb will be processed in cookie_v[46]_check() with the
+> > listener.
+> >
+> > Note that we do not clear skb->sk and skb->destructor so that we
+> > can carry the reqsk to cookie_v[46]_check().
+> >
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > ---
+> >  include/net/request_sock.h | 15 +++++++++++++--
+> >  1 file changed, 13 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/include/net/request_sock.h b/include/net/request_sock.h
+> > index 26c630c40abb..8839133d6f6b 100644
+> > --- a/include/net/request_sock.h
+> > +++ b/include/net/request_sock.h
+> > @@ -101,10 +101,21 @@ static inline struct sock *skb_steal_sock(struct sk_buff *skb,
+> >         }
+> >
+> >         *prefetched = skb_sk_is_prefetched(skb);
+> > -       if (*prefetched)
+> > +       if (*prefetched) {
+> > +#if IS_ENABLED(CONFIG_SYN_COOKIES)
+> > +               if (sk->sk_state == TCP_NEW_SYN_RECV && inet_reqsk(sk)->syncookie) {
+> > +                       struct request_sock *req = inet_reqsk(sk);
+> > +
+> > +                       *refcounted = false;
+> > +                       sk = req->rsk_listener;
+> > +                       req->rsk_listener = NULL;
 > 
-> It can be repoduced via:
+> I am not sure about interactions with MPTCP.
 > 
->     ip netns add ns1
->     ip netns exec ns1 ip link add bond0 type bond mode 0
->     ip netns exec ns1 ip link add bond_slave_1 type veth peer veth2
->     ip netns exec ns1 ip link set bond_slave_1 master bond0
-> [1] ip netns exec ns1 ethtool -K bond0 rx-vlan-filter off
-> [2] ip netns exec ns1 ip link add link bond_slave_1 name bond_slave_1.0 type vlan id 0
-> [3] ip netns exec ns1 ip link add link bond0 name bond0.0 type vlan id 0
-> [4] ip netns exec ns1 ip link set bond_slave_1 nomaster
-> [5] ip netns exec ns1 ip link del veth2
->     ip netns del ns1
+> I would be nice to have their feedback.
 
-Could you construct a selftest based on those commands?
+Matthieu, Mat, Paolo, could you double check if the change
+above is sane ?
+https://lore.kernel.org/bpf/20231214155424.67136-4-kuniyu@amazon.com/
 
-> This is all caused by command [1] turning off the rx-vlan-filter function
-> of bond0. The reason is the same as commit 01f4fd270870 ("bonding: Fix
-> incorrect deletion of ETH_P_8021AD protocol vid from slaves"). Commands
-> [2] [3] add the same vid to slave and master respectively, causing
-> command [4] to empty slave->vlan_info. The following command [5] triggers
-> this problem.
+
+Short sumamry:
+
+With this series, tc could allocate reqsk to skb->sk and set a
+listener to reqsk->rsk_listener, then __inet_lookup_skb() returns
+a listener in the same reuseport group, and skb is processed in the
+listener function flow, especially cookie_v[46]_check().
+
+The only difference here is that skb->sk has reqsk, which does not
+have rsk_listener.
+
+
 > 
-> To fix this problem, we should add VLAN_FILTER feature checks in
-> vlan_vids_add_by_dev() and vlan_vids_del_by_dev() to prevent incorrect
-> addition or deletion of vlan_vid information.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-
-Did the STAG/CTAG features exist in 2.6? I thought I saw the commit
-that added them in git at some point. Could be misremembering...
-
-> Signed-off-by: Liu Jian <liujian56@huawei.com>
-> ---
-> v1->v2: Modify patch title and commit message.
-> 	Remove superfluous operations in ethtool/features.c and ioctl.c
->  net/8021q/vlan_core.c | 21 ++++++++++++++++++++-
->  1 file changed, 20 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/8021q/vlan_core.c b/net/8021q/vlan_core.c
-> index 0beb44f2fe1f..e94b509386bb 100644
-> --- a/net/8021q/vlan_core.c
-> +++ b/net/8021q/vlan_core.c
-> @@ -407,6 +407,12 @@ int vlan_vids_add_by_dev(struct net_device *dev,
->  		return 0;
->  
->  	list_for_each_entry(vid_info, &vlan_info->vid_list, list) {
-> +		if (!(by_dev->features & NETIF_F_HW_VLAN_CTAG_FILTER) &&
-> +		    vid_info->proto == htons(ETH_P_8021Q))
-> +			continue;
-> +		if (!(by_dev->features & NETIF_F_HW_VLAN_STAG_FILTER) &&
-> +		    vid_info->proto == htons(ETH_P_8021AD))
-> +			continue;
-
-this code is copied 3 times, could you please factor it out to a helper
-taking dev and vid_info and deciding if the walk should skip?
--- 
-pw-bot: cr
+> > +                       return sk;
+> > +               }
+> > +#endif
+> >                 *refcounted = sk_is_refcounted(sk);
+> > -       else
+> > +       } else {
+> >                 *refcounted = true;
+> > +       }
+> >
+> >         skb->destructor = NULL;
+> >         skb->sk = NULL;
+> > --
+> > 2.30.2
 
