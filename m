@@ -1,267 +1,159 @@
-Return-Path: <netdev+bounces-57781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9466D8141FF
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 07:52:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 53D96814248
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 08:22:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C39428355B
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 06:52:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 029BD283CD9
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 07:22:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16319D281;
-	Fri, 15 Dec 2023 06:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1DC6CA68;
+	Fri, 15 Dec 2023 07:22:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wDarasQ9"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cocvtpnW"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42235D287
-	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 06:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <5918e180-beb6-43cc-919b-1018efdf06d3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1702623121;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uAabUvWVUDumHKqzrIGE4cDELpHSuAO8oKlQsLV2LqQ=;
-	b=wDarasQ9SbymyUeiZHT2Qughkv5lWD+uSSLx64gRAnFcSr1htqsm/b5eMtd1oVweTcBvFx
-	l9hCbH/Yg9WhZJLEeQvySUhQSugH5oLINNPeSODMbCwoxm8WBfyazKY3DnAgL32rmV/dyf
-	yUgLXyC1MY8X1UsjBi9LVtD6l29YRZs=
-Date: Thu, 14 Dec 2023 22:51:56 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161AD10783
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 07:22:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-54c5ed26cf6so340385a12.3
+        for <netdev@vger.kernel.org>; Thu, 14 Dec 2023 23:22:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1702624965; x=1703229765; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=z1N/IqnPuUTMF0bMvQG1DYelgzWvnk5JJ2yMI964gjE=;
+        b=cocvtpnWDsShq++VOm79oPeBqGkYRijLzAvRYvcriKlVBzLftjTn/mvdFJ04y4qpJW
+         9DNpXjmm/SiNTrMxOPCTHZ5ORpj+L1Lwiepfm/97t52upua32Uf+FCY+b7dUqfXgvhu2
+         igLzN5nsHmKph3VOOvDC0BeNv5n1bmLfwVorusljBJkxOWD7yx4F/FSmo7IGWIxPX0hZ
+         DBUfM2/X9BnXLuCcAEav0HNovaVHWrpFGQQOD9ZzkBBMdeLU5c4i5+vWhPJbm+2R7zwa
+         c0kR8GP6ms3LTqxRGGtAA2/8LjkE/EsVSaqvFTlaqFZbtKpvtYZhbEJqb9PrpU3VttyW
+         P1CQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702624965; x=1703229765;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z1N/IqnPuUTMF0bMvQG1DYelgzWvnk5JJ2yMI964gjE=;
+        b=O+Cr+nUGzM704dsKfXpLXPbHz13ZJkeUGH0MYkIMn48Z9jt3HkqKPpakgT6pgLDy0L
+         wLo8EB/XOrEKFZfuKornnUEL8LeE16i6WW52LqNftWw+sWQv8j6TsPIlCdZikOVVEYT1
+         9UqVGpMn4WrOGQZ/s0DaFRcKTL3Hz2nCPlQPD0sUtB6aUt6uMXcI2Jr9s5Vt5qf11DEz
+         3z8IDcRISf4hZ1lN74sR4fcg+1VIg5G66aPFh/h3Ctp+1CzYBKbQDfPsUTPKZR4yLyaM
+         w1WVErufK6z7Gjhq6dfBkl372IThMoWo9Tu1l14kpPdQOM08rD5l8XQDyTr+hi6oc005
+         V/Bg==
+X-Gm-Message-State: AOJu0Ywe7KfzdMx9tx2aBb6+wUzLYy+fZAr87WYlPxKS+niEB5rKJCt1
+	YOXsPJ8CCbAsAgi+SCakOeY0Nw==
+X-Google-Smtp-Source: AGHT+IHjQCJzPMaljEx66j5jK8Y/TjVx4csCkgGE49TpsRVgAlf0luivMkJCYj8hGiMkQKAsCiL94g==
+X-Received: by 2002:a17:906:7398:b0:a19:a19b:55de with SMTP id f24-20020a170906739800b00a19a19b55demr4954226ejl.110.1702624965226;
+        Thu, 14 Dec 2023 23:22:45 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.218.27])
+        by smtp.gmail.com with ESMTPSA id vk2-20020a170907cbc200b00a1d3e9e888bsm10423928ejc.55.2023.12.14.23.22.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Dec 2023 23:22:44 -0800 (PST)
+Message-ID: <3b7072c5-8b38-418f-b960-3c5401e8b18f@linaro.org>
+Date: Fri, 15 Dec 2023 08:22:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v13 10/14] bpf, net: switch to dynamic
- registration
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 1/2] nfc: llcp_core: Hold a ref to
+ llcp_local->dev when holding a ref to llcp_local
+To: Siddh Raman Pant <code@siddh.me>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Suman Ghosh <sumang@marvell.com>,
+ netdev <netdev@vger.kernel.org>, linux-kernel
+ <linux-kernel@vger.kernel.org>,
+ syzbot+bbe84a4010eeea00982d
+ <syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com>
+References: <cover.1702404519.git.code@siddh.me>
+ <6a26e3b65817bb31cb11c8dde5b1b420071d944e.1702404519.git.code@siddh.me>
+ <1813902b-6afc-4539-96b2-050df6fc75c1@linaro.org>
+ <18c695b4512.5afde007311004.1718468931473736202@siddh.me>
 Content-Language: en-US
-To: thinker.li@gmail.com
-Cc: sinquersw@gmail.com, kuifeng@meta.com, netdev@vger.kernel.org,
- bpf@vger.kernel.org, ast@kernel.org, song@kernel.org, kernel-team@meta.com,
- andrii@kernel.org, drosen@google.com
-References: <20231209002709.535966-1-thinker.li@gmail.com>
- <20231209002709.535966-11-thinker.li@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20231209002709.535966-11-thinker.li@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <18c695b4512.5afde007311004.1718468931473736202@siddh.me>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 12/8/23 4:27 PM, thinker.li@gmail.com wrote:
-> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> index 7384806ee74e..c881befa35f5 100644
-> --- a/include/linux/bpf.h
-> +++ b/include/linux/bpf.h
-> @@ -1698,7 +1698,6 @@ struct bpf_struct_ops_desc {
->   #if defined(CONFIG_BPF_JIT) && defined(CONFIG_BPF_SYSCALL)
->   #define BPF_MODULE_OWNER ((void *)((0xeB9FUL << 2) + POISON_POINTER_DELTA))
->   const struct bpf_struct_ops_desc *bpf_struct_ops_find(struct btf *btf, u32 type_id);
-> -void bpf_struct_ops_init(struct btf *btf, struct bpf_verifier_log *log);
->   bool bpf_struct_ops_get(const void *kdata);
->   void bpf_struct_ops_put(const void *kdata);
->   int bpf_struct_ops_map_sys_lookup_elem(struct bpf_map *map, void *key,
-> @@ -1744,10 +1743,6 @@ static inline const struct bpf_struct_ops_desc *bpf_struct_ops_find(struct btf *
->   {
->   	return NULL;
->   }
-> -static inline void bpf_struct_ops_init(struct btf *btf,
-> -				       struct bpf_verifier_log *log)
-> -{
-> -}
->   static inline bool bpf_try_module_get(const void *data, struct module *owner)
->   {
->   	return try_module_get(owner);
-> @@ -3321,6 +3316,14 @@ static inline bool bpf_is_subprog(const struct bpf_prog *prog)
->   	return prog->aux->func_idx != 0;
->   }
->   
-> +int register_bpf_struct_ops(struct bpf_struct_ops *st_ops);
+On 14/12/2023 18:23, Siddh Raman Pant wrote:
+> On Wed, 13 Dec 2023 13:10:16 +0530, Krzysztof Kozlowski wrote:
+>>> -	if (sk_acceptq_is_full(parent)) {
+>>> -		reason = LLCP_DM_REJ;
+>>> -		release_sock(&sock->sk);
+>>> -		sock_put(&sock->sk);
+>>> -		goto fail;
+>>> -	}
+>>> +	if (sk_acceptq_is_full(parent))
+>>> +		goto fail_put_sock;
+>>
+>> I would argue that you reshuffle here more code than needed for the fix.
+>>
+>> This should fix only missing dev reference, not reshuffle code. It's a
+>> bugfix, not cleanup.
+> 
+> So this should not be done? I did it because you told to extend the
+> cleanup label in v3 discussion.
 
-This probably should be in btf.h like register_btf_kfunc_id_set().
-and should have an empty implementation when CONFIG_BPF_SYSCALL is not set.
+It can be done but not in the same commit. You must not combine fixes
+with other changes. Also, each commit is one logical change.
 
-> +
-> +#define REGISTER_BPF_STRUCT_OPS(st_ops, type) \
-
-Add comment here to suggest the module writer to use REGISTER_BPF_STRUCT_OPS 
-instead of register_bpf_struct_ops().
-
-> +({					      \
-> +	BTF_STRUCT_OPS_TYPE_EMIT(type);	      \
-
-Directly use BTF_TYPE_EMIT(struct bpf_struct_ops_##type) here.
-
-Also, is it possible to do the DEFINE_STRUCT_OPS_VALUE_TYPE() type here such 
-that the module writer does not need to. It will be nice if 
-REGISTER_BPF_STRUCT_OPS does the define value type and emit value type together.
-
-> +	register_bpf_struct_ops(st_ops);      \
-> +})
-> +
->   enum bpf_struct_ops_state {
->   	BPF_STRUCT_OPS_STATE_INIT,
->   	BPF_STRUCT_OPS_STATE_INUSE,
-> @@ -3333,4 +3336,19 @@ struct bpf_struct_ops_common_value {
->   	enum bpf_struct_ops_state state;
->   };
->   
-> +/* bpf_struct_ops_##_name (e.g. bpf_struct_ops_tcp_congestion_ops) is
-> + * the map's value exposed to the userspace and its btf-type-id is
-> + * stored at the map->btf_vmlinux_value_type_id.
-> + *
-> + */
-> +#define DEFINE_STRUCT_OPS_VALUE_TYPE(_name)			\
-> +struct bpf_struct_ops_##_name {					\
-> +	struct bpf_struct_ops_common_value common;		\
-> +	struct _name data ____cacheline_aligned_in_smp;		\
-> +}
-> +
-> +int bpf_struct_ops_desc_init(struct bpf_struct_ops_desc *st_ops_desc,
-> +			     struct btf *btf,
-> +			     struct bpf_verifier_log *log);
-> +
-
-nit. same as the comment in previous patch 8. Move these up closer to other 
-struct_ops structs and functions. bpf_struct_ops_desc_init is implemented in 
-bpf_struct_ops.c and it should be in the same CONFIG_BPF_JIT guard earlier in 
-this file. Also, where is the empty bpf_struct_ops_desc_init() when 
-CONFIG_BPF_JIT is not set?
-
->   #endif /* _LINUX_BPF_H */
-> diff --git a/include/linux/btf.h b/include/linux/btf.h
-> index e2f4b85cf82a..cabab3db5216 100644
-> --- a/include/linux/btf.h
-> +++ b/include/linux/btf.h
-> @@ -12,6 +12,8 @@
->   #include <uapi/linux/bpf.h>
->   
->   #define BTF_TYPE_EMIT(type) ((void)(type *)0)
-> +#define BTF_STRUCT_OPS_TYPE_EMIT(type) \
-> +	((void)(struct bpf_struct_ops_##type *)0)
-
-Remove this new macro. It is almost the same as BTF_TYPE_EMIT and it is only 
-used once in REGISTER_BPF_STRUCT_OPS. module writer will use 
-REGISTER_BPF_STRUCT_OPS and no need to figure out what type needs to be emitted.
-
->   #define BTF_TYPE_EMIT_ENUM(enum_val) ((void)enum_val)
->   
->   /* These need to be macros, as the expressions are used in assembler input */
-
-[ ... ]
-
->   static const struct bpf_struct_ops_desc *
->   bpf_struct_ops_find_value(struct btf *btf, u32 value_id)
->   {
-> +	const struct bpf_struct_ops_desc *st_ops_list;
->   	unsigned int i;
-> +	u32 cnt = 0;
->   
-> -	if (!value_id || !btf)
-> +	if (!value_id)
->   		return NULL;
->   
-> -	for (i = 0; i < ARRAY_SIZE(bpf_struct_ops); i++) {
-> -		if (bpf_struct_ops[i].value_id == value_id)
-> -			return &bpf_struct_ops[i];
-> +	st_ops_list = btf_get_struct_ops(btf, &cnt);
-> +	for (i = 0; i < cnt; i++) {
-> +		if (st_ops_list[i].value_id == value_id)
-> +			return &st_ops_list[i];
->   	}
->   
->   	return NULL;
-> @@ -266,14 +227,17 @@ bpf_struct_ops_find_value(struct btf *btf, u32 value_id)
->   const struct bpf_struct_ops_desc *
->   bpf_struct_ops_find(struct btf *btf, u32 type_id)
->   {
-> +	const struct bpf_struct_ops_desc *st_ops_list;
->   	unsigned int i;
-> +	u32 cnt;
-
-cnt is not initialized here. The above bpf_struct_ops_find_value() did init cnt 
-to 0 though.
-
->   
-> -	if (!type_id || !btf)
-> +	if (!type_id)
->   		return NULL;
->   
-> -	for (i = 0; i < ARRAY_SIZE(bpf_struct_ops); i++) {
-> -		if (bpf_struct_ops[i].type_id == type_id)
-> -			return &bpf_struct_ops[i];
-> +	st_ops_list = btf_get_struct_ops(btf, &cnt);
-> +	for (i = 0; i < cnt; i++) {
-
-If st_ops_list is NULL, cnt could be anything here. Lets fix patch 4 to set cnt 
-to 0 when btf->struct_ops_tab is empty.
-
-> +		if (st_ops_list[i].type_id == type_id)
-> +			return &st_ops_list[i];
->   	}
->   
->   	return NULL;
-> diff --git a/kernel/bpf/bpf_struct_ops_types.h b/kernel/bpf/bpf_struct_ops_types.h
-> deleted file mode 100644
-> index 5678a9ddf817..000000000000
-> --- a/kernel/bpf/bpf_struct_ops_types.h
-> +++ /dev/null
-> @@ -1,12 +0,0 @@
-> -/* SPDX-License-Identifier: GPL-2.0 */
-> -/* internal file - do not include directly */
-> -
-> -#ifdef CONFIG_BPF_JIT
-> -#ifdef CONFIG_NET
-> -BPF_STRUCT_OPS_TYPE(bpf_dummy_ops)
-> -#endif
-> -#ifdef CONFIG_INET
-> -#include <net/tcp.h>
-> -BPF_STRUCT_OPS_TYPE(tcp_congestion_ops)
-> -#endif
-> -#endif
-> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-> index edbe3cbf2dcc..5545dee3ff54 100644
-> --- a/kernel/bpf/btf.c
-> +++ b/kernel/bpf/btf.c
-> @@ -19,6 +19,7 @@
->   #include <linux/bpf_verifier.h>
->   #include <linux/btf.h>
->   #include <linux/btf_ids.h>
-> +#include <linux/bpf.h>
->   #include <linux/bpf_lsm.h>
->   #include <linux/skmsg.h>
->   #include <linux/perf_event.h>
-> @@ -5792,8 +5793,6 @@ struct btf *btf_parse_vmlinux(void)
->   	/* btf_parse_vmlinux() runs under bpf_verifier_lock */
->   	bpf_ctx_convert.t = btf_type_by_id(btf, bpf_ctx_convert_btf_id[0]);
->   
-> -	bpf_struct_ops_init(btf, log);
-> -
->   	refcount_set(&btf->refcnt, 1);
->   
->   	err = btf_alloc_id(btf);
-> @@ -8621,11 +8620,21 @@ bool btf_type_ids_nocast_alias(struct bpf_verifier_log *log,
->   	return !strncmp(reg_name, arg_name, cmp_len);
->   }
->   
-> +#ifndef CONFIG_BPF_JIT
-> +int bpf_struct_ops_desc_init(struct bpf_struct_ops_desc *st_ops_desc,
-> +			     struct btf *btf,
-> +			     struct bpf_verifier_log *log)
-> +{
-> +	return -ENOTSUPP;
-> +}
-> +#endif /* CONFIG_BPF_JIT */
-
-ah. It is here. This should be in bpf.h.
-
+Best regards,
+Krzysztof
 
 
