@@ -1,151 +1,185 @@
-Return-Path: <netdev+bounces-57983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-57984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1CD8814AC9
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 15:42:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA2E1814AE0
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 15:44:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 978FC285F45
-	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:42:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFAF61C237BB
+	for <lists+netdev@lfdr.de>; Fri, 15 Dec 2023 14:44:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 322A41DFDA;
-	Fri, 15 Dec 2023 14:40:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A74F1C29;
+	Fri, 15 Dec 2023 14:43:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="ak0fHNng"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="EoGF6Y5c"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2079.outbound.protection.outlook.com [40.107.13.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95CF35F16;
-	Fri, 15 Dec 2023 14:40:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TpDRwc3fEzRuXhBCGJGAAX2Xkm9blHh0bT75u4/ck6K1YnlmHNa0Q6PiW1U79jD9mGVV5qVBaYBmZfQ5cveg6cUgJqaqltlz6kooEdrfF8DbRuoDeU8xUu1kP7bzAvOcu494lUZ0oQaFP5BmGnNjQswHcaNuKSzdvM9+dd9jv2i66U8D0bU0ooe7Tx1p527jkJXyskVectNuiKBBbAHGOqsufhsPvHGeFTx2Ipqr1XpbOPm4P1rzq2hQtSpNRlbokbp9jPydP9TdRml0RjCMocYHLGOKdbAW1e59hQQ6cdrJZO6wTe+JbD5crizNU476hSPyJv4pi8CCEDvajzU+2A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eD6RuvGeNJe+jHtabFaGc7x8ce1KiEadzfPQ3nJYjzc=;
- b=E1SieX9UNR2+v+zNqgc0YisL4AznFtyZ8uitmCfA92SCYYV28eBwylaHbh0atqsh3pG4srX4Fj+Bsy9UgjY+vimtCL/NgJguATDz71NzJ1M4QSAsH/lfcU6mdJNDc/yoOk4KD5HU3nlZE2m48TopoywRNZQM+Qsanx9oG+krw8+fRswdw8asuAkS3PD338XTM7PUBz7At54R9VtHuIkTULiICDw8peUUHDjodBnhKv1wm4+cOfrMpkw+aE+XYtR6vxmSrPqtL4k6L6vPIIih8IZC9HZP+a5bS2llzN+K0159EU51ENut8vC0oRlvtbccS6Cp0ORueSFKVAn4yv3Ihw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eD6RuvGeNJe+jHtabFaGc7x8ce1KiEadzfPQ3nJYjzc=;
- b=ak0fHNngjlr+MUmrwKOYWvWqQ9WBADkAsN8JoTOf/aZqQA8aQm4UrgXUsh6kN+nA6uwM335NHYw4Rf4BRxKTAZ2VUpqr2Zy331uEbjGnydjxL0suwVr4C1W1f6oDdgK59ICXUCBs7G2XoQxUNeSMBOYw3SF5xdqLfRMBtknaFS8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from GV1PR04MB9070.eurprd04.prod.outlook.com (2603:10a6:150:21::14)
- by AM8PR04MB7361.eurprd04.prod.outlook.com (2603:10a6:20b:1d2::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.30; Fri, 15 Dec
- 2023 14:40:40 +0000
-Received: from GV1PR04MB9070.eurprd04.prod.outlook.com
- ([fe80::1290:90d4:98c1:3d35]) by GV1PR04MB9070.eurprd04.prod.outlook.com
- ([fe80::1290:90d4:98c1:3d35%7]) with mapi id 15.20.7091.030; Fri, 15 Dec 2023
- 14:40:39 +0000
-Date: Fri, 15 Dec 2023 16:40:36 +0200
-From: Ioana Ciornei <ioana.ciornei@nxp.com>
-To: yang.guang5@zte.com.cn
-Cc: davem@davemloft.net, jiang.xuexin@zte.com.cn, chen.haonan2@zte.com.cn, 
-	cgel.zte@gmail.com, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	sd@queasysnail.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH linux-next] mlxsw: spectrum: use netif_is_macsec()
- instead of open code
-Message-ID: <zkadwo3imhhatvmkhuvxnoql4qmrgpkz77mugifckredfv5hxo@pbjp3ffoxvba>
-References: <202312152145312776210@zte.com.cn>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202312152145312776210@zte.com.cn>
-X-ClientProxiedBy: AS4P191CA0037.EURP191.PROD.OUTLOOK.COM
- (2603:10a6:20b:657::16) To GV1PR04MB9070.eurprd04.prod.outlook.com
- (2603:10a6:150:21::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA0B3A8C3
+	for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 14:42:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-5e3b9c14e46so6206187b3.0
+        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 06:42:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1702651379; x=1703256179; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oXQLHdrE09LIcbHHrRw3NxIRpL1RXbK4rug1WTmsabE=;
+        b=EoGF6Y5c6KgyJpoNuOD3sE300Eg2cFvxFILIEDtMMADWbT8oMH1uSYjtsAqhBmnO9k
+         Vi+N3lNcdRG5M8LRJK2GFvelbk1EF5M7xxgavqOhpnfx2lKdIcb1ZmgOqCveLaDB/E/7
+         CI1eXkDnxwPAX+t3D1JGeUEqh2uexcusXGrsN4V6D1AeRovYamf6K39xipH1TfyFGpMu
+         JthcPFcMKYldAD+X83UedFAE26wQzbkIBW6przeI6EvY0DyZh+EW8p+0rfwKdInLCzDV
+         tz3YBwnb375h/W9TG2o/K9MNAoAmYEREZgHRZpyN7f/QhANAO0rqBAiQ1TWNLvkZ8bka
+         +5GQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702651379; x=1703256179;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oXQLHdrE09LIcbHHrRw3NxIRpL1RXbK4rug1WTmsabE=;
+        b=OWtcYPSZk9QDdF8JCUYZlcpywM4LwGUbz4KyElbF6p/kgFwK8gsgVgCqkFmDaE9WEw
+         O4W+sDD20StplvUF0xylLC971cN4QGNrj/+IWRCoka1gCcsTEx3cYXjmNsAnmk7H3c38
+         us7Nu1mzhVRHbQAgBcpcGSgIzW7UI8VL0gV+TZbFA+oqqN361mBnLJkyqa53fm9XCZ+z
+         1lxqj1vYkNSHnJSvXG1uzerLyZoNk79MtLvkcuRmdP6bi5ifcvcoxrsWzNO2poH2K77L
+         ZpEr48dMHbN7BKHJs169+4qcXDqtuD3/h8+utZ91CPOmpMIStBGK8HxREb+nBtcCzvHr
+         S47w==
+X-Gm-Message-State: AOJu0Ywcig2pp+NDqF7GhGfbVzFYIgt/GAE02VaHxt7sP3Zq5EZujKso
+	DztWedb/1fAFfnSuMuXRkcB9iCF5+PVd5/TWQc42rg==
+X-Google-Smtp-Source: AGHT+IE+doyRFarhU99rwfwgXBUcU0wvZctB5cOTtzjWWKxR2RHWTE4sRyuRC8MwUWNfCkN4eh/X/EWmmlj5rSsKe6c=
+X-Received: by 2002:a81:c80b:0:b0:5df:5d59:7939 with SMTP id
+ n11-20020a81c80b000000b005df5d597939mr8173745ywi.12.1702651378907; Fri, 15
+ Dec 2023 06:42:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: GV1PR04MB9070:EE_|AM8PR04MB7361:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3a3b03bd-ce1c-4d6a-147e-08dbfd7bcef6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	uxsY0WP8cW0LWioBVJO5RjJdwSe9h7kddLITd7lgOgUk5aJictAB6xKwWGyETlclxFNmeIUQUDpV0JQ7C2FSA37p6hCH7sNK8vL1Mw5DrOt/ENNkueFRA/x1AuvzVSUX79KKH7XW2aHqX5J+lqnx7kjtzE5e8OG76RrFNhafbQaYEDEK7bePmDOZQDl7BPmABGW8zWzqxtbx8MmQ/H6QXLdzsmpEb5Ly+3veWy7ASaBFurRk2iEJI0ysxVVRfJ2eB5MIPrXsddKDwgt3Mly8aHVwJxEfjnvxcOwo3yfr5ZR4PRK7dsY1yszH3DvX1oZMZwHbvBO+w3URy4FHPe1ansvUOth/9sZ0/mKgfTDxNIS8RfEkqZ+25Xk9AMn2V5fu00iMxh9gOV1RM1FO7fEBg75bZwVMwGzqVQHfSaR4Vy1QCSNZymMI1EOOQqqiSrc6p9lfy6qY1Tlo34MhxQFUPsHPMQDyxxZcTTuNuymkuEYrkFuLyk2mkj3rknYB1t3XYMDiwlWY/n8n3662poW0ZKMJBTfkEahSQ0/FkvjXsV4wySvceoCJpELQ98vO66JI
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9070.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(346002)(396003)(366004)(136003)(376002)(39860400002)(230922051799003)(64100799003)(1800799012)(451199024)(186009)(26005)(38100700002)(86362001)(83380400001)(44832011)(5660300002)(9686003)(6512007)(6506007)(6666004)(8936002)(8676002)(4326008)(66556008)(66946007)(6486002)(316002)(66476007)(6916009)(41300700001)(2906002)(4744005)(7416002)(33716001)(478600001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?7LWWK8FvodzncHzctR2ql3Jx7dK8KMSb4LHP4MzV3T3/a8Ggq3Ri4ZBaw0Ku?=
- =?us-ascii?Q?Dn7AdaHFgwzRPoUQkS8uzMYq7cJhfVt3TvLJPZfax43t7CWeMJPtxeisiklm?=
- =?us-ascii?Q?pwJzIwDfxP4hUmAuwERmY9fHrzPbxKo1TghC4/e8XxPDhAUMa+4msLXytixT?=
- =?us-ascii?Q?9Ha0bzIH7Dl/f7/Wbqnp+CoxQp8QpWCJb73K3qjKqbAP0oUh8KpCW0zUqPv4?=
- =?us-ascii?Q?dO4B+y+aG4mLf1Cr7zY/WgNOOT5OBNM4YY7Kv3U+aA2TbJexQ4grJK88E0mn?=
- =?us-ascii?Q?x29WXVba05I3wqN2Hi/u7l0PEgFNyaGXI37olsgFBi5uVUt6xoCnPulAJwhd?=
- =?us-ascii?Q?BR4qn+v3Oq8Np/0z8ww3T9lEMTWhuOryX8vaBoZGnpSHSQZAV7vBsNCqkOIf?=
- =?us-ascii?Q?bacrk+qs/w32i4/vNeT47j18Qh9Z2QiYQ9faFs6j2ZpzwC+EMW0Ex0p8pptJ?=
- =?us-ascii?Q?S3OW6RVXBaEEydIpYtFoz6V2yHDcOP60ont+ppv6TTsHJyWES0LFggkTZeFi?=
- =?us-ascii?Q?QecmYozc1/jUOLVeyKMMIh5b+c3aGHxwP95OzTLenEGo8wMM7ti1v/cogDYs?=
- =?us-ascii?Q?EW97EbucYPNxIIMP1/LiBCw9vupb/jBHWtweqbwAUxHjg9CX9zIWIS9GwsW6?=
- =?us-ascii?Q?XBU3qpGOCAg9yDSYUve0euai/5BQxTidXT9xslrfMyB3N2Knfk7sc2Om2KGo?=
- =?us-ascii?Q?b32TgCPadp1CuJZfWuZTWqCrr7nuarlq396PEYuAlXAmuedUorEzevwxR/ij?=
- =?us-ascii?Q?rDoQBZPfiQvmzkSnWDlU2+SL0BYO9Ng/S8q4yLPXSRFFtYglBRRH43k79JZ6?=
- =?us-ascii?Q?9kSlv0frlJOnvdiGn05hcx7LdbH2cGyZNqii9VH7wu71b/mM6nBIS0YiZQFh?=
- =?us-ascii?Q?xd3m7ck+a8YFW89OgTJ4I7cJ5cEldTul5LlL3Eb7FTUKFLZTmEEoKFvA5WVH?=
- =?us-ascii?Q?c69aUGgbm7XZh2gRoRXC/CD7mMwZUI+QKjp8OMhUlRPraIj1ok2zFcJbInuT?=
- =?us-ascii?Q?n+7o2rQyTTfCAqFsvblm8tetE2wOiDFTMKsYpziVO+vInXOn1HCRk5K0Wnuj?=
- =?us-ascii?Q?rEQVHqWvw0RRF3aGfZEZuruMcwM8zhqGB+U+xdjDCZLeMNRwXQ5CV/aCXn5O?=
- =?us-ascii?Q?T0QrXgp8qaRqOOvjgAigqyD/4ra89x9Y28MDkXBCD1UKzCkSO1KL6LLcnQTQ?=
- =?us-ascii?Q?m1HN7ZVklWxmFem1RwOXu1w8OpN5fYxL9g87ATZnALxQSP/vlWYaEmA3QTex?=
- =?us-ascii?Q?Pnw0x49Ni3Z5ycwvoAez+P+bpOGHCeYQfrsjLCnLS6IEIZp/V4l7kseC3ujn?=
- =?us-ascii?Q?LFHgxyxKQBMW9KelH6XxmK+SO0Q7Q3SJAesb/oy4WTR29Xm/hyVazMwVQhnB?=
- =?us-ascii?Q?Mia+n7E4KSTUhl/vYQYFrGshGXGiZ0btvnbRdJmAkRJt6PWMRoDBKmZuohG2?=
- =?us-ascii?Q?omUZ7DMEKRXhI8wzVXm/+gJRqjN1bd9Ub+xHujDTNCDmdZtS4Fp+qUeSf3+e?=
- =?us-ascii?Q?VHbWnVn94xnyyfO5W+2whvSnua34cQI208hp4LRcLsaq0SWaWh4drbtB0V4b?=
- =?us-ascii?Q?vHJBQupEKrSiOfHRKK4Ues3chbKTm43zKOBdvtTF?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3a3b03bd-ce1c-4d6a-147e-08dbfd7bcef6
-X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9070.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2023 14:40:39.9292
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xlPqqDLyo/JEuLjh+g7sjZjCA9aqSa1hZnzS9+clwc5eCDml5LjBRM1sjjmDNur9cJnHgsHNnlJuAvUvpDeMuA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7361
+References: <20231205205030.3119672-1-victor@mojatatu.com> <20231205205030.3119672-3-victor@mojatatu.com>
+ <20231211182534.09392034@kernel.org> <CAM0EoMkYq+qqO6pwMy_G58_+PCT6A6EGtpPJXPkvQ1=aVvY=Sw@mail.gmail.com>
+ <CANn89i+-G0gTF=Vmr5NprYizdqXqpoQC5OvnXbc-7dA47tcdyQ@mail.gmail.com>
+ <CAAFAkD8X-EXt4K+9Jp4P_f607zd=HxB6WCEF_4BGcCm_hSbv_A@mail.gmail.com>
+ <CAM0EoMk9cA0qCGNa181QkGjRHr=4oZhvfMGEWoTRS-kHXFWt7g@mail.gmail.com>
+ <20231213130807.503e1332@kernel.org> <CAM0EoM=+zoLNc2JihS4Xyz77YciKCywXdtr8N3cDuwYRxc8TcQ@mail.gmail.com>
+ <fecd5da8-4657-3454-b64d-d3f07b071a5d@gmail.com>
+In-Reply-To: <fecd5da8-4657-3454-b64d-d3f07b071a5d@gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 15 Dec 2023 09:42:47 -0500
+Message-ID: <CAM0EoM=mG51sY9-9_Bm8Sb=nUmF33b=Vcf6PvuOPqhoAQgUvwg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/3] net: sched: Make tc-related drop reason
+ more flexible for remaining qdiscs
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Jamal Hadi Salim <hadi@mojatatu.com>, 
+	Eric Dumazet <edumazet@google.com>, Victor Nogueira <victor@mojatatu.com>, xiyou.wangcong@gmail.com, 
+	jiri@resnulli.us, davem@davemloft.net, pabeni@redhat.com, 
+	daniel@iogearbox.net, dcaratti@redhat.com, netdev@vger.kernel.org, 
+	kernel@mojatatu.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 15, 2023 at 09:45:31PM +0800, yang.guang5@zte.com.cn wrote:
-> From: Yang Guang <yang.guang5@zte.com.cn>
-> 
-> Open code which is dev->priv_flags & IFF_MACSEC has already defined as
-> netif_is_macsec(). So use netif_is_macsec() instead of open code.
-> No functional changed.
-> 
-> Signed-off-by: Chen Haonan <chen.haonan2@zte.com.cn>
-> ---
->  include/linux/netdevice.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 1b935ee341b4..1f2b23d854c9 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -5103,7 +5103,7 @@ void netif_inherit_tso_max(struct net_device *to,
-> 
->  static inline bool netif_is_macsec(const struct net_device *dev)
->  {
-> -	return dev->priv_flags & IFF_MACSEC;
-> +	return netif_is_macsec(dev);
->  }
+On Thu, Dec 14, 2023 at 12:18=E2=80=AFPM Taehee Yoo <ap420073@gmail.com> wr=
+ote:
+>
+> On 12/15/23 00:31, Jamal Hadi Salim wrote:
+>
+> Hi Jamal,
+>
+>  > On Wed, Dec 13, 2023 at 4:08=E2=80=AFPM Jakub Kicinski <kuba@kernel.or=
+g> wrote:
+>  >>
+>  >> On Wed, 13 Dec 2023 13:36:31 -0500 Jamal Hadi Salim wrote:
+>  >>> Putting this to rest:
+>  >>> Other than fq codel, the others that deal with multiple skbs due to
+>  >>> gso segments. So the conclusion is: if we have a bunch in the list
+>  >>> then they all suffer the same fate. So a single reason for the list =
+is
+>  >>> sufficient.
+>  >>
+>  >> Alright.
+>  >>
+>  >> I'm still a bit confused about the cb, tho.
+>  >>
+>  >> struct qdisc_skb_cb is the state struct.
+>  >
+>  > Per packet state within tc though, no? Once it leaves tc whatever sits
+>  > in that space cant be trusted to be valid.
+>  > To answer your earlier question tcf_result is not available at the
+>  > qdisc level (when we call free_skb_list() but cb is and thats why we
+>  > used it)
+>  >
+>  >> But we put the drop reason in struct tc_skb_cb.
+>  >> How does that work. Qdiscs will assume they own all of
+>  >> qdisc_skb_cb::data ?
+>  >>
+>  >
+>  > Short answer, yes. Anyone can scribble over that. And multiple
+>  > consumers have a food fight going on - but it is expected behavior:
+>  > ebpf's skb->cb, cake, fq_codel etc - all use qdisc_skb_cb::data.
+>  > Out of the 48B in skb->cb qdisc_skb_cb redefined the first 28B and
+>  > left in qdisc_skb_cb::data as free-for-all space. I think,
+>  > unfortunately, that is now cast in stone.
+>  > Which still leaves us 20 bytes which is now being squatered by
+>  > tc_skb_cb where the drop reason was placed. Shit, i just noticed this
+>  > is not exclusive - seems like
+>  > drivers/net/amt.c is using this space - not sure why it is even using
+>  > tc space. I am wondering if we can make it use the 20B scratch pad.
+>  > +Cc author Taehee Yoo - it doesnt seem to conflict but strange that it
+>  > is considering qdisc_skb_cb
+>
+> The reason why amt considers qdisc_skb_cb is to not use CB area the TC
+> is using.
+> When amt driver send igmp/mld packet, it stores tunnel data in CB before
+> calling dev_queue_xmit().
+> Then, it uses that tunnel data from CB in the amt_dev_xmit().
+> So, amt CB area should not be used by TC, this is the reason why it
+> considers qdisc_skb_cb size.
+> But It looks wrong, it should use tc_skb_cb instead of qdisc_skb_cb to
+> fully avoid CB area of TC, right?
 
-So you are replacing the actual implementation of the netif_is_macsec()
-function with a call to the same netif_is_macsec().
 
-How does this work?
+Yeah, that doesnt seem safe if you are storing state expecting it to
+be intact afterwards - tc will definitely overwrite parts of it today.
+See this:
+
+struct qdisc_skb_cb {
+        struct {
+                unsigned int            pkt_len;
+                u16                     slave_dev_queue_mapping;
+                u16                     tc_classid;
+        };
+#define QDISC_CB_PRIV_LEN 20
+        unsigned char           data[QDISC_CB_PRIV_LEN];
+};
+
+struct tc_skb_cb {
+        struct qdisc_skb_cb qdisc_cb;
+
+        u16 mru;
+        u8 post_ct:1;
+        u8 post_ct_snat:1;
+        u8 post_ct_dnat:1;
+        u16 zone; /* Only valid if post_ct =3D true */
+};
+
+tc_skb_cb->mru etc are writting over the area you are using.
+
+The rule is you cant trust skb->cb content after it goes out of your "domai=
+n".
+
+cheers,
+jamal
+
+>  >
+>  >> Maybe some documentation about the lifetimes of these things
+>  >> would clarify things?
+>  >
+>  > What text do you think makes sense and where should it go?
+>  >
+>  > cheers,
+>  > jamal
 
