@@ -1,194 +1,119 @@
-Return-Path: <netdev+bounces-58266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81205815B17
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 19:36:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ECE5815B32
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 20:08:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE0CF1C217E3
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 18:36:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 366F91F23186
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 19:08:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2946A1E4A7;
-	Sat, 16 Dec 2023 18:36:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E29530FBF;
+	Sat, 16 Dec 2023 19:08:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="knEr4V0D"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="t5qEeIlc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EFB71E489
-	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 18:36:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AD6FC433C8;
-	Sat, 16 Dec 2023 18:36:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702751770;
-	bh=nPux3DcNvKYPeaW0mzGJpfvBNYque5qaVeX651FcuNA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=knEr4V0D1OJvUWVNjs02BxWCfXu+imap2LWhTMY6LqyraKDJKIvB+WlzB7FbU8LdY
-	 +JSvGjtfWkGInsfe5XPQOfEB8+8moQp1aRSKuGZoHa7y7myQZz9S/prmwyyuFxwGG1
-	 ttuOfNSQx4YJIa2XUfKZQ9SCUNvmzRkZRT8bTTo7DP/pGuu5ObFQjcH6A2kO3ns7kS
-	 8ENMyWwsZ35lqf3H1v6OmMXq33WDC6xVeN8IJWJpRAZL7B4cQCINqi+5eEeFzbwmRG
-	 iDOtaBPIWPb6UlJy39uWE6Aqs/8fAAfIyRj1RbPy7BdlqjQtjm5n8MkquiDwq8U+Jy
-	 q25rPRFYwEQ4w==
-Message-ID: <e587f26f-f003-4730-acb0-cecb2a5a83f2@kernel.org>
-Date: Sat, 16 Dec 2023 11:36:09 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599111E485;
+	Sat, 16 Dec 2023 19:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=OkwSnz/x+hw4c0xXlPnigUYNs6Tn7wFQ/QxZa13dJc8=; b=t5qEeIlc3121z+dSVt4ZCU/PYa
+	Qv/ZbQtLsVP+9NLHkgFXoa9zPwcH8pqycW42DmsjSo5T6LWzQOXBiAh/lACvS1YoAG+IeJ1ixQ10h
+	J8WIYZx5VLPsBXtDExi2XUMs2vk7iNqYL3W3336V1Gor4u4ZakdbwkUIl38IPUA0wagTBD/KUDdVb
+	/IIjz+1bDnr61I6QYO7W/NldqalNLQkBQh8fraM392ixYkPDN9i7WS6PK6SbHB/gGZnA7Dr+Ptb2c
+	tYojilSRddiwys+a6Wpae2W7TAtkmLuA4wzYwH4lBlXzK3iyGgPQEUxBM4ihHo+usVUTGRMEpK/fs
+	Ky5YIWOg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39248)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rEa1O-0003xs-2R;
+	Sat, 16 Dec 2023 19:08:22 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rEa1O-0004tz-Lr; Sat, 16 Dec 2023 19:08:22 +0000
+Date: Sat, 16 Dec 2023 19:08:22 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jie Luo <quic_luoj@quicinc.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, hkallweit1@gmail.com, corbet@lwn.net,
+	p.zabel@pengutronix.de, f.fainelli@gmail.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v8 14/14] dt-bindings: net: ar803x: add qca8084 PHY
+ properties
+Message-ID: <ZX31pq4yXM8Fb/rj@shell.armlinux.org.uk>
+References: <20231215074005.26976-1-quic_luoj@quicinc.com>
+ <20231215074005.26976-15-quic_luoj@quicinc.com>
+ <60b9081c-76fa-4122-b7ae-5c3dcf7229f9@lunn.ch>
+ <a65ad12d-b990-4439-b196-903f4a5f096a@quicinc.com>
+ <f5c5cbce-c36e-498a-97e2-35f06d927d74@lunn.ch>
+ <a9798333-3105-422f-8033-76c0b1d4f439@quicinc.com>
+ <15d95222-35dd-4ea1-a1a3-3ad9e4ef0349@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 1/2] net/ipv6: insert a f6i to a GC list only
- if the f6i is in a fib6_table tree.
-Content-Language: en-US
-To: Kui-Feng Lee <sinquersw@gmail.com>, thinker.li@gmail.com,
- netdev@vger.kernel.org, martin.lau@linux.dev, kernel-team@meta.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
-Cc: kuifeng@meta.com, syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com
-References: <20231213213735.434249-1-thinker.li@gmail.com>
- <20231213213735.434249-2-thinker.li@gmail.com>
- <28f016bc-3514-444f-82df-719aeb2d013a@kernel.org>
- <185a3177-3281-4ead-838e-6d621151ea36@gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <185a3177-3281-4ead-838e-6d621151ea36@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <15d95222-35dd-4ea1-a1a3-3ad9e4ef0349@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 12/15/23 11:12 AM, Kui-Feng Lee wrote:
+On Sat, Dec 16, 2023 at 06:30:00PM +0100, Andrew Lunn wrote:
+> > The following is the chip package, the chip can work on the switch mode
+> > like the existed upstream code qca8k, where PHY1-PHY4 is connected with
+> > MAC1-MAC4 directly; The chip can also work on the PHY mode, where PHY1-
+> > PHY4 is connected with PCS1 by 10g-qxgmii; Either switch mode or PHY mode,
+> > the PHY4 is optionally connected with PCS0 by SGMII, PCS0 and PCS1
+> > are connected with the SoC(IPQ platform) PCSes.
 > 
-> I tried to reproduce the issue yesterday, according to the hypothesis
-> behind the patch of this thread. The following is the instructions
-> to reproduce the UAF issue. However, this instruction doesn't create
-> a crash at the place since the memory is still available even it has
-> been free. But, the log shows a UAF.
+> I don't really understand. Are you saying the hardware is actually :
 > 
-> The patch at the end of this message is required to reproduce and
-> show UAF. The most critical change in the patch is to insert
-> a 'mdelay(3000)' to sleep 3s in rt6_route_rcv(). That gives us
-> a chance to manipulate the kernel to reproduce the UAF.
 > 
-> Here is my conclusion. There is no protection between finding
-> a route and changing the route in rt6_route_rcv(), including inserting
-> the entry to the gc list. It is possible to insert an entry that will be
-> free later to the gc list, causing a UAF. There is more explanations
-> along with the following logs.
+> +----------------------------------------------+
+> |          PCS1           PCS0                 |
+> |                                              |
+> |          MAC0           MAC5                 |
+> |           |              |                   |
+> |     +-----+--------------+-------------+     |
+> |     |                                  |     |
+> |     |                Switch            |     |
+> |     |                                  |     |
+> |     +-+---------+---------+---------+--+     |
+> |       |         |         |         |        |
+> |      MAC1      MAC2      MAC3      MAC4      |
+> |                                              |
+> |      PHY1      PHY2      PHY3      PHY4      |
+> +----------------------------------------------+
+> 
+> When in PHY mode, the switch is hard coded to map the 4 PCS1 channels
+> straight to MAC1-MAC4 and all switch functionality is disabled. But
+> then in switch mode, the switch can be controlled as a DSA switch? The
+> 10G PCS1 is then a single 10G port, not 4x 2.5G?
+> 
+> Is there a product brief for this PHY? That might help us understand
+> this hardware?
 
-TL;DR: I think 3dec89b14d37 should be reverted for 6.6 and 6.7
-(selftests should be valid with or without this change) and you try
-again for 6.9 (6.7 dev cycle is about to close).
+Not even digikey give any clues what "QCA8084" is - they list it as
+"unclassified" and give no documentation and no photo. Basically it
+seems to be a super secret device.
 
-###
-
-I was successful in triggering UAF twice yesterday, but a slightly
-different code path that in Eric's trace:
-
-This is the WARN_ON for !hlist_unhashed in fib6_info_release:
-
-[   46.926339] ------------[ cut here ]------------
-[   46.926368] WARNING: CPU: 3 PID: 0 at include/net/ip6_fib.h:332
-fib6_info_release+0x2a/0x43
-[   46.926384] Modules linked in:
-[   46.926393] CPU: 3 PID: 0 Comm: swapper/3 Not tainted
-6.7.0-rc4-debug+ #16
-[   46.926399] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
-1.15.0-1 04/01/2014
-[   46.926404] RIP: 0010:fib6_info_release+0x2a/0x43
-[   46.926409] Code: 48 85 ff 74 3d 55 48 89 e5 53 48 89 fb 48 8d 7f 2c
-e8 3e ff ff ff 84 c0 74 25 48 8d 7b 40 e8 33 11 8b ff 48 83 7b 40 00 74
-02 <0f> 0b 48 8d bb a0 00 00 00 48 c7 c6 93 ea ae 81 e8 3f 00 66 ff 5b
-[   46.926416] RSP: 0018:ffffc900002a8390 EFLAGS: 00010282
-[   46.926422] RAX: 1ffff11002048b00 RBX: ffff888010245c00 RCX:
-ffffffff81af8c9e
-[   46.926426] RDX: dffffc0000000000 RSI: 0000000000000004 RDI:
-ffff888010245c40
-[   46.926431] RBP: ffffc900002a8398 R08: ffffed1002048b86 R09:
-0000000000000001
-[   46.926435] R10: ffffffff81af8be4 R11: ffff888010245c2f R12:
-ffff88800aeec000
-[   46.926439] R13: 0000000000000000 R14: ffff88801ab7c200 R15:
-0000000000000020
-[   46.926444] FS:  0000000000000000(0000) GS:ffff88806c000000(0000)
-knlGS:0000000000000000
-[   46.926448] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   46.926452] CR2: 00007f897cc95fb0 CR3: 000000001d69d000 CR4:
-0000000000750ef0
-[   46.926458] PKRU: 55555554
-[   46.926462] Call Trace:
-[   46.926466]  <IRQ>
-[   46.926470]  ? show_regs+0x5c/0x60
-[   46.926478]  ? fib6_info_release+0x2a/0x43
-[   46.926483]  ? __warn+0xcb/0x19c
-[   46.926489]  ? fib6_info_release+0x2a/0x43
-[   46.926495]  ? report_bug+0x114/0x186
-[   46.926504]  ? handle_bug+0x40/0x6b
-[   46.926510]  ? exc_invalid_op+0x19/0x41
-[   46.926515]  ? asm_exc_invalid_op+0x1b/0x20
-[   46.926524]  ? refcount_dec_and_test+0x15/0x43
-[   46.926530]  ? fib6_info_release+0x23/0x43
-[   46.926536]  ? fib6_info_release+0x2a/0x43
-[   46.926542]  ndisc_router_discovery+0xf41/0xfa6
-
-
-UAF here:
-
-[   47.941928]
-==================================================================
-[   47.942548] BUG: KASAN: slab-use-after-free in
-fib6_gc_all.constprop.0+0x19b/0x294
-[   47.943178] Read of size 8 at addr ffff888010245c38 by task swapper/3/0
-
-[   47.943866] CPU: 3 PID: 0 Comm: swapper/3 Tainted: G        W
- 6.7.0-rc4-debug+ #16
-[   47.944548] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
-1.15.0-1 04/01/2014
-[   47.945204] Call Trace:
-[   47.945416]  <IRQ>
-[   47.945595]  dump_stack_lvl+0x5b/0x82
-[   47.945912]  print_address_description.constprop.0+0x7a/0x2eb
-[   47.946391]  print_report+0x106/0x1e0
-[   47.946703]  ? virt_to_slab+0x9/0x1a
-[   47.947007]  ? kmem_cache_debug_flags+0x13/0x1f
-[   47.947392]  ? kasan_complete_mode_report_info+0x19e/0x1a1
-[   47.947850]  ? fib6_gc_all.constprop.0+0x19b/0x294
-[   47.948254]  kasan_report+0x99/0xc4
-[   47.948554]  ? fib6_gc_all.constprop.0+0x19b/0x294
-[   47.948962]  __asan_load8+0x77/0x79
-[   47.949262]  fib6_gc_all.constprop.0+0x19b/0x294
-
-
-for a route added here:
-
-[   47.970092] Allocated by task 0:
-[   47.970366]  stack_trace_save+0x8d/0xbb
-[   47.970373]  kasan_save_stack+0x26/0x46
-[   47.970379]  kasan_set_track+0x25/0x2b
-[   47.970385]  kasan_save_alloc_info+0x1e/0x21
-[   47.970392]  ____kasan_kmalloc+0x6f/0x7b
-[   47.970398]  __kasan_kmalloc+0x9/0xb
-[   47.970404]  __kmalloc+0x91/0xbf
-[   47.970411]  kzalloc+0xf/0x11
-[   47.970416]  fib6_info_alloc+0x26/0xa1
-[   47.970422]  ip6_route_info_create+0x266/0x6c5
-[   47.970428]  ip6_route_add+0x14/0x46
-[   47.970433]  rt6_add_dflt_router+0x123/0x1bd
-[   47.970439]  ndisc_router_discovery+0x5a4/0xfa6
-[   47.970447]  ndisc_rcv+0x1a2/0x1b5
-
-This is just aggressive RA's and aggressive gc with a hack to the stack
-to toggle lifetime or metric on every RA (something that can be scripted
-with an ra command - set and reset lifetime in every other RA and change
-the metric in every RA).
-
-I was targeting this code path because I noticed rt6_add_dflt_router
-sets RTF_EXPIRES but does not pass in the expires value. There are races
-(like the one you found with a different code path) in the handling of
-RTF_EXPIRES, setting the timer, running gc and adding the route entry to
-the gc list.
-
-In short there are a number of places in the RA path that need the
-lifetime handling cleaned up first to make it all consistent with the
-idea of using a linked list to track entries with an expires tag.
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
