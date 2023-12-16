@@ -1,98 +1,94 @@
-Return-Path: <netdev+bounces-58210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B13A0815886
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 10:26:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46CD1815895
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 11:03:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58E8D1F2592F
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 09:26:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 131801C24A4C
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 10:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AFFE14285;
-	Sat, 16 Dec 2023 09:26:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1356B14285;
+	Sat, 16 Dec 2023 10:03:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="JIQ5jIFq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JIGSJ2dc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F234E1427B;
-	Sat, 16 Dec 2023 09:26:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-	s=s31663417; t=1702718778; x=1703323578; i=wahrenst@gmx.net;
-	bh=gfYciJ2AEdIgDiTmCWiWaoharmtLugzOfLflyfvVBs8=;
-	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
-	 In-Reply-To;
-	b=JIQ5jIFqeSpiAJOUhXiSZPVLYmjHCd0lkOXbkq3EznZ3CEc+RO9swyeUB6NdTILo
-	 Xf1omLUsFd2pFtqUzeFNmeL+z6Sa5YEuCxE61SQiVQWhvplg87/82cQ8Yvp2VHELG
-	 PSaDA4gK0ux6PoUyWpNeEz3JQSu85NhnieE3CoDmcYhUDlvE3fU8ZMyIUhGCAlkTk
-	 In0RYrdN/JPklhQaQ2EiBeZX3JG4ah8HT5V3jKr4/kHTUWCVGd1ywUUuVHd8vd4Hw
-	 br/c7XZ4OWLxsTbF1v+qEyHqRH6iGuJOpygGm64W5dlFb8VGRUBW0gsHhuAHnKjbB
-	 iCQy0LP19Mp5Hvg3qA==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.1.130] ([37.4.248.43]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MjjCL-1rd0Er0RcB-00lGki; Sat, 16
- Dec 2023 10:26:18 +0100
-Message-ID: <58b48448-2a6b-41bf-8b04-fdff3391aecd@gmx.net>
-Date: Sat, 16 Dec 2023 10:26:17 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE3715487
+	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 10:03:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70517C433C8;
+	Sat, 16 Dec 2023 10:03:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702721021;
+	bh=GR78kp2M52nF0sM0SHOrXYdt45Bz3o9fsu/Czb3BiDw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JIGSJ2dcK1OHQCGbQH5TgNPW4ooAYhW9QbC9hMrn/r6F1f99dLs4+wWGmjsYPBtR+
+	 s7q3SujUNKg3kYyKq6EqmPB38a8eXuY0AGjWzhL1BlgZMITTRP6Btk9EK3EFTAmftL
+	 3P9sRz0vfA8UbIaqv5ykkkxewk6aVnuRNBJEzOxg/WexAarzp1YtNJod9AMzyu9nWx
+	 aVFmr+n6K0ujcQv7EQJwBlEJ27Rc3C0m51lahJjUA2CTwkgR1KAugOtWF8Eb2Voeb2
+	 QLlKCK0ma8f/zZf7bxUEO9w0wfihHje7pa/l7mOsBaWSycHTMsa29uDduo7VsMlXzV
+	 zEPqsK9IJCc8Q==
+Date: Sat, 16 Dec 2023 10:03:37 +0000
+From: Simon Horman <horms@kernel.org>
+To: Lukasz Plachno <lukasz.plachno@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Jakub Buchocki <jakubx.buchocki@intel.com>,
+	Mateusz Pacuszka <mateuszx.pacuszka@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH iwl-next v3 2/2] ice: Implement 'flow-type ether' rules
+Message-ID: <20231216100337.GL6288@kernel.org>
+References: <20231214043449.15835-1-lukasz.plachno@intel.com>
+ <20231214043449.15835-3-lukasz.plachno@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/12 net-next] qca_spi: collection of improvements
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231214150944.55808-1-wahrenst@gmx.net>
- <20231215182518.081559ea@kernel.org>
-From: Stefan Wahren <wahrenst@gmx.net>
-In-Reply-To: <20231215182518.081559ea@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:M2q3R/2uiIc6vknGORc7HkL4znYPM48XdZ3gipX/3ai/dYcfE5q
- MPTUnYV3kgIatWZf/KAoYC98ZuElgH1K9OrOrQhv7tTgu5cekXqzqmq9xcaW9XAyv+FmfAX
- goEQfifVjMlYB7+jChW4ujUe6AcyQvFYABT/ev6nG+zyCoAn2oaxtdh+1JKlOaMF9DoKKl0
- CwV96PMC00zOZXY4aBP4w==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:6n220bydgKY=;dFzdhSai7pV06as8WXYsdnG7q/D
- rELGuywfF3LtHTpj0N66f66YUaOTB8j5uGnRX/l7+tpYRH6FQt2tRoruWQVl9huVAmrkPJ2En
- 7BcEZZr/s3crYSlDALYSClaLKRXlJ4MG/r3/NFDBi65tLf64gdO5m7xTwghMd1Pj/UIOT4JyQ
- HOlv2qQr+9GO6HGK82PCCNfdmLd1rcviwM5dC2CbbE0tGwm6EMQ9IavtwKw9M2X40exjp+DMC
- /pk38VGli6Mkg7QXsBJ+ndzgHAzESUzFXvHcSRyi3sUPlMcB4e6LZepWMaC40qZa3JQa2e9hd
- c4vPNmrJdyIz2aJxoOvZTIqdoAeW0HVdfrRfot3Ts5/Lqkl0sWQDJFVrpcpENRomRl4TKwehx
- mk9Fk88mVo48q+mzpgUHhjE/GAbVo7BngYso46I1Cbeb4/Hod9SksgsNl79YSIxPXTu9tQ4oV
- sutIljBtgIgB7mm7xpLBniN+A1lrWJv9MoLJ6XKWddofrb6mrd1moZutX9GwjnLiuoaAlnqLj
- q7r/3a/VkaOehV5EjwcgYg47u0P+brant0NO18JktAkDyjLj1wsoqf3oVtSHENEBeIrZe6TQa
- q6k/VOoYbgVmsyFMadFWNo5TZlWH1h6MYgLjCVmzu/IGbU4TuNm15luePbXLYrGt/hJ/gIQ9Z
- oxAP68DUsAxJdrY5N3LG8PCVpDPQjadIpGySO3cE1kFZObJn7zqk/EqS/japNhM7HnlXVLkRc
- LTLj7DWfZ7VZzjsAFlJGLJ/0vxjNQ57fx6JTjtflDGQx9Gvvc1m8sxRcePmVgCZSDtafc+5oQ
- tqBw+LeCjWfLoXVBtVeZKqccOZSXPIaMpUm/NFCO2Y0xwu8Kx2Yp1XnwUVFcFRW7iryZ+lRP5
- LX78l+rCBzhGRTxm1V96uicyLZ2eOB6r5bLypcuAmHCq0i42Qhz9snEtlPDOj8Qtxv8dQqWBw
- 5geu8Fz4CSUvQgANz5Xo/k0yo1g=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231214043449.15835-3-lukasz.plachno@intel.com>
 
-Hi Jakub,
+On Thu, Dec 14, 2023 at 05:34:49AM +0100, Lukasz Plachno wrote:
 
-Am 16.12.23 um 03:25 schrieb Jakub Kicinski:
-> On Thu, 14 Dec 2023 16:09:32 +0100 Stefan Wahren wrote:
->> This series contains a wild collection of improvements for the
->> qca_spi driver. This is a follow-up series to the recent bugfixes.
-> The fixes are now in net-next, and looks like this series
-> no longer applied, please rebase & repost.
-let me explain. This series shouldn't replace the already applied
-bugfixes. Before i submitted the bugfix patches, i prepared all these
-patches. Since the bugfixes had a much higher prio, i decided to split
-my patches into a bugfix and improvement series. The bugfixes has been
-applied and this series is the improvement part which based on current
-net-next including the bugfix series. Sorry for not making this clear.
-Patch 1 & 2 in this series is the initially intended rework, which is
-also considered valuable by Paolo.
+...
+
+> @@ -1199,6 +1212,99 @@ ice_set_fdir_ip6_usr_seg(struct ice_flow_seg_info *seg,
+>  	return 0;
+>  }
+>  
+> +/**
+> + * ice_fdir_vlan_valid - validate VLAN data for Flow Director rule
+> + * @fsp: pointer to ethtool Rx flow specification
+> + *
+> + * Return: true if vlan data is valid, false otherwise
+> + */
+> +static bool ice_fdir_vlan_valid(struct ethtool_rx_flow_spec *fsp)
+> +{
+> +	if (fsp->m_ext.vlan_etype &&
+> +	    ntohs(fsp->h_ext.vlan_etype) & ~(ETH_P_8021Q | ETH_P_8021AD))
+> +		return false;
+
+Hi Jakub and Lukasz,
+
+It is not obvious to me that a bitwise comparison of the vlan_ethtype is
+correct. Possibly naively I expected something more like
+(completely untested!):
+
+	if (!eth_type_vlan(sp->m_ext.vlan_etype))
+		return false:
+
+> +
+> +	if (fsp->m_ext.vlan_tci &&
+> +	    ntohs(fsp->h_ext.vlan_tci) >= VLAN_N_VID)
+> +		return false;
+> +
+> +	return true;
+> +}
+
+...
 
