@@ -1,113 +1,118 @@
-Return-Path: <netdev+bounces-58214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7481E8158CC
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 12:27:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 174D48158D9
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 12:48:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 656B2B2400C
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 11:26:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4EF91F21E17
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 11:48:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53869154A9;
-	Sat, 16 Dec 2023 11:26:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1837715EA6;
+	Sat, 16 Dec 2023 11:48:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dc/sHShb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e0DADZs0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9ADD18040
-	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 11:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a232e9f0ca9so10937566b.1
-        for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 03:26:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702726009; x=1703330809; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mt6QS+gMUxFf6hAvwoyNks7iQ8znNP0zxhVoIyqc0rY=;
-        b=dc/sHShbuoWBUCRnVH5i/2vZN0bq03+REDjaTvD6QyM8vmfPnql/4+a/7kHoj5ka5k
-         AG1JdwlqLUOPr6PitfND4PTN0LiEoaQBYpEFvZbMQFTa6ZICuvgL5AFd3qrwYofTpKEI
-         PvA1jheLOOA+VCkCPKbGoD2pIJaWJIYqbrGjP+MqcvUeWNSEdyVpQZps3uH9oYcdamTW
-         zdtLMbpRXTJx3kiu66u9YZkUKHw8gn/zQWXsBTyV4TpPOwAmSD1Iy3mp4/4aJBBrd874
-         mBgMax0sDSue+IGYt1BbjVyjPsQlmXNX2cnJEUxS0+p66vfekc3w5tNyfvI6iKKRPFjO
-         EcYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702726009; x=1703330809;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Mt6QS+gMUxFf6hAvwoyNks7iQ8znNP0zxhVoIyqc0rY=;
-        b=OKls1+tWcAQQDjwmzU0IHTZeFfXwooeKkw6AsYuExePvMJEM4bVpZfzA0KIhvOae0H
-         NYGNr0FtMrRoTzkg81hqySQ+GaTxws873ZenzXF95iKReT66TF5q3NK/v7t+/Wge+qdZ
-         fcXxv11Uk6MOBrCyay22E6swwltjw36GYtpBUtC2MDbeRTc9zEGX7aA9DCJMjq2wT02X
-         V72iltbNjHOMRC29iBG6ZGSj2L4c9pSbOKaqTpdwVNhxkaHzYhVJ3C+ZvOlbsqXMwhqw
-         VhzIjsE52hT5l1hv5SrdlCgTHqBCXDTq4EvxXNi57OGHqEL9Tj+/4bhJumw0fRIlcvkD
-         uAYw==
-X-Gm-Message-State: AOJu0YyT8UNWv39XzBxdDQudJ29e7OoDWZH3LicZEoJi+MAbfIH4so++
-	QKmH16vHa+n+TMCpQJb7vBQ=
-X-Google-Smtp-Source: AGHT+IGES/sn6jdjBxPEEn6I6qhpsqIS/BcqNy6kMO0KcCazOR0Iqttjp2kY83xfQOohIN5sIeoP4Q==
-X-Received: by 2002:a17:906:d282:b0:9fe:81a:c258 with SMTP id ay2-20020a170906d28200b009fe081ac258mr7761669ejb.26.1702726008741;
-        Sat, 16 Dec 2023 03:26:48 -0800 (PST)
-Received: from pek-lpggp6.wrs.com (unknown-105-121.windriver.com. [147.11.105.121])
-        by smtp.gmail.com with ESMTPSA id sf22-20020a1709078a9600b00982a92a849asm11866504ejc.91.2023.12.16.03.26.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Dec 2023 03:26:48 -0800 (PST)
-From: Kevin Hao <haokexin@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73E4115E80;
+	Sat, 16 Dec 2023 11:48:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702727321; x=1734263321;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=DB3MGM5D5VrNZHP9PT0yHBxITEQsllQW8tS5jK7QUtw=;
+  b=e0DADZs0VE2Cb9bCEWBMtKCx5l3AqZfZ9Q820ToipDhY3oej0mlpEQjS
+   HTTl7RjfsgN2Z0V9x/ruJCTv35rZdJOHMmY5e8O1CoadKV2heI5FzfoGL
+   og3XUQRapYPUqoQ1lqISJGjUT6meyZ3kTCRWi7N/XPqPWa4r9YNYjxCgo
+   8vzSQDWvW50zZDnUaqxZJAUZQBzt3s2fXeSMStORN8kUN8J5x++U7fuXM
+   gk6gmV9vFnmdsBmDLLA20DZQ2UTY98Jlo4Mj8QEQJ+ED4sKPMbjCZMjZd
+   sMuptRh7wHhYNX5oCwdvwV1xr4Z+R31jowYacR8/DQ8JBGPiyz5fDqrVd
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10925"; a="461827402"
+X-IronPort-AV: E=Sophos;i="6.04,281,1695711600"; 
+   d="scan'208";a="461827402"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2023 03:48:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10925"; a="778563021"
+X-IronPort-AV: E=Sophos;i="6.04,281,1695711600"; 
+   d="scan'208";a="778563021"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by fmsmga007.fm.intel.com with ESMTP; 16 Dec 2023 03:48:35 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rET9l-0001Wo-1I;
+	Sat, 16 Dec 2023 11:48:33 +0000
+Date: Sat, 16 Dec 2023 19:48:12 +0800
+From: kernel test robot <lkp@intel.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net
+Cc: oe-kbuild-all@lists.linux.dev,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Pavel Machek <pavel@ucw.cz>
-Subject: [PATCH net-next] net: pktgen: Use wait_event_freezable_timeout() for freezable kthread
-Date: Sat, 16 Dec 2023 19:26:32 +0800
-Message-Id: <20231216112632.2255398-1-haokexin@gmail.com>
-X-Mailer: git-send-email 2.39.2
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>
+Subject: Re: [PATCH net-next v4 05/13] net: ethtool: Allow passing a phy
+ index for some commands
+Message-ID: <202312161945.RaGyJll9-lkp@intel.com>
+References: <20231215171237.1152563-6-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231215171237.1152563-6-maxime.chevallier@bootlin.com>
 
-A freezable kernel thread can enter frozen state during freezing by
-either calling try_to_freeze() or using wait_event_freezable() and its
-variants. So for the following snippet of code in a kernel thread loop:
-  wait_event_interruptible_timeout();
-  try_to_freeze();
+Hi Maxime,
 
-We can change it to a simple wait_event_freezable_timeout() and then
-eliminate a function call.
+kernel test robot noticed the following build errors:
 
-Signed-off-by: Kevin Hao <haokexin@gmail.com>
----
- net/core/pktgen.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+[auto build test ERROR on net-next/main]
 
-diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-index 57cea67b7562..2b59fc66fe26 100644
---- a/net/core/pktgen.c
-+++ b/net/core/pktgen.c
-@@ -3669,10 +3669,8 @@ static int pktgen_thread_worker(void *arg)
- 		if (unlikely(!pkt_dev && t->control == 0)) {
- 			if (t->net->pktgen_exiting)
- 				break;
--			wait_event_interruptible_timeout(t->queue,
--							 t->control != 0,
--							 HZ/10);
--			try_to_freeze();
-+			wait_event_freezable_timeout(t->queue,
-+						     t->control != 0, HZ/10);
- 			continue;
- 		}
- 
+url:    https://github.com/intel-lab-lkp/linux/commits/Maxime-Chevallier/net-phy-Introduce-ethernet-link-topology-representation/20231216-012641
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231215171237.1152563-6-maxime.chevallier%40bootlin.com
+patch subject: [PATCH net-next v4 05/13] net: ethtool: Allow passing a phy index for some commands
+config: nios2-randconfig-001-20231216 (https://download.01.org/0day-ci/archive/20231216/202312161945.RaGyJll9-lkp@intel.com/config)
+compiler: nios2-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231216/202312161945.RaGyJll9-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312161945.RaGyJll9-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   nios2-linux-ld: net/ethtool/netlink.o: in function `ethnl_parse_header_dev_get':
+   netlink.c:(.text+0x2e8): undefined reference to `phy_link_topo_get_phy'
+>> netlink.c:(.text+0x2e8): relocation truncated to fit: R_NIOS2_CALL26 against `phy_link_topo_get_phy'
+
 -- 
-2.39.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
