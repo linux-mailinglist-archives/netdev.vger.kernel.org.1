@@ -1,172 +1,143 @@
-Return-Path: <netdev+bounces-58302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0325B815C04
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 23:06:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB134815C0B
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 23:09:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D8FC1F229A9
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 22:06:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 222DD1F229DD
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 22:09:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED95735294;
-	Sat, 16 Dec 2023 22:06:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D5F035298;
+	Sat, 16 Dec 2023 22:09:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lLU0lYDS"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gWowHxus"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61DE9328D6
-	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 22:06:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a22f59c6aeaso210288466b.2
-        for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 14:06:53 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A915FD279;
+	Sat, 16 Dec 2023 22:09:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702764412; x=1703369212; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+A7W+kQw39I0W+Av8fUPMRQeHZ3+3clgt7HAcEmlw4M=;
-        b=lLU0lYDSOvL7Pdd2ht480XXWFbTog77uJW3GTfVxty9Yo6ftdBe0qIAvqkxneVS8iw
-         su0w5Q+ZgOL9reXN36S6iswgCRkkzJpOgZL1tkEHTPF5aC/6gPgsjfFlFsV9uy2lOvNa
-         CliMKrSAutKrFZTp2jJ1NQ1jxdY/Rw9s2yUIeUtrOgdqbaMpQ1/448fznFnXN+W9V2Ib
-         yT8JWrMA0TRzIFxIn/wS8aFice/kLFTkekGFkJuZpP1MVvH1KXVUuYrvZNBawl/Uwbwj
-         bYOGEtIU/RCzWJ+bMRfLcFJaOfy7T38M+WdmyKnfaddKScHuw0BoB20QzKDZzgD3BXMc
-         7q9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702764412; x=1703369212;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+A7W+kQw39I0W+Av8fUPMRQeHZ3+3clgt7HAcEmlw4M=;
-        b=kA6avUKB70bXIYGZggymyeAAIMmcs05J9+Hy+BzDbyOpT2wGdqQtT+HbOmTzL+/IJa
-         dkguPEbsAIpsFgNILjKwCAgxaR+m+N62193eaqF2GyDgRzyjeKNzknmCg4S3NIO7ME4V
-         rSnvnBodomGCdFHfKb9PHM47QgSstWVdEiZxr3HUliJsri1L6BX3dmdoq+oTqY3sAqze
-         AP1fQs7YDbJNyUHo1T+VEwxfzpJqksbzRuV6HDD4yM87RodJHsSD0iE5595cCw2V+M9B
-         kPVnvQWI8d+KHrcicU0ZtcYmt0c5KD0pGhZuUCnPzHR+i/XbRZ2iglUEDfyRsvaK/CZ1
-         jiGQ==
-X-Gm-Message-State: AOJu0YyUQuMkPKfCrkcHkN903zSbkRJhc2uPHnuyL2wJr4uXGlI4i00y
-	bO6CV0eti5TOrWEJfbI5acZCfymr2Rg6W9FNW665pQ==
-X-Google-Smtp-Source: AGHT+IGDXfzXuemDkP4NhH4/F2a+MWPk45mdXOzcRD0E8CLBsGt8xOy7gIh+Vxsp5NTZ/wNHJ6UVEu48UkBiCbqW+qY=
-X-Received: by 2002:a17:907:7d8c:b0:a19:a19b:55ef with SMTP id
- oz12-20020a1709077d8c00b00a19a19b55efmr7448815ejc.127.1702764411294; Sat, 16
- Dec 2023 14:06:51 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1702764567; x=1734300567;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=E9SukeIuCwi2LM5I94WvlVByJpsCm4UYtu9SKiCRw9g=;
+  b=gWowHxuslogOcMMTueKiUIK25pWeta7vaV5DD05yjnkt2opnzy9Im91S
+   8wQ92xBn++VhTJglNJ+S3SzFL/zGssfFJve9p+66zqxNJMnQfaKKx0CHW
+   PEgC5rRqsFanUwopdQI5EfTIrulKLW5mIOUnG0Aqn6vudtKMitL499WmM
+   0=;
+X-IronPort-AV: E=Sophos;i="6.04,282,1695686400"; 
+   d="scan'208";a="51508333"
+Subject: RE: [PATCH net-next 17/24] net: amazon, aquanti, broadcom, cavium,
+ engleder: Use nested-BH locking for XDP redirect.
+Thread-Topic: [PATCH net-next 17/24] net: amazon, aquanti, broadcom, cavium,
+ engleder: Use nested-BH locking for XDP redirect.
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-a65ebc6e.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2023 22:09:24 +0000
+Received: from smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
+	by email-inbound-relay-iad-1e-m6i4x-a65ebc6e.us-east-1.amazon.com (Postfix) with ESMTPS id 4281F6952E;
+	Sat, 16 Dec 2023 22:09:13 +0000 (UTC)
+Received: from EX19MTAEUB001.ant.amazon.com [10.0.17.79:33115]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.15.188:2525] with esmtp (Farcaster)
+ id 23abffa8-d535-4bad-b314-f92c80785dd5; Sat, 16 Dec 2023 22:09:12 +0000 (UTC)
+X-Farcaster-Flow-ID: 23abffa8-d535-4bad-b314-f92c80785dd5
+Received: from EX19D047EUA003.ant.amazon.com (10.252.50.160) by
+ EX19MTAEUB001.ant.amazon.com (10.252.51.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Sat, 16 Dec 2023 22:09:12 +0000
+Received: from EX19D022EUA002.ant.amazon.com (10.252.50.201) by
+ EX19D047EUA003.ant.amazon.com (10.252.50.160) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Sat, 16 Dec 2023 22:09:12 +0000
+Received: from EX19D022EUA002.ant.amazon.com ([fe80::7f87:7d63:def0:157d]) by
+ EX19D022EUA002.ant.amazon.com ([fe80::7f87:7d63:def0:157d%3]) with mapi id
+ 15.02.1118.040; Sat, 16 Dec 2023 22:09:12 +0000
+From: "Kiyanovski, Arthur" <akiyano@amazon.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+CC: "David S. Miller" <davem@davemloft.net>, Boqun Feng
+	<boqun.feng@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, Eric Dumazet
+	<edumazet@google.com>, Frederic Weisbecker <frederic@kernel.org>, Ingo Molnar
+	<mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner
+	<tglx@linutronix.de>, Waiman Long <longman@redhat.com>, Will Deacon
+	<will@kernel.org>, Alexei Starovoitov <ast@kernel.org>, "Arinzon, David"
+	<darinzon@amazon.com>, Igor Russkikh <irusskikh@marvell.com>, "Jesper
+ Dangaard Brouer" <hawk@kernel.org>, John Fastabend
+	<john.fastabend@gmail.com>, Michael Chan <michael.chan@broadcom.com>, "Dagan,
+ Noam" <ndagan@amazon.com>, "Bshara, Saeed" <saeedb@amazon.com>, "Agroskin,
+ Shay" <shayagr@amazon.com>, Sunil Goutham <sgoutham@marvell.com>
+Thread-Index: AQHaL3nHmwTRRV3r7EuTS0zOjdq1crCsc+Ow
+Date: Sat, 16 Dec 2023 22:09:07 +0000
+Deferred-Delivery: Sat, 16 Dec 2023 22:08:39 +0000
+Message-ID: <13a755a898a44a98ac9b8e3240d17550@amazon.com>
+References: <20231215171020.687342-1-bigeasy@linutronix.de>
+ <20231215171020.687342-18-bigeasy@linutronix.de>
+In-Reply-To: <20231215171020.687342-18-bigeasy@linutronix.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231214020530.2267499-1-almasrymina@google.com>
- <20231214020530.2267499-5-almasrymina@google.com> <ddffff98-f3de-6a5d-eb26-636dacefe9aa@huawei.com>
- <CAHS8izO2nDHuxKau8iLcAmnho-1TYkzW09MBZ80+JzOo9YyVFA@mail.gmail.com>
- <20231215021114.ipvdx2bwtxckrfdg@google.com> <20231215190126.1040fa12@kernel.org>
- <CALvZod5myy2SvuCMNmqjjYeNONqSArV+8y8mrkfnNeog8WLjng@mail.gmail.com>
-In-Reply-To: <CALvZod5myy2SvuCMNmqjjYeNONqSArV+8y8mrkfnNeog8WLjng@mail.gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Sat, 16 Dec 2023 14:06:37 -0800
-Message-ID: <CAHS8izOLBtjHOqbTS_PiTNe+rTE=jboDWDM9zS108B57vVNcwA@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v1 4/4] net: page_pool: use netmem_t instead
- of struct page in API
-To: Shakeel Butt <shakeelb@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Yunsheng Lin <linyunsheng@huawei.com>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Michael Chan <michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Wei Fang <wei.fang@nxp.com>, 
-	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
-	NXP Linux Team <linux-imx@nxp.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
-	Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, 
-	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Marcin Wojtas <mw@semihalf.com>, 
-	Russell King <linux@armlinux.org.uk>, Sunil Goutham <sgoutham@marvell.com>, 
-	Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, 
-	hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, 
-	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Jassi Brar <jaswinder.singh@linaro.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
-	Ravi Gunasekaran <r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>, 
-	Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, 
-	Ronak Doshi <doshir@vmware.com>, VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, 
-	Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>, 
-	Kalle Valo <kvalo@kernel.org>, Juergen Gross <jgross@suse.com>, 
-	Stefano Stabellini <sstabellini@kernel.org>, 
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
-	Jason Gunthorpe <jgg@nvidia.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Precedence: Bulk
 
-On Sat, Dec 16, 2023 at 11:47=E2=80=AFAM Shakeel Butt <shakeelb@google.com>=
- wrote:
->
-> On Fri, Dec 15, 2023 at 7:01=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> >
-> > On Fri, 15 Dec 2023 02:11:14 +0000 Shakeel Butt wrote:
-> > > > From my POV it has to be the first one. We want to abstract the mem=
-ory
-> > > > type from the drivers as much as possible, not introduce N new memo=
-ry
-> > > > types and ask the driver to implement new code for each of them
-> > > > separately.
-> > >
-> > > Agree with Mina's point. Let's aim to decouple memory types from
-> > > drivers.
-> >
-> > What does "decouple" mean? Drivers should never convert netmem
-> > to pages. Either a path in the driver can deal with netmem,
-> > i.e. never touch the payload, or it needs pages.
->
-
-I'm guessing the paths in the driver that need pages will have to be
-disabled for non-paged netmem, which is fine.
-
-One example that I ran into with GVE is that it calls page_address()
-to copy small packets instead of adding them as a frag. I can add a
-netmem_address() that returns page_address() for pages, and NULL for
-non-pages (never passing non-pages to mm code). The driver can detect
-that the netmem has no address, and disable the optimization for
-non-paged netmem.
-
-> "Decouple" might not be the right word. What I wanted to say was to
-> avoid too much specialization such that we have to have a new API for
-> every new fancy thing.
->
-> >
-> > Perhaps we should aim to not export netmem_to_page(),
-> > prevent modules from accessing it directly.
->
-> +1.
-
-This is an aggressive approach and I like it. I'll try to make it work
-(should be fine).
-
-
---
-Thanks,
-Mina
+PiBUaGUgcGVyLUNQVSB2YXJpYWJsZXMgdXNlZCBkdXJpbmcgYnBmX3Byb2dfcnVuX3hkcCgpIGlu
+dm9jYXRpb24gYW5kIGxhdGVyDQo+IGR1cmluZyB4ZHBfZG9fcmVkaXJlY3QoKSByZWx5IG9uIGRp
+c2FibGVkIEJIIGZvciB0aGVpciBwcm90ZWN0aW9uLg0KPiBXaXRob3V0IGxvY2tpbmcgaW4gbG9j
+YWxfYmhfZGlzYWJsZSgpIG9uIFBSRUVNUFRfUlQgdGhlc2UgZGF0YSBzdHJ1Y3R1cmUNCj4gcmVx
+dWlyZSBleHBsaWNpdCBsb2NraW5nLg0KPiANCj4gVGhpcyBpcyBhIGZvbGxvdy11cCBvbiB0aGUg
+cHJldmlvdXMgY2hhbmdlIHdoaWNoIGludHJvZHVjZWQNCj4gYnBmX3J1bl9sb2NrLnJlZGlyZWN0
+X2xvY2sgYW5kIHVzZXMgaXQgbm93IHdpdGhpbiBkcml2ZXJzLg0KPiANCj4gVGhlIHNpbXBsZSB3
+YXkgaXMgdG8gYWNxdWlyZSB0aGUgbG9jayBiZWZvcmUgYnBmX3Byb2dfcnVuX3hkcCgpIGlzIGlu
+dm9rZWQgYW5kDQo+IGhvbGQgaXQgdW50aWwgdGhlIGVuZCBvZiBmdW5jdGlvbi4NCj4gVGhpcyBk
+b2VzIG5vdCBhbHdheXMgd29yayBiZWNhdXNlIHNvbWUgZHJpdmVycyAoY3BzdywgYXRsYW50aWMp
+IGludm9rZQ0KPiB4ZHBfZG9fZmx1c2goKSBpbiB0aGUgc2FtZSBjb250ZXh0Lg0KPiBBY3F1aXJp
+bmcgdGhlIGxvY2sgaW4gYnBmX3Byb2dfcnVuX3hkcCgpIGFuZCBkcm9wcGluZyBpbg0KPiB4ZHBf
+ZG9fcmVkaXJlY3QoKSAod2l0aG91dCB0b3VjaGluZyBkcml2ZXJzKSBkb2VzIG5vdCB3b3JrIGJl
+Y2F1c2Ugbm90IGFsbA0KPiBkcml2ZXIsIHdoaWNoIHVzZSBicGZfcHJvZ19ydW5feGRwKCksIGRv
+IHN1cHBvcnQgWERQX1JFRElSRUNUIChhbmQgaW52b2tlDQo+IHhkcF9kb19yZWRpcmVjdCgpKS4N
+Cj4gDQo+IElkZWFsbHkgdGhlIG1pbmltYWwgbG9ja2luZyBzY29wZSB3b3VsZCBiZSBicGZfcHJv
+Z19ydW5feGRwKCkgKw0KPiB4ZHBfZG9fcmVkaXJlY3QoKSBhbmQgZXZlcnl0aGluZyBlbHNlIChl
+cnJvciByZWNvdmVyeSwgRE1BIHVubWFwcGluZywgZnJlZS8NCj4gYWxsb2Mgb2YgbWVtb3J5LCDi
+gKYpIHdvdWxkIGhhcHBlbiBvdXRzaWRlIG9mIHRoZSBsb2NrZWQgc2VjdGlvbi4NCj4gDQo+IFNp
+Z25lZC1vZmYtYnk6IFNlYmFzdGlhbiBBbmRyemVqIFNpZXdpb3IgPGJpZ2Vhc3lAbGludXRyb25p
+eC5kZT4NCg0KSGkgU2ViYXN0aWFuLA0KDQpJIHdvdWxkIGxpa2UgdG8gbWFrZSBzdXJlIEkgdW5k
+ZXJzdGFuZCBjb3JyZWN0bHkgdGhlIGRpZmZlcmVuY2UgaW4gdGhpcyBwYXRjaA0KYmV0d2VlbiBl
+bmEgYW5kIGF0bGFudGljIGRyaXZlcnMuDQoNCkluIHRoZSBhdGxhbnRpYyBkcml2ZXIgdGhlIGNo
+YW5nZSB5b3UndmUgbWFkZSBzZWVtcyBsaWtlIHRoZSBiZXN0IGNoYW5nZQ0KaW4gdGVybXMgb2Yg
+bWFraW5nIHRoZSBjcml0aWNhbCBzZWN0aW9uIGFzIHNtYWxsIGFzIHBvc3NpYmxlLg0KDQpZb3Ug
+Y291bGQgaGF2ZSBkb25lIGV4YWN0bHkgdGhlIHNhbWUgdGhpbmcgd2l0aCBlbmEsIGJ1dCB5b3Ug
+Y2hvc2UgaW5zdGVhZA0KdG8gbGV0IGVuYSByZWxlYXNlIHRoZSBsb2NrIGF0IHRoZSBlbmQgb2Yg
+dGhlIGZ1bmN0aW9uLCB3aGljaCBpbiBjYXNlIG9mIGFuIFhEUF9UWA0KbWF5IG1ha2UgdGhlIGNy
+aXRpY2FsIHNlY3Rpb24gY29uc2lkZXJhYmx5IGxvbmdlciB0aGFuIGluIHRoZSBhdGxhbnRpYyBz
+b2x1dGlvbi4NCg0KSWYgSSB1bmRlcnN0YW5kIGNvcnJlY3RseSAocXVvdGUgZnJvbSB5b3VyIGNv
+bW1pdCBtZXNzYWdlICJUaGlzIGRvZXMgbm90DQphbHdheXMgd29yayBiZWNhdXNlIHNvbWUgZHJp
+dmVycyAoY3BzdywgYXRsYW50aWMpIGludm9rZSB4ZHBfZG9fZmx1c2goKQ0KaW4gdGhlIHNhbWUg
+Y29udGV4dCIpLCBpbiB0aGUgY2FzZSBvZiBhdGxhbnRpYyB5b3UgaGFkIHRvIGdvIGZvciB0aGUg
+bW9yZQ0KY29kZS1hbHRlcmluZyBjaGFuZ2UsIGJlY2F1c2UgaWYgeW91IHNpbXBseSB1c2VkIGd1
+YXJkKCkgeW91IHdvdWxkIGluY2x1ZGUNCnRoZSB4ZHBfZG9fZmx1c2goKSBpbiB0aGUgY3JpdGlj
+YWwgc2VjdGlvbiwgYnV0IGluIHRoZSBjYXNlIG9mIGVuYSB4ZHBfZG9fZmx1c2goKQ0KaXMgY2Fs
+bGVkIGFmdGVyIHRoZSBmdW5jdGlvbiBlbmRzIHNvIGd1YXJkIGlzIGdvb2QgZW5vdWdoLg0KDQpR
+dWVzdGlvbnM6DQoxLiBEaWQgSSB1bmRlcnN0YW5kIGNvcnJlY3RseSB0aGUgZGlmZmVyZW5jZSBp
+biBzb2x1dGlvbiBjaG9pY2UgYmV0d2VlbiBhdGxhbnRpYw0KYW5kIGVuYT8NCjIuIEFzIGZhciBh
+cyBJIGNhbiBzZWUgdGhlIGd1YXJkKCkgc29sdXRpb24gbG9va3MgZ29vZCBmb3IgZW5hIGV4Y2Vw
+dCBmb3IgKG1heWJlPykNClhEUF9UWCwgd2hlcmUgdGhlIGNyaXRpY2FsIHNlY3Rpb24gYmVjb21l
+cyBhIGJpdCBsb25nLiBDYW4geW91IHBsZWFzZSBleHBsYWluLA0Kd2h5IHlvdSB0aGluayBpdCBp
+cyBzdGlsbCAgZ29vZCBlbm91Z2ggZm9yIGVuYSB0byB1c2UgdGhlIGd1YXJkKCkgc29sdXRpb24g
+aW5zdGVhZA0Kb2YgZG9pbmcgdGhlIG1vcmUgIGNvZGUtYWx0ZXJpbmcgYXRsYW50aWMgc29sdXRp
+b24/DQoNClRoYW5rcyENCkFydGh1cg0KDQoNCg==
 
