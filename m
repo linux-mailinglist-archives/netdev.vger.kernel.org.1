@@ -1,91 +1,84 @@
-Return-Path: <netdev+bounces-58158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71644815609
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 02:43:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41FE981560F
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 02:47:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0879E1F257E8
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 01:43:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1EB7B243BA
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 01:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47925110D;
-	Sat, 16 Dec 2023 01:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE2C3110E;
+	Sat, 16 Dec 2023 01:47:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qeYMA2dj"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22D8310F1;
-	Sat, 16 Dec 2023 01:42:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4SsTMs5dhtz29frc;
-	Sat, 16 Dec 2023 09:41:45 +0800 (CST)
-Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id 920011400DA;
-	Sat, 16 Dec 2023 09:42:55 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sat, 16 Dec 2023 09:42:54 +0800
-Message-ID: <ad6b7294-049b-475a-bd55-75f61d72d258@huawei.com>
-Date: Sat, 16 Dec 2023 09:42:54 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3064110D
+	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 01:47:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E044EC433C8;
+	Sat, 16 Dec 2023 01:47:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702691229;
+	bh=84H98YcSh33wXt1xNDx8TrAJaO6JQefXyhvTmUX7nGI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qeYMA2djtyBpdwicZGXtzetCuBf2AOVUk7t+4IjdUh894pzMD45+BJR976Kcwzvpw
+	 QNTT9DEceVyNyHQo66w2ro+cApGSpYtZi0iSySaO83jE2tAwpwUTNZDKO9LqxGVs+6
+	 tGb5j3jx0ytPnc+fvj7l13bVuk9hwp2X73qHAUWrL7qx0RmM37PBUeLhHYkHtYpa7S
+	 O/fO8bIF2Pf8GVK/VYiXx9BoGV3YCz7N0KeS6IVSZKQrtUmHwZKRKmPFgJ86n8LnwY
+	 qyvJK8ha+BBJXhJVG0EbSiEPI4v7s8Op9pwAhV1xKXfxR5O6rGMxOPZHS/aGgyAePe
+	 PqFjAW5s1IwNA==
+Date: Fri, 15 Dec 2023 17:47:07 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, jacob.e.keller@intel.com, jhs@mojatatu.com,
+ johannes@sipsolutions.net, andriy.shevchenko@linux.intel.com,
+ amritha.nambiar@intel.com, sdf@google.com, horms@kernel.org,
+ przemyslaw.kitszel@intel.com
+Subject: Re: [patch net-next v7 5/9] genetlink: introduce per-sock family
+ private storage
+Message-ID: <20231215174707.6ae0a290@kernel.org>
+In-Reply-To: <ZXwnqqsFPDhRUNBy@nanopsycho>
+References: <20231214181549.1270696-1-jiri@resnulli.us>
+	<20231214181549.1270696-6-jiri@resnulli.us>
+	<20231214192358.1b150fda@kernel.org>
+	<ZXwnqqsFPDhRUNBy@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <yisen.zhuang@huawei.com>,
-	<salil.mehta@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <shenjian15@huawei.com>,
-	<wangjie125@huawei.com>, <liuyonglong@huawei.com>, <lanhao@huawei.com>,
-	<wangpeiyang1@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V2 net-next 1/3] net: hns3: add command queue trace for
- hns3
-To: Simon Horman <horms@kernel.org>
-References: <20231214141135.613485-1-shaojijie@huawei.com>
- <20231214141135.613485-2-shaojijie@huawei.com>
- <20231214210434.GU5817@kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20231214210434.GU5817@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm000007.china.huawei.com (7.193.23.189)
 
+Sorry for the latency...
 
-on 2023/12/15 5:04, Simon Horman wrote:
-> On Thu, Dec 14, 2023 at 10:11:33PM +0800, Jijie Shao wrote:
->> From: Hao Lan <lanhao@huawei.com>
->> ...
->> @@ -470,10 +470,14 @@ static int hclge_comm_cmd_check_result(struct hclge_comm_hw *hw,
->>   int hclge_comm_cmd_send(struct hclge_comm_hw *hw, struct hclge_desc *desc,
->>   			int num)
->>   {
->> +	bool is_special = hclge_comm_is_special_opcode(desc->opcode);
->>   	struct hclge_comm_cmq_ring *csq = &hw->cmq.csq;
->>   	int ret;
->>   	int ntc;
-> hclge_comm_is_special_opcode takes a u16 value as it's argument,
-> but the type of desc->opcode is __le16. So perhaps this should be
-> (completely untested!):
->
-> 	struct hclge_comm_cmq_ring *csq = &hw->cmq.csq;
-> 	bool is_special;
-> 	...
->
-> 	is_special = hclge_comm_is_special_opcode(le16_to_cpu(desc->opcode));
->
-> Flagged by Sparse.
+On Fri, 15 Dec 2023 11:17:14 +0100 Jiri Pirko wrote:
+> Wait, let me make your suggestion clear. Do you suggest to remove the
+> WARN_ON_ONCE from __genl_sk_priv_get() as well?
+> 
+> To put it in code:
+> void *__genl_sk_priv_get(struct genl_family *family, struct sock *sk)
+> {
+> 	if (WARN_ON_ONCE(!family->sock_privs))
+> 		return ERR_PTR(-EINVAL);
+> 	return xa_load(family->sock_privs, (unsigned long) sk);
+> }
 
-Thank you,
-it will be fixed in v3
+I meant this, although no strong feelings.
 
-Jijie
-
+> OR:
+> void *__genl_sk_priv_get(struct genl_family *family, struct sock *sk)
+> {
+> 	if (!family->sock_privs)
+> 		return ERR_PTR(-EINVAL);
+> 	return xa_load(family->sock_privs, (unsigned long) sk);
+> }
+> ?
 
