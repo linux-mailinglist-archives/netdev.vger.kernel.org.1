@@ -1,139 +1,150 @@
-Return-Path: <netdev+bounces-58278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44F04815B69
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 20:44:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F5CD815B6C
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 20:45:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E293B20E16
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 19:44:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10C6B1F238CE
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 19:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CE4A321AF;
-	Sat, 16 Dec 2023 19:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B130E321AF;
+	Sat, 16 Dec 2023 19:45:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iE/anO1+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D371B13AC0;
-	Sat, 16 Dec 2023 19:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.104] (31.173.82.73) by msexch01.omp.ru (10.188.4.12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 16 Dec
- 2023 22:43:47 +0300
-Subject: Re: [PATCH net-next v2 17/21] net: ravb: Keep clock request
- operations grouped together
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
-	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>,
-	<geert+renesas@glider.be>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
- <20231214114600.2451162-18-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <2cb29821-7135-4369-ebc7-c742226e6230@omp.ru>
-Date: Sat, 16 Dec 2023 22:43:47 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D5E328A6;
+	Sat, 16 Dec 2023 19:45:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a22f59c6aeaso203974166b.2;
+        Sat, 16 Dec 2023 11:45:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702755910; x=1703360710; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vj41VeZNQFyL0rSwdtm6vNaa3BhzpzPMKgY30VuChQc=;
+        b=iE/anO1+GlGjkgWaxGIiMcFoAdCJ5gsDYeLxd31Q9N5i6bfQpDbaTCuQ7Zw0Eh7NdK
+         byHCPjGI5ErQkOpZgHawGb4p8xChR38BCN+AtR8Id5Cy+88KdrfGlZNIQPQONInCb8YZ
+         AVAS8OKiTKPHyEhuWz97sO8IzrVCS18gsxMPw1AIQfh51xy3ayiHW2gMKv7QEFb1nPTu
+         HqQvykzFQ8t97O4IRC5U0pyTAhW40LiQMSFTnUQxXRnXDXfFLuuEmfgltoignfj4pWzu
+         AtSkreOi3m9moq17UaNQk+UDWfX6CCb9ad/UZCIAfShB1R6NMXT2jMZMgpV73f9etva8
+         Nlmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702755910; x=1703360710;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Vj41VeZNQFyL0rSwdtm6vNaa3BhzpzPMKgY30VuChQc=;
+        b=LRf7uvG1hJ4+EFH+w5WrdPxAg6vmnGmY1//tNyoGERVKMTzfDlFLCvmqBtkyYpshUq
+         H10JtlRxPP5WObj/b7qzgXncHzfHDLs2Af/m2Nm/1w7bUPH5/qkAZY/DfDBxO9IHhMfh
+         DBFl+DJysNP8PpO5djLzHGyFt642/zzFPzK0xt5MQiaUQRxY4QEMILZDCNlBTRAqqucu
+         rTp4IDnII0DdFVRlVMlqeBSbNXP7OlAFpzeJ8VYebNWPLjAUYGfbNHzJZmJNCnY8UOFy
+         CY5Ni6VcivhoUT8wXbFB+K0ofP9E0ZowhOBmZYmYIbAIogqNcUd/N4GXTSmoZWA3ybVj
+         WRpA==
+X-Gm-Message-State: AOJu0YxWiLSb9miNIRilZoLNGADwqVkT4ACV9qOAK0Bv48DrFT39ddjs
+	ulWDS+MciDUjabVJSSZU1q0=
+X-Google-Smtp-Source: AGHT+IEYBDRJyWE/t05L1R2LOLYnbmnq/+bNe3AIAANo7bxOB4TuGrYVe81ACdezWahp02FC7qldgQ==
+X-Received: by 2002:a17:906:74cd:b0:a23:1000:56a2 with SMTP id z13-20020a17090674cd00b00a23100056a2mr2106350ejl.12.1702755910210;
+        Sat, 16 Dec 2023 11:45:10 -0800 (PST)
+Received: from corebook.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id rg14-20020a1709076b8e00b00a23002c8059sm5211196ejc.70.2023.12.16.11.45.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 Dec 2023 11:45:09 -0800 (PST)
+From: Eric Woudstra <ericwouds@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"Frank Wunderlich" <frank-w@public-files.de>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Lucien Jheng  <lucien.jheng@airoha.com>,
+	Zhi-Jun You <hujy652@protonmail.com>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	Eric Woudstra <ericwouds@gmail.com>
+Subject: [PATCH RFC net-next 1/2] Add en8811h bindings documentation yaml
+Date: Sat, 16 Dec 2023 20:44:29 +0100
+Message-ID: <20231216194432.18963-2-ericwouds@gmail.com>
+X-Mailer: git-send-email 2.42.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231214114600.2451162-18-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/16/2023 19:03:00
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 182147 [Dec 16 2023]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.82.73 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.82.73 in (user) dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;31.173.82.73:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.82.73
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 12/16/2023 19:09:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 12/16/2023 5:24:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Transfer-Encoding: 8bit
 
-On 12/14/23 2:45 PM, Claudiu wrote:
+The en8811h phy can be set with serdes polarity reversed on rx and/or tx.
 
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> 
-> Keep clock request operations grouped togeter to have all clock-related
-> code in a single place. This makes the code simpler to follow.
-> 
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> ---
-> 
-> Changes in v2:
-> - none; this patch is new
-> 
->  drivers/net/ethernet/renesas/ravb_main.c | 28 ++++++++++++------------
->  1 file changed, 14 insertions(+), 14 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index 38999ef1ea85..a2a64c22ec41 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -2768,6 +2768,20 @@ static int ravb_probe(struct platform_device *pdev)
->  	if (error)
->  		goto out_reset_assert;
->  
-> +	priv->clk = devm_clk_get(&pdev->dev, NULL);
-> +	if (IS_ERR(priv->clk)) {
-> +		error = PTR_ERR(priv->clk);
-> +		goto out_reset_assert;
-> +	}
-> +
-> +	if (info->gptp_ref_clk) {
-> +		priv->gptp_clk = devm_clk_get(&pdev->dev, "gptp");
-> +		if (IS_ERR(priv->gptp_clk)) {
-> +			error = PTR_ERR(priv->gptp_clk);
-> +			goto out_reset_assert;
-> +		}
-> +	}
-> +
->  	priv->refclk = devm_clk_get_optional(&pdev->dev, "refclk");
->  	if (IS_ERR(priv->refclk)) {
->  		error = PTR_ERR(priv->refclk);
+Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+---
+ .../bindings/net/airoha,en8811h.yaml          | 42 +++++++++++++++++++
+ 1 file changed, 42 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/airoha,en8811h.yaml
 
-   Hmm... I think we currently have all these calls in one place.
-Perhaps you just shouldn't have moved this code around?
+diff --git a/Documentation/devicetree/bindings/net/airoha,en8811h.yaml b/Documentation/devicetree/bindings/net/airoha,en8811h.yaml
+new file mode 100644
+index 000000000000..96febd8ed6fa
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/airoha,en8811h.yaml
+@@ -0,0 +1,42 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/airoha,en8811h.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Airoha EN8811H PHY
++
++maintainers:
++  - Someone <someone@somemail.com>
++
++description:
++  Bindings for Airoha EN8811H PHY
++
++allOf:
++  - $ref: ethernet-phy.yaml#
++
++properties:
++  airoha,rx-pol-reverse:
++    type: boolean
++    description:
++      Reverse rx polarity of SERDES.
++
++
++  airoha,tx-pol-reverse:
++    type: boolean
++    description:
++      Reverse tx polarity of SERDES.
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    mdio {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        ethphy1: ethernet-phy@1 {
++                reg = <1>;
++                airoha,rx-pol-reverse;
++        };
++    };
+-- 
+2.42.1
 
-MBR, Sergey
 
