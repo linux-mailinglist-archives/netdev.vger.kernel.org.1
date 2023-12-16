@@ -1,161 +1,110 @@
-Return-Path: <netdev+bounces-58186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F361D8157E2
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 06:53:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CF99815801
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 07:23:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2364D1C24A57
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 05:53:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C88501C23ABA
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 06:23:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F51D125B7;
-	Sat, 16 Dec 2023 05:53:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="oKB1G3G8";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="R1vD17Wr";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="oKB1G3G8";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="R1vD17Wr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0502F12B68;
+	Sat, 16 Dec 2023 06:23:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from anchovy2.45ru.net.au (anchovy2.45ru.net.au [203.30.46.146])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F22217731;
-	Sat, 16 Dec 2023 05:53:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 8BF9E21E77;
-	Sat, 16 Dec 2023 05:53:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1702706011; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YSGP6I8Ny4OeE7XmI3QQ1QBFHyKnDzH7eeoRkwZqFOM=;
-	b=oKB1G3G8HeLTqaN9tm0hfaNUGJJN0KYA7gnHixOBz3qtXADal9sw93FB8i2xeAs7slkME1
-	Hsw010R9pZd5gmvbGTH4RhflIeiHf3ep2/ogz+EDmf2RLlMWQCiYrj0vcy7EUkehsyqqm0
-	//vPbf4rIErOAOZw8c1MTrro0rGEJYE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1702706011;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YSGP6I8Ny4OeE7XmI3QQ1QBFHyKnDzH7eeoRkwZqFOM=;
-	b=R1vD17Wr3gMiuQ3jYZCh8zNkFimr9RaTJlrA2ZcgHdb/OfhERUfbTgRAG0QMyAkp28emIp
-	UfQXMseGb0F1r3Ag==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1702706011; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YSGP6I8Ny4OeE7XmI3QQ1QBFHyKnDzH7eeoRkwZqFOM=;
-	b=oKB1G3G8HeLTqaN9tm0hfaNUGJJN0KYA7gnHixOBz3qtXADal9sw93FB8i2xeAs7slkME1
-	Hsw010R9pZd5gmvbGTH4RhflIeiHf3ep2/ogz+EDmf2RLlMWQCiYrj0vcy7EUkehsyqqm0
-	//vPbf4rIErOAOZw8c1MTrro0rGEJYE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1702706011;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YSGP6I8Ny4OeE7XmI3QQ1QBFHyKnDzH7eeoRkwZqFOM=;
-	b=R1vD17Wr3gMiuQ3jYZCh8zNkFimr9RaTJlrA2ZcgHdb/OfhERUfbTgRAG0QMyAkp28emIp
-	UfQXMseGb0F1r3Ag==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CFD491373E;
-	Sat, 16 Dec 2023 05:53:26 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id LYMDIVY7fWWXOQAAD6G6ig
-	(envelope-from <neilb@suse.de>); Sat, 16 Dec 2023 05:53:26 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0667F199AD
+	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 06:22:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=electromag.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=electromag.com.au
+Received: (qmail 2195 invoked by uid 5089); 16 Dec 2023 06:16:15 -0000
+Received: by simscan 1.2.0 ppid: 1962, pid: 1963, t: 0.4050s
+         scanners: regex: 1.2.0 attach: 1.2.0 clamav: 0.88.3/m:40/d:1950 spam: 3.1.4
+X-Spam-Level: 
+Received: from unknown (HELO ?192.168.1.24?) (rtresidd@electromag.com.au@202.90.244.20)
+  by anchovy3.45ru.net.au with ESMTPA; 16 Dec 2023 06:16:14 -0000
+Message-ID: <624fc854-a8cf-43d5-9be0-6c2c0dccad1f@electromag.com.au>
+Date: Sat, 16 Dec 2023 14:15:32 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "NeilBrown" <neilb@suse.de>
-To: Ahelenia =?utf-8?q?Ziemia=C5=84ska?= <nabijaczleweli@nabijaczleweli.xyz>
-Cc: "Trond Myklebust" <trond.myklebust@hammerspace.com>,
- "Anna Schumaker" <anna@kernel.org>, "Chuck Lever" <chuck.lever@oracle.com>,
- "Jeff Layton" <jlayton@kernel.org>, "Olga Kornievskaia" <kolga@netapp.com>,
- "Dai Ngo" <Dai.Ngo@oracle.com>, "Tom Talpey" <tom@talpey.com>,
- "David S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: sunrpc: sizeof('\0') is 4, not 1
-In-reply-to:
- <ikgsiev777wvypqueii5mcshrdeftme22stfvztonxbvcrf35l@tarta.nabijaczleweli.xyz>
-References: =?utf-8?q?=3C4zlmy3qwneijnrsbygfr2wbsnvdvcgvjyvudqnuxq5zvwmyaof?=
- =?utf-8?q?=40tarta=2Enabijaczleweli=2Exyz=3E=2C?=
- <170270083607.12910.2219100479356858889@noble.neil.brown.name>,
- <ikgsiev777wvypqueii5mcshrdeftme22stfvztonxbvcrf35l@tarta.nabijaczleweli.xyz>
-Date: Sat, 16 Dec 2023 16:53:23 +1100
-Message-id: <170270600360.12910.7954602598238459243@noble.neil.brown.name>
-X-Spam-Level: 
-Authentication-Results: smtp-out1.suse.de;
-	none
-X-Spam-Level: 
-X-Spam-Score: -1.30
-X-Spamd-Result: default: False [-1.30 / 50.00];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 NEURAL_HAM_SHORT(-0.20)[-0.999];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 BAYES_HAM(-0.00)[40.71%];
-	 ARC_NA(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 MIME_GOOD(-0.10)[text/plain];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 RCPT_COUNT_TWELVE(0.00)[15];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 RCVD_TLS_ALL(0.00)[]
-X-Spam-Flag: NO
+User-Agent: Mozilla Thunderbird
+Subject: Re: DSA tags seem to break checksum offloading on DWMAC100
+To: Romain Gantois <romain.gantois@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
+  Florian Fainelli <f.fainelli@gmail.com>,
+  Vladimir Oltean <olteanv@gmail.com>,
+  Alexandre Torgue <alexandre.torgue@foss.st.com>,
+  Jose Abreu <joabreu@synopsys.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+  Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+  Maxime Chevallier <maxime.chevallier@bootlin.com>,
+  Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+  Linus Walleij <linus.walleij@linaro.org>
+References: <c57283ed-6b9b-b0e6-ee12-5655c1c54495@bootlin.com>
+Content-Language: en-US
+From: Richard Tresidder <rtresidd@electromag.com.au>
+In-Reply-To: <c57283ed-6b9b-b0e6-ee12-5655c1c54495@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sat, 16 Dec 2023, Ahelenia Ziemia=C5=84ska wrote:
-> On Sat, Dec 16, 2023 at 03:27:16PM +1100, NeilBrown wrote:
-> > On Sat, 16 Dec 2023, Ahelenia Ziemia=C5=84ska wrote:
-> > > To make it self-documenting, the referenced commit added the space
-> > > for the null terminator as sizeof('\0'). The message elaborates on
-> > > why only one byte is needed, so this is clearly a mistake.
-> > > Spell it as 1 /* NUL */ instead.
-> > >=20
-> > > Fixes: commit 1e360a60b24a ("SUNRPC: Address  buffer overrun in
-> > >  rpc_uaddr2sockaddr()")
-> > It isn't clear to me that "Fixes" is appropriate as that patch isn't
-> > harmful, just confused and sub-optimal.
-> I definitely agree, I don't like Fixes here at all,
-> but I don't really see another trailer in the documentation
-> or in the log that could be used for this.
->=20
+On 15/12/2023 5:54 pm, Romain Gantois wrote:
 
-Make up a new Trailer?=20
+> A similar issue was just reported for a different MAC driver:
+>
+> https://lore.kernel.org/netdev/20231215-new-gemini-ethernet-regression-v1-2-93033544be23@linaro.org/T/#u
+>
+> Hello everyone,
+>
+> I was rebasing on net-next an out-of-tree stmmac driver for the RZN1 GMAC
+> IP, and I noticed that something broke all TCP transmissions going through the
+> GMAC1 Ethernet controller. This MAC controller was connected to a 88E6352
+> Marvell switch through its CPU port. Further investigation revealed that
+> egressing packets had an invalid TCP checksum, which caused them to be dropped
+> at the receiving side's kernel.
+>
+> A bisection on the transmitting side's kernel showed that the commit that caused
+> the bug was:
+>
+>      6b2c6e4a938f (net: stmmac: propagate feature flags to vlan, 2023-04-17)
+>
+> This stmmac patch makes it so that most of the feature flags of stmmac net
+> devices are copied to its vlan features. Some of these flags are then
+> transmitted to DSA user devices. The NETIF_F_IP_CSUM and NETIF_F_IPV6_CSUM flags
+> that control checksum offloading, are responsible for the bug.
+>
+> Relevant call chain:
+> dsa_user_xmit -> ...[packet is tagged] -> __dev_queue_xmit \
+> -> validate_xmit_skb and stmmac_xmit
+>
+> If checksum offloading is enabled, stmmac will set it in hardware at the
+> following location:
+>
+> https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/stmicro/stmmac/enh_desc.c#L322
+>
+> Then the hardware computes an incorrect checksum. I believe that this is caused
+> by the presence of DSA tags in the frames, although I can't be 100% sure of
+> this.
+>
+> So it seems like a solution is needed to prevent checksum offloading by Ethernet
+> drivers when DSA tags are in used. I'm not sure how this would be done, since
+> DSA is purposefully kept quite separate from CPU port drivers. What are your
+> thoughts on this?
+>
+> Best Regards,
+I'm working through a very similar issue in this conversation:
+https://lore.kernel.org/netdev/e5c6c75f-2dfa-4e50-a1fb-6bf4cdb617c2@electromag.com.au/
+It's the same commit that I found when bisecting that caused the issue.
+We have this same stmmac interfacing with a 88E6352 running with the DSA 
+driver.
 
-I would probably just write
+Cheers
+     Richard Tresidder
 
- To make it self-documenting,
-   commit 1e360a60b24a ("SUNRPC: Address  buffer overrun in rpc_uaddr2sockadd=
-r()")
- added the space for the null terminator as sizeof('\0') which is 4.  The com=
-mit
- elaborates on  why only one byte is needed, so this is clearly a mistake.
- Spell it as 1 /* NUL */ instead.
-=20
-NeilBrown
 
