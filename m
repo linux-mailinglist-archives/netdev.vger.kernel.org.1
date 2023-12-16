@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-58265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0FB6815B03
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 19:19:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 81205815B17
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 19:36:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 032791C2160C
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 18:19:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE0CF1C217E3
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 18:36:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D377C31739;
-	Sat, 16 Dec 2023 18:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2946A1E4A7;
+	Sat, 16 Dec 2023 18:36:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qTIBdmqu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="knEr4V0D"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98783066C
-	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 18:19:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D153EC433C7;
-	Sat, 16 Dec 2023 18:19:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EFB71E489
+	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 18:36:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AD6FC433C8;
+	Sat, 16 Dec 2023 18:36:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702750787;
-	bh=9GhNFtS7ftpmGcQln2/O3fa0QpAQ4hTvmG69X4+UJIg=;
+	s=k20201202; t=1702751770;
+	bh=nPux3DcNvKYPeaW0mzGJpfvBNYque5qaVeX651FcuNA=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=qTIBdmquM85HAtxSkWoadKv6nqxpnLxAM8bTiXgkIlTFSbOUETokdd4V7tBXsMZ/K
-	 952dpfbx3zPe/NdsXscK2EZVslYY+nhzNZq8/iyt0lsaQbDqXhjh9+Dau0zaiz7O9J
-	 GCwf89pAbUyUOgBfJFSGLNsweM1G1AU+TrLHoJgyxjwtO1zThHQNJ6Niq2KuYDmnES
-	 ofulHqt+Yx0s6MqYGkCUo59wz02ZX7lzkF7oPJXhqqlzB5TX0IW6rZxvwWXAOzUddD
-	 sh3jROhMsyzySb79qFS00gRnThD8wfdIw/R2d0PRPajDSVO8rTQhEfJZTbyHxnRlW6
-	 X/X73+zEZlJBw==
-Message-ID: <10569cc5-1624-4edf-88b9-ec9110c11890@kernel.org>
-Date: Sat, 16 Dec 2023 11:19:46 -0700
+	b=knEr4V0D1OJvUWVNjs02BxWCfXu+imap2LWhTMY6LqyraKDJKIvB+WlzB7FbU8LdY
+	 +JSvGjtfWkGInsfe5XPQOfEB8+8moQp1aRSKuGZoHa7y7myQZz9S/prmwyyuFxwGG1
+	 ttuOfNSQx4YJIa2XUfKZQ9SCUNvmzRkZRT8bTTo7DP/pGuu5ObFQjcH6A2kO3ns7kS
+	 8ENMyWwsZ35lqf3H1v6OmMXq33WDC6xVeN8IJWJpRAZL7B4cQCINqi+5eEeFzbwmRG
+	 iDOtaBPIWPb6UlJy39uWE6Aqs/8fAAfIyRj1RbPy7BdlqjQtjm5n8MkquiDwq8U+Jy
+	 q25rPRFYwEQ4w==
+Message-ID: <e587f26f-f003-4730-acb0-cecb2a5a83f2@kernel.org>
+Date: Sat, 16 Dec 2023 11:36:09 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,64 +41,154 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] RFC: net: ipconfig: temporarily bring interface down when
- changing MTU.
+Subject: Re: [PATCH net-next v3 1/2] net/ipv6: insert a f6i to a GC list only
+ if the f6i is in a fib6_table tree.
 Content-Language: en-US
-To: Graeme Smecher <gsmecher@threespeedlogic.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- claudiu.beznea@tuxon.dev, nicolas.ferre@microchip.com, mdf@kernel.org
-References: <58519bfa-260c-4745-a145-fdca89b4e9d1@kernel.org>
- <20231216010431.84776-1-gsmecher@threespeedlogic.com>
+To: Kui-Feng Lee <sinquersw@gmail.com>, thinker.li@gmail.com,
+ netdev@vger.kernel.org, martin.lau@linux.dev, kernel-team@meta.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+Cc: kuifeng@meta.com, syzbot+c15aa445274af8674f41@syzkaller.appspotmail.com
+References: <20231213213735.434249-1-thinker.li@gmail.com>
+ <20231213213735.434249-2-thinker.li@gmail.com>
+ <28f016bc-3514-444f-82df-719aeb2d013a@kernel.org>
+ <185a3177-3281-4ead-838e-6d621151ea36@gmail.com>
 From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20231216010431.84776-1-gsmecher@threespeedlogic.com>
+In-Reply-To: <185a3177-3281-4ead-838e-6d621151ea36@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 12/15/23 5:04 PM, Graeme Smecher wrote:
-\> diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
-> index c56b6fe6f0d7..69c2a41393a0 100644
-> --- a/net/ipv4/ipconfig.c
-> +++ b/net/ipv4/ipconfig.c
-> @@ -396,9 +396,21 @@ static int __init ic_setup_if(void)
->  	 */
->  	if (ic_dev_mtu != 0) {
->  		rtnl_lock();
-> -		if ((err = dev_set_mtu(ic_dev->dev, ic_dev_mtu)) < 0)
-> -			pr_err("IP-Config: Unable to set interface mtu to %d (%d)\n",
-> -			       ic_dev_mtu, err);
-> +		/* Some Ethernet adapters only allow MTU to change when down. */
-> +		if((err = dev_change_flags(ic_dev->dev, ic_dev->dev->flags | IFF_UP, NULL)))
+On 12/15/23 11:12 AM, Kui-Feng Lee wrote:
+> 
+> I tried to reproduce the issue yesterday, according to the hypothesis
+> behind the patch of this thread. The following is the instructions
+> to reproduce the UAF issue. However, this instruction doesn't create
+> a crash at the place since the memory is still available even it has
+> been free. But, the log shows a UAF.
+> 
+> The patch at the end of this message is required to reproduce and
+> show UAF. The most critical change in the patch is to insert
+> a 'mdelay(3000)' to sleep 3s in rt6_route_rcv(). That gives us
+> a chance to manipulate the kernel to reproduce the UAF.
+> 
+> Here is my conclusion. There is no protection between finding
+> a route and changing the route in rt6_route_rcv(), including inserting
+> the entry to the gc list. It is possible to insert an entry that will be
+> free later to the gc list, causing a UAF. There is more explanations
+> along with the following logs.
 
-IFF_UP?
+TL;DR: I think 3dec89b14d37 should be reverted for 6.6 and 6.7
+(selftests should be valid with or without this change) and you try
+again for 6.9 (6.7 dev cycle is about to close).
 
-> +			pr_err("IP-Config: About to set MTU, but failed to "
-> +				 "bring interface %s down! (%d)\n",
-> +				 ic_dev->dev->name, err);
-> +		else {
-> +			if ((err = dev_set_mtu(ic_dev->dev, ic_dev_mtu)) < 0)
+###
 
-try to set the MTU even if DOWN fails otherwise a regression.
+I was successful in triggering UAF twice yesterday, but a slightly
+different code path that in Eric's trace:
+
+This is the WARN_ON for !hlist_unhashed in fib6_info_release:
+
+[   46.926339] ------------[ cut here ]------------
+[   46.926368] WARNING: CPU: 3 PID: 0 at include/net/ip6_fib.h:332
+fib6_info_release+0x2a/0x43
+[   46.926384] Modules linked in:
+[   46.926393] CPU: 3 PID: 0 Comm: swapper/3 Not tainted
+6.7.0-rc4-debug+ #16
+[   46.926399] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
+1.15.0-1 04/01/2014
+[   46.926404] RIP: 0010:fib6_info_release+0x2a/0x43
+[   46.926409] Code: 48 85 ff 74 3d 55 48 89 e5 53 48 89 fb 48 8d 7f 2c
+e8 3e ff ff ff 84 c0 74 25 48 8d 7b 40 e8 33 11 8b ff 48 83 7b 40 00 74
+02 <0f> 0b 48 8d bb a0 00 00 00 48 c7 c6 93 ea ae 81 e8 3f 00 66 ff 5b
+[   46.926416] RSP: 0018:ffffc900002a8390 EFLAGS: 00010282
+[   46.926422] RAX: 1ffff11002048b00 RBX: ffff888010245c00 RCX:
+ffffffff81af8c9e
+[   46.926426] RDX: dffffc0000000000 RSI: 0000000000000004 RDI:
+ffff888010245c40
+[   46.926431] RBP: ffffc900002a8398 R08: ffffed1002048b86 R09:
+0000000000000001
+[   46.926435] R10: ffffffff81af8be4 R11: ffff888010245c2f R12:
+ffff88800aeec000
+[   46.926439] R13: 0000000000000000 R14: ffff88801ab7c200 R15:
+0000000000000020
+[   46.926444] FS:  0000000000000000(0000) GS:ffff88806c000000(0000)
+knlGS:0000000000000000
+[   46.926448] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   46.926452] CR2: 00007f897cc95fb0 CR3: 000000001d69d000 CR4:
+0000000000750ef0
+[   46.926458] PKRU: 55555554
+[   46.926462] Call Trace:
+[   46.926466]  <IRQ>
+[   46.926470]  ? show_regs+0x5c/0x60
+[   46.926478]  ? fib6_info_release+0x2a/0x43
+[   46.926483]  ? __warn+0xcb/0x19c
+[   46.926489]  ? fib6_info_release+0x2a/0x43
+[   46.926495]  ? report_bug+0x114/0x186
+[   46.926504]  ? handle_bug+0x40/0x6b
+[   46.926510]  ? exc_invalid_op+0x19/0x41
+[   46.926515]  ? asm_exc_invalid_op+0x1b/0x20
+[   46.926524]  ? refcount_dec_and_test+0x15/0x43
+[   46.926530]  ? fib6_info_release+0x23/0x43
+[   46.926536]  ? fib6_info_release+0x2a/0x43
+[   46.926542]  ndisc_router_discovery+0xf41/0xfa6
 
 
-> +				pr_err("IP-Config: Unable to set interface mtu to %d (%d)\n",
-> +				       ic_dev_mtu, err);
-> +
-> +			if((err = dev_change_flags(ic_dev->dev, ic_dev->dev->flags | IFF_UP, NULL)))
-> +				pr_err("IP-Config: Trying to set MTU, but unable "
-> +					 "to bring interface %s back up! (%d)\n",
+UAF here:
+
+[   47.941928]
+==================================================================
+[   47.942548] BUG: KASAN: slab-use-after-free in
+fib6_gc_all.constprop.0+0x19b/0x294
+[   47.943178] Read of size 8 at addr ffff888010245c38 by task swapper/3/0
+
+[   47.943866] CPU: 3 PID: 0 Comm: swapper/3 Tainted: G        W
+ 6.7.0-rc4-debug+ #16
+[   47.944548] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
+1.15.0-1 04/01/2014
+[   47.945204] Call Trace:
+[   47.945416]  <IRQ>
+[   47.945595]  dump_stack_lvl+0x5b/0x82
+[   47.945912]  print_address_description.constprop.0+0x7a/0x2eb
+[   47.946391]  print_report+0x106/0x1e0
+[   47.946703]  ? virt_to_slab+0x9/0x1a
+[   47.947007]  ? kmem_cache_debug_flags+0x13/0x1f
+[   47.947392]  ? kasan_complete_mode_report_info+0x19e/0x1a1
+[   47.947850]  ? fib6_gc_all.constprop.0+0x19b/0x294
+[   47.948254]  kasan_report+0x99/0xc4
+[   47.948554]  ? fib6_gc_all.constprop.0+0x19b/0x294
+[   47.948962]  __asan_load8+0x77/0x79
+[   47.949262]  fib6_gc_all.constprop.0+0x19b/0x294
 
 
-This step is not "trying to set MTU"; the last one did:
+for a route added here:
 
-pr_err("IP-Config: Failed to bring interface %s up after changing MTU
-(%d)\n",
+[   47.970092] Allocated by task 0:
+[   47.970366]  stack_trace_save+0x8d/0xbb
+[   47.970373]  kasan_save_stack+0x26/0x46
+[   47.970379]  kasan_set_track+0x25/0x2b
+[   47.970385]  kasan_save_alloc_info+0x1e/0x21
+[   47.970392]  ____kasan_kmalloc+0x6f/0x7b
+[   47.970398]  __kasan_kmalloc+0x9/0xb
+[   47.970404]  __kmalloc+0x91/0xbf
+[   47.970411]  kzalloc+0xf/0x11
+[   47.970416]  fib6_info_alloc+0x26/0xa1
+[   47.970422]  ip6_route_info_create+0x266/0x6c5
+[   47.970428]  ip6_route_add+0x14/0x46
+[   47.970433]  rt6_add_dflt_router+0x123/0x1bd
+[   47.970439]  ndisc_router_discovery+0x5a4/0xfa6
+[   47.970447]  ndisc_rcv+0x1a2/0x1b5
 
-> +					 ic_dev->dev->name, err);
-> +		}
->  		rtnl_unlock();
->  	}
->  	return 0;
+This is just aggressive RA's and aggressive gc with a hack to the stack
+to toggle lifetime or metric on every RA (something that can be scripted
+with an ra command - set and reset lifetime in every other RA and change
+the metric in every RA).
 
+I was targeting this code path because I noticed rt6_add_dflt_router
+sets RTF_EXPIRES but does not pass in the expires value. There are races
+(like the one you found with a different code path) in the handling of
+RTF_EXPIRES, setting the timer, running gc and adding the route entry to
+the gc list.
+
+In short there are a number of places in the RA path that need the
+lifetime handling cleaned up first to make it all consistent with the
+idea of using a linked list to track entries with an expires tag.
 
