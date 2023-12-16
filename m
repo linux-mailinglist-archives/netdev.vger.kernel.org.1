@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-58294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5D26815BBB
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 21:44:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09DA9815BBC
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 21:44:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 471351F229FF
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 20:44:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3177284B47
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 20:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E8E415AD2;
-	Sat, 16 Dec 2023 20:44:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 186FF321A5;
+	Sat, 16 Dec 2023 20:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="QHIcYER9"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="lfQwmNey"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F4E1DFDA
-	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 20:44:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89ACF1E490
+	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 20:44:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-2031b9c8389so1325989fac.1
-        for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 12:44:44 -0800 (PST)
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-5bdb0be3591so1488199a12.2
+        for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 12:44:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1702759483; x=1703364283; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ybN/JQklFxxdvbFcBG4Es2B5/vNf6JnHtZJeVvDftTs=;
-        b=QHIcYER9Vp3rlzGLhWuxn1xYemBN7USeWW2ov7ALw7anbNaaP1ItiGVlGry67HYrK6
-         G6+yIhBh8nejVnQsehlhFckqV3ULFuID9yHOz2UP/WhZhEzr5XQ8u/QqBkwfzyiB23Y5
-         rksL7ca2oSBLMz3qZLXZ/hOXUNREG1H1UqtxUoK8OOnrRndI92SpgRLxnw8PVDvwyxTh
-         G3shtEx7OUa/CAttWXMjvLCvTlS31H2Z5trdH+i33hNMPn6DAkOGwJXr78mkLeZNBx5H
-         6qx7QW0QIz1cGO9Q72eaz/B7GGA9lZMceePu39TW6jgSRwIGT55y/izxy/lPDS6gnm3Q
-         NU+Q==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1702759487; x=1703364287; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Of6J+086OPjEIj9keVzyqTPwLJ+HMrnbr9lLx0QxZhc=;
+        b=lfQwmNey8F3iWB8i4CY77vqRk899xCjzVdXp6GWYuAe2/PyeDbe2rTbzAy7xj8vrFA
+         H2cOEn2lGYPVr7wJseCXnzOH0372+4M14XONqO2VNWLJ1Hb1iXZQFA8mllQ6149GR1l2
+         KUx1OWvrxFqnVCT7lL8Ha4I+tdcMXw7xKBNWi/u4WJ/jvDjTQsAF4QG74kFGGjdFr0YS
+         0BFnHHm6gt/0noYEoB39HqtmasUfBAyVV1FGtg+e77WQit59D6xwR6LGCgPFgJuy11SJ
+         L6vKQ2U5Ja2lr10UWjL5lGNhvuTjKRCC8Jpm++Bl4oWooTJDvWJkmNvE6VsgnWAdmQzs
+         jlPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702759483; x=1703364283;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ybN/JQklFxxdvbFcBG4Es2B5/vNf6JnHtZJeVvDftTs=;
-        b=GpPGwnUFJKnEfHxWu0kbNpy1okeykn/egOhR4UmynMFdlqCAqaDfBg4/jHZyDWshJl
-         G+sEjJmrJB3A8fcR+To1D1DhvZq4kO5wPh288mMRJFZ6N+EmkiDBIuSC2kI+enqzwSWO
-         iZ6Qt9zItJ7E8+1uDcXbvJhgt492MquhzLdBUOzeUmWmn4CXp0P8q0K88nn+pZ4JiPFK
-         7obzD6HE5uaCxdAGYo85JEDtcapDhlsFnsa1nBCtK5ojB8OQwgizkYwdzwTKEJmLyzwL
-         487gDgsw2IM9QjDYx6U+p7I7QaavIV8oQLJRND6GWssGrzCvXDN59LgUhJp0x9L0ZIZN
-         ujwA==
-X-Gm-Message-State: AOJu0YzCr83ueYm3Q6htaB795TB/MH2BPHw8Yf1VX9WpmfvE2Wx8vRvf
-	2jLw0OwlrMHC+6A1lX0WNN27Ug==
-X-Google-Smtp-Source: AGHT+IFS+D7hlgHMH9sAM++x5AYwE83AGRQcAr/xbc7bmuINTK8pJP72qUuiI6LP/a5rxdqYqmX+Cw==
-X-Received: by 2002:a05:6870:2803:b0:1fb:64:1b25 with SMTP id gz3-20020a056870280300b001fb00641b25mr17527329oab.24.1702759483328;
-        Sat, 16 Dec 2023 12:44:43 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702759487; x=1703364287;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Of6J+086OPjEIj9keVzyqTPwLJ+HMrnbr9lLx0QxZhc=;
+        b=glBCJLh3usY2rzzP4vnnoMZ9V0NfN2Xc1BFp57yL8KF9qFbf2ao0PkwdP9eIyc2Gpb
+         rsZBmsFNZwwLOesiP7etZYuS6dXhLLdF10xcsuAsCO1XQ4hlAHzE7FV6xsiqX3PT8VUH
+         W6uXNtUxUwmQXl4QysKBjvsNsntKDmWV8/lPidshMnkrlzz1cKvxcjIC2DwzgUq6wI+x
+         zQf7sepHxAJ+bBBGd0j3bTAC65qOaRd9TRVDkgk28mSKsAIy1wklSNSqOe4d9KnCnoPT
+         IH44j4CoyefHZOdKaGC9tsSe25r79Ap/wOLmXxbOgcm4j4LA8U9lkNw7uW2TTicCbMLL
+         yRpg==
+X-Gm-Message-State: AOJu0YyrMSVuQFE8cojegJ/aJrYT8XwG3feajML2BohRY4ZIIpu6eznA
+	2tEkJh7HqKXUVkPnRFMxmtpDzw==
+X-Google-Smtp-Source: AGHT+IHE979GmK7E7xv7s81+MfVFrSzG8Scjk0zTxmQBuos7gERa5mKs3KaHE0yJiguQzQqhnQgiXA==
+X-Received: by 2002:a05:6a21:186:b0:194:2c8b:8ba1 with SMTP id le6-20020a056a21018600b001942c8b8ba1mr814661pzb.58.1702759486836;
+        Sat, 16 Dec 2023 12:44:46 -0800 (PST)
 Received: from localhost.localdomain ([2804:7f1:e2c0:60e3:4c1:486f:7eda:5fb5])
-        by smtp.gmail.com with ESMTPSA id y13-20020a17090a390d00b0028b5739c927sm1380343pjb.34.2023.12.16.12.44.39
+        by smtp.gmail.com with ESMTPSA id y13-20020a17090a390d00b0028b5739c927sm1380343pjb.34.2023.12.16.12.44.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Dec 2023 12:44:42 -0800 (PST)
+        Sat, 16 Dec 2023 12:44:46 -0800 (PST)
 From: Victor Nogueira <victor@mojatatu.com>
 To: jhs@mojatatu.com,
 	xiyou.wangcong@gmail.com,
@@ -69,10 +70,12 @@ To: jhs@mojatatu.com,
 Cc: dcaratti@redhat.com,
 	netdev@vger.kernel.org,
 	kernel@mojatatu.com
-Subject: [PATCH net-next v5 0/3] net: sched: Make tc-related drop reason more flexible for remaining qdiscs
-Date: Sat, 16 Dec 2023 17:44:33 -0300
-Message-ID: <20231216204436.3712716-1-victor@mojatatu.com>
+Subject: [PATCH net-next v5 1/3] net: sched: Move drop_reason to struct tc_skb_cb
+Date: Sat, 16 Dec 2023 17:44:34 -0300
+Message-ID: <20231216204436.3712716-2-victor@mojatatu.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20231216204436.3712716-1-victor@mojatatu.com>
+References: <20231216204436.3712716-1-victor@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,48 +84,200 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch builds on Daniel's patch[1] to add initial support of tc drop
-reason. The main goal is to distinguish between policy and error drops for
-the remainder of the egress qdiscs (other than clsact).
-The drop reason is set by cls_api and act_api in the tc skb cb in case
-any error occurred in the data path.
+Move drop_reason from struct tcf_result to skb cb - more specifically to
+struct tc_skb_cb. With that, we'll be able to also set the drop reason for
+the remaining qdiscs (aside from clsact) that do not have access to
+tcf_result when time comes to set the skb drop reason.
 
-Also add new skb drop reasons that are idiosyncratic to TC.
+Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+Acked-by: Daniel Borkmann <daniel@iogearbox.net>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+ include/net/pkt_cls.h     | 14 ++++++++++++--
+ include/net/pkt_sched.h   |  3 ++-
+ include/net/sch_generic.h |  1 -
+ net/core/dev.c            |  4 ++--
+ net/sched/act_api.c       |  2 +-
+ net/sched/cls_api.c       | 23 ++++++++---------------
+ 6 files changed, 25 insertions(+), 22 deletions(-)
 
-[1] https://lore.kernel.org/all/20231009092655.22025-1-daniel@iogearbox.net
-
-Changes in V5:
-- Drop "EXT_" from cookie error's drop reason name in doc
-
-Changes in V4:
-- Condense all the cookie drop reasons into one
-
-Changes in V3:
-- Removed duplicate assignment
-- Rename function tc_skb_cb_drop_reason to tcf_get_drop_reason
-- Move zone field upwards in struct tc_skb_cb to move hole to the end of 
-  the struct
-
-Changes in V2:
-- Dropped RFC tag
-- Removed check for drop reason being overwritten by filter in cls_api.c
-- Simplified logic and removed function tcf_init_drop_reason
-
-Victor Nogueira (3):
-  net: sched: Move drop_reason to struct tc_skb_cb
-  net: sched: Make tc-related drop reason more flexible for remaining
-    qdiscs
-  net: sched: Add initial TC error skb drop reasons
-
- include/net/dropreason-core.h | 18 +++++++++++++++---
- include/net/pkt_cls.h         |  6 ------
- include/net/pkt_sched.h       | 18 ------------------
- include/net/sch_generic.h     | 32 +++++++++++++++++++++++++++++++-
- net/core/dev.c                | 11 +++++++----
- net/sched/act_api.c           |  3 ++-
- net/sched/cls_api.c           | 31 +++++++++++++++----------------
- 7 files changed, 70 insertions(+), 49 deletions(-)
-
+diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+index a76c9171db0e..761e4500cca0 100644
+--- a/include/net/pkt_cls.h
++++ b/include/net/pkt_cls.h
+@@ -154,10 +154,20 @@ __cls_set_class(unsigned long *clp, unsigned long cl)
+ 	return xchg(clp, cl);
+ }
+ 
+-static inline void tcf_set_drop_reason(struct tcf_result *res,
++struct tc_skb_cb;
++
++static inline struct tc_skb_cb *tc_skb_cb(const struct sk_buff *skb);
++
++static inline enum skb_drop_reason
++tcf_get_drop_reason(const struct sk_buff *skb)
++{
++	return tc_skb_cb(skb)->drop_reason;
++}
++
++static inline void tcf_set_drop_reason(const struct sk_buff *skb,
+ 				       enum skb_drop_reason reason)
+ {
+-	res->drop_reason = reason;
++	tc_skb_cb(skb)->drop_reason = reason;
+ }
+ 
+ static inline void
+diff --git a/include/net/pkt_sched.h b/include/net/pkt_sched.h
+index 9fa1d0794dfa..9b559aa5c079 100644
+--- a/include/net/pkt_sched.h
++++ b/include/net/pkt_sched.h
+@@ -277,12 +277,13 @@ static inline void skb_txtime_consumed(struct sk_buff *skb)
+ 
+ struct tc_skb_cb {
+ 	struct qdisc_skb_cb qdisc_cb;
++	u32 drop_reason;
+ 
++	u16 zone; /* Only valid if post_ct = true */
+ 	u16 mru;
+ 	u8 post_ct:1;
+ 	u8 post_ct_snat:1;
+ 	u8 post_ct_dnat:1;
+-	u16 zone; /* Only valid if post_ct = true */
+ };
+ 
+ static inline struct tc_skb_cb *tc_skb_cb(const struct sk_buff *skb)
+diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+index dcb9160e6467..c499b56bb215 100644
+--- a/include/net/sch_generic.h
++++ b/include/net/sch_generic.h
+@@ -332,7 +332,6 @@ struct tcf_result {
+ 		};
+ 		const struct tcf_proto *goto_tp;
+ 	};
+-	enum skb_drop_reason		drop_reason;
+ };
+ 
+ struct tcf_chain;
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 0432b04cf9b0..16af89a733e4 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -3923,14 +3923,14 @@ static int tc_run(struct tcx_entry *entry, struct sk_buff *skb,
+ 
+ 	tc_skb_cb(skb)->mru = 0;
+ 	tc_skb_cb(skb)->post_ct = false;
+-	res.drop_reason = *drop_reason;
++	tcf_set_drop_reason(skb, *drop_reason);
+ 
+ 	mini_qdisc_bstats_cpu_update(miniq, skb);
+ 	ret = tcf_classify(skb, miniq->block, miniq->filter_list, &res, false);
+ 	/* Only tcf related quirks below. */
+ 	switch (ret) {
+ 	case TC_ACT_SHOT:
+-		*drop_reason = res.drop_reason;
++		*drop_reason = tcf_get_drop_reason(skb);
+ 		mini_qdisc_qstats_cpu_drop(miniq);
+ 		break;
+ 	case TC_ACT_OK:
+diff --git a/net/sched/act_api.c b/net/sched/act_api.c
+index 3a7770eff52d..db500aa9f841 100644
+--- a/net/sched/act_api.c
++++ b/net/sched/act_api.c
+@@ -1119,7 +1119,7 @@ int tcf_action_exec(struct sk_buff *skb, struct tc_action **actions,
+ 			}
+ 		} else if (TC_ACT_EXT_CMP(ret, TC_ACT_GOTO_CHAIN)) {
+ 			if (unlikely(!rcu_access_pointer(a->goto_chain))) {
+-				tcf_set_drop_reason(res, SKB_DROP_REASON_TC_ERROR);
++				tcf_set_drop_reason(skb, SKB_DROP_REASON_TC_ERROR);
+ 				return TC_ACT_SHOT;
+ 			}
+ 			tcf_action_goto_chain_exec(a, res);
+diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+index dc1c19a25882..199406e4bcdd 100644
+--- a/net/sched/cls_api.c
++++ b/net/sched/cls_api.c
+@@ -1657,7 +1657,6 @@ static inline int __tcf_classify(struct sk_buff *skb,
+ 				 int act_index,
+ 				 u32 *last_executed_chain)
+ {
+-	u32 orig_reason = res->drop_reason;
+ #ifdef CONFIG_NET_CLS_ACT
+ 	const int max_reclassify_loop = 16;
+ 	const struct tcf_proto *first_tp;
+@@ -1682,13 +1681,13 @@ static inline int __tcf_classify(struct sk_buff *skb,
+ 			 */
+ 			if (unlikely(n->tp != tp || n->tp->chain != n->chain ||
+ 				     !tp->ops->get_exts)) {
+-				tcf_set_drop_reason(res, SKB_DROP_REASON_TC_ERROR);
++				tcf_set_drop_reason(skb, SKB_DROP_REASON_TC_ERROR);
+ 				return TC_ACT_SHOT;
+ 			}
+ 
+ 			exts = tp->ops->get_exts(tp, n->handle);
+ 			if (unlikely(!exts || n->exts != exts)) {
+-				tcf_set_drop_reason(res, SKB_DROP_REASON_TC_ERROR);
++				tcf_set_drop_reason(skb, SKB_DROP_REASON_TC_ERROR);
+ 				return TC_ACT_SHOT;
+ 			}
+ 
+@@ -1712,18 +1711,12 @@ static inline int __tcf_classify(struct sk_buff *skb,
+ 			goto reset;
+ 		}
+ #endif
+-		if (err >= 0) {
+-			/* Policy drop or drop reason is over-written by
+-			 * classifiers with a bogus value(0) */
+-			if (err == TC_ACT_SHOT &&
+-			    res->drop_reason == SKB_NOT_DROPPED_YET)
+-				tcf_set_drop_reason(res, orig_reason);
++		if (err >= 0)
+ 			return err;
+-		}
+ 	}
+ 
+ 	if (unlikely(n)) {
+-		tcf_set_drop_reason(res, SKB_DROP_REASON_TC_ERROR);
++		tcf_set_drop_reason(skb, SKB_DROP_REASON_TC_ERROR);
+ 		return TC_ACT_SHOT;
+ 	}
+ 
+@@ -1735,7 +1728,7 @@ static inline int __tcf_classify(struct sk_buff *skb,
+ 				       tp->chain->block->index,
+ 				       tp->prio & 0xffff,
+ 				       ntohs(tp->protocol));
+-		tcf_set_drop_reason(res, SKB_DROP_REASON_TC_ERROR);
++		tcf_set_drop_reason(skb, SKB_DROP_REASON_TC_ERROR);
+ 		return TC_ACT_SHOT;
+ 	}
+ 
+@@ -1773,7 +1766,7 @@ int tcf_classify(struct sk_buff *skb,
+ 				n = tcf_exts_miss_cookie_lookup(ext->act_miss_cookie,
+ 								&act_index);
+ 				if (!n) {
+-					tcf_set_drop_reason(res, SKB_DROP_REASON_TC_ERROR);
++					tcf_set_drop_reason(skb, SKB_DROP_REASON_TC_ERROR);
+ 					return TC_ACT_SHOT;
+ 				}
+ 
+@@ -1784,7 +1777,7 @@ int tcf_classify(struct sk_buff *skb,
+ 
+ 			fchain = tcf_chain_lookup_rcu(block, chain);
+ 			if (!fchain) {
+-				tcf_set_drop_reason(res, SKB_DROP_REASON_TC_ERROR);
++				tcf_set_drop_reason(skb, SKB_DROP_REASON_TC_ERROR);
+ 				return TC_ACT_SHOT;
+ 			}
+ 
+@@ -1806,7 +1799,7 @@ int tcf_classify(struct sk_buff *skb,
+ 
+ 			ext = tc_skb_ext_alloc(skb);
+ 			if (WARN_ON_ONCE(!ext)) {
+-				tcf_set_drop_reason(res, SKB_DROP_REASON_TC_ERROR);
++				tcf_set_drop_reason(skb, SKB_DROP_REASON_TC_ERROR);
+ 				return TC_ACT_SHOT;
+ 			}
+ 
 -- 
 2.25.1
 
