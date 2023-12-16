@@ -1,54 +1,37 @@
-Return-Path: <netdev+bounces-58196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B247D815848
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 08:38:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2A5381584A
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 08:40:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7A1C1C248D3
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 07:38:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A00C5287B83
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 07:40:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91924134D7;
-	Sat, 16 Dec 2023 07:38:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QiDW06Er"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6634E134C0;
+	Sat, 16 Dec 2023 07:40:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADDAD6FAA;
-	Sat, 16 Dec 2023 07:38:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BG7XqhJ014419;
-	Sat, 16 Dec 2023 07:38:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=ndYd+Iu1vbd/bN6oLMb7dJWtSKVu7rA8gkPyWVZ0MI8=; b=Qi
-	DW06Ern132uckvBCXfh1b9fzuQcoZR2OcbeU9Etm/66IQaYqAZ3ZBB55zBdsnMjl
-	AlmhfWVK511uG898V4LBdUIoMoATO1PYFxX12Ef6cwt5D2dWQIvmNSg/IqJgTXLL
-	xN7XX51aGpgq/1vXO4hx5U3qLI5HmzAwsCmfttI01nv1I52gpjbNbWtb7C5ou0VO
-	iWhJiu6fgj5N7+IlGfgQhkmZZzmpMwL4B7xJilUcEaAxR52X9h2aub7Tbl512/NX
-	nwDQAX/i9loUd5ekGw8Go0B3uGwuAGPWOZ9QWmQECgeJd7zQRlVE225QJcSUudk3
-	c789TAwnCIffOPOHkPBg==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3v1531r62x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 16 Dec 2023 07:38:00 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BG7bxXC027203
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 16 Dec 2023 07:37:59 GMT
-Received: from [10.253.9.247] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 15 Dec
- 2023 23:37:55 -0800
-Message-ID: <a9798333-3105-422f-8033-76c0b1d4f439@quicinc.com>
-Date: Sat, 16 Dec 2023 15:37:52 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3ABA111A6
+	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 07:40:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4SsdKL6X9KzMnrj;
+	Sat, 16 Dec 2023 15:40:06 +0800 (CST)
+Received: from canpemm500010.china.huawei.com (unknown [7.192.105.118])
+	by mail.maildlp.com (Postfix) with ESMTPS id 857441800CB;
+	Sat, 16 Dec 2023 15:40:17 +0800 (CST)
+Received: from [10.174.176.93] (10.174.176.93) by
+ canpemm500010.china.huawei.com (7.192.105.118) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sat, 16 Dec 2023 15:40:16 +0800
+Message-ID: <7a7bc7ff-8705-4a6b-ab48-42a396ce4aec@huawei.com>
+Date: Sat, 16 Dec 2023 15:40:16 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,167 +39,110 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 14/14] dt-bindings: net: ar803x: add qca8084 PHY
- properties
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <corbet@lwn.net>,
-        <p.zabel@pengutronix.de>, <f.fainelli@gmail.com>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
-References: <20231215074005.26976-1-quic_luoj@quicinc.com>
- <20231215074005.26976-15-quic_luoj@quicinc.com>
- <60b9081c-76fa-4122-b7ae-5c3dcf7229f9@lunn.ch>
- <a65ad12d-b990-4439-b196-903f4a5f096a@quicinc.com>
- <f5c5cbce-c36e-498a-97e2-35f06d927d74@lunn.ch>
-Content-Language: en-US
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <f5c5cbce-c36e-498a-97e2-35f06d927d74@lunn.ch>
+Subject: Re: [PATCH net v2] net: check vlan filter feature in
+ vlan_vids_add_by_dev() and vlan_vids_del_by_dev()
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<jiri@resnulli.us>, <vladimir.oltean@nxp.com>, <andrew@lunn.ch>,
+	<d-tatianin@yandex-team.ru>, <justin.chen@broadcom.com>,
+	<rkannoth@marvell.com>, <idosch@nvidia.com>, <jdamato@fastly.com>,
+	<netdev@vger.kernel.org>
+References: <20231213040641.2653812-1-liujian56@huawei.com>
+ <20231214183631.578f374b@kernel.org>
+From: "liujian (CE)" <liujian56@huawei.com>
+In-Reply-To: <20231214183631.578f374b@kernel.org>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: yaqN3gKkiwOCxb0oIMz_hdARHIPkCsMv
-X-Proofpoint-ORIG-GUID: yaqN3gKkiwOCxb0oIMz_hdARHIPkCsMv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- phishscore=0 spamscore=0 clxscore=1015 mlxscore=0 mlxlogscore=999
- lowpriorityscore=0 adultscore=0 impostorscore=0 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2312160056
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ canpemm500010.china.huawei.com (7.192.105.118)
 
 
 
-On 12/15/2023 9:31 PM, Andrew Lunn wrote:
-> On Fri, Dec 15, 2023 at 08:33:00PM +0800, Jie Luo wrote:
+在 2023/12/15 10:36, Jakub Kicinski 写道:
+> On Wed, 13 Dec 2023 12:06:41 +0800 Liu Jian wrote:
+>> I got the bleow warning trace:
+> 
+> s/bleow/below/
+> 
+>> WARNING: CPU: 4 PID: 4056 at net/core/dev.c:11066 unregister_netdevice_many_notify
+>> CPU: 4 PID: 4056 Comm: ip Not tainted 6.7.0-rc4+ #15
+>> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+>> RIP: 0010:unregister_netdevice_many_notify+0x9a4/0x9b0
+>> Call Trace:
+>>   rtnl_dellink
+>>   rtnetlink_rcv_msg
+>>   netlink_rcv_skb
+>>   netlink_unicast
+>>   netlink_sendmsg
+>>   __sock_sendmsg
+>>   ____sys_sendmsg
+>>   ___sys_sendmsg
+>>   __sys_sendmsg
+>>   do_syscall_64
+>>   entry_SYSCALL_64_after_hwframe
 >>
+>> It can be repoduced via:
 >>
->> On 12/15/2023 8:12 PM, Andrew Lunn wrote:
->>>> +  clocks:
->>>> +    items:
->>>> +      - description: APB bridge clock
->>>> +      - description: AHB clock
->>>> +      - description: Security control clock
->>>> +      - description: TLMM clock
->>>> +      - description: TLMM AHB clock
->>>> +      - description: CNOC AHB clock
->>>> +      - description: MDIO AHB clock
->>>> +      - description: MDIO master AHB clock
->>>> +      - description: PCS0 system clock
->>>> +      - description: PCS1 system clock
->>>> +      - description: EPHY0 system clock
->>>> +      - description: EPHY1 system clock
->>>> +      - description: EPHY2 system clock
->>>> +      - description: EPHY3 system clock
+>>      ip netns add ns1
+>>      ip netns exec ns1 ip link add bond0 type bond mode 0
+>>      ip netns exec ns1 ip link add bond_slave_1 type veth peer veth2
+>>      ip netns exec ns1 ip link set bond_slave_1 master bond0
+>> [1] ip netns exec ns1 ethtool -K bond0 rx-vlan-filter off
+>> [2] ip netns exec ns1 ip link add link bond_slave_1 name bond_slave_1.0 type vlan id 0
+>> [3] ip netns exec ns1 ip link add link bond0 name bond0.0 type vlan id 0
+>> [4] ip netns exec ns1 ip link set bond_slave_1 nomaster
+>> [5] ip netns exec ns1 ip link del veth2
+>>      ip netns del ns1
 > 
->> Hi Andrew,
->> These clocks are for the whole PHY package including quad PHYs, since
->> these clocks & resets need to be initialized at one point, i put it
->> the previous MDIO driver code, these clocks & resets are configured
->> after GPIO hardware reset, after these clocks and resets sequences
->> configured, each PHY capabilities can be acquired correctly in the PHY
->> probe function.
+> Could you construct a selftest based on those commands?
+OK.
 > 
-> I really expect the hardware is hierarchical. Its unlikely that EPHY0
-> is connected to all four PHYs in the package. Its specific to one
-> PHY. So it should be in the DT properties for that one specific PHY. I
-> expect the resets are the same. It seems there is a soft and hard
-> reset per PHY, so i would expect these to be in the node for one PHY.be 
-
-Hi Andrew,
-i understand your point, i tried putting the related clocks and resets
-into each device node per PHY, which does not work, since these clocks
-ans resets need to be initialized at one function pointer after GPIO 
-reset on the qca8084 package.
-
-Sorry for these confusions here, let me explain the qca8084 chip more
-detail here, and i will also update this info on the cover letter.
-
-The following is the chip package, the chip can work on the switch mode
-like the existed upstream code qca8k, where PHY1-PHY4 is connected with
-MAC1-MAC4 directly; The chip can also work on the PHY mode, where PHY1-
-PHY4 is connected with PCS1 by 10g-qxgmii; Either switch mode or PHY 
-mode, the PHY4 is optionally connected with PCS0 by SGMII, PCS0 and PCS1
-are connected with the SoC(IPQ platform) PCSes.
-+----------------------------------------------+
-|          PCS1           PCS0                 |
-|                                              |
-|          MAC0           MAC5                 |
-|                                              |
-|                                              |
-|                                              |
-|      MAC1      MAC2      MAC3      MAC4      |
-|                                              |
-|      PHY1      PHY2      PHY3      PHY4      |
-+----------------------------------------------+
-
-After the GPIO reset on this package from the MDIO bus level, the chip
-is in the cold hardware reset status, the clocks and resets mentioned
-here need to be initialized before the capabilities of PHY can be
-acquired correctly in the PHY probe function, that is why i put these
-clocks and resets in the first PHY device tree node.
-When the chip works on the PHY mode, the MAC listed in the block is
-not used, the MAC is only used in the switch mode.
-
-i know we can also put the related clocks and resets into the each
-PHY and PCS device node to make the hardware hierarchical, then i can
-read all initial clocks and resets in the first PHY probe function,
-but there are still some package level clocks such as APB/AHB/CNOC
-clocks needed for these initial configuration, so i put these clocks
-and resets at one PHY device node and only needed to be called by one
-time.
-
- From the clocks and resets name, EPHY0 is specific to the first PHY1,
-which is providing clock and reset on the first PHY1, other EPHY clock
-and reset is same for the corresponding PHY.
-
+>> This is all caused by command [1] turning off the rx-vlan-filter function
+>> of bond0. The reason is the same as commit 01f4fd270870 ("bonding: Fix
+>> incorrect deletion of ETH_P_8021AD protocol vid from slaves"). Commands
+>> [2] [3] add the same vid to slave and master respectively, causing
+>> command [4] to empty slave->vlan_info. The following command [5] triggers
+>> this problem.
+>>
+>> To fix this problem, we should add VLAN_FILTER feature checks in
+>> vlan_vids_add_by_dev() and vlan_vids_del_by_dev() to prevent incorrect
+>> addition or deletion of vlan_vid information.
+>>
+>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 > 
-> Do the two PCS instances take up two MDIO address? They can be
-> considered devices on the bus, so could have a DT node, and hence you
-> can place the PCS clocks on that node?
-
-Yes, two PCS instances take up two MDIO device with different MDIO
-address, which also have the DT nodes as the child node of MDIO bus node
-there is also some specific clocks and resets defined in the PCS DT
-node for the PCS driver.
-
+> Did the STAG/CTAG features exist in 2.6? I thought I saw the commit
+> that added them in git at some point. Could be misremembering...
+I just saw the feature NETIF_F_HW_VLAN_FILTER 
+(NETIF_F_HW_VLAN_CTAG_FILTER) in this tag.
+Now I find that the following tag may be more suitable.
+348a1443cc43 ("vlan: introduce functions to do mass addition/deletion of 
+vids by another device")
 > 
-> What exactly do the two MDIO clocks do? I assume these are not for the
-> MDIO bus master, but the MDIO slave block within the PHY package?
-> There is one MDIO slave block shared by the four PHYs. So these are
-> package properties and should be in the package node in DT.
-
-The MDIO clocks are the qca8084 package level clock, since there
-are other modules such as GCC and security control located in the
-qca8084 chip, these module register is also accessed by the MDIO bus,
-the MDIO AHB clock is this modules access.
-there is also a MDIO master for the back pressure function in qca8084
-chip, the MDIO master AHB clock is for this function, actually this
-function is for the switch mode, but it is the package level clock,
-so i put it together here.
-
-No, these clocks are not for the IPQ4019 SoC MDIO bus master. Four PHYs 
-are the independent MDIO slave devices.
-
-For the switch mode, we can define these package level clocks and resets
-in the DSA device node.
-
-But for the PHY mode, All 4 PHYs is connected with PCS1 by 10g-qxgmii,
-there is no package level device tree node defined.
-
+>> Signed-off-by: Liu Jian <liujian56@huawei.com>
+>> ---
+>> v1->v2: Modify patch title and commit message.
+>> 	Remove superfluous operations in ethtool/features.c and ioctl.c
+>>   net/8021q/vlan_core.c | 21 ++++++++++++++++++++-
+>>   1 file changed, 20 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/8021q/vlan_core.c b/net/8021q/vlan_core.c
+>> index 0beb44f2fe1f..e94b509386bb 100644
+>> --- a/net/8021q/vlan_core.c
+>> +++ b/net/8021q/vlan_core.c
+>> @@ -407,6 +407,12 @@ int vlan_vids_add_by_dev(struct net_device *dev,
+>>   		return 0;
+>>   
+>>   	list_for_each_entry(vid_info, &vlan_info->vid_list, list) {
+>> +		if (!(by_dev->features & NETIF_F_HW_VLAN_CTAG_FILTER) &&
+>> +		    vid_info->proto == htons(ETH_P_8021Q))
+>> +			continue;
+>> +		if (!(by_dev->features & NETIF_F_HW_VLAN_STAG_FILTER) &&
+>> +		    vid_info->proto == htons(ETH_P_8021AD))
+>> +			continue;
 > 
-> Look at all the other clocks and decide, are they package clocks, or
-> specific to one block on the MDIO bus? Do the properties go in the
-> package node, or the per PHY node?
-> 
-> 	Andrew
+> this code is copied 3 times, could you please factor it out to a helper
+> taking dev and vid_info and deciding if the walk should skip?
 
-The clocks and resets with prefix PCS or EPHY is per PHY/PCS node, other
-clocks and resets are the qca8084 package level node.
+Find a suitable existing function vlan_hw_filter_capable().
+Thanks for your review.
 
