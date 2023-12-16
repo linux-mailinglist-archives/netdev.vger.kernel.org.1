@@ -1,124 +1,157 @@
-Return-Path: <netdev+bounces-58253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 419A1815A92
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 18:11:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCB9F815A98
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 18:17:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 956A81F2314C
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 17:11:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB2111C2195A
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 17:17:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0360230661;
-	Sat, 16 Dec 2023 17:11:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD52330677;
+	Sat, 16 Dec 2023 17:17:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tv5Il2gL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2903035D;
-	Sat, 16 Dec 2023 17:10:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.104] (31.173.82.73) by msexch01.omp.ru (10.188.4.12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 16 Dec
- 2023 20:10:46 +0300
-Subject: Re: [PATCH net-next v2 12/21] net: ravb: Move ptp initialization in
- the driver's ndo_open API for ccc_gac platorms
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
-	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>,
-	<geert+renesas@glider.be>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
- <20231214114600.2451162-13-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <5c33fc3e-5ca7-a0da-acff-32b2e7a38dd9@omp.ru>
-Date: Sat, 16 Dec 2023 20:10:45 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C5731728;
+	Sat, 16 Dec 2023 17:17:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=FHjww8/JwxqxsdngrNpGSnmmTqKJPwi9ZbW08puInak=; b=tv5Il2gL1C6mALplFJ6c1DXf//
+	h6AVYnapE5sTimAMquEf+yv4USmN58k4jF3KtOT7PCIIZGbG88KlHM8Z8ly06olorQU5VeOCtdUcL
+	Yem92xDcwLs9nI2hvnJ5qNiYvk0mEgnvycqc7rwNqPwCQLCEKWKJbFriQUyS9N37Ju20=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rEYI6-0036tz-LE; Sat, 16 Dec 2023 18:17:30 +0100
+Date: Sat, 16 Dec 2023 18:17:30 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jie Luo <quic_luoj@quicinc.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	hkallweit1@gmail.com, corbet@lwn.net, p.zabel@pengutronix.de,
+	f.fainelli@gmail.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH v8 14/14] dt-bindings: net: ar803x: add qca8084 PHY
+ properties
+Message-ID: <b5ff9f69-e341-4846-bc5a-ebe636b7a71a@lunn.ch>
+References: <20231215074005.26976-1-quic_luoj@quicinc.com>
+ <20231215074005.26976-15-quic_luoj@quicinc.com>
+ <bdfba8a7-9197-4aae-a7f9-6075a375f60b@linaro.org>
+ <c3391e33-e770-4c61-855e-d90e82b95f75@quicinc.com>
+ <4cb2bd57-f3d3-49f9-9c02-a922fd270572@lunn.ch>
+ <ed0dd288-be8a-4161-a19f-2d4d2d17b3ec@quicinc.com>
+ <ZXxXzm8hP68KrXYs@shell.armlinux.org.uk>
+ <3a40570b-40bf-4609-b1f4-a0a6974accea@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231214114600.2451162-13-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/16/2023 16:57:54
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 182146 [Dec 15 2023]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.82.73 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;31.173.82.73:7.1.2;127.0.0.199:7.1.2;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.82.73
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 12/16/2023 17:03:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 12/16/2023 2:57:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3a40570b-40bf-4609-b1f4-a0a6974accea@quicinc.com>
 
-On 12/14/23 2:45 PM, Claudiu wrote:
+> Yes, Russell, i will add an example in the DT doc in the next patch set.
+> The following is the device node used for the current qca8084 PHY
+> code design.
 
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+If you look at Christians work, this would be expressed differently:
+
+> mdio: mdio@90000 {
+>     ethernet-phy-package@1 {
 > 
-> The initialization sequence for PTP is the same for platforms with ccc_gac
-> and gptp (according to chapter "Figure 50.71 Flow of gPTP Initialization
-> (Normal, Common to All Modes)" of the R-Car Series, 3rd generation hardware
-   Figure is hardly a chapter. :-)
-
-> manual and chapter "Figure 37A.53 Flow of gPTP Initialization (Normal,
-
-   Here as well...
-
-> Common to All Modes)" of the RZ/G Series hardware manual).
+>         compatible = "qca,qca8084-package";
 > 
-> As some IP variants switch to reset mode (and thus registers' content is
+>         qcom,phy-work-mode = <2>;
+>         clocks = <&qca8k_nsscc NSS_CC_APB_BRIDGE_CLK>,
+>                <&qca8k_nsscc NSS_CC_AHB_CLK>,
+>                <&qca8k_nsscc NSS_CC_SEC_CTRL_AHB_CLK>,
+>                <&qca8k_nsscc NSS_CC_TLMM_CLK>,
+>                <&qca8k_nsscc NSS_CC_TLMM_AHB_CLK>,
+>                <&qca8k_nsscc NSS_CC_CNOC_AHB_CLK>,
+>                <&qca8k_nsscc NSS_CC_MDIO_AHB_CLK>,
+>                <&qca8k_nsscc NSS_CC_MDIO_MASTER_AHB_CLK>,
+>                <&qca8k_nsscc NSS_CC_SRDS0_SYS_CLK>,
+>                <&qca8k_nsscc NSS_CC_SRDS1_SYS_CLK>;
+>         clock-names = "apb_bridge",
+>                 "ahb",
+>                 "sec_ctrl_ahb",
+>                 "tlmm",
+>                 "tlmm_ahb",
+>                 "cnoc_ahb",
+>                 "mdio_ahb",
+>                 "mdio_master_ahb",
+>                 "srds0_sys",
+>                 "srds1_sys";
+>         resets = <&qca8k_nsscc NSS_CC_SRDS0_SYS_ARES>,
+>                <&qca8k_nsscc NSS_CC_SRDS1_SYS_ARES>,
+>                <&qca8k_nsscc NSS_CC_DSP_ARES>;
+>         reset-names = "srds0_sys",
+>                       "srds1_sys";
+>
 
-   The register content.
+All the properties above are common to the package as a whole.
 
-> lost) when setting clocks (due to module standby functionality) to be able
-> to implement runtime PM, move the PTP initialization to the driver's
-> ndo_open API.
+Then follow the four individual PHYs, and the properties which are
+specific to each one.
+
 > 
-> This commit prepares the code for the addition of runtime PM.
-> 
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>         ethernet-phy@0 {
+>             compatible = "ethernet-phy-id004d.d180";
+>             reg = <0>;
+>             clocks = <qca8k_nsscc NSS_CC_GEPHY0_SYS_CLK>,
+>             clock-names = <"gephy_sys">;
+>             resets = <&qca8k_nsscc NSS_CC_GEPHY0_SYS_ARES>,
+>                      <&qca8k_nsscc NSS_CC_GEPHY0_ARES>;
+>             reset-names = "gephy_sys", "gephy_soft";
+>         };
+>     
+>     
+>         ethernet-phy@1 {
+>             compatible = "ethernet-phy-id004d.d180";
+>             reg = <1>;
+>             clocks = <qca8k_nsscc NSS_CC_GEPHY1_SYS_CLK>,
+>             clock-names = <"gephy_sys">;
+>             resets = <&qca8k_nsscc NSS_CC_GEPHY1_SYS_ARES>,
+>                      <&qca8k_nsscc NSS_CC_GEPHY1_ARES>;
+>             reset-names = "gephy_sys", "gephy_soft";
+>     
+>         };
+>     
+>         ethernet-phy@2 {
+>             compatible = "ethernet-phy-id004d.d180";
+>             reg = <2>;
+>             clocks = <qca8k_nsscc NSS_CC_GEPHY2_SYS_CLK>,
+>             clock-names = <"gephy_sys">;
+>             resets = <&qca8k_nsscc NSS_CC_GEPHY2_SYS_ARES>,
+>                      <&qca8k_nsscc NSS_CC_GEPHY2_ARES>;
+>             reset-names = "gephy_sys", "gephy_soft";
+>     
+>         };
+>     
+>         ethernet-phy@3 {
+>             compatible = "ethernet-phy-id004d.d180";
+>             reg = <3>;
+>             clocks = <qca8k_nsscc NSS_CC_GEPHY3_SYS_CLK>,
+>             clock-names = <"gephy_sys">;
+>             reset-names = "gephy_sys", "gephy_soft";
+>         };
+> };
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-
-[...]
-
-MBR, Sergey
+	Andrew
 
