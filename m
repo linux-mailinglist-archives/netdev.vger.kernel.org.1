@@ -1,159 +1,129 @@
-Return-Path: <netdev+bounces-58293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51D95815BB7
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 21:36:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5D26815BBB
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 21:44:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E553A2845D8
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 20:36:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 471351F229FF
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 20:44:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DBA81D697;
-	Sat, 16 Dec 2023 20:36:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E8E415AD2;
+	Sat, 16 Dec 2023 20:44:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="QHIcYER9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330ED1E48E;
-	Sat, 16 Dec 2023 20:36:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.104] (31.173.82.73) by msexch01.omp.ru (10.188.4.12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 16 Dec
- 2023 23:36:32 +0300
-Subject: Re: [PATCH net-next v2 20/21] net: ravb: Do not apply RX CSUM
- settings to hardware if the interface is down
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
-	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>,
-	<geert+renesas@glider.be>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
- <20231214114600.2451162-21-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <247ad9d9-298e-017b-f6e4-e672ee458ee7@omp.ru>
-Date: Sat, 16 Dec 2023 23:36:31 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F4E1DFDA
+	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 20:44:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-2031b9c8389so1325989fac.1
+        for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 12:44:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1702759483; x=1703364283; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ybN/JQklFxxdvbFcBG4Es2B5/vNf6JnHtZJeVvDftTs=;
+        b=QHIcYER9Vp3rlzGLhWuxn1xYemBN7USeWW2ov7ALw7anbNaaP1ItiGVlGry67HYrK6
+         G6+yIhBh8nejVnQsehlhFckqV3ULFuID9yHOz2UP/WhZhEzr5XQ8u/QqBkwfzyiB23Y5
+         rksL7ca2oSBLMz3qZLXZ/hOXUNREG1H1UqtxUoK8OOnrRndI92SpgRLxnw8PVDvwyxTh
+         G3shtEx7OUa/CAttWXMjvLCvTlS31H2Z5trdH+i33hNMPn6DAkOGwJXr78mkLeZNBx5H
+         6qx7QW0QIz1cGO9Q72eaz/B7GGA9lZMceePu39TW6jgSRwIGT55y/izxy/lPDS6gnm3Q
+         NU+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702759483; x=1703364283;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ybN/JQklFxxdvbFcBG4Es2B5/vNf6JnHtZJeVvDftTs=;
+        b=GpPGwnUFJKnEfHxWu0kbNpy1okeykn/egOhR4UmynMFdlqCAqaDfBg4/jHZyDWshJl
+         G+sEjJmrJB3A8fcR+To1D1DhvZq4kO5wPh288mMRJFZ6N+EmkiDBIuSC2kI+enqzwSWO
+         iZ6Qt9zItJ7E8+1uDcXbvJhgt492MquhzLdBUOzeUmWmn4CXp0P8q0K88nn+pZ4JiPFK
+         7obzD6HE5uaCxdAGYo85JEDtcapDhlsFnsa1nBCtK5ojB8OQwgizkYwdzwTKEJmLyzwL
+         487gDgsw2IM9QjDYx6U+p7I7QaavIV8oQLJRND6GWssGrzCvXDN59LgUhJp0x9L0ZIZN
+         ujwA==
+X-Gm-Message-State: AOJu0YzCr83ueYm3Q6htaB795TB/MH2BPHw8Yf1VX9WpmfvE2Wx8vRvf
+	2jLw0OwlrMHC+6A1lX0WNN27Ug==
+X-Google-Smtp-Source: AGHT+IFS+D7hlgHMH9sAM++x5AYwE83AGRQcAr/xbc7bmuINTK8pJP72qUuiI6LP/a5rxdqYqmX+Cw==
+X-Received: by 2002:a05:6870:2803:b0:1fb:64:1b25 with SMTP id gz3-20020a056870280300b001fb00641b25mr17527329oab.24.1702759483328;
+        Sat, 16 Dec 2023 12:44:43 -0800 (PST)
+Received: from localhost.localdomain ([2804:7f1:e2c0:60e3:4c1:486f:7eda:5fb5])
+        by smtp.gmail.com with ESMTPSA id y13-20020a17090a390d00b0028b5739c927sm1380343pjb.34.2023.12.16.12.44.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 Dec 2023 12:44:42 -0800 (PST)
+From: Victor Nogueira <victor@mojatatu.com>
+To: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	daniel@iogearbox.net,
+	horms@kernel.org
+Cc: dcaratti@redhat.com,
+	netdev@vger.kernel.org,
+	kernel@mojatatu.com
+Subject: [PATCH net-next v5 0/3] net: sched: Make tc-related drop reason more flexible for remaining qdiscs
+Date: Sat, 16 Dec 2023 17:44:33 -0300
+Message-ID: <20231216204436.3712716-1-victor@mojatatu.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231214114600.2451162-21-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/16/2023 20:25:28
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 182147 [Dec 16 2023]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_phishing_log_reg_50_60}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.82.73 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	31.173.82.73:7.1.2;127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.82.73
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 12/16/2023 20:30:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 12/16/2023 5:57:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Transfer-Encoding: 8bit
 
-On 12/14/23 2:45 PM, Claudiu wrote:
+This patch builds on Daniel's patch[1] to add initial support of tc drop
+reason. The main goal is to distinguish between policy and error drops for
+the remainder of the egress qdiscs (other than clsact).
+The drop reason is set by cls_api and act_api in the tc skb cb in case
+any error occurred in the data path.
 
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> 
-> Do not apply the RX CSUM settings to hardware if the interface is down. In
-> case runtime PM is enabled, and while the interface is down, the IP will be
-> in reset mode (as for some platforms disabling/enabling the clocks will
-> switch the IP to standby mode, which will lead to losing registers'
+Also add new skb drop reasons that are idiosyncratic to TC.
 
-   To/From perhaps?
-   And just "register".
+[1] https://lore.kernel.org/all/20231009092655.22025-1-daniel@iogearbox.net
 
-> content) and applying settings in reset mode is not an option. Instead,
-> cache the RX CSUM settings and apply them in ravb_open().
+Changes in V5:
+- Drop "EXT_" from cookie error's drop reason name in doc
 
-   Have this issue actually occurred for you?
+Changes in V4:
+- Condense all the cookie drop reasons into one
 
-> Commit prepares for the addition of runtime PM.
-> 
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-[...]
+Changes in V3:
+- Removed duplicate assignment
+- Rename function tc_skb_cb_drop_reason to tcf_get_drop_reason
+- Move zone field upwards in struct tc_skb_cb to move hole to the end of 
+  the struct
 
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index 633346b6cd7c..9ff943dff522 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -1868,6 +1868,15 @@ static int ravb_open(struct net_device *ndev)
->  	if (info->gptp || info->ccc_gac)
->  		ravb_ptp_init(ndev, priv->pdev);
->  
-> +	/* Apply features that might have been changed while the interface
-> +	 * was down.
-> +	 */
-> +	if (ndev->hw_features & NETIF_F_RXCSUM) {
+Changes in V2:
+- Dropped RFC tag
+- Removed check for drop reason being overwritten by filter in cls_api.c
+- Simplified logic and removed function tcf_init_drop_reason
 
-   I'm afraid this is a wrong field; we need ndev->features, no?
+Victor Nogueira (3):
+  net: sched: Move drop_reason to struct tc_skb_cb
+  net: sched: Make tc-related drop reason more flexible for remaining
+    qdiscs
+  net: sched: Add initial TC error skb drop reasons
 
-> +		u32 val = (ndev->features & NETIF_F_RXCSUM) ? ECMR_RCSC : 0;
-> +
-> +		ravb_modify(ndev, ECMR, ECMR_RCSC, val);
-> +	}
-> +
+ include/net/dropreason-core.h | 18 +++++++++++++++---
+ include/net/pkt_cls.h         |  6 ------
+ include/net/pkt_sched.h       | 18 ------------------
+ include/net/sch_generic.h     | 32 +++++++++++++++++++++++++++++++-
+ net/core/dev.c                | 11 +++++++----
+ net/sched/act_api.c           |  3 ++-
+ net/sched/cls_api.c           | 31 +++++++++++++++----------------
+ 7 files changed, 70 insertions(+), 49 deletions(-)
 
-   The ECMR setting is already done in ravb_emac_init_rcar(), no need
-to duplicate it here, I think...
+-- 
+2.25.1
 
->  	/* PHY control start */
->  	error = ravb_phy_start(ndev);
->  	if (error)
-> @@ -2337,6 +2346,9 @@ static void ravb_set_rx_csum(struct net_device *ndev, bool enable)
->  	struct ravb_private *priv = netdev_priv(ndev);
->  	unsigned long flags;
->  
-> +	if (!netif_running(ndev))
-
-   Racy as well...
-
-> +		return;
-> +
-
-   Hm, sh_eth.c doesn't have such check -- perhaps should be fixed
-as well...
-
-[...]
-
-MBR, Sergey
 
