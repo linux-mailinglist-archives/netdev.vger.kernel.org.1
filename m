@@ -1,126 +1,131 @@
-Return-Path: <netdev+bounces-58289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E78B815B93
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 21:13:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FD9E815B99
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 21:16:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 431B51F2393A
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 20:13:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14D0B28388B
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 20:16:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE74328C5;
-	Sat, 16 Dec 2023 20:12:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E6zBWbkI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58D34328CF;
+	Sat, 16 Dec 2023 20:16:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9067434543
-	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 20:12:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5180C433C7;
-	Sat, 16 Dec 2023 20:12:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702757579;
-	bh=LIm7Dz5snfAFXUEJzX/fp4f2C8YE/qn45EFVgfIsR14=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=E6zBWbkIMVihQHhLVsH++QxmIrSGloeTl7CRdruBHTGJeRMxhhasu2D7/IniSa0Uf
-	 TkdTZrTeRQCAyY1a2/oHUKg0kAG2wRsmRs6kAml/lVhjqH5jUs1k/aOP0CZ2s5LFH9
-	 pi556JTIwZC1H1nAbPFifj4non3zC8T+EubT20Bw/EHLJAo2upvNlRSfAUs4JxUH1j
-	 LqN6eeu4h0Kj006v4f5SIXNAaqKY4UrALTP+IBPAjPLiQvV9fdCo1wOm3WT/++4lP9
-	 yIk2LobajZ595SXHjAKMNTZwiSaubZYMt5g3s2JGNtmbGbtgjNY8pqSyvaJEbcBOth
-	 ANLp+Q5R9lxWA==
-Date: Sat, 16 Dec 2023 20:12:54 +0000
-From: Simon Horman <horms@kernel.org>
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, daniel@iogearbox.net, dcaratti@redhat.com,
-	netdev@vger.kernel.org, kernel@mojatatu.com
-Subject: Re: [PATCH net-next v4 3/3] net: sched: Add initial TC error skb
- drop reasons
-Message-ID: <20231216201254.GV6288@kernel.org>
-References: <20231214203532.3594232-1-victor@mojatatu.com>
- <20231214203532.3594232-4-victor@mojatatu.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529882FC24;
+	Sat, 16 Dec 2023 20:16:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (31.173.82.73) by msexch01.omp.ru (10.188.4.12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 16 Dec
+ 2023 23:16:32 +0300
+Subject: Re: [PATCH net-next v2 19/21] net: ravb: Do not set promiscuous mode
+ if the interface is down
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>,
+	<geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214114600.2451162-20-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <69a80458-b607-2cee-e8b1-38eb8d56eca3@omp.ru>
+Date: Sat, 16 Dec 2023 23:16:32 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231214203532.3594232-4-victor@mojatatu.com>
+In-Reply-To: <20231214114600.2451162-20-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/16/2023 19:03:00
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182147 [Dec 16 2023]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_phishing_log_reg_50_60}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.82.73 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.82.73 in (user) dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.82.73
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 12/16/2023 19:36:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 12/16/2023 5:57:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Thu, Dec 14, 2023 at 05:35:32PM -0300, Victor Nogueira wrote:
-> Continue expanding Daniel's patch by adding new skb drop reasons that
-> are idiosyncratic to TC.
+On 12/14/23 2:45 PM, Claudiu wrote:
+
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 > 
-> More specifically:
+> Do not allow setting promiscuous mode if the interface is down. In case
+> runtime PM is enabled, and while interface is down, the IP will be in reset
+> mode (as for some platforms disabling/enabling the clocks will switch the
+> IP to standby mode which will lead to losing registers' content).
+
+   Register.
+   Have this issue actually occurred for you?
+
+> Commit prepares for the addition of runtime PM.
 > 
-> - SKB_DROP_REASON_TC_EXT_COOKIE_ERROR: An error occurred whilst
->   processing a tc ext cookie.
-> 
-> - SKB_DROP_REASON_TC_CHAIN_NOTFOUND: tc chain lookup failed.
-> 
-> - SKB_DROP_REASON_TC_RECLASSIFY_LOOP: tc exceeded max reclassify loop
->   iterations
-> 
-> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> ---
->  include/net/dropreason-core.h | 18 +++++++++++++++---
->  net/sched/act_api.c           |  3 ++-
->  net/sched/cls_api.c           | 22 ++++++++++++++--------
->  3 files changed, 31 insertions(+), 12 deletions(-)
-> 
-> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-> index 278e4c7d465c..dea361b3555d 100644
-> --- a/include/net/dropreason-core.h
-> +++ b/include/net/dropreason-core.h
-> @@ -85,8 +85,10 @@
->  	FN(IPV6_NDISC_BAD_OPTIONS)	\
->  	FN(IPV6_NDISC_NS_OTHERHOST)	\
->  	FN(QUEUE_PURGE)			\
-> -	FN(TC_ERROR)			\
-> +	FN(TC_COOKIE_ERROR)		\
->  	FN(PACKET_SOCK_ERROR)		\
-> +	FN(TC_CHAIN_NOTFOUND)		\
-> +	FN(TC_RECLASSIFY_LOOP)		\
->  	FNe(MAX)
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+[...]
+
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index 1995cf7ff084..633346b6cd7c 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -2164,6 +2164,9 @@ static void ravb_set_rx_mode(struct net_device *ndev)
+>  	struct ravb_private *priv = netdev_priv(ndev);
+>  	unsigned long flags;
 >  
->  /**
-> @@ -377,13 +379,23 @@ enum skb_drop_reason {
->  	SKB_DROP_REASON_IPV6_NDISC_NS_OTHERHOST,
->  	/** @SKB_DROP_REASON_QUEUE_PURGE: bulk free. */
->  	SKB_DROP_REASON_QUEUE_PURGE,
-> -	/** @SKB_DROP_REASON_TC_ERROR: generic internal tc error. */
-> -	SKB_DROP_REASON_TC_ERROR,
-> +	/**
-> +	 * @SKB_DROP_REASON_TC_EXT_COOKIE_ERROR: An error occurred whilst
+> +	if (!netif_running(ndev))
 
-nit: @SKB_DROP_REASON_TC_COOKIE_ERROR
+   Seems racy as well...
 
-> +	 * processing a tc ext cookie.
-> +	 */
-> +	SKB_DROP_REASON_TC_COOKIE_ERROR,
->  	/**
->  	 * @SKB_DROP_REASON_PACKET_SOCK_ERROR: generic packet socket errors
->  	 * after its filter matches an incoming packet.
->  	 */
->  	SKB_DROP_REASON_PACKET_SOCK_ERROR,
-> +	/** @SKB_DROP_REASON_TC_CHAIN_NOTFOUND: tc chain lookup failed. */
-> +	SKB_DROP_REASON_TC_CHAIN_NOTFOUND,
-> +	/**
-> +	 * @SKB_DROP_REASON_TC_RECLASSIFY_LOOP: tc exceeded max reclassify loop
-> +	 * iterations.
-> +	 */
-> +	SKB_DROP_REASON_TC_RECLASSIFY_LOOP,
->  	/**
->  	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
->  	 * shouldn't be used as a real 'reason' - only for tracing code gen
+> +		return;
 
-...
+   Hm, sh_eth.c doesn't have such check -- perhaps should be fixed
+as well...
+
+[...]
+
+MBR, Sergey
 
