@@ -1,119 +1,135 @@
-Return-Path: <netdev+bounces-58267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8ECE5815B32
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 20:08:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 750FB815B48
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 20:24:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 366F91F23186
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 19:08:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BB50284B20
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 19:24:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E29530FBF;
-	Sat, 16 Dec 2023 19:08:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9393731A89;
+	Sat, 16 Dec 2023 19:24:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="t5qEeIlc"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="iscJyetl"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599111E485;
-	Sat, 16 Dec 2023 19:08:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=OkwSnz/x+hw4c0xXlPnigUYNs6Tn7wFQ/QxZa13dJc8=; b=t5qEeIlc3121z+dSVt4ZCU/PYa
-	Qv/ZbQtLsVP+9NLHkgFXoa9zPwcH8pqycW42DmsjSo5T6LWzQOXBiAh/lACvS1YoAG+IeJ1ixQ10h
-	J8WIYZx5VLPsBXtDExi2XUMs2vk7iNqYL3W3336V1Gor4u4ZakdbwkUIl38IPUA0wagTBD/KUDdVb
-	/IIjz+1bDnr61I6QYO7W/NldqalNLQkBQh8fraM392ixYkPDN9i7WS6PK6SbHB/gGZnA7Dr+Ptb2c
-	tYojilSRddiwys+a6Wpae2W7TAtkmLuA4wzYwH4lBlXzK3iyGgPQEUxBM4ihHo+usVUTGRMEpK/fs
-	Ky5YIWOg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39248)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rEa1O-0003xs-2R;
-	Sat, 16 Dec 2023 19:08:22 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rEa1O-0004tz-Lr; Sat, 16 Dec 2023 19:08:22 +0000
-Date: Sat, 16 Dec 2023 19:08:22 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jie Luo <quic_luoj@quicinc.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, hkallweit1@gmail.com, corbet@lwn.net,
-	p.zabel@pengutronix.de, f.fainelli@gmail.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v8 14/14] dt-bindings: net: ar803x: add qca8084 PHY
- properties
-Message-ID: <ZX31pq4yXM8Fb/rj@shell.armlinux.org.uk>
-References: <20231215074005.26976-1-quic_luoj@quicinc.com>
- <20231215074005.26976-15-quic_luoj@quicinc.com>
- <60b9081c-76fa-4122-b7ae-5c3dcf7229f9@lunn.ch>
- <a65ad12d-b990-4439-b196-903f4a5f096a@quicinc.com>
- <f5c5cbce-c36e-498a-97e2-35f06d927d74@lunn.ch>
- <a9798333-3105-422f-8033-76c0b1d4f439@quicinc.com>
- <15d95222-35dd-4ea1-a1a3-3ad9e4ef0349@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C0C31A7E
+	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 19:24:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 846B13F2C2
+	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 19:24:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1702754682;
+	bh=arp4KgnNalvlcscGqi/VgrS8JYrKrYTVbwSx1z/f2Zk=;
+	h=From:In-Reply-To:References:Mime-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=iscJyetlYx/Qnbmo/VkOHDYJiCr4Rk8y/rSSWRPM/rY61Og3jIV6/7uBwigcl8MsO
+	 nEh1GHEqwlbBs9B+EMeRoFZiGLe/23dIWe0Bt2o0mReBGGkHQYap0cNVByxdnc+34T
+	 h+EQOsZLiewz3AMDlS0z8NoYPv+MQTVijewBcp4PzNDh0HHueJkQssF8moXHX8o5eC
+	 8C711SnZsGtXNF7Wy8UR1dZ8YDwUp3X1QYK+Eyvb/xZ2E25GE2Hj3Bq5sfVVgZ1xQ3
+	 JzKqk2z4sTzvWQl/s7n/Wp8SsYk1vGvyI+zOUTjy5iif0RoJDF9iodY/x3Jn+B5/Mm
+	 HhCVXkepkTWPg==
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-425c3f06bd9so33462321cf.2
+        for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 11:24:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702754681; x=1703359481;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=arp4KgnNalvlcscGqi/VgrS8JYrKrYTVbwSx1z/f2Zk=;
+        b=hRLilC5lOF7iub2sAlShrze76fsS79rK6TMJvmuhyZKBXl+bIB+w4zN45U0l6xpW0b
+         PQw3vVQIjnb2nSYtcMgWOyJtbV1+qTBYDE6gK7fDS17rWKCD53cjh/AIIhuVWbcrh4hw
+         oWjo91xrMcrk0FD7b3vVANv5HDLIknRNBHl9g+zuBP9CdUQ1elbJzNIcGoyh21j4eCU6
+         TK99beScSUIPEE9s0H23/hNRXC9i5vq4Zk2r218mX9VItGwch4oQ400PkLXhSjjwco7d
+         19bO2n3iWW3kKFCAL42g22NP642b+fk277q5H3HsHwEYOkGZXhy6g7zeshSR0G4krVEb
+         CjYg==
+X-Gm-Message-State: AOJu0YzUW91hrHnF7JOFKhrVF4MxREfS7CsUpWI31nz3VXpqsct+62u9
+	hL5PpPGtjnfufBm08ADYCSZe/jGIRI02GqAstzJt7J1vD0eerZwv+IcLaKViWAZpRp3ZZe8nUHR
+	IkVwq9JKXQcQ1fXh6U5rd1edOLE6Rpuq75xrGI5CrNHwWUvRZOA==
+X-Received: by 2002:a05:622a:1cf:b0:418:1565:ed50 with SMTP id t15-20020a05622a01cf00b004181565ed50mr17632935qtw.66.1702754681671;
+        Sat, 16 Dec 2023 11:24:41 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHh1FB45qk7mcuI2qHGO1vj4JgeCLK0ZvhpRnKj5MhPIcHzu1iD+2wJffax6hiqvMJOiTseak4ew2mkMkdlIE8=
+X-Received: by 2002:a05:622a:1cf:b0:418:1565:ed50 with SMTP id
+ t15-20020a05622a01cf00b004181565ed50mr17632917qtw.66.1702754681432; Sat, 16
+ Dec 2023 11:24:41 -0800 (PST)
+Received: from 348282803490 named unknown by gmailapi.google.com with
+ HTTPREST; Sat, 16 Dec 2023 11:24:40 -0800
+From: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+In-Reply-To: <698fbb5d-0750-4f2a-857f-5429e5f589f9@collabora.com>
+References: <20231029042712.520010-1-cristian.ciocaltea@collabora.com>
+ <20231029042712.520010-13-cristian.ciocaltea@collabora.com>
+ <CAJM55Z9e=vjGKNnmURN15mvXo2bVd3igBA-3puF9q7eh5hiP+A@mail.gmail.com>
+ <2f06ce36-0dc1-495e-b6a6-318951a53e8d@collabora.com> <698fbb5d-0750-4f2a-857f-5429e5f589f9@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <15d95222-35dd-4ea1-a1a3-3ad9e4ef0349@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Mime-Version: 1.0
+Date: Sat, 16 Dec 2023 11:24:40 -0800
+Message-ID: <CAJM55Z-e8mkjac-nCF9_w6EmMVbL9ued0mAcjwTMF=pKDLkMsA@mail.gmail.com>
+Subject: Re: [PATCH v2 12/12] [UNTESTED] riscv: dts: starfive:
+ beaglev-starlight: Enable gmac
+To: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>, 
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Emil Renner Berthing <kernel@esmil.dk>, Samin Guo <samin.guo@starfivetech.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, kernel@collabora.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Dec 16, 2023 at 06:30:00PM +0100, Andrew Lunn wrote:
-> > The following is the chip package, the chip can work on the switch mode
-> > like the existed upstream code qca8k, where PHY1-PHY4 is connected with
-> > MAC1-MAC4 directly; The chip can also work on the PHY mode, where PHY1-
-> > PHY4 is connected with PCS1 by 10g-qxgmii; Either switch mode or PHY mode,
-> > the PHY4 is optionally connected with PCS0 by SGMII, PCS0 and PCS1
-> > are connected with the SoC(IPQ platform) PCSes.
-> 
-> I don't really understand. Are you saying the hardware is actually :
-> 
-> 
-> +----------------------------------------------+
-> |          PCS1           PCS0                 |
-> |                                              |
-> |          MAC0           MAC5                 |
-> |           |              |                   |
-> |     +-----+--------------+-------------+     |
-> |     |                                  |     |
-> |     |                Switch            |     |
-> |     |                                  |     |
-> |     +-+---------+---------+---------+--+     |
-> |       |         |         |         |        |
-> |      MAC1      MAC2      MAC3      MAC4      |
-> |                                              |
-> |      PHY1      PHY2      PHY3      PHY4      |
-> +----------------------------------------------+
-> 
-> When in PHY mode, the switch is hard coded to map the 4 PCS1 channels
-> straight to MAC1-MAC4 and all switch functionality is disabled. But
-> then in switch mode, the switch can be controlled as a DSA switch? The
-> 10G PCS1 is then a single 10G port, not 4x 2.5G?
-> 
-> Is there a product brief for this PHY? That might help us understand
-> this hardware?
+Cristian Ciocaltea wrote:
+> On 11/28/23 02:40, Cristian Ciocaltea wrote:
+> > On 11/26/23 23:10, Emil Renner Berthing wrote:
+> >> Cristian Ciocaltea wrote:
+> >>> The BeagleV Starlight SBC uses a Microchip KSZ9031RNXCA PHY supporting
+> >>> RGMII-ID.
+> >>>
+>
+> [...]
+>
+> >> You've alse removed the phy reset gpio on the Starlight board:
+> >>
+> >>   snps,reset-gpios = <&gpio 63 GPIO_ACTIVE_LOW>
+> >>
+> >> Why?
+> >
+> > I missed this in v1 as the gmac handling was done exclusively in
+> > jh7100-common. Thanks for noticing!
+>
+> Hi Emil,
+>
+> I think the reset doesn't actually trigger because "snps,reset-gpios" is
+> not a valid property, it should have been "snps,reset-gpio" (without the
+> trailing "s").
+>
+> However, this seems to be deprecated now, and the recommended approach
+> would be to define the reset gpio in the phy node, which I did in [1].
+>
+> Hopefully this won't cause any unexpected behaviour. Otherwise we should
+> probably simply drop it.
+>
+> [1]: https://lore.kernel.org/lkml/20231215204050.2296404-8-cristian.ciocaltea@collabora.com/
 
-Not even digikey give any clues what "QCA8084" is - they list it as
-"unclassified" and give no documentation and no photo. Basically it
-seems to be a super secret device.
+Oh, nice catch! With your v3 patches the Starlight board still works fine and
+GPIO63 is correctly grabbed and used for "PHY reset".
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+/Emil
 
