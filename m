@@ -1,145 +1,162 @@
-Return-Path: <netdev+bounces-58248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D552815A1E
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 17:13:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A0A6815A6B
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 17:38:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C3A01C21819
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 16:13:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2143B1C20BE7
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 16:38:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C4931728;
-	Sat, 16 Dec 2023 16:12:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NX2dreHZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B05872E3F8;
+	Sat, 16 Dec 2023 16:38:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7959530D10;
-	Sat, 16 Dec 2023 16:12:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-40c6ea99429so12275175e9.3;
-        Sat, 16 Dec 2023 08:12:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702743136; x=1703347936; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v8KycpmoEY28RLHnfyVEt7HZvLA/Co1CVDklFA2THj0=;
-        b=NX2dreHZxTuFC5btUwKWWLKVXY0n2rVS86Txrlg1vQQb9pjTFobTaeJeBNrXIyRBmi
-         5yT4eEa9RqWPW2hjLcvKePbi1192uFn45sCMTY3Iuh02e6yjfRtObb1OChN2ngv06/nA
-         RmUrrdDrVxVDA3KuURIa/2xLDnIiz9iaRs2IcWKubEMSkGh5Tpz+2M9GZ1e0j985jnaD
-         d9HEpNFtJXEHryycseodOjvTQIlYx/sbpEJ24/LXtuR0AOx6EeUK2QYqKJ+AGowygQtT
-         I+elf2DFLW3qcClDpR7LZHeQEOf0g9eHst9IrdDGk3u9+WuCSTttZXGON5YjwnxRkVjV
-         cboA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702743136; x=1703347936;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v8KycpmoEY28RLHnfyVEt7HZvLA/Co1CVDklFA2THj0=;
-        b=cy08CKtaS3vpfXXSjWapb2tGrFylcVpjiY+GVYoOy4p1WD0GdTPv4mHHUTQSOiyTqp
-         p5PUIUuR50Xvv5vrTAKGcx+5fYJB4J3rLD0dU9/OYhzPZO/jQIpaTTLkieBp4pDkgAXu
-         hDBVNKupgoXSyTnfS3De2HsirxPxBgRujo+/qLeIVDQlg0jAIMaNAewFiJf/9N1lyOoz
-         R7gJiozYJ2Iirk7ezptGPER3Izwy220BtLmtjW+445AGu+zYdCzL7T0r1B87IbSIfK+Q
-         4Svt+zHOP1sIT44/MRs4+GdLL9KtjNrX0JrskUjM72ckvgRYmo2H6gFzrqbaEIs1UYni
-         vlHw==
-X-Gm-Message-State: AOJu0YzYqCEp+GkzSH/Hpw/1AQFZzLfcwltXm8XgsL6VUs+BxuMNucH+
-	Og794zLOG7+ddEgDuITXgEk=
-X-Google-Smtp-Source: AGHT+IG+PosLTFC/WuXxcQPX59iIK88iPx8jKXdJ2Reu1gJNxhJX7oPTHSzzmS6Op7WxrU2CkOXdOg==
-X-Received: by 2002:a05:600c:22d8:b0:40c:66a8:3567 with SMTP id 24-20020a05600c22d800b0040c66a83567mr1669571wmg.59.1702743135543;
-        Sat, 16 Dec 2023 08:12:15 -0800 (PST)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id g9-20020a05600c310900b0040c3953cda5sm30818925wmo.45.2023.12.16.08.12.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Dec 2023 08:12:14 -0800 (PST)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Christian Marangi <ansuelsmth@gmail.com>
-Subject: [net-next PATCH v4 3/3] net: phy: led: dynamically allocate speed modes array
-Date: Sat, 16 Dec 2023 17:12:06 +0100
-Message-Id: <20231216161206.1729-4-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231216161206.1729-1-ansuelsmth@gmail.com>
-References: <20231216161206.1729-1-ansuelsmth@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13841E481;
+	Sat, 16 Dec 2023 16:38:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (31.173.82.73) by msexch01.omp.ru (10.188.4.12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 16 Dec
+ 2023 19:38:13 +0300
+Subject: Re: [PATCH net-next v2 09/21] net: ravb: Split GTI computation and
+ set operations
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>,
+	<geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214114600.2451162-10-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <3e8f65e3-3aab-ddf4-2b05-16b275af6021@omp.ru>
+Date: Sat, 16 Dec 2023 19:38:12 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231214114600.2451162-10-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/16/2023 16:21:16
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182146 [Dec 15 2023]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.82.73 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	31.173.82.73:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.82.73
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 12/16/2023 16:25:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 12/16/2023 2:57:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Instead of defining a big enough array for speed modes use the newly
-introduced API to get the actual number of supported speed modes and
-dynamically allocate them.
+On 12/14/23 2:45 PM, Claudiu wrote:
 
-Allocated space is freed at the end of the LED register loop.
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> ravb_set_gti() was computing the value of GTI based on the reference clock
+> rate and then applied it to register. This was done on the driver's probe
+> function. In order to implement runtime PM for all IP variants (as some IP
+> variants switches to reset operation mode (and thus the register's content
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- drivers/net/phy/phy_led_triggers.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+   Again, operating mode...
 
-diff --git a/drivers/net/phy/phy_led_triggers.c b/drivers/net/phy/phy_led_triggers.c
-index f550576eb9da..3b962ec13d90 100644
---- a/drivers/net/phy/phy_led_triggers.c
-+++ b/drivers/net/phy/phy_led_triggers.c
-@@ -83,14 +83,21 @@ static void phy_led_trigger_unregister(struct phy_led_trigger *plt)
- 
- int phy_led_triggers_register(struct phy_device *phy)
- {
-+	unsigned int *speeds;
- 	int i, err;
--	unsigned int speeds[50];
- 
--	phy->phy_num_led_triggers = phy_supported_speeds(phy, speeds,
--							 ARRAY_SIZE(speeds));
-+	phy->phy_num_led_triggers = phy_supported_speeds_num(phy);
- 	if (!phy->phy_num_led_triggers)
- 		return 0;
- 
-+	speeds = kmalloc_array(phy->phy_num_led_triggers, sizeof(*speeds),
-+			       GFP_KERNEL);
-+	if (!speeds)
-+		return -ENOMEM;
-+
-+	/* Presence of speed modes already checked up */
-+	phy_supported_speeds(phy, speeds, phy->phy_num_led_triggers);
-+
- 	phy->led_link_trigger = devm_kzalloc(&phy->mdio.dev,
- 					     sizeof(*phy->led_link_trigger),
- 					     GFP_KERNEL);
-@@ -123,6 +130,8 @@ int phy_led_triggers_register(struct phy_device *phy)
- 	phy->last_triggered = NULL;
- 	phy_led_trigger_change_speed(phy);
- 
-+	kfree(speeds);
-+
- 	return 0;
- out_unreg:
- 	while (i--)
-@@ -134,6 +143,7 @@ int phy_led_triggers_register(struct phy_device *phy)
- 	devm_kfree(&phy->mdio.dev, phy->led_link_trigger);
- 	phy->led_link_trigger = NULL;
- out_clear:
-+	kfree(speeds);
- 	phy->phy_num_led_triggers = 0;
- 	return err;
- }
--- 
-2.40.1
+> is lost) when module standby is configured through clock APIs) the GTI was
 
+   The GTI what? Setup?
+
+> split in 2 parts: one computing the value of the GTI register (done in the
+> driver's probe function) and one applying the computed value to register
+> (done in the driver's ndo_open API).
+> 
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+[...]
+
+> diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
+> index e0f8276cffed..76202395b68d 100644
+> --- a/drivers/net/ethernet/renesas/ravb.h
+> +++ b/drivers/net/ethernet/renesas/ravb.h
+> @@ -1106,6 +1106,8 @@ struct ravb_private {
+>  
+>  	const struct ravb_hw_info *info;
+>  	struct reset_control *rstc;
+> +
+> +	uint64_t gti_tiv;
+
+   Please use the kernel type, u64; uint64_t is for userland, IIRC.
+
+[...]
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index d7f6e8ea8e79..5e01e03e1b43 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -1750,6 +1750,51 @@ static int ravb_set_reset_mode(struct net_device *ndev)
+>  	return error;
+>  }
+>  
+> +static int ravb_set_gti(struct net_device *ndev)
+> +{
+[...]
+> +	/* Request GTI loading */
+> +	ravb_modify(ndev, GCCR, GCCR_LTI, GCCR_LTI);
+> +
+> +	/* Check completion status. */
+> +	return ravb_wait(ndev, GCCR, GCCR_LTI, 0);
+
+   Is this really necessary?
+
+[...]
+> @@ -1767,6 +1812,10 @@ static int ravb_open(struct net_device *ndev)
+>  		goto out_napi_off;
+>  	ravb_emac_init(ndev);
+>  
+> +	error = ravb_set_gti(ndev);
+> +	if (error)
+> +		goto out_dma_stop;
+> +
+
+   Hm... belongs in ravb_dmac_init() now, as it seems... 
+
+[...]
+
+MBR, Sergey
 
