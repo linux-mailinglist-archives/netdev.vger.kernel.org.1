@@ -1,49 +1,99 @@
-Return-Path: <netdev+bounces-58174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74E1B815673
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 03:41:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAAD681568D
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 03:52:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A71A41C2392B
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 02:41:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E1321F25706
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 02:52:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 023ED1846;
-	Sat, 16 Dec 2023 02:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF81186B;
+	Sat, 16 Dec 2023 02:52:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t8EdNxaZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q8wt3Inh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7CAF1841
-	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 02:41:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64182C433C8;
-	Sat, 16 Dec 2023 02:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6186412E43;
+	Sat, 16 Dec 2023 02:52:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 615E2C433C7;
+	Sat, 16 Dec 2023 02:52:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702694468;
-	bh=XYK1phRN3GR0XiDDkB+58/mKh6cFoXtvgyg5B5b13jc=;
+	s=k20201202; t=1702695123;
+	bh=wEadWnvCc/HfoIu80FLtOBCdt6lNEYIGt4Ee9W8bEjg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=t8EdNxaZKoPxbj4398LJiXVISbzJsfENaebpSPC7cWmxYQuhpGgM8MR4mCtv6SUav
-	 yjck74MJlCcQOepvZj0UxC9sj/QEJsmw/k0p5MLUP388jUA0Mrgvf24LtblByuXKDW
-	 zfHgupc+5jyvVWGtcpDZB0T2L1CsfN2bSR9LVYy0bm7GIMwRnAvKASwT6uR4VKamXl
-	 60ZOa2/qRzCCViliK0TXXPOZuXfYb7d95KNOfbqp7slDdf8ZE/SqAnqLpJgvJNxU2h
-	 6j7rnjPNr4Zu+tyJBWSqsqcsNIgZMgfFNOUwI6nkfrXw0gCp8jT62H2vmzH9mGb1I0
-	 aqrACWyOLolag==
-Date: Fri, 15 Dec 2023 18:41:07 -0800
+	b=Q8wt3InhMLHP4VwWMxtLBaYe3KIX1lISFdsJfCNMYuN6LBF/tbvmujO/sscks2DP0
+	 qabxY/Lv3ST8+XiAtfpeCmmt9Rw3NTPWReIFKDc8VnIoM1aQNyRZ6IOMs4lSocMGwH
+	 ClGUfqoazOPQtCpnh2M/dKPRR9nehaLyVlsdT3LDDeDHY3Cv9b6MN2yC8tRV6XZa3t
+	 QYjHj/d5BCuH73p6iErkWyO30jEcjW/wGMw12uB8rzMQCAzU9zhRX4QTbUg7KF/blS
+	 4zPRshHn9VtyganOS93WrDYuFSSvr2uFMnv/NoM/BXLMvpTjb5oT26u6a0Um1tmTXC
+	 A+xUgIOjlTUqg==
+Date: Fri, 15 Dec 2023 18:51:59 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- linux@armlinux.org.uk, andrew@lunn.ch, netdev@vger.kernel.org,
- mengyuanlou@net-swift.com
-Subject: Re: [PATCH net-next v5 7/8] net: wangxun: add ethtool_ops for
- channel number
-Message-ID: <20231215184107.1eaa8a95@kernel.org>
-In-Reply-To: <20231214025456.1387175-8-jiawenwu@trustnetic.com>
-References: <20231214025456.1387175-1-jiawenwu@trustnetic.com>
-	<20231214025456.1387175-8-jiawenwu@trustnetic.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+ <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
+ <hpa@zytor.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael
+ J. Wysocki" <rafael@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ "Christian =?UTF-8?B?S8O2bmln?=" <christian.koenig@amd.com>, Michael Chan
+ <michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
+ <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team
+ <linux-imx@nxp.com>, Jeroen de Borst <jeroendb@google.com>, Praveen
+ Kaligineedi <pkaligineedi@google.com>, Shailend Chand
+ <shailend@google.com>, Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
+ <salil.mehta@huawei.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, Marcin Wojtas <mw@semihalf.com>, Russell
+ King <linux@armlinux.org.uk>, Sunil Goutham <sgoutham@marvell.com>, Geetha
+ sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
+ hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, John Crispin
+ <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>, Mark Lee
+ <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Matthias
+ Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Horatiu Vultur
+ <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, "K. Y.
+ Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
+ Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Jassi Brar
+ <jaswinder.singh@linaro.org>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, Siddharth Vadapalli
+ <s-vadapalli@ti.com>, Ravi Gunasekaran <r-gunasekaran@ti.com>, Roger
+ Quadros <rogerq@kernel.org>, Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan
+ Lou <mengyuanlou@net-swift.com>, Ronak Doshi <doshir@vmware.com>, VMware
+ PV-Drivers Reviewers <pv-drivers@vmware.com>, Ryder Lee
+ <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>, Kalle
+ Valo <kvalo@kernel.org>, Juergen Gross <jgross@suse.com>, Stefano
+ Stabellini <sstabellini@kernel.org>, Oleksandr Tyshchenko
+ <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano
+ Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, "
+ =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?=" <mic@digikod.net>, Nathan Chancellor
+ <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Bill
+ Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Jason
+ Gunthorpe <jgg@nvidia.com>, Shakeel Butt <shakeelb@google.com>, Yunsheng
+ Lin <linyunsheng@huawei.com>, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>
+Subject: Re: [RFC PATCH net-next v1 2/4] net: introduce abstraction for
+ network memory
+Message-ID: <20231215185159.7bada9a7@kernel.org>
+In-Reply-To: <20231214020530.2267499-3-almasrymina@google.com>
+References: <20231214020530.2267499-1-almasrymina@google.com>
+	<20231214020530.2267499-3-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,46 +103,25 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 14 Dec 2023 10:54:55 +0800 Jiawen Wu wrote:
-> +	if (!(wx->msix_q_entries)) {
+On Wed, 13 Dec 2023 18:05:25 -0800 Mina Almasry wrote:
+> +struct netmem {
+> +	union {
+> +		struct page page;
+> +
+> +		/* Stub to prevent compiler implicitly converting from page*
+> +		 * to netmem_t* and vice versa.
+> +		 *
+> +		 * Other memory type(s) net stack would like to support
+> +		 * can be added to this union.
+> +		 */
+> +		void *addr;
+> +	};
+> +};
 
-pointless brackets
+My mind went to something like:
 
-> +void wx_get_channels(struct net_device *dev,
-> +		     struct ethtool_channels *ch)
-> +{
-> +	struct wx *wx = netdev_priv(dev);
-> +
-> +	/* report maximum channels */
-> +	ch->max_combined = wx_max_channels(wx);
-> +
-> +	/* report info for other vector */
-> +	if (wx->msix_q_entries) {
-> +		ch->max_other = 1;
-> +		ch->other_count = 1;
-> +	}
-> +
-> +	/* record RSS queues */
-> +	ch->combined_count = wx->ring_feature[RING_F_RSS].indices;
-> +
-> +	/* nothing else to report if RSS is disabled */
-> +	if (ch->combined_count == 1)
-> +		return;
+typedef unsigned long __bitwise netmem_ref;
 
-pointless return
-
-> +}
-> +EXPORT_SYMBOL(wx_get_channels);
-> +
-> +int wx_set_channels(struct net_device *dev,
-> +		    struct ethtool_channels *ch)
-> +{
-> +	unsigned int count = ch->combined_count;
-> +	struct wx *wx = netdev_priv(dev);
-> +
-> +	/* verify they are not requesting separate vectors */
-> +	if (!count || ch->rx_count || ch->tx_count)
-> +		return -EOPNOTSUPP;
-
-core shouldn't allow this to reach you
+instead. struct netmem does not exist, it's a handle which has 
+to be converted to a real type using a helper.
 
