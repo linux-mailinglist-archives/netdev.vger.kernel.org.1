@@ -1,101 +1,159 @@
-Return-Path: <netdev+bounces-58292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85E14815BA9
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 21:23:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51D95815BB7
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 21:36:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94F321C21AA5
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 20:23:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E553A2845D8
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 20:36:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2870C32C62;
-	Sat, 16 Dec 2023 20:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VDWbmCsE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DBA81D697;
+	Sat, 16 Dec 2023 20:36:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7316328D6;
-	Sat, 16 Dec 2023 20:23:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a2339262835so20613466b.3;
-        Sat, 16 Dec 2023 12:23:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702758220; x=1703363020; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JvDfT9hUlqd//b2qmA2Q0ZygPz1sbEjPpPLswigsGbw=;
-        b=VDWbmCsEFgT/qW4KPG9KLZaZD7c3CHuV/lAD4YuuctGgId5Ma9gMfYi1ckvZJX6ykx
-         nWEkuR+f96xsWmXSVTCEB2ZqFTep5RWbEq8F90cZJz1mWejaCmIruEnPrUAEEkgKeivV
-         iPCmhlTqEkmgm2UUmjdk/hzj/lG69HZ0OGo8wV/vL9vxfnTw0mwDjsSzVUfRo1IuAm98
-         ua3JfJDXJiwmik+DX7jKJZiVNeeppq5jS58/yHtdac0x+ycWwcK0F1tESfbb/iIL5A6b
-         6u5N3EB5I1TI4g7P/guIXaYuXZwx0UvKg2dcFOnRYNqOKArosC8upc7oSY8iopLTEv9Z
-         /80w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702758220; x=1703363020;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JvDfT9hUlqd//b2qmA2Q0ZygPz1sbEjPpPLswigsGbw=;
-        b=tzN8/eO0B1BN6zy0ZZcdTauo9WQ60tFjrpTRyReSwu8IZ3SoHK0I1Y5k/NxHOxT1zG
-         jk4kuZvFa5h4hXVAeU+slIGgo9BM51azmX9rO1eII2Nve5pM9xwYhOE71iJEQdvhfkog
-         hW18MGQBlGHn39+WbAkHjJrY2xYdMG7kqGLkK16RtnC3PpvhaSXyabHv+ZuNfhBQvh/g
-         cheR9ysgNmJcnqRt8swY3xLnZHh1C2K+8R6l3cStYWOSR37OLBiD1t/KsZMDWzBp32k+
-         bH2AwUCMJEz7RnyUKJ17qymwvORVg6dkYHX3dNLcyFvYxnKrprJRGZskwFWkkaLc16FU
-         Te2g==
-X-Gm-Message-State: AOJu0YzzwWyTXUcTcztrmcz7ZhnW4S2irq1Krfu5y6CYd4zV9S2qjpU0
-	NQB6Tm/Dpm8c7gnGF7VcAmk=
-X-Google-Smtp-Source: AGHT+IGv3TjKn9mKLtvthLiz2xswkA4zxxNvNgsA6ZCF80vG1PfJNNksoFMPi2V5JzAzmgUtfGy6BA==
-X-Received: by 2002:a17:906:1d7:b0:a23:309b:e0cb with SMTP id 23-20020a17090601d700b00a23309be0cbmr377715ejj.155.1702758219852;
-        Sat, 16 Dec 2023 12:23:39 -0800 (PST)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id lm11-20020a17090718cb00b00a1cf3fce937sm12170176ejc.162.2023.12.16.12.23.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 16 Dec 2023 12:23:39 -0800 (PST)
-Message-ID: <cd60b227-df1c-4fea-9554-695261c9d6a9@gmail.com>
-Date: Sat, 16 Dec 2023 21:23:38 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330ED1E48E;
+	Sat, 16 Dec 2023 20:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (31.173.82.73) by msexch01.omp.ru (10.188.4.12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 16 Dec
+ 2023 23:36:32 +0300
+Subject: Re: [PATCH net-next v2 20/21] net: ravb: Do not apply RX CSUM
+ settings to hardware if the interface is down
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>,
+	<geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214114600.2451162-21-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <247ad9d9-298e-017b-f6e4-e672ee458ee7@omp.ru>
+Date: Sat, 16 Dec 2023 23:36:31 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next 2/2] Add the Airoha EN8811H PHY driver
+In-Reply-To: <20231214114600.2451162-21-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-To: Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Russell King <linux@armlinux.org.uk>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Frank Wunderlich <frank-w@public-files.de>,
- Daniel Golle <daniel@makrotopia.org>, Lucien Jheng
- <lucien.jheng@airoha.com>, Zhi-Jun You <hujy652@protonmail.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org
-References: <20231216194432.18963-2-ericwouds@gmail.com>
- <20231216194432.18963-3-ericwouds@gmail.com>
- <a0a47222-769b-4aaf-9143-1d7ad3e6ade9@gmail.com>
-From: Eric Woudstra <ericwouds@gmail.com>
-In-Reply-To: <a0a47222-769b-4aaf-9143-1d7ad3e6ade9@gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/16/2023 20:25:28
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182147 [Dec 16 2023]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_phishing_log_reg_50_60}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.82.73 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	31.173.82.73:7.1.2;127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.82.73
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 12/16/2023 20:30:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 12/16/2023 5:57:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
+On 12/14/23 2:45 PM, Claudiu wrote:
 
-
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 > 
-> Why don't you use the module_phy_driver() macro?
+> Do not apply the RX CSUM settings to hardware if the interface is down. In
+> case runtime PM is enabled, and while the interface is down, the IP will be
+> in reset mode (as for some platforms disabling/enabling the clocks will
+> switch the IP to standby mode, which will lead to losing registers'
+
+   To/From perhaps?
+   And just "register".
+
+> content) and applying settings in reset mode is not an option. Instead,
+> cache the RX CSUM settings and apply them in ravb_open().
+
+   Have this issue actually occurred for you?
+
+> Commit prepares for the addition of runtime PM.
 > 
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+[...]
 
-Thanks for the tip, I missed that in the conversion to recent kernel.
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index 633346b6cd7c..9ff943dff522 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -1868,6 +1868,15 @@ static int ravb_open(struct net_device *ndev)
+>  	if (info->gptp || info->ccc_gac)
+>  		ravb_ptp_init(ndev, priv->pdev);
+>  
+> +	/* Apply features that might have been changed while the interface
+> +	 * was down.
+> +	 */
+> +	if (ndev->hw_features & NETIF_F_RXCSUM) {
 
-I will.
+   I'm afraid this is a wrong field; we need ndev->features, no?
+
+> +		u32 val = (ndev->features & NETIF_F_RXCSUM) ? ECMR_RCSC : 0;
+> +
+> +		ravb_modify(ndev, ECMR, ECMR_RCSC, val);
+> +	}
+> +
+
+   The ECMR setting is already done in ravb_emac_init_rcar(), no need
+to duplicate it here, I think...
+
+>  	/* PHY control start */
+>  	error = ravb_phy_start(ndev);
+>  	if (error)
+> @@ -2337,6 +2346,9 @@ static void ravb_set_rx_csum(struct net_device *ndev, bool enable)
+>  	struct ravb_private *priv = netdev_priv(ndev);
+>  	unsigned long flags;
+>  
+> +	if (!netif_running(ndev))
+
+   Racy as well...
+
+> +		return;
+> +
+
+   Hm, sh_eth.c doesn't have such check -- perhaps should be fixed
+as well...
+
+[...]
+
+MBR, Sergey
 
