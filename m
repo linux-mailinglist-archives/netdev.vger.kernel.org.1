@@ -1,103 +1,75 @@
-Return-Path: <netdev+bounces-58176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CE16815696
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 04:01:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D3CB8156EB
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 04:33:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C7D7B234E3
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 03:01:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6D8C287AD7
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 03:33:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26DD81877;
-	Sat, 16 Dec 2023 03:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ACBA23D4;
+	Sat, 16 Dec 2023 03:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kSJWuzXf"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Yf/0Qb7d"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0F71869;
-	Sat, 16 Dec 2023 03:01:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB8FFC433C7;
-	Sat, 16 Dec 2023 03:01:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702695691;
-	bh=/P/ZhrLqJHACtkn9yyEkbbr1lTbkhgNG4DxVbVllBpc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kSJWuzXf5JsHFjt6K7rC+2VlvyaR6vrFZPqXGVBXJ22KO4Xlf0lCZ6503KvqaGDL9
-	 IS4QM56v9pkuRl1X3HiEY24kAYSv4YOAY0AZ/6yZjXOI4Qubv7whLLJ6VlTUKGRtoT
-	 L1k7/gFq6GVPcg4ZfH/lgDpPFnzba89eyccX0FQbsbQFs3gfLhwEzKHSjRVwwazTVM
-	 npO5CMl1qlngApV+pK6Cki843NGMwIUeJYmBnzSLUYFdflZM16+e9IHhFZW2xB0jMs
-	 c7+bzsTrOS7SIewdnVCHELoCnspZ01H+edRsLNE8MGbibM1YZ+LoHXvhgn+1yeXICt
-	 ny2/w064p7T4A==
-Date: Fri, 15 Dec 2023 19:01:26 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Shakeel Butt <shakeelb@google.com>
-Cc: Mina Almasry <almasrymina@google.com>, Yunsheng Lin
- <linyunsheng@huawei.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org, Thomas Gleixner
- <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
- <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
- Sumit Semwal <sumit.semwal@linaro.org>, "Christian =?UTF-8?B?S8O2bmln?="
- <christian.koenig@amd.com>, Michael Chan <michael.chan@broadcom.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
- Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Wei
- Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
- <xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, Jeroen de
- Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- Shailend Chand <shailend@google.com>, Yisen Zhuang
- <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, Jesse
- Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, Marcin Wojtas <mw@semihalf.com>, Russell
- King <linux@armlinux.org.uk>, Sunil Goutham <sgoutham@marvell.com>, Geetha
- sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
- hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, John Crispin
- <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>, Mark Lee
- <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Matthias
- Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>, Saeed Mahameed
- <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Horatiu Vultur
- <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, "K. Y.
- Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
- Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Jassi Brar
- <jaswinder.singh@linaro.org>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, Siddharth Vadapalli
- <s-vadapalli@ti.com>, Ravi Gunasekaran <r-gunasekaran@ti.com>, Roger
- Quadros <rogerq@kernel.org>, Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan
- Lou <mengyuanlou@net-swift.com>, Ronak Doshi <doshir@vmware.com>, VMware
- PV-Drivers Reviewers <pv-drivers@vmware.com>, Ryder Lee
- <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>, Kalle
- Valo <kvalo@kernel.org>, Juergen Gross <jgross@suse.com>, Stefano
- Stabellini <sstabellini@kernel.org>, Oleksandr Tyshchenko
- <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano
- Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, "
- =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?=" <mic@digikod.net>, Nathan Chancellor
- <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Bill
- Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Jason
- Gunthorpe <jgg@nvidia.com>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>
-Subject: Re: [RFC PATCH net-next v1 4/4] net: page_pool: use netmem_t
- instead of struct page in API
-Message-ID: <20231215190126.1040fa12@kernel.org>
-In-Reply-To: <20231215021114.ipvdx2bwtxckrfdg@google.com>
-References: <20231214020530.2267499-1-almasrymina@google.com>
-	<20231214020530.2267499-5-almasrymina@google.com>
-	<ddffff98-f3de-6a5d-eb26-636dacefe9aa@huawei.com>
-	<CAHS8izO2nDHuxKau8iLcAmnho-1TYkzW09MBZ80+JzOo9YyVFA@mail.gmail.com>
-	<20231215021114.ipvdx2bwtxckrfdg@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49FDB32C64
+	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 03:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-5bdbe2de25fso1079845a12.3
+        for <netdev@vger.kernel.org>; Fri, 15 Dec 2023 19:30:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1702697427; x=1703302227; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xvJvZX9MVMaNFrVGKDw+JqESfxfEY0+7o4ksFuEFYe4=;
+        b=Yf/0Qb7dWqWK4NnTDfg5tAtz1lt0p6FQTv16+ySDKSOgMhjB1D7AkWUVlMILFROlWD
+         lrRNV4WfSwJ4MUtanhC+K0o8vl7sZAXC0RJq9hcODJdcZ4pzYA2JAmNxTlFXmTEZCxek
+         zhWc7faY1xpF3TzwllPjjv4qBHyue3C2tgQ8I+1f8H41pdwiAC4/4Rjp6PaTx91ON5+W
+         3CCMAfnDlysKb+DaMfKSpKTaUTj7fzu8u/Y4PCe49Pdtgutx/JMclqBKxDg57WPrdJFF
+         1pnu80cYvpKfEf2fL7mqDWhrk5cT+PXn6AXImqIocl2OhhBFr1jTWiKWaHdYKd7NSiGo
+         7xdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702697427; x=1703302227;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xvJvZX9MVMaNFrVGKDw+JqESfxfEY0+7o4ksFuEFYe4=;
+        b=t0yVGcW4dpFDaOJUWAjh0Qes/bY2RyjexNTHavhuF5rkbpQo9UgXkzWzIKx8q30dVP
+         cPYE73kIS8JNwDEQTW/Bp1QHpYxzzcHnSnU5WwCt0AS2FPplkx6ghNcetOO1XJjfFD8R
+         cfav/SgtEVQDnpThlIult8C3s0s6960rMWOOnfzZqjbUQltplarqRgY66Sc65ZApoBzQ
+         Z8SfVZLHufHUgqJE9RLcs18N7VtUtrS9CIM8jWGRU2w74C+UT+mawMFhpCyafdyOj9OE
+         9Ljogl69y/6MX6vReKqZex4k6MHOsVBmYlyoHShGQBWoIIYtdFSzBlrjo9TnKa8vBlwR
+         jZtA==
+X-Gm-Message-State: AOJu0YwhfDJWLySRhw9ebbszekAq08n7ZKWCbVZZ4vL14gEXu6u7Qfb1
+	HM+J3GPRNaa+BIpXJYzt8w13AQ==
+X-Google-Smtp-Source: AGHT+IG6s8lfUZo0Vxcy0w9JOjCtXYSHv/DZCAkJhN2T5J+mSH0L5DYWqC5tRqgOciFsbejRWHeRjw==
+X-Received: by 2002:a05:6a20:100b:b0:193:fd0c:a268 with SMTP id gs11-20020a056a20100b00b00193fd0ca268mr1376550pzc.29.1702697427348;
+        Fri, 15 Dec 2023 19:30:27 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id ka38-20020a056a0093a600b006d28dec8a40sm506709pfb.56.2023.12.15.19.30.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Dec 2023 19:30:26 -0800 (PST)
+Date: Fri, 15 Dec 2023 19:30:24 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Graeme Smecher <gsmecher@threespeedlogic.com>
+Cc: David Ahern <dsahern@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ claudiu.beznea@tuxon.dev, nicolas.ferre@microchip.com, mdf@kernel.org
+Subject: Re: [PATCH] RFC: net: ipconfig: temporarily bring interface down
+ when changing MTU.
+Message-ID: <20231215193024.02819d85@hermes.local>
+In-Reply-To: <20231216010431.84776-1-gsmecher@threespeedlogic.com>
+References: <58519bfa-260c-4745-a145-fdca89b4e9d1@kernel.org>
+	<20231216010431.84776-1-gsmecher@threespeedlogic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,19 +79,56 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 15 Dec 2023 02:11:14 +0000 Shakeel Butt wrote:
-> > From my POV it has to be the first one. We want to abstract the memory
-> > type from the drivers as much as possible, not introduce N new memory
-> > types and ask the driver to implement new code for each of them
-> > separately.
+On Fri, 15 Dec 2023 17:04:31 -0800
+Graeme Smecher <gsmecher@threespeedlogic.com> wrote:
+
+> Several network drivers (sh_eth, macb_main, nixge, sundance) only allow
+> the MTU to be changed when the interface is down, because their buffer
+> allocations are performed during ndo_open() and calculated using a
+> specific MTU.
 > 
-> Agree with Mina's point. Let's aim to decouple memory types from
-> drivers.
+> Kick-tested using QEMU (rtl8139, e1000).
+> 
+> Tested-by: Graeme Smecher <gsmecher@threespeedlogic.com>
+> ---
+>  net/ipv4/ipconfig.c | 18 +++++++++++++++---
+>  1 file changed, 15 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
+> index c56b6fe6f0d7..69c2a41393a0 100644
+> --- a/net/ipv4/ipconfig.c
+> +++ b/net/ipv4/ipconfig.c
+> @@ -396,9 +396,21 @@ static int __init ic_setup_if(void)
+>  	 */
+>  	if (ic_dev_mtu != 0) {
+>  		rtnl_lock();
+> -		if ((err = dev_set_mtu(ic_dev->dev, ic_dev_mtu)) < 0)
+> -			pr_err("IP-Config: Unable to set interface mtu to %d (%d)\n",
+> -			       ic_dev_mtu, err);
+> +		/* Some Ethernet adapters only allow MTU to change when down. */
+Check if interface was already down first.
 
-What does "decouple" mean? Drivers should never convert netmem 
-to pages. Either a path in the driver can deal with netmem,
-i.e. never touch the payload, or it needs pages.
+> +		if((err = dev_change_flags(ic_dev->dev, ic_dev->dev->flags | IFF_UP, NULL)))
 
-Perhaps we should aim to not export netmem_to_page(),
-prevent modules from accessing it directly.
+Please do not combine function call with err test. Surprised checkpatch doesn't complain about hat.
+
+> +			pr_err("IP-Config: About to set MTU, but failed to "
+> +				 "bring interface %s down! (%d)\n",
+
+Don't break lines in error messages.
+> +				 ic_dev->dev->name, err);
+> +		else {
+> +			if ((err = dev_set_mtu(ic_dev->dev, ic_dev_mtu)) < 0)
+> +				pr_err("IP-Config: Unable to set interface mtu to %d (%d)\n",
+> +				       ic_dev_mtu, err);
+> +
+> +			if((err = dev_change_flags(ic_dev->dev, ic_dev->dev->flags | IFF_UP, NULL)))
+> +				pr_err("IP-Config: Trying to set MTU, but unable "
+> +					 "to bring interface %s back up! (%d)\n",
+> +					 ic_dev->dev->name, err);
+> +		}
+>  		rtnl_unlock();
+>  	}
+>  	return 0;
+
 
