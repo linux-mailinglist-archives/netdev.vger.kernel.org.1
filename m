@@ -1,151 +1,110 @@
-Return-Path: <netdev+bounces-58273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD529815B5A
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 20:37:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 456D6815B5B
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 20:38:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47832284E07
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 19:37:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEF8E1F2334A
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 19:38:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E59632C6B;
-	Sat, 16 Dec 2023 19:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sb/Pyfeh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2AA831A9C;
+	Sat, 16 Dec 2023 19:38:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73026328A6
-	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 19:36:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-50e270639d9so853540e87.3
-        for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 11:36:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702755414; x=1703360214; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9h9Ee/Vwe1BIQxBQqqcTxcTd1wrlWdnAiQYYrezMqwc=;
-        b=sb/Pyfeh8z1OtZ04S5ISpAiwsUnCm7TTcqvL8zDF7U3cFLVgeUo57JXj00ycCB7YmX
-         GnlFtZkYgkLf8zPffckB0xCZ38g7YgL6YoQ4NB0qZamEtZcYwOmHiFZmGxC+8PObXPz8
-         JKScbTCiJTQYconhPfHZcaJ2whRRxaTe8fcVbkrA7qZjQASsrhbc++br5LyyRDYpwqEh
-         +N06bYd2lsnJQ9s3RLs5HoVTsvSLsA0sJFW2waXr6UOJoUa4To2XoeTXu8hJeWOEJFwy
-         cDvW74uXXOqnGVzbMIytY0BMZMIHcRUnOPsjzpYmW+zivkFSSnR6qFw6okPYafWOBMjs
-         r2KA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702755414; x=1703360214;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9h9Ee/Vwe1BIQxBQqqcTxcTd1wrlWdnAiQYYrezMqwc=;
-        b=STZl1bdm1MnUoDOrYHqe20hUusvo4/FkR7zgauL7FoZ1KB1ntzcIw5DXEC5VFNkHGn
-         hAErKIWyJI5V1801+fcjgfWFs2Umm3a0lRDU82XTazh/EvmVlhuyOdgreLAXJRRtdcgD
-         PFXbASBksqPtNv8r1LyL2mUvEIjLSPGs5XNbNfSkJ/xFHwNb4f9hr4QzTJXGwXtnnS6+
-         t0tPOFbhcedQt1fQHMwaTQzEP58cTo5fqZ4qOluG/0tJeb0CmgF7xhX4+pkJDTFEZeA5
-         svREEIq+oNTgMxETQHmIDEw9RlY+EKaebNYEAskuJ/cxauFnPfvLgrAuTRn0ycmiESFg
-         a0dQ==
-X-Gm-Message-State: AOJu0YzU4jRIotkmNqZ4pk+uMmD/J7oVXpd+hjo5A3fgFzS+R7gp8tdU
-	ZlZDMtzBpsvtEMMCJTe9yeRNlyONLA8iIh+xHzg=
-X-Google-Smtp-Source: AGHT+IFzz+T2hXXKxiCdBwJyMPL+OjikGaLBZmuS4blLXomqcUvu7YRY16pFw58HaKIwbEvjI8YB8w==
-X-Received: by 2002:a05:6512:693:b0:50b:b9c7:9f3d with SMTP id t19-20020a056512069300b0050bb9c79f3dmr9084665lfe.21.1702755414542;
-        Sat, 16 Dec 2023 11:36:54 -0800 (PST)
-Received: from [127.0.1.1] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id u13-20020ac25bcd000000b0050bc96f5258sm2441553lfn.214.2023.12.16.11.36.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Dec 2023 11:36:54 -0800 (PST)
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sat, 16 Dec 2023 20:36:53 +0100
-Subject: [PATCH net v2 2/2] net: ethernet: cortina: Bypass checksumming
- engine of alien ethertypes
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3B030F8A;
+	Sat, 16 Dec 2023 19:38:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (31.173.82.73) by msexch01.omp.ru (10.188.4.12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 16 Dec
+ 2023 22:38:16 +0300
+Subject: Re: [PATCH net-next v2 16/21] net: ravb: Keep the reverse order of
+ operations in ravb_close()
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>,
+	<geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214114600.2451162-17-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <665f3a75-2687-d8bf-9fe0-9693759b8f3f@omp.ru>
+Date: Sat, 16 Dec 2023 22:38:16 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <20231214114600.2451162-17-claudiu.beznea.uj@bp.renesas.com>
 Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231216-new-gemini-ethernet-regression-v2-2-64c269413dfa@linaro.org>
-References: <20231216-new-gemini-ethernet-regression-v2-0-64c269413dfa@linaro.org>
-In-Reply-To: <20231216-new-gemini-ethernet-regression-v2-0-64c269413dfa@linaro.org>
-To: Hans Ulli Kroll <ulli.kroll@googlemail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
-X-Mailer: b4 0.12.4
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/16/2023 19:03:00
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182147 [Dec 16 2023]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.82.73 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.82.73 in (user) dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;31.173.82.73:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.82.73
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 12/16/2023 19:09:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 12/16/2023 5:24:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-We had workarounds were the ethernet checksumming engine would be bypassed
-for larger frames, this fixed devices using DSA, but regressed devices
-where the ethernet was connected directly to a PHY.
+On 12/14/23 2:45 PM, Claudiu wrote:
 
-The devices with a PHY connected directly can't handle large frames
-either way, with or without bypass. Looking at the size of the frame
-is probably just wrong.
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> Keep the reverse order of operations in ravb_close() when comparing with
 
-Rework the workaround such that we just bypass the checksumming engine if
-the ethertype inside the actual frame is something else than 0x0800
-(IPv4) or 0x86dd (IPv6). These are the only frames the checksumming engine
-can actually handle. VLAN framing (0x8100) also works fine.
+   Compared.
 
-We can't inspect skb->protocol because DSA frames will sometimes have a
-custom ethertype despite skb->protocol is e.g. 0x0800.
+> ravb_open(). This is the recommended configuration sequence.
+> 
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-After this both devices with direct ethernet attached such as D-Link
-DNS-313 and devices with a DSA switch with a custom ethertype such as
-D-Link DIR-685 work fine.
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-Fixes: d4d0c5b4d279 ("net: ethernet: cortina: Handle large frames")
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- drivers/net/ethernet/cortina/gemini.c | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
+[...]
 
-diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethernet/cortina/gemini.c
-index 6a7ea051391a..1400f19bf05b 100644
---- a/drivers/net/ethernet/cortina/gemini.c
-+++ b/drivers/net/ethernet/cortina/gemini.c
-@@ -1143,7 +1143,9 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
- 	skb_frag_t *skb_frag;
- 	dma_addr_t mapping;
- 	unsigned short mtu;
-+	u16 ethertype;
- 	void *buffer;
-+	__be16 *p;
- 
- 	mtu  = ETH_HLEN;
- 	mtu += netdev->mtu;
-@@ -1158,7 +1160,24 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
- 		word3 |= mtu;
- 	}
- 
--	if (skb->ip_summed == CHECKSUM_PARTIAL) {
-+	/* Dig out the the ethertype actually in the buffer and not what the
-+	 * protocol claims to be. This is the raw data that the checksumming
-+	 * offload engine will have to deal with.
-+	 */
-+	p = (__be16 *)(skb->data + 2 * ETH_ALEN);
-+	ethertype = ntohs(*p);
-+	if (ethertype == ETH_P_8021Q) {
-+		p += 2; /* +2 sizeof(__be16) */
-+		ethertype = ntohs(*p);
-+	}
-+
-+	if (ethertype != ETH_P_IP && ethertype != ETH_P_IPV6) {
-+		/* Hardware offloaded checksumming isn't working on non-IP frames.
-+		 * This happens for example on some DSA switches using a custom
-+		 * ethertype. Just bypass the engine for those.
-+		 */
-+		word1 |= TSS_BYPASS_BIT;
-+	} else if (skb->ip_summed == CHECKSUM_PARTIAL) {
- 		int tcp = 0;
- 
- 		/* We do not switch off the checksumming on non TCP/UDP
-
--- 
-2.34.1
-
+MBR, Sergey
 
