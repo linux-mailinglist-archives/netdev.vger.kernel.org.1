@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-58271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B59B5815B58
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 20:37:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B5DC6815B59
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 20:37:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8D1E1C21E9D
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 19:37:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E84FF1C2193E
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 19:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 920DA328B1;
-	Sat, 16 Dec 2023 19:36:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EEAD328CD;
+	Sat, 16 Dec 2023 19:36:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UXbEPbIX"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AwkAdIVr"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C76D330F8A
-	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 19:36:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B90F31A8E
+	for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 19:36:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-50bdec453c8so1977073e87.3
-        for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 11:36:54 -0800 (PST)
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-50e30b28c1aso299782e87.0
+        for <netdev@vger.kernel.org>; Sat, 16 Dec 2023 11:36:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google; t=1702755413; x=1703360213; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/iqFExnMMnDmnSeIZIxR8k3x9FOQqNIEVBfvkstK1ys=;
-        b=UXbEPbIXNWzpPe/BOHMgcggeYym9ugJmfcfJgyzimh7tZk3laitmyY1OV3YHmaT1ZV
-         bJAw5LAyIJzmPzm08eFzNG0sPA3q36u5pTFtpGDr7Ncle/fYfmDNYeQSPMvCe1V3uwo2
-         AKQ0jMAY+7aHAUOzl2Nog4CEMWqezq1t9aQtcyF7yw4rglrvqb2KK3gLC4UThRE4/RhW
-         WgLPRsexONZ0RWEBm+SZqe3OrQjGrvSCW7jCnlRA8zG21OYp9YwDgY98LPUaRCpZWTe6
-         lGruaSi2viAEdgZf3fqEpn2n/IwnmWg86e36swiefvlzrXOOQ07531DLMgpqy6E5qHSj
-         KoSQ==
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RVRwOGlgS4OX+8vqS+0hxHNi+4vVCWuPIOJJBMqWhWs=;
+        b=AwkAdIVrpZzQjk1itmEtvQHQXik0zUpSni1rLSkQsNifH6+QEUgePUKjtPfMSJGs37
+         apjy0Elf6ydjs4IG0sqkDaaT6LhjE0XQtRGpZSDSxCfG5/elNhA8USwN3AXVyH5kLX7c
+         EE+98jKl1e91p7DesMhOevmbBxtgJYOBuGRlwqf2BVSHn/Ljpv1pe6zOsYcB56zzHzOM
+         ghCkWfzHs6/O0dUHpUFx4TKXcI7ZA0+uFEsL7KjiFNjBLav7GnKc0Uzh2kTKuNTGEjTq
+         HJMnuJ2P9IwogX2fwjm2S2FzJf06XcX9CScw0G99NqCYGGt20UryT9fUkpnCWhhPCPtt
+         pB6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1702755413; x=1703360213;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/iqFExnMMnDmnSeIZIxR8k3x9FOQqNIEVBfvkstK1ys=;
-        b=oWwsxXorz07UBF2B5B5PTqcM+BcdSSrGtL5AQpZmlDGmYyIGQgqnrEWckAeOHd9bCo
-         V2PfwbQPuGgWAAxmdh9MLVUyE+7Mo0k8O9QHRm781XrQ5Jl3vS0/10VP7hKhoTMAHc4h
-         WjdzezKy9SuBU9nIX6WIqVbbIIPwuodV43eqqqZdVBLhgm9eBf43Hy4F3w3/3Jfd2pw/
-         W4GZgISFLRrr3Iy26MU7TWs4O7afTp/UvGQXLUeO4t7mOf7Ts9E98XJJltSDZft+yDO2
-         tEbswXbhdp40jzzcidwnD559GSb2tnU9s+tU2Eh0Uf33VYSg0hBp3qieg6yTrbMJL9a4
-         HIQg==
-X-Gm-Message-State: AOJu0YxEUcH4o428VzuGoAJbnMSnRfS+PGVAjwwrRqmWkRIfDDHl/LL0
-	QDqGCZYRp9jNMhrVfHTuJCR8Xw==
-X-Google-Smtp-Source: AGHT+IG+R9Dj4buPVokLmNqNC563QcuFSeQfLUjcQvKLkso27rvIBKeqh1RuA4h2iKSLvh6p5ZhM3Q==
-X-Received: by 2002:ac2:52b4:0:b0:50b:f041:e434 with SMTP id r20-20020ac252b4000000b0050bf041e434mr5698422lfm.70.1702755412834;
-        Sat, 16 Dec 2023 11:36:52 -0800 (PST)
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RVRwOGlgS4OX+8vqS+0hxHNi+4vVCWuPIOJJBMqWhWs=;
+        b=nIhIc4PXgGpw41q68WEpm6S6mH4NW0L3poQk8EIzS8oe93sZIvnL2GqZVq6sN1V/AP
+         UGPikrKi1KUF9KniF1g473O7+po8sJoazBOIn3G+Q+bTTjT1nwb7hMHX7SdDJ9dK7WtV
+         /eoW7m2UPEOtMoAs7u2/XA6y/xvowzF7lZTNnFQwtGFSh8JcY73a4TT+0YhizBxtFe5T
+         tpLmQmXgyS8fS8KP60tCtGHj95ZFfRtwPcBn7SIbRGPbT9EQePAC/+0JcYuML4X02Wvj
+         alWAeM7FJsCkMhuxiAaltjwbPhuNrebXYeeX1PDDFBMw8ciLE5EhCLcIsrJQfuoHJjBK
+         qc6g==
+X-Gm-Message-State: AOJu0YxJHATxnLWI5rgIn/wYaja5xX6GVE9e6u4E3SQpUR754Yk1rkgD
+	tRE4jUKBKMKCyVwbpWyLLh0cCs8RSh9QY0HgZ48=
+X-Google-Smtp-Source: AGHT+IHY2ROHEnoFTZYPwJOrMyDhsKSiT8c8G0JCi/UQNfM0wO3Ieumfb25ZUVURB0//wh+mxHCHxQ==
+X-Received: by 2002:ac2:4c4a:0:b0:50b:ef70:8d66 with SMTP id o10-20020ac24c4a000000b0050bef708d66mr8871731lfk.26.1702755413706;
+        Sat, 16 Dec 2023 11:36:53 -0800 (PST)
 Received: from [127.0.1.1] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id u13-20020ac25bcd000000b0050bc96f5258sm2441553lfn.214.2023.12.16.11.36.51
+        by smtp.gmail.com with ESMTPSA id u13-20020ac25bcd000000b0050bc96f5258sm2441553lfn.214.2023.12.16.11.36.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Dec 2023 11:36:52 -0800 (PST)
+        Sat, 16 Dec 2023 11:36:53 -0800 (PST)
 From: Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH net v2 0/2] Fix a regression in the Gemini ethernet
- controller.
-Date: Sat, 16 Dec 2023 20:36:51 +0100
-Message-Id: <20231216-new-gemini-ethernet-regression-v2-0-64c269413dfa@linaro.org>
+Date: Sat, 16 Dec 2023 20:36:52 +0100
+Subject: [PATCH net v2 1/2] net: ethernet: cortina: Drop software checksum
+ and TSO
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,43 +69,103 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAFP8fWUC/4WNTQ6CMBCFr0Jm7Zi2AxpceQ/DAmEok2hrpgQ1h
- Ltb8QAu39/3FkiswglOxQLKsySJIQu3K6Ab2+AZpc8anHFknSEM/ETPdwmCPI2sgSdU9srpO0X
- qDkfXc90NfQ0Z8lAe5LUdXCB3ocnmKGmK+t5OZ7tFP76t/vFniwZrMkRVWV7Z0fkmodW4j+qhW
- df1A9dmVP3SAAAA
+Message-Id: <20231216-new-gemini-ethernet-regression-v2-1-64c269413dfa@linaro.org>
+References: <20231216-new-gemini-ethernet-regression-v2-0-64c269413dfa@linaro.org>
+In-Reply-To: <20231216-new-gemini-ethernet-regression-v2-0-64c269413dfa@linaro.org>
 To: Hans Ulli Kroll <ulli.kroll@googlemail.com>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
 X-Mailer: b4 0.12.4
 
-These fixes were developed on top of the earlier fixes.
+The recent change to allow large frames without hardware checksumming
+slotted in software checksumming in the driver if hardware could not
+do it.
 
-Finding the right solution is hard because the Gemini checksumming
-engine is completely undocumented in the datasheets.
+This will however upset TSO (TCP Segment Offloading). Typical
+error dumps includes this:
 
+skb len=2961 headroom=222 headlen=66 tailroom=0
+(...)
+WARNING: CPU: 0 PID: 956 at net/core/dev.c:3259 skb_warn_bad_offload+0x7c/0x108
+gemini-ethernet-port: caps=(0x0000010000154813, 0x00002007ffdd7889)
+
+And the packets do not go through.
+
+After investigating I drilled it down to the introduction of the
+software checksumming in the driver.
+
+Since the segmenting of packets will be done by the hardware this
+makes a bit of sense since in that case the hardware also needs to
+be keeping track of the checksumming.
+
+That begs the question why large TCP or UDP packets also have to
+bypass the checksumming (like e.g. ICMP does). If the hardware is
+splitting it into smaller packets per-MTU setting, and checksumming
+them, why is this happening then? I don't know. I know it is needed,
+from tests: the OpenWrt webserver uhttpd starts sending big skb:s (up
+to 2047 bytes, the max MTU) and above 1514 bytes it starts to fail
+and hang unless the bypass bit is set: the frames are not getting
+through.
+
+Drop the size check and the offloading features for now: this
+needs to be fixed up properly.
+
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Fixes: d4d0c5b4d279 ("net: ethernet: cortina: Handle large frames")
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
-Changes in v2:
-- Drop the TSO and length checks altogether, this was never
-  working properly.
-- Plan to make a proper TSO implementation in the next kernel
-  cycle.
-- Link to v1: https://lore.kernel.org/r/20231215-new-gemini-ethernet-regression-v1-0-93033544be23@linaro.org
+ drivers/net/ethernet/cortina/gemini.c | 21 ++-------------------
+ 1 file changed, 2 insertions(+), 19 deletions(-)
 
----
-Linus Walleij (2):
-      net: ethernet: cortina: Drop software checksum and TSO
-      net: ethernet: cortina: Bypass checksumming engine of alien ethertypes
+diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethernet/cortina/gemini.c
+index 78287cfcbf63..6a7ea051391a 100644
+--- a/drivers/net/ethernet/cortina/gemini.c
++++ b/drivers/net/ethernet/cortina/gemini.c
+@@ -79,8 +79,7 @@ MODULE_PARM_DESC(debug, "Debug level (0=none,...,16=all)");
+ #define GMAC0_IRQ4_8 (GMAC0_MIB_INT_BIT | GMAC0_RX_OVERRUN_INT_BIT)
+ 
+ #define GMAC_OFFLOAD_FEATURES (NETIF_F_SG | NETIF_F_IP_CSUM | \
+-		NETIF_F_IPV6_CSUM | NETIF_F_RXCSUM | \
+-		NETIF_F_TSO | NETIF_F_TSO_ECN | NETIF_F_TSO6)
++	       NETIF_F_IPV6_CSUM | NETIF_F_RXCSUM )
+ 
+ /**
+  * struct gmac_queue_page - page buffer per-page info
+@@ -1145,7 +1144,6 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
+ 	dma_addr_t mapping;
+ 	unsigned short mtu;
+ 	void *buffer;
+-	int ret;
+ 
+ 	mtu  = ETH_HLEN;
+ 	mtu += netdev->mtu;
+@@ -1160,22 +1158,7 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
+ 		word3 |= mtu;
+ 	}
+ 
+-	if (skb->len >= ETH_FRAME_LEN) {
+-		/* Hardware offloaded checksumming isn't working on frames
+-		 * bigger than 1514 bytes. A hypothesis about this is that the
+-		 * checksum buffer is only 1518 bytes, so when the frames get
+-		 * bigger they get truncated, or the last few bytes get
+-		 * overwritten by the FCS.
+-		 *
+-		 * Just use software checksumming and bypass on bigger frames.
+-		 */
+-		if (skb->ip_summed == CHECKSUM_PARTIAL) {
+-			ret = skb_checksum_help(skb);
+-			if (ret)
+-				return ret;
+-		}
+-		word1 |= TSS_BYPASS_BIT;
+-	} else if (skb->ip_summed == CHECKSUM_PARTIAL) {
++	if (skb->ip_summed == CHECKSUM_PARTIAL) {
+ 		int tcp = 0;
+ 
+ 		/* We do not switch off the checksumming on non TCP/UDP
 
- drivers/net/ethernet/cortina/gemini.c | 34 ++++++++++++++++++----------------
- 1 file changed, 18 insertions(+), 16 deletions(-)
----
-base-commit: 33cc938e65a98f1d29d0a18403dbbee050dcad9a
-change-id: 20231203-new-gemini-ethernet-regression-3c672de9cfd9
-
-Best regards,
 -- 
-Linus Walleij <linus.walleij@linaro.org>
+2.34.1
 
 
