@@ -1,114 +1,232 @@
-Return-Path: <netdev+bounces-58234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23086815997
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 14:51:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBD898159D6
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 15:17:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B735C284A62
-	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 13:51:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD9F11C217D9
+	for <lists+netdev@lfdr.de>; Sat, 16 Dec 2023 14:16:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D55F2D623;
-	Sat, 16 Dec 2023 13:51:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A212D7A9;
+	Sat, 16 Dec 2023 14:16:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="IoXaWU4d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aZ6vKmeg"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E8152C6A9;
-	Sat, 16 Dec 2023 13:51:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=dSsrLnhvQMh6fed+BTCDMZIum7s58eYFEwcQNJr4BqE=; b=IoXaWU4dUaeDmsuhAoOpjm0sd1
-	HKoOolEwFK2gD1iF5p99cML3WccY5XjkOnhu4UMZKmToZqqCH+hiLjvMN9jBKK+dYfDMAm1zXNA4W
-	6Mk+75xgCTm+tulWvITlE4xFal1mtk7fzv9ibLC7TU9P9Fb4ljxK7g0J+mEijHuAOhf7iQkpgWbAQ
-	1kZhD08zTk9W7asMgGI+tx9/oDwtlCzpx8sbvqJ6vsak5wKTn6ji4hH12MjxiN/edLqTJnk3J+/ar
-	pVv7Tl243xLUkI7wK8ZVuvXfjwU9bQd8EfYiXFinqZNN1QluCuZw9iN+m2GvZ+XgvSdPHfDsK70R4
-	h3akB9TQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55866)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rEV4X-0003ms-22;
-	Sat, 16 Dec 2023 13:51:17 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rEV4V-0004i2-WF; Sat, 16 Dec 2023 13:51:16 +0000
-Date: Sat, 16 Dec 2023 13:51:15 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jie Luo <quic_luoj@quicinc.com>, davem@davemloft.net,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D0D92D7A6;
+	Sat, 16 Dec 2023 14:16:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E476C433C8;
+	Sat, 16 Dec 2023 14:16:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702736213;
+	bh=t+y+M2JnxGrEOUAALEQCknie1oJTMkhmah2MAcB9pfI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aZ6vKmegJLHpPyCchb+m2KOseBHjiCzbJOcZFVCXoZbG4Ecwbr+ELIHorMLBSJ8+/
+	 Dg5IjcwIDqMj4tlOivVTrTalKpzFh6XojsZhJHCJ4wqlG2WyCCPmi8f7vy2arzHyoC
+	 weuYNGKTN3uaL9z5ggmLKiUATaQF1yUDAZbi+yxCzv1lJKQIQ0IGr8ywNvrCLkXNcM
+	 fTgT4UAo0QI/NUsz59PuMmL3iDSqeTa9pEo9eOR9X+H2JNFNFWVgzU/KVbE90/Su0D
+	 pipsiszoqrHvCkcOOnPx5IpAUXGuH0y9uu/AdkFyFG5oUBhdQkWjr+s9DQwfN/o8gK
+	 9WymAOmAbA+KA==
+Date: Sat, 16 Dec 2023 14:16:47 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Jie Luo <quic_luoj@quicinc.com>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, agross@kernel.org,
+	andersson@kernel.org, konrad.dybcio@linaro.org, davem@davemloft.net,
 	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
 	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, hkallweit1@gmail.com, corbet@lwn.net,
-	p.zabel@pengutronix.de, f.fainelli@gmail.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	Christian Marangi <ansuelsmth@gmail.com>
-Subject: Re: [PATCH v8 14/14] dt-bindings: net: ar803x: add qca8084 PHY
- properties
-Message-ID: <ZX2rU5OFcZFyBmGl@shell.armlinux.org.uk>
-References: <20231215074005.26976-1-quic_luoj@quicinc.com>
- <20231215074005.26976-15-quic_luoj@quicinc.com>
- <60b9081c-76fa-4122-b7ae-5c3dcf7229f9@lunn.ch>
- <a65ad12d-b990-4439-b196-903f4a5f096a@quicinc.com>
- <f5c5cbce-c36e-498a-97e2-35f06d927d74@lunn.ch>
- <a9798333-3105-422f-8033-76c0b1d4f439@quicinc.com>
- <7c05b08a-bb6d-4fa1-8cee-c1051badc9d9@lunn.ch>
+	conor+dt@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, robert.marko@sartura.hr,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	quic_srichara@quicinc.com
+Subject: Re: [PATCH v2 5/5] dt-bindings: net: ipq4019-mdio: Document ipq5332
+ platform
+Message-ID: <20231216-unearned-lucid-4bd2ddcd4ac2@spud>
+References: <26c8b0b1-5ea9-45cc-adf3-0d0b03a1284d@linaro.org>
+ <4b9c56b8-3b29-4861-a3d5-2da26fbc14b4@quicinc.com>
+ <2e77e3b1-00b6-46b9-bfed-7cae3ffa15e9@linaro.org>
+ <7bae46fd-63fd-4b86-9a56-73052cf0ea95@quicinc.com>
+ <5a8095e6-b6a6-4d11-b006-31519e8d8622@linaro.org>
+ <7466b655-2b7e-44f2-a510-6e0cc1b95248@quicinc.com>
+ <602759ce-c93d-4111-9272-1dce7e4a170a@linaro.org>
+ <f656d1c7-ea86-405a-9165-9eb079ea6f2a@quicinc.com>
+ <20231215-gauze-sprinkled-172729f22b6c@spud>
+ <9eab958e-d91f-4f3c-aadd-6b34eaed2cef@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="lskATpY3N5YDan1V"
+Content-Disposition: inline
+In-Reply-To: <9eab958e-d91f-4f3c-aadd-6b34eaed2cef@quicinc.com>
+
+
+--lskATpY3N5YDan1V
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7c05b08a-bb6d-4fa1-8cee-c1051badc9d9@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Dec 16, 2023 at 11:21:53AM +0100, Andrew Lunn wrote:
-> > The following is the chip package, the chip can work on the switch mode
-> > like the existed upstream code qca8k, where PHY1-PHY4 is connected with
-> > MAC1-MAC4 directly;
-> 
-> Ah, that is new information, and has a big effect on the design.
+On Sat, Dec 16, 2023 at 09:16:49PM +0800, Jie Luo wrote:
+>=20
+>=20
+> On 12/15/2023 9:41 PM, Conor Dooley wrote:
+> > On Fri, Dec 15, 2023 at 08:40:20PM +0800, Jie Luo wrote:
+> > >=20
+> > >=20
+> > > On 12/15/2023 8:19 PM, Krzysztof Kozlowski wrote:
+> > > > On 15/12/2023 12:42, Jie Luo wrote:
+> > > > > > > > > > > > Which clocks are these mentioned in the property? F=
+rom where do they come?
+> > > > > > > > > > > >=20
+> > > > > > > > > > > > Anyway, property is in existing form is not correct=
+ - this is not a
+> > > > > > > > > > > > generic property.
+> > > > > > > > > > > >=20
+> > > > > > > > > > >=20
+> > > > > > > > > > > This property cmn-reference-clock is just the hardwar=
+e register
+> > > > > > > > > > > configuration, since the different IPQ platform needs=
+ to select
+> > > > > > > > > > > the different reference clock source for the CMN PLL =
+block that
+> > > > > > > > > > > provides the various clock outputs to the all kinds o=
+f Ethernet
+> > > > > > > > > > > devices, which is not from GCC provider.
+> > > > > > > > > >=20
+> > > > > > > > > > AGAIN: where do the clocks come from? Which device gene=
+rates them?
+> > > > > > > > >=20
+> > > > > > > > > Oh, OK, the reference clock is from wifi that provides 48=
+MHZ to
+> > > > > > > > > Ethernet block.
+> > > > > > > >=20
+> > > > > > > > Then WiFi should be providing you the clock and this device=
+ should be
+> > > > > > > > clock consumer, right?
+> > > > > > >=20
+> > > > > > > Yes, wifi provides 48MHz clock to CMM PLL block, there is no =
+GCC
+> > > > > > > for this 48MHZ clock output, it is the hardware PIN connectio=
+n.
+> > > > > >=20
+> > > > > > All clocks are some hardware pin connections.
+> > > > > >=20
+> > > > > > Best regards,
+> > > > > > Krzysztof
+> > > > > >=20
+> > > > >=20
+> > > > > Yes, all reference clocks here are from hardware pin connection.
+> > > >=20
+> > > > You keep answering with short sentences without touching the root o=
+f the
+> > > > problem. I don't know exactly why, but I feel this discussion leads
+> > > > nowhere. After long discussion you finally admitted that clocks came
+> > > > from another device - Wifi. It took us like 6 emails?
+> > > >=20
+> > > > So last statement: if you have clock provider and clock consumer, y=
+ou
+> > > > must represent it in the bindings or provide rationale why it shoul=
+d not
+> > > > or must not be represented in the bindings. So far I do not see any=
+ of
+> > > > such arguments.
+> > > >=20
+> > > > If you use arguments like:
+> > > > "My driver....": sorry, bindings are not about drivers
+> > > > "I don't have clock driver for WiFi": sorry, it does not matter if =
+you
+> > > > can write one, right?
+> > > >=20
+> > > > Please reach internally your colleagues to solve these problems and=
+ make
+> > > > review process smoother.
+> >=20
+> > > These reference clocks source do not need the hardware configuration,
+> > > that is the reason why the clock provider is not needed, some referen=
+ce
+> > > clock source are even from external crystal.
+> >=20
+> > I fail to understand how that makes this clock different to the clocks
+> > on any other platform. Clocks from external crystals are present in many
+> > many systems. See for example fixed-clock.yaml.
+>=20
+> The reference clock rate has no meaning to the CMN PLL block, since the
+> software can't control the behavior of CMN PLL, and various output
+> clocks of CMN PLL block are fixed, adding this custom property is just
+> for selecting the different reference clock source, since different
+> IPQ platform needs to be configured the different reference clock source
+> for the CMN PLL block.
 
-This QCA8084 that's being proposed in these patches is not a PHY in
-itself, but is a SoC. I came across this:
+Many, many other systems are in the same situation, where clocks are
+provided to a peripheral that has no control over the clock rate, but
+has to pick internal dividers or set bits in a config register depending
+on what clock rate is provided to it. That is not something special
+about this particular platform and other systems are able to use the
+clocks property for this purpose.
 
- https://www.rt-rk.com/android-tv-solution-tv-in-smartphone-pantsstb-based-on-qualcomm-soc-design/
+> let's say if we register 48MHZ reference clock as the fix clock, we
+> can't distinguish it is internal 48MHZ or external 48MHZ, for these
+> two reference clock sources, there are different hardware configuration
+> of CMN PLL block
 
-It's sounding like what we have here is some PHY IP that is integrated
-into a larger SoC, and the larger SoC needs to be configured so the
-PHY IP can work correctly.
+That's easy, if the reference is external, it is provided by the clocks
+property. If it internal, then there will be no clocks property
+providing it.
 
-Given that this package of four PHYs seems to be rather unique, I think
-we need Jie Luo to provide sufficient information so we can understand:
+> and this reference clock selection is not applicable
+> for the IPQ4019 platform.
 
-1) this package of four PHYs itself
-2) how this package is integrated into the SoC
+Isn't this a patch for the IPQ4019? Why would it not be relevant?
 
-Specifically, what resets and clocks are controlled from within the
-package's register space, which are external to the package
-register space (and thus are provided by other IPs in the SoC).
+> > > There is also no enable control for the reference clocks since it is
+> > > inputted by the hardware PIN connection, i will update these descript=
+ion
+> > > in the DT to make it more clear.
+> >=20
+> > Again, this does not justify having custom properties for this clock,
+> > as it is no different to other platforms. As far as I can tell, the only
+> > thing that a standard "clocks" property cannot convey here is the
+> > internal reference. I would suggest that since there is only one
+> > internal clock frequency, the absence of this particular clock in the
+> > "clocks" property can be used to determine that the reference is the
+> > internal one.
 
-As I've said previously, the lack of DT example doesn't help to further
-our understanding. The lack of details of what the package encompases
-also doesn't help us understand the hardware.
+I'm surprised you didn't pick up on this, but there are actually _2_
+internal references, which I have just noticed while double checking the
+binding patch.
 
-Unless we can gain that understanding, I feel that Jie Luo's patches
-are effectively unreviewable and can't be accepted into mainline.
+What is the impact of using the 48 MHz or 96 MHz internal reference?
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks,
+Conor.
+
+> Yes, we can get the clock rate of the clocks property if we register
+> these as the fix clock to distinguish the different clock source.
+>=20
+> Since the reference clock rate value has no matter with the CMN clock
+> configuration, it is just the reference clock source selection, so
+> i did not use the fix clock for this.
+>
+> Thanks for this suggestion, i will verify the fix clock register solution.
+
+--lskATpY3N5YDan1V
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZX2xTwAKCRB4tDGHoIJi
+0psiAPwOjDlpx9TwSrv5c3aiBLP8ykDC5q3w39hpCmuz8eQLZgD/V8nYISfPXZY8
+IBfmbcjtQYNPCAgQZSYXk2eYrs8/fw4=
+=Tk8X
+-----END PGP SIGNATURE-----
+
+--lskATpY3N5YDan1V--
 
