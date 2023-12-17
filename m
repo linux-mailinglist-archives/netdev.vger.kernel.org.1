@@ -1,69 +1,70 @@
-Return-Path: <netdev+bounces-58317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3728815DEE
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 09:09:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08F6C815DF6
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 09:10:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 796E9283259
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 08:09:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7458A1F22533
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 08:10:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AED91863;
-	Sun, 17 Dec 2023 08:09:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDD2C185B;
+	Sun, 17 Dec 2023 08:09:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hsqj3sjW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vhvMowPD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33F71849
-	for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 08:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26D2D1C17
+	for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 08:09:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5e56d85fa91so7250377b3.2
-        for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 00:09:18 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbd0be3a7e9so1210427276.0
+        for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 00:09:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702800558; x=1703405358; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QsH9QLVPpBb4NCLNFoF1VK/l5bin9axXMtCbklwluC0=;
-        b=Hsqj3sjWLSd3Q3tGXVjtQAQO6Gi0KBz0TlNlTERU89+AMPeq1pRvBQttLfaa6oWPJk
-         l3fbdVabPT9ZMGFWAD+lhdY59gEmkF7dujVHYgPxTwOuoUuJk7x4poKPpGge1TsmsUBD
-         d3Ca0h9PYR6dUfEOgsgWU6p0yt/rnswMNqViOkHH+L+4H8L/gPCNM9BFNVIboWMGw6RT
-         53V6UFu72kwkffDWdX8k09iNX+KnHThaxAIheMscsBMC1CKEm/pEY8nTWpLcZvGCjNXH
-         1Bj0NgeczECeS7/aOtv2XpBVREOUUj6wRK8S5ycUYDe7ueZFHG4OBX6hx42dR9itHCFS
-         JfEw==
+        d=google.com; s=20230601; t=1702800560; x=1703405360; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dx3B6aLRQGDHWIOJfDNBvVD3RlXkr+3jhLG4738eUjE=;
+        b=vhvMowPDr4sLum8/34TI9++Tk1uFJc07pqhf20tmo5zM3v8PhMagvrXPbIQ8OIpLBD
+         9xnezFGb/RekGg82Z/GCkdBWQH8ehOHy4FtpvNQRRwNlJVw9tmjp8h8warVitOJHtpOz
+         uCBs4eDOgK3WjSGPoBJ9t3giV92Lupxo5w4CDXt8awG4/wCWQndY6NVMd7F6zklL3r2/
+         z/c7hfrYs3nRP2b4kQqK5ECfCVIB6ctsjfQDUbHU8y1zSgUSrpavluBB4tuJp2pOnOhC
+         6+nKGicouYy8xQ5y38Pi9O1TAy4D71VYzaVL+iZYL6i7990iKpF9NlgxespIru74W194
+         RpIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702800558; x=1703405358;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QsH9QLVPpBb4NCLNFoF1VK/l5bin9axXMtCbklwluC0=;
-        b=nJJuOL19ikotiLGNY1pPlZn2yBP/iNWjRxwZqDFJ6mncfmgJDR7zJEYDVbzPT/04qK
-         5DCCLHks0ON9AbF+c6hRiJSeukRtTrg+FX2oRBabnjHY7MwSNe/lqEZ0fZbEuqyJnCzr
-         iv0DCyAqEQ4hrCzllwQg1Mj1jOAJALgx8mJ4OnNl+d4DIiTcWnSCTi3g7oFAAVFol4qt
-         SB6dr65c5wDPA/SCNf/N89nGyZyRHcEXzWaa12cF3TtpSHjQKwWw4Gnq3hDxGSNTAocZ
-         XCdXkXU0AOxi1QrTspAB3x7U0eVFXXyu7B5Qt2UqsMM5zopkyzDuo4q4xlHC3HRWun6c
-         pXug==
-X-Gm-Message-State: AOJu0YyJv2r8G4iZ4BszYhO0lgQbtsENphMCgnHqMgReJJhywa3O9pZA
-	ZjNTaA3OMlN7MLxhK7w5Oj+jUuqHC8MlfTPD7g==
-X-Google-Smtp-Source: AGHT+IFgkSK2rNHEatJQvrQrdr36+TUgi1Z/vuAfdrjxwnBPxU+VrSvy3F8ozm4eK5gFgSf5MjBLCP8BZU+cLVBeyg==
+        d=1e100.net; s=20230601; t=1702800560; x=1703405360;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dx3B6aLRQGDHWIOJfDNBvVD3RlXkr+3jhLG4738eUjE=;
+        b=huLsOq9BvvFi62UBMhmg6iyHtik/mE1jPv76GRW9RsYU9SdIe9ev/3a4QVQ+DXvaf6
+         h9ok5xJSi8DAb7XJLbU2oYJywlcLOxr274n9jAKVCNcgFJSnc0EjQrITf/hX+L01sdst
+         x0TO3ZPJgKuQ3oyGDdq22mETKgVaupCx9flxtp2idNSRqHEXY5yywLlpmWbudlLpuL0q
+         nblpHwP0PFRSB4aho5ut4ppbJfP3RlV9VrGEnHGbVTWHLeSmb4YLh6bxgBdwKP3L+08N
+         LTszux91C1RBbWYSdBkePDDZsRCJvifqhKIaUzXhKNco1RbZ9ArPWM8uNPw8XKNYw2zS
+         esnw==
+X-Gm-Message-State: AOJu0YxsQ4Xzz8MZRVumgSkGljN1TUCfQJvsnItsr4pYVHsql1dEcV3M
+	RuN/JAxdKS9eOP+NAgbZ/fJG0tSkzXplz290eQ==
+X-Google-Smtp-Source: AGHT+IEwZTJQinwLs899XxaD5GQX67+mFW+pdrHRCj7vW1TcxI+XrOUDAC3B4t5e+jZNBioLBKKYu7HWw6u6KGTvBg==
 X-Received: from almasrymina.svl.corp.google.com ([2620:15c:2c4:200:3eb4:e132:f78a:5ba9])
- (user=almasrymina job=sendgmr) by 2002:a05:690c:e1d:b0:5e4:afdb:a5ff with
- SMTP id cp29-20020a05690c0e1d00b005e4afdba5ffmr1117521ywb.6.1702800557793;
- Sun, 17 Dec 2023 00:09:17 -0800 (PST)
-Date: Sun, 17 Dec 2023 00:09:08 -0800
+ (user=almasrymina job=sendgmr) by 2002:a05:6902:1343:b0:dbd:13b8:2598 with
+ SMTP id g3-20020a056902134300b00dbd13b82598mr628107ybu.3.1702800560127; Sun,
+ 17 Dec 2023 00:09:20 -0800 (PST)
+Date: Sun, 17 Dec 2023 00:09:09 -0800
+In-Reply-To: <20231217080913.2025973-1-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20231217080913.2025973-1-almasrymina@google.com>
 X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20231217080913.2025973-1-almasrymina@google.com>
-Subject: [PATCH net-next v2 0/3] Abstract page from net stack
+Message-ID: <20231217080913.2025973-2-almasrymina@google.com>
+Subject: [PATCH net-next v2 1/3] vsock/virtio: use skb_frag_*() helpers
 From: Mina Almasry <almasrymina@google.com>
 To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org, 
 	virtualization@lists.linux.dev
@@ -74,64 +75,45 @@ Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.ne
 	"=?UTF-8?q?Christian=20K=C3=B6nig?=" <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, 
 	Yunsheng Lin <linyunsheng@huawei.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Changes in v2:
-- Reverted changes to the page_pool. The page pool now retains the same
-  API, so that we don't have to touch many existing drivers. The devmem
-  TCP series will include the changes to the page pool.
+Minor fix for virtio: code wanting to access the fields inside an skb
+frag should use the skb_frag_*() helpers, instead of accessing the
+fields directly. This allows for extensions where the underlying
+memory is not a page.
 
-- Addressed comments.
+Signed-off-by: Mina Almasry <almasrymina@google.com>
 
-This series is a prerequisite to the devmem TCP series. For a full
-snapshot of the code which includes these changes, feel free to check:
+---
 
-https://github.com/mina/linux/commits/tcpdevmem-rfcv5/
+v2:
 
------------
+- Also fix skb_frag_off() + skb_frag_size() (David)
+- Did not apply the reviewed-by from Stefano since the patch changed
+relatively much.
 
-Currently these components in the net stack use the struct page
-directly:
+---
+ net/vmw_vsock/virtio_transport.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-1. Drivers.
-2. Page pool.
-3. skb_frag_t.
-
-To add support for new (non struct page) memory types to the net stack, we
-must first abstract the current memory type.
-
-Originally the plan was to reuse struct page* for the new memory types,
-and to set the LSB on the page* to indicate it's not really a page.
-However, for safe compiler type checking we need to introduce a new type.
-
-struct netmem is introduced to abstract the underlying memory type.
-Currently it's a no-op abstraction that is always a struct page underneath.
-In parallel there is an undergoing effort to add support for devmem to the
-net stack:
-
-https://lore.kernel.org/netdev/20231208005250.2910004-1-almasrymina@google.=
-com/
-
-Cc: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Christian K=C3=B6nig <christian.koenig@amd.com>
-Cc: Shakeel Butt <shakeelb@google.com>
-Cc: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-
-Mina Almasry (3):
-  vsock/virtio: use skb_frag_*() helpers
-  net: introduce abstraction for network memory
-  net: add netmem_t to skb_frag_t
-
- include/linux/skbuff.h           | 70 ++++++++++++++++++++++++--------
- include/net/netmem.h             | 35 ++++++++++++++++
- net/core/skbuff.c                | 22 +++++++---
- net/kcm/kcmsock.c                | 10 ++++-
- net/vmw_vsock/virtio_transport.c |  6 +--
- 5 files changed, 116 insertions(+), 27 deletions(-)
- create mode 100644 include/net/netmem.h
-
---=20
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index f495b9e5186b..1748268e0694 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -153,10 +153,10 @@ virtio_transport_send_pkt_work(struct work_struct *work)
+ 				 * 'virt_to_phys()' later to fill the buffer descriptor.
+ 				 * We don't touch memory at "virtual" address of this page.
+ 				 */
+-				va = page_to_virt(skb_frag->bv_page);
++				va = page_to_virt(skb_frag_page(skb_frag));
+ 				sg_init_one(sgs[out_sg],
+-					    va + skb_frag->bv_offset,
+-					    skb_frag->bv_len);
++					    va + skb_frag_off(skb_frag),
++					    skb_frag_size(skb_frag));
+ 				out_sg++;
+ 			}
+ 		}
+-- 
 2.43.0.472.g3155946c3a-goog
 
 
