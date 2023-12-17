@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-58368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06A72815F9F
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 15:19:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9558815FD8
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 15:34:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 997891F21DE9
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 14:19:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB8291C20B69
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 14:34:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8439E4439A;
-	Sun, 17 Dec 2023 14:19:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 119751EB25;
+	Sun, 17 Dec 2023 14:34:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="TXRaIoZN"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="mNvFjsTE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E3E44C65
-	for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 14:19:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a1e35c2807fso242001066b.3
-        for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 06:19:44 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 547A52FE2E
+	for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 14:34:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-40b5155e154so27395335e9.3
+        for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 06:34:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1702822783; x=1703427583; darn=vger.kernel.org;
+        d=tuxon.dev; s=google; t=1702823675; x=1703428475; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=46s4XR8p2ZqIXEzN3Qc7mK75wNdchG/YnXJTX3J45Fc=;
-        b=TXRaIoZNSKnJbyxGi6Mrjy28AJ1Lyf+ir9Na8NGAdUHQBYy9MC3Wy31vUSz2VHsNar
-         9rfnSMsmB01FEtdb/E2QDs0bTafInV2yW8U0DAxAMI/QnRxtW48oRCYq95I2klGX4p6A
-         8/jenvTmQxmQkFjtjoiHbUmGt/FLxF2WS3I6TsmYSxNVKN/wj7dwvy5QuaznOAPVuGN9
-         ubkdCUrsKQoVW55s6ztBlap1m8MYzRJ93Zsensi0D3rPKoyWafjvM4LVMUSI3av6KpoR
-         8Mcr7IwVBiNCBYey15IaZ88ZeN3DSnJ2ElQIOnaSlslhuJBc1ERLoAjlvS6TUTTIPj1r
-         lmSA==
+        bh=aqCEu2l0NGB07K1ndlA1ZvH3rmbMfoOKQJlevWlQ0i0=;
+        b=mNvFjsTE28oh6pStQtHcJfP+XYNpCucW7lKKo4u1ElTYWSQcpIKjVPkKgikcGRu6kJ
+         W4ZlJWqHpSjC3yzrKeeQmMipQ0JFt7Zo58A9x6zl6EsYcoH1bQxfwiAqovq04HgLvpCT
+         OdjxBYNQej7RczBU6bsRM0yhl4IMPbOJcrOA0nRnTQOG2uYT5fjrXF5R9sg1re7q4ekJ
+         u/G2Z9bqKPKryHRFezmv9orZ/DP40hy2WcINeKvoYCGWvcn+o1JrFcCM7QEDYBx9lx6s
+         XaJ3TnTX0E04jl7Y0IUl3aQ9BxP8T2GrVAlK+A6IDLVds/C+zdjt44vkLQz/4dLENoSZ
+         EtYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702822783; x=1703427583;
+        d=1e100.net; s=20230601; t=1702823675; x=1703428475;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=46s4XR8p2ZqIXEzN3Qc7mK75wNdchG/YnXJTX3J45Fc=;
-        b=owLirkuc3dnU5742YPrN7aaTQHGUODX9Ien8ji88LOnlNKLxyvNFh2JiPnpAUghBTl
-         8gbQ5Yq0wpLuS/vAaKiXcEXDVC/BaDWmxIOZGwIqVBPTE7qAaIQrv932w6c6HLCQh3DX
-         dYbarJyYtT5rPgXSQCBnSLZDXQjuZ/hkueaJTXJ38M3k9VkldLRRvPfQqvk9kXO57tYU
-         CEaT7VntlwRSZ7puW89B4JhAisCDTZibidtWeXY6WgzQpfgoa7pGmWxnzAqRnNcr5War
-         GB/1f3M9VsTe26qqqI5DkkC0jAIq3nhasFum2j4DmAw74DCPRq7IERiuOndMtF0Gi6ym
-         KqBQ==
-X-Gm-Message-State: AOJu0YzHZTuCyd8eOQC1mR0vVqFD1FcBWIXDUE7eTvIPfVB/Qd8+kyR8
-	vu/pqatZKy5k3yQS4a0QX2cPrA==
-X-Google-Smtp-Source: AGHT+IHy7RWEEWDa0UpGrCYAt4bCTO1zFZ/U/S595rqDa+/oHui+ADssOTK47t9+CD2FIv5XDC2P2w==
-X-Received: by 2002:a17:906:234c:b0:a23:513f:a83b with SMTP id m12-20020a170906234c00b00a23513fa83bmr305769eja.57.1702822783280;
-        Sun, 17 Dec 2023 06:19:43 -0800 (PST)
-Received: from [192.168.0.161] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id cx12-20020a170907168c00b00a1caa9dd507sm13068110ejd.52.2023.12.17.06.19.41
+        bh=aqCEu2l0NGB07K1ndlA1ZvH3rmbMfoOKQJlevWlQ0i0=;
+        b=NxRKh8DzkM26nynuHh7p0fQNhGdDV41cDhWeylgURgc/qbG174fJjMQkOC4Yit2GzL
+         9Cp2Gu6Tnxs1VIojwn0cgkTv4wPbht+TNFSaFNH4A9Irix/WNBsyP3yr/DnH9jviAHBe
+         NQfVDG52ldEnX/K8EaNPIMXlBXEU54rrB7b46p7eJRdq7PXPXB4xKmv3UBklYh/lYVtU
+         Jx8qzHivIRuVIo6aQVFeGBQCnuytGeWskkHJ+nff8URmInjxjNbw9bobw9btJETd74qA
+         bAkz92k7QjWTpEpcvGrPdOpLkEiFKiQep3k98PPN0nN7AEZC9rFsLuFzEwzdoFEQG6EE
+         wzfw==
+X-Gm-Message-State: AOJu0YyIUipRzZ61vOKsukJIjXlGOXeVTP68cuN0bBdA4dME14h4qfHc
+	Y2OkVqeaLc4EouNFRHGhz5RDig==
+X-Google-Smtp-Source: AGHT+IHF3xKWYIHsI8tvXbw1+h7osXEx8EMefr1MhYNl8r0c1B9owVBM0V0DkArB3hBHKZwEAB/Lvw==
+X-Received: by 2002:a7b:ca5a:0:b0:40c:2a41:4a1f with SMTP id m26-20020a7bca5a000000b0040c2a414a1fmr7002927wml.183.1702823675283;
+        Sun, 17 Dec 2023 06:34:35 -0800 (PST)
+Received: from [192.168.50.4] ([82.78.167.103])
+        by smtp.gmail.com with ESMTPSA id k40-20020a05600c1ca800b0040b45356b72sm40209275wms.33.2023.12.17.06.34.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 17 Dec 2023 06:19:42 -0800 (PST)
-Message-ID: <acc5f924-514d-40f3-a14f-7e569b56451b@blackwall.org>
-Date: Sun, 17 Dec 2023 16:19:41 +0200
+        Sun, 17 Dec 2023 06:34:34 -0800 (PST)
+Message-ID: <322c95f1-d42d-447d-89d1-7c61112b0cfd@tuxon.dev>
+Date: Sun, 17 Dec 2023 16:34:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,66 +66,108 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net: rtnl: use rcu_replace_pointer_rtnl in
- rtnl_unregister_*
+Subject: Re: [PATCH net-next v2 20/21] net: ravb: Do not apply RX CSUM
+ settings to hardware if the interface is down
 Content-Language: en-US
-To: Pedro Tammela <pctammela@mojatatu.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us, jhs@mojatatu.com,
- victor@mojatatu.com, martin@strongswan.org, idosch@nvidia.com,
- lucien.xin@gmail.com, edwin.peer@broadcom.com, amcohen@nvidia.com
-References: <20231215175711.323784-1-pctammela@mojatatu.com>
- <20231215175711.323784-3-pctammela@mojatatu.com>
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20231215175711.323784-3-pctammela@mojatatu.com>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, p.zabel@pengutronix.de,
+ yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com,
+ geert+renesas@glider.be
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214114600.2451162-21-claudiu.beznea.uj@bp.renesas.com>
+ <247ad9d9-298e-017b-f6e4-e672ee458ee7@omp.ru>
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <247ad9d9-298e-017b-f6e4-e672ee458ee7@omp.ru>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 15/12/2023 19:57, Pedro Tammela wrote:
-> With the introduction of the rcu_replace_pointer_rtnl helper,
-> cleanup the rtnl_unregister_* functions to use the helper instead
-> of open coding it.
-> 
-> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-> ---
->  net/core/rtnetlink.c | 12 +++---------
->  1 file changed, 3 insertions(+), 9 deletions(-)
-> 
-> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-> index 5e0ab4c08f72..94c4572512b8 100644
-> --- a/net/core/rtnetlink.c
-> +++ b/net/core/rtnetlink.c
-> @@ -342,8 +342,7 @@ int rtnl_unregister(int protocol, int msgtype)
->  		return -ENOENT;
->  	}
->  
-> -	link = rtnl_dereference(tab[msgindex]);
-> -	RCU_INIT_POINTER(tab[msgindex], NULL);
-> +	link = rcu_replace_pointer_rtnl(tab[msgindex], NULL);
->  	rtnl_unlock();
->  
->  	kfree_rcu(link, rcu);
-> @@ -368,18 +367,13 @@ void rtnl_unregister_all(int protocol)
->  	BUG_ON(protocol < 0 || protocol > RTNL_FAMILY_MAX);
->  
->  	rtnl_lock();
-> -	tab = rtnl_dereference(rtnl_msg_handlers[protocol]);
-> +	tab = rcu_replace_pointer_rtnl(rtnl_msg_handlers[protocol], NULL);
->  	if (!tab) {
->  		rtnl_unlock();
->  		return;
->  	}
-> -	RCU_INIT_POINTER(rtnl_msg_handlers[protocol], NULL);
->  	for (msgindex = 0; msgindex < RTM_NR_MSGTYPES; msgindex++) {
-> -		link = rtnl_dereference(tab[msgindex]);
-> -		if (!link)
-> -			continue;
-> -
-> -		RCU_INIT_POINTER(tab[msgindex], NULL);
-> +		link = rcu_replace_pointer_rtnl(tab[msgindex], NULL);
->  		kfree_rcu(link, rcu);
->  	}
->  	rtnl_unlock();
 
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+
+On 16.12.2023 22:36, Sergey Shtylyov wrote:
+> On 12/14/23 2:45 PM, Claudiu wrote:
+> 
+>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>
+>> Do not apply the RX CSUM settings to hardware if the interface is down. In
+>> case runtime PM is enabled, and while the interface is down, the IP will be
+>> in reset mode (as for some platforms disabling/enabling the clocks will
+>> switch the IP to standby mode, which will lead to losing registers'
+> 
+>    To/From perhaps?
+>    And just "register".
+> 
+>> content) and applying settings in reset mode is not an option. Instead,
+>> cache the RX CSUM settings and apply them in ravb_open().
+> 
+>    Have this issue actually occurred for you?
+
+Setting RX CSUM while the if is down? No.
+
+> 
+>> Commit prepares for the addition of runtime PM.
+>>
+>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> [...]
+> 
+>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>> index 633346b6cd7c..9ff943dff522 100644
+>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>> @@ -1868,6 +1868,15 @@ static int ravb_open(struct net_device *ndev)
+>>  	if (info->gptp || info->ccc_gac)
+>>  		ravb_ptp_init(ndev, priv->pdev);
+>>  
+>> +	/* Apply features that might have been changed while the interface
+>> +	 * was down.
+>> +	 */
+>> +	if (ndev->hw_features & NETIF_F_RXCSUM) {
+> 
+>    I'm afraid this is a wrong field; we need ndev->features, no?
+
+RX CSUM is not enabled for all ravb aware devices (see struct
+ravb_hw_info::net_hw_features). We should be setting the ECMR only for
+these ones. ravb_hw_info::net_hw_features is set in ndev->hw_features in
+probe(). So here code checks if platforms supports RXCSUM and then below it
+applies what has been requested though ndo_set_features(), if any.
+
+> 
+>> +		u32 val = (ndev->features & NETIF_F_RXCSUM) ? ECMR_RCSC : 0;
+>> +
+>> +		ravb_modify(ndev, ECMR, ECMR_RCSC, val);
+>> +	}
+>> +
+> 
+>    The ECMR setting is already done in ravb_emac_init_rcar(), no need
+> to duplicate it here, I think...
+
+Ok, it worth being moved there.
+
+> 
+>>  	/* PHY control start */
+>>  	error = ravb_phy_start(ndev);
+>>  	if (error)
+>> @@ -2337,6 +2346,9 @@ static void ravb_set_rx_csum(struct net_device *ndev, bool enable)
+>>  	struct ravb_private *priv = netdev_priv(ndev);
+>>  	unsigned long flags;
+>>  
+>> +	if (!netif_running(ndev))
+> 
+>    Racy as well...
+
+It's also called with rtnl_mutex locked.
+
+> 
+>> +		return;
+>> +
+> 
+>    Hm, sh_eth.c doesn't have such check -- perhaps should be fixed
+> as well...
+> 
+> [...]
+> 
+> MBR, Sergey
 
