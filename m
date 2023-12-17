@@ -1,177 +1,122 @@
-Return-Path: <netdev+bounces-58351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DB36815F09
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 13:40:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E9D0815F0E
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 13:43:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 368241C210F7
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 12:40:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 215F0B21E41
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 12:43:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78C0E4315C;
-	Sun, 17 Dec 2023 12:40:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6D842AB4;
+	Sun, 17 Dec 2023 12:43:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="FEq67YBj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S1sR076o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B06817721
-	for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 12:40:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-40d12ade25dso7253035e9.2
-        for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 04:40:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1702816841; x=1703421641; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GU80QkwXBYjxwV+Vd0WaRyZK1HPqtvKgdIz4AA7eqAw=;
-        b=FEq67YBjdR1Az4Txg3McEbVjSzhu4e/M4AaNKnRMidF1qDOT28kDFDUuK9XPbjPCwu
-         SjhbZRG/fzxhZSiPi2HJIg9gsOOiWroot4EoSPTjCAVf42EFjmkVTl4/3qGPikD32ukf
-         D4YrIWFqYoMlDr6Ayr7MUQEmPsQ1qJDbyZO/e99Hx3tYnOWw8+XhN4itDeuLC5W+KB/l
-         aCJYufdnM2951+IiCHBBJqkT2vb4HfGO/1UvLcjsBT5SujoSEnKbQcEWeG/bKnqecpmx
-         +TsZXbn6ZnXu2vuyBZ09fSj3ze6UVmHLFfDaIjIZQ1zi90cqkPjS1++Jfoa/aUbVltg7
-         Xzsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702816841; x=1703421641;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GU80QkwXBYjxwV+Vd0WaRyZK1HPqtvKgdIz4AA7eqAw=;
-        b=VG14YJrEpjhkcfSIkU/YjRcxh8+D0Pgg8vNTyUljgVaA9qe6ytBVrY9Jvz6Yvjjqy7
-         waZQ5Fb+HRE12/T3bWq4JI8tvWMJeYtMSK+Be692MsEAY/tdUzOx5ATwtNM+w7+F+N9A
-         GDW9VaCxDNIE4JYwPYL8xYXoS9oNr4aoXrLJ+d1OzBBWqiGDhcIpQOZW22XdACFFTZNJ
-         kiGLp2yS173h1ABWkZrUOGrKBYLbgWuZIF4ia1n4qcbbtqYc/S9gMGQU0+oM1yMPwQ6p
-         HnMLoBGffF9QPgj9pXkdUBaGpcxPbKEUZLSHQH9czY7D8159vea5BoFIe6Rv32n2EtoR
-         3MVg==
-X-Gm-Message-State: AOJu0YwD0ogMuA08hiVVFsgwLc2E6G4Bpi2iRt5I4kvkGJG+ya5WBjXv
-	jpCjZJQhM778pcg3bSxGg2ksow==
-X-Google-Smtp-Source: AGHT+IEHeiYdvXeVpGnCpcW5Gz1VHGVmBxt4e1d3/L8RxTCjpc/8JFEXRE5benjpM3Yr6MaJuNyaEQ==
-X-Received: by 2002:a05:600c:3b29:b0:40c:3290:7b80 with SMTP id m41-20020a05600c3b2900b0040c32907b80mr7550212wms.138.1702816841521;
-        Sun, 17 Dec 2023 04:40:41 -0800 (PST)
-Received: from [192.168.50.4] ([82.78.167.103])
-        by smtp.gmail.com with ESMTPSA id f18-20020a05600c4e9200b0040d18ffbeeasm370432wmq.31.2023.12.17.04.40.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 17 Dec 2023 04:40:41 -0800 (PST)
-Message-ID: <53c90a2a-c43b-40e7-a9b2-55aab55541d7@tuxon.dev>
-Date: Sun, 17 Dec 2023 14:40:39 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E8444367;
+	Sun, 17 Dec 2023 12:43:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702816993; x=1734352993;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ACMZYUw/c3LU7bK9uq07xvXLyS+mDBY6zrKqOWw9xCs=;
+  b=S1sR076oIn/zdyP+bSNvFkuJMSvftT+Lp8ToGFfdwwWqHJYHxQyyRDe0
+   OA5BF7ZQzEMlpB7b579jFVBU4tDRwnzgWtVDWonmZhmZzavtNA2t7u82G
+   6ZQPxy4K+1jl4/b0Yg70scF45oc6vUpEF1s7NAaT7c7sUz1fc3NuezVN+
+   g5EogIre0pk+38uZqnYnsS0ATBhjJQAls51vZWKUKgvIHa9Ihhf/IcJcU
+   +Wx8DtgLRbYVDz4o7GWlLXKANLWP7U2kAYQitLFTjGL8KZd6mfAbfj4RN
+   fn7vMSnWJ1L+DUNE2sMz+ry5B5fj5X3vHKeWsAQ/i0jWKnR9uDnRw5wZJ
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10926"; a="2239725"
+X-IronPort-AV: E=Sophos;i="6.04,283,1695711600"; 
+   d="scan'208";a="2239725"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2023 04:43:12 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10926"; a="865926572"
+X-IronPort-AV: E=Sophos;i="6.04,283,1695711600"; 
+   d="scan'208";a="865926572"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by FMSMGA003.fm.intel.com with ESMTP; 17 Dec 2023 04:43:09 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rEqU6-00032G-2T;
+	Sun, 17 Dec 2023 12:43:06 +0000
+Date: Sun, 17 Dec 2023 20:42:08 +0800
+From: kernel test robot <lkp@intel.com>
+To: yang.guang5@zte.com.cn, davem@davemloft.net
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	jiang.xuexin@zte.com.cn, chen.haonan2@zte.com.cn,
+	cgel.zte@gmail.com, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, sd@queasysnail.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH linux-next] mlxsw: spectrum: use netif_is_macsec()
+ instead of open code
+Message-ID: <202312172042.gMYseKZQ-lkp@intel.com>
+References: <202312152145312776210@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 09/21] net: ravb: Split GTI computation and
- set operations
-Content-Language: en-US
-To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, p.zabel@pengutronix.de,
- yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com,
- geert+renesas@glider.be
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
- <20231214114600.2451162-10-claudiu.beznea.uj@bp.renesas.com>
- <3e8f65e3-3aab-ddf4-2b05-16b275af6021@omp.ru>
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
-In-Reply-To: <3e8f65e3-3aab-ddf4-2b05-16b275af6021@omp.ru>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202312152145312776210@zte.com.cn>
+
+Hi,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on next-20231215]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/yang-guang5-zte-com-cn/mlxsw-spectrum-use-netif_is_macsec-instead-of-open-code/20231215-214631
+base:   next-20231215
+patch link:    https://lore.kernel.org/r/202312152145312776210%40zte.com.cn
+patch subject: [PATCH linux-next] mlxsw: spectrum: use netif_is_macsec() instead of open code
+config: i386-buildonly-randconfig-003-20231217 (https://download.01.org/0day-ci/archive/20231217/202312172042.gMYseKZQ-lkp@intel.com/config)
+compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231217/202312172042.gMYseKZQ-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312172042.gMYseKZQ-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from kernel/cgroup/cgroup.c:33:
+   In file included from include/linux/bpf-cgroup.h:11:
+   In file included from include/net/sock.h:46:
+>> include/linux/netdevice.h:5105:1: warning: all paths through this function will call itself [-Winfinite-recursion]
+   {
+   ^
+   1 warning generated.
 
 
+vim +5105 include/linux/netdevice.h
 
-On 16.12.2023 18:38, Sergey Shtylyov wrote:
-> On 12/14/23 2:45 PM, Claudiu wrote:
-> 
->> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>
->> ravb_set_gti() was computing the value of GTI based on the reference clock
->> rate and then applied it to register. This was done on the driver's probe
->> function. In order to implement runtime PM for all IP variants (as some IP
->> variants switches to reset operation mode (and thus the register's content
-> 
->    Again, operating mode...
-> 
->> is lost) when module standby is configured through clock APIs) the GTI was
-> 
->    The GTI what? Setup?
-> 
->> split in 2 parts: one computing the value of the GTI register (done in the
->> driver's probe function) and one applying the computed value to register
->> (done in the driver's ndo_open API).
->>
->> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> [...]
-> 
->> diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
->> index e0f8276cffed..76202395b68d 100644
->> --- a/drivers/net/ethernet/renesas/ravb.h
->> +++ b/drivers/net/ethernet/renesas/ravb.h
->> @@ -1106,6 +1106,8 @@ struct ravb_private {
->>  
->>  	const struct ravb_hw_info *info;
->>  	struct reset_control *rstc;
->> +
->> +	uint64_t gti_tiv;
-> 
->    Please use the kernel type, u64; uint64_t is for userland, IIRC.
+7967168cefdbc6 Herbert Xu      2006-06-22  5098  
+14d7b8122fd591 Jakub Kicinski  2022-05-05  5099  void netif_set_tso_max_size(struct net_device *dev, unsigned int size);
+14d7b8122fd591 Jakub Kicinski  2022-05-05  5100  void netif_set_tso_max_segs(struct net_device *dev, unsigned int segs);
+6df6398f7c8b48 Jakub Kicinski  2022-05-05  5101  void netif_inherit_tso_max(struct net_device *to,
+6df6398f7c8b48 Jakub Kicinski  2022-05-05  5102  			   const struct net_device *from);
+6df6398f7c8b48 Jakub Kicinski  2022-05-05  5103  
+3c17578473b9be Sabrina Dubroca 2016-03-11  5104  static inline bool netif_is_macsec(const struct net_device *dev)
+3c17578473b9be Sabrina Dubroca 2016-03-11 @5105  {
+55cddeca5e222e Yang Guang      2023-12-15  5106  	return netif_is_macsec(dev);
+3c17578473b9be Sabrina Dubroca 2016-03-11  5107  }
+3c17578473b9be Sabrina Dubroca 2016-03-11  5108  
 
-I just kept the initial type here. Anyway, uint64_t should translate to u64
-AFAICT.
-
-Looking at it again the field here is enough to be 32 bit as the register
-field is no longer than that. It is needed on 64 bits when checking the
-ranges in compute function.
-
-> 
-> [...]
->> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->> index d7f6e8ea8e79..5e01e03e1b43 100644
->> --- a/drivers/net/ethernet/renesas/ravb_main.c
->> +++ b/drivers/net/ethernet/renesas/ravb_main.c
->> @@ -1750,6 +1750,51 @@ static int ravb_set_reset_mode(struct net_device *ndev)
->>  	return error;
->>  }
->>  
->> +static int ravb_set_gti(struct net_device *ndev)
->> +{
-> [...]
->> +	/* Request GTI loading */
->> +	ravb_modify(ndev, GCCR, GCCR_LTI, GCCR_LTI);
->> +
->> +	/* Check completion status. */
->> +	return ravb_wait(ndev, GCCR, GCCR_LTI, 0);
-> 
->    Is this really necessary?
-
-I've just updated it to respect the manual specifications. Please let me
-know if you want me to drop it. For this series it should be harmless
-keeping it as it was previously (I will double check it).
-
-> 
-> [...]
->> @@ -1767,6 +1812,10 @@ static int ravb_open(struct net_device *ndev)
->>  		goto out_napi_off;
->>  	ravb_emac_init(ndev);
->>  
->> +	error = ravb_set_gti(ndev);
->> +	if (error)
->> +		goto out_dma_stop;
->> +
-> 
->    Hm... belongs in ravb_dmac_init() now, as it seems... 
-
-Isn't it PTP specific?
-
-> 
-> [...]
-> 
-> MBR, Sergey
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
