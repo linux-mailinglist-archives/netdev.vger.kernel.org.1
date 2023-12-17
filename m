@@ -1,84 +1,132 @@
-Return-Path: <netdev+bounces-58370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E26A5816033
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 16:38:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B714816095
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 17:57:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74C5C1F21E19
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 15:38:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 462E9283738
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 16:57:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0240B43AAB;
-	Sun, 17 Dec 2023 15:37:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50BBF44C99;
+	Sun, 17 Dec 2023 16:57:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FTEQ+v40"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EaKGOjUm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0D644C82
-	for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 15:37:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C335AC433C8;
-	Sun, 17 Dec 2023 15:37:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702827477;
-	bh=GK7xAUGF66NpUpUig6hIj6/sKGq7G9HW5IE15iuBjb8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=FTEQ+v40mXkS6e04xHul8k6JolCDsURXrm3YRcQCaI4vNYtemLLS6D6ZBig0kEkj0
-	 wTTliYDQttNMn5IizXVn8oCGRlqvyUwkg7KZL7B7SUOwvmc7/f9CTmEbWOp1E2p1Mm
-	 1FnsKXWN392NlaBdI3pAfULNIFQRkub+pqbtOeN74nzMlbFZ7Z1YbKXUc3+BsQcC8i
-	 mf34KmeeP6pTEobnXTMWB3NUjTg0Edz6C3WFGeQS+xa/ij/t7rjcQ5A9kDZ1rvm/Vw
-	 xhfrtcQPoDu3sl/lCI3YtAYwYidV+ltKdSgwZy1RjeAeXp6vQNBE+5638ClRsnZD5Z
-	 tXWNa1TVv32nQ==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: netdev@vger.kernel.org
-Cc: lorenzo.bianconi@redhat.com,
-	nbd@nbd.name,
-	john@phrozen.org,
-	sean.wang@mediatek.com,
-	Mark-MC.Lee@mediatek.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: [PATCH net] net: ethernet: mtk_wed: fix possible NULL pointer dereference in mtk_wed_wo_queue_tx_clean()
-Date: Sun, 17 Dec 2023 16:37:40 +0100
-Message-ID: <3c1262464d215faa8acebfc08869798c81c96f4a.1702827359.git.lorenzo@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1DDE47F5E;
+	Sun, 17 Dec 2023 16:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=gQ4VXb6aTdqcaOkXb5g9GnK1Q/37tTNEjG1RRH6Dcn0=; b=EaKGOjUm/Lmqo4HWwoN5DYsu9V
+	cR4Xv0Rpt0TZSVgkRoBB0REzy+MCPnFok4MnDE8pQtr9mZg4X/9EiSk7WJwhTVBWa7xpRImVdEwLq
+	pT63WDfGl9guNcHF3SexzzyXxp/ccpD6BIefUN0W9Tjt6ptTHf5t/hp1oUUSEvoyagM8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rEuRy-003A5K-R1; Sun, 17 Dec 2023 17:57:10 +0100
+Date: Sun, 17 Dec 2023 17:57:10 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>
+Subject: Re: [PATCH net-next v4 01/13] net: phy: Introduce ethernet link
+ topology representation
+Message-ID: <ede222d4-11da-4b95-a685-17cb480694dd@lunn.ch>
+References: <20231215171237.1152563-1-maxime.chevallier@bootlin.com>
+ <20231215171237.1152563-1-maxime.chevallier@bootlin.com>
+ <20231215171237.1152563-2-maxime.chevallier@bootlin.com>
+ <20231215171237.1152563-2-maxime.chevallier@bootlin.com>
+ <20231215214523.ntk5kec32mb5vqjs@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231215214523.ntk5kec32mb5vqjs@skbuf>
 
-In order to avoid a NULL pointer dereference, check entry->buf pointer before running
-skb_free_frag in mtk_wed_wo_queue_tx_clean routine.
+On Fri, Dec 15, 2023 at 11:45:23PM +0200, Vladimir Oltean wrote:
+> On Fri, Dec 15, 2023 at 06:12:23PM +0100, Maxime Chevallier wrote:
+> > diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+> > index d8e9335d415c..89daaccc9276 100644
+> > --- a/drivers/net/phy/phy_device.c
+> > +++ b/drivers/net/phy/phy_device.c
+> > @@ -1491,6 +1500,11 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
+> >  
+> >  		if (phydev->sfp_bus_attached)
+> >  			dev->sfp_bus = phydev->sfp_bus;
+> > +
+> > +		err = phy_link_topo_add_phy(&dev->link_topo, phydev,
+> > +					    PHY_UPSTREAM_MAC, dev);
+> > +		if (err)
+> > +			goto error;
+> >  	}
+> >  
+> >  	/* Some Ethernet drivers try to connect to a PHY device before
+> > @@ -1816,6 +1830,7 @@ void phy_detach(struct phy_device *phydev)
+> >  	if (dev) {
+> >  		phydev->attached_dev->phydev = NULL;
+> >  		phydev->attached_dev = NULL;
+> > +		phy_link_topo_del_phy(&dev->link_topo, phydev);
+> >  	}
+> >  	phydev->phylink = NULL;
+> >  
+> > diff --git a/drivers/net/phy/phy_link_topology.c b/drivers/net/phy/phy_link_topology.c
+> > new file mode 100644
+> > index 000000000000..22f6372d002c
+> > --- /dev/null
+> > +++ b/drivers/net/phy/phy_link_topology.c
+> > +int phy_link_topo_add_phy(struct phy_link_topology *topo,
+> > +			  struct phy_device *phy,
+> > +			  enum phy_upstream upt, void *upstream)
+> > +{
+> > +	struct phy_device_node *pdn;
+> > +	int ret;
+> > +
+> > +	/* Protects phy and upstream */
+> > +	ASSERT_RTNL();
+> 
+> Something to think for the PHY library maintainers. This is probably
+> the first time when the rtnl_lock() requirement is asserted at
+> phy_attach_direct() time.
 
-Fixes: 799684448e3e ("net: ethernet: mtk_wed: introduce wed wo support")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/mediatek/mtk_wed_wo.c | 3 +++
- 1 file changed, 3 insertions(+)
+There are two use cases here for plain MAC drivers.
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_wed_wo.c b/drivers/net/ethernet/mediatek/mtk_wed_wo.c
-index 3bd51a3d6650..ae44ad5f8ce8 100644
---- a/drivers/net/ethernet/mediatek/mtk_wed_wo.c
-+++ b/drivers/net/ethernet/mediatek/mtk_wed_wo.c
-@@ -291,6 +291,9 @@ mtk_wed_wo_queue_tx_clean(struct mtk_wed_wo *wo, struct mtk_wed_wo_queue *q)
- 	for (i = 0; i < q->n_desc; i++) {
- 		struct mtk_wed_wo_queue_entry *entry = &q->entry[i];
- 
-+		if (!entry->buf)
-+			continue;
-+
- 		dma_unmap_single(wo->hw->dev, entry->addr, entry->len,
- 				 DMA_TO_DEVICE);
- 		skb_free_frag(entry->buf);
--- 
-2.43.0
+1) phy_attach_direct() is called from probe. RTNL is normally not
+held, the driver would have to take it before making the call.
 
+2) phy_attach_direct() is called from ndo_open. In that case,
+__dev_open() has a ASSERT_RTNL() so we can assume RTNL has been taken.
+
+So i don't think we can assume RTNL is held, but it might be held.
+
+We need a better understanding what is being protected here.
+
+   Andrew
 
