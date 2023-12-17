@@ -1,65 +1,44 @@
-Return-Path: <netdev+bounces-58382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3FC88161BA
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 20:16:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B07A8161BD
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 20:18:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5971B282011
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 19:16:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A7C51C20CE5
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 19:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC87B47F78;
-	Sun, 17 Dec 2023 19:16:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C0E47F78;
+	Sun, 17 Dec 2023 19:18:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ta3r/nvd"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="Yg9gl2IB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BCC6481A0;
-	Sun, 17 Dec 2023 19:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2cc4029dc6eso27073831fa.1;
-        Sun, 17 Dec 2023 11:16:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702840574; x=1703445374; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=yEgP8jIJVAEUyj5VeqhD7WNWwleYce7HTymoGIdGF9o=;
-        b=Ta3r/nvdVrb7sSJQTrJxs5zkOT1CsNUmjgX4SFqYIW/BRvppaDBQSE4Wj6mSArjc8c
-         8EuNquaEXNuhGzzm/nNLg1YIOwFbi4iildarbgi1ljuJhfh1yW9wCy1vfgtkGSDgNo/s
-         PjK0aD9RJjnRP1Y4ysAMRCaAeARtbZXzivpIR+1RLrdxeBh1ket2nN9jNQWs7RBmaidy
-         Xe0xIOWY/gCozLnACnRnqz6zPwLDRUWQPowGoBiVxLUH6TMbCia6E1AmZ51MyvLO7+FE
-         xif95+9wgIxLNnvBqm1GNXteO7v//S9dwR8C2dkv8y5uhAZQ3SqWuOx7oDZwvNkiuKkb
-         jdfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702840574; x=1703445374;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yEgP8jIJVAEUyj5VeqhD7WNWwleYce7HTymoGIdGF9o=;
-        b=Tz9o7tOJCIdss6BJ1XEcCMsUb7TJtqLWqcdUMQR4Dp6MMDApXh7zMPq9YH5EPkJZpk
-         NgrpFrJjork7FkfMUEpQ80+WoreKxrykMJZ+qWWyfewHsR75OyFSkIFl6mFkM/rs89Pb
-         RvuNkuO/rc7cgBxuCnr/lIguOhOuFkXwnS5DaSNzGIRWDql5y4d1w1u0FVcmc3JhxCFM
-         qxaA0mHLfhHBQuXkJphbsVAXaV91AKPz7EYgGJPfZ8PTw59L9Y0GQXnWLgCJDf6FzMib
-         Mr8/JlOeLzeI3YU+XnEzsdxvvx/srMJ/meyyVbbUIo2nEWLqXJEskw0Zyf7wacJquxWo
-         mR5Q==
-X-Gm-Message-State: AOJu0YzqrI2eUziPw962St8g1sU/R8RQBa2M6YPMzhpfKS4+DrRvC+Ns
-	j6aNq3CJap2Wpb9kwt3IlXnOhTe7zdw=
-X-Google-Smtp-Source: AGHT+IF2/mE2xKWlzjaf5tcwQmmdUPdf5ylsE16VTN8t7vCGCYf9Cuk2C+7Edzfg0frx8Qv/UlUgDg==
-X-Received: by 2002:a2e:9787:0:b0:2ca:d14:96cf with SMTP id y7-20020a2e9787000000b002ca0d1496cfmr6452714lji.48.1702840573999;
-        Sun, 17 Dec 2023 11:16:13 -0800 (PST)
-Received: from ?IPV6:2a01:c22:6e42:9000:b4eb:1338:e451:9de3? (dynamic-2a01-0c22-6e42-9000-b4eb-1338-e451-9de3.c22.pool.telefonica.de. [2a01:c22:6e42:9000:b4eb:1338:e451:9de3])
-        by smtp.googlemail.com with ESMTPSA id ds12-20020a0564021ccc00b00552a6a19ed0sm2779409edb.9.2023.12.17.11.16.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 17 Dec 2023 11:16:12 -0800 (PST)
-Message-ID: <7b6cf0fb-4c77-4088-b87b-5649cfaa697e@gmail.com>
-Date: Sun, 17 Dec 2023 20:16:11 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29CB47F79;
+	Sun, 17 Dec 2023 19:18:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+	s=s31663417; t=1702840677; x=1703445477; i=wahrenst@gmx.net;
+	bh=AX4lHlgq9JKPdeXZfLkm/inQf0LnPS5SF4KW6q3dgqA=;
+	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
+	 In-Reply-To;
+	b=Yg9gl2IBB1viC+JMtA9JmlTG1mFV8nvY9oj+JIoCNsXOfkqyWfN423jzH5ueIEYm
+	 q31Xl9GUOegIxT0DUCYEeXbB4CmwwSrOI9ojQgocDfFSRBdRXaaL8v/jZW5feXqJW
+	 RBPorYEaYcQPL2MOXUGBNWSbW+RVMy3cG2tz1HaZCFp128hhuH3DNnjnTHbVWzGck
+	 WZIxQ6nTxumoPwR1NFjR41nOq8EMlcL+T3LhgJQGX8dGDWeiq5GR984RnWTjcXKyi
+	 yGcXg31zy9XEh78WMFdicUHAn5iyYzrUSECKKJl91K9ddAgx8RL06C6jkgzazK/ew
+	 m1OT/qmb9dqaX0aJjw==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.1.130] ([37.4.248.43]) by mail.gmx.net (mrgmx105
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1Mr9G2-1rZUPr39uQ-00oCNL; Sun, 17
+ Dec 2023 20:17:57 +0100
+Message-ID: <8cdac20c-e860-4157-95c0-6e8250e50af5@gmx.net>
+Date: Sun, 17 Dec 2023 20:17:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,77 +46,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESUBMIT] leds: trigger: netdev: add core support for hw
- not supporting fallback to LED sw control
+Subject: Re: [PATCH 02/12 net-next] qca_spi: Improve SPI IRQ handling
 Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>
-Cc: "linux-leds@vger.kernel.org" <linux-leds@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Andrew Lunn <andrew@lunn.ch>
-References: <3fd5184c-3641-4b0b-b59a-f489ec69a6cd@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <3fd5184c-3641-4b0b-b59a-f489ec69a6cd@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231214150944.55808-1-wahrenst@gmx.net>
+ <20231214150944.55808-3-wahrenst@gmx.net>
+ <c5b81005-e309-46df-b534-b24814d10006@lunn.ch>
+From: Stefan Wahren <wahrenst@gmx.net>
+In-Reply-To: <c5b81005-e309-46df-b534-b24814d10006@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:UXnUwy0WzBMA+K4ONhel7DRkYSdrQRvn8Xuv0Gub1b3Cdkw1sFM
+ lMSU3RLgb2/EVL2MHnz3MyLZCmTO2sajE5WVQgqPmlQjxHBboCss3BH+SnCe4NKcl6tTZ1m
+ W13mwNEtNiDlHbWMEYClfcTly5JxFgyn1WiIB1J9guHkg75rvl2630gogL2harmW2pwFgBB
+ pGSBmfQlnjGMpWT9KQGxQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:WcVz3KETitU=;L8+8O7zSHtFOlkkjZnUzw3Fkmk8
+ 43BzEzHCqA7lcNX4ft/Zd7MhDzPJo4qSq/eohocB9PmxHLsRI56anjSHDEnuR5SU9Leo3wBSm
+ slYDRaObO+c0UxFCYZGFPOJg+DsMwIrW1blsL9CxNlUPXQfsXsSDwBOe7QK4QRDLVwI1l27k0
+ 7W3YLE5XBkynNAka8RjyNkt3bbNNufoTRkCPa91ul2isNmJU6cI7U90ao7jLw5yR/s8TRkETt
+ DEU6tK0Ewc697/slEAyf+3OAfvgUy5JkFwvPj9vYJU2BWc0ZWsFF9J/8ELCBHbljt4YADwQgn
+ NgUELadviZMoFHPqmmz3ut5GrcM4kBZilRVbV+S6r5WsIeRHKmCCAla6prHRhJqA4HRop/XEX
+ tn7GISx5uFordIMVM39/fni2O5MbkK+NoeKXiTCKFsSBjwJ0N6THUkw0cGlmjg9LLne1FW1Xv
+ UyR71mK1YxjMgD4O6a3yUCe8y5GZaxzbye/LEbSyKoY2XqneVM24WeWcyIck6V8893E8RI8Vk
+ 1QmapkhyPt2ejhRyg8vMO9HWEduO5L1CyHws7KrNkW4Bd7sgZ+ZJxVHpeCAwuCp/oZ/yCbpHu
+ xd7667mDXNJ1TnDH+HEDKR9LpFpkgD6lGPUH3/yBly/14SecN+4MiVV1lRZc2/kyj6A7b53Wf
+ rjnAll0nDaN6dutQN9UHVNtZhFkCusXS0bx4k4I9XCocOmF9GNBaqQvhxxXBZQn0nFVKgzTX4
+ oZiPYIHTEvCm2pMNYayjbQfWXWc7J2wkdMw7EYPX53SFL8Lhn8Jwf0RCeS2YoV1D1UxniUMbV
+ tUNAOQWmoYhtcXtvahj2G11F7GCA4YWbGD0LbFo9VIw1pemBHe/lkcV4ALU03D1axsR3po7qG
+ FSLB6X569wsHsoFdCm9OIIRb5yDz2jot32XnyhUB5OqfPQlpfHs1Uh1tkEUb3GQjMsTqEgs3T
+ uYXd3w==
 
-On 17.12.2023 19:46, Heiner Kallweit wrote:
-> If hw doesn't support sw control of the LED and we switch to a mode
-> not supported by hw, currently we get lots of errors because neither
-> brigthness_set() nor brithness_set_blocking() is set.
-> Deal with this by not falling back to sw control, and return
-> -EOPNOTSUPP to the user. Note that we still store the new mode.
-> This is needed in case an intermediate unsupported mode is necessary
-> to switch from one supported mode to another.
-> 
-> Add a comment explaining how a driver for such hw is supposed to behave.
-> 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
+Hi Andrew,
 
-For whatever reason this patch (original version and resubmit) doesn't
-show up on linux-leds patchwork. In netdev patchwork it's visible.
+Am 17.12.23 um 19:14 schrieb Andrew Lunn:
+> On Thu, Dec 14, 2023 at 04:09:34PM +0100, Stefan Wahren wrote:
+>> The functions qcaspi_netdev_open/close are responsible of request &
+>> free of the SPI interrupt, which wasn't the best choice because
+>> allocation problems are discovered not during probe. So let us split
+>> IRQ allocation & enabling, so we can take advantage of a device
+>> managed IRQ.
+> Could you replace the kernel thread with a threaded interrupt handler?
+the kernel thread is responsible for receiving, transmitting and reset
+handling (there is no GPIO reset in this driver) which must be
+synchronized along the same SPI interface. The interrupt just signalize
+a chip reset or a received packet is available.
+
+Could you please elaborate this request more in detail:
+What is the problem with the kernel thread?
+Why should i use the threaded interrupt as a replacement instead of e.g.
+workqueue?
+
+Please don't get me wrong, but i need to convince my employer for such a
+big rewrite.
+
+Regards
+
+>
+>        Andrew
 
 
