@@ -1,91 +1,117 @@
-Return-Path: <netdev+bounces-58398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C8838162E6
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 23:48:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93524816355
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 00:25:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE9D31C21915
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 22:48:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5C2B1C2093B
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 23:25:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 007EA47F5A;
-	Sun, 17 Dec 2023 22:48:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61E4D49F9E;
+	Sun, 17 Dec 2023 23:25:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vTuABx1C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kthW37U9"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574154B134;
-	Sun, 17 Dec 2023 22:48:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=283olUZWXoRvFe1qG4d0iFlOJnatVaq3Eq/A7zg0yes=; b=vTuABx1CIetIEPDr/0CJFyKpJO
-	kCxltH2Kb9zpvrcINBN+X6O1BV+SYIrgoMqVrSUY9YpfZDFGEzQ51cBs8x58GAlL03PS5JduGqiv5
-	5DVswWL5TYFtMb3gu7zSmxXN/USpBEsUBWIQqgy4JSMMZf+byXisoivw0OgLTuKpTDyI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rEzve-003AuU-1w; Sun, 17 Dec 2023 23:48:10 +0100
-Date: Sun, 17 Dec 2023 23:48:10 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Stefan Wahren <wahrenst@gmx.net>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D272F49F96;
+	Sun, 17 Dec 2023 23:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40c38e292c8so12453675e9.0;
+        Sun, 17 Dec 2023 15:25:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702855522; x=1703460322; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fRBTxZTtANtJ9sB0koycTxqbtIoU/uRCl3pXfs/ZlB8=;
+        b=kthW37U9vBOnQlXbcLTYqKB2QG8mGCNWCEDV2mESYyo0SrSnf5m7cQfKvmRk0Y/Te8
+         SIuw43UpfZKCDxn8bgG9XtkpyxR9MIocM3rxANNwq5hfrGge5TIK6MKgiKsa2GnyL1zW
+         VoJoyklzqTIHQkvcq1pJi7JDLnlP0UK3cU+91IewfIG6uN93bMYItXqy3vn6S/5Oj8aq
+         wOldByANiM//g07Kv+GJ3vVwQbqi0mXKmPFugSmraJM5Du6VAxonMNSE0lJ66aSsHDkt
+         3YenE3xyPy1urOAQu0GZ0uDAP4gJasYntjZdAwCuPTYGsq1y1qH/PSg+ku9lNa7CJJHW
+         JxYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702855522; x=1703460322;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fRBTxZTtANtJ9sB0koycTxqbtIoU/uRCl3pXfs/ZlB8=;
+        b=sElRtguasdv5tjv0GtI2frHPHnd5adBeQncSH83yKFIsR5xW3smkquTF5hz0wFpXth
+         CeZhBLSnMgDAzBsP38/AyTvv+aXXjmMDy8M+6qUr44ry1+vf9lGXBnfi3j/y+dvPAhsF
+         XI0V79tsSB2/+rtQ8qfIumGwStZ+cMFLuEcH7Hy4bW6FdhHfoPGd4enr4yfjAZkckQLv
+         ZVOPKQFja9P/6OmDLxnYYdWDdrWDEKDLJ/v0PRtA/v5czlLfLp8y/ca78xBUyQt91IZP
+         k2o0RP6N2wzqEoY0rMDY6uIOfxym9T3C8LC4bG3SW7hUCSbj3kV/2Zv7zkFUPBqDGyy3
+         3zkw==
+X-Gm-Message-State: AOJu0Yx50VbSoxHOm5bmj7OlEy/XfG9KkDB5NkKNaiJEVD2skn9Qfzy8
+	IGu/0Axbn5JHY8JPxH2lF/M=
+X-Google-Smtp-Source: AGHT+IFCOgvIxkxEiAqinYd76eGJ+ggDFNgJ+NHiEJlJE75zz11dobDBkfNYlRgWni0fwA2gjOI19w==
+X-Received: by 2002:a05:600c:8607:b0:40c:2a2b:4ea with SMTP id ha7-20020a05600c860700b0040c2a2b04eamr7099260wmb.155.1702855521851;
+        Sun, 17 Dec 2023 15:25:21 -0800 (PST)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id o16-20020a5d6850000000b0033332df65absm25058949wrw.50.2023.12.17.15.25.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 Dec 2023 15:25:21 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 02/12 net-next] qca_spi: Improve SPI IRQ handling
-Message-ID: <0a372815-ce13-4254-ab3b-12bc2ca1b1a2@lunn.ch>
-References: <20231214150944.55808-1-wahrenst@gmx.net>
- <20231214150944.55808-3-wahrenst@gmx.net>
- <c5b81005-e309-46df-b534-b24814d10006@lunn.ch>
- <8cdac20c-e860-4157-95c0-6e8250e50af5@gmx.net>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Christian Marangi <ansuelsmth@gmail.com>
+Subject: [net-next PATCH] net: phy: at803x: replace msleep(1) with usleep_range
+Date: Mon, 18 Dec 2023 00:25:08 +0100
+Message-Id: <20231217232508.26470-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8cdac20c-e860-4157-95c0-6e8250e50af5@gmx.net>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Dec 17, 2023 at 08:17:56PM +0100, Stefan Wahren wrote:
-> Hi Andrew,
-> 
-> Am 17.12.23 um 19:14 schrieb Andrew Lunn:
-> > On Thu, Dec 14, 2023 at 04:09:34PM +0100, Stefan Wahren wrote:
-> > > The functions qcaspi_netdev_open/close are responsible of request &
-> > > free of the SPI interrupt, which wasn't the best choice because
-> > > allocation problems are discovered not during probe. So let us split
-> > > IRQ allocation & enabling, so we can take advantage of a device
-> > > managed IRQ.
-> > Could you replace the kernel thread with a threaded interrupt handler?
-> the kernel thread is responsible for receiving, transmitting and reset
-> handling (there is no GPIO reset in this driver) which must be
-> synchronized along the same SPI interface. The interrupt just signalize
-> a chip reset or a received packet is available.
-> 
-> Could you please elaborate this request more in detail:
-> What is the problem with the kernel thread?
-> Why should i use the threaded interrupt as a replacement instead of e.g.
-> workqueue?
-> 
-> Please don't get me wrong, but i need to convince my employer for such a
-> big rewrite.
+Replace msleep(1) with usleep_range as suggested by timers-howto guide.
 
-I don't know this driver, which is why i asked the question. Its just
-a suggestion. Maybe it makes no sense. But there have been other SPI
-based Ethernet drivers which have been simplified by using threaded
-interrupts rather than a kernel thread or a work queue, since the
-interrupt core does all the thread management, and in particular the
-creating and destroying of the thread which drivers often get wrong.
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+---
+ drivers/net/phy/at803x.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-	 Andrew
+diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
+index a7d28848ee93..2b2f0fadaf84 100644
+--- a/drivers/net/phy/at803x.c
++++ b/drivers/net/phy/at803x.c
+@@ -916,9 +916,9 @@ static void at803x_link_change_notify(struct phy_device *phydev)
+ 		at803x_context_save(phydev, &context);
+ 
+ 		phy_device_reset(phydev, 1);
+-		msleep(1);
++		usleep_range(1000, 2000);
+ 		phy_device_reset(phydev, 0);
+-		msleep(1);
++		usleep_range(1000, 2000);
+ 
+ 		at803x_context_restore(phydev, &context);
+ 
+@@ -1733,7 +1733,7 @@ static int qca83xx_resume(struct phy_device *phydev)
+ 	if (ret)
+ 		return ret;
+ 
+-	msleep(1);
++	usleep_range(1000, 2000);
+ 
+ 	return 0;
+ }
+-- 
+2.40.1
+
 
