@@ -1,132 +1,133 @@
-Return-Path: <netdev+bounces-58355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6AA9815F16
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 13:54:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A387B815F17
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 13:54:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 30267B216DE
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 12:54:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FAFB281941
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 12:54:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22F5B34550;
-	Sun, 17 Dec 2023 12:53:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA9C41C63;
+	Sun, 17 Dec 2023 12:54:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b0yryinz"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="I6H16lmq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072A144360;
-	Sun, 17 Dec 2023 12:53:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BA99C433C7;
-	Sun, 17 Dec 2023 12:53:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702817638;
-	bh=JNQejdVwe4wbdwQ0rhcGiGtmdcp8mgsEXgDOORjnZeQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=b0yryinzoN8U9E3DbLLK4EKnHNSETzH70rlsGQzY/wVNzoSTLsjzREtygDrGAGKlF
-	 /BLDKE0FLb1gcyBX2TaPu43tUzBqycWBomFvM8Tg4MpCKp/pPsUyLuMOQk9JJXyAy5
-	 MKGRxuXXTlJO0uU+ev6UWd8+MfEBhJAFWpcKgEWevhYEP2D+FAjOcDlOk5tArkAlbV
-	 nsPfDdOto4pSTJuPoawCs2TdEmitis60M7zOEJsmH+dxPWQpQyzxZGMZa6XdyXGiHp
-	 2jtSiK40ibPWm9Mazs+9wbeQyrD1AbHX6AV2T56adCtGXk6Dbssesp1YJC6elZAnNB
-	 yp7P8u9xca3QA==
-Date: Sun, 17 Dec 2023 12:53:53 +0000
-From: Simon Horman <horms@kernel.org>
-To: Ronald Wahl <rwahl@gmx.de>
-Cc: Ronald Wahl <ronald.wahl@raritan.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ben Dooks <ben.dooks@codethink.co.uk>,
-	Tristram Ha <Tristram.Ha@microchip.com>, netdev@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net v3] net: ks8851: Fix TX stall caused by TX buffer
- overrun
-Message-ID: <20231217125353.GY6288@kernel.org>
-References: <20231214181112.76052-1-rwahl@gmx.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77BC742AB5
+	for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 12:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-552231d9c1dso2866163a12.0
+        for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 04:54:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1702817661; x=1703422461; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2y6j4volUPxIglN5c+2IOQlzSNJxoPhmqBpW0yeoppY=;
+        b=I6H16lmqFysr5PzdZzTQEiu2eJ2yT1GrCJlZ8wwa0rQvTrz17AXO9FTBn/npjZuzNP
+         //EGQe62P4mhEAew9ZXO5Kxnd66YIdjsOMEpqL0Nqcral3EqFW5tzx4MXRkpI7Jj8Bbk
+         iJa+x1yR3jHlr14S9PxwDSfMktB07wsoLZS+DPJYmD9mxY+tlaeJGSQg0AMau5DcnWkg
+         FIE+5og/NmDchtqK8GXGd7MAZR6qS66O8lZlW26oX2Txv7F85JzeaypkqoAr4FaYrpUN
+         uyag39GBY6WTZmA2C6KyRIp1lIqpIMQRiJemFBWjDP/ziFukwoKigSOMpNP0S/1F/fOa
+         PgTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702817661; x=1703422461;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2y6j4volUPxIglN5c+2IOQlzSNJxoPhmqBpW0yeoppY=;
+        b=rmlWW1YEdS79delNyh3f8rOSvQ5wnnpgm0pN4XpNS6ckOOlUw2ePBipAKK5iJfPaWQ
+         HPGepDDm6NoKvqDpZNhMdoBiv8K0uvYelUvlFOgffB2OV2IsJjr6Fw5Qyx/BDe94M3Wu
+         GUyKshX/C2U4eVsTbLk0jy2k2GTSYH51h7NfkxMk11GFX18jBEExqv7LrKx6kEa+LtLJ
+         rJyHN5lwiwehs0hcjhRCdu7cEl5fLBzq4RNAcdh9S2AOLjwtr6aAnHwAGO676yXFiXxr
+         Rg/1OIuBbtWrPLc+7jYuh/szQ/nl4Yu3whI0+1QWJSs6xKgums8+VZC9rUZbrFuW2bmi
+         elYg==
+X-Gm-Message-State: AOJu0Yyf7zo8x6IRqLCp8XAbw0t2ZtyiAHbwmA2Ud4HZCsh6kIs8WW/1
+	lEV6rL+Ohv91X+7EKQVCJZ84Kf6wF9EeYzK9BEc=
+X-Google-Smtp-Source: AGHT+IHFrpkEdjf9blF2KVAoMa6D3JCfEssoS9DIr4NBO30vKzMHJRXTp5iDTHWIYi5TpTyOABFDHA==
+X-Received: by 2002:a50:9311:0:b0:553:30d:c116 with SMTP id m17-20020a509311000000b00553030dc116mr1587140eda.4.1702817660724;
+        Sun, 17 Dec 2023 04:54:20 -0800 (PST)
+Received: from [192.168.50.4] ([82.78.167.103])
+        by smtp.gmail.com with ESMTPSA id di5-20020a056402318500b0054cea9f91e9sm9477186edb.20.2023.12.17.04.54.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 17 Dec 2023 04:54:20 -0800 (PST)
+Message-ID: <b17c6124-0b84-40b2-a254-cce617f73cf2@tuxon.dev>
+Date: Sun, 17 Dec 2023 14:54:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231214181112.76052-1-rwahl@gmx.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 11/21] net: ravb: Move DBAT configuration to
+ the driver's ndo_open API
+Content-Language: en-US
+To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, p.zabel@pengutronix.de,
+ yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com,
+ geert+renesas@glider.be
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214114600.2451162-12-claudiu.beznea.uj@bp.renesas.com>
+ <a93c0673-2876-5bb2-29aa-0d0208b97b10@omp.ru>
+ <4721c4e6-cc0f-48bd-8b14-4a8217ada1fd@omp.ru>
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <4721c4e6-cc0f-48bd-8b14-4a8217ada1fd@omp.ru>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 14, 2023 at 07:11:12PM +0100, Ronald Wahl wrote:
-> From: Ronald Wahl <ronald.wahl@raritan.com>
-> 
-> There is a bug in the ks8851 Ethernet driver that more data is written
-> to the hardware TX buffer than actually available. This is caused by
-> wrong accounting of the free TX buffer space.
-> 
-> The driver maintains a tx_space variable that represents the TX buffer
-> space that is deemed to be free. The ks8851_start_xmit_spi() function
-> adds an SKB to a queue if tx_space is large enough and reduces tx_space
-> by the amount of buffer space it will later need in the TX buffer and
-> then schedules a work item. If there is not enough space then the TX
-> queue is stopped.
-> 
-> The worker function ks8851_tx_work() dequeues all the SKBs and writes
-> the data into the hardware TX buffer. The last packet will trigger an
-> interrupt after it was send. Here it is assumed that all data fits into
-> the TX buffer.
-> 
-> In the interrupt routine (which runs asynchronously because it is a
-> threaded interrupt) tx_space is updated with the current value from the
-> hardware. Also the TX queue is woken up again.
-> 
-> Now it could happen that after data was sent to the hardware and before
-> handling the TX interrupt new data is queued in ks8851_start_xmit_spi()
-> when the TX buffer space had still some space left. When the interrupt
-> is actually handled tx_space is updated from the hardware but now we
-> already have new SKBs queued that have not been written to the hardware
-> TX buffer yet. Since tx_space has been overwritten by the value from the
-> hardware the space is not accounted for.
-> 
-> Now we have more data queued then buffer space available in the hardware
-> and ks8851_tx_work() will potentially overrun the hardware TX buffer. In
-> many cases it will still work because often the buffer is written out
-> fast enough so that no overrun occurs but for example if the peer
-> throttles us via flow control then an overrun may happen.
-> 
-> This can be fixed in different ways. The most simple way would be to set
-> tx_space to 0 before writing data to the hardware TX buffer preventing
-> the queuing of more SKBs until the TX interrupt has been handled. I have
-> chosen a slightly more efficient (and still rather simple) way and
-> track the amount of data that is already queued and not yet written to
-> the hardware. When new SKBs are to be queued the already queued amount
-> of data is honoured when checking free TX buffer space.
-> 
-> I tested this with a setup of two linked KS8851 running iperf3 between
-> the two in bidirectional mode. Before the fix I got a stall after some
-> minutes. With the fix I saw now issues anymore after hours.
-> 
-> Fixes: 3ba81f3ece3c ("net: Micrel KS8851 SPI network driver")
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Ben Dooks <ben.dooks@codethink.co.uk>
-> Cc: Tristram Ha <Tristram.Ha@microchip.com>
-> Cc: netdev@vger.kernel.org
-> Cc: stable@vger.kernel.org # 5.10+
-> Signed-off-by: Ronald Wahl <ronald.wahl@raritan.com>
-> ---
-> V3: - Add missing kdoc of structure fields
->     - Avoid potential NULL pointer dereference
->     - Fix stack variable declaration order
-> 
-> V2: - Added Fixes: tag (issue actually present from the beginning)
->     - cosmetics reported by checkpatch
 
-Thanks for the updates.
 
-This change looks good to me, and I agree that
-the problem was introduced in the cited commit.
+On 15.12.2023 22:01, Sergey Shtylyov wrote:
+> On 12/15/23 12:03 AM, Sergey Shtylyov wrote:
+> [...]
+> 
+>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>
+>>> DBAT setup was done in the driver's probe API. As some IP variants switch
+>>> to reset mode (and thus registers' content is lost) when setting clocks
+>>> (due to module standby functionality) to be able to implement runtime PM
+>>> move the DBAT configuration in the driver's ndo_open API.
+>>>
+>>> This commit prepares the code for the addition of runtime PM.
+>>>
+>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>
+>> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+>>
+>> [...]
+>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>>> index 04eaa1967651..6b8ca08be35e 100644
+>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>>> @@ -1822,6 +1822,7 @@ static int ravb_open(struct net_device *ndev)
+>>>  		napi_enable(&priv->napi[RAVB_NC]);
+>>>  
+>>>  	ravb_set_delay_mode(ndev);
+>>> +	ravb_write(ndev, priv->desc_bat_dma, DBAT);
+> 
+>    Looking at it again, I suspect this belong in ravb_dmac_init()...
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+ravb_dmac_init() is called from multiple places in this driver, e.g.,
+ravb_set_ringparam(), ravb_tx_timeout_work(). I'm afraid we may broke the
+behavior of these if DBAT setup is moved in ravb_dmac_init(). This is also
+valid for setting delay (see patch 10/12).
+
+> 
+>>>  
+>>>  	/* Device init */
+>>>  	error = ravb_dmac_init(ndev);
+> [...]
+> 
+> MBR, Sergey
 
