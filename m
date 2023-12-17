@@ -1,173 +1,84 @@
-Return-Path: <netdev+bounces-58369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9558815FD8
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 15:34:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E26A5816033
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 16:38:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB8291C20B69
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 14:34:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74C5C1F21E19
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 15:38:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 119751EB25;
-	Sun, 17 Dec 2023 14:34:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0240B43AAB;
+	Sun, 17 Dec 2023 15:37:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="mNvFjsTE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FTEQ+v40"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 547A52FE2E
-	for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 14:34:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-40b5155e154so27395335e9.3
-        for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 06:34:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1702823675; x=1703428475; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aqCEu2l0NGB07K1ndlA1ZvH3rmbMfoOKQJlevWlQ0i0=;
-        b=mNvFjsTE28oh6pStQtHcJfP+XYNpCucW7lKKo4u1ElTYWSQcpIKjVPkKgikcGRu6kJ
-         W4ZlJWqHpSjC3yzrKeeQmMipQ0JFt7Zo58A9x6zl6EsYcoH1bQxfwiAqovq04HgLvpCT
-         OdjxBYNQej7RczBU6bsRM0yhl4IMPbOJcrOA0nRnTQOG2uYT5fjrXF5R9sg1re7q4ekJ
-         u/G2Z9bqKPKryHRFezmv9orZ/DP40hy2WcINeKvoYCGWvcn+o1JrFcCM7QEDYBx9lx6s
-         XaJ3TnTX0E04jl7Y0IUl3aQ9BxP8T2GrVAlK+A6IDLVds/C+zdjt44vkLQz/4dLENoSZ
-         EtYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702823675; x=1703428475;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aqCEu2l0NGB07K1ndlA1ZvH3rmbMfoOKQJlevWlQ0i0=;
-        b=NxRKh8DzkM26nynuHh7p0fQNhGdDV41cDhWeylgURgc/qbG174fJjMQkOC4Yit2GzL
-         9Cp2Gu6Tnxs1VIojwn0cgkTv4wPbht+TNFSaFNH4A9Irix/WNBsyP3yr/DnH9jviAHBe
-         NQfVDG52ldEnX/K8EaNPIMXlBXEU54rrB7b46p7eJRdq7PXPXB4xKmv3UBklYh/lYVtU
-         Jx8qzHivIRuVIo6aQVFeGBQCnuytGeWskkHJ+nff8URmInjxjNbw9bobw9btJETd74qA
-         bAkz92k7QjWTpEpcvGrPdOpLkEiFKiQep3k98PPN0nN7AEZC9rFsLuFzEwzdoFEQG6EE
-         wzfw==
-X-Gm-Message-State: AOJu0YyIUipRzZ61vOKsukJIjXlGOXeVTP68cuN0bBdA4dME14h4qfHc
-	Y2OkVqeaLc4EouNFRHGhz5RDig==
-X-Google-Smtp-Source: AGHT+IHF3xKWYIHsI8tvXbw1+h7osXEx8EMefr1MhYNl8r0c1B9owVBM0V0DkArB3hBHKZwEAB/Lvw==
-X-Received: by 2002:a7b:ca5a:0:b0:40c:2a41:4a1f with SMTP id m26-20020a7bca5a000000b0040c2a414a1fmr7002927wml.183.1702823675283;
-        Sun, 17 Dec 2023 06:34:35 -0800 (PST)
-Received: from [192.168.50.4] ([82.78.167.103])
-        by smtp.gmail.com with ESMTPSA id k40-20020a05600c1ca800b0040b45356b72sm40209275wms.33.2023.12.17.06.34.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 17 Dec 2023 06:34:34 -0800 (PST)
-Message-ID: <322c95f1-d42d-447d-89d1-7c61112b0cfd@tuxon.dev>
-Date: Sun, 17 Dec 2023 16:34:33 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0D644C82
+	for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 15:37:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C335AC433C8;
+	Sun, 17 Dec 2023 15:37:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702827477;
+	bh=GK7xAUGF66NpUpUig6hIj6/sKGq7G9HW5IE15iuBjb8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=FTEQ+v40mXkS6e04xHul8k6JolCDsURXrm3YRcQCaI4vNYtemLLS6D6ZBig0kEkj0
+	 wTTliYDQttNMn5IizXVn8oCGRlqvyUwkg7KZL7B7SUOwvmc7/f9CTmEbWOp1E2p1Mm
+	 1FnsKXWN392NlaBdI3pAfULNIFQRkub+pqbtOeN74nzMlbFZ7Z1YbKXUc3+BsQcC8i
+	 mf34KmeeP6pTEobnXTMWB3NUjTg0Edz6C3WFGeQS+xa/ij/t7rjcQ5A9kDZ1rvm/Vw
+	 xhfrtcQPoDu3sl/lCI3YtAYwYidV+ltKdSgwZy1RjeAeXp6vQNBE+5638ClRsnZD5Z
+	 tXWNa1TVv32nQ==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: netdev@vger.kernel.org
+Cc: lorenzo.bianconi@redhat.com,
+	nbd@nbd.name,
+	john@phrozen.org,
+	sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Subject: [PATCH net] net: ethernet: mtk_wed: fix possible NULL pointer dereference in mtk_wed_wo_queue_tx_clean()
+Date: Sun, 17 Dec 2023 16:37:40 +0100
+Message-ID: <3c1262464d215faa8acebfc08869798c81c96f4a.1702827359.git.lorenzo@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 20/21] net: ravb: Do not apply RX CSUM
- settings to hardware if the interface is down
-Content-Language: en-US
-To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, p.zabel@pengutronix.de,
- yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com,
- geert+renesas@glider.be
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
- <20231214114600.2451162-21-claudiu.beznea.uj@bp.renesas.com>
- <247ad9d9-298e-017b-f6e4-e672ee458ee7@omp.ru>
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
-In-Reply-To: <247ad9d9-298e-017b-f6e4-e672ee458ee7@omp.ru>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+In order to avoid a NULL pointer dereference, check entry->buf pointer before running
+skb_free_frag in mtk_wed_wo_queue_tx_clean routine.
 
+Fixes: 799684448e3e ("net: ethernet: mtk_wed: introduce wed wo support")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/ethernet/mediatek/mtk_wed_wo.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-On 16.12.2023 22:36, Sergey Shtylyov wrote:
-> On 12/14/23 2:45 PM, Claudiu wrote:
-> 
->> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>
->> Do not apply the RX CSUM settings to hardware if the interface is down. In
->> case runtime PM is enabled, and while the interface is down, the IP will be
->> in reset mode (as for some platforms disabling/enabling the clocks will
->> switch the IP to standby mode, which will lead to losing registers'
-> 
->    To/From perhaps?
->    And just "register".
-> 
->> content) and applying settings in reset mode is not an option. Instead,
->> cache the RX CSUM settings and apply them in ravb_open().
-> 
->    Have this issue actually occurred for you?
+diff --git a/drivers/net/ethernet/mediatek/mtk_wed_wo.c b/drivers/net/ethernet/mediatek/mtk_wed_wo.c
+index 3bd51a3d6650..ae44ad5f8ce8 100644
+--- a/drivers/net/ethernet/mediatek/mtk_wed_wo.c
++++ b/drivers/net/ethernet/mediatek/mtk_wed_wo.c
+@@ -291,6 +291,9 @@ mtk_wed_wo_queue_tx_clean(struct mtk_wed_wo *wo, struct mtk_wed_wo_queue *q)
+ 	for (i = 0; i < q->n_desc; i++) {
+ 		struct mtk_wed_wo_queue_entry *entry = &q->entry[i];
+ 
++		if (!entry->buf)
++			continue;
++
+ 		dma_unmap_single(wo->hw->dev, entry->addr, entry->len,
+ 				 DMA_TO_DEVICE);
+ 		skb_free_frag(entry->buf);
+-- 
+2.43.0
 
-Setting RX CSUM while the if is down? No.
-
-> 
->> Commit prepares for the addition of runtime PM.
->>
->> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> [...]
-> 
->> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->> index 633346b6cd7c..9ff943dff522 100644
->> --- a/drivers/net/ethernet/renesas/ravb_main.c
->> +++ b/drivers/net/ethernet/renesas/ravb_main.c
->> @@ -1868,6 +1868,15 @@ static int ravb_open(struct net_device *ndev)
->>  	if (info->gptp || info->ccc_gac)
->>  		ravb_ptp_init(ndev, priv->pdev);
->>  
->> +	/* Apply features that might have been changed while the interface
->> +	 * was down.
->> +	 */
->> +	if (ndev->hw_features & NETIF_F_RXCSUM) {
-> 
->    I'm afraid this is a wrong field; we need ndev->features, no?
-
-RX CSUM is not enabled for all ravb aware devices (see struct
-ravb_hw_info::net_hw_features). We should be setting the ECMR only for
-these ones. ravb_hw_info::net_hw_features is set in ndev->hw_features in
-probe(). So here code checks if platforms supports RXCSUM and then below it
-applies what has been requested though ndo_set_features(), if any.
-
-> 
->> +		u32 val = (ndev->features & NETIF_F_RXCSUM) ? ECMR_RCSC : 0;
->> +
->> +		ravb_modify(ndev, ECMR, ECMR_RCSC, val);
->> +	}
->> +
-> 
->    The ECMR setting is already done in ravb_emac_init_rcar(), no need
-> to duplicate it here, I think...
-
-Ok, it worth being moved there.
-
-> 
->>  	/* PHY control start */
->>  	error = ravb_phy_start(ndev);
->>  	if (error)
->> @@ -2337,6 +2346,9 @@ static void ravb_set_rx_csum(struct net_device *ndev, bool enable)
->>  	struct ravb_private *priv = netdev_priv(ndev);
->>  	unsigned long flags;
->>  
->> +	if (!netif_running(ndev))
-> 
->    Racy as well...
-
-It's also called with rtnl_mutex locked.
-
-> 
->> +		return;
->> +
-> 
->    Hm, sh_eth.c doesn't have such check -- perhaps should be fixed
-> as well...
-> 
-> [...]
-> 
-> MBR, Sergey
 
