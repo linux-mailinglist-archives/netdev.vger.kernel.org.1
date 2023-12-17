@@ -1,94 +1,132 @@
-Return-Path: <netdev+bounces-58386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2950A81623E
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 22:02:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBF2C816242
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 22:03:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD11C1F21A87
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 21:01:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BDF21F214E5
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 21:03:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C11481DA;
-	Sun, 17 Dec 2023 21:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89D1F481D7;
+	Sun, 17 Dec 2023 21:03:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gwho3piZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hvrsPbSD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF5D4347C9;
-	Sun, 17 Dec 2023 21:01:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 68143C433C9;
-	Sun, 17 Dec 2023 21:01:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6162948CC0;
+	Sun, 17 Dec 2023 21:03:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61A47C433C7;
+	Sun, 17 Dec 2023 21:03:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702846912;
-	bh=QooiDWtDhrpz9KdYagYeUGjZiKuPYATavk/3k5xXyp8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gwho3piZAAly6/OHoTjCp6MoVralueg4Dj0dCyHEs1XLaDov40fuWQ3LYSa8VdbXE
-	 8VN8yK0s6mgkmHuJRvgH2gxERaNd4A06MPE8ub4ue3xLSfbjU80XwjtbkBII2cYQJ9
-	 AMZg0Tsa143QEKrHtlqAs+cKEOtLaBbejUpmrXFySQTcI7n7KaHySBnaluB/9pfpoo
-	 1/y/WIoEFxZqxzw/WpD1cYWbgEId4tvvz1M4gQ7Q5PK4+HaB4n6mpS4cfIRk6Nhxf9
-	 KGy4oikN1Td3oKA43T6mbTdctVxWb1AaiJ5+PJn8YP6tMwLqCeBv28DGiiDTip9sL6
-	 s6QpJrqz8EXcQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4E6C1C04DD9;
-	Sun, 17 Dec 2023 21:01:52 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1702847023;
+	bh=mCEcMXWBRCUl8ycxVYQtMfuRfaojP7UvcGTxOXhKDaI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hvrsPbSDBmXRz7fBWAVgf3e4EySM97yOUjYsBwbpgyiOdI9DY8G/gQoVfOAG5b9io
+	 ELWQSRpweiRp25KmFZScZE1R7gu3L4njHUmSeYafmHTHI1hXgkZaaWm+wXueeGyORN
+	 sZLgKSVG117kpnXWB//nwjQTcU5HLd07b5ozYEhy3wzX0cuqZ6M2yicJ+k0XCxRjaU
+	 bYfavnhJ/435XHwjKKNE8uKp5+tbIyQKUqBUcbUdsw3Poed/utfsxAEUQnqJbL1W+U
+	 yBb5EgZjWizSeRZC1XgwZNH1Nz5Hg1OZg9pXcBUMplPIgDrLmtpz+n3p6shg2jcd1L
+	 P3At3ee5NOOhQ==
+Date: Sun, 17 Dec 2023 21:03:36 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+Cc: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Samin Guo <samin.guo@starfivetech.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Hal Feng <hal.feng@starfivetech.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org, linux-clk@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, kernel@collabora.com
+Subject: Re: [PATCH v3 5/9] riscv: dts: starfive: jh7100-common: Setup pinmux
+ and enable gmac
+Message-ID: <20231217-rippling-galleria-904152e41f95@spud>
+References: <20231215204050.2296404-1-cristian.ciocaltea@collabora.com>
+ <20231215204050.2296404-6-cristian.ciocaltea@collabora.com>
+ <CAJM55Z-bg0EGPaLHtxcu2AzqN59zfuiT0eE7oCShrx7dG_QK1g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/4] mptcp: misc. fixes for v6.7
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170284691231.19159.11595245549872933441.git-patchwork-notify@kernel.org>
-Date: Sun, 17 Dec 2023 21:01:52 +0000
-References: <20231215-upstream-net-20231215-mptcp-misc-fixes-v1-0-91d20266d525@kernel.org>
-In-Reply-To: <20231215-upstream-net-20231215-mptcp-misc-fixes-v1-0-91d20266d525@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org,
- benjamin.hesmans@tessares.net, dmytro@shytyi.net, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- geliang.tang@linux.dev, stable@vger.kernel.org,
- syzbot+c53d4d3ddb327e80bc51@syzkaller.appspotmail.com
-
-Hello:
-
-This series was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Fri, 15 Dec 2023 17:04:23 +0100 you wrote:
-> Here are a few fixes related to MPTCP:
-> 
-> Patch 1 avoids skipping some subtests of the MPTCP Join selftest by
-> mistake when using older versions of GCC. This fixes a patch introduced
-> in v6.4, backported up to v6.1.
-> 
-> Patch 2 fixes an inconsistent state when using MPTCP + FastOpen. A fix
-> for v6.2.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,1/4] selftests: mptcp: join: fix subflow_send_ack lookup
-    https://git.kernel.org/netdev/net/c/c8f021eec581
-  - [net,2/4] mptcp: fix inconsistent state on fastopen race
-    https://git.kernel.org/netdev/net/c/4fd19a307016
-  - [net,3/4] mptcp: fill in missing MODULE_DESCRIPTION()
-    https://git.kernel.org/netdev/net/c/a8f570b24797
-  - [net,4/4] mailmap: add entries for Geliang Tang
-    https://git.kernel.org/netdev/net/c/356c71c46169
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="kG7DkOG8HSp8FfWf"
+Content-Disposition: inline
+In-Reply-To: <CAJM55Z-bg0EGPaLHtxcu2AzqN59zfuiT0eE7oCShrx7dG_QK1g@mail.gmail.com>
 
 
+--kG7DkOG8HSp8FfWf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sat, Dec 16, 2023 at 11:38:53AM -0800, Emil Renner Berthing wrote:
+> Cristian Ciocaltea wrote:
+> > Add pinmux configuration for DWMAC found on the JH7100 based boards and
+> > enable the related DT node, providing a basic PHY configuration.
+> >
+> > Co-developed-by: Emil Renner Berthing <emil.renner.berthing@canonical.c=
+om>
+> > Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+> > Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+> > ---
+> >  .../boot/dts/starfive/jh7100-common.dtsi      | 85 +++++++++++++++++++
+> >  1 file changed, 85 insertions(+)
+> >
+> > diff --git a/arch/riscv/boot/dts/starfive/jh7100-common.dtsi b/arch/ris=
+cv/boot/dts/starfive/jh7100-common.dtsi
+> > index 42fb61c36068..5cafe8f5c2e7 100644
+> > --- a/arch/riscv/boot/dts/starfive/jh7100-common.dtsi
+> > +++ b/arch/riscv/boot/dts/starfive/jh7100-common.dtsi
+> > @@ -72,7 +72,92 @@ wifi_pwrseq: wifi-pwrseq {
+> >  	};
+> >  };
+> >
+> > +&gmac {
+> > +	pinctrl-names =3D "default";
+> > +	pinctrl-0 =3D <&gmac_pins>;
+> > +	phy-mode =3D "rgmii-id";
+> > +	phy-handle =3D <&phy>;
+>=20
+> I'm not sure if it's a generic policy or not, but I don't really like add=
+ing a
+> reference to a non-existant node here. I'd move this property to the board
+> files where the phy node is actually defined.
+
+FWIW, I don't like the reference-in-the-wrong-place thing either.
+
+--kG7DkOG8HSp8FfWf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZX9iKAAKCRB4tDGHoIJi
+0ljjAQDdeQS9ySXycX3Kr1uE7USW6FuoSN3axiU/roL2LS3UxAD/QmhKPwhsop/g
+JHAPtH4K9zTWBI5z0reix7grWZuUDgQ=
+=ljQG
+-----END PGP SIGNATURE-----
+
+--kG7DkOG8HSp8FfWf--
 
