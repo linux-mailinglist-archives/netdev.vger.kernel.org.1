@@ -1,93 +1,106 @@
-Return-Path: <netdev+bounces-58339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F3DD815E9A
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 12:02:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E8B9815EA8
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 12:15:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC73B283213
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 11:02:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F334A1F21DFC
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 11:15:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F60212B7C;
-	Sun, 17 Dec 2023 11:02:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B3EE12B8E;
+	Sun, 17 Dec 2023 11:15:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uL2AyEVl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uco6LgQT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B88912B74
-	for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 11:01:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 99AECC433C9;
-	Sun, 17 Dec 2023 11:01:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702810919;
-	bh=pZbwoYu1x9dSoyYPLsCDp8KSA0hLznjGpDxCDQtbi8E=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uL2AyEVl1MNXzLCwJ87m9QiOHzPGJLGk9VWmo4UH/d8hX0i/U/KLlZVF3MF8WCmvS
-	 aVZ8ZnlGqDcl7a15dKnITAD9Eb9RScXxp4q+RcCT7F66UMQqL83lz1rpLW6z9qshqM
-	 b9Hdqc/NtGNf1GREX1PbU4xwYPyY+iZ3dI5XHxVGmi4G7XQSPCQmPlEFbGtHT3N96A
-	 TbghVU42WRV+ep88G4ZBST3lcSKZ/RfczbVsB3U6ut7nsdGvh2Ve7q7ltvTtUA4qfe
-	 6QUKn/tQ03y4lJeppa7ougIfIqzTWoYWEsXT/BMeGlMfEWPweatA8YF+CnpT99kuYT
-	 eqkWF/6tTpJJw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 75CA4C4314C;
-	Sun, 17 Dec 2023 11:01:59 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9271E12B82;
+	Sun, 17 Dec 2023 11:15:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3365f09de18so869615f8f.2;
+        Sun, 17 Dec 2023 03:15:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702811741; x=1703416541; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hym40JBSXDRDZKvtqXj9BJbXV0r9zW1DhVziIQP7ja8=;
+        b=Uco6LgQTFZihkBT2OyTucySrjqR/Z/DVAWMvYS5VS7HSXeS2EJu/LufzuqX9r3wRrK
+         EVFZTfKVkzWawCUSP2AVw3GIzXbU857eSJZvfBJAEDyStSHfqHZSAScf5tBHm0gZ17tv
+         5Y9LW1d11VpsWPCT/aE1FDLIfhpldUK9BlHiDYBLkLk5ZVCVYqTw2ni5D6DqjRjfFHGl
+         opJHapta7Lv0U9RxbxAZdj5idNnorYnyIW8JBGq52mezRmAokSKa5sEmuTRXGriLIrPp
+         ODPUm4uhK97A0NzDqV/FXI+QUaJniV8Pl4SpEbtPfMkqrBvNvayMwi4/17D8KvS8siO+
+         bQEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702811741; x=1703416541;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hym40JBSXDRDZKvtqXj9BJbXV0r9zW1DhVziIQP7ja8=;
+        b=f7J3vubXJeZbNNXdH7lUNU718yoE39O0LJRV4YXAtEybNxnfy6/f/GTVl4AYxmjWbx
+         vVfmhlPmM/0RZK0ritcVJCbNC0+U2Pa6jfaAS51z4nAjGictXhQQruVTXYw0oES3NiA/
+         5OKDxR669qjWpKTUkYzkew9MTEUdvdyi0jVDUpX7sJpaw/5UzEQnTLzYmPLCqvMm0azS
+         rpwM37Vsf7wM6icL38TC9UrwGeIvSxtyKX5LXdYf6rwVSDKLK8PVSpQc3gJR9O3yvOro
+         QK+wm6Bx2PGcMjeGexJfBclLQShZWgcSeWOKmJs82UaNiNeLH+EJhkzwPvq6vwVU/LJI
+         q+Eg==
+X-Gm-Message-State: AOJu0YwSCcxdMlwfrWiLrSu+0w5ntYVAAbVwwVdmtTRfuPsaCLLSBgKp
+	ylbHpVtcOSNfMVkywzt3VC0=
+X-Google-Smtp-Source: AGHT+IFcVTOq0dk+RIY2YcinV8e+kO0/lef/P3+a23oj8Hh0ayCAA+Y8CpyfLapvr/pXvatjuf9BVA==
+X-Received: by 2002:a5d:6e89:0:b0:333:2fd2:2f05 with SMTP id k9-20020a5d6e89000000b003332fd22f05mr6176871wrz.126.1702811740576;
+        Sun, 17 Dec 2023 03:15:40 -0800 (PST)
+Received: from debian ([93.184.186.109])
+        by smtp.gmail.com with ESMTPSA id t3-20020adff603000000b003364c0aadebsm7840775wrp.15.2023.12.17.03.15.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 Dec 2023 03:15:40 -0800 (PST)
+Date: Sun, 17 Dec 2023 12:15:38 +0100
+From: Dimitri Fedrau <dima.fedrau@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: marvell-88q2xxx: add driver for the Marvell
+ 88Q2220 PHY
+Message-ID: <20231217111538.GA3591@debian>
+References: <20231215213102.35994-1-dima.fedrau@gmail.com>
+ <74d4b8f9-700e-45bc-af59-95a40a777b00@lunn.ch>
+ <20231216221151.GA143483@debian>
+ <28cc73bf-ed6d-49d8-b80b-4fbf5fa0442f@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v11 0/3] skbuff: Optimize SKB coalescing for page
- pool
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170281091947.1355.12420531280583558242.git-patchwork-notify@kernel.org>
-Date: Sun, 17 Dec 2023 11:01:59 +0000
-References: <20231215033011.12107-1-liangchen.linux@gmail.com>
-In-Reply-To: <20231215033011.12107-1-liangchen.linux@gmail.com>
-To: Liang Chen <liangchen.linux@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, hawk@kernel.org, ilias.apalodimas@linaro.org,
- linyunsheng@huawei.com, netdev@vger.kernel.org, linux-mm@kvack.org,
- jasowang@redhat.com, almasrymina@google.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <28cc73bf-ed6d-49d8-b80b-4fbf5fa0442f@lunn.ch>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Fri, 15 Dec 2023 11:30:08 +0800 you wrote:
-> The combination of the following condition was excluded from skb coalescing:
+Am Sun, Dec 17, 2023 at 10:22:54AM +0100 schrieb Andrew Lunn:
+> > > > +	/* Set IEEE power down */
+> > > > +	ret = phy_write_mmd(phydev, MDIO_MMD_PMAPMD, MDIO_CTRL1, 0x840);
+> > > 
+> > > 0x800 is MDIO_CTRL1_LPOWER. What is the other? It seems like a speed
+> > > selection bit?
+> > >
+> > The other is MDIO_PMA_CTRL1_SPEED1000. Will fix this in V2.
 > 
-> from->pp_recycle = 1
-> from->cloned = 1
-> to->pp_recycle = 1
-> 
-> With page pool in use, this combination can be quite common(ex.
-> NetworkMananger may lead to the additional packet_type being registered,
-> thus the cloning). In scenarios with a higher number of small packets, it
-> can significantly affect the success rate of coalescing.
-> 
-> [...]
+> It seems odd to set a speed, and power it down. But i guess you have
+> blindly copied the reference code, so have no idea why?
+>
+I agree, absolutely no idea. I already asked the Marvell support for
+any document describing the init sequence, but they couldn't help me.
+So I have to stick to the reference code. At least I copied the comments
+that were part of the init sequence, trying to give some meaning to it.
 
-Here is the summary with links:
-  - [net-next,v11,1/3] page_pool: halve BIAS_MAX for multiple user references of a fragment
-    https://git.kernel.org/netdev/net-next/c/aaf153aecef1
-  - [net-next,v11,2/3] skbuff: Add a function to check if a page belongs to page_pool
-    https://git.kernel.org/netdev/net-next/c/8cfa2dee325f
-  - [net-next,v11,3/3] skbuff: Optimization of SKB coalescing for page pool
-    https://git.kernel.org/netdev/net-next/c/f7dc3248dcfb
+> 	Andrew
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+	Dimitri
 
