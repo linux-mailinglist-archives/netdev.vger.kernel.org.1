@@ -1,113 +1,134 @@
-Return-Path: <netdev+bounces-58357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E578815F21
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 14:02:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 907A3815F31
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 14:12:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A09D1C2100F
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 13:02:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1778DB22062
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 13:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBF5042ABE;
-	Sun, 17 Dec 2023 13:02:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49C3643AB7;
+	Sun, 17 Dec 2023 13:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hIP8vS81"
+	dkim=pass (1024-bit key) header.d=siddh.me header.i=code@siddh.me header.b="TLGGRC8C"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sender-of-o51.zoho.in (sender-of-o51.zoho.in [103.117.158.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A233C43147;
-	Sun, 17 Dec 2023 13:02:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6A4DC433C7;
-	Sun, 17 Dec 2023 13:02:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702818147;
-	bh=totc3bhdIJhST4jH5HrKG/pFIPp32//1T4FxcfKMPPg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hIP8vS81QN8xQGOQeCV0N/GyEHaBWKyERYOmoJe64KTzsjv1E+PpSRvJPJ4/8mrNt
-	 qime86vnW6dQyV6RtIgscW3NhC6hgpEeUiriJxWnBy9zj9SoPso9BNuoLdcCWSSp9C
-	 VzqKYs29YIuknddmfyTfKVIfnvbNLAFdanhnD4Q9Rg8nfvy3D5enzAwBg3PXKixndO
-	 omRCnEfR1cbXWLcxLC+JMvYzD+I1YAq6rtQooiiOSRXgSJf4nerbTpZu2d+dqV53bH
-	 tRdFi+O127uMshEDgLW5hMAXgq9wk1EWVCltY4M5tYNtrAoUm3oKssGpdWqgEOxWWk
-	 2lqQcCTlwC3NQ==
-Date: Sun, 17 Dec 2023 13:02:21 +0000
-From: Simon Horman <horms@kernel.org>
-To: Luo Jie <quic_luoj@quicinc.com>
-Cc: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	hkallweit1@gmail.com, linux@armlinux.org.uk, corbet@lwn.net,
-	p.zabel@pengutronix.de, f.fainelli@gmail.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v8 13/14] net: phy: at803x: configure qca8084 work mode
-Message-ID: <20231217130221.GZ6288@kernel.org>
-References: <20231215074005.26976-1-quic_luoj@quicinc.com>
- <20231215074005.26976-14-quic_luoj@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B55BB4437F;
+	Sun, 17 Dec 2023 13:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=siddh.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=siddh.me
+ARC-Seal: i=1; a=rsa-sha256; t=1702818673; cv=none; 
+	d=zohomail.in; s=zohoarc; 
+	b=QmAf8kqV+yTljdzTRSl6UxLpyfJJJ+2YrVm94jAQQmP+GBS8nloqENinopxMhoBsv+sCrQBtU6ap4ooVshJfePJb8Q4Mb++7r5mBz8BURaAo3Y4PyNTuQmgiU1ukKV0Se73tbNJy+YZ3oW6jbOxqT4U9kr2vdsDMZUtk9a1OQBI=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
+	t=1702818673; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=/DTzar0LgmlyqX+qKR/d8wSc2aOpgmvZm8dRTkblnhw=; 
+	b=PXPDC8i0dnRSQ+hDqOp0SzptBfV+sixrpsb6MJ+muwEwPpP4bXhn2WxkvvEOVwIqfjwQ+4AOtLnphTRAmXaMqm+ChVgJ3GeOUA1PJR0ECJYyHQctCiJSeBZ3Q9sWk8S7odrTlLnhUUL7iu1k9aDhbGysvgyz/bCg0y/vn2bsaYc=
+ARC-Authentication-Results: i=1; mx.zohomail.in;
+	dkim=pass  header.i=siddh.me;
+	spf=pass  smtp.mailfrom=code@siddh.me;
+	dmarc=pass header.from=<code@siddh.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1702818673;
+	s=zmail; d=siddh.me; i=code@siddh.me;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=/DTzar0LgmlyqX+qKR/d8wSc2aOpgmvZm8dRTkblnhw=;
+	b=TLGGRC8Cln5wpHoo1Zi8rO+47k1ocI0cUTyBJVwgUYbYai+6VXDlsUGukiHL1JU3
+	hCelgVsJH/K9Kve3nCbWUN0dr9y16s6aLxdAImMUgp+XY0MJ7cE+Quid3wWojdio86i
+	Wv14lMYCKJy0YgkNlHvwKkgPzhG/YarPIEXokRX8=
+Received: from kampyooter.. (122.170.167.40 [122.170.167.40]) by mx.zoho.in
+	with SMTPS id 1702818672684498.387606860955; Sun, 17 Dec 2023 18:41:12 +0530 (IST)
+From: Siddh Raman Pant <code@siddh.me>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Suman Ghosh <sumang@marvell.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v6 0/2] nfc: Fix UAF during datagram sending caused by missing refcounting
+Date: Sun, 17 Dec 2023 18:41:02 +0530
+Message-ID: <cover.1702816635.git.code@siddh.me>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231215074005.26976-14-quic_luoj@quicinc.com>
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-On Fri, Dec 15, 2023 at 03:40:03PM +0800, Luo Jie wrote:
+Changes in v6:
+- Revert label introduction from v4, and thus also v5 entirely.
 
-...
+Changes in v5:
+- Move reason = LLCP_DM_REJ under the fail_put_sock label.
+- Checkpatch now warns about == NULL check for new_sk, so fix that,
+  and also at other similar places in the same function.
 
-> @@ -1038,6 +1045,46 @@ static int qca8084_common_clock_init(struct phy_device *phydev)
->  	return clk_prepare_enable(priv->clk[MDIO_MASTER_AHB_CLK]);
->  }
->  
-> +static int qca8084_parse_and_set_work_mode(struct phy_device *phydev)
-> +{
-> +	struct device_node *node;
-> +	struct at803x_priv *priv;
-> +	u32 value, work_mode;
-> +	int ret;
-> +
-> +	node = phydev->mdio.dev.of_node;
-> +	priv = phydev->priv;
+Changes in v4:
+- Fix put ordering and comments.
+- Separate freeing in recv() into end labels.
+- Remove obvious comment and add reasoning.
+- Picked up r-bs by Suman.
 
-Hi Luo Jie,
+Changes in v3:
+- Fix missing freeing statements.
 
-a minor nit from my side: priv is set but otherwise unused in this function.
+Changes in v2:
+- Add net-next in patch subject.
+- Removed unnecessary extra lock and hold nfc_dev ref when holding llcp_sock.
+- Remove last formatting patch.
+- Picked up r-b from Krzysztof for LLCP_BOUND patch.
 
-> +
-> +	/* The property "qcom,phy-work-mode" is only defined in one
-> +	 * PHY device tree node.
-> +	 */
-> +	ret = of_property_read_u32(node, "qcom,phy-work-mode", &value);
-> +	if (ret)
-> +		return ret == -EINVAL ? 0 : ret;
-> +
-> +	switch (value) {
-> +	case 0:
-> +		work_mode = QCA8084_WORK_MODE_QXGMII;
-> +		break;
-> +	case 1:
-> +		work_mode = QCA8084_WORK_MODE_QXGMII_PORT4_SGMII;
-> +		break;
-> +	case 2:
-> +		work_mode = QCA8084_WORK_MODE_SWITCH;
-> +		break;
-> +	case 3:
-> +		work_mode = QCA8084_WORK_MODE_SWITCH_PORT4_SGMII;
-> +		break;
-> +	default:
-> +		phydev_err(phydev, "invalid qcom,phy-work-mode %d\n", value);
-> +		return -EINVAL;
-> +	}
-> +
-> +	return qca8084_mii_modify(phydev, QCA8084_WORK_MODE_CFG,
-> +				  QCA8084_WORK_MODE_MASK,
-> +				  FIELD_PREP(QCA8084_WORK_MODE_MASK, work_mode));
-> +}
+---
 
-...
+For connectionless transmission, llcp_sock_sendmsg() codepath will
+eventually call nfc_alloc_send_skb() which takes in an nfc_dev as
+an argument for calculating the total size for skb allocation.
+
+virtual_ncidev_close() codepath eventually releases socket by calling
+nfc_llcp_socket_release() (which sets the sk->sk_state to LLCP_CLOSED)
+and afterwards the nfc_dev will be eventually freed.
+
+When an ndev gets freed, llcp_sock_sendmsg() will result in an
+use-after-free as it
+
+(1) doesn't have any checks in place for avoiding the datagram sending.
+
+(2) calls nfc_llcp_send_ui_frame(), which also has a do-while loop
+    which can race with freeing. This loop contains the call to
+    nfc_alloc_send_skb() where we dereference the nfc_dev pointer.
+
+nfc_dev is being freed because we do not hold a reference to it when
+we hold a reference to llcp_local. Thus, virtual_ncidev_close()
+eventually calls nfc_release() due to refcount going to 0.
+
+Since state has to be LLCP_BOUND for datagram sending, we can bail out
+early in llcp_sock_sendmsg().
+
+Please review and let me know if any errors are there, and hopefully
+this gets accepted.
+
+Thanks,
+Siddh
+
+Siddh Raman Pant (2):
+  nfc: llcp_core: Hold a ref to llcp_local->dev when holding a ref to
+    llcp_local
+  nfc: Do not send datagram if socket state isn't LLCP_BOUND
+
+ net/nfc/llcp_core.c | 40 +++++++++++++++++++++++++++++++++++++---
+ net/nfc/llcp_sock.c |  5 +++++
+ 2 files changed, 42 insertions(+), 3 deletions(-)
+
+-- 
+2.42.0
+
 
