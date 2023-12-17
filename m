@@ -1,64 +1,43 @@
-Return-Path: <netdev+bounces-58343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66C28815ED3
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 12:56:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC392815ED8
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 13:01:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D05471F2122E
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 11:56:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BFE55B21A8D
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 12:01:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 582883219A;
-	Sun, 17 Dec 2023 11:56:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8276321AA;
+	Sun, 17 Dec 2023 12:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="DuPcnK9J"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="ZP2lPxfB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A4A32C64
-	for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 11:56:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-40c2718a768so21214845e9.0
-        for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 03:56:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1702814194; x=1703418994; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0amEYboeCnpD2OzQpaMHXIRECFlCijj7YXw/ZUaDRiE=;
-        b=DuPcnK9J2zefL19rnRR/DIX5pHkUa3cY/8TWFshNx1KFtxQrpEOMq6tf3i6bVSaVCs
-         YS4cs3aQCh+4+DZCHnbKs6nTIx/h7RcqORMWb+JC0iT/XG4DcrIuWBaWLHqzNZmLFgnK
-         ii2QaApCAUir2eQOWkxwyR6hHXPtVnqscbpGhF6fMB1ejORoaSKQYPfW4QotbQy97+cB
-         nKvdimSztWqDuSOBVtXqAEMnGifKsqJTtdz723f+SewZUyAMCIOTkdTbxPYopTFjyrl1
-         Ym2n8i/hRq5WukSo9FsKLtrqNFvfzDVWPUrACl4vleU14v8R4DNRx6HxVfVYaS4DIxnD
-         dOdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702814194; x=1703418994;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0amEYboeCnpD2OzQpaMHXIRECFlCijj7YXw/ZUaDRiE=;
-        b=QXA85Akce5/wSewkgTRSePOodQRouwM21SH8U+JfxDIgeSqNZvQmjC2rTW+fTU5EDU
-         qvzGCbojI9jt9bOYY5cJPK/uRHTdheCwtSY+j/GZmCtNQYJWY2aOl5IsIXIFGmiN8S1a
-         iSgI7WgO8+MrVEencLSN8UltIgll2px3sw4SK1Q0A4fDme5xfrx/Ocix4YwnyEsT7XU6
-         dW+ax+FoX/LkF2a50VEjjA71q9PNdEMIc3owFyz3VNHkiSZfyDMfmTQ5RVMjBaoJLOh1
-         kIstveDeRyRcImG0he99c0YjN40lw9jWb6QlvM2umkga9lIFD00zln43b6ipZHj7/+kE
-         PO/Q==
-X-Gm-Message-State: AOJu0YxAgPcEDxp8l69iJuMhQZHelXHXnmKCP6LUErVIeomo950/8VYA
-	oj5+7lGMrvTuXyvUFQujx8SjXA==
-X-Google-Smtp-Source: AGHT+IG6/yTDIdQjTd0M7wyrR9T4w8tojsRmQ1+p3UcALSDAw5ri4OwrFEPN0NaZyY99sHWXcInIlA==
-X-Received: by 2002:a05:600c:458d:b0:40b:33c0:a22 with SMTP id r13-20020a05600c458d00b0040b33c00a22mr8716330wmo.28.1702814194184;
-        Sun, 17 Dec 2023 03:56:34 -0800 (PST)
-Received: from [192.168.50.4] ([82.78.167.103])
-        by smtp.gmail.com with ESMTPSA id ay35-20020a05600c1e2300b0040b2b38a1fasm37860381wmb.4.2023.12.17.03.56.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 17 Dec 2023 03:56:33 -0800 (PST)
-Message-ID: <8fa1183f-93ff-48c2-a5c7-fb48027c4d52@tuxon.dev>
-Date: Sun, 17 Dec 2023 13:56:32 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB2232C63;
+	Sun, 17 Dec 2023 12:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C0F3660005;
+	Sun, 17 Dec 2023 12:01:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1702814469;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3Lg07BUdOWLUb55sl4jY2nUVlLAz2wv5V6/HSrQCs+4=;
+	b=ZP2lPxfBeruufnF1FkXf5EEupfSURUouUpZVNBWpt9hzX776i2vf0egCVk609emM5rwQOe
+	8UyasLk7LJ7an88tcOqUzI2yU0vxxW42D08t6m7itnmaLDC+K0tGN2qiCzQNbvEsWBBsxY
+	hwbmguqITa0CkysH9MJo59hXkNR7zXolm5/uBOaY9Cw7LgDEkeoON6AlnMZemUu+5XX1Fv
+	XXaMWPBMk8nFhPY/753hBJQcplIOBFEgQ3MkD6wCJqDZjT/Ps4/jfwuqTadyGBFwrybnRh
+	d41T+ISJmN+alFszpETgB4FvSKcitQEgrV19AO92Zg5aZdTaVoklFrvqBnAmLw==
+Message-ID: <968d0374-2584-42dd-9ec4-c30fb01c5202@arinc9.com>
+Date: Sun, 17 Dec 2023 15:01:02 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,179 +45,61 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 08/21] net: ravb: Move the IRQs get and
- request in the probe function
+Subject: Re: [PATCH net-next 05/15] net: dsa: mt7530: improve code path for
+ setting up port 5
 Content-Language: en-US
-To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, p.zabel@pengutronix.de,
- yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com,
- geert+renesas@glider.be
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
- <20231214114600.2451162-9-claudiu.beznea.uj@bp.renesas.com>
- <b3c03bd5-83f2-331e-07c0-eeabca139224@omp.ru>
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
-In-Reply-To: <b3c03bd5-83f2-331e-07c0-eeabca139224@omp.ru>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Daniel Golle <daniel@makrotopia.org>, Landen Chao
+ <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Bartel Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com
+References: <20231118123205.266819-1-arinc.unal@arinc9.com>
+ <20231118123205.266819-6-arinc.unal@arinc9.com>
+ <ZVjNJ0nf7Mp0kHzH@shell.armlinux.org.uk>
+ <5e95a436-189f-412e-b409-89a003003292@arinc9.com>
+ <20231207180332.ugfp33xcdkw3elrw@skbuf>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20231207180332.ugfp33xcdkw3elrw@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-
-
-On 16.12.2023 17:53, Sergey Shtylyov wrote:
-> On 12/14/23 2:45 PM, Claudiu wrote:
-> 
->> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+On 7.12.2023 21:03, Vladimir Oltean wrote:
+> On Sat, Dec 02, 2023 at 11:36:03AM +0300, Arınç ÜNAL wrote:
+>> On 18.11.2023 17:41, Russell King (Oracle) wrote:
+>>>> For the cases of PHY muxing or the port being disabled, call
+>>>> mt7530_setup_port5() from mt7530_setup(). mt7530_setup_port5() from
+>>>> mt753x_phylink_mac_config() won't run when port 5 is disabled or used for
+>>>> PHY muxing as port 5 won't be defined on the devicetree.
+>>>
+>>> ... and this should state why this needs to happen - in other words,
+>>> the commit message should state why is it critical that port 5 is
+>>> always setup.
 >>
->> Move the IRQs get and request in the driver's probe function. As some IP
->> variants switches to reset operation mode as a result of setting module
-> 
->    s/switches/switch/.
->    Also, the manuals call this "operating mode", not to mix with one of
-> the modes -- "operation mode".
-
-ok
-
-> 
->> standby through clock enable/disable APIs, to implement runtime PM the
->> resource parsing and requests are moved in the probe function and IP
-> 
->    Requesting.
->    Could you explain in more detail why you need to do this?
-
-Ok, I'll update it in the next version.
-
-> 
->> settings are moved in the open functions. This is a preparatory change to
-> 
->    I don't see you moving anything into ravb_open() here...
-
-Indeed, this is the general explanation. I'll adapt it to explain it what
-has been done in the commit (as it should have been).
-
-> 
->> add runtime PM support for all IP variants.
+>> Actually, port 5 must not always be setup. With patch 7, I explain this
+>> while preventing mt7530_setup_port5() from running if port 5 is disabled.
 >>
->> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> [...]
+>> Arınç
 > 
->> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->> index 83691a0f0cc2..d7f6e8ea8e79 100644
->> --- a/drivers/net/ethernet/renesas/ravb_main.c
->> +++ b/drivers/net/ethernet/renesas/ravb_main.c
->> @@ -1731,7 +1731,7 @@ static inline int ravb_hook_irq(unsigned int irq, irq_handler_t handler,
->>  	name = devm_kasprintf(dev, GFP_KERNEL, "%s:%s", ndev->name, ch);
+> Then change that last paragraph. You could say something like this:
 > 
->    Ugh, I didn't realize we had the managed device API call in a function
-> called from ravb_open()... :-/
+> To keep the cases where port 5 isn't controlled by phylink working as
+> before, we need to preserve the mt7530_setup_port5() call from mt7530_setup().
 > 
-> [...]
->> @@ -2616,6 +2536,127 @@ static void ravb_parse_delay_mode(struct device_node *np, struct net_device *nde
->>  	}
->>  }
->>  
->> +static int ravb_get_irqs(struct ravb_private *priv)
->> +{
->> +	const char *err_a_irq_name = NULL, *mgmt_a_irq_name = NULL;
-> 
->    You don't seem to use these as the pointers. Could be bool instead?
-> But even that doesn't seem necessary..
+> I think it's a case of saying too much, which sparks too many unresolved
+> questions in the reader's mind, which are irrelevant for the purpose of
+> this specific change: eliminating the overlap between DSA's setup() time
+> and phylink.
 
-Indeed, I've messed it a bit. I'll update it in the next version.
-
-> 
->> +	const struct ravb_hw_info *info = priv->info;
->> +	struct platform_device *pdev = priv->pdev;
->> +	struct net_device *ndev = priv->ndev;
->> +	const char *irq_name, *emac_irq_name;
->> +	int i, irq;
->> +
->> +	if (!info->multi_irqs) {
->> +		irq = platform_get_irq(pdev, 0);
->> +		if (irq < 0)
->> +			return irq;
->> +
->> +		ndev->irq = irq;
->> +		return 0;
->> +	}
->> +
->> +	if (info->err_mgmt_irqs) {
->> +		irq_name = "dia";
->> +		emac_irq_name = "line3";
->> +		err_a_irq_name = "err_a";
->> +		mgmt_a_irq_name = "mgmt_a";
->> +	} else {
->> +		irq_name = "ch22";
->> +		emac_irq_name = "ch24";
->> +	}
->> +
->> +	irq = platform_get_irq_byname(pdev, irq_name);
->> +	if (irq < 0)
->> +		return irq;
->> +	ndev->irq = irq;
->> +
->> +	irq = platform_get_irq_byname(pdev, emac_irq_name);
->> +	if (irq < 0)
->> +		return irq;
->> +	priv->emac_irq = irq;
->> +
->> +	if (err_a_irq_name) {
-> 
->    Why not just ctest info->err_mgmt_irqs here, as it was before
-> this patch?
-
-I can't tell ATM what I've wanted to achieve here. Indeed, just checking
-info->err_mgmt_irqs should be better.
-
-> 
->> +		irq = platform_get_irq_byname(pdev, "err_a");
->> +		if (irq < 0)
->> +			return irq;
->> +		priv->erra_irq = irq;
->> +	}
->> +
->> +	if (mgmt_a_irq_name) {
->> +		irq = platform_get_irq_byname(pdev, "mgmt_a");
->> +		if (irq < 0)
->> +			return irq;
->> +		priv->mgmta_irq = irq;
->> +	}
->> +
->> +	for (i = 0; i < NUM_RX_QUEUE; i++) {
->> +		irq = platform_get_irq_byname(pdev, ravb_rx_irqs[i]);
->> +		if (irq < 0)
->> +			return irq;
->> +		priv->rx_irqs[i] = irq;
->> +	}
->> +	for (i = 0; i < NUM_TX_QUEUE; i++) {
->> +		irq = platform_get_irq_byname(pdev, ravb_tx_irqs[i]);
->> +		if (irq < 0)
->> +			return irq;
->> +		priv->tx_irqs[i] = irq;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static int ravb_request_irqs(struct ravb_private *priv)
-> 
->    I'm not sure separating getting and requesting IRQs is a good idea.
-> As you're switching to using the managed device API anyway, you could
-> save on some IRQ-related fields in the *struct* ravb_private, I think...
-
-I'll have a look. By keeping them separated I tried to have the code doing
-the similar things grouped together, tried to keep code similar to what was
-previously and tried to avoid huge functions (having parse and request in a
-single function will lead, AFAICT, at a function with more lines of code
-(difficult to browse in my opinion)).
-
-Thank you for your review,
-Claudiu Beznea
-
-> 
-> [...]
-> 
-> MBR, Sergey
+Will do, thanks.
 
