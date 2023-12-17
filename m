@@ -1,25 +1,25 @@
-Return-Path: <netdev+bounces-58377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4DAF816190
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 19:14:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 738D3816195
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 19:22:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10AC21C20B6D
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 18:14:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB621282A12
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 18:22:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 641BF47A60;
-	Sun, 17 Dec 2023 18:14:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CCD147A4B;
+	Sun, 17 Dec 2023 18:22:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Q6Uixddx"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kNa2mq1Z"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5EA9315B6;
-	Sun, 17 Dec 2023 18:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C5347F43
+	for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 18:22:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -27,23 +27,23 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=H3Yg9Ks44h9xKxHznRP1HbmjN2e0OY+H92vAnJ0cCh0=; b=Q6UixddxCDy7gVGAHV27qsheGf
-	Jd7EFu86koHVAIv7bZFLthsnvAftOIxQh4UtTzhOfPcsqmAZ+TZNvXGBGr2GrrMk3fK7jIl6QWyVA
-	Ld+EoMuLG3+RXOg5ZWFFtSKxh1GqGoldy526reoKJMgBgZ6EORoh31GgUVM0b542unKU=;
+	bh=a+SEjM8jPzus0exn5sWerBqdUPF0Sgk2hQTiTcrQcrY=; b=kNa2mq1Z/xDzTABTNvU5iB0zEE
+	+cWMnB4uQrY236KIgkFEJ/sSkzfEDHU087tUKldZbcNzw6PIdiUxBpLjMZLWHCZ9eBc2PXrFvizCT
+	X7iaBmpgD+Lhcwuav21tjgQmjhN9qeLc8UUrxqgaldThRQMEnafejY9J+zqrXDiHrtVo=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rEvel-003AIp-Ax; Sun, 17 Dec 2023 19:14:27 +0100
-Date: Sun, 17 Dec 2023 19:14:27 +0100
+	id 1rEvmZ-003AKL-J5; Sun, 17 Dec 2023 19:22:31 +0100
+Date: Sun, 17 Dec 2023 19:22:31 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Stefan Wahren <wahrenst@gmx.net>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 02/12 net-next] qca_spi: Improve SPI IRQ handling
-Message-ID: <c5b81005-e309-46df-b534-b24814d10006@lunn.ch>
-References: <20231214150944.55808-1-wahrenst@gmx.net>
- <20231214150944.55808-3-wahrenst@gmx.net>
+To: David Ahern <dsahern@kernel.org>
+Cc: Graeme Smecher <gsmecher@threespeedlogic.com>, davem@davemloft.net,
+	netdev@vger.kernel.org, claudiu.beznea@tuxon.dev,
+	nicolas.ferre@microchip.com, mdf@kernel.org
+Subject: Re: net: ipconfig: dev_set_mtu call is incompatible with a number of
+ Ethernet drivers
+Message-ID: <43538a80-2b46-4fe2-9bb7-97d1e0f0c4c7@lunn.ch>
+References: <f532722f-d1ea-d8fb-cf56-da55f3d2eb59@threespeedlogic.com>
+ <58519bfa-260c-4745-a145-fdca89b4e9d1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,16 +52,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231214150944.55808-3-wahrenst@gmx.net>
+In-Reply-To: <58519bfa-260c-4745-a145-fdca89b4e9d1@kernel.org>
 
-On Thu, Dec 14, 2023 at 04:09:34PM +0100, Stefan Wahren wrote:
-> The functions qcaspi_netdev_open/close are responsible of request &
-> free of the SPI interrupt, which wasn't the best choice because
-> allocation problems are discovered not during probe. So let us split
-> IRQ allocation & enabling, so we can take advantage of a device
-> managed IRQ.
+On Fri, Dec 15, 2023 at 09:49:45AM -0800, David Ahern wrote:
+> On 12/14/23 12:07 PM, Graeme Smecher wrote:
+> > Hi all,
+> > 
+> > In a number of ethernet drivers, the MTU can't be changed on a running
+> > device. Here's one example (from drivers/net/ethernet/cadence/macb_main.c):
+> > 
+> 
+> ...
+> 
+> > 
+> > So - what to do? I can see three defensible arguments:
+> > 
+> > - The network drivers should allow MTU changes on-the-fly (many do), or
+> > - The ipconfig code could bring the adapter down and up again, or
+> 
+> looking at the ordering, bringing down the selected device to change the
+> MTU seems the more reasonable solution.
 
-Could you replace the kernel thread with a threaded interrupt handler?
+But you need to review all the drivers and make sure there are none
+which require the interface to be up in order to change the MTU.
+
+So you might actually want to do is first try to change the MTU with
+the interface up. If that fails, try it with it down. That should not
+cause any regressions.
 
       Andrew
 
