@@ -1,80 +1,82 @@
-Return-Path: <netdev+bounces-58325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E481815E2C
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 09:33:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83642815E29
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 09:33:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2FB7AB21787
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 08:33:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 334DD282F3A
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 08:33:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F1B1C20;
-	Sun, 17 Dec 2023 08:33:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F3F11874;
+	Sun, 17 Dec 2023 08:33:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="XlnOFSgA"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="jGMynj4k"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2049.outbound.protection.outlook.com [40.107.92.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ECF21FBB
-	for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 08:33:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB8BF1C20
+	for <netdev@vger.kernel.org>; Sun, 17 Dec 2023 08:33:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QY8a4sQ+s6vZ1yhsJjCWQA7KX1QA+W0ls0kcFJAG5WY0zUYy6dxqdYaJ7Ej4T6Hw32LVHd86oU3b6ey42GgsAt8fQb0dYm44sFYmUBfUt2Q4yFxdtwkdhZ8col7PRnPiF9IHcujdLyYDS+VC+2fCWSXts9ZTlv2ILtyu39uvZGjsHWk56cPnQVp27seY7CKX9YvugxX8JB4hrkUk2vctSVlL8sjzvoQ2B8zYjrtNX+X3oFvbrbyoQjutyBaY2icZ/cENqgYguhJ3pT68pfef42FBcEmHnGk1ljO5zthDDN7L/Ld8dcjSjfojUjuGCfSSpBfSGbXONFNqxiOUv2Z4qA==
+ b=epNo9uL+JOsx/tsFzn1MMoDddmwjgndrcKvDN5rr8l5lJyn+FXpaPi3aGtWA1tJh7ugC4Hxj1fkm9SHsuubbTfBxlqaxXUwQx2ymsP1beXGZotdXpEtcv4UIoWVd410TLRCOru6/SE8FZW+nGXxsn202L13z4SpQ4ARO7BMVQNJsgPSsuYqFDZ1RYRHI8MXQdMpdaUl4GKWmuGqAbvhxBcqAZqQZ9OETZGc548q1cHzcMmYVnB8eMFoi73RgyYB66Z/41BDxYHnYuu3HzaaL4NHpnaff3cHADFHQ5t3VZBBo9jM0PYsp5sniJCWCu7yfdeH072aYlj7voaW6FmTcbw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BAhH2crXMB986PhnDKSMftnuRp09mnSaX9pmG+RZHpk=;
- b=PACANXKbZKfZHiX5oZe1asViZ6Dskbm7FMBqZjPDK/cEvAch6kFXRlHu7jlFCId8ypgPY3GMq2uqwDCboyukmsV3trheW0ldzxIW13SycF9eLWeezSi0SAbn2qVn1KElXR5sRtrx1U0o8riftrhNnzJE4/OXQxCu1Q0DH98JNk2DVDotUIJHTrUJUFnNQuS+VMdsCZeWQKe+l97w/HYZfTyQuR+Z/3wOuMz2JMULfSIii79hdiHmL9wb3FfetDOEuB6X4yHI3vw4fWHHaBxMrLZ24oKVkvsMFoN+S91ZxUk4U6FS48k2BkcXkfto1VYCJs/yQh+Chzdhkvk7Yezgdw==
+ bh=QWMmYgRiye9sR2sz3THdXCaeNEc+9lS6Q3IhGB7cAYE=;
+ b=Z4T82Z/XYM6lvUDnrFeb8/BF4nQlL7MAdLSO5mZMnWYv4XAfOEshB2htgC/460UcpANjcSRNgGS5CUxdT58PuS7ZFMR6qOsqO6vPJGv6ViVWlF3zYdLu2ULBUcDStqNx+PlqO0FO2IvBqU3L4yFULTH+aJdiMglxjNGerY40KdmXa+zGjbF/Ucza/DUzpoJEN++wLU4yPEpPvBuXd+0yZohyksmoq6mzaB1BrQ0FSKK+Bfa0hd5m/7XttPSdliH6q4n8koPraitMW38KwNc6LCbqt6/+wwN50ApG9uP58dHxz9L93QtodPMzMlWEu2hNraLRAUug4ozocNC0GjntBw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BAhH2crXMB986PhnDKSMftnuRp09mnSaX9pmG+RZHpk=;
- b=XlnOFSgAKBFsB/TPDJPVv/v555xGBQgqJlejmV01r0JDrNVlzj2My0jXYMq5rzsPc+5qtzMxnhb1JHqQ6hintItLmRJh+4Lcdwxo4UTfcff9ieYCIqRyx6CA1NOCnUVDBoC3MdMcRKMb1rb3HBk+o9+9Qh1MXYYJYKu1so769zwxaYawOa5ri/YVDqgXd5ZZ6MLQROhFbJTlddXVy/uDYWJ9G8l+QD+IeQ7mE4Cnofsw9eBFRYHRHfVqNxgHTZ96vJzSvyCMGARIXMsWfhrW7wB62A/g8W09xH7YXvNBi/gqp4QmtpZNWdpU4ZWKukobpVntVTlwPwHWAd8iJm5dzA==
-Received: from MN2PR17CA0029.namprd17.prod.outlook.com (2603:10b6:208:15e::42)
- by CH0PR12MB8579.namprd12.prod.outlook.com (2603:10b6:610:182::10) with
+ bh=QWMmYgRiye9sR2sz3THdXCaeNEc+9lS6Q3IhGB7cAYE=;
+ b=jGMynj4k98rSfNda0NJmGoJzUW3SiWb6F9OzMjkNjExE82+zImIXX0HARxIU+bxszOOSi5yGyJ6dk+u5xnlb722vsXPQQe3Spd+aZYw9/bBOneV155QuSMetyZFjJ3DYRID+2OdaMoP+v+MmOQdXZBys45kL9ffo0Z2FKo+seXh51NWO8S1EMjF3QwHovUHABNhk4eBS295njW/SzvwWULOO5ijfwS9AH2qdvMm5P1ohyg3N60FakP4c8n3hTv9Qw1Pm+nWohF9kBcN0OigQaYFmxkTiJRIGbTNaHgV9oQBB7sWGRngAhdBRr1S3UCaJ8ss+0wUHb5PTD5i//BozCw==
+Received: from CH0PR03CA0055.namprd03.prod.outlook.com (2603:10b6:610:b3::30)
+ by SA3PR12MB9178.namprd12.prod.outlook.com (2603:10b6:806:396::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.37; Sun, 17 Dec
- 2023 08:33:32 +0000
-Received: from BL6PEPF0001AB59.namprd02.prod.outlook.com
- (2603:10b6:208:15e:cafe::7c) by MN2PR17CA0029.outlook.office365.com
- (2603:10b6:208:15e::42) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.36; Sun, 17 Dec
+ 2023 08:33:29 +0000
+Received: from DS3PEPF000099DF.namprd04.prod.outlook.com
+ (2603:10b6:610:b3:cafe::a3) by CH0PR03CA0055.outlook.office365.com
+ (2603:10b6:610:b3::30) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.36 via Frontend
- Transport; Sun, 17 Dec 2023 08:33:32 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ Transport; Sun, 17 Dec 2023 08:33:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BL6PEPF0001AB59.mail.protection.outlook.com (10.167.241.11) with Microsoft
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ DS3PEPF000099DF.mail.protection.outlook.com (10.167.17.202) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7113.14 via Frontend Transport; Sun, 17 Dec 2023 08:33:32 +0000
+ 15.20.7113.14 via Frontend Transport; Sun, 17 Dec 2023 08:33:28 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Sun, 17 Dec
- 2023 00:33:18 -0800
+ 2023 00:33:21 -0800
 Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.231.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Sun, 17 Dec 2023 00:33:15 -0800
+ 15.2.986.41; Sun, 17 Dec 2023 00:33:18 -0800
 From: Ido Schimmel <idosch@nvidia.com>
 To: <netdev@vger.kernel.org>, <bridge@lists.linux-foundation.org>
 CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
 	<edumazet@google.com>, <roopa@nvidia.com>, <razor@blackwall.org>,
 	<petrm@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net-next 0/9] Add MDB bulk deletion support
-Date: Sun, 17 Dec 2023 10:32:35 +0200
-Message-ID: <20231217083244.4076193-1-idosch@nvidia.com>
+Subject: [PATCH net-next 1/9] bridge: add MDB state mask uAPI attribute
+Date: Sun, 17 Dec 2023 10:32:36 +0200
+Message-ID: <20231217083244.4076193-2-idosch@nvidia.com>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20231217083244.4076193-1-idosch@nvidia.com>
+References: <20231217083244.4076193-1-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,87 +89,53 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB59:EE_|CH0PR12MB8579:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9a2ab15b-ad57-4dd4-481e-08dbfedada97
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099DF:EE_|SA3PR12MB9178:EE_
+X-MS-Office365-Filtering-Correlation-Id: fefe37ba-bfc5-403c-f42a-08dbfedad862
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	UujYOhCQ195anodfX2qOQJcXZagpudrJdMIWlWUCHzJZCG+YHSEhyMbuBwgIi+ufnZfRj4fZ8iaNoazL9Jwg6cRwNzYZKSnOdeMGSVowabeQG1hyNiGwUC7j9OkD3ILKHaSPFUtOkpPuQ5PYoksiCVAEvzHDJjXOLHL8wQaNIbSwYNISoTvLkyiQD4j6XsCWqOaZudKiOOeNbiKACPGidZ4uOhHQNLBk331zosfRBa7Q4JoOq6wmx8sy2Sf5B+Q1VaSTFCDNPl0sB7hixOkidST/H/KF7/dipNm9xB4NuH6I6Yb9nuNCgVWOGC8GXhsEfGHGR0nnr37ddzSMglKKiyoP2Vt/8yaR1hH64jhmPN1wTm95+YEGS5dLBxtfFfxfyTqhyBlPvsuzgUvewAgsAvUXCYTKAIobaYPUsUZnO1CQWDFrF/V9T9dFdOR4xZzXh4lAwzxOQp388yp9H8l9coIhQsQ4MbplUXdWj+CgrT0lyCaHDuLOyygI20GQKz4pzfX2A2ld3DDrkJPSCcTzLKK05QvrTaOhxrmUweI/ENwnuh86k2SovCOkfcPyepsfQg0fGW80DBa3j32oFop0Fp9KpFGKsKpcZdXiHg+/mUslgkI/aL3KcnDtvNKua2nO1BqyB5mYocgpAQEaHTqgzUnocx42ktSiNyAdyjyLh6azP3t6MA8ikJosfvCWIT9z49Ymax9qr/pXqMRDWLkXdiJ2OOPhsRKUCNF67hNiDsHK2nbK/2zkToTClXZkh/L7OkdjsCXIH5VDU361Rsi2qus6RO2fngQhnhsvRcRLO4E=
+	GOWZvo5mG1VD+m9MjDpbpyNS1nDXF44B5QzIit3RwMbrfTEcCQcDam8IUSEr7QD9So0dFvuRVwgstuiFVEjyic4dCvxMJ4IAwF8CL3SyojlKcyu2TAAvsk1lny6341JgOx0iEvFDl8svJIQCnJAgv3psiJZevFYrzyaz1QRJlvJs+vr5UTOVSg+/+TL+kXfY+4oHPPl4yS2tUqSeMji8iyz/9p1PCxdPVWqVRrdV5PXnnPQMjyDb3DLKscHfeEhF7eH0qvYAN70ha1nZ7IrRF13CqZoMl+aeHhPwrcs2Hb8S0s0E+NtUm4dh6LHQqlJ4LulvlgEsFZoLIz2Llr6/RYKbVvSofA/PnxmvdaGOPnDtrYRQsJKDELPOyTAT7ohDT37sP1n/x0j6L7tZjv7Rr3fxGWj2M6WgmohoA7I0ReaiUHx/1huTkidAZ5rM47kBlOOq+dP8zo653QZOaiFnNmd4uc0uuHQmiuFoJipgOeXdGnXGzYgpQGbU5OQrOyQjIcYA0XEoay6jC8oZWmFWIMOvLsyhnemgMOiyyKwpE0mXJvd2nr1NxvMeEkxbuZ0IegWMvQsEr8xbLy9TUvwScZyLEoOmrXQqpLSjen/s3YhFk+ym99Flgavzqk/MDRtJ3+NXBN9lOU0RQSVhCBmpyEfHpwZeTh4jg9ua0NEBNTZPlCaDVi09vGPAaA3Y1fTC9pNZb4QGUOZZlt3DDHlYv8+12r/NHS+neQ3sLnXeC7/WUp2kV9gRnrQDZJ4pNoNr
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(376002)(346002)(39860400002)(396003)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(82310400011)(46966006)(40470700004)(36840700001)(336012)(83380400001)(26005)(16526019)(426003)(1076003)(2616005)(107886003)(36860700001)(47076005)(5660300002)(4326008)(41300700001)(2906002)(966005)(6666004)(478600001)(110136005)(316002)(54906003)(8936002)(8676002)(70206006)(70586007)(36756003)(86362001)(82740400003)(7636003)(356005)(40480700001)(40460700003);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(39860400002)(136003)(346002)(396003)(230922051799003)(1800799012)(451199024)(82310400011)(64100799003)(186009)(46966006)(40470700004)(36840700001)(40480700001)(40460700003)(426003)(336012)(16526019)(26005)(2906002)(4744005)(107886003)(1076003)(6666004)(2616005)(70206006)(70586007)(4326008)(110136005)(82740400003)(316002)(36756003)(54906003)(5660300002)(83380400001)(36860700001)(41300700001)(8676002)(8936002)(478600001)(356005)(86362001)(47076005)(7636003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Dec 2023 08:33:32.4855
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Dec 2023 08:33:28.8340
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9a2ab15b-ad57-4dd4-481e-08dbfedada97
+X-MS-Exchange-CrossTenant-Network-Message-Id: fefe37ba-bfc5-403c-f42a-08dbfedad862
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF0001AB59.namprd02.prod.outlook.com
+	DS3PEPF000099DF.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB8579
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB9178
 
-This patchset adds MDB bulk deletion support, allowing user space to
-request the deletion of matching entries instead of dumping the entire
-MDB and issuing a separate deletion request for each matching entry.
-Support is added in both the bridge and VXLAN drivers in a similar
-fashion to the existing FDB bulk deletion support.
+Currently, the 'state' field in 'struct br_port_msg' can be set to 1 if
+the MDB entry is permanent or 0 if it is temporary. Additional states
+might be added in the future.
 
-The parameters according to which bulk deletion can be performed are
-similar to the FDB ones, namely: Destination port, VLAN ID, state (e.g.,
-"permanent"), routing protocol, source / destination VNI, destination IP
-and UDP port. Flushing based on flags (e.g., "offload", "fast_leave",
-"added_by_star_ex", "blocked") is not currently supported, but can be
-added in the future, if a use case arises.
+In a similar fashion to 'NDA_NDM_STATE_MASK', add an MDB state mask uAPI
+attribute that will allow the upcoming bulk deletion API to bulk delete
+MDB entries with a certain state or any state.
 
-Patch #1 adds a new uAPI attribute to allow specifying the state mask
-according to which bulk deletion will be performed, if any.
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+Reviewed-by: Petr Machata <petrm@nvidia.com>
+---
+ include/uapi/linux/if_bridge.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-Patch #2 adds a new policy according to which bulk deletion requests
-(with 'NLM_F_BULK' flag set) will be parsed.
-
-Patches #3-#4 add a new NDO for MDB bulk deletion and invoke it from the
-rtnetlink code when a bulk deletion request is made.
-
-Patches #5-#6 implement the MDB bulk deletion NDO in the bridge and
-VXLAN drivers, respectively.
-
-Patch #7 allows user space to issue MDB bulk deletion requests by no
-longer rejecting the 'NLM_F_BULK' flag when it is set in 'RTM_DELMDB'
-requests.
-
-Patches #8-#9 add selftests for both drivers, for both good and bad
-flows.
-
-iproute2 changes can be found here [1].
-
-https://github.com/idosch/iproute2/tree/submit/mdb_flush_v1
-
-Ido Schimmel (9):
-  bridge: add MDB state mask uAPI attribute
-  rtnetlink: bridge: Use a different policy for MDB bulk delete
-  net: Add MDB bulk deletion device operation
-  rtnetlink: bridge: Invoke MDB bulk deletion when needed
-  bridge: mdb: Add MDB bulk deletion support
-  vxlan: mdb: Add MDB bulk deletion support
-  rtnetlink: bridge: Enable MDB bulk deletion
-  selftests: bridge_mdb: Add MDB bulk deletion test
-  selftests: vxlan_mdb: Add MDB bulk deletion test
-
- drivers/net/vxlan/vxlan_core.c                |   1 +
- drivers/net/vxlan/vxlan_mdb.c                 | 174 ++++++++++++---
- drivers/net/vxlan/vxlan_private.h             |   2 +
- include/linux/netdevice.h                     |   6 +
- include/uapi/linux/if_bridge.h                |   1 +
- net/bridge/br_device.c                        |   1 +
- net/bridge/br_mdb.c                           | 133 ++++++++++++
- net/bridge/br_private.h                       |   8 +
- net/core/rtnetlink.c                          |  62 +++++-
- .../selftests/net/forwarding/bridge_mdb.sh    | 191 ++++++++++++++++-
- tools/testing/selftests/net/test_vxlan_mdb.sh | 201 +++++++++++++++++-
- 11 files changed, 749 insertions(+), 31 deletions(-)
-
+diff --git a/include/uapi/linux/if_bridge.h b/include/uapi/linux/if_bridge.h
+index 2e23f99dc0f1..a5b743a2f775 100644
+--- a/include/uapi/linux/if_bridge.h
++++ b/include/uapi/linux/if_bridge.h
+@@ -757,6 +757,7 @@ enum {
+ 	MDBE_ATTR_VNI,
+ 	MDBE_ATTR_IFINDEX,
+ 	MDBE_ATTR_SRC_VNI,
++	MDBE_ATTR_STATE_MASK,
+ 	__MDBE_ATTR_MAX,
+ };
+ #define MDBE_ATTR_MAX (__MDBE_ATTR_MAX - 1)
 -- 
 2.40.1
 
