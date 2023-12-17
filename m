@@ -1,55 +1,78 @@
-Return-Path: <netdev+bounces-58363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAC60815F5C
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 14:25:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBAF1815F84
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 14:50:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77C9C2832A7
-	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 13:25:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E08811C20E3E
+	for <lists+netdev@lfdr.de>; Sun, 17 Dec 2023 13:50:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 898E844372;
-	Sun, 17 Dec 2023 13:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C0344390;
+	Sun, 17 Dec 2023 13:50:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DIuNjv9h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X5LJdFJ/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6029744368;
-	Sun, 17 Dec 2023 13:25:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49778C433C7;
-	Sun, 17 Dec 2023 13:25:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702819552;
-	bh=ylkP0Dm94uUDf3yvVALYoxZUe7EaLIQ0d83lxLefEUo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DIuNjv9hrBVuqmVA5anmfzAhDISWcDsG0wjgXPiHzfbJTjtGaRWVvFHndHjbZBEp5
-	 lWO+mBBt7paDQETPAIQWrVAFLKynu4btxNZCQHtm1xhGyoQiZSjvSjshpKu9PZRE3o
-	 Wj7vmyYCV1OYD8rjKjcXxi45QT2+8gSk+HclvdyoASibPIxrhmDUsVslOORJFF2vcX
-	 lhNIwXzkYUfE0Aw1CajRa4cBqM8LASUCWnvgk1KflCAFZdwvlmxFF0k1WsQ1tWZkoh
-	 FnDwQ6vmVSSU0txXEwYeMqxNuTjdHWCUGg4/VNWVfA1apgIfEca6L3EfAlPM/8F2yE
-	 UjyJErf5FifCQ==
-Date: Sun, 17 Dec 2023 15:25:48 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: longli@linuxonhyperv.com
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Ajay Sharma <sharmaajay@microsoft.com>,
-	Dexuan Cui <decui@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF99444398;
+	Sun, 17 Dec 2023 13:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40c6736d10fso27574055e9.1;
+        Sun, 17 Dec 2023 05:50:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702821052; x=1703425852; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ICvtQdGfPaFWjFHYx5GmMKJ3nabe2JosWfeIvlfNizg=;
+        b=X5LJdFJ/c5RIBpBIXUWzggBXKcJJxVu+pFH8VYt8ljcUold8kNnASB/zSQZKitgRR2
+         27id93pEG9Gch2KMXJwB9HrzmS+pAFEFBRWq6d7lpGUjwZq7Es/6EkOWqi0ZFMYFt27g
+         5wQX6QpoBTlnhI+sRmoyGopKb5zcGAhYhkLg+VMqWhvsjA72B8l8KBODYD9yRIprv0+E
+         0rePJsr7FsDpTkiWxWn1KRaqmqn5wwux/vWXp58+cksztbUbhznA7qqLX2umcXu/Q4Qf
+         eYS/50gBTc9bo+7kv2vIUEN782aOKmdzIvFNaBJ1Bic0p80XHAgUiiNIcSUPfORgSCON
+         sUcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702821052; x=1703425852;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ICvtQdGfPaFWjFHYx5GmMKJ3nabe2JosWfeIvlfNizg=;
+        b=Gc9nJQkwgxLSSe4Ru6zis5hWt9uOAqsZNps9LvamYi5fOa9IKDZ5E4VKD+LeS9Uxzn
+         Hol9FeSHdH5NaoAV8RgPymLxgni/Bf8JMWX1SQXexjeayYaH0JInzl4OLH+Cmjfd7VxX
+         UcVGcx8SZk6Jx6LA9Zu5K1Y7W6r0q0TAW5r7igqu3EXbcwjp287J1IrXMMqxjg06teV4
+         IA79V8Tpiua8+mChCxm4+Gv0raEY5xpMpXFL2lndJdcQaRpPJ8+AoZSxM2eoy5NpnWAr
+         7/mCpi2OKysu7QMkcJH0fgi4mNEMQRflYbpDPs/SkQqVchrn74wPXJ0wL5isxUl4uNcX
+         tWPw==
+X-Gm-Message-State: AOJu0Yw0+gjB+ji17fojbLP2w+6Dc08dTK5tqGJTigfbBGBfoIvx/Xww
+	3IkpIl+nL+fuJanMOl+clio=
+X-Google-Smtp-Source: AGHT+IHic1xpcdt6VSPIjMTyJqvegeP17Kyhl5kC32DwWbYTrOCh5a6a1pc20yCFd/ntgBtc5y9uUA==
+X-Received: by 2002:a05:600c:1384:b0:40c:521a:5d11 with SMTP id u4-20020a05600c138400b0040c521a5d11mr5104466wmf.39.1702821051594;
+        Sun, 17 Dec 2023 05:50:51 -0800 (PST)
+Received: from eichest-laptop ([2a02:168:af72:0:ba4e:4805:1a67:13c2])
+        by smtp.gmail.com with ESMTPSA id fa17-20020a05600c519100b0040c46719966sm28658569wmb.25.2023.12.17.05.50.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 Dec 2023 05:50:51 -0800 (PST)
+Date: Sun, 17 Dec 2023 14:50:49 +0100
+From: Stefan Eichenberger <eichest@gmail.com>
+To: Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Long Li <longli@microsoft.com>
-Subject: Re: [Patch v4 0/3] Register with RDMA SOC interface and support for
- CQ
-Message-ID: <20231217132548.GC4886@unreal>
-References: <1702692255-23640-1-git-send-email-longli@linuxonhyperv.com>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: marvell-88q2xxx: add driver for the Marvell
+ 88Q2220 PHY
+Message-ID: <ZX78ucHcNyEatXLD@eichest-laptop>
+References: <20231215213102.35994-1-dima.fedrau@gmail.com>
+ <74d4b8f9-700e-45bc-af59-95a40a777b00@lunn.ch>
+ <20231216221151.GA143483@debian>
+ <28cc73bf-ed6d-49d8-b80b-4fbf5fa0442f@lunn.ch>
+ <20231217111538.GA3591@debian>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,47 +81,144 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1702692255-23640-1-git-send-email-longli@linuxonhyperv.com>
+In-Reply-To: <20231217111538.GA3591@debian>
 
-On Fri, Dec 15, 2023 at 06:04:12PM -0800, longli@linuxonhyperv.com wrote:
-> From: Long Li <longli@microsoft.com>
-> 
-> This patchset add support for registering a RDMA device with SoC for
-> support of querying device capabilities, upcoming RC queue pairs and
-> CQ interrupts.
-> 
-> This patchset is partially based on Ajay Sharma's work:
-> https://lore.kernel.org/netdev/1697494322-26814-1-git-send-email-sharmaajay@linuxonhyperv.com
-> 
-> Changes in v2:
-> Dropped the patches to create EQs for RC QP. They will be implemented with
-> RC patches.
+Hi Dimitri,
 
-You sent twice v2, never sent v3 and two days later sent v4 without even
-explaining why.
+On Sun, Dec 17, 2023 at 12:15:38PM +0100, Dimitri Fedrau wrote:
+> Am Sun, Dec 17, 2023 at 10:22:54AM +0100 schrieb Andrew Lunn:
+> > > > > +	/* Set IEEE power down */
+> > > > > +	ret = phy_write_mmd(phydev, MDIO_MMD_PMAPMD, MDIO_CTRL1, 0x840);
+> > > > 
+> > > > 0x800 is MDIO_CTRL1_LPOWER. What is the other? It seems like a speed
+> > > > selection bit?
+> > > >
+> > > The other is MDIO_PMA_CTRL1_SPEED1000. Will fix this in V2.
+> > 
+> > It seems odd to set a speed, and power it down. But i guess you have
+> > blindly copied the reference code, so have no idea why?
+> >
+> I agree, absolutely no idea. I already asked the Marvell support for
+> any document describing the init sequence, but they couldn't help me.
+> So I have to stick to the reference code. At least I copied the comments
+> that were part of the init sequence, trying to give some meaning to it.
 
-Can you please invest time and write more detailed changelog which will
-include v2, v3 and v4 changes?
+I also tried to make the 88Q2221 work but didn't find the time yet to
+write a clean version yet. My last minimal patch looks as attached
+bellow.
 
-Tanks
+I think the main thing to make the PHY work is to call this
+sequence to set the master/slave detection threshold:
 
-> 
-> 
-> Long Li (3):
->   RDMA/mana_ib: register RDMA device with GDMA
->   RDMA/mana_ib: query device capabilities
->   RDMA/mana_ib: Add CQ interrupt support for RAW QP
-> 
->  drivers/infiniband/hw/mana/cq.c               | 34 ++++++-
->  drivers/infiniband/hw/mana/device.c           | 31 +++++--
->  drivers/infiniband/hw/mana/main.c             | 69 ++++++++++----
->  drivers/infiniband/hw/mana/mana_ib.h          | 53 +++++++++++
->  drivers/infiniband/hw/mana/qp.c               | 90 ++++++++++++++++---
->  .../net/ethernet/microsoft/mana/gdma_main.c   |  5 ++
->  include/net/mana/gdma.h                       |  5 ++
->  7 files changed, 252 insertions(+), 35 deletions(-)
-> 
-> -- 
-> 2.25.1
-> 
+/* Set detection threshold slave master */
+phy_write_mmd(phydev, MDIO_MMD_AN, 0x8032, 0x2020);
+phy_write_mmd(phydev, MDIO_MMD_AN, 0x8031, 0x0a28);
+phy_write_mmd(phydev, MDIO_MMD_AN, 0x8031, 0x0c28);
+
+Without this sequence the PHY does not work. I was also wondering as
+Andrew wrote why we write twice to the same register. My assumption is
+that 0x8032 is some kind of selector for a subregister while 0x8031 will
+set a 32 bit value. Unforunately, I also didn't get that information
+from Marvell and it is just a wild guess. Please also note that calling
+the sequence in the probe function (as I do it in the example below) is
+definitely wrong, it was just a quick and dirty test I did because I
+wanted to know if it is enough to call it only once.
+
+Are you able to test everyting with the upstream kernel? I'm asking
+because I have to backport a lot of stuff to a downstream kernel 5.15
+from NXP to test the 88Q2221. 
+
+Further, are you able to verify that autonegotion works? Somehow for me
+this never really worked even when using the example sequence from
+Marvell.
+
+Best regards,
+Stefan
+
+diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
+index 94a8c99b58da..15e82e8ff8f4 100644
+--- a/drivers/net/phy/marvell-88q2xxx.c
++++ b/drivers/net/phy/marvell-88q2xxx.c
+@@ -208,17 +214,26 @@ static int mv88q2xxxx_get_sqi(struct phy_device *phydev)
+ 
+ 		ret = ret >> 12;
+ 	} else {
+-		/* Read from vendor specific registers, they are not documented
+-		 * but can be found in the Software Initialization Guide. Only
+-		 * revisions >= A0 are supported.
+-		 */
+-		ret = phy_modify_mmd(phydev, MDIO_MMD_PCS, 0xFC5D, 0x00FF, 0x00AC);
+-		if (ret < 0)
+-			return ret;
++		if (phydev->drv->phy_id == MARVELL_PHY_ID_88Q2221) {
++			/* Read from vendor specific register, they can be
++			 * found in the sample source code of the Q222X API
++			 */
++			ret = phy_read_mmd(phydev, MDIO_MMD_PCS, 0xfcd9);
++			if (ret < 0)
++				return ret;
++		} else {
++			/* Read from vendor specific registers, they are not documented
++			 * but can be found in the Software Initialization Guide. Only
++			 * revisions >= A0 are supported.
++			 */
++			ret = phy_modify_mmd(phydev, MDIO_MMD_PCS, 0xFC5D, 0x00FF, 0x00AC);
++			if (ret < 0)
++				return ret;
+ 
+-		ret = phy_read_mmd(phydev, MDIO_MMD_PCS, 0xfc88);
+-		if (ret < 0)
+-			return ret;
++			ret = phy_read_mmd(phydev, MDIO_MMD_PCS, 0xfc88);
++			if (ret < 0)
++				return ret;
++		}
+ 	}
+ 
+ 	return ret & 0x0F;
+@@ -229,6 +244,16 @@ static int mv88q2xxxx_get_sqi_max(struct phy_device *phydev)
+ 	return 15;
+ }
+ 
++static int mv88q2221_probe(struct phy_device *phydev)
++{
++	/* Set detection threshold slave master */
++	phy_write_mmd(phydev, MDIO_MMD_AN, 0x8032, 0x2020);
++	phy_write_mmd(phydev, MDIO_MMD_AN, 0x8031, 0x0a28);
++	phy_write_mmd(phydev, MDIO_MMD_AN, 0x8031, 0x0c28);
++
++	return 0;
++}
++
+ static struct phy_driver mv88q2xxx_driver[] = {
+ 	{
+ 		.phy_id			= MARVELL_PHY_ID_88Q2110,
+@@ -243,12 +268,27 @@ static struct phy_driver mv88q2xxx_driver[] = {
+ 		.get_sqi		= mv88q2xxxx_get_sqi,
+ 		.get_sqi_max		= mv88q2xxxx_get_sqi_max,
+ 	},
++	{
++		.phy_id			= MARVELL_PHY_ID_88Q2221,
++		.phy_id_mask		= MARVELL_PHY_ID_MASK,
++		.name			= "mv88q2221",
++		.get_features		= mv88q2xxx_get_features,
++		.config_aneg		= mv88q2xxx_config_aneg,
++		.config_init		= mv88q2xxx_config_init,
++		.read_status		= mv88q2xxx_read_status,
++		.soft_reset		= mv88q2xxx_soft_reset,
++		.set_loopback		= genphy_c45_loopback,
++		.get_sqi		= mv88q2xxxx_get_sqi,
++		.get_sqi_max		= mv88q2xxxx_get_sqi_max,
++		.probe			= mv88q2221_probe,
++	},
+ };
+ 
+ module_phy_driver(mv88q2xxx_driver);
+ 
+ static struct mdio_device_id __maybe_unused mv88q2xxx_tbl[] = {
+ 	{ MARVELL_PHY_ID_88Q2110, MARVELL_PHY_ID_MASK },
++	{ MARVELL_PHY_ID_88Q2221, MARVELL_PHY_ID_MASK },
+ 	{ /*sentinel*/ }
+ };
+ MODULE_DEVICE_TABLE(mdio, mv88q2xxx_tbl);
 
