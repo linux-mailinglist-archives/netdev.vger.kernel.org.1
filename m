@@ -1,109 +1,72 @@
-Return-Path: <netdev+bounces-58694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB8D5817DE6
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 00:10:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8D89817DF9
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 00:17:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89DF21F24652
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 23:10:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F0461F24815
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 23:17:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F0D76094;
-	Mon, 18 Dec 2023 23:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C00F476098;
+	Mon, 18 Dec 2023 23:17:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CYn9fjii"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D2cOYxYI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C36351EA85;
-	Mon, 18 Dec 2023 23:10:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 92E40C433C9;
-	Mon, 18 Dec 2023 23:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986454C3B2;
+	Mon, 18 Dec 2023 23:17:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20E4EC433C7;
+	Mon, 18 Dec 2023 23:17:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702941027;
-	bh=95/9p+qdwlznQhwye/627I6KjP6ua5ueRj7+oeGQow4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CYn9fjiiRtprSMMfnQVFJ2NdwXbuLilS4aJ6uZdZZmhENrW2HQ5dMkkScw1OElkYw
-	 cgx7ohwfOIbBk1I9kqSHgoZRlPNON0+8T4UIHcgW0G5EFB0au+U1D3COBcSo4M68Qf
-	 /heGjYRUwyOvRs+w4x0a90AkKUH5PN0U9/3fuvJLjZVOP1Fz20xc2MSjG5mS1TiIYs
-	 ehl/SYngLc9XljXS7NQTCDZfldAH/EnwI4MWN85CujwMgAwWzUJ2CLOfTKA4ACynXQ
-	 Nb6gVgpECmnflxBlMubbZEVE/ZCJZUN04M4JFhugqj2wJkpp/Mob3TzIA1ExgdvCao
-	 S50jw1xTeINTA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 73C1DD8C98B;
-	Mon, 18 Dec 2023 23:10:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1702941427;
+	bh=9NPpjjGdr4FE4YAQV7We+AqNV5E8KFdD9TC+YKaSMKI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=D2cOYxYI0Uml5DbWzJUXd9jVYt/t2IKdKso8LEzlLzZMiuLlLbf44z9Nh2TTZpCHv
+	 bvLaDGnfAsBuExWqTFTTXQ20QaP+SakFMmIOSZ1IkYo6ahCBWIKIOkt5Pya0ywtk3C
+	 6MdOw2Vp9RlKGHR47pdTLlCdAMl18AEMRR9b72Qv+sd5a8dQeMKi4eS7uPHnhNfJ0O
+	 N5iRoZ2goQPyWIdPJLX346liF4Ykf9mhHe4nrTTpNttz7wVktYvIRJy9Ow1dVWyOXW
+	 v4PIgRnzoebcyokOHEber5wV40H5saplrV4/jY3I3jpPGS4qcw1CAW5DkXgw6F+p63
+	 7MTUqm2RLjvIQ==
+Date: Mon, 18 Dec 2023 15:17:05 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: syzbot <syzbot+f43a23b6e622797c7a28@syzkaller.appspotmail.com>
+Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com,
+ haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org,
+ keescook@chromium.org, kpsingh@kernel.org, linux-kernel@vger.kernel.org,
+ martin.lau@linux.dev, netdev@vger.kernel.org, pabeni@redhat.com,
+ sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com,
+ yonghong.song@linux.dev
+Subject: Re: [syzbot] [bpf?] [net?] KASAN: slab-use-after-free Read in
+ nla_find
+Message-ID: <20231218151705.7861913d@kernel.org>
+In-Reply-To: <000000000000cdad2b060cc9c542@google.com>
+References: <000000000000cdad2b060cc9c542@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 00/13] tools/net/ynl: Add 'sub-message' support to
- ynl
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170294102747.20113.587351606180091252.git-patchwork-notify@kernel.org>
-Date: Mon, 18 Dec 2023 23:10:27 +0000
-References: <20231215093720.18774-1-donald.hunter@gmail.com>
-In-Reply-To: <20231215093720.18774-1-donald.hunter@gmail.com>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, corbet@lwn.net,
- linux-doc@vger.kernel.org, jacob.e.keller@intel.com, leitao@debian.org,
- donald.hunter@redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 18 Dec 2023 06:43:26 -0800 syzbot wrote:
+>  __dump_stack lib/dump_stack.c:88 [inline]
+>  dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
+>  print_address_description mm/kasan/report.c:364 [inline]
+>  print_report+0xc4/0x620 mm/kasan/report.c:475
+>  kasan_report+0xda/0x110 mm/kasan/report.c:588
+>  nla_ok include/net/netlink.h:1230 [inline]
+>  nla_find+0x120/0x130 lib/nlattr.c:746
+>  nla_find_nested include/net/netlink.h:1260 [inline]
+>  ____bpf_skb_get_nlattr_nest net/core/filter.c:209 [inline]
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 15 Dec 2023 09:37:07 +0000 you wrote:
-> This patchset adds a 'sub-message' attribute type to the netlink-raw
-> schema and implements it in ynl. This provides support for kind-specific
-> options attributes as used in rt_link and tc raw netlink families.
-> 
-> A description of the new 'sub-message' attribute type and the
-> corresponding sub-message definitions is provided in patch 3.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v5,01/13] tools/net/ynl: Use consistent array index expression formatting
-    https://git.kernel.org/netdev/net-next/c/62691b801daa
-  - [net-next,v5,02/13] doc/netlink: Add sub-message support to netlink-raw
-    https://git.kernel.org/netdev/net-next/c/de2d98743b83
-  - [net-next,v5,03/13] doc/netlink: Document the sub-message format for netlink-raw
-    https://git.kernel.org/netdev/net-next/c/17ed5c1a9e36
-  - [net-next,v5,04/13] tools/net/ynl: Add 'sub-message' attribute decoding to ynl
-    https://git.kernel.org/netdev/net-next/c/1769e2be4baa
-  - [net-next,v5,05/13] tools/net/ynl: Add binary and pad support to structs for tc
-    https://git.kernel.org/netdev/net-next/c/8b6811d96666
-  - [net-next,v5,06/13] doc/netlink/specs: Add sub-message type to rt_link family
-    https://git.kernel.org/netdev/net-next/c/077b6022d24b
-  - [net-next,v5,07/13] doc/netlink/specs: use pad in structs in rt_link
-    https://git.kernel.org/netdev/net-next/c/6b4b0754ef8a
-  - [net-next,v5,08/13] doc/netlink/specs: Add a spec for tc
-    https://git.kernel.org/netdev/net-next/c/a1bcfde83669
-  - [net-next,v5,09/13] doc/netlink: Regenerate netlink .rst files if ynl-gen-rst changes
-    https://git.kernel.org/netdev/net-next/c/646158f20cbc
-  - [net-next,v5,10/13] tools/net/ynl-gen-rst: Add sub-messages to generated docs
-    https://git.kernel.org/netdev/net-next/c/6235b3d8bc3f
-  - [net-next,v5,11/13] tools/net/ynl-gen-rst: Sort the index of generated netlink specs
-    https://git.kernel.org/netdev/net-next/c/e8c32339cf49
-  - [net-next,v5,12/13] tools/net/ynl-gen-rst: Remove bold from attribute-set headings
-    https://git.kernel.org/netdev/net-next/c/e9d7c59212e4
-  - [net-next,v5,13/13] tools/net/ynl-gen-rst: Remove extra indentation from generated docs
-    https://git.kernel.org/netdev/net-next/c/9b0aa2244d9d
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+This needs nla_ok() instead of playing with nla_len directly.
+Will send a fix soon..
 
