@@ -1,244 +1,268 @@
-Return-Path: <netdev+bounces-58576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 635108173AA
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 15:34:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69C458173A3
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 15:33:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 075B8285110
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 14:34:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83605B225C8
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 14:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35DD13786C;
-	Mon, 18 Dec 2023 14:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QJBOxDO6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2B3A1D157;
+	Mon, 18 Dec 2023 14:33:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D6B3D576;
-	Mon, 18 Dec 2023 14:33:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BICKfws024358;
-	Mon, 18 Dec 2023 14:33:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=puoFa3yLTYW107D/vW65vbmYC2kIEd07nOsLiYZz1CU=; b=QJ
-	BOxDO6UKjh//EXJd/XbSDkjdNT52ubgNs3nbXWSymtYWv9EsOPdJLj7WumBXItb5
-	VKBQkHeU5rG1KUnIGCtulRcphymWRlZ1dqL/rSBcMgQ1DSl1B7hadekO+8w9q6yY
-	tVWU5Ohiz6zPgjUVYLGLPTXU5yReKZiVjaemwjA9D7BPCAzJoXb2In65F/7UJ0rx
-	hx5bVvojDa+gkM5c7Ur/7VjSTDUbaUQBPJGqGuyTXKrSWiHvlc2dIp3je3PHZ88L
-	IcTsQD+dWwIA2Btkh+amfQklEa4bYYeJ0X2se/cmxolBtxWYImZOmqAb4oNRZXO4
-	d0K2N4aHyCBenSAPu/dA==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3v2n178e5b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Dec 2023 14:33:11 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BIEXAeD011655
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Dec 2023 14:33:10 GMT
-Received: from [10.216.38.106] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 18 Dec
- 2023 06:33:02 -0800
-Message-ID: <edfb87b5-504e-467d-9119-66b59727cc21@quicinc.com>
-Date: Mon, 18 Dec 2023 20:02:58 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D0F1D144
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 14:33:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7b7a245dc28so348237839f.3
+        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 06:33:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702910006; x=1703514806;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mHqXAXC9IJS35+e76KEwP+h9cwIzTMH2Oz/+Skx4up4=;
+        b=C29EYOHbSqVl19exj+Yu/NmTf7SHk1z4wULB74ZMZ4PsdytRMarMdnvJBl6uZOSMP5
+         c0qjtVxSOErI2qEH6LXfzwxeYlq48uCmcfelW0pldzzhygId0u82t3/tDG6ca4GFa31t
+         yvgijAMvrqtrMuKcgfF1rKW/RZ7AXUMpB6Wq10dYZVr37jCDNpkOzliT15xcusAoTdum
+         SG81sX+UqCA+5cbqHw8fH+9gmBssbEVInw6ehjuD6NNmhZao7eUW+GAM8/cJS/huq37j
+         PlvHEh5LubXtsc2GbEEsFy1lhP+r2wO1zunqIrVxcv+Lu3MPhYFzHHyE1JU67G/Jki8s
+         ehPg==
+X-Gm-Message-State: AOJu0Yz1U7AAMVNbfMz6Dy7Hgc4Wazh39lGCoeS65T1NVvtJ5CSa7EsO
+	YxyG7yxNdBF7K7vvO+QdvCqdsTcaRgu3ov+lFihhnWOHBxMG
+X-Google-Smtp-Source: AGHT+IHXfRAtY9RT5qM9zmOMPAT9/mATWf2HJvLy0p7ZVePT99cZ4uZPFxrH9u7YO0FRkZduNP5wkG8lITIZrWtYMGV5Em9TxtYf
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: stmmac: dwmac-qcom-ethqos: Add support for
- 2.5G SGMII
-Content-Language: en-US
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-CC: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu
-	<joabreu@synopsys.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        Andrew Halaney <ahalaney@redhat.com>, <kernel@quicinc.com>
-References: <20231218071118.21879-1-quic_snehshah@quicinc.com>
- <20231218152112.4adc5961@device-28.home>
-From: Sneh Shah <quic_snehshah@quicinc.com>
-In-Reply-To: <20231218152112.4adc5961@device-28.home>
+X-Received: by 2002:a05:6638:210a:b0:469:2a61:9e97 with SMTP id
+ n10-20020a056638210a00b004692a619e97mr618317jaj.4.1702910006419; Mon, 18 Dec
+ 2023 06:33:26 -0800 (PST)
+Date: Mon, 18 Dec 2023 06:33:26 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000000467ea060cc9a24b@google.com>
+Subject: [syzbot] [net?] KASAN: slab-use-after-free Read in taprio_dump
+From: syzbot <syzbot+d4d8c0fd15a0abe39bcf@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com, 
+	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	vinicius.gomes@intel.com, xiyou.wangcong@gmail.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: r4LEj6Q7sAtbhhkWp8JygyP8bKFV1Ssg
-X-Proofpoint-GUID: r4LEj6Q7sAtbhhkWp8JygyP8bKFV1Ssg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 mlxscore=0
- lowpriorityscore=0 impostorscore=0 bulkscore=0 adultscore=0 clxscore=1011
- priorityscore=1501 suspectscore=0 malwarescore=0 phishscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2311290000
- definitions=main-2312180106
 
-Hi,
+Hello,
 
-On 12/18/2023 7:51 PM, Maxime Chevallier wrote:
-> Hi,
-> 
-> On Mon, 18 Dec 2023 12:41:18 +0530
-> Sneh Shah <quic_snehshah@quicinc.com> wrote:
-> 
->> Serdes phy needs to operate at 2500 mode for 2.5G speed and 1000
->> mode for 1G/100M/10M speed.
->> Added changes to configure serdes phy and mac based on link speed.
->>
->> Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
->> ---
->>  .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 31 +++++++++++++++++--
->>  1 file changed, 29 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->> index d3bf42d0fceb..b3a28dc19161 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->> @@ -21,6 +21,7 @@
->>  #define RGMII_IO_MACRO_CONFIG2		0x1C
->>  #define RGMII_IO_MACRO_DEBUG1		0x20
->>  #define EMAC_SYSTEM_LOW_POWER_DEBUG	0x28
->> +#define ETHQOS_MAC_AN_CTRL		0xE0
->>  
->>  /* RGMII_IO_MACRO_CONFIG fields */
->>  #define RGMII_CONFIG_FUNC_CLK_EN		BIT(30)
->> @@ -78,6 +79,10 @@
->>  #define ETHQOS_MAC_CTRL_SPEED_MODE		BIT(14)
->>  #define ETHQOS_MAC_CTRL_PORT_SEL		BIT(15)
->>  
->> +/*ETHQOS_MAC_AN_CTRL bits */
->> +#define ETHQOS_MAC_AN_CTRL_RAN			BIT(9)
->> +#define ETHQOS_MAC_AN_CTRL_ANE			BIT(12)
->> +
->>  struct ethqos_emac_por {
->>  	unsigned int offset;
->>  	unsigned int value;
->> @@ -109,6 +114,7 @@ struct qcom_ethqos {
->>  	unsigned int num_por;
->>  	bool rgmii_config_loopback_en;
->>  	bool has_emac_ge_3;
->> +	unsigned int serdes_speed;
-> 
-> Looks like you are storing SPEED_XXX definitions here, which can be
-> negative in case of SPEED_UNKNOWN, so this should be an int.
-Agree, will update this in next patch.
-> 
->>  };
->>  
->>  static int rgmii_readl(struct qcom_ethqos *ethqos, unsigned int offset)
->> @@ -600,27 +606,47 @@ static int ethqos_configure_rgmii(struct qcom_ethqos *ethqos)
->>  
->>  static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
->>  {
->> -	int val;
->> -
->> +	int val, mac_an_value;
->>  	val = readl(ethqos->mac_base + MAC_CTRL_REG);
->> +	mac_an_value = readl(ethqos->mac_base + ETHQOS_MAC_AN_CTRL);
->>  
->>  	switch (ethqos->speed) {
->> +	case SPEED_2500:
->> +		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
->> +		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
->> +			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
->> +			      RGMII_IO_MACRO_CONFIG2);
->> +		if (ethqos->serdes_speed != SPEED_2500)
->> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
->> +		mac_an_value &= ~ETHQOS_MAC_AN_CTRL_ANE;
->> +		break;
->>  	case SPEED_1000:
->>  		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
->>  		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
->>  			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
->>  			      RGMII_IO_MACRO_CONFIG2);
->> +		if (ethqos->serdes_speed != SPEED_1000)
->> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
->> +		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
->>  		break;
->>  	case SPEED_100:
->>  		val |= ETHQOS_MAC_CTRL_PORT_SEL | ETHQOS_MAC_CTRL_SPEED_MODE;
->> +		if (ethqos->serdes_speed != SPEED_1000)
->> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
-> 
-> I understand that SGMII's serdes always runs at 1000 / 2500, but this
-> check doesn't make much sense then, if the speed isn't 1000, then you
-> set the serdes PHY's speed to 100, and the assignment that comes after
-> that switch-case will also set the serdes speed to 100.
-> 
-> Also, if the serdes PHY really needs to be configured differently for
-> 10/100/1000, then switching from speed 1000 to speed 100 for example
-> won't trigger a serdes PHY reconfiguration here.
-> 
-> My guess is that you want something like :
-> 
-> 	phy_set_speed(ethqos->serdes_phy, SPEED_1000)
-> 
-> and the assignment at the end of the switch-case should be
-> SPEED_1000/SPEED_2500 only (see the comment bellow).
+syzbot found the following issue on:
 
-Good point, we have only serdes speed of 1000 and 2500. So for 1000/100/10 we should set ethqos_serdes to speed_1000 and pass speed_1000 to phy_set_speed in case of 1000/100/10. Will update this in next patch.
-> 
->> +		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
->>  		break;
->>  	case SPEED_10:
->>  		val |= ETHQOS_MAC_CTRL_PORT_SEL;
->>  		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
->> +		if (ethqos->serdes_speed != SPEED_1000)
->> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
-> 
-> Same remark here
-> 
->> +		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
->>  		break;
->>  	}
->>  
->>  	writel(val, ethqos->mac_base + MAC_CTRL_REG);
->> +	writel(mac_an_value, ethqos->mac_base + ETHQOS_MAC_AN_CTRL);
->> +	ethqos->serdes_speed = ethqos->speed;
-> 
-> Although the code will behave the same, as you are storing the true
-> serdes speed here, shouldn't it be either SPEED_1000 or SPEED_2500 ?
-> 
-> You'll end-up storing SPEED_10 / SPEED_100 should the link use these
-> speeds, which doesn't represent the true serdes speed.
-> 
-> This would spare serdes reconfigurations when alternating between
-> 10/100/1000M speeds.
-> 
->>  	return val;
->>  }
->> @@ -789,6 +815,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
->>  				     "Failed to get serdes phy\n");
->>  
->>  	ethqos->speed = SPEED_1000;
->> +	ethqos->serdes_speed = SPEED_1000;
->>  	ethqos_update_link_clk(ethqos, SPEED_1000);
->>  	ethqos_set_func_clk_en(ethqos);
->>  
-> 
-> Thanks,
-> 
-> Maxime
+HEAD commit:    d5b235ec8eab Merge branch 'for-next/core' into for-kernelci
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=126c1c8ae80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f36ea342ce412b14
+dashboard link: https://syzkaller.appspot.com/bug?extid=d4d8c0fd15a0abe39bcf
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm64
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=112380bae80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15e40371e80000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/edab88544ce7/disk-d5b235ec.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/2d149255b78d/vmlinux-d5b235ec.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c3bfc66db2fc/Image-d5b235ec.gz.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d4d8c0fd15a0abe39bcf@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in taprio_dump_tc_entries net/sched/sch_taprio.c:2307 [inline]
+BUG: KASAN: slab-use-after-free in taprio_dump+0x72c/0xb94 net/sched/sch_taprio.c:2420
+Read of size 4 at addr ffff0000c1f660d8 by task syz-executor368/7987
+
+CPU: 0 PID: 7987 Comm: syz-executor368 Not tainted 6.7.0-rc5-syzkaller-gd5b235ec8eab #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
+Call trace:
+ dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:291
+ show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:298
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd0/0x124 lib/dump_stack.c:106
+ print_address_description mm/kasan/report.c:364 [inline]
+ print_report+0x174/0x514 mm/kasan/report.c:475
+ kasan_report+0xd8/0x138 mm/kasan/report.c:588
+ __asan_report_load4_noabort+0x20/0x2c mm/kasan/report_generic.c:380
+ taprio_dump_tc_entries net/sched/sch_taprio.c:2307 [inline]
+ taprio_dump+0x72c/0xb94 net/sched/sch_taprio.c:2420
+ tc_fill_qdisc+0x570/0xf1c net/sched/sch_api.c:952
+ qdisc_notify+0x1a0/0x338 net/sched/sch_api.c:1024
+ tc_modify_qdisc+0x16d4/0x1870 net/sched/sch_api.c:1719
+ rtnetlink_rcv_msg+0x748/0xdbc net/core/rtnetlink.c:6558
+ netlink_rcv_skb+0x214/0x3c4 net/netlink/af_netlink.c:2545
+ rtnetlink_rcv+0x28/0x38 net/core/rtnetlink.c:6576
+ netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+ netlink_unicast+0x65c/0x898 net/netlink/af_netlink.c:1368
+ netlink_sendmsg+0x83c/0xb20 net/netlink/af_netlink.c:1910
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x56c/0x840 net/socket.c:2584
+ ___sys_sendmsg net/socket.c:2638 [inline]
+ __sys_sendmsg+0x26c/0x33c net/socket.c:2667
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __arm64_sys_sendmsg+0x80/0x94 net/socket.c:2674
+ __invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
+ invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:51
+ el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:136
+ do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:155
+ el0_svc+0x54/0x158 arch/arm64/kernel/entry-common.c:678
+ el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:696
+ el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:595
+
+Allocated by task 7987:
+ kasan_save_stack mm/kasan/common.c:45 [inline]
+ kasan_set_track+0x4c/0x7c mm/kasan/common.c:52
+ kasan_save_alloc_info+0x24/0x30 mm/kasan/generic.c:511
+ ____kasan_kmalloc mm/kasan/common.c:374 [inline]
+ __kasan_kmalloc+0xac/0xc4 mm/kasan/common.c:383
+ kasan_kmalloc include/linux/kasan.h:198 [inline]
+ kmalloc_trace+0x70/0x88 mm/slab_common.c:1103
+ kmalloc include/linux/slab.h:600 [inline]
+ kzalloc include/linux/slab.h:721 [inline]
+ taprio_change+0xd74/0x3c54 net/sched/sch_taprio.c:1881
+ qdisc_change net/sched/sch_api.c:1387 [inline]
+ tc_modify_qdisc+0x1474/0x1870 net/sched/sch_api.c:1717
+ rtnetlink_rcv_msg+0x748/0xdbc net/core/rtnetlink.c:6558
+ netlink_rcv_skb+0x214/0x3c4 net/netlink/af_netlink.c:2545
+ rtnetlink_rcv+0x28/0x38 net/core/rtnetlink.c:6576
+ netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+ netlink_unicast+0x65c/0x898 net/netlink/af_netlink.c:1368
+ netlink_sendmsg+0x83c/0xb20 net/netlink/af_netlink.c:1910
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x56c/0x840 net/socket.c:2584
+ ___sys_sendmsg net/socket.c:2638 [inline]
+ __sys_sendmsg+0x26c/0x33c net/socket.c:2667
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __arm64_sys_sendmsg+0x80/0x94 net/socket.c:2674
+ __invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
+ invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:51
+ el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:136
+ do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:155
+ el0_svc+0x54/0x158 arch/arm64/kernel/entry-common.c:678
+ el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:696
+ el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:595
+
+Freed by task 40:
+ kasan_save_stack mm/kasan/common.c:45 [inline]
+ kasan_set_track+0x4c/0x7c mm/kasan/common.c:52
+ kasan_save_free_info+0x38/0x5c mm/kasan/generic.c:522
+ ____kasan_slab_free+0x144/0x1c0 mm/kasan/common.c:236
+ __kasan_slab_free+0x18/0x28 mm/kasan/common.c:244
+ kasan_slab_free include/linux/kasan.h:164 [inline]
+ slab_free_hook mm/slub.c:1800 [inline]
+ slab_free_freelist_hook mm/slub.c:1826 [inline]
+ slab_free mm/slub.c:3809 [inline]
+ __kmem_cache_free+0x2ac/0x480 mm/slub.c:3822
+ kfree+0xb8/0x19c mm/slab_common.c:1056
+ taprio_free_sched_cb+0x158/0x178 net/sched/sch_taprio.c:199
+ rcu_do_batch kernel/rcu/tree.c:2158 [inline]
+ rcu_core+0x890/0x1b34 kernel/rcu/tree.c:2431
+ rcu_core_si+0x10/0x1c kernel/rcu/tree.c:2448
+ __do_softirq+0x2d8/0xce4 kernel/softirq.c:553
+
+Last potentially related work creation:
+ kasan_save_stack+0x40/0x6c mm/kasan/common.c:45
+ __kasan_record_aux_stack+0xcc/0xe8 mm/kasan/generic.c:492
+ kasan_record_aux_stack_noalloc+0x14/0x20 mm/kasan/generic.c:502
+ __call_rcu_common kernel/rcu/tree.c:2681 [inline]
+ call_rcu+0x104/0xaf4 kernel/rcu/tree.c:2795
+ switch_schedules net/sched/sch_taprio.c:210 [inline]
+ advance_sched+0x7e0/0xac0 net/sched/sch_taprio.c:984
+ __run_hrtimer kernel/time/hrtimer.c:1688 [inline]
+ __hrtimer_run_queues+0x484/0xca0 kernel/time/hrtimer.c:1752
+ hrtimer_interrupt+0x2c0/0xb64 kernel/time/hrtimer.c:1814
+ timer_handler drivers/clocksource/arm_arch_timer.c:674 [inline]
+ arch_timer_handler_virt+0x74/0x88 drivers/clocksource/arm_arch_timer.c:685
+ handle_percpu_devid_irq+0x2a4/0x804 kernel/irq/chip.c:942
+ generic_handle_irq_desc include/linux/irqdesc.h:161 [inline]
+ handle_irq_desc kernel/irq/irqdesc.c:672 [inline]
+ generic_handle_domain_irq+0x7c/0xc4 kernel/irq/irqdesc.c:728
+ __gic_handle_irq drivers/irqchip/irq-gic-v3.c:782 [inline]
+ __gic_handle_irq_from_irqson drivers/irqchip/irq-gic-v3.c:833 [inline]
+ gic_handle_irq+0x6c/0x190 drivers/irqchip/irq-gic-v3.c:877
+
+Second to last potentially related work creation:
+ kasan_save_stack+0x40/0x6c mm/kasan/common.c:45
+ __kasan_record_aux_stack+0xcc/0xe8 mm/kasan/generic.c:492
+ kasan_record_aux_stack_noalloc+0x14/0x20 mm/kasan/generic.c:502
+ __call_rcu_common kernel/rcu/tree.c:2681 [inline]
+ call_rcu+0x104/0xaf4 kernel/rcu/tree.c:2795
+ switch_schedules net/sched/sch_taprio.c:210 [inline]
+ advance_sched+0x7e0/0xac0 net/sched/sch_taprio.c:984
+ __run_hrtimer kernel/time/hrtimer.c:1688 [inline]
+ __hrtimer_run_queues+0x484/0xca0 kernel/time/hrtimer.c:1752
+ hrtimer_interrupt+0x2c0/0xb64 kernel/time/hrtimer.c:1814
+ timer_handler drivers/clocksource/arm_arch_timer.c:674 [inline]
+ arch_timer_handler_virt+0x74/0x88 drivers/clocksource/arm_arch_timer.c:685
+ handle_percpu_devid_irq+0x2a4/0x804 kernel/irq/chip.c:942
+ generic_handle_irq_desc include/linux/irqdesc.h:161 [inline]
+ handle_irq_desc kernel/irq/irqdesc.c:672 [inline]
+ generic_handle_domain_irq+0x7c/0xc4 kernel/irq/irqdesc.c:728
+ __gic_handle_irq drivers/irqchip/irq-gic-v3.c:782 [inline]
+ __gic_handle_irq_from_irqson drivers/irqchip/irq-gic-v3.c:833 [inline]
+ gic_handle_irq+0x6c/0x190 drivers/irqchip/irq-gic-v3.c:877
+
+The buggy address belongs to the object at ffff0000c1f66000
+ which belongs to the cache kmalloc-512 of size 512
+The buggy address is located 216 bytes inside of
+ freed 512-byte region [ffff0000c1f66000, ffff0000c1f66200)
+
+The buggy address belongs to the physical page:
+page:00000000dead7e4a refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff0000c1f64800 pfn:0x101f64
+head:00000000dead7e4a order:2 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0x5ffc00000000840(slab|head|node=0|zone=2|lastcpupid=0x7ff)
+page_type: 0xffffffff()
+raw: 05ffc00000000840 ffff0000c0001c80 fffffc00036bd110 fffffc0003653210
+raw: ffff0000c1f64800 000000000010000e 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff0000c1f65f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff0000c1f66000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff0000c1f66080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                                    ^
+ ffff0000c1f66100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff0000c1f66180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
