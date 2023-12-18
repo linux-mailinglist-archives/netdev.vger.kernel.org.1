@@ -1,268 +1,95 @@
-Return-Path: <netdev+bounces-58575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69C458173A3
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 15:33:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60D358173B4
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 15:36:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83605B225C8
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 14:33:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D2551C232CA
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 14:36:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2B3A1D157;
-	Mon, 18 Dec 2023 14:33:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D83B2200A4;
+	Mon, 18 Dec 2023 14:36:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D0F1D144
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 14:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F0F18E03
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 14:36:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7b7a245dc28so348237839f.3
-        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 06:33:27 -0800 (PST)
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7b77e8eec3aso393968039f.2
+        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 06:36:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702910006; x=1703514806;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mHqXAXC9IJS35+e76KEwP+h9cwIzTMH2Oz/+Skx4up4=;
-        b=C29EYOHbSqVl19exj+Yu/NmTf7SHk1z4wULB74ZMZ4PsdytRMarMdnvJBl6uZOSMP5
-         c0qjtVxSOErI2qEH6LXfzwxeYlq48uCmcfelW0pldzzhygId0u82t3/tDG6ca4GFa31t
-         yvgijAMvrqtrMuKcgfF1rKW/RZ7AXUMpB6Wq10dYZVr37jCDNpkOzliT15xcusAoTdum
-         SG81sX+UqCA+5cbqHw8fH+9gmBssbEVInw6ehjuD6NNmhZao7eUW+GAM8/cJS/huq37j
-         PlvHEh5LubXtsc2GbEEsFy1lhP+r2wO1zunqIrVxcv+Lu3MPhYFzHHyE1JU67G/Jki8s
-         ehPg==
-X-Gm-Message-State: AOJu0Yz1U7AAMVNbfMz6Dy7Hgc4Wazh39lGCoeS65T1NVvtJ5CSa7EsO
-	YxyG7yxNdBF7K7vvO+QdvCqdsTcaRgu3ov+lFihhnWOHBxMG
-X-Google-Smtp-Source: AGHT+IHXfRAtY9RT5qM9zmOMPAT9/mATWf2HJvLy0p7ZVePT99cZ4uZPFxrH9u7YO0FRkZduNP5wkG8lITIZrWtYMGV5Em9TxtYf
+        d=1e100.net; s=20230601; t=1702910178; x=1703514978;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=l7LnU8RknCJWsPsqm7RXDpRlRmyk9PFdTymemdD1BB0=;
+        b=Z+Tk9LJ+W8tecOeKpgq/JEel3f2JgiDQhZJ70sRSoneulsnqwtbILVCz7GKinASx7k
+         byz4ANB6cJ5P0V3DXKZmRVpn64EPBSFvxNZ1pNTWVLG+4itC2HTpnp2A6neK9bJtZ9L9
+         B0usvXYOati7G601zE6WI6pDsvxmbeWmown2jZSddKPXFupkwha1valCWarOEz14ZYIw
+         5WvY4LLZuSd5CJrnOAd2MUf72Benp+Sm5ySxGbj3bd/g7d8N0dJWEwOOyotFy24xbGFA
+         vhwgoTS6LIdQP7Xzed0ajEbTmVq2Wy/mn54bl4opq6QHewnNa6+srgYIJj2Uy//YYoeN
+         RstQ==
+X-Gm-Message-State: AOJu0YzLYKmbgUPzNfrXyUsQUCfAbWd7j/Kt2xEY9OxZoCxZhDNYs3nP
+	OPf9DGgRIJeD44+nfQmKcTbEbKMVUosVEX/FAMOjJrVyyszP
+X-Google-Smtp-Source: AGHT+IFkNLsPR1axQYWCJ+SpPnOFsw/t4pfNw4EGH7RocShupcn9OymSX8sxcFLnEQuyCg/HvO19Z6BN6qQXhx9SP+LRAN3o0G5o
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:210a:b0:469:2a61:9e97 with SMTP id
- n10-20020a056638210a00b004692a619e97mr618317jaj.4.1702910006419; Mon, 18 Dec
- 2023 06:33:26 -0800 (PST)
-Date: Mon, 18 Dec 2023 06:33:26 -0800
+X-Received: by 2002:a92:da01:0:b0:35d:70c7:4c5c with SMTP id
+ z1-20020a92da01000000b0035d70c74c5cmr528892ilm.6.1702910178612; Mon, 18 Dec
+ 2023 06:36:18 -0800 (PST)
+Date: Mon, 18 Dec 2023 06:36:18 -0800
+In-Reply-To: <0000000000009393ba059691c6a3@google.com>
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000000467ea060cc9a24b@google.com>
-Subject: [syzbot] [net?] KASAN: slab-use-after-free Read in taprio_dump
-From: syzbot <syzbot+d4d8c0fd15a0abe39bcf@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com, 
-	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	vinicius.gomes@intel.com, xiyou.wangcong@gmail.com
+Message-ID: <00000000000047de92060cc9ace1@google.com>
+Subject: Re: [syzbot] KASAN: use-after-free Read in j1939_session_get_by_addr
+From: syzbot <syzbot+d9536adc269404a984f8@syzkaller.appspotmail.com>
+To: Jose.Abreu@synopsys.com, arvid.brodin@alten.se, davem@davemloft.net, 
+	dvyukov@google.com, ilias.apalodimas@linaro.org, joabreu@synopsys.com, 
+	jose.abreu@synopsys.com, kernel@pengutronix.de, linux-can@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux@rempel-privat.de, mkl@pengutronix.de, 
+	netdev@vger.kernel.org, nogikh@google.com, robin@protonic.nl, 
+	socketcan@hartkopp.net, syzkaller-bugs@googlegroups.com, 
+	tonymarislogistics@yandex.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+This bug is marked as fixed by commit:
+can: j1939: transport: make sure the aborted session will be deactivated only once
 
-syzbot found the following issue on:
+But I can't find it in the tested trees[1] for more than 90 days.
+Is it a correct commit? Please update it by replying:
 
-HEAD commit:    d5b235ec8eab Merge branch 'for-next/core' into for-kernelci
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=126c1c8ae80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f36ea342ce412b14
-dashboard link: https://syzkaller.appspot.com/bug?extid=d4d8c0fd15a0abe39bcf
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=112380bae80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15e40371e80000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/edab88544ce7/disk-d5b235ec.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/2d149255b78d/vmlinux-d5b235ec.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c3bfc66db2fc/Image-d5b235ec.gz.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d4d8c0fd15a0abe39bcf@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: slab-use-after-free in taprio_dump_tc_entries net/sched/sch_taprio.c:2307 [inline]
-BUG: KASAN: slab-use-after-free in taprio_dump+0x72c/0xb94 net/sched/sch_taprio.c:2420
-Read of size 4 at addr ffff0000c1f660d8 by task syz-executor368/7987
-
-CPU: 0 PID: 7987 Comm: syz-executor368 Not tainted 6.7.0-rc5-syzkaller-gd5b235ec8eab #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
-Call trace:
- dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:291
- show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:298
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd0/0x124 lib/dump_stack.c:106
- print_address_description mm/kasan/report.c:364 [inline]
- print_report+0x174/0x514 mm/kasan/report.c:475
- kasan_report+0xd8/0x138 mm/kasan/report.c:588
- __asan_report_load4_noabort+0x20/0x2c mm/kasan/report_generic.c:380
- taprio_dump_tc_entries net/sched/sch_taprio.c:2307 [inline]
- taprio_dump+0x72c/0xb94 net/sched/sch_taprio.c:2420
- tc_fill_qdisc+0x570/0xf1c net/sched/sch_api.c:952
- qdisc_notify+0x1a0/0x338 net/sched/sch_api.c:1024
- tc_modify_qdisc+0x16d4/0x1870 net/sched/sch_api.c:1719
- rtnetlink_rcv_msg+0x748/0xdbc net/core/rtnetlink.c:6558
- netlink_rcv_skb+0x214/0x3c4 net/netlink/af_netlink.c:2545
- rtnetlink_rcv+0x28/0x38 net/core/rtnetlink.c:6576
- netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
- netlink_unicast+0x65c/0x898 net/netlink/af_netlink.c:1368
- netlink_sendmsg+0x83c/0xb20 net/netlink/af_netlink.c:1910
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x56c/0x840 net/socket.c:2584
- ___sys_sendmsg net/socket.c:2638 [inline]
- __sys_sendmsg+0x26c/0x33c net/socket.c:2667
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __arm64_sys_sendmsg+0x80/0x94 net/socket.c:2674
- __invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
- invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:51
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:136
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:155
- el0_svc+0x54/0x158 arch/arm64/kernel/entry-common.c:678
- el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:696
- el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:595
-
-Allocated by task 7987:
- kasan_save_stack mm/kasan/common.c:45 [inline]
- kasan_set_track+0x4c/0x7c mm/kasan/common.c:52
- kasan_save_alloc_info+0x24/0x30 mm/kasan/generic.c:511
- ____kasan_kmalloc mm/kasan/common.c:374 [inline]
- __kasan_kmalloc+0xac/0xc4 mm/kasan/common.c:383
- kasan_kmalloc include/linux/kasan.h:198 [inline]
- kmalloc_trace+0x70/0x88 mm/slab_common.c:1103
- kmalloc include/linux/slab.h:600 [inline]
- kzalloc include/linux/slab.h:721 [inline]
- taprio_change+0xd74/0x3c54 net/sched/sch_taprio.c:1881
- qdisc_change net/sched/sch_api.c:1387 [inline]
- tc_modify_qdisc+0x1474/0x1870 net/sched/sch_api.c:1717
- rtnetlink_rcv_msg+0x748/0xdbc net/core/rtnetlink.c:6558
- netlink_rcv_skb+0x214/0x3c4 net/netlink/af_netlink.c:2545
- rtnetlink_rcv+0x28/0x38 net/core/rtnetlink.c:6576
- netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
- netlink_unicast+0x65c/0x898 net/netlink/af_netlink.c:1368
- netlink_sendmsg+0x83c/0xb20 net/netlink/af_netlink.c:1910
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x56c/0x840 net/socket.c:2584
- ___sys_sendmsg net/socket.c:2638 [inline]
- __sys_sendmsg+0x26c/0x33c net/socket.c:2667
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __arm64_sys_sendmsg+0x80/0x94 net/socket.c:2674
- __invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
- invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:51
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:136
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:155
- el0_svc+0x54/0x158 arch/arm64/kernel/entry-common.c:678
- el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:696
- el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:595
-
-Freed by task 40:
- kasan_save_stack mm/kasan/common.c:45 [inline]
- kasan_set_track+0x4c/0x7c mm/kasan/common.c:52
- kasan_save_free_info+0x38/0x5c mm/kasan/generic.c:522
- ____kasan_slab_free+0x144/0x1c0 mm/kasan/common.c:236
- __kasan_slab_free+0x18/0x28 mm/kasan/common.c:244
- kasan_slab_free include/linux/kasan.h:164 [inline]
- slab_free_hook mm/slub.c:1800 [inline]
- slab_free_freelist_hook mm/slub.c:1826 [inline]
- slab_free mm/slub.c:3809 [inline]
- __kmem_cache_free+0x2ac/0x480 mm/slub.c:3822
- kfree+0xb8/0x19c mm/slab_common.c:1056
- taprio_free_sched_cb+0x158/0x178 net/sched/sch_taprio.c:199
- rcu_do_batch kernel/rcu/tree.c:2158 [inline]
- rcu_core+0x890/0x1b34 kernel/rcu/tree.c:2431
- rcu_core_si+0x10/0x1c kernel/rcu/tree.c:2448
- __do_softirq+0x2d8/0xce4 kernel/softirq.c:553
-
-Last potentially related work creation:
- kasan_save_stack+0x40/0x6c mm/kasan/common.c:45
- __kasan_record_aux_stack+0xcc/0xe8 mm/kasan/generic.c:492
- kasan_record_aux_stack_noalloc+0x14/0x20 mm/kasan/generic.c:502
- __call_rcu_common kernel/rcu/tree.c:2681 [inline]
- call_rcu+0x104/0xaf4 kernel/rcu/tree.c:2795
- switch_schedules net/sched/sch_taprio.c:210 [inline]
- advance_sched+0x7e0/0xac0 net/sched/sch_taprio.c:984
- __run_hrtimer kernel/time/hrtimer.c:1688 [inline]
- __hrtimer_run_queues+0x484/0xca0 kernel/time/hrtimer.c:1752
- hrtimer_interrupt+0x2c0/0xb64 kernel/time/hrtimer.c:1814
- timer_handler drivers/clocksource/arm_arch_timer.c:674 [inline]
- arch_timer_handler_virt+0x74/0x88 drivers/clocksource/arm_arch_timer.c:685
- handle_percpu_devid_irq+0x2a4/0x804 kernel/irq/chip.c:942
- generic_handle_irq_desc include/linux/irqdesc.h:161 [inline]
- handle_irq_desc kernel/irq/irqdesc.c:672 [inline]
- generic_handle_domain_irq+0x7c/0xc4 kernel/irq/irqdesc.c:728
- __gic_handle_irq drivers/irqchip/irq-gic-v3.c:782 [inline]
- __gic_handle_irq_from_irqson drivers/irqchip/irq-gic-v3.c:833 [inline]
- gic_handle_irq+0x6c/0x190 drivers/irqchip/irq-gic-v3.c:877
-
-Second to last potentially related work creation:
- kasan_save_stack+0x40/0x6c mm/kasan/common.c:45
- __kasan_record_aux_stack+0xcc/0xe8 mm/kasan/generic.c:492
- kasan_record_aux_stack_noalloc+0x14/0x20 mm/kasan/generic.c:502
- __call_rcu_common kernel/rcu/tree.c:2681 [inline]
- call_rcu+0x104/0xaf4 kernel/rcu/tree.c:2795
- switch_schedules net/sched/sch_taprio.c:210 [inline]
- advance_sched+0x7e0/0xac0 net/sched/sch_taprio.c:984
- __run_hrtimer kernel/time/hrtimer.c:1688 [inline]
- __hrtimer_run_queues+0x484/0xca0 kernel/time/hrtimer.c:1752
- hrtimer_interrupt+0x2c0/0xb64 kernel/time/hrtimer.c:1814
- timer_handler drivers/clocksource/arm_arch_timer.c:674 [inline]
- arch_timer_handler_virt+0x74/0x88 drivers/clocksource/arm_arch_timer.c:685
- handle_percpu_devid_irq+0x2a4/0x804 kernel/irq/chip.c:942
- generic_handle_irq_desc include/linux/irqdesc.h:161 [inline]
- handle_irq_desc kernel/irq/irqdesc.c:672 [inline]
- generic_handle_domain_irq+0x7c/0xc4 kernel/irq/irqdesc.c:728
- __gic_handle_irq drivers/irqchip/irq-gic-v3.c:782 [inline]
- __gic_handle_irq_from_irqson drivers/irqchip/irq-gic-v3.c:833 [inline]
- gic_handle_irq+0x6c/0x190 drivers/irqchip/irq-gic-v3.c:877
-
-The buggy address belongs to the object at ffff0000c1f66000
- which belongs to the cache kmalloc-512 of size 512
-The buggy address is located 216 bytes inside of
- freed 512-byte region [ffff0000c1f66000, ffff0000c1f66200)
-
-The buggy address belongs to the physical page:
-page:00000000dead7e4a refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff0000c1f64800 pfn:0x101f64
-head:00000000dead7e4a order:2 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0x5ffc00000000840(slab|head|node=0|zone=2|lastcpupid=0x7ff)
-page_type: 0xffffffff()
-raw: 05ffc00000000840 ffff0000c0001c80 fffffc00036bd110 fffffc0003653210
-raw: ffff0000c1f64800 000000000010000e 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff0000c1f65f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff0000c1f66000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff0000c1f66080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                                    ^
- ffff0000c1f66100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff0000c1f66180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
 #syz fix: exact-commit-title
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Until then the bug is still considered open and new crashes with
+the same signature are ignored.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+Kernel: Linux
+Dashboard link: https://syzkaller.appspot.com/bug?extid=d9536adc269404a984f8
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+---
+[1] I expect the commit to be present in:
 
-If you want to undo deduplication, reply with:
-#syz undup
+1. for-kernelci branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git
+
+2. master branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git
+
+3. master branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git
+
+4. main branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git
+
+The full list of 9 trees can be found at
+https://syzkaller.appspot.com/upstream/repos
 
