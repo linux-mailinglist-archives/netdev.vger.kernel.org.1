@@ -1,77 +1,63 @@
-Return-Path: <netdev+bounces-58484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8AC1816987
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 10:13:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C506C8169E3
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 10:34:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0794B1C20AA8
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:13:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A5E11F23198
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:34:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F1CA111B5;
-	Mon, 18 Dec 2023 09:12:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9706211C8E;
+	Mon, 18 Dec 2023 09:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GTM4oZND"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uYDD1Zf2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17D515483;
-	Mon, 18 Dec 2023 09:12:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d32c5ce32eso28100805ad.0;
-        Mon, 18 Dec 2023 01:12:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702890736; x=1703495536; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=l8wf06F/XJLNPFw5y4gVtxQ1Sn+Ur9N/zSmsQOxOZr0=;
-        b=GTM4oZNDvpdrT5b5SY3MT86K0UVKmfUaftKFxYSOJKdlRKAlgLLUtY7+9B3yFmUhQZ
-         PYQZBf0RP02WY1v9rt0MmiExryp3zX8MnGLo7r+Z6RzFGcQEEmZnIufbQnTEcDCXzmPU
-         vsvUrxPW5mdHLRnASXU4+dw07tXQqkPxj0vy5CZ860wrNpbxzSgAhD7oe1xpRtejwtmi
-         GStWeyy6YKyQFUi0t8DtG1uiEJiZu0rogG8TRxCXA2AF2d36avd5dQA0dd6gw7qpoF9c
-         CppIG7q/Dc5/Wx8sCkOqOVIF8+F7+/JzBD1MFAGIWDlIL+KqRa2aDOZiyl+nmn1Rxcfn
-         O2vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702890736; x=1703495536;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l8wf06F/XJLNPFw5y4gVtxQ1Sn+Ur9N/zSmsQOxOZr0=;
-        b=JJtZhDO5ENtg5ywh8kH/NEeHUZYJP3xOb4ltO6N0XPUHk7ptVH8INdQ493jwaj4aml
-         hadgmW2Sc8OeunAL3KaLZRo5tJ6hjPtJjTIbs//mziLXPy7TVVJ2x28cUVkqrKteHGMo
-         mx9QKQZKLxx9AEQzYJ9w1VWKEDkM9KkHhq6Ltjm1GOEpOP/wYL2PcaDdsDZmZMfc+xzh
-         ZLIzKxnoMldaWHIySka+oxq+Wbivq+8J+SeFeDxYEXVOIZT398KKSQ4hosDiqtavc0TM
-         5tu9VJRDEAKYG9Avp2DpUb9af1Lr4owethJm+FTC7vsqwjM8zTMsCgPfkrF7m2ww8Zz5
-         xNQw==
-X-Gm-Message-State: AOJu0YyuvFu4ZOtE4EawPbSHUS4B3IdfamBR0C1G881oFtntbk01SmAI
-	SCvb6988EMm7zYkAucOtoj9nzl0vrWGo6R2m
-X-Google-Smtp-Source: AGHT+IGFD8Jz5ulAxVNCVNJzA/QZEO8b7C2RAtooPiF2BKrw73oalg3e2fULzLq5x9rOhBOAvgBOAw==
-X-Received: by 2002:a17:902:e54b:b0:1d0:bf4c:166c with SMTP id n11-20020a170902e54b00b001d0bf4c166cmr20889261plf.1.1702890736006;
-        Mon, 18 Dec 2023 01:12:16 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id t18-20020a170902e85200b001d0675e59f9sm18525659plg.200.2023.12.18.01.12.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Dec 2023 01:12:15 -0800 (PST)
-Date: Mon, 18 Dec 2023 17:12:10 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Dmitry Safonov <dima@arista.com>
-Cc: Shuah Khan <shuah@kernel.org>, David Ahern <dsahern@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Salam Noureddine <noureddine@arista.com>,
-	Bob Gilligan <gilligan@arista.com>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
-	Dmitry Safonov <0x7f454c46@gmail.com>
-Subject: Re: [PATCH 11/12] selftests/net: Add TCP-AO selfconnect/simultaneous
- connect test
-Message-ID: <ZYAM6ioeJEq5FnJf@Laptop-X1>
-References: <20231215-tcp-ao-selftests-v1-0-f6c08180b985@arista.com>
- <20231215-tcp-ao-selftests-v1-11-f6c08180b985@arista.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2835D12B61;
+	Mon, 18 Dec 2023 09:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Kn4zmaFBjozESWwWrKfESsTCFZ/blBS5KRsj7FAUpT0=; b=uYDD1Zf2+rVDnY4JLZf2awm+dP
+	Nvwdtr9XH3ac4S/0D1GWjUeFg5i3cT4+7nIVquTQ4MNB2Wc7XISjwImK2ixEFci9VLhrXOK++0oUo
+	FlqToatihkMOqW0NPVNhFKpQXYrbv9qZkeMH5e5TEQEyVYZd+lRH/Q4YIiJCl3Gr1KYk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rFA0n-003EBi-V6; Mon, 18 Dec 2023 10:34:09 +0100
+Date: Mon, 18 Dec 2023 10:34:09 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jie Luo <quic_luoj@quicinc.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	hkallweit1@gmail.com, corbet@lwn.net, p.zabel@pengutronix.de,
+	f.fainelli@gmail.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH v8 14/14] dt-bindings: net: ar803x: add qca8084 PHY
+ properties
+Message-ID: <b4fe4ac4-9b28-4dba-8287-1af4804eb0be@lunn.ch>
+References: <20231215074005.26976-1-quic_luoj@quicinc.com>
+ <20231215074005.26976-15-quic_luoj@quicinc.com>
+ <bdfba8a7-9197-4aae-a7f9-6075a375f60b@linaro.org>
+ <c3391e33-e770-4c61-855e-d90e82b95f75@quicinc.com>
+ <4cb2bd57-f3d3-49f9-9c02-a922fd270572@lunn.ch>
+ <ed0dd288-be8a-4161-a19f-2d4d2d17b3ec@quicinc.com>
+ <ZXxXzm8hP68KrXYs@shell.armlinux.org.uk>
+ <3a40570b-40bf-4609-b1f4-a0a6974accea@quicinc.com>
+ <b5ff9f69-e341-4846-bc5a-ebe636b7a71a@lunn.ch>
+ <27ee13e7-5073-413c-8481-52b92d7c3687@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,28 +66,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231215-tcp-ao-selftests-v1-11-f6c08180b985@arista.com>
+In-Reply-To: <27ee13e7-5073-413c-8481-52b92d7c3687@quicinc.com>
 
-On Fri, Dec 15, 2023 at 02:36:25AM +0000, Dmitry Safonov wrote:
-> Check that a rare functionality of TCP named self-connect works with
-> TCP-AO. This "under the cover" also checks TCP simultaneous connect
-> (TCP_SYN_RECV socket state), which would be harder to check other ways.
-> 
-> In order to verify that it's indeed TCP simultaneous connect, check
-> the counters TCPChallengeACK and TCPSYNChallenge.
-> 
-> Sample of the output:
-> > # ./self-connect_ipv6
-> > 1..4
-> > # 1738[lib/setup.c:254] rand seed 1696451931
-> > TAP version 13
-> > ok 1 self-connect(same keyids): connect TCPAOGood 0 => 24
-> > ok 2 self-connect(different keyids): connect TCPAOGood 26 => 50
-> > ok 3 self-connect(restore): connect TCPAOGood 52 => 97
-> > ok 4 self-connect(restore, different keyids): connect TCPAOGood 99 => 144
-> > # Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
-> 
-> Signed-off-by: Dmitry Safonov <dima@arista.com>
+> Thanks Andrew for the proposal.
+> For the pure PHY chip qca8084, there is no driver to parse the package
+> level device tree node for common clocks and resets.
 
-Tested-by: Hangbin Liu <liuhangbin@gmail.com>
+So you still have not look at the work Christian is doing. You must
+work together with Christian. This driver is not going to be accepted
+unless you do.
+
+> > >          ethernet-phy@0 {
+> > >              compatible = "ethernet-phy-id004d.d180";
+> > >              reg = <0>;
+> > >              clocks = <qca8k_nsscc NSS_CC_GEPHY0_SYS_CLK>,
+> > >              clock-names = <"gephy_sys">;
+> > >              resets = <&qca8k_nsscc NSS_CC_GEPHY0_SYS_ARES>,
+> > >                       <&qca8k_nsscc NSS_CC_GEPHY0_ARES>;
+> > >              reset-names = "gephy_sys", "gephy_soft";
+
+Which of these properties exist for the Pure PHY device? Which exist
+for the integrated switch? And by that, i mean which are actual pins
+on the PHY device? We need the device tree binding to list which
+properties are required for each use case.
+
+	   Andrew
 
