@@ -1,105 +1,100 @@
-Return-Path: <netdev+bounces-58631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5C05817A97
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 20:06:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22834817A9E
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 20:09:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAB271C21FBB
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 19:06:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8699428110A
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 19:09:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BF16495DE;
-	Mon, 18 Dec 2023 19:06:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A755A5D733;
+	Mon, 18 Dec 2023 19:08:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r5YqmWcH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fmfroHBM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D0B53BF;
-	Mon, 18 Dec 2023 19:06:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2AB9C433CA;
-	Mon, 18 Dec 2023 19:06:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702926406;
-	bh=Oj7Gm/7pBuv1oprC+a4gyIhGSXnfXjSzl+Q2UzH9PfU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=r5YqmWcHA0EErYG+wdUrVMo+G3NRUlAHHAaq8OYyMC+0aX3HzBieTQD+saJYkuXz8
-	 8tVeyb80ImB6jhtI/nCc/Z9kQn/N2mRN7e1vDE5LoljMmYoR69+vqAXN1l42F15tJv
-	 a8k2+RplvA3gsK98gcp0wfob+x0GP2P5SzBFh9Z+IYLdNg9RRtq2wmqwaOSQBPQXr0
-	 6aWyqySgDEBIot96WJUo8TFNS+PW1e7qTruMg+rlru7oGH0qU8CsY51PH95b3w4QJA
-	 md8wKk/oWSDg770HWrBq6f79Fd0ArFWxcevlh1fKJbMVseMl2yto9fneZ6aWJD194T
-	 SIuvC5hdmrtMA==
-Date: Mon, 18 Dec 2023 19:06:40 +0000
-From: Simon Horman <horms@kernel.org>
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de,
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, coreteam@netfilter.org,
-	netfilter-devel@vger.kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	ast@kernel.org
-Subject: Re: [RFC nf-next v2 1/2] netfilter: bpf: support prog update
-Message-ID: <20231218190640.GJ6288@kernel.org>
-References: <1702873101-77522-1-git-send-email-alibuda@linux.alibaba.com>
- <1702873101-77522-2-git-send-email-alibuda@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1691653BF
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 19:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-336437ae847so3690706f8f.2
+        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 11:08:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702926533; x=1703531333; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/VjLnKurb94JOJEc5/JiQM+XH6LAGsKmWg8/mQBR2hU=;
+        b=fmfroHBM4X2l1OCJTFpgeb/lNf9lpOXjcqrojLpkFGaO5HPeoL9hecrW/2F0tuI0vX
+         eQZHxNZ47HdMxo6QYN0xl44X8rCjtBIhKMDhn27LXdVvTWJzXchXkS+EyAlSF0gNo7ih
+         waszJ2eZiNIg9/DRX940vuFaTtpIXB3It68jDUQoUW8N60xRuUA4RKoBil/Yzs2/2JVf
+         JMWt3TPsA+M59d7s1X4eKhxIfELhWi/dT8Q/vcpHsSKN7XLoh7tqA3eaS8n0nCUyGX2T
+         pBs49rE/Q7nLodIVYDwOtudcEP2bpXvMZxkENr0dPHrkEE4RBvsXTi/y9DMM2bgmZDU3
+         10vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702926533; x=1703531333;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/VjLnKurb94JOJEc5/JiQM+XH6LAGsKmWg8/mQBR2hU=;
+        b=moTm0mLXXqDuJE0hhrsWS0HceSE+gjr5FQsNE7Uuo62KEqeFzyDLS0tJgARTCKkVEh
+         IN3AHBGO1sU0B/WW8skXijG5moB5Lsop0WDu8JNktpd0fUX5bc/ZE6eWcHtsp56xYsrw
+         vQYMSPKc7nvYHEGm8ZbfaR97aF/jErKbcMf3A7U8YiphBE5aZgCJI0vbP3MgVWkXQCEU
+         3NQWWOj5q/8qOpiM94XMrYSfb3Ve8vr4vALn07BFYoTXBMLVtyW7A+996U9DMF9br4i2
+         SI8e3KFRSOonNOMMCP5gVWnL3KAQYAiVbljTqPfIeG86oheTTELVynxPg3qoTnMhLZly
+         fp/A==
+X-Gm-Message-State: AOJu0YwhwAZglGi7K3thY/hb9If36ZSfHrjGER/ul3GZYYegijTiB4KI
+	yRBKPe1NkOq4n7R+43T1gfOAkbKZGvieN4/Xyr0IFw==
+X-Google-Smtp-Source: AGHT+IHaFdfIEpO3fZUTL4Wf2Y8HPXZH1xwNOjyaIvh0OcsgRhDmrYh6xFp6oxBL15Pvv/pP34wDIwpN82+DbGf4Bh0=
+X-Received: by 2002:a5d:488b:0:b0:333:2fd2:5d2e with SMTP id
+ g11-20020a5d488b000000b003332fd25d2emr8604653wrq.96.1702926533113; Mon, 18
+ Dec 2023 11:08:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1702873101-77522-2-git-send-email-alibuda@linux.alibaba.com>
+References: <20231217-i40e-comma-v1-1-85c075eff237@kernel.org>
+ <CAKwvOd=ZKV6KsgX0UxBX4Y89YEgpry00jG6K6qSjodwY3DLAzA@mail.gmail.com> <20231218190055.GB2863043@dev-arch.thelio-3990X>
+In-Reply-To: <20231218190055.GB2863043@dev-arch.thelio-3990X>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Mon, 18 Dec 2023 11:08:38 -0800
+Message-ID: <CAKwvOd=LjM08FyiXu-Qn7JmtM0oBD7rf4qkr=oo3QKeP+njRUw@mail.gmail.com>
+Subject: Re: [PATCH iwl-next] i40e: Avoid unnecessary use of comma operator
+To: Nathan Chancellor <nathan@kernel.org>, Simon Horman <horms@kernel.org>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, intel-wired-lan@lists.osuosl.org, 
+	netdev@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 18, 2023 at 12:18:20PM +0800, D. Wythe wrote:
-> From: "D. Wythe" <alibuda@linux.alibaba.com>
-> 
-> To support the prog update, we need to ensure that the prog seen
-> within the hook is always valid. Considering that hooks are always
-> protected by rcu_read_lock(), which provide us the ability to
-> access the prog under rcu.
-> 
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+On Mon, Dec 18, 2023 at 11:00=E2=80=AFAM Nathan Chancellor <nathan@kernel.o=
+rg> wrote:
+>
+> On Mon, Dec 18, 2023 at 08:32:28AM -0800, Nick Desaulniers wrote:
+> > (Is -Wcomma enabled by -Wall?)
+>
+> No and last time that I looked into enabling it, there were a lot of
+> instances in the kernel:
+>
+> https://lore.kernel.org/20230630192825.GA2745548@dev-arch.thelio-3990X/
+>
+> It is still probably worth pursuing at some point but that is a lot of
+> instances to clean up (along with potentially having a decent amount of
+> pushback depending on the changes necessary to eliminate all instances).
 
-...
-
-> @@ -26,8 +17,20 @@ struct bpf_nf_link {
->  	struct net *net;
->  	u32 dead;
->  	const struct nf_defrag_hook *defrag_hook;
-> +	struct rcu_head head;
->  };
->  
-> +static unsigned int nf_hook_run_bpf(void *bpf_link, struct sk_buff *skb,
-> +				    const struct nf_hook_state *s)
-> +{
-> +	const struct bpf_nf_link *nf_link = bpf_link;
-> +	struct bpf_nf_ctx ctx = {
-> +		.state = s,
-> +		.skb = skb,
-> +	};
-> +	return bpf_prog_run(rcu_dereference(nf_link->link.prog), &ctx);
-
-Hi,
-
-AFAICT nf_link->link.prog isn't annotated as __rcu,
-so perhaps rcu_dereference() is not correct here?
-
-In any case, sparse seems a bit unhappy:
-
-  .../nf_bpf_link.c:31:29: error: incompatible types in comparison expression (different address spaces):
-  .../nf_bpf_link.c:31:29:    struct bpf_prog [noderef] __rcu *
-  .../nf_bpf_link.c:31:29:    struct bpf_prog *
-
-> +}
-> +
->  #if IS_ENABLED(CONFIG_NF_DEFRAG_IPV4) || IS_ENABLED(CONFIG_NF_DEFRAG_IPV6)
->  static const struct nf_defrag_hook *
->  get_proto_defrag_hook(struct bpf_nf_link *link,
-
-...
+Filed this todo:
+https://github.com/ClangBuiltLinux/linux/issues/1968
+I'd be happy if Simon keeps poking at getting that warning enabled.
+--=20
+Thanks,
+~Nick Desaulniers
 
