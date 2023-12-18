@@ -1,211 +1,94 @@
-Return-Path: <netdev+bounces-58602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 626A9817789
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 17:31:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF361817790
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 17:31:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C083AB22247
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 16:31:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC3321C246DE
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 16:31:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 725BC1DFFE;
-	Mon, 18 Dec 2023 16:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64A524FF71;
+	Mon, 18 Dec 2023 16:31:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BvsYD/nh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jm1k/jcI"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B87E04FF8F
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 16:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702917070;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gyklUaQH9+w5u3EWbqqNdNPWrEzxqS/e6qwVBUpXKmQ=;
-	b=BvsYD/nhiEY6EyXgK1hhE6SZ3J/nyRX3n6zu/TBLC62nsdEpUTqsVAxNypw1IAPhmeBiNc
-	v9JyfkhwDb9uc4+jS2rXUXxzlCfA8atl5d2+a0SFJQBH5RcsKOtZVkoS23Qz2xABhFqZYU
-	92AwwYKpWimGybQLbncz5l/sgP6GBVk=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-590-zoNXhy-JNAujduteflvmjA-1; Mon, 18 Dec 2023 11:31:08 -0500
-X-MC-Unique: zoNXhy-JNAujduteflvmjA-1
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-67ab7e9d393so58866786d6.1
-        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 08:31:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702917068; x=1703521868;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E2D4FF6D
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 16:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-40c3963f9fcso90935e9.1
+        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 08:31:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702917081; x=1703521881; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gyklUaQH9+w5u3EWbqqNdNPWrEzxqS/e6qwVBUpXKmQ=;
-        b=o8TlBiCkmZIBU32eGwRrK7+TWhIH2mHhyFYMrV4RFmmz9h+hibcXaDNorwFMh+OXgr
-         3rS8A/YHWs5pupoLHywcNsdA2Mj0scNccVRvuE1z0RVjYdIOJSKKPYM6Lohfrx7Xr7Fs
-         So5P8cMnqEm1Xdi2Py64xe8atXdkAHAkp2B679tfFAnSWtTqOHcbkxCAath7yb/2moY8
-         hokACDQjwlTWv5xPx0nOtPw8IwH+tNrdycBoulFRS3sUZi7xiZTp4PHTEodCc2aqZsJ8
-         vgksa7X9FHD6cDWZgy0LzhxCjnlaRBHXf/TvoxppWxrl+aOOE69B/3/odUlptPNEMcNp
-         60CQ==
-X-Gm-Message-State: AOJu0Yys9I1lOxyRveeIPvduO1PLguijpmmOSn7ULInIJDuGuatn3Dl8
-	a/sWDqRljZQWTYYwww/1Jw3aV/qMXD1PcKrxfSkAyj+gVDoS++W6E/HZf+w90zXc5tweGCrdImt
-	kTs2ri+jGj7Ff4cB8
-X-Received: by 2002:a05:6214:2262:b0:67f:4c0:59f0 with SMTP id gs2-20020a056214226200b0067f04c059f0mr13283878qvb.77.1702917068349;
-        Mon, 18 Dec 2023 08:31:08 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHYtPAkjW+suWvwLO6oqUyWkHoZlf2OBTm+xBUTH5nyvhqcUjD5pspfwg2Sp3Pu/DNpwnTBEA==
-X-Received: by 2002:a05:6214:2262:b0:67f:4c0:59f0 with SMTP id gs2-20020a056214226200b0067f04c059f0mr13283848qvb.77.1702917068034;
-        Mon, 18 Dec 2023 08:31:08 -0800 (PST)
-Received: from fedora ([2600:1700:1ff0:d0e0::37])
-        by smtp.gmail.com with ESMTPSA id bu19-20020ad455f3000000b0067f46605191sm1019502qvb.56.2023.12.18.08.31.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Dec 2023 08:31:07 -0800 (PST)
-Date: Mon, 18 Dec 2023 10:31:04 -0600
-From: Andrew Halaney <ahalaney@redhat.com>
-To: Sneh Shah <quic_snehshah@quicinc.com>
-Cc: Vinod Koul <vkoul@kernel.org>, 
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kernel@quicinc.com
-Subject: Re: [PATCH net-next] net: stmmac: dwmac-qcom-ethqos: Add support for
- 2.5G SGMII
-Message-ID: <pdoedu3n7rdl6ifrfyugoa7pbjougqj4cg6mxyerhu5udf4e2h@unjqgqjt7odi>
-References: <20231218071118.21879-1-quic_snehshah@quicinc.com>
- <4zbf5fmijxnajk7kygcjrcusf6tdnuzsqqboh23nr6f3rb3c4g@qkfofhq7jmv6>
+        bh=tSfFyev3M0Ii/CPggARf3Bn6NdpAFruv7rRm9uHMXYw=;
+        b=jm1k/jcIQJ96pxwW+vbOq3c5fXv9ovdxMOdTcJ68VVYdchyT8kjLq1o6MYBpWBvgfs
+         6nAuikHLhspTu5KJr4irnohA6CKV6mBv8nclXjntGrVK9bdmW+QgzjgEn0azy9JMELFv
+         XNykGGeb2W0pZhjrnhcHe8tlxzqnDu09CqNU7ktTaKqgBfq6dnJZP8k55yC0eK1J6VPL
+         +iE6Mx2BMjQnTPwL4FMfqxl/k+B82B+/rqcy42B9/gxq5UZczwKQ2u536txLW9B/qSDJ
+         kecECB1kNW+axfWVCIWaeUvOHaYrceoVdP+6sf6tCHatK+ZpxXdPVjSABuvEOaFltmYu
+         3CIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702917081; x=1703521881;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tSfFyev3M0Ii/CPggARf3Bn6NdpAFruv7rRm9uHMXYw=;
+        b=G/vFNzzsVXP976tSwTf1khqawkEugZt5F4AnQqkVZz+wmdSandHq2HrMuMkxRHV5OJ
+         NdPPkCWmuzAomgWwvcauSa9RqBYYqmY/ugTLinJLwnCWXEzS4Jn9agvb+PRs+IpEUSdy
+         q2qAxEBcY/UMqyqKVdBBCqa6TKWiHh3xFHcDg0N7G5H4j3y14noofgsjiajsdnQiDn26
+         R3a0MzfOBHXbPT4j++l7W5912cKni4TrB77KFJtzDUNV7bjkDqkgrj3tTy006S1OefBJ
+         Hl0SbHdZ369fisiBporXdB1+Zpt2elsHwz6LTdFWbOuJgRYiJMwZsjgX9zaHDXid3M66
+         28Nw==
+X-Gm-Message-State: AOJu0Yx6yoms9eX2FfIWNIYhw+P4IS3WUmiGINw8lC7Sv+qLOk8jmC7e
+	PKlAYBM/GsPIFDaSvsa2bIjH19bTiUpesM9qo3CgbfdhnWaQ
+X-Google-Smtp-Source: AGHT+IHq0+yBnswrVMyNq6Z2SMPI0WrmsOtDXKIh7kKnrvI4BEP8iHd2zzYCYA3cAq8q/SSQTYewqWdArsLZY9cFlRY=
+X-Received: by 2002:a05:600c:1d16:b0:40c:20d3:3a12 with SMTP id
+ l22-20020a05600c1d1600b0040c20d33a12mr371086wms.2.1702917080670; Mon, 18 Dec
+ 2023 08:31:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4zbf5fmijxnajk7kygcjrcusf6tdnuzsqqboh23nr6f3rb3c4g@qkfofhq7jmv6>
+References: <20231217185505.22867-1-dsahern@kernel.org>
+In-Reply-To: <20231217185505.22867-1-dsahern@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 18 Dec 2023 17:31:06 +0100
+Message-ID: <CANn89iLGSJ-TaKfH002pqMyd2xfGybDkdrcGOm_Hn=2JsOKa=g@mail.gmail.com>
+Subject: Re: [PATCH net] net/ipv6: Revert remove expired routes with a
+ separated list of routes
+To: David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org, Kui-Feng Lee <thinker.li@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 18, 2023 at 10:20:03AM -0600, Andrew Halaney wrote:
-> On Mon, Dec 18, 2023 at 12:41:18PM +0530, Sneh Shah wrote:
-> > Serdes phy needs to operate at 2500 mode for 2.5G speed and 1000
-> > mode for 1G/100M/10M speed.
-> > Added changes to configure serdes phy and mac based on link speed.
-> > 
-> > Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
-> > ---
-> >  .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 31 +++++++++++++++++--
-> >  1 file changed, 29 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> > index d3bf42d0fceb..b3a28dc19161 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> > @@ -21,6 +21,7 @@
-> >  #define RGMII_IO_MACRO_CONFIG2		0x1C
-> >  #define RGMII_IO_MACRO_DEBUG1		0x20
-> >  #define EMAC_SYSTEM_LOW_POWER_DEBUG	0x28
-> > +#define ETHQOS_MAC_AN_CTRL		0xE0
-> >  
-> >  /* RGMII_IO_MACRO_CONFIG fields */
-> >  #define RGMII_CONFIG_FUNC_CLK_EN		BIT(30)
-> > @@ -78,6 +79,10 @@
-> >  #define ETHQOS_MAC_CTRL_SPEED_MODE		BIT(14)
-> >  #define ETHQOS_MAC_CTRL_PORT_SEL		BIT(15)
-> >  
-> > +/*ETHQOS_MAC_AN_CTRL bits */
-> > +#define ETHQOS_MAC_AN_CTRL_RAN			BIT(9)
-> > +#define ETHQOS_MAC_AN_CTRL_ANE			BIT(12)
-> > +
-> 
-> nit: space please add a space before ETHQOS_MAC_AN_CTRL
-> 
-> >  struct ethqos_emac_por {
-> >  	unsigned int offset;
-> >  	unsigned int value;
-> > @@ -109,6 +114,7 @@ struct qcom_ethqos {
-> >  	unsigned int num_por;
-> >  	bool rgmii_config_loopback_en;
-> >  	bool has_emac_ge_3;
-> > +	unsigned int serdes_speed;
-> >  };
-> >  
-> >  static int rgmii_readl(struct qcom_ethqos *ethqos, unsigned int offset)
-> > @@ -600,27 +606,47 @@ static int ethqos_configure_rgmii(struct qcom_ethqos *ethqos)
-> >  
-> >  static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
-> >  {
-> > -	int val;
-> > -
-> > +	int val, mac_an_value;
-> >  	val = readl(ethqos->mac_base + MAC_CTRL_REG);
-> > +	mac_an_value = readl(ethqos->mac_base + ETHQOS_MAC_AN_CTRL);
-> >  
-> >  	switch (ethqos->speed) {
-> > +	case SPEED_2500:
-> > +		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
-> > +		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
-> > +			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
-> > +			      RGMII_IO_MACRO_CONFIG2);
-> > +		if (ethqos->serdes_speed != SPEED_2500)
-> > +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
+On Sun, Dec 17, 2023 at 7:55=E2=80=AFPM David Ahern <dsahern@kernel.org> wr=
+ote:
+>
+> Revert the remainder of 5a08d0065a915 which added a warn on if a fib
+> entry is still on the gc_link list, and then revert  all of the commit
+> in the Fixes tag. The commit has some race conditions given how expires
+> is managed on a fib6_info in relation to timer start, adding the entry
+> to the gc list and setting the timer value leading to UAF. Revert
+> the commit and try again in a later release.
+>
+> Fixes: 3dec89b14d37 ("net/ipv6: Remove expired routes with a separated li=
+st of routes")
+> Cc: Kui-Feng Lee <thinker.li@gmail.com>
+> Signed-off-by: David Ahern <dsahern@kernel.org>
 
-Also, please capture the return value here and propagate the error as
-appropriate.
+I guess we need two patches, one in net-next, one in net ?
 
-> > +		mac_an_value &= ~ETHQOS_MAC_AN_CTRL_ANE;
-> > +		break;
-> >  	case SPEED_1000:
-> >  		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
-> >  		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
-> >  			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
-> >  			      RGMII_IO_MACRO_CONFIG2);
-> > +		if (ethqos->serdes_speed != SPEED_1000)
-> > +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
-> > +		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
-> >  		break;
-> >  	case SPEED_100:
-> >  		val |= ETHQOS_MAC_CTRL_PORT_SEL | ETHQOS_MAC_CTRL_SPEED_MODE;
-> > +		if (ethqos->serdes_speed != SPEED_1000)
-> > +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
-> > +		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
-> >  		break;
-> >  	case SPEED_10:
-> >  		val |= ETHQOS_MAC_CTRL_PORT_SEL;
-> >  		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
-> > +		if (ethqos->serdes_speed != SPEED_1000)
-> > +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
-> > +		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
-> >  		break;
-> >  	}
-> >  
-> >  	writel(val, ethqos->mac_base + MAC_CTRL_REG);
-> > +	writel(mac_an_value, ethqos->mac_base + ETHQOS_MAC_AN_CTRL);
-> > +	ethqos->serdes_speed = ethqos->speed;
-> 
-> I see these bits are generic and there's some functions in stmmac_pcs.h
-> that muck with these...
-> 
-> Could you help me understand if this really should be Qualcomm specific,
-> or if this is something that should be considered for the more core bits
-> of the driver? I feel in either case we should take advantage of the
-> common definitions in that file if possible.
-> 
-> >  
-> >  	return val;
-> >  }
-> > @@ -789,6 +815,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
-> >  				     "Failed to get serdes phy\n");
-> >  
-> >  	ethqos->speed = SPEED_1000;
-> > +	ethqos->serdes_speed = SPEED_1000;
-> >  	ethqos_update_link_clk(ethqos, SPEED_1000);
-> >  	ethqos_set_func_clk_en(ethqos);
-> >  
-> > -- 
-> > 2.17.1
-> > 
-
+If this patch targets net tree, it probably should be a plain revert
+(no need to mention 5a08d0065a915)
 
