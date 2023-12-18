@@ -1,142 +1,156 @@
-Return-Path: <netdev+bounces-58591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BDA281754D
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 16:34:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C329F817556
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 16:35:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED673B21E1A
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 15:34:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AB38283986
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 15:35:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D4A63A1D9;
-	Mon, 18 Dec 2023 15:34:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11F813D556;
+	Mon, 18 Dec 2023 15:35:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VAQNKWcE"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="VTUwr0Cm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3870B1D137;
-	Mon, 18 Dec 2023 15:34:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D5B7C433C7;
-	Mon, 18 Dec 2023 15:34:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702913672;
-	bh=JcaGFOxBdAWGxXi0BmXm9oDYVTLNqgQcR2Pq85HZItc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=VAQNKWcEUkRWFjq6tpWYpQJzK2EUmIc9yeAFj8v+mWi4FsWAhIil3Jh8aBpZgvqPh
-	 0uQptdIHnawvGbZR1g93gc79o4LGnarrfoHFCWCYBLx2Ffgk2WHm3iGH2Hcfm5BVHu
-	 QlF8lC+M72l0dssDpPTrklriIUEfDVOZKgMHannI56uzru7PwMhLoXGKkuksDcVek7
-	 PxhuJ7PlZTzhPxpeQrx5K/T0WGdBaPWi2X/zDWM687OlJPfyawMCAGx5DjRV79esJC
-	 hnuLhOkFntCahq7G7Mas8avhe2rKd4+TgjYrAzZYssZ5TJxvf5j3wz94PYPqj98kog
-	 brUGx8y70iY5Q==
-Message-ID: <239a5cbc-126f-4c27-bbbc-2b8b102716d5@kernel.org>
-Date: Mon, 18 Dec 2023 17:34:26 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 166783A1B6
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 15:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-28ba18740d6so446886a91.1
+        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 07:35:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1702913719; x=1703518519; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3odB7GvVfCpt6hAKkOq8Dzug7Y4DbAByO4D5CM2s3uc=;
+        b=VTUwr0CmLTYYeHQUC9JoEMCQXvgo77zkhDFDg3PzluFU20nOAEIteT19aRQ0FQ0bXK
+         af7cf1Fx4RQqypAN9AoId2sj8Fao1zMmW9NiAHQbA9zEvC0nLcqAoDIeykzo1wKbLR8f
+         wRHqWo2sr2q6xR2GfE/88cOTbUWehNW2HAq4+sJELXm5yjH53+7eUDyv8RJbPM1TV+cO
+         L8pEmNnYa0oN4L2JDmEjV8au/JrNTJreoYnqL+3dlKaBKd90LJAFUG1lih/4AhXIfyMi
+         z/CepBfTiiC+SD/2TWE4mn+SRe9cS558xS0HK+YaXiQ0SKmnrGGII8ZGPwj2eXxZd7Vx
+         BN0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702913719; x=1703518519;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3odB7GvVfCpt6hAKkOq8Dzug7Y4DbAByO4D5CM2s3uc=;
+        b=kiQaXMPqpe/s1bSFasnnZqPvIqm55wT9yxFkIT0RHWDF3+BtTK3mrsa0SuGJWvoH2g
+         9e9qg2c7+5elNFH6emHdhDCltNfc1zZ13ObRblpU1p0Vni+irGB+ePHwLev2kgyqLvnL
+         DzPfS/WnjVwZR/GcQa90nEsHzC1M2KfH/kpFECGcFIAcV09SR1aLoF5KwOssAZfBuR/g
+         XfI0cIvHCXxlKrQQ1mvgju6vYU1+pMAfYgF2u5x05AqxdVIOs2EB6WlIO1jJbWGEJOz8
+         l9C04d72G8gwed3q6km1lD49GnkBnl9N5yK0cHc2lyMuFmBFoB9b1mVOKu6hoyu+YV/q
+         0mfQ==
+X-Gm-Message-State: AOJu0YxcBJ87AZq7sp+X+UJH5ckOA1+HdzXxlT7e9GKHhd5T58r8xCfY
+	sjj2mQKdOAH6JbNuy6ShTmv1gckoSRodLgxhRtTZkA==
+X-Google-Smtp-Source: AGHT+IF9zvll8gtLQJeTHApkdcP9tE9zKBXC2J3Kql9IiJ/+HZPWL0Tz1UxW/WstUjmS318kSiD8CPTd90EaMWpoP4M=
+X-Received: by 2002:a17:90a:2e8a:b0:28b:3504:713e with SMTP id
+ r10-20020a17090a2e8a00b0028b3504713emr2526148pjd.70.1702913719313; Mon, 18
+ Dec 2023 07:35:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 08/10] net: ethernet: ti: am65-cpsw: add
- mqprio qdisc offload in channel mode
-To: Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shuah@kernel.org, vladimir.oltean@nxp.com,
- s-vadapalli@ti.com, r-gunasekaran@ti.com, vigneshr@ti.com, srk@ti.com,
- p-varis@ti.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20231215132048.43727-1-rogerq@kernel.org>
- <20231215132048.43727-9-rogerq@kernel.org> <20231218134326.GD6288@kernel.org>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20231218134326.GD6288@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20231215180827.3638838-1-victor@mojatatu.com> <ZYAHl3f4+scOdJYc@dcaratti.users.ipa.redhat.com>
+In-Reply-To: <ZYAHl3f4+scOdJYc@dcaratti.users.ipa.redhat.com>
+From: Jamal Hadi Salim <hadi@mojatatu.com>
+Date: Mon, 18 Dec 2023 10:35:08 -0500
+Message-ID: <CAAFAkD9nb1uRypAViV+OQ+M1NiFfO4DVozQb9U4UVD_K88OXBQ@mail.gmail.com>
+Subject: Re: [PATCH RFC net-next] net: sched: act_mirred: Extend the cpu
+ mirred nest guard with an explicit loop ttl
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: Victor Nogueira <victor@mojatatu.com>, jhs@mojatatu.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, mleitner@redhat.com, 
+	pctammela@mojatatu.com, netdev@vger.kernel.org, kernel@mojatatu.com, 
+	Florian Westphal <fw@strlen.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Simon,
+On Mon, Dec 18, 2023 at 3:49=E2=80=AFAM Davide Caratti <dcaratti@redhat.com=
+> wrote:
+>
+> hello Victor, thanks for the patch!
+>
+> On Fri, Dec 15, 2023 at 03:08:27PM -0300, Victor Nogueira wrote:
+> > As pointed out by Jamal in:
+> > https://lore.kernel.org/netdev/CAM0EoMn4C-zwrTCGzKzuRYukxoqBa8tyHyFDwUS=
+ZYwkMOUJ4Lw@mail.gmail.com/
+> >
+> > Mirred is allowing for infinite loops in certain use cases, such as the
+> > following:
+> >
+> > ----
+> > sudo ip netns add p4node
+> > sudo ip link add p4port0 address 10:00:00:01:AA:BB type veth peer \
+> >    port0 address 10:00:00:02:AA:BB
+> >
+> > sudo ip link set dev port0 netns p4node
+> > sudo ip a add 10.0.0.1/24 dev p4port0
+> > sudo ip neigh add 10.0.0.2 dev p4port0 lladdr 10:00:00:02:aa:bb
+> > sudo ip netns exec p4node ip a add 10.0.0.2/24 dev port0
+> > sudo ip netns exec p4node ip l set dev port0 up
+> > sudo ip l set dev p4port0 up
+> > sudo ip netns exec p4node tc qdisc add dev port0 clsact
+> > sudo ip netns exec p4node tc filter add dev port0 ingress protocol ip \
+> >    prio 10 matchall action mirred ingress redirect dev port0
+> >
+> > ping -I p4port0 10.0.0.2 -c 1
+> > -----
+> >
+> > To solve this, we reintroduced a ttl variable attached to the skb (in
+> > struct tc_skb_cb) which will prevent infinite loops for use cases such =
+as
+> > the one described above.
+> >
+> > The nest per cpu variable (tcf_mirred_nest_level) is now only used for
+> > detecting whether we should call netif_rx or netif_receive_skb when
+> > sending the packet to ingress.
+>
+> looks good to me. Do you think it's worth setting an initial value (0, AF=
+AIU)
+> for tc_skb_cb(skb)->ttl inside tc_run() ?
+>
 
-On 18/12/2023 15:43, Simon Horman wrote:
-> On Fri, Dec 15, 2023 at 03:20:46PM +0200, Roger Quadros wrote:
->> From: Grygorii Strashko <grygorii.strashko@ti.com>
->>
->> This patch adds MQPRIO Qdisc offload in full 'channel' mode which allows
->> not only setting up pri:tc mapping, but also configuring TX shapers
->> (rate-limiting) on external port FIFOs.
->>
->> The MQPRIO Qdisc offload is expected to work with or without VLAN/priority
->> tagged packets.
->>
->> The CPSW external Port FIFO has 8 Priority queues. The rate-limit can be
->> set for each of these priority queues. Which Priority queue a packet is
->> assigned to depends on PN_REG_TX_PRI_MAP register which maps header
->> priority to switch priority.
->>
->> The header priority of a packet is assigned via the RX_PRI_MAP_REG which
->> maps packet priority to header priority.
->>
->> The packet priority is either the VLAN priority (for VLAN tagged packets)
->> or the thread/channel offset.
->>
->> For simplicity, we assign the same priority queue to all queues of a
->> Traffic Class so it can be rate-limited correctly.
->>
->> Configuration example:
->>  ethtool -L eth1 tx 5
->>  ethtool --set-priv-flags eth1 p0-rx-ptype-rrobin off
->>
->>  tc qdisc add dev eth1 parent root handle 100: mqprio num_tc 3 \
->>  map 0 0 1 2 0 0 0 0 0 0 0 0 0 0 0 0 \
->>  queues 1@0 1@1 1@2 hw 1 mode channel \
->>  shaper bw_rlimit min_rate 0 100mbit 200mbit max_rate 0 101mbit 202mbit
->>
->>  tc qdisc replace dev eth2 handle 100: parent root mqprio num_tc 1 \
->>  map 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 queues 1@0 hw 1
->>
->>  ip link add link eth1 name eth1.100 type vlan id 100
->>  ip link set eth1.100 type vlan egress 0:0 1:1 2:2 3:3 4:4 5:5 6:6 7:7
->>
->> In the above example two ports share the same TX CPPI queue 0 for low
->> priority traffic. 3 traffic classes are defined for eth1 and mapped to:
->> TC0 - low priority, TX CPPI queue 0 -> ext Port 1 fifo0, no rate limit
->> TC1 - prio 2, TX CPPI queue 1 -> ext Port 1 fifo1, CIR=100Mbit/s, EIR=1Mbit/s
->> TC2 - prio 3, TX CPPI queue 2 -> ext Port 1 fifo2, CIR=200Mbit/s, EIR=2Mbit/s
->>
->> Signed-off-by: Grygorii Strashko <grygorii.strashko@ti.com>
->> Signed-off-by: Roger Quadros <rogerq@kernel.org>
-> 
-> ...
-> 
->> diff --git a/drivers/net/ethernet/ti/am65-cpsw-qos.c b/drivers/net/ethernet/ti/am65-cpsw-qos.c
->> index 9f0a05e763d1..7ad7af3b3c60 100644
->> --- a/drivers/net/ethernet/ti/am65-cpsw-qos.c
->> +++ b/drivers/net/ethernet/ti/am65-cpsw-qos.c
->> @@ -7,6 +7,7 @@
->>   */
->>  
->>  #include <linux/pm_runtime.h>
->> +#include <linux/math.h>
->>  #include <linux/time.h>
->>  #include <net/pkt_cls.h>
->>  
->> @@ -15,6 +16,8 @@
->>  #include "am65-cpts.h"
->>  #include "cpsw_ale.h"
->>  
->> +#define TO_MBPS(x)	DIV_ROUND_UP((x), BYTES_PER_MBIT)
-> 
-> Hi Grygorii and Roger,
-> 
-> a minor nit from my side: in order for BYTES_PER_MBIT to be defined
-> linux/units.h needs to be included. But that isn't added until
-> the next patch.
+Good point but I am afraid that will reset the loop counter (imagine
+ingress->ingress, egress->ingress etc). So it wont work. Unfortunately
+we've hit a snag with cb because it is shared across multiple layers.
+I am afraid we cant ignore it.
+If the packet came downward from some upper layer (or driver, buggy
+mostly) using the same ttl spot in the cb, then the ttl field will be
+either 0 or > 0.
+1) 0 < ttl < 4 then we will interpret it as "packet has looped before"
+and we wont drop it, so we are good here and we will end up dropping
+it later in one or more loop.
+2) If the retrieved ttl is >=3D4 we will immediately drop it. This is
+catastrophic because we cant stop ipv4 or esp from using this field to
+their pleasure and they certainly dont reset these fields.
 
-Thanks for the catch. I'll fix it in next spin.
+I dont see a way out unless we extend the skb->tc_at_ingress to be to
+2 bits as it was originally. In the original code it was called we had
+SET_TC_AT() which set two bits to in the skb->verdict to say "this
+packet was last seen at ingress/egress/elsewhere". Elsewhere was a 0
+and this got changed to a boolean which translates to "this packet was
+last seen at ingress/egress". So if it came from a freshly allocated
+skb eg from driver or if it came from the stack it will be 0 (since
+the field is reserved for tc).
 
--- 
++Cc Florian.
+
 cheers,
--roger
+jamal
+
+> other than this,
+>
+> Acked-by: Davide Caratti <dcaratti@redhat.com>
+>
 
