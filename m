@@ -1,172 +1,191 @@
-Return-Path: <netdev+bounces-58445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB36681673B
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 08:17:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BCAA816720
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 08:12:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A8391F22BDA
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 07:17:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDC371F21C4A
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 07:12:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781C879E2;
-	Mon, 18 Dec 2023 07:17:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38AD079D1;
+	Mon, 18 Dec 2023 07:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="gO4kYuKu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m127230.xmail.ntesmail.com (mail-m127230.xmail.ntesmail.com [115.236.127.230])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF4179E1;
-	Mon, 18 Dec 2023 07:17:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sangfor.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sangfor.com.cn
-Received: from localhost.localdomain (unknown [IPV6:240e:3b7:3270:35d0:f136:8ef4:5e9e:94b4])
-	by mail-m12741.qiye.163.com (Hmail) with ESMTPA id EE1229E0608;
-	Mon, 18 Dec 2023 15:09:06 +0800 (CST)
-From: Ke Xiao <xiaoke@sangfor.com.cn>
-To: jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: dinghui@sangfor.com.cn,
-	zhudi2@huawei.com,
-	zhangrui182@huawei.com,
-	shannon.nelson@amd.com,
-	jan.sokolowski@intel.com,
-	horms@kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ke Xiao <xiaoke@sangfor.com.cn>
-Subject: [net PATCH v2] i40e: fix use-after-free in i40e_aqc_add_filters()
-Date: Mon, 18 Dec 2023 15:08:50 +0800
-Message-Id: <20231218070850.15870-1-xiaoke@sangfor.com.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CC2F1FB2;
+	Mon, 18 Dec 2023 07:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BI6W2th032313;
+	Mon, 18 Dec 2023 07:11:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id; s=qcppdkim1; bh=V3p1JFE4C6ua
+	8k53+rwVOsLfLC5EdBhsrQCkXO9H+28=; b=gO4kYuKujzcT8NP7HPlW1SoJGLXV
+	fY/lcdE3Jq65e0NtDOh7zqKB7ZRcKU3coLW4fQ9R2srjwKCcRlQim8MaZn095+/f
+	3pNUP+TNFRkGGg7Y0+gcw262YMTCoSTX/AdwphqLGlaYx3614qRHNqb+Mm9xDKDr
+	ULNIS97+q7eXM1TuN5Y2430/7PBqUw6VXVHxL1+1ZVXeMvWB8bhjgYH5UJEaDl4x
+	wuVDE+XN2HpRQNQYwRPPhk7ZqT2ADxQYF+StnMW7TLwXfzCLD9ZsAzFdPf6rctr9
+	JwFXHtcZjel4nqOuXV0eLaf8X0RzXjci9/ILR0cT0UfZ9+Ms4ronnLrLVg==
+Received: from apblrppmta01.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3v2gw0r2gu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 18 Dec 2023 07:11:24 +0000 (GMT)
+Received: from pps.filterd (APBLRPPMTA01.qualcomm.com [127.0.0.1])
+	by APBLRPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 3BI7BLno004919;
+	Mon, 18 Dec 2023 07:11:21 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTP id 3v14ykxp2e-1;
+	Mon, 18 Dec 2023 07:11:21 +0000
+Received: from APBLRPPMTA01.qualcomm.com (APBLRPPMTA01.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BI7BLPF004913;
+	Mon, 18 Dec 2023 07:11:21 GMT
+Received: from hu-maiyas-hyd.qualcomm.com (hu-snehshah-hyd.qualcomm.com [10.147.246.35])
+	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTP id 3BI7BKnM004911;
+	Mon, 18 Dec 2023 07:11:21 +0000
+Received: by hu-maiyas-hyd.qualcomm.com (Postfix, from userid 2319345)
+	id 9CACB5001DB; Mon, 18 Dec 2023 12:41:19 +0530 (+0530)
+From: Sneh Shah <quic_snehshah@quicinc.com>
+To: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Andrew Halaney <ahalaney@redhat.com>
+Cc: Sneh Shah <quic_snehshah@quicinc.com>, kernel@quicinc.com
+Subject: [PATCH net-next] net: stmmac: dwmac-qcom-ethqos: Add support for 2.5G SGMII
+Date: Mon, 18 Dec 2023 12:41:18 +0530
+Message-Id: <20231218071118.21879-1-quic_snehshah@quicinc.com>
 X-Mailer: git-send-email 2.17.1
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlCT0hNVhpLSh1CQkNMGU9MH1UTARMWGhIXJBQOD1
-	lXWRgSC1lBWUlPSx5BSBlMQUhJTEtBSE4fS0EdSkhNQUMeHU9BTh5CHkFCTxlPWVdZFhoPEhUdFF
-	lBWU9LSFVKTU9JTE5VSktLVUpCS0tZBg++
-X-HM-Tid: 0a8c7bc1cba9b214kuuuee1229e0608
-X-HM-MType: 1
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6MDo6Pxw5CTwwKykpKigqGA0L
-	FTcaCwtVSlVKTEtJQ0NISE9DSklMVTMWGhIXVQMSGhQQHjsIGhUcHRQJVRgUFlUYFUVZV1kSC1lB
-	WUlPSx5BSBlMQUhJTEtBSE4fS0EdSkhNQUMeHU9BTh5CHkFCTxlPWVdZCAFZQU9CTUI3Bg++
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: oXJQX_IlBXkALNAjyU-vo8QDVoD6Vehy
+X-Proofpoint-ORIG-GUID: oXJQX_IlBXkALNAjyU-vo8QDVoD6Vehy
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
+ mlxscore=0 adultscore=0 malwarescore=0 suspectscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxlogscore=999 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2312180049
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-Commit 3116f59c12bd ("i40e: fix use-after-free in
-i40e_sync_filters_subtask()") avoided use-after-free issues,
-by increasing refcount during update the VSI filter list to
-the HW. However, it missed the unicast situation.
+Serdes phy needs to operate at 2500 mode for 2.5G speed and 1000
+mode for 1G/100M/10M speed.
+Added changes to configure serdes phy and mac based on link speed.
 
-When deleting an unicast FDB entry, the i40e driver will release
-the mac_filter, and i40e_service_task will concurrently request
-firmware to add the mac_filter, which will lead to the following
-use-after-free issue.
-
-Fix again for both netdev->uc and netdev->mc.
-
-BUG: KASAN: use-after-free in i40e_aqc_add_filters+0x55c/0x5b0 [i40e]
-Read of size 2 at addr ffff888eb3452d60 by task kworker/8:7/6379
-
-CPU: 8 PID: 6379 Comm: kworker/8:7 Kdump: loaded Tainted: G
-Workqueue: i40e i40e_service_task [i40e]
-Call Trace:
- dump_stack+0x71/0xab
- print_address_description+0x6b/0x290
- kasan_report+0x14a/0x2b0
- i40e_aqc_add_filters+0x55c/0x5b0 [i40e]
- i40e_sync_vsi_filters+0x1676/0x39c0 [i40e]
- i40e_service_task+0x1397/0x2bb0 [i40e]
- process_one_work+0x56a/0x11f0
- worker_thread+0x8f/0xf40
- kthread+0x2a0/0x390
- ret_from_fork+0x1f/0x40
-
-Allocated by task 21948:
- kasan_kmalloc+0xa6/0xd0
- kmem_cache_alloc_trace+0xdb/0x1c0
- i40e_add_filter+0x11e/0x520 [i40e]
- i40e_addr_sync+0x37/0x60 [i40e]
- __hw_addr_sync_dev+0x1f5/0x2f0
- i40e_set_rx_mode+0x61/0x1e0 [i40e]
- dev_uc_add_excl+0x137/0x190
- i40e_ndo_fdb_add+0x161/0x260 [i40e]
- rtnl_fdb_add+0x567/0x950
- rtnetlink_rcv_msg+0x5db/0x880
- netlink_rcv_skb+0x254/0x380
- netlink_unicast+0x454/0x610
- netlink_sendmsg+0x747/0xb00
- sock_sendmsg+0xe2/0x120
- __sys_sendto+0x1ae/0x290
- __x64_sys_sendto+0xdd/0x1b0
- do_syscall_64+0xa0/0x370
- entry_SYSCALL_64_after_hwframe+0x65/0xca
-
-Freed by task 21948:
- __kasan_slab_free+0x137/0x190
- kfree+0x8b/0x1b0
- __i40e_del_filter+0x116/0x1e0 [i40e]
- i40e_del_mac_filter+0x16c/0x300 [i40e]
- i40e_addr_unsync+0x134/0x1b0 [i40e]
- __hw_addr_sync_dev+0xff/0x2f0
- i40e_set_rx_mode+0x61/0x1e0 [i40e]
- dev_uc_del+0x77/0x90
- rtnl_fdb_del+0x6a5/0x860
- rtnetlink_rcv_msg+0x5db/0x880
- netlink_rcv_skb+0x254/0x380
- netlink_unicast+0x454/0x610
- netlink_sendmsg+0x747/0xb00
- sock_sendmsg+0xe2/0x120
- __sys_sendto+0x1ae/0x290
- __x64_sys_sendto+0xdd/0x1b0
- do_syscall_64+0xa0/0x370
- entry_SYSCALL_64_after_hwframe+0x65/0xca
-
-Fixes: 3116f59c12bd ("i40e: fix use-after-free in i40e_sync_filters_subtask()")
-Fixes: 41c445ff0f48 ("i40e: main driver core")
-Signed-off-by: Ke Xiao <xiaoke@sangfor.com.cn>
-Signed-off-by: Ding Hui <dinghui@sangfor.com.cn>
-Cc: Di Zhu <zhudi2@huawei.com>
-Reviewed-by: Jan Sokolowski <jan.sokolowski@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
 ---
-v2:
-- Order local variable declarations in Reverse Christmas Tree (RCT)
+ .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 31 +++++++++++++++++--
+ 1 file changed, 29 insertions(+), 2 deletions(-)
 
----
- drivers/net/ethernet/intel/i40e/i40e_main.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 1ab8dbe2d880..d5633a440cca 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -107,12 +107,18 @@ static struct workqueue_struct *i40e_wq;
- static void netdev_hw_addr_refcnt(struct i40e_mac_filter *f,
- 				  struct net_device *netdev, int delta)
- {
-+	struct netdev_hw_addr_list *ha_list;
- 	struct netdev_hw_addr *ha;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+index d3bf42d0fceb..b3a28dc19161 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+@@ -21,6 +21,7 @@
+ #define RGMII_IO_MACRO_CONFIG2		0x1C
+ #define RGMII_IO_MACRO_DEBUG1		0x20
+ #define EMAC_SYSTEM_LOW_POWER_DEBUG	0x28
++#define ETHQOS_MAC_AN_CTRL		0xE0
  
- 	if (!f || !netdev)
- 		return;
+ /* RGMII_IO_MACRO_CONFIG fields */
+ #define RGMII_CONFIG_FUNC_CLK_EN		BIT(30)
+@@ -78,6 +79,10 @@
+ #define ETHQOS_MAC_CTRL_SPEED_MODE		BIT(14)
+ #define ETHQOS_MAC_CTRL_PORT_SEL		BIT(15)
  
--	netdev_for_each_mc_addr(ha, netdev) {
-+	if (is_unicast_ether_addr(f->macaddr) || is_link_local_ether_addr(f->macaddr))
-+		ha_list = &netdev->uc;
-+	else
-+		ha_list = &netdev->mc;
++/*ETHQOS_MAC_AN_CTRL bits */
++#define ETHQOS_MAC_AN_CTRL_RAN			BIT(9)
++#define ETHQOS_MAC_AN_CTRL_ANE			BIT(12)
 +
-+	netdev_hw_addr_list_for_each(ha, ha_list) {
- 		if (ether_addr_equal(ha->addr, f->macaddr)) {
- 			ha->refcount += delta;
- 			if (ha->refcount <= 0)
+ struct ethqos_emac_por {
+ 	unsigned int offset;
+ 	unsigned int value;
+@@ -109,6 +114,7 @@ struct qcom_ethqos {
+ 	unsigned int num_por;
+ 	bool rgmii_config_loopback_en;
+ 	bool has_emac_ge_3;
++	unsigned int serdes_speed;
+ };
+ 
+ static int rgmii_readl(struct qcom_ethqos *ethqos, unsigned int offset)
+@@ -600,27 +606,47 @@ static int ethqos_configure_rgmii(struct qcom_ethqos *ethqos)
+ 
+ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
+ {
+-	int val;
+-
++	int val, mac_an_value;
+ 	val = readl(ethqos->mac_base + MAC_CTRL_REG);
++	mac_an_value = readl(ethqos->mac_base + ETHQOS_MAC_AN_CTRL);
+ 
+ 	switch (ethqos->speed) {
++	case SPEED_2500:
++		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
++		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
++			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
++			      RGMII_IO_MACRO_CONFIG2);
++		if (ethqos->serdes_speed != SPEED_2500)
++			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
++		mac_an_value &= ~ETHQOS_MAC_AN_CTRL_ANE;
++		break;
+ 	case SPEED_1000:
+ 		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
+ 		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+ 			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+ 			      RGMII_IO_MACRO_CONFIG2);
++		if (ethqos->serdes_speed != SPEED_1000)
++			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
++		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
+ 		break;
+ 	case SPEED_100:
+ 		val |= ETHQOS_MAC_CTRL_PORT_SEL | ETHQOS_MAC_CTRL_SPEED_MODE;
++		if (ethqos->serdes_speed != SPEED_1000)
++			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
++		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
+ 		break;
+ 	case SPEED_10:
+ 		val |= ETHQOS_MAC_CTRL_PORT_SEL;
+ 		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
++		if (ethqos->serdes_speed != SPEED_1000)
++			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
++		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
+ 		break;
+ 	}
+ 
+ 	writel(val, ethqos->mac_base + MAC_CTRL_REG);
++	writel(mac_an_value, ethqos->mac_base + ETHQOS_MAC_AN_CTRL);
++	ethqos->serdes_speed = ethqos->speed;
+ 
+ 	return val;
+ }
+@@ -789,6 +815,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+ 				     "Failed to get serdes phy\n");
+ 
+ 	ethqos->speed = SPEED_1000;
++	ethqos->serdes_speed = SPEED_1000;
+ 	ethqos_update_link_clk(ethqos, SPEED_1000);
+ 	ethqos_set_func_clk_en(ethqos);
+ 
 -- 
 2.17.1
 
