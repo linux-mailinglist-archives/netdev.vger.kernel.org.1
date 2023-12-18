@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-58548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A355816E9B
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 13:52:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61D55816EAD
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 13:53:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDDE428CD36
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 12:52:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EAF428CF2C
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 12:53:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F8A95A852;
-	Mon, 18 Dec 2023 12:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C057145C;
+	Mon, 18 Dec 2023 12:45:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jgIubcIl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T8sqtap5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419445A86A;
-	Mon, 18 Dec 2023 12:45:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10F83C433C7;
-	Mon, 18 Dec 2023 12:45:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4436D71459;
+	Mon, 18 Dec 2023 12:45:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0500AC433CB;
+	Mon, 18 Dec 2023 12:45:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702903526;
-	bh=Zh0LAncxj/VWb9xRFNBIH9bMxkCXatxgxFtp7/ZQ1xs=;
+	s=k20201202; t=1702903535;
+	bh=Xdi9ODgbTlGCteMm1KwfDu9VCAjH4Hpq0lQ44eD0cwk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jgIubcIlvYm8dQANn3pdBWRuqehnzWJuX4OCxnbeuNTLegEbfWHx6mLJvz1Oa2Cof
-	 Egny50i0q70xmlVjN+bRRn6FcN1Kia55ObR/cRurGknEFoLCg527PztzAgpKExzndE
-	 zAJmi1YIrmrilTVv5RSdPYSp4saFhlgKUnSyPQT1SPs4wke3rb265ECg7kK+udlkx8
-	 C5LoZEO3rlUrNZIwyxMI+mKytT4mZpAhHU00GHZPAdnX3c9oZMPdYuKrU1y3EkKedy
-	 YRbc7/2qMfwhcOvgKQJZaKv2f3M2dvqOp85lQqZQaeZ5OQrdQVEJdborzbd04oO8BZ
-	 G1Hi/3/FN8sGQ==
+	b=T8sqtap5cQEWX0Ol9bPlLnKBwzP0YnLukgsg1CrMyyqNSKMViVfijQZWcanLAyFAd
+	 FEwaf+IjUGBgHe2ywWYWxTa37TnzGVGQVCkVzeU/Phn1xe0Z8oetgMLlqlzNGd+P4a
+	 OvuTJL3yoJNdCph7+KZfjyC6AC+2VrCztdf1M/aD1cOjv5whfeAtprHeq54ZysMDwD
+	 JM5+CitgNLXPXPEbuwOvszlTAG0rm55x+gHPyS4eDXIiGyFVXlmn8tp2Z2Vk+B2PFp
+	 D/K1ConTKgpRgglvEav2R/apSO+4ia/4zFBZGt4IbjNRlKClbJ6yW8Jnq5NsNbw3Zs
+	 Ozo1xXlLxxcZQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Judy Hsiao <judyhsiao@chromium.org>,
-	Douglas Anderson <dianders@chromium.org>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Yanteng Si <siyanteng@loongson.cn>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Jiaxun Yang <jiaxun.yang@flygoat.com>,
 	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	martin.lau@kernel.org,
-	leon@kernel.org,
-	ja@ssi.bg,
-	haleyb.dev@gmail.com,
-	joel.granados@gmail.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 06/15] neighbour: Don't let neigh_forced_gc() disable preemption for long
-Date: Mon, 18 Dec 2023 07:44:53 -0500
-Message-ID: <20231218124513.1380056-6-sashal@kernel.org>
+	mcoquelin.stm32@gmail.com,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 6.1 12/15] stmmac: dwmac-loongson: drop useless check for compatible fallback
+Date: Mon, 18 Dec 2023 07:44:59 -0500
+Message-ID: <20231218124513.1380056-12-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231218124513.1380056-1-sashal@kernel.org>
 References: <20231218124513.1380056-1-sashal@kernel.org>
@@ -66,62 +67,42 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.1.68
 Content-Transfer-Encoding: 8bit
 
-From: Judy Hsiao <judyhsiao@chromium.org>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-[ Upstream commit e5dc5afff62f3e97e86c3643ec9fcad23de4f2d3 ]
+[ Upstream commit 31fea092c6f9f8fb2c40a08137907f5fbeae55dd ]
 
-We are seeing cases where neigh_cleanup_and_release() is called by
-neigh_forced_gc() many times in a row with preemption turned off.
-When running on a low powered CPU at a low CPU frequency, this has
-been measured to keep preemption off for ~10 ms. That's not great on a
-system with HZ=1000 which expects tasks to be able to schedule in
-with ~1ms latency.
+Device binds to proper PCI ID (LOONGSON, 0x7a03), already listed in DTS,
+so checking for some other compatible does not make sense.  It cannot be
+bound to unsupported platform.
 
-Suggested-by: Douglas Anderson <dianders@chromium.org>
-Signed-off-by: Judy Hsiao <judyhsiao@chromium.org>
-Reviewed-by: David Ahern <dsahern@kernel.org>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Douglas Anderson <dianders@chromium.org>
+Drop useless, incorrect (space in between) and undocumented compatible.
+
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+Acked-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/core/neighbour.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 41daa47d03934..c842f150c3048 100644
---- a/net/core/neighbour.c
-+++ b/net/core/neighbour.c
-@@ -253,9 +253,11 @@ static int neigh_forced_gc(struct neigh_table *tbl)
- {
- 	int max_clean = atomic_read(&tbl->gc_entries) -
- 			READ_ONCE(tbl->gc_thresh2);
-+	u64 tmax = ktime_get_ns() + NSEC_PER_MSEC;
- 	unsigned long tref = jiffies - 5 * HZ;
- 	struct neighbour *n, *tmp;
- 	int shrunk = 0;
-+	int loop = 0;
- 
- 	NEIGH_CACHE_STAT_INC(tbl, forced_gc_runs);
- 
-@@ -278,11 +280,16 @@ static int neigh_forced_gc(struct neigh_table *tbl)
- 				shrunk++;
- 			if (shrunk >= max_clean)
- 				break;
-+			if (++loop == 16) {
-+				if (ktime_get_ns() > tmax)
-+					goto unlock;
-+				loop = 0;
-+			}
- 		}
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index a25c187d31853..900972521b599 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -59,11 +59,6 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+ 		return -ENODEV;
  	}
  
- 	WRITE_ONCE(tbl->last_flush, jiffies);
+-	if (!of_device_is_compatible(np, "loongson, pci-gmac")) {
+-		pr_info("dwmac_loongson_pci: Incompatible OF node\n");
+-		return -ENODEV;
+-	}
 -
-+unlock:
- 	write_unlock_bh(&tbl->lock);
- 
- 	return shrunk;
+ 	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
+ 	if (!plat)
+ 		return -ENOMEM;
 -- 
 2.43.0
 
