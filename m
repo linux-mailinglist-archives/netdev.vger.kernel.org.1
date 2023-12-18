@@ -1,151 +1,161 @@
-Return-Path: <netdev+bounces-58658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4BCE817B97
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 21:12:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 42FE3817B9B
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 21:12:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 685721F228C1
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 20:12:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D77A21F242D2
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 20:12:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D61E72045;
-	Mon, 18 Dec 2023 20:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 126A47146E;
+	Mon, 18 Dec 2023 20:12:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="mb/useEv";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LF1Xkp2v"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OnaSB4Dy"
 X-Original-To: netdev@vger.kernel.org
-Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9BD495DE;
-	Mon, 18 Dec 2023 20:12:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id B69CA5C020B;
-	Mon, 18 Dec 2023 15:12:25 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Mon, 18 Dec 2023 15:12:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1702930345;
-	 x=1703016745; bh=LWYyWkDsY/Zi8FphFf+H4zFoydBDiorSz1khQkPdMEE=; b=
-	mb/useEvR5Rr6NLotqJE7xJWNLJ+871ZGy2/uYtuW2wQXO4yYeUTVbM0SsBzoj0r
-	CzGNA7FvC0317zUMQnG6wLHyTcPZdpmpSSHQCi7sEgM1nTWuk8DpTkQSrtUrwfz2
-	Ih7R0NjNdsj8fZ2CT0HzxSuaqNB2a/9Z5IwFFR5lJIm4TZHt7WpRbqupcfWk+flg
-	hLIzRnHovyAEpOu9WtoLABYKqYR7Y0CXXqmZIldqSaRaTix89BeZTc8sxEWnjycc
-	Szx0VnfX3lvp9K9yPvWFh5v0nX5cFfN8FrvZ3x8fAspjwEm2u/6gURTjdQix3Z6w
-	6FJnphYvBziTP5qGbFYYaQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1702930345; x=
-	1703016745; bh=LWYyWkDsY/Zi8FphFf+H4zFoydBDiorSz1khQkPdMEE=; b=L
-	F1Xkp2vIwgqV/4OdisyCGMQFVTW5IFoaaqJj3kCayBQNrYZM9ndbo+Y9cmAmjwcx
-	pbbFhfdrnZqf/fzmntpD/WaxjdiGgE8nMhJbjvvzVnmJl4ijveL5KGerpFgWMNJU
-	Are/Hdy33E1sKsJ0S4ythvV85FNpLYyD8n5+bp4mW7zFAOKZBEe824d0YIuYXtgQ
-	0ChzimvOs/bpWkN+6D/6YZymwuFEBu+yLOcsFZ0JVCAEapToQ0FETVfpOKt+utHM
-	WmEwpFVZ6QkZMZEy8TptfwHDwJf0XtfeC1Ejti5cCaoJc3wMZ013i+NlGX2A8oea
-	gB9EEedZVnqrgai433oBQ==
-X-ME-Sender: <xms:qaeAZVNU9jc9V7p_xXLit5xJB7G8mRHv_3ZA2nCGZ8ny4ifmovULOA>
-    <xme:qaeAZX-VHiIKbDAN6kZVWW-E3xDR5_-vJ0q5PiabrgANmOeI8F7J8ioFwWK5ic3Y8
-    dKU3hDueUpu6XH2Ip4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvddtkedgudefvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefofgggkfgjfhffhffvvefutgfgsehtqhertderreejnecuhfhrohhmpedf
-    tehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrf
-    grthhtvghrnhepgfekueelgeeigefhudduledtkeefffejueelheelfedutedttdfgveeu
-    feefieegnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
-    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:qaeAZUQZyuvtnu9jG9ZCE373jnslc6O9xHM9fgvua2oHX0tj1zoerA>
-    <xmx:qaeAZRtGU3-JqMbkcdE_Qxt1dyMekmGFHGzqJQwMY9vDqDT-YNVqOw>
-    <xmx:qaeAZdffmE7gyHKDv0fAB6a4Heq0I1HVzJOhzTQ4MCVo2OS1d_C1ag>
-    <xmx:qaeAZXt95DbkWPruTOYNUd6HK2gC3gt8H4Pw8fmCaN_8MTgdIqvU2A>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 2CAD3B6008D; Mon, 18 Dec 2023 15:12:25 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-1283-g327e3ec917-fm-20231207.002-g327e3ec9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2257346C
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 20:12:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702930361;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IsJVSX6IEkmtFV9+0aEN/tS3XHrjWv1JC1BbSwjirH0=;
+	b=OnaSB4DytjLY55nDa3ws5dmT4YbUUhDTXfTAMfqDz5CSI+7k3rulmEaA3Yru/T92/GjUup
+	BAX+d+xs93duM7bgzdI6mWyDUceQj1ggkORg0fqrHvcVNQNgrlGuTAsqvNn+qMo6NUcOLr
+	ccTTUKvi+g52+hqVZFnlGYjhrWizWyI=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-466-50DtuWmMNqGWqrSHaEpn7w-1; Mon, 18 Dec 2023 15:12:39 -0500
+X-MC-Unique: 50DtuWmMNqGWqrSHaEpn7w-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a23739b8459so1015866b.0
+        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 12:12:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702930358; x=1703535158;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IsJVSX6IEkmtFV9+0aEN/tS3XHrjWv1JC1BbSwjirH0=;
+        b=YKn6Cslk81oTUjPeLcZqdLn49qOOiuny6Ht7XaqDnKgx1KPB5oKYqUEZE2+KAdCCGB
+         xkij8yCdKqGnUFVMRXsnQLzXrYB8Hip2Fzh2BY+ExgQhFOe/ZDfBTD5RIYmG22wWDZTe
+         1hcQfZ/LqZtPpEzxBNQoNbJTo+YXsEwPQZ5jIsbbZNKrx71ETmd5cI4aT8zFjmiyC7tp
+         zlHFI1TEtyZbFCXgircHhKYUmn9ehMCDHEyXt/ARdDJtiCO5bZjs4FL2OnUHj2cbr+Yr
+         lGV6kkfCM5KqZogK97+rEXTJrGNLFkbv+NYVtV9TGx9WQ2fzCb1e2zxeqhIWCI3EnuRa
+         darg==
+X-Gm-Message-State: AOJu0Yzzz7b4jSSl+u5aKZ4qUnc56MKVrWw+E2/4HCrdvI1kMR0IrhRR
+	ACmNxBjgdiTTmwky548wTkdyUrsnRl2euPzjWUC1U9giabInBCBZIPYXX4f23IVCGyiYPuBF7OT
+	MrQlQQ7hBJcsv+bZO
+X-Received: by 2002:a50:bb06:0:b0:553:46ed:3133 with SMTP id y6-20020a50bb06000000b0055346ed3133mr3447595ede.1.1702930358296;
+        Mon, 18 Dec 2023 12:12:38 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGxMl1ef4XcJR6LMN9lFW5JBcbOLREMzwim3fhKSyUDak7Z0VJgOu2KaMA5DHNWK50AhpB2Fw==
+X-Received: by 2002:a50:bb06:0:b0:553:46ed:3133 with SMTP id y6-20020a50bb06000000b0055346ed3133mr3447586ede.1.1702930357962;
+        Mon, 18 Dec 2023 12:12:37 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-253-3.dyn.eolo.it. [146.241.253.3])
+        by smtp.gmail.com with ESMTPSA id l14-20020aa7cace000000b005530492d900sm2561975edt.58.2023.12.18.12.12.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Dec 2023 12:12:37 -0800 (PST)
+Message-ID: <baa4bd4b3aa0639d29e5c396bd3da94e01cd8528.camel@redhat.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 0/5] iavf: Add devlink and
+ devlink rate support'
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
+ anthony.l.nguyen@intel.com, intel-wired-lan@lists.osuosl.org, 
+ qi.z.zhang@intel.com, Wenjun Wu <wenjun1.wu@intel.com>,
+ maxtram95@gmail.com,  "Chittim, Madhu" <madhu.chittim@intel.com>,
+ "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Simon Horman
+ <simon.horman@redhat.com>
+Date: Mon, 18 Dec 2023 21:12:35 +0100
+In-Reply-To: <20231215144155.194a188e@kernel.org>
+References: <20230727021021.961119-1-wenjun1.wu@intel.com>
+	 <20230822034003.31628-1-wenjun1.wu@intel.com> <ZORRzEBcUDEjMniz@nanopsycho>
+	 <20230822081255.7a36fa4d@kernel.org> <ZOTVkXWCLY88YfjV@nanopsycho>
+	 <0893327b-1c84-7c25-d10c-1cc93595825a@intel.com>
+	 <ZOcBEt59zHW9qHhT@nanopsycho>
+	 <5aed9b87-28f8-f0b0-67c4-346e1d8f762c@intel.com>
+	 <bdb0137a-b735-41d9-9fea-38b238db0305@intel.com>
+	 <20231118084843.70c344d9@kernel.org>
+	 <3d60fabf-7edf-47a2-9b95-29b0d9b9e236@intel.com>
+	 <20231122192201.245a0797@kernel.org>
+	 <e662dca5-84e4-4f7b-bfa3-50bce30c697c@intel.com>
+	 <20231127174329.6dffea07@kernel.org>
+	 <55e51b97c29894ebe61184ab94f7e3d8486e083a.camel@redhat.com>
+	 <20231214174604.1ca4c30d@kernel.org>
+	 <7b0c2e0132b71b131fc9a5407abd27bc0be700ee.camel@redhat.com>
+	 <20231215144155.194a188e@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <0877a767-dea5-4c49-8125-d1995ef55407@app.fastmail.com>
-In-Reply-To: <20231218-net-skbuff-build-bug-v1-1-eefc2fb0a7d3@weissschuh.net>
-References: <20231218-net-skbuff-build-bug-v1-1-eefc2fb0a7d3@weissschuh.net>
-Date: Mon, 18 Dec 2023 20:12:07 +0000
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>
-Cc: Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
- "kernel test robot" <lkp@intel.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] net: avoid build bug in skb extension length calculation
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 18, 2023, at 17:06, Thomas Wei=C3=9Fschuh wrote:
-> GCC seems to incorrectly fail to evaluate skb_ext_total_length() at
-> compile time under certain conditions.
->
-> The issue even occurs if all values in skb_ext_type_len[] are "0",
-> ruling out the possibility of an actual overflow.
->
-> As the patch has been in mainline since v6.6 without triggering the
-> problem it seems to be a very uncommon occurrence.
->
-> As the issue only occurs when -fno-tree-loop-im is specified as part of
-> CFLAGS_GCOV, disable the BUILD_BUG_ON() only when building with covera=
-ge
-> reporting enabled.
->
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes:=20
-> https://lore.kernel.org/oe-kbuild-all/202312171924.4FozI5FG-lkp@intel.=
-com/
-> Suggested-by: Arnd Bergmann <arnd@arndb.de>
-> Link:=20
-> https://lore.kernel.org/lkml/487cfd35-fe68-416f-9bfd-6bb417f98304@app.=
-fastmail.com/
-> Fixes: 5d21d0a65b57 ("net: generalize calculation of skb extensions=20
-> length")
-> Cc:  <stable@vger.kernel.org>
-> Signed-off-by: Thomas Wei=C3=9Fschuh <linux@weissschuh.net>
+On Fri, 2023-12-15 at 14:41 -0800, Jakub Kicinski wrote:
+> I explained before (perhaps on the netdev call) - Qdiscs have two
+> different offload models. "local" and "switchdev", here we want "local"
+> AFAIU and TBF only has "switchdev" offload (take a look at the enqueue
+> method and which drivers support it today).
 
-Acked-by: Arnd Bergmann <arnd@arndb.de>
+I must admit the above is not yet clear to me.
 
-> ---
->  net/core/skbuff.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index 83af8aaeb893..94cc40a6f797 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -4825,7 +4825,9 @@ static __always_inline unsigned int=20
-> skb_ext_total_length(void)
->  static void skb_extensions_init(void)
->  {
->  	BUILD_BUG_ON(SKB_EXT_NUM >=3D 8);
-> +#if !IS_ENABLED(CONFIG_KCOV_INSTRUMENT_ALL)
->  	BUILD_BUG_ON(skb_ext_total_length() > 255);
-> +#endif
+I initially thought you meant that "local" offloads properly
+reconfigure the S/W datapath so that locally generated traffic would go
+through the expected processing (e.g. shaping) just once, while with
+"switchdev" offload locally generated traffic will see shaping done
+both by the S/W and the H/W[1].
 
-The way I would write this is
+Reading the above I now think you mean that local offloads has only
+effect for locally generated traffic but not on traffic forwarded via
+eswitch, and vice versa[2].=20
 
-BUILD_BUG_ON(!IS_ENABLED(CONFIG_KCOV_INSTRUMENT_ALL) &&
-             skb_ext_total_length() > 255);
+The drivers I looked at did not show any clue (to me).
 
-but of course the effect is the same.
+FTR, I think that [1] is a bug worth fixing and [2] is evil ;)
 
-     Arnd
+Could you please clarify which is the difference exactly between them?
+
+> "We'll extend TBF" is very much adding a new API. You'll have to add
+> "local offload" support in TBF and no NIC driver today supports it.
+> I'm not saying TBF is bad, but I disagree that it's any different
+> than a new NDO for all practical purposes.
+>=20
+> > ndo_setup_tc() feels like the natural choice for H/W offload and TBF
+> > is the existing interface IMHO nearest to the requirements here.
+>=20
+> I question whether something as basic as scheduling and ACLs should
+> follow the "offload SW constructs" mantra. You are exposed to more
+> diverse users so please don't hesitate to disagree, but AFAICT
+> the transparent offload (user installs SW constructs and if offload
+> is available - offload, otherwise use SW is good enough) has not
+> played out like we have hoped.
+>=20
+> Let's figure out what is the abstract model of scheduling / shaping
+> within a NIC that we want to target. And then come up with a way of
+> representing it in SW. Not which uAPI we can shoehorn into the use
+> case.
+
+I thought the model was quite well defined since the initial submission
+from Intel, and is quite simple: expose TX shaping on per tx queue
+basis, with min rate, max rate (in bps) and burst (in bytes).
+
+I think that making it more complex (e.g. with nesting, pkt overhead,
+etc) we will still not cover every possible use case and will add
+considerable complexity.
+>=20
+Cheers,
+
+Paolo
+
 
