@@ -1,150 +1,114 @@
-Return-Path: <netdev+bounces-58534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEF20816CFA
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 12:53:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D0EE816D07
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 12:55:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33604B24057
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 11:53:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B42C1B23537
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 11:55:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D6BA20DD4;
-	Mon, 18 Dec 2023 11:40:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B922E1B26C;
+	Mon, 18 Dec 2023 11:42:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K+feXAuH"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="olpcJOvX"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C887B4122B
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 11:40:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702899642;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zDjgbF9OjLRhltzpu3hy0SxWUcdMTSMBcWAO5Y5sfDM=;
-	b=K+feXAuHbH/y/nZA4NhYNGXxRDVaUbBa0nFJC7Y13BdE027ER85cawIy0OaO7yvUK04/RY
-	RZWl+TygKuZpKPKwuDvcvN7dB+/ZFwVArd7XlFBU0cvIhMfULQLqHwgeoyPa4YODnTvjy9
-	yD0kfhkdLLcqWNc9Ld6xisiL+DntLAo=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-597-Fw0XbCttOpG0M_wq6Mwwsw-1; Mon, 18 Dec 2023 06:40:40 -0500
-X-MC-Unique: Fw0XbCttOpG0M_wq6Mwwsw-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2c9fdb15388so20664911fa.2
-        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 03:40:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702899639; x=1703504439;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zDjgbF9OjLRhltzpu3hy0SxWUcdMTSMBcWAO5Y5sfDM=;
-        b=SXNO5CVdJEM1HdUi8c/Uc62TXd5dgZBCyDu55MO7sOJH7OrYD7emBrk17OFk7kocc5
-         0cPkTv7cr5L96tMmLbwwxQsbaVplxS3EUBc5ZO/rM7T0yx7r1+er/Vu+p6RNYGlZsQyg
-         iITNSE4E2kv43B/slY7bDfVRwU4iEB6mSoz3nEyH8719BTrD+USw3K7w4yzl0nVhLaiw
-         kH3WNKWUwN3b3DBxWbgyAkDYTjlx6uf6RESVpx/J7O3fHQYUudQmBje6Oja26tVOZBES
-         yjJp6Oo77pVWs4NrWA2unJ6WVryLRa0qeqGGC5XDlqcCesIXwZhXVn8XCCtr7xUiXI2Y
-         f+xw==
-X-Gm-Message-State: AOJu0Yy7SMAMCMWYJptipwPxiwk6Pv17Qa8g1EjzFhxn5yvfGM8IcuXj
-	lt+pYSw5xUCMusMSFM+JBgpwobE3dwA6TaxFChCfsl19d4IbkwThTrmPwGG6YZK4+HI0kXBa77G
-	PthJb1FfjgsJtFe1rLH1hpVF9G0dU1a3j
-X-Received: by 2002:a2e:8611:0:b0:2cc:7104:2100 with SMTP id a17-20020a2e8611000000b002cc71042100mr629660lji.97.1702899639466;
-        Mon, 18 Dec 2023 03:40:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGBGK3niuCU6Q1qTkpaY9j+eoHbVVt+OmMgZ4Gxa5TMtB6I/6w061Lu2ry0EEJrCma/bWoK7fx772HVHm82XfE=
-X-Received: by 2002:a2e:8611:0:b0:2cc:7104:2100 with SMTP id
- a17-20020a2e8611000000b002cc71042100mr629651lji.97.1702899639145; Mon, 18 Dec
- 2023 03:40:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD06A4D5BD;
+	Mon, 18 Dec 2023 11:41:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1702899716;
+	bh=Ay7Tt9dce00P1AFvH+VR0Quwph8t7Z1Zn8abP+bDKl8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=olpcJOvXtTBBpVcYE8PqF5uNLFcLGnlrd77Yy4U2M1CVK1OMCU44ovp8ox0ABd+vx
+	 vMMIhpPKRjVYneLkb/RvRi7d4oSroIqe2BjDHoHmIw7nn6GftbYRPI/M/z5ce+U1Ax
+	 Xjff2yIbY3xKiaYY9fcWh7LjjHnDZPqbswmEj2DvPmFUBoLeqwQvBZaPBfs9rzAc0I
+	 349sA3zHVM5n127CwidQ+I2ZWhl4UpVTusm8MpYA//tJrf50cwyXU1NSx6rkRG4hhi
+	 9F77N0ItNtAnDrl7xx1QDhAZsFIdKxvgmdmQxMGqqKHZv7I9w2FZ/Ps3gPOjIvAivu
+	 CLedaHr2oRvJg==
+Received: from [100.115.223.179] (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: cristicc)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 84CA537814A3;
+	Mon, 18 Dec 2023 11:41:54 +0000 (UTC)
+Message-ID: <cb18617d-e34a-4c3e-a37a-1b051587f8b5@collabora.com>
+Date: Mon, 18 Dec 2023 13:41:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231215035009.498049-1-liuhangbin@gmail.com> <20231215035009.498049-4-liuhangbin@gmail.com>
-In-Reply-To: <20231215035009.498049-4-liuhangbin@gmail.com>
-From: Davide Caratti <dcaratti@redhat.com>
-Date: Mon, 18 Dec 2023 12:40:27 +0100
-Message-ID: <CAKa-r6sFAqfPbwXh1mSrTBYpicbYBMTqR-48DDSrxkTZp4Rm_A@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] netlink: specs: use exact-len for IPv6 addr
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 5/9] riscv: dts: starfive: jh7100-common: Setup pinmux
+ and enable gmac
+Content-Language: en-US
+To: Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
+ Samin Guo <samin.guo@starfivetech.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Hal Feng <hal.feng@starfivetech.com>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-clk@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, kernel@collabora.com
+References: <20231215204050.2296404-1-cristian.ciocaltea@collabora.com>
+ <20231215204050.2296404-6-cristian.ciocaltea@collabora.com>
+ <CAJM55Z-bg0EGPaLHtxcu2AzqN59zfuiT0eE7oCShrx7dG_QK1g@mail.gmail.com>
+From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+In-Reply-To: <CAJM55Z-bg0EGPaLHtxcu2AzqN59zfuiT0eE7oCShrx7dG_QK1g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-hello Hangbin!
+On 12/16/23 21:38, Emil Renner Berthing wrote:
+> Cristian Ciocaltea wrote:
+>> Add pinmux configuration for DWMAC found on the JH7100 based boards and
+>> enable the related DT node, providing a basic PHY configuration.
+>>
+>> Co-developed-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+>> Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+>> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+>> ---
+>>  .../boot/dts/starfive/jh7100-common.dtsi      | 85 +++++++++++++++++++
+>>  1 file changed, 85 insertions(+)
+>>
+>> diff --git a/arch/riscv/boot/dts/starfive/jh7100-common.dtsi b/arch/riscv/boot/dts/starfive/jh7100-common.dtsi
+>> index 42fb61c36068..5cafe8f5c2e7 100644
+>> --- a/arch/riscv/boot/dts/starfive/jh7100-common.dtsi
+>> +++ b/arch/riscv/boot/dts/starfive/jh7100-common.dtsi
+>> @@ -72,7 +72,92 @@ wifi_pwrseq: wifi-pwrseq {
+>>  	};
+>>  };
+>>
+>> +&gmac {
+>> +	pinctrl-names = "default";
+>> +	pinctrl-0 = <&gmac_pins>;
+>> +	phy-mode = "rgmii-id";
+>> +	phy-handle = <&phy>;
+> 
+> I'm not sure if it's a generic policy or not, but I don't really like adding a
+> reference to a non-existant node here. I'd move this property to the board
+> files where the phy node is actually defined.
 
-for the mptcp part: I didn't convert mptcp events, here transition
-from min-len to exact-len should not generate issues at all.
-
-Acked-by: Davide Caratti <dcaratti@redhat.com>
-
-On Fri, Dec 15, 2023 at 4:50=E2=80=AFAM Hangbin Liu <liuhangbin@gmail.com> =
-wrote:
->
-> We should use the exact-len instead of min-len for IPv6 address.
->
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
->  Documentation/netlink/specs/fou.yaml   | 4 ++--
->  Documentation/netlink/specs/mptcp.yaml | 4 ++--
->  2 files changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/Documentation/netlink/specs/fou.yaml b/Documentation/netlink=
-/specs/fou.yaml
-> index 0af5ab842c04..d472fd5055bd 100644
-> --- a/Documentation/netlink/specs/fou.yaml
-> +++ b/Documentation/netlink/specs/fou.yaml
-> @@ -52,7 +52,7 @@ attribute-sets:
->          name: local_v6
->          type: binary
->          checks:
-> -          min-len: 16
-> +          exact-len: 16
->        -
->          name: peer_v4
->          type: u32
-> @@ -60,7 +60,7 @@ attribute-sets:
->          name: peer_v6
->          type: binary
->          checks:
-> -          min-len: 16
-> +          exact-len: 16
->        -
->          name: peer_port
->          type: u16
-> diff --git a/Documentation/netlink/specs/mptcp.yaml b/Documentation/netli=
-nk/specs/mptcp.yaml
-> index 49f90cfb4698..2f694b79c3a7 100644
-> --- a/Documentation/netlink/specs/mptcp.yaml
-> +++ b/Documentation/netlink/specs/mptcp.yaml
-> @@ -223,7 +223,7 @@ attribute-sets:
->          name: saddr6
->          type: binary
->          checks:
-> -          min-len: 16
-> +          exact-len: 16
->        -
->          name: daddr4
->          type: u32
-> @@ -232,7 +232,7 @@ attribute-sets:
->          name: daddr6
->          type: binary
->          checks:
-> -          min-len: 16
-> +          exact-len: 16
->        -
->          name: sport
->          type: u16
-> --
-> 2.43.0
->
->
-
+Totally agree, I simply went too far while dropping duplicated code and
+didn't realize the mistake.  Thanks for noticing!
 
