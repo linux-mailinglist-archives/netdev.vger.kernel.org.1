@@ -1,161 +1,292 @@
-Return-Path: <netdev+bounces-58659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42FE3817B9B
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 21:12:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1131817BC8
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 21:22:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D77A21F242D2
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 20:12:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8FC9285A93
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 20:22:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 126A47146E;
-	Mon, 18 Dec 2023 20:12:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A85BE72069;
+	Mon, 18 Dec 2023 20:22:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OnaSB4Dy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oljQn0xn"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2257346C
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 20:12:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702930361;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IsJVSX6IEkmtFV9+0aEN/tS3XHrjWv1JC1BbSwjirH0=;
-	b=OnaSB4DytjLY55nDa3ws5dmT4YbUUhDTXfTAMfqDz5CSI+7k3rulmEaA3Yru/T92/GjUup
-	BAX+d+xs93duM7bgzdI6mWyDUceQj1ggkORg0fqrHvcVNQNgrlGuTAsqvNn+qMo6NUcOLr
-	ccTTUKvi+g52+hqVZFnlGYjhrWizWyI=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-466-50DtuWmMNqGWqrSHaEpn7w-1; Mon, 18 Dec 2023 15:12:39 -0500
-X-MC-Unique: 50DtuWmMNqGWqrSHaEpn7w-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a23739b8459so1015866b.0
-        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 12:12:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF52C72050
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 20:22:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a2335d81693so413322766b.0
+        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 12:22:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702930943; x=1703535743; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hBnDjqR8ev8eEOR/Wb/mNlLBPLyySVDmi6fwcpUC1aE=;
+        b=oljQn0xnbHUycvaF+zVaIvUUqRi2ivtzBgVGbZpm+FtVvn3zwZrHLFRwK+OIQbHkMG
+         UQUFTeylQBFUE19DpGZcTU+1xWmbzEFJLwbyZaJt/TqL7j/iFWHiajeNKzEUBF9Gpn5y
+         PPB9yn18Aa4nHyv8G2ifU6MZevfnDTCq5hXvdJJ1LA8lO/ClkJvRFruGPIR5BnpC9Kpr
+         8EQH+DwX3Goyqx0M7Ld4P0r+H5SdNUJWICs8V3j6HMXvTdAwHrq6a/2Zafq3zzU4BaRr
+         VRaWO+nLw06R3EQKsWMkNLSQxJcSwtb09f2uHGrkILYZokRiQmSOEuyo0f+pe8GQF0zL
+         nEWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702930358; x=1703535158;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IsJVSX6IEkmtFV9+0aEN/tS3XHrjWv1JC1BbSwjirH0=;
-        b=YKn6Cslk81oTUjPeLcZqdLn49qOOiuny6Ht7XaqDnKgx1KPB5oKYqUEZE2+KAdCCGB
-         xkij8yCdKqGnUFVMRXsnQLzXrYB8Hip2Fzh2BY+ExgQhFOe/ZDfBTD5RIYmG22wWDZTe
-         1hcQfZ/LqZtPpEzxBNQoNbJTo+YXsEwPQZ5jIsbbZNKrx71ETmd5cI4aT8zFjmiyC7tp
-         zlHFI1TEtyZbFCXgircHhKYUmn9ehMCDHEyXt/ARdDJtiCO5bZjs4FL2OnUHj2cbr+Yr
-         lGV6kkfCM5KqZogK97+rEXTJrGNLFkbv+NYVtV9TGx9WQ2fzCb1e2zxeqhIWCI3EnuRa
-         darg==
-X-Gm-Message-State: AOJu0Yzzz7b4jSSl+u5aKZ4qUnc56MKVrWw+E2/4HCrdvI1kMR0IrhRR
-	ACmNxBjgdiTTmwky548wTkdyUrsnRl2euPzjWUC1U9giabInBCBZIPYXX4f23IVCGyiYPuBF7OT
-	MrQlQQ7hBJcsv+bZO
-X-Received: by 2002:a50:bb06:0:b0:553:46ed:3133 with SMTP id y6-20020a50bb06000000b0055346ed3133mr3447595ede.1.1702930358296;
-        Mon, 18 Dec 2023 12:12:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGxMl1ef4XcJR6LMN9lFW5JBcbOLREMzwim3fhKSyUDak7Z0VJgOu2KaMA5DHNWK50AhpB2Fw==
-X-Received: by 2002:a50:bb06:0:b0:553:46ed:3133 with SMTP id y6-20020a50bb06000000b0055346ed3133mr3447586ede.1.1702930357962;
-        Mon, 18 Dec 2023 12:12:37 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-253-3.dyn.eolo.it. [146.241.253.3])
-        by smtp.gmail.com with ESMTPSA id l14-20020aa7cace000000b005530492d900sm2561975edt.58.2023.12.18.12.12.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Dec 2023 12:12:37 -0800 (PST)
-Message-ID: <baa4bd4b3aa0639d29e5c396bd3da94e01cd8528.camel@redhat.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 0/5] iavf: Add devlink and
- devlink rate support'
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
- anthony.l.nguyen@intel.com, intel-wired-lan@lists.osuosl.org, 
- qi.z.zhang@intel.com, Wenjun Wu <wenjun1.wu@intel.com>,
- maxtram95@gmail.com,  "Chittim, Madhu" <madhu.chittim@intel.com>,
- "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Simon Horman
- <simon.horman@redhat.com>
-Date: Mon, 18 Dec 2023 21:12:35 +0100
-In-Reply-To: <20231215144155.194a188e@kernel.org>
-References: <20230727021021.961119-1-wenjun1.wu@intel.com>
-	 <20230822034003.31628-1-wenjun1.wu@intel.com> <ZORRzEBcUDEjMniz@nanopsycho>
-	 <20230822081255.7a36fa4d@kernel.org> <ZOTVkXWCLY88YfjV@nanopsycho>
-	 <0893327b-1c84-7c25-d10c-1cc93595825a@intel.com>
-	 <ZOcBEt59zHW9qHhT@nanopsycho>
-	 <5aed9b87-28f8-f0b0-67c4-346e1d8f762c@intel.com>
-	 <bdb0137a-b735-41d9-9fea-38b238db0305@intel.com>
-	 <20231118084843.70c344d9@kernel.org>
-	 <3d60fabf-7edf-47a2-9b95-29b0d9b9e236@intel.com>
-	 <20231122192201.245a0797@kernel.org>
-	 <e662dca5-84e4-4f7b-bfa3-50bce30c697c@intel.com>
-	 <20231127174329.6dffea07@kernel.org>
-	 <55e51b97c29894ebe61184ab94f7e3d8486e083a.camel@redhat.com>
-	 <20231214174604.1ca4c30d@kernel.org>
-	 <7b0c2e0132b71b131fc9a5407abd27bc0be700ee.camel@redhat.com>
-	 <20231215144155.194a188e@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        d=1e100.net; s=20230601; t=1702930943; x=1703535743;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hBnDjqR8ev8eEOR/Wb/mNlLBPLyySVDmi6fwcpUC1aE=;
+        b=kzvscUa7XWNmfz1NG4+0LZMiuD+UUyLMEFbSXg5CsLCchIZEv9vrViz1pPuPp4u0tQ
+         gr+GbSzIkhbQUbzl/xrgzZBfJKkAf9fNgxtEO4cgj2fvdQQrMOAI4ZDcodRmhMjmfPAD
+         CZ2a5WlsZYjYBhKdsPkho9dL72U/iJ07q6lXPQmIRB3+lybJvpW5+sITkxW3L5WbGFq4
+         ZDx4X62iEUMgH+cLiNFiojPoz3cw6v0d9QC2F4E9QwPR2TIL06jIwv5HDvW90WrdpFMM
+         GlkrdEurr02k4UpQdE1qQTRr4CmpbpfKMfu3QNJlmBkY+N59HWjhzF5BcYRDtXe1k5RT
+         d7AQ==
+X-Gm-Message-State: AOJu0Yw0XdQUHGQMB02iTlKXihfpGP5nLlCK2SHYKXznwKMnqWcZatlh
+	ysOf41SSPp9/Cw47gq+uJUK032M8hXc7W5/41nSmzQ==
+X-Google-Smtp-Source: AGHT+IGOSn3yMNFErnneEacsS5/2W9PoiIzpIb6xAZzuXfnZ1mobdrawzlxvMuTKK0N9yjEitoiX5+htjybXySy6Z+s=
+X-Received: by 2002:a17:906:1b0e:b0:a23:5893:1ac8 with SMTP id
+ o14-20020a1709061b0e00b00a2358931ac8mr2231828ejg.27.1702930942877; Mon, 18
+ Dec 2023 12:22:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20231217080913.2025973-1-almasrymina@google.com>
+ <20231217080913.2025973-4-almasrymina@google.com> <1195676f-59a4-40d8-b459-d2668eb8c5fe@huawei.com>
+In-Reply-To: <1195676f-59a4-40d8-b459-d2668eb8c5fe@huawei.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 18 Dec 2023 12:22:11 -0800
+Message-ID: <CAHS8izPJOrv_4tRRVP=g_m-02d=QKWQCsvO9UTxgGFtoDxFfuw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/3] net: add netmem_t to skb_frag_t
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, 
+	Jason Gunthorpe <jgg@nvidia.com>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Shakeel Butt <shakeelb@google.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2023-12-15 at 14:41 -0800, Jakub Kicinski wrote:
-> I explained before (perhaps on the netdev call) - Qdiscs have two
-> different offload models. "local" and "switchdev", here we want "local"
-> AFAIU and TBF only has "switchdev" offload (take a look at the enqueue
-> method and which drivers support it today).
+On Mon, Dec 18, 2023 at 4:39=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
+>
+> On 2023/12/17 16:09, Mina Almasry wrote:
+> > Use netmem_t instead of page directly in skb_frag_t. Currently netmem_t
+> > is always a struct page underneath, but the abstraction allows efforts
+> > to add support for skb frags not backed by pages.
+> >
+> > There is unfortunately 1 instance where the skb_frag_t is assumed to be
+> > a bio_vec in kcm. For this case, add a debug assert that the skb frag i=
+s
+> > indeed backed by a page, and do a cast.
+> >
+> > Add skb[_frag]_fill_netmem_*() and skb_add_rx_frag_netmem() helpers so
+> > that the API can be used to create netmem skbs.
+> >
+> > Signed-off-by: Mina Almasry <almasrymina@google.com>
+> >
+>
+> ...
+>
+> >
+> > -typedef struct bio_vec skb_frag_t;
+> > +typedef struct skb_frag {
+> > +     struct netmem *bv_page;
+>
+> bv_page -> bv_netmem?
+>
 
-I must admit the above is not yet clear to me.
+bv_page, bv_len & bv_offset all are misnomers after this change
+indeed, because bv_ refers to bio_vec and skb_frag_t is no longer a
+bio_vec. However I'm hoping renaming everything can be done in a
+separate series. Maybe I'll just apply the bv_page -> bv_netmem
+change, that doesn't seem to be much code churn and it makes things
+much less confusing.
 
-I initially thought you meant that "local" offloads properly
-reconfigure the S/W datapath so that locally generated traffic would go
-through the expected processing (e.g. shaping) just once, while with
-"switchdev" offload locally generated traffic will see shaping done
-both by the S/W and the H/W[1].
+> > +     unsigned int bv_len;
+> > +     unsigned int bv_offset;
+> > +} skb_frag_t;
+> >
+> >  /**
+> >   * skb_frag_size() - Returns the size of a skb fragment
+> > @@ -2431,22 +2436,37 @@ static inline unsigned int skb_pagelen(const st=
+ruct sk_buff *skb)
+> >       return skb_headlen(skb) + __skb_pagelen(skb);
+> >  }
+> >
+>
+> ...
+>
+> >  /**
+> > @@ -2462,10 +2482,10 @@ static inline void skb_len_add(struct sk_buff *=
+skb, int delta)
+> >  }
+> >
+> >  /**
+> > - * __skb_fill_page_desc - initialise a paged fragment in an skb
+> > + * __skb_fill_netmem_desc - initialise a paged fragment in an skb
+> >   * @skb: buffer containing fragment to be initialised
+> >   * @i: paged fragment index to initialise
+> > - * @page: the page to use for this fragment
+> > + * @netmem: the netmem to use for this fragment
+> >   * @off: the offset to the data with @page
+> >   * @size: the length of the data
+> >   *
+> > @@ -2474,10 +2494,13 @@ static inline void skb_len_add(struct sk_buff *=
+skb, int delta)
+> >   *
+> >   * Does not take any additional reference on the fragment.
+> >   */
+> > -static inline void __skb_fill_page_desc(struct sk_buff *skb, int i,
+> > -                                     struct page *page, int off, int s=
+ize)
+> > +static inline void __skb_fill_netmem_desc(struct sk_buff *skb, int i,
+> > +                                       struct netmem *netmem, int off,
+> > +                                       int size)
+> >  {
+> > -     __skb_fill_page_desc_noacc(skb_shinfo(skb), i, page, off, size);
+> > +     struct page *page =3D netmem_to_page(netmem);
+> > +
+> > +     __skb_fill_netmem_desc_noacc(skb_shinfo(skb), i, netmem, off, siz=
+e);
+> >
+> >       /* Propagate page pfmemalloc to the skb if we can. The problem is
+> >        * that not all callers have unique ownership of the page but rel=
+y
+> > @@ -2485,7 +2508,21 @@ static inline void __skb_fill_page_desc(struct s=
+k_buff *skb, int i,
+> >        */
+> >       page =3D compound_head(page);
+> >       if (page_is_pfmemalloc(page))
+> > -             skb->pfmemalloc =3D true;
+> > +             skb->pfmemalloc =3D true;
+>
+> Is it possible to introduce netmem_is_pfmemalloc() and netmem_compound_he=
+ad()
+> for netmem,
 
-Reading the above I now think you mean that local offloads has only
-effect for locally generated traffic but not on traffic forwarded via
-eswitch, and vice versa[2].=20
+That is exactly the plan, and I added these helpers in the follow up
+series which introduces devmem support:
 
-The drivers I looked at did not show any clue (to me).
+https://patchwork.kernel.org/project/netdevbpf/patch/20231218024024.3516870=
+-8-almasrymina@google.com/
 
-FTR, I think that [1] is a bug worth fixing and [2] is evil ;)
+> and have some built-time testing to ensure the implementation
+> is the same between page_is_pfmemalloc()/compound_head() and
+> netmem_is_pfmemalloc()/netmem_compound_head()?
 
-Could you please clarify which is the difference exactly between them?
+That doesn't seem desirable to me. It's too hacky IMO to duplicate the
+implementation details of the MM stack in the net stack and that is
+not the implementation you see in the patch that adds these helpers
+above.
 
-> "We'll extend TBF" is very much adding a new API. You'll have to add
-> "local offload" support in TBF and no NIC driver today supports it.
-> I'm not saying TBF is bad, but I disagree that it's any different
-> than a new NDO for all practical purposes.
->=20
-> > ndo_setup_tc() feels like the natural choice for H/W offload and TBF
-> > is the existing interface IMHO nearest to the requirements here.
->=20
-> I question whether something as basic as scheduling and ACLs should
-> follow the "offload SW constructs" mantra. You are exposed to more
-> diverse users so please don't hesitate to disagree, but AFAICT
-> the transparent offload (user installs SW constructs and if offload
-> is available - offload, otherwise use SW is good enough) has not
-> played out like we have hoped.
->=20
-> Let's figure out what is the abstract model of scheduling / shaping
-> within a NIC that we want to target. And then come up with a way of
-> representing it in SW. Not which uAPI we can shoehorn into the use
-> case.
+> So that we can avoid the
+> netmem_to_page() as much as possible, especially in the driver.
+>
 
-I thought the model was quite well defined since the initial submission
-from Intel, and is quite simple: expose TX shaping on per tx queue
-basis, with min rate, max rate (in bps) and burst (in bytes).
+Agreed.
 
-I think that making it more complex (e.g. with nesting, pkt overhead,
-etc) we will still not cover every possible use case and will add
-considerable complexity.
->=20
-Cheers,
+>
+> > +}
+> > +
+> > +static inline void __skb_fill_page_desc(struct sk_buff *skb, int i,
+> > +                                     struct page *page, int off, int s=
+ize)
+> > +{
+> > +     __skb_fill_netmem_desc(skb, i, page_to_netmem(page), off, size);
+> > +}
+> > +
+>
+> ...
+>
+> >   */
+> >  static inline struct page *skb_frag_page(const skb_frag_t *frag)
+> >  {
+> > -     return frag->bv_page;
+> > +     return netmem_to_page(frag->bv_page);
+>
+> It seems we are not able to have a safe type protection for the above
+> function, as the driver may be able to pass a devmem frag as a param here=
+,
+> and pass the returned page into the mm subsystem, and compiler is not abl=
+e
+> to catch it when compiling.
+>
 
-Paolo
+That depends on the implementation of netmem_to_page(). As I
+implemented it in the follow up series, netmem_to_page() always checks
+that netmem is actually a page before doing the conversion via
+checking the LSB checking. It's of course unacceptable to make an
+unconditional cast here. That will get around the type safety as you
+point out, and defeat the point. But I'm not doing that.
 
+I can add a comment above netmem_to_page():
+
+/* Returns page* if the netmem is backed by a page, NULL otherwise. Current=
+ly
+ * netmem can only be backed by a page, so we always return the underlying
+ * page.
+ */
+static inline struct page *netmem_to_page(struct netmem *netmem);
+
+> >  }
+> >
+> >  /**
+> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > index 83af8aaeb893..053d220aa2f2 100644
+> > --- a/net/core/skbuff.c
+> > +++ b/net/core/skbuff.c
+> > @@ -845,16 +845,24 @@ struct sk_buff *__napi_alloc_skb(struct napi_stru=
+ct *napi, unsigned int len,
+> >  }
+> >  EXPORT_SYMBOL(__napi_alloc_skb);
+> >
+>
+> ...
+>
+> > diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
+> > index 65d1f6755f98..5c46db045f4c 100644
+> > --- a/net/kcm/kcmsock.c
+> > +++ b/net/kcm/kcmsock.c
+> > @@ -636,9 +636,15 @@ static int kcm_write_msgs(struct kcm_sock *kcm)
+> >               for (i =3D 0; i < skb_shinfo(skb)->nr_frags; i++)
+> >                       msize +=3D skb_shinfo(skb)->frags[i].bv_len;
+> >
+> > +             /* The cast to struct bio_vec* here assumes the frags are
+> > +              * struct page based.
+> > +              */
+> > +             DEBUG_NET_WARN_ON_ONCE(
+> > +                     !skb_frag_page(&skb_shinfo(skb)->frags[0]));
+>
+> It seems skb_frag_page() always return non-NULL in this patch, the above
+> checking seems unnecessary?
+
+We're doing a cast below, and the cast is only valid if the frag has a
+page underneath. This check makes sure the skb has a page. In the
+series that adds devmem support, skb_frag_page() returns NULL as the
+frag has no page. Since this patch adds the dangerous cast, I think it
+may be reasonable for it to also add the check.
+
+I can add a comment above skb_frag_page() to indicate the intention again:
+
+ * Returns the &struct page associated with @frag. Returns NULL if this fra=
+g
+ * has no associated page.
+
+But as of this series netmem can only be a page, so I think adding
+that information may be premature.
+
+--=20
+Thanks,
+Mina
 
