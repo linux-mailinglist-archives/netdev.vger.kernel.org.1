@@ -1,128 +1,160 @@
-Return-Path: <netdev+bounces-58669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83C50817C9C
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 22:29:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 380A9817CA5
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 22:33:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36FC61F23EDD
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 21:29:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 430F61C22C2E
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 21:33:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DCFF7409E;
-	Mon, 18 Dec 2023 21:28:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1CC0740A2;
+	Mon, 18 Dec 2023 21:33:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=corelatus.se header.i=@corelatus.se header.b="mXXh6UtI";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="yEBqUg/t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nKI38e3b"
 X-Original-To: netdev@vger.kernel.org
-Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA1842361
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 21:28:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corelatus.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=corelatus.se
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-	by mailout.nyi.internal (Postfix) with ESMTP id 078005C03CA;
-	Mon, 18 Dec 2023 16:28:50 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute3.internal (MEProxy); Mon, 18 Dec 2023 16:28:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=corelatus.se; h=
-	cc:content-transfer-encoding:content-type:content-type:date:date
-	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to; s=fm1; t=1702934930; x=1703021330; bh=b3PDwCj9W7
-	k5W473CsFdWaBtVeiECx5bTgcFflVPyuo=; b=mXXh6UtIESD2sXaS3iMNZu26C3
-	8hmSSymnZ/hJ7hXycBJSBW20McRqIDvlHuew+8TJgR/Rttt28c9IbZKYZJUf1QXN
-	Tu9CN3waEWLNymmDywUHsEovxdu//2HF2W485tYJB6cbCKeCMcIkng4GZRyih4dS
-	gRKQzjcmReQctuPOiS0xnBqnOUv6DJhhH7mkbNNqRHmBhiVDFUibe1LrOyJD0McM
-	er02yZots1H2o+sDDobSGFmTbof93Wt+6uxtSWtDy8kLkfMdJL3HAA3daGYqW6vp
-	e55bXT4JdCH4RinSiI3Cb5q2ROsiRVXJSSqRxHsJOkfhAYvQDusX/ODwB1iw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:content-transfer-encoding:content-type
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1702934930; x=1703021330; bh=b3PDwCj9W7k5W473CsFdWaBtVeiE
-	Cx5bTgcFflVPyuo=; b=yEBqUg/t1gjuO+demerJGLRkwwnFvPx9HvwU8dwb22NE
-	35xJOD7Pnsy7uVWhDPQXghtpoNKmEvMfGcur49Nt20LGLzvjZ22AInjFr1GqfFtx
-	ygMf2zCi/8e7FgugeJGBV1ia5ZSVARNgdETXgTbhgorniNeRaJHbsLySVEOKG0z7
-	L8ByAq3D77d0MicncyV8plafzdHvCcaTW1febTBDTfjKaLX6RlvOz46HkKzjKn/L
-	hD7KTixclwfPTNsbaYXVU/hb53dV+w2Vomj3Pfk/GKEcPmEUQq49We40/GDwVOVd
-	tJ2KlCLvbYKH42VhxFqtRwPVeINMqBw77pvXO6YFaA==
-X-ME-Sender: <xms:kbmAZRNjrcw8fTnIYAnIldMilipdIYUyaQOo3BFVhiG5WtUmjL1dOA>
-    <xme:kbmAZT9dUAQVeIg7y61yPYOYb2QtTyVbsNSFCHtDkp_Z0kAgVJCAbcfgN6sqA__RD
-    mXPIp2t0Y1aHSC4fg>
-X-ME-Received: <xmr:kbmAZQSmcpnFSYhlsd3MO85P5zdjUv23an9EZWKynEhpHyFjo7QTN2AFzylK4EhL>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvddtkedgudegkecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecunecujfgurhepkfffgggfvffhufgtgfesthejre
-    dttddvjeenucfhrhhomhepvfhhohhmrghsucfnrghnghgvuceothhhohhmrghssegtohhr
-    vghlrghtuhhsrdhsvgeqnecuggftrfgrthhtvghrnhepvdevteekieehhfekjedtgfdvhe
-    ekheeiieelvdeiieevgeelhfetkeetkeevieehnecuvehluhhsthgvrhfuihiivgeptden
-    ucfrrghrrghmpehmrghilhhfrhhomhepthhhohhmrghssegtohhrvghlrghtuhhsrdhsvg
-X-ME-Proxy: <xmx:kbmAZduzix-eXEnmWXJOlzWR10_eUNv57JrtHZwot3l60nSWuGw6OQ>
-    <xmx:kbmAZZcaOubCWAbQehFRr6OHFRmonL9o3K3al09WNEbtFbUZ5WTI0w>
-    <xmx:kbmAZZ2YuzDmSfBgd6VreNLLs56Faolz-6qxHXOpNP2PUt_KXqWzBw>
-    <xmx:krmAZZn_xJ9sLN1OWmiSKVlBBxm1HOi-7hq1Gdl3kstWkaEZj91TSQ>
-Feedback-ID: ia69946ac:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 18 Dec 2023 16:28:49 -0500 (EST)
-Message-ID: <a9090be2-ca7c-494c-89cb-49b1db2438ba@corelatus.se>
-Date: Mon, 18 Dec 2023 22:28:47 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9842473465
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 21:33:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9286DC433C8;
+	Mon, 18 Dec 2023 21:33:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702935201;
+	bh=viIrjkpxCQsWojqf+L/giT1tkiNy8AuoGtrntUG6hfM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nKI38e3bD9+jAuj404JQ1Kd2UFhbcWPDT27UaKAnp5mh4upUrTjxeWexHSc0CbdPT
+	 0fms9NDXUWfdhoA14cwf1KuGZ+XKzBW1+UG2VzNVuMykx/VX17eWzFl7mAEzcPB7fb
+	 vtH180qrvwZXamE4pn31h0ZigRpW4BFxwjp8nZEIdv78TY9d32R44eW+6ZzS/+gOLu
+	 XW4w02hGawA6jqORtEZHJeGAnDxV8wymqVMOvqUQ7qXkWVQGjTeTP+DhWsif3zOQgS
+	 xz9t8dj83wSQGi8sdHLSgKb4Fv/GyJZy80WnS9a/iJoCOYC2xutsvLda20JCYf4SlB
+	 rkeSVXvxvX8nw==
+Date: Mon, 18 Dec 2023 13:33:19 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+ anthony.l.nguyen@intel.com, intel-wired-lan@lists.osuosl.org,
+ qi.z.zhang@intel.com, Wenjun Wu <wenjun1.wu@intel.com>,
+ maxtram95@gmail.com, "Chittim, Madhu" <madhu.chittim@intel.com>,
+ "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Simon Horman
+ <simon.horman@redhat.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 0/5] iavf: Add devlink and
+ devlink rate support'
+Message-ID: <20231218133319.3eef8931@kernel.org>
+In-Reply-To: <baa4bd4b3aa0639d29e5c396bd3da94e01cd8528.camel@redhat.com>
+References: <20230727021021.961119-1-wenjun1.wu@intel.com>
+	<20230822034003.31628-1-wenjun1.wu@intel.com>
+	<ZORRzEBcUDEjMniz@nanopsycho>
+	<20230822081255.7a36fa4d@kernel.org>
+	<ZOTVkXWCLY88YfjV@nanopsycho>
+	<0893327b-1c84-7c25-d10c-1cc93595825a@intel.com>
+	<ZOcBEt59zHW9qHhT@nanopsycho>
+	<5aed9b87-28f8-f0b0-67c4-346e1d8f762c@intel.com>
+	<bdb0137a-b735-41d9-9fea-38b238db0305@intel.com>
+	<20231118084843.70c344d9@kernel.org>
+	<3d60fabf-7edf-47a2-9b95-29b0d9b9e236@intel.com>
+	<20231122192201.245a0797@kernel.org>
+	<e662dca5-84e4-4f7b-bfa3-50bce30c697c@intel.com>
+	<20231127174329.6dffea07@kernel.org>
+	<55e51b97c29894ebe61184ab94f7e3d8486e083a.camel@redhat.com>
+	<20231214174604.1ca4c30d@kernel.org>
+	<7b0c2e0132b71b131fc9a5407abd27bc0be700ee.camel@redhat.com>
+	<20231215144155.194a188e@kernel.org>
+	<baa4bd4b3aa0639d29e5c396bd3da94e01cd8528.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: netdev@vger.kernel.org
-Content-Language: en-US
-From: Thomas Lange <thomas@corelatus.se>
-Subject: net/core/sock.c lacks some SO_TIMESTAMPING_NEW support
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-It seems that net/core/sock.c is missing support for SO_TIMESTAMPING_NEW in
-some paths.
+On Mon, 18 Dec 2023 21:12:35 +0100 Paolo Abeni wrote:
+> On Fri, 2023-12-15 at 14:41 -0800, Jakub Kicinski wrote:
+> > I explained before (perhaps on the netdev call) - Qdiscs have two
+> > different offload models. "local" and "switchdev", here we want "local"
+> > AFAIU and TBF only has "switchdev" offload (take a look at the enqueue
+> > method and which drivers support it today).  
+> 
+> I must admit the above is not yet clear to me.
+> 
+> I initially thought you meant that "local" offloads properly
+> reconfigure the S/W datapath so that locally generated traffic would go
+> through the expected processing (e.g. shaping) just once, while with
+> "switchdev" offload locally generated traffic will see shaping done
+> both by the S/W and the H/W[1].
+> 
+> Reading the above I now think you mean that local offloads has only
+> effect for locally generated traffic but not on traffic forwarded via
+> eswitch, and vice versa[2]. 
+> 
+> The drivers I looked at did not show any clue (to me).
+> 
+> FTR, I think that [1] is a bug worth fixing and [2] is evil ;)
+> 
+> Could you please clarify which is the difference exactly between them?
 
-I cross compile for a 32bit ARM system using Yocto 4.3.1, which seems to have
-64bit time by default. This maps SO_TIMESTAMPING to SO_TIMESTAMPING_NEW which
-is expected AFAIK.
+The practical difference which you can see in the code is that
+"locally offloaded" qdiscs will act like a FIFO in the SW path (at least
+to some extent). While "switchdev" offload qdiscs act exactly the same
+regardless of the offload.
 
-However, this breaks my application (Chrony) that sends SO_TIMESTAMPING as
-a cmsg:
+Neither is wrong, they are offloading different things. Qdisc offload
+on a representor (switchdev) offloads from the switch perspective, i.e.
+"ingress to host". Only fallback goes thru SW path, and should be
+negligible.
 
-sendmsg(4, {msg_name={sa_family=AF_INET, sin_port=htons(123), sin_addr=inet_addr("172.16.11.22")}, msg_namelen=16, msg_iov=[{iov_base="#\0\6 \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., iov_len=48}], msg_iovlen=1, msg_control=[{cmsg_len=16, cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMPING_NEW, cmsg_data=???}], msg_controllen=16, msg_flags=0}, 0) = -1 EINVAL (Invalid argument)
+"Local" offload can be implemented as admission control (and is
+sometimes work conserving), it's on the "real" interface, it's egress,
+and doesn't take part in forwarding.
 
-This is because __sock_cmsg_send() does not support SO_TIMESTAMPING_NEW as-is.
+> > I question whether something as basic as scheduling and ACLs should
+> > follow the "offload SW constructs" mantra. You are exposed to more
+> > diverse users so please don't hesitate to disagree, but AFAICT
+> > the transparent offload (user installs SW constructs and if offload
+> > is available - offload, otherwise use SW is good enough) has not
+> > played out like we have hoped.
+> > 
+> > Let's figure out what is the abstract model of scheduling / shaping
+> > within a NIC that we want to target. And then come up with a way of
+> > representing it in SW. Not which uAPI we can shoehorn into the use
+> > case.  
+> 
+> I thought the model was quite well defined since the initial submission
+> from Intel, and is quite simple: expose TX shaping on per tx queue
+> basis, with min rate, max rate (in bps) and burst (in bytes).
 
-This patch seems to fix things and the packet is transmitted:
+For some definition of a model, I guess. Given the confusion about
+switchdev vs local (ingress vs egress) - I can't agree that the model
+is well defined :(
 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 16584e2dd648..a56ec1d492c9 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -2821,6 +2821,7 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
-                 sockc->mark = *(u32 *)CMSG_DATA(cmsg);
-                 break;
-         case SO_TIMESTAMPING_OLD:
-+       case SO_TIMESTAMPING_NEW:
-                 if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
-                         return -EINVAL;
+What I mean is - given piece of functionality like "Tx queue shaping"
+you can come up with a reasonable uAPI that you can hijack and it makes
+sense to you. But someone else (switchdev ingress) can chose the same
+API to implement a different offload. Not to mention that yet another
+person will chose a different API to implement the same things as you :(
 
-However, looking through the module, it seems that sk_getsockopt() has no
-support for SO_TIMESTAMPING_NEW either, but sk_setsockopt() has.
-Testing seems to confirm this:
+Off the top of my head we have at least:
 
-setsockopt(4, SOL_SOCKET, SO_TIMESTAMPING_NEW, [1048], 4) = 0
-getsockopt(4, SOL_SOCKET, SO_TIMESTAMPING_NEW, 0x7ed5db20, [4]) = -1 ENOPROTOOPT (Protocol not available)
+ - Tx DMA admission control / scheduling (which Tx DMA queue will NIC 
+   pull from)
+ - Rx DMA scheduling (which Rx queue will NIC push to)
 
-Patching sk_getsockopt() is not as obvious to me though.
+ - buffer/queue configuration (how to deal with buildup of packets in
+   NIC SRAM, usually mostly for ingress)
+ - NIC buffer configuration (how the SRAM is allocated to queues)
 
-I used a custom 6.6 kernel for my tests.
-The relevant code seems unchanged in net-next.git though.
+ - policers in the NIC forwarding logic
 
-/Thomas
+
+Let's extend this list so that it covers all reasonable NIC designs,
+and them work on mapping how each of them is configured?
+
+> I think that making it more complex (e.g. with nesting, pkt overhead,
+> etc) we will still not cover every possible use case and will add
+> considerable complexity.
 
