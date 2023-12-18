@@ -1,128 +1,154 @@
-Return-Path: <netdev+bounces-58468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B8998168A6
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:49:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0D598168A8
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:50:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DFE95B2248B
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 08:49:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC98BB22731
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 08:50:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0B7010964;
-	Mon, 18 Dec 2023 08:49:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B6A107AD;
+	Mon, 18 Dec 2023 08:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SBHo43vu"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JF2MrTeR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 429B7101D3
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 08:49:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702889374;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3723F10941;
+	Mon, 18 Dec 2023 08:50:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4D3A740004;
+	Mon, 18 Dec 2023 08:49:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1702889399;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=96J1k28J+MjDnv0pl5SmRROhcfWOfBkfzf+7bPvEEpo=;
-	b=SBHo43vuVnhWTgtuMcHDXcrelvp79xtt1pfAFtG1YkDxyg4tXcnL+d1MfPtPvSxI5sCFUb
-	jQFouZzGU7dj9PWS9hw3XtLKpUcJwAlZVMDkWCt46hrdN6DY1oaqgSroujjZjSTjBiCFN3
-	y3wXQev1R4MTOgXPQudmO44EiyOMpfc=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-227-QyAir-xKNSqfQHwdutVLpw-1; Mon, 18 Dec 2023 03:49:32 -0500
-X-MC-Unique: QyAir-xKNSqfQHwdutVLpw-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-50e3de9c2d3so169284e87.2
-        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 00:49:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702889369; x=1703494169;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=96J1k28J+MjDnv0pl5SmRROhcfWOfBkfzf+7bPvEEpo=;
-        b=r2aXSRH6qP92fIn0WbKv0xz4eP5VUx2HOWiIovjCJdeMxz9NRdWFLt2W5bQpLg2XD9
-         lnhDQm+wQ++B7QjQXGfrKiqMAReGbxIZXvgFUDGUebbbif6SB8hKi2VXuTPX66JApoBE
-         YgLoAHXmyzcdDzKRw03zsik0B3gdWtdK1w226MgJa8IwYxkfiNwhNPVLgo0OpligHS1J
-         5sQEtZcTDnoLRH2DGOWRYb41mf/GW5/sKESdMfbTA9GZx+1XzBTTi6I33sYCuRbS+5OZ
-         eTkp12D8cKdURFx83BU5fT38REqtohPDwWSn0XPC8dW1kNNa3jR4UqdjThNc52GgaKR4
-         BVsQ==
-X-Gm-Message-State: AOJu0Yy2oJ2AmsuFvNxnkvJBQY5p9UV4apL88t6sA7lFkA+mjILCI+a5
-	9E2KrIvK/L+KIDPmGtC3JK38WIhevof5kYVg2OQDEFT1bQKRXdtjCa6nM83CKseCpQ7RgHiVBtL
-	Eu0YGKbS33ZZ/3F7QQUyRQ4ogVbA=
-X-Received: by 2002:ac2:42cd:0:b0:50e:30cf:9adf with SMTP id n13-20020ac242cd000000b0050e30cf9adfmr1053748lfl.109.1702889369688;
-        Mon, 18 Dec 2023 00:49:29 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHmAqvDzZZK0X7HUhBeJVDsC7MXCREWAxrZtN2Xk3IIJMSb0xjiL5A8HYGdE7+yn/n9U86NkQ==
-X-Received: by 2002:ac2:42cd:0:b0:50e:30cf:9adf with SMTP id n13-20020ac242cd000000b0050e30cf9adfmr1053736lfl.109.1702889369318;
-        Mon, 18 Dec 2023 00:49:29 -0800 (PST)
-Received: from localhost ([81.56.90.2])
-        by smtp.gmail.com with ESMTPSA id op24-20020a170906bcf800b00a2361163cfesm442342ejb.13.2023.12.18.00.49.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Dec 2023 00:49:28 -0800 (PST)
-Date: Mon, 18 Dec 2023 09:49:27 +0100
-From: Davide Caratti <dcaratti@redhat.com>
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: jhs@mojatatu.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com,
-	jiri@resnulli.us, mleitner@redhat.com, pctammela@mojatatu.com,
-	netdev@vger.kernel.org, kernel@mojatatu.com
-Subject: Re: [PATCH RFC net-next] net: sched: act_mirred: Extend the cpu
- mirred nest guard with an explicit loop ttl
-Message-ID: <ZYAHl3f4+scOdJYc@dcaratti.users.ipa.redhat.com>
-References: <20231215180827.3638838-1-victor@mojatatu.com>
+	bh=bwiHZrMTP7Wiahde4BM0HLwINyMuE+Tg6ATmX7gQwnc=;
+	b=JF2MrTeRWDXBcGI3/WDea3Ht6B5N4RpvQCz83GOeUkIzg/MMjDrma3A5Sd9oxYcA5nY4FG
+	hT/vHT/3XUxSwbssvhSQIMxTB+cN1bArWKrrEMZIDMH52aR2gqHA+yyE2PX76CvtGPmrQl
+	6WY5ukQYYj3HYcyPd/Mu8/qiQBy8ZtZGzvSZ7g8hFPrGQ/cWYWtNvUF1PCZCu7+k41VYgH
+	YyI9ox40tOZ2SErdfmb95t9SP1Eu10YpojxePqvpQhO4R0DsFcGIdOXiuNh4i7oDE8scf1
+	Xnk6AlK61qgnKVIJ4lvA7It8nGqZjUdIiuJwRSvE8LOz8GwEr9EtW5bT0UaOwA==
+Date: Mon, 18 Dec 2023 09:49:56 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, davem@davemloft.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell
+ King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Jonathan Corbet <corbet@lwn.net>, Marek =?UTF-8?B?QmVow7pu?=
+ <kabel@kernel.org>, Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
+ <nicveronese@gmail.com>
+Subject: Re: [PATCH net-next v4 01/13] net: phy: Introduce ethernet link
+ topology representation
+Message-ID: <20231218094956.676e7ed0@device-28.home>
+In-Reply-To: <ede222d4-11da-4b95-a685-17cb480694dd@lunn.ch>
+References: <20231215171237.1152563-1-maxime.chevallier@bootlin.com>
+	<20231215171237.1152563-1-maxime.chevallier@bootlin.com>
+	<20231215171237.1152563-2-maxime.chevallier@bootlin.com>
+	<20231215171237.1152563-2-maxime.chevallier@bootlin.com>
+	<20231215214523.ntk5kec32mb5vqjs@skbuf>
+	<ede222d4-11da-4b95-a685-17cb480694dd@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231215180827.3638838-1-victor@mojatatu.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-hello Victor, thanks for the patch!
+Hello Andrew,
 
-On Fri, Dec 15, 2023 at 03:08:27PM -0300, Victor Nogueira wrote:
-> As pointed out by Jamal in:
-> https://lore.kernel.org/netdev/CAM0EoMn4C-zwrTCGzKzuRYukxoqBa8tyHyFDwUSZYwkMOUJ4Lw@mail.gmail.com/
-> 
-> Mirred is allowing for infinite loops in certain use cases, such as the
-> following:
-> 
-> ----
-> sudo ip netns add p4node
-> sudo ip link add p4port0 address 10:00:00:01:AA:BB type veth peer \
->    port0 address 10:00:00:02:AA:BB
-> 
-> sudo ip link set dev port0 netns p4node
-> sudo ip a add 10.0.0.1/24 dev p4port0
-> sudo ip neigh add 10.0.0.2 dev p4port0 lladdr 10:00:00:02:aa:bb
-> sudo ip netns exec p4node ip a add 10.0.0.2/24 dev port0
-> sudo ip netns exec p4node ip l set dev port0 up
-> sudo ip l set dev p4port0 up
-> sudo ip netns exec p4node tc qdisc add dev port0 clsact
-> sudo ip netns exec p4node tc filter add dev port0 ingress protocol ip \
->    prio 10 matchall action mirred ingress redirect dev port0
-> 
-> ping -I p4port0 10.0.0.2 -c 1
-> -----
-> 
-> To solve this, we reintroduced a ttl variable attached to the skb (in
-> struct tc_skb_cb) which will prevent infinite loops for use cases such as
-> the one described above.
-> 
-> The nest per cpu variable (tcf_mirred_nest_level) is now only used for
-> detecting whether we should call netif_rx or netif_receive_skb when
-> sending the packet to ingress.
+Thanks for the review,
 
-looks good to me. Do you think it's worth setting an initial value (0, AFAIU)
-for tc_skb_cb(skb)->ttl inside tc_run() ?
+On Sun, 17 Dec 2023 17:57:10 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-other than this,
+> On Fri, Dec 15, 2023 at 11:45:23PM +0200, Vladimir Oltean wrote:
+> > On Fri, Dec 15, 2023 at 06:12:23PM +0100, Maxime Chevallier wrote:  
+> > > diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+> > > index d8e9335d415c..89daaccc9276 100644
+> > > --- a/drivers/net/phy/phy_device.c
+> > > +++ b/drivers/net/phy/phy_device.c
+> > > @@ -1491,6 +1500,11 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
+> > >  
+> > >  		if (phydev->sfp_bus_attached)
+> > >  			dev->sfp_bus = phydev->sfp_bus;
+> > > +
+> > > +		err = phy_link_topo_add_phy(&dev->link_topo, phydev,
+> > > +					    PHY_UPSTREAM_MAC, dev);
+> > > +		if (err)
+> > > +			goto error;
+> > >  	}
+> > >  
+> > >  	/* Some Ethernet drivers try to connect to a PHY device before
+> > > @@ -1816,6 +1830,7 @@ void phy_detach(struct phy_device *phydev)
+> > >  	if (dev) {
+> > >  		phydev->attached_dev->phydev = NULL;
+> > >  		phydev->attached_dev = NULL;
+> > > +		phy_link_topo_del_phy(&dev->link_topo, phydev);
+> > >  	}
+> > >  	phydev->phylink = NULL;
+> > >  
+> > > diff --git a/drivers/net/phy/phy_link_topology.c b/drivers/net/phy/phy_link_topology.c
+> > > new file mode 100644
+> > > index 000000000000..22f6372d002c
+> > > --- /dev/null
+> > > +++ b/drivers/net/phy/phy_link_topology.c
+> > > +int phy_link_topo_add_phy(struct phy_link_topology *topo,
+> > > +			  struct phy_device *phy,
+> > > +			  enum phy_upstream upt, void *upstream)
+> > > +{
+> > > +	struct phy_device_node *pdn;
+> > > +	int ret;
+> > > +
+> > > +	/* Protects phy and upstream */
+> > > +	ASSERT_RTNL();  
+> > 
+> > Something to think for the PHY library maintainers. This is probably
+> > the first time when the rtnl_lock() requirement is asserted at
+> > phy_attach_direct() time.  
+> 
+> There are two use cases here for plain MAC drivers.
+> 
+> 1) phy_attach_direct() is called from probe. RTNL is normally not
+> held, the driver would have to take it before making the call.
+> 
+> 2) phy_attach_direct() is called from ndo_open. In that case,
+> __dev_open() has a ASSERT_RTNL() so we can assume RTNL has been taken.
+> 
+> So i don't think we can assume RTNL is held, but it might be held.
+> 
+> We need a better understanding what is being protected here.
 
-Acked-by: Davide Caratti <dcaratti@redhat.com>
+I'm protecting the struct phy_device and the *upstream pointer (which
+can be a net_device or a struct phy_device as well). In particular, I'm
+protecting the phy_device->phyindex field. While I don't see any case
+where we would concurrently write to it, given the weird topologies
+that might be implemented in the future, I guess better safe than sorry.
+
+For the rest, the actual phy list and the next_index pointer from the
+topology should be already protected by the xarray mechanism.
+
+Thanks,
+
+Maxime
 
 
