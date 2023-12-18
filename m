@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-58466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F6E281687C
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:44:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEF27816881
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:45:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E14C1C2061B
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 08:44:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 662E7B20EC5
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 08:45:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9FC510799;
-	Mon, 18 Dec 2023 08:44:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C197E107AB;
+	Mon, 18 Dec 2023 08:45:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HCi3PFLi"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oy4IDvBA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7337C10954
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 08:44:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FC7A10944
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 08:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a2330a92ae6so142530266b.0
-        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 00:44:45 -0800 (PST)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-54c79968ffbso2787768a12.3
+        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 00:45:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702889083; x=1703493883; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1702889105; x=1703493905; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZMWYwK3CbGtnx2VTGLWwmSrr1KAJFsuwdnq4MZBC6CU=;
-        b=HCi3PFLiYAy/RF0crD5B0UbBbOw4g5o59ZSxgvFrBCD2d4rduxbTsQw1ruhVomZW5E
-         ZJv3XrQByU3J4iink7t8pimmhh/omy25IFNfi5iuiijYjIph1ApCXzlDznSTdPLnJbU2
-         8+EXEZtQ4C13ZqbGPbISBr0FeTYTbOhcxOE7Kg4si7CBpelPa9Z15wtT2W1xM6GT2ma3
-         YNDAxeiAy4ISUDHNWXHmwBUOTbNV3jBr7N4ymOmKzY/nQK5M1q+/gKC1sn8ZrQW1Kjlb
-         AYFR9WOc6h8cSLJc20CL7tQp6SDJY19i1X8Bfnpc2hOGLDiR2X6tCMOr3tva2ZbVVqQH
-         uMYg==
+        bh=pIEzOVRkrP5ZlHkJkS6jbdIe9GzUy3Ll5MhoztGKioY=;
+        b=oy4IDvBAhVARvWtJHCArn32RzIwqOqRgT5knY/6n3aFduVtgV/uaCZrjeLegUfD/5x
+         h8U0fQpRmif6MGURPestttu/eeRJFC/9JPDz1jLcqvwMmIohNuXykqZWC1USRV3mzOM+
+         T8u142mWpI2LH8npcNUgVjN0WKUBoEn+K3GAJL2XCr1tGhwOzlpMKRnCHePmNcb8MIxZ
+         0gY8LyE+raOgbYuSEo0UZzwLFaWW6Yw58j8ify8S5ON2Y1HEzBUbQsHPvX62wYOnW/no
+         +Wd1fHUxqM6UjF/SkJ6l5+sm7Y2jeD+Rg4G6vxnJa8JtLOqUzTSczu8t/muomFyOOOUC
+         +Njw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702889083; x=1703493883;
+        d=1e100.net; s=20230601; t=1702889105; x=1703493905;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZMWYwK3CbGtnx2VTGLWwmSrr1KAJFsuwdnq4MZBC6CU=;
-        b=nwkJwWOg2jmsGNXpe3JXBfHTeyJnqg9gmiqU2/tPjmak+VIvgbHKabY/spqIVetQIV
-         VFhXF7RPU2WzS+gX/PCawU+FLMCRSNaFvr4knr+KKF0Js7H0iHzDoFSvfFq7Vs+FSR07
-         JTJn0q6+vHRkhkCORPemhWmy56yWDMzO4GRVn4aZkXPOVo2p8+DdwxPmSj2mkZhYlyQj
-         WuJfG5BbpKzzTiXx3Zc4yErNXzW9lZA8rmRM0Ze9k2gHB0EKNogYdbIw+ysvmsrIH9GJ
-         fYtn/HUg4JxVuiiaMRYrtnCX/JfB9s66c034yhXt9HqEh6I00Os1/MFdXrVKr+ERb7Dz
-         jkKg==
-X-Gm-Message-State: AOJu0YzqEHoEb6ADGiQi+6hwSL+7mcTmNy0uVZGmxGdGeO/5UwiFWrA5
-	M5WqwsGf7txlIoJABo3wnHxitw==
-X-Google-Smtp-Source: AGHT+IEHuMjiuLD+YNzav0nUQJUTLKh0DDmvvPeULRx70vkz+3GCGaGXwOkr2RH0PzwNAKCp4aOn7Q==
-X-Received: by 2002:a17:906:212:b0:a1c:d54e:c026 with SMTP id 18-20020a170906021200b00a1cd54ec026mr7697472ejd.4.1702889083674;
-        Mon, 18 Dec 2023 00:44:43 -0800 (PST)
+        bh=pIEzOVRkrP5ZlHkJkS6jbdIe9GzUy3Ll5MhoztGKioY=;
+        b=rYNVCx2syJW9hxbYFeEmMRu7VhdslVrgaDYnfLB2zDspePKZqQ0RopGw59rD/q5gne
+         0Ow1+F9fy/xGpI/IK8UR8pc49z5GJbkOIyMd6VM3rmEcSaWz7v47krpo5tNzJQlpfYXW
+         XnLWyVFaUGKpKVRZtWeL3sdo+1oWYBizy5KmIEIEYgQlIUGC+WlOvTU0bOYcF4CgtaNJ
+         hXyWkEwEW7TsizkD/uB/SkskXwbG6unixxFXMC1YezSHTUnp5EbvfAk7p0+ezaPAsUdA
+         NQu1+5JInIOuUbOaRZSWW1V/NRnENiWcasm50W+DER9FVo02P2moCQaehlO1bmIy3xvP
+         +ltQ==
+X-Gm-Message-State: AOJu0Ywm+qAglAliBfcaLv/oAFPtUl81eUA4QOqWUNcfbI+8oSBQVkuf
+	AY1RClCpvtxIi0kUbHYz3WLXbg==
+X-Google-Smtp-Source: AGHT+IHifk4eiA2098i7qwcOvk+ZyWM9zVlobKjkFVr4SeOAuEWKH0xh16q8/HzNWFRiiQw/8Cagqg==
+X-Received: by 2002:a17:907:37a:b0:a23:4529:9fcc with SMTP id rs26-20020a170907037a00b00a2345299fccmr743462ejb.18.1702889105646;
+        Mon, 18 Dec 2023 00:45:05 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.218.27])
-        by smtp.gmail.com with ESMTPSA id p7-20020a17090628c700b00a236347e97esm268947ejd.8.2023.12.18.00.44.40
+        by smtp.gmail.com with ESMTPSA id p7-20020a17090628c700b00a236347e97esm268947ejd.8.2023.12.18.00.45.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Dec 2023 00:44:42 -0800 (PST)
-Message-ID: <0a9e8da3-5bfe-4d8e-ac76-01ab28e9ce56@linaro.org>
-Date: Mon, 18 Dec 2023 09:44:40 +0100
+        Mon, 18 Dec 2023 00:45:04 -0800 (PST)
+Message-ID: <1aaf7d90-a0dc-4629-bf4a-99cd7c5b489c@linaro.org>
+Date: Mon, 18 Dec 2023 09:45:02 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,7 +81,8 @@ To: Eric Woudstra <ericwouds@gmail.com>, "David S. Miller"
  Daniel Golle <daniel@makrotopia.org>, Lucien Jheng
  <lucien.jheng@airoha.com>, Zhi-Jun You <hujy652@protonmail.com>
 Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org
-References: <20231216194432.18963-2-ericwouds@gmail.com>
+References: <20231216194321.18928-1-ericwouds@gmail.com>
+ <20231216194321.18928-2-ericwouds@gmail.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -127,68 +128,17 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20231216194432.18963-2-ericwouds@gmail.com>
+In-Reply-To: <20231216194321.18928-2-ericwouds@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 16/12/2023 20:44, Eric Woudstra wrote:
+On 16/12/2023 20:43, Eric Woudstra wrote:
 > The en8811h phy can be set with serdes polarity reversed on rx and/or tx.
-
-Please use subject prefixes matching the subsystem. You can get them for
-example with `git log --oneline -- DIRECTORY_OR_FILE` on the directory
-your patch is touching.
-
-A nit, subject: drop second/last, redundant "bindings documentation
-yaml". The "dt-bindings" prefix is already stating that these are
-bindings. Quite redundant/useless subject.
-
 > 
 > Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
 > ---
->  .../bindings/net/airoha,en8811h.yaml          | 42 +++++++++++++++++++
->  1 file changed, 42 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/airoha,en8811h.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/airoha,en8811h.yaml b/Documentation/devicetree/bindings/net/airoha,en8811h.yaml
-> new file mode 100644
-> index 000000000000..96febd8ed6fa
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/airoha,en8811h.yaml
-> @@ -0,0 +1,42 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/airoha,en8811h.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Airoha EN8811H PHY
-> +
-> +maintainers:
-> +  - Someone <someone@somemail.com>
-> +
-> +description:
-> +  Bindings for Airoha EN8811H PHY
 
-Drop "Bindings for" and instead describe the hardware. Don't copy the
-title, what's the point in this?
-
-> +
-> +allOf:
-> +  - $ref: ethernet-phy.yaml#
-> +
-> +properties:
-> +  airoha,rx-pol-reverse:
-> +    type: boolean
-> +    description:
-> +      Reverse rx polarity of SERDES.
-> +
-> +
-
-No, that won't work. Your schema is not being applied. Look at patches
-on the mailing list for the phys.
-
-
-Why do I see multiple patchsets of this?
+Why duplicated patchsets? Nothing improved here.
 
 Best regards,
 Krzysztof
