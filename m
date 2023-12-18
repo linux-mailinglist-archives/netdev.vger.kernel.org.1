@@ -1,115 +1,118 @@
-Return-Path: <netdev+bounces-58629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99B57817A25
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 19:56:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 530FA817A78
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 20:01:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B96351C21995
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 18:56:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69F401C21B8E
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 19:01:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1B72574D;
-	Mon, 18 Dec 2023 18:56:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A41C495DE;
+	Mon, 18 Dec 2023 19:00:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siddh.me header.i=code@siddh.me header.b="YeyPUT89"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KtBSFMcs"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender-of-o51.zoho.in (sender-of-o51.zoho.in [103.117.158.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 853201EB24;
-	Mon, 18 Dec 2023 18:56:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=siddh.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=siddh.me
-ARC-Seal: i=1; a=rsa-sha256; t=1702925748; cv=none; 
-	d=zohomail.in; s=zohoarc; 
-	b=D+FmKTCl43bfhfUKQmCUxHOQTjaAXyP/W5ffXJWbfaxcgQB/Opu/E19h3mTIqqYWPo5T9+RJnRcu/B8vf7tHwSAnlY7UOkqGkdU4Cs49aG9Op1nMGQqQOgjPDzOIg3X3LkUkjQQtzPQKt1+pk69LtTJ5cHncUngMOfWA1YZvdNw=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
-	t=1702925748; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=U66pKooJUfR7TnaJpMLRYIeBDW23xBDJpRAZey+fgdc=; 
-	b=GVvbEJseT0kebZPXxsw7+wdSWlxZv5kXEnr9OSmrUGYWOm4DX5BRqWiB8jYRPWCpRiXiPy1hF+9gIGpfN+SkLnRzwioIcpsQXvG61/aDnK4bolZuk0Q/OVWkx0bLMG9Q5H7QnZngoikq7Vr4MNJsrAwyvbTt7NS2BNjvGwBSIks=
-ARC-Authentication-Results: i=1; mx.zohomail.in;
-	dkim=pass  header.i=siddh.me;
-	spf=pass  smtp.mailfrom=code@siddh.me;
-	dmarc=pass header.from=<code@siddh.me>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1702925748;
-	s=zmail; d=siddh.me; i=code@siddh.me;
-	h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=U66pKooJUfR7TnaJpMLRYIeBDW23xBDJpRAZey+fgdc=;
-	b=YeyPUT89Msd3TQhtUSVEOVig93P0jLiNesER9OZuP4tRriHJVfbxnkhGSRFPogAD
-	ibBqva0KEsYUmHq2e00ax1zcRwnqkfqmFj6JuzuFXsUN7jrKSR0dNJwxIwtz90aTKqr
-	qOHmRnv052/n9pzdkwq5sVB67M9Je+wsLuZV0dQA=
-Received: from mail.zoho.in by mx.zoho.in
-	with SMTP id 1702925716591727.0450941163903; Tue, 19 Dec 2023 00:25:16 +0530 (IST)
-Date: Tue, 19 Dec 2023 00:25:16 +0530
-From: Siddh Raman Pant <code@siddh.me>
-To: "Krzysztof Kozlowski" <krzysztof.kozlowski@linaro.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	"Eric Dumazet" <edumazet@google.com>,
-	"Jakub Kicinski" <kuba@kernel.org>,
-	"Paolo Abeni" <pabeni@redhat.com>,
-	"Suman Ghosh" <sumang@marvell.com>,
-	"netdev" <netdev@vger.kernel.org>,
-	"linux-kernel" <linux-kernel@vger.kernel.org>,
-	"syzbot+bbe84a4010eeea00982d"
- <syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com>
-Message-ID: <18c7e484c46.35167daf376072.28325334020826186@siddh.me>
-In-Reply-To: <6160aa1e-5f77-4d7d-aafd-e1ac7606bf06@linaro.org>
-References: <cover.1702816635.git.code@siddh.me>
- <0d812b9aae2f16691d373460b06c5f3e098ed2a6.1702816635.git.code@siddh.me> <6160aa1e-5f77-4d7d-aafd-e1ac7606bf06@linaro.org>
-Subject: Re: [PATCH net-next v6 1/2] nfc: llcp_core: Hold a ref to
- llcp_local->dev when holding a ref to llcp_local
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8D77146A;
+	Mon, 18 Dec 2023 19:00:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 442E2C433CA;
+	Mon, 18 Dec 2023 19:00:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702926058;
+	bh=VApFh3cRumz6BLzq1kdAeoE0D33106JBTlF4Ob27DSg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KtBSFMcsOxj1N0SaNjSviRGYpMENFKp7sNvzql/Z+d+Q5EBYkme6rrWcaBnpFzokT
+	 mnUhEyPn/1J7SGFTBlVi9IB1YaUXXtr7iu1DTuik9c+O/SnpYZJMbUOLCRlrsxnn/v
+	 xx0YGhthVVS5L+2HFXiJ+E0ZDZe2rgRxcE/vPe6bSAgIVaI7gQDKWcxwc2hiyRHjrJ
+	 omOwu3Zeww79+vv7L8bRgRRgsMsnxMaT/MYj4BtTmllEWVWmT4IP4Q0xYEzyRtaGRb
+	 QywvQhrNi7Qww36KtXcJXZg3/C3OpoV3JjFmLx7C5OB3qX6q6E64CdVfsiQ3s8lGRn
+	 dVdiT2uak84pA==
+Date: Mon, 18 Dec 2023 12:00:55 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Simon Horman <horms@kernel.org>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: Re: [PATCH iwl-next] i40e: Avoid unnecessary use of comma operator
+Message-ID: <20231218190055.GB2863043@dev-arch.thelio-3990X>
+References: <20231217-i40e-comma-v1-1-85c075eff237@kernel.org>
+ <CAKwvOd=ZKV6KsgX0UxBX4Y89YEgpry00jG6K6qSjodwY3DLAzA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Importance: Medium
-User-Agent: Zoho Mail
-X-Mailer: Zoho Mail
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKwvOd=ZKV6KsgX0UxBX4Y89YEgpry00jG6K6qSjodwY3DLAzA@mail.gmail.com>
 
-On Mon, 18 Dec 2023 15:09:00 +0530, Krzysztof Kozlowski wrote:
-> On 17/12/2023 14:11, Siddh Raman Pant wrote:
-> >  static struct nfc_llcp_sock *nfc_llcp_sock_get(struct nfc_llcp_local *local,
-> > @@ -959,8 +974,18 @@ static void nfc_llcp_recv_connect(struct nfc_llcp_local *local,
-> >  	}
-> >  
-> >  	new_sock = nfc_llcp_sock(new_sk);
-> > -	new_sock->dev = local->dev;
-> > +
-> >  	new_sock->local = nfc_llcp_local_get(local);
-> > +	if (!new_sock->local) {
-> > +		reason = LLCP_DM_REJ;
-> > +		release_sock(&sock->sk);
-> > +		sock_put(&sock->sk);
-> > +		sock_put(&new_sock->sk);
+On Mon, Dec 18, 2023 at 08:32:28AM -0800, Nick Desaulniers wrote:
+> On Sun, Dec 17, 2023 at 1:45 AM Simon Horman <horms@kernel.org> wrote:
+> >
+> > Although it does not seem to have any untoward side-effects,
+> > the use of ';' to separate to assignments seems more appropriate than ','.
+> >
+> > Flagged by clang-17 -Wcomma
 > 
-> Why is this needed? Which part earlier gets the reference?
-
-Thanks for pointing out. sk_init sets refcount to 1. Actually on a
-further look, the next line shouldn't be there as nfc_llcp_sock_free()
-is already called in sk->sk_destruct (== llcp_sock_destruct()), which
-is called via __sk_destruct().
-
-As sock_put() -> sk_free() -> __sk_destruct() -> sk_prot_free(),
-so we need to put.
-
-TBH really don't know why nfc_llcp_sock_free() is not static.
-
-> > +		nfc_llcp_sock_free(new_sock);
+> Yikes! This kind of example is why I hate the comma operator!
 > 
-> This order is still wrong. Unwinding is almost always done in reversed
-> order, for good reasons. Why do you unwind in other order?
+> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+> 
+> (Is -Wcomma enabled by -Wall?)
 
-Oops, extremely sorry about that :( I reverted back to wrong ordering
-from an older local commit and didn't check.
+No and last time that I looked into enabling it, there were a lot of
+instances in the kernel:
 
-I'll send the fixed one.
+https://lore.kernel.org/20230630192825.GA2745548@dev-arch.thelio-3990X/
 
-Thanks,
-Siddh
+It is still probably worth pursuing at some point but that is a lot of
+instances to clean up (along with potentially having a decent amount of
+pushback depending on the changes necessary to eliminate all instances).
+
+> Is there a fixes tag we can add?
+> 
+> >
+> > No functional change intended.
+> > Compile tested only.
+> >
+> > Signed-off-by: Simon Horman <horms@kernel.org>
+> > ---
+> >  drivers/net/ethernet/intel/i40e/i40e_ethtool.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
+> > index 812d04747bd0..f542f2671957 100644
+> > --- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
+> > +++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
+> > @@ -1917,7 +1917,7 @@ int i40e_get_eeprom(struct net_device *netdev,
+> >                         len = eeprom->len - (I40E_NVM_SECTOR_SIZE * i);
+> >                         last = true;
+> >                 }
+> > -               offset = eeprom->offset + (I40E_NVM_SECTOR_SIZE * i),
+> > +               offset = eeprom->offset + (I40E_NVM_SECTOR_SIZE * i);
+> >                 ret_val = i40e_aq_read_nvm(hw, 0x0, offset, len,
+> >                                 (u8 *)eeprom_buff + (I40E_NVM_SECTOR_SIZE * i),
+> >                                 last, NULL);
+> >
+> >
+> 
+> 
+> -- 
+> Thanks,
+> ~Nick Desaulniers
+> 
 
