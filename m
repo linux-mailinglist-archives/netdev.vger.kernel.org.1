@@ -1,49 +1,71 @@
-Return-Path: <netdev+bounces-58461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B59EC816818
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:34:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2D1881681B
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:35:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71A69280D6E
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 08:34:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87AB31F22E32
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 08:35:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A801094B;
-	Mon, 18 Dec 2023 08:33:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE776101F7;
+	Mon, 18 Dec 2023 08:35:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nNXxBIND"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cqKR6jTw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BAF1119F
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 08:33:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCF01C433BA;
-	Mon, 18 Dec 2023 08:33:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D471101E8;
+	Mon, 18 Dec 2023 08:35:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14FCAC433C8;
+	Mon, 18 Dec 2023 08:35:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702888431;
-	bh=6S0SJlUripJgMDU4h59IQMRxeLJODmnZ9gVF+qUmWvk=;
+	s=k20201202; t=1702888506;
+	bh=PvieyW9kHU+3JjdvRizTuAsBF+M7+DN21zt8QD6huP8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nNXxBINDMlki/Tl0E4AsMgkGk7YOYj73aqX77FRDHxY5RCfRxZCilwYJQbzm2bcZ9
-	 Yi8mWmOKl04c3iu9U14YEFo7MjE/eV1cvZYJxC/5BrwnAwnnmwnXIvZl/EK6MX5wal
-	 l3EGIpqfLcJI6cYXFZfDUNwM/kYxZNbLOuanS+iTOylb+tvuerOhi+2/jCc6lxlZPn
-	 5RCxd+imUVrAVpqZhvmCh9r551IEDmOA7qiBDyI/v4JKkEg357czL/o6QR0rV3V2/P
-	 1LXnvNLTDvZsfv8/ljkebjz2e1Piy9dsF4l0z7ZN0ph29wG2zD/4Rchgn/Jmm2RF42
-	 UJ2SgSIQHREmw==
-Date: Mon, 18 Dec 2023 08:33:45 +0000
-From: Simon Horman <horms@kernel.org>
-To: Ioana Ciornei <ioana.ciornei@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 6/8] dpaa2-switch: reorganize the
- [pre]changeupper events
-Message-ID: <20231218083345.GA6288@kernel.org>
-References: <20231213121411.3091597-1-ioana.ciornei@nxp.com>
- <20231213121411.3091597-7-ioana.ciornei@nxp.com>
- <20231215114939.GB6288@kernel.org>
- <tkskehfowdrohukyhqu4ae6t56ceuwp6p2mm7r2tfzihladl6t@vxeggsm2ppte>
+	b=cqKR6jTwpmCKyTFqiDsud8Ud91Y2vl0XnJ70WkUUWsejg3N21krgNOC2hGTW6Sr//
+	 PkugwCVTKDJbZBbTAjn2pZOtgeXLfIt4KhVQdagYFnoBeWEVHdgSDchIq1/IEoOYgz
+	 UPhMPfMZofuUfwXr9yS3PhKhC0IHJypA2VlCOfPMF5X3opuQwu7Tnyq59gPlfhE2L7
+	 BMOT1Z09reyctvlBiTybBEDPjQ60FLqs31RXDW6RG7gr4O0un4ilMkg7Cgrs/fszps
+	 ppFsjdnc33uZ69wLfbVJFyRfIMVBseNo/FtnnrcNqwp53jB9iKEBeFsADcFruxnW5a
+	 /8S2G6GLNLRGw==
+Received: from johan by xi.lan with local (Exim 4.96.2)
+	(envelope-from <johan@kernel.org>)
+	id 1rF95c-0003FH-0v;
+	Mon, 18 Dec 2023 09:35:05 +0100
+Date: Mon, 18 Dec 2023 09:35:04 +0100
+From: Johan Hovold <johan@kernel.org>
+To: Francesco Dolcini <francesco@dolcini.it>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>, linux-bluetooth@vger.kernel.org,
+	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, greybus-dev@lists.linaro.org,
+	linux-iio@vger.kernel.org, netdev@vger.kernel.org,
+	chrome-platform@lists.linux.dev,
+	platform-driver-x86@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Alex Elder <elder@kernel.org>, Jonathan Cameron <jic23@kernel.org>,
+	Lee Jones <lee@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
+	Benson Leung <bleung@chromium.org>,
+	Tzung-Bi Shih <tzungbi@kernel.org>, Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v1] treewide, serdev: change receive_buf() return type to
+ size_t
+Message-ID: <ZYAEOCMwZGMNvpNX@hovoldconsulting.com>
+References: <20231214170146.641783-1-francesco@dolcini.it>
+ <ZXxWX-Fw1InID2ax@hovoldconsulting.com>
+ <ZXxa7yzKzG6048vw@francesco-nb.int.toradex.com>
+ <ZXx8bCVyxJ9Ddvqm@hovoldconsulting.com>
+ <ZXyH1Zv3Pxd6S3ag@francesco-nb.int.toradex.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,70 +74,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <tkskehfowdrohukyhqu4ae6t56ceuwp6p2mm7r2tfzihladl6t@vxeggsm2ppte>
+In-Reply-To: <ZXyH1Zv3Pxd6S3ag@francesco-nb.int.toradex.com>
 
-On Fri, Dec 15, 2023 at 02:08:51PM +0200, Ioana Ciornei wrote:
-> On Fri, Dec 15, 2023 at 11:49:39AM +0000, Simon Horman wrote:
-> > On Wed, Dec 13, 2023 at 02:14:09PM +0200, Ioana Ciornei wrote:
+On Fri, Dec 15, 2023 at 06:07:33PM +0100, Francesco Dolcini wrote:
 
-...
-
-> > >  	if (!dpaa2_switch_port_dev_check(netdev))
-> > > -		return NOTIFY_DONE;
-> > > +		return 0;
-> > >  
-> > >  	extack = netdev_notifier_info_to_extack(&info->info);
-> > > -
-> > > -	switch (event) {
-> > > -	case NETDEV_PRECHANGEUPPER:
-> > > -		upper_dev = info->upper_dev;
-> > > -		if (!netif_is_bridge_master(upper_dev))
-> > > -			break;
-> > > -
-> > > +	upper_dev = info->upper_dev;
-> > > +	if (netif_is_bridge_master(upper_dev)) {
-> > >  		err = dpaa2_switch_prechangeupper_sanity_checks(netdev,
-> > >  								upper_dev,
-> > >  								extack);
-> > >  		if (err)
-> > > -			goto out;
-> > > +			return err;
-> > >  
-> > >  		if (!info->linking)
-> > >  			dpaa2_switch_port_pre_bridge_leave(netdev);
-> > > +	}
+> On Fri, Dec 15, 2023 at 05:18:52PM +0100, Johan Hovold wrote:
+> > On Fri, Dec 15, 2023 at 02:55:59PM +0100, Francesco Dolcini wrote:
+> > > To me the change is correct, with that said probably this should have
+> > > been explicitly mentioned in the commit message or a separate
+> > > preparation patch.
 > > 
-> > FWIIW, I think that a more idomatic flow would be to return if
-> > netif_is_bridge_master() is false. Something like this (completely untested!):
+> > It's a separate change and should not be hidden away in a tree-wide
+> > change that goes through a different maintainer.
 > > 
-> > 	if (!netif_is_bridge_master(upper_dev))
-> > 		return 0;
-> > 
-> > 	err = dpaa2_switch_prechangeupper_sanity_checks(netdev, upper_dev,
-> > 							extack);
-> > 	if (err)
-> > 		return err;
-> > 
-> > 	if (!info->linking)
-> > 		dpaa2_switch_port_pre_bridge_leave(netdev);
-> > 
+> > Please drop this change from this patch and resubmit it separately to me
+> > if you want and I'll review when I have the time.
 > 
-> It looks better but I don't think this it's easily extensible.
+> Fine, I agree.
 > 
-> I am planning to add support for LAG offloading which would mean that I
-> would have to revert to the initial flow and extend it to something
-> like:
+> I see those options (let me know if you see other options I have not
+> mentioned):
 > 
-> 	if (netif_is_bridge_master(upper_dev)) {
-> 		...
-> 	} else if (netif_is_lag_master(upper_dev)) {
-> 		...
-> 	}
+> 1. I add this change (taking into account also intel ice) as a separate
+>    patch in this series and you may just ack it and Greg could merge
+>    together with the serdev one.
+> 2. I prepare an independent patch for the GNSS change and only once this
+>    is merged I'll send a rebased v2 of this one.
+> 3. I update this patch without this GNSS API change, that mean I will
+>    have to cast away the signed type from a few GNSS drivers.
 > 
-> The same thing applies to the dpaa2_switch_port_changeupper() function
-> below.
+> 1 is my preferred option, 2 is fine, but it seems a little bit of overdoing,
+> 3 I would avoid, we are doing this cleanup to be a little bit more
+> strongly typed and to prevent the kind of bugs that is the original trigger
+> for this patch.
 
-Understood. If this is going somewhere then don't let me derail it.
+Changing the return type of gnss_insert_raw() is going to be a bit more
+involved and should be done in a separate patch (e.g. you need to look
+at gnss_usb_rx_complete() and ice_gnss_read() to avoid introducing new
+warnings there).
 
-,,,
+And both option 2 and 3 will introduce conversion warnings (W=3, which
+we have plenty of anyway) unless you add casts.
+
+I suggest you go with 3, unless you insist on 2.
+
+Johan
 
