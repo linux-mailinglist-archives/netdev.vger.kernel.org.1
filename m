@@ -1,84 +1,82 @@
-Return-Path: <netdev+bounces-58595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 793C4817671
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 16:58:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7FC68177C9
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 17:44:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D6C41F22AF6
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 15:58:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B662F1C21E96
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 16:44:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DAAF3A1B6;
-	Mon, 18 Dec 2023 15:57:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A15D849888;
+	Mon, 18 Dec 2023 16:44:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c97I722j"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dJn8RQUE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A2A1EA71
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 15:57:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-db3a09e96daso1933988276.3
-        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 07:57:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702915074; x=1703519874; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zygwJSjMe2eYUZaDyLafoB0FdFlBGABC230eRNUsyrM=;
-        b=c97I722jYGBSf69ld0eJdfST3NMGpRWI53kpzYAStrssW6lEiAgFk9Cc6GPvv9FW5N
-         O4YHUSKs/gbUFsJWDF3z/6Jt5M98MupuMGJMvssjtxdqz8gf+lS+l64p7jbPa7CAKn+I
-         th9HE5HBc07Jb66vtc9Rzvq4Xr/7UVbFgQwozMe+0dKtb6jdK+QFwNymBYDVMitBiLyo
-         sQRqgWodyJU2zDkh+HhnSIUUCwDF4lXOhfZFuUGF8lrOs/SjzgmTf75hm/1CwdBA0R8P
-         QnGN/9ixgG88EWJJ2geHPSeh1G3gXwxTRoSgIOzaiKazbz2aoyIGz6O7PGktUXY8PJHr
-         PMBA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FFE71E4B0
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 16:44:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702917890;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RzF2JbZXyIcepSdPLxopsW7MW0ToCu0TxILicJdkReA=;
+	b=dJn8RQUE8Cjze3TeSOrkPHNBa03ynMx2ct+Px9eEBEnDIDyZRaTFIKckXmWQdJ6y50/BqO
+	nAqgZl4yJa8qHuPvsjs8wyduw1yGfU829oxZCB82lNu28vuzUmp06S7o6ygBfl/wjmKoWW
+	Y5QnpRtBfvaIjciRYpBKPXcHbgY2uJk=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-44-O7Y7ZSohOUqC4iF-vQnigw-1; Mon, 18 Dec 2023 11:44:48 -0500
+X-MC-Unique: O7Y7ZSohOUqC4iF-vQnigw-1
+Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-6da08049013so3718643a34.2
+        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 08:44:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702915074; x=1703519874;
+        d=1e100.net; s=20230601; t=1702917888; x=1703522688;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zygwJSjMe2eYUZaDyLafoB0FdFlBGABC230eRNUsyrM=;
-        b=AGDRfOdCFn7PgXcwjqZ6tZbfBAiHqUPAZtNvglek0QhHJQlUyyenfgMYAUHeZsatJ0
-         DYPsBluT9G7cC5sXnAr7ThMBhCTm2oY6ctomL6+83yDe58iQ2lLLX00y7123wz/+UcKK
-         g9d4KDihkiv0uG/Xk2bOkK9y+UEmQHOyGwnHXih3eR3BoKEV+g5SWRciZ5b3KnxpkPx6
-         imAxYHkGMKeX2qXRQKAO92igWiYGKDeEm0VWHLzRpvE+isnTvUMtH4C5ND3M9Dtrjn4H
-         f/aVMEIZgWoB+pJJVom5s0g5xGtXVoyZQC/w5vg8DRDN8qPdXI686S+N8DNbMY18HfDc
-         H9Ag==
-X-Gm-Message-State: AOJu0YxHaa6IcK25xp4hXLMwni3p6aIEHdSsUXxVLDljhU9Y9IAA17On
-	BbLHRuUu2ltgtB5hnQmh8Zk=
-X-Google-Smtp-Source: AGHT+IHenxc44IBKqvf9+YpIc5gdTJ+X6U7J9szWeK56xk4R6IXcAibg8OOKyP6YFyuok23IHHMF0w==
-X-Received: by 2002:a05:6902:245:b0:db7:dad0:60c1 with SMTP id k5-20020a056902024500b00db7dad060c1mr8289686ybs.78.1702915073569;
-        Mon, 18 Dec 2023 07:57:53 -0800 (PST)
-Received: from localhost ([2601:344:8301:57f0:9c41:1dd2:7d5d:e008])
-        by smtp.gmail.com with ESMTPSA id g13-20020a258a0d000000b00d8674371317sm7720490ybl.36.2023.12.18.07.57.44
+        bh=RzF2JbZXyIcepSdPLxopsW7MW0ToCu0TxILicJdkReA=;
+        b=uI7V/xI8mTMwXMCUmpSnJ7heg27/o32JTVOe8/7Xa47I1vY0aEGw2Xuc6qFqafSaiD
+         WFiw4719AdGTZZ2VEpBo6AffxD74N+SZc5VQ4E0IqcYDcKSj6Armbz+W13tWcnPy8Pm7
+         3xvDCI2AyWjxL7y+FOs6JRWTR1bE7/llkpwzHk5BCF1aIcseR23+3aEz6tN+NzE1OO17
+         Ngf4VkZA4wVmyFu3RuEBc+uxNfTIoFwThpCi9QdjF0l6mhF7qV9o3s45bd50fGfGcpRs
+         6LT5LHmQFpePoQN+h2hJUT+NF3FtEqeIQG4vGsimIC27XYzRLbwqyY1wQvEMVzAL72Y6
+         6+lQ==
+X-Gm-Message-State: AOJu0YyKdM2bZvgDBNQT3TcHuz/CF+h3Gex7r9MMuRtCyYSe1VDCKDZb
+	x/6lepdvCIomPO0aEjwB0brGsSa0voAmnJrKjfxuYcx1BnQM3hdbwm5Iz1znevIoH+9w6jm5ynu
+	A194+7Ms8oPmnnQTF
+X-Received: by 2002:a0c:d84d:0:b0:67e:f2a3:65b3 with SMTP id i13-20020a0cd84d000000b0067ef2a365b3mr10243373qvj.43.1702916069123;
+        Mon, 18 Dec 2023 08:14:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE6/x18YmncDwyp50UjFRfP/NiAFTZa/XpjJpoegbGivyb5S1NuE3buhOUOC8ymOCWqVGkP/Q==
+X-Received: by 2002:a0c:d84d:0:b0:67e:f2a3:65b3 with SMTP id i13-20020a0cd84d000000b0067ef2a365b3mr10243358qvj.43.1702916068894;
+        Mon, 18 Dec 2023 08:14:28 -0800 (PST)
+Received: from fedora ([2600:1700:1ff0:d0e0::37])
+        by smtp.gmail.com with ESMTPSA id l10-20020a0ce84a000000b0067f38f0afd1sm1644254qvo.19.2023.12.18.08.14.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Dec 2023 07:57:46 -0800 (PST)
-Date: Mon, 18 Dec 2023 07:57:43 -0800
-From: Yury Norov <yury.norov@gmail.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Alexander Potapenko <glider@google.com>
-Cc: Marcin Szycik <marcin.szycik@linux.intel.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>, pabeni@redhat.com,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	michal.swiatkowski@linux.intel.com, wojciech.drewek@intel.com,
-	idosch@nvidia.com, jesse.brandeburg@intel.com,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	jiri@resnulli.us
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 0/7] Add PFCP filter support
-Message-ID: <ZYBr98sd+XzSfy9v@yury-ThinkPad>
-References: <20231207164911.14330-1-marcin.szycik@linux.intel.com>
- <b3e5ec09-d01b-0cea-69ea-c7406ea3f8b5@intel.com>
- <13f7d3b4-214c-4987-9adc-1c14ae686946@intel.com>
- <aeb76f91-ab1d-b951-f895-d618622b137b@intel.com>
- <539ae7a3-c769-4cf6-b82f-74e05b01f619@linux.intel.com>
- <67e287f5-b126-4049-9f3b-f05bf216c8b9@intel.com>
- <20231215084924.40b47a7e@kernel.org>
- <ff8cfb1e-8a03-4a82-a651-3424bf9787a6@linux.intel.com>
- <1eb475bb-d2ba-4cf3-a2ce-36263b61b5ff@intel.com>
+        Mon, 18 Dec 2023 08:14:28 -0800 (PST)
+Date: Mon, 18 Dec 2023 10:14:25 -0600
+From: Andrew Halaney <ahalaney@redhat.com>
+To: Sneh Shah <quic_snehshah@quicinc.com>
+Cc: Vinod Koul <vkoul@kernel.org>, 
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kernel@quicinc.com
+Subject: Re: [PATCH net-next] net: stmmac: Fix ethool link settings ops for
+ integrated PCS
+Message-ID: <lcfvxawesjc3r2n66zjd2qu5gan7gvvpefgjqjzqwcxosh3n4l@kcggappvytkm>
+References: <20231218135032.27209-1-quic_snehshah@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,60 +85,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1eb475bb-d2ba-4cf3-a2ce-36263b61b5ff@intel.com>
+In-Reply-To: <20231218135032.27209-1-quic_snehshah@quicinc.com>
 
-+ Alexander Potapenko
+Hi,
 
-On Mon, Dec 18, 2023 at 01:47:01PM +0100, Alexander Lobakin wrote:
-> From: Marcin Szycik <marcin.szycik@linux.intel.com>
-> Date: Mon, 18 Dec 2023 11:04:01 +0100
+I think the subject should be [PATCH net] since this is a fix.
+
+On Mon, Dec 18, 2023 at 07:20:32PM +0530, Sneh Shah wrote:
+> Currently get/set_link_ksettings ethtool ops are dependent on PCS.
+> When PCS is integrated in MAC, it will not have separate link config.
+> Bypass cofiguring and checking PCS link config for integrated PCS.
+
+s/cofiguring/configuring/
+
+Please add:
+
+    Fixes: ("aa571b6275fb net: stmmac: add new switch to struct plat_stmmacenet_data")
+
+This fixes using the ethtool ops for me so also please feel free to add:
+
+    Tested-by: Andrew Halaney <ahalaney@redhat.com> # sa8775p-ride
+
+Thanks for the patch!
+
 > 
-> > 
-> > 
-> > On 15.12.2023 17:49, Jakub Kicinski wrote:
-> >> On Fri, 15 Dec 2023 11:11:23 +0100 Alexander Lobakin wrote:
-> >>> Ping? :s
-> >>> Or should we resubmit?
-> >>
-> >> Can you wait for next merge window instead?
-> >> We're getting flooded with patches as everyone seemingly tries to get
-> >> their own (i.e. the most important!) work merged before the end of 
-> >> the year. The set of PRs from the bitmap tree which Linus decided
-> >> not to pull is not empty. So we'd have to go figure out what's exactly
-> >> is in that branch we're supposed to pull, and whether it's fine.
-> >> It probably is, but you see, this is a problem which can be solved by
-> >> waiting, and letting Linus pull it himself. While the 150 patches we're
-> >> getting a day now have to be looked at.
-> > 
-> > Let's wait to the next window then.
+> Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
 > 
-> Hey Yury,
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> index f628411ae4ae..e3ba4cd47b8d 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> @@ -311,8 +311,9 @@ static int stmmac_ethtool_get_link_ksettings(struct net_device *dev,
+>  {
+>  	struct stmmac_priv *priv = netdev_priv(dev);
+>  
+> -	if (priv->hw->pcs & STMMAC_PCS_RGMII ||
+> -	    priv->hw->pcs & STMMAC_PCS_SGMII) {
+> +	if (!(priv->plat->flags & STMMAC_FLAG_HAS_INTEGRATED_PCS) &&
+> +	    (priv->hw->pcs & STMMAC_PCS_RGMII ||
+> +	     priv->hw->pcs & STMMAC_PCS_SGMII)) {
+>  		struct rgmii_adv adv;
+>  		u32 supported, advertising, lp_advertising;
+>  
+> @@ -397,8 +398,9 @@ stmmac_ethtool_set_link_ksettings(struct net_device *dev,
+>  {
+>  	struct stmmac_priv *priv = netdev_priv(dev);
+>  
+> -	if (priv->hw->pcs & STMMAC_PCS_RGMII ||
+> -	    priv->hw->pcs & STMMAC_PCS_SGMII) {
+> +	if (!(priv->plat->flags & STMMAC_FLAG_HAS_INTEGRATED_PCS) &&
+> +	    (priv->hw->pcs & STMMAC_PCS_RGMII ||
+> +	     priv->hw->pcs & STMMAC_PCS_SGMII)) {
+>  		/* Only support ANE */
+>  		if (cmd->base.autoneg != AUTONEG_ENABLE)
+>  			return -EINVAL;
+> -- 
+> 2.17.1
 > 
-> Given that PFCP will be resent in the next window...
-> 
-> Your "boys" tree is in fact self-contained -- those are mostly
-> optimizations and cleanups, and for the new API -- bitmap_{read,write}()
-> -- it has internal users (after "bitmap: make bitmap_{get,set}_value8()
-> use bitmap_{read,write}()"). IOW, I don't see a reason for not merging
-> it into your main for-next tree (this week :p).
-> What do you think?
 
-I think that there's already enough mess with this patch. Alexander
-submitted new version of his MTE series together with the patch.
-
-https://lore.kernel.org/lkml/ZXtciaxTKFBiui%2FX@yury-ThinkPad/T/
-
-Now you're asking me to merge it separately. I don't want to undercut
-arm64 folks.
-
-Can you guys decide what you want? If you want to move
-bitmap_read/write() with my branch, I need to send it in -next for
-testing ASAP. And for that, as I already said, I need at least one
-active user in current kernel tree. (Yes, bitmap_get_value8() counts.)
-
-If you want to move it this way, please resend all the patches
-together.
-
-Thanks,
-Yury
 
