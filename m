@@ -1,281 +1,100 @@
-Return-Path: <netdev+bounces-58654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26AB6817B68
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 20:52:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5048B817B83
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 20:58:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 977FB284EB1
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 19:52:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7714285A28
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 19:58:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A14CD7BF02;
-	Mon, 18 Dec 2023 19:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E53DC7409A;
+	Mon, 18 Dec 2023 19:56:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QniFx5Bx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RuFXviiD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF4607BEEC
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 19:48:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702928930; x=1734464930;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ZQ4ojfswKmWMuGtV14SM6wyc/UrUaoRNC38O5WuxPIQ=;
-  b=QniFx5BxZzYAnwLbXPPOBnW22tfSU+fvl3IOcb24e+X1vGUDDMFhX1lT
-   CCswoQsqoks1ZiRRUy701+zQNS/HKavM5ne2Ozy4GVKgW+WZ4h6lEWAZx
-   YQYWnA2kZ8TgQu8aojm5FxWxUjgZhxQlxIjx4wMFIExcbv3d6783qemQp
-   Q+dM7fboxpRmThuZCUhfvwWM5iTE5TXJxMrSFaJrJSNWpQCi+yaV4BwO3
-   5+wS0jeUDJFf3yM9WHjgCUmqXJjcXKDpOW1gPrxAAsO/FwEobEwA51ugS
-   AZO8BVA4os3YrDMiTcWxQXs4vyHWP3ngzsO+nbDjOf0NuAqc/gXQrRcIJ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10928"; a="394436862"
-X-IronPort-AV: E=Sophos;i="6.04,286,1695711600"; 
-   d="scan'208";a="394436862"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2023 11:48:39 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,286,1695711600"; 
-   d="scan'208";a="23902141"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa001.jf.intel.com with ESMTP; 18 Dec 2023 11:48:39 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH net-next 15/15] idpf: refactor some missing field get/prep conversions
-Date: Mon, 18 Dec 2023 11:48:30 -0800
-Message-ID: <20231218194833.3397815-16-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231218194833.3397815-1-anthony.l.nguyen@intel.com>
-References: <20231218194833.3397815-1-anthony.l.nguyen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A812372047;
+	Mon, 18 Dec 2023 19:56:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26CDEC433CA;
+	Mon, 18 Dec 2023 19:56:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702929400;
+	bh=grKlAQWV5xV5wJkfKbKrDwxqfLJY1vUR6WlZYNNuA/M=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=RuFXviiDAzvfM6oPPwKPeQxhxx0ROEeGABDBXhq8+EgQGsx84/SxCdxu6h2KyALeC
+	 yS18QnDvUZ+3Aa7PQRbyli72gr8maRcPxAkZpL/O6f6wOMUooq3TsDjzodkp50+6iY
+	 sdereDZp7Y5Kf2KTpOaVRw12M7DrO2RRGRO5PDJ1dxeRBZcB9UOCG77XZMA1ZdKQqk
+	 vvIAWPG9koo53krWGRGspu4tFnL2m3PLxMDI9pGKROG1tAkxcXec51DyZZ22fly72U
+	 RNtUB/YNiVzjqBx4cNhX3U/jpz5GKUQxa5WsCIvm7Ckru4YcNE+eNx1hcDTx96lOxx
+	 kYN53AyvKi9dQ==
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-50e384cd6ebso1758627e87.3;
+        Mon, 18 Dec 2023 11:56:40 -0800 (PST)
+X-Gm-Message-State: AOJu0YwAP8U83ZAT1OGBJ3UcXy7vRGMFbsj5JS8RATS3L6epacpwBtYN
+	yKiOOHm9URsaTSeGPdL3SUPqhI38kt04mAugcNw=
+X-Google-Smtp-Source: AGHT+IGRZ13EcavCOorqsgntfK6FaZoWyYwMzNZj5jKJnbQHE7+5oLKfwJj7KjKBJ+wssogvyt5tiMo+CYWeUoo1XBY=
+X-Received: by 2002:a05:6512:96a:b0:50e:1ce0:b510 with SMTP id
+ v10-20020a056512096a00b0050e1ce0b510mr1996591lft.97.1702929398315; Mon, 18
+ Dec 2023 11:56:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <2f33be45-fe11-4b69-8e89-4d2824a0bf01@daynix.com>
+In-Reply-To: <2f33be45-fe11-4b69-8e89-4d2824a0bf01@daynix.com>
+From: Song Liu <song@kernel.org>
+Date: Mon, 18 Dec 2023 11:56:27 -0800
+X-Gmail-Original-Message-ID: <CAPhsuW6=-FK+ysh_Q1H7ana=A6v9d0Rsn+2hpJpm5n2dB_A1Qg@mail.gmail.com>
+Message-ID: <CAPhsuW6=-FK+ysh_Q1H7ana=A6v9d0Rsn+2hpJpm5n2dB_A1Qg@mail.gmail.com>
+Subject: Re: Should I add BPF kfuncs for userspace apps? And how?
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Jason Wang <jasowang@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
+	Benjamin Tissoires <bentiss@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, kvm@vger.kernel.org, 
+	LKML <linux-kernel@vger.kernel.org>, virtualization@lists.linux-foundation.org, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Hi Akihiko,
 
-Most of idpf correctly uses FIELD_GET and FIELD_PREP, but a couple spots
-were missed so fix those.
+On Tue, Dec 12, 2023 at 12:05=E2=80=AFAM Akihiko Odaki <akihiko.odaki@dayni=
+x.com> wrote:
+>
+[...]
+> ---
+>
+> I'm working on a new feature that aids virtio-net implementations using
+> tuntap virtual network device. You can see [1] for details, but
+> basically it's to extend BPF_PROG_TYPE_SOCKET_FILTER to report four more
+> bytes.
 
-Automated conversion with coccinelle script and manually fixed up,
-including audits for opportunities to convert to {get,encode,replace}
-bits functions.
+AFAICT, [1] adds a new program type, which is really hard to ship. However,
+you mentioned it is basically "extend BPF_PROG_TYPE_SOCKET_FILTER to
+report four more bytes", which confuses me.
 
-Add conversions to le16_get/encode/replace_bits where appropriate. And
-in one place fix up a cast from a u16 to a u16.
+Can we achieve the same goal by extending BPF_PROG_TYPE_SOCKET_FILTER
+(without adding a new program type)? Does this require extending
+__sk_buff, which
+is also not an option any more?
 
-@prep2@
-constant shift,mask;
-type T;
-expression a;
-@@
--(((T)(a) << shift) & mask)
-+FIELD_PREP(mask, a)
-
-@prep@
-constant shift,mask;
-type T;
-expression a;
-@@
--((T)((a) << shift) & mask)
-+FIELD_PREP(mask, a)
-
-@get@
-constant shift,mask;
-type T;
-expression a;
-@@
--((T)((a) & mask) >> shift)
-+FIELD_GET(mask, a)
-
-and applied via:
-spatch --sp-file field_prep.cocci --in-place --dir \
- drivers/net/ethernet/intel/
-
-CC: Alexander Lobakin <aleksander.lobakin@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  7 +--
- drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 58 +++++++++----------
- 2 files changed, 30 insertions(+), 35 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-index 81288a17da2a..447753495c53 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-@@ -328,10 +328,9 @@ static void idpf_tx_singleq_build_ctx_desc(struct idpf_queue *txq,
- 
- 	if (offload->tso_segs) {
- 		qw1 |= IDPF_TX_CTX_DESC_TSO << IDPF_TXD_CTX_QW1_CMD_S;
--		qw1 |= ((u64)offload->tso_len << IDPF_TXD_CTX_QW1_TSO_LEN_S) &
--			IDPF_TXD_CTX_QW1_TSO_LEN_M;
--		qw1 |= ((u64)offload->mss << IDPF_TXD_CTX_QW1_MSS_S) &
--			IDPF_TXD_CTX_QW1_MSS_M;
-+		qw1 |= FIELD_PREP(IDPF_TXD_CTX_QW1_TSO_LEN_M,
-+				  offload->tso_len);
-+		qw1 |= FIELD_PREP(IDPF_TXD_CTX_QW1_MSS_M, offload->mss);
- 
- 		u64_stats_update_begin(&txq->stats_sync);
- 		u64_stats_inc(&txq->q_stats.tx.lso_pkts);
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index a005626129a5..ad730d20fbe6 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -505,9 +505,9 @@ static void idpf_rx_post_buf_refill(struct idpf_sw_queue *refillq, u16 buf_id)
- 
- 	/* store the buffer ID and the SW maintained GEN bit to the refillq */
- 	refillq->ring[nta] =
--		((buf_id << IDPF_RX_BI_BUFID_S) & IDPF_RX_BI_BUFID_M) |
--		(!!(test_bit(__IDPF_Q_GEN_CHK, refillq->flags)) <<
--		 IDPF_RX_BI_GEN_S);
-+		FIELD_PREP(IDPF_RX_BI_BUFID_M, buf_id) |
-+		FIELD_PREP(IDPF_RX_BI_GEN_M,
-+			   test_bit(__IDPF_Q_GEN_CHK, refillq->flags));
- 
- 	if (unlikely(++nta == refillq->desc_count)) {
- 		nta = 0;
-@@ -1825,14 +1825,14 @@ static bool idpf_tx_clean_complq(struct idpf_queue *complq, int budget,
- 		u16 gen;
- 
- 		/* if the descriptor isn't done, no work yet to do */
--		gen = (le16_to_cpu(tx_desc->qid_comptype_gen) &
--		      IDPF_TXD_COMPLQ_GEN_M) >> IDPF_TXD_COMPLQ_GEN_S;
-+		gen = le16_get_bits(tx_desc->qid_comptype_gen,
-+				    IDPF_TXD_COMPLQ_GEN_M);
- 		if (test_bit(__IDPF_Q_GEN_CHK, complq->flags) != gen)
- 			break;
- 
- 		/* Find necessary info of TX queue to clean buffers */
--		rel_tx_qid = (le16_to_cpu(tx_desc->qid_comptype_gen) &
--			 IDPF_TXD_COMPLQ_QID_M) >> IDPF_TXD_COMPLQ_QID_S;
-+		rel_tx_qid = le16_get_bits(tx_desc->qid_comptype_gen,
-+					   IDPF_TXD_COMPLQ_QID_M);
- 		if (rel_tx_qid >= complq->txq_grp->num_txq ||
- 		    !complq->txq_grp->txqs[rel_tx_qid]) {
- 			dev_err(&complq->vport->adapter->pdev->dev,
-@@ -1842,9 +1842,8 @@ static bool idpf_tx_clean_complq(struct idpf_queue *complq, int budget,
- 		tx_q = complq->txq_grp->txqs[rel_tx_qid];
- 
- 		/* Determine completion type */
--		ctype = (le16_to_cpu(tx_desc->qid_comptype_gen) &
--			IDPF_TXD_COMPLQ_COMPL_TYPE_M) >>
--			IDPF_TXD_COMPLQ_COMPL_TYPE_S;
-+		ctype = le16_get_bits(tx_desc->qid_comptype_gen,
-+				      IDPF_TXD_COMPLQ_COMPL_TYPE_M);
- 		switch (ctype) {
- 		case IDPF_TXD_COMPLT_RE:
- 			hw_head = le16_to_cpu(tx_desc->q_head_compl_tag.q_head);
-@@ -1945,11 +1944,10 @@ void idpf_tx_splitq_build_ctb(union idpf_tx_flex_desc *desc,
- 			      u16 td_cmd, u16 size)
- {
- 	desc->q.qw1.cmd_dtype =
--		cpu_to_le16(params->dtype & IDPF_FLEX_TXD_QW1_DTYPE_M);
-+		le16_encode_bits(params->dtype, IDPF_FLEX_TXD_QW1_DTYPE_M);
- 	desc->q.qw1.cmd_dtype |=
--		cpu_to_le16((td_cmd << IDPF_FLEX_TXD_QW1_CMD_S) &
--			    IDPF_FLEX_TXD_QW1_CMD_M);
--	desc->q.qw1.buf_size = cpu_to_le16((u16)size);
-+		le16_encode_bits(td_cmd, IDPF_FLEX_TXD_QW1_CMD_M);
-+	desc->q.qw1.buf_size = cpu_to_le16(size);
- 	desc->q.qw1.l2tags.l2tag1 = cpu_to_le16(params->td_tag);
- }
- 
-@@ -2843,8 +2841,9 @@ static void idpf_rx_splitq_extract_csum_bits(struct virtchnl2_rx_flex_desc_adv_n
- 				qword1);
- 	csum->ipv6exadd = FIELD_GET(VIRTCHNL2_RX_FLEX_DESC_ADV_STATUS0_IPV6EXADD_M,
- 				    qword0);
--	csum->raw_csum_inv = FIELD_GET(VIRTCHNL2_RX_FLEX_DESC_ADV_RAW_CSUM_INV_M,
--				       le16_to_cpu(rx_desc->ptype_err_fflags0));
-+	csum->raw_csum_inv =
-+		le16_get_bits(rx_desc->ptype_err_fflags0,
-+			      VIRTCHNL2_RX_FLEX_DESC_ADV_RAW_CSUM_INV_M);
- 	csum->raw_csum = le16_to_cpu(rx_desc->misc.raw_cs);
- }
- 
-@@ -2938,8 +2937,8 @@ static int idpf_rx_process_skb_fields(struct idpf_queue *rxq,
- 	struct idpf_rx_ptype_decoded decoded;
- 	u16 rx_ptype;
- 
--	rx_ptype = FIELD_GET(VIRTCHNL2_RX_FLEX_DESC_ADV_PTYPE_M,
--			     le16_to_cpu(rx_desc->ptype_err_fflags0));
-+	rx_ptype = le16_get_bits(rx_desc->ptype_err_fflags0,
-+				 VIRTCHNL2_RX_FLEX_DESC_ADV_PTYPE_M);
- 
- 	decoded = rxq->vport->rx_ptype_lkup[rx_ptype];
- 	/* If we don't know the ptype we can't do anything else with it. Just
-@@ -2953,8 +2952,8 @@ static int idpf_rx_process_skb_fields(struct idpf_queue *rxq,
- 
- 	skb->protocol = eth_type_trans(skb, rxq->vport->netdev);
- 
--	if (FIELD_GET(VIRTCHNL2_RX_FLEX_DESC_ADV_RSC_M,
--		      le16_to_cpu(rx_desc->hdrlen_flags)))
-+	if (le16_get_bits(rx_desc->hdrlen_flags,
-+			  VIRTCHNL2_RX_FLEX_DESC_ADV_RSC_M))
- 		return idpf_rx_rsc(rxq, skb, rx_desc, &decoded);
- 
- 	idpf_rx_splitq_extract_csum_bits(rx_desc, &csum_bits);
-@@ -3148,8 +3147,8 @@ static int idpf_rx_splitq_clean(struct idpf_queue *rxq, int budget)
- 		dma_rmb();
- 
- 		/* if the descriptor isn't done, no work yet to do */
--		gen_id = le16_to_cpu(rx_desc->pktlen_gen_bufq_id);
--		gen_id = FIELD_GET(VIRTCHNL2_RX_FLEX_DESC_ADV_GEN_M, gen_id);
-+		gen_id = le16_get_bits(rx_desc->pktlen_gen_bufq_id,
-+				       VIRTCHNL2_RX_FLEX_DESC_ADV_GEN_M);
- 
- 		if (test_bit(__IDPF_Q_GEN_CHK, rxq->flags) != gen_id)
- 			break;
-@@ -3164,9 +3163,8 @@ static int idpf_rx_splitq_clean(struct idpf_queue *rxq, int budget)
- 			continue;
- 		}
- 
--		pkt_len = le16_to_cpu(rx_desc->pktlen_gen_bufq_id);
--		pkt_len = FIELD_GET(VIRTCHNL2_RX_FLEX_DESC_ADV_LEN_PBUF_M,
--				    pkt_len);
-+		pkt_len = le16_get_bits(rx_desc->pktlen_gen_bufq_id,
-+					VIRTCHNL2_RX_FLEX_DESC_ADV_LEN_PBUF_M);
- 
- 		hbo = FIELD_GET(VIRTCHNL2_RX_FLEX_DESC_ADV_STATUS0_HBO_M,
- 				rx_desc->status_err0_qw1);
-@@ -3183,14 +3181,12 @@ static int idpf_rx_splitq_clean(struct idpf_queue *rxq, int budget)
- 			goto bypass_hsplit;
- 		}
- 
--		hdr_len = le16_to_cpu(rx_desc->hdrlen_flags);
--		hdr_len = FIELD_GET(VIRTCHNL2_RX_FLEX_DESC_ADV_LEN_HDR_M,
--				    hdr_len);
-+		hdr_len = le16_get_bits(rx_desc->hdrlen_flags,
-+					VIRTCHNL2_RX_FLEX_DESC_ADV_LEN_HDR_M);
- 
- bypass_hsplit:
--		bufq_id = le16_to_cpu(rx_desc->pktlen_gen_bufq_id);
--		bufq_id = FIELD_GET(VIRTCHNL2_RX_FLEX_DESC_ADV_BUFQ_ID_M,
--				    bufq_id);
-+		bufq_id = le16_get_bits(rx_desc->pktlen_gen_bufq_id,
-+					VIRTCHNL2_RX_FLEX_DESC_ADV_BUFQ_ID_M);
- 
- 		rxq_set = container_of(rxq, struct idpf_rxq_set, rxq);
- 		if (!bufq_id)
--- 
-2.41.0
-
+Thanks,
+Song
 
