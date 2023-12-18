@@ -1,95 +1,110 @@
-Return-Path: <netdev+bounces-58505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E392816AD3
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 11:19:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C35C9816ADD
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 11:22:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 559231C2253F
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 10:19:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63BECB21F31
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 10:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B880134DF;
-	Mon, 18 Dec 2023 10:18:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9784013ADC;
+	Mon, 18 Dec 2023 10:22:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941E715483;
-	Mon, 18 Dec 2023 10:18:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3BIAIVdC43382004, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3BIAIVdC43382004
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 18 Dec 2023 18:18:31 +0800
-Received: from RTEXDAG02.realtek.com.tw (172.21.6.101) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Mon, 18 Dec 2023 18:18:31 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXDAG02.realtek.com.tw (172.21.6.101) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Mon, 18 Dec 2023 18:18:30 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7]) by
- RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7%5]) with mapi id
- 15.01.2375.007; Mon, 18 Dec 2023 18:18:30 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Paolo Abeni <pabeni@redhat.com>, "kuba@kernel.org" <kuba@kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "andrew@lunn.ch" <andrew@lunn.ch>, Ping-Ke Shih
-	<pkshih@realtek.com>,
-        Larry Chiu <larry.chiu@realtek.com>
-Subject: RE: [PATCH net-next v14 07/13] rtase: Implement a function to receive packets
-Thread-Topic: [PATCH net-next v14 07/13] rtase: Implement a function to
- receive packets
-Thread-Index: AQHaKbuc5PsGtCK8iE+X+AXG8s/kd7Ck67gAgAn2eIA=
-Date: Mon, 18 Dec 2023 10:18:30 +0000
-Message-ID: <5368be1697534df09784f95d93b1f1fd@realtek.com>
-References: <20231208094733.1671296-1-justinlai0215@realtek.com>
-	 <20231208094733.1671296-8-justinlai0215@realtek.com>
- <18552cff6fe32d4c21b4751cd6be4ff4757c63e8.camel@redhat.com>
-In-Reply-To: <18552cff6fe32d4c21b4751cd6be4ff4757c63e8.camel@redhat.com>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-kse-serverinfo: RTEXDAG02.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD59F14F67
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 10:22:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.112.193])
+	by gateway (Coremail) with SMTP id _____8AxFetPHYBlYAgCAA--.6588S3;
+	Mon, 18 Dec 2023 18:22:07 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.112.193])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxCHNMHYBlMBIKAA--.32567S3;
+	Mon, 18 Dec 2023 18:22:06 +0800 (CST)
+Message-ID: <033fedc9-1d96-408e-911b-9829c6a5e851@loongson.cn>
+Date: Mon, 18 Dec 2023 18:22:04 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 5/9] net: stmmac: Add Loongson-specific register
+ definitions
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, fancer.lancer@gmail.com,
+ Jose.Abreu@synopsys.com, chenhuacai@loongson.cn, linux@armlinux.org.uk,
+ guyinggang@loongson.cn, netdev@vger.kernel.org, loongarch@lists.linux.dev,
+ chris.chenfeiyang@gmail.com
+References: <cover.1702458672.git.siyanteng@loongson.cn>
+ <40eff8db93b02599f00a156b07a0dcdacfc0fbf3.1702458672.git.siyanteng@loongson.cn>
+ <8a7d2d11-a299-42e0-960f-a6916e9b54fe@lunn.ch>
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <8a7d2d11-a299-42e0-960f-a6916e9b54fe@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8DxCHNMHYBlMBIKAA--.32567S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj9xXoWrKrWrJF47WFyfuw4DKw47KFX_yoWDZrX_Kr
+	yF9w1kCr4DKrnFkF4UKrW5Zr1q9FZ7ZrW0gr1FqwsYv343Ja4xGFW8GryFva48Wr1jvFn8
+	Cw17tF4DG3yagosvyTuYvTs0mTUanT9S1TB71UUUUj7qnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbfkYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6r4UJVWxJr1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
+	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q
+	6rW5McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
+	1lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_
+	Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67
+	AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8I
+	cVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI
+	8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v2
+	6r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU4Xo7DUUUU
 
-PiA+ICsNCj4gPiArICAgICBjdXJfcnggPSByaW5nLT5jdXJfaWR4Ow0KPiA+ICsgICAgIGVudHJ5
-ID0gY3VyX3J4ICUgTlVNX0RFU0M7DQo+ID4gKyAgICAgZGVzYyA9ICZkZXNjX2Jhc2VbZW50cnld
-Ow0KPiA+ICsNCj4gPiArICAgICBkbyB7DQo+ID4gKyAgICAgICAgICAgICAvKiBtYWtlIHN1cmUg
-ZGlzY3JpcHRvciBoYXMgYmVlbiB1cGRhdGVkICovDQo+ID4gKyAgICAgICAgICAgICBybWIoKTsN
-Cj4gPiArICAgICAgICAgICAgIHN0YXR1cyA9IGxlMzJfdG9fY3B1KGRlc2MtPmRlc2Nfc3RhdHVz
-Lm9wdHMxKTsNCj4gPiArDQo+ID4gKyAgICAgICAgICAgICBpZiAoc3RhdHVzICYgREVTQ19PV04p
-DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgIGJyZWFrOw0KPiA+ICsNCj4gPiArICAgICAgICAg
-ICAgIGlmICh1bmxpa2VseShzdGF0dXMgJiBSWF9SRVMpKSB7DQo+ID4gKyAgICAgICAgICAgICAg
-ICAgICAgIGlmIChuZXRfcmF0ZWxpbWl0KCkpDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgbmV0ZGV2X3dhcm4oZGV2LCAiUnggRVJST1IuIHN0YXR1cyA9DQo+ICUwOHhcbiIsDQo+
-ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3RhdHVzKTsNCj4g
-PiArDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgIGRldi0+c3RhdHMucnhfZXJyb3JzKys7DQo+
-ID4gKw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICBpZiAoc3RhdHVzICYgKFJYX1JXVCB8IFJY
-X1JVTlQpKQ0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRldi0+c3RhdHMucnhf
-bGVuZ3RoX2Vycm9ycysrOw0KPiANCj4gVGhlIGRldmljZSBoYXMgYSBzaW5nbGUgUlggcXVldWUs
-IHJpZ2h0PyBPdGhlcndpc2UgdGhpcyBraW5kIG9mIHN0YXRzDQo+IGFjY291bnRpbmcgaXMgZ29p
-bmcgdG8gYmUgY29zdGx5Lg0KPiANCj4gQ2hlZXJzLA0KPiANCj4gUGFvbG8NCg0KSGksIFBhb2xv
-DQoNClRoaXMgZGV2aWNlIHN1cHBvcnRzIG11bHRpcGxlIFJYIHF1ZXVlLg0KQ291bGQgeW91IHBs
-ZWFzZSBwcm92aWRlIGFuIGV4YW1wbGUgb2YgaG93IHlvdSB3b3VsZCBsaWtlIGl0IGRvbmU/DQo=
+
+在 2023/12/16 23:47, Andrew Lunn 写道:
+> On Wed, Dec 13, 2023 at 06:14:23PM +0800, Yanteng Si wrote:
+>> There are two types of Loongson DWGMAC. The first type shares the same
+>> register definitions and has similar logic as dwmac1000. The second type
+>> uses several different register definitions.
+>>
+>> Simply put, we split some single bit fields into double bits fileds:
+>>
+>> DMA_INTR_ENA_NIE = 0x00040000 + 0x00020000
+>> DMA_INTR_ENA_AIE = 0x00010000 + 0x00008000
+>> DMA_STATUS_NIS = 0x00040000 + 0x00020000
+>> DMA_STATUS_AIS = 0x00010000 + 0x00008000
+>> DMA_STATUS_FBI = 0x00002000 + 0x00001000
+> What is missing here is why? What are the second bits used for? And
+
+We think it is necessary to distinguish rx and tx, so we split these 
+bits into two.
+
+this is:
+
+DMA_INTR_ENA_NIE = rx + tx
+
+> why does the driver not care which bit is set when handing interrupts?
+
+We will care about it later. Because now we will support the minimum 
+feature set
+
+first, which can reduce everyone’s review pressure.
+
+
+Thanks,
+
+Yanteng
+
+>
+>      Andrew
+
 
