@@ -1,216 +1,136 @@
-Return-Path: <netdev+bounces-58542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4009816DD2
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 13:21:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5C05816E04
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 13:39:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95A1A2819FF
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 12:21:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 569391F22992
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 12:39:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D04042AAE;
-	Mon, 18 Dec 2023 12:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 742377D60B;
+	Mon, 18 Dec 2023 12:39:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RjBavxh2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HjTamBvt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D2F3A262;
-	Mon, 18 Dec 2023 12:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702902095; x=1734438095;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=uyVBY1/AA0uw/Ko3YQ+9RvPJXljsI9q5rsCygy11O+A=;
-  b=RjBavxh2lQ+14mllfz7XWLWdRTa8l108/ToGHSMYeSCTUlLoOZJf9VV8
-   bvX7A4TCyt0QQCldCv/iJrCWHTFjlbzpWRc1gkwaaivNgiz6kmqliWZyc
-   GMGxXL0p8X/2L2wpGeZCKzttNRauWOpd9FQK6P9k3YKCdpJlUzbEdY6oe
-   91pgJLNj11LheL1gE4oE9kKuuTLN7Cm++Rsv9I6Nsqi22F+ojnZZEi9Qq
-   2rexgajC4Edj+u4YdSdxHMqbN5yVZlZAYvRstzYFpxDUsHwMRRiKx60As
-   +NSfM1+5bz4b22pTdkezfn48OZkAdD1qeWTjbBi10tJe5RMDCDxJ88++m
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10927"; a="2326446"
-X-IronPort-AV: E=Sophos;i="6.04,285,1695711600"; 
-   d="scan'208";a="2326446"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2023 04:21:34 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10927"; a="841467052"
-X-IronPort-AV: E=Sophos;i="6.04,285,1695711600"; 
-   d="scan'208";a="841467052"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Dec 2023 04:21:34 -0800
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 18 Dec 2023 04:21:34 -0800
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 18 Dec 2023 04:21:33 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 18 Dec 2023 04:21:33 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 18 Dec 2023 04:21:33 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gXtMGe2KlpZxE1ZUy/vpBNKxYa2QgdDVUVu/m3kZ9Fwoi97JtX6EckdphfWvUGRyzXiwqarvSqcoTcg6N3nZU6EPTsaivFY5z5XYRWwBH0rUelCeG07sBQKAgwP3r7+iEfYDQU66sUj1L7G6ca8QUYCF7JcOd8O+zzmyx6E9WB1hc40BVJ/h5zmiKVwoiK/z0AYDZ0fW4LlEaD5GRWi2WjKXwKkr4hL0wX7tPJyK+cnSTR6teP123W+JEdZn3FUdUxMB8vtIV1LlqF85ITLDJ2O+k2MAwe10o7KhXjFyjSXzFtBaJZCf9B6UmqofvaK+SrgJv+FABIoNfkv3BBoI5A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JLZgkcnimXrGpSO5+Q1C6nI5Rb0+fYJGlX4Z3flO1UI=;
- b=ZM9TJDRoGGtyGPgmssNi9RQeyMzlkx2GRUNPLkIQhu95CBGt0a0VilG9qYL2qCBouAVOT+8scOGH7MfsrLH+ct3B2DWRFWnBQ5X62dZvFBy20BBGPA4/rtvTQ6aIXwKtZ+REck4vLH6uBP6hGvQPkbVyyx9qByPlTOnD9Tn1z2Ry93o124x2HE0AYthX6Kf0HoadU3OH2LLLk+PFdbRp0EgC3qZjEYSytmH9AjpIxcme64FM6zJ0Jn9FAQvGyV1aWnYLh26IRVSBKbI9FMONpn61l3x+d7Bb/BByYpxr0uSbzrt46CUXBVpKK+lkmlqh+ZQvXyHDT/Wzr6ooiWQkDw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB5013.namprd11.prod.outlook.com (2603:10b6:510:30::21)
- by BL3PR11MB5681.namprd11.prod.outlook.com (2603:10b6:208:33c::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.38; Mon, 18 Dec
- 2023 12:21:30 +0000
-Received: from PH0PR11MB5013.namprd11.prod.outlook.com
- ([fe80::a0ef:99b5:2de7:75db]) by PH0PR11MB5013.namprd11.prod.outlook.com
- ([fe80::a0ef:99b5:2de7:75db%4]) with mapi id 15.20.7091.034; Mon, 18 Dec 2023
- 12:21:30 +0000
-From: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
-To: "Staikov, Andrii" <andrii.staikov@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Szycik, Marcin"
-	<marcin.szycik@intel.com>, "Drewek, Wojciech" <wojciech.drewek@intel.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Staikov,
- Andrii" <andrii.staikov@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v6] ice: Add support for packet
- mirroring using hardware in switchdev mode
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v6] ice: Add support for
- packet mirroring using hardware in switchdev mode
-Thread-Index: AQHaLPn+QEH6ZvceAUqw/JFtinAQrbCu/2sw
-Date: Mon, 18 Dec 2023 12:21:30 +0000
-Message-ID: <PH0PR11MB5013BD828C05D0661244E7B59690A@PH0PR11MB5013.namprd11.prod.outlook.com>
-References: <20231212125126.3297556-1-andrii.staikov@intel.com>
-In-Reply-To: <20231212125126.3297556-1-andrii.staikov@intel.com>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB5013:EE_|BL3PR11MB5681:EE_
-x-ms-office365-filtering-correlation-id: b2fad7f9-ad7b-42dd-4e84-08dbffc3ddcc
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 9Cn0SqzXGoT2pT+zfisdZLsOMEDtP1gNlTOM1cMaQ46xFkELhEl4tnupnQLTStKo5i1uole462PNAucsPWUv49XgpxEv/Vs7TfyhtSXNojDi1LJfU5507bJcLT+UDe1zTjFdD7oTz1XyFLqSP5oHJgD5WLk9od4eolOi9vL4/Eo17DDnQtWAk0QolfoSFXrDt4LzEddq9gO0UzPWlYGLLi0lDjQ0jbJSE5yVQNTNomTg5THouxkHjisd4q4mdnj2tOCDW5TGdbXI3yq99FYZ8A676CGeTc4VbP5EqpKj4Oh/ISHNz4Hus3IjkSSeh3X4T7IdD7vrzEX48tc4c3wxGH021S8jGDp8jwHBuloDSCqn1kjhwouXzNP7sDiym/DZQahjiOrvih69BjDu0m8szR3OGHziF0Hwh9FUAo/hK90/K+g4DOWrNC77IjngJFaWt+DFyALoyjGLLQyZpeVo3HWSG4wcDgXO/Tr+GQaIp/dF5mVPd2ryerU6V/o+QgIjUtCH08QbOpGHcZzEDXrotT0cBTHc62A0P5Q9XHkfFoFLC91S9GbbCp6qX1fqfufVlqCt7GC6RUZyLTqAQxUe0vMe94cYbIGaaET81KJuOG42B0A5NpQaQ34JhpaqKKBO
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5013.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(39860400002)(396003)(346002)(376002)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(55016003)(38070700009)(110136005)(76116006)(82960400001)(86362001)(33656002)(38100700002)(122000001)(83380400001)(107886003)(26005)(53546011)(71200400001)(478600001)(2906002)(66946007)(66556008)(66476007)(66446008)(64756008)(54906003)(316002)(9686003)(7696005)(6506007)(5660300002)(8676002)(8936002)(4326008)(41300700001)(52536014);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?sfATnybLFqYGEUo3MquHVUq5WauPvskjhAPs4hYHw5UU+OUcObzrooTqTbqa?=
- =?us-ascii?Q?tyKzK0GHDx/ZpB3eq2aETkTK6irAMuCnN7c9tYo/qcZghQ2OJGUnXB5DRw0b?=
- =?us-ascii?Q?w2x4U4Llw1cFf8OnGYgjQgzh5++QwtLBur1nUn7UIp7nHw4DeTOyhDsL9Gv9?=
- =?us-ascii?Q?YT0XniVN7PF6ScWUZqV3L4PDvKYTrttBGFLTYx5IrVVWbJCMRT2AqBbX2TaD?=
- =?us-ascii?Q?v4CkRTuoGgKc1yDAb55cqh9eSzLyaTPKN4tYmcvb0/aYY2Gwl+1hdf1WN52e?=
- =?us-ascii?Q?uPHjDugM88kNnJBEZECBh5GSyfFYk5dm+vQ9FZ1iI84LtcH0wH5f8FWnsFN8?=
- =?us-ascii?Q?zBnFMiNhw2irKMEiVxMsV+9HGvWvt44yubblwenzMltDpwA26Eoj8II6TMjI?=
- =?us-ascii?Q?4cN324+Uq6qzoiNOFXo6Jpvq+FHfaeTGMSA5HuWxk2lbQiGjNHSUDcQ84CHU?=
- =?us-ascii?Q?21Zx3MgPBrzVPv4sek0nHO652cPhIwfRq8KrEAOq8q1PWOni0ps3uk3uh94o?=
- =?us-ascii?Q?LRLTaRmJLYcbr4DqMulPDOWotY9MDLxF+MNDZKz4n3/kAvvRRFuBGRv5D6CI?=
- =?us-ascii?Q?LpSY1q5xcytuLf5yj9Dv1FFeLhAjSFIeHRt9AwMieNhMwKz3S2XLpe2KUDjT?=
- =?us-ascii?Q?Uc9gbIkUT/wab/yTTKusXAIUmkcsq1452i9cwIKb2C9KJ7yDrtxNVUz7Fn0N?=
- =?us-ascii?Q?QpD31pXuBv/aIHM7ykXF7JxcFgext+q9cmVvKGLftICA9NxHjffUPi2zDVBK?=
- =?us-ascii?Q?vOoJ1g0T4OhNhka2iWRKhw9h9+zy3rxNH3bZLLRG+BPpcZ3ZeY9k1zR6iQlO?=
- =?us-ascii?Q?DQeraFpyQyfhrim1VMRDHu8qzjIULTvA+Ohv+T36GfDhpDvdtGIjT6y9TXcT?=
- =?us-ascii?Q?y9+MWfKOp2Lt/Kdrw4GRmzXtav/Dn3YOIL9hKrYMLGeYTlQ6QHvgdrauAQNV?=
- =?us-ascii?Q?bPQrT3I7HIGCXhfN/5P89dRQBne2rWeQODC9tpGjkFqDCYkDAkkJYKVWeJhy?=
- =?us-ascii?Q?4fPNH4Jfj3Nmh/4pbrffOQfs9hHe2klDQUMbqiMiIbaJNxiO3lJzQgNXSklZ?=
- =?us-ascii?Q?lobAHY6mkKzC3B8bb2NiomywGrHpYe5G5pwKF8OEasAOz+l2QO06PaLz6bf1?=
- =?us-ascii?Q?HXgEpnum1mT93418lkGNrnortJI1LZ/F8q5Dii0Arpb/XG22t9i3D7paarEm?=
- =?us-ascii?Q?g+fLIt2+f3cUX2v9KSr9RyrHnNAzSit7zr/LGLANi/zyNZcRE4qlqSV0FGmX?=
- =?us-ascii?Q?ro1bLV3bJw3vfHVtu7XnM9rmHo+BfRMNRLdkMrOFc2oRUtIOamTBVzdpiAKy?=
- =?us-ascii?Q?dlE8mNFIoDTdiIAlMT1FXN3KbpJeSRtXzgbs4AAX6ZhNCmxinVfvuJBa6Dde?=
- =?us-ascii?Q?5nR9w5e8DF3h+lc9BatyWL3LOVfra9WdG2bht0FEfhB/XfCq/MjuxtzcWRfn?=
- =?us-ascii?Q?lrGJc/cn0a9Qp/nHc4U1qpyLnww9fiCkJR+Lo9vBZ1YhXU5tKk6AtOhi/odo?=
- =?us-ascii?Q?mLt6kqiHAqKO0CVvHY1+IbdjiDF401tZtUjb1pC5g7f1dKFB9gt1Rn0xOszl?=
- =?us-ascii?Q?g54DCFz/dofOruxorfcfTgq86nVGvt86YcgUL65bZwwxbl9IgO3xFKHLUgt4?=
- =?us-ascii?Q?Bw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C243A262;
+	Mon, 18 Dec 2023 12:39:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A5B0C433C8;
+	Mon, 18 Dec 2023 12:39:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702903149;
+	bh=VI1TrtlceuEBz2etHmTIzW5gF+DnQL9zxLaBcO6AK8o=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=HjTamBvtbaoB+TEYe7ZAb2sCf8F8tlzBS3MiEBWx/ftoN3KkP5xS8696avO9+L6SB
+	 iOW+r1aWk8GAHPIW0FqE57qdtLfesRg1FPXi8LLmnPGECLer7jxJmvM+F8/MYsW2nA
+	 oChSp70N5TrxwXIAJ1PLCMy6vCABcND1uk8MZuq8PTuGfuNo5/FnanpIgh1J700qil
+	 j5KlfS6OL39/fM8m631TOPI18ST8MNsDPzAp9f+rYgrj4NcEkhLnao8hR5cnJEnUSN
+	 lb7xN+gxShV5DgDmosDUPNv3B0J5eoqO5LhknfU54Z0YtUzhCj8Ookt57e3IlVpK4+
+	 jHJm9LE+3XPeQ==
+Message-ID: <dc691a01-5b70-448c-bed3-fcd6819c4bc5@kernel.org>
+Date: Mon, 18 Dec 2023 14:39:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5013.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b2fad7f9-ad7b-42dd-4e84-08dbffc3ddcc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Dec 2023 12:21:30.7386
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 0yuusUb5wDPUswUbeqgsLXYvxCWTl/CIwJfCY5zNNb7Q0doXwZkpspLmvgPNtpC1fZVTBFO9NB0OM4Xr8BEULuA3dOvYBQ4b9f3WCBB6Q40=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB5681
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 02/10] selftests: forwarding: ethtool_mm: fall
+ back to aggregate if device does not report pMAC stats
+Content-Language: en-US
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, shuah@kernel.org, s-vadapalli@ti.com,
+ r-gunasekaran@ti.com, vigneshr@ti.com, srk@ti.com, horms@kernel.org,
+ p-varis@ti.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20231215132048.43727-1-rogerq@kernel.org>
+ <20231215132048.43727-3-rogerq@kernel.org>
+ <20231215172710.v6gtreijeqzocmv4@skbuf>
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20231215172710.v6gtreijeqzocmv4@skbuf>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Andrii Staikov
-> Sent: Tuesday, December 12, 2023 6:21 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Szycik, Marcin <marcin.szycik@intel.com>;
-> Drewek, Wojciech <wojciech.drewek@intel.com>; linux-
-> kernel@vger.kernel.org; Staikov, Andrii <andrii.staikov@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v6] ice: Add support for packe=
-t
-> mirroring using hardware in switchdev mode
->=20
-> Switchdev mode allows to add mirroring rules to mirror incoming and
-> outgoing packets to the interface's port representor. Previously, this wa=
-s
-> available only using software functionality. Add possibility to offload t=
-his
-> functionality to the NIC hardware.
->=20
-> Introduce ICE_MIRROR_PACKET filter action to the ice_sw_fwd_act_type
-> enum to identify the desired action and pass it to the hardware as well a=
-s the
-> VSI to mirror.
->=20
-> Example of tc mirror command using hardware:
->   tc filter add dev ens1f0np0 ingress protocol ip prio 1 flower src_mac
->   b4:96:91:a5:c7:a7 skip_sw action mirred egress mirror dev eth1
->=20
-> ens1f0np0 - PF
-> b4:96:91:a5:c7:a7 - source MAC address
-> eth1 - PR of a VF to mirror to
->=20
-> Co-developed-by: Marcin Szycik <marcin.szycik@intel.com>
-> Signed-off-by: Marcin Szycik <marcin.szycik@intel.com>
-> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> Signed-off-by: Andrii Staikov <andrii.staikov@intel.com>
-> ---
-> v1 -> v2: no need for changes in ice_add_tc_flower_adv_fltr()
-> v2 -> v3: add another if branch for netif_is_ice(act->dev) ||
-> ice_is_tunnel_supported(act->dev) for FLOW_ACTION_MIRRED action and
-> add direction rules for filters
-> v3 -> v4: move setting mirroring into dedicated function
-> ice_tc_setup_mirror_action()
-> v4 -> v5: Fix packets not mirroring from VF to VF by changing
-> ICE_ESWITCH_FLTR_INGRESS to ICE_ESWITCH_FLTR_EGRESS where needed
-> v5 -> v6: Additionally fix some tags
-> ---
->  drivers/net/ethernet/intel/ice/ice_switch.c | 25 +++++++++----
-> drivers/net/ethernet/intel/ice/ice_tc_lib.c | 41 +++++++++++++++++++++
->  drivers/net/ethernet/intel/ice/ice_type.h   |  1 +
->  3 files changed, 60 insertions(+), 7 deletions(-)
->=20
-Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
+
+
+On 15/12/2023 19:27, Vladimir Oltean wrote:
+> On Fri, Dec 15, 2023 at 03:20:40PM +0200, Roger Quadros wrote:
+>> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+>> index 8f6ca458af9a..763c262a3453 100755
+>> --- a/tools/testing/selftests/net/forwarding/lib.sh
+>> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+>> @@ -146,6 +146,15 @@ check_ethtool_mm_support()
+>>  	fi
+>>  }
+>>  
+>> +check_ethtool_pmac_std_stats_support()
+>> +{
+>> +	local dev=$1; shift
+>> +	local grp=$1; shift
+>> +
+>> +	[ 0 -ne $(ethtool --json -S $dev --all-groups --src pmac 2>/dev/null \
+>> +		| jq '.[]."$grp" | length') ]
+> 
+> This is broken. $grp inside single quotes will search for the plain-text
+> "$grp" string, not for the $grp bash variable. Use ".[].\"$grp\" | length".
+> 
+
+Thanks for catching this. Will fix in next spin.
+
+> $ ./ethtool_mm.sh eno0 swp0
+> eno0 does not report pMAC statistics, falling back to aggregate
+> swp0 does not report pMAC statistics, falling back to aggregate
+> $ ethtool -S swp0 --all-groups --src pmac
+> Standard stats for swp0:
+> eth-phy-SymbolErrorDuringCarrier: 0
+> eth-mac-FramesTransmittedOK: 90017
+> eth-mac-FramesReceivedOK: 90033
+> eth-mac-FrameCheckSequenceErrors: 0
+> eth-mac-AlignmentErrors: 0
+> eth-mac-OctetsTransmittedOK: 9181138
+> eth-mac-OctetsReceivedOK: 9182112
+> eth-mac-MulticastFramesXmittedOK: 17
+> eth-mac-BroadcastFramesXmittedOK: 90000
+> eth-mac-MulticastFramesReceivedOK: 33
+> eth-mac-BroadcastFramesReceivedOK: 90000
+> eth-mac-FrameTooLongErrors: 0
+> eth-ctrl-MACControlFramesReceived: 0
+> rmon-etherStatsUndersizePkts: 0
+> rmon-etherStatsOversizePkts: 0
+> rmon-etherStatsFragments: 0
+> rmon-etherStatsJabbers: 0
+> rx-rmon-etherStatsPkts64to64Octets: 33
+> rx-rmon-etherStatsPkts65to127Octets: 90000
+> rx-rmon-etherStatsPkts128to255Octets: 0
+> rx-rmon-etherStatsPkts256to511Octets: 0
+> rx-rmon-etherStatsPkts512to1023Octets: 0
+> rx-rmon-etherStatsPkts1024to1526Octets: 0
+> rx-rmon-etherStatsPkts1527to65535Octets: 0
+> tx-rmon-etherStatsPkts64to64Octets: 12
+> tx-rmon-etherStatsPkts65to127Octets: 90005
+> tx-rmon-etherStatsPkts128to255Octets: 0
+> tx-rmon-etherStatsPkts256to511Octets: 0
+> tx-rmon-etherStatsPkts512to1023Octets: 0
+> tx-rmon-etherStatsPkts1024to1526Octets: 0
+> tx-rmon-etherStatsPkts1527to65535Octets: 0
+> 
+>> +}
+>> +
+>>  check_locked_port_support()
+>>  {
+>>  	if ! bridge -d link show | grep -q " locked"; then
+>> -- 
+>> 2.34.1
+>>
+
+-- 
+cheers,
+-roger
 
