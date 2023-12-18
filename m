@@ -1,25 +1,25 @@
-Return-Path: <netdev+bounces-58488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A180816A1D
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 10:46:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D34C8816A1E
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 10:46:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D30BB215FA
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:46:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF4A6B20E9E
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:46:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 376F211CB7;
-	Mon, 18 Dec 2023 09:46:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F10F611CB2;
+	Mon, 18 Dec 2023 09:46:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uR6xd55q"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LC7nsR6d"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F9412B9D;
-	Mon, 18 Dec 2023 09:46:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F1B134A8;
+	Mon, 18 Dec 2023 09:46:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -27,22 +27,25 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=fMKaYER4HHEEPcoTB7NnUNSrSSLoCHuDty7qTHLn6Vw=; b=uR6xd55qq1RNW7InS6yl5oMSAH
-	9USQ4Bj/1VOfs6fjkX7ZDG4rtzTNKBksToL/4jnMZnjpNIz3IlBneREnsOj7Zco/OS1vjWIwLa1Sz
-	s7H3ydTwK5Ark5z3xHppyLyqHd3ScRH6Jp294X5c+xujmZiz80JB+wy9ffDUBBL2yRxQ=;
+	bh=A6G+QSdsIk146CSB2jyGLj1t4yQSV8wZDsIv69iwWuA=; b=LC7nsR6dqatrN5ZxhkR+0yD40q
+	QENIfGtnzm8585+biS2dTVGhp8KqFiPMMwKlvghPbQdQVDSwBfkOmZUewDr19j+D5U9QSBdwlOmtb
+	cHJ1Z3zlSHzWx/JJXNpIeMipn7Sny/8mT84pkO3WAKFhzo+8od2NeiE17yV+q+WviyPc=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rFACE-003EH0-8x; Mon, 18 Dec 2023 10:45:58 +0100
-Date: Mon, 18 Dec 2023 10:45:58 +0100
+	id 1rFACc-003EHM-Ki; Mon, 18 Dec 2023 10:46:22 +0100
+Date: Mon, 18 Dec 2023 10:46:22 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
-	"linux-leds@vger.kernel.org" <linux-leds@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH RESUBMIT] leds: trigger: netdev: add core support for hw
- not supporting fallback to LED sw control
-Message-ID: <639a6a12-be24-49be-9b0d-43cb3ccf7ee7@lunn.ch>
-References: <3fd5184c-3641-4b0b-b59a-f489ec69a6cd@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH] net: phy: at803x: replace msleep(1) with
+ usleep_range
+Message-ID: <45521aec-7530-45a7-888f-c0715b984338@lunn.ch>
+References: <20231217232508.26470-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,20 +54,12 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3fd5184c-3641-4b0b-b59a-f489ec69a6cd@gmail.com>
+In-Reply-To: <20231217232508.26470-1-ansuelsmth@gmail.com>
 
-On Sun, Dec 17, 2023 at 07:46:42PM +0100, Heiner Kallweit wrote:
-> If hw doesn't support sw control of the LED and we switch to a mode
-> not supported by hw, currently we get lots of errors because neither
-> brigthness_set() nor brithness_set_blocking() is set.
-> Deal with this by not falling back to sw control, and return
-> -EOPNOTSUPP to the user. Note that we still store the new mode.
-> This is needed in case an intermediate unsupported mode is necessary
-> to switch from one supported mode to another.
+On Mon, Dec 18, 2023 at 12:25:08AM +0100, Christian Marangi wrote:
+> Replace msleep(1) with usleep_range as suggested by timers-howto guide.
 > 
-> Add a comment explaining how a driver for such hw is supposed to behave.
-> 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
