@@ -1,108 +1,73 @@
-Return-Path: <netdev+bounces-58685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DD91817D30
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 23:19:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A1AE817D34
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 23:22:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBE231F23E7D
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 22:18:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EB471F2147D
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 22:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B069D76083;
-	Mon, 18 Dec 2023 22:18:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCBCB74E08;
+	Mon, 18 Dec 2023 22:22:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dKlR7InW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L9ifHZim"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2868D71470;
-	Mon, 18 Dec 2023 22:18:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-40c38de1ee4so38107955e9.0;
-        Mon, 18 Dec 2023 14:18:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702937916; x=1703542716; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vKxmXgd84F0l1C3rdxwz9qBQGX032HUOjc/IMT1HuYc=;
-        b=dKlR7InW5uhDWc5mu4uccAZ0T6mRDNZk3FSz3nynJwf+ex9bA23u2KJRFjEbyjSwmq
-         ljZGbiUhnhBnByQ3pUMyokpOAExUxXWjhGw7BQ7Hbm4PE0LjuKZFE6BngHTx303GkqXf
-         nrWmJdBsxbalxpZ/MEqTA2fBNj1XeeV97n3hc+o0B0FiXj91qpTT1sMjrx14GGdfOpk9
-         +4xK1d40Kc8fPPGJit8jQC9Zw+nWCQijSrh2SmOuRsmLNISarCbSvVB9O3kLO/M2nEqA
-         8IKXEpb57U+KlXxMcys/eBGMoVkKAllSR26aVjHijITanZx3rMmUo36Kot4E5xqODtMg
-         4aUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702937916; x=1703542716;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vKxmXgd84F0l1C3rdxwz9qBQGX032HUOjc/IMT1HuYc=;
-        b=wSzGfafRF/0yqlv6X7b7PoqA8dUxIuHkrld6+CDwA6+MTRhWjsvtK+H+kDJ4k18wNn
-         Hf/KpIuH3tgxz78Lzw7Fp295ObeiTPPtZQxv5IQfnPSiz7LPB/7mbUgE1yO0bLthRZ2b
-         3CDoLp45CDBUf9rC4rBLQEv4kZ+/vvdPAOziDpYMu2RLi8I3n0XXEefR1UHd2uKzqLNU
-         mOuegFSDRw91i8fNDdFD6Z/nomg1QnO4Dnu0JQQOU8VzCbWs+Fdy4rAqumUj6fRFhec6
-         XOASYHhEd7Zc6f/f0nJR6uTObFkdB7ofvXcLmBhYnqyDp2+PszadmBqI7i2c/wrMUZqW
-         kUcg==
-X-Gm-Message-State: AOJu0Ywkfrhg6eT/ci3LwSpg+DbWlD7FTAGDMuBBTkT9g8l4cWiAJK+k
-	0Qf+djxiurezi2M2R4BX/Rw=
-X-Google-Smtp-Source: AGHT+IF+FFQWtym9rQ6akSd1UL7fu/Rk5wBZt6VirWA5sxLt+y2oSTB8TSc1AFT2bEKk8wTHNcojZw==
-X-Received: by 2002:a05:600c:3790:b0:40b:5e21:ec3c with SMTP id o16-20020a05600c379000b0040b5e21ec3cmr8387726wmr.110.1702937916252;
-        Mon, 18 Dec 2023 14:18:36 -0800 (PST)
-Received: from debian.fritz.box ([93.184.186.109])
-        by smtp.gmail.com with ESMTPSA id d9-20020a05600c34c900b0040c2c5f5844sm86928wmq.21.2023.12.18.14.18.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Dec 2023 14:18:35 -0800 (PST)
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: 
-Cc: Dimitri Fedrau <dima.fedrau@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] net: phy: Support 100BT1 and 1000BT1 linkmode advertisements
-Date: Mon, 18 Dec 2023 23:18:14 +0100
-Message-Id: <20231218221814.69304-2-dima.fedrau@gmail.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231218221814.69304-1-dima.fedrau@gmail.com>
-References: <20231218221814.69304-1-dima.fedrau@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A368B7349B
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 22:22:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5EF3C433C7;
+	Mon, 18 Dec 2023 22:22:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702938131;
+	bh=fuCOkRcNRCuYL1taZEuX2hFpkxyQ/vwD/0ZY5a7CGrI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=L9ifHZimYhi8PkYVefJFqoj9Ejncq0P/YnBYXB1PcDYWDaUiZPpgSefCcWf0D59Jx
+	 +++XR12FIpfSd/6eFjfoYmH/RB3cTRnrrNhBLrJJUMu0cgPUnflTtiuCtgGBiOnamp
+	 J3ogThJn9eUq5Rp6GXQFLdsJdQ7q5WuQImtHMVqiyjLICr8EggvUyS9lSsOcIT+VTF
+	 Lvc9+kgos7HOPHrDVoNHFlbSwz0VKgEIrYmNcLKI+CFSGYGvNwGUFiwWK1ogFakSuB
+	 EM4LmOX+BVdzrON1R2njK331Tv+OQpu9+sMaQMFptqFhdpszsHGIZzRW5pBClTZdLi
+	 8uRPd1lfTjipw==
+Date: Mon, 18 Dec 2023 14:22:09 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 1/3] tools: ynl-gen: use correct len for string
+ and binary
+Message-ID: <20231218142209.64b0a2ab@kernel.org>
+In-Reply-To: <ZX1hXMhJLwgg5S1v@Laptop-X1>
+References: <20231215035009.498049-1-liuhangbin@gmail.com>
+	<20231215035009.498049-2-liuhangbin@gmail.com>
+	<20231215180603.576748b1@kernel.org>
+	<ZX1hXMhJLwgg5S1v@Laptop-X1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Extend helper function linkmode_adv_to_mii_t1_adv_m_t to support
-100BT1 and 1000BT1 linkmode advertisements.
+On Sat, 16 Dec 2023 16:35:40 +0800 Hangbin Liu wrote:
+> The max-len / min-len / extact-len micro are used by binary. For string we
+> need to use "len" to define the max length. e.g.
+> 
+> static const struct nla_policy
+> team_nl_option_policy[TEAM_ATTR_OPTION_MAX + 1] = {
+>         [TEAM_ATTR_OPTION_UNSPEC]               = { .type = NLA_UNSPEC, },
+>         [TEAM_ATTR_OPTION_NAME] = {
+>                 .type = NLA_STRING,
+>                 .len = TEAM_STRING_MAX_LEN,
+>         },
 
-Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
----
- include/linux/mdio.h | 4 ++++
- 1 file changed, 4 insertions(+)
+max-len / min-len / extact-len are just the names in the spec.
+We can put the value provided in the spec as max-len inside
+nla_policy as len, given that for string spec::max-len == policy::len 
 
-diff --git a/include/linux/mdio.h b/include/linux/mdio.h
-index 007fd9c3e4b6..322c7a5092e4 100644
---- a/include/linux/mdio.h
-+++ b/include/linux/mdio.h
-@@ -408,6 +408,10 @@ static inline u32 linkmode_adv_to_mii_t1_adv_m_t(unsigned long *advertising)
- 
- 	if (linkmode_test_bit(ETHTOOL_LINK_MODE_10baseT1L_Full_BIT, advertising))
- 		result |= MDIO_AN_T1_ADV_M_B10L;
-+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_100baseT1_Full_BIT, advertising))
-+		result |= MDIO_AN_T1_ADV_M_100BT1;
-+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_1000baseT1_Full_BIT, advertising))
-+		result |= MDIO_AN_T1_ADV_M_1000BT1;
- 
- 	return result;
- }
--- 
-2.39.2
-
+Am I confused? 
 
