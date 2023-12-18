@@ -1,105 +1,76 @@
-Return-Path: <netdev+bounces-58588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0BFF817516
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 16:18:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CF50817532
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 16:27:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 806591F24E83
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 15:18:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C93A1F23579
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 15:27:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84488498B9;
-	Mon, 18 Dec 2023 15:17:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB7CE3A1B6;
+	Mon, 18 Dec 2023 15:27:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qsGzLhld"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wDpkNIVo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A2815485;
-	Mon, 18 Dec 2023 15:17:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE153C433C8;
-	Mon, 18 Dec 2023 15:17:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702912673;
-	bh=gdw2rG1kHMxFAFPOz78qJY9ASvmd2ILrgUQz0xLeORE=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=qsGzLhldjXDOoUeKXNf619KvH5SkEYA4I+fGoUcCNWOxv3vJIetK15Ui3BnVr9wMZ
-	 qk3TzhQEXcftcZv4sXkPWxKO0PAqCo0srqyRoZ3iXVY56jfeL+Eo80+m6SXtQ+jBK5
-	 Fy8IJ66lZwBfnXeoaNJ+14DUjs5uI5K1ZNGfuCao1I9tN6kH+08lZfSZy8aVQnTsiS
-	 XoL5mfU/MpW+kFx+Becsv72a06N92eq/iESC8IA6nsVq9Axk62nC4QgTKxzj9CqNes
-	 N3uq+ZVW8cEXxp1D3KBVHT9oNNfzYyp0bYQFMYU5EmZhNEjzGPsCbkMJonYgSDOnip
-	 5ljboZDb0DhNw==
-From: Kalle Valo <kvalo@kernel.org>
-To: Mario Limonciello <mario.limonciello@amd.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>,  "David S . Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  "open
- list:MAC80211" <linux-wireless@vger.kernel.org>,  "open list:NETWORKING
- [GENERAL]" <netdev@vger.kernel.org>,  open list
- <linux-kernel@vger.kernel.org>,  Jun Ma <Jun.ma2@amd.com>
-Subject: Re: [PATCH] wifi: mac80211: Use subsystem appropriate debug call
-References: <20231215145439.57286-1-mario.limonciello@amd.com>
-Date: Mon, 18 Dec 2023 17:17:49 +0200
-In-Reply-To: <20231215145439.57286-1-mario.limonciello@amd.com> (Mario
-	Limonciello's message of "Fri, 15 Dec 2023 08:54:39 -0600")
-Message-ID: <87frzzsfoi.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A188200C0
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 15:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:To:From:Date:Reply-To:Cc:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=VnNMk0bUluQAleIzcIWSWUgm8MAocoUefn8viYkQdDU=; b=wDpkNIVoZL/m8WTS7AlxknkGzD
+	WYzGMZYvQxrBw2OR8gT1en4oYCmA4PY9YNGa7VE4wncwC30c/sXXkyI+szF+IDpxD8qSfY6Tn6WCB
+	gIbad8vXXy/nqDblKSpuJ2zr7phvQK+H1gaSX9mEI4/dkqt0eCnSppkgYLGZlCqwj3iCEtzrbqYc6
+	f9uzC4DZLDDmN/JrzJEfXv3VPl0CPF/17VZuk4VI3nTtYIZSj+JM1Ee4QKc5glC2B/5GQ8KJMMbTJ
+	FMx/VaH4028FMaO98co3bQw1Pa961HVqVoaZoCdSsjQeTn6DHmtHp5X9oaSQJysfAaRF3T+uX9ntl
+	Hvs4Kadw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40360)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rFFWW-0005VF-1z;
+	Mon, 18 Dec 2023 15:27:16 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rFFWZ-0006oc-0H; Mon, 18 Dec 2023 15:27:19 +0000
+Date: Mon, 18 Dec 2023 15:27:18 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
+Subject: rmk offline until after Christmas
+Message-ID: <ZYBk1u0TmX3GCieY@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Mario Limonciello <mario.limonciello@amd.com> writes:
+All,
 
-> mac80211 doesn't use dev_dbg() but instead various macros from
-> net/mac80211/debug.h. Adjust wbrf code to use wiphy_dbg() instead.
->
-> Cc: Jun Ma <Jun.ma2@amd.com>
-> Reported-by: kvalo@kernel.org
-> Closes:
-> https://lore.kernel.org/amd-gfx/8bd60010-7534-4c22-9337-c4219946d8d6@amd.com/T/#mfe2f29372c45130d27745912faf33d9f7ce50118
-> Fixes: d34be4310cbe ("wifi: mac80211: Add support for WBRF features")
-> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
-> ---
->  net/mac80211/wbrf.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/net/mac80211/wbrf.c b/net/mac80211/wbrf.c
-> index a05c5b971789..12c23e14f884 100644
-> --- a/net/mac80211/wbrf.c
-> +++ b/net/mac80211/wbrf.c
-> @@ -23,8 +23,8 @@ void ieee80211_check_wbrf_support(struct ieee80211_local *local)
->  		return;
->  
->  	local->wbrf_supported = acpi_amd_wbrf_supported_producer(dev);
-> -	dev_dbg(dev, "WBRF is %s supported\n",
-> -		local->wbrf_supported ? "" : "not");
-> +	wiphy_dbg(wiphy, "WBRF is %s supported\n",
-> +		  local->wbrf_supported ? "" : "not");
->  }
+To make it more plainly obvious to everyone, I will be offline from when
+I send this email until the new year. This means I will not be reviewing
+any patches or otherwise responding on the mailing lists.
 
-This won't work, I still see the debug message:
+This has happened earlier than anticipated as I have contracted Covid
+last week and tested positive last night. Unfortunately, it does not
+appear to be a mild case.
 
-[  333.765867] ieee80211 phy0: WBRF is not supported
-
-The issue seems to be that mac80211 defines DEBUG in
-net/mac80211/Makefile:
-
-ccflags-y += -DDEBUG
-
-That -DDEBUG should be cleaned up, but I think separately. It's just
-that I cannot come up with any good proposal, all the macros in
-net/mac80211/debug.h require sdata and we don't have that in this stage.
-Any ideas?
+Sorry.
 
 -- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
