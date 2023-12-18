@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-58552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AC38816F0C
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 13:59:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CACD816F38
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 14:01:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 310251C2322E
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 12:59:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B0DB2869D3
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 13:01:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745017BF04;
-	Mon, 18 Dec 2023 12:46:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EF50138D58;
+	Mon, 18 Dec 2023 12:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aVuxmojH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pqddNTbs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 560CD7BF19;
-	Mon, 18 Dec 2023 12:46:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59125C433C7;
-	Mon, 18 Dec 2023 12:46:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D8E83539;
+	Mon, 18 Dec 2023 12:47:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60B55C433C8;
+	Mon, 18 Dec 2023 12:47:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702903605;
-	bh=x696ipv4HxFzYbI7HG2uz3GmrymnQNpwwBf/5I4SA0U=;
+	s=k20201202; t=1702903627;
+	bh=+OVnW9vNlawrZz1istndX1LrRMdDvVBnU24JfXpxuPY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aVuxmojHEQcaytcf3k+TZjceGWcdocPOauUZdleYLKqumuTNVSe+Nnovwfi4DNRlO
-	 ncggASzw3uecKVnG9oz3HgJcgguWVimBf4RUTCmofX6js/afRdcfHolgJi8COogYcX
-	 ECw1iuoT4vyFByXOMjsh3pLhDZAlOIzDw0ufKqh+1Y51LMTfyn3NCR415NzS/BU3e/
-	 ErmwryLf4cni0mjYYspoXqdODKGRzaME3GQHvxfy6h9l2CtqEXEmarueeunSng8KKk
-	 u1IrYCbk9wEjQedFuOwv43ESs3u+BlpZgk0vg/ATD2Pe1aweIHX1dGNA27RNFnxIIJ
-	 LQfGhc8mMkfrw==
+	b=pqddNTbs5ghWquCMmYw2ajxJhifTnkKN1j92poqObsQ/JMsdHCZo2YUlh8Cvtj2m5
+	 xBsXcYRPXaz03zKbbIlVf5qR9ahJNfaX0FcpOsV8ND91k/pSXdYyeIY8rsruNCsYGN
+	 FEOlfp8qIjXwHZhcmzL4dwtPfbtvHXE1rfJHiD/2dIEv0GXQdQcdceNEH7TueU3GNC
+	 2yHjFrhP061PvlvFVBQLawZhTZviEYjNoCiMhlaxxsUFVfgAwDh+tp8JKYqNsaQySN
+	 6CRZHSxragdLBbF0o8EWQKS3jxLtaQcE/SD4o8SXiwe3vmcrAgtXhz3K6Ur64EYgQO
+	 /qLa76TP9g+YA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -43,17 +43,18 @@ Cc: Judy Hsiao <judyhsiao@chromium.org>,
 	Sasha Levin <sashal@kernel.org>,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	leon@kernel.org,
-	joel.granados@gmail.com,
+	martin.lau@kernel.org,
 	ja@ssi.bg,
+	joel.granados@gmail.com,
+	leon@kernel.org,
 	haleyb.dev@gmail.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 4/8] neighbour: Don't let neigh_forced_gc() disable preemption for long
-Date: Mon, 18 Dec 2023 07:46:25 -0500
-Message-ID: <20231218124635.1381482-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 4/7] neighbour: Don't let neigh_forced_gc() disable preemption for long
+Date: Mon, 18 Dec 2023 07:46:49 -0500
+Message-ID: <20231218124656.1381949-4-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231218124635.1381482-1-sashal@kernel.org>
-References: <20231218124635.1381482-1-sashal@kernel.org>
+In-Reply-To: <20231218124656.1381949-1-sashal@kernel.org>
+References: <20231218124656.1381949-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.204
+X-stable-base: Linux 5.4.264
 Content-Transfer-Encoding: 8bit
 
 From: Judy Hsiao <judyhsiao@chromium.org>
@@ -88,7 +89,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 4c43183a8d93a..432e3a64dc4a5 100644
+index 9d631b7adb7bf..e571007d083cc 100644
 --- a/net/core/neighbour.c
 +++ b/net/core/neighbour.c
 @@ -226,9 +226,11 @@ static int neigh_forced_gc(struct neigh_table *tbl)
