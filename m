@@ -1,99 +1,142 @@
-Return-Path: <netdev+bounces-58590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 101CB817534
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 16:28:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BDA281754D
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 16:34:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42414282167
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 15:28:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED673B21E1A
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 15:34:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A02543A1C8;
-	Mon, 18 Dec 2023 15:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D4A63A1D9;
+	Mon, 18 Dec 2023 15:34:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="p6JZmqlP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VAQNKWcE"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8DEC3A1B6;
-	Mon, 18 Dec 2023 15:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=oJskJN4R/iyEsuEHtoL4otuKCFa7wjBQnbjBdPls1FE=; b=p6
-	JZmqlPoPSkXH7+rUb12CNgWmirtpk2vBlE7uCixmqphuax0C8UqQvPH8wgPUa8NlotmyslGw4/CRU
-	Y2pfXXSfBiaNG2NEhd7HBwdV79YjHCfXARQQfZ2/9SCPQfe0MaihpDWSZY9DfyRHrzIPWWruhvngx
-	/S2lnfjf/Ry//r8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rFFXK-003G9h-Au; Mon, 18 Dec 2023 16:28:06 +0100
-Date: Mon, 18 Dec 2023 16:28:06 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: hkallweit1@gmail.com, peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	fancer.lancer@gmail.com, Jose.Abreu@synopsys.com,
-	chenhuacai@loongson.cn, linux@armlinux.org.uk,
-	guyinggang@loongson.cn, netdev@vger.kernel.org,
-	loongarch@lists.linux.dev, chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH v6 5/9] net: stmmac: Add Loongson-specific register
- definitions
-Message-ID: <bc36a2a1-1c3c-4adb-8c8a-d4e4427a6999@lunn.ch>
-References: <cover.1702458672.git.siyanteng@loongson.cn>
- <40eff8db93b02599f00a156b07a0dcdacfc0fbf3.1702458672.git.siyanteng@loongson.cn>
- <8a7d2d11-a299-42e0-960f-a6916e9b54fe@lunn.ch>
- <033fedc9-1d96-408e-911b-9829c6a5e851@loongson.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3870B1D137;
+	Mon, 18 Dec 2023 15:34:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D5B7C433C7;
+	Mon, 18 Dec 2023 15:34:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702913672;
+	bh=JcaGFOxBdAWGxXi0BmXm9oDYVTLNqgQcR2Pq85HZItc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=VAQNKWcEUkRWFjq6tpWYpQJzK2EUmIc9yeAFj8v+mWi4FsWAhIil3Jh8aBpZgvqPh
+	 0uQptdIHnawvGbZR1g93gc79o4LGnarrfoHFCWCYBLx2Ffgk2WHm3iGH2Hcfm5BVHu
+	 QlF8lC+M72l0dssDpPTrklriIUEfDVOZKgMHannI56uzru7PwMhLoXGKkuksDcVek7
+	 PxhuJ7PlZTzhPxpeQrx5K/T0WGdBaPWi2X/zDWM687OlJPfyawMCAGx5DjRV79esJC
+	 hnuLhOkFntCahq7G7Mas8avhe2rKd4+TgjYrAzZYssZ5TJxvf5j3wz94PYPqj98kog
+	 brUGx8y70iY5Q==
+Message-ID: <239a5cbc-126f-4c27-bbbc-2b8b102716d5@kernel.org>
+Date: Mon, 18 Dec 2023 17:34:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <033fedc9-1d96-408e-911b-9829c6a5e851@loongson.cn>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 08/10] net: ethernet: ti: am65-cpsw: add
+ mqprio qdisc offload in channel mode
+To: Simon Horman <horms@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, shuah@kernel.org, vladimir.oltean@nxp.com,
+ s-vadapalli@ti.com, r-gunasekaran@ti.com, vigneshr@ti.com, srk@ti.com,
+ p-varis@ti.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20231215132048.43727-1-rogerq@kernel.org>
+ <20231215132048.43727-9-rogerq@kernel.org> <20231218134326.GD6288@kernel.org>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20231218134326.GD6288@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 18, 2023 at 06:22:04PM +0800, Yanteng Si wrote:
+Hi Simon,
+
+On 18/12/2023 15:43, Simon Horman wrote:
+> On Fri, Dec 15, 2023 at 03:20:46PM +0200, Roger Quadros wrote:
+>> From: Grygorii Strashko <grygorii.strashko@ti.com>
+>>
+>> This patch adds MQPRIO Qdisc offload in full 'channel' mode which allows
+>> not only setting up pri:tc mapping, but also configuring TX shapers
+>> (rate-limiting) on external port FIFOs.
+>>
+>> The MQPRIO Qdisc offload is expected to work with or without VLAN/priority
+>> tagged packets.
+>>
+>> The CPSW external Port FIFO has 8 Priority queues. The rate-limit can be
+>> set for each of these priority queues. Which Priority queue a packet is
+>> assigned to depends on PN_REG_TX_PRI_MAP register which maps header
+>> priority to switch priority.
+>>
+>> The header priority of a packet is assigned via the RX_PRI_MAP_REG which
+>> maps packet priority to header priority.
+>>
+>> The packet priority is either the VLAN priority (for VLAN tagged packets)
+>> or the thread/channel offset.
+>>
+>> For simplicity, we assign the same priority queue to all queues of a
+>> Traffic Class so it can be rate-limited correctly.
+>>
+>> Configuration example:
+>>  ethtool -L eth1 tx 5
+>>  ethtool --set-priv-flags eth1 p0-rx-ptype-rrobin off
+>>
+>>  tc qdisc add dev eth1 parent root handle 100: mqprio num_tc 3 \
+>>  map 0 0 1 2 0 0 0 0 0 0 0 0 0 0 0 0 \
+>>  queues 1@0 1@1 1@2 hw 1 mode channel \
+>>  shaper bw_rlimit min_rate 0 100mbit 200mbit max_rate 0 101mbit 202mbit
+>>
+>>  tc qdisc replace dev eth2 handle 100: parent root mqprio num_tc 1 \
+>>  map 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 queues 1@0 hw 1
+>>
+>>  ip link add link eth1 name eth1.100 type vlan id 100
+>>  ip link set eth1.100 type vlan egress 0:0 1:1 2:2 3:3 4:4 5:5 6:6 7:7
+>>
+>> In the above example two ports share the same TX CPPI queue 0 for low
+>> priority traffic. 3 traffic classes are defined for eth1 and mapped to:
+>> TC0 - low priority, TX CPPI queue 0 -> ext Port 1 fifo0, no rate limit
+>> TC1 - prio 2, TX CPPI queue 1 -> ext Port 1 fifo1, CIR=100Mbit/s, EIR=1Mbit/s
+>> TC2 - prio 3, TX CPPI queue 2 -> ext Port 1 fifo2, CIR=200Mbit/s, EIR=2Mbit/s
+>>
+>> Signed-off-by: Grygorii Strashko <grygorii.strashko@ti.com>
+>> Signed-off-by: Roger Quadros <rogerq@kernel.org>
 > 
-> 在 2023/12/16 23:47, Andrew Lunn 写道:
-> > On Wed, Dec 13, 2023 at 06:14:23PM +0800, Yanteng Si wrote:
-> > > There are two types of Loongson DWGMAC. The first type shares the same
-> > > register definitions and has similar logic as dwmac1000. The second type
-> > > uses several different register definitions.
-> > > 
-> > > Simply put, we split some single bit fields into double bits fileds:
-> > > 
-> > > DMA_INTR_ENA_NIE = 0x00040000 + 0x00020000
-> > > DMA_INTR_ENA_AIE = 0x00010000 + 0x00008000
-> > > DMA_STATUS_NIS = 0x00040000 + 0x00020000
-> > > DMA_STATUS_AIS = 0x00010000 + 0x00008000
-> > > DMA_STATUS_FBI = 0x00002000 + 0x00001000
-> > What is missing here is why? What are the second bits used for? And
+> ...
 > 
-> We think it is necessary to distinguish rx and tx, so we split these bits
-> into two.
+>> diff --git a/drivers/net/ethernet/ti/am65-cpsw-qos.c b/drivers/net/ethernet/ti/am65-cpsw-qos.c
+>> index 9f0a05e763d1..7ad7af3b3c60 100644
+>> --- a/drivers/net/ethernet/ti/am65-cpsw-qos.c
+>> +++ b/drivers/net/ethernet/ti/am65-cpsw-qos.c
+>> @@ -7,6 +7,7 @@
+>>   */
+>>  
+>>  #include <linux/pm_runtime.h>
+>> +#include <linux/math.h>
+>>  #include <linux/time.h>
+>>  #include <net/pkt_cls.h>
+>>  
+>> @@ -15,6 +16,8 @@
+>>  #include "am65-cpts.h"
+>>  #include "cpsw_ale.h"
+>>  
+>> +#define TO_MBPS(x)	DIV_ROUND_UP((x), BYTES_PER_MBIT)
 > 
-> this is:
+> Hi Grygorii and Roger,
 > 
-> DMA_INTR_ENA_NIE = rx + tx
+> a minor nit from my side: in order for BYTES_PER_MBIT to be defined
+> linux/units.h needs to be included. But that isn't added until
+> the next patch.
 
-O.K, so please add DMA_INTR_ENA_NIE_RX and DMA_INTR_ENA_NIE_TX
-#define's, etc.
+Thanks for the catch. I'll fix it in next spin.
 
-> We will care about it later. Because now we will support the minimum feature
-> set first, which can reduce everyone’s review pressure.
-
-Well, you failed with that, since you did not provide the details what
-these bits are. If you had directly handled the bits separately, it
-would of been obvious what they are for.
-
-      Andrew
+-- 
+cheers,
+-roger
 
