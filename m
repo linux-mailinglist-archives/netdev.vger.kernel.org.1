@@ -1,131 +1,143 @@
-Return-Path: <netdev+bounces-58570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3510D8170D5
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 14:51:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0380817239
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 15:07:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA3F51F23193
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 13:51:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E53B61C24D89
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 14:07:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1717B1D123;
-	Mon, 18 Dec 2023 13:51:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33D913A1A8;
+	Mon, 18 Dec 2023 14:04:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="RxMEhI0N"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="JryDuWhq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70755129EF3;
-	Mon, 18 Dec 2023 13:50:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BIAsVWW017332;
-	Mon, 18 Dec 2023 13:50:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id; s=qcppdkim1; bh=nUdOg7e/uqM8
-	fAT/uL8XeBHHGJeylXDTsQX179ijxSk=; b=RxMEhI0NwhaB8DgcapUyRgMHCN/n
-	zk6Pivg5MSY+vm24um1dVW2c+hxXhFP9ETICnsUGFxQ4oqmg2LfbksgnakeayWjo
-	hI21iB9FuXMVuALz31K+kvN87u1/4mlEmyvzAUusGz8lsb4MnAglB90RoJeZ3eo2
-	vlOhsdBDVarMUE3WhAIE+DwJ4+e7LN8W9UEs2+ymvoXoJpSJQe/aK/+erWx1LVDg
-	OZiQ9RkkgtONSfrxVQFUrc7N2oflGFjs1bXbZ/kLzNuA/uMkJNFlpb2cMCNEPXSD
-	lkorj2AdpJVZBuFQNtu87uO0CDqjdLeJVUbkMtvyUoagVzKYWbW/wRynUA==
-Received: from apblrppmta01.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3v2j2dgr4p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Dec 2023 13:50:41 +0000 (GMT)
-Received: from pps.filterd (APBLRPPMTA01.qualcomm.com [127.0.0.1])
-	by APBLRPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 3BIDoblo013928;
-	Mon, 18 Dec 2023 13:50:37 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTP id 3v14ym0na4-1;
-	Mon, 18 Dec 2023 13:50:37 +0000
-Received: from APBLRPPMTA01.qualcomm.com (APBLRPPMTA01.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BIDoa0d013922;
-	Mon, 18 Dec 2023 13:50:36 GMT
-Received: from hu-maiyas-hyd.qualcomm.com (hu-snehshah-hyd.qualcomm.com [10.147.246.35])
-	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTP id 3BIDoa8n013918;
-	Mon, 18 Dec 2023 13:50:36 +0000
-Received: by hu-maiyas-hyd.qualcomm.com (Postfix, from userid 2319345)
-	id 9DB1D5001DB; Mon, 18 Dec 2023 19:20:35 +0530 (+0530)
-From: Sneh Shah <quic_snehshah@quicinc.com>
-To: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Andrew Halaney <ahalaney@redhat.com>
-Cc: Sneh Shah <quic_snehshah@quicinc.com>, kernel@quicinc.com
-Subject: [PATCH net-next] net: stmmac: Fix ethool link settings ops for integrated PCS
-Date: Mon, 18 Dec 2023 19:20:32 +0530
-Message-Id: <20231218135032.27209-1-quic_snehshah@quicinc.com>
-X-Mailer: git-send-email 2.17.1
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: MsEGX18yZSJR_NepSVO8KsNU-e5xjiMl
-X-Proofpoint-GUID: MsEGX18yZSJR_NepSVO8KsNU-e5xjiMl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
- mlxscore=0 bulkscore=0 suspectscore=0 impostorscore=0 priorityscore=1501
- adultscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2311290000
- definitions=main-2312180100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F7A3789C;
+	Mon, 18 Dec 2023 14:04:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B366C433C8;
+	Mon, 18 Dec 2023 14:04:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1702908275;
+	bh=12JU2qGxIsCVYa5CU7ihXZlf1Z40nsoKy2hh4Sh+Bh8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=JryDuWhq84qWvKta+TwKZj8lEtqj8MqJAo8DcUoGT7/PbqxxR6mMPq+AkmmYwmYxM
+	 b4nwkuo4TCHtBDPUAVgP97XHYgb2zkgU5//DivFdh4s5oJjYbdBi0Kf59qYu7mfakA
+	 wmJsY768zaKAqiUiqf0/Gg47k+k4TpSf5xOUxmLM=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org,
+	netdev@vger.kernel.org,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.6 088/166] rxrpc: Fix some minor issues with bundle tracing
+Date: Mon, 18 Dec 2023 14:50:54 +0100
+Message-ID: <20231218135108.934698009@linuxfoundation.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20231218135104.927894164@linuxfoundation.org>
+References: <20231218135104.927894164@linuxfoundation.org>
+User-Agent: quilt/0.67
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Currently get/set_link_ksettings ethtool ops are dependent on PCS.
-When PCS is integrated in MAC, it will not have separate link config.
-Bypass cofiguring and checking PCS link config for integrated PCS.
+6.6-stable review patch.  If anyone has any objections, please let me know.
 
-Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
+------------------
+
+From: David Howells <dhowells@redhat.com>
+
+[ Upstream commit 0c3bd086d12d185650d095a906662593ec607bd0 ]
+
+Fix some superficial issues with the tracing of rxrpc_bundle structs,
+including:
+
+ (1) Set the debug_id when the bundle is allocated rather than when it is
+     set up so that the "NEW" trace line displays the correct bundle ID.
+
+ (2) Show the refcount when emitting the "FREE" traceline.
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: linux-afs@lists.infradead.org
+cc: netdev@vger.kernel.org
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ net/rxrpc/conn_client.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-index f628411ae4ae..e3ba4cd47b8d 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-@@ -311,8 +311,9 @@ static int stmmac_ethtool_get_link_ksettings(struct net_device *dev,
+diff --git a/net/rxrpc/conn_client.c b/net/rxrpc/conn_client.c
+index 981ca5b98bcb9..1d95f8bc769fa 100644
+--- a/net/rxrpc/conn_client.c
++++ b/net/rxrpc/conn_client.c
+@@ -73,6 +73,7 @@ static void rxrpc_destroy_client_conn_ids(struct rxrpc_local *local)
+ static struct rxrpc_bundle *rxrpc_alloc_bundle(struct rxrpc_call *call,
+ 					       gfp_t gfp)
  {
- 	struct stmmac_priv *priv = netdev_priv(dev);
++	static atomic_t rxrpc_bundle_id;
+ 	struct rxrpc_bundle *bundle;
  
--	if (priv->hw->pcs & STMMAC_PCS_RGMII ||
--	    priv->hw->pcs & STMMAC_PCS_SGMII) {
-+	if (!(priv->plat->flags & STMMAC_FLAG_HAS_INTEGRATED_PCS) &&
-+	    (priv->hw->pcs & STMMAC_PCS_RGMII ||
-+	     priv->hw->pcs & STMMAC_PCS_SGMII)) {
- 		struct rgmii_adv adv;
- 		u32 supported, advertising, lp_advertising;
+ 	bundle = kzalloc(sizeof(*bundle), gfp);
+@@ -85,6 +86,7 @@ static struct rxrpc_bundle *rxrpc_alloc_bundle(struct rxrpc_call *call,
+ 		bundle->upgrade		= test_bit(RXRPC_CALL_UPGRADE, &call->flags);
+ 		bundle->service_id	= call->dest_srx.srx_service;
+ 		bundle->security_level	= call->security_level;
++		bundle->debug_id	= atomic_inc_return(&rxrpc_bundle_id);
+ 		refcount_set(&bundle->ref, 1);
+ 		atomic_set(&bundle->active, 1);
+ 		INIT_LIST_HEAD(&bundle->waiting_calls);
+@@ -105,7 +107,8 @@ struct rxrpc_bundle *rxrpc_get_bundle(struct rxrpc_bundle *bundle,
  
-@@ -397,8 +398,9 @@ stmmac_ethtool_set_link_ksettings(struct net_device *dev,
+ static void rxrpc_free_bundle(struct rxrpc_bundle *bundle)
  {
- 	struct stmmac_priv *priv = netdev_priv(dev);
+-	trace_rxrpc_bundle(bundle->debug_id, 1, rxrpc_bundle_free);
++	trace_rxrpc_bundle(bundle->debug_id, refcount_read(&bundle->ref),
++			   rxrpc_bundle_free);
+ 	rxrpc_put_peer(bundle->peer, rxrpc_peer_put_bundle);
+ 	key_put(bundle->key);
+ 	kfree(bundle);
+@@ -239,7 +242,6 @@ static bool rxrpc_may_reuse_conn(struct rxrpc_connection *conn)
+  */
+ int rxrpc_look_up_bundle(struct rxrpc_call *call, gfp_t gfp)
+ {
+-	static atomic_t rxrpc_bundle_id;
+ 	struct rxrpc_bundle *bundle, *candidate;
+ 	struct rxrpc_local *local = call->local;
+ 	struct rb_node *p, **pp, *parent;
+@@ -306,7 +308,6 @@ int rxrpc_look_up_bundle(struct rxrpc_call *call, gfp_t gfp)
+ 	}
  
--	if (priv->hw->pcs & STMMAC_PCS_RGMII ||
--	    priv->hw->pcs & STMMAC_PCS_SGMII) {
-+	if (!(priv->plat->flags & STMMAC_FLAG_HAS_INTEGRATED_PCS) &&
-+	    (priv->hw->pcs & STMMAC_PCS_RGMII ||
-+	     priv->hw->pcs & STMMAC_PCS_SGMII)) {
- 		/* Only support ANE */
- 		if (cmd->base.autoneg != AUTONEG_ENABLE)
- 			return -EINVAL;
+ 	_debug("new bundle");
+-	candidate->debug_id = atomic_inc_return(&rxrpc_bundle_id);
+ 	rb_link_node(&candidate->local_node, parent, pp);
+ 	rb_insert_color(&candidate->local_node, &local->client_bundles);
+ 	call->bundle = rxrpc_get_bundle(candidate, rxrpc_bundle_get_client_call);
 -- 
-2.17.1
+2.43.0
+
+
 
 
