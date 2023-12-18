@@ -1,252 +1,121 @@
-Return-Path: <netdev+bounces-58460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 009BB816816
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:34:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B59EC816818
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:34:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 337391C2251C
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 08:34:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71A69280D6E
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 08:34:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BC4C107A3;
-	Mon, 18 Dec 2023 08:33:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A801094B;
+	Mon, 18 Dec 2023 08:33:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HTevlBku"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nNXxBIND"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D1C11185
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 08:33:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702888425;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PZCyaG6jNmPR26J2KXgAzagBivkyvaOw3c3fQFDUPyw=;
-	b=HTevlBku9u25Xe+YOSGxFbMJwYZF4kOhSzYl9k9ppMGRBqbwOt3rfAd+axCIpts3T6A37L
-	2LN5ZYTPo3KJYxpA6P/lQNIEWca/rgSsjPBWCcZJUrZ3R0NXY8qOqgck5XibXIcFD0GpkV
-	m2gDUX5/5IRWf1LLkzxuZuYuNKoVNzw=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-91-W1ddd4zBOvmLmbZTM7dFyQ-1; Mon, 18 Dec 2023 03:33:43 -0500
-X-MC-Unique: W1ddd4zBOvmLmbZTM7dFyQ-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a232d6a33a3so18998966b.0
-        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 00:33:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702888423; x=1703493223;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PZCyaG6jNmPR26J2KXgAzagBivkyvaOw3c3fQFDUPyw=;
-        b=U0M/M9lkrI0TOHJ2tB1QiVzIj+LE3GsAGZRdvPJ1/xLxG+IRqU7EIpkmqKDfw6WXSF
-         C08argbrb5Z9/Q3lEG7zNSzAmeyIkkbQTGu+ecflI/Xgl9tTwJrpQW1U4aJKkcuEaiyO
-         7lGYmMRMS3FsYsZY1trBhI0QroYbRrpj7dsPoiX0ICU1i8idiHC64X3dgNlM90Yvj+TB
-         C2MHb3ij7rPmM1sf0CW1sfL2lEZrPkaca3lHnApXwef+ALFFYoUuKpqRws/p8NSidAZZ
-         UqM6K2KTJzcPiSsTu9J3pjgHgMXMMybBHCkKEViyUm/Q9jFbenOiQLUh8YkxyuTIPgE9
-         sMZA==
-X-Gm-Message-State: AOJu0Yw6/edcSXeFw0N0/D1HZT0T3497Y7JG/iuWOusGQDL8aaVC16qy
-	kJVofmgYvDkE8RMHR8m8V5JJ0KFXAYNXS01NO/ydxHSJdXGwdhtl9mOxcN4Z3CCMPzf/a569zpV
-	jIeb36eV8DQSesYBO
-X-Received: by 2002:a17:906:d9c8:b0:a23:58f9:e1c6 with SMTP id qk8-20020a170906d9c800b00a2358f9e1c6mr964554ejb.2.1702888422803;
-        Mon, 18 Dec 2023 00:33:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGQGBMWYTkky6iUzAdVFk/IT8+5vyhBj/peOAS45LyC7l2LbL4ZHsINHOLEzPcnUm2Z41gz1w==
-X-Received: by 2002:a17:906:d9c8:b0:a23:58f9:e1c6 with SMTP id qk8-20020a170906d9c800b00a2358f9e1c6mr964532ejb.2.1702888422424;
-        Mon, 18 Dec 2023 00:33:42 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-253-3.dyn.eolo.it. [146.241.253.3])
-        by smtp.gmail.com with ESMTPSA id li18-20020a170907199200b00a1e4558e450sm13852424ejc.156.2023.12.18.00.33.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Dec 2023 00:33:41 -0800 (PST)
-Message-ID: <a8d155ec7d43bf3308fcfa3387dc16d1723617c6.camel@redhat.com>
-Subject: Re: [PATCH net-next 12/24] seg6: Use nested-BH locking for
- seg6_bpf_srh_states.
-From: Paolo Abeni <pabeni@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, Boqun Feng
- <boqun.feng@gmail.com>,  Daniel Borkmann <daniel@iogearbox.net>, Eric
- Dumazet <edumazet@google.com>, Frederic Weisbecker <frederic@kernel.org>,
- Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Peter
- Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>,
- Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>, Alexei
- Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, David
- Ahern <dsahern@kernel.org>, Hao Luo <haoluo@google.com>,  Jiri Olsa
- <jolsa@kernel.org>, John Fastabend <john.fastabend@gmail.com>, KP Singh
- <kpsingh@kernel.org>,  Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
- <song@kernel.org>, Stanislav Fomichev <sdf@google.com>, Yonghong Song
- <yonghong.song@linux.dev>, bpf@vger.kernel.org
-Date: Mon, 18 Dec 2023 09:33:39 +0100
-In-Reply-To: <20231215171020.687342-13-bigeasy@linutronix.de>
-References: <20231215171020.687342-1-bigeasy@linutronix.de>
-	 <20231215171020.687342-13-bigeasy@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BAF1119F
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 08:33:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCF01C433BA;
+	Mon, 18 Dec 2023 08:33:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702888431;
+	bh=6S0SJlUripJgMDU4h59IQMRxeLJODmnZ9gVF+qUmWvk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nNXxBINDMlki/Tl0E4AsMgkGk7YOYj73aqX77FRDHxY5RCfRxZCilwYJQbzm2bcZ9
+	 Yi8mWmOKl04c3iu9U14YEFo7MjE/eV1cvZYJxC/5BrwnAwnnmwnXIvZl/EK6MX5wal
+	 l3EGIpqfLcJI6cYXFZfDUNwM/kYxZNbLOuanS+iTOylb+tvuerOhi+2/jCc6lxlZPn
+	 5RCxd+imUVrAVpqZhvmCh9r551IEDmOA7qiBDyI/v4JKkEg357czL/o6QR0rV3V2/P
+	 1LXnvNLTDvZsfv8/ljkebjz2e1Piy9dsF4l0z7ZN0ph29wG2zD/4Rchgn/Jmm2RF42
+	 UJ2SgSIQHREmw==
+Date: Mon, 18 Dec 2023 08:33:45 +0000
+From: Simon Horman <horms@kernel.org>
+To: Ioana Ciornei <ioana.ciornei@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 6/8] dpaa2-switch: reorganize the
+ [pre]changeupper events
+Message-ID: <20231218083345.GA6288@kernel.org>
+References: <20231213121411.3091597-1-ioana.ciornei@nxp.com>
+ <20231213121411.3091597-7-ioana.ciornei@nxp.com>
+ <20231215114939.GB6288@kernel.org>
+ <tkskehfowdrohukyhqu4ae6t56ceuwp6p2mm7r2tfzihladl6t@vxeggsm2ppte>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <tkskehfowdrohukyhqu4ae6t56ceuwp6p2mm7r2tfzihladl6t@vxeggsm2ppte>
 
-On Fri, 2023-12-15 at 18:07 +0100, Sebastian Andrzej Siewior wrote:
-> The access to seg6_bpf_srh_states is protected by disabling preemption.
-> Based on the code, the entry point is input_action_end_bpf() and
-> every other function (the bpf helper functions bpf_lwt_seg6_*()), that
-> is accessing seg6_bpf_srh_states, should be called from within
-> input_action_end_bpf().
->=20
-> input_action_end_bpf() accesses seg6_bpf_srh_states first at the top of
-> the function and then disables preemption. This looks wrong because if
-> preemption needs to be disabled as part of the locking mechanism then
-> the variable shouldn't be accessed beforehand.
->=20
-> Looking at how it is used via test_lwt_seg6local.sh then
-> input_action_end_bpf() is always invoked from softirq context. If this
-> is always the case then the preempt_disable() statement is superfluous.
-> If this is not always invoked from softirq then disabling only
-> preemption is not sufficient.
->=20
-> Replace the preempt_disable() statement with nested-BH locking. This is
-> not an equivalent replacement as it assumes that the invocation of
-> input_action_end_bpf() always occurs in softirq context and thus the
-> preempt_disable() is superfluous.
-> Add a local_lock_t the data structure and use local_lock_nested_bh() in
-> guard notation for locking. Add lockdep_assert_held() to ensure the lock
-> is held while the per-CPU variable is referenced in the helper functions.
->=20
-> Cc: Alexei Starovoitov <ast@kernel.org>
-> Cc: Andrii Nakryiko <andrii@kernel.org>
-> Cc: David Ahern <dsahern@kernel.org>
-> Cc: Hao Luo <haoluo@google.com>
-> Cc: Jiri Olsa <jolsa@kernel.org>
-> Cc: John Fastabend <john.fastabend@gmail.com>
-> Cc: KP Singh <kpsingh@kernel.org>
-> Cc: Martin KaFai Lau <martin.lau@linux.dev>
-> Cc: Song Liu <song@kernel.org>
-> Cc: Stanislav Fomichev <sdf@google.com>
-> Cc: Yonghong Song <yonghong.song@linux.dev>
-> Cc: bpf@vger.kernel.org
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> ---
->  include/net/seg6_local.h |  1 +
->  net/core/filter.c        |  3 ++
->  net/ipv6/seg6_local.c    | 59 ++++++++++++++++++++++------------------
->  3 files changed, 36 insertions(+), 27 deletions(-)
->=20
-> diff --git a/include/net/seg6_local.h b/include/net/seg6_local.h
-> index 3fab9dec2ec45..0f22771359f4c 100644
-> --- a/include/net/seg6_local.h
-> +++ b/include/net/seg6_local.h
-> @@ -20,6 +20,7 @@ extern bool seg6_bpf_has_valid_srh(struct sk_buff *skb)=
-;
-> =20
->  struct seg6_bpf_srh_state {
->  	struct ipv6_sr_hdr *srh;
-> +	local_lock_t bh_lock;
->  	u16 hdrlen;
->  	bool valid;
->  };
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 1737884be52f8..c8013f762524b 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -6384,6 +6384,7 @@ BPF_CALL_4(bpf_lwt_seg6_store_bytes, struct sk_buff=
- *, skb, u32, offset,
->  	void *srh_tlvs, *srh_end, *ptr;
->  	int srhoff =3D 0;
-> =20
-> +	lockdep_assert_held(&srh_state->bh_lock);
->  	if (srh =3D=3D NULL)
->  		return -EINVAL;
-> =20
-> @@ -6440,6 +6441,7 @@ BPF_CALL_4(bpf_lwt_seg6_action, struct sk_buff *, s=
-kb,
->  	int hdroff =3D 0;
->  	int err;
-> =20
-> +	lockdep_assert_held(&srh_state->bh_lock);
->  	switch (action) {
->  	case SEG6_LOCAL_ACTION_END_X:
->  		if (!seg6_bpf_has_valid_srh(skb))
-> @@ -6516,6 +6518,7 @@ BPF_CALL_3(bpf_lwt_seg6_adjust_srh, struct sk_buff =
-*, skb, u32, offset,
->  	int srhoff =3D 0;
->  	int ret;
-> =20
-> +	lockdep_assert_held(&srh_state->bh_lock);
->  	if (unlikely(srh =3D=3D NULL))
->  		return -EINVAL;
-> =20
-> diff --git a/net/ipv6/seg6_local.c b/net/ipv6/seg6_local.c
-> index 24e2b4b494cb0..ed7278af321a2 100644
-> --- a/net/ipv6/seg6_local.c
-> +++ b/net/ipv6/seg6_local.c
-> @@ -1380,7 +1380,9 @@ static int input_action_end_b6_encap(struct sk_buff=
- *skb,
->  	return err;
->  }
-> =20
-> -DEFINE_PER_CPU(struct seg6_bpf_srh_state, seg6_bpf_srh_states);
-> +DEFINE_PER_CPU(struct seg6_bpf_srh_state, seg6_bpf_srh_states) =3D {
-> +	.bh_lock	=3D INIT_LOCAL_LOCK(bh_lock),
-> +};
-> =20
->  bool seg6_bpf_has_valid_srh(struct sk_buff *skb)
->  {
-> @@ -1388,6 +1390,7 @@ bool seg6_bpf_has_valid_srh(struct sk_buff *skb)
->  		this_cpu_ptr(&seg6_bpf_srh_states);
->  	struct ipv6_sr_hdr *srh =3D srh_state->srh;
-> =20
-> +	lockdep_assert_held(&srh_state->bh_lock);
->  	if (unlikely(srh =3D=3D NULL))
->  		return false;
-> =20
-> @@ -1408,8 +1411,7 @@ bool seg6_bpf_has_valid_srh(struct sk_buff *skb)
->  static int input_action_end_bpf(struct sk_buff *skb,
->  				struct seg6_local_lwt *slwt)
->  {
-> -	struct seg6_bpf_srh_state *srh_state =3D
-> -		this_cpu_ptr(&seg6_bpf_srh_states);
-> +	struct seg6_bpf_srh_state *srh_state;
->  	struct ipv6_sr_hdr *srh;
->  	int ret;
-> =20
-> @@ -1420,41 +1422,44 @@ static int input_action_end_bpf(struct sk_buff *s=
-kb,
->  	}
->  	advance_nextseg(srh, &ipv6_hdr(skb)->daddr);
-> =20
-> -	/* preempt_disable is needed to protect the per-CPU buffer srh_state,
-> -	 * which is also accessed by the bpf_lwt_seg6_* helpers
-> +	/* The access to the per-CPU buffer srh_state is protected by running
-> +	 * always in softirq context (with disabled BH). On PREEMPT_RT the
-> +	 * required locking is provided by the following local_lock_nested_bh()
-> +	 * statement. It is also accessed by the bpf_lwt_seg6_* helpers via
-> +	 * bpf_prog_run_save_cb().
->  	 */
-> -	preempt_disable();
-> -	srh_state->srh =3D srh;
-> -	srh_state->hdrlen =3D srh->hdrlen << 3;
-> -	srh_state->valid =3D true;
-> +	scoped_guard(local_lock_nested_bh, &seg6_bpf_srh_states.bh_lock) {
-> +		srh_state =3D this_cpu_ptr(&seg6_bpf_srh_states);
-> +		srh_state->srh =3D srh;
-> +		srh_state->hdrlen =3D srh->hdrlen << 3;
-> +		srh_state->valid =3D true;
+On Fri, Dec 15, 2023 at 02:08:51PM +0200, Ioana Ciornei wrote:
+> On Fri, Dec 15, 2023 at 11:49:39AM +0000, Simon Horman wrote:
+> > On Wed, Dec 13, 2023 at 02:14:09PM +0200, Ioana Ciornei wrote:
 
-Here the 'scoped_guard' usage adds a lot of noise to the patch, due to
-the added indentation. What about using directly
-local_lock_nested_bh()/local_unlock_nested_bh() ?
+...
 
-Cheers,
+> > >  	if (!dpaa2_switch_port_dev_check(netdev))
+> > > -		return NOTIFY_DONE;
+> > > +		return 0;
+> > >  
+> > >  	extack = netdev_notifier_info_to_extack(&info->info);
+> > > -
+> > > -	switch (event) {
+> > > -	case NETDEV_PRECHANGEUPPER:
+> > > -		upper_dev = info->upper_dev;
+> > > -		if (!netif_is_bridge_master(upper_dev))
+> > > -			break;
+> > > -
+> > > +	upper_dev = info->upper_dev;
+> > > +	if (netif_is_bridge_master(upper_dev)) {
+> > >  		err = dpaa2_switch_prechangeupper_sanity_checks(netdev,
+> > >  								upper_dev,
+> > >  								extack);
+> > >  		if (err)
+> > > -			goto out;
+> > > +			return err;
+> > >  
+> > >  		if (!info->linking)
+> > >  			dpaa2_switch_port_pre_bridge_leave(netdev);
+> > > +	}
+> > 
+> > FWIIW, I think that a more idomatic flow would be to return if
+> > netif_is_bridge_master() is false. Something like this (completely untested!):
+> > 
+> > 	if (!netif_is_bridge_master(upper_dev))
+> > 		return 0;
+> > 
+> > 	err = dpaa2_switch_prechangeupper_sanity_checks(netdev, upper_dev,
+> > 							extack);
+> > 	if (err)
+> > 		return err;
+> > 
+> > 	if (!info->linking)
+> > 		dpaa2_switch_port_pre_bridge_leave(netdev);
+> > 
+> 
+> It looks better but I don't think this it's easily extensible.
+> 
+> I am planning to add support for LAG offloading which would mean that I
+> would have to revert to the initial flow and extend it to something
+> like:
+> 
+> 	if (netif_is_bridge_master(upper_dev)) {
+> 		...
+> 	} else if (netif_is_lag_master(upper_dev)) {
+> 		...
+> 	}
+> 
+> The same thing applies to the dpaa2_switch_port_changeupper() function
+> below.
 
-Paolo
+Understood. If this is going somewhere then don't let me derail it.
 
+,,,
 
