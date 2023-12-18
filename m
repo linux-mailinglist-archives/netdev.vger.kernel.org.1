@@ -1,100 +1,69 @@
-Return-Path: <netdev+bounces-58632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22834817A9E
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 20:09:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42867817AA0
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 20:10:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8699428110A
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 19:09:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D691D1F2306F
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 19:10:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A755A5D733;
-	Mon, 18 Dec 2023 19:08:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 405BC49891;
+	Mon, 18 Dec 2023 19:10:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fmfroHBM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sWmkz+Yv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1691653BF
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 19:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-336437ae847so3690706f8f.2
-        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 11:08:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702926533; x=1703531333; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/VjLnKurb94JOJEc5/JiQM+XH6LAGsKmWg8/mQBR2hU=;
-        b=fmfroHBM4X2l1OCJTFpgeb/lNf9lpOXjcqrojLpkFGaO5HPeoL9hecrW/2F0tuI0vX
-         eQZHxNZ47HdMxo6QYN0xl44X8rCjtBIhKMDhn27LXdVvTWJzXchXkS+EyAlSF0gNo7ih
-         waszJ2eZiNIg9/DRX940vuFaTtpIXB3It68jDUQoUW8N60xRuUA4RKoBil/Yzs2/2JVf
-         JMWt3TPsA+M59d7s1X4eKhxIfELhWi/dT8Q/vcpHsSKN7XLoh7tqA3eaS8n0nCUyGX2T
-         pBs49rE/Q7nLodIVYDwOtudcEP2bpXvMZxkENr0dPHrkEE4RBvsXTi/y9DMM2bgmZDU3
-         10vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702926533; x=1703531333;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/VjLnKurb94JOJEc5/JiQM+XH6LAGsKmWg8/mQBR2hU=;
-        b=moTm0mLXXqDuJE0hhrsWS0HceSE+gjr5FQsNE7Uuo62KEqeFzyDLS0tJgARTCKkVEh
-         IN3AHBGO1sU0B/WW8skXijG5moB5Lsop0WDu8JNktpd0fUX5bc/ZE6eWcHtsp56xYsrw
-         vQYMSPKc7nvYHEGm8ZbfaR97aF/jErKbcMf3A7U8YiphBE5aZgCJI0vbP3MgVWkXQCEU
-         3NQWWOj5q/8qOpiM94XMrYSfb3Ve8vr4vALn07BFYoTXBMLVtyW7A+996U9DMF9br4i2
-         SI8e3KFRSOonNOMMCP5gVWnL3KAQYAiVbljTqPfIeG86oheTTELVynxPg3qoTnMhLZly
-         fp/A==
-X-Gm-Message-State: AOJu0YwhwAZglGi7K3thY/hb9If36ZSfHrjGER/ul3GZYYegijTiB4KI
-	yRBKPe1NkOq4n7R+43T1gfOAkbKZGvieN4/Xyr0IFw==
-X-Google-Smtp-Source: AGHT+IHaFdfIEpO3fZUTL4Wf2Y8HPXZH1xwNOjyaIvh0OcsgRhDmrYh6xFp6oxBL15Pvv/pP34wDIwpN82+DbGf4Bh0=
-X-Received: by 2002:a5d:488b:0:b0:333:2fd2:5d2e with SMTP id
- g11-20020a5d488b000000b003332fd25d2emr8604653wrq.96.1702926533113; Mon, 18
- Dec 2023 11:08:53 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2317853BF;
+	Mon, 18 Dec 2023 19:10:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C690C433C7;
+	Mon, 18 Dec 2023 19:10:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702926619;
+	bh=XGALOxLIXLpZiiD0d7eWWL8+n4CoB+wewPDQcWFCmhk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sWmkz+Yvt9Qrj05CCyrLpZ3TPXeciu2TaZ5JrrcFJlBGi1QKnmM1tSSbfQ/DffYP4
+	 3b4PTq5enB8VFO2cuyqleezvn1pBpN8YePMCr1x3+aSEveT8eyiE7c7pUm9oXZR1SU
+	 Zd8eAOsno3I0dJoNT8ZVXsRak77rjJSApJL2o9TXxcLXGBydCZMMY7uXT8/X1adWkq
+	 Hyar8QMB/LUc/XDbquDBPy8swrMt3mpb1gJkbS9gvFFGCdc3q9bPi8csAHyVDyifFG
+	 ihC/n4jUDkvPJMGrN2C4lsN8ZnyvrO51LAz1wN3qkat2Vk6NLeQgb61nYj0hKG6nU2
+	 vutWp5r7exVMg==
+Date: Mon, 18 Dec 2023 19:10:14 +0000
+From: Simon Horman <horms@kernel.org>
+To: Suman Ghosh <sumang@marvell.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, sgoutham@marvell.com, sbhatta@marvell.com,
+	jerinj@marvell.com, gakula@marvell.com, hkelam@marvell.com,
+	lcherian@marvell.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH] octeontx2-af: Fix a double free issue
+Message-ID: <20231218191014.GK6288@kernel.org>
+References: <20231218180258.303468-1-sumang@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231217-i40e-comma-v1-1-85c075eff237@kernel.org>
- <CAKwvOd=ZKV6KsgX0UxBX4Y89YEgpry00jG6K6qSjodwY3DLAzA@mail.gmail.com> <20231218190055.GB2863043@dev-arch.thelio-3990X>
-In-Reply-To: <20231218190055.GB2863043@dev-arch.thelio-3990X>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Mon, 18 Dec 2023 11:08:38 -0800
-Message-ID: <CAKwvOd=LjM08FyiXu-Qn7JmtM0oBD7rf4qkr=oo3QKeP+njRUw@mail.gmail.com>
-Subject: Re: [PATCH iwl-next] i40e: Avoid unnecessary use of comma operator
-To: Nathan Chancellor <nathan@kernel.org>, Simon Horman <horms@kernel.org>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, intel-wired-lan@lists.osuosl.org, 
-	netdev@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231218180258.303468-1-sumang@marvell.com>
 
-On Mon, Dec 18, 2023 at 11:00=E2=80=AFAM Nathan Chancellor <nathan@kernel.o=
-rg> wrote:
->
-> On Mon, Dec 18, 2023 at 08:32:28AM -0800, Nick Desaulniers wrote:
-> > (Is -Wcomma enabled by -Wall?)
->
-> No and last time that I looked into enabling it, there were a lot of
-> instances in the kernel:
->
-> https://lore.kernel.org/20230630192825.GA2745548@dev-arch.thelio-3990X/
->
-> It is still probably worth pursuing at some point but that is a lot of
-> instances to clean up (along with potentially having a decent amount of
-> pushback depending on the changes necessary to eliminate all instances).
+On Mon, Dec 18, 2023 at 11:32:58PM +0530, Suman Ghosh wrote:
+> There was a memory leak during error handling in function
+> npc_mcam_rsrcs_init().
+> 
+> Fixes: dd7842878633 ("octeontx2-af: Add new devlink param to configure maximum usable NIX block LFs")
+> Suggested-by: Simon Horman <horms@kernel.org>
+> Signed-off-by: Suman Ghosh <sumang@marvell.com>
 
-Filed this todo:
-https://github.com/ClangBuiltLinux/linux/issues/1968
-I'd be happy if Simon keeps poking at getting that warning enabled.
---=20
-Thanks,
-~Nick Desaulniers
+Hi Suman,
+
+thanks for the quick fix.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
