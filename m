@@ -1,110 +1,252 @@
-Return-Path: <netdev+bounces-58471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 428F88168E8
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:57:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 009BB816816
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:34:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 001BD282EE9
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 08:57:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 337391C2251C
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 08:34:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 863B210959;
-	Mon, 18 Dec 2023 08:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BC4C107A3;
+	Mon, 18 Dec 2023 08:33:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="HqwLgHin"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HTevlBku"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A15B111A1;
-	Mon, 18 Dec 2023 08:57:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BI3LPCC020756;
-	Mon, 18 Dec 2023 00:57:16 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=pfpt0220; bh=P9HCpRvo
-	cxgDIAlncH65HWa5yp44CPybVsfOANN0Cxc=; b=HqwLgHinFwzACcXxbBHL3emG
-	IFK3RVCaOPHASwKkZmDTQYufZpAs9cMnbp8TwGlskVkWCJqA92t5xVSAzxBX+CJf
-	CgEOE4qyYSDvN38iqCqsnkrpNjeuITIC0+MHL7g5yLZs3UG7f0MmMY50du2OCW7k
-	ErMyp67gQ/BceCfuoq9qeEb+Hz8UvRYO4jlfEzFkYaN/2325WPJr5xCNDqnMry1a
-	z4OFXrwDnSJmZIwoOSDSHd+ADaSO0gIxIU/g+Axow+4XY+eXYbrxoudS3Y6TQyEI
-	5jfbkH6B9EBMrkKHdWfVCrSb+gZsDk7aWgNIFjSsx103HxY4UtdRCVOA1054vA==
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3v2e3v8y3c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Mon, 18 Dec 2023 00:57:16 -0800 (PST)
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 18 Dec
- 2023 00:57:15 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Mon, 18 Dec 2023 00:57:15 -0800
-Received: from localhost.localdomain (unknown [10.28.36.166])
-	by maili.marvell.com (Postfix) with ESMTP id 48E643F7970;
-	Mon, 18 Dec 2023 00:28:01 -0800 (PST)
-From: Suman Ghosh <sumang@marvell.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <sgoutham@marvell.com>, <sbhatta@marvell.com>,
-        <jerinj@marvell.com>, <gakula@marvell.com>, <hkelam@marvell.com>,
-        <lcherian@marvell.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: Suman Ghosh <sumang@marvell.com>
-Subject: [net PATCH] octeontx2-af: Fix marking couple of structure as __packed
-Date: Mon, 18 Dec 2023 13:57:58 +0530
-Message-ID: <20231218082758.247831-1-sumang@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D1C11185
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 08:33:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702888425;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PZCyaG6jNmPR26J2KXgAzagBivkyvaOw3c3fQFDUPyw=;
+	b=HTevlBku9u25Xe+YOSGxFbMJwYZF4kOhSzYl9k9ppMGRBqbwOt3rfAd+axCIpts3T6A37L
+	2LN5ZYTPo3KJYxpA6P/lQNIEWca/rgSsjPBWCcZJUrZ3R0NXY8qOqgck5XibXIcFD0GpkV
+	m2gDUX5/5IRWf1LLkzxuZuYuNKoVNzw=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-91-W1ddd4zBOvmLmbZTM7dFyQ-1; Mon, 18 Dec 2023 03:33:43 -0500
+X-MC-Unique: W1ddd4zBOvmLmbZTM7dFyQ-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a232d6a33a3so18998966b.0
+        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 00:33:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702888423; x=1703493223;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PZCyaG6jNmPR26J2KXgAzagBivkyvaOw3c3fQFDUPyw=;
+        b=U0M/M9lkrI0TOHJ2tB1QiVzIj+LE3GsAGZRdvPJ1/xLxG+IRqU7EIpkmqKDfw6WXSF
+         C08argbrb5Z9/Q3lEG7zNSzAmeyIkkbQTGu+ecflI/Xgl9tTwJrpQW1U4aJKkcuEaiyO
+         7lGYmMRMS3FsYsZY1trBhI0QroYbRrpj7dsPoiX0ICU1i8idiHC64X3dgNlM90Yvj+TB
+         C2MHb3ij7rPmM1sf0CW1sfL2lEZrPkaca3lHnApXwef+ALFFYoUuKpqRws/p8NSidAZZ
+         UqM6K2KTJzcPiSsTu9J3pjgHgMXMMybBHCkKEViyUm/Q9jFbenOiQLUh8YkxyuTIPgE9
+         sMZA==
+X-Gm-Message-State: AOJu0Yw6/edcSXeFw0N0/D1HZT0T3497Y7JG/iuWOusGQDL8aaVC16qy
+	kJVofmgYvDkE8RMHR8m8V5JJ0KFXAYNXS01NO/ydxHSJdXGwdhtl9mOxcN4Z3CCMPzf/a569zpV
+	jIeb36eV8DQSesYBO
+X-Received: by 2002:a17:906:d9c8:b0:a23:58f9:e1c6 with SMTP id qk8-20020a170906d9c800b00a2358f9e1c6mr964554ejb.2.1702888422803;
+        Mon, 18 Dec 2023 00:33:42 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGQGBMWYTkky6iUzAdVFk/IT8+5vyhBj/peOAS45LyC7l2LbL4ZHsINHOLEzPcnUm2Z41gz1w==
+X-Received: by 2002:a17:906:d9c8:b0:a23:58f9:e1c6 with SMTP id qk8-20020a170906d9c800b00a2358f9e1c6mr964532ejb.2.1702888422424;
+        Mon, 18 Dec 2023 00:33:42 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-253-3.dyn.eolo.it. [146.241.253.3])
+        by smtp.gmail.com with ESMTPSA id li18-20020a170907199200b00a1e4558e450sm13852424ejc.156.2023.12.18.00.33.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Dec 2023 00:33:41 -0800 (PST)
+Message-ID: <a8d155ec7d43bf3308fcfa3387dc16d1723617c6.camel@redhat.com>
+Subject: Re: [PATCH net-next 12/24] seg6: Use nested-BH locking for
+ seg6_bpf_srh_states.
+From: Paolo Abeni <pabeni@redhat.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, Boqun Feng
+ <boqun.feng@gmail.com>,  Daniel Borkmann <daniel@iogearbox.net>, Eric
+ Dumazet <edumazet@google.com>, Frederic Weisbecker <frederic@kernel.org>,
+ Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Peter
+ Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>, Alexei
+ Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, David
+ Ahern <dsahern@kernel.org>, Hao Luo <haoluo@google.com>,  Jiri Olsa
+ <jolsa@kernel.org>, John Fastabend <john.fastabend@gmail.com>, KP Singh
+ <kpsingh@kernel.org>,  Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
+ <song@kernel.org>, Stanislav Fomichev <sdf@google.com>, Yonghong Song
+ <yonghong.song@linux.dev>, bpf@vger.kernel.org
+Date: Mon, 18 Dec 2023 09:33:39 +0100
+In-Reply-To: <20231215171020.687342-13-bigeasy@linutronix.de>
+References: <20231215171020.687342-1-bigeasy@linutronix.de>
+	 <20231215171020.687342-13-bigeasy@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: eE_W25v32nyC96SHiaYXWkHuFXnEU8xR
-X-Proofpoint-GUID: eE_W25v32nyC96SHiaYXWkHuFXnEU8xR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
 
-Couple of structures was not marked as __packed which may have some
-performance implication. This patch fixes the same and mark them as
-__packed.
+On Fri, 2023-12-15 at 18:07 +0100, Sebastian Andrzej Siewior wrote:
+> The access to seg6_bpf_srh_states is protected by disabling preemption.
+> Based on the code, the entry point is input_action_end_bpf() and
+> every other function (the bpf helper functions bpf_lwt_seg6_*()), that
+> is accessing seg6_bpf_srh_states, should be called from within
+> input_action_end_bpf().
+>=20
+> input_action_end_bpf() accesses seg6_bpf_srh_states first at the top of
+> the function and then disables preemption. This looks wrong because if
+> preemption needs to be disabled as part of the locking mechanism then
+> the variable shouldn't be accessed beforehand.
+>=20
+> Looking at how it is used via test_lwt_seg6local.sh then
+> input_action_end_bpf() is always invoked from softirq context. If this
+> is always the case then the preempt_disable() statement is superfluous.
+> If this is not always invoked from softirq then disabling only
+> preemption is not sufficient.
+>=20
+> Replace the preempt_disable() statement with nested-BH locking. This is
+> not an equivalent replacement as it assumes that the invocation of
+> input_action_end_bpf() always occurs in softirq context and thus the
+> preempt_disable() is superfluous.
+> Add a local_lock_t the data structure and use local_lock_nested_bh() in
+> guard notation for locking. Add lockdep_assert_held() to ensure the lock
+> is held while the per-CPU variable is referenced in the helper functions.
+>=20
+> Cc: Alexei Starovoitov <ast@kernel.org>
+> Cc: Andrii Nakryiko <andrii@kernel.org>
+> Cc: David Ahern <dsahern@kernel.org>
+> Cc: Hao Luo <haoluo@google.com>
+> Cc: Jiri Olsa <jolsa@kernel.org>
+> Cc: John Fastabend <john.fastabend@gmail.com>
+> Cc: KP Singh <kpsingh@kernel.org>
+> Cc: Martin KaFai Lau <martin.lau@linux.dev>
+> Cc: Song Liu <song@kernel.org>
+> Cc: Stanislav Fomichev <sdf@google.com>
+> Cc: Yonghong Song <yonghong.song@linux.dev>
+> Cc: bpf@vger.kernel.org
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> ---
+>  include/net/seg6_local.h |  1 +
+>  net/core/filter.c        |  3 ++
+>  net/ipv6/seg6_local.c    | 59 ++++++++++++++++++++++------------------
+>  3 files changed, 36 insertions(+), 27 deletions(-)
+>=20
+> diff --git a/include/net/seg6_local.h b/include/net/seg6_local.h
+> index 3fab9dec2ec45..0f22771359f4c 100644
+> --- a/include/net/seg6_local.h
+> +++ b/include/net/seg6_local.h
+> @@ -20,6 +20,7 @@ extern bool seg6_bpf_has_valid_srh(struct sk_buff *skb)=
+;
+> =20
+>  struct seg6_bpf_srh_state {
+>  	struct ipv6_sr_hdr *srh;
+> +	local_lock_t bh_lock;
+>  	u16 hdrlen;
+>  	bool valid;
+>  };
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 1737884be52f8..c8013f762524b 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -6384,6 +6384,7 @@ BPF_CALL_4(bpf_lwt_seg6_store_bytes, struct sk_buff=
+ *, skb, u32, offset,
+>  	void *srh_tlvs, *srh_end, *ptr;
+>  	int srhoff =3D 0;
+> =20
+> +	lockdep_assert_held(&srh_state->bh_lock);
+>  	if (srh =3D=3D NULL)
+>  		return -EINVAL;
+> =20
+> @@ -6440,6 +6441,7 @@ BPF_CALL_4(bpf_lwt_seg6_action, struct sk_buff *, s=
+kb,
+>  	int hdroff =3D 0;
+>  	int err;
+> =20
+> +	lockdep_assert_held(&srh_state->bh_lock);
+>  	switch (action) {
+>  	case SEG6_LOCAL_ACTION_END_X:
+>  		if (!seg6_bpf_has_valid_srh(skb))
+> @@ -6516,6 +6518,7 @@ BPF_CALL_3(bpf_lwt_seg6_adjust_srh, struct sk_buff =
+*, skb, u32, offset,
+>  	int srhoff =3D 0;
+>  	int ret;
+> =20
+> +	lockdep_assert_held(&srh_state->bh_lock);
+>  	if (unlikely(srh =3D=3D NULL))
+>  		return -EINVAL;
+> =20
+> diff --git a/net/ipv6/seg6_local.c b/net/ipv6/seg6_local.c
+> index 24e2b4b494cb0..ed7278af321a2 100644
+> --- a/net/ipv6/seg6_local.c
+> +++ b/net/ipv6/seg6_local.c
+> @@ -1380,7 +1380,9 @@ static int input_action_end_b6_encap(struct sk_buff=
+ *skb,
+>  	return err;
+>  }
+> =20
+> -DEFINE_PER_CPU(struct seg6_bpf_srh_state, seg6_bpf_srh_states);
+> +DEFINE_PER_CPU(struct seg6_bpf_srh_state, seg6_bpf_srh_states) =3D {
+> +	.bh_lock	=3D INIT_LOCAL_LOCK(bh_lock),
+> +};
+> =20
+>  bool seg6_bpf_has_valid_srh(struct sk_buff *skb)
+>  {
+> @@ -1388,6 +1390,7 @@ bool seg6_bpf_has_valid_srh(struct sk_buff *skb)
+>  		this_cpu_ptr(&seg6_bpf_srh_states);
+>  	struct ipv6_sr_hdr *srh =3D srh_state->srh;
+> =20
+> +	lockdep_assert_held(&srh_state->bh_lock);
+>  	if (unlikely(srh =3D=3D NULL))
+>  		return false;
+> =20
+> @@ -1408,8 +1411,7 @@ bool seg6_bpf_has_valid_srh(struct sk_buff *skb)
+>  static int input_action_end_bpf(struct sk_buff *skb,
+>  				struct seg6_local_lwt *slwt)
+>  {
+> -	struct seg6_bpf_srh_state *srh_state =3D
+> -		this_cpu_ptr(&seg6_bpf_srh_states);
+> +	struct seg6_bpf_srh_state *srh_state;
+>  	struct ipv6_sr_hdr *srh;
+>  	int ret;
+> =20
+> @@ -1420,41 +1422,44 @@ static int input_action_end_bpf(struct sk_buff *s=
+kb,
+>  	}
+>  	advance_nextseg(srh, &ipv6_hdr(skb)->daddr);
+> =20
+> -	/* preempt_disable is needed to protect the per-CPU buffer srh_state,
+> -	 * which is also accessed by the bpf_lwt_seg6_* helpers
+> +	/* The access to the per-CPU buffer srh_state is protected by running
+> +	 * always in softirq context (with disabled BH). On PREEMPT_RT the
+> +	 * required locking is provided by the following local_lock_nested_bh()
+> +	 * statement. It is also accessed by the bpf_lwt_seg6_* helpers via
+> +	 * bpf_prog_run_save_cb().
+>  	 */
+> -	preempt_disable();
+> -	srh_state->srh =3D srh;
+> -	srh_state->hdrlen =3D srh->hdrlen << 3;
+> -	srh_state->valid =3D true;
+> +	scoped_guard(local_lock_nested_bh, &seg6_bpf_srh_states.bh_lock) {
+> +		srh_state =3D this_cpu_ptr(&seg6_bpf_srh_states);
+> +		srh_state->srh =3D srh;
+> +		srh_state->hdrlen =3D srh->hdrlen << 3;
+> +		srh_state->valid =3D true;
 
-Fixes: 42006910b5ea ("octeontx2-af: cleanup KPU config data")
-Signed-off-by: Suman Ghosh <sumang@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/npc.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Here the 'scoped_guard' usage adds a lot of noise to the patch, due to
+the added indentation. What about using directly
+local_lock_nested_bh()/local_unlock_nested_bh() ?
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-index ab3e39eef2eb..8c0732c9a7ee 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-@@ -528,7 +528,7 @@ struct npc_lt_def {
- 	u8	ltype_mask;
- 	u8	ltype_match;
- 	u8	lid;
--};
-+} __packed;
- 
- struct npc_lt_def_ipsec {
- 	u8	ltype_mask;
-@@ -536,7 +536,7 @@ struct npc_lt_def_ipsec {
- 	u8	lid;
- 	u8	spi_offset;
- 	u8	spi_nz;
--};
-+} __packed;
- 
- struct npc_lt_def_apad {
- 	u8	ltype_mask;
--- 
-2.25.1
+Cheers,
+
+Paolo
 
 
