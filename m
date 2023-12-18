@@ -1,188 +1,261 @@
-Return-Path: <netdev+bounces-58579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F545817401
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 15:45:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7427C817412
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 15:46:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B427B22969
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 14:45:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D69D283628
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 14:46:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE9673D540;
-	Mon, 18 Dec 2023 14:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 009F11D14B;
+	Mon, 18 Dec 2023 14:45:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC33200C0
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 14:44:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F69337863
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 14:45:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-35d36f83b3fso35270965ab.1
-        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 06:44:28 -0800 (PST)
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7b739032bf6so372379139f.3
+        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 06:45:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702910667; x=1703515467;
+        d=1e100.net; s=20230601; t=1702910726; x=1703515526;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=hdr6Pd6fw7LwaclRYgeuilcUVrKfZtWFz2t88DKZ0NI=;
-        b=Q0srmhZIq/ZGBU3BWq74nWprsMnZ8nV+GgO9S+eAsPJ47c3lnC32mJwFBSwBhnph0v
-         cNAYncVVNP0DUqY2TeYKJKNpOYiUGonn0QHUv//49XpaHjtlVePib4868p/qflVe4447
-         lFDvfbvscIMaDinsGwVlXv0Eo15NaO+yjouynU5UOZUWK3eSPHccSsjf0J/fbECUSHQb
-         UH/MvB2iVTW7OCWB1ZkFsWOz99scuQLzxAV+XGdaGcryHUPELqhIMwztXH6SEZ6hTkEu
-         cdrSBPri9l/Nr0PhijCtQz6TTtDXNwRzWLDnlKN3HVCkHRReT3ijvqi1WGed6dHPeyZx
-         DFMg==
-X-Gm-Message-State: AOJu0YywKjUpoXVxsQxmhUiPYBb0f0LXr//mK4/KYXqOV5AHLqyDCC3x
-	mMRPZXUq1zdFTAl5G1oUfiHQWVlZUCRshwmrTEVNUg+6i003
-X-Google-Smtp-Source: AGHT+IGC2DsvykjQgFi/Ot2UUh+mgeRJ/M+aNJMfMK9gO0Xelzd3z5hT6tLut5jE8/g0nbuSjdepDNC4tzwKP54KFstgCUhw36WQ
+        bh=a2hcKBWRTFc8cf/IyxHXD85RGAXgANYdNqTf+HBzUSc=;
+        b=VxeN4c5NWJiFME/purtaHL6QLhlyDenQt9Oz2jz8Yimdi4la8ZKSuiDmoPqyAIgmbF
+         bpgZr2wvGC1vXYx8ATqmOhlpwwf8qDYTb0OXFpLS+S+RTxAQtyUTouCPPzSUdeqS5NiL
+         ZuvzVh/42CXBFnkXzel/FDaY/KZqE54kFLOPsbHYKnRFPKYgn3ey+47HvUqmDPK5+S/3
+         984AwPSac1iFSIUOI8huCJAOyiW2c9F/ed+Qb6axnjQL4YjYxMclMx1+Gs/2kO4qB3DI
+         58Nw7pMJYmzJFdCfRt0CzLip93g3fJlgIkpM1d+w1h39aAlnkf5WAqlrGWzJ0jOuherI
+         ITnw==
+X-Gm-Message-State: AOJu0Ywft2WjMNWzVhaXoEtbG9BBkN6Z4o3kqN174KUa5Z8TbGe6a1XP
+	UnCIxZ601kPC9Qmv0X9EMiyvIUHbzJhXvbEj7+NjKc8IbWIU
+X-Google-Smtp-Source: AGHT+IF+3JfM2KpBfG5mwHbgX33kDuZ3QGxZ/xIId/aI3wChlRAvI09KcxDkawRCwL2prle+0KFII/bLFY76X3DyMtsbwUUTxVJT
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:12ce:b0:35f:90ab:8d91 with SMTP id
- i14-20020a056e0212ce00b0035f90ab8d91mr802994ilm.1.1702910667500; Mon, 18 Dec
- 2023 06:44:27 -0800 (PST)
-Date: Mon, 18 Dec 2023 06:44:27 -0800
+X-Received: by 2002:a05:6638:12cf:b0:466:509d:18b9 with SMTP id
+ v15-20020a05663812cf00b00466509d18b9mr778357jas.3.1702910726475; Mon, 18 Dec
+ 2023 06:45:26 -0800 (PST)
+Date: Mon, 18 Dec 2023 06:45:26 -0800
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006bb5b5060cc9c999@google.com>
-Subject: [syzbot] [net?] INFO: task hung in addrconf_verify_work (8)
-From: syzbot <syzbot+e6b87f5edf5469e359e9@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Message-ID: <000000000000ef958c060cc9cc3d@google.com>
+Subject: [syzbot] [net?] WARNING in call_rcu (3)
+From: syzbot <syzbot+d17177af4afd8c6f804c@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com, 
+	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	vinicius.gomes@intel.com, xiyou.wangcong@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 
 Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    b1dfc0f76231 net: phy: skip LED triggers on PHYs on SFP mo..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=113bc4d6e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e043d554f0a5f852
-dashboard link: https://syzkaller.appspot.com/bug?extid=e6b87f5edf5469e359e9
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11611749e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1629b876e80000
+HEAD commit:    d5b235ec8eab Merge branch 'for-next/core' into for-kernelci
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=10ee273ae80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f36ea342ce412b14
+dashboard link: https://syzkaller.appspot.com/bug?extid=d17177af4afd8c6f804c
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm64
+
+Unfortunately, I don't have any reproducer for this issue yet.
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/fcd0802bfd92/disk-b1dfc0f7.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d3d9e5ecc7f0/vmlinux-b1dfc0f7.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4b04f82a5ed6/bzImage-b1dfc0f7.xz
+disk image: https://storage.googleapis.com/syzbot-assets/edab88544ce7/disk-d5b235ec.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/2d149255b78d/vmlinux-d5b235ec.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c3bfc66db2fc/Image-d5b235ec.gz.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e6b87f5edf5469e359e9@syzkaller.appspotmail.com
+Reported-by: syzbot+d17177af4afd8c6f804c@syzkaller.appspotmail.com
 
-INFO: task kworker/0:1:9 blocked for more than 143 seconds.
-      Not tainted 6.7.0-rc5-syzkaller-00167-gb1dfc0f76231 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/0:1     state:D stack:25984 pid:9     tgid:9     ppid:2      flags:0x00004000
-Workqueue: ipv6_addrconf addrconf_verify_work
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5376 [inline]
- __schedule+0xedb/0x5af0 kernel/sched/core.c:6688
- __schedule_loop kernel/sched/core.c:6763 [inline]
- schedule+0xe9/0x270 kernel/sched/core.c:6778
- schedule_preempt_disabled+0x13/0x20 kernel/sched/core.c:6835
- __mutex_lock_common kernel/locking/mutex.c:679 [inline]
- __mutex_lock+0x5b9/0x9d0 kernel/locking/mutex.c:747
- addrconf_verify_work+0x12/0x30 net/ipv6/addrconf.c:4679
- process_one_work+0x886/0x15d0 kernel/workqueue.c:2627
- process_scheduled_works kernel/workqueue.c:2700 [inline]
- worker_thread+0x8b9/0x1290 kernel/workqueue.c:2781
- kthread+0x2c6/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
- </TASK>
-
-Showing all locks held in the system:
-3 locks held by kworker/0:1/9:
- #0: ffff888025733538 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_one_work+0x789/0x15d0 kernel/workqueue.c:2602
- #1: ffffc900000e7d80 ((work_completion)(&(&net->ipv6.addr_chk_work)->work)){+.+.}-{0:0}, at: process_one_work+0x7eb/0x15d0 kernel/workqueue.c:2603
- #2: ffffffff8eaad7a8 (rtnl_mutex){+.+.}-{3:3}, at: addrconf_verify_work+0x12/0x30 net/ipv6/addrconf.c:4679
-3 locks held by kworker/1:1/27:
-1 lock held by khungtaskd/30:
- #0: ffffffff8cfabce0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:301 [inline]
- #0: ffffffff8cfabce0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:747 [inline]
- #0: ffffffff8cfabce0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x75/0x340 kernel/locking/lockdep.c:6614
-2 locks held by getty/4825:
- #0: ffff8880260860a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x24/0x80 drivers/tty/tty_ldisc.c:243
- #1: ffffc900031332f0 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0xfc6/0x1490 drivers/tty/n_tty.c:2201
-3 locks held by syz-executor383/5095:
-
-=============================================
-
-NMI backtrace for cpu 0
-CPU: 0 PID: 30 Comm: khungtaskd Not tainted 6.7.0-rc5-syzkaller-00167-gb1dfc0f76231 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
- nmi_cpu_backtrace+0x277/0x390 lib/nmi_backtrace.c:113
- nmi_trigger_cpumask_backtrace+0x299/0x300 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:160 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:222 [inline]
- watchdog+0xf87/0x1210 kernel/hung_task.c:379
- kthread+0x2c6/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
- </TASK>
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 PID: 5095 Comm: syz-executor383 Not tainted 6.7.0-rc5-syzkaller-00167-gb1dfc0f76231 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-RIP: 0010:write_comp_data+0x35/0x80 kernel/kcov.c:236
-Code: 8b 14 25 c0 bc 03 00 65 8b 05 7f 34 7c 7e a9 00 01 ff 00 74 0f f6 c4 01 74 59 8b 82 fc 15 00 00 85 c0 74 4f 8b 82 d8 15 00 00 <83> f8 03 75 44 48 8b 82 e0 15 00 00 8b 92 dc 15 00 00 48 8b 38 48
-RSP: 0018:ffffc900040ef360 EFLAGS: 00000246
-RAX: 0000000000000000 RBX: 00000000fffffff8 RCX: ffffffff8a21a0a0
-RDX: ffff888024df8000 RSI: 0000000000000000 RDI: 0000000000000005
-RBP: ffff88814b3ba058 R08: 0000000000000005 R09: 0000000000000000
-R10: 00000000fffffff8 R11: 0000000000000000 R12: ffffc900040ef3c0
-R13: ffff88814b3ba098 R14: dffffc0000000000 R15: ffff888021d118c0
-FS:  0000555556e1c380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055ee31815440 CR3: 0000000079951000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <NMI>
- </NMI>
- <TASK>
- tipc_udp_is_known_peer+0x110/0x250 net/tipc/udp_media.c:292
- tipc_udp_nl_bearer_add+0x20f/0x2f0 net/tipc/udp_media.c:646
- tipc_nl_bearer_add+0x21b/0x360 net/tipc/bearer.c:1089
- genl_family_rcv_msg_doit+0x1fc/0x2e0 net/netlink/genetlink.c:972
- genl_family_rcv_msg net/netlink/genetlink.c:1052 [inline]
- genl_rcv_msg+0x561/0x800 net/netlink/genetlink.c:1067
- netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2545
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1076
+------------[ cut here ]------------
+ODEBUG: activate active (active state 1) object: 000000001b663dc1 object type: rcu_head hint: 0x0
+WARNING: CPU: 0 PID: 21462 at lib/debugobjects.c:517 debug_print_object lib/debugobjects.c:514 [inline]
+WARNING: CPU: 0 PID: 21462 at lib/debugobjects.c:517 debug_object_activate+0x578/0x7e0 lib/debugobjects.c:733
+Modules linked in:
+CPU: 0 PID: 21462 Comm: syz-executor.1 Not tainted 6.7.0-rc5-syzkaller-gd5b235ec8eab #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
+pstate: 604000c5 (nZCv daIF +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : debug_print_object lib/debugobjects.c:514 [inline]
+pc : debug_object_activate+0x578/0x7e0 lib/debugobjects.c:733
+lr : debug_print_object lib/debugobjects.c:514 [inline]
+lr : debug_object_activate+0x578/0x7e0 lib/debugobjects.c:733
+sp : ffff800080007a00
+x29: ffff800080007ad0 x28: dfff800000000000 x27: ffff700010000f44
+x26: 0000000000000000 x25: ffff0000d99ed500 x24: 0000000000000000
+x23: ffff80008a9af3a0 x22: ffff80008ae8cdc0 x21: 0000000000000001
+x20: ffff80008a9af3a0 x19: ffff0000d99ed500 x18: ffff800080006ee0
+x17: 6364333636623130 x16: ffff80008a77a080 x15: 0000000000000001
+x14: 1ffff00010000e5c x13: 0000000000000000 x12: 0000000000000000
+x11: 0000000000010205 x10: 0000000000ff0100 x9 : dddee9959d64fa00
+x8 : dddee9959d64fa00 x7 : 00000000000310a8 x6 : 0000000000031070
+x5 : ffff8000800072f8 x4 : ffff80008e5c8460 x3 : ffff800080366550
+x2 : 0000000000000001 x1 : 0000000100010203 x0 : 0000000000000000
+Call trace:
+ debug_print_object lib/debugobjects.c:514 [inline]
+ debug_object_activate+0x578/0x7e0 lib/debugobjects.c:733
+ debug_rcu_head_queue kernel/rcu/rcu.h:227 [inline]
+ __call_rcu_common kernel/rcu/tree.c:2666 [inline]
+ call_rcu+0x48/0xaf4 kernel/rcu/tree.c:2795
+ switch_schedules net/sched/sch_taprio.c:210 [inline]
+ advance_sched+0x7e0/0xac0 net/sched/sch_taprio.c:984
+ __run_hrtimer kernel/time/hrtimer.c:1688 [inline]
+ __hrtimer_run_queues+0x484/0xca0 kernel/time/hrtimer.c:1752
+ hrtimer_interrupt+0x2c0/0xb64 kernel/time/hrtimer.c:1814
+ timer_handler drivers/clocksource/arm_arch_timer.c:674 [inline]
+ arch_timer_handler_virt+0x74/0x88 drivers/clocksource/arm_arch_timer.c:685
+ handle_percpu_devid_irq+0x2a4/0x804 kernel/irq/chip.c:942
+ generic_handle_irq_desc include/linux/irqdesc.h:161 [inline]
+ handle_irq_desc kernel/irq/irqdesc.c:672 [inline]
+ generic_handle_domain_irq+0x7c/0xc4 kernel/irq/irqdesc.c:728
+ __gic_handle_irq drivers/irqchip/irq-gic-v3.c:782 [inline]
+ __gic_handle_irq_from_irqson drivers/irqchip/irq-gic-v3.c:833 [inline]
+ gic_handle_irq+0x6c/0x190 drivers/irqchip/irq-gic-v3.c:877
+ call_on_irq_stack+0x24/0x4c arch/arm64/kernel/entry.S:886
+ do_interrupt_handler+0xd4/0x138 arch/arm64/kernel/entry-common.c:276
+ __el1_irq arch/arm64/kernel/entry-common.c:502 [inline]
+ el1_interrupt+0x34/0x68 arch/arm64/kernel/entry-common.c:517
+ el1h_64_irq_handler+0x18/0x24 arch/arm64/kernel/entry-common.c:522
+ el1h_64_irq+0x64/0x68 arch/arm64/kernel/entry.S:591
+ __daif_local_irq_restore arch/arm64/include/asm/irqflags.h:176 [inline]
+ arch_local_irq_restore arch/arm64/include/asm/irqflags.h:196 [inline]
+ __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:151 [inline]
+ _raw_spin_unlock_irqrestore+0x44/0x98 kernel/locking/spinlock.c:194
+ spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
+ taprio_change+0x335c/0x3c54 net/sched/sch_taprio.c:1993
+ qdisc_change net/sched/sch_api.c:1387 [inline]
+ tc_modify_qdisc+0x1474/0x1870 net/sched/sch_api.c:1717
+ rtnetlink_rcv_msg+0x748/0xdbc net/core/rtnetlink.c:6558
+ netlink_rcv_skb+0x214/0x3c4 net/netlink/af_netlink.c:2545
+ rtnetlink_rcv+0x28/0x38 net/core/rtnetlink.c:6576
  netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
- netlink_unicast+0x53b/0x810 net/netlink/af_netlink.c:1368
- netlink_sendmsg+0x93c/0xe40 net/netlink/af_netlink.c:1910
+ netlink_unicast+0x65c/0x898 net/netlink/af_netlink.c:1368
+ netlink_sendmsg+0x83c/0xb20 net/netlink/af_netlink.c:1910
  sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0xd5/0x180 net/socket.c:745
- ____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
- ___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
- __sys_sendmsg+0x117/0x1e0 net/socket.c:2667
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7fb2f32cae19
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 71 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffe3d73e478 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fb2f32cae19
-RDX: 0000000000000000 RSI: 0000000020000f00 RDI: 0000000000000005
-RBP: 0000000000000000 R08: 0000000000000006 R09: 0000000000000006
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
-INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 2.222 msecs
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x56c/0x840 net/socket.c:2584
+ ___sys_sendmsg net/socket.c:2638 [inline]
+ __sys_sendmsg+0x26c/0x33c net/socket.c:2667
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __arm64_sys_sendmsg+0x80/0x94 net/socket.c:2674
+ __invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
+ invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:51
+ el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:136
+ do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:155
+ el0_svc+0x54/0x158 arch/arm64/kernel/entry-common.c:678
+ el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:696
+ el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:595
+irq event stamp: 647
+hardirqs last  enabled at (646): [<ffff80008a91b884>] __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:151 [inline]
+hardirqs last  enabled at (646): [<ffff80008a91b884>] _raw_spin_unlock_irqrestore+0x38/0x98 kernel/locking/spinlock.c:194
+hardirqs last disabled at (647): [<ffff80008a829e84>] __el1_irq arch/arm64/kernel/entry-common.c:499 [inline]
+hardirqs last disabled at (647): [<ffff80008a829e84>] el1_interrupt+0x24/0x68 arch/arm64/kernel/entry-common.c:517
+softirqs last  enabled at (636): [<ffff80008002189c>] softirq_handle_end kernel/softirq.c:399 [inline]
+softirqs last  enabled at (636): [<ffff80008002189c>] __do_softirq+0xac8/0xce4 kernel/softirq.c:582
+softirqs last disabled at (640): [<ffff800088d02978>] spin_lock_bh include/linux/spinlock.h:356 [inline]
+softirqs last disabled at (640): [<ffff800088d02978>] taprio_change+0x2e44/0x3c54 net/sched/sch_taprio.c:1943
+---[ end trace 0000000000000000 ]---
+------------[ cut here ]------------
+ODEBUG: active_state active (active state 1) object: 000000001b663dc1 object type: rcu_head hint: 0x0
+WARNING: CPU: 0 PID: 21462 at lib/debugobjects.c:517 debug_print_object lib/debugobjects.c:514 [inline]
+WARNING: CPU: 0 PID: 21462 at lib/debugobjects.c:517 debug_object_active_state+0x2e4/0x414 lib/debugobjects.c:993
+Modules linked in:
+CPU: 0 PID: 21462 Comm: syz-executor.1 Tainted: G        W          6.7.0-rc5-syzkaller-gd5b235ec8eab #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
+pstate: 604000c5 (nZCv daIF +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : debug_print_object lib/debugobjects.c:514 [inline]
+pc : debug_object_active_state+0x2e4/0x414 lib/debugobjects.c:993
+lr : debug_print_object lib/debugobjects.c:514 [inline]
+lr : debug_object_active_state+0x2e4/0x414 lib/debugobjects.c:993
+sp : ffff800080007ac0
+x29: ffff800080007ad0 x28: ffff80008e4f0000 x27: dfff800000000000
+x26: 1fffe0001ab43d28 x25: ffff800092d4d000 x24: 1fffe0001ab43d29
+x23: 0000000000000000 x22: ffff0000d99ed500 x21: ffff80008a9af3a0
+x20: ffff80008ae8cdc0 x19: 0000000000000001 x18: ffff800080006ee0
+x17: 3662313030303030 x16: ffff80008a77a080 x15: 0000000000000001
+x14: 1ffff00010000e74 x13: 0000000000000000 x12: 0000000000000000
+x11: 0000000000010205 x10: 0000000000ff0100 x9 : dddee9959d64fa00
+x8 : dddee9959d64fa00 x7 : 0000000000032628 x6 : 00000000000325d0
+x5 : ffff8000800073b8 x4 : ffff80008e5c89e8 x3 : ffff800080366550
+x2 : 0000000000000001 x1 : 0000000100010203 x0 : 0000000000000000
+Call trace:
+ debug_print_object lib/debugobjects.c:514 [inline]
+ debug_object_active_state+0x2e4/0x414 lib/debugobjects.c:993
+ debug_rcu_head_queue kernel/rcu/rcu.h:228 [inline]
+ __call_rcu_common kernel/rcu/tree.c:2666 [inline]
+ call_rcu+0x60/0xaf4 kernel/rcu/tree.c:2795
+ switch_schedules net/sched/sch_taprio.c:210 [inline]
+ advance_sched+0x7e0/0xac0 net/sched/sch_taprio.c:984
+ __run_hrtimer kernel/time/hrtimer.c:1688 [inline]
+ __hrtimer_run_queues+0x484/0xca0 kernel/time/hrtimer.c:1752
+ hrtimer_interrupt+0x2c0/0xb64 kernel/time/hrtimer.c:1814
+ timer_handler drivers/clocksource/arm_arch_timer.c:674 [inline]
+ arch_timer_handler_virt+0x74/0x88 drivers/clocksource/arm_arch_timer.c:685
+ handle_percpu_devid_irq+0x2a4/0x804 kernel/irq/chip.c:942
+ generic_handle_irq_desc include/linux/irqdesc.h:161 [inline]
+ handle_irq_desc kernel/irq/irqdesc.c:672 [inline]
+ generic_handle_domain_irq+0x7c/0xc4 kernel/irq/irqdesc.c:728
+ __gic_handle_irq drivers/irqchip/irq-gic-v3.c:782 [inline]
+ __gic_handle_irq_from_irqson drivers/irqchip/irq-gic-v3.c:833 [inline]
+ gic_handle_irq+0x6c/0x190 drivers/irqchip/irq-gic-v3.c:877
+ call_on_irq_stack+0x24/0x4c arch/arm64/kernel/entry.S:886
+ do_interrupt_handler+0xd4/0x138 arch/arm64/kernel/entry-common.c:276
+ __el1_irq arch/arm64/kernel/entry-common.c:502 [inline]
+ el1_interrupt+0x34/0x68 arch/arm64/kernel/entry-common.c:517
+ el1h_64_irq_handler+0x18/0x24 arch/arm64/kernel/entry-common.c:522
+ el1h_64_irq+0x64/0x68 arch/arm64/kernel/entry.S:591
+ __daif_local_irq_restore arch/arm64/include/asm/irqflags.h:176 [inline]
+ arch_local_irq_restore arch/arm64/include/asm/irqflags.h:196 [inline]
+ __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:151 [inline]
+ _raw_spin_unlock_irqrestore+0x44/0x98 kernel/locking/spinlock.c:194
+ spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
+ taprio_change+0x335c/0x3c54 net/sched/sch_taprio.c:1993
+ qdisc_change net/sched/sch_api.c:1387 [inline]
+ tc_modify_qdisc+0x1474/0x1870 net/sched/sch_api.c:1717
+ rtnetlink_rcv_msg+0x748/0xdbc net/core/rtnetlink.c:6558
+ netlink_rcv_skb+0x214/0x3c4 net/netlink/af_netlink.c:2545
+ rtnetlink_rcv+0x28/0x38 net/core/rtnetlink.c:6576
+ netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+ netlink_unicast+0x65c/0x898 net/netlink/af_netlink.c:1368
+ netlink_sendmsg+0x83c/0xb20 net/netlink/af_netlink.c:1910
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x56c/0x840 net/socket.c:2584
+ ___sys_sendmsg net/socket.c:2638 [inline]
+ __sys_sendmsg+0x26c/0x33c net/socket.c:2667
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __arm64_sys_sendmsg+0x80/0x94 net/socket.c:2674
+ __invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
+ invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:51
+ el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:136
+ do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:155
+ el0_svc+0x54/0x158 arch/arm64/kernel/entry-common.c:678
+ el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:696
+ el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:595
+irq event stamp: 647
+hardirqs last  enabled at (646): [<ffff80008a91b884>] __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:151 [inline]
+hardirqs last  enabled at (646): [<ffff80008a91b884>] _raw_spin_unlock_irqrestore+0x38/0x98 kernel/locking/spinlock.c:194
+hardirqs last disabled at (647): [<ffff80008a829e84>] __el1_irq arch/arm64/kernel/entry-common.c:499 [inline]
+hardirqs last disabled at (647): [<ffff80008a829e84>] el1_interrupt+0x24/0x68 arch/arm64/kernel/entry-common.c:517
+softirqs last  enabled at (636): [<ffff80008002189c>] softirq_handle_end kernel/softirq.c:399 [inline]
+softirqs last  enabled at (636): [<ffff80008002189c>] __do_softirq+0xac8/0xce4 kernel/softirq.c:582
+softirqs last disabled at (640): [<ffff800088d02978>] spin_lock_bh include/linux/spinlock.h:356 [inline]
+softirqs last disabled at (640): [<ffff800088d02978>] taprio_change+0x2e44/0x3c54 net/sched/sch_taprio.c:1943
+---[ end trace 0000000000000000 ]---
+rcu: __call_rcu_common(): Double-freed CB 000000001b663dc1->taprio_free_sched_cb+0x0/0x178()!!!   slab kmalloc-512 start ffff0000d99ed400 pointer offset 256 size 512
 
 
 ---
@@ -195,10 +268,6 @@ https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
 If the report is already addressed, let syzbot know by replying with:
 #syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
 If you want to overwrite report's subsystems, reply with:
 #syz set subsystems: new-subsystem
