@@ -1,86 +1,84 @@
-Return-Path: <netdev+bounces-58609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9FB68177BB
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 17:42:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 484EE8177C3
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 17:43:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A7E61F232C5
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 16:42:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E6A41C240BF
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 16:43:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 780651E4AF;
-	Mon, 18 Dec 2023 16:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qme3P9fJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68F681E520;
+	Mon, 18 Dec 2023 16:43:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1551F1E486
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 16:41:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=050EqGmVCVUNmEMi4n09ihXv28lZpEFwZCiQLfcsttA=; b=qme3P9fJPXSo+DXDdDUMS5iZsK
-	nqWHie2/Fpb1X00Bf+9009jmjkLFAWlXCt5v0QRUzCUXE9B4aK8yFdYTKvGsX9DsxLoEpcuaW7ctl
-	+KqYMVh98MsgNopKqzPaC8CXC62GMhewOZJsCPK22m3CSB3nD+YBp5ihEV8uqaR6QMQo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rFGgS-003GXN-7B; Mon, 18 Dec 2023 17:41:36 +0100
-Date: Mon, 18 Dec 2023 17:41:36 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Sylvain Girard <sylvain.girard@se.com>,
-	Pascal EBERHARD <pascal.eberhard@se.com>,
-	Richard Tresidder <rtresidd@electromag.com.au>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net 0/1] Prevent DSA tags from breaking COE
-Message-ID: <f4166144-4874-4b10-96f8-fc3e03f94904@lunn.ch>
-References: <20231218162326.173127-1-romain.gantois@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C51C1E4A5
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 16:43:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-35f49926297so55789425ab.3
+        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 08:43:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702917803; x=1703522603;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vEnH9DOn7htdFLxlz85xz/DnYEHpLVOwxdzfKYN97ZE=;
+        b=IKDgACVAd3r96s4crH0BgP/+eR1eUbg6F4Na18EjraUe6+U4W2AyBgUOKwEYxYnmCA
+         F2MfXByWEl1tDv26E2Sz7OVLQ9UXXDarstrcu0kVXwDY/p+rGv/0WtWGdOOQmyF1x2r1
+         s8rFckXTDmt2M7VBv2uTfU6zOtLGce5YU67QdCZOrnZQ/SmFFAMaqPlhK7/teiC9mqzU
+         skARCPXMU4qHPr+cU963H6ltxULP5SBJ1NiAE5ClNynqKg3BB5MeIpi1HRz9L1Eyosga
+         dIs+7ydBDLDQUNcjYDebRP8mTH5FUc4ctDWfYNO2GPLsPlsCht6W8EPR6ynSAlplsWPd
+         mZMA==
+X-Gm-Message-State: AOJu0YzKGSG11X9b5zF2NYrrXYg4Znm+c03Npb0wniWEUenyX1cprVrq
+	oitdqktwrJrhYm0Xmi54HZIbwjYjEd1/OSaP3joF6zsZ6V9T
+X-Google-Smtp-Source: AGHT+IF4wvXEHfOc3ZSuANzi4m1bDvhjZf71Zka5lYRnL4qoOZz98UZyuXVBY4Vn79HA0t8E0W2CAZ+Cjrxd2RVUVEhZVH+Guf8E
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231218162326.173127-1-romain.gantois@bootlin.com>
+X-Received: by 2002:a05:6e02:338d:b0:35f:b2f8:6ca3 with SMTP id
+ bn13-20020a056e02338d00b0035fb2f86ca3mr250224ilb.2.1702917803210; Mon, 18 Dec
+ 2023 08:43:23 -0800 (PST)
+Date: Mon, 18 Dec 2023 08:43:23 -0800
+In-Reply-To: <000000000000ab8015060ad3f9bc@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000be00ba060ccb7291@google.com>
+Subject: Re: [syzbot] go runtime error
+From: syzbot <syzbot+b8bbc03ee7bf80fc9f78@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Dec 18, 2023 at 05:23:22PM +0100, Romain Gantois wrote:
-> Hello everyone,
-> 
-> This is a bugfix for an issue that was recently brought up in two
-> reports:
-> 
-> https://lore.kernel.org/netdev/c57283ed-6b9b-b0e6-ee12-5655c1c54495@bootlin.com/
-> https://lore.kernel.org/netdev/e5c6c75f-2dfa-4e50-a1fb-6bf4cdb617c2@electromag.com.au/
-> 
-> The Checksum Offloading Engine of some stmmac cores (e.g. DWMAC1000)
-> computes an incorrect checksum when presented with DSA-tagged packets. This
-> causes all TCP/UDP transfers to break when the stmmac device is connected
-> to the CPU port of a DSA switch.
+syzbot has found a reproducer for the following issue on:
 
-Probably a dumb question.... Does this COE also perform checksum
-validation on receive? Is it also getting confused by the DSA header?
+HEAD commit:    610a689d2a57 Merge branch 'rtnl-rcu'
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=12ded821e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=df5e944701db1d04
+dashboard link: https://syzkaller.appspot.com/bug?extid=b8bbc03ee7bf80fc9f78
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16da084ee80000
 
-You must of tested receive, so it works somehow, but i just wounder if
-something needs to be done to be on the safe side?
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/f1698c13981a/disk-610a689d.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/21213e55dd47/vmlinux-610a689d.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/3f85e89cca69/bzImage-610a689d.xz
 
-	  Andrew
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b8bbc03ee7bf80fc9f78@syzkaller.appspotmail.com
+
+fatal error: Connection to 10.128.1.63 closed by remote host.
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
