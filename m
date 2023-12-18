@@ -1,80 +1,151 @@
-Return-Path: <netdev+bounces-58514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDC5C816B38
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 11:32:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79197816929
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 10:04:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A0C0281B0B
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 10:32:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 303E028128F
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:04:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D134B14AB8;
-	Mon, 18 Dec 2023 10:32:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3379110A1D;
+	Mon, 18 Dec 2023 09:04:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fgtT/IY4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m12814.netease.com (mail-m12814.netease.com [103.209.128.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64BC814F7D;
-	Mon, 18 Dec 2023 10:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sangfor.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sangfor.com.cn
-Received: from [172.23.77.185] (unknown [121.32.254.148])
-	by mail-m12741.qiye.163.com (Hmail) with ESMTPA id 47A809E0588;
-	Mon, 18 Dec 2023 14:54:50 +0800 (CST)
-Message-ID: <3ca71217-4291-45e4-9073-9e32c5177e29@sangfor.com.cn>
-Date: Mon, 18 Dec 2023 14:54:49 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D131412B6C;
+	Mon, 18 Dec 2023 09:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1d04c097e34so20541605ad.0;
+        Mon, 18 Dec 2023 01:04:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702890287; x=1703495087; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8YU1reJ9K3iukGIMAlWDnrpIVtAk/bboD9gXjUJSYOQ=;
+        b=fgtT/IY4dLvX8ahW5kmvZNrHEY2hFJ72OMBd2lq2T8oIxjQC38Vsr0VhXOCuQLOYST
+         OZVth1nc/iwrxueiwFSDd7fBTlqqS2GEPskPKKWfux25L2pFAeTAqp9o3qRWdiSCvruR
+         eahF+n6ay9/kef7YNY2O8LwsJyUa+5NUEsGhHzTf3P5yFkQGI9iz7l5fie8Q4NdPSgMD
+         EoUI5I37g33YtXnG6B3kX/9Xue7b5nWE01ifDX5kb3zAkUR7hM3WiJc9pi3lobby84Eo
+         z43QrfEyGRO2o+b5BoeV767i5FRUQjE0n7Z+qtdFfLonActZOojcHvfEgYjiFMM+Aqkr
+         WWPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702890287; x=1703495087;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8YU1reJ9K3iukGIMAlWDnrpIVtAk/bboD9gXjUJSYOQ=;
+        b=faeGhQdtjj9S0sZV0Xg69Go0vc+50Ex2Enp7K4HXiibjc2fFD0uLWBAhmSQ50X83xk
+         aRnWXV7uAZ4lgDgNuqsX9Rm8BP8jDSH9gH/pzIJHhd5aVVXRpIJ5yWCi/zjNG+04S282
+         8bmitQylfv0BDP5ANQ/6siUXrz+wBvZAtF4cAMwkBRUhP5i2I5L6JEhXSF/9NhcsfYfw
+         aZMVEqzSUiLy+Z50V0Selz8L3AF0zKNjE1R5v19PqeyhGZ8b/cjOiF2w9AdmtrtiXGox
+         Fay8FAUAyrj8cmGXMxNlJLEeSh3sPjsWe4q33/t0oe2mQEU92Y+qOuUXLOrOnH/mLsgX
+         pFEA==
+X-Gm-Message-State: AOJu0YzWXAb97uobZ2Zzzr22gn28hhYD+m6HcEy9WZ5jHmNcPbyOUOTQ
+	ByfhbRg1+bWe+K3BodU1A7k=
+X-Google-Smtp-Source: AGHT+IEYtZJkpuaQCy6F85uGc0t/zB4XAkh9CanuyYqHbEGu2p4qs3yLw/2+PTY0aW5BZI4g9Z6Z7Q==
+X-Received: by 2002:a17:902:c3c6:b0:1d3:a674:6da6 with SMTP id j6-20020a170902c3c600b001d3a6746da6mr2766688plj.49.1702890287101;
+        Mon, 18 Dec 2023 01:04:47 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id b2-20020a170902bd4200b001d369beee67sm4196951plx.131.2023.12.18.01.04.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Dec 2023 01:04:46 -0800 (PST)
+Date: Mon, 18 Dec 2023 17:04:41 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Dmitry Safonov <dima@arista.com>
+Cc: Shuah Khan <shuah@kernel.org>, David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Salam Noureddine <noureddine@arista.com>,
+	Bob Gilligan <gilligan@arista.com>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
+	Dmitry Safonov <0x7f454c46@gmail.com>
+Subject: Re: [PATCH 03/12] selftests/net: Add TCP-AO ICMPs accept test
+Message-ID: <ZYALKQGYuRrpOo_A@Laptop-X1>
+References: <20231215-tcp-ao-selftests-v1-0-f6c08180b985@arista.com>
+ <20231215-tcp-ao-selftests-v1-3-f6c08180b985@arista.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net PATCH] i40e: fix use-after-free in i40e_aqc_add_filters()
-Content-Language: en-US
-To: Brett Creeley <bcreeley@amd.com>, jesse.brandeburg@intel.com,
- anthony.l.nguyen@intel.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: dinghui@sangfor.com.cn, zhudi2@huawei.com,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20231213104912.16153-1-xiaoke@sangfor.com.cn>
- <0edc953a-0357-d054-d9a2-e9a86e90233d@amd.com>
-From: "xiaoke@sangfor.com.cn" <xiaoke@sangfor.com.cn>
-In-Reply-To: <0edc953a-0357-d054-d9a2-e9a86e90233d@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlCGhlPVk4eQh8dQx9JShlOTFUTARMWGhIXJBQOD1
-	lXWRgSC1lBWUpJSlVISVVJTk9VSk9DWVdZFhoPEhUdFFlBWU9LSFVKTU9JTE5VSktLVUpCS0tZBg
-	++
-X-HM-Tid: 0a8c7bb4b97cb214kuuu47a809e0588
-X-HM-MType: 1
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6Ngg6Nxw4UTwxSioDKyhKDVEU
-	SRowC01VSlVKTEtJQ0NJT0JKSU9MVTMWGhIXVQMSGhQQHjsIGhUcHRQJVRgUFlUYFUVZV1kSC1lB
-	WUpJSlVISVVJTk9VSk9DWVdZCAFZQUlOSkI3Bg++
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231215-tcp-ao-selftests-v1-3-f6c08180b985@arista.com>
 
-On 2023/12/16 1:16, Brett Creeley wrote:
-> On 12/13/2023 2:49 AM, Ke Xiao wrote:
->> Caution: This message originated from an External Source. Use proper 
->> caution when opening attachments, clicking links, or responding.
->>
->>
->> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c 
->> b/drivers/net/ethernet/intel/i40e/i40e_main.c
->> index 1ab8dbe2d880..16b574d69843 100644
->> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
->> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
->> @@ -108,11 +108,17 @@ static void netdev_hw_addr_refcnt(struct 
->> i40e_mac_filter *f,
->>                                    struct net_device *netdev, int delta)
->>   {
->>          struct netdev_hw_addr *ha;
->> +       struct netdev_hw_addr_list *ha_list;
+On Fri, Dec 15, 2023 at 02:36:17AM +0000, Dmitry Safonov wrote:
+> Reverse to icmps-discard test: the server accepts ICMPs, using
+> TCP_AO_CMDF_ACCEPT_ICMP and it is expected to fail under ICMP
+> flood from client. Test that the default pre-TCP-AO behaviour functions
+> when TCP_AO_CMDF_ACCEPT_ICMP is set.
 > 
-> Nit, needs to be in Reverse Christmas Tree (RCT) order.
+> Expected output for ipv4 version (in case it receives ICMP_PROT_UNREACH):
+> > # ./icmps-accept_ipv4
+> > 1..3
+> > # 3209[lib/setup.c:166] rand seed 1642623870
+> > TAP version 13
+> > # 3209[lib/proc.c:207]    Snmp6             Ip6InReceives: 0 => 1
+> > # 3209[lib/proc.c:207]    Snmp6             Ip6InNoRoutes: 0 => 1
+> > # 3209[lib/proc.c:207]    Snmp6               Ip6InOctets: 0 => 76
+> > # 3209[lib/proc.c:207]    Snmp6            Ip6InNoECTPkts: 0 => 1
+> > # 3209[lib/proc.c:207]      Tcp                    InSegs: 3 => 23
+> > # 3209[lib/proc.c:207]      Tcp                   OutSegs: 2 => 22
+> > # 3209[lib/proc.c:207]  IcmpMsg                   InType3: 0 => 4
+> > # 3209[lib/proc.c:207]     Icmp                    InMsgs: 0 => 4
+> > # 3209[lib/proc.c:207]     Icmp            InDestUnreachs: 0 => 4
+> > # 3209[lib/proc.c:207]       Ip                InReceives: 3 => 27
+> > # 3209[lib/proc.c:207]       Ip                InDelivers: 3 => 27
+> > # 3209[lib/proc.c:207]       Ip               OutRequests: 2 => 22
+> > # 3209[lib/proc.c:207]    IpExt                  InOctets: 288 => 3420
+> > # 3209[lib/proc.c:207]    IpExt                 OutOctets: 124 => 3244
+> > # 3209[lib/proc.c:207]    IpExt               InNoECTPkts: 3 => 25
+> > # 3209[lib/proc.c:207]   TcpExt               TCPPureAcks: 1 => 2
+> > # 3209[lib/proc.c:207]   TcpExt           TCPOrigDataSent: 0 => 20
+> > # 3209[lib/proc.c:207]   TcpExt              TCPDelivered: 0 => 19
+> > # 3209[lib/proc.c:207]   TcpExt                 TCPAOGood: 3 => 23
+> > ok 1 InDestUnreachs delivered 4
+> > ok 2 server failed with -92: Protocol not available
+> > ok 3 TCPAODroppedIcmps counter didn't change: 0 >= 0
+> > # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
+> 
+> Expected output for ipv6 version (in case it receives ADM_PROHIBITED):
+> > # ./icmps-accept_ipv6
+> > 1..3
+> > # 3277[lib/setup.c:166] rand seed 1642624035
+> > TAP version 13
+> > # 3277[lib/proc.c:207]    Snmp6             Ip6InReceives: 6 => 31
+> > # 3277[lib/proc.c:207]    Snmp6             Ip6InDelivers: 4 => 29
+> > # 3277[lib/proc.c:207]    Snmp6            Ip6OutRequests: 4 => 24
+> > # 3277[lib/proc.c:207]    Snmp6               Ip6InOctets: 592 => 4492
+> > # 3277[lib/proc.c:207]    Snmp6              Ip6OutOctets: 332 => 3852
+> > # 3277[lib/proc.c:207]    Snmp6            Ip6InNoECTPkts: 6 => 31
+> > # 3277[lib/proc.c:207]    Snmp6               Icmp6InMsgs: 1 => 6
+> > # 3277[lib/proc.c:207]    Snmp6       Icmp6InDestUnreachs: 0 => 5
+> > # 3277[lib/proc.c:207]    Snmp6              Icmp6InType1: 0 => 5
+> > # 3277[lib/proc.c:207]      Tcp                    InSegs: 3 => 23
+> > # 3277[lib/proc.c:207]      Tcp                   OutSegs: 2 => 22
+> > # 3277[lib/proc.c:207]   TcpExt               TCPPureAcks: 1 => 2
+> > # 3277[lib/proc.c:207]   TcpExt           TCPOrigDataSent: 0 => 20
+> > # 3277[lib/proc.c:207]   TcpExt              TCPDelivered: 0 => 19
+> > # 3277[lib/proc.c:207]   TcpExt                 TCPAOGood: 3 => 23
+> > ok 1 Icmp6InDestUnreachs delivered 5
+> > ok 2 server failed with -13: Permission denied
+> > ok 3 TCPAODroppedIcmps counter didn't change: 0 >= 0
+> > # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
+> 
+> With some luck the server may fail with ECONNREFUSED (depending on what
+> icmp packet was delivered firstly).
+> For the kernel error handlers see: tab_unreach[] and icmp_err_convert[].
+> 
+> Signed-off-by: Dmitry Safonov <dima@arista.com>
 
-Thanks, I will send the V2 to follow the rule.
+Tested-by: Hangbin Liu <liuhangbin@gmail.com>
 
