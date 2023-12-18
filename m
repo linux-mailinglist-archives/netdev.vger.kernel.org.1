@@ -1,71 +1,207 @@
-Return-Path: <netdev+bounces-58688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5203F817D36
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 23:24:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C8D8817D55
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 23:39:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBA53284CC9
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 22:24:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 195B51F230D1
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 22:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D54D740B0;
-	Mon, 18 Dec 2023 22:24:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE35D74E33;
+	Mon, 18 Dec 2023 22:39:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AYfW+woI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I3uUzqBp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1454371470
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 22:24:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5038CC433C7;
-	Mon, 18 Dec 2023 22:24:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702938266;
-	bh=ANYkOI2y+y0ieA3uw4Cj7QxgqGQuSFlxWwFAdyD6ZSs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AYfW+woIPc25C8ojuCBOElQgB6PuY6b1QdygEMABSEZFyULnih7QisrEpdzl7frHO
-	 4eBz+4qSWh5b0QnoVs8hvSZQH5Ma7hn/V7YyWqDY0lWKi94Twnvqp/Qj3og66LJheF
-	 TUjdnk0/jV/9XVLaktJkhXFt0yZSHpDVBZ70pwiT67xhWlNiOB9/eet2q4OargG4Ee
-	 tr7HHE/rTXYlKGKr/2ts5JkT20EmFN6A1yH9A2/TuDn9MkrvlbDo9UrWBfXsmBUgAs
-	 aGZOZZQ5C3ytWKra1micrCLzLK1062JPnb/Ixn4cZM4rVAKhDvO+4abt/lAjwXWSdx
-	 21dDg64nT+uwQ==
-Date: Mon, 18 Dec 2023 14:24:25 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Davide Caratti
- <dcaratti@redhat.com>
-Subject: Re: [PATCH net-next 3/3] netlink: specs: use exact-len for IPv6
- addr
-Message-ID: <20231218142425.257a049f@kernel.org>
-In-Reply-To: <ZX1kQQKZ7BdTAG15@Laptop-X1>
-References: <20231215035009.498049-1-liuhangbin@gmail.com>
-	<20231215035009.498049-4-liuhangbin@gmail.com>
-	<20231215180911.414b76d3@kernel.org>
-	<ZX1kQQKZ7BdTAG15@Laptop-X1>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B50871470
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 22:39:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a2345aaeb05so247889266b.0
+        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 14:39:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702939154; x=1703543954; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CvjmfRNkX4sQk84Kdm8DrzXfsoFjryBSCdk41+TbjH4=;
+        b=I3uUzqBpXN9vkAAFlomaQRNFV8b4LNomjX0Lt1uKTJvLgcxrQzXvY/maQ8XfhRZp9G
+         zP4C9f1oJkUiy+lgm7d/5oy7pQSaEeOjv1Yy7YdRaPhKHvepKwxLUKtu5s56UwGpDkKK
+         /2YpB9lE7U9auU/z5lVcv+Iiq/HC9/MXE2EF2wzGPpItkCSJtCjE2m9emhaqQXzFFlNL
+         iIvq1aE3Ig00EKAvHUsRXVg94lFadXcxJUiDQv9lvmpSU+hpgkgRM5fbL1TENRuuv+bd
+         LefD9JIzhxMWcbi0Z7LY8tx8xJ5HYkeDfPqn+CnRds9y238zzu4rV0ueU1CtlQGJXYUH
+         3ytg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702939154; x=1703543954;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CvjmfRNkX4sQk84Kdm8DrzXfsoFjryBSCdk41+TbjH4=;
+        b=oj+3kOcomHX+Gyze8M+7UpFRrUZacuk0uUrQp4BNE2XMNJ+p0E8AHKF/SnKZTbwD4O
+         wqbFmo0eMsD9RKke71N838ffKztYDAV1DFrzT0rq/lkWntzU4stGlH1XCeyf7Wo89eGE
+         fz0lWptZe2XBpr8qy/uQY6sdejUaRWpfsjE90Ymm7iHpuUTAA6gZrg+QB2D2p6bSucAt
+         7d3v1jhEJP5o2gniSCuGSyZItF2guq4/o/Vxh633d2dsbHiFuV7O1h6XBAqMle8m1/AZ
+         vksUnYAMmtJxkdeohMUS0Nt+N2DYlV5yHeIkHUg6ccvm8muy6HcJV3PjUqUAeXn0aC2S
+         vnug==
+X-Gm-Message-State: AOJu0Yzjgk2eereYguU55rlOAtqBQ7FWDbO/Ti1XA5VbRte2VPsrJHzr
+	q3R8A2xbbHoy/Azrcz1Glf6I/8WNX+fNdHAiWv93NA==
+X-Google-Smtp-Source: AGHT+IE38t56xKGEIq6v9fWBqcXWI3e+v/qbMcPaymGNE3vZkdT7rySUdUkAVxhjSZQ6JuBEoI7z0tYYM9Ug0h2HmPg=
+X-Received: by 2002:a17:906:1044:b0:a1f:7f7e:9200 with SMTP id
+ j4-20020a170906104400b00a1f7f7e9200mr8485209ejj.8.1702939154243; Mon, 18 Dec
+ 2023 14:39:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20231214020530.2267499-1-almasrymina@google.com>
+ <20231214020530.2267499-3-almasrymina@google.com> <20231215185159.7bada9a7@kernel.org>
+ <CAHS8izMcFWu7zSuX9q8QgVNLiOiE5RKsb_yh5LoTKA1K8FUu1w@mail.gmail.com>
+ <84787af3-aa5e-4202-8578-7a9f14283d87@kernel.org> <CAHS8izOeCdA+WVRYbieTqaCyadARsOpYttAXh7Lhu-B7RC3Tmg@mail.gmail.com>
+ <20231218140645.461169a7@kernel.org>
+In-Reply-To: <20231218140645.461169a7@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 18 Dec 2023 14:38:58 -0800
+Message-ID: <CAHS8izOZ3c_3hretPBhowW5u-o5r4+WBeG3VVg_k32PUhAZqHA@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v1 2/4] net: introduce abstraction for
+ network memory
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: David Ahern <dsahern@kernel.org>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Michael Chan <michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Wei Fang <wei.fang@nxp.com>, 
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	NXP Linux Team <linux-imx@nxp.com>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
+	Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, 
+	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Marcin Wojtas <mw@semihalf.com>, 
+	Russell King <linux@armlinux.org.uk>, Sunil Goutham <sgoutham@marvell.com>, 
+	Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, 
+	hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, 
+	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, Jassi Brar <jaswinder.singh@linaro.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
+	Ravi Gunasekaran <r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>, 
+	Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, 
+	Ronak Doshi <doshir@vmware.com>, VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, 
+	Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>, 
+	Kalle Valo <kvalo@kernel.org>, Juergen Gross <jgross@suse.com>, 
+	Stefano Stabellini <sstabellini@kernel.org>, 
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+	Jason Gunthorpe <jgg@nvidia.com>, Shakeel Butt <shakeelb@google.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, 16 Dec 2023 16:48:01 +0800 Hangbin Liu wrote:
-> On Fri, Dec 15, 2023 at 06:09:11PM -0800, Jakub Kicinski wrote:
-> > On Fri, 15 Dec 2023 11:50:09 +0800 Hangbin Liu wrote:  
-> > > We should use the exact-len instead of min-len for IPv6 address.  
-> > 
-> > It does make sense, but these families historically used min-len..
-> > Not sure if it's worth changing this now or we risk regressions.  
-> 
-> The addr6 in mptcp.yaml also use exact-len. I don't think the IPv6 address
-> could be larger than 16 bytes. So the min-len check looks incorrect.
+On Mon, Dec 18, 2023 at 2:06=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Sun, 17 Dec 2023 00:14:59 -0800 Mina Almasry wrote:
+> > > > Sure thing I can do that. Is it better to do something like:
+> > > >
+> > > > struct netmem_ref;
+> > > >
+> > > > like in this patch:
+> > > >
+> > > > https://lore.kernel.org/linux-mm/20221108194139.57604-1-torvalds@li=
+nux-foundation.org/
+> > > >
+> > > > Asking because checkpatch tells me not to add typedefs to the kerne=
+l,
+> > > > but checkpatch can be ignored if you think it's OK.
+> > > >
+> > > > Also with this approach I can't use container_of and I need to do a
+> > > > cast, I assume that's fine.
+> > > >
+> > >
+> > > Isn't that the whole point of this set - to introduce a new data type
+> > > and avoid casts?
+>
+> I don't see how we can avoid casts if the type of the referenced object
+> is encoded on the low bits of the pointer. If we had a separate member
+> we could so something like:
+>
+> struct netmem_ref {
+>         enum netmem_type type;
+>         union {
+>                 struct page *p;
+>                 struct page_pool_iov *pi;
+>         };
+> };
+>
+> barring crazy things with endian-aware bitfields, we need at least one
+> cast.
+>
+> > My understanding here the requirements from Jason are:
+> >
+> > 1. Never pass a non-page to an mm api.
+> > 2. If a mangle a pointer to indicate it's not a page, then I must not
+> > call it mm's struct page*, I must add a new type.
+> >
+> > I think both requirements are met regardless of whether
+> > netmem_to_page() is implemented using union/container_of or straight
+> > casts. folios implemented something similar being unioned with struct
+> > page to avoid casts.
+>
+> Folios overlay a real struct page. It's completely different.
+>
+> > I honestly could go either way on this. The union
+> > provides some self documenting code and avoids casts.
+>
+> Maybe you guys know some trick to mask out the bottom bit :S
+>
+> > The implementation without the union obfuscates the type and makes it m=
+uch
+> > more opaque.
+>
+> Some would say that that's the damn point of the wrapping..
+>
+> You don't want non-core code futzing with the inside of the struct.
+>
+> > I finished addressing the rest of the comments and I have this series
+> > and the next devmem TCP series ready to go, so I fired v2 of this
+> > patchset. If one feels strongly about this let me know and I will
+> > re-spin.
+>
+> You didn't address my feedback :|
+>
+> struct netmem which contains struct page by value is almost as bad
+> as passing around pretend struct page pointers.
 
-I understand, what I'm saying is that the nla_policy before we started
-using specs was buggy, so we kept the bugginess in the conversion.
-But it should be fine, so we can change it now and hope for the best..
+Sorry about that. I misread your original request as 'here is
+something else you can do if you want', not something that you feel is
+critical. Honestly I missed the subtlety and the approaches seemed
+roughly equivalent to me. I will respin after the 24hr cooldown.
+
+--=20
+Thanks,
+Mina
 
