@@ -1,154 +1,161 @@
-Return-Path: <netdev+bounces-58469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0D598168A8
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:50:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1AAA8168B9
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:52:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC98BB22731
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 08:50:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70D62B22877
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 08:52:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B6A107AD;
-	Mon, 18 Dec 2023 08:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 860B71097E;
+	Mon, 18 Dec 2023 08:52:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JF2MrTeR"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="pVnxw0u3"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3723F10941;
-	Mon, 18 Dec 2023 08:50:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 4D3A740004;
-	Mon, 18 Dec 2023 08:49:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1702889399;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bwiHZrMTP7Wiahde4BM0HLwINyMuE+Tg6ATmX7gQwnc=;
-	b=JF2MrTeRWDXBcGI3/WDea3Ht6B5N4RpvQCz83GOeUkIzg/MMjDrma3A5Sd9oxYcA5nY4FG
-	hT/vHT/3XUxSwbssvhSQIMxTB+cN1bArWKrrEMZIDMH52aR2gqHA+yyE2PX76CvtGPmrQl
-	6WY5ukQYYj3HYcyPd/Mu8/qiQBy8ZtZGzvSZ7g8hFPrGQ/cWYWtNvUF1PCZCu7+k41VYgH
-	YyI9ox40tOZ2SErdfmb95t9SP1Eu10YpojxePqvpQhO4R0DsFcGIdOXiuNh4i7oDE8scf1
-	Xnk6AlK61qgnKVIJ4lvA7It8nGqZjUdIiuJwRSvE8LOz8GwEr9EtW5bT0UaOwA==
-Date: Mon, 18 Dec 2023 09:49:56 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, davem@davemloft.net,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell
- King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
- Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
- <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
- Kallweit <hkallweit1@gmail.com>, =?UTF-8?B?S8O2cnk=?= Maincent
- <kory.maincent@bootlin.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Jonathan Corbet <corbet@lwn.net>, Marek =?UTF-8?B?QmVow7pu?=
- <kabel@kernel.org>, Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>
-Subject: Re: [PATCH net-next v4 01/13] net: phy: Introduce ethernet link
- topology representation
-Message-ID: <20231218094956.676e7ed0@device-28.home>
-In-Reply-To: <ede222d4-11da-4b95-a685-17cb480694dd@lunn.ch>
-References: <20231215171237.1152563-1-maxime.chevallier@bootlin.com>
-	<20231215171237.1152563-1-maxime.chevallier@bootlin.com>
-	<20231215171237.1152563-2-maxime.chevallier@bootlin.com>
-	<20231215171237.1152563-2-maxime.chevallier@bootlin.com>
-	<20231215214523.ntk5kec32mb5vqjs@skbuf>
-	<ede222d4-11da-4b95-a685-17cb480694dd@lunn.ch>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED231094F;
+	Mon, 18 Dec 2023 08:52:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=u9rU7FfAkS1Xg3KQP7X+Uy8VuWy1sh7xNAOO2EeOmow=; b=pVnxw0u3V2KMrtdVYsexwpdnA5
+	XUz4IKQOBNxaBluhdNYzL8zwlyI8CjvzruSXco86xKeQ6QX9cV0XiRUgx1SayqkGcLFTuuCdNcreN
+	IYv72Eo9aa2ezSpHM/sq6jV2R3+vIjjFyGjsK/x2Nl8dUJj/GySOniPAkjktHMBS0gwug9YlUSVKk
+	E1ANshGn7IEXwUCrQ0edmmtKumnnePMpDfJ7tvxXWWIUvjf8OwTHC7AAiHt93l6j9w58BEch4hds3
+	CFiaDf4S4lSKklzGWwvE7xj7zzlkiYN9B3rJVXyRh4lviegYdZLL2jkzTg8CtU/F3vHY7hgsqJnoi
+	sJS6vhrQ==;
+Received: from sslproxy06.your-server.de ([78.46.172.3])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rF9M8-000GMZ-Kc; Mon, 18 Dec 2023 09:52:08 +0100
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy06.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rF9M6-000DSm-B8; Mon, 18 Dec 2023 09:52:06 +0100
+Subject: Re: [PATCH net-next 16/24] net: netkit, veth, tun, virt*: Use
+ nested-BH locking for XDP redirect.
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, Boqun Feng
+ <boqun.feng@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Frederic Weisbecker <frederic@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
+ "K. Y. Srinivasan" <kys@microsoft.com>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Hao Luo <haoluo@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, Jiri Olsa <jolsa@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Juergen Gross <jgross@suse.com>,
+ KP Singh <kpsingh@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
+ Nikolay Aleksandrov <razor@blackwall.org>, Song Liu <song@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, Wei Liu <wei.liu@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Yonghong Song <yonghong.song@linux.dev>, bpf@vger.kernel.org,
+ virtualization@lists.linux.dev, xen-devel@lists.xenproject.org
+References: <20231215171020.687342-1-bigeasy@linutronix.de>
+ <20231215171020.687342-17-bigeasy@linutronix.de>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <74feb818-7109-cb1e-8eec-a037c17a2871@iogearbox.net>
+Date: Mon, 18 Dec 2023 09:52:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+In-Reply-To: <20231215171020.687342-17-bigeasy@linutronix.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27126/Sun Dec 17 10:37:59 2023)
 
-Hello Andrew,
+Hi Sebastian,
 
-Thanks for the review,
-
-On Sun, 17 Dec 2023 17:57:10 +0100
-Andrew Lunn <andrew@lunn.ch> wrote:
-
-> On Fri, Dec 15, 2023 at 11:45:23PM +0200, Vladimir Oltean wrote:
-> > On Fri, Dec 15, 2023 at 06:12:23PM +0100, Maxime Chevallier wrote:  
-> > > diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-> > > index d8e9335d415c..89daaccc9276 100644
-> > > --- a/drivers/net/phy/phy_device.c
-> > > +++ b/drivers/net/phy/phy_device.c
-> > > @@ -1491,6 +1500,11 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
-> > >  
-> > >  		if (phydev->sfp_bus_attached)
-> > >  			dev->sfp_bus = phydev->sfp_bus;
-> > > +
-> > > +		err = phy_link_topo_add_phy(&dev->link_topo, phydev,
-> > > +					    PHY_UPSTREAM_MAC, dev);
-> > > +		if (err)
-> > > +			goto error;
-> > >  	}
-> > >  
-> > >  	/* Some Ethernet drivers try to connect to a PHY device before
-> > > @@ -1816,6 +1830,7 @@ void phy_detach(struct phy_device *phydev)
-> > >  	if (dev) {
-> > >  		phydev->attached_dev->phydev = NULL;
-> > >  		phydev->attached_dev = NULL;
-> > > +		phy_link_topo_del_phy(&dev->link_topo, phydev);
-> > >  	}
-> > >  	phydev->phylink = NULL;
-> > >  
-> > > diff --git a/drivers/net/phy/phy_link_topology.c b/drivers/net/phy/phy_link_topology.c
-> > > new file mode 100644
-> > > index 000000000000..22f6372d002c
-> > > --- /dev/null
-> > > +++ b/drivers/net/phy/phy_link_topology.c
-> > > +int phy_link_topo_add_phy(struct phy_link_topology *topo,
-> > > +			  struct phy_device *phy,
-> > > +			  enum phy_upstream upt, void *upstream)
-> > > +{
-> > > +	struct phy_device_node *pdn;
-> > > +	int ret;
-> > > +
-> > > +	/* Protects phy and upstream */
-> > > +	ASSERT_RTNL();  
-> > 
-> > Something to think for the PHY library maintainers. This is probably
-> > the first time when the rtnl_lock() requirement is asserted at
-> > phy_attach_direct() time.  
+On 12/15/23 6:07 PM, Sebastian Andrzej Siewior wrote:
+> The per-CPU variables used during bpf_prog_run_xdp() invocation and
+> later during xdp_do_redirect() rely on disabled BH for their protection.
+> Without locking in local_bh_disable() on PREEMPT_RT these data structure
+> require explicit locking.
 > 
-> There are two use cases here for plain MAC drivers.
+> This is a follow-up on the previous change which introduced
+> bpf_run_lock.redirect_lock and uses it now within drivers.
 > 
-> 1) phy_attach_direct() is called from probe. RTNL is normally not
-> held, the driver would have to take it before making the call.
+> The simple way is to acquire the lock before bpf_prog_run_xdp() is
+> invoked and hold it until the end of function.
+> This does not always work because some drivers (cpsw, atlantic) invoke
+> xdp_do_flush() in the same context.
+> Acquiring the lock in bpf_prog_run_xdp() and dropping in
+> xdp_do_redirect() (without touching drivers) does not work because not
+> all driver, which use bpf_prog_run_xdp(), do support XDP_REDIRECT (and
+> invoke xdp_do_redirect()).
 > 
-> 2) phy_attach_direct() is called from ndo_open. In that case,
-> __dev_open() has a ASSERT_RTNL() so we can assume RTNL has been taken.
-> 
-> So i don't think we can assume RTNL is held, but it might be held.
-> 
-> We need a better understanding what is being protected here.
+> Ideally the minimal locking scope would be bpf_prog_run_xdp() +
+> xdp_do_redirect() and everything else (error recovery, DMA unmapping,
+> free/ alloc of memory, …) would happen outside of the locked section.
+[...]
 
-I'm protecting the struct phy_device and the *upstream pointer (which
-can be a net_device or a struct phy_device as well). In particular, I'm
-protecting the phy_device->phyindex field. While I don't see any case
-where we would concurrently write to it, given the weird topologies
-that might be implemented in the future, I guess better safe than sorry.
+>   drivers/net/hyperv/netvsc_bpf.c |  1 +
+>   drivers/net/netkit.c            | 13 +++++++----
+>   drivers/net/tun.c               | 28 +++++++++++++----------
+>   drivers/net/veth.c              | 40 ++++++++++++++++++++-------------
+>   drivers/net/virtio_net.c        |  1 +
+>   drivers/net/xen-netfront.c      |  1 +
+>   6 files changed, 52 insertions(+), 32 deletions(-)
+[...]
 
-For the rest, the actual phy list and the next_index pointer from the
-topology should be already protected by the xarray mechanism.
+Please exclude netkit from this set given it does not support XDP, but
+instead only accepts tc BPF typed programs.
 
 Thanks,
+Daniel
 
-Maxime
-
+> diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
+> index 39171380ccf29..fbcf78477bda8 100644
+> --- a/drivers/net/netkit.c
+> +++ b/drivers/net/netkit.c
+> @@ -80,8 +80,15 @@ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
+>   	netkit_prep_forward(skb, !net_eq(dev_net(dev), dev_net(peer)));
+>   	skb->dev = peer;
+>   	entry = rcu_dereference(nk->active);
+> -	if (entry)
+> -		ret = netkit_run(entry, skb, ret);
+> +	if (entry) {
+> +		scoped_guard(local_lock_nested_bh, &bpf_run_lock.redirect_lock) {
+> +			ret = netkit_run(entry, skb, ret);
+> +			if (ret == NETKIT_REDIRECT) {
+> +				dev_sw_netstats_tx_add(dev, 1, len);
+> +				skb_do_redirect(skb);
+> +			}
+> +		}
+> +	}
+>   	switch (ret) {
+>   	case NETKIT_NEXT:
+>   	case NETKIT_PASS:
+> @@ -95,8 +102,6 @@ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
+>   		}
+>   		break;
+>   	case NETKIT_REDIRECT:
+> -		dev_sw_netstats_tx_add(dev, 1, len);
+> -		skb_do_redirect(skb);
+>   		break;
+>   	case NETKIT_DROP:
+>   	default:
 
