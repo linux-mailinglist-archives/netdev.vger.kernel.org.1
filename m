@@ -1,122 +1,198 @@
-Return-Path: <netdev+bounces-58617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 814D381788C
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 18:22:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E23B81789C
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 18:24:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8744E1C226F7
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 17:22:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87C2E1C2451D
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 17:24:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4495D72E;
-	Mon, 18 Dec 2023 17:20:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 445B971445;
+	Mon, 18 Dec 2023 17:23:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y2yQkEnF"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="E8Zr2gQH";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="fcFiiycG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A220B5BF9C;
-	Mon, 18 Dec 2023 17:20:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3A77C433C7;
-	Mon, 18 Dec 2023 17:20:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702920039;
-	bh=mxQodVK8Qo9iWtDoh+f+wkylLrmy3Zyz6oU2mXSN1t0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Y2yQkEnF95YPtGg+mLklR/7o4FtDTIxrwVBi4PYmUk+YTwLBqcT7WpUmFm/jV8+sv
-	 VNScfR1KSaABDVNP9JzH40oMDEgbQr6DSyb42bkfc528E8CibzpjHYXJG8Su61gz1/
-	 YCQZu5B7CIfpOK+Uyafa7Xqlub6I9MSbItN2deXY6MgKddE3LyJymziUMMLS8Sqp+W
-	 wqLFfV48vB88DppDq3YBH7TBO5i/ieDZ8991cFtCCivIAKmn1og8tkYY+RmZlitg3H
-	 ifkaTN7jH9ze3QcF9+ZwBiUXiQIFApfhUskYpeIsCm+wuJlAMRpB33E9blOO8K2kbF
-	 ovcDOXfb5uHIw==
-Message-ID: <a205c24f-f170-47eb-a21e-1809290fa7b2@kernel.org>
-Date: Mon, 18 Dec 2023 19:20:33 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33CC75A860;
+	Mon, 18 Dec 2023 17:23:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Mon, 18 Dec 2023 18:23:31 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1702920214;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P1XgGZYPjy8h7WYBBhi2vRaDTtl2GOwX8g4rRNZ63x8=;
+	b=E8Zr2gQHS1RTIapRpz9bYE2YgbOVxJsDMiTk+cC8+ZD8ze7eBR7efXe6vNMqWB6LZr2QjR
+	eNWaKXEt+h+o/u48gjxbMCLoZPFF+ZcU8dgh4lek+ljyY/tZnGKfZPBoXYdJCBZaCEiISI
+	XIR3q1eJFpAdi0EHGkFXs9ZnSunMxNF5m4KPotSLxsbwhyXRrMePD5UyxUxhloy6cToCjv
+	24rJkXVwYfybx+WTsstsA/j9x42Y94EOxAcnDVoFcceNQVR1fLK0NkK3oT2tJQ1pfxfym9
+	LM4LjwaKaMMrnbN0K7uuUC23xL7yOgYPEKQseoFspzQTCnTdjhRoHMFduzv0iw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1702920214;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P1XgGZYPjy8h7WYBBhi2vRaDTtl2GOwX8g4rRNZ63x8=;
+	b=fcFiiycGeLxLFabKrK2qZ5LMXyUpYcjlq8IuIdoaeVfiBxDpG08imbK97Iw0WNey9/NMnb
+	9OfewZGtfacEQMDg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH net-next 00/24] locking: Introduce nested-BH locking.
+Message-ID: <20231218172331.fp-nC_Nr@linutronix.de>
+References: <20231215171020.687342-1-bigeasy@linutronix.de>
+ <20231215145059.3b42ee35@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 08/10] net: ethernet: ti: am65-cpsw: add
- mqprio qdisc offload in channel mode
-Content-Language: en-US
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shuah@kernel.org, vladimir.oltean@nxp.com
-Cc: s-vadapalli@ti.com, r-gunasekaran@ti.com, vigneshr@ti.com, srk@ti.com,
- horms@kernel.org, p-varis@ti.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20231218125513.52337-1-rogerq@kernel.org>
- <20231218125513.52337-9-rogerq@kernel.org>
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20231218125513.52337-9-rogerq@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20231215145059.3b42ee35@kernel.org>
+
+On 2023-12-15 14:50:59 [-0800], Jakub Kicinski wrote:
+> On Fri, 15 Dec 2023 18:07:19 +0100 Sebastian Andrzej Siewior wrote:
+> > The proposed way out is to introduce explicit per-CPU locks for
+> > resources which are protected by local_bh_disable() and use those only
+> > on PREEMPT_RT so there is no additional overhead for !PREEMPT_RT builds.
+>=20
+> As I said at LPC, complicating drivers with odd locking constructs
+> is a no go for me.
+
+I misunderstood it then as I assumed you wanted to ease the work while I
+was done which every driver after (hopefully) understanding what is
+possible/ needed and what not. We do speak here about 15++?
+
+Now. The pattern is usually
+|	act =3D bpf_prog_run_xdp(xdp_prog, &xdp);
+|	switch (act) {
+|	case XDP_REDIRECT:
+|		ret =3D xdp_do_redirect(netdev, &xdp, xdp_prog)))
+|		if (ret)
+|			goto XDP_ABORTED;
+|		xdp_redir++ or so;
+
+so we might be able to turn this into something that covers both and
+returns either XDP_REDIRECT or XDP_ABORTED. So this could be merged
+into
+
+| u32 bpf_prog_run_xdp_and_redirect(struct net_device *dev, const struct
+| 				  bpf_prog *prog, struct xdp_buff *xdp)
+| {
+| 	u32 act;
+| 	int ret;
+|=20
+| 	act =3D bpf_prog_run_xdp(prog, xdp);
+| 	if (act =3D=3D XDP_REDIRECT) {
+| 		ret =3D xdp_do_redirect(netdev, xdp, prog);
+| 		if (ret < 0)
+| 			act =3D XDP_ABORTED;
+| 	}
+| 	return act;
+| }
+
+so the lock can be put inside the function and all drivers use this
+function.
+
+=46rom looking through drivers/net/ethernet/, this should work for most
+drivers:
+- amazon/ena
+- aquantia/atlantic
+- engleder/tsnep
+- freescale/enetc
+- freescale/fec
+- intel/igb
+- intel/igc
+- marvell/mvneta
+- marvell/mvpp2
+- marvell/octeontx2
+- mediatek/mtk
+- mellanox/mlx5
+- microchip/lan966x
+- microsoft/mana
+- netronome/nfp (two call paths with no support XDP_REDIRECT)
+- sfc/rx
+- sfc/siena (that offset pointer can be moved)
+- socionext/netsec
+- stmicro/stmmac
+
+A few do something custom/ additionally between bpf_prog_run_xdp() and
+  xdp_do_redirect():
+
+- broadcom/bnxt
+  calculates length, offset, data pointer. DMA unmaps + memory
+  allocations before redirect.
+
+- freescale/dpaa2
+- freescale/dpaa
+  sets xdp.data_hard_start + frame_sz, unmaps DMA.
+
+- fungible/funeth
+  conditional redirect.
+
+- google/gve
+  Allocates a new packet for redirect.
+
+- intel/ixgbe
+- intel/i40e
+- intel/ice
+  Failure in the ZC case is different from XDP_ABORTED, depends on the
+  error from xdp_do_redirect())
+
+- mellanox/mlx4/
+  calculates page_offset.
+
+- qlogic/qede
+  DMA unmap and buffer alloc.
+
+- ti/cpsw_priv
+  recalculates length (pointer).
+
+and a few more don't support XDP_REDIRECT:
+
+- cavium/thunder
+  does not support XDP_REDIRECT, calculates length, offset.
+
+- intel/ixgbevf
+  does not support XDP_REDIRECT
+
+I don't understand why some driver need to recalculate data_hard_start,
+length and so on and others don't. This might be only needed for the
+XDP_TX case or not needed=E2=80=A6
+Also I'm not sure about the dma unmaps and skb allocations. The new skb
+allocation can be probably handled before running the bpf prog but then
+in the XDP_PASS case it is a waste=E2=80=A6
+And the DMA unmaps. Only a few seem to need it. Maybe it can be done
+before running the BPF program. After all the bpf may look into the skb.
 
 
+If that is no go, then the only thing that comes to mind is (as you
+mentioned on LPC) to acquire the lock in bpf_prog_run_xdp() and drop it
+in xdp_do_redirect(). This would require that every driver invokes
+xdp_do_redirect() even not if it is not supporting it (by setting netdev
+to NULL or so).
 
-On 18/12/2023 14:55, Roger Quadros wrote:
-> From: Grygorii Strashko <grygorii.strashko@ti.com>
-> 
-> This patch adds MQPRIO Qdisc offload in full 'channel' mode which allows
-> not only setting up pri:tc mapping, but also configuring TX shapers
-> (rate-limiting) on external port FIFOs.
-> 
-> The MQPRIO Qdisc offload is expected to work with or without VLAN/priority
-> tagged packets.
-> 
-> The CPSW external Port FIFO has 8 Priority queues. The rate-limit can be
-> set for each of these priority queues. Which Priority queue a packet is
-> assigned to depends on PN_REG_TX_PRI_MAP register which maps header
-> priority to switch priority.
-> 
-> The header priority of a packet is assigned via the RX_PRI_MAP_REG which
-> maps packet priority to header priority.
-> 
-> The packet priority is either the VLAN priority (for VLAN tagged packets)
-> or the thread/channel offset.
-> 
-> For simplicity, we assign the same priority queue to all queues of a
-> Traffic Class so it can be rate-limited correctly.
-> 
-> Configuration example:
->  ethtool -L eth1 tx 5
->  ethtool --set-priv-flags eth1 p0-rx-ptype-rrobin off
-> 
->  tc qdisc add dev eth1 parent root handle 100: mqprio num_tc 3 \
->  map 0 0 1 2 0 0 0 0 0 0 0 0 0 0 0 0 \
->  queues 1@0 1@1 1@2 hw 1 mode channel \
->  shaper bw_rlimit min_rate 0 100mbit 200mbit max_rate 0 101mbit 202mbit
-> 
->  tc qdisc replace dev eth2 handle 100: parent root mqprio num_tc 1 \
->  map 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 queues 1@0 hw 1
-> 
->  ip link add link eth1 name eth1.100 type vlan id 100
->  ip link set eth1.100 type vlan egress 0:0 1:1 2:2 3:3 4:4 5:5 6:6 7:7
-> 
-> In the above example two ports share the same TX CPPI queue 0 for low
-> priority traffic. 3 traffic classes are defined for eth1 and mapped to:
-> TC0 - low priority, TX CPPI queue 0 -> ext Port 1 fifo0, no rate limit
-> TC1 - prio 2, TX CPPI queue 1 -> ext Port 1 fifo1, CIR=100Mbit/s, EIR=1Mbit/s
-> TC2 - prio 3, TX CPPI queue 2 -> ext Port 1 fifo2, CIR=200Mbit/s, EIR=2Mbit/s
-> 
-> Signed-off-by: Grygorii Strashko <grygorii.strashko@ti.com>
-> Signed-off-by: Roger Quadros <rogerq@kernel.org>
-> Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> ---
->  drivers/net/ethernet/ti/Kconfig          |   3 +-
->  drivers/net/ethernet/ti/am65-cpsw-nuss.c |   3 +
->  drivers/net/ethernet/ti/am65-cpsw-qos.c  | 255 ++++++++++++++++++++++-
->  drivers/net/ethernet/ti/am65-cpsw-qos.h  |  20 ++
->  4 files changed, 277 insertions(+), 4 deletions(-)
-
-This breaks build due to undefined BYTES_PER_MBIT.
-I'll fix it up and send another revision.
-
--- 
-cheers,
--roger
+Sebastian
 
