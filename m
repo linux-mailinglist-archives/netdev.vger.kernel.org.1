@@ -1,160 +1,131 @@
-Return-Path: <netdev+bounces-58670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 380A9817CA5
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 22:33:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C08E0817CB6
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 22:44:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 430F61C22C2E
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 21:33:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FED628625A
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 21:44:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1CC0740A2;
-	Mon, 18 Dec 2023 21:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8E85740A3;
+	Mon, 18 Dec 2023 21:44:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nKI38e3b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gp17vnOo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9842473465
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 21:33:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9286DC433C8;
-	Mon, 18 Dec 2023 21:33:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702935201;
-	bh=viIrjkpxCQsWojqf+L/giT1tkiNy8AuoGtrntUG6hfM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nKI38e3bD9+jAuj404JQ1Kd2UFhbcWPDT27UaKAnp5mh4upUrTjxeWexHSc0CbdPT
-	 0fms9NDXUWfdhoA14cwf1KuGZ+XKzBW1+UG2VzNVuMykx/VX17eWzFl7mAEzcPB7fb
-	 vtH180qrvwZXamE4pn31h0ZigRpW4BFxwjp8nZEIdv78TY9d32R44eW+6ZzS/+gOLu
-	 XW4w02hGawA6jqORtEZHJeGAnDxV8wymqVMOvqUQ7qXkWVQGjTeTP+DhWsif3zOQgS
-	 xz9t8dj83wSQGi8sdHLSgKb4Fv/GyJZy80WnS9a/iJoCOYC2xutsvLda20JCYf4SlB
-	 rkeSVXvxvX8nw==
-Date: Mon, 18 Dec 2023 13:33:19 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- anthony.l.nguyen@intel.com, intel-wired-lan@lists.osuosl.org,
- qi.z.zhang@intel.com, Wenjun Wu <wenjun1.wu@intel.com>,
- maxtram95@gmail.com, "Chittim, Madhu" <madhu.chittim@intel.com>,
- "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Simon Horman
- <simon.horman@redhat.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 0/5] iavf: Add devlink and
- devlink rate support'
-Message-ID: <20231218133319.3eef8931@kernel.org>
-In-Reply-To: <baa4bd4b3aa0639d29e5c396bd3da94e01cd8528.camel@redhat.com>
-References: <20230727021021.961119-1-wenjun1.wu@intel.com>
-	<20230822034003.31628-1-wenjun1.wu@intel.com>
-	<ZORRzEBcUDEjMniz@nanopsycho>
-	<20230822081255.7a36fa4d@kernel.org>
-	<ZOTVkXWCLY88YfjV@nanopsycho>
-	<0893327b-1c84-7c25-d10c-1cc93595825a@intel.com>
-	<ZOcBEt59zHW9qHhT@nanopsycho>
-	<5aed9b87-28f8-f0b0-67c4-346e1d8f762c@intel.com>
-	<bdb0137a-b735-41d9-9fea-38b238db0305@intel.com>
-	<20231118084843.70c344d9@kernel.org>
-	<3d60fabf-7edf-47a2-9b95-29b0d9b9e236@intel.com>
-	<20231122192201.245a0797@kernel.org>
-	<e662dca5-84e4-4f7b-bfa3-50bce30c697c@intel.com>
-	<20231127174329.6dffea07@kernel.org>
-	<55e51b97c29894ebe61184ab94f7e3d8486e083a.camel@redhat.com>
-	<20231214174604.1ca4c30d@kernel.org>
-	<7b0c2e0132b71b131fc9a5407abd27bc0be700ee.camel@redhat.com>
-	<20231215144155.194a188e@kernel.org>
-	<baa4bd4b3aa0639d29e5c396bd3da94e01cd8528.camel@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E00273467;
+	Mon, 18 Dec 2023 21:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-28659348677so2561511a91.0;
+        Mon, 18 Dec 2023 13:44:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702935882; x=1703540682; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hsIQRoDMyAO/1DgxQjK7hg35wfAQDmgiayboWw066aQ=;
+        b=Gp17vnOoU0YRBcRwYY6sIP/lzFDxecnFZCWWG5n4lkj9+u5aik8Cm+Jo3Ziho//TT0
+         f+Gh7Dez8xhAy9zSZm0EcvYg2FZ3nhMXWfB4t4WAJaFE8heuC+Fu7VA7hyDQH7aalEaf
+         pQXZxR5ebfnsdRUxdGofrGEpKr8S1mLgSqCx1+QVdUYTfqgbCdcewCUE8kppbRSuE6G1
+         U+xy9EWkA6ylgiX8RSzkOMVhGrxT3DzTX9KJAtUZs1NFa3D9jVJi2t5F2RVwz7RDygds
+         bN94SRKmlC4SKzfyH0ltOll2xQ8Bq0bwgv2FpSq5STEM87+Dbjb0Wcdw7uv3oPJa+H4f
+         dR2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702935882; x=1703540682;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hsIQRoDMyAO/1DgxQjK7hg35wfAQDmgiayboWw066aQ=;
+        b=VxgVNXkMo2TLMG3Ok+l/qOkVx0RU18EAx0B/yxBGxcxdujr6dq4os1zdrfcLaCo/21
+         b9bfDTZFO/uGy8QLEW8zVLL2Z8DNWjV4z9uuAWeVTqLga2JatSc6y1LH7PyP5NtB74XT
+         MkHsWfZMZ5VFNy4vuhAjCpNErqM3L1u7r6CBHWNHkaGwCGgHEmNRNOTDidaZB/6m2Mns
+         Aeraax46AVJA5fJUQaCqIRvQ95JGAixJj0DXXILDLKIM3Jw4Vn1d63dS66FxC1QM6HQF
+         8lP60Ez1T1gApZVzfkkpCwS1JcRuVxmWODvb7zfgegA6Tr12nlZD7uAkPpqHXXakQmtS
+         JoJw==
+X-Gm-Message-State: AOJu0YyJKNVkJjDmvkpq71V8OgPvm6ax6y6gMQ2TfpH0GqB/iWN2FnKy
+	hoLSuyGWHKAFZXkj6uoiHZY=
+X-Google-Smtp-Source: AGHT+IFovrmEbJoaKAuL0WhPM+7iXQ84uNI1T6Ho3Ro2axd+SDJpSLOBetddAyB1nl1YYc1ub8pO1Q==
+X-Received: by 2002:a17:90a:f3ca:b0:28b:664a:807d with SMTP id ha10-20020a17090af3ca00b0028b664a807dmr77347pjb.25.1702935881851;
+        Mon, 18 Dec 2023 13:44:41 -0800 (PST)
+Received: from localhost ([216.228.127.130])
+        by smtp.gmail.com with ESMTPSA id x14-20020a170902820e00b001d2ffeac9d3sm8253339pln.186.2023.12.18.13.44.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Dec 2023 13:44:41 -0800 (PST)
+Date: Mon, 18 Dec 2023 13:42:25 -0800
+From: Yury Norov <yury.norov@gmail.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
+	leon@kernel.org, cai.huoqing@linux.dev, ssengar@linux.microsoft.com,
+	vkuznets@redhat.com, tglx@linutronix.de,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	schakrabarti@microsoft.com, paulros@microsoft.com
+Subject: Re: [PATCH 3/3] net: mana: add a function to spread IRQs per CPUs
+Message-ID: <ZYC8wYdyHi3KA3Bp@yury-ThinkPad>
+References: <20231217213214.1905481-1-yury.norov@gmail.com>
+ <20231217213214.1905481-4-yury.norov@gmail.com>
+ <9ba04aef-ba13-4366-8709-ea1808dd4270@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9ba04aef-ba13-4366-8709-ea1808dd4270@intel.com>
 
-On Mon, 18 Dec 2023 21:12:35 +0100 Paolo Abeni wrote:
-> On Fri, 2023-12-15 at 14:41 -0800, Jakub Kicinski wrote:
-> > I explained before (perhaps on the netdev call) - Qdiscs have two
-> > different offload models. "local" and "switchdev", here we want "local"
-> > AFAIU and TBF only has "switchdev" offload (take a look at the enqueue
-> > method and which drivers support it today).  
+On Mon, Dec 18, 2023 at 01:17:53PM -0800, Jacob Keller wrote:
 > 
-> I must admit the above is not yet clear to me.
 > 
-> I initially thought you meant that "local" offloads properly
-> reconfigure the S/W datapath so that locally generated traffic would go
-> through the expected processing (e.g. shaping) just once, while with
-> "switchdev" offload locally generated traffic will see shaping done
-> both by the S/W and the H/W[1].
+> On 12/17/2023 1:32 PM, Yury Norov wrote:
+> > +static __maybe_unused int irq_setup(unsigned int *irqs, unsigned int len, int node)
+> > +{
+> > +	const struct cpumask *next, *prev = cpu_none_mask;
+> > +	cpumask_var_t cpus __free(free_cpumask_var);
+> > +	int cpu, weight;
+> > +
+> > +	if (!alloc_cpumask_var(&cpus, GFP_KERNEL))
+> > +		return -ENOMEM;
+> > +
+> > +	rcu_read_lock();
+> > +	for_each_numa_hop_mask(next, node) {
+> > +		weight = cpumask_weight_andnot(next, prev);
+> > +		while (weight-- > 0) {
+> > +			cpumask_andnot(cpus, next, prev);
+> > +			for_each_cpu(cpu, cpus) {
+> > +				if (len-- == 0)
+> > +					goto done;
+> > +				irq_set_affinity_and_hint(*irqs++, topology_sibling_cpumask(cpu));
+> > +				cpumask_andnot(cpus, cpus, topology_sibling_cpumask(cpu));
+> > +			}
+> > +		}
+> > +		prev = next;
+> > +	}
+> > +done:
+> > +	rcu_read_unlock();
+> > +	return 0;
+> > +}
+> > +
 > 
-> Reading the above I now think you mean that local offloads has only
-> effect for locally generated traffic but not on traffic forwarded via
-> eswitch, and vice versa[2]. 
-> 
-> The drivers I looked at did not show any clue (to me).
-> 
-> FTR, I think that [1] is a bug worth fixing and [2] is evil ;)
-> 
-> Could you please clarify which is the difference exactly between them?
+> You're adding a function here but its not called and even marked as
+> __maybe_unused?
 
-The practical difference which you can see in the code is that
-"locally offloaded" qdiscs will act like a FIFO in the SW path (at least
-to some extent). While "switchdev" offload qdiscs act exactly the same
-regardless of the offload.
+I expect that Souradeep would build his driver improvement on top of
+this function. cpumask API is somewhat tricky to use it properly here,
+so this is an attempt help him, instead of moving back and forth on
+review.
 
-Neither is wrong, they are offloading different things. Qdisc offload
-on a representor (switchdev) offloads from the switch perspective, i.e.
-"ingress to host". Only fallback goes thru SW path, and should be
-negligible.
+Sorry, I had to be more explicit.
 
-"Local" offload can be implemented as admission control (and is
-sometimes work conserving), it's on the "real" interface, it's egress,
-and doesn't take part in forwarding.
-
-> > I question whether something as basic as scheduling and ACLs should
-> > follow the "offload SW constructs" mantra. You are exposed to more
-> > diverse users so please don't hesitate to disagree, but AFAICT
-> > the transparent offload (user installs SW constructs and if offload
-> > is available - offload, otherwise use SW is good enough) has not
-> > played out like we have hoped.
-> > 
-> > Let's figure out what is the abstract model of scheduling / shaping
-> > within a NIC that we want to target. And then come up with a way of
-> > representing it in SW. Not which uAPI we can shoehorn into the use
-> > case.  
-> 
-> I thought the model was quite well defined since the initial submission
-> from Intel, and is quite simple: expose TX shaping on per tx queue
-> basis, with min rate, max rate (in bps) and burst (in bytes).
-
-For some definition of a model, I guess. Given the confusion about
-switchdev vs local (ingress vs egress) - I can't agree that the model
-is well defined :(
-
-What I mean is - given piece of functionality like "Tx queue shaping"
-you can come up with a reasonable uAPI that you can hijack and it makes
-sense to you. But someone else (switchdev ingress) can chose the same
-API to implement a different offload. Not to mention that yet another
-person will chose a different API to implement the same things as you :(
-
-Off the top of my head we have at least:
-
- - Tx DMA admission control / scheduling (which Tx DMA queue will NIC 
-   pull from)
- - Rx DMA scheduling (which Rx queue will NIC push to)
-
- - buffer/queue configuration (how to deal with buildup of packets in
-   NIC SRAM, usually mostly for ingress)
- - NIC buffer configuration (how the SRAM is allocated to queues)
-
- - policers in the NIC forwarding logic
-
-
-Let's extend this list so that it covers all reasonable NIC designs,
-and them work on mapping how each of them is configured?
-
-> I think that making it more complex (e.g. with nesting, pkt overhead,
-> etc) we will still not cover every possible use case and will add
-> considerable complexity.
+Thanks,
+Yury
 
