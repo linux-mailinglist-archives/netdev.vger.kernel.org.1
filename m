@@ -1,137 +1,164 @@
-Return-Path: <netdev+bounces-58580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB401817400
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 15:45:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01A58817404
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 15:45:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A022D1F23AF6
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 14:45:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D30B1F23DC8
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 14:45:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A04F3D548;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54CE33D54E;
 	Mon, 18 Dec 2023 14:44:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 701573A1CE
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE003A1C5
 	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 14:44:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7b7ac24cef5so303150339f.0
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-35f8dc26895so26395235ab.1
         for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 06:44:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702910667; x=1703515467;
+        d=1e100.net; s=20230601; t=1702910668; x=1703515468;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=i4doMgNiRAG0oY64YZBGbw9i5anbFAngH6k0NEAjhqo=;
-        b=CTz+kLY1xWaApOQlUhVOO6SCsGNJ/SxIufAGXSNaIIFw1EunJguKS7UCwjBTmXHrwf
-         1cDvN1Y2wvSXR7QROfKB7xzgJCnd1w0umTAoMdAdFjjY7PUgfQ4Do84bqp+MRp0qHE3u
-         SHmW1TrLOA7aKPdGZret2XUzmNzqfigfx+RyhutisMn/XHpGazQ9CNTgozv9OpH1cjZm
-         0dE9r7kt8YVZatbXq2OGrke58BkEETMdduWIA4kdtezcNTqv5Z2UISnctAxDw8INpKyn
-         Md2iYUEPhacQZXJYwRgyy5zBQA9w7RHeQlNjvFxmF+8wjwIgLQ3VI78SomLFFB/nvyGb
-         N7Vg==
-X-Gm-Message-State: AOJu0Yz3/iEY9l6nG5sbBcXhVdZgVaxR0jfXfWvc2eIxaHbGRonCg2wx
-	1wRGlKC7fOLry1Z6A2fUqLQL2M0pE/nZ97iukCpzPYWfHo4b
-X-Google-Smtp-Source: AGHT+IF+8OhGLaiuZnCCoA2uK6/w0OxH5geCmM5R01yRSiNAdaXlgQLnnE2pkdQ4gJgKxExnUfLz9P5sAVWuSRqxMffEzZUXxVhB
+        bh=Z8FZr9GGQ5Z6eGGuNWExKewLBexkS29/CYxgSR13hRQ=;
+        b=Be/o9VjqmtKB4WdCznXuYrX3/ZiVahh2Xsb9b21uC/b/TPlH8r9pAapR2epNkQox3+
+         +z5JG4iSNkY2HVBClvDMvxW0wV/h2zJUoOFmzIsRcJM7pJQxSfTU05OiK8zNwa1jRFK6
+         HSeXeB+QyaMx81ywDeE2a2yf8k3m2kqrkSxpoOsUY6/1dl6YhAj6vWfEqtLnV+QcnArI
+         M8f9k06A5AxZHFYyCKwgVbwLKqdw2ZfZ4k+a3IomFIv7HN/2tC4p/1Oy3rV3IWvb1IMC
+         EMMEFIUTODHlV8oarsc5jZhxhFniauVHOQYWPQ8VOZKE4c6SU0hPKZW08opSAC5DpLvt
+         9dTw==
+X-Gm-Message-State: AOJu0YzyzirGqqT4cmBlGKDSIpmPKD0mZw2Wjgu09Z1sr7MrZvTbLsCM
+	Qkqp/0zoZ7ldnoUsGoLLwmji/F8IzW+K0HNR5G4eW4b8gywu
+X-Google-Smtp-Source: AGHT+IGTYkC40CCVpihEqJYHF3lwCRR7lvtCfuHKZIUqQlB4kE/K2Ew5pCFMhEaOWdudDAcEgkbJUu5qBuGQnPKt/Q0scnky+c40
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:1445:b0:44a:fe65:d743 with SMTP id
- l5-20020a056638144500b0044afe65d743mr647000jad.0.1702910667748; Mon, 18 Dec
- 2023 06:44:27 -0800 (PST)
+X-Received: by 2002:a05:6e02:20cb:b0:35f:97da:499b with SMTP id
+ 11-20020a056e0220cb00b0035f97da499bmr811860ilq.1.1702910668011; Mon, 18 Dec
+ 2023 06:44:28 -0800 (PST)
 Date: Mon, 18 Dec 2023 06:44:27 -0800
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006f7cb5060cc9c9ac@google.com>
-Subject: [syzbot] [bpf?] UBSAN: shift-out-of-bounds in adjust_reg_min_max_vals
-From: syzbot <syzbot+46700eea57ecc7f84776@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, haoluo@google.com, hawk@kernel.org, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
-	martin.lau@linux.dev, nathan@kernel.org, ndesaulniers@google.com, 
-	netdev@vger.kernel.org, sdf@google.com, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, trix@redhat.com, yhs@fb.com, 
-	yonghong.song@linux.dev
+Message-ID: <0000000000007380e8060cc9c98a@google.com>
+Subject: [syzbot] [tipc?] general protection fault in tipc_udp_is_known_peer
+From: syzbot <syzbot+5142b87a9abc510e14fa@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, jmaloy@redhat.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	tipc-discussion@lists.sourceforge.net, ying.xue@windriver.com
 Content-Type: text/plain; charset="UTF-8"
 
 Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    b1dfc0f76231 net: phy: skip LED triggers on PHYs on SFP mo..
-git tree:       net
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=15d0331ee80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e043d554f0a5f852
-dashboard link: https://syzkaller.appspot.com/bug?extid=46700eea57ecc7f84776
+HEAD commit:    3a3af3aedb00 Merge branch 'skb-coalescing-page_pool'
+git tree:       net-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1186978ee80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=df5e944701db1d04
+dashboard link: https://syzkaller.appspot.com/bug?extid=5142b87a9abc510e14fa
 compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=128c8ad1e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12456fb6e80000
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16414cd6e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=111a741ae80000
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/fcd0802bfd92/disk-b1dfc0f7.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d3d9e5ecc7f0/vmlinux-b1dfc0f7.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4b04f82a5ed6/bzImage-b1dfc0f7.xz
-
-The issue was bisected to:
-
-commit f63181b6ae79fd3b034cde641db774268c2c3acf
-Author: Andrii Nakryiko <andrii@kernel.org>
-Date:   Fri Nov 4 16:36:47 2022 +0000
-
-    bpf: stop setting precise in current state
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10eed821e80000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=12eed821e80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=14eed821e80000
+disk image: https://storage.googleapis.com/syzbot-assets/b7e80f7c12e6/disk-3a3af3ae.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/24b99e397f9f/vmlinux-3a3af3ae.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/2ed5171f7844/bzImage-3a3af3ae.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+46700eea57ecc7f84776@syzkaller.appspotmail.com
-Fixes: f63181b6ae79 ("bpf: stop setting precise in current state")
+Reported-by: syzbot+5142b87a9abc510e14fa@syzkaller.appspotmail.com
 
-================================================================================
-UBSAN: shift-out-of-bounds in kernel/bpf/verifier.c:13571:63
-shift exponent 1073741824 is too large for 32-bit type 'int'
-CPU: 0 PID: 5069 Comm: syz-executor200 Not tainted 6.7.0-rc5-syzkaller-00167-gb1dfc0f76231 #0
+tipc: Enabled bearer <eth:ip6gre0>, priority 10
+tipc: Enabling of bearer <udp:syz2> rejected, already enabled
+general protection fault, probably for non-canonical address 0xdffffc0000000010: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000080-0x0000000000000087]
+CPU: 1 PID: 5061 Comm: syz-executor528 Not tainted 6.7.0-rc5-syzkaller-01080-g3a3af3aedb00 #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+RIP: 0010:tipc_udp_is_known_peer+0x9c/0x250 net/tipc/udp_media.c:291
+Code: 48 c1 ea 03 80 3c 02 00 0f 85 b4 01 00 00 4c 8b b5 98 00 00 00 48 b8 00 00 00 00 00 fc ff df 49 8d 5e c8 4c 89 f2 48 c1 ea 03 <80> 3c 02 00 0f 85 81 01 00 00 49 8b 06 4d 39 f5 48 8d 68 c8 0f 84
+RSP: 0018:ffffc900040b7368 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: 0000000000000048 RCX: ffffffff8a218d4f
+RDX: 0000000000000010 RSI: ffffffff8a218c3e RDI: 0000000000000001
+RBP: ffff88814b630000 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000000 R12: ffffc900040b73c0
+R13: ffff88814b630098 R14: 0000000000000080 R15: 0000000000000000
+FS:  0000555555ffd380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f3ed64c4ea3 CR3: 0000000026de2000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 Call Trace:
  <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x125/0x1b0 lib/dump_stack.c:106
- ubsan_epilogue lib/ubsan.c:217 [inline]
- __ubsan_handle_shift_out_of_bounds+0x2a6/0x480 lib/ubsan.c:387
- scalar32_min_max_arsh kernel/bpf/verifier.c:13571 [inline]
- adjust_scalar_min_max_vals kernel/bpf/verifier.c:13759 [inline]
- adjust_reg_min_max_vals.cold+0x162/0x221 kernel/bpf/verifier.c:13860
- check_alu_op+0x498/0x3a60 kernel/bpf/verifier.c:14092
- do_check kernel/bpf/verifier.c:17517 [inline]
- do_check_common+0x1b30/0xd690 kernel/bpf/verifier.c:20177
- do_check_main kernel/bpf/verifier.c:20240 [inline]
- bpf_check+0x77d9/0xa5e0 kernel/bpf/verifier.c:20877
- bpf_prog_load+0x1531/0x2200 kernel/bpf/syscall.c:2716
- __sys_bpf+0xbf7/0x4920 kernel/bpf/syscall.c:5383
- __do_sys_bpf kernel/bpf/syscall.c:5487 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5485 [inline]
- __x64_sys_bpf+0x78/0xc0 kernel/bpf/syscall.c:5485
+ tipc_udp_nl_bearer_add+0x212/0x2f0 net/tipc/udp_media.c:646
+ tipc_nl_bearer_add+0x21e/0x360 net/tipc/bearer.c:1089
+ genl_family_rcv_msg_doit+0x1fc/0x2e0 net/netlink/genetlink.c:972
+ genl_family_rcv_msg net/netlink/genetlink.c:1052 [inline]
+ genl_rcv_msg+0x561/0x800 net/netlink/genetlink.c:1067
+ netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2544
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1076
+ netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
+ netlink_unicast+0x53b/0x810 net/netlink/af_netlink.c:1367
+ netlink_sendmsg+0x8b7/0xd70 net/netlink/af_netlink.c:1909
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0xd5/0x180 net/socket.c:745
+ ____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
+ ___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
+ __sys_sendmsg+0x117/0x1e0 net/socket.c:2667
  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
  do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
  entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7ff0c7237af9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff01650e58 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007ff0c7237af9
-RDX: 0000000000000048 RSI: 00000000200054c0 RDI: 0000000000000005
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000006
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000003a28
-R13: 431bde82d7b634db R14: 0000000000000001 R15: 0000000000000001
+RIP: 0033:0x7f3ed64c6dd9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 71 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff950619b8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f3ed64c6dd9
+RDX: 0000000000000000 RSI: 0000000020000f00 RDI: 0000000000000005
+RBP: 0000000000000000 R08: 0000000000000006 R09: 0000000000000006
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000000001
  </TASK>
-================================================================================
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:tipc_udp_is_known_peer+0x9c/0x250 net/tipc/udp_media.c:291
+Code: 48 c1 ea 03 80 3c 02 00 0f 85 b4 01 00 00 4c 8b b5 98 00 00 00 48 b8 00 00 00 00 00 fc ff df 49 8d 5e c8 4c 89 f2 48 c1 ea 03 <80> 3c 02 00 0f 85 81 01 00 00 49 8b 06 4d 39 f5 48 8d 68 c8 0f 84
+RSP: 0018:ffffc900040b7368 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: 0000000000000048 RCX: ffffffff8a218d4f
+RDX: 0000000000000010 RSI: ffffffff8a218c3e RDI: 0000000000000001
+RBP: ffff88814b630000 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000000 R12: ffffc900040b73c0
+R13: ffff88814b630098 R14: 0000000000000080 R15: 0000000000000000
+FS:  0000555555ffd380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f3ed64c4ea3 CR3: 0000000026de2000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	48 c1 ea 03          	shr    $0x3,%rdx
+   4:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
+   8:	0f 85 b4 01 00 00    	jne    0x1c2
+   e:	4c 8b b5 98 00 00 00 	mov    0x98(%rbp),%r14
+  15:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  1c:	fc ff df
+  1f:	49 8d 5e c8          	lea    -0x38(%r14),%rbx
+  23:	4c 89 f2             	mov    %r14,%rdx
+  26:	48 c1 ea 03          	shr    $0x3,%rdx
+* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+  2e:	0f 85 81 01 00 00    	jne    0x1b5
+  34:	49 8b 06             	mov    (%r14),%rax
+  37:	4d 39 f5             	cmp    %r14,%r13
+  3a:	48 8d 68 c8          	lea    -0x38(%rax),%rbp
+  3e:	0f                   	.byte 0xf
+  3f:	84                   	.byte 0x84
 
 
 ---
@@ -141,7 +168,6 @@ syzbot engineers can be reached at syzkaller@googlegroups.com.
 
 syzbot will keep track of this issue. See:
 https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
 If the report is already addressed, let syzbot know by replying with:
 #syz fix: exact-commit-title
