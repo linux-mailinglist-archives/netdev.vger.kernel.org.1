@@ -1,114 +1,170 @@
-Return-Path: <netdev+bounces-58581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01A58817404
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 15:45:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F545817401
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 15:45:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D30B1F23DC8
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 14:45:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B427B22969
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 14:45:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54CE33D54E;
-	Mon, 18 Dec 2023 14:44:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE9673D540;
+	Mon, 18 Dec 2023 14:44:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE003A1C5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC33200C0
 	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 14:44:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-35f8dc26895so26395235ab.1
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-35d36f83b3fso35270965ab.1
         for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 06:44:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702910668; x=1703515468;
+        d=1e100.net; s=20230601; t=1702910667; x=1703515467;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Z8FZr9GGQ5Z6eGGuNWExKewLBexkS29/CYxgSR13hRQ=;
-        b=Be/o9VjqmtKB4WdCznXuYrX3/ZiVahh2Xsb9b21uC/b/TPlH8r9pAapR2epNkQox3+
-         +z5JG4iSNkY2HVBClvDMvxW0wV/h2zJUoOFmzIsRcJM7pJQxSfTU05OiK8zNwa1jRFK6
-         HSeXeB+QyaMx81ywDeE2a2yf8k3m2kqrkSxpoOsUY6/1dl6YhAj6vWfEqtLnV+QcnArI
-         M8f9k06A5AxZHFYyCKwgVbwLKqdw2ZfZ4k+a3IomFIv7HN/2tC4p/1Oy3rV3IWvb1IMC
-         EMMEFIUTODHlV8oarsc5jZhxhFniauVHOQYWPQ8VOZKE4c6SU0hPKZW08opSAC5DpLvt
-         9dTw==
-X-Gm-Message-State: AOJu0YzyzirGqqT4cmBlGKDSIpmPKD0mZw2Wjgu09Z1sr7MrZvTbLsCM
-	Qkqp/0zoZ7ldnoUsGoLLwmji/F8IzW+K0HNR5G4eW4b8gywu
-X-Google-Smtp-Source: AGHT+IGTYkC40CCVpihEqJYHF3lwCRR7lvtCfuHKZIUqQlB4kE/K2Ew5pCFMhEaOWdudDAcEgkbJUu5qBuGQnPKt/Q0scnky+c40
+        bh=hdr6Pd6fw7LwaclRYgeuilcUVrKfZtWFz2t88DKZ0NI=;
+        b=Q0srmhZIq/ZGBU3BWq74nWprsMnZ8nV+GgO9S+eAsPJ47c3lnC32mJwFBSwBhnph0v
+         cNAYncVVNP0DUqY2TeYKJKNpOYiUGonn0QHUv//49XpaHjtlVePib4868p/qflVe4447
+         lFDvfbvscIMaDinsGwVlXv0Eo15NaO+yjouynU5UOZUWK3eSPHccSsjf0J/fbECUSHQb
+         UH/MvB2iVTW7OCWB1ZkFsWOz99scuQLzxAV+XGdaGcryHUPELqhIMwztXH6SEZ6hTkEu
+         cdrSBPri9l/Nr0PhijCtQz6TTtDXNwRzWLDnlKN3HVCkHRReT3ijvqi1WGed6dHPeyZx
+         DFMg==
+X-Gm-Message-State: AOJu0YywKjUpoXVxsQxmhUiPYBb0f0LXr//mK4/KYXqOV5AHLqyDCC3x
+	mMRPZXUq1zdFTAl5G1oUfiHQWVlZUCRshwmrTEVNUg+6i003
+X-Google-Smtp-Source: AGHT+IGC2DsvykjQgFi/Ot2UUh+mgeRJ/M+aNJMfMK9gO0Xelzd3z5hT6tLut5jE8/g0nbuSjdepDNC4tzwKP54KFstgCUhw36WQ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:20cb:b0:35f:97da:499b with SMTP id
- 11-20020a056e0220cb00b0035f97da499bmr811860ilq.1.1702910668011; Mon, 18 Dec
- 2023 06:44:28 -0800 (PST)
+X-Received: by 2002:a05:6e02:12ce:b0:35f:90ab:8d91 with SMTP id
+ i14-20020a056e0212ce00b0035f90ab8d91mr802994ilm.1.1702910667500; Mon, 18 Dec
+ 2023 06:44:27 -0800 (PST)
 Date: Mon, 18 Dec 2023 06:44:27 -0800
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007380e8060cc9c98a@google.com>
-Subject: [syzbot] [tipc?] general protection fault in tipc_udp_is_known_peer
-From: syzbot <syzbot+5142b87a9abc510e14fa@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, jmaloy@redhat.com, 
+Message-ID: <0000000000006bb5b5060cc9c999@google.com>
+Subject: [syzbot] [net?] INFO: task hung in addrconf_verify_work (8)
+From: syzbot <syzbot+e6b87f5edf5469e359e9@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
 	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	tipc-discussion@lists.sourceforge.net, ying.xue@windriver.com
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
 Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    3a3af3aedb00 Merge branch 'skb-coalescing-page_pool'
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1186978ee80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=df5e944701db1d04
-dashboard link: https://syzkaller.appspot.com/bug?extid=5142b87a9abc510e14fa
+HEAD commit:    b1dfc0f76231 net: phy: skip LED triggers on PHYs on SFP mo..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=113bc4d6e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e043d554f0a5f852
+dashboard link: https://syzkaller.appspot.com/bug?extid=e6b87f5edf5469e359e9
 compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16414cd6e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=111a741ae80000
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11611749e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1629b876e80000
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/b7e80f7c12e6/disk-3a3af3ae.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/24b99e397f9f/vmlinux-3a3af3ae.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2ed5171f7844/bzImage-3a3af3ae.xz
+disk image: https://storage.googleapis.com/syzbot-assets/fcd0802bfd92/disk-b1dfc0f7.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/d3d9e5ecc7f0/vmlinux-b1dfc0f7.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4b04f82a5ed6/bzImage-b1dfc0f7.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5142b87a9abc510e14fa@syzkaller.appspotmail.com
+Reported-by: syzbot+e6b87f5edf5469e359e9@syzkaller.appspotmail.com
 
-tipc: Enabled bearer <eth:ip6gre0>, priority 10
-tipc: Enabling of bearer <udp:syz2> rejected, already enabled
-general protection fault, probably for non-canonical address 0xdffffc0000000010: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000080-0x0000000000000087]
-CPU: 1 PID: 5061 Comm: syz-executor528 Not tainted 6.7.0-rc5-syzkaller-01080-g3a3af3aedb00 #0
+INFO: task kworker/0:1:9 blocked for more than 143 seconds.
+      Not tainted 6.7.0-rc5-syzkaller-00167-gb1dfc0f76231 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/0:1     state:D stack:25984 pid:9     tgid:9     ppid:2      flags:0x00004000
+Workqueue: ipv6_addrconf addrconf_verify_work
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5376 [inline]
+ __schedule+0xedb/0x5af0 kernel/sched/core.c:6688
+ __schedule_loop kernel/sched/core.c:6763 [inline]
+ schedule+0xe9/0x270 kernel/sched/core.c:6778
+ schedule_preempt_disabled+0x13/0x20 kernel/sched/core.c:6835
+ __mutex_lock_common kernel/locking/mutex.c:679 [inline]
+ __mutex_lock+0x5b9/0x9d0 kernel/locking/mutex.c:747
+ addrconf_verify_work+0x12/0x30 net/ipv6/addrconf.c:4679
+ process_one_work+0x886/0x15d0 kernel/workqueue.c:2627
+ process_scheduled_works kernel/workqueue.c:2700 [inline]
+ worker_thread+0x8b9/0x1290 kernel/workqueue.c:2781
+ kthread+0x2c6/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+
+Showing all locks held in the system:
+3 locks held by kworker/0:1/9:
+ #0: ffff888025733538 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_one_work+0x789/0x15d0 kernel/workqueue.c:2602
+ #1: ffffc900000e7d80 ((work_completion)(&(&net->ipv6.addr_chk_work)->work)){+.+.}-{0:0}, at: process_one_work+0x7eb/0x15d0 kernel/workqueue.c:2603
+ #2: ffffffff8eaad7a8 (rtnl_mutex){+.+.}-{3:3}, at: addrconf_verify_work+0x12/0x30 net/ipv6/addrconf.c:4679
+3 locks held by kworker/1:1/27:
+1 lock held by khungtaskd/30:
+ #0: ffffffff8cfabce0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:301 [inline]
+ #0: ffffffff8cfabce0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:747 [inline]
+ #0: ffffffff8cfabce0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x75/0x340 kernel/locking/lockdep.c:6614
+2 locks held by getty/4825:
+ #0: ffff8880260860a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x24/0x80 drivers/tty/tty_ldisc.c:243
+ #1: ffffc900031332f0 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0xfc6/0x1490 drivers/tty/n_tty.c:2201
+3 locks held by syz-executor383/5095:
+
+=============================================
+
+NMI backtrace for cpu 0
+CPU: 0 PID: 30 Comm: khungtaskd Not tainted 6.7.0-rc5-syzkaller-00167-gb1dfc0f76231 #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-RIP: 0010:tipc_udp_is_known_peer+0x9c/0x250 net/tipc/udp_media.c:291
-Code: 48 c1 ea 03 80 3c 02 00 0f 85 b4 01 00 00 4c 8b b5 98 00 00 00 48 b8 00 00 00 00 00 fc ff df 49 8d 5e c8 4c 89 f2 48 c1 ea 03 <80> 3c 02 00 0f 85 81 01 00 00 49 8b 06 4d 39 f5 48 8d 68 c8 0f 84
-RSP: 0018:ffffc900040b7368 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000048 RCX: ffffffff8a218d4f
-RDX: 0000000000000010 RSI: ffffffff8a218c3e RDI: 0000000000000001
-RBP: ffff88814b630000 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: ffffc900040b73c0
-R13: ffff88814b630098 R14: 0000000000000080 R15: 0000000000000000
-FS:  0000555555ffd380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
+ nmi_cpu_backtrace+0x277/0x390 lib/nmi_backtrace.c:113
+ nmi_trigger_cpumask_backtrace+0x299/0x300 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:160 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:222 [inline]
+ watchdog+0xf87/0x1210 kernel/hung_task.c:379
+ kthread+0x2c6/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+Sending NMI from CPU 0 to CPUs 1:
+NMI backtrace for cpu 1
+CPU: 1 PID: 5095 Comm: syz-executor383 Not tainted 6.7.0-rc5-syzkaller-00167-gb1dfc0f76231 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+RIP: 0010:write_comp_data+0x35/0x80 kernel/kcov.c:236
+Code: 8b 14 25 c0 bc 03 00 65 8b 05 7f 34 7c 7e a9 00 01 ff 00 74 0f f6 c4 01 74 59 8b 82 fc 15 00 00 85 c0 74 4f 8b 82 d8 15 00 00 <83> f8 03 75 44 48 8b 82 e0 15 00 00 8b 92 dc 15 00 00 48 8b 38 48
+RSP: 0018:ffffc900040ef360 EFLAGS: 00000246
+RAX: 0000000000000000 RBX: 00000000fffffff8 RCX: ffffffff8a21a0a0
+RDX: ffff888024df8000 RSI: 0000000000000000 RDI: 0000000000000005
+RBP: ffff88814b3ba058 R08: 0000000000000005 R09: 0000000000000000
+R10: 00000000fffffff8 R11: 0000000000000000 R12: ffffc900040ef3c0
+R13: ffff88814b3ba098 R14: dffffc0000000000 R15: ffff888021d118c0
+FS:  0000555556e1c380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
 CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f3ed64c4ea3 CR3: 0000000026de2000 CR4: 00000000003506f0
+CR2: 000055ee31815440 CR3: 0000000079951000 CR4: 00000000003506f0
 DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
 DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 Call Trace:
+ <NMI>
+ </NMI>
  <TASK>
- tipc_udp_nl_bearer_add+0x212/0x2f0 net/tipc/udp_media.c:646
- tipc_nl_bearer_add+0x21e/0x360 net/tipc/bearer.c:1089
+ tipc_udp_is_known_peer+0x110/0x250 net/tipc/udp_media.c:292
+ tipc_udp_nl_bearer_add+0x20f/0x2f0 net/tipc/udp_media.c:646
+ tipc_nl_bearer_add+0x21b/0x360 net/tipc/bearer.c:1089
  genl_family_rcv_msg_doit+0x1fc/0x2e0 net/netlink/genetlink.c:972
  genl_family_rcv_msg net/netlink/genetlink.c:1052 [inline]
  genl_rcv_msg+0x561/0x800 net/netlink/genetlink.c:1067
- netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2544
+ netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2545
  genl_rcv+0x28/0x40 net/netlink/genetlink.c:1076
- netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
- netlink_unicast+0x53b/0x810 net/netlink/af_netlink.c:1367
- netlink_sendmsg+0x8b7/0xd70 net/netlink/af_netlink.c:1909
+ netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+ netlink_unicast+0x53b/0x810 net/netlink/af_netlink.c:1368
+ netlink_sendmsg+0x93c/0xe40 net/netlink/af_netlink.c:1910
  sock_sendmsg_nosec net/socket.c:730 [inline]
  __sock_sendmsg+0xd5/0x180 net/socket.c:745
  ____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
@@ -117,48 +173,16 @@ Call Trace:
  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
  do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
  entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7f3ed64c6dd9
+RIP: 0033:0x7fb2f32cae19
 Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 71 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff950619b8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f3ed64c6dd9
+RSP: 002b:00007ffe3d73e478 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fb2f32cae19
 RDX: 0000000000000000 RSI: 0000000020000f00 RDI: 0000000000000005
 RBP: 0000000000000000 R08: 0000000000000006 R09: 0000000000000006
 R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
 R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000000001
  </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:tipc_udp_is_known_peer+0x9c/0x250 net/tipc/udp_media.c:291
-Code: 48 c1 ea 03 80 3c 02 00 0f 85 b4 01 00 00 4c 8b b5 98 00 00 00 48 b8 00 00 00 00 00 fc ff df 49 8d 5e c8 4c 89 f2 48 c1 ea 03 <80> 3c 02 00 0f 85 81 01 00 00 49 8b 06 4d 39 f5 48 8d 68 c8 0f 84
-RSP: 0018:ffffc900040b7368 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000048 RCX: ffffffff8a218d4f
-RDX: 0000000000000010 RSI: ffffffff8a218c3e RDI: 0000000000000001
-RBP: ffff88814b630000 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: ffffc900040b73c0
-R13: ffff88814b630098 R14: 0000000000000080 R15: 0000000000000000
-FS:  0000555555ffd380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f3ed64c4ea3 CR3: 0000000026de2000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	48 c1 ea 03          	shr    $0x3,%rdx
-   4:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
-   8:	0f 85 b4 01 00 00    	jne    0x1c2
-   e:	4c 8b b5 98 00 00 00 	mov    0x98(%rbp),%r14
-  15:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  1c:	fc ff df
-  1f:	49 8d 5e c8          	lea    -0x38(%r14),%rbx
-  23:	4c 89 f2             	mov    %r14,%rdx
-  26:	48 c1 ea 03          	shr    $0x3,%rdx
-* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
-  2e:	0f 85 81 01 00 00    	jne    0x1b5
-  34:	49 8b 06             	mov    (%r14),%rax
-  37:	4d 39 f5             	cmp    %r14,%r13
-  3a:	48 8d 68 c8          	lea    -0x38(%rax),%rbp
-  3e:	0f                   	.byte 0xf
-  3f:	84                   	.byte 0x84
+INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 2.222 msecs
 
 
 ---
