@@ -1,209 +1,126 @@
-Return-Path: <netdev+bounces-58481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BACD8816980
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 10:12:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6800816984
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 10:13:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 326F71F231CA
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:12:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 127AEB20C72
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:13:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6208A12E73;
-	Mon, 18 Dec 2023 09:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DAA612B75;
+	Mon, 18 Dec 2023 09:11:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GPAlMkVE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X5ZYcSVk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF1DE134DE
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 09:11:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702890702; x=1734426702;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=KAgG9vSTXhOTz9WBi0S1/lzti8fMKu5cs/esPViGZSA=;
-  b=GPAlMkVE+8cdjf5id8suMAjVfKOkth7EA2D+YqW2fHCA1zQp+UOtJLBv
-   aB9aqXjIohkHh4LAGWPJkTuVmvCH20ED2JZPfeH7wmr7Mw2SBDWP5gWfo
-   wl5pZsa4L6SReEl59CtNK9sFriZ6Bil4zzN+0P1ghh69GKw9t56FiBZQs
-   6NTnpGPMEehwVkXaFNnZ3LDDiFrkxRh4G/XJkEcpKY4ZZf4y8zByQILlj
-   BgOg2Fm1WCEx5j+udNtl4BIeNc7tzlTXyG3RwSdwBhP3jxmWXdH5B9RQG
-   11m1gw00i4inQha2nTQch/Vrzr5eWy7kDDUG6QO+s8H70rxM1uqdfXPXe
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10927"; a="394353176"
-X-IronPort-AV: E=Sophos;i="6.04,285,1695711600"; 
-   d="scan'208";a="394353176"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2023 01:11:41 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10927"; a="725240032"
-X-IronPort-AV: E=Sophos;i="6.04,285,1695711600"; 
-   d="scan'208";a="725240032"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Dec 2023 01:11:36 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 18 Dec 2023 01:11:35 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 18 Dec 2023 01:11:35 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 18 Dec 2023 01:11:35 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 18 Dec 2023 01:11:35 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GTDBtQRpPVIdo4AeaI09DD/esA7k1df6fdVDG66wFcsZz+C6KAFtc+nVVx1ds0fVYWWP9rSzlugArLHt2DLy5n8q8+yP8CryndphsZOUj3BFJN6eTlmdV/n4i/yXXy4TS7j04sQrUBi+8+s1NhoP1nuCYalWM2DwTCa4GBazLDKICKs74EaNEhzfcbnayoNrkIYB0EVj0zFo9t9DFL1TUcukXikkbNrZZ718469Q0b0x+3Nh11d8sjHRl+QuxduCRkDUcTqaK6c1FILYl3TCid6g+9Wm2b9pBFhSa68xA/E8A9sI1MeA+IR116lpPFuuUBDd/17uB1ERtWfkYXOY9A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KAgG9vSTXhOTz9WBi0S1/lzti8fMKu5cs/esPViGZSA=;
- b=WQL8vob0Wir9+VXNNOCv+GLKwSYujwJv1xEcDWiPd9oRG3PuC6/f5g1JO5hrenz8fTYGaLAbBI1acQMt3VKVOdH8eier5dP69VZuFwabD/n6cuDUaSTAm3F+5Z5UtfOmcKuh/od+1zcnBw9fHq9OjfHFXtQnxA4j8gwp2MR8KLzXS6zdKm/mEWH73eXrfh/TmVemzCT3GJpnkznmrro1tcEX3nSmIJrc+hhF3yssEdGDmzmA5HuJMMc6I8+RL3y/QhPyZV6DS/YA7HBt/HlNC4SbeCW+FfrpxY0SmkF+tE7sKreLe/QuB1n/j8V427f2A1N/awf9fNThD3obMIHKtA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CH3PR11MB8313.namprd11.prod.outlook.com (2603:10b6:610:17c::15)
- by CH3PR11MB7273.namprd11.prod.outlook.com (2603:10b6:610:141::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.38; Mon, 18 Dec
- 2023 09:11:33 +0000
-Received: from CH3PR11MB8313.namprd11.prod.outlook.com
- ([fe80::adc:80f6:2ab0:ec38]) by CH3PR11MB8313.namprd11.prod.outlook.com
- ([fe80::adc:80f6:2ab0:ec38%3]) with mapi id 15.20.7091.034; Mon, 18 Dec 2023
- 09:11:32 +0000
-From: "Rout, ChandanX" <chandanx.rout@intel.com>
-To: "Zaremba, Larysa" <larysa.zaremba@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Brandeburg, Jesse"
-	<jesse.brandeburg@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Keller, Jacob E" <jacob.e.keller@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, "Kuruvinakunnel,
- George" <george.kuruvinakunnel@intel.com>, "Nagraj, Shravan"
-	<shravan.nagraj@intel.com>, "Fijalkowski, Maciej"
-	<maciej.fijalkowski@intel.com>, "Sreenivas, Bharathi"
-	<bharathi.sreenivas@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net] ice: Fix PF with enabled XDP
- going no-carrier after reset
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net] ice: Fix PF with enabled XDP
- going no-carrier after reset
-Thread-Index: AQHaLN4R8D7FBBH0eECZDi78dpU+nbCuyaYA
-Date: Mon, 18 Dec 2023 09:11:32 +0000
-Message-ID: <CH3PR11MB8313225A36BBE97FEC84500EEA90A@CH3PR11MB8313.namprd11.prod.outlook.com>
-References: <20231212092903.446491-1-larysa.zaremba@intel.com>
-In-Reply-To: <20231212092903.446491-1-larysa.zaremba@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CH3PR11MB8313:EE_|CH3PR11MB7273:EE_
-x-ms-office365-filtering-correlation-id: a57f628c-8482-4b95-7dc3-08dbffa953b3
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: TpbiN7UsP3l41Q0/grjpLmmbFxhqo7wGxcH4VXZm0Pd5lZNOJrq6CBhtj7ytAQWFmwPwOo4DRWWAnHzEXxYF8ypZiPsWpWSH+YU1X1Ks/BdYNATqatWowI/HJ4ty5CA9NuaakzLAxPF+H0OWH7l/82bUehujTqWBDH3CP21vc0tJBqGdzRYYPSzzSb+pf99WbnPZRuSsHM0/CqSFoZuNbZC2r4VMiVI8fx/JPmUOUlwHRrns9URDCq6S9KIMYq8oLugkeYJqx/rG/I6WJya1u9vEHv16n2pvg47QN4u67FC7DtBBh6uUscXcPmslUUN8beTFHK8ZZ0Xe8Wcz1Cs+txbFA0d0GfYUZZ7ftONzdKgIyt+UTlMB/KGUQ23LQIMZCAhc+Rnkr9DfDCix6qxZ3ov+O+pxEgYpUwoaBm5h2ZNgHlLpzJ4YfQIhlCiCDqKwHf3bm+D8ZCr0euzNuxLLJ1KYftDO1oD+1MQwUM02QhLAFCdPODyo1W2BFeK6LUMxbvdnUr9N+qTiPXPjyQwz2CQhcRvxHStmGGpYoE54PCNO3Zq6EpzTmO8uHlrh2OcLOUcr28zZFpEyBAnUKW8154TLFBYLHmRHAkubgP4VlcjAx6rdUhbiuKfLX4G/sl+1
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8313.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(39860400002)(366004)(396003)(376002)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(38070700009)(66556008)(66946007)(316002)(83380400001)(55016003)(76116006)(66446008)(110136005)(66476007)(54906003)(64756008)(2906002)(122000001)(52536014)(4326008)(8676002)(8936002)(5660300002)(38100700002)(71200400001)(7696005)(9686003)(6506007)(26005)(478600001)(86362001)(41300700001)(33656002)(82960400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?MYwol7zk/fUTcA+84q2HKVUs5mg2yOylkdQKtsIszcWsHMKNta5z5gv+iz3a?=
- =?us-ascii?Q?dqr1IrF80FySzUrVdZdkCsrBdCZEvBrdM8YMy9p/lPpKBoDGCeNGh2OaaGAS?=
- =?us-ascii?Q?/yyaV06YvgxUBrc6QNZPr4op8+xVxxcceuDNHg102doCugZFrCyXb/kSKTdC?=
- =?us-ascii?Q?6IksoiKkIJZG5pvAdUjBjqL55ibyVYzAgIhqMf54Nf+AwpFfX3F2n78fuIVr?=
- =?us-ascii?Q?Lsrtf6+XNP7DRmDSLiArC9xHqb7TY3uYEZb7VqFxxjWMM+FjB/jMWdwTeKG4?=
- =?us-ascii?Q?BOatiTCrFfk5SWugVpvR2m49qUmzLn4dA33FieSpaWu6bz+F8EPSgLzt5A9Y?=
- =?us-ascii?Q?/Ubxe0WpeVYwHE/J5JrKaGOWN0z8/XkVWCGc0EWR+IsZx8PNoy1uKm1kB5P3?=
- =?us-ascii?Q?qeBT77vXOzF+V5J4U6jbZoDfzXW/Nwd+fsEHexPTkFNIS+6kbp1VI1WgkKIu?=
- =?us-ascii?Q?CTHFE12lCPQqclYNDQveoEWCETX8zqyd789E7lILjEu/TSJv2WVrxwIc5GHs?=
- =?us-ascii?Q?l6ZKoq161ZspjzSXlIqqF9JzCOzDGBDiuvUwRfKdUbLhmEsyI6BXmvuOmuQN?=
- =?us-ascii?Q?Nw/WBG+s5USbHSuaSrasmsJB+ta0b2qvyyaKfHqTxsbuyMopkljNB8J+aMFl?=
- =?us-ascii?Q?+aH0jlVZ9ZH2KYMDstnTPX4Sk4iJguBz8DfCASTPbh0RcNF+MQVdC57iwGbY?=
- =?us-ascii?Q?U9JGs+cXWcPaW8N66EE1bt4zi9KsPu/GHEgAocVyKHo12YLAuXBALIunDx8/?=
- =?us-ascii?Q?uHCNnQP9Mti02pU6pkHsgqDLG0GEzZK4KD0qaZWKM5FPZDjLj3sRvmBjmD7a?=
- =?us-ascii?Q?Sg04Bmtmu1ehWEj0wWUvhkxxYFLXTlYSDK4Q1YHBAo/lxPgqxurHKEbqFqW0?=
- =?us-ascii?Q?gWiEdZtrtc+H51/zcdzZN18Ry+ra+BAHr/0pF/9avEacxWCnBu1rTfXLnUYZ?=
- =?us-ascii?Q?FR55kP1hQ6VuwL9jbWUDAw2IIL1a8yf1/uclhlpreqD18H0yyrdk7q8m4TJJ?=
- =?us-ascii?Q?8fxkDbeDsIPClity3a8IvXLbCqEWjY0OPF+eED8sk5f12B+ujY1BBThMJVf3?=
- =?us-ascii?Q?TURuUL5WDKccY5IV2HxS9JsJSDQFQJPeHaaHwJnHRtu81dhNJbHzQIl0Tx1g?=
- =?us-ascii?Q?4Oh2pgvCQzD1auwDQR95DCMQWADxT9HGBV5DAvTUVj2th14Pv0coh5gVXQMc?=
- =?us-ascii?Q?ztiX/N+Uhdnbz+6xMy9mhVjoWxorSTBiortsYeJiLuw/rWnLxRK+saYDWZCI?=
- =?us-ascii?Q?uVb5gos9Eq2f0NaZl13phfwBQntsqgtXLqdOg9opHgOhOeJRmoMtI9khwhPv?=
- =?us-ascii?Q?GNuT+717QrHrgcB8MbAIBfHxK6PAclR0Ot2phUJRDnOVRFVzoPx4/ZH7VzQg?=
- =?us-ascii?Q?ldkM3FCC+GPDmcnj561IUtj83oCloPLPFSQyQT9nN/JwXumaRnzf12TtSP2Y?=
- =?us-ascii?Q?/VXLs7sGqzoMfq+oW8oAJc0rP5nN5fdoogCTAjC0YJuvcVhzU+2E4JIxBfJQ?=
- =?us-ascii?Q?fX9wFolrrSfCGa0pjppNTkWYn029713uU9Y7D1lXwZdnQB/7KfhhF+nCH7Vl?=
- =?us-ascii?Q?2fYBNk7jLZqh9vuOw3kYM2CMi9dGPUMBHhvN8r9n?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED12C13FED;
+	Mon, 18 Dec 2023 09:11:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-5cd86e3a9afso874207a12.1;
+        Mon, 18 Dec 2023 01:11:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702890707; x=1703495507; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oamstZbN15K9v7B2Yii8F7ZBVCYFkDw5e8OQEaBwsXY=;
+        b=X5ZYcSVkgLm+BfPqDsDuFi/Cfxz9DHvR6wSxsjrK+zu5wLAXNonugMjVwyACw6iriW
+         uzlQA2mI5KKJHDbpwdm/ipyA2SefpllT8qtRwJ5RNbeXSWUa+b1eDlNR6zv5YBLxrRub
+         3wSMr3Lgi4aS5FlNeMqafD3LCff4gg5Q5yCb19KYy2hqX3v19nbmsCqdDjqOyTe2laAf
+         yfbvzbVS0WOiNI+AjUjLIrMgWLXynCnxouH+4YtlhtfgMFUh3hi74DsqlBQQRXvKUAHQ
+         9I4zTjQ/wes8o14T4PABPkUtlDonp2yyy3e4CYYBlTcQZlOKh/vi/wEnL5r6Lf+ULZYc
+         FJtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702890707; x=1703495507;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oamstZbN15K9v7B2Yii8F7ZBVCYFkDw5e8OQEaBwsXY=;
+        b=ZOoKarM/gpBziyIggoPkXvw/bggLyCqtywMwza820RvvP5JP4ki/Ew6+W7+CwNzd5w
+         VUnL2/2zbDTc4bmyfKZfVA/EOE3Zo0iEPvelISImqaFSUW5wmmqkiFcV8Byf5upY0VJg
+         pE+ypiZbi3JG4jUBo/d5FGVHlmMLhNsoIJfvuw+qPMb6lFmqYwh9o6RLGlZTixr8Vr3H
+         MjjfUg+DQ/pN4wKuixEh2ttEmaP3yWXZqvozQsVUcwZG+xYLrZhQhXim4ZmEP3VlgZUs
+         0p0pwKVKTfPB4e5pd//h8V2Tk+iXrhzpPHI0xNgFMQdVqQvOfTzbKJX9r3kGZyQneXYa
+         zYBQ==
+X-Gm-Message-State: AOJu0YyULc8+e17hMxRas1zQ93hsjg1j2tOA6qGfh5iEGUiP1PivXF+N
+	AMCdWhbCP0R6cf9392Q8gg4=
+X-Google-Smtp-Source: AGHT+IElrdFe1Jr/qc2kdXlQQjkbrR7DD5sZxu8ga0fhCiDmugYYPl+QHBGUROH/AsmUlShiz8S2oQ==
+X-Received: by 2002:a05:6a20:29a5:b0:18f:97c:384f with SMTP id f37-20020a056a2029a500b0018f097c384fmr16245111pzh.41.1702890707307;
+        Mon, 18 Dec 2023 01:11:47 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id kq13-20020a056a004b0d00b006c3069547bfsm17626092pfb.79.2023.12.18.01.11.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Dec 2023 01:11:46 -0800 (PST)
+Date: Mon, 18 Dec 2023 17:11:40 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Dmitry Safonov <dima@arista.com>
+Cc: Shuah Khan <shuah@kernel.org>, David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Salam Noureddine <noureddine@arista.com>,
+	Bob Gilligan <gilligan@arista.com>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
+	Dmitry Safonov <0x7f454c46@gmail.com>
+Subject: Re: [PATCH 10/12] selftests/net: Add TCP-AO RST test
+Message-ID: <ZYAMzMzWa9PTUpLG@Laptop-X1>
+References: <20231215-tcp-ao-selftests-v1-0-f6c08180b985@arista.com>
+ <20231215-tcp-ao-selftests-v1-10-f6c08180b985@arista.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8313.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a57f628c-8482-4b95-7dc3-08dbffa953b3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Dec 2023 09:11:32.1314
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Cd5/jq+bgPxLkHoNBDy/0NaBCiOx4+EpW+dRiYgPY6YqptyoKK0Qg3onGexSkNtskpCeBW8CVauDzgaBbJdKhw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7273
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231215-tcp-ao-selftests-v1-10-f6c08180b985@arista.com>
 
+On Fri, Dec 15, 2023 at 02:36:24AM +0000, Dmitry Safonov wrote:
+> Check that both active and passive reset works and correctly sign
+> segments with TCP-AO or don't send RSTs if not possible to sign.
+> A listening socket with backlog = 0 gets one connection in accept
+> queue, another in syn queue. Once the server/listener socket is
+> forcibly closed, client sockets aren't connected to anything.
+> In regular situation they would receive RST on any segment, but
+> with TCP-AO as there's no listener, no AO-key and unknown ISNs,
+> no RST should be sent.
+> 
+> And "passive" reset, where RST is sent on reply for some segment
+> (tcp_v{4,6}_send_reset()) - there use TCP_REPAIR to corrupt SEQ numbers,
+> which later results in TCP-AO signed RST, which will be verified and
+> client socket will get EPIPE.
+> 
+> No TCPAORequired/TCPAOBad segments are expected during these tests.
+> 
+> Sample of the output:
+> > # ./rst_ipv4
+> > 1..15
+> > # 1462[lib/setup.c:254] rand seed 1686611171
+> > TAP version 13
+> > ok 1 servered 1000 bytes
+> > ok 2 Verified established tcp connection
+> > ok 3 sk[0] = 7, connection was reset
+> > ok 4 sk[1] = 8, connection was reset
+> > ok 5 sk[2] = 9
+> > ok 6 MKT counters are good on server
+> > ok 7 Verified established tcp connection
+> > ok 8 client connection broken post-seq-adjust
+> > ok 9 client connection was reset
+> > ok 10 No segments without AO sign (server)
+> > ok 11 Signed AO segments (server): 0 => 30
+> > ok 12 No segments with bad AO sign (server)
+> > ok 13 No segments without AO sign (client)
+> > ok 14 Signed AO segments (client): 0 => 30
+> > ok 15 No segments with bad AO sign (client)
+> > # Totals: pass:15 fail:0 xfail:0 xpass:0 skip:0 error:0
+> 
+> Signed-off-by: Dmitry Safonov <dima@arista.com>
 
-
->-----Original Message-----
->From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
->Zaremba, Larysa
->Sent: Tuesday, December 12, 2023 2:59 PM
->To: intel-wired-lan@lists.osuosl.org
->Cc: Zaremba, Larysa <larysa.zaremba@intel.com>; netdev@vger.kernel.org;
->Brandeburg, Jesse <jesse.brandeburg@intel.com>; Nguyen, Anthony L
-><anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
-><przemyslaw.kitszel@intel.com>; Keller, Jacob E <jacob.e.keller@intel.com>=
-;
->Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
->Subject: [Intel-wired-lan] [PATCH iwl-net] ice: Fix PF with enabled XDP go=
-ing
->no-carrier after reset
->
->Commit 6624e780a577fc596788 ("ice: split ice_vsi_setup into smaller
->functions") has refactored a bunch of code involved in PFR. In this proces=
-s, TC
->queue number adjustment for XDP was lost. Bring it back.
->
->Lack of such adjustment causes interface to go into no-carrier after a res=
-et, if
->XDP program is attached, with the following message:
->
->ice 0000:b1:00.0: Failed to set LAN Tx queue context, error: -22 ice
->0000:b1:00.0 ens801f0np0: Failed to open VSI 0x0006 on switch 0x0001 ice
->0000:b1:00.0: enable VSI failed, err -22, VSI index 0, type ICE_VSI_PF ice
->0000:b1:00.0: PF VSI rebuild failed: -22 ice 0000:b1:00.0: Rebuild failed,
->unload and reload driver
->
->Fixes: 6624e780a577 ("ice: split ice_vsi_setup into smaller functions")
->Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
->---
-> drivers/net/ethernet/intel/ice/ice_lib.c | 3 +++
-> 1 file changed, 3 insertions(+)
->
-
-Tested-by: Chandan Kumar Rout <chandanx.rout@intel.com> (A Contingent Worke=
-r at Intel)
+Tested-by: Hangbin Liu <liuhangbin@gmail.com>
 
