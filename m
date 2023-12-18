@@ -1,161 +1,104 @@
-Return-Path: <netdev+bounces-58623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BE1E817955
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 19:02:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C56A0817957
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 19:03:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 135941F225C8
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 18:02:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D9162858D7
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 18:03:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1DBF5BFB5;
-	Mon, 18 Dec 2023 18:02:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C09B45BFAC;
+	Mon, 18 Dec 2023 18:03:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="lU/Dul2r"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="arMMbyd/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC11E5BFA2
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 18:02:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-50e33fe3856so1929066e87.1
-        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 10:02:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1702922565; x=1703527365; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=O97uj9e08s7i9aDFJjFTarMdK1KNX1EjP0tGTzMNUfY=;
-        b=lU/Dul2rHvHzDJJAL07vWE0RX5l7/RZt1WB7UGIcMkur4wNppgJ1QQJr71txsvxx9Z
-         Q6+C2ZsS8XWDanRu0dD72fyjYDXshkuhLhc63BTELgUea476pnweRknF+I9WsELr5ieG
-         0Fv4zvKPmdWruIBFI00vowpAizZuvty+LqlBwhMYCV4YMpExj0hSG+m5SWRg88Z3YUK8
-         c8Yhw9n1N75/5/h+2Ydi4bOSTxLQGiXmBYFv2HhZP9YF6tq7UsNGBFbb+l6ysJ6yiq5a
-         ptYlLmvLyfZEN5j6xCDacvUbucWOa64ZnOxdLHFLDsIxMc6Y1/NdTHPpOpMyLaNwHyO4
-         vGNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702922565; x=1703527365;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O97uj9e08s7i9aDFJjFTarMdK1KNX1EjP0tGTzMNUfY=;
-        b=ey0pxP0KSVWHF8lOar82Ip2WZiOCzOKmkba116qouCotzrNdYXZrBCCk7ogPUaCrSf
-         3fjRhrBNlGF3beit4Q9Z9HePCEHKbVu6S3iy88oXuY/793Sy46stIkZi+28O/6aOTK3Z
-         /0S1zHZ+Bndk2OjHT3yqVtk1n/1uf70AsmLTa+CvRsHCVo7TWwntuQubdYHSSmC0rAdN
-         WW3OTFJNbMX6W/RURtwUeNldJ32i3emWmmYKxPdYBHgw3od+arSx2rzkAMmS+x80M+CQ
-         XMsKed5ByGtN8LG4eU8pVhF2KKQ/uxdsNHB4uQIaFVbdum9RbazDchDpBrXgNaZUWcMl
-         bX9Q==
-X-Gm-Message-State: AOJu0YwGKf19qia2PDtHuxoE8V99LwymaBXcgYu46CXo0NvpTIrUAVP/
-	VKkSOmakbvvGUmo4+WHtNexDUA==
-X-Google-Smtp-Source: AGHT+IGeBDtRuHT4pEAlzpm7lZdQbY5RWwW8araiEEgTbOTDMdKguqOI6mkQ3QIsoZKYSZrlc5gdzg==
-X-Received: by 2002:ac2:4ec4:0:b0:50e:3e13:ae89 with SMTP id p4-20020ac24ec4000000b0050e3e13ae89mr420029lfr.66.1702922564804;
-        Mon, 18 Dec 2023 10:02:44 -0800 (PST)
-Received: from wkz-x13 (a124.broadband3.quicknet.se. [46.17.184.124])
-        by smtp.gmail.com with ESMTPSA id o22-20020ac24bd6000000b0050d1672f10csm2839691lfq.39.2023.12.18.10.02.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Dec 2023 10:02:43 -0800 (PST)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: davem@davemloft.net, kuba@kernel.org, kabel@kernel.org, andrew@lunn.ch,
- hkallweit1@gmail.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 2/4] net: phy: marvell10g: Fix power-up when
- strapped to start powered down
-In-Reply-To: <ZXx0eVzJ3I1PwOa0@shell.armlinux.org.uk>
-References: <20231214201442.660447-1-tobias@waldekranz.com>
- <20231214201442.660447-3-tobias@waldekranz.com>
- <ZXx0eVzJ3I1PwOa0@shell.armlinux.org.uk>
-Date: Mon, 18 Dec 2023 19:02:43 +0100
-Message-ID: <87y1dr75j0.fsf@waldekranz.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57FFC1DFDE;
+	Mon, 18 Dec 2023 18:03:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BIFAJWx011943;
+	Mon, 18 Dec 2023 10:03:08 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=pfpt0220; bh=ltnbOgbv
+	1rFAKiQQb0O/LdKhSjcYgvW52nepTPzv6Ow=; b=arMMbyd/ZPMCwBnIl8v7FTTq
+	hQe1QgIbs9rMi1Hf+co5ACpUjPkg0bnt+jy9XKoRx3eMufYy5q5sCIzXnHneHWzG
+	GTZgstJAoKDGs3LzoN68Pb0CoL5ZJnZ/3WLOjHcojbHEl4Oha6xgh81olmufD5Cm
+	YHDpXXOXuDmciteks1dPdZWAx0ceUdJ+xQdPUelSmPhZT27yVVcRCTHNsjx7L+PE
+	i+21yvXPsYl9BA2bJ+PpBJXdWDHXpmrAIbW36iQjyv+DJxqcqD85BAK+UXYJ0CFV
+	CrkdLlZiyl1tEwuO85RNUB2gQzZUDuilcFBknT26Zb77/M765yoW51a1+p0aPA==
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3v2rg58mrj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Mon, 18 Dec 2023 10:03:07 -0800 (PST)
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 18 Dec
+ 2023 10:03:06 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Mon, 18 Dec 2023 10:03:06 -0800
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id 234483F707D;
+	Mon, 18 Dec 2023 10:03:01 -0800 (PST)
+From: Suman Ghosh <sumang@marvell.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <sgoutham@marvell.com>, <sbhatta@marvell.com>,
+        <jerinj@marvell.com>, <gakula@marvell.com>, <hkelam@marvell.com>,
+        <lcherian@marvell.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <horms@kernel.org>
+CC: Suman Ghosh <sumang@marvell.com>
+Subject: [net-next PATCH] octeontx2-af: Fix a double free issue
+Date: Mon, 18 Dec 2023 23:32:58 +0530
+Message-ID: <20231218180258.303468-1-sumang@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: ZWYpnapBLHaUTHG7NQo_YBPoUe7AgMLZ
+X-Proofpoint-GUID: ZWYpnapBLHaUTHG7NQo_YBPoUe7AgMLZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
 
-On fre, dec 15, 2023 at 15:44, "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-> On Thu, Dec 14, 2023 at 09:14:40PM +0100, Tobias Waldekranz wrote:
->> On devices which are hardware strapped to start powered down (PDSTATE
->> == 1), make sure that we clear the power-down bit on all units
->> affected by this setting.
->> 
->> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
->> ---
->>  drivers/net/phy/marvell10g.c | 17 ++++++++++++++---
->>  1 file changed, 14 insertions(+), 3 deletions(-)
->> 
->> diff --git a/drivers/net/phy/marvell10g.c b/drivers/net/phy/marvell10g.c
->> index 83233b30d7b0..1c1333d867fb 100644
->> --- a/drivers/net/phy/marvell10g.c
->> +++ b/drivers/net/phy/marvell10g.c
->> @@ -344,11 +344,22 @@ static int mv3310_power_down(struct phy_device *phydev)
->>  
->>  static int mv3310_power_up(struct phy_device *phydev)
->>  {
->> +	static const u16 resets[][2] = {
->> +		{ MDIO_MMD_PCS,    MV_PCS_BASE_R    + MDIO_CTRL1 },
->> +		{ MDIO_MMD_PCS,    MV_PCS_1000BASEX + MDIO_CTRL1 },
->
-> This is not necessary. The documentation states that the power down
-> bit found at each of these is the same physical bit appearing in two
-> different locations. So only one is necessary.
+There was a memory leak during error handling in function
+npc_mcam_rsrcs_init().
 
-Right, I'll remove the entry for 1000BASE-X in v2.
+Fixes: dd7842878633 ("octeontx2-af: Add new devlink param to configure maximum usable NIX block LFs")
+Suggested-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Suman Ghosh <sumang@marvell.com>
+---
+This is a follow-up of
+https://urldefense.proofpoint.com/v2/url?u=https-3A__git.kernel.org_netdev_net-2Dnext_c_dd7842878633&d=DwIDaQ&c=nKjWec2b6R0mOyPaz7xtfQ&r=7si3Xn9Ly-Se1a655kvEPIYU0nQ9HPeN280sEUv5ROU&m=60aBCTsbI2Wra6po5SgIjqyAuIFqF5EhovKncvmmGaMwU94GDPEB2f_wC_piT9AE&s=7z2Gk48pbPhPqKU-pUu2xd2k6Ze5niLKk3P0iBiD9F8&e=
 
->> +		{ MDIO_MMD_PCS,    MV_PCS_BASE_T    + MDIO_CTRL1 },
->> +		{ MDIO_MMD_PMAPMD, MDIO_CTRL1 },
->> +		{ MDIO_MMD_VEND2,  MV_V2_PORT_CTRL },
->> +	};
->>  	struct mv3310_priv *priv = dev_get_drvdata(&phydev->mdio.dev);
->> -	int ret;
->> +	int i, ret;
->>  
->> -	ret = phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2, MV_V2_PORT_CTRL,
->> -				 MV_V2_PORT_CTRL_PWRDOWN);
->> +	for (i = 0; i < ARRAY_SIZE(resets); i++) {
->> +		ret = phy_clear_bits_mmd(phydev, resets[i][0], resets[i][1],
->> +					 MV_V2_PORT_CTRL_PWRDOWN);
->
-> While MV_V2_PORT_CTRL_PWRDOWN may correspond with the correct bit for
-> the MDIO CTRL1 register, we have MDIO_CTRL1_LPOWER which describes
-> this bit. Probably the simplest solution would be to leave the
-> existing phy_clear_bits_mmd(), remove the vendor 2 entry from the
-> table, and run through that table first.
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Yes, I'll fix this in v2.
-
-> Lastly, how does this impact a device which has firmware, and the
-> firmware manages the power-down state (the manual states that unused
-> blocks will be powered down - I assume by the firmware.) If this
-> causes blocks which had been powered down by the firmware because
-> they're not being used to then be powered up, that is a regression.
-> Please check that this is not the case.
-
-This will be very hard for me to test, as I only have access to boards
-without dedicated FLASHes. That said, I don't think I understand how
-this is related to how the devices load their firmware. As I understand
-it, we should pick up the device in the exact same state after the MDIO
-load as we would if it had booted on its own, via a serial FLASH.
-
-The selection of PDSTATE, based on the sample-at-reset pins, is
-independent of how firmware is loaded.
-
-From the manual:
-
-    The following registers can be set to force the units to power down.
-
-I interpret this as the power-down bits only acting as gates to stop
-firmware from powering up a particular unit. Conversely, clearing one of
-these bits merely indicates that the firmware is free to power up the
-unit in question.
-
-On a device strapped to PDSTATE==0, I would expect all of these bits to
-already be cleared, since the manual states that the value of PDSTATE is
-latched into all these bits at reset.
-
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+index 513c4fe86967..7f30e08b580f 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+@@ -1990,7 +1990,7 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
+ free_bmap_reverse:
+ 	kfree(mcam->bmap_reverse);
+ free_bmap:
+-	kfree(mcam->counters.bmap);
++	kfree(mcam->bmap);
+ 
+ 	return -ENOMEM;
+ }
+-- 
+2.25.1
 
 
