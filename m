@@ -1,225 +1,168 @@
-Return-Path: <netdev+bounces-58620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24BEB8178E6
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 18:40:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 634D5817930
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 18:52:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F6591F23B63
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 17:40:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12926287907
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 17:52:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6BDD5BFAC;
-	Mon, 18 Dec 2023 17:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF5B5A879;
+	Mon, 18 Dec 2023 17:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WVLhvxPC"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="Ybtf4nWf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C5C5A85A;
-	Mon, 18 Dec 2023 17:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BIGvQLA012226;
-	Mon, 18 Dec 2023 17:40:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=kGU3Y0ofIoXUefql5OFH7DdlnKdmPymElNGMnFFsIf4=;
- b=WVLhvxPCBl1D39stVR9VfQ9LN0BGZQtQjcOwSOxKNYfmdMtxU4r3imRiwN/ATckl3jIa
- f/xqj/19Z2BueGa1UeYbNLyMCSFWiCOlkmZlMkd2gIOWAbIfD/RX626Wdx5/R726Y443
- GhEUk0adE9Dcxc2LZez6eImTIKOwAFypFbf5PDu/dSYXgBxwP4NKpDK+CHhv9BUj9qQT
- 9zN07muU0dUkqpY3DIkoJk0lHek3wSt5RzpjyJ3kuN/UHOoxHb68G1NXnQ9adIrr0e/Q
- q2vW+XIt9i3O0tTGcWIkhsr85cnIzXqMHQSA6qx40KtVXS/49HGzFQuXDLEKeY8LQpme LA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v2t25rywp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Dec 2023 17:40:18 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BIHVR0f001741;
-	Mon, 18 Dec 2023 17:40:18 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v2t25ryw6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Dec 2023 17:40:17 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BIFEF29004797;
-	Mon, 18 Dec 2023 17:40:16 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3v1pkyjh38-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Dec 2023 17:40:16 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BIHeCoC63898010
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 18 Dec 2023 17:40:13 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B950B20043;
-	Mon, 18 Dec 2023 17:40:12 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DBEB52004D;
-	Mon, 18 Dec 2023 17:40:11 +0000 (GMT)
-Received: from [9.171.88.206] (unknown [9.171.88.206])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 18 Dec 2023 17:40:11 +0000 (GMT)
-Message-ID: <c9d908e3-5147-4c54-a2de-ef9254ac5c4f@linux.ibm.com>
-Date: Mon, 18 Dec 2023 18:40:11 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 03/10] net/smc: unify the structs of accept or
- confirm message for v1 and v2
-Content-Language: en-US
-To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        kgraul@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, raspl@linux.ibm.com, schnelle@linux.ibm.com,
-        guangguan.wang@linux.alibaba.com, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1702371151-125258-1-git-send-email-guwen@linux.alibaba.com>
- <1702371151-125258-4-git-send-email-guwen@linux.alibaba.com>
- <63aa2995-7980-430d-84be-58ce204f5172@linux.ibm.com>
- <32c7fbda-297b-76a7-9da3-e136b49a63b5@linux.alibaba.com>
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <32c7fbda-297b-76a7-9da3-e136b49a63b5@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Qu_lQrGnQWpKIe0PAEEvEcwaORHJdTzu
-X-Proofpoint-GUID: ULhosz6Bol4JSy8P-vLJRZ0yEEnA1v-Q
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCFEC71450
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 17:50:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40d190df5d0so15774415e9.3
+        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 09:50:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1702921849; x=1703526649; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Occqa1d1wrIZ9JrkFxA0ptrItrzkGFf6vJHCa/yFOBc=;
+        b=Ybtf4nWfX+W36bNomyQ67b8ig1z4ey95P3ksvnYWaLtD3j/TXLYm1iUB1lqPz+ZDoq
+         aksQun5dEdQiepFHG/jsKTKZphoJYsuOLKh5gbi2dbh3sDjYZZTMGwf48hMUDIaBGCoI
+         HqgoWG++SbhAJwKhibnNQAIGTKZ73gvcbKgG0IF+LCbia43uc1nkuuBPwaz6B7V8zPmt
+         E2K8KoYGFNPO0TOgydRakwzJwKxZ5XGx7qdXSv67gF7hxWyeF979+OliAifVRBFvuzWG
+         cppN/dlOd5cDW4JhQ+bEAR8Za9/gDGGBwizFrgPu/6+wtX/2KLrDR4M1T+ycfhTTEgtu
+         FwYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702921849; x=1703526649;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Occqa1d1wrIZ9JrkFxA0ptrItrzkGFf6vJHCa/yFOBc=;
+        b=BZeSAmCGIF5Uau4CdGQGp2HuxdKco1phYpfrOoCUfVxZoHQB4zbo6so2xj/BLzNeL5
+         gtZ8Y8K2KLtqe++bWDTJMW7uWgesDPUPSGe/QjrMyOpgTY+d+zhoDUfp1bsApYV9H6wt
+         zbBmkoWT2BFrIrQ/b3FEHyX9Q5WVrnZSBBt3OJWQuzDvpGOALDh8O9r5ZRZ8nU1lUeXI
+         RihEEqquH0imoWSUUp8Hb8pMIp89Hi/TBBBka4xK29dgBIJwwM3OuC16wlZ7Yg9ZvrAg
+         0GHcrfDK9r6wUbiFY1N1bQS8aYLZYVmFL2WL6NU3rpgEh6jCAoV5NRnIImNgFF9g0F9z
+         2cFA==
+X-Gm-Message-State: AOJu0Yy/2jKzCKIsP5DDvqVvzclvlWgOtwOQbeISgo9SinBNqYF+eVVm
+	DX8wFOzYPy2mXk8Jl0PfDDXxNg==
+X-Google-Smtp-Source: AGHT+IEzdWkqKi1MfYmTW3wl7a4FaBZpV6heiMEnBKo7jRC4v2GKBHRpFX/j1mba8zTFSD5PlUMeJg==
+X-Received: by 2002:a05:600c:a3af:b0:40c:2c36:2a23 with SMTP id hn47-20020a05600ca3af00b0040c2c362a23mr8185591wmb.180.1702921849029;
+        Mon, 18 Dec 2023 09:50:49 -0800 (PST)
+Received: from [10.83.37.178] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id ay35-20020a05600c1e2300b0040b2b38a1fasm43508366wmb.4.2023.12.18.09.50.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Dec 2023 09:50:48 -0800 (PST)
+Message-ID: <3ff06ca1-95ef-4b94-a6a7-1731fef40d8a@arista.com>
+Date: Mon, 18 Dec 2023 17:50:49 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-18_11,2023-12-14_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- lowpriorityscore=0 phishscore=0 clxscore=1015 mlxscore=0 suspectscore=0
- spamscore=0 impostorscore=0 bulkscore=0 malwarescore=0 adultscore=0
- mlxlogscore=713 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2312180130
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH][next] selftests/net: Fix various spelling mistakes in
+ TCP-AO tests
+Content-Language: en-US
+To: Colin Ian King <colin.i.king@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20231218133022.321069-1-colin.i.king@gmail.com>
+From: Dmitry Safonov <dima@arista.com>
+In-Reply-To: <20231218133022.321069-1-colin.i.king@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-
-
-On 18.12.23 13:21, Wen Gu wrote:
-> The fields in smcr_clc_msg_accept_confirm and smcd_clc_msg_accept_confirm_common
-> seem to have not changed since SMCDv1. So I guess there is no v2-only fields
-> in this two struct. I tried to confirm this in some documents but didn't find
-> the message format for v1.
-
-V1 is documented in
-https://datatracker.ietf.org/doc/html/draft-fox-tcpm-shared-memory-rdma-03
-
+On 12/18/23 13:30, Colin Ian King wrote:
+> There are a handful of spelling mistakes in test messages in the
+> TCP-AIO selftests. Fix these.
 > 
-> If the smcr_clc_msg_accept_confirm and smcd_clc_msg_accept_confirm_common
-> is inherited from v1, should we still put the fields of v2 into these two structures?
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 
-You are right, they do not contain v2 fields, I guess I was confused. 
+Thank you, Colin.
 
-I still think, it would be better for readability and maintainability to avoid
-+#define r0	r1._r0
-+#define d0	d1._d0
+The patch looks good to me, my grammar and typos - not so much :-)
 
-I guess you and previous editors wanted to avoid changing all the instances that use r0 and d0.
-But then.. it is a rather simple search/replace..
+Reviewed-by: Dmitry Safonov <dima@arista.com>
 
+> ---
+>  tools/testing/selftests/net/tcp_ao/connect-deny.c      | 2 +-
+>  tools/testing/selftests/net/tcp_ao/lib/proc.c          | 4 ++--
+>  tools/testing/selftests/net/tcp_ao/setsockopt-closed.c | 2 +-
+>  tools/testing/selftests/net/tcp_ao/unsigned-md5.c      | 2 +-
+>  4 files changed, 5 insertions(+), 5 deletions(-)
 > 
-> If still, I will change these structures as
-> 
-> diff --git a/net/smc/smc_clc.h b/net/smc/smc_clc.h
-> index 614fa2f298f5..18157aeb14ec 100644
-> --- a/net/smc/smc_clc.h
-> +++ b/net/smc/smc_clc.h
-> @@ -201,9 +201,12 @@ struct smcr_clc_msg_accept_confirm {       /* SMCR accept/confirm */
->         __be64 rmb_dma_addr;    /* RMB virtual address */
->         u8 reserved2;
->         u8 psn[3];              /* packet sequence number */
-> +       /* v2 only, reserved and ignored in v1: */
-> +       u8 eid[SMC_MAX_EID_LEN];
-> +       u8 reserved6[8];
->  } __packed;
-> 
-> -struct smcd_clc_msg_accept_confirm_common {    /* SMCD accept/confirm */
-> +struct smcd_clc_msg_accept_confirm {   /* SMCD accept/confirm */
->         __be64 gid;             /* Sender GID */
->         __be64 token;           /* DMB token */
->         u8 dmbe_idx;            /* DMBE index */
-> @@ -216,6 +219,10 @@ struct smcd_clc_msg_accept_confirm_common {        /* SMCD accept/confirm */
->  #endif
->         u16 reserved4;
->         __be32 linkid;          /* Link identifier */
-> +       /* v2 only, reserved and ignored in v1: */
-> +       __be16 chid;
-> +       u8 eid[SMC_MAX_EID_LEN];
-> +       u8 reserved5[8];
->  } __packed;
-> 
->  #define SMC_CLC_OS_ZOS         1
-> @@ -259,22 +266,9 @@ struct smc_clc_fce_gid_ext {
->  struct smc_clc_msg_accept_confirm {    /* clc accept / confirm message */
->         struct smc_clc_msg_hdr hdr;
->         union {
-> -               struct { /* SMC-R */
-> -                       struct smcr_clc_msg_accept_confirm _r0;
-> -                       /* v2 only, reserved and ignored in v1: */
+> diff --git a/tools/testing/selftests/net/tcp_ao/connect-deny.c b/tools/testing/selftests/net/tcp_ao/connect-deny.c
+> index 1ca78040d8b7..185a2f6e5ff3 100644
+> --- a/tools/testing/selftests/net/tcp_ao/connect-deny.c
+> +++ b/tools/testing/selftests/net/tcp_ao/connect-deny.c
+> @@ -55,7 +55,7 @@ static void try_accept(const char *tst_name, unsigned int port, const char *pwd,
+>  	err = test_wait_fd(lsk, timeout, 0);
+>  	if (err == -ETIMEDOUT) {
+>  		if (!fault(TIMEOUT))
+> -			test_fail("timeouted for accept()");
+> +			test_fail("timed out for accept()");
+>  	} else if (err < 0) {
+>  		test_error("test_wait_fd()");
+>  	} else {
+> diff --git a/tools/testing/selftests/net/tcp_ao/lib/proc.c b/tools/testing/selftests/net/tcp_ao/lib/proc.c
+> index 2322f4d4676d..2fb6dd8adba6 100644
+> --- a/tools/testing/selftests/net/tcp_ao/lib/proc.c
+> +++ b/tools/testing/selftests/net/tcp_ao/lib/proc.c
+> @@ -227,7 +227,7 @@ void netstat_print_diff(struct netstat *nsa, struct netstat *nsb)
+>  		}
+>  
+>  		if (nsb->counters_nr < nsa->counters_nr)
+> -			test_error("Unexpected: some counters dissapeared!");
+> +			test_error("Unexpected: some counters disappeared!");
+>  
+>  		for (j = 0, i = 0; i < nsb->counters_nr; i++) {
+>  			if (strcmp(nsb->counters[i].name, nsa->counters[j].name)) {
+> @@ -244,7 +244,7 @@ void netstat_print_diff(struct netstat *nsa, struct netstat *nsb)
+>  			j++;
+>  		}
+>  		if (j != nsa->counters_nr)
+> -			test_error("Unexpected: some counters dissapeared!");
+> +			test_error("Unexpected: some counters disappeared!");
+>  
+>  		nsb = nsb->next;
+>  		nsa = nsa->next;
+> diff --git a/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c b/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c
+> index 7e4601b3f6a3..a329f42f40ce 100644
+> --- a/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c
+> +++ b/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c
+> @@ -427,7 +427,7 @@ static void test_einval_del_key(void)
+>  
+>  	sk = prepare_defs(TCP_AO_DEL_KEY, &del);
+>  	del.set_current = 1;
+> -	setsockopt_checked(sk, TCP_AO_DEL_KEY, &del, ENOENT, "set non-exising current key");
+> +	setsockopt_checked(sk, TCP_AO_DEL_KEY, &del, ENOENT, "set non-existing current key");
+>  
+>  	sk = prepare_defs(TCP_AO_DEL_KEY, &del);
+>  	del.set_rnext = 1;
+> diff --git a/tools/testing/selftests/net/tcp_ao/unsigned-md5.c b/tools/testing/selftests/net/tcp_ao/unsigned-md5.c
+> index 7cffde02d2be..14addfd46468 100644
+> --- a/tools/testing/selftests/net/tcp_ao/unsigned-md5.c
+> +++ b/tools/testing/selftests/net/tcp_ao/unsigned-md5.c
+> @@ -72,7 +72,7 @@ static void try_accept(const char *tst_name, unsigned int port,
+>  	err = test_wait_fd(lsk, timeout, 0);
+>  	if (err == -ETIMEDOUT) {
+>  		if (!fault(TIMEOUT))
+> -			test_fail("timeouted for accept()");
+> +			test_fail("timed out for accept()");
+>  	} else if (err < 0) {
+>  		test_error("test_wait_fd()");
+>  	} else {
 
-^^ Actually these commetns are not fully correct. The fields are not reserved in V1. 
-(my bad) The message length is shorter in V1.
-So /* v2 only: */ would be more correct.
+Thanks,
+            Dmitry
 
-> -                       u8 eid[SMC_MAX_EID_LEN];
-> -                       u8 reserved6[8];
-> -               } r1;
-> -               struct { /* SMC-D */
-> -                       struct smcd_clc_msg_accept_confirm_common _d0;
-> -                       /* v2 only, reserved and ignored in v1: */
-
-same here: /* v2 only: */
-
-> -                       __be16 chid;
-> -                       u8 eid[SMC_MAX_EID_LEN];
-> -                       u8 reserved5[8];
-> -               } d1;
-> +               struct smcr_clc_msg_accept_confirm r0; /* SMC-R */
-> +               struct smcd_clc_msg_accept_confirm d0; /* SMC-D */
->         };
-> -#define r0     r1._r0
-> -#define d0     d1._d0
->  };
-> 
->>
->>>   };
-
-Yes, I like that solution better. 
-But I have no strong feelings. At least the duplicate declarations are gone. 
-So, if you prefer the #defines , it's ok with me.
-
-
-
->>
->> You have removed the __packed attribute.
->> patch 07/10 adds it back for the SMC-D case, but the SMC-R case needs it as well.
->>
-> 
-> r1 and d1 in smc_clc_msg_accept_confirm_v2 (smc_clc_msg_accept_confirm now in
-> this patch) is aligned well. In patch 07/10 I replaced reserved5[8] with u64 gid_ext,
-> thus making a hole before gid_ext, so I added __packed attribute to SMC-D.
-> 
-> If it is to avoid potential mistakes in future expansion, I can also add __packed to SMC-R.
-> 
-
-Yes, __packed is not only about preventing misalignement today.
-IMU, without __packed, there is no guarantee that a future compile run will not insert unused bytes.
-(highly unlikely, I admit). But __packed makes it visible that this needs to go to hardware in exactly
-this layout.
-
-
-> Thanks.
 
