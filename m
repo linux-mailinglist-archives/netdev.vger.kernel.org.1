@@ -1,118 +1,98 @@
-Return-Path: <netdev+bounces-58508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7D7B816AE4
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 11:24:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F3D8816AEE
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 11:25:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3BC5FB21F39
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 10:23:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C8E4281BDA
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 10:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00F2714267;
-	Mon, 18 Dec 2023 10:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC4CE13FE3;
+	Mon, 18 Dec 2023 10:24:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GIwHuhOy"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="R37K1isA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5558313AC2;
-	Mon, 18 Dec 2023 10:23:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702895025; x=1734431025;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=OR8ENRQEVanZisncmHUkNCSziQATmbvmhDTN5mpUyIE=;
-  b=GIwHuhOybTOdTaDw5shnbLYkoOmyuhL4Rq9vErQUh9aBKsfYgdkQ/ZGp
-   7nlVdifKjn/9FNYuEeK2L+wfCtcvI9QxDyvZllP2/+M7WqBoAuw8zOS4n
-   BQiF0xYpiH8/PhsDJvb8D07OP4GNoG5Yh/OGEQuvGfSD4mjJbY76vNoF9
-   lRWcI7Zsi/McMgnEB0JaWm89x50U5PKj1TUPmjaLNlxM3l/zo4dlIOZbi
-   6nNsHOW2gBpR2n4sMZrXmPcmFwFgEf39WWQlq9hBYefqjd6MXk7Z+N1pc
-   hmQ3o4vl+QuVzsI0Tvk/qHDZPJUV9jE7iVgBT5hMC5e/ogvwKj0uP+pGv
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10927"; a="2692351"
-X-IronPort-AV: E=Sophos;i="6.04,285,1695711600"; 
-   d="scan'208";a="2692351"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2023 02:23:44 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10927"; a="809764965"
-X-IronPort-AV: E=Sophos;i="6.04,285,1695711600"; 
-   d="scan'208";a="809764965"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orsmga001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2023 02:23:37 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.97)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1rFAmb-00000006tHO-0x88;
-	Mon, 18 Dec 2023 12:23:33 +0200
-Date: Mon, 18 Dec 2023 12:23:32 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Peter Hilber <peter.hilber@opensynergy.com>
-Cc: linux-kernel@vger.kernel.org,
-	"D, Lakshmi Sowjanya" <lakshmi.sowjanya.d@intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>, jstultz@google.com,
-	giometti@enneenne.com, corbet@lwn.net,
-	"Dong, Eddie" <eddie.dong@intel.com>,
-	"Hall, Christopher S" <christopher.s.hall@intel.com>,
-	Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Wanpeng Li <wanpengli@tencent.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	Richard Cochran <richardcochran@gmail.com>, kvm@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [RFC PATCH v2 3/7] x86/kvm, ptp/kvm: Add clocksource ID, set
- system_counterval_t.cs_id
-Message-ID: <ZYAdpPfFa2jlmZ44@smile.fi.intel.com>
-References: <20231215220612.173603-1-peter.hilber@opensynergy.com>
- <20231215220612.173603-4-peter.hilber@opensynergy.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7826914F79
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 10:24:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-40c3fe6c08fso32162195e9.1
+        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 02:24:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1702895092; x=1703499892; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bgqfxng/f1TeURYLmSla2oJOkzUelTfDM8uCrGRKaag=;
+        b=R37K1isAxgLNY7Ij3aFyyFp0qRPSzukg6M8lfvEDul7/MmLlbbx5P1tZLhNNiuuTNl
+         hD7hsTmWXPznhQsyVVAO8P3VNZGUVxqUSGsbG/dVnmzmkvOnVH/mUQPsf1DMM02XjdgO
+         mUPee5SySkbDmObLtqWxFxxSPOfSwtJXH+VpnjEBa82oFwmVHHvSXsbOB0YzFLj3VUkA
+         +Srqo6QFN+UsTylqjwGUt3v8bs83pEOyHv2FyTK1oqp2c7s/aZ1nCEAXiQo7/FVN19rb
+         QERKL1E5R5gdbr/XnfPQa5hkPhqOAW8flgoEAgN+WGTwEHkjw97Ww0ATJRcZ+011Wtc6
+         AVHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702895092; x=1703499892;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bgqfxng/f1TeURYLmSla2oJOkzUelTfDM8uCrGRKaag=;
+        b=jjBkB3lpIED41QytIXPs/mLzuYKnwDfobl/Y2pngkSz913DSj1FDssYmPtu7/3X/Ln
+         GirHZC9DFDCjb51QJnV9RLfpgWe1qSLnvI9pSW2Xh3HEQ0OxucL2muFpZ/7mMH8QzZzE
+         dzDIQjqvIJOPZG4GV3uqjvBGQs3+O2HhFHiqYKT7B8Usw3/5Y+mA0/kRLOfXWIcABxSt
+         GCwChTId9GsidjSekWJJXrgPsDWErzxoKKBgrX2GVYdJUbGBgjAg0qRG2qmFXIn48AK3
+         nQBbx2YO6SeFP+aqwXxFno7bX59L1LpMgVy1juUUByrKD2bZkCKyLOmc2JHg8YyibMES
+         i5cQ==
+X-Gm-Message-State: AOJu0YzF7Ctdv25x3oG1mVMZ7ed7c3Un3WJ/4RDm1Em85uUhzoN7zabg
+	+FRyJveQDpBfRV+X/JzHdt9GZA==
+X-Google-Smtp-Source: AGHT+IHtjTd2rdStR2WSp5hVDvpU9VvdG8nF9k7zFxdFMbmk9kAaOH3qG7Z/8/HZGCF/iL9fGWqByg==
+X-Received: by 2002:a05:600c:35cb:b0:40d:1773:2d79 with SMTP id r11-20020a05600c35cb00b0040d17732d79mr695244wmq.205.1702895091723;
+        Mon, 18 Dec 2023 02:24:51 -0800 (PST)
+Received: from [192.168.51.243] ([78.128.78.220])
+        by smtp.gmail.com with ESMTPSA id h17-20020a05600c315100b0040d1775dfd6sm5777864wmo.10.2023.12.18.02.24.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Dec 2023 02:24:51 -0800 (PST)
+Message-ID: <4d0d42c6-8219-48a6-828b-1743d28e871e@blackwall.org>
+Date: Mon, 18 Dec 2023 12:24:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231215220612.173603-4-peter.hilber@opensynergy.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 6/9] vxlan: mdb: Add MDB bulk deletion support
+Content-Language: en-US
+To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
+ bridge@lists.linux-foundation.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, roopa@nvidia.com, petrm@nvidia.com
+References: <20231217083244.4076193-1-idosch@nvidia.com>
+ <20231217083244.4076193-7-idosch@nvidia.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20231217083244.4076193-7-idosch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 15, 2023 at 11:06:08PM +0100, Peter Hilber wrote:
-> Add a clocksource ID for the x86 kvmclock.
+On 17/12/2023 10:32, Ido Schimmel wrote:
+> Implement MDB bulk deletion support in the VXLAN driver, allowing MDB
+> entries to be deleted in bulk according to provided parameters.
 > 
-> Also, for ptp_kvm, set the recently added struct system_counterval_t member
-> cs_id to the clocksource ID (x86 kvmclock or Arm Generic Timer). In the
-> future, this will keep get_device_system_crosststamp() working, when it
-> will compare the clocksource id in struct system_counterval_t, rather than
-> the clocksource.
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
+> ---
+>   drivers/net/vxlan/vxlan_core.c    |   1 +
+>   drivers/net/vxlan/vxlan_mdb.c     | 174 +++++++++++++++++++++++++-----
+>   drivers/net/vxlan/vxlan_private.h |   2 +
+>   3 files changed, 153 insertions(+), 24 deletions(-)
 > 
-> For now, to avoid touching too many subsystems at once, extract the
-> clocksource ID from the clocksource. The clocksource dereference will be
-> removed in the following.
 
-...
-
->  #include <linux/clocksource.h>
-> +#include <linux/clocksource_ids.h>
-
-It's the second file that includes both.
-
-I'm just wondering if it makes sense to always (?) include the latter into
-the former.
-
--- 
-With Best Regards,
-Andy Shevchenko
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
 
