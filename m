@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-58655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5227B817B69
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 20:52:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B0FF817B67
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 20:52:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DD32284E76
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 19:52:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACE5F284E93
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 19:52:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F7F760A3;
-	Mon, 18 Dec 2023 19:48:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFDA37BEFB;
+	Mon, 18 Dec 2023 19:48:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hBG0MmeR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c1jB74Pm"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7FF7BEE3
-	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 19:48:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6507AE99
+	for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 19:48:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702928930; x=1734464930;
+  t=1702928929; x=1734464929;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=CP/mgvPVsF85u92aynOzViEzaMe7sOgl1KAueLIqfSE=;
-  b=hBG0MmeRIAeXPKyQorOjAAqcZOFYy2qY+umPKvfcUeunvrfIP44IrDvs
-   pk1yJu2orV5o/qcUuPd+whXuT0C7dsKW9dsGYLSr4v3YMLg1NwDbAKMXQ
-   q0xYy1dJ/bmSX+OEGeOsFkMCqv4C+cMhHzwZazR4h/2ijJTdW3VYGiihV
-   VjCMECzCQ24WnBlGFanBozcwRC59wmH+piOVCcNMtcyODPGyLCk6eibob
-   JCN+9MONVwX5cD4PkLH30agqd7lk/8++sX8fR5zup6vj+YVTqEIblg3Dw
-   Jb4k9D4gQz0fIDPDJA61CnqyiqqyMR6E4Q68cY/Oyw2Q8Lxtg280TlkpN
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10928"; a="394436856"
+  bh=V9K8sjjNbosvNJfKqVfd6bqinvNcMZM9RKf5gPcX42M=;
+  b=c1jB74Pm4VK0lfdZCsFqaZ+vKVDC4HP57rflORnI6TuTVuW1TxS4Bj3a
+   hyj8IMs+hOedOGaenajE/6zQahfXnHiCTxfiDpJreYqrR3aFUDoPIbYfq
+   USmC7KK36BbhX5/UNUQ7vhhwT3/4pA2fxgckIfEyrLr0XE+X6KCNzrujR
+   aZTZqkVDNVFMJ2q33DZieIOaG6XF6iHlNz3uLxqKzCBneG6sTztrKT3lR
+   vuR5IO/My/nlY//n9rxfdB4bPgF26YjmLeNsBBZZGdt9+QFhKw5Xq25KK
+   mqBFBWvesg/9J4ho4aPGt/IfqXPK8V9BgBes5X5dmpD1nTnMtcj99TSP+
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10928"; a="394436860"
 X-IronPort-AV: E=Sophos;i="6.04,286,1695711600"; 
-   d="scan'208";a="394436856"
+   d="scan'208";a="394436860"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
   by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2023 11:48:39 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.04,286,1695711600"; 
-   d="scan'208";a="23902132"
+   d="scan'208";a="23902136"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa001.jf.intel.com with ESMTP; 18 Dec 2023 11:48:39 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -53,14 +53,10 @@ To: davem@davemloft.net,
 	netdev@vger.kernel.org
 Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
 	anthony.l.nguyen@intel.com,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Julia Lawall <Julia.Lawall@inria.fr>,
-	Marcin Szycik <marcin.szycik@linux.intel.com>,
-	Simon Horman <horms@kernel.org>,
 	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net-next 13/15] ice: field get conversion
-Date: Mon, 18 Dec 2023 11:48:28 -0800
-Message-ID: <20231218194833.3397815-14-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 14/15] ice: cleanup inconsistent code
+Date: Mon, 18 Dec 2023 11:48:29 -0800
+Message-ID: <20231218194833.3397815-15-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231218194833.3397815-1-anthony.l.nguyen@intel.com>
 References: <20231218194833.3397815-1-anthony.l.nguyen@intel.com>
@@ -74,618 +70,53 @@ Content-Transfer-Encoding: 8bit
 
 From: Jesse Brandeburg <jesse.brandeburg@intel.com>
 
-Refactor the ice driver to use FIELD_GET() for mask and shift reads,
-which reduces lines of code and adds clarity of intent.
+It was found while doing further testing of the previous commit
+fbf32a9bab91 ("ice: field get conversion") that one of the FIELD_GET
+conversions should really be a FIELD_PREP. The previous code was styled
+as a match to the FIELD_GET conversion, which always worked because the
+shift value was 0.  The code makes way more sense as a FIELD_PREP and
+was in fact the only FIELD_GET with two constant arguments in this
+series.
 
-This code was generated by the following coccinelle/spatch script and
-then manually repaired.
+Didn't squash this patch to make it easier to call out the
+(non-impactful) bug.
 
-@get@
-constant shift,mask;
-type T;
-expression a;
-@@
--(((T)(a) & mask) >> shift)
-+FIELD_GET(mask, a)
-
-and applied via:
-spatch --sp-file field_prep.cocci --in-place --dir \
- drivers/net/ethernet/intel/
-
-CC: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Julia Lawall <Julia.Lawall@inria.fr>
-Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
 Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_base.c     | 12 +--
- drivers/net/ethernet/intel/ice/ice_common.c   | 19 ++---
- drivers/net/ethernet/intel/ice/ice_dcb.c      | 74 ++++++++-----------
- drivers/net/ethernet/intel/ice/ice_dcb_nl.c   |  2 +-
- .../net/ethernet/intel/ice/ice_ethtool_fdir.c |  3 +-
- drivers/net/ethernet/intel/ice/ice_lib.c      |  5 +-
- drivers/net/ethernet/intel/ice/ice_main.c     | 48 +++++-------
- drivers/net/ethernet/intel/ice/ice_nvm.c      | 15 ++--
- drivers/net/ethernet/intel/ice/ice_ptp.c      |  4 +-
- drivers/net/ethernet/intel/ice/ice_sched.c    |  3 +-
- drivers/net/ethernet/intel/ice/ice_sriov.c    |  3 +-
- drivers/net/ethernet/intel/ice/ice_virtchnl.c |  2 +-
- .../ethernet/intel/ice/ice_virtchnl_fdir.c    | 13 ++--
- 13 files changed, 82 insertions(+), 121 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_dcb.c | 2 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
-index 6c5a9e7a5658..46a70662edea 100644
---- a/drivers/net/ethernet/intel/ice/ice_base.c
-+++ b/drivers/net/ethernet/intel/ice/ice_base.c
-@@ -232,14 +232,10 @@ static void ice_cfg_itr_gran(struct ice_hw *hw)
- 
- 	/* no need to update global register if ITR gran is already set */
- 	if (!(regval & GLINT_CTL_DIS_AUTOMASK_M) &&
--	    (((regval & GLINT_CTL_ITR_GRAN_200_M) >>
--	     GLINT_CTL_ITR_GRAN_200_S) == ICE_ITR_GRAN_US) &&
--	    (((regval & GLINT_CTL_ITR_GRAN_100_M) >>
--	     GLINT_CTL_ITR_GRAN_100_S) == ICE_ITR_GRAN_US) &&
--	    (((regval & GLINT_CTL_ITR_GRAN_50_M) >>
--	     GLINT_CTL_ITR_GRAN_50_S) == ICE_ITR_GRAN_US) &&
--	    (((regval & GLINT_CTL_ITR_GRAN_25_M) >>
--	      GLINT_CTL_ITR_GRAN_25_S) == ICE_ITR_GRAN_US))
-+	    (FIELD_GET(GLINT_CTL_ITR_GRAN_200_M, regval) == ICE_ITR_GRAN_US) &&
-+	    (FIELD_GET(GLINT_CTL_ITR_GRAN_100_M, regval) == ICE_ITR_GRAN_US) &&
-+	    (FIELD_GET(GLINT_CTL_ITR_GRAN_50_M, regval) == ICE_ITR_GRAN_US) &&
-+	    (FIELD_GET(GLINT_CTL_ITR_GRAN_25_M, regval) == ICE_ITR_GRAN_US))
- 		return;
- 
- 	regval = FIELD_PREP(GLINT_CTL_ITR_GRAN_200_M, ICE_ITR_GRAN_US) |
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 0a9c4581005b..6fb0c1e8ae7c 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -942,9 +942,8 @@ static void ice_cleanup_fltr_mgmt_struct(struct ice_hw *hw)
-  */
- static void ice_get_itr_intrl_gran(struct ice_hw *hw)
- {
--	u8 max_agg_bw = (rd32(hw, GL_PWR_MODE_CTL) &
--			 GL_PWR_MODE_CTL_CAR_MAX_BW_M) >>
--			GL_PWR_MODE_CTL_CAR_MAX_BW_S;
-+	u8 max_agg_bw = FIELD_GET(GL_PWR_MODE_CTL_CAR_MAX_BW_M,
-+				  rd32(hw, GL_PWR_MODE_CTL));
- 
- 	switch (max_agg_bw) {
- 	case ICE_MAX_AGG_BW_200G:
-@@ -976,9 +975,7 @@ int ice_init_hw(struct ice_hw *hw)
- 	if (status)
- 		return status;
- 
--	hw->pf_id = (u8)(rd32(hw, PF_FUNC_RID) &
--			 PF_FUNC_RID_FUNC_NUM_M) >>
--		PF_FUNC_RID_FUNC_NUM_S;
-+	hw->pf_id = FIELD_GET(PF_FUNC_RID_FUNC_NUM_M, rd32(hw, PF_FUNC_RID));
- 
- 	status = ice_reset(hw, ICE_RESET_PFR);
- 	if (status)
-@@ -1163,8 +1160,8 @@ int ice_check_reset(struct ice_hw *hw)
- 	 * or EMPR has occurred. The grst delay value is in 100ms units.
- 	 * Add 1sec for outstanding AQ commands that can take a long time.
- 	 */
--	grst_timeout = ((rd32(hw, GLGEN_RSTCTL) & GLGEN_RSTCTL_GRSTDEL_M) >>
--			GLGEN_RSTCTL_GRSTDEL_S) + 10;
-+	grst_timeout = FIELD_GET(GLGEN_RSTCTL_GRSTDEL_M,
-+				 rd32(hw, GLGEN_RSTCTL)) + 10;
- 
- 	for (cnt = 0; cnt < grst_timeout; cnt++) {
- 		mdelay(100);
-@@ -2248,7 +2245,7 @@ ice_parse_1588_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_p,
- 	info->tmr_index_owned = ((number & ICE_TS_TMR_IDX_OWND_M) != 0);
- 	info->tmr_index_assoc = ((number & ICE_TS_TMR_IDX_ASSOC_M) != 0);
- 
--	info->clk_freq = (number & ICE_TS_CLK_FREQ_M) >> ICE_TS_CLK_FREQ_S;
-+	info->clk_freq = FIELD_GET(ICE_TS_CLK_FREQ_M, number);
- 	info->clk_src = ((number & ICE_TS_CLK_SRC_M) != 0);
- 
- 	if (info->clk_freq < NUM_ICE_TIME_REF_FREQ) {
-@@ -2449,7 +2446,7 @@ ice_parse_1588_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
- 	info->tmr0_owned = ((number & ICE_TS_TMR0_OWND_M) != 0);
- 	info->tmr0_ena = ((number & ICE_TS_TMR0_ENA_M) != 0);
- 
--	info->tmr1_owner = (number & ICE_TS_TMR1_OWNR_M) >> ICE_TS_TMR1_OWNR_S;
-+	info->tmr1_owner = FIELD_GET(ICE_TS_TMR1_OWNR_M, number);
- 	info->tmr1_owned = ((number & ICE_TS_TMR1_OWND_M) != 0);
- 	info->tmr1_ena = ((number & ICE_TS_TMR1_ENA_M) != 0);
- 
-@@ -5773,7 +5770,7 @@ ice_get_link_default_override(struct ice_link_default_override_tlv *ldo,
- 		ice_debug(hw, ICE_DBG_INIT, "Failed to read override link options.\n");
- 		return status;
- 	}
--	ldo->options = buf & ICE_LINK_OVERRIDE_OPT_M;
-+	ldo->options = FIELD_GET(ICE_LINK_OVERRIDE_OPT_M, buf);
- 	ldo->phy_config = (buf & ICE_LINK_OVERRIDE_PHY_CFG_M) >>
- 		ICE_LINK_OVERRIDE_PHY_CFG_S;
- 
 diff --git a/drivers/net/ethernet/intel/ice/ice_dcb.c b/drivers/net/ethernet/intel/ice/ice_dcb.c
-index 41b7853291d3..7f3e00c187b4 100644
+index 7f3e00c187b4..74418c445cc4 100644
 --- a/drivers/net/ethernet/intel/ice/ice_dcb.c
 +++ b/drivers/net/ethernet/intel/ice/ice_dcb.c
-@@ -146,8 +146,7 @@ static u8 ice_get_dcbx_status(struct ice_hw *hw)
- 	u32 reg;
+@@ -967,7 +967,7 @@ void ice_get_dcb_cfg_from_mib_change(struct ice_port_info *pi,
  
- 	reg = rd32(hw, PRTDCB_GENS);
--	return (u8)((reg & PRTDCB_GENS_DCBX_STATUS_M) >>
--		    PRTDCB_GENS_DCBX_STATUS_S);
-+	return FIELD_GET(PRTDCB_GENS_DCBX_STATUS_M, reg);
- }
+ 	mib = (struct ice_aqc_lldp_get_mib *)&event->desc.params.raw;
  
- /**
-@@ -173,11 +172,9 @@ ice_parse_ieee_ets_common_tlv(u8 *buf, struct ice_dcb_ets_cfg *ets_cfg)
- 	 */
- 	for (i = 0; i < 4; i++) {
- 		ets_cfg->prio_table[i * 2] =
--			((buf[offset] & ICE_IEEE_ETS_PRIO_1_M) >>
--			 ICE_IEEE_ETS_PRIO_1_S);
-+			FIELD_GET(ICE_IEEE_ETS_PRIO_1_M, buf[offset]);
- 		ets_cfg->prio_table[i * 2 + 1] =
--			((buf[offset] & ICE_IEEE_ETS_PRIO_0_M) >>
--			 ICE_IEEE_ETS_PRIO_0_S);
-+			FIELD_GET(ICE_IEEE_ETS_PRIO_0_M, buf[offset]);
- 		offset++;
- 	}
- 
-@@ -221,11 +218,9 @@ ice_parse_ieee_etscfg_tlv(struct ice_lldp_org_tlv *tlv,
- 	 * |1bit | 1bit|3 bits|3bits|
- 	 */
- 	etscfg = &dcbcfg->etscfg;
--	etscfg->willing = ((buf[0] & ICE_IEEE_ETS_WILLING_M) >>
--			   ICE_IEEE_ETS_WILLING_S);
--	etscfg->cbs = ((buf[0] & ICE_IEEE_ETS_CBS_M) >> ICE_IEEE_ETS_CBS_S);
--	etscfg->maxtcs = ((buf[0] & ICE_IEEE_ETS_MAXTC_M) >>
--			  ICE_IEEE_ETS_MAXTC_S);
-+	etscfg->willing = FIELD_GET(ICE_IEEE_ETS_WILLING_M, buf[0]);
-+	etscfg->cbs = FIELD_GET(ICE_IEEE_ETS_CBS_M, buf[0]);
-+	etscfg->maxtcs = FIELD_GET(ICE_IEEE_ETS_MAXTC_M, buf[0]);
- 
- 	/* Begin parsing at Priority Assignment Table (offset 1 in buf) */
- 	ice_parse_ieee_ets_common_tlv(&buf[1], etscfg);
-@@ -267,11 +262,9 @@ ice_parse_ieee_pfccfg_tlv(struct ice_lldp_org_tlv *tlv,
- 	 * -----------------------------------------
- 	 * |1bit | 1bit|2 bits|4bits| 1 octet      |
- 	 */
--	dcbcfg->pfc.willing = ((buf[0] & ICE_IEEE_PFC_WILLING_M) >>
--			       ICE_IEEE_PFC_WILLING_S);
--	dcbcfg->pfc.mbc = ((buf[0] & ICE_IEEE_PFC_MBC_M) >> ICE_IEEE_PFC_MBC_S);
--	dcbcfg->pfc.pfccap = ((buf[0] & ICE_IEEE_PFC_CAP_M) >>
--			      ICE_IEEE_PFC_CAP_S);
-+	dcbcfg->pfc.willing = FIELD_GET(ICE_IEEE_PFC_WILLING_M, buf[0]);
-+	dcbcfg->pfc.mbc = FIELD_GET(ICE_IEEE_PFC_MBC_M, buf[0]);
-+	dcbcfg->pfc.pfccap = FIELD_GET(ICE_IEEE_PFC_CAP_M, buf[0]);
- 	dcbcfg->pfc.pfcena = buf[1];
- }
- 
-@@ -293,7 +286,7 @@ ice_parse_ieee_app_tlv(struct ice_lldp_org_tlv *tlv,
- 	u8 *buf;
- 
- 	typelen = ntohs(tlv->typelen);
--	len = ((typelen & ICE_LLDP_TLV_LEN_M) >> ICE_LLDP_TLV_LEN_S);
-+	len = FIELD_GET(ICE_LLDP_TLV_LEN_M, typelen);
- 	buf = tlv->tlvinfo;
- 
- 	/* Removing sizeof(ouisubtype) and reserved byte from len.
-@@ -313,12 +306,10 @@ ice_parse_ieee_app_tlv(struct ice_lldp_org_tlv *tlv,
- 	 *        -----------------------------------------
- 	 */
- 	while (offset < len) {
--		dcbcfg->app[i].priority = ((buf[offset] &
--					    ICE_IEEE_APP_PRIO_M) >>
--					   ICE_IEEE_APP_PRIO_S);
--		dcbcfg->app[i].selector = ((buf[offset] &
--					    ICE_IEEE_APP_SEL_M) >>
--					   ICE_IEEE_APP_SEL_S);
-+		dcbcfg->app[i].priority = FIELD_GET(ICE_IEEE_APP_PRIO_M,
-+						    buf[offset]);
-+		dcbcfg->app[i].selector = FIELD_GET(ICE_IEEE_APP_SEL_M,
-+						    buf[offset]);
- 		dcbcfg->app[i].prot_id = (buf[offset + 1] << 0x8) |
- 			buf[offset + 2];
- 		/* Move to next app */
-@@ -346,8 +337,7 @@ ice_parse_ieee_tlv(struct ice_lldp_org_tlv *tlv, struct ice_dcbx_cfg *dcbcfg)
- 	u8 subtype;
- 
- 	ouisubtype = ntohl(tlv->ouisubtype);
--	subtype = (u8)((ouisubtype & ICE_LLDP_TLV_SUBTYPE_M) >>
--		       ICE_LLDP_TLV_SUBTYPE_S);
-+	subtype = FIELD_GET(ICE_LLDP_TLV_SUBTYPE_M, ouisubtype);
- 	switch (subtype) {
- 	case ICE_IEEE_SUBTYPE_ETS_CFG:
- 		ice_parse_ieee_etscfg_tlv(tlv, dcbcfg);
-@@ -398,11 +388,9 @@ ice_parse_cee_pgcfg_tlv(struct ice_cee_feat_tlv *tlv,
- 	 */
- 	for (i = 0; i < 4; i++) {
- 		etscfg->prio_table[i * 2] =
--			((buf[offset] & ICE_CEE_PGID_PRIO_1_M) >>
--			 ICE_CEE_PGID_PRIO_1_S);
-+			FIELD_GET(ICE_CEE_PGID_PRIO_1_M, buf[offset]);
- 		etscfg->prio_table[i * 2 + 1] =
--			((buf[offset] & ICE_CEE_PGID_PRIO_0_M) >>
--			 ICE_CEE_PGID_PRIO_0_S);
-+			FIELD_GET(ICE_CEE_PGID_PRIO_0_M, buf[offset]);
- 		offset++;
- 	}
- 
-@@ -465,7 +453,7 @@ ice_parse_cee_app_tlv(struct ice_cee_feat_tlv *tlv, struct ice_dcbx_cfg *dcbcfg)
- 	u8 i;
- 
- 	typelen = ntohs(tlv->hdr.typelen);
--	len = ((typelen & ICE_LLDP_TLV_LEN_M) >> ICE_LLDP_TLV_LEN_S);
-+	len = FIELD_GET(ICE_LLDP_TLV_LEN_M, typelen);
- 
- 	dcbcfg->numapps = len / sizeof(*app);
- 	if (!dcbcfg->numapps)
-@@ -520,14 +508,13 @@ ice_parse_cee_tlv(struct ice_lldp_org_tlv *tlv, struct ice_dcbx_cfg *dcbcfg)
- 	u32 ouisubtype;
- 
- 	ouisubtype = ntohl(tlv->ouisubtype);
--	subtype = (u8)((ouisubtype & ICE_LLDP_TLV_SUBTYPE_M) >>
--		       ICE_LLDP_TLV_SUBTYPE_S);
-+	subtype = FIELD_GET(ICE_LLDP_TLV_SUBTYPE_M, ouisubtype);
- 	/* Return if not CEE DCBX */
- 	if (subtype != ICE_CEE_DCBX_TYPE)
- 		return;
- 
- 	typelen = ntohs(tlv->typelen);
--	tlvlen = ((typelen & ICE_LLDP_TLV_LEN_M) >> ICE_LLDP_TLV_LEN_S);
-+	tlvlen = FIELD_GET(ICE_LLDP_TLV_LEN_M, typelen);
- 	len = sizeof(tlv->typelen) + sizeof(ouisubtype) +
- 		sizeof(struct ice_cee_ctrl_tlv);
- 	/* Return if no CEE DCBX Feature TLVs */
-@@ -539,9 +526,8 @@ ice_parse_cee_tlv(struct ice_lldp_org_tlv *tlv, struct ice_dcbx_cfg *dcbcfg)
- 		u16 sublen;
- 
- 		typelen = ntohs(sub_tlv->hdr.typelen);
--		sublen = ((typelen & ICE_LLDP_TLV_LEN_M) >> ICE_LLDP_TLV_LEN_S);
--		subtype = (u8)((typelen & ICE_LLDP_TLV_TYPE_M) >>
--			       ICE_LLDP_TLV_TYPE_S);
-+		sublen = FIELD_GET(ICE_LLDP_TLV_LEN_M, typelen);
-+		subtype = FIELD_GET(ICE_LLDP_TLV_TYPE_M, typelen);
- 		switch (subtype) {
- 		case ICE_CEE_SUBTYPE_PG_CFG:
- 			ice_parse_cee_pgcfg_tlv(sub_tlv, dcbcfg);
-@@ -578,7 +564,7 @@ ice_parse_org_tlv(struct ice_lldp_org_tlv *tlv, struct ice_dcbx_cfg *dcbcfg)
- 	u32 oui;
- 
- 	ouisubtype = ntohl(tlv->ouisubtype);
--	oui = ((ouisubtype & ICE_LLDP_TLV_OUI_M) >> ICE_LLDP_TLV_OUI_S);
-+	oui = FIELD_GET(ICE_LLDP_TLV_OUI_M, ouisubtype);
- 	switch (oui) {
- 	case ICE_IEEE_8021QAZ_OUI:
- 		ice_parse_ieee_tlv(tlv, dcbcfg);
-@@ -615,8 +601,8 @@ static int ice_lldp_to_dcb_cfg(u8 *lldpmib, struct ice_dcbx_cfg *dcbcfg)
- 	tlv = (struct ice_lldp_org_tlv *)lldpmib;
- 	while (1) {
- 		typelen = ntohs(tlv->typelen);
--		type = ((typelen & ICE_LLDP_TLV_TYPE_M) >> ICE_LLDP_TLV_TYPE_S);
--		len = ((typelen & ICE_LLDP_TLV_LEN_M) >> ICE_LLDP_TLV_LEN_S);
-+		type = FIELD_GET(ICE_LLDP_TLV_TYPE_M, typelen);
-+		len = FIELD_GET(ICE_LLDP_TLV_LEN_M, typelen);
- 		offset += sizeof(typelen) + len;
- 
- 		/* END TLV or beyond LLDPDU size */
-@@ -805,11 +791,11 @@ ice_cee_to_dcb_cfg(struct ice_aqc_get_cee_dcb_cfg_resp *cee_cfg,
- 	 */
- 	for (i = 0; i < ICE_MAX_TRAFFIC_CLASS / 2; i++) {
- 		dcbcfg->etscfg.prio_table[i * 2] =
--			((cee_cfg->oper_prio_tc[i] & ICE_CEE_PGID_PRIO_0_M) >>
--			 ICE_CEE_PGID_PRIO_0_S);
-+			FIELD_GET(ICE_CEE_PGID_PRIO_0_M,
-+				  cee_cfg->oper_prio_tc[i]);
- 		dcbcfg->etscfg.prio_table[i * 2 + 1] =
--			((cee_cfg->oper_prio_tc[i] & ICE_CEE_PGID_PRIO_1_M) >>
--			 ICE_CEE_PGID_PRIO_1_S);
-+			FIELD_GET(ICE_CEE_PGID_PRIO_1_M,
-+				  cee_cfg->oper_prio_tc[i]);
- 	}
- 
- 	ice_for_each_traffic_class(i) {
-@@ -1482,7 +1468,7 @@ ice_dcb_cfg_to_lldp(u8 *lldpmib, u16 *miblen, struct ice_dcbx_cfg *dcbcfg)
- 	while (1) {
- 		ice_add_dcb_tlv(tlv, dcbcfg, tlvid++);
- 		typelen = ntohs(tlv->typelen);
--		len = (typelen & ICE_LLDP_TLV_LEN_M) >> ICE_LLDP_TLV_LEN_S;
-+		len = FIELD_GET(ICE_LLDP_TLV_LEN_M, typelen);
- 		if (len)
- 			offset += len + 2;
- 		/* END TLV or beyond LLDPDU size */
-diff --git a/drivers/net/ethernet/intel/ice/ice_dcb_nl.c b/drivers/net/ethernet/intel/ice/ice_dcb_nl.c
-index e1fbc6de452d..6d50b90a7359 100644
---- a/drivers/net/ethernet/intel/ice/ice_dcb_nl.c
-+++ b/drivers/net/ethernet/intel/ice/ice_dcb_nl.c
-@@ -227,7 +227,7 @@ static void ice_get_pfc_delay(struct ice_hw *hw, u16 *delay)
- 	u32 val;
- 
- 	val = rd32(hw, PRTDCB_GENC);
--	*delay = (u16)((val & PRTDCB_GENC_PFCLDA_M) >> PRTDCB_GENC_PFCLDA_S);
-+	*delay = FIELD_GET(PRTDCB_GENC_PFCLDA_M, val);
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-index 54e4536219aa..9a1a04f5f146 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-@@ -503,8 +503,7 @@ ice_parse_rx_flow_user_data(struct ethtool_rx_flow_spec *fsp,
- 		return -EINVAL;
- 
- 	data->flex_word = value & ICE_USERDEF_FLEX_WORD_M;
--	data->flex_offset = (value & ICE_USERDEF_FLEX_OFFS_M) >>
--			     ICE_USERDEF_FLEX_OFFS_S;
-+	data->flex_offset = FIELD_GET(ICE_USERDEF_FLEX_OFFS_M, value);
- 	if (data->flex_offset > ICE_USERDEF_FLEX_MAX_OFFS_VAL)
- 		return -EINVAL;
+-	change_type = FIELD_GET(ICE_AQ_LLDP_MIB_TYPE_M,  mib->type);
++	change_type = FIELD_GET(ICE_AQ_LLDP_MIB_TYPE_M, mib->type);
+ 	if (change_type == ICE_AQ_LLDP_MIB_REMOTE)
+ 		dcbx_cfg = &pi->qos_cfg.remote_dcbx_cfg;
  
 diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index ca6fdc1269ae..673830b77bfd 100644
+index 673830b77bfd..9b4fe8ce3d3b 100644
 --- a/drivers/net/ethernet/intel/ice/ice_lib.c
 +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -974,9 +974,8 @@ static void ice_set_dflt_vsi_ctx(struct ice_hw *hw, struct ice_vsi_ctx *ctxt)
+@@ -974,8 +974,8 @@ static void ice_set_dflt_vsi_ctx(struct ice_hw *hw, struct ice_vsi_ctx *ctxt)
  	/* Traffic from VSI can be sent to LAN */
  	ctxt->info.sw_flags2 = ICE_AQ_VSI_SW_FLAG_LAN_ENA;
  	/* allow all untagged/tagged packets by default on Tx */
--	ctxt->info.inner_vlan_flags = ((ICE_AQ_VSI_INNER_VLAN_TX_MODE_ALL &
--				  ICE_AQ_VSI_INNER_VLAN_TX_MODE_M) >>
--				 ICE_AQ_VSI_INNER_VLAN_TX_MODE_S);
-+	ctxt->info.inner_vlan_flags = FIELD_GET(ICE_AQ_VSI_INNER_VLAN_TX_MODE_M,
-+						ICE_AQ_VSI_INNER_VLAN_TX_MODE_ALL);
+-	ctxt->info.inner_vlan_flags = FIELD_GET(ICE_AQ_VSI_INNER_VLAN_TX_MODE_M,
+-						ICE_AQ_VSI_INNER_VLAN_TX_MODE_ALL);
++	ctxt->info.inner_vlan_flags = FIELD_PREP(ICE_AQ_VSI_INNER_VLAN_TX_MODE_M,
++						 ICE_AQ_VSI_INNER_VLAN_TX_MODE_ALL);
  	/* SVM - by default bits 3 and 4 in inner_vlan_flags are 0's which
  	 * results in legacy behavior (show VLAN, DEI, and UP) in descriptor.
  	 *
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 9b0c04d595ce..014170228477 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -980,7 +980,7 @@ static void ice_set_dflt_mib(struct ice_pf *pf)
- 	 * Octets 13 - 20 are TSA values - leave as zeros
- 	 */
- 	buf[5] = 0x64;
--	len = (typelen & ICE_LLDP_TLV_LEN_M) >> ICE_LLDP_TLV_LEN_S;
-+	len = FIELD_GET(ICE_LLDP_TLV_LEN_M, typelen);
- 	offset += len + 2;
- 	tlv = (struct ice_lldp_org_tlv *)
- 		((char *)tlv + sizeof(tlv->typelen) + len);
-@@ -1014,7 +1014,7 @@ static void ice_set_dflt_mib(struct ice_pf *pf)
- 
- 	/* Octet 1 left as all zeros - PFC disabled */
- 	buf[0] = 0x08;
--	len = (typelen & ICE_LLDP_TLV_LEN_M) >> ICE_LLDP_TLV_LEN_S;
-+	len = FIELD_GET(ICE_LLDP_TLV_LEN_M, typelen);
- 	offset += len + 2;
- 
- 	if (ice_aq_set_lldp_mib(hw, mib_type, (void *)lldpmib, offset, NULL))
-@@ -1771,14 +1771,10 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
- 	/* find what triggered an MDD event */
- 	reg = rd32(hw, GL_MDET_TX_PQM);
- 	if (reg & GL_MDET_TX_PQM_VALID_M) {
--		u8 pf_num = (reg & GL_MDET_TX_PQM_PF_NUM_M) >>
--				GL_MDET_TX_PQM_PF_NUM_S;
--		u16 vf_num = (reg & GL_MDET_TX_PQM_VF_NUM_M) >>
--				GL_MDET_TX_PQM_VF_NUM_S;
--		u8 event = (reg & GL_MDET_TX_PQM_MAL_TYPE_M) >>
--				GL_MDET_TX_PQM_MAL_TYPE_S;
--		u16 queue = ((reg & GL_MDET_TX_PQM_QNUM_M) >>
--				GL_MDET_TX_PQM_QNUM_S);
-+		u8 pf_num = FIELD_GET(GL_MDET_TX_PQM_PF_NUM_M, reg);
-+		u16 vf_num = FIELD_GET(GL_MDET_TX_PQM_VF_NUM_M, reg);
-+		u8 event = FIELD_GET(GL_MDET_TX_PQM_MAL_TYPE_M, reg);
-+		u16 queue = FIELD_GET(GL_MDET_TX_PQM_QNUM_M, reg);
- 
- 		if (netif_msg_tx_err(pf))
- 			dev_info(dev, "Malicious Driver Detection event %d on TX queue %d PF# %d VF# %d\n",
-@@ -1788,14 +1784,10 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
- 
- 	reg = rd32(hw, GL_MDET_TX_TCLAN_BY_MAC(hw));
- 	if (reg & GL_MDET_TX_TCLAN_VALID_M) {
--		u8 pf_num = (reg & GL_MDET_TX_TCLAN_PF_NUM_M) >>
--				GL_MDET_TX_TCLAN_PF_NUM_S;
--		u16 vf_num = (reg & GL_MDET_TX_TCLAN_VF_NUM_M) >>
--				GL_MDET_TX_TCLAN_VF_NUM_S;
--		u8 event = (reg & GL_MDET_TX_TCLAN_MAL_TYPE_M) >>
--				GL_MDET_TX_TCLAN_MAL_TYPE_S;
--		u16 queue = ((reg & GL_MDET_TX_TCLAN_QNUM_M) >>
--				GL_MDET_TX_TCLAN_QNUM_S);
-+		u8 pf_num = FIELD_GET(GL_MDET_TX_TCLAN_PF_NUM_M, reg);
-+		u16 vf_num = FIELD_GET(GL_MDET_TX_TCLAN_VF_NUM_M, reg);
-+		u8 event = FIELD_GET(GL_MDET_TX_TCLAN_MAL_TYPE_M, reg);
-+		u16 queue = FIELD_GET(GL_MDET_TX_TCLAN_QNUM_M, reg);
- 
- 		if (netif_msg_tx_err(pf))
- 			dev_info(dev, "Malicious Driver Detection event %d on TX queue %d PF# %d VF# %d\n",
-@@ -1805,14 +1797,10 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
- 
- 	reg = rd32(hw, GL_MDET_RX);
- 	if (reg & GL_MDET_RX_VALID_M) {
--		u8 pf_num = (reg & GL_MDET_RX_PF_NUM_M) >>
--				GL_MDET_RX_PF_NUM_S;
--		u16 vf_num = (reg & GL_MDET_RX_VF_NUM_M) >>
--				GL_MDET_RX_VF_NUM_S;
--		u8 event = (reg & GL_MDET_RX_MAL_TYPE_M) >>
--				GL_MDET_RX_MAL_TYPE_S;
--		u16 queue = ((reg & GL_MDET_RX_QNUM_M) >>
--				GL_MDET_RX_QNUM_S);
-+		u8 pf_num = FIELD_GET(GL_MDET_RX_PF_NUM_M, reg);
-+		u16 vf_num = FIELD_GET(GL_MDET_RX_VF_NUM_M, reg);
-+		u8 event = FIELD_GET(GL_MDET_RX_MAL_TYPE_M, reg);
-+		u16 queue = FIELD_GET(GL_MDET_RX_QNUM_M, reg);
- 
- 		if (netif_msg_rx_err(pf))
- 			dev_info(dev, "Malicious Driver Detection event %d on RX queue %d PF# %d VF# %d\n",
-@@ -3135,8 +3123,8 @@ static irqreturn_t ice_misc_intr(int __always_unused irq, void *data)
- 
- 		/* we have a reset warning */
- 		ena_mask &= ~PFINT_OICR_GRST_M;
--		reset = (rd32(hw, GLGEN_RSTAT) & GLGEN_RSTAT_RESET_TYPE_M) >>
--			GLGEN_RSTAT_RESET_TYPE_S;
-+		reset = FIELD_GET(GLGEN_RSTAT_RESET_TYPE_M,
-+				  rd32(hw, GLGEN_RSTAT));
- 
- 		if (reset == ICE_RESET_CORER)
- 			pf->corer_count++;
-@@ -7995,8 +7983,8 @@ static void ice_tx_timeout(struct net_device *netdev, unsigned int txqueue)
- 		struct ice_hw *hw = &pf->hw;
- 		u32 head, val = 0;
- 
--		head = (rd32(hw, QTX_COMM_HEAD(vsi->txq_map[txqueue])) &
--			QTX_COMM_HEAD_HEAD_M) >> QTX_COMM_HEAD_HEAD_S;
-+		head = FIELD_GET(QTX_COMM_HEAD_HEAD_M,
-+				 rd32(hw, QTX_COMM_HEAD(vsi->txq_map[txqueue])));
- 		/* Read interrupt register */
- 		val = rd32(hw, GLINT_DYN_CTL(tx_ring->q_vector->reg_idx));
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_nvm.c b/drivers/net/ethernet/intel/ice/ice_nvm.c
-index f6f52a248066..d4e05d2cb30c 100644
---- a/drivers/net/ethernet/intel/ice/ice_nvm.c
-+++ b/drivers/net/ethernet/intel/ice/ice_nvm.c
-@@ -571,8 +571,8 @@ ice_get_nvm_ver_info(struct ice_hw *hw, enum ice_bank_select bank, struct ice_nv
- 		return status;
- 	}
- 
--	nvm->major = (ver & ICE_NVM_VER_HI_MASK) >> ICE_NVM_VER_HI_SHIFT;
--	nvm->minor = (ver & ICE_NVM_VER_LO_MASK) >> ICE_NVM_VER_LO_SHIFT;
-+	nvm->major = FIELD_GET(ICE_NVM_VER_HI_MASK, ver);
-+	nvm->minor = FIELD_GET(ICE_NVM_VER_LO_MASK, ver);
- 
- 	status = ice_read_nvm_sr_copy(hw, bank, ICE_SR_NVM_EETRACK_LO, &eetrack_lo);
- 	if (status) {
-@@ -706,9 +706,9 @@ ice_get_orom_ver_info(struct ice_hw *hw, enum ice_bank_select bank, struct ice_o
- 
- 	combo_ver = le32_to_cpu(civd.combo_ver);
- 
--	orom->major = (u8)((combo_ver & ICE_OROM_VER_MASK) >> ICE_OROM_VER_SHIFT);
--	orom->patch = (u8)(combo_ver & ICE_OROM_VER_PATCH_MASK);
--	orom->build = (u16)((combo_ver & ICE_OROM_VER_BUILD_MASK) >> ICE_OROM_VER_BUILD_SHIFT);
-+	orom->major = FIELD_GET(ICE_OROM_VER_MASK, combo_ver);
-+	orom->patch = FIELD_GET(ICE_OROM_VER_PATCH_MASK, combo_ver);
-+	orom->build = FIELD_GET(ICE_OROM_VER_BUILD_MASK, combo_ver);
- 
- 	return 0;
- }
-@@ -950,7 +950,8 @@ static int ice_determine_active_flash_banks(struct ice_hw *hw)
- 	}
- 
- 	/* Check that the control word indicates validity */
--	if ((ctrl_word & ICE_SR_CTRL_WORD_1_M) >> ICE_SR_CTRL_WORD_1_S != ICE_SR_CTRL_WORD_VALID) {
-+	if (FIELD_GET(ICE_SR_CTRL_WORD_1_M, ctrl_word) !=
-+	    ICE_SR_CTRL_WORD_VALID) {
- 		ice_debug(hw, ICE_DBG_NVM, "Shadow RAM control word is invalid\n");
- 		return -EIO;
- 	}
-@@ -1027,7 +1028,7 @@ int ice_init_nvm(struct ice_hw *hw)
- 	 * as the blank mode may be used in the factory line.
- 	 */
- 	gens_stat = rd32(hw, GLNVM_GENS);
--	sr_size = (gens_stat & GLNVM_GENS_SR_SIZE_M) >> GLNVM_GENS_SR_SIZE_S;
-+	sr_size = FIELD_GET(GLNVM_GENS_SR_SIZE_M, gens_stat);
- 
- 	/* Switching to words (sr_size contains power of 2) */
- 	flash->sr_words = BIT(sr_size) * ICE_SR_WORDS_IN_1KB;
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index eb3ff6da5c5f..19cc7e9910d1 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -1140,9 +1140,9 @@ static int ice_ptp_check_tx_fifo(struct ice_ptp_port *port)
- 	}
- 
- 	if (offs & 0x1)
--		phy_sts = (val & Q_REG_FIFO13_M) >> Q_REG_FIFO13_S;
-+		phy_sts = FIELD_GET(Q_REG_FIFO13_M, val);
- 	else
--		phy_sts = (val & Q_REG_FIFO02_M) >> Q_REG_FIFO02_S;
-+		phy_sts = FIELD_GET(Q_REG_FIFO02_M, val);
- 
- 	if (phy_sts & FIFO_EMPTY) {
- 		port->tx_fifo_busy_cnt = FIFO_OK;
-diff --git a/drivers/net/ethernet/intel/ice/ice_sched.c b/drivers/net/ethernet/intel/ice/ice_sched.c
-index 2f4a621254e8..d174a4eeb899 100644
---- a/drivers/net/ethernet/intel/ice/ice_sched.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sched.c
-@@ -1387,8 +1387,7 @@ void ice_sched_get_psm_clk_freq(struct ice_hw *hw)
- 	u32 val, clk_src;
- 
- 	val = rd32(hw, GLGEN_CLKSTAT_SRC);
--	clk_src = (val & GLGEN_CLKSTAT_SRC_PSM_CLK_SRC_M) >>
--		GLGEN_CLKSTAT_SRC_PSM_CLK_SRC_S;
-+	clk_src = FIELD_GET(GLGEN_CLKSTAT_SRC_PSM_CLK_SRC_M, val);
- 
- #define PSM_CLK_SRC_367_MHZ 0x0
- #define PSM_CLK_SRC_416_MHZ 0x1
-diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
-index 54d602388c9c..4ee349fe6409 100644
---- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-@@ -1318,8 +1318,7 @@ ice_vf_lan_overflow_event(struct ice_pf *pf, struct ice_rq_event_info *event)
- 	dev_dbg(ice_pf_to_dev(pf), "GLDCB_RTCTQ: 0x%08x\n", gldcb_rtctq);
- 
- 	/* event returns device global Rx queue number */
--	queue = (gldcb_rtctq & GLDCB_RTCTQ_RXQNUM_M) >>
--		GLDCB_RTCTQ_RXQNUM_S;
-+	queue = FIELD_GET(GLDCB_RTCTQ_RXQNUM_M, gldcb_rtctq);
- 
- 	vf = ice_get_vf_from_pfq(pf, ice_globalq_to_pfq(pf, queue));
- 	if (!vf)
-diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-index d4ad0739b57b..c925813ec9ca 100644
---- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-+++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-@@ -3102,7 +3102,7 @@ static struct ice_vlan ice_vc_to_vlan(struct virtchnl_vlan *vc_vlan)
- {
- 	struct ice_vlan vlan = { 0 };
- 
--	vlan.prio = (vc_vlan->tci & VLAN_PRIO_MASK) >> VLAN_PRIO_SHIFT;
-+	vlan.prio = FIELD_GET(VLAN_PRIO_MASK, vc_vlan->tci);
- 	vlan.vid = vc_vlan->tci & VLAN_VID_MASK;
- 	vlan.tpid = vc_vlan->tpid;
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
-index 9ee7ab207b37..f001553e1a1a 100644
---- a/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
-+++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
-@@ -1463,16 +1463,15 @@ ice_vf_verify_rx_desc(struct ice_vf *vf, struct ice_vf_fdir_ctx *ctx,
- 	int ret;
- 
- 	stat_err = le16_to_cpu(ctx->rx_desc.wb.status_error0);
--	if (((stat_err & ICE_FXD_FLTR_WB_QW1_DD_M) >>
--	    ICE_FXD_FLTR_WB_QW1_DD_S) != ICE_FXD_FLTR_WB_QW1_DD_YES) {
-+	if (FIELD_GET(ICE_FXD_FLTR_WB_QW1_DD_M, stat_err) !=
-+	    ICE_FXD_FLTR_WB_QW1_DD_YES) {
- 		*status = VIRTCHNL_FDIR_FAILURE_RULE_NORESOURCE;
- 		dev_err(dev, "VF %d: Desc Done not set\n", vf->vf_id);
- 		ret = -EINVAL;
- 		goto err_exit;
- 	}
- 
--	prog_id = (stat_err & ICE_FXD_FLTR_WB_QW1_PROG_ID_M) >>
--		ICE_FXD_FLTR_WB_QW1_PROG_ID_S;
-+	prog_id = FIELD_GET(ICE_FXD_FLTR_WB_QW1_PROG_ID_M, stat_err);
- 	if (prog_id == ICE_FXD_FLTR_WB_QW1_PROG_ADD &&
- 	    ctx->v_opcode != VIRTCHNL_OP_ADD_FDIR_FILTER) {
- 		dev_err(dev, "VF %d: Desc show add, but ctx not",
-@@ -1491,8 +1490,7 @@ ice_vf_verify_rx_desc(struct ice_vf *vf, struct ice_vf_fdir_ctx *ctx,
- 		goto err_exit;
- 	}
- 
--	error = (stat_err & ICE_FXD_FLTR_WB_QW1_FAIL_M) >>
--		ICE_FXD_FLTR_WB_QW1_FAIL_S;
-+	error = FIELD_GET(ICE_FXD_FLTR_WB_QW1_FAIL_M, stat_err);
- 	if (error == ICE_FXD_FLTR_WB_QW1_FAIL_YES) {
- 		if (prog_id == ICE_FXD_FLTR_WB_QW1_PROG_ADD) {
- 			dev_err(dev, "VF %d, Failed to add FDIR rule due to no space in the table",
-@@ -1507,8 +1505,7 @@ ice_vf_verify_rx_desc(struct ice_vf *vf, struct ice_vf_fdir_ctx *ctx,
- 		goto err_exit;
- 	}
- 
--	error = (stat_err & ICE_FXD_FLTR_WB_QW1_FAIL_PROF_M) >>
--		ICE_FXD_FLTR_WB_QW1_FAIL_PROF_S;
-+	error = FIELD_GET(ICE_FXD_FLTR_WB_QW1_FAIL_PROF_M, stat_err);
- 	if (error == ICE_FXD_FLTR_WB_QW1_FAIL_PROF_YES) {
- 		dev_err(dev, "VF %d: Profile matching error", vf->vf_id);
- 		*status = VIRTCHNL_FDIR_FAILURE_RULE_NORESOURCE;
 -- 
 2.41.0
 
