@@ -1,161 +1,155 @@
-Return-Path: <netdev+bounces-58470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1AAA8168B9
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:52:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D4EB81691E
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 10:03:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70D62B22877
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 08:52:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51CA31C20900
+	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 09:03:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 860B71097E;
-	Mon, 18 Dec 2023 08:52:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0C8710A22;
+	Mon, 18 Dec 2023 09:03:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="pVnxw0u3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UZx0lTU6"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED231094F;
-	Mon, 18 Dec 2023 08:52:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=u9rU7FfAkS1Xg3KQP7X+Uy8VuWy1sh7xNAOO2EeOmow=; b=pVnxw0u3V2KMrtdVYsexwpdnA5
-	XUz4IKQOBNxaBluhdNYzL8zwlyI8CjvzruSXco86xKeQ6QX9cV0XiRUgx1SayqkGcLFTuuCdNcreN
-	IYv72Eo9aa2ezSpHM/sq6jV2R3+vIjjFyGjsK/x2Nl8dUJj/GySOniPAkjktHMBS0gwug9YlUSVKk
-	E1ANshGn7IEXwUCrQ0edmmtKumnnePMpDfJ7tvxXWWIUvjf8OwTHC7AAiHt93l6j9w58BEch4hds3
-	CFiaDf4S4lSKklzGWwvE7xj7zzlkiYN9B3rJVXyRh4lviegYdZLL2jkzTg8CtU/F3vHY7hgsqJnoi
-	sJS6vhrQ==;
-Received: from sslproxy06.your-server.de ([78.46.172.3])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rF9M8-000GMZ-Kc; Mon, 18 Dec 2023 09:52:08 +0100
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy06.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rF9M6-000DSm-B8; Mon, 18 Dec 2023 09:52:06 +0100
-Subject: Re: [PATCH net-next 16/24] net: netkit, veth, tun, virt*: Use
- nested-BH locking for XDP redirect.
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, Boqun Feng
- <boqun.feng@gmail.com>, Eric Dumazet <edumazet@google.com>,
- Frederic Weisbecker <frederic@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>,
- Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
- "K. Y. Srinivasan" <kys@microsoft.com>, "Michael S. Tsirkin"
- <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Dexuan Cui <decui@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Hao Luo <haoluo@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, Jiri Olsa <jolsa@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Juergen Gross <jgross@suse.com>,
- KP Singh <kpsingh@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
- Nikolay Aleksandrov <razor@blackwall.org>, Song Liu <song@kernel.org>,
- Stanislav Fomichev <sdf@google.com>,
- Stefano Stabellini <sstabellini@kernel.org>, Wei Liu <wei.liu@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Yonghong Song <yonghong.song@linux.dev>, bpf@vger.kernel.org,
- virtualization@lists.linux.dev, xen-devel@lists.xenproject.org
-References: <20231215171020.687342-1-bigeasy@linutronix.de>
- <20231215171020.687342-17-bigeasy@linutronix.de>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <74feb818-7109-cb1e-8eec-a037c17a2871@iogearbox.net>
-Date: Mon, 18 Dec 2023 09:52:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF7D1118B;
+	Mon, 18 Dec 2023 09:03:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-28ade227850so2224160a91.2;
+        Mon, 18 Dec 2023 01:03:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702890207; x=1703495007; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ak/uY7ctjUJpG2EB2nkOjy7ocgBtOBfLnLR5sFh/TJA=;
+        b=UZx0lTU6r0W3/ufBdYUXIHGdWXJEh/NkCb9gPxwZLOLh8Gv7TCz0qmg5DqNm9zxOep
+         s3yBmKET0O8yelwNkRH6N9ZwVt94Ks7fW6ra/9wRgT7FaQyXcreI1W3KahS6hzKGeHfh
+         RSA4SoW4G4qdlqipNzgroxgY1iKiuJm7MXyy773HIfgt0dQoEQ6KTrWjPHYUKcaj0Mg2
+         DXyoTE03N61j4Phli2mG14GGLPtDSJdgnssYDAq2LPFBa+U4Vh7xs725bp4qmegkB/Td
+         YMuwmnaIaJkdKqOiaqFwmD464Wep5F92k4XQTfEhjUWpRCltZiSptrihB11NR85Rkd7b
+         kSHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702890207; x=1703495007;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ak/uY7ctjUJpG2EB2nkOjy7ocgBtOBfLnLR5sFh/TJA=;
+        b=UXzHq+cqRz//A6xQBgpPLF8pG5DIgN3p9bgkv/8U7iUu7MtdJMb1b861kxCXSxvfTv
+         tkgw5CtyOZHYW3rzKBEUar+mOtxKlotI7nob7TZx7QxffY66amUaLFS/3IMIYczrkWye
+         gIUOlQRRzAL+FwuKqpD4Ny7/1MVULtBHJrAwxEEIQHsX71K1zEn2XOqc9kuVzFRkJ7uA
+         oM+gvB9dF8fEFDDuVEwnjcp7UFAtecedxoES6J5soPEwEPdvrViStT/UeA3XFLi7ER7/
+         ZTamsinjxmovpK71SpMsJemyakqmpYZVSatq9NIGNPtCnOCalwGzR7tqz5hNKqXgNH2B
+         BUHA==
+X-Gm-Message-State: AOJu0Yx3Fd2LxiBNWVRCLPWmBJegrpajeTE2+7vwexfmd2m7mu+0SW1v
+	E4M1n7pbNIDecYUxxRHjC3Y=
+X-Google-Smtp-Source: AGHT+IFSKH+fRCqgmyE2xogsVWKfTvVyijpoHCjNrGMowybsup8w1lOtkHbMsO62D3YfJrmRDEKNIA==
+X-Received: by 2002:a17:90b:1d8b:b0:28b:5a99:c02e with SMTP id pf11-20020a17090b1d8b00b0028b5a99c02emr931913pjb.83.1702890207418;
+        Mon, 18 Dec 2023 01:03:27 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id si6-20020a17090b528600b0028aefb5fa05sm3892619pjb.40.2023.12.18.01.03.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Dec 2023 01:03:26 -0800 (PST)
+Date: Mon, 18 Dec 2023 17:03:21 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Dmitry Safonov <dima@arista.com>
+Cc: Shuah Khan <shuah@kernel.org>, David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Salam Noureddine <noureddine@arista.com>,
+	Bob Gilligan <gilligan@arista.com>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
+	Dmitry Safonov <0x7f454c46@gmail.com>
+Subject: Re: [PATCH 02/12] selftests/net: Verify that TCP-AO complies with
+ ignoring ICMPs
+Message-ID: <ZYAK2U4GikRKFLQs@Laptop-X1>
+References: <20231215-tcp-ao-selftests-v1-0-f6c08180b985@arista.com>
+ <20231215-tcp-ao-selftests-v1-2-f6c08180b985@arista.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231215171020.687342-17-bigeasy@linutronix.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27126/Sun Dec 17 10:37:59 2023)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231215-tcp-ao-selftests-v1-2-f6c08180b985@arista.com>
 
-Hi Sebastian,
-
-On 12/15/23 6:07 PM, Sebastian Andrzej Siewior wrote:
-> The per-CPU variables used during bpf_prog_run_xdp() invocation and
-> later during xdp_do_redirect() rely on disabled BH for their protection.
-> Without locking in local_bh_disable() on PREEMPT_RT these data structure
-> require explicit locking.
+On Fri, Dec 15, 2023 at 02:36:16AM +0000, Dmitry Safonov wrote:
+> Hand-crafted ICMP packets are sent to the server, the server checks for
+> hard/soft errors and fails if any.
 > 
-> This is a follow-up on the previous change which introduced
-> bpf_run_lock.redirect_lock and uses it now within drivers.
+> Expected output for ipv4 version:
+> > # ./icmps-discard_ipv4
+> > 1..3
+> > # 3164[lib/setup.c:166] rand seed 1642623745
+> > TAP version 13
+> > # 3164[lib/proc.c:207]    Snmp6             Ip6InReceives: 0 => 1
+> > # 3164[lib/proc.c:207]    Snmp6             Ip6InNoRoutes: 0 => 1
+> > # 3164[lib/proc.c:207]    Snmp6               Ip6InOctets: 0 => 76
+> > # 3164[lib/proc.c:207]    Snmp6            Ip6InNoECTPkts: 0 => 1
+> > # 3164[lib/proc.c:207]      Tcp                    InSegs: 2 => 203
+> > # 3164[lib/proc.c:207]      Tcp                   OutSegs: 1 => 202
+> > # 3164[lib/proc.c:207]  IcmpMsg                   InType3: 0 => 543
+> > # 3164[lib/proc.c:207]     Icmp                    InMsgs: 0 => 543
+> > # 3164[lib/proc.c:207]     Icmp            InDestUnreachs: 0 => 543
+> > # 3164[lib/proc.c:207]       Ip                InReceives: 2 => 746
+> > # 3164[lib/proc.c:207]       Ip                InDelivers: 2 => 746
+> > # 3164[lib/proc.c:207]       Ip               OutRequests: 1 => 202
+> > # 3164[lib/proc.c:207]    IpExt                  InOctets: 132 => 61684
+> > # 3164[lib/proc.c:207]    IpExt                 OutOctets: 68 => 31324
+> > # 3164[lib/proc.c:207]    IpExt               InNoECTPkts: 2 => 744
+> > # 3164[lib/proc.c:207]   TcpExt               TCPPureAcks: 1 => 2
+> > # 3164[lib/proc.c:207]   TcpExt           TCPOrigDataSent: 0 => 200
+> > # 3164[lib/proc.c:207]   TcpExt              TCPDelivered: 0 => 199
+> > # 3164[lib/proc.c:207]   TcpExt                 TCPAOGood: 2 => 203
+> > # 3164[lib/proc.c:207]   TcpExt         TCPAODroppedIcmps: 0 => 541
+> > ok 1 InDestUnreachs delivered 543
+> > ok 2 Server survived 20000 bytes of traffic
+> > ok 3 ICMPs ignored 541
+> > # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
 > 
-> The simple way is to acquire the lock before bpf_prog_run_xdp() is
-> invoked and hold it until the end of function.
-> This does not always work because some drivers (cpsw, atlantic) invoke
-> xdp_do_flush() in the same context.
-> Acquiring the lock in bpf_prog_run_xdp() and dropping in
-> xdp_do_redirect() (without touching drivers) does not work because not
-> all driver, which use bpf_prog_run_xdp(), do support XDP_REDIRECT (and
-> invoke xdp_do_redirect()).
+> Expected output for ipv6 version:
+> > # ./icmps-discard_ipv6
+> > 1..3
+> > # 3186[lib/setup.c:166] rand seed 1642623803
+> > TAP version 13
+> > # 3186[lib/proc.c:207]    Snmp6             Ip6InReceives: 4 => 568
+> > # 3186[lib/proc.c:207]    Snmp6             Ip6InDelivers: 3 => 564
+> > # 3186[lib/proc.c:207]    Snmp6            Ip6OutRequests: 2 => 204
+> > # 3186[lib/proc.c:207]    Snmp6            Ip6InMcastPkts: 1 => 4
+> > # 3186[lib/proc.c:207]    Snmp6           Ip6OutMcastPkts: 0 => 1
+> > # 3186[lib/proc.c:207]    Snmp6               Ip6InOctets: 320 => 70420
+> > # 3186[lib/proc.c:207]    Snmp6              Ip6OutOctets: 160 => 35512
+> > # 3186[lib/proc.c:207]    Snmp6          Ip6InMcastOctets: 72 => 336
+> > # 3186[lib/proc.c:207]    Snmp6         Ip6OutMcastOctets: 0 => 76
+> > # 3186[lib/proc.c:207]    Snmp6            Ip6InNoECTPkts: 4 => 568
+> > # 3186[lib/proc.c:207]    Snmp6               Icmp6InMsgs: 1 => 361
+> > # 3186[lib/proc.c:207]    Snmp6              Icmp6OutMsgs: 1 => 2
+> > # 3186[lib/proc.c:207]    Snmp6       Icmp6InDestUnreachs: 0 => 360
+> > # 3186[lib/proc.c:207]    Snmp6      Icmp6OutMLDv2Reports: 0 => 1
+> > # 3186[lib/proc.c:207]    Snmp6              Icmp6InType1: 0 => 360
+> > # 3186[lib/proc.c:207]    Snmp6           Icmp6OutType143: 0 => 1
+> > # 3186[lib/proc.c:207]      Tcp                    InSegs: 2 => 203
+> > # 3186[lib/proc.c:207]      Tcp                   OutSegs: 1 => 202
+> > # 3186[lib/proc.c:207]   TcpExt               TCPPureAcks: 1 => 2
+> > # 3186[lib/proc.c:207]   TcpExt           TCPOrigDataSent: 0 => 200
+> > # 3186[lib/proc.c:207]   TcpExt              TCPDelivered: 0 => 199
+> > # 3186[lib/proc.c:207]   TcpExt                 TCPAOGood: 2 => 203
+> > # 3186[lib/proc.c:207]   TcpExt         TCPAODroppedIcmps: 0 => 360
+> > ok 1 Icmp6InDestUnreachs delivered 360
+> > ok 2 Server survived 20000 bytes of traffic
+> > ok 3 ICMPs ignored 360
+> > # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
 > 
-> Ideally the minimal locking scope would be bpf_prog_run_xdp() +
-> xdp_do_redirect() and everything else (error recovery, DMA unmapping,
-> free/ alloc of memory, …) would happen outside of the locked section.
-[...]
+> Signed-off-by: Dmitry Safonov <dima@arista.com>
 
->   drivers/net/hyperv/netvsc_bpf.c |  1 +
->   drivers/net/netkit.c            | 13 +++++++----
->   drivers/net/tun.c               | 28 +++++++++++++----------
->   drivers/net/veth.c              | 40 ++++++++++++++++++++-------------
->   drivers/net/virtio_net.c        |  1 +
->   drivers/net/xen-netfront.c      |  1 +
->   6 files changed, 52 insertions(+), 32 deletions(-)
-[...]
-
-Please exclude netkit from this set given it does not support XDP, but
-instead only accepts tc BPF typed programs.
-
-Thanks,
-Daniel
-
-> diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
-> index 39171380ccf29..fbcf78477bda8 100644
-> --- a/drivers/net/netkit.c
-> +++ b/drivers/net/netkit.c
-> @@ -80,8 +80,15 @@ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
->   	netkit_prep_forward(skb, !net_eq(dev_net(dev), dev_net(peer)));
->   	skb->dev = peer;
->   	entry = rcu_dereference(nk->active);
-> -	if (entry)
-> -		ret = netkit_run(entry, skb, ret);
-> +	if (entry) {
-> +		scoped_guard(local_lock_nested_bh, &bpf_run_lock.redirect_lock) {
-> +			ret = netkit_run(entry, skb, ret);
-> +			if (ret == NETKIT_REDIRECT) {
-> +				dev_sw_netstats_tx_add(dev, 1, len);
-> +				skb_do_redirect(skb);
-> +			}
-> +		}
-> +	}
->   	switch (ret) {
->   	case NETKIT_NEXT:
->   	case NETKIT_PASS:
-> @@ -95,8 +102,6 @@ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
->   		}
->   		break;
->   	case NETKIT_REDIRECT:
-> -		dev_sw_netstats_tx_add(dev, 1, len);
-> -		skb_do_redirect(skb);
->   		break;
->   	case NETKIT_DROP:
->   	default:
+Tested-by: Hangbin Liu <liuhangbin@gmail.com>
 
