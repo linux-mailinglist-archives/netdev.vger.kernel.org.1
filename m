@@ -1,120 +1,115 @@
-Return-Path: <netdev+bounces-58807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F20381843B
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 10:15:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5573881843F
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 10:19:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0FECEB2264F
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 09:15:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03BF2284DFF
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 09:19:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9125D12B98;
-	Tue, 19 Dec 2023 09:15:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9609012B98;
+	Tue, 19 Dec 2023 09:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ws8WpIMK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HB/xOs8J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E0F12B87
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 09:15:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so11189a12.0
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 01:15:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702977313; x=1703582113; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H3C2LHQgXwxgzamhTVeMi0dLfT0KzRA6aJGGwgr9iL8=;
-        b=ws8WpIMK0giiFEtmZ9mcw3D6azun6qvlw0nZpxRd4xktGPwCyOtmp5dMrVKZmHh+l9
-         /KwCmUpLKsK3wLwyrFQpjLnx7mQnd4/3yk79BD/nTUVnSIkrR3Zi220hTol/Yl5R8OjV
-         rgzxhVuDXp/9yhM7lJzZv9+2ZDbpL5UFHPauHTqroW23/brpN5xKWP9SGt9kqfv35MiU
-         Z6I91h/2fvrYYRunYQ6WXMJo5twm2UgrcGronNTwp4kJg66QFqXbVpAyHtdZkVX8emAw
-         i7M8qkmnDOcXXaDIy+JrqI1v0el1ZBHHIc+Im+eBUzPi7jX0QxO2u/m7YL+SayRzV2gn
-         Qvqw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B49F134A5
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 09:19:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702977556;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZHyjrBTzzv8hgHUAyTnHinUm2FdompoSEVgOa1MaGBo=;
+	b=HB/xOs8JAuKeFkxctB9rKLfTh/89y10+Ni1Xq5GTepi6UcxUy22KHGmZpF2cjLQp8q6uiw
+	2CA7llZWMvJo/AwRWjXqqRJDzqjZ5IpZx6zXnUlyqhO4j+E/wnp+T1w6lnKu0JwdSc3knh
+	EEn5rNhL5UUh4VJJzokINu05NfmV1q4=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-633-syziRRiXM3iV97dhHym4kQ-1; Tue, 19 Dec 2023 04:19:15 -0500
+X-MC-Unique: syziRRiXM3iV97dhHym4kQ-1
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-552ab0a61d0so501378a12.0
+        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 01:19:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702977313; x=1703582113;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H3C2LHQgXwxgzamhTVeMi0dLfT0KzRA6aJGGwgr9iL8=;
-        b=nOg4vzp7dge2AjLvcmqqIvAaPQySgWS+3H/2L3RWo8o5NLLUCaGU6gSY6eJh3aSVOd
-         0TevgNuWOQpCI1sW7aMT6Al8krp0w+39IavCG/GLIejhIwP1GO4r7ln0lZBQc9LQv1qx
-         5RMu3csQrJw+tmdejOaHLHzZoEOvq9zrWqDV9lGoA9QtFUE1JxaYdjl6w8XzYAov9inD
-         JXwOKpteIs+p8FU6/rfXg0Th6RZ90P3RIRNnoL5lXa9emRl6Vt/psXcN9koYnWGuYfKr
-         FI4zCHz+t0NtFIb9p7hkpx09nKLWxLxvMk1XOPcGQfYyMSg/8jKEUwmLGjwoAilXrwYO
-         pHCA==
-X-Gm-Message-State: AOJu0Yy2SwtYIS47THcda2ape7ZupmU5siNUg7yrtLfbNeTC8z20fGci
-	ceBMNXW1hfo3U9lgsJysKXkflHMIYB4fb840r1gN3VeRbPQ8DOFhIUluC7tjw/gh
-X-Google-Smtp-Source: AGHT+IFGHVZeMhHhmfSSuughOLMneN2eb8mWXPZbrYqWuiGZoDb5n+2EVunL+QgbUNoZHfl8Um3ih9f+8Ht7iP+8kU4=
-X-Received: by 2002:a05:6402:268b:b0:553:9d94:9f6a with SMTP id
- w11-20020a056402268b00b005539d949f6amr46782edd.7.1702977313062; Tue, 19 Dec
- 2023 01:15:13 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702977554; x=1703582354;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZHyjrBTzzv8hgHUAyTnHinUm2FdompoSEVgOa1MaGBo=;
+        b=UNVItzBRjAUfpD9rdXKnC18BTuwh4ZLPQmxEW5d253UakebcOSSBWDqlWkl/VghzuH
+         h1LAgmrSlS6Ol/qZLjiWPhrb4Nu7+gO5rAbT6VuqRtmgA4/SppGK7WEGmGTCo2N4Va+s
+         ZULk0RERiH5WqNnq0zexZF0QZM4Cbn0NZwA4LMirut1NJYVC+tm7NHxsDywDIMh5EscW
+         FsGJw5IcA7Mj6mUnBsuLMByBrzyXjf32kjh4FwOF0efCkMIJKSJUR3kZnY8RfVlXXNuD
+         3QBoT3MhUISJ1DVEBbAcZzR5yxFyBiEpFxLndfQA2FzenVmcIvzXOm7WaUU/ejN9iYMD
+         tRTg==
+X-Gm-Message-State: AOJu0YyGG1tzveaOc3IT64lcZdehtSg+eWZlHOFMk9DW6rdN82ofb4X3
+	WqwLaezlTYXk+FQC7fOWmDKrWKvtkbOO1VU1YsEqbEYlnLN+p2pM+CC5U3WLN3cIfHSUCjAEHl7
+	7VA3m0goOswElp+67
+X-Received: by 2002:a50:9fa6:0:b0:553:1f7:7387 with SMTP id c35-20020a509fa6000000b0055301f77387mr5639703edf.1.1702977554698;
+        Tue, 19 Dec 2023 01:19:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE7d4mpHOiz14mHEHcX8qOxC6qX1Gv0owpqbGC1A5Zys6PvNEyn2xG+HLYZwZ+mq0Pu03opJA==
+X-Received: by 2002:a50:9fa6:0:b0:553:1f7:7387 with SMTP id c35-20020a509fa6000000b0055301f77387mr5639682edf.1.1702977554343;
+        Tue, 19 Dec 2023 01:19:14 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-246-245.dyn.eolo.it. [146.241.246.245])
+        by smtp.gmail.com with ESMTPSA id i41-20020a0564020f2900b00553854de928sm721798eda.36.2023.12.19.01.19.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Dec 2023 01:19:14 -0800 (PST)
+Message-ID: <f91f45a72f789a1f31646a5d7ed579194807b102.camel@redhat.com>
+Subject: Re: [PATCH] sfc: fix a double-free bug in efx_probe_filters
+From: Paolo Abeni <pabeni@redhat.com>
+To: Zhipeng Lu <alexious@zju.edu.cn>
+Cc: Edward Cree <ecree.xilinx@gmail.com>, Martin Habets
+ <habetsm.xilinx@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org,  linux-net-drivers@amd.com,
+ linux-kernel@vger.kernel.org
+Date: Tue, 19 Dec 2023 10:19:12 +0100
+In-Reply-To: <20231214152247.3482788-1-alexious@zju.edu.cn>
+References: <20231214152247.3482788-1-alexious@zju.edu.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231216-new-gemini-ethernet-regression-v2-0-64c269413dfa@linaro.org>
- <20231216-new-gemini-ethernet-regression-v2-2-64c269413dfa@linaro.org>
- <CANn89iLu_vE_S++5Q6Re4c6DZOD7GD-pLFC61VjYGcjFnKDWCw@mail.gmail.com> <CACRpkdbq=X485QuFvdd8Q=pPE0Hy4CduBbRZH7mdqag=mQw0ag@mail.gmail.com>
-In-Reply-To: <CACRpkdbq=X485QuFvdd8Q=pPE0Hy4CduBbRZH7mdqag=mQw0ag@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 19 Dec 2023 10:14:59 +0100
-Message-ID: <CANn89iKfqZaqL02GigqwypwD7xKxKbiJMWvJsiPigzNBMPYtDA@mail.gmail.com>
-Subject: Re: [PATCH net v2 2/2] net: ethernet: cortina: Bypass checksumming
- engine of alien ethertypes
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 19, 2023 at 12:42=E2=80=AFAM Linus Walleij <linus.walleij@linar=
-o.org> wrote:
->
-> On Mon, Dec 18, 2023 at 3:50=E2=80=AFPM Eric Dumazet <edumazet@google.com=
-> wrote:
-> > On Sat, Dec 16, 2023 at 8:36=E2=80=AFPM Linus Walleij <linus.walleij@li=
-naro.org> wrote:
->
-> > > +       /* Dig out the the ethertype actually in the buffer and not w=
-hat the
-> > > +        * protocol claims to be. This is the raw data that the check=
-summing
-> > > +        * offload engine will have to deal with.
-> > > +        */
-> > > +       p =3D (__be16 *)(skb->data + 2 * ETH_ALEN);
-> > > +       ethertype =3D ntohs(*p);
-> > > +       if (ethertype =3D=3D ETH_P_8021Q) {
-> > > +               p +=3D 2; /* +2 sizeof(__be16) */
-> > > +               ethertype =3D ntohs(*p);
-> > > +       }
-> >
-> > Presumably all you need is to call vlan_get_protocol() ?
->
-> Sadly no. As the comment says: we want the ethertype that is actually in =
-the
-> skb, not what is in skb->protocol, and the code in vlan_get_protocol() ju=
-st
-> trusts skb->protocol to be the ethertype in the frame, especially if vlan
-> is not used.
->
-> This is often what we want: DSA switches will "wash" custom ethertypes
-> before they go out, but in this case the custom ethertype upsets the
-> ethernet checksum engine used as conduit interface toward the DSA
-> switch.
+Hi,
 
- Problem is that your code misses skb_header_pointer() or
-pskb_may_pull() call...
-Second "ethertype =3D ntohs(*p);" might access uninitialized data.
+On Thu, 2023-12-14 at 23:22 +0800, Zhipeng Lu wrote:
+> In efx_probe_filters, the channel->rps_flow_id is freed in a
+> efx_for_each_channel marco  when success equals to 0.
+> However, after the following call chain:
+>=20
+> efx_probe_filters
+>   |-> ef100_net_open
+>         |-> ef100_net_stop
+>               |-> efx_remove_filters
+>=20
+> The channel->rps_flow_id is freed again in the efx_for_each_channel of
+> efx_remove_filters, triggering a double-free bug.
+>=20
+> Fixes: a9dc3d5612ce ("sfc_ef100: RX filter table management and related g=
+ubbins")
+> Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
 
-If this is a common operation, perhaps use a common helper from all drivers=
-,
-this would help code review a bit...
+The patch LGTM, but could you please update the commit message as per
+Simon's suggestions make it more consistent? You can retain Simon's RB
+tag.
+
+Thanks!
+
+Paolo
+
 
