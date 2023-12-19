@@ -1,95 +1,119 @@
-Return-Path: <netdev+bounces-58959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C103818B2A
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:25:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C3FD818B2C
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:25:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB3451F240DD
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:25:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 534051F2416A
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 482EB1CA83;
-	Tue, 19 Dec 2023 15:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19B41C6B3;
+	Tue, 19 Dec 2023 15:25:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C8MIcvgE"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Bzg5gOKN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6761CF96
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 15:25:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so16206a12.0
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 07:25:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702999499; x=1703604299; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Pjiy56oSom/iMHm2sE4LXBH+9WC96Qys/2cGl5n7JwA=;
-        b=C8MIcvgEgwOh8ZwyqlGeT/tJMaebboH4N7YFzo7d01MQTUpbqR69otmVOMYTBc6r21
-         YPVQoR6KoiEzUgRgmxwYYGVNUyeq8XnMqrKQiOXnjAp1D3q0/Rhg6uZ93bVgolJoGefO
-         GeMxEnXMAdnqt5pGqw5xcZyCoVnHbdiK92rubq96RxViycJta7fdclqA1pJn2BQJ40wS
-         k1WsFcgNYOYqHNEx2eP9WJ7zzsNop2yih7yYuCToGU235+2Q6VjNc/nJoTimT/Khq6ur
-         wj1KWZmsSEwcKK6BpGlwchcq7JebwMQc5pbvFGQWhqcOu5Lc+TZK9z1iuzxSuq2MCLf4
-         RxSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702999499; x=1703604299;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Pjiy56oSom/iMHm2sE4LXBH+9WC96Qys/2cGl5n7JwA=;
-        b=rV0hNqq3CZQNGmcBa/bPcRIj63VNC+8spbdVJhOyGjKqfs4bL3tXy0iDzNFhmh43Fx
-         0pK1gI0hchxDHJhBv7/LmNNFXUY1yl8J1w2HWYqgqmUajIZFJ3dFkjdzslV0uCm33ATs
-         m59ImjmZElYcIx9gt7gVBPJctMMfbz6zzG4u8/Fa1MRmgsVboQAc8+o5VOsRcoNMAcXG
-         G9PSu4n90iVeSBGnQAv0+aZAw6RHNMeBkM/tTc4Pub4F5lifGf2tQY4IKgOwuFJCG9tE
-         ava5UHV9rjH204FlfZED8/VMx43nbRS3bMp5GP73/zui+uQQ2z+69JKocrNflNOR3TCx
-         HM0w==
-X-Gm-Message-State: AOJu0Yz2SEJ7RtAwWo/Hvj4g4gptArTEsUeaU2cPLB/3mYlO4XO8+XVe
-	Ltt5z8aPBQAM8tzNhnpVvu+u0hWkStCEnAoj4xSaHpXYmFo3
-X-Google-Smtp-Source: AGHT+IGhHMKP1ciOvkntkZerJl/tZMNFwCOwNhOz+taLmSDqsDFSJAgpy21LnL4K0ONP8hPib+v5buBr9p3rZuieKi4=
-X-Received: by 2002:a50:d616:0:b0:553:5578:2fc9 with SMTP id
- x22-20020a50d616000000b0055355782fc9mr166450edi.5.1702999498786; Tue, 19 Dec
- 2023 07:24:58 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933AE1CA88;
+	Tue, 19 Dec 2023 15:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BJDWS5G001797;
+	Tue, 19 Dec 2023 15:25:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=RcKcDrB1hs/i3VF5GVWi4TmC2CSiOkBqWt3RLoIoTsQ=;
+ b=Bzg5gOKNqitFmy7vfJ9RMsDlNFHDs+sOw2lWCNy2FGcMo2HCfmB0dYJu5jaOoN4L8Buc
+ 49FgbCgCif0/gyBfoiXCKWZIQ6lkq6PTYw2/3DLnU0ZuRuwNWOe1M8o3RWt4H1jPGq1n
+ Eyny9A4I94TE8esL2d6XHJVMY+5NyWtCdvT+8Y190Fno2x/fGuUhZ7F7L/YzQvOpwozL
+ tj6fyzczZ8esw2IZpqE2zIG7uCYCprLTk8zSGRNH78n4/uW4BTK2XL3FaUmQXZiMnLGI
+ 7NfPVOCtIpka3qJVrrjjoqnHw4uOI7dxcVWXcSyH0DdoC+6jJgpYCbFjoQBCfJnmaFm6 zw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v3c52u689-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Dec 2023 15:25:19 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BJErslP014769;
+	Tue, 19 Dec 2023 15:25:19 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v3c52u678-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Dec 2023 15:25:19 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BJD0r36010870;
+	Tue, 19 Dec 2023 15:25:17 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3v1q7ngjvh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Dec 2023 15:25:17 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BJFPEv013894268
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 19 Dec 2023 15:25:14 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 82E9F20043;
+	Tue, 19 Dec 2023 15:25:14 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C5C0F20040;
+	Tue, 19 Dec 2023 15:25:13 +0000 (GMT)
+Received: from [9.179.0.97] (unknown [9.179.0.97])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 19 Dec 2023 15:25:13 +0000 (GMT)
+Message-ID: <8ab61ee331b8087b8a26a2a38b3ae0c72cc31bb0.camel@linux.ibm.com>
+Subject: Re: [PATCH] icuv: make iucv_bus const
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, wintera@linux.ibm.com,
+        wenjia@linux.ibm.com
+Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org
+Date: Tue, 19 Dec 2023 16:25:13 +0100
+In-Reply-To: <2023121950-prankster-stomp-a1aa@gregkh>
+References: <2023121950-prankster-stomp-a1aa@gregkh>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231219001833.10122-1-kuniyu@amazon.com> <20231219001833.10122-7-kuniyu@amazon.com>
-In-Reply-To: <20231219001833.10122-7-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 19 Dec 2023 16:24:47 +0100
-Message-ID: <CANn89iKCKBx+pWFP8OWDz+caNmt0X45N2x+vo9AaNBLJFAwcAQ@mail.gmail.com>
-Subject: Re: [PATCH RESEND v2 net-next 06/12] tcp: Link bhash2 to bhash.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: posuTIFkQp8GRJgX1Bndj_RLuxyNur2h
+X-Proofpoint-ORIG-GUID: C9vaImxA8fX9KFkH9iUT5YeLqQ4ESDQi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-19_08,2023-12-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ impostorscore=0 suspectscore=0 mlxscore=0 bulkscore=0 adultscore=0
+ priorityscore=1501 spamscore=0 mlxlogscore=696 phishscore=0 malwarescore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2312190115
 
-On Tue, Dec 19, 2023 at 1:21=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> bhash2 added a new member sk_bind2_node in struct sock to link
-> sockets to bhash2 in addition to bhash.
->
-> bhash is still needed to search conflicting sockets efficiently
-> from a port for the wildcard address.  However, bhash itself need
-> not have sockets.
->
-> If we link each bhash2 bucket to the corresponding bhash bucket,
-> we can iterate the same set of the sockets from bhash2 via bhash.
->
-> This patch links bhash2 to bhash only, and the actual use will be
-> in the later patches.  Finally, we will remove sk_bind2_node.
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+On Tue, 2023-12-19 at 16:07 +0100, Greg Kroah-Hartman wrote:
+> Now that the driver core can properly handle constant struct bus_type,
+> move the iucv_bus variable to be a constant structure as well, placing
+> it into read-only memory which can not be modified at runtime.
+>=20
+> Cc: Alexandra Winter <wintera@linux.ibm.com>
+> Cc: Wenjia Zhang <wenjia@linux.ibm.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: linux-s390@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> ---
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Nit: There seems to be a typo in the subject line s/icuv/iucv/
 
