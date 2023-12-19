@@ -1,131 +1,199 @@
-Return-Path: <netdev+bounces-58880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A606D818734
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 13:16:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75106818748
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 13:20:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCCD71C22FAF
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:16:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6EE1B22F70
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:20:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E3A3168DF;
-	Tue, 19 Dec 2023 12:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03380171C3;
+	Tue, 19 Dec 2023 12:20:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="RAneCU9w"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ew76LuJ4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF5A199CA
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 12:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-28b62c6317dso1120228a91.0
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 04:16:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4BD1802D;
+	Tue, 19 Dec 2023 12:20:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a2340c803c6so317307966b.0;
+        Tue, 19 Dec 2023 04:20:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1702988199; x=1703592999; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pdERbfWd8axs3o2A8KOivOOsBTH7eU7jDtQCQU5TR64=;
-        b=RAneCU9wXoqkp9sJKB3vJwk+9/S5DscO15PpEqNV94MOxjOqcGkbmJq92FLtm07lf1
-         btXH/h2kapHoettWj7tXmDhw8BybJ3HwzCFMIYT3KB0nAAR1TwaP96hFHo0vF9GsGt+w
-         SMjITtrm39RTTdE/UTAmaNAu6Fee/tYjvknt3QHI5vYw2HiTc5d0mUDpgNidFidPUUR3
-         2DVAxwx3hZ1Opa9qTJl64XXAQvgzGSezCQPKoomV/OTK6Pt6gX71ng0zBC0FVrR3xUqC
-         2vdZ4Toauj1JoRWM48Ba+HC3+dJNA6VFdA8yn7HIhjdmQIyLIvy23etcwNDXmP3k9WTD
-         8NsA==
+        d=gmail.com; s=20230601; t=1702988437; x=1703593237; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=l6TxmZzSrla4vvXDQC7Cn74njvru9m/j+6El3HghLS4=;
+        b=Ew76LuJ4whOny86D5q8FcStaWDAWlWbWeASoT3VZRE0jCGZhc3RmcN8Y1cagCHVwZp
+         zFbkWs4VtdLwC63WMXXomtVvXkK4c5nuvG1hih8FXzH25DPmdIsPPpgK2L9uC9qdx1ma
+         Wo0gjsPvLA0SNGEMF3c84O9DkifBSypf7IM4hF7WMsKwOV6N1kvbldTSOunPL6F/hzmt
+         79PHchHebXMJpHSk3A8pxXxfgsTUAngdzBdXmyL5X1BaEg9bX7re3/792To+NustZZZY
+         JH8ZzJy57lcSVXpt3joCqOhXJoAMvAEqW3dvtXSSb9CWy5/9X9Q0caJR6q5QK+sQEOWe
+         ao+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702988199; x=1703592999;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pdERbfWd8axs3o2A8KOivOOsBTH7eU7jDtQCQU5TR64=;
-        b=ZBs1RZa8HF0KMaoi8O6S900Ome2HDt8w/6psC3icGW4JshBOsfvTON0NEF7hfZoBvd
-         0Yx8oyu5b8hFvOOrDPy3NbzrAg4KyUMZyk2r6So8tm/6UlZnVDYKxoYbnS2GVf5y4Y0E
-         ZP2lpnY6zjluvY/7isAluACncyupAZvwEMzPagV6syuR7eQddXPc7HN2eNSeEE/PIOYj
-         dzejuEproNVn/JfyEMWQDzF+p4xzK6ORTOqL54LjqS6WWeXf3BZm88Jl39jAf0dSCIZg
-         07qDr49JeXzd+8jzjxGzXzbLORhasdcg+iEHXxjrXAdyklgJ92I2At4w4S5AKQqs/O8w
-         SpmA==
-X-Gm-Message-State: AOJu0Yxx4XQbbsqJn9zeTiBbz3ZO0TqE+LvpbzE7QFYi9ffPTy4UDBWH
-	nY+Nc8tfdhweM+Y7qyi1nJj7jQ==
-X-Google-Smtp-Source: AGHT+IFYjl+Fut6DF10AvB+rC8c9j309BtUc82beTcI2OpnuUGu9er2HNCKWhRNTJ7qi3gFQPi0b+g==
-X-Received: by 2002:a17:90a:303:b0:28a:f0bc:2a9f with SMTP id 3-20020a17090a030300b0028af0bc2a9fmr2996731pje.21.1702988199587;
-        Tue, 19 Dec 2023 04:16:39 -0800 (PST)
-Received: from [157.82.205.15] ([157.82.205.15])
-        by smtp.gmail.com with ESMTPSA id g15-20020a17090a4b0f00b0028bb87b2378sm1385953pjh.49.2023.12.19.04.16.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Dec 2023 04:16:39 -0800 (PST)
-Message-ID: <87ae3eae-84b4-40eb-a637-b65161bdc1ed@daynix.com>
-Date: Tue, 19 Dec 2023 21:16:32 +0900
+        d=1e100.net; s=20230601; t=1702988437; x=1703593237;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l6TxmZzSrla4vvXDQC7Cn74njvru9m/j+6El3HghLS4=;
+        b=wex245zs0S6J8HJFymv2Z7oIe6SuhawGnTSdis0tGGUHOxVeulhaA3FRKjzaKyUYpq
+         iAEEUP7FNes0Qadklxm+LCGbKErUsgbQFHcf5uw/c0ovoZr/DGSL1XeTj5XTtuKOCnQF
+         3keTEERkx5X6j6dc5psKqG0YxTibZKaIxBexiMqP5YjhaE0Y+Hc7q6HHhLKeNzw7EC5G
+         0i566ZoZMRrcMmA/Pwc+ErX7YcsILhG0jxh25OrVhZfxtfiGLU1FWyM+rjmpbLt4os4o
+         wLxNjPK4JYM+OUMwhP5pgGRZsxED4JWpkWTeeN3ZSUAJtNUhd+HqeSnwuC3UYLesD/tJ
+         EwNA==
+X-Gm-Message-State: AOJu0YyZUa6dMswQ6O8ItfCiY4CEpI7RaYGuSeEXhRydj6vWa3qtziDM
+	59+4BVPLs1iXXA0Jyr6yrNU=
+X-Google-Smtp-Source: AGHT+IEF85zDgPhfMUFpTsLoXGcLUVBLjiYkSXZm9jyM0zEWCF6zNqlV9cTbyQPPvo84zRJXC5qRFg==
+X-Received: by 2002:a17:906:b0d4:b0:a1d:7792:cdbe with SMTP id bk20-20020a170906b0d400b00a1d7792cdbemr7007558ejb.146.1702988437094;
+        Tue, 19 Dec 2023 04:20:37 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id lm11-20020a17090718cb00b00a1cf3fce937sm15284866ejc.162.2023.12.19.04.20.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Dec 2023 04:20:36 -0800 (PST)
+Date: Tue, 19 Dec 2023 14:20:34 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Sylvain Girard <sylvain.girard@se.com>,
+	Pascal EBERHARD <pascal.eberhard@se.com>,
+	Richard Tresidder <rtresidd@electromag.com.au>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
+Subject: Re: [PATCH net 1/1] net: stmmac: Prevent DSA tags from breaking COE
+Message-ID: <20231219122034.pg2djgrosa4irubh@skbuf>
+References: <20231218162326.173127-1-romain.gantois@bootlin.com>
+ <20231218162326.173127-2-romain.gantois@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Should I add BPF kfuncs for userspace apps? And how?
-Content-Language: en-US
-To: Song Liu <song@kernel.org>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
- Jason Wang <jasowang@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, Yuri Benditovich
- <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>,
- Benjamin Tissoires <bentiss@kernel.org>, bpf <bpf@vger.kernel.org>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, kvm@vger.kernel.org,
- LKML <linux-kernel@vger.kernel.org>,
- virtualization@lists.linux-foundation.org,
- "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
- Network Development <netdev@vger.kernel.org>
-References: <2f33be45-fe11-4b69-8e89-4d2824a0bf01@daynix.com>
- <CAPhsuW6=-FK+ysh_Q1H7ana=A6v9d0Rsn+2hpJpm5n2dB_A1Qg@mail.gmail.com>
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CAPhsuW6=-FK+ysh_Q1H7ana=A6v9d0Rsn+2hpJpm5n2dB_A1Qg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231218162326.173127-2-romain.gantois@bootlin.com>
 
-On 2023/12/19 4:56, Song Liu wrote:
-> Hi Akihiko,
+Hi Romain,
+
+On Mon, Dec 18, 2023 at 05:23:23PM +0100, Romain Gantois wrote:
+> Some stmmac cores have Checksum Offload Engines that cannot handle DSA tags
+> properly. These cores find the IP/TCP headers on their own and end up
+> computing an incorrect checksum when a DSA tag is inserted between the MAC
+> header and IP header.
 > 
-> On Tue, Dec 12, 2023 at 12:05 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>
-> [...]
->> ---
->>
->> I'm working on a new feature that aids virtio-net implementations using
->> tuntap virtual network device. You can see [1] for details, but
->> basically it's to extend BPF_PROG_TYPE_SOCKET_FILTER to report four more
->> bytes.
+> Add an additional check on stmmac link up so that COE is deactivated
+> when the stmmac device is used as a DSA conduit.
 > 
-> AFAICT, [1] adds a new program type, which is really hard to ship. However,
-> you mentioned it is basically "extend BPF_PROG_TYPE_SOCKET_FILTER to
-> report four more bytes", which confuses me.
+> Add a new dma_feature flag to allow cores to signal that their COEs can't
+> handle DSA tags on TX.
 > 
-> Can we achieve the same goal by extending BPF_PROG_TYPE_SOCKET_FILTER
-> (without adding a new program type)? Does this require extending
-> __sk_buff, which
-> is also not an option any more?
+> Fixes: 6b2c6e4a938f ("net: stmmac: propagate feature flags to vlan")
+> Cc: stable@vger.kernel.org
+> Reported-by: Richard Tresidder <rtresidd@electromag.com.au>
+> Closes: https://lore.kernel.org/netdev/e5c6c75f-2dfa-4e50-a1fb-6bf4cdb617c2@electromag.com.au/
+> Reported-by: Romain Gantois <romain.gantois@bootlin.com>
+> Closes: https://lore.kernel.org/netdev/c57283ed-6b9b-b0e6-ee12-5655c1c54495@bootlin.com/
+> Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
+> ---
 
-It is certainly possible to achieve the same result by extending 
-BPF_PROG_TYPE_SOCKET_FILTER.
+DSA_TAG_PROTO_LAN9303, DSA_TAG_PROTO_SJA1105 and DSA_TAG_PROTO_SJA1110
+construct tags with ETH_P_8021Q as EtherType. Do you still think it
+would be correct to say that all DSA tags break COE on the stmmac, as
+this patch assumes?
 
-It is not required to extend __sk_buff; we can repurpose the cb member. 
-But I think such an API will be error-prone than new members dedicated 
-for this particular purpose.
+The NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM convention is not about
+statically checking whether the interface using DSA, but about looking
+at each packet before deciding whether to use the offload engine or to
+call skb_checksum_help().
 
-Regards,
-Akihiko Odaki
+You can experiment with any tagging protocol on the stmmac driver, and
+thus with the controller's response to any kind of traffic, even if the
+port is not attached to a hardware switch. You need to enable the
+CONFIG_NET_DSA_LOOP option, edit the return value of dsa_loop_get_protocol()
+and the "netdev" field of dsa_loop_pdata. The packets need to be
+analyzed on the link partner with a packet analysis tool, since there is
+no switch to strip the DSA tag.
+
+>  drivers/net/ethernet/stmicro/stmmac/common.h     |  1 +
+>  .../net/ethernet/stmicro/stmmac/dwmac1000_dma.c  |  1 +
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c    | 16 +++++++++++++++-
+>  3 files changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> index daf79cdbd3ec..50686cdc3320 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> @@ -264,6 +264,7 @@ static int dwmac1000_get_hw_feature(void __iomem *ioaddr,
+>  	dma_cap->number_tx_channel = (hw_cap & DMA_HW_FEAT_TXCHCNT) >> 22;
+>  	/* Alternate (enhanced) DESC mode */
+>  	dma_cap->enh_desc = (hw_cap & DMA_HW_FEAT_ENHDESSEL) >> 24;
+> +	dma_cap->dsa_breaks_tx_coe = 1;
+>  
+>  	return 0;
+>  }
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index a9b6b383e863..733348c65e04 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -42,6 +42,7 @@
+>  #include <net/page_pool/helpers.h>
+>  #include <net/pkt_cls.h>
+>  #include <net/xdp_sock_drv.h>
+> +#include <net/dsa.h>
+>  #include "stmmac_ptp.h"
+>  #include "stmmac.h"
+>  #include "stmmac_xdp.h"
+> @@ -993,8 +994,11 @@ static void stmmac_mac_link_up(struct phylink_config *config,
+>  			       int speed, int duplex,
+>  			       bool tx_pause, bool rx_pause)
+>  {
+> -	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
+> +	struct net_device *ndev = to_net_dev(config->dev);
+> +	struct stmmac_priv *priv = netdev_priv(ndev);
+> +	unsigned int tx_queue_cnt;
+>  	u32 old_ctrl, ctrl;
+> +	int queue;
+>  
+>  	if ((priv->plat->flags & STMMAC_FLAG_SERDES_UP_AFTER_PHY_LINKUP) &&
+>  	    priv->plat->serdes_powerup)
+> @@ -1102,6 +1106,16 @@ static void stmmac_mac_link_up(struct phylink_config *config,
+>  
+>  	if (priv->plat->flags & STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY)
+>  		stmmac_hwtstamp_correct_latency(priv, priv);
+> +
+> +	/* DSA tags break COEs on some cores. Disable TX checksum
+> +	 * offloading on those cores if the netdevice is a DSA conduit.
+> +	 */
+> +	if (priv->dma_cap.dsa_breaks_tx_coe && netdev_uses_dsa(ndev)) {
+> +		tx_queue_cnt = priv->plat->tx_queues_to_use;
+> +		for (queue = 0; queue < tx_queue_cnt; queue++)
+> +			priv->plat->tx_queues_cfg[queue].coe_unsupported = true;
+> +	}
+> +
+
+The DSA switch driver can load after stmmac_mac_link_up() runs.
+This implementation is racy anyway.
+
+>  }
+>  
+>  static const struct phylink_mac_ops stmmac_phylink_mac_ops = {
+> -- 
+> 2.43.0
+> 
+> 
+
+pw-bot: cr
 
