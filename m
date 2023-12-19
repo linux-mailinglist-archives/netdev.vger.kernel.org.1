@@ -1,120 +1,113 @@
-Return-Path: <netdev+bounces-58957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F078D818B1E
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:24:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64A12818B23
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:24:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CD2FB221CE
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:24:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19E791F23A29
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:24:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 336751C68E;
-	Tue, 19 Dec 2023 15:23:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 767731C6BE;
+	Tue, 19 Dec 2023 15:24:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="D7+iiYBo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KGq+7Uh+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252321CA91;
-	Tue, 19 Dec 2023 15:23:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BJFMmsY005041;
-	Tue, 19 Dec 2023 15:23:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=OjDSW67WfOHNYepERi2F4vGTbKkUTWV7AvtejFbFzoE=;
- b=D7+iiYBocTfjcTadmJeolJolk9pb8W5gGpAtlC9eG86ZGWJA/v4SGa6Xh2NC7dqKsHfR
- UlDH06osgD30u367G+JzyWxhZF2Pz1+KjFQoOj+ZyFN6sMRFqjUvE752Xs1hg1weOpQX
- d7QUXr5pxydfSZ9D7RYrqC/dGH0B2ZJieCJsWngt0iocw5l2v5dhPgZjL692rsGzaVhg
- RMT2MyoYQNvmqq/KQRbFDN9hsGGvSnF0fVHsAeA4175ifoIQgXkPtbs7pGIWY/7B9FQK
- IGQ0NOSscLVfWd6sPsGBn+788vwYJBSmkQzsZAAEkIf1BlP7JSCCsbP6myvFOqqPGExH 1A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v3dmn852q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Dec 2023 15:23:47 +0000
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BJFNlkN008798;
-	Tue, 19 Dec 2023 15:23:47 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v3dmn851r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Dec 2023 15:23:47 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BJDM8ag010900;
-	Tue, 19 Dec 2023 15:23:46 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3v1q7ngjjs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Dec 2023 15:23:46 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BJFNi4h44368316
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 19 Dec 2023 15:23:44 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5548D20043;
-	Tue, 19 Dec 2023 15:23:44 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 14C1520040;
-	Tue, 19 Dec 2023 15:23:44 +0000 (GMT)
-Received: from [9.152.224.160] (unknown [9.152.224.160])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 19 Dec 2023 15:23:44 +0000 (GMT)
-Message-ID: <21124441-d57b-46d4-8926-dedf7d2485d2@linux.ibm.com>
-Date: Tue, 19 Dec 2023 16:23:43 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD651CAB6
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 15:24:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702999443;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qqy3wtKu2RpMhAf44zdAjTFEaoDT5QKe4xFKMUw3+5k=;
+	b=KGq+7Uh+tzMBFzLaFya2x9HcOZULEXmNhx9+lf8owxd8JjbocATb5d+C/K9XVONYXl+nLp
+	wAvs6H+ruPosqOBwZHfH8oCBrKKyf3lyNVlmZi/eXhqhnUjp3hjvPDaVhNcV1lkRs4xEiw
+	i12neOqqBeCP2cRZ+S4BE4AHhBj5kpY=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-226-v79DN1shP0mnWI1ol4PFGg-1; Tue, 19 Dec 2023 10:24:02 -0500
+X-MC-Unique: v79DN1shP0mnWI1ol4PFGg-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a232f069e60so29942166b.1
+        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 07:24:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702999441; x=1703604241;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qqy3wtKu2RpMhAf44zdAjTFEaoDT5QKe4xFKMUw3+5k=;
+        b=IJcROrL1gjjL4bCncCjb61p+615PDCHLnpZMDvuS138f3hvirrSEZ2Qj5uC3JVrYnq
+         MX8vkAMATv+vuweJtgQc7ZAhR5iRI35wZGi8GhNMZkcfL6Qtl3gh8nQ/SfEdaWbrQba2
+         Ssanjxguens+ODT09CKpyKOuDiwLmsjhYmWZZr54223EKw7i0YudRWyk/fmaHZzz1UL0
+         llXAOhpjLzhKSkSLqmLthZhB9EolsOGKpHu5sYsQKMUWX5qJTXtoLaBNEUd9c2sU7QHq
+         KgKA9y+is03gubqpyqgjwEjbrda1w3D/0dYYgxEcQEgYZGKWQ7cqmVlRYkSFhjMHoPX1
+         WSTw==
+X-Gm-Message-State: AOJu0YzpLmG5d9qr8KXe4inxT1+HWDYqOugBSR/C4gJQ91Dnhq+gGxmG
+	zXzYdlm+cenMjx/8Lqvwjp1+yqYaJqVNcOyZorDT+6YBrweOAnz4sUhiWTxNCfc+ZWEeU1YPF43
+	S9kuBCOQpQyXLcGgX
+X-Received: by 2002:a17:906:354e:b0:a23:58f9:e1e3 with SMTP id s14-20020a170906354e00b00a2358f9e1e3mr3600141eja.2.1702999441089;
+        Tue, 19 Dec 2023 07:24:01 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFd0dgWBJVckg8y4NbbSgoLWG04HdfE6jM/KTshFzIrCjgjsrKQx/VS4FbrtGGixICTTdPZ4w==
+X-Received: by 2002:a17:906:354e:b0:a23:58f9:e1e3 with SMTP id s14-20020a170906354e00b00a2358f9e1e3mr3600131eja.2.1702999440790;
+        Tue, 19 Dec 2023 07:24:00 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-246-245.dyn.eolo.it. [146.241.246.245])
+        by smtp.gmail.com with ESMTPSA id jw11-20020a17090776ab00b00a2358b0fa03sm2574203ejc.194.2023.12.19.07.23.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Dec 2023 07:24:00 -0800 (PST)
+Message-ID: <c49124012f186e06a4a379b060c85e4cca1a9d53.camel@redhat.com>
+Subject: Re: [PATCH v5 net-next 1/3] net: introduce page_pool pointer in
+ softnet_data percpu struct
+From: Paolo Abeni <pabeni@redhat.com>
+To: Ilias Apalodimas <ilias.apalodimas@linaro.org>, hawk@kernel.org
+Cc: lorenzo.bianconi@redhat.com, davem@davemloft.net, kuba@kernel.org, 
+	edumazet@google.com, bpf@vger.kernel.org, toke@redhat.com, 
+	willemdebruijn.kernel@gmail.com, jasowang@redhat.com, sdf@google.com, 
+	netdev@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Tue, 19 Dec 2023 16:23:58 +0100
+In-Reply-To: <b1432fc51c694f1be8daabb19773744fcee13cf1.1702563810.git.lorenzo@kernel.org>
+References: <cover.1702563810.git.lorenzo@kernel.org>
+	 <b1432fc51c694f1be8daabb19773744fcee13cf1.1702563810.git.lorenzo@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] icuv: make iucv_bus const
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, wenjia@linux.ibm.com
-Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org
-References: <2023121950-prankster-stomp-a1aa@gregkh>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <2023121950-prankster-stomp-a1aa@gregkh>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Rn_94nL-4GRqZWWVvHjyJ_6GpxjrfHM8
-X-Proofpoint-ORIG-GUID: l5lIv2UJc5DrTxWxvfRCfMp55OCb-7sp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-19_08,2023-12-14_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- phishscore=0 mlxlogscore=644 lowpriorityscore=0 malwarescore=0
- suspectscore=0 spamscore=0 priorityscore=1501 mlxscore=0 clxscore=1011
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2312190115
 
-
-
-On 19.12.23 16:07, Greg Kroah-Hartman wrote:
-> Now that the driver core can properly handle constant struct bus_type,
-> move the iucv_bus variable to be a constant structure as well, placing
-> it into read-only memory which can not be modified at runtime.
-> 
-> Cc: Alexandra Winter <wintera@linux.ibm.com>
-> Cc: Wenjia Zhang <wenjia@linux.ibm.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: linux-s390@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+On Thu, 2023-12-14 at 15:29 +0100, Lorenzo Bianconi wrote:
+> Allocate percpu page_pools in softnet_data.
+> Moreover add cpuid filed in page_pool struct in order to recycle the
+> page in the page_pool "hot" cache if napi_pp_put_page() is running on
+> the same cpu.
+> This is a preliminary patch to add xdp multi-buff support for xdp running
+> in generic mode.
+>=20
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 > ---
+>  include/linux/netdevice.h       |  1 +
+>  include/net/page_pool/helpers.h |  5 +++++
+>  include/net/page_pool/types.h   |  1 +
+>  net/core/dev.c                  | 39 ++++++++++++++++++++++++++++++++-
+>  net/core/page_pool.c            |  5 +++++
+>  net/core/skbuff.c               |  5 +++--
+>  6 files changed, 53 insertions(+), 3 deletions(-)
 
-Acked-by: Alexandra Winter <wintera@linux.ibm.com>
+@Jesper, @Ilias: could you please have a look at the pp bits?
+
+Thanks!
+
+Paolo
+
 
