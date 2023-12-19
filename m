@@ -1,101 +1,131 @@
-Return-Path: <netdev+bounces-58870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EDD98186CC
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 13:00:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A606D818734
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 13:16:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B76A41F246AE
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:00:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCCD71C22FAF
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819F815E95;
-	Tue, 19 Dec 2023 11:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E3A3168DF;
+	Tue, 19 Dec 2023 12:16:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="owi3TJxZ"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="RAneCU9w"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5984F1CF83;
-	Tue, 19 Dec 2023 11:59:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3CF6C433C7;
-	Tue, 19 Dec 2023 11:59:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702987198;
-	bh=Slc/Za9XYBMhPi7UfoEhTPhvfB8X5HymBGZAjUc/RO8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=owi3TJxZmRC2AiSyycVpF7FIucUKejgeWXDjtkjs2seIG4auDL8f/V4/Gqy4pBI8P
-	 JnjpxtYFkDxDTdQBYwe6D7FcTllZ8pFxa+BBeqhN8eY6ExPtPbQnOJVDMtA/ANXIv3
-	 +XW27BH/NAYTyIOtyYhyNJArjbA1gnPmvO52JhMGE9NJMXbtu0B5cvyu9xr7vuxs3S
-	 GH9TA14JlWX+Oz3lalq0HpKDCsHFVUq+Dn6/P7ldEIKLESji+60E2HDdPyD6EgFBDQ
-	 Dsn/UeoYqXOWUJ/jy5jH9qatodlw94CGyvxaEll7WEdhGQ4qdA5Gpd7xsaLFM1yxpd
-	 3/jYNY4JOQnCg==
-Date: Tue, 19 Dec 2023 11:59:52 +0000
-From: Simon Horman <horms@kernel.org>
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: wintera@linux.ibm.com, wenjia@linux.ibm.com, hca@linux.ibm.com,
-	gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	kgraul@linux.ibm.com, jaka@linux.ibm.com, borntraeger@linux.ibm.com,
-	svens@linux.ibm.com, alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com, raspl@linux.ibm.com,
-	schnelle@linux.ibm.com, guangguan.wang@linux.alibaba.com,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v7 07/10] net/smc: compatible with 128-bits
- extended GID of virtual ISM device
-Message-ID: <20231219115952.GL811967@kernel.org>
-References: <20231219084536.8158-1-guwen@linux.alibaba.com>
- <20231219084536.8158-8-guwen@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF5A199CA
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 12:16:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-28b62c6317dso1120228a91.0
+        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 04:16:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1702988199; x=1703592999; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pdERbfWd8axs3o2A8KOivOOsBTH7eU7jDtQCQU5TR64=;
+        b=RAneCU9wXoqkp9sJKB3vJwk+9/S5DscO15PpEqNV94MOxjOqcGkbmJq92FLtm07lf1
+         btXH/h2kapHoettWj7tXmDhw8BybJ3HwzCFMIYT3KB0nAAR1TwaP96hFHo0vF9GsGt+w
+         SMjITtrm39RTTdE/UTAmaNAu6Fee/tYjvknt3QHI5vYw2HiTc5d0mUDpgNidFidPUUR3
+         2DVAxwx3hZ1Opa9qTJl64XXAQvgzGSezCQPKoomV/OTK6Pt6gX71ng0zBC0FVrR3xUqC
+         2vdZ4Toauj1JoRWM48Ba+HC3+dJNA6VFdA8yn7HIhjdmQIyLIvy23etcwNDXmP3k9WTD
+         8NsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702988199; x=1703592999;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pdERbfWd8axs3o2A8KOivOOsBTH7eU7jDtQCQU5TR64=;
+        b=ZBs1RZa8HF0KMaoi8O6S900Ome2HDt8w/6psC3icGW4JshBOsfvTON0NEF7hfZoBvd
+         0Yx8oyu5b8hFvOOrDPy3NbzrAg4KyUMZyk2r6So8tm/6UlZnVDYKxoYbnS2GVf5y4Y0E
+         ZP2lpnY6zjluvY/7isAluACncyupAZvwEMzPagV6syuR7eQddXPc7HN2eNSeEE/PIOYj
+         dzejuEproNVn/JfyEMWQDzF+p4xzK6ORTOqL54LjqS6WWeXf3BZm88Jl39jAf0dSCIZg
+         07qDr49JeXzd+8jzjxGzXzbLORhasdcg+iEHXxjrXAdyklgJ92I2At4w4S5AKQqs/O8w
+         SpmA==
+X-Gm-Message-State: AOJu0Yxx4XQbbsqJn9zeTiBbz3ZO0TqE+LvpbzE7QFYi9ffPTy4UDBWH
+	nY+Nc8tfdhweM+Y7qyi1nJj7jQ==
+X-Google-Smtp-Source: AGHT+IFYjl+Fut6DF10AvB+rC8c9j309BtUc82beTcI2OpnuUGu9er2HNCKWhRNTJ7qi3gFQPi0b+g==
+X-Received: by 2002:a17:90a:303:b0:28a:f0bc:2a9f with SMTP id 3-20020a17090a030300b0028af0bc2a9fmr2996731pje.21.1702988199587;
+        Tue, 19 Dec 2023 04:16:39 -0800 (PST)
+Received: from [157.82.205.15] ([157.82.205.15])
+        by smtp.gmail.com with ESMTPSA id g15-20020a17090a4b0f00b0028bb87b2378sm1385953pjh.49.2023.12.19.04.16.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Dec 2023 04:16:39 -0800 (PST)
+Message-ID: <87ae3eae-84b4-40eb-a637-b65161bdc1ed@daynix.com>
+Date: Tue, 19 Dec 2023 21:16:32 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231219084536.8158-8-guwen@linux.alibaba.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: Should I add BPF kfuncs for userspace apps? And how?
+Content-Language: en-US
+To: Song Liu <song@kernel.org>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, Yuri Benditovich
+ <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>,
+ Benjamin Tissoires <bentiss@kernel.org>, bpf <bpf@vger.kernel.org>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, kvm@vger.kernel.org,
+ LKML <linux-kernel@vger.kernel.org>,
+ virtualization@lists.linux-foundation.org,
+ "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+ Network Development <netdev@vger.kernel.org>
+References: <2f33be45-fe11-4b69-8e89-4d2824a0bf01@daynix.com>
+ <CAPhsuW6=-FK+ysh_Q1H7ana=A6v9d0Rsn+2hpJpm5n2dB_A1Qg@mail.gmail.com>
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CAPhsuW6=-FK+ysh_Q1H7ana=A6v9d0Rsn+2hpJpm5n2dB_A1Qg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 19, 2023 at 04:45:33PM +0800, Wen Gu wrote:
-> According to virtual ISM support feature defined by SMCv2.1, GIDs of
-> virtual ISM device are UUIDs defined by RFC4122, which are 128-bits
-> long. So some adaptation work is required. And note that the GIDs of
-> existing platform firmware ISM devices still remain 64-bits long.
+On 2023/12/19 4:56, Song Liu wrote:
+> Hi Akihiko,
 > 
-> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+> On Tue, Dec 12, 2023 at 12:05 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+> [...]
+>> ---
+>>
+>> I'm working on a new feature that aids virtio-net implementations using
+>> tuntap virtual network device. You can see [1] for details, but
+>> basically it's to extend BPF_PROG_TYPE_SOCKET_FILTER to report four more
+>> bytes.
+> 
+> AFAICT, [1] adds a new program type, which is really hard to ship. However,
+> you mentioned it is basically "extend BPF_PROG_TYPE_SOCKET_FILTER to
+> report four more bytes", which confuses me.
+> 
+> Can we achieve the same goal by extending BPF_PROG_TYPE_SOCKET_FILTER
+> (without adding a new program type)? Does this require extending
+> __sk_buff, which
+> is also not an option any more?
 
-...
+It is certainly possible to achieve the same result by extending 
+BPF_PROG_TYPE_SOCKET_FILTER.
 
-> @@ -1023,9 +1041,12 @@ smcd_clc_prep_confirm_accept(struct smc_connection *conn,
->  	if (version == SMC_V1) {
->  		clc->hdr.length = htons(SMCD_CLC_ACCEPT_CONFIRM_LEN);
->  	} else {
-> -		clc->d1.chid = htons(smc_ism_get_chid(smcd));
-> +		chid = smc_ism_get_chid(smcd);
-> +		clc->d1.chid = htons(chid);
->  		if (eid && eid[0])
->  			memcpy(clc->d1.eid, eid, SMC_MAX_EID_LEN);
-> +		if (__smc_ism_is_virtual(chid))
-> +			clc->d1.gid_ext = htonll(smcd_gid.gid_ext);
+It is not required to extend __sk_buff; we can repurpose the cb member. 
+But I think such an API will be error-prone than new members dedicated 
+for this particular purpose.
 
-Hi Wen Gu,
-
-The type of clc->d1.gid_ext is u64 (host byte-order)
-but here it is being assigned a big endian value.
-This does not seem correct.
-
-Flagged by Smatch.
-
->  		len = SMCD_CLC_ACCEPT_CONFIRM_LEN_V2;
->  		if (first_contact) {
->  			*fce_len = smc_clc_fill_fce_v2x(fce_v2x, ini);
-
-...
-
--- 
-pw-bot: changes-requested
+Regards,
+Akihiko Odaki
 
