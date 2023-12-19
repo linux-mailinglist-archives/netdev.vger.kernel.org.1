@@ -1,159 +1,93 @@
-Return-Path: <netdev+bounces-58742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 856F6817F29
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 02:11:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED895817F2E
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 02:14:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F1C2285668
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 01:11:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C5F11F230BB
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 01:14:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EA0A7F8;
-	Tue, 19 Dec 2023 01:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9319410EF;
+	Tue, 19 Dec 2023 01:14:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="h8ocAtp+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OSyXQljj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 512E110E4
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 01:11:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40c3ceded81so39310495e9.1
-        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 17:11:45 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3814410E4
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 01:14:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-5e248b40c97so32322967b3.2
+        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 17:14:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1702948303; x=1703553103; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hej4AjxanXNrySIhvl+6S8hgAgsJIbBbBmJWQyMfh84=;
-        b=h8ocAtp+qBDlpapTHPqOHFpk1+La8yMvPjGQ0gKoO3crTE0h11ug5NWVOTCRGzhgSS
-         0s6Af+dfTYm/2CVnKe70WFjPi3vUYccPaHl635m8yWyP9Psgivj78vx/Gbv2alEmMebh
-         u9vwwNSBbZwOgZnR5Tz7CZsEh9GigxNuToMAs=
+        d=gmail.com; s=20230601; t=1702948466; x=1703553266; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xtAVnekgmhwpqTIome4g6Wn7kowfqPy/ZN5t6l1+xV8=;
+        b=OSyXQljj+AN6MnNjCerL1o6y9VANyuCtRQy8JVY2UqH1elVXK8zZC4fOnKyo9ADxwf
+         GtCFEIOJMlnuLvrURLvJN0BGgXG8F/fuGVtt6FQE2wUwGCJbroDItEStsVO3ySmOzpQT
+         KlD7AzXfcWQfnZIBJqdrAYlTnjlpMK68azZzrF9AW1QnqSSEXizGZKb+iYnB6i8u5i95
+         l6+TOpylFkdJ7I1Pw+Fx0GSnu8iyGDXmRY5jA9DBZRJO3N5jddQbPabYJqlk0T4zRDma
+         piBLxw7Qgfv3nfar2zyMHW4EWH8dsigIpz1LEnKn6yQrjdmmhe2Z4I4/+62H6UZrtCuF
+         4/sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702948303; x=1703553103;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Hej4AjxanXNrySIhvl+6S8hgAgsJIbBbBmJWQyMfh84=;
-        b=Rya88mB2ZYWGhvBW2z76eMwtP6pm4PQ7yaNCoW29WD19krt1LT/Q7ohiOBYI50s1LN
-         DLBKAZGzdwDVjKR8jwvD2UUhBC8NfX/uIiFLUomlVDfHbiVjjcIIhYRVnk0q/eVj+Hqo
-         QrQy4RQCLWspk8vFqiAoXROTJRu27I3phjuyMQIAypJyB6Cag1F1xfeZR2lNHEbtw6d2
-         RdKmBfVi6dcOdj4csLBFQrfBDnF4R7WOqxSZWmkDZDa0EVYy3dAXrfo6m1O4lQh8RKAp
-         grkpb6Us0+7c/S5Uv9jQANydvaAJJ3VM2CIqbDODT2A/WZzDcfMXpR4mtmYsp0qt3ZzA
-         cvww==
-X-Gm-Message-State: AOJu0YyaSH6IRf32PqAzn5mCGECH9VzQVhF2S/UqLb/IHf3lFVKXGgYO
-	xOj/sF07Q0LUrRgqAQiCNJNYwp0tz6FKp2Go1Wf1SA==
-X-Google-Smtp-Source: AGHT+IEBS285suNPAo201lNPaWxQY+HmaoS4g88wfxn4qWcuvXjhywPZUz+YhXPs3COClG+F4pn4Bg==
-X-Received: by 2002:a05:600c:358d:b0:40d:27d3:8f2c with SMTP id p13-20020a05600c358d00b0040d27d38f2cmr5208wmq.56.1702948303477;
-        Mon, 18 Dec 2023 17:11:43 -0800 (PST)
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com. [209.85.221.50])
-        by smtp.gmail.com with ESMTPSA id vu3-20020a170907a64300b00a1cd9627474sm14658708ejc.44.2023.12.18.17.11.42
-        for <netdev@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1702948466; x=1703553266;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xtAVnekgmhwpqTIome4g6Wn7kowfqPy/ZN5t6l1+xV8=;
+        b=kulE28YUM4FdeVaf+yXgrPJIJAYOXhFfxDh80Hq/3bwMzguwfvtCSYKEokrWF81C6u
+         sB3sCojr0KfG5QizOYPFuRMYz7NAY1iFhzQ6niq600gCd30055ib+wINio8v+yHjJOhL
+         gHj9J/dIsdOBI4GPzgP4MJX65/aK8Oegef0ilw5Ba3n6beEXg+UaoGSn74lQeTw7C78u
+         p+cMbT91t+YHbHPYvJeD4pmdkljWUL5Xiel6duBpyBXJta5wDZPE/T79tiUmA8P3b7xf
+         K/BUo5e9q5eJRaTD0WNvtgAgGoIW8y3IJjjOOOG8yN9txor0lEe/V01wpXQ3k6iXVEmW
+         VHpw==
+X-Gm-Message-State: AOJu0YyUf3P7exKOqdZmmEEjh46lVa8exPOGpWqKMAaN884EbY65sfp4
+	L/k9MEhTvKvy8QAm9w+M4eb5Am0kIJE=
+X-Google-Smtp-Source: AGHT+IG7/kEDmBbiTLZocLu0aOm5yVzAsXRtrUg0rzKcOjSNVE629CETeHDGc6IYABXRWaxnO8Zonw==
+X-Received: by 2002:a0d:dc81:0:b0:5d7:1940:f3d6 with SMTP id f123-20020a0ddc81000000b005d71940f3d6mr13482928ywe.62.1702948466044;
+        Mon, 18 Dec 2023 17:14:26 -0800 (PST)
+Received: from ?IPV6:2600:1700:6cf8:1240:e84:899c:4b9b:a70e? ([2600:1700:6cf8:1240:e84:899c:4b9b:a70e])
+        by smtp.gmail.com with ESMTPSA id eq17-20020a05690c2d1100b005e181bc7d2esm6316631ywb.54.2023.12.18.17.14.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Dec 2023 17:11:42 -0800 (PST)
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-32f8441dfb5so3782523f8f.0
-        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 17:11:42 -0800 (PST)
-X-Received: by 2002:a05:600c:511a:b0:405:37bb:d942 with SMTP id
- o26-20020a05600c511a00b0040537bbd942mr8221931wms.4.1702948301548; Mon, 18 Dec
- 2023 17:11:41 -0800 (PST)
+        Mon, 18 Dec 2023 17:14:25 -0800 (PST)
+Message-ID: <a289e845-f244-48a4-ba75-34ce027c0de4@gmail.com>
+Date: Mon, 18 Dec 2023 17:14:24 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231219000520.34178-1-alexei.starovoitov@gmail.com>
-In-Reply-To: <20231219000520.34178-1-alexei.starovoitov@gmail.com>
-From: Linus Torvalds <torvalds@linuxfoundation.org>
-Date: Mon, 18 Dec 2023 17:11:23 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wg7JuFYwGy=GOMbRCtOL+jwSQsdUaBsRWkDVYbxipbM5A@mail.gmail.com>
-Message-ID: <CAHk-=wg7JuFYwGy=GOMbRCtOL+jwSQsdUaBsRWkDVYbxipbM5A@mail.gmail.com>
-Subject: Re: pull-request: bpf-next 2023-12-18
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, daniel@iogearbox.net, andrii@kernel.org, 
-	peterz@infradead.org, brauner@kernel.org, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org, kernel-team@fb.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/ipv6: Revert remove expired routes with a
+ separated list of routes
+Content-Language: en-US
+To: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
+Cc: edumazet@google.com, Kui-Feng Lee <thinker.li@gmail.com>
+References: <20231217185505.22867-1-dsahern@kernel.org>
+From: Kui-Feng Lee <sinquersw@gmail.com>
+In-Reply-To: <20231217185505.22867-1-dsahern@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 18 Dec 2023 at 16:05, Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> 2) Introduce BPF token object, from Andrii Nakryiko.
 
-I assume this is why I and some other unusual recipients are cc'd,
-because the networking people feel like they can't judge this and
-shouldn't merge non-networking code like this.
 
-Honestly, I was told - and expected - that this part would come in a
-branch of its own, so that it would be sanely reviewable.
+On 12/17/23 10:55, David Ahern wrote:
+> Revert the remainder of 5a08d0065a915 which added a warn on if a fib
+> entry is still on the gc_link list, and then revert  all of the commit
+> in the Fixes tag. The commit has some race conditions given how expires
+> is managed on a fib6_info in relation to timer start, adding the entry
+> to the gc list and setting the timer value leading to UAF. Revert
+> the commit and try again in a later release.
 
-Now it's mixed in with everything else.
-
-This is *literally* why we have branches in git, so that people can
-make more independent changes and judgements, and so that we don't
-have to be in a situation where "look, here's ten different things,
-pull it all or nothing".
-
-Many of the changes *look* like they are in branches, but they've been
-the "fake branches" that are just done as "patch series in a branch,
-with the cover letter as the merge message".
-
-Which is great for maintaining that cover letter information and a
-certain amount of historical clarity, but not helpful AT ALL for the
-"independent changes" thing when it is all mixed up in history, where
-independent things are mostly serialized and not actually independent
-in history at all.
-
-So now it appears to be one big mess, and exactly that "all or
-nothing" thing that isn't great, since the whole point was that the
-networking people weren't comfortable with the reviewing filesystem
-side.
-
-And honestly, the bpf side *still* seems to be absolutely conbfused
-and complkete crap when it comes to file descriptors.
-
-I took a quick look, and I *still* see new code being introduced there
-that thinks that file descriptor zero is special, and we tols you a
-*year* ago that that wasn't true, and that you need to fix this.
-
-I literally see complete garbage like tghis:
-
-        ..
-        __u32 btf_token_fd;
-        ...
-        if (attr->btf_token_fd) {
-                token = bpf_token_get_from_fd(attr->btf_token_fd);
-
-and this is all *new* code that makes that same bogus sh*t-for-brains
-mistake that was wrong the first time.
-
-So now I'm saying NAK. Enough is enough.  No more of this crazy "I
-don't understand even the _basics_ of file descriptors, and yet I'm
-introducing new random interfaces".
-
-I know you thought fd zero was something invalid. You were told
-otherwise. Apparently you just ignored being wrong, and have decided
-to double down on being wrong.
-
-We don't take this kind of flat-Earther crap.
-
-File descriptors don't start at 1. Deal with reality. Stop making the
-same mistake over and over. If you ant to have a "no file descriptor"
-flag, you use a signed type, and a signed value for that, because file
-descriptor zero is perfectly valid, and I don't want to hear any more
-uninformed denialism.
-
-Stop polluting the kernel with incorrect assumptions.
-
-So yes, I will keep NAK'ing this until this kind of fundamental
-mistake is fixed. This is not rocket science, and this is not
-something that wasn't discussed before. Your ignorance has now turned
-from "I didn't know" to "I didn 't care", and at that point I really
-don't want to see new code any more.
-
-               Linus
+May I know what your concerns are about the patch I provided?
+Even I try it again later, I still need to know what I miss and should
+address.
 
