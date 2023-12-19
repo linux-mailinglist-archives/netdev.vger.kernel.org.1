@@ -1,142 +1,118 @@
-Return-Path: <netdev+bounces-58997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB48C818E0F
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 18:27:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D9C2818E2C
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 18:32:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BF571C20E72
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 17:27:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53A42286514
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 17:32:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6172225A5;
-	Tue, 19 Dec 2023 17:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DF9B22EF2;
+	Tue, 19 Dec 2023 17:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iGUtjMxO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tjPJ7AQy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3020036AEA
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 17:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1d3ea8d0f9dso32135ad.1
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 09:27:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1703006859; x=1703611659; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UdBXHobU/TDJkZyR8l3Y3KrInvE9xX6bF3D3uGhwm88=;
-        b=iGUtjMxOKhHRHLdb4Ivi53xjL/Iru7ZW/uMHRUB6gVhNlWgKsk1956IJ3tj4uznkEy
-         doegLK9lscrQM4ZAZHbo1KiCw3D+Trb7UwBa4q0f7wDqTzWBbMEE7iq6XOl0ixPmA+3Y
-         XitK52NpzO8W6t+Z7G8IOGVO8RoeGAbsw+Y+PAY5iC8UrhvZ/9fHZTWFzQ6pl7BXaUBA
-         w8Wv/Uj0q/1mYOwmTHAXJfsFDacBsMjew5LSob+1wEK0IpcAuOXkgZpNnBWZx+waN5vL
-         WIgtIws5DuNbOky2cu62ooyEv6KcL5Q8pu9dEiHptQok0rGTRLZwknq7Bn4jtArEZERw
-         EWmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703006859; x=1703611659;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UdBXHobU/TDJkZyR8l3Y3KrInvE9xX6bF3D3uGhwm88=;
-        b=vOMjCwpLE2BxNCYl+7ntLe/VugVLZXQVIA1hACuGdD2imc4yg/0l2FEibbYwDKRE0e
-         Td3hRkGSGt2IfTxrLgN3ojqqo1xr/goMIDpGCDEyCihI8W+d8yrt8JkgXE/+NRm5T9gh
-         qaPptxLtYNRPypEU/ioD5o08XGFO8KcigYyWVYKz6bLBT8jIyx6SXfiMqjGXSTm0tRya
-         Cqlg7Y/iKo31WJ7ie31JcvJ2x/LsIY0Ah/JAEGQVmcAZW4DFPHTPHNSbHJBLwD6GRc3v
-         svE9nMIoO01mikXktLHDZaGoVKCHse7GdQI2UW1bmCQylhjSoBOlaghUNH4vdfxhJKf+
-         yIgg==
-X-Gm-Message-State: AOJu0Yz+vP/yDOecQXQsF1kjPOxiQiyKIst20Y3BSsHNB0tyOVxbe1q2
-	jji9UvVoBJbtmO95KPKcxsJ+fn9BXYx4i5z/3pze3ltjAgEB
-X-Google-Smtp-Source: AGHT+IGixb9h/6OmozmM25gvtdpu7j71DlG4O9g5PVgtzDGnD2/Nd968UnfjYfedN5Vcl4WrP6WiADKs98SeHLycHzE=
-X-Received: by 2002:a17:902:cec6:b0:1d3:ce75:a696 with SMTP id
- d6-20020a170902cec600b001d3ce75a696mr211169plg.5.1703006859127; Tue, 19 Dec
- 2023 09:27:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F16837D08;
+	Tue, 19 Dec 2023 17:32:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B3FEC433C7;
+	Tue, 19 Dec 2023 17:32:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703007155;
+	bh=DOLY6rWmqh5ec0k9/aGUb6iYDuhsCvDc9FcVXRqGXm4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tjPJ7AQyB069VymZHh3C1d/6yI3kNKO1rlQSK0aQhGEFqUitPJlnxGqWupu8g1RZy
+	 lZs635rpWABVBGTNxfMl09sax+fbBUJ2fUCAAa77MkhVxbIculES3iUEMK2zyLKc+q
+	 04g90wUmD3iof+0tOyTYK92MOs8CazWjav/9DA/lP9Il7wX1FspTWTNo8h48KktKti
+	 cjuMEtb5Rs5UzIUSLotj7plo5xgCtYvKGveZVw6eno1iUEnQO7GJxIMAxCvAjsY0B7
+	 dRhOHEZrYy8dQ0vmhBjrtqTQrPaGwVSvOhI3xPOWVoPhwRGxw6c0PGkl863m05QFR8
+	 ahtIEWe5pafRw==
+Date: Tue, 19 Dec 2023 18:32:31 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, lorenzo.bianconi@redhat.com,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	bpf@vger.kernel.org, hawk@kernel.org, toke@redhat.com,
+	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	sdf@google.com
+Subject: Re: [PATCH v5 net-next 1/3] net: introduce page_pool pointer in
+ softnet_data percpu struct
+Message-ID: <ZYHTr-26328RpBDf@lore-desk>
+References: <cover.1702563810.git.lorenzo@kernel.org>
+ <b1432fc51c694f1be8daabb19773744fcee13cf1.1702563810.git.lorenzo@kernel.org>
+ <CANn89iKytnOU3_mR2RidXE74ad3x9QdWxGf+OZei4tpL8Wvcbw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231214020530.2267499-1-almasrymina@google.com>
- <20231214020530.2267499-3-almasrymina@google.com> <20231215185159.7bada9a7@kernel.org>
- <CAHS8izMcFWu7zSuX9q8QgVNLiOiE5RKsb_yh5LoTKA1K8FUu1w@mail.gmail.com>
- <84787af3-aa5e-4202-8578-7a9f14283d87@kernel.org> <CAHS8izOeCdA+WVRYbieTqaCyadARsOpYttAXh7Lhu-B7RC3Tmg@mail.gmail.com>
- <20231218140645.461169a7@kernel.org> <CAHS8izOZ3c_3hretPBhowW5u-o5r4+WBeG3VVg_k32PUhAZqHA@mail.gmail.com>
-In-Reply-To: <CAHS8izOZ3c_3hretPBhowW5u-o5r4+WBeG3VVg_k32PUhAZqHA@mail.gmail.com>
-From: Shakeel Butt <shakeelb@google.com>
-Date: Tue, 19 Dec 2023 09:27:27 -0800
-Message-ID: <CALvZod6oCPk1tJLyffGJ1acJvo7wG72ymm8AePnGi=T=h4sehw@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v1 2/4] net: introduce abstraction for
- network memory
-To: Mina Almasry <almasrymina@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Michael Chan <michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Wei Fang <wei.fang@nxp.com>, 
-	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
-	NXP Linux Team <linux-imx@nxp.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
-	Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, 
-	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Marcin Wojtas <mw@semihalf.com>, 
-	Russell King <linux@armlinux.org.uk>, Sunil Goutham <sgoutham@marvell.com>, 
-	Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, 
-	hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, 
-	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Jassi Brar <jaswinder.singh@linaro.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
-	Ravi Gunasekaran <r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>, 
-	Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, 
-	Ronak Doshi <doshir@vmware.com>, VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, 
-	Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>, 
-	Kalle Valo <kvalo@kernel.org>, Juergen Gross <jgross@suse.com>, 
-	Stefano Stabellini <sstabellini@kernel.org>, 
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
-	Jason Gunthorpe <jgg@nvidia.com>, Yunsheng Lin <linyunsheng@huawei.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="CbQoNBFBfWs13DN6"
+Content-Disposition: inline
+In-Reply-To: <CANn89iKytnOU3_mR2RidXE74ad3x9QdWxGf+OZei4tpL8Wvcbw@mail.gmail.com>
+
+
+--CbQoNBFBfWs13DN6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 18, 2023 at 2:39=E2=80=AFPM Mina Almasry <almasrymina@google.co=
-m> wrote:
->
-[...]
+> On Thu, Dec 14, 2023 at 3:30=E2=80=AFPM Lorenzo Bianconi <lorenzo@kernel.=
+org> wrote:
 > >
-> > You didn't address my feedback :|
+> > Allocate percpu page_pools in softnet_data.
+> > Moreover add cpuid filed in page_pool struct in order to recycle the
+> > page in the page_pool "hot" cache if napi_pp_put_page() is running on
+> > the same cpu.
+> > This is a preliminary patch to add xdp multi-buff support for xdp runni=
+ng
+> > in generic mode.
 > >
-> > struct netmem which contains struct page by value is almost as bad
-> > as passing around pretend struct page pointers.
->
-> Sorry about that. I misread your original request as 'here is
-> something else you can do if you want', not something that you feel is
-> critical. Honestly I missed the subtlety and the approaches seemed
-> roughly equivalent to me. I will respin after the 24hr cooldown.
->
+> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > ---
+> >  include/linux/netdevice.h       |  1 +
+> >  include/net/page_pool/helpers.h |  5 +++++
+> >  include/net/page_pool/types.h   |  1 +
+> >  net/core/dev.c                  | 39 ++++++++++++++++++++++++++++++++-
+> >  net/core/page_pool.c            |  5 +++++
+> >  net/core/skbuff.c               |  5 +++--
+> >  6 files changed, 53 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> > index 1b935ee341b4..30b6a3f601fe 100644
+> > --- a/include/linux/netdevice.h
+> > +++ b/include/linux/netdevice.h
+> > @@ -3319,6 +3319,7 @@ struct softnet_data {
+> >         int                     defer_count;
+> >         int                     defer_ipi_scheduled;
+> >         struct sk_buff          *defer_list;
+> > +       struct page_pool        *page_pool;
+> >         call_single_data_t      defer_csd;
+> >  };
+>=20
+> This field should be put elsewhere, not in this contended cache line.
 
-Jakub's suggestion aligns more with the encoded_page approach as well,
-so let's proceed with that. Waiting for your respin.
+ack, I think we could add a percpu dedicated pointer for it.
+
+Regards,
+Lorenzo
+
+--CbQoNBFBfWs13DN6
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZYHTrwAKCRA6cBh0uS2t
+rBAFAP4ijVWyw72BYaRqhg68zQNqUWJ+kMkRtWwAsGew9NjQmgEAqGpMs7dKz4YQ
+V6jwoyX9cgiJcBC2j7/htNO/0C11Tgc=
+=lP2u
+-----END PGP SIGNATURE-----
+
+--CbQoNBFBfWs13DN6--
 
