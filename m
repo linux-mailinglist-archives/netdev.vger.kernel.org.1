@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-58765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A95A818090
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 05:31:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21E1D818097
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 05:33:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7CAB280F36
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 04:31:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2F561C2031F
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 04:33:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27C1010E4;
-	Tue, 19 Dec 2023 04:31:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DEDA80A;
+	Tue, 19 Dec 2023 04:33:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vqvhVnMO"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="U/Qzq7dT"
 X-Original-To: netdev@vger.kernel.org
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED277468;
-	Tue, 19 Dec 2023 04:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B1F11C88;
+	Tue, 19 Dec 2023 04:33:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
 	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=Yl1i0HhmIul/to3qVQu3Rd551a5SvQG/1lxtOIMQiUE=; b=vqvhVnMOOUf3joM0ZR+ZT2MS1A
-	qlkJDZeIm7DU+VxeZLWtMEfXS7Uiw3tpmSYAneXMjp2zf3HTqHUBCvX/tLwqiMDkEbO0rmrKS8BXn
-	5TqFZkJ6VBQshh3hiSZ6RyKVhpwHundEoIKD9dExkqummhZMHCT2rliXpa+9394Gj1D9SrKwFbuks
-	tSXctmLqR/m6VwhEkWQl9uX8nUhRQSAO+82Z4bNhZOdTS2Y5pmG+UUBz/YNWd9LmO7RtGJ1IOyD/x
-	+DVYMHtRTE6fJh+uR2nL4NoErD4vpj4Xb+QUfNsQm0rre4Ki//yTvElJnQNsaXlbwaoMO75cwVw+r
-	Hr8MOTgQ==;
+	bh=TUfuyA2HikIciWYw2DWYWO3QHNpsWLvhYHuMp80PSzY=; b=U/Qzq7dTOUjuDqjUtTxylXhfM4
+	XROpWSUBRP2XyNyOmQFUz7hc8/jrRmAlvsEqARcGxrmQzAAAEMo0S4BhJa2qD8/kT5DoQWadkWP6P
+	bjlYuD8RRoVTdxoBZ7992qopBaFuYVva1pLHotOUt3h5roAL6pqWID/opGjGak68jxpZ+UlNlMDKx
+	hJrGoeqHNKNZ7NQytTOH1/zEJEyKH/duJHtU3E/EVucv2bH0IPYb+C8GbfL9+oaCOnhkez2NOiFh7
+	sS9ViVjq2QRSJ+EBWFM5E5jK3qqCBVa3JIQrZb+A9TjlQ0jigJOpz6hliwwj3fpUCz9mHeTzAOOzZ
+	bOL1TrhQ==;
 Received: from [50.53.46.231] (helo=[192.168.254.15])
 	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1rFRlU-00CneJ-3D;
-	Tue, 19 Dec 2023 04:31:33 +0000
-Message-ID: <62d80fec-8de4-4719-b244-86b26954d723@infradead.org>
-Date: Mon, 18 Dec 2023 20:31:31 -0800
+	id 1rFRn0-00CneJ-0j;
+	Tue, 19 Dec 2023 04:33:06 +0000
+Message-ID: <d3acd1e8-54fa-4523-95ec-b971d318e003@infradead.org>
+Date: Mon, 18 Dec 2023 20:33:05 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,55 +45,97 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: skbuff: Remove some excess struct-member
- documentation
+Subject: Re: [PATCH] tipc: Remove some excess struct member documentation
 Content-Language: en-US
-To: Jonathan Corbet <corbet@lwn.net>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <87cyv3javh.fsf@meer.lwn.net>
+To: Jonathan Corbet <corbet@lwn.net>, Jon Maloy <jmaloy@redhat.com>,
+ Ying Xue <ying.xue@windriver.com>
+Cc: netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+ linux-kernel@vger.kernel.org
+References: <878r5rjasi.fsf@meer.lwn.net>
 From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <87cyv3javh.fsf@meer.lwn.net>
+In-Reply-To: <878r5rjasi.fsf@meer.lwn.net>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
-On 12/18/23 16:26, Jonathan Corbet wrote:
-> Remove documentation for nonexistent structure members, addressing these
+On 12/18/23 16:28, Jonathan Corbet wrote:
+> Remove documentation for nonexistent struct members, addressing these
 > warnings:
 > 
->   ./include/linux/skbuff.h:1063: warning: Excess struct member 'sp' description in 'sk_buff'
->   ./include/linux/skbuff.h:1063: warning: Excess struct member 'nf_bridge' description in 'sk_buff'
+>   ./net/tipc/link.c:228: warning: Excess struct member 'media_addr' description in 'tipc_link'
+>   ./net/tipc/link.c:228: warning: Excess struct member 'timer' description in 'tipc_link'
+>   ./net/tipc/link.c:228: warning: Excess struct member 'refcnt' description in 'tipc_link'
+>   ./net/tipc/link.c:228: warning: Excess struct member 'proto_msg' description in 'tipc_link'
+>   ./net/tipc/link.c:228: warning: Excess struct member 'pmsg' description in 'tipc_link'
+>   ./net/tipc/link.c:228: warning: Excess struct member 'backlog_limit' description in 'tipc_link'
+>   ./net/tipc/link.c:228: warning: Excess struct member 'exp_msg_count' description in 'tipc_link'
+>   ./net/tipc/link.c:228: warning: Excess struct member 'reset_rcv_checkpt' description in 'tipc_link'
+>   ./net/tipc/link.c:228: warning: Excess struct member 'transmitq' description in 'tipc_link'
+>   ./net/tipc/link.c:228: warning: Excess struct member 'snt_nxt' description in 'tipc_link'
+>   ./net/tipc/link.c:228: warning: Excess struct member 'deferred_queue' description in 'tipc_link'
+>   ./net/tipc/link.c:228: warning: Excess struct member 'unacked_window' description in 'tipc_link'
+>   ./net/tipc/link.c:228: warning: Excess struct member 'next_out' description in 'tipc_link'
+>   ./net/tipc/link.c:228: warning: Excess struct member 'long_msg_seq_no' description in 'tipc_link'
+>   ./net/tipc/link.c:228: warning: Excess struct member 'bc_rcvr' description in 'tipc_link'
 > 
 > Signed-off-by: Jonathan Corbet <corbet@lwn.net>
+
 
 Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
 Thanks.
 
 > ---
->  include/linux/skbuff.h | 2 --
->  1 file changed, 2 deletions(-)
+>  net/tipc/link.c | 15 ---------------
+>  1 file changed, 15 deletions(-)
 > 
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index 27998f73183e..1cdab90a10a2 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -742,7 +742,6 @@ typedef unsigned char *sk_buff_data_t;
->   *	@dev_scratch: (aka @dev) alternate use of @dev when @dev would be %NULL
->   *	@cb: Control buffer. Free for use by every layer. Put private vars here
->   *	@_skb_refdst: destination entry (with norefcount bit)
-> - *	@sp: the security path, used for xfrm
->   *	@len: Length of actual data
->   *	@data_len: Data length
->   *	@mac_len: Length of link layer header
-> @@ -776,7 +775,6 @@ typedef unsigned char *sk_buff_data_t;
->   *	@tcp_tsorted_anchor: list structure for TCP (tp->tsorted_sent_queue)
->   *	@_sk_redir: socket redirection information for skmsg
->   *	@_nfct: Associated connection, if any (with nfctinfo bits)
-> - *	@nf_bridge: Saved data about a bridged frame - see br_netfilter.c
->   *	@skb_iif: ifindex of device we arrived on
->   *	@tc_index: Traffic control index
->   *	@hash: the packet hash
+> diff --git a/net/tipc/link.c b/net/tipc/link.c
+> index d0143823658d..0716eb5c8a31 100644
+> --- a/net/tipc/link.c
+> +++ b/net/tipc/link.c
+> @@ -82,10 +82,7 @@ struct tipc_stats {
+>   * struct tipc_link - TIPC link data structure
+>   * @addr: network address of link's peer node
+>   * @name: link name character string
+> - * @media_addr: media address to use when sending messages over link
+> - * @timer: link timer
+>   * @net: pointer to namespace struct
+> - * @refcnt: reference counter for permanent references (owner node & timer)
+>   * @peer_session: link session # being used by peer end of link
+>   * @peer_bearer_id: bearer id used by link's peer endpoint
+>   * @bearer_id: local bearer id used by link
+> @@ -94,31 +91,19 @@ struct tipc_stats {
+>   * @state: current state of link FSM
+>   * @peer_caps: bitmap describing capabilities of peer node
+>   * @silent_intv_cnt: # of timer intervals without any reception from peer
+> - * @proto_msg: template for control messages generated by link
+> - * @pmsg: convenience pointer to "proto_msg" field
+>   * @priority: current link priority
+>   * @net_plane: current link network plane ('A' through 'H')
+>   * @mon_state: cookie with information needed by link monitor
+> - * @backlog_limit: backlog queue congestion thresholds (indexed by importance)
+> - * @exp_msg_count: # of tunnelled messages expected during link changeover
+> - * @reset_rcv_checkpt: seq # of last acknowledged message at time of link reset
+>   * @mtu: current maximum packet size for this link
+>   * @advertised_mtu: advertised own mtu when link is being established
+> - * @transmitq: queue for sent, non-acked messages
+>   * @backlogq: queue for messages waiting to be sent
+> - * @snt_nxt: next sequence number to use for outbound messages
+>   * @ackers: # of peers that needs to ack each packet before it can be released
+>   * @acked: # last packet acked by a certain peer. Used for broadcast.
+>   * @rcv_nxt: next sequence number to expect for inbound messages
+> - * @deferred_queue: deferred queue saved OOS b'cast message received from node
+> - * @unacked_window: # of inbound messages rx'd without ack'ing back to peer
+>   * @inputq: buffer queue for messages to be delivered upwards
+>   * @namedq: buffer queue for name table messages to be delivered upwards
+> - * @next_out: ptr to first unsent outbound message in queue
+>   * @wakeupq: linked list of wakeup msgs waiting for link congestion to abate
+> - * @long_msg_seq_no: next identifier to use for outbound fragmented messages
+>   * @reasm_buf: head of partially reassembled inbound message fragments
+> - * @bc_rcvr: marks that this is a broadcast receiver link
+>   * @stats: collects statistics regarding link activity
+>   * @session: session to be used by link
+>   * @snd_nxt_state: next send seq number
 
 -- 
 #Randy
