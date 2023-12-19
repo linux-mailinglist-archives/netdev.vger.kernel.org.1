@@ -1,111 +1,140 @@
-Return-Path: <netdev+bounces-59022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ACE1818FD9
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 19:36:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 939B3818FDF
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 19:40:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10CE92870C8
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 18:36:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38C3C1F23175
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 18:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 497EC1DDDF;
-	Tue, 19 Dec 2023 18:36:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VCFFYINl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 980621E4AA;
+	Tue, 19 Dec 2023 18:40:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E0A638FB3
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 18:36:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703010991;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v47UTmHzAdl2Nt8HKA6jp1il3Lpc0GyKxIVnJREGniE=;
-	b=VCFFYINlSC8B9VqE5Pvedsb4Z376BYQtkxncEGEiuMJU7RAOC7cCLhOCQgkwFFSE6SXuO2
-	mxQuxdvRucg3viWk0jIwSL+3EqFdRYV3f/mSwhERGCWgbcRERpZ0yMRjSGxejCApNGBDeS
-	dr7G3IN2nqAFfoJNGkVyJbk932oA4II=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-609-S0KfxSKQPt-q_IvgayRTwQ-1; Tue, 19 Dec 2023 13:36:29 -0500
-X-MC-Unique: S0KfxSKQPt-q_IvgayRTwQ-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3366dcb20e0so1091126f8f.2
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 10:36:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703010988; x=1703615788;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v47UTmHzAdl2Nt8HKA6jp1il3Lpc0GyKxIVnJREGniE=;
-        b=GOOyA4sr7l/UCxN4atbNy9j/BASKIZuPLlG+ljv3UXaycpgnkqZ246t/kT+hqsj+BZ
-         PgjO/UDhKc5PSxqJxIWTzKKhslA8NVavK8ajkySHjABFciFFvKUIltHQW9IeHKT8+TOL
-         gM0uIMaFU96drGF1iyRW9JCNOB/iEWCDqQkLmI4PnsvHKxabfwaGW+gvAc+PLzoKWtUS
-         nMCI2ocWS1LSfh2vsYraDRsgw9o8wz0ZsTZ0oDprZjLozDmI3VLvzlWH9madfCSIerDq
-         xHgBssra4xVXBJoAzwJjoSVUgH84LaaRGy4f9/t6PzBhNhcS/wqt6RylEyui4EYC9Z5j
-         qRLg==
-X-Gm-Message-State: AOJu0Yzxn5afN1NL8c2CRABhoVbZw00aPSTMuUd9DNoXUaoB2d+69vjv
-	szqh2we+ElCJ9vOXesYmFPR1FFZw5TeYLaqDR2ZAMvuaOVLzBaJbYdm3OuZ1+n2QpCsO9b5xeXE
-	mdHqPiYv6svGJTK+K
-X-Received: by 2002:adf:fc43:0:b0:336:73ea:b831 with SMTP id e3-20020adffc43000000b0033673eab831mr846383wrs.50.1703010988639;
-        Tue, 19 Dec 2023 10:36:28 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF7ZDUfdCp8TeJng+VjBTvRf6OjZ70v7Qzcn/FZ5sz+Lbr05EsgZlGNV4j59UjFadCCiaJivQ==
-X-Received: by 2002:adf:fc43:0:b0:336:73ea:b831 with SMTP id e3-20020adffc43000000b0033673eab831mr846375wrs.50.1703010988261;
-        Tue, 19 Dec 2023 10:36:28 -0800 (PST)
-Received: from redhat.com ([2.52.148.230])
-        by smtp.gmail.com with ESMTPSA id p16-20020a5d48d0000000b0033616ea5a0fsm26973853wrs.45.2023.12.19.10.36.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Dec 2023 10:36:26 -0800 (PST)
-Date: Tue, 19 Dec 2023 13:36:22 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Willem de Bruijn <willemb@google.com>
-Subject: Re: [PATCH RFC 1/4] virtio-net: support transmit hash report
-Message-ID: <20231219133545-mutt-send-email-mst@kernel.org>
-References: <20231218-v6-7-topic-virtio-net-ptp-v1-0-cac92b2d8532@pengutronix.de>
- <20231218-v6-7-topic-virtio-net-ptp-v1-1-cac92b2d8532@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2F5A1DDEA;
+	Tue, 19 Dec 2023 18:40:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (178.176.72.19) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 19 Dec
+ 2023 21:40:03 +0300
+Subject: Re: [PATCH net-next v2 10/21] net: ravb: Move delay mode set in the
+ driver's ndo_open API
+To: claudiu beznea <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>,
+	<geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214114600.2451162-11-claudiu.beznea.uj@bp.renesas.com>
+ <421c684d-7092-d7a8-e00a-6abe40c557c5@omp.ru>
+ <58b11076-3e8e-42a0-864f-7ad16abaccd6@tuxon.dev>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <c00db758-54ca-80a9-7ba3-9a6ce61f9224@omp.ru>
+Date: Tue, 19 Dec 2023 21:40:02 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231218-v6-7-topic-virtio-net-ptp-v1-1-cac92b2d8532@pengutronix.de>
+In-Reply-To: <58b11076-3e8e-42a0-864f-7ad16abaccd6@tuxon.dev>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/19/2023 18:21:27
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182235 [Dec 19 2023]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;178.176.72.19:7.4.1,7.7.3;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: {cloud_iprep_silent}
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.72.19
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 12/19/2023 18:26:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 12/19/2023 3:42:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Mon, Dec 18, 2023 at 12:37:08PM +0100, Steffen Trumtrar wrote:
-> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
-> index cc65ef0f3c3e2..698a11f8c6ab9 100644
-> --- a/include/uapi/linux/virtio_net.h
-> +++ b/include/uapi/linux/virtio_net.h
-> @@ -56,6 +56,7 @@
->  #define VIRTIO_NET_F_MQ	22	/* Device supports Receive Flow
->  					 * Steering */
->  #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
-> +#define VIRTIO_NET_F_TX_HASH	  51	/* Driver sends hash report */
->  #define VIRTIO_NET_F_VQ_NOTF_COAL 52	/* Device supports virtqueue notification coalescing */
->  #define VIRTIO_NET_F_NOTF_COAL	53	/* Device supports notifications coalescing */
->  #define VIRTIO_NET_F_GUEST_USO4	54	/* Guest can handle USOv4 in. */
+On 12/17/23 3:49 PM, claudiu beznea wrote:
 
+[...]
+>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>
+>>> Delay parse and set were done in the driver's probe API. As some IP
+>>
+>>    Parsing and setting?
+>>
+>>> variants switch to reset mode (and thus registers' content is lost) when
+>>
+>>    Register.
+>>
+>>> setting clocks (due to module standby functionality) to be able to
+>>> implement runtime PM keep the delay parsing in the driver's probe function
+>>> and move the delay apply function to the driver's ndo_open API.
+>>
+>>    Applying?
+>>
+>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>> [...]
+>>
+>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>>> index 5e01e03e1b43..04eaa1967651 100644
+>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>> [...]
+>>> @@ -1806,6 +1821,8 @@ static int ravb_open(struct net_device *ndev)
+>>>  	if (info->nc_queues)
+>>>  		napi_enable(&priv->napi[RAVB_NC]);
+>>>  
+>>> +	ravb_set_delay_mode(ndev);
+>>> +
+>>
+>>    I suspect this belongs in ravb_dmac_init() now...
+> 
+> I'm confused... Why? To me this seems more like MAC-PHY interface related.
 
-Please make sure to register the feature bit with virtio tc
-to avoid collisions.
+   APSR's full name is AVB-DMAC product specific register. :-)
 
--- 
-MST
+> Though I'm not sure what ravb_dmac_init() purpose is.
 
+   To configure and start the AVB-DMAC, apparently. :-)
+
+[...]
+
+MRB, Sergey
 
