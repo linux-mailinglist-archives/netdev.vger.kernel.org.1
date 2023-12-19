@@ -1,305 +1,327 @@
-Return-Path: <netdev+bounces-58797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1FB08183D0
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 09:48:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 717758183E6
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 09:53:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04CA11C23A13
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 08:48:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD9F51F21D20
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 08:53:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12F8D18036;
-	Tue, 19 Dec 2023 08:46:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2D1D11CB3;
+	Tue, 19 Dec 2023 08:53:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="koAV2O/O"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1969B182A4;
-	Tue, 19 Dec 2023 08:46:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R371e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=22;SR=0;TI=SMTPD_---0VyqJ4yo_1702975561;
-Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VyqJ4yo_1702975561)
-          by smtp.aliyun-inc.com;
-          Tue, 19 Dec 2023 16:46:03 +0800
-From: Wen Gu <guwen@linux.alibaba.com>
-To: wintera@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	hca@linux.ibm.com,
-	gor@linux.ibm.com,
-	agordeev@linux.ibm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kgraul@linux.ibm.com,
-	jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com,
-	svens@linux.ibm.com,
-	alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	raspl@linux.ibm.com,
-	schnelle@linux.ibm.com,
-	guangguan.wang@linux.alibaba.com,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v7 10/10] net/smc: manage system EID in SMC stack instead of ISM driver
-Date: Tue, 19 Dec 2023 16:45:36 +0800
-Message-Id: <20231219084536.8158-11-guwen@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20231219084536.8158-1-guwen@linux.alibaba.com>
-References: <20231219084536.8158-1-guwen@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E076612B60;
+	Tue, 19 Dec 2023 08:53:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BJ6Kjam014499;
+	Tue, 19 Dec 2023 08:52:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=2IjR9WTnZRSKRr83K1HzdaurKy9qc2TXBR1+H/1+Ylw=; b=ko
+	AV2O/OO8D/uxHVWkV/XDCxmax62VWzvwWU2ygVVS8SEN6SjOxMpX1zeuubdza3yH
+	svyHNZ+L5w4RulT3u+15W/vRIA1apVvrVJBZQQ0F+XWFl3sfux+n7foXQkKWGi7f
+	aV19Tcb99NYosJ7VV2Ii5eyakfHl8Vn4fX/vQ2pU/9r3P4ISnwS9ncg581p+VpXY
+	uSwYJG4qwlgNddRsv72NO5cwiKZk1lF6fGmQeYhlhFkrYlNWIIlaVLuFdTAj9WQH
+	1WwIZ+ZhBJvFE5gstw54Tecp2/wzsd8K0AGDRR2ZE3hIXXL0FnZdNRrT5Fg1g0Vf
+	Ojp8E/7CpvNF4SNgdxGQ==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3v35tm8dqg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Dec 2023 08:52:57 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BJ8qtrg020141
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Dec 2023 08:52:55 GMT
+Received: from [10.253.32.162] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Tue, 19 Dec
+ 2023 00:52:51 -0800
+Message-ID: <f01665a8-96cb-4ddc-94d8-7f1811a12a23@quicinc.com>
+Date: Tue, 19 Dec 2023 16:52:48 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 14/14] dt-bindings: net: ar803x: add qca8084 PHY
+ properties
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski@linaro.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <hkallweit1@gmail.com>, <corbet@lwn.net>, <p.zabel@pengutronix.de>,
+        <f.fainelli@gmail.com>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>
+References: <20231215074005.26976-1-quic_luoj@quicinc.com>
+ <20231215074005.26976-15-quic_luoj@quicinc.com>
+ <bdfba8a7-9197-4aae-a7f9-6075a375f60b@linaro.org>
+ <c3391e33-e770-4c61-855e-d90e82b95f75@quicinc.com>
+ <4cb2bd57-f3d3-49f9-9c02-a922fd270572@lunn.ch>
+ <ed0dd288-be8a-4161-a19f-2d4d2d17b3ec@quicinc.com>
+ <ZXxXzm8hP68KrXYs@shell.armlinux.org.uk>
+ <3a40570b-40bf-4609-b1f4-a0a6974accea@quicinc.com>
+ <b5ff9f69-e341-4846-bc5a-ebe636b7a71a@lunn.ch>
+ <27ee13e7-5073-413c-8481-52b92d7c3687@quicinc.com>
+ <b4fe4ac4-9b28-4dba-8287-1af4804eb0be@lunn.ch>
+Content-Language: en-US
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <b4fe4ac4-9b28-4dba-8287-1af4804eb0be@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: kTfYW9S0PLYnargAsECQcv-y7BrqhOMP
+X-Proofpoint-ORIG-GUID: kTfYW9S0PLYnargAsECQcv-y7BrqhOMP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ adultscore=0 spamscore=0 priorityscore=1501 malwarescore=0 mlxlogscore=665
+ impostorscore=0 phishscore=0 mlxscore=0 suspectscore=0 clxscore=1015
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2312190065
 
-The System EID (SEID) is an internal EID that is used by the SMCv2
-software stack that has a predefined and constant value representing
-the s390 physical machine that the OS is executing on. So it should
-be managed by SMC stack instead of ISM driver and be consistent for
-all ISMv2 device (including virtual ISM devices) on s390 architecture.
 
-Suggested-by: Alexandra Winter <wintera@linux.ibm.com>
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-Reviewed-and-tested-by: Wenjia Zhang <wenjia@linux.ibm.com>
-Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
----
- drivers/s390/net/ism.h     |  7 -------
- drivers/s390/net/ism_drv.c | 38 ++++++--------------------------------
- include/linux/ism.h        |  1 -
- include/net/smc.h          |  1 -
- net/smc/smc_ism.c          | 33 ++++++++++++++++++++++++---------
- net/smc/smc_ism.h          |  7 +++++++
- 6 files changed, 37 insertions(+), 50 deletions(-)
 
-diff --git a/drivers/s390/net/ism.h b/drivers/s390/net/ism.h
-index 70c5bbda0fea..047fa6101555 100644
---- a/drivers/s390/net/ism.h
-+++ b/drivers/s390/net/ism.h
-@@ -16,7 +16,6 @@
-  */
- #define ISM_DMB_WORD_OFFSET	1
- #define ISM_DMB_BIT_OFFSET	(ISM_DMB_WORD_OFFSET * 32)
--#define ISM_IDENT_MASK		0x00FFFF
- 
- #define ISM_REG_SBA	0x1
- #define ISM_REG_IEQ	0x2
-@@ -192,12 +191,6 @@ struct ism_sba {
- #define ISM_CREATE_REQ(dmb, idx, sf, offset)		\
- 	((dmb) | (idx) << 24 | (sf) << 23 | (offset))
- 
--struct ism_systemeid {
--	u8	seid_string[24];
--	u8	serial_number[4];
--	u8	type[4];
--};
--
- static inline void __ism_read_cmd(struct ism_dev *ism, void *data,
- 				  unsigned long offset, unsigned long len)
- {
-diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
-index 34dd06324e38..2c8e964425dc 100644
---- a/drivers/s390/net/ism_drv.c
-+++ b/drivers/s390/net/ism_drv.c
-@@ -36,6 +36,7 @@ static struct ism_client *clients[MAX_CLIENTS];	/* use an array rather than */
- 						/* a list for fast mapping  */
- static u8 max_client;
- static DEFINE_MUTEX(clients_lock);
-+static bool ism_v2_capable;
- struct ism_dev_list {
- 	struct list_head list;
- 	struct mutex mutex; /* protects ism device list */
-@@ -443,32 +444,6 @@ int ism_move(struct ism_dev *ism, u64 dmb_tok, unsigned int idx, bool sf,
- }
- EXPORT_SYMBOL_GPL(ism_move);
- 
--static struct ism_systemeid SYSTEM_EID = {
--	.seid_string = "IBM-SYSZ-ISMSEID00000000",
--	.serial_number = "0000",
--	.type = "0000",
--};
--
--static void ism_create_system_eid(void)
--{
--	struct cpuid id;
--	u16 ident_tail;
--	char tmp[5];
--
--	get_cpu_id(&id);
--	ident_tail = (u16)(id.ident & ISM_IDENT_MASK);
--	snprintf(tmp, 5, "%04X", ident_tail);
--	memcpy(&SYSTEM_EID.serial_number, tmp, 4);
--	snprintf(tmp, 5, "%04X", id.machine);
--	memcpy(&SYSTEM_EID.type, tmp, 4);
--}
--
--u8 *ism_get_seid(void)
--{
--	return SYSTEM_EID.seid_string;
--}
--EXPORT_SYMBOL_GPL(ism_get_seid);
--
- static void ism_handle_event(struct ism_dev *ism)
- {
- 	struct ism_event *entry;
-@@ -560,7 +535,9 @@ static int ism_dev_init(struct ism_dev *ism)
- 
- 	if (!ism_add_vlan_id(ism, ISM_RESERVED_VLANID))
- 		/* hardware is V2 capable */
--		ism_create_system_eid();
-+		ism_v2_capable = true;
-+	else
-+		ism_v2_capable = false;
- 
- 	mutex_lock(&ism_dev_list.mutex);
- 	mutex_lock(&clients_lock);
-@@ -665,8 +642,7 @@ static void ism_dev_exit(struct ism_dev *ism)
- 	}
- 	mutex_unlock(&clients_lock);
- 
--	if (SYSTEM_EID.serial_number[0] != '0' ||
--	    SYSTEM_EID.type[0] != '0')
-+	if (ism_v2_capable)
- 		ism_del_vlan_id(ism, ISM_RESERVED_VLANID);
- 	unregister_ieq(ism);
- 	unregister_sba(ism);
-@@ -813,8 +789,7 @@ static int smcd_move(struct smcd_dev *smcd, u64 dmb_tok, unsigned int idx,
- 
- static int smcd_supports_v2(void)
- {
--	return SYSTEM_EID.serial_number[0] != '0' ||
--		SYSTEM_EID.type[0] != '0';
-+	return ism_v2_capable;
- }
- 
- static u64 ism_get_local_gid(struct ism_dev *ism)
-@@ -860,7 +835,6 @@ static const struct smcd_ops ism_ops = {
- 	.signal_event = smcd_signal_ieq,
- 	.move_data = smcd_move,
- 	.supports_v2 = smcd_supports_v2,
--	.get_system_eid = ism_get_seid,
- 	.get_local_gid = smcd_get_local_gid,
- 	.get_chid = smcd_get_chid,
- 	.get_dev = smcd_get_dev,
-diff --git a/include/linux/ism.h b/include/linux/ism.h
-index 9a4c204df3da..5428edd90982 100644
---- a/include/linux/ism.h
-+++ b/include/linux/ism.h
-@@ -86,7 +86,6 @@ int  ism_register_dmb(struct ism_dev *dev, struct ism_dmb *dmb,
- int  ism_unregister_dmb(struct ism_dev *dev, struct ism_dmb *dmb);
- int  ism_move(struct ism_dev *dev, u64 dmb_tok, unsigned int idx, bool sf,
- 	      unsigned int offset, void *data, unsigned int size);
--u8  *ism_get_seid(void);
- 
- const struct smcd_ops *ism_get_smcd_ops(void);
- 
-diff --git a/include/net/smc.h b/include/net/smc.h
-index a0dc1187e96e..c9dcb30e3fd9 100644
---- a/include/net/smc.h
-+++ b/include/net/smc.h
-@@ -73,7 +73,6 @@ struct smcd_ops {
- 			 bool sf, unsigned int offset, void *data,
- 			 unsigned int size);
- 	int (*supports_v2)(void);
--	u8* (*get_system_eid)(void);
- 	void (*get_local_gid)(struct smcd_dev *dev, struct smcd_gid *gid);
- 	u16 (*get_chid)(struct smcd_dev *dev);
- 	struct device* (*get_dev)(struct smcd_dev *dev);
-diff --git a/net/smc/smc_ism.c b/net/smc/smc_ism.c
-index a33f861cf7c1..ac88de2a06a0 100644
---- a/net/smc/smc_ism.c
-+++ b/net/smc/smc_ism.c
-@@ -43,6 +43,27 @@ static struct ism_client smc_ism_client = {
- };
- #endif
- 
-+static void smc_ism_create_system_eid(void)
-+{
-+	struct smc_ism_seid *seid =
-+		(struct smc_ism_seid *)smc_ism_v2_system_eid;
-+#if IS_ENABLED(CONFIG_S390)
-+	struct cpuid id;
-+	u16 ident_tail;
-+	char tmp[5];
-+
-+	memcpy(seid->seid_string, "IBM-SYSZ-ISMSEID00000000", 24);
-+	get_cpu_id(&id);
-+	ident_tail = (u16)(id.ident & SMC_ISM_IDENT_MASK);
-+	snprintf(tmp, 5, "%04X", ident_tail);
-+	memcpy(seid->serial_number, tmp, 4);
-+	snprintf(tmp, 5, "%04X", id.machine);
-+	memcpy(seid->type, tmp, 4);
-+#else
-+	memset(seid, 0, SMC_MAX_EID_LEN);
-+#endif
-+}
-+
- /* Test if an ISM communication is possible - same CPC */
- int smc_ism_cantalk(struct smcd_gid *peer_gid, unsigned short vlan_id,
- 		    struct smcd_dev *smcd)
-@@ -431,14 +452,8 @@ static void smcd_register_dev(struct ism_dev *ism)
- 
- 	mutex_lock(&smcd_dev_list.mutex);
- 	if (list_empty(&smcd_dev_list.list)) {
--		u8 *system_eid = NULL;
--
--		system_eid = smcd->ops->get_system_eid();
--		if (smcd->ops->supports_v2()) {
-+		if (smcd->ops->supports_v2())
- 			smc_ism_v2_capable = true;
--			memcpy(smc_ism_v2_system_eid, system_eid,
--			       SMC_MAX_EID_LEN);
--		}
- 	}
- 	/* sort list: devices without pnetid before devices with pnetid */
- 	if (smcd->pnetid[0])
-@@ -542,10 +557,10 @@ int smc_ism_init(void)
- {
- 	int rc = 0;
- 
--#if IS_ENABLED(CONFIG_ISM)
- 	smc_ism_v2_capable = false;
--	memset(smc_ism_v2_system_eid, 0, SMC_MAX_EID_LEN);
-+	smc_ism_create_system_eid();
- 
-+#if IS_ENABLED(CONFIG_ISM)
- 	rc = ism_register_client(&smc_ism_client);
- #endif
- 	return rc;
-diff --git a/net/smc/smc_ism.h b/net/smc/smc_ism.h
-index 0e5e563099ec..ffff40c30a06 100644
---- a/net/smc/smc_ism.h
-+++ b/net/smc/smc_ism.h
-@@ -16,6 +16,7 @@
- #include "smc.h"
- 
- #define SMC_VIRTUAL_ISM_CHID_MASK	0xFF00
-+#define SMC_ISM_IDENT_MASK		0x00FFFF
- 
- struct smcd_dev_list {	/* List of SMCD devices */
- 	struct list_head list;
-@@ -30,6 +31,12 @@ struct smc_ism_vlanid {			/* VLAN id set on ISM device */
- 	refcount_t refcnt;		/* Reference count */
- };
- 
-+struct smc_ism_seid {
-+	u8 seid_string[24];
-+	u8 serial_number[4];
-+	u8 type[4];
-+};
-+
- struct smcd_dev;
- 
- int smc_ism_cantalk(struct smcd_gid *peer_gid, unsigned short vlan_id,
--- 
-2.32.0.3.g01195cf9f
+On 12/18/2023 5:34 PM, Andrew Lunn wrote:
+>> Thanks Andrew for the proposal.
+>> For the pure PHY chip qca8084, there is no driver to parse the package
+>> level device tree node for common clocks and resets.
+> 
+> So you still have not look at the work Christian is doing. You must
+> work together with Christian. This driver is not going to be accepted
+> unless you do.
+OK, Andrew, i am looking at Christian's patches on at803x.c, and i will
+update qca8084 patches based on Christian's patch set.
 
+> 
+>>>>           ethernet-phy@0 {
+>>>>               compatible = "ethernet-phy-id004d.d180";
+>>>>               reg = <0>;
+>>>>               clocks = <qca8k_nsscc NSS_CC_GEPHY0_SYS_CLK>,
+>>>>               clock-names = <"gephy_sys">;
+>>>>               resets = <&qca8k_nsscc NSS_CC_GEPHY0_SYS_ARES>,
+>>>>                        <&qca8k_nsscc NSS_CC_GEPHY0_ARES>;
+>>>>               reset-names = "gephy_sys", "gephy_soft";
+> 
+> Which of these properties exist for the Pure PHY device? Which exist
+> for the integrated switch? And by that, i mean which are actual pins
+> on the PHY device? We need the device tree binding to list which
+> properties are required for each use case.
+> 
+> 	   Andrew
+
+Hi Andrew,
+For the clocks and resets listed here, only the clock "mdio_master_ahb"
+is dedicated in qca8386, others are needed on the both chips qca8386
+and qca8084.
+
+Here is the DTS example for the clocks and resets working on the
+devices, from the example below, we can get the dedicated clocks
+and resets for each MDIO device and package level device.
+
+The DTS properties in the "qcom,phy-common" should be initialized by
+the first PHY probe function, and only being initialized one time.
+
+phy0: ethernet-phy@0 { 
+
+         compatible = "ethernet-phy-id004d.d180"; 
+
+         reg = <1>;
+
+         /* Package level configs, applicable on qca8386 and qca8081. */ 
+
+         phy-common-config { 
+
+                 qcom,phy-addr-fixup = <1 2 3 4 5 6 7>; 
+
+                 qcom,phy-work-mode = <2>; 
+
+                 clocks = <&qca8k_nsscc NSS_CC_APB_BRIDGE_CLK>, 
+
+                        <&qca8k_nsscc NSS_CC_AHB_CLK>, 
+
+                        <&qca8k_nsscc NSS_CC_SEC_CTRL_AHB_CLK>, 
+
+                        <&qca8k_nsscc NSS_CC_TLMM_CLK>, 
+
+                        <&qca8k_nsscc NSS_CC_TLMM_AHB_CLK>, 
+
+                        <&qca8k_nsscc NSS_CC_CNOC_AHB_CLK>, 
+
+                        <&qca8k_nsscc NSS_CC_MDIO_AHB_CLK>; 
+
+ 
+
+                 clock-names = "apb_bridge", 
+
+                         "ahb", 
+
+                         "sec_ctrl_ahb", 
+
+                         "tlmm", 
+
+                         "tlmm_ahb", 
+
+                         "cnoc_ahb", 
+
+                         "mdio_ahb"; 
+
+ 
+
+                 resets = <&qca8k_nsscc NSS_CC_DSP_ARES>; 
+
+                 reset-names = "gephy_dsp"; 
+
+ 
+
+                 ethernet-ports { 
+
+                         /* clocks and resets for pcs0. */ 
+
+                         pcs0 {
+                                 clocks = <&qca8k_nsscc 
+NSS_CC_SRDS0_SYS_CLK>;
+                                 clock-names = "srds0_sys"; 
+
+                                 resets = <&qca8k_nsscc 
+NSS_CC_SRDS0_SYS_ARES>;
+                                 reset-names = "srds0_sys"; 
+
+                         };
+
+                         /* clocks and resets for pcs1. */ 
+
+                         pcs1 {
+                                 clocks = <&qca8k_nsscc 
+NSS_CC_SRDS1_SYS_CLK>;
+                                 clock-names = "srds1_sys"; 
+
+                                 resets = <&qca8k_nsscc 
+NSS_CC_SRDS1_SYS_ARES>;
+                                 reset-names = "srds1_sys"; 
+
+                         };
+
+			/* clocks and resets for first phy */
+                         phy0 {
+                                 clocks = <&qca8k_nsscc 
+NSS_CC_GEPHY0_SYS_CLK>;
+                                 clock-names = "gephy0_sys"; 
+
+                                 resets = <&qca8k_nsscc 
+NSS_CC_GEPHY0_SYS_ARES>,
+                                        <&qca8k_nsscc 
+NSS_CC_GEPHY0_ARES>;
+                                 reset-names = "gephy0_sys", 
+
+                                         "gephy0_soft"; 
+
+                         }; 
+
+
+			/* clocks and resets for second phy */ 
+
+                         phy1 {
+                                 clocks = <&qca8k_nsscc 
+NSS_CC_GEPHY1_SYS_CLK>;
+                                 clock-names = "gephy1_sys"; 
+
+                                 resets = <&qca8k_nsscc 
+NSS_CC_GEPHY1_SYS_ARES>,
+                                        <&qca8k_nsscc 
+NSS_CC_GEPHY1_ARES>;
+                                 reset-names = "gephy1_sys", 
+
+                                         "gephy1_soft"; 
+
+                         }; 
+
+
+			/* clocks and resets for third phy */ 
+
+                         phy2 {
+                                 clocks = <&qca8k_nsscc 
+NSS_CC_GEPHY2_SYS_CLK>;
+                                 clock-names = "gephy2_sys"; 
+
+                                 resets = <&qca8k_nsscc 
+NSS_CC_GEPHY2_SYS_ARES>,
+                                        <&qca8k_nsscc 
+NSS_CC_GEPHY2_ARES>;
+                                 reset-names = "gephy2_sys", 
+
+                                         "gephy2_soft"; 
+
+                         }; 
+
+
+			/* clocks and resets for fourth phy */ 
+
+                         phy3 {
+                                 clocks = <&qca8k_nsscc 
+NSS_CC_GEPHY3_SYS_CLK>;
+                                 clock-names = "gephy3_sys"; 
+
+                                 resets = <&qca8k_nsscc 
+NSS_CC_GEPHY3_SYS_ARES>,
+                                        <&qca8k_nsscc 
+NSS_CC_GEPHY3_ARES>;
+                                 reset-names = "gephy3_sys", 
+
+                                         "gephy3_soft"; 
+
+                         }; 
+
+ 
+
+                 }; 
+
+         };
+
+phy1: ethernet-phy@1 { 
+
+         compatible = "ethernet-phy-id004d.d180"; 
+
+         reg = <2>; 
+
+};
+ 
+
+phy2: ethernet-phy@2 { 
+
+         compatible = "ethernet-phy-id004d.d180"; 
+
+         reg = <3>; 
+
+}; 
+
+ 
+
+phy3: ethernet-phy@3 { 
+
+         compatible = "ethernet-phy-id004d.d180"; 
+
+         reg = <4>; 
+
+};
 
