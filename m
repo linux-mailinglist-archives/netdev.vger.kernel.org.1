@@ -1,77 +1,88 @@
-Return-Path: <netdev+bounces-58974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76F5B818BD3
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 17:07:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00BA9818BD6
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 17:07:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88DAD1C247D0
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:07:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 923EE2878DD
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DBDF1CFBE;
-	Tue, 19 Dec 2023 16:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7034E1D13C;
+	Tue, 19 Dec 2023 16:06:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Rz5K5x5l"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i27H6yyj"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC591D521;
-	Tue, 19 Dec 2023 16:06:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=znNsi/FwfGWyvqcVQI282vSklPfeCpZisa0qhu0toGk=; b=Rz5K5x5lR5vTHywnybXfcDm7SY
-	LFOYRaYfiZV5OO1MmiDCaRuLev/+6y8sk4Rzkb3JpMzwAJjMSwY6REupdx4PJfPbliF/aKAOdskGS
-	/DNHU309iZXZ2EhY+7A/c9kHriv48k9q8v/SQ50J95+0BluKE5a5Vvjmv3UNVjuYCeioAEKFPEAU2
-	xCDE5+08WmHjfmWo5jsAP+Peb+suLqfPBepYKsNTe33HkN6Vi3evbkDB/FXtUlbokkE+j5e19YxGm
-	DuSLlp5f4sRdWAuj1C/yeZikNNSA+fo23p/VMa2k870EuCqkf4ktfeXj/47sFRiQhX6CxGoTC4+EH
-	GcFoqCdQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1rFcbx-0037O7-TT; Tue, 19 Dec 2023 16:06:25 +0000
-Date: Tue, 19 Dec 2023 16:06:25 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Linus Torvalds <torvalds@linuxfoundation.org>,
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-	andrii@kernel.org, kuba@kernel.org, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, daniel@iogearbox.net,
-	peterz@infradead.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
-	kernel-team@fb.com, linux-fsdevel@vger.kernel.org
-Subject: Re: pull-request: bpf-next 2023-12-18
-Message-ID: <ZYG/gR6Kl9+11Myl@casper.infradead.org>
-References: <20231219000520.34178-1-alexei.starovoitov@gmail.com>
- <CAHk-=wg7JuFYwGy=GOMbRCtOL+jwSQsdUaBsRWkDVYbxipbM5A@mail.gmail.com>
- <20231219-kinofilm-legen-305bd52c15db@brauner>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F77F2031C
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 16:06:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso13844a12.1
+        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 08:06:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1703002011; x=1703606811; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8h4dwVtQO63lQFVRgdgpluJBGC54ZTO1zN+DQfSJ1G8=;
+        b=i27H6yyjrkm5+0s1S+L3w9npS7li2G8lSv8FlufRsKE2+q14iUBpHwyGbwM89R8i2r
+         N7adJWkkNVNHgyDjPa7ciXK0uSvq7hdLlpCdnKIX7oAP8I+vuP2BYFCKZ4BYdABfCMQD
+         7E0CfTL3m88sBje80tqFgudfd2kyNxySrG4kdb45lqH9+UqlqKr0glPFpeNBHbbJFjWn
+         bmDXBnSDZVzh+jaClBRKxcxlHJsGWQPU5f4L3q4yk/T0y6U2rqtDT8SvUO9pFvnX3Gzs
+         oav8YfnezB7bDIvdO75E2GywSr8GZLFgVoNaH43UAqPU/uc678dowAJGiwQbI2lFp0/c
+         C44w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703002011; x=1703606811;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8h4dwVtQO63lQFVRgdgpluJBGC54ZTO1zN+DQfSJ1G8=;
+        b=OMtRaTPQ0RRPfR2N230yNk95Q4g58YIx5PvcpYisExk8DsfqsmF1jCMxrSOMR7D+jD
+         vzKFIEn9MPswySLpu0HI5Z37u3sT0yEDdlqn+2GADhltE56ZBfPITQWFUBs++Wm61FHA
+         vI1AUxobpM4jVhCoLOzhjNZWUgoz1YQ1I/K3EOzMpjpvYvXggJeoRdyfpIsGN2Dmi0rL
+         fdEMwUUC/FON1FrgFuA05VWQ5mPzpFrHPsTeq5DMWlZ0GtLgTNjpxFurSuyhhDhAvkja
+         nHrcQaOVotzuLTi+gfUqXUMiotWR/jzg+vNWcmZYAseuqnBbksR9gfgH4mY/xsad48ap
+         xTUQ==
+X-Gm-Message-State: AOJu0YzWKIb75+X0J0cp/Tbp7o3cQLUudl3Nrv9BT315o4DokEgyHA3f
+	Viybs1n4WlltOCoGMobDXdgkgUAQn1NzleUwUUmAe1L1sv0B
+X-Google-Smtp-Source: AGHT+IGbhPcpBonml+vXQtU57M44KBDeyYHi/RvyEVgu0bbQBBah3MMaGLpZSJzi7f44UBVKSjJgYCAB4CfgK0FJEgI=
+X-Received: by 2002:a50:8acf:0:b0:553:3864:53 with SMTP id k15-20020a508acf000000b0055338640053mr193702edk.0.1703002011305;
+ Tue, 19 Dec 2023 08:06:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231219-kinofilm-legen-305bd52c15db@brauner>
+References: <20231219001833.10122-1-kuniyu@amazon.com> <20231219001833.10122-13-kuniyu@amazon.com>
+In-Reply-To: <20231219001833.10122-13-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 19 Dec 2023 17:06:37 +0100
+Message-ID: <CANn89iL3SvkVZcS+daH9ASWmYzO9WiVuuAXKB07saZ+NT34Jtg@mail.gmail.com>
+Subject: Re: [PATCH RESEND v2 net-next 12/12] tcp: Remove dead code and fields
+ for bhash2.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 19, 2023 at 11:23:50AM +0100, Christian Brauner wrote:
-> Alexei, Andrii, this is a massive breach of trust and flatout
-> disrespectful. I barely reword mails and believe me I've reworded this
-> mail many times. I'm furious. 
-> 
-> Over the last couple of months since LSFMM in May 2023 until almost last
-> week I've given you extensive design and review for this whole approach
-> to get this into even remotely sane shape from a VFS perspective.
+On Tue, Dec 19, 2023 at 1:24=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> Now all sockets including TIME_WAIT are linked to bhash2 using
+> sock_common.skc_bind_node.
+>
+> We no longer use inet_bind2_bucket.deathrow, sock.sk_bind2_node,
+> and inet_timewait_sock.tw_bind2_node.
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-This isn't new behaviour from the BPF people.  They always go their own
-way on everything.  They refuse to collaborate with anyone in MM to make
-the memory allocators work with their constraints; instead they implement
-their own.  It feels like they're on a Mission From God to implement the
-BPF Operating System and dealing with everyone else is an inconvenience.
-
-https://lore.kernel.org/bpf/20220623003230.37497-1-alexei.starovoitov@gmail.com/
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
