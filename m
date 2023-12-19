@@ -1,117 +1,118 @@
-Return-Path: <netdev+bounces-58884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB9F3818780
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 13:30:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C817818781
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 13:30:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5973028620D
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:30:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD5861F2472A
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30DE418626;
-	Tue, 19 Dec 2023 12:30:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gihxHhyX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92791182C6;
+	Tue, 19 Dec 2023 12:30:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A551418032
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 12:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a234139b725so338627366b.3
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 04:30:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702989019; x=1703593819; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uAE5oZxuQF7vsLFo157rr7pOuH+fIC0h765Im6IICOg=;
-        b=gihxHhyX1dPYqfElT11xJYEY8rkjTpLUqHY/kL6T/LiZ/zyH8FrRkAOn0YDVlGQK0q
-         hVjaAuQKPRuMVwfjuift1o/uPnIyhdUjD8ckw34TuhRcgpznLrmxgL6wFU7GSEE+AZxT
-         8rbmeporSztV/Qu7d4jMuHtL3qEYM3FeLvxQ9DbvlvlBl/4wRhHm54u3pveIYovrje2E
-         oDnFqoMyi1d5nJwU+TYT1/ZS6+sLoAYw3De9Jzg1CQ1kK8qfuAzD3SeleQfaQtTzaqSx
-         5ilTyhfKLhwvsZyDji9/kzTQ1WPpEL507+1nMAKHLqrcE4cpS5/4X+xfOdXo03JdQtGT
-         ZDsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702989019; x=1703593819;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uAE5oZxuQF7vsLFo157rr7pOuH+fIC0h765Im6IICOg=;
-        b=T8KVfoX6k76pg/vB9NYm10d3+5LvpJCl7amrnKPE8JKP88OuimzA6ULCBcezKO8cMe
-         irqMTzI8kzMCttP7v4ZK7MLupvemPdjPDSBrJBNp/T100HnjE28ee6gviKExF4SXywgb
-         qV9G6LfeD1n5ZF/MxMRRDKnuXjongNKpGKxLpxoI8gBo1UFjwD0W3hflltkd/cHnUMwX
-         VscgfPF+36QeCUv/Sfh+MuSWCLBOUXvLqeWNotmpDxUedb+zbC8hxi+ZJvh1MoViSdyy
-         41lXvzzsU2BUoPok94Uaq8DReXUVDmUDXFu4oCOTCHKEp5Fm9u1bAeA525TK27/8nxFJ
-         LOnQ==
-X-Gm-Message-State: AOJu0YwtC8vzglmiLrG5Zoh9sJVLTtS09e0S80bIVIOTWxr3HfPJuID9
-	9huemXKoDMis4Tf4fknAacU=
-X-Google-Smtp-Source: AGHT+IFc5N71mVk34rjjafqWNqN0PdEd8VSeSvwch2jdpbByer+h2AyqIB/ZBY2FIKsYDc2IkcIZIQ==
-X-Received: by 2002:a17:906:493:b0:a23:5f76:3467 with SMTP id f19-20020a170906049300b00a235f763467mr639744eja.100.1702989018649;
-        Tue, 19 Dec 2023 04:30:18 -0800 (PST)
-Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id x24-20020a170906135800b00a25501f4160sm492406ejb.1.2023.12.19.04.30.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Dec 2023 04:30:18 -0800 (PST)
-Date: Tue, 19 Dec 2023 14:30:16 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Sylvain Girard <sylvain.girard@se.com>,
-	Pascal EBERHARD <pascal.eberhard@se.com>,
-	Richard Tresidder <rtresidd@electromag.com.au>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net 0/1] Prevent DSA tags from breaking COE
-Message-ID: <20231219123016.6xy3gamz4lkr5fdz@skbuf>
-References: <20231218162326.173127-1-romain.gantois@bootlin.com>
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFBE218059
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 12:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.110.252])
+	by gateway (Coremail) with SMTP id _____8CxhfDijIFlbpsCAA--.13003S3;
+	Tue, 19 Dec 2023 20:30:26 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.110.252])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxneTgjIFl_U8AAA--.2346S3;
+	Tue, 19 Dec 2023 20:30:26 +0800 (CST)
+Message-ID: <b3afbe08-3cd2-4b7e-8191-f7028f3d6acc@loongson.cn>
+Date: Tue, 19 Dec 2023 20:30:24 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231218162326.173127-1-romain.gantois@bootlin.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 5/9] net: stmmac: Add Loongson-specific register
+ definitions
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, fancer.lancer@gmail.com,
+ Jose.Abreu@synopsys.com, chenhuacai@loongson.cn, linux@armlinux.org.uk,
+ guyinggang@loongson.cn, netdev@vger.kernel.org, loongarch@lists.linux.dev,
+ chris.chenfeiyang@gmail.com
+References: <cover.1702458672.git.siyanteng@loongson.cn>
+ <40eff8db93b02599f00a156b07a0dcdacfc0fbf3.1702458672.git.siyanteng@loongson.cn>
+ <8a7d2d11-a299-42e0-960f-a6916e9b54fe@lunn.ch>
+ <033fedc9-1d96-408e-911b-9829c6a5e851@loongson.cn>
+ <bc36a2a1-1c3c-4adb-8c8a-d4e4427a6999@lunn.ch>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <bc36a2a1-1c3c-4adb-8c8a-d4e4427a6999@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8BxneTgjIFl_U8AAA--.2346S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7tF18Wr1kAry3tw18KFy7CFX_yoW8XrWxpw
+	47WFWkKr4kJr42y3W0ya15WFy5t3ySkFyrGw48G3s7tas8Zr17Cr4rGrs5WasrJr4DA3y2
+	qF1DArn3tr4rA3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
+	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUUU==
 
-On Mon, Dec 18, 2023 at 05:23:22PM +0100, Romain Gantois wrote:
-> I've run some iperf3 tests and the TX hotpath performance doesn't seem
-> to be degraded by the field added to dma_features.
 
-I don't know what CPU cores you are using, but if the iperf3 performance
-was line rate at gigabit before and is line rate at gigabit now, you
-haven't effectively measured the impact of the change (and "doesn't seem
-to be degraded" is a false conclusion). You need something more CPU
-intensive to see the difference, like IP forwarding of 64 byte packets.
+在 2023/12/18 23:28, Andrew Lunn 写道:
+> On Mon, Dec 18, 2023 at 06:22:04PM +0800, Yanteng Si wrote:
+>> 在 2023/12/16 23:47, Andrew Lunn 写道:
+>>> On Wed, Dec 13, 2023 at 06:14:23PM +0800, Yanteng Si wrote:
+>>>> There are two types of Loongson DWGMAC. The first type shares the same
+>>>> register definitions and has similar logic as dwmac1000. The second type
+>>>> uses several different register definitions.
+>>>>
+>>>> Simply put, we split some single bit fields into double bits fileds:
+>>>>
+>>>> DMA_INTR_ENA_NIE = 0x00040000 + 0x00020000
+>>>> DMA_INTR_ENA_AIE = 0x00010000 + 0x00008000
+>>>> DMA_STATUS_NIS = 0x00040000 + 0x00020000
+>>>> DMA_STATUS_AIS = 0x00010000 + 0x00008000
+>>>> DMA_STATUS_FBI = 0x00002000 + 0x00001000
+>>> What is missing here is why? What are the second bits used for? And
+>> We think it is necessary to distinguish rx and tx, so we split these bits
+>> into two.
+>>
+>> this is:
+>>
+>> DMA_INTR_ENA_NIE = rx + tx
+> O.K, so please add DMA_INTR_ENA_NIE_RX and DMA_INTR_ENA_NIE_TX
+> #define's, etc.
+OK!
+>
+>> We will care about it later. Because now we will support the minimum feature
+>> set first, which can reduce everyone’s review pressure.
+> Well, you failed with that, since you did not provide the details what
+> these bits are. If you had directly handled the bits separately, it
+> would of been obvious what they are for.
 
-A very simplistic way to set up IP forwarding between 2 DSA user ports
-is to do this on the router board (DUT):
+  It is because I did not give a clear reply to serge's comment, which 
+was more detailed. :)
 
-echo 1 > /proc/sys/net/ipv4/ip_forward
-ip link set swp0 up && ip addr add 192.168.100.2/24 dev swp0
-ip link set swp1 up && ip addr add 192.168.101.2/24 dev swp1
 
-and this on the system with 2 endpoints:
+Thanks,
 
-ip netns add ns0
-ip link set $ETH1 netns ns0
-ip link set $ETH0 up && ip addr add 192.168.100.1/24 dev $ETH0
-ip -n ns0 link set $ETH1 up && ip -n ns0 addr add 192.168.101.1/24 dev $ETH1
-ip route add 192.168.101.0/24 via 192.168.100.2
-ip -n ns0 route add 192.168.100.0/24 via 192.168.101.2
-./net-next/samples/pktgen/pktgen_sample03_burst_single_flow.sh -i $ETH0 -s 64 -m 00:04:9f:05:de:0a -d 192.168.101.1 -t 2 -f 13 -c 0 -p 400 -n 0 -b 4
+Yanteng
 
-I compiled the commands from some notes I had lying around, I didn't
-retest them.
+>
+>        Andrew
+
 
