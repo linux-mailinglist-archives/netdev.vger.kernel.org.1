@@ -1,91 +1,171 @@
-Return-Path: <netdev+bounces-58787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D519818385
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 09:37:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBD058183AF
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 09:45:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D0CE1C23983
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 08:37:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 726E11F25094
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 08:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B142125CC;
-	Tue, 19 Dec 2023 08:36:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s8+dGmau"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC1111712;
+	Tue, 19 Dec 2023 08:45:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D56D13AD5
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 08:36:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-40c2db0ca48so29875e9.1
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 00:36:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702975013; x=1703579813; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=siz1aP3ObfhV4yvlFrkOWXqqkGRhrBfwEAj7xN3VCkc=;
-        b=s8+dGmau0ecN2Rm/XX8jbqcubFhOEM7Q02plPS/tbWXiFH6RGMgUb6Ltb6hwtzuEbw
-         faCPkSKAgPJmz+8+EiBFdVfltn17xN/49Lhc7f2qytbMMYdvRL5DwVSPuruV1WnjShAv
-         ModI2kL/0mOL072khqMvIjpbgCMHlLC+cmi/VMb+z8IsFsbQX5E+npqtc6JZ6sXEGeq1
-         r96XmZdnb+FABlKIBUBYKzfZmU35xUFenA7pUoJrfnqiRLaF4NjJcW9Lruki4uq9i1r3
-         QTkvGHFEicPP2TVPUaMOieCeYmU0s53Pm7UKh0WTo2qMqd6rMJT9/OgDFRi/NbDe8wUW
-         YEXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702975013; x=1703579813;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=siz1aP3ObfhV4yvlFrkOWXqqkGRhrBfwEAj7xN3VCkc=;
-        b=unPKXggBSHcoPDhxD6Nr1tsaG0gUalNoDFoO1sWyB4nbIHU/8F7qCSM+m4AbKv/wvI
-         hxkNmhDHqaArDjOuQC3glUU3ZnWANz8xLYPylIIEHJqc3lF/fyYhCJI4uJfG9kgh8TU0
-         PjA9Z57lWrD3/WAicrbO19tv8yQ0DyHGK3zkEA8T1RKPcgouIEgEOR4te9k54G1DNZjI
-         cDAqwbh3zNddxp5cSULNr/dj4ujp9nJ5bU7vleEJse+DW2AC1a4E3ec0mGebklj7cz82
-         1XzcF6UHB5kxiJNbMRbODGP791UrRjC5hXs1S52v9Zc49Ce6um2TsPTtfE9Y4zh98fQx
-         Vc3A==
-X-Gm-Message-State: AOJu0Yw2rC1uxXmLF1KIgm5j+dADHBxq0yXWNdttby1cKOp/8leIwaXs
-	WyyjT0+jlViZu40oh36I6kWpR7z2EHwcIl+2jqi1SVNBVfVFx78kemtslF99Eg==
-X-Google-Smtp-Source: AGHT+IFhbmGF1uEujzNNCq8sm6ZyN68nG0N4kWBCfPpYcuUq0ItEQwatBppBMdh4wszbrgxGqNcAdAY78NWfjEoMlVE=
-X-Received: by 2002:a05:600c:1d88:b0:40b:4355:a04b with SMTP id
- p8-20020a05600c1d8800b0040b4355a04bmr124420wms.6.1702975013384; Tue, 19 Dec
- 2023 00:36:53 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B0A12B69;
+	Tue, 19 Dec 2023 08:45:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R371e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=22;SR=0;TI=SMTPD_---0VyqKZpy_1702975536;
+Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VyqKZpy_1702975536)
+          by smtp.aliyun-inc.com;
+          Tue, 19 Dec 2023 16:45:38 +0800
+From: Wen Gu <guwen@linux.alibaba.com>
+To: wintera@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	hca@linux.ibm.com,
+	gor@linux.ibm.com,
+	agordeev@linux.ibm.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kgraul@linux.ibm.com,
+	jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com,
+	svens@linux.ibm.com,
+	alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com,
+	raspl@linux.ibm.com,
+	schnelle@linux.ibm.com,
+	guangguan.wang@linux.alibaba.com,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v7 00/10] net/smc: implement SMCv2.1 virtual ISM device support
+Date: Tue, 19 Dec 2023 16:45:26 +0800
+Message-Id: <20231219084536.8158-1-guwen@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231219030243.25687-1-dsahern@kernel.org>
-In-Reply-To: <20231219030243.25687-1-dsahern@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 19 Dec 2023 09:36:42 +0100
-Message-ID: <CANn89i+MV6eKwD774-_Rpfx2oeAj5umAxHoveLCpM+fiZi5xBw@mail.gmail.com>
-Subject: Re: [PATCH v2 net] net/ipv6: Revert remove expired routes with a
- separated list of routes
-To: David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org, Kui-Feng Lee <thinker.li@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 19, 2023 at 4:02=E2=80=AFAM David Ahern <dsahern@kernel.org> wr=
-ote:
->
-> This reverts commit 3dec89b14d37ee635e772636dad3f09f78f1ab87.
->
-> The commit has some race conditions given how expires is managed on a
-> fib6_info in relation to gc start, adding the entry to the gc list and
-> setting the timer value leading to UAF. Revert the commit and try again
-> in a later release.
->
-> Fixes: 3dec89b14d37 ("net/ipv6: Remove expired routes with a separated li=
-st of routes")
-> Cc: Kui-Feng Lee <thinker.li@gmail.com>
-> Signed-off-by: David Ahern <dsahern@kernel.org>
+The fourth edition of SMCv2 adds the SMC version 2.1 feature updates for
+SMC-Dv2 with virtual ISM. Virtual ISM are created and supported mainly by
+OS or hypervisor software, comparable to IBM ISM which is based on platform
+firmware or hardware.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+With the introduction of virtual ISM, SMCv2.1 makes some updates:
+
+- Introduce feature bitmask to indicate supplemental features.
+- Reserve a range of CHIDs for virtual ISM.
+- Support extended GIDs (128 bits) in CLC handshake.
+
+So this patch set aims to implement these updates in Linux kernel. And it
+acts as the first part of SMC-D virtual ISM extension & loopback-ism [1].
+
+[1] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
+
+v7->v6:
+- Collect the Reviewed-by tag in v6;
+- Patch #3: redefine the struct smc_clc_msg_accept_confirm;
+- Patch #7: Because that the Patch #3 already adds '__packed' to
+  smc_clc_msg_accept_confirm, so Patch #7 doesn't need to do the same thing.
+  But this is a minor change, so I kept the 'Reviewed-by' tag.
+
+Other changes in previous versions but not yet acked:
+- Patch #1: Some minor changes in subject and fix the format issue
+  (length exceeds 80 columns) compared to v3.
+- Patch #5: removes useless ini->feature_mask assignment in __smc_connect()
+  and smc_listen_v2_check() compared to v4.
+- Patch #8: new added, compared to v3.
+
+v6->v5:
+- Add 'Reviewed-by' label given in the previous versions:
+  * Patch #4, #6, #9, #10 have nothing changed since v3;
+- Patch #2:
+  * fix the format issue (Alignment should match open parenthesis) compared to v5;
+  * remove useless clc->hdr.length assignment in smcr_clc_prep_confirm_accept()
+    compared to v5;
+- Patch #3: new added compared to v5.
+- Patch #7: some minor changes like aclc_v2->aclc or clc_v2->clc compared to v5
+  due to the introduction of Patch #3. Since there were no major changes, I kept
+  the 'Reviewed-by' label.
+
+Other changes in previous versions but not yet acked:
+- Patch #1: Some minor changes in subject and fix the format issue
+  (length exceeds 80 columns) compared to v3.
+- Patch #5: removes useless ini->feature_mask assignment in __smc_connect()
+  and smc_listen_v2_check() compared to v4.
+- Patch #8: new added, compared to v3.
+
+v5->v4:
+- Patch #6: improve the comment of SMCD_CLC_MAX_V2_GID_ENTRIES;
+- Patch #4: remove useless ini->feature_mask assignment;
+
+v4->v3:
+- Patch #6: use SMCD_CLC_MAX_V2_GID_ENTRIES to indicate the max gid
+  entries in CLC proposal and using SMC_MAX_V2_ISM_DEVS to indicate the
+  max devices to propose;
+- Patch #6: use i and i+1 in smc_find_ism_v2_device_serv();
+- Patch #2: replace the large if-else block in smc_clc_send_confirm_accept()
+  with 2 subfunctions;
+- Fix missing byte order conversion of GID and token in CLC handshake,
+  which is in a separate patch sending to net:
+  https://lore.kernel.org/netdev/1701882157-87956-1-git-send-email-guwen@linux.alibaba.com/
+- Patch #7: add extended GID in SMC-D lgr netlink attribute;
+
+v3->v2:
+- Rename smc_clc_fill_fce as smc_clc_fill_fce_v2x;
+- Remove ISM_IDENT_MASK from drivers/s390/net/ism.h;
+- Add explicitly assigning 'false' to ism_v2_capable in ism_dev_init();
+- Remove smc_ism_set_v2_capable() helper for now, and introduce it in
+  later loopback-ism implementation;
+
+v2->v1:
+- Fix sparse complaint;
+- Rebase to the latest net-next;
+
+Wen Gu (10):
+  net/smc: rename some 'fce' to 'fce_v2x' for clarity
+  net/smc: introduce sub-functions for smc_clc_send_confirm_accept()
+  net/smc: unify the structs of accept or confirm message for v1 and v2
+  net/smc: support SMCv2.x supplemental features negotiation
+  net/smc: introduce virtual ISM device support feature
+  net/smc: define a reserved CHID range for virtual ISM devices
+  net/smc: compatible with 128-bits extended GID of virtual ISM device
+  net/smc: support extended GID in SMC-D lgr netlink attribute
+  net/smc: disable SEID on non-s390 archs where virtual ISM may be used
+  net/smc: manage system EID in SMC stack instead of ISM driver
+
+ drivers/s390/net/ism.h        |   7 -
+ drivers/s390/net/ism_drv.c    |  57 ++----
+ include/linux/ism.h           |   1 -
+ include/net/smc.h             |  16 +-
+ include/uapi/linux/smc.h      |   2 +
+ include/uapi/linux/smc_diag.h |   2 +
+ net/smc/af_smc.c              | 118 ++++++++-----
+ net/smc/smc.h                 |  10 +-
+ net/smc/smc_clc.c             | 318 +++++++++++++++++++++-------------
+ net/smc/smc_clc.h             |  64 +++----
+ net/smc/smc_core.c            |  37 ++--
+ net/smc/smc_core.h            |  18 +-
+ net/smc/smc_diag.c            |   9 +-
+ net/smc/smc_ism.c             |  50 ++++--
+ net/smc/smc_ism.h             |  30 +++-
+ net/smc/smc_pnet.c            |   4 +-
+ 16 files changed, 448 insertions(+), 295 deletions(-)
+
+-- 
+2.32.0.3.g01195cf9f
+
 
