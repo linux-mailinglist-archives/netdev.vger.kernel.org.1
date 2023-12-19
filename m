@@ -1,223 +1,188 @@
-Return-Path: <netdev+bounces-58896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D264818877
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 14:18:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1029781887B
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 14:19:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B07521F23CAB
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 13:18:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 923BE1F23C7B
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 13:19:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0794918E1D;
-	Tue, 19 Dec 2023 13:18:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E3918E29;
+	Tue, 19 Dec 2023 13:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fDzT3YuH"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z3hKlCt9"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5281318E18
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 13:18:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702991899;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=8gCg7F2LD8ybUPGUCi7YjR3rBSf86+Mz8l1OEgEMuIY=;
-	b=fDzT3YuHgZka8QNJpn9UG1wCv4r2CWW85+crQ1h+qdWkEBIeDJRBMelTqVkunF+uvhHb5E
-	2XfAUM5v+YjjCpGQgssnTmJw3wrtglgml+rL6vheHhXW1mA8SUFvx0GtdnsbY1Zun0KcvE
-	Pah3g7tKH19+Gm9T3CgZ6KBYO0GiFWE=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-149-yrVAfHalNQS9rWMmGCJneQ-1; Tue, 19 Dec 2023 08:18:18 -0500
-X-MC-Unique: yrVAfHalNQS9rWMmGCJneQ-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40c62d9bd43so20007835e9.0
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 05:18:17 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8516F18E0C
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 13:19:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-50e23a4df33so4635533e87.2
+        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 05:19:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1702991955; x=1703596755; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=UuNv0kD8oZOhBxHeGqP/9yBh0biN0sGGA/7UYqG104w=;
+        b=z3hKlCt9UncEICSzs5VwS2X8mE/E+MkLbLgzw71gza6WAZwnOZZDrCvtTp2LkhSqbZ
+         yqYSRS0vZwkpA8Oj2256n9L0yh2K42pofZV/O0nwq5CSaZ22lfVde+7fhEPWRkX6sRfO
+         F+Tvk1DTel1ScjfsdhQw04g88xCqv9z9FpyZYFZadBki2aENCCIWNLaIQyAkGksKE8vU
+         iKslBaHGgSbZLLqN7jbMEXf1ipzNFqNVvemoyvc0oRv53gJyfimvubyQDvOATfqJxq9M
+         zJrUcnG0JnFQg0DfRNf62IKA0TVqlJ0WLrptQpFRXlP6CmJXvprFGYUXo2NEKdiV5OzR
+         eRbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702991896; x=1703596696;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8gCg7F2LD8ybUPGUCi7YjR3rBSf86+Mz8l1OEgEMuIY=;
-        b=dEw3DomuGYTgoitgkEOoTRDoxMXsGH8wpk00kHSbUqLnVmf7L3xdBoxyinYIgVGvCh
-         EF9mZiQpjNmjqztO+jQJPMfrBa9myImnWTYnl+rktOTQMailAy94Bxb7590WvsF1Hs31
-         SUWQzpbyDaZS3VH9U58vJmaWodRRhqFnrxJEjDl17AuXTIKD6uSZe12p0mFpK7BA3uQe
-         L6zZyqyoeVBAWnVDxBORTMTcHfymDWmgEe1NNeJXVrikzThRYiHr70z2aLOJmEeOnlfE
-         18mRk/awH4Yl8mNbueAqNdSlc2faQxARX1KCynCqvEbljiUX15s6OYa6eUi0oDZSWeOA
-         dvpA==
-X-Gm-Message-State: AOJu0YwXSGSmOnLkOgTzaPmg9YWIOswrc+HsZRkRtVmb0FeY9/x/9/y5
-	nTV3/o92XJLfF7xuLOIjts90ILLLNn2TsMsE64lOTFgysWdUi87/Tnl7jjVYG2QQtxuR4dnbJfq
-	O/ZQyCX9iE6wkp85oBKNC7PU+
-X-Received: by 2002:a1c:6a02:0:b0:40c:619e:d117 with SMTP id f2-20020a1c6a02000000b0040c619ed117mr516104wmc.177.1702991896241;
-        Tue, 19 Dec 2023 05:18:16 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFPIuKtGBDlfRg/fdZjff/J3MI9cxEfDlIkXkOAXRmDa3dWozQdFrBGWUGTw20xVSzWKqOr3w==
-X-Received: by 2002:a1c:6a02:0:b0:40c:619e:d117 with SMTP id f2-20020a1c6a02000000b0040c619ed117mr516092wmc.177.1702991895858;
-        Tue, 19 Dec 2023 05:18:15 -0800 (PST)
-Received: from debian (2a01cb058d23d600034751d9eeb3e349.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:347:51d9:eeb3:e349])
-        by smtp.gmail.com with ESMTPSA id p20-20020a05600c359400b0040c440f9393sm2807931wmq.42.2023.12.19.05.18.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Dec 2023 05:18:14 -0800 (PST)
-Date: Tue, 19 Dec 2023 14:18:13 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: David Ahern <dsahern@gmail.com>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Michal Kubecek <mkubecek@suse.cz>
-Subject: [PATCH iproute2-next v2] ss: Add support for dumping TCP
- bound-inactive sockets.
-Message-ID: <ef4e0489be45f59ad05f05f5cae0b070255a65ef.1702991661.git.gnault@redhat.com>
+        d=1e100.net; s=20230601; t=1702991955; x=1703596755;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UuNv0kD8oZOhBxHeGqP/9yBh0biN0sGGA/7UYqG104w=;
+        b=iG6XzFLHZXeM26SqLPRXbL6eCstKDw7atyfxWLHAMXCE7NJqoxqoDAEx7S5s3QxBve
+         ig5NRnVVJlMByewlJkB/hQaif4U+Gs3MceO1UgQTRVT9geR4al/feaDc8slCOCK7Hc+t
+         QdOKRPcXuMOHYEMNCzyRZEGncHHYlSJGqz/86cEsvriv7f/osdwEO82QMpK+Zugf0U/G
+         wUq8FfRL5VmTWXW7NFwyn3XlmfDeFzjDfKsN84ACVvKuBPPrcD5qCv8FsmNw34nmJJHE
+         jjtFfUoaARuFlSu0F15ywWED4QxXyI7deIlDXXy27UcpzL671vT0Z9W1doH/NHlpTwkw
+         +B/g==
+X-Gm-Message-State: AOJu0Yw5Cl65sqsTHLorfQKcFvWZCvMDKpSm6g/FY/XXYiQrs/K/xc4v
+	9FzAUWtfZ1rREV7tWbCzjid+fQ==
+X-Google-Smtp-Source: AGHT+IGaOuJev6vg//VrJB9ReKO+YgqnNA+Q0Rd1UpKP0ieEgMKhBr6YIVMptHey/EMI5YVKPLeNoQ==
+X-Received: by 2002:a19:5f55:0:b0:50b:f3a0:861 with SMTP id a21-20020a195f55000000b0050bf3a00861mr7335426lfj.7.1702991955621;
+        Tue, 19 Dec 2023 05:19:15 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.218.27])
+        by smtp.gmail.com with ESMTPSA id tq14-20020a170907c50e00b00a1f83646eb6sm14093785ejc.149.2023.12.19.05.19.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Dec 2023 05:19:13 -0800 (PST)
+Message-ID: <15077e1f-c13b-4424-9918-df441b56b695@linaro.org>
+Date: Tue, 19 Dec 2023 14:19:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/9] dt-bindings: net: starfive,jh7110-dwmac: Add
+ JH7100 SoC compatible
+To: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
+ Samin Guo <samin.guo@starfivetech.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Hal Feng <hal.feng@starfivetech.com>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-clk@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, kernel@collabora.com
+References: <20231218214451.2345691-1-cristian.ciocaltea@collabora.com>
+ <20231218214451.2345691-3-cristian.ciocaltea@collabora.com>
+ <c9225053-78f8-40b7-9453-dc3dabe44500@linaro.org>
+ <d030f5b7-8d32-4a80-a3c0-98cfa1c0fe4f@collabora.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <d030f5b7-8d32-4a80-a3c0-98cfa1c0fe4f@collabora.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Make ss aware of the new "bound-inactive" pseudo-state for TCP (see
-Linux commit 91051f003948 ("tcp: Dump bound-only sockets in inet_diag.")).
-These are TCP sockets that have been bound, but are neither listening nor
-connecting.
+On 19/12/2023 13:49, Cristian Ciocaltea wrote:
+>>>    reg:
+>>>      maxItems: 1
+>>> @@ -46,23 +50,6 @@ properties:
+>>>        - const: tx
+>>>        - const: gtx
+>>>  
+>>> -  interrupts:
+>>> -    minItems: 3
+>>> -    maxItems: 3
+>>> -
+>>> -  interrupt-names:
+>>> -    minItems: 3
+>>> -    maxItems: 3
+>>> -
+>>> -  resets:
+>>> -    minItems: 2
+>>> -    maxItems: 2
+>>
+>> What is the point of your previous patch if you immediately remove it?
+>> It is a no-op. Just mention in this commit msg, that both resets and
+>> reset-names are coming from snps,dwmac so they can be removed from
+>> top-level entirely.
+> 
+> This has been discussed during v2 review [1], where I also provided the
+> rational behind not updating reset-names. So the code was not deleted,
+> but moved under an if clause.
+> 
+> Thanks for reviewing,
+> Cristian
+> 
+> [1]: https://lore.kernel.org/lkml/f4d0b216-5bdc-4559-aabb-8af638d33721@collabora.com/
 
-With this patch, these sockets can now be dumped with:
+I don't see it being addressed:
 
-  * the existing -a (--all) option, to dump all sockets, including
-    bound-inactive ones,
+https://lore.kernel.org/lkml/35556392-3b9a-4997-b482-082dc2f9121f@linaro.org/
 
-  * the new -B (--bound-inactive) option, to dump them exclusively,
+Repeating the same and the same :/
 
-  * the new "bound-inactive" state, to be used in a STATE-FILTER.
-
-Note that the SS_BOUND_INACTIVE state is a pseudo-state used for queries
-only. The kernel returns them as SS_CLOSE.
-
-The SS_NEW_SYN_RECV pseudo-state is added in this patch only because we
-have to set its entry in the sstate_namel array (in scan_state()). Care
-is taken not to make it visible by users.
-
-Signed-off-by: Guillaume Nault <gnault@redhat.com>
----
-v2: Reject the "new-syn-recv" pseudo-state in scan_state() and add
-    comments to make it clear that NEW_SYN_RECV is kernel-only and
-    and shouldn't be exposed to users (Kuniyuki Iwashima).
-
- man/man8/ss.8 |  7 +++++++
- misc/ss.c     | 20 +++++++++++++++++++-
- 2 files changed, 26 insertions(+), 1 deletion(-)
-
-diff --git a/man/man8/ss.8 b/man/man8/ss.8
-index 073e9f03..4ece41fa 100644
---- a/man/man8/ss.8
-+++ b/man/man8/ss.8
-@@ -40,6 +40,10 @@ established connections) sockets.
- .B \-l, \-\-listening
- Display only listening sockets (these are omitted by default).
- .TP
-+.B \-B, \-\-bound-inactive
-+Display only TCP bound but inactive (not listening, connecting, etc.) sockets
-+(these are omitted by default).
-+.TP
- .B \-o, \-\-options
- Show timer information. For TCP protocol, the output format is:
- .RS
-@@ -456,6 +460,9 @@ states except for
- - opposite to
- .B bucket
- 
-+.B bound-inactive
-+- bound but otherwise inactive sockets (not listening, connecting, etc.)
-+
- .SH EXPRESSION
- 
- .B EXPRESSION
-diff --git a/misc/ss.c b/misc/ss.c
-index 16ffb6c8..c220a075 100644
---- a/misc/ss.c
-+++ b/misc/ss.c
-@@ -210,6 +210,8 @@ enum {
- 	SS_LAST_ACK,
- 	SS_LISTEN,
- 	SS_CLOSING,
-+	SS_NEW_SYN_RECV, /* Kernel only value, not for use in user space */
-+	SS_BOUND_INACTIVE,
- 	SS_MAX
- };
- 
-@@ -1382,6 +1384,8 @@ static void sock_state_print(struct sockstat *s)
- 		[SS_LAST_ACK] = "LAST-ACK",
- 		[SS_LISTEN] =	"LISTEN",
- 		[SS_CLOSING] = "CLOSING",
-+		[SS_NEW_SYN_RECV] = "UNDEF", /* Never returned by kernel */
-+		[SS_BOUND_INACTIVE] = "UNDEF", /* Never returned by kernel */
- 	};
- 
- 	switch (s->local.family) {
-@@ -5339,6 +5343,7 @@ static void _usage(FILE *dest)
- "   -r, --resolve       resolve host names\n"
- "   -a, --all           display all sockets\n"
- "   -l, --listening     display listening sockets\n"
-+"   -B, --bound-inactive display TCP bound but inactive sockets\n"
- "   -o, --options       show timer information\n"
- "   -e, --extended      show detailed socket information\n"
- "   -m, --memory        show socket memory usage\n"
-@@ -5421,9 +5426,17 @@ static int scan_state(const char *state)
- 		[SS_LAST_ACK] = "last-ack",
- 		[SS_LISTEN] =	"listening",
- 		[SS_CLOSING] = "closing",
-+		[SS_NEW_SYN_RECV] = "new-syn-recv",
-+		[SS_BOUND_INACTIVE] = "bound-inactive",
- 	};
- 	int i;
- 
-+	/* NEW_SYN_RECV is a kernel implementation detail. It shouldn't be used
-+	 * or even be visible by users.
-+	 */
-+	if (strcasecmp(state, "new-syn-recv") == 0)
-+		goto wrong_state;
-+
- 	if (strcasecmp(state, "close") == 0 ||
- 	    strcasecmp(state, "closed") == 0)
- 		return (1<<SS_CLOSE);
-@@ -5446,6 +5459,7 @@ static int scan_state(const char *state)
- 			return (1<<i);
- 	}
- 
-+wrong_state:
- 	fprintf(stderr, "ss: wrong state name: %s\n", state);
- 	exit(-1);
- }
-@@ -5487,6 +5501,7 @@ static const struct option long_opts[] = {
- 	{ "vsock", 0, 0, OPT_VSOCK },
- 	{ "all", 0, 0, 'a' },
- 	{ "listening", 0, 0, 'l' },
-+	{ "bound-inactive", 0, 0, 'B' },
- 	{ "ipv4", 0, 0, '4' },
- 	{ "ipv6", 0, 0, '6' },
- 	{ "packet", 0, 0, '0' },
-@@ -5525,7 +5540,7 @@ int main(int argc, char *argv[])
- 	int state_filter = 0;
- 
- 	while ((ch = getopt_long(argc, argv,
--				 "dhaletuwxnro460spTbEf:mMiA:D:F:vVzZN:KHSO",
-+				 "dhalBetuwxnro460spTbEf:mMiA:D:F:vVzZN:KHSO",
- 				 long_opts, NULL)) != EOF) {
- 		switch (ch) {
- 		case 'n':
-@@ -5590,6 +5605,9 @@ int main(int argc, char *argv[])
- 		case 'l':
- 			state_filter = (1 << SS_LISTEN) | (1 << SS_CLOSE);
- 			break;
-+		case 'B':
-+			state_filter = 1 << SS_BOUND_INACTIVE;
-+			break;
- 		case '4':
- 			filter_af_set(&current_filter, AF_INET);
- 			break;
--- 
-2.39.2
+Best regards,
+Krzysztof
 
 
