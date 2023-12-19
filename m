@@ -1,199 +1,99 @@
-Return-Path: <netdev+bounces-58738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAADB817EE1
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 01:41:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0126D817EF6
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 01:46:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 795881F23099
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 00:41:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EC7A1F215FA
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 00:46:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9053620;
-	Tue, 19 Dec 2023 00:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B8915B1;
+	Tue, 19 Dec 2023 00:46:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H56w/d+p"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="hjpyFY5/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D3FD15A0;
-	Tue, 19 Dec 2023 00:41:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED812C433C7;
-	Tue, 19 Dec 2023 00:41:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702946504;
-	bh=8eMEq2EQPcJdSoDYjoL4uYUzfmA7mbwgk3VmCG7O0T0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=H56w/d+pl+NtQL688KYylFmPYQByNU/Yx9h+6GeWG8o4+3YEtr2/tOqE/K058P3rn
-	 I+wk1r6Jg8JKiS5qaBYjYDZCvpY7qhYvRU1sB73fc2d5pAxoLUBlIlhf//Z5kY54P1
-	 9TYvT7B1LuFVlfOrbZlsE2mBzukF3AuTMZQEhSFSwIl9kS1VZJ81BPj/263DFl/Rh/
-	 gUK4lIWHvM290Uvf5gKedYDZHwzmS9OmHV2c4/jMQP5sybpxaorucJKrvghHCCgCvt
-	 OwZS5Jxeg9DNclquCgTnn8FYp4a20boJn2yVGRgoALRMXFa6SdsIzEtLXiN79tduGX
-	 F5/7l546/H+Qg==
-Date: Mon, 18 Dec 2023 16:41:42 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Michael Chan
- <michael.chan@broadcom.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, "David S. Miller"
- <davem@davemloft.net>, Boqun Feng <boqun.feng@gmail.com>, Daniel Borkmann
- <daniel@iogearbox.net>, Eric Dumazet <edumazet@google.com>, Frederic
- Weisbecker <frederic@kernel.org>, Ingo Molnar <mingo@redhat.com>, Paolo
- Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Thomas
- Gleixner <tglx@linutronix.de>, Waiman Long <longman@redhat.com>, Will
- Deacon <will@kernel.org>
-Subject: Re: [PATCH net-next 00/24] locking: Introduce nested-BH locking.
-Message-ID: <20231218164142.0b10e29d@kernel.org>
-In-Reply-To: <20231218172331.fp-nC_Nr@linutronix.de>
-References: <20231215171020.687342-1-bigeasy@linutronix.de>
-	<20231215145059.3b42ee35@kernel.org>
-	<20231218172331.fp-nC_Nr@linutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7831381
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 00:46:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1702946787; x=1734482787;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=RyyCn35duNjzcFkQjiTlLR2jcSJuUyc1e0PIfM6JdIk=;
+  b=hjpyFY5/5jD2a2j5yQhgXwR1xlKDOu8mc4mIHhyy4ddKIza4kX9O5IeL
+   /fw2Vjg4PNsfJh5TA7wPKIOU/fqbquVBsHPWZxtkqrlu9X+3eW1/3RmXd
+   orcaIGbUO9T4Ki5Qr1wkfOvfGLA/r7vMKH/9F+rNBKDJ9KYCbUlDpu/Ku
+   I=;
+X-IronPort-AV: E=Sophos;i="6.04,287,1695686400"; 
+   d="scan'208";a="52106202"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-96feee09.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 00:46:25 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
+	by email-inbound-relay-iad-1a-m6i4x-96feee09.us-east-1.amazon.com (Postfix) with ESMTPS id 593B249AE3;
+	Tue, 19 Dec 2023 00:46:23 +0000 (UTC)
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:44164]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.34.165:2525] with esmtp (Farcaster)
+ id 420226b0-4f4a-41e3-8a64-dee1ba6d386b; Tue, 19 Dec 2023 00:46:22 +0000 (UTC)
+X-Farcaster-Flow-ID: 420226b0-4f4a-41e3-8a64-dee1ba6d386b
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Tue, 19 Dec 2023 00:46:21 +0000
+Received: from 88665a182662.ant.amazon.com (10.118.248.48) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
+ Tue, 19 Dec 2023 00:46:18 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuniyu@amazon.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <ivan@cloudflare.com>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>
+Subject: [PATCH v3 net-next 0/4] af_unix: Random improvements for GC.
+Date: Tue, 19 Dec 2023 09:46:09 +0900
+Message-ID: <20231219004609.12656-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20231218075020.60826-1-kuniyu@amazon.com>
+References: <20231218075020.60826-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D035UWA003.ant.amazon.com (10.13.139.86) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-On Mon, 18 Dec 2023 18:23:31 +0100 Sebastian Andrzej Siewior wrote:
-> On 2023-12-15 14:50:59 [-0800], Jakub Kicinski wrote:
-> > On Fri, 15 Dec 2023 18:07:19 +0100 Sebastian Andrzej Siewior wrote: =20
-> > > The proposed way out is to introduce explicit per-CPU locks for
-> > > resources which are protected by local_bh_disable() and use those only
-> > > on PREEMPT_RT so there is no additional overhead for !PREEMPT_RT buil=
-ds. =20
-> >=20
-> > As I said at LPC, complicating drivers with odd locking constructs
-> > is a no go for me. =20
->=20
-> I misunderstood it then as I assumed you wanted to ease the work while I
-> was done which every driver after (hopefully) understanding what is
-> possible/ needed and what not. We do speak here about 15++?
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date: Mon, 18 Dec 2023 16:50:16 +0900
+> If more than 16000 inflight AF_UNIX sockets exist on a host, each
+> sendmsg() will be forced to wait for unix_gc() even if a process
+> is not sending any FD.
+> 
+> This series tries not to impose such a penalty on sane users who
+> do not send AF_UNIX FDs or do not have inflight sockets more than
+> SCM_MAX_FD * 8.
+> 
+> 
+> Changes:
+>   v3:
 
-My main concern is that it takes the complexity of writing network
-device drivers to a next level. It's already hard enough to implement
-XDP correctly. "local lock" and "guard"? Too complicated :(
-Or "unmaintainable" as in "too much maintainer's time will be spent
-reviewing code that gets this wrong".
+Just noticed the patch 4 needs --3way to apply, probably due to
+the recent io_uring commit.
 
-> Now. The pattern is usually
-> |	act =3D bpf_prog_run_xdp(xdp_prog, &xdp);
-> |	switch (act) {
-> |	case XDP_REDIRECT:
-> |		ret =3D xdp_do_redirect(netdev, &xdp, xdp_prog)))
-> |		if (ret)
-> |			goto XDP_ABORTED;
-> |		xdp_redir++ or so;
->=20
-> so we might be able to turn this into something that covers both and
-> returns either XDP_REDIRECT or XDP_ABORTED. So this could be merged
-> into
->=20
-> | u32 bpf_prog_run_xdp_and_redirect(struct net_device *dev, const struct
-> | 				  bpf_prog *prog, struct xdp_buff *xdp)
-> | {
-> | 	u32 act;
-> | 	int ret;
-> |=20
-> | 	act =3D bpf_prog_run_xdp(prog, xdp);
-> | 	if (act =3D=3D XDP_REDIRECT) {
-> | 		ret =3D xdp_do_redirect(netdev, xdp, prog);
-> | 		if (ret < 0)
-> | 			act =3D XDP_ABORTED;
-> | 	}
-> | 	return act;
-> | }
+I'll rebase on the latest and repost v4 to make patchwork happy.
+Sorry for the noise.
 
-If we could fold the DROP case into this -- even better!
-
-> so the lock can be put inside the function and all drivers use this
-> function.
->=20
-> From looking through drivers/net/ethernet/, this should work for most
-> drivers:
-> - amazon/ena
-> - aquantia/atlantic
-> - engleder/tsnep
-> - freescale/enetc
-> - freescale/fec
-> - intel/igb
-> - intel/igc
-> - marvell/mvneta
-> - marvell/mvpp2
-> - marvell/octeontx2
-> - mediatek/mtk
-> - mellanox/mlx5
-> - microchip/lan966x
-> - microsoft/mana
-> - netronome/nfp (two call paths with no support XDP_REDIRECT)
-> - sfc/rx
-> - sfc/siena (that offset pointer can be moved)
-> - socionext/netsec
-> - stmicro/stmmac
->=20
-> A few do something custom/ additionally between bpf_prog_run_xdp() and
->   xdp_do_redirect():
->=20
-> - broadcom/bnxt
->   calculates length, offset, data pointer. DMA unmaps + memory
->   allocations before redirect.
-
-Just looked at this one. The recalculation is probably for the PASS /
-TX cases, REDIRECT / DROP shouldn't care. The DMA unmap looks like=20
-a bug (hi, Michael!)
-
-> - freescale/dpaa2
-> - freescale/dpaa
->   sets xdp.data_hard_start + frame_sz, unmaps DMA.
->=20
-> - fungible/funeth
->   conditional redirect.
->=20
-> - google/gve
->   Allocates a new packet for redirect.
->=20
-> - intel/ixgbe
-> - intel/i40e
-> - intel/ice
->   Failure in the ZC case is different from XDP_ABORTED, depends on the
->   error from xdp_do_redirect())
->=20
-> - mellanox/mlx4/
->   calculates page_offset.
->=20
-> - qlogic/qede
->   DMA unmap and buffer alloc.
->=20
-> - ti/cpsw_priv
->   recalculates length (pointer).
->=20
-> and a few more don't support XDP_REDIRECT:
->=20
-> - cavium/thunder
->   does not support XDP_REDIRECT, calculates length, offset.
->=20
-> - intel/ixgbevf
->   does not support XDP_REDIRECT
->=20
-> I don't understand why some driver need to recalculate data_hard_start,
-> length and so on and others don't. This might be only needed for the
-> XDP_TX case or not needed=E2=80=A6
-> Also I'm not sure about the dma unmaps and skb allocations. The new skb
-> allocation can be probably handled before running the bpf prog but then
-> in the XDP_PASS case it is a waste=E2=80=A6
-> And the DMA unmaps. Only a few seem to need it. Maybe it can be done
-> before running the BPF program. After all the bpf may look into the skb.
->=20
->=20
-> If that is no go, then the only thing that comes to mind is (as you
-> mentioned on LPC) to acquire the lock in bpf_prog_run_xdp() and drop it
-> in xdp_do_redirect(). This would require that every driver invokes
-> xdp_do_redirect() even not if it is not supporting it (by setting netdev
-> to NULL or so).
-
-To make progress on other parts of the stack we could also take=20
-the local lock around all of napi->poll() for now..
+---
+pw-bot: cr
 
