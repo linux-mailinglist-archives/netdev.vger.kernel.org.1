@@ -1,50 +1,49 @@
-Return-Path: <netdev+bounces-59089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 807788194C3
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:51:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D2938194CA
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:53:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E11C0B2367A
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 23:51:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39D122843A2
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 23:53:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C14B3EA7D;
-	Tue, 19 Dec 2023 23:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 476493DBA3;
+	Tue, 19 Dec 2023 23:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="XF0psh0q"
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="HiAhe10Q"
 X-Original-To: netdev@vger.kernel.org
 Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2689B3D3A0;
-	Tue, 19 Dec 2023 23:51:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6DF940BE4;
+	Tue, 19 Dec 2023 23:53:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
 Received: from localhost (unknown [IPv6:2601:280:5e00:7e19::646])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id 2DE6E2E5;
-	Tue, 19 Dec 2023 23:51:13 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 2DE6E2E5
+	by ms.lwn.net (Postfix) with ESMTPSA id EF12D2AE;
+	Tue, 19 Dec 2023 23:53:46 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net EF12D2AE
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1703029873; bh=QDHuHcjPbAEzrE9RHuknoM9QEOx2FrXu/2JTRq9S4Ss=;
+	t=1703030027; bh=4bxsCb3d4Rri3k4ZP1joC3ve9NadD0wIAlYgvDY2Je0=;
 	h=From:To:Cc:Subject:Date:From;
-	b=XF0psh0qXs4vrysvRvsggaaIgnLkLnw4HddaOhA5r/oXvAbxkDI34aPZM8XukAw2r
-	 Dkn4gZBioNQwEDQP0JGYV934qH9Un0KSqCgQHm274dfLlSoCpDyDsRegjqiU9T1MeB
-	 TbzJ6F9fdTUEj/CHS/FE8xiVPpp99TijP8tM/a1Sdg8EpLGCAlyznJ4deH+ZgdJn7F
-	 4QKYXqvj1NbZCQBf+uraDk+2HbU04e4i+kMny9ceRQ/NhvUM0qUXW5FJwf7nKhFTY6
-	 wQWP62jMlcDJ4iezS3w/vnEB/+cUgKoDOm9fHRubllmaL+WNClmUK4sLp60mJSi2Vv
-	 t0/qWtTieudUw==
+	b=HiAhe10QsiNMZLZJVA12+4ieEF5GUsBkHF1JGXD+GKZtyczR7R7ml4WzsqnmzEhcu
+	 3dZi+eKXzUXYjxsmFSNxUbnaPvsmOglnAmMmdGMEs6mz9aTzi7dEjDvAK3hS8C0ucR
+	 tfV/Y7mi7I+Gh93dCGEEg7cqt6MolzwKTOWrGzShqH/JTeEw3aTtCYfb5eUETc5M1k
+	 QafxaRgaoBfma7HUOcNNcv46P/WkyD60if+zV8VCdnrbQzOZecAtWJzWUa7vM8ckNd
+	 HDisbqlLW6qkfjfiaZ9QsauiE0IcAqrA/lV9GEU1Bam9WOYV9Q7o88TBRvgzY8nbyp
+	 IfX0Q52P44Y3Q==
 From: Jonathan Corbet <corbet@lwn.net>
 To: netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: sock: remove excess structure-member documentation
-Date: Tue, 19 Dec 2023 16:51:12 -0700
-Message-ID: <874jgdhhu7.fsf@meer.lwn.net>
+Cc: "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org
+Subject: [PATCH net] ethtool: reformat kerneldoc for struct
+ ethtool_link_settings
+Date: Tue, 19 Dec 2023 16:53:46 -0700
+Message-ID: <87zfy5g35h.fsf@meer.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,30 +52,68 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-Remove a couple of kerneldoc entries for struct members that do not exist,
-addressing these warnings:
+The kernel doc comments for struct ethtool_link_settings includes
+documentation for three fields that were never present there, leading to
+these docs-build warnings:
 
-  ./include/net/sock.h:548: warning: Excess struct member '__sk_flags_offset' description in 'sock'
-  ./include/net/sock.h:548: warning: Excess struct member 'sk_padding' description in 'sock'
+  ./include/uapi/linux/ethtool.h:2207: warning: Excess struct member 'supported' description in 'ethtool_link_settings'
+  ./include/uapi/linux/ethtool.h:2207: warning: Excess struct member 'advertising' description in 'ethtool_link_settings'
+  ./include/uapi/linux/ethtool.h:2207: warning: Excess struct member 'lp_advertising' description in 'ethtool_link_settings'
+
+Remove the entries to make the warnings go away.  There was some
+information there on how data in >link_mode_masks is formatted; move that
+to the body of the comment to preserve it.
 
 Signed-off-by: Jonathan Corbet <corbet@lwn.net>
 ---
- include/net/sock.h | 2 --
- 1 file changed, 2 deletions(-)
+ include/uapi/linux/ethtool.h | 27 +++++++++++++++------------
+ 1 file changed, 15 insertions(+), 12 deletions(-)
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 1d6931caf0c3..bee854b477b2 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -277,8 +277,6 @@ struct sk_filter;
-   *	@sk_pacing_status: Pacing status (requested, handled by sch_fq)
-   *	@sk_max_pacing_rate: Maximum pacing rate (%SO_MAX_PACING_RATE)
-   *	@sk_sndbuf: size of send buffer in bytes
--  *	@__sk_flags_offset: empty field used to determine location of bitfield
--  *	@sk_padding: unused element for alignment
-   *	@sk_no_check_tx: %SO_NO_CHECK setting, set checksum in TX packets
-   *	@sk_no_check_rx: allow zero checksum in RX packets
-   *	@sk_route_caps: route capabilities (e.g. %NETIF_F_TSO)
+diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
+index f7fba0dc87e5..50253287c321 100644
+--- a/include/uapi/linux/ethtool.h
++++ b/include/uapi/linux/ethtool.h
+@@ -2128,18 +2128,6 @@ enum ethtool_reset_flags {
+  *	refused. For drivers: ignore this field (use kernel's
+  *	__ETHTOOL_LINK_MODE_MASK_NBITS instead), any change to it will
+  *	be overwritten by kernel.
+- * @supported: Bitmap with each bit meaning given by
+- *	%ethtool_link_mode_bit_indices for the link modes, physical
+- *	connectors and other link features for which the interface
+- *	supports autonegotiation or auto-detection.  Read-only.
+- * @advertising: Bitmap with each bit meaning given by
+- *	%ethtool_link_mode_bit_indices for the link modes, physical
+- *	connectors and other link features that are advertised through
+- *	autonegotiation or enabled for auto-detection.
+- * @lp_advertising: Bitmap with each bit meaning given by
+- *	%ethtool_link_mode_bit_indices for the link modes, and other
+- *	link features that the link partner advertised through
+- *	autonegotiation; 0 if unknown or not applicable.  Read-only.
+  * @transceiver: Used to distinguish different possible PHY types,
+  *	reported consistently by PHYLIB.  Read-only.
+  * @master_slave_cfg: Master/slave port mode.
+@@ -2181,6 +2169,21 @@ enum ethtool_reset_flags {
+  * %set_link_ksettings() should validate all fields other than @cmd
+  * and @link_mode_masks_nwords that are not described as read-only or
+  * deprecated, and must ignore all fields described as read-only.
++ *
++ * @link_mode_masks is divided into three bitfields, each of length
++ * @link_mode_masks_nwords:
++ * - supported: Bitmap with each bit meaning given by
++ *	%ethtool_link_mode_bit_indices for the link modes, physical
++ *	connectors and other link features for which the interface
++ *	supports autonegotiation or auto-detection.  Read-only.
++ * - advertising: Bitmap with each bit meaning given by
++ *	%ethtool_link_mode_bit_indices for the link modes, physical
++ *	connectors and other link features that are advertised through
++ *	autonegotiation or enabled for auto-detection.
++ * - lp_advertising: Bitmap with each bit meaning given by
++ *	%ethtool_link_mode_bit_indices for the link modes, and other
++ *	link features that the link partner advertised through
++ *	autonegotiation; 0 if unknown or not applicable.  Read-only.
+  */
+ struct ethtool_link_settings {
+ 	__u32	cmd;
 -- 
 2.43.0
 
