@@ -1,86 +1,69 @@
-Return-Path: <netdev+bounces-58860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1594818623
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:16:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AC06818634
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:19:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1BDA1C239D5
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 11:16:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFDCD282BDB
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 11:19:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F5214F91;
-	Tue, 19 Dec 2023 11:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E33154AD;
+	Tue, 19 Dec 2023 11:18:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QH5d/8zH"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9B117982;
-	Tue, 19 Dec 2023 11:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R411e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0Vyqh1xd_1702984602;
-Received: from 30.221.130.243(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0Vyqh1xd_1702984602)
-          by smtp.aliyun-inc.com;
-          Tue, 19 Dec 2023 19:16:43 +0800
-Message-ID: <6fb86598-6114-bc64-2400-543e95fba8a2@linux.alibaba.com>
-Date: Tue, 19 Dec 2023 19:16:40 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A16B18634;
+	Tue, 19 Dec 2023 11:18:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C9B8C433C7;
+	Tue, 19 Dec 2023 11:18:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702984737;
+	bh=Qo03vyXdW7F4uUNSw3Fdacxi8RM9846AC7Ddh6naNlI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QH5d/8zH3zl+DcY3uXwrstlgJ95682qV32ULzGgcK1tIhO7HGokN3epDpO8f/38B9
+	 D16PTtMuSEBfneoKkQkGDAfvaNLUEgj85EScab+KU6p2URcaNKFeL7Oicerzx7vlqm
+	 eIoFdDksUsDFN7Kz/zIi6sVifFeFRwaEfZUdZQO9gZI2itAubKL/qTRVMyHZH6mZ/E
+	 Z3sHT3mQMEZ949bmwiGFgi728mRTjV3V+TERDx9+fUxt5x1T1eEd+gNGykrUgucVp6
+	 RocBFVrkh39cnHAGAK+gNIkVRfI6jVvsBBR6jbv58Eb5boFEvaFVbJh9PGzqj+ug1O
+	 5zPznOF0E05wA==
+Date: Tue, 19 Dec 2023 11:18:52 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	shenjian15@huawei.com, wangjie125@huawei.com,
+	liuyonglong@huawei.com, lanhao@huawei.com, wangpeiyang1@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V4 net-next 3/4] net: hns3: dump more reg info based on
+ ras mod
+Message-ID: <20231219111852.GJ811967@kernel.org>
+References: <20231219013513.2589845-1-shaojijie@huawei.com>
+ <20231219013513.2589845-4-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net-next v6 00/10] net/smc: implement SMCv2.1 virtual ISM
- device support
-To: Jan Karcher <jaka@linux.ibm.com>, wintera@linux.ibm.com,
- wenjia@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
- agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, kgraul@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, raspl@linux.ibm.com,
- schnelle@linux.ibm.com, guangguan.wang@linux.alibaba.com,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <1702371151-125258-1-git-send-email-guwen@linux.alibaba.com>
- <8d118a94-945f-466f-9d34-e0b8a6d8a9e7@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <8d118a94-945f-466f-9d34-e0b8a6d8a9e7@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231219013513.2589845-4-shaojijie@huawei.com>
 
+On Tue, Dec 19, 2023 at 09:35:12AM +0800, Jijie Shao wrote:
+> From: Peiyang Wang <wangpeiyang1@huawei.com>
+> 
+> Dump more reg info base on ras mod before reset, which is useful to
+> analyze the ras error.
+> 
+> Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-On 2023/12/14 00:13, Jan Karcher wrote:
-> 
-> 
-> On 12/12/2023 09:52, Wen Gu wrote:
->> The fourth edition of SMCv2 adds the SMC version 2.1 feature updates for
->> SMC-Dv2 with virtual ISM. Virtual ISM are created and supported mainly by
->> OS or hypervisor software, comparable to IBM ISM which is based on platform
->> firmware or hardware.
->>
->> With the introduction of virtual ISM, SMCv2.1 makes some updates:
->>
->> - Introduce feature bitmask to indicate supplemental features.
->> - Reserve a range of CHIDs for virtual ISM.
->> - Support extended GIDs (128 bits) in CLC handshake.
->>
->> So this patch set aims to implement these updates in Linux kernel. And it
->> acts as the first part of SMC-D virtual ISM extension & loopback-ism [1].
->>
->> [1] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
-> 
-> FYI I'm currently reviewing this version of the series.
-> Hope to give you feedback by the end of tomorrow.
-> 
-> Thanks for your effort
-> - Jan
-> 
-
-Thank you very much for your time, Jan. The new version (v7) is updated:
-https://lore.kernel.org/netdev/20231219084536.8158-1-guwen@linux.alibaba.com/
 
