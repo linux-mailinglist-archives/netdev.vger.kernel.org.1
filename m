@@ -1,100 +1,176 @@
-Return-Path: <netdev+bounces-59008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29658818ECA
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 18:53:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B15A9818F48
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 19:08:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D1D41C24EDA
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 17:53:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 664741F28722
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 18:08:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA9613985A;
-	Tue, 19 Dec 2023 17:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48CEF37D2A;
+	Tue, 19 Dec 2023 18:07:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siddh.me header.i=code@siddh.me header.b="d3w5td7+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AGNyDIKy"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender-of-o51.zoho.in (sender-of-o51.zoho.in [103.117.158.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D6E374F8;
-	Tue, 19 Dec 2023 17:50:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=siddh.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=siddh.me
-ARC-Seal: i=1; a=rsa-sha256; t=1703008193; cv=none; 
-	d=zohomail.in; s=zohoarc; 
-	b=O2lZZ9HwWZENrMMyZrM1Yzod/hHiK+jK7pDwdayn2m/RELjnaOQnoMBhLc8IgMYKPkp/gIlHxPLgIOZ4KmPkAVR/7tlVNneEy+hM1iKd8T4Osi57whn1bSuVC1f4zoc2OMSZ/G0LiBqOEJAOtx4j8NAvNsFbnsoupDURhzgLP5M=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
-	t=1703008193; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=872tkGPm7VUCxpgjJMERmpcep5wm35gG4ZP3R1Drljw=; 
-	b=RAmho9NtBqc8m36Qeb4liQdXtQa96J7exICe0g9G/LAGohQmSHMOq7impzN3sDPMcWQd2iuImnttjpLMgK27s0kTYvj34zoU7mZAl/gvF+mCIki+Z1umMeUvUmt0BcPiigMScbdTp0tfAwvGT47vijAHTqokNzmm7BXo/KMS1F4=
-ARC-Authentication-Results: i=1; mx.zohomail.in;
-	dkim=pass  header.i=siddh.me;
-	spf=pass  smtp.mailfrom=code@siddh.me;
-	dmarc=pass header.from=<code@siddh.me>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1703008193;
-	s=zmail; d=siddh.me; i=code@siddh.me;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=872tkGPm7VUCxpgjJMERmpcep5wm35gG4ZP3R1Drljw=;
-	b=d3w5td7+zQt54GRVeCfbgqH/oeI7Y0/Kqr/EfxRXvdCSbwbJTYN0z51jFOGuQ3DI
-	H+WpJKUkaIMo73xARw10HHgeCqQmna40+cEq7eCkGrH2l7dlq5pCdlaD4A3kptOOgna
-	5H5BRWJ2kwXXZN9Y9+zP8LcVOSbkCXJBYdTXw+9M=
-Received: from kampyooter.. (122.170.167.40 [122.170.167.40]) by mx.zoho.in
-	with SMTPS id 1703008191467810.3177351858395; Tue, 19 Dec 2023 23:19:51 +0530 (IST)
-From: Siddh Raman Pant <code@siddh.me>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Suman Ghosh <sumang@marvell.com>
-Subject: [PATCH net-next v7 2/2] nfc: Do not send datagram if socket state isn't LLCP_BOUND
-Date: Tue, 19 Dec 2023 23:19:44 +0530
-Message-ID: <0490c52b68c27730d9916ff22c917b4838c32af4.1702925869.git.code@siddh.me>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1702925869.git.code@siddh.me>
-References: <cover.1702925869.git.code@siddh.me>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A5D37D21;
+	Tue, 19 Dec 2023 18:07:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2cb21afa6c1so67644811fa.0;
+        Tue, 19 Dec 2023 10:07:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703009230; x=1703614030; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m1ZwhJRZ+N/d+fVkkOSiSnflGiueYMOvsJ8Gh3pY+IU=;
+        b=AGNyDIKyj8U/cb68cytRNvA6qP8BT2drBNahHGjI4Q1JmXEES1l4js7XoAkMGCfXSs
+         BoArn8jLLoLvTFLHoNeqPG/pEc1cqE1UlOPi3HMPi1aCevbCCm2/NiU5XGSzFp6g3yWV
+         MAKAV/WUeJRj34BIOkl935xVKP47qDKqZchm/P53y2jrtO9Ld2i2jumCr6ioNKL90qPj
+         w1eV3DRh2AWes2/vHDVTywsYnV3/0J2rwVCIbii6+m1mwsjx7tcoOCDCjpqo29Un5mRY
+         ttDEV6zJ7uklFZwiRH5/wtAaL/pXp8lxpLg+u8rnBWp1tSpRJfhEZxDexxfyfeT/gxAc
+         6+wA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703009230; x=1703614030;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m1ZwhJRZ+N/d+fVkkOSiSnflGiueYMOvsJ8Gh3pY+IU=;
+        b=g5JpnU9cAH9lngE5sGv0e48qhBCdIbEAkOU+WqUG9SbqeLyu/tsByzQtLJg/K81pIn
+         Zky10VyZYtzWwiaALUeDtOcQdFd6zxSROO911D2VqeCJERrhDaVttxUzeiXBiU+5kniU
+         BMO610fh5+p65BSgwSOCnkyj1wJmBIBfKYCzU9G8LHLJzsmg9xxsbgMOjIPfSkqhYS9l
+         X6tp2tuOawzrmWKnfnbELwTyPFjhMCXib3AJb/6G9Dt1mwBT7pZzwiKTGV4gVDnv0Cb1
+         K6wRU52Ish6RS5xEqGtMZ1t+eBtNxGijs9R3VQVIHRIqP7egLE1EGrRN4S4ugrVhgmko
+         RvLQ==
+X-Gm-Message-State: AOJu0Yy8sg9tY0lxi3Qr6+XtVI2A/q85ykQ6zIUz2oSM5wjH0PlAj9Tz
+	HX3HDbqq13BeC5VG4ZB44ZS4nJS5oE8O+v0DNbo=
+X-Google-Smtp-Source: AGHT+IHgrHf2vtd9/nC2WuK81Zvn8uEeNd7HMPJmvdMP//OocIojGSo3xSvxYEcEm60tX4XNcioe2quihSJ1O8WT8pA=
+X-Received: by 2002:a2e:b606:0:b0:2cc:87b4:3f9f with SMTP id
+ r6-20020a2eb606000000b002cc87b43f9fmr498039ljn.22.1703009229969; Tue, 19 Dec
+ 2023 10:07:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+References: <20231208130705.kernel.v1.1.Ic5024b3da99b11e39c247a5b8ba44876c18880a0@changeid>
+In-Reply-To: <20231208130705.kernel.v1.1.Ic5024b3da99b11e39c247a5b8ba44876c18880a0@changeid>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 19 Dec 2023 13:06:57 -0500
+Message-ID: <CABBYNZKOKOCzLkggM1PRXuFjsaU9-0=6WmdTxaF-s3v7WSzvhg@mail.gmail.com>
+Subject: Re: [kernel PATCH v1] Bluetooth: btmtksdio: clear BTMTKSDIO_BT_WAKE_ENABLED
+ after resume
+To: Zhengping Jiang <jiangzp@google.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, 
+	chromeos-bluetooth-upstreaming@chromium.org, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-As we know we cannot send the datagram (state can be set to LLCP_CLOSED
-by nfc_llcp_socket_release()), there is no need to proceed further.
+Hi Zhengping,
 
-Thus, bail out early from llcp_sock_sendmsg().
+On Fri, Dec 8, 2023 at 4:07=E2=80=AFPM Zhengping Jiang <jiangzp@google.com>=
+ wrote:
+>
+> Always clear BTMTKSDIO_BT_WAKE_ENABLED bit after resume. When Bluetooth
+> does not generate interrupts, the bit will not be cleared and causes
+> premature wakeup.
+>
+> Fixes: 4ed924fc122f ("Bluetooth: btmtksdio: enable bluetooth wakeup in sy=
+stem suspend")
+> Signed-off-by: Zhengping Jiang <jiangzp@google.com>
+> ---
+>
+> Changes in v1:
+> - Clear BTMTKSDIO_BT_WAKE_ENABLED flag on resume
+>
+>  drivers/bluetooth/btmtksdio.c    | 10 ++++++++++
+>  include/net/bluetooth/hci_core.h |  1 +
+>  net/bluetooth/hci_sync.c         |  2 ++
+>  3 files changed, 13 insertions(+)
+>
+> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.=
+c
+> index ff4868c83cd8..8f00b71573c8 100644
+> --- a/drivers/bluetooth/btmtksdio.c
+> +++ b/drivers/bluetooth/btmtksdio.c
+> @@ -1296,6 +1296,15 @@ static bool btmtksdio_sdio_inband_wakeup(struct hc=
+i_dev *hdev)
+>         return device_may_wakeup(bdev->dev);
+>  }
+>
+> +static void btmtksdio_disable_bt_wakeup(struct hci_dev *hdev)
+> +{
+> +       struct btmtksdio_dev *bdev =3D hci_get_drvdata(hdev);
+> +
+> +       if (!bdev)
+> +               return;
+> +       clear_bit(BTMTKSDIO_BT_WAKE_ENABLED, &bdev->tx_state);
+> +}
+> +
+>  static bool btmtksdio_sdio_wakeup(struct hci_dev *hdev)
+>  {
+>         struct btmtksdio_dev *bdev =3D hci_get_drvdata(hdev);
+> @@ -1363,6 +1372,7 @@ static int btmtksdio_probe(struct sdio_func *func,
+>         hdev->shutdown =3D btmtksdio_shutdown;
+>         hdev->send     =3D btmtksdio_send_frame;
+>         hdev->wakeup   =3D btmtksdio_sdio_wakeup;
+> +       hdev->clear_wakeup =3D btmtksdio_disable_bt_wakeup;
+>         /*
+>          * If SDIO controller supports wake on Bluetooth, sending a wakeo=
+n
+>          * command is not necessary.
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
+_core.h
+> index 0c1754f416bd..4bbd55335269 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -672,6 +672,7 @@ struct hci_dev {
+>         int (*get_codec_config_data)(struct hci_dev *hdev, __u8 type,
+>                                      struct bt_codec *codec, __u8 *vnd_le=
+n,
+>                                      __u8 **vnd_data);
+> +       void (*clear_wakeup)(struct hci_dev *hdev);
 
-Signed-off-by: Siddh Raman Pant <code@siddh.me>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Reviewed-by: Suman Ghosh <sumang@marvell.com>
----
- net/nfc/llcp_sock.c | 5 +++++
- 1 file changed, 5 insertions(+)
+I wonder if it wouldn't be a better idea to add something like suspend
+and resume callbacks to notify the about these hdev states, that way
+we can synchronize the states better and avoid having to clear the
+wakeup state when it shouldn't be active to begin with since the hdev
+is not suspended.
 
-diff --git a/net/nfc/llcp_sock.c b/net/nfc/llcp_sock.c
-index 645677f84dba..819157bbb5a2 100644
---- a/net/nfc/llcp_sock.c
-+++ b/net/nfc/llcp_sock.c
-@@ -796,6 +796,11 @@ static int llcp_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	}
- 
- 	if (sk->sk_type == SOCK_DGRAM) {
-+		if (sk->sk_state != LLCP_BOUND) {
-+			release_sock(sk);
-+			return -ENOTCONN;
-+		}
-+
- 		DECLARE_SOCKADDR(struct sockaddr_nfc_llcp *, addr,
- 				 msg->msg_name);
- 
--- 
-2.43.0
+>  };
+>
+>  #define HCI_PHY_HANDLE(handle) (handle & 0xff)
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index 3563a90ed2ac..6c4d5ce40524 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -5947,6 +5947,8 @@ int hci_resume_sync(struct hci_dev *hdev)
+>                 return 0;
+>
+>         hdev->suspended =3D false;
+> +       if (hdev->clear_wakeup)
+> +               hdev->clear_wakeup(hdev);
+>
+>         /* Restore event mask */
+>         hci_set_event_mask_sync(hdev);
+> --
+> 2.43.0.472.g3155946c3a-goog
+>
 
+
+--=20
+Luiz Augusto von Dentz
 
