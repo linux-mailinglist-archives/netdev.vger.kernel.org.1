@@ -1,90 +1,95 @@
-Return-Path: <netdev+bounces-59092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70E5F8194CF
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:55:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4CB78194D7
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:58:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25A921F23FE1
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 23:55:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23A161C23632
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 23:58:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FD0D3EA8E;
-	Tue, 19 Dec 2023 23:55:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4EC3F8E1;
+	Tue, 19 Dec 2023 23:58:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="BZzeEuPP"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="I43QO99F"
 X-Original-To: netdev@vger.kernel.org
-Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2773440BE0;
-	Tue, 19 Dec 2023 23:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
-Received: from localhost (unknown [IPv6:2601:280:5e00:7e19::646])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC53405DA;
+	Tue, 19 Dec 2023 23:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1703030310;
+	bh=9ot1i5HIItHqTBppVifdZueNQoMSqIGzNGpHOD0XAqc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=I43QO99FBAD+LAYUHaX0jD0j7R3pbtTunfbwq3SrhABMgkPe8NqQRgvTuixWDE7bi
+	 h20n+Au7JiN1soqOvjeDMKJUd4Tu291QWEP+bzcrgXs6PdSt2jPhL3RyP1QRmpG0fx
+	 XBZ+R4rnIxVCjT7JBGXdKlJUTGKwXnIxMS5LFaSWu1c+kXlwKDp/UuBGH4SmNpsD5I
+	 /Fjnik7GOhKzRqNQFjCJUQXXobMrSWIwk0mcW59H7TkymIcox7TEmhSpEqHz/xDwFC
+	 E9qCFLXc0vUhj9tGMEpVuGRKaOvOZx3VbURU4DnG5rfdJiZg7QVp82PiIEcibLo8Ih
+	 1nKgF43MkQQjA==
+Received: from [100.115.223.179] (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id 4E3632AE;
-	Tue, 19 Dec 2023 23:55:32 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 4E3632AE
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1703030132; bh=EXq6rWek7Ihcua6GQcHpZR4rHtTXCSQsjBPcDo0bgYA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=BZzeEuPPsI1uDYd4TlY8Q+Euo89z8zsKuR8O9P5rl5Nk0qXX8A013GzquNUTlX4Y5
-	 Z5/w5Tgj2Vx/zD5SGfkwONokhWWeZbYSLkuBlpozS5itGfdVPDz4y2oH8MPijx0x/U
-	 qKF2CITgydhq2Av12VdjiHHVlxZPv8MVuzaSiTwHzxPLdYAZkAPOIWLaYF3Oex0tLs
-	 WVGOcse6sh8F/mTtWovthNwb7dn3mhafhbc5p0HVBAmRSv3IofcLaYit6+BdxNK7KT
-	 rHiholnf3XHH6EKqg4+8jKwjMxR/wxkQ+M5yuPqewPDSFuxIqnAYwuzh6Fq3O7CoC2
-	 viWeEzJ14cMEw==
-From: Jonathan Corbet <corbet@lwn.net>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, linux-kernel@vger.kernel.org
-Subject: [PATCH net] ethtool: reformat kerneldoc for struct ethtool_fec_stats
-Date: Tue, 19 Dec 2023 16:55:31 -0700
-Message-ID: <87v88tg32k.fsf@meer.lwn.net>
+	(Authenticated sender: cristicc)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 912B237811D4;
+	Tue, 19 Dec 2023 23:58:29 +0000 (UTC)
+Message-ID: <25f36378-a998-4a48-b348-1ab1df6c803e@collabora.com>
+Date: Wed, 20 Dec 2023 01:58:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/1] StarFive DWMAC support for JH7100
+Content-Language: en-US
+To: Conor Dooley <conor@kernel.org>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Emil Renner Berthing <kernel@esmil.dk>,
+ Samin Guo <samin.guo@starfivetech.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kernel@collabora.com
+References: <20231219231040.2459358-1-cristian.ciocaltea@collabora.com>
+ <20231219-green-footwear-e81d37f9c63c@spud>
+From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+In-Reply-To: <20231219-green-footwear-e81d37f9c63c@spud>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The kerneldoc comment for struct ethtool_fec_stats attempts to describe the
-"total" and "lanes" fields of the ethtool_fec_stat substructure in a way
-leading to these warnings:
+On 12/20/23 01:48, Conor Dooley wrote:
+> On Wed, Dec 20, 2023 at 01:10:38AM +0200, Cristian Ciocaltea wrote:
+>> This is just a subset of the initial patch series [1] adding networking
+>> support for StarFive JH7100 SoC.
+>>
+>> [1]: https://lore.kernel.org/lkml/20231218214451.2345691-1-cristian.ciocaltea@collabora.com/
+> 
+> You need to send the binding patch alongside the driver, unless that has
+> been applied already.
 
-  ./include/linux/ethtool.h:424: warning: Excess struct member 'lane' description in 'ethtool_fec_stats'
-  ./include/linux/ethtool.h:424: warning: Excess struct member 'total' description in 'ethtool_fec_stats'
+Yeah, I wasn't sure about that, that's why I initially asked in [1] for
+a confirmation regarding the split.  I chose to keep the binding in the
+same set with the dts patches because the driver is just a glue layer
+and doesn't really depend on bindings changes.
 
-Reformat the comment to retain the information while eliminating the
-warnings.
+Should I still provide it here?  I was about to submit the remaining
+patch set, so it would be great if we could clarify this beforehand.
 
-Signed-off-by: Jonathan Corbet <corbet@lwn.net>
----
- include/linux/ethtool.h | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Thanks for noticing the potential issue,
+Cristian
 
-diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index 689028257fcc..77c7a9ac0ece 100644
---- a/include/linux/ethtool.h
-+++ b/include/linux/ethtool.h
-@@ -409,8 +409,10 @@ struct ethtool_pause_stats {
-  *	not entire FEC data blocks. This is a non-standard statistic.
-  *	Reported to user space as %ETHTOOL_A_FEC_STAT_CORR_BITS.
-  *
-- * @lane: per-lane/PCS-instance counts as defined by the standard
-- * @total: error counts for the entire port, for drivers incapable of reporting
-+ * For each of the above fields, the two substructure members are:
-+ *
-+ * - @lanes: per-lane/PCS-instance counts as defined by the standard
-+ * - @total: error counts for the entire port, for drivers incapable of reporting
-  *	per-lane stats
-  *
-  * Drivers should fill in either only total or per-lane statistics, core
--- 
-2.43.0
+[1]:
+https://lore.kernel.org/lkml/0451e5a9-0cfb-42a5-b74b-2012e2c0d326@collabora.com/
+
 
 
