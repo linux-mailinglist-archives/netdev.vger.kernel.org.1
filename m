@@ -1,335 +1,187 @@
-Return-Path: <netdev+bounces-59018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F51D818FA1
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 19:19:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C5D6818FB0
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 19:21:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DACFD288AEB
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 18:19:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4ACBE1C25108
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 18:21:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB92E38FB6;
-	Tue, 19 Dec 2023 18:16:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="Pd/ksgh9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A63C37D0B;
+	Tue, 19 Dec 2023 18:20:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 906C13B198
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 18:16:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1d3d0faf262so15180985ad.3
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 10:16:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1703009810; x=1703614610; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+Wj1EI+jejrr1+80FmGs2fBTfDHOu3WlruoLPf7+2Tc=;
-        b=Pd/ksgh9ZtJMUuMQbAPGCjczMKEHyKD81shuV9I/wlTUDsG3RGrcBb+iPe+94GXgV+
-         PUvt/R5R4m+URBTwUI6CmGXl22A4fb2Q0uobjacMCrY9SiqDViKPLZrgq/bwSlbk31Zi
-         dTuLED/54oGwNBFa8Gg4OGrkyiWmixXyWT5bK+6XELB/iOLuCvyJc3c3RInC6+dCAaaA
-         sgnixDpm0TYdZ064YKg+xwKcAP9BqI8P9RmTz8ou/Q51w6qu4LljhwxfpuYdnNfQ+bsR
-         h4IWZosmu8d6uhzHMdzrwEKR1UFNIGzv9pMF+l2/QVRQKyPgF9A5SHGeQESQsTJdewt4
-         ZHCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703009810; x=1703614610;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+Wj1EI+jejrr1+80FmGs2fBTfDHOu3WlruoLPf7+2Tc=;
-        b=AyII31TrhLeIyIkHVwzL7mlNRROCpOIzdlXvgTVYylX7XC8t79yURH8RP9jgE0DXzJ
-         xxeRpQ/OfahgafSDytvPx4a8nnXOKCk0OrPSMdsI5X8lQSOqbFITVu5bHYB4nSJ2+P9s
-         Pfayst60UoUDw6XZV3H09LrRuh0k1m0qnNlnT9xBM/jhBcYiy7lk7l7Q5/k9boEWWDM/
-         gGzJPQO1RPuNq9uSH2wfxCYfS7h0hW38K+dsotthATLgH/VSta6dt0UFwVvGwXy2sKmE
-         gy0no5emd89BGeOp1wJOAqYEzYVI3DILfba8h5HKv8eDc5af12+dQVtXcY9qYaE6FIE0
-         AkdQ==
-X-Gm-Message-State: AOJu0YwGXLt4tmN6RTDsteF0mw0OYkiSjNKi6gdNQFVXD775cuqmkaZh
-	Om2vSK+l/rvMUfZ6flmSf2rZEA==
-X-Google-Smtp-Source: AGHT+IEmQznYsHPA6tB4eW4jLpKiNxYWA1C6I8aJ8JgK+NKTFZ6fCFjZ6mgfFQ0sYTVIkrWhcbcd5g==
-X-Received: by 2002:a17:902:6bc4:b0:1d0:acd7:97fa with SMTP id m4-20020a1709026bc400b001d0acd797famr18562411plt.127.1703009809983;
-        Tue, 19 Dec 2023 10:16:49 -0800 (PST)
-Received: from localhost.localdomain ([2804:7f1:e2c0:60e3:4c1:486f:7eda:5fb5])
-        by smtp.gmail.com with ESMTPSA id h11-20020a170902f54b00b001d348571ccesm4372188plf.240.2023.12.19.10.16.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Dec 2023 10:16:49 -0800 (PST)
-From: Victor Nogueira <victor@mojatatu.com>
-To: jhs@mojatatu.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us
-Cc: mleitner@redhat.com,
-	vladbu@nvidia.com,
-	paulb@nvidia.com,
-	pctammela@mojatatu.com,
-	netdev@vger.kernel.org,
-	kernel@mojatatu.com
-Subject: [PATCH net-next v8 5/5] net/sched: act_mirred: Allow mirred to block
-Date: Tue, 19 Dec 2023 15:16:23 -0300
-Message-ID: <20231219181623.3845083-6-victor@mojatatu.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231219181623.3845083-1-victor@mojatatu.com>
-References: <20231219181623.3845083-1-victor@mojatatu.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A8439860;
+	Tue, 19 Dec 2023 18:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (178.176.72.19) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 19 Dec
+ 2023 21:20:47 +0300
+Subject: Re: [PATCH net-next v2 09/21] net: ravb: Split GTI computation and
+ set operations
+To: claudiu beznea <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>,
+	<geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214114600.2451162-10-claudiu.beznea.uj@bp.renesas.com>
+ <3e8f65e3-3aab-ddf4-2b05-16b275af6021@omp.ru>
+ <53c90a2a-c43b-40e7-a9b2-55aab55541d7@tuxon.dev>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <154d6a86-d2d3-afae-a604-aa8fecb63f23@omp.ru>
+Date: Tue, 19 Dec 2023 21:20:46 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <53c90a2a-c43b-40e7-a9b2-55aab55541d7@tuxon.dev>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/19/2023 17:56:33
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 182235 [Dec 19 2023]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info:
+	178.176.72.19:7.7.3,7.4.1;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: {cloud_iprep_silent}
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.72.19
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 12/19/2023 18:00:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 12/19/2023 3:42:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-So far the mirred action has dealt with syntax that handles
-mirror/redirection for netdev. A matching packet is redirected or mirrored
-to a target netdev.
+On 12/17/23 3:40 PM, claudiu beznea wrote:
 
-In this patch we enable mirred to mirror to a tc block as well.
-IOW, the new syntax looks as follows:
-... mirred <ingress | egress> <mirror | redirect> [index INDEX] < <blockid BLOCKID> | <dev <devname>> >
+[...]
+>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>
+>>> ravb_set_gti() was computing the value of GTI based on the reference clock
+>>> rate and then applied it to register. This was done on the driver's probe
+>>> function. In order to implement runtime PM for all IP variants (as some IP
+>>> variants switches to reset operation mode (and thus the register's content
+>>
+>>    Again, operating mode...
+>>
+>>> is lost) when module standby is configured through clock APIs) the GTI was
+>>
+>>    The GTI what? Setup?
+>>
+>>> split in 2 parts: one computing the value of the GTI register (done in the
+>>> driver's probe function) and one applying the computed value to register
+>>> (done in the driver's ndo_open API).
+>>>
+>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>> [...]
+>>
+>>> diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
+>>> index e0f8276cffed..76202395b68d 100644
+>>> --- a/drivers/net/ethernet/renesas/ravb.h
+>>> +++ b/drivers/net/ethernet/renesas/ravb.h
+>>> @@ -1106,6 +1106,8 @@ struct ravb_private {
+>>>  
+>>>  	const struct ravb_hw_info *info;
+>>>  	struct reset_control *rstc;
+>>> +
+>>> +	uint64_t gti_tiv;
+>>
+>>    Please use the kernel type, u64; uint64_t is for userland, IIRC.
+> 
+> I just kept the initial type here.
 
-Examples of mirroring or redirecting to a tc block:
-$ tc filter add block 22 protocol ip pref 25 \
-  flower dst_ip 192.168.0.0/16 action mirred egress mirror blockid 22
+   Oops, that type slipped in while I wasn't yet a reviewer. :-/
 
-$ tc filter add block 22 protocol ip pref 25 \
-  flower dst_ip 10.10.10.10/32 action mirred egress redirect blockid 22
+> Anyway, uint64_t should translate to u64 AFAICT.
 
-Co-developed-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
-Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-Signed-off-by: Victor Nogueira <victor@mojatatu.com>
----
- include/net/tc_act/tc_mirred.h        |   1 +
- include/uapi/linux/tc_act/tc_mirred.h |   1 +
- net/sched/act_mirred.c                | 119 +++++++++++++++++++++++++-
- 3 files changed, 119 insertions(+), 2 deletions(-)
+   Yes.
 
-diff --git a/include/net/tc_act/tc_mirred.h b/include/net/tc_act/tc_mirred.h
-index 32ce8ea36950..75722d967bf2 100644
---- a/include/net/tc_act/tc_mirred.h
-+++ b/include/net/tc_act/tc_mirred.h
-@@ -8,6 +8,7 @@
- struct tcf_mirred {
- 	struct tc_action	common;
- 	int			tcfm_eaction;
-+	u32                     tcfm_blockid;
- 	bool			tcfm_mac_header_xmit;
- 	struct net_device __rcu	*tcfm_dev;
- 	netdevice_tracker	tcfm_dev_tracker;
-diff --git a/include/uapi/linux/tc_act/tc_mirred.h b/include/uapi/linux/tc_act/tc_mirred.h
-index 2500a0005d05..c61e76f3c23b 100644
---- a/include/uapi/linux/tc_act/tc_mirred.h
-+++ b/include/uapi/linux/tc_act/tc_mirred.h
-@@ -21,6 +21,7 @@ enum {
- 	TCA_MIRRED_TM,
- 	TCA_MIRRED_PARMS,
- 	TCA_MIRRED_PAD,
-+	TCA_MIRRED_BLOCKID,
- 	__TCA_MIRRED_MAX
- };
- #define TCA_MIRRED_MAX (__TCA_MIRRED_MAX - 1)
-diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
-index a1be8f3c4a8e..d1f9794ca9b7 100644
---- a/net/sched/act_mirred.c
-+++ b/net/sched/act_mirred.c
-@@ -85,6 +85,7 @@ static void tcf_mirred_release(struct tc_action *a)
- 
- static const struct nla_policy mirred_policy[TCA_MIRRED_MAX + 1] = {
- 	[TCA_MIRRED_PARMS]	= { .len = sizeof(struct tc_mirred) },
-+	[TCA_MIRRED_BLOCKID]	= NLA_POLICY_MIN(NLA_U32, 1),
- };
- 
- static struct tc_action_ops act_mirred_ops;
-@@ -136,6 +137,17 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
- 	if (exists && bind)
- 		return 0;
- 
-+	if (tb[TCA_MIRRED_BLOCKID] && parm->ifindex) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Cannot specify Block ID and dev simultaneously");
-+		if (exists)
-+			tcf_idr_release(*a, bind);
-+		else
-+			tcf_idr_cleanup(tn, index);
-+
-+		return -EINVAL;
-+	}
-+
- 	switch (parm->eaction) {
- 	case TCA_EGRESS_MIRROR:
- 	case TCA_EGRESS_REDIR:
-@@ -152,9 +164,10 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
- 	}
- 
- 	if (!exists) {
--		if (!parm->ifindex) {
-+		if (!parm->ifindex && !tb[TCA_MIRRED_BLOCKID]) {
- 			tcf_idr_cleanup(tn, index);
--			NL_SET_ERR_MSG_MOD(extack, "Specified device does not exist");
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "Must specify device or block");
- 			return -EINVAL;
- 		}
- 		ret = tcf_idr_create_from_flags(tn, index, est, a,
-@@ -192,6 +205,11 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
- 		tcf_mirred_replace_dev(m, ndev);
- 		netdev_tracker_alloc(ndev, &m->tcfm_dev_tracker, GFP_ATOMIC);
- 		m->tcfm_mac_header_xmit = mac_header_xmit;
-+		m->tcfm_blockid = 0;
-+	} else if (tb[TCA_MIRRED_BLOCKID]) {
-+		tcf_mirred_replace_dev(m, NULL);
-+		m->tcfm_mac_header_xmit = false;
-+		m->tcfm_blockid = nla_get_u32(tb[TCA_MIRRED_BLOCKID]);
- 	}
- 	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
- 	m->tcfm_eaction = parm->eaction;
-@@ -316,6 +334,89 @@ static int tcf_mirred_to_dev(struct sk_buff *skb, struct tcf_mirred *m,
- 	return retval;
- }
- 
-+static int tcf_blockcast_redir(struct sk_buff *skb, struct tcf_mirred *m,
-+			       struct tcf_block *block, int m_eaction,
-+			       const u32 exception_ifindex, int retval)
-+{
-+	struct net_device *dev_prev = NULL;
-+	struct net_device *dev = NULL;
-+	unsigned long index;
-+	int mirred_eaction;
-+
-+	mirred_eaction = tcf_mirred_act_wants_ingress(m_eaction) ?
-+		TCA_INGRESS_MIRROR : TCA_EGRESS_MIRROR;
-+
-+	xa_for_each(&block->ports, index, dev) {
-+		if (index == exception_ifindex)
-+			continue;
-+
-+		if (!dev_prev)
-+			goto assign_prev;
-+
-+		tcf_mirred_to_dev(skb, m, dev_prev,
-+				  dev_is_mac_header_xmit(dev),
-+				  mirred_eaction, retval);
-+assign_prev:
-+		dev_prev = dev;
-+	}
-+
-+	if (dev_prev)
-+		return tcf_mirred_to_dev(skb, m, dev_prev,
-+					 dev_is_mac_header_xmit(dev_prev),
-+					 m_eaction, retval);
-+
-+	return retval;
-+}
-+
-+static int tcf_blockcast_mirror(struct sk_buff *skb, struct tcf_mirred *m,
-+				struct tcf_block *block, int m_eaction,
-+				const u32 exception_ifindex, int retval)
-+{
-+	struct net_device *dev = NULL;
-+	unsigned long index;
-+
-+	xa_for_each(&block->ports, index, dev) {
-+		if (index == exception_ifindex)
-+			continue;
-+
-+		tcf_mirred_to_dev(skb, m, dev,
-+				  dev_is_mac_header_xmit(dev),
-+				  m_eaction, retval);
-+	}
-+
-+	return retval;
-+}
-+
-+static int tcf_blockcast(struct sk_buff *skb, struct tcf_mirred *m,
-+			 const u32 blockid, struct tcf_result *res,
-+			 int retval)
-+{
-+	const u32 exception_ifindex = skb->dev->ifindex;
-+	struct tcf_block *block;
-+	bool is_redirect;
-+	int m_eaction;
-+
-+	m_eaction = READ_ONCE(m->tcfm_eaction);
-+	is_redirect = tcf_mirred_is_act_redirect(m_eaction);
-+
-+	/* we are already under rcu protection, so can call block lookup
-+	 * directly.
-+	 */
-+	block = tcf_block_lookup(dev_net(skb->dev), blockid);
-+	if (!block || xa_empty(&block->ports)) {
-+		tcf_action_inc_overlimit_qstats(&m->common);
-+		return retval;
-+	}
-+
-+	if (is_redirect)
-+		return tcf_blockcast_redir(skb, m, block, m_eaction,
-+					   exception_ifindex, retval);
-+
-+	/* If it's not redirect, it is mirror */
-+	return tcf_blockcast_mirror(skb, m, block, m_eaction, exception_ifindex,
-+				    retval);
-+}
-+
- TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *skb,
- 				     const struct tc_action *a,
- 				     struct tcf_result *res)
-@@ -326,6 +427,7 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *skb,
- 	bool m_mac_header_xmit;
- 	struct net_device *dev;
- 	int m_eaction;
-+	u32 blockid;
- 
- 	nest_level = __this_cpu_inc_return(mirred_nest_level);
- 	if (unlikely(nest_level > MIRRED_NEST_LIMIT)) {
-@@ -338,6 +440,12 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *skb,
- 	tcf_lastuse_update(&m->tcf_tm);
- 	tcf_action_update_bstats(&m->common, skb);
- 
-+	blockid = READ_ONCE(m->tcfm_blockid);
-+	if (blockid) {
-+		retval = tcf_blockcast(skb, m, blockid, res, retval);
-+		goto dec_nest_level;
-+	}
-+
- 	dev = rcu_dereference_bh(m->tcfm_dev);
- 	if (unlikely(!dev)) {
- 		pr_notice_once("tc mirred: target device is gone\n");
-@@ -379,6 +487,7 @@ static int tcf_mirred_dump(struct sk_buff *skb, struct tc_action *a, int bind,
- 	};
- 	struct net_device *dev;
- 	struct tcf_t t;
-+	u32 blockid;
- 
- 	spin_lock_bh(&m->tcf_lock);
- 	opt.action = m->tcf_action;
-@@ -390,6 +499,10 @@ static int tcf_mirred_dump(struct sk_buff *skb, struct tc_action *a, int bind,
- 	if (nla_put(skb, TCA_MIRRED_PARMS, sizeof(opt), &opt))
- 		goto nla_put_failure;
- 
-+	blockid = m->tcfm_blockid;
-+	if (blockid && nla_put_u32(skb, TCA_MIRRED_BLOCKID, blockid))
-+		goto nla_put_failure;
-+
- 	tcf_tm_dump(&t, &m->tcf_tm);
- 	if (nla_put_64bit(skb, TCA_MIRRED_TM, sizeof(t), &t, TCA_MIRRED_PAD))
- 		goto nla_put_failure;
-@@ -420,6 +533,8 @@ static int mirred_device_event(struct notifier_block *unused,
- 				 * net_device are already rcu protected.
- 				 */
- 				RCU_INIT_POINTER(m->tcfm_dev, NULL);
-+			} else if (m->tcfm_blockid) {
-+				m->tcfm_blockid = 0;
- 			}
- 			spin_unlock_bh(&m->tcf_lock);
- 		}
--- 
-2.25.1
+> Looking at it again the field here is enough to be 32 bit as the register
+> field is no longer than that. It is needed on 64 bits when checking the
+> ranges in compute function.
 
+   Indeed. The actual GTI.TIV field is even 28-bit wide only...
+
+[...]
+>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>>> index d7f6e8ea8e79..5e01e03e1b43 100644
+>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>>> @@ -1750,6 +1750,51 @@ static int ravb_set_reset_mode(struct net_device *ndev)
+>>>  	return error;
+>>>  }
+>>>  
+>>> +static int ravb_set_gti(struct net_device *ndev)
+>>> +{
+>> [...]
+>>> +	/* Request GTI loading */
+>>> +	ravb_modify(ndev, GCCR, GCCR_LTI, GCCR_LTI);
+>>> +
+>>> +	/* Check completion status. */
+>>> +	return ravb_wait(ndev, GCCR, GCCR_LTI, 0);
+>>
+>>    Is this really necessary?
+> 
+> I've just updated it to respect the manual specifications. Please let me
+> know if you want me to drop it. For this series it should be harmless
+> keeping it as it was previously (I will double check it).
+
+   Looks like you'll have to frop the fix patch #2, so this ravb_wait()
+call shouldn't be placed here as well...
+
+>> [...]
+>>> @@ -1767,6 +1812,10 @@ static int ravb_open(struct net_device *ndev)
+>>>  		goto out_napi_off;
+>>>  	ravb_emac_init(ndev);
+>>>  
+>>> +	error = ravb_set_gti(ndev);
+>>> +	if (error)
+>>> +		goto out_dma_stop;
+>>> +
+>>
+>>    Hm... belongs in ravb_dmac_init() now, as it seems... 
+> 
+> Isn't it PTP specific?
+
+   I just had an impression it belonged to the AVB-DMAC register range
+but perhaps I'm wrong...
+
+[...]
+
+MBR, Sergey
 
