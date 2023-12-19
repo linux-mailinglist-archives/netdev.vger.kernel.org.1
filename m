@@ -1,203 +1,251 @@
-Return-Path: <netdev+bounces-58784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5AE1818332
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 09:18:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2D83818339
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 09:19:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4449FB23C1E
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 08:18:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E30A61C2399A
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 08:19:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 251BE11710;
-	Tue, 19 Dec 2023 08:17:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ecYOVDfq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0703D11700;
+	Tue, 19 Dec 2023 08:19:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22D614267;
-	Tue, 19 Dec 2023 08:17:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702973855; x=1734509855;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=gA33C88lLypI/mnTgB5T0KSA6Hi+/UFBm/D8v5cDsfs=;
-  b=ecYOVDfqfOrCpJTwzva/tGq0FpWb4/NYUsA3fxM0Jk2sbWeu5D1AeaZO
-   UJp3vnW+O7HRF7x2AgYkzIpV0N70fOpRbbRHh0KQ4qZeXQ2MmBDRaweO+
-   +BE/InksEctLEkDcYjKL7xnrNvpjm0ER08Ew0eAd1KLt4HpA2CiPOctDv
-   z1fN1TrCowOzSx58IhITkBTBuR9TbKMLgL9a9FrcHCOeSfd45+4Vt5n50
-   leEKigNbhw5b8fdR5ahX7GeSFOlgjm2/hMZgf+5ptIeHpRG/TIzMWU5bw
-   0RuODxCnZCE3BQh4iMhm3WKitPYr386Qx6z82JRjO6bKC2k/j7nTGqh9c
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10928"; a="375114471"
-X-IronPort-AV: E=Sophos;i="6.04,287,1695711600"; 
-   d="scan'208";a="375114471"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 00:17:35 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10928"; a="779399580"
-X-IronPort-AV: E=Sophos;i="6.04,287,1695711600"; 
-   d="scan'208";a="779399580"
-Received: from linux.intel.com ([10.54.29.200])
-  by fmsmga007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 00:17:34 -0800
-Received: from mohdfai2-iLBPG12-1.png.intel.com (mohdfai2-iLBPG12-1.png.intel.com [10.88.227.73])
-	by linux.intel.com (Postfix) with ESMTP id EFAC4580E34;
-	Tue, 19 Dec 2023 00:17:31 -0800 (PST)
-From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 net 4/4] net/sched: taprio: get corrected value of cycle_time and interval
-Date: Tue, 19 Dec 2023 03:14:53 -0500
-Message-Id: <20231219081453.718489-5-faizal.abdul.rahim@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231219081453.718489-1-faizal.abdul.rahim@linux.intel.com>
-References: <20231219081453.718489-1-faizal.abdul.rahim@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C0B13FE3;
+	Tue, 19 Dec 2023 08:18:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0VyqA-Ko_1702973928;
+Received: from 30.221.130.243(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VyqA-Ko_1702973928)
+          by smtp.aliyun-inc.com;
+          Tue, 19 Dec 2023 16:18:49 +0800
+Message-ID: <e1c819b9-a088-8284-9083-90408c78eb2e@linux.alibaba.com>
+Date: Tue, 19 Dec 2023 16:18:46 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next v6 03/10] net/smc: unify the structs of accept or
+ confirm message for v1 and v2
+To: Alexandra Winter <wintera@linux.ibm.com>, wenjia@linux.ibm.com,
+ hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kgraul@linux.ibm.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, raspl@linux.ibm.com,
+ schnelle@linux.ibm.com, guangguan.wang@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <1702371151-125258-1-git-send-email-guwen@linux.alibaba.com>
+ <1702371151-125258-4-git-send-email-guwen@linux.alibaba.com>
+ <63aa2995-7980-430d-84be-58ce204f5172@linux.ibm.com>
+ <32c7fbda-297b-76a7-9da3-e136b49a63b5@linux.alibaba.com>
+ <c9d908e3-5147-4c54-a2de-ef9254ac5c4f@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <c9d908e3-5147-4c54-a2de-ef9254ac5c4f@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Added a new field, correction_active to determine the entry's correction
-state. This field is required due to specific flow like
-find_entry_to_transmit() -> get_interval_end_time() which retrieves
-the interval for each entry. During positive cycle time correction,
-it's known that the last entry interval requires correction.
-However, for negative correction, the affected entry is unknown, which
-is why this new field is necessary.
 
-Note that in some cases where the original values are required,
-such as in dump_schedule() and setup_first_end_time(), direct calls
-to cycle_time and interval are retained without using the new functions.
 
-Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
----
- net/sched/sch_taprio.c | 34 ++++++++++++++++++++++++++++------
- 1 file changed, 28 insertions(+), 6 deletions(-)
+On 2023/12/19 01:40, Alexandra Winter wrote:
+> 
+> 
+> On 18.12.23 13:21, Wen Gu wrote:
+>> The fields in smcr_clc_msg_accept_confirm and smcd_clc_msg_accept_confirm_common
+>> seem to have not changed since SMCDv1. So I guess there is no v2-only fields
+>> in this two struct. I tried to confirm this in some documents but didn't find
+>> the message format for v1.
+> 
+> V1 is documented in
+> https://datatracker.ietf.org/doc/html/draft-fox-tcpm-shared-memory-rdma-03
+> 
 
-diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-index a3c71be21af2..d11ddb1f554c 100644
---- a/net/sched/sch_taprio.c
-+++ b/net/sched/sch_taprio.c
-@@ -61,6 +61,7 @@ struct sched_entry {
- 	u32 gate_mask;
- 	u32 interval;
- 	u8 command;
-+	bool correction_active;
- };
- 
- struct sched_gate_list {
-@@ -220,6 +221,14 @@ static bool sched_switch_pending(const struct sched_gate_list *oper)
- 	return oper->cycle_time_correction != CYCLE_TIME_CORRECTION_UNSPEC;
- }
- 
-+static s64 get_cycle_time(const struct sched_gate_list *oper)
-+{
-+	if (sched_switch_pending(oper))
-+		return oper->cycle_time + oper->cycle_time_correction;
-+	else
-+		return oper->cycle_time;
-+}
-+
- /* Get how much time has been already elapsed in the current cycle. */
- static s32 get_cycle_time_elapsed(struct sched_gate_list *sched, ktime_t time)
- {
-@@ -227,11 +236,20 @@ static s32 get_cycle_time_elapsed(struct sched_gate_list *sched, ktime_t time)
- 	s32 time_elapsed;
- 
- 	time_since_sched_start = ktime_sub(time, sched->base_time);
--	div_s64_rem(time_since_sched_start, sched->cycle_time, &time_elapsed);
-+	div_s64_rem(time_since_sched_start, get_cycle_time(sched), &time_elapsed);
- 
- 	return time_elapsed;
- }
- 
-+static u32 get_interval(const struct sched_entry *entry,
-+			const struct sched_gate_list *oper)
-+{
-+	if (entry->correction_active)
-+		return entry->interval + oper->cycle_time_correction;
-+	else
-+		return entry->interval;
-+}
-+
- static ktime_t get_interval_end_time(struct sched_gate_list *sched,
- 				     struct sched_gate_list *admin,
- 				     struct sched_entry *entry,
-@@ -240,8 +258,9 @@ static ktime_t get_interval_end_time(struct sched_gate_list *sched,
- 	s32 cycle_elapsed = get_cycle_time_elapsed(sched, intv_start);
- 	ktime_t intv_end, cycle_ext_end, cycle_end;
- 
--	cycle_end = ktime_add_ns(intv_start, sched->cycle_time - cycle_elapsed);
--	intv_end = ktime_add_ns(intv_start, entry->interval);
-+	cycle_end = ktime_add_ns(intv_start,
-+				 get_cycle_time(sched) - cycle_elapsed);
-+	intv_end = ktime_add_ns(intv_start, get_interval(entry, sched));
- 	cycle_ext_end = ktime_add(cycle_end, sched->cycle_time_extension);
- 
- 	if (ktime_before(intv_end, cycle_end))
-@@ -348,7 +367,7 @@ static struct sched_entry *find_entry_to_transmit(struct sk_buff *skb,
- 	if (!sched)
- 		return NULL;
- 
--	cycle = sched->cycle_time;
-+	cycle = get_cycle_time(sched);
- 	cycle_elapsed = get_cycle_time_elapsed(sched, time);
- 	curr_intv_end = ktime_sub_ns(time, cycle_elapsed);
- 	cycle_end = ktime_add_ns(curr_intv_end, cycle);
-@@ -362,7 +381,7 @@ static struct sched_entry *find_entry_to_transmit(struct sk_buff *skb,
- 			break;
- 
- 		if (!(entry->gate_mask & BIT(tc)) ||
--		    packet_transmit_time > entry->interval)
-+		    packet_transmit_time > get_interval(entry, sched))
- 			continue;
- 
- 		txtime = entry->next_txtime;
-@@ -540,7 +559,8 @@ static long get_packet_txtime(struct sk_buff *skb, struct Qdisc *sch)
- 		 * interval starts.
- 		 */
- 		if (ktime_after(transmit_end_time, interval_end))
--			entry->next_txtime = ktime_add(interval_start, sched->cycle_time);
-+			entry->next_txtime =
-+				ktime_add(interval_start, get_cycle_time(sched));
- 	} while (sched_changed || ktime_after(transmit_end_time, interval_end));
- 
- 	entry->next_txtime = transmit_end_time;
-@@ -1033,6 +1053,7 @@ static enum hrtimer_restart advance_sched(struct hrtimer *timer)
- 
- 			oper->cycle_end_time = new_base_time;
- 			end_time = new_base_time;
-+			next->correction_active = true;
- 
- 			update_open_gate_duration(next, oper, num_tc,
- 						  new_gate_duration);
-@@ -1133,6 +1154,7 @@ static int fill_sched_entry(struct taprio_sched *q, struct nlattr **tb,
- 	}
- 
- 	entry->interval = interval;
-+	entry->correction_active = false;
- 
- 	return 0;
- }
--- 
-2.25.1
+Thank you, Sandy. It clearly shows the SMC-Rv1 message format. I guess SMC-Dv1
+message format is not publicly documented?
 
+>>
+>> If the smcr_clc_msg_accept_confirm and smcd_clc_msg_accept_confirm_common
+>> is inherited from v1, should we still put the fields of v2 into these two structures?
+> 
+> You are right, they do not contain v2 fields, I guess I was confused.
+> 
+> I still think, it would be better for readability and maintainability to avoid
+> +#define r0	r1._r0
+> +#define d0	d1._d0
+> 
+
+I agree. Macros may cause some unexpected substitutions. I will remove them.
+
+> I guess you and previous editors wanted to avoid changing all the instances that use r0 and d0.
+> But then.. it is a rather simple search/replace..
+> 
+
+Yes, but not exactly. clc->r1.r0.xxx is somewhat strange for me, compared to clc->r0.xxx.
+So I try to avoid it.
+
+>>
+>> If still, I will change these structures as
+>>
+>> diff --git a/net/smc/smc_clc.h b/net/smc/smc_clc.h
+>> index 614fa2f298f5..18157aeb14ec 100644
+>> --- a/net/smc/smc_clc.h
+>> +++ b/net/smc/smc_clc.h
+>> @@ -201,9 +201,12 @@ struct smcr_clc_msg_accept_confirm {       /* SMCR accept/confirm */
+>>          __be64 rmb_dma_addr;    /* RMB virtual address */
+>>          u8 reserved2;
+>>          u8 psn[3];              /* packet sequence number */
+>> +       /* v2 only, reserved and ignored in v1: */
+>> +       u8 eid[SMC_MAX_EID_LEN];
+>> +       u8 reserved6[8];
+>>   } __packed;
+>>
+>> -struct smcd_clc_msg_accept_confirm_common {    /* SMCD accept/confirm */
+>> +struct smcd_clc_msg_accept_confirm {   /* SMCD accept/confirm */
+>>          __be64 gid;             /* Sender GID */
+>>          __be64 token;           /* DMB token */
+>>          u8 dmbe_idx;            /* DMBE index */
+>> @@ -216,6 +219,10 @@ struct smcd_clc_msg_accept_confirm_common {        /* SMCD accept/confirm */
+>>   #endif
+>>          u16 reserved4;
+>>          __be32 linkid;          /* Link identifier */
+>> +       /* v2 only, reserved and ignored in v1: */
+>> +       __be16 chid;
+>> +       u8 eid[SMC_MAX_EID_LEN];
+>> +       u8 reserved5[8];
+>>   } __packed;
+>>
+>>   #define SMC_CLC_OS_ZOS         1
+>> @@ -259,22 +266,9 @@ struct smc_clc_fce_gid_ext {
+>>   struct smc_clc_msg_accept_confirm {    /* clc accept / confirm message */
+>>          struct smc_clc_msg_hdr hdr;
+>>          union {
+>> -               struct { /* SMC-R */
+>> -                       struct smcr_clc_msg_accept_confirm _r0;
+>> -                       /* v2 only, reserved and ignored in v1: */
+> 
+> ^^ Actually these commetns are not fully correct. The fields are not reserved in V1.
+> (my bad) The message length is shorter in V1.
+> So /* v2 only: */ would be more correct.
+> 
+>> -                       u8 eid[SMC_MAX_EID_LEN];
+>> -                       u8 reserved6[8];
+>> -               } r1;
+>> -               struct { /* SMC-D */
+>> -                       struct smcd_clc_msg_accept_confirm_common _d0;
+>> -                       /* v2 only, reserved and ignored in v1: */
+> 
+> same here: /* v2 only: */
+> 
+>> -                       __be16 chid;
+>> -                       u8 eid[SMC_MAX_EID_LEN];
+>> -                       u8 reserved5[8];
+>> -               } d1;
+>> +               struct smcr_clc_msg_accept_confirm r0; /* SMC-R */
+>> +               struct smcd_clc_msg_accept_confirm d0; /* SMC-D */
+>>          };
+>> -#define r0     r1._r0
+>> -#define d0     d1._d0
+>>   };
+>>
+>>>
+>>>>    };
+> 
+> Yes, I like that solution better.
+> But I have no strong feelings. At least the duplicate declarations are gone.
+> So, if you prefer the #defines , it's ok with me.
+> 
+
+After wrestling with several options, I decided to go with this definition.
+
+  struct smc_clc_msg_accept_confirm {    /* clc accept / confirm message */
+-       struct smc_clc_msg_hdr hdr;
+-       union {
+-               struct smcr_clc_msg_accept_confirm r0; /* SMC-R */
+-               struct { /* SMC-D */
+-                       struct smcd_clc_msg_accept_confirm_common d0;
+-                       u32 reserved5[3];
+-               };
+-       };
+-} __packed;                    /* format defined in RFC7609 */
+-
+-struct smc_clc_msg_accept_confirm_v2 { /* clc accept / confirm message */
+         struct smc_clc_msg_hdr hdr;
+         union {
+                 struct { /* SMC-R */
+                         struct smcr_clc_msg_accept_confirm r0;
+-                       u8 eid[SMC_MAX_EID_LEN];
+-                       u8 reserved6[8];
+-               } r1;
++                       struct { /* v2 only */
++                               u8 eid[SMC_MAX_EID_LEN];
++                               u8 reserved6[8];
++                       } __packed r1;
++               };
+                 struct { /* SMC-D */
+                         struct smcd_clc_msg_accept_confirm_common d0;
+-                       __be16 chid;
+-                       u8 eid[SMC_MAX_EID_LEN];
+-                       u8 reserved5[8];
+-               } d1;
++                       struct { /* v2 only, but 12 bytes reserved in v1 */
++                               __be16 chid;
++                               u8 eid[SMC_MAX_EID_LEN];
++                               u8 reserved5[8];
++                       } __packed d1;
++               };
+         };
+  };
+
+Based on these considerations:
+- smcr_clc_msg_accept_confirm and smcd_clc_msg_accept_confirm_common are inherited
+   from v1 or common with v1, I think it's better to reflect this in the definition.
+   So I didn't put the v2 fields into them.
+- d1 and r1 is used as name of following v2 fields, so that no need to change the
+   instances that use r0/d0/r1/d1, and no need to use macro.
+- __packed is added in d1 and r1 since smc_clc_msg_hdr, smcr_clc_msg_accept_confirm
+   and smcd_clc_msg_accept_confirm_common is packed, and the subsequent modifications
+   will most likely occur on d1 and r1 (e.g. using the reserved fields).
+- Add the comment 'but 12 bytes reserved in v1' since I guess people may wonder why
+   SMCD_CLC_ACCEPT_CONFIRM_LEN is defined as 48. The comments could be a explanation.
+   (I have also considered using a union to show the 12 bytes, but this would make the
+    structure appear complicated. Given that the length of the SMCDv2 field has already
+    exceeded 12 bytes and cannot be shortened, I think it is fine as it is.)
+
+> 
+> 
+>>>
+>>> You have removed the __packed attribute.
+>>> patch 07/10 adds it back for the SMC-D case, but the SMC-R case needs it as well.
+>>>
+>>
+>> r1 and d1 in smc_clc_msg_accept_confirm_v2 (smc_clc_msg_accept_confirm now in
+>> this patch) is aligned well. In patch 07/10 I replaced reserved5[8] with u64 gid_ext,
+>> thus making a hole before gid_ext, so I added __packed attribute to SMC-D.
+>>
+>> If it is to avoid potential mistakes in future expansion, I can also add __packed to SMC-R.
+>>
+> 
+> Yes, __packed is not only about preventing misalignement today.
+> IMU, without __packed, there is no guarantee that a future compile run will not insert unused bytes.
+> (highly unlikely, I admit). But __packed makes it visible that this needs to go to hardware in exactly
+> this layout.
+> 
+
+Agree. I will add them to r1 and d1 definition.
+
+Thank you.
+Wen Gu
+
+> 
+>> Thanks.
 
