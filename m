@@ -1,171 +1,143 @@
-Return-Path: <netdev+bounces-58888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A205E8187E5
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 13:49:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FE0D8187EB
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 13:50:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57A241F2103A
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:49:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DFB328A89A
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D5F1862A;
-	Tue, 19 Dec 2023 12:49:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="JT3RSC2l"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4228318629;
+	Tue, 19 Dec 2023 12:50:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 245651CA82;
-	Tue, 19 Dec 2023 12:49:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1702990151;
-	bh=7c9DrFu1ZPG35MYcFGxt231G+iS6qoQmOYU2uV067uQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=JT3RSC2lfVBE6Q7Yc6yECbidmsqSt8wv21FHq8IqeElYu7eoJt6pu3SOLiUnWNgfM
-	 nLdU6Atb2ypBuVzamOh0RuSPDqskOJpHPFlb0r4Eyd1f4W+4ofj+Zostqz8r83UpkE
-	 H89CazU5ezRWmR4nhfDV4fozczu+cpW6+uqRGoTgUJ0pmUtT0EFwSwHjezODsw9YbK
-	 KvqYz3xQZf8/e3YCLuHWrVr6MZKldCWplJ04NGFAfexrbOKBQrpmpdAvOYqyExoDTh
-	 Xb43sr8KuHd1zzrFmBJXl+4BorJa246m4a030YTSG724eoufc5Dydjy+75zGVQ9Pbg
-	 027k9msweKWkA==
-Received: from [100.115.223.179] (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: cristicc)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 7278F37813EB;
-	Tue, 19 Dec 2023 12:49:09 +0000 (UTC)
-Message-ID: <d030f5b7-8d32-4a80-a3c0-98cfa1c0fe4f@collabora.com>
-Date: Tue, 19 Dec 2023 14:49:08 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F6EA1862E;
+	Tue, 19 Dec 2023 12:50:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VyqyhQ6_1702990206;
+Received: from 30.221.149.49(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VyqyhQ6_1702990206)
+          by smtp.aliyun-inc.com;
+          Tue, 19 Dec 2023 20:50:08 +0800
+Message-ID: <2fd4fb88-8aaa-b22d-d048-776a6c19d9a6@linux.alibaba.com>
+Date: Tue, 19 Dec 2023 20:50:06 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/9] dt-bindings: net: starfive,jh7110-dwmac: Add
- JH7100 SoC compatible
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [RFC nf-next v2 1/2] netfilter: bpf: support prog update
 Content-Language: en-US
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
- Samin Guo <samin.guo@starfivetech.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Hal Feng <hal.feng@starfivetech.com>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
- linux-clk@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, kernel@collabora.com
-References: <20231218214451.2345691-1-cristian.ciocaltea@collabora.com>
- <20231218214451.2345691-3-cristian.ciocaltea@collabora.com>
- <c9225053-78f8-40b7-9453-dc3dabe44500@linaro.org>
-From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-In-Reply-To: <c9225053-78f8-40b7-9453-dc3dabe44500@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To: Simon Horman <horms@kernel.org>
+Cc: pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ coreteam@netfilter.org, netfilter-devel@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, ast@kernel.org
+References: <1702873101-77522-1-git-send-email-alibuda@linux.alibaba.com>
+ <1702873101-77522-2-git-send-email-alibuda@linux.alibaba.com>
+ <20231218190640.GJ6288@kernel.org>
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <20231218190640.GJ6288@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 12/19/23 09:27, Krzysztof Kozlowski wrote:
-> On 18/12/2023 22:44, Cristian Ciocaltea wrote:
->> The Synopsys DesignWare MAC found on StarFive JH7100 SoC is mostly
->> similar to the newer JH7110, but it requires only two interrupts and a
->> single reset line, which is 'ahb' instead of the commonly used
->> 'stmmaceth'.
+
+
+On 12/19/23 3:06 AM, Simon Horman wrote:
+> On Mon, Dec 18, 2023 at 12:18:20PM +0800, D. Wythe wrote:
+>> From: "D. Wythe" <alibuda@linux.alibaba.com>
 >>
-> 
->>    reg:
->> @@ -145,9 +146,13 @@ properties:
->>  
->>    reset-names:
->>      minItems: 1
->> -    items:
->> -      - const: stmmaceth
->> -      - const: ahb
->> +    maxItems: 2
-> 
-> min and maxItems should not be needed here.
+>> To support the prog update, we need to ensure that the prog seen
+>> within the hook is always valid. Considering that hooks are always
+>> protected by rcu_read_lock(), which provide us the ability to
+>> access the prog under rcu.
+>>
+>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> ...
+>
+>> @@ -26,8 +17,20 @@ struct bpf_nf_link {
+>>   	struct net *net;
+>>   	u32 dead;
+>>   	const struct nf_defrag_hook *defrag_hook;
+>> +	struct rcu_head head;
+>>   };
+>>   
+>> +static unsigned int nf_hook_run_bpf(void *bpf_link, struct sk_buff *skb,
+>> +				    const struct nf_hook_state *s)
+>> +{
+>> +	const struct bpf_nf_link *nf_link = bpf_link;
+>> +	struct bpf_nf_ctx ctx = {
+>> +		.state = s,
+>> +		.skb = skb,
+>> +	};
+>> +	return bpf_prog_run(rcu_dereference(nf_link->link.prog), &ctx);
+> Hi,
+>
+> AFAICT nf_link->link.prog isn't annotated as __rcu,
+> so perhaps rcu_dereference() is not correct here?
+>
+> In any case, sparse seems a bit unhappy:
+>
+>    .../nf_bpf_link.c:31:29: error: incompatible types in comparison expression (different address spaces):
+>    .../nf_bpf_link.c:31:29:    struct bpf_prog [noderef] __rcu *
+>    .../nf_bpf_link.c:31:29:    struct bpf_prog *
 
-Indeed, I will drop them.
+Hi Simon,
 
->> +    oneOf:
->> +      - items:
->> +          - enum: [stmmaceth, ahb]
->> +      - items:
->> +          - const: stmmaceth
->> +          - const: ahb
->>  
->>    power-domains:
->>      maxItems: 1
->> diff --git a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
->> index d90cb82c1424..f5f0bff5be0f 100644
->> --- a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
->> +++ b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
->> @@ -16,16 +16,20 @@ select:
->>      compatible:
->>        contains:
->>          enum:
->> +          - starfive,jh7100-dwmac
->>            - starfive,jh7110-dwmac
->>    required:
->>      - compatible
->>  
->>  properties:
->>    compatible:
->> -    items:
->> -      - enum:
->> -          - starfive,jh7110-dwmac
->> -      - const: snps,dwmac-5.20
->> +    oneOf:
->> +      - items:
->> +          - const: starfive,jh7100-dwmac
->> +          - const: snps,dwmac
->> +      - items:
->> +          - const: starfive,jh7110-dwmac
->> +          - const: snps,dwmac-5.20
->>  
->>    reg:
->>      maxItems: 1
->> @@ -46,23 +50,6 @@ properties:
->>        - const: tx
->>        - const: gtx
->>  
->> -  interrupts:
->> -    minItems: 3
->> -    maxItems: 3
->> -
->> -  interrupt-names:
->> -    minItems: 3
->> -    maxItems: 3
->> -
->> -  resets:
->> -    minItems: 2
->> -    maxItems: 2
-> 
-> What is the point of your previous patch if you immediately remove it?
-> It is a no-op. Just mention in this commit msg, that both resets and
-> reset-names are coming from snps,dwmac so they can be removed from
-> top-level entirely.
+thanks for the reporting.
 
-This has been discussed during v2 review [1], where I also provided the
-rational behind not updating reset-names. So the code was not deleted,
-but moved under an if clause.
+Yes, I had anticipated that sparse would report an error. I tried to 
+cast the type,
+but it would compile an error likes that:
 
-Thanks for reviewing,
-Cristian
 
-[1]: https://lore.kernel.org/lkml/f4d0b216-5bdc-4559-aabb-8af638d33721@collabora.com/
+net/netfilter/nf_bpf_link.c: In function ‘nf_hook_run_bpf’:
+./include/asm-generic/rwonce.h:44:70: error: lvalue required as unary 
+‘&’ operand
+    44 | #define __READ_ONCE(x) (*(const volatile 
+__unqual_scalar_typeof(x) *)&(x))
+| ^
+./include/asm-generic/rwonce.h:50:2: note: in expansion of macro 
+‘__READ_ONCE’
+    50 |  __READ_ONCE(x);       \
+       |  ^~~~~~~~~~~
+./include/linux/rcupdate.h:436:43: note: in expansion of macro ‘READ_ONCE’
+   436 |  typeof(*p) *local = (typeof(*p) *__force)READ_ONCE(p); \
+       |                                           ^~~~~~~~~
+./include/linux/rcupdate.h:584:2: note: in expansion of macro 
+‘__rcu_dereference_check’
+   584 |  __rcu_dereference_check((p), __UNIQUE_ID(rcu), \
+       |  ^~~~~~~~~~~~~~~~~~~~~~~
+./include/linux/rcupdate.h:656:28: note: in expansion of macro 
+‘rcu_dereference_check’
+   656 | #define rcu_dereference(p) rcu_dereference_check(p, 0)
+       |                            ^~~~~~~~~~~~~~~~~~~~~
+net/netfilter/nf_bpf_link.c:31:22: note: in expansion of macro 
+‘rcu_dereference’
+    31 |  return bpf_prog_run(rcu_dereference((const struct bpf_prog 
+__rcu *)nf_link->link.prog), &ctx);
+       |                      ^~~~~~~~~~~~~~~
+
+So, I think we might need to go back to version 1.
+
+@ Florian , what do you think ?
+
+D. Wythe
+
+>> +}
+>> +
+>>   #if IS_ENABLED(CONFIG_NF_DEFRAG_IPV4) || IS_ENABLED(CONFIG_NF_DEFRAG_IPV6)
+>>   static const struct nf_defrag_hook *
+>>   get_proto_defrag_hook(struct bpf_nf_link *link,
+> ...
+
 
