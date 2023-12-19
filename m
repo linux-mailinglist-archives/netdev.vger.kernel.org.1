@@ -1,83 +1,284 @@
-Return-Path: <netdev+bounces-59083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2B9781949C
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:30:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35DB08194A4
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:36:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28629B21DF1
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 23:30:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59F701C20CDE
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 23:36:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA50926281;
-	Tue, 19 Dec 2023 23:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 220403D0CC;
+	Tue, 19 Dec 2023 23:36:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=joby.aero header.i=@joby.aero header.b="Qa3fnCk0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0YPlSrx6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B91B3EA7E
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 23:30:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=joby.aero
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jobyaviation.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a2370535060so35637066b.1
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 15:30:10 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 478883D561
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 23:36:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-33621d443a7so5246791f8f.3
+        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 15:36:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=joby.aero; s=aero; t=1703028608; x=1703633408; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=I3qMmKfq61ryt80/4ZFSfgmWpcFz14X+vNAF65ciOIs=;
-        b=Qa3fnCk0TCMkDJNjSIhtXEDugWtWdgV464zBlNNEIFYhM5YSpi2rJE3Jw4tb/1SNof
-         LxAUoJolM5xpd5XZCoCTB9gZm/2/zUBW79KJ7HNzPK65dMmqJcq5nbbCVS9Lopd9HquT
-         w+gwODj/0fp6tBy/f//ULOmeZmoTj1NU9TFk0aWhdwhhrldq2IpMdJpLP1im6l4Q0BLk
-         jPStoUvGet7prEGQx8Fd7hgKBhoInr2cNi8RsjswEFK8zsFlbtkrBF62IQOG2LLQq3Qa
-         yxqKgxDTKscxbX2/sDRk7N8C4WqZ48InHtchJpFnAa2QQ26c2LpGTYRTAQG8/ur59Zsm
-         PwHw==
+        d=google.com; s=20230601; t=1703028959; x=1703633759; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Lfxsf2aW4lAEwXghNxr0xJgKkPMekYB/QnfBQu3miCI=;
+        b=0YPlSrx6ZJoQqKZeaJEa4WTQ4MuS9O1c3A4ToQcnMyz4jLHex/tY1RaRYTk4P9lDlK
+         aeu4TKRmJ4+9argN8pCxFLvZJ1jDa0qPBp2CxnxSk8b4BesyfLTGH1kEYkx2NQ9GHVTw
+         CkgdUVvpZLYFABdK9uTj3xNSaK1qS8K4hK2VcQbjZef+mrX/6AvWIF1HxZ1ZukEJ/3cE
+         9QG+jfg2sVeGFzFYnZuTMvv89TM3nd0s4Aem4SFzhra6RhYcxHUmZy+CsLk/7zTNpB3h
+         5WyvQXoQA1RMLs7D1QLWpnSVNUdTkj9Moo34pqGgV7HkXZ0e1PgbenaqLD6BNi6KROgs
+         dAEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703028608; x=1703633408;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I3qMmKfq61ryt80/4ZFSfgmWpcFz14X+vNAF65ciOIs=;
-        b=Cks4lgpfADPOiEyX9w1r08NH03PYlmVHj4z6GarCDLudf91dbgM/fMM3CQsOKaRAnX
-         uRkD2GPM2akweWdVRGPalwFj8J8joEQ7iccUXvjJq7L5jeIE0uLzAL9T74BEzNxszbbj
-         5SYTVxNKwRRQtrFnRCUiJ48NOdKMhnhj67NIjRAlW0oG92cxAqzy8SCeKfJKoelj7GgR
-         hX88PJazY+knqopuju95wzYmLiznmeiEUaIJo1P9dj9f9cRIQ987XKroaRkmtm28mYuh
-         Uk8ZmeC/Nwte7ihx5j5wXn9rD4bf/zZ3TGowEuIpaODaFx8fOelDsSpQlPSyfIv5B5ZX
-         6IWw==
-X-Gm-Message-State: AOJu0YxFqqoXp0Ts62qnXD8QbNmE4q1BW4t8JoFGYK5wXtOr97Igv9gU
-	0pLUWDs9XnI4qNUc9fsrKwUQj3uDyuTtdJuzs0orHa73Rk0PaIjRQlBqvxsVSzpVBmSR2Tj8Wjv
-	QDMbL7zqG1FXNNsFRK6yCYLfHfdaQeAqkdI5jQA==
-X-Google-Smtp-Source: AGHT+IEWQP5Ph9v8Oho3y8/vgQ5kKO6/sDZz00l25UQhi6qStXstYKLPr49yFcmT/8AY1nCaoP92IFKO8uVxLnjV2hA=
-X-Received: by 2002:a17:906:4b:b0:a23:617d:1bbc with SMTP id
- 11-20020a170906004b00b00a23617d1bbcmr2151300ejg.15.1703028608181; Tue, 19 Dec
- 2023 15:30:08 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703028959; x=1703633759;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Lfxsf2aW4lAEwXghNxr0xJgKkPMekYB/QnfBQu3miCI=;
+        b=cNzZKX6IZ+gzAVCztdgYv3bRt8h2VeR6A4aHwx6jP1DN2TnP74fGuHCGfNYj6oXJ8v
+         4mq6zE6quBmHIIxg6WvNVVZ1+vE6oZ1ESAhU39yEt6qwteOHZLz8DMEmWBke1diZrw3Y
+         8yrvLRycxIG+bkBkErtBv/Egr9MJeMw/Y7pyN1pSju2njmW1UapFhWY3URKDkRUK69Xx
+         dI+1+FWuFg2lWTK5hO4JfXvAn01RBhrOZmNwoZo7/X/kfyPjPvAHPE3O10LAIv4BZ6KE
+         URXBsFxAQVYyDraUy2QL9CksDaAG7pOwH4LVgVWtg7fvhNrvjEeo/5kpfp4+J1VPt34q
+         NoZA==
+X-Gm-Message-State: AOJu0Yws2pznVrFRTIP2WMp9o2yBPv0cyXwJeEVHSfv3qPuA0ugfH+2Q
+	lES+s+ZqXuVWmyAIbXSOoPXdCtd3/2p5TKcTkpF8dA==
+X-Google-Smtp-Source: AGHT+IF7Cz4xBYhWbimnBW9uzClxcac+PhvcyXzBdUecSYu5N6HHjmkojtRhbfIZPAmJjswVKSgvYWCHw3jLw7YY3M0=
+X-Received: by 2002:a05:600c:1503:b0:40c:3555:e230 with SMTP id
+ b3-20020a05600c150300b0040c3555e230mr9472805wmg.46.1703028959249; Tue, 19 Dec
+ 2023 15:35:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Matthew Bellizzi <matthew.bellizzi@joby.aero>
-Date: Tue, 19 Dec 2023 15:29:56 -0800
-Message-ID: <CAJkJqoSBJAdFTOGuXyW+bwdbW5o2spw5UYd3TzC3Oqy5kYjCSg@mail.gmail.com>
-Subject: 
-To: netdev@vger.kernel.org
+References: <20231219210357.4029713-1-dw@davidwei.uk> <20231219210357.4029713-4-dw@davidwei.uk>
+In-Reply-To: <20231219210357.4029713-4-dw@davidwei.uk>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 19 Dec 2023 15:35:47 -0800
+Message-ID: <CAHS8izPqKg73ub5WUg=EBdd8ifCcAuh69LB0pBUSw6t+5NGjjQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 03/20] net: page pool: rework ppiov life cycle
+To: David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-unsubscribe netdev
+On Tue, Dec 19, 2023 at 1:04=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
+>
+> From: Pavel Begunkov <asml.silence@gmail.com>
+>
+> NOT FOR UPSTREAM
+> The final version will depend on how the ppiov infra looks like
+>
+> Page pool is tracking how many pages were allocated and returned, which
+> serves for refcounting the pool, and so every page/frag allocated should
+> eventually come back to the page pool via appropriate ways, e.g. by
+> calling page_pool_put_page().
+>
+> When it comes to normal page pools (i.e. without memory providers
+> attached), it's fine to return a page when it's still refcounted by
+> somewhat in the stack, in which case we'll "detach" the page from the
+> pool and rely on page refcount for it to return back to the kernel.
+>
+> Memory providers are different, at least ppiov based ones, they need
+> all their buffers to eventually return back, so apart from custom pp
+> ->release handlers, we'll catch when someone puts down a ppiov and call
+> its memory provider to handle it, i.e. __page_pool_iov_free().
+>
+> The first problem is that __page_pool_iov_free() hard coded devmem
+> handling, and other providers need a flexible way to specify their own
+> callbacks.
+>
+> The second problem is that it doesn't go through the generic page pool
+> paths and so can't do the mentioned pp accounting right. And we can't
+> even safely rely on page_pool_put_page() to be called somewhere before
+> to do the pp refcounting, because then the page pool might get destroyed
+> and ppiov->pp would point to garbage.
+>
+> The solution is to make the pp ->release callback to be responsible for
+> properly recycling its buffers, e.g. calling what was
+> __page_pool_iov_free() before in case of devmem.
+> page_pool_iov_put_many() will be returning buffers to the page pool.
+>
+
+Hmm this patch is working on top of slightly outdated code. I think
+the correct solution here is to transition to using pp_ref_count for
+refcounting the ppiovs/niovs. Once we do that, we no longer need
+special refcounting for ppiovs, they're refcounted identically to
+pages, makes the pp more maintainable, gives us some unified handling
+of page pool refcounting, it becomes trivial to support fragmented
+pages which require a pp_ref_count, and all the code in this patch can
+go away.
+
+I'm unsure if this patch is just because you haven't rebased to my
+latest RFC (which is completely fine by me), or if you actually think
+using pp_ref_count for refcounting is wrong and want us to go back to
+the older model which required some custom handling for ppiov and
+disabled frag support. I'm guessing it's the former, but please
+correct if I'm wrong.
+
+[1] https://patchwork.kernel.org/project/netdevbpf/patch/20231218024024.351=
+6870-8-almasrymina@google.com/
+
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> ---
+>  include/net/page_pool/helpers.h | 15 ++++++++---
+>  net/core/page_pool.c            | 46 +++++++++++++++++----------------
+>  2 files changed, 35 insertions(+), 26 deletions(-)
+>
+> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/help=
+ers.h
+> index 92804c499833..ef380ee8f205 100644
+> --- a/include/net/page_pool/helpers.h
+> +++ b/include/net/page_pool/helpers.h
+> @@ -137,15 +137,22 @@ static inline void page_pool_iov_get_many(struct pa=
+ge_pool_iov *ppiov,
+>         refcount_add(count, &ppiov->refcount);
+>  }
+>
+> -void __page_pool_iov_free(struct page_pool_iov *ppiov);
+> +static inline bool page_pool_iov_sub_and_test(struct page_pool_iov *ppio=
+v,
+> +                                             unsigned int count)
+> +{
+> +       return refcount_sub_and_test(count, &ppiov->refcount);
+> +}
+>
+>  static inline void page_pool_iov_put_many(struct page_pool_iov *ppiov,
+>                                           unsigned int count)
+>  {
+> -       if (!refcount_sub_and_test(count, &ppiov->refcount))
+> -               return;
+> +       if (count > 1)
+> +               WARN_ON_ONCE(page_pool_iov_sub_and_test(ppiov, count - 1)=
+);
+>
+> -       __page_pool_iov_free(ppiov);
+> +#ifdef CONFIG_PAGE_POOL
+> +       page_pool_put_defragged_page(ppiov->pp, page_pool_mangle_ppiov(pp=
+iov),
+> +                                    -1, false);
+> +#endif
+>  }
+>
+>  /* page pool mm helpers */
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 38eff947f679..ecf90a1ccabe 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -599,6 +599,16 @@ void __page_pool_release_page_dma(struct page_pool *=
+pool, struct page *page)
+>         page_pool_set_dma_addr(page, 0);
+>  }
+>
+> +static void page_pool_return_provider(struct page_pool *pool, struct pag=
+e *page)
+> +{
+> +       int count;
+> +
+> +       if (pool->mp_ops->release_page(pool, page)) {
+> +               count =3D atomic_inc_return_relaxed(&pool->pages_state_re=
+lease_cnt);
+> +               trace_page_pool_state_release(pool, page, count);
+> +       }
+> +}
+> +
+>  /* Disconnects a page (from a page_pool).  API users can have a need
+>   * to disconnect a page (from a page_pool), to allow it to be used as
+>   * a regular page (that will eventually be returned to the normal
+> @@ -607,13 +617,13 @@ void __page_pool_release_page_dma(struct page_pool =
+*pool, struct page *page)
+>  void page_pool_return_page(struct page_pool *pool, struct page *page)
+>  {
+>         int count;
+> -       bool put;
+>
+> -       put =3D true;
+> -       if (static_branch_unlikely(&page_pool_mem_providers) && pool->mp_=
+ops)
+> -               put =3D pool->mp_ops->release_page(pool, page);
+> -       else
+> -               __page_pool_release_page_dma(pool, page);
+> +       if (static_branch_unlikely(&page_pool_mem_providers) && pool->mp_=
+ops) {
+> +               page_pool_return_provider(pool, page);
+> +               return;
+> +       }
+> +
+> +       __page_pool_release_page_dma(pool, page);
+>
+>         /* This may be the last page returned, releasing the pool, so
+>          * it is not safe to reference pool afterwards.
+> @@ -621,10 +631,8 @@ void page_pool_return_page(struct page_pool *pool, s=
+truct page *page)
+>         count =3D atomic_inc_return_relaxed(&pool->pages_state_release_cn=
+t);
+>         trace_page_pool_state_release(pool, page, count);
+>
+> -       if (put) {
+> -               page_pool_clear_pp_info(page);
+> -               put_page(page);
+> -       }
+> +       page_pool_clear_pp_info(page);
+> +       put_page(page);
+>         /* An optimization would be to call __free_pages(page, pool->p.or=
+der)
+>          * knowing page is not part of page-cache (thus avoiding a
+>          * __page_cache_release() call).
+> @@ -1034,15 +1042,6 @@ void page_pool_update_nid(struct page_pool *pool, =
+int new_nid)
+>  }
+>  EXPORT_SYMBOL(page_pool_update_nid);
+>
+> -void __page_pool_iov_free(struct page_pool_iov *ppiov)
+> -{
+> -       if (ppiov->pp->mp_ops !=3D &dmabuf_devmem_ops)
+> -               return;
+> -
+> -       netdev_free_devmem(ppiov);
+> -}
+> -EXPORT_SYMBOL_GPL(__page_pool_iov_free);
+> -
+>  /*** "Dmabuf devmem memory provider" ***/
+>
+>  static int mp_dmabuf_devmem_init(struct page_pool *pool)
+> @@ -1093,9 +1092,12 @@ static bool mp_dmabuf_devmem_release_page(struct p=
+age_pool *pool,
+>                 return false;
+>
+>         ppiov =3D page_to_page_pool_iov(page);
+> -       page_pool_iov_put_many(ppiov, 1);
+> -       /* We don't want the page pool put_page()ing our page_pool_iovs. =
+*/
+> -       return false;
+> +
+> +       if (!page_pool_iov_sub_and_test(ppiov, 1))
+> +               return false;
+> +       netdev_free_devmem(ppiov);
+> +       /* tell page_pool that the ppiov is released */
+> +       return true;
+>  }
+>
+>  const struct pp_memory_provider_ops dmabuf_devmem_ops =3D {
+> --
+> 2.39.3
+>
+
 
 --=20
-This email and any relevant attachments may include confidential and/or=20
-proprietary information.=C2=A0 Any distribution or use by anyone other than=
- the=20
-intended recipient(s) or other than for the intended purpose(s) is=20
-prohibited and may be unlawful.=C2=A0 If you are not the intended recipient=
- of=20
-this message, please notify the sender by replying to this message and then=
-=20
-delete it from your system.
+Thanks,
+Mina
 
