@@ -1,87 +1,150 @@
-Return-Path: <netdev+bounces-58931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6C6A818A07
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:33:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C600818A20
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:37:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECF1F1C244E9
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 14:33:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE04528ACD9
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 14:37:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874D31C69D;
-	Tue, 19 Dec 2023 14:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F354732C9D;
+	Tue, 19 Dec 2023 14:32:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SbnFl8eD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZACObj+l"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3A13C1D;
-	Tue, 19 Dec 2023 14:30:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D4C89C433C9;
-	Tue, 19 Dec 2023 14:30:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702996223;
-	bh=faeMPzd73yVIKMm0m1fp3uXayvPlwPSp/B2C28RZlD8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SbnFl8eD6e2r27N/6/SEqBRAKNMpf+lzcCr3YGUk0le1kcnVQGIMKy6eKi5JTb356
-	 He40HkPTSENk1LhI9pyuJcWcsvLJMFP8XbN0FurXB4gjCTs8nBWZNOEKitk4XImw9G
-	 WRswfzCnBaRFytM2J/+pFZYrN03Mt+K75lb3TU0OziK24+bYQa+Q+zk2TsUHNa+xPw
-	 xM02x13Qk6DqK4ytOWOfMobcP5Ou1nyUQb0e0k6PvArfaMv52T7J8vWT9fDn2k5ehj
-	 wWa/+dTcgV6zAQMeeCGCFA7fM0bDrMXz6GxZRpiCP++xPAGam0r8l4IszRKOYSbWjs
-	 nm8xriXsLV5oQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BAB35C561EE;
-	Tue, 19 Dec 2023 14:30:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 174142D7A7
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 14:32:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702996322;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fcH5mhNCfy4Npx8m9bnDGoyerhb2vmsJtBvMFIY3PE4=;
+	b=ZACObj+l4w7skWKmFjJ3e5SzDrq0EGk0kfsjaxEXQEJXxM390+ahrlC3d8T+QfJSVo7vT2
+	B2g20LvVIZ2ZEvzghRi/Tco6g36jPgFFucfzddBSKqQMpjyU1h6syyQKsiLhiRPuegovvh
+	p7y0SIY3+RccdI+AXtTge7PQcPvnlqo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-646-E3lE2-3DM7eN9FhE4GCjsQ-1; Tue, 19 Dec 2023 09:31:58 -0500
+X-MC-Unique: E3lE2-3DM7eN9FhE4GCjsQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A58A6101AA4D;
+	Tue, 19 Dec 2023 14:31:56 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.195.169])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A72882166B31;
+	Tue, 19 Dec 2023 14:31:53 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <367107fa03540f7ddd2e8de51c751348bd7eb42c.camel@kernel.org>
+References: <367107fa03540f7ddd2e8de51c751348bd7eb42c.camel@kernel.org> <20231213152350.431591-1-dhowells@redhat.com> <20231213152350.431591-13-dhowells@redhat.com>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>,
+    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 12/39] netfs: Add iov_iters to (sub)requests to describe various buffers
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next] bpf: use nla_ok() instead of checking nla_len
- directly
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170299622376.11598.17473952266274189003.git-patchwork-notify@kernel.org>
-Date: Tue, 19 Dec 2023 14:30:23 +0000
-References: <20231218231904.260440-1-kuba@kernel.org>
-In-Reply-To: <20231218231904.260440-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: ast@kernel.org, netdev@vger.kernel.org,
- syzbot+f43a23b6e622797c7a28@syzkaller.appspotmail.com, martin.lau@linux.dev,
- daniel@iogearbox.net, john.fastabend@gmail.com, andrii@kernel.org,
- song@kernel.org, yonghong.song@linux.dev, kpsingh@kernel.org, sdf@google.com,
- haoluo@google.com, jolsa@kernel.org, keescook@chromium.org,
- bpf@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <488522.1702996313.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 19 Dec 2023 14:31:53 +0000
+Message-ID: <488523.1702996313@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-Hello:
+Jeff Layton <jlayton@kernel.org> wrote:
 
-This patch was applied to bpf/bpf-next.git (master)
-by Daniel Borkmann <daniel@iogearbox.net>:
+> > @@ -408,6 +417,10 @@ int netfs_write_begin(struct netfs_inode *ctx,
+> >  	ractl._nr_pages =3D folio_nr_pages(folio);
+> >  	netfs_rreq_expand(rreq, &ractl);
+> >  =
 
-On Mon, 18 Dec 2023 15:19:04 -0800 you wrote:
-> nla_len may also be too short to be sane, in which case after
-> recent changes nla_len() will return a wrapped value.
-> 
-> Reported-by: syzbot+f43a23b6e622797c7a28@syzkaller.appspotmail.com
-> Fixes: 172db56d90d2 ("netlink: Return unsigned value for nla_len()")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> 
-> [...]
+> > +	/* Set up the output buffer */
+> > +	iov_iter_xarray(&rreq->iter, ITER_DEST, &mapping->i_pages,
+> > +			rreq->start, rreq->len);
+> =
 
-Here is the summary with links:
-  - [bpf-next] bpf: use nla_ok() instead of checking nla_len directly
-    https://git.kernel.org/bpf/bpf-next/c/2130c519a401
+> Should the above be ITER_SOURCE ?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+No - we're in ->write_begin() and are prefetching.  If you look in the cod=
+e,
+there's a netfs_begin_read() call a few lines below.  The output buffer fo=
+r
+the read is the page we're going to write into.
 
+Note that netfs_write_begin() should be considered deprecated as the whole
+perform_write thing will get replaced.
+
+> > @@ -88,6 +78,11 @@ static void netfs_read_from_server(struct netfs_io_=
+request *rreq,
+> >  				   struct netfs_io_subrequest *subreq)
+> >  {
+> >  	netfs_stat(&netfs_n_rh_download);
+> > +	if (iov_iter_count(&subreq->io_iter) !=3D subreq->len - subreq->tran=
+sferred)
+> > +		pr_warn("R=3D%08x[%u] ITER PRE-MISMATCH %zx !=3D %zx-%zx %lx\n",
+> > +			rreq->debug_id, subreq->debug_index,
+> > +			iov_iter_count(&subreq->io_iter), subreq->len,
+> > +			subreq->transferred, subreq->flags);
+> =
+
+> pr_warn is a bit alarmist, esp given the cryptic message.  Maybe demote
+> this to INFO or DEBUG?
+> =
+
+> Does this indicate a bug in the client or that the server is sending us
+> malformed frames?
+
+Good question.  The network filesystem updated subreq->transferred to indi=
+cate
+it had transferred X amount of data, but the iterator had been updated to
+indicate Y amount of data was transferred.  They really ought to match as =
+it
+may otherwise indicate an underrun (and potential leakage of old data).
+Overruns are less of a problem since the iterator would have to 'go negati=
+ve'
+as it were.
+
+However, it might be better just to leave io_iter unchecked since we end u=
+p
+resetting it anyway each time we reinvoke the ->issue_read() op.  It's alw=
+ays
+possible that it will get copied and a different iterator get passed to th=
+e
+network layer or cache fs - and so the change to the iterator then has to =
+be
+manually propagated just to avoid the warning.
+
+David
 
 
