@@ -1,119 +1,139 @@
-Return-Path: <netdev+bounces-58960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C3FD818B2C
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:25:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10E8F818B34
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:26:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 534051F2416A
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:25:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 784B41F21DCC
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:26:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19B41C6B3;
-	Tue, 19 Dec 2023 15:25:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Bzg5gOKN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 406B91C69D;
+	Tue, 19 Dec 2023 15:26:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933AE1CA88;
-	Tue, 19 Dec 2023 15:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BJDWS5G001797;
-	Tue, 19 Dec 2023 15:25:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=RcKcDrB1hs/i3VF5GVWi4TmC2CSiOkBqWt3RLoIoTsQ=;
- b=Bzg5gOKNqitFmy7vfJ9RMsDlNFHDs+sOw2lWCNy2FGcMo2HCfmB0dYJu5jaOoN4L8Buc
- 49FgbCgCif0/gyBfoiXCKWZIQ6lkq6PTYw2/3DLnU0ZuRuwNWOe1M8o3RWt4H1jPGq1n
- Eyny9A4I94TE8esL2d6XHJVMY+5NyWtCdvT+8Y190Fno2x/fGuUhZ7F7L/YzQvOpwozL
- tj6fyzczZ8esw2IZpqE2zIG7uCYCprLTk8zSGRNH78n4/uW4BTK2XL3FaUmQXZiMnLGI
- 7NfPVOCtIpka3qJVrrjjoqnHw4uOI7dxcVWXcSyH0DdoC+6jJgpYCbFjoQBCfJnmaFm6 zw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v3c52u689-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Dec 2023 15:25:19 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BJErslP014769;
-	Tue, 19 Dec 2023 15:25:19 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v3c52u678-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Dec 2023 15:25:19 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BJD0r36010870;
-	Tue, 19 Dec 2023 15:25:17 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3v1q7ngjvh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Dec 2023 15:25:17 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BJFPEv013894268
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 19 Dec 2023 15:25:14 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 82E9F20043;
-	Tue, 19 Dec 2023 15:25:14 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C5C0F20040;
-	Tue, 19 Dec 2023 15:25:13 +0000 (GMT)
-Received: from [9.179.0.97] (unknown [9.179.0.97])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 19 Dec 2023 15:25:13 +0000 (GMT)
-Message-ID: <8ab61ee331b8087b8a26a2a38b3ae0c72cc31bb0.camel@linux.ibm.com>
-Subject: Re: [PATCH] icuv: make iucv_bus const
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, wintera@linux.ibm.com,
-        wenjia@linux.ibm.com
-Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo
- Abeni <pabeni@redhat.com>, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org
-Date: Tue, 19 Dec 2023 16:25:13 +0100
-In-Reply-To: <2023121950-prankster-stomp-a1aa@gregkh>
-References: <2023121950-prankster-stomp-a1aa@gregkh>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E3F1CF87
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 15:26:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-63--MssvIPyP6awiriq4uC_pg-1; Tue, 19 Dec 2023 15:26:27 +0000
+X-MC-Unique: -MssvIPyP6awiriq4uC_pg-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 19 Dec
+ 2023 15:26:11 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Tue, 19 Dec 2023 15:26:11 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Jacob Keller' <jacob.e.keller@intel.com>, Suman Ghosh
+	<sumang@marvell.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"sgoutham@marvell.com" <sgoutham@marvell.com>, "sbhatta@marvell.com"
+	<sbhatta@marvell.com>, "jerinj@marvell.com" <jerinj@marvell.com>,
+	"gakula@marvell.com" <gakula@marvell.com>, "hkelam@marvell.com"
+	<hkelam@marvell.com>, "lcherian@marvell.com" <lcherian@marvell.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [net PATCH] octeontx2-af: Fix marking couple of structure as
+ __packed
+Thread-Topic: [net PATCH] octeontx2-af: Fix marking couple of structure as
+ __packed
+Thread-Index: AQHaMfL5LSuKUocy/Uq8m0SZmFOeabCwuX2Q
+Date: Tue, 19 Dec 2023 15:26:11 +0000
+Message-ID: <35751ffb2c4d436baaa93230c1430a03@AcuMS.aculab.com>
+References: <20231218082758.247831-1-sumang@marvell.com>
+ <c48b24d9-f05f-4c66-a0ca-5cd6f59bea0c@intel.com>
+In-Reply-To: <c48b24d9-f05f-4c66-a0ca-5cd6f59bea0c@intel.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: posuTIFkQp8GRJgX1Bndj_RLuxyNur2h
-X-Proofpoint-ORIG-GUID: C9vaImxA8fX9KFkH9iUT5YeLqQ4ESDQi
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-19_08,2023-12-14_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 suspectscore=0 mlxscore=0 bulkscore=0 adultscore=0
- priorityscore=1501 spamscore=0 mlxlogscore=696 phishscore=0 malwarescore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2312190115
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 
-On Tue, 2023-12-19 at 16:07 +0100, Greg Kroah-Hartman wrote:
-> Now that the driver core can properly handle constant struct bus_type,
-> move the iucv_bus variable to be a constant structure as well, placing
-> it into read-only memory which can not be modified at runtime.
->=20
-> Cc: Alexandra Winter <wintera@linux.ibm.com>
-> Cc: Wenjia Zhang <wenjia@linux.ibm.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: linux-s390@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> ---
+RnJvbTogSmFjb2IgS2VsbGVyDQo+IFNlbnQ6IDE4IERlY2VtYmVyIDIwMjMgMjA6NDQNCj4gDQo+
+IE9uIDEyLzE4LzIwMjMgMTI6MjcgQU0sIFN1bWFuIEdob3NoIHdyb3RlOg0KPiA+IENvdXBsZSBv
+ZiBzdHJ1Y3R1cmVzIHdhcyBub3QgbWFya2VkIGFzIF9fcGFja2VkIHdoaWNoIG1heSBoYXZlIHNv
+bWUNCj4gPiBwZXJmb3JtYW5jZSBpbXBsaWNhdGlvbi4gVGhpcyBwYXRjaCBmaXhlcyB0aGUgc2Ft
+ZSBhbmQgbWFyayB0aGVtIGFzDQo+ID4gX19wYWNrZWQuDQo+IA0KPiBOb3Qgc3VyZSBJIGZvbGxv
+dyB3aHkgbGFjayBvZiBfX3BhY2tlZCB3b3VsZCBoYXZlIHBlcmZvcm1hbmNlDQo+IGltcGxpY2F0
+aW9ucz8gSSBnZXQgdGhhdCBfX3BhY2tlZCBpcyBpbXBvcnRhbnQgdG8gZW5zdXJlIGxheW91dCBp
+cw0KPiBjb3JyZWN0IG9yIHRvIGVuc3VyZSB0aGUgd2hvbGUgc3RydWN0dXJlIGhhcyB0aGUgcmln
+aHQgc2l6ZSByYXRoZXIgdGhhbg0KPiB1bmV4cGVjdGVkIGdhcHMuIEknZCBndWVzcyBtYXliZSBi
+ZWNhdXNlIHRoZSBzdHJ1Y3R1cmVzIHNpemUgd291bGQNCj4gaW5jbHVkZSBwYWRkaW5nIHdpdGhv
+dXQgX19wYWNrZWQsIGxlYWRpbmcgdG8gYSBsb3Qgb2YgZ2FwcyB3aGVuDQo+IGNvbWJpbmluZyBz
+ZXZlcmFsIHN0cnVjdHVyZXMgdG9nZXRoZXIuLi4NCj4gDQo+IEkgZGlkIHRlc3Qgb24gbXkgc3lz
+dGVtIHdpdGggcGFob2xlLCBhbmQgZXZlbiB3aXRob3V0IF9fcGFja2VkLCBJIGRvbid0DQo+IGdl
+dCBhbnkgZ2FwcyBpbiB0aGUgbnBjX2x0X2RlZl9jZmcgc3RydWN0dXJlOg0KPiANCj4gDQo+ID4g
+c3RydWN0IG5wY19sdF9kZWZfY2ZnIHsNCj4gPiAgICAgICAgIHN0cnVjdCBucGNfbHRfZGVmICAg
+ICAgICAgIHJ4X29sMjsgICAgICAgICAgICAgICAvKiAgICAgMCAgICAgMyAqLw0KPiA+ICAgICAg
+ICAgc3RydWN0IG5wY19sdF9kZWYgICAgICAgICAgcnhfb2lwNDsgICAgICAgICAgICAgIC8qICAg
+ICAzICAgICAzICovDQo+ID4gICAgICAgICBzdHJ1Y3QgbnBjX2x0X2RlZiAgICAgICAgICByeF9p
+aXA0OyAgICAgICAgICAgICAgLyogICAgIDYgICAgIDMgKi8NCj4gPiAgICAgICAgIHN0cnVjdCBu
+cGNfbHRfZGVmICAgICAgICAgIHJ4X29pcDY7ICAgICAgICAgICAgICAvKiAgICAgOSAgICAgMyAq
+Lw0KPiA+ICAgICAgICAgc3RydWN0IG5wY19sdF9kZWYgICAgICAgICAgcnhfaWlwNjsgICAgICAg
+ICAgICAgIC8qICAgIDEyICAgICAzICovDQo+ID4gICAgICAgICBzdHJ1Y3QgbnBjX2x0X2RlZiAg
+ICAgICAgICByeF9vdGNwOyAgICAgICAgICAgICAgLyogICAgMTUgICAgIDMgKi8NCj4gPiAgICAg
+ICAgIHN0cnVjdCBucGNfbHRfZGVmICAgICAgICAgIHJ4X2l0Y3A7ICAgICAgICAgICAgICAvKiAg
+ICAxOCAgICAgMyAqLw0KPiA+ICAgICAgICAgc3RydWN0IG5wY19sdF9kZWYgICAgICAgICAgcnhf
+b3VkcDsgICAgICAgICAgICAgIC8qICAgIDIxICAgICAzICovDQo+ID4gICAgICAgICBzdHJ1Y3Qg
+bnBjX2x0X2RlZiAgICAgICAgICByeF9pdWRwOyAgICAgICAgICAgICAgLyogICAgMjQgICAgIDMg
+Ki8NCj4gPiAgICAgICAgIHN0cnVjdCBucGNfbHRfZGVmICAgICAgICAgIHJ4X29zY3RwOyAgICAg
+ICAgICAgICAvKiAgICAyNyAgICAgMyAqLw0KPiA+ICAgICAgICAgc3RydWN0IG5wY19sdF9kZWYg
+ICAgICAgICAgcnhfaXNjdHA7ICAgICAgICAgICAgIC8qICAgIDMwICAgICAzICovDQo+ID4gICAg
+ICAgICBzdHJ1Y3QgbnBjX2x0X2RlZl9pcHNlYyAgICByeF9pcHNlY1syXTsgICAgICAgICAgLyog
+ICAgMzMgICAgMTAgKi8NCj4gPiAgICAgICAgIHN0cnVjdCBucGNfbHRfZGVmICAgICAgICAgIHBj
+a19vbDI7ICAgICAgICAgICAgICAvKiAgICA0MyAgICAgMyAqLw0KPiA+ICAgICAgICAgc3RydWN0
+IG5wY19sdF9kZWYgICAgICAgICAgcGNrX29pcDQ7ICAgICAgICAgICAgIC8qICAgIDQ2ICAgICAz
+ICovDQo+ID4gICAgICAgICBzdHJ1Y3QgbnBjX2x0X2RlZiAgICAgICAgICBwY2tfb2lwNjsgICAg
+ICAgICAgICAgLyogICAgNDkgICAgIDMgKi8NCj4gPiAgICAgICAgIHN0cnVjdCBucGNfbHRfZGVm
+ICAgICAgICAgIHBja19paXA0OyAgICAgICAgICAgICAvKiAgICA1MiAgICAgMyAqLw0KPiA+ICAg
+ICAgICAgc3RydWN0IG5wY19sdF9kZWZfYXBhZCAgICAgcnhfYXBhZDA7ICAgICAgICAgICAgIC8q
+ICAgIDU1ICAgICA0ICovDQo+ID4gICAgICAgICBzdHJ1Y3QgbnBjX2x0X2RlZl9hcGFkICAgICBy
+eF9hcGFkMTsgICAgICAgICAgICAgLyogICAgNTkgICAgIDQgKi8NCj4gPiAgICAgICAgIHN0cnVj
+dCBucGNfbHRfZGVmX2NvbG9yICAgIG92bGFuOyAgICAgICAgICAgICAgICAvKiAgICA2MyAgICAg
+NSAqLw0KPiA+ICAgICAgICAgLyogLS0tIGNhY2hlbGluZSAxIGJvdW5kYXJ5ICg2NCBieXRlcykg
+d2FzIDQgYnl0ZXMgYWdvIC0tLSAqLw0KPiA+ICAgICAgICAgc3RydWN0IG5wY19sdF9kZWZfY29s
+b3IgICAgaXZsYW47ICAgICAgICAgICAgICAgIC8qICAgIDY4ICAgICA1ICovDQo+ID4gICAgICAg
+ICBzdHJ1Y3QgbnBjX2x0X2RlZl9jb2xvciAgICByeF9nZW4wX2NvbG9yOyAgICAgICAgLyogICAg
+NzMgICAgIDUgKi8NCj4gPiAgICAgICAgIHN0cnVjdCBucGNfbHRfZGVmX2NvbG9yICAgIHJ4X2dl
+bjFfY29sb3I7ICAgICAgICAvKiAgICA3OCAgICAgNSAqLw0KPiA+ICAgICAgICAgc3RydWN0IG5w
+Y19sdF9kZWZfZXQgICAgICAgcnhfZXRbMl07ICAgICAgICAgICAgIC8qICAgIDgzICAgIDEwICov
+DQo+ID4NCj4gPiAgICAgICAgIC8qIHNpemU6IDkzLCBjYWNoZWxpbmVzOiAyLCBtZW1iZXJzOiAy
+MyAqLw0KPiA+ICAgICAgICAgLyogbGFzdCBjYWNoZWxpbmU6IDI5IGJ5dGVzICovDQo+ID4gfTsN
+Cj4gDQo+IA0KPiBIb3dldmVyIHRoYXQgbWF5IG5vdCBiZSB0cnVlIGFjcm9zcyBhbGwgY29tcGls
+ZXJzIGV0Yy4gQWxzbyBhbGwgdGhlDQo+IG90aGVyIHN0cnVjdHVyZXMgYXJlIF9fcGFja2VkLiBN
+YWtlcyBzZW5zZS4NCg0KT3Igbm90IC0gbWF5YmUgYWxsIHRoZSBfX3BhY2tlZCBzaG91bGQgYmUg
+cmVtb3ZlZCBpbnN0ZWFkIQ0KDQpVbmxlc3MgdGhlc2Ugc3RydWN0dXJlcyAob3IgYW55IG90aGVy
+cykgYXBwZWFyIGluICdtZXNzYWdlcycgd2hpY2gNCmdldCB0cmFuc2ZlcnJlZCBiZXR3ZWVuIHN5
+c3RlbXMgdGhleSByZWFsbHkgc2hvdWxkbid0IGJlIF9fcGFja2VkLg0KQW5kIGEgOTMgYnl0ZSAn
+bWVzc2FnZScgd2l0aCBhbGwgdGhvc2UgZmllbGRzIHNlZW1zIHJhdGhlciBvZGQuDQoNClRoZSBh
+Ym92ZSBicmVha2Rvd24gc2VlbXMgdG8gaW1wbHkgZXZlcnl0aGluZyBpcyAndW5zaWduZWQgY2hh
+cicNCnNvIHRoZSBfX3BhY2tlZCBtYWtlcyBubyBkaWZmZXJlbmNlLg0KDQpVc2luZyBfX3BhY2tl
+ZCByZXF1aXJlcyB0aGUgY29tcGlsZXIgZ2VuZXJhdGUgYnl0ZSBsb2Fkcy9zdG9yZQ0Kd2l0aCBz
+aGlmdHMgKGV0Yykgb24gbWFueSBhcmNoaXRlY3R1cmVzIGFuZCBzaG91bGQgcmVhbGx5IGJlIGF2
+b2lkZWQNCnVubGVzcyBpdCBpcyBhYnNvbHV0ZWx5IG5lZWRlZCBmb3IgYmluYXJ5IGNvbXBhdGli
+aWxpdHkuDQoNCkV2ZW4gdGhlbiBpZiB0aGUgcHJvYmxlbSBpcyBhIDY0Yml0IGZpZWxkIHRoYXQg
+b25seSBuZWVkcyB0byBiZQ0KMzJiaXQgYWxpZ25lZCAoYXMgaXMgY29tbW9uIGZvciBzb21lIGNv
+bXBhdDMyIGNvZGUpIHRoZW4gdGhlIDY0Yml0DQpmaWVsZHMgc2hvdWxkIGJlIG1hcmtlZCBhcyBi
+ZWluZyAzMmJpdCBhbGlnbmVkLg0KDQoJRGF2aWQNCg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExh
+a2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0sIE1pbHRvbiBLZXluZXMsIE1LMSAxUFQs
+IFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdhbGVzKQ0K
 
-Nit: There seems to be a typo in the subject line s/icuv/iucv/
 
