@@ -1,235 +1,132 @@
-Return-Path: <netdev+bounces-58814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C7F8818470
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 10:31:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9D0581849C
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 10:36:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F9071C23CD2
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 09:31:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F06181C20845
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 09:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D008D134DE;
-	Tue, 19 Dec 2023 09:31:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37C513AD7;
+	Tue, 19 Dec 2023 09:35:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A8/6N720"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 479AB1426B
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 09:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7b7f94d43b7so6801339f.0
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 01:31:22 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51C091426E;
+	Tue, 19 Dec 2023 09:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3364c9ff8e1so2332926f8f.0;
+        Tue, 19 Dec 2023 01:35:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702978556; x=1703583356; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9tF4Z5Fm8wpvM9kENnxFg1GOt/6EcGOZ/wJLhLT6ong=;
+        b=A8/6N720USRCMuQzrUBk+LLcu2NW7I8D+EawQamNA3suLw6o4DKh4LTAansLvqMBZU
+         0gMF2d3H7B2s9FHVzR8qKijIqk/A8GbAbrS3ONLOfpDGPxdyz+khZBDtftxEcfG5LQas
+         QqqFoYPUG5C+xfoPO0VWqBHqTsAV7hVDJKtHoy28et+5x2ra5xDB3EFSRfx/XoGTn8d2
+         rmj6nZHFT5TfLhZz351hrQNJJKdiBULvDTNqyirTZUFKHsZPmwiWBuCQlEUaR9TP7iyd
+         WMAzl/mDYjU5B9frKIhd7OQmw2i1Ay4dDxFjn3MDkFcJt4yynexmj3wR8XVkYSDOVnrd
+         7Ylg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702978282; x=1703583082;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wnhULLaK7IK9y6KRIpk8ya8WI7AoVLTm74NJ6dDxbXU=;
-        b=Mk4GnmtoTXpzlcH6FZsKQX6EVYbh0LvDWp2DXGe4IBxC2SEZ6Ni74A0c7az7TqB2L0
-         LArwzTB0qt/+/v5axo12JCG9d3i+rCJHE9ipAGriN40CmjiwwwhPWnWd2pyzETcmb+SX
-         zFNSeetnGs/FZAxy5fjJtQ842TzUHNIgxTvD+aw8GQDcX8IROQxCopgTHDOdaApowPGa
-         PRABWIwAby/2mj1gykeZiGsG3kW9eG6Xh83a+rqc5COJvDsizyl6/O42KfyxKUREfDDv
-         hh6Pte4mhhA070821Jic0Kn5hMpGE8xfe3tZyW/JQ8xk3ugakccjWreCDgcslcoUUQxS
-         nrLA==
-X-Gm-Message-State: AOJu0YxeGcfbVQMp/e7jjH9RYefhEELZHxOaiKSHwBP5rA1KZfcINWcV
-	AscDXgKxtvlZ+rvBi3NQwM1RMd7GAguJ9IDM+023KdyzT7Tn
-X-Google-Smtp-Source: AGHT+IEktIyeeHOKlKM0TPExIiOHQ5EvOx/si+oSKfBPfed5SbzgHJNIUXUGWhj18PNFRTKXy2l+SHRSgJre1QM8zhAzY5q0aR7l
+        d=1e100.net; s=20230601; t=1702978556; x=1703583356;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9tF4Z5Fm8wpvM9kENnxFg1GOt/6EcGOZ/wJLhLT6ong=;
+        b=QVX15ZfEA9A9436XFq/cj/pbuoLig0x4Xh/FrdprzfTwybGwcPzVkG66Iz5MLIk/a4
+         /Yu/ksHrkTkTHqH0n0mUBXwCUgAi0te2ODMSSB8wOoNlH3+hGK2n9TYGjfE1JZAG75N+
+         V+9CKlulMmsKqKxxRBXFxfQOAS60GlT8VZvsJ3oVWRLpds7L/kDOhq+MNurWWGAfj+J4
+         wbPR/CLUOZUpxSwu+P1TABSzGI5SK/Gk/Eq36N4EcPaoZYEJwK4Bb/NFpKEV6KCNIZzV
+         J4lwuc4rchxiggS49tyNN7RifMtIhcVMCOe/gH3mgFdxwKxQmK+u356x8Rj8FU0BJNkr
+         1ucg==
+X-Gm-Message-State: AOJu0YzVK77C6Hzt9ZUdSibXkn9D3bP8C29mq9Yl/mIoLgsOlpIETIoC
+	wqyv97HgVdDGBv/0kO0SNWk=
+X-Google-Smtp-Source: AGHT+IGpyp8BSukk+UDTj5z5JREfSz+alb3sH2oD1oIeAeVYhnVaLCG4dGSSt7Mw7T4w4HS/AypSpw==
+X-Received: by 2002:a05:600c:4f92:b0:40b:5e56:7b39 with SMTP id n18-20020a05600c4f9200b0040b5e567b39mr383986wmq.130.1702978556331;
+        Tue, 19 Dec 2023 01:35:56 -0800 (PST)
+Received: from debian ([93.184.186.109])
+        by smtp.gmail.com with ESMTPSA id bh20-20020a05600c3d1400b0040d15dcb77asm1992713wmb.23.2023.12.19.01.35.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Dec 2023 01:35:56 -0800 (PST)
+Date: Tue, 19 Dec 2023 10:35:54 +0100
+From: Dimitri Fedrau <dima.fedrau@gmail.com>
+To: Stefan Eichenberger <eichest@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: marvell-88q2xxx: add driver for the Marvell
+ 88Q2220 PHY
+Message-ID: <20231219093554.GA6393@debian>
+References: <20231215213102.35994-1-dima.fedrau@gmail.com>
+ <74d4b8f9-700e-45bc-af59-95a40a777b00@lunn.ch>
+ <20231216221151.GA143483@debian>
+ <28cc73bf-ed6d-49d8-b80b-4fbf5fa0442f@lunn.ch>
+ <20231217111538.GA3591@debian>
+ <ZX78ucHcNyEatXLD@eichest-laptop>
+ <20231218090932.GA4319@debian>
+ <ZYAqxPZHICtZO15O@eichest-laptop>
+ <20231219081117.GA3479@debian>
+ <ZYFfzei3SJSts5E/@eichest-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:b45:b0:35f:983a:7924 with SMTP id
- f5-20020a056e020b4500b0035f983a7924mr462859ilu.0.1702978282250; Tue, 19 Dec
- 2023 01:31:22 -0800 (PST)
-Date: Tue, 19 Dec 2023 01:31:22 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000092ec15060cd987e2@google.com>
-Subject: [syzbot] [batman?] INFO: rcu detected stall in sys_recvmmsg (3)
-From: syzbot <syzbot+b079dc0aa6e992859e7c@syzkaller.appspotmail.com>
-To: a@unstable.cc, b.a.t.m.a.n@lists.open-mesh.org, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	mareklindner@neomailbox.ch, netdev@vger.kernel.org, pabeni@redhat.com, 
-	sven@narfation.org, sw@simonwunderlich.de, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZYFfzei3SJSts5E/@eichest-laptop>
 
-Hello,
+Am Tue, Dec 19, 2023 at 10:19:41AM +0100 schrieb Stefan Eichenberger:
+> On Tue, Dec 19, 2023 at 09:11:17AM +0100, Dimitri Fedrau wrote:
+> 
+> > I could add the init sequence for the 88Q2221 PHY. Then you could test
+> > it on your side. Would this be helpful to you ? Did you already have the
+> > chance to test the patch ?
+> 
+> Unfortunately I haven't had time to test it yet. I will try to do it on
+> Thursday, otherwise sadly it will be next year.
+>
+Ok.
 
-syzbot found the following issue on:
+> > You are right, but I would propose to stick to the reference init
+> > sequence and make sure the PHYs works with our code and then work on
+> > optimizing the code. We still can remove and/or document parts of it.
+> 
+> I am not sure that it will be accepted by the maintainers if you use a
+> lot of registers that are not documented. For this reason, keeping it to
+> a minimum might increase the chances of it being accepted.
+>
+Ok. Will try to reduce them.
 
-HEAD commit:    2cf4f94d8e86 Merge tag 'scsi-fixes' of git://git.kernel.or..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12534501e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=671af399e2dac0e3
-dashboard link: https://syzkaller.appspot.com/bug?extid=b079dc0aa6e992859e7c
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> > Are you trying with the patch I provided or your own code ? If you use
+> > my patch you should wait until V3, because I found some problems with
+> > it. Switching from 1000Mbit/s to 100Mbit/s in autonegotiation mode doesn't
+> > work. I could fix it but the fix touches some code already upstreamed. So
+> > I tried to push parts of it yesterday. I forgot to cc you, just used the
+> > get_maintainer script. I will add you to the cc list. Until then you can
+> > look it up here: 20231218221814.69304-2-dima.fedrau@gmail.com
+> 
+> I used my own code so far but I will try again with your patches. Maybe
+> send this and the other patches as a whole series so that it gets clear
+> why you need the changes as Andrew wrote.
+> 
+Ok. Will send an V3 including all patches.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+> Regards,
+> Stefan
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/08b534ec982d/disk-2cf4f94d.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/8c44c6da6081/vmlinux-2cf4f94d.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/7e291c0f9693/bzImage-2cf4f94d.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b079dc0aa6e992859e7c@syzkaller.appspotmail.com
-
-rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-rcu: 	0-...!: (1 GPs behind) idle=c844/1/0x4000000000000000 softirq=35391/35392 fqs=3
-rcu: 	(detected by 1, t=10502 jiffies, g=60989, q=82 ncpus=2)
-Sending NMI from CPU 1 to CPUs 0:
-NMI backtrace for cpu 0
-CPU: 0 PID: 12878 Comm: syz-executor.1 Not tainted 6.7.0-rc6-syzkaller-00010-g2cf4f94d8e86 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-RIP: 0010:rcu_dynticks_curr_cpu_in_eqs include/linux/context_tracking.h:122 [inline]
-RIP: 0010:rcu_is_watching+0x3d/0xb0 kernel/rcu/tree.c:700
-Code: c7 c3 e8 6d 03 00 83 f8 07 89 c5 77 7a 48 8d 3c ed 60 da a6 8c 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 <75> 54 48 03 1c ed 60 da a6 8c 48 b8 00 00 00 00 00 fc ff df 48 89
-RSP: 0018:ffffc90000007c78 EFLAGS: 00000046
-RAX: dffffc0000000000 RBX: 0000000000036de8 RCX: ffffffff8166f367
-RDX: 1ffffffff194db4c RSI: ffffffff8b2ed360 RDI: ffffffff8ca6da60
-RBP: 0000000000000000 R08: 0000000000000000 R09: fffffbfff1e30d1a
-R10: ffffffff8f1868d7 R11: 0000000000000002 R12: 0000000000000001
-R13: 0000000000000000 R14: ffff88802be37300 R15: 0000000000000000
-FS:  00007feb948206c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020230030 CR3: 000000001f8f7000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <NMI>
- </NMI>
- <IRQ>
- trace_lock_acquire include/trace/events/lock.h:24 [inline]
- lock_acquire+0x464/0x520 kernel/locking/lockdep.c:5725
- __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
- _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
- spin_lock include/linux/spinlock.h:351 [inline]
- advance_sched+0xd5/0xc60 net/sched/sch_taprio.c:935
- __run_hrtimer kernel/time/hrtimer.c:1688 [inline]
- __hrtimer_run_queues+0x203/0xc20 kernel/time/hrtimer.c:1752
- hrtimer_interrupt+0x31b/0x800 kernel/time/hrtimer.c:1814
- local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1065 [inline]
- __sysvec_apic_timer_interrupt+0x105/0x400 arch/x86/kernel/apic/apic.c:1082
- sysvec_apic_timer_interrupt+0x90/0xb0 arch/x86/kernel/apic/apic.c:1076
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:649
-RIP: 0010:__raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
-RIP: 0010:_raw_spin_unlock_irqrestore+0x31/0x70 kernel/locking/spinlock.c:194
-Code: f5 53 48 8b 74 24 10 48 89 fb 48 83 c7 18 e8 86 37 e4 f6 48 89 df e8 ee ae e4 f6 f7 c5 00 02 00 00 75 1f 9c 58 f6 c4 02 75 2f <bf> 01 00 00 00 e8 25 68 d6 f6 65 8b 05 a6 10 81 75 85 c0 74 12 5b
-RSP: 0018:ffffc90003b0f738 EFLAGS: 00000246
-RAX: 0000000000000006 RBX: ffff8880290ad9d0 RCX: 1ffffffff23ead8c
-RDX: 0000000000000000 RSI: ffffffff8acc9f40 RDI: ffffffff8b2ed3e0
-RBP: 0000000000000246 R08: 0000000000000001 R09: fffffbfff23e1fe5
-R10: ffffffff91f0ff2f R11: 0000000000000001 R12: ffff8880290ad9b8
-R13: ffff8880177bda80 R14: 0000000000000246 R15: ffffc90003b0f8d8
- spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
- __skb_try_recv_datagram+0x16f/0x4f0 net/core/datagram.c:266
- __unix_dgram_recvmsg+0x1d1/0xee0 net/unix/af_unix.c:2383
- unix_dgram_recvmsg+0xc3/0xf0 net/unix/af_unix.c:2485
- sock_recvmsg_nosec net/socket.c:1044 [inline]
- ____sys_recvmsg+0x4ab/0x5c0 net/socket.c:2801
- ___sys_recvmsg+0x115/0x1a0 net/socket.c:2845
- do_recvmmsg+0x2af/0x740 net/socket.c:2939
- __sys_recvmmsg net/socket.c:3018 [inline]
- __do_sys_recvmmsg net/socket.c:3041 [inline]
- __se_sys_recvmmsg net/socket.c:3034 [inline]
- __x64_sys_recvmmsg+0x235/0x290 net/socket.c:3034
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7feb93a7cbe9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007feb948200c8 EFLAGS: 00000246 ORIG_RAX: 000000000000012b
-RAX: ffffffffffffffda RBX: 00007feb93b9c050 RCX: 00007feb93a7cbe9
-RDX: 0000000000010106 RSI: 00000000200000c0 RDI: 0000000000000003
-RBP: 00007feb93ac847a R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000002 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000006e R14: 00007feb93b9c050 R15: 00007ffcb6b30bd8
- </TASK>
-rcu: rcu_preempt kthread starved for 10496 jiffies! g60989 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=1
-rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-rcu: RCU grace-period kthread stack dump:
-task:rcu_preempt     state:R  running task     stack:28024 pid:16    tgid:16    ppid:2      flags:0x00004000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5376 [inline]
- __schedule+0xedb/0x5af0 kernel/sched/core.c:6688
- __schedule_loop kernel/sched/core.c:6763 [inline]
- schedule+0xe9/0x270 kernel/sched/core.c:6778
- schedule_timeout+0x137/0x290 kernel/time/timer.c:2167
- rcu_gp_fqs_loop+0x1ec/0xb10 kernel/rcu/tree.c:1631
- rcu_gp_kthread+0x24b/0x380 kernel/rcu/tree.c:1830
- kthread+0x2c6/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
- </TASK>
-rcu: Stack dump where RCU GP kthread last ran:
-CPU: 1 PID: 11 Comm: kworker/u4:1 Not tainted 6.7.0-rc6-syzkaller-00010-g2cf4f94d8e86 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-Workqueue: events_unbound toggle_allocation_gate
-RIP: 0010:csd_lock_wait kernel/smp.c:311 [inline]
-RIP: 0010:smp_call_function_many_cond+0x4e4/0x1550 kernel/smp.c:855
-Code: 0b 00 85 ed 74 4d 48 b8 00 00 00 00 00 fc ff df 4d 89 f4 4c 89 f5 49 c1 ec 03 83 e5 07 49 01 c4 83 c5 03 e8 fe b6 0b 00 f3 90 <41> 0f b6 04 24 40 38 c5 7c 08 84 c0 0f 85 24 0e 00 00 8b 43 08 31
-RSP: 0018:ffffc9000031f930 EFLAGS: 00000293
-RAX: 0000000000000000 RBX: ffff8880b98414c0 RCX: ffffffff817aaaa8
-RDX: ffff88801a66e080 RSI: ffffffff817aaa82 RDI: 0000000000000005
-RBP: 0000000000000003 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000006 R12: ffffed1017308299
-R13: 0000000000000001 R14: ffff8880b98414c8 R15: ffff8880b993d900
-FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020015000 CR3: 000000000cd77000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- </IRQ>
- <TASK>
- on_each_cpu_cond_mask+0x40/0x90 kernel/smp.c:1023
- on_each_cpu include/linux/smp.h:71 [inline]
- text_poke_sync arch/x86/kernel/alternative.c:2006 [inline]
- text_poke_bp_batch+0x22b/0x750 arch/x86/kernel/alternative.c:2216
- text_poke_flush arch/x86/kernel/alternative.c:2407 [inline]
- text_poke_flush arch/x86/kernel/alternative.c:2404 [inline]
- text_poke_finish+0x30/0x40 arch/x86/kernel/alternative.c:2414
- arch_jump_label_transform_apply+0x1c/0x30 arch/x86/kernel/jump_label.c:146
- jump_label_update+0x1d7/0x400 kernel/jump_label.c:829
- static_key_enable_cpuslocked+0x1b7/0x270 kernel/jump_label.c:205
- static_key_enable+0x1a/0x20 kernel/jump_label.c:218
- toggle_allocation_gate mm/kfence/core.c:830 [inline]
- toggle_allocation_gate+0xf4/0x250 mm/kfence/core.c:822
- process_one_work+0x886/0x15d0 kernel/workqueue.c:2627
- process_scheduled_works kernel/workqueue.c:2700 [inline]
- worker_thread+0x8b9/0x1290 kernel/workqueue.c:2781
- kthread+0x2c6/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Regards,
+Dimitri
 
