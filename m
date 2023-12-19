@@ -1,129 +1,81 @@
-Return-Path: <netdev+bounces-58736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CEBF817ECD
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 01:28:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E361A817EE0
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 01:41:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D538B22681
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 00:28:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 980F61F21543
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 00:41:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F33057EC;
-	Tue, 19 Dec 2023 00:28:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49BAA17D9;
+	Tue, 19 Dec 2023 00:40:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="Vw7IAmmr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SlKvu4tf"
 X-Original-To: netdev@vger.kernel.org
-Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7BF387;
-	Tue, 19 Dec 2023 00:28:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
-Received: from localhost (unknown [IPv6:2601:280:5e00:7e19::646])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id AC5A32E5;
-	Tue, 19 Dec 2023 00:28:13 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net AC5A32E5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1702945693; bh=a0F1KU/c3GJSM1QvgmP6g60KFqrrB2L92VtyVaFu2AE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Vw7IAmmrc6vAXS/pqzU68bdEHzA1Wq4Cy1DJTXVUvvkpZzZ4xF2RUzYnQZaDkrvf/
-	 5VLQKzI40rtpt2xsp3acV6laGL87KeduAMWnp4/nH/J090kmgoRTyOxkDuLoJ2sjqK
-	 fRKfclNyDMaMbU4ADh0O85kd9kBtl/0DfpVN9E24F5e18BmNkNj6Qzr3XQflUyQTcL
-	 0tYLdTU8JCg5kejRbgrV2L/llepW9RGSrmeJ0eCIy6p59A5/zfZBasfCFJnDS5xTye
-	 1MvNLs9x4HQgbAkixFfBRyAz0nHIVg8ImZJaXiyrLjzhUHQ/qcEilVzN6n9kVLwms2
-	 O3T73zOVc3HUA==
-From: Jonathan Corbet <corbet@lwn.net>
-To: Jon Maloy <jmaloy@redhat.com>, Ying Xue <ying.xue@windriver.com>
-Cc: netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
- linux-kernel@vger.kernel.org
-Subject: [PATCH] tipc: Remove some excess struct member documentation
-Date: Mon, 18 Dec 2023 17:28:13 -0700
-Message-ID: <878r5rjasi.fsf@meer.lwn.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A8217CB;
+	Tue, 19 Dec 2023 00:40:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 917F5C43395;
+	Tue, 19 Dec 2023 00:40:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702946444;
+	bh=CfLFULyCobbm11Ctyb+YHPSIvzQ3Pji0eKUQGAROm+M=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SlKvu4tfSZ6phtWDJBib5qNJD9JlpfwsZejraqBlrG0zpismyOgUfaHWqFZZYNXwq
+	 EX9qGaC5mRJjceP3VxH/FlkBg8DYd6FE/GaQxtT4Vx/CjUyLtEMLPFF+qPlHkXr1Yo
+	 BYUqK38WSD8axVCQXzymQx+PVURSjXlobsl2pyrRBquesjH6t5Zc6iw8HICOxp3ErZ
+	 CcYVvD4le4QuslpBuuFnda+noa99/NME9q4dlZPSOYDox1x6nYRNiEilVtPSs80aYG
+	 Bhy8h6UOn4kCXHnPHjE994qrKMwD3Cv5cYxctYEBY9uKySGCOpXikdMJhb2zJN50kA
+	 BdS77fkRRRuww==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6DC08D8C984;
+	Tue, 19 Dec 2023 00:40:44 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: wireless-next-2023-12-18
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170294644444.1070.13230618944313891274.git-patchwork-notify@kernel.org>
+Date: Tue, 19 Dec 2023 00:40:44 +0000
+References: <20231218163900.C031DC433C9@smtp.kernel.org>
+In-Reply-To: <20231218163900.C031DC433C9@smtp.kernel.org>
+To: Kalle Valo <kvalo@kernel.org>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
 
-Remove documentation for nonexistent struct members, addressing these
-warnings:
+Hello:
 
-  ./net/tipc/link.c:228: warning: Excess struct member 'media_addr' description in 'tipc_link'
-  ./net/tipc/link.c:228: warning: Excess struct member 'timer' description in 'tipc_link'
-  ./net/tipc/link.c:228: warning: Excess struct member 'refcnt' description in 'tipc_link'
-  ./net/tipc/link.c:228: warning: Excess struct member 'proto_msg' description in 'tipc_link'
-  ./net/tipc/link.c:228: warning: Excess struct member 'pmsg' description in 'tipc_link'
-  ./net/tipc/link.c:228: warning: Excess struct member 'backlog_limit' description in 'tipc_link'
-  ./net/tipc/link.c:228: warning: Excess struct member 'exp_msg_count' description in 'tipc_link'
-  ./net/tipc/link.c:228: warning: Excess struct member 'reset_rcv_checkpt' description in 'tipc_link'
-  ./net/tipc/link.c:228: warning: Excess struct member 'transmitq' description in 'tipc_link'
-  ./net/tipc/link.c:228: warning: Excess struct member 'snt_nxt' description in 'tipc_link'
-  ./net/tipc/link.c:228: warning: Excess struct member 'deferred_queue' description in 'tipc_link'
-  ./net/tipc/link.c:228: warning: Excess struct member 'unacked_window' description in 'tipc_link'
-  ./net/tipc/link.c:228: warning: Excess struct member 'next_out' description in 'tipc_link'
-  ./net/tipc/link.c:228: warning: Excess struct member 'long_msg_seq_no' description in 'tipc_link'
-  ./net/tipc/link.c:228: warning: Excess struct member 'bc_rcvr' description in 'tipc_link'
+This pull request was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Signed-off-by: Jonathan Corbet <corbet@lwn.net>
----
- net/tipc/link.c | 15 ---------------
- 1 file changed, 15 deletions(-)
+On Mon, 18 Dec 2023 16:39:00 +0000 (UTC) you wrote:
+> Hi,
+> 
+> here's a pull request to net-next tree, more info below. Please let me know if
+> there are any problems.
+> 
+> Kalle
+> 
+> [...]
 
-diff --git a/net/tipc/link.c b/net/tipc/link.c
-index d0143823658d..0716eb5c8a31 100644
---- a/net/tipc/link.c
-+++ b/net/tipc/link.c
-@@ -82,10 +82,7 @@ struct tipc_stats {
-  * struct tipc_link - TIPC link data structure
-  * @addr: network address of link's peer node
-  * @name: link name character string
-- * @media_addr: media address to use when sending messages over link
-- * @timer: link timer
-  * @net: pointer to namespace struct
-- * @refcnt: reference counter for permanent references (owner node & timer)
-  * @peer_session: link session # being used by peer end of link
-  * @peer_bearer_id: bearer id used by link's peer endpoint
-  * @bearer_id: local bearer id used by link
-@@ -94,31 +91,19 @@ struct tipc_stats {
-  * @state: current state of link FSM
-  * @peer_caps: bitmap describing capabilities of peer node
-  * @silent_intv_cnt: # of timer intervals without any reception from peer
-- * @proto_msg: template for control messages generated by link
-- * @pmsg: convenience pointer to "proto_msg" field
-  * @priority: current link priority
-  * @net_plane: current link network plane ('A' through 'H')
-  * @mon_state: cookie with information needed by link monitor
-- * @backlog_limit: backlog queue congestion thresholds (indexed by importance)
-- * @exp_msg_count: # of tunnelled messages expected during link changeover
-- * @reset_rcv_checkpt: seq # of last acknowledged message at time of link reset
-  * @mtu: current maximum packet size for this link
-  * @advertised_mtu: advertised own mtu when link is being established
-- * @transmitq: queue for sent, non-acked messages
-  * @backlogq: queue for messages waiting to be sent
-- * @snt_nxt: next sequence number to use for outbound messages
-  * @ackers: # of peers that needs to ack each packet before it can be released
-  * @acked: # last packet acked by a certain peer. Used for broadcast.
-  * @rcv_nxt: next sequence number to expect for inbound messages
-- * @deferred_queue: deferred queue saved OOS b'cast message received from node
-- * @unacked_window: # of inbound messages rx'd without ack'ing back to peer
-  * @inputq: buffer queue for messages to be delivered upwards
-  * @namedq: buffer queue for name table messages to be delivered upwards
-- * @next_out: ptr to first unsent outbound message in queue
-  * @wakeupq: linked list of wakeup msgs waiting for link congestion to abate
-- * @long_msg_seq_no: next identifier to use for outbound fragmented messages
-  * @reasm_buf: head of partially reassembled inbound message fragments
-- * @bc_rcvr: marks that this is a broadcast receiver link
-  * @stats: collects statistics regarding link activity
-  * @session: session to be used by link
-  * @snd_nxt_state: next send seq number
+Here is the summary with links:
+  - pull-request: wireless-next-2023-12-18
+    https://git.kernel.org/netdev/net-next/c/0ee28c9ae042
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
