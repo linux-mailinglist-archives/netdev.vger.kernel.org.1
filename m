@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-59039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21A388191EA
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 22:04:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53C518191EC
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 22:04:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B19B21F23BF1
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 21:04:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DCF72823C9
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 21:04:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C0AC3B29D;
-	Tue, 19 Dec 2023 21:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 122B43A1AD;
+	Tue, 19 Dec 2023 21:04:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="r91WcHkF"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="Erzzqqgj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689A03B2BD
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 21:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6108239FE5
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 21:04:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6d0a679fca7so2811652b3a.2
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 13:04:10 -0800 (PST)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6d411636a95so76072b3a.0
+        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 13:04:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1703019849; x=1703624649; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1703019850; x=1703624650; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zs+cSQCBJyAxSPUcytmGfDGwcvea+TXK48eVoO+ZZxM=;
-        b=r91WcHkFUHCQ5SAxBq1DMCCRf01qUer6dm3fGeY4q73QJqhgnLFgUaW2t7VBHRhoPq
-         Gclgz5RAJZRAfzQNPk4NKuG7cLsz0B2OK+YXeF7+9jDVRzhztHRIs4MAZp1qvaBMQB2Z
-         mSIf8mIfXWJ2/8kCnkDZIywuZFMQKRamlowq/ZW9nU4rkSFNfh/UM2sxMYqjIz3ZgRuJ
-         WNPNtYIKRZY+o/48hBHtR2aVcCGdnmXWvSSX5INpCXs7e2Zr4lhh5Pp0Ux1/2ZbmxbDk
-         jwk1jbFsDpjLGSGvrNZea3M/hwA5QhXrKsuaiFxd+21Eprag4UMoYBmoyOl0wi5lAVg8
-         X+8w==
+        bh=bxF16fAD5eY0vARRtlHeEdU6+P5TPKLrnZoJ3mN5VeE=;
+        b=ErzzqqgjalS5ujCO50KqgFAMsFMtWp1/zrlkAU6OCuzTTHXuRB8eB649YsZa7WIG1S
+         Z5E4ICEorKlo4kxD4YRQqUWl9WX5rJRHnz/K/cYE4oAfx9DG3rJc1eAc/6tWY5PqQJaJ
+         XrvsLt/FfVEEEhVezufe+skQMskQnWoZaFq0sIsdsXiQVcFLsSNsgrFKWcBZ5M4MYEGR
+         0NtRqazGtD695JYR1s+CUyVlxLaTvLyLQPsGOhABh2c45mDh0wUANOC6/1t/d3k3eKtB
+         y8Q49aCxdbtgtrhOS5YeAnl/1+bnWlMA8ApBS7WkcOx6raCijxVYo+IgrTEOOnzKIoVQ
+         VcYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703019849; x=1703624649;
+        d=1e100.net; s=20230601; t=1703019850; x=1703624650;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zs+cSQCBJyAxSPUcytmGfDGwcvea+TXK48eVoO+ZZxM=;
-        b=n8GJEebNhpCox47pMPcbQyVbO08syTiXuWSUnYEEBwPxT8C9xm5ADVb2HFEtZnIFHx
-         GaBuNPVdhii3P8EXyBtFSOKkAMn0YNz9QRHRc5c2Z/vR/mC3NKoq4J66fKcoH/UAXV2b
-         lcXjhGtEVBt02HUyEuh801M5p6nduzE1wmgzvvbYb7vHpWidwensTRFp1o9e7W23EJ1R
-         5k6EJWaEzCjsfRd+CTQgyA4Z+w/cZwAatheQ6SilKDyfmEwQXuZMlddycZrzmktduwou
-         MZ19x10C7aUpVg+y9umeiswuRi7k+wY90L6nXEd7APSPhZs4fAorQtxgufmyKZJoZr44
-         a9Tw==
-X-Gm-Message-State: AOJu0YyLXRFfDHRuzMIvGvKM+bLPQPCg3jcUzgdWwRvz9u5BRtiBGkzZ
-	bMOO6dABFZ3nKf1Adhks0wddfOUIAxj6mnW/ibNMOQ==
-X-Google-Smtp-Source: AGHT+IHjfDQaUz2sKAkFTiAhNVlx7Yd3lLWWRw8dr6FWMxhyPk+XlzUgXZXfLatLI87/PuyoBdiiAg==
-X-Received: by 2002:a05:6a20:3ca3:b0:18b:ec94:deed with SMTP id b35-20020a056a203ca300b0018bec94deedmr9799295pzj.45.1703019849709;
-        Tue, 19 Dec 2023 13:04:09 -0800 (PST)
-Received: from localhost (fwdproxy-prn-002.fbsv.net. [2a03:2880:ff:2::face:b00c])
-        by smtp.gmail.com with ESMTPSA id e9-20020a17090ab38900b0028b07d1f647sm2076812pjr.23.2023.12.19.13.04.09
+        bh=bxF16fAD5eY0vARRtlHeEdU6+P5TPKLrnZoJ3mN5VeE=;
+        b=itY/6CHFhSql6yox1NsMetSTBM4AHTQBGlMsUpgJDvt0t5N5TdX4YljzK9922U9Dte
+         LXWdPeg9u7ssIPaXIKaA3qVxHK0dZHBfN3IUy4bKrbT1G7sjEYgh9Q+RAwynhULveNx3
+         zeHRz2xZyWMclaVgTzgNIzZkCiIvA5n3xI7BGddCiWB7V10XJn6f4+sLG58o57by7jn6
+         NYBasg5H8tV1kuamyPiJzSnzMg3eQVwlXsH6ni5l2N9/t86p+Z6//0bE575AboYintGm
+         Ls0q0eiULDHGSwxAG+kj2HlJj2+NoV51cIoxYJUCt19YcXtSs68gtFCvu9GVEIXAIPxp
+         K/2g==
+X-Gm-Message-State: AOJu0YxqYgYaofBcafYqaCmF74UqyEy2revJuyd3hN0n94KhaAN57zLa
+	9SsbEbzRAX9C0NekNjoid+V6kg==
+X-Google-Smtp-Source: AGHT+IHQu3MDTkpc00SBCiVZjqGTylNNidHL0fESRWK86uvjemoU13/tRBE4mX3qs2HdkNdYcVbOmg==
+X-Received: by 2002:a05:6a20:6311:b0:18f:354f:58c2 with SMTP id h17-20020a056a20631100b0018f354f58c2mr1314596pzf.44.1703019850627;
+        Tue, 19 Dec 2023 13:04:10 -0800 (PST)
+Received: from localhost (fwdproxy-prn-025.fbsv.net. [2a03:2880:ff:19::face:b00c])
+        by smtp.gmail.com with ESMTPSA id c3-20020aa78803000000b006d451d8d7f3sm6017911pfo.76.2023.12.19.13.04.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Dec 2023 13:04:09 -0800 (PST)
+        Tue, 19 Dec 2023 13:04:10 -0800 (PST)
 From: David Wei <dw@davidwei.uk>
 To: io-uring@vger.kernel.org,
 	netdev@vger.kernel.org
@@ -69,9 +69,9 @@ Cc: Jens Axboe <axboe@kernel.dk>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
 	David Ahern <dsahern@kernel.org>,
 	Mina Almasry <almasrymina@google.com>
-Subject: [RFC PATCH v3 05/20] net: page_pool: add ->scrub mem provider callback
-Date: Tue, 19 Dec 2023 13:03:42 -0800
-Message-Id: <20231219210357.4029713-6-dw@davidwei.uk>
+Subject: [RFC PATCH v3 06/20] io_uring: separate header for exported net bits
+Date: Tue, 19 Dec 2023 13:03:43 -0800
+Message-Id: <20231219210357.4029713-7-dw@davidwei.uk>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20231219210357.4029713-1-dw@davidwei.uk>
 References: <20231219210357.4029713-1-dw@davidwei.uk>
@@ -85,42 +85,93 @@ Content-Transfer-Encoding: 8bit
 
 From: Pavel Begunkov <asml.silence@gmail.com>
 
-page pool is now waiting for all ppiovs to return before destroying
-itself, and for that to happen the memory provider might need to push
-some buffers, flush caches and so on.
+We're exporting some io_uring bits to networking, e.g. for implementing
+a net callback for io_uring cmds, but we don't want to expose more than
+needed. Add a separate header for networking.
 
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- include/net/page_pool/types.h | 1 +
- net/core/page_pool.c          | 2 ++
- 2 files changed, 3 insertions(+)
+ include/linux/io_uring.h     |  6 ------
+ include/linux/io_uring/net.h | 18 ++++++++++++++++++
+ io_uring/uring_cmd.c         |  1 +
+ net/socket.c                 |  2 +-
+ 4 files changed, 20 insertions(+), 7 deletions(-)
+ create mode 100644 include/linux/io_uring/net.h
 
-diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-index a701310b9811..fd846cac9fb6 100644
---- a/include/net/page_pool/types.h
-+++ b/include/net/page_pool/types.h
-@@ -134,6 +134,7 @@ enum pp_memory_provider_type {
- struct pp_memory_provider_ops {
- 	int (*init)(struct page_pool *pool);
- 	void (*destroy)(struct page_pool *pool);
-+	void (*scrub)(struct page_pool *pool);
- 	struct page *(*alloc_pages)(struct page_pool *pool, gfp_t gfp);
- 	bool (*release_page)(struct page_pool *pool, struct page *page);
- };
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 71af9835638e..9e3073d61a97 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -947,6 +947,8 @@ static int page_pool_release(struct page_pool *pool)
- {
- 	int inflight;
+diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
+index d8fc93492dc5..88d9aae7681b 100644
+--- a/include/linux/io_uring.h
++++ b/include/linux/io_uring.h
+@@ -12,7 +12,6 @@ void __io_uring_cancel(bool cancel_all);
+ void __io_uring_free(struct task_struct *tsk);
+ void io_uring_unreg_ringfd(void);
+ const char *io_uring_get_opcode(u8 opcode);
+-int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags);
  
-+	if (pool->mp_ops && pool->mp_ops->scrub)
-+		pool->mp_ops->scrub(pool);
- 	page_pool_scrub(pool);
- 	inflight = page_pool_inflight(pool);
- 	if (!inflight)
+ static inline void io_uring_files_cancel(void)
+ {
+@@ -49,11 +48,6 @@ static inline const char *io_uring_get_opcode(u8 opcode)
+ {
+ 	return "";
+ }
+-static inline int io_uring_cmd_sock(struct io_uring_cmd *cmd,
+-				    unsigned int issue_flags)
+-{
+-	return -EOPNOTSUPP;
+-}
+ #endif
+ 
+ #endif
+diff --git a/include/linux/io_uring/net.h b/include/linux/io_uring/net.h
+new file mode 100644
+index 000000000000..b58f39fed4d5
+--- /dev/null
++++ b/include/linux/io_uring/net.h
+@@ -0,0 +1,18 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#ifndef _LINUX_IO_URING_NET_H
++#define _LINUX_IO_URING_NET_H
++
++struct io_uring_cmd;
++
++#if defined(CONFIG_IO_URING)
++int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags);
++
++#else
++static inline int io_uring_cmd_sock(struct io_uring_cmd *cmd,
++				    unsigned int issue_flags)
++{
++	return -EOPNOTSUPP;
++}
++#endif
++
++#endif
+diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
+index 34030583b9b2..c98749eff5ce 100644
+--- a/io_uring/uring_cmd.c
++++ b/io_uring/uring_cmd.c
+@@ -3,6 +3,7 @@
+ #include <linux/errno.h>
+ #include <linux/file.h>
+ #include <linux/io_uring/cmd.h>
++#include <linux/io_uring/net.h>
+ #include <linux/security.h>
+ #include <linux/nospec.h>
+ 
+diff --git a/net/socket.c b/net/socket.c
+index 3379c64217a4..d75246450a3c 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -88,7 +88,7 @@
+ #include <linux/xattr.h>
+ #include <linux/nospec.h>
+ #include <linux/indirect_call_wrapper.h>
+-#include <linux/io_uring.h>
++#include <linux/io_uring/net.h>
+ 
+ #include <linux/uaccess.h>
+ #include <asm/unistd.h>
 -- 
 2.39.3
 
