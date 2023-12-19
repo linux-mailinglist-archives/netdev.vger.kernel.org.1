@@ -1,161 +1,152 @@
-Return-Path: <netdev+bounces-58987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD5DC818CE5
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 17:50:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CE01818CF0
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 17:51:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3C5C1C242F3
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:50:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1FF91F22FF2
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:51:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70591200C7;
-	Tue, 19 Dec 2023 16:49:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FE42208DB;
+	Tue, 19 Dec 2023 16:51:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MPMEWXOr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 339CD20DFE;
-	Tue, 19 Dec 2023 16:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.104] (178.176.72.19) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 19 Dec
- 2023 19:49:30 +0300
-Subject: Re: [PATCH net 1/2] net: ravb: Wait for operation mode to be applied
-To: claudiu beznea <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<claudiu.beznea.uj@bp.renesas.com>, <yoshihiro.shimoda.uh@renesas.com>,
-	<wsa+renesas@sang-engineering.com>, <niklas.soderlund+renesas@ragnatech.se>,
-	<biju.das.jz@bp.renesas.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	<mitsuhiro.kimura.kc@renesas.com>, <geert+renesas@glider.be>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20231214113137.2450292-1-claudiu.beznea.uj@bp.renesas.com>
- <20231214113137.2450292-2-claudiu.beznea.uj@bp.renesas.com>
- <d08dbbd4-2e63-c436-6935-df68c291bf75@omp.ru>
- <0b807496-f387-4aef-8650-a43a9249468f@tuxon.dev>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <2e70a095-8079-84f1-f842-eb90059610ed@omp.ru>
-Date: Tue, 19 Dec 2023 19:49:29 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8322620DD7
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 16:51:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703004694;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w5Xe1M0Gz0LaWjI/lQS6+uzcaH3a3lGFMV4s4r+jDpI=;
+	b=MPMEWXOrq3Qf0xMRkSpgpydM4GEqPmebi4ymHnKJweYdrvz2xueqONpfXiZe4ts17Lao29
+	x5lPQKn5jjD7gShrHu3qpHGuHt6GtZaD5UNpKUH1vtp9dDFl4KZidrZgWWMSpax6JKZ0/0
+	KXJpcr6i35TWNVyKTo/eD5R2d46+njs=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-538-SZhKt4N1MPKXfQGXxUAb8Q-1; Tue, 19 Dec 2023 11:51:31 -0500
+X-MC-Unique: SZhKt4N1MPKXfQGXxUAb8Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 544C185A589;
+	Tue, 19 Dec 2023 16:51:30 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.195.169])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 745142166B31;
+	Tue, 19 Dec 2023 16:51:27 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <d1d4f3996f55cb98ab6297844a51bc905e2ce631.camel@kernel.org>
+References: <d1d4f3996f55cb98ab6297844a51bc905e2ce631.camel@kernel.org> <20231213152350.431591-1-dhowells@redhat.com> <20231213152350.431591-37-dhowells@redhat.com>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>,
+    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 36/39] netfs: Implement a write-through caching option
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <0b807496-f387-4aef-8650-a43a9249468f@tuxon.dev>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/19/2023 16:26:24
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 182235 [Dec 19 2023]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;178.176.72.19:7.7.3,7.4.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: {cloud_iprep_silent}
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.72.19
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 12/19/2023 16:32:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 12/19/2023 2:00:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1075259.1703004686.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 19 Dec 2023 16:51:26 +0000
+Message-ID: <1075260.1703004686@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-On 12/15/23 1:04 PM, claudiu beznea wrote:
-[...]
->>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>>
->>> CSR.OPS bits specify the current operating mode and (according to
->>> documentation) they are updated when the operating mode change request
->>> is processed. Thus, check CSR.OPS before proceeding.
->>
->>    The manuals I have indeed say we need to check CSR.OPS... But we only
->> need to wait iff we transfer from the operation mode to the config mode...
-> 
-> RZ/G3S manual say about CSR.OPS "These bits are updated when an operating
+Jeff Layton <jlayton@kernel.org> wrote:
 
-   I was unable to find the RZ/G3 manuals on ther Renesas' website... :-(
+> > This can't be used with content encryption as that may require expansi=
+on of
+> > the write RPC beyond the write being made.
+> > =
 
-> mode changes is processed". From this I get we need to check it for any mode.
+> > This doesn't affect writes via mmap - those are written back in the no=
+rmal
+> > way; similarly failed writethrough writes are marked dirty and left to
+> > writeback to retry.  Another option would be to simply invalidate them=
+, but
+> > the contents can be simultaneously accessed by read() and through mmap=
+.
+> > =
 
-  I don't argue with the (safety) checking of CSR.OPS, I was just pointing
-out that the R-Car gen3 manual says that only transfer from operation to
-the config mode happens after a considerable amount of time, other transfers
-do happen immediately after updating CCC.OPC.
+> =
 
-> Also, on configuration procedure (of RZ/G3S) it say CSR.OPS need to be
-> checked when switching from reset -> config.
+> I do wish Linux were less of a mess in this regard. Different
+> filesystems behave differently when writeback fails.
 
-   Just checked or waited on?
-   The R-car does have a specific algorithm for transferring from the operation
-to the reset mode (you need to set CC.DTSR first and then wait for CSR.DTS to
-clear before updating CCC.OPC)...
+Cifs is particularly, um, entertaining in this regard as it allows the wri=
+te
+to fail on the server due to a checksum failure if the source data changes
+during the write and then just retries it later.
 
-[...]
+> That said, the modern consensus with local filesystems is to just leave
+> the pages clean when buffered writeback fails, but set a writeback error
+> on the inode. That at least keeps dirty pages from stacking up in the
+> cache. In the case of something like a netfs, we usually invalidate the
+> inode and the pages -- netfs's usually have to spontaneously deal with
+> that anyway, so we might as well.
+> =
 
->>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>> ---
->>>  drivers/net/ethernet/renesas/ravb_main.c | 47 ++++++++++++++++++++----
->>>  1 file changed, 39 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->>> index 9178f6d60e74..ce95eb5af354 100644
->>> --- a/drivers/net/ethernet/renesas/ravb_main.c
->>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-[...]
->>> @@ -1744,6 +1747,18 @@ static inline int ravb_hook_irq(unsigned int irq, irq_handler_t handler,
->>>  	return error;
->>>  }
->>>  
->>> +static int ravb_set_reset_mode(struct net_device *ndev)
->>> +{
->>> +	int error;
->>> +
->>> +	ravb_write(ndev, CCC_OPC_RESET, CCC);
->>> +	error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_RESET);
->>> +	if (error)
->>> +		netdev_err(ndev, "failed to switch device to reset mode\n");
->>> +
->>> +	return error;
->>> +}
->>> +
->>
->>    Again, ravb_wait() call doesn't seem necessary here...
-> 
-> Ok. I followed the guideline from the description of CSR.OPS. Let me know
-> if you want to keep it or not. I think I haven't saw any issues w/o this.
+> Marking the pages dirty here should mean that they'll effectively get a
+> second try at writeback, which is a change in behavior from most
+> filesystems. I'm not sure it's a bad one, but writeback can take a long
+> time if you have a laggy network.
 
-  Yes, please remove the waiting.
+I'm not sure what the best thing to do is.  If everything is doing
+O_DSYNC/writethrough I/O on an inode and there is no mmap, then invalidati=
+ng
+the pages is probably not a bad way to deal with failure here.
 
-[...]
+> When a write has already failed once, why do you think it'll succeed on
+> a second attempt (and probably with page-aligned I/O, I guess)?
 
-MBR, Sergey
+See above with cifs.  I wonder if the pages being written to should be mad=
+e RO
+and page_mkwrite() forced to lock against DSYNC writethrough.
+
+> Another question: when the writeback is (re)attempted, will it end up
+> just doing page-aligned I/O, or is the byte range still going to be
+> limited to the written range?
+
+At the moment, it then happens exactly as it would if it wasn't doing
+writethrough - so it will write partial folios if it's doing a streaming w=
+rite
+and will do full folios otherwise.
+
+> The more I consider it, I think it might be a lot simpler to just "fail
+> fast" here rather than remarking the write dirty.
+
+You may be right - but, again, mmap:-/
+
+David
+
 
