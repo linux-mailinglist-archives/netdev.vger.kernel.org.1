@@ -1,108 +1,114 @@
-Return-Path: <netdev+bounces-58951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF87E818ABA
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:02:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E19E818AD1
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:08:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D563C1C21A6A
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:02:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D2411C23549
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:08:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2868F1BDDE;
-	Tue, 19 Dec 2023 15:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C7841CA92;
+	Tue, 19 Dec 2023 15:07:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3kBJC7px"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="mWqQFs03"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83BFB20315
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 15:02:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so15771a12.0
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 07:02:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702998156; x=1703602956; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Px3R+YIh5PQ/gOPwHTyJV+wi4ltg6ySoz0bgIUEmZv0=;
-        b=3kBJC7pxxOXIC2nG4XpsNwdmL2tPN0HzIDhadnvzRIMHYkkIKnZVun19a7Nht5B61d
-         3OKTgWfaYpJlzjUo0Nixp0KKMRq7+niEOHvj2vI+l/4LL9UaGtsrZcW7/sWga3mCbbY6
-         oA/E9LzUdI1qyE911Vm4db/8vdj7vW0U+S1iTrXwBEWbU/B73Jy4FTx1hBwXpVOzeZMF
-         S4FSolYYcHmXHeipmYLPAfgTeq3Ng1u90hz/csPjO+w72P+eT+BXB6qg6VeKYsKkax9X
-         J8/P8GtZdBHHa7EUpTPyiw+RP0BpkRlmyK4Xgbh/7hNQCEqkig4pYA1AXmn7Hn0c36tS
-         xmaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702998156; x=1703602956;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Px3R+YIh5PQ/gOPwHTyJV+wi4ltg6ySoz0bgIUEmZv0=;
-        b=cZPGT98bdpxkmOQICHQPFD6mxsM675Ucdz8RYEU9gmSY8fvyQxBHnXqu9vjFededqs
-         Gi/zKJSCHkS/Y0NnZ07rG1eP21DBtoXLImpPFwlFxDbGGGFTUJSPwt+ckTF8igA3P3K4
-         Y8WML9EyT55eXkqJrX9XQ+VSvxGM7rE95SK1rF2OSbJg3MYtkCh/uOC+YP1jAY2IJqQv
-         UHKsjHN2vtddTVNkoEnTrnecgiZw4A7dYM7xjEVo27lZzZs3EuOhQvBtArBlvsUXpU6R
-         SGPG69gSvgyeBfb3bTWGW3ETR68rZfhgXh18AGah0DyXP0yYkKRbGBn8xFckDd//3CT1
-         mzgA==
-X-Gm-Message-State: AOJu0YxLskH2zUYWZZwY82g194OeHieVYNNUx+kj+Dhre4JpqX+k0JTT
-	jKEPzTHBOl0/iib0nmYyrpoFYVFpoXplaFe3t/+pJCbLCMhV
-X-Google-Smtp-Source: AGHT+IGRY/3HG+jPsYWUp9SBBE0EvPMT610dURXYSSuBBwZb/+KGVMQ/+H97CcRJf47swMagq4I8Zd2sd7hONSCNkIo=
-X-Received: by 2002:a50:d616:0:b0:553:5578:2fc9 with SMTP id
- x22-20020a50d616000000b0055355782fc9mr162639edi.5.1702998155484; Tue, 19 Dec
- 2023 07:02:35 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C681CA81;
+	Tue, 19 Dec 2023 15:07:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03D26C433CB;
+	Tue, 19 Dec 2023 15:07:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1702998476;
+	bh=76IMDa35Ejr4DS8JJBlGFBxWrx3Os8GLF+gs9kZW9II=;
+	h=From:To:Cc:Subject:Date:From;
+	b=mWqQFs03BZuMAl/JfgCocD6vFVETom5/non6pqxKgM1JS/XadCHFlz5/Qb8WHNc5j
+	 L8QuaMjlk9oz5so+qnZNtaMITMWoBwpAPNzfHMMdAGYrneIp3gptGhqJXPbOx+jb93
+	 lIkdL8V6cqaRYqe1pSVGivwPoFpFrqlvYj6VgCP8=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: wintera@linux.ibm.com,
+	wenjia@linux.ibm.com
+Cc: linux-kernel@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH] icuv: make iucv_bus const
+Date: Tue, 19 Dec 2023 16:07:51 +0100
+Message-ID: <2023121950-prankster-stomp-a1aa@gregkh>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231219125331.4127498-1-edumazet@google.com> <21ccf1acce6f4a711f6323f9392c1254135999b8.camel@redhat.com>
-In-Reply-To: <21ccf1acce6f4a711f6323f9392c1254135999b8.camel@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 19 Dec 2023 16:02:24 +0100
-Message-ID: <CANn89i+T6oYTNrjeQ4K7D1kYHTQgwJ1uJxCn0LY0ADPEg_bGbw@mail.gmail.com>
-Subject: Re: [PATCH net] net: check dev->gso_max_size in gso_features_check()
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Lines: 55
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1792; i=gregkh@linuxfoundation.org; h=from:subject:message-id; bh=76IMDa35Ejr4DS8JJBlGFBxWrx3Os8GLF+gs9kZW9II=; b=owGbwMvMwCRo6H6F97bub03G02pJDKmNG4/HvBFNfNNYMSvisnXSm9asi+9m/cg+P+OQ56Jjh gpTtood74hlYRBkYpAVU2T5so3n6P6KQ4pehranYeawMoEMYeDiFICJfPzBsGDRhXQ1p/bOowui i6ec9JsaYt0tU80wT2lq6J8rhWaHXmptFXrN8IqDt2jFIgA=
+X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 19, 2023 at 3:42=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On Tue, 2023-12-19 at 12:53 +0000, Eric Dumazet wrote:
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index 0432b04cf9b000628497345d9ec0e8a141a617a3..b55d539dca153f921260346=
-a4f23bcce0e888227 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -3471,6 +3471,9 @@ static netdev_features_t gso_features_check(const=
- struct sk_buff *skb,
-> >       if (gso_segs > READ_ONCE(dev->gso_max_segs))
-> >               return features & ~NETIF_F_GSO_MASK;
-> >
-> > +     if (unlikely(skb->len >=3D READ_ONCE(dev->gso_max_size)))
->
-> Since we are checking vs the limit supported by the NIC, should the
-> above be 'tso_max_size'?
->
-> My understanding is that 'gso{,_ipv4}_max_size' is the max aggregate
-> size the device asks for, and 'tso_max_size' is the actual limit
-> supported by the NIC.
->
+Now that the driver core can properly handle constant struct bus_type,
+move the iucv_bus variable to be a constant structure as well, placing
+it into read-only memory which can not be modified at runtime.
 
-Problem is tso_max_size has been added very recently, depending on
-this would make backports tricky.
+Cc: Alexandra Winter <wintera@linux.ibm.com>
+Cc: Wenjia Zhang <wenjia@linux.ibm.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: linux-s390@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ include/net/iucv/iucv.h | 4 ++--
+ net/iucv/iucv.c         | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-I think the fix using gso_max_size is more portable to stable
-versions, and allows the user to tweak the value,
-and build tests.
+diff --git a/include/net/iucv/iucv.h b/include/net/iucv/iucv.h
+index f9e88401d7da..8b2055d64a6b 100644
+--- a/include/net/iucv/iucv.h
++++ b/include/net/iucv/iucv.h
+@@ -80,7 +80,7 @@ struct iucv_array {
+ 	u32 length;
+ } __attribute__ ((aligned (8)));
+ 
+-extern struct bus_type iucv_bus;
++extern const struct bus_type iucv_bus;
+ extern struct device *iucv_root;
+ 
+ /*
+@@ -489,7 +489,7 @@ struct iucv_interface {
+ 	int (*path_sever)(struct iucv_path *path, u8 userdata[16]);
+ 	int (*iucv_register)(struct iucv_handler *handler, int smp);
+ 	void (*iucv_unregister)(struct iucv_handler *handler, int smp);
+-	struct bus_type *bus;
++	const struct bus_type *bus;
+ 	struct device *root;
+ };
+ 
+diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
+index 0ed6e34d6edd..6334f64f04d5 100644
+--- a/net/iucv/iucv.c
++++ b/net/iucv/iucv.c
+@@ -67,7 +67,7 @@ static int iucv_bus_match(struct device *dev, struct device_driver *drv)
+ 	return 0;
+ }
+ 
+-struct bus_type iucv_bus = {
++const struct bus_type iucv_bus = {
+ 	.name = "iucv",
+ 	.match = iucv_bus_match,
+ };
+-- 
+2.43.0
 
-As a bonus, dev->gso_max_size is in the net_device_read_tx cacheline,
-while tso_max_size is currently far away.
 
