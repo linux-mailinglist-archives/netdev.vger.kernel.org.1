@@ -1,296 +1,137 @@
-Return-Path: <netdev+bounces-59068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 109F78192BC
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 23:00:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5FA8819358
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 23:14:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3642D1C24E86
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 22:00:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E1331F21870
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 22:14:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A93C40C09;
-	Tue, 19 Dec 2023 21:58:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 376913D0D3;
+	Tue, 19 Dec 2023 22:06:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="fRDX8hck"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ncNJ6vWg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F85B4174F
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 21:58:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1d04c097e34so1051735ad.0
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 13:58:18 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E363D0C1;
+	Tue, 19 Dec 2023 22:06:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1d3aa0321b5so27101305ad.2;
+        Tue, 19 Dec 2023 14:06:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1703023098; x=1703627898; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1703023569; x=1703628369; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nM0koGqiZNSpnJMYJB5q6p5i94HTaqJ4gpyX8NFfI6c=;
-        b=fRDX8hckiFwYV1zT2iJHGfNFvvok3NPoYrr3NtK5ZSOIlGIP8kl/EcLArXAB1T45wE
-         pHFlqm4BGV1B53r9mjCozIF+J2w2RtgA5JRfX4MlQmt40ZTH5k/OoGMP6HqFGnAHc9dP
-         chswhawTCKLU7+nxTSH85SrV6EddiSc/JUsjE=
+        bh=KpQ/R44BfxnaThyybloTKnv0rytzbAxoza/GiXNSIDA=;
+        b=ncNJ6vWgX9CegEJrw/sDH/cC/sIDn8/b+1y8rqdxZYLJFJgEFD3nbcTUN4gPitUMM6
+         rDv4V7YhzMzWOWo1JMa0OBxaIV+jWepOSRPZ/xFRks3VXqArOraSIPzLkJV3/D44Tqb1
+         SuuY6sPeVOg0qYmByojdfYYgiFkO13E6na+96pSQ/G1aUPOhM6T2WPB07w+ogammKqMO
+         MEC00qE0QLtGNYC5mBxLGhVIfHMp9S97duNb8iQ4d6hmq3zugul3aPCrHISWL4vQz+MN
+         v7n8aduHqrzxk0ainxT5phbd7yU9fN3DKXo2pWsIrYNZa7rIJi2SAudfsmERwa8xG+Rf
+         CsCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703023098; x=1703627898;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nM0koGqiZNSpnJMYJB5q6p5i94HTaqJ4gpyX8NFfI6c=;
-        b=IFkAy23R1kRw7kDrj+KDrC9M2T58Jwqyz1H4VqMoWXvhdOwCBsUAvmbPXPo51eKZlp
-         L0Bi2EcchmXL9YmZQ3KX8cHIY3cJW/WrNFQPDaBpZn975ruuC79sCCGqFIpwiDXs3XJE
-         dB+mSuWtMcEYhnv+P1so6oNecUfXXf32q3qxtD5I05k8DEW52zG1Y+67E6FOh8g5YaKl
-         9e041/HHB4+/upMTywv11dG1jr8e9bjxfl0pk2qFOnDajPOzzjvbp+03JCZ0HkUIeo4Z
-         L52Uwmo4s/DLIW/w6WOMNFssIe+gF8EgnuR39j5NeUvOKx724u0fPmTzsePfFPMNh5TS
-         nDJw==
-X-Gm-Message-State: AOJu0YyyRR0i39vVJfJiywgZbyXp/9TVEV0Z/QzXWMKf5Y1luqaO+t86
-	+ehfQdpO9r+oFtTXlaHDuMiJ4g==
-X-Google-Smtp-Source: AGHT+IFuq1D+imdWMdT2mP3dQ4nuRY71YwfaZHC02g8v1eOnQNRqZN/WTfEUmhHy3daf/RPFRuykmQ==
-X-Received: by 2002:a17:903:238e:b0:1d3:e694:c20 with SMTP id v14-20020a170903238e00b001d3e6940c20mr1556985plh.43.1703023097808;
-        Tue, 19 Dec 2023 13:58:17 -0800 (PST)
-Received: from amakhalov-build-vm.eng.vmware.com ([128.177.82.146])
-        by smtp.gmail.com with ESMTPSA id v1-20020a170902e8c100b001d3aa7604c5sm5356476plg.0.2023.12.19.13.58.15
+        d=1e100.net; s=20230601; t=1703023569; x=1703628369;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=KpQ/R44BfxnaThyybloTKnv0rytzbAxoza/GiXNSIDA=;
+        b=EZVaquAW6sh0VHpIVzEUSQ6RupExoSORzXfe+fsjJELmeEdjKn+4VP6yeqHr0OFojU
+         DcVTLmZov1VxEW/19JX2cAMjW0lWhSyjAi7sCaIRTrvO9M5ti7F6Tkgs49WWQks4KpX+
+         btF/tjxyEw8dIThOFIAk1Jv7Ha/tCj0j5R9Tmt60tfHKFAe/wET8rKpM657jeGSae/UO
+         b90dMa+0qhG5+xoDbX+yPVzqE5oA+j8EIer0/pact39cZLXHJa+BkS8zLM8zgtvG84yU
+         kWqH3rq7CaRsXfFc2KEEkr1ks2DoFAJbMJ0ZC0lNZnQ/ctL+mSZ/JXrZXihcsOxNguO3
+         RbKw==
+X-Gm-Message-State: AOJu0YzSS3KdUFPZNc0Y8mnRLB6O6HaWhF9pw8wRi1VLjt6dO6hFlb4F
+	WmAmhZr4jflkh+J1G8etCw4=
+X-Google-Smtp-Source: AGHT+IEjWk57tP9AGmj5l4hY+NlculjvAxGJP8YTdR+jwFopaczXUyZ4VFRhcpqOolsT2GNpWLn+Vw==
+X-Received: by 2002:a17:902:e88f:b0:1d0:6ffd:e2da with SMTP id w15-20020a170902e88f00b001d06ffde2damr23446902plg.116.1703023569011;
+        Tue, 19 Dec 2023 14:06:09 -0800 (PST)
+Received: from localhost ([98.97.32.4])
+        by smtp.gmail.com with ESMTPSA id p17-20020a170903249100b001cfbe348ca5sm21533352plw.187.2023.12.19.14.06.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Dec 2023 13:58:17 -0800 (PST)
-From: Alexey Makhalov <alexey.makhalov@broadcom.com>
-To: linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	bp@alien8.de,
-	hpa@zytor.com,
-	dave.hansen@linux.intel.com,
-	mingo@redhat.com,
-	tglx@linutronix.de
-Cc: x86@kernel.org,
-	netdev@vger.kernel.org,
-	richardcochran@gmail.com,
-	linux-input@vger.kernel.org,
-	dmitry.torokhov@gmail.com,
-	zackr@vmware.com,
-	linux-graphics-maintainer@vmware.com,
-	pv-drivers@vmware.com,
-	namit@vmware.com,
-	timothym@vmware.com,
-	akaher@vmware.com,
-	jsipek@vmware.com,
-	dri-devel@lists.freedesktop.org,
-	daniel@ffwll.ch,
-	airlied@gmail.com,
-	tzimmermann@suse.de,
-	mripard@kernel.org,
-	maarten.lankhorst@linux.intel.com,
-	horms@kernel.org,
-	kirill.shutemov@linux.intel.com
-Subject: [PATCH v3 6/6] x86/vmware: Add TDX hypercall support
-Date: Tue, 19 Dec 2023 13:57:51 -0800
-Message-Id: <20231219215751.9445-7-alexey.makhalov@broadcom.com>
-X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20231219215751.9445-1-alexey.makhalov@broadcom.com>
-References: <20231219215751.9445-1-alexey.makhalov@broadcom.com>
+        Tue, 19 Dec 2023 14:06:08 -0800 (PST)
+Date: Tue, 19 Dec 2023 14:06:07 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: John Fastabend <john.fastabend@gmail.com>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ xrivendell7@gmail.com
+Cc: alexander@mihalicyn.com, 
+ bpf@vger.kernel.org, 
+ daan.j.demeyer@gmail.com, 
+ davem@davemloft.net, 
+ dhowells@redhat.com, 
+ edumazet@google.com, 
+ john.fastabend@gmail.com, 
+ kuba@kernel.org, 
+ kuniyu@amazon.com, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ pabeni@redhat.com
+Message-ID: <658213cf198a3_96d8820886@john.notmuch>
+In-Reply-To: <6581fd3754b79_95e63208f@john.notmuch>
+References: <CABOYnLwXyxPukiaL36NvGvSa6yW3y0rXgrU=ABOzE-1gDAc4-g@mail.gmail.com>
+ <20231219155057.12716-1-kuniyu@amazon.com>
+ <6581f509a56ea_90e25208c7@john.notmuch>
+ <6581fd3754b79_95e63208f@john.notmuch>
+Subject: Re: memory leak in unix_create1/copy_process/security_prepare_creds
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Alexey Makhalov <amakhalov@vmware.com>
+John Fastabend wrote:
+> John Fastabend wrote:
+> > Kuniyuki Iwashima wrote:
+> > > From: xingwei lee <xrivendell7@gmail.com>
+> > > Date: Tue, 19 Dec 2023 17:12:25 +0800
+> > > > Hello I found a bug in net/af_unix in the lastest upstream linux
+> > > > 6.7.rc5 and comfired in lastest net/net-next/bpf/bpf-next tree.
+> > > > Titled "TITLE: memory leak in unix_create1=E2=80=9D and I also up=
+load the
+> > > > repro.c and repro.txt.
+> > > > =
 
-VMware hypercalls use I/O port, VMCALL or VMMCALL instructions.
-Add __tdx_hypercall path to support TDX guests.
+> > > > If you fix this issue, please add the following tag to the commit=
+:
+> > > > Reported-by: xingwei Lee <xrivendell7@gmail.com>
+> > > =
 
-No change in high bandwidth hypercalls, as only low bandwidth
-ones are supported for TDX guests.
+> > > Thanks for reporting!
+> > > =
 
-Co-developed-by: Tim Merrifield <timothym@vmware.com>
-Signed-off-by: Tim Merrifield <timothym@vmware.com>
-Signed-off-by: Alexey Makhalov <amakhalov@vmware.com>
-Reviewed-by: Nadav Amit <namit@vmware.com>
----
- arch/x86/include/asm/vmware.h | 83 +++++++++++++++++++++++++++++++++++
- arch/x86/kernel/cpu/vmware.c  | 24 ++++++++++
- 2 files changed, 107 insertions(+)
+> > > It seems 8866730aed510 forgot to add sock_put().
+> > > I've confirmed that the diff below silenced kmemleak but will check=
 
-diff --git a/arch/x86/include/asm/vmware.h b/arch/x86/include/asm/vmware.h
-index 719e41260ece..cad6f5b371a8 100644
---- a/arch/x86/include/asm/vmware.h
-+++ b/arch/x86/include/asm/vmware.h
-@@ -34,12 +34,65 @@
- #define VMWARE_CMD_GETHZ		45
- #define VMWARE_CMD_GETVCPU_INFO		68
- #define VMWARE_CMD_STEALCLOCK		91
-+/*
-+ * Hypercall command mask:
-+ *   bits[6:0] command, range [0, 127]
-+ *   bits[19:16] sub-command, range [0, 15]
-+ */
-+#define VMWARE_CMD_MASK			0xf007fU
- 
- #define CPUID_VMWARE_FEATURES_ECX_VMMCALL	BIT(0)
- #define CPUID_VMWARE_FEATURES_ECX_VMCALL	BIT(1)
- 
- extern u8 vmware_hypercall_mode;
- 
-+#define VMWARE_TDX_VENDOR_LEAF 0x1af7e4909ULL
-+#define VMWARE_TDX_HCALL_FUNC  1
-+
-+extern unsigned long vmware_tdx_hypercall(unsigned long cmd,
-+					  struct tdx_module_args *args);
-+
-+/*
-+ * TDCALL[TDG.VP.VMCALL] uses rax (arg0) and rcx (arg2), while the use of
-+ * rbp (arg6) is discouraged by the TDX specification. Therefore, we
-+ * remap those registers to r12, r13 and r14, respectively.
-+ */
-+static inline
-+unsigned long vmware_tdx_hypercall_args(unsigned long cmd, unsigned long in1,
-+					unsigned long in3, unsigned long in4,
-+					unsigned long in5, unsigned long in6,
-+					uint32_t *out1, uint32_t *out2,
-+					uint32_t *out3, uint32_t *out4,
-+					uint32_t *out5, uint32_t *out6)
-+{
-+	unsigned long ret;
-+
-+	struct tdx_module_args args = {
-+		.rbx = in1,
-+		.rdx = in3,
-+		.rsi = in4,
-+		.rdi = in5,
-+		.r14 = in6,
-+	};
-+
-+	ret = vmware_tdx_hypercall(cmd, &args);
-+
-+	if (out1)
-+		*out1 = args.rbx;
-+	if (out2)
-+		*out2 = args.r13;
-+	if (out3)
-+		*out3 = args.rdx;
-+	if (out4)
-+		*out4 = args.rsi;
-+	if (out5)
-+		*out5 = args.rdi;
-+	if (out6)
-+		*out6 = args.r14;
-+
-+	return ret;
-+}
-+
- /*
-  * The low bandwidth call. The low word of edx is presumed to have OUT bit
-  * set. The high word of edx may contain input data from the caller.
-@@ -67,6 +120,11 @@ unsigned long vmware_hypercall1(unsigned long cmd, unsigned long in1)
- {
- 	unsigned long out0;
- 
-+	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
-+		return vmware_tdx_hypercall_args(cmd, in1, 0, 0, 0, 0,
-+						 NULL, NULL, NULL,
-+						 NULL, NULL, NULL);
-+
- 	asm_inline volatile (VMWARE_HYPERCALL
- 		: "=a" (out0)
- 		: [port] "i" (VMWARE_HYPERVISOR_PORT),
-@@ -85,6 +143,11 @@ unsigned long vmware_hypercall3(unsigned long cmd, unsigned long in1,
- {
- 	unsigned long out0;
- 
-+	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
-+		return vmware_tdx_hypercall_args(cmd, in1, 0, 0, 0, 0,
-+						 out1, out2, NULL,
-+						 NULL, NULL, NULL);
-+
- 	asm_inline volatile (VMWARE_HYPERCALL
- 		: "=a" (out0), "=b" (*out1), "=c" (*out2)
- 		: [port] "i" (VMWARE_HYPERVISOR_PORT),
-@@ -104,6 +167,11 @@ unsigned long vmware_hypercall4(unsigned long cmd, unsigned long in1,
- {
- 	unsigned long out0;
- 
-+	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
-+		return vmware_tdx_hypercall_args(cmd, in1, 0, 0, 0, 0,
-+						 out1, out2, out3,
-+						 NULL, NULL, NULL);
-+
- 	asm_inline volatile (VMWARE_HYPERCALL
- 		: "=a" (out0), "=b" (*out1), "=c" (*out2), "=d" (*out3)
- 		: [port] "i" (VMWARE_HYPERVISOR_PORT),
-@@ -123,6 +191,11 @@ unsigned long vmware_hypercall5(unsigned long cmd, unsigned long in1,
- {
- 	unsigned long out0;
- 
-+	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
-+		return vmware_tdx_hypercall_args(cmd, in1, in3, in4, in5, 0,
-+						 NULL, out2, NULL,
-+						 NULL, NULL, NULL);
-+
- 	asm_inline volatile (VMWARE_HYPERCALL
- 		: "=a" (out0), "=c" (*out2)
- 		: [port] "i" (VMWARE_HYPERVISOR_PORT),
-@@ -145,6 +218,11 @@ unsigned long vmware_hypercall6(unsigned long cmd, unsigned long in1,
- {
- 	unsigned long out0;
- 
-+	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
-+		return vmware_tdx_hypercall_args(cmd, in1, in3, 0, 0, 0,
-+						 NULL, out2, out3,
-+						 out4, out5, NULL);
-+
- 	asm_inline volatile (VMWARE_HYPERCALL
- 		: "=a" (out0), "=c" (*out2), "=d" (*out3), "=S" (*out4),
- 		  "=D" (*out5)
-@@ -166,6 +244,11 @@ unsigned long vmware_hypercall7(unsigned long cmd, unsigned long in1,
- {
- 	unsigned long out0;
- 
-+	if (cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
-+		return vmware_tdx_hypercall_args(cmd, in1, in3, in4, in5, 0,
-+						 out1, out2, out3,
-+						 NULL, NULL, NULL);
-+
- 	asm_inline volatile (VMWARE_HYPERCALL
- 		: "=a" (out0), "=b" (*out1), "=c" (*out2), "=d" (*out3)
- 		: [port] "i" (VMWARE_HYPERVISOR_PORT),
-diff --git a/arch/x86/kernel/cpu/vmware.c b/arch/x86/kernel/cpu/vmware.c
-index 3aa1adaed18f..ef07ab7a07e1 100644
---- a/arch/x86/kernel/cpu/vmware.c
-+++ b/arch/x86/kernel/cpu/vmware.c
-@@ -428,6 +428,30 @@ static bool __init vmware_legacy_x2apic_available(void)
- 		(eax & BIT(VCPU_LEGACY_X2APIC));
- }
- 
-+#ifdef CONFIG_INTEL_TDX_GUEST
-+unsigned long vmware_tdx_hypercall(unsigned long cmd,
-+				   struct tdx_module_args *args)
-+{
-+	if (!hypervisor_is_type(X86_HYPER_VMWARE))
-+		return 0;
-+
-+	if (cmd & ~VMWARE_CMD_MASK) {
-+		pr_warn("Out of range command %x\n", cmd);
-+		return 0;
-+	}
-+
-+	args->r10 = VMWARE_TDX_VENDOR_LEAF;
-+	args->r11 = VMWARE_TDX_HCALL_FUNC;
-+	args->r12 = VMWARE_HYPERVISOR_MAGIC;
-+	args->r13 = cmd;
-+
-+	__tdx_hypercall(args);
-+
-+	return args->r12;
-+}
-+EXPORT_SYMBOL_GPL(vmware_tdx_hypercall);
-+#endif
-+
- #ifdef CONFIG_AMD_MEM_ENCRYPT
- static void vmware_sev_es_hcall_prepare(struct ghcb *ghcb,
- 					struct pt_regs *regs)
--- 
-2.39.0
+> > > more before posting a patch.
+> > =
 
+> > Did it really silence the memleak?
+> =
+
+> Yes reverting the patch fixed the issue for me.
+
+The problem is we call proto update twice that bumps the refcnt
+when adding a the same element to the map in the same slot. I'll fix
+this on sockmap side so we can keep the current af_unix logic. Should
+be able to push a fix tomorrow.
+
+We probably never noticed for other socket types because its an
+unusal replace to do same sock/same slot, but af_unix has this
+side effect of incrementing the refcnt that doesn't exist elsewhere.
+
+Thanks,
+John=
 
