@@ -1,89 +1,77 @@
-Return-Path: <netdev+bounces-58971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16CDE818BA3
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:55:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D0C7818BB2
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:58:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B654F2861B8
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:55:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 195EC286CEF
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:58:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C89C1CFA8;
-	Tue, 19 Dec 2023 15:55:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C49C1CF9B;
+	Tue, 19 Dec 2023 15:58:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xE3YTvoV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OWu2ERDW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29A111D542
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 15:55:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-552eaf800abso17409a12.0
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 07:55:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1703001327; x=1703606127; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N6VVqXCOP3y9jHvrk7wySN2T3vdbOMYcwytfuOKrDrA=;
-        b=xE3YTvoVO/bUM5pK4tHDHSdyOW5lXsemIjkQyXVTXjz1eSFUqrli+fAPL+x0rPEdrC
-         XZ5wVqpuF8R5cb5ZtiQY9mmCDiS2o+OvV6+TW1XEDphZ63GK0i1qcN7Me67FwOSFbKlk
-         joLBCIlKIMR7+awTFeE39ErotLx6YhFstowPeTpT4sce76O7l9HbfsxkCNqNWsMMQXdQ
-         wMVRFfZUEd7zCih/oqLo1PXALuYI/E/5q6h/RPGWGFGGnyt8SU+kQMAHhRFLWT42WGZK
-         WxNBALzRH65MuwBpnXg92EPt6rbfu+MQx0oLqjfc6vCrgLsiuvQIFQOBX0uRZqEaIGd0
-         m+5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703001327; x=1703606127;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N6VVqXCOP3y9jHvrk7wySN2T3vdbOMYcwytfuOKrDrA=;
-        b=qKyriZyHpOSYEOedg0QEQL9g36YbCSkx4thjluU3NrGMQ1ko4nDpKHvsWmsYwRRrPK
-         //wmly1KSKyP9l7rMDEE2O0dKYF2K3FpNs0gQOOaft/uFLrJ8r4jfzFnrfXrISxID4Q5
-         c0murrUZey1xlYjU0PGJ/DzQ3ACZ797Azj/jht+CM+LL1wpSdMusTBkLwGm1B9IOCGgO
-         BEyumT6WgACsz5qCTTxJK3uPacJFrZmOgUs3Vd83JEPvDvbipeENx7ex1LISOVith1hg
-         EKnMdWcAwtbxFIa8eUyxrsFIbkabSZayz2Ahw2ZoeUUGN3/kR4zFRcE1PFg2JAzpPeAH
-         Yi/A==
-X-Gm-Message-State: AOJu0YyavJXpp/abPAceDAT+SM4Qg9yGcPkyVUZbc/bB7QZR++quVA7n
-	jocqF1/2878scVqCjwwhhf7ZlTjCoF/8WG2cfRF/j9HuPK2u
-X-Google-Smtp-Source: AGHT+IHjJPHd0XCEpKiJKvZSCOqiLywem8xJK19+v0Z5OYCSp1pE3xV62epw1aU0i8HW9BoqrZSll0BA+YRhBnIzkcA=
-X-Received: by 2002:a50:9fab:0:b0:54c:f4fd:3427 with SMTP id
- c40-20020a509fab000000b0054cf4fd3427mr190776edf.7.1703001327187; Tue, 19 Dec
- 2023 07:55:27 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173A41D539;
+	Tue, 19 Dec 2023 15:58:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=tBpqWuxs1yCz983VuRpsBO762+PIqvAH6Pn4+BMpnf4=; b=OWu2ERDWnREFZXruavgwOGbIvw
+	LYCd5bWU8fxh58t1y945bqSa5gF5dj53Hs0LDemkFrCtkp+h98mlxYV4QGqbza0KZhBbcP+yHpqq5
+	0BwJ7jntI84KGjp2jQWr+d+u7gzRV7AdyeO3YiwJEyA9hrDY71JsqSKUw4sSQCGNWuTk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rFcTe-003LOK-PW; Tue, 19 Dec 2023 16:57:50 +0100
+Date: Tue, 19 Dec 2023 16:57:50 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Stefan Eichenberger <eichest@gmail.com>
+Cc: Dimitri Fedrau <dima.fedrau@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: marvell-88q2xxx: add driver for the Marvell
+ 88Q2220 PHY
+Message-ID: <5d545a9b-feda-4908-8f74-9218806451c1@lunn.ch>
+References: <20231215213102.35994-1-dima.fedrau@gmail.com>
+ <74d4b8f9-700e-45bc-af59-95a40a777b00@lunn.ch>
+ <20231216221151.GA143483@debian>
+ <28cc73bf-ed6d-49d8-b80b-4fbf5fa0442f@lunn.ch>
+ <20231217111538.GA3591@debian>
+ <ZX78ucHcNyEatXLD@eichest-laptop>
+ <20231218090932.GA4319@debian>
+ <ZYAqxPZHICtZO15O@eichest-laptop>
+ <20231219081117.GA3479@debian>
+ <ZYFfzei3SJSts5E/@eichest-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231219001833.10122-1-kuniyu@amazon.com> <20231219001833.10122-12-kuniyu@amazon.com>
-In-Reply-To: <20231219001833.10122-12-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 19 Dec 2023 16:55:16 +0100
-Message-ID: <CANn89iKVTAewzWfbcuY_pLemvMOAOVOoFGOj1KwJpYBuZ5bCNQ@mail.gmail.com>
-Subject: Re: [PATCH RESEND v2 net-next 11/12] tcp: Link sk and twsk to
- tb2->owners using skc_bind_node.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZYFfzei3SJSts5E/@eichest-laptop>
 
-On Tue, Dec 19, 2023 at 1:23=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> Now we can use sk_bind_node/tw_bind_node for bhash2, which means
-> we need not link TIME_WAIT sockets separately.
->
-> The dead code and sk_bind2_node will be removed in the next patch.
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
+> I am not sure that it will be accepted by the maintainers if you use a
+> lot of registers that are not documented.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Sometimes there is no choice, there is no documentation except the
+vendor crap driver which we try to clean up as much as possible, but
+we still end up with lots of magic numbers.
+
+	Andrew
 
