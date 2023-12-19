@@ -1,68 +1,86 @@
-Return-Path: <netdev+bounces-58859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A28C818618
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:14:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1594818623
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:16:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BB3C1C23682
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 11:14:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1BDA1C239D5
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 11:16:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 031A614F8D;
-	Tue, 19 Dec 2023 11:14:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uCLn8Aan"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F5214F91;
+	Tue, 19 Dec 2023 11:16:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7F3514F79;
-	Tue, 19 Dec 2023 11:14:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC2A6C433C7;
-	Tue, 19 Dec 2023 11:14:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702984458;
-	bh=4dslH+bYawkfXaHXPZBzbHeEjQIgy5C0S5DQUgJOamE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uCLn8AanN0AhspbNLHhFt+V5YjWqp0f9Ywobt3FpVQ+4wacdEKkm701QAi0Z4HYeC
-	 8CfzMqj+K2cwGcAz6kah1fJhH5ZxOJIrAGZWL6QxFy2HnDkdJPBAOree9A1V79oH3y
-	 ky4RivFiTMf6dsb7ACb57UOv27ypC8X987bOE856eR1w2+CjuN85AJGLXmC9P0/NhR
-	 qs2h5hnzOJV48miDVIx3TfYgsPrX+3K5wZJMQHgM3P4X0BjRVInWcoOOr6gXW5Y9UD
-	 pixpKfH2Oqis+7O/Hg8Cfgh5iLlsgjYLPNOk5bSp9xjIV/9QNjjGxZEUq32HMjUpd7
-	 a1Yc0bNEI+ipQ==
-Date: Tue, 19 Dec 2023 11:14:13 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	shenjian15@huawei.com, wangjie125@huawei.com,
-	liuyonglong@huawei.com, lanhao@huawei.com, wangpeiyang1@huawei.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V4 net-next 2/4] net: hns3: move constants from
- hclge_debugfs.h to hclge_debugfs.c
-Message-ID: <20231219111413.GI811967@kernel.org>
-References: <20231219013513.2589845-1-shaojijie@huawei.com>
- <20231219013513.2589845-3-shaojijie@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9B117982;
+	Tue, 19 Dec 2023 11:16:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R411e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0Vyqh1xd_1702984602;
+Received: from 30.221.130.243(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0Vyqh1xd_1702984602)
+          by smtp.aliyun-inc.com;
+          Tue, 19 Dec 2023 19:16:43 +0800
+Message-ID: <6fb86598-6114-bc64-2400-543e95fba8a2@linux.alibaba.com>
+Date: Tue, 19 Dec 2023 19:16:40 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231219013513.2589845-3-shaojijie@huawei.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next v6 00/10] net/smc: implement SMCv2.1 virtual ISM
+ device support
+To: Jan Karcher <jaka@linux.ibm.com>, wintera@linux.ibm.com,
+ wenjia@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+ agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, kgraul@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, raspl@linux.ibm.com,
+ schnelle@linux.ibm.com, guangguan.wang@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <1702371151-125258-1-git-send-email-guwen@linux.alibaba.com>
+ <8d118a94-945f-466f-9d34-e0b8a6d8a9e7@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <8d118a94-945f-466f-9d34-e0b8a6d8a9e7@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 19, 2023 at 09:35:11AM +0800, Jijie Shao wrote:
-> some constants are defined in hclge_debugfs.h,
-> but only used in hclge_debugfs.c.
-> so move them from hclge_debugfs.h to hclge_debugfs.c.
+
+
+On 2023/12/14 00:13, Jan Karcher wrote:
 > 
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> 
+> On 12/12/2023 09:52, Wen Gu wrote:
+>> The fourth edition of SMCv2 adds the SMC version 2.1 feature updates for
+>> SMC-Dv2 with virtual ISM. Virtual ISM are created and supported mainly by
+>> OS or hypervisor software, comparable to IBM ISM which is based on platform
+>> firmware or hardware.
+>>
+>> With the introduction of virtual ISM, SMCv2.1 makes some updates:
+>>
+>> - Introduce feature bitmask to indicate supplemental features.
+>> - Reserve a range of CHIDs for virtual ISM.
+>> - Support extended GIDs (128 bits) in CLC handshake.
+>>
+>> So this patch set aims to implement these updates in Linux kernel. And it
+>> acts as the first part of SMC-D virtual ISM extension & loopback-ism [1].
+>>
+>> [1] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
+> 
+> FYI I'm currently reviewing this version of the series.
+> Hope to give you feedback by the end of tomorrow.
+> 
+> Thanks for your effort
+> - Jan
+> 
 
-Thanks, I agree that these symbols belong in hclge_debugfs.c.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
+Thank you very much for your time, Jan. The new version (v7) is updated:
+https://lore.kernel.org/netdev/20231219084536.8158-1-guwen@linux.alibaba.com/
 
