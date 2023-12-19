@@ -1,89 +1,126 @@
-Return-Path: <netdev+bounces-58855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B36B8185F5
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:02:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 333DD8185F9
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:02:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CC8D1C2365F
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 11:02:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE5391F257AE
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 11:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E53714F9F;
-	Tue, 19 Dec 2023 11:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d+l5ilSD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 648E8156E7;
+	Tue, 19 Dec 2023 11:02:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 502B415E98;
-	Tue, 19 Dec 2023 11:00:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D8464C433C9;
-	Tue, 19 Dec 2023 11:00:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702983623;
-	bh=Ls1VSehIckeYRhZGqbGwjer6mvVnecVGtJljbb5X1uw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=d+l5ilSDD7btiGPAGilXZb40KYaDOimnn1uzPDV0H8bp1hGK6Z8see3PqXNiCUM6Z
-	 TWFt/koT3XmJK7Tv5ceS4EWuuMT91Ht3QIoQKM0EBI2lQhcLg9hwnUIZqNP/fkrxbw
-	 xFta7xHfyqElbMBM16NxaQJVzI95C91ASv3ZvsDw8Aoctffbg6yaEiBQAKF/A923Wl
-	 mqtqvtfWD3Dh4LBcOkCUpJ4wn5AaTapkmmgcIVXguZays+qKMqwjyElXJbIMYwCWoZ
-	 hPHHJkOY4Wxk1TVG//lxHxFPU/N2YQTBrKJgzbShMyhKRekADZ/vEiB/y2XbU/Jz1w
-	 kmbfBrOcE//4w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C0EA7C561EE;
-	Tue, 19 Dec 2023 11:00:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5637518E10
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 11:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=ratatoskr.pengutronix.de)
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <s.trumtrar@pengutronix.de>)
+	id 1rFXrX-0001qh-Dm; Tue, 19 Dec 2023 12:02:11 +0100
+References: <20231023121346.4098160-1-s.hauer@pengutronix.de>
+ <addf492843338e853f7fda683ce35050f26c9da0.camel@redhat.com>
+ <20231026070310.GY3359458@pengutronix.de>
+ <8404022493c5ceda74807a3407e5a087425678e2.camel@redhat.com>
+ <20231027120432.GB3359458@pengutronix.de>
+ <20231117-starter-unvisited-d10f0314ae76-mkl@pengutronix.de>
+User-agent: mu4e 1.10.8; emacs 29.1
+From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: Sascha Hauer <s.hauer@pengutronix.de>, Jens Axboe <axboe@kernel.dk>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, kernel@pengutronix.de
+Subject: Re: [PATCH] net: Do not break out of sk_stream_wait_memory() with
+ TIF_NOTIFY_SIGNAL
+Date: Tue, 19 Dec 2023 12:00:44 +0100
+In-reply-to: <20231117-starter-unvisited-d10f0314ae76-mkl@pengutronix.de>
+Message-ID: <87cyv2wj4e.fsf@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] net: ks8851: Fix TX stall caused by TX buffer overrun
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170298362378.20843.3373461129605286844.git-patchwork-notify@kernel.org>
-Date: Tue, 19 Dec 2023 11:00:23 +0000
-References: <20231214181112.76052-1-rwahl@gmx.de>
-In-Reply-To: <20231214181112.76052-1-rwahl@gmx.de>
-To: Ronald Wahl <rwahl@gmx.de>
-Cc: ronald.wahl@raritan.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, ben.dooks@codethink.co.uk,
- Tristram.Ha@microchip.com, netdev@vger.kernel.org, stable@vger.kernel.org
-
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Thu, 14 Dec 2023 19:11:12 +0100 you wrote:
-> From: Ronald Wahl <ronald.wahl@raritan.com>
-> 
-> There is a bug in the ks8851 Ethernet driver that more data is written
-> to the hardware TX buffer than actually available. This is caused by
-> wrong accounting of the free TX buffer space.
-> 
-> The driver maintains a tx_space variable that represents the TX buffer
-> space that is deemed to be free. The ks8851_start_xmit_spi() function
-> adds an SKB to a queue if tx_space is large enough and reduces tx_space
-> by the amount of buffer space it will later need in the TX buffer and
-> then schedules a work item. If there is not enough space then the TX
-> queue is stopped.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v3] net: ks8851: Fix TX stall caused by TX buffer overrun
-    https://git.kernel.org/netdev/net/c/3dc5d4454545
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Content-Type: text/plain; format=flowed
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: s.trumtrar@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 
+On 2023-11-17 at 11:43 +01, Marc Kleine-Budde <mkl@pengutronix.de> wrote:
+
+> [[PGP Signed Part:Undecided]]
+> On 27.10.2023 14:04:32, Sascha Hauer wrote:
+>> On Thu, Oct 26, 2023 at 10:49:18AM +0200, Paolo Abeni wrote:
+>> > On Thu, 2023-10-26 at 09:03 +0200, Sascha Hauer wrote:
+>> > > On Tue, Oct 24, 2023 at 03:56:17PM +0200, Paolo Abeni wrote:
+>> > > > On Mon, 2023-10-23 at 14:13 +0200, Sascha Hauer wrote:
+>> > > > > It can happen that a socket sends the remaining data at close() time.
+>> > > > > With io_uring and KTLS it can happen that sk_stream_wait_memory() bails
+>> > > > > out with -512 (-ERESTARTSYS) because TIF_NOTIFY_SIGNAL is set for the
+>> > > > > current task. This flag has been set in io_req_normal_work_add() by
+>> > > > > calling task_work_add().
+>> > > > >
+>> > > > > It seems signal_pending() is too broad, so this patch replaces it with
+>> > > > > task_sigpending(), thus ignoring the TIF_NOTIFY_SIGNAL flag.
+>> > > >
+>> > > > This looks dangerous, at best. Other possible legit users setting
+>> > > > TIF_NOTIFY_SIGNAL will be broken.
+>> > > >
+>> > > > Can't you instead clear TIF_NOTIFY_SIGNAL in io_run_task_work() ?
+>> > >
+>> > > I don't have an idea how io_run_task_work() comes into play here, but it
+>> > > seems it already clears TIF_NOTIFY_SIGNAL:
+>> > >
+>> > > static inline int io_run_task_work(void)
+>> > > {
+>> > >         /*
+>> > >          * Always check-and-clear the task_work notification signal. With how
+>> > >          * signaling works for task_work, we can find it set with nothing to
+>> > >          * run. We need to clear it for that case, like get_signal() does.
+>> > >          */
+>> > >         if (test_thread_flag(TIF_NOTIFY_SIGNAL))
+>> > >                 clear_notify_signal();
+>> > > 	...
+>> > > }
+>> >
+>> > I see, io_run_task_work() is too late, sk_stream_wait_memory() is
+>> > already woken up.
+>> >
+>> > I still think this patch is unsafe. What about explicitly handling the
+>> > restart in tls_sw_release_resources_tx() ? The main point is that such
+>> > function is called by inet_release() and the latter can't be re-
+>> > started.
+>>
+>> I don't think there's anything I can do in tls_sw_release_resources_tx().
+>> When entering this function TIF_NOTIFY_SIGNAL is not (yet) set. It gets
+>> set at some point while tls_sw_release_resources_tx() is running. I find
+>> it set when tls_tx_records() returns with -ERESTARTSYS. I tried clearing
+>> TIF_NOTIFY_SIGNAL then and called tls_tx_records() again, but that doesn't
+>> work.
+>
+> Seems the discussion got stuck, what are the blocking points?
+
+Ping!
+
+Any pointers on how to get this sorted out?
+
+
+Best regards,
+Steffen
+
+--
+Pengutronix e.K.                | Dipl.-Inform. Steffen Trumtrar |
+Steuerwalder Str. 21            | https://www.pengutronix.de/    |
+31137 Hildesheim, Germany       | Phone: +49-5121-206917-0       |
+Amtsgericht Hildesheim, HRA 2686| Fax:   +49-5121-206917-5555    |
 
