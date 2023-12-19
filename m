@@ -1,69 +1,92 @@
-Return-Path: <netdev+bounces-58861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AC06818634
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:19:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4800818638
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:20:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFDCD282BDB
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 11:19:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2A0C1C213FF
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 11:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E33154AD;
-	Tue, 19 Dec 2023 11:18:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8D601548B;
+	Tue, 19 Dec 2023 11:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QH5d/8zH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ePkWVA4r"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A16B18634;
-	Tue, 19 Dec 2023 11:18:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C9B8C433C7;
-	Tue, 19 Dec 2023 11:18:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98D616405;
+	Tue, 19 Dec 2023 11:20:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 212FCC433C8;
+	Tue, 19 Dec 2023 11:20:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702984737;
-	bh=Qo03vyXdW7F4uUNSw3Fdacxi8RM9846AC7Ddh6naNlI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QH5d/8zH3zl+DcY3uXwrstlgJ95682qV32ULzGgcK1tIhO7HGokN3epDpO8f/38B9
-	 D16PTtMuSEBfneoKkQkGDAfvaNLUEgj85EScab+KU6p2URcaNKFeL7Oicerzx7vlqm
-	 eIoFdDksUsDFN7Kz/zIi6sVifFeFRwaEfZUdZQO9gZI2itAubKL/qTRVMyHZH6mZ/E
-	 Z3sHT3mQMEZ949bmwiGFgi728mRTjV3V+TERDx9+fUxt5x1T1eEd+gNGykrUgucVp6
-	 RocBFVrkh39cnHAGAK+gNIkVRfI6jVvsBBR6jbv58Eb5boFEvaFVbJh9PGzqj+ug1O
-	 5zPznOF0E05wA==
-Date: Tue, 19 Dec 2023 11:18:52 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	shenjian15@huawei.com, wangjie125@huawei.com,
-	liuyonglong@huawei.com, lanhao@huawei.com, wangpeiyang1@huawei.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V4 net-next 3/4] net: hns3: dump more reg info based on
- ras mod
-Message-ID: <20231219111852.GJ811967@kernel.org>
-References: <20231219013513.2589845-1-shaojijie@huawei.com>
- <20231219013513.2589845-4-shaojijie@huawei.com>
+	s=k20201202; t=1702984825;
+	bh=FxNtzFmTDXIECr6vy5RnaSZ24/wTDFdWrO+Iou4nKMo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ePkWVA4rEdxmflF5Xc8zD/EpGQUyEGK7o5ZE7tWqn4pH7K+CdrI6VUYMYYFovuML1
+	 7CeO1Gdtyl1PBZ0ILW3CzrETRb6j0FrAtiohbdl/mq1e18RXvhhAVhuur00nkoAy9K
+	 6CW5Gt2pREFVCv77M6+hmD+oXnlkPcrfWWQhq2RjN6SOt2zldqDMdecjv5+JlCDUZb
+	 R7aSko7xB/6mI0txwQaIDm8g3270FVQEbWfJxfQrUxWc2wXEHr/0zTUEoAeh9+j8Yi
+	 cW7wc2E9VvAv6r1nJrDhd6vT3AJG5JyrLIoEI3UxiZlMQ4UEl6w56EtzVAYp0zAFKu
+	 NPXo4Wt9cG4zw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 069A6C561EE;
+	Tue, 19 Dec 2023 11:20:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231219013513.2589845-4-shaojijie@huawei.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v6 0/4] add PF-VF mailbox support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170298482502.31697.94316863464466171.git-patchwork-notify@kernel.org>
+Date: Tue, 19 Dec 2023 11:20:25 +0000
+References: <20231215181425.2681426-1-srasheed@marvell.com>
+In-Reply-To: <20231215181425.2681426-1-srasheed@marvell.com>
+To: Shinas Rasheed <srasheed@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, hgani@marvell.com,
+ vimleshk@marvell.com, egallen@redhat.com, mschmidt@redhat.com,
+ pabeni@redhat.com, horms@kernel.org, kuba@kernel.org, davem@davemloft.net,
+ wizhao@redhat.com, kheib@redhat.com, konguyen@redhat.com,
+ shenjian15@huawei.com
 
-On Tue, Dec 19, 2023 at 09:35:12AM +0800, Jijie Shao wrote:
-> From: Peiyang Wang <wangpeiyang1@huawei.com>
-> 
-> Dump more reg info base on ras mod before reset, which is useful to
-> analyze the ras error.
-> 
-> Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+Hello:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Fri, 15 Dec 2023 10:14:21 -0800 you wrote:
+> This patchset aims to add PF-VF mailbox support, its related
+> version support, and relevant control net support for immediate
+> functionalities such as firmware notifications to VF.
+> 
+> Changes:
+> V6:
+>   - Fixed 1/4 patch to apply to top of net-next merged with net fixes
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v6,1/4] octeon_ep: add PF-VF mailbox communication
+    https://git.kernel.org/netdev/net-next/c/cde29af9e68e
+  - [net-next,v6,2/4] octeon_ep: PF-VF mailbox version support
+    https://git.kernel.org/netdev/net-next/c/c130e589d50b
+  - [net-next,v6,3/4] octeon_ep: control net framework to support VF offloads
+    https://git.kernel.org/netdev/net-next/c/e28db8cbeba3
+  - [net-next,v6,4/4] octeon_ep: support firmware notifications for VFs
+    https://git.kernel.org/netdev/net-next/c/4ebb86a97ceb
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
