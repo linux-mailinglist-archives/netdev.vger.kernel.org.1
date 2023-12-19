@@ -1,143 +1,110 @@
-Return-Path: <netdev+bounces-58889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FE0D8187EB
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 13:50:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A960F818809
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 13:53:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DFB328A89A
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:50:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4772328C6D4
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:53:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4228318629;
-	Tue, 19 Dec 2023 12:50:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17DB81862A;
+	Tue, 19 Dec 2023 12:53:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pf7LjMa1"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F6EA1862E;
-	Tue, 19 Dec 2023 12:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VyqyhQ6_1702990206;
-Received: from 30.221.149.49(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VyqyhQ6_1702990206)
-          by smtp.aliyun-inc.com;
-          Tue, 19 Dec 2023 20:50:08 +0800
-Message-ID: <2fd4fb88-8aaa-b22d-d048-776a6c19d9a6@linux.alibaba.com>
-Date: Tue, 19 Dec 2023 20:50:06 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FDB1BDC3
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 12:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbcf1b27794so3726303276.2
+        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 04:53:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702990412; x=1703595212; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6iLkD/kmm3rl/27nC8mmpi3BqCULi3lDXMsQJIHD3Io=;
+        b=pf7LjMa1F3Kg9xn0CBujrVFj0+S3ALyuUUrFh/TpXWsaW1a4SWVjbfY15D4Je80Cex
+         kfe+Wr2S195CMusE4d0SfwU/tzjdFtfyJsd1WSbartx4Uy3MS96sk4faJUV8Sjuj+bS0
+         FacR69vJVncwijHIOHxvpcW87ID3QZL2g1Hv7vHe5DFoJotUDSkemiDdc26D2JYC1NrF
+         ReQfEVNFirK2eeENLxJnfW7fBTgTU0J/RIbi5pqECNXCZuz3B3u30O/tGYByk7/bjinb
+         KhnU7v/XRdqvypnwAKcJq83h2UO7Vg8RftJWJ41habquVkef5VZkDsqP5HVGevCvutcl
+         CjSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702990412; x=1703595212;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6iLkD/kmm3rl/27nC8mmpi3BqCULi3lDXMsQJIHD3Io=;
+        b=h4zPnF4C48uvqs/m+YjDu7L2TK3pOuBcanBubEnuOdv3WYVxc3kcTGflSwZeOUdjRx
+         3k8dLlQvq+UrV2TnKsVtY8j23eLF0DvMxZ3OQPlaHaIAY/I2ibkUOdxaZnGrpFyv2eos
+         pG18e+jQKdt56Z3tGESu+qpfWwbsCqPlbeD+oLpzfS4hCaWMJeGa6ldvuxBsT9OvdjaS
+         pbHhPAlHbslBn59YiqsKxOtzCKy53vU9SgSeinWcG+hP1CI/mf2ygleO/SjrSxpUl3ZL
+         BMHFN4gNAHUARMR9rD4JcCegEXONgsycLmFYp6g46zLE2EYkXZ7FcuttbFAmgIGGVZws
+         93Vg==
+X-Gm-Message-State: AOJu0YzAm3o/Oc4o6J0ZHeTWqwiq1xuYjSplyGMUFhQpY5J4m1Nb+CW+
+	jYkHijADrhpzCm2QGL6qONjsU1MFnHqAsA==
+X-Google-Smtp-Source: AGHT+IGoSJ9yNhNxC8R4jYgetFABSShYFxwXkGrekmzjMkt3TKWs7hDLzdZfDLxaxmSiM2np68ekfDF9leZYdA==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:513:0:b0:dbc:c59e:fa7b with SMTP id
+ 19-20020a250513000000b00dbcc59efa7bmr247895ybf.7.1702990412558; Tue, 19 Dec
+ 2023 04:53:32 -0800 (PST)
+Date: Tue, 19 Dec 2023 12:53:31 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [RFC nf-next v2 1/2] netfilter: bpf: support prog update
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-Cc: pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- coreteam@netfilter.org, netfilter-devel@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, ast@kernel.org
-References: <1702873101-77522-1-git-send-email-alibuda@linux.alibaba.com>
- <1702873101-77522-2-git-send-email-alibuda@linux.alibaba.com>
- <20231218190640.GJ6288@kernel.org>
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <20231218190640.GJ6288@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Message-ID: <20231219125331.4127498-1-edumazet@google.com>
+Subject: [PATCH net] net: check dev->gso_max_size in gso_features_check()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
+Some drivers might misbehave if TSO packets get too big.
 
+GVE for instance uses a 16bit field in its TX descriptor,
+and will do bad things if a packet is bigger than 2^16 bytes.
 
-On 12/19/23 3:06 AM, Simon Horman wrote:
-> On Mon, Dec 18, 2023 at 12:18:20PM +0800, D. Wythe wrote:
->> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>
->> To support the prog update, we need to ensure that the prog seen
->> within the hook is always valid. Considering that hooks are always
->> protected by rcu_read_lock(), which provide us the ability to
->> access the prog under rcu.
->>
->> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> ...
->
->> @@ -26,8 +17,20 @@ struct bpf_nf_link {
->>   	struct net *net;
->>   	u32 dead;
->>   	const struct nf_defrag_hook *defrag_hook;
->> +	struct rcu_head head;
->>   };
->>   
->> +static unsigned int nf_hook_run_bpf(void *bpf_link, struct sk_buff *skb,
->> +				    const struct nf_hook_state *s)
->> +{
->> +	const struct bpf_nf_link *nf_link = bpf_link;
->> +	struct bpf_nf_ctx ctx = {
->> +		.state = s,
->> +		.skb = skb,
->> +	};
->> +	return bpf_prog_run(rcu_dereference(nf_link->link.prog), &ctx);
-> Hi,
->
-> AFAICT nf_link->link.prog isn't annotated as __rcu,
-> so perhaps rcu_dereference() is not correct here?
->
-> In any case, sparse seems a bit unhappy:
->
->    .../nf_bpf_link.c:31:29: error: incompatible types in comparison expression (different address spaces):
->    .../nf_bpf_link.c:31:29:    struct bpf_prog [noderef] __rcu *
->    .../nf_bpf_link.c:31:29:    struct bpf_prog *
+Linux TCP stack honors dev->gso_max_size, but there are
+other ways for too big packets to reach an ndo_start_xmit()
+handler : virtio_net, af_packet, GRO...
 
-Hi Simon,
+Add a generic check in gso_features_check() and fallback
+to GSO when needed.
 
-thanks for the reporting.
+gso_max_size was added in the blamed commit.
 
-Yes, I had anticipated that sparse would report an error. I tried to 
-cast the type,
-but it would compile an error likes that:
+Fixes: 82cc1a7a5687 ("[NET]: Add per-connection option to set max TSO frame size")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/core/dev.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-
-net/netfilter/nf_bpf_link.c: In function ‘nf_hook_run_bpf’:
-./include/asm-generic/rwonce.h:44:70: error: lvalue required as unary 
-‘&’ operand
-    44 | #define __READ_ONCE(x) (*(const volatile 
-__unqual_scalar_typeof(x) *)&(x))
-| ^
-./include/asm-generic/rwonce.h:50:2: note: in expansion of macro 
-‘__READ_ONCE’
-    50 |  __READ_ONCE(x);       \
-       |  ^~~~~~~~~~~
-./include/linux/rcupdate.h:436:43: note: in expansion of macro ‘READ_ONCE’
-   436 |  typeof(*p) *local = (typeof(*p) *__force)READ_ONCE(p); \
-       |                                           ^~~~~~~~~
-./include/linux/rcupdate.h:584:2: note: in expansion of macro 
-‘__rcu_dereference_check’
-   584 |  __rcu_dereference_check((p), __UNIQUE_ID(rcu), \
-       |  ^~~~~~~~~~~~~~~~~~~~~~~
-./include/linux/rcupdate.h:656:28: note: in expansion of macro 
-‘rcu_dereference_check’
-   656 | #define rcu_dereference(p) rcu_dereference_check(p, 0)
-       |                            ^~~~~~~~~~~~~~~~~~~~~
-net/netfilter/nf_bpf_link.c:31:22: note: in expansion of macro 
-‘rcu_dereference’
-    31 |  return bpf_prog_run(rcu_dereference((const struct bpf_prog 
-__rcu *)nf_link->link.prog), &ctx);
-       |                      ^~~~~~~~~~~~~~~
-
-So, I think we might need to go back to version 1.
-
-@ Florian , what do you think ?
-
-D. Wythe
-
->> +}
->> +
->>   #if IS_ENABLED(CONFIG_NF_DEFRAG_IPV4) || IS_ENABLED(CONFIG_NF_DEFRAG_IPV6)
->>   static const struct nf_defrag_hook *
->>   get_proto_defrag_hook(struct bpf_nf_link *link,
-> ...
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 0432b04cf9b000628497345d9ec0e8a141a617a3..b55d539dca153f921260346a4f23bcce0e888227 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -3471,6 +3471,9 @@ static netdev_features_t gso_features_check(const struct sk_buff *skb,
+ 	if (gso_segs > READ_ONCE(dev->gso_max_segs))
+ 		return features & ~NETIF_F_GSO_MASK;
+ 
++	if (unlikely(skb->len >= READ_ONCE(dev->gso_max_size)))
++		return features & ~NETIF_F_GSO_MASK;
++
+ 	if (!skb_shinfo(skb)->gso_type) {
+ 		skb_warn_bad_offload(skb);
+ 		return features & ~NETIF_F_GSO_MASK;
+-- 
+2.43.0.472.g3155946c3a-goog
 
 
