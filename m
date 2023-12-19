@@ -1,710 +1,165 @@
-Return-Path: <netdev+bounces-58866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF7AE818687
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:41:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 612B0818692
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:47:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 19298B20D52
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 11:41:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64D531C23C48
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 11:47:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 954BD156EC;
-	Tue, 19 Dec 2023 11:41:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC8715ACB;
+	Tue, 19 Dec 2023 11:47:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WDe2rwg4"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="KzFUpD78"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2050.outbound.protection.outlook.com [40.107.20.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7813818622;
-	Tue, 19 Dec 2023 11:41:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8111BC433C7;
-	Tue, 19 Dec 2023 11:41:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702986104;
-	bh=cDfdWiJtmGvrJUbve2kGHiBiXY9df2MDs0UH8gsu9X4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WDe2rwg4TIs6ightcF3BIQ4XZ3x8mbAYXbgDUUb+QVqC5dJWXMktgxW165/4dXr49
-	 vh4dLBWE/Ig0wYT6+Ck0zMgqrBoONaT6X0bCA2psMEYVK+d/RhEujbRTOV4owNafl4
-	 yDUR8WT3YN0QQ4/IbZvYu0Pr+0aOvDI6vtdA2YrnsZ7XGNmlrJS2n441/mIjWxcbpM
-	 ipXYrfn6+P4PgUa8ec86g9dQ32bvTWoFYwUeGNjcdJE20oc1WrQv63xtzKmAiY6eYD
-	 hmVG3mnnNNY2weFnhJuw1flSGR21NOjoyord3u1/s66eWdbbSTonFik2TsVXMkvz9P
-	 awhcqY4gBlWXA==
-Date: Tue, 19 Dec 2023 11:41:41 +0000
-From: Simon Horman <horms@kernel.org>
-To: Min Li <lnimi@hotmail.com>
-Cc: richardcochran@gmail.com, lee@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Min Li <min.li.xe@renesas.com>
-Subject: Re: [PATCH net-next v4 2/2] ptp: add FemtoClock3 Wireless as ptp
- hardware clock
-Message-ID: <20231219114141.GK811967@kernel.org>
-References: <20231218165045.27847-1-lnimi@hotmail.com>
- <PH7PR03MB70644D12BC9B5B02AF5ADFC2A090A@PH7PR03MB7064.namprd03.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F0518626;
+	Tue, 19 Dec 2023 11:47:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MXcwS5NaS6c31dCpH0Gm/MZSfVR0D1XqGzRRe6ewYubq684JJ97PARYGWZ5yHyGctsxUuzdsn+q+YY+DG+lvRP1fCWMw4sRln6r4iAmvGkiUORyxX+a0Yo7ME+ytkh590JfBn26BUc0JxAwfB/0zTfWiwalGc7Ng9fVdHn+KGB+JvCNnWaeZGclahradHersDwbnM0+0LrQcro49mSxsm429geFeFcvqCbirw4cBoBh9APZlT3u4XBsvNbGo+s85znVvmnCz18/XqQIo6E0uDCGHde7upBFhZ+LkK9KoG2eLH9Oub2k/FcN24K+1Dz8MdWalNB6rzfZli44GYmzrJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WMQOO80YdDGx5O0zr6sYZU/cGiUndPRkJeiWxA/3zOc=;
+ b=jxjdTlsGrWFTo7476QpV/hP/ZQZ2r3oyEH66tKuVbR98a9F9LJLPLXw8I8loXnzQS7Wi4EGpCIVZLBfa8LGTIW6B+EyymDBcookc2v5+qc5yXX8RoJpvmS1uGgSDJ/2FhfWzMAvbC5Orrzplw1qRnLxUtJFXfAKOUJc8lNMD5viwhzJEwtKyNTG2mdBNQA2iJHfNBtfgpK9RuhtsECMYY5E3ex4x9Oho5izEUkpx/uCrOFWou0qh0RcLZPFk+jYhPhrhJ36JSnCx70YQBVBGV7i/w2q7QUj/Nxt8E7LK6JmVfIos4WaxF+xmijcHvFYa+luG60h5Bpa7QfqTbuIlAg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WMQOO80YdDGx5O0zr6sYZU/cGiUndPRkJeiWxA/3zOc=;
+ b=KzFUpD78jgVBFpe4rhnvvbiQEUysUMzJwdQdpNTzS5YUnkhWzP+BZXnmvUUmHsYZTP0XX3KWVYBg6bKPGPE2IOVoo2CSWjSL7KRMlnZSlyinxw8/RTJDVL6iikx2oVsZ2xraSu9NeHgcUul01Xzzr0LtX9HcVnazO7w9rV23Xo8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by AM8PR04MB7425.eurprd04.prod.outlook.com (2603:10a6:20b:1d6::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.38; Tue, 19 Dec
+ 2023 11:47:06 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7091.034; Tue, 19 Dec 2023
+ 11:47:06 +0000
+Date: Tue, 19 Dec 2023 13:47:01 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>
+Subject: Re: [PATCH net-next] xsk: make struct xsk_cb_desc available outside
+ CONFIG_XDP_SOCKETS
+Message-ID: <20231219114701.5r5qoqkekfbvqtcy@skbuf>
+References: <20231219110205.1289506-1-vladimir.oltean@nxp.com>
+ <ZYF9+lhYT1i7dvDT@lzaremba-mobl.ger.corp.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZYF9+lhYT1i7dvDT@lzaremba-mobl.ger.corp.intel.com>
+X-ClientProxiedBy: AS4PR09CA0007.eurprd09.prod.outlook.com
+ (2603:10a6:20b:5e0::8) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PH7PR03MB70644D12BC9B5B02AF5ADFC2A090A@PH7PR03MB7064.namprd03.prod.outlook.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AM8PR04MB7425:EE_
+X-MS-Office365-Filtering-Correlation-Id: 948ffa16-0e28-41da-73e0-08dc0088395f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	/wQtR2FxXlGuPE5L/P/1PNcqnuTu/E6HM9X89EThVkYIpFJWpKRP+65aT3MO/L4WxjsWsfgAl+aopacNLWGgBpg7ZRhchi4ftFMfBs51OmKVoOqnPJrw5japhsRIxpy2cYDN8pJtjE8bx32P8yFYSKEZLlToOXurOvdMmr7LCWgEnHEaqrdeVIr9x6/LX85MZ593Bk9cyih6xWYOn4RO3FGM4xlfj+IbDN/F6sYH1JAwv+BgDf9ALkhqtYWBFJniBtJUwht20ymjDMRQJKrMMGs24vGzdwzlkR1qEEE0e54ceCzjFivMDd2QcMFzDHLEkgivP6gavUi92jrHOvTlLS+g+RyOv9+/6hvNX9XYlKcJGB5CNTJ2blYK5DiXHx6O2GbiMx/OdvcPLWSCqPiwrG8brC8qsx8Ipdz26/T/d4nG+WAm2eAUM5KkTT4FZ8BDLjyFn4A4xRjNeAYN1/rcd5YoAPxK4Bz1kgxxX0A6LAqzYYX1uHG1/cvInXXQXYhq3MB8xCDd7zxRl4tbHiT0JE12aGSCD/0nTrI7C5+CWP8=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(366004)(346002)(376002)(39860400002)(396003)(230922051799003)(451199024)(1800799012)(186009)(64100799003)(4326008)(5660300002)(8936002)(41300700001)(8676002)(86362001)(6506007)(44832011)(66476007)(66556008)(54906003)(6916009)(66946007)(316002)(38100700002)(2906002)(7416002)(1076003)(83380400001)(66899024)(26005)(33716001)(6512007)(9686003)(478600001)(966005)(6486002)(6666004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?+dlFd4/bQsKfjyznTbyhvmtXohsv6lPwwGPfee/IVlD89VMvktFXxPJDTuQE?=
+ =?us-ascii?Q?sMZZStEi/j9xKuxeH1adI1dpuj7eJ7FUoVzNT894uIIIzUDkDrfooV2pDfnY?=
+ =?us-ascii?Q?dASHD8wNX9ufr9p5iZX9Tx/lPwpidPSdl+mfw4NR4Wb2n6gkL/0WrfAMPyMn?=
+ =?us-ascii?Q?XDVBRV8/VSCskobr/7XH4hpuPJ3Ew0BgN6hDmhxCwFULihEOdKnl+is4G9oA?=
+ =?us-ascii?Q?j48vR+Zs7gkzRLedtGrdxvcZL1/EEO0hkd7d8SFZ1/F+xxIeaMRM2KTZ1jws?=
+ =?us-ascii?Q?oHO0+jvZ6ymbHO6RdAWGJMlKYaL7k5G/wZTSqddkU7j4TXJIKWoZ8GkTJUuc?=
+ =?us-ascii?Q?PLPyVXNb+VRuuGoxARbLsQiZpNVLVBqb7pbiLZFPULZLTkAB6T1E5hIOADue?=
+ =?us-ascii?Q?fGFdrqqdqXlYV5wd8M0P6s5KjphczATXApk1ZmZFYxZ6Bowehyq9b7vbCkj5?=
+ =?us-ascii?Q?HFEoVb2k0xBiH9DDhgRBpxRAs7Fuw2YTgPet2jqCMmYe+qBccmMRCmOdKmYl?=
+ =?us-ascii?Q?ceJAt6rDiwzPLBiTSzX21gfmiHyfqohgREH32rfZTbOTxkfXJU8f8Gkosto+?=
+ =?us-ascii?Q?whH/XyhjA8pNL8EFCKLYO60PHXdarw2AL1TehYSjpEySR33K5c65KnweBlxw?=
+ =?us-ascii?Q?cAcZy0gWmNHKppnbcPboo4c0CiDntb2aCzvscUfwSBMJ7/rklufANNUWklaI?=
+ =?us-ascii?Q?kiY0ZeCAksTPaQy7RwI7mcqRKiRk8Y5klYq3rxx2Hvjhu+D0hBGk8qQ8KniY?=
+ =?us-ascii?Q?9q9TUDV+9J/g4J7bkL+gp/SmjzzsBgJADRCCHYHBlRSoYE7On/4ZXKAczyuU?=
+ =?us-ascii?Q?whNB7Uq2H3e6Gx8ClDLBR5CGwZkWmWb1wx0FN8zxAyWmHyDKbg+vhT3uWiOh?=
+ =?us-ascii?Q?DBUQgNmFJNYoe1Hj9EYYw0x99SNFBxOT69vhNG5jlpEcfviylEWyQ5sLQjTu?=
+ =?us-ascii?Q?pCiz6h8OEvxelZnLFj1rp3spNVW4FOVpmKzOuHIkjHGI5Hnx949A6Q5pxc+O?=
+ =?us-ascii?Q?kjFOrPP3MlNjhAIlVRo8Dtyaxi6qbLApSyGNXBj4WehfKEZcr26zrNOjM72q?=
+ =?us-ascii?Q?WNkTDJYbtcJ1rM+qyf3iTtZY8pBCn7UfZa8+BRfIGoxsqz09cw9+jN1snGk6?=
+ =?us-ascii?Q?ChlmBNd0LYEjEfHOoEQ3WvP5zn0Cn8VwNihODaojAE5T+xmonqZxTXbHE+ZR?=
+ =?us-ascii?Q?q26cLxni0NWdOCpJbqW8yyJT+ArXh35DV/6+YE4vz440H2HEK+xd01943eYy?=
+ =?us-ascii?Q?jz8/fzaK5B5kDJDUA2rcBo5R0WjCdEjVFezLi1YLDI5lxnxTuMeZMWsF8bvs?=
+ =?us-ascii?Q?vcXQjOEikX9G2teGY7U+secAm5yNm6Uk4mHaYoPPgmv1hll0iQe3mmXQtKFs?=
+ =?us-ascii?Q?KbJoxE0j3UzUyVwpItDGaWXvMHrHduW2Pc8GVjtUzC2j0DbWE3RVEj4aR+kC?=
+ =?us-ascii?Q?jr4GHagwFjZ636WsR1lOsaGeRNeRBohYZv0xerizuVqHhO5+pUTxVi7Zd5DJ?=
+ =?us-ascii?Q?eqCVIvc+tTfALlJ11UdAP34MFZrRqQIRgGTx3zT3t+jpJVc/tslj4q49xm3O?=
+ =?us-ascii?Q?e4o+vFBRkNJgTQ0zyG/Gd20vOhV+qwtChyz9f4TImCopk7IJ0PYCYQGYT5AK?=
+ =?us-ascii?Q?Jw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 948ffa16-0e28-41da-73e0-08dc0088395f
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Dec 2023 11:47:05.9421
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: n9XmYR4dVJzD6qMM1yAxmGPDoTdIT+kCjvJ/8Vaj1PDaobROhwXAvxyCVqjI9K9ChZvE2O4Xh+sthwpJGy7CUA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7425
 
-On Mon, Dec 18, 2023 at 11:50:45AM -0500, Min Li wrote:
-> From: Min Li <min.li.xe@renesas.com>
+On Tue, Dec 19, 2023 at 12:26:50PM +0100, Larysa Zaremba wrote:
+> On Tue, Dec 19, 2023 at 01:02:05PM +0200, Vladimir Oltean wrote:
+> > The ice driver fails to build when CONFIG_XDP_SOCKETS is disabled.
+> > 
+> > drivers/net/ethernet/intel/ice/ice_base.c:533:21: error:
+> > variable has incomplete type 'struct xsk_cb_desc'
+> >         struct xsk_cb_desc desc = {};
+> >                            ^
+> > include/net/xsk_buff_pool.h:15:8: note:
+> > forward declaration of 'struct xsk_cb_desc'
+> > struct xsk_cb_desc;
+> >        ^
+> > 
+> > Fixes: d68d707dcbbf ("ice: Support XDP hints in AF_XDP ZC mode")
+> > Closes: https://lore.kernel.org/netdev/8b76dad3-8847-475b-aa17-613c9c978f7a@infradead.org/
+> > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 > 
-> The RENESAS FemtoClock3 Wireless is a high-performance jitter attenuator,
-> frequency translator, and clock synthesizer. The device is comprised of 3
-> digital PLLs (DPLL) to track CLKIN inputs and three independent low phase
-> noise fractional output dividers (FOD) that output low phase noise clocks.
+> This probably should go through bpf-next. Other than that, fix looks fine:
 > 
-> FemtoClock3 supports one Time Synchronization (Time Sync) channel to enable
-> an external processor to control the phase and frequency of the Time Sync
-> channel and to take phase measurements using the TDC. Intended applications
-> are synchronization using the precision time protocol (PTP) and
-> synchronization with 0.5 Hz and 1 Hz signals from GNSS.
+> Acked-by: Larysa Zaremba <larysa.zaremba@intel.com>
 > 
-> Signed-off-by: Min Li <min.li.xe@renesas.com>
+> > ---
+> > Posting to net-next since this tree is broken at this stage, not only
+> > bpf-next.
 
-...
-
-> diff --git a/drivers/ptp/ptp_fc3.c b/drivers/ptp/ptp_fc3.c
-> new file mode 100644
-> index 000000000..b9ef0c963
-> --- /dev/null
-> +++ b/drivers/ptp/ptp_fc3.c
-> @@ -0,0 +1,1036 @@
-> +// SPDX-License-Identifier: GPL-2.0+
-> +/*
-> + * PTP hardware clock driver for the FemtoClock3 family of timing and
-> + * synchronization devices.
-> + *
-> + * Copyright (C) 2023 Integrated Device Technology, Inc., a Renesas Company.
-> + */
-> +#include <linux/firmware.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/module.h>
-> +#include <linux/ptp_clock_kernel.h>
-> +#include <linux/delay.h>
-> +#include <linux/jiffies.h>
-> +#include <linux/kernel.h>
-> +#include <linux/timekeeping.h>
-> +#include <linux/string.h>
-> +#include <linux/of.h>
-> +#include <linux/bitfield.h>
-> +#include <linux/mfd/rsmu.h>
-> +#include <linux/mfd/idtRC38xxx_reg.h>
-> +#include <asm/unaligned.h>
-> +
-> +#include "ptp_private.h"
-> +#include "ptp_fc3.h"
-> +
-> +MODULE_DESCRIPTION("Driver for IDT FemtoClock3(TM) family");
-> +MODULE_AUTHOR("IDT support-1588 <IDT-support-1588@lm.renesas.com>");
-> +MODULE_VERSION("1.0");
-> +MODULE_LICENSE("GPL");
-> +
-> +/*
-> + * The name of the firmware file to be loaded
-> + * over-rides any automatic selection
-> + */
-> +static char *firmware;
-> +module_param(firmware, charp, 0);
-> +
-> +static s64 ns2counters(struct idtfc3 *idtfc3, s64 nsec, u32 *sub_ns)
-> +{
-> +	s64 sync;
-> +	s32 rem;
-> +
-> +	if (likely(nsec >= 0)) {
-> +		sync = div_u64_rem(nsec, idtfc3->ns_per_sync, &rem);
-> +		*sub_ns = rem;
-> +	} else if (nsec < 0) {
-> +		sync = -div_u64_rem(-nsec - 1, idtfc3->ns_per_sync, &rem) - 1;
-> +		*sub_ns = idtfc3->ns_per_sync - rem - 1;
-> +	}
-
-Hi Min Li,
-
-Clang is a bit unhappy about the constriction above,
-because it doesn't see that sync is set for all possible values of nsec.
-
-Could we go for the following, which TBH is easier on my eyes too.
-
-	if (likely(nsec >= 0)) {
-		...
-	} else {
-		...
-	}
-
-> +
-> +	return sync * idtfc3->ns_per_sync;
-> +}
-> +
-> +static s64 tdc_meas2offset(struct idtfc3 *idtfc3, u64 meas_read)
-> +{
-> +	s64 coarse, fine;
-> +
-> +	fine = sign_extend64(FIELD_GET(FINE_MEAS_MASK, meas_read), 12);
-> +	coarse = sign_extend64(FIELD_GET(COARSE_MEAS_MASK, meas_read), (39 - 13));
-> +
-> +	fine = div64_s64(fine * NSEC_PER_SEC, idtfc3->tdc_apll_freq * 62LL);
-> +	coarse = div64_s64(coarse * NSEC_PER_SEC, idtfc3->time_ref_freq);
-> +
-> +	return coarse + fine;
-> +}
-> +
-> +static s64 tdc_offset2phase(struct idtfc3 *idtfc3, s64 offset_ns)
-> +{
-> +	if (offset_ns > idtfc3->ns_per_sync / 2)
-> +		offset_ns -= idtfc3->ns_per_sync;
-> +
-> +	return offset_ns * idtfc3->tdc_offset_sign;
-> +}
-> +
-> +static int idtfc3_set_lpf_mode(struct idtfc3 *idtfc3, u8 mode)
-> +{
-> +	int err;
-> +
-> +	if (mode >= LPF_INVALID)
-> +		return -EINVAL;
-> +
-> +	if (idtfc3->lpf_mode == mode)
-> +		return 0;
-> +
-> +	err = regmap_bulk_write(idtfc3->regmap, LPF_MODE_CNFG, &mode, sizeof(mode));
-> +	if (err)
-> +		return err;
-> +
-> +	idtfc3->lpf_mode = mode;
-> +
-> +	return 0;
-> +}
-> +
-> +static int idtfc3_enable_lpf(struct idtfc3 *idtfc3, bool enable)
-> +{
-> +	u8 val;
-> +	int err;
-> +
-> +	err = regmap_bulk_read(idtfc3->regmap, LPF_CTRL, &val, sizeof(val));
-> +	if (err)
-> +		return err;
-> +
-> +	if (enable == true)
-> +		val |= LPF_EN;
-> +	else
-> +		val &= ~LPF_EN;
-> +
-> +	return regmap_bulk_write(idtfc3->regmap, LPF_CTRL, &val, sizeof(val));
-> +}
-> +
-> +static int idtfc3_get_time_ref_freq(struct idtfc3 *idtfc3)
-> +{
-> +	int err;
-> +	u8 buf[4];
-> +	u8 time_ref_div;
-> +	u8 time_clk_div;
-> +
-> +	err = regmap_bulk_read(idtfc3->regmap, TIME_CLOCK_MEAS_DIV_CNFG, buf, sizeof(buf));
-> +	if (err)
-> +		return err;
-> +	time_ref_div = FIELD_GET(TIME_REF_DIV_MASK, get_unaligned_le32(buf)) + 1;
-> +
-> +	err = regmap_bulk_read(idtfc3->regmap, TIME_CLOCK_COUNT, buf, 1);
-> +	if (err)
-> +		return err;
-> +	time_clk_div = (buf[0] & TIME_CLOCK_COUNT_MASK) + 1;
-> +	idtfc3->time_ref_freq = idtfc3->hw_param.time_clk_freq *
-> +				time_clk_div / time_ref_div;
-> +
-> +	return 0;
-> +}
-> +
-> +static int idtfc3_get_tdc_offset_sign(struct idtfc3 *idtfc3)
-> +{
-> +	int err;
-> +	u8 buf[4];
-> +	u32 val;
-> +	u8 sig1, sig2;
-> +
-> +	err = regmap_bulk_read(idtfc3->regmap, TIME_CLOCK_TDC_FANOUT_CNFG, buf, sizeof(buf));
-> +	if (err)
-> +		return err;
-> +
-> +	val = get_unaligned_le32(buf);
-> +	if ((val & TIME_SYNC_TO_TDC_EN) != TIME_SYNC_TO_TDC_EN) {
-> +		dev_err(idtfc3->dev, "TIME_SYNC_TO_TDC_EN is off !!!");
-> +		return -EINVAL;
-> +	}
-> +
-> +	sig1 = FIELD_GET(SIG1_MUX_SEL_MASK, val);
-> +	sig2 = FIELD_GET(SIG2_MUX_SEL_MASK, val);
-> +
-> +	if ((sig1 == sig2) || ((sig1 != TIME_SYNC) && (sig2 != TIME_SYNC))) {
-> +		dev_err(idtfc3->dev, "Invalid tdc_mux_sel sig1=%d sig2=%d", sig1, sig2);
-> +		return -EINVAL;
-> +	} else if (sig1 == TIME_SYNC) {
-> +		idtfc3->tdc_offset_sign = 1;
-> +	} else if (sig2 == TIME_SYNC) {
-> +		idtfc3->tdc_offset_sign = -1;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int idtfc3_lpf_bw(struct idtfc3 *idtfc3, u8 shift, u8 mult)
-> +{
-> +	u8 val = FIELD_PREP(LPF_BW_SHIFT, shift) | FIELD_PREP(LPF_BW_MULT, mult);
-> +
-> +	return regmap_bulk_write(idtfc3->regmap, LPF_BW_CNFG, &val, sizeof(val));
-> +}
-> +
-> +static int idtfc3_enable_tdc(struct idtfc3 *idtfc3, bool enable, u8 meas_mode)
-> +{
-> +	int err;
-> +	u8 val = 0;
-> +
-> +	/* Disable TDC first */
-> +	err = regmap_bulk_write(idtfc3->regmap, TIME_CLOCK_MEAS_CTRL, &val, sizeof(val));
-> +	if (err)
-> +		return err;
-> +
-> +	if (enable == false)
-> +		return idtfc3_lpf_bw(idtfc3, LPF_BW_SHIFT_DEFAULT, LPF_BW_MULT_DEFAULT);
-> +
-> +	if (meas_mode >= MEAS_MODE_INVALID)
-> +		return -EINVAL;
-> +
-> +	/* Change TDC meas mode */
-> +	err = regmap_bulk_write(idtfc3->regmap, TIME_CLOCK_MEAS_CNFG,
-> +				&meas_mode, sizeof(meas_mode));
-> +	if (err)
-> +		return err;
-> +
-> +	/* Enable TDC */
-> +	val = TDC_MEAS_EN;
-> +	if (meas_mode == CONTINUOUS)
-> +		val |= TDC_MEAS_START;
-> +	err = regmap_bulk_write(idtfc3->regmap, TIME_CLOCK_MEAS_CTRL, &val, sizeof(val));
-> +	if (err)
-> +		return err;
-> +
-> +	return idtfc3_lpf_bw(idtfc3, LPF_BW_SHIFT_1PPS, LPF_BW_MULT_DEFAULT);
-> +}
-> +
-> +static bool get_tdc_meas(struct idtfc3 *idtfc3, s64 *offset_ns)
-> +{
-> +	bool valid = false;
-> +	u8 buf[9];
-> +	u8 val;
-> +	int err;
-> +
-> +	while (true) {
-> +		err = regmap_bulk_read(idtfc3->regmap, TDC_FIFO_STS,
-> +				       &val, sizeof(val));
-> +		if (err)
-> +			return false;
-> +
-> +		if (val & FIFO_EMPTY)
-> +			break;
-> +
-> +		err = regmap_bulk_read(idtfc3->regmap, TDC_FIFO_READ_REQ,
-> +				       &buf, sizeof(buf));
-> +		if (err)
-> +			return false;
-> +
-> +		valid = true;
-> +	}
-> +
-> +	if (valid)
-> +		*offset_ns = tdc_meas2offset(idtfc3, get_unaligned_le64(&buf[1]));
-> +
-> +	return valid;
-> +}
-> +
-> +static int check_tdc_fifo_overrun(struct idtfc3 *idtfc3)
-> +{
-> +	u8 val;
-> +	int err;
-> +
-> +	/* Check if FIFO is overrun */
-> +	err = regmap_bulk_read(idtfc3->regmap, TDC_FIFO_STS, &val, sizeof(val));
-> +	if (err)
-> +		return err;
-> +
-> +	if (!(val & FIFO_FULL))
-> +		return 0;
-> +
-> +	dev_warn(idtfc3->dev, "TDC FIFO overrun !!!");
-> +
-> +	err = idtfc3_enable_tdc(idtfc3, true, CONTINUOUS);
-> +	if (err)
-> +		return err;
-> +
-> +	return 0;
-> +}
-> +
-> +static int get_tdc_meas_continuous(struct idtfc3 *idtfc3)
-> +{
-> +	int err;
-> +	s64 offset_ns;
-> +	struct ptp_clock_event event;
-> +
-> +	err = check_tdc_fifo_overrun(idtfc3);
-> +	if (err)
-> +		return err;
-> +
-> +	if (get_tdc_meas(idtfc3, &offset_ns) && offset_ns >= 0) {
-> +		event.index = 0;
-> +		event.offset = tdc_offset2phase(idtfc3, offset_ns);
-> +		event.type = PTP_CLOCK_EXTOFF;
-> +		ptp_clock_event(idtfc3->ptp_clock, &event);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int idtfc3_read_subcounter(struct idtfc3 *idtfc3)
-> +{
-> +	u8 buf[5] = {0};
-> +	int err;
-> +
-> +	err = regmap_bulk_read(idtfc3->regmap, TOD_COUNTER_READ_REQ,
-> +			       &buf, sizeof(buf));
-> +	if (err)
-> +		return err;
-> +
-> +	/* sync_counter_value is [31:82] and sub_sync_counter_value is [0:30] */
-> +	return get_unaligned_le32(&buf[1]) & SUB_SYNC_COUNTER_MASK;
-> +}
-> +
-> +static int idtfc3_tod_update_is_done(struct idtfc3 *idtfc3)
-> +{
-> +	int err;
-> +	u8 req;
-> +
-> +	err = read_poll_timeout_atomic(regmap_bulk_read, err, !req, USEC_PER_MSEC,
-> +				       idtfc3->tc_write_timeout, true, idtfc3->regmap,
-> +				       TOD_SYNC_LOAD_REQ_CTRL, &req, 1);
-> +	if (err)
-> +		dev_err(idtfc3->dev, "TOD counter write timeout !!!");
-> +
-> +	return err;
-> +}
-> +
-> +static int idtfc3_write_subcounter(struct idtfc3 *idtfc3, u32 counter)
-> +{
-> +	u8 buf[18] = {0};
-> +	int err;
-> +
-> +	/* sync_counter_value is [31:82] and sub_sync_counter_value is [0:30] */
-> +	put_unaligned_le32(counter & SUB_SYNC_COUNTER_MASK, &buf[0]);
-> +
-> +	buf[16] = SUB_SYNC_LOAD_ENABLE | SYNC_LOAD_ENABLE;
-> +	buf[17] = SYNC_LOAD_REQ;
-> +
-> +	err = regmap_bulk_write(idtfc3->regmap, TOD_SYNC_LOAD_VAL_CTRL,
-> +				&buf, sizeof(buf));
-> +	if (err)
-> +		return err;
-> +
-> +	return idtfc3_tod_update_is_done(idtfc3);
-> +}
-> +
-> +static int idtfc3_timecounter_update(struct idtfc3 *idtfc3, u32 counter, s64 ns)
-> +{
-> +	int err;
-> +
-> +	err = idtfc3_write_subcounter(idtfc3, counter);
-> +	if (err)
-> +		return err;
-> +
-> +	/* Update time counter */
-> +	idtfc3->ns = ns;
-> +	idtfc3->last_counter = counter;
-> +
-> +	return 0;
-> +}
-> +
-> +static int idtfc3_timecounter_read(struct idtfc3 *idtfc3)
-> +{
-> +	int now, delta;
-> +
-> +	now = idtfc3_read_subcounter(idtfc3);
-> +	if (now < 0)
-> +		return now;
-> +
-> +	/* calculate the delta since the last idtfc3_timecounter_read(): */
-> +	if (now >= idtfc3->last_counter)
-> +		delta = now - idtfc3->last_counter;
-> +	else
-> +		delta = idtfc3->sub_sync_count - idtfc3->last_counter + now;
-> +
-> +	/* Update time counter */
-> +	idtfc3->ns += delta * idtfc3->ns_per_counter;
-> +	idtfc3->last_counter = now;
-> +
-> +	return 0;
-> +}
-> +
-> +static int _idtfc3_gettime(struct idtfc3 *idtfc3, struct timespec64 *ts)
-> +{
-> +	int err;
-> +
-> +	err = idtfc3_timecounter_read(idtfc3);
-> +	if (err)
-> +		return err;
-> +
-> +	*ts = ns_to_timespec64(idtfc3->ns);
-> +
-> +	return 0;
-> +}
-> +
-> +static int idtfc3_gettime(struct ptp_clock_info *ptp, struct timespec64 *ts)
-> +{
-> +	struct idtfc3 *idtfc3 = container_of(ptp, struct idtfc3, caps);
-> +	int err;
-> +
-> +	mutex_lock(idtfc3->lock);
-> +	err = _idtfc3_gettime(idtfc3, ts);
-> +	mutex_unlock(idtfc3->lock);
-> +
-> +	if (err)
-> +		dev_err(idtfc3->dev, "Failed at line %d in %s!",
-> +			__LINE__, __func__);
-
-Please drop the log above, it doesn't seem useful to users.
-Likewise elsewhere in this patch.
-
-> +
-> +	return err;
-> +}
-> +
-> +static int _idtfc3_settime(struct idtfc3 *idtfc3, const struct timespec64 *ts)
-> +{
-> +	s64 offset_ns, now_ns, sync_ns;
-> +	u32 counter, sub_ns;
-> +	int now;
-> +
-> +	if (timespec64_valid(ts) == false) {
-> +		dev_err(idtfc3->dev, "%s: invalid timespec", __func__);
-
-Likewise, please drop the __func__ portion of the log above,
-or the entire log message.
-
-> +		return -EINVAL;
-> +	}
-> +
-> +	now = idtfc3_read_subcounter(idtfc3);
-> +	if (now < 0)
-> +		return now;
-> +
-> +	offset_ns = (idtfc3->sub_sync_count - now) * idtfc3->ns_per_counter;
-> +	now_ns = timespec64_to_ns(ts);
-> +	sync_ns = ns2counters(idtfc3, offset_ns + now_ns, &sub_ns);
-
-sync_ns is set but unused in this function.
-
-Flagged by W=1 builds.
-
-> +
-> +	counter = sub_ns / idtfc3->ns_per_counter;
-> +	return idtfc3_timecounter_update(idtfc3, counter, now_ns);
-> +}
-> +
-> +static int idtfc3_settime(struct ptp_clock_info *ptp, const struct timespec64 *ts)
-> +{
-> +	struct idtfc3 *idtfc3 = container_of(ptp, struct idtfc3, caps);
-> +	int err;
-> +
-> +	mutex_lock(idtfc3->lock);
-> +	err = _idtfc3_settime(idtfc3, ts);
-> +	mutex_unlock(idtfc3->lock);
-> +
-> +	if (err)
-> +		dev_err(idtfc3->dev,
-> +			"Failed at line %d in %s!", __LINE__, __func__);
-> +
-> +	return err;
-> +}
-> +
-> +static int _idtfc3_adjtime(struct idtfc3 *idtfc3, s64 delta)
-> +{
-> +	/*
-> +	 * The TOD counter can be synchronously loaded with any value,
-> +	 * to be loaded on the next Time Sync pulse
-> +	 */
-> +	s64 sync_ns;
-> +	u32 sub_ns;
-> +	u32 counter;
-> +
-> +	if (idtfc3->ns + delta < 0) {
-> +		dev_err(idtfc3->dev, "%lld ns adj is too large", delta);
-> +		return -EINVAL;
-> +	}
-> +
-> +	sync_ns = ns2counters(idtfc3, delta + idtfc3->ns_per_sync, &sub_ns);
-> +
-> +	counter = sub_ns / idtfc3->ns_per_counter;
-> +	return idtfc3_timecounter_update(idtfc3, counter, idtfc3->ns + sync_ns +
-> +									counter * idtfc3->ns_per_counter);
-
-The line above is not indented correctly:
-
-	return idtfc3_timecounter_update(idtfc3, counter, idtfc3->ns + sync_ns +
-					 counter * idtfc3->ns_per_counter);
-
-> +}
-> +
-> +static int idtfc3_adjtime(struct ptp_clock_info *ptp, s64 delta)
-> +{
-> +	struct idtfc3 *idtfc3 = container_of(ptp, struct idtfc3, caps);
-> +	int err;
-> +
-> +	mutex_lock(idtfc3->lock);
-> +	err = _idtfc3_adjtime(idtfc3, delta);
-> +	mutex_unlock(idtfc3->lock);
-> +
-> +	if (err)
-> +		dev_err(idtfc3->dev,
-> +			"Failed at line %d in %s!", __LINE__, __func__);
-> +
-> +	return err;
-> +}
-> +
-> +static int _idtfc3_adjphase(struct idtfc3 *idtfc3, s32 delta)
-> +{
-> +	u8 buf[8] = {0};
-> +	int err;
-> +	s64 pcw;
-> +
-> +	err = idtfc3_set_lpf_mode(idtfc3, LPF_WP);
-> +	if (err)
-> +		return err;
-> +
-> +	/*
-> +	 * Phase Control Word unit is: 10^9 / (TDC_APLL_FREQ * 124)
-> +	 *
-> +	 *       delta * TDC_APLL_FREQ * 124
-> +	 * PCW = ---------------------------
-> +	 *                  10^9
-> +	 *
-> +	 */
-> +	pcw = div_s64((s64)delta * idtfc3->tdc_apll_freq * 124, NSEC_PER_SEC);
-> +
-> +	put_unaligned_le64(pcw, buf);
-> +
-> +	return regmap_bulk_write(idtfc3->regmap, LPF_WR_PHASE_CTRL, buf, sizeof(buf));
-> +}
-> +
-> +static int idtfc3_adjphase(struct ptp_clock_info *ptp, s32 delta)
-> +{
-> +	struct idtfc3 *idtfc3 = container_of(ptp, struct idtfc3, caps);
-> +	int err;
-> +
-> +	mutex_lock(idtfc3->lock);
-> +	err = _idtfc3_adjphase(idtfc3, delta);
-> +	mutex_unlock(idtfc3->lock);
-> +
-> +	if (err)
-> +		dev_err(idtfc3->dev,
-> +			"Failed at line %d in %s!", __LINE__, __func__);
-> +
-> +	return err;
-> +}
-> +
-> +static int _idtfc3_adjfine(struct idtfc3 *idtfc3, long scaled_ppm)
-> +{
-> +	u8 buf[8] = {0};
-> +	int err;
-> +	s64 fcw;
-> +
-> +	err = idtfc3_set_lpf_mode(idtfc3, LPF_WF);
-> +	if (err)
-> +		return err;
-> +
-> +	/*
-> +	 * Frequency Control Word unit is: 2^-44 * 10^6 ppm
-> +	 *
-> +	 * adjfreq:
-> +	 *       ppb * 2^44
-> +	 * FCW = ----------
-> +	 *          10^9
-> +	 *
-> +	 * adjfine:
-> +	 *       ppm_16 * 2^28
-> +	 * FCW = -------------
-> +	 *           10^6
-> +	 */
-> +	fcw = scaled_ppm * BIT(28);
-> +	fcw = div_s64(fcw, 1000000);
-> +
-> +	put_unaligned_le64(fcw, buf);
-> +
-> +	return regmap_bulk_write(idtfc3->regmap, LPF_WR_FREQ_CTRL, buf, sizeof(buf));
-> +}
-> +
-> +static int idtfc3_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
-> +{
-> +	struct idtfc3 *idtfc3 = container_of(ptp, struct idtfc3, caps);
-> +	int err;
-> +
-> +	mutex_lock(idtfc3->lock);
-> +	err = _idtfc3_adjfine(idtfc3, scaled_ppm);
-> +	mutex_unlock(idtfc3->lock);
-> +
-> +	if (err)
-> +		dev_err(idtfc3->dev,
-> +			"Failed at line %d in %s!", __LINE__, __func__);
-> +
-> +	return err;
-> +}
-> +
-> +static int idtfc3_enable(struct ptp_clock_info *ptp,
-> +			 struct ptp_clock_request *rq, int on)
-> +{
-> +	struct idtfc3 *idtfc3 = container_of(ptp, struct idtfc3, caps);
-> +	int err = -EOPNOTSUPP;
-> +
-> +	mutex_lock(idtfc3->lock);
-> +		switch (rq->type) {
-> +		case PTP_CLK_REQ_PEROUT:
-> +			if (!on)
-> +				err = 0;
-> +			/* Only accept a 1-PPS aligned to the second. */
-> +			else if (rq->perout.start.nsec || rq->perout.period.sec != 1 ||
-> +				 rq->perout.period.nsec)
-> +				err = -ERANGE;
-> +			else
-> +				err = 0;
-> +			break;
-> +		case PTP_CLK_REQ_EXTTS:
-> +			if (on) {
-> +				/* Only accept requests for external phase offset */
-> +				if ((rq->extts.flags & PTP_EXT_OFFSET) != (PTP_EXT_OFFSET))
-> +					err = -EOPNOTSUPP;
-> +				else
-> +					err = idtfc3_enable_tdc(idtfc3, true, CONTINUOUS);
-> +			} else {
-> +				err = idtfc3_enable_tdc(idtfc3, false, MEAS_MODE_INVALID);
-> +			}
-> +			break;
-> +		default:
-> +			break;
-> +		}
-
-The entire switch block above appears to be indented one tab too many.
-
-> +	mutex_unlock(idtfc3->lock);
-> +
-> +	if (err)
-> +		dev_err(idtfc3->dev, "Failed in %s with err %d!", __func__, err);
-> +
-> +	return err;
-> +}
-
--- 
-pw-bot: changes-requested
+It was a conscious decision. Build fixes are more time critical than
+most other patches, and net-next is more likely to suffer from a failure
+with CONFIG_XDP_SOCKETS disabled than bpf-next is. But, sure, it's up to
+maintainers to figure out how to deal with it.
 
