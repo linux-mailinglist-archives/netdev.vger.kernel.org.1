@@ -1,216 +1,161 @@
-Return-Path: <netdev+bounces-58986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B8E6818CDD
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 17:49:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD5DC818CE5
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 17:50:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEE311F25C69
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:49:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3C5C1C242F3
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2118034547;
-	Tue, 19 Dec 2023 16:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Azl9s/nF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70591200C7;
+	Tue, 19 Dec 2023 16:49:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33CEF364A8;
-	Tue, 19 Dec 2023 16:48:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703004481; x=1734540481;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=oetnxeft6YahVtinLZb4u6Ax4AjXbd59FAXz7ye9yvc=;
-  b=Azl9s/nF4UwE1/v8FoqXnWyGvQbmrCPmlRCcy/MWsNkRiyAHyAnLIOgE
-   MjKr5ceKQguGLZah6V2ljCIdWBZIV83YRFfF3aAhimoYUlicHs76Vgbj2
-   7mUj/TY2cFW907PSk87kzFvMZA7DM8o3Q4bbVpAMt32rqZt57tf5wWBtM
-   3sZzmdZ/7CS4ndIO6EJMiUAu19LeqMyEyLx2PD0NOgHbgjPDCDIeBJ2Ef
-   D8D8tJZUS/oPG1xXGeGl2y6xasm3yI55JesBF+IetTlIpItDQQSj2H/JN
-   V1W0F3l0UKQX/D4daZcxbxNUkaNyOs/jhI8Y8Q7H/xQOYTNz8y3wDYoIc
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="462138764"
-X-IronPort-AV: E=Sophos;i="6.04,288,1695711600"; 
-   d="scan'208";a="462138764"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 08:48:00 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="752216268"
-X-IronPort-AV: E=Sophos;i="6.04,288,1695711600"; 
-   d="scan'208";a="752216268"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Dec 2023 08:47:58 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 19 Dec 2023 08:47:56 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 19 Dec 2023 08:47:54 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 19 Dec 2023 08:47:54 -0800
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.41) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 19 Dec 2023 08:47:52 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MOji6RN4tIQ3eRUc0E0DHEupp/Wh6AIi4ioTyMqEluCrELhlKOunONWE+g6RAxOw1lP9Hm5sN24LqhgxWWCR/6VXZsZ4zmsGx1Yy1pQis1G5oD6qH5//ZPDutYndkVvzv4M2LwNwbCM+Wn85iBUoYItFw6wRh8WiaNNQAm1Zh3VVarEJYtx/Fw7stYdvnljtZCmYAnxl0VVduyNnCG4BEJD0Xw/01iuW7SLMNZeUCmpQDwxYw5VWo6AMXcTsO8vutKjGuBYy5FjSoJO9MfDMAzJ9FPMco873OzI+liJNt4vvyypK+u1KBjvEsek+x4RDDN8w92Ne1TfS0scYdh9NPg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8ZgA2WL3lvuDCtENH1znb2BvRD0rbzrhehfwd55Atb0=;
- b=e/hrCqBdnsiv8wcx2ZbCcdElGR3qIi1F5S0qM7YnquwTUOdrYrB3+bSZyxm0+VrVVg3PLNpbFU3RO544os5qL6ss1PTmIeUbYPnIpXfLr7FfUHYzHuXzRmQ5fazHQHQgssk38fWZKP4YQQNgh1iqR5oGyHW6O7NniJ0b3cYxh7luP9gjV+wcTslBI1z4iuq+ksVLAoYzo/YBRL+0WVOPWQLYbix3JBg41kjzpnQCRXVXqOQCZmC5GwEFPHf3NWre34egjto5ZW/Byr+Okk3oRt1DKuc0cDuTWUanmhJU3c201svmJx3hLeUTOoIydhavnCPlp1DRM5QG9TCq7jMjdQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- LV3PR11MB8556.namprd11.prod.outlook.com (2603:10b6:408:1b4::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.38; Tue, 19 Dec
- 2023 16:47:50 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::ee54:9452:634e:8c53]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::ee54:9452:634e:8c53%7]) with mapi id 15.20.7091.034; Tue, 19 Dec 2023
- 16:47:50 +0000
-Date: Tue, 19 Dec 2023 17:47:44 +0100
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-CC: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, "Tony
- Nguyen" <anthony.l.nguyen@intel.com>, =?iso-8859-1?Q?Bj=F6rn_T=F6pel?=
-	<bjorn@kernel.org>, Magnus Karlsson <magnus.karlsson@intel.com>, "Jonathan
- Lemon" <jonathan.lemon@gmail.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, "Daniel
- Borkmann" <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, Larysa Zaremba
-	<larysa.zaremba@intel.com>
-Subject: Re: [PATCH net-next] xsk: make struct xsk_cb_desc available outside
- CONFIG_XDP_SOCKETS
-Message-ID: <ZYHJMM6pjwD0UbqW@boxer>
-References: <20231219110205.1289506-1-vladimir.oltean@nxp.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20231219110205.1289506-1-vladimir.oltean@nxp.com>
-X-ClientProxiedBy: FR0P281CA0068.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:49::13) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 339CD20DFE;
+	Tue, 19 Dec 2023 16:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (178.176.72.19) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 19 Dec
+ 2023 19:49:30 +0300
+Subject: Re: [PATCH net 1/2] net: ravb: Wait for operation mode to be applied
+To: claudiu beznea <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<claudiu.beznea.uj@bp.renesas.com>, <yoshihiro.shimoda.uh@renesas.com>,
+	<wsa+renesas@sang-engineering.com>, <niklas.soderlund+renesas@ragnatech.se>,
+	<biju.das.jz@bp.renesas.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	<mitsuhiro.kimura.kc@renesas.com>, <geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20231214113137.2450292-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214113137.2450292-2-claudiu.beznea.uj@bp.renesas.com>
+ <d08dbbd4-2e63-c436-6935-df68c291bf75@omp.ru>
+ <0b807496-f387-4aef-8650-a43a9249468f@tuxon.dev>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <2e70a095-8079-84f1-f842-eb90059610ed@omp.ru>
+Date: Tue, 19 Dec 2023 19:49:29 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|LV3PR11MB8556:EE_
-X-MS-Office365-Filtering-Correlation-Id: 73ecb61c-548b-45e5-4dc5-08dc00b23caa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: nSwHS+R6wX9NVjh/bZAIPFJAH0tFFT0UmuJNevtbWQPEgr7cFbdbyatSaruC6dPp183Bfe57FEftG3vybf2VxBUJi2UOwgw2shXglhRTuVBBq/KhhHQHVxOA7/RBjNTlgtEw8B5h0ZNxzvRJqEUN51uKsFbbwAOd3KEON8XtXz14gpCSebhANN0+x/wgNSMGANHgTFOiEXJ2vAvR0cCZdMsC4B7T28Cn3orr+BwClDKNUQPX2QzapCVogHBNYj3SHsgKGP8uhVWdWmgQDmOoK5KMdjEyA46q/GlVWRxt2b5v69nYKPeJZioev+RJw7hmnfL+DmycFdMTpKJuQVg5yW0pH2bP+ccX4cDCYbI0sw0y9BI5y65CYQs4ZGoD2cpas+iAANauGr53wJMB7cKWaJRxKG40B/lVr67g9bxbgDAFM1wIMZQpxp5cBezW8zbzLyRWWt0bUILYVJqhQQtLOXkBLnwM1T6oAhdSRQT8zEin31Js8qmPN3AjjN4poSNuCcdxso8sp1o0dDBWRAkcefN3AO4JRerQ+gzeTOmQlh0=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(136003)(376002)(39860400002)(366004)(346002)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(26005)(83380400001)(107886003)(6512007)(9686003)(6506007)(4326008)(44832011)(5660300002)(41300700001)(966005)(7416002)(2906002)(316002)(6666004)(33716001)(478600001)(8676002)(54906003)(6486002)(8936002)(66556008)(6916009)(86362001)(66946007)(66476007)(82960400001)(38100700002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9Exq5+Ri8OOoAixdyKDFW1jYx0ouXWqqCxJ+tvyaHOMfbqNb49ygsLdeb7Gw?=
- =?us-ascii?Q?hc0B1p32L/y46SW4Fv3mq4mEf2D9q9sofbU8heRnAL6OCpq+Zlr69jVSqEJM?=
- =?us-ascii?Q?E0233nB5YlxyzhssSvfGlhJBvbD85H8xpQ2KJmidWJVxtUWfvL6ki3HCczWA?=
- =?us-ascii?Q?xHFG0Us/oBHpDPeQjOf05y+C6Rr7qIFGViBXQ61TVik8u6l9ooTQl++tbhF1?=
- =?us-ascii?Q?EI2bKpO3zMZLcRl7JfPUPR/bR1gpRzzSlnXWPYwTxMHROhRG0qWjNnvcuHIH?=
- =?us-ascii?Q?O7gYb0iAdGyi3aU5tfVc5TKbp3UlsIrZUFC3hOmWXr4VVHNylhSpS1QZobjD?=
- =?us-ascii?Q?g3g+1EtU2cc+hp8s/57nkE+sWKLkbqbag3r6x9zO4GKqHutaR0+G9JFPo/C7?=
- =?us-ascii?Q?MiWb4EKTbkqdLvSbZEnNUYBHwQgcVLYS+FoU5Oh0KiG3oE1CRsj3VC+8k8jo?=
- =?us-ascii?Q?ulRyoWoDXfaVLqR7H+NnQKD1XyRSxdtG4C7q8xT8WBf8BZH1VPUSRW9CZJE1?=
- =?us-ascii?Q?Y+fdowWzqiXM5by4gn8MkNcFSrYZUe5Fg/oFzmkrxnezlwQX7Joqx1wm5Was?=
- =?us-ascii?Q?fBdNcRz8aXHCwOOwIa083o3XFBwJlXbebA5FWeouqwT5ljurdYfQewqGbxnB?=
- =?us-ascii?Q?+3OMTqCiR19V0UU9IBa6iAJC9g9AsTlZqaDItsELqIzEk/at34RwoOwuMkaO?=
- =?us-ascii?Q?ETNctuKH0EMm6LRn4S4Tz/j/JLOievVxqZlUAqBB7cYugktSMWR1PK9tA+eC?=
- =?us-ascii?Q?yBD5D5/D3q1GHuBm2FzWugugxEixCZj+HeokOFUH52MP79nt+20Gp67IG/cP?=
- =?us-ascii?Q?YjIzDtZxOv7PCYTaQrn2zA33c5/6Yqb1/b5JZVhEGg0XtKfxdKZxfyjZtc9L?=
- =?us-ascii?Q?U2ekt++qw/JnkoI8cgK1xuhqX9I3Y3aOyAXkZplXARqjZ7KgdXUvWZwjGgvq?=
- =?us-ascii?Q?mcEoMgtRZFz2fzKRQhj5JsttaXiCOTMI/sZdPkUQgkA0y1ooZaXSDiEBEuKI?=
- =?us-ascii?Q?LGc3J6kacfIs7Ugb+1yrkWGyMn3KtfGN2F7xKyT87U3papoUUYiGCxOQX6tI?=
- =?us-ascii?Q?BAAx5yVnUb2MBagPKNSoSY+WaighDprymSEti1zozjuZZDfXKHYdhRCIj5U0?=
- =?us-ascii?Q?f6QUACkeP8kwNPLe8AIYq/hRvU06ovnruYYTFfwhxqTpVJ7fs7Uve208RW/+?=
- =?us-ascii?Q?/9SnCJvs6A/VmM9pZAHUG4eAxu8LigUrQeJ9aQPGg0H25qEekYENL+h0g2x5?=
- =?us-ascii?Q?C/PKZ13iWMienmH+eoMr7iLveli/834eYLTh/7pueLLXsJ9e232KSfWR2F+Z?=
- =?us-ascii?Q?v3qGjvrcTq0Z2eK0yd3O4tZgs/hQKIwTYp7xHWRopmm5AsbuXK+jswuIIz8g?=
- =?us-ascii?Q?BuxzUo9Lk5797q2DTpzTr/U7dJ7DvX5YZczYeaodbxdvBSIny3mvLZ+lJaRc?=
- =?us-ascii?Q?ZFo3zpaYt4oeztIaA1tG6gmXGRCEENcq+hqJfmBFbpwHHBOcSzj5ExIK9NPC?=
- =?us-ascii?Q?COj0VpTUXSXSuDUADKbv8Fgd+YeK/L7XJZATgGDfMumDWflOmN3sVHP0XQpL?=
- =?us-ascii?Q?vV3Kpuhc1KVUIhATI1AvFTCaZyQVZMLe990nsTGXUB4sv+yZlF2ziBzNaxUS?=
- =?us-ascii?Q?EA=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 73ecb61c-548b-45e5-4dc5-08dc00b23caa
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Dec 2023 16:47:50.2818
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mrfPNmGbqqeu8CnT5yQ5AGMXo+d7/c3ViMBudqf5uSE1USZw8orSgFyyCNthztUBPaTDfo0k0bM2lETZbNPeWPaqxg7ZEFuz4uAtdexwtOs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8556
-X-OriginatorOrg: intel.com
+In-Reply-To: <0b807496-f387-4aef-8650-a43a9249468f@tuxon.dev>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/19/2023 16:26:24
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182235 [Dec 19 2023]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;178.176.72.19:7.7.3,7.4.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: {cloud_iprep_silent}
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.72.19
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 12/19/2023 16:32:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 12/19/2023 2:00:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Tue, Dec 19, 2023 at 01:02:05PM +0200, Vladimir Oltean wrote:
-> The ice driver fails to build when CONFIG_XDP_SOCKETS is disabled.
+On 12/15/23 1:04 PM, claudiu beznea wrote:
+[...]
+>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>
+>>> CSR.OPS bits specify the current operating mode and (according to
+>>> documentation) they are updated when the operating mode change request
+>>> is processed. Thus, check CSR.OPS before proceeding.
+>>
+>>    The manuals I have indeed say we need to check CSR.OPS... But we only
+>> need to wait iff we transfer from the operation mode to the config mode...
 > 
-> drivers/net/ethernet/intel/ice/ice_base.c:533:21: error:
-> variable has incomplete type 'struct xsk_cb_desc'
->         struct xsk_cb_desc desc = {};
->                            ^
-> include/net/xsk_buff_pool.h:15:8: note:
-> forward declaration of 'struct xsk_cb_desc'
-> struct xsk_cb_desc;
->        ^
-> 
-> Fixes: d68d707dcbbf ("ice: Support XDP hints in AF_XDP ZC mode")
-> Closes: https://lore.kernel.org/netdev/8b76dad3-8847-475b-aa17-613c9c978f7a@infradead.org/
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> RZ/G3S manual say about CSR.OPS "These bits are updated when an operating
 
-Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+   I was unable to find the RZ/G3 manuals on ther Renesas' website... :-(
 
-Thanks Vladimir for acting upon this. Later on let us think about moving
-this definition to xdp_sock.h maybe.
+> mode changes is processed". From this I get we need to check it for any mode.
 
-> ---
-> Posting to net-next since this tree is broken at this stage, not only
-> bpf-next.
+  I don't argue with the (safety) checking of CSR.OPS, I was just pointing
+out that the R-Car gen3 manual says that only transfer from operation to
+the config mode happens after a considerable amount of time, other transfers
+do happen immediately after updating CCC.OPC.
+
+> Also, on configuration procedure (of RZ/G3S) it say CSR.OPS need to be
+> checked when switching from reset -> config.
+
+   Just checked or waited on?
+   The R-car does have a specific algorithm for transferring from the operation
+to the reset mode (you need to set CC.DTSR first and then wait for CSR.DTS to
+clear before updating CCC.OPC)...
+
+[...]
+
+>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>> ---
+>>>  drivers/net/ethernet/renesas/ravb_main.c | 47 ++++++++++++++++++++----
+>>>  1 file changed, 39 insertions(+), 8 deletions(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>>> index 9178f6d60e74..ce95eb5af354 100644
+>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+[...]
+>>> @@ -1744,6 +1747,18 @@ static inline int ravb_hook_irq(unsigned int irq, irq_handler_t handler,
+>>>  	return error;
+>>>  }
+>>>  
+>>> +static int ravb_set_reset_mode(struct net_device *ndev)
+>>> +{
+>>> +	int error;
+>>> +
+>>> +	ravb_write(ndev, CCC_OPC_RESET, CCC);
+>>> +	error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_RESET);
+>>> +	if (error)
+>>> +		netdev_err(ndev, "failed to switch device to reset mode\n");
+>>> +
+>>> +	return error;
+>>> +}
+>>> +
+>>
+>>    Again, ravb_wait() call doesn't seem necessary here...
 > 
->  include/net/xdp_sock_drv.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
-> index b62bb8525a5f..526c1e7f505e 100644
-> --- a/include/net/xdp_sock_drv.h
-> +++ b/include/net/xdp_sock_drv.h
-> @@ -12,14 +12,14 @@
->  #define XDP_UMEM_MIN_CHUNK_SHIFT 11
->  #define XDP_UMEM_MIN_CHUNK_SIZE (1 << XDP_UMEM_MIN_CHUNK_SHIFT)
->  
-> -#ifdef CONFIG_XDP_SOCKETS
-> -
->  struct xsk_cb_desc {
->  	void *src;
->  	u8 off;
->  	u8 bytes;
->  };
->  
-> +#ifdef CONFIG_XDP_SOCKETS
-> +
->  void xsk_tx_completed(struct xsk_buff_pool *pool, u32 nb_entries);
->  bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc);
->  u32 xsk_tx_peek_release_desc_batch(struct xsk_buff_pool *pool, u32 max);
-> -- 
-> 2.34.1
-> 
+> Ok. I followed the guideline from the description of CSR.OPS. Let me know
+> if you want to keep it or not. I think I haven't saw any issues w/o this.
+
+  Yes, please remove the waiting.
+
+[...]
+
+MBR, Sergey
 
