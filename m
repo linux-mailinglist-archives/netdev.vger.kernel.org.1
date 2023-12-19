@@ -1,164 +1,75 @@
-Return-Path: <netdev+bounces-58752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95976817F86
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 03:03:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B444B817FE0
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 03:38:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 251AFB234F6
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 02:03:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 816931C215CD
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 02:38:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF791872;
-	Tue, 19 Dec 2023 02:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7512F15AB;
+	Tue, 19 Dec 2023 02:38:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="Xjlv5j/p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DM0UfcDk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA4817D9
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 02:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-40c38de1ee4so39836415e9.0
-        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 18:03:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1702951393; x=1703556193; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wjsAHbjfMeDwtBP8wrx8HGvaKAxkSsjCBhep4ZbKU2k=;
-        b=Xjlv5j/p/JeyugKxAljebVR7bkCLcw0+Z71qAklY64xXgDqZ0zE7y5p51cgcW6xXe7
-         AvdvN7e7KvjUL6z+QppAmkXcmsh4xrEKNY4xhhIgS9bIH1YSDUxrhkDH8iR07Wq+Fg03
-         Fzpz/07lNuSTaBeeKRBBqWMpdojmtE58Fo1I+hEALzkdRUM1A3CZk3USVE3bnzuGicsC
-         WBdYqqvqOoY5SPNDZBZKnBJTXrQ32ByzuIdEQNMdff0ExKz4qze9DIzLO/3Vvjh0ZFbG
-         7udnPWEC9KlKx8BPQsQ2IdntMLUXT3W7caKUBq8OPKzvm3qzRlMMu69XaJaPAGXHj748
-         lJnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702951393; x=1703556193;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wjsAHbjfMeDwtBP8wrx8HGvaKAxkSsjCBhep4ZbKU2k=;
-        b=Cqi7hu2o45wcz1XVCc/ZIwVg7f5Evc39M9ErO9Q/CHk9qyxO8x3f/GRHJc4Gx2mcOJ
-         Z4TdIb2XUrnZ6Vk+tLFdAF/iT0iipzLlx3/9v8Ei6nP6p93LeQPsjN+K1lFzh1j4JGt9
-         ArEam7zzkzU1JQ148na3LMhMnaYVOOfUJhAltT3sRpWiWuijR+pN3+O0QoQWmtsDmlDY
-         bzcsjMZu8E9K60j77acDT7mUEulu74fIwWV3st4eNts5CJhqg8FURJhq37g3SblwxUIt
-         QbA6C/En792C2yoXKZmq2slbPVxT1CYdvGjkkPSRzICHcDsHgxQgCsAykqeQA6yHMW/Q
-         u+ow==
-X-Gm-Message-State: AOJu0YxHKGXPaO9g1p52nCB8n503Uv+WGgCWeCub7Ve4tfraoM/YmYPE
-	0RM/Mm1PZf07kuamxM6mYkensw==
-X-Google-Smtp-Source: AGHT+IF/kNWkZMYNHeVVL3RUNGwgYlxAj7dA/S+cQyieGNqNAtjbstLMUDuonlQ07VWTyaXlrIyung==
-X-Received: by 2002:a05:600c:358d:b0:40d:27d3:8f2c with SMTP id p13-20020a05600c358d00b0040d27d38f2cmr25810wmq.56.1702951393183;
-        Mon, 18 Dec 2023 18:03:13 -0800 (PST)
-Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id r19-20020a05600c35d300b0040c495b1c90sm590084wmq.11.2023.12.18.18.03.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Dec 2023 18:03:12 -0800 (PST)
-From: Dmitry Safonov <dima@arista.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Dmitry Safonov <0x7f454c46@gmail.com>
-Cc: Dmitry Safonov <dima@arista.com>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH net-next] selftest/tcp-ao: Rectify out-of-tree build
-Date: Tue, 19 Dec 2023 02:03:05 +0000
-Message-ID: <20231219-b4-tcp-ao-selftests-out-of-tree-v1-1-0fff92d26eac@arista.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5053911702
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 02:38:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F0CFC433C8;
+	Tue, 19 Dec 2023 02:38:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702953494;
+	bh=0PvKh7wwMHm0vkqOj0P4irBZvnROHkhfZw5/YQYdIS0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=DM0UfcDk8Fuo+uAhCo/RkoWGnAzoP9GLqlgiF2H2atL8ssLCUCJuk/QJx7/d//nw4
+	 BnnWurv4TD20NiSSic8HZdKvms1GCfm38TKSto8ApQYZmZpvbMrKsJ8YA0Y3YAUHOS
+	 QLxhUSjstW1hOtLExCpXkYnJ6vl2MG8Loq4Uk2+zuSxrV64j3ja1UuieXoLkYGJ5D+
+	 9d1C0su5Ia7ItL5EzdzLdWYNuIEcq7+AyUUmAmgxqDYc0hDL2+GE+Wr8EoUnJt6ngN
+	 Aa0f0kwuoZ5uW6463Kr4igq9Z8aCpXWjY3KR1zCJ/isUItIirk7mV4fEO6ZG7atio+
+	 WPKqmRJzyZAMA==
+Message-ID: <c3ae9c3a-9ecd-4b22-a908-9da587c1c88b@kernel.org>
+Date: Mon, 18 Dec 2023 19:38:13 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Mailer: b4 0.13-dev-b6b4b
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1702951385; l=3173; i=dima@arista.com; s=20231212; h=from:subject:message-id; bh=kXGv43WpVA4QuiP4NyRqa0KCrJ/VO9r5P4J8vlLiCw4=; b=1kOnNm8p4AmUsY6Nx+/rLZt4zV6JjEDoQl4HTO7eoE4E/lSubDKnwS+Igmo/2rYam28n2VLEx I0by5+u8dJJCTRd323F9YsGNn3GyyBehrNSJVuJnaY7J2b0MMRoyxZ0
-X-Developer-Key: i=dima@arista.com; a=ed25519; pk=hXINUhX25b0D/zWBKvd6zkvH7W2rcwh/CH6cjEa3OTk=
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/ipv6: Revert remove expired routes with a
+ separated list of routes
+Content-Language: en-US
+To: Kui-Feng Lee <sinquersw@gmail.com>, netdev@vger.kernel.org
+Cc: edumazet@google.com, Kui-Feng Lee <thinker.li@gmail.com>
+References: <20231217185505.22867-1-dsahern@kernel.org>
+ <a289e845-f244-48a4-ba75-34ce027c0de4@gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <a289e845-f244-48a4-ba75-34ce027c0de4@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Trivial fix for out-of-tree build that I wasn't testing previously:
+On 12/18/23 6:14 PM, Kui-Feng Lee wrote:
+> 
+> 
+> On 12/17/23 10:55, David Ahern wrote:
+>> Revert the remainder of 5a08d0065a915 which added a warn on if a fib
+>> entry is still on the gc_link list, and then revert  all of the commit
+>> in the Fixes tag. The commit has some race conditions given how expires
+>> is managed on a fib6_info in relation to timer start, adding the entry
+>> to the gc list and setting the timer value leading to UAF. Revert
+>> the commit and try again in a later release.
+> 
+> May I know what your concerns are about the patch I provided?
+> Even I try it again later, I still need to know what I miss and should
+> address.
 
-1. Create a directory for library object files, fixes:
-> gcc lib/kconfig.c -Wall -O2 -g -D_GNU_SOURCE -fno-strict-aliasing -I ../../../../../usr/include/ -iquote /tmp/kselftest/kselftest/net/tcp_ao/lib -I ../../../../include/  -o /tmp/kselftest/kselftest/net/tcp_ao/lib/kconfig.o -c
-> Assembler messages:
-> Fatal error: can't create /tmp/kselftest/kselftest/net/tcp_ao/lib/kconfig.o: No such file or directory
-> make[1]: *** [Makefile:46: /tmp/kselftest/kselftest/net/tcp_ao/lib/kconfig.o] Error 1
-
-2. Include $(KHDR_INCLUDES) that's exported by selftests/Makefile, fixes:
-> In file included from lib/kconfig.c:6:
-> lib/aolib.h:320:45: warning: ‘struct tcp_ao_add’ declared inside parameter list will not be visible outside of this definition or declaration
->   320 | extern int test_prepare_key_sockaddr(struct tcp_ao_add *ao, const char *alg,
->       |                                             ^~~~~~~~~~
-...
-
-3. While at here, clean-up $(KSFT_KHDR_INSTALL): it's not needed anymore
-   since commit f2745dc0ba3d ("selftests: stop using KSFT_KHDR_INSTALL")
-
-4. Also, while at here, drop .DEFAULT_GOAL definition: that has a
-   self-explaining comment, that was valid when I made these selftests
-   compile on local v4.19 kernel, but not needed since
-   commit 8ce72dc32578 ("selftests: fix headers_install circular dependency")
-
-Fixes: cfbab37b3da0 ("selftests/net: Add TCP-AO library")
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202312190645.q76MmHyq-lkp@intel.com/
-Signed-off-by: Dmitry Safonov <dima@arista.com>
----
- tools/testing/selftests/net/tcp_ao/Makefile | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
-
-diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
-index 6343cfcf919b..8e60bae67aa9 100644
---- a/tools/testing/selftests/net/tcp_ao/Makefile
-+++ b/tools/testing/selftests/net/tcp_ao/Makefile
-@@ -17,22 +17,18 @@ TEST_IPV6_PROGS := $(TEST_BOTH_AF:%=%_ipv6)
- TEST_GEN_PROGS := $(TEST_IPV4_PROGS) $(TEST_IPV6_PROGS)
- 
- top_srcdir	  := ../../../../..
--KSFT_KHDR_INSTALL := 1
- include ../../lib.mk
- 
- HOSTAR ?= ar
- 
--# Drop it on port to linux/master with commit 8ce72dc32578
--.DEFAULT_GOAL := all
--
- LIBDIR	:= $(OUTPUT)/lib
- LIB	:= $(LIBDIR)/libaotst.a
- LDLIBS	+= $(LIB) -pthread
- LIBDEPS	:= lib/aolib.h Makefile
- 
- CFLAGS	:= -Wall -O2 -g -D_GNU_SOURCE -fno-strict-aliasing
--CFLAGS	+= -I ../../../../../usr/include/ -iquote $(LIBDIR)
--CFLAGS	+= -I ../../../../include/
-+CFLAGS	+= $(KHDR_INCLUDES)
-+CFLAGS	+= -iquote ./lib/ -I ../../../../include/
- 
- # Library
- LIBSRC	:= kconfig.c netlink.c proc.c repair.c setup.c sock.c utils.c
-@@ -43,6 +39,7 @@ $(LIB): $(LIBOBJ)
- 	$(HOSTAR) rcs $@ $^
- 
- $(LIBDIR)/%.o: ./lib/%.c $(LIBDEPS)
-+	mkdir -p $(LIBDIR)
- 	$(CC) $< $(CFLAGS) $(CPPFLAGS) -o $@ -c
- 
- $(TEST_GEN_PROGS): $(LIB)
-
----
-base-commit: ceb2fe0d438644e1de06b9a6468a1fb8e2199c70
-change-id: 20231219-b4-tcp-ao-selftests-out-of-tree-452f787f2d58
-
-Best regards,
--- 
-Dmitry Safonov <dima@arista.com>
-
+This is a judgement call based on 6.7-rc number and upcoming holidays
+with people offline. A bug fix is needed for a performance optimization;
+the smart response here is to revert the patch and try again after the
+holidays.
 
