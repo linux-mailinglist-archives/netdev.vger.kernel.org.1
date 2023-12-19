@@ -1,99 +1,136 @@
-Return-Path: <netdev+bounces-58978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 367B4818C22
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 17:25:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE814818C21
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 17:24:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C99FC1F258C6
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:25:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D94F11C20F1F
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:24:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307CA1D542;
-	Tue, 19 Dec 2023 16:24:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD2151D53F;
+	Tue, 19 Dec 2023 16:24:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R8kDf+vB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AD/RpbFG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A1B41DA59
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 16:24:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3366920db54so2450750f8f.1
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 08:24:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1703003066; x=1703607866; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8uNwkU9kqRe/iMS3l4jAnLfwvJqCmqKLT4regqpL0b4=;
-        b=R8kDf+vB3QMVDhYpRODEeyuSiy8QAWMNO1oSr8bWBz9fVS03kCaziTSmNFaAKRr+2a
-         b5ZVxb1UjlP+eFoFjbqfnBDK6rYO1EXP7rpsA/sagiPgwE8mqXk/mDwWZfW4MY7wh5a/
-         5pbojOkBjcbGU3NIg/oFc3LIC+nk+S1nNZJxp0yIuRvd4zDXdldji1o9vGwzqlgis9oE
-         nxHriHY9RFUFZtR1eqggnR5cbXOyhXqOvZiRmQg0Oso0OnU6ceD4ZUAqIxGB2kV2nWWT
-         vRN9A7RDJl0/QQNnrGFxMrefywbNmhcS0/LTG4w6QG7mr5LH8dWwHoqlN+IC/hlIfkUI
-         4eLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703003066; x=1703607866;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8uNwkU9kqRe/iMS3l4jAnLfwvJqCmqKLT4regqpL0b4=;
-        b=igTnQKRQ9gxHEMiUErY5IDIkeZhrOMRVkCZnErRzZnjEvzIVyFetwZNbuu1ISgpYJo
-         a9yk9KmRcneIZ+HdP3sqLLYKhjJ7VqjshMLFNyWKhtkuv7vzhpCwhA7gMqQwtkTYyWKD
-         Pj6dmOJhxY8dlIIWqxq/yOFIc7U9ZPJXiTyD0Q9sBWoHfgtxB5UrnGVRnZqBi7/t/BJM
-         vRsfajxI4GaKRcgfNDffBz645bIbp68pknZPCin8SMguqPIUzGoTfG2l/8yV3jxGCOQh
-         MEXCT8Qp7lv2cYk2j3jz/NWWv+3Uh41SLqX+Hl80M9R/Jhr2GM7rjaE1ae6ijtVkthrv
-         xS7A==
-X-Gm-Message-State: AOJu0YwfSgB/q7Iynvibbe10VjA7s1nqKGmTWy5BrzWGpQ7Bsp2m2v79
-	hixEY+wjQygE4zaN5ufgSCJ2OoOMszCJVGVaWG9vIw==
-X-Google-Smtp-Source: AGHT+IH1fQpHrgQ1AQ0sGIpdVwNAENGWCsTtuPMZEL7iT/lV+6KhEOFjQ0f7EQjww7MFIhQn55pIpmcjQyZ4enkYLwk=
-X-Received: by 2002:a5d:6786:0:b0:336:5162:de5d with SMTP id
- v6-20020a5d6786000000b003365162de5dmr1714276wru.227.1703003066507; Tue, 19
- Dec 2023 08:24:26 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C35871F939
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 16:24:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04E1DC433C7;
+	Tue, 19 Dec 2023 16:24:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703003060;
+	bh=nqJdHWvYZ46f8qf/EtcB3OKHLCRGzjt/1qyPQeHxq9o=;
+	h=From:To:Cc:Subject:Date:From;
+	b=AD/RpbFGyGi1zQUM7OB12k3uLLE8v+T2VWgUE3YgtdkpIfSeuAMx0WdzdpSkrX1r5
+	 z3/fOZWC+7iXcYtuUWCU9aASVAPIFCGVhdyiSottyKvBnIHgGZuG9d1sfDo5W1ps3Z
+	 pgnzVIi8bjsC8NtKE1gS9zqKa2PFpLN/r1FYSs4S/CL6vmx5YSTBxhJEX8B+QkVpX2
+	 eleHcLfH2QhqnrdWRtuAc30wq2xAbIAUA/BOKW27lQx2MhuUCXD9gmUy0+ChSbdE07
+	 j+5S5b5VfiKWMtQV0As5Xm4HtU4ZWahrPCqNBG3GIdTiNmf7uiFn0J/y6flieDsGYW
+	 B7t9esboby1lw==
+From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+To: netdev@vger.kernel.org,
+	Russell King <rmk+kernel@armlinux.org.uk>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Wei Lei <quic_leiwei@quicinc.com>
+Subject: [PATCH net-next] net: sfp: fix PHY discovery for FS SFP-10G-T module
+Date: Tue, 19 Dec 2023 17:24:15 +0100
+Message-ID: <20231219162415.29409-1-kabel@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231217-i40e-comma-v1-1-85c075eff237@kernel.org>
- <CAKwvOd=ZKV6KsgX0UxBX4Y89YEgpry00jG6K6qSjodwY3DLAzA@mail.gmail.com>
- <20231218190055.GB2863043@dev-arch.thelio-3990X> <CAKwvOd=LjM08FyiXu-Qn7JmtM0oBD7rf4qkr=oo3QKeP+njRUw@mail.gmail.com>
- <20231219101202.GE811967@kernel.org>
-In-Reply-To: <20231219101202.GE811967@kernel.org>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Tue, 19 Dec 2023 08:24:11 -0800
-Message-ID: <CAKwvOdkLx64b2d+F1CgRn6duxhUDNWfdj7mRuoScu1Jz2H4mXA@mail.gmail.com>
-Subject: Re: [PATCH iwl-next] i40e: Avoid unnecessary use of comma operator
-To: Simon Horman <horms@kernel.org>
-Cc: Nathan Chancellor <nathan@kernel.org>, Jesse Brandeburg <jesse.brandeburg@intel.com>, 
-	Tony Nguyen <anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 19, 2023 at 2:12=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
-te:
->
-> So while I'm all for more checks.
-> And I'm all for only using the comma where it is necessary
-> (I suspect that often it is a typo).
-> I do not get the feeling that we are sitting on a trove of nasty bugs.
+Commit 2f3ce7a56c6e ("net: sfp: rework the RollBall PHY waiting code")
+changed the long wait before accessing RollBall / FS modules into
+probing for PHY every 1 second, and trying 25 times.
 
-I still get nightmares frome:
-- commit e7140639b1de ("powerpc/xmon: Fix opcode being uninitialized
-in print_insn_powerpc")
-- commit f7019b7b0ad1 ("xsk: Properly terminate assignment in
-xskq_produce_flush_desc")
+Wei Lei reports that this does not work correctly on FS modules: when
+initializing, they may report values different from 0xffff in PHY ID
+registers for some MMDs, causing get_phy_c45_ids() to find some bogus
+MMD.
 
---=20
-Thanks,
-~Nick Desaulniers
+Fix this by adding the module_t_wait member back, and setting it to 4
+seconds for FS modules.
+
+Fixes: 2f3ce7a56c6e ("net: sfp: rework the RollBall PHY waiting code")
+Reported-by: Wei Lei <quic_leiwei@quicinc.com>
+Signed-off-by: Marek Behún <kabel@kernel.org>
+---
+Lei, could you please test this and send a Tested-by tag?
+---
+ drivers/net/phy/sfp.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index 3780a96d2caa..f75c9eb3958e 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -274,6 +274,7 @@ struct sfp {
+ 	struct sfp_eeprom_id id;
+ 	unsigned int module_power_mW;
+ 	unsigned int module_t_start_up;
++	unsigned int module_t_wait;
+ 	unsigned int phy_t_retry;
+ 
+ 	unsigned int rate_kbd;
+@@ -388,6 +389,12 @@ static void sfp_fixup_fs_10gt(struct sfp *sfp)
+ {
+ 	sfp_fixup_10gbaset_30m(sfp);
+ 	sfp_fixup_rollball(sfp);
++
++	/* The RollBall fixup is not enough for FS modules, the AQR chip inside
++	 * them does not return 0xffff for PHY ID registers in all MMDs for the
++	 * while initializing. They need a 4 second wait before accessing PHY.
++	 */
++	sfp->module_t_wait = msecs_to_jiffies(4000);
+ }
+ 
+ static void sfp_fixup_halny_gsfp(struct sfp *sfp)
+@@ -2329,6 +2336,7 @@ static int sfp_sm_mod_probe(struct sfp *sfp, bool report)
+ 		mask |= SFP_F_RS1;
+ 
+ 	sfp->module_t_start_up = T_START_UP;
++	sfp->module_t_wait = T_WAIT;
+ 	sfp->phy_t_retry = T_PHY_RETRY;
+ 
+ 	sfp->state_ignore_mask = 0;
+@@ -2566,9 +2574,10 @@ static void sfp_sm_main(struct sfp *sfp, unsigned int event)
+ 
+ 		/* We need to check the TX_FAULT state, which is not defined
+ 		 * while TX_DISABLE is asserted. The earliest we want to do
+-		 * anything (such as probe for a PHY) is 50ms.
++		 * anything (such as probe for a PHY) is 50ms (or more on
++		 * specific modules).
+ 		 */
+-		sfp_sm_next(sfp, SFP_S_WAIT, T_WAIT);
++		sfp_sm_next(sfp, SFP_S_WAIT, sfp->module_t_wait);
+ 		break;
+ 
+ 	case SFP_S_WAIT:
+@@ -2582,8 +2591,8 @@ static void sfp_sm_main(struct sfp *sfp, unsigned int event)
+ 			 * deasserting.
+ 			 */
+ 			timeout = sfp->module_t_start_up;
+-			if (timeout > T_WAIT)
+-				timeout -= T_WAIT;
++			if (timeout > sfp->module_t_wait)
++				timeout -= sfp->module_t_wait;
+ 			else
+ 				timeout = 1;
+ 
+-- 
+2.41.0
+
 
