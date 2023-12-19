@@ -1,69 +1,98 @@
-Return-Path: <netdev+bounces-58810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9619E818447
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 10:22:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE544818452
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 10:23:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB29E1C214AA
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 09:22:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E40391C23B1E
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 09:23:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C7E812B98;
-	Tue, 19 Dec 2023 09:22:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 670E1134A5;
+	Tue, 19 Dec 2023 09:22:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GmjKCQVm"
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="aSsyqycr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A88312E48;
-	Tue, 19 Dec 2023 09:22:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95180C433C7;
-	Tue, 19 Dec 2023 09:22:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702977725;
-	bh=Z21dUfsapgtIWyYATafp6nz9R/e935bEpMDxj+E68o4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GmjKCQVm8XjWw+ADmlXxiOrv4jR7zxPj7hMPSWru7PV6Cs+IOQBoRMYZnfPF1RCeH
-	 RDkOl0n3eiQMVFC9NNt/3lSmRpDH6eauaHkxfayvRUYCtwLSVaIt4RM/PG5PYO4MbR
-	 MsCW1JwPINE7VvV3rQWyTK5hxykGqxPxMQmPX7TVj2h754oJxNjAE0awkbLmJ1SsvU
-	 gCl3Bey7C3+CFU+Hg0avuHBCNJzRgrKWjuSRAGt0B1y65roUWthGWKZ1wPcinwLnyv
-	 ft0GBjL/QaMDw1DzzwXVyy2ntrYO0LKQCEQx1APaCBVQ65y1dtiAfGuihGmQILmJKm
-	 dwQkeTqDWROZg==
-Date: Tue, 19 Dec 2023 10:22:00 +0100
-From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux@armlinux.org.uk,
- andrew@lunn.ch, hkallweit1@gmail.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 1/4] net: phy: marvell10g: Support firmware
- loading on 88X3310
-Message-ID: <20231219102200.2d07ff2f@dellmb>
-In-Reply-To: <20231214201442.660447-2-tobias@waldekranz.com>
-References: <20231214201442.660447-1-tobias@waldekranz.com>
-	<20231214201442.660447-2-tobias@waldekranz.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C940134CE;
+	Tue, 19 Dec 2023 09:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
+Received: from [10.10.2.52] (unknown [10.10.2.52])
+	by mail.ispras.ru (Postfix) with ESMTPSA id B760040737B5;
+	Tue, 19 Dec 2023 09:22:45 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru B760040737B5
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1702977765;
+	bh=WWF3YNN11SVW5+0GW8dd87ugjXyC0t8VZ4S66eU8nMM=;
+	h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+	b=aSsyqycr9637ZJHqGmTHoneiXjdKNN//qnfowNxnUnIU2BkqvI4HVWVUUij9yRw/0
+	 Q0ZXcOXun023inqmtrFk/txM1r/17/P0FGQzGkhpR7tqdo7ubsfU16TcEz923tCVXa
+	 kbIR1ajyx02GxNRGHWk8jYm/b4RMkU1hGa0W7sro=
+Subject: Re: [lvc-project] [PATCH] linux-5.19.y: net: fddi: skfp:
+ Uninitialized data
+To: =?UTF-8?B?0JDQu9C10LrRgdCw0L3QtNGAIEM=?= <alsp705@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ lvc-project@linuxtesting.org
+References: <CAGMq193upjidhTnr8hK6cgbVpP9tNQh-YvR2GJN_2cxdDOYnPA@mail.gmail.com>
+From: Alexey Khoroshilov <khoroshilov@ispras.ru>
+Message-ID: <c68bc048-3a57-c95b-dae5-555284ec2122@ispras.ru>
+Date: Tue, 19 Dec 2023 12:22:45 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAGMq193upjidhTnr8hK6cgbVpP9tNQh-YvR2GJN_2cxdDOYnPA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: ru-RU
+Content-Transfer-Encoding: 8bit
 
-On Thu, 14 Dec 2023 21:14:39 +0100
-Tobias Waldekranz <tobias@waldekranz.com> wrote:
+Dear Alexander,
 
-> +MODULE_FIRMWARE("mrvl/x3310fw.hdr");
 
-And do you have permission to publish this firmware into linux-firmware?
+On 19.12.2023 12:00, Александр C wrote:
+> Uninitialized data is read from local variable 'word_val' at pmf.c:1302.
+> 
+> Found by Linux Verification Center (linuxtesting.org
+> <http://linuxtesting.org>) with SVACE.
+> 
+> Signed-off-by: Alexander Sapozhnikov <alsp705@gmail.com
+> <mailto:alsp705@gmail.com>>
+> ---
+>  drivers/net/fddi/skfp/pmf.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/fddi/skfp/pmf.c b/drivers/net/fddi/skfp/pmf.c
+> index 563fb7f0b327..3f24fbd82a73 100644
+> --- a/drivers/net/fddi/skfp/pmf.c
+> +++ b/drivers/net/fddi/skfp/pmf.c
+> @@ -1084,7 +1084,7 @@ static int smt_set_para(struct s_smc *smc, struct
+> smt_para *pa, int index,
+>   int path ;
+>   int port ;
+>   SK_LOC_DECL(u_char,byte_val) ;
+> - SK_LOC_DECL(u_short,word_val) ;
+> + SK_LOC_DECL(u_short, word_val) = 0 ;
+>   SK_LOC_DECL(u_long,long_val) ;
+>  
+>   mac = index - INDEX_MAC ;
+> -- 
 
-Because when we tried this with Marvell, their lawyer guy said we can't
-do that...
+Something is broken with your e-mail settings. The mail is in HTML, not
+in plain text.
 
-Marek
+Have you used git send-email to send the patch?
+
+--
+Alexey
 
