@@ -1,101 +1,92 @@
-Return-Path: <netdev+bounces-58762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2B01818033
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 04:22:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D100581804A
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 04:52:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7E841C231C7
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 03:22:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F0D32858EC
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 03:52:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A05F46A5;
-	Tue, 19 Dec 2023 03:22:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F040D4C8A;
+	Tue, 19 Dec 2023 03:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WAptozQe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RVv+5zx5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C55DBE79
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 03:22:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AA8EC433C7;
-	Tue, 19 Dec 2023 03:22:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702956133;
-	bh=/NG1/kY5qKBtfobyTEJXH0D53immN0qWfP8+Hf8WEfA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=WAptozQevlbmbpWs+NJr3tMbospaaGaV0kXK0yAh+RWi9Jayl2t34FV4RT+rrVrL+
-	 HsFx0v6AvQLhL8Yp97JidLEcLkN5Kk531wamc41H0e5ggNUAEfe4YU1bDmxOr+lDwh
-	 OsVDD0wLjl3ZG087r83b1MceBjI7H69vJ4QkT5mGvBbvl3HVC/URpbqKDyZF0/VbTT
-	 j3VnISpnsDV/tM4HU+fZTDDCamdkxSTrXFr9zab/eSrstOAH9ZXiE0nfiLXq17njj5
-	 pev8yzvbzuKx3QJ/UpW8jKfMHi/zdhZ/yIfNdmaEWjczs5gsIt7vx/DgDq+Y5D8s9/
-	 7I7ZV4Ocn4h8A==
-Message-ID: <e8fe542c-80ba-4ca2-a1fa-ec6d29194e81@kernel.org>
-Date: Mon, 18 Dec 2023 20:22:12 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7D75232;
+	Tue, 19 Dec 2023 03:52:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-7b70c2422a8so45378939f.0;
+        Mon, 18 Dec 2023 19:52:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702957973; x=1703562773; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VbWLFBtyAplRUFACvI5DMGuOtgKln1xEAx0ADZAOZvs=;
+        b=RVv+5zx5ounedfYmgw1E76X6TqzmNhxYaLpnIMSlNNiYMYrQWmcKY4Ojl5btvK+Ez2
+         5lphJDqD/jzcqXbMTCgqKVmQNlHn1/q+NKZncCVIDPvh+jaFLlY4Dr6TQi5WgQcVk86h
+         m0VAGpl3WDy41OdstVAGBpDF5k76l9txC5Da1M5ynV3s5mmFvc63v+wRlv8RHg8Osi6v
+         S7fUc0zYi7pyNUuf2FfPU/I0R5/xN6E4ObHKFk7RW4uFwZwcbiDqr8znjTUb+NIAgKoK
+         q3yqgWkB1xXboX7uxJeAbOCEQPN4RSNh8gl6YCH9AOUMBWv0BWq/ex8ML6lkSKk1f2QE
+         fkGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702957973; x=1703562773;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VbWLFBtyAplRUFACvI5DMGuOtgKln1xEAx0ADZAOZvs=;
+        b=Z5JAMMJAy3VYTHYcbKsN3UlyX9vVAJxY1oOxNpy9mYj73EOnMpmKuSm/emmP9mCbTG
+         QYWB+SLORrvXsyGWGZ2sZHRyoy5rVWIBaPwyBlQ//UsL7hGVTvbM/isaWnsrQd54kiwe
+         S9oemRxcRMzB5rwrCoSWxjrTO/lfzz84De8ZzbeOWea9rB3xGzje6hvR+z0OQkDj79m9
+         ij1GOO5oQO94ZFHAeRC2/NDs89DUBN4rvPfEV0NQRZfU69dGjpQidWGV/IWWMkJUHK+c
+         WcJf8llxSZ07XA+JXCBTjy/hW0pOF1Mp/PXfrAwh96RnCJe6Jl20F4Rsi1MiK+Czd+sC
+         P+Hw==
+X-Gm-Message-State: AOJu0YynKkCnfEOvg+yAuwMEMs3xebdsqE+IBpvELe00Sdvk86hBf1xq
+	q2kpLo1sSV7v8FL82IvJNCk=
+X-Google-Smtp-Source: AGHT+IHqwILNzHq9Znt1NMHD9YqI9sR3dgZOD2VHNoAOEXofNHBXUdaunMZMP7YFTu18vM19urNoKA==
+X-Received: by 2002:a5d:9f05:0:b0:7b7:d4c3:65c0 with SMTP id q5-20020a5d9f05000000b007b7d4c365c0mr3938876iot.2.1702957972740;
+        Mon, 18 Dec 2023 19:52:52 -0800 (PST)
+Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id w2-20020a654102000000b005c65ed23b65sm15635364pgp.94.2023.12.18.19.52.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Dec 2023 19:52:52 -0800 (PST)
+Date: Mon, 18 Dec 2023 19:52:50 -0800
+From: Richard Cochran <richardcochran@gmail.com>
+To: Min Li <lnimi@hotmail.com>
+Cc: lee@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Min Li <min.li.xe@renesas.com>
+Subject: Re: [PATCH net-next v4 1/2] ptp: introduce PTP_CLOCK_EXTOFF event
+ for the measured external offset
+Message-ID: <ZYETkpALegYmGMZU@hoboy.vegasvil.org>
+References: <PH7PR03MB7064ADDCABE34B67FA9C30E8A090A@PH7PR03MB7064.namprd03.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/ipv6: Revert remove expired routes with a
- separated list of routes
-Content-Language: en-US
-To: Kui-Feng Lee <sinquersw@gmail.com>, netdev@vger.kernel.org
-Cc: edumazet@google.com, Kui-Feng Lee <thinker.li@gmail.com>
-References: <20231217185505.22867-1-dsahern@kernel.org>
- <a289e845-f244-48a4-ba75-34ce027c0de4@gmail.com>
- <c3ae9c3a-9ecd-4b22-a908-9da587c1c88b@kernel.org>
- <9e8f86e1-8663-4bbb-baa9-fe0030dbbabd@gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <9e8f86e1-8663-4bbb-baa9-fe0030dbbabd@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PH7PR03MB7064ADDCABE34B67FA9C30E8A090A@PH7PR03MB7064.namprd03.prod.outlook.com>
 
-On 12/18/23 7:45 PM, Kui-Feng Lee wrote:
-> 
-> 
-> On 12/18/23 18:38, David Ahern wrote:
->> On 12/18/23 6:14 PM, Kui-Feng Lee wrote:
->>>
->>>
->>> On 12/17/23 10:55, David Ahern wrote:
->>>> Revert the remainder of 5a08d0065a915 which added a warn on if a fib
->>>> entry is still on the gc_link list, and then revert  all of the commit
->>>> in the Fixes tag. The commit has some race conditions given how expires
->>>> is managed on a fib6_info in relation to timer start, adding the entry
->>>> to the gc list and setting the timer value leading to UAF. Revert
->>>> the commit and try again in a later release.
->>>
->>> May I know what your concerns are about the patch I provided?
->>> Even I try it again later, I still need to know what I miss and should
->>> address.
->>
->> This is a judgement call based on 6.7-rc number and upcoming holidays
->> with people offline. A bug fix is needed for a performance optimization;
->> the smart response here is to revert the patch and try again after the
->> holidays.
-> Got it! Thanks!
+On Mon, Dec 18, 2023 at 11:50:44AM -0500, Min Li wrote:
+> @@ -50,6 +52,11 @@
+>  					 PTP_RISING_EDGE |	\
+>  					 PTP_FALLING_EDGE)
+>  
+> +/*
+> + * flag fields valid for the ptp_extts_event report.
+> + */
+> +#define PTP_EXTTS_EVENT_VALID_FLAGS	(PTP_ENABLE_FEATURE)
 
-In January, send a new set (RFC if it is still the merge window) with
-the following:
+Nit: Can we please call this PTP_EXTTS_EVENT_VALID without the _FLAGS suffix?
 
-1. audit all of the uses of RTF_EXPIRES. Some of the places need to be
-cleaned up first. For example, rt6_add_dflt_router sets RTF_EXPIRES flag
-but does not set fc_expires. I believe that function can be updated to
-take the expires value and removes the need to set it later in
-ndisc_router_discovery. See if the management of expires value can be
-consolidated under the table lock.
-
-2. Use gc_list instead of gc_link to be consistent with other gc lists
-(and the fact that it is a list)
-
-3. Add selftests using veth and namespaces to test RAs. It can depend on
-and check for the existence of the ra or radvd command; the key is to
-attempt a stress test on the router discovery path. Similarly for addrconf.
-
-That is in addition to your new selftests in the last set you sent.
+Thanks,
+Richard
 
