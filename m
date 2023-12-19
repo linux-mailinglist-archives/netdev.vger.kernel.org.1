@@ -1,25 +1,25 @@
-Return-Path: <netdev+bounces-58972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D0C7818BB2
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:58:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F2E2818BBF
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 17:01:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 195EC286CEF
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:58:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5467A1C24585
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C49C1CF9B;
-	Tue, 19 Dec 2023 15:58:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 141611CFB5;
+	Tue, 19 Dec 2023 16:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OWu2ERDW"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3zDVnsgI"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173A41D539;
-	Tue, 19 Dec 2023 15:58:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0753920323;
+	Tue, 19 Dec 2023 16:01:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -27,35 +27,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=tBpqWuxs1yCz983VuRpsBO762+PIqvAH6Pn4+BMpnf4=; b=OWu2ERDWnREFZXruavgwOGbIvw
-	LYCd5bWU8fxh58t1y945bqSa5gF5dj53Hs0LDemkFrCtkp+h98mlxYV4QGqbza0KZhBbcP+yHpqq5
-	0BwJ7jntI84KGjp2jQWr+d+u7gzRV7AdyeO3YiwJEyA9hrDY71JsqSKUw4sSQCGNWuTk=;
+	bh=2P8yV53vl0UUKGT9ZG2NVjkjQuA8zzjMdrp6s7PKqho=; b=3zDVnsgIZVcg+h5lXx4sbdNjNN
+	uG0IpVnJnckXhrySVQeZZRd4ykrlNlFlaI0MjM91z/QSHzWS8x+1k8zXNKpXjjiITLjHjBn4n9dXv
+	2bde897jtMNV1f2LWj09c7tuDLVEARJT2kmqqLrUr2hm0jmWcQpazDm9mgV+SxQAjoaI=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rFcTe-003LOK-PW; Tue, 19 Dec 2023 16:57:50 +0100
-Date: Tue, 19 Dec 2023 16:57:50 +0100
+	id 1rFcWw-003LQ6-OC; Tue, 19 Dec 2023 17:01:14 +0100
+Date: Tue, 19 Dec 2023 17:01:14 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Stefan Eichenberger <eichest@gmail.com>
-Cc: Dimitri Fedrau <dima.fedrau@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: marvell-88q2xxx: add driver for the Marvell
- 88Q2220 PHY
-Message-ID: <5d545a9b-feda-4908-8f74-9218806451c1@lunn.ch>
-References: <20231215213102.35994-1-dima.fedrau@gmail.com>
- <74d4b8f9-700e-45bc-af59-95a40a777b00@lunn.ch>
- <20231216221151.GA143483@debian>
- <28cc73bf-ed6d-49d8-b80b-4fbf5fa0442f@lunn.ch>
- <20231217111538.GA3591@debian>
- <ZX78ucHcNyEatXLD@eichest-laptop>
- <20231218090932.GA4319@debian>
- <ZYAqxPZHICtZO15O@eichest-laptop>
- <20231219081117.GA3479@debian>
- <ZYFfzei3SJSts5E/@eichest-laptop>
+To: Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Stefan Eichenberger <eichest@gmail.com>
+Subject: Re: [PATCH 1/2] net: phy: Add BaseT1 auto-negotiation constants
+Message-ID: <ad5f6bc9-071b-4c3e-b53b-872ca91fb8ea@lunn.ch>
+References: <20231218221814.69304-1-dima.fedrau@gmail.com>
+ <89f68405-2506-420b-952f-a168ebcb4d73@lunn.ch>
+ <20231219092837.GB3479@debian>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,14 +53,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZYFfzei3SJSts5E/@eichest-laptop>
+In-Reply-To: <20231219092837.GB3479@debian>
 
-> I am not sure that it will be accepted by the maintainers if you use a
-> lot of registers that are not documented.
+> Yes, I'm currently trying to push a driver for the Marvell88Q2220
+> 100BASE-T1/1000BASE-T1 PHY. It supports autonegotiation and with an
+> additional patch to function genphy_c45_baset1_an_config_aneg which is
+> not part of the series it is possible to set the advertised speed.
+> I probably should send all patches as a series including the driver ?
 
-Sometimes there is no choice, there is no documentation except the
-vendor crap driver which we try to clean up as much as possible, but
-we still end up with lots of magic numbers.
+Yes, please do send it all together as one patchset.
 
 	Andrew
 
