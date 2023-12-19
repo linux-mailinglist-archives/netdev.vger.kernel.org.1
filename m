@@ -1,96 +1,96 @@
-Return-Path: <netdev+bounces-58953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8265F818AD9
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:09:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB24A818B02
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:18:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30509283111
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:09:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F2B0B20B05
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:18:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A44FB1C29F;
-	Tue, 19 Dec 2023 15:09:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 372DB1C2BB;
+	Tue, 19 Dec 2023 15:17:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="VrOFsnWz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H+OjxsQD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329AA1C697;
-	Tue, 19 Dec 2023 15:09:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C871CA83
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 15:17:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-552eaf800abso16673a12.0
+        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 07:17:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1702998566; x=1734534566;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=gqCZICqTsn1ZAWtUxDZg9+U6l8m0uHS+deZJRdybB1c=;
-  b=VrOFsnWzzd2qIQDqo+bjVTp38kVXrVFsChV/WwykHK+s5g9Z138wM3H3
-   mAIGFne+vX5LYvHaTM2eFekbLia6a1WdhFRxrOBKbvIRrReQ5hnBrl94D
-   28meiocyDvUoCBv3VO7ssJc8B50uFdZIWoVMO7Q9m4HrVvxa5XXfS5n9Z
-   k=;
-X-IronPort-AV: E=Sophos;i="6.04,288,1695686400"; 
-   d="scan'208";a="260445655"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-3554bfcf.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 15:09:23 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
-	by email-inbound-relay-iad-1e-m6i4x-3554bfcf.us-east-1.amazon.com (Postfix) with ESMTPS id F327882E2E;
-	Tue, 19 Dec 2023 15:09:22 +0000 (UTC)
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:38779]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.28.164:2525] with esmtp (Farcaster)
- id a73f32d0-54d2-499f-b599-5a7df5d71c0c; Tue, 19 Dec 2023 15:09:22 +0000 (UTC)
-X-Farcaster-Flow-ID: a73f32d0-54d2-499f-b599-5a7df5d71c0c
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 19 Dec 2023 15:09:21 +0000
-Received: from 88665a182662.ant.amazon.com (10.118.248.48) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 19 Dec 2023 15:09:17 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <mengkanglai2@huawei.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<fengtao40@huawei.com>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <yanan@huawei.com>,
-	<kuniyu@amazon.com>
-Subject: Re: [Consult]kernel tcp socket lack of refcnt for net may cause uaf problem?
-Date: Wed, 20 Dec 2023 00:09:07 +0900
-Message-ID: <20231219150907.9338-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <26f7811f5ee247c389ddd38034d8747d@huawei.com>
-References: <26f7811f5ee247c389ddd38034d8747d@huawei.com>
+        d=google.com; s=20230601; t=1702999075; x=1703603875; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fNRkbdVZuemnh1yFK45bipp6+UrqkjQfduv8PlT282w=;
+        b=H+OjxsQDnWChVWLVm31Cit4ah3nz+wA7vOxrgUlQZ1FfhfQJerVbE/rIib3VLiOeNN
+         6KYrkY0sR+8GWIcXh55l9WRLndlhFxvUTpLKpoPCDLSFLg/hlNxO59AZfJ2N2Lp2mWtF
+         LJongjro5q4M+XGcEbBE5DAgVvJkR+Opbu1M/0e/4bvRR3r/BBeywxKhUd2ntfsWIjol
+         w0NpdtJuC1H5DXW2Ncgrgox6yGyxQtRV8b0VGQ7zrogk+TzViHtV6leVFhQ1if6+gup0
+         KpBQOzDNMT/iyh6+3TnIXkTteRC+qgCssPOSut2bOcG6w6qMdQdscN/YbQ6RBRlPl4ry
+         QP0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702999075; x=1703603875;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fNRkbdVZuemnh1yFK45bipp6+UrqkjQfduv8PlT282w=;
+        b=OdT0Y8CFhbzc0CrLOpj7EJ52IeRRfFqLzsCV5RpGvsJDm4Lj+Gre4578Hb1dQvcdwx
+         XfvnOJAWuHerxDh7OQSvDqPx0Dd9KiRbzbHSSTRmp5LB97FXDix7WXn020kUBCeX3Vgs
+         57dyQZkDoa5PcT/gRJ3ARLfDrhTc3qc6QjFQBR51j50xw4jySv6+5erg7mRTD5rJdpAI
+         G3aTauGcI7f1eGAc7LQioDV+cgVXIEh1U1254T7onEkdpcfnGkDMYgOuRbbYNnMmFLwx
+         6slsAZVb7yuHyuCT6/GHlM/tFM0bRGpGhGltrQvKCoxENNIN8X3nPPvVuGXD533VGuVH
+         glsQ==
+X-Gm-Message-State: AOJu0Yx2i1PdaFk2KCOVOn4v+O1oDYQiB05LkOl7vAq0nqQKrLrjYxcZ
+	DLVpnJKVo34mtbI4ZZvWDTMre8W68YBt/Oah++o1tDsmAGeW
+X-Google-Smtp-Source: AGHT+IH11TC8MfyJIMPPTfwj3TUM5YksvAenbSL28erJHcmMMPFkPUmNphLon2fMfu3Fi4UPfL/nXYeR+UTgV/xwbuk=
+X-Received: by 2002:aa7:cf19:0:b0:553:9935:294a with SMTP id
+ a25-20020aa7cf19000000b005539935294amr147000edy.5.1702999074468; Tue, 19 Dec
+ 2023 07:17:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWA002.ant.amazon.com (10.13.139.17) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+References: <20231219001833.10122-1-kuniyu@amazon.com> <20231219001833.10122-3-kuniyu@amazon.com>
+In-Reply-To: <20231219001833.10122-3-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 19 Dec 2023 16:17:43 +0100
+Message-ID: <CANn89iK28G4O0vfF2U7Q175XiRc1NwdWOLbSRD9jqr7G=CQ+dg@mail.gmail.com>
+Subject: Re: [PATCH RESEND v2 net-next 02/12] tcp: Rearrange tests in inet_bind2_bucket_(addr_match|match_addr_any)().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: mengkanglai <mengkanglai2@huawei.com>
-Date: Tue, 19 Dec 2023 13:44:36 +0000
-> Hello, Eric:
-> 
-> I found upstream have fixed a UAF issue (smc: Fix use-after-free in
-> tcp_write_timer_handler()):
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9744d2bf19762703704ecba885b7ac282c02eacf
-> 
-> When create a kernel socket use sock_create_kern , it won't call get_net()
-> to increase refcnt for net where the socket is located.
-> I found some other subsystem(like rds and sunrpc) also use sock_create_kern
-> to create kernel tcp socket, I want to know if they have same UAF problem?
+On Tue, Dec 19, 2023 at 1:19=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> The protocol family tests in inet_bind2_bucket_addr_match() and
+> inet_bind2_bucket_match_addr_any() are ordered as follows.
+>
+>   if (sk->sk_family !=3D tb2->family)
+>   else if (sk->sk_family =3D=3D AF_INET6)
+>   else
+>
+> This patch rearranges them so that AF_INET6 socket is handled first
+> to make the following patch tidy, where tb2->family will be removed.
+>
+>   if (sk->sk_family =3D=3D AF_INET6)
+>   else if (tb2->family =3D=3D AF_INET6)
+>   else
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-You need to check if the subsystem itself holds net refcnt (not per socket)
-and if it waits for TCP timer to be fired before destroying a socket.
-
-It seems that runrpc holds net refcnt (xprt_net) and rds holds per-socket
-net refcnt.
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
