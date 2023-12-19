@@ -1,105 +1,127 @@
-Return-Path: <netdev+bounces-58754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F2FA817FEE
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 03:45:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4D10817FFC
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 04:01:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE44C1F23347
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 02:45:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DA5B285B36
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 03:01:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A687D15AB;
-	Tue, 19 Dec 2023 02:45:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 211FC17F7;
+	Tue, 19 Dec 2023 03:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N1Q3iC4V"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="HEJG1ax6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 552BC79C2
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 02:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-5e7415df4d6so7906747b3.0
-        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 18:45:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A9A14409
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 03:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702953905; x=1703558705; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=An9zJwJNmznbaeONtJS2lyTdh1jPvxfKVpSvMYzXtu0=;
-        b=N1Q3iC4Vv1llsfYQWTtrYsYsDQSJv20BnXoy8P4KELr6ajx5StKUbSGtl7rHpXRXOV
-         k7TKd6wBo6L5r5a80Bxa/cz/OfKcB1t4+uTtYrJkJMRpvpd2sl1UdUANFH9r0Ro/aFvo
-         yCWyuB9/W8Crxwe0kEAYpXIG9r5bgfkAwICT6JLq5L6aa+R5aQaWFpn2049BoMPAHDWt
-         0uIYhHzyXr1W+QwWbGVpSh+xla36af6vFs/c7ZrEzFVA2mpi3B66DMl7QxC00tE1op8m
-         92mgMsT/wKOsxLLuqTlRZwpXQdmg19UPqR2VkkZHGFQp+Vnzz3GRQagPb/4fj9ccQFHG
-         0p3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702953905; x=1703558705;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=An9zJwJNmznbaeONtJS2lyTdh1jPvxfKVpSvMYzXtu0=;
-        b=hG9yrKkoi4DxJLQAAVUmf/7wopoOSBprc0z5DPd9H+M1xk6suZkvxB5+00z0W/6MYT
-         rafXlz+BIrulwQ9n5onTAbFUIyUl2d0rvXrxosC83yzPMRTcXlpb3O1SWfZtK1wf0lk1
-         IpwctOoeGroEih2n82/j3L0o9BLy31x0WZ8lA1uNM8lmqrRU4qiyLoOahl4cDUHbkw+Z
-         EpdGyb9ZIbG7cKBuqxfowzDTaLjZnOIJ7n4vViz8AsTnn2NnpMTOuwldVm+ldCJRCYml
-         xO1xDvyhFK+Hkk01Tv6tGiahP7Osmk6gXAX48qyYwd67oMKTwIbwg+xUEX17pjBx9jiD
-         AVvA==
-X-Gm-Message-State: AOJu0Yxb8NNGE0zsjYQAIsTEA+nYSdXL0Hm4AJpzJ3p8OlK8kP3tMUtO
-	6O8FK8zIbdC9St0e+WvAK8I=
-X-Google-Smtp-Source: AGHT+IE9dpt1Y3YR0So4iR0pkWFKEzbZJGzOgxkWME3o90uSIocpx4pVShrrMWjiIwVs/n1pWXZ8XA==
-X-Received: by 2002:a81:5b57:0:b0:5d7:1a33:5ad7 with SMTP id p84-20020a815b57000000b005d71a335ad7mr215146ywb.36.1702953905205;
-        Mon, 18 Dec 2023 18:45:05 -0800 (PST)
-Received: from ?IPV6:2600:1700:6cf8:1240:e84:899c:4b9b:a70e? ([2600:1700:6cf8:1240:e84:899c:4b9b:a70e])
-        by smtp.gmail.com with ESMTPSA id gw6-20020a05690c460600b005e492ea4709sm3311880ywb.46.2023.12.18.18.45.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Dec 2023 18:45:04 -0800 (PST)
-Message-ID: <9e8f86e1-8663-4bbb-baa9-fe0030dbbabd@gmail.com>
-Date: Mon, 18 Dec 2023 18:45:03 -0800
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1702954896; x=1734490896;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=14W//wmOfpa9X1272SHPM41oBmIzDtWGq68CY54eORU=;
+  b=HEJG1ax6xJFlq2QJSE9WAXw+wlYxcKgXS3Pk2kbOIL4FCAslPGGs9HJj
+   BK9HrfgFy/s43kl+8x2DBQe9LGr8qzdiXjLUJ71UuZPMXn1Bjhf+UM8jz
+   H7gAoH19UbKc+nLFnGoADJbcWSz4jOcaTDPMZS4318+YpPaSa3qBj8i6B
+   M=;
+X-IronPort-AV: E=Sophos;i="6.04,287,1695686400"; 
+   d="scan'208";a="377262548"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-0aba4706.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 03:01:34 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
+	by email-inbound-relay-iad-1e-m6i4x-0aba4706.us-east-1.amazon.com (Postfix) with ESMTPS id 58D46A63C0;
+	Tue, 19 Dec 2023 03:01:31 +0000 (UTC)
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:53851]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.33.64:2525] with esmtp (Farcaster)
+ id 92eda60e-68d9-42c6-be80-ceacdc595633; Tue, 19 Dec 2023 03:01:30 +0000 (UTC)
+X-Farcaster-Flow-ID: 92eda60e-68d9-42c6-be80-ceacdc595633
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Tue, 19 Dec 2023 03:01:30 +0000
+Received: from 88665a182662.ant.amazon.com (10.118.248.48) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
+ Tue, 19 Dec 2023 03:01:27 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Ivan Babrou <ivan@cloudflare.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v4 net-next 0/4] af_unix: Random improvements for GC.
+Date: Tue, 19 Dec 2023 12:00:58 +0900
+Message-ID: <20231219030102.27509-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/ipv6: Revert remove expired routes with a
- separated list of routes
-Content-Language: en-US
-To: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
-Cc: edumazet@google.com, Kui-Feng Lee <thinker.li@gmail.com>
-References: <20231217185505.22867-1-dsahern@kernel.org>
- <a289e845-f244-48a4-ba75-34ce027c0de4@gmail.com>
- <c3ae9c3a-9ecd-4b22-a908-9da587c1c88b@kernel.org>
-From: Kui-Feng Lee <sinquersw@gmail.com>
-In-Reply-To: <c3ae9c3a-9ecd-4b22-a908-9da587c1c88b@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D035UWB004.ant.amazon.com (10.13.138.104) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+
+If more than 16000 inflight AF_UNIX sockets exist on a host, each
+sendmsg() will be forced to wait for unix_gc() even if a process
+is not sending any FD.
+
+This series tries not to impose such a penalty on sane users who
+do not send AF_UNIX FDs or do not have inflight sockets more than
+SCM_MAX_FD * 8.
+
+Cleanup patches for commit 69db702c8387 ("io_uring/af_unix: disable
+sending io_uring over sockets") will be posted later as noted in [0].
+
+[0]: https://lore.kernel.org/netdev/c716c88321939156909cfa1bd8b0faaf1c804103.1701868795.git.asml.silence@gmail.com/
 
 
+Changes:
+  v4:
+    * Rebase on the latest
 
-On 12/18/23 18:38, David Ahern wrote:
-> On 12/18/23 6:14 PM, Kui-Feng Lee wrote:
->>
->>
->> On 12/17/23 10:55, David Ahern wrote:
->>> Revert the remainder of 5a08d0065a915 which added a warn on if a fib
->>> entry is still on the gc_link list, and then revert  all of the commit
->>> in the Fixes tag. The commit has some race conditions given how expires
->>> is managed on a fib6_info in relation to timer start, adding the entry
->>> to the gc list and setting the timer value leading to UAF. Revert
->>> the commit and try again in a later release.
->>
->> May I know what your concerns are about the patch I provided?
->> Even I try it again later, I still need to know what I miss and should
->> address.
-> 
-> This is a judgement call based on 6.7-rc number and upcoming holidays
-> with people offline. A bug fix is needed for a performance optimization;
-> the smart response here is to revert the patch and try again after the
-> holidays.
-Got it! Thanks!
+  v3: https://lore.kernel.org/netdev/20231218075020.60826-1-kuniyu@amazon.com/
+    * Patch 3
+      * Reuse gc_in_progress flag.
+      * Call flush_work() only when gc is queued or in progress.
+    * Patch 4
+      * Bump UNIX_INFLIGHT_SANE_USER to (SCM_MAX_FD * 8).
+
+  v2: https://lore.kernel.org/netdev/20231123014747.66063-1-kuniyu@amazon.com/
+    * Patch 4
+      * Fix build error when CONFIG_UNIX=n
+
+  v1: https://lore.kernel.org/netdev/20231122013629.28554-1-kuniyu@amazon.com/
+
+
+Kuniyuki Iwashima (4):
+  af_unix: Do not use atomic ops for unix_sk(sk)->inflight.
+  af_unix: Return struct unix_sock from unix_get_socket().
+  af_unix: Run GC on only one CPU.
+  af_unix: Try to run GC async.
+
+ include/linux/io_uring.h |  4 +-
+ include/net/af_unix.h    |  6 +--
+ include/net/scm.h        |  1 +
+ io_uring/io_uring.c      |  5 ++-
+ net/core/scm.c           |  5 +++
+ net/unix/af_unix.c       | 10 +++--
+ net/unix/garbage.c       | 83 +++++++++++++++++++++-------------------
+ net/unix/scm.c           | 34 ++++++++--------
+ 8 files changed, 79 insertions(+), 69 deletions(-)
+
+-- 
+2.30.2
+
 
