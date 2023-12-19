@@ -1,91 +1,181 @@
-Return-Path: <netdev+bounces-58913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55AB58189C7
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:26:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A52068189CB
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:26:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04B97281C82
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 14:26:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5AA741F27374
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 14:26:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4889E1BDCE;
-	Tue, 19 Dec 2023 14:26:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="aIWyliap";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="nQvuLWV0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191691B29A;
+	Tue, 19 Dec 2023 14:26:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCED71D525
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 14:26:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1702995965;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7T+BVsISZ4M4K107mOguc7pWHjx5PSIHJSlTULmNLWI=;
-	b=aIWyliapHoaRQBo0pQnSNU5xcdSrOQL4IezqOiISRVFLcb52AuSsXxTBxmXY/1SZ5GuV06
-	UOo8OGcTWRjASfIuWj512S28KAAAUkeknrSIRwTQJwRiON0LGZxjDU8V3/V39Wz9YcCm8F
-	bJHOuNEpI24b7+DthZAttPTe1t6hMESTBk2vdu6kCRcrn0wQMEwGobDE9sQZSJiQQA/jHH
-	em5E33m8lJmzVrWwSq1KR1ayMvtUmdaBS8EPYtrs6/EkToSa1Q2RNINS2f8Etq2UazihTn
-	KJWqrFO7StiMVDx/DWcfdROLtH2Ix7Q03Wblw9JDT8AbU14qlpexJVpCyMpSEA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1702995965;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7T+BVsISZ4M4K107mOguc7pWHjx5PSIHJSlTULmNLWI=;
-	b=nQvuLWV04nLYxVFnZQ69kgSHL4M9M9msDAJJbUlSUuhYFnfPNskCyqV1b3zVPsa4FWkMW2
-	MyDGThVm9Xg+QTBA==
-To: Martin Zaharinov <micron10@gmail.com>
-Cc: peterz@infradead.org, netdev <netdev@vger.kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, patchwork-bot+netdevbpf@kernel.org, Jakub Kicinski
- <kuba@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>,
- kuba+netdrv@kernel.org, dsahern@gmail.com, Eric Dumazet
- <edumazet@google.com>
-Subject: Re: Urgent Bug Report Kernel crash 6.5.2
-In-Reply-To: <6D816814-1334-4F22-AFF8-B5E42254038E@gmail.com>
-References: <64CCB695-BA43-48F5-912A-AFD5B9C103A7@gmail.com>
- <CANn89iL9Twf+Rzm9v_dwsH_iG4YkW3fAc2Hnx2jypN_Qf9oojw@mail.gmail.com>
- <D773F198-BCE3-4D43-9C27-2C2CA34062AC@gmail.com>
- <8E92BAA8-0FC6-4D29-BB4D-B6B60047A1D2@gmail.com>
- <5E63894D-913B-416C-B901-F628BB6C00E0@gmail.com> <87lea4qqun.ffs@tglx>
- <2B5C19AE-C125-45A3-8C6F-CA6BBC01A6D9@gmail.com> <87r0jrp9qi.ffs@tglx>
- <6D816814-1334-4F22-AFF8-B5E42254038E@gmail.com>
-Date: Tue, 19 Dec 2023 15:26:04 +0100
-Message-ID: <87v88ul14z.ffs@tglx>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C4411B27B;
+	Tue, 19 Dec 2023 14:26:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R741e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=22;SR=0;TI=SMTPD_---0Vyr6180_1702995977;
+Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0Vyr6180_1702995977)
+          by smtp.aliyun-inc.com;
+          Tue, 19 Dec 2023 22:26:22 +0800
+From: Wen Gu <guwen@linux.alibaba.com>
+To: wintera@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	hca@linux.ibm.com,
+	gor@linux.ibm.com,
+	agordeev@linux.ibm.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kgraul@linux.ibm.com,
+	jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com,
+	svens@linux.ibm.com,
+	alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com,
+	raspl@linux.ibm.com,
+	schnelle@linux.ibm.com,
+	guangguan.wang@linux.alibaba.com,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v8 00/10] net/smc: implement SMCv2.1 virtual ISM device support
+Date: Tue, 19 Dec 2023 22:26:06 +0800
+Message-ID: <20231219142616.80697-1-guwen@linux.alibaba.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 19 2023 at 11:25, Martin Zaharinov wrote:
->> On 12 Dec 2023, at 20:16, Thomas Gleixner <tglx@linutronix.de> wrote:
->> Btw, how easy is this to reproduce?
->
-> Its not easy this report is generate on machine with 5-6k users , with
-> traffic and one time is show on 1 day , other show after 4-5 days=E2=80=A6
+The fourth edition of SMCv2 adds the SMC version 2.1 feature updates for
+SMC-Dv2 with virtual ISM. Virtual ISM are created and supported mainly by
+OS or hypervisor software, comparable to IBM ISM which is based on platform
+firmware or hardware.
 
-I love those bugs ...
+With the introduction of virtual ISM, SMCv2.1 makes some updates:
 
-> Apply this patch and will upload image on one machine as fast as
-> possible and when get any reports will send you.
+- Introduce feature bitmask to indicate supplemental features.
+- Reserve a range of CHIDs for virtual ISM.
+- Support extended GIDs (128 bits) in CLC handshake.
 
-Let's see how that goes!
+So this patch set aims to implement these updates in Linux kernel. And it
+acts as the first part of SMC-D virtual ISM extension & loopback-ism [1].
 
-Thanks,
+[1] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
 
-        tglx
+v8->v7:
+- Patch #7: v7 mistakenly changed the type of gid_ext in
+  smc_clc_msg_accept_confirm to u64 instead of __be64 as previous versions
+  when fixing the rebase conflicts. So fix this mistake.
+
+v7->v6:
+Link: https://lore.kernel.org/netdev/20231219084536.8158-1-guwen@linux.alibaba.com/
+- Collect the Reviewed-by tag in v6;
+- Patch #3: redefine the struct smc_clc_msg_accept_confirm;
+- Patch #7: Because that the Patch #3 already adds '__packed' to
+  smc_clc_msg_accept_confirm, so Patch #7 doesn't need to do the same thing.
+  But this is a minor change, so I kept the 'Reviewed-by' tag.
+
+Other changes in previous versions but not yet acked:
+- Patch #1: Some minor changes in subject and fix the format issue
+  (length exceeds 80 columns) compared to v3.
+- Patch #5: removes useless ini->feature_mask assignment in __smc_connect()
+  and smc_listen_v2_check() compared to v4.
+- Patch #8: new added, compared to v3.
+
+v6->v5:
+Link: https://lore.kernel.org/netdev/1702371151-125258-1-git-send-email-guwen@linux.alibaba.com/
+- Add 'Reviewed-by' label given in the previous versions:
+  * Patch #4, #6, #9, #10 have nothing changed since v3;
+- Patch #2:
+  * fix the format issue (Alignment should match open parenthesis) compared to v5;
+  * remove useless clc->hdr.length assignment in smcr_clc_prep_confirm_accept()
+    compared to v5;
+- Patch #3: new added compared to v5.
+- Patch #7: some minor changes like aclc_v2->aclc or clc_v2->clc compared to v5
+  due to the introduction of Patch #3. Since there were no major changes, I kept
+  the 'Reviewed-by' label.
+
+Other changes in previous versions but not yet acked:
+- Patch #1: Some minor changes in subject and fix the format issue
+  (length exceeds 80 columns) compared to v3.
+- Patch #5: removes useless ini->feature_mask assignment in __smc_connect()
+  and smc_listen_v2_check() compared to v4.
+- Patch #8: new added, compared to v3.
+
+v5->v4:
+Link: https://lore.kernel.org/netdev/1702021259-41504-1-git-send-email-guwen@linux.alibaba.com/
+- Patch #6: improve the comment of SMCD_CLC_MAX_V2_GID_ENTRIES;
+- Patch #4: remove useless ini->feature_mask assignment;
+
+v4->v3:
+https://lore.kernel.org/netdev/1701920994-73705-1-git-send-email-guwen@linux.alibaba.com/
+- Patch #6: use SMCD_CLC_MAX_V2_GID_ENTRIES to indicate the max gid
+  entries in CLC proposal and using SMC_MAX_V2_ISM_DEVS to indicate the
+  max devices to propose;
+- Patch #6: use i and i+1 in smc_find_ism_v2_device_serv();
+- Patch #2: replace the large if-else block in smc_clc_send_confirm_accept()
+  with 2 subfunctions;
+- Fix missing byte order conversion of GID and token in CLC handshake,
+  which is in a separate patch sending to net:
+  https://lore.kernel.org/netdev/1701882157-87956-1-git-send-email-guwen@linux.alibaba.com/
+- Patch #7: add extended GID in SMC-D lgr netlink attribute;
+
+v3->v2:
+https://lore.kernel.org/netdev/1701343695-122657-1-git-send-email-guwen@linux.alibaba.com/
+- Rename smc_clc_fill_fce as smc_clc_fill_fce_v2x;
+- Remove ISM_IDENT_MASK from drivers/s390/net/ism.h;
+- Add explicitly assigning 'false' to ism_v2_capable in ism_dev_init();
+- Remove smc_ism_set_v2_capable() helper for now, and introduce it in
+  later loopback-ism implementation;
+
+v2->v1:
+- Fix sparse complaint;
+- Rebase to the latest net-next;
+
+Wen Gu (10):
+  net/smc: rename some 'fce' to 'fce_v2x' for clarity
+  net/smc: introduce sub-functions for smc_clc_send_confirm_accept()
+  net/smc: unify the structs of accept or confirm message for v1 and v2
+  net/smc: support SMCv2.x supplemental features negotiation
+  net/smc: introduce virtual ISM device support feature
+  net/smc: define a reserved CHID range for virtual ISM devices
+  net/smc: compatible with 128-bits extended GID of virtual ISM device
+  net/smc: support extended GID in SMC-D lgr netlink attribute
+  net/smc: disable SEID on non-s390 archs where virtual ISM may be used
+  net/smc: manage system EID in SMC stack instead of ISM driver
+
+ drivers/s390/net/ism.h        |   7 -
+ drivers/s390/net/ism_drv.c    |  57 ++----
+ include/linux/ism.h           |   1 -
+ include/net/smc.h             |  16 +-
+ include/uapi/linux/smc.h      |   2 +
+ include/uapi/linux/smc_diag.h |   2 +
+ net/smc/af_smc.c              | 118 ++++++++-----
+ net/smc/smc.h                 |  10 +-
+ net/smc/smc_clc.c             | 318 +++++++++++++++++++++-------------
+ net/smc/smc_clc.h             |  64 +++----
+ net/smc/smc_core.c            |  37 ++--
+ net/smc/smc_core.h            |  18 +-
+ net/smc/smc_diag.c            |   9 +-
+ net/smc/smc_ism.c             |  50 ++++--
+ net/smc/smc_ism.h             |  30 +++-
+ net/smc/smc_pnet.c            |   4 +-
+ 16 files changed, 448 insertions(+), 295 deletions(-)
+
+-- 
+2.43.0
+
 
