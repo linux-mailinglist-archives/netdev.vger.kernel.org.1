@@ -1,245 +1,111 @@
-Return-Path: <netdev+bounces-59021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 543E7818FD0
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 19:31:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5ACE1818FD9
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 19:36:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0ACDC28885C
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 18:31:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10CE92870C8
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 18:36:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83891DDDB;
-	Tue, 19 Dec 2023 18:31:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 497EC1DDDF;
+	Tue, 19 Dec 2023 18:36:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d75r+G0a"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VCFFYINl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F9A637D29;
-	Tue, 19 Dec 2023 18:31:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-553ba2f0c8fso109746a12.1;
-        Tue, 19 Dec 2023 10:31:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703010691; x=1703615491; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4QGugHCK361sNlNDEPjXLzwYghYGU1Ph2hMHhF29FS4=;
-        b=d75r+G0aLeuGu4aXRRpltmwiKj8UZkIT8cwF9GK6tGYhkqESVJzttleTHDuS/gEbgN
-         wmvIi+woP4lJ7+koPOqVLLdjHCuo4drNUs413X64oU1rV0dfiVTjYHulONVF1X6noOR0
-         AhiV9MnjNCVMbgAazW9Mv50fMDcEnEdnwGfBIoL1/kZdjoQAp9bu33hvsJ3hVhqXtNZq
-         QTrZwngNpPZ1rcDo31LXk02Gj2cwQOTzZiyRtPUDeWWthZuIM0aj8Bb8uGAzpxXW569T
-         6aGbFliudQUQK3h+kN3pjiG488rIgZXWJUjEyDhShrDT8+4IXdbH6F7Q2DXZunktZV5U
-         HqGQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E0A638FB3
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 18:36:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703010991;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=v47UTmHzAdl2Nt8HKA6jp1il3Lpc0GyKxIVnJREGniE=;
+	b=VCFFYINlSC8B9VqE5Pvedsb4Z376BYQtkxncEGEiuMJU7RAOC7cCLhOCQgkwFFSE6SXuO2
+	mxQuxdvRucg3viWk0jIwSL+3EqFdRYV3f/mSwhERGCWgbcRERpZ0yMRjSGxejCApNGBDeS
+	dr7G3IN2nqAFfoJNGkVyJbk932oA4II=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-609-S0KfxSKQPt-q_IvgayRTwQ-1; Tue, 19 Dec 2023 13:36:29 -0500
+X-MC-Unique: S0KfxSKQPt-q_IvgayRTwQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3366dcb20e0so1091126f8f.2
+        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 10:36:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703010691; x=1703615491;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4QGugHCK361sNlNDEPjXLzwYghYGU1Ph2hMHhF29FS4=;
-        b=BVXgYak4qK0Ro8FTY344cRQIcaTq7ge3Pn5rOdcWAB9e/AECkajGCOcjK3p4/n4bPP
-         2Dxef5rqf3YtDfBPQdsqz0m2dn9NI8XGO6yvVJe8buqM1WmJTJOYNOi3KqQPadzkN4lH
-         9LeQroSiS0oHhpOhkFOb5urvpk4kmfpt4cPVO2zI2Fb5YvqT/L8KDwgtXTDCq5EsOd5j
-         oIjYUwrC8bHWig67Qb4YUHu20/ki4An1VXcrioetD2im0lHJpJnVmeN6+7meHb4Pj9VA
-         nYOQOWZAgyWufYIHkDuZZJoTQ4mnVpO0JXZU/l0lcvReryhSzSSyThmOqy7VAJFMaGoq
-         uDEQ==
-X-Gm-Message-State: AOJu0YwWhOTvDFdpZehLOmsH32piXU08fMnwk8jFqb+p0Z1TU7z0vmhg
-	xL1nqU7xrHISPc5E0GKYLj/KvtbzOamu4PU482M=
-X-Google-Smtp-Source: AGHT+IE6wOUr1ZpMez2HtH2cj4yCTgZHbSPpmpNdet17jScwIGemQl/0sWDxSsogHmd2oyc7W+Fv24zBAtpVmJAJ4ZU=
-X-Received: by 2002:a17:906:109a:b0:a26:8dc7:a5b0 with SMTP id
- u26-20020a170906109a00b00a268dc7a5b0mr14747eju.257.1703010690937; Tue, 19 Dec
- 2023 10:31:30 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703010988; x=1703615788;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v47UTmHzAdl2Nt8HKA6jp1il3Lpc0GyKxIVnJREGniE=;
+        b=GOOyA4sr7l/UCxN4atbNy9j/BASKIZuPLlG+ljv3UXaycpgnkqZ246t/kT+hqsj+BZ
+         PgjO/UDhKc5PSxqJxIWTzKKhslA8NVavK8ajkySHjABFciFFvKUIltHQW9IeHKT8+TOL
+         gM0uIMaFU96drGF1iyRW9JCNOB/iEWCDqQkLmI4PnsvHKxabfwaGW+gvAc+PLzoKWtUS
+         nMCI2ocWS1LSfh2vsYraDRsgw9o8wz0ZsTZ0oDprZjLozDmI3VLvzlWH9madfCSIerDq
+         xHgBssra4xVXBJoAzwJjoSVUgH84LaaRGy4f9/t6PzBhNhcS/wqt6RylEyui4EYC9Z5j
+         qRLg==
+X-Gm-Message-State: AOJu0Yzxn5afN1NL8c2CRABhoVbZw00aPSTMuUd9DNoXUaoB2d+69vjv
+	szqh2we+ElCJ9vOXesYmFPR1FFZw5TeYLaqDR2ZAMvuaOVLzBaJbYdm3OuZ1+n2QpCsO9b5xeXE
+	mdHqPiYv6svGJTK+K
+X-Received: by 2002:adf:fc43:0:b0:336:73ea:b831 with SMTP id e3-20020adffc43000000b0033673eab831mr846383wrs.50.1703010988639;
+        Tue, 19 Dec 2023 10:36:28 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF7ZDUfdCp8TeJng+VjBTvRf6OjZ70v7Qzcn/FZ5sz+Lbr05EsgZlGNV4j59UjFadCCiaJivQ==
+X-Received: by 2002:adf:fc43:0:b0:336:73ea:b831 with SMTP id e3-20020adffc43000000b0033673eab831mr846375wrs.50.1703010988261;
+        Tue, 19 Dec 2023 10:36:28 -0800 (PST)
+Received: from redhat.com ([2.52.148.230])
+        by smtp.gmail.com with ESMTPSA id p16-20020a5d48d0000000b0033616ea5a0fsm26973853wrs.45.2023.12.19.10.36.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Dec 2023 10:36:26 -0800 (PST)
+Date: Tue, 19 Dec 2023 13:36:22 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Cc: Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Willem de Bruijn <willemb@google.com>
+Subject: Re: [PATCH RFC 1/4] virtio-net: support transmit hash report
+Message-ID: <20231219133545-mutt-send-email-mst@kernel.org>
+References: <20231218-v6-7-topic-virtio-net-ptp-v1-0-cac92b2d8532@pengutronix.de>
+ <20231218-v6-7-topic-virtio-net-ptp-v1-1-cac92b2d8532@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231219000520.34178-1-alexei.starovoitov@gmail.com>
- <CAHk-=wg7JuFYwGy=GOMbRCtOL+jwSQsdUaBsRWkDVYbxipbM5A@mail.gmail.com>
- <20231219-kinofilm-legen-305bd52c15db@brauner> <CAADnVQK6CkFTGukQyCif6AK045L_6bwaaRj3kfjQjL4xKd9AhQ@mail.gmail.com>
-In-Reply-To: <CAADnVQK6CkFTGukQyCif6AK045L_6bwaaRj3kfjQjL4xKd9AhQ@mail.gmail.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Tue, 19 Dec 2023 10:31:17 -0800
-Message-ID: <CAEf4BzZvvFyRCJcWibv_n+aeusGvFQuvyfOux0-3RUT3R35Qwg@mail.gmail.com>
-Subject: Re: pull-request: bpf-next 2023-12-18
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Christian Brauner <brauner@kernel.org>, Linus Torvalds <torvalds@linuxfoundation.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Peter Zijlstra <peterz@infradead.org>, Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Kernel Team <kernel-team@fb.com>, Linux-Fsdevel <linux-fsdevel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231218-v6-7-topic-virtio-net-ptp-v1-1-cac92b2d8532@pengutronix.de>
 
-On Tue, Dec 19, 2023 at 8:43=E2=80=AFAM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Tue, Dec 19, 2023 at 2:23=E2=80=AFAM Christian Brauner <brauner@kernel=
-.org> wrote:
-> >
-> > On Mon, Dec 18, 2023 at 05:11:23PM -0800, Linus Torvalds wrote:
-> > > On Mon, 18 Dec 2023 at 16:05, Alexei Starovoitov
-> > > <alexei.starovoitov@gmail.com> wrote:
-> > > >
-> > > > 2) Introduce BPF token object, from Andrii Nakryiko.
-> > >
-> > > I assume this is why I and some other unusual recipients are cc'd,
-> > > because the networking people feel like they can't judge this and
-> > > shouldn't merge non-networking code like this.
-> > >
-> > > Honestly, I was told - and expected - that this part would come in a
-> > > branch of its own, so that it would be sanely reviewable.
-> > >
-> > > Now it's mixed in with everything else.
-> > >
-> > > This is *literally* why we have branches in git, so that people can
-> > > make more independent changes and judgements, and so that we don't
-> > > have to be in a situation where "look, here's ten different things,
-> > > pull it all or nothing".
-> > >
-> > > Many of the changes *look* like they are in branches, but they've bee=
-n
-> > > the "fake branches" that are just done as "patch series in a branch,
-> > > with the cover letter as the merge message".
-> > >
-> > > Which is great for maintaining that cover letter information and a
-> > > certain amount of historical clarity, but not helpful AT ALL for the
-> > > "independent changes" thing when it is all mixed up in history, where
-> > > independent things are mostly serialized and not actually independent
-> > > in history at all.
-> > >
-> > > So now it appears to be one big mess, and exactly that "all or
-> > > nothing" thing that isn't great, since the whole point was that the
-> > > networking people weren't comfortable with the reviewing filesystem
-> > > side.
-> > >
-> > > And honestly, the bpf side *still* seems to be absolutely conbfused
-> > > and complkete crap when it comes to file descriptors.
-> > >
-> > > I took a quick look, and I *still* see new code being introduced ther=
-e
-> > > that thinks that file descriptor zero is special, and we tols you a
-> > > *year* ago that that wasn't true, and that you need to fix this.
-> > >
-> > > I literally see complete garbage like tghis:
-> > >
-> > >         ..
-> > >         __u32 btf_token_fd;
-> > >         ...
-> > >         if (attr->btf_token_fd) {
-> > >                 token =3D bpf_token_get_from_fd(attr->btf_token_fd);
-> > >
-> > > and this is all *new* code that makes that same bogus sh*t-for-brains
-> > > mistake that was wrong the first time.
-> > >
-> > > So now I'm saying NAK. Enough is enough.  No more of this crazy "I
-> > > don't understand even the _basics_ of file descriptors, and yet I'm
-> > > introducing new random interfaces".
-> > >
-> > > I know you thought fd zero was something invalid. You were told
-> > > otherwise. Apparently you just ignored being wrong, and have decided
-> > > to double down on being wrong.
-> > >
-> > > We don't take this kind of flat-Earther crap.
-> > >
-> > > File descriptors don't start at 1. Deal with reality. Stop making the
-> > > same mistake over and over. If you ant to have a "no file descriptor"
-> > > flag, you use a signed type, and a signed value for that, because fil=
-e
-> > > descriptor zero is perfectly valid, and I don't want to hear any more
-> > > uninformed denialism.
-> > >
-> > > Stop polluting the kernel with incorrect assumptions.
-> > >
-> > > So yes, I will keep NAK'ing this until this kind of fundamental
-> > > mistake is fixed. This is not rocket science, and this is not
-> > > something that wasn't discussed before. Your ignorance has now turned
-> > > from "I didn't know" to "I didn 't care", and at that point I really
-> > > don't want to see new code any more.
-> >
-> > Alexei, Andrii, this is a massive breach of trust and flatout
-> > disrespectful. I barely reword mails and believe me I've reworded this
-> > mail many times. I'm furious.
-> >
-> > Over the last couple of months since LSFMM in May 2023 until almost las=
-t
-> > week I've given you extensive design and review for this whole approach
-> > to get this into even remotely sane shape from a VFS perspective.
+On Mon, Dec 18, 2023 at 12:37:08PM +0100, Steffen Trumtrar wrote:
+> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
+> index cc65ef0f3c3e2..698a11f8c6ab9 100644
+> --- a/include/uapi/linux/virtio_net.h
+> +++ b/include/uapi/linux/virtio_net.h
+> @@ -56,6 +56,7 @@
+>  #define VIRTIO_NET_F_MQ	22	/* Device supports Receive Flow
+>  					 * Steering */
+>  #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
+> +#define VIRTIO_NET_F_TX_HASH	  51	/* Driver sends hash report */
+>  #define VIRTIO_NET_F_VQ_NOTF_COAL 52	/* Device supports virtqueue notification coalescing */
+>  #define VIRTIO_NET_F_NOTF_COAL	53	/* Device supports notifications coalescing */
+>  #define VIRTIO_NET_F_GUEST_USO4	54	/* Guest can handle USOv4 in. */
 
-Yes, and I appreciate your reviews and feedback a lot. There was never
-an intent to clandestinely land anything bad or outlandish, so I'm
-sorry you feel this way. I've cc'ed you and fsdevel mailing list, just
-like LSM folks, on every relevant patch set, each and every patch in
-them, and incorporated all the feedback I got over the last multiple
-months.
 
-> >
-> > The VFS maintainers including Linus have explicitly NAKed this "zero is
-> > not a valid fd nonsense" and told you to stop doing that. We told you
-> > that such fundamental VFS semantics are not yours to decide.
+Please make sure to register the feature bit with virtio tc
+to avoid collisions.
 
-It's on me to have interpreted FD=3D0 as AT_CWD in my original patch set
-for BPF_OBJ_PIN/BPF_OBJ_GET ([0]). It was totally my fault not
-thinking through all the negative consequences of defaulting to
-AT_CWD, and I acknowledged that and fixed it.
+-- 
+MST
 
-It's also my bad that I kept using the "fd=3D0 means no FD was
-specified" approach which has been a consistent approach within bpf()
-syscall API without really thinking twice about this and how much it
-might irritate kernel people. I sent a fix ([1]) and going forward
-I'll remember to always add a flag for any new FD-based field in BPF
-UAPI.
-
-  [0] https://lore.kernel.org/all/20230516001348.286414-1-andrii@kernel.org=
-/
-  [1] https://patchwork.kernel.org/project/netdevbpf/patch/20231219053150.3=
-36991-1-andrii@kernel.org/
-
-> >
-> > And yet you put a patch into a series that did exactly that and then ha=
-d
-> > the unbelievable audacity to repeatedly ask me to put my ACK under this
-> > - both in person and on list.
-
-I did ask for a review and an ack as a sign that it looks good to you.
-Precisely to make sure that *everything* looks good overall from the
-POV of people outside of the BPF subsystem. I didn't ask for rubber
-stamping anything, if that's what is implied here.
-
-> >
-> > I'm glad I only gave my ACK to the two patches that I extensivly
-> > reviewed and never to the whole series.
->
-> fwiw to three patches:
-> https://lore.kernel.org/bpf/20231208-besessen-vibrieren-4e963e3ca3ba@brau=
-ner/
-> which are all the main bits of it.
->
-> The patch 4 that does:
-> if (attr->map_token_fd)
-> wasn't sneaked in in any way.
-> You were cc-ed on it just like linux-fsdevel@vger
-> during all 12 revisions of the token series over many months.
->
-> So this accusation of breach of trust is baseless.
->
-> Indeed we didn't internalize that you guys hate fd=3D0 so much.
-> In the past you made it clear fd=3D0 shouldn't be an alias to AT_FDCWD.
-
-Right, and AT_FDCWD interpretation for fd=3D0 had security implications
-which was a clear and a bad bug.
-
-> We got that part. Meaning of fd=3D0 here wasn't a special new thing.
-> We made this mistake in the past and assumed it's ok-ish to continue
-> in similar situations.
-> As I said. Point taken. We'll use flag+fd approach as Linus suggested.
-
-Yes, I second the above.
 
