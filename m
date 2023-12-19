@@ -1,114 +1,96 @@
-Return-Path: <netdev+bounces-58952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E19E818AD1
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:08:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8265F818AD9
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:09:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D2411C23549
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:08:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30509283111
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:09:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C7841CA92;
-	Tue, 19 Dec 2023 15:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A44FB1C29F;
+	Tue, 19 Dec 2023 15:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="mWqQFs03"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="VrOFsnWz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C681CA81;
-	Tue, 19 Dec 2023 15:07:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03D26C433CB;
-	Tue, 19 Dec 2023 15:07:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1702998476;
-	bh=76IMDa35Ejr4DS8JJBlGFBxWrx3Os8GLF+gs9kZW9II=;
-	h=From:To:Cc:Subject:Date:From;
-	b=mWqQFs03BZuMAl/JfgCocD6vFVETom5/non6pqxKgM1JS/XadCHFlz5/Qb8WHNc5j
-	 L8QuaMjlk9oz5so+qnZNtaMITMWoBwpAPNzfHMMdAGYrneIp3gptGhqJXPbOx+jb93
-	 lIkdL8V6cqaRYqe1pSVGivwPoFpFrqlvYj6VgCP8=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: wintera@linux.ibm.com,
-	wenjia@linux.ibm.com
-Cc: linux-kernel@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH] icuv: make iucv_bus const
-Date: Tue, 19 Dec 2023 16:07:51 +0100
-Message-ID: <2023121950-prankster-stomp-a1aa@gregkh>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329AA1C697;
+	Tue, 19 Dec 2023 15:09:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1702998566; x=1734534566;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=gqCZICqTsn1ZAWtUxDZg9+U6l8m0uHS+deZJRdybB1c=;
+  b=VrOFsnWzzd2qIQDqo+bjVTp38kVXrVFsChV/WwykHK+s5g9Z138wM3H3
+   mAIGFne+vX5LYvHaTM2eFekbLia6a1WdhFRxrOBKbvIRrReQ5hnBrl94D
+   28meiocyDvUoCBv3VO7ssJc8B50uFdZIWoVMO7Q9m4HrVvxa5XXfS5n9Z
+   k=;
+X-IronPort-AV: E=Sophos;i="6.04,288,1695686400"; 
+   d="scan'208";a="260445655"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-3554bfcf.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 15:09:23 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
+	by email-inbound-relay-iad-1e-m6i4x-3554bfcf.us-east-1.amazon.com (Postfix) with ESMTPS id F327882E2E;
+	Tue, 19 Dec 2023 15:09:22 +0000 (UTC)
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:38779]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.28.164:2525] with esmtp (Farcaster)
+ id a73f32d0-54d2-499f-b599-5a7df5d71c0c; Tue, 19 Dec 2023 15:09:22 +0000 (UTC)
+X-Farcaster-Flow-ID: a73f32d0-54d2-499f-b599-5a7df5d71c0c
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Tue, 19 Dec 2023 15:09:21 +0000
+Received: from 88665a182662.ant.amazon.com (10.118.248.48) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Tue, 19 Dec 2023 15:09:17 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <mengkanglai2@huawei.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<fengtao40@huawei.com>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <yanan@huawei.com>,
+	<kuniyu@amazon.com>
+Subject: Re: [Consult]kernel tcp socket lack of refcnt for net may cause uaf problem?
+Date: Wed, 20 Dec 2023 00:09:07 +0900
+Message-ID: <20231219150907.9338-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <26f7811f5ee247c389ddd38034d8747d@huawei.com>
+References: <26f7811f5ee247c389ddd38034d8747d@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Lines: 55
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1792; i=gregkh@linuxfoundation.org; h=from:subject:message-id; bh=76IMDa35Ejr4DS8JJBlGFBxWrx3Os8GLF+gs9kZW9II=; b=owGbwMvMwCRo6H6F97bub03G02pJDKmNG4/HvBFNfNNYMSvisnXSm9asi+9m/cg+P+OQ56Jjh gpTtood74hlYRBkYpAVU2T5so3n6P6KQ4pehranYeawMoEMYeDiFICJfPzBsGDRhXQ1p/bOowui i6ec9JsaYt0tU80wT2lq6J8rhWaHXmptFXrN8IqDt2jFIgA=
-X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWA002.ant.amazon.com (10.13.139.17) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-Now that the driver core can properly handle constant struct bus_type,
-move the iucv_bus variable to be a constant structure as well, placing
-it into read-only memory which can not be modified at runtime.
+From: mengkanglai <mengkanglai2@huawei.com>
+Date: Tue, 19 Dec 2023 13:44:36 +0000
+> Hello, Eric:
+> 
+> I found upstream have fixed a UAF issue (smc: Fix use-after-free in
+> tcp_write_timer_handler()):
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9744d2bf19762703704ecba885b7ac282c02eacf
+> 
+> When create a kernel socket use sock_create_kern , it won't call get_net()
+> to increase refcnt for net where the socket is located.
+> I found some other subsystem(like rds and sunrpc) also use sock_create_kern
+> to create kernel tcp socket, I want to know if they have same UAF problem?
 
-Cc: Alexandra Winter <wintera@linux.ibm.com>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: linux-s390@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- include/net/iucv/iucv.h | 4 ++--
- net/iucv/iucv.c         | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+You need to check if the subsystem itself holds net refcnt (not per socket)
+and if it waits for TCP timer to be fired before destroying a socket.
 
-diff --git a/include/net/iucv/iucv.h b/include/net/iucv/iucv.h
-index f9e88401d7da..8b2055d64a6b 100644
---- a/include/net/iucv/iucv.h
-+++ b/include/net/iucv/iucv.h
-@@ -80,7 +80,7 @@ struct iucv_array {
- 	u32 length;
- } __attribute__ ((aligned (8)));
- 
--extern struct bus_type iucv_bus;
-+extern const struct bus_type iucv_bus;
- extern struct device *iucv_root;
- 
- /*
-@@ -489,7 +489,7 @@ struct iucv_interface {
- 	int (*path_sever)(struct iucv_path *path, u8 userdata[16]);
- 	int (*iucv_register)(struct iucv_handler *handler, int smp);
- 	void (*iucv_unregister)(struct iucv_handler *handler, int smp);
--	struct bus_type *bus;
-+	const struct bus_type *bus;
- 	struct device *root;
- };
- 
-diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
-index 0ed6e34d6edd..6334f64f04d5 100644
---- a/net/iucv/iucv.c
-+++ b/net/iucv/iucv.c
-@@ -67,7 +67,7 @@ static int iucv_bus_match(struct device *dev, struct device_driver *drv)
- 	return 0;
- }
- 
--struct bus_type iucv_bus = {
-+const struct bus_type iucv_bus = {
- 	.name = "iucv",
- 	.match = iucv_bus_match,
- };
--- 
-2.43.0
-
+It seems that runrpc holds net refcnt (xprt_net) and rds holds per-socket
+net refcnt.
 
