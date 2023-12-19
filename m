@@ -1,119 +1,186 @@
-Return-Path: <netdev+bounces-58893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EC3381884A
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 14:08:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CB97818868
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 14:13:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48F8A1F22551
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 13:08:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05C52281BD8
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 13:13:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 945A418AF3;
-	Tue, 19 Dec 2023 13:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FD8618E15;
+	Tue, 19 Dec 2023 13:13:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="J/IGMFa4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JGkg2TB2"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E690118E10;
-	Tue, 19 Dec 2023 13:07:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C78DE1C000F;
-	Tue, 19 Dec 2023 13:07:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1702991278;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E915C18EB0
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 13:13:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702991600;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/vOCGtitF2HXWOLXDqhpNdoEBncyC42eynFv1ljek8s=;
-	b=J/IGMFa4EEj/d/lEkcPk0xSpQNuPyk2FE6kqlPgm/6jdbO/ngl3pGC/pYFd7akxBt6Rl03
-	BYOB11oXgmQCP8b/zIbLG98RzZqD6r5v56IqxtnFM5iwOS2q37v4N7weF3RdGiYKdcPjRJ
-	LESkn5eU0dafsjzWts/m6HqmXaIG0t8dyvd8ynrXs/9TL0pOHh394ZN8XxUIQZOWhO7aGc
-	0Mqtli1bCPm1Tx1YCc2tdp1NNMB/zTytaqteHcmQ/4gH4ODU2UM/x6sQQ7aNJqYdwqOE6a
-	Ge79Fcd8q2q2CDcOKiBfI3xBJDTNcfcVJDUAZx8ynU5q5b1CYpWq2AGWdaE7uQ==
-Date: Tue, 19 Dec 2023 14:07:54 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Romain Gantois <romain.gantois@bootlin.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, Miquel Raynal
- <miquel.raynal@bootlin.com>, Sylvain Girard <sylvain.girard@se.com>, Pascal
- EBERHARD <pascal.eberhard@se.com>, Richard Tresidder
- <rtresidd@electromag.com.au>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org, Linus Walleij
- <linus.walleij@linaro.org>
-Subject: Re: [PATCH net 1/1] net: stmmac: Prevent DSA tags from breaking COE
-Message-ID: <20231219140754.7a7a8dbd@device-28.home>
-In-Reply-To: <20231219122034.pg2djgrosa4irubh@skbuf>
-References: <20231218162326.173127-1-romain.gantois@bootlin.com>
-	<20231218162326.173127-2-romain.gantois@bootlin.com>
-	<20231219122034.pg2djgrosa4irubh@skbuf>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	bh=km7B8rqaE4cuU/tTleclsqdvPEhf+k+mxhpbemw2EX0=;
+	b=JGkg2TB2/i9P2gTmAgeRnxMKf5yVFciPVsk8wArkVIkrVrVDFngytJGZjkTkNxe2rWkDkP
+	1xYgYBhI+4pG2zCQBWVG3cmseTaPEHe+V2cioaGmMl6jGJx45nlmungQEJ/jt5abx0aeyt
+	nJS1a+s/Ojyt9Qqurkh678i1DNVxfeU=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-99-b1x_Oa73N4ulJ6HPSkeD1A-1; Tue, 19 Dec 2023 08:13:19 -0500
+X-MC-Unique: b1x_Oa73N4ulJ6HPSkeD1A-1
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-55376255452so163602a12.0
+        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 05:13:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702991598; x=1703596398;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=km7B8rqaE4cuU/tTleclsqdvPEhf+k+mxhpbemw2EX0=;
+        b=ReOqv5C4cXtyUo7v1guNFHm7AsFT9+tWvNQKLY3yckpLkscFA33gIhkhaDkKlGsqSh
+         bcMV5DyhYToDL8e/fHvzw05S8LppryJmzSK1CcZXWzhM9e01ojlMShWBWOZSiaPdFMIt
+         siCs1awSHhPILKNzkdG3pRp7L1ZR8gP1iM2VSQMuIHhfnb+HMFJiBLFUYL6kdd5K8hTK
+         123krAcoNjLJ5DPOS8+JQmn4aJ2B4Wodd6NKmkhSIyVj4IHZgGk57IzeC/GA/Y0cvgEy
+         Ib2L+C3UwObrZQ7ur/rbpMRuT2bubG6B7UHMalw1phwk0NZecWE2u28kOfpqZ/up1jXU
+         8qiA==
+X-Gm-Message-State: AOJu0YyBZ1YPBrPau/Fom1DetILewk60sUCK9KU1NojXf46RhVaM6mfi
+	Z6Xztr/upFuJLZPAUBgKMkIiecbSaYd2NVpEf6tHiyW5Ba/G9j50yDjRzrp6D2KrQhAf602i6lQ
+	F/X6LTTWbCFrsIkYt
+X-Received: by 2002:a50:bb06:0:b0:553:46ed:3133 with SMTP id y6-20020a50bb06000000b0055346ed3133mr4788663ede.1.1702991598496;
+        Tue, 19 Dec 2023 05:13:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFX7NdkRkDyz3rtbTezhATyr8w4xOSNOVYLoMis2BKCtC036UmtsA1NZo8sFvhhWAFmr++Kig==
+X-Received: by 2002:a50:bb06:0:b0:553:46ed:3133 with SMTP id y6-20020a50bb06000000b0055346ed3133mr4788654ede.1.1702991598147;
+        Tue, 19 Dec 2023 05:13:18 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-246-245.dyn.eolo.it. [146.241.246.245])
+        by smtp.gmail.com with ESMTPSA id b8-20020aa7df88000000b00553686b8749sm1645162edy.39.2023.12.19.05.13.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Dec 2023 05:13:17 -0800 (PST)
+Message-ID: <e1e15554bfa5cfc8048d6074eedbc83c4d912c98.camel@redhat.com>
+Subject: Re: [PATCH] net: Do not break out of sk_stream_wait_memory() with
+ TIF_NOTIFY_SIGNAL
+From: Paolo Abeni <pabeni@redhat.com>
+To: Steffen Trumtrar <s.trumtrar@pengutronix.de>, Marc Kleine-Budde
+	 <mkl@pengutronix.de>
+Cc: Sascha Hauer <s.hauer@pengutronix.de>, Jens Axboe <axboe@kernel.dk>, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ kernel@pengutronix.de
+Date: Tue, 19 Dec 2023 14:13:16 +0100
+In-Reply-To: <87cyv2wj4e.fsf@pengutronix.de>
+References: <20231023121346.4098160-1-s.hauer@pengutronix.de>
+	 <addf492843338e853f7fda683ce35050f26c9da0.camel@redhat.com>
+	 <20231026070310.GY3359458@pengutronix.de>
+	 <8404022493c5ceda74807a3407e5a087425678e2.camel@redhat.com>
+	 <20231027120432.GB3359458@pengutronix.de>
+	 <20231117-starter-unvisited-d10f0314ae76-mkl@pengutronix.de>
+	 <87cyv2wj4e.fsf@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hi Vlad,
+On Tue, 2023-12-19 at 12:00 +0100, Steffen Trumtrar wrote:
+> On 2023-11-17 at 11:43 +01, Marc Kleine-Budde <mkl@pengutronix.de> wrote:
+>=20
+> > [[PGP Signed Part:Undecided]]
+> > On 27.10.2023 14:04:32, Sascha Hauer wrote:
+> > > On Thu, Oct 26, 2023 at 10:49:18AM +0200, Paolo Abeni wrote:
+> > > > On Thu, 2023-10-26 at 09:03 +0200, Sascha Hauer wrote:
+> > > > > On Tue, Oct 24, 2023 at 03:56:17PM +0200, Paolo Abeni wrote:
+> > > > > > On Mon, 2023-10-23 at 14:13 +0200, Sascha Hauer wrote:
+> > > > > > > It can happen that a socket sends the remaining data at close=
+() time.
+> > > > > > > With io_uring and KTLS it can happen that sk_stream_wait_memo=
+ry() bails
+> > > > > > > out with -512 (-ERESTARTSYS) because TIF_NOTIFY_SIGNAL is set=
+ for the
+> > > > > > > current task. This flag has been set in io_req_normal_work_ad=
+d() by
+> > > > > > > calling task_work_add().
+> > > > > > >=20
+> > > > > > > It seems signal_pending() is too broad, so this patch replace=
+s it with
+> > > > > > > task_sigpending(), thus ignoring the TIF_NOTIFY_SIGNAL flag.
+> > > > > >=20
+> > > > > > This looks dangerous, at best. Other possible legit users setti=
+ng
+> > > > > > TIF_NOTIFY_SIGNAL will be broken.
+> > > > > >=20
+> > > > > > Can't you instead clear TIF_NOTIFY_SIGNAL in io_run_task_work()=
+ ?
+> > > > >=20
+> > > > > I don't have an idea how io_run_task_work() comes into play here,=
+ but it
+> > > > > seems it already clears TIF_NOTIFY_SIGNAL:
+> > > > >=20
+> > > > > static inline int io_run_task_work(void)
+> > > > > {
+> > > > >         /*
+> > > > >          * Always check-and-clear the task_work notification sign=
+al. With how
+> > > > >          * signaling works for task_work, we can find it set with=
+ nothing to
+> > > > >          * run. We need to clear it for that case, like get_signa=
+l() does.
+> > > > >          */
+> > > > >         if (test_thread_flag(TIF_NOTIFY_SIGNAL))
+> > > > >                 clear_notify_signal();
+> > > > > 	...
+> > > > > }
+> > > >=20
+> > > > I see, io_run_task_work() is too late, sk_stream_wait_memory() is
+> > > > already woken up.
+> > > >=20
+> > > > I still think this patch is unsafe. What about explicitly handling =
+the
+> > > > restart in tls_sw_release_resources_tx() ? The main point is that s=
+uch
+> > > > function is called by inet_release() and the latter can't be re-
+> > > > started.
+> > >=20
+> > > I don't think there's anything I can do in tls_sw_release_resources_t=
+x().
+> > > When entering this function TIF_NOTIFY_SIGNAL is not (yet) set. It ge=
+ts
+> > > set at some point while tls_sw_release_resources_tx() is running. I f=
+ind
+> > > it set when tls_tx_records() returns with -ERESTARTSYS. I tried clear=
+ing
+> > > TIF_NOTIFY_SIGNAL then and called tls_tx_records() again, but that do=
+esn't
+> > > work.
+> >=20
+> > Seems the discussion got stuck, what are the blocking points?
+>=20
+> Ping!
+>=20
+> Any pointers on how to get this sorted out?
 
-+ Linus Walleij
+I raised the point if this patch could be dangerous outside of the
+specific scenario and I did not get any reply to that.
 
-On Tue, 19 Dec 2023 14:20:34 +0200
-Vladimir Oltean <olteanv@gmail.com> wrote:
+To be more explicit: why this will not cause user-space driven
+connect() from missing relevant events? Why this is needed only here
+and not in all the many others event loops waiting for signals? Why
+can't the issue be addressed in any place more closely tied to the
+scenario, e.g. io_uring or ktls?
 
-> Hi Romain,
-> 
-> On Mon, Dec 18, 2023 at 05:23:23PM +0100, Romain Gantois wrote:
-> > Some stmmac cores have Checksum Offload Engines that cannot handle DSA tags
-> > properly. These cores find the IP/TCP headers on their own and end up
-> > computing an incorrect checksum when a DSA tag is inserted between the MAC
-> > header and IP header.
-> > 
-> > Add an additional check on stmmac link up so that COE is deactivated
-> > when the stmmac device is used as a DSA conduit.
-> > 
-> > Add a new dma_feature flag to allow cores to signal that their COEs can't
-> > handle DSA tags on TX.
-> > 
-> > Fixes: 6b2c6e4a938f ("net: stmmac: propagate feature flags to vlan")
-> > Cc: stable@vger.kernel.org
-> > Reported-by: Richard Tresidder <rtresidd@electromag.com.au>
-> > Closes: https://lore.kernel.org/netdev/e5c6c75f-2dfa-4e50-a1fb-6bf4cdb617c2@electromag.com.au/
-> > Reported-by: Romain Gantois <romain.gantois@bootlin.com>
-> > Closes: https://lore.kernel.org/netdev/c57283ed-6b9b-b0e6-ee12-5655c1c54495@bootlin.com/
-> > Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
-> > ---  
-> 
-> DSA_TAG_PROTO_LAN9303, DSA_TAG_PROTO_SJA1105 and DSA_TAG_PROTO_SJA1110
-> construct tags with ETH_P_8021Q as EtherType. Do you still think it
-> would be correct to say that all DSA tags break COE on the stmmac, as
-> this patch assumes?
-> 
-> The NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM convention is not about
-> statically checking whether the interface using DSA, but about looking
-> at each packet before deciding whether to use the offload engine or to
-> call skb_checksum_help().
+Thanks
 
-So it looks like an acceptable solution would be something along the
-lines of what Linus is suggesting here :
+Paolo
 
-https://lore.kernel.org/netdev/20231216-new-gemini-ethernet-regression-v2-2-64c269413dfa@linaro.org/
 
-If so, maybe it's worth adding a new helper for that check ?
-
-Maxime
 
