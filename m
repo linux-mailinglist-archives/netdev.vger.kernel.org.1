@@ -1,113 +1,95 @@
-Return-Path: <netdev+bounces-58958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64A12818B23
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:24:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C103818B2A
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:25:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19E791F23A29
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:24:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB3451F240DD
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:25:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 767731C6BE;
-	Tue, 19 Dec 2023 15:24:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 482EB1CA83;
+	Tue, 19 Dec 2023 15:25:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KGq+7Uh+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C8MIcvgE"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD651CAB6
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 15:24:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702999443;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qqy3wtKu2RpMhAf44zdAjTFEaoDT5QKe4xFKMUw3+5k=;
-	b=KGq+7Uh+tzMBFzLaFya2x9HcOZULEXmNhx9+lf8owxd8JjbocATb5d+C/K9XVONYXl+nLp
-	wAvs6H+ruPosqOBwZHfH8oCBrKKyf3lyNVlmZi/eXhqhnUjp3hjvPDaVhNcV1lkRs4xEiw
-	i12neOqqBeCP2cRZ+S4BE4AHhBj5kpY=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-226-v79DN1shP0mnWI1ol4PFGg-1; Tue, 19 Dec 2023 10:24:02 -0500
-X-MC-Unique: v79DN1shP0mnWI1ol4PFGg-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a232f069e60so29942166b.1
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 07:24:01 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6761CF96
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 15:25:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so16206a12.0
+        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 07:25:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702999499; x=1703604299; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Pjiy56oSom/iMHm2sE4LXBH+9WC96Qys/2cGl5n7JwA=;
+        b=C8MIcvgEgwOh8ZwyqlGeT/tJMaebboH4N7YFzo7d01MQTUpbqR69otmVOMYTBc6r21
+         YPVQoR6KoiEzUgRgmxwYYGVNUyeq8XnMqrKQiOXnjAp1D3q0/Rhg6uZ93bVgolJoGefO
+         GeMxEnXMAdnqt5pGqw5xcZyCoVnHbdiK92rubq96RxViycJta7fdclqA1pJn2BQJ40wS
+         k1WsFcgNYOYqHNEx2eP9WJ7zzsNop2yih7yYuCToGU235+2Q6VjNc/nJoTimT/Khq6ur
+         wj1KWZmsSEwcKK6BpGlwchcq7JebwMQc5pbvFGQWhqcOu5Lc+TZK9z1iuzxSuq2MCLf4
+         RxSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702999441; x=1703604241;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qqy3wtKu2RpMhAf44zdAjTFEaoDT5QKe4xFKMUw3+5k=;
-        b=IJcROrL1gjjL4bCncCjb61p+615PDCHLnpZMDvuS138f3hvirrSEZ2Qj5uC3JVrYnq
-         MX8vkAMATv+vuweJtgQc7ZAhR5iRI35wZGi8GhNMZkcfL6Qtl3gh8nQ/SfEdaWbrQba2
-         Ssanjxguens+ODT09CKpyKOuDiwLmsjhYmWZZr54223EKw7i0YudRWyk/fmaHZzz1UL0
-         llXAOhpjLzhKSkSLqmLthZhB9EolsOGKpHu5sYsQKMUWX5qJTXtoLaBNEUd9c2sU7QHq
-         KgKA9y+is03gubqpyqgjwEjbrda1w3D/0dYYgxEcQEgYZGKWQ7cqmVlRYkSFhjMHoPX1
-         WSTw==
-X-Gm-Message-State: AOJu0YzpLmG5d9qr8KXe4inxT1+HWDYqOugBSR/C4gJQ91Dnhq+gGxmG
-	zXzYdlm+cenMjx/8Lqvwjp1+yqYaJqVNcOyZorDT+6YBrweOAnz4sUhiWTxNCfc+ZWEeU1YPF43
-	S9kuBCOQpQyXLcGgX
-X-Received: by 2002:a17:906:354e:b0:a23:58f9:e1e3 with SMTP id s14-20020a170906354e00b00a2358f9e1e3mr3600141eja.2.1702999441089;
-        Tue, 19 Dec 2023 07:24:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFd0dgWBJVckg8y4NbbSgoLWG04HdfE6jM/KTshFzIrCjgjsrKQx/VS4FbrtGGixICTTdPZ4w==
-X-Received: by 2002:a17:906:354e:b0:a23:58f9:e1e3 with SMTP id s14-20020a170906354e00b00a2358f9e1e3mr3600131eja.2.1702999440790;
-        Tue, 19 Dec 2023 07:24:00 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-246-245.dyn.eolo.it. [146.241.246.245])
-        by smtp.gmail.com with ESMTPSA id jw11-20020a17090776ab00b00a2358b0fa03sm2574203ejc.194.2023.12.19.07.23.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Dec 2023 07:24:00 -0800 (PST)
-Message-ID: <c49124012f186e06a4a379b060c85e4cca1a9d53.camel@redhat.com>
-Subject: Re: [PATCH v5 net-next 1/3] net: introduce page_pool pointer in
- softnet_data percpu struct
-From: Paolo Abeni <pabeni@redhat.com>
-To: Ilias Apalodimas <ilias.apalodimas@linaro.org>, hawk@kernel.org
-Cc: lorenzo.bianconi@redhat.com, davem@davemloft.net, kuba@kernel.org, 
-	edumazet@google.com, bpf@vger.kernel.org, toke@redhat.com, 
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com, sdf@google.com, 
-	netdev@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Tue, 19 Dec 2023 16:23:58 +0100
-In-Reply-To: <b1432fc51c694f1be8daabb19773744fcee13cf1.1702563810.git.lorenzo@kernel.org>
-References: <cover.1702563810.git.lorenzo@kernel.org>
-	 <b1432fc51c694f1be8daabb19773744fcee13cf1.1702563810.git.lorenzo@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        d=1e100.net; s=20230601; t=1702999499; x=1703604299;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Pjiy56oSom/iMHm2sE4LXBH+9WC96Qys/2cGl5n7JwA=;
+        b=rV0hNqq3CZQNGmcBa/bPcRIj63VNC+8spbdVJhOyGjKqfs4bL3tXy0iDzNFhmh43Fx
+         0pK1gI0hchxDHJhBv7/LmNNFXUY1yl8J1w2HWYqgqmUajIZFJ3dFkjdzslV0uCm33ATs
+         m59ImjmZElYcIx9gt7gVBPJctMMfbz6zzG4u8/Fa1MRmgsVboQAc8+o5VOsRcoNMAcXG
+         G9PSu4n90iVeSBGnQAv0+aZAw6RHNMeBkM/tTc4Pub4F5lifGf2tQY4IKgOwuFJCG9tE
+         ava5UHV9rjH204FlfZED8/VMx43nbRS3bMp5GP73/zui+uQQ2z+69JKocrNflNOR3TCx
+         HM0w==
+X-Gm-Message-State: AOJu0Yz2SEJ7RtAwWo/Hvj4g4gptArTEsUeaU2cPLB/3mYlO4XO8+XVe
+	Ltt5z8aPBQAM8tzNhnpVvu+u0hWkStCEnAoj4xSaHpXYmFo3
+X-Google-Smtp-Source: AGHT+IGhHMKP1ciOvkntkZerJl/tZMNFwCOwNhOz+taLmSDqsDFSJAgpy21LnL4K0ONP8hPib+v5buBr9p3rZuieKi4=
+X-Received: by 2002:a50:d616:0:b0:553:5578:2fc9 with SMTP id
+ x22-20020a50d616000000b0055355782fc9mr166450edi.5.1702999498786; Tue, 19 Dec
+ 2023 07:24:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20231219001833.10122-1-kuniyu@amazon.com> <20231219001833.10122-7-kuniyu@amazon.com>
+In-Reply-To: <20231219001833.10122-7-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 19 Dec 2023 16:24:47 +0100
+Message-ID: <CANn89iKCKBx+pWFP8OWDz+caNmt0X45N2x+vo9AaNBLJFAwcAQ@mail.gmail.com>
+Subject: Re: [PATCH RESEND v2 net-next 06/12] tcp: Link bhash2 to bhash.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2023-12-14 at 15:29 +0100, Lorenzo Bianconi wrote:
-> Allocate percpu page_pools in softnet_data.
-> Moreover add cpuid filed in page_pool struct in order to recycle the
-> page in the page_pool "hot" cache if napi_pp_put_page() is running on
-> the same cpu.
-> This is a preliminary patch to add xdp multi-buff support for xdp running
-> in generic mode.
->=20
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  include/linux/netdevice.h       |  1 +
->  include/net/page_pool/helpers.h |  5 +++++
->  include/net/page_pool/types.h   |  1 +
->  net/core/dev.c                  | 39 ++++++++++++++++++++++++++++++++-
->  net/core/page_pool.c            |  5 +++++
->  net/core/skbuff.c               |  5 +++--
->  6 files changed, 53 insertions(+), 3 deletions(-)
+On Tue, Dec 19, 2023 at 1:21=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> bhash2 added a new member sk_bind2_node in struct sock to link
+> sockets to bhash2 in addition to bhash.
+>
+> bhash is still needed to search conflicting sockets efficiently
+> from a port for the wildcard address.  However, bhash itself need
+> not have sockets.
+>
+> If we link each bhash2 bucket to the corresponding bhash bucket,
+> we can iterate the same set of the sockets from bhash2 via bhash.
+>
+> This patch links bhash2 to bhash only, and the actual use will be
+> in the later patches.  Finally, we will remove sk_bind2_node.
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-@Jesper, @Ilias: could you please have a look at the pp bits?
-
-Thanks!
-
-Paolo
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
