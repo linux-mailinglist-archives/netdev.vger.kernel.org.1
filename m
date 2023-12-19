@@ -1,123 +1,87 @@
-Return-Path: <netdev+bounces-58969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8AB1818B9F
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:54:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BBC6818BA1
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 16:54:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE4C71C249A6
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:54:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4623B224CB
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:54:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 918361CF8B;
-	Tue, 19 Dec 2023 15:54:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D7B1CF8D;
+	Tue, 19 Dec 2023 15:54:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GD3M2ZuY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EJ9Zb2XW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C23AE1CF96;
-	Tue, 19 Dec 2023 15:54:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2ca02def690so54531041fa.3;
-        Tue, 19 Dec 2023 07:54:03 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B9C320315
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 15:54:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5534180f0e9so14142a12.1
+        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 07:54:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703001242; x=1703606042; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=t+/0NojnEKyeTXrrsJnCjkci5dAMTlrQZF+wpXNcSGQ=;
-        b=GD3M2ZuYOYBCjVhcSS0baON2f1i717mEJL8oxbr0Ew2fSpRZBzwnIDkUZ8/bGuWFcx
-         sgDtZPY3DT3rK0rAe/uizSGuUxCxvceaT6zfmZy83dyUSL6AteWfCMHswWkcM1jiLKhV
-         HLz+Ivlw/tig6p3ZdiqPGni6rCY4iP8gvMgbPcC+IX8n5fVTgl9eZZOKMls8sCsW5201
-         DXw+ba0EuCRZ3A/S9swyhoqSwT0Hv7hGTtxMfeKrw+8spgPN080nQcq3ZQlFwMru8PLA
-         cDnjLO3Hjia51oHS6ekoZ8yWbautQbXY6MbS4w6L5Aw1PIcKSAwlM7vmeH0hwy1Ohcj9
-         K/yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703001242; x=1703606042;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1703001284; x=1703606084; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=t+/0NojnEKyeTXrrsJnCjkci5dAMTlrQZF+wpXNcSGQ=;
-        b=Kv2nNzzgdMtYD+M+3WcyeKvC6TBGZiDEvyEBnBxDPvq8zOpe8zxRZXmppG8+22u9AP
-         a/QqpqvURfZr0qIF7gtj4uVZ8pFVKpAKRGvwMW2W1P2q/LNxdyo/IttpMuRp4AFDP7Tr
-         9g+SVhScybf+YePuFZNQuLo53lpPsjzcPgyV2twnw2HhRpiMPWyjvFsa3eluGNHz8xuK
-         qo3NUZZwGzh+8I27cG94NDdkeo0orIn1qpOAfTJIQmDmChQ/+FMNmv5Obev90UU/g9Zt
-         0v+q7j7YY6eX4WfdTOKPlTxsHKe9vek2jxfeRGykYcbXYcw93rvXzCGpyTDIsZs/JvoX
-         0C5g==
-X-Gm-Message-State: AOJu0Yz7sxdQ3PMnfsHjOsM8swJNlZzqb3sQCeF/TuPjpoXBxJJQ+eMI
-	O9VR1vdzF80+wKLJYSCl3B0=
-X-Google-Smtp-Source: AGHT+IGxgJlS76KKbhiIvrV4SZ9jaaRyya80b/MRTuQcf4q27hcVV0Tzdk0NnqtpF7D4YgggeMnAPA==
-X-Received: by 2002:a05:651c:b09:b0:2cc:88bd:d4dd with SMTP id b9-20020a05651c0b0900b002cc88bdd4ddmr325821ljr.63.1703001241537;
-        Tue, 19 Dec 2023 07:54:01 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id z22-20020a2e3516000000b002cc6a6d6a33sm1026846ljz.115.2023.12.19.07.54.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Dec 2023 07:54:01 -0800 (PST)
-Date: Tue, 19 Dec 2023 18:53:58 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Lai Peter Jun Ann <jun.ann.lai@intel.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Song Yoong Siang <yoong.siang.song@intel.com>
-Subject: Re: [PATCH net v2 1/1] net: stmmac: fix incorrect flag check in
- timestamp interrupt
-Message-ID: <bhw5l75erhcci7z55vrcos43qtyn7txsspv6qtazhlulpbn7km@dp6yg6sf2gwk>
-References: <1702885892-30369-1-git-send-email-jun.ann.lai@intel.com>
+        bh=Fk5EdLhyt38pZfuik0Ss1id1m1ywXSvBSH4pMzHPXGM=;
+        b=EJ9Zb2XWH1+9cUwtQff3bb9IbF5Y7iz/NFds4rs2oiUOpjmIwO63+q7Mip0IN5B3es
+         Eo/X9/2WNPC63yya7Xino3Ldapq+xBL1qvriwG2EqB9Tws/LK+TOVe/tQw2iR3ucWknr
+         lOx6n9kjVrdSYI1kbO22kIxyVW9Tl7FhwxBuR/tm6+AvNEWq9IHBMy5emArpKUq64DEq
+         ZmY440oO74uoqkBU42V3AfGG64lys2zjghW4YDp6ESD8FQzs3cgh9HoSc9/wbqFxnKnz
+         eeIrGsd3yQibMq3+v6A0PjjfX7dV+6T4PF+ChwF/JncwknlTuFyt2kxcAC7kpW0rN7rX
+         QvLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703001284; x=1703606084;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Fk5EdLhyt38pZfuik0Ss1id1m1ywXSvBSH4pMzHPXGM=;
+        b=GOPSISRqs2QxAkXwJJRnJ/XF35GqCNdHwqtqWlHG4ZGXyx4weWRlRXJ0H3Xf05Ufsd
+         hndwGBFTpqywU44+FcxSAVcMR65rYDutqzWeZS+gUsdiYjdaHyyVmb1/vPDejQChCWEW
+         7r6sMt9cbBZW4Wk/jkwtzQEF+/OVDU+qK3hdLTGgHbAT9wenFgmbICedLd33e+G/V6L8
+         /7Ri/TECOpKpXxDKe6k/ZvAFeOi+U12OYMozo8JoaVl5D+GTB6Vuf75HkttDMA7STTSB
+         ografTr//fayKckCUYr8srBGf02QX0jNtPXx/bjzWPJ//PzAIxwg0CFPOS1VMIrhh1bj
+         XuxQ==
+X-Gm-Message-State: AOJu0Yx14EtkQj4SuOQQwSCxv1+T9FTH6hLWP8svoT/RU28/l8NEXmXK
+	j4chNzg8PXjOhDeATgmGSiYlDUKCksiIyRX8OFQ3ikAFyZml
+X-Google-Smtp-Source: AGHT+IG6kyBlOKQdUOaETO8OsLwdSv8eeAb37i/0LbWL3VA2Q+MxymIwm5h0Yw1/vyEjI9s9eeMQZSTC/8KpO4lCtnY=
+X-Received: by 2002:a50:cd89:0:b0:553:6de7:43d7 with SMTP id
+ p9-20020a50cd89000000b005536de743d7mr212979edi.6.1703001283963; Tue, 19 Dec
+ 2023 07:54:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1702885892-30369-1-git-send-email-jun.ann.lai@intel.com>
+References: <20231219001833.10122-1-kuniyu@amazon.com> <20231219001833.10122-11-kuniyu@amazon.com>
+In-Reply-To: <20231219001833.10122-11-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 19 Dec 2023 16:54:32 +0100
+Message-ID: <CANn89iL7xHFsXMkK3+WCvun-KbYqBmUiOYNdk5w7_OVVRtV4vQ@mail.gmail.com>
+Subject: Re: [PATCH RESEND v2 net-next 10/12] tcp: Unlink sk from bhash.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 18, 2023 at 03:51:32PM +0800, Lai Peter Jun Ann wrote:
-> The driver should continue get the timestamp if STMMAC_FLAG_EXT_SNAPSHOT_EN
-> flag is set.
-> 
-> Fixes: aa5513f5d95f ("net: stmmac: replace the ext_snapshot_en field with a flag")
-> Cc: <stable@vger.kernel.org> # 6.6
-> Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
-> Signed-off-by: Lai Peter Jun Ann <jun.ann.lai@intel.com>
+On Tue, Dec 19, 2023 at 1:23=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> Now we do not use tb->owners and can unlink sockets from bhash.
+>
+> sk_bind_node/tw_bind_node are available for bhash2 and will be
+> used in the following patch.
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Right. The blamed commit has wrongly converted that conditional
-statement.
-
-Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
-
--Serge(y)
-
-> ---
-> v2 changelog:
->  - Add fix tag and stable@vger.kernel.org in email cc list.
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-> index 540f6a4..f05bd75 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-> @@ -237,7 +237,7 @@ static void timestamp_interrupt(struct stmmac_priv *priv)
->  	 */
->  	ts_status = readl(priv->ioaddr + GMAC_TIMESTAMP_STATUS);
->  
-> -	if (priv->plat->flags & STMMAC_FLAG_EXT_SNAPSHOT_EN)
-> +	if (!(priv->plat->flags & STMMAC_FLAG_EXT_SNAPSHOT_EN))
->  		return;
->  
->  	num_snapshot = (ts_status & GMAC_TIMESTAMP_ATSNS_MASK) >>
-> -- 
-> 1.9.1
-> 
-> 
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
