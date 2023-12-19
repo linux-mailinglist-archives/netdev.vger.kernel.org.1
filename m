@@ -1,126 +1,84 @@
-Return-Path: <netdev+bounces-59075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BC188193EF
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 23:57:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4576D81945B
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:10:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD0351C22F10
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 22:57:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 461151C21EA9
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 23:10:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 628F93D0AB;
-	Tue, 19 Dec 2023 22:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9515D3D0A4;
+	Tue, 19 Dec 2023 23:10:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="xhkXf21S"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="F3msmZiD"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301C03D0AE;
-	Tue, 19 Dec 2023 22:57:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=M7vYwyFBTmXa7mBCYsTu/n+QlJGbIPVud40PFjUfiyM=; b=xhkXf21S7LYXVoeF3VpoobRnb1
-	Dv/PMqOfwlfkkNy03gDBHnf/IIFG77n6wGj0BTrf8LNTtz8SO9dBU+okjGyKQEGNouOKTwGupcAdH
-	QEdbpM11JGfsOi69JGBQ5sHDaj4XjsPX+ZCJzy34OlxUIf397A4FHIEW6w5tMQLxXbcbbULfCsVK+
-	36/PLyjx85RGIXKof1LCC8rO0Euokn+xoMjE8j/Nv8q/kPMxpP4lFvJuYTCQxYygpuoByjK4zKKSf
-	SQ9SG+/Kh97kOTdsb4dsMpazvluGNzPLaTYf4UKtDg7XKTrO0MOoFZwSy/gzY0uFAQt5HQg9IICMu
-	2m7ELvOQ==;
-Received: from [50.53.46.231] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1rFj1v-00Fdwd-1k;
-	Tue, 19 Dec 2023 22:57:39 +0000
-Message-ID: <41abf11c-dbd4-48b1-8ca3-746b62256da8@infradead.org>
-Date: Tue, 19 Dec 2023 14:57:38 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E1E3EA7F;
+	Tue, 19 Dec 2023 23:10:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1703027443;
+	bh=cml583hYMd5H0M+dTJ5nBjWzjRfXDczHOXLxpP2fGlo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=F3msmZiDCZ+S2WCQSRScFtjIaiKHjunpAUeZ+xyYW54dxfusEUyYr/dQqJNr8llKM
+	 Z0Add/DeTUKwQ7I7VOKZWF2mPHJV1XR5ZtcbLqNWlQLslhb/vwBTVrVsfvTgScBCGi
+	 x6XLB2T+jwQbT3nzIsyrUUDJ59VgRfA1E3OTcY0a0KHav3MAOAvkdhxDD+CrpaOrw3
+	 dcCbhC73qmI0jNFELSr50B7obDJzbEU+dYMn9nKbqjJtfsGqeadRyypJjN5+pEZfz4
+	 gl+dOUvK+3QRbAQwKOxTCqLf3B9rAimnt0aCYiAD8cSB5K38j2vpqUlMjhWzkQWYjx
+	 iR6O9MYBU4Uyg==
+Received: from localhost (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: cristicc)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id B93113781469;
+	Tue, 19 Dec 2023 23:10:42 +0000 (UTC)
+From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Samin Guo <samin.guo@starfivetech.com>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kernel@collabora.com
+Subject: [PATCH 0/1] StarFive DWMAC support for JH7100
+Date: Wed, 20 Dec 2023 01:10:38 +0200
+Message-ID: <20231219231040.2459358-1-cristian.ciocaltea@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] xsk: make struct xsk_cb_desc available outside
- CONFIG_XDP_SOCKETS
-Content-Language: en-US
-To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- Tony Nguyen <anthony.l.nguyen@intel.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@kernel.org>, Magnus Karlsson <magnus.karlsson@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Larysa Zaremba <larysa.zaremba@intel.com>
-References: <20231219110205.1289506-1-vladimir.oltean@nxp.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20231219110205.1289506-1-vladimir.oltean@nxp.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+This is just a subset of the initial patch series [1] adding networking
+support for StarFive JH7100 SoC.
 
+[1]: https://lore.kernel.org/lkml/20231218214451.2345691-1-cristian.ciocaltea@collabora.com/
 
-On 12/19/23 03:02, Vladimir Oltean wrote:
-> The ice driver fails to build when CONFIG_XDP_SOCKETS is disabled.
-> 
-> drivers/net/ethernet/intel/ice/ice_base.c:533:21: error:
-> variable has incomplete type 'struct xsk_cb_desc'
->         struct xsk_cb_desc desc = {};
->                            ^
-> include/net/xsk_buff_pool.h:15:8: note:
-> forward declaration of 'struct xsk_cb_desc'
-> struct xsk_cb_desc;
->        ^
-> 
-> Fixes: d68d707dcbbf ("ice: Support XDP hints in AF_XDP ZC mode")
-> Closes: https://lore.kernel.org/netdev/8b76dad3-8847-475b-aa17-613c9c978f7a@infradead.org/
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cristian Ciocaltea (1):
+  net: stmmac: dwmac-starfive: Add support for JH7100 SoC
 
-
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
-Tested-by: Randy Dunlap <rdunlap@infradead.org> # build-tested
-
-Thanks.
-
-> ---
-> Posting to net-next since this tree is broken at this stage, not only
-> bpf-next.
-> 
->  include/net/xdp_sock_drv.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
-> index b62bb8525a5f..526c1e7f505e 100644
-> --- a/include/net/xdp_sock_drv.h
-> +++ b/include/net/xdp_sock_drv.h
-> @@ -12,14 +12,14 @@
->  #define XDP_UMEM_MIN_CHUNK_SHIFT 11
->  #define XDP_UMEM_MIN_CHUNK_SIZE (1 << XDP_UMEM_MIN_CHUNK_SHIFT)
->  
-> -#ifdef CONFIG_XDP_SOCKETS
-> -
->  struct xsk_cb_desc {
->  	void *src;
->  	u8 off;
->  	u8 bytes;
->  };
->  
-> +#ifdef CONFIG_XDP_SOCKETS
-> +
->  void xsk_tx_completed(struct xsk_buff_pool *pool, u32 nb_entries);
->  bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc);
->  u32 xsk_tx_peek_release_desc_batch(struct xsk_buff_pool *pool, u32 max);
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  6 ++--
+ .../ethernet/stmicro/stmmac/dwmac-starfive.c  | 32 ++++++++++++++++---
+ 2 files changed, 31 insertions(+), 7 deletions(-)
 
 -- 
-#Randy
-https://people.kernel.org/tglx/notes-about-netiquette
-https://subspace.kernel.org/etiquette.html
+2.43.0
+
 
