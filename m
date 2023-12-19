@@ -1,126 +1,171 @@
-Return-Path: <netdev+bounces-58887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA6D6818799
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 13:37:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A205E8187E5
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 13:49:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EC621F21171
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:37:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57A241F2103A
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:49:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18CD9179AB;
-	Tue, 19 Dec 2023 12:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D5F1862A;
+	Tue, 19 Dec 2023 12:49:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FfAVOdUm"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="JT3RSC2l"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C90618E15
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 12:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702989449;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K/S5Wyg/d2+ETYQbWuIm2yAwXlqytm0NKhDqNizGgHY=;
-	b=FfAVOdUmNR5VlcU80987/vMInIJUoZeEM3eLoZc7zMGlb7xNQ7234teNhqVSwSbVrsB6lS
-	0QuxTUMTc6+Md91oOVhFd4KSVef5/xvD30N0mglpI3QCJE25jFPVFgjnx60Ys2RmZJFZG8
-	B2Gpy9ZMOBw+NCCw+w9EnPqbDbvB/aA=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-197-bVF-T4gkMcS1VYXprZevxQ-1; Tue, 19 Dec 2023 07:37:26 -0500
-X-MC-Unique: bVF-T4gkMcS1VYXprZevxQ-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-553360a958eso321937a12.1
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 04:37:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702989445; x=1703594245;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=K/S5Wyg/d2+ETYQbWuIm2yAwXlqytm0NKhDqNizGgHY=;
-        b=u1yQREZLBk2kMZdv/XZlUfoFH7YB8ucZ/rAWmQ9vdJXPnNCTjiv+RrTS+kRYsgOTwy
-         OSY4vGgsJmxwh5gVlaHx0b2CenLmXU7sZ34bRAa0NgDQFu/YZYB+1LNKPtr2nG+UWt9y
-         sOLTN+6x6hDLbiJ+yXhsndvs3RHJeGm204oqJfVFBdus1W1WbRN1Rc8AhPkxifcTTtuy
-         utHP1I1ZoWupRtbR7ATDkxUZpGxOB5pH2eU/dFRbyubsEm7rrB7Pr1PkNIZbXZuq3RCV
-         jz5OP5n45UjWzqJpkUHgyDW7Ew+1hHnZuD3k9TYcixvqzKaoE6nAXj/hpNLVB6e2qM3i
-         KopA==
-X-Gm-Message-State: AOJu0YyqOZVW9Gn2tQ2G57wNjpFQ4c/p6kvj6MGe1EKgUzKS+8+2zTUy
-	bNL18TzOvlSGXpzeV1xYDrQOhMG9pK5m3eqBZ81We/tlwfJGpP2qTHypZ5lCODALqj05aZFjgF2
-	J1+BShxKM2/GpPePy
-X-Received: by 2002:a17:906:12cc:b0:a24:71aa:5da6 with SMTP id l12-20020a17090612cc00b00a2471aa5da6mr1058013ejb.5.1702989445128;
-        Tue, 19 Dec 2023 04:37:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGZB6SNq+WpmOvsg+Tx19853VnfovG9sdUw3oSjC46FmzEMnamyx6F0xDGDCoCX3TteL741Bg==
-X-Received: by 2002:a17:906:12cc:b0:a24:71aa:5da6 with SMTP id l12-20020a17090612cc00b00a2471aa5da6mr1058001ejb.5.1702989444824;
-        Tue, 19 Dec 2023 04:37:24 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-246-245.dyn.eolo.it. [146.241.246.245])
-        by smtp.gmail.com with ESMTPSA id i14-20020a170906a28e00b00a2332116b3esm3699466ejz.152.2023.12.19.04.37.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Dec 2023 04:37:24 -0800 (PST)
-Message-ID: <38f6b7856f8060f9770ec0ea2a163c5960d9eed9.camel@redhat.com>
-Subject: Re: [PATCH net-next] net: pktgen: Use
- wait_event_freezable_timeout() for freezable kthread
-From: Paolo Abeni <pabeni@redhat.com>
-To: Kevin Hao <haokexin@gmail.com>, "David S. Miller" <davem@davemloft.net>,
-  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>, Pavel
-	Machek <pavel@ucw.cz>
-Date: Tue, 19 Dec 2023 13:37:23 +0100
-In-Reply-To: <20231216112632.2255398-1-haokexin@gmail.com>
-References: <20231216112632.2255398-1-haokexin@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 245651CA82;
+	Tue, 19 Dec 2023 12:49:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1702990151;
+	bh=7c9DrFu1ZPG35MYcFGxt231G+iS6qoQmOYU2uV067uQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=JT3RSC2lfVBE6Q7Yc6yECbidmsqSt8wv21FHq8IqeElYu7eoJt6pu3SOLiUnWNgfM
+	 nLdU6Atb2ypBuVzamOh0RuSPDqskOJpHPFlb0r4Eyd1f4W+4ofj+Zostqz8r83UpkE
+	 H89CazU5ezRWmR4nhfDV4fozczu+cpW6+uqRGoTgUJ0pmUtT0EFwSwHjezODsw9YbK
+	 KvqYz3xQZf8/e3YCLuHWrVr6MZKldCWplJ04NGFAfexrbOKBQrpmpdAvOYqyExoDTh
+	 Xb43sr8KuHd1zzrFmBJXl+4BorJa246m4a030YTSG724eoufc5Dydjy+75zGVQ9Pbg
+	 027k9msweKWkA==
+Received: from [100.115.223.179] (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: cristicc)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 7278F37813EB;
+	Tue, 19 Dec 2023 12:49:09 +0000 (UTC)
+Message-ID: <d030f5b7-8d32-4a80-a3c0-98cfa1c0fe4f@collabora.com>
+Date: Tue, 19 Dec 2023 14:49:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/9] dt-bindings: net: starfive,jh7110-dwmac: Add
+ JH7100 SoC compatible
+Content-Language: en-US
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
+ Samin Guo <samin.guo@starfivetech.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Hal Feng <hal.feng@starfivetech.com>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-clk@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, kernel@collabora.com
+References: <20231218214451.2345691-1-cristian.ciocaltea@collabora.com>
+ <20231218214451.2345691-3-cristian.ciocaltea@collabora.com>
+ <c9225053-78f8-40b7-9453-dc3dabe44500@linaro.org>
+From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+In-Reply-To: <c9225053-78f8-40b7-9453-dc3dabe44500@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat, 2023-12-16 at 19:26 +0800, Kevin Hao wrote:
-> A freezable kernel thread can enter frozen state during freezing by
-> either calling try_to_freeze() or using wait_event_freezable() and its
-> variants. So for the following snippet of code in a kernel thread loop:
->   wait_event_interruptible_timeout();
->   try_to_freeze();
->=20
-> We can change it to a simple wait_event_freezable_timeout() and then
-> eliminate a function call.
->=20
-> Signed-off-by: Kevin Hao <haokexin@gmail.com>
-> ---
->  net/core/pktgen.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
->=20
-> diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-> index 57cea67b7562..2b59fc66fe26 100644
-> --- a/net/core/pktgen.c
-> +++ b/net/core/pktgen.c
-> @@ -3669,10 +3669,8 @@ static int pktgen_thread_worker(void *arg)
->  		if (unlikely(!pkt_dev && t->control =3D=3D 0)) {
->  			if (t->net->pktgen_exiting)
->  				break;
-> -			wait_event_interruptible_timeout(t->queue,
-> -							 t->control !=3D 0,
-> -							 HZ/10);
-> -			try_to_freeze();
-> +			wait_event_freezable_timeout(t->queue,
-> +						     t->control !=3D 0, HZ/10);
+On 12/19/23 09:27, Krzysztof Kozlowski wrote:
+> On 18/12/2023 22:44, Cristian Ciocaltea wrote:
+>> The Synopsys DesignWare MAC found on StarFive JH7100 SoC is mostly
+>> similar to the newer JH7110, but it requires only two interrupts and a
+>> single reset line, which is 'ahb' instead of the commonly used
+>> 'stmmaceth'.
+>>
+> 
+>>    reg:
+>> @@ -145,9 +146,13 @@ properties:
+>>  
+>>    reset-names:
+>>      minItems: 1
+>> -    items:
+>> -      - const: stmmaceth
+>> -      - const: ahb
+>> +    maxItems: 2
+> 
+> min and maxItems should not be needed here.
 
-The patch looks functionally correct to me, so I'm sorry to nit-pick.=C2=A0
+Indeed, I will drop them.
 
-Since you touch the last line just for a 'cosmetic' change, please make
-checkpatch happy, too:  please replace 'HZ/10' with 'HZ / 10'.
+>> +    oneOf:
+>> +      - items:
+>> +          - enum: [stmmaceth, ahb]
+>> +      - items:
+>> +          - const: stmmaceth
+>> +          - const: ahb
+>>  
+>>    power-domains:
+>>      maxItems: 1
+>> diff --git a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
+>> index d90cb82c1424..f5f0bff5be0f 100644
+>> --- a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
+>> +++ b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
+>> @@ -16,16 +16,20 @@ select:
+>>      compatible:
+>>        contains:
+>>          enum:
+>> +          - starfive,jh7100-dwmac
+>>            - starfive,jh7110-dwmac
+>>    required:
+>>      - compatible
+>>  
+>>  properties:
+>>    compatible:
+>> -    items:
+>> -      - enum:
+>> -          - starfive,jh7110-dwmac
+>> -      - const: snps,dwmac-5.20
+>> +    oneOf:
+>> +      - items:
+>> +          - const: starfive,jh7100-dwmac
+>> +          - const: snps,dwmac
+>> +      - items:
+>> +          - const: starfive,jh7110-dwmac
+>> +          - const: snps,dwmac-5.20
+>>  
+>>    reg:
+>>      maxItems: 1
+>> @@ -46,23 +50,6 @@ properties:
+>>        - const: tx
+>>        - const: gtx
+>>  
+>> -  interrupts:
+>> -    minItems: 3
+>> -    maxItems: 3
+>> -
+>> -  interrupt-names:
+>> -    minItems: 3
+>> -    maxItems: 3
+>> -
+>> -  resets:
+>> -    minItems: 2
+>> -    maxItems: 2
+> 
+> What is the point of your previous patch if you immediately remove it?
+> It is a no-op. Just mention in this commit msg, that both resets and
+> reset-names are coming from snps,dwmac so they can be removed from
+> top-level entirely.
 
-Thanks!
+This has been discussed during v2 review [1], where I also provided the
+rational behind not updating reset-names. So the code was not deleted,
+but moved under an if clause.
 
-Paolo
+Thanks for reviewing,
+Cristian
 
+[1]: https://lore.kernel.org/lkml/f4d0b216-5bdc-4559-aabb-8af638d33721@collabora.com/
 
