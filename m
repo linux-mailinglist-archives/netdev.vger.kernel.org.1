@@ -1,47 +1,50 @@
-Return-Path: <netdev+bounces-58858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6AC2818601
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:05:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A28C818618
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:14:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0689B1C23534
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 11:05:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BB3C1C23682
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 11:14:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6F7A14F6C;
-	Tue, 19 Dec 2023 11:05:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 031A614F8D;
+	Tue, 19 Dec 2023 11:14:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UMDxoloA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uCLn8Aan"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D62B14F68
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 11:05:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0027CC433C7;
-	Tue, 19 Dec 2023 11:05:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7F3514F79;
+	Tue, 19 Dec 2023 11:14:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC2A6C433C7;
+	Tue, 19 Dec 2023 11:14:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702983937;
-	bh=Xan9OqFnkjXD7ZpmSsIbY/MakraHLHQyHXooQOvJ+VI=;
+	s=k20201202; t=1702984458;
+	bh=4dslH+bYawkfXaHXPZBzbHeEjQIgy5C0S5DQUgJOamE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UMDxoloAmp6IbL4Ssnizmw1K75UjMC4/XVE5DWuwRrllGiZ6BqcWpmXgpfTCnbyQ5
-	 w6IjTv3o57bfS0d67TZD3zYjz2rGMFpxjZdRFk1Kqp4r7M5Rejtlm8+RlhdKDlqs27
-	 qlimxIPBHnRjRtXJCbkQeY0AUy88YAqdyjMUNlT2aa7scc5IFa/g8qywEwUWOvTF4q
-	 E2zPQKmVDgDMiD6o8QspCWAn5pQ4m/1L1F4u1bycanABvUBbyM82mwKEVynZ97H8S/
-	 kphfPhHpGIGeC98UDPYoLkzeRs0qLXXtSceMjmDZBlb0lzQ51t1kNhVk7CnIYfmp0G
-	 M95CfCsnguQVQ==
-Date: Tue, 19 Dec 2023 11:05:33 +0000
+	b=uCLn8AanN0AhspbNLHhFt+V5YjWqp0f9Ywobt3FpVQ+4wacdEKkm701QAi0Z4HYeC
+	 8CfzMqj+K2cwGcAz6kah1fJhH5ZxOJIrAGZWL6QxFy2HnDkdJPBAOree9A1V79oH3y
+	 ky4RivFiTMf6dsb7ACb57UOv27ypC8X987bOE856eR1w2+CjuN85AJGLXmC9P0/NhR
+	 qs2h5hnzOJV48miDVIx3TfYgsPrX+3K5wZJMQHgM3P4X0BjRVInWcoOOr6gXW5Y9UD
+	 pixpKfH2Oqis+7O/Hg8Cfgh5iLlsgjYLPNOk5bSp9xjIV/9QNjjGxZEUq32HMjUpd7
+	 a1Yc0bNEI+ipQ==
+Date: Tue, 19 Dec 2023 11:14:13 +0000
 From: Simon Horman <horms@kernel.org>
-To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH iwl-next v5 1/2] ixgbe: Refactor overtemp event handling
-Message-ID: <20231219110533.GH811967@kernel.org>
-References: <20231218103926.346294-1-jedrzej.jagielski@intel.com>
- <20231218103926.346294-2-jedrzej.jagielski@intel.com>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	shenjian15@huawei.com, wangjie125@huawei.com,
+	liuyonglong@huawei.com, lanhao@huawei.com, wangpeiyang1@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V4 net-next 2/4] net: hns3: move constants from
+ hclge_debugfs.h to hclge_debugfs.c
+Message-ID: <20231219111413.GI811967@kernel.org>
+References: <20231219013513.2589845-1-shaojijie@huawei.com>
+ <20231219013513.2589845-3-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,28 +53,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231218103926.346294-2-jedrzej.jagielski@intel.com>
+In-Reply-To: <20231219013513.2589845-3-shaojijie@huawei.com>
 
-On Mon, Dec 18, 2023 at 11:39:25AM +0100, Jedrzej Jagielski wrote:
-> Currently ixgbe driver is notified of overheating events
-> via internal IXGBE_ERR_OVERTEMP error code.
+On Tue, Dec 19, 2023 at 09:35:11AM +0800, Jijie Shao wrote:
+> some constants are defined in hclge_debugfs.h,
+> but only used in hclge_debugfs.c.
+> so move them from hclge_debugfs.h to hclge_debugfs.c.
 > 
-> Change the approach for handle_lasi() to use freshly introduced
-> is_overtemp function parameter which set when such event occurs.
-> Change check_overtemp() to bool and return true if overtemp
-> event occurs.
-> 
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> ---
-> v2: change aproach to use additional function parameter to notify when overheat
-> v4: change check_overtemp to bool
-> v5: adress Simon's comments
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 
-Hi Jedrzej,
-
-Thanks for the updates, this version looks good to me.
+Thanks, I agree that these symbols belong in hclge_debugfs.c.
 
 Reviewed-by: Simon Horman <horms@kernel.org>
-
 
