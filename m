@@ -1,68 +1,89 @@
-Return-Path: <netdev+bounces-58854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9F658185F3
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:02:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B36B8185F5
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 12:02:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19C661C236D4
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 11:02:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CC8D1C2365F
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 11:02:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0A614AB6;
-	Tue, 19 Dec 2023 11:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E53714F9F;
+	Tue, 19 Dec 2023 11:00:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GEeU/ma1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d+l5ilSD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 137B5168AB;
-	Tue, 19 Dec 2023 11:00:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76E35C433C8;
-	Tue, 19 Dec 2023 11:00:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 502B415E98;
+	Tue, 19 Dec 2023 11:00:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D8464C433C9;
+	Tue, 19 Dec 2023 11:00:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702983620;
-	bh=WmywoZqCQCI+Za9fjHWCHh0YK4XKWWcoHTQX1Ku1Vp4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GEeU/ma1mlMdSGMkSzyfsHzsfHaieGz6nljrCUJiyZZ88YN1jmfS4VyzoL0sOseNL
-	 7yjYFxrtox6VLMT83dOX9Aa9RXWzCv/wrfUkxD4suBjJk8KZp/6CTpkogRkSO13Qjc
-	 +l0g6c4WcQI+LIikGBF4HmxaTNaBXDqrscfK3R08cYLtGp5boGgkoQsSUMnL6DcVv6
-	 BB2foEp/gw1hZTbG7qiuoLWUZvxl0/bCSFFQMxuSZvqyXGYeEfOFNLvyZn76jnn76s
-	 QpVSpxc8u7sNPInfg4Ez6WLmGddLlxP60UeeHuYccZndxkvvFNj1v7P2JHeeQcN+sS
-	 fcke/PTDd94oQ==
-Date: Tue, 19 Dec 2023 11:00:15 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: ast@kernel.org, netdev@vger.kernel.org,
-	syzbot+f43a23b6e622797c7a28@syzkaller.appspotmail.com,
-	martin.lau@linux.dev, daniel@iogearbox.net,
-	john.fastabend@gmail.com, andrii@kernel.org, song@kernel.org,
-	yonghong.song@linux.dev, kpsingh@kernel.org, sdf@google.com,
-	haoluo@google.com, jolsa@kernel.org, keescook@chromium.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next] bpf: use nla_ok() instead of checking nla_len
- directly
-Message-ID: <20231219110015.GG811967@kernel.org>
-References: <20231218231904.260440-1-kuba@kernel.org>
+	s=k20201202; t=1702983623;
+	bh=Ls1VSehIckeYRhZGqbGwjer6mvVnecVGtJljbb5X1uw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=d+l5ilSDD7btiGPAGilXZb40KYaDOimnn1uzPDV0H8bp1hGK6Z8see3PqXNiCUM6Z
+	 TWFt/koT3XmJK7Tv5ceS4EWuuMT91Ht3QIoQKM0EBI2lQhcLg9hwnUIZqNP/fkrxbw
+	 xFta7xHfyqElbMBM16NxaQJVzI95C91ASv3ZvsDw8Aoctffbg6yaEiBQAKF/A923Wl
+	 mqtqvtfWD3Dh4LBcOkCUpJ4wn5AaTapkmmgcIVXguZays+qKMqwjyElXJbIMYwCWoZ
+	 hPHHJkOY4Wxk1TVG//lxHxFPU/N2YQTBrKJgzbShMyhKRekADZ/vEiB/y2XbU/Jz1w
+	 kmbfBrOcE//4w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C0EA7C561EE;
+	Tue, 19 Dec 2023 11:00:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231218231904.260440-1-kuba@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] net: ks8851: Fix TX stall caused by TX buffer overrun
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170298362378.20843.3373461129605286844.git-patchwork-notify@kernel.org>
+Date: Tue, 19 Dec 2023 11:00:23 +0000
+References: <20231214181112.76052-1-rwahl@gmx.de>
+In-Reply-To: <20231214181112.76052-1-rwahl@gmx.de>
+To: Ronald Wahl <rwahl@gmx.de>
+Cc: ronald.wahl@raritan.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, ben.dooks@codethink.co.uk,
+ Tristram.Ha@microchip.com, netdev@vger.kernel.org, stable@vger.kernel.org
 
-On Mon, Dec 18, 2023 at 03:19:04PM -0800, Jakub Kicinski wrote:
-> nla_len may also be too short to be sane, in which case after
-> recent changes nla_len() will return a wrapped value.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Thu, 14 Dec 2023 19:11:12 +0100 you wrote:
+> From: Ronald Wahl <ronald.wahl@raritan.com>
 > 
-> Reported-by: syzbot+f43a23b6e622797c7a28@syzkaller.appspotmail.com
-> Fixes: 172db56d90d2 ("netlink: Return unsigned value for nla_len()")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> There is a bug in the ks8851 Ethernet driver that more data is written
+> to the hardware TX buffer than actually available. This is caused by
+> wrong accounting of the free TX buffer space.
+> 
+> The driver maintains a tx_space variable that represents the TX buffer
+> space that is deemed to be free. The ks8851_start_xmit_spi() function
+> adds an SKB to a queue if tx_space is large enough and reduces tx_space
+> by the amount of buffer space it will later need in the TX buffer and
+> then schedules a work item. If there is not enough space then the TX
+> queue is stopped.
+> 
+> [...]
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Here is the summary with links:
+  - [net,v3] net: ks8851: Fix TX stall caused by TX buffer overrun
+    https://git.kernel.org/netdev/net/c/3dc5d4454545
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
