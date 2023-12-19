@@ -1,425 +1,94 @@
-Return-Path: <netdev+bounces-59087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0DCE8194B8
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:44:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 735A88194BF
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:49:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7724A2821A9
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 23:44:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4DFD1C25113
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 23:48:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A98E3DB80;
-	Tue, 19 Dec 2023 23:44:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 973DA3DB8D;
+	Tue, 19 Dec 2023 23:48:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t+JpYqGg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X1BE4kY9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2919838DD1
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 23:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-54f4f7e88feso7020006a12.3
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 15:44:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1703029479; x=1703634279; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9Efn2BKPVPbpMDZ/DN82ZFRz90BMfrcBq6mcSKCI8VM=;
-        b=t+JpYqGgsT1QZbofvpeQywgL2I4i2xxJHDEuAE9QSaS5bZfH3ElQ8jicuiOke34Odn
-         3JAKmKyKDCn/0732TdG7lQ0vQSqaiNqT1+NMMktRdDkoLUy7Lsj1gRRsFfLV4p4Gpg3T
-         Im0Fir+jjTyYbc0HzTrvaFGVh9NU9b5qD6KvCCgOl1Vz5WXNT9rSco+JkyjQteOXs6we
-         bqZN9eq/Z+y/rFE1wgdkIgfN4FNN5Vlw2bKlQ9EsKp/Q+J6aSCGeJXgXeVztehoxcbyt
-         uV8c9WBlhmIqoivPJMyEU5JuFA6Mujz99ql/AB+/9x8QiVxR7+6ySb/tVhJPjrnkZ/xG
-         7RZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703029479; x=1703634279;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9Efn2BKPVPbpMDZ/DN82ZFRz90BMfrcBq6mcSKCI8VM=;
-        b=rHUm3ScLY7s2JYI2JNViv7bN+PzCdY+aFK9qSDo8SHi3j5f4WVwiCxv0chwEpBKhEW
-         wsbb1S6mGttFHKKg9AfN9tFheCMrvpPNNM8o9qUYTOu9wGAcvbValKCQS1lbOVFIm1bk
-         bDT0mxRAikAHd6p4FoqfcMeiuXfTtQzJl6qZwQYhOT6MC8aQaMpU7zNqJdOkU4MFsjOj
-         ndScaclTXjFoQc4FVoIGhwxaHknXj9YEbcajcpiVk7dUBTNWmVE6OgRmDETSVY/MHrF6
-         ryVddhUpYbOviAmI+jA3GUxliJLH3HA6xwVPfbfDgT6Bm44ZK9CZPOjBfdIuKpzpQzyg
-         Mz/Q==
-X-Gm-Message-State: AOJu0YyXpZduwL2iL03sg4a0s46kXRorKA1IwVY13E5Dh2OVxHYC4Cid
-	MFbMSQBfynk4P3GXJRUYTbXGH90EGUgJckb5TASEhw==
-X-Google-Smtp-Source: AGHT+IFfZGJl3Fz7tNeAHn+3mUvEBoFYt41FySMnogjhfMBWi8OY5QdQA+LQ9Mmbiusds8MY+KSFvM4tBsjDADN3dMk=
-X-Received: by 2002:a17:906:2e8d:b0:a23:386d:7ff3 with SMTP id
- o13-20020a1709062e8d00b00a23386d7ff3mr2823504eji.115.1703029479216; Tue, 19
- Dec 2023 15:44:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779943D0CB;
+	Tue, 19 Dec 2023 23:48:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17142C433C7;
+	Tue, 19 Dec 2023 23:48:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703029735;
+	bh=6Awxn5V8AF848/sL+nni2y6BxV7vYA7baRCKnw14y/w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=X1BE4kY9mKQ+gismCY/LJfkXQmNsCT6872ehEHdX++U0c1AgqKeDNv2A97UOnMu3m
+	 6nixw/ZlAgr08kVBigelDw6ZCQHHhBXywVX/aSdNOQmSz8dUOxPsVRQxC+eIEUExMb
+	 efywyJg0/FkooDguWnKhF55ooRvX13ghr7mTplfw9K81OxwSPUTMpeej27ux245DWB
+	 vaD7KlF99H+rILYxj/ZzcHBrHXm3YMUheb06bVcETyQ3D0kkTK3N7A1AhnF2yodeAU
+	 RfavRNEeiWIkOW56sRLWvf0F47gLdGFmRjXu7cN/R4uLWgfOV8NPtl6cGsWwC1H4L1
+	 GMe+D68ejKvrQ==
+Date: Tue, 19 Dec 2023 23:48:49 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Samin Guo <samin.guo@starfivetech.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kernel@collabora.com
+Subject: Re: [PATCH 0/1] StarFive DWMAC support for JH7100
+Message-ID: <20231219-green-footwear-e81d37f9c63c@spud>
+References: <20231219231040.2459358-1-cristian.ciocaltea@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231219210357.4029713-1-dw@davidwei.uk> <20231219210357.4029713-14-dw@davidwei.uk>
-In-Reply-To: <20231219210357.4029713-14-dw@davidwei.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 19 Dec 2023 15:44:27 -0800
-Message-ID: <CAHS8izPHG5=z_x1RF3vht9bvPMG2hJ9-aTGqD3mzHwDSKHwi0g@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 13/20] io_uring: implement pp memory provider for
- zc rx
-To: David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="oh06CCJkLIxcVNXN"
+Content-Disposition: inline
+In-Reply-To: <20231219231040.2459358-1-cristian.ciocaltea@collabora.com>
+
+
+--oh06CCJkLIxcVNXN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 19, 2023 at 1:04=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
->
-> From: Pavel Begunkov <asml.silence@gmail.com>
->
-> We're adding a new pp memory provider to implement io_uring zerocopy
-> receive. It'll be "registered" in pp and used in later paches.
->
-> The typical life cycle of a buffer goes as follows: first it's allocated
-> to a driver with the initial refcount set to 1. The drivers fills it
-> with data, puts it into an skb and passes down the stack, where it gets
-> queued up to a socket. Later, a zc io_uring request will be receiving
-> data from the socket from a task context. At that point io_uring will
-> tell the userspace that this buffer has some data by posting an
-> appropriate completion. It'll also elevating the refcount by
-> IO_ZC_RX_UREF, so the buffer is not recycled while userspace is reading
+On Wed, Dec 20, 2023 at 01:10:38AM +0200, Cristian Ciocaltea wrote:
+> This is just a subset of the initial patch series [1] adding networking
+> support for StarFive JH7100 SoC.
+>=20
+> [1]: https://lore.kernel.org/lkml/20231218214451.2345691-1-cristian.cioca=
+ltea@collabora.com/
 
-After you rebase to the latest RFC, you will want to elevante the
-[pp|n]iov->pp_ref_count, rather than the non-existent ppiov->refcount.
-I do the same thing for devmem TCP.
+You need to send the binding patch alongside the driver, unless that has
+been applied already.
 
-> the data. When the userspace is done with the buffer it should return it
-> back to io_uring by adding an entry to the buffer refill ring. When
-> necessary io_uring will poll the refill ring, compare references
-> including IO_ZC_RX_UREF and reuse the buffer.
->
-> Initally, all buffers are placed in a spinlock protected ->freelist.
-> It's a slow path stash, where buffers are considered to be unallocated
-> and not exposed to core page pool. On allocation, pp will first try
-> all its caches, and the ->alloc_pages callback if everything else
-> failed.
->
-> The hot path for io_pp_zc_alloc_pages() is to grab pages from the refill
-> ring. The consumption from the ring is always done in the attached napi
-> context, so no additional synchronisation required. If that fails we'll
-> be getting buffers from the ->freelist.
->
-> Note: only ->freelist are considered unallocated for page pool, so we
-> only add pages_state_hold_cnt when allocating from there. Subsequently,
-> as page_pool_return_page() and others bump the ->pages_state_release_cnt
-> counter, io_pp_zc_release_page() can only use ->freelist, which is not a
-> problem as it's not a slow path.
->
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> ---
->  include/linux/io_uring/net.h |   5 +
->  io_uring/zc_rx.c             | 204 +++++++++++++++++++++++++++++++++++
->  io_uring/zc_rx.h             |   6 ++
->  3 files changed, 215 insertions(+)
->
-> diff --git a/include/linux/io_uring/net.h b/include/linux/io_uring/net.h
-> index d994d26116d0..13244ae5fc4a 100644
-> --- a/include/linux/io_uring/net.h
-> +++ b/include/linux/io_uring/net.h
-> @@ -13,6 +13,11 @@ struct io_zc_rx_buf {
->  };
->
->  #if defined(CONFIG_IO_URING)
-> +
-> +#if defined(CONFIG_PAGE_POOL)
-> +extern const struct pp_memory_provider_ops io_uring_pp_zc_ops;
-> +#endif
-> +
->  int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags=
-);
->
->  #else
-> diff --git a/io_uring/zc_rx.c b/io_uring/zc_rx.c
-> index 1e656b481725..ff1dac24ac40 100644
-> --- a/io_uring/zc_rx.c
-> +++ b/io_uring/zc_rx.c
-> @@ -6,6 +6,7 @@
->  #include <linux/io_uring.h>
->  #include <linux/netdevice.h>
->  #include <linux/nospec.h>
-> +#include <trace/events/page_pool.h>
->
->  #include <uapi/linux/io_uring.h>
->
-> @@ -387,4 +388,207 @@ int io_register_zc_rx_sock(struct io_ring_ctx *ctx,
->         return 0;
->  }
->
-> +static inline struct io_zc_rx_buf *io_iov_to_buf(struct page_pool_iov *i=
-ov)
-> +{
-> +       return container_of(iov, struct io_zc_rx_buf, ppiov);
-> +}
-> +
-> +static inline unsigned io_buf_pgid(struct io_zc_rx_pool *pool,
-> +                                  struct io_zc_rx_buf *buf)
-> +{
-> +       return buf - pool->bufs;
-> +}
-> +
-> +static __maybe_unused void io_zc_rx_get_buf_uref(struct io_zc_rx_buf *bu=
-f)
-> +{
-> +       refcount_add(IO_ZC_RX_UREF, &buf->ppiov.refcount);
-> +}
-> +
-> +static bool io_zc_rx_put_buf_uref(struct io_zc_rx_buf *buf)
-> +{
-> +       if (page_pool_iov_refcount(&buf->ppiov) < IO_ZC_RX_UREF)
-> +               return false;
-> +
-> +       return page_pool_iov_sub_and_test(&buf->ppiov, IO_ZC_RX_UREF);
-> +}
-> +
-> +static inline struct page *io_zc_buf_to_pp_page(struct io_zc_rx_buf *buf=
-)
-> +{
-> +       return page_pool_mangle_ppiov(&buf->ppiov);
-> +}
-> +
-> +static inline void io_zc_add_pp_cache(struct page_pool *pp,
-> +                                     struct io_zc_rx_buf *buf)
-> +{
-> +       refcount_set(&buf->ppiov.refcount, 1);
-> +       pp->alloc.cache[pp->alloc.count++] =3D io_zc_buf_to_pp_page(buf);
-> +}
-> +
-> +static inline u32 io_zc_rx_rqring_entries(struct io_zc_rx_ifq *ifq)
-> +{
-> +       struct io_rbuf_ring *ring =3D ifq->ring;
-> +       u32 entries;
-> +
-> +       entries =3D smp_load_acquire(&ring->rq.tail) - ifq->cached_rq_hea=
-d;
-> +       return min(entries, ifq->rq_entries);
-> +}
-> +
-> +static void io_zc_rx_ring_refill(struct page_pool *pp,
-> +                                struct io_zc_rx_ifq *ifq)
-> +{
-> +       unsigned int entries =3D io_zc_rx_rqring_entries(ifq);
-> +       unsigned int mask =3D ifq->rq_entries - 1;
-> +       struct io_zc_rx_pool *pool =3D ifq->pool;
-> +
-> +       if (unlikely(!entries))
-> +               return;
-> +
-> +       while (entries--) {
-> +               unsigned int rq_idx =3D ifq->cached_rq_head++ & mask;
-> +               struct io_uring_rbuf_rqe *rqe =3D &ifq->rqes[rq_idx];
-> +               u32 pgid =3D rqe->off / PAGE_SIZE;
-> +               struct io_zc_rx_buf *buf =3D &pool->bufs[pgid];
-> +
-> +               if (!io_zc_rx_put_buf_uref(buf))
-> +                       continue;
-> +               io_zc_add_pp_cache(pp, buf);
-> +               if (pp->alloc.count >=3D PP_ALLOC_CACHE_REFILL)
-> +                       break;
-> +       }
-> +       smp_store_release(&ifq->ring->rq.head, ifq->cached_rq_head);
-> +}
-> +
-> +static void io_zc_rx_refill_slow(struct page_pool *pp, struct io_zc_rx_i=
-fq *ifq)
-> +{
-> +       struct io_zc_rx_pool *pool =3D ifq->pool;
-> +
-> +       spin_lock_bh(&pool->freelist_lock);
-> +       while (pool->free_count && pp->alloc.count < PP_ALLOC_CACHE_REFIL=
-L) {
-> +               struct io_zc_rx_buf *buf;
-> +               u32 pgid;
-> +
-> +               pgid =3D pool->freelist[--pool->free_count];
-> +               buf =3D &pool->bufs[pgid];
-> +
-> +               io_zc_add_pp_cache(pp, buf);
-> +               pp->pages_state_hold_cnt++;
-> +               trace_page_pool_state_hold(pp, io_zc_buf_to_pp_page(buf),
-> +                                          pp->pages_state_hold_cnt);
-> +       }
-> +       spin_unlock_bh(&pool->freelist_lock);
-> +}
-> +
-> +static void io_zc_rx_recycle_buf(struct io_zc_rx_pool *pool,
-> +                                struct io_zc_rx_buf *buf)
-> +{
-> +       spin_lock_bh(&pool->freelist_lock);
-> +       pool->freelist[pool->free_count++] =3D io_buf_pgid(pool, buf);
-> +       spin_unlock_bh(&pool->freelist_lock);
-> +}
-> +
-> +static struct page *io_pp_zc_alloc_pages(struct page_pool *pp, gfp_t gfp=
-)
-> +{
-> +       struct io_zc_rx_ifq *ifq =3D pp->mp_priv;
-> +
-> +       /* pp should already be ensuring that */
-> +       if (unlikely(pp->alloc.count))
-> +               goto out_return;
-> +
-> +       io_zc_rx_ring_refill(pp, ifq);
-> +       if (likely(pp->alloc.count))
-> +               goto out_return;
-> +
-> +       io_zc_rx_refill_slow(pp, ifq);
-> +       if (!pp->alloc.count)
-> +               return NULL;
-> +out_return:
-> +       return pp->alloc.cache[--pp->alloc.count];
-> +}
-> +
-> +static bool io_pp_zc_release_page(struct page_pool *pp, struct page *pag=
-e)
-> +{
-> +       struct io_zc_rx_ifq *ifq =3D pp->mp_priv;
-> +       struct page_pool_iov *ppiov;
-> +
-> +       if (WARN_ON_ONCE(!page_is_page_pool_iov(page)))
-> +               return false;
-> +
-> +       ppiov =3D page_to_page_pool_iov(page);
-> +
-> +       if (!page_pool_iov_sub_and_test(ppiov, 1))
-> +               return false;
-> +
-> +       io_zc_rx_recycle_buf(ifq->pool, io_iov_to_buf(ppiov));
-> +       return true;
-> +}
-> +
-> +static void io_pp_zc_scrub(struct page_pool *pp)
-> +{
-> +       struct io_zc_rx_ifq *ifq =3D pp->mp_priv;
-> +       struct io_zc_rx_pool *pool =3D ifq->pool;
-> +       struct io_zc_rx_buf *buf;
-> +       int i;
-> +
-> +       for (i =3D 0; i < pool->nr_bufs; i++) {
-> +               buf =3D &pool->bufs[i];
-> +
-> +               if (io_zc_rx_put_buf_uref(buf)) {
-> +                       /* just return it to the page pool, it'll clean i=
-t up */
-> +                       refcount_set(&buf->ppiov.refcount, 1);
-> +                       page_pool_iov_put_many(&buf->ppiov, 1);
-> +               }
-> +       }
-> +}
-> +
+Cheers,
+Conor.
 
-I'm unsure about this. So scrub forcibly frees the pending data? Why
-does this work? Can't the application want to read this data even
-though the page_pool is destroyed?
+--oh06CCJkLIxcVNXN
+Content-Type: application/pgp-signature; name="signature.asc"
 
-AFAIK the page_pool being destroyed doesn't mean we can free the
-pages/niovs in it. The niovs that were in it can be waiting on the
-receive queue for the application to call recvmsg() on it. Does
-io_uring work differently such that you're able to force-free the
-ppiovs/niovs?
+-----BEGIN PGP SIGNATURE-----
 
-> +static void io_zc_rx_init_pool(struct io_zc_rx_pool *pool,
-> +                              struct page_pool *pp)
-> +{
-> +       struct io_zc_rx_buf *buf;
-> +       int i;
-> +
-> +       for (i =3D 0; i < pool->nr_bufs; i++) {
-> +               buf =3D &pool->bufs[i];
-> +               buf->ppiov.pp =3D pp;
-> +       }
-> +}
-> +
-> +static int io_pp_zc_init(struct page_pool *pp)
-> +{
-> +       struct io_zc_rx_ifq *ifq =3D pp->mp_priv;
-> +
-> +       if (!ifq)
-> +               return -EINVAL;
-> +       if (pp->p.order !=3D 0)
-> +               return -EINVAL;
-> +       if (!pp->p.napi)
-> +               return -EINVAL;
-> +
-> +       io_zc_rx_init_pool(ifq->pool, pp);
-> +       percpu_ref_get(&ifq->ctx->refs);
-> +       ifq->pp =3D pp;
-> +       return 0;
-> +}
-> +
-> +static void io_pp_zc_destroy(struct page_pool *pp)
-> +{
-> +       struct io_zc_rx_ifq *ifq =3D pp->mp_priv;
-> +       struct io_zc_rx_pool *pool =3D ifq->pool;
-> +
-> +       ifq->pp =3D NULL;
-> +
-> +       if (WARN_ON_ONCE(pool->free_count !=3D pool->nr_bufs))
-> +               return;
-> +       percpu_ref_put(&ifq->ctx->refs);
-> +}
-> +
-> +const struct pp_memory_provider_ops io_uring_pp_zc_ops =3D {
-> +       .alloc_pages            =3D io_pp_zc_alloc_pages,
-> +       .release_page           =3D io_pp_zc_release_page,
-> +       .init                   =3D io_pp_zc_init,
-> +       .destroy                =3D io_pp_zc_destroy,
-> +       .scrub                  =3D io_pp_zc_scrub,
-> +};
-> +EXPORT_SYMBOL(io_uring_pp_zc_ops);
-> +
-> +
->  #endif
-> diff --git a/io_uring/zc_rx.h b/io_uring/zc_rx.h
-> index af1d865525d2..00d864700c67 100644
-> --- a/io_uring/zc_rx.h
-> +++ b/io_uring/zc_rx.h
-> @@ -10,6 +10,9 @@
->  #define IO_ZC_IFQ_IDX_OFFSET           16
->  #define IO_ZC_IFQ_IDX_MASK             ((1U << IO_ZC_IFQ_IDX_OFFSET) - 1=
-)
->
-> +#define IO_ZC_RX_UREF                  0x10000
-> +#define IO_ZC_RX_KREF_MASK             (IO_ZC_RX_UREF - 1)
-> +
->  struct io_zc_rx_pool {
->         struct io_zc_rx_ifq     *ifq;
->         struct io_zc_rx_buf     *bufs;
-> @@ -26,12 +29,15 @@ struct io_zc_rx_ifq {
->         struct io_ring_ctx              *ctx;
->         struct net_device               *dev;
->         struct io_zc_rx_pool            *pool;
-> +       struct page_pool                *pp;
->
->         struct io_rbuf_ring             *ring;
->         struct io_uring_rbuf_rqe        *rqes;
->         struct io_uring_rbuf_cqe        *cqes;
->         u32                             rq_entries;
->         u32                             cq_entries;
-> +       u32                             cached_rq_head;
-> +       u32                             cached_cq_tail;
->
->         /* hw rx descriptor ring id */
->         u32                             if_rxq_id;
-> --
-> 2.39.3
->
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZYIr4QAKCRB4tDGHoIJi
+0h8IAQCS86wYpq5Hrwpt9eYpD/kbb3OmnLoYFWKbzhsIywOcwgD+NDOhb/Qneu3B
+kkjU++IJXvuRpPCfETXRhcCGaxFrXQ8=
+=7Klu
+-----END PGP SIGNATURE-----
 
-
---=20
-Thanks,
-Mina
+--oh06CCJkLIxcVNXN--
 
