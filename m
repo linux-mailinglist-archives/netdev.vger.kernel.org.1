@@ -1,63 +1,70 @@
-Return-Path: <netdev+bounces-58800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0B2D8183F0
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 09:57:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E588D8183FA
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 09:59:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A8702864D8
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 08:57:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58375B22FC5
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 08:58:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF7D011CA8;
-	Tue, 19 Dec 2023 08:57:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC792125CC;
+	Tue, 19 Dec 2023 08:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hNntwxVd"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kZwHzqjK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C156E134B2;
-	Tue, 19 Dec 2023 08:57:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D49CAC433C7;
-	Tue, 19 Dec 2023 08:57:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702976254;
-	bh=Qdl2WTOHb4rTUwS9hPDzncPiZEnkbpJEzM85A3gmzoY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hNntwxVdsfrEB7fJ+mBfl5fRUwDuZSaMhdg+6Z0g4/+wp4Wc3XwfudEx4JdcLfO16
-	 Mld/NrcEPGDK+Hu7SRevyZCr7gZGAPB1e3HSvMpW3SkrGW5R8SD48RgKcD9KqAsQgw
-	 sEVKEsxp/aAGCWqASiwnW7CU6oDYK5jrN661HMTohdO+NDs4FwecRk4t7RDNTpRk9G
-	 OogsU38OtIc8qsyAcec7Y03IBJyrUyX46+We9bQbEOYDFyZSE7yOlxtsqZECb6POwg
-	 +n+unclTpiSz7n1RCfXlAcj0g9vvC+zIyTV9aEWXOqVV+RdCGIuAlZ1Au7ilG/ydHd
-	 TprBpLr7klKhw==
-Date: Tue, 19 Dec 2023 08:55:57 +0000
-From: Simon Horman <horms@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?utf-8?Q?Nicol=C3=B2?= Veronese <nicveronese@gmail.com>
-Subject: Re: [PATCH net-next v4 07/13] net: ethtool: Introduce a command to
- list PHYs on an interface
-Message-ID: <20231219085557.GB811967@kernel.org>
-References: <20231215171237.1152563-1-maxime.chevallier@bootlin.com>
- <20231215171237.1152563-8-maxime.chevallier@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3DA7125B5;
+	Tue, 19 Dec 2023 08:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=mApDO3T9Xz1helbAZSFet16out2mW7MWySk8mjZ5wDE=; b=kZwHzqjKiWEgoZn1veK4cqHCKR
+	SerS327V6zs7qE4E6zPYWmsCCljxHbsbPRP8PnWbjTURrTEHbkjZ8o2iz5NzhD8JA+Ff7VkMuDU7y
+	IuyEa1zVHU6FlNhAMzyxTvwbEkuOczsw1MpSllM/sbokb9AG9DcNbi1v0/8T47H9dxsI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rFVvb-003JjA-OP; Tue, 19 Dec 2023 09:58:15 +0100
+Date: Tue, 19 Dec 2023 09:58:15 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Samin Guo <samin.guo@starfivetech.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Hal Feng <hal.feng@starfivetech.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org, linux-clk@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, kernel@collabora.com,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>
+Subject: Re: [PATCH v4 6/9] riscv: dts: starfive: visionfive-v1: Setup
+ ethernet phy
+Message-ID: <962691a4-993d-44c0-861f-d0fd5bbc2da9@lunn.ch>
+References: <20231218214451.2345691-1-cristian.ciocaltea@collabora.com>
+ <20231218214451.2345691-7-cristian.ciocaltea@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,86 +73,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231215171237.1152563-8-maxime.chevallier@bootlin.com>
+In-Reply-To: <20231218214451.2345691-7-cristian.ciocaltea@collabora.com>
 
-On Fri, Dec 15, 2023 at 06:12:29PM +0100, Maxime Chevallier wrote:
-> As we have the ability to track the PHYs connected to a net_device
-> through the link_topology, we can expose this list to userspace. This
-> allows userspace to use these identifiers for phy-specific commands and
-> take the decision of which PHY to target by knowing the link topology.
+On Mon, Dec 18, 2023 at 11:44:46PM +0200, Cristian Ciocaltea wrote:
+> The StarFive VisionFive V1 SBC uses a Motorcomm YT8521 PHY supporting
+> RGMII-ID, but requires manual adjustment of the RX internal delay to
+> work properly.
 > 
-> Add PHY_GET and PHY_DUMP, which can be a filtered DUMP operation to list
-> devices on only one interface.
+> The default RX delay provided by the driver is 1.95 ns, which proves to
+> be too high. Applying a 50% reduction seems to mitigate the issue.
 > 
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> Also note this adjustment is not necessary on BeagleV Starlight SBC,
+> which uses a Microchip PHY.  Hence, there is no indication of a
+> misbehaviour on the GMAC side, but most likely the issue stems from
+> the Motorcomm PHY.
+> 
+> While at it, drop the redundant gpio include, which is already provided
+> by jh7100-common.dtsi.
+> 
+> Co-developed-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+> Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
 
-Hi Maxime,
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-some minor feedback from my side.
-
-> +static int ethnl_phy_parse_request(struct ethnl_req_info *req_base,
-> +				   struct nlattr **tb)
-> +{
-> +	struct phy_req_info *req_info = PHY_REQINFO(req_base);
-> +	struct phy_link_topology *topo = &req_base->dev->link_topo;
-> +	struct phy_device_node *pdn;
-
-nit: Please consider arranging local variables in reverse xmas tree order -
-     longest line to shortest.
-
-> +
-> +	if (!req_base->phydev)
-> +		return 0;
-> +
-> +	pdn = xa_load(&topo->phys, req_base->phydev->phyindex);
-> +	memcpy(&req_info->pdn, pdn, sizeof(*pdn));
-> +
-> +	return 0;
-> +}
-
-...
-
-> +static int ethnl_phy_dump_one_dev(struct sk_buff *skb, struct net_device *dev,
-> +				  struct netlink_callback *cb)
-> +{
-> +	struct ethnl_phy_dump_ctx *ctx = (void *)cb->ctx;
-> +	struct phy_req_info *pri = ctx->phy_req_info;
-> +	struct phy_device_node *pdn;
-> +	unsigned long index = 1;
-> +	void *ehdr;
-> +	int ret;
-> +
-> +	pri->base.dev = dev;
-> +
-> +	xa_for_each(&dev->link_topo.phys, index, pdn) {
-> +		ehdr = ethnl_dump_put(skb, cb,
-> +				      ETHTOOL_MSG_PHY_GET_REPLY);
-> +		if (!ehdr) {
-> +			ret = -EMSGSIZE;
-> +			break;
-> +		}
-> +
-> +		ret = ethnl_fill_reply_header(skb, dev,
-> +					      ETHTOOL_A_PHY_HEADER);
-> +		if (ret < 0) {
-> +			genlmsg_cancel(skb, ehdr);
-> +			break;
-> +		}
-> +
-> +		memcpy(&pri->pdn, pdn, sizeof(*pdn));
-> +		ret = ethnl_phy_fill_reply(&pri->base, skb);
-> +
-> +		genlmsg_end(skb, ehdr);
-> +	}
-> +
-> +	return ret;
-
-I'm unsure if it can happen, but if the loop runs zero times then
-ret will be used uninitialised here.
-
-Flagged by Smatch.
-
-> +}
-
-...
+    Andrew
 
