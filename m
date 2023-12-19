@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-58713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FB3C817E3E
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 00:45:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC2EE817E4E
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 01:00:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC7AB284B96
-	for <lists+netdev@lfdr.de>; Mon, 18 Dec 2023 23:45:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86F252859FE
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 00:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A217B740AB;
-	Mon, 18 Dec 2023 23:45:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBF845384;
+	Tue, 19 Dec 2023 00:00:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="S5ch7WhD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U1i6h7yR"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D951D14D;
-	Mon, 18 Dec 2023 23:45:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Ku82/a/J+0bFtIhYsVynfUEnaLEMFdenmJjJZ6ZQ1P0=; b=S5ch7WhD3leBOYhM3tR6+E2r/f
-	vxE8UMfVsIbHLqtrP+yrS1J8Zrx2f1Wzh0XTsZzt4VPcZouwEz42d367o8/y9hImHwzVagfr2AqS3
-	oFp3OmWN7HCNm4YoqcJIVPbklQbEOjukXlSnSqI/kP7vOzMfrtV4qmEuOVquqUNQ3ueM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rFNID-003HgS-0h; Tue, 19 Dec 2023 00:45:01 +0100
-Date: Tue, 19 Dec 2023 00:45:01 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Dimitri Fedrau <dima.fedrau@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] net: phy: Add BaseT1 auto-negotiation constants
-Message-ID: <89f68405-2506-420b-952f-a168ebcb4d73@lunn.ch>
-References: <20231218221814.69304-1-dima.fedrau@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6DD6129;
+	Tue, 19 Dec 2023 00:00:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF2B4C433C7;
+	Tue, 19 Dec 2023 00:00:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702944024;
+	bh=uH9ugU+7qqeRDjMYoKm8lVQHLGXGmWs2ElB1AqWtjug=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=U1i6h7yRznY+6DGXxmEsXQibpH+4jvmWkcauqO2DbhOJQSwU9vJ3fb/rzhwH9dpS9
+	 aBJ/zC9Bnvs2YI/dcwLWEbOBZfWQnCQGI2v+m+ylfM775kbiVdCAxeny2HqS+K4T6g
+	 u8SUFuAUGVaqB4LDHhJ9ILJ1PlnHeuFY/63oH0KDcwWtY2YALw1nDDOe65FM+AAI4b
+	 gWv0rESaCCs+HCy1B4VGPkVdPCFfienU8u1+POUYrJm+vwknBvZqlAQAJtdnpyLgQ0
+	 QjBAfcuqS5sZaL7gC+6CpQniFcFQh4Dq3psxjzJpTvHbUluOmlIEr1wZjLBlAPhVsM
+	 dL3EF3FoH8tpw==
+Date: Mon, 18 Dec 2023 16:00:22 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Leone Fernando <leone4fernando@gmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] ipmr: support IP_PKTINFO on cache report
+ IGMP msg
+Message-ID: <20231218160022.60434a91@kernel.org>
+In-Reply-To: <63bd69c0-8729-4237-82e6-53af12a60bf9@gmail.com>
+References: <63bd69c0-8729-4237-82e6-53af12a60bf9@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231218221814.69304-1-dima.fedrau@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 18, 2023 at 11:18:13PM +0100, Dimitri Fedrau wrote:
-> Added constants for advertising 100BT1 and 1000BT1 in register BASE-T1
-> auto-negotiation advertisement register [31:16] (Register 7.515)
+On Wed, 13 Dec 2023 17:19:35 +0100 Leone Fernando wrote:
+> In order to support IP_PKTINFO on those packets, we need to call
+> ipv4_pktinfo_prepare.
+> 
+> When sending mrouted/pimd daemons a cache report IGMP msg, it is
+> unnecessary to set dst on the newly created skb.
+> It used to be necessary on older versions until
+> commit d826eb14ecef ("ipv4: PKTINFO doesnt need dst reference") which
+> changed the way IP_PKTINFO struct is been retrieved.
+> 
+> Changes from v1:
+> 1. Undo changes in ipv4_pktinfo_prepare function. use it directly
+>    and copy the control block.
+> 
+> Fixes: d826eb14ecef ("ipv4: PKTINFO doesnt need dst reference")
+> Signed-off-by: Leone Fernando <leone4fernando@gmail.com>
 
-Hi Dimitri
-
-These two patches look good, but...
-
-Please take a read of:
-
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#netdev-faq
-
-Also, its normal to include a user for new APIs. Do you have a driver
-which will make use of this to advertisement modes?
-
-Thanks
-	Andrew
+Applied to net-next, thanks!
 
