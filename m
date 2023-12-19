@@ -1,130 +1,78 @@
-Return-Path: <netdev+bounces-58900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44D9C8188BE
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 14:37:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EDBB8188D2
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 14:44:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A963E2859F0
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 13:37:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF7561F24D0D
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 13:44:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06B0E1945C;
-	Tue, 19 Dec 2023 13:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="rr/fsctI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3BB1947D;
+	Tue, 19 Dec 2023 13:44:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0661B267;
-	Tue, 19 Dec 2023 13:37:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1702993021;
-	bh=FnY6knylJ3x5vm9CnT/Sy6SqYuEWSlZ8nKY07PB5N7Y=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=rr/fsctIrfTYaB6wwgAqsttKJXuqFEYeaGHdO+RJUJx6mCnkUHNcbAmTsAv6hHtz6
-	 HWU/k63GGZPmCPkoC9UHuhiYM/WE4xnxpAp9lY7KOp/yy/aHG59CzEK6ae141k4iy2
-	 ylfrB0Sl7xcYDxL0qJ/RiVjxDqBMokBKDX9oRNhd7F/jrw+TEr6sObE7JXzSWliHDG
-	 O8B1yPGN20H3Pr4IuFPnN0jlNyfrnNfBFI0AtX2LFY6lPtKGxF1oOlnKYl60VAjjJL
-	 BfCwuad1t7Mz4l63tcJxsvYvM7a+iquoBaxInwxx8kFCelNCoxO0SfT/b0kM9q/E7x
-	 agTbnn5KDVMWQ==
-Received: from [100.115.223.179] (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: cristicc)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id A413B378145A;
-	Tue, 19 Dec 2023 13:36:59 +0000 (UTC)
-Message-ID: <50f0a002-f602-4cdb-ab18-e085adbf09bc@collabora.com>
-Date: Tue, 19 Dec 2023 15:36:58 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093CB19BCB;
+	Tue, 19 Dec 2023 13:44:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4SvdF828JHz1Q6Rk;
+	Tue, 19 Dec 2023 21:43:24 +0800 (CST)
+Received: from kwepemm600002.china.huawei.com (unknown [7.193.23.29])
+	by mail.maildlp.com (Postfix) with ESMTPS id 74FAE140415;
+	Tue, 19 Dec 2023 21:44:37 +0800 (CST)
+Received: from dggpeml500007.china.huawei.com (7.185.36.75) by
+ kwepemm600002.china.huawei.com (7.193.23.29) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 19 Dec 2023 21:44:37 +0800
+Received: from dggpeml500007.china.huawei.com ([7.185.36.75]) by
+ dggpeml500007.china.huawei.com ([7.185.36.75]) with mapi id 15.01.2507.035;
+ Tue, 19 Dec 2023 21:44:36 +0800
+From: mengkanglai <mengkanglai2@huawei.com>
+To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+CC: "Fengtao (fengtao, Euler)" <fengtao40@huawei.com>, "Yanan (Euler)"
+	<yanan@huawei.com>
+Subject: [Consult]kernel tcp socket lack of refcnt for net may cause uaf
+ problem?
+Thread-Topic: [Consult]kernel tcp socket lack of refcnt for net may cause uaf
+ problem?
+Thread-Index: AdoygXTr5FKzOdnSR4i43aSi6m/SRw==
+Date: Tue, 19 Dec 2023 13:44:36 +0000
+Message-ID: <26f7811f5ee247c389ddd38034d8747d@huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/9] dt-bindings: net: starfive,jh7110-dwmac: Add
- JH7100 SoC compatible
-Content-Language: en-US
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
- Samin Guo <samin.guo@starfivetech.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Hal Feng <hal.feng@starfivetech.com>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
- linux-clk@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, kernel@collabora.com
-References: <20231218214451.2345691-1-cristian.ciocaltea@collabora.com>
- <20231218214451.2345691-3-cristian.ciocaltea@collabora.com>
- <c9225053-78f8-40b7-9453-dc3dabe44500@linaro.org>
- <d030f5b7-8d32-4a80-a3c0-98cfa1c0fe4f@collabora.com>
- <15077e1f-c13b-4424-9918-df441b56b695@linaro.org>
-From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-In-Reply-To: <15077e1f-c13b-4424-9918-df441b56b695@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 12/19/23 15:19, Krzysztof Kozlowski wrote:
-> On 19/12/2023 13:49, Cristian Ciocaltea wrote:
->>>>    reg:
->>>>      maxItems: 1
->>>> @@ -46,23 +50,6 @@ properties:
->>>>        - const: tx
->>>>        - const: gtx
->>>>  
->>>> -  interrupts:
->>>> -    minItems: 3
->>>> -    maxItems: 3
->>>> -
->>>> -  interrupt-names:
->>>> -    minItems: 3
->>>> -    maxItems: 3
->>>> -
->>>> -  resets:
->>>> -    minItems: 2
->>>> -    maxItems: 2
->>>
->>> What is the point of your previous patch if you immediately remove it?
->>> It is a no-op. Just mention in this commit msg, that both resets and
->>> reset-names are coming from snps,dwmac so they can be removed from
->>> top-level entirely.
->>
->> This has been discussed during v2 review [1], where I also provided the
->> rational behind not updating reset-names. So the code was not deleted,
->> but moved under an if clause.
->>
->> Thanks for reviewing,
->> Cristian
->>
->> [1]: https://lore.kernel.org/lkml/f4d0b216-5bdc-4559-aabb-8af638d33721@collabora.com/
-> 
-> I don't see it being addressed:
-> 
-> https://lore.kernel.org/lkml/35556392-3b9a-4997-b482-082dc2f9121f@linaro.org/
-> 
-> Repeating the same and the same :/
+Hello, Eric:
 
-I think this was just a misunderstanding, sorry for the confusion.  I
-kept two sets of changes which were not directly related into separate
-patches, so I'm going to squash them in v5.
+I found upstream have fixed a UAF issue (smc: Fix use-after-free in tcp_wri=
+te_timer_handler()):=20
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?=
+id=3D9744d2bf19762703704ecba885b7ac282c02eacf
 
-Thanks,
-Cristian
+When create a kernel socket use sock_create_kern , it won't call get_net() =
+to increase refcnt for net where the socket is located.
+I found some other subsystem(like rds and sunrpc) also use sock_create_kern=
+ to create kernel tcp socket, I want to know if they have same UAF problem?
+
+Best wishes!
+
 
