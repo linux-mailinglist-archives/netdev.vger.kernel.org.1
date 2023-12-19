@@ -1,93 +1,110 @@
-Return-Path: <netdev+bounces-58743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED895817F2E
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 02:14:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAD28817F37
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 02:17:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C5F11F230BB
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 01:14:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79620285644
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 01:17:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9319410EF;
-	Tue, 19 Dec 2023 01:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 201C517F7;
+	Tue, 19 Dec 2023 01:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OSyXQljj"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="EEy4X/f5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3814410E4
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 01:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-5e248b40c97so32322967b3.2
-        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 17:14:26 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723A115AB
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 01:17:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-40c236624edso43731605e9.1
+        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 17:17:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702948466; x=1703553266; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xtAVnekgmhwpqTIome4g6Wn7kowfqPy/ZN5t6l1+xV8=;
-        b=OSyXQljj+AN6MnNjCerL1o6y9VANyuCtRQy8JVY2UqH1elVXK8zZC4fOnKyo9ADxwf
-         GtCFEIOJMlnuLvrURLvJN0BGgXG8F/fuGVtt6FQE2wUwGCJbroDItEStsVO3ySmOzpQT
-         KlD7AzXfcWQfnZIBJqdrAYlTnjlpMK68azZzrF9AW1QnqSSEXizGZKb+iYnB6i8u5i95
-         l6+TOpylFkdJ7I1Pw+Fx0GSnu8iyGDXmRY5jA9DBZRJO3N5jddQbPabYJqlk0T4zRDma
-         piBLxw7Qgfv3nfar2zyMHW4EWH8dsigIpz1LEnKn6yQrjdmmhe2Z4I4/+62H6UZrtCuF
-         4/sQ==
+        d=linuxfoundation.org; s=google; t=1702948643; x=1703553443; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=2d8n5veSwDKrjujjZS9oHRQwKzoLqynkBXf88Dby3fc=;
+        b=EEy4X/f5X0wsZNCyurB/GSgHNDbneaC9y9bWf3Apg2T7aE1qk9TqHhVqcyLCX9VUqK
+         9b/rVF3ARJ6WKoUR8FVkI9jC7BWnbxkJEWa2P+kJZwQFHhIS2vAz5iDr6K3OpQsRZ7r0
+         /A2KzkSirrhJO4hPfwtdvnfyAeM4vtLeQ+4QQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702948466; x=1703553266;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xtAVnekgmhwpqTIome4g6Wn7kowfqPy/ZN5t6l1+xV8=;
-        b=kulE28YUM4FdeVaf+yXgrPJIJAYOXhFfxDh80Hq/3bwMzguwfvtCSYKEokrWF81C6u
-         sB3sCojr0KfG5QizOYPFuRMYz7NAY1iFhzQ6niq600gCd30055ib+wINio8v+yHjJOhL
-         gHj9J/dIsdOBI4GPzgP4MJX65/aK8Oegef0ilw5Ba3n6beEXg+UaoGSn74lQeTw7C78u
-         p+cMbT91t+YHbHPYvJeD4pmdkljWUL5Xiel6duBpyBXJta5wDZPE/T79tiUmA8P3b7xf
-         K/BUo5e9q5eJRaTD0WNvtgAgGoIW8y3IJjjOOOG8yN9txor0lEe/V01wpXQ3k6iXVEmW
-         VHpw==
-X-Gm-Message-State: AOJu0YyUf3P7exKOqdZmmEEjh46lVa8exPOGpWqKMAaN884EbY65sfp4
-	L/k9MEhTvKvy8QAm9w+M4eb5Am0kIJE=
-X-Google-Smtp-Source: AGHT+IG7/kEDmBbiTLZocLu0aOm5yVzAsXRtrUg0rzKcOjSNVE629CETeHDGc6IYABXRWaxnO8Zonw==
-X-Received: by 2002:a0d:dc81:0:b0:5d7:1940:f3d6 with SMTP id f123-20020a0ddc81000000b005d71940f3d6mr13482928ywe.62.1702948466044;
-        Mon, 18 Dec 2023 17:14:26 -0800 (PST)
-Received: from ?IPV6:2600:1700:6cf8:1240:e84:899c:4b9b:a70e? ([2600:1700:6cf8:1240:e84:899c:4b9b:a70e])
-        by smtp.gmail.com with ESMTPSA id eq17-20020a05690c2d1100b005e181bc7d2esm6316631ywb.54.2023.12.18.17.14.25
+        d=1e100.net; s=20230601; t=1702948643; x=1703553443;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2d8n5veSwDKrjujjZS9oHRQwKzoLqynkBXf88Dby3fc=;
+        b=Sxsv7nVjaEpQyth850zocpfZcW/nMw5asHefVgyQgSD4Pm3BgY90M4ASEyPNsQdItx
+         mX08N8hMaQBWrPH3+GU2j3FNH0+G3KsQz/aC8AUZxLBzHcCGGSdNYclMfax+9FC/z6S0
+         mbP3LHySFc62Z14uxP/Mx6074GlCyK9FcGuemDGfCVBAdB5laFhSH/wU6xabie9mg6Wm
+         4ohdUqA+jqtQqf9KcO0AgkKkl9MGRtk+rLDtSdDLFX4S1FrvRZdg0rbe/jesQw9eJkd1
+         Ec9yI/P4FjVH8CI/+0vkHxDSBg6IYx8fw9RWrHwlX0MPRnMvFFl1cKX45J/cIXnbSgeV
+         J7RQ==
+X-Gm-Message-State: AOJu0YxhyahLj9Fx/wGmcot+ux3Rv3CC6ot6zvf5dwR88XG0SR+x1lhS
+	pVYm72k0Ba1h+O0sIWPmMJBwqwDq1wQHv3Lkt2r5Ow==
+X-Google-Smtp-Source: AGHT+IE90s94xbfL+/0wAA5MT/aLpZxEtlJf8vSEuM0+SaiG261KWeAmDEcQNASwmijrlXrj2LHWNw==
+X-Received: by 2002:a05:600c:2147:b0:409:247b:b0ae with SMTP id v7-20020a05600c214700b00409247bb0aemr9794079wml.36.1702948643455;
+        Mon, 18 Dec 2023 17:17:23 -0800 (PST)
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com. [209.85.208.51])
+        by smtp.gmail.com with ESMTPSA id vi7-20020a170907d40700b00a1dc7e789fbsm14649076ejc.21.2023.12.18.17.17.22
+        for <netdev@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Dec 2023 17:14:25 -0800 (PST)
-Message-ID: <a289e845-f244-48a4-ba75-34ce027c0de4@gmail.com>
-Date: Mon, 18 Dec 2023 17:14:24 -0800
+        Mon, 18 Dec 2023 17:17:22 -0800 (PST)
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-553338313a0so2341322a12.2
+        for <netdev@vger.kernel.org>; Mon, 18 Dec 2023 17:17:22 -0800 (PST)
+X-Received: by 2002:a17:907:7d8c:b0:a19:a19b:55ef with SMTP id
+ oz12-20020a1709077d8c00b00a19a19b55efmr9119435ejc.127.1702948641815; Mon, 18
+ Dec 2023 17:17:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/ipv6: Revert remove expired routes with a
- separated list of routes
-Content-Language: en-US
-To: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
-Cc: edumazet@google.com, Kui-Feng Lee <thinker.li@gmail.com>
-References: <20231217185505.22867-1-dsahern@kernel.org>
-From: Kui-Feng Lee <sinquersw@gmail.com>
-In-Reply-To: <20231217185505.22867-1-dsahern@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20231219000520.34178-1-alexei.starovoitov@gmail.com> <20231218165513.24717ec1@kernel.org>
+In-Reply-To: <20231218165513.24717ec1@kernel.org>
+From: Linus Torvalds <torvalds@linuxfoundation.org>
+Date: Mon, 18 Dec 2023 17:17:05 -0800
+X-Gmail-Original-Message-ID: <CAHk-=whBBWGaQy=rtS2Ma6QPqbQ+jEUKUWfF2zS7gDXpim11bA@mail.gmail.com>
+Message-ID: <CAHk-=whBBWGaQy=rtS2Ma6QPqbQ+jEUKUWfF2zS7gDXpim11bA@mail.gmail.com>
+Subject: Re: pull-request: bpf-next 2023-12-18
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, daniel@iogearbox.net, andrii@kernel.org, 
+	peterz@infradead.org, brauner@kernel.org, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, kernel-team@fb.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
+On Mon, 18 Dec 2023 at 16:55, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> LGTM, but what do I know about file systems.. Adding LKML to the CC
+> list, if anyone has any late comments on the BPF token come forward
+> now, petty please?
 
+See my crossed email reply.
 
-On 12/17/23 10:55, David Ahern wrote:
-> Revert the remainder of 5a08d0065a915 which added a warn on if a fib
-> entry is still on the gc_link list, and then revert  all of the commit
-> in the Fixes tag. The commit has some race conditions given how expires
-> is managed on a fib6_info in relation to timer start, adding the entry
-> to the gc list and setting the timer value leading to UAF. Revert
-> the commit and try again in a later release.
+The file descriptor handling is FUNDAMENTALLY wrong. The first time
+that happened, we chalked it up to a mistake. Now it's something
+worse.
 
-May I know what your concerns are about the patch I provided?
-Even I try it again later, I still need to know what I miss and should
-address.
+Please don't pull until at least that part is fixed.
+
+I tried to review the token patches, but honestly, I got to that part
+and I just gave up.
+
+We had this whole discussion more than 6 months ago:
+
+  https://lore.kernel.org/all/20230517-allabendlich-umgekehrt-8cc81f8313ac@brauner/
+
+and I really thought the bpf people had *understood* they their
+special use of "fd == 0" was wrong.
+
+But it seems that they never did. Once is a mistake. Twice is a
+choice. And the bpf people have chosen insanity.
+
+               Linus
 
