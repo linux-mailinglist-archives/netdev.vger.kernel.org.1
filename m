@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-59035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAE678191E3
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 22:04:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5A358191E5
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 22:04:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32D491F239C6
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 21:04:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C34CB21528
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 21:04:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C07D3B19C;
-	Tue, 19 Dec 2023 21:04:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E873F3B791;
+	Tue, 19 Dec 2023 21:04:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="KTauUz9t"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="DNaHuW9J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DAC539AFC
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 21:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45AA3B18E
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 21:04:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-5cd68a0de49so3548042a12.2
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 13:04:07 -0800 (PST)
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-28bc0c0375fso643657a91.0
+        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 13:04:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1703019847; x=1703624647; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1703019848; x=1703624648; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AHaFgdexCzA0uTP4OJiRQISL/EACmJ6kzizjojPCXBw=;
-        b=KTauUz9txi8e8EDGRgr7KZDO3GLkQxgu9BD+dn1djoKo/8Enlb+nguOCnC3D8nyDmz
-         dzKgEX4OKmqK+TUm4Nv/izPM3FHj++rCwbB9aQYQOv6hPupeMWCQ3yui2JWK3vEObReB
-         /ccew2Dj455A2VWcpa9YFFCEo9CqzEW7aAIobFD/TZ1WWSnE+norGtTqjRdE5vcPlTTq
-         6mplqBvIZparTmqfSI6n9C1hZCC20AKZjgO5A2wmrNabqK0vptd+rpryxybdVOxwjmFK
-         dCyA5y/VmdCyuAm2aAbuU6ep7W7/08uGNyi1807TWc7Tf4L2LpS9sCmZFOsFkIVJV5Tc
-         x7Fg==
+        bh=C5DHyX6aeoJMKvf3FMrIDlFr+7zOXVmc0yCRXRvCbfw=;
+        b=DNaHuW9JyCsGjRr32FZPjepveILYCjfq/NnQ5P+SElQi/jJBJDR7xLy3zeoRr0B47F
+         /82kHVdDftMc5fRmHH75Olo/PpecEW6xhz72icYfBdAhSsXePomp4WDV8r9W0WjkjXe8
+         VWmnPMCBx4WX1ixDBanNjr0xjl4c0EUQm9AQIRq3fhcajJDV/M5f7mGG9a8i8JhEPcRd
+         1LqMXhFflA178I7DOiE9sILA9BFqdb+RTyHN6n0wz5fqzUi8sdDdwIdz3R5xnhtcf+dC
+         41SZpoCCtBnTZAud1vNlupTsutLyJK5EgaYQEN/G/Lj+rAvUbCRF992UGQXckMkUvMm0
+         Ou0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703019847; x=1703624647;
+        d=1e100.net; s=20230601; t=1703019848; x=1703624648;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AHaFgdexCzA0uTP4OJiRQISL/EACmJ6kzizjojPCXBw=;
-        b=dwCzRKIXKNJUisBuVIuwvptqIOGlmlBxCcSXAbKoMK33ptWRKSDtzlfcwhSI4OJ+K2
-         NG5cJo/MaZlCH/wEQUmhIzN2+91FFglbSzGJ6A5StD7bEXWf5ihhgF/6PT9toQKdBYo+
-         MRAFEJU1tSMu/7VvieMQ7E5y7+Lgp8jykdVuS/UuzWRm0fuF7tJyIMzCB2KLKSk9GT/O
-         5zAGPLAP+56NzcULPxVMus6m2gcIjLzcJTbe7db6bL6TprXxjFL8mxS72pld+mhZVyAO
-         VLC0TNy4NW2QNmzqIjpGhOCGHfZE4PlYMgtiZM4xWI+cGBWO8u8gqGX1DHntrEyvsQa9
-         sLAA==
-X-Gm-Message-State: AOJu0YwM/jMuTzEdyeqngokiXQGwiw1iTMyqow/NUBzldTF62RGqE1sc
-	/QQwVZ2NfEeh/mLrr2Xn7HvjgA==
-X-Google-Smtp-Source: AGHT+IF16V9K9fxk40dVoBfsF4UCnLKdU0l3jKOgVGqIYtUJwS2ni4AdskvJa710jcq0aAXd9+X4lA==
-X-Received: by 2002:a17:90a:fa4f:b0:28b:c572:1f0 with SMTP id dt15-20020a17090afa4f00b0028bc57201f0mr819001pjb.90.1703019846948;
-        Tue, 19 Dec 2023 13:04:06 -0800 (PST)
-Received: from localhost (fwdproxy-prn-020.fbsv.net. [2a03:2880:ff:14::face:b00c])
-        by smtp.gmail.com with ESMTPSA id g15-20020a17090a4b0f00b0028bb87b2378sm2082025pjh.49.2023.12.19.13.04.06
+        bh=C5DHyX6aeoJMKvf3FMrIDlFr+7zOXVmc0yCRXRvCbfw=;
+        b=RMZRG4nnFJgznK5uX1EXO58xpF2MJszeeyDHhg+O2CDSc08h49p6QsUX9h6pkK8ei5
+         Z2crwyYJRECu08WRj6TrtET6+1mbPCPznosc2MAAUTfJgwxV/yCbadzLIMRcYUD/uQFc
+         A6AKXuueA9jxEeZtBFL8oiBKpTekk32CMWzgkhKFwLoXeaN6lTZOWfGodNWpfotc3/S2
+         GPO5fSMr+pKhwAA9WJrI/8VXRHP7+POSod++/7qwSyOFVFcb3mFHwJayTYTYkFNmhfJX
+         dRRt/QSbjOlnutSGzNFf5N8vW3/tivEVL1iHX5CBTILlBaPNaGdRDDngMrLI4GLhu3UW
+         FV0w==
+X-Gm-Message-State: AOJu0Yxr5lYUjSFzO614mqnuegoVooZFwV6B0o4F1jwc+fxgxmxA84Mt
+	EI9CTnJAElZQWZcyJvLL+CPZ/Q==
+X-Google-Smtp-Source: AGHT+IGng/UXhQ+pTyRj8hIhoKPfhzyfyq52gtF64Uvn9PD+x5fXxFr0YyiQhiVsLPL8ylYTdzjzaw==
+X-Received: by 2002:a17:90a:b901:b0:28b:1f1e:827e with SMTP id p1-20020a17090ab90100b0028b1f1e827emr3955367pjr.48.1703019847844;
+        Tue, 19 Dec 2023 13:04:07 -0800 (PST)
+Received: from localhost (fwdproxy-prn-119.fbsv.net. [2a03:2880:ff:77::face:b00c])
+        by smtp.gmail.com with ESMTPSA id oe7-20020a17090b394700b0028a69db1f51sm2110330pjb.30.2023.12.19.13.04.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Dec 2023 13:04:06 -0800 (PST)
+        Tue, 19 Dec 2023 13:04:07 -0800 (PST)
 From: David Wei <dw@davidwei.uk>
 To: io-uring@vger.kernel.org,
 	netdev@vger.kernel.org
@@ -69,9 +69,9 @@ Cc: Jens Axboe <axboe@kernel.dk>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
 	David Ahern <dsahern@kernel.org>,
 	Mina Almasry <almasrymina@google.com>
-Subject: [RFC PATCH v3 02/20] tcp: don't allow non-devmem originated ppiov
-Date: Tue, 19 Dec 2023 13:03:39 -0800
-Message-Id: <20231219210357.4029713-3-dw@davidwei.uk>
+Subject: [RFC PATCH v3 03/20] net: page pool: rework ppiov life cycle
+Date: Tue, 19 Dec 2023 13:03:40 -0800
+Message-Id: <20231219210357.4029713-4-dw@davidwei.uk>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20231219210357.4029713-1-dw@davidwei.uk>
 References: <20231219210357.4029713-1-dw@davidwei.uk>
@@ -86,36 +86,162 @@ Content-Transfer-Encoding: 8bit
 From: Pavel Begunkov <asml.silence@gmail.com>
 
 NOT FOR UPSTREAM
+The final version will depend on how the ppiov infra looks like
 
-There will be more users of struct page_pool_iov, and ppiovs from one
-subsystem must not be used by another. That should never happen for any
-sane application, but we need to enforce it in case of bufs and/or
-malicious users.
+Page pool is tracking how many pages were allocated and returned, which
+serves for refcounting the pool, and so every page/frag allocated should
+eventually come back to the page pool via appropriate ways, e.g. by
+calling page_pool_put_page().
+
+When it comes to normal page pools (i.e. without memory providers
+attached), it's fine to return a page when it's still refcounted by
+somewhat in the stack, in which case we'll "detach" the page from the
+pool and rely on page refcount for it to return back to the kernel.
+
+Memory providers are different, at least ppiov based ones, they need
+all their buffers to eventually return back, so apart from custom pp
+->release handlers, we'll catch when someone puts down a ppiov and call
+its memory provider to handle it, i.e. __page_pool_iov_free().
+
+The first problem is that __page_pool_iov_free() hard coded devmem
+handling, and other providers need a flexible way to specify their own
+callbacks.
+
+The second problem is that it doesn't go through the generic page pool
+paths and so can't do the mentioned pp accounting right. And we can't
+even safely rely on page_pool_put_page() to be called somewhere before
+to do the pp refcounting, because then the page pool might get destroyed
+and ppiov->pp would point to garbage.
+
+The solution is to make the pp ->release callback to be responsible for
+properly recycling its buffers, e.g. calling what was
+__page_pool_iov_free() before in case of devmem.
+page_pool_iov_put_many() will be returning buffers to the page pool.
 
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- net/ipv4/tcp.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ include/net/page_pool/helpers.h | 15 ++++++++---
+ net/core/page_pool.c            | 46 +++++++++++++++++----------------
+ 2 files changed, 35 insertions(+), 26 deletions(-)
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 33a8bb63fbf5..9c6b18eebb5b 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -2384,6 +2384,13 @@ static int tcp_recvmsg_devmem(const struct sock *sk, const struct sk_buff *skb,
- 			}
+diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
+index 92804c499833..ef380ee8f205 100644
+--- a/include/net/page_pool/helpers.h
++++ b/include/net/page_pool/helpers.h
+@@ -137,15 +137,22 @@ static inline void page_pool_iov_get_many(struct page_pool_iov *ppiov,
+ 	refcount_add(count, &ppiov->refcount);
+ }
  
- 			ppiov = skb_frag_page_pool_iov(frag);
-+
-+			/* Disallow non devmem owned buffers */
-+			if (ppiov->pp->p.memory_provider != PP_MP_DMABUF_DEVMEM) {
-+				err = -ENODEV;
-+				goto out;
-+			}
-+
- 			end = start + skb_frag_size(frag);
- 			copy = end - offset;
+-void __page_pool_iov_free(struct page_pool_iov *ppiov);
++static inline bool page_pool_iov_sub_and_test(struct page_pool_iov *ppiov,
++					      unsigned int count)
++{
++	return refcount_sub_and_test(count, &ppiov->refcount);
++}
  
+ static inline void page_pool_iov_put_many(struct page_pool_iov *ppiov,
+ 					  unsigned int count)
+ {
+-	if (!refcount_sub_and_test(count, &ppiov->refcount))
+-		return;
++	if (count > 1)
++		WARN_ON_ONCE(page_pool_iov_sub_and_test(ppiov, count - 1));
+ 
+-	__page_pool_iov_free(ppiov);
++#ifdef CONFIG_PAGE_POOL
++	page_pool_put_defragged_page(ppiov->pp, page_pool_mangle_ppiov(ppiov),
++				     -1, false);
++#endif
+ }
+ 
+ /* page pool mm helpers */
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 38eff947f679..ecf90a1ccabe 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -599,6 +599,16 @@ void __page_pool_release_page_dma(struct page_pool *pool, struct page *page)
+ 	page_pool_set_dma_addr(page, 0);
+ }
+ 
++static void page_pool_return_provider(struct page_pool *pool, struct page *page)
++{
++	int count;
++
++	if (pool->mp_ops->release_page(pool, page)) {
++		count = atomic_inc_return_relaxed(&pool->pages_state_release_cnt);
++		trace_page_pool_state_release(pool, page, count);
++	}
++}
++
+ /* Disconnects a page (from a page_pool).  API users can have a need
+  * to disconnect a page (from a page_pool), to allow it to be used as
+  * a regular page (that will eventually be returned to the normal
+@@ -607,13 +617,13 @@ void __page_pool_release_page_dma(struct page_pool *pool, struct page *page)
+ void page_pool_return_page(struct page_pool *pool, struct page *page)
+ {
+ 	int count;
+-	bool put;
+ 
+-	put = true;
+-	if (static_branch_unlikely(&page_pool_mem_providers) && pool->mp_ops)
+-		put = pool->mp_ops->release_page(pool, page);
+-	else
+-		__page_pool_release_page_dma(pool, page);
++	if (static_branch_unlikely(&page_pool_mem_providers) && pool->mp_ops) {
++		page_pool_return_provider(pool, page);
++		return;
++	}
++
++	__page_pool_release_page_dma(pool, page);
+ 
+ 	/* This may be the last page returned, releasing the pool, so
+ 	 * it is not safe to reference pool afterwards.
+@@ -621,10 +631,8 @@ void page_pool_return_page(struct page_pool *pool, struct page *page)
+ 	count = atomic_inc_return_relaxed(&pool->pages_state_release_cnt);
+ 	trace_page_pool_state_release(pool, page, count);
+ 
+-	if (put) {
+-		page_pool_clear_pp_info(page);
+-		put_page(page);
+-	}
++	page_pool_clear_pp_info(page);
++	put_page(page);
+ 	/* An optimization would be to call __free_pages(page, pool->p.order)
+ 	 * knowing page is not part of page-cache (thus avoiding a
+ 	 * __page_cache_release() call).
+@@ -1034,15 +1042,6 @@ void page_pool_update_nid(struct page_pool *pool, int new_nid)
+ }
+ EXPORT_SYMBOL(page_pool_update_nid);
+ 
+-void __page_pool_iov_free(struct page_pool_iov *ppiov)
+-{
+-	if (ppiov->pp->mp_ops != &dmabuf_devmem_ops)
+-		return;
+-
+-	netdev_free_devmem(ppiov);
+-}
+-EXPORT_SYMBOL_GPL(__page_pool_iov_free);
+-
+ /*** "Dmabuf devmem memory provider" ***/
+ 
+ static int mp_dmabuf_devmem_init(struct page_pool *pool)
+@@ -1093,9 +1092,12 @@ static bool mp_dmabuf_devmem_release_page(struct page_pool *pool,
+ 		return false;
+ 
+ 	ppiov = page_to_page_pool_iov(page);
+-	page_pool_iov_put_many(ppiov, 1);
+-	/* We don't want the page pool put_page()ing our page_pool_iovs. */
+-	return false;
++
++	if (!page_pool_iov_sub_and_test(ppiov, 1))
++		return false;
++	netdev_free_devmem(ppiov);
++	/* tell page_pool that the ppiov is released */
++	return true;
+ }
+ 
+ const struct pp_memory_provider_ops dmabuf_devmem_ops = {
 -- 
 2.39.3
 
