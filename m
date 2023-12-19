@@ -1,114 +1,147 @@
-Return-Path: <netdev+bounces-58934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-58935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 485D7818A32
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:39:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22858818A43
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 15:41:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 269E9B20E6E
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 14:39:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2D211F2C65D
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 14:41:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BDAA1BDD8;
-	Tue, 19 Dec 2023 14:38:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CD311BDD8;
+	Tue, 19 Dec 2023 14:41:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="efn7jtUH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SV00iLVS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E511BDF8
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 14:38:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2cc2adbcf87so13539501fa.0
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 06:38:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702996721; x=1703601521; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BWSAM4JsfdqzIuyAx+IdTO0qt6TDFvdTGLZtS03HYUE=;
-        b=efn7jtUHS0Dt+/jVBp865jNakcxKQMXkRCmBMkEqykfv8QlK/e6AdsOVN+H/xB3ZCj
-         xfLyj9xhNgqYLUeS/bB0Ynfgo/VH7ruWOWvdUIGA9SV/Y4m14J2g2Sc3yPw0+tI4SYWP
-         sS3PX+RyohF/SDVwVOLQivZyMNcq7S7ZpHmM6m0sMzzo/piuswTATme1ZMhcHkgT6bKM
-         qjxB4WzR4KWNMokb7mIrhGZ2SszbhCkspYaFBEEetyEXOIQTy66MlKXSAaoPY6dtZ33r
-         Dbe/o7SShky0cbV7IfWTdnFRk78cNxYyisRyTVa6zwWkiKU5D/YAcg9eL7ifSx1TrhIG
-         g+mA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702996721; x=1703601521;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BWSAM4JsfdqzIuyAx+IdTO0qt6TDFvdTGLZtS03HYUE=;
-        b=PBoPC4wogWNx541wpaZaXvZ1sPx0i9lsYfwO9xoA4Yne8QjT3gncTudtozxcz4HRp1
-         gR4cLyHaW+nR0PbNqTvg25Urw5OjMRL2o0llOdFTuKc7AgGL3h7hXKltE8HCX9P92ehS
-         JDpcViXZkMS6LwexIe8aLggjNLtCGYPEGOPwUY+YkdF8i/HUM5vNDyf0FpGl2JDrNtbX
-         AVDlAgGDExO1pxWGouZvG7vm7yd0DabR9hLCEIX77uiuT5zkM3iNOEqN5zlzXhW3SDe/
-         qNOBYoS3NKWXc6qa3iE+3ycuEm/4m5Ze/RPGC4OaVO+bhu1NCKDOBcJOiRtouLEWnh6p
-         MHlA==
-X-Gm-Message-State: AOJu0YycQC//UsoW5z2oeU0SGFe/kZYJzeNeM8eTQgSjLBoiNNhqQZuc
-	ATLhSdRGhTDSnH9qZb++lDtCzHaSnVbgf+u+
-X-Google-Smtp-Source: AGHT+IFLhg+xtbV+M+nVmNE5s2OiGWHNhS7K/CarW1reqabeeFVHr542zmiSFHaWmp0Yx3S6kAYTiw==
-X-Received: by 2002:a2e:9914:0:b0:2cc:5f22:ba34 with SMTP id v20-20020a2e9914000000b002cc5f22ba34mr5433670lji.1.1702996720413;
-        Tue, 19 Dec 2023 06:38:40 -0800 (PST)
-Received: from localhost.localdomain ([83.217.200.104])
-        by smtp.gmail.com with ESMTPSA id c6-20020a2e9d86000000b002cc68cce064sm1011014ljj.62.2023.12.19.06.38.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Dec 2023 06:38:39 -0800 (PST)
-From: Denis Kirjanov <kirjanov@gmail.com>
-X-Google-Original-From: Denis Kirjanov <dkirjanov@suse.de>
-To: netdev@vger.kernel.org
-Cc: pabeni@redhat.com,
-	Denis Kirjanov <dkirjanov@suse.de>
-Subject: [PATCH net-next v2 2/2] net: remove SOCK_DEBUG macro
-Date: Tue, 19 Dec 2023 17:38:20 +0300
-Message-Id: <20231219143820.9379-2-dkirjanov@suse.de>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20231219143820.9379-1-dkirjanov@suse.de>
-References: <20231219143820.9379-1-dkirjanov@suse.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB9501BDDE
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 14:41:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702996869;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7TWKhr2LMbpjEPBw/2MEwrqBs0s6c+M03rN98iODU4U=;
+	b=SV00iLVSCSg2RHBzwk7r2wZBU5KhUqn10T1/qICJp5AgkvLNfmAvKd7pXglbNrv6OEgRpN
+	9Shkosk2vJg5zMMrbsQK0QUWg4r6LDaLKwExjrvhI4lWl9BYCO3rbJl+hpfDN27Vh7723t
+	pL7YFFy//nhA2g8cUzlWWiwHWtom3XM=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-53-pxkXtkAlOI-jeHJPe9wIAw-1; Tue,
+ 19 Dec 2023 09:41:01 -0500
+X-MC-Unique: pxkXtkAlOI-jeHJPe9wIAw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E7A47299E748;
+	Tue, 19 Dec 2023 14:40:59 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.195.169])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 27B1F1121306;
+	Tue, 19 Dec 2023 14:40:57 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <488523.1702996313@warthog.procyon.org.uk>
+References: <488523.1702996313@warthog.procyon.org.uk> <367107fa03540f7ddd2e8de51c751348bd7eb42c.camel@kernel.org> <20231213152350.431591-1-dhowells@redhat.com> <20231213152350.431591-13-dhowells@redhat.com>
+Cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
+    Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>,
+    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 12/39] netfs: Add iov_iters to (sub)requests to describe various buffers
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <488793.1702996856.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 19 Dec 2023 14:40:56 +0000
+Message-ID: <488794.1702996856@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-Since there are no more users of the macro let's finally
-burn it
+David Howells <dhowells@redhat.com> wrote:
 
-Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
----
- include/net/sock.h | 13 -------------
- 1 file changed, 13 deletions(-)
+> > > @@ -88,6 +78,11 @@ static void netfs_read_from_server(struct netfs_i=
+o_request *rreq,
+> > >  				   struct netfs_io_subrequest *subreq)
+> > >  {
+> > >  	netfs_stat(&netfs_n_rh_download);
+> > > +	if (iov_iter_count(&subreq->io_iter) !=3D subreq->len - subreq->tr=
+ansferred)
+> > > +		pr_warn("R=3D%08x[%u] ITER PRE-MISMATCH %zx !=3D %zx-%zx %lx\n",
+> > > +			rreq->debug_id, subreq->debug_index,
+> > > +			iov_iter_count(&subreq->io_iter), subreq->len,
+> > > +			subreq->transferred, subreq->flags);
+> > =
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 8b6fe164b218..7c0353fcdfaf 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -76,19 +76,6 @@
-  * the other protocols.
-  */
- 
--/* Define this to get the SOCK_DBG debugging facility. */
--#define SOCK_DEBUGGING
--#ifdef SOCK_DEBUGGING
--#define SOCK_DEBUG(sk, msg...) do { if ((sk) && sock_flag((sk), SOCK_DBG)) \
--					printk(KERN_DEBUG msg); } while (0)
--#else
--/* Validate arguments and do nothing */
--static inline __printf(2, 3)
--void SOCK_DEBUG(const struct sock *sk, const char *msg, ...)
--{
--}
--#endif
--
- /* This is the per-socket lock.  The spinlock provides a synchronization
-  * between user contexts and software interrupt processing, whereas the
-  * mini-semaphore synchronizes multiple users amongst themselves.
--- 
-2.35.1
+> > pr_warn is a bit alarmist, esp given the cryptic message.  Maybe demot=
+e
+> > this to INFO or DEBUG?
+> > =
+
+> > Does this indicate a bug in the client or that the server is sending u=
+s
+> > malformed frames?
+> =
+
+> Good question.  The network filesystem updated subreq->transferred to in=
+dicate
+> it had transferred X amount of data, but the iterator had been updated t=
+o
+> indicate Y amount of data was transferred.  They really ought to match a=
+s it
+> may otherwise indicate an underrun (and potential leakage of old data).
+> Overruns are less of a problem since the iterator would have to 'go nega=
+tive'
+> as it were.
+> =
+
+> However, it might be better just to leave io_iter unchecked since we end=
+ up
+> resetting it anyway each time we reinvoke the ->issue_read() op.  It's a=
+lways
+> possible that it will get copied and a different iterator get passed to =
+the
+> network layer or cache fs - and so the change to the iterator then has t=
+o be
+> manually propagated just to avoid the warning.
+
+Actually, it's more complicated than that.  It's an assertion that netfsli=
+b is
+doing the right prep.  This assertion is checked both when we initially ma=
+ke a
+request (in which case it definitely shouldn't fire) and when we perform a
+resubmission on partial/complete read failure when we need to carefully
+revalidate the numbers to make sure we don't end up with holes or wrinkles=
+ in
+the buffer.
+
+Anyway, it shouldn't happen - but if it does, it probably presages data
+corruption.
+
+David
 
 
