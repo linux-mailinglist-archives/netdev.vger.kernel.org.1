@@ -1,247 +1,266 @@
-Return-Path: <netdev+bounces-59026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D1AD8190C8
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 20:33:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F11DB81910F
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 20:55:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC4C61C24E97
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 19:33:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D87A1F2401E
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 19:55:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26D753984A;
-	Tue, 19 Dec 2023 19:33:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E409239877;
+	Tue, 19 Dec 2023 19:54:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="R+qB0NBN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b7qYD2Q9"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6770B39854
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 19:33:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1703014390;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hFULqfGrXOrtFGhKGhQc9jg8xfjAiJmb5sz/d5R9CnQ=;
-	b=R+qB0NBNYBSHrpDMunpUNfbmgQ5i+a/ua47qsU3YmKg1XrNjxN6vJjRj/CeRWgnIXSsEK0
-	hOisSYwVLXeoMRpFIQW7KqTIdf8UmOeeDU1vLqfhW3QEmggZBZsOBtjDa6YViN9j3Uht6Z
-	/8zlHS47XOREdfnjYGAZCCX3FV9BZ2U=
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: bpf@vger.kernel.org
-Cc: 'Alexei Starovoitov ' <ast@kernel.org>,
-	'Andrii Nakryiko ' <andrii@kernel.org>,
-	'Daniel Borkmann ' <daniel@iogearbox.net>,
-	netdev@vger.kernel.org,
-	kernel-team@meta.com
-Subject: [PATCH bpf 2/2] selftests/bpf: Test udp and tcp iter batching
-Date: Tue, 19 Dec 2023 11:32:59 -0800
-Message-Id: <20231219193259.3230692-2-martin.lau@linux.dev>
-In-Reply-To: <20231219193259.3230692-1-martin.lau@linux.dev>
-References: <20231219193259.3230692-1-martin.lau@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4A238FBE;
+	Tue, 19 Dec 2023 19:54:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6d9344f30caso24443b3a.1;
+        Tue, 19 Dec 2023 11:54:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703015692; x=1703620492; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HmwwUSeyrYCgHBvw5mHE/b1bJ1ioEpUS68KBkhFzJSo=;
+        b=b7qYD2Q931MOXAJno00mPYc+Ez35bRD2xNYGBcJKFoU472aLiYY2MZq/qa5zMCAXpO
+         1JMRCrOfYMimUeHtCZegxePsG1erNoc5KVj9JhXxGBNWceaPranYRi1Gyw1vVWiC/YkC
+         tcOI+3YOwopnff0x+b68ZAi66SV3w7O+80KVTGTidhjHwXOpLErFQ7dtyygizgO7URLB
+         Dz3UoEmO+NKndAAne1I8L1VSC+642KrY6O0rdL4DU5X3E9kAuzM0myQKFFSzm4iIA7O4
+         uSNWlp2mSnJjfst8NQCjt4cBA+HZLUznZKLDEQGhjY7MVOqxduymr97h0MIdnb+pC7iF
+         FaMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703015692; x=1703620492;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=HmwwUSeyrYCgHBvw5mHE/b1bJ1ioEpUS68KBkhFzJSo=;
+        b=Kal5UrA0YmhW00OBTYynlu1bD8G9A/C6ZqbFIlfukOAvzZwVSKRZJ5JNar7beB824Y
+         UAhfycO+rASk8mTysvEenkpjQp6NOeksiZIPa18R5WHEZBfGJsIWOLC3wWtLnm4Ce0+k
+         mbCgQ1QxnyR2L7RzBt4IOizGllIvNWBKISx8d5qmtsHA1hMq30l343htd4n6SZ+6nf9f
+         vTYma5Urhby6fv+GR4Lp/f7jDVH0US99OwU8MNsXIk8aYCLIuCaxGnp5Zkv11OhYQrHe
+         YPzEXQv79aUWTjBtlbALwVFHRYAhKdXT/TaNz3iEKgnc/A62DkzeFyfFoNmkTFK3zmDf
+         rR8Q==
+X-Gm-Message-State: AOJu0Yz7JGBRn7tJj7EFew33FM+NmIJwpKeu2oAfoskEuP1ysz1JpIU2
+	xp1vNpf3+hNOv5Ye417gQl0=
+X-Google-Smtp-Source: AGHT+IGBIJjIY2nykGLKL/5CLk9IMeThlNWb4vsWcDCOOY7Ihto5pwt+klsCCc9P0Z4N8/2oQpQWRQ==
+X-Received: by 2002:a05:6a00:27a4:b0:6cd:dc48:1fff with SMTP id bd36-20020a056a0027a400b006cddc481fffmr2413330pfb.0.1703015692173;
+        Tue, 19 Dec 2023 11:54:52 -0800 (PST)
+Received: from localhost ([98.97.32.4])
+        by smtp.gmail.com with ESMTPSA id h21-20020a056a00171500b006d9367f57d1sm1739361pfc.88.2023.12.19.11.54.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Dec 2023 11:54:51 -0800 (PST)
+Date: Tue, 19 Dec 2023 11:54:49 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ xrivendell7@gmail.com
+Cc: alexander@mihalicyn.com, 
+ bpf@vger.kernel.org, 
+ daan.j.demeyer@gmail.com, 
+ davem@davemloft.net, 
+ dhowells@redhat.com, 
+ edumazet@google.com, 
+ john.fastabend@gmail.com, 
+ kuba@kernel.org, 
+ kuniyu@amazon.com, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ pabeni@redhat.com
+Message-ID: <6581f509a56ea_90e25208c7@john.notmuch>
+In-Reply-To: <20231219155057.12716-1-kuniyu@amazon.com>
+References: <CABOYnLwXyxPukiaL36NvGvSa6yW3y0rXgrU=ABOzE-1gDAc4-g@mail.gmail.com>
+ <20231219155057.12716-1-kuniyu@amazon.com>
+Subject: Re: memory leak in unix_create1/copy_process/security_prepare_creds
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Martin KaFai Lau <martin.lau@kernel.org>
+Kuniyuki Iwashima wrote:
+> From: xingwei lee <xrivendell7@gmail.com>
+> Date: Tue, 19 Dec 2023 17:12:25 +0800
+> > Hello I found a bug in net/af_unix in the lastest upstream linux
+> > 6.7.rc5 and comfired in lastest net/net-next/bpf/bpf-next tree.
+> > Titled "TITLE: memory leak in unix_create1=E2=80=9D and I also upload=
+ the
+> > repro.c and repro.txt.
+> > =
 
-The patch adds a test to exercise the bpf_iter_udp batching
-logic. It specifically tests the case that there are multiple
-so_reuseport udp_sk in a bucket of the udp_table.
-The userspace is only reading one udp_sk at a time from
-the bpf_iter_udp prog. The true case in
-"read_batch(..., bool read_one)". This is the buggy case
-that the previous patch fixed.
+> > If you fix this issue, please add the following tag to the commit:
+> > Reported-by: xingwei Lee <xrivendell7@gmail.com>
+> =
 
-It also tests the "false" case in "read_batch(..., bool read_one)",
-meaning the userspace reads the whole bucket. There is
-no bug in this case but adding this test also while
-at it.
+> Thanks for reporting!
+> =
 
-Considering the way to have multiple tcp_sk in the same
-bucket is similar (by using so_reuseport),
-this patch also tests the bpf_iter_tcp even though the
-bpf_iter_tcp batching logic works correctly.
+> It seems 8866730aed510 forgot to add sock_put().
+> I've confirmed that the diff below silenced kmemleak but will check
+> more before posting a patch.
 
-Both IP v4 and v6 are exercising the same bpf_iter batching
-code path, so only v6 is tested.
+Did it really silence the memleak?
 
-Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
----
- .../bpf/prog_tests/sock_iter_batch.c          | 101 ++++++++++++++++++
- .../selftests/bpf/progs/sock_iter_batch.c     |  43 ++++++++
- 2 files changed, 144 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
- create mode 100644 tools/testing/selftests/bpf/progs/sock_iter_batch.c
+> =
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c b/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-new file mode 100644
-index 000000000000..38aa564862e8
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-@@ -0,0 +1,101 @@
-+// SPDX-License-Identifier: GPL-2.0
-+// Copyright (c) 2023 Meta
-+
-+#include <test_progs.h>
-+#include "network_helpers.h"
-+#include "sock_iter_batch.skel.h"
-+
-+#define TEST_NS "sock_iter_batch_netns"
-+
-+static const char expected_char = 'x';
-+static const int nr_soreuse = 4;
-+
-+static void read_batch(struct bpf_program *prog, bool read_one)
-+{
-+	int iter_fd, i, nread, total_nread = 0;
-+	struct bpf_link *link;
-+	char b[nr_soreuse];
-+
-+	link = bpf_program__attach_iter(prog, NULL);
-+	if (!ASSERT_OK_PTR(link, "bpf_program__attach_iter"))
-+		return;
-+
-+	iter_fd = bpf_iter_create(bpf_link__fd(link));
-+	if (!ASSERT_GE(iter_fd, 0, "bpf_iter_create")) {
-+		bpf_link__destroy(link);
-+		return;
-+	}
-+
-+	do {
-+		nread = read(iter_fd, b, read_one ? 1 : nr_soreuse);
-+		if (nread <= 0)
-+			break;
-+
-+		for (i = 0; i < nread; i++)
-+			ASSERT_EQ(b[i], expected_char, "b[i]");
-+
-+		total_nread += nread;
-+	} while (total_nread <= nr_soreuse);
-+
-+	ASSERT_EQ(nread, 0, "nread");
-+	ASSERT_EQ(total_nread, nr_soreuse, "total_nread");
-+
-+	close(iter_fd);
-+	bpf_link__destroy(link);
-+}
-+
-+static void do_test(int sock_type)
-+{
-+	struct sock_iter_batch *skel;
-+	int *fds, err;
-+
-+	fds = start_reuseport_server(AF_INET6, sock_type, "::1", 0, 0,
-+				     nr_soreuse);
-+	if (!ASSERT_OK_PTR(fds, "start_reuseport_server"))
-+		return;
-+
-+	skel = sock_iter_batch__open();
-+	if (!ASSERT_OK_PTR(skel, "sock_iter_batch__open"))
-+		goto done;
-+
-+	skel->rodata->local_port = ntohs(get_socket_local_port(fds[0]));
-+	skel->rodata->expected_char = expected_char;
-+
-+	err = sock_iter_batch__load(skel);
-+	if (!ASSERT_OK(err, "sock_iter_batch__load"))
-+		goto done;
-+
-+	if (sock_type == SOCK_STREAM) {
-+		read_batch(skel->progs.iter_tcp_soreuse, true);
-+		read_batch(skel->progs.iter_tcp_soreuse, false);
-+	} else {
-+		read_batch(skel->progs.iter_udp_soreuse, true);
-+		read_batch(skel->progs.iter_udp_soreuse, false);
-+	}
-+
-+done:
-+	sock_iter_batch__destroy(skel);
-+	free_fds(fds, nr_soreuse);
-+}
-+
-+void test_sock_iter_batch(void)
-+{
-+	struct nstoken *nstoken = NULL;
-+
-+	SYS_NOFAIL("ip netns del " TEST_NS " &> /dev/null");
-+	SYS(done, "ip netns add %s", TEST_NS);
-+	SYS(done, "ip -net %s link set dev lo up", TEST_NS);
-+
-+	nstoken = open_netns(TEST_NS);
-+	if (!ASSERT_OK_PTR(nstoken, "open_netns"))
-+		goto done;
-+
-+	if (test__start_subtest("tcp"))
-+		do_test(SOCK_STREAM);
-+	if (test__start_subtest("udp"))
-+		do_test(SOCK_DGRAM);
-+
-+done:
-+	close_netns(nstoken);
-+	SYS_NOFAIL("ip netns del " TEST_NS " &> /dev/null");
-+}
-diff --git a/tools/testing/selftests/bpf/progs/sock_iter_batch.c b/tools/testing/selftests/bpf/progs/sock_iter_batch.c
-new file mode 100644
-index 000000000000..4264df162d83
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/sock_iter_batch.c
-@@ -0,0 +1,43 @@
-+// SPDX-License-Identifier: GPL-2.0
-+// Copyright (c) 2023 Meta
-+
-+#include "vmlinux.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_core_read.h>
-+#include "bpf_tracing_net.h"
-+#include "bpf_kfuncs.h"
-+
-+volatile const __u16 local_port;
-+volatile const char expected_char;
-+
-+SEC("iter/tcp")
-+int iter_tcp_soreuse(struct bpf_iter__tcp *ctx)
-+{
-+	struct sock *sk = (struct sock *)ctx->sk_common;
-+
-+	if (!sk)
-+		return 0;
-+
-+	sk = bpf_rdonly_cast(sk, bpf_core_type_id_kernel(struct sock));
-+	if (sk->sk_family == AF_INET6 && sk->sk_num == local_port)
-+		bpf_seq_write(ctx->meta->seq, (void *)&expected_char, 1);
-+
-+	return 0;
-+}
-+
-+SEC("iter/udp")
-+int iter_udp_soreuse(struct bpf_iter__udp *ctx)
-+{
-+	struct sock *sk = (struct sock *)ctx->udp_sk;
-+
-+	if (!sk)
-+		return 0;
-+
-+	sk = bpf_rdonly_cast(sk, bpf_core_type_id_kernel(struct sock));
-+	if (sk->sk_family == AF_INET6 && sk->sk_num == local_port)
-+		bpf_seq_write(ctx->meta->seq, (void *)&expected_char, 1);
-+
-+	return 0;
-+}
-+
-+char _license[] SEC("license") = "GPL";
--- 
-2.34.1
+> ---8<---
+> diff --git a/net/unix/unix_bpf.c b/net/unix/unix_bpf.c
+> index 7ea7c3a0d0d0..32daba9e7f8b 100644
+> --- a/net/unix/unix_bpf.c
+> +++ b/net/unix/unix_bpf.c
+> @@ -164,6 +164,7 @@ int unix_stream_bpf_update_proto(struct sock *sk, s=
+truct sk_psock *psock, bool r
+>  	if (restore) {
+>  		sk->sk_write_space =3D psock->saved_write_space;
+>  		sock_replace_proto(sk, psock->sk_proto);
+> +		sock_put(psock->sk_pair);
+>  		return 0;
 
+The reason the sock_put is not in this routine but in the sk_psock_destor=
+y
+is because we need to wait a RCU grace period for any pending queued
+BPF sends to also be flushed.
+
+>  	}
+>  =
+
+> ---8<---
+> =
+
+> Thanks!
+> =
+
+> =
+
+
+I'm also trying to understand how this adds up to
+unix_stream_bpf_update_proto() issue. The reproduce has a map_create
+followed by two map_delete() calls. I can't see how the unix socket
+ever got added to the BPF map and the deletes should be empty?
+
+> > =
+
+> > lastest net tree: 979e90173af8d2f52f671d988189aab98c6d1be6
+> > Kernel config: https://syzkaller.appspot.com/text?tag=3DKernelConfig&=
+x=3D8c4e4700f1727d30
+> > =
+
+> > in the lastest net tree, the crash like:
+> > Linux syzkaller 6.7.0-rc5-00172-g979e90173af8 #4 SMP PREEMPT_DYNAMIC
+> > Tue Dec 19 11:03:58 HKT 2023 x86_4
+> > =
+
+> > TITLE: memory leak in security_prepare_creds
+> >    [<ffffffff8129291a>] copy_process+0x6aa/0x25c0 kernel/fork.c:2366
+> >    [<ffffffff812949db>] kernel_clone+0x11b/0x690 kernel/fork.c:2907
+> >    [<ffffffff81294fcc>] __do_sys_clone+0x7c/0xb0 kernel/fork.c:3050
+> >    [<ffffffff84b70dcf>] do_syscall_x64 arch/x86/entry/common.c:52 [in=
+line]
+> >    [<ffffffff84b70dcf>] do_syscall_64+0x3f/0x110 arch/x86/entry/commo=
+n.c:83
+> >    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+...
+
+> > uint64_t r[1] =3D {0xffffffffffffffff};
+> > =
+
+> > void execute_one(void) {
+> >  intptr_t res =3D 0;
+> >  syscall(__NR_socketpair, /*domain=3D*/1ul, /*type=3D*/1ul, /*proto=3D=
+*/0,
+> >          /*fds=3D*/0x20000000ul);
+> >  *(uint32_t*)0x200000c0 =3D 0x12;
+> >  *(uint32_t*)0x200000c4 =3D 2;
+> >  *(uint32_t*)0x200000c8 =3D 4;
+> >  *(uint32_t*)0x200000cc =3D 1;
+> >  *(uint32_t*)0x200000d0 =3D 0;
+> >  *(uint32_t*)0x200000d4 =3D -1;
+> >  *(uint32_t*)0x200000d8 =3D 0;
+
+
+> >  memset((void*)0x200000dc, 0, 16);
+> >  *(uint32_t*)0x200000ec =3D 0;
+> >  *(uint32_t*)0x200000f0 =3D -1;
+> >  *(uint32_t*)0x200000f4 =3D 0;
+> >  *(uint32_t*)0x200000f8 =3D 0;
+> >  *(uint32_t*)0x200000fc =3D 0;
+> >  *(uint64_t*)0x20000100 =3D 0;
+> >  res =3D syscall(__NR_bpf, /*cmd=3D*/0ul, /*arg=3D*/0x200000c0ul, /*s=
+ize=3D*/0x48ul);
+
+mapfd =3D map_create( bpf_attr { SOCKHASH, 1 entry, 0 flags, ...} )
+
+> >  if (res !=3D -1) r[0] =3D res;
+> >  *(uint32_t*)0x200003c0 =3D r[0];
+> >  *(uint64_t*)0x200003c8 =3D 0x20000040;
+> >  *(uint64_t*)0x200003d0 =3D 0x20000000;
+> >  *(uint64_t*)0x200003d8 =3D 0;
+> >  syscall(__NR_bpf, /*cmd=3D*/2ul, /*arg=3D*/0x200003c0ul, /*size=3D*/=
+0x20ul);
+
+map_delete(mapfd, key=3D0x20000040, value=3D0x20000000, flags =3D 0)
+
+> >  *(uint32_t*)0x200003c0 =3D r[0];
+> >  *(uint64_t*)0x200003c8 =3D 0x20000040;
+> >  *(uint64_t*)0x200003d0 =3D 0x20000000;
+> >  *(uint64_t*)0x200003d8 =3D 0;
+> >  syscall(__NR_bpf, /*cmd=3D*/2ul, /*arg=3D*/0x200003c0ul, /*size=3D*/=
+0x20ul);
+
+map_delete(mapfd, key=3D0x20000040, value=3D0x20000000, flags =3D 0)
+
+so same as repro.txt below makes sense. But, if the sockets are
+never added to the sockhash then we never touched the proto from
+BPF side. And both of these deletes should return errors.
+
+> > }
+> > int main(void) {
+> >  syscall(__NR_mmap, /*addr=3D*/0x1ffff000ul, /*len=3D*/0x1000ul, /*pr=
+ot=3D*/0ul,
+> >          /*flags=3D*/0x32ul, /*fd=3D*/-1, /*offset=3D*/0ul);
+> >  syscall(__NR_mmap, /*addr=3D*/0x20000000ul, /*len=3D*/0x1000000ul, /=
+*prot=3D*/7ul,
+> >          /*flags=3D*/0x32ul, /*fd=3D*/-1, /*offset=3D*/0ul);
+> >  syscall(__NR_mmap, /*addr=3D*/0x21000000ul, /*len=3D*/0x1000ul, /*pr=
+ot=3D*/0ul,
+> >          /*flags=3D*/0x32ul, /*fd=3D*/-1, /*offset=3D*/0ul);
+> >  setup_leak();
+> >  loop();
+> >  return 0;
+> > }
+> > =
+
+> > =
+
+> > =
+
+> > =3D* repro.txt =3D*
+> > socketpair(0x1, 0x1, 0x0, &(0x7f0000000000))
+> > r0 =3D bpf$MAP_CREATE(0x0, &(0x7f00000000c0)=3D@base=3D{0x12, 0x2, 0x=
+4, 0x1}, 0x48)
+> > bpf$MAP_DELETE_ELEM(0x2, &(0x7f00000003c0)=3D{r0, &(0x7f0000000040),
+> > 0x20000000}, 0x20)
+> > bpf$MAP_DELETE_ELEM(0x2, &(0x7f00000003c0)=3D{r0, &(0x7f0000000040),
+> > 0x20000000}, 0x20)
+
+So not making sense to me how we got to blaming the proto delete
+logic here. It doesn't look like we ever added the psock and
+configured the proto?
+
+Did a bisect really blame the mentioned patch? I can likely try here
+as well.
+
+Thanks,
+John=
 
