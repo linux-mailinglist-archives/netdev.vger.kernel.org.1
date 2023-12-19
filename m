@@ -1,118 +1,144 @@
-Return-Path: <netdev+bounces-59078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DDC881947B
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:20:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06D4381947F
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:22:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 921D91F27033
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 23:20:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B86CF289840
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 23:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4761C3D0C9;
-	Tue, 19 Dec 2023 23:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E452D3D0C7;
+	Tue, 19 Dec 2023 23:22:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q+PamraM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iR/EVyWE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D204D3EA7D;
-	Tue, 19 Dec 2023 23:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703028033; x=1734564033;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=uYTsoLYZOvCUsCGVaoQxTU6za82GcPNPw7Jy1FK3eiE=;
-  b=Q+PamraMa/1oIf/uY5c/QjksqS6R2NaLy54INBGaZh/0NY2pTpo9d1TR
-   sftVRzQbFnp6EbWISkCu+VP3aw15ByuINqWheSon2hHAVKqQ0/0xObUJJ
-   RNBlnzx7sa2A32am59Btmd3han7pyFEKDpgscM733vNZn0hfImqFgw6pq
-   nGnT4aWq5Adc1Be7X7gsCaqmx1rfmrj+jui+F5cU3QcvtqmFrHdj42+8h
-   s0eVV9I7J0UIHxUm9CcBJ4gbOyL0kvwZ9NP+SLvrrcFQVqJtCWvIwvQld
-   QZ8KJDuglILBZPU7MVjA8xh8nrckWnUNF+MJnLk+R2S+DxUERZIHmh9I5
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="380721075"
-X-IronPort-AV: E=Sophos;i="6.04,289,1695711600"; 
-   d="scan'208";a="380721075"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 15:20:33 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="805055842"
-X-IronPort-AV: E=Sophos;i="6.04,289,1695711600"; 
-   d="scan'208";a="805055842"
-Received: from lveltman-mobl.ger.corp.intel.com (HELO box.shutemov.name) ([10.252.33.252])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 15:20:26 -0800
-Received: by box.shutemov.name (Postfix, from userid 1000)
-	id 5494010A43B; Wed, 20 Dec 2023 02:20:23 +0300 (+03)
-Date: Wed, 20 Dec 2023 02:20:23 +0300
-From: kirill.shutemov@linux.intel.com
-To: Alexey Makhalov <alexey.makhalov@broadcom.com>
-Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
-	bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
-	mingo@redhat.com, tglx@linutronix.de, x86@kernel.org,
-	netdev@vger.kernel.org, richardcochran@gmail.com,
-	linux-input@vger.kernel.org, dmitry.torokhov@gmail.com,
-	zackr@vmware.com, linux-graphics-maintainer@vmware.com,
-	pv-drivers@vmware.com, namit@vmware.com, timothym@vmware.com,
-	akaher@vmware.com, jsipek@vmware.com,
-	dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
-	tzimmermann@suse.de, mripard@kernel.org,
-	maarten.lankhorst@linux.intel.com, horms@kernel.org
-Subject: Re: [PATCH v3 2/6] x86/vmware: Introduce vmware_hypercall API
-Message-ID: <20231219232023.u4dyuvbzbh565grk@box.shutemov.name>
-References: <20231219215751.9445-1-alexey.makhalov@broadcom.com>
- <20231219215751.9445-3-alexey.makhalov@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F4B40BE1
+	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 23:22:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a2339939573so418718266b.3
+        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 15:22:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1703028138; x=1703632938; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MgzZo4TyHHi8UhQ+Ni8cGrZnxs3u8ZG6aWxX69pl984=;
+        b=iR/EVyWEuY6kQ6rWY1GMxvJhC2mL88ETzQQVpGPXc7PAC3qRrC6e58TuL5DkShfRSu
+         sUfYNiyfRa627YG6KdP5WmEbuwaZfne1oIvTTxMnkJXnmf4/YfabMOFwVcvrnWY0Ddwa
+         e1rzWX1TO1gllyET5bvMyjdO7SXtbcBRgckQFZkpGJZZBEcqBxq36tdUnZdhbq/PHTvF
+         xZCfdekT6pO3oXO/B4rkBjeDezy0LstNzpXJ1/gE9gJhC5y90xc3RMBywJrpAhPLxm6b
+         d+QOBGVscQVJh7J6XNXDtDo2o/OgT7gcQeobNC/Xr+y+STQAFtuDxUacpFPMwj191rK/
+         NTKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703028138; x=1703632938;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MgzZo4TyHHi8UhQ+Ni8cGrZnxs3u8ZG6aWxX69pl984=;
+        b=uwC8tabynQbvyJCN2rsUpewYEZt5PcbLcMBB690LaoGpdBhl5IMP52Grhsfra94lSb
+         ejtH2DqQSW7M66yFGoTBDsTZ34J+GnMuBeMDJwwVctR4+jhyxnsTQ9LlF/TSyulESjjJ
+         PhWsQcsUKebhP2lP054K2nBvTKv/ghtBQsgSuQA1zxVp8iGDz1HsjOjErLGFAiqRx7RU
+         Mr5LD2N9pyHJl56/ikry/TLWmqMft7kpMWv52EqadIt3DJiTFGHfoLvQko1X3AfXjJPC
+         jzKLdfaGA/g/SURTw0UQcru/VByvu/2bz82RPXJ5h8wFSVmWQT1KnR7O9BRuWRheQ+Z0
+         220w==
+X-Gm-Message-State: AOJu0YwmRfVZc9SugD4MsmZabEh012zZtcoabAhiqSWR0aO4wPmxBzK4
+	9ZSztD/whUvL3zrFQktPcfBC9alQa691OnT0Kdx82SmN9THZlfufy3oU2g==
+X-Google-Smtp-Source: AGHT+IHF5ZvsFmaeJz2hiEJeyU3bIiqjfnIF5A+tpCwrw8JweSmEUYcokOaNMK1KaCEkVLZIRwKHEV3YAMStVPNdt6A=
+X-Received: by 2002:a17:906:6c92:b0:a23:6eb6:6b35 with SMTP id
+ s18-20020a1709066c9200b00a236eb66b35mr1077988ejr.136.1703028138420; Tue, 19
+ Dec 2023 15:22:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231219215751.9445-3-alexey.makhalov@broadcom.com>
+References: <20231219210357.4029713-1-dw@davidwei.uk> <20231219210357.4029713-2-dw@davidwei.uk>
+In-Reply-To: <20231219210357.4029713-2-dw@davidwei.uk>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 19 Dec 2023 15:22:04 -0800
+Message-ID: <CAHS8izMQ2u9KTBz+QhnmB483OW0hmma7Vy7OgoTGajM7FyJhiA@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 01/20] net: page_pool: add ppiov mangling helper
+To: David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 19, 2023 at 01:57:47PM -0800, Alexey Makhalov wrote:
-> +static inline
-> +unsigned long vmware_hypercall1(unsigned long cmd, unsigned long in1)
-...
-> +static inline
-> +unsigned long vmware_hypercall3(unsigned long cmd, unsigned long in1,
-> +				uint32_t *out1, uint32_t *out2)
-...
-> +static inline
-> +unsigned long vmware_hypercall4(unsigned long cmd, unsigned long in1,
-> +				uint32_t *out1, uint32_t *out2,
-> +				uint32_t *out3)
-...
-> +static inline
-> +unsigned long vmware_hypercall5(unsigned long cmd, unsigned long in1,
-> +				unsigned long in3, unsigned long in4,
-> +				unsigned long in5, uint32_t *out2)
-...
-> +static inline
-> +unsigned long vmware_hypercall6(unsigned long cmd, unsigned long in1,
-> +				unsigned long in3, uint32_t *out2,
-> +				uint32_t *out3, uint32_t *out4,
-> +				uint32_t *out5)
-...
-> +static inline
-> +unsigned long vmware_hypercall7(unsigned long cmd, unsigned long in1,
-> +				unsigned long in3, unsigned long in4,
-> +				unsigned long in5, uint32_t *out1,
-> +				uint32_t *out2, uint32_t *out3)
+On Tue, Dec 19, 2023 at 1:04=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
+>
+> From: Pavel Begunkov <asml.silence@gmail.com>
+>
+> NOT FOR UPSTREAM
+>
+> The final version will depend on how ppiov looks like, but add a
+> convenience helper for now.
+>
 
-Naming is weird. The number in the name doesn't help much as there seems
-no system on how many of the parameters are ins and outs.
+Thanks, this patch becomes unnecessary once you pull in the latest
+version of our changes; you could use net_iov_to_netmem() added here:
 
-Why these combinations of ins/outs are supported?
+https://patchwork.kernel.org/project/netdevbpf/patch/20231218024024.3516870=
+-9-almasrymina@google.com/
 
-And as an outsider, I'm curious where in2 got lost :P
+Not any kind of objection from me, just an FYI.
 
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> ---
+>  include/net/page_pool/helpers.h | 5 +++++
+>  net/core/page_pool.c            | 2 +-
+>  2 files changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/help=
+ers.h
+> index 95f4d579cbc4..92804c499833 100644
+> --- a/include/net/page_pool/helpers.h
+> +++ b/include/net/page_pool/helpers.h
+> @@ -86,6 +86,11 @@ static inline u64 *page_pool_ethtool_stats_get(u64 *da=
+ta, void *stats)
+>
+>  /* page_pool_iov support */
+>
+> +static inline struct page *page_pool_mangle_ppiov(struct page_pool_iov *=
+ppiov)
+> +{
+> +       return (struct page *)((unsigned long)ppiov | PP_DEVMEM);
+> +}
+> +
+>  static inline struct dmabuf_genpool_chunk_owner *
+>  page_pool_iov_owner(const struct page_pool_iov *ppiov)
+>  {
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index c0bc62ee77c6..38eff947f679 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -1074,7 +1074,7 @@ static struct page *mp_dmabuf_devmem_alloc_pages(st=
+ruct page_pool *pool,
+>         pool->pages_state_hold_cnt++;
+>         trace_page_pool_state_hold(pool, (struct page *)ppiov,
+>                                    pool->pages_state_hold_cnt);
+> -       return (struct page *)((unsigned long)ppiov | PP_DEVMEM);
+> +       return page_pool_mangle_ppiov(ppiov);
+>  }
+>
+>  static void mp_dmabuf_devmem_destroy(struct page_pool *pool)
+> --
+> 2.39.3
+>
+
+
+--=20
+Thanks,
+Mina
 
