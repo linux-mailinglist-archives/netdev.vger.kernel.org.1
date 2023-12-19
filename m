@@ -1,233 +1,102 @@
-Return-Path: <netdev+bounces-59031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABF4E81917E
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 21:31:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 219438191D3
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 21:58:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6288D28248A
-	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 20:31:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3A58286110
+	for <lists+netdev@lfdr.de>; Tue, 19 Dec 2023 20:58:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DFB93D0D6;
-	Tue, 19 Dec 2023 20:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD1939AEF;
+	Tue, 19 Dec 2023 20:58:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="nOEOdJJL"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="Lcx1T6rp"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7916B3A1B5
-	for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 20:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id BEBA0207BB;
-	Tue, 19 Dec 2023 21:30:25 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id S1hO3oBaaOmh; Tue, 19 Dec 2023 21:30:25 +0100 (CET)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7BFB39AEA;
+	Tue, 19 Dec 2023 20:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1703019473;
+	bh=HL+J12pGhDwMatKlkflli5mu1mZB75z2ODA2GA/b1lU=;
+	h=Date:From:To:Cc:Subject:From;
+	b=Lcx1T6rpxvGwsRI7qdwtAsV2Hefhi8R6YM2K118OqEW1F3b8PLtsE4yV2lIY3rHM5
+	 dyYSzCnJEvqYT+iNxV2xFyXWNBatw3/tdOxpJEga+rSYepXMcGIqcqPq/TtVMZUGAO
+	 EPz7fjYolqgsx2y+NAK4NbW2CcyOVxSvZ7ZvvIFZzG/k+Hxu4ePsSbaVuI4PU9R7Ia
+	 GGuDYCN84FFXIEioDqG/GaYZSSiKA8Y/6UmjYl7xVXIC/d5VF1vzXTehe0Ov0r51as
+	 Al5aaRTlAOaBKiiO+0K+PRUGaq7rMfOW+2r5fbpYnfFVuK199H1+V5rfRHdWzGoHhZ
+	 ti8hcluPI3eFA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 03F0E2080B;
-	Tue, 19 Dec 2023 21:30:25 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 03F0E2080B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1703017825;
-	bh=aXLeUJevmECOG0csnnPRmr3XSKd8QkYbfnzH9WJ2whc=;
-	h=Date:From:To:CC:Subject:Reply-To:References:In-Reply-To:From;
-	b=nOEOdJJLuaZY6zG+wwgwBTDhWc9w2ZxX8SZpuOCWbB9xmMbMsPIpMyJypvz2Pbtyq
-	 95V6QWR+lLMcLwuLDOVxzNCDwMj39GCe5rrimkbm/sQrGRMZxe81bKHJGETMgPlwOL
-	 uxF7EqpnHO/ltqT7DGhg2bqoeRq2Lzi7W5KqRK2gRR0a4SeTfhovyicu2x5p0pkGrq
-	 ScPiBfNS2/09s0t0kQuZTmT6wgMcT4WWJPRfVgsfEFz1gooAnjNtGtEd7EU2u7zF+N
-	 ofa0EP7aOnKVFmbyL3wOxxdwyXSubKl1vTeLn8FxUIznRBlov0PcG/xKxle4bNiOAH
-	 rCj2r/nhJaCOQ==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id EC14D80004A;
-	Tue, 19 Dec 2023 21:30:24 +0100 (CET)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Tue, 19 Dec 2023 21:30:24 +0100
-Received: from moon.secunet.de (172.18.149.1) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Tue, 19 Dec
- 2023 21:30:24 +0100
-Date: Tue, 19 Dec 2023 21:30:07 +0100
-From: Antony Antony <antony.antony@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, Antony Antony
-	<antony.antony@secunet.com>, "David S. Miller" <davem@davemloft.net>,
-	<devel@linux-ipsec.org>, Jakub Kicinski <kuba@kernel.org>,
-	<netdev@vger.kernel.org>
-Subject: [PATCH v3 ipsec-next 2/2] xfrm: fix source address in icmp error
- generation from IPsec gateway
-Message-ID: <ed78d17f116595bdcc6aca275619b3ca76c538ae.1703016801.git.antony.antony@secunet.com>
-Reply-To: <antony.antony@secunet.comesden202310>
-References: <e9b8e0f951662162cc761ee5473be7a3f54183a7.1639872656.git.antony.antony@secunet.com>
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4SvptT1Rfjz4wdB;
+	Wed, 20 Dec 2023 07:57:52 +1100 (AEDT)
+Date: Wed, 20 Dec 2023 07:57:50 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Yury Norov <yury.norov@gmail.com>, Networking <netdev@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
+ Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: Fixes tag needs some work in the net tree
+Message-ID: <20231220075750.19541c67@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <e9b8e0f951662162cc761ee5473be7a3f54183a7.1639872656.git.antony.antony@secunet.com>
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Type: multipart/signed; boundary="Sig_/B9wA7/bc.L3DUIsAuTRRMxS";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-When enabling support for xfrm lookup using reverse ICMP payload,
-We have identified an issue where the source address of the IPv4 e.g
-"Destination Host Unreachable" message is incorrect. The IPv6 appear
-to do the right thing.
+--Sig_/B9wA7/bc.L3DUIsAuTRRMxS
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Here is example of incorrect source address for ICMP error response.
-When sending a ping to an unreachable host, the sender would receive an
-ICMP unreachable response with a fake source address. Rather the address
-of the host that generated ICMP Unreachable message. This is confusing
-and incorrect.
+Hi all,
 
-Example:
-ping -W 9 -w 5 -c 1 10.1.4.3
-PING 10.1.4.3 (10.1.4.3) 56(84) bytes of data.
-From 10.1.4.3 icmp_seq=1 Destination Host Unreachable
+In commit
 
-Notice : packet has the source address of the ICMP "Unreachable host!"
+  340943fbff3d ("net: mana: select PAGE_POOL")
 
-This issue can be traced back to commit
-415b3334a21a ("icmp: Fix regression in nexthop resolution during replies.")
-which introduced a change that copied the source address from the ICMP
-payload.
+Fixes tag
 
-This commit would force to use source address from the gatway/host.
-The ICMP error message source address correctly set from the host.
+  Fixes: ca9c54d2 ("net: mana: Add a driver for Microsoft Azure Network Ada=
+pter")
 
-After fixing:
-ping -W 5 -c 1 10.1.4.3
-PING 10.1.4.3 (10.1.4.3) 56(84) bytes of data.
-From 10.1.3.2 icmp_seq=1 Destination Host Unreachable
+has these problem(s):
 
-Here is an example to reporduce:
+  - SHA1 should be at least 12 digits long
+    This can be fixed for the future by setting core.abbrev to 12 (or
+    more) or (for git v2.11 or later) just making sure it is not set
+    (or set to "auto").
 
-export AB="10.1"
-for i in 1 2 3 4 5; do
-        h="host${i}"
-        ip netns add ${h}
-        ip -netns ${h} link set lo up
-        ip netns exec ${h} sysctl -wq net.ipv4.ip_forward=1
-        if [ $i -lt 5 ]; then
-                ip -netns ${h} link add eth0 type veth peer name eth10${i}
-                ip -netns ${h} addr add "${AB}.${i}.1/24" dev eth0
-                ip -netns ${h} link set up dev eth0
-        fi
-done
+--=20
+Cheers,
+Stephen Rothwell
 
-for i in 1 2 3 4 5; do
-        h="host${i}"
-        p=$((i - 1))
-        ph="host${p}"
-        # connect to previous host
-        if [ $i -gt 1 ]; then
-                ip -netns ${ph} link set eth10${p} netns ${h}
-                ip -netns ${h} link set eth10${p} name eth1
-                ip -netns ${h} link set up dev eth1
-                ip -netns ${h} addr add "${AB}.${p}.2/24" dev eth1
-        fi
-        # add forward routes
-        for k in $(seq ${i} $((5 - 1))); do
-                ip -netns ${h} route 2>/dev/null | (grep "${AB}.${k}.0" 2>/dev/null) || \
-                ip -netns ${h} route add "${AB}.${k}.0/24" via "${AB}.${i}.2" 2>/dev/nul
-        done
+--Sig_/B9wA7/bc.L3DUIsAuTRRMxS
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-        # add reverse routes
-        for k in $(seq 1 $((i - 2))); do
-                ip -netns ${h} route 2>/dev/null | grep "${AB}.${k}.0" 2>/dev/null || \
-                ip -netns ${h} route add "${AB}.${k}.0/24" via "${AB}.${p}.1" 2>/dev/nul
-        done
-done
+-----BEGIN PGP SIGNATURE-----
 
-ip netns exec host1 ping -q -W 2 -w 1 -c 1 10.1.4.2 2>&1>/dev/null && echo "success 10.1.4.2 reachable" || echo "ERROR"
-ip netns exec host1 ping -W 9 -w 5 -c 1 10.1.4.3 || echo  "note the source address of unreachble"
-ip -netns host1 route flush cache
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmWCA84ACgkQAVBC80lX
+0GwbGggAj9qHrs5DFB1oOI5tpHL58AuwA/yPDi7pXV386Wyk8VFTCSR3QOhqsu0U
+80NRS/roDih6w6XcfKTuKSYWHJKf2J7kT6HzaFMpxtmiyKxAcePdsm6ZZDFSbRV7
+S4lJi3Qh+34LFpYO4Tb26/1uQdUXvG4KvteWVNX+08/xX3vWR0aeNZxtq424DEeT
+whfdU1H1etjN+Lt8tpDmlKgES+iM+fhNeuWN5tyxCw12PVYs0oh2KtlRWNFbvWKP
+1sNwzna9nTbHaOtNg0gNTZy7m1DQ0boM+tf5oqv4+DMoz6gy5bOzXOtWI/boW+7+
+/FTWRfU6G+uU5Z4CR1tBFwb/U+G4Bw==
+=mpp2
+-----END PGP SIGNATURE-----
 
-ip netns exec host3 nft add table inet filter
-ip netns exec host3 nft add chain inet filter FORWARD { type filter hook forward priority filter\; policy drop \; }
-ip netns exec host3 nft add rule inet filter FORWARD counter ip protocol icmp drop
-ip netns exec host3 nft add rule inet filter FORWARD counter ip protocol esp accept
-ip netns exec host3 nft add rule inet filter FORWARD counter drop
-
-ip -netns host2 xfrm policy add src 10.1.1.0/24 dst 10.1.4.0/24 dir out \
-        flag icmp tmpl src 10.1.2.1 dst 10.1.3.2 proto esp reqid 1 mode tunnel
-
-ip -netns host2 xfrm policy add src 10.1.4.0/24 dst 10.1.1.0/24 dir in \
-        tmpl src 10.1.3.2 dst 10.1.2.1 proto esp reqid 2 mode tunnel
-
-ip -netns host2 xfrm policy add src 10.1.4.0/24 dst 10.1.1.0/24 dir fwd \
-        flag icmp tmpl src 10.1.3.2 dst 10.1.2.1 proto esp reqid 2 mode tunnel
-
-ip -netns host2 xfrm state add src 10.1.2.1 dst 10.1.3.2 proto esp spi 1 \
-        reqid 1 replay-window 1  mode tunnel aead 'rfc4106(gcm(aes))' \
-        0x1111111111111111111111111111111111111111 96 \
-        sel src 10.1.1.0/24 dst 10.1.4.0/24
-
-ip -netns host2 xfrm state add src 10.1.3.2 dst 10.1.2.1 proto esp spi 2 \
-        flag icmp reqid 2 replay-window 10 mode tunnel aead 'rfc4106(gcm(aes))' \
-        0x2222222222222222222222222222222222222222 96
-
-ip -netns host4 xfrm policy add src 10.1.4.0/24 dst 10.1.1.0/24 dir out \
-        flag icmp tmpl src 10.1.3.2 dst 10.1.2.1 proto esp reqid 1 mode tunnel
-
-ip -netns host4 xfrm policy add src 10.1.1.0/24 dst 10.1.4.0/24 dir in \
-        tmpl src 10.1.2.1 dst 10.1.3.2 proto esp reqid 2  mode tunnel
-
-ip -netns host4 xfrm policy add src 10.1.1.0/24 dst 10.1.4.0/24 dir fwd \
-                flag icmp tmpl src 10.1.2.1 dst 10.1.3.2 proto esp reqid 2 mode tunnel
-
-ip -netns host4 xfrm state add src 10.1.3.2 dst 10.1.2.1 proto esp spi 2 \
-        reqid 1 replay-window 1 mode tunnel aead 'rfc4106(gcm(aes))' \
-        0x2222222222222222222222222222222222222222 96
-
-ip -netns host4 xfrm state add src 10.1.2.1 dst 10.1.3.2 proto esp spi 1 \
-        reqid 2 replay-window 20 flag icmp  mode tunnel aead 'rfc4106(gcm(aes))' \
-        0x1111111111111111111111111111111111111111 96 \
-        sel src 10.1.1.0/24 dst 10.1.4.0/24
-
-ip netns exec host1 ping -W 5 -c 1 10.1.4.2 2>&1 > /dev/null && echo ""
-ip netns exec host1 ping -W 5 -c 1 10.1.4.3 || echo "note source address"
-
-Again before the fix
-ping -W 5 -c 1 10.1.4.3
-From 10.1.4.3 icmp_seq=1 Destination Host Unreachable
-
-After the fix
-From 10.1.3.2 icmp_seq=1 Destination Host Unreachable
-
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
----
- net/ipv4/icmp.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index e63a3bf99617..bec234637122 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -555,7 +555,6 @@ static struct rtable *icmp_route_lookup(struct net *net,
- 					    XFRM_LOOKUP_ICMP);
- 	if (!IS_ERR(rt2)) {
- 		dst_release(&rt->dst);
--		memcpy(fl4, &fl4_dec, sizeof(*fl4));
- 		rt = rt2;
- 	} else if (PTR_ERR(rt2) == -EPERM) {
- 		if (rt)
---
-2.30.2
-
+--Sig_/B9wA7/bc.L3DUIsAuTRRMxS--
 
