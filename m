@@ -1,232 +1,326 @@
-Return-Path: <netdev+bounces-59290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46A7F81A389
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 17:03:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A8A881A3A3
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 17:04:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2E311F2612F
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:03:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5E22B222D6
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:04:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AD88482CB;
-	Wed, 20 Dec 2023 15:59:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B042946439;
+	Wed, 20 Dec 2023 16:01:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dtk5bSUS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r+2gZ7NQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E474A47771
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 15:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703087966;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QFekkLOHfS9CYH1irDgUqE2noE0/6vpj/TYA4n1czRU=;
-	b=Dtk5bSUS+X+Ghj4YEu5m/2Qf6J+knKGVrwEWAxr5Z1FO75ZuHuzSH53VGWgvS6V8yjv7zf
-	Q+SMdfo6JcsAAw+W4qnbr5NUn6Ld6xPc5tnNxRx2EaX4oTnwqxeXK6c0AsdojX2VkwgODL
-	UKVFwfy2zMU5MtJNJ7aEF9pu63cqluY=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-543-bq_a05oZM3aG0QZ4DW8Njg-1; Wed, 20 Dec 2023 10:59:24 -0500
-X-MC-Unique: bq_a05oZM3aG0QZ4DW8Njg-1
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-6d9fa2f1156so3835425a34.3
-        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 07:59:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703087964; x=1703692764;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QFekkLOHfS9CYH1irDgUqE2noE0/6vpj/TYA4n1czRU=;
-        b=nFJTcEp9mWFU1QJkHj1ztBjDy2oldRKUIkYyEFrmZW8fmCwHzku76BAXvvCodO/Nb6
-         NkaLTo154MRBCb2rnf1HlCeyTUfWi4TIr1UKPoFrPlTrukKH37vkpHbKeGwL3uQj0+vr
-         8Ng+cqSvAK6x+c9jNriWVcL3JasfiWVBefjbZ2DLHr6Y4Vxi/w8Q2pfnr8sQZ9GKYpe1
-         Q/nU2yuPFlv5TgVQWmoTkJDZrDrR9/64bH3/lXnjZEVDUWoxiAL1N9loVWwIhrftWaLJ
-         pgyXfWGT7hMVuRXNqAmoQg1qLNvQyrbXFfVFW/95IC3UHnt2+D5wu8hJv4Ul7VBJFbpq
-         J9rw==
-X-Gm-Message-State: AOJu0YwJk1yUAmcRMM/Uk6yHk0FUXmR1Gxjvo20PmcXhxzfTvua0k8wp
-	K55LnHIwq9TsdeuoZH+BHOGByTkAkCgpl1QeirHg+1ekYb+qLcUNWAWx4ETv2GiagJjMUllAjvQ
-	FwZaTA5hkzq4TMRm1
-X-Received: by 2002:a05:6808:3a09:b0:3a7:6213:6897 with SMTP id gr9-20020a0568083a0900b003a762136897mr18486021oib.11.1703087963854;
-        Wed, 20 Dec 2023 07:59:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHyXE0D9wJpfoVdm7QRffLwuE2S8IrTtR9VN2B+Knu+scUActUZX4vewE4I3XtDRyBzU1hqag==
-X-Received: by 2002:a05:6808:3a09:b0:3a7:6213:6897 with SMTP id gr9-20020a0568083a0900b003a762136897mr18486005oib.11.1703087963567;
-        Wed, 20 Dec 2023 07:59:23 -0800 (PST)
-Received: from fedora ([2600:1700:1ff0:d0e0::37])
-        by smtp.gmail.com with ESMTPSA id y8-20020ad45308000000b0067f032cf59bsm6251098qvr.27.2023.12.20.07.59.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Dec 2023 07:59:23 -0800 (PST)
-Date: Wed, 20 Dec 2023 09:59:20 -0600
-From: Andrew Halaney <ahalaney@redhat.com>
-To: Sneh Shah <quic_snehshah@quicinc.com>
-Cc: Vinod Koul <vkoul@kernel.org>, 
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kernel@quicinc.com
-Subject: Re: [PATCH net-next] net: stmmac: dwmac-qcom-ethqos: Add support for
- 2.5G SGMII
-Message-ID: <wvzhz4fmtheculsiag4t2pn2kaggyle2mzhvawbs4m5isvqjto@lmaonvq3c3e7>
-References: <20231218071118.21879-1-quic_snehshah@quicinc.com>
- <4zbf5fmijxnajk7kygcjrcusf6tdnuzsqqboh23nr6f3rb3c4g@qkfofhq7jmv6>
- <8b80ab09-8444-4c3d-83b0-c7dbf5e58658@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8F74776A;
+	Wed, 20 Dec 2023 16:01:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3DD0C433C7;
+	Wed, 20 Dec 2023 16:01:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703088102;
+	bh=CSa9vgnYzla1CprgzfBcXsc621DZ4W/ZOKDD7gCZCkY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=r+2gZ7NQizZOTLdTMypX8PTNe4zhCKmn5V4QP+/IHWYvtm1aEXom+X5RpsGOLGfzd
+	 J5HlOFlaQHyPrFTRqYzyPjP9zr6HocL48UO6BUY0igY2It6ekHCZ1CQ5c63yCJK/r/
+	 eCseZG9ZuAhuyDEVWuEZuXXx/O6G+zmp1kIHa2JsI2kjDaCdUEdd53sZqEDVwNvbmL
+	 OWOGHLzbxALpz8+0/MtVGNWn2wQ4logZp4feSFk2VdhBo+oCUjP4oCNy4Po8NXDxPx
+	 uUAC9UoWYQV/vfzkqRJd47OdhZxOfsSh2V7jY59ebMnFOmnMI0Tc1DMp8TJPhu+iFv
+	 ClBF4ZmNDM1bA==
+Message-ID: <d617df2b-620f-4a6f-b7dd-852bf156f904@kernel.org>
+Date: Wed, 20 Dec 2023 17:01:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8b80ab09-8444-4c3d-83b0-c7dbf5e58658@quicinc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 net-next 3/3] xdp: add multi-buff support for xdp
+ running in generic mode
+Content-Language: en-US
+To: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org
+Cc: lorenzo.bianconi@redhat.com, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, bpf@vger.kernel.org,
+ toke@redhat.com, willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+ sdf@google.com, Yan Zhai <yan@cloudflare.com>
+References: <cover.1702563810.git.lorenzo@kernel.org>
+ <e73a75e0d0f81a3b20568675829df4763fa0d389.1702563810.git.lorenzo@kernel.org>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <e73a75e0d0f81a3b20568675829df4763fa0d389.1702563810.git.lorenzo@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Dec 20, 2023 at 01:02:45PM +0530, Sneh Shah wrote:
+
+
+On 14/12/2023 15.29, Lorenzo Bianconi wrote:
+> Similar to native xdp, do not always linearize the skb in
+> netif_receive_generic_xdp routine but create a non-linear xdp_buff to be
+> processed by the eBPF program. This allow to add  multi-buffer support
+> for xdp running in generic mode.
 > 
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>   net/core/dev.c | 153 +++++++++++++++++++++++++++++++++++++++++++------
+>   1 file changed, 134 insertions(+), 19 deletions(-)
 > 
-> On 12/18/2023 9:50 PM, Andrew Halaney wrote:
-> > On Mon, Dec 18, 2023 at 12:41:18PM +0530, Sneh Shah wrote:
-> >> Serdes phy needs to operate at 2500 mode for 2.5G speed and 1000
-> >> mode for 1G/100M/10M speed.
-> >> Added changes to configure serdes phy and mac based on link speed.
-> >>
-> >> Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
-> >> ---
-> >>  .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 31 +++++++++++++++++--
-> >>  1 file changed, 29 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> >> index d3bf42d0fceb..b3a28dc19161 100644
-> >> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> >> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> >> @@ -21,6 +21,7 @@
-> >>  #define RGMII_IO_MACRO_CONFIG2		0x1C
-> >>  #define RGMII_IO_MACRO_DEBUG1		0x20
-> >>  #define EMAC_SYSTEM_LOW_POWER_DEBUG	0x28
-> >> +#define ETHQOS_MAC_AN_CTRL		0xE0
-> >>  
-> >>  /* RGMII_IO_MACRO_CONFIG fields */
-> >>  #define RGMII_CONFIG_FUNC_CLK_EN		BIT(30)
-> >> @@ -78,6 +79,10 @@
-> >>  #define ETHQOS_MAC_CTRL_SPEED_MODE		BIT(14)
-> >>  #define ETHQOS_MAC_CTRL_PORT_SEL		BIT(15)
-> >>  
-> >> +/*ETHQOS_MAC_AN_CTRL bits */
-> >> +#define ETHQOS_MAC_AN_CTRL_RAN			BIT(9)
-> >> +#define ETHQOS_MAC_AN_CTRL_ANE			BIT(12)
-> >> +
-> > 
-> > nit: space please add a space before ETHQOS_MAC_AN_CTRL
-> > 
-> will take care of this in next patch
-> 
-> >>  struct ethqos_emac_por {
-> >>  	unsigned int offset;
-> >>  	unsigned int value;
-> >> @@ -109,6 +114,7 @@ struct qcom_ethqos {
-> >>  	unsigned int num_por;
-> >>  	bool rgmii_config_loopback_en;
-> >>  	bool has_emac_ge_3;
-> >> +	unsigned int serdes_speed;
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index d7857de03dba..47164acc3268 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -4854,6 +4854,12 @@ u32 bpf_prog_run_generic_xdp(struct sk_buff *skb, struct xdp_buff *xdp,
+>   	xdp_init_buff(xdp, frame_sz, &rxqueue->xdp_rxq);
+>   	xdp_prepare_buff(xdp, hard_start, skb_headroom(skb) - mac_len,
+>   			 skb_headlen(skb) + mac_len, true);
+> +	if (skb_is_nonlinear(skb)) {
+> +		skb_shinfo(skb)->xdp_frags_size = skb->data_len;
+> +		xdp_buff_set_frags_flag(xdp);
+> +	} else {
+> +		xdp_buff_clear_frags_flag(xdp);
+> +	}
+>   
+>   	orig_data_end = xdp->data_end;
+>   	orig_data = xdp->data;
+> @@ -4883,6 +4889,14 @@ u32 bpf_prog_run_generic_xdp(struct sk_buff *skb, struct xdp_buff *xdp,
+>   		skb->len += off; /* positive on grow, negative on shrink */
+>   	}
+>   
+> +	/* XDP frag metadata (e.g. nr_frags) are updated in eBPF helpers
+> +	 * (e.g. bpf_xdp_adjust_tail), we need to update data_len here.
+> +	 */
+> +	if (xdp_buff_has_frags(xdp))
+> +		skb->data_len = skb_shinfo(skb)->xdp_frags_size;
+> +	else
+> +		skb->data_len = 0;
+> +
+>   	/* check if XDP changed eth hdr such SKB needs update */
+>   	eth = (struct ethhdr *)xdp->data;
+>   	if ((orig_eth_type != eth->h_proto) ||
+> @@ -4916,12 +4930,118 @@ u32 bpf_prog_run_generic_xdp(struct sk_buff *skb, struct xdp_buff *xdp,
+>   	return act;
+>   }
+>   
+> +static int netif_skb_segment_for_xdp(struct sk_buff **pskb,
 
-Another nit as I look closer: I think this should be grouped by phy_mode
-etc just for readability.
+This function "...segment_for_xdp" always reallocate SKB and copies all
+bits over.
+Should it have been named "skb_realloc_for_xdp" ?
 
-> >>  };
-> >>  
-> >>  static int rgmii_readl(struct qcom_ethqos *ethqos, unsigned int offset)
-> >> @@ -600,27 +606,47 @@ static int ethqos_configure_rgmii(struct qcom_ethqos *ethqos)
-> >>  
-> >>  static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
-> >>  {
-> >> -	int val;
-> >> -
-> >> +	int val, mac_an_value;
-> >>  	val = readl(ethqos->mac_base + MAC_CTRL_REG);
-> >> +	mac_an_value = readl(ethqos->mac_base + ETHQOS_MAC_AN_CTRL);
-> >>  
-> >>  	switch (ethqos->speed) {
-> >> +	case SPEED_2500:
-> >> +		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
-> >> +		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
-> >> +			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
-> >> +			      RGMII_IO_MACRO_CONFIG2);
-> >> +		if (ethqos->serdes_speed != SPEED_2500)
-> >> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
-> >> +		mac_an_value &= ~ETHQOS_MAC_AN_CTRL_ANE;
-> >> +		break;
-> >>  	case SPEED_1000:
-> >>  		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
-> >>  		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
-> >>  			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
-> >>  			      RGMII_IO_MACRO_CONFIG2);
-> >> +		if (ethqos->serdes_speed != SPEED_1000)
-> >> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
-> >> +		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
-> >>  		break;
-> >>  	case SPEED_100:
-> >>  		val |= ETHQOS_MAC_CTRL_PORT_SEL | ETHQOS_MAC_CTRL_SPEED_MODE;
-> >> +		if (ethqos->serdes_speed != SPEED_1000)
-> >> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
-> >> +		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
-> >>  		break;
-> >>  	case SPEED_10:
-> >>  		val |= ETHQOS_MAC_CTRL_PORT_SEL;
-> >>  		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
-> >> +		if (ethqos->serdes_speed != SPEED_1000)
-> >> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
-> >> +		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
-> >>  		break;
-> >>  	}
-> >>  
-> >>  	writel(val, ethqos->mac_base + MAC_CTRL_REG);
-> >> +	writel(mac_an_value, ethqos->mac_base + ETHQOS_MAC_AN_CTRL);
-> >> +	ethqos->serdes_speed = ethqos->speed;
-> > 
-> > I see these bits are generic and there's some functions in stmmac_pcs.h
-> > that muck with these...
-> > 
-> > Could you help me understand if this really should be Qualcomm specific,
-> > or if this is something that should be considered for the more core bits
-> > of the driver? I feel in either case we should take advantage of the
-> > common definitions in that file if possible.
-> > 
-> we do have function dwmac_ctrl_ane in core driver which updates same registers. However, it does not have the option to reset ANE bit, it can only set bits. For SPEED_2500 we need to reset ANE bit. Hence I am adding it here. Not sure if we can extend dwmac_ctrl_ane function to reset bits as well.
+I was really hopeing we can find a design to avoid doing this realloc.
 
-I'd evaluate if you can update that function to clear the ANE bit when
-the ane boolean is false. From the usage I see I feel that makes sense,
-but correct me if you think I'm wrong.
-At the very least let's use the defines from there, and possibly add a
-new function if clearing is not acceptable in dwmac_ctrl_ane().
+If the BPF-prog doesn't write into any of the fragments, then we can
+avoid this realloc (+copy) dance. We designed XDP multi-buff to have
+exactly the same layout+location as SKB in skb_shared_info, exactly to
+avoid having to reallocated.
 
-Stepping back, I was asking in general is the need to muck with ANE here
-is a Qualcomm specific problem, or is that a generic thing that should be
-handled in the core (and the phy_set_speed() bit stay here)? i.e. would
-any dwmac5 based IP need to do something like this for SPEED_2500?
+More comments inline below...
 
-> >>  
-> >>  	return val;
-> >>  }
-> >> @@ -789,6 +815,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
-> >>  				     "Failed to get serdes phy\n");
-> >>  
-> >>  	ethqos->speed = SPEED_1000;
-> >> +	ethqos->serdes_speed = SPEED_1000;
-> >>  	ethqos_update_link_clk(ethqos, SPEED_1000);
-> >>  	ethqos_set_func_clk_en(ethqos);
-> >>  
-> >> -- 
-> >> 2.17.1
-> >>
-> > 
-> 
+> +				     struct bpf_prog *prog)
+> +{
+> +#if IS_ENABLED(CONFIG_PAGE_POOL)
+> +	struct softnet_data *sd = this_cpu_ptr(&softnet_data);
+> +	u32 size, truesize, len, max_head_size, off;
+> +	struct sk_buff *skb = *pskb, *nskb;
+> +	int err, i, head_off;
+> +	void *data;
+> +
+> +	/* XDP does not support fraglist so we need to linearize
+> +	 * the skb.
+> +	 */
+> +	if (skb_has_frag_list(skb) || !prog->aux->xdp_has_frags)
+> +		return -EOPNOTSUPP;
+> +
+> +	max_head_size = SKB_WITH_OVERHEAD(PAGE_SIZE - XDP_PACKET_HEADROOM);
+> +	if (skb->len > max_head_size + MAX_SKB_FRAGS * PAGE_SIZE)
+> +		return -ENOMEM;
+> +
+> +	size = min_t(u32, skb->len, max_head_size);
+> +	truesize = SKB_HEAD_ALIGN(size) + XDP_PACKET_HEADROOM;
+> +	data = page_pool_dev_alloc_va(sd->page_pool, &truesize);
+> +	if (!data)
+> +		return -ENOMEM;
+> +
+> +	nskb = napi_build_skb(data, truesize);
+> +	if (!nskb) {
+> +		page_pool_free_va(sd->page_pool, data, true);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	skb_reserve(nskb, XDP_PACKET_HEADROOM);
+> +	skb_copy_header(nskb, skb);
+> +	skb_mark_for_recycle(nskb);
+> +
+> +	err = skb_copy_bits(skb, 0, nskb->data, size);
 
+This will likely copy part of the "frags" into the SKB "head" area.
+
+Especially for netstack generated TCP packets, this will change the
+segmentation layout significantly.  I wonder what (performance) effects
+this will have on further handling of these SKBs.
+
+
+
+> +	if (err) {
+> +		consume_skb(nskb);
+> +		return err;
+> +	}
+> +	skb_put(nskb, size);
+> +
+> +	head_off = skb_headroom(nskb) - skb_headroom(skb);
+> +	skb_headers_offset_update(nskb, head_off);
+> +
+> +	off = size;
+> +	len = skb->len - off;
+> +	for (i = 0; i < MAX_SKB_FRAGS && off < skb->len; i++) {
+> +		struct page *page;
+> +		u32 page_off;
+> +
+> +		size = min_t(u32, len, PAGE_SIZE);
+> +		truesize = size;
+> +
+> +		page = page_pool_dev_alloc(sd->page_pool, &page_off,
+> +					   &truesize);
+> +		if (!data) {
+> +			consume_skb(nskb);
+> +			return -ENOMEM;
+> +		}
+> +
+> +		skb_add_rx_frag(nskb, i, page, page_off, size, truesize);
+> +		err = skb_copy_bits(skb, off, page_address(page) + page_off,
+> +				    size);
+
+I think it is correct, but we can easily endup with the new SKB (nskb)
+having a different nskb->nr_frags.
+
+
+> +		if (err) {
+> +			consume_skb(nskb);
+> +			return err;
+> +		}
+> +
+> +		len -= size;
+> +		off += size;
+> +	}
+> +
+> +	consume_skb(skb);
+> +	*pskb = nskb;
+> +
+> +	return 0;
+> +#else
+> +	return -EOPNOTSUPP;
+> +#endif
+> +}
+> +
+> +static int netif_skb_check_for_xdp(struct sk_buff **pskb,
+> +				   struct bpf_prog *prog)
+> +{
+> +	struct sk_buff *skb = *pskb;
+> +	int err, hroom, troom;
+> +
+> +	if (!netif_skb_segment_for_xdp(pskb, prog))
+> +		return 0;
+
+IMHO the code call logic, does not make it easy to add cases where we
+can avoid the realloc.  With this patch, it feels like the realloc+copy
+code path is the "main" code path for XDP-generic.
+
+Our goal should be to avoid realloc.
+
+My goal for XDP multi-buff was/is that it can co-exist with GSO/GRO
+packets.  This patchset is a step in the direction of enabling GRO on
+devices with XDP (generic) loaded.  And I was really excited about this,
+but the overhead is going to be massive compared to normal GRO (without
+realloc+copy) that XDP end-users are going to be disappointed.
+
+
+> +
+> +	/* In case we have to go down the path and also linearize,
+> +	 * then lets do the pskb_expand_head() work just once here.
+> +	 */
+> +	hroom = XDP_PACKET_HEADROOM - skb_headroom(skb);
+> +	troom = skb->tail + skb->data_len - skb->end;
+> +	err = pskb_expand_head(skb,
+> +			       hroom > 0 ? ALIGN(hroom, NET_SKB_PAD) : 0,
+> +			       troom > 0 ? troom + 128 : 0, GFP_ATOMIC);
+> +	if (err)
+> +		return err;
+> +
+> +	return skb_linearize(skb);
+> +}
+> +
+>   static u32 netif_receive_generic_xdp(struct sk_buff **pskb,
+>   				     struct xdp_buff *xdp,
+>   				     struct bpf_prog *xdp_prog)
+>   {
+>   	struct sk_buff *skb = *pskb;
+> -	u32 act = XDP_DROP;
+> +	u32 mac_len, act = XDP_DROP;
+>   
+>   	/* Reinjected packets coming from act_mirred or similar should
+>   	 * not get XDP generic processing.
+> @@ -4929,41 +5049,36 @@ static u32 netif_receive_generic_xdp(struct sk_buff **pskb,
+>   	if (skb_is_redirected(skb))
+>   		return XDP_PASS;
+>   
+> -	/* XDP packets must be linear and must have sufficient headroom
+> -	 * of XDP_PACKET_HEADROOM bytes. This is the guarantee that also
+> -	 * native XDP provides, thus we need to do it here as well.
+> +	/* XDP packets must have sufficient headroom of XDP_PACKET_HEADROOM
+> +	 * bytes. This is the guarantee that also native XDP provides,
+> +	 * thus we need to do it here as well.
+
+Some "native" XDP provider only have 192 bytes as HEADROOM and XDP code
+can this not being static (256 bytes).  So, perhaps it is time to allow
+XDP generic to only require 192 bytes?
+
+>   	 */
+> +	mac_len = skb->data - skb_mac_header(skb);
+> +	__skb_push(skb, mac_len);
+> +
+>   	if (skb_cloned(skb) || skb_is_nonlinear(skb) ||
+>   	    skb_headroom(skb) < XDP_PACKET_HEADROOM) {
+> -		int hroom = XDP_PACKET_HEADROOM - skb_headroom(skb);
+> -		int troom = skb->tail + skb->data_len - skb->end;
+> -
+> -		/* In case we have to go down the path and also linearize,
+> -		 * then lets do the pskb_expand_head() work just once here.
+> -		 */
+> -		if (pskb_expand_head(skb,
+> -				     hroom > 0 ? ALIGN(hroom, NET_SKB_PAD) : 0,
+> -				     troom > 0 ? troom + 128 : 0, GFP_ATOMIC))
+> -			goto do_drop;
+> -		if (skb_linearize(skb))
+> +		if (netif_skb_check_for_xdp(pskb, xdp_prog))
+>   			goto do_drop;
+>   	}
+>   
+> -	act = bpf_prog_run_generic_xdp(skb, xdp, xdp_prog);
+> +	__skb_pull(*pskb, mac_len);
+> +
+> +	act = bpf_prog_run_generic_xdp(*pskb, xdp, xdp_prog);
+>   	switch (act) {
+>   	case XDP_REDIRECT:
+>   	case XDP_TX:
+>   	case XDP_PASS:
+>   		break;
+>   	default:
+> -		bpf_warn_invalid_xdp_action(skb->dev, xdp_prog, act);
+> +		bpf_warn_invalid_xdp_action((*pskb)->dev, xdp_prog, act);
+>   		fallthrough;
+>   	case XDP_ABORTED:
+> -		trace_xdp_exception(skb->dev, xdp_prog, act);
+> +		trace_xdp_exception((*pskb)->dev, xdp_prog, act);
+>   		fallthrough;
+>   	case XDP_DROP:
+>   	do_drop:
+> -		kfree_skb(skb);
+> +		kfree_skb(*pskb);
+>   		break;
+>   	}
+>   
 
