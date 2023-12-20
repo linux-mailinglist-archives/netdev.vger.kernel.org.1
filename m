@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-59285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 143B381A34C
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:57:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB40981A34D
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:57:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 982CA1F25C31
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 15:57:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A4F51C245A2
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 15:57:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B4FE41C96;
-	Wed, 20 Dec 2023 15:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D48B47A66;
+	Wed, 20 Dec 2023 15:56:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ES0S4cDx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eyji8rs8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FBD741875
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 15:56:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FEACC433C9;
-	Wed, 20 Dec 2023 15:55:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242C545C18
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 15:56:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61A67C433CB;
+	Wed, 20 Dec 2023 15:56:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703087760;
-	bh=PzqSoS7JcvqSMbjEYVeKdFso7tqADg3bJ1pfbVXyVDU=;
+	s=k20201202; t=1703087763;
+	bh=D24IxqQ8SbOHt1SLy+6Yt1Bwj3SMfAtFEcvcSNmoatg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ES0S4cDxOVXd+2Fl6uKtO1BKt0J/axd0o6ZbB4HPQevWUvAdmzb+ARCEXY5DvXVtL
-	 n5jd/cJsB5vU6CwUslQUOnJEeVv7xy+7DH5XmsP31/7WRj1Rie5vjCjIXiJsrGPXjx
-	 qbwoNsUzmc57NOGHQCYTOT6x+4Y0AAi/ZwFSagsUd87NKD87nk2XOLP6qRnNy95sg0
-	 nxoO3xgDuwFyTKgXEGsXlaKEGsc+CKFG+DDlc5anuaFyO165mT4TOY/tvJp0VYtB7D
-	 PCy+UTFaKe5x+mSPy5KKG3ZM8p46HbnxZhdYJeZH/hc1bjmirRk2/tuFebojS2OgW4
-	 RTiEyTlwEPG2A==
+	b=eyji8rs81KJMljwUXb2whPzsQHRaXF4+n5GmHqwH4rGdLJijvGoCs+xUn/CYkcHs6
+	 UgSPi5yLNPz+aLdpApP4f+5QgUUqUu80Rhq7mSq2M2jeGYxWvohOLyQeLlVbLRrkqD
+	 +wjU2gp9lAdTGpQc/taiqxS40hUT2Xu8m1GcE2qiaJb1X+CjZuwjREbjucKfrKqjDx
+	 F3tKWNrY+Y2k/0raASWinESdk4lHfI8uIMucbBRX9/XrPC7Cm4G2qTQBJT24CrqYaP
+	 4qmPAY+8x70taCkM4LsJYo0uWHrG1TpJZVL56e9wJ9KOSs/j4GmI1sw2hXRKSCjRso
+	 Pse7Q3LIKxw4Q==
 From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
 To: netdev@vger.kernel.org,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -47,9 +47,9 @@ Cc: Russell King <rmk+kernel@armlinux.org.uk>,
 	=?UTF-8?q?Marek=20Moj=C3=ADk?= <marek.mojik@nic.cz>,
 	=?UTF-8?q?Maximili=C3=A1n=20Maliar?= <maximilian.maliar@nic.cz>,
 	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
-Subject: [PATCH net-next 12/15] net: phy: realtek: use generic c45 suspend/resume for rtl822x
-Date: Wed, 20 Dec 2023 16:55:15 +0100
-Message-ID: <20231220155518.15692-13-kabel@kernel.org>
+Subject: [PATCH net-next 13/15] net: phy: realtek: drop .read_page and .write_page for rtl822x series
+Date: Wed, 20 Dec 2023 16:55:16 +0100
+Message-ID: <20231220155518.15692-14-kabel@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231220155518.15692-1-kabel@kernel.org>
 References: <20231220155518.15692-1-kabel@kernel.org>
@@ -62,108 +62,79 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Now that rtl822x PHYs .read_mmd() and .write_mmd() methods support
-accessing all MMD registers, use the generic clause 45 functions
-genphy_c45_pma_suspend() and genphy_c45_pma_resume() for the rtl822x
-series of Realtek transceivers.
+Drop the .read_page() and .write_page() methods for rtl822x series.
 
-Add a 20ms delay after resume, as done in the current resume
-implementation.
+The rtl822x driver methods are now reimplemented to only access clause
+45 registers and these are the last methods that explicitly access
+clause 22 registers.
+
+If the underlying MDIO bus is clause 22, the paging mechanism is still
+used internally in the .read_mmd() and .write_mmd() methods when
+accessing registers in MMD 31.
 
 Signed-off-by: Marek Behún <kabel@kernel.org>
 ---
- drivers/net/phy/realtek.c | 36 ++++++++++++++++++++++++------------
- 1 file changed, 24 insertions(+), 12 deletions(-)
+ drivers/net/phy/realtek.c | 12 ------------
+ 1 file changed, 12 deletions(-)
 
 diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-index f36b2bfabe57..cf608d390aa5 100644
+index cf608d390aa5..e2f68ac4b005 100644
 --- a/drivers/net/phy/realtek.c
 +++ b/drivers/net/phy/realtek.c
-@@ -651,6 +651,18 @@ static int rtl822x_probe(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int rtl822x_resume(struct phy_device *phydev)
-+{
-+	int ret = genphy_c45_pma_resume(phydev);
-+
-+	if (ret < 0)
-+		return ret;
-+
-+	msleep(20);
-+
-+	return 0;
-+}
-+
- static int rtl822x_config_aneg(struct phy_device *phydev)
- {
- 	bool changed = false;
-@@ -949,8 +961,8 @@ static struct phy_driver realtek_drvs[] = {
- 		.probe		= rtl822x_probe,
- 		.config_aneg	= rtl822x_config_aneg,
+@@ -963,8 +963,6 @@ static struct phy_driver realtek_drvs[] = {
  		.read_status	= rtl822x_read_status,
--		.suspend	= genphy_suspend,
--		.resume		= rtlgen_resume,
-+		.suspend	= genphy_c45_pma_suspend,
-+		.resume		= rtl822x_resume,
- 		.read_page	= rtl821x_read_page,
- 		.write_page	= rtl821x_write_page,
+ 		.suspend	= genphy_c45_pma_suspend,
+ 		.resume		= rtl822x_resume,
+-		.read_page	= rtl821x_read_page,
+-		.write_page	= rtl821x_write_page,
  		.read_mmd	= rtlgen_read_mmd,
-@@ -961,8 +973,8 @@ static struct phy_driver realtek_drvs[] = {
- 		.probe		= rtl822x_probe,
- 		.config_aneg	= rtl822x_config_aneg,
+ 		.write_mmd	= rtlgen_write_mmd,
+ 	}, {
+@@ -975,8 +973,6 @@ static struct phy_driver realtek_drvs[] = {
  		.read_status	= rtl822x_read_status,
--		.suspend	= genphy_suspend,
--		.resume		= rtlgen_resume,
-+		.suspend	= genphy_c45_pma_suspend,
-+		.resume		= rtl822x_resume,
- 		.read_page	= rtl821x_read_page,
- 		.write_page	= rtl821x_write_page,
+ 		.suspend	= genphy_c45_pma_suspend,
+ 		.resume		= rtl822x_resume,
+-		.read_page	= rtl821x_read_page,
+-		.write_page	= rtl821x_write_page,
  		.read_mmd	= rtlgen_read_mmd,
-@@ -973,8 +985,8 @@ static struct phy_driver realtek_drvs[] = {
- 		.probe		= rtl822x_probe,
- 		.config_aneg    = rtl822x_config_aneg,
+ 		.write_mmd	= rtlgen_write_mmd,
+ 	}, {
+@@ -987,8 +983,6 @@ static struct phy_driver realtek_drvs[] = {
  		.read_status    = rtl822x_read_status,
--		.suspend        = genphy_suspend,
--		.resume         = rtlgen_resume,
-+		.suspend	= genphy_c45_pma_suspend,
-+		.resume		= rtl822x_resume,
- 		.read_page      = rtl821x_read_page,
- 		.write_page     = rtl821x_write_page,
+ 		.suspend	= genphy_c45_pma_suspend,
+ 		.resume		= rtl822x_resume,
+-		.read_page      = rtl821x_read_page,
+-		.write_page     = rtl821x_write_page,
  		.read_mmd	= rtlgen_read_mmd,
-@@ -985,8 +997,8 @@ static struct phy_driver realtek_drvs[] = {
- 		.probe		= rtl822x_probe,
- 		.config_aneg    = rtl822x_config_aneg,
+ 		.write_mmd	= rtlgen_write_mmd,
+ 	}, {
+@@ -999,8 +993,6 @@ static struct phy_driver realtek_drvs[] = {
  		.read_status    = rtl822x_read_status,
--		.suspend        = genphy_suspend,
--		.resume         = rtlgen_resume,
-+		.suspend	= genphy_c45_pma_suspend,
-+		.resume		= rtl822x_resume,
- 		.read_page      = rtl821x_read_page,
- 		.write_page     = rtl821x_write_page,
+ 		.suspend	= genphy_c45_pma_suspend,
+ 		.resume		= rtl822x_resume,
+-		.read_page      = rtl821x_read_page,
+-		.write_page     = rtl821x_write_page,
  		.read_mmd	= rtlgen_read_mmd,
-@@ -997,8 +1009,8 @@ static struct phy_driver realtek_drvs[] = {
- 		.probe		= rtl822x_probe,
- 		.config_aneg    = rtl822x_config_aneg,
+ 		.write_mmd	= rtlgen_write_mmd,
+ 	}, {
+@@ -1011,8 +1003,6 @@ static struct phy_driver realtek_drvs[] = {
  		.read_status    = rtl822x_read_status,
--		.suspend        = genphy_suspend,
--		.resume         = rtlgen_resume,
-+		.suspend	= genphy_c45_pma_suspend,
-+		.resume		= rtl822x_resume,
- 		.read_page      = rtl821x_read_page,
- 		.write_page     = rtl821x_write_page,
+ 		.suspend	= genphy_c45_pma_suspend,
+ 		.resume		= rtl822x_resume,
+-		.read_page      = rtl821x_read_page,
+-		.write_page     = rtl821x_write_page,
  		.read_mmd	= rtlgen_read_mmd,
-@@ -1009,8 +1021,8 @@ static struct phy_driver realtek_drvs[] = {
- 		.probe		= rtl822x_probe,
- 		.config_aneg    = rtl822x_config_aneg,
+ 		.write_mmd	= rtlgen_write_mmd,
+ 	}, {
+@@ -1023,8 +1013,6 @@ static struct phy_driver realtek_drvs[] = {
  		.read_status    = rtl822x_read_status,
--		.suspend        = genphy_suspend,
--		.resume         = rtlgen_resume,
-+		.suspend	= genphy_c45_pma_suspend,
-+		.resume		= rtl822x_resume,
- 		.read_page      = rtl821x_read_page,
- 		.write_page     = rtl821x_write_page,
+ 		.suspend	= genphy_c45_pma_suspend,
+ 		.resume		= rtl822x_resume,
+-		.read_page      = rtl821x_read_page,
+-		.write_page     = rtl821x_write_page,
  		.read_mmd	= rtlgen_read_mmd,
+ 		.write_mmd	= rtlgen_write_mmd,
+ 	}, {
 -- 
 2.41.0
 
