@@ -1,159 +1,250 @@
-Return-Path: <netdev+bounces-59250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAB2981A138
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 15:39:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 018CB81A157
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 15:45:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 093101C22F0A
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 14:39:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26E471C224EB
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 14:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAA233D397;
-	Wed, 20 Dec 2023 14:39:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D7943D3B6;
+	Wed, 20 Dec 2023 14:45:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="X0tJIcSN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C1c/dfnJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DAA33D388;
-	Wed, 20 Dec 2023 14:39:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1703083139;
-	bh=R2rCuNyBRNg+TZc+54PKcT/z1boJ+LwN+LmqAXkaP/E=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=X0tJIcSNYys6pId5gicm+KV2lXyiMvnfhqnbfLkeIrLVagWhtD9/nu0HkawJJDZ92
-	 9LsuYl+fGgBv71HfR/uf8KTiD3CMZSj0sOBklIQxsM7Nej+ajAsdmOsxJVrCS763gY
-	 By0r6Vufa3ZmiJ/gxTKM8ac/SMsKZn4nDWjaN/GCMp6wIsVjT34bLCAzM5MBUSlMrm
-	 nvLayth3R3flPJztmXFpey/7AbgNVk49+TAZ4dIIFW3PyrOZ29r95hz8Vtm0EvMiCI
-	 F2VOLNYuqLcFguIbZ419VfnJUrRi6jZMHEd73Z3z7rlO72UReuFNxBsXxX5mz/NMlw
-	 xFGETRxG0hMMQ==
-Received: from [100.115.223.179] (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: cristicc)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id F30873781F8F;
-	Wed, 20 Dec 2023 14:38:57 +0000 (UTC)
-Message-ID: <3b2d41cd-4c0a-4277-8650-e6da37139023@collabora.com>
-Date: Wed, 20 Dec 2023 16:38:57 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8E4E3F8CD
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 14:45:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7810992c613so103135785a.3
+        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 06:45:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703083525; x=1703688325; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=00hWthZLZR4bx/F9jEFUNl/uLb7wDcknN2yFH2/3Afo=;
+        b=C1c/dfnJUnzXmsEC732ZXE3Gp7gUqtwzwL7qMuRqOGvwMv7LYwpXIAa4Id4tWi9gVE
+         eRO0qR+YxQH4PpYyjeM5l/sWITnNzAss/cbGGGJEH4KQDgpzxNmzlUU91eQTYh2A5RVM
+         BEXEd10gBUVw5TyGJzsK6Cyx7eWbOZIjORCqJzAmatzhtrF2CDx0V9bSeY0jv217QDWd
+         QQ6DhDTMGRO2RurqMEHfPgVr8LaEtmlDXj0sdsq2vTBons0q17fYiXGNB2lVxvuNI4uC
+         K59clA8duex1S3/O4OTRByN6gP8Cw3gPixqdNYSuoiZBe6kcKkYX6KXAJ0NUKWb/KMjM
+         kaYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703083525; x=1703688325;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=00hWthZLZR4bx/F9jEFUNl/uLb7wDcknN2yFH2/3Afo=;
+        b=tCBA4los6/cKhAYN70/ycysqgzjQn350HacRoZLuiMkOlCMbYtA7JE2pFrRe54G9UW
+         as5o0Rpb6Z7WZJlhAD0UPIx/JvsKuK7Ve0QBjjVxRoOinnAuFnHquAT6YP75ZjgLkt5f
+         4Rhn2g1+hchzLoDsv0npFTEdldpZSOI7rQ0XJnicejYpk8kH8jXiUlU1mL7dqRsfrUN5
+         f39tFKwRrBR62hV2VMwD+rywpjg7pRQCXishg+yM2VVnAHawv/lQePC3zcsZmdDn5Mri
+         7yqBdeqWRWNurEkCHRjUknNkh8T7Wd98l+4dQ7hvTIgIBp44HNxz8sh80GssVh588x20
+         +wRQ==
+X-Gm-Message-State: AOJu0YyK7B0e3SFdmWiI81+RfsqesMqAh0G0L2WaPEmCQzH7IHTbuHWV
+	2OKO3CPuBgXtFfTqyqLILk3/y+6tzhw=
+X-Google-Smtp-Source: AGHT+IHv7lb+06r/c9ShUIhRC6qHu+HFbvkuZ1S27Ryc/Xemou3/giVSsr8JKcTU/7LdyInq8/HT0g==
+X-Received: by 2002:ad4:5de2:0:b0:67f:276d:a113 with SMTP id jn2-20020ad45de2000000b0067f276da113mr10263563qvb.72.1703083525574;
+        Wed, 20 Dec 2023 06:45:25 -0800 (PST)
+Received: from localhost (114.66.194.35.bc.googleusercontent.com. [35.194.66.114])
+        by smtp.gmail.com with ESMTPSA id f9-20020a37ad09000000b0077fb3fca44asm887159qkm.95.2023.12.20.06.45.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Dec 2023 06:45:25 -0800 (PST)
+Date: Wed, 20 Dec 2023 09:45:25 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Heng Qi <hengqi@linux.alibaba.com>, 
+ netdev@vger.kernel.org, 
+ virtualization@lists.linux-foundation.org
+Cc: Jason Wang <jasowang@redhat.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Message-ID: <6582fe057cb9_1a34a429435@willemb.c.googlers.com.notmuch>
+In-Reply-To: <f9f7d28624f8084ef07842ee569c22b324ee4055.1703059341.git.hengqi@linux.alibaba.com>
+References: <f9f7d28624f8084ef07842ee569c22b324ee4055.1703059341.git.hengqi@linux.alibaba.com>
+Subject: Re: [PATCH net-next] virtio-net: switch napi_tx without downing nic
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 1/4] riscv: dts: starfive: jh7100: Add sysmain and gmac
- DT nodes
-Content-Language: en-US
-To: Emil Renner Berthing <emil.renner.berthing@canonical.com>,
- Emil Renner Berthing <kernel@esmil.dk>, Conor Dooley <conor@kernel.org>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Jacob Keller <jacob.e.keller@intel.com>
-Cc: linux-riscv@lists.infradead.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kernel@collabora.com
-References: <20231220004638.2463643-1-cristian.ciocaltea@collabora.com>
- <20231220004638.2463643-2-cristian.ciocaltea@collabora.com>
- <CAJM55Z9DhojDTDPEqx3NO5g61=ezRg-U9odixbZugcXRRVmS7w@mail.gmail.com>
-From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-In-Reply-To: <CAJM55Z9DhojDTDPEqx3NO5g61=ezRg-U9odixbZugcXRRVmS7w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On 12/20/23 15:43, Emil Renner Berthing wrote:
-> Cristian Ciocaltea wrote:
->> Provide the sysmain and gmac DT nodes supporting the DWMAC found on the
->> StarFive JH7100 SoC.
->>
->> Co-developed-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
->> Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
->> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
->> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
->> ---
->>  arch/riscv/boot/dts/starfive/jh7100.dtsi | 36 ++++++++++++++++++++++++
->>  1 file changed, 36 insertions(+)
->>
->> diff --git a/arch/riscv/boot/dts/starfive/jh7100.dtsi b/arch/riscv/boot/dts/starfive/jh7100.dtsi
->> index c216aaecac53..2ebdebe6a81c 100644
->> --- a/arch/riscv/boot/dts/starfive/jh7100.dtsi
->> +++ b/arch/riscv/boot/dts/starfive/jh7100.dtsi
->> @@ -204,6 +204,37 @@ sdio1: mmc@10010000 {
->>  			status = "disabled";
->>  		};
->>
->> +		gmac: ethernet@10020000 {
->> +			compatible = "starfive,jh7100-dwmac", "snps,dwmac";
->> +			reg = <0x0 0x10020000 0x0 0x10000>;
->> +			clocks = <&clkgen JH7100_CLK_GMAC_ROOT_DIV>,
->> +				 <&clkgen JH7100_CLK_GMAC_AHB>,
->> +				 <&clkgen JH7100_CLK_GMAC_PTP_REF>,
->> +				 <&clkgen JH7100_CLK_GMAC_TX_INV>,
->> +				 <&clkgen JH7100_CLK_GMAC_GTX>;
->> +			clock-names = "stmmaceth", "pclk", "ptp_ref", "tx", "gtx";
->> +			resets = <&rstgen JH7100_RSTN_GMAC_AHB>;
->> +			reset-names = "ahb";
->> +			interrupts = <6>, <7>;
->> +			interrupt-names = "macirq", "eth_wake_irq";
->> +			max-frame-size = <9000>;
->> +			snps,multicast-filter-bins = <32>;
->> +			snps,perfect-filter-entries = <128>;
->> +			starfive,syscon = <&sysmain 0x70 0>;
->> +			rx-fifo-depth = <32768>;
->> +			tx-fifo-depth = <16384>;
->> +			snps,axi-config = <&stmmac_axi_setup>;
->> +			snps,fixed-burst;
->> +			snps,force_thresh_dma_mode;
+Heng Qi wrote:
+> virtio-net has two ways to switch napi_tx: one is through the
+> module parameter, and the other is through coalescing parameter
+> settings (provided that the nic status is down).
 > 
-> Compared to v4 you're missing a
+> Sometimes we face performance regression caused by napi_tx,
+> then we need to switch napi_tx when debugging. However, the
+> existing methods are a bit troublesome, such as needing to
+> reload the driver or turn off the network card. So try to make
+> this update.
 > 
->   snps,no-pbl-x8;
+> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+
+The commit does not explain why it is safe to do so.
+
+The tx-napi weights are not really weights: it is a boolean whether
+napi is used for transmit cleaning, or whether packets are cleaned
+in ndo_start_xmit.
+
+There certainly are some subtle issues with regard to pausing/waking
+queues when switching between modes.
+
+Calling napi_enable/napi_disable without bringing down the device is
+allowed. The actually napi.weight field is only updated when neither
+napi nor ndo_start_xmit is running. So I don't see an immediate issue.
+
+
+> ---
+>  drivers/net/virtio_net.c | 81 ++++++++++++++++++----------------------
+>  1 file changed, 37 insertions(+), 44 deletions(-)
 > 
-> here. It might be the right thing to do, but then I would have expected
-> it to me mentioned in the cover letter version history.
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 10614e9f7cad..12f8e1f9971c 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -3559,16 +3559,37 @@ static int virtnet_coal_params_supported(struct ethtool_coalesce *ec)
+>  	return 0;
+>  }
+>  
+> -static int virtnet_should_update_vq_weight(int dev_flags, int weight,
+> -					   int vq_weight, bool *should_update)
+> +static void virtnet_switch_napi_tx(struct virtnet_info *vi, u32 qstart,
+> +				   u32 qend, u32 tx_frames)
+>  {
+> -	if (weight ^ vq_weight) {
+> -		if (dev_flags & IFF_UP)
+> -			return -EBUSY;
+> -		*should_update = true;
+> -	}
+> +	struct net_device *dev = vi->dev;
+> +	int new_weight, cur_weight;
+> +	struct netdev_queue *txq;
+> +	struct send_queue *sq;
+>  
+> -	return 0;
+> +	new_weight = tx_frames ? NAPI_POLL_WEIGHT : 0;
+> +	for (; qstart < qend; qstart++) {
+> +		sq = &vi->sq[qstart];
+> +		cur_weight = sq->napi.weight;
+> +		if (!(new_weight ^ cur_weight))
+> +			continue;
+> +
+> +		if (!(dev->flags & IFF_UP)) {
+> +			sq->napi.weight = new_weight;
+> +			continue;
+> +		}
+> +
+> +		if (cur_weight)
+> +			virtnet_napi_tx_disable(&sq->napi);
+> +
+> +		txq = netdev_get_tx_queue(dev, qstart);
+> +		__netif_tx_lock_bh(txq);
+> +		sq->napi.weight = new_weight;
+> +		__netif_tx_unlock_bh(txq);
+> +
+> +		if (!cur_weight)
+> +			virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
+> +	}
+>  }
+>  
+>  static int virtnet_set_coalesce(struct net_device *dev,
+> @@ -3577,25 +3598,11 @@ static int virtnet_set_coalesce(struct net_device *dev,
+>  				struct netlink_ext_ack *extack)
+>  {
+>  	struct virtnet_info *vi = netdev_priv(dev);
+> -	int ret, queue_number, napi_weight;
+> -	bool update_napi = false;
+> -
+> -	/* Can't change NAPI weight if the link is up */
+> -	napi_weight = ec->tx_max_coalesced_frames ? NAPI_POLL_WEIGHT : 0;
+> -	for (queue_number = 0; queue_number < vi->max_queue_pairs; queue_number++) {
+> -		ret = virtnet_should_update_vq_weight(dev->flags, napi_weight,
+> -						      vi->sq[queue_number].napi.weight,
+> -						      &update_napi);
+> -		if (ret)
+> -			return ret;
+> -
+> -		if (update_napi) {
+> -			/* All queues that belong to [queue_number, vi->max_queue_pairs] will be
+> -			 * updated for the sake of simplicity, which might not be necessary
+> -			 */
+> -			break;
+> -		}
+> -	}
+> +	int ret;
+> +
+> +	/* Param tx_frames can be used to switch napi_tx */
+> +	virtnet_switch_napi_tx(vi, 0, vi->max_queue_pairs,
+> +			       ec->tx_max_coalesced_frames);
+>  
+>  	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL))
+>  		ret = virtnet_send_notf_coal_cmds(vi, ec);
+> @@ -3605,11 +3612,6 @@ static int virtnet_set_coalesce(struct net_device *dev,
+>  	if (ret)
+>  		return ret;
+>  
+> -	if (update_napi) {
+> -		for (; queue_number < vi->max_queue_pairs; queue_number++)
+> -			vi->sq[queue_number].napi.weight = napi_weight;
+> -	}
+> -
+>  	return ret;
+>  }
+>  
+> @@ -3641,19 +3643,13 @@ static int virtnet_set_per_queue_coalesce(struct net_device *dev,
+>  					  struct ethtool_coalesce *ec)
+>  {
+>  	struct virtnet_info *vi = netdev_priv(dev);
+> -	int ret, napi_weight;
+> -	bool update_napi = false;
+> +	int ret;
+>  
+>  	if (queue >= vi->max_queue_pairs)
+>  		return -EINVAL;
+>  
+> -	/* Can't change NAPI weight if the link is up */
+> -	napi_weight = ec->tx_max_coalesced_frames ? NAPI_POLL_WEIGHT : 0;
+> -	ret = virtnet_should_update_vq_weight(dev->flags, napi_weight,
+> -					      vi->sq[queue].napi.weight,
+> -					      &update_napi);
+> -	if (ret)
+> -		return ret;
+> +	/* Param tx_frames can be used to switch napi_tx */
+> +	virtnet_switch_napi_tx(vi, queue, queue, ec->tx_max_coalesced_frames);
+>  
+>  	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
+>  		ret = virtnet_send_notf_coal_vq_cmds(vi, ec, queue);
+> @@ -3663,9 +3659,6 @@ static int virtnet_set_per_queue_coalesce(struct net_device *dev,
+>  	if (ret)
+>  		return ret;
+>  
+> -	if (update_napi)
+> -		vi->sq[queue].napi.weight = napi_weight;
+> -
+>  	return 0;
+>  }
+>  
+> -- 
+> 2.19.1.6.gb485710b
+> 
 
-Oh yes, I missed to add this to the changelog, sorry!  I dropped that
-because the property is only valid for snps,dwmac-{3.50a, 4.10a, 4.20a,
-5.20} compatibles, while we have plain snps,dwmac to handle 3.7x.
 
-We could have probably used snps,dwmac-3.70a or snps,dwmac-3.710, but
-I'm not sure which is the exact chip revision and it wouldn't really
-change anything as there is no special handling for them in the
-snps,dwmac.yaml binding.
-
->> +			status = "disabled";
->> +
->> +			stmmac_axi_setup: stmmac-axi-config {
->> +				snps,wr_osr_lmt = <16>;
->> +				snps,rd_osr_lmt = <16>;
->> +				snps,blen = <256 128 64 32 0 0 0>;
->> +			};
->> +		};
->> +
->>  		clkgen: clock-controller@11800000 {
->>  			compatible = "starfive,jh7100-clkgen";
->>  			reg = <0x0 0x11800000 0x0 0x10000>;
->> @@ -218,6 +249,11 @@ rstgen: reset-controller@11840000 {
->>  			#reset-cells = <1>;
->>  		};
->>
->> +		sysmain: syscon@11850000 {
->> +			compatible = "starfive,jh7100-sysmain", "syscon";
->> +			reg = <0x0 0x11850000 0x0 0x10000>;
->> +		};
->> +
->>  		i2c0: i2c@118b0000 {
->>  			compatible = "snps,designware-i2c";
->>  			reg = <0x0 0x118b0000 0x0 0x10000>;
->> --
->> 2.43.0
->>
 
