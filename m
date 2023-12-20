@@ -1,86 +1,219 @@
-Return-Path: <netdev+bounces-59163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D45EE81998F
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 08:32:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6556A819994
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 08:33:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9280628230D
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 07:32:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D7ED283242
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 07:33:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBDBD168D8;
-	Wed, 20 Dec 2023 07:32:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD7615AD8;
+	Wed, 20 Dec 2023 07:33:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AlXL4G3U"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="eaI1ixBT"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E15FE168C4;
-	Wed, 20 Dec 2023 07:32:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id CC4DD240003;
-	Wed, 20 Dec 2023 07:32:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1703057564;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WuxHDbx959XSxmvAZu7trGTApMk5GJ020wwO6Eb9hwM=;
-	b=AlXL4G3U9C1OTwtEp7GI63ef2TOC5XP+2kO6DdpNnZK95iopMj42c3ce48ffU8+HPCFhN5
-	lDlSH5U5XGpoo7hQqQNknoQyTwYDOPNeQxkG6OhM/dW96EA/DRBBJKPEjfZbvbwUGqq2Mp
-	p4s6Zh1liVH9+Slrd572H+ee3WXgOjYWQPhFilgdsR4ta1jqkx/AecSiUUJXZlVkiQoGRi
-	M9TGmxcI/g8Q4moR8kLXHENl7jrN1t641HM/G0akCQunM/HDzTN1H4YCLg+IjoEVNedKJK
-	pHBuZHELrvXU5DpKs81pIfnAhvdCvWMMBG+TNYm/frZXvOhRMku5HTLtYYd8/g==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Miquel Raynal <miquel.raynal@bootlin.com>,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	linux-wpan@vger.kernel.org
-Cc: David Girault <david.girault@qorvo.com>,
-	Romuald Despres <romuald.despres@qorvo.com>,
-	Frederic Blain <frederic.blain@qorvo.com>,
-	Nicolas Schodet <nico@ni.fr.eu.org>,
-	Guilhem Imberton <guilhem.imberton@qorvo.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH wpan-next 1/5] mac80254: Provide real PAN coordinator info in beacons
-Date: Wed, 20 Dec 2023 08:32:41 +0100
-Message-Id: <20231220073241.411025-1-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231128111655.507479-2-miquel.raynal@bootlin.com>
-References: 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B34B1640D;
+	Wed, 20 Dec 2023 07:33:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BK4Dlpo022880;
+	Wed, 20 Dec 2023 07:32:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=BnD/wIZiRU3uaH33fmoB/ksRaZee7RDastjX3GeqY2c=; b=ea
+	I1ixBTee++GRkUQVKLhYJsx12ZZpiVVAQXk3lz3yC3r6YihSdPMhg3Me8xiMPu/j
+	gcAJL1QLfdk4Hn7F/YSy0xc2oE2UNySI6fIxf0hUEPYVYPBQcJ2qVDBHHssbAqNC
+	Kuiskpx0r3CCCusQWIWLvy6wuR5nyUm5pTq5sCnybROR/0sAOSeCC1NyL+eZ6F0o
+	flZ6Dayj2edj154r6tP1bEBZKLUuktBAADJ0g0En12Wvr/m5waeLy6dGZAyaQv3i
+	HSDNODvRmoYlI8KLlATygcMJ7lZLdyMta7m/R6j19Vcl1t8CEvn74rwhPzn/yWRl
+	9W0FgdZIDYS1IazDGgaw==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3v3fa3hj2t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Dec 2023 07:32:58 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BK7WvM4019047
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Dec 2023 07:32:57 GMT
+Received: from [10.216.10.102] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Tue, 19 Dec
+ 2023 23:32:48 -0800
+Message-ID: <8b80ab09-8444-4c3d-83b0-c7dbf5e58658@quicinc.com>
+Date: Wed, 20 Dec 2023 13:02:45 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-linux-wpan-patch-notification: thanks
-X-linux-wpan-patch-commit: b'cf1b830e625baaee5bf1ae4ba4b562cbec5ad012'
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: miquel.raynal@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: stmmac: dwmac-qcom-ethqos: Add support for
+ 2.5G SGMII
+Content-Language: en-US
+To: Andrew Halaney <ahalaney@redhat.com>
+CC: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu
+	<joabreu@synopsys.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@quicinc.com>
+References: <20231218071118.21879-1-quic_snehshah@quicinc.com>
+ <4zbf5fmijxnajk7kygcjrcusf6tdnuzsqqboh23nr6f3rb3c4g@qkfofhq7jmv6>
+From: Sneh Shah <quic_snehshah@quicinc.com>
+In-Reply-To: <4zbf5fmijxnajk7kygcjrcusf6tdnuzsqqboh23nr6f3rb3c4g@qkfofhq7jmv6>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 7Ut7UXyS2eIOhFoqn7Ux1zDtvLQ-HMcx
+X-Proofpoint-ORIG-GUID: 7Ut7UXyS2eIOhFoqn7Ux1zDtvLQ-HMcx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ phishscore=0 spamscore=0 suspectscore=0 mlxlogscore=999 impostorscore=0
+ clxscore=1015 adultscore=0 mlxscore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2312200050
 
-On Tue, 2023-11-28 at 11:16:51 UTC, Miquel Raynal wrote:
-> Sending a beacon is a way to advertise a PAN, but also ourselves as
-> coordinator in the PAN. There is only one PAN coordinator in a PAN, this
-> is the device without parent (not associated itself to an "upper"
-> coordinator). Instead of blindly saying that we are the PAN coordinator,
-> let's actually use our internal information to fill this field.
+
+
+On 12/18/2023 9:50 PM, Andrew Halaney wrote:
+> On Mon, Dec 18, 2023 at 12:41:18PM +0530, Sneh Shah wrote:
+>> Serdes phy needs to operate at 2500 mode for 2.5G speed and 1000
+>> mode for 1G/100M/10M speed.
+>> Added changes to configure serdes phy and mac based on link speed.
+>>
+>> Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
+>> ---
+>>  .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 31 +++++++++++++++++--
+>>  1 file changed, 29 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+>> index d3bf42d0fceb..b3a28dc19161 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+>> @@ -21,6 +21,7 @@
+>>  #define RGMII_IO_MACRO_CONFIG2		0x1C
+>>  #define RGMII_IO_MACRO_DEBUG1		0x20
+>>  #define EMAC_SYSTEM_LOW_POWER_DEBUG	0x28
+>> +#define ETHQOS_MAC_AN_CTRL		0xE0
+>>  
+>>  /* RGMII_IO_MACRO_CONFIG fields */
+>>  #define RGMII_CONFIG_FUNC_CLK_EN		BIT(30)
+>> @@ -78,6 +79,10 @@
+>>  #define ETHQOS_MAC_CTRL_SPEED_MODE		BIT(14)
+>>  #define ETHQOS_MAC_CTRL_PORT_SEL		BIT(15)
+>>  
+>> +/*ETHQOS_MAC_AN_CTRL bits */
+>> +#define ETHQOS_MAC_AN_CTRL_RAN			BIT(9)
+>> +#define ETHQOS_MAC_AN_CTRL_ANE			BIT(12)
+>> +
 > 
-> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
-> Acked-by: Alexander Aring <aahringo@redhat.com>
+> nit: space please add a space before ETHQOS_MAC_AN_CTRL
+> 
+will take care of this in next patch
 
-Applied to https://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan-next.git master.
-
-Miquel
+>>  struct ethqos_emac_por {
+>>  	unsigned int offset;
+>>  	unsigned int value;
+>> @@ -109,6 +114,7 @@ struct qcom_ethqos {
+>>  	unsigned int num_por;
+>>  	bool rgmii_config_loopback_en;
+>>  	bool has_emac_ge_3;
+>> +	unsigned int serdes_speed;
+>>  };
+>>  
+>>  static int rgmii_readl(struct qcom_ethqos *ethqos, unsigned int offset)
+>> @@ -600,27 +606,47 @@ static int ethqos_configure_rgmii(struct qcom_ethqos *ethqos)
+>>  
+>>  static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
+>>  {
+>> -	int val;
+>> -
+>> +	int val, mac_an_value;
+>>  	val = readl(ethqos->mac_base + MAC_CTRL_REG);
+>> +	mac_an_value = readl(ethqos->mac_base + ETHQOS_MAC_AN_CTRL);
+>>  
+>>  	switch (ethqos->speed) {
+>> +	case SPEED_2500:
+>> +		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
+>> +		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+>> +			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+>> +			      RGMII_IO_MACRO_CONFIG2);
+>> +		if (ethqos->serdes_speed != SPEED_2500)
+>> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
+>> +		mac_an_value &= ~ETHQOS_MAC_AN_CTRL_ANE;
+>> +		break;
+>>  	case SPEED_1000:
+>>  		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
+>>  		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+>>  			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+>>  			      RGMII_IO_MACRO_CONFIG2);
+>> +		if (ethqos->serdes_speed != SPEED_1000)
+>> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
+>> +		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
+>>  		break;
+>>  	case SPEED_100:
+>>  		val |= ETHQOS_MAC_CTRL_PORT_SEL | ETHQOS_MAC_CTRL_SPEED_MODE;
+>> +		if (ethqos->serdes_speed != SPEED_1000)
+>> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
+>> +		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
+>>  		break;
+>>  	case SPEED_10:
+>>  		val |= ETHQOS_MAC_CTRL_PORT_SEL;
+>>  		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
+>> +		if (ethqos->serdes_speed != SPEED_1000)
+>> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
+>> +		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
+>>  		break;
+>>  	}
+>>  
+>>  	writel(val, ethqos->mac_base + MAC_CTRL_REG);
+>> +	writel(mac_an_value, ethqos->mac_base + ETHQOS_MAC_AN_CTRL);
+>> +	ethqos->serdes_speed = ethqos->speed;
+> 
+> I see these bits are generic and there's some functions in stmmac_pcs.h
+> that muck with these...
+> 
+> Could you help me understand if this really should be Qualcomm specific,
+> or if this is something that should be considered for the more core bits
+> of the driver? I feel in either case we should take advantage of the
+> common definitions in that file if possible.
+> 
+we do have function dwmac_ctrl_ane in core driver which updates same registers. However, it does not have the option to reset ANE bit, it can only set bits. For SPEED_2500 we need to reset ANE bit. Hence I am adding it here. Not sure if we can extend dwmac_ctrl_ane function to reset bits as well.
+>>  
+>>  	return val;
+>>  }
+>> @@ -789,6 +815,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+>>  				     "Failed to get serdes phy\n");
+>>  
+>>  	ethqos->speed = SPEED_1000;
+>> +	ethqos->serdes_speed = SPEED_1000;
+>>  	ethqos_update_link_clk(ethqos, SPEED_1000);
+>>  	ethqos_set_func_clk_en(ethqos);
+>>  
+>> -- 
+>> 2.17.1
+>>
+> 
 
