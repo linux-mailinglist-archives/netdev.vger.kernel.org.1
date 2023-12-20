@@ -1,77 +1,251 @@
-Return-Path: <netdev+bounces-59223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52996819EAA
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 13:10:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AB38819EDE
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 13:17:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 072481F21F03
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 12:10:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F6AD1C21E32
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 12:17:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C742206C;
-	Wed, 20 Dec 2023 12:10:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s/WHOWsR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B3B92230A;
+	Wed, 20 Dec 2023 12:17:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C49022305;
-	Wed, 20 Dec 2023 12:10:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B37CAC433C8;
-	Wed, 20 Dec 2023 12:10:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703074215;
-	bh=uUmL12oIsK0mMjJGAEOsDm5UE+qL53PZkLmI3v9dvQE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s/WHOWsRZqX8unNmgZ5uXAWhl3uz1R0Qdz55YeXQUrVXwcgcz4OjdYW2PcnbglSGB
-	 xtWp95lEgURSMrSUqjXgFNAwENN3+5XXI5dIR0Aok/ui1hJA/S3NLM467kzrClszTQ
-	 UAxMKZHxH9SDT/FYiTUjEQS0VdX9+GiaU+fr8AuwC4JC2sW3yHmpLvtHo6kxuSdjMe
-	 +CROvvcUcTpoYTAa4kVklBUG9UzvHJ2Rb0ayYu90k3JokkyID4Gl1v3vzVkZmIrg5j
-	 q4GU5qFSRYuFGlb6xWWRqNxsLN4XFL7zB6dBMJrTaE8y7KZC4n0sXdvuzqkkaHtKVy
-	 UJfjmUqOhftKA==
-Date: Wed, 20 Dec 2023 13:10:10 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Andrii Nakryiko <andrii@kernel.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
-	torvalds@linuxfoundation.org, ast@kernel.org, daniel@iogearbox.net,
-	linux-fsdevel@vger.kernel.org, kernel-team@meta.com
-Subject: Re: [PATCH bpf-next] bpf: add BPF_F_TOKEN_FD flag to pass with BPF
- token FD
-Message-ID: <20231220-drillen-obskur-a310578e99bb@brauner>
-References: <20231219053150.336991-1-andrii@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45AD7225D6;
+	Wed, 20 Dec 2023 12:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R371e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0VyuTIO4_1703074615;
+Received: from 30.221.130.111(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VyuTIO4_1703074615)
+          by smtp.aliyun-inc.com;
+          Wed, 20 Dec 2023 20:16:56 +0800
+Message-ID: <38f06cfb-2d68-2b10-f82b-62a44c25b8f8@linux.alibaba.com>
+Date: Wed, 20 Dec 2023 20:16:50 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231219053150.336991-1-andrii@kernel.org>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next v8 03/10] net/smc: unify the structs of accept or
+ confirm message for v1 and v2
+To: Alexandra Winter <wintera@linux.ibm.com>, wenjia@linux.ibm.com,
+ hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kgraul@linux.ibm.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, raspl@linux.ibm.com,
+ schnelle@linux.ibm.com, guangguan.wang@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231219142616.80697-1-guwen@linux.alibaba.com>
+ <20231219142616.80697-4-guwen@linux.alibaba.com>
+ <ab835e29-ad4a-4377-b80a-8ef6bb35ef7b@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <ab835e29-ad4a-4377-b80a-8ef6bb35ef7b@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 18, 2023 at 09:31:50PM -0800, Andrii Nakryiko wrote:
-> Add BPF_F_TOKEN_FD flag to be used across bpf() syscall commands
-> that accept BPF token FD: BPF_PROG_LOAD, BPF_MAP_CREATE, and
-> BPF_BTF_LOAD. This flag has to be set whenever token FD is provided.
+
+
+On 2023/12/20 19:37, Alexandra Winter wrote:
 > 
-> BPF_BTF_LOAD command didn't have a flags field, so add it as well.
 > 
-> Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
-> ---
+> On 19.12.23 15:26, Wen Gu wrote:
+>>   struct smc_clc_msg_accept_confirm {	/* clc accept / confirm message */
+>> -	struct smc_clc_msg_hdr hdr;
+>> -	union {
+>> -		struct smcr_clc_msg_accept_confirm r0; /* SMC-R */
+>> -		struct { /* SMC-D */
+>> -			struct smcd_clc_msg_accept_confirm_common d0;
+>> -			u32 reserved5[3];
+>> -		};
+>> -	};
+>> -} __packed;			/* format defined in RFC7609 */
+>> -
+>> -struct smc_clc_msg_accept_confirm_v2 {	/* clc accept / confirm message */
+>>   	struct smc_clc_msg_hdr hdr;
+>>   	union {
+>>   		struct { /* SMC-R */
+>>   			struct smcr_clc_msg_accept_confirm r0;
+>> -			u8 eid[SMC_MAX_EID_LEN];
+>> -			u8 reserved6[8];
+>> -		} r1;
+>> +			struct { /* v2 only */
+>> +				u8 eid[SMC_MAX_EID_LEN];
+>> +				u8 reserved6[8];
+>> +			} __packed r1;
+>> +		};
+>>   		struct { /* SMC-D */
+>>   			struct smcd_clc_msg_accept_confirm_common d0;
+>> -			__be16 chid;
+>> -			u8 eid[SMC_MAX_EID_LEN];
+>> -			u8 reserved5[8];
+>> -		} d1;
+>> +			struct { /* v2 only, but 12 bytes reserved in v1 */
+>> +				__be16 chid;
+>> +				u8 eid[SMC_MAX_EID_LEN];
+>> +				u8 reserved5[8];
+>> +			} __packed d1;
+>> +		};
+>>   	};
+>>   };
+> 
+> 
+> I still think the __packed at the outmost level is the safest place.
+> Like you have it now the compiler could place unused memory between
+> ro and r1 or between d0 and d1.
+> Afaik compilers don't do that, if the blocks are word-aligned, but
+> there is no guarantee.
+> 
+> Up to you. My R-b still applies.
+> Sandy
 
-Reviewed-by: Christian Brauner <brauner@kernel.org>
+Thank you, Sandy.
 
->  /* Get path from provided FD in BPF_OBJ_PIN/BPF_OBJ_GET commands */
->  	BPF_F_PATH_FD		= (1U << 14),
-> +
-> +/* BPF token FD is passed in a corresponding command's token_fd field */
-> +	BPF_F_TOKEN_FD		= (1U << 15),
+IIUC, if only outmost level has __packed, it won't work for the inner block.
 
-The placement of the new flag right after the BPF_F_PATH_FD flag alone
-does tell us everything about the "we didn't know" claims wrt to the
-token fd stuff. Literally the same review and the same solution I
-requested back then.
+e.g.
+
+If __packed is added at d1 and r1:
+
+struct smc_clc_msg_accept_confirm {     /* clc accept / confirm message */
+         struct smc_clc_msg_hdr hdr;
+         union {
+                 struct { /* SMC-R */
+                         struct smcr_clc_msg_accept_confirm r0;
+                         struct { /* v2 only */
+                                 u8 eid[SMC_MAX_EID_LEN];
+                                 u8 reserved6[8];
+                         } __packed r1;
+                 };
+                 struct { /* SMC-D */
+                         struct smcd_clc_msg_accept_confirm_common d0;
+                         struct { /* v2 only, but 12 bytes reserved in v1 */
+                                 __be16 chid;
+                                 u8 eid[SMC_MAX_EID_LEN];
+                                 u64 gid_ext;
+                         } __packed d1;
+                 };
+         };
+};
+
+According to pahole, it will be:
+
+struct smc_clc_msg_accept_confirm {
+         struct smc_clc_msg_hdr     hdr;                  /*     0     8 */
+         union {
+                 struct {
+                         struct smcr_clc_msg_accept_confirm r0; /*     8    56 */
+                         /* --- cacheline 1 boundary (64 bytes) --- */
+                         struct {
+                                 u8 eid[32];              /*    64    32 */
+                                 u8 reserved6[8];         /*    96     8 */
+                         } r1;                            /*    64    40 */
+                 };                                       /*     8    96 */
+                 struct {
+                         struct smcd_clc_msg_accept_confirm_common d0; /*     8    24 */
+                         struct {
+                                 __be16 chid;             /*    32     2 */
+                                 u8 eid[32];              /*    34    32 */
+                                 /* --- cacheline 1 boundary (64 bytes) was 2 bytes ago --- */
+                                 u64 gid_ext;             /*    66     8 */
+                         } __attribute__((__packed__)) d1; /*    32    42 */
+                 } __attribute__((__packed__));           /*     8    66 */
+         };                                               /*     8    96 */
+
+         /* size: 104, cachelines: 2, members: 2 */
+         /* last cacheline: 40 bytes */
+};
+
+
+If __packed is added at outmost level:
+
+struct smc_clc_msg_accept_confirm {     /* clc accept / confirm message */
+         struct smc_clc_msg_hdr hdr;
+         union {
+                 struct { /* SMC-R */
+                         struct smcr_clc_msg_accept_confirm r0;
+                         struct { /* v2 only */
+                                 u8 eid[SMC_MAX_EID_LEN];
+                                 u8 reserved6[8];
+                         } r1;
+                 };
+                 struct { /* SMC-D */
+                         struct smcd_clc_msg_accept_confirm_common d0;
+                         struct { /* v2 only, but 12 bytes reserved in v1 */
+                                 __be16 chid;
+                                 u8 eid[SMC_MAX_EID_LEN];
+                                 u64 gid_ext;
+                         } d1;
+                 };
+         };
+} __packed;
+
+According to pahole, it will be:
+
+struct smc_clc_msg_accept_confirm {
+         struct smc_clc_msg_hdr     hdr;                  /*     0     8 */
+         union {
+                 struct {
+                         struct smcr_clc_msg_accept_confirm r0; /*     8    56 */
+                         /* --- cacheline 1 boundary (64 bytes) --- */
+                         struct {
+                                 u8 eid[32];              /*    64    32 */
+                                 u8 reserved6[8];         /*    96     8 */
+                         } r1;                            /*    64    40 */
+                 };                                       /*     8    96 */
+                 struct {
+                         struct smcd_clc_msg_accept_confirm_common d0; /*     8    24 */
+                         struct {
+                                 __be16 chid;             /*    32     2 */
+                                 u8 eid[32];              /*    34    32 */
+
+                                 /* XXX 6 bytes hole, try to pack */
+
+                                 /* --- cacheline 1 boundary (64 bytes) was 8 bytes ago --- */
+                                 u64 gid_ext;             /*    72     8 */
+                         } d1;                            /*    32    48 */   <- doesn't work for inner d1.
+                 };                                       /*     8    72 */
+         };                                               /*     8    96 */
+
+         /* size: 104, cachelines: 2, members: 2 */
+         /* last cacheline: 40 bytes */
+};
+
+
+I also considered add them all:
+
+struct smc_clc_msg_accept_confirm {     /* clc accept / confirm message */
+         struct smc_clc_msg_hdr hdr;
+         union {
+                 struct { /* SMC-R */
+                         struct smcr_clc_msg_accept_confirm r0;
+                         struct { /* v2 only */
+                                 u8 eid[SMC_MAX_EID_LEN];
+                                 u8 reserved6[8];
+                         } __packed r1;
+                 } __packed;
+                 struct { /* SMC-D */
+                         struct smcd_clc_msg_accept_confirm_common d0;
+                         struct { /* v2 only, but 12 bytes reserved in v1 */
+                                 __be16 chid;
+                                 u8 eid[SMC_MAX_EID_LEN];
+                                 u64 gid_ext;
+                         } __packed d1;
+                 } __packed;
+         };
+} __packed;
+
+but a little bit strange since for only d1 needs to packed, so I kept it as it is now.
+
+Thanks,
+Wen Gu
 
