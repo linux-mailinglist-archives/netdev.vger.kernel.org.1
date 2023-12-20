@@ -1,121 +1,128 @@
-Return-Path: <netdev+bounces-59121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D225819665
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 02:35:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E30581967E
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 02:48:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E3131F265EA
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 01:35:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 275B92884FF
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 01:48:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C62F8486;
-	Wed, 20 Dec 2023 01:34:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97D5A7488;
+	Wed, 20 Dec 2023 01:47:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m2gZPl3C"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="qyYwjq/n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9893CBE4E;
-	Wed, 20 Dec 2023 01:34:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-33666fb9318so3120676f8f.2;
-        Tue, 19 Dec 2023 17:34:27 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3265A79D8
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 01:47:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6d728c75240so2717535b3a.1
+        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 17:47:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703036065; x=1703640865; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=oWmavVkI7EEMaO28reqdQwqx9OWZaDcK9JROIB+bbN0=;
-        b=m2gZPl3CqEM9Wg7a5p61+7M+5qdyjAjC105BOE4fPq31x2oK+u1anqbL+PD1JtKAkY
-         nZtJWNrLN0iof2a9ywW9UIatrir7gSWqtwDHBjFCNi5m2njh6ghEYJZlExkxq9F3hon9
-         n/di4jrmO35yIRVyJGQS3FVXlgOFBnxhxzT5LCspi3RUVE3IAkgnJ2yBMvDkyP8NOAKN
-         I5g5dcuCq2YMc/ZCwleOVr2b4qBGjooDAG6lQNA0YzlNJvuvdw87WiBZsRr+gyGku9jc
-         lpws+70nu9qOFWnNYTBopMmrHxkeiIECOlSpelTGPffwdl+NxtGIZvFcTaDXxIOjZuoi
-         l+ow==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1703036869; x=1703641669; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ROxVQkx9l0kjEx3MjfcjpHmcSftmEdNIq+Od9JRmTkc=;
+        b=qyYwjq/nOUhj8tvhW+wDjOXXZb0QVPnMU+ojzh8AUcO4r0N0JHvrRQDxSLFHp+/U/G
+         sJQXsDf9qEWxUUu4sfiKL8G3jlVjL8ghWQoPR1rpqD9HAWHWuQd9OHzkfRQJjimVn3RD
+         nYPMDHS0STBBwBK1cfMQ/fAgMiNahPWCVqlwQE93FY/ggUgqmgke4KpE2XPUsF0tVzFn
+         n0xGxtass6khY9ONYCA9sMez5M0LVRyFtpb6s7o369RGP/34FpN4SCs+TgbgOyJZBdWP
+         FsHYYX5b/9vBe5k6kykM+KVUvQM/0CSV16VZXftjiDw1wm4PXvVsPgNH/ygMBNfKJoIB
+         W6/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703036065; x=1703640865;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oWmavVkI7EEMaO28reqdQwqx9OWZaDcK9JROIB+bbN0=;
-        b=X5odA1UmCRZL7hHupEt5NqQpAvpdNYgmVz+tJIijccI+i10axXehKG3yahK0I0Un0k
-         yDNzXsHxAH4FZFsdU73ZvREJ2wkQn1CCFP1pV4GS/6Su/Hc5NZoURjkjt7FsyNfiiDJ8
-         Z7Xxx4vJe2gvBO6wiUWLYTLmxpPQ5T97eONVXIsL3ziylwrC9oG3pKRQpCKgHQmrB0Rx
-         6g7Wvs0vHChJ/5hu4cc/0I5OvjTUdPygo6I2LbtaWO3LYKMVdtK8tgjAl0cTgUD8nZEj
-         P1I3grOEiOerEAfMwzX9h/OjqCoSh7BMpqVByZtCDXKES4NutINXes1iiSbCfRKm5j37
-         4LVg==
-X-Gm-Message-State: AOJu0YwAZI0nVGRdW0AzGKzJIkO/346YgLd0GsXUarxAoS7olFpRQNUi
-	qmq7OGWOwPuYhS9s6qWpPZsqZHDoIBI8ZQOhf5FBphq762A=
-X-Google-Smtp-Source: AGHT+IHOoYBpGqBAKmhevOvTOhyr4vge/09Bn4hEDFcElu9D7XLwnRhdQygWNq8N2OumlkocMnF8U70q8MFuqSJQCBY=
-X-Received: by 2002:a5d:6801:0:b0:336:6e12:7c62 with SMTP id
- w1-20020a5d6801000000b003366e127c62mr1482788wru.110.1703036065419; Tue, 19
- Dec 2023 17:34:25 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703036869; x=1703641669;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ROxVQkx9l0kjEx3MjfcjpHmcSftmEdNIq+Od9JRmTkc=;
+        b=rxvUQQE+1mD0IGLZF0HSE0QV41c6fDwexxhutU2Kdh2jSVgEHDCst2tVGAXIscCOBo
+         7SWTij5K0eIyw9qxjEjVNhZ3KsJPSfHwslRG5Oy4Bms/r8uO4sCe5JHcPHXHbXLqdktg
+         bwylqVf5zh22Kpy5AHujoce33oRAMZFuz7WHUwODP3FSPfBVU2u7CG51jOT0NJAnULSa
+         Fekt9Z1DF7bR2NIVki5jhhba8C/jkmk3BUWNCMOULWzMT7wcrYwPo2G1MwLUhOAFAgbN
+         Z46zZHc4FVu40D3Z3Q842ErcALJ9G9peNk5hp2eOTU18fpJVC0HFJBZoN1go0ixDggu/
+         lDJw==
+X-Gm-Message-State: AOJu0YxxR30Z74rcWEfYF3rn8EOvFEIrTbK+3ySSgw/GYySIS0mqI7Lk
+	QHCM3Mfgv7aCkpUB4u/EDZBv/BCeuFktzUbEpRI=
+X-Google-Smtp-Source: AGHT+IHv81pUXy77Vls8NrmxKAC/tiUHrWtxyujKGrqLNPPXtzNTVBtMmGO0eHLs3oal58EauyKNUg==
+X-Received: by 2002:a17:902:d581:b0:1d3:7f26:b3b0 with SMTP id k1-20020a170902d58100b001d37f26b3b0mr13192906plh.104.1703036869425;
+        Tue, 19 Dec 2023 17:47:49 -0800 (PST)
+Received: from localhost (fwdproxy-prn-005.fbsv.net. [2a03:2880:ff:5::face:b00c])
+        by smtp.gmail.com with ESMTPSA id d4-20020a170902b70400b001cfb971edfasm21689929pls.205.2023.12.19.17.47.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Dec 2023 17:47:49 -0800 (PST)
+From: David Wei <dw@davidwei.uk>
+To: Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next v4 0/5] netdevsim: link and forward skbs between ports
+Date: Tue, 19 Dec 2023 17:47:42 -0800
+Message-Id: <20231220014747.1508581-1-dw@davidwei.uk>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Tue, 19 Dec 2023 17:34:13 -0800
-Message-ID: <CAADnVQ+vEstw90A-Urt-SgrdNNhuXO_VmWuojOJ=3zKReFWY2g@mail.gmail.com>
-Subject: [bug] splat in perf event
-To: bpf <bpf@vger.kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Steven Rostedt <rostedt@goodmis.org>, Arnaldo Carvalho de Melo <acme@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi,
+This patchset adds the ability to link two netdevsim ports together and
+forward skbs between them, similar to veth. The goal is to use netdevsim
+for testing features e.g. zero copy Rx using io_uring.
 
-after rebasing bpf-next to the latest net-next.
-I consistently see the following while running
-test_progs -t attach_probe/manual-default
+This feature was tested locally on QEMU, and a selftest is included.
 
-[   28.638654] WARNING: CPU: 1 PID: 2135 at kernel/events/core.c:1950
-__do_sys_perf_event_open+0x14e0/0x15b0
-[   28.639329] Modules linked in: bpf_testmod(O)
-[   28.639632] CPU: 1 PID: 2135 Comm: test_progs Tainted: G
-O       6.7.0-rc5-01520-gc337f237291b #5281
-[   28.640299] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
-[   28.641062] RIP: 0010:__do_sys_perf_event_open+0x14e0/0x15b0
-[   28.647751] Call Trace:
-[   28.647919]  <TASK>
-[   28.648082]  ? __warn+0xa1/0x1f0
-[   28.648311]  ? __do_sys_perf_event_open+0x14e0/0x15b0
-[   28.648641]  ? report_bug+0x1fa/0x230
-[   28.648902]  ? handle_bug+0x3c/0x70
-[   28.649164]  ? exc_invalid_op+0x17/0x40
-[   28.649416]  ? asm_exc_invalid_op+0x1a/0x20
-[   28.649699]  ? entry_SYSCALL_64_after_hwframe+0x46/0x4e
-[   28.650062]  ? __do_sys_perf_event_open+0x14e0/0x15b0
-[   28.650406]  ? perf_event_set_output+0x2a0/0x2a0
-[   28.650727]  ? __audit_syscall_entry+0x4f/0x200
-[   28.651063]  do_syscall_64+0x2f/0xa0
-[   28.651306]  entry_SYSCALL_64_after_hwframe+0x46/0x4e
-[   28.651635] RIP: 0033:0x7fc0846f752d
-[   28.656060]  </TASK>
-[   28.656219] irq event stamp: 413681
-[   28.656461] hardirqs last  enabled at (413689):
-[<ffffffff81193e67>] console_unlock+0x137/0x140
-[   28.657083] hardirqs last disabled at (413698):
-[<ffffffff81193e4c>] console_unlock+0x11c/0x140
-[   28.657663] softirqs last  enabled at (413368):
-[<ffffffff810c0e89>] irq_exit_rcu+0x99/0xf0
-[   28.658215] softirqs last disabled at (413351):
-[<ffffffff810c0e89>] irq_exit_rcu+0x99/0xf0
+---
+v3->v4:
+- maintain a mutex protected list of probed nsim_devs instead of using
+  nsim_bus_dev
+- fixed synchronization issues by taking rtnl_lock
+- track tx_dropped skbs
 
-Line 1950 is
-        for_each_sibling_event(sibling, group_leader) {
-                if (__perf_event_read_size(sibling->attr.read_format,
-                                           group_leader->nr_siblings +
-1) > 16*1024)
-                        return false;
-        }
+v2->v3:
+- take lock when traversing nsim_bus_dev_list
+- take device ref when getting a nsim_bus_dev
+- return 0 if nsim_dev_peer_read cannot find the port
+- address code formatting
+- do not hard code values in selftests
+- add Makefile for selftests
 
+v1->v2:
+- renamed debugfs file from "link" to "peer"
+- replaced strstep() with sscanf() for consistency
+- increased char[] buf sz to 22 for copying id + port from user
+- added err msg w/ expected fmt when linking as a hint to user
+- prevent linking port to itself
+- protect peer ptr using RCU
 
-Probably a known issue?
+David Wei (5):
+  netdevsim: maintain a list of probed netdevsims
+  netdevsim: allow two netdevsim ports to be connected
+  netdevsim: forward skbs from one connected port to another
+  netdevsim: add selftest for forwarding skb between connected ports
+  netdevsim: add Makefile for selftests
+
+ MAINTAINERS                                   |   1 +
+ drivers/net/netdevsim/dev.c                   | 144 ++++++++++++++++--
+ drivers/net/netdevsim/netdev.c                |  31 +++-
+ drivers/net/netdevsim/netdevsim.h             |   3 +
+ .../selftests/drivers/net/netdevsim/Makefile  |  18 +++
+ .../selftests/drivers/net/netdevsim/peer.sh   | 123 +++++++++++++++
+ 6 files changed, 304 insertions(+), 16 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/netdevsim/Makefile
+ create mode 100755 tools/testing/selftests/drivers/net/netdevsim/peer.sh
+
+-- 
+2.39.3
+
 
