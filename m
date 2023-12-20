@@ -1,225 +1,164 @@
-Return-Path: <netdev+bounces-59331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D32C781A7E0
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 22:11:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8140B81A7EC
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 22:18:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 279DF286937
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 21:11:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63F581C22D16
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 21:18:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42B2B224D3;
-	Wed, 20 Dec 2023 21:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1021222073;
+	Wed, 20 Dec 2023 21:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iFyhXVgn"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="pc5FCFsO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8497B48796;
-	Wed, 20 Dec 2023 21:11:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-33668163949so69799f8f.2;
-        Wed, 20 Dec 2023 13:11:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703106698; x=1703711498; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vcmfAZtKeHQ+xz4l7OTo1rSFylynVcbq+ZS/3NlOtSo=;
-        b=iFyhXVgnnS060kCc2qzkZT6ysybHruYBFnPRAG2ar7hLIqlrG8Qbzisn6tGYmfvNik
-         9VBIT/xh9CflEISptX6FR2gmjfDN8KEJHLre5A4b+QnQnryEQ31R818tr80FPx3/jEhP
-         NSsyCPXRyxAJ/lg/6s9GKbyryB7+0ZcAypQj/b6osY1pS/EHb4aeASOGKCslpfE5GNz7
-         FBz8TPtyh+LCekCya+83RylqbyAoBQEOVQ2BV8WzyMHTtE6Fl/L8h8akII73JZZBdQ4b
-         R5vrAASBeNKn0CXgp3FExlYGZo7MluqProU2YVQbGKj+yAEpsB5Q9EmLu+vIc3or4pKX
-         UOTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703106698; x=1703711498;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vcmfAZtKeHQ+xz4l7OTo1rSFylynVcbq+ZS/3NlOtSo=;
-        b=sqLYCwLIVCIz/hsWFqM+bTrYOm/pY6VzcGrIVq7OF7R0PzUFanIkZYQHwbp9zM1Z26
-         F9G5uNIwiSjn3u8XX3bCk8HDakp8D6hFTI53Pr/2FzY5FrB8YfcizzUaMDOP1mF6ATIj
-         SA+RgBsKfJMqVX36z3mcoYC1OGTFRlGvRbdI/i9sCsg9tKScsSziFy3S548POr0Uy4su
-         v4roxjBSv2NvLkruHTEB8lRswi7uhAhXUm/wQWekz1ZZm0q8SbrK9TGqDaw1GCgrHQHC
-         qZ7EMIrEQvuhIXcQEciNJ0vpb8pmM61sQswV6CwDsIPfWsIiCZCmNm1Vq+KM4QcLmbEQ
-         NAkw==
-X-Gm-Message-State: AOJu0YwsF0nRLAdcHKdmmABCHlWyFIooGHAeDr/HxARguldlILHpixmF
-	6ASVXF09jNL4/uUq9yNNBa+cqyWu1Gpq0NbPsbM=
-X-Google-Smtp-Source: AGHT+IHjOkPEU1b26MfTtMIY0DN6AeEhVHPXnN8otVaKeYwi4QrGZHpE84IQwSr4f+XbFVhBiTrH6O08PNUI51gjBGI=
-X-Received: by 2002:a5d:4f06:0:b0:336:6ebb:704f with SMTP id
- c6-20020a5d4f06000000b003366ebb704fmr63710wru.122.1703106697456; Wed, 20 Dec
- 2023 13:11:37 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472F94B5A4;
+	Wed, 20 Dec 2023 21:17:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1703107072;
+	bh=LToB9O1kzplrx0ArQIKTk3jeG9kcJyhV6Az+MBs4+P4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=pc5FCFsO5gyBiQjQHGODZnZxvmbSnGUeAvv/QPvQNafZpqWm4yw0w7Pzrce5jdlsz
+	 FzEvRVi8uYngZnkSuj6CDcQvVbQz42gh/tD1UT+TAtnwxqu78QqftFsGfn6HvAusVi
+	 h8D94spDbe8M1y+Fx9lkKsVmU0kNo6D8NNpi7qRZVPb18hsoM5e/Y4OB43gxqmnzfV
+	 83uvJPgpkGxomNALy3kLobv2JAG8i6mG+48zs18gRGHwOSvIYUlchAdCAYPiTCEBOX
+	 LDMvX7A+7Dqawpr7CNB/TsuMgYqxPZVI8kG7Wtkjn/Csc1ayMWvxjORIH3DVO4B7FO
+	 4npAppxo4v6HA==
+Received: from localhost (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: cristicc)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id D335F3781F8C;
+	Wed, 20 Dec 2023 21:17:51 +0000 (UTC)
+From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+To: Emil Renner Berthing <kernel@esmil.dk>,
+	Conor Dooley <conor@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jacob Keller <jacob.e.keller@intel.com>
+Cc: linux-riscv@lists.infradead.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	kernel@collabora.com
+Subject: [PATCH v6 0/4] Enable networking support for StarFive JH7100 SoC
+Date: Wed, 20 Dec 2023 23:17:38 +0200
+Message-ID: <20231220211743.2490518-1-cristian.ciocaltea@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1703081351-85579-1-git-send-email-alibuda@linux.alibaba.com> <1703081351-85579-2-git-send-email-alibuda@linux.alibaba.com>
-In-Reply-To: <1703081351-85579-2-git-send-email-alibuda@linux.alibaba.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 20 Dec 2023 13:11:26 -0800
-Message-ID: <CAADnVQK3Wk+pKbvc5_7jgaQ=qFq3y0ozgnn+dbW56DaHL2ExWQ@mail.gmail.com>
-Subject: Re: [RFC nf-next v3 1/2] netfilter: bpf: support prog update
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
-	Florian Westphal <fw@strlen.de>, bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, coreteam@netfilter.org, 
-	netfilter-devel <netfilter-devel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 20, 2023 at 6:09=E2=80=AFAM D. Wythe <alibuda@linux.alibaba.com=
-> wrote:
->
-> From: "D. Wythe" <alibuda@linux.alibaba.com>
->
-> To support the prog update, we need to ensure that the prog seen
-> within the hook is always valid. Considering that hooks are always
-> protected by rcu_read_lock(), which provide us the ability to
-> access the prog under rcu.
->
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> ---
->  net/netfilter/nf_bpf_link.c | 63 ++++++++++++++++++++++++++++++++++-----=
-------
->  1 file changed, 48 insertions(+), 15 deletions(-)
->
-> diff --git a/net/netfilter/nf_bpf_link.c b/net/netfilter/nf_bpf_link.c
-> index e502ec0..9bc91d1 100644
-> --- a/net/netfilter/nf_bpf_link.c
-> +++ b/net/netfilter/nf_bpf_link.c
-> @@ -8,17 +8,8 @@
->  #include <net/netfilter/nf_bpf_link.h>
->  #include <uapi/linux/netfilter_ipv4.h>
->
-> -static unsigned int nf_hook_run_bpf(void *bpf_prog, struct sk_buff *skb,
-> -                                   const struct nf_hook_state *s)
-> -{
-> -       const struct bpf_prog *prog =3D bpf_prog;
-> -       struct bpf_nf_ctx ctx =3D {
-> -               .state =3D s,
-> -               .skb =3D skb,
-> -       };
-> -
-> -       return bpf_prog_run(prog, &ctx);
-> -}
-> +/* protect link update in parallel */
-> +static DEFINE_MUTEX(bpf_nf_mutex);
->
->  struct bpf_nf_link {
->         struct bpf_link link;
-> @@ -26,8 +17,20 @@ struct bpf_nf_link {
->         struct net *net;
->         u32 dead;
->         const struct nf_defrag_hook *defrag_hook;
-> +       struct rcu_head head;
+This patch series adds ethernet support for the StarFive JH7100 SoC and
+makes it available for the StarFive VisionFive V1 and BeagleV Starlight
+boards, although I could only validate on the former SBC.  Thank you Emil
+and Geert for helping with tests on BeagleV!
 
-I have to point out the same issues as before, but
-will ask them differently...
+The work is heavily based on the reference implementation [1] and depends
+on the SiFive Composable Cache controller and non-coherent DMA support
+provided by Emil via [2] and [3].
 
-Why do you think above rcu_head is necessary?
+*Update 1*: As of next-20231214, dependencies [2] & [3] have been merged.
 
->  };
->
-> +static unsigned int nf_hook_run_bpf(void *bpf_link, struct sk_buff *skb,
-> +                                   const struct nf_hook_state *s)
-> +{
-> +       const struct bpf_nf_link *nf_link =3D bpf_link;
-> +       struct bpf_nf_ctx ctx =3D {
-> +               .state =3D s,
-> +               .skb =3D skb,
-> +       };
-> +       return bpf_prog_run(rcu_dereference_raw(nf_link->link.prog), &ctx=
-);
-> +}
-> +
->  #if IS_ENABLED(CONFIG_NF_DEFRAG_IPV4) || IS_ENABLED(CONFIG_NF_DEFRAG_IPV=
-6)
->  static const struct nf_defrag_hook *
->  get_proto_defrag_hook(struct bpf_nf_link *link,
-> @@ -126,8 +129,7 @@ static void bpf_nf_link_release(struct bpf_link *link=
-)
->  static void bpf_nf_link_dealloc(struct bpf_link *link)
->  {
->         struct bpf_nf_link *nf_link =3D container_of(link, struct bpf_nf_=
-link, link);
-> -
-> -       kfree(nf_link);
-> +       kfree_rcu(nf_link, head);
+*Update 2*: Since v5, the dwmac patches will be handled via [4], while the
+            clock patches subset via [5].
 
-Why is this needed ?
-Have you looked at tcx_link_lops ?
+[1] https://github.com/starfive-tech/linux/commits/visionfive
+[2] https://lore.kernel.org/all/CAJM55Z_pdoGxRXbmBgJ5GbVWyeM1N6+LHihbNdT26Oo_qA5VYA@mail.gmail.com/
+[3] https://lore.kernel.org/all/20231130151932.729708-1-emil.renner.berthing@canonical.com/
+[4] https://lore.kernel.org/lkml/20231220002824.2462655-1-cristian.ciocaltea@collabora.com/
+[5] https://lore.kernel.org/lkml/20231219232442.2460166-1-cristian.ciocaltea@collabora.com/
 
->  }
->
->  static int bpf_nf_link_detach(struct bpf_link *link)
-> @@ -162,7 +164,34 @@ static int bpf_nf_link_fill_link_info(const struct b=
-pf_link *link,
->  static int bpf_nf_link_update(struct bpf_link *link, struct bpf_prog *ne=
-w_prog,
->                               struct bpf_prog *old_prog)
->  {
-> -       return -EOPNOTSUPP;
-> +       struct bpf_nf_link *nf_link =3D container_of(link, struct bpf_nf_=
-link, link);
-> +       int err =3D 0;
-> +
-> +       mutex_lock(&bpf_nf_mutex);
+Changes in v6:
+ - Applied alphabetical ordering in PATCH 3 and 4 (Emil)
 
-Why do you need this mutex?
-What race does it solve?
+Changes in v5:
+ - Collected R-b tags from Jacob and Andrew
+ - Squashed PATCH 2 into PATCH 1 per Krzysztof's review
+ - Drop unsupported snps,no-pbl-x8 property from gmac DT node
+ - Split series into patch sets per subsystem, as described in "Update 2"
+   section above (per Andrew's review)
+ - v4:
+   https://lore.kernel.org/lkml/20231218214451.2345691-1-cristian.ciocaltea@collabora.com/
 
-> +
-> +       if (nf_link->dead) {
-> +               err =3D -EPERM;
-> +               goto out;
-> +       }
-> +
-> +       /* target old_prog mismatch */
-> +       if (old_prog && link->prog !=3D old_prog) {
-> +               err =3D -EPERM;
-> +               goto out;
-> +       }
-> +
-> +       old_prog =3D link->prog;
-> +       if (old_prog =3D=3D new_prog) {
-> +               /* don't need update */
-> +               bpf_prog_put(new_prog);
-> +               goto out;
-> +       }
-> +
-> +       old_prog =3D xchg(&link->prog, new_prog);
-> +       bpf_prog_put(old_prog);
-> +out:
-> +       mutex_unlock(&bpf_nf_mutex);
-> +       return err;
->  }
->
->  static const struct bpf_link_ops bpf_nf_link_lops =3D {
-> @@ -226,7 +255,11 @@ int bpf_nf_link_attach(const union bpf_attr *attr, s=
-truct bpf_prog *prog)
->
->         link->hook_ops.hook =3D nf_hook_run_bpf;
->         link->hook_ops.hook_ops_type =3D NF_HOOK_OP_BPF;
-> -       link->hook_ops.priv =3D prog;
-> +
-> +       /* bpf_nf_link_release & bpf_nf_link_dealloc() can ensures that l=
-ink remains
-> +        * valid at all times within nf_hook_run_bpf().
-> +        */
-> +       link->hook_ops.priv =3D link;
->
->         link->hook_ops.pf =3D attr->link_create.netfilter.pf;
->         link->hook_ops.priority =3D attr->link_create.netfilter.priority;
-> --
-> 1.8.3.1
->
+Changes in v4:
+ - Restricted double usage of 'ahb' reset name in PATCH 2 (Jessica, Samuel)
+ - Moved phy reference from PATCH 5 to both PATCH 6 & 7 where the node is
+   actually defined (Emil, Conor)
+ - Drop unnecessary gpio include in PATCH 6; also added a DTS comment
+   describing the rational behind RX internal delay adjustment (Andrew)
+ - v3:
+   https://lore.kernel.org/lkml/20231215204050.2296404-1-cristian.ciocaltea@collabora.com/
+
+Changes in v3:
+ - Rebased series onto next-20231214 and dropped the ccache & DMA coherency
+   related patches (v2 06-08/12) handled by Emil via [3]
+ - Squashed PATCH v2 01/12 into PATCH v3 2/9, per Krzysztof's review
+ - Dropped incorrect PATCH v2 02/12
+ - Incorporated Emil's feedback; also added his Co-developed-by on all dts
+   patches
+ - Documented the need of adjusting RX internal delay in PATCH v3 8/9, per
+   Andrew's request
+ - Added clock fixes from Emil (PATCH v3 8-9/9) required to support
+   10/100Mb link speeds
+ - v2:
+   https://lore.kernel.org/lkml/20231029042712.520010-1-cristian.ciocaltea@collabora.com/
+
+Changes in v2:
+ - Dropped ccache PATCH 01-05 reworked by Emil via [2]
+ - Dropped already applied PATCH 06/12
+ - Added PATCH v2 01 to prepare snps-dwmac binding for JH7100 support
+ - Added PATCH v2 02-03 to provide some jh7110-dwmac binding optimizations
+ - Handled JH7110 conflicting work in PATCH 07 via PATCH v2 04
+ - Reworked PATCH 8 via PATCH v2 05, adding JH7100 quirk and dropped
+   starfive,gtxclk-dlychain DT property; also fixed register naming
+ - Added PATCH v2 08 providing DMA coherency related DT changes
+ - Updated PATCH 9 commit msg:
+   s/OF_DMA_DEFAULT_COHERENT/ARCH_DMA_DEFAULT_COHERENT/
+ - Replaced 'uncached-offset' property with 'sifive,cache-ops' in PATCH
+   10/12 and dropped 'sideband' reg
+ - Add new patch providing coherent DMA memory pool (PATCH v2 10)
+ - Updated PATCH 11/12 according to the stmmac glue layer changes in
+   upstream
+ - Split PATCH 12/12 into PATCH v2 10-12 to handle individual gmac setup of
+   VisionFive v1 and BeagleV boards as they use different PHYs; also
+   switched phy-mode from "rgmii-tx" to "rgmii-id" (requires a reduction of
+   rx-internal-delay-ps by ~50%)
+ - Rebased series onto next-20231024
+ - v1:
+   https://lore.kernel.org/lkml/20230211031821.976408-1-cristian.ciocaltea@collabora.com/
+
+Cristian Ciocaltea (4):
+  riscv: dts: starfive: jh7100: Add sysmain and gmac DT nodes
+  riscv: dts: starfive: jh7100-common: Setup pinmux and enable gmac
+  riscv: dts: starfive: visionfive-v1: Setup ethernet phy
+  riscv: dts: starfive: beaglev-starlight: Setup phy reset gpio
+
+ .../dts/starfive/jh7100-beaglev-starlight.dts | 11 +++
+ .../boot/dts/starfive/jh7100-common.dtsi      | 84 +++++++++++++++++++
+ .../jh7100-starfive-visionfive-v1.dts         | 22 ++++-
+ arch/riscv/boot/dts/starfive/jh7100.dtsi      | 36 ++++++++
+ 4 files changed, 152 insertions(+), 1 deletion(-)
+
+-- 
+2.43.0
+
 
