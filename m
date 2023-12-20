@@ -1,157 +1,84 @@
-Return-Path: <netdev+bounces-59217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C5FB819E49
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 12:41:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9706819E71
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 12:50:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B61AF1F23571
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 11:41:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 085401C22519
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 11:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D50721378;
-	Wed, 20 Dec 2023 11:41:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C199D219EA;
+	Wed, 20 Dec 2023 11:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="hCIQKu+V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HHL5iV9g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC24A22311
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 11:41:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-40c69403b3eso55996875e9.3
-        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 03:41:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1703072481; x=1703677281; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SZWhqtv1uYgAtrEvWORH5Jkai5M2Z/ROl6KfWhfHkKU=;
-        b=hCIQKu+Vbkex63tChfosUR/zvPPmw6Hgoz9w9dgx8GYL58b5wM6+5PhSZbIAqqxRE1
-         5e4t3mYaXvvLzC4MK3+Q70+hWDNmhtOU9dW0tNa97vMIwD/ymWvpzsEYW+ZhF3mYRwgt
-         33B4Icep/S83qd8FvEa7KJ6zwiflKWri63WZosr2J0ZmMnRSOCFPSk4J5hzVluiz6FP8
-         0il8U5fYQf+ZWV0r7sfBahOPWGtz9XAcBwN3fn4S/IIbM4WtXKWsnk+CgIfy2Gd7dF2K
-         C806ZRENcOhTY2QP9iMfXJ/aOUzH/sV9SEtxdQy2GiuQO7cU/QmYgXQX9feCeOojev2c
-         jZqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703072481; x=1703677281;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SZWhqtv1uYgAtrEvWORH5Jkai5M2Z/ROl6KfWhfHkKU=;
-        b=ql9GqPidjQoWt4IjmDzRiPGqhBzo/lGS0rLf21PwF8KjYO7NhSYhvVvd0Wx3XFTZV+
-         sNAElOCEfWZj0BIkOg32nnRDdJzHYindhiK5vaqAAwGkoB0xYjLIYLs4GELKfO58d4C6
-         Nh6F9u0ayQEn9FYALWwmiKJmJs6kH41jvykzNJ+zQzZCo9JcEIOKdwgSw7r3+Nn9TsFw
-         pWp7ETtJCbGZtOgAz9VfW49HkeMtRQF/JTfXBRWrgl33T+/U8Oq/eKP6ExcCmmpovPx3
-         T7Gv15v6IPNamJZLC7n1GV0Jsps/Yb57toRPMgW2pngBOrIzJNMr3oCEhdKfzuMT5IYE
-         GM4g==
-X-Gm-Message-State: AOJu0YxwUpcWc03e7vnkU94qD6wcKUfC1sM1uEqGGe4xH3sisvIO+EYG
-	e03TRZ/L42GXZKqtmKyNCraitw==
-X-Google-Smtp-Source: AGHT+IGrOP3rCvSQlLOPOY+Br1f+srVKe7B5d6K6/Ee1K7y3SdFosWv+1eHUoS5ib1QvAzNgoIZg0w==
-X-Received: by 2002:a05:600c:1688:b0:40b:2a53:7913 with SMTP id k8-20020a05600c168800b0040b2a537913mr9715344wmn.13.1703072480998;
-        Wed, 20 Dec 2023 03:41:20 -0800 (PST)
-Received: from [192.168.50.4] ([82.78.167.103])
-        by smtp.gmail.com with ESMTPSA id z5-20020a05600c0a0500b0040c2963e5f3sm7135141wmp.38.2023.12.20.03.41.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Dec 2023 03:41:20 -0800 (PST)
-Message-ID: <3d4511bd-fd96-4281-a5cb-ac1765bded31@tuxon.dev>
-Date: Wed, 20 Dec 2023 13:41:18 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9095219E5
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 11:50:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 341F7C433C8;
+	Wed, 20 Dec 2023 11:50:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703073023;
+	bh=mARVmx1+q9umGMbkbZ7ptjb8EjT+DgKEUGo6cV7zMMs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=HHL5iV9g7Nejme7XRNhTpAMNgh6oLpY9kDxw1AIoCoXcek2Xyes47Us8yYY8dxwju
+	 SEqi8lQbgkg35qoSTPdAPSfYZZ6nkO+9snCCOIAPVsc3SZraLNlexEdwVQaDlUZEag
+	 n/XAl86IvaeKC+l7xXYbRv0bDPPGtd1wwX5OJqDkGa7H9KEPwFE6gL/1agViyo26qj
+	 PCDI1fI5U23Q87eZeg8d9cHZyc9kArKfmV5/tQGgNy7Rbfv9qi5ocFYZyfqSYj7SzR
+	 Qvm04wYFiO76wi7SxBgECT2lFOvjuVpSou2+pja1VUnPh5odZd4GmeXGa32WIDwuLA
+	 QtGA98uCE5hgw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1D489DD4EE5;
+	Wed, 20 Dec 2023 11:50:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 11/21] net: ravb: Move DBAT configuration to
- the driver's ndo_open API
-Content-Language: en-US
-To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, p.zabel@pengutronix.de,
- yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com,
- geert+renesas@glider.be
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
- <20231214114600.2451162-12-claudiu.beznea.uj@bp.renesas.com>
- <a93c0673-2876-5bb2-29aa-0d0208b97b10@omp.ru>
- <4721c4e6-cc0f-48bd-8b14-4a8217ada1fd@omp.ru>
- <b17c6124-0b84-40b2-a254-cce617f73cf2@tuxon.dev>
- <59ba595a-ab79-cc5d-feff-dad60e80c44f@omp.ru>
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
-In-Reply-To: <59ba595a-ab79-cc5d-feff-dad60e80c44f@omp.ru>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net-next] r8169: add support for LED's on RTL8168/RTL8101
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170307302311.27593.13735667668813260803.git-patchwork-notify@kernel.org>
+Date: Wed, 20 Dec 2023 11:50:23 +0000
+References: <6639e1bc-9b8a-4f59-9614-3c1c3cae8be2@gmail.com>
+In-Reply-To: <6639e1bc-9b8a-4f59-9614-3c1c3cae8be2@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: nic_swsd@realtek.com, pabeni@redhat.com, kuba@kernel.org,
+ edumazet@google.com, davem@davemloft.net, netdev@vger.kernel.org,
+ kabel@kernel.org
 
+Hello:
 
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-On 19.12.2023 20:54, Sergey Shtylyov wrote:
-> On 12/17/23 3:54 PM, claudiu beznea wrote:
+On Sat, 16 Dec 2023 20:58:10 +0100 you wrote:
+> This adds support for the LED's on most chip versions. Excluded are
+> the old non-PCIe versions and RTL8125. RTL8125 has a different LED
+> register layout, support for it will follow later.
+> 
+> LED's can be controlled from userspace using the netdev LED trigger.
+> 
+> Tested on RTL8168h.
 > 
 > [...]
-> 
->>>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>>>>
->>>>> DBAT setup was done in the driver's probe API. As some IP variants switch
->>>>> to reset mode (and thus registers' content is lost) when setting clocks
->>>>> (due to module standby functionality) to be able to implement runtime PM
->>>>> move the DBAT configuration in the driver's ndo_open API.
->>>>>
->>>>> This commit prepares the code for the addition of runtime PM.
->>>>>
->>>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>>>
->>>> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
->>>>
->>>> [...]
->>>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->>>>> index 04eaa1967651..6b8ca08be35e 100644
->>>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
->>>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
->>>>> @@ -1822,6 +1822,7 @@ static int ravb_open(struct net_device *ndev)
->>>>>  		napi_enable(&priv->napi[RAVB_NC]);
->>>>>  
->>>>>  	ravb_set_delay_mode(ndev);
->>>>> +	ravb_write(ndev, priv->desc_bat_dma, DBAT);
->>>
->>>    Looking at it again, I suspect this belong in ravb_dmac_init()...
->>
->> ravb_dmac_init() is called from multiple places in this driver, e.g.,
-> 
->    It's purpose is to configure AVB-DMAC and DBAT is the AVB-DMAC register,
-> right?
 
-It is. But it is pointless to configure it more than one time after
-ravb_open() has been called as the register content is not changed until IP
-enters reset mode (though ravb_close() now).
+Here is the summary with links:
+  - [v2,net-next] r8169: add support for LED's on RTL8168/RTL8101
+    https://git.kernel.org/netdev/net-next/c/18764b883e15
 
-> 
->> ravb_set_ringparam(), ravb_tx_timeout_work().
-> 
->    I know. Its value is only calculated once, in ravb_probe(), right?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-right
 
-> 
->> I'm afraid we may broke the behavior of these if DBAT setup is moved
-
-I was wrong here. DBAT is not changed by IP while TX/RX is working.
-
-> 
->    Do not be afraid! :-)
-> 
->> in ravb_dmac_init(). This is also
->> valid for setting delay (see patch 10/12).
-> 
->    I don't think there will be a problem either... but maybe we
-> should call it in ravb_emac_init() indeed.
-> 
-> [...]
-> 
-> MBR, Sergey
 
